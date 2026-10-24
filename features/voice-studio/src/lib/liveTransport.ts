@@ -78,6 +78,41 @@ export function float32ToPcm16Base64(float32: Float32Array): string {
 }
 
 /**
+ * Resamples Float32 audio samples from native device rate (e.g. 48kHz / 44.1kHz)
+ * down to target rate (16kHz standard for Gemini Multimodal Live API) using
+ * linear interpolation, and encodes to little-endian 16-bit PCM base64.
+ */
+export function resampleAndConvertToPcm16Base64(
+  float32: Float32Array,
+  fromSampleRate: number,
+  toSampleRate = 16000
+): string {
+  if (!fromSampleRate || fromSampleRate <= 0) fromSampleRate = toSampleRate;
+  if (fromSampleRate === toSampleRate) {
+    return float32ToPcm16Base64(float32);
+  }
+  const ratio = fromSampleRate / toSampleRate;
+  const newLength = Math.max(1, Math.floor(float32.length / ratio));
+  const int16 = new Int16Array(newLength);
+  for (let i = 0; i < newLength; i++) {
+    const originIdx = i * ratio;
+    const low = Math.floor(originIdx);
+    const high = Math.min(low + 1, float32.length - 1);
+    const weight = originIdx - low;
+    const sample = (1 - weight) * float32[low] + weight * float32[high];
+    const s = Math.max(-1, Math.min(1, sample));
+    int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  const bytes = new Uint8Array(int16.buffer);
+  let binary = '';
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
  * Decodes 16-bit little-endian PCM base64 string into a Web Audio AudioBuffer (typically 24kHz).
  * Safe against odd byte lengths and endian mismatch.
  */

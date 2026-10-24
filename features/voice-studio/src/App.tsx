@@ -60,6 +60,7 @@ import {
   evaluateTurnLocal,
   evaluateUtteranceClientSide,
   float32ToPcm16Base64,
+  resampleAndConvertToPcm16Base64,
   LiveTransportMode,
   pcm16Base64ToAudioBuffer,
   reportGeminiLiveSessionDrop,
@@ -1266,15 +1267,80 @@ export default function App() {
   const startLiveCall = async () => {
     if (isLiveConnected || isLiveConnecting) return;
     primeAudioPlayback();
-    if (!micPermWarmedRef.current && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
-      micPermWarmedRef.current = true;
-      void navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((s) => s.getTracks().forEach((tr) => tr.stop()))
-        .catch(() => {
-          micPermWarmedRef.current = false;
-        });
+
+    // 1. Prime Output AudioContext (24kHz for Gemini Live) directly in user gesture
+    try {
+      const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!outputAudioCtxRef.current || outputAudioCtxRef.current.state === 'closed') {
+        const outputCtx = new CtxClass({ sampleRate: 24000 });
+        outputAudioCtxRef.current = outputCtx;
+        nextStartTimeRef.current = outputCtx.currentTime;
+      }
+      if (outputAudioCtxRef.current && outputAudioCtxRef.current.state === 'suspended') {
+        void outputAudioCtxRef.current.resume().catch(() => {});
+      }
+    } catch {
+      // AudioContext fallback
     }
+
+    // 2. Prime Microphone input stream directly in user gesture
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
+        micStreamRef.current = stream;
+
+        const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (!inputAudioCtxRef.current || inputAudioCtxRef.current.state === 'closed') {
+          inputAudioCtxRef.current = new CtxClass();
+        }
+        const inputCtx = inputAudioCtxRef.current;
+        if (inputCtx.state === 'suspended') {
+          void inputCtx.resume().catch(() => {});
+        }
+
+        const source = inputCtx.createMediaStreamSource(stream);
+        const processor = inputCtx.createScriptProcessor(4096, 1, 1);
+        scriptProcessorRef.current = processor;
+
+        processor.onaudioprocess = (e) => {
+          if (isMicMutedRef.current) return;
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+            const pcmBase64 = resampleAndConvertToPcm16Base64(
+              e.inputBuffer.getChannelData(0),
+              inputCtx.sampleRate || 48000,
+              16000
+            );
+            wsRef.current.send(
+              JSON.stringify({
+                realtimeInput: {
+                  mediaChunks: [
+                    {
+                      mimeType: 'audio/pcm;rate=16000',
+                      data: pcmBase64,
+                    },
+                  ],
+                },
+              })
+            );
+          }
+        };
+
+        const muteGain = inputCtx.createGain();
+        muteGain.gain.value = 0;
+        source.connect(processor);
+        processor.connect(muteGain);
+        muteGain.connect(inputCtx.destination);
+      } catch (err) {
+        console.warn('Microphone permission or stream error:', err);
+      }
+    }
+
     setStatusBanner(null);
     setIsLiveConnecting(true);
     setLiveUserDraft('');
@@ -1411,73 +1477,17 @@ export default function App() {
             isLiveConnectedRef.current = true;
             playFiezelSfx('lesson_start');
 
-            // Setup Output Audio Context (24kHz for Gemini Live)
-            if (!outputAudioCtxRef.current || outputAudioCtxRef.current.state === 'closed') {
-              const outputCtx = new AudioContext({ sampleRate: 24000 });
-              outputAudioCtxRef.current = outputCtx;
-              nextStartTimeRef.current = outputCtx.currentTime;
-            }
-            if (outputAudioCtxRef.current.state === 'suspended') {
+            // Resume Audio Contexts if suspended
+            if (outputAudioCtxRef.current && outputAudioCtxRef.current.state === 'suspended') {
               void outputAudioCtxRef.current.resume().catch(() => {});
             }
+            if (inputAudioCtxRef.current && inputAudioCtxRef.current.state === 'suspended') {
+              void inputAudioCtxRef.current.resume().catch(() => {});
+            }
 
-            // Setup Input Mic (match native hardware sample rate or 16kHz)
-            void navigator.mediaDevices
-              ?.getUserMedia({
-                audio: {
-                  echoCancellation: true,
-                  noiseSuppression: true,
-                  autoGainControl: true,
-                },
-              })
-              .then((stream) => {
-                micStreamRef.current = stream;
-                if (!inputAudioCtxRef.current || inputAudioCtxRef.current.state === 'closed') {
-                  inputAudioCtxRef.current = new AudioContext();
-                }
-                const inputCtx = inputAudioCtxRef.current;
-                if (inputCtx.state === 'suspended') {
-                  void inputCtx.resume().catch(() => {});
-                }
-                const source = inputCtx.createMediaStreamSource(stream);
-                const processor = inputCtx.createScriptProcessor(4096, 1, 1);
-                scriptProcessorRef.current = processor;
-
-                processor.onaudioprocess = (e) => {
-                  if (isMicMutedRef.current) return;
-                  if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                    const pcmBase64 = float32ToPcm16Base64(e.inputBuffer.getChannelData(0));
-                    if (isGoogleLive) {
-                      const inputRate = inputCtx.sampleRate || 16000;
-                      wsRef.current.send(
-                        JSON.stringify({
-                          realtimeInput: {
-                            mediaChunks: [
-                              {
-                                mimeType: `audio/pcm;rate=${inputRate}`,
-                                data: pcmBase64,
-                              },
-                            ],
-                          },
-                        })
-                      );
-                    } else {
-                      wsRef.current.send(JSON.stringify({ audio: pcmBase64 }));
-                    }
-                  }
-                };
-                const muteGain = inputCtx.createGain();
-                muteGain.gain.value = 0;
-                source.connect(processor);
-                processor.connect(muteGain);
-                muteGain.connect(inputCtx.destination);
-              })
-              .catch(() => {
-                // Mic optional
-              });
-
-            // If brand new call with 0 turns, prompt AI to speak opening greeting immediately
-            if (!isReconnect && turnsRef.current.length === 0 && isGoogleLive) {
+            // If brand new call, prompt AI to speak opening greeting immediately in Gemini Live voice
+            const hasUserSpoken = turnsRef.current.some((t) => t.speaker === 'user');
+            if (!isReconnect && !hasUserSpoken && isGoogleLive) {
               try {
                 ws.send(
                   JSON.stringify({
@@ -1791,6 +1801,30 @@ export default function App() {
     }
     if (isRecordingPtt) {
       stopPttRecording();
+    }
+    if (micStreamRef.current) {
+      try {
+        micStreamRef.current.getTracks().forEach((track) => track.stop());
+      } catch {
+        // Ignore
+      }
+      micStreamRef.current = null;
+    }
+    if (scriptProcessorRef.current) {
+      try {
+        scriptProcessorRef.current.disconnect();
+      } catch {
+        // Ignore
+      }
+      scriptProcessorRef.current = null;
+    }
+    if (inputAudioCtxRef.current && inputAudioCtxRef.current.state !== 'closed') {
+      try {
+        void inputAudioCtxRef.current.close().catch(() => {});
+      } catch {
+        // Ignore
+      }
+      inputAudioCtxRef.current = null;
     }
     if (liveSilenceTimerRef.current) {
       window.clearTimeout(liveSilenceTimerRef.current);
@@ -2423,9 +2457,9 @@ export default function App() {
                           : isRecordingPtt
                             ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
                             : isLiveConnected
-                              ? isListeningLiveSpeech && !isMicMuted
-                                ? `Mendengarkan... (${formatTimer(callDurationSec)})`
-                                : `LIVE · ${formatTimer(callDurationSec)}`
+                              ? isMicMuted
+                                ? `Mic dibisukan · ${formatTimer(callDurationSec)}`
+                                : `Mendengarkan kamu... (${formatTimer(callDurationSec)})`
                               : 'Siap bicara'}
                       </span>
                     </div>
@@ -2882,44 +2916,80 @@ export default function App() {
             )}
 
             <div className="bg-white rounded-full shadow-[0_4px_20px_rgba(28,22,17,0.08)] border border-black/[0.05] p-1.5 flex items-center gap-1.5 w-full min-w-0">
-              <button
-                type="button"
-                data-testid="ptt-record-btn"
-                disabled={isAnalyzingTurn}
-                onClick={() => {
-                  if (isPlayingAiAudio) {
-                    interruptAiAndStartListening();
-                    if (!isLiveConnected) {
+              {isLiveConnected ? (
+                <button
+                  type="button"
+                  data-testid="live-handsfree-indicator-btn"
+                  onClick={() => {
+                    if (isPlayingAiAudio) {
+                      interruptAiAndStartListening();
+                    }
+                    toggleMuteMic();
+                  }}
+                  className={`px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
+                    isMicMuted
+                      ? 'bg-[#8C2233] text-white hover:bg-[#721B29]'
+                      : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                  }`}
+                  title={
+                    isMicMuted
+                      ? 'Mikrofon dibisukan. Klik untuk aktifkan suara.'
+                      : 'Hands-free aktif. Klik untuk bisukan suara.'
+                  }
+                >
+                  {isMicMuted ? (
+                    <>
+                      <MicOff className="w-3.5 h-3.5 shrink-0 text-white" />
+                      <span>{locale === 'th' ? 'ปิดไมค์' : 'Mic Mati'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      <Mic className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                      <span>{locale === 'th' ? 'แฮนด์ฟรี' : 'Hands-Free'}</span>
+                    </>
+                  )}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  data-testid="ptt-record-btn"
+                  disabled={isAnalyzingTurn}
+                  onClick={() => {
+                    if (isPlayingAiAudio) {
+                      interruptAiAndStartListening();
+                      return;
+                    }
+                    if (isRecordingPtt) {
+                      stopPttRecording();
+                    } else {
                       void startPttRecording();
                     }
-                    return;
-                  }
-                  if (isRecordingPtt) {
-                    stopPttRecording();
-                  } else {
-                    void startPttRecording();
-                  }
-                }}
-                className={`px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
-                  isRecordingPtt
-                    ? 'bg-[#8C2233] text-white'
-                    : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
-                }`}
-                title={isPlayingAiAudio ? 'Sela AI & bicara' : t(locale, 'call.pushToTalk')}
-              >
-                {isRecordingPtt ? (
-                  <MicOff className="w-3.5 h-3.5 shrink-0" />
-                ) : (
-                  <Mic className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
-                )}
-                <span>
-                  {isRecordingPtt
-                    ? `Stop (${pttRecordingSec}s)`
-                    : locale === 'th'
-                      ? 'พูด'
-                      : 'Bicara'}
-                </span>
-              </button>
+                  }}
+                  className={`px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
+                    isRecordingPtt
+                      ? 'bg-[#8C2233] text-white'
+                      : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
+                  }`}
+                  title={isPlayingAiAudio ? 'Sela AI & bicara' : t(locale, 'call.pushToTalk')}
+                >
+                  {isRecordingPtt ? (
+                    <MicOff className="w-3.5 h-3.5 shrink-0" />
+                  ) : (
+                    <Mic className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
+                  )}
+                  <span>
+                    {isRecordingPtt
+                      ? `Stop (${pttRecordingSec}s)`
+                      : locale === 'th'
+                        ? 'พูด'
+                        : 'Bicara'}
+                  </span>
+                </button>
+              )}
 
               <input
                 type="text"
