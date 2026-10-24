@@ -1,7 +1,7 @@
 {
-  "version": "m025-656",
-  "claimedBy": "branch feat/m025-656-unclipped-mochi-paws-camera-framing",
-  "claimedAt": "2026-10-24T11:43:49.545Z",
-  "reason": "fix(mascot): unclipped mochi paws with safe camera framing and natural cuddle kinematics (m025-656)",
+  "version": "m025-657",
+  "claimedBy": "branch feat/m025-657-prominent-wide-mochi-dimensions",
+  "claimedAt": "2026-10-24T12:09:42.544Z",
+  "reason": "feat(mascot): prominent wide mochi proportions and expanded hero viewport (m025-657)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

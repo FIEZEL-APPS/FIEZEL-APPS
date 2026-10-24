@@ -7647,14 +7647,16 @@ body:has(.home-today),
 
 .fz-vissol-mascot-wrap {
   flex-shrink: 0 !important;
-  width: 122px !important;
-  height: 122px !important;
+  width: 154px !important;
+  height: 150px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   position: relative !important;
   cursor: grab !important;
   touch-action: none !important;
+  margin-top: -6px !important;
+  margin-right: -4px !important;
 }
 
 .fz-vissol-mascot-wrap:active {
@@ -7679,10 +7681,10 @@ body:has(.home-today),
 
 .fz-vissol-mascot-cloud-bg {
   position: absolute !important;
-  top: -10px !important;
-  right: -8px !important;
-  width: 134px !important;
-  height: 130px !important;
+  top: -12px !important;
+  right: -10px !important;
+  width: 172px !important;
+  height: 165px !important;
   background: radial-gradient(circle at 60% 45%, #FEF08A 0%, #FEF9C3 40%, rgba(254, 240, 138, 0) 75%) !important;
   border-radius: 50% !important;
   filter: blur(12px) !important;
@@ -8465,12 +8467,12 @@ nav.bottomnav .nav:not(.active) {
     grid-template-columns: repeat(4, 1fr) !important;
   }
   .fz-vissol-mascot-wrap {
-    width: 120px !important;
-    height: 120px !important;
+    width: 160px !important;
+    height: 160px !important;
   }
   .fz-vissol-mascot-img {
-    width: 116px !important;
-    max-height: 120px !important;
+    width: 154px !important;
+    max-height: 160px !important;
   }
 }
 
@@ -8527,12 +8529,12 @@ nav.bottomnav .nav:not(.active) {
   }
 
   .fz-vissol-mascot-wrap {
-    width: 132px !important;
-    height: 132px !important;
+    width: 175px !important;
+    height: 175px !important;
   }
   .fz-vissol-mascot-img {
-    width: 126px !important;
-    max-height: 132px !important;
+    width: 168px !important;
+    max-height: 175px !important;
   }
 }
 
