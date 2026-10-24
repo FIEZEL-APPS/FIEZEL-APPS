@@ -1,7 +1,7 @@
 {
-  "version": "m025-658",
-  "claimedBy": "branch feat/m025-655-gemini-live-pool",
-  "claimedAt": "2026-10-24T12:24:01.145Z",
-  "reason": "feat(voice): m025-658 multi-key gemini live pool with auto failover",
+  "version": "m025-659",
+  "claimedBy": "branch feat/m025-658-natural-canonical-mochi-proportions",
+  "claimedAt": "2026-10-24T12:39:47.667Z",
+  "reason": "fix(mascot): restore natural canonical daifuku proportions with prominent unclipped framing (m025-659)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
