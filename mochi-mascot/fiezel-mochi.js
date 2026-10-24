@@ -122,7 +122,7 @@ export class FiezelMochi {
     this.scene = new THREE.Scene();
 
     this.camera = new THREE.PerspectiveCamera(46, this.width / this.height, 0.1, 100);
-    this.camera.position.set(0, 0.08, 5.80); // Framing: plush, prominent Daifuku Mochi with generous safe margins around ears and paws
+    this.camera.position.set(0, 0.06, 5.20); // Close prominent framing: plush, wide, chubby Daifuku Mochi with comfortable margins
 
 
     this.renderer = new THREE.WebGLRenderer({
@@ -217,19 +217,19 @@ export class FiezelMochi {
       let y = pos.getY(i);
       let z = pos.getZ(i);
 
-      // Base proportions: Width 1.34, Height 1.06, Depth 0.90
-      x *= 1.32;
-      y *= 1.05;
-      z *= 0.89;
+      // Base proportions: Plump, wide, chubby Daifuku Mochi (Option C)
+      x *= 1.38;
+      y *= 1.04;
+      z *= 0.90;
 
       // Organic power curvature (G2 continuous curve, eliminates flat tabletop)
       const signX = Math.sign(x);
       const signY = Math.sign(y);
       const signZ = Math.sign(z);
 
-      const ax = Math.pow(Math.abs(x / 1.32), 0.68) * 1.32 * signX;
-      const ay = Math.pow(Math.abs(y / 1.05), 0.74) * 1.05 * signY;
-      const az = Math.pow(Math.abs(z / 0.89), 0.74) * 0.89 * signZ;
+      const ax = Math.pow(Math.abs(x / 1.38), 0.68) * 1.38 * signX;
+      const ay = Math.pow(Math.abs(y / 1.04), 0.74) * 1.04 * signY;
+      const az = Math.pow(Math.abs(z / 0.90), 0.74) * 0.90 * signZ;
 
       x = x * 0.54 + ax * 0.46;
       y = y * 0.58 + ay * 0.42;
@@ -511,7 +511,7 @@ export class FiezelMochi {
 
     // Left Fox Ear Rig
     this.earL = new THREE.Group();
-    this.earL.position.set(-0.50, 0.96, 0.14);
+    this.earL.position.set(-0.54, 0.96, 0.14);
 
     this.earL_Flex = new THREE.Group();
     this.earL_Flex.add(new THREE.Mesh(earOuterGeo, this.mochiMaterial));
@@ -533,7 +533,7 @@ export class FiezelMochi {
 
     // Right Fox Ear Rig
     this.earR = new THREE.Group();
-    this.earR.position.set(0.50, 0.96, 0.14);
+    this.earR.position.set(0.54, 0.96, 0.14);
 
     this.earR_Flex = new THREE.Group();
     this.earR_Flex.add(new THREE.Mesh(earOuterGeo, this.mochiMaterial));
@@ -1450,13 +1450,13 @@ export class FiezelMochi {
 
     // 1. Arched Headband spanning across crown, seamlessly behind ears (Zero clipping/translucency anomaly)
     const headbandPoints = [
-      new THREE.Vector3(-1.50, 0.18, 0.22),
-      new THREE.Vector3(-1.36, 0.72, -0.04),
-      new THREE.Vector3(-0.80, 1.38, -0.10),
+      new THREE.Vector3(-1.56, 0.18, 0.22),
+      new THREE.Vector3(-1.40, 0.74, -0.04),
+      new THREE.Vector3(-0.84, 1.38, -0.10),
       new THREE.Vector3( 0.00, 1.48, -0.12),
-      new THREE.Vector3( 0.80, 1.38, -0.10),
-      new THREE.Vector3( 1.36, 0.72, -0.04),
-      new THREE.Vector3( 1.50, 0.18, 0.22)
+      new THREE.Vector3( 0.84, 1.38, -0.10),
+      new THREE.Vector3( 1.40, 0.74, -0.04),
+      new THREE.Vector3( 1.56, 0.18, 0.22)
     ];
     const headbandCurve = new THREE.CatmullRomCurve3(headbandPoints);
     const bandGeo = new THREE.TubeGeometry(headbandCurve, 48, 0.068, 16, false);
@@ -1465,11 +1465,11 @@ export class FiezelMochi {
 
     // 1b. Underside Cushion Padding
     const cushionPoints = [
-      new THREE.Vector3(-1.05, 1.10, -0.08),
-      new THREE.Vector3(-0.55, 1.34, -0.10),
+      new THREE.Vector3(-1.08, 1.10, -0.08),
+      new THREE.Vector3(-0.58, 1.34, -0.10),
       new THREE.Vector3( 0.00, 1.40, -0.11),
-      new THREE.Vector3( 0.55, 1.34, -0.10),
-      new THREE.Vector3( 1.05, 1.10, -0.08)
+      new THREE.Vector3( 0.58, 1.34, -0.10),
+      new THREE.Vector3( 1.08, 1.10, -0.08)
     ];
     const cushionCurve = new THREE.CatmullRomCurve3(cushionPoints);
     const cushionPadGeo = new THREE.TubeGeometry(cushionCurve, 32, 0.048, 12, false);
@@ -1480,7 +1480,7 @@ export class FiezelMochi {
     [-1, 1].forEach((side) => {
       const sliderGeo = new THREE.CylinderGeometry(0.082, 0.082, 0.16, 20);
       const slider = new THREE.Mesh(sliderGeo, metallicChromeMat);
-      slider.position.set(side * 1.44, 0.48, 0.10);
+      slider.position.set(side * 1.50, 0.50, 0.10);
       slider.rotation.set(-0.06, 0, -side * 0.38);
       this.headsetGroup.add(slider);
     });
@@ -1488,7 +1488,7 @@ export class FiezelMochi {
     // 2. Chunky, Pillowy Kawaii Earcups (Left & Right)
     const buildCup = (side) => {
       const cup = new THREE.Group();
-      cup.position.set(side * 1.50, 0.14, 0.22);
+      cup.position.set(side * 1.56, 0.14, 0.22);
       cup.rotation.set(0.08, -side * 0.52, -side * 0.10);
 
       // 2a. Plush Cheek Cushion Ring (Marshmallow cream)
