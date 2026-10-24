@@ -843,6 +843,80 @@ export function generateDynamicContextualAiReply(params: {
   const ctx = extractUserConversationContext(params.userText, params.history);
 
   if (params.targetLang === 'ja') {
+    if (params.scenarioId.includes('free')) {
+      // 1. Greetings & Well-being
+      if (
+        /(こんにちは|おはよう|こんばんは|はじめまして|元気|調子|久しぶり|お疲れ)/u.test(params.userText) ||
+        /\b(konnichiwa|ohayou|ohayo|konbanwa|genki|hajimemashite)\b/i.test(uLower)
+      ) {
+        return {
+          aiReply: 'こんにちは！すごく元気ですよ！今日はお話しできてとっても嬉しいです。今日はどんな一日でしたか？',
+          aiReplyTranslationId: 'Halo! Kabarku sangat baik! Hari ini aku senang sekali bisa mengobrol denganmu. Hari ini harimu bagaimana?',
+          aiReplyTranslationTh: 'สวัสดีค่ะ! สบายดีมากเลยค่ะ ดีใจที่ได้คุยกันวันนี้นะคะ วันนี้เป็นอย่างไรบ้างคะ?',
+        };
+      }
+      // 2. Food & Drinks
+      if (
+        /(食べ|飲む|料理|ご飯|ラーメン|寿司|肉|魚|甘い|ケーキ|カフェ|お茶|美味しい|うまい|おいしい)/u.test(params.userText) ||
+        /\b(taberu|nomu|ramen|sushi|oishii|keki|kohi|koohii|cake)\b/i.test(uLower)
+      ) {
+        return {
+          aiReply: 'わあ、すごく美味しそう！聞いてるだけでお腹がすいてきちゃいました！最近食べたもので、一番おすすめは何ですか？',
+          aiReplyTranslationId: 'Wah, terdengar lezat sekali! Mendengarnya saja bikin perutku jadi lapar nih! Makanan apa yang paling kamu sukai akhir-akhir ini?',
+          aiReplyTranslationTh: 'ว้าว ฟังดูน่าอร่อยมากเลยค่ะ! แค่ฟังก็เริ่มหิวแล้ว เมนูที่ชอบที่สุดช่วงนี้คืออะไรคะ?',
+        };
+      }
+      // 3. Hobbies, Anime, Music, Travel, Games
+      if (
+        /(アニメ|漫画|映画|音楽|歌|ゲーム|旅行|散歩|写真|本|読書|スポーツ|趣味|好き)/u.test(params.userText) ||
+        /\b(anime|manga|eiga|ongaku|geemu|game|ryokou|shumi|suki)\b/i.test(uLower)
+      ) {
+        return {
+          aiReply: 'あはは、それめっちゃいいね！私もそういうの大好きだよ！一番おすすめの作品や、楽しかった場所はある？',
+          aiReplyTranslationId: 'Haha, seru banget itu! Aku juga suka hal-hal seperti itu! Ada karya favorit atau tempat seru yang paling kamu rekomendasikan?',
+          aiReplyTranslationTh: 'ฮ่าๆ ยอดเยี่ยมเลยค่ะ! ฉันก็ชอบอะไรแบบนี้เหมือนกัน มีเรื่องที่ชอบหรือสถานที่แนะนำไหมคะ?',
+        };
+      }
+      // 4. Weather, Places, Weekend Plans
+      if (
+        /(天気|晴れ|雨|暑い|寒い|週末|休み|出かけ|どこ|日本|東京|京都)/u.test(params.userText) ||
+        /\b(tenki|ame|hare|atsui|samui|shuumatsu|nihon|tokyo)\b/i.test(uLower)
+      ) {
+        return {
+          aiReply: 'そうなんだ！そっちの天気や季節の雰囲気、すごく気になります！休みの日はいつもどんなふうに過ごすのが好き？',
+          aiReplyTranslationId: 'Begitu ya! Aku penasaran dengan suasana cuaca di tempatmu! Kalau hari libur biasanya kamu paling suka menghabiskan waktu dengan cara bagaimana?',
+          aiReplyTranslationTh: 'อย่างนั้นเหรอคะ! น่าสนใจมากเลย วันหยุดปกติชอบใช้เวลาทำอะไรมากที่สุดเหรอคะ?',
+        };
+      }
+      // 5. Work, Study, Busy, Tired
+      if (
+        /(仕事|勉強|学校|忙しい|疲れ|大変|がんば|残業|テスト)/u.test(params.userText) ||
+        /\b(shigoto|benkyou|benkyo|gakkou|isogashii|tsukareta)\b/i.test(uLower)
+      ) {
+        return {
+          aiReply: '今日もお疲れ様です！毎日本当によく頑張っていますね。息抜きに何か好きなことはできましたか？',
+          aiReplyTranslationId: 'Selamat atas kerja kerasmu hari ini! Kamu hebat selalu berusaha keras setiap hari. Apakah sempat melakukan hal yang kamu sukai untuk refreshing?',
+          aiReplyTranslationTh: 'วันนี้เหนื่อยหน่อยนะคะ สู้ๆ ค่ะ มีเวลาได้ทำสิ่งที่ชอบเพื่อผ่อนคลายบ้างไหมคะ?',
+        };
+      }
+      // 6. Questions to Sensei Nanami
+      if (
+        /(どう|何|なぜ|どうして|先生|七海|好きですか|ありますか|ですか|？|\?)/u.test(params.userText)
+      ) {
+        return {
+          aiReply: '聞いてくれてありがとう！私は日本語でおしゃべりすることと、美味しいお茶を飲むのが大好きだよ！あなたはどう？',
+          aiReplyTranslationId: 'Terima kasih sudah bertanya! Aku paling suka ngobrol santai dalam bahasa Jepang dan minum teh yang enak! Kalau kamu gimana?',
+          aiReplyTranslationTh: 'ขอบคุณที่ถามนะคะ! ฉันชอบคุยภาษาญี่ปุ่นและดื่มชาอร่อยๆ มากที่สุดเลย แล้วคุณล่ะคะเป็นอย่างไรบ้าง?',
+        };
+      }
+      // 7. Default Warm Free Talk
+      return {
+        aiReply: 'うんうん、なるほど！すごく自然にお話しできて素晴らしいですね！それについてもっと詳しく聞かせてくれる？',
+        aiReplyTranslationId: 'Begitu ya, bagus sekali caramu bercerita, sangat mengalir alami! Boleh ceritakan lebih banyak tentang hal itu?',
+        aiReplyTranslationTh: 'เข้าใจแล้วค่ะ พูดคุยได้เป็นธรรมชาติมากเลย ช่วยเล่าเรื่องนั้นเพิ่มเติมอีกนิดได้ไหมคะ?',
+      };
+    }
+
     const isN4 = params.scenarioId.includes('n4');
     if (isN4) {
       if (
@@ -1018,7 +1092,46 @@ export function generateDynamicContextualAiReply(params: {
     };
   }
 
-  // 4. IELTS / B1 Remote Work Discussion
+  // 4. Free Talk with Coach Alex
+  if (params.scenarioId.includes('free')) {
+    if (
+      /\b(hi|hello|hey|morning|evening|how are you|how are things|how do you do)\b/i.test(uLower)
+    ) {
+      return {
+        aiReply: "Hey there! I'm doing awesome, thanks for asking! It is so great connecting with you today. How has your day been going?",
+        aiReplyTranslationId: "Hai! Kabarku luar biasa, terima kasih sudah bertanya! Senang sekali bisa terhubung denganmu hari ini. Bagaimana harimu sejauh ini?",
+        aiReplyTranslationTh: "สวัสดีครับ! ผมสบายดีมาก ขอบคุณที่ถามนะครับ ดีใจที่ได้คุยกันวันนี้ วันนี้ของคุณเป็นอย่างไรบ้างครับ?",
+      };
+    }
+    if (/\b(food|eat|dinner|lunch|breakfast|pizza|burger|noodle|rice|cook|cooking|delicious)\b/i.test(uLower)) {
+      return {
+        aiReply: "Oh man, that sounds so good! You're making me hungry just thinking about it. What's your absolute favorite food to eat?",
+        aiReplyTranslationId: "Wah, terdengar enak banget! Bikin aku lapar cuma membayangkannya. Apa makanan yang paling kamu sukai?",
+        aiReplyTranslationTh: "ว้าว ฟังดูน่าอร่อยมากเลยครับ! แค่คิดก็เริ่มหิวแล้ว อาหารโปรดที่สุดของคุณคืออะไรครับ?",
+      };
+    }
+    if (/\b(movie|film|music|song|game|gaming|hobby|hobbies|travel|reading|book|sports)\b/i.test(uLower)) {
+      return {
+        aiReply: "Haha, no way, that is so cool! I really love that kind of stuff too! What got you interested in it?",
+        aiReplyTranslationId: "Haha, seru banget itu! Aku juga sangat suka hal seperti itu! Apa yang bikin kamu pertama kali tertarik?",
+        aiReplyTranslationTh: "ฮ่าๆ ยอดเยี่ยมไปเลยครับ! ผมก็ชอบเรื่องแบบนี้มากเหมือนกัน อะไรทำให้คุณเริ่มสนใจเหรอครับ?",
+      };
+    }
+    if (/\b(busy|tired|work|working|study|studying|exhausted|deadline|school)\b/i.test(uLower)) {
+      return {
+        aiReply: "You worked really hard today! Make sure you take some time to unwind and relax tonight. How do you usually like to recharge?",
+        aiReplyTranslationId: "Kamu sudah bekerja keras sekali hari ini! Pastikan kamu meluangkan waktu santai malam ini ya. Biasanya kamu suka ngapain buat recharge energi?",
+        aiReplyTranslationTh: "วันนี้คุณเหนื่อยมากเลย เก่งมากครับ คืนนี้อย่าลืมหาเวลาพักผ่อนคลายเครียดนะครับ ปกติชอบชาร์จพลังด้วยวิธีไหนครับ?",
+      };
+    }
+    return {
+      aiReply: "Haha, I love that! That sounds super interesting. Tell me more about that, what happened next?",
+      aiReplyTranslationId: "Haha, aku suka ceritamu! Terdengar seru sekali. Ceritakan lebih banyak dong, apa yang terjadi selanjutnya?",
+      aiReplyTranslationTh: "ฮ่าๆ ฟังดูน่าสนใจมากเลยครับ ช่วยเล่าให้ฟังต่อหน่อยได้ไหมครับว่าเกิดอะไรขึ้นต่อ?",
+    };
+  }
+
+  // 5. IELTS / B1 Remote Work Discussion
   return {
     aiReply:
       'Excellent point. Your clause clearly contrasts the benefits and drawbacks. Do you think companies should allow hybrid schedules in the future to balance productivity and teamwork?',

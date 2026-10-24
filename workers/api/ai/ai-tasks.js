@@ -1890,7 +1890,7 @@
     var maxTokens = spec.maxOutputTokens;
     var isCall = (taskName === 'conversation_turn' || taskName === 'conversation_correct') && isCallInput(a.input);
     if (isCall) {
-      maxTokens = Math.min(maxTokens, 40);
+      maxTokens = Math.min(maxTokens, 90);
     }
     var payload = model && model === MODELS.voiceCall
       ? { messages: [{ role: 'user', content: prompt }], max_tokens: maxTokens }
