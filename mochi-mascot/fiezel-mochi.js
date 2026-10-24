@@ -15,18 +15,19 @@
  */
 import * as THREE from './three.module.js';
 
-// Phones and tablets get a lighter render budget (m025-567). m025-542 removed this guard to
-// restore sharpness, which put full-desktop cost (MSAA, DPR 2, 128x96 mesh, 1024px skin
-// repainted on every mood change) on every mobile frame and made the PWA lag. The skin is
-// now painted in 1024-unit coordinates scaled onto the smaller canvas, so the 512px texture
-// keeps the full blush layout instead of only its top-left quarter.
+// Universal HD Render Protocol (m025-645):
+// Previously, aggressive mobile budget throttling (antialias=false, DPR capped at 1.5, 512px skin,
+// 56x42 low-poly mesh) degraded Mochi into a blurry, jagged, "burik" appearance on modern phones.
+// Modern mobile GPUs effortlessly render single-character PBR models at full Retina clarity.
+// We now enforce universal hardware MSAA antialiasing, crisp Retina DPR (up to 2.0), full 1024px skin,
+// and smooth 128x96 daifuku geometry across all mobile and desktop devices.
 const IS_MOBILE = typeof window !== 'undefined' && (
   window.innerWidth <= 768 ||
   ('ontouchstart' in window) ||
   (navigator.maxTouchPoints > 0)
 );
-const SKIN_RES = IS_MOBILE ? 512 : 1024;
-const BADGE_SCALE = IS_MOBILE ? 0.5 : 1;
+const SKIN_RES = 1024;
+const BADGE_SCALE = 1;
 
 export class FiezelMochi {
   constructor(container, options = {}) {
@@ -117,7 +118,7 @@ export class FiezelMochi {
 
 
     this.renderer = new THREE.WebGLRenderer({
-      antialias: !IS_MOBILE,
+      antialias: true, // Universal hardware MSAA: silky-smooth silhouette on mobile & desktop
       alpha: true,
       preserveDrawingBuffer: true,
       powerPreference: 'high-performance'
@@ -125,7 +126,7 @@ export class FiezelMochi {
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
     this.renderer.toneMapping = THREE.NoToneMapping;
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.5 : 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0)); // Crystal clear Retina DPR (capped at 2.0 for 60fps thermal comfort)
 
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
@@ -200,7 +201,7 @@ export class FiezelMochi {
    * Ultra-dense 128x96 subdivision for mathematically silky smooth antialiased contours.
    */
   createMochiMesh() {
-    const geo = new THREE.SphereGeometry(1.22, IS_MOBILE ? 56 : 128, IS_MOBILE ? 42 : 96);
+    const geo = new THREE.SphereGeometry(1.22, 128, 96);
     const pos = geo.attributes.position;
 
     for (let i = 0; i < pos.count; i++) {

@@ -1,7 +1,7 @@
 {
-  "version": "m025-645",
-  "claimedBy": "branch fix/m025-641-voice-studio-anti-etto-speed",
-  "claimedAt": "2026-10-24T03:58:04.149Z",
-  "reason": "feat(voice-studio): m025-645 free talk open discussion mode, anti-etto filler & speed duplex latency",
+  "version": "m025-646",
+  "claimedBy": "branch fix/m025-645-mobile-hd-mascot",
+  "claimedAt": "2026-10-24T04:25:38.567Z",
+  "reason": "fix(mascot): upgrade 3D Mochi to universal HD Retina clarity on mobile",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
