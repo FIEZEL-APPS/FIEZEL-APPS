@@ -1,8 +1,8 @@
-# FIEZEL Handoff Dossier — Build `m025-637`
+# FIEZEL Handoff Dossier — Build `m025-638`
 ## Pure JLPT N5–N1 Japanese UX, 50 Structured Bunpō Lessons, Live Kanji & JLPT Moshi Modules, Unclipped Minimalist Level Picker, and Level Exam / Placement Fixes
 
-**Tanggal:** 2026-10-24  
-**Build:** `m025-637`  
+**Tanggal:** 2026-10-24
+**Build:** `m025-638`
 **Branch:** `fix/ja-ux-pure-jlpt-n5-n1`
 
 ---
@@ -65,7 +65,7 @@ Hasil eksekusi probe Playwright (`probe-ja-flows.mjs` & `audit-ja-ux-bugs.mjs`):
 
 ## 4. Status Kelulusan Gerbang Mutu Lokal
 
-- `node tools/bump-build.mjs --check` -> **Selaras (`m025-637`)**
+- `node tools/bump-build.mjs --check` -> **Selaras (`m025-638`)**
 - `node tests/id-golden-snapshot-test.js` -> **PASS (13/13 berkas terkunci identik, 5933 literal utuh)**
 - `node tests/th-ui-leak-test.js` -> **PASS (4497 kunci ID/TH 100% paritas)**
 - `node tests/level-grammar-contract-test.js` -> **PASS (18/18 checks)**
@@ -76,5 +76,5 @@ Hasil eksekusi probe Playwright (`probe-ja-flows.mjs` & `audit-ja-ux-bugs.mjs`):
 - `node tests/japanese-course-wiring-test.js` -> **PASS (9/9 asserts)**
 - `node tests/japanese-th-parity-test.js` -> **PASS (8/8 asserts)**
 - `node tests/japanese-vocab-bank-test.js` -> **PASS (9/9 asserts)**
-- `node tests/curriculum-cache-version-test.js` -> **PASS (26 assertions, build `m025-637`)**
+- `node tests/curriculum-cache-version-test.js` -> **PASS (26 assertions, build `m025-638`)**
 - `node tests/gate-registry-test.js` -> **PASS (10/10 checks)**
