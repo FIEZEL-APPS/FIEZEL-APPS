@@ -174,9 +174,12 @@
     viewport.addEventListener('click', function (e) {
       e.stopPropagation();
       try {
-        mochi.triggerHop(0.28);
-        mochi.triggerHandGesture('wave', 1.2);
+        mochi.setMood('happy');
+        if (typeof mochi.holdMood === 'function') mochi.holdMood(3.5);
+        mochi.triggerHop(0.32);
+        mochi.triggerHandGesture('cheer', 2.2);
         if (typeof mochi.triggerEarWiggle === 'function') mochi.triggerEarWiggle(1.3);
+        if (typeof global.uiSfx === 'function') global.uiSfx('paw_greet');
       } catch (_) {}
     });
 
