@@ -52,7 +52,8 @@
     '.coach-strip-face',
     '.quiz-mascot',
     '.jlpt-mascot-slot',
-    '.jlpt-mobile-card'
+    '.jlpt-mobile-card',
+    '.fz-vissol-mascot-wrap'
   ];
 
   function isPracticeHost(host) {
@@ -106,13 +107,6 @@
   function detectSession(host) {
     try {
       if (!host) return 'quiz';
-      if (host.closest('.jlpt-mascot-slot') ||
-          host.closest('.fsl-mascot-slot') ||
-          host.closest('#listeningPanelModal') ||
-          host.closest('.fsl-player') ||
-          (typeof global.__getFiezelState === 'function' && global.__getFiezelState()?.view === 'listening')) {
-        return 'listening';
-      }
       if (host.closest('.writing-stage') ||
           host.closest('.writing-shell') ||
           host.classList.contains('writing-mascot') ||
@@ -125,6 +119,18 @@
           (typeof global.__getFiezelState === 'function' && global.__getFiezelState()?.view === 'reading')) {
         return 'reading';
       }
+      if (host.closest('.jlpt-mascot-slot') ||
+          host.closest('.fsl-mascot-slot') ||
+          host.closest('#listeningPanelModal') ||
+          host.closest('.fsl-player') ||
+          (typeof global.__getFiezelState === 'function' && global.__getFiezelState()?.view === 'listening')) {
+        return 'listening';
+      }
+      if (host.closest('.fz-vissol-mascot-wrap') ||
+          host.classList.contains('fz-vissol-mascot-wrap') ||
+          host.closest('.tactile-welcome-bar')) {
+        return 'home';
+      }
     } catch (_) {}
     return 'quiz';
   }
@@ -132,7 +138,11 @@
   function applySessionAccessories(m, host) {
     if (!m || typeof m.setAccessory !== 'function') return;
     var session = detectSession(host);
-    if (session === 'listening') {
+    if (session === 'home') {
+      m.setAccessory('headset');
+      m.setAura('gold');
+      m.setMood('happy');
+    } else if (session === 'listening') {
       m.setAccessory('headset');
       m.setAura('blue');
     } else if (session === 'reading') {
@@ -470,6 +480,11 @@
       svg.style.opacity = '';
       svg.style.display = '';
     }
+    var fallbackImg = host.querySelector ? host.querySelector('.fz-vissol-mascot-img') : null;
+    if (fallbackImg) {
+      fallbackImg.style.opacity = '';
+      fallbackImg.style.display = '';
+    }
     if (pool.ro) {
       try { pool.ro.unobserve(host); } catch (_) {}
     }
@@ -513,11 +528,16 @@
     host.classList.add('mochi-active');
     hookHost(host);
 
-    // Hide the 2D SVG visually while preserving it in the DOM for a11y & tests
+    // Hide the 2D SVG or fallback image visually while preserving it in the DOM for a11y & tests
     var svg = host.querySelector('.fz-svg');
     if (svg) {
       svg.style.opacity = '0';
       svg.style.display = 'none';
+    }
+    var fallbackImg = host.querySelector('.fz-vissol-mascot-img');
+    if (fallbackImg) {
+      fallbackImg.style.opacity = '0';
+      fallbackImg.style.display = 'none';
     }
 
     host.appendChild(pool.viewport);
@@ -584,12 +604,16 @@
   function outranks(a, b) {
     var ra = isRendered(a), rb = isRendered(b);
     if (ra !== rb) return ra;
+    // Practice sessions & quiz stages strictly take precedence over the home card
+    var aIsHome = a.classList.contains('fz-vissol-mascot-wrap') || !!a.closest('.tactile-welcome-bar');
+    var bIsHome = b.classList.contains('fz-vissol-mascot-wrap') || !!b.closest('.tactile-welcome-bar');
+    if (aIsHome !== bIsHome) return !aIsHome;
     if (a.__mochiSeen !== b.__mochiSeen) return a.__mochiSeen > b.__mochiSeen;
     return a.offsetWidth * a.offsetHeight > b.offsetWidth * b.offsetHeight;
   }
 
   function pickHost() {
-    var mascots = global.document.querySelectorAll('fiezel-mascot');
+    var mascots = global.document.querySelectorAll('fiezel-mascot, .fz-vissol-mascot-wrap');
     var stamp = 0;
     var best = (pool.host && pool.host.isConnected) ? pool.host : null;
     for (var i = 0; i < mascots.length; i++) {
@@ -680,7 +704,10 @@
       for (var j = 0; j < added.length; j++) {
         var n = added[j];
         if (n.nodeType !== 1) continue;
-        if (n.localName === 'fiezel-mascot' || (n.firstElementChild && n.querySelector('fiezel-mascot'))) return true;
+        if (n.localName === 'fiezel-mascot' ||
+            (n.firstElementChild && n.querySelector('fiezel-mascot')) ||
+            (n.classList && n.classList.contains('fz-vissol-mascot-wrap')) ||
+            (n.firstElementChild && n.querySelector('.fz-vissol-mascot-wrap'))) return true;
       }
     }
     return false;

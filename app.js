@@ -11051,8 +11051,8 @@ function todayHomeMarkup(){
     + `<span>${isTh ? 'คุณทำได้แน่นอน!' : 'Kamu pasti bisa!'}</span>`
     + `</div>`
     + `</div>`
-    + `<div class="fz-vissol-mascot-wrap" aria-hidden="true">`
-    + `<div class="fz-vissol-mascot-cloud-bg"></div>`
+    + `<div class="fz-vissol-mascot-wrap" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{if(window.FiezelMochiCompanion?.getInstance()){var m=window.FiezelMochiCompanion.getInstance();m.triggerHop(0.35);m.triggerHandGesture('wave',1.2);if(typeof m.triggerEarWiggle==='function')m.triggerEarWiggle(1.4);if(typeof uiSfx==='function')uiSfx('paw_greet');}}catch(_){}">`
+    + `<div class="fz-vissol-mascot-cloud-bg" aria-hidden="true"></div>`
     + `<img src="./assets/brand/mochi-mascot-headset.png" alt="Mochi Mascot" class="fz-vissol-mascot-img" />`
     + `</div>`
     + (currentStreak > 0 ? `<div class="tactile-streak-badge" style="display:none;" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
@@ -11947,7 +11947,10 @@ function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama k
      percobaan-terputus, gerbang level, hidrasi konstanta) berlaku untuk KEDUANYA -
      memindahkannya ke dalam salah satu cabang adalah cara paling mudah membuat satu
      tata letak diam-diam kehilangan kabar yang harus ia sampaikan. */
-  if(uxOn('todayHome'))setApp(`<section class="fade home-page home-today">${todayHomeMarkup()}</section>`);
+  if(uxOn('todayHome')){
+    setApp(`<section class="fade home-page home-today">${todayHomeMarkup()}</section>`);
+    try{if(window.FiezelMochiCompanion&&typeof window.FiezelMochiCompanion.scan==='function')window.FiezelMochiCompanion.scan();}catch(_){}
+  }
   else setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
