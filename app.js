@@ -1616,7 +1616,8 @@ function recordSkipExamFail(s=state,level='',detail={}){
   const target=String(level||'').toUpperCase();
   if(!LEVELS.includes(target))return false;
   const trust=levelTrustState(s),now=Date.now(),previous=trust.exams[target]||{attempts:0};
-  trust.exams[target]={...previous,attempts:Math.floor(Number(previous.attempts||0))+1,passed:false,lastAt:now,lastScore:Math.max(0,Math.floor(Number(detail.score||0))),lastTotal:Math.max(0,Math.floor(Number(detail.total||0))),lastAccuracy:Math.max(0,Math.min(100,Math.floor(Number(detail.accuracy||0)))),cooldownUntil:now+LEVEL_EXAM_COOLDOWN_MS,weakSkill:String(detail.weakSkill||'').slice(0,80)};
+  const cooldownUntil=detail?.noCooldown?0:(now+LEVEL_EXAM_COOLDOWN_MS);
+  trust.exams[target]={...previous,attempts:Math.floor(Number(previous.attempts||0))+1,passed:false,lastAt:now,lastScore:Math.max(0,Math.floor(Number(detail.score||0))),lastTotal:Math.max(0,Math.floor(Number(detail.total||0))),lastAccuracy:Math.max(0,Math.min(100,Math.floor(Number(detail.accuracy||0)))),cooldownUntil,weakSkill:String(detail.weakSkill||'').slice(0,80)};
   s.levelTrust=trust;
   return true;
 }
@@ -2051,7 +2052,7 @@ function policyTargetMastery(policy){
 }
 function recentSkillAccuracy(skill,before=Infinity,limit=20,level=getActiveLevel()){const key=String(skill||'');if(!key)return null;const xs=(state.history||[]).filter(h=>Number(h?.at||0)<before&&historyMatchesActive(h,level)&&(String(h.skill||'')===key||String(h.target||'')===key)).slice(-limit);return xs.length?Math.round(xs.filter(h=>h.ok).length/xs.length*100):null}
 function beginLearningSession(cfg,total){
-  const now=Date.now(),policy=cfg?.policy||null;state.activeSession={id:`session-${now}-${Math.random().toString(36).slice(2,8)}`,startedAt:now,level:getActiveLevel(),type:String(cfg?.type||'practice'),levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),planned:Math.max(0,Number(total)||0),answered:0,policyId:String(policy?.policyId||'').slice(0,120),policyMode:String(policy?.mode||'').slice(0,30),targetSkill:String(policy?.targetSkill||'').slice(0,80),primaryDomain:String(policy?.primaryDomain||'').slice(0,20),policySource:String(policy?.source||'').slice(0,40),baselineTargetMastery:policyTargetMastery(policy),baselineTargetAccuracy:recentSkillAccuracy(policy?.targetSkill,now,20)};
+  const now=Date.now(),policy=cfg?.policy||null;state.activeSession={id:`session-${now}-${Math.random().toString(36).slice(2,8)}`,startedAt:now,level:getActiveLevel(),type:String(cfg?.type||'practice'),levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),isMoshi:!!cfg?.isMoshi,planned:Math.max(0,Number(total)||0),answered:0,policyId:String(policy?.policyId||'').slice(0,120),policyMode:String(policy?.mode||'').slice(0,30),targetSkill:String(policy?.targetSkill||'').slice(0,80),primaryDomain:String(policy?.primaryDomain||'').slice(0,20),policySource:String(policy?.source||'').slice(0,40),baselineTargetMastery:policyTargetMastery(policy),baselineTargetAccuracy:recentSkillAccuracy(policy?.targetSkill,now,20)};
   /* W1 P1-2 (10-002, 09-003): penanda percobaan-berjalan untuk alat ukur berpenalti.
      Di-settle di TIGA pintu yang sama: selesai bersih (completeActiveSession), keluar sadar
      (abandonActiveSession), dan boot berikutnya (sanitizeState) \u2014 sehingga reload/kill
@@ -2059,7 +2060,7 @@ function beginLearningSession(cfg,total){
      dicermin dari record() supaya rahmat answered==0 (buka lalu keluar tanpa menjawab) tetap
      berlaku di semua pintu. */
   const sType=String(cfg?.type||'');
-  if(sType==='level-exam'||sType==='grammar-skip')state.inflightAttempt={type:sType,levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),startedAt:now,planned:Math.max(0,Number(total)||0),answered:0};
+  if(sType==='level-exam'||sType==='grammar-skip')state.inflightAttempt={type:sType,levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),isMoshi:!!cfg?.isMoshi,startedAt:now,planned:Math.max(0,Number(total)||0),answered:0};
   save();anSessionStarted(state.activeSession);/*A1-EMIT*/return state.activeSession
 }
 function abandonActiveSession(reason='exit'){
@@ -2072,7 +2073,7 @@ function abandonActiveSession(reason='exit'){
      sama (buka, intip soal, keluar kalau terasa berat). Kini: sudah menjawab >=1 soal berarti
      percobaannya terpakai — level-exam mencatat gagal + jeda 24 jam, gerbang lewati materi
      menutup gerbang lesson itu 24 jam. Membuka lalu keluar sebelum menjawab tetap gratis. */
-  if(String(a.type||'')==='level-exam'&&answered>0){try{recordSkipExamFail(state,String(a.levelScope||''),{score:0,total:Number(a.planned||LEVEL_EXAM_SIZE),accuracy:0,weakSkill:'ujian ditinggalkan sebelum selesai'})}catch(_){}}
+  if(String(a.type||'')==='level-exam'&&answered>0){try{recordSkipExamFail(state,String(a.levelScope||''),{score:0,total:Number(a.planned||LEVEL_EXAM_SIZE),accuracy:0,weakSkill:'ujian ditinggalkan sebelum selesai',noCooldown:!!a.isMoshi})}catch(_){}}
   if(String(a.type||'')==='grammar-skip'&&answered>0&&a.skipGateSkill){try{const g=state.grammar[a.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};g.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[a.skipGateSkill]=g}catch(_){}}
   state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();try{queueBrainSyncFlush()}catch(_){}/* Audit F2 */if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome,now);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/return true
 }
@@ -10145,8 +10146,8 @@ function startLevelExam(level){
   const target=String(level||nextVerifiableLevel(state)||'').toUpperCase();
   const availability=levelExamAvailability(target,state);
   if(!availability.ok){
-    if(availability.reason==='cooldown')return showToast(FiezelI18n.t('level.toast-cooldown',{judul:LEVEL_GUARD_COPY.examTitle,level:target,jeda:levelExamCooldownLabel(availability.waitMs)}));
-    if(availability.reason==='not_next')return showToast(FiezelI18n.t('level.toast-berantai',{level:availability.next||verifiedLevel(state)}));
+    if(availability.reason==='cooldown')return showToast(FiezelI18n.t('level.toast-cooldown',{judul:LEVEL_GUARD_COPY.examTitle,level:displayLevel(target),jeda:levelExamCooldownLabel(availability.waitMs)}));
+    if(availability.reason==='not_next')return showToast(FiezelI18n.t('level.toast-berantai',{level:displayLevel(availability.next||verifiedLevel(state))}));
     return showToast(FiezelI18n.t('level.toast-tak-bisa'));
   }
   let questions=[];
@@ -10160,7 +10161,7 @@ function startLevelExam(level){
   // "yang paling sering meleset" dihitung dari jawaban UJIAN INI saja - bukan dari sesi
   // lain yang kebetulan menumpuk di state.wrongAnswers.
   levelExamWeakSkill.mark=Array.isArray(state.wrongAnswers)?state.wrongAnswers.length:0;
-  showToast(FiezelI18n.t('level.exam-start-toast',{title:LEVEL_GUARD_COPY.examTitle,target,size:LEVEL_EXAM_SIZE}));
+  showToast(FiezelI18n.t('level.exam-start-toast',{title:LEVEL_GUARD_COPY.examTitle,target:displayLevel(target),size:LEVEL_EXAM_SIZE}));
   quizLoop({type:'level-exam',count:LEVEL_EXAM_SIZE,pool:questions,factory:x=>x,levelScope:target,noHints:true,preserveOrder:false});
   disarmStageLayerSwap();
 }
@@ -10191,7 +10192,7 @@ function levelExamFloorShortfalls(tally){
   }
   return out;
 }
-function levelExamSettle(examLevel,score,total,accuracy,sectionAnswers){
+function levelExamSettle(examLevel,score,total,accuracy,sectionAnswers,isMoshi=false){
   const target=String(examLevel||'').toUpperCase();
   if(!LEVELS.includes(target))return null;
   const shortfalls=levelExamFloorShortfalls(levelExamSectionTally(sectionAnswers));
@@ -10201,11 +10202,11 @@ function levelExamSettle(examLevel,score,total,accuracy,sectionAnswers){
     try{coreBrainCache=null}catch(_){}
     try{if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(target)}catch(_){}
     const next=nextVerifiableLevel(state);
-    return{passed:true,level:target,message:`${LEVEL_GUARD_COPY.examPass}${next?FiezelI18n.t('level.pass-next',{level:next}):''}`};
+    return{passed:true,level:target,message:`${LEVEL_GUARD_COPY.examPass}${next?FiezelI18n.t('level.pass-next',{level:displayLevel(next)}):''}`};
   }
   const floorNote=shortfalls.map(s=>FiezelI18n.t('level.lantai-butuh',{label:s.label,ok:s.ok,n:s.n,lantai:s.floor})).join(', ');
   const weak=shortfalls.length?shortfalls.map(s=>s.label).join(', '):levelExamWeakSkill();
-  recordSkipExamFail(state,target,{score,total,accuracy,weakSkill:weak});
+  recordSkipExamFail(state,target,{score,total,accuracy,weakSkill:weak,noCooldown:isMoshi});
   const detail=Number(accuracy||0)>=LEVEL_EXAM_PASS&&shortfalls.length?FiezelI18n.t('level.gagal-lantai',{skor:score,total:total,akurasi:accuracy,rincian:floorNote}):`${FiezelI18n.t('level.gagal-skor',{skor:score,total:total,akurasi:accuracy,lulus:LEVEL_EXAM_PASS})}${floorNote?FiezelI18n.t('level.gagal-kurang',{rincian:floorNote}):''}${!shortfalls.length&&weak?` Yang paling sering meleset tadi: ${weak}.`:''}`;
   return{passed:false,level:target,message:`${LEVEL_GUARD_COPY.examFail}${detail}`};
 }
@@ -10527,16 +10528,23 @@ function startKanjiQuiz(targetLevel){
 }
 window.startKanjiQuiz=startKanjiQuiz;
 
-function openJlptMoshiPanel(){
-  const level=getActiveLevel();
+function openJlptMoshiPanel(customLevel){
+  const level=LEVELS.includes(String(customLevel||'').toUpperCase())?String(customLevel).toUpperCase():(LEVELS.includes(getActiveLevel())?getActiveLevel():'A1');
   const jlptName=displayLevel(level);
   const title=FiezelI18n.t('jepang.moshi-modal-title')+' · '+jlptName;
+  const levelChips=['A1','A2','B1','B2','C1'].map(lvl=>{
+    const isAct=lvl===level;
+    const name=displayLevel(lvl);
+    return `<button type="button" class="badge-chip ${isAct?'is-active':''}" onclick="openJlptMoshiPanel('${lvl}')" style="${isAct?'background:var(--accent,#0284c7);color:#fff;font-weight:700;padding:6px 12px;border-radius:20px;border:none;cursor:pointer;':'background:var(--card-bg,#f1f5f9);color:var(--text,#334155);font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid var(--border,#cbd5e1);cursor:pointer;'}">${esc(name)}</button>`;
+  }).join(' ');
+
   const markup=`
     <div class="skill-help-panel">
       <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${FiezelI18n.t('modal.tutup')}"><i data-lucide="x"></i></button>
       <span class="skill-badge">${esc(FiezelI18n.t('jepang.moshi-badge',{level:jlptName}))}</span>
       <h2>${esc(title)}</h2>
       <p class="muted">${esc(FiezelI18n.t('jepang.moshi-desc'))}</p>
+      <div style="display:flex;gap:6px;justify-content:center;margin:12px 0;flex-wrap:wrap;">${levelChips}</div>
       <div class="card" style="margin:14px 0;padding:12px;background:var(--card-bg, #ffffff);">
         <div class="row" style="margin-bottom:6px;"><b>${esc(FiezelI18n.t('jepang.moshi-lbl-level'))}</b><span class="badge" style="font-weight:700;">${esc(jlptName)}</span></div>
         <div class="row" style="margin-bottom:6px;"><b>${esc(FiezelI18n.t('jepang.moshi-lbl-count'))}</b><span>${esc(FiezelI18n.t('jepang.moshi-val-count'))}</span></div>
@@ -10557,8 +10565,14 @@ function openJlptMoshiPanel(){
 window.openJlptMoshiPanel=openJlptMoshiPanel;
 
 function startJlptMoshiExam(targetLevel){
-  const level=targetLevel||getActiveLevel();
-  return startLevelExam(level);
+  const target=String(targetLevel||getActiveLevel()||'A1').toUpperCase();
+  let questions=[];
+  try{questions=buildLevelExamQuestions(target)}catch(error){return showToast(String(error?.message||error))}
+  if(closeModalNow())armStageLayerSwap();
+  levelExamWeakSkill.mark=Array.isArray(state.wrongAnswers)?state.wrongAnswers.length:0;
+  showToast(FiezelI18n.t('jepang.moshi-start-toast',{level:displayLevel(target),size:LEVEL_EXAM_SIZE})||FiezelI18n.t('level.exam-start-toast',{title:LEVEL_GUARD_COPY.examTitle,target:displayLevel(target),size:LEVEL_EXAM_SIZE}));
+  quizLoop({type:'level-exam',count:LEVEL_EXAM_SIZE,pool:questions,factory:x=>x,levelScope:target,isMoshi:true,noHints:true,preserveOrder:false});
+  disarmStageLayerSwap();
 }
 window.startJlptMoshiExam=startJlptMoshiExam;
 function skillHubMarkup(){
@@ -17109,7 +17123,7 @@ function finishQuiz(cfg,score,total,tutorReport){
      level), lulus >=LEVEL_EXAM_PASS% menaikkan verified SATU tangga dan membuka kunci;
      gagal hanya memberi jeda 24 jam untuk level itu. */
   let examVerdict=null;
-  if(cfg&&cfg.type==='level-exam'&&cfg.levelScope){try{examVerdict=levelExamSettle(cfg.levelScope,score,total,accuracy,cfg.__examSectionAnswers)}catch(_){examVerdict=null}}
+  if(cfg&&cfg.type==='level-exam'&&cfg.levelScope){try{examVerdict=levelExamSettle(cfg.levelScope,score,total,accuracy,cfg.__examSectionAnswers,!!cfg.isMoshi)}catch(_){examVerdict=null}}
   /* R2-2: penilaian gerbang "Lewati materi". Lulus (>=LESSON_SKIP_GATE_PASS benar) mengangkat
      mastery lesson ke ambang unlock — TIDAK menimpa bukti yang lebih tinggi; tiap jawaban
      gerbang sudah tercatat lewat updateMastery seperti jawaban biasa, jadi angka aktual yang
@@ -17217,7 +17231,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   const detailsMarkup=(compactResult?summaryPeek+alasanRekap:'')+
     (compactResult?`<details class="acc result-details" data-testid="result-details"><summary>${FiezelI18n.t('quiz.result-details-summary')}</summary><div class="result-details-body">${detailBlocks}</div></details>`:detailBlocks);
   const primaryNext=cfg?.warmupSkill?`<button class="primary" data-testid="result-return-warmup-btn" onclick="openGrammarLesson('${esc(cfg.warmupSkill)}')">${FiezelI18n.t('grammar.kembali-ke-lesson','Lanjut ke Materi Grammar')} <i data-lucide="arrow-right"></i></button>`:nextLessonSkill?`<button class="primary" data-testid="result-next-lesson-btn" onclick="openGrammarLesson('${esc(nextLessonSkill)}')">${FiezelI18n.t('quiz.result-next-lesson-btn')} <i data-lucide="arrow-right"></i></button>`:nextDomain?`<button class="primary" data-testid="result-next-btn" onclick="go('${nextDomain}')">${FiezelI18n.t('quiz.result-next-btn')} <i data-lucide="arrow-right"></i></button>`:'';
-  setApp(`<section class="fade center result-stage${compactResult?' is-compact':''}">${card(`<div class="result-icon"><i data-lucide="${resultProud?'trophy':'book-open'}"></i></div>${starsBlock}<div class="modal-mark">${resultProud?FiezelI18n.t('quiz.result-proud-mark'):FiezelI18n.t('quiz.result-review-mark')}</div><h2>${cfg.placement?FiezelI18n.t('quiz.result-placement-done'):cfg.type==='level-exam'?FiezelI18n.t('quiz.result-exam-done',{title:esc(LEVEL_GUARD_COPY.examTitle),scope:esc(cfg.levelScope||'')}):cfg.type==='grammar-skip'?FiezelI18n.t('quiz.result-skip-done'):FiezelI18n.t('quiz.result-practice-done')}</h2><div class="ring-row"><div class="score" role="img" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${FiezelI18n.t('quiz.result-score',{score,total})}</p>${rewardBlock}${placementLevelBlock}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${detailsMarkup}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:primaryNext?`<div class="result-actions">${primaryNext}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:`<button class="primary" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')} <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
+  setApp(`<section class="fade center result-stage${compactResult?' is-compact':''}">${card(`<div class="result-icon"><i data-lucide="${resultProud?'trophy':'book-open'}"></i></div>${starsBlock}<div class="modal-mark">${resultProud?FiezelI18n.t('quiz.result-proud-mark'):FiezelI18n.t('quiz.result-review-mark')}</div><h2>${cfg.placement?FiezelI18n.t('quiz.result-placement-done'):cfg.type==='level-exam'?(cfg.isMoshi?FiezelI18n.t('jepang.moshi-modal-title')+' · '+esc(displayLevel(cfg.levelScope||'')):FiezelI18n.t('quiz.result-exam-done',{title:esc(LEVEL_GUARD_COPY.examTitle),scope:esc(displayLevel(cfg.levelScope||''))})):cfg.type==='grammar-skip'?FiezelI18n.t('quiz.result-skip-done'):FiezelI18n.t('quiz.result-practice-done')}</h2><div class="ring-row"><div class="score" role="img" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${FiezelI18n.t('quiz.result-score',{score,total})}</p>${rewardBlock}${placementLevelBlock}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${detailsMarkup}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:primaryNext?`<div class="result-actions">${primaryNext}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:`<button class="primary" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')} <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
   // P0-1: skor count-up 0→n% (audit §5: angka tidak pernah melompat). Markup sudah memuat
   // nilai final, jadi lingkungan tanpa animasi tetap benar tanpa satu frame pun berjalan.
   try{countUpScore($('quizScoreCount'),accuracy)}catch(_){}

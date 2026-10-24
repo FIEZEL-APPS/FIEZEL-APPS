@@ -1,7 +1,7 @@
 {
-  "version": "m025-642",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-24T03:01:02.948Z",
-  "reason": "fix(mascot): aesthetic overhaul of 3d mochi headset glasses pencil and lofi listening motion",
+  "version": "m025-643",
+  "claimedBy": "branch fix/jlpt-moshi-interactive-launch",
+  "claimedAt": "2026-10-24T03:22:15.569Z",
+  "reason": "fix(ja-moshi): unlock JLPT Moshi interactive N5-N1 simulations and prevent chained exam lockout (m025-642)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
