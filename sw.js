@@ -244,9 +244,7 @@ self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>
 // dengan DUA pengecualian keras: (1) CACHE aktif tidak pernah disentuh; (2) cache basi
 // yang masih menyimpan bita model neural (path /vendor/) DIPERTAHANKAN - model 152 MB
 // itu mahal diunduh ulang dan siklus hidupnya milik lapisan neural, bukan SW ini.
-self.addEventListener('activate',e=>e.waitUntil(Promise.all([
-  self.clients.claim(),
-  caches.keys().then(keys=>Promise.all(keys.map(async k=>{
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(async k=>{
   if(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE)return caches.delete(k);
   // Wave 1 i18n: generasi cache locale th yang basi ikut dibersihkan di sini - kalau kontrak
   // konten th naik (v1 -> v2), byte generasi lama tidak boleh menumpuk di kuota perangkat
@@ -270,8 +268,7 @@ self.addEventListener('activate',e=>e.waitUntil(Promise.all([
       if(!holdsNeural)return caches.delete(k);
     }catch{}
   }
-})))
-])));
+})))));
 /* Halaman luring yang DISINTESIS, bukan diambil dari cache.
    Disengaja: kalau ia berupa berkas ter-precache, ia akan hilang persis pada satu-satunya
    keadaan yang membutuhkannya (cache kosong). Naskahnya Indonesia karena murid FIEZEL
