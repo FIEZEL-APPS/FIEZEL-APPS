@@ -2048,6 +2048,8 @@ export class FiezelMochi {
       purple: 0x9D65FF,
       blue:   0x3296FF,
       amber:  0xFFAA24,
+      gold:   0xFFD700,
+      cyan:   0x00E5FF,
       green:  0x1EE58F,
       pink:   0xFF5096
     };
@@ -2230,6 +2232,18 @@ export class FiezelMochi {
         this.squish.targetY = 1;
         this.squish.targetZ = 1;
       }, 80);
+
+      // Interactive Tap Detection (dragged less than 12px)
+      const dx = Math.abs(e.clientX - this.dragStartX);
+      const dy = Math.abs(e.clientY - this.dragStartY);
+      if (dx < 12 && dy < 12) {
+        if (typeof this.onTap === 'function') {
+          try { this.onTap(this); } catch (_) {}
+        }
+        try {
+          dom.dispatchEvent(new CustomEvent('mochi-tap', { bubbles: true, detail: { mochi: this } }));
+        } catch (_) {}
+      }
 
       // Smoothly return to neutral forward-facing orientation after 1200ms
       clearTimeout(this._restoreRotTimeout);

@@ -209,6 +209,13 @@ export default function App() {
         if (ttsAudioCtxRef.current.state === 'suspended') {
           void ttsAudioCtxRef.current.resume().catch(() => {});
         }
+        if (!outputAudioCtxRef.current || outputAudioCtxRef.current.state === 'closed') {
+          outputAudioCtxRef.current = new AudioCtx({ sampleRate: 24000 });
+          nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
+        }
+        if (outputAudioCtxRef.current.state === 'suspended') {
+          void outputAudioCtxRef.current.resume().catch(() => {});
+        }
       }
     } catch {
       // Ignore
@@ -1362,14 +1369,14 @@ export default function App() {
           } catch {
             // Ignore
           }
-          if (!isReconnect && liveReconnectAttemptsRef.current < 3) {
+          if (!isReconnect && liveReconnectAttemptsRef.current < 1) {
             liveReconnectAttemptsRef.current += 1;
             void connectDuplex(false);
           } else {
             activateTurnByTurnLiveFallback();
           }
         }
-      }, 4000);
+      }, 3000);
 
       try {
         ws = new WebSocket(targetWsUrl);
@@ -1425,9 +1432,19 @@ export default function App() {
         }
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = async (event: MessageEvent) => {
         try {
-          const msg = JSON.parse(event.data);
+          let rawData = '';
+          if (typeof event.data === 'string') {
+            rawData = event.data;
+          } else if (event.data instanceof Blob) {
+            rawData = await event.data.text();
+          } else if (event.data instanceof ArrayBuffer) {
+            rawData = new TextDecoder().decode(event.data);
+          } else {
+            return;
+          }
+          const msg = JSON.parse(rawData);
           const isGoogleReady = Boolean(msg.setupComplete);
 
           if (isGoogleReady || msg.type === 'ready' || msg.type === 'live_ready') {
@@ -1451,7 +1468,7 @@ export default function App() {
               void outputAudioCtxRef.current.resume().catch(() => {});
             }
 
-            // Setup Input Mic (16kHz for Gemini Live)
+            // Setup Input Mic (match native hardware sample rate or 16kHz)
             void navigator.mediaDevices
               ?.getUserMedia({
                 audio: {
@@ -1463,8 +1480,7 @@ export default function App() {
               .then((stream) => {
                 micStreamRef.current = stream;
                 if (!inputAudioCtxRef.current || inputAudioCtxRef.current.state === 'closed') {
-                  const inputCtx = new AudioContext({ sampleRate: 16000 });
-                  inputAudioCtxRef.current = inputCtx;
+                  inputAudioCtxRef.current = new AudioContext();
                 }
                 const inputCtx = inputAudioCtxRef.current;
                 if (inputCtx.state === 'suspended') {
@@ -1479,13 +1495,16 @@ export default function App() {
                   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
                     const pcmBase64 = float32ToPcm16Base64(e.inputBuffer.getChannelData(0));
                     if (isGoogleLive) {
+                      const inputRate = inputCtx.sampleRate || 16000;
                       wsRef.current.send(
                         JSON.stringify({
                           realtimeInput: {
-                            audio: {
-                              data: pcmBase64,
-                              mimeType: 'audio/pcm;rate=16000',
-                            },
+                            mediaChunks: [
+                              {
+                                mimeType: `audio/pcm;rate=${inputRate}`,
+                                data: pcmBase64,
+                              },
+                            ],
                           },
                         })
                       );
@@ -1714,7 +1733,7 @@ export default function App() {
         if (!settled) {
           settled = true;
           window.clearTimeout(connectTimer);
-          if (!isReconnect && liveReconnectAttemptsRef.current < 3) {
+          if (!isReconnect && liveReconnectAttemptsRef.current < 1) {
             liveReconnectAttemptsRef.current += 1;
             void connectDuplex(false);
           } else {
@@ -1727,7 +1746,7 @@ export default function App() {
         if (!settled) {
           settled = true;
           window.clearTimeout(connectTimer);
-          if (!isReconnect && liveReconnectAttemptsRef.current < 3) {
+          if (!isReconnect && liveReconnectAttemptsRef.current < 1) {
             liveReconnectAttemptsRef.current += 1;
             void connectDuplex(false);
           } else {
@@ -1755,7 +1774,7 @@ export default function App() {
               if (!userHungUpRef.current) {
                 void connectDuplex(true);
               }
-            }, 400);
+            }, 300);
           } else {
             activateTurnByTurnLiveFallback();
           }

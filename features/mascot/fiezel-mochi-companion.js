@@ -157,6 +157,103 @@
     }
   }
 
+  /**
+   * 4-Stage Interactive Mascot Sound & Choreography Cycle
+   * 1. paw_greet:     Chirp vibrato (38 Hz, F4->A4). Signature sound. Mood: wink, gesture: wave, aura: gold, hop: 0.32, earWiggle: 1.3
+   * 2. paw_appear:    Trill roll (24 Hz, ~C5). Perky & curious. Mood: dots, gesture: cheer, aura: blue, hop: 0.24, earWiggle: 1.8
+   * 3. paw_encourage: Purr (26 Hz AM, F2 87Hz). Warm soothing comfort. Mood: hearts, gesture: pout/snuggle, aura: pink, hop: 0.14, earWiggle: 0.7
+   * 4. paw_celebrate: Meow (F4->C5 + shimmer). High joy celebration. Mood: happy, gesture: cheer, aura: green, hop: 0.48, earWiggle: 1.6, fx: 'orbit'
+   */
+  var TOUCH_VOICE_STEPS = [
+    {
+      sfx: 'paw_greet',
+      mood: 'wink',
+      gesture: 'wave',
+      aura: 'gold',
+      hop: 0.32,
+      earWiggle: 1.3,
+      talkDuration: 0.88,
+      holdSec: 3.5,
+      fx: null,
+      title: 'Chirp Greet'
+    },
+    {
+      sfx: 'paw_appear',
+      mood: 'dots',
+      gesture: 'cheer',
+      aura: 'blue',
+      hop: 0.24,
+      earWiggle: 1.8,
+      talkDuration: 0.68,
+      holdSec: 3.2,
+      fx: null,
+      title: 'Trill Pop'
+    },
+    {
+      sfx: 'paw_encourage',
+      mood: 'hearts',
+      gesture: 'pout',
+      aura: 'pink',
+      hop: 0.14,
+      earWiggle: 0.7,
+      talkDuration: 1.48,
+      holdSec: 3.8,
+      fx: null,
+      title: 'Purr Cuddle'
+    },
+    {
+      sfx: 'paw_celebrate',
+      mood: 'happy',
+      gesture: 'cheer',
+      aura: 'green',
+      hop: 0.48,
+      earWiggle: 1.6,
+      talkDuration: 1.78,
+      holdSec: 4.2,
+      fx: 'orbit',
+      title: 'Meow Celebrate'
+    }
+  ];
+  var touchStepIndex = 0;
+  var _touchFxTimer = null;
+
+  function interactTouch(m, overrideIndex) {
+    var mochi = m || pool.mochi;
+    if (!mochi) return null;
+
+    var idx = (typeof overrideIndex === 'number' && overrideIndex >= 0)
+      ? (overrideIndex % TOUCH_VOICE_STEPS.length)
+      : touchStepIndex;
+
+    var step = TOUCH_VOICE_STEPS[idx];
+    if (typeof overrideIndex !== 'number') {
+      touchStepIndex = (touchStepIndex + 1) % TOUCH_VOICE_STEPS.length;
+    }
+
+    try {
+      if (typeof mochi.setMood === 'function') mochi.setMood(step.mood);
+      if (typeof mochi.holdMood === 'function') mochi.holdMood(step.holdSec);
+      if (typeof mochi.setAura === 'function') mochi.setAura(step.aura);
+      if (typeof mochi.setTalking === 'function') mochi.setTalking(true, step.talkDuration);
+      if (typeof mochi.triggerHop === 'function') mochi.triggerHop(step.hop);
+      if (typeof mochi.triggerHandGesture === 'function') mochi.triggerHandGesture(step.gesture, step.holdSec);
+      if (typeof mochi.triggerEarWiggle === 'function') mochi.triggerEarWiggle(step.earWiggle);
+      if (typeof mochi.setFx === 'function') {
+        clearTimeout(_touchFxTimer);
+        mochi.setFx(step.fx);
+        if (step.fx) {
+          _touchFxTimer = setTimeout(function () {
+            if (mochi.fx === step.fx) mochi.setFx(null);
+          }, Math.round(step.talkDuration * 1000) + 400);
+        }
+      }
+      if (typeof global.uiSfx === 'function') {
+        global.uiSfx(step.sfx, { force: true });
+      }
+    } catch (_) {}
+    return step;
+  }
+
   function createPoolInstance(size) {
     var viewport = createViewport();
     var mochi = new global.FiezelMochi(viewport, {
@@ -170,17 +267,14 @@
       height: size.h
     });
 
-    // Interactive tactile tap/click feedback
+    // Wire up tactile tap & click feedback
+    mochi.onTap = function () {
+      interactTouch(mochi);
+    };
+
     viewport.addEventListener('click', function (e) {
       e.stopPropagation();
-      try {
-        mochi.setMood('happy');
-        if (typeof mochi.holdMood === 'function') mochi.holdMood(3.5);
-        mochi.triggerHop(0.32);
-        mochi.triggerHandGesture('cheer', 2.2);
-        if (typeof mochi.triggerEarWiggle === 'function') mochi.triggerEarWiggle(1.3);
-        if (typeof global.uiSfx === 'function') global.uiSfx('paw_greet');
-      } catch (_) {}
+      interactTouch(mochi);
     });
 
     // Responsive ResizeObserver, re-pointed at whichever host holds the viewport
@@ -811,7 +905,10 @@
     getInstance: function () { return pool.mochi; },
     setAccessory: function (acc) { if (pool.mochi && typeof pool.mochi.setAccessory === 'function') pool.mochi.setAccessory(acc); },
     setThinking: function (th) { if (pool.mochi && typeof pool.mochi.setThinking === 'function') pool.mochi.setThinking(th); },
-    setTalking: function (tk, dur) { if (pool.mochi && typeof pool.mochi.setTalking === 'function') pool.mochi.setTalking(tk, dur); }
+    setTalking: function (tk, dur) { if (pool.mochi && typeof pool.mochi.setTalking === 'function') pool.mochi.setTalking(tk, dur); },
+    interact: function (idx) { return interactTouch(pool.mochi, idx); },
+    getVoiceSequence: function () { return TOUCH_VOICE_STEPS; },
+    getCurrentStepIndex: function () { return touchStepIndex; }
   };
 
 })(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : null));

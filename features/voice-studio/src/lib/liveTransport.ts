@@ -236,10 +236,10 @@ export interface GeminiLiveSessionInfo {
 export async function requestGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
   const base =
     resolveCfApiBase() ||
-    (typeof window !== 'undefined' && window.location.origin.includes('fiezel.my.id')
-      ? 'https://api.fiezel.my.id'
-      : '');
-  const url = `${base}/api/voice/live-session`;
+    (typeof window !== 'undefined' && window.FIEZEL_CF_CONFIG?.base
+      ? window.FIEZEL_CF_CONFIG.base
+      : 'https://api.fiezel.my.id');
+  const url = `${base.replace(/\/$/, '')}/api/voice/live-session`;
 
   try {
     const controller = new AbortController();
@@ -284,11 +284,11 @@ export async function reportGeminiLiveSessionDrop(
 ): Promise<void> {
   const base =
     resolveCfApiBase() ||
-    (typeof window !== 'undefined' && window.location.origin.includes('fiezel.my.id')
-      ? 'https://api.fiezel.my.id'
-      : '');
+    (typeof window !== 'undefined' && window.FIEZEL_CF_CONFIG?.base
+      ? window.FIEZEL_CF_CONFIG.base
+      : 'https://api.fiezel.my.id');
   try {
-    await fetch(`${base}/api/voice/report-drop`, {
+    await fetch(`${base.replace(/\/$/, '')}/api/voice/report-drop`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reason, code, keyIndex }),
@@ -849,7 +849,6 @@ function resolveCfApiBase(): string {
   if (typeof window === 'undefined') return '';
   const cfg = window.FIEZEL_CF_CONFIG || getSameOriginParent()?.FIEZEL_CF_CONFIG;
   if (!cfg || cfg.enabled === false) return '';
-  if (cfg.endpoints && typeof cfg.endpoints.ai === 'string' && cfg.endpoints.ai !== 'on') return '';
   return String(cfg.base || '').trim().replace(/\/$/, '');
 }
 
