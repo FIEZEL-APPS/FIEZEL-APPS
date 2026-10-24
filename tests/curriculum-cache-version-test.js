@@ -54,7 +54,7 @@ const path = require('path');
 const __fzRoot = path.join(__dirname, '..');
 const baca = (f) => fs.readFileSync(path.join(__fzRoot, f), 'utf8');
 
-const HALAMAN = ['kurikulum.html', 'misi.html'];
+const HALAMAN = ['kurikulum.html', 'misi.html', 'call.html'];
 
 let lulus = 0;
 const gagal = [];

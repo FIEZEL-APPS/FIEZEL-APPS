@@ -56,11 +56,15 @@ import {
   translateAndPhoneticizeLiveText,
 } from './lib/liveCallHelper';
 import {
-  evaluateTurnFlexible,
+  evaluateTurnLocal,
+  evaluateUtteranceClientSide,
   float32ToPcm16Base64,
+  getThinkingFillers,
   LiveTransportMode,
   pcm16Base64ToAudioBuffer,
+  resolveAiReply,
   resolveLiveCallWebSocketUrls,
+  splitIntoSpeechChunks,
   synthesizeFlexibleTts,
   warmUpVoiceServices,
 } from './lib/liveTransport';
@@ -108,6 +112,8 @@ export default function App() {
   const [turns, setTurns] = useState<CallTurn[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isAnalyzingTurn, setIsAnalyzingTurn] = useState<boolean>(false);
+  // m025-637: true while the REAL AI partner is generating its reply (Mochi "thinking").
+  const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
   const [isPlayingAiAudio, setIsPlayingAiAudio] = useState<boolean>(false);
   const [showHint, setShowHint] = useState<boolean>(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
@@ -164,6 +170,15 @@ export default function App() {
   const ttsSourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const micPermWarmedRef = useRef<boolean>(false);
   const speechWatchdogRef = useRef<number | null>(null);
+  // Chunked neural playback bookkeeping (m025-637): a newer speakAiText call supersedes the
+  // older one, and every pending chunk promise is settled when playback is halted.
+  const speakTokenRef = useRef<number>(0);
+  const playbackSettleRef = useRef<(() => void) | null>(null);
+  const fillerIndexRef = useRef<number>(0);
+  const fillerDoneRef = useRef<Promise<void> | null>(null);
+  const mochiContainerRef = useRef<HTMLDivElement | null>(null);
+  const mochiInstanceRef = useRef<any>(null);
+  const [is3dMochiReady, setIs3dMochiReady] = useState<boolean>(false);
 
   /** Unlocks Web Audio + one persistent HTMLAudioElement inside a user gesture. */
   const primeAudioPlayback = () => {
@@ -234,18 +249,34 @@ export default function App() {
   const activePersona =
     VOICE_PERSONAS[activeScenario.personaId] || VOICE_PERSONAS.coach_alex;
 
-  // Pre-render the scenario's opening line with the neural persona voice so the call
-  // starts speaking instantly (cached in memory by synthesizeFlexibleTts).
+  // Pre-render the scenario's opening line so the call starts speaking with zero lag
+  // without sending concurrent TTS requests that queue on Render's single worker.
   useEffect(() => {
     if (!activeScenario.openingLine) return;
+    let cancelled = false;
     const t = window.setTimeout(() => {
-      void synthesizeFlexibleTts({
-        text: activeScenario.openingLine,
-        targetLang: activeScenario.targetLang,
-        persona: activePersona,
-      });
-    }, 600);
-    return () => window.clearTimeout(t);
+      void (async () => {
+        await synthesizeFlexibleTts({
+          text: activeScenario.openingLine,
+          targetLang: activeScenario.targetLang,
+          persona: activePersona,
+        });
+        // m025-637: pre-render the short neural "thinking" fillers one by one (never in
+        // parallel) so they can play instantly while the real AI reply is generated.
+        for (const filler of getThinkingFillers(activeScenario.targetLang)) {
+          if (cancelled) return;
+          await synthesizeFlexibleTts({
+            text: filler,
+            targetLang: activeScenario.targetLang,
+            persona: activePersona,
+          });
+        }
+      })();
+    }, 300);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
   }, [activeScenario.id]);
 
   const isMeasureMode =
@@ -408,12 +439,17 @@ export default function App() {
         force: attempt > 0,
       });
       if (res?.audioBase64) return res;
-      if (attempt < 2) await new Promise((r) => window.setTimeout(r, 900 * (attempt + 1)));
+      if (attempt < 2) await new Promise((r) => window.setTimeout(r, 350 * (attempt + 1)));
     }
     return null;
   };
 
   const stopNeuralBufferSource = () => {
+    if (playbackSettleRef.current) {
+      const settle = playbackSettleRef.current;
+      playbackSettleRef.current = null;
+      settle();
+    }
     if (ttsSourceNodeRef.current) {
       try {
         ttsSourceNodeRef.current.onended = null;
@@ -446,7 +482,18 @@ export default function App() {
       const bytes = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
       const decoded = await ctx.decodeAudioData(bytes.buffer.slice(0));
-      stopNeuralBufferSource();
+      // Stop only the previous Web Audio node here — NOT the chunk promise that is
+      // currently waiting for this very playback to finish.
+      if (ttsSourceNodeRef.current) {
+        try {
+          ttsSourceNodeRef.current.onended = null;
+          ttsSourceNodeRef.current.stop();
+          ttsSourceNodeRef.current.disconnect();
+        } catch {
+          // Ignore
+        }
+        ttsSourceNodeRef.current = null;
+      }
       const src = ctx.createBufferSource();
       src.buffer = decoded;
       src.playbackRate.value = targetRate;
@@ -463,6 +510,68 @@ export default function App() {
     }
   };
 
+  /**
+   * Plays ONE neural MP3 chunk and resolves when it has finished, failed, or been halted.
+   * HTMLAudio first (element unlocked during the user's tap), then the gesture-unlocked
+   * Web Audio context — never browser `speechSynthesis`.
+   * Resolves `true` when audio actually started.
+   */
+  const playNeuralChunk = (
+    audioBase64: string,
+    audioMime: string,
+    targetRate: number
+  ): Promise<boolean> =>
+    new Promise<boolean>((resolve) => {
+      let settled = false;
+      let started = false;
+      const settle = () => {
+        if (settled) return;
+        settled = true;
+        clearSpeechWatchdog();
+        if (playbackSettleRef.current === settle) playbackSettleRef.current = null;
+        resolve(started);
+      };
+      playbackSettleRef.current = settle;
+
+      const audio = sharedAudioElRef.current || new Audio();
+      const detach = () => {
+        audio.onended = null;
+        audio.onerror = null;
+        audio.onpause = null;
+        if (currentAudioElRef.current === audio) currentAudioElRef.current = null;
+      };
+      detach();
+      audio.muted = false;
+      audio.src = `data:${audioMime};base64,${audioBase64}`;
+      audio.defaultPlaybackRate = targetRate;
+      audio.playbackRate = targetRate;
+      currentAudioElRef.current = audio;
+      const done = () => {
+        detach();
+        settle();
+      };
+      audio.onended = done;
+      audio.onerror = done;
+      // Watchdog: a stalled decoder must never keep the hands-free mic closed forever.
+      speechWatchdogRef.current = window.setTimeout(done, 30000);
+      audio
+        .play()
+        .then(() => {
+          started = true;
+          // Halted from outside (hang-up / newer reply) also ends this chunk.
+          audio.onpause = done;
+        })
+        .catch(async () => {
+          // HTMLAudio blocked outside a tap (hands-free turn on Safari/mobile): play the
+          // EXACT SAME neural MP3 via the unlocked Web Audio context — zero robot voice.
+          detach();
+          if (settled) return;
+          const ok = await playNeuralBase64ViaWebAudio(audioBase64, targetRate, () => settle());
+          if (ok) started = true;
+          else settle();
+        });
+    });
+
   const speakAiText = async (
     text: string,
     preloadedBase64?: string | null,
@@ -470,77 +579,107 @@ export default function App() {
   ) => {
     if (!text.trim()) return;
     const targetRate = overrideRate ?? speechRate;
+    const token = ++speakTokenRef.current;
+
+    // m025-637 pipelined playback: fetch chunk 0 immediately; start fetching chunk i+1 ONLY
+    // after chunk i has arrived (while chunk i is playing on the speaker) so two TTS requests
+    // never compete on Render's single worker.
+    const chunks = preloadedBase64
+      ? [text]
+      : splitIntoSpeechChunks(text, activeScenario.targetLang);
+    if (!chunks.length) chunks.push(text);
+    const fetchChunk = (idx: number) =>
+      idx === 0 && preloadedBase64
+        ? Promise.resolve({ audioBase64: preloadedBase64, audioMimeType: 'audio/mpeg', engine: 'preloaded' })
+        : fetchNeuralVoice(chunks[idx]);
+    let nextAudioJob: Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> | null =
+      fetchChunk(0);
+
+    // Let a "thinking" filler finish its word instead of cutting it off mid-syllable.
+    if (fillerDoneRef.current) {
+      await Promise.race([
+        fillerDoneRef.current,
+        new Promise<void>((r) => window.setTimeout(r, 1200)),
+      ]);
+    }
+    if (token !== speakTokenRef.current) return;
+
     clearSpeechWatchdog();
     stopNeuralBufferSource();
+    if (currentAudioElRef.current) {
+      currentAudioElRef.current.onpause = null;
+      currentAudioElRef.current.pause();
+      currentAudioElRef.current = null;
+    }
+    setIsPlayingAiAudio(true);
+
+    let anyAudio = false;
+    let anyPlayed = false;
     try {
-      if (currentAudioElRef.current) {
-        currentAudioElRef.current.pause();
-        currentAudioElRef.current = null;
-      }
-      setIsPlayingAiAudio(true);
-
-      let audioBase64 = preloadedBase64 || null;
-      let audioMime = 'audio/mpeg';
-
-      if (!audioBase64) {
-        const neural = await fetchNeuralVoice(text);
-        if (neural?.audioBase64) {
-          audioBase64 = neural.audioBase64;
-          audioMime = neural.audioMimeType || 'audio/mpeg';
-        }
-      }
-
-      if (!audioBase64) {
-        setIsPlayingAiAudio(false);
-        setStatusBanner(
-          locale === 'th'
-            ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
-            : 'Suara neural sedang menyambung ulang. Teks balasan tetap tampil — ketuk "Putar Suara" untuk mencoba lagi.'
-        );
-        return;
-      }
-
-      // Reuse the element unlocked during the user's tap (autoplay-safe on iOS/Android).
-      const audio = sharedAudioElRef.current || new Audio();
-      audio.onended = null;
-      audio.onerror = null;
-      audio.muted = false;
-      audio.src = `data:${audioMime};base64,${audioBase64}`;
-      audio.defaultPlaybackRate = targetRate;
-      audio.playbackRate = targetRate;
-      currentAudioElRef.current = audio;
-      const finish = () => {
-        clearSpeechWatchdog();
-        if (currentAudioElRef.current === audio) currentAudioElRef.current = null;
-        setIsPlayingAiAudio(false);
-      };
-      audio.onended = finish;
-      audio.onerror = finish;
-      // Watchdog: a stalled decoder must never keep the hands-free mic closed forever.
-      speechWatchdogRef.current = window.setTimeout(finish, 30000);
-      try {
-        await audio.play();
-        setStatusBanner(null);
-      } catch {
-        // HTMLAudio blocked outside tap gesture (e.g. hands-free turn 10s later on Safari/mobile):
-        // play the EXACT SAME Neural MP3 via the unlocked Web Audio context — zero robot voice.
-        if (currentAudioElRef.current === audio) currentAudioElRef.current = null;
-        const okWebAudio = await playNeuralBase64ViaWebAudio(audioBase64, targetRate, finish);
-        if (okWebAudio) {
+      for (let i = 0; i < chunks.length; i++) {
+        const currentJob = nextAudioJob || fetchChunk(i);
+        const res = await currentJob;
+        if (token !== speakTokenRef.current) return;
+        // Start fetching chunk i+1 NOW while chunk i plays on the speaker
+        nextAudioJob = i + 1 < chunks.length ? fetchChunk(i + 1) : null;
+        if (!res?.audioBase64) continue;
+        anyAudio = true;
+        const ok = await playNeuralChunk(res.audioBase64, res.audioMimeType || 'audio/mpeg', targetRate);
+        if (token !== speakTokenRef.current) return;
+        if (ok) {
+          anyPlayed = true;
           setStatusBanner(null);
-        } else {
-          finish();
+        } else if (!anyPlayed) {
           setStatusBanner(
             locale === 'th'
               ? 'เบราว์เซอร์บล็อกการเล่นอัตโนมัติ แตะ "เล่นเสียง" เพื่อฟังคำตอบ'
               : 'Peramban menahan pemutaran otomatis. Ketuk "Putar Suara" untuk mendengar balasan.'
           );
+          break;
         }
       }
+      if (!anyAudio) {
+        setStatusBanner(
+          locale === 'th'
+            ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
+            : 'Suara neural sedang menyambung ulang. Teks balasan tetap tampil — ketuk "Putar Suara" untuk mencoba lagi.'
+        );
+      }
     } catch {
-      clearSpeechWatchdog();
-      setIsPlayingAiAudio(false);
+      // Ignore — the reply text stays on screen and can be replayed.
+    } finally {
+      if (token === speakTokenRef.current) {
+        clearSpeechWatchdog();
+        setIsPlayingAiAudio(false);
+      }
     }
+  };
+
+  /**
+   * Short neural "listening" filler (e.g. "Hmm, okay…" / 「えーと…」) while the real AI is
+   * still thinking. Only plays when its audio is already cached or arrives within 900 ms,
+   * so it never delays the actual reply.
+   */
+  const isAiThinkingRef = useRef<boolean>(false);
+  const playThinkingFiller = async () => {
+    const fillers = getThinkingFillers(activeScenario.targetLang);
+    const phrase = fillers[fillerIndexRef.current % fillers.length];
+    fillerIndexRef.current += 1;
+    const res = await Promise.race([
+      synthesizeFlexibleTts({
+        text: phrase,
+        targetLang: activeScenario.targetLang,
+        persona: activePersona,
+      }),
+      new Promise<null>((r) => window.setTimeout(() => r(null), 900)),
+    ]);
+    if (!res?.audioBase64 || !isAiThinkingRef.current || isPlayingAiAudio) return;
+    const p = playNeuralChunk(res.audioBase64, res.audioMimeType || 'audio/mpeg', speechRate).then(
+      () => undefined
+    );
+    fillerDoneRef.current = p;
+    await p;
+    if (fillerDoneRef.current === p) fillerDoneRef.current = null;
   };
 
   const handleUnlockPrerequisite = () => {
@@ -562,8 +701,9 @@ export default function App() {
     setIsAnalyzingTurn(true);
     setStatusBanner(null);
 
+    let fillerTimer: number | null = null;
     try {
-      const fallbackEv = await evaluateTurnFlexible({
+      const evalParams = {
         text: trimmed || activeScenario.sampleUtterances[0]?.text || 'Hello',
         scenario: activeScenario,
         persona: activePersona,
@@ -574,19 +714,12 @@ export default function App() {
           speaker: tItem.speaker,
           text: tItem.text,
         })),
-      });
-      const exactTranscript = fallbackEv.userExactTranscript;
-      const ev = fallbackEv;
-      const aiAudioBase64 = fallbackEv.audioBase64 || null;
-      const aiAudioMimeType = fallbackEv.audioMimeType || 'audio/mpeg';
-      if (
-        Array.isArray(fallbackEv.nextSuggestedReplies) &&
-        fallbackEv.nextSuggestedReplies.length > 0
-      ) {
-        setNextSuggestedReplies(fallbackEv.nextSuggestedReplies);
-      } else {
-        setNextSuggestedReplies([]);
-      }
+      };
+
+      // STEP 1 — instant local Braincore grading of the learner's EXACT words.
+      const localEv = evaluateTurnLocal(evalParams);
+      const exactTranscript = localEv.userExactTranscript;
+      const ev = localEv;
 
       const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
       const attemptOutcome = recordSpeakingAttempt(brainState, {
@@ -640,29 +773,59 @@ export default function App() {
         diagnosis,
       };
 
-      const aiTurn: CallTurn = {
-        id: `turn_ai_${Date.now() + 1}`,
-        speaker: 'ai',
-        text: ev.aiReply,
-        translationId: ev.aiReplyTranslationId,
-        translationTh: ev.aiReplyTranslationTh,
-        timestamp: Date.now() + 1,
-        audioBase64: aiAudioBase64 || undefined,
-        audioMimeType: aiAudioMimeType,
-      };
-
-      setTurns((prev) => [...prev, userTurn, aiTurn]);
+      // The learner sees their own words + feedback immediately.
+      setTurns((prev) => [...prev, userTurn]);
       setInputText('');
       setLiveUserDraft('');
       setShowHint(false);
-
-      void speakAiText(ev.aiReply, aiAudioBase64);
       void brainSyncFlush(attemptOutcome.nextState).then(({ nextState }) =>
         setBrainState(nextState)
       );
+
+      // STEP 2 — the REAL AI partner reply (never a silent template swap).
+      isAiThinkingRef.current = true;
+      setIsAiThinking(true);
+      fillerTimer = window.setTimeout(() => {
+        fillerTimer = null;
+        void playThinkingFiller();
+      }, 650);
+
+      const replyEv = await resolveAiReply(evalParams, localEv);
+
+      if (fillerTimer) {
+        window.clearTimeout(fillerTimer);
+        fillerTimer = null;
+      }
+      isAiThinkingRef.current = false;
+      setIsAiThinking(false);
+
+      if (Array.isArray(replyEv.nextSuggestedReplies) && replyEv.nextSuggestedReplies.length > 0) {
+        setNextSuggestedReplies(replyEv.nextSuggestedReplies);
+      } else {
+        setNextSuggestedReplies([]);
+      }
+
+      const aiAudioBase64 = replyEv.audioBase64 || null;
+      const aiTurn: CallTurn = {
+        id: `turn_ai_${Date.now() + 1}`,
+        speaker: 'ai',
+        text: replyEv.aiReply,
+        translationId: replyEv.aiReplyTranslationId,
+        translationTh: replyEv.aiReplyTranslationTh,
+        timestamp: Date.now() + 1,
+        audioBase64: aiAudioBase64 || undefined,
+        audioMimeType: replyEv.audioMimeType || 'audio/mpeg',
+        replySource: replyEv.replySource,
+      };
+
+      setTurns((prev) => [...prev, aiTurn]);
+      void speakAiText(replyEv.aiReply, aiAudioBase64);
     } catch (err) {
       setStatusBanner((err as Error).message || 'Kesalahan jaringan.');
     } finally {
+      if (fillerTimer) window.clearTimeout(fillerTimer);
+      isAiThinkingRef.current = false;
+      setIsAiThinking(false);
       setIsAnalyzingTurn(false);
     }
   };
@@ -747,6 +910,8 @@ export default function App() {
             if (liveSilenceTimerRef.current) {
               window.clearTimeout(liveSilenceTimerRef.current);
             }
+            const lastRes = event.results[event.results.length - 1];
+            const silenceWaitMs = lastRes && lastRes.isFinal ? 550 : 900;
             liveSilenceTimerRef.current = window.setTimeout(() => {
               if (isDisposed) return;
               const toSend = accumulatedSpeech.trim();
@@ -765,7 +930,7 @@ export default function App() {
                   speakingDurationSec: 3,
                 });
               }
-            }, 1350);
+            }, silenceWaitMs);
           }
         };
 
@@ -895,13 +1060,13 @@ export default function App() {
             setLiveUserDraft(clean);
             setInputText(clean);
 
-            // Auto-submit after 1.8s of silence once user has spoken a phrase
+            // Auto-submit after 950ms of silence once user has spoken a phrase
             if (pttSilenceTimerRef.current) {
               window.clearTimeout(pttSilenceTimerRef.current);
             }
             pttSilenceTimerRef.current = window.setTimeout(() => {
               stopPttRecording();
-            }, 1800);
+            }, 950);
           }
         };
 
@@ -996,7 +1161,7 @@ export default function App() {
             'Belum ada suara yang terdengar. Pastikan mikrofon aktif dan ucapkan kalimat dengan jelas, atau ketik di kolom bawah.'
           );
         }
-      }, 240);
+      }, 80);
       return;
     }
 
@@ -1422,6 +1587,8 @@ export default function App() {
     });
     activeSourcesRef.current = [];
     clearSpeechWatchdog();
+    // Supersede any chunked reply still queued so nothing keeps talking after hang-up.
+    speakTokenRef.current += 1;
     stopNeuralBufferSource();
     if (currentAudioElRef.current) {
       try {
@@ -1548,6 +1715,135 @@ export default function App() {
   const lastAiTurn = [...turns].reverse().find((tr) => tr.speaker === 'ai');
   const lastUserTurn = [...turns].reverse().find((tr) => tr.speaker === 'user');
 
+  // Mount authentic 3D Volumetric Daifuku Mochi Mascot (FiezelMochi) inside the Call Stage
+  useEffect(() => {
+    if (activeTab !== 'call' || !prereqStatus.isReady) {
+      if (mochiInstanceRef.current) {
+        try {
+          mochiInstanceRef.current.destroy?.();
+        } catch {
+          // Ignore
+        }
+        mochiInstanceRef.current = null;
+        setIs3dMochiReady(false);
+      }
+      return;
+    }
+
+    const hostEl = mochiContainerRef.current;
+    if (!hostEl) return;
+
+    let cancelled = false;
+
+    const init3dMochi = async () => {
+      try {
+        let MochiCtor = (window as any).FiezelMochi;
+        if (!MochiCtor) {
+          const baseHref = (() => {
+            try {
+              return new URL('.', window.location.href).href;
+            } catch {
+              return './';
+            }
+          })();
+          const candidates = [
+            new URL('mochi-mascot/fiezel-mochi.js', baseHref).href,
+            './mochi-mascot/fiezel-mochi.js',
+            '/app/mochi-mascot/fiezel-mochi.js',
+            '/mochi-mascot/fiezel-mochi.js',
+          ];
+          const dynamicImport = new Function('u', 'return import(u)');
+          for (const url of candidates) {
+            try {
+              const mod = await dynamicImport(url);
+              if (mod && mod.FiezelMochi) {
+                MochiCtor = mod.FiezelMochi;
+                (window as any).FiezelMochi = MochiCtor;
+                break;
+              }
+            } catch {
+              // try next candidate
+            }
+          }
+        }
+        if (cancelled || !MochiCtor || !mochiContainerRef.current) return;
+
+        mochiContainerRef.current.innerHTML = '';
+        const inst = new MochiCtor(mochiContainerRef.current, {
+          mood: 'dots',
+          badge: 'chat_purple',
+          aura: 'purple',
+          showHands: true,
+          showEars: true,
+          showTail: false,
+          width: 156,
+          height: 148,
+        });
+        mochiInstanceRef.current = inst;
+        setIs3dMochiReady(true);
+        inst.triggerEarWiggle?.(1.3);
+      } catch {
+        setIs3dMochiReady(false);
+      }
+    };
+
+    void init3dMochi();
+
+    return () => {
+      cancelled = true;
+      if (mochiInstanceRef.current) {
+        try {
+          mochiInstanceRef.current.destroy?.();
+        } catch {
+          // Ignore
+        }
+        mochiInstanceRef.current = null;
+      }
+      setIs3dMochiReady(false);
+    };
+  }, [activeTab, prereqStatus.isReady]);
+
+  // Synchronize 3D Mochi Mascot expressions, aura & gestures with live call state
+  useEffect(() => {
+    const m = mochiInstanceRef.current;
+    if (!m) return;
+    try {
+      if (isAiThinking && callStateKey !== 'speaking') {
+        // m025-637: visible "listening / thinking" while the real AI composes its reply.
+        m.setMood?.('dots');
+        m.setBadge?.('chat_blue');
+        m.setAura?.('blue');
+        m.retractHands?.();
+        m.triggerEarWiggle?.(1.1);
+      } else if (callStateKey === 'speaking') {
+        m.setMood?.('happy');
+        m.setBadge?.('chat_purple');
+        m.setAura?.('purple');
+        m.triggerHop?.(0.26);
+        m.triggerHandGesture?.('wave', 1.4);
+        m.triggerEarWiggle?.(1.3);
+      } else if (callStateKey === 'recording') {
+        m.setMood?.('dots');
+        m.setBadge?.('chat_purple');
+        m.setAura?.('purple');
+        m.triggerEarWiggle?.(1.2);
+      } else if (callStateKey === 'live') {
+        m.setMood?.('dots');
+        m.setBadge?.('chat_purple');
+        m.setAura?.('purple');
+        m.retractHands?.();
+      } else {
+        m.setMood?.('dots');
+        m.setBadge?.('chat_purple');
+        m.setAura?.('purple');
+        m.setFx?.(null);
+        m.retractHands?.();
+      }
+    } catch {
+      // Ignore
+    }
+  }, [callStateKey, is3dMochiReady, isAiThinking]);
+
   const activeAiLiveText = liveAiDraft.trim() || lastAiTurn?.text || activeScenario.openingLine;
   const activeAiSubtitle = translateAndPhoneticizeLiveText(
     activeAiLiveText,
@@ -1620,54 +1916,57 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen text-[#241A11] flex flex-col">
-      {/* HEADER KACA HANGAT KHAS FIEZEL (Warm Paper + Solar Gold + Maroon) */}
-      <header className="sticky top-0 z-30 bg-[#FFF9EE]/95 backdrop-blur-xl border-b border-[#F0E4CF]">
+    <div className="min-h-screen bg-[#F6F3EC] text-[#1C1611] flex flex-col">
+      {/* TOP BAR BERSIH SATU BARIS (Tanpa Kotak Berlapis) */}
+      <header className="sticky top-0 z-30 bg-[#F6F3EC]/90 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
-            {/* Tombol Kembali ke PWA Utama */}
+          <div className="flex items-center gap-2 min-w-0">
             <a
               href="./index.html"
               onClick={handleBackToPwa}
               data-testid="mitra-kaiwa-back-btn"
-              className="px-2.5 py-1.5 rounded-xl bg-white border border-[#F0E4CF] font-bold text-[#8C2233] hover:border-[#8C2233] cursor-pointer shadow-2xs flex items-center gap-1 transition-all text-xs shrink-0"
-              title="Kembali ke Beranda PWA FIEZEL"
+              className="px-3 py-1.5 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] font-semibold text-[#1C1611] cursor-pointer flex items-center gap-1.5 transition-all text-xs shrink-0"
+              title="Kembali"
             >
               <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
-              <span>{locale === 'th' ? 'กลับ' : 'Kembali'}</span>
+              <span className="hidden sm:inline">{locale === 'th' ? 'กลับ' : 'Kembali'}</span>
             </a>
 
-            {/* Identitas Mitra Kaiwa / Kawan Bicara */}
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              <FiezelBrandCrest className="hidden sm:flex w-8 h-8 rounded-xl shadow-xs shrink-0" />
-              <div className="min-w-0 flex-1">
-                <div className="font-display font-bold text-sm sm:text-base text-[#241A11] leading-tight tracking-tight flex items-center gap-1.5 min-w-0">
-                  <span data-testid="mitra-kaiwa-header-title" className="truncate">
-                    {targetLang === 'ja'
-                      ? locale === 'th'
-                        ? 'คู่สนทนาไควะ'
-                        : 'Mitra Kaiwa'
-                      : locale === 'th'
-                        ? 'คู่สนทนา AI'
-                        : 'Kawan Bicara'}
-                  </span>
-                  <span
-                    className={`w-2 h-2 rounded-full shrink-0 ${
-                      isLiveConnected || isRecordingPtt
-                        ? 'bg-[#2E8B69] animate-ping'
-                        : 'bg-[#2E8B69]'
-                    }`}
-                  />
-                </div>
-                <div className="hidden md:block text-[10px] font-bold uppercase tracking-wider text-[#8C6D1F] truncate">
-                  {targetLang === 'ja'
-                    ? '会話パートナー · Studio Suara AI'
-                    : 'Speaking Partner · Studio Suara AI'}
-                </div>
-              </div>
-            </div>
+            <span
+              data-testid="mitra-kaiwa-header-title"
+              className="sr-only"
+            >
+              {targetLang === 'ja'
+                ? locale === 'th'
+                  ? 'คู่สนทนาไควะ'
+                  : 'Mitra Kaiwa'
+                : locale === 'th'
+                  ? 'คู่สนทนา AI'
+                  : 'Kawan Bicara'}
+            </span>
 
-            {/* Navigasi Segmented Khas FIEZEL (Nonaktif pada mode tunggal Mitra Kaiwa) */}
+            {/* Pemilih Skenario Terintegrasi di Top Bar (Hemat Ruang Vertikal) */}
+            {activeTab === 'call' && (
+              <div className="relative min-w-0">
+                <select
+                  aria-label="Pilih skenario panggilan suara"
+                  value={activeScenario.id}
+                  onChange={(e) => {
+                    stopLiveCall();
+                    setActiveScenarioId(e.target.value);
+                  }}
+                  className="max-w-[185px] sm:max-w-[280px] rounded-full bg-white/90 hover:bg-white px-3.5 py-1.5 text-xs font-semibold text-[#1C1611] shadow-[0_1px_2px_rgba(28,22,17,0.05)] focus:outline-none cursor-pointer truncate"
+                >
+                  {scenariosForLang.map((scen) => (
+                    <option key={scen.id} value={scen.id}>
+                      {scen.level} · {locale === 'th' ? scen.titleTh : scen.titleId}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Navigasi Segmented (Nonaktif pada mode tunggal Mitra Kaiwa) */}
             <nav
               aria-hidden="true"
               style={{ display: 'none' }}
@@ -1676,71 +1975,37 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => handleTabChange('home')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'home'
-                    ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
-                    : 'text-[#6E5E47] hover:text-[#241A11]'
-                }`}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold"
               >
                 {locale === 'th' ? 'หน้าแรก' : 'Beranda'}
               </button>
               <button
                 type="button"
                 onClick={() => handleTabChange('call')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'call'
-                    ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
-                    : 'text-[#6E5E47] hover:text-[#241A11]'
-                }`}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold"
               >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    isLiveConnected ? 'bg-[#2E8B69] animate-ping' : 'bg-[#8C2233]'
-                  }`}
-                />
                 <span>{locale === 'th' ? 'โทรกับ AI' : 'Panggilan AI'}</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleTabChange('braincore')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'braincore'
-                    ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
-                    : 'text-[#6E5E47] hover:text-[#241A11]'
-                }`}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold"
               >
                 Braincore ({Math.round(currentMasteryP * 100)}%)
               </button>
             </nav>
           </div>
 
-          {/* Kontrol Kunci Live, Kursus (EN/JA), Bahasa (ID/TH) & Unduh Patch */}
-          <div className="flex items-center gap-1.5 sm:gap-2 text-xs">
-            <button
-              type="button"
-              onClick={() => {
-                setTempApiKey(geminiApiKey);
-                setIsApiKeyModalOpen(true);
-              }}
-              className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-2xs ${
-                geminiApiKey
-                  ? 'bg-[#EBF7F0] border border-[#2E8B69] text-[#2E8B69]'
-                  : 'bg-white border border-[#F0E4CF] text-[#6E5E47] hover:border-[#FFC700]'
-              }`}
-              title="Atur Google Gemini Multimodal Live API Key pribadi"
-            >
-              <Key className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{geminiApiKey ? 'Gemini Live' : 'Kunci Live'}</span>
-            </button>
-
-            <div className="flex items-center bg-[#FFF3DC] border border-[#F0E4CF] rounded-xl p-0.5">
+          {/* Kontrol Kanan Ringkas: EN/JA Pill, BKT %, API Key */}
+          <div className="flex items-center gap-1.5 text-xs shrink-0">
+            <div className="flex items-center bg-white/90 rounded-full p-0.5 shadow-[0_1px_2px_rgba(28,22,17,0.05)]">
               <button
                 type="button"
                 onClick={() => handleSelectTargetLang('en')}
-                className={`px-2 py-1 rounded-lg font-bold cursor-pointer transition-all ${
+                className={`px-2.5 py-1 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
                   targetLang === 'en'
-                    ? 'bg-[#8C2233] text-[#FFFBF3] shadow-2xs'
-                    : 'text-[#6E5E47] hover:text-[#241A11]'
+                    ? 'bg-[#1C1611] text-white'
+                    : 'text-[#6E5E47] hover:text-[#1C1611]'
                 }`}
               >
                 EN
@@ -1748,10 +2013,10 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => handleSelectTargetLang('ja')}
-                className={`px-2 py-1 rounded-lg font-bold cursor-pointer transition-all ${
+                className={`px-2.5 py-1 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
                   targetLang === 'ja'
-                    ? 'bg-[#8C2233] text-[#FFFBF3] shadow-2xs'
-                    : 'text-[#6E5E47] hover:text-[#241A11]'
+                    ? 'bg-[#1C1611] text-white'
+                    : 'text-[#6E5E47] hover:text-[#1C1611]'
                 }`}
               >
                 JA
@@ -1760,11 +2025,28 @@ export default function App() {
 
             <button
               type="button"
-              onClick={() => handleSelectLocale(locale === 'id' ? 'th' : 'id')}
-              className="px-2 py-1.5 rounded-xl bg-white border border-[#F0E4CF] font-bold text-[#241A11] hover:border-[#FFC700] cursor-pointer shadow-2xs"
-              title="Ganti Bahasa Antarmuka (ID / TH)"
+              data-testid="btn-open-braincore"
+              onClick={() => handleTabChange('braincore')}
+              title="Analitik Braincore"
+              className="px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#5C4E3C] font-mono text-[11px] font-semibold tabular-nums cursor-pointer transition-all"
             >
-              {locale.toUpperCase()}
+              {Math.round(currentMasteryP * 100)}%
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setTempApiKey(geminiApiKey);
+                setIsApiKeyModalOpen(true);
+              }}
+              className={`w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-[0_1px_2px_rgba(28,22,17,0.05)] ${
+                geminiApiKey
+                  ? 'bg-[#E9F7F0] text-[#2E8B69]'
+                  : 'bg-white/90 hover:bg-white text-[#6E5E47] hover:text-[#1C1611]'
+              }`}
+              title="Atur Google Gemini Multimodal Live API Key pribadi"
+            >
+              <Key className="w-3.5 h-3.5" />
             </button>
 
             <a
@@ -1773,11 +2055,9 @@ export default function App() {
               data-testid="download-patch-btn"
               aria-hidden="true"
               style={{ display: 'none' }}
-              className="hidden px-2.5 py-1.5 rounded-xl btn-sun-tactile font-bold items-center gap-1.5 cursor-pointer"
-              title="Unduh kode fitur Voice Studio sebagai Git Patch (.patch)"
+              className="hidden"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Patch</span>
+              Patch
             </a>
           </div>
         </div>
@@ -1785,51 +2065,48 @@ export default function App() {
 
       {/* MODAL PENGATURAN GOOGLE GEMINI MULTIMODAL LIVE KEY */}
       {isApiKeyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#FFFDF9] border border-[#F0E4CF] rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[#8C2233] font-bold">
-                <Key className="w-5 h-5" />
-                <h3 className="font-display text-lg text-[#241A11]">Google AI Studio Gemini Live</h3>
+              <div className="flex items-center gap-2 text-[#1C1611] font-bold">
+                <Key className="w-4 h-4 text-[#8C2233]" />
+                <h3 className="text-base">Google AI Studio Gemini Live</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsApiKeyModalOpen(false)}
-                className="p-1 rounded-xl text-[#6E5E47] hover:bg-[#F5EAD4] cursor-pointer"
+                className="p-1.5 rounded-full text-[#6E5E47] hover:bg-[#F5F1E8] cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <p className="text-xs text-[#6E5E47] leading-relaxed">
-              Gunakan Gemini API Key pribadi Anda untuk mengaktifkan koneksi audio dua arah real-time berlatensi ultra-rendah (<code className="bg-[#F5EAD4] px-1 py-0.5 rounded text-[#8C2233]">gemini-2.0-flash-exp</code>) langsung ke Google AI Studio Live WebSocket (<code className="bg-[#F5EAD4] px-1 py-0.5 rounded text-[#241A11]">wss://generativelanguage.googleapis.com</code>) tanpa server perantara.
+              Opsional: masukkan Gemini API Key pribadi untuk koneksi langsung ke Google AI Studio Live WebSocket.
             </p>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#241A11] block">
-                Gemini API Key (Tersimpan aman di peramban lokal Anda):
-              </label>
               <input
                 type="password"
                 value={tempApiKey}
                 onChange={(e) => setTempApiKey(e.target.value)}
                 placeholder="AIzaSy..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#D5C2A5] bg-white text-xs font-mono focus:outline-none focus:border-[#FFC700] focus:ring-2 focus:ring-[#FFC700]/30"
+                className="w-full px-3.5 py-2.5 rounded-2xl bg-[#F6F3EC] text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#1C1611]/20"
               />
-              <div className="flex items-center justify-between text-[11px] text-[#8C6D1F]">
-                <span>Kunci hanya disimpan di <code className="font-mono">localStorage</code> perangkat ini.</span>
+              <div className="flex items-center justify-between text-[11px] text-[#6E5E47] px-1">
+                <span>Tersimpan di perangkat ini.</span>
                 <a
                   href="https://aistudio.google.com/app/apikey"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#8C2233] font-bold hover:underline"
+                  className="text-[#8C2233] font-semibold hover:underline"
                 >
-                  Dapatkan Kunci Gratis ↗
+                  Dapatkan Kunci ↗
                 </a>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex items-center justify-end gap-2 pt-1">
               {geminiApiKey && (
                 <button
                   type="button"
@@ -1842,9 +2119,9 @@ export default function App() {
                     setIsApiKeyModalOpen(false);
                     setStatusBanner('Gemini Live API Key berhasil dihapus.');
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-[#8C2233] hover:bg-[#FCE8EB] cursor-pointer"
+                  className="px-3.5 py-2 rounded-full text-xs font-semibold text-[#8C2233] hover:bg-[#FDF2F4] cursor-pointer"
                 >
-                  Hapus Kunci
+                  Hapus
                 </button>
               )}
               <button
@@ -1862,13 +2139,13 @@ export default function App() {
                   setIsApiKeyModalOpen(false);
                   setStatusBanner(
                     cleanKey
-                      ? 'Gemini Live API Key aktif! Percakapan suara kini tersambung langsung ke Google AI Studio Live WebSocket.'
+                      ? 'Gemini Live API Key aktif.'
                       : 'Gemini Live API Key dinonaktifkan.'
                   );
                 }}
-                className="px-5 py-2 rounded-xl text-xs font-bold btn-sun-tactile cursor-pointer"
+                className="px-5 py-2 rounded-full text-xs font-semibold bg-[#1C1611] text-white cursor-pointer"
               >
-                Simpan & Gunakan
+                Simpan
               </button>
             </div>
           </div>
@@ -1877,22 +2154,22 @@ export default function App() {
 
       {/* STATUS BANNER GLOBAL */}
       {statusBanner && (
-        <div className="max-w-4xl mx-auto px-4 pt-3 w-full">
-          <div className="rounded-2xl p-3 text-xs font-bold flex items-center justify-between gap-3 bg-[#FFF3DC] border border-[#F0E4CF] text-[#8C6D1F] shadow-2xs animate-fade-in">
+        <div className="max-w-4xl mx-auto px-4 pt-1 w-full">
+          <div className="rounded-2xl px-4 py-2 text-xs font-medium flex items-center justify-between gap-2 bg-white/90 shadow-2xs text-[#5C4E3C]">
             <span>{statusBanner}</span>
             <button
               type="button"
               onClick={() => setStatusBanner(null)}
-              className="text-[#6E5E47] hover:text-[#241A11] cursor-pointer p-0.5"
+              className="text-[#6E5E47] hover:text-[#1C1611] cursor-pointer p-0.5"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
       )}
 
-      {/* RUANG KERJA UTAMA FIEZEL VOICE STUDIO */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-5 pb-10 space-y-5">
+      {/* RUANG KERJA UTAMA VOICE-FIRST */}
+      <main className="flex-1 max-w-4xl mx-auto px-4 pt-2 pb-6 space-y-4 w-full">
         {activeTab === 'home' ? (
           <HomeRedesignView
             locale={locale}
@@ -1914,7 +2191,7 @@ export default function App() {
               setStatusBanner(
                 locale === 'th'
                   ? 'ปลดล็อกคำศัพท์พื้นฐานเรียบร้อยแล้ว!'
-                  : 'Kosakata prasyarat berhasil dikuasai dan dicatat ke Braincore!'
+                  : 'Kosakata prasyarat berhasil dikuasai!'
               );
               void brainSyncFlush(nextState).then(({ nextState: synced }) => setBrainState(synced));
             }}
@@ -1924,86 +2201,23 @@ export default function App() {
           />
         ) : activeTab === 'call' ? (
           <>
-            {/* 1. PITA SKENARIO & MODE LATIHAN KHAS FIEZEL */}
-            <div className="fz-studio-card rounded-2xl p-3 sm:px-4 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                <span className="w-9 h-9 rounded-xl bg-[#FFF3C4] border border-[#E6A800]/40 flex items-center justify-center text-[#8C2233] shrink-0">
-                  <SlidersHorizontal className="w-4 h-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-[#8C6D1F]">
-                    {locale === 'th' ? 'สถานการณ์ปัจจุบัน' : 'SKENARIO PERCAKAPAN AKTIF'}
-                  </div>
-                  <select
-                    aria-label="Pilih skenario panggilan suara"
-                    value={activeScenario.id}
-                    onChange={(e) => {
-                      stopLiveCall();
-                      setActiveScenarioId(e.target.value);
-                    }}
-                    className="w-full bg-transparent text-sm font-bold text-[#241A11] focus:outline-none cursor-pointer truncate"
-                  >
-                    {scenariosForLang.map((scen) => (
-                      <option key={scen.id} value={scen.id}>
-                        {scen.level} · {locale === 'th' ? scen.titleTh : scen.titleId}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between sm:justify-end gap-2.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#F0E4CF] shrink-0">
-                <button
-                  type="button"
-                  data-testid="btn-open-braincore"
-                  onClick={() => handleTabChange('braincore')}
-                  title="Buka Analitik Braincore OLM & Buku Catatan Miskonsepsi"
-                  className="fz-badge-paw font-mono tabular-nums cursor-pointer hover:bg-[#FFF3C4] transition-colors"
-                >
-                  <FiezelPawStamp className="w-3.5 h-3.5 text-[#8C2233]" />
-                  <span>BKT {Math.round(currentMasteryP * 100)}%</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setCustomMeasureOverride(!isMeasureMode)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
-                    isMeasureMode
-                      ? 'bg-[#FDF2F4] border-[#8C2233]/30 text-[#8C2233]'
-                      : 'bg-[#FFF3DC] border-[#F0E4CF] text-[#241A11] hover:bg-[#FFF3C4]'
-                  }`}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#8C2233]" />
-                  <span>
-                    {isMeasureMode
-                      ? locale === 'th'
-                        ? 'โหมดสอบ (ปิดตัวช่วย)'
-                        : 'Mode Ujian (Murni)'
-                      : locale === 'th'
-                        ? 'โหมดฝึกซ้อม (มีตัวช่วย)'
-                        : 'Mode Latihan (Ada Bantuan)'}
-                  </span>
-                </button>
-              </div>
-            </div>
-
             {/* Gerbang Prasyarat Kosakata (Jika BKT < 60%) */}
             {!prereqStatus.isReady ? (
-              <section className="fz-studio-card rounded-3xl p-6 space-y-4">
-                <div className="flex items-center gap-2.5 text-base font-bold text-[#241A11]">
-                  <Lock className="w-5 h-5 text-[#8C2233]" />
+              <section className="bg-white rounded-3xl p-5 shadow-[0_2px_16px_rgba(28,22,17,0.04)] space-y-3">
+                <div className="flex items-center gap-2 text-sm font-bold text-[#1C1611]">
+                  <Lock className="w-4 h-4 text-[#8C2233]" />
                   <span>{t(locale, 'prereq.lockedTitle')}</span>
                 </div>
-                <p className="text-xs sm:text-sm text-[#6E5E47]">
+                <p className="text-xs text-[#6E5E47]">
                   {t(locale, 'prereq.lockedDesc')} (BKT {Math.round(prereqStatus.pMastery * 100)}%)
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {activeScenario.vocabPrereqs.map((v) => (
                     <div
                       key={v.id}
-                      className="bg-[#FFF9EE] border border-[#F0E4CF] rounded-2xl p-3.5 text-xs"
+                      className="bg-[#F6F3EC] rounded-2xl p-3 text-xs"
                     >
-                      <div className="font-bold text-[#241A11] text-sm">{v.term}</div>
+                      <div className="font-bold text-[#1C1611]">{v.term}</div>
                       <div className="text-[#6E5E47] mt-0.5">
                         {locale === 'th' ? v.meaningTh : v.meaningId}
                       </div>
@@ -2013,321 +2227,252 @@ export default function App() {
                 <button
                   type="button"
                   onClick={handleUnlockPrerequisite}
-                  className="w-full py-3.5 rounded-2xl btn-sun-tactile font-bold text-sm flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 rounded-full bg-[#1C1611] text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Unlock className="w-4 h-4" />
+                  <Unlock className="w-3.5 h-3.5" />
                   {t(locale, 'prereq.completeBtn')}
                 </button>
               </section>
             ) : (
               <>
-                {/* 2. KARTU PANGGILAN SUARA AI PAW (dengan Ornamen Neural Emas & Transisi Fading/Scaling) */}
+                {/* 1. PANGGUNG UTAMA PANGGILAN SUARA (Terpusat, Lapang, Tanpa Kotak Dalam Kotak) */}
                 <section
                   data-testid="ai-call-card"
                   data-call-state={callStateKey}
                   data-transport-mode={liveTransportMode}
-                  className={`relative rounded-3xl p-5 sm:p-6 space-y-5 w-full overflow-hidden border-2 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
-                    callStateKey === 'recording'
-                      ? 'bg-gradient-to-br from-[#FDF2F4] via-white to-[#FFF9EE] border-[#8C2233] scale-[1.012] opacity-100 shadow-[0_20px_50px_-12px_rgba(140,34,51,0.22)] ring-2 ring-[#F0A0AC]'
-                      : callStateKey === 'speaking'
-                        ? 'bg-gradient-to-br from-[#FFF3C4] via-white to-[#FFF9EE] border-[#FFC700] scale-[1.012] opacity-100 shadow-[0_20px_50px_-12px_rgba(230,168,0,0.26)] ring-2 ring-[#FFC700]/60'
-                        : callStateKey === 'live'
-                          ? 'bg-gradient-to-br from-[#E9F7F0] via-white to-[#FFF9EE] border-[#2E8B69] scale-[1.012] opacity-100 shadow-[0_20px_50px_-12px_rgba(46,139,105,0.22)] ring-2 ring-[#2E8B69]/40'
-                          : 'fz-studio-card border-[#F0E4CF] scale-100 opacity-95 ring-0'
-                  }`}
+                  className="bg-gradient-to-b from-[#FAF5EB] to-white rounded-3xl px-5 py-5 sm:px-8 sm:py-6 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-black/[0.04] flex flex-col items-center text-center space-y-3.5 w-full"
                 >
-                  {/* Ornamen Konstelasi Neural Emas & Filigree Sudut Khas FIEZEL */}
-                  <FiezelNeuralConstellation
-                    className="absolute inset-x-0 top-0 h-32"
-                    strokeColor="#E6A800"
-                    opacity={0.32}
-                  />
-                  <FiezelCornerOrnament className="absolute -right-2 -top-2 w-28 h-28 opacity-85" />
+                  {/* Baris Meta Atas: Identitas Partner Satu Baris & Pill Mode */}
+                  <div className="w-full flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-1.5 text-[#6E5E47] min-w-0">
+                      <span className="font-bold text-[#1C1611] truncate">{activePersona.name}</span>
+                      <span className="shrink-0">·</span>
+                      <span className="shrink-0">{activeScenario.level}</span>
+                    </div>
 
-                  {/* Baris Atas: Avatar PAW + Status + Tombol Kontrol Panggilan */}
-                  <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 w-full sm:w-auto min-w-0">
-                      {/* Avatar PAW si Kucing Geometris dengan Cincin Aura Fading/Scaling */}
-                      <div className="relative shrink-0">
-                        <span
-                          aria-hidden="true"
-                          className={`pointer-events-none absolute -inset-1.5 rounded-3xl transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                            callStateKey === 'recording'
-                              ? 'bg-[#F0A0AC]/50 border-2 border-[#8C2233] opacity-100 scale-105 fz-aura-pulse'
-                              : callStateKey === 'speaking'
-                                ? 'bg-[#FFC700]/45 border-2 border-[#E6A800] opacity-100 scale-105 fz-aura-pulse'
-                                : callStateKey === 'live'
-                                  ? 'bg-[#2E8B69]/30 border-2 border-[#2E8B69] opacity-100 scale-105 fz-aura-pulse'
-                                  : 'opacity-0 scale-90'
-                          }`}
-                        />
-                        <img
-                          src={
+                    <button
+                      type="button"
+                      onClick={() => setCustomMeasureOverride(!isMeasureMode)}
+                      className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer shrink-0 ${
+                        isMeasureMode
+                          ? 'bg-[#FDF2F4] text-[#8C2233]'
+                          : 'bg-[#F5F1E8] text-[#5C4E3C] hover:text-[#1C1611]'
+                      }`}
+                    >
+                      {isMeasureMode
+                        ? locale === 'th'
+                          ? 'โหมดสอบ'
+                          : 'Mode Ujian'
+                        : locale === 'th'
+                          ? 'โหมดฝึกซ้อม'
+                          : 'Mode Latihan'}
+                    </button>
+                  </div>
+
+                  {/* Mascot 3D Mochi Terpusat + Pill Status Panggilan */}
+                  <div className="flex flex-col items-center space-y-1.5">
+                    <div
+                      onClick={() => {
+                        const m = mochiInstanceRef.current;
+                        if (m) {
+                          try {
+                            m.triggerHop?.(0.28);
+                            m.triggerHandGesture?.('wave', 1.2);
+                            m.triggerEarWiggle?.(1.3);
+                          } catch {}
+                        }
+                      }}
+                      className="relative w-[156px] h-[148px] flex items-center justify-center cursor-pointer select-none"
+                    >
+                      <div
+                        ref={mochiContainerRef}
+                        data-testid="mochi-3d-stage"
+                        className="w-[156px] h-[148px] flex items-center justify-center"
+                      />
+                      <img
+                        src={
                             isPlayingAiAudio
                               ? '/assets/brand/paw-mochi-speaking.svg'
                               : '/assets/brand/paw-mochi-idle.svg'
                           }
-                          onError={(e) => {
-                            const fallback = isPlayingAiAudio
-                              ? './assets/brand/paw-mochi-speaking.svg'
-                              : './assets/brand/paw-mochi-idle.svg';
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = fallback;
-                          }}
-                          alt="PAW"
-                          className={`relative z-10 w-16 h-16 sm:w-18 sm:h-18 shrink-0 rounded-2xl object-contain p-1.5 border-2 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-                            callStateKey === 'recording'
-                              ? 'bg-[#FFF9EE] border-[#8C2233] scale-105 shadow-md'
-                              : callStateKey === 'speaking'
-                                ? 'bg-[#FFF3C4] border-[#FFC700] scale-105 shadow-md'
-                                : callStateKey === 'live'
-                                  ? 'bg-[#E9F7F0] border-[#2E8B69] scale-105 shadow-md'
-                                  : 'bg-[#FFF9EE] border-[#F0E4CF] scale-100 shadow-xs'
-                          }`}
-                        />
-                      </div>
-
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <FiezelPawStamp className="w-3.5 h-3.5 text-[#8C2233]" />
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C2233]">
-                            {activePersona.accentLabel} · {activeScenario.level}
-                          </span>
-                        </div>
-                        <h1 className="font-display text-xl sm:text-2xl font-bold text-[#241A11] leading-none flex items-center gap-1.5 flex-wrap">
-                          <span>PAW · {activePersona.name}</span>
-                          <FiezelSparkleOrnament className="w-5 h-5" />
-                        </h1>
-
-                        {/* Kapsul Status Animasi Fading & Scaling */}
-                        <div className="pt-1 flex flex-wrap items-center gap-2">
-                          <div
-                            key={callStateKey}
-                            data-testid="ai-call-status-pill"
-                            className={`fz-status-transition inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono tabular-nums transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                              callStateKey === 'recording'
-                                ? 'bg-[#FDF2F4] border-[#8C2233] text-[#8C2233] scale-[1.03] opacity-100'
-                                : callStateKey === 'speaking'
-                                  ? 'bg-[#FFF3C4] border-[#E6A800] text-[#241A11] scale-[1.03] opacity-100'
-                                  : callStateKey === 'live'
-                                    ? 'bg-[#E9F7F0] border-[#2E8B69] text-[#2E8B69] scale-[1.03] opacity-100'
-                                    : 'bg-[#FFF3DC] border-[#F0E4CF] text-[#6E5E47] scale-100 opacity-90'
-                            }`}
-                          >
-                            <span
-                              aria-hidden="true"
-                              className={`w-2 h-2 rounded-full shrink-0 transition-all duration-500 ${
-                                callStateKey === 'recording'
-                                  ? 'bg-[#8C2233] scale-125 animate-ping'
-                                  : callStateKey === 'speaking'
-                                    ? 'bg-[#E6A800] scale-125 animate-pulse'
-                                    : callStateKey === 'live'
-                                      ? 'bg-[#2E8B69] scale-125 animate-pulse'
-                                      : 'bg-[#2E8B69] scale-95'
-                              }`}
-                            />
-                            <span
-                              data-testid="ai-call-status-text"
-                              className={`transition-all duration-300 ${
-                                callStateKey === 'ready' ? 'font-semibold' : 'font-bold'
-                              }`}
-                            >
-                              {isPlayingAiAudio
-                                ? isLiveConnected
-                                  ? `PAW berbicara... (${formatTimer(callDurationSec)})`
-                                  : 'Sedang berbicara...'
-                                : isRecordingPtt
-                                  ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
-                                  : isLiveConnected
-                                    ? isListeningLiveSpeech && !isMicMuted
-                                      ? `🎙️ Mendengarkan... (${formatTimer(callDurationSec)})`
-                                      : `LIVE · ${formatTimer(callDurationSec)}`
-                                    : 'Siap bicara'}
-                            </span>
-
-                            {/* Waveform Suara Reaktif 4-Bar */}
-                            <span
-                              aria-hidden="true"
-                              className={`inline-flex items-end gap-0.5 h-3 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                                isPlayingAiAudio || isRecordingPtt || isLiveConnected
-                                  ? 'opacity-100 scale-100 w-3.5 ml-0.5'
-                                  : 'opacity-0 scale-75 w-0 overflow-hidden'
-                              }`}
-                            >
-                              <i
-                                className={`w-0.5 h-2 rounded-full fz-wave-bar-1 ${
-                                  callStateKey === 'recording' ? 'bg-[#8C2233]' : 'bg-[#E6A800]'
-                                }`}
-                              />
-                              <i
-                                className={`w-0.5 h-3 rounded-full fz-wave-bar-2 ${
-                                  callStateKey === 'recording' ? 'bg-[#8C2233]' : 'bg-[#E6A800]'
-                                }`}
-                              />
-                              <i
-                                className={`w-0.5 h-1.5 rounded-full fz-wave-bar-3 ${
-                                  callStateKey === 'recording' ? 'bg-[#8C2233]' : 'bg-[#E6A800]'
-                                }`}
-                              />
-                              <i
-                                className={`w-0.5 h-2.5 rounded-full fz-wave-bar-4 ${
-                                  callStateKey === 'recording' ? 'bg-[#8C2233]' : 'bg-[#E6A800]'
-                                }`}
-                              />
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                        onError={(e) => {
+                          const fallback = isPlayingAiAudio
+                            ? './assets/brand/paw-mochi-speaking.svg'
+                            : './assets/brand/paw-mochi-idle.svg';
+                          if (e.currentTarget.getAttribute('src') !== fallback) {
+                            e.currentTarget.setAttribute('src', fallback);
+                          }
+                        }}
+                        alt="Mochi"
+                        style={{ display: is3dMochiReady ? 'none' : 'block' }}
+                        className="w-16 h-16 rounded-full object-contain p-1.5 bg-white shadow-2xs"
+                      />
                     </div>
 
-                    {/* Tombol Aksi Panggilan Khas FIEZEL */}
-                    <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                      <button
-                        type="button"
-                        onClick={() => setSpeechRate(speechRate === 1.0 ? 0.8 : 1.0)}
-                        className="px-2.5 sm:px-3 py-2.5 rounded-xl bg-[#FFF3DC] hover:bg-[#FFF3C4] border border-[#F0E4CF] text-[#241A11] text-xs font-mono font-bold cursor-pointer transition-all shrink-0"
-                        title="Ubah kecepatan bicara PAW (1.0x Normal / 0.8x Lambat)"
-                      >
-                        {speechRate === 1.0 ? '1.0x' : '0.8x'}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const lastAi = [...turns].reverse().find((tr) => tr.speaker === 'ai');
-                          if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64);
-                        }}
-                        className={`flex-1 sm:flex-initial justify-center px-3 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-300 ${
-                          callStateKey === 'speaking'
-                            ? 'bg-[#FFF3C4] text-[#241A11] border-2 border-[#FFC700] scale-105'
-                            : 'bg-[#FFF3DC] hover:bg-[#FFF3C4] border border-[#F0E4CF] text-[#241A11] scale-100'
+                    <div
+                      key={callStateKey}
+                      data-testid="ai-call-status-pill"
+                      className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] font-medium text-[#5C4E3C]"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                          callStateKey === 'recording'
+                            ? 'bg-[#8C2233] animate-ping'
+                            : callStateKey === 'speaking'
+                              ? 'bg-[#E6A800] animate-pulse'
+                              : callStateKey === 'live'
+                                ? 'bg-[#2E8B69] animate-pulse'
+                                : 'bg-[#2E8B69]'
                         }`}
-                      >
-                        <Volume2 className="w-4 h-4 text-[#8C2233] shrink-0" />
-                        <span>
-                          {callStateKey === 'speaking' ? 'Diputar...' : 'Putar Suara'}
-                        </span>
-                      </button>
+                      />
+                      <span data-testid="ai-call-status-text">
+                        {isAiThinking && !isPlayingAiAudio
+                          ? locale === 'th'
+                            ? 'Mochi กำลังคิด…'
+                            : 'Mochi sedang berpikir…'
+                          : isPlayingAiAudio
+                          ? isLiveConnected
+                            ? `PAW berbicara... (${formatTimer(callDurationSec)})`
+                            : 'Sedang berbicara...'
+                          : isRecordingPtt
+                            ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
+                            : isLiveConnected
+                              ? isListeningLiveSpeech && !isMicMuted
+                                ? `Mendengarkan... (${formatTimer(callDurationSec)})`
+                                : `LIVE · ${formatTimer(callDurationSec)}`
+                              : 'Siap bicara'}
+                      </span>
+                    </div>
+                  </div>
 
-                      {!isLiveConnected ? (
+                  {/* Subtitle Spotlight Terbuka (Tanpa Kotak Dalam Kotak) */}
+                  <div
+                    data-testid="live-translation-hud"
+                    className="max-w-xl mx-auto space-y-1.5 px-1"
+                  >
+                    {isAiThinking ? (
+                      <div
+                        data-testid="live-hud-ai-thinking"
+                        aria-live="polite"
+                        className="flex items-center justify-center gap-1.5 py-1.5"
+                      >
+                        <span className="sr-only">
+                          {locale === 'th' ? 'Mochi กำลังคิดคำตอบ' : 'Mochi sedang menyiapkan jawaban'}
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce [animation-delay:-0.3s]" />
+                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce [animation-delay:-0.15s]" />
+                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce" />
+                      </div>
+                    ) : (
+                      <>
+                        <p
+                          data-testid="live-hud-ai-text"
+                          data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
+                          className="text-base sm:text-lg font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
+                        >
+                          {activeAiLiveText}
+                        </p>
+
+                        {!isMeasureMode && showTranslations && (
+                          <p
+                            data-testid="live-hud-ai-translation"
+                            className="text-xs sm:text-sm text-[#6E5E47] leading-relaxed break-words"
+                          >
+                            {locale === 'th'
+                              ? activeAiSubtitle.translationTh
+                              : activeAiSubtitle.translationId}
+                          </p>
+                        )}
+
+                        {!liveAiDraft.trim() && lastAiTurn?.replySource === 'offline-template' && (
+                          <span
+                            data-testid="live-hud-offline-label"
+                            className="inline-block px-2.5 py-0.5 rounded-full bg-[#FFF4E0] text-[10px] font-semibold text-[#8A5A00]"
+                          >
+                            {locale === 'th'
+                              ? 'โหมดออฟไลน์ · ประโยคฝึก ไม่ใช่ AI'
+                              : 'Mode offline · kalimat latihan, bukan AI'}
+                          </span>
+                        )}
+                      </>
+                    )}
+
+                    {activeUserSubtitle && (
+                      <div className="pt-1">
+                        <span className="inline-block px-3 py-1 rounded-full bg-[#F5F1E8] text-xs text-[#5C4E3C]">
+                          <strong className="font-semibold text-[#1C1611]">Kamu:</strong> "{activeUserSubtitle.text}"
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Kontrol Panggilan Pill Terpusat */}
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setSpeechRate(speechRate === 1.0 ? 0.8 : 1.0)}
+                      className="px-3 py-2 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#5C4E3C] text-xs font-mono font-semibold cursor-pointer transition-colors"
+                      title="Kecepatan bicara (1.0x / 0.8x)"
+                    >
+                      {speechRate === 1.0 ? '1.0x' : '0.8x'}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const lastAi = [...turns].reverse().find((tr) => tr.speaker === 'ai');
+                        if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64);
+                      }}
+                      className="px-3.5 py-2 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+                    >
+                      <Volume2 className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
+                      <span>{callStateKey === 'speaking' ? 'Diputar...' : 'Putar Suara'}</span>
+                    </button>
+
+                    {!isLiveConnected ? (
+                      <button
+                        type="button"
+                        disabled={isLiveConnecting}
+                        onClick={startLiveCall}
+                        className="px-5 py-2 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-60"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>{isLiveConnecting ? 'Menyambungkan...' : 'Telepon Live'}</span>
+                      </button>
+                    ) : (
+                      <>
                         <button
                           type="button"
-                          disabled={isLiveConnecting}
-                          onClick={startLiveCall}
-                          className="flex-1 sm:flex-initial justify-center px-4 py-2.5 rounded-xl btn-maroon-tactile font-bold text-xs flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                          onClick={toggleMuteMic}
+                          className={`w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-colors ${
+                            isMicMuted
+                              ? 'bg-[#B8432D] text-white'
+                              : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
+                          }`}
+                          aria-label="Mute Mic"
                         >
-                          <Phone className="w-3.5 h-3.5 text-[#FFC700]" />
-                          <span>
-                            {isLiveConnecting ? 'Menyambungkan...' : 'Telepon Live'}
-                          </span>
+                          {isMicMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                         </button>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={toggleMuteMic}
-                            className={`p-2.5 rounded-xl cursor-pointer transition-all ${
-                              isMicMuted
-                                ? 'bg-[#B8432D] text-white'
-                                : 'bg-[#FFF3DC] border border-[#F0E4CF] text-[#241A11]'
-                            }`}
-                            aria-label="Mute Mic"
-                          >
-                            {isMicMuted ? (
-                              <MicOff className="w-4 h-4" />
-                            ) : (
-                              <Mic className="w-4 h-4" />
-                            )}
-                          </button>
-                          <button
-                            type="button"
+                        <button
+                          type="button"
                             onClick={() => {
                               playFiezelSfx('button_tap');
                               stopLiveCall();
                               setLiveUserDraft('');
                               setLiveAiDraft('');
                             }}
-                            className="px-4 py-2.5 rounded-xl bg-[#B8432D] hover:bg-[#9E3622] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm transition-all"
-                          >
-                            <PhoneOff className="w-3.5 h-3.5" />
-                            <span>Akhiri</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* SPOTLIGHT PERTANYAAN PAW & TERJEMAHAN REALTIME (dengan Pita Kiri Solar Gold .fz-solar-ribbon) */}
-                  <div
-                    data-testid="live-translation-hud"
-                    className="relative z-10 bg-[#FFF9EE] border border-[#F0E4CF] fz-solar-ribbon rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                      <span className="inline-flex items-center gap-2 font-bold text-[#8C2233] uppercase tracking-wider text-[11px]">
-                        <span className="w-2 h-2 rounded-full bg-[#2E8B69] animate-pulse" />
-                        <span>
-                          {isMeasureMode || !showTranslations
-                            ? locale === 'th'
-                              ? 'คำถามจาก PAW'
-                              : 'Pertanyaan PAW'
-                            : locale === 'th'
-                              ? 'คำถามจาก PAW และคำแปลเรียลไทม์'
-                              : 'Pertanyaan PAW & Terjemahan Realtime'}
-                        </span>
-                      </span>
-                      {!isMeasureMode && (
-                        <button
-                          type="button"
-                          onClick={() => void speakAiText(activeAiLiveText, undefined, 0.8)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFF3C4] hover:bg-[#FFC700]/60 border border-[#E6A800]/30 text-[#241A11] font-bold text-xs cursor-pointer transition-colors"
+                          className="px-4 py-2 rounded-full bg-[#B8432D] hover:bg-[#9E3622] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                         >
-                          <Volume2 className="w-3.5 h-3.5 text-[#8C2233]" />
-                          <span>Dengar Pelan (0.8x)</span>
+                          <PhoneOff className="w-3.5 h-3.5" />
+                          <span>Akhiri</span>
                         </button>
-                      )}
-                    </div>
-
-                    {/* Kalimat Pertanyaan AI */}
-                    <p
-                      data-testid="live-hud-ai-text"
-                      className="text-base sm:text-lg font-bold text-[#241A11] leading-snug tracking-tight break-words"
-                    >
-                      AI: "{activeAiLiveText}"
-                    </p>
-
-                    {/* Kotak Terjemahan Langsung (Hanya jika bukan Mode Ujian & Terjemahan Aktif) */}
-                    {!isMeasureMode && showTranslations && (
-                      <div
-                        data-testid="live-hud-ai-translation"
-                        className="bg-[#E9F7F0] border border-[#2E8B69]/30 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#241A11] flex items-start gap-2 break-words"
-                      >
-                        <span className="font-bold text-[#2E8B69] shrink-0">
-                          {locale === 'th' ? 'คำแปล:' : '🇮🇩 Terjemahan:'}
-                        </span>
-                        <span className="font-semibold">
-                          "{locale === 'th'
-                            ? activeAiSubtitle.translationTh
-                            : activeAiSubtitle.translationId}"
-                        </span>
-                      </div>
-                    )}
-
-                    {activeUserSubtitle && (
-                      <div className="pt-2 border-t border-[#F0E4CF] flex flex-wrap items-center justify-between gap-1 text-xs text-[#6E5E47]">
-                        <span>
-                          🎙️ <b className="text-[#241A11]">Jawabanmu:</b> "{activeUserSubtitle.text}"
-                        </span>
-                        {!isMeasureMode && showTranslations && (
-                          <span className="text-[#8C6D1F] font-semibold">
-                            ({locale === 'th' ? activeUserSubtitle.translationTh : activeUserSubtitle.translationId})
-                          </span>
-                        )}
-                      </div>
+                      </>
                     )}
                   </div>
                 </section>
 
-                {/* 3. BANTUAN CARA JAWAB PEMULA REALTIME */}
+                {/* 2. IDE BALASAN INTERAKTIF (Baris Pill Tanpa Kotak Luar) */}
                 {!isMeasureMode && (
                   <BeginnerAnswerAssistant
                     locale={locale}
@@ -2377,29 +2522,19 @@ export default function App() {
                   />
                 )}
 
-                {/* 4. RIWAYAT PERCAKAPAN & EVALUASI BRAINCORE */}
-                <section className="fz-studio-card rounded-3xl p-4 sm:p-6 space-y-4 w-full overflow-hidden">
-                  {/* Header Transkrip Percakapan */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5 pb-2 border-b border-[#F0E4CF] text-xs text-[#6E5E47]">
-                    <div className="flex items-center gap-2 font-medium min-w-0">
-                      <FiezelPawStamp className="w-3.5 h-3.5 text-[#8C2233] shrink-0" />
-                      <span className="font-bold text-[#241A11] truncate">
-                        {locale === 'th'
-                          ? 'บันทึกการสนทนาและผลวิเคราะห์'
-                          : 'Riwayat Percakapan & Evaluasi'}
-                      </span>
-                      <span aria-hidden="true">·</span>
-                      <span className="font-mono tabular-nums text-[#8C2233] font-bold shrink-0">
-                        {turns.filter((tr) => tr.speaker === 'user').length} giliran
-                      </span>
-                    </div>
+                {/* 3. ALUR PERCAKAPAN RINGKAS (Hanya Tampil Bersih Tanpa Kotak Luar Berat) */}
+                <section className="space-y-2.5 w-full pt-1">
+                  <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47]">
+                    <span className="font-semibold text-[#5C4E3C]">
+                      {locale === 'th' ? 'บทสนทนา' : 'Percakapan'} ({turns.filter((tr) => tr.speaker === 'user').length})
+                    </span>
 
                     <div className="flex items-center gap-3 shrink-0">
                       {!isMeasureMode && (
                         <button
                           type="button"
                           onClick={() => setShowTranslations(!showTranslations)}
-                          className="font-bold text-[#6E5E47] hover:text-[#241A11] cursor-pointer"
+                          className="font-medium text-[#6E5E47] hover:text-[#1C1611] cursor-pointer"
                         >
                           {showTranslations ? 'Sembunyikan Arti' : 'Tampilkan Arti'}
                         </button>
@@ -2407,7 +2542,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={handleResetCallSession}
-                        className="font-bold text-[#8C2233] hover:underline flex items-center gap-1 cursor-pointer"
+                        className="font-medium text-[#6E5E47] hover:text-[#1C1611] flex items-center gap-1 cursor-pointer"
                       >
                         <RefreshCw className="w-3 h-3" />
                         <span>Ulangi</span>
@@ -2415,48 +2550,39 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Daftar Balon Percakapan & Kartu Diagnosis Pedagogis */}
                   <div
                     ref={transcriptContainerRef}
-                    className="space-y-3.5 max-h-[380px] overflow-y-auto pr-1"
+                    className="space-y-2 max-h-[280px] overflow-y-auto px-0.5"
                   >
-                    {turns.map((turn) => {
+                    {turns.map((turn, idx) => {
+                      // Jangan duplikasi kalimat pembuka pertama jika murid belum membalas
+                      if (idx === 0 && turns.length === 1 && turn.speaker === 'ai') {
+                        return null;
+                      }
                       if (turn.speaker === 'ai') {
                         return (
                           <div
                             key={turn.id}
-                            className="bg-[#FFF9EE] border border-[#F0E4CF] fz-solar-ribbon rounded-2xl p-4 max-w-[92%] sm:max-w-[86%] break-words space-y-2"
+                            className="bg-white/85 rounded-2xl rounded-tl-xs px-4 py-2.5 max-w-[90%] sm:max-w-[82%] shadow-[0_1px_3px_rgba(28,22,17,0.04)] break-words space-y-1"
                           >
-                            <div className="flex items-center justify-between text-xs text-[#6E5E47]">
-                              <span className="font-bold text-[#8C2233] flex items-center gap-1.5">
-                                <FiezelPawStamp className="w-3 h-3" />
-                                <span>PAW · {activePersona.name} (AI)</span>
-                              </span>
-                              <div className="flex items-center gap-1.5">
-                                <button
-                                  type="button"
-                                  onClick={() => void speakAiText(turn.text, turn.audioBase64, 1.0)}
-                                  className="px-2.5 py-1 rounded-lg bg-white border border-[#F0E4CF] hover:border-[#FFC700] text-[11px] font-bold text-[#241A11] cursor-pointer"
-                                >
-                                  🔊 Putar
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => void speakAiText(turn.text, turn.audioBase64, 0.78)}
-                                  className="px-2 py-1 rounded-lg bg-white border border-[#F0E4CF] hover:border-[#FFC700] text-[11px] font-mono font-bold text-[#6E5E47] cursor-pointer"
-                                >
-                                  0.8x
-                                </button>
-                              </div>
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-sm font-medium text-[#1C1611] break-words leading-snug">
+                                {turn.text}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => void speakAiText(turn.text, turn.audioBase64, 1.0)}
+                                className="w-6 h-6 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] flex items-center justify-center text-[#5C4E3C] shrink-0 cursor-pointer"
+                                title="Putar suara"
+                              >
+                                <Volume2 className="w-3 h-3" />
+                              </button>
                             </div>
-                            <p className="text-sm sm:text-[15px] font-semibold text-[#241A11] break-words leading-relaxed">
-                              {turn.text}
-                            </p>
                             {!isMeasureMode &&
                               showTranslations &&
                               (turn.translationId || turn.translationTh) && (
-                                <p className="text-xs text-[#2E8B69] pt-1.5 border-t border-[#F0E4CF] break-words font-semibold">
-                                  🇮🇩 {locale === 'th' ? turn.translationTh : turn.translationId}
+                                <p className="text-xs text-[#6E5E47] break-words">
+                                  {locale === 'th' ? turn.translationTh : turn.translationId}
                                 </p>
                               )}
                           </div>
@@ -2465,11 +2591,11 @@ export default function App() {
 
                       const diag = turn.diagnosis;
                       return (
-                        <div key={turn.id} className="flex flex-col items-end space-y-2">
-                          <div className="btn-maroon-tactile rounded-2xl rounded-tr-sm px-4 py-3 max-w-[92%] sm:max-w-[86%] break-words">
+                        <div key={turn.id} className="flex flex-col items-end space-y-1">
+                          <div className="bg-[#1C1611] text-white rounded-2xl rounded-tr-xs px-4 py-2 max-w-[90%] sm:max-w-[82%] break-words">
                             <p
                               data-testid="user-exact-transcript"
-                              className="text-sm sm:text-[15px] font-semibold break-words"
+                              className="text-sm font-medium break-words"
                             >
                               {turn.text}
                             </p>
@@ -2479,52 +2605,52 @@ export default function App() {
                             <div
                               data-testid="turn-diagnosis-card"
                               data-ok={diag.ok ? 'true' : 'false'}
-                              className={`rounded-2xl p-3.5 text-xs max-w-[92%] sm:max-w-[86%] break-words border space-y-2 shadow-2xs ${
+                              className={`rounded-2xl px-3.5 py-2 text-xs max-w-[90%] sm:max-w-[82%] break-words space-y-1 ${
                                 diag.ok
-                                  ? 'bg-[#E9F7F0] border-[#2E8B69]/35 text-[#241A11]'
-                                  : 'bg-[#FDE3DE] border-[#B8432D]/35 text-[#241A11]'
+                                  ? 'bg-[#E9F7F0] text-[#1C1611]'
+                                  : 'bg-[#FDE3DE] text-[#1C1611]'
                               }`}
                             >
-                              <div className="flex flex-wrap items-center justify-between gap-2 font-bold">
+                              <div className="flex flex-wrap items-center justify-between gap-2 font-semibold">
                                 <div className="flex items-center gap-1.5">
                                   {diag.ok ? (
-                                    <CheckCircle2 className="w-4 h-4 shrink-0 text-[#2E8B69]" />
+                                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-[#2E8B69]" />
                                   ) : (
-                                    <AlertTriangle className="w-4 h-4 shrink-0 text-[#B8432D]" />
+                                    <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-[#B8432D]" />
                                   )}
                                   <span className={diag.ok ? 'text-[#2E8B69]' : 'text-[#B8432D]'}>
-                                    {diag.ok ? 'Struktur Kalimat Tepat' : 'Catatan Perbaikan Kalimat'}
+                                    {diag.ok ? 'Kalimat Tepat' : 'Perbaikan Kalimat'}
                                   </span>
                                 </div>
-                                <span className="font-mono tabular-nums text-[11px] bg-white/90 px-2 py-0.5 rounded-md border border-[#F0E4CF]">
-                                  Grammar {diag.grammarScore}% · Fluency {diag.fluencyScore}% · BKT{' '}
-                                  {Math.round(diag.bktAfter * 100)}%
+                                <span className="font-mono tabular-nums text-[11px] text-[#6E5E47]">
+                                  Grammar {diag.grammarScore}% · BKT {Math.round(diag.bktAfter * 100)}%
                                 </span>
                               </div>
 
                               {!diag.ok && diag.syntacticCorrection && (
-                                <div className="bg-white rounded-xl p-2.5 flex items-center justify-between gap-2 text-[#241A11] border border-[#F0E4CF] fz-solar-ribbon">
-                                  <span className="font-semibold break-words">
-                                    Saran tepat:{' '}
-                                    <b className="text-[#8C2233]">"{diag.syntacticCorrection}"</b>
+                                <div className="bg-white/90 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[#1C1611]">
+                                  <span className="break-words">
+                                    Saran: <b className="text-[#8C2233]">"{diag.syntacticCorrection}"</b>
                                   </span>
                                   <button
                                     type="button"
                                     onClick={() => {
                                       setInputText(diag.syntacticCorrection || '');
                                     }}
-                                    className="shrink-0 px-3 py-1.5 rounded-lg btn-sun-tactile text-[11px] font-bold cursor-pointer"
+                                    className="shrink-0 px-2.5 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] font-semibold cursor-pointer"
                                   >
-                                    Coba Ulang
+                                    Gunakan
                                   </button>
                                 </div>
                               )}
 
-                              <p className="text-[#241A11] break-words leading-relaxed">
-                                {locale === 'th'
-                                  ? diag.whyFailsTh || diag.pedagogicalFeedbackTh
-                                  : diag.whyFailsId || diag.pedagogicalFeedbackId}
-                              </p>
+                              {!diag.ok && (
+                                <p className="text-[#5C4E3C] break-words leading-snug">
+                                  {locale === 'th'
+                                    ? diag.whyFailsTh || diag.pedagogicalFeedbackTh
+                                    : diag.whyFailsId || diag.pedagogicalFeedbackId}
+                                </p>
+                              )}
                             </div>
                           )}
                         </div>
@@ -2532,9 +2658,9 @@ export default function App() {
                     })}
 
                     {isAnalyzingTurn && (
-                      <div className="bg-[#FFF3C4] border border-[#FFC700] rounded-2xl px-4 py-3 max-w-[80%] text-xs font-bold text-[#241A11] flex items-center gap-2.5">
-                        <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-ping" />
-                        <span>PAW sedang mengevaluasi jawabanmu & menyiapkan balasan...</span>
+                      <div className="bg-white/85 rounded-2xl px-3.5 py-2 max-w-[70%] text-xs font-medium text-[#6E5E47] inline-flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#1C1611] animate-ping" />
+                        <span>Menyiapkan balasan...</span>
                       </div>
                     )}
 
@@ -2650,26 +2776,26 @@ export default function App() {
         )}
       </main>
 
-      {/* DOCK BAWAH STICKY KHAS FIEZEL (Rekam Suara + Input Teks + Kirim — Bebas Terpotong) */}
+      {/* FLOATING PILL COMPOSER DOCK (Gaya Voice App Modern — Tanpa Kotak Kaku) */}
       {activeTab === 'call' && prereqStatus.isReady && (
         <div
           data-testid="mitra-kaiwa-bottom-dock"
-          className="sticky bottom-0 left-0 right-0 z-30 bg-[#FFF9EE]/96 backdrop-blur-xl border-t border-[#F0E4CF] px-3 sm:px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(36,26,17,0.12)]"
+          className="sticky bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#F6F3EC] via-[#F6F3EC]/95 to-transparent px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         >
-          <div className="max-w-4xl mx-auto space-y-1.5">
+          <div className="max-w-2xl mx-auto space-y-1.5">
             {(isRecordingPtt || isListeningLiveSpeech || liveUserDraft.trim()) && (
               <div
                 data-testid="live-voice-capture-banner"
-                className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-[#FDF2F4] border border-[#8C2233]/25 text-xs text-[#8C2233]"
+                className="flex items-center justify-between gap-2 px-4 py-1.5 rounded-full bg-white shadow-sm text-xs text-[#1C1611]"
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-ping shrink-0" />
-                  <span className="font-bold truncate">
+                  <span className="w-2 h-2 rounded-full bg-[#2E8B69] animate-ping shrink-0" />
+                  <span className="font-medium truncate">
                     {liveUserDraft.trim()
-                      ? `🎙️ "${liveUserDraft.trim()}"`
+                      ? `"${liveUserDraft.trim()}"`
                       : locale === 'th'
-                        ? '🎙️ กำลังฟังเสียงของคุณ... พูดได้เลย'
-                        : '🎙️ Mendengarkan suaramu... Silakan bicara sekarang'}
+                        ? 'กำลังฟังเสียงของคุณ...'
+                        : 'Mendengarkan... Silakan bicara'}
                   </span>
                 </div>
                 {liveUserDraft.trim() && (
@@ -2683,7 +2809,7 @@ export default function App() {
                         void submitStudentTurn({ text: textToSend, speakingDurationSec: 3 });
                       }
                     }}
-                    className="px-2.5 py-0.5 rounded-lg bg-[#8C2233] text-white font-bold text-[11px] shrink-0 cursor-pointer"
+                    className="px-3 py-0.5 rounded-full bg-[#1C1611] text-white font-semibold text-[11px] shrink-0 cursor-pointer"
                   >
                     Kirim
                   </button>
@@ -2691,30 +2817,30 @@ export default function App() {
               </div>
             )}
 
-            <div className="flex items-center gap-2 w-full min-w-0">
+            <div className="bg-white rounded-full shadow-[0_4px_20px_rgba(28,22,17,0.08)] border border-black/[0.05] p-1.5 flex items-center gap-1.5 w-full min-w-0">
               <button
                 type="button"
                 data-testid="ptt-record-btn"
                 disabled={isAnalyzingTurn}
                 onClick={isRecordingPtt ? stopPttRecording : startPttRecording}
-                className={`px-3 sm:px-3.5 py-2.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
+                className={`px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
                   isRecordingPtt
-                    ? 'btn-maroon-tactile animate-pulse'
-                    : 'bg-[#FFF3DC] hover:bg-[#FFF3C4] text-[#241A11] border border-[#E2D0B2]'
+                    ? 'bg-[#8C2233] text-white'
+                    : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
                 }`}
                 title={t(locale, 'call.pushToTalk')}
               >
                 {isRecordingPtt ? (
-                  <MicOff className="w-4 h-4 shrink-0" />
+                  <MicOff className="w-3.5 h-3.5 shrink-0" />
                 ) : (
-                  <Mic className="w-4 h-4 text-[#8C2233] shrink-0" />
+                  <Mic className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
                 )}
                 <span>
                   {isRecordingPtt
                     ? `Stop (${pttRecordingSec}s)`
                     : locale === 'th'
-                      ? 'พูดตอบ'
-                      : 'Rekam Suara'}
+                      ? 'พูด'
+                      : 'Bicara'}
                 </span>
               </button>
 
@@ -2738,9 +2864,9 @@ export default function App() {
                   }
                 }}
                 placeholder={
-                  locale === 'th' ? 'พิมพ์ / พูด...' : 'Ketik / bicara...'
+                  locale === 'th' ? 'พิมพ์หรือพูด...' : 'Ketik atau bicara...'
                 }
-                className="min-w-0 flex-1 bg-white border border-[#E2D0B2] rounded-2xl px-3.5 py-2.5 text-sm font-medium text-[#241A11] placeholder:text-[#857350] focus:outline-none focus:border-[#8C2233]"
+                className="min-w-0 flex-1 bg-transparent border-0 px-2.5 py-1.5 text-sm text-[#1C1611] placeholder:text-[#8C7E6A] focus:outline-none"
               />
 
               <button
@@ -2759,7 +2885,7 @@ export default function App() {
                     void submitStudentTurn({ text: inputText });
                   }
                 }}
-                className="px-3.5 sm:px-4 py-2.5 rounded-2xl btn-sun-tactile font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-40"
+                className="px-4 py-2 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all disabled:opacity-30"
               >
                 <Send className="w-3.5 h-3.5 shrink-0" />
                 <span>{isAnalyzingTurn ? '...' : locale === 'th' ? 'ส่ง' : 'Kirim'}</span>

@@ -962,13 +962,29 @@ export function generateDynamicContextualAiReply(params: {
           'ขอบคุณมากค่ะ! เดี๋ยวจะรีบนำไปเสิร์ฟที่โต๊ะนะคะ วันนี้หลังจากนี้มีแผนจะไปเที่ยวไหนต่อไหมคะ?',
       };
     }
+    const hasIceCoffee = uLower.includes('アイスコーヒー') || uLower.includes('aisu');
+    const hasCheeseCake = uLower.includes('チーズケーキ') || uLower.includes('keeki');
+    const orderedJa =
+      hasIceCoffee && hasCheeseCake
+        ? 'アイスコーヒーとチーズケーキ'
+        : hasIceCoffee
+          ? 'アイスコーヒーお一つ'
+          : hasCheeseCake
+            ? 'ホットコーヒーとチーズケーキ'
+            : 'ホットコーヒーお一つ';
+    const orderedId =
+      hasIceCoffee && hasCheeseCake
+        ? 'Es kopi dan cheesecake'
+        : hasIceCoffee
+          ? 'Satu es kopi'
+          : hasCheeseCake
+            ? 'Kopi panas dan cheesecake'
+            : 'Satu kopi panas';
     return {
-      aiReply:
-        'かしこまりました！ホットコーヒーとチーズケーキですね。店内でお召し上がりですか、それともお持ち帰りですか？',
-      aiReplyTranslationId:
-        'Baik, dimengerti! Kopi panas dan cheesecake ya. Apakah ingin dinikmati di dalam kafe, atau dibawa pulang?',
+      aiReply: `かしこまりました！${orderedJa}ですね。店内でお召し上がりですか、それともお持ち帰りですか？`,
+      aiReplyTranslationId: `Baik, dimengerti! ${orderedId} ya. Apakah ingin dinikmati di dalam kafe, atau dibawa pulang?`,
       aiReplyTranslationTh:
-        'รับทราบค่ะ! กาแฟร้อนและชีสเค้กนะคะ จะรับประทานที่ร้าน หรือรับกลับบ้านดีคะ?',
+        'รับทราบค่ะ! จะรับประทานที่ร้าน หรือรับกลับบ้านดีคะ?',
     };
   }
 

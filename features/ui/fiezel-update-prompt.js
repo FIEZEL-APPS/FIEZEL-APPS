@@ -203,7 +203,7 @@
                 setTimeout(reloadIfApproved, 3500);
               }
             });
-            setTimeout(reloadIfApproved, 10000);
+            setTimeout(reloadIfApproved, 45000);
             return;
           }
           reloadIfApproved();

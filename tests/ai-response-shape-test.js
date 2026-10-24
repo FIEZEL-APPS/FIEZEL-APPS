@@ -117,7 +117,7 @@ const F = AiTasks.OUTPUT_FAILURES;
       '@cf/aisingapore/gemma-sea-lion-v4-27b-it': 'openai',
       '@cf/google/gemma-4-26b-a4b-it': 'openai'
     };
-    const declared = ['cheap', 'standard', 'reasoning', 'candidate', 'rejected']
+    const declared = ['cheap', 'standard', 'reasoning', 'candidate', 'voiceCall', 'rejected']
       .map((k) => AiTasks.MODELS[k])
       .every((m) => shapeOf[m.id] === m.responseShape);
     check('Bentuk jawaban tiap model terukur dicatat di registry, bukan ditebak runtime',
