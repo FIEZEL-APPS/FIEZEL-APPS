@@ -98,14 +98,15 @@ server.listen(PORT, '127.0.0.1', async () => {
       return {
         badge: mochi ? mochi.badge : null,
         aura: mochi ? mochi.aura : null,
-        mood: mochi ? mochi.mood : null
+        mood: mochi ? mochi.mood : null,
+        accessory: mochi ? mochi.currentAccessory : null
       };
     });
 
-    if (jlptStatus.badge !== 'chat_purple' || jlptStatus.aura !== 'purple') {
-      throw new Error(`FAIL: JLPT idle state indicator badge mismatch: ${JSON.stringify(jlptStatus)}`);
+    if (jlptStatus.badge !== null || jlptStatus.accessory !== 'headset') {
+      throw new Error(`FAIL: JLPT idle state indicator badge / accessory mismatch: ${JSON.stringify(jlptStatus)}`);
     }
-    console.log('✓ PASS: JLPT idle state has active chat_purple badge and purple aura.');
+    console.log('✓ PASS: JLPT idle state has active headset accessory and badge is null (purple badge gone on idle).');
 
     // Test session entrance / lesson-start on JLPT mascot
     const jlptStartStatus = await page.evaluate(() => {
@@ -118,13 +119,14 @@ server.listen(PORT, '127.0.0.1', async () => {
         badge: mochi ? mochi.badge : null,
         aura: mochi ? mochi.aura : null,
         earWiggleTimer: mochi ? mochi.earWiggleTimer : 0,
-        earWiggleIntensity: mochi ? mochi.earWiggleIntensity : 0
+        earWiggleIntensity: mochi ? mochi.earWiggleIntensity : 0,
+        accessory: mochi ? mochi.currentAccessory : null
       };
     });
-    if (jlptStartStatus.earWiggleTimer <= 0 || jlptStartStatus.badge !== 'chat_purple') {
-      throw new Error(`FAIL: JLPT lesson-start ear wiggle mismatch: ${JSON.stringify(jlptStartStatus)}`);
+    if (jlptStartStatus.earWiggleTimer <= 0 || jlptStartStatus.accessory !== 'headset') {
+      throw new Error(`FAIL: JLPT lesson-start ear wiggle/accessory mismatch: ${JSON.stringify(jlptStartStatus)}`);
     }
-    console.log('✓ PASS: JLPT lesson-start triggers dynamic ear wiggle (1.3) and preserves chat_purple badge.');
+    console.log('✓ PASS: JLPT lesson-start triggers dynamic ear wiggle (1.3) and preserves headset accessory.');
 
     // Close JLPT modal
     await page.evaluate(() => {
@@ -168,10 +170,10 @@ server.listen(PORT, '127.0.0.1', async () => {
     if (!quizTestStatus.attached || !quizTestStatus.hasMochi) {
       throw new Error(`FAIL: Mascot in .fz-paw-slot did not attach 3D companion.`);
     }
-    if (quizTestStatus.badge !== 'chat_purple' || quizTestStatus.aura !== 'purple') {
-      throw new Error(`FAIL: Quiz mascot idle badge mismatch: ${JSON.stringify(quizTestStatus)}`);
+    if (quizTestStatus.badge !== null) {
+      throw new Error(`FAIL: Quiz mascot idle badge should be null: ${JSON.stringify(quizTestStatus)}`);
     }
-    console.log('✓ PASS: Standard Quiz mascot attaches with active chat_purple badge and purple aura.');
+    console.log('✓ PASS: Standard Quiz mascot attaches with clean idle state (purple badge is null).');
 
     // Test question-shown reaction on quiz mascot
     const qShownStatus = await page.evaluate(() => {
@@ -187,10 +189,60 @@ server.listen(PORT, '127.0.0.1', async () => {
         earWiggleIntensity: mochi ? mochi.earWiggleIntensity : 0
       };
     });
-    if (qShownStatus.earWiggleTimer <= 0 || qShownStatus.badge !== 'chat_purple') {
-      throw new Error(`FAIL: question-shown ear wiggle mismatch: ${JSON.stringify(qShownStatus)}`);
+    if (qShownStatus.earWiggleTimer <= 0 || qShownStatus.badge !== null) {
+      throw new Error(`FAIL: question-shown ear wiggle/badge mismatch: ${JSON.stringify(qShownStatus)}`);
     }
-    console.log('✓ PASS: question-shown triggers dynamic ear wiggle (1.3) and maintains chat_purple badge.');
+    console.log('✓ PASS: question-shown triggers dynamic ear wiggle (1.3) and keeps purple badge null.');
+
+    // Test THINKING reaction: purple badge appears ONLY when thinking!
+    const qThinkStatus = await page.evaluate(() => {
+      const mascot = document.querySelector('#testQuizContainer fiezel-mascot');
+      if (mascot && typeof mascot.react === 'function') {
+        mascot.react('thinking');
+      }
+      const mochi = mascot ? mascot.__mochiInstance : null;
+      return {
+        badge: mochi ? mochi.badge : null,
+        aura: mochi ? mochi.aura : null,
+        isThinking: mochi ? mochi.isThinking : false
+      };
+    });
+    if (qThinkStatus.badge !== 'chat_purple' || !qThinkStatus.isThinking) {
+      throw new Error(`FAIL: thinking reaction expected chat_purple badge: ${JSON.stringify(qThinkStatus)}`);
+    }
+    console.log('✓ PASS: thinking state triggers active chat_purple badge and purple aura.');
+
+    // Test THINKING-END: purple badge disappears
+    const qThinkEndStatus = await page.evaluate(() => {
+      const mascot = document.querySelector('#testQuizContainer fiezel-mascot');
+      if (mascot && typeof mascot.react === 'function') {
+        mascot.react('think-end');
+      }
+      const mochi = mascot ? mascot.__mochiInstance : null;
+      return {
+        badge: mochi ? mochi.badge : null
+      };
+    });
+    if (qThinkEndStatus.badge !== null) {
+      throw new Error(`FAIL: think-end expected badge null: ${JSON.stringify(qThinkEndStatus)}`);
+    }
+    console.log('✓ PASS: think-end successfully dismisses purple badge.');
+
+    // Test TALKING motion
+    const qTalkingStatus = await page.evaluate(() => {
+      const mascot = document.querySelector('#testQuizContainer fiezel-mascot');
+      const mochi = mascot ? mascot.__mochiInstance : null;
+      if (mochi && typeof mochi.setTalking === 'function') {
+        mochi.setTalking(true, 1.5);
+      }
+      return {
+        isTalking: mochi ? mochi.isTalking : false
+      };
+    });
+    if (!qTalkingStatus.isTalking) {
+      throw new Error(`FAIL: setTalking(true) did not activate mouth motion: ${JSON.stringify(qTalkingStatus)}`);
+    }
+    console.log('✓ PASS: Mouth motion (setTalking) activates articulated speaking wave.');
 
     // Test wrong reaction: toddler pout
     const qWrongStatus = await page.evaluate(() => {
@@ -258,7 +310,8 @@ server.listen(PORT, '127.0.0.1', async () => {
         hasMochi: !!mochi,
         badge: mochi ? mochi.badge : null,
         aura: mochi ? mochi.aura : null,
-        mood: mochi ? mochi.mood : null
+        mood: mochi ? mochi.mood : null,
+        accessory: mochi ? mochi.currentAccessory : null
       };
     });
 
@@ -266,10 +319,10 @@ server.listen(PORT, '127.0.0.1', async () => {
     if (!writingStatus.attached || !writingStatus.hasMochi) {
       throw new Error(`FAIL: Mascot in .writing-stage did not attach 3D companion.`);
     }
-    if (writingStatus.badge !== 'chat_purple' || writingStatus.aura !== 'purple') {
-      throw new Error(`FAIL: Writing mascot idle badge mismatch: ${JSON.stringify(writingStatus)}`);
+    if (writingStatus.badge !== null || writingStatus.accessory !== 'pencil') {
+      throw new Error(`FAIL: Writing mascot idle badge/accessory mismatch: ${JSON.stringify(writingStatus)}`);
     }
-    console.log('✓ PASS: Writing stage mascot attaches with active chat_purple badge and purple aura.');
+    console.log('✓ PASS: Writing stage mascot attaches with pencil accessory and purple badge is null.');
 
     // Clean up test writing stage
     await page.evaluate(() => {
@@ -300,7 +353,8 @@ server.listen(PORT, '127.0.0.1', async () => {
         hasMochi: !!mochi,
         badge: mochi ? mochi.badge : null,
         aura: mochi ? mochi.aura : null,
-        mood: mochi ? mochi.mood : null
+        mood: mochi ? mochi.mood : null,
+        accessory: mochi ? mochi.currentAccessory : null
       };
     });
 
@@ -308,10 +362,10 @@ server.listen(PORT, '127.0.0.1', async () => {
     if (!fslStatus.attached || !fslStatus.hasMochi) {
       throw new Error(`FAIL: Mascot in .fsl-player did not attach 3D companion.`);
     }
-    if (fslStatus.badge !== 'chat_purple' || fslStatus.aura !== 'purple') {
-      throw new Error(`FAIL: Skills Lab mascot idle badge mismatch: ${JSON.stringify(fslStatus)}`);
+    if (fslStatus.badge !== null || fslStatus.accessory !== 'headset') {
+      throw new Error(`FAIL: Skills Lab mascot idle badge/accessory mismatch: ${JSON.stringify(fslStatus)}`);
     }
-    console.log('✓ PASS: Skills Lab mascot attaches with active chat_purple badge and purple aura.');
+    console.log('✓ PASS: Skills Lab mascot attaches with headset accessory and purple badge is null.');
 
     // Clean up fsl player
     await page.evaluate(() => {

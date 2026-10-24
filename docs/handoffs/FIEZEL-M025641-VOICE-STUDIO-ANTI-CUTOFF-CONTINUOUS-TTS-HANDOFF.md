@@ -1,8 +1,8 @@
-# FIEZEL HANDOFF DOSSIER: M025-639 VOICE STUDIO ANTI-CUTOFF VAD, CONTINUOUS SENTENCE TTS, ANTI-OK OPENER & INSTANT BARGE-IN
+# FIEZEL HANDOFF DOSSIER: M025-641 VOICE STUDIO ANTI-CUTOFF VAD, CONTINUOUS SENTENCE TTS, ANTI-OK OPENER & INSTANT BARGE-IN
 
-**Tanggal Rilis**: 24 Oktober 2026  
-**Build Version**: `m025-639`  
-**Target Modul**: `features/voice-studio/` (Mitra Kaiwa AI Call Studio) & `workers/api/ai/ai-tasks.js` (Cloudflare AI Pipeline)  
+**Tanggal Rilis**: 24 Oktober 2026
+**Build Version**: `m025-641`
+**Target Modul**: `features/voice-studio/` (Mitra Kaiwa AI Call Studio) & `workers/api/ai/ai-tasks.js` (Cloudflare AI Pipeline)
 **Tipe Rilis**: Perbaikan Bug Kritis, Peningkatan UX Realtime Voice Duplex, & Penegakan Regulasi Anti-Cutoff
 
 ---
@@ -140,16 +140,16 @@ VERDICT: PASS
 8. `id-golden-baseline.json`:
    - Regenerasi baseline snapshot teks Indonesia resmi.
 9. `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`:
-   - Kenaikan versi selaras ke build `m025-639` via `bump-build.mjs`.
+   - Kenaikan versi selaras ke build `m025-641` via `bump-build.mjs`.
 
 ---
 
 ## 5. Status Gerbang Mutu Lokal & Verifikasi Hexa-Sync
 
-- `node tools/bump-build.mjs --check`: **Selaras (m025-639)**
+- `node tools/bump-build.mjs --check`: **Selaras (m025-641)**
 - `node tests/id-golden-snapshot-test.js`: **PASS (HIJAU: baseline emas Indonesia utuh)**
 - `node tests/th-ui-leak-test.js`: **PASS (0 kebocoran)**
-- `node tests/curriculum-cache-version-test.js`: **PASS (33 penegasan, build m025-639)**
+- `node tests/curriculum-cache-version-test.js`: **PASS (33 penegasan, build m025-641)**
 - `node tests/gate-registry-test.js`: **PASS (10 pass, 0 fail)**
 - `node tests/voice-studio-ui-architecture-test.js`: **PASS (5/5)**
 - `node tests/ai-conversation-task-test.js`: **PASS (48/48)**

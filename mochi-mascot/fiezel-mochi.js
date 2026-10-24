@@ -34,10 +34,15 @@ export class FiezelMochi {
     if (!this.container) throw new Error('FiezelMochi: Container element not found');
 
     // State Configuration
-    this.mood = options.mood || 'wink';             // 'dots', 'wink', 'happy', 'hearts', 'sleepy'
+    this.mood = options.mood || 'dots';             // 'dots', 'wink', 'happy', 'hearts', 'sleepy', 'pout'
     this.badge = options.badge || null;             // null, 'chat_purple', 'chat_blue', 'alert', 'online'
     this.fx = options.fx || null;                   // null, 'orbit', 'stars', 'hearts'
     this.aura = options.aura || null;               // null, 'purple', 'blue', 'amber', 'green', 'pink'
+    this.currentAccessory = options.accessory || null; // null, 'headset', 'glasses', 'pencil'
+    this.isTalking = false;
+    this.talkDuration = 0;
+    this.talkTimer = 0;
+    this.isThinking = false;
     this.showHands = options.showHands ?? true;
     this.showEars = options.showEars ?? true;
     this.showTail = options.showTail ?? false;
@@ -93,12 +98,14 @@ export class FiezelMochi {
     this.createShadow();
     this.createOrbit();
     this.createBadge();
+    this.createAccessories();
     this.createParticles();
     this.setupLighting();
     this.bindEvents();
 
-    // Apply initial aura & visibility
+    // Apply initial aura, accessory & visibility
     if (this.aura) this.setAura(this.aura);
+    if (this.currentAccessory) this.setAccessory(this.currentAccessory);
     this.start();
   }
 
@@ -112,6 +119,7 @@ export class FiezelMochi {
     this.renderer = new THREE.WebGLRenderer({
       antialias: !IS_MOBILE,
       alpha: true,
+      preserveDrawingBuffer: true,
       powerPreference: 'high-performance'
     });
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
@@ -1379,6 +1387,322 @@ export class FiezelMochi {
     this.badgeTex.needsUpdate = true;
   }
 
+  createAccessories() {
+    this.accessoriesGroup = new THREE.Group();
+    this.accessoriesGroup.renderOrder = 1005;
+    this.mochiGroup.add(this.accessoriesGroup);
+
+    this.createHeadsetAccessory();
+    this.createGlassesAccessory();
+    this.createPencilAccessory();
+
+    this.setAccessory(this.currentAccessory);
+  }
+
+  createHeadsetAccessory() {
+    this.headsetGroup = new THREE.Group();
+    this.accessoriesGroup.add(this.headsetGroup);
+
+    // 1. Arched Headband spanning across the crown between fox ears
+    const bandGeo = new THREE.TorusGeometry(1.22, 0.045, 16, 48, Math.PI * 0.78);
+    const bandMat = new THREE.MeshPhysicalMaterial({
+      color: 0x241C32,
+      roughness: 0.35,
+      metalness: 0.20,
+      clearcoat: 0.7,
+      clearcoatRoughness: 0.2
+    });
+    const bandMesh = new THREE.Mesh(bandGeo, bandMat);
+    bandMesh.position.set(0, 0.15, 0.04);
+    bandMesh.rotation.set(0.08, 0, Math.PI * 0.11);
+    this.headsetGroup.add(bandMesh);
+
+    // 1b. Soft cushion padding under headband
+    const padGeo = new THREE.TorusGeometry(1.18, 0.030, 12, 36, Math.PI * 0.62);
+    const padMat = new THREE.MeshStandardMaterial({ color: 0x382D4A, roughness: 0.75 });
+    const padMesh = new THREE.Mesh(padGeo, padMat);
+    padMesh.position.set(0, 0.16, 0.04);
+    padMesh.rotation.set(0.08, 0, Math.PI * 0.19);
+    this.headsetGroup.add(padMesh);
+
+    // 2. Earcups Left & Right
+    const cupMat = new THREE.MeshPhysicalMaterial({
+      color: 0x3F2E5E,
+      roughness: 0.25,
+      metalness: 0.25,
+      clearcoat: 0.8,
+      sheen: 0.6,
+      sheenColor: new THREE.Color(0xC084FC)
+    });
+    const cushionMat = new THREE.MeshStandardMaterial({ color: 0x181222, roughness: 0.85 });
+    const accentMat = new THREE.MeshPhysicalMaterial({ color: 0x9D65FF, metalness: 0.6, roughness: 0.2 });
+    this.headsetLedMat = new THREE.MeshBasicMaterial({ color: 0x00E5FF, transparent: true, opacity: 0.88 });
+
+    const buildCup = (side) => {
+      const cup = new THREE.Group();
+      cup.position.set(side * 1.20, 0.28, 0.10);
+      cup.rotation.set(0.06, -side * 0.22, -side * 0.12);
+
+      // Inner cushion ring
+      const cushionGeo = new THREE.TorusGeometry(0.20, 0.065, 16, 32);
+      const cushion = new THREE.Mesh(cushionGeo, cushionMat);
+      cushion.rotation.y = Math.PI / 2;
+      cushion.position.x = side * -0.05;
+      cushion.scale.set(1.0, 1.15, 0.8);
+      cup.add(cushion);
+
+      // Outer cup cylinder
+      const bodyGeo = new THREE.CylinderGeometry(0.22, 0.23, 0.12, 32);
+      const cupBody = new THREE.Mesh(bodyGeo, cupMat);
+      cupBody.rotation.z = Math.PI / 2;
+      cupBody.position.x = side * 0.02;
+      cup.add(cupBody);
+
+      // Accent metallic rim disc
+      const discGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.02, 32);
+      const discMesh = new THREE.Mesh(discGeo, accentMat);
+      discMesh.rotation.z = Math.PI / 2;
+      discMesh.position.x = side * 0.085;
+      cup.add(discMesh);
+
+      // Glowing Neon LED Audio Visualizer Ring
+      const ledGeo = new THREE.TorusGeometry(0.125, 0.020, 16, 32);
+      const ledMesh = new THREE.Mesh(ledGeo, this.headsetLedMat);
+      ledMesh.rotation.y = Math.PI / 2;
+      ledMesh.position.x = side * 0.098;
+      cup.add(ledMesh);
+
+      if (side < 0) this.headsetLedL = ledMesh;
+      else this.headsetLedR = ledMesh;
+
+      return cup;
+    };
+
+    this.headsetGroup.add(buildCup(-1));
+    this.headsetGroup.add(buildCup(1));
+
+    // 3. Boom microphone curving from left earcup toward mouth
+    const micArmGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.48, 12);
+    const micArm = new THREE.Mesh(micArmGeo, new THREE.MeshStandardMaterial({ color: 0x221B2E, metalness: 0.8, roughness: 0.3 }));
+    micArm.position.set(-0.95, -0.04, 0.55);
+    micArm.rotation.set(0.65, -0.45, 0.35);
+    this.headsetGroup.add(micArm);
+
+    const spongeGeo = new THREE.SphereGeometry(0.042, 16, 12);
+    spongeGeo.scale(1.2, 0.9, 0.9);
+    const spongeMesh = new THREE.Mesh(spongeGeo, new THREE.MeshStandardMaterial({ color: 0x1A1524, roughness: 0.95 }));
+    spongeMesh.position.set(-0.72, -0.16, 0.88);
+    this.headsetGroup.add(spongeMesh);
+
+    this.headsetGroup.visible = false;
+  }
+
+  createGlassesAccessory() {
+    this.glassesGroup = new THREE.Group();
+    this.accessoriesGroup.add(this.glassesGroup);
+
+    const goldMat = new THREE.MeshPhysicalMaterial({
+      color: 0xF59E0B,
+      metalness: 0.85,
+      roughness: 0.18,
+      clearcoat: 0.9
+    });
+    const lensMat = new THREE.MeshPhysicalMaterial({
+      color: 0xE0F2FE,
+      transmission: 0.94,
+      opacity: 0.38,
+      transparent: true,
+      roughness: 0.05,
+      depthWrite: false
+    });
+
+    // Left and right rims
+    const rimGeo = new THREE.TorusGeometry(0.185, 0.016, 16, 36);
+    const rimL = new THREE.Mesh(rimGeo, goldMat);
+    rimL.position.set(-0.38, 0.08, 1.305);
+    rimL.rotation.set(-0.06, -0.14, 0);
+    this.glassesGroup.add(rimL);
+
+    const rimR = new THREE.Mesh(rimGeo, goldMat);
+    rimR.position.set(0.38, 0.08, 1.305);
+    rimR.rotation.set(-0.06, 0.14, 0);
+    this.glassesGroup.add(rimR);
+
+    // Arched nose bridge
+    const bridgeGeo = new THREE.TorusGeometry(0.10, 0.013, 12, 20, Math.PI * 0.65);
+    const bridgeMesh = new THREE.Mesh(bridgeGeo, goldMat);
+    bridgeMesh.position.set(0, 0.12, 1.305);
+    bridgeMesh.rotation.set(-0.06, 0, Math.PI * 0.175);
+    this.glassesGroup.add(bridgeMesh);
+
+    // Transparent reflective lenses
+    const lensGeo = new THREE.CircleGeometry(0.175, 32);
+    const lensL = new THREE.Mesh(lensGeo, lensMat);
+    lensL.position.set(-0.38, 0.08, 1.30);
+    lensL.rotation.set(-0.06, -0.14, 0);
+    this.glassesGroup.add(lensL);
+
+    const lensR = new THREE.Mesh(lensGeo, lensMat);
+    lensR.position.set(0.38, 0.08, 1.30);
+    lensR.rotation.set(-0.06, 0.14, 0);
+    this.glassesGroup.add(lensR);
+
+    this.glassesGroup.visible = false;
+  }
+
+  createPencilAccessory() {
+    this.pencilGroup = new THREE.Group();
+    this.pencilGroup.position.set(0.72, 0.84, 0.18);
+    this.pencilGroup.rotation.set(0.15, 0.10, -0.55);
+    this.accessoriesGroup.add(this.pencilGroup);
+
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0xF59E0B, roughness: 0.35 });
+    const ferruleMat = new THREE.MeshStandardMaterial({ color: 0xD1D5DB, metalness: 0.8, roughness: 0.25 });
+    const eraserMat = new THREE.MeshStandardMaterial({ color: 0xF472B6, roughness: 0.8 });
+    const tipMat = new THREE.MeshStandardMaterial({ color: 0xFEF3C7, roughness: 0.6 });
+    const leadMat = new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.4 });
+
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.44, 6), woodMat);
+    this.pencilGroup.add(shaft);
+
+    const ferrule = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.040, 0.06, 16), ferruleMat);
+    ferrule.position.y = 0.25;
+    this.pencilGroup.add(ferrule);
+
+    const eraser = new THREE.Mesh(new THREE.CylinderGeometry(0.037, 0.037, 0.08, 16), eraserMat);
+    eraser.position.y = 0.32;
+    this.pencilGroup.add(eraser);
+
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.038, 0.11, 16), tipMat);
+    cone.position.y = -0.275;
+    cone.rotation.x = Math.PI;
+    this.pencilGroup.add(cone);
+
+    const lead = new THREE.Mesh(new THREE.ConeGeometry(0.016, 0.045, 16), leadMat);
+    lead.position.y = -0.31;
+    lead.rotation.x = Math.PI;
+    this.pencilGroup.add(lead);
+
+    this.pencilGroup.visible = false;
+  }
+
+  setAccessory(name) {
+    this.currentAccessory = name;
+    if (this.headsetGroup) this.headsetGroup.visible = (name === 'headset');
+    if (this.glassesGroup) this.glassesGroup.visible = (name === 'glasses');
+    if (this.pencilGroup) this.pencilGroup.visible = (name === 'pencil');
+  }
+
+  setThinking(isThinking) {
+    this.isThinking = !!isThinking;
+    if (this.isThinking) {
+      this.setBadge('chat_purple');
+      this.setAura('purple');
+      this.targetRot.z = 0.08;
+      this.targetRot.y = 0.12;
+      this.triggerHandGesture('wave', 3.5);
+    } else {
+      this.setBadge(null);
+      this.setAura(null);
+      this.targetRot.z = 0;
+      this.targetRot.y = 0;
+      this.retractHands();
+    }
+  }
+
+  setTalking(isTalking, durationSeconds = 0) {
+    this.isTalking = !!isTalking;
+    this.talkDuration = durationSeconds > 0 ? durationSeconds : 0;
+  }
+
+  updateMouthMotion(dt) {
+    if (this.talkDuration > 0) {
+      this.talkDuration -= dt;
+      if (this.talkDuration <= 0) {
+        this.isTalking = false;
+        this.talkDuration = 0;
+      }
+    }
+
+    if (this.isTalking) {
+      this.talkTimer = (this.talkTimer || 0) + dt;
+      const syllableWave = Math.sin(this.talkTimer * 14.0) * 0.55 + Math.sin(this.talkTimer * 22.0) * 0.25 + 0.20;
+      const mouthOpen = Math.max(0, Math.min(1.0, syllableWave));
+
+      if (this.mood !== 'pout' && this.mood !== 'sleepy') {
+        if (this.mouthW) {
+          this.mouthW.position.y = -0.10 - mouthOpen * 0.038;
+          this.mouthW.scale.set(1.0 - mouthOpen * 0.14, 1.0 + mouthOpen * 0.52, 1.0);
+        }
+        if (this.mouthO) {
+          this.mouthO.visible = (mouthOpen > 0.38);
+          this.mouthO.position.y = -0.105 - mouthOpen * 0.022;
+          this.mouthO.scale.set(0.70 + mouthOpen * 0.35, 0.70 + mouthOpen * 0.45, 1.0);
+        }
+      } else {
+        if (this.mouthPout) {
+          this.mouthPout.position.y = -0.11 + Math.sin(this.talkTimer * 12.0) * 0.015;
+        }
+      }
+    } else {
+      const breath = Math.sin(this.time * 2.2) * 0.005;
+      if (this.mouthW && this.mouthW.visible) {
+        this.mouthW.position.y = -0.10 + breath;
+        this.mouthW.scale.set(1.0, 1.0, 1.0);
+      }
+      if (this.mouthO && (this.mood === 'dots' || this.mood === 'wink')) {
+        this.mouthO.visible = false;
+      }
+    }
+  }
+
+  updateAccessoriesMotion(dt) {
+    if (this.currentAccessory === 'headset') {
+      // 1. Headset LED neon ring pulses with audio rhythm
+      const audioPulse = Math.sin(this.time * 8.5) * 0.5 + 0.5;
+      if (this.headsetLedMat) {
+        this.headsetLedMat.opacity = 0.55 + audioPulse * 0.45;
+      }
+      if (this.headsetLedL && this.headsetLedR) {
+        const pScale = 1.0 + audioPulse * 0.20;
+        this.headsetLedL.scale.set(pScale, pScale, 1.0);
+        this.headsetLedR.scale.set(pScale, pScale, 1.0);
+      }
+      // 2. Rhythmic listening head bop
+      const headBop = Math.sin(this.time * 4.6) * 0.06;
+      this.targetRot.x += headBop;
+      if (this.earPhys) {
+        this.earPhys.L.tip += headBop * 0.4;
+        this.earPhys.R.tip += headBop * 0.4;
+      }
+    } else if (this.currentAccessory === 'glasses') {
+      // 1. Reading eye scan motion: sweep smoothly left to right, then return
+      const scanPeriod = 1.6;
+      const scanProg = (this.time % scanPeriod) / scanPeriod;
+      let scanX = 0;
+      if (scanProg < 0.82) {
+        scanX = ((scanProg / 0.82) - 0.5) * 0.09;
+      } else {
+        const retProg = (scanProg - 0.82) / 0.18;
+        scanX = (0.5 - retProg) * 0.09;
+      }
+      if (this.eyeLeftDot && this.eyeRightDot) {
+        this.eyeLeftDot.position.x = -0.38 + scanX;
+        this.eyeRightDot.position.x = 0.38 + scanX;
+      }
+      this.targetRot.y = Math.sin(this.time * 1.6) * 0.035;
+    } else if (this.currentAccessory === 'pencil') {
+      if (this.pencilGroup) {
+        this.pencilGroup.rotation.z = -0.55 + Math.sin(this.time * 9.0) * 0.06;
+      }
+    } else {
+      if (this.eyeLeftDot && this.eyeRightDot && this.mood === 'dots') {
+        this.eyeLeftDot.position.x = -0.38;
+        this.eyeRightDot.position.x = 0.38;
+      }
+    }
+  }
+
   createParticles() {
     this.particleGroup = new THREE.Group();
     this.scene.add(this.particleGroup);
@@ -1829,9 +2153,16 @@ export class FiezelMochi {
     this.faceGroup.scale.set(this.squish.x, this.squish.y, this.squish.z);
     if (this.earsGroup) this.earsGroup.scale.set(this.squish.x, this.squish.y, this.squish.z);
     if (this.tailGroup) this.tailGroup.scale.set(this.squish.x, this.squish.y, this.squish.z);
+    if (this.accessoriesGroup) this.accessoriesGroup.scale.set(this.squish.x, this.squish.y, this.squish.z);
 
     // Fox Ears & Cat Tail kinematics and expressive reaction
     this.updateEarsAndTail(dt);
+
+    // Dynamic Mouth Motion (Talking articulation & subtle micro-breathing)
+    this.updateMouthMotion(dt);
+
+    // Dynamic Accessories Motion & Sesi Kinematics
+    this.updateAccessoriesMotion(dt);
 
     // 4. Heart eyes gentle pulse (Frame 11)
     if (this.mood === 'hearts') {
@@ -1978,6 +2309,21 @@ export class FiezelMochi {
           P.x = -1.80; P.y = -0.30 + bob; P.z = 0.52;
           P.rx = 0.05; P.ry = 0.35; P.rz = 0.25;
           P.s = 0.88;
+        }
+      } else if (this.currentAccessory === 'pencil') {
+        if (lead) {
+          // RIGHT PAW: Writing scribbling motion with mini pencil
+          const scribbleX = Math.cos(t * 11.0) * 0.05;
+          const scribbleY = Math.sin(t * 11.0) * 0.03;
+          P.x = 1.35 + scribbleX;
+          P.y = -0.16 + scribbleY + bob * 0.4;
+          P.z = 0.65;
+          P.rx = -0.06; P.ry = -0.25; P.rz = -0.32;
+          P.s = 0.95;
+        } else {
+          P.x = -1.35; P.y = -0.22 + bob * 0.4; P.z = 0.55;
+          P.rx = 0.06; P.ry = 0.25; P.rz = 0.16;
+          P.s = 0.85;
         }
       }
       return P;

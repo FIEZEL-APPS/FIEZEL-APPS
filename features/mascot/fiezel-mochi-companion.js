@@ -103,12 +103,56 @@
     return { w: Math.round(w), h: Math.round(h) };
   }
 
+  function detectSession(host) {
+    try {
+      if (!host) return 'quiz';
+      if (host.closest('.jlpt-mascot-slot') ||
+          host.closest('.fsl-mascot-slot') ||
+          host.closest('#listeningPanelModal') ||
+          host.closest('.fsl-player') ||
+          (typeof global.__getFiezelState === 'function' && global.__getFiezelState()?.view === 'listening')) {
+        return 'listening';
+      }
+      if (host.closest('.writing-stage') ||
+          host.closest('.writing-shell') ||
+          host.classList.contains('writing-mascot') ||
+          (typeof global.__getFiezelState === 'function' && global.__getFiezelState()?.view === 'writing')) {
+        return 'writing';
+      }
+      if (host.closest('.reading-stage') ||
+          host.closest('.reading-shell') ||
+          host.closest('.quiz-shell.is-reading') ||
+          (typeof global.__getFiezelState === 'function' && global.__getFiezelState()?.view === 'reading')) {
+        return 'reading';
+      }
+    } catch (_) {}
+    return 'quiz';
+  }
+
+  function applySessionAccessories(m, host) {
+    if (!m || typeof m.setAccessory !== 'function') return;
+    var session = detectSession(host);
+    if (session === 'listening') {
+      m.setAccessory('headset');
+      m.setAura('blue');
+    } else if (session === 'reading') {
+      m.setAccessory('glasses');
+      m.setAura(null);
+    } else if (session === 'writing') {
+      m.setAccessory('pencil');
+      m.setAura(null);
+    } else {
+      m.setAccessory(null);
+      m.setAura(null);
+    }
+  }
+
   function createPoolInstance(size) {
     var viewport = createViewport();
     var mochi = new global.FiezelMochi(viewport, {
       mood: 'dots',
-      badge: 'chat_purple',
-      aura: 'purple',
+      badge: null,       // Badges purple GONE on idle! Only appears when thinking
+      aura: null,
       showHands: true,
       showEars: true,
       showTail: false,
@@ -171,10 +215,11 @@
           setTimeout(function () {
             if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
               m.setMood('dots');
-              m.setBadge('chat_purple');
-              m.setAura('purple');
+              m.setBadge(null);
+              m.setAura(null);
               m.setFx(null);
               m.retractHands();
+              applySessionAccessories(m, host);
             }
           }, 2300);
           break;
@@ -188,41 +233,69 @@
           setTimeout(function () {
             if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
               m.setMood('dots');
-              m.setBadge('chat_purple');
-              m.setAura('purple');
+              m.setBadge(null);
+              m.setAura(null);
               m.setFx(null);
               m.retractHands();
+              applySessionAccessories(m, host);
             }
           }, 2100);
           break;
         case 'listening-start':
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null);
+          m.setAccessory('headset');
+          m.setAura('blue');
+          if (typeof m.setTalking === 'function') m.setTalking(true);
           m.triggerHandGesture('wave', 1.2);
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
           break;
         case 'listening-stop':
           m.setMood('dots');
-          m.setBadge('chat_purple'); // Keep indicator badge active
-          m.setAura('purple');
+          m.setBadge(null);
+          if (typeof m.setTalking === 'function') m.setTalking(false);
           m.retractHands();
+          applySessionAccessories(m, host);
+          break;
+        case 'speaking':
+        case 'talk':
+          if (typeof m.setTalking === 'function') m.setTalking(true, (detail && detail.duration) ? detail.duration : 0);
+          break;
+        case 'speaking-stop':
+          if (typeof m.setTalking === 'function') m.setTalking(false);
+          break;
+        case 'think':
+        case 'thinking':
+        case 'evaluating':
+        case 'analyzing':
+        case 'loading':
+          if (typeof m.setThinking === 'function') m.setThinking(true);
+          else { m.setBadge('chat_purple'); m.setAura('purple'); }
+          break;
+        case 'think-end':
+        case 'thinking-end':
+        case 'think-stop':
+          if (typeof m.setThinking === 'function') m.setThinking(false);
+          else { m.setBadge(null); m.setAura(null); }
+          applySessionAccessories(m, host);
           break;
         case 'question-shown':
           host.__mochiHoldUntil = 0;
           m.setMood('dots');
-          m.setBadge('chat_purple'); // Always show indicator badge
-          m.setAura('purple');
+          m.setBadge(null); // Purple badge GONE on question shown!
+          m.setAura(null);
           m.retractHands();
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          applySessionAccessories(m, host);
           break;
         case 'idle':
           host.__mochiHoldUntil = 0;
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null); // Purple badge GONE on idle!
+          m.setAura(null);
           m.setFx(null);
           m.retractHands();
+          applySessionAccessories(m, host);
           break;
         case 'hover-answer':
           m.triggerHandGesture('wave', 1.5);
@@ -233,8 +306,7 @@
           break;
         case 'answer-picked':
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null);
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.0);
           break;
         case 'reward':
@@ -252,10 +324,11 @@
           setTimeout(function () {
             if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
               m.setMood('dots');
-              m.setBadge('chat_purple');
-              m.setAura('purple');
+              m.setBadge(null);
+              m.setAura(null);
               m.setFx(null);
               m.retractHands();
+              applySessionAccessories(m, host);
             }
           }, 2600);
           break;
@@ -266,26 +339,26 @@
         case 'onboard':
           host.__mochiHoldUntil = 0;
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null);
           m.triggerHop(0.25);
           m.triggerHandGesture('wave', 1.4);
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          applySessionAccessories(m, host);
           break;
         case 'curious':
         case 'encouraging':
           host.__mochiHoldUntil = 0;
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null);
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          applySessionAccessories(m, host);
           break;
         case 'wake':
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null);
           m.triggerHop(0.22);
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          applySessionAccessories(m, host);
           break;
       }
       return ret;
@@ -325,18 +398,35 @@
           m.setFx(null);
           m.triggerHandGesture('sulk', 2.0);
           break;
+        case 'thinking':
+          if (typeof m.setThinking === 'function') m.setThinking(true);
+          else { m.setBadge('chat_purple'); m.setAura('purple'); }
+          break;
         case 'listening':
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null);
+          m.setAccessory('headset');
+          m.setAura('blue');
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'reading':
+          m.setMood('dots');
+          m.setBadge(null);
+          m.setAccessory('glasses');
+          m.setAura(null);
+          break;
+        case 'writing':
+          m.setMood('dots');
+          m.setBadge(null);
+          m.setAccessory('pencil');
+          m.setAura(null);
           break;
         case 'curious':
         case 'encouraging':
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null);
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          applySessionAccessories(m, host);
           break;
         case 'lesson-start':
         case 'session-start':
@@ -344,11 +434,11 @@
         case 'welcome-back':
         case 'onboard':
           m.setMood('dots');
-          m.setBadge('chat_purple');
-          m.setAura('purple');
+          m.setBadge(null);
           m.triggerHop(0.25);
           m.triggerHandGesture('wave', 1.4);
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          applySessionAccessories(m, host);
           break;
         case 'sleepy':
           m.setMood('sleepy');
@@ -357,11 +447,11 @@
           break;
         case 'idle':
           m.setMood('dots');
-          m.setBadge('chat_purple'); // ALWAYS KEEP INDICATOR BADGE VISIBLE ON IDLE/DIAM!
-          m.setAura('purple');
+          m.setBadge(null);
           m.setFx(null);
           m.retractHands();
           if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(0.9);
+          applySessionAccessories(m, host);
           break;
       }
       return ret;
@@ -438,12 +528,12 @@
     // Same entrance a freshly built Mochi used to make on a new host
     try {
       if (m.mood !== 'dots') m.setMood('dots');
-      m.setBadge('chat_purple');
-      m.setAura('purple');
+      m.setBadge(null); // Purple badge GONE on mount/idle!
       m.setFx(null);
       m.retractHands();
       m.resume();
       if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+      applySessionAccessories(m, host);
     } catch (_) {}
 
     // Re-calibrate size after CSS modal/card pop animations settle (280ms)
@@ -665,9 +755,33 @@
     init();
   }
 
+  // Real-time Audio / Speech Watcher: Drives Mochi mouth animation during voice playback
+  if (typeof global.setInterval !== 'undefined') {
+    global.setInterval(function () {
+      try {
+        if (!pool.mochi || !pool.host) return;
+        var isSpeaking = false;
+        if (typeof global.voiceIsSpeaking === 'function') isSpeaking = global.voiceIsSpeaking();
+        else if (global.FiezelSpeechBridge && global.FiezelSpeechBridge.speaking && global.FiezelSpeechBridge.speaking()) isSpeaking = true;
+        else if (global.FiezelPuterVoice && global.FiezelPuterVoice.status && global.FiezelPuterVoice.status().speaking) isSpeaking = true;
+
+        if (pool._lastSpeaking !== isSpeaking) {
+          pool._lastSpeaking = isSpeaking;
+          if (typeof pool.mochi.setTalking === 'function') {
+            pool.mochi.setTalking(isSpeaking);
+          }
+        }
+      } catch (_) {}
+    }, 100);
+  }
+
   global.FiezelMochiCompanion = {
     scan: scanAndAttach,
-    attach: attachMochi
+    attach: attachMochi,
+    getInstance: function () { return pool.mochi; },
+    setAccessory: function (acc) { if (pool.mochi && typeof pool.mochi.setAccessory === 'function') pool.mochi.setAccessory(acc); },
+    setThinking: function (th) { if (pool.mochi && typeof pool.mochi.setThinking === 'function') pool.mochi.setThinking(th); },
+    setTalking: function (tk, dur) { if (pool.mochi && typeof pool.mochi.setTalking === 'function') pool.mochi.setTalking(tk, dur); }
   };
 
 })(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : null));
