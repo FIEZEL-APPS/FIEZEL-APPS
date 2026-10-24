@@ -56,6 +56,19 @@ public class FiezelNativeBridge {
     }
 
     /**
+     * Triggers a seamless reload of the WebView to immediately synchronize with live server changes.
+     */
+    @JavascriptInterface
+    public void reloadApp() {
+        activity.runOnUiThread(() -> {
+            if (webView != null) {
+                Log.i(TAG, "Native OTA sync reload triggered via bridge");
+                webView.reload();
+            }
+        });
+    }
+
+    /**
      * Triggers physical haptic feedback via the Android Vibrator.
      *
      * @param durationMs Milliseconds to vibrate (fallback)
