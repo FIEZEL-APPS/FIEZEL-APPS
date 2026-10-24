@@ -11062,6 +11062,70 @@ function todayHomeMarkup(){
     + `</div>` : '')
     + `</div>`
     + `</div>`;
+
+  /* Quick Practice (4-Grid Learning Cards) */
+  const quickPracticeCard = `
+    <section class="quick-practice-section fz-vissol-learning-hub" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
+      ${targetLangChipMarkup()}
+      <div class="fz-vissol-grid">
+        <div class="fz-vissol-tile is-vocab" role="button" tabindex="0" onclick="go('vocab')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('vocab')}">
+          <div class="fz-vissol-tile-top">
+            <span class="fz-vissol-tile-icon is-vocab-icon">ABC</span>
+            <span class="fz-vissol-tile-chevron is-vocab-chevron">›</span>
+          </div>
+          <div class="fz-vissol-tile-bottom">
+            <h3 class="fz-vissol-tile-title">Vocabulary</h3>
+            <p class="fz-vissol-tile-sub">Kosakata</p>
+          </div>
+        </div>
+
+        <div class="fz-vissol-tile is-grammar" role="button" tabindex="0" onclick="go('grammar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('grammar')}">
+          <div class="fz-vissol-tile-top">
+            <span class="fz-vissol-tile-icon is-grammar-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+              </svg>
+            </span>
+            <span class="fz-vissol-tile-chevron is-grammar-chevron">›</span>
+          </div>
+          <div class="fz-vissol-tile-bottom">
+            <h3 class="fz-vissol-tile-title">Grammar</h3>
+            <p class="fz-vissol-tile-sub">Tata bahasa</p>
+          </div>
+        </div>
+
+        <div class="fz-vissol-tile is-reading" role="button" tabindex="0" onclick="go('reading')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('reading')}">
+          <div class="fz-vissol-tile-top">
+            <span class="fz-vissol-tile-icon is-reading-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+            </span>
+            <span class="fz-vissol-tile-chevron is-reading-chevron">›</span>
+          </div>
+          <div class="fz-vissol-tile-bottom">
+            <h3 class="fz-vissol-tile-title">Reading</h3>
+            <p class="fz-vissol-tile-sub">Pemahaman teks</p>
+          </div>
+        </div>
+
+        <div class="fz-vissol-tile is-listening" role="button" tabindex="0" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('skills');" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('skills');}">
+          <div class="fz-vissol-tile-top">
+            <span class="fz-vissol-tile-icon is-listening-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+              </svg>
+            </span>
+            <span class="fz-vissol-tile-chevron is-listening-chevron">›</span>
+          </div>
+          <div class="fz-vissol-tile-bottom">
+            <h3 class="fz-vissol-tile-title">Listening-Writing</h3>
+            <p class="fz-vissol-tile-sub">${esc(FiezelI18n.t('home.chip-dengar-sub'))}</p>
+          </div>
+        </div>
+      </div>
+    </section>`;
+
   /* UX-BRIEF §1: tombol aksi utama yang mencolok di lipatan pertama - "Mulai Belajar Sekarang"
      atau "Lanjutkan Misi" kalau ada sesi yang tertunda. Satu ketukan → homeQuickStart(). */
   const heroResume = !!(state.activeSession && state.adaptiveReady);
@@ -11543,68 +11607,6 @@ function todayHomeMarkup(){
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
             <span>± ${Math.max(8, Math.round(((rhythmTarget || 6) - (rhythmShown || 4)) * 8.5))} menit lagi</span>
-          </div>
-        </div>
-      </div>
-    </section>`;
-
-  /* Quick Practice (4-Grid Learning Cards) */
-  const quickPracticeCard = `
-    <section class="quick-practice-section fz-vissol-learning-hub" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
-      <div class="fz-vissol-grid">
-        <div class="fz-vissol-tile is-vocab" role="button" tabindex="0" onclick="go('vocab')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('vocab')}">
-          <div class="fz-vissol-tile-top">
-            <span class="fz-vissol-tile-icon is-vocab-icon">ABC</span>
-            <span class="fz-vissol-tile-chevron is-vocab-chevron">›</span>
-          </div>
-          <div class="fz-vissol-tile-bottom">
-            <h3 class="fz-vissol-tile-title">Vocabulary</h3>
-            <p class="fz-vissol-tile-sub">Kosakata</p>
-          </div>
-        </div>
-
-        <div class="fz-vissol-tile is-grammar" role="button" tabindex="0" onclick="go('grammar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('grammar')}">
-          <div class="fz-vissol-tile-top">
-            <span class="fz-vissol-tile-icon is-grammar-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-              </svg>
-            </span>
-            <span class="fz-vissol-tile-chevron is-grammar-chevron">›</span>
-          </div>
-          <div class="fz-vissol-tile-bottom">
-            <h3 class="fz-vissol-tile-title">Grammar</h3>
-            <p class="fz-vissol-tile-sub">Tata bahasa</p>
-          </div>
-        </div>
-
-        <div class="fz-vissol-tile is-reading" role="button" tabindex="0" onclick="go('reading')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('reading')}">
-          <div class="fz-vissol-tile-top">
-            <span class="fz-vissol-tile-icon is-reading-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-              </svg>
-            </span>
-            <span class="fz-vissol-tile-chevron is-reading-chevron">›</span>
-          </div>
-          <div class="fz-vissol-tile-bottom">
-            <h3 class="fz-vissol-tile-title">Reading</h3>
-            <p class="fz-vissol-tile-sub">Pemahaman teks</p>
-          </div>
-        </div>
-
-        <div class="fz-vissol-tile is-listening" role="button" tabindex="0" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('skills');" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('skills');}">
-          <div class="fz-vissol-tile-top">
-            <span class="fz-vissol-tile-icon is-listening-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
-              </svg>
-            </span>
-            <span class="fz-vissol-tile-chevron is-listening-chevron">›</span>
-          </div>
-          <div class="fz-vissol-tile-bottom">
-            <h3 class="fz-vissol-tile-title">Listening-Writing</h3>
-            <p class="fz-vissol-tile-sub">${esc(FiezelI18n.t('home.chip-dengar-sub'))}</p>
           </div>
         </div>
       </div>
