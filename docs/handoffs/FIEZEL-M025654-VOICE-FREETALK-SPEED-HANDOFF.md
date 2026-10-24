@@ -1,7 +1,7 @@
-# FIEZEL HANDOFF DOSSIER: Build m025-653
+# FIEZEL HANDOFF DOSSIER: Build m025-654
 ## Mitra Kaiwa & Kawan Bicara: Free Talk Real-Human Voice Architecture
 
-- **Nomor Build**: `m025-653`
+- **Nomor Build**: `m025-654`
 - **Tanggal**: 24 Oktober 2026
 - **Status Mutu**: HIJAU / LULUS SEMUA GERBANG MUTU
 - **Branch**: `feat/m025-653-voice-freetalk-clean`
