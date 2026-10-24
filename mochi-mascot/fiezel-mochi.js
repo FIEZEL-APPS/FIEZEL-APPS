@@ -1485,7 +1485,7 @@ export class FiezelMochi {
     const buildCup = (side) => {
       const cup = new THREE.Group();
       cup.position.set(side * 1.54, 0.16, 0.22);
-      cup.rotation.set(0.06, -side * 0.42, -side * 0.12);
+      cup.rotation.set(0.08, -side * 0.52, -side * 0.10);
       cup.renderOrder = 2500;
 
       // 2a. Plush Cheek Cushion Ring (Marshmallow cream)
@@ -1613,8 +1613,8 @@ export class FiezelMochi {
     });
 
     // 1. Chunky Rounded Rims (Left & Right)
-    const rimRadius = 0.27;
-    const rimTube = 0.028;
+    const rimRadius = 0.25;
+    const rimTube = 0.020;
     const rimGeo = new THREE.TorusGeometry(rimRadius, rimTube, 16, 48);
 
     const rimL = new THREE.Mesh(rimGeo, frameMat);
@@ -1631,12 +1631,12 @@ export class FiezelMochi {
 
     // 2. Arched Gold Nose Bridge
     const bridgePoints = [
-      new THREE.Vector3(-0.13, 0.09, 1.35),
-      new THREE.Vector3( 0.00, 0.14, 1.36),
-      new THREE.Vector3( 0.13, 0.09, 1.35)
+      new THREE.Vector3(-0.12, 0.08, 1.35),
+      new THREE.Vector3( 0.00, 0.12, 1.36),
+      new THREE.Vector3( 0.12, 0.08, 1.35)
     ];
     const bridgeCurve = new THREE.CatmullRomCurve3(bridgePoints);
-    const bridgeGeo = new THREE.TubeGeometry(bridgeCurve, 16, 0.020, 12, false);
+    const bridgeGeo = new THREE.TubeGeometry(bridgeCurve, 16, 0.016, 12, false);
     const bridgeMesh = new THREE.Mesh(bridgeGeo, goldMat);
     bridgeMesh.renderOrder = 2501;
     this.glassesGroup.add(bridgeMesh);
@@ -1657,25 +1657,25 @@ export class FiezelMochi {
     this.glassesGroup.add(lensR);
 
     // 4. Iconic Anime Glasses Gleam Highlight (Upper-Left on each lens)
-    const gleamGeo = new THREE.CapsuleGeometry(0.024, 0.10, 4, 12);
+    const gleamGeo = new THREE.CapsuleGeometry(0.020, 0.08, 4, 12);
 
     const gleamL = new THREE.Mesh(gleamGeo, gleamMat);
-    gleamL.position.set(-0.46, 0.17, 1.345);
+    gleamL.position.set(-0.46, 0.16, 1.345);
     gleamL.rotation.set(-0.06, -0.14, Math.PI / 4);
     gleamL.renderOrder = 2502;
     this.glassesGroup.add(gleamL);
 
     const gleamR = new THREE.Mesh(gleamGeo, gleamMat);
-    gleamR.position.set(0.30, 0.17, 1.345);
+    gleamR.position.set(0.30, 0.16, 1.345);
     gleamR.rotation.set(-0.06, 0.14, Math.PI / 4);
     gleamR.renderOrder = 2502;
     this.glassesGroup.add(gleamR);
 
     // 5. Chic Gold Temple Hinges (Discreet, cute, sits flush at outer rim edges)
     [-1, 1].forEach((side) => {
-      const hingeGeo = new THREE.CylinderGeometry(0.028, 0.028, 0.05, 16);
+      const hingeGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.045, 16);
       const hinge = new THREE.Mesh(hingeGeo, goldMat);
-      hinge.position.set(side * 0.65, 0.08, 1.32);
+      hinge.position.set(side * 0.64, 0.08, 1.31);
       hinge.rotation.z = Math.PI / 2;
       hinge.renderOrder = 2501;
       this.glassesGroup.add(hinge);
@@ -1690,9 +1690,9 @@ export class FiezelMochi {
     this.pencilGroup.rotation.set(0.12, -0.20, -0.75);
     this.pencilGroup.renderOrder = 2500;
 
-    // Attach directly to Right Paw's core so it moves naturally with the paw!
-    if (this.handR && this.handR.userData && this.handR.userData.core) {
-      this.handR.userData.core.add(this.pencilGroup);
+    // Attach directly to Right Paw (NOT core) so it moves naturally with the paw without squashing!
+    if (this.handR) {
+      this.handR.add(this.pencilGroup);
     } else {
       this.accessoriesGroup.add(this.pencilGroup);
     }
@@ -1743,16 +1743,9 @@ export class FiezelMochi {
     if (this.glassesGroup) this.glassesGroup.visible = (name === 'glasses');
     if (this.pencilGroup) this.pencilGroup.visible = (name === 'pencil');
 
-    if (name === 'pencil') {
-      if (this.handR) {
-        this.handR.visible = true;
-        this.handR.scale.set(1.0, 1.0, 1.0);
-        this.handR.position.set(0.92, -0.10, 0.72);
-        this.handR.rotation.set(-0.20, 0.15, -0.35);
-      }
-    } else {
+    if (name !== 'pencil') {
       if (this.pencilGroup && !this.pencilGroup.visible) {
-        if (this.handR && !this.handGesture) {
+        if (this.handR && !this.handGesture && this.handState === 'hidden') {
           this.handR.visible = false;
           this.handR.scale.set(0.001, 0.001, 0.001);
         }
@@ -1801,14 +1794,19 @@ export class FiezelMochi {
       const mouthOpen = Math.max(0, Math.min(1.0, syllableWave));
 
       if (this.mood !== 'pout' && this.mood !== 'sleepy') {
+        const isOpen = (mouthOpen > 0.35);
+        if (this.mouthHappy) {
+          this.mouthHappy.visible = isOpen;
+          this.mouthHappy.position.y = -0.10 - mouthOpen * 0.015;
+          const hScale = 0.85 + mouthOpen * 0.25;
+          this.mouthHappy.scale.set(hScale, hScale, 1.0);
+        }
         if (this.mouthW) {
-          this.mouthW.position.y = -0.10 - mouthOpen * 0.038;
-          this.mouthW.scale.set(1.0 - mouthOpen * 0.14, 1.0 + mouthOpen * 0.52, 1.0);
+          this.mouthW.visible = !isOpen;
+          this.mouthW.position.y = -0.10 - mouthOpen * 0.02;
         }
         if (this.mouthO) {
-          this.mouthO.visible = (mouthOpen > 0.38);
-          this.mouthO.position.y = -0.105 - mouthOpen * 0.022;
-          this.mouthO.scale.set(0.70 + mouthOpen * 0.35, 0.70 + mouthOpen * 0.45, 1.0);
+          this.mouthO.visible = false;
         }
       } else {
         if (this.mouthPout) {
@@ -1817,11 +1815,15 @@ export class FiezelMochi {
       }
     } else {
       const breath = Math.sin(this.time * 2.2) * 0.005;
-      if (this.mouthW && this.mouthW.visible) {
+      if (this.mouthW && (this.mood === 'dots' || this.mood === 'wink')) {
+        this.mouthW.visible = true;
         this.mouthW.position.y = -0.10 + breath;
         this.mouthW.scale.set(1.0, 1.0, 1.0);
       }
-      if (this.mouthO && (this.mood === 'dots' || this.mood === 'wink')) {
+      if (this.mouthHappy) {
+        this.mouthHappy.visible = (this.mood === 'happy');
+      }
+      if (this.mouthO) {
         this.mouthO.visible = false;
       }
     }
@@ -1829,56 +1831,54 @@ export class FiezelMochi {
 
   updateAccessoriesMotion(dt) {
     if (this.currentAccessory === 'headset') {
-      // Gentle, cozy, relaxing lofi listening groove (NO DIZZINESS, NO RAPID SHAKE)
-      // Tempo: 65 BPM chill beat (~0.35 Hz)
-      const lofiTime = this.time * 2.2;
+      // Gentle, cozy, relaxing lofi listening groove (Single master phase, ZERO DIZZINESS)
+      const lofiTime = this.time * 1.5;
 
-      // 1. Soft rhythmic head tilt (only +/- 2.0 degrees, very gentle and cozy)
-      const tiltZ = Math.sin(lofiTime) * 0.035;
-      // 2. Soft micro-nod on the beat (max 1.4 degrees)
-      const nodX = (Math.sin(lofiTime * 2.0) * 0.5 + 0.5) * 0.022;
+      // 1. Soft rhythmic head tilt (only +/- 1.2 degrees, smooth and cozy)
+      const tiltZ = Math.sin(lofiTime) * 0.022;
+      // 2. Soft micro-nod on the beat (only 0.8 degrees)
+      const nodX = (Math.sin(lofiTime * 2.0) * 0.5 + 0.5) * 0.015;
       // 3. Gentle float breath
-      const bobY = Math.sin(lofiTime) * 0.016;
+      const bobY = Math.sin(lofiTime) * 0.010;
 
       this.accessoryMotionOffset = { rotX: nodX, rotY: 0, rotZ: tiltZ, posY: bobY };
 
       // 4. Soothing Breathing LED Glow (smooth ambient light, zero aggressive strobe)
       if (this.headsetLedMat) {
-        const breath = Math.sin(this.time * 2.2) * 0.22 + 0.78;
+        const breath = Math.sin(lofiTime) * 0.20 + 0.80;
         this.headsetLedMat.opacity = breath;
         if (this.headsetLedL && this.headsetLedR) {
-          const pScale = 1.0 + breath * 0.04;
+          const pScale = 1.0 + breath * 0.03;
           this.headsetLedL.scale.set(pScale, pScale, 1.0);
           this.headsetLedR.scale.set(pScale, pScale, 1.0);
         }
       }
     } else if (this.currentAccessory === 'glasses') {
       // Intelligent reading focus: soft focus tilt and smooth, gentle text-scan
-      const scanPeriod = 2.4;
+      const scanPeriod = 2.6;
       const scanProg = (this.time % scanPeriod) / scanPeriod;
       let scanX = 0;
       if (scanProg < 0.80) {
-        scanX = ((scanProg / 0.80) - 0.5) * 0.045;
+        scanX = ((scanProg / 0.80) - 0.5) * 0.035;
       } else {
         const retProg = (scanProg - 0.80) / 0.20;
-        scanX = (0.5 - retProg) * 0.045;
+        scanX = (0.5 - retProg) * 0.035;
       }
       if (this.eyeLeftDot && this.eyeRightDot) {
         this.eyeLeftDot.position.x = -0.38 + scanX;
         this.eyeRightDot.position.x = 0.38 + scanX;
       }
-      this.accessoryMotionOffset = { rotX: 0.025, rotY: Math.sin(this.time * 1.4) * 0.020, rotZ: 0, posY: 0 };
+      this.accessoryMotionOffset = { rotX: 0.025, rotY: Math.sin(this.time * 1.2) * 0.018, rotZ: 0, posY: 0 };
     } else if (this.currentAccessory === 'pencil') {
-      // Gentle rhythmic writing / note-taking gestures
-      const scribble = Math.sin(this.time * 3.5) * 0.03;
-      if (this.pencilGroup) {
-        this.pencilGroup.rotation.z = -0.45 + scribble;
-        this.pencilGroup.position.y = 0.05 + scribble * 0.5;
-      }
-      if (this.handR && this.handR.visible) {
-        this.handR.rotation.z = -0.35 + scribble;
-      }
-      this.accessoryMotionOffset = { rotX: 0.02, rotY: 0, rotZ: 0, posY: 0 };
+      // Gentle, calm study rhythm (NO JITTER, NO RAPID SHAKE)
+      const studyTime = this.time * 1.8;
+      const nod = Math.sin(studyTime) * 0.015;
+      this.accessoryMotionOffset = {
+        rotX: 0.025 + nod,
+        rotY: 0.035, // Looking slightly towards the pencil with cute focus
+        rotZ: -0.015,
+        posY: -0.008
+      };
     } else {
       this.accessoryMotionOffset = { rotX: 0, rotY: 0, rotZ: 0, posY: 0 };
       if (this.eyeLeftDot && this.eyeRightDot && this.mood === 'dots') {
@@ -2293,7 +2293,8 @@ export class FiezelMochi {
 
     this.updateAccessoriesMotion(dt);
 
-    const ambientSway = Math.sin(this.time * 1.8) * 0.035;
+    const hasAccessoryMotion = (this.currentAccessory === 'headset' || this.currentAccessory === 'pencil');
+    const ambientSway = hasAccessoryMotion ? 0 : Math.sin(this.time * 1.8) * 0.035;
     const accRotX = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotX) || 0;
     const accRotY = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotY) || 0;
     const accRotZ = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotZ) || 0;
@@ -2502,24 +2503,18 @@ export class FiezelMochi {
         }
       } else if (this.currentAccessory === 'pencil') {
         if (lead) {
-          // RIGHT PAW: Holding pencil, gentle writing motion
-          const scribbleX = Math.cos(t * 3.5) * 0.04;
-          const scribbleY = Math.sin(t * 3.5) * 0.02;
-          P.x = 1.40 + scribbleX;
-          P.y = -0.06 + scribbleY + bob * 0.4;
-          P.z = 0.88;
-          P.rx = -0.15;
-          P.ry = -0.22;
-          P.rz = -0.42 + scribbleX;
+          // RIGHT PAW: Holding pencil, gentle, rhythmic, charming bobbing
+          const wave = Math.sin(t * 1.8);
+          P.x = 1.42;
+          P.y = -0.06 + wave * 0.035;
+          P.z = 0.78;
+          P.rx = -0.12;
+          P.ry = -0.20;
+          P.rz = -0.32 + wave * 0.06;
           P.s = 1.0;
         } else {
-          P.x = -1.55;
-          P.y = -0.26 + bob * 0.4;
-          P.z = 0.55;
-          P.rx = 0.06;
-          P.ry = 0.25;
-          P.rz = 0.16;
-          P.s = 0.82;
+          // Left paw remains tucked inside cleanly during pencil writing
+          P.s = 0.0;
         }
       }
       return P;
