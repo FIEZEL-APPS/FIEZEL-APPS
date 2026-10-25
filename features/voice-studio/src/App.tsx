@@ -150,6 +150,11 @@ export default function App() {
   const [liveAiDraft, setLiveAiDraft] = useState<string>('');
   const [callDurationSec, setCallDurationSec] = useState<number>(0);
   const [syncingNow, setSyncingNow] = useState<boolean>(false);
+  const [showMicPermissionModal, setShowMicPermissionModal] = useState<boolean>(false);
+  const [isRequestingMic, setIsRequestingMic] = useState<boolean>(false);
+  const [micPermissionError, setMicPermissionError] = useState<string | null>(null);
+  const [isUserSpeakingLive, setIsUserSpeakingLive] = useState<boolean>(false);
+  const userSpeakingTimerRef = useRef<number | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
   const liveAudioCtxRef = useRef<AudioContext | null>(null);
@@ -1436,11 +1441,77 @@ export default function App() {
     void speakAiText(lastAi?.text || activeScenario.openingLine);
   };
 
-  const startLiveCall = async () => {
+  const acquireLiveMicrophoneStream = async (): Promise<MediaStream> => {
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      throw new Error('Peramban ini tidak mendukung akses mikrofon.');
+    }
+    // Percobaan 1: Konfigurasi standar dengan echoCancellation
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      const track = stream.getAudioTracks()[0];
+      if (track && track.readyState === 'live') {
+        return stream;
+      }
+    } catch {
+      // Fallback untuk Safari WebKit tertentu
+    }
+    // Percobaan 2: Konfigurasi minimalis murni { audio: true }
+    const fallbackStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const track = fallbackStream.getAudioTracks()[0];
+    if (!track || track.readyState !== 'live') {
+      throw new Error('Gagal mengaktifkan trek audio mikrofon.');
+    }
+    return fallbackStream;
+  };
+
+  const startLiveCall = async (preAcquiredStream?: MediaStream) => {
     if (isLiveConnected || isLiveConnecting) return;
     primeAudioPlayback();
 
-    // 1. Prime Unified Live AudioContext (native hardware rate for iOS & Desktop)
+    // 1. Dapatkan dan Verifikasi Mikrofon WAJIB (Mandatory Permission Gate)
+    let stream: MediaStream | null = preAcquiredStream || micStreamRef.current;
+    const hasLiveTrack = Boolean(
+      stream && stream.getAudioTracks().some((tr) => tr.readyState === 'live' && tr.enabled)
+    );
+
+    if (!hasLiveTrack) {
+      setIsRequestingMic(true);
+      setMicPermissionError(null);
+      try {
+        stream = await acquireLiveMicrophoneStream();
+        micStreamRef.current = stream;
+        setIsRequestingMic(false);
+        setShowMicPermissionModal(false);
+      } catch (err: any) {
+        setIsRequestingMic(false);
+        micStreamRef.current = null;
+        setShowMicPermissionModal(true);
+        const errMsg = err?.message || String(err || '');
+        if (
+          err?.name === 'NotAllowedError' ||
+          errMsg.includes('Permission denied') ||
+          errMsg.includes('not-allowed')
+        ) {
+          setMicPermissionError(
+            'Izin mikrofon belum diberikan oleh peramban. Di iPhone, ketuk tombol "aA" di bilah alamat Safari > Pengaturan Situs Web > Mikrofon: Izinkan.'
+          );
+        } else {
+          setMicPermissionError(
+            'Gagal mengakses mikrofon. Pastikan mikrofon perangkatmu tidak sedang digunakan oleh aplikasi lain.'
+          );
+        }
+        // MANDATORY INVARIANT: JIKA MIC GAGAL, DILARANG LANJUT PANGGILAN!
+        return;
+      }
+    }
+
+    // 2. Prime Unified Live AudioContext (native hardware rate for iOS & Desktop)
     const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
     if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
       liveAudioCtxRef.current = new CtxClass();
@@ -1453,146 +1524,137 @@ export default function App() {
       void liveCtx.resume().catch(() => {});
     }
 
-    // 2. Prime Microphone input stream directly in user gesture
-    if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          },
-        });
-        micStreamRef.current = stream;
+    try {
+      // Re-resume context for iOS AVAudioSession PlayAndRecord
+      if (liveCtx.state === 'suspended') {
+        await liveCtx.resume().catch(() => {});
+      }
 
-        // CRITICAL FOR iOS Safari WebKit:
-        // After getUserMedia resolves, iOS reconfigures AVAudioSession to PlayAndRecord.
-        // We must re-resume the AudioContext so it binds to the new hardware microphone route!
-        if (liveCtx.state === 'suspended') {
-          await liveCtx.resume().catch(() => {});
+      const source = liveCtx.createMediaStreamSource(stream!);
+      let workletInitialized = false;
+
+      const handleMicPcmData = (float32: Float32Array) => {
+        if (isMicMutedRef.current) return;
+        // Hitung volume untuk indikator visual user speaking
+        let sum = 0;
+        const step = Math.max(1, Math.floor(float32.length / 64));
+        let count = 0;
+        for (let i = 0; i < float32.length; i += step) {
+          sum += float32[i] * float32[i];
+          count++;
+        }
+        const rms = Math.sqrt(sum / count);
+        if (rms > 0.02) {
+          setIsUserSpeakingLive(true);
+          if (userSpeakingTimerRef.current) window.clearTimeout(userSpeakingTimerRef.current);
+          userSpeakingTimerRef.current = window.setTimeout(() => {
+            setIsUserSpeakingLive(false);
+          }, 450);
         }
 
-        const source = liveCtx.createMediaStreamSource(stream);
-        let workletInitialized = false;
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+          const pcmBase64 = resampleAndConvertToPcm16Base64(
+            float32,
+            liveCtx.sampleRate || 48000,
+            16000
+          );
+          wsRef.current.send(
+            JSON.stringify({
+              realtimeInput: {
+                audio: {
+                  mimeType: 'audio/pcm;rate=16000',
+                  data: pcmBase64,
+                },
+              },
+            })
+          );
+        }
+      };
 
-        // Try AudioWorklet first (Modern iOS Safari 14.5+ and Chromium)
-        if (
-          liveCtx.audioWorklet &&
-          typeof liveCtx.audioWorklet.addModule === 'function' &&
-          (typeof window !== 'undefined' && window.isSecureContext)
-        ) {
-          try {
-            const workletCode = `
-              class LiveMicCaptureProcessor extends AudioWorkletProcessor {
-                constructor() {
-                  super();
-                  this.bufferSize = 2048;
-                  this.buffer = new Float32Array(this.bufferSize);
-                  this.bytesWritten = 0;
-                }
-                process(inputs) {
-                  const input = inputs[0];
-                  if (!input || !input[0]) return true;
-                  const channelData = input[0];
-                  let offset = 0;
-                  while (offset < channelData.length) {
-                    const needed = this.bufferSize - this.bytesWritten;
-                    const toCopy = Math.min(needed, channelData.length - offset);
-                    this.buffer.set(channelData.subarray(offset, offset + toCopy), this.bytesWritten);
-                    this.bytesWritten += toCopy;
-                    offset += toCopy;
-                    if (this.bytesWritten >= this.bufferSize) {
-                      this.port.postMessage(this.buffer.slice(0));
-                      this.bytesWritten = 0;
-                    }
+      // Try AudioWorklet first (Modern iOS Safari 14.5+ and Chromium)
+      if (
+        liveCtx.audioWorklet &&
+        typeof liveCtx.audioWorklet.addModule === 'function' &&
+        (typeof window !== 'undefined' && window.isSecureContext)
+      ) {
+        try {
+          const workletCode = `
+            class LiveMicCaptureProcessor extends AudioWorkletProcessor {
+              constructor() {
+                super();
+                this.bufferSize = 2048;
+                this.buffer = new Float32Array(this.bufferSize);
+                this.bytesWritten = 0;
+              }
+              process(inputs) {
+                const input = inputs[0];
+                if (!input || !input[0]) return true;
+                const channelData = input[0];
+                let offset = 0;
+                while (offset < channelData.length) {
+                  const needed = this.bufferSize - this.bytesWritten;
+                  const toCopy = Math.min(needed, channelData.length - offset);
+                  this.buffer.set(channelData.subarray(offset, offset + toCopy), this.bytesWritten);
+                  this.bytesWritten += toCopy;
+                  offset += toCopy;
+                  if (this.bytesWritten >= this.bufferSize) {
+                    this.port.postMessage(this.buffer.slice(0));
+                    this.bytesWritten = 0;
                   }
-                  return true;
                 }
+                return true;
               }
-              registerProcessor('live-mic-capture-processor', LiveMicCaptureProcessor);
-            `;
-            const blob = new Blob([workletCode], { type: 'application/javascript' });
-            const url = URL.createObjectURL(blob);
-            await liveCtx.audioWorklet.addModule(url);
-            URL.revokeObjectURL(url);
-
-            const workletNode = new AudioWorkletNode(liveCtx, 'live-mic-capture-processor');
-            audioWorkletNodeRef.current = workletNode;
-
-            workletNode.port.onmessage = (e: MessageEvent<Float32Array>) => {
-              if (isMicMutedRef.current) return;
-              if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-                const pcmBase64 = resampleAndConvertToPcm16Base64(
-                  e.data,
-                  liveCtx.sampleRate || 48000,
-                  16000
-                );
-                wsRef.current.send(
-                  JSON.stringify({
-                    realtimeInput: {
-                      audio: {
-                        mimeType: 'audio/pcm;rate=16000',
-                        data: pcmBase64,
-                      },
-                    },
-                  })
-                );
-              }
-            };
-
-            source.connect(workletNode);
-            const dummyGain = liveCtx.createGain();
-            dummyGain.gain.value = 0;
-            workletNode.connect(dummyGain);
-            dummyGain.connect(liveCtx.destination);
-            workletInitialized = true;
-          } catch (workletErr) {
-            console.warn('AudioWorklet init fallback to ScriptProcessor:', workletErr);
-          }
-        }
-
-        if (!workletInitialized) {
-          // Fallback: ScriptProcessorNode
-          const processor = liveCtx.createScriptProcessor(4096, 1, 1);
-          scriptProcessorRef.current = processor;
-          (window as any).__fzLiveProcessor = processor;
-
-          processor.onaudioprocess = (e) => {
-            if (isMicMutedRef.current) return;
-            if (liveCtx.state === 'suspended') {
-              void liveCtx.resume().catch(() => {});
             }
-            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-              const pcmBase64 = resampleAndConvertToPcm16Base64(
-                e.inputBuffer.getChannelData(0),
-                liveCtx.sampleRate || 48000,
-                16000
-              );
-              wsRef.current.send(
-                JSON.stringify({
-                  realtimeInput: {
-                    audio: {
-                      mimeType: 'audio/pcm;rate=16000',
-                      data: pcmBase64,
-                    },
-                  },
-                })
-              );
-            }
+            registerProcessor('live-mic-capture-processor', LiveMicCaptureProcessor);
+          `;
+          const blob = new Blob([workletCode], { type: 'application/javascript' });
+          const url = URL.createObjectURL(blob);
+          await liveCtx.audioWorklet.addModule(url);
+          URL.revokeObjectURL(url);
+
+          const workletNode = new AudioWorkletNode(liveCtx, 'live-mic-capture-processor');
+          audioWorkletNodeRef.current = workletNode;
+
+          workletNode.port.onmessage = (e: MessageEvent<Float32Array>) => {
+            handleMicPcmData(e.data);
           };
 
-          const muteGain = liveCtx.createGain();
-          muteGain.gain.value = 0.00001; // Positive non-zero gain prevents Chrome power-saving from throttling onaudioprocess
-          source.connect(processor);
-          processor.connect(muteGain);
-          muteGain.connect(liveCtx.destination);
+          source.connect(workletNode);
+          const dummyGain = liveCtx.createGain();
+          dummyGain.gain.value = 0;
+          workletNode.connect(dummyGain);
+          dummyGain.connect(liveCtx.destination);
+          workletInitialized = true;
+        } catch (workletErr) {
+          console.warn('AudioWorklet init fallback to ScriptProcessor:', workletErr);
         }
-      } catch (err) {
-        console.warn('Microphone permission or stream error:', err);
-        setStatusBanner(
-          'Izin mikrofon belum aktif. Izinkan akses mikrofon di bilah alamat peramban, lalu tekan Telepon Live lagi — atau ketik kalimatmu di bawah.'
-        );
       }
+
+      if (!workletInitialized) {
+        // Fallback: ScriptProcessorNode
+        const processor = liveCtx.createScriptProcessor(4096, 1, 1);
+        scriptProcessorRef.current = processor;
+        (window as any).__fzLiveProcessor = processor;
+
+        processor.onaudioprocess = (e) => {
+          if (liveCtx.state === 'suspended') {
+            void liveCtx.resume().catch(() => {});
+          }
+          handleMicPcmData(e.inputBuffer.getChannelData(0));
+        };
+
+        const muteGain = liveCtx.createGain();
+        muteGain.gain.value = 0.00001; // Positive non-zero gain prevents Chrome power-saving from throttling onaudioprocess
+        source.connect(processor);
+        processor.connect(muteGain);
+        muteGain.connect(liveCtx.destination);
+      }
+    } catch (err: any) {
+      console.warn('Microphone node wiring error:', err);
+      micStreamRef.current = null;
+      setShowMicPermissionModal(true);
+      setMicPermissionError('Terjadi kendala saat menyambungkan mikrofon ke peramban.');
+      return;
     }
 
     setStatusBanner(null);
@@ -2038,9 +2100,42 @@ export default function App() {
     void connectDuplex(false);
   };
 
+  const handleGrantMicAndStart = async () => {
+    setIsRequestingMic(true);
+    setMicPermissionError(null);
+    try {
+      const stream = await acquireLiveMicrophoneStream();
+      micStreamRef.current = stream;
+      setIsRequestingMic(false);
+      setShowMicPermissionModal(false);
+      void startLiveCall(stream);
+    } catch (err: any) {
+      setIsRequestingMic(false);
+      const errMsg = err?.message || String(err || '');
+      if (
+        err?.name === 'NotAllowedError' ||
+        errMsg.includes('Permission denied') ||
+        errMsg.includes('not-allowed')
+      ) {
+        setMicPermissionError(
+          'Izin mikrofon ditolak oleh peramban. Jika menggunakan iPhone, buka pengaturan Safari di ikon aA pada bilah alamat lalu ubah Mikrofon menjadi Izinkan.'
+        );
+      } else {
+        setMicPermissionError(
+          'Gagal mengakses mikrofon perangkat. Pastikan izin mikrofon telah diberikan di peramban dan tidak sedang digunakan aplikasi lain.'
+        );
+      }
+    }
+  };
+
   const stopLiveCall = () => {
     userHungUpRef.current = true;
     isLiveConnectedRef.current = false;
+    setIsUserSpeakingLive(false);
+    if (userSpeakingTimerRef.current) {
+      window.clearTimeout(userSpeakingTimerRef.current);
+      userSpeakingTimerRef.current = null;
+    }
     if (liveKeepAliveTimerRef.current) {
       window.clearInterval(liveKeepAliveTimerRef.current);
       liveKeepAliveTimerRef.current = null;
@@ -2893,7 +2988,7 @@ export default function App() {
                       <button
                         type="button"
                         disabled={isLiveConnecting}
-                        onClick={startLiveCall}
+                        onClick={() => void startLiveCall()}
                         className="px-5 py-2 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-60"
                       >
                         <Phone className="w-3.5 h-3.5" />
@@ -2901,6 +2996,21 @@ export default function App() {
                       </button>
                     ) : (
                       <>
+                        {/* Indikator Mikrofon Aktif & Mendengarkan Real-Time */}
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FDFAF3] border border-[#EAE3D5] text-xs shadow-2xs">
+                          {isUserSpeakingLive ? (
+                            <>
+                              <span className="w-2 h-2 rounded-full bg-[#2E7D32] animate-ping" />
+                              <span className="font-bold text-[#2E7D32]">Mendengarkan...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="w-2 h-2 rounded-full bg-[#E06738] animate-pulse" />
+                              <span className="text-[#6E5E47]">Mic Aktif</span>
+                            </>
+                          )}
+                        </div>
+
                         <button
                           type="button"
                           onClick={toggleMuteMic}
@@ -3471,6 +3581,69 @@ export default function App() {
           </button>
         </div>
       </nav>
+
+      {/* MODAL WAJIB IZIN MIKROFON (MANDATORY PERMISSION GATE) */}
+      {showMicPermissionModal && (
+        <div className="fixed inset-0 z-50 bg-[#1C1611]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FDFAF3] border border-[#EAE3D5] rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 text-[#1C1611] animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-14 h-14 rounded-2xl bg-[#F5EBE1] border border-[#E8D9C8] flex items-center justify-center text-[#B8432D] mx-auto shadow-xs">
+              <Mic className="w-7 h-7 animate-pulse" />
+            </div>
+
+            <div className="text-center space-y-1.5">
+              <h3 className="text-base sm:text-lg font-bold text-[#1C1611]">
+                Izin Mikrofon Wajib Diaktifkan
+              </h3>
+              <p className="text-xs sm:text-sm text-[#5C4E3C] leading-relaxed">
+                Fitur <strong>Telepon Live</strong> membutuhkan akses mikrofon agar Mitra Bicara AI dapat mendengar dan mengevaluasi percakapanmu secara langsung. Tanpa mikrofon, panggilan live tidak dapat dimulai.
+              </p>
+            </div>
+
+            {/* Petunjuk Khusus iPhone / Mobile */}
+            <div className="bg-white/80 border border-[#E8D9C8] rounded-2xl p-3.5 text-xs text-[#5C4E3C] space-y-2">
+              <div className="font-semibold text-[#1C1611] flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-[#2E7D32]" />
+                <span>Petunjuk untuk Pengguna iPhone (Safari):</span>
+              </div>
+              <ol className="list-decimal list-inside space-y-1 text-[#6E5E47] pl-1 leading-normal">
+                <li>Ketuk tombol hitam <strong>"Aktifkan Mikrofon Sekarang"</strong> di bawah.</li>
+                <li>Saat muncul pop-up izin Safari, pilih <strong>"Izinkan"</strong> (<em>Allow</em>).</li>
+                <li>Jika sebelumnya pernah tertolak: ketuk tombol <strong>aA</strong> di pojok kiri bilah alamat Safari &rarr; pilih <em>Pengaturan Situs Web</em> &rarr; ubah <em>Mikrofon</em> menjadi <strong>Izinkan</strong>.</li>
+              </ol>
+            </div>
+
+            {micPermissionError && (
+              <div className="bg-[#FDEDEC] border border-[#F5C6CB] rounded-xl p-3 text-xs text-[#721C24] flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-[#B8432D]" />
+                <span>{micPermissionError}</span>
+              </div>
+            )}
+
+            <div className="space-y-2 pt-2">
+              <button
+                type="button"
+                onClick={handleGrantMicAndStart}
+                disabled={isRequestingMic}
+                className="w-full py-3 px-4 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md disabled:opacity-60"
+              >
+                <Mic className="w-4 h-4" />
+                <span>{isRequestingMic ? 'Meminta Akses Mikrofon...' : 'Aktifkan Mikrofon Sekarang'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMicPermissionModal(false);
+                  setMicPermissionError(null);
+                  setIsRequestingMic(false);
+                }}
+                className="w-full py-2.5 px-4 rounded-full bg-transparent hover:bg-[#EAE3D5]/50 text-[#6E5E47] font-medium text-xs text-center cursor-pointer transition-colors"
+              >
+                Batalkan Panggilan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
