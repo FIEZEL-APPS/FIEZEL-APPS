@@ -17,6 +17,7 @@ import {
   SlidersHorizontal,
   ArrowLeft,
   X,
+  MessageSquare,
 } from 'lucide-react';
 import {
   BraincoreStoreState,
@@ -102,6 +103,8 @@ export default function App() {
     return firstForLang ? firstForLang.id : 'scen_en_free_talk';
   });
   const [customMeasureOverride, setCustomMeasureOverride] = useState<boolean | null>(null);
+  // Mode tampilan di tab Panggilan: 'stage' (Panggung Live terpusat, zero-scroll) vs 'history' (Riwayat Chat & Evaluasi)
+  const [callViewMode, setCallViewMode] = useState<'stage' | 'history'>('stage');
 
   const [turns, setTurns] = useState<CallTurn[]>([]);
   const [inputText, setInputText] = useState<string>('');
@@ -376,16 +379,27 @@ export default function App() {
     }
   }, [turns, activeScenario.targetLang, activeScenario.id]);
 
+  // UX Invariant: Saat di Panggung Live, murid STAY di tampilan panggung tanpa auto-scroll liar ke bawah
   useEffect(() => {
-    if (activeTab === 'call' && turns.length > 1) {
-      if (transcriptContainerRef.current) {
-        transcriptContainerRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-        });
+    if (activeTab === 'call') {
+      if (callViewMode === 'history' && turns.length > 1) {
+        if (transcriptContainerRef.current) {
+          transcriptContainerRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        }
+      } else if (callViewMode === 'stage') {
+        try {
+          if (mainScrollRef.current && mainScrollRef.current.scrollTop > 0) {
+            mainScrollRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+          }
+        } catch {
+          // Ignore
+        }
       }
     }
-  }, [turns.length, activeTab]);
+  }, [turns.length, activeTab, callViewMode]);
 
   useEffect(() => {
     if (!isRecordingPtt) {
@@ -1469,6 +1483,14 @@ export default function App() {
 
   const startLiveCall = async (preAcquiredStream?: MediaStream) => {
     if (isLiveConnected || isLiveConnecting) return;
+    setCallViewMode('stage');
+    try {
+      if (mainScrollRef.current) {
+        mainScrollRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      }
+    } catch {
+      // Ignore
+    }
     primeAudioPlayback();
 
     // 1. Dapatkan mikrofon secara non-blocking jika peramban mengizinkan langsung
@@ -2729,9 +2751,11 @@ export default function App() {
                   data-testid="ai-call-card"
                   data-call-state={callStateKey}
                   data-transport-mode={liveTransportMode}
-                  className="bg-gradient-to-b from-[#FAF5EB] to-white rounded-3xl px-5 py-5 sm:px-8 sm:py-6 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-black/[0.04] flex flex-col items-center text-center space-y-3.5 w-full"
+                  className={`bg-gradient-to-b from-[#FAF5EB] to-white rounded-3xl px-5 py-5 sm:px-8 sm:py-6 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-black/[0.04] items-center text-center space-y-3.5 w-full ${
+                    callViewMode === 'history' ? 'hidden' : 'flex flex-col'
+                  }`}
                 >
-                  {/* Baris Meta Atas: Identitas Partner Satu Baris & Pill Mode */}
+                  {/* Baris Meta Atas: Identitas Partner Satu Baris & Pill Mode Switcher */}
                   <div className="w-full flex items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-1.5 text-[#6E5E47] min-w-0">
                       <span className="font-bold text-[#1C1611] truncate">{activePersona.name}</span>
@@ -2739,23 +2763,65 @@ export default function App() {
                       <span className="shrink-0">{activeScenario.level}</span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setCustomMeasureOverride(!isMeasureMode)}
-                      className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer shrink-0 ${
-                        isMeasureMode
-                          ? 'bg-[#FDF2F4] text-[#8C2233]'
-                          : 'bg-[#F5F1E8] text-[#5C4E3C] hover:text-[#1C1611]'
-                      }`}
-                    >
-                      {isMeasureMode
-                        ? locale === 'th'
-                          ? 'โหมดสอบ'
-                          : 'Mode Ujian'
-                        : locale === 'th'
-                          ? 'โหมดฝึกซ้อม'
-                          : 'Mode Latihan'}
-                    </button>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {/* Segmented Switcher: Live (Panggung) vs Riwayat Chat */}
+                      <div
+                        data-testid="call-view-mode-toggle"
+                        className="inline-flex items-center p-0.5 rounded-full bg-[#EFE8DA] text-[11px] font-semibold shadow-2xs"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            playFiezelSfx('button_tap');
+                            setCallViewMode('stage');
+                          }}
+                          className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${
+                            callViewMode === 'stage'
+                              ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                              : 'text-[#6E5E47] hover:text-[#1C1611]'
+                          }`}
+                        >
+                          {locale === 'th' ? 'โหมดสด' : 'Live'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            playFiezelSfx('button_tap');
+                            setCallViewMode('history');
+                          }}
+                          className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+                            callViewMode === 'history'
+                              ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                              : 'text-[#6E5E47] hover:text-[#1C1611]'
+                          }`}
+                        >
+                          <span>{locale === 'th' ? 'แชท' : 'Riwayat'}</span>
+                          {turns.filter((tr) => tr.speaker === 'user').length > 0 && (
+                            <span className="w-3.5 h-3.5 rounded-full bg-[#8C2233] text-white text-[9px] flex items-center justify-center font-bold">
+                              {turns.filter((tr) => tr.speaker === 'user').length}
+                            </span>
+                          )}
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setCustomMeasureOverride(!isMeasureMode)}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer shrink-0 ${
+                          isMeasureMode
+                            ? 'bg-[#FDF2F4] text-[#8C2233]'
+                            : 'bg-[#F5F1E8] text-[#5C4E3C] hover:text-[#1C1611]'
+                        }`}
+                      >
+                        {isMeasureMode
+                          ? locale === 'th'
+                            ? 'โหมดสอบ'
+                            : 'Mode Ujian'
+                          : locale === 'th'
+                            ? 'โหมดฝึกซ้อม'
+                            : 'Mode Latihan'}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Mascot 3D Mochi Terpusat + Pill Status Panggilan */}
@@ -3003,9 +3069,27 @@ export default function App() {
                   </div>
                 </section>
 
+                {/* Tombol Akses Riwayat Cepat saat di Panggung Live */}
+                {callViewMode === 'stage' && turns.filter((tr) => tr.speaker === 'user').length > 0 && !isLiveConnected && (
+                  <div className="flex justify-center w-full pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playFiezelSfx('button_tap');
+                        setCallViewMode('history');
+                      }}
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/90 hover:bg-white text-xs font-semibold text-[#8C6D1F] hover:text-[#1C1611] border border-[#E8DFC8]/70 shadow-2xs transition-all cursor-pointer active:scale-95"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 text-[#8C6D1F]" />
+                      <span>{locale === 'th' ? 'ดูประวัติบทสนทนาและการประเมิน' : 'Lihat Riwayat & Catatan Evaluasi'} ({turns.filter((tr) => tr.speaker === 'user').length})</span>
+                      <span>↓</span>
+                    </button>
+                  </div>
+                )}
+
                 {/* 1.5 ASISTEN JAWABAN PEMULA (Pilihan respon alami cepat) */}
                 {!isMeasureMode && beginnerReplyCards.length > 0 && (
-                  <div className="w-full">
+                  <div className={`w-full ${callViewMode === 'stage' ? 'block' : 'hidden'}`}>
                     <BeginnerAnswerAssistant
                       cards={beginnerReplyCards}
                       targetLang={activeScenario.targetLang}
@@ -3020,12 +3104,20 @@ export default function App() {
                   </div>
                 )}
 
-                {/* 2. ALUR PERCAKAPAN RINGKAS (Hanya Tampil Bersih Tanpa Kotak Luar Berat) */}
-                <section className="space-y-2.5 w-full pt-1">
-                  <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47]">
-                    <span className="font-semibold text-[#5C4E3C]">
-                      {locale === 'th' ? 'บทสนทนา' : 'Percakapan'} ({turns.filter((tr) => tr.speaker === 'user').length})
-                    </span>
+                {/* 2. ALUR PERCAKAPAN RINGKAS (Tampil di Mode Riwayat atau saat Murid Ingin Membaca Transkrip) */}
+                <section className={`space-y-2.5 w-full pt-1 ${callViewMode === 'history' ? 'block' : 'hidden'}`}>
+                  <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47] pb-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playFiezelSfx('button_tap');
+                        setCallViewMode('stage');
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1C1611] text-white font-semibold text-xs cursor-pointer hover:bg-[#332920] transition-colors shadow-2xs"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>{locale === 'th' ? 'กลับไปที่หน้าจอสด' : 'Kembali ke Panggung Live'}</span>
+                    </button>
 
                     <div className="flex items-center gap-3 shrink-0">
                       {!isMeasureMode && (
