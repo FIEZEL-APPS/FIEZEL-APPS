@@ -1151,9 +1151,7 @@ function findBestStoredStudentState(){
     try{
       for(let i=0;i<localStorage.length;i++){
         const k=localStorage.key(i);
-        if(k&&(k.startsWith(ACCOUNT_STATE_PREFIX)||k.startsWith('fiezel-v4-state')||k.startsWith(SAFETY_SNAPSHOT_KEY))){
-          if(!candidates.includes(k))candidates.push(k);
-        }
+        if(k&&!candidates.includes(k))candidates.push(k);
       }
     }catch(_){}
     for(const k of candidates){
@@ -2046,6 +2044,35 @@ async function activateAccountStateFromPuter(sdk=self.puter){
        dimuat saat boot — locale disinkronkan SEBELUM render() di bawah supaya cat pertama akun
        ini sudah berbahasa miliknya (listener onChange yang dipasang di boot ikut menyetel lang). */
     try{self.FiezelI18n?.setLocale?.(state?.preferences?.learnerLocale)}catch(_){}
+    /* m025-669: Sinkron otomatis saat login Puter — sama dengan Google. */
+    try{
+      if(typeof progressSyncConsented==='function'&&!progressSyncConsented()){
+        const prefs={...(state.preferences||{}),progressSyncConsent:{at:Date.now(),by:'murid-login'}};
+        delete prefs.brainSync;
+        state.preferences=prefs;save();
+      }
+      setTimeout(()=>{try{if(typeof queueBrainSyncFlush==='function')queueBrainSyncFlush(500)}catch(_){}},600);
+      setTimeout(async()=>{
+        try{
+          if(typeof brainSyncPull==='function'){
+            const remote=await brainSyncPull();
+            if(Array.isArray(remote)&&remote.length>0){
+              const hasil=brainSyncRebuild(remote);
+              if(hasil&&hasil.stream&&hasil.stream.length>0){
+                const localLen=(state.history||[]).length;
+                if(localLen===0||hasil.stream.length>localLen){
+                  brainSyncApplyRebuild(hasil);
+                  if(typeof showToast==='function')showToast(FiezelI18n.t('sinkron.pulih-berhasil',{n:hasil.stream.length}),'success');
+                  if(appOpened)render();
+                  return;
+                }
+              }
+            }
+          }
+          if(typeof progressSyncRestoreOffer==='function')progressSyncRestoreOffer();
+        }catch(_){}
+      },1200);
+    }catch(_){}
     if(appOpened)render();return true;
   }catch{return false}
 }
@@ -2081,6 +2108,42 @@ function activateAccountState(rawId){
   migrateSideStateToAccount(uuid);
   state=loadState(key);state.ownerUuid=uuid;coreBrainCache=null;save();
   try{self.FiezelI18n?.setLocale?.(state?.preferences?.learnerLocale)}catch(_){}
+  /* m025-669: Sinkron otomatis saat login Google/akun.
+   * Murid yang login sudah memberikan persetujuan implisit bahwa data belajarnya
+   * boleh disimpan di server — ini layanan inti FIEZEL, bukan opsional.
+   * Jika izin belum tercatat, catat sekarang sebagai 'murid-login' (otomatis saat login).
+   * Kemudian langsung flush data lokal ke server, dan tawarkan pulihkan dari server
+   * jika perangkat ini baru (history < 20 entri). */
+  try{
+    if(typeof progressSyncConsented==='function'&&!progressSyncConsented()){
+      const prefs={...(state.preferences||{}),progressSyncConsent:{at:Date.now(),by:'murid-login'}};
+      delete prefs.brainSync;
+      state.preferences=prefs;save();
+    }
+    /* Kirim data lokal ke server segera setelah login (delay 600ms agar render selesai dulu) */
+    setTimeout(()=>{try{if(typeof queueBrainSyncFlush==='function')queueBrainSyncFlush(500)}catch(_){}},600);
+    /* Pulihkan otomatis dari server jika riwayat lokal masih kosong / lebih sedikit */
+    setTimeout(async()=>{
+      try{
+        if(typeof brainSyncPull==='function'){
+          const remote=await brainSyncPull();
+          if(Array.isArray(remote)&&remote.length>0){
+            const hasil=brainSyncRebuild(remote);
+            if(hasil&&hasil.stream&&hasil.stream.length>0){
+              const localLen=(state.history||[]).length;
+              if(localLen===0||hasil.stream.length>localLen){
+                brainSyncApplyRebuild(hasil);
+                if(typeof showToast==='function')showToast(FiezelI18n.t('sinkron.pulih-berhasil',{n:hasil.stream.length}),'success');
+                if(appOpened)render();
+                return;
+              }
+            }
+          }
+        }
+        if(typeof progressSyncRestoreOffer==='function')progressSyncRestoreOffer();
+      }catch(_){}
+    },1200);
+  }catch(_){}
   if(appOpened)render();return true;
 }
 function deactivateAccountState(){
@@ -4715,6 +4778,27 @@ function brainSyncApplyRebuild(hasil){
     const st=brainSyncRead();
     brainSyncWrite({...st,lastRebuiltAt:Date.now()});
     coreBrainCache=null;
+    if(Array.isArray(hasil.stream)&&hasil.stream.length>0){
+      const existingIds=new Set((state.history||[]).map(h=>h&&h.attemptId).filter(Boolean));
+      const newItems=[];
+      for(const rec of hasil.stream){
+        if(!rec||!rec.attemptId||existingIds.has(rec.attemptId))continue;
+        newItems.push({
+          attemptId: rec.attemptId,
+          timestamp: rec.at||Date.now(),
+          correct: rec.ok===true,
+          type: rec.type||'practice',
+          lesson: rec.lesson||rec.skill||'',
+          restoredFromSync: true
+        });
+      }
+      if(newItems.length>0){
+        state.history=[...(state.history||[]),...newItems].sort((a,b)=>(a.timestamp||0)-(b.timestamp||0)).slice(-1000);
+        state.totalAnswered=Math.max(Number(state.totalAnswered||0),state.history.length);
+        state.totalCorrect=Math.max(Number(state.totalCorrect||0),state.history.filter(h=>h&&h.correct).length);
+        save();
+      }
+    }
     return true;
   }catch{return false}
 }
