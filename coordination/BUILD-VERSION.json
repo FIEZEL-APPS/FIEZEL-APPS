@@ -1,7 +1,7 @@
 {
-  "version": "m025-672",
-  "claimedBy": "branch fix/mandatory-mic-permission-popup-m025-672",
-  "claimedAt": "2026-10-25T15:40:03.114Z",
-  "reason": "fix(voice): modal wajib izin mikrofon & proteksi panggilan live duplex m025-672",
+  "version": "m025-673",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-25T16:47:56.336Z",
+  "reason": "fix(voice): zero-lock ios pwa live call & hands-free speech duplex m025-673",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
