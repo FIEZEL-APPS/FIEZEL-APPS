@@ -1605,8 +1605,6 @@ export default function App() {
                   model: 'models/gemini-3.8-live',
                   generationConfig: {
                     responseModalities: ['AUDIO'],
-                    inputAudioTranscription: {},
-                    outputAudioTranscription: {},
                     speechConfig: {
                       voiceConfig: {
                         prebuiltVoiceConfig: {
@@ -1624,8 +1622,6 @@ export default function App() {
                       },
                     ],
                   },
-                  inputAudioTranscription: {},
-                  outputAudioTranscription: {},
                 },
               })
             );
