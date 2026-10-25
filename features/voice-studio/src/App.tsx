@@ -152,6 +152,9 @@ export default function App() {
   const [syncingNow, setSyncingNow] = useState<boolean>(false);
 
   const wsRef = useRef<WebSocket | null>(null);
+  const liveAudioCtxRef = useRef<AudioContext | null>(null);
+  const audioWorkletNodeRef = useRef<AudioWorkletNode | null>(null);
+  const liveKeepAliveTimerRef = useRef<number | null>(null);
   const inputAudioCtxRef = useRef<AudioContext | null>(null);
   const outputAudioCtxRef = useRef<AudioContext | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
@@ -197,12 +200,15 @@ export default function App() {
         if (ttsAudioCtxRef.current.state === 'suspended') {
           void ttsAudioCtxRef.current.resume().catch(() => {});
         }
-        if (!outputAudioCtxRef.current || outputAudioCtxRef.current.state === 'closed') {
-          outputAudioCtxRef.current = new AudioCtx({ sampleRate: 24000 });
-          nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
+        if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
+          liveAudioCtxRef.current = new AudioCtx();
         }
-        if (outputAudioCtxRef.current.state === 'suspended') {
-          void outputAudioCtxRef.current.resume().catch(() => {});
+        const liveCtx = liveAudioCtxRef.current;
+        outputAudioCtxRef.current = liveCtx;
+        inputAudioCtxRef.current = liveCtx;
+        nextStartTimeRef.current = liveCtx.currentTime;
+        if (liveCtx.state === 'suspended') {
+          void liveCtx.resume().catch(() => {});
         }
       }
     } catch {
@@ -1434,36 +1440,21 @@ export default function App() {
     if (isLiveConnected || isLiveConnecting) return;
     primeAudioPlayback();
 
-    // 1. Prime Output AudioContext (24kHz for Gemini Live) directly in user gesture
-    try {
-      const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (!outputAudioCtxRef.current || outputAudioCtxRef.current.state === 'closed') {
-        const outputCtx = new CtxClass({ sampleRate: 24000 });
-        outputAudioCtxRef.current = outputCtx;
-        nextStartTimeRef.current = outputCtx.currentTime;
-      }
-      if (outputAudioCtxRef.current && outputAudioCtxRef.current.state === 'suspended') {
-        void outputAudioCtxRef.current.resume().catch(() => {});
-      }
-    } catch {
-      // AudioContext fallback
+    // 1. Prime Unified Live AudioContext (native hardware rate for iOS & Desktop)
+    const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
+      liveAudioCtxRef.current = new CtxClass();
+    }
+    const liveCtx = liveAudioCtxRef.current;
+    inputAudioCtxRef.current = liveCtx;
+    outputAudioCtxRef.current = liveCtx;
+    nextStartTimeRef.current = liveCtx.currentTime;
+    if (liveCtx.state === 'suspended') {
+      void liveCtx.resume().catch(() => {});
     }
 
     // 2. Prime Microphone input stream directly in user gesture
     if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
-      // Create + resume the input AudioContext synchronously (before any await) so iOS Safari
-      // still counts it as part of the tap gesture; otherwise it stays suspended and captures silence.
-      try {
-        const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
-        if (!inputAudioCtxRef.current || inputAudioCtxRef.current.state === 'closed') {
-          inputAudioCtxRef.current = new CtxClass();
-        }
-        if (inputAudioCtxRef.current.state === 'suspended') {
-          void inputAudioCtxRef.current.resume().catch(() => {});
-        }
-      } catch {
-        // AudioContext unavailable
-      }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: {
@@ -1474,46 +1465,128 @@ export default function App() {
         });
         micStreamRef.current = stream;
 
-        const inputCtx = inputAudioCtxRef.current as AudioContext;
-        if (inputCtx.state === 'suspended') {
-          void inputCtx.resume().catch(() => {});
+        // CRITICAL FOR iOS Safari WebKit:
+        // After getUserMedia resolves, iOS reconfigures AVAudioSession to PlayAndRecord.
+        // We must re-resume the AudioContext so it binds to the new hardware microphone route!
+        if (liveCtx.state === 'suspended') {
+          await liveCtx.resume().catch(() => {});
         }
 
-        const source = inputCtx.createMediaStreamSource(stream);
-        const processor = inputCtx.createScriptProcessor(4096, 1, 1);
-        scriptProcessorRef.current = processor;
+        const source = liveCtx.createMediaStreamSource(stream);
+        let workletInitialized = false;
 
-        processor.onaudioprocess = (e) => {
-          if (isMicMutedRef.current) return;
-          if (inputCtx.state === 'suspended') {
-            void inputCtx.resume().catch(() => {});
+        // Try AudioWorklet first (Modern iOS Safari 14.5+ and Chromium)
+        if (
+          liveCtx.audioWorklet &&
+          typeof liveCtx.audioWorklet.addModule === 'function' &&
+          (typeof window !== 'undefined' && window.isSecureContext)
+        ) {
+          try {
+            const workletCode = `
+              class LiveMicCaptureProcessor extends AudioWorkletProcessor {
+                constructor() {
+                  super();
+                  this.bufferSize = 2048;
+                  this.buffer = new Float32Array(this.bufferSize);
+                  this.bytesWritten = 0;
+                }
+                process(inputs) {
+                  const input = inputs[0];
+                  if (!input || !input[0]) return true;
+                  const channelData = input[0];
+                  let offset = 0;
+                  while (offset < channelData.length) {
+                    const needed = this.bufferSize - this.bytesWritten;
+                    const toCopy = Math.min(needed, channelData.length - offset);
+                    this.buffer.set(channelData.subarray(offset, offset + toCopy), this.bytesWritten);
+                    this.bytesWritten += toCopy;
+                    offset += toCopy;
+                    if (this.bytesWritten >= this.bufferSize) {
+                      this.port.postMessage(this.buffer.slice(0));
+                      this.bytesWritten = 0;
+                    }
+                  }
+                  return true;
+                }
+              }
+              registerProcessor('live-mic-capture-processor', LiveMicCaptureProcessor);
+            `;
+            const blob = new Blob([workletCode], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            await liveCtx.audioWorklet.addModule(url);
+            URL.revokeObjectURL(url);
+
+            const workletNode = new AudioWorkletNode(liveCtx, 'live-mic-capture-processor');
+            audioWorkletNodeRef.current = workletNode;
+
+            workletNode.port.onmessage = (e: MessageEvent<Float32Array>) => {
+              if (isMicMutedRef.current) return;
+              if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+                const pcmBase64 = resampleAndConvertToPcm16Base64(
+                  e.data,
+                  liveCtx.sampleRate || 48000,
+                  16000
+                );
+                wsRef.current.send(
+                  JSON.stringify({
+                    realtimeInput: {
+                      audio: {
+                        mimeType: 'audio/pcm;rate=16000',
+                        data: pcmBase64,
+                      },
+                    },
+                  })
+                );
+              }
+            };
+
+            source.connect(workletNode);
+            const dummyGain = liveCtx.createGain();
+            dummyGain.gain.value = 0;
+            workletNode.connect(dummyGain);
+            dummyGain.connect(liveCtx.destination);
+            workletInitialized = true;
+          } catch (workletErr) {
+            console.warn('AudioWorklet init fallback to ScriptProcessor:', workletErr);
           }
-          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-            const pcmBase64 = resampleAndConvertToPcm16Base64(
-              e.inputBuffer.getChannelData(0),
-              inputCtx.sampleRate || 48000,
-              16000
-            );
-            // Gemini Live only hears `realtimeInput.audio`; the legacy `mediaChunks` frame is
-            // silently ignored (proven by scratch/test-gemini-mic-input.mjs: zero transcript).
-            wsRef.current.send(
-              JSON.stringify({
-                realtimeInput: {
-                  audio: {
-                    mimeType: 'audio/pcm;rate=16000',
-                    data: pcmBase64,
+        }
+
+        if (!workletInitialized) {
+          // Fallback: ScriptProcessorNode
+          const processor = liveCtx.createScriptProcessor(4096, 1, 1);
+          scriptProcessorRef.current = processor;
+          (window as any).__fzLiveProcessor = processor;
+
+          processor.onaudioprocess = (e) => {
+            if (isMicMutedRef.current) return;
+            if (liveCtx.state === 'suspended') {
+              void liveCtx.resume().catch(() => {});
+            }
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+              const pcmBase64 = resampleAndConvertToPcm16Base64(
+                e.inputBuffer.getChannelData(0),
+                liveCtx.sampleRate || 48000,
+                16000
+              );
+              wsRef.current.send(
+                JSON.stringify({
+                  realtimeInput: {
+                    audio: {
+                      mimeType: 'audio/pcm;rate=16000',
+                      data: pcmBase64,
+                    },
                   },
-                },
-              })
-            );
-          }
-        };
+                })
+              );
+            }
+          };
 
-        const muteGain = inputCtx.createGain();
-        muteGain.gain.value = 0.00001; // Positive non-zero gain prevents Chrome power-saving from throttling onaudioprocess
-        source.connect(processor);
-        processor.connect(muteGain);
-        muteGain.connect(inputCtx.destination);
+          const muteGain = liveCtx.createGain();
+          muteGain.gain.value = 0.00001; // Positive non-zero gain prevents Chrome power-saving from throttling onaudioprocess
+          source.connect(processor);
+          processor.connect(muteGain);
+          muteGain.connect(liveCtx.destination);
+        }
       } catch (err) {
         console.warn('Microphone permission or stream error:', err);
         setStatusBanner(
@@ -1657,13 +1730,25 @@ export default function App() {
             isLiveConnectedRef.current = true;
             playFiezelSfx('lesson_start');
 
-            // Resume Audio Contexts if suspended
+            // Resume Audio Context if suspended & start keep-alive watchdog for iOS Safari
+            if (liveAudioCtxRef.current && liveAudioCtxRef.current.state === 'suspended') {
+              void liveAudioCtxRef.current.resume().catch(() => {});
+            }
             if (outputAudioCtxRef.current && outputAudioCtxRef.current.state === 'suspended') {
               void outputAudioCtxRef.current.resume().catch(() => {});
             }
-            if (inputAudioCtxRef.current && inputAudioCtxRef.current.state === 'suspended') {
-              void inputAudioCtxRef.current.resume().catch(() => {});
+            if (liveKeepAliveTimerRef.current) {
+              window.clearInterval(liveKeepAliveTimerRef.current);
             }
+            liveKeepAliveTimerRef.current = window.setInterval(() => {
+              if (
+                liveAudioCtxRef.current &&
+                liveAudioCtxRef.current.state === 'suspended' &&
+                isLiveConnectedRef.current
+              ) {
+                void liveAudioCtxRef.current.resume().catch(() => {});
+              }
+            }, 1200);
 
             // If brand new call, prompt AI to speak opening greeting immediately in Gemini Live voice
             const hasUserSpoken = turnsRef.current.some((t) => t.speaker === 'user');
@@ -1956,22 +2041,51 @@ export default function App() {
   const stopLiveCall = () => {
     userHungUpRef.current = true;
     isLiveConnectedRef.current = false;
+    if (liveKeepAliveTimerRef.current) {
+      window.clearInterval(liveKeepAliveTimerRef.current);
+      liveKeepAliveTimerRef.current = null;
+    }
+    if (audioWorkletNodeRef.current) {
+      try {
+        audioWorkletNodeRef.current.port.onmessage = null;
+        audioWorkletNodeRef.current.disconnect();
+      } catch {
+        // Ignore
+      }
+      audioWorkletNodeRef.current = null;
+    }
     if (scriptProcessorRef.current) {
-      scriptProcessorRef.current.disconnect();
+      try {
+        scriptProcessorRef.current.onaudioprocess = null;
+        scriptProcessorRef.current.disconnect();
+      } catch {
+        // Ignore
+      }
       scriptProcessorRef.current = null;
     }
+    try {
+      delete (window as any).__fzLiveProcessor;
+    } catch {
+      // Ignore
+    }
     if (micStreamRef.current) {
-      micStreamRef.current.getTracks().forEach((tr) => tr.stop());
+      try {
+        micStreamRef.current.getTracks().forEach((tr) => tr.stop());
+      } catch {
+        // Ignore
+      }
       micStreamRef.current = null;
     }
-    if (inputAudioCtxRef.current) {
-      void inputAudioCtxRef.current.close().catch(() => {});
-      inputAudioCtxRef.current = null;
+    if (liveAudioCtxRef.current) {
+      try {
+        void liveAudioCtxRef.current.close().catch(() => {});
+      } catch {
+        // Ignore
+      }
+      liveAudioCtxRef.current = null;
     }
-    if (outputAudioCtxRef.current) {
-      void outputAudioCtxRef.current.close().catch(() => {});
-      outputAudioCtxRef.current = null;
-    }
+    inputAudioCtxRef.current = null;
+    outputAudioCtxRef.current = null;
     if (wsRef.current) {
       wsRef.current.onclose = null;
       wsRef.current.onerror = null;
@@ -2006,30 +2120,6 @@ export default function App() {
     }
     if (isRecordingPtt) {
       stopPttRecording();
-    }
-    if (micStreamRef.current) {
-      try {
-        micStreamRef.current.getTracks().forEach((track) => track.stop());
-      } catch {
-        // Ignore
-      }
-      micStreamRef.current = null;
-    }
-    if (scriptProcessorRef.current) {
-      try {
-        scriptProcessorRef.current.disconnect();
-      } catch {
-        // Ignore
-      }
-      scriptProcessorRef.current = null;
-    }
-    if (inputAudioCtxRef.current && inputAudioCtxRef.current.state !== 'closed') {
-      try {
-        void inputAudioCtxRef.current.close().catch(() => {});
-      } catch {
-        // Ignore
-      }
-      inputAudioCtxRef.current = null;
     }
     if (liveSilenceTimerRef.current) {
       window.clearTimeout(liveSilenceTimerRef.current);
@@ -2069,11 +2159,13 @@ export default function App() {
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
         });
         micStreamRef.current = stream;
-        if (inputAudioCtxRef.current) {
-          const inputCtx = inputAudioCtxRef.current;
-          if (inputCtx.state === 'suspended') void inputCtx.resume().catch(() => {});
-          const source = inputCtx.createMediaStreamSource(stream);
-          if (scriptProcessorRef.current) {
+        const liveCtx = liveAudioCtxRef.current || inputAudioCtxRef.current;
+        if (liveCtx) {
+          if (liveCtx.state === 'suspended') void liveCtx.resume().catch(() => {});
+          const source = liveCtx.createMediaStreamSource(stream);
+          if (audioWorkletNodeRef.current) {
+            source.connect(audioWorkletNodeRef.current);
+          } else if (scriptProcessorRef.current) {
             source.connect(scriptProcessorRef.current);
           }
         }
