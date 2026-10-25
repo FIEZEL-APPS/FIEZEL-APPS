@@ -251,13 +251,43 @@ async function tryMsEdgeTts(text, persona) {
   return null;
 }
 
+// Helper: Wrap raw 16-bit PCM buffer into standard WAV container (zero dependencies)
+function pcmToWavBuffer(pcmBuffer, sampleRate = 24000, numChannels = 1, bitsPerSample = 16) {
+  const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+  const blockAlign = numChannels * (bitsPerSample / 8);
+  const dataSize = pcmBuffer.length;
+  const buffer = Buffer.alloc(44 + dataSize);
+
+  buffer.write('RIFF', 0);
+  buffer.writeUInt32LE(36 + dataSize, 4);
+  buffer.write('WAVE', 8);
+
+  buffer.write('fmt ', 12);
+  buffer.writeUInt32LE(16, 16);
+  buffer.writeUInt16LE(1, 20); // PCM
+  buffer.writeUInt16LE(numChannels, 22);
+  buffer.writeUInt32LE(sampleRate, 24);
+  buffer.writeUInt32LE(byteRate, 28);
+  buffer.writeUInt16LE(blockAlign, 32);
+  buffer.writeUInt16LE(bitsPerSample, 34);
+
+  buffer.write('data', 36);
+  buffer.writeUInt32LE(dataSize, 40);
+  pcmBuffer.copy(buffer, 44);
+
+  return buffer;
+}
+
 // Gemini TTS with multi-key pool rotation
 const KEYS_FILE = path.join(ROOT, 'config', 'gemini-keys.json');
 let geminiKeys = [];
 try {
   geminiKeys = JSON.parse(fs.readFileSync(KEYS_FILE, 'utf8'));
 } catch (_) {
-  if (process.env.GEMINI_API_KEY) geminiKeys = [process.env.GEMINI_API_KEY];
+  const rawEnv = process.env.GEMINI_LIVE_KEYS || process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '';
+  if (rawEnv) {
+    geminiKeys = rawEnv.split(',').map((s) => s.trim()).filter((s) => s.length > 10);
+  }
 }
 let currentKeyIndex = 0;
 
@@ -292,23 +322,35 @@ async function tryGeminiTts(text, persona) {
       const tempMp3 = path.join(CACHE_DIR, `temp_${tempId}.mp3`);
       fs.writeFileSync(tempPcm, pcmBuffer);
 
-      const cp = require('child_process');
-      const cmd = `ffmpeg -f s16le -ar 24000 -ac 1 -i "${tempPcm}" -q:a 9 -acodec libmp3lame "${tempMp3}" -y`;
-      cp.execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'], timeout: 15000 });
+      let audioBuffer = null;
+      let audioMime = 'audio/mpeg';
+
+      try {
+        const cp = require('child_process');
+        const cmd = `ffmpeg -f s16le -ar 24000 -ac 1 -i "${tempPcm}" -q:a 9 -acodec libmp3lame "${tempMp3}" -y`;
+        cp.execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'], timeout: 15000 });
+        if (fs.existsSync(tempMp3)) {
+          audioBuffer = fs.readFileSync(tempMp3);
+          try { fs.unlinkSync(tempMp3); } catch (_) {}
+          audioMime = 'audio/mpeg';
+        }
+      } catch (_) {}
+
       try { fs.unlinkSync(tempPcm); } catch (_) {}
 
-      if (fs.existsSync(tempMp3)) {
-        const mp3Buffer = fs.readFileSync(tempMp3);
-        try { fs.unlinkSync(tempMp3); } catch (_) {}
-        currentKeyIndex = (currentKeyIndex + attempt) % geminiKeys.length;
-        return {
-          audioBase64: mp3Buffer.toString('base64'),
-          mimeType: 'audio/mpeg',
-          voiceName: persona.edgeVoice.replace(/^[a-z]{2}-[A-Z]{2}-/, ''),
-          personaLabel: persona.personaLabel,
-          engine: 'gemini-tts-24khz'
-        };
+      if (!audioBuffer) {
+        audioBuffer = pcmToWavBuffer(pcmBuffer, 24000, 1, 16);
+        audioMime = 'audio/wav';
       }
+
+      currentKeyIndex = (currentKeyIndex + attempt) % geminiKeys.length;
+      return {
+        audioBase64: audioBuffer.toString('base64'),
+        mimeType: audioMime,
+        voiceName: persona.geminiVoice || persona.edgeVoice.replace(/^[a-z]{2}-[A-Z]{2}-/, ''),
+        personaLabel: persona.personaLabel,
+        engine: 'gemini-tts-24khz'
+      };
     } catch (_) {}
   }
   return null;
@@ -377,10 +419,10 @@ async function synthesizeNeuralLine(text, speaker, lang) {
   const synthPromise = (async () => {
     try {
       const runSynthesis = async () => {
-        let res = await tryMsEdgeTts(text, persona);
+        let res = await tryGeminiTts(text, persona);
         if (res) return res;
 
-        res = await tryGeminiTts(text, persona);
+        res = await tryMsEdgeTts(text, persona);
         if (res) return res;
 
         return getFallbackAudio(persona);
