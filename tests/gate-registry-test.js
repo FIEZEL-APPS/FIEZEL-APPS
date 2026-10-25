@@ -187,6 +187,22 @@ const EXCLUSIONS = new Map([
       'Memerlukan browser Playwright Chromium lokal dan port server aktif. Bukti kelulusan terdokumentasi ' +
       'di docs/handoffs/FIEZEL-M025592-BOOT-SPLASH-REPAIR-HANDOFF.md.'
   }],
+  ['tools/dev/probe-english-listening-ux-audit.mjs', {
+    class: 'alat-pelaporan',
+    reason:
+      'BUKAN gerbang CI Linux: alat pelaporan audit empiris Playwright Chromium lokal untuk mengukur ' +
+      'fit viewport, eliminasi double topbar 156px pushdown, simetri ruang kosong, dan anti-overlap ' +
+      'tombol aksi terapung pada sesi Listening English (m025-675). Memerlukan browser Playwright Chromium ' +
+      'lokal dan port server aktif. Bukti kelulusan terdokumentasi di docs/handoffs/FIEZEL-M025675-SPEAKING-LISTENING-UIUX-OVERHAUL-HANDOFF.md.'
+  }],
+  ['tools/dev/probe-speaking-audit.mjs', {
+    class: 'alat-pelaporan',
+    reason:
+      'BUKAN gerbang CI Linux: alat pelaporan audit empiris Playwright Chromium lokal untuk memverifikasi ' +
+      'fit viewport, kartu Tactile Travertine, tombol exit silang sudut kanan atas, dan anti-overlap ' +
+      'tombol Lanjut pada sesi Speaking (m025-675). Memerlukan browser Playwright Chromium lokal dan ' +
+      'port server aktif. Bukti kelulusan terdokumentasi di docs/handoffs/FIEZEL-M025675-SPEAKING-LISTENING-UIUX-OVERHAUL-HANDOFF.md.'
+  }],
   ['tests/chokai-multi-voice-protocol-test.js', {
     class: 'gerbang-pra-rilis-fitur',
     reason:

@@ -400,6 +400,25 @@ html.fz-booting body{overflow:hidden}
     .skills-page {
       padding-top: calc(64px + max(10px, env(safe-area-inset-top, 10px))) !important;
     }
+    body.fsl-session-active .skill-page-topbar,
+    body:has(.fsl-card-listening) .skill-page-topbar,
+    body:has(.fsl-card-speaking) .skill-page-topbar {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      pointer-events: none !important;
+    }
+    body.fsl-session-active section.skills-page:has(.skill-page-topbar),
+    body.fsl-session-active .skills-page,
+    body:has(.fsl-card-listening) section.skills-page:has(.skill-page-topbar),
+    body:has(.fsl-card-listening) .skills-page,
+    body:has(.fsl-card-speaking) section.skills-page:has(.skill-page-topbar),
+    body:has(.fsl-card-speaking) .skills-page {
+      padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
+    }
 
     /* Anti-Ruang Hampa (Zero Void Space): eliminate bottom void across all panels */
     body, body.fz-lux, body.fz-stage-map .app, body.fz-stage-quiz .app,

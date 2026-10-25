@@ -117,7 +117,8 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
    Penyelarasan Tema Tactile Travertine resmi Fiezel:
    Latar #FFFDF9, border 1.5px solid #E8DFD3, box-shadow 0 12px 32px rgba(36,26,17,0.08). */
 
-.fsl-card-listening {
+.fsl-card-listening,
+.fsl-card-speaking {
   position: relative !important;
   background: #FFFDF9 !important;
   color: #1E1B18 !important;
@@ -132,10 +133,15 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
 
 /* 1. KONTRAK HEADLINE: Kontras >= 12:1 di atas travertine */
 html body .fsl-card.fsl-card-listening h2,
+html body .fsl-card.fsl-card-speaking h2,
 html body .fsl-card-listening h2,
+html body .fsl-card-speaking h2,
 .fsl-card-listening h2,
+.fsl-card-speaking h2,
 .fsl-card-listening>h2,
-body.fz-stage-sl.fsl-session-active .fsl-card-listening>h2 {
+.fsl-card-speaking>h2,
+body.fz-stage-sl.fsl-session-active .fsl-card-listening>h2,
+body.fz-stage-sl.fsl-session-active .fsl-card-speaking>h2 {
   color: #0F172A !important;
   -webkit-text-fill-color: #0F172A !important;
   font-size: 20px !important;
@@ -144,6 +150,123 @@ body.fz-stage-sl.fsl-session-active .fsl-card-listening>h2 {
   margin: 0 0 12px 0 !important;
   padding-right: 44px !important; /* Ruang untuk tombol silang exit di pojok kanan atas */
   word-break: break-word !important;
+}
+
+/* Penataan Khusus Sesi Speaking (Tactile Travertine) */
+.fsl-card-speaking .fsl-kicker {
+  display: inline-block !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #8C2233 !important;
+  background: #FDF2F4 !important;
+  border: 1px solid #F5D0D6 !important;
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+  margin-bottom: 8px !important;
+  width: fit-content !important;
+}
+.fsl-card-speaking .fsl-mascot-strip {
+  margin: 4px 0 10px 0 !important;
+}
+.fsl-card-speaking .fsl-prompt {
+  position: relative !important;
+  background: #FFF8EB !important;
+  border: 1.5px solid #F0E4CF !important;
+  border-radius: 16px !important;
+  padding: 14px 18px !important;
+  color: #241A11 !important;
+  font-size: 1.15rem !important;
+  font-weight: 750 !important;
+  line-height: 1.45 !important;
+  margin: 8px 0 12px 0 !important;
+  box-shadow: 0 2px 8px rgba(36, 26, 17, 0.04) !important;
+  word-break: break-word !important;
+}
+.fsl-card-speaking .fsl-prompt::before {
+  content: '“';
+  font-family: Georgia, serif;
+  font-size: 1.6rem;
+  color: #D4BFA6;
+  line-height: 0;
+  vertical-align: -0.15em;
+  margin-right: 4px;
+}
+.fsl-card-speaking .fsl-prompt::after {
+  content: '”';
+  font-family: Georgia, serif;
+  font-size: 1.6rem;
+  color: #D4BFA6;
+  line-height: 0;
+  vertical-align: -0.3em;
+  margin-left: 4px;
+}
+.fsl-card-speaking .fsl-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin: 12px 0 8px 0 !important;
+  width: 100% !important;
+}
+.fsl-card-speaking button[data-recognize] {
+  width: 100% !important;
+  height: 52px !important;
+  min-height: 50px !important;
+  max-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  padding: 0 20px !important;
+  border-radius: 999px !important;
+  background: #1E1B18 !important;
+  color: #FFFDF9 !important;
+  border: 1.5px solid #1E1B18 !important;
+  font-size: 15.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(30, 27, 24, 0.16) !important;
+  transition: all 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+.fsl-card-speaking button[data-recognize]:hover {
+  background: #2D2723 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(30, 27, 24, 0.22) !important;
+}
+.fsl-card-speaking button[data-recognize]:active {
+  transform: translateY(1px) !important;
+}
+.fsl-card-speaking button[data-record] {
+  width: 100% !important;
+  min-height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+  background: #FFF8EB !important;
+  color: #6E5E47 !important;
+  border: 1.5px solid #E8DFD3 !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+.fsl-card-speaking button[data-record]:hover {
+  background: #F5EADB !important;
+  color: #241A11 !important;
+}
+.fsl-card-speaking .fsl-status {
+  margin-top: 8px !important;
+  padding: 10px 14px !important;
+  border-radius: 14px !important;
+  background: #F7EFE1 !important;
+  border: 1px solid #E8DFD3 !important;
+  color: #6E5E47 !important;
+  font-size: 0.84rem !important;
+  line-height: 1.45 !important;
 }
 
 /* 2. ERGONOMI TOMBOL KELUAR: Ikon silang ✕ di pojok kanan atas kartu */
@@ -629,53 +752,155 @@ body.fsl-session-active .app {
   min-height: 100dvh !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: flex-start !important;
+  justify-content: center !important;
   padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
   padding-left: 12px !important;
   padding-right: 12px !important;
-  padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
   box-sizing: border-box !important;
 }
 body.fz-stage-sl.fsl-session-active #app,
 body.fz-stage-sl.fsl-session-active .skills-page,
 body.fz-stage-sl.fsl-session-active #speakingListeningRoot,
-body.fz-stage-sl.fsl-session-active .fsl-shell {
+body.fz-stage-sl.fsl-session-active .fsl-shell,
+body.fsl-session-active #app,
+body.fsl-session-active .skills-page,
+body.fsl-session-active #speakingListeningRoot,
+body.fsl-session-active .fsl-shell {
   width: 100% !important;
   display: flex !important;
   flex-direction: column !important;
   min-height: 0 !important;
 }
+body.fz-stage-sl.fsl-session-active section.skills-page,
+body.fsl-session-active section.skills-page,
+body.fz-stage-sl.fsl-session-active .skills-page,
+body.fsl-session-active .skills-page,
+body:has(.fsl-card-listening) .skills-page,
+body:has(.fsl-card-speaking) .skills-page {
+  padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
+  margin-top: 0 !important;
+}
+body.fz-stage-sl.fsl-session-active .fsl-shell,
+body.fsl-session-active .fsl-shell {
+  max-width: 540px !important;
+  margin: auto !important;
+}
 body.fz-stage-sl.fsl-session-active .fsl-card-listening,
-body.fsl-session-active .fsl-card-listening {
+body.fsl-session-active .fsl-card-listening,
+body.fz-stage-sl.fsl-session-active .fsl-card-speaking,
+body.fsl-session-active .fsl-card-speaking {
   flex: 0 1 auto !important;
   min-height: 0 !important;
-  padding: 12px 14px !important;
+  padding: 14px 16px !important;
   overflow-y: visible !important;
 }
+
+/* ANTI-COLLISION PADDING: Mencegah tombol mengambang "Lanjut" menabrak naskah/gem-footer */
 body.fz-stage-sl.fsl-session-active .fsl-card-listening:has(.fsl-feedback),
-body.fsl-session-active .fsl-card-listening:has(.fsl-feedback) {
-  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+body.fsl-session-active .fsl-card-listening:has(.fsl-feedback),
+body.fz-stage-sl.fsl-session-active .fsl-card-speaking:has(.fsl-feedback),
+body.fsl-session-active .fsl-card-speaking:has(.fsl-feedback),
+body.fz-stage-sl.fsl-session-active .fsl-card:has(.fsl-feedback),
+body.fsl-session-active .fsl-card:has(.fsl-feedback) {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 16px)) !important;
+}
+.fsl-card-listening:has(.fsl-feedback) .fsl-gem-footer {
+  margin-bottom: calc(76px + env(safe-area-inset-bottom, 16px)) !important;
+}
+.fsl-card-speaking:has(.fsl-feedback) .fsl-feedback {
+  margin-bottom: calc(76px + env(safe-area-inset-bottom, 16px)) !important;
 }
 
 @media (min-width: 768px) {
-  body.fz-stage-sl.fsl-session-active .fsl-shell {
-    max-width: 720px !important;
-    margin: 0 auto !important;
+  body.fz-stage-sl.fsl-session-active .fsl-shell,
+  body.fsl-session-active .fsl-shell {
+    max-width: min(980px, 92vw) !important;
+    margin: auto !important;
   }
-  body.fz-stage-sl.fsl-session-active .fsl-card-listening {
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening,
+  body.fz-stage-sl.fsl-session-active .fsl-card-speaking,
+  .fsl-card-listening,
+  .fsl-card-speaking {
     padding: 24px 28px !important;
     border-radius: 28px !important;
+    display: grid !important;
+    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr) !important;
+    column-gap: 28px !important;
+    row-gap: 16px !important;
+    align-items: start !important;
+  }
+  .fsl-card-listening h2,
+  .fsl-card-speaking h2 {
+    grid-column: 1 / -1 !important;
+    margin-bottom: 4px !important;
+    padding-right: 50px !important;
   }
   .fsl-card-listening .fsl-player {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    height: 150px !important;
+    max-height: 160px !important;
+  }
+  .fsl-card-listening .fsl-audio-actions {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    margin: 0 !important;
+  }
+  .fsl-card-listening .fsl-work {
+    grid-column: 2 !important;
+    grid-row: 2 / span 3 !important;
+    margin: 0 !important;
+  }
+  .fsl-card-listening [data-feedback] {
+    grid-column: 2 !important;
+  }
+  .fsl-card-listening .fsl-gem-footer {
+    grid-column: 1 / -1 !important;
+    margin-top: 12px !important;
+  }
+
+  .fsl-card-speaking .fsl-kicker {
+    grid-column: 1 / -1 !important;
+  }
+  .fsl-card-speaking .fsl-mascot-strip {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    height: 140px !important;
+  }
+  .fsl-card-speaking .fsl-mascot-strip .fsl-mascot-slot,
+  .fsl-card-speaking .fsl-mascot-strip .fsl-mascot {
+    width: 120px !important;
     height: 120px !important;
-    max-height: 130px !important;
+  }
+  .fsl-card-speaking .fsl-prompt {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+  }
+  .fsl-card-speaking .fsl-actions {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .fsl-card-speaking .fsl-status {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+  }
+  .fsl-card-speaking .fsl-privacy {
+    grid-column: 2 !important;
+    grid-row: 5 !important;
+  }
+  .fsl-card-speaking [data-feedback] {
+    grid-column: 2 !important;
+    grid-row: 6 !important;
   }
   .fsl-card-listening .fsl-mascot-slot .fz-mochi-viewport,
   .fsl-card-listening .fsl-mascot-slot canvas {
     pointer-events: none !important;
     z-index: 1 !important;
   }
-  .fsl-card-listening h2,
   .fsl-card-listening .fsl-actions,
   .fsl-card-listening .fsl-options,
   .fsl-card-listening .fsl-play-hero {
@@ -684,7 +909,11 @@ body.fsl-session-active .fsl-card-listening:has(.fsl-feedback) {
   }
 }
 
-/* Hide global navbars and background hub headers during session */
+/* Hide global navbars, background hub headers, and skill-page-topbar during session */
+body.fz-stage-sl.fsl-session-active .skill-page-topbar,
+body.fsl-session-active .skill-page-topbar,
+body:has(.fsl-card-listening) .skill-page-topbar,
+body:has(.fsl-card-speaking) .skill-page-topbar,
 body.fz-stage-sl.fsl-session-active .topbar,
 body.fsl-session-active .topbar,
 body.fz-stage-sl.fsl-session-active .bottomnav,
@@ -692,10 +921,19 @@ body.fsl-session-active .bottomnav,
 body.fz-stage-sl.fsl-session-active .section-head,
 body.fsl-session-active .section-head,
 body:has(.fsl-card-listening) .bottomnav,
+body:has(.fsl-card-speaking) .bottomnav,
 body:has(.fsl-card-listening) .section-head,
-body:has(.fsl-feedback) .bottomnav {
+body:has(.fsl-card-speaking) .section-head,
+body:has(.fsl-feedback) .bottomnav,
+body:has(.fsl-feedback) .skill-page-topbar {
   display: none !important;
   visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
   pointer-events: none !important;
 }
 
@@ -758,5 +996,27 @@ body.fz-stage-sl.fsl-session-active .fz-coach-bubble {
     border: 1px solid #E8DFD3 !important;
     max-height: 60px !important;
     overflow-y: auto !important;
+  }
+  .fsl-card-speaking .fsl-mascot-strip {
+    margin: 0 0 4px 0 !important;
+  }
+  .fsl-card-speaking .fsl-mascot-strip .fsl-mascot-slot,
+  .fsl-card-speaking .fsl-mascot-strip .fsl-mascot {
+    width: 42px !important;
+    height: 42px !important;
+  }
+  .fsl-card-speaking .fsl-prompt {
+    font-size: 1.02rem !important;
+    padding: 10px 14px !important;
+    margin: 6px 0 8px 0 !important;
+  }
+  .fsl-card-speaking button[data-recognize] {
+    height: 48px !important;
+    min-height: 46px !important;
+    max-height: 48px !important;
+  }
+  .fsl-card-speaking .fsl-actions {
+    margin: 8px 0 6px 0 !important;
+    gap: 6px !important;
   }
 }
