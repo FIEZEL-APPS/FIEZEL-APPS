@@ -1,0 +1,256 @@
+{
+  "android_compact": {
+    "hub": {
+      "windowWidth": 360,
+      "windowHeight": 780,
+      "bodyScrollHeight": 787,
+      "overflowY": true,
+      "cardCount": 2,
+      "shellRect": {
+        "top": 134,
+        "bottom": 636.15625,
+        "width": 336,
+        "height": 502.15625
+      }
+    },
+    "listeningInitial": {
+      "windowWidth": 360,
+      "windowHeight": 780,
+      "docScrollHeight": 780,
+      "overflowY": false,
+      "cardFitsViewport": true,
+      "spaceAboveCard": 117,
+      "spaceBelowCard": 119,
+      "cardHeight": 544,
+      "cardWidth": 312,
+      "topbarHeight": 0,
+      "playerHeight": 72,
+      "mascotSlotHeight": 72,
+      "mascotSlotWidth": 278,
+      "playHeroHeight": 48,
+      "optionsCount": 4,
+      "optionsHeight": 234,
+      "gemFooterHeight": 78,
+      "bottomnavVisible": false
+    },
+    "listeningAnswered": {
+      "docScrollHeight": 1051,
+      "overflowY": true,
+      "overflowAmountPx": 271,
+      "cardBottom": 959,
+      "feedbackBottom": 703,
+      "nextBtnTop": 712,
+      "nextBtnBottom": 762,
+      "nextBtnOverlapsFeedbackText": false,
+      "nextBtnOverlapsGemFooter": true,
+      "nextBtnIsFixed": true
+    },
+    "listeningDictation": {
+      "hasDictationInput": false,
+      "hasSubmitBtn": false,
+      "docScrollHeight": 1051,
+      "overflowY": true,
+      "cardHeight": 869,
+      "cardFitsViewport": false
+    },
+    "listeningExam": {
+      "windowHeight": 780,
+      "docScrollHeight": 1051,
+      "overflowY": true,
+      "overflowAmountPx": 271,
+      "hasNotes": false,
+      "notesHeight": 0,
+      "hasSourceText": false,
+      "questionCount": 0,
+      "submitVisible": false
+    }
+  },
+  "iphone14": {
+    "hub": {
+      "windowWidth": 390,
+      "windowHeight": 844,
+      "bodyScrollHeight": 844,
+      "overflowY": false,
+      "cardCount": 2,
+      "shellRect": {
+        "top": 134,
+        "bottom": 636.15625,
+        "width": 366,
+        "height": 502.15625
+      }
+    },
+    "listeningInitial": {
+      "windowWidth": 390,
+      "windowHeight": 844,
+      "docScrollHeight": 844,
+      "overflowY": false,
+      "cardFitsViewport": true,
+      "spaceAboveCard": 155,
+      "spaceBelowCard": 157,
+      "cardHeight": 532,
+      "cardWidth": 342,
+      "topbarHeight": 0,
+      "playerHeight": 72,
+      "mascotSlotHeight": 72,
+      "mascotSlotWidth": 308,
+      "playHeroHeight": 48,
+      "optionsCount": 4,
+      "optionsHeight": 222,
+      "gemFooterHeight": 78,
+      "bottomnavVisible": false
+    },
+    "listeningAnswered": {
+      "docScrollHeight": 1023,
+      "overflowY": true,
+      "overflowAmountPx": 179,
+      "cardBottom": 931,
+      "feedbackBottom": 691,
+      "nextBtnTop": 776,
+      "nextBtnBottom": 826,
+      "nextBtnOverlapsFeedbackText": false,
+      "nextBtnOverlapsGemFooter": false,
+      "nextBtnIsFixed": true
+    },
+    "listeningDictation": {
+      "hasDictationInput": false,
+      "hasSubmitBtn": false,
+      "docScrollHeight": 1023,
+      "overflowY": true,
+      "cardHeight": 841,
+      "cardFitsViewport": false
+    },
+    "listeningExam": {
+      "windowHeight": 844,
+      "docScrollHeight": 1023,
+      "overflowY": true,
+      "overflowAmountPx": 179,
+      "hasNotes": false,
+      "notesHeight": 0,
+      "hasSourceText": false,
+      "questionCount": 0,
+      "submitVisible": false
+    }
+  },
+  "pixel7": {
+    "hub": {
+      "windowWidth": 412,
+      "windowHeight": 915,
+      "bodyScrollHeight": 915,
+      "overflowY": false,
+      "cardCount": 0,
+      "shellRect": null
+    },
+    "listeningInitial": {
+      "windowWidth": 412,
+      "windowHeight": 915,
+      "docScrollHeight": 915,
+      "overflowY": false,
+      "cardFitsViewport": true,
+      "spaceAboveCard": 192,
+      "spaceBelowCard": 194,
+      "cardHeight": 528,
+      "cardWidth": 364,
+      "topbarHeight": 0,
+      "playerHeight": 72,
+      "mascotSlotHeight": 72,
+      "mascotSlotWidth": 330,
+      "playHeroHeight": 48,
+      "optionsCount": 4,
+      "optionsHeight": 234,
+      "gemFooterHeight": 62,
+      "bottomnavVisible": false
+    },
+    "listeningAnswered": {
+      "docScrollHeight": 1036,
+      "overflowY": true,
+      "overflowAmountPx": 121,
+      "cardBottom": 944,
+      "feedbackBottom": 703,
+      "nextBtnTop": 847,
+      "nextBtnBottom": 897,
+      "nextBtnOverlapsFeedbackText": false,
+      "nextBtnOverlapsGemFooter": false,
+      "nextBtnIsFixed": true
+    },
+    "listeningDictation": {
+      "hasDictationInput": false,
+      "hasSubmitBtn": false,
+      "docScrollHeight": 1036,
+      "overflowY": true,
+      "cardHeight": 854,
+      "cardFitsViewport": false
+    },
+    "listeningExam": {
+      "windowHeight": 915,
+      "docScrollHeight": 1036,
+      "overflowY": true,
+      "overflowAmountPx": 121,
+      "hasNotes": false,
+      "notesHeight": 0,
+      "hasSourceText": false,
+      "questionCount": 0,
+      "submitVisible": false
+    }
+  },
+  "desktop_1280": {
+    "hub": {
+      "windowWidth": 1280,
+      "windowHeight": 800,
+      "bodyScrollHeight": 800,
+      "overflowY": false,
+      "cardCount": 0,
+      "shellRect": null
+    },
+    "listeningInitial": {
+      "windowWidth": 1280,
+      "windowHeight": 800,
+      "docScrollHeight": 800,
+      "overflowY": false,
+      "cardFitsViewport": true,
+      "spaceAboveCard": 196,
+      "spaceBelowCard": 222,
+      "cardHeight": 382,
+      "cardWidth": 824,
+      "topbarHeight": 0,
+      "playerHeight": 72,
+      "mascotSlotHeight": 72,
+      "mascotSlotWidth": 340,
+      "playHeroHeight": 48,
+      "optionsCount": 0,
+      "optionsHeight": 134,
+      "gemFooterHeight": 48,
+      "bottomnavVisible": false
+    },
+    "listeningAnswered": {
+      "docScrollHeight": 800,
+      "overflowY": false,
+      "overflowAmountPx": 0,
+      "cardBottom": 578,
+      "feedbackBottom": 0,
+      "nextBtnTop": 0,
+      "nextBtnBottom": 0,
+      "nextBtnOverlapsFeedbackText": false,
+      "nextBtnOverlapsGemFooter": false,
+      "nextBtnIsFixed": false
+    },
+    "listeningDictation": {
+      "hasDictationInput": true,
+      "hasSubmitBtn": true,
+      "docScrollHeight": 800,
+      "overflowY": false,
+      "cardHeight": 382,
+      "cardFitsViewport": true
+    },
+    "listeningExam": {
+      "windowHeight": 800,
+      "docScrollHeight": 800,
+      "overflowY": false,
+      "overflowAmountPx": 0,
+      "hasNotes": false,
+      "notesHeight": 0,
+      "hasSourceText": false,
+      "questionCount": 0,
+      "submitVisible": false
+    }
+  }
+}
