@@ -3025,12 +3025,12 @@ export default function App() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => {
-                            playFiezelSfx('button_tap');
-                            stopLiveCall();
-                            setLiveUserDraft('');
-                            setLiveAiDraft('');
-                          }}
+                            onClick={() => {
+                              playFiezelSfx('button_tap');
+                              stopLiveCall();
+                              setLiveUserDraft('');
+                              setLiveAiDraft('');
+                            }}
                           className="px-4 py-2 rounded-full bg-[#B8432D] hover:bg-[#9E3622] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                         >
                           <PhoneOff className="w-3.5 h-3.5" />
