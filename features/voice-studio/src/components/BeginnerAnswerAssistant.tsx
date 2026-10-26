@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Volume2, Send, Mic, RefreshCw, Sparkles } from 'lucide-react';
+import { Volume2, Send, Mic, RefreshCw, Sparkles, Eye, EyeOff } from 'lucide-react';
 import type { BeginnerReplyCard } from '../lib/liveCallHelper';
 import type { CallScenario, LearnerLocale } from '../types/voiceCall';
 import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
@@ -48,6 +48,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
   onStartPttWithPrompt,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   // Reset spotlight to easiest/shortest option whenever Partner AI speaks a new sentence
   useEffect(() => {
@@ -64,6 +65,43 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
 
   if (!showLoadingState && !activeCard) {
     return null;
+  }
+
+  const isOfflineCard = copilotSource === 'offline-fallback' || Boolean(activeCard?.isOfflineFallback);
+
+  // Mode Sembunyikan: Tampilan ringkas agar panggung & avatar lawan bicara terlihat bebas leluasa
+  if (isCollapsed) {
+    return (
+      <section
+        data-testid="beginner-answer-assistant"
+        data-copilot-source={showLoadingState ? 'loading' : isOfflineCard ? 'offline-fallback' : 'ai-realtime'}
+        data-copilot-collapsed="true"
+        aria-label="Layar Bantuan Jawaban Natural (Disembunyikan)"
+        className="w-full"
+      >
+        <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-2xl bg-white/90 backdrop-blur-sm border border-[#E6DEC8]/80 shadow-2xs">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Sparkles className="w-3.5 h-3.5 text-[#8C2233] shrink-0" />
+            <span className="text-xs font-semibold text-[#5C4E3C] truncate">
+              {locale === 'th'
+                ? 'ให้ Fiezel ช่วยตอบอย่างเป็นธรรมชาติ'
+                : 'Sini, biar Fiezel bantuin kamu jawab lebih natural'}
+            </span>
+          </div>
+          <button
+            type="button"
+            data-testid="copilot-toggle-collapse-btn"
+            onClick={() => setIsCollapsed(false)}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611] text-[11px] font-semibold cursor-pointer transition-colors shrink-0"
+            title="Tampilkan kembali bantuan jawaban AI"
+            aria-label={locale === 'th' ? 'เปิดตัวช่วย' : 'Tampilkan Bantuan'}
+          >
+            <Eye className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
+            <span>{locale === 'th' ? 'เปิดตัวช่วย' : 'Tampilkan Bantuan'}</span>
+          </button>
+        </div>
+      </section>
+    );
   }
 
   const getShortTabLabel = (card: BeginnerReplyCard, idx: number): string => {
@@ -89,29 +127,32 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
     return raw;
   };
 
-  const isOfflineCard = copilotSource === 'offline-fallback' || Boolean(activeCard?.isOfflineFallback);
-
   return (
     <section
       data-testid="beginner-answer-assistant"
       data-copilot-source={showLoadingState ? 'loading' : isOfflineCard ? 'offline-fallback' : 'ai-realtime'}
-      aria-label="Layar Copilot Jawaban AI Realtime"
+      data-copilot-collapsed="false"
+      aria-label="Sini, biar Fiezel bantuin kamu jawab lebih natural"
       className="w-full space-y-1.5"
     >
-      {/* Baris Header Copilot: Status AI Realtime + Tombol Variasi Baru */}
+      {/* Baris Header Bantuan: Judul Natural + Badge Status + Tombol Sembunyikan & Variasi Baru */}
       <div className="flex items-center justify-between gap-2 px-1">
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-[#1C1611] tracking-[-0.01em] whitespace-nowrap shrink-0">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1C1611] tracking-[-0.01em] min-w-0">
             <Sparkles className="w-3.5 h-3.5 text-[#8C2233] shrink-0" />
-            <span className="sm:hidden">{locale === 'th' ? 'Copilot AI' : 'Copilot AI'}</span>
-            <span className="hidden sm:inline">
-              {locale === 'th' ? 'ผู้ช่วยคำตอบ AI สด' : 'Copilot Jawaban AI'}
+            <span className="sm:hidden truncate">
+              {locale === 'th' ? 'Biar Fiezel bantu jawab' : 'Biar Fiezel bantu jawab natural'}
+            </span>
+            <span className="hidden sm:inline truncate">
+              {locale === 'th'
+                ? 'ตรงนี้ ให้ Fiezel ช่วยตอบอย่างเป็นธรรมชาติ'
+                : 'Sini, biar Fiezel bantuin kamu jawab lebih natural'}
             </span>
           </span>
 
           <span
             data-testid="realtime-context-sync-badge"
-            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap ${
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0 ${
               showLoadingState
                 ? 'bg-[#FFF4DB] text-[#8A5A00]'
                 : isOfflineCard
@@ -136,26 +177,40 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               <>
                 <span className="sm:hidden">{locale === 'th' ? 'AI สด' : 'AI Realtime'}</span>
                 <span className="hidden sm:inline">
-                  {locale === 'th' ? 'AI สด · ตามบริบท' : 'AI Realtime · Kontekstual'}
+                  {locale === 'th' ? 'AI สด · สดใหม่' : 'AI Realtime · Spontan'}
                 </span>
               </>
             )}
           </span>
         </div>
 
-        {onRefreshAssist && (
+        <div className="flex items-center gap-1.5 shrink-0">
+          {onRefreshAssist && (
+            <button
+              type="button"
+              data-testid="copilot-refresh-btn"
+              disabled={showLoadingState || isAnalyzingTurn}
+              onClick={onRefreshAssist}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-[#FAF5EB] border border-[#E6DEC8] text-[#5C4E3C] hover:text-[#1C1611] text-[11px] font-semibold shadow-2xs cursor-pointer transition-all shrink-0 disabled:opacity-50"
+              title="Minta 3 variasi jawaban AI baru"
+            >
+              <RefreshCw className={`w-3 h-3 ${isRefreshingAssist ? 'animate-spin' : ''}`} />
+              <span className="hidden xs:inline">{locale === 'th' ? 'สร้างใหม่' : 'Opsi Baru'}</span>
+            </button>
+          )}
+
           <button
             type="button"
-            data-testid="copilot-refresh-btn"
-            disabled={showLoadingState || isAnalyzingTurn}
-            onClick={onRefreshAssist}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white hover:bg-[#FAF5EB] border border-[#E6DEC8] text-[#5C4E3C] hover:text-[#1C1611] text-[11px] font-semibold shadow-2xs cursor-pointer transition-all shrink-0 disabled:opacity-50"
-            title="Minta 3 variasi jawaban AI baru"
+            data-testid="copilot-toggle-collapse-btn"
+            onClick={() => setIsCollapsed(true)}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#FAF5EB] border border-[#E6DEC8] text-[#5C4E3C] hover:text-[#8C2233] text-[11px] font-semibold shadow-2xs cursor-pointer transition-all shrink-0"
+            title="Sembunyikan bantuan jawaban untuk melihat lawan bicara lebih leluasa"
+            aria-label={locale === 'th' ? 'ซ่อน' : 'Sembunyikan Bantuan'}
           >
-            <RefreshCw className={`w-3 h-3 ${isRefreshingAssist ? 'animate-spin' : ''}`} />
-            <span>{locale === 'th' ? 'สร้างใหม่' : 'Opsi Baru'}</span>
+            <EyeOff className="w-3 h-3 text-[#7A6B56] shrink-0" />
+            <span>{locale === 'th' ? 'ซ่อน' : 'Sembunyikan'}</span>
           </button>
-        )}
+        </div>
       </div>
 
       {/* Konteks tersembunyi untuk inspeksi sinkronisasi */}

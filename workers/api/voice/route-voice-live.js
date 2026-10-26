@@ -23,7 +23,7 @@ import { readJsonFromCtx } from '../mw-guard.js';
 const GOOGLE_AUTH_TOKEN_API = 'https://generativelanguage.googleapis.com/v1alpha/auth_tokens';
 const GOOGLE_GEN_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const DEFAULT_LIVE_MODEL = 'gemini-3.8-live';
-const COPILOT_MODELS = ['gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemini-flash-lite-latest'];
+const COPILOT_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
 const DEFAULT_CONSTRAINED_ENDPOINT =
   'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained';
 
@@ -256,6 +256,11 @@ async function invokeSingleGeminiJson({
   }
   const timer = setTimeout(() => controller.abort(), 9500);
   try {
+    const thinkingConfig =
+      model === 'gemini-3-flash-preview'
+        ? { thinkingBudget: 0 }
+        : { thinkingLevel: 'MINIMAL' };
+
     const res = await fetch(
       `${GOOGLE_GEN_API_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
       {
@@ -266,8 +271,8 @@ async function invokeSingleGeminiJson({
           generationConfig: {
             responseMimeType: 'application/json',
             temperature,
-            maxOutputTokens,
-            thinkingConfig: { thinkingLevel: 'MINIMAL' },
+            maxOutputTokens: Math.min(maxOutputTokens, 750),
+            thinkingConfig,
           },
         }),
         signal: controller.signal,
@@ -321,8 +326,8 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
   let lastReason = 'unknown';
 
   // Hedged Dual-Key Execution:
-  // Primary fires immediately on gemini-3.1-flash-lite (~1.4s-2.3s).
-  // If primary takes >1900ms or fails early, hedged backup fires on key #2 with gemini-flash-lite-latest.
+  // Primary fires immediately on gemini-3-flash-preview (~1.5s-2.1s).
+  // If primary takes >750ms or fails early, hedged backup fires on key #2 in parallel.
   const keyPrimary = activePool[0];
   const keyHedge = activePool[1 % activePool.length];
   let hedgeTimer = null;
@@ -346,7 +351,7 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
       pending += 1;
       invokeSingleGeminiJson({
         key: keyHedge,
-        model: COPILOT_MODELS[1],
+        model: COPILOT_MODELS[0],
         promptText,
         temperature,
         maxOutputTokens,
@@ -365,7 +370,7 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
       });
     };
 
-    hedgeTimer = setTimeout(startHedge, 1900);
+    hedgeTimer = setTimeout(startHedge, 750);
 
     invokeSingleGeminiJson({
       key: keyPrimary,
@@ -426,6 +431,8 @@ export async function routeVoiceCopilotAssist(ctx) {
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
   const targetLang = body.targetLang === 'ja' ? 'ja' : 'en';
+  const locale = body.locale === 'th' ? 'th' : 'id';
+  const targetLocaleName = locale === 'th' ? 'Thai' : 'Indonesian';
   const aiText = cleanSpokenText(body.aiText || body.aiQuestionText || '').slice(0, 500);
   if (!aiText) {
     return badRequest('empty_ai_text');
@@ -445,23 +452,23 @@ export async function routeVoiceCopilotAssist(ctx) {
       : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy Indonesian phonetic guide)';
 
   const prompt = [
-    `Live Two-Way Call Copilot (${scenarioTitle}). Language: ${langSpec}`,
+    `Speech Copilot (${scenarioTitle}). Target: ${langSpec}.`,
     historyLines.length
       ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
       : '',
-    lastUserText ? `Learner previously said: "${lastUserText}"` : '',
-    `Partner AI JUST SAID: "${aiText}"`,
+    lastUserText ? `Learner said: "${lastUserText}"` : '',
+    `Partner AI said: "${aiText}"`,
     excludeList.length
-      ? `Do NOT repeat these previous options: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
+      ? `Do NOT repeat: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
       : '',
-    `Generate 3 natural spoken replies that directly answer "${aiText}" (NEVER unrelated textbook templates): easy=1 short easy sentence, mission=natural reply with specific detail, rescue=reply + friendly follow-up question back. Translate "${aiText}" literally into aiMeaningId (Indonesian) & aiMeaningTh (Thai), and write the direct literal first-person translation of each reply in hintId & hintTh (never a meta-description like "Menjawab...").`,
-    `JSON only: {"aiMeaningId":"...","aiMeaningTh":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}`,
+    `Generate 3 natural spoken replies directly answering "${aiText}" (NEVER textbook templates): easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back. Translate "${aiText}" literally into aiMeaning (${targetLocaleName}), and write direct literal first-person translation of each reply in hint (${targetLocaleName}).`,
+    `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
   ]
     .filter(Boolean)
     .join('\n');
 
   const temp = variationSeed > 0 || excludeList.length > 0 ? 0.75 : 0.45;
-  const gen = await runGeminiJsonWithPool(keys, prompt, temp, 2048);
+  const gen = await runGeminiJsonWithPool(keys, prompt, temp, 500);
   if (!gen.ok || !gen.parsed) {
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
@@ -471,12 +478,14 @@ export async function routeVoiceCopilotAssist(ctx) {
     return jsonResponse({ ok: false, fallback: true, reason: 'invalid_replies' }, { status: 503 });
   }
 
+  const aiMeaning = cleanSpokenText(gen.parsed.aiMeaning || gen.parsed.aiMeaningId || gen.parsed.aiMeaningTh || '');
+
   return jsonResponse({
     ok: true,
     source: 'ai-realtime',
     model: gen.model,
-    aiMeaningId: cleanSpokenText(gen.parsed.aiMeaningId || ''),
-    aiMeaningTh: cleanSpokenText(gen.parsed.aiMeaningTh || ''),
+    aiMeaningId: locale === 'id' ? aiMeaning : cleanSpokenText(gen.parsed.aiMeaningId || ''),
+    aiMeaningTh: locale === 'th' ? aiMeaning : cleanSpokenText(gen.parsed.aiMeaningTh || ''),
     replies,
     suggestions: replies,
   });
@@ -496,6 +505,8 @@ export async function routeVoicePartnerTurn(ctx) {
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
   const targetLang = body.targetLang === 'ja' ? 'ja' : 'en';
+  const locale = body.locale === 'th' ? 'th' : 'id';
+  const targetLocaleName = locale === 'th' ? 'Thai' : 'Indonesian';
   const userText = cleanSpokenText(body.text || '').slice(0, 400);
   if (!userText) {
     return badRequest('empty_user_text');
@@ -511,19 +522,19 @@ export async function routeVoicePartnerTurn(ctx) {
       : 'English (warm natural spoken A2-B1, NO emojis; reply "pronunciation" = easy Indonesian phonetic guide)';
 
   const prompt = [
-    `You are ${personaName} on a live call (${scenarioTitle}). Language: ${langSpec}`,
+    `You are ${personaName} on a live voice call (${scenarioTitle}). Target: ${langSpec}.`,
     historyLines.length
       ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
       : '',
-    `Learner JUST SAID: "${userText}"`,
-    `1) "aiReply": Reply naturally as ${personaName} in 1-2 short spoken sentences (max 20 words) reacting directly to "${userText}" + a follow-up question on the same topic (no emojis). Translate into aiReplyTranslationId (Indonesian) & aiReplyTranslationTh (Thai).`,
-    `2) "replies": 3 natural spoken replies the learner can say NEXT to directly answer your new "aiReply" (easy=short, mission=with detail, rescue=answer+question back; NEVER unrelated templates).`,
-    `JSON only: {"aiReply":"...","aiReplyTranslationId":"...","aiReplyTranslationTh":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}`,
+    `Learner said: "${userText}"`,
+    `1) "aiReply": Reply as ${personaName} in 1-2 short spoken sentences (max 18 words) reacting directly to "${userText}" + a follow-up question. Translate into aiReplyTranslation (${targetLocaleName}).`,
+    `2) "replies": 3 natural spoken replies the learner can say NEXT directly answering your new aiReply (easy=short, mission=detail, rescue=answer+question back; never templates). Translate each in hint (${targetLocaleName}).`,
+    `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
   ]
     .filter(Boolean)
     .join('\n');
 
-  const gen = await runGeminiJsonWithPool(keys, prompt, 0.55, 2048);
+  const gen = await runGeminiJsonWithPool(keys, prompt, 0.55, 600);
   if (!gen.ok || !gen.parsed) {
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
@@ -534,14 +545,15 @@ export async function routeVoicePartnerTurn(ctx) {
   }
 
   const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang);
+  const aiReplyTranslation = cleanSpokenText(gen.parsed.aiReplyTranslation || gen.parsed.aiReplyTranslationId || gen.parsed.aiReplyTranslationTh || '');
 
   return jsonResponse({
     ok: true,
     source: 'ai-realtime',
     model: gen.model,
     aiReply,
-    aiReplyTranslationId: cleanSpokenText(gen.parsed.aiReplyTranslationId || ''),
-    aiReplyTranslationTh: cleanSpokenText(gen.parsed.aiReplyTranslationTh || ''),
+    aiReplyTranslationId: locale === 'id' ? aiReplyTranslation : cleanSpokenText(gen.parsed.aiReplyTranslationId || ''),
+    aiReplyTranslationTh: locale === 'th' ? aiReplyTranslation : cleanSpokenText(gen.parsed.aiReplyTranslationTh || ''),
     replies,
   });
 }

@@ -454,10 +454,10 @@ function parseJsonBody(req) {
   });
 }
 
-const LOCAL_COPILOT_MODELS = ['gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemini-flash-lite-latest'];
+const LOCAL_COPILOT_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
 const localKeyCooldowns = new Map();
 
-async function invokeLocalGeminiSingle({ key, model, promptText, temperature, maxOutputTokens = 2048, parentSignal }) {
+async function invokeLocalGeminiSingle({ key, model, promptText, temperature, maxOutputTokens = 750, parentSignal }) {
   const controller = new AbortController();
   const onParentAbort = () => controller.abort();
   if (parentSignal) {
@@ -466,6 +466,9 @@ async function invokeLocalGeminiSingle({ key, model, promptText, temperature, ma
   }
   const timer = setTimeout(() => controller.abort(), 9500);
   try {
+    const thinkingConfig = model === 'gemini-3-flash-preview'
+      ? { thinkingBudget: 0 }
+      : { thinkingLevel: 'MINIMAL' };
     const gRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
       {
@@ -477,7 +480,7 @@ async function invokeLocalGeminiSingle({ key, model, promptText, temperature, ma
             responseMimeType: 'application/json',
             temperature,
             maxOutputTokens,
-            thinkingConfig: { thinkingLevel: 'MINIMAL' }
+            thinkingConfig
           }
         }),
         signal: controller.signal
@@ -513,7 +516,7 @@ async function invokeLocalGeminiSingle({ key, model, promptText, temperature, ma
   }
 }
 
-async function runLocalGeminiJsonWithHedge(promptText, temperature = 0.5, maxOutputTokens = 700) {
+async function runLocalGeminiJsonWithHedge(promptText, temperature = 0.5, maxOutputTokens = 750) {
   if (!geminiKeys || geminiKeys.length === 0) return { ok: false, reason: 'no_keys' };
   const now = Date.now();
   const total = geminiKeys.length;
@@ -566,7 +569,8 @@ async function runLocalGeminiJsonWithHedge(promptText, temperature = 0.5, maxOut
       });
     };
 
-    hedgeTimer = setTimeout(startHedge, 1900);
+    // Hedge fires at 750ms if primary key #1 has not yet answered
+    hedgeTimer = setTimeout(startHedge, 750);
 
     invokeLocalGeminiSingle({
       key: keyPrimary,
@@ -729,6 +733,8 @@ const server = http.createServer(async (req, res) => {
   if ((pathname === '/api/voice/copilot-assist' || pathname === '/api/voice-call/assist') && req.method === 'POST') {
     const body = await parseJsonBody(req);
     const targetLang = body.targetLang === 'en' ? 'en' : 'ja';
+    const locale = body.locale === 'th' ? 'th' : 'id';
+    const learnerLangName = locale === 'th' ? 'Thai' : 'Indonesian';
     const cleanText = (v) => String(v || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\*[^*]{1,30}\*/g, '').replace(/\s+/g, ' ').trim();
     const aiText = cleanText(body.aiText || body.aiQuestionText || '').slice(0, 500);
     if (!aiText) {
@@ -753,24 +759,29 @@ const server = http.createServer(async (req, res) => {
     const langSpec =
       targetLang === 'ja'
         ? 'Japanese (natural spoken N5-N3, Kanji+Hiragana, NO emojis; "pronunciation" = word-spaced Hepburn Romaji)'
-        : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy Indonesian phonetic guide)';
+        : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy phonetic guide)';
 
+    // Optimized lean prompt for sub-2s generation with zero static templates
     const prompt = [
-      `Live Two-Way Call Copilot (${scenarioTitle}). Language: ${langSpec}`,
-      historyLines.length ? `Context:\n${historyLines.join('\n')}` : '',
-      lastUserText ? `Learner previously said: "${lastUserText}"` : '',
-      `Partner AI JUST SAID: "${aiText}"`,
-      excludeList.length
-        ? `Do NOT repeat these previous options: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
-        : '',
-      `Generate 3 natural spoken replies that directly answer "${aiText}" (NEVER unrelated textbook templates): easy=1 short easy sentence, mission=natural reply with specific detail, rescue=reply + friendly follow-up question back. Translate "${aiText}" literally into aiMeaningId (Indonesian) & aiMeaningTh (Thai), and write the direct literal first-person translation of each reply in hintId & hintTh (never a meta-description like "Menjawab...").`,
-      'JSON only: {"aiMeaningId":"...","aiMeaningTh":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}'
+      `Live Two-Way Spoken Conversation Copilot (${scenarioTitle}). Language: ${langSpec}.`,
+      historyLines.length ? `Recent context:\n${historyLines.join('\n')}` : '',
+      lastUserText ? `Learner said previously: "${lastUserText}"` : '',
+      `Partner AI JUST SPOKE: "${aiText}"`,
+      excludeList.length ? `Provide 3 fresh angles (do not repeat: ${JSON.stringify(excludeList)}).` : '',
+      `Generate 3 spontaneous spoken replies directly answering "${aiText}" (NEVER static textbook templates):`,
+      `- easy: 1 short natural sentence`,
+      `- mission: contextual answer with concrete detail`,
+      `- rescue: polite reply + a smart follow-up question back`,
+      `Also translate "${aiText}" into ${learnerLangName} as "aiMeaning".`,
+      `For each reply, provide natural first-person translation in ${learnerLangName} as "hint" (e.g. "Saya suka ramen pedas", NOT meta-labels).`,
+      'Output JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}'
     ].filter(Boolean).join('\n');
 
-    const temp = variationSeed > 0 || excludeList.length > 0 ? 0.75 : 0.45;
-    const gen = await runLocalGeminiJsonWithHedge(prompt, temp, 2048);
+    const temp = variationSeed > 0 || excludeList.length > 0 ? 0.7 : 0.4;
+    const gen = await runLocalGeminiJsonWithHedge(prompt, temp, 750);
     if (gen && gen.ok && gen.parsed) {
       const parsed = gen.parsed;
+      const aiMeaning = cleanText(parsed?.aiMeaning || parsed?.aiMeaningId || parsed?.aiMeaningTh || '');
       const defaultBadges = [
         { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
         { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ' },
@@ -781,6 +792,7 @@ const server = http.createServer(async (req, res) => {
           const meta = defaultBadges[i] || defaultBadges[0];
           const text = cleanText(it?.text || '');
           if (!text) return null;
+          const hint = cleanText(it?.hint || (locale === 'th' ? it?.hintTh : it?.hintId) || it?.translation || '');
           return {
             id: `ai_rt_${Date.now()}_${i}`,
             tier: it?.tier === 'easy' || it?.tier === 'mission' || it?.tier === 'rescue' ? it.tier : meta.tier,
@@ -788,8 +800,9 @@ const server = http.createServer(async (req, res) => {
             badgeTh: cleanText(it?.badgeTh || it?.labelTh || meta.badgeTh) || meta.badgeTh,
             text,
             pronunciation: cleanText(it?.pronunciation || it?.phonetic || ''),
-            hintId: cleanText(it?.hintId || it?.translationId || it?.meaningId || ''),
-            hintTh: cleanText(it?.hintTh || it?.translationTh || it?.meaningTh || ''),
+            hintId: locale === 'th' ? cleanText(it?.hintId || hint) : hint,
+            hintTh: locale === 'th' ? hint : cleanText(it?.hintTh || hint),
+            hint,
             isRealtimeAi: true
           };
         })
@@ -800,8 +813,9 @@ const server = http.createServer(async (req, res) => {
           ok: true,
           source: 'ai-realtime',
           model: gen.model,
-          aiMeaningId: cleanText(parsed?.aiMeaningId || ''),
-          aiMeaningTh: cleanText(parsed?.aiMeaningTh || ''),
+          aiMeaning,
+          aiMeaningId: locale === 'th' ? cleanText(parsed?.aiMeaningId || aiMeaning) : aiMeaning,
+          aiMeaningTh: locale === 'th' ? aiMeaning : cleanText(parsed?.aiMeaningTh || aiMeaning),
           replies,
           suggestions: replies,
           serverTime: Date.now()
@@ -814,6 +828,8 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/voice/partner-turn' && req.method === 'POST') {
     const body = await parseJsonBody(req);
     const targetLang = body.targetLang === 'en' ? 'en' : 'ja';
+    const locale = body.locale === 'th' ? 'th' : 'id';
+    const learnerLangName = locale === 'th' ? 'Thai' : 'Indonesian';
     const cleanText = (v) => String(v || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\*[^*]{1,30}\*/g, '').replace(/\s+/g, ' ').trim();
     const userText = cleanText(body.text || '').slice(0, 400);
     if (!userText) {
@@ -834,21 +850,22 @@ const server = http.createServer(async (req, res) => {
     const langSpec =
       targetLang === 'ja'
         ? 'Japanese (warm natural N5-N3, Kanji+Hiragana, NO emojis; reply "pronunciation" = word-spaced Hepburn Romaji)'
-        : 'English (warm natural spoken A2-B1, NO emojis; reply "pronunciation" = easy Indonesian phonetic guide)';
+        : 'English (warm natural spoken A2-B1, NO emojis; reply "pronunciation" = easy phonetic guide)';
 
     const prompt = [
-      `You are ${personaName} on a live call (${scenarioTitle}). Language: ${langSpec}`,
+      `You are ${personaName} on a live call (${scenarioTitle}). Language: ${langSpec}.`,
       historyLines.length ? `Context:\n${historyLines.join('\n')}` : '',
-      `Learner JUST SAID: "${userText}"`,
-      `1) "aiReply": Reply naturally as ${personaName} in 1-2 short spoken sentences (max 20 words) reacting directly to "${userText}" + a follow-up question on the same topic (no emojis). Translate into aiReplyTranslationId (Indonesian) & aiReplyTranslationTh (Thai).`,
-      `2) "replies": 3 natural spoken replies the learner can say NEXT to directly answer your new "aiReply" (easy=short, mission=with detail, rescue=answer+question back; NEVER unrelated templates).`,
-      'JSON only: {"aiReply":"...","aiReplyTranslationId":"...","aiReplyTranslationTh":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}'
+      `Learner JUST SPOKE: "${userText}"`,
+      `1) "aiReply": Reply naturally as ${personaName} in 1-2 short spoken sentences (max 18 words) reacting directly to "${userText}" + a follow-up question on the same topic (no emojis). Translate into ${learnerLangName} as "aiReplyTranslation".`,
+      `2) "replies": 3 spontaneous spoken replies the learner can say NEXT to directly answer your new "aiReply" (easy=short, mission=with detail, rescue=answer+question back; NEVER static templates). Translate each into ${learnerLangName} as "hint".`,
+      'JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}'
     ].filter(Boolean).join('\n');
 
-    const gen = await runLocalGeminiJsonWithHedge(prompt, 0.55, 2048);
+    const gen = await runLocalGeminiJsonWithHedge(prompt, 0.5, 750);
     if (gen && gen.ok && gen.parsed) {
       const parsed = gen.parsed;
       const aiReply = cleanText(parsed?.aiReply || '');
+      const aiReplyTranslation = cleanText(parsed?.aiReplyTranslation || parsed?.aiReplyTranslationId || parsed?.aiReplyTranslationTh || '');
       if (aiReply) {
         const defaultBadges = [
           { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
@@ -860,6 +877,7 @@ const server = http.createServer(async (req, res) => {
             const meta = defaultBadges[i] || defaultBadges[0];
             const text = cleanText(it?.text || '');
             if (!text) return null;
+            const hint = cleanText(it?.hint || (locale === 'th' ? it?.hintTh : it?.hintId) || it?.translation || '');
             return {
               id: `ai_rt_${Date.now()}_${i}`,
               tier: it?.tier === 'easy' || it?.tier === 'mission' || it?.tier === 'rescue' ? it.tier : meta.tier,
@@ -867,8 +885,9 @@ const server = http.createServer(async (req, res) => {
               badgeTh: cleanText(it?.badgeTh || it?.labelTh || meta.badgeTh) || meta.badgeTh,
               text,
               pronunciation: cleanText(it?.pronunciation || it?.phonetic || ''),
-              hintId: cleanText(it?.hintId || it?.translationId || it?.meaningId || ''),
-              hintTh: cleanText(it?.hintTh || it?.translationTh || it?.meaningTh || ''),
+              hintId: locale === 'th' ? cleanText(it?.hintId || hint) : hint,
+              hintTh: locale === 'th' ? hint : cleanText(it?.hintTh || hint),
+              hint,
               isRealtimeAi: true
             };
           })
@@ -879,8 +898,9 @@ const server = http.createServer(async (req, res) => {
           source: 'ai-realtime',
           model: gen.model,
           aiReply,
-          aiReplyTranslationId: cleanText(parsed?.aiReplyTranslationId || ''),
-          aiReplyTranslationTh: cleanText(parsed?.aiReplyTranslationTh || ''),
+          aiReplyTranslation,
+          aiReplyTranslationId: locale === 'th' ? cleanText(parsed?.aiReplyTranslationId || aiReplyTranslation) : aiReplyTranslation,
+          aiReplyTranslationTh: locale === 'th' ? aiReplyTranslation : cleanText(parsed?.aiReplyTranslationTh || aiReplyTranslation),
           replies,
           serverTime: Date.now()
         });

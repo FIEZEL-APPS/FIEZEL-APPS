@@ -42,6 +42,9 @@ await new Promise((resolve, reject) => {
       resolve();
     }
   });
+  serverProc.stderr.on('data', (chunk) => {
+    process.stderr.write(`[SERVER STDERR] ${chunk}`);
+  });
   serverProc.on('error', (err) => {
     clearTimeout(timeout);
     reject(err);
@@ -89,6 +92,29 @@ try {
   const openAiJa = await pageJa.locator('[data-testid="live-hud-ai-text"]').innerText();
   const openCopilotJa = await pageJa.locator('[data-testid="teleprompter-target-text"]').innerText();
   assert.ok(!openCopilotJa.includes('ホットコーヒー'), `Template statis terdeteksi: ${openCopilotJa}`);
+
+  // Verifikasi judul natural dan tombol sembunyikan bantuan pada Mobile
+  const assistantJaText = await pageJa.locator('[data-testid="beginner-answer-assistant"]').innerText();
+  assert.ok(
+    assistantJaText.includes('Biar Fiezel bantu') || assistantJaText.includes('Fiezel'),
+    `Judul natural tidak ditemukan: ${assistantJaText}`
+  );
+  assert.ok(
+    assistantJaText.includes('Spontan') || assistantJaText.includes('AI Realtime'),
+    `Badge status tidak sesuai: ${assistantJaText}`
+  );
+
+  // Verifikasi fungsi toggle Sembunyikan / Tampilkan Bantuan
+  await pageJa.locator('[data-testid="copilot-toggle-collapse-btn"]').click();
+  await pageJa.waitForSelector('[data-testid="beginner-answer-assistant"][data-copilot-collapsed="true"]', { timeout: 3000 });
+  const collapsedText = await pageJa.locator('[data-testid="beginner-answer-assistant"]').innerText();
+  assert.ok(
+    collapsedText.includes('Tampilkan Bantuan') || collapsedText.includes('เปิดตัวช่วย'),
+    `Tombol expand tidak muncul saat disembunyikan: ${collapsedText}`
+  );
+  // Klik kembali untuk menampilkan bantuan
+  await pageJa.locator('[data-testid="copilot-toggle-collapse-btn"]').click();
+  await pageJa.waitForSelector('[data-testid="beginner-answer-assistant"][data-copilot-collapsed="false"]', { timeout: 3000 });
 
   const jaStageBox = await pageJa.locator('[data-testid="ai-call-card"]').boundingBox();
   const jaCopilotBox = await pageJa.locator('[data-testid="beginner-answer-assistant"]').boundingBox();
@@ -168,6 +194,18 @@ try {
     !/\b(CEFR|JLPT)\b|100%\s*Gratis|Latihan\s*Bisa\s*Offline/i.test(visibleBodyEn),
     'Ditemukan teks terlarang pada UI Kawan Bicara EN'
   );
+
+  const assistantEnText = await pageEn.locator('[data-testid="beginner-answer-assistant"]').innerText();
+  assert.ok(
+    assistantEnText.includes('Sini, biar Fiezel bantuin kamu') || assistantEnText.includes('Fiezel'),
+    `Judul natural desktop tidak ditemukan: ${assistantEnText}`
+  );
+
+  // Toggle Sembunyikan Bantuan di Desktop
+  await pageEn.locator('[data-testid="copilot-toggle-collapse-btn"]').click();
+  await pageEn.waitForSelector('[data-testid="beginner-answer-assistant"][data-copilot-collapsed="true"]', { timeout: 3000 });
+  await pageEn.locator('[data-testid="copilot-toggle-collapse-btn"]').click();
+  await pageEn.waitForSelector('[data-testid="beginner-answer-assistant"][data-copilot-collapsed="false"]', { timeout: 3000 });
 
   const openAiEn = await pageEn.locator('[data-testid="live-hud-ai-text"]').innerText();
   await pageEn.fill(
