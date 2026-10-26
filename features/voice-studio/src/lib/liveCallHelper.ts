@@ -11,7 +11,9 @@ export interface BeginnerReplyCard {
   hintTh: string;
   contextAnchorId?: string;
   contextAnchorTh?: string;
-  wordBreakdown: Array<{ word: string; reading: string; meaningId: string }>;
+  wordBreakdown?: Array<{ word: string; reading: string; meaningId: string }>;
+  isRealtimeAi?: boolean;
+  isOfflineFallback?: boolean;
 }
 
 export interface LiveTranslationResult {

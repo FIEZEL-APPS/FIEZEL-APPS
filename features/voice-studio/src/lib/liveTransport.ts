@@ -1,6 +1,6 @@
-import { CallScenario, LearnerLocale, TargetLang, VoicePersona } from '../types/voiceCall';
+import type { CallScenario, LearnerLocale, TargetLang, VoicePersona } from '../types/voiceCall';
 import {
-  BeginnerReplyCard,
+  type BeginnerReplyCard,
   generateDynamicContextualAiReply,
   getBeginnerReplyCards,
   translateAndPhoneticizeLiveText,
@@ -265,48 +265,73 @@ export interface GeminiLiveSessionInfo {
 }
 
 /**
- * Requests an ephemeral session token from the Cloudflare Worker 16-key pool.
- * Automatically round-robins and fails over if a key encounters quota limits.
+ * Resolves ordered API base URLs for Voice Studio real-time endpoints.
+ * On localhost/127.0.0.1 preview server, tries same-origin (`""`) first so local
+ * 16-key Gemini endpoints respond directly without cross-origin blocks; in production,
+ * routes directly to Cloudflare Worker (`api.fiezel.my.id`).
  */
-export async function requestGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
-  const base =
+export function resolveVoiceApiCandidateBases(): string[] {
+  const bases: string[] = [];
+  const isLocalHost =
+    typeof window !== 'undefined' &&
+    /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(window.location?.hostname || '');
+  const cfBase =
     resolveCfApiBase() ||
     (typeof window !== 'undefined' && window.FIEZEL_CF_CONFIG?.base
       ? window.FIEZEL_CF_CONFIG.base
       : 'https://api.fiezel.my.id');
-  const url = `${base.replace(/\/$/, '')}/api/voice/live-session`;
 
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '{}',
-      mode: 'cors',
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.ok && data.token) {
-        return {
-          ok: true,
-          token: data.token,
-          model: data.model || 'gemini-3.8-live',
-          endpoint:
-            data.endpoint ||
-            'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained',
-          keyIndex: data.keyIndex,
-          totalKeys: data.totalKeys,
-        };
-      }
-    }
-    return { ok: false, fallback: true };
-  } catch {
-    return { ok: false, fallback: true };
+  if (isLocalHost) {
+    bases.push('');
   }
+  if (cfBase) {
+    bases.push(cfBase.replace(/\/$/, ''));
+  }
+  if (!isLocalHost) {
+    bases.push('');
+  }
+  return Array.from(new Set(bases));
+}
+
+/**
+ * Requests an ephemeral session token from the Cloudflare Worker / Local 16-key pool.
+ * Automatically round-robins and fails over if a key encounters quota limits.
+ */
+export async function requestGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
+  for (const base of resolveVoiceApiCandidateBases()) {
+    const url = `${base}/api/voice/live-session`;
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+        mode: 'cors',
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.ok && data.token) {
+          return {
+            ok: true,
+            token: data.token,
+            model: data.model || 'gemini-3.8-live',
+            endpoint:
+              data.endpoint ||
+              'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained',
+            keyIndex: data.keyIndex,
+            totalKeys: data.totalKeys,
+          };
+        }
+      }
+    } catch {
+      // Try next base candidate
+    }
+  }
+  return { ok: false, fallback: true };
 }
 
 /**
@@ -317,13 +342,9 @@ export async function reportGeminiLiveSessionDrop(
   code?: number,
   keyIndex?: number
 ): Promise<void> {
-  const base =
-    resolveCfApiBase() ||
-    (typeof window !== 'undefined' && window.FIEZEL_CF_CONFIG?.base
-      ? window.FIEZEL_CF_CONFIG.base
-      : 'https://api.fiezel.my.id');
+  const base = resolveVoiceApiCandidateBases()[0] ?? 'https://api.fiezel.my.id';
   try {
-    await fetch(`${base.replace(/\/$/, '')}/api/voice/report-drop`, {
+    await fetch(`${base}/api/voice/report-drop`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reason, code, keyIndex }),
@@ -332,6 +353,252 @@ export async function reportGeminiLiveSessionDrop(
   } catch {
     // Ignore
   }
+}
+
+export interface RealtimeCopilotAssistResult {
+  ok: boolean;
+  source: 'ai-realtime' | 'offline-fallback';
+  aiMeaningId: string;
+  aiMeaningTh: string;
+  replies: BeginnerReplyCard[];
+  cards: BeginnerReplyCard[];
+}
+
+const _copilotTurnCache = new Map<string, RealtimeCopilotAssistResult>();
+
+function normalizeServerCopilotCards(
+  rawList: unknown,
+  targetLang: TargetLang
+): BeginnerReplyCard[] {
+  if (!Array.isArray(rawList)) return [];
+  const defaultMeta: Array<{ tier: 'easy' | 'mission' | 'rescue'; badgeId: string; badgeTh: string }> = [
+    { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
+    { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ' },
+    { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ' },
+  ];
+  const out: BeginnerReplyCard[] = [];
+  for (let i = 0; i < rawList.length && out.length < 3; i++) {
+    const item = rawList[i] as Record<string, unknown> | null;
+    if (!item || typeof item !== 'object') continue;
+    const text = stripEmojisAndEmotWords(String(item.text || '')).trim();
+    if (!text || !replyLooksLikeTargetLanguage(text, targetLang)) continue;
+    const meta = defaultMeta[out.length] || defaultMeta[0];
+    const rawPron = stripEmojisAndEmotWords(String(item.pronunciation || item.phonetic || '')).trim();
+    out.push({
+      id: String(item.id || `ai_rt_${Date.now()}_${out.length}`),
+      tier:
+        item.tier === 'easy' || item.tier === 'mission' || item.tier === 'rescue'
+          ? item.tier
+          : meta.tier,
+      badgeId: stripEmojisAndEmotWords(String(item.badgeId || item.levelLabel || meta.badgeId)).trim() || meta.badgeId,
+      badgeTh: stripEmojisAndEmotWords(String(item.badgeTh || meta.badgeTh)).trim() || meta.badgeTh,
+      text,
+      pronunciation:
+        rawPron || (targetLang === 'ja' ? toPhoneticRomaji(text) : text),
+      hintId: stripEmojisAndEmotWords(String(item.hintId || item.translationId || '')).trim(),
+      hintTh: stripEmojisAndEmotWords(String(item.hintTh || item.translationTh || item.hintId || '')).trim(),
+      isRealtimeAi: true,
+      wordBreakdown: [],
+    });
+  }
+  return out;
+}
+
+/**
+ * Generates 100% real-time AI reply assistance (ZERO static templates) tailored specifically
+ * to the exact utterance Partner AI just spoke + recent conversation context.
+ */
+export async function requestRealtimeCopilotAssist(params: {
+  aiText?: string;
+  aiQuestionText?: string;
+  lastUserText?: string;
+  scenario: CallScenario;
+  persona?: VoicePersona;
+  targetLang: TargetLang;
+  locale: LearnerLocale;
+  history?: Array<{ speaker: 'ai' | 'user'; text: string }>;
+  variationSeed?: number;
+  excludeTexts?: string[];
+  signal?: AbortSignal;
+}): Promise<RealtimeCopilotAssistResult> {
+  const cleanAiText = stripEmojisAndEmotWords(params.aiText || params.aiQuestionText || '').trim();
+  if (!cleanAiText) {
+    return {
+      ok: false,
+      source: 'offline-fallback',
+      aiMeaningId: '',
+      aiMeaningTh: '',
+      replies: [],
+      cards: [],
+    };
+  }
+
+  const variationSeed = params.variationSeed || 0;
+  const cacheKey = `${params.targetLang}::${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
+  if (variationSeed === 0 && (!params.excludeTexts || params.excludeTexts.length === 0)) {
+    const cached = _copilotTurnCache.get(cacheKey);
+    if (cached && cached.replies.length > 0) {
+      return cached;
+    }
+  }
+
+  const payload = {
+    aiText: cleanAiText,
+    lastUserText: (params.lastUserText || '').trim().slice(0, 320),
+    scenarioId: params.scenario.id,
+    scenarioTitle: params.scenario.titleId,
+    level: params.scenario.level,
+    targetLang: params.targetLang,
+    locale: params.locale,
+    history: (params.history || []).slice(-6),
+    variationSeed,
+    excludeTexts: params.excludeTexts || [],
+  };
+
+  // 1) Server 16-Key Gemini Pool (/api/voice/copilot-assist on Local or Cloudflare Worker)
+  for (const base of resolveVoiceApiCandidateBases()) {
+    if (params.signal?.aborted) {
+      return {
+        ok: false,
+        source: 'offline-fallback',
+        aiMeaningId: '',
+        aiMeaningTh: '',
+        replies: [],
+        cards: [],
+      };
+    }
+    const controller = new AbortController();
+    const onAbort = () => controller.abort();
+    params.signal?.addEventListener('abort', onAbort, { once: true });
+    const timer = setTimeout(() => controller.abort(), 14000);
+    try {
+      const res = await fetch(`${base}/api/voice/copilot-assist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        mode: 'cors',
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      params.signal?.removeEventListener('abort', onAbort);
+      if (res.ok) {
+        const data = await res.json();
+        const cards = normalizeServerCopilotCards(
+          data?.replies || data?.suggestions,
+          params.targetLang
+        );
+        if (cards.length > 0) {
+          const result: RealtimeCopilotAssistResult = {
+            ok: true,
+            source: 'ai-realtime',
+            aiMeaningId: stripEmojisAndEmotWords(String(data?.aiMeaningId || '')).trim(),
+            aiMeaningTh: stripEmojisAndEmotWords(String(data?.aiMeaningTh || '')).trim(),
+            replies: cards,
+            cards,
+          };
+          if (variationSeed === 0) {
+            _copilotTurnCache.set(cacheKey, result);
+          }
+          return result;
+        }
+      }
+    } catch {
+      clearTimeout(timer);
+      params.signal?.removeEventListener('abort', onAbort);
+    }
+  }
+
+  // 2) Optional learner personal Gemini API key direct fallback (gemini-3.5-flash-lite)
+  let userGeminiKey = '';
+  try {
+    if (typeof localStorage !== 'undefined') {
+      userGeminiKey = (localStorage.getItem('fz_gemini_api_key') || '').trim();
+    }
+  } catch {
+    // Ignore
+  }
+
+  if (userGeminiKey.length > 10 && !params.signal?.aborted) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    try {
+      const langSpec =
+        params.targetLang === 'ja'
+          ? 'Japanese (N5-N3, Kanji+Hiragana, NO emojis; word-spaced Hepburn Romaji in pronunciation)'
+          : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
+      const prompt = [
+        `Partner AI just said: "${cleanAiText}".`,
+        params.lastUserText ? `Learner previously said: "${params.lastUserText}".` : '',
+        params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
+        `Generate 3 real-time natural spoken reply options in ${langSpec} that directly answer "${cleanAiText}" (easy=short, mission=natural detail, rescue=answer+follow-up question). NEVER use unrelated templates.`,
+        `JSON only: {"aiMeaningId":"...","aiMeaningTh":"...","replies":[{"tier":"easy","badgeId":"Singkat & Mudah","badgeTh":"สั้นและง่าย","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","badgeId":"Alami & Kontekstual","badgeTh":"เป็นธรรมชาติ","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","badgeId":"Jawab + Tanya Balik","badgeTh":"ตอบและถามกลับ","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${encodeURIComponent(
+          userGeminiKey
+        )}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: 'application/json',
+              temperature: variationSeed > 0 ? 0.75 : 0.45,
+              maxOutputTokens: 2048,
+              thinkingConfig: { thinkingLevel: 'MINIMAL' },
+            },
+          }),
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timer);
+      if (res.ok) {
+        const data = await res.json();
+        const rawTxt = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const parsedRaw = JSON.parse(rawTxt);
+        const parsed = Array.isArray(parsedRaw) ? parsedRaw[0] : parsedRaw;
+        const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
+        if (cards.length > 0) {
+          const result: RealtimeCopilotAssistResult = {
+            ok: true,
+            source: 'ai-realtime',
+            aiMeaningId: stripEmojisAndEmotWords(String(parsed?.aiMeaningId || '')).trim(),
+            aiMeaningTh: stripEmojisAndEmotWords(String(parsed?.aiMeaningTh || '')).trim(),
+            replies: cards,
+            cards,
+          };
+          if (variationSeed === 0) {
+            _copilotTurnCache.set(cacheKey, result);
+          }
+          return result;
+        }
+      }
+    } catch {
+      clearTimeout(timer);
+    }
+  }
+
+  // 3) Offline-only honest fallback (marked explicitly as isOfflineFallback: true)
+  const offlineCards = getBeginnerReplyCards(
+    params.scenario.id,
+    params.targetLang,
+    undefined,
+    cleanAiText,
+    params.lastUserText || '',
+    params.history || []
+  ).map((c) => ({ ...c, isRealtimeAi: false, isOfflineFallback: true }));
+
+  return {
+    ok: false,
+    source: 'offline-fallback',
+    aiMeaningId: '',
+    aiMeaningTh: '',
+    replies: offlineCards,
+    cards: offlineCards,
+  };
 }
 
 /**
@@ -1048,6 +1315,13 @@ function getSameOriginParent(): Window | null {
   return null;
 }
 
+function isLocalDevHost(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(window.location?.hostname || '')
+  );
+}
+
 function resolveCfApiBase(): string {
   if (typeof window === 'undefined') return '';
   const cfg = window.FIEZEL_CF_CONFIG || getSameOriginParent()?.FIEZEL_CF_CONFIG;
@@ -1058,6 +1332,7 @@ function resolveCfApiBase(): string {
 /** Idempotent anonymous identity cookie (`fz_id`) — required by the Worker quota gate. */
 export function ensureLearnerIdentity(): Promise<boolean> {
   if (_identityReady) return Promise.resolve(true);
+  if (isLocalDevHost()) return Promise.resolve(false);
   const base = resolveCfApiBase();
   if (!base) return Promise.resolve(false);
   if (!_identityPromise) {
@@ -1111,7 +1386,7 @@ export function mapScenarioLevel(level: string | undefined): string {
 export function replyLooksLikeTargetLanguage(text: string, targetLang: TargetLang): boolean {
   const tx = String(text || '');
   if (!tx.trim() || /[\u0E00-\u0E7F]/.test(tx)) return false;
-  if (targetLang === 'ja') return /[\u3040-\u30ff]/.test(tx);
+  if (targetLang === 'ja') return /[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
   return /[A-Za-z]/.test(tx) && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
 }
 
@@ -1258,7 +1533,7 @@ export function warmUpVoiceServices(): void {
   const ping = () => {
     try {
       const cfg = window.FIEZEL_TTS_CONFIG || getSameOriginParent()?.FIEZEL_TTS_CONFIG;
-      const personas = cfg?.personasEndpoint;
+      const personas = isLocalDevHost() ? '/api/tts/personas' : cfg?.personasEndpoint;
       if (personas) {
         void fetch(personas, { method: 'GET', mode: 'cors', cache: 'no-store' })
           .then((r) => {
@@ -1302,6 +1577,7 @@ export function resolveTtsEndpoint(): string {
       window.FIEZEL_VOICE_STUDIO_CONFIG?.ttsApiUrl ||
       parentWin?.FIEZEL_VOICE_STUDIO_CONFIG?.ttsApiUrl;
     if (override) return override;
+    if (isLocalDevHost()) return '/api/tts/line';
     const host = window.FIEZEL_TTS_CONFIG || parentWin?.FIEZEL_TTS_CONFIG;
     if (host && host.enabled !== false && host.endpoint) return host.endpoint;
   }
@@ -1354,11 +1630,82 @@ export async function resolveAiReply(
       aiReply: string,
       translationId: string,
       translationTh: string,
-      nextSuggestedReplies?: ReturnType<typeof getBeginnerReplyCards>
+      nextSuggestedReplies?: BeginnerReplyCard[]
     ) => void;
   }
 ): Promise<FlexibleTurnEvaluationResult> {
-  // 1) Learner's own Gemini key (optional): same honesty rules, bounded wait.
+  // 0) Unified 16-Key Gemini Partner + Real-Time Copilot Turn (/api/voice/partner-turn)
+  //    Generates BOTH Partner AI's spoken reply AND 3 bespoke Real-Time Copilot replies in ONE call!
+  for (const base of resolveVoiceApiCandidateBases()) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 14000);
+    try {
+      const res = await fetch(`${base}/api/voice/partner-turn`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: params.text,
+          personaName: params.persona.name,
+          scenarioId: params.scenario.id,
+          scenarioTitle: params.scenario.titleId,
+          targetLang: params.targetLang,
+          locale: params.locale,
+          history: params.history.slice(-6),
+        }),
+        mode: 'cors',
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (res.ok) {
+        const data = await res.json();
+        const partnerReply = stripEmojisAndEmotWords(String(data?.aiReply || '')).trim();
+        if (partnerReply && replyLooksLikeTargetLanguage(partnerReply, params.targetLang)) {
+          const transId = stripEmojisAndEmotWords(String(data?.aiReplyTranslationId || '')).trim();
+          const transTh = stripEmojisAndEmotWords(String(data?.aiReplyTranslationTh || '')).trim();
+          const rtCards = normalizeServerCopilotCards(data?.replies, params.targetLang);
+          if (rtCards.length > 0) {
+            const cacheKey = `${params.targetLang}::${partnerReply.toLowerCase()}::${params.text.trim().toLowerCase()}`;
+            _copilotTurnCache.set(cacheKey, {
+              ok: true,
+              source: 'ai-realtime',
+              aiMeaningId: transId,
+              aiMeaningTh: transTh,
+              replies: rtCards,
+              cards: rtCards,
+            });
+          }
+
+          options?.onTextReady?.(
+            partnerReply,
+            transId,
+            transTh,
+            rtCards.length > 0 ? rtCards : undefined
+          );
+
+          const ttsRes = await synthesizeFlexibleTts({
+            text: partnerReply,
+            targetLang: params.targetLang,
+            persona: params.persona,
+          });
+          return {
+            ...localResult,
+            aiReply: partnerReply,
+            aiReplyTranslationId: transId,
+            aiReplyTranslationTh: transTh,
+            nextSuggestedReplies: rtCards.length > 0 ? rtCards : undefined,
+            audioBase64: ttsRes?.audioBase64 || null,
+            audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
+            ttsEngine: ttsRes?.engine || 'fiezel-edge-tts-binary',
+            replySource: 'ai',
+          };
+        }
+      }
+    } catch {
+      clearTimeout(timer);
+    }
+  }
+
+  // 1) Learner's own Gemini key (optional): upgraded to gemini-3.5-flash-lite + unified real-time copilot replies
   let userGeminiKey = '';
   try {
     if (typeof localStorage !== 'undefined') {
@@ -1372,27 +1719,27 @@ export async function resolveAiReply(
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 6000);
-      const langLabel = params.targetLang === 'ja' ? 'Japanese (polite N5/N4)' : 'English (A1/A2)';
+      const langLabel =
+        params.targetLang === 'ja'
+          ? 'Japanese (natural N5/N4, Kanji+Hiragana, NO emojis; word-spaced Hepburn Romaji in pronunciation)'
+          : 'English (natural A2/B1, NO emojis; easy phonetic guide in pronunciation)';
       const historyLines = params.history
         .filter((h) => h && h.text && h.text.trim())
         .slice(-6)
         .map((h) => `${h.speaker === 'ai' ? 'You' : 'Learner'}: ${h.text.trim().slice(0, 240)}`);
       const promptText = [
         `You are ${params.persona.name}, a real human friend chatting on a live voice call. Scenario: "${params.scenario.titleId}".`,
-        `Reply in ${langLabel}, 1-2 lively conversational sentences (max 20 words).`,
-        'HUMAN WARMTH, WIT & VARIED HUMOR: Be warm, fun, and expressive like a real human friend hanging out. If the learner jokes or says something funny, react with lively empathy and varied natural humor (e.g. "No way, seriously?!", "That is too funny!", "Oh man, I know that feeling!"). In Japanese, use natural friendly exclamations (e.g. 「えー！ウケる！」, 「それめっちゃわかる〜！」, 「うそでしょ！？」, 「ふふっ、最高！」, 「マジで！？」). DO NOT mechanically prepend "Haha!" or "あはは！" to every single response like a repetitive robot template! Vary your openers and reactions naturally.',
-        'NATURAL INTONATION: Talk like a real friend hanging out on a phone call. In Japanese, use natural conversational particles (〜じゃん、〜ね、〜よ、〜でしょ). In English, use natural conversational expressions.',
-        'ABSOLUTE BAN ON EMOJIS & EMOTICONS: NEVER include emojis (😊, 😂, etc.), emoticon descriptions (smiling face, etc.), or action tags (*laughs*, (smiles)). All output must be pure, clean spoken words.',
-        'Your reply MUST directly respond to what the learner just said. Do not change the topic, never lecture, never explain grammar, and never sound like a robotic AI or customer service agent.',
+        `Reply in ${langLabel}, 1-2 lively conversational sentences (max 20 words) directly reacting to the learner and asking a follow-up question.`,
+        'ABSOLUTE BAN ON EMOJIS & EMOTICONS: Pure clean spoken words only.',
         historyLines.length ? `Conversation so far:\n${historyLines.join('\n')}` : '',
         `Learner (last message): "${params.text}"`,
-        'aiReplyTranslationId must be a faithful Indonesian translation of aiReply only.',
-        `Respond ONLY with valid JSON: {"aiReply":"...","aiReplyTranslationId":"...","aiReplyTranslationTh":"...(Thai translation)"}`,
+        'Also generate "replies": 3 real-time spoken reply suggestions (easy, mission, rescue) that directly answer YOUR new aiReply (never generic templates).',
+        `Respond ONLY with valid JSON: {"aiReply":"...","aiReplyTranslationId":"...","aiReplyTranslationTh":"...","replies":[{"tier":"easy","badgeId":"Singkat & Mudah","badgeTh":"สั้นและง่าย","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","badgeId":"Alami & Kontekstual","badgeTh":"เป็นธรรมชาติ","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","badgeId":"Jawab + Tanya Balik","badgeTh":"ตอบและถามกลับ","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}`,
       ]
         .filter(Boolean)
         .join('\n');
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${encodeURIComponent(
           userGeminiKey
         )}`,
         {
@@ -1400,7 +1747,12 @@ export async function resolveAiReply(
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: promptText }] }],
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.5 },
+            generationConfig: {
+              responseMimeType: 'application/json',
+              temperature: 0.5,
+              maxOutputTokens: 2048,
+              thinkingConfig: { thinkingLevel: 'MINIMAL' },
+            },
           }),
           signal: controller.signal,
         }
@@ -1409,7 +1761,8 @@ export async function resolveAiReply(
       if (res.ok) {
         const data = await res.json();
         const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const parsed = JSON.parse(rawText);
+        const parsedRaw = JSON.parse(rawText);
+        const parsed = Array.isArray(parsedRaw) ? parsedRaw[0] : parsedRaw;
         let geminiReply = typeof parsed?.aiReply === 'string' ? parsed.aiReply.trim() : '';
         if (params.targetLang === 'ja') {
           let stripped = geminiReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
@@ -1422,32 +1775,28 @@ export async function resolveAiReply(
           if (stripped && stripped.length >= 2) geminiReply = stripped;
         }
         geminiReply = stripEmojisAndEmotWords(geminiReply);
-        const geminiTransId = stripEmojisAndEmotWords(parsed.aiReplyTranslationId || '');
-        const geminiTransTh = stripEmojisAndEmotWords(parsed.aiReplyTranslationTh || '');
+        const geminiTransId = stripEmojisAndEmotWords(parsed?.aiReplyTranslationId || '');
+        const geminiTransTh = stripEmojisAndEmotWords(parsed?.aiReplyTranslationTh || '');
         if (geminiReply && replyLooksLikeTargetLanguage(geminiReply, params.targetLang)) {
-          const cards = getBeginnerReplyCards(
-            params.scenario.id,
-            params.targetLang,
-            undefined,
+          const rtCards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
+          options?.onTextReady?.(
             geminiReply,
-            params.text,
-            params.history
+            geminiTransId,
+            geminiTransTh,
+            rtCards.length > 0 ? rtCards : undefined
           );
-          // Decoupled instant text reveal before awaiting TTS!
-          options?.onTextReady?.(geminiReply, geminiTransId, geminiTransTh, cards);
 
-          const ttsPromise = synthesizeFlexibleTts({
+          const ttsRes = await synthesizeFlexibleTts({
             text: geminiReply,
             targetLang: params.targetLang,
             persona: params.persona,
           });
-          const ttsRes = await ttsPromise;
           return {
             ...localResult,
             aiReply: geminiReply,
             aiReplyTranslationId: geminiTransId,
             aiReplyTranslationTh: geminiTransTh,
-            nextSuggestedReplies: cards,
+            nextSuggestedReplies: rtCards.length > 0 ? rtCards : undefined,
             audioBase64: ttsRes?.audioBase64 || null,
             audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
             ttsEngine: ttsRes?.engine || 'fiezel-edge-tts-binary',
@@ -1460,8 +1809,8 @@ export async function resolveAiReply(
     }
   }
 
-  // 2) Production AI partner (same Worker path as Ngobrol AI). Awaited — never raced
-  //    against a template.
+  // 2) Production AI partner (/api/ai/task conversation_turn fallback).
+  //    Never inject static template cards here — fire real-time Copilot assist in parallel with TTS!
   const partner = await requestAiPartnerReply({
     text: params.text,
     scenario: params.scenario,
@@ -1475,29 +1824,32 @@ export async function resolveAiReply(
     const cleanPartnerTrans = stripEmojisAndEmotWords(partner.translation);
     const transId = params.locale === 'th' ? '' : cleanPartnerTrans;
     const transTh = params.locale === 'th' ? cleanPartnerTrans : '';
-    const cards = getBeginnerReplyCards(
-      params.scenario.id,
-      params.targetLang,
-      undefined,
-      cleanPartnerReply,
-      params.text,
-      params.history
-    );
-    // Decoupled instant text reveal before awaiting TTS!
-    options?.onTextReady?.(cleanPartnerReply, transId, transTh, cards);
 
-    const ttsPromise = synthesizeFlexibleTts({
-      text: cleanPartnerReply,
-      targetLang: params.targetLang,
-      persona: params.persona,
-    });
-    const ttsRes = await ttsPromise;
+    // Reveal AI reply text immediately; App.tsx triggers real-time Copilot assist in parallel!
+    options?.onTextReady?.(cleanPartnerReply, transId, transTh, undefined);
+
+    const [ttsRes, copilotRes] = await Promise.all([
+      synthesizeFlexibleTts({
+        text: cleanPartnerReply,
+        targetLang: params.targetLang,
+        persona: params.persona,
+      }),
+      requestRealtimeCopilotAssist({
+        aiText: cleanPartnerReply,
+        lastUserText: params.text,
+        scenario: params.scenario,
+        targetLang: params.targetLang,
+        locale: params.locale,
+        history: params.history,
+      }),
+    ]);
+
     return {
       ...localResult,
       aiReply: cleanPartnerReply,
-      aiReplyTranslationId: transId,
-      aiReplyTranslationTh: transTh,
-      nextSuggestedReplies: cards,
+      aiReplyTranslationId: transId || copilotRes.aiMeaningId,
+      aiReplyTranslationTh: transTh || copilotRes.aiMeaningTh,
+      nextSuggestedReplies: copilotRes.ok ? copilotRes.replies : undefined,
       audioBase64: ttsRes?.audioBase64 || null,
       audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
       ttsEngine: ttsRes?.engine || 'fiezel-ai-partner',
@@ -1506,14 +1858,20 @@ export async function resolveAiReply(
   }
 
   // 3) Truly offline / AI unavailable: deterministic script, explicitly labelled.
+  const offlineCards = (localResult.nextSuggestedReplies || []).map((c) => ({
+    ...c,
+    isRealtimeAi: false,
+    isOfflineFallback: true,
+  }));
   options?.onTextReady?.(
     localResult.aiReply,
     localResult.aiReplyTranslationId,
     localResult.aiReplyTranslationTh,
-    localResult.nextSuggestedReplies
+    offlineCards
   );
   return {
     ...localResult,
+    nextSuggestedReplies: offlineCards,
     audioBase64: null,
     audioMimeType: 'audio/mpeg',
     ttsEngine: 'fiezel-edge-tts-binary',

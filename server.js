@@ -289,7 +289,7 @@ try {
     geminiKeys = rawEnv.split(',').map((s) => s.trim()).filter((s) => s.length > 10);
   }
 }
-let currentKeyIndex = 0;
+let currentKeyIndex = Math.floor(Math.random() * Math.max(1, geminiKeys.length));
 
 async function tryGeminiTts(text, persona) {
   if (!geminiKeys || geminiKeys.length === 0) return null;
@@ -317,31 +317,8 @@ async function tryGeminiTts(text, persona) {
       if (!b64) continue;
 
       const pcmBuffer = Buffer.from(b64, 'base64');
-      const tempId = crypto.randomUUID();
-      const tempPcm = path.join(CACHE_DIR, `temp_${tempId}.pcm`);
-      const tempMp3 = path.join(CACHE_DIR, `temp_${tempId}.mp3`);
-      fs.writeFileSync(tempPcm, pcmBuffer);
-
-      let audioBuffer = null;
-      let audioMime = 'audio/mpeg';
-
-      try {
-        const cp = require('child_process');
-        const cmd = `ffmpeg -f s16le -ar 24000 -ac 1 -i "${tempPcm}" -q:a 9 -acodec libmp3lame "${tempMp3}" -y`;
-        cp.execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'], timeout: 15000 });
-        if (fs.existsSync(tempMp3)) {
-          audioBuffer = fs.readFileSync(tempMp3);
-          try { fs.unlinkSync(tempMp3); } catch (_) {}
-          audioMime = 'audio/mpeg';
-        }
-      } catch (_) {}
-
-      try { fs.unlinkSync(tempPcm); } catch (_) {}
-
-      if (!audioBuffer) {
-        audioBuffer = pcmToWavBuffer(pcmBuffer, 24000, 1, 16);
-        audioMime = 'audio/wav';
-      }
+      const audioBuffer = pcmToWavBuffer(pcmBuffer, 24000, 1, 16);
+      const audioMime = 'audio/wav';
 
       currentKeyIndex = (currentKeyIndex + attempt) % geminiKeys.length;
       return {
@@ -477,6 +454,156 @@ function parseJsonBody(req) {
   });
 }
 
+const LOCAL_COPILOT_MODELS = ['gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemini-flash-lite-latest'];
+const localKeyCooldowns = new Map();
+
+async function invokeLocalGeminiSingle({ key, model, promptText, temperature, maxOutputTokens = 2048, parentSignal }) {
+  const controller = new AbortController();
+  const onParentAbort = () => controller.abort();
+  if (parentSignal) {
+    if (parentSignal.aborted) return { ok: false, reason: 'aborted' };
+    parentSignal.addEventListener('abort', onParentAbort, { once: true });
+  }
+  const timer = setTimeout(() => controller.abort(), 9500);
+  try {
+    const gRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: promptText }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature,
+            maxOutputTokens,
+            thinkingConfig: { thinkingLevel: 'MINIMAL' }
+          }
+        }),
+        signal: controller.signal
+      }
+    );
+    clearTimeout(timer);
+    if (parentSignal) parentSignal.removeEventListener('abort', onParentAbort);
+    if (gRes.status === 429) {
+      localKeyCooldowns.set(key, Date.now() + 65000);
+      return { ok: false, reason: `HTTP 429 (${model})` };
+    }
+    if (!gRes.ok) {
+      if (gRes.status !== 404) localKeyCooldowns.set(key, Date.now() + 15000);
+      return { ok: false, reason: `HTTP ${gRes.status} (${model})` };
+    }
+    const gData = await gRes.json();
+    const rawTxt = (gData.candidates?.[0]?.content?.parts?.[0]?.text || '')
+      .replace(/^```json\s*/i, '')
+      .replace(/```\s*$/i, '')
+      .trim();
+    if (!rawTxt) return { ok: false, reason: 'empty_candidate' };
+    const parsedRaw = JSON.parse(rawTxt);
+    localKeyCooldowns.delete(key);
+    return {
+      ok: true,
+      parsed: Array.isArray(parsedRaw) ? parsedRaw[0] : parsedRaw,
+      model
+    };
+  } catch (err) {
+    clearTimeout(timer);
+    if (parentSignal) parentSignal.removeEventListener('abort', onParentAbort);
+    return { ok: false, reason: err?.message || 'fetch_error' };
+  }
+}
+
+async function runLocalGeminiJsonWithHedge(promptText, temperature = 0.5, maxOutputTokens = 700) {
+  if (!geminiKeys || geminiKeys.length === 0) return { ok: false, reason: 'no_keys' };
+  const now = Date.now();
+  const total = geminiKeys.length;
+  const healthy = [];
+  for (let i = 0; i < total; i++) {
+    const k = geminiKeys[(currentKeyIndex + i) % total];
+    if (now >= (localKeyCooldowns.get(k) || 0)) healthy.push(k);
+  }
+  const pool = healthy.length > 0 ? healthy : geminiKeys;
+  currentKeyIndex = (currentKeyIndex + 1) % total;
+
+  const raceAbort = new AbortController();
+  const keyPrimary = pool[0];
+  const keyHedge = pool[1 % pool.length];
+  let hedgeTimer = null;
+
+  const hedgeWinner = await new Promise(resolve => {
+    let settled = false;
+    let pending = 1;
+    let hedgeStarted = false;
+
+    const finishWinner = winner => {
+      if (settled) return;
+      settled = true;
+      if (hedgeTimer) clearTimeout(hedgeTimer);
+      raceAbort.abort();
+      resolve(winner);
+    };
+
+    const startHedge = () => {
+      if (settled || hedgeStarted) return;
+      hedgeStarted = true;
+      pending += 1;
+      invokeLocalGeminiSingle({
+        key: keyHedge,
+        model: LOCAL_COPILOT_MODELS[1],
+        promptText,
+        temperature,
+        maxOutputTokens,
+        parentSignal: raceAbort.signal
+      }).then(resB => {
+        if (resB.ok) finishWinner(resB);
+        else {
+          pending -= 1;
+          if (pending === 0 && !settled) {
+            settled = true;
+            resolve(null);
+          }
+        }
+      });
+    };
+
+    hedgeTimer = setTimeout(startHedge, 1900);
+
+    invokeLocalGeminiSingle({
+      key: keyPrimary,
+      model: LOCAL_COPILOT_MODELS[0],
+      promptText,
+      temperature,
+      maxOutputTokens,
+      parentSignal: raceAbort.signal
+    }).then(resA => {
+      if (resA.ok) finishWinner(resA);
+      else {
+        if (hedgeTimer) {
+          clearTimeout(hedgeTimer);
+          hedgeTimer = null;
+        }
+        startHedge();
+        pending -= 1;
+        if (pending === 0 && !settled) {
+          settled = true;
+          resolve(null);
+        }
+      }
+    });
+  });
+
+  if (hedgeWinner && hedgeWinner.ok) return hedgeWinner;
+
+  const keyFallback = pool[2 % pool.length];
+  return invokeLocalGeminiSingle({
+    key: keyFallback,
+    model: LOCAL_COPILOT_MODELS[2],
+    promptText,
+    temperature,
+    maxOutputTokens
+  });
+}
+
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
@@ -556,81 +683,210 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  if (pathname === '/api/voice-call/assist' && req.method === 'POST') {
+  if (pathname === '/api/voice/live-session' && req.method === 'POST') {
+    if (!geminiKeys || geminiKeys.length === 0) {
+      return sendJson(res, 503, { ok: false, fallback: true, error: 'no_keys_configured' });
+    }
+    const now = Date.now();
+    for (let attempt = 0; attempt < geminiKeys.length; attempt++) {
+      const idx = (currentKeyIndex + attempt) % geminiKeys.length;
+      const key = geminiKeys[idx];
+      try {
+        const tokRes = await fetch('https://generativelanguage.googleapis.com/v1alpha/auth_tokens', {
+          method: 'POST',
+          headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
+          body: JSON.stringify({
+            uses: 1,
+            expireTime: new Date(now + 30 * 60e3).toISOString(),
+            newSessionExpireTime: new Date(now + 2 * 60e3).toISOString()
+          })
+        });
+        const tokJson = await tokRes.json().catch(() => ({}));
+        if (tokRes.ok && tokJson && typeof tokJson.name === 'string' && tokJson.name.startsWith('auth_tokens/')) {
+          currentKeyIndex = (idx + 1) % geminiKeys.length;
+          return sendJson(res, 200, {
+            ok: true,
+            token: tokJson.name,
+            model: 'gemini-3.8-live',
+            endpoint: 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained',
+            keyIndex: idx + 1,
+            totalKeys: geminiKeys.length
+          });
+        }
+      } catch (_) {}
+    }
+    return sendJson(res, 503, { ok: false, fallback: true, error: 'all_keys_busy' });
+  }
+
+  if (pathname === '/api/voice/report-drop' && req.method === 'POST') {
+    await parseJsonBody(req);
+    if (geminiKeys && geminiKeys.length > 0) {
+      currentKeyIndex = (currentKeyIndex + 1) % geminiKeys.length;
+    }
+    return sendJson(res, 200, { ok: true, shifted: true });
+  }
+
+  if ((pathname === '/api/voice/copilot-assist' || pathname === '/api/voice-call/assist') && req.method === 'POST') {
     const body = await parseJsonBody(req);
     const targetLang = body.targetLang === 'en' ? 'en' : 'ja';
-    const turnCount = Number(body.turnCount || 0);
-    const suggestions =
+    const cleanText = (v) => String(v || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\*[^*]{1,30}\*/g, '').replace(/\s+/g, ' ').trim();
+    const aiText = cleanText(body.aiText || body.aiQuestionText || '').slice(0, 500);
+    if (!aiText) {
+      return sendJson(res, 400, { ok: false, error: 'invalid_request', message: 'aiText wajib diisi.' });
+    }
+    if (!geminiKeys || geminiKeys.length === 0) {
+      return sendJson(res, 503, { ok: false, fallback: true, error: 'no_keys_configured' });
+    }
+
+    const lastUserText = cleanText(body.lastUserText || '').slice(0, 320);
+    const scenarioTitle = cleanText(body.scenarioTitle || body.scenarioId || 'Free Talk').slice(0, 100);
+    const rawHist = Array.isArray(body.history || body.conversationHistory) ? (body.history || body.conversationHistory) : [];
+    const historyLines = rawHist
+      .filter((h) => h && typeof h.text === 'string' && h.text.trim())
+      .slice(-6)
+      .map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner AI'}: "${cleanText(h.text).slice(0, 260)}"`);
+    const excludeList = Array.isArray(body.excludeTexts)
+      ? body.excludeTexts.map((t) => cleanText(t).slice(0, 160)).filter(Boolean).slice(0, 6)
+      : [];
+    const variationSeed = Number(body.variationSeed || 0);
+
+    const langSpec =
       targetLang === 'ja'
-        ? [
-            {
-              id: `assist_ja_${turnCount}_1`,
-              levelLabel: 'Mudah & Sopan',
-              text: 'はい、ホットコーヒーを一つお願いします。',
-              phonetic: 'Hai, hotto kōhī o hitotsu onegaishimasu.',
-              translationId: 'Ya, tolong satu kopi panas.',
-              translationTh: 'ครับ/ค่ะ ขอชาหรือกาแฟร้อนหนึ่งแก้วครับ/ค่ะ',
-              tipId: 'Gunakan を (o) + お願いします (onegaishimasu) untuk memesan dengan sopan.',
-              tipTh: 'ใช้ を + お願いします เพื่อสั่งอย่างสุภาพ'
-            },
-            {
-              id: `assist_ja_${turnCount}_2`,
-              levelLabel: 'Natural & Lengkap',
-              text: '店内で飲みます。チーズケーキも一つください。',
-              phonetic: 'Tennai de nomimasu. Chīzukēki mo hitotsu kudasai.',
-              translationId: 'Minum di sini. Tolong sekalian satu cheesecake.',
-              translationTh: 'ดื่มที่ร้านครับ/ค่ะ ขอชีสเค้กอีกหนึ่งชิ้นด้วยครับ/ค่ะ',
-              tipId: 'Gunakan で (de) untuk lokasi aktivitas dan も (mo) untuk tambahan pesanan.',
-              tipTh: 'ใช้ で สำหรับสถานที่ทำกิจกรรม และ も สำหรับสั่งเพิ่ม'
-            },
-            {
-              id: `assist_ja_${turnCount}_3`,
-              levelLabel: 'Tanya Balik Natural',
-              text: 'おすすめのメニューは何ですか？カードで払えますか？',
-              phonetic: 'Osusume no menyū wa nan desu ka? Kādo de haraemasu ka?',
-              translationId: 'Menu rekomendasinya apa? Apakah bisa bayar pakai kartu?',
-              translationTh: 'เมนูแนะนำคืออะไรครับ/ค่ะ? จ่ายด้วยบัตรได้ไหม?',
-              tipId: 'Gunakan は何ですか untuk bertanya rekomendasi dengan sopan.',
-              tipTh: 'ใช้ は何ですか เพื่อถามเมนูแนะนำอย่างสุภาพ'
-            }
-          ]
-        : [
-            {
-              id: `assist_en_${turnCount}_1`,
-              levelLabel: 'Polite & Clear',
-              text: 'Last weekend I went to a cozy cafe and met my old friends.',
-              phonetic: 'laast week-end ai went tu a koh-zee ka-fey and met mai old frendz',
-              translationId: 'Akhir pekan lalu saya pergi ke kafe yang nyaman dan bertemu teman lama.',
-              translationTh: 'สุดสัปดาห์ที่แล้วฉันไปคาเฟ่สบายๆ และพบเพื่อนเก่า',
-              tipId: 'Gunakan Past Simple tidak beraturan: went (bukan goed) dan met.',
-              tipTh: 'ใช้ Past Simple กริยาไม่ปกติ: went และ met'
-            },
-            {
-              id: `assist_en_${turnCount}_2`,
-              levelLabel: 'Natural Detail',
-              text: 'We drank iced lattes and talked about our upcoming project for two hours.',
-              phonetic: 'wee drangk aist laa-teyz and tawkt a-bawt aw-er up-kuh-ming pro-jekt',
-              translationId: 'Kami minum es latte dan mengobrol tentang proyek mendatang selama dua jam.',
-              translationTh: 'เราดื่มลาเต้เย็นและคุยเรื่องโปรเจกต์ที่กำลังจะมาถึงสองชั่วโมง',
-              tipId: 'Pastikan kedua kata kerja yang dihubungkan "and" sama-sama memakai bentuk lampau.',
-              tipTh: 'ตรวจสอบให้แน่ใจว่ากริยาทั้งสองตัวที่เชื่อมด้วย and เป็นรูปอดีต'
-            },
-            {
-              id: `assist_en_${turnCount}_3`,
-              levelLabel: 'Engage Partner',
-              text: 'It was really refreshing! How about you, what did you do last weekend?',
-              phonetic: 'it woz ree-lee ri-fresh-ing! haw a-bawt yoo, wot did yoo doo laast week-end?',
-              translationId: 'Sangat menyegarkan! Bagaimana denganmu, apa yang kamu lakukan akhir pekan lalu?',
-              translationTh: 'สดชื่นมากเลย! แล้วคุณล่ะ สุดสัปดาห์ที่แล้วทำอะไรบ้าง?',
-              tipId: 'Tutup cerita dengan pertanyaan balik agar percakapan dua arah tetap hidup.',
-              tipTh: 'ปิดท้ายเรื่องเล่าด้วยคำถามกลับเพื่อให้บทสนทนาไหลลื่น'
-            }
-          ];
-    return sendJson(res, 200, {
-      ok: true,
-      suggestions,
-      serverTime: Date.now()
-    });
+        ? 'Japanese (natural spoken N5-N3, Kanji+Hiragana, NO emojis; "pronunciation" = word-spaced Hepburn Romaji)'
+        : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy Indonesian phonetic guide)';
+
+    const prompt = [
+      `Live Two-Way Call Copilot (${scenarioTitle}). Language: ${langSpec}`,
+      historyLines.length ? `Context:\n${historyLines.join('\n')}` : '',
+      lastUserText ? `Learner previously said: "${lastUserText}"` : '',
+      `Partner AI JUST SAID: "${aiText}"`,
+      excludeList.length
+        ? `Do NOT repeat these previous options: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
+        : '',
+      `Generate 3 natural spoken replies that directly answer "${aiText}" (NEVER unrelated textbook templates): easy=1 short easy sentence, mission=natural reply with specific detail, rescue=reply + friendly follow-up question back. Translate "${aiText}" literally into aiMeaningId (Indonesian) & aiMeaningTh (Thai), and write the direct literal first-person translation of each reply in hintId & hintTh (never a meta-description like "Menjawab...").`,
+      'JSON only: {"aiMeaningId":"...","aiMeaningTh":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}'
+    ].filter(Boolean).join('\n');
+
+    const temp = variationSeed > 0 || excludeList.length > 0 ? 0.75 : 0.45;
+    const gen = await runLocalGeminiJsonWithHedge(prompt, temp, 2048);
+    if (gen && gen.ok && gen.parsed) {
+      const parsed = gen.parsed;
+      const defaultBadges = [
+        { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
+        { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ' },
+        { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ' }
+      ];
+      const replies = (Array.isArray(parsed?.replies) ? parsed.replies : [])
+        .map((it, i) => {
+          const meta = defaultBadges[i] || defaultBadges[0];
+          const text = cleanText(it?.text || '');
+          if (!text) return null;
+          return {
+            id: `ai_rt_${Date.now()}_${i}`,
+            tier: it?.tier === 'easy' || it?.tier === 'mission' || it?.tier === 'rescue' ? it.tier : meta.tier,
+            badgeId: cleanText(it?.badgeId || it?.labelId || meta.badgeId) || meta.badgeId,
+            badgeTh: cleanText(it?.badgeTh || it?.labelTh || meta.badgeTh) || meta.badgeTh,
+            text,
+            pronunciation: cleanText(it?.pronunciation || it?.phonetic || ''),
+            hintId: cleanText(it?.hintId || it?.translationId || it?.meaningId || ''),
+            hintTh: cleanText(it?.hintTh || it?.translationTh || it?.meaningTh || ''),
+            isRealtimeAi: true
+          };
+        })
+        .filter(Boolean)
+        .slice(0, 3);
+      if (replies.length > 0) {
+        return sendJson(res, 200, {
+          ok: true,
+          source: 'ai-realtime',
+          model: gen.model,
+          aiMeaningId: cleanText(parsed?.aiMeaningId || ''),
+          aiMeaningTh: cleanText(parsed?.aiMeaningTh || ''),
+          replies,
+          suggestions: replies,
+          serverTime: Date.now()
+        });
+      }
+    }
+    return sendJson(res, 503, { ok: false, fallback: true, error: 'copilot_unavailable' });
+  }
+
+  if (pathname === '/api/voice/partner-turn' && req.method === 'POST') {
+    const body = await parseJsonBody(req);
+    const targetLang = body.targetLang === 'en' ? 'en' : 'ja';
+    const cleanText = (v) => String(v || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\*[^*]{1,30}\*/g, '').replace(/\s+/g, ' ').trim();
+    const userText = cleanText(body.text || '').slice(0, 400);
+    if (!userText) {
+      return sendJson(res, 400, { ok: false, error: 'invalid_request', message: 'text wajib diisi.' });
+    }
+    if (!geminiKeys || geminiKeys.length === 0) {
+      return sendJson(res, 503, { ok: false, fallback: true, error: 'no_keys_configured' });
+    }
+
+    const personaName = cleanText(body.personaName || (targetLang === 'ja' ? 'Nanami' : 'Alex')).slice(0, 40);
+    const scenarioTitle = cleanText(body.scenarioTitle || 'Free Talk').slice(0, 100);
+    const rawHist = Array.isArray(body.history) ? body.history : [];
+    const historyLines = rawHist
+      .filter((h) => h && typeof h.text === 'string' && h.text.trim())
+      .slice(-6)
+      .map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner AI'}: "${cleanText(h.text).slice(0, 260)}"`);
+
+    const langSpec =
+      targetLang === 'ja'
+        ? 'Japanese (warm natural N5-N3, Kanji+Hiragana, NO emojis; reply "pronunciation" = word-spaced Hepburn Romaji)'
+        : 'English (warm natural spoken A2-B1, NO emojis; reply "pronunciation" = easy Indonesian phonetic guide)';
+
+    const prompt = [
+      `You are ${personaName} on a live call (${scenarioTitle}). Language: ${langSpec}`,
+      historyLines.length ? `Context:\n${historyLines.join('\n')}` : '',
+      `Learner JUST SAID: "${userText}"`,
+      `1) "aiReply": Reply naturally as ${personaName} in 1-2 short spoken sentences (max 20 words) reacting directly to "${userText}" + a follow-up question on the same topic (no emojis). Translate into aiReplyTranslationId (Indonesian) & aiReplyTranslationTh (Thai).`,
+      `2) "replies": 3 natural spoken replies the learner can say NEXT to directly answer your new "aiReply" (easy=short, mission=with detail, rescue=answer+question back; NEVER unrelated templates).`,
+      'JSON only: {"aiReply":"...","aiReplyTranslationId":"...","aiReplyTranslationTh":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}'
+    ].filter(Boolean).join('\n');
+
+    const gen = await runLocalGeminiJsonWithHedge(prompt, 0.55, 2048);
+    if (gen && gen.ok && gen.parsed) {
+      const parsed = gen.parsed;
+      const aiReply = cleanText(parsed?.aiReply || '');
+      if (aiReply) {
+        const defaultBadges = [
+          { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
+          { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ' },
+          { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ' }
+        ];
+        const replies = (Array.isArray(parsed?.replies) ? parsed.replies : [])
+          .map((it, i) => {
+            const meta = defaultBadges[i] || defaultBadges[0];
+            const text = cleanText(it?.text || '');
+            if (!text) return null;
+            return {
+              id: `ai_rt_${Date.now()}_${i}`,
+              tier: it?.tier === 'easy' || it?.tier === 'mission' || it?.tier === 'rescue' ? it.tier : meta.tier,
+              badgeId: cleanText(it?.badgeId || it?.labelId || meta.badgeId) || meta.badgeId,
+              badgeTh: cleanText(it?.badgeTh || it?.labelTh || meta.badgeTh) || meta.badgeTh,
+              text,
+              pronunciation: cleanText(it?.pronunciation || it?.phonetic || ''),
+              hintId: cleanText(it?.hintId || it?.translationId || it?.meaningId || ''),
+              hintTh: cleanText(it?.hintTh || it?.translationTh || it?.meaningTh || ''),
+              isRealtimeAi: true
+            };
+          })
+          .filter(Boolean)
+          .slice(0, 3);
+        return sendJson(res, 200, {
+          ok: true,
+          source: 'ai-realtime',
+          model: gen.model,
+          aiReply,
+          aiReplyTranslationId: cleanText(parsed?.aiReplyTranslationId || ''),
+          aiReplyTranslationTh: cleanText(parsed?.aiReplyTranslationTh || ''),
+          replies,
+          serverTime: Date.now()
+        });
+      }
+    }
+    return sendJson(res, 503, { ok: false, fallback: true, error: 'partner_turn_unavailable' });
   }
 
   if (pathname === '/api/braincore/sync' && req.method === 'POST') {

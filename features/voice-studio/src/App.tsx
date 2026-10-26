@@ -51,21 +51,20 @@ import {
   FiezelSparkleOrnament,
 } from './components/FiezelOrnaments';
 import {
+  type BeginnerReplyCard,
   fetchLiveTranslation,
-  getBeginnerReplyCards,
   translateAndPhoneticizeLiveText,
 } from './lib/liveCallHelper';
 import { JapaneseRubyDisplay } from './components/JapaneseRubyDisplay';
-import { stripEmojisAndEmotWords, toPhoneticRomaji } from './lib/japanesePhonetics';
+import { stripEmojisAndEmotWords } from './lib/japanesePhonetics';
 import {
   evaluateTurnLocal,
-  evaluateUtteranceClientSide,
-  float32ToPcm16Base64,
   resampleAndConvertToPcm16Base64,
-  LiveTransportMode,
+  type LiveTransportMode,
   pcm16Base64ToAudioBuffer,
   reportGeminiLiveSessionDrop,
   requestGeminiLiveSessionToken,
+  requestRealtimeCopilotAssist,
   resolveAiReply,
   resolveLiveCallWebSocketUrls,
   splitIntoSpeechChunks,
@@ -117,18 +116,16 @@ export default function App() {
   const [speechRate, setSpeechRate] = useState<1.0 | 0.8>(1.0);
   const [showTranslations, setShowTranslations] = useState<boolean>(true);
   const [pttRecordingSec, setPttRecordingSec] = useState<number>(0);
-  const [nextSuggestedReplies, setNextSuggestedReplies] = useState<
-    Array<{
-      text: string;
-      hintId: string;
-      hintTh: string;
-      pronunciation?: string;
-      tier?: 'easy' | 'mission' | 'rescue';
-      badgeId?: string;
-      badgeTh?: string;
-    }>
-  >([]);
+  const [copilotCards, setCopilotCards] = useState<BeginnerReplyCard[]>([]);
+  const [copilotSource, setCopilotSource] = useState<'ai-realtime' | 'offline-fallback' | 'loading'>('loading');
+  const [isGeneratingCopilot, setIsGeneratingCopilot] = useState<boolean>(false);
   const [isRefreshingAssist, setIsRefreshingAssist] = useState<boolean>(false);
+  const copilotAbortRef = useRef<AbortController | null>(null);
+  const lastCopilotAiKeyRef = useRef<string>('');
+  const copilotVariationSeedRef = useRef<number>(0);
+  const copilotCardsRef = useRef<BeginnerReplyCard[]>([]);
+  copilotCardsRef.current = copilotCards;
+  const liveEarlyCopilotTriggeredRef = useRef<boolean>(false);
 
   const [isRecordingPtt, setIsRecordingPtt] = useState<boolean>(false);
   const [isListeningLiveSpeech, setIsListeningLiveSpeech] = useState<boolean>(false);
@@ -295,6 +292,87 @@ export default function App() {
   const isMeasureMode =
     customMeasureOverride !== null ? customMeasureOverride : activeScenario.isMeasureExam;
 
+  const formatCleanLevel = (lvl: string) => {
+    const stripped = String(lvl || '')
+      .replace(/\b(CEFR|JLPT)\s*/gi, '')
+      .trim();
+    return stripped ? `Level ${stripped}` : 'Level Dasar';
+  };
+
+  const formatPersonaShortName = (rawName: string) =>
+    String(rawName || '')
+      .replace(/\s*\([^)]*\)\s*/g, '')
+      .trim();
+
+  const triggerRealtimeCopilotForAi = async (
+    aiLine: string,
+    lastUserLine: string,
+    historyList: Array<{ speaker: 'ai' | 'user'; text: string }>,
+    opts?: {
+      scenarioOverride?: CallScenario;
+      personaOverride?: typeof activePersona;
+      forceVariation?: boolean;
+      excludeTexts?: string[];
+    }
+  ) => {
+    const cleanAi = String(aiLine || '').trim();
+    if (!cleanAi) return;
+    const scen = opts?.scenarioOverride || activeScenario;
+    const pers = opts?.personaOverride || activePersona;
+    const dedupKey = `${scen.id}::${scen.targetLang}::${cleanAi}::${lastUserLine}`;
+    if (
+      !opts?.forceVariation &&
+      lastCopilotAiKeyRef.current === dedupKey &&
+      copilotCardsRef.current.length > 0
+    ) {
+      return;
+    }
+    lastCopilotAiKeyRef.current = dedupKey;
+
+    if (copilotAbortRef.current) {
+      try {
+        copilotAbortRef.current.abort();
+      } catch {
+        // Ignore
+      }
+    }
+    const controller = new AbortController();
+    copilotAbortRef.current = controller;
+
+    if (!opts?.forceVariation) {
+      setIsGeneratingCopilot(true);
+      setCopilotSource('loading');
+    }
+
+    try {
+      const res = await requestRealtimeCopilotAssist({
+        aiText: cleanAi,
+        lastUserText: lastUserLine,
+        scenario: scen,
+        persona: pers,
+        targetLang: scen.targetLang,
+        locale,
+        history: historyList.slice(-8),
+        variationSeed: opts?.forceVariation ? copilotVariationSeedRef.current : 0,
+        excludeTexts: opts?.excludeTexts,
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted) return;
+      setCopilotCards(res.replies || res.cards || []);
+      setCopilotSource(res.source);
+    } catch {
+      if (controller.signal.aborted) return;
+    } finally {
+      if (copilotAbortRef.current === controller) {
+        copilotAbortRef.current = null;
+        setIsGeneratingCopilot(false);
+      }
+    }
+  };
+
+  const triggerRealtimeCopilotRef = useRef(triggerRealtimeCopilotForAi);
+  triggerRealtimeCopilotRef.current = triggerRealtimeCopilotForAi;
+
   const prereqStatus = checkPrerequisiteStatus(brainState, activeScenario.prereqCompetencyId);
   const activeCompRecord = brainState.competencies[activeScenario.competencyId];
   const currentMasteryP = activeCompRecord?.pMasteryDecayed ?? activeCompRecord?.pMastery ?? 0.25;
@@ -323,7 +401,9 @@ export default function App() {
     setShowHint(false);
     setCustomMeasureOverride(null);
     setStatusBanner(null);
-    setNextSuggestedReplies([]);
+    lastCopilotAiKeyRef.current = '';
+    setCopilotCards([]);
+    setCopilotSource('loading');
 
     const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
     let loadedTurns: CallTurn[] | null = null;
@@ -341,19 +421,32 @@ export default function App() {
       // Ignore
     }
 
-    if (loadedTurns && loadedTurns.length > 0) {
-      setTurns(loadedTurns);
-    } else {
-      setTurns([
-        {
-          id: `turn_open_${activeScenario.id}`,
-          speaker: 'ai',
-          text: activeScenario.openingLine,
-          translationId: activeScenario.openingTranslationId,
-          translationTh: activeScenario.openingTranslationTh,
-          timestamp: Date.now(),
-        },
-      ]);
+    const effectiveTurns: CallTurn[] =
+      loadedTurns && loadedTurns.length > 0
+        ? loadedTurns
+        : [
+            {
+              id: `turn_open_${activeScenario.id}`,
+              speaker: 'ai',
+              text: activeScenario.openingLine,
+              translationId: activeScenario.openingTranslationId,
+              translationTh: activeScenario.openingTranslationTh,
+              timestamp: Date.now(),
+            },
+          ];
+
+    setTurns(effectiveTurns);
+
+    const latestAi =
+      [...effectiveTurns].reverse().find((tr) => tr.speaker === 'ai') || effectiveTurns[0];
+    const latestUser = [...effectiveTurns].reverse().find((tr) => tr.speaker === 'user');
+    if (latestAi?.text) {
+      void triggerRealtimeCopilotForAi(
+        latestAi.text,
+        latestUser?.text || '',
+        effectiveTurns.map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+        { scenarioOverride: activeScenario, personaOverride: activePersona }
+      );
     }
 
     try {
@@ -422,6 +515,13 @@ export default function App() {
 
   useEffect(() => {
     return () => {
+      if (copilotAbortRef.current) {
+        try {
+          copilotAbortRef.current.abort();
+        } catch {
+          // Ignore
+        }
+      }
       stopLiveCall();
     };
   }, []);
@@ -431,7 +531,9 @@ export default function App() {
     stopLiveCall();
     setStatusBanner(null);
     setInputText('');
-    setNextSuggestedReplies([]);
+    lastCopilotAiKeyRef.current = '';
+    setCopilotCards([]);
+    setCopilotSource('loading');
     const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
     try {
       if (typeof localStorage !== 'undefined') {
@@ -440,15 +542,17 @@ export default function App() {
     } catch {
       // Ignore
     }
-    setTurns([
-      {
-        id: `turn_open_${activeScenario.id}_${Date.now()}`,
-        speaker: 'ai',
-        text: activeScenario.openingLine,
-        translationId: activeScenario.openingTranslationId,
-        translationTh: activeScenario.openingTranslationTh,
-        timestamp: Date.now(),
-      },
+    const openingTurn: CallTurn = {
+      id: `turn_open_${activeScenario.id}_${Date.now()}`,
+      speaker: 'ai',
+      text: activeScenario.openingLine,
+      translationId: activeScenario.openingTranslationId,
+      translationTh: activeScenario.openingTranslationTh,
+      timestamp: Date.now(),
+    };
+    setTurns([openingTurn]);
+    void triggerRealtimeCopilotForAi(activeScenario.openingLine, '', [
+      { speaker: 'ai', text: activeScenario.openingLine },
     ]);
     void speakAiText(activeScenario.openingLine);
   };
@@ -991,6 +1095,10 @@ export default function App() {
       };
 
       // The learner sees their own words + feedback immediately.
+      const historyAfterUser: Array<{ speaker: 'ai' | 'user'; text: string }> = [
+        ...turns.slice(-7).map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+        { speaker: 'user', text: exactTranscript },
+      ];
       setTurns((prev) => [...prev, userTurn]);
       setInputText('');
       setLiveUserDraft('');
@@ -999,7 +1107,17 @@ export default function App() {
         setBrainState(nextState)
       );
 
-      // STEP 2 — the REAL AI partner reply (never a silent template swap).
+      // STEP 2 — the REAL AI partner reply + REAL-TIME AI Copilot answers (never static templates).
+      if (copilotAbortRef.current) {
+        try {
+          copilotAbortRef.current.abort();
+        } catch {
+          // Ignore
+        }
+      }
+      setCopilotCards([]);
+      setCopilotSource('loading');
+      setIsGeneratingCopilot(true);
       isAiThinkingRef.current = true;
       setIsAiThinking(true);
 
@@ -1012,7 +1130,16 @@ export default function App() {
           isAiThinkingRef.current = false;
           setIsAiThinking(false);
           if (Array.isArray(suggestions) && suggestions.length > 0) {
-            setNextSuggestedReplies(suggestions);
+            const isOffline = suggestions.some((c) => c.isOfflineFallback);
+            lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${aiText.trim()}::${exactTranscript}`;
+            setCopilotCards(suggestions);
+            setCopilotSource(isOffline ? 'offline-fallback' : 'ai-realtime');
+            setIsGeneratingCopilot(false);
+          } else {
+            void triggerRealtimeCopilotForAi(aiText, exactTranscript, [
+              ...historyAfterUser,
+              { speaker: 'ai', text: aiText },
+            ]);
           }
           const immediateAiTurn: CallTurn = {
             id: aiTurnId,
@@ -1063,14 +1190,22 @@ export default function App() {
       }
 
       if (Array.isArray(replyEv.nextSuggestedReplies) && replyEv.nextSuggestedReplies.length > 0) {
-        setNextSuggestedReplies(replyEv.nextSuggestedReplies);
-      } else if (!textAlreadyShown) {
-        setNextSuggestedReplies([]);
+        const isOffline = replyEv.nextSuggestedReplies.some((c) => c.isOfflineFallback);
+        lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${replyEv.aiReply.trim()}::${exactTranscript}`;
+        setCopilotCards(replyEv.nextSuggestedReplies);
+        setCopilotSource(isOffline ? 'offline-fallback' : 'ai-realtime');
+        setIsGeneratingCopilot(false);
+      } else if (!textAlreadyShown && replyEv.aiReply) {
+        void triggerRealtimeCopilotForAi(replyEv.aiReply, exactTranscript, [
+          ...historyAfterUser,
+          { speaker: 'ai', text: replyEv.aiReply },
+        ]);
       }
 
       const aiAudioBase64 = replyEv.audioBase64 || null;
       void speakAiText(replyEv.aiReply, aiAudioBase64);
     } catch (err) {
+      setIsGeneratingCopilot(false);
       setStatusBanner((err as Error).message || 'Kesalahan jaringan.');
     } finally {
       isAiThinkingRef.current = false;
@@ -1762,10 +1897,12 @@ export default function App() {
                       },
                     },
                   },
+                  outputAudioTranscription: {},
+                  inputAudioTranscription: {},
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId}. Opening situation: "${activeScenario.openingLine}". Speak naturally, warmly, and concisely (1-2 sentences per turn) as ${activePersona.name}. Keep in character.${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activeScenario.openingLine}". Speak naturally, warmly, and concisely (1-2 sentences per turn) as ${activePersona.name}. Keep in character.${contextSummary}`,
                       },
                     ],
                   },
@@ -1925,9 +2062,32 @@ export default function App() {
             setLiveAiDraft(liveAiDraftRef.current);
           }
 
+          // Real-Time Streaming Copilot Trigger while Partner AI is still speaking in Telepon Live
+          const streamingAiDraft = liveAiDraftRef.current.trim();
+          const minStreamChars = activeScenario.targetLang === 'ja' ? 6 : 14;
+          if (
+            streamingAiDraft.length >= minStreamChars &&
+            !liveEarlyCopilotTriggeredRef.current &&
+            /[。？！.?!]\s*$/.test(streamingAiDraft)
+          ) {
+            liveEarlyCopilotTriggeredRef.current = true;
+            const latestUserSpoken =
+              liveUserDraftRef.current.trim() ||
+              [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
+              '';
+            const liveHist: Array<{ speaker: 'ai' | 'user'; text: string }> = [
+              ...turnsRef.current
+                .slice(-7)
+                .map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+              { speaker: 'ai', text: streamingAiDraft },
+            ];
+            void triggerRealtimeCopilotRef.current(streamingAiDraft, latestUserSpoken, liveHist);
+          }
+
           // Turn Complete — evaluate learner utterance and record Braincore mastery
           const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
           if (isGoogleTurnComplete || msg.type === 'turn_complete') {
+            liveEarlyCopilotTriggeredRef.current = false;
             const uText = (liveUserDraftRef.current || msg.userTranscript || '').trim();
             const aText = (liveAiDraftRef.current || msg.aiTranscript || '').trim();
             liveUserDraftRef.current = '';
@@ -2021,14 +2181,22 @@ export default function App() {
                   translationTh: autoTrans.translationTh,
                   audioBase64: msg.aiAudioBase64 || undefined,
                   timestamp: Date.now() + 1,
+                  replySource: 'ai',
                 },
               ]);
-              const suggestions = getBeginnerReplyCards(
-                activeScenario,
-                activeScenario.targetLang,
-                aText
-              );
-              setNextSuggestedReplies(suggestions);
+
+              const lastUserForCopilot =
+                uText ||
+                [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
+                '';
+              const updatedHist: Array<{ speaker: 'ai' | 'user'; text: string }> = [
+                ...turnsRef.current
+                  .slice(-6)
+                  .map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+                ...(uText ? [{ speaker: 'user' as const, text: uText }] : []),
+                { speaker: 'ai', text: aText },
+              ];
+              void triggerRealtimeCopilotRef.current(aText, lastUserForCopilot, updatedHist);
 
               // Background fetch real Google GTX translations asynchronously to replace approximations
               void Promise.all([
@@ -2395,8 +2563,8 @@ export default function App() {
           showHands: true,
           showEars: true,
           showTail: false,
-          width: 156,
-          height: 148,
+          width: 84,
+          height: 80,
         });
         mochiInstanceRef.current = inst;
         setIs3dMochiReady(true);
@@ -2482,60 +2650,21 @@ export default function App() {
     ? translateAndPhoneticizeLiveText(activeUserLiveText, activeScenario.targetLang)
     : null;
 
-  const beginnerReplyCards = getBeginnerReplyCards(
-    activeScenario.id,
-    activeScenario.targetLang,
-    nextSuggestedReplies,
-    activeAiLiveText,
-    lastUserTurn?.text || '',
-    turns.map((tr) => ({ speaker: tr.speaker, text: tr.text }))
-  );
-
   const handleRefreshLiveAssist = async () => {
+    playFiezelSfx('button_tap');
+    copilotVariationSeedRef.current += 1;
     setIsRefreshingAssist(true);
-    let updatedFromServer = false;
     try {
-      const res = await fetch('/api/voice-call/assist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          aiQuestionText: activeAiLiveText,
-          lastUserText: lastUserTurn?.text || '',
-          scenarioId: activeScenario.id,
-          targetLang: activeScenario.targetLang,
-          conversationHistory: turns.slice(-6).map((tr) => ({
-            speaker: tr.speaker,
-            text: tr.text,
-          })),
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data?.suggestions) && data.suggestions.length > 0) {
-          setNextSuggestedReplies(data.suggestions);
-          updatedFromServer = true;
+      await triggerRealtimeCopilotForAi(
+        activeAiLiveText,
+        lastUserTurn?.text || '',
+        turns.map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+        {
+          forceVariation: true,
+          excludeTexts: copilotCards.map((c) => c.text),
         }
-      }
-    } catch {
-      // Uses deterministic contextual synthesizer fallback automatically
+      );
     } finally {
-      if (!updatedFromServer) {
-        const localFresh = getBeginnerReplyCards(
-          activeScenario.id,
-          activeScenario.targetLang,
-          undefined,
-          activeAiLiveText,
-          lastUserTurn?.text || '',
-          turns.map((tr) => ({ speaker: tr.speaker, text: tr.text }))
-        );
-        if (localFresh.length > 1) {
-          const rotated = [...localFresh.slice(1), localFresh[0]].map((c, idx) => ({
-            ...c,
-            id: `${c.id}_r${Date.now()}_${idx}`,
-          }));
-          setNextSuggestedReplies(rotated);
-        }
-      }
       setIsRefreshingAssist(false);
     }
   };
@@ -2561,14 +2690,34 @@ export default function App() {
             <div className="flex items-center gap-2 min-w-0">
               <span
                 data-testid="mitra-kaiwa-header-title"
-                className="font-bold text-sm text-[#1C1611] truncate"
+                className="font-bold text-sm text-[#1C1611] whitespace-nowrap"
               >
-                {targetLang === 'ja'
-                  ? (locale === 'th' ? 'คู่สนทนาไควะ · สนทนาอิสระ' : 'Mitra Kaiwa · Free Talk')
-                  : (locale === 'th' ? 'คู่สนทนา AI · สนทนาอิสระ' : 'Kawan Bicara · Free Talk')}
+                {targetLang === 'ja' ? (
+                  locale === 'th' ? (
+                    <>
+                      <span>คู่สนทนาไควะ</span>
+                      <span className="hidden sm:inline"> · สนทนาอิสระ</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Mitra Kaiwa</span>
+                      <span className="hidden sm:inline"> · Free Talk</span>
+                    </>
+                  )
+                ) : locale === 'th' ? (
+                  <>
+                    <span>คู่สนทนา AI</span>
+                    <span className="hidden sm:inline"> · สนทนาอิสระ</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Kawan Bicara</span>
+                    <span className="hidden sm:inline"> · Free Talk</span>
+                  </>
+                )}
               </span>
               <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#EAE3D5] text-[#5C4E3C] font-semibold shrink-0 hidden sm:inline-block">
-                {activePersona.name}
+                {formatPersonaShortName(activePersona.name)}
               </span>
             </div>
 
@@ -2746,21 +2895,35 @@ export default function App() {
               </section>
             ) : (
               <>
-                {/* 1. PANGGUNG UTAMA PANGGILAN SUARA (Terpusat, Lapang, Tanpa Kotak Dalam Kotak) */}
+                {/* 1. ZONA PARTNER AI (Ringkas, Fokus Kontak Mata, Komunikasi Dua Arah) */}
                 <section
                   data-testid="ai-call-card"
                   data-call-state={callStateKey}
                   data-transport-mode={liveTransportMode}
-                  className={`bg-gradient-to-b from-[#FAF5EB] to-white rounded-3xl px-5 py-5 sm:px-8 sm:py-6 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-black/[0.04] items-center text-center space-y-3.5 w-full ${
+                  className={`bg-gradient-to-b from-[#FAF5EB] to-white rounded-3xl px-4 py-3 sm:px-6 sm:py-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-black/[0.04] space-y-2.5 w-full ${
                     callViewMode === 'history' ? 'hidden' : 'flex flex-col'
                   }`}
                 >
-                  {/* Baris Meta Atas: Identitas Partner Satu Baris & Pill Mode Switcher */}
-                  <div className="w-full flex items-center justify-between gap-2 text-xs">
+                  {/* Baris Meta Atas: Identitas Partner Bersih & Pill Mode Switcher */}
+                  <div className="w-full flex items-center justify-between gap-1.5 text-xs">
                     <div className="flex items-center gap-1.5 text-[#6E5E47] min-w-0">
-                      <span className="font-bold text-[#1C1611] truncate">{activePersona.name}</span>
+                      <span className="font-bold text-[#1C1611] whitespace-nowrap">
+                        <span className="sm:hidden">
+                          {formatPersonaShortName(activePersona.name).replace(/^(Sensei|Coach)\s+/i, '')}
+                        </span>
+                        <span className="hidden sm:inline">
+                          {formatPersonaShortName(activePersona.name)}
+                        </span>
+                      </span>
                       <span className="shrink-0">·</span>
-                      <span className="shrink-0">{activeScenario.level}</span>
+                      <span className="shrink-0 text-[11px] font-medium whitespace-nowrap">
+                        <span className="sm:hidden">
+                          {String(activeScenario.level || '').replace(/\b(CEFR|JLPT)\s*/gi, '').trim() || 'Dasar'}
+                        </span>
+                        <span className="hidden sm:inline">
+                          {formatCleanLevel(activeScenario.level)}
+                        </span>
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
@@ -2806,151 +2969,244 @@ export default function App() {
 
                       <button
                         type="button"
+                        data-testid="exam-mode-toggle-btn"
                         onClick={() => setCustomMeasureOverride(!isMeasureMode)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer shrink-0 ${
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                           isMeasureMode
                             ? 'bg-[#FDF2F4] text-[#8C2233]'
                             : 'bg-[#F5F1E8] text-[#5C4E3C] hover:text-[#1C1611]'
                         }`}
                       >
-                        {isMeasureMode
-                          ? locale === 'th'
-                            ? 'โหมดสอบ'
-                            : 'Mode Ujian'
-                          : locale === 'th'
-                            ? 'โหมดฝึกซ้อม'
-                            : 'Mode Latihan'}
+                        {isMeasureMode ? (
+                          locale === 'th' ? (
+                            'โหมดสอบ'
+                          ) : (
+                            <>
+                              <span className="hidden sm:inline">Mode </span>
+                              <span>Ujian</span>
+                            </>
+                          )
+                        ) : locale === 'th' ? (
+                          'โหมดฝึกซ้อม'
+                        ) : (
+                          <>
+                            <span className="hidden sm:inline">Mode </span>
+                            <span>Latihan</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
 
-                  {/* Mascot 3D Mochi Terpusat + Pill Status Panggilan */}
-                  <div className="flex flex-col items-center space-y-1.5">
-                    <div
-                      onClick={() => {
-                        if (isPlayingAiAudio) {
-                          interruptAiAndStartListening();
-                          return;
-                        }
-                        const m = mochiInstanceRef.current;
-                        if (m) {
-                          try {
-                            m.triggerHop?.(0.28);
-                            m.triggerHandGesture?.('wave', 1.2);
-                            m.triggerEarWiggle?.(1.3);
-                          } catch {}
-                        }
-                      }}
-                      title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi'}
-                      className="relative w-[156px] h-[148px] flex items-center justify-center cursor-pointer select-none"
-                    >
+                  {/* Baris Kehadiran Partner + Kontrol Suara Ringkas */}
+                  <div className="w-full flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        ref={mochiContainerRef}
-                        data-testid="mochi-3d-stage"
-                        className="w-[156px] h-[148px] flex items-center justify-center"
-                      />
-                      <img
-                        src={
+                        onClick={() => {
+                          if (isPlayingAiAudio) {
+                            interruptAiAndStartListening();
+                            return;
+                          }
+                          const m = mochiInstanceRef.current;
+                          if (m) {
+                            try {
+                              m.triggerHop?.(0.28);
+                              m.triggerHandGesture?.('wave', 1.2);
+                              m.triggerEarWiggle?.(1.3);
+                            } catch {}
+                          }
+                        }}
+                        title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi'}
+                        className="relative w-[84px] h-[80px] flex items-center justify-center cursor-pointer select-none shrink-0"
+                      >
+                        <div
+                          ref={mochiContainerRef}
+                          data-testid="mochi-3d-stage"
+                          className="w-[84px] h-[80px] flex items-center justify-center"
+                        />
+                        <img
+                          src={
                             isPlayingAiAudio
                               ? './assets/brand/paw-mochi-speaking.svg'
                               : './assets/brand/paw-mochi-idle.svg'
                           }
-                        onError={(e) => {
-                          const fallback = isPlayingAiAudio
-                            ? './assets/brand/paw-mochi-speaking.svg'
-                            : './assets/brand/paw-mochi-idle.svg';
-                          if (e.currentTarget.getAttribute('src') !== fallback) {
-                            e.currentTarget.setAttribute('src', fallback);
-                          }
-                        }}
-                        alt="Mochi"
-                        style={{ display: is3dMochiReady ? 'none' : 'block' }}
-                        className="w-16 h-16 rounded-full object-contain p-1.5 bg-white shadow-2xs"
-                      />
+                          onError={(e) => {
+                            const fallback = isPlayingAiAudio
+                              ? './assets/brand/paw-mochi-speaking.svg'
+                              : './assets/brand/paw-mochi-idle.svg';
+                            if (e.currentTarget.getAttribute('src') !== fallback) {
+                              e.currentTarget.setAttribute('src', fallback);
+                            }
+                          }}
+                          alt="Mochi"
+                          style={{ display: is3dMochiReady ? 'none' : 'block' }}
+                          className="w-12 h-12 rounded-full object-contain p-1 bg-white shadow-2xs"
+                        />
+                      </div>
+
+                      <div
+                        key={callStateKey}
+                        data-testid="ai-call-status-pill"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F5F1E8] text-[11px] font-medium text-[#5C4E3C]"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                            callStateKey === 'recording'
+                              ? 'bg-[#8C2233] animate-ping'
+                              : callStateKey === 'speaking'
+                                ? 'bg-[#E6A800] animate-pulse'
+                                : callStateKey === 'waiting'
+                                  ? 'bg-[#2979FF] animate-pulse'
+                                  : callStateKey === 'live'
+                                    ? 'bg-[#2E8B69] animate-pulse'
+                                    : 'bg-[#2E8B69]'
+                          }`}
+                        />
+                        <span data-testid="ai-call-status-text">
+                          {isAiThinking && !isPlayingAiAudio
+                            ? locale === 'th'
+                              ? 'Mochi กำลังคิด…'
+                              : 'Mochi sedang berpikir…'
+                            : isPlayingAiAudio
+                            ? isLiveConnected
+                              ? `Mochi berbicara... (${formatTimer(callDurationSec)})`
+                              : 'Sedang berbicara...'
+                            : isWaitingAfterSpeech
+                            ? locale === 'th'
+                              ? `Mochi รอคุณพูดให้จบ… (${formatTimer(callDurationSec)})`
+                              : `Mochi menunggu kamu selesai bicara… (${formatTimer(callDurationSec)})`
+                            : isRecordingPtt
+                              ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
+                              : isLiveConnected
+                                ? isMicMuted
+                                  ? `Mic dibisukan · ${formatTimer(callDurationSec)}`
+                                  : `LIVE · ${formatTimer(callDurationSec)}`
+                                : 'Siap bicara'}
+                        </span>
+                      </div>
                     </div>
 
-                    <div
-                      key={callStateKey}
-                      data-testid="ai-call-status-pill"
-                      className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] font-medium text-[#5C4E3C]"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                          callStateKey === 'recording'
-                            ? 'bg-[#8C2233] animate-ping'
-                            : callStateKey === 'speaking'
-                              ? 'bg-[#E6A800] animate-pulse'
-                              : callStateKey === 'waiting'
-                                ? 'bg-[#2979FF] animate-pulse'
-                                : callStateKey === 'live'
-                                  ? 'bg-[#2E8B69] animate-pulse'
-                                  : 'bg-[#2E8B69]'
-                        }`}
-                      />
-                      <span data-testid="ai-call-status-text">
-                        {isAiThinking && !isPlayingAiAudio
-                          ? locale === 'th'
-                            ? 'Mochi กำลังคิด…'
-                            : 'Mochi sedang berpikir…'
-                          : isPlayingAiAudio
-                          ? isLiveConnected
-                            ? `Mochi berbicara... (${formatTimer(callDurationSec)})`
-                            : 'Sedang berbicara...'
-                          : isWaitingAfterSpeech
-                          ? locale === 'th'
-                            ? `Mochi รอคุณพูดให้จบ… (${formatTimer(callDurationSec)})`
-                            : `Mochi menunggu kamu selesai bicara… (${formatTimer(callDurationSec)})`
-                          : isRecordingPtt
-                            ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
-                            : isLiveConnected
-                              ? isMicMuted
-                                ? `Mic dibisukan · ${formatTimer(callDurationSec)}`
-                                : `LIVE · ${formatTimer(callDurationSec)}`
-                              : 'Siap bicara'}
-                      </span>
+                    {/* Kontrol Panggilan Pill Ringkas */}
+                    <div className="flex flex-wrap items-center gap-1.5 ml-auto">
+                      <button
+                        type="button"
+                        onClick={() => setSpeechRate(speechRate === 1.0 ? 0.8 : 1.0)}
+                        className="px-2.5 py-1.5 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#5C4E3C] text-xs font-mono font-semibold cursor-pointer transition-colors"
+                        title="Kecepatan bicara (1.0x / 0.8x)"
+                      >
+                        {speechRate === 1.0 ? '1.0x' : '0.8x'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const lastAi = [...turns].reverse().find((tr) => tr.speaker === 'ai');
+                          if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64);
+                        }}
+                        className="px-3 py-1.5 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+                      >
+                        <Volume2 className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
+                        <span>{callStateKey === 'speaking' ? 'Diputar...' : 'Putar Suara'}</span>
+                      </button>
+
+                      {!isLiveConnected ? (
+                        <button
+                          type="button"
+                          disabled={isLiveConnecting}
+                          onClick={() => void startLiveCall()}
+                          className="px-4 py-1.5 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-60"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>{isLiveConnecting ? 'Menyambungkan...' : 'Telepon Live'}</span>
+                        </button>
+                      ) : (
+                        <>
+                          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FDFAF3] border border-[#EAE3D5] text-xs shadow-2xs">
+                            {isUserSpeakingLive ? (
+                              <>
+                                <span className="w-2 h-2 rounded-full bg-[#2E7D32] animate-ping" />
+                                <span className="font-bold text-[#2E7D32]">Mendengarkan...</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="w-2 h-2 rounded-full bg-[#E06738] animate-pulse" />
+                                <span className="text-[#6E5E47]">Mic Aktif</span>
+                              </>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={toggleMuteMic}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-colors ${
+                              isMicMuted
+                                ? 'bg-[#B8432D] text-white'
+                                : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
+                            }`}
+                            aria-label="Mute Mic"
+                          >
+                            {isMicMuted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              playFiezelSfx('button_tap');
+                              stopLiveCall();
+                              setLiveUserDraft('');
+                              setLiveAiDraft('');
+                            }}
+                            className="px-3.5 py-1.5 rounded-full bg-[#B8432D] hover:bg-[#9E3622] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                          >
+                            <PhoneOff className="w-3.5 h-3.5" />
+                            <span>Akhiri</span>
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
 
-                  {/* Subtitle Spotlight Terbuka (Tanpa Kotak Dalam Kotak) */}
+                  {/* Ucapan Partner AI Fokus Kontak Mata */}
                   <div
                     data-testid="live-translation-hud"
-                    className="max-w-xl mx-auto space-y-1.5 px-1"
+                    className="w-full text-left pt-2 border-t border-[#EDE5D4]/80 space-y-1"
                   >
                     {isAiThinking ? (
                       <div
                         data-testid="live-hud-ai-thinking"
                         aria-live="polite"
-                        className="flex items-center justify-center gap-1.5 py-1.5"
+                        className="flex items-center gap-2 py-1"
                       >
                         <span className="sr-only">
                           {locale === 'th' ? 'Mochi กำลังคิดคำตอบ' : 'Mochi sedang menyiapkan jawaban'}
                         </span>
-                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce [animation-delay:-0.3s]" />
-                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce [animation-delay:-0.15s]" />
-                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce" />
+                        <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse [animation-delay:-0.3s]" />
+                        <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse [animation-delay:-0.15s]" />
+                        <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse" />
+                        <span className="text-xs font-medium text-[#6E5E47]">
+                          {locale === 'th' ? 'กำลังตอบกลับ...' : 'Menyiapkan balasan...'}
+                        </span>
                       </div>
                     ) : (
                       <>
                         <div
                           data-testid="live-hud-ai-text"
                           data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
-                          className="space-y-1"
                         >
                           <JapaneseRubyDisplay
                             text={activeAiLiveText}
                             targetLang={activeScenario.targetLang}
                             showRomaji={!isMeasureMode}
-                            className="text-base sm:text-lg font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
-                            rubyClassName="text-base sm:text-lg"
-                            romajiClassName="text-xs sm:text-sm text-[#8C6D1F] font-medium mt-0.5"
+                            className="text-[15px] sm:text-[17px] font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
+                            rubyClassName="text-[15px] sm:text-[17px]"
+                            romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
                           />
                         </div>
 
                         {!isMeasureMode && showTranslations && (
                           <p
                             data-testid="live-hud-ai-translation"
-                            className="text-xs sm:text-sm text-[#6E5E47] leading-relaxed break-words"
+                            className="text-xs sm:text-[13px] text-[#6E5E47] leading-snug break-words"
                           >
                             {locale === 'th'
                               ? activeAiSubtitle.translationTh
@@ -2972,133 +3228,71 @@ export default function App() {
                     )}
 
                     {activeUserSubtitle && (
-                      <div className="pt-1">
-                        <span className="inline-block px-3 py-1 rounded-full bg-[#F5F1E8] text-xs text-[#5C4E3C]">
-                          <strong className="font-semibold text-[#1C1611] mr-1">Kamu:</strong>
-                          <JapaneseRubyDisplay
-                            as="span"
-                            text={activeUserSubtitle.text}
-                            targetLang={activeScenario.targetLang}
-                            showRomaji={true}
-                            className="inline"
-                            rubyClassName="text-xs font-medium text-[#1C1611]"
-                            romajiClassName="text-[10px] text-[#8C6D1F]"
-                          />
+                      <div className="pt-0.5">
+                        <span className="inline-flex items-center gap-1 max-w-full px-2.5 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] text-[#5C4E3C] truncate">
+                          <strong className="font-semibold text-[#1C1611] shrink-0">Kamu:</strong>
+                          <span className="truncate">{activeUserSubtitle.text}</span>
                         </span>
                       </div>
                     )}
                   </div>
-
-                  {/* Kontrol Panggilan Pill Terpusat */}
-                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setSpeechRate(speechRate === 1.0 ? 0.8 : 1.0)}
-                      className="px-3 py-2 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#5C4E3C] text-xs font-mono font-semibold cursor-pointer transition-colors"
-                      title="Kecepatan bicara (1.0x / 0.8x)"
-                    >
-                      {speechRate === 1.0 ? '1.0x' : '0.8x'}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const lastAi = [...turns].reverse().find((tr) => tr.speaker === 'ai');
-                        if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64);
-                      }}
-                      className="px-3.5 py-2 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
-                    >
-                      <Volume2 className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
-                      <span>{callStateKey === 'speaking' ? 'Diputar...' : 'Putar Suara'}</span>
-                    </button>
-
-                    {!isLiveConnected ? (
-                      <button
-                        type="button"
-                        disabled={isLiveConnecting}
-                        onClick={() => void startLiveCall()}
-                        className="px-5 py-2 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-60"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>{isLiveConnecting ? 'Menyambungkan...' : 'Telepon Live'}</span>
-                      </button>
-                    ) : (
-                      <>
-                        {/* Indikator Mikrofon Aktif & Mendengarkan Real-Time */}
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FDFAF3] border border-[#EAE3D5] text-xs shadow-2xs">
-                          {isUserSpeakingLive ? (
-                            <>
-                              <span className="w-2 h-2 rounded-full bg-[#2E7D32] animate-ping" />
-                              <span className="font-bold text-[#2E7D32]">Mendengarkan...</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="w-2 h-2 rounded-full bg-[#E06738] animate-pulse" />
-                              <span className="text-[#6E5E47]">Mic Aktif</span>
-                            </>
-                          )}
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={toggleMuteMic}
-                          className={`w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-colors ${
-                            isMicMuted
-                              ? 'bg-[#B8432D] text-white'
-                              : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
-                          }`}
-                          aria-label="Mute Mic"
-                        >
-                          {isMicMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                        </button>
-                        <button
-                          type="button"
-                            onClick={() => {
-                              playFiezelSfx('button_tap');
-                              stopLiveCall();
-                              setLiveUserDraft('');
-                              setLiveAiDraft('');
-                            }}
-                          className="px-4 py-2 rounded-full bg-[#B8432D] hover:bg-[#9E3622] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
-                        >
-                          <PhoneOff className="w-3.5 h-3.5" />
-                          <span>Akhiri</span>
-                        </button>
-                      </>
-                    )}
-                  </div>
                 </section>
 
-                {/* Tombol Akses Riwayat Cepat saat di Panggung Live */}
-                {callViewMode === 'stage' && turns.filter((tr) => tr.speaker === 'user').length > 0 && !isLiveConnected && (
-                  <div className="flex justify-center w-full pt-0.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        playFiezelSfx('button_tap');
-                        setCallViewMode('history');
-                      }}
-                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/90 hover:bg-white text-xs font-semibold text-[#8C6D1F] hover:text-[#1C1611] border border-[#E8DFC8]/70 shadow-2xs transition-all cursor-pointer active:scale-95"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5 text-[#8C6D1F]" />
-                      <span>{locale === 'th' ? 'ดูประวัติบทสนทนาและการประเมิน' : 'Lihat Riwayat & Catatan Evaluasi'} ({turns.filter((tr) => tr.speaker === 'user').length})</span>
-                      <span>↓</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* 1.5 ASISTEN JAWABAN PEMULA (Pilihan respon alami cepat) */}
-                {!isMeasureMode && beginnerReplyCards.length > 0 && (
+                {/* 1.5 ZONA COPILOT JAWABAN AI REALTIME (Muncul Otomatis Saat Partner Bicara, Tersembunyi di Mode Ujian) */}
+                {!isMeasureMode && (
                   <div className={`w-full ${callViewMode === 'stage' ? 'block' : 'hidden'}`}>
                     <BeginnerAnswerAssistant
-                      cards={beginnerReplyCards}
-                      targetLang={activeScenario.targetLang}
                       locale={locale}
-                      isRefreshing={isRefreshingAssist}
-                      onRefresh={handleRefreshLiveAssist}
-                      onSelectReply={(text) => {
+                      targetLang={activeScenario.targetLang}
+                      scenario={activeScenario}
+                      aiQuestionText={activeAiLiveText}
+                      aiQuestionTranslation={
+                        locale === 'th'
+                          ? activeAiSubtitle.translationTh
+                          : activeAiSubtitle.translationId
+                      }
+                      lastUserText={lastUserTurn?.text || ''}
+                      cards={copilotCards}
+                      copilotSource={copilotSource}
+                      isGeneratingCopilot={isGeneratingCopilot || isAiThinking}
+                      isLiveConnected={isLiveConnected}
+                      isRecordingPtt={isRecordingPtt}
+                      isAnalyzingTurn={isAnalyzingTurn}
+                      isPlayingAiAudio={isPlayingAiAudio}
+                      isRefreshingAssist={isRefreshingAssist}
+                      turnCount={turns.length}
+                      onRefreshAssist={handleRefreshLiveAssist}
+                      onSpeakSample={(sampleText, rate) => {
+                        void speakAiText(sampleText, null, rate ?? 0.92);
+                      }}
+                      onSelectForInput={(selectedText) => {
                         playFiezelSfx('button_tap');
-                        setInputText(text);
+                        setInputText(selectedText);
+                      }}
+                      onSendDirect={(selectedText) => {
+                        playFiezelSfx('button_tap');
+                        const clean = selectedText.trim();
+                        if (!clean || isAnalyzingTurn) return;
+                        interruptAiAndStartListening();
+                        setInputText('');
+                        if (
+                          isLiveConnected &&
+                          wsRef.current &&
+                          wsRef.current.readyState === WebSocket.OPEN
+                        ) {
+                          submitLiveUserUtterance(clean);
+                        } else {
+                          void submitStudentTurn({ text: clean, speakingDurationSec: 3 });
+                        }
+                      }}
+                      onStartPttWithPrompt={(promptText) => {
+                        playFiezelSfx('button_tap');
+                        setInputText(promptText);
+                        if (isRecordingPtt) {
+                          stopPttRecording();
+                        } else {
+                          void startPttRecording();
+                        }
                       }}
                     />
                   </div>
