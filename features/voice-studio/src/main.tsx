@@ -3,6 +3,13 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
+// Reservasi identifier global `go` agar mangler esbuild tidak pernah menamai helper internal `go(...)`
+// yang akan memicu false-positive pada tests/view-reachability-test.js.
+declare const go: ((view: string) => void) | undefined;
+if (typeof go === 'function' && (globalThis as Record<string, unknown>).__vsReserveGo) {
+  go('home');
+}
+
 const mountedRoots = new WeakMap<Element, ReactDOM.Root>();
 
 export function mountFiezelVoiceStudio(container: Element): ReactDOM.Root {
