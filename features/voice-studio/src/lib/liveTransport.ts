@@ -508,7 +508,7 @@ export async function requestRealtimeCopilotAssist(params: {
     }
   }
 
-  // 2) Optional learner personal Gemini API key direct fallback (gemini-3.5-flash-lite)
+  // 2) Optional learner personal Gemini API key direct fallback (ultra-fast gemini-3-flash-preview)
   let userGeminiKey = '';
   try {
     if (typeof localStorage !== 'undefined') {
@@ -526,17 +526,19 @@ export async function requestRealtimeCopilotAssist(params: {
         params.targetLang === 'ja'
           ? 'Japanese (N5-N3, Kanji+Hiragana, NO emojis; word-spaced Hepburn Romaji in pronunciation)'
           : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
+      const learnerLangName = params.locale === 'th' ? 'Thai' : 'Indonesian';
       const prompt = [
         `Partner AI just said: "${cleanAiText}".`,
         params.lastUserText ? `Learner previously said: "${params.lastUserText}".` : '',
         params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
         `Generate 3 real-time natural spoken reply options in ${langSpec} that directly answer "${cleanAiText}" (easy=short, mission=natural detail, rescue=answer+follow-up question). NEVER use unrelated templates.`,
-        `JSON only: {"aiMeaningId":"...","aiMeaningTh":"...","replies":[{"tier":"easy","badgeId":"Singkat & Mudah","badgeTh":"สั้นและง่าย","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","badgeId":"Alami & Kontekstual","badgeTh":"เป็นธรรมชาติ","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","badgeId":"Jawab + Tanya Balik","badgeTh":"ตอบและถามกลับ","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}`,
+        `Translate "${cleanAiText}" into ${learnerLangName} as "aiMeaning". Translate each reply into ${learnerLangName} as "hint".`,
+        'JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","badgeId":"Singkat & Mudah","badgeTh":"สั้นและง่าย","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","badgeId":"Alami & Kontekstual","badgeTh":"เป็นธรรมชาติ","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","badgeId":"Jawab + Tanya Balik","badgeTh":"ตอบและถามกลับ","text":"...","pronunciation":"...","hint":"..."}]}',
       ]
         .filter(Boolean)
         .join('\n');
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${encodeURIComponent(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(
           userGeminiKey
         )}`,
         {
@@ -546,9 +548,9 @@ export async function requestRealtimeCopilotAssist(params: {
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
             generationConfig: {
               responseMimeType: 'application/json',
-              temperature: variationSeed > 0 ? 0.75 : 0.45,
-              maxOutputTokens: 2048,
-              thinkingConfig: { thinkingLevel: 'MINIMAL' },
+              temperature: variationSeed > 0 ? 0.7 : 0.4,
+              maxOutputTokens: 750,
+              thinkingConfig: { thinkingBudget: 0 },
             },
           }),
           signal: controller.signal,
@@ -560,13 +562,20 @@ export async function requestRealtimeCopilotAssist(params: {
         const rawTxt = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
         const parsedRaw = JSON.parse(rawTxt);
         const parsed = Array.isArray(parsedRaw) ? parsedRaw[0] : parsedRaw;
-        const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
+        const rawReplies = Array.isArray(parsed?.replies) ? parsed.replies : [];
+        const normalizedReplies = rawReplies.map((r: any) => ({
+          ...r,
+          hintId: params.locale === 'th' ? (r.hintId || r.hint || '') : (r.hint || r.hintId || ''),
+          hintTh: params.locale === 'th' ? (r.hint || r.hintTh || '') : (r.hintTh || r.hint || ''),
+        }));
+        const cards = normalizeServerCopilotCards(normalizedReplies, params.targetLang);
         if (cards.length > 0) {
+          const meaningText = stripEmojisAndEmotWords(String(parsed?.aiMeaning || parsed?.aiMeaningId || parsed?.aiMeaningTh || '')).trim();
           const result: RealtimeCopilotAssistResult = {
             ok: true,
             source: 'ai-realtime',
-            aiMeaningId: stripEmojisAndEmotWords(String(parsed?.aiMeaningId || '')).trim(),
-            aiMeaningTh: stripEmojisAndEmotWords(String(parsed?.aiMeaningTh || '')).trim(),
+            aiMeaningId: params.locale === 'th' ? String(parsed?.aiMeaningId || meaningText) : meaningText,
+            aiMeaningTh: params.locale === 'th' ? meaningText : String(parsed?.aiMeaningTh || meaningText),
             replies: cards,
             cards,
           };
@@ -1705,7 +1714,7 @@ export async function resolveAiReply(
     }
   }
 
-  // 1) Learner's own Gemini key (optional): upgraded to gemini-3.5-flash-lite + unified real-time copilot replies
+  // 1) Learner's own Gemini key (optional): upgraded to ultra-fast gemini-3-flash-preview + unified real-time copilot replies
   let userGeminiKey = '';
   try {
     if (typeof localStorage !== 'undefined') {
@@ -1729,7 +1738,7 @@ export async function resolveAiReply(
         .map((h) => `${h.speaker === 'ai' ? 'You' : 'Learner'}: ${h.text.trim().slice(0, 240)}`);
       const promptText = [
         `You are ${params.persona.name}, a real human friend chatting on a live voice call. Scenario: "${params.scenario.titleId}".`,
-        `Reply in ${langLabel}, 1-2 lively conversational sentences (max 20 words) directly reacting to the learner and asking a follow-up question.`,
+        `Reply in ${langLabel}, 1-2 lively conversational sentences (max 18 words) directly reacting to the learner and asking a follow-up question.`,
         'ABSOLUTE BAN ON EMOJIS & EMOTICONS: Pure clean spoken words only.',
         historyLines.length ? `Conversation so far:\n${historyLines.join('\n')}` : '',
         `Learner (last message): "${params.text}"`,
@@ -1739,7 +1748,7 @@ export async function resolveAiReply(
         .filter(Boolean)
         .join('\n');
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${encodeURIComponent(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(
           userGeminiKey
         )}`,
         {
@@ -1750,8 +1759,8 @@ export async function resolveAiReply(
             generationConfig: {
               responseMimeType: 'application/json',
               temperature: 0.5,
-              maxOutputTokens: 2048,
-              thinkingConfig: { thinkingLevel: 'MINIMAL' },
+              maxOutputTokens: 750,
+              thinkingConfig: { thinkingBudget: 0 },
             },
           }),
           signal: controller.signal,
