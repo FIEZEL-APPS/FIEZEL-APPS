@@ -1,7 +1,7 @@
 {
-  "version": "m025-675",
-  "claimedBy": "branch feat/speaking-listening-ux-viewport-fit-travertine-m025-675",
-  "claimedAt": "2026-10-25T20:05:08.551Z",
-  "reason": "fix(speaking-listening): overhaul ui ux viewport fit anti-overlap travertine",
+  "version": "m025-676",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-26T12:50:49.718Z",
+  "reason": "feat(kawan-bicara): copilot bantuan jawaban AI realtime dua arah & rekonstruksi panggung live",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

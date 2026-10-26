@@ -103,6 +103,11 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
       ? activeScenario.competencyNameTh
       : activeScenario.competencyNameId;
 
+  const cleanLevelLabel = (lvl: string) =>
+    String(lvl || '')
+      .replace(/\b(CEFR|JLPT)\s*/gi, '')
+      .trim();
+
   return (
     <div className="space-y-6 pb-20 relative" data-testid="home-redesign-view">
       {/* 1. SAPAAN EDITORIAL & RITME HARIAN KHAS FIEZEL */}
@@ -267,8 +272,8 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <FiezelSparkleOrnament className="w-4 h-4" />
               <span>
                 {locale === 'th'
-                  ? `แนะนำโดย Mochi · ระดับ ${activeScenario.level}`
-                  : `Pilihan Utama Mochi · Level ${activeScenario.level}`}
+                  ? `แนะนำโดย Mochi · ระดับ ${cleanLevelLabel(activeScenario.level)}`
+                  : `Pilihan Utama Mochi · Level ${cleanLevelLabel(activeScenario.level)}`}
               </span>
             </div>
 
@@ -578,7 +583,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   <div className="flex items-center justify-between gap-2 text-xs">
                     <span className="fz-badge-paw">
                       <FiezelPawStamp className="w-3 h-3 text-[#8C2233]" />
-                      <span>{scen.level}</span>
+                      <span>Level {cleanLevelLabel(scen.level)}</span>
                       <span>·</span>
                       <span>{locale === 'th' ? scen.competencyNameTh : scen.competencyNameId}</span>
                     </span>
