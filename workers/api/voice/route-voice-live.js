@@ -208,7 +208,7 @@ function normalizeHistory(rawHistory) {
     }));
 }
 
-function normalizeCopilotReplies(rawReplies, targetLang) {
+function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id') {
   if (!Array.isArray(rawReplies)) return [];
   const defaultBadges = [
     { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
@@ -223,6 +223,7 @@ function normalizeCopilotReplies(rawReplies, targetLang) {
     const text = cleanSpokenText(item.text || '');
     if (!looksLikeTargetLang(text, targetLang)) continue;
     const meta = defaultBadges[valid.length] || defaultBadges[0];
+    const hint = cleanSpokenText(item.hint || (locale === 'th' ? item.hintTh : item.hintId) || item.translation || '').slice(0, 260);
     valid.push({
       id: `ai_rt_${Date.now()}_${valid.length}`,
       tier: item.tier === 'easy' || item.tier === 'mission' || item.tier === 'rescue' ? item.tier : meta.tier,
@@ -230,8 +231,9 @@ function normalizeCopilotReplies(rawReplies, targetLang) {
       badgeTh: cleanSpokenText(item.badgeTh || item.labelTh || meta.badgeTh).slice(0, 40) || meta.badgeTh,
       text,
       pronunciation: cleanSpokenText(item.pronunciation || item.phonetic || '').slice(0, 260),
-      hintId: cleanSpokenText(item.hintId || item.translationId || item.meaningId || '').slice(0, 260),
-      hintTh: cleanSpokenText(item.hintTh || item.translationTh || item.meaningTh || '').slice(0, 260),
+      hintId: locale === 'th' ? cleanSpokenText(item.hintId || hint).slice(0, 260) : hint,
+      hintTh: locale === 'th' ? hint : cleanSpokenText(item.hintTh || hint).slice(0, 260),
+      hint,
       isRealtimeAi: true,
     });
   }
@@ -473,7 +475,7 @@ export async function routeVoiceCopilotAssist(ctx) {
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
 
-  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang);
+  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang, locale);
   if (!replies.length) {
     return jsonResponse({ ok: false, fallback: true, reason: 'invalid_replies' }, { status: 503 });
   }
@@ -544,7 +546,7 @@ export async function routeVoicePartnerTurn(ctx) {
     return jsonResponse({ ok: false, fallback: true, reason: 'invalid_ai_reply' }, { status: 503 });
   }
 
-  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang);
+  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang, locale);
   const aiReplyTranslation = cleanSpokenText(gen.parsed.aiReplyTranslation || gen.parsed.aiReplyTranslationId || gen.parsed.aiReplyTranslationTh || '');
 
   return jsonResponse({
