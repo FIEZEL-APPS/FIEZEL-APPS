@@ -111,9 +111,31 @@ export default function App() {
   // m025-637: true while the REAL AI partner is generating its reply (Mochi "thinking").
   const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
   const [isPlayingAiAudio, setIsPlayingAiAudio] = useState<boolean>(false);
+  const isPlayingAiAudioRef = useRef<boolean>(false);
+  const aiPlayoutTailTimerRef = useRef<number | null>(null);
   const [showHint, setShowHint] = useState<boolean>(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
-  const [speechRate, setSpeechRate] = useState<1.0 | 0.8>(1.0);
+  const [speechRate, setSpeechRate] = useState<number>(0.88);
+
+  const setAiAudioPlaying = (playing: boolean, tailDelayMs = 0) => {
+    if (aiPlayoutTailTimerRef.current) {
+      window.clearTimeout(aiPlayoutTailTimerRef.current);
+      aiPlayoutTailTimerRef.current = null;
+    }
+    if (playing) {
+      isPlayingAiAudioRef.current = true;
+      setIsPlayingAiAudio(true);
+    } else if (tailDelayMs > 0) {
+      aiPlayoutTailTimerRef.current = window.setTimeout(() => {
+        aiPlayoutTailTimerRef.current = null;
+        isPlayingAiAudioRef.current = false;
+        setIsPlayingAiAudio(false);
+      }, tailDelayMs);
+    } else {
+      isPlayingAiAudioRef.current = false;
+      setIsPlayingAiAudio(false);
+    }
+  };
   const [showTranslations, setShowTranslations] = useState<boolean>(true);
   const [pttRecordingSec, setPttRecordingSec] = useState<number>(0);
   const [copilotCards, setCopilotCards] = useState<BeginnerReplyCard[]>([]);
@@ -809,7 +831,7 @@ export default function App() {
       currentAudioElRef.current.pause();
       currentAudioElRef.current = null;
     }
-    setIsPlayingAiAudio(true);
+    setAiAudioPlaying(true);
 
     let anyAudio = false;
     let anyPlayed = false;
@@ -848,22 +870,26 @@ export default function App() {
     } finally {
       if (token === speakTokenRef.current) {
         clearSpeechWatchdog();
-        setIsPlayingAiAudio(false);
+        setAiAudioPlaying(false, 250);
       }
     }
   };
 
   /**
-   * Deteksi kalimat yang belum lengkap (koma gramatikal, konjungsi, preposisi, kata ganti, partikel)
-   * agar VAD memberikan jeda berpikir lebih panjang (3000ms vs 2000ms baseline) tanpa memotong murid.
+   * Deteksi kalimat yang belum lengkap (koma gramatikal, konjungsi, preposisi, kata ganti, partikel,
+   * atau bunyi jeda berpikir / filler) agar VAD memberikan jeda berpikir lebih panjang (4500ms vs 3200ms baseline)
+   * tanpa memotong murid yang sedang merangkai kata.
    */
   const isGrammaticallyIncomplete = (t: string, lang: TargetLang): boolean => {
     const lower = t.toLowerCase().trim();
     if (!lower) return false;
+    const cleanChars = lower.replace(/\s+/g, '');
     if (lang === 'en') {
-      return /\b(and|or|but|because|so|if|as|with|to|for|in|on|at|of|from|by|about|a|an|the|i|you|we|they|he|she|it|my|your|our|their|is|are|was|were|have|has|had|do|did|does|can|could|will|would|like|want|would like|could i|can i|give me|i'd|i'm|we're|there's|that's|what|where|when|why|how)\s*$/i.test(lower);
+      if (cleanChars.split(/\s+/).length < 3) return true;
+      return /\b(and|or|but|because|so|if|as|with|to|for|in|on|at|of|from|by|about|a|an|the|i|you|we|they|he|she|it|my|your|our|their|is|are|was|were|have|has|had|do|did|does|can|could|will|would|like|want|would like|could i|can i|give me|i'd|i'm|we're|there's|that's|what|where|when|why|how|uh|um|umm|er|err|well|hmm|like)\s*$/i.test(lower);
     }
-    return /[\u306f\u304c\u3092\u306b\u3078\u3067\u3068\u304b\u3089\u307e\u3067\u3088\u308a\u306e\u304b\u306d\u3088\u3051\u3069\u306e\u3067\u3066\u3067]\s*$/.test(lower);
+    if (cleanChars.length <= 4) return true;
+    return /([\u306f\u304c\u3092\u306b\u3078\u3067\u3068\u304b\u3089\u307e\u3067\u3088\u308a\u306e\u304b\u306d\u3088\u3051\u3069\u306e\u3067\u3066\u3067\u3057\u305f\u308a]|ええと|あの|あのう|その|そのう|えー|えっと|んー|まあ|うーん|そうですね|eeto|ano|anou|sono|etto|un)\s*$/i.test(lower);
   };
 
   /**
@@ -897,7 +923,10 @@ export default function App() {
       }
       currentAudioElRef.current = null;
     }
-    setIsPlayingAiAudio(false);
+    if (outputAudioCtxRef.current) {
+      nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
+    }
+    setAiAudioPlaying(false, 0);
   };
 
   /**
@@ -1293,7 +1322,8 @@ export default function App() {
             if (liveSilenceTimerRef.current) {
               window.clearTimeout(liveSilenceTimerRef.current);
             }
-            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 2200 : 1600;
+            // Pacing patience: 3200ms baseline, 4500ms if grammatically incomplete or thinking filler
+            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 4500 : 3200;
             setIsWaitingAfterSpeech(true);
             liveSilenceTimerRef.current = window.setTimeout(() => {
               if (isDisposed) return;
@@ -1358,42 +1388,50 @@ export default function App() {
 
         rec.onend = () => {
           if (isDisposed) return;
-          // Anti-Cutoff: If the silence patience timer is still ticking, the user paused to think or breathe.
-          // Chrome often closes interim recognition prematurely. DO NOT force-submit partial speech!
-          // Save what was heard into speechPrefix and restart recognition seamlessly so the next words append.
-          if (liveSilenceTimerRef.current) {
-            if (accumulatedSpeech) {
-              speechPrefix = accumulatedSpeech;
+          // Anti-Premature Cutoff: If the learner has spoken something, NEVER force-submit on browser onend!
+          // Chrome often terminates recognition prematurely after 700-1000ms pause.
+          // We preserve accumulated speech into speechPrefix, keep/start the patient silence timer,
+          // and seamlessly restart recognition cycle so the learner can finish their thought undisturbed!
+          if (accumulatedSpeech.trim()) {
+            speechPrefix = accumulatedSpeech.trim();
+            if (!liveSilenceTimerRef.current) {
+              const silenceWaitMs = isGrammaticallyIncomplete(speechPrefix, activeScenario.targetLang) ? 4500 : 3200;
+              setIsWaitingAfterSpeech(true);
+              liveSilenceTimerRef.current = window.setTimeout(() => {
+                if (isDisposed) return;
+                liveSilenceTimerRef.current = null;
+                setIsWaitingAfterSpeech(false);
+                setIsUserSpeakingLive(false);
+                const toSend = accumulatedSpeech.trim() || speechPrefix.trim();
+                if (toSend) {
+                  accumulatedSpeech = '';
+                  speechPrefix = '';
+                  liveDictatedTextRef.current = '';
+                  setIsListeningLiveSpeech(false);
+                  if (
+                    wsRef.current &&
+                    wsRef.current.readyState === WebSocket.OPEN &&
+                    liveTransportMode === 'ws-duplex'
+                  ) {
+                    submitLiveUserUtterance(toSend);
+                  } else {
+                    void submitStudentTurnRef.current({
+                      text: toSend,
+                      speakingDurationSec: 3,
+                    });
+                  }
+                }
+              }, silenceWaitMs);
             }
             window.setTimeout(() => {
-              if (!isDisposed && liveSilenceTimerRef.current) {
+              if (!isDisposed) {
                 startListeningCycle();
               }
             }, 60);
             return;
           }
+
           setIsWaitingAfterSpeech(false);
-          const pending = accumulatedSpeech.trim();
-          if (pending) {
-            accumulatedSpeech = '';
-            speechPrefix = '';
-            liveDictatedTextRef.current = '';
-            setIsListeningLiveSpeech(false);
-            setIsUserSpeakingLive(false);
-            if (
-              wsRef.current &&
-              wsRef.current.readyState === WebSocket.OPEN &&
-              liveTransportMode === 'ws-duplex'
-            ) {
-              submitLiveUserUtterance(pending);
-            } else {
-              void submitStudentTurnRef.current({
-                text: pending,
-                speakingDurationSec: 3,
-              });
-            }
-            return;
-          }
           // Restart listening loop while call remains active
           window.setTimeout(() => {
             if (!isDisposed) {
@@ -1489,7 +1527,7 @@ export default function App() {
             if (pttSilenceTimerRef.current) {
               window.clearTimeout(pttSilenceTimerRef.current);
             }
-            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 2400 : 1800;
+            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 4800 : 3500;
             pttSilenceTimerRef.current = window.setTimeout(() => {
               stopPttRecording();
             }, pttSilenceWaitMs);
@@ -1632,21 +1670,17 @@ export default function App() {
     let stream: MediaStream | null = preAcquiredStream || micStreamRef.current;
     if (!stream && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
       try {
-        const isIOS =
-          /iPad|iPhone|iPod/.test(navigator.userAgent || '') ||
-          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-        const getStreamPromise = navigator.mediaDevices.getUserMedia(
-          isIOS
-            ? { audio: true }
-            : {
-                audio: {
-                  echoCancellation: true,
-                  noiseSuppression: true,
-                  autoGainControl: true,
-                },
-              }
-        );
+        const getStreamPromise = navigator.mediaDevices
+          .getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+            },
+          })
+          .catch(() => {
+            return navigator.mediaDevices.getUserMedia({ audio: true });
+          });
         // Timeout 1200ms mencegah lock/hang pada iOS PWA standalone WebKit
         const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
         const res = await Promise.race([getStreamPromise, timeoutPromise]);
@@ -1694,12 +1728,28 @@ export default function App() {
             count++;
           }
           const rms = Math.sqrt(sum / count);
-          if (rms > 0.02) {
+
+          // ACOUSTIC ECHO & ANTI-COLLISION SUPPRESSION:
+          // Saat AI sedang aktif bicara melalui speaker perangkat:
+          if (isPlayingAiAudioRef.current) {
+            // Suara dari speaker bocor ke mikrofon (RMS ~0.02 - 0.07).
+            // DILARANG mengalirkan echo suara AI kembali ke Gemini Live!
+            // Pengaliran echo menyebabkan tabrakan suara ganda dan AI memotong ucapannya sendiri (glitch).
+            // HANYA bila murid bicara lantang dan sengaja menyela/barge-in (RMS > 0.085):
+            if (rms > 0.085) {
+              interruptAiAndStartListening();
+            } else {
+              // Redam suara speaker balik
+              return;
+            }
+          }
+
+          if (rms > 0.018) {
             setIsUserSpeakingLive(true);
             if (userSpeakingTimerRef.current) window.clearTimeout(userSpeakingTimerRef.current);
             userSpeakingTimerRef.current = window.setTimeout(() => {
               setIsUserSpeakingLive(false);
-            }, 450);
+            }, 500);
           }
 
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
@@ -1881,6 +1931,11 @@ export default function App() {
                     .join('\n')}\nCRITICAL MEMORY DIRECTIVE: If the learner asks about past topics or previous conversations (e.g. "Do you remember what about our previous conversation?" or mentions what they are building or working on), YOU MUST warmly and specifically recall the exact facts they mentioned above (such as building a language app, BKT algorithm, English/Japanese focus, school pilot testing, etc.)! Never say you just met or forgot!`
                 : '';
 
+            const pacingDirective =
+              speechRate <= 0.95
+                ? `\n\n[MANDATORY PACING & ENUNCIATION FOR LEARNER]: You are speaking to a language learner. Speak at a CALM, RELAXED, UNHURRIED, and GENTLE pace (around 0.85x speed). Articulate every syllable, mora, and grammatical particle (such as は, が, を, に, で) with crystal-clear clarity. Insert natural breathing pauses between phrases so the learner can easily follow and understand every word without feeling rushed. NEVER rush your words.`
+                : `\n\n[PACING & ENUNCIATION]: Speak clearly, warmly, and with natural articulation.`;
+
             ws.send(
               JSON.stringify({
                 setup: {
@@ -1902,7 +1957,7 @@ export default function App() {
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activeScenario.openingLine}". Speak naturally, warmly, and concisely (1-2 sentences per turn) as ${activePersona.name}. Keep in character.${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activeScenario.openingLine}". Speak naturally, warmly, and concisely (1-2 sentences per turn) as ${activePersona.name}. Keep in character.${pacingDirective}${contextSummary}`,
                       },
                     ],
                   },
@@ -2013,17 +2068,34 @@ export default function App() {
             const buffer = pcm16Base64ToAudioBuffer(ctx, incomingAudioBase64, 24000);
             const source = ctx.createBufferSource();
             source.buffer = buffer;
-            source.connect(ctx.destination);
 
-            const startAt = Math.max(ctx.currentTime, nextStartTimeRef.current);
+            // Jitter buffer lead: bila antrean kosong atau tertinggal, beri lead safety 120ms
+            // agar variasi latensi paket (jitter) tidak memicu keheningan mikro / buffer underrun.
+            const now = ctx.currentTime;
+            if (nextStartTimeRef.current < now + 0.02) {
+              nextStartTimeRef.current = now + 0.12;
+            }
+            const startAt = nextStartTimeRef.current;
+            const duration = buffer.duration;
+            nextStartTimeRef.current = startAt + duration;
+
+            // Micro-gain ramp 3ms mencegah letupan tegangan (zero-crossing clicks / crackle glitches)
+            const gainNode = ctx.createGain();
+            gainNode.gain.setValueAtTime(0.001, startAt);
+            gainNode.gain.linearRampToValueAtTime(1.0, startAt + 0.003);
+            gainNode.gain.setValueAtTime(1.0, Math.max(startAt + 0.003, startAt + duration - 0.003));
+            gainNode.gain.linearRampToValueAtTime(0.001, startAt + duration);
+
+            source.connect(gainNode);
+            gainNode.connect(ctx.destination);
             source.start(startAt);
-            nextStartTimeRef.current = startAt + buffer.duration;
+
             activeSourcesRef.current.push(source);
-            setIsPlayingAiAudio(true);
+            setAiAudioPlaying(true);
             source.onended = () => {
               activeSourcesRef.current = activeSourcesRef.current.filter((s) => s !== source);
               if (activeSourcesRef.current.length === 0) {
-                setIsPlayingAiAudio(false);
+                setAiAudioPlaying(false, 300);
               }
             };
           }
@@ -2042,7 +2114,7 @@ export default function App() {
               }
             });
             activeSourcesRef.current = [];
-            setIsPlayingAiAudio(false);
+            setAiAudioPlaying(false, 0);
           }
 
           // Real-time transcriptions
@@ -3074,8 +3146,8 @@ export default function App() {
                               : 'Sedang berbicara...'
                             : isWaitingAfterSpeech
                             ? locale === 'th'
-                              ? `Mochi รอคุณพูดให้จบ… (${formatTimer(callDurationSec)})`
-                              : `Mochi menunggu kamu selesai bicara… (${formatTimer(callDurationSec)})`
+                              ? `Mochi กำลังฟัง… (ช่วงคิด) (${formatTimer(callDurationSec)})`
+                              : `Mochi mendengarkan... (jeda berpikir) (${formatTimer(callDurationSec)})`
                             : isRecordingPtt
                               ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
                               : isLiveConnected
@@ -3091,11 +3163,13 @@ export default function App() {
                     <div className="flex flex-wrap items-center gap-1.5 ml-auto">
                       <button
                         type="button"
-                        onClick={() => setSpeechRate(speechRate === 1.0 ? 0.8 : 1.0)}
+                        onClick={() => {
+                          setSpeechRate((prev) => (prev <= 0.86 ? 0.92 : prev <= 0.93 ? 1.0 : 0.85));
+                        }}
                         className="px-2.5 py-1.5 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#5C4E3C] text-xs font-mono font-semibold cursor-pointer transition-colors"
-                        title="Kecepatan bicara (1.0x / 0.8x)"
+                        title="Kecepatan bicara AI (0.85x Santai / 0.92x Sedang / 1.0x Normal)"
                       >
-                        {speechRate === 1.0 ? '1.0x' : '0.8x'}
+                        {speechRate <= 0.86 ? '0.85x' : speechRate <= 0.93 ? '0.92x' : '1.0x'}
                       </button>
 
                       <button
@@ -3613,7 +3687,9 @@ export default function App() {
                   />
                   <span className="font-medium truncate">
                     {liveUserDraft.trim()
-                      ? `"${liveUserDraft.trim()}"`
+                      ? isWaitingAfterSpeech
+                        ? `"${liveUserDraft.trim()}" (jeda berpikir...)`
+                        : `"${liveUserDraft.trim()}"`
                       : isPlayingAiAudio
                         ? locale === 'th'
                           ? 'AI กำลังพูด (พูดแทรกเพื่อขัดจังหวะได้)'
