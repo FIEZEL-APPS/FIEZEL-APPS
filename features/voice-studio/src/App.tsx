@@ -94,6 +94,15 @@ export default function App() {
     }
     return 'call'; // Single unified Mitra Kaiwa / Kawan Bicara Call Room
   });
+  const [selectedPersonaId, setSelectedPersonaId] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('fiezel_voice_persona_pref');
+      if (saved && VOICE_PERSONAS[saved]) return saved;
+    } catch {}
+    const initialLang = loadBraincoreState().targetLang || 'en';
+    return initialLang === 'ja' ? 'nanami' : 'coach_alex';
+  });
+  const [showPersonaModal, setShowPersonaModal] = useState<boolean>(false);
   const [activeScenarioId, setActiveScenarioId] = useState<string>(() => {
     const initialLang = loadBraincoreState().targetLang || 'en';
     const freeScenario = CALL_SCENARIOS.find((s) => s.targetLang === initialLang && s.id.includes('free'));
@@ -289,18 +298,21 @@ export default function App() {
     scenariosForLang.find((s) => s.id === activeScenarioId) ||
     scenariosForLang[0] ||
     CALL_SCENARIOS[0];
-  const activePersona =
-    VOICE_PERSONAS[activeScenario.personaId] || VOICE_PERSONAS.coach_alex;
+  const activePersona: VoicePersona =
+    VOICE_PERSONAS[selectedPersonaId] && VOICE_PERSONAS[selectedPersonaId].targetLang === targetLang
+      ? VOICE_PERSONAS[selectedPersonaId]
+      : (VOICE_PERSONAS[activeScenario.personaId] || (targetLang === 'ja' ? VOICE_PERSONAS.nanami : VOICE_PERSONAS.coach_alex));
 
   // Pre-render the scenario's opening line so the call starts speaking with zero lag
   // without sending concurrent TTS requests that queue on Render's single worker.
   useEffect(() => {
-    if (!activeScenario.openingLine) return;
+    const lineToPreRender = activePersona.openingGreeting || activeScenario.openingLine;
+    if (!lineToPreRender) return;
     let cancelled = false;
     const t = window.setTimeout(() => {
       void (async () => {
         await synthesizeFlexibleTts({
-          text: activeScenario.openingLine,
+          text: lineToPreRender,
           targetLang: activeScenario.targetLang,
           persona: activePersona,
         });
@@ -310,7 +322,7 @@ export default function App() {
       cancelled = true;
       window.clearTimeout(t);
     };
-  }, [activeScenario.id]);
+  }, [activeScenario.id, activePersona.id]);
 
   const isMeasureMode =
     customMeasureOverride !== null ? customMeasureOverride : activeScenario.isMeasureExam;
@@ -634,7 +646,13 @@ export default function App() {
   const handleSelectTargetLang = (lang: TargetLang) => {
     playFiezelSfx('button_tap');
     stopLiveCall();
+    const defaultPersona = lang === 'ja' ? 'nanami' : 'coach_alex';
+    setSelectedPersonaId(defaultPersona);
+    try {
+      localStorage.setItem('fiezel_voice_persona_pref', defaultPersona);
+    } catch {}
     const firstScenario =
+      CALL_SCENARIOS.find((s) => s.targetLang === lang && s.personaId === defaultPersona && s.id.includes('free')) ||
       CALL_SCENARIOS.find((s) => s.targetLang === lang && s.id.includes('free')) ||
       CALL_SCENARIOS.find((s) => s.targetLang === lang) ||
       CALL_SCENARIOS[0];
@@ -652,6 +670,52 @@ export default function App() {
       // Ignore
     }
     setBrainState(saveBraincoreState({ ...brainState, targetLang: lang }));
+  };
+
+  const handleSelectPersona = (pId: string) => {
+    const p = VOICE_PERSONAS[pId];
+    if (!p) return;
+    setSelectedPersonaId(pId);
+    try {
+      localStorage.setItem('fiezel_voice_persona_pref', pId);
+    } catch {}
+    const matchingScen =
+      CALL_SCENARIOS.find((s) => s.targetLang === p.targetLang && s.personaId === pId && s.id.includes('free')) ||
+      CALL_SCENARIOS.find((s) => s.targetLang === p.targetLang && s.personaId === pId) ||
+      activeScenario;
+    if (matchingScen && matchingScen.id !== activeScenarioId) {
+      setActiveScenarioId(matchingScen.id);
+    }
+    playFiezelSfx('button_tap');
+    if (isLiveConnectedRef.current) {
+      stopLiveCall();
+    }
+    const lineToSay = p.openingGreeting || matchingScen.openingLine;
+    if (lineToSay) {
+      void synthesizeFlexibleTts({
+        text: lineToSay,
+        targetLang: p.targetLang,
+        persona: p,
+      });
+    }
+    setShowPersonaModal(false);
+  };
+
+  const handleSelectScenario = (scenId: string) => {
+    const scen = CALL_SCENARIOS.find((s) => s.id === scenId);
+    if (!scen) return;
+    setActiveScenarioId(scen.id);
+    if (scen.personaId && VOICE_PERSONAS[scen.personaId]) {
+      setSelectedPersonaId(scen.personaId);
+      try {
+        localStorage.setItem('fiezel_voice_persona_pref', scen.personaId);
+      } catch {}
+    }
+    playFiezelSfx('button_tap');
+    if (isLiveConnectedRef.current) {
+      stopLiveCall();
+    }
+    setShowPersonaModal(false);
   };
 
   const handleSelectLocale = (nextLocale: LearnerLocale) => {
@@ -1996,7 +2060,7 @@ export default function App() {
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activeScenario.openingLine}". Speak naturally, warmly, and concisely (1-2 sentences per turn) as ${activePersona.name}. Keep in character.${pacingDirective}${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak with your signature sassy tough-love personality (roasting stiffness playfully, dropping colloquial phrasing, no robotic formality, leading every turn with a sassy reaction) as ${activePersona.name}. Keep in character.${pacingDirective}${contextSummary}`,
                       },
                     ],
                   },
@@ -2067,7 +2131,7 @@ export default function App() {
                           role: 'user',
                           parts: [
                             {
-                              text: `[Instruction: Please begin our conversation now by greeting me warmly as ${activePersona.name} in scenario "${activeScenario.titleId}". Say your opening line: "${activeScenario.openingLine}"]`,
+                              text: `[Instruction: Please begin our conversation now with your signature sassy, witty greeting as ${activePersona.name} in scenario "${activeScenario.titleId}". Say your opening line: "${activePersona.openingGreeting || activeScenario.openingLine}"]`,
                             },
                           ],
                         },
@@ -2900,9 +2964,24 @@ export default function App() {
                   </>
                 )}
               </span>
-              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#EAE3D5] text-[#5C4E3C] font-semibold shrink-0 hidden sm:inline-block">
-                {formatPersonaShortName(activePersona.name)}
-              </span>
+              <button
+                type="button"
+                data-testid="persona-picker-trigger"
+                onClick={() => {
+                  playFiezelSfx('button_tap');
+                  setShowPersonaModal(true);
+                }}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-[#5C4E3C] text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+                title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์ AI' : 'Ganti Karakter & Gaya Bicara AI'}
+              >
+                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+                <span className="max-w-[120px] sm:max-w-[160px] truncate">
+                  {formatPersonaShortName(activePersona.name)}
+                </span>
+                <svg className="w-3 h-3 text-[#8C7A65]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             </div>
 
             {/* Navigasi Segmented (Nonaktif pada mode tunggal Mitra Kaiwa) */}
@@ -2940,6 +3019,7 @@ export default function App() {
             <div className="flex items-center bg-white/90 rounded-full p-0.5 shadow-[0_1px_2px_rgba(28,22,17,0.05)]">
               <button
                 type="button"
+                data-testid="target-lang-en"
                 onClick={() => handleSelectTargetLang('en')}
                 className={`px-2.5 py-1 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
                   targetLang === 'en'
@@ -2951,6 +3031,7 @@ export default function App() {
               </button>
               <button
                 type="button"
+                data-testid="target-lang-ja"
                 onClick={() => handleSelectTargetLang('ja')}
                 className={`px-2.5 py-1 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
                   targetLang === 'ja'
@@ -3081,14 +3162,24 @@ export default function App() {
                   {/* Baris Meta Atas: Identitas Partner Bersih & Pill Mode Switcher */}
                   <div className="w-full flex items-center justify-between gap-1.5 text-xs">
                     <div className="flex items-center gap-1.5 text-[#6E5E47] min-w-0">
-                      <span className="font-bold text-[#1C1611] whitespace-nowrap">
+                      <button
+                        type="button"
+                        data-testid="persona-card-trigger"
+                        onClick={() => {
+                          playFiezelSfx('button_tap');
+                          setShowPersonaModal(true);
+                        }}
+                        className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95"
+                        title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์ AI' : 'Ganti Karakter & Gaya Bicara AI'}
+                      >
                         <span className="sm:hidden">
                           {formatPersonaShortName(activePersona.name).replace(/^(Sensei|Coach)\s+/i, '')}
                         </span>
                         <span className="hidden sm:inline">
                           {formatPersonaShortName(activePersona.name)}
                         </span>
-                      </span>
+                        <span className="text-[10px] text-[#8C7A65]">▾</span>
+                      </button>
                       <span className="shrink-0">·</span>
                       <span className="shrink-0 text-[11px] font-medium whitespace-nowrap">
                         <span className="sm:hidden">
@@ -3997,6 +4088,170 @@ export default function App() {
           </button>
         </div>
       </nav>
+
+      {/* MODAL / BOTTOM SHEET PILIH KARAKTER & SKENARIO (Persona & Scenario Picker) */}
+      {showPersonaModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs transition-opacity"
+          onClick={() => setShowPersonaModal(false)}
+        >
+          <div
+            data-testid="persona-scenario-modal"
+            className="bg-[#FDFAF5] text-[#1C1611] w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#EDE2D0] p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto overscroll-contain"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Modal */}
+            <div className="flex items-center justify-between pb-3 border-b border-[#EAE0CE]">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-[#1C1611] flex items-center gap-2">
+                  <span>{locale === 'th' ? 'เลือกคู่สนทนาและสไตล์ AI' : 'Pilih Karakter & Gaya Bicara AI'}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#1C1611] text-white font-bold">
+                    {targetLang.toUpperCase()}
+                  </span>
+                </h3>
+                <p className="text-xs text-[#6E5E47] mt-0.5">
+                  {locale === 'th'
+                    ? 'เลือกติวเตอร์ที่มีเอกลักษณ์ บุคลิก และระดับการเคี่ยวเข็ญที่คุณชอบ'
+                    : 'Pilih mentor dengan gaya mengajar, aksen, dan tingkat roasting yang kamu sukai'}
+                </p>
+              </div>
+              <button
+                type="button"
+                data-testid="close-persona-modal-btn"
+                onClick={() => setShowPersonaModal(false)}
+                className="w-8 h-8 rounded-full bg-[#EAE0CE] hover:bg-[#DDD0BC] text-[#5C4E3C] flex items-center justify-center font-bold text-sm cursor-pointer transition-colors"
+                aria-label="Tutup"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Bagian 1: Karakter & Persona (Grid 2 Kolom) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-[#5C4E3C] uppercase tracking-wider">
+                <span>{locale === 'th' ? 'ติวเตอร์ที่เลือกได้' : 'Karakter Mentor AI'}</span>
+                <span className="text-[11px] font-normal normal-case text-[#8C7A65]">
+                  {locale === 'th' ? 'แตะเพื่อเปลี่ยนทันที' : 'Klik untuk ganti mentor'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {Object.values(VOICE_PERSONAS)
+                  .filter((p) => p.targetLang === targetLang)
+                  .map((persona) => {
+                    const isSelected = activePersona.id === persona.id;
+                    return (
+                      <button
+                        key={persona.id}
+                        type="button"
+                        data-testid={`persona-card-${persona.id}`}
+                        onClick={() => handleSelectPersona(persona.id)}
+                        className={`text-left p-3.5 rounded-2xl border transition-all cursor-pointer relative flex flex-col justify-between ${
+                          isSelected
+                            ? 'bg-white border-[#1C1611] shadow-[0_4px_16px_rgba(28,22,17,0.08)] ring-2 ring-[#1C1611]/10'
+                            : 'bg-white/60 hover:bg-white border-[#EAE0CE] hover:border-[#D5C6AF]'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-9 h-9 rounded-full bg-[#F3ECE0] flex items-center justify-center text-lg shrink-0">
+                              {persona.targetLang === 'ja'
+                                ? persona.id === 'nanami'
+                                  ? '🌸'
+                                  : '⚡'
+                                : persona.id === 'coach_alex'
+                                ? '🔥'
+                                : '🎓'}
+                            </div>
+                            <div>
+                              <div className="font-bold text-sm text-[#1C1611] leading-tight">
+                                {persona.name}
+                              </div>
+                              <div className="text-[10px] text-[#8C7A65] font-medium leading-tight">
+                                {persona.accentLabel}
+                              </div>
+                            </div>
+                          </div>
+                          {isSelected && (
+                            <span className="w-5 h-5 rounded-full bg-[#10B981] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+                              ✓
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="space-y-1 mt-1">
+                          <div className="inline-block text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#FAF2E4] text-[#7A5A29]">
+                            {locale === 'th' ? persona.personalityTagTh || persona.roleTh : persona.personalityTagId || persona.roleId}
+                          </div>
+                          <div className="text-[11px] text-[#5C4E3C] line-clamp-2 leading-snug">
+                            {locale === 'th' ? persona.roastStyleTh || persona.speakingStyle : persona.roastStyleId || persona.speakingStyle}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+
+            {/* Bagian 2: Topik & Skenario Percakapan */}
+            <div className="space-y-2 pt-2 border-t border-[#EAE0CE]">
+              <div className="flex items-center justify-between text-xs font-bold text-[#5C4E3C] uppercase tracking-wider">
+                <span>{locale === 'th' ? 'หัวข้อบทสนทนา' : 'Pilihan Skenario & Topik'}</span>
+                <span className="text-[11px] font-normal normal-case text-[#8C7A65]">
+                  {scenariosForLang.length} {locale === 'th' ? 'สถานการณ์' : 'skenario'}
+                </span>
+              </div>
+
+              <div className="space-y-1.5 max-h-48 overflow-y-auto overscroll-contain pr-1">
+                {scenariosForLang.map((scen) => {
+                  const isScenActive = activeScenario.id === scen.id;
+                  const scenPersona = VOICE_PERSONAS[scen.personaId] || activePersona;
+                  return (
+                    <button
+                      key={scen.id}
+                      type="button"
+                      data-testid={`scenario-item-${scen.id}`}
+                      onClick={() => handleSelectScenario(scen.id)}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                        isScenActive
+                          ? 'bg-white border-[#1C1611] font-bold shadow-xs'
+                          : 'bg-white/50 hover:bg-white border-[#EAE0CE]'
+                      }`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs text-[#1C1611] truncate font-medium">
+                          {locale === 'th' ? scen.titleTh : scen.titleId}
+                        </div>
+                        <div className="text-[10px] text-[#8C7A65] truncate">
+                          {formatPersonaShortName(scenPersona.name)} · {formatCleanLevel(scen.level)}
+                        </div>
+                      </div>
+                      {isScenActive && (
+                        <span className="text-xs text-[#10B981] font-bold shrink-0">✓ Aktif</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer Action */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setShowPersonaModal(false)}
+                className="w-full py-2.5 px-4 rounded-xl bg-[#1C1611] hover:bg-[#332A22] text-white font-bold text-xs cursor-pointer transition-all active:scale-[0.98] shadow-md"
+              >
+                {locale === 'th'
+                  ? `เริ่มคุยกับ ${formatPersonaShortName(activePersona.name)}`
+                  : `Mulai Bicara dengan ${formatPersonaShortName(activePersona.name)}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

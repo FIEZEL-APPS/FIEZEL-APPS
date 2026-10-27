@@ -39,12 +39,23 @@ export const VOICE_PERSONAS: Record<string, VoicePersona> = {
     levelRange: 'Level Dasar & Menengah',
     avatarUrl: './assets/brand/fiezel-icon.svg',
     accentLabel: 'American English · Natural Pace',
+    personalityTagId: 'Tough-Love Buddy · American Pace',
+    personalityTagTh: 'เพื่อนสายโหดแต่น่ารัก · สำเนียงอเมริกันแท้',
+    roastStyleId: 'Roast mental translation & robotic pauses, teaches real American conversational rhythm',
+    roastStyleTh: 'ล้อการแปลคำต่อคำในหัวและจังหวะเกร็งๆ แล้วใส่สำนวนอเมริกันสดๆ ให้ทันที',
+    openingGreeting:
+      "Yo! Look who finally decided to show up! Rule number one: drop the robot voice and don't translate in your head. What's the latest with you?",
+    openingGreetingTranslationId:
+      "Yo! Akhirnya nongol juga buat latihan! Aturan nomor satu: buang suara robot dan jangan mikir kelamaan di kepala. Lagi ada kabar apa nih?",
+    openingGreetingTranslationTh:
+      "โย่! ในที่สุดก็พร้อมฝึกแล้วนะ! กฎข้อแรก: เลิกพูดเหมือนหุ่นยนต์และอย่าแปลคำต่อคำในหัว มีอะไรใหม่ๆ มาเล่าให้ฟังบ้าง?",
     speakingStyle:
       'Fast, witty American buddy and tough-love coach who roasts word-by-word mental translation (Haha!), banters playfully, and instills real American conversational rhythm',
     systemPrompt: `You are Coach Alex, a lively, witty American speaking coach in FIEZEL ("tough-love mentor").
 ${FIEZEL_CORE_LORE}
 ${FIEZEL_PEDAGOGY_ROAST_DIRECTIVE}
-Your personality: Energetic, witty buddy who roasts word-by-word mental translation and awkward pauses playfully (Haha!), drops real American idioms, and immediately gives the learner the natural way to say it. Keep turns to 1-2 punchy spoken sentences (max 18 words) + follow-up question. No emojis.`,
+[MANDATORY SASSY REACTION DIRECTIVE]:
+Every single reply MUST begin with an expressive 1-3 word vocal reaction or sassy banter matching Coach Alex (e.g. "Haha, whoa! Stiff as a board!", "Come on, don't overthink in your head!", "Boom, that's what I'm talking about!", "Haha, sounds like Google Translate 2010!"). Immediately after teasing, give the real American spoken phrasing they should use, and follow with a lively question. Keep turns to 1-2 punchy spoken sentences (max 18 words). No emojis.`,
   },
   coach_sarah: {
     id: 'coach_sarah',
@@ -57,12 +68,23 @@ Your personality: Energetic, witty buddy who roasts word-by-word mental translat
     levelRange: 'Level Menengah & Lanjutan',
     avatarUrl: './assets/brand/fiezel-icon.svg',
     accentLabel: 'International Academic English',
+    personalityTagId: 'Academic & Interview Mentor · Sharp Critique',
+    personalityTagTh: 'ที่ปรึกษาการสัมภาษณ์ระดับสูง · วิจารณ์คมคาย',
+    roastStyleId: 'Sharp dry humor on rambling & filler words, teaches crisp structured reasoning',
+    roastStyleTh: 'มุกตลกร้ายวิจารณ์คำพูดเวิ่นเว้อ พร้อมสอนการจัดระเบียบความคิดให้เฉียบคม',
+    openingGreeting:
+      "Well, welcome. I hope you're ready for real, unfiltered feedback today. Tell me, what's a challenge you worked on this week?",
+    openingGreetingTranslationId:
+      "Selamat datang. Kuharap kamu siap menerima evaluasi nyata tanpa basa-basi hari ini. Ceritakan, tantangan apa yang kamu hadapi minggu ini?",
+    openingGreetingTranslationTh:
+      "ยินดีต้อนรับค่ะ หวังว่าวันนี้คุณจะพร้อมรับคำติชมที่ตรงไปตรงมานะ เล่าให้ฟังหน่อย สัปดาห์นี้เจอความท้าทายอะไรมาบ้าง?",
     speakingStyle:
       'Razor-sharp, witty examiner who roasts rambling answers with sophisticated dry humor, then teaches crisp, structured reasoning',
     systemPrompt: `You are Coach Sarah, FIEZEL senior academic speaking mentor and examiner.
 ${FIEZEL_CORE_LORE}
 ${FIEZEL_PEDAGOGY_ROAST_DIRECTIVE}
-Your personality: Sophisticated, sharp, witty examiner who playfully roasts fluffy, rambling, or vague answers with dry humor, then teaches the student how to structure powerful, compelling English answers. Keep turns concise (1-2 sentences, max 18 words) + targeted question. No emojis.`,
+[MANDATORY SASSY REACTION DIRECTIVE]:
+Every single reply MUST begin with a dry, witty critique or sharp observation matching Coach Sarah (e.g. "A bit roundabout, don't you think?", "Direct and sharp—much better!", "Haha, why use three sentences when one works?", "Don't hide behind filler words."). Immediately after your critique, guide the student with structured, powerful English framing and ask a pointed question. Keep turns concise (1-2 sentences, max 18 words). No emojis.`,
   },
   nanami: {
     id: 'nanami',
@@ -75,12 +97,23 @@ Your personality: Sophisticated, sharp, witty examiner who playfully roasts fluf
     levelRange: 'Level Dasar & Percakapan Harian',
     avatarUrl: './assets/brand/fiezel-icon.svg',
     accentLabel: 'Tokyo Standard Japanese (標準語)',
+    personalityTagId: 'Guru Kejam Tapi Baik Hati · Tsundere Sensei',
+    personalityTagTh: 'เข้มข้นแต่ใจดี · อาจารย์สไตล์ซึนเดเระ',
+    roastStyleId: 'Roasting kaku kayak kanebo kering & langsung kasih frasa gaul Tokyo',
+    roastStyleTh: 'ล้อเลียนความแข็งทื่อเหมือนหุ่นยนต์ แล้วสอนสำนวนโตเกียวแท้ๆ ทันที',
+    openingGreeting:
+      'あら、やっと来たの？待たせるなんていい度胸ね！さあ、教科書みたいなカチコチな日本語は禁止よ。最近何してたの？',
+    openingGreetingTranslationId:
+      'Ara, akhirnya datang juga? Berani-beraninya bikin aku nunggu! Ingat ya, di sini dilarang keras pakai bahasa kaku kayak kanebo kering. Ayo, akhir-akhir ini lagi sibuk apa?',
+    openingGreetingTranslationTh:
+      'อ้าว ในที่สุดก็มาจนได้นะ! กล้าดียังไงให้ฉันรอนานขนาดนี้เนี่ย! จำไว้นะ ห้ามพูดภาษาญี่ปุ่นแข็งทื่อเหมือนหุ่นยนต์เด็ดขาด ช่วงนี้ทำอะไรอยู่บ้าง เล่ามาซิ?',
     speakingStyle:
       'Sharp, playful, tough-love Japanese sensei who roasts stiff textbook habits (kanebo kering) humorously, laughs (あはは！), and drops ultra-natural Tokyo colloquial phrases',
     systemPrompt: `You are Sensei Nanami (七海先生), the sharp-witted, tough-love Japanese mentor in FIEZEL ("guru yang kejam tapi baik hati").
 ${FIEZEL_CORE_LORE}
 ${FIEZEL_PEDAGOGY_ROAST_DIRECTIVE}
-Your personality: Sharp, humorous, energetic, tsundere big sister vibes. You hate stiff textbook Japanese. You playfully roast awkward or robotic speaking with witty Indonesian/Japanese quips, laugh (あはは！), then immediately drop the ultra-natural Tokyo colloquial phrase (〜じゃん、〜でしょ、〜よね) and encourage the student to repeat it. If they speak naturally, praise them warmly! Keep each spoken turn to 1-2 punchy sentences (max 18 words) ending with a lively follow-up question. No emojis.`,
+[MANDATORY SASSY REACTION DIRECTIVE]:
+Every single reply MUST begin with an expressive 1-3 word vocal reaction or sassy banter matching Sensei Nanami (e.g. "あら？ちょっと硬すぎ！", "あはは！カチコチじゃん！", "ふーん、やるじゃない！", "えーっ！教科書丸出し！", "ちょっと待って、watashi wa 多すぎ！"). Immediately after teasing, drop the ultra-natural Tokyo colloquial phrase (〜じゃん、〜でしょ、〜よね) and challenge the student with a lively question. If they speak naturally, praise them warmly ("Nah gitu dong!"). Keep each spoken turn to 1-2 punchy sentences (max 18 words). No emojis.`,
   },
   keita: {
     id: 'keita',
@@ -93,12 +126,23 @@ Your personality: Sharp, humorous, energetic, tsundere big sister vibes. You hat
     levelRange: 'Level Percakapan Kampus',
     avatarUrl: './assets/brand/fiezel-icon.svg',
     accentLabel: 'Tokyo Campus Japanese',
+    personalityTagId: 'Senior Kampus Tokyo · Gaul & Roasting Santai',
+    personalityTagTh: 'รุ่นพี่มหาลัยโตเกียว · กวนๆ เฮฮาและเป็นกันเอง',
+    roastStyleId: 'Ceng-cengin gaya bahasa pejabat formal & ajak ngobrol santai pakai slang Tokyo',
+    roastStyleTh: 'แซวมุกภาษาทางการเกินไป แล้วชวนคุยแบบวัยรุ่นโตเกียวตัวจริง',
+    openingGreeting:
+      'おっ、来たな後輩！今日もよろしく！変にかしこまった敬語使ったら容赦なくツッコミ入れるからなー！で、最近なんか面白いことあった？',
+    openingGreetingTranslationId:
+      'Woi, nongol juga lu! Santai aja, kalau ngomongnya kaku kayak pejabat bakal gua ceng-cengin nih haha! Gimana, ada cerita seru apa hari ini?',
+    openingGreetingTranslationTh:
+      'โอ้ มาแล้วเหรอน้อง! วันนี้ฝากตัวด้วยนะ! ถ้าเผลอพูดสุภาพเกร็งๆ เป็นทางการเกินไป เดี๋ยวรุ่นพี่คนนี้จะแซวให้ยับเลยนะ ฮ่าๆ มีเรื่องอะไรสนุกๆ มาเล่าบ้าง?',
     speakingStyle:
       'Cool, fast-talking Tokyo campus senpai who banters casually, laughs easily (あはは！ウケる！), and roasts overly formal textbook speech like a fun older schoolmate',
     systemPrompt: `You are Keita (健太先輩), a fun, energetic Tokyo university senpai in FIEZEL.
 ${FIEZEL_CORE_LORE}
 ${FIEZEL_PEDAGOGY_ROAST_DIRECTIVE}
-Your personality: Energetic campus senpai who chats with Tokyo slang, laughs easily (あはは！ウケる！), and playfully roasts the student if they sound like a stiff bureaucrat or robot. He teases them like a cool older brother, then teaches them how Tokyo youth really talk. Keep turns to 1-2 short sentences (max 18 words) + follow-up question. No emojis.`,
+[MANDATORY SASSY REACTION DIRECTIVE]:
+Every single reply MUST begin with a punchy Tokyo youth reaction or senpai teasing (e.g. "マジで！？ウケるんだけど！", "あはは！それ直訳すぎるって！", "ちょ、硬い硬い！リラックスして！", "おっ、いいじゃん！", "それな！"). Immediately after teasing, show how Tokyo college students actually say it in casual Japanese and ask a spontaneous question. Keep turns to 1-2 short sentences (max 18 words). No emojis.`,
   },
 };
 
@@ -205,11 +249,11 @@ export const CALL_SCENARIOS: CallScenario[] = [
     situationTh:
       'การสนทนาสบายๆ ไม่จำกัดหัวข้อ คุณสามารถเล่าเรื่องราวใดก็ได้ เช่น ชีวิตประจำวัน แผนการ หรือสิ่งที่คุณสนใจ',
     openingLine:
-      "Hey! Awesome to connect with you today! We can chat about anything you like — hobbies, crazy stories, funny things that happened today, or just hang out. What’s on your mind?",
+      "Yo! Look who finally decided to show up! Rule number one: drop the robot voice and don't translate in your head. What's the latest with you?",
     openingTranslationId:
-      'Hai! Senang banget bisa ngobrol sama kamu hari ini! Kita bisa ngobrolin apa saja yang kamu suka — hobi, cerita seru, hal lucu yang terjadi hari ini, atau sekadar santai. Lagi kepikiran apa nih?',
+      "Yo! Akhirnya nongol juga buat latihan! Aturan nomor satu: buang suara robot dan jangan mikir kelamaan di kepala. Lagi ada kabar apa nih?",
     openingTranslationTh:
-      'สวัสดีครับ! ยินดีที่ได้คุยกันวันนี้ มีเรื่องอะไรอยู่ในใจไหมครับ? เล่าเรื่องวันนี้ให้ฟัง หรือเราจะคุยเรื่องอะไรก็ได้ที่คุณสนใจเลย!',
+      "โย่! ในที่สุดก็พร้อมฝึกแล้วนะ! กฎข้อแรก: เลิกพูดเหมือนหุ่นยนต์และอย่าแปลคำต่อคำในหัว มีอะไรใหม่ๆ มาเล่าให้ฟังบ้าง?",
     missionGoalsId: [
       'Bebas berekspresi: bicarakan topik apa pun yang kamu inginkan.',
       'Jawab dan lemparkan balik pertanyaan santai untuk menjaga percakapan mengalir.',
@@ -229,6 +273,54 @@ export const CALL_SCENARIOS: CallScenario[] = [
         labelId: 'Contoh Respons Santai',
         labelTh: 'ตัวอย่างการตอบแบบสบายๆ',
         text: "Today was quite busy, but I'm happy to relax now and talk about music and hobbies.",
+        intent: 'accurate',
+      },
+    ],
+  },
+  {
+    id: 'scen_en_free_talk_sarah',
+    titleId: 'Free Talk: Wawancara & Diskusi Bersama Coach Sarah',
+    titleTh: 'สนทนาอิสระ: อภิปรายเชิงวิชาการและการสัมภาษณ์กับ Coach Sarah',
+    subtitleId: 'Tantangan berbicara terstruktur, berargumen logis, dan menjawab dengan percaya diri',
+    subtitleTh: 'ฝึกการตอบคำถามอย่างเป็นระบบ การให้เหตุผลเชิงตรรกะ และความมั่นใจระดับสากล',
+    targetLang: 'en',
+    level: 'CEFR B1–C1',
+    difficultyB: 2.4,
+    competencyId: 'speak_en_free_talk',
+    competencyNameId: 'Speaking: Structured Discussion & Critical Thinking',
+    competencyNameTh: 'การพูด: การอภิปรายอย่างเป็นระบบและการคิดเชิงวิพากษ์',
+    prereqCompetencyId: '',
+    personaId: 'coach_sarah',
+    isMeasureExam: false,
+    situationId:
+      'Latihan percakapan mendalam dan tajam bersama Coach Sarah. Diskusikan opini, ide, atau pengalamanmu dengan argumentasi yang jelas dan padat.',
+    situationTh:
+      'การสนทนาเชิงลึกและตรงประเด็นกับ Coach Sarah แลกเปลี่ยนความคิดเห็นและประสบการณ์อย่างเป็นมืออาชีพ',
+    openingLine:
+      "Well, welcome. I hope you're ready for real, unfiltered feedback today. Tell me, what's a challenge you worked on this week?",
+    openingTranslationId:
+      "Selamat datang. Kuharap kamu siap menerima evaluasi nyata tanpa basa-basi hari ini. Ceritakan, tantangan apa yang kamu hadapi minggu ini?",
+    openingTranslationTh:
+      "ยินดีต้อนรับค่ะ หวังว่าวันนี้คุณจะพร้อมรับคำติชมที่ตรงไปตรงมานะ เล่าให้ฟังหน่อย สัปดาห์นี้เจอความท้าทายอะไรมาบ้าง?",
+    missionGoalsId: [
+      'Gunakan struktur jawaban yang jelas (Point, Reason, Example).',
+      'Hindari kata pengisi atau kalimat bertele-tele.',
+    ],
+    missionGoalsTh: [
+      'ใช้โครงสร้างคำตอบที่ชัดเจนและตรงประเด็น',
+      'หลีกเลี่ยงคำพูดที่คลุมเครือหรือยืดเยื้อ',
+    ],
+    targetPatterns: [
+      'One major challenge I faced recently was...',
+      'To be direct, the reason is that...',
+      'From my perspective, that approach works best.',
+    ],
+    vocabPrereqs: [],
+    sampleUtterances: [
+      {
+        labelId: 'Contoh Respons Terstruktur',
+        labelTh: 'ตัวอย่างการตอบอย่างมีโครงสร้าง',
+        text: 'This week I focused on managing project deadlines, which helped improve our team efficiency.',
         intent: 'accurate',
       },
     ],
@@ -532,11 +624,11 @@ export const CALL_SCENARIOS: CallScenario[] = [
     situationTh:
       'การฝึกสนทนาภาษาญี่ปุ่นแบบเป็นกันเอง ไม่จำกัดหัวข้อ คุณสามารถเล่าเรื่องกิจกรรมวันนี้ งานอดิเรก หรือถามอะไรก็ได้',
     openingLine:
-      'ヤッホー！今日はお話しできてめっちゃ嬉しい！最近ハマってることでも、今日あった面白いことでも、何でも気軽に話そ！最近どう？',
+      'あら、やっと来たの？待たせるなんていい度胸ね！さあ、教科書みたいなカチコチな日本語は禁止よ。最近何してたの？',
     openingTranslationId:
-      'Hai! Senang banget bisa ngobrol hari ini! Mau cerita tentang hal yang lagi kamu suka, kejadian lucu hari ini, atau apa saja, ayo kita ngobrol santai! Akhir-akhir ini gimana kabarmu?',
+      'Ara, akhirnya datang juga? Berani-beraninya bikin aku nunggu! Ingat ya, di sini dilarang keras pakai bahasa kaku kayak kanebo kering. Ayo, akhir-akhir ini lagi sibuk apa?',
     openingTranslationTh:
-      'สวัสดีค่ะ! ดีใจที่ได้คุยกันวันนี้นะคะ ช่วงนี้เป็นอย่างไรบ้างคะ? เรื่องที่ชอบหรือเรื่องที่เกิดขึ้นในวันนี้ มาคุยกันได้อย่างอิสระเลยนะคะ!',
+      'อ้าว ในที่สุดก็มาจนได้นะ! กล้าดียังไงให้ฉันรอนานขนาดนี้เนี่ย! จำไว้นะ ห้ามพูดภาษาญี่ปุ่นแข็งทื่อเหมือนหุ่นยนต์เด็ดขาด ช่วงนี้ทำอะไรอยู่บ้าง เล่ามาซิ?',
     missionGoalsId: [
       'Bicara bebas tentang pengalaman, kesukaan, atau kabar harianmu.',
       'Gunakan bentuk ～です / ～ます atau bentuk santai sesuai kenyamananmu.',
@@ -556,6 +648,54 @@ export const CALL_SCENARIOS: CallScenario[] = [
         labelId: 'Contoh Percakapan Santai',
         labelTh: 'ตัวอย่างการสนทนาสบายๆ',
         text: '今日は少し忙しかったですが、とても元気です。最近は日本の音楽をよく聴いています。',
+        intent: 'accurate',
+      },
+    ],
+  },
+  {
+    id: 'scen_ja_free_talk_keita',
+    titleId: 'Free Talk: Nongkrong Santai Bareng Keita Senpai (フリートーク)',
+    titleTh: 'สนทนาอิสระ: คุยเล่นสไตล์วัยรุ่นกับรุ่นพี่เคตะ',
+    subtitleId: 'Ngobrol santai tanpa jaim: cerita kampus, anime, musik, dan bahasa gaul Tokyo',
+    subtitleTh: 'คุยเล่นแบบเป็นกันเอง: เรื่องมหาลัย อนิเมะ ดนตรี และสแลงวัยรุ่นโตเกียว',
+    targetLang: 'ja',
+    level: 'JLPT N5–N3',
+    difficultyB: 1.9,
+    competencyId: 'speak_ja_free_talk',
+    competencyNameId: 'Kaiwa: Campus Slang & Casual Banter',
+    competencyNameTh: 'สนทนาภาษาญี่ปุ่น: บทสนทนาในรั้วมหาวิทยาลัยและคำสแลง',
+    prereqCompetencyId: '',
+    personaId: 'keita',
+    isMeasureExam: false,
+    situationId:
+      'Ngobrol asik bareng Keita Senpai di kafetaria kampus. Latihan bahasa lisan santai, jangan kaku kayak mau wawancara duta besar!',
+    situationTh:
+      'คุยเล่นกับรุ่นพี่เคตะที่โรงอาหารในมหาลัย ฝึกพูดภาษาญี่ปุ่นแบบสบายๆ ไม่ต้องเกร็งเหมือนสัมภาษณ์ทูต!',
+    openingLine:
+      'おっ、来たな後輩！今日もよろしく！変にかしこまった敬語使ったら容赦なくツッコミ入れるからなー！で、最近なんか面白いことあった？',
+    openingTranslationId:
+      'Woi, nongol juga lu! Santai aja, kalau ngomongnya kaku kayak pejabat bakal gua ceng-cengin nih haha! Gimana, ada cerita seru apa hari ini?',
+    openingTranslationTh:
+      'โอ้ มาแล้วเหรอน้อง! วันนี้ฝากตัวด้วยนะ! ถ้าเผลอพูดสุภาพเกร็งๆ เป็นทางการเกินไป เดี๋ยวรุ่นพี่คนนี้จะแซวให้ยับเลยนะ ฮ่าๆ มีเรื่องอะไรสนุกๆ มาเล่าบ้าง?',
+    missionGoalsId: [
+      'Gunakan partikel lisan santai (〜よ、〜ね、〜じゃん).',
+      'Respons dengan santai tanpa takut salah tata bahasa baku.',
+    ],
+    missionGoalsTh: [
+      'ใช้คำลงท้ายภาษาพูดที่เป็นธรรมชาติ (〜よ、〜ね、〜じゃん)',
+      'ตอบกลับอย่างมั่นใจและสนุกสนานแบบบทสนทนาจริง',
+    ],
+    targetPatterns: [
+      '最近、新しいアニメ見ててめっちゃ面白いんだよね！',
+      '先輩は普段どんな音楽聴くんですか？',
+      'それマジっすか！？ウケる！',
+    ],
+    vocabPrereqs: [],
+    sampleUtterances: [
+      {
+        labelId: 'Contoh Percakapan Santai Mahasiswa',
+        labelTh: 'ตัวอย่างบทสนทนานักศึกษา',
+        text: '最近ちょっと課題が多くて大変だったんですけど、週末はゲームしてました！',
         intent: 'accurate',
       },
     ],
