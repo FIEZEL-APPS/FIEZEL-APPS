@@ -1,7 +1,7 @@
 {
-  "version": "m025-690",
+  "version": "m025-689",
   "claimedBy": "branch feat/japanese-multi-device-responsive-m025-688",
-  "claimedAt": "2026-10-27T23:17:56.097Z",
-  "reason": "feat(japanese): multi-device responsive architecture across mobile, tablet, and desktop (m025-688)",
+  "claimedAt": "2026-10-27T23:20:47.850Z",
+  "reason": "fix(ja-ui): perombakan total tipografi Jepang romaji furigana dan tata letak responsif kuis",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
