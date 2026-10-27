@@ -902,6 +902,7 @@
   gap: 8px;
   transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease, border-color 0.15s ease;
   user-select: none;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
 }
@@ -1374,6 +1375,11 @@
    Split-view halus tanpa horizontal overflow dan kartu modal bergeser simetris.
    ========================================================================= */
 @media (min-width: 768px) {
+  .listening-modal-box {
+    width: min(740px, 92vw) !important;
+    max-height: min(880px, 90vh) !important;
+  }
+
   #jlptDetailSheet,
   .jlpt-detail-sheet {
     flex-direction: row !important;
@@ -1413,6 +1419,8 @@
   }
 
   .listening-modal-box {
+    width: min(980px, 88vw) !important;
+    max-height: min(780px, 88vh) !important;
     transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
   }
 
@@ -2004,12 +2012,22 @@
 @media (min-width: 641px) {
   .listening-modal {
     padding: 12px 18px !important;
+    overflow-x: hidden !important;
   }
   .listening-modal-box {
     width: min(94vw, 760px) !important;
     max-width: 760px !important;
     max-height: 92vh !important;
   }
+}
+
+@media (min-width: 1025px) {
+  .listening-modal-box {
+    width: min(980px, 88vw) !important;
+    max-width: 980px !important;
+    max-height: min(780px, 88vh) !important;
+  }
+}
   .listening-head {
     min-height: 42px !important;
     padding: 8px 16px !important;
@@ -2071,7 +2089,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .listening-modal {
     padding: 0 !important;
     align-items: stretch !important;

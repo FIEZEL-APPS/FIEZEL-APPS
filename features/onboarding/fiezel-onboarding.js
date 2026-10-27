@@ -957,6 +957,7 @@
     var nameOnly = opts.nameOnly === true;
     if (!nameOnly && opts.force !== true && completed(target)) return { shown: false, reason: 'completed' };
     if (nameOnly && !needsName(target)) return { shown: false, reason: 'named' };
+    if (doc.querySelector && doc.querySelector('.fiezel-ob')) return { shown: false, reason: 'already_visible' };
 
     var host = doc.createElement('div');
     host.className = 'fiezel-ob';

@@ -16300,7 +16300,9 @@ function buktiIngatanAttach(q,cfg,measure){
   if(verdict)verdict.insertAdjacentHTML('afterend',html);
 }
 function quizLoop(cfg){
- if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>quizLoop(cfg);return}
+  state.quizActive = true;
+  state.quizType = String(cfg?.type || 'practice');
+  if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>quizLoop(cfg);return}
  /* Audit F01 (2026-09-22): "Mulai tes awal" menutup perkenalan dengan fade 260 ms, dan kuis
     yang dibangun lebih cepat dari itu mendorong stage-nya SAAT .fiezel-ob masih di DOM.
     Back-nav menolak lapisan baru selama overlay penuh layar ada, enterStage membuang
@@ -17587,6 +17589,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // Menandai sesi selesai supaya pemulih stage kuis tidak lagi menutupnya sebagai
   // "ditinggalkan" ketika murid menekan kembali dari layar hasil.
   if(cfg)cfg.__finished=true;
+  state.quizActive = false;
   const accuracy=Math.round(score/Math.max(1,total)*100),session=completeActiveSession(cfg,score,total);
   // F1 placement: level dibaca dari DUA hal yang harus sepakat, dan yang lebih rendah menang.
   // (Tes RINGKAS hanya memakai tangga bukti, versi placementLiteBandLevel - lihat Audit P-B di
