@@ -303,6 +303,14 @@
     'kursus-ja.writing.rubrik-meta': 'เกณฑ์การประเมินอ้างอิงมาตรฐาน JLPT N5–N1',
     'kursus-ja.writing.rubrik-intro': 'การประเมินไวยากรณ์ คำช่วย ความถูกต้องของประโยค และความตรงประเด็น',
     'kursus-ja.home.peta-cefr': 'แผนผังความก้าวหน้า JLPT N5 – N1',
-    'kursus-ja.home.peta-cefr-sub': 'เส้นทางการเรียนรู้ทีละขั้น JLPT N5 ถึง N1'
+    'kursus-ja.home.peta-cefr-sub': 'เส้นทางการเรียนรู้ทีละขั้น JLPT N5 ถึง N1',
+    'jepang.kakijun-desc': 'ฝึกเขียนเส้นฮิรางานะ คาตาคานะ และคันจิ บนกระดาษเก็งโคโยชิ',
+    'jepang.kakijun-mulai': 'เริ่มเขียน',
+    'jepang.kakijun-bagus': 'ยอดเยี่ยม! เขียนเส้นถัดไปที่ ',
+    'jepang.kakijun-coba-lagi': 'ทิศทางหรือรูปแบบของเส้นยังไม่ถูกต้อง ลองใหม่อีกครั้ง!',
+    'jepang.kakijun-lanjut': 'ไปยังตัวอักษรถัดไป →',
+    'jepang.kakijun-batal': 'ยกเลิกเส้นล่าสุดแล้ว เขียนเส้นที่ ',
+    'jepang.kakijun-tutup': 'ปิดสตูดิโอ',
+    'jepang.kakijun-suara': 'ฟังเสียง'
   });
 })();
