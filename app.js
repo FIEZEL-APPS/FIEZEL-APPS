@@ -16870,7 +16870,6 @@ function quizLoop(cfg){
    try {
      if (feedbackSoundsOn()) uiSfx('click');
      try { if (navigator.vibrate) navigator.vibrate(15); } catch (_) {}
-     try { pawReact('observing'); } catch (_) {}
    } catch (_) {}
    try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
    enhanceUI();
@@ -17447,7 +17446,6 @@ function quizLoop(cfg){
    try {
      if (feedbackSoundsOn()) uiSfx('click');
      try { if (navigator.vibrate) navigator.vibrate(15); } catch (_) {}
-     try { pawReact('observing'); } catch (_) {}
    } catch (_) {}
    try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
    enhanceUI();
