@@ -1,8 +1,15 @@
 /* ==========================================================================
-   FIEZEL KAKIJUN STUDIO (書き順 / Japanese Stroke Order Writing Canvas)
-   Interactive handwriting engine with Genkō Yōshi grid, guided tracing,
-   memory recall mode, real-time vector validation, audio pronunciation,
-   and Braincore telemetry.
+   FIEZEL KAKIJUN STUDIO (書き順 / Japanese Stroke Order Master Studio)
+   Authentic MEXT-Standard Calligraphy Engine powered by KanjiVG.
+   Features:
+   - Genkō Yōshi (米字格) 8-division Japanese calligraphy grid
+   - Authentic KanjiVG Bezier path rendering via native Path2D & SVG
+   - Real-time animated stroke demonstration (書き順アニメーション)
+   - Pedagogical trajectory validation & reverse-stroke detection
+   - Complete 136-character library (46 Hiragana, 46 Katakana, 44 N5 Kanji)
+   - Interactive character picker drawer with script tabs
+   - Zero-Leak bilingual i18n (Indonesian & Thai)
+   - Braincore telemetry integration
    ========================================================================== */
 (function (root) {
   'use strict';
@@ -14,33 +21,19 @@
   var userPoints = [];
   var isDrawing = false;
   var completedStrokes = [];
+  var isDemoPlaying = false;
+  var demoTimer = null;
   var canvasEl = null;
   var ctx = null;
   var guideSvgEl = null;
   var overlayEl = null;
-
-  var GOJUON_LIST = [
-    'あ', 'い', 'う', 'え', 'お',
-    'か', 'き', 'く', 'け', 'こ',
-    'さ', 'し', 'す', 'せ', 'そ',
-    'た', 'ち', 'つ', 'て', 'と',
-    'な', 'に', 'ぬ', 'ね', 'の',
-    'は', 'ひ', 'ふ', 'へ', 'ほ',
-    'ま', 'み', 'む', 'め', 'も',
-    'や', 'ゆ', 'よ',
-    'ら', 'り', 'る', 'れ', 'ろ',
-    'わ', 'を', 'ん',
-    // Katakana
-    'ア', 'イ', 'ウ', 'エ', 'オ',
-    'カ', 'シ', 'ス', 'セ', 'ソ',
-    'タ', 'ツ', 'ン',
-    // N5 Kanji
-    '一', '二', '三', '人', '日'
-  ];
+  var pickerOpen = false;
+  var activePickerTab = 'hiragana';
 
   function T(key, fallback) {
     if (root.FiezelI18n && typeof root.FiezelI18n.t === 'function') {
-      return root.FiezelI18n.t(key, fallback || key);
+      var res = root.FiezelI18n.t(key);
+      if (res && res !== key) return res;
     }
     return fallback || key;
   }
@@ -52,13 +45,29 @@
     return null;
   }
 
-  function speakJapanese(charText, romaji) {
+  function getAllChars() {
+    if (root.FiezelKakijunData && typeof root.FiezelKakijunData.listAll === 'function') {
+      return root.FiezelKakijunData.listAll();
+    }
+    return ['あ', 'い', 'う', 'え', 'お'];
+  }
+
+  function getCharsByScript(script) {
+    if (root.FiezelKakijunData && typeof root.FiezelKakijunData.filterByScript === 'function') {
+      return root.FiezelKakijunData.filterByScript(script).map(function (item) {
+        return item.char;
+      });
+    }
+    return [];
+  }
+
+  function speakJapanese(charText) {
     try {
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         var u = new SpeechSynthesisUtterance(charText);
         u.lang = 'ja-JP';
-        u.rate = 0.88;
+        u.rate = 0.86;
         u.pitch = 1.05;
         window.speechSynthesis.speak(u);
       }
@@ -68,9 +77,9 @@
   function triggerHaptic(type) {
     try {
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        if (type === 'success') navigator.vibrate([16]);
-        else if (type === 'complete') navigator.vibrate([20, 40, 20]);
-        else if (type === 'error') navigator.vibrate([35, 45, 35]);
+        if (type === 'success') navigator.vibrate([18]);
+        else if (type === 'complete') navigator.vibrate([24, 48, 24]);
+        else if (type === 'error') navigator.vibrate([35, 50, 35]);
       }
     } catch (_) {}
   }
@@ -86,53 +95,48 @@
     redraw();
   }
 
+  // Draw traditional Japanese Genko Yoshi / Kanji practice grid (米字格)
   function drawGrid(w, h) {
     if (!ctx) return;
     ctx.save();
-    // Warm Genkō Yōshi paper base
-    ctx.fillStyle = '#FAF8F5';
+    // Warm washi paper base
+    ctx.fillStyle = '#FAF7F2';
     ctx.fillRect(0, 0, w, h);
 
-    // Dashed center grid crosshairs (slate/sand)
-    ctx.strokeStyle = '#D9CEC3';
-    ctx.lineWidth = 1.2;
-    ctx.setLineDash([6, 6]);
+    var pad = 12;
+    var gw = w - pad * 2;
+    var gh = h - pad * 2;
 
-    // Horizontal center line
+    // Diagonal guidelines (subtle light sand for kanji balance)
+    ctx.strokeStyle = '#EBE2D8';
+    ctx.lineWidth = 1.0;
+    ctx.setLineDash([4, 4]);
+
     ctx.beginPath();
-    ctx.moveTo(14, h / 2);
-    ctx.lineTo(w - 14, h / 2);
+    ctx.moveTo(pad, pad);
+    ctx.lineTo(w - pad, h - pad);
+    ctx.moveTo(w - pad, pad);
+    ctx.lineTo(pad, h - pad);
     ctx.stroke();
 
-    // Vertical center line
+    // Center crosshairs (horizontal & vertical)
+    ctx.strokeStyle = '#D9CEC3';
+    ctx.lineWidth = 1.3;
+    ctx.setLineDash([6, 6]);
+
     ctx.beginPath();
-    ctx.moveTo(w / 2, 14);
-    ctx.lineTo(w / 2, h - 14);
+    ctx.moveTo(pad, h / 2);
+    ctx.lineTo(w - pad, h / 2);
+    ctx.moveTo(w / 2, pad);
+    ctx.lineTo(w / 2, h - pad);
     ctx.stroke();
 
     // Outer bounding grid square
     ctx.strokeStyle = '#C9BCB0';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.6;
     ctx.setLineDash([]);
-    ctx.strokeRect(12, 12, w - 24, h - 24);
+    ctx.strokeRect(pad, pad, gw, gh);
 
-    ctx.restore();
-  }
-
-  function drawPathFromPoints(points, color, width) {
-    if (!ctx || points.length < 2) return;
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    for (var i = 1; i < points.length; i++) {
-      ctx.lineTo(points[i].x, points[i].y);
-    }
-    ctx.stroke();
     ctx.restore();
   }
 
@@ -147,102 +151,171 @@
     var data = getStrokeData(activeChar);
     if (!data) return;
 
-    // Draw completed strokes (deep rich obsidian ink with smooth tips)
+    var scaleX = w / 109;
+    var scaleY = h / 109;
+
+    // In Guided mode, draw ghost watermark of full character (見本 / Mihon)
+    if (activeMode === 'guided' && !isDemoPlaying) {
+      ctx.save();
+      ctx.scale(scaleX, scaleY);
+      ctx.strokeStyle = '#E2D9CE';
+      ctx.lineWidth = 4.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (var k = 0; k < data.strokes.length; k++) {
+        try {
+          ctx.stroke(new Path2D(data.strokes[k].d));
+        } catch (_) {}
+      }
+      ctx.restore();
+    }
+
+    // Draw completed strokes in deep obsidian Sumi black ink
+    ctx.save();
+    ctx.scale(scaleX, scaleY);
+    ctx.strokeStyle = '#1E293B';
+    ctx.lineWidth = 5.2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     for (var i = 0; i < completedStrokes.length; i++) {
-      var stroke = data.strokes[i];
-      if (stroke) {
-        var strokePoints = scaleNormalizedPoints(stroke.d, w, h);
-        drawPathFromPoints(strokePoints, '#1E293B', Math.max(9, w * 0.032));
+      var strokeIdx = completedStrokes[i];
+      var s = data.strokes[strokeIdx];
+      if (s) {
+        try {
+          ctx.stroke(new Path2D(s.d));
+        } catch (_) {}
       }
     }
+    ctx.restore();
 
-    // If currently drawing active stroke, render live trail
+    // Draw active user drawing trail (Japanese Carmine Crimson)
     if (userPoints.length > 1) {
-      drawPathFromPoints(userPoints, '#7E2D3B', Math.max(8, w * 0.028));
-    }
-
-    updateGuideOverlay(w, h, data);
-  }
-
-  function scaleNormalizedPoints(svgD, w, h) {
-    // Generate sample points from standard normalized 100x100 SVG path
-    var points = [];
-    var parts = svgD.split(' ');
-    var cur = { x: 0, y: 0 };
-    for (var i = 0; i < parts.length; i++) {
-      var p = parts[i];
-      if (p === 'M' || p === 'L') {
-        var coords = parts[++i].split(',');
-        cur = { x: (parseFloat(coords[0]) / 100) * w, y: (parseFloat(coords[1]) / 100) * h };
-        points.push(cur);
-      } else if (p === 'Q') {
-        var cp = parts[++i].split(',');
-        var ep = parts[++i].split(',');
-        var cpx = (parseFloat(cp[0]) / 100) * w, cpy = (parseFloat(cp[1]) / 100) * h;
-        var epx = (parseFloat(ep[0]) / 100) * w, epy = (parseFloat(ep[1]) / 100) * h;
-        // Sample quadratic curve points
-        for (var t = 0.25; t <= 1; t += 0.25) {
-          var x = (1 - t) * (1 - t) * cur.x + 2 * (1 - t) * t * cpx + t * t * epx;
-          var y = (1 - t) * (1 - t) * cur.y + 2 * (1 - t) * t * cpy + t * t * epy;
-          points.push({ x: x, y: y });
-        }
-        cur = { x: epx, y: epy };
-      } else if (p === 'C') {
-        var cp1 = parts[++i].split(',');
-        var cp2 = parts[++i].split(',');
-        var ep2 = parts[++i].split(',');
-        var cpx1 = (parseFloat(cp1[0]) / 100) * w, cpy1 = (parseFloat(cp1[1]) / 100) * h;
-        var cpx2 = (parseFloat(cp2[0]) / 100) * w, cpy2 = (parseFloat(cp2[1]) / 100) * h;
-        var epx2 = (parseFloat(ep2[0]) / 100) * w, epy2 = (parseFloat(ep2[1]) / 100) * h;
-        for (var t2 = 0.2; t2 <= 1; t2 += 0.2) {
-          var omt = 1 - t2;
-          var cx = omt * omt * omt * cur.x + 3 * omt * omt * t2 * cpx1 + 3 * omt * t2 * t2 * cpx2 + t2 * t2 * t2 * epx2;
-          var cy = omt * omt * omt * cur.y + 3 * omt * omt * t2 * cpy1 + 3 * omt * t2 * t2 * cpy2 + t2 * t2 * t2 * epy2;
-          points.push({ x: cx, y: cy });
-        }
-        cur = { x: epx2, y: epy2 };
+      ctx.save();
+      ctx.strokeStyle = '#BE123C';
+      ctx.lineWidth = Math.max(7, w * 0.042);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(userPoints[0].x, userPoints[0].y);
+      for (var j = 1; j < userPoints.length; j++) {
+        ctx.lineTo(userPoints[j].x, userPoints[j].y);
       }
+      ctx.stroke();
+      ctx.restore();
     }
-    return points;
+
+    updateGuideOverlay(data);
   }
 
-  function updateGuideOverlay(w, h, data) {
+  function updateGuideOverlay(data) {
     if (!guideSvgEl) return;
-    if (activeMode === 'recall') {
+    if (activeMode === 'recall' || isDemoPlaying) {
+      guideSvgEl.innerHTML = '';
+      return;
+    }
+
+    if (!data || activeStrokeIndex >= data.strokes.length) {
+      guideSvgEl.innerHTML = '';
+      return;
+    }
+
+    var target = data.strokes[activeStrokeIndex];
+    if (!target) {
       guideSvgEl.innerHTML = '';
       return;
     }
 
     var html = '';
-    // Draw ghost outlines of remaining strokes
-    for (var i = activeStrokeIndex; i < data.strokes.length; i++) {
-      var s = data.strokes[i];
-      var isCurrent = (i === activeStrokeIndex);
-      var strokeColor = isCurrent ? 'rgba(126, 45, 59, 0.38)' : 'rgba(180, 168, 156, 0.25)';
-      var strokeWidth = isCurrent ? 8 : 6;
-      html += '<path d="' + s.d + '" fill="none" stroke="' + strokeColor + '" stroke-width="' + strokeWidth + '" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />';
-      if (isCurrent) {
-        // Draw start number indicator bead
-        var sx = s.start[0];
-        var sy = s.start[1];
-        html += '<circle cx="' + sx + '" cy="' + sy + '" r="5" fill="#7E2D3B" />';
-        html += '<text x="' + sx + '" y="' + (sy + 1.8) + '" font-size="4.2" font-weight="bold" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">' + (i + 1) + '</text>';
-        // Direction arrow bead near start pointing towards direction
-        var ex = s.end[0];
-        var ey = s.end[1];
-        var dx = ex - sx;
-        var dy = ey - sy;
-        var len = Math.sqrt(dx * dx + dy * dy) || 1;
-        var arrowX = sx + (dx / len) * 12;
-        var arrowY = sy + (dy / len) * 12;
-        html += '<circle cx="' + arrowX + '" cy="' + arrowY + '" r="2.2" fill="#D97706" opacity="0.88"><animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite" /></circle>';
-      }
-    }
+    // Highlight target stroke in warm coral amber with animated pulsing dash
+    html += '<path d="' + target.d + '" fill="none" stroke="#E11D48" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />';
+    html += '<path d="' + target.d + '" fill="none" stroke="#FDE68A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 6"><animate attributeName="stroke-dashoffset" from="30" to="0" dur="1.2s" repeatCount="indefinite" /></path>';
+
+    // Position of stroke order number badge
+    var nx = (target.numPos && target.numPos[0]) || (target.start && target.start[0]) || 50;
+    var ny = (target.numPos && target.numPos[1]) || (target.start && target.start[1]) || 50;
+    var order = target.order || (activeStrokeIndex + 1);
+
+    // Number badge circle with subtle attention ripple
+    html += '<circle cx="' + nx + '" cy="' + ny + '" r="6.2" fill="none" stroke="#BE123C" stroke-width="1.2" opacity="0.6"><animate attributeName="r" values="4.8;8.5;4.8" dur="1.8s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.8s" repeatCount="indefinite" /></circle>';
+    html += '<circle cx="' + nx + '" cy="' + ny + '" r="5.0" fill="#BE123C" />';
+    html += '<text x="' + nx + '" y="' + ny + '" font-size="4.8" font-weight="800" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central">' + order + '</text>';
+
     guideSvgEl.innerHTML = html;
   }
 
+  // Demonstration Animation Player (書き順アニメーション)
+  function playDemoAnimation() {
+    if (isDemoPlaying) {
+      stopDemoAnimation();
+      return;
+    }
+
+    var data = getStrokeData(activeChar);
+    if (!data) return;
+
+    isDemoPlaying = true;
+    updateDemoButtonState(true);
+    setFeedback(T('jepang.kakijun-sedang-animasi', 'Memperagakan urutan goresan baku...'), 'normal');
+
+    // Build SVG animated strokes
+    var svgHtml = '';
+    var totalDelay = 0;
+    var strokeDuration = 0.65; // seconds per stroke
+
+    for (var i = 0; i < data.strokes.length; i++) {
+      var s = data.strokes[i];
+      var order = s.order || (i + 1);
+      var numX = (s.numPos && s.numPos[0]) || s.start[0];
+      var numY = (s.numPos && s.numPos[1]) || s.start[1];
+      var delay = i * (strokeDuration + 0.35);
+
+      svgHtml += '<g id="demoStrokeG_' + i + '">';
+      // Static ghost track
+      svgHtml += '<path d="' + s.d + '" fill="none" stroke="#E2D9CE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />';
+      // Animated drawing path
+      svgHtml += '<path class="kakijun-demo-anim-path" d="' + s.d + '" fill="none" stroke="#1E293B" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round" style="animation-delay:' + delay + 's; animation-duration:' + strokeDuration + 's;" />';
+      // Number badge
+      svgHtml += '<circle cx="' + numX + '" cy="' + numY + '" r="4.6" fill="#BE123C" opacity="0" style="animation: fz-kakijun-badge-appear 0.2s ' + delay + 's forwards;" />';
+      svgHtml += '<text x="' + numX + '" y="' + numY + '" font-size="4.6" font-weight="800" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" opacity="0" style="animation: fz-kakijun-badge-appear 0.2s ' + delay + 's forwards;">' + order + '</text>';
+      svgHtml += '</g>';
+      totalDelay = delay + strokeDuration;
+    }
+
+    if (guideSvgEl) {
+      guideSvgEl.innerHTML = svgHtml;
+    }
+
+    demoTimer = setTimeout(function () {
+      stopDemoAnimation();
+      setFeedback(T('jepang.kakijun-giliran-anda', 'Sekarang giliran Anda! Goreskan mengikuti contoh.'), 'success');
+      redraw();
+    }, (totalDelay + 0.5) * 1000);
+  }
+
+  function stopDemoAnimation() {
+    isDemoPlaying = false;
+    if (demoTimer) {
+      clearTimeout(demoTimer);
+      demoTimer = null;
+    }
+    updateDemoButtonState(false);
+    redraw();
+  }
+
+  function updateDemoButtonState(playing) {
+    var btn = overlayEl && overlayEl.querySelector('#kakijunDemoBtn');
+    if (!btn) return;
+    if (playing) {
+      btn.classList.add('is-playing');
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg><span>' + T('jepang.kakijun-berhenti', 'Hentikan') + '</span>';
+    } else {
+      btn.classList.remove('is-playing');
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>' + T('jepang.kakijun-animasi', 'Lihat Contoh') + '</span>';
+    }
+  }
+
   function getCanvasCoords(e) {
-    if (!canvasEl) return { x: 0, y: 0, nx: 0, ny: 0 };
+    if (!canvasEl) return { x: 0, y: 0, vx: 0, vy: 0 };
     var rect = canvasEl.getBoundingClientRect();
     var clientX = e.clientX;
     var clientY = e.clientY;
@@ -252,30 +325,31 @@
     }
     var x = clientX - rect.left;
     var y = clientY - rect.top;
-    var nx = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    var ny = Math.max(0, Math.min(100, (y / rect.height) * 100));
-    return { x: x, y: y, nx: nx, ny: ny };
+    var vx = Math.max(0, Math.min(109, (x / rect.width) * 109));
+    var vy = Math.max(0, Math.min(109, (y / rect.height) * 109));
+    return { x: x, y: y, vx: vx, vy: vy };
   }
 
   function handlePointerDown(e) {
+    if (isDemoPlaying) {
+      stopDemoAnimation();
+    }
     e.preventDefault();
     var data = getStrokeData(activeChar);
     if (!data || activeStrokeIndex >= data.strokes.length) return;
 
     var coords = getCanvasCoords(e);
     isDrawing = true;
-    userPoints = [{ x: coords.x, y: coords.y, nx: coords.nx, ny: coords.ny }];
+    userPoints = [{ x: coords.x, y: coords.y, vx: coords.vx, vy: coords.vy }];
 
-    // Start-point proximity check against current stroke
     var targetStroke = data.strokes[activeStrokeIndex];
-    var dist = Math.sqrt(Math.pow(coords.nx - targetStroke.start[0], 2) + Math.pow(coords.ny - targetStroke.start[1], 2));
-
-    // If starting too far away (> 28 units in 100-grid)
-    if (dist > 28) {
-      setFeedback('Urutan goresan belum tepat. Mulai dari titik goresan ke-' + (activeStrokeIndex + 1), 'error');
-      triggerHaptic('error');
-    } else {
-      setFeedback('Goreskan ke arah yang dipandu...', 'normal');
+    if (targetStroke && targetStroke.start) {
+      var dist = Math.hypot(coords.vx - targetStroke.start[0], coords.vy - targetStroke.start[1]);
+      if (dist > 30) {
+        setFeedback(T('jepang.kakijun-mulai-dari', 'Mulai dari titik goresan ke-') + ' ' + (activeStrokeIndex + 1), 'normal');
+      } else {
+        setFeedback(T('jepang.kakijun-tarik-garis', 'Goreskan mengikuti arah panduan...'), 'normal');
+      }
     }
     redraw();
   }
@@ -284,7 +358,7 @@
     if (!isDrawing) return;
     e.preventDefault();
     var coords = getCanvasCoords(e);
-    userPoints.push({ x: coords.x, y: coords.y, nx: coords.nx, ny: coords.ny });
+    userPoints.push({ x: coords.x, y: coords.y, vx: coords.vx, vy: coords.vy });
     redraw();
   }
 
@@ -303,39 +377,29 @@
       return;
     }
 
-    var startP = userPoints[0];
-    var endP = userPoints[userPoints.length - 1];
-
-    var startDist = Math.sqrt(Math.pow(startP.nx - targetStroke.start[0], 2) + Math.pow(startP.ny - targetStroke.start[1], 2));
-    var endDist = Math.sqrt(Math.pow(endP.nx - targetStroke.end[0], 2) + Math.pow(endP.ny - targetStroke.end[1], 2));
-
-    // Vector direction alignment
-    var targetDx = targetStroke.end[0] - targetStroke.start[0];
-    var targetDy = targetStroke.end[1] - targetStroke.start[1];
-    var userDx = endP.nx - startP.nx;
-    var userDy = endP.ny - startP.ny;
-    var dot = (targetDx * userDx + targetDy * userDy);
-
-    // Validation thresholds: start <= 30, end <= 34, dot >= -0.2 (allowing curves/loops)
-    var isValid = (startDist <= 30 && endDist <= 34 && (targetStroke.direction === 'loop' || dot >= -0.2));
-
-    if (isValid) {
-      // Stroke Succeeded!
+    var result = validateStroke(userPoints, targetStroke);
+    if (result.ok) {
+      // Stroke Succeeded
       completedStrokes.push(activeStrokeIndex);
       activeStrokeIndex++;
       userPoints = [];
       triggerHaptic('success');
 
       if (activeStrokeIndex >= data.strokes.length) {
-        // Character Completed!
         onCharacterCompleted(data);
       } else {
         setFeedback(T('jepang.kakijun-bagus', 'Bagus! Lanjut goresan ke-') + ' ' + (activeStrokeIndex + 1), 'success');
       }
     } else {
-      // Stroke Failed
+      // Stroke Failed with precise pedagogical diagnostics
       triggerHaptic('error');
-      setFeedback(T('jepang.kakijun-coba-lagi', 'Bentuk atau arah goresan belum sesuai. Coba lagi!'), 'error');
+      if (result.reason === 'reversed') {
+        setFeedback(T('jepang.kakijun-arah-terbalik', 'Arah goresan terbalik! Tarik dari titik goresan ke-') + ' ' + (activeStrokeIndex + 1), 'error');
+      } else if (result.reason === 'bad_start') {
+        setFeedback(T('jepang.kakijun-titik-awal-salah', 'Titik awal belum tepat. Mulai dari nomor') + ' ' + (activeStrokeIndex + 1), 'error');
+      } else {
+        setFeedback(T('jepang.kakijun-coba-lagi', 'Bentuk atau arah goresan belum sesuai. Coba lagi!'), 'error');
+      }
       userPoints = [];
     }
 
@@ -343,10 +407,54 @@
     redraw();
   }
 
+  // Pedagogical stroke evaluation against authentic KanjiVG path
+  function validateStroke(points, targetStroke) {
+    if (!points || points.length < 2) return { ok: false, reason: 'too_short' };
+
+    var uStart = points[0];
+    var uEnd = points[points.length - 1];
+
+    // Measure target start and end from SVG path in memory
+    var pStart = { x: targetStroke.start[0], y: targetStroke.start[1] };
+    var pEnd = { x: targetStroke.start[0], y: targetStroke.start[1] };
+
+    try {
+      var pEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      pEl.setAttribute('d', targetStroke.d);
+      var totalLen = pEl.getTotalLength();
+      if (totalLen > 0) {
+        var sp = pEl.getPointAtLength(0);
+        var ep = pEl.getPointAtLength(totalLen);
+        pStart = { x: sp.x, y: sp.y };
+        pEnd = { x: ep.x, y: ep.y };
+      }
+    } catch (_) {}
+
+    var distStart = Math.hypot(uStart.vx - pStart.x, uStart.vy - pStart.y);
+    var distEnd = Math.hypot(uEnd.vx - pEnd.x, uEnd.vy - pEnd.y);
+
+    // Check Reverse Stroke (drew backwards)
+    var distRevStart = Math.hypot(uStart.vx - pEnd.x, uStart.vy - pEnd.y);
+    var distRevEnd = Math.hypot(uEnd.vx - pStart.x, uEnd.vy - pStart.y);
+    if (distRevStart < 22 && distRevEnd < 22 && Math.hypot(pStart.x - pEnd.x, pStart.y - pEnd.y) > 20) {
+      return { ok: false, reason: 'reversed' };
+    }
+
+    // Proximity tolerances in 109-unit coordinate space
+    if (distStart > 28) {
+      return { ok: false, reason: 'bad_start' };
+    }
+    if (distEnd > 34) {
+      return { ok: false, reason: 'bad_end' };
+    }
+
+    return { ok: true };
+  }
+
   function onCharacterCompleted(data) {
-    setFeedback('Sempurna! Karakter ' + data.char + ' berhasil ditulis!', 'success');
+    setFeedback(T('jepang.kakijun-sempurna', 'Sempurna! Karakter ') + data.char + T('jepang.kakijun-berhasil-ditulis', ' berhasil ditulis!'), 'success');
     triggerHaptic('complete');
-    speakJapanese(data.char, data.romaji);
+    speakJapanese(data.char);
 
     // Emit Braincore Telemetry: genuine learner mastery update
     try {
@@ -382,7 +490,7 @@
     var html = '';
     for (var i = 0; i < data.strokes.length; i++) {
       var s = data.strokes[i];
-      var isDone = (i < activeStrokeIndex);
+      var isDone = completedStrokes.indexOf(i) !== -1;
       var isCurrent = (i === activeStrokeIndex);
       var cls = 'kakijun-stroke-item' + (isDone ? ' is-done' : isCurrent ? ' is-current' : '');
       var statusIcon = isDone ? '✓' : String(i + 1);
@@ -395,16 +503,17 @@
   }
 
   function resetCanvas() {
+    stopDemoAnimation();
     activeStrokeIndex = 0;
     completedStrokes = [];
     userPoints = [];
-    setFeedback('Goreskan mengikuti nomor dan arah panah', 'normal');
+    setFeedback(T('jepang.kakijun-petunjuk-awal', 'Goreskan mengikuti nomor dan arah panah'), 'normal');
     updateStrokeListUI();
     var actionBtn = overlayEl && overlayEl.querySelector('#kakijunNextActionBtn');
     if (actionBtn) {
       actionBtn.classList.remove('kakijun-btn-success');
       actionBtn.classList.add('kakijun-btn-primary');
-      actionBtn.innerHTML = '<span>Ulangi dari Awal</span>';
+      actionBtn.innerHTML = '<span>' + T('jepang.kakijun-ulangi', 'Ulangi dari Awal') + '</span>';
       actionBtn.onclick = resetCanvas;
     }
     redraw();
@@ -422,20 +531,23 @@
   }
 
   function nextCharacter() {
-    var idx = GOJUON_LIST.indexOf(activeChar);
-    var nextIdx = (idx + 1) % GOJUON_LIST.length;
-    setCharacter(GOJUON_LIST[nextIdx]);
+    var all = getAllChars();
+    var idx = all.indexOf(activeChar);
+    var nextIdx = (idx + 1) % all.length;
+    setCharacter(all[nextIdx]);
   }
 
   function prevCharacter() {
-    var idx = GOJUON_LIST.indexOf(activeChar);
-    var prevIdx = (idx - 1 + GOJUON_LIST.length) % GOJUON_LIST.length;
-    setCharacter(GOJUON_LIST[prevIdx]);
+    var all = getAllChars();
+    var idx = all.indexOf(activeChar);
+    var prevIdx = (idx - 1 + all.length) % all.length;
+    setCharacter(all[prevIdx]);
   }
 
   function setCharacter(c) {
     var data = getStrokeData(c);
     if (!data) return;
+    stopDemoAnimation();
     activeChar = c;
     activeScript = data.script;
     activeStrokeIndex = 0;
@@ -448,14 +560,19 @@
       if (glyphEl) glyphEl.textContent = data.char;
       var romajiEl = overlayEl.querySelector('#kakijunCharRomaji');
       if (romajiEl) romajiEl.textContent = data.romaji;
+      var meaningEl = overlayEl.querySelector('#kakijunCharMeaning');
+      if (meaningEl) {
+        meaningEl.textContent = data.meaning ? data.meaning : '';
+        meaningEl.style.display = data.meaning ? 'block' : 'none';
+      }
       var countEl = overlayEl.querySelector('#kakijunStrokeTotal');
-      if (countEl) countEl.textContent = data.strokeCount + ' goresan';
+      if (countEl) countEl.textContent = data.strokeCount + ' ' + T('jepang.kakijun-goresan', 'goresan');
     }
 
-    setFeedback('Goreskan mengikuti nomor dan arah panah', 'normal');
+    setFeedback(T('jepang.kakijun-petunjuk-awal', 'Goreskan mengikuti nomor dan arah panah'), 'normal');
     updateStrokeListUI();
     redraw();
-    speakJapanese(data.char, data.romaji);
+    speakJapanese(data.char);
   }
 
   function setMode(mode) {
@@ -469,10 +586,78 @@
     resetCanvas();
   }
 
+  // Character Grid Picker Drawer
+  function togglePicker(openState) {
+    pickerOpen = (typeof openState === 'boolean') ? openState : !pickerOpen;
+    var drawer = overlayEl && overlayEl.querySelector('#kakijunPickerDrawer');
+    if (!drawer) return;
+    if (pickerOpen) {
+      renderPickerContent();
+      drawer.classList.add('is-open');
+    } else {
+      drawer.classList.remove('is-open');
+    }
+  }
+
+  function setPickerTab(tab) {
+    activePickerTab = tab;
+    renderPickerContent();
+  }
+
+  function renderPickerContent() {
+    var drawer = overlayEl && overlayEl.querySelector('#kakijunPickerDrawer');
+    if (!drawer) return;
+
+    var chars = getCharsByScript(activePickerTab);
+    var html = '<div class="kakijun-picker-header">' +
+      '<div class="kakijun-picker-tabs">' +
+        '<button type="button" class="kakijun-picker-tab ' + (activePickerTab === 'hiragana' ? 'is-active' : '') + '" data-picker-tab="hiragana">Hiragana (46)</button>' +
+        '<button type="button" class="kakijun-picker-tab ' + (activePickerTab === 'katakana' ? 'is-active' : '') + '" data-picker-tab="katakana">Katakana (46)</button>' +
+        '<button type="button" class="kakijun-picker-tab ' + (activePickerTab === 'kanji' ? 'is-active' : '') + '" data-picker-tab="kanji">Kanji N5 (44)</button>' +
+      '</div>' +
+      '<button type="button" class="kakijun-picker-close-btn" id="kakijunPickerCloseBtn" aria-label="' + T('jepang.kakijun-tutup', 'Tutup') + '">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+      '</button>' +
+    '</div>' +
+    '<div class="kakijun-picker-grid">';
+
+    for (var i = 0; i < chars.length; i++) {
+      var ch = chars[i];
+      var isCurrent = (ch === activeChar);
+      html += '<button type="button" class="kakijun-picker-item ' + (isCurrent ? 'is-current' : '') + '" data-char-target="' + ch + '">' + ch + '</button>';
+    }
+    html += '</div>';
+    drawer.innerHTML = html;
+
+    // Attach picker events
+    var closeBtn = drawer.querySelector('#kakijunPickerCloseBtn');
+    if (closeBtn) closeBtn.onclick = function () { togglePicker(false); };
+
+    var tabs = drawer.querySelectorAll('[data-picker-tab]');
+    for (var t = 0; t < tabs.length; t++) {
+      (function (btn) {
+        btn.onclick = function () {
+          setPickerTab(btn.getAttribute('data-picker-tab'));
+        };
+      })(tabs[t]);
+    }
+
+    var items = drawer.querySelectorAll('[data-char-target]');
+    for (var m = 0; m < items.length; m++) {
+      (function (btn) {
+        btn.onclick = function () {
+          var target = btn.getAttribute('data-char-target');
+          setCharacter(target);
+          togglePicker(false);
+        };
+      })(items[m]);
+    }
+  }
+
   function renderMarkup(charData) {
     var c = charData.char;
     var r = charData.romaji;
-    var s = charData.script;
+    var meaning = charData.meaning || '';
     var totalStrokes = charData.strokeCount;
 
     return '<div class="kakijun-overlay" id="kakijunOverlay" role="dialog" aria-modal="true" aria-label="Studio Menulis Huruf Jepang">' +
@@ -480,11 +665,17 @@
         '<div class="kakijun-header">' +
           '<div class="kakijun-header-left">' +
             '<span class="kakijun-badge">Kakijun Studio</span>' +
-            '<h2 class="kakijun-title">Studio Menulis & Urutan Goresan</h2>' +
+            '<h2 class="kakijun-title">' + T('jepang.kakijun-judul', 'Studio Menulis & Urutan Goresan') + '</h2>' +
           '</div>' +
-          '<button type="button" class="kakijun-close-btn" id="kakijunCloseBtn" aria-label="' + T('jepang.kakijun-tutup', 'Tutup Studio') + '">' +
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
-          '</button>' +
+          '<div class="kakijun-header-right">' +
+            '<button type="button" class="kakijun-header-btn" id="kakijunOpenPickerBtn">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' +
+              '<span>' + T('jepang.kakijun-pilih-huruf', 'Pilih Huruf') + '</span>' +
+            '</button>' +
+            '<button type="button" class="kakijun-close-btn" id="kakijunCloseBtn" aria-label="' + T('jepang.kakijun-tutup', 'Tutup Studio') + '">' +
+              '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
         '<div class="kakijun-body">' +
           // Left Panel: Character Profile & Breakdown
@@ -492,9 +683,12 @@
             '<div class="kakijun-char-card">' +
               '<div class="kakijun-char-display">' +
                 '<span class="kakijun-char-glyph" id="kakijunCharGlyph" lang="ja">' + c + '</span>' +
-                '<span class="kakijun-char-romaji" id="kakijunCharRomaji">' + r + '</span>' +
+                '<div class="kakijun-char-meta">' +
+                  '<span class="kakijun-char-romaji" id="kakijunCharRomaji">' + r + '</span>' +
+                  '<span class="kakijun-char-meaning" id="kakijunCharMeaning" style="' + (meaning ? '' : 'display:none;') + '">' + meaning + '</span>' +
+                '</div>' +
               '</div>' +
-              '<small id="kakijunStrokeTotal" style="color:#6E635C;font-weight:700;">' + totalStrokes + ' goresan</small>' +
+              '<small id="kakijunStrokeTotal" style="color:#6E635C;font-weight:700;">' + totalStrokes + ' ' + T('jepang.kakijun-goresan', 'goresan') + '</small>' +
               '<button type="button" class="kakijun-voice-btn" id="kakijunVoiceBtn" aria-label="Dengarkan pengucapan">' +
                 '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>' +
                 '<span>' + T('jepang.kakijun-suara', 'Dengarkan Suara') + '</span>' +
@@ -502,40 +696,46 @@
             '</div>' +
             '<div class="kakijun-mode-switcher">' +
               '<button type="button" class="kakijun-mode-btn ' + (activeMode === 'guided' ? 'is-active' : '') + '" data-kakijun-mode="guided">' +
-                '<span>🎯 Dipandu</span>' +
+                '<span>🎯 ' + T('jepang.kakijun-mode-dipandu', 'Dipandu') + '</span>' +
               '</button>' +
               '<button type="button" class="kakijun-mode-btn ' + (activeMode === 'recall' ? 'is-active' : '') + '" data-kakijun-mode="recall">' +
-                '<span>🧠 Ingatan</span>' +
+                '<span>🧠 ' + T('jepang.kakijun-mode-ingatan', 'Ingatan') + '</span>' +
               '</button>' +
             '</div>' +
             '<div class="kakijun-stroke-list" id="kakijunStrokeList"></div>' +
           '</div>' +
           // Right Panel: Genko Yoshi Canvas Workbench
           '<div class="kakijun-canvas-panel">' +
-            '<div class="kakijun-feedback-bar" id="kakijunFeedback">Goreskan mengikuti nomor dan arah panah</div>' +
+            '<div class="kakijun-feedback-bar" id="kakijunFeedback">' + T('jepang.kakijun-petunjuk-awal', 'Goreskan mengikuti nomor dan arah panah') + '</div>' +
             '<div class="kakijun-canvas-wrapper" id="kakijunCanvasWrap">' +
               '<canvas class="kakijun-canvas" id="kakijunCanvas"></canvas>' +
-              '<svg class="kakijun-guide-overlay" id="kakijunGuideSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>' +
+              '<svg class="kakijun-guide-overlay" id="kakijunGuideSvg" viewBox="0 0 109 109" preserveAspectRatio="none"></svg>' +
             '</div>' +
             '<div class="kakijun-toolbar">' +
+              '<button type="button" class="kakijun-btn kakijun-btn-demo" id="kakijunDemoBtn" aria-label="Lihat contoh animasi goresan">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>' +
+                '<span>' + T('jepang.kakijun-animasi', 'Lihat Contoh') + '</span>' +
+              '</button>' +
               '<button type="button" class="kakijun-btn kakijun-btn-ghost" id="kakijunUndoBtn" aria-label="Batalkan goresan terakhir">' +
                 '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>' +
-                '<span>Urungkan</span>' +
+                '<span>' + T('jepang.kakijun-urungkan', 'Urungkan') + '</span>' +
               '</button>' +
               '<button type="button" class="kakijun-btn kakijun-btn-primary" id="kakijunNextActionBtn">' +
-                '<span>Ulangi dari Awal</span>' +
+                '<span>' + T('jepang.kakijun-ulangi', 'Ulangi dari Awal') + '</span>' +
               '</button>' +
             '</div>' +
             '<div class="kakijun-footer-nav">' +
               '<button type="button" class="kakijun-nav-btn" id="kakijunPrevBtn">' +
-                '<span>← Karakter Sebelumnya</span>' +
+                '<span>' + T('jepang.kakijun-sebelumnya', '← Karakter Sebelumnya') + '</span>' +
               '</button>' +
               '<button type="button" class="kakijun-nav-btn" id="kakijunNextBtn">' +
-                '<span>Karakter Berikutnya →</span>' +
+                '<span>' + T('jepang.kakijun-berikutnya', 'Karakter Berikutnya →') + '</span>' +
               '</button>' +
             '</div>' +
           '</div>' +
         '</div>' +
+        // Character Picker Drawer
+        '<div class="kakijun-picker-drawer" id="kakijunPickerDrawer"></div>' +
       '</div>' +
     '</div>';
   }
@@ -549,9 +749,12 @@
     }
     activeChar = c;
     activeScript = (data && data.script) || script || 'hiragana';
+    activePickerTab = activeScript;
     activeStrokeIndex = 0;
     completedStrokes = [];
     userPoints = [];
+    isDemoPlaying = false;
+    pickerOpen = false;
 
     // Remove existing if any
     close();
@@ -578,9 +781,17 @@
       });
     }
 
+    var pickerBtn = document.getElementById('kakijunOpenPickerBtn');
+    if (pickerBtn) pickerBtn.addEventListener('click', function () {
+      togglePicker();
+    });
+
+    var demoBtn = document.getElementById('kakijunDemoBtn');
+    if (demoBtn) demoBtn.addEventListener('click', playDemoAnimation);
+
     var voiceBtn = document.getElementById('kakijunVoiceBtn');
     if (voiceBtn) voiceBtn.addEventListener('click', function () {
-      speakJapanese(activeChar, (data && data.romaji) || '');
+      speakJapanese(activeChar);
     });
 
     var undoBtn = document.getElementById('kakijunUndoBtn');
@@ -613,10 +824,11 @@
     }
 
     window.addEventListener('resize', setupCanvas);
-    speakJapanese(activeChar, (data && data.romaji) || '');
+    speakJapanese(activeChar);
   }
 
   function close() {
+    stopDemoAnimation();
     window.removeEventListener('resize', setupCanvas);
     var host = document.getElementById('kakijunMountHost');
     if (host) host.remove();
@@ -632,6 +844,8 @@
     setCharacter: setCharacter,
     setMode: setMode,
     resetCanvas: resetCanvas,
+    playDemo: playDemoAnimation,
+    stopDemo: stopDemoAnimation,
     speak: speakJapanese
   };
 
