@@ -22,6 +22,13 @@ export interface VoicePersona {
   accentLabel: string;
   speakingStyle: string;
   systemPrompt: string;
+  personalityTagId?: string;
+  personalityTagTh?: string;
+  openingGreeting?: string;
+  openingGreetingTranslationId?: string;
+  openingGreetingTranslationTh?: string;
+  roastStyleId?: string;
+  roastStyleTh?: string;
 }
 
 export interface VocabPrereqItem {
