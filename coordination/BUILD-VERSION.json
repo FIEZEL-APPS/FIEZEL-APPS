@@ -1,7 +1,7 @@
 {
-  "version": "m025-681",
-  "claimedBy": "branch feat/clean-install-page",
-  "claimedAt": "2026-10-27T17:27:48.996Z",
-  "reason": "refactor(install): streamline cara install page for instant above-the-fold access",
+  "version": "m025-682",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-27T17:43:20.625Z",
+  "reason": "fix(voice-studio): simplifikasi UI/UX kawan bicara dan hapus pill build di header",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

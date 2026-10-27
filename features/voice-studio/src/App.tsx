@@ -624,6 +624,12 @@ export default function App() {
     window.location.reload();
   };
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__fzForceFlushPwaCache = handleForceFlushPwaCache;
+    }
+  }, []);
+
   const handleSelectTargetLang = (lang: TargetLang) => {
     playFiezelSfx('button_tap');
     stopLiveCall();
@@ -2892,16 +2898,6 @@ export default function App() {
               {Math.round(currentMasteryP * 100)}%
             </button>
 
-            <button
-              type="button"
-              onClick={handleForceFlushPwaCache}
-              title="Perbarui & Bersihkan Cache PWA: Klik untuk memuat ulang versi terbaru dan menghapus cache lama secara otomatis."
-              className="px-2 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#8C2233] font-mono text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all"
-            >
-              <RefreshCw className="w-2.5 h-2.5 shrink-0" />
-              <span>{(typeof window !== 'undefined' && (window as any).FIEZEL_PAGE_BUILD) || 'm025-667'}</span>
-            </button>
-
             <a
               href="/api/download-patch"
               download="fiezel-ai-voice-call.patch"
@@ -3222,8 +3218,9 @@ export default function App() {
                           disabled={isLiveConnecting}
                           onClick={() => void startLiveCall()}
                           className="px-4 py-1.5 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-60"
+                          title="Mulai panggilan suara dua arah hands-free (bebas bicara langsung)"
                         >
-                          <Phone className="w-3.5 h-3.5" />
+                          <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                           <span>{isLiveConnecting ? 'Menyambungkan...' : 'Telepon Live'}</span>
                         </button>
                       ) : (
