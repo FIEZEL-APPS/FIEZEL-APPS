@@ -201,6 +201,15 @@
     'onboarding.summary-streak-zero': '0 วัน · เริ่มเลยตอนนี้!',
     'onboarding.btn-start': 'เริ่มเรียน',
     'onboarding.btn-skip': 'ข้าม',
+    'onboarding.checking': 'กำลังตรวจสอบ...',
+    'onboarding.path-choice-title': 'เลือกเส้นทางการเรียนรู้ของคุณ',
+    'onboarding.path-choice-desc': 'เริ่มตั้งแต่พื้นฐานหรือทดสอบระดับเพื่อรับบทเรียนที่พอดีตัว',
+    'onboarding.path-beginner-title': 'เริ่มจากศูนย์',
+    'onboarding.path-beginner-desc': 'เรียนรู้คำศัพท์และไวยากรณ์พื้นฐานทีละขั้นตอน',
+    'onboarding.path-beginner-btn': 'เริ่มจากพื้นฐาน',
+    'onboarding.path-test-title': 'แบบทดสอบวัดระดับ',
+    'onboarding.path-test-desc': 'เพื่อค้นหาระดับเริ่มต้นที่เหมาะสมที่สุดสำหรับคุณ',
+    'onboarding.path-test-btn': 'ทำแบบทดสอบ',
 
     // ---------- coach.* (panel) ----------
     'coach.panel-aria': 'ผู้ช่วยสอน FIEZEL',
@@ -339,6 +348,7 @@
     'onboarding.kerjakan-santai-aja-ini-bukan': '<p class="fiezel-body">ทำแบบสบาย ๆ ได้เลย นี่ไม่ใช่การสอบ — แค่ให้เรารู้จักความสามารถของคุณ</p>',
     'onboarding.me-pakai-namamu-buat-nyapa': '<p class="fiezel-body">เราใช้ชื่อของคุณไว้ทักทายทุกวัน การเรียนจะได้รู้สึกเป็นของคุณเอง</p>',
     'onboarding.nama-this-disimpan-at-hp': '<p class="fiezel-note">ชื่อนี้ถูกเก็บไว้ในมือถือและในบัญชี FIEZEL ของคุณ เพื่อให้ตัวเตือนทักทายคุณได้ และผู้สอน FIEZEL รู้ว่าความก้าวหน้านี้เป็นของใคร สิ่งที่ส่งไปมีแค่ชื่อเล่น ไม่ใช่คำตอบหรือประวัติข้อสอบ เปลี่ยนได้ทุกเมื่อในการตั้งค่า</p>',
+    'onboarding.checking': 'กำลังตรวจสอบ...',
     'onboarding.next': 'ต่อไป',
     'onboarding.next-l523': 'ต่อไป',
     'onboarding.next-l554': 'ต่อไป',

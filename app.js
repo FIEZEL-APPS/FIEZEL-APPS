@@ -8506,6 +8506,29 @@ function afterOnboardingExit(action){try{prefetchPlacementListening()}catch(_){}
      dipasang langkah tujuan dulu tetap menyala dan terbuka DI ATAS soal pertama tes awal -
      dengan tombol "Ikuti ujian A2" yang membawa murid baru ke ujian berpenalti. */
   if(action==='placement'){pendingAfterGate='placement';levelEntryGatePending=''}
+  var obRecord = null;
+  try { obRecord = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); } catch (_) {}
+  const isBeginner = action === 'beginner' || (typeof action === 'object' && action?.via === 'beginner') || (action === 'home' && obRecord?.via === 'beginner');
+  if (isBeginner) {
+    try {
+      if (obRecord && obRecord.via === 'beginner') {
+        obRecord.via = 'beginner_active';
+        localStorage.setItem('fiezel-onboarding-v1', JSON.stringify(obRecord));
+      }
+    } catch (_) {}
+    state.level = 1;
+    state.placementDone = true;
+    state.placementBandLevel = 1;
+    state.streak = Math.max(Number(state.streak)||0, 1);
+    state.gems = (Number(state.gems)||0) + 15;
+    save();
+    try { render(); } catch (_) {}
+    if (!appOpened) openApp();
+    setTimeout(() => {
+      try { startQuickWinLesson(activeTargetLang()); } catch (_) { go('home'); }
+    }, 300);
+    return;
+  }
   /* m025-262 PENDAFTARAN SEKALI: begitu perkenalan selesai, nama yang baru saja diketik
      LANGSUNG menjadi ID online murid. Tidak ada formulir kedua di Pengaturan, di Online &
      Teman, atau di gerbang akun — jalur ini diam kalau offline dan dicoba lagi nanti. */
@@ -8513,9 +8536,10 @@ function afterOnboardingExit(action){try{prefetchPlacementListening()}catch(_){}
   // Peran dari perkenalan: hanya guru terverifikasi yang mendarat di Tutor Action Center.
   // Pengguna tanpa kode undangan diarahkan ke modal aktivasi guru.
   if(action==='home'){try{const role=self.FiezelOnboarding?.storedRole?.(self)||'murid';const verified=isVerifiedTeacher();if(role==='guru'&&!verified){showToast('Akses Guru memerlukan kode undangan resmi.');setTimeout(()=>{try{openFiezelAuthModal('teacher')}catch{}},420)}else{if(state.preferences?.role!==role){state.preferences={...state.preferences,role:verified?role:'murid'};save()}if(role==='guru'&&verified)setTimeout(()=>{try{go('tutor')}catch{}},420)}}catch{}}
-  if(appOpened){if(action==='placement'){/* q19-P2a 2026-08-29: kalau gerbang akun sedang menutup layar, penempatan menunggu lewat pendingAfterGate (jalur 'placement' setelah gate selesai) — memulai kuis di balik gerbang membuat pushLayer ditolak dan mode lesson tidak pernah menyala. */if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>startPlacement();/* v38 2026-08-29: cabang defensif ini dulu memarkir niat di pendingAfterGate yang tak pernah dikonsumsi setelah gerbang turun — sekarang lewat jalur generik runPendingAfterGateFn. */return}pendingAfterGate=null;startPlacement()}else if(action==='classroom')go('classroom');else go('home');return}
-  if(action==='classroom')state.view='classroom';
-  startNotificationInvitation()
+  if(!appOpened)openApp();
+  if(action==='placement'){/* q19-P2a 2026-08-29: kalau gerbang akun sedang menutup layar, penempatan menunggu lewat pendingAfterGate (jalur 'placement' setelah gate selesai) — memulai kuis di balik gerbang membuat pushLayer ditolak dan mode lesson tidak pernah menyala. */if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>startPlacement();/* v38 2026-08-29: cabang defensif ini dulu memarkir niat di pendingAfterGate yang tak pernah dikonsumsi setelah gerbang turun — sekarang lewat jalur generik runPendingAfterGateFn. */return}pendingAfterGate=null;startPlacement();return}
+  if(action==='classroom'){go('classroom');return}
+  go('home');return;
 }
 // m025-80 AUDIT (Bagian 1 + Bagian 6): kesan pertama harus identitas brand, bukan dialog
 // izin. Sebelum ini hanya murid BARU yang melihat splash; murid lama langsung ditabrak
@@ -10692,7 +10716,7 @@ function openKanjiPractice(){
       <span class="skill-badge">${esc(displayLevel(level))} · 漢字 ${kanjiPool.length} KANJI</span>
       <h2>${esc(title)}</h2>
       <p class="muted">${esc(FiezelI18n.t('jepang.kanji-card-note'))}</p>
-      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0;">
+      <div class="kanji-modal-grid">
         ${gridHtml}
       </div>
       <div class="modal-actions" style="margin-top:10px;display:flex;gap:8px;">
@@ -10732,7 +10756,7 @@ function openJlptMoshiPanel(customLevel){
       <span class="skill-badge">${esc(FiezelI18n.t('jepang.moshi-badge',{level:jlptName}))}</span>
       <h2>${esc(title)}</h2>
       <p class="muted">${esc(FiezelI18n.t('jepang.moshi-desc'))}</p>
-      <div style="display:flex;gap:6px;justify-content:center;margin:12px 0;flex-wrap:wrap;">${levelChips}</div>
+      <div class="moshi-level-chips">${levelChips}</div>
       <div class="card" style="margin:14px 0;padding:12px;background:var(--card-bg, #ffffff);">
         <div class="row" style="margin-bottom:6px;"><b>${esc(FiezelI18n.t('jepang.moshi-lbl-level'))}</b><span class="badge" style="font-weight:700;">${esc(jlptName)}</span></div>
         <div class="row" style="margin-bottom:6px;"><b>${esc(FiezelI18n.t('jepang.moshi-lbl-count'))}</b><span>${esc(FiezelI18n.t('jepang.moshi-val-count'))}</span></div>
@@ -11838,6 +11862,7 @@ function todayHomeMarkup(){
   /* Home Cockpit: Render pure daylight Tactile Clay interface directly */
   return `<div class="today-home-cockpit fz-edu-cockpit tactile-home-cockpit">
   ${homeTop}
+  ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
   ${conversationPartnerHomeCardMarkup()}
   ${heroQuestCard}
   ${braincoreHomeCardMarkup()}
@@ -15859,6 +15884,98 @@ function startLevelPractice(level){
   if(!items.length)return showToast(FiezelI18n.t('placement.materi-level-belum-tersedia',{level:level}));
   quizLoop({type:'level',count:Math.min(10,items.length),pool:items,factory:x=>x})
 }
+function startQuickWinLesson(lang) {
+  const targetLang = (lang || activeTargetLang()) === 'ja' ? 'ja' : 'en';
+  let pool = [];
+  if (targetLang === 'ja') {
+    pool = [
+      {
+        id: 'qw-ja-1',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-ja-q1', 'Dengarkan suara dan pilih huruf Hiragana yang tepat: (a)'),
+        options: ['あ (a)', 'い (i)', 'う (u)', 'え (e)'],
+        answerIndex: 0,
+        audio: 'あ',
+        skill: 'hiragana_basics',
+        explanation: t('quiz.quickwin-ja-exp1', 'Huruf あ dibaca a, merupakan huruf vokal pertama dalam bahasa Jepang.')
+      },
+      {
+        id: 'qw-ja-2',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-ja-q2', 'Pilih huruf Hiragana untuk bunyi vokal (i):'),
+        options: ['あ (a)', 'い (i)', 'お (o)', 'か (ka)'],
+        answerIndex: 1,
+        audio: 'い',
+        skill: 'hiragana_basics',
+        explanation: t('quiz.quickwin-ja-exp2', 'Huruf い dibaca i. Huruf ini terdiri dari dua goresan melengkung.')
+      },
+      {
+        id: 'qw-ja-3',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-ja-q3', 'Gabungkan kedua huruf yang baru kamu pelajari: あ (a) + い (i) = あい. Apa arti kata ini?'),
+        options: [t('quiz.quickwin-opt-love', 'Cinta / Kasih sayang'), t('quiz.quickwin-opt-thanks', 'Terima kasih'), t('quiz.quickwin-opt-morning', 'Selamat pagi'), t('quiz.quickwin-opt-water', 'Air')],
+        answerIndex: 0,
+        audio: 'あい',
+        skill: 'hiragana_vocab',
+        explanation: t('quiz.quickwin-ja-exp3', 'Hebat! あい (ai) berarti cinta. Kamu baru saja berhasil membaca kata bahasa Jepang pertamamu!')
+      }
+    ];
+  } else {
+    pool = [
+      {
+        id: 'qw-en-1',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-en-q1', 'Pilih sapaan ramah dalam bahasa Inggris untuk menyapa seseorang:'),
+        options: ['Hello!', 'Goodbye!', 'Never', 'Behind'],
+        answerIndex: 0,
+        audio: 'Hello',
+        skill: 'greetings',
+        explanation: t('quiz.quickwin-en-exp1', 'Hello adalah sapaan paling umum dan ramah untuk menyapa siapa saja.')
+      },
+      {
+        id: 'qw-en-2',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-en-q2', 'Bagaimana cara mengucapkan Selamat Pagi dalam bahasa Inggris?'),
+        options: ['Good evening', 'Good morning', 'Good night', 'Goodbye'],
+        answerIndex: 1,
+        audio: 'Good morning',
+        skill: 'greetings',
+        explanation: t('quiz.quickwin-en-exp2', 'Good morning digunakan untuk mengucapkan selamat pagi sejak terbit matahari hingga tengah hari.')
+      },
+      {
+        id: 'qw-en-3',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-en-q3', 'Ketika seseorang membantumu, apa ungkapan terima kasih yang tepat?'),
+        options: ['Thank you!', 'Excuse me', 'Please', 'Sorry'],
+        answerIndex: 0,
+        audio: 'Thank you',
+        skill: 'polite_expressions',
+        explanation: t('quiz.quickwin-en-exp3', 'Thank you adalah cara paling sopan untuk menunjukkan rasa terima kasih.')
+      }
+    ];
+  }
+  state.quizActive = true;
+  state.quizType = 'quick_win';
+  state.level = 1;
+  state.placementDone = true;
+  state.placementBandLevel = 1;
+  state.streak = Math.max(Number(state.streak)||0, 1);
+  state.gems = (Number(state.gems)||0) + 15;
+  save();
+  quizLoop({
+    type: 'quick_win',
+    count: pool.length,
+    pool: pool,
+    factory: x => x
+  });
+}
+window.startQuickWinLesson = startQuickWinLesson;
 /* ---- m025-118 sesi belajar yang diajar, bukan sekadar dijalankan ---------------------
  *
  * OWNER: "belum sepenuhnya adaptive terhadap user, belum bisa berinteraksi realtime, belum
@@ -16732,6 +16849,13 @@ function quizLoop(cfg){
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
   $('tutorTurn')?.classList.add('hidden');
   document.querySelectorAll('.option').forEach(b=>b.disabled=true);
+  if(Number.isInteger(j) && j >= 0){
+    const pickedOpt = document.querySelectorAll('.option')[j];
+    if(pickedOpt){
+      pickedOpt.classList.add('is-selected', 'picked');
+      pickedOpt.setAttribute('aria-selected', 'true');
+    }
+  }
   /* W1 P1-1: di mode ukur TIDAK ADA yang dibuka — tidak ada sorotan kunci, tidak ada
      vonis, tidak ada pembahasan, tidak ada tombol AI. Hanya tanda terima netral; murid
      lanjut, dan pembahasan lengkap menunggunya di layar hasil (finishQuiz). */
@@ -16741,11 +16865,19 @@ function quizLoop(cfg){
    answer.locked=true;
    $('quizNext').disabled=false;
    showQuizFloatingNext();
+   try {
+     if (feedbackSoundsOn()) uiSfx('click');
+     try { if (navigator.vibrate) navigator.vibrate(15); } catch (_) {}
+     try { pawReact('observing'); } catch (_) {}
+   } catch (_) {}
    try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
    enhanceUI();
    return;
   }
   document.querySelectorAll('.option')[q.answerIndex]?.classList.add('correct');
+  if(!ok && Number.isInteger(j) && j >= 0){
+    document.querySelectorAll('.option')[j]?.classList.add('wrong');
+  }
   const turn=tutorCompose(q,j,ok,answer.scaffold||'tell',forced?'reteach':answer.move,answer.timing);
   const f=$('feedback');f.classList.remove('hidden','feedback-success','feedback-error');f.classList.add(ok?'feedback-success':'feedback-error');
   /* m025-377 (Opsi 1, bagian C): saat jawaban SALAH, tampilkan langsung alasan kenapa pilihan
@@ -17310,6 +17442,11 @@ function quizLoop(cfg){
    answer.locked=true;
    $('quizNext').disabled=false;
    showQuizFloatingNext();
+   try {
+     if (feedbackSoundsOn()) uiSfx('click');
+     try { if (navigator.vibrate) navigator.vibrate(15); } catch (_) {}
+     try { pawReact('observing'); } catch (_) {}
+   } catch (_) {}
    try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
    enhanceUI();
    return;
@@ -17583,7 +17720,7 @@ function finishQuiz(cfg,score,total,tutorReport){
      COMPLETE" di atas skor 17% adalah nada yang berbohong. Ambang ikon/tanda = ambang
      konfeti quizMajorCelebrate di atas (accuracy>=70). Literal vonis & CTA (r2 smoke:
      'Tes level selesai', 'Gerbang lewati materi selesai', 'ditandai selesai') tetap. */
-  const resultProud=accuracy>=70;
+  const resultProud=(cfg.type==='quick_win')||(accuracy>=70);
   /* UX-BRIEF §4 (Layar Kemenangan): satu kartu penuh tanpa scroll - bintang (0-3) animasi,
      ringkasan hadiah (permata sesi ini, benar/total, combo terbaik), CTA "Lanjut Materi Baru"
      ke lesson berikutnya yang terbuka. Rincian analitik (laporan tutor, hasil sesi, ringkasan

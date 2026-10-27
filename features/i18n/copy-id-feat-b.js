@@ -204,6 +204,15 @@
     'onboarding.summary-streak-zero': '0 hari · mulai sekarang!',
     'onboarding.btn-start': 'Mulai Belajar',
     'onboarding.btn-skip': 'Lewati',
+    'onboarding.checking': 'Memeriksa...',
+    'onboarding.path-choice-title': 'Pilih Jalur Belajarmu',
+    'onboarding.path-choice-desc': 'Mulai dari dasar atau ukur kemampuanmu sekarang agar materi langsung pas.',
+    'onboarding.path-beginner-title': 'Mulai dari Nol',
+    'onboarding.path-beginner-desc': 'Pelajari kosakata dan tata bahasa dasar langkah demi langkah.',
+    'onboarding.path-beginner-btn': 'Mulai dari Dasar',
+    'onboarding.path-test-title': 'Tes Penempatan',
+    'onboarding.path-test-desc': 'untuk menemukan level awal yang paling cocok untukmu.',
+    'onboarding.path-test-btn': 'Ikuti Tes Penempatan',
 
     // ---------- features/ui/fiezel-coach-bubble.js (4 titik; 44 lainnya di zona chunk beku, lihat handoff) ----------
     'coach.panel-aria': 'Pembimbing FIEZEL',
@@ -381,6 +390,7 @@
     // features/onboarding/fiezel-onboarding.js:490
     'onboarding.nama-this-disimpan-at-hp': '<p class="fiezel-note">Nama ini disimpan di HP kamu dan di akun FIEZEL kamu, jadi pengingat belajar bisa nyapa kamu dan pengajar FIEZEL tahu kemajuanmu itu punya siapa. Yang ikut cuma nama panggilannya — bukan jawabanmu, bukan riwayat soalmu. Bisa kamu ganti kapan aja di Pengaturan.</p>',
     // features/onboarding/fiezel-onboarding.js:491
+    'onboarding.checking': 'Memeriksa...',
     'onboarding.next': 'Lanjut',
     // features/onboarding/fiezel-onboarding.js:523
     'onboarding.next-l523': 'Lanjut',

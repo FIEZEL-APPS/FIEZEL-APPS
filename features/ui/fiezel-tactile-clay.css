@@ -6028,7 +6028,7 @@ html body #app .grammar-brief-example b{color:#9A3412!important;-webkit-text-fil
        diberi latar krem padat supaya terbaca di panel mana pun;
      - label "Daftar kata tersedia" abu sangat muda (1,48:1);
      - label "PRASASTI BARU" kuning di atas krem (1,29:1). */
-body.fz-lesson-mode .toast,body:has(.quiz-shell) .toast{top:calc(66px + env(safe-area-inset-top));bottom:auto!important}
+body.fz-lesson-mode .toast,body:has(.quiz-shell) .toast{top:auto!important;bottom:calc(84px + env(safe-area-inset-bottom))!important}
 html body #app .path-step .path-node{padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
 html body #app .path-step .path-node .path-ring{width:34px!important;height:34px!important;border-radius:50%!important;flex:none!important}
 html body #app .path-step .path-node .path-ring > b{display:block!important;margin:0!important;padding:0!important;height:auto!important;line-height:1!important;background:none!important;border:0!important;box-shadow:none!important;font-size:14px!important;font-weight:800!important;color:#1F1A14!important;-webkit-text-fill-color:#1F1A14!important}

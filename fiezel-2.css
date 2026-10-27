@@ -93,7 +93,9 @@ body.fz-lux .option.correct,body .option.correct,body.fz-lux .option.correct:dis
 body.fz-lux .option.correct::before,body .option.correct::before{background:var(--good-bright)!important;color:#fff!important;content:"✓"!important}
 body.fz-lux .option.wrong,body .option.wrong,body.fz-lux .option.wrong:disabled,body .option.wrong:disabled{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);box-shadow:0 3px 0 var(--bad)}
 body.fz-lux .option.wrong::before,body .option.wrong::before{background:var(--bad)!important;color:#fff!important;content:"✕"!important}
-body.fz-lux .option:disabled:not(.correct):not(.wrong),body .option:disabled:not(.correct):not(.wrong){opacity:.78;color:var(--muted);box-shadow:none}
+body.fz-lux .option.is-selected,body .option.is-selected,body.fz-lux .option.picked,body .option.picked,body.fz-lux .option.is-selected:disabled,body .option.is-selected:disabled,body.fz-lux .option.picked:disabled,body .option.picked:disabled{opacity:1!important;border-color:#2563EB!important;background:#EFF6FF!important;color:#1E3A8A!important;box-shadow:0 0 0 2px #2563EB,0 4px 12px rgba(37,99,235,.15)!important}
+body.fz-lux .option.is-selected::before,body .option.is-selected::before,body.fz-lux .option.picked::before,body .option.picked::before{background:#2563EB!important;color:#fff!important;box-shadow:0 2px 4px rgba(37,99,235,.3)!important}
+body.fz-lux .option:disabled:not(.correct):not(.wrong):not(.is-selected):not(.picked),body .option:disabled:not(.correct):not(.wrong):not(.is-selected):not(.picked){opacity:.55;color:var(--muted);box-shadow:none}
 body.fz-lux .feedback,body .feedback{border-radius:20px;padding:16px 18px;background:var(--surface-tint);border:1px solid var(--line);font-size:.95rem}
 body.fz-lux .feedback.feedback-success,body .feedback.feedback-success,body.fz-lux .feedback.is-correct,body .feedback.is-correct{background:var(--good-soft);border-color:#CDE9DD}
 body.fz-lux .feedback.feedback-error,body .feedback.feedback-error,body.fz-lux .feedback.is-wrong,body .feedback.is-wrong{background:#FFF5F2;border-color:#F5C6BC}
@@ -410,13 +412,45 @@ html body .ja-kana .kana-tab[aria-selected="true"]{background:var(--accent);colo
 .ja-kotoba-word{margin:14px 0 2px;font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-size:40px;line-height:1.35;color:var(--text)}
 .ja-kotoba-reading{margin:0;font-size:15px;font-weight:700;color:var(--muted)}
 .ja-kotoba-meaning{margin:8px 0 0;font-size:16px;color:var(--text)}
-/* Anotasi soal & jawaban kursus Jepang: romaji duduk di bawah potongan Jepang, bukan menyela. */
-.ja-run{display:inline-flex;flex-direction:column;align-items:flex-start;vertical-align:bottom;line-height:1.5}
-.option .ja-run{align-items:center}
-.ja-run-romaji{font-size:.62em;font-weight:600;letter-spacing:.01em;color:var(--muted);line-height:1.2;margin-top:1px;white-space:normal}
-.ja-quiz-display{display:flex;justify-content:center;margin:8px 0 2px}
+/* Anotasi soal & jawaban kursus Jepang: Furigana & Romaji tertata rapi, elegan, dan terbaca jernih. */
+.ja-run{display:block;width:100%;margin:0 auto;text-align:left;line-height:1.8}
+.ja-run-text{display:block;font-size:1.28rem;line-height:1.85;font-weight:700;color:inherit;letter-spacing:.02em}
+.ja-run-romaji{display:block;margin-top:8px;padding-top:6px;border-top:1px dashed rgba(110,99,92,.25);font-size:.9rem;font-weight:600;font-family:var(--fz-body);color:var(--muted);line-height:1.45;letter-spacing:.01em}
+.ja-blank{display:inline-block;min-width:54px;border-bottom:2.5px solid #2563EB;color:#2563EB;font-weight:800;letter-spacing:2px;padding:0 4px;margin:0 4px;vertical-align:baseline;background:rgba(37,99,235,.06);border-radius:4px 4px 0 0;text-align:center;line-height:1.2}
+
+/* Di dalam tombol pilihan (.option): tata letak vertikal ringkas dan terpusat */
+.option .ja-run{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;width:auto;margin:0;line-height:1.35}
+.option .ja-run-text{display:inline;font-size:1.06rem;line-height:1.35;font-weight:700}
+.option .ja-run-romaji{display:block;margin-top:2px;padding-top:0;border-top:none;font-size:.76rem;line-height:1.2;opacity:.82}
+
+/* Di dalam passage / reading */
+.passage .ja-run{margin-bottom:12px}
+.passage .ja-run:last-child{margin-bottom:0}
+
+/* Toggles & visibilitas */
+.ja-quiz-display{display:flex;justify-content:center;margin:10px 0 4px;position:relative;z-index:10}
 .ja-quiz-display .ja-display{margin:0}
-body.fz-ja-no-romaji .ja-run{display:inline}
+body.fz-ja-no-romaji .ja-run-romaji{display:none!important}
+body.fz-ja-no-romaji .ja-run{line-height:1.6}
+body.fz-ja-no-furigana ruby.ja-word rt,body.fz-ja-no-furigana ruby.ja-word rp{display:none!important}
+
+/* Responsive Quiz Layout: Tablet & Desktop */
+@media (min-width:640px){
+  .quiz-shell{max-width:700px;margin-left:auto;margin-right:auto}
+  .quiz-shell .card{padding:28px 32px;border-radius:24px}
+  .quiz-shell .options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .quiz-shell .options .option{min-height:64px;padding:14px 18px 14px 58px;font-size:1.05rem}
+  .quiz-shell .options .cloze-entry,.quiz-shell .options .token-rail,.quiz-shell .options .token-widget{grid-column:1/-1}
+  .quiz-shell .options .option:nth-child(5):last-child{grid-column:1/-1}
+  .quiz-shell .feedback{grid-column:1/-1}
+}
+@media (min-width:1024px){
+  .quiz-shell{max-width:780px}
+  .quiz-shell .card{padding:34px 38px;border-radius:28px}
+  .quiz-shell .question{font-size:1.55rem;line-height:1.75}
+  .quiz-shell .options{gap:16px}
+  .quiz-shell .options .option{min-height:68px;padding:16px 20px 16px 62px;font-size:1.1rem}
+}
 
 /* ==== Audit F21: desktop bukan ponsel yang dilebarkan (≥1100px) ====
    Kolom konten melebar, rel navigasi kiri MENEMPEL ke tepi kolom (bukan mengambang di tepi
@@ -444,3 +478,245 @@ body.fz-ja-no-romaji .ja-run{display:inline}
 .prasasti-fold[open]>summary svg,.prasasti-fold[open]>summary i{transform:rotate(180deg)}
 @media (prefers-reduced-motion:reduce){.prasasti-fold>summary svg,.prasasti-fold>summary i{transition:none}}
 @media (max-width:1099px){#app .stats > :nth-child(5):last-child:nth-child(odd){grid-column:1/-1}}
+
+
+/* =========================================================================
+   FIEZEL RESPONSIVE MULTI-DEVICE ARCHITECTURE (MOBILE / TABLET / DESKTOP)
+   Empirically certified: zero wasted space, zero mobile stretch, zero desktop squeeze.
+   ========================================================================= */
+
+/* 1. Touch & Anti-Zoom Invariants on Interactive Surfaces */
+.kana-cell,
+.kana-tab,
+.kana-scope-btn,
+.ja-toggle,
+.jlpt-opt-btn,
+.badge-chip,
+.ja-kakijun-banner-btn,
+.launch-card {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 2. Beranda Kursus Jepang (Cockpit Multi-Device Dashboard) */
+@media (min-width: 768px) {
+  html body.fz-lang-ja .home-today .today-home-cockpit,
+  html body:has([data-ja-toggle]) .home-today .today-home-cockpit,
+  .home-today .today-home-cockpit {
+    max-width: 860px !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+    align-items: start !important;
+  }
+  .today-home-cockpit > .fz-home-brand-wrap,
+  .today-home-cockpit > .today-topbar,
+  .today-home-cockpit > .fz-home-topbar,
+  .today-home-cockpit > .ja-kotoba,
+  .today-home-cockpit > .card-hero-quest,
+  .today-home-cockpit > .paw-hero-cockpit {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  html body.fz-lang-ja .home-today .today-home-cockpit,
+  html body:has([data-ja-toggle]) .home-today .today-home-cockpit,
+  .home-today .today-home-cockpit {
+    max-width: 1120px !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 20px !important;
+  }
+  .today-home-cockpit > .ja-kotoba {
+    grid-column: span 12 !important;
+  }
+  .today-home-cockpit > .card-hero-quest {
+    grid-column: span 7 !important;
+  }
+  .today-home-cockpit > .conversation-partner-card,
+  .today-home-cockpit > .bc-home-card {
+    grid-column: span 5 !important;
+  }
+  .today-home-cockpit > .quick-practice-section {
+    grid-column: span 7 !important;
+  }
+  .today-home-cockpit > .progress-card,
+  .today-home-cockpit > .kelasku-card {
+    grid-column: span 5 !important;
+  }
+}
+
+/* 3. Tabel Kana (Gojūon & Dakuon Responsive Split & Scope) */
+.ja-kana-top-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.kana-scope-group {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+}
+.kana-scope-btn {
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: none;
+}
+.kana-scope-btn.is-active,
+.kana-scope-btn[aria-selected="true"] {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+.kana-scope-btn:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ja-kana .kana-cell {
+  aspect-ratio: 1 / 1;
+  max-width: 76px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 900px) {
+  .ja-kana-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) !important;
+    gap: 28px !important;
+    align-items: start !important;
+  }
+  .ja-kana-layout .kana-heading {
+    margin-top: 6px !important;
+  }
+}
+
+/* 4. Modal Bottom Sheet Drawer di Mobile (< 768px) vs Centered Dialog di Tablet & Desktop */
+@media (max-width: 767px) {
+  #modal.modal {
+    align-items: flex-end !important;
+    padding: 0 !important;
+    background: rgba(15, 10, 8, 0.65) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+  #modalPanel.modal-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 24px 24px 0 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    margin: 0 !important;
+    max-height: min(88dvh, 720px) !important;
+    padding: 14px 18px calc(18px + env(safe-area-inset-bottom, 12px)) !important;
+    box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.28) !important;
+    animation: fzBottomSheetUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    touch-action: pan-y !important;
+    box-sizing: border-box !important;
+  }
+  #modalPanel::before {
+    content: "";
+    display: block;
+    width: 38px;
+    height: 4.5px;
+    background: #CBD5E1;
+    border-radius: 999px;
+    margin: 0 auto 12px;
+  }
+  .kanji-modal-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin: 10px 0 !important;
+  }
+  .moshi-level-chips {
+    display: flex !important;
+    gap: 6px !important;
+    justify-content: center !important;
+    margin: 12px 0 !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+@keyframes fzBottomSheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (min-width: 768px) {
+  #modalPanel.modal-panel {
+    width: min(640px, 92vw) !important;
+    max-height: min(780px, 88vh) !important;
+    border-radius: 24px !important;
+    padding: 28px 26px !important;
+    margin: auto !important;
+  }
+  .kanji-modal-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin: 12px 0 !important;
+  }
+  .moshi-level-chips {
+    display: flex !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    margin: 14px 0 !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  #modalPanel.modal-panel {
+    width: min(740px, 86vw) !important;
+  }
+  .kanji-modal-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+}
+
+/* 5. Kakijun Banner Responsiveness */
+@media (max-width: 767px) {
+  .ja-kakijun-banner {
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 10px 14px !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+  .ja-kakijun-icon-bubble {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1.2rem !important;
+    border-radius: 10px !important;
+  }
+  .ja-kakijun-banner-text h3 {
+    font-size: 0.88rem !important;
+    margin: 0 !important;
+  }
+  .ja-kakijun-banner-text p {
+    display: none !important;
+  }
+  .ja-kakijun-banner-btn {
+    padding: 6px 12px !important;
+    font-size: 0.78rem !important;
+    border-radius: 999px !important;
+  }
+}
