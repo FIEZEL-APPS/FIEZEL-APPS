@@ -455,6 +455,7 @@ export async function routeVoiceCopilotAssist(ctx) {
 
   const prompt = [
     `Speech Copilot (${scenarioTitle}). Target: ${langSpec}.`,
+    `Persona & Pedagogy: Witty, lively, tough-love conversational mentor in FIEZEL (ecosystem created by Fitra Rustqi from Banda Aceh; powered by Braincore).`,
     historyLines.length
       ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
       : '',
@@ -463,7 +464,7 @@ export async function routeVoiceCopilotAssist(ctx) {
     excludeList.length
       ? `Do NOT repeat: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
       : '',
-    `Generate 3 natural spoken replies directly answering "${aiText}" (NEVER textbook templates): easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back. Translate "${aiText}" literally into aiMeaning (${targetLocaleName}), and write direct literal first-person translation of each reply in hint (${targetLocaleName}).`,
+    `Generate 3 spontaneous spoken replies directly answering "${aiText}" (natural, conversational, punchy; NEVER textbook templates): easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back. Translate "${aiText}" into aiMeaning (${targetLocaleName}), and write natural first-person translation of each reply in hint (${targetLocaleName}).`,
     `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
   ]
     .filter(Boolean)
@@ -525,12 +526,18 @@ export async function routeVoicePartnerTurn(ctx) {
 
   const prompt = [
     `You are ${personaName} on a live voice call (${scenarioTitle}). Target: ${langSpec}.`,
+    `[FIEZEL ECOSYSTEM]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku cat who loves onigiri. If asked about Fiezel or who made it, answer proudly, enthusiastically, and accurately with witty persona!`,
+    `[PEDAGOGY: GURU KEJAM TAPI BAIK HATI / TOUGH LOVE & TSUNDERE SENSEI]:`,
+    `- Do NOT talk like a stiff, boring textbook robot.`,
+    `- If the learner sounds stiff, robotic ("kanebo kering"), hesitates too long, translates word-by-word, or repeats formal crutches like "watashi wa" over and over: playfully tease/roast their stiff habit with humorous wit (e.g. "Waduh kaku banget kayak kanebo kering!", "Bahasanya kayak robot Google Translate tahun 2010 nih haha", "ちょっと教科書っぽすぎ！もっと自然にいこうよ！").`,
+    `- NEVER insult the learner's person. ALWAYS roast the stiff habit playfully, then IMMEDIATELY provide the crisp, ultra-natural spoken phrase they should use!`,
+    `- When the learner speaks naturally, give proud, gratified praise (e.g. "Nah gitu dong! Keren banget!").`,
     historyLines.length
       ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
       : '',
     `Learner said: "${userText}"`,
-    `1) "aiReply": Reply as ${personaName} in 1-2 short spoken sentences (max 18 words) reacting directly to "${userText}" + a follow-up question. Translate into aiReplyTranslation (${targetLocaleName}).`,
-    `2) "replies": 3 natural spoken replies the learner can say NEXT directly answering your new aiReply (easy=short, mission=detail, rescue=answer+question back; never templates). Translate each in hint (${targetLocaleName}).`,
+    `1) "aiReply": Reply as ${personaName} in 1-2 short spoken sentences (max 18 words) reacting directly with your witty persona to "${userText}" + a follow-up question (no emojis). Translate into aiReplyTranslation (${targetLocaleName}).`,
+    `2) "replies": 3 spontaneous spoken replies the learner can say NEXT directly answering your new aiReply (easy=short, mission=detail, rescue=answer+question back; never static templates). Translate each in hint (${targetLocaleName}).`,
     `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
   ]
     .filter(Boolean)

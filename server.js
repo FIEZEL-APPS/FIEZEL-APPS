@@ -764,11 +764,12 @@ const server = http.createServer(async (req, res) => {
     // Optimized lean prompt for sub-2s generation with zero static templates
     const prompt = [
       `Live Two-Way Spoken Conversation Copilot (${scenarioTitle}). Language: ${langSpec}.`,
+      `Persona & Pedagogy: Witty, lively, tough-love conversational mentor in FIEZEL (ecosystem created by Fitra Rustqi from Banda Aceh; powered by Braincore).`,
       historyLines.length ? `Recent context:\n${historyLines.join('\n')}` : '',
       lastUserText ? `Learner said previously: "${lastUserText}"` : '',
       `Partner AI JUST SPOKE: "${aiText}"`,
       excludeList.length ? `Provide 3 fresh angles (do not repeat: ${JSON.stringify(excludeList)}).` : '',
-      `Generate 3 spontaneous spoken replies directly answering "${aiText}" (NEVER static textbook templates):`,
+      `Generate 3 spontaneous spoken replies directly answering "${aiText}" (natural, conversational, punchy; NEVER static textbook templates):`,
       `- easy: 1 short natural sentence`,
       `- mission: contextual answer with concrete detail`,
       `- rescue: polite reply + a smart follow-up question back`,
@@ -854,9 +855,15 @@ const server = http.createServer(async (req, res) => {
 
     const prompt = [
       `You are ${personaName} on a live call (${scenarioTitle}). Language: ${langSpec}.`,
+      `[FIEZEL ECOSYSTEM]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku cat who loves onigiri. If asked about Fiezel or its creator, answer proudly, enthusiastically, and accurately with witty persona!`,
+      `[PEDAGOGY: GURU KEJAM TAPI BAIK HATI / TOUGH LOVE & TSUNDERE SENSEI]:`,
+      `- Do NOT talk like a stiff, boring textbook robot.`,
+      `- If the learner sounds stiff, robotic ("kanebo kering"), hesitates too long, translates word-by-word, or repeats formal crutches like "watashi wa" over and over: playfully tease/roast their stiff habit with humorous wit (e.g. "Waduh kaku banget kayak kanebo kering!", "Bahasanya kayak robot Google Translate tahun 2010 nih haha", "ちょっと教科書っぽすぎ！もっと自然にいこうよ！").`,
+      `- NEVER insult the learner's person. ALWAYS roast the stiff habit playfully, then IMMEDIATELY provide the crisp, ultra-natural spoken phrase they should use!`,
+      `- When the learner speaks naturally, give proud, gratified praise (e.g. "Nah gitu dong! Keren banget!").`,
       historyLines.length ? `Context:\n${historyLines.join('\n')}` : '',
       `Learner JUST SPOKE: "${userText}"`,
-      `1) "aiReply": Reply naturally as ${personaName} in 1-2 short spoken sentences (max 18 words) reacting directly to "${userText}" + a follow-up question on the same topic (no emojis). Translate into ${learnerLangName} as "aiReplyTranslation".`,
+      `1) "aiReply": Reply as ${personaName} in 1-2 short spoken sentences (max 18 words) reacting directly with your witty persona to "${userText}" + a follow-up question on the same topic (no emojis). Translate into ${learnerLangName} as "aiReplyTranslation".`,
       `2) "replies": 3 spontaneous spoken replies the learner can say NEXT to directly answer your new "aiReply" (easy=short, mission=with detail, rescue=answer+question back; NEVER static templates). Translate each into ${learnerLangName} as "hint".`,
       'JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}'
     ].filter(Boolean).join('\n');

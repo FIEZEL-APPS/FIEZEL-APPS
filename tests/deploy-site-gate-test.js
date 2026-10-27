@@ -157,6 +157,7 @@ function sumberAplikasi() {
   const sapu = (dir, depth) => {
     if (depth > 4 || !fs.existsSync(path.join(ROOT, dir))) return;
     for (const e of fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })) {
+      if (e.name === 'node_modules' || e.name === '.git' || e.name === 'dist') continue;
       const rel = dir + '/' + e.name;
       if (e.isDirectory()) sapu(rel, depth + 1);
       else if (/\.(js|css|json)$/.test(e.name)) fitur.push(rel);

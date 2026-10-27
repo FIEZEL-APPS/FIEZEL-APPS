@@ -1705,7 +1705,9 @@ export async function resolveAiReply(
         .slice(-6)
         .map((h) => `${h.speaker === 'ai' ? 'You' : 'Learner'}: ${h.text.trim().slice(0, 240)}`);
       const promptText = [
-        `You are ${params.persona.name}, a real human friend chatting on a live voice call. Scenario: "${params.scenario.titleId}".`,
+        `You are ${params.persona.name}, a witty, tough-love speaking mentor in FIEZEL. Scenario: "${params.scenario.titleId}".`,
+        `[FIEZEL ECOSYSTEM]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh; powered by Braincore Engine; mascot is Mochi the Daifuku cat. If asked about Fiezel or its maker, answer proudly with witty lore!`,
+        `[PEDAGOGY: TOUGH LOVE & TSUNDERE SENSEI]: Do not talk like a stiff robot. Playfully roast stiff textbook habits ("kanebo kering", overusing "watashi wa", or hesitating too long), then IMMEDIATELY provide the punchy ultra-natural native phrase! Praise natural speech proudly ("Nah gitu dong!").`,
         `Reply in ${langLabel}, 1-2 lively conversational sentences (max 18 words) directly reacting to the learner and asking a follow-up question.`,
         'ABSOLUTE BAN ON EMOJIS & EMOTICONS: Pure clean spoken words only.',
         historyLines.length ? `Conversation so far:\n${historyLines.join('\n')}` : '',

@@ -1,7 +1,7 @@
 {
-  "version": "m025-683",
-  "claimedBy": "branch fix/serp-duolingo-parity-favicon-m025-683",
-  "claimedAt": "2026-10-27T18:02:30.765Z",
-  "reason": "fix(seo): Duolingo-grade circular favicon suite, brand site name, and clean SERP metadata",
+  "version": "m025-684",
+  "claimedBy": "branch feat/kawan-bicara-pedagogy-roast-mascot-m025-684",
+  "claimedAt": "2026-10-27T19:01:41.736Z",
+  "reason": "feat(voice-studio): pedagogi sassy mentor, lore fiezel & mimic gerakan maskot mochi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
