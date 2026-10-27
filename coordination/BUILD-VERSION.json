@@ -1,7 +1,7 @@
 {
-  "version": "m025-679",
-  "claimedBy": "branch feat/seo-geo-aeo-indexing",
-  "claimedAt": "2026-10-27T16:22:33.086Z",
-  "reason": "feat(seo): comprehensive GEO, AEO, and AI search indexing overhaul",
+  "version": "m025-680",
+  "claimedBy": "branch fix/kawan-bicara-kill-offline-templates-m025-679",
+  "claimedAt": "2026-10-27T17:06:21.983Z",
+  "reason": "fix(voice-studio): matikan seluruh proses offline dan hapus template statis",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

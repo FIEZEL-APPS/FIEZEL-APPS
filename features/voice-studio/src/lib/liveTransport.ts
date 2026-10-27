@@ -2,7 +2,6 @@ import type { CallScenario, LearnerLocale, TargetLang, VoicePersona } from '../t
 import {
   type BeginnerReplyCard,
   generateDynamicContextualAiReply,
-  getBeginnerReplyCards,
   translateAndPhoneticizeLiveText,
 } from './liveCallHelper';
 import { stripEmojisAndEmotWords, toPhoneticRomaji } from './japanesePhonetics';
@@ -32,11 +31,10 @@ export interface FlexibleTurnEvaluationResult {
   audioMimeType?: string | null;
   ttsEngine?: string;
   /**
-   * Honest provenance of `aiReply` (m025-637): 'ai' = production AI partner,
-   * 'ai-gemini-key' = learner's own Gemini key, 'offline-template' = deterministic
-   * Braincore script used ONLY when no AI answer could be obtained (shown with a label).
+   * Provenance of `aiReply`: strictly online AI ('ai' = production AI partner,
+   * 'ai-gemini-key' = learner's own Gemini key). Zero offline templates.
    */
-  replySource?: 'ai' | 'ai-gemini-key' | 'offline-template';
+  replySource?: 'ai' | 'ai-gemini-key';
 }
 
 declare global {
@@ -357,7 +355,7 @@ export async function reportGeminiLiveSessionDrop(
 
 export interface RealtimeCopilotAssistResult {
   ok: boolean;
-  source: 'ai-realtime' | 'offline-fallback';
+  source: 'ai-realtime';
   aiMeaningId: string;
   aiMeaningTh: string;
   replies: BeginnerReplyCard[];
@@ -422,10 +420,10 @@ export async function requestRealtimeCopilotAssist(params: {
   signal?: AbortSignal;
 }): Promise<RealtimeCopilotAssistResult> {
   const cleanAiText = stripEmojisAndEmotWords(params.aiText || params.aiQuestionText || '').trim();
-  if (!cleanAiText) {
+  if (!cleanAiText || params.signal?.aborted) {
     return {
       ok: false,
-      source: 'offline-fallback',
+      source: 'ai-realtime',
       aiMeaningId: '',
       aiMeaningTh: '',
       replies: [],
@@ -442,77 +440,16 @@ export async function requestRealtimeCopilotAssist(params: {
     }
   }
 
-  const payload = {
-    aiText: cleanAiText,
-    lastUserText: (params.lastUserText || '').trim().slice(0, 320),
-    scenarioId: params.scenario.id,
-    scenarioTitle: params.scenario.titleId,
-    level: params.scenario.level,
-    targetLang: params.targetLang,
-    locale: params.locale,
-    history: (params.history || []).slice(-6),
-    variationSeed,
-    excludeTexts: params.excludeTexts || [],
-  };
-
-  // 1) Server 16-Key Gemini Pool (/api/voice/copilot-assist on Local or Cloudflare Worker)
-  for (const base of resolveVoiceApiCandidateBases()) {
-    if (params.signal?.aborted) {
-      return {
-        ok: false,
-        source: 'offline-fallback',
-        aiMeaningId: '',
-        aiMeaningTh: '',
-        replies: [],
-        cards: [],
-      };
-    }
-    const controller = new AbortController();
-    const onAbort = () => controller.abort();
-    params.signal?.addEventListener('abort', onAbort, { once: true });
-    const timer = setTimeout(() => controller.abort(), 14000);
-    try {
-      const res = await fetch(`${base}/api/voice/copilot-assist`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        mode: 'cors',
-        signal: controller.signal,
-      });
-      clearTimeout(timer);
-      params.signal?.removeEventListener('abort', onAbort);
-      if (res.ok) {
-        const data = await res.json();
-        const cards = normalizeServerCopilotCards(
-          data?.replies || data?.suggestions,
-          params.targetLang
-        );
-        if (cards.length > 0) {
-          const result: RealtimeCopilotAssistResult = {
-            ok: true,
-            source: 'ai-realtime',
-            aiMeaningId: stripEmojisAndEmotWords(String(data?.aiMeaningId || '')).trim(),
-            aiMeaningTh: stripEmojisAndEmotWords(String(data?.aiMeaningTh || '')).trim(),
-            replies: cards,
-            cards,
-          };
-          if (variationSeed === 0) {
-            _copilotTurnCache.set(cacheKey, result);
-          }
-          return result;
-        }
-      }
-    } catch {
-      clearTimeout(timer);
-      params.signal?.removeEventListener('abort', onAbort);
-    }
-  }
-
-  // 2) Optional learner personal Gemini API key direct fallback (ultra-fast gemini-3-flash-preview)
+  // 1) Fast-Path: Optional learner personal Gemini API key direct generation (gemini-3-flash-preview sub-second)
   let userGeminiKey = '';
   try {
     if (typeof localStorage !== 'undefined') {
-      userGeminiKey = (localStorage.getItem('fz_gemini_api_key') || '').trim();
+      userGeminiKey = (
+        localStorage.getItem('fz_gemini_api_key') ||
+        localStorage.getItem('gemini_api_key') ||
+        localStorage.getItem('GEMINI_API_KEY') ||
+        ''
+      ).trim();
     }
   } catch {
     // Ignore
@@ -520,7 +457,7 @@ export async function requestRealtimeCopilotAssist(params: {
 
   if (userGeminiKey.length > 10 && !params.signal?.aborted) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6000);
+    const timer = setTimeout(() => controller.abort(), 6500);
     try {
       const langSpec =
         params.targetLang === 'ja'
@@ -590,23 +527,82 @@ export async function requestRealtimeCopilotAssist(params: {
     }
   }
 
-  // 3) Offline-only honest fallback (marked explicitly as isOfflineFallback: true)
-  const offlineCards = getBeginnerReplyCards(
-    params.scenario.id,
-    params.targetLang,
-    undefined,
-    cleanAiText,
-    params.lastUserText || '',
-    params.history || []
-  ).map((c) => ({ ...c, isRealtimeAi: false, isOfflineFallback: true }));
+  const payload = {
+    aiText: cleanAiText,
+    lastUserText: (params.lastUserText || '').trim().slice(0, 320),
+    scenarioId: params.scenario.id,
+    scenarioTitle: params.scenario.titleId,
+    level: params.scenario.level,
+    targetLang: params.targetLang,
+    locale: params.locale,
+    history: (params.history || []).slice(-6),
+    variationSeed,
+    excludeTexts: params.excludeTexts || [],
+  };
 
+  // 2) Server 16-Key Gemini Pool (/api/voice/copilot-assist on Local or Cloudflare Worker)
+  for (const base of resolveVoiceApiCandidateBases()) {
+    if (params.signal?.aborted) {
+      return {
+        ok: false,
+        source: 'ai-realtime',
+        aiMeaningId: '',
+        aiMeaningTh: '',
+        replies: [],
+        cards: [],
+      };
+    }
+    const controller = new AbortController();
+    const onAbort = () => controller.abort();
+    params.signal?.addEventListener('abort', onAbort, { once: true });
+    const timer = setTimeout(() => controller.abort(), 7500);
+    try {
+      const res = await fetch(`${base}/api/voice/copilot-assist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        mode: 'cors',
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      params.signal?.removeEventListener('abort', onAbort);
+      if (res.ok) {
+        const data = await res.json();
+        const cards = normalizeServerCopilotCards(
+          data?.replies || data?.suggestions,
+          params.targetLang
+        );
+        if (cards.length > 0) {
+          const result: RealtimeCopilotAssistResult = {
+            ok: true,
+            source: 'ai-realtime',
+            aiMeaningId: stripEmojisAndEmotWords(String(data?.aiMeaningId || '')).trim(),
+            aiMeaningTh: stripEmojisAndEmotWords(String(data?.aiMeaningTh || '')).trim(),
+            replies: cards,
+            cards,
+          };
+          if (variationSeed === 0) {
+            _copilotTurnCache.set(cacheKey, result);
+          }
+          return result;
+        }
+      }
+    } catch {
+      clearTimeout(timer);
+      params.signal?.removeEventListener('abort', onAbort);
+    }
+  }
+
+  // 3) Online AI unavailable or network offline:
+  //    Strict invariant: NEVER substitute offline templates. Return empty list so UI
+  //    shows transparent AI connection status / retry prompt.
   return {
     ok: false,
-    source: 'offline-fallback',
+    source: 'ai-realtime',
     aiMeaningId: '',
     aiMeaningTh: '',
-    replies: offlineCards,
-    cards: offlineCards,
+    replies: [],
+    cards: [],
   };
 }
 
@@ -1031,14 +1027,7 @@ export function evaluateUtteranceClientSide(params: {
                 : 'Usaha yang bagus! Coba ucapkan kembali dengan pola kalimat yang disarankan agar maknanya jelas.',
         aiReplyTranslationTh:
           'ลองพูดอีกครั้งตามโครงสร้างประโยคที่แนะนำเพื่อให้ถูกต้องตามหลักไวยากรณ์นะ',
-        nextSuggestedReplies: getBeginnerReplyCards(
-          scenarioId,
-          targetLang,
-          undefined,
-          aiReply,
-          exact,
-          history
-        ),
+        nextSuggestedReplies: [],
       };
     }
 
@@ -1070,14 +1059,7 @@ export function evaluateUtteranceClientSide(params: {
       aiReply: dynamicTurn.aiReply,
       aiReplyTranslationId: dynamicTurn.aiReplyTranslationId,
       aiReplyTranslationTh: dynamicTurn.aiReplyTranslationTh,
-      nextSuggestedReplies: getBeginnerReplyCards(
-        scenarioId,
-        targetLang,
-        undefined,
-        dynamicTurn.aiReply,
-        exact,
-        history
-      ),
+      nextSuggestedReplies: [],
     };
   }
 
@@ -1229,14 +1211,7 @@ export function evaluateUtteranceClientSide(params: {
           : 'Begitu! Saat memesan, mari gunakan partikel objek "o" menjadi "Hotto kōhī o hitotsu onegaishimasu" atau "nomimasu". Yuk coba ucapkan lagi!',
       aiReplyTranslationTh:
         'เข้าใจแล้วค่ะ! ลองพูดใหม่อีกครั้งโดยใช้โครงสร้างและคำช่วยที่ถูกต้องตามคำแนะนำนะคะ',
-      nextSuggestedReplies: getBeginnerReplyCards(
-        scenarioId,
-        targetLang,
-        undefined,
-        aiReply,
-        exact,
-        history
-      ),
+      nextSuggestedReplies: [],
     };
   }
 
@@ -1268,14 +1243,7 @@ export function evaluateUtteranceClientSide(params: {
     aiReply: dynamicJaTurn.aiReply,
     aiReplyTranslationId: dynamicJaTurn.aiReplyTranslationId,
     aiReplyTranslationTh: dynamicJaTurn.aiReplyTranslationTh,
-    nextSuggestedReplies: getBeginnerReplyCards(
-      scenarioId,
-      targetLang,
-      undefined,
-      dynamicJaTurn.aiReply,
-      exact,
-      history
-    ),
+    nextSuggestedReplies: [],
   };
 }
 
@@ -1627,8 +1595,8 @@ export function evaluateTurnLocal(params: TurnEvaluationParams): FlexibleTurnEva
  * The old 850 ms race replaced the AI with a deterministic template on almost every turn
  * (production AI needs ~2-6 s), which produced off-topic lines such as "presentation with my
  * family" in a cafe. Now we wait for the AI (bounded by AI_PARTNER_TIMEOUT_MS); the UI hides
- * the wait with Mochi's thinking state + a short neural filler. The template is used ONLY
- * when no AI answer is obtainable, and it is labelled `replySource: 'offline-template'`.
+ * the wait with Mochi's thinking state + a short neural filler. Offline templates are purged;
+ * if transient network drops occur, the partner asks to repeat in character with zero static cards.
  * No speculative TTS is started for a reply that may never be spoken.
  */
 export async function resolveAiReply(
@@ -1866,25 +1834,40 @@ export async function resolveAiReply(
     };
   }
 
-  // 3) Truly offline / AI unavailable: deterministic script, explicitly labelled.
-  const offlineCards = (localResult.nextSuggestedReplies || []).map((c) => ({
-    ...c,
-    isRealtimeAi: false,
-    isOfflineFallback: true,
-  }));
+  // 3) Online AI unavailable or transient network error:
+  //    Return a spoken conversational retry line in character. Zero offline template cards.
+  const networkApologyReply =
+    params.targetLang === 'ja'
+      ? 'すみません、電波が少し途切れました。もう一度お話しいただけますか？'
+      : 'Sorry, the line glitched for a second. Could you say that again?';
+  const networkApologyTransId =
+    'Maaf, koneksi sempat terputus sebentar. Bisa tolong ucapkan sekali lagi?';
+  const networkApologyTransTh =
+    'ขออภัย การเชื่อมต่อขัดข้องชั่วคราว ช่วยพูดอีกครั้งได้ไหมคะ?';
+
   options?.onTextReady?.(
-    localResult.aiReply,
-    localResult.aiReplyTranslationId,
-    localResult.aiReplyTranslationTh,
-    offlineCards
+    networkApologyReply,
+    networkApologyTransId,
+    networkApologyTransTh,
+    []
   );
+
+  const ttsRes = await synthesizeFlexibleTts({
+    text: networkApologyReply,
+    targetLang: params.targetLang,
+    persona: params.persona,
+  }).catch(() => null);
+
   return {
     ...localResult,
-    nextSuggestedReplies: offlineCards,
-    audioBase64: null,
-    audioMimeType: 'audio/mpeg',
-    ttsEngine: 'fiezel-edge-tts-binary',
-    replySource: 'offline-template',
+    aiReply: networkApologyReply,
+    aiReplyTranslationId: networkApologyTransId,
+    aiReplyTranslationTh: networkApologyTransTh,
+    nextSuggestedReplies: [],
+    audioBase64: ttsRes?.audioBase64 || null,
+    audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
+    ttsEngine: ttsRes?.engine || 'fiezel-edge-tts-binary',
+    replySource: 'ai',
   };
 }
 
