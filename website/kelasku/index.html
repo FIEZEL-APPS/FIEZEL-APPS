@@ -27,8 +27,8 @@
 <meta name="twitter:description" content="Ruang kerja guru FIEZEL: buat kelas dengan kode unik, tugas kurikulum otomatis tergradasi, dan analitik kompetensi murid.">
 <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/teacher-desktop.png">
 <meta name="twitter:image:alt" content="Dashboard KelasKu untuk Guru">
-<meta name="author" content="FIEZEL">
-<meta name="creator" content="fitrarustqi">
+<meta name="author" content="Fitra Rusdiawan, Athar Rayyan Muhammad, S.Kom.">
+<meta name="creator" content="Fitra Rusdiawan">
 <meta name="publisher" content="FIEZEL">
 <meta name="application-name" content="FIEZEL">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -94,11 +94,29 @@
     "url": "https://fiezel.my.id/kelasku/",
     "isPartOf": {"@id": "https://fiezel.my.id/#app"},
     "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "IDR"
+      "@type": "AggregateOffer",
+      "priceCurrency": "IDR",
+      "lowPrice": "0",
+      "highPrice": "15000",
+      "offerCount": "2",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Akses Tugas Sekolah Murid",
+          "price": "0",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "Lisensi Institusi KelasKu (Sekolah & Bimbel)",
+          "price": "10000",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        }
+      ]
     },
-    "description": "Ruang kerja guru dan manajemen kelas berbasis web untuk menerbitkan tugas adaptif berstandar kurikulum, asesmen ujian berwaktu, dan membaca analitik siswa tanpa koreksi manual."
+    "description": "Ruang kerja guru dan manajemen kelas berbasis web untuk menerbitkan tugas adaptif Kurikulum Nasional, Mode Kelas Tanpa HP (kuis proyektor & LKS cetak A4), otomatisasi draf e-Rapor KKTP, dan analitik kompetensi murid tanpa koreksi manual."
   },
   {
     "@context": "https://schema.org",
@@ -158,6 +176,22 @@
       },
       {
         "@type": "Question",
+        "name": "Apa yang dimaksud dengan Mode Kelas Tanpa HP?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Mode Kelas Tanpa HP adalah fitur khusus KelasKu untuk sekolah yang melarang ponsel di kelas. Guru dapat menjalankan Kuis Proyektor 5 Menit interaktif di layar depan kelas atau mencetak Lembar Kerja Siswa (LKS) PDF A4 ber-QR code untuk asesmen luring tanpa memerlukan ponsel murid."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah KelasKu mendukung penyusunan e-Rapor Kurikulum Merdeka?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya. KelasKu menyediakan generator draf narasi Ketercapaian Kriteria Tujuan Pembelajaran (KKTP) berbasis capaian riil latihan murid yang siap disalin langsung ke berkas e-Rapor sekolah."
+        }
+      },
+      {
+        "@type": "Question",
         "name": "Apa yang dimaksud dengan fitur Pengawasan Fokus (Focus Exit Detection)?",
         "acceptedAnswer": {
           "@type": "Answer",
@@ -185,7 +219,7 @@
         "name": "Apakah KelasKu gratis?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Ya, KelasKu gratis digunakan tanpa biaya lisensi, langganan, ataupun biaya tersembunyi."
+          "text": "Akses tugas sekolah melalui KelasKu gratis selamanya bagi murid dan guru kelas. Untuk sekolah dan bimbingan belajar yang memerlukan lisensi institusi dan analitik menyeluruh, tersedia paket kemitraan terjangkau (Rp 10.000–15.000/murid/bulan)."
         }
       },
       {
@@ -359,6 +393,14 @@
           <h3>Ekspor &amp; Rekapitulasi CSV</h3>
           <p>Guru dapat mengunduh seluruh data kelas, tingkat kehadiran, nilai per skill, dan riwayat tugas ke dalam berkas CSV untuk keperluan arsip administrasi sekolah.</p>
         </div>
+        <div class="card-feat">
+          <h3>Mode Kelas Tanpa HP (No-Phone Mode)</h3>
+          <p>Solusi untuk sekolah yang melarang murid membawa ponsel ke kelas. Guru cukup menyalakan <strong>Kuis Proyektor 5 Menit</strong> interaktif di depan kelas atau mencetak <strong>Lembar Kerja Siswa (LKS) PDF A4 ber-QR code</strong> untuk asesmen luring tanpa memerlukan ponsel murid.</p>
+        </div>
+        <div class="card-feat">
+          <h3>Otomatisasi Draf e-Rapor KKTP</h3>
+          <p>Mengonversi data latihan dan riwayat penguasaan kompetensi murid menjadi draf narasi Ketercapaian Kriteria Tujuan Pembelajaran (KKTP) siap salin untuk e-Rapor Kurikulum Merdeka secara instan.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -507,6 +549,16 @@
       </div>
 
       <div class="faq-card">
+        <h3>Apa yang dimaksud dengan Mode Kelas Tanpa HP?</h3>
+        <p>Mode Kelas Tanpa HP adalah fitur khusus KelasKu untuk sekolah yang melarang ponsel di kelas. Guru dapat menjalankan Kuis Proyektor 5 Menit interaktif di layar depan kelas atau mencetak Lembar Kerja Siswa (LKS) PDF A4 ber-QR code untuk asesmen luring tanpa memerlukan ponsel murid.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Apakah KelasKu mendukung penyusunan e-Rapor Kurikulum Merdeka?</h3>
+        <p>Ya. KelasKu menyediakan generator draf narasi Ketercapaian Kriteria Tujuan Pembelajaran (KKTP) berbasis capaian riil latihan murid yang siap disalin langsung ke berkas e-Rapor sekolah.</p>
+      </div>
+
+      <div class="faq-card">
         <h3>Apa yang dimaksud dengan fitur Pengawasan Fokus (Focus Exit Detection)?</h3>
         <p>Saat murid mengerjakan ujian berwaktu, sistem mencatat jika murid meninggalkan layar atau berpindah ke tab lain. Guru melihat frekuensi dan durasi keluar layar secara faktual tanpa vonis otomatis, sehingga keputusan pedagogis tetap di tangan guru.</p>
       </div>
@@ -523,7 +575,7 @@
 
       <div class="faq-card">
         <h3>Apakah KelasKu gratis?</h3>
-        <p>Ya, KelasKu gratis digunakan tanpa biaya lisensi, langganan, ataupun biaya tersembunyi.</p>
+        <p>Akses tugas sekolah melalui KelasKu gratis selamanya bagi murid dan guru kelas. Untuk sekolah dan bimbingan belajar yang memerlukan lisensi institusi dan analitik menyeluruh, tersedia paket kemitraan terjangkau (Rp 10.000–15.000/murid/bulan).</p>
       </div>
 
       <div class="faq-card">
