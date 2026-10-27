@@ -18,7 +18,7 @@
 
 ## Founder Origin Story & The Core Problem
 
-FIEZEL originated from Fitra Rusdiawan's personal struggle in Banda Aceh when preparing to achieve an IELTS target (~5.0–5.5) for a 2-year Vocational Education and Training (VET) program in Australia. 
+FIEZEL originated from Fitra Rusdiawan's personal struggle in Banda Aceh when preparing to achieve an IELTS target (~5.0–5.5) for a 2-year Vocational Education and Training (VET) program in Australia.
 
 Facing expensive private tutoring costs on one hand, and finding popular commercial apps (such as Duolingo) ineffective on the other—because they forced repetition of known basics, behaved like linear guessing games, and spoon-fed answer keys upon mistakes without explaining the grammatical logic—Fitra designed a pedagogical system focused on authentic understanding:
 1. **Adaptive Difficulty**: Starting from the learner's actual ability level rather than forcing repetitive kindergarten basics.

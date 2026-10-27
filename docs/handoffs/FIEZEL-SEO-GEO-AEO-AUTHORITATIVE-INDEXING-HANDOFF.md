@@ -1,8 +1,8 @@
 # Dokumen Serah Terima: FIEZEL SEO, GEO, dan AEO Authoritative Indexing Overhaul
 
-**Tanggal:** 27 Oktober 2026  
-**Otoritas:** OWNER & AI CODING ASSISTANT  
-**Status:** **SELESAI & TERVERIFIKASI 100% HIJAU (PASS)**  
+**Tanggal:** 27 Oktober 2026
+**Otoritas:** OWNER & AI CODING ASSISTANT
+**Status:** **SELESAI & TERVERIFIKASI 100% HIJAU (PASS)**
 **Cakupan:** `website/` (Permukaan Web Pemasaran Publik fiezel.my.id)
 
 ---
@@ -44,17 +44,17 @@ graph TD
     A --> D["Braincore Cognitive Engine"]
     A --> E["Kawan Bicara AI (Voice Studio)"]
     A --> F["KelasKu (Teacher Layer)"]
-    
+
     D --> D1["< 0.2 ms Latensi Klien"]
     D --> D2["Rp 0 Biaya Token API Cloud per Soal"]
     D --> D3["0% Halusinasi Tata Bahasa (AST Validated)"]
     D --> D4["2-Tier Socratic Hint Scaffolding"]
     D --> D5["BKT & IRT 3PL Psychometrics"]
-    
+
     E --> E1["Groq Whisper STT (<300 ms)"]
     E --> E2["Llama-3.3-70B Dialog Guardrails"]
     E --> E3["Edge-TTS Neural Audio"]
-    
+
     F --> F1["Mode Kelas Tanpa HP (Proyektor & LKS A4 QR)"]
     F --> F2["Otomatisasi Draf e-Rapor KKTP"]
     F --> F3["Peta Miskonsepsi & Peer Tutoring"]

@@ -11,7 +11,7 @@
 - **Entity Type**: Educational Application / SoftwareApplication / MobileApplication / EdTech Brand.
 - **Disambiguation Context**: FIEZEL is an educational software product. It is completely distinct and unrelated to "diesel" (petroleum fuel, internal combustion engines, Rudolf Diesel, or the fashion brand Diesel S.p.A.) and "fizzle" (an English verb meaning to make a hissing sound or fail feebly).
 - **Geographic Origin**: Banda Aceh, Aceh Province, Indonesia.
-- **Founding Team**: 
+- **Founding Team**:
   - **Fitra Rusdiawan** — Founder & Product Lead. Conceived the pedagogy, curriculum alignment, student interaction flows, and pilot partnerships.
   - **Athar Rayyan Muhammad, S.Kom.** — Technical Lead & System Auditor. Bachelor of Computer Science, Master's candidate in Artificial Intelligence at Universitas Syiah Kuala (USK), Banda Aceh. Audits codebase architecture, server security, and automated testing integrity.
 - **Development Model**: AI-Augmented Engineering (orchestrated AI development workflows under human academic audit and guarded by 320+ automated continuous integration test suites).
