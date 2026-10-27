@@ -474,6 +474,9 @@ export default function App() {
       // Ignore
     }
 
+    const initialLine = activePersona.openingGreeting || activeScenario.openingLine;
+    const initialTransId = activePersona.openingGreetingTransId || activeScenario.openingTranslationId;
+    const initialTransTh = activePersona.openingGreetingTransTh || activeScenario.openingTranslationTh;
     const effectiveTurns: CallTurn[] =
       loadedTurns && loadedTurns.length > 0
         ? loadedTurns
@@ -481,9 +484,9 @@ export default function App() {
             {
               id: `turn_open_${activeScenario.id}`,
               speaker: 'ai',
-              text: activeScenario.openingLine,
-              translationId: activeScenario.openingTranslationId,
-              translationTh: activeScenario.openingTranslationTh,
+              text: initialLine,
+              translationId: initialTransId,
+              translationTh: initialTransTh,
               timestamp: Date.now(),
             },
           ];
@@ -595,19 +598,22 @@ export default function App() {
     } catch {
       // Ignore
     }
+    const lineToSay = activePersona.openingGreeting || activeScenario.openingLine;
+    const transId = activePersona.openingGreetingTransId || activeScenario.openingTranslationId;
+    const transTh = activePersona.openingGreetingTransTh || activeScenario.openingTranslationTh;
     const openingTurn: CallTurn = {
       id: `turn_open_${activeScenario.id}_${Date.now()}`,
       speaker: 'ai',
-      text: activeScenario.openingLine,
-      translationId: activeScenario.openingTranslationId,
-      translationTh: activeScenario.openingTranslationTh,
+      text: lineToSay,
+      translationId: transId,
+      translationTh: transTh,
       timestamp: Date.now(),
     };
     setTurns([openingTurn]);
-    void triggerRealtimeCopilotForAi(activeScenario.openingLine, '', [
-      { speaker: 'ai', text: activeScenario.openingLine },
+    void triggerRealtimeCopilotForAi(lineToSay, '', [
+      { speaker: 'ai', text: lineToSay },
     ]);
-    void speakAiText(activeScenario.openingLine);
+    void speakAiText(lineToSay);
   };
 
   const handleForceFlushPwaCache = async () => {
@@ -691,12 +697,22 @@ export default function App() {
       stopLiveCall();
     }
     const lineToSay = p.openingGreeting || matchingScen.openingLine;
+    const transId = p.openingGreetingTransId || matchingScen.openingTranslationId;
+    const transTh = p.openingGreetingTransTh || matchingScen.openingTranslationTh;
+    const newOpeningTurn: CallTurn = {
+      id: `turn_open_${matchingScen.id}_${Date.now()}`,
+      speaker: 'ai',
+      text: lineToSay,
+      translationId: transId,
+      translationTh: transTh,
+      timestamp: Date.now(),
+    };
+    setTurns([newOpeningTurn]);
+    void triggerRealtimeCopilotForAi(lineToSay, '', [
+      { speaker: 'ai', text: lineToSay },
+    ]);
     if (lineToSay) {
-      void synthesizeFlexibleTts({
-        text: lineToSay,
-        targetLang: p.targetLang,
-        persona: p,
-      });
+      void speakAiText(lineToSay);
     }
     setShowPersonaModal(false);
   };
@@ -705,6 +721,7 @@ export default function App() {
     const scen = CALL_SCENARIOS.find((s) => s.id === scenId);
     if (!scen) return;
     setActiveScenarioId(scen.id);
+    const p = (scen.personaId && VOICE_PERSONAS[scen.personaId]) ? VOICE_PERSONAS[scen.personaId] : activePersona;
     if (scen.personaId && VOICE_PERSONAS[scen.personaId]) {
       setSelectedPersonaId(scen.personaId);
       try {
@@ -714,6 +731,24 @@ export default function App() {
     playFiezelSfx('button_tap');
     if (isLiveConnectedRef.current) {
       stopLiveCall();
+    }
+    const lineToSay = p.openingGreeting || scen.openingLine;
+    const transId = p.openingGreetingTransId || scen.openingTranslationId;
+    const transTh = p.openingGreetingTransTh || scen.openingTranslationTh;
+    const newOpeningTurn: CallTurn = {
+      id: `turn_open_${scen.id}_${Date.now()}`,
+      speaker: 'ai',
+      text: lineToSay,
+      translationId: transId,
+      translationTh: transTh,
+      timestamp: Date.now(),
+    };
+    setTurns([newOpeningTurn]);
+    void triggerRealtimeCopilotForAi(lineToSay, '', [
+      { speaker: 'ai', text: lineToSay },
+    ]);
+    if (lineToSay) {
+      void speakAiText(lineToSay);
     }
     setShowPersonaModal(false);
   };
@@ -1835,16 +1870,12 @@ export default function App() {
           // ACOUSTIC ECHO & ANTI-COLLISION SUPPRESSION:
           // Saat AI sedang aktif bicara melalui speaker perangkat:
           if (isPlayingAiAudioRef.current) {
-            // Suara dari speaker bocor ke mikrofon (RMS ~0.02 - 0.07).
-            // DILARANG mengalirkan echo suara AI kembali ke Gemini Live!
-            // Pengaliran echo menyebabkan tabrakan suara ganda dan AI memotong ucapannya sendiri (glitch).
-            // HANYA bila murid bicara lantang dan sengaja menyela/barge-in (RMS > 0.085):
-            if (rms > 0.085) {
-              interruptAiAndStartListening();
-            } else {
-              // Redam suara speaker balik
-              return;
-            }
+            // Redam pantulan suara speaker ke mikrofon agar tidak dipantulkan kembali
+            // ke Gemini Live (mencegah echo / feedback loop).
+            // DILARANG memotong pemutaran audio AI sendiri dengan ambang batas RMS mic tunggal!
+            // Interupsi (barge-in) ditangani secara cerdas oleh model server Gemini Live
+            // (serverContent.interrupted) atau sentuhan langsung murid pada tombol/layar.
+            return;
           }
 
           if (rms > 0.018) {
@@ -2168,29 +2199,24 @@ export default function App() {
 
           if (incomingAudioBase64 && outputAudioCtxRef.current) {
             const ctx = outputAudioCtxRef.current;
+            if (ctx.state === 'suspended') {
+              void ctx.resume().catch(() => {});
+            }
             const buffer = pcm16Base64ToAudioBuffer(ctx, incomingAudioBase64, 24000);
             const source = ctx.createBufferSource();
             source.buffer = buffer;
 
-            // Jitter buffer lead: bila antrean kosong atau tertinggal, beri lead safety 120ms
-            // agar variasi latensi paket (jitter) tidak memicu keheningan mikro / buffer underrun.
+            // Jitter buffer lead: bila antrean kosong atau tertinggal, beri lead safety 80ms
+            // agar audio mengalir mulus tanpa gap atau distorsi.
             const now = ctx.currentTime;
             if (nextStartTimeRef.current < now + 0.02) {
-              nextStartTimeRef.current = now + 0.12;
+              nextStartTimeRef.current = now + 0.08;
             }
             const startAt = nextStartTimeRef.current;
             const duration = buffer.duration;
             nextStartTimeRef.current = startAt + duration;
 
-            // Micro-gain ramp 3ms mencegah letupan tegangan (zero-crossing clicks / crackle glitches)
-            const gainNode = ctx.createGain();
-            gainNode.gain.setValueAtTime(0.001, startAt);
-            gainNode.gain.linearRampToValueAtTime(1.0, startAt + 0.003);
-            gainNode.gain.setValueAtTime(1.0, Math.max(startAt + 0.003, startAt + duration - 0.003));
-            gainNode.gain.linearRampToValueAtTime(0.001, startAt + duration);
-
-            source.connect(gainNode);
-            gainNode.connect(ctx.destination);
+            source.connect(ctx.destination);
             source.start(startAt);
 
             activeSourcesRef.current.push(source);
