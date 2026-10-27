@@ -139,7 +139,7 @@ export default function App() {
   const [showTranslations, setShowTranslations] = useState<boolean>(true);
   const [pttRecordingSec, setPttRecordingSec] = useState<number>(0);
   const [copilotCards, setCopilotCards] = useState<BeginnerReplyCard[]>([]);
-  const [copilotSource, setCopilotSource] = useState<'ai-realtime' | 'offline-fallback' | 'loading'>('loading');
+  const [copilotSource, setCopilotSource] = useState<'ai-realtime' | 'loading'>('loading');
   const [isGeneratingCopilot, setIsGeneratingCopilot] = useState<boolean>(false);
   const [isRefreshingAssist, setIsRefreshingAssist] = useState<boolean>(false);
   const copilotAbortRef = useRef<AbortController | null>(null);
@@ -380,8 +380,13 @@ export default function App() {
         signal: controller.signal,
       });
       if (controller.signal.aborted) return;
-      setCopilotCards(res.replies || res.cards || []);
-      setCopilotSource(res.source);
+      const validCards = (res.replies || res.cards || []).filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
+      if (validCards.length > 0) {
+        setCopilotCards(validCards);
+        setCopilotSource('ai-realtime');
+      } else {
+        setCopilotCards([]);
+      }
     } catch {
       if (controller.signal.aborted) return;
     } finally {
@@ -405,7 +410,15 @@ export default function App() {
         setBrainState(loadBraincoreState());
       }
     };
+    const handleOffline = () => {
+      setStatusBanner(
+        locale === 'th'
+          ? 'ฟีเจอร์คุยสดกับ Fiezel ต้องการการเชื่อมต่ออินเทอร์เน็ตสำหรับการสนทนา AI แบบเรียลไทม์'
+          : 'Kawan Bicara membutuhkan koneksi internet aktif untuk percakapan AI realtime.'
+      );
+    };
     const handleOnline = () => {
+      setStatusBanner(null);
       setBrainState((prev) => {
         void brainSyncFlush(prev).then(({ nextState }) => setBrainState(nextState));
         return prev;
@@ -413,9 +426,14 @@ export default function App() {
     };
     window.addEventListener('storage', handleStorage);
     window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      handleOffline();
+    }
     return () => {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
@@ -1159,11 +1177,18 @@ export default function App() {
           isAiThinkingRef.current = false;
           setIsAiThinking(false);
           if (Array.isArray(suggestions) && suggestions.length > 0) {
-            const isOffline = suggestions.some((c) => c.isOfflineFallback);
-            lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${aiText.trim()}::${exactTranscript}`;
-            setCopilotCards(suggestions);
-            setCopilotSource(isOffline ? 'offline-fallback' : 'ai-realtime');
-            setIsGeneratingCopilot(false);
+            const aiOnly = suggestions.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
+            if (aiOnly.length > 0) {
+              lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${aiText.trim()}::${exactTranscript}`;
+              setCopilotCards(aiOnly);
+              setCopilotSource('ai-realtime');
+              setIsGeneratingCopilot(false);
+            } else {
+              void triggerRealtimeCopilotForAi(aiText, exactTranscript, [
+                ...historyAfterUser,
+                { speaker: 'ai', text: aiText },
+              ]);
+            }
           } else {
             void triggerRealtimeCopilotForAi(aiText, exactTranscript, [
               ...historyAfterUser,
@@ -1219,11 +1244,18 @@ export default function App() {
       }
 
       if (Array.isArray(replyEv.nextSuggestedReplies) && replyEv.nextSuggestedReplies.length > 0) {
-        const isOffline = replyEv.nextSuggestedReplies.some((c) => c.isOfflineFallback);
-        lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${replyEv.aiReply.trim()}::${exactTranscript}`;
-        setCopilotCards(replyEv.nextSuggestedReplies);
-        setCopilotSource(isOffline ? 'offline-fallback' : 'ai-realtime');
-        setIsGeneratingCopilot(false);
+        const aiOnly = replyEv.nextSuggestedReplies.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
+        if (aiOnly.length > 0) {
+          lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${replyEv.aiReply.trim()}::${exactTranscript}`;
+          setCopilotCards(aiOnly);
+          setCopilotSource('ai-realtime');
+          setIsGeneratingCopilot(false);
+        } else if (!textAlreadyShown && replyEv.aiReply) {
+          void triggerRealtimeCopilotForAi(replyEv.aiReply, exactTranscript, [
+            ...historyAfterUser,
+            { speaker: 'ai', text: replyEv.aiReply },
+          ]);
+        }
       } else if (!textAlreadyShown && replyEv.aiReply) {
         void triggerRealtimeCopilotForAi(replyEv.aiReply, exactTranscript, [
           ...historyAfterUser,
@@ -3286,17 +3318,6 @@ export default function App() {
                               ? activeAiSubtitle.translationTh
                               : activeAiSubtitle.translationId}
                           </p>
-                        )}
-
-                        {!liveAiDraft.trim() && lastAiTurn?.replySource === 'offline-template' && (
-                          <span
-                            data-testid="live-hud-offline-label"
-                            className="inline-block px-2.5 py-0.5 rounded-full bg-[#FFF4E0] text-[10px] font-semibold text-[#8A5A00]"
-                          >
-                            {locale === 'th'
-                              ? 'โหมดออฟไลน์ · ประโยคฝึก ไม่ใช่ AI'
-                              : 'Mode offline · kalimat latihan, bukan AI'}
-                          </span>
                         )}
                       </>
                     )}

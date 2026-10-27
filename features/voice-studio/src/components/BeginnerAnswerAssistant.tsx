@@ -13,7 +13,7 @@ export interface BeginnerAnswerAssistantProps {
   aiQuestionTranslation: string;
   lastUserText?: string;
   cards: BeginnerReplyCard[];
-  copilotSource?: 'ai-realtime' | 'offline-fallback' | 'loading';
+  copilotSource?: 'ai-realtime' | 'loading';
   isGeneratingCopilot?: boolean;
   isLiveConnected: boolean;
   isRecordingPtt: boolean;
@@ -61,20 +61,18 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
 
   // Keep current teleprompter steady while learner is actively recording speech aloud
   const showLoadingState =
-    !isRecordingPtt && (isGeneratingCopilot || isRefreshingAssist || (!activeCard && isAnalyzingTurn));
+    !isRecordingPtt && (isGeneratingCopilot || isRefreshingAssist || copilotSource === 'loading' || (!activeCard && isAnalyzingTurn));
 
   if (!showLoadingState && !activeCard) {
     return null;
   }
-
-  const isOfflineCard = copilotSource === 'offline-fallback' || Boolean(activeCard?.isOfflineFallback);
 
   // Mode Sembunyikan: Tampilan ringkas agar panggung & avatar lawan bicara terlihat bebas leluasa
   if (isCollapsed) {
     return (
       <section
         data-testid="beginner-answer-assistant"
-        data-copilot-source={showLoadingState ? 'loading' : isOfflineCard ? 'offline-fallback' : 'ai-realtime'}
+        data-copilot-source={showLoadingState ? 'loading' : 'ai-realtime'}
         data-copilot-collapsed="true"
         aria-label="Layar Bantuan Jawaban Natural (Disembunyikan)"
         className="w-full"
@@ -130,7 +128,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
   return (
     <section
       data-testid="beginner-answer-assistant"
-      data-copilot-source={showLoadingState ? 'loading' : isOfflineCard ? 'offline-fallback' : 'ai-realtime'}
+      data-copilot-source={showLoadingState ? 'loading' : 'ai-realtime'}
       data-copilot-collapsed="false"
       aria-label="Sini, biar Fiezel bantuin kamu jawab lebih natural"
       className="w-full space-y-1.5"
@@ -155,24 +153,18 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0 ${
               showLoadingState
                 ? 'bg-[#FFF4DB] text-[#8A5A00]'
-                : isOfflineCard
-                  ? 'bg-[#F3ECE0] text-[#6E5E47]'
-                  : 'bg-[#E9F7F0] text-[#1F6E50]'
+                : 'bg-[#E9F7F0] text-[#1F6E50]'
             }`}
           >
             <span
               className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                 showLoadingState
                   ? 'bg-[#E6A800] animate-ping'
-                  : isOfflineCard
-                    ? 'bg-[#8C7E6A]'
-                    : 'bg-[#2E8B69]'
+                  : 'bg-[#2E8B69]'
               }`}
             />
             {showLoadingState ? (
               <span>{locale === 'th' ? 'กำลังสร้าง...' : 'Meracik AI...'}</span>
-            ) : isOfflineCard ? (
-              <span>{locale === 'th' ? 'ออฟไลน์' : 'Cadangan Offline'}</span>
             ) : (
               <>
                 <span className="sm:hidden">{locale === 'th' ? 'AI สด' : 'AI Realtime'}</span>

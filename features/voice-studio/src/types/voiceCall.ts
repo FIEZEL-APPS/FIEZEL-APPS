@@ -99,8 +99,8 @@ export interface CallTurn {
   hintsUsed?: number;
   speakingDurationSec?: number;
   diagnosis?: TurnDiagnosis;
-  /** m025-637: honest provenance of an AI line ('ai' | 'ai-gemini-key' | 'offline-template'). */
-  replySource?: 'ai' | 'ai-gemini-key' | 'offline-template';
+  /** Provenance of an AI line: strictly online AI ('ai' via 16-key pool or 'ai-gemini-key' via learner key). */
+  replySource?: 'ai' | 'ai-gemini-key';
 }
 
 export interface SpeakingSessionMetric {
