@@ -1,57 +1,64 @@
-/* Fiezel Kakijun Studio Data - Standard Japanese Stroke Order Vector Bank */
+/* ==========================================================================
+   FIEZEL KAKIJUN DATA (書き順 / Japanese Stroke Order Master Vector Bank)
+   Authentic MEXT-standard vector paths for Hiragana, Katakana, and JLPT Kanji.
+   Vector data derived from KanjiVG (http://kanjivg.tagaini.net)
+   Copyright (C) 2009-2026 Ulrich Apel and contributors.
+   Licensed under Creative Commons Attribution-Share Alike 3.0 (CC BY-SA 3.0).
+   Coordinate System: SVG 109x109 viewBox standard.
+   ========================================================================== */
 (function(root) {
   'use strict';
+
   var STROKES = {
   "あ": {
     "char": "あ",
     "romaji": "a",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik garis mendatar dari kiri ke kanan dengan sedikit melengkung",
-        "hintTh": "ลากเส้นแนวนอนจากซ้ายไปขวา",
+        "d": "M31.01,33c0.88,0.88,2.75,1.82,5.25,1.75c8.62-0.25,20-2.12,29.5-4.25c1.51-0.34,4.62-0.88,6.62-0.5",
         "start": [
-          24,
-          32
+          31.01,
+          33
         ],
-        "end": [
-          76,
-          28
+        "numPos": [
+          22.51,
+          35
         ],
-        "direction": "right",
-        "d": "M 24,32 Q 50,30 76,28"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis vertikal sedikit melengkung memotong garis pertama",
-        "hintTh": "ลากเส้นแนวตั้งตัดกับเส้นแรก",
+        "d": "M49.76,17.62c0.88,1,1.82,3.26,1.38,5.25c-3.75,16.75-6.25,38.13-5.13,53.63c0.41,5.7,1.88,10.88,3.38,13.62",
         "start": [
-          50,
-          16
+          49.76,
+          17.62
         ],
-        "end": [
-          46,
-          84
+        "numPos": [
+          41.51,
+          19
         ],
-        "direction": "down",
-        "d": "M 50,16 Q 48,50 46,84"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Lengkungkan spiral memutar dari tengah ke bawah lalu melingkar",
-        "hintTh": "สร้างส่วนโค้งวนเป็นวงกลม",
+        "d": "M65.63,44.12c0.75,1.12,1.16,4.39,0.5,6.12c-4.62,12.26-11.24,23.76-25.37,35.76c-6.86,5.83-15.88,3.75-16.25-8.38c-0.34-10.87,13.38-23.12,32.38-26.74c12.42-2.37,27,1.38,30.5,12.75c4.05,13.18-3.76,26.37-20.88,30.49",
         "start": [
-          36,
-          44
+          65.63,
+          44.12
         ],
-        "end": [
-          42,
-          60
+        "numPos": [
+          57.51,
+          42
         ],
-        "direction": "loop",
-        "d": "M 36,44 C 24,70 56,88 78,64 C 88,48 64,44 42,60"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -59,37 +66,37 @@
     "char": "い",
     "romaji": "i",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik garis lengkung ke bawah di kiri, lalu buat sentakan kecil (hane) ke atas",
-        "hintTh": "ลากเส้นโค้งลงทางซ้ายแล้วสะบัดขึ้นเล็กน้อย",
+        "d": "M21.5,29.66c2.01,2.17,2.61,4.68,2.17,7.43c-3.09,19.16-1.03,32.01,7.93,41.45c6.12,6.45,6.26,3.14,7.04-5.21",
         "start": [
-          30,
-          26
+          21.5,
+          29.66
         ],
-        "end": [
-          34,
-          76
+        "numPos": [
+          14.96,
+          27.13
         ],
-        "direction": "down",
-        "d": "M 30,26 C 26,50 28,68 34,76"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis lengkung lebih pendek di sisi kanan dari atas ke bawah",
-        "hintTh": "ลากเส้นโค้งสั้นกว่าทางด้านขวาจากบนลงล่าง",
+        "d": "M72.96,36.51c9.44,8.05,17.79,18.82,18.41,33.83",
         "start": [
-          68,
-          34
+          72.96,
+          36.51
         ],
-        "end": [
-          74,
-          66
+        "numPos": [
+          62.21,
+          32.88
         ],
-        "direction": "down",
-        "d": "M 68,34 Q 72,50 74,66"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -97,37 +104,37 @@
     "char": "う",
     "romaji": "u",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik titik/garis pendek miring di bagian atas",
-        "hintTh": "ลากเส้นเฉียงสั้นๆ ด้านบน",
+        "d": "M42,15.5c5.62,2.12,9.62,3,12.88,3c8.27,0,8,1.12-0.38,5.5",
         "start": [
           42,
-          20
+          15.5
         ],
-        "end": [
-          58,
-          26
+        "numPos": [
+          33.5,
+          14.13
         ],
-        "direction": "right",
-        "d": "M 42,20 Q 50,22 58,26"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Mulai dari kiri atas, buat lengkungan besar ke kanan lalu turun membulat ke bawah",
-        "hintTh": "ลากเส้นโค้งใหญ่ไปทางขวาแล้วโค้งลงด้านล่าง",
+        "d": "M33,42.38c2.12,1.12,4.12,2.88,8.5,1.38c4.38-1.5,12.75-7.12,18.5-7c5.75,0.12,10.25,5,10.25,18c0,15.49-8.25,30.24-24.37,41.24",
         "start": [
-          34,
-          38
+          33,
+          42.38
         ],
-        "end": [
-          42,
-          82
+        "numPos": [
+          28.75,
+          39.63
         ],
-        "direction": "curve_right",
-        "d": "M 34,38 C 72,32 78,64 42,82"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -135,37 +142,37 @@
     "char": "え",
     "romaji": "e",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik titik miring pendek di bagian atas",
-        "hintTh": "ลากเส้นเฉียงสั้นๆ ด้านบน",
+        "d": "M40.52,13.25c5.62,2.12,10,3,14.12,3c8.27,0,8,1.12-0.38,5.5",
         "start": [
-          44,
-          20
+          40.52,
+          13.25
         ],
-        "end": [
-          56,
-          26
+        "numPos": [
+          33.9,
+          13.5
         ],
-        "direction": "right",
-        "d": "M 44,20 Q 50,23 56,26"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis zig-zag: miring ke bawah, lalu naik mendatar, lalu gelombang ke kanan",
-        "hintTh": "ลากเส้นซิกแซกโค้งเหมือนคลื่น",
+        "d": "M32.52,45.12c1.88,1.25,4.5,1.75,7.38,0.62c3.29-1.29,17-7.88,21.25-9.88c4.25-2,8.32,0.04,4.38,4.62c-12.26,14.27-27.26,31.52-39.51,44.4c-3.26,3.42-0.58,3.54,1.5,1.37c13.5-14.12,18.12-20.12,23.62-20.12c7.13,0,3.5,16.75,6.75,22.38c3.25,5.63,19.12,3.75,26.12,2.12",
         "start": [
-          32,
-          42
+          32.52,
+          45.12
         ],
-        "end": [
-          78,
-          80
+        "numPos": [
+          25.15,
+          44.38
         ],
-        "direction": "zigzag",
-        "d": "M 32,42 L 56,38 L 34,76 Q 54,66 72,74 L 78,80"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -173,52 +180,51 @@
     "char": "お",
     "romaji": "o",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis mendatar pendek dari kiri ke kanan",
-        "hintTh": "ลากเส้นแนวนอนสั้นๆ จากซ้ายไปขวา",
+        "d": "M22.88,35.12c1.38,1,3.62,2.38,6,2.12c2.38-0.26,19.62-5.12,21.12-5.74c1.5-0.62,4-1.25,5.88-2",
         "start": [
-          24,
-          36
+          22.88,
+          35.12
         ],
-        "end": [
-          62,
-          34
+        "numPos": [
+          17.25,
+          34.88
         ],
-        "direction": "right",
-        "d": "M 24,36 L 62,34"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis turun vertikal, buat simpul kecil ke kiri, lalu lengkungkan membulat ke kanan",
-        "hintTh": "ลากลงมาทำห่วงเล็กๆ แล้วโค้งออกไปทางขวา",
+        "d": "M41.5,16.12c2.25,1,3.59,4.39,3.12,7.38c-2.5,16.12-3.37,45.53-2.25,58.38c0.75,8.62-0.64,10.45-7.12,7.12c-5.13-2.62-13.75-8-13.75-12.38c0-7.5,24.38-23.62,44.75-23.62c17.25,0,25,8.25,25,17.25c0,8.25-9.38,18.88-26.75,21",
         "start": [
-          46,
-          20
+          41.5,
+          16.12
         ],
-        "end": [
-          44,
-          76
+        "numPos": [
+          32.75,
+          16.63
         ],
-        "direction": "loop",
-        "d": "M 46,20 L 46,62 C 46,74 32,70 36,58 C 42,46 76,52 74,74 C 70,84 56,84 44,76"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Tambahkan titik miring di kanan atas",
-        "hintTh": "แต้มจุดเฉียงที่ด้านขวาบน",
+        "d": "M73,22.12c5.38,2.62,8.88,5.88,10.62,8.25c2.27,3.08,0.38,4.5-1.12,5",
         "start": [
-          70,
-          28
+          73,
+          22.12
         ],
-        "end": [
-          80,
-          38
+        "numPos": [
+          64.38,
+          21.63
         ],
-        "direction": "down_right",
-        "d": "M 70,28 Q 76,34 80,38"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -226,52 +232,51 @@
     "char": "か",
     "romaji": "ka",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik garis melintang ke kanan, tekuk ke bawah dengan sedikit sentakan",
-        "hintTh": "ลากเส้นไปทางขวา หักมุมลงแล้วสะบัดขึ้น",
+        "d": "M24.62,38.62c1.88,1.62,4.65,2.33,8.62,1c25.5-8.5,29.5-4.13,29.5,7.62c0,9.38-1.24,17.46-4.25,25.25c-7.62,19.76-10.87,17.39-16.12,10.89",
         "start": [
-          24,
-          38
+          24.62,
+          38.62
         ],
-        "end": [
-          50,
-          78
+        "numPos": [
+          16.75,
+          37.38
         ],
-        "direction": "hook",
-        "d": "M 24,38 L 54,34 Q 62,34 60,46 L 50,78"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis lengkung melintasi goresan pertama dari atas ke kiri bawah",
-        "hintTh": "ลากเส้นโค้งตัดเส้นแรกจากบนลงล่างซ้าย",
+        "d": "M48.5,17.5c1,1.38,1.29,4.7,0.5,7.12c-5,15.25-18.02,40.93-19.62,43.88c-3.12,5.75-6.38,11.88-9.38,16.25",
         "start": [
-          38,
-          22
+          48.5,
+          17.5
         ],
-        "end": [
-          30,
-          80
+        "numPos": [
+          39.75,
+          16
         ],
-        "direction": "down_left",
-        "d": "M 38,22 Q 36,52 30,80"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Beri titik goresan miring di kanan atas",
-        "hintTh": "แต้มจุดเฉียงที่ด้านขวาบน",
+        "d": "M77.37,31.62c7.5,6.88,13.25,15.75,15,24.88",
         "start": [
-          72,
-          30
+          77.37,
+          31.62
         ],
-        "end": [
-          82,
-          42
+        "numPos": [
+          70,
+          29.75
         ],
-        "direction": "down_right",
-        "d": "M 72,30 Q 78,36 82,42"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -279,67 +284,65 @@
     "char": "き",
     "romaji": "ki",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 4,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal atas agak miring ke atas",
-        "hintTh": "ลากเส้นแนวนอนเส้นบนเฉียงขึ้นเล็กน้อย",
+        "d": "M30.5,30.25c1.88,0.75,4.64,1.06,5.88,0.88c6.75-1,22.25-4.5,26.5-6c2.17-0.76,3.5-1.25,4.88-2.12",
         "start": [
-          30,
-          32
+          30.5,
+          30.25
         ],
-        "end": [
-          70,
-          26
+        "numPos": [
+          24.5,
+          29.5
         ],
-        "direction": "right",
-        "d": "M 30,32 L 70,26"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal kedua di bawahnya sejajar",
-        "hintTh": "ลากเส้นแนวนอนเส้นที่สองขนานกัน",
+        "d": "M36.25,48.7c2.01,0.85,4.97,1.2,6.29,0.99c7.23-1.13,23.82-5.09,28.37-6.79c2.32-0.86,3.75-1.41,5.22-2.4",
         "start": [
-          26,
-          46
+          36.25,
+          48.7
         ],
-        "end": [
-          74,
-          40
+        "numPos": [
+          28.13,
+          48.13
         ],
-        "direction": "right",
-        "d": "M 26,46 L 74,40"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Tarik garis diagonal memotong kedua garis lalu buat sentakan ke kiri",
-        "hintTh": "ลากเส้นทแยงตัดทั้งสองเส้นแล้วสะบัดไปทางซ้าย",
+        "d": "M42,14.12c1.5,0.88,3.13,2.94,4,5.12c5.5,13.76,16,29.26,26.37,40.76c7.64,8.47,9.12,9.38-6,3.88",
         "start": [
-          56,
-          16
-        ],
-        "end": [
           42,
-          64
+          14.12
         ],
-        "direction": "down_left",
-        "d": "M 56,16 L 44,60 Q 42,64 36,62"
+        "numPos": [
+          32.5,
+          13
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       },
       {
         "order": 4,
-        "hint": "Lengkungkan senyum terbuka di bawah",
-        "hintTh": "สร้างเส้นโค้งด้านล่าง",
+        "d": "M33.75,83.25c10.62,9.75,27.25,8.62,38.12,5",
         "start": [
-          36,
-          72
+          33.75,
+          83.25
         ],
-        "end": [
-          64,
-          76
+        "numPos": [
+          24.5,
+          77
         ],
-        "direction": "curve_right",
-        "d": "M 36,72 Q 48,84 64,76"
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
       }
     ]
   },
@@ -347,22 +350,23 @@
     "char": "く",
     "romaji": "ku",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis diagonal ke kiri bawah lalu tekuk ke kanan bawah (sudut lancip)",
-        "hintTh": "ลากเส้นทแยงลงซ้ายแล้วหักมุมเฉียงลงขวา",
+        "d": "M60.66,15c0.5,1.62,0.35,5.44-1,7.38c-6.75,9.62-14.3,19.08-18.62,24.5c-4,5-3.79,7.03-0.88,11c5.5,7.5,12.75,18.75,17.62,27.25c1.48,2.59,2.75,4.75,4.5,8.62",
         "start": [
-          64,
-          20
+          60.66,
+          15
         ],
-        "end": [
-          66,
-          80
+        "numPos": [
+          53.66,
+          12.38
         ],
-        "direction": "angle",
-        "d": "M 64,20 L 32,50 L 66,80"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -370,52 +374,51 @@
     "char": "け",
     "romaji": "ke",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik garis vertikal di kiri dengan sentakan kecil di ujung bawah",
-        "hintTh": "ลากเส้นแนวตั้งทางซ้ายแล้วสะบัดขึ้นเล็กน้อย",
+        "d": "M24.67,19.75c1.25,1.5,2.62,3.75,2.12,6.38c-3,15.88-6.5,29.5-4.88,44.62c2.02,18.84,2.25,4.75,6.75-3.5",
         "start": [
-          30,
-          24
+          24.67,
+          19.75
         ],
-        "end": [
-          28,
-          76
+        "numPos": [
+          16.3,
+          18.75
         ],
-        "direction": "down",
-        "d": "M 30,24 Q 28,52 28,76"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis horizontal di kanan atas",
-        "hintTh": "ลากเส้นแนวนอนด้านขวาบน",
+        "d": "M53.67,38.62c2.12,1.38,4.28,1.89,6.88,1.5c8.25-1.25,15.39-2.57,20.62-4c2.76-0.74,5.26-1.12,6.88-1.12",
         "start": [
-          48,
-          36
+          53.67,
+          38.62
         ],
-        "end": [
-          76,
-          32
+        "numPos": [
+          46.68,
+          36.88
         ],
-        "direction": "right",
-        "d": "M 48,36 L 76,32"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Tarik garis vertikal memotong garis kedua dan melengkung lembut ke kiri bawah",
-        "hintTh": "ลากเส้นแนวตั้งตัดเส้นที่สองแล้วโค้งลงซ้าย",
+        "d": "M71.67,14.38c2.13,1.37,2.88,3.35,2.88,5.12c0,11.62,0.12,20.38,0.12,30.12c0,20.75-0.62,30.88-12.5,42.25",
         "start": [
-          64,
-          20
+          71.67,
+          14.38
         ],
-        "end": [
-          56,
-          82
+        "numPos": [
+          64.05,
+          13.25
         ],
-        "direction": "down_left",
-        "d": "M 64,20 Q 64,52 56,82"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -423,37 +426,37 @@
     "char": "こ",
     "romaji": "ko",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal atas melengkung sedikit dengan sentakan kecil di kanan",
-        "hintTh": "ลากเส้นแนวนอนด้านบนแล้วสะบัดเบาๆ",
+        "d": "M34.75,26.75c1.12,0.88,2.91,2.01,6,1.5c7.62-1.25,14.11-2.56,22.38-2.62c15.5-0.12,5.88,5-5.75,9",
         "start": [
-          32,
-          34
+          34.75,
+          26.75
         ],
-        "end": [
-          68,
-          32
+        "numPos": [
+          28,
+          25.88
         ],
-        "direction": "right",
-        "d": "M 32,34 Q 50,30 68,32"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal bawah melengkung lembut membentuk mangkok datar",
-        "hintTh": "ลากเส้นแนวนอนด้านล่างโค้งรับ",
+        "d": "M30,68.12c2.25,14.5,15.26,17.96,31,16.75c6.5-0.5,11.88-1.25,17.62-2.88",
         "start": [
           30,
-          70
+          68.12
         ],
-        "end": [
-          70,
-          68
+        "numPos": [
+          23.75,
+          68.13
         ],
-        "direction": "right",
-        "d": "M 30,70 Q 52,74 70,68"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -461,52 +464,51 @@
     "char": "さ",
     "romaji": "sa",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar agak naik ke kanan",
-        "hintTh": "ลากเส้นแนวนอนเฉียงขึ้นทางขวา",
+        "d": "M27,38.9c2.42,1.33,5.38,1.47,8.32,1.06c8.79-1.24,28.67-7.76,34.15-10.43c2.79-1.36,3.78-1.91,6.28-3.53",
         "start": [
-          28,
-          36
+          27,
+          38.9
         ],
-        "end": [
-          72,
-          28
+        "numPos": [
+          21.25,
+          38.5
         ],
-        "direction": "right",
-        "d": "M 28,36 L 72,28"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis diagonal memotong garis pertama dengan sentakan di kiri bawah",
-        "hintTh": "ลากเส้นทแยงตัดเส้นแรกแล้วสะบัดปลาย",
+        "d": "M41.5,13.88c1.5,0.88,3.63,2.94,4.5,5.12c5.5,13.75,15.25,27.62,26.87,39.5c7.98,8.15,6.38,10-6,3.12",
         "start": [
-          56,
-          18
+          41.5,
+          13.88
         ],
-        "end": [
-          42,
-          60
+        "numPos": [
+          32,
+          13
         ],
-        "direction": "down_left",
-        "d": "M 56,18 L 44,56 Q 42,60 38,58"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Lengkungan melingkar terbuka di bawah",
-        "hintTh": "ลากเส้นโค้งด้านล่าง",
+        "d": "M35.25,80.5c4.5,11.75,20.88,12.5,38.38,7.5",
         "start": [
-          34,
-          68
+          35.25,
+          80.5
         ],
-        "end": [
-          66,
-          74
+        "numPos": [
+          28.25,
+          77
         ],
-        "direction": "curve_right",
-        "d": "M 34,68 Q 48,84 66,74"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -514,22 +516,23 @@
     "char": "し",
     "romaji": "shi",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis vertikal dari atas lalu melengkung ke kanan seperti kait pancing",
-        "hintTh": "ลากตรงลงมาแล้วโค้งขึ้นขวาเหมือนเบ็ดตกปลา",
+        "d": "M39.12,17.5c1.25,3.12,0.93,6.74,0.38,10.25c-2.12,13.5-3,26.5-3,39.12c0,27.38,19.88,30.12,45.5,17.25",
         "start": [
-          38,
-          20
+          39.12,
+          17.5
         ],
-        "end": [
-          72,
-          54
+        "numPos": [
+          30.87,
+          14.13
         ],
-        "direction": "curve_up",
-        "d": "M 38,20 L 38,60 C 38,76 60,82 72,54"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -537,37 +540,37 @@
     "char": "す",
     "romaji": "su",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal panjang dari kiri ke kanan",
-        "hintTh": "ลากเส้นแนวนอนยาวจากซ้ายไปขวา",
+        "d": "M15.5,37.12c2.88,2.12,6.94,1.51,12.75,0.25c16.12-3.5,36.14-5.38,46.62-6.5c7-0.75,11.88-0.62,17.75,0.12",
         "start": [
-          22,
-          34
+          15.5,
+          37.12
         ],
-        "end": [
-          78,
-          30
+        "numPos": [
+          9.12,
+          35.5
         ],
-        "direction": "right",
-        "d": "M 22,34 L 78,30"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis turun, buat simpul memutar ke kiri di tengah, lalu lanjut lurus ke bawah",
-        "hintTh": "ลากเส้นตรงลงมา ทำห่วงกลมตรงกลางแล้วลากลงต่อ",
+        "d": "M57.62,13.38c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,35.12,0,40.75c0,14.62-15.62,16.38-15.62,1.75c0-14.25,18-14.12,18,6.38c0,13.25-7.75,21.5-16,28.38",
         "start": [
-          52,
-          16
+          57.62,
+          13.38
         ],
-        "end": [
-          40,
-          84
+        "numPos": [
+          49,
+          14.13
         ],
-        "direction": "loop_down",
-        "d": "M 52,16 L 52,50 C 52,60 40,64 42,50 C 44,40 56,44 52,56 L 40,84"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -575,52 +578,51 @@
     "char": "せ",
     "romaji": "se",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar panjang melintasi bagian atas",
-        "hintTh": "ลากเส้นแนวนอนยาว",
+        "d": "M16.5,49.93c2.88,2.42,6.86,1.57,12.75,0.53c19-3.34,33-5.72,47.12-7.64c6.99-0.95,11.88-1.21,17.75-0.36",
         "start": [
-          20,
-          42
+          16.5,
+          49.93
         ],
-        "end": [
-          80,
-          36
+        "numPos": [
+          10.12,
+          48.5
         ],
-        "direction": "right",
-        "d": "M 20,42 L 80,36"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal di kanan melengkung ke kiri bawah",
-        "hintTh": "ลากเส้นแนวตั้งทางขวาแล้วหักเลี้ยวซ้าย",
+        "d": "M69.74,17.75c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,17.88,0,23.5c0,25.62-5.75,23.25-11.88,19",
         "start": [
-          66,
-          24
+          69.74,
+          17.75
         ],
-        "end": [
-          48,
-          76
+        "numPos": [
+          61.25,
+          16.5
         ],
-        "direction": "down_left",
-        "d": "M 66,24 L 66,62 Q 66,74 48,76"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis vertikal di kiri turun dan menyentak ke kanan atas",
-        "hintTh": "ลากเส้นแนวตั้งทางซ้ายแล้วสะบัดขึ้น",
+        "d": "M35.62,26.25c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,28.38,0,34c0,14.5,6.38,19.55,20.14,19.55c10.24,0,13.74,0.07,22.61-1.68",
         "start": [
-          36,
-          26
+          35.62,
+          26.25
         ],
-        "end": [
-          40,
-          78
+        "numPos": [
+          27.75,
+          25.25
         ],
-        "direction": "down_hook",
-        "d": "M 36,26 L 36,70 Q 36,78 44,76"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -628,22 +630,23 @@
     "char": "そ",
     "romaji": "so",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis mendatar, miring diagonal ke bawah, balik ke kanan, lalu lengkungkan membulat ke bawah",
-        "hintTh": "ลากเส้นซิกแซกต่อด้วยเส้นโค้งด้านล่างในจังหวะเดียว",
+        "d": "M38.4,22c1.88,1.25,4.98,1.05,7.5,0.38c6.5-1.75,13.25-3.75,19.38-5.38c4.63-1.23,7.18,2.06,3.62,5.25c-12.12,10.87-31.14,24.4-40,30.25c-6.25,4.12-5.88,5.75,1.38,3.88c17.08-4.42,35.96-8.68,50.12-10.38c9.38-1.12,9.62,0.12,0.5,1.38c-15.82,2.17-34.38,14.25-34.38,26.5c0,12.88,11.62,20.38,31.5,16.62",
         "start": [
-          32,
-          28
+          38.4,
+          22
         ],
-        "end": [
-          66,
-          80
+        "numPos": [
+          31.9,
+          20.5
         ],
-        "direction": "complex_z",
-        "d": "M 32,28 L 62,26 L 34,54 L 66,50 C 66,78 40,84 66,80"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -651,67 +654,65 @@
     "char": "た",
     "romaji": "ta",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 4,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar pendek di kiri atas",
-        "hintTh": "ลากเส้นแนวนอนสั้นๆ ด้านบนซ้าย",
+        "d": "M24.38,35.38c1.38,0.62,3.88,1.51,6.38,1.12c6.5-1,16.25-2.88,24.88-4.75c2.64-0.57,5.38-1.5,7.62-2.38",
         "start": [
-          24,
-          38
+          24.38,
+          35.38
         ],
-        "end": [
-          56,
-          32
+        "numPos": [
+          16.88,
+          34.88
         ],
-        "direction": "right",
-        "d": "M 24,38 L 56,32"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis diagonal memotong garis pertama dari atas ke kiri bawah",
-        "hintTh": "ลากเส้นทแยงตัดเส้นแรกจากบนลงล่างซ้าย",
+        "d": "M45,16.88c0.75,1.25,0.87,3.62,0.38,5.25c-6.35,20.94-12.75,36.37-18.88,52.37c-1.36,3.56-4.75,11.75-6,14.62",
         "start": [
-          42,
-          22
+          45,
+          16.88
         ],
-        "end": [
-          30,
-          72
+        "numPos": [
+          35.13,
+          16.25
         ],
-        "direction": "down_left",
-        "d": "M 42,22 L 30,72"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis horizontal kecil di kanan tengah",
-        "hintTh": "ลากเส้นแนวนอนเล็กๆ ตรงกลางขวา",
+        "d": "M56.38,53.25c12.38-2.75,18.25-3.7,23.62-3.12c15.12,1.62-1.12,2.25-4.25,4.88",
         "start": [
-          52,
-          46
+          56.38,
+          53.25
         ],
-        "end": [
-          74,
-          44
+        "numPos": [
+          52.26,
+          50.63
         ],
-        "direction": "right",
-        "d": "M 52,46 L 74,44"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       },
       {
         "order": 4,
-        "hint": "Garis melengkung kecil di bawah garis ketiga",
-        "hintTh": "ลากเส้นโค้งเล็กๆ ใต้เส้นที่สาม",
+        "d": "M54.13,82.25c4.38,7,14.25,8.12,34.5,5.62",
         "start": [
-          50,
-          66
+          54.13,
+          82.25
         ],
-        "end": [
-          76,
-          68
+        "numPos": [
+          46.76,
+          80
         ],
-        "direction": "curve_right",
-        "d": "M 50,66 Q 64,74 76,68"
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
       }
     ]
   },
@@ -719,37 +720,37 @@
     "char": "ち",
     "romaji": "chi",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar dari kiri ke kanan",
-        "hintTh": "ลากเส้นแนวนอนจากซ้ายไปขวา",
+        "d": "M24.5,32.62c1.38,0.62,3.88,1.51,6.38,1.12c6.5-1,18.25-4.12,26.88-6c2.64-0.57,5.38-1.5,7.62-2.38",
         "start": [
-          26,
-          34
+          24.5,
+          32.62
         ],
-        "end": [
-          72,
-          30
+        "numPos": [
+          20,
+          28.88
         ],
-        "direction": "right",
-        "d": "M 26,34 L 72,30"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis turun vertikal lalu buat lengkungan membulat besar seperti angka 5",
-        "hintTh": "ลากเส้นตรงลงมาแล้ววาดส่วนโค้งใหญ่คล้ายเลข 5",
+        "d": "M45.62,15.62c0.75,1.25,0.71,3.58,0.38,5.25c-3,15-4.25,22.59-8.38,38.62c-3.25,12.62-5.38,11.12,3.62,4.38c8.29-6.21,19.75-9.5,28.5-9.5c8.62,0,14.58,5.88,14.5,14.5c-0.12,13.5-16.5,20.62-29.88,23.25",
         "start": [
-          48,
-          18
+          45.62,
+          15.62
         ],
-        "end": [
-          42,
-          82
+        "numPos": [
+          36.75,
+          15.5
         ],
-        "direction": "loop",
-        "d": "M 48,18 L 48,46 C 74,38 78,74 42,82"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -757,22 +758,23 @@
     "char": "つ",
     "romaji": "tsu",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis horizontal melengkung ke kanan lalu turun membulat seperti ombak besar",
-        "hintTh": "ลากเส้นโค้งแนวนอนแล้วโค้งตวัดลงมาเหมือนเกลียวคลื่น",
+        "d": "M14,44.75c1.88,1.62,4.68,2.09,8.12,0.62c17.88-7.62,30-11.12,44.88-10.88c12.56,0.21,22.98,7.17,22.87,19.17c-0.18,18.77-24.75,28.71-45.01,32.08",
         "start": [
-          24,
-          40
+          14,
+          44.75
         ],
-        "end": [
-          40,
-          78
+        "numPos": [
+          9.76,
+          40.38
         ],
-        "direction": "curve_wave",
-        "d": "M 24,40 C 56,26 84,40 76,64 C 70,82 46,84 40,78"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -780,22 +782,23 @@
     "char": "て",
     "romaji": "te",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis horizontal ke kanan lalu melengkung turun ke kiri membulat",
-        "hintTh": "ลากแนวนอนไปขวาแล้วโค้งย้อนกลับลงมาทางซ้าย",
+        "d": "M20.5,26.38c1.87,1.62,4.42,1.97,8.12,1.37c21.75-3.5,33-5.12,50.12-8.38c12.34-2.34,13-0.88,0.38,1.38c-17.89,3.19-33.78,19.12-33.78,37.62c0,20.5,17.91,30.25,35.16,30.25",
         "start": [
-          28,
-          34
+          20.5,
+          26.38
         ],
-        "end": [
-          66,
-          76
+        "numPos": [
+          16.37,
+          20
         ],
-        "direction": "curve_c",
-        "d": "M 28,34 L 70,30 C 70,54 36,60 66,76"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -803,37 +806,37 @@
     "char": "と",
     "romaji": "to",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis diagonal pendek dari atas condong ke kanan bawah",
-        "hintTh": "ลากเส้นเฉียงสั้นๆ จากบนลงล่างขวา",
+        "d": "M35.5,18.38c1.74,0.74,3.62,2.62,4.12,5.37c0.5,2.75,4.75,25,5.38,28.12",
         "start": [
-          38,
-          22
+          35.5,
+          18.38
         ],
-        "end": [
-          50,
-          44
+        "numPos": [
+          27.87,
+          18.75
         ],
-        "direction": "down_right",
-        "d": "M 38,22 L 50,44"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis lengkungan C terbuka memeluk goresan pertama dari kiri ke bawah",
-        "hintTh": "ลากเส้นโค้งอ้อมโอบเส้นแรกจากซ้ายลงล่าง",
+        "d": "M78.12,25.5c0.25,1.88,0.04,4.09-2.25,5.75c-6.37,4.63-13.22,8.49-22.75,15.25c-12.88,9.12-21.62,18.38-21.62,27.5c0,10.12,8.5,13.88,26.88,13.88c6.25,0,14.75-0.12,21.62-1.25",
         "start": [
-          62,
-          38
+          78.12,
+          25.5
         ],
-        "end": [
-          66,
-          78
+        "numPos": [
+          69.25,
+          22.25
         ],
-        "direction": "curve_c",
-        "d": "M 62,38 C 30,52 34,76 66,78"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -841,67 +844,65 @@
     "char": "な",
     "romaji": "na",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 4,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar pendek di kiri atas",
-        "hintTh": "ลากเส้นแนวนอนสั้นๆ",
+        "d": "M22.88,28.96c1.18,0.58,3.3,1.1,5.47,1.05c5.53-0.13,10.9-0.98,16.52-2.42c4.82-1.23,9.13-3.12,11.38-4.22",
         "start": [
-          24,
-          34
+          22.88,
+          28.96
         ],
-        "end": [
-          50,
-          30
+        "numPos": [
+          17.63,
+          23.75
         ],
-        "direction": "right",
-        "d": "M 24,34 L 50,30"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis diagonal memotong garis pertama dari atas ke kiri bawah",
-        "hintTh": "ลากเส้นทแยงตัดเส้นแรก",
+        "d": "M42.99,14c0.63,0.89,0.56,2.52,0.31,3.72c-2.96,14.16-7.95,26.56-14.25,37.87c-2.05,3.69-4.25,7.24-6.55,10.65",
         "start": [
-          38,
-          20
+          42.99,
+          14
         ],
-        "end": [
-          30,
-          64
+        "numPos": [
+          32.51,
+          12
         ],
-        "direction": "down_left",
-        "d": "M 38,20 L 30,64"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Titik miring kecil di kanan tengah",
-        "hintTh": "แต้มจุดเฉียงเล็กๆ ด้านขวา",
+        "d": "M72.26,23.25c6.88,2.5,12.62,5.62,14.75,9.5c4.06,7.41-0.25,3.38-3.5,3.88",
         "start": [
-          62,
-          36
+          72.26,
+          23.25
         ],
-        "end": [
-          70,
-          44
+        "numPos": [
+          64.63,
+          22.13
         ],
-        "direction": "down_right",
-        "d": "M 62,36 L 70,44"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       },
       {
         "order": 4,
-        "hint": "Garis vertikal di kanan bawah membuat simpul melingkar kecil",
-        "hintTh": "ลากเส้นแนวตั้งแล้วม้วนทำห่วงเล็กๆ",
+        "d": "M68.88,44.62c-1,1.88-2.14,5.24-1.88,8.25c0.62,7,1.5,13.12,1.5,20.62c0,20-27.88,19.75-27.88,9.38c0-5.62,8.25-8.25,13.88-8.25c8.75,0,21.5,3.25,29.75,11.5",
         "start": [
-          66,
-          52
+          68.88,
+          44.62
         ],
-        "end": [
-          52,
-          82
+        "numPos": [
+          64.26,
+          41.63
         ],
-        "direction": "loop",
-        "d": "M 66,52 L 66,70 C 66,78 54,80 54,72 C 54,64 68,66 64,80 L 52,82"
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
       }
     ]
   },
@@ -909,52 +910,51 @@
     "char": "に",
     "romaji": "ni",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal melengkung di sisi kiri dengan sentakan kecil di bawah",
-        "hintTh": "ลากเส้นแนวตั้งทางซ้ายแล้วสะบัดขึ้น",
+        "d": "M24.53,22.75c1.25,1.5,1.62,3.75,1.12,6.38c-3,15.88-9,32.5-7.38,47.62c2.02,18.84,4.5,5.75,8.5-3.5",
         "start": [
-          30,
-          24
+          24.53,
+          22.75
         ],
-        "end": [
-          28,
-          76
+        "numPos": [
+          16.79,
+          22.13
         ],
-        "direction": "down",
-        "d": "M 30,24 Q 28,52 28,76"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal atas di sisi kanan",
-        "hintTh": "ลากเส้นแนวนอนด้านขวาบน",
+        "d": "M53.2,30.64c0.96,0.79,2.44,1.58,5.1,1.35c6.98-0.61,15.01-3.3,22.04-3.36c13.19-0.11,1.5,3.75-8.39,7.35",
         "start": [
-          52,
-          40
+          53.2,
+          30.64
         ],
-        "end": [
-          76,
-          38
+        "numPos": [
+          46.91,
+          29
         ],
-        "direction": "right",
-        "d": "M 52,40 L 76,38"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis horizontal bawah di sisi kanan melengkung lembut",
-        "hintTh": "ลากเส้นแนวนอนด้านขวาล่าง",
+        "d": "M52.53,68c1.76,12.92,11.92,16.01,24.23,14.93c5.08-0.45,8.9-0.8,14.27-2.06",
         "start": [
-          50,
+          52.53,
+          68
+        ],
+        "numPos": [
+          46.41,
           66
         ],
-        "end": [
-          78,
-          64
-        ],
-        "direction": "right",
-        "d": "M 50,66 Q 64,70 78,64"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -962,37 +962,37 @@
     "char": "ぬ",
     "romaji": "nu",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis diagonal miring dari kiri atas ke tengah bawah",
-        "hintTh": "ลากเส้นทแยงจากบนซ้ายลงกลางล่าง",
+        "d": "M25.38,28.5c2,1.38,2.97,3.23,3.38,5.88c1.87,12.18,4.12,23.92,8.54,34.67c1.79,4.36,3.96,8.33,6.84,12.46",
         "start": [
-          38,
-          24
+          25.38,
+          28.5
         ],
-        "end": [
-          30,
-          74
+        "numPos": [
+          17.63,
+          27.88
         ],
-        "direction": "down_left",
-        "d": "M 38,24 L 30,74"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Mulai dari tengah atas, turun melingkar membentuk badan lalu buat simpul kecil di kanan bawah",
-        "hintTh": "ลากโค้งวนเป็นรูปไข่แล้วทำห่วงเล็กที่มุมขวาล่าง",
+        "d": "M57.12,19.25c0.88,2.12,1.06,3.79,0.62,5.88c-3.12,15-13.14,39.81-18.12,48.62c-11.87,21-20.62,1.25-20.62-4.5c0-22.63,43.75-44.25,62.36-29.59c7.66,6.03,9.8,14.58,9.14,23.34c-2,26.75-32.88,28.38-32.88,16.88c0-9.38,17.38-7.12,27.12-1.12c3.1,1.91,7.25,5.25,9.5,7.5",
         "start": [
-          26,
-          40
+          57.12,
+          19.25
         ],
-        "end": [
-          78,
-          80
+        "numPos": [
+          47.25,
+          17.25
         ],
-        "direction": "complex_loop",
-        "d": "M 26,40 C 62,32 76,64 42,76 C 28,80 50,44 72,66 C 76,70 78,80 78,80"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1000,37 +1000,37 @@
     "char": "ね",
     "romaji": "ne",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal lurus di sebelah kiri",
-        "hintTh": "ลากเส้นแนวตั้งตรงทางซ้าย",
+        "d": "M33.29,14.5c1.62,1.62,2.1,3.21,1.88,5.88c-1.03,11.93-2.06,31.66-2.53,53.12c-0.1,4.62-0.18,9.31-0.22,14",
         "start": [
-          32,
-          22
+          33.29,
+          14.5
         ],
-        "end": [
-          32,
-          80
+        "numPos": [
+          25.91,
+          13.75
         ],
-        "direction": "down",
-        "d": "M 32,22 L 32,80"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis zig-zag melintasi garis pertama lalu buat simpul kecil di ujung kanan",
-        "hintTh": "ลากเส้นซิกแซกตัดเส้นตรงแล้วม้วนห่วงที่ปลายขวา",
+        "d": "M17.16,37.88c1.62,0.88,3.25,1.38,5.62,0.75c2.14-0.56,7.8-2.31,12.37-4.03c6.26-2.35,6.88-1.47,3.12,3.63c-5.56,7.53-13.02,17.38-18.48,26.77c-5.6,9.62-3.45,8.3,2,3c19.12-18.62,38.5-39.12,54.12-39.12c11.38,0,12.88,11.25,12.88,32.5c0,28.62-30.18,24.88-30.18,16.26c0-9.63,18.73-7.82,28.06-1.88c2.75,1.75,5.88,4.88,7.5,6.75",
         "start": [
-          22,
-          44
+          17.16,
+          37.88
         ],
-        "end": [
-          76,
-          76
+        "numPos": [
+          12.91,
+          34.13
         ],
-        "direction": "zigzag_loop",
-        "d": "M 22,44 L 56,38 L 26,76 Q 50,56 70,68 C 76,72 74,80 70,78 L 76,76"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1038,22 +1038,23 @@
     "char": "の",
     "romaji": "no",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis diagonal pendek dari kanan atas ke tengah, lalu melingkar besar ke kanan membulat",
-        "hintTh": "ลากเฉียงลงกลางแล้ววาดวงกลมโค้งมนออกไปทางขวา",
+        "d": "M53.82,28.62c1,1.5,1.34,4.12,0.88,6.62c-1.75,9.5-6.89,25-10.75,33.12c-9.63,20.26-16.55,14.74-24.38-1.98c-9.13-19.5,23.5-48.88,50.63-40.38c32.38,10.15,28,54.62-4.75,60.88",
         "start": [
-          52,
-          28
+          53.82,
+          28.62
         ],
-        "end": [
-          34,
-          68
+        "numPos": [
+          46.45,
+          34.88
         ],
-        "direction": "spiral",
-        "d": "M 52,28 L 38,58 C 24,78 68,90 76,56 C 82,32 46,30 34,68"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -1061,52 +1062,51 @@
     "char": "は",
     "romaji": "ha",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal kiri dengan sentakan kecil di bawah",
-        "hintTh": "ลากเส้นแนวตั้งทางซ้ายแล้วสะบัดขึ้น",
+        "d": "M24.51,18c1.25,1.5,2.15,4,1.62,6.62c-3.5,17.62-6.98,36.4-4,54.88c2.5,15.5,1.12,2,5.62-6.25",
         "start": [
-          30,
-          22
+          24.51,
+          18
         ],
-        "end": [
-          28,
-          78
+        "numPos": [
+          16.89,
+          17.63
         ],
-        "direction": "down",
-        "d": "M 30,22 Q 28,52 28,78"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal mendatar pendek di kanan atas",
-        "hintTh": "ลากเส้นแนวนอนสั้นๆ ด้านขวา",
+        "d": "M49.64,37.89c2.41,1.57,4.85,2.16,7.8,1.71c9.36-1.43,17.46-2.94,23.4-4.57c3.12-0.86,5.96-1.29,7.8-1.29",
         "start": [
-          50,
-          36
+          49.64,
+          37.89
         ],
-        "end": [
-          74,
-          34
+        "numPos": [
+          43.02,
+          36.38
         ],
-        "direction": "right",
-        "d": "M 50,36 L 74,34"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis vertikal memotong garis kedua lalu membentuk simpul melingkar ke kiri",
-        "hintTh": "ลากเส้นแนวตั้งตัดเส้นที่สองแล้วทำห่วงกลมไปทางซ้าย",
+        "d": "M69.77,16.5c2.25,2.12,2.88,4.12,2.88,6.5c0,2.38,1.5,38.62,1.5,48c0,22.5-30.62,19.62-30.62,10.5c0-9.75,23.88-5.62,29.5-2.88c5.62,2.74,11.98,8.26,13.36,9.38",
         "start": [
-          64,
-          20
+          69.77,
+          16.5
         ],
-        "end": [
-          50,
-          78
+        "numPos": [
+          59.89,
+          16
         ],
-        "direction": "loop",
-        "d": "M 64,20 L 64,64 C 64,74 50,78 50,68 C 50,58 64,60 62,74 L 50,78"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -1114,22 +1114,23 @@
     "char": "ひ",
     "romaji": "hi",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis horizontal pendek, lengkung mangkok besar ke bawah, lalu naik dan turun miring",
-        "hintTh": "ลากแนวนอนสั้นๆ โค้งเป็นรูปถ้วยใหญ่แล้วลากลงเฉียงๆ",
+        "d": "M20,25.12c1.25,0.88,3.75,2.25,6.5,1.38c2.75-0.87,7.31-2.38,11.38-4.5c6-3.12,8.42-1.01,4.25,4c-27.13,32.62-23.76,58.5-1.52,62.88c18.07,3.56,37.63-16.38,35.63-56.51c-0.72-14.5-0.17-14.78,4.12-1.75c3.76,11.38,10.26,20.76,16.14,26.5",
         "start": [
-          24,
-          38
+          20,
+          25.12
         ],
-        "end": [
-          76,
-          68
+        "numPos": [
+          15.25,
+          21.38
         ],
-        "direction": "complex_u",
-        "d": "M 24,38 L 44,34 C 26,68 64,84 66,54 L 76,68"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -1137,67 +1138,65 @@
     "char": "ふ",
     "romaji": "fu",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 4,
     "strokes": [
       {
         "order": 1,
-        "hint": "Titik miring pendek di bagian atas",
-        "hintTh": "แต้มจุดเฉียงสั้นๆ ด้านบน",
+        "d": "M42.63,15.62c3.62,3.38,7.5,5.38,12.74,6.13c9.59,1.37,3.5,3.38-1.88,6.12",
         "start": [
-          48,
-          18
+          42.63,
+          15.62
         ],
-        "end": [
-          54,
-          28
+        "numPos": [
+          36.75,
+          13.88
         ],
-        "direction": "down",
-        "d": "M 48,18 Q 50,24 54,28"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal melengkung di tengah dengan sentakan",
-        "hintTh": "ลากเส้นโค้งตรงกลางแล้วสะบัดปลาย",
+        "d": "M43.63,46.88c1.88,4.62,7.5,9.41,14.25,17.5c10.62,12.74,0.49,30-19.13,21.62",
         "start": [
-          50,
-          36
+          43.63,
+          46.88
         ],
-        "end": [
-          44,
-          76
+        "numPos": [
+          37.75,
+          43.88
         ],
-        "direction": "down_hook",
-        "d": "M 50,36 Q 48,56 44,76"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Titik melengkung di sisi kiri",
-        "hintTh": "แต้มจุดโค้งทางด้านซ้าย",
+        "d": "M16.5,73.38c0.75,4,1.88,8.12,5,10.12c1.16,0.74,0.12-3.38,13.25-9.12",
         "start": [
-          26,
-          48
+          16.5,
+          73.38
         ],
-        "end": [
-          32,
-          60
+        "numPos": [
+          13.5,
+          67.63
         ],
-        "direction": "down_left",
-        "d": "M 26,48 Q 28,54 32,60"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       },
       {
         "order": 4,
-        "hint": "Titik miring di sisi kanan",
-        "hintTh": "แต้มจุดเฉียงทางด้านขวา",
+        "d": "M80.13,61.88c5.12,3.38,10.28,7.49,11.38,8.88c6.75,8.5-0.25,4.62-4.62,7.12",
         "start": [
-          72,
-          46
+          80.13,
+          61.88
         ],
-        "end": [
-          80,
-          58
+        "numPos": [
+          69.38,
+          59.13
         ],
-        "direction": "down_right",
-        "d": "M 72,46 Q 76,52 80,58"
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
       }
     ]
   },
@@ -1205,22 +1204,23 @@
     "char": "へ",
     "romaji": "he",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: naik miring seperti atap gunung lalu melandai panjang ke kanan bawah",
-        "hintTh": "ลากขึ้นเฉียงเหมือนยอดเขาแล้วลากเฉียงลงทางขวา",
+        "d": "M15,48.75c2.25,1.62,4.67,1.96,7-0.38c3.62-3.62,7.46-6.54,11.25-10.5c5.5-5.75,8.48-4.75,13.12-0.88c12.12,10.12,30.38,25.12,33.38,27.38c3,2.26,12.37,10.38,13.87,11.63",
         "start": [
-          24,
-          60
+          15,
+          48.75
         ],
-        "end": [
-          78,
-          56
+        "numPos": [
+          9.87,
+          42.75
         ],
-        "direction": "mountain",
-        "d": "M 24,60 L 46,32 L 78,56"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -1228,67 +1228,65 @@
     "char": "ほ",
     "romaji": "ho",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 4,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal di kiri dengan sentakan kecil",
-        "hintTh": "ลากเส้นแนวตั้งทางซ้าย",
+        "d": "M24.51,18.75c1.25,1.5,2.15,4,1.62,6.62c-3.5,17.63-6.98,37.4-4,55.88c2.5,15.5,1.12,2,5.62-6.25",
         "start": [
-          28,
-          22
+          24.51,
+          18.75
         ],
-        "end": [
-          26,
-          78
+        "numPos": [
+          17.13,
+          18.13
         ],
-        "direction": "down",
-        "d": "M 28,22 L 26,78"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal atas di sebelah kanan",
-        "hintTh": "ลากเส้นแนวนอนด้านบนขวา",
+        "d": "M53.08,21.13c1.9,1.28,3.82,1.76,6.14,1.4c7.36-1.17,13.73-2.4,18.41-3.73c2.46-0.7,4.69-1.05,6.13-1.05",
         "start": [
-          46,
-          32
+          53.08,
+          21.13
         ],
-        "end": [
-          76,
-          30
+        "numPos": [
+          46.38,
+          20.5
         ],
-        "direction": "right",
-        "d": "M 46,32 L 76,30"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis horizontal kedua di bawahnya",
-        "hintTh": "ลากเส้นแนวนอนเส้นที่สองด้านขวา",
+        "d": "M53.83,44.3c2.21,1.44,4.46,1.98,7.16,1.57c8.59-1.31,15.78-2.44,21.23-3.94c2.87-0.79,5.72-1.18,7.41-1.18",
         "start": [
-          48,
+          53.83,
+          44.3
+        ],
+        "numPos": [
+          45.51,
           46
         ],
-        "end": [
-          74,
-          44
-        ],
-        "direction": "right",
-        "d": "M 48,46 L 74,44"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       },
       {
         "order": 4,
-        "hint": "Garis vertikal memotong garis kedua lalu membuat simpul melingkar di bawah",
-        "hintTh": "ลากเส้นแนวตั้งตัดเส้นที่สามแล้วทำห่วงกลม",
+        "d": "M72.51,23c1.38,1.62,1.62,4.12,1.62,6.5c0,2.38,2,35.12,2,44.5c0,17.5-29.88,17.12-29.88,8c0-9.75,21.38-7.88,29.5-2.88c5.33,3.28,12,8.25,13.38,9.38",
         "start": [
-          62,
-          22
+          72.51,
+          23
         ],
-        "end": [
-          50,
-          80
+        "numPos": [
+          66.13,
+          29.38
         ],
-        "direction": "loop",
-        "d": "M 62,22 L 62,64 C 62,74 48,78 48,68 C 48,58 62,60 60,74 L 50,80"
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
       }
     ]
   },
@@ -1296,52 +1294,51 @@
     "char": "ま",
     "romaji": "ma",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar atas",
-        "hintTh": "ลากเส้นแนวนอนเส้นบน",
+        "d": "M29.83,32.28c2.2,1.15,4.43,1.5,7.14,1.26c11.54-1.04,25.94-3.12,34.66-4.85c2.87-0.57,5.45-0.44,7.13-0.44",
         "start": [
-          28,
-          32
+          29.83,
+          32.28
         ],
-        "end": [
-          72,
-          28
+        "numPos": [
+          24.26,
+          28.13
         ],
-        "direction": "right",
-        "d": "M 28,32 L 72,28"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal mendatar kedua di bawahnya",
-        "hintTh": "ลากเส้นแนวนอนเส้นที่สอง",
+        "d": "M33.83,51.84c2.45,1.61,4.94,1.72,7.94,1.26c9.52-1.46,17.87-3.1,27.03-5.16c3.22-0.72,6.34-1.32,8.21-1.32",
         "start": [
-          32,
-          46
+          33.83,
+          51.84
         ],
-        "end": [
-          68,
-          44
+        "numPos": [
+          26.63,
+          50.88
         ],
-        "direction": "right",
-        "d": "M 32,46 L 68,44"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis vertikal memotong kedua garis lalu membuat simpul melingkar ke kiri",
-        "hintTh": "ลากเส้นแนวตั้งตัดทั้งสองเส้นแล้วทำห่วงกลมไปทางซ้าย",
+        "d": "M55.81,14c1.52,1.8,1.8,4.57,1.8,7.19c0,2.63,0.46,43.88,0.46,54.25c0,21.3-30.07,19.96-30.07,9.86c0-10.79,25.88-9.93,38.57-3.18c6.12,3.25,11.55,6.38,14.8,9.13",
         "start": [
-          52,
-          18
+          55.81,
+          14
         ],
-        "end": [
-          40,
-          82
+        "numPos": [
+          47.26,
+          13.13
         ],
-        "direction": "loop",
-        "d": "M 52,18 L 52,62 C 52,72 38,76 38,66 C 38,56 52,58 50,72 L 40,82"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -1349,37 +1346,37 @@
     "char": "み",
     "romaji": "mi",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis meluncur ke kiri, membuat simpul miring ke kanan, lalu tarik panjang mendatar",
-        "hintTh": "ลากเส้นลงเฉียง ทำห่วงแล้วตวัดขนานไปทางขวา",
+        "d": "M32.5,26c1.88,1.75,4.06,1.7,6.88,1.25c3.88-0.62,7.62-1.75,11.88-3.12c4.26-1.37,6.25-0.12,4.5,5.12c-1.75,5.24-6.66,17.39-12,30.12c-13.63,32.51-29.26,29.26-29.26,18.63c0-14.25,20.48-15.36,33-13.5c18.5,2.75,30,6.62,44.38,14.25",
         "start": [
-          30,
-          28
+          32.5,
+          26
         ],
-        "end": [
-          76,
-          60
+        "numPos": [
+          26.51,
+          24.88
         ],
-        "direction": "complex_knot",
-        "d": "M 30,28 L 52,24 L 32,60 C 26,68 38,72 46,64 L 76,60"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis lengkung melintasi ekor garis pertama dari atas ke kanan bawah",
-        "hintTh": "ลากเส้นโค้งตัดปลายเส้นแรกจากบนลงล่างขวา",
+        "d": "M79.38,54.75c0.75,2.38,0.49,4.37,0,6.25c-2.12,8.12-7.5,25-22.12,33.75",
         "start": [
-          66,
-          36
+          79.38,
+          54.75
         ],
-        "end": [
-          56,
-          78
+        "numPos": [
+          71.13,
+          52
         ],
-        "direction": "down_left",
-        "d": "M 66,36 Q 64,56 56,78"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1387,52 +1384,51 @@
     "char": "む",
     "romaji": "mu",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar dari kiri ke kanan",
-        "hintTh": "ลากเส้นแนวนอนจากซ้ายไปขวา",
+        "d": "M19.59,31.65c2.1,1.55,4.24,1.66,6.81,1.21c8.17-1.41,15.33-2.98,23.19-4.96c2.76-0.69,5.44-1.27,7.05-1.27",
         "start": [
-          24,
-          36
+          19.59,
+          31.65
         ],
-        "end": [
-          60,
-          32
+        "numPos": [
+          12.9,
+          29
         ],
-        "direction": "right",
-        "d": "M 24,36 L 60,32"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal turun memotong garis pertama, membuat simpul kecil, naik ke kanan atas",
-        "hintTh": "ลากเส้นแนวตั้งลงมา ทำห่วงเล็กแล้วสะบัดขึ้นทางขวา",
+        "d": "M37.02,15.5c1.62,1.25,2.31,2.88,2.12,5.25c-0.88,11.12-1.5,20.75-4,34.88c-3.61,20.44-19.25,16.99-18.62,7.37c0.5-7.74,6.25-12.86,12.62-13.5c5-0.5,14.28,1.93,5.88,15c-12.62,19.62-11.42,24.51,5.11,25.54c10.98,0.68,19.26,0.72,28.49-0.92c14.15-2.5,7.4-2.63,7.4-11.13",
         "start": [
-          44,
-          20
+          37.02,
+          15.5
         ],
-        "end": [
-          74,
-          52
+        "numPos": [
+          26.65,
+          13
         ],
-        "direction": "loop_up",
-        "d": "M 44,20 L 44,60 C 44,70 32,74 34,62 C 36,50 56,58 66,66 L 74,52"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Beri titik miring di kanan atas",
-        "hintTh": "แต้มจุดเฉียงที่ด้านขวาบน",
+        "d": "M78.52,36.25c6.88,3.12,11.71,5.95,14.88,10.12c6.25,8.25-1.38,3.62-4.5,4.5",
         "start": [
-          72,
-          30
+          78.52,
+          36.25
         ],
-        "end": [
-          80,
-          40
+        "numPos": [
+          70.4,
+          34.75
         ],
-        "direction": "down_right",
-        "d": "M 72,30 L 80,40"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -1440,37 +1436,37 @@
     "char": "め",
     "romaji": "me",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis diagonal pendek melengkung dari kiri atas ke tengah bawah",
-        "hintTh": "ลากเส้นเฉียงสั้นๆ จากบนซ้ายลงกลางล่าง",
+        "d": "M27.48,31.75c1.75,1,2.41,3.09,2.5,5.25c0.5,11.62,2.75,23.5,7.25,31.38c1.39,2.44,5.38,8.5,7.25,10.38",
         "start": [
-          40,
-          24
+          27.48,
+          31.75
         ],
-        "end": [
-          30,
-          72
+        "numPos": [
+          20.1,
+          30
         ],
-        "direction": "down_left",
-        "d": "M 40,24 L 30,72"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Mulai dari kiri tengah, melengkung besar membulat memotong garis pertama lalu menyapu ke kanan",
-        "hintTh": "ลากเส้นโค้งใหญ่ตัดเส้นแรกแล้วปัดลงทางขวา",
+        "d": "M59.6,19.38c1,1.5,1.35,4.12,0.88,6.62c-2.75,14.62-13.62,37.75-20.1,47.24c-12.28,17.14-16.78,13.14-22.28,0.64c-5.38-15.38,26.4-42.18,53.42-35.28c29.08,8.27,23.96,46.02-7.98,50.15",
         "start": [
-          28,
-          42
+          59.6,
+          19.38
         ],
-        "end": [
-          76,
-          76
+        "numPos": [
+          50.1,
+          18
         ],
-        "direction": "curve_sweep",
-        "d": "M 28,42 C 60,30 76,58 50,76 C 36,82 52,48 76,76"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1478,52 +1474,51 @@
     "char": "も",
     "romaji": "mo",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal melengkung di bawah seperti kail pancing (mirip し)",
-        "hintTh": "ลากเส้นแนวตั้งแล้วโค้งขึ้นคล้ายเบ็ดตกปลา",
+        "d": "M49.17,14.75c1.88,1.88,1.86,4.52,1.12,8c-3,14.25-5,26.62-7,42.12c-2.55,19.73-0.75,29.88,17,29.86c20.25-0.02,28.63-13.11,20.01-35.73",
         "start": [
-          48,
-          18
+          49.17,
+          14.75
         ],
-        "end": [
-          72,
-          68
+        "numPos": [
+          40.55,
+          14.38
         ],
-        "direction": "hook_up",
-        "d": "M 48,18 L 48,64 C 48,78 64,82 72,68"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal mendatar atas memotong garis vertikal",
-        "hintTh": "ลากเส้นแนวนอนเส้นบนตัดเส้นตรง",
+        "d": "M26.54,34.62c1.12,0.88,2.87,2.21,6,2c11.12-0.75,20-2.12,27.74-3.46c3.88-0.67,5.88-1.17,8.88-1.04",
         "start": [
-          30,
-          36
+          26.54,
+          34.62
         ],
-        "end": [
-          70,
-          32
+        "numPos": [
+          21.3,
+          29.63
         ],
-        "direction": "right",
-        "d": "M 30,36 L 70,32"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis horizontal mendatar kedua di bawahnya",
-        "hintTh": "ลากเส้นแนวนอนเส้นที่สองตัดเส้นตรง",
+        "d": "M26.42,53.38c-1.5,4,1,6.75,7.75,6.75c8.75,0,17.62-1,22.88-1.88c2.01-0.33,5.38-1,7.5-1.75",
         "start": [
-          28,
-          50
+          26.42,
+          53.38
         ],
-        "end": [
-          72,
-          46
+        "numPos": [
+          21.8,
+          50.88
         ],
-        "direction": "right",
-        "d": "M 28,50 L 72,46"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -1531,52 +1526,51 @@
     "char": "や",
     "romaji": "ya",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis melengkung ke kanan atas, turun melengkung ke bawah dengan sentakan",
-        "hintTh": "ลากเส้นโค้งขึ้นขวาแล้วโค้งลงพร้อมสะบัดปลาย",
+        "d": "M18,49.38c1.88,1.62,5.25,2.5,8.62,0.88c18.51-8.88,35.76-19.38,50.83-19.26c9.02,0.14,16.01,4.13,15.93,12.29c0,8.33-10.88,16.58-24.5,17.83",
         "start": [
-          28,
-          40
+          18,
+          49.38
         ],
-        "end": [
-          50,
-          78
+        "numPos": [
+          12.88,
+          44.13
         ],
-        "direction": "hook",
-        "d": "M 28,40 C 44,28 66,32 64,48 L 50,78"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Titik miring pendek di bagian atas",
-        "hintTh": "แต้มจุดเฉียงสั้นๆ ด้านบน",
+        "d": "M47.13,15.88c5.12,0.88,10.41,4.05,11.5,6.62c2.12,5-1,2.38-2.88,2.62",
         "start": [
-          44,
-          24
+          47.13,
+          15.88
         ],
-        "end": [
-          48,
-          34
+        "numPos": [
+          39.88,
+          13.88
         ],
-        "direction": "down",
-        "d": "M 44,24 L 48,34"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis diagonal panjang dari atas memotong goresan pertama ke kiri bawah",
-        "hintTh": "ลากเส้นทแยงยาวตัดเส้นแรกจากบนลงล่างซ้าย",
+        "d": "M30,24.38c2.38,1.88,3.28,2.87,3.88,5.25c2.62,10.5,11.12,41.12,14.75,52.5c0.65,2.04,1.88,6.25,2.88,9.38",
         "start": [
-          66,
-          20
-        ],
-        "end": [
           30,
-          80
+          24.38
         ],
-        "direction": "down_left",
-        "d": "M 66,20 L 30,80"
+        "numPos": [
+          19.26,
+          25
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -1584,37 +1578,37 @@
     "char": "ゆ",
     "romaji": "yu",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis turun vertikal, melingkar membulat ke kanan, lalu memotong dirinya sendiri ke atas",
-        "hintTh": "ลากเส้นตรงลงมา ทำส่วนโค้งมนไปทางขวาแล้วตวัดขึ้น",
+        "d": "M21.05,25.38c1.38,1.5,2.02,4.13,1.5,6.25c-2.88,11.75-4,22.25-2.12,35c2.77,18.85,1.12,3.88,3.25-1.5c9-22.75,27.24-34.5,44.38-34.5c16.88,0,21.88,11.38,21.88,20.25c0,27.38-30.88,29.62-43,16.75",
         "start": [
-          36,
+          21.05,
+          25.38
+        ],
+        "numPos": [
+          12.67,
           22
         ],
-        "end": [
-          66,
-          52
-        ],
-        "direction": "complex_bowl",
-        "d": "M 36,22 L 36,60 C 36,78 68,76 68,52 L 66,52"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal lurus memotong lengkungan dari atas ke bawah",
-        "hintTh": "ลากเส้นแนวตั้งตรงตัดผ่านส่วนโค้งจากบนลงล่าง",
+        "d": "M58.42,16.75c2.62,1.75,3.17,3.13,3.5,7.12c0.88,10.5,1.4,18.72,1.62,29.38c0.5,24-6.25,32-12.38,39.25",
         "start": [
-          58,
-          20
+          58.42,
+          16.75
         ],
-        "end": [
-          52,
-          82
+        "numPos": [
+          49.8,
+          15.88
         ],
-        "direction": "down",
-        "d": "M 58,20 L 52,82"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1622,37 +1616,37 @@
     "char": "よ",
     "romaji": "yo",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar pendek di kiri atas",
-        "hintTh": "ลากเส้นแนวนอนสั้นๆ ด้านบนซ้าย",
+        "d": "M58.24,35.38c7.5-1.28,13.74-2.63,18.5-4.1c2.5-0.77,4.77-1.15,6.25-1.15",
         "start": [
-          30,
-          36
+          58.24,
+          35.38
         ],
-        "end": [
-          56,
-          34
+        "numPos": [
+          61.62,
+          28.88
         ],
-        "direction": "right",
-        "d": "M 30,36 L 56,34"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal turun memotong garis pertama, membuat simpul melingkar di kiri, lalu menyapu ke kanan",
-        "hintTh": "ลากเส้นแนวตั้งลงมา ทำห่วงทางซ้ายแล้วปัดไปทางขวา",
+        "d": "M54.62,13.88c2.25,2.12,2.98,4.13,2.88,6.5c-0.75,17-0.12,34.88,1.39,53.5c1.88,23.07-34.89,20.88-34.89,11.5c0-12,26.25-8,35.98-4.12c8.1,3.23,11.52,4.88,18.52,10.38",
         "start": [
-          54,
-          18
+          54.62,
+          13.88
         ],
-        "end": [
-          74,
-          76
+        "numPos": [
+          45.62,
+          14.63
         ],
-        "direction": "loop_right",
-        "d": "M 54,18 L 54,64 C 54,76 38,76 38,66 C 38,56 56,58 54,74 L 74,76"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1660,37 +1654,37 @@
     "char": "ら",
     "romaji": "ra",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Titik miring pendek di bagian atas",
-        "hintTh": "แต้มจุดเฉียงสั้นๆ ด้านบน",
+        "d": "M35.33,15c3.75,3,9.22,4.41,16.5,4.25c11.12-0.25-0.25,2.38-1.25,3.5",
         "start": [
-          42,
-          22
+          35.33,
+          15
         ],
-        "end": [
-          52,
-          28
+        "numPos": [
+          28.96,
+          13.75
         ],
-        "direction": "right",
-        "d": "M 42,22 L 52,28"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis turun sedikit lalu melengkung membulat besar seperti angka 5 terbalik",
-        "hintTh": "ลากเส้นลงมาเล็กน้อยแล้ววาดส่วนโค้งใหญ่",
+        "d": "M35.83,35.75c-2.14,4.34-2.79,8.67-3.11,13.24c-0.42,5.84-0.31,12.05-2.14,19.13c-3.16,12.27,1.49,4.77,3,3.5c11.88-10,21.7-12.67,32.61-12.49c9.21,0.15,16.85,5.19,16.76,13.88c-0.12,13.6-14.24,21.49-32.49,22.49",
         "start": [
-          38,
-          40
+          35.83,
+          35.75
         ],
-        "end": [
-          44,
-          80
+        "numPos": [
+          27.21,
+          35.25
         ],
-        "direction": "curve_c",
-        "d": "M 38,40 L 42,46 C 74,42 74,76 44,80"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1698,37 +1692,37 @@
     "char": "り",
     "romaji": "ri",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal pendek di sebelah kiri dengan sentakan kecil ke atas",
-        "hintTh": "ลากเส้นแนวตั้งสั้นทางซ้ายแล้วสะบัดขึ้น",
+        "d": "M38.75,25.25c1.25,1.5,2.24,4.03,1.62,6.62c-2.88,12.13-6.29,29.65-4.25,42.38c2,12.5,1.75-0.75,5.62-6.25",
         "start": [
-          36,
-          28
+          38.75,
+          25.25
         ],
-        "end": [
-          34,
-          60
+        "numPos": [
+          30.37,
+          25
         ],
-        "direction": "down_hook",
-        "d": "M 36,28 L 34,56 Q 34,60 38,58"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal panjang di kanan melengkung anggun ke kiri bawah",
-        "hintTh": "ลากเส้นแนวตั้งยาวทางขวาโค้งมนลงล่างซ้าย",
+        "d": "M69.37,18.75c2.25,2.12,2.88,4.12,2.88,6.5c0,2.38,0,26.38,0,35.75c0,16.5-5,25.75-12.62,33.12",
         "start": [
-          64,
-          20
+          69.37,
+          18.75
         ],
-        "end": [
-          52,
-          82
+        "numPos": [
+          61.62,
+          17
         ],
-        "direction": "down_left",
-        "d": "M 64,20 Q 64,56 52,82"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1736,22 +1730,23 @@
     "char": "る",
     "romaji": "ru",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis mendatar, diagonal turun, lengkung membulat, dan simpul lingkaran kecil di ujung",
-        "hintTh": "ลากแนวนอน เฉียงลง โค้งมนคล้ายเลข 3 แล้วม้วนห่วงกลมที่ปลาย",
+        "d": "M34.31,20.38c1.75,1.25,4.62,2.62,8.5,1.5c3.88-1.12,9.62-2.5,15.62-4.62c6-2.12,7.5-0.12,4.38,4.25c-3.12,4.37-18.89,24.62-27.75,34c-8.5,9-13.09,11.89,0.75,3.25c15.62-9.75,43-10.88,43,13.38c0,22.5-40.88,24.5-40.88,12.62c0-11.25,18.12-8.75,24.38-0.38",
         "start": [
-          30,
-          26
+          34.31,
+          20.38
         ],
-        "end": [
-          52,
-          74
+        "numPos": [
+          28.94,
+          18.63
         ],
-        "direction": "complex_loop",
-        "d": "M 30,26 L 66,24 L 38,52 C 72,46 76,78 48,78 C 42,78 42,70 48,70 C 54,70 54,76 52,74"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -1759,37 +1754,37 @@
     "char": "れ",
     "romaji": "re",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal lurus di sebelah kiri",
-        "hintTh": "ลากเส้นแนวตั้งตรงทางซ้าย",
+        "d": "M34.48,13c1.5,1.38,2.83,3.74,2.5,6.38c-0.5,4-2.75,44.5-2.75,52.88c0,8.38,0.12,16.62,0.12,19.5",
         "start": [
-          32,
-          22
+          34.48,
+          13
         ],
-        "end": [
-          32,
-          80
+        "numPos": [
+          27.36,
+          12.88
         ],
-        "direction": "down",
-        "d": "M 32,22 L 32,80"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis zig-zag melintasi garis pertama lalu melengkung keluar dan menyentak ke kanan atas",
-        "hintTh": "ลากเส้นซิกแซกตัดเส้นตรงแล้วตวัดปลายขึ้นขวา",
+        "d": "M16.98,40.75c2.12,1.38,3.74,1.46,7.5,0c4.5-1.75,6.55-2.66,13-5.5c4.25-1.88,4.4,0.24,2.5,3.5c-5.25,9-10.5,16.75-18.88,27.62c-7.55,9.81-6.93,12.85,3.25,3.12c14-13.38,20.34-19.76,33.88-32.5c6.38-6,19.39-12.09,18.14,0.88c-1.02,10.63-1.89,22.13-2.29,30.75c-1.02,21.71,11.53,18,20.15,8.63",
         "start": [
-          22,
-          44
+          16.98,
+          40.75
         ],
-        "end": [
-          76,
-          68
+        "numPos": [
+          11.86,
+          36.25
         ],
-        "direction": "zigzag_wave",
-        "d": "M 22,44 L 56,38 L 28,76 Q 48,56 62,64 L 76,68"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1797,22 +1792,23 @@
     "char": "ろ",
     "romaji": "ro",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis mendatar, diagonal turun, lalu lengkung membulat seperti angka 3 (tanpa simpul)",
-        "hintTh": "ลากแนวนอน เฉียงลง แล้ววาดส่วนโค้งมนคล้ายเลข 3 (ไม่มีห่วง)",
+        "d": "M36.95,21.88c1.5,2,4.62,3.62,8.5,2.5c3.88-1.12,8.12-2.25,14.12-4.38c6-2.13,6.53-0.1,3.38,4.25c-7.88,10.88-18,22.75-27.5,35.25c-7.49,9.86-10.68,11.32,2.88,2.25c17.38-11.62,46.62-14,46.62,8.12c0,15.62-16,22.5-32.12,25.12",
         "start": [
-          30,
-          26
+          36.95,
+          21.88
         ],
-        "end": [
-          42,
-          80
+        "numPos": [
+          31.08,
+          19.38
         ],
-        "direction": "three",
-        "d": "M 30,26 L 66,24 L 36,52 C 76,46 76,82 42,80"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -1820,37 +1816,37 @@
     "char": "わ",
     "romaji": "wa",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal lurus di sisi kiri",
-        "hintTh": "ลากเส้นแนวตั้งตรงทางซ้าย",
+        "d": "M38.53,14.75c1.5,1.38,2.22,3.73,2,6.38c-1,11.87-2.75,44.49-2.75,52.87c0,8.38-0.62,16.62-0.62,19.5",
         "start": [
-          32,
-          22
+          38.53,
+          14.75
         ],
-        "end": [
-          32,
-          80
+        "numPos": [
+          31.16,
+          13.25
         ],
-        "direction": "down",
-        "d": "M 32,22 L 32,80"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis zig-zag melintasi garis vertikal lalu membulat besar ke kanan",
-        "hintTh": "ลากเส้นซิกแซกตัดเส้นตรงแล้วโค้งมนออกไปทางขวา",
+        "d": "M17.53,40.75c2.12,1.38,3.68,1.3,7.5,0c5.88-2,9.8-3.16,16.25-6c4.25-1.88,6.12,0,2.75,4c-6.72,7.96-13,16.5-22.12,27.88c-7.75,9.66-7.54,12.21,3,2.88c21.88-19.38,49.75-35.62,63.5-21c14.36,15.27,1.62,36.62-23.38,42.62",
         "start": [
-          22,
-          44
+          17.53,
+          40.75
         ],
-        "end": [
-          44,
-          80
+        "numPos": [
+          12.41,
+          36.25
         ],
-        "direction": "zigzag_bowl",
-        "d": "M 22,44 L 54,38 L 28,76 C 54,54 78,54 74,72 C 70,82 56,82 44,80"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1858,52 +1854,51 @@
     "char": "を",
     "romaji": "wo",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar di bagian atas",
-        "hintTh": "ลากเส้นแนวนอนด้านบน",
+        "d": "M28.56,27.87c1.62,1.13,3.17,1.64,6.01,1.12c10.86-1.99,16.74-3.37,24.71-4.72c3.64-0.62,5.65-0.93,8.4-0.75",
         "start": [
-          26,
-          30
+          28.56,
+          27.87
         ],
-        "end": [
-          66,
-          28
+        "numPos": [
+          21.94,
+          25.88
         ],
-        "direction": "right",
-        "d": "M 26,30 L 66,28"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis diagonal turun memotong garis pertama lalu melengkung ke kanan",
-        "hintTh": "ลากเส้นเฉียงตัดเส้นแรกแล้วหักเลี้ยวขวา",
+        "d": "M49.93,14.38c0.75,1,1.48,3.22,0.38,5.62c-4.62,10.12-10,20.75-17.12,30.25c-9.25,12.33-9.25,11.19,2.12,2.5c9-6.88,23.75-12.12,22.88,19.88",
         "start": [
-          48,
-          18
+          49.93,
+          14.38
         ],
-        "end": [
-          68,
-          54
+        "numPos": [
+          39.69,
+          12.75
         ],
-        "direction": "down_right",
-        "d": "M 48,18 L 38,54 L 68,54"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Lengkungkan pola C memotong garis kedua di bagian bawah",
-        "hintTh": "วาดเส้นโค้งตัว C ตัดเส้นที่สองด้านล่าง",
+        "d": "M83.06,39.88c0.62,1.75,0,4-3,5.75c-3,1.75-49.62,24.16-44.75,38.25c3.28,9.48,17.93,9.12,29.98,7.75c4.48-0.51,9.15-1.12,12.4-1.75",
         "start": [
-          42,
-          60
+          83.06,
+          39.88
         ],
-        "end": [
-          74,
-          76
+        "numPos": [
+          76.69,
+          37.38
         ],
-        "direction": "curve_c",
-        "d": "M 42,60 C 26,72 50,86 74,76"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -1911,22 +1906,23 @@
     "char": "ん",
     "romaji": "n",
     "script": "hiragana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Satu tarikan: garis diagonal turun, naik miring, lalu buat lengkungan ombak ke kanan bawah (seperti huruf 'n')",
-        "hintTh": "ลากเส้นเฉียงลง ลากขึ้นแล้วทำส่วนโค้งคล้ายตัวอักษร 'n'",
+        "d": "M56.35,16.5c0.75,1.75,1.13,5.83-0.38,8.25c-7,11.25-27.22,43.47-33.88,54.37c-9,14.75-7.62,16.25,1.5,1.25c17.86-29.36,32-23.76,32-6.75c0,25,19,26.5,34.25-5",
         "start": [
-          34,
-          24
+          56.35,
+          16.5
         ],
-        "end": [
-          76,
-          70
+        "numPos": [
+          45.85,
+          15.88
         ],
-        "direction": "n_wave",
-        "d": "M 34,24 L 28,68 Q 42,42 56,54 C 64,62 70,72 76,70"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
@@ -1934,37 +1930,37 @@
     "char": "ア",
     "romaji": "a",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik garis horizontal ke kanan lalu tekuk miring ke kiri bawah",
-        "hintTh": "ลากเส้นแนวนอนไปขวาแล้วหักมุมลงซ้าย",
+        "d": "M23.5,26.25c2.41,1.56,3.98,1.44,8.51,0.75c11.4-1.75,37.77-5.5,48.28-6.78c5.23-0.64,7.99,2.06,2.62,6.04c-6.75,5-13.12,9.5-23.25,16",
         "start": [
-          28,
-          30
+          23.5,
+          26.25
         ],
-        "end": [
-          44,
-          52
+        "numPos": [
+          20.41,
+          22.13
         ],
-        "direction": "hook_left",
-        "d": "M 28,30 L 68,26 L 44,52"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis lengkung diagonal dari tengah atas menyapu ke kiri bawah",
-        "hintTh": "ลากเส้นโค้งทแยงจากตรงกลางลงซ้ายล่าง",
+        "d": "M53.12,41.12c0.79,1.5,1.02,3.24,0.58,5.28c-4.04,18.48-9.92,31.85-19.92,45.48",
         "start": [
-          52,
-          28
+          53.12,
+          41.12
         ],
-        "end": [
-          30,
-          80
+        "numPos": [
+          44.79,
+          41.75
         ],
-        "direction": "down_left",
-        "d": "M 52,28 Q 50,56 30,80"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -1972,37 +1968,37 @@
     "char": "イ",
     "romaji": "i",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis diagonal miring dari atas ke kiri bawah",
-        "hintTh": "ลากเส้นทแยงจากบนลงล่างซ้าย",
+        "d": "M69.75,16.75c0.12,1.75-0.34,3.86-1.62,5.5c-10.13,12.87-23.75,29.63-45.63,42.87",
         "start": [
-          52,
-          20
+          69.75,
+          16.75
         ],
-        "end": [
-          30,
-          52
+        "numPos": [
+          61.13,
+          15.13
         ],
-        "direction": "down_left",
-        "d": "M 52,20 L 30,52"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal lurus turun dari tengah goresan pertama",
-        "hintTh": "ลากเส้นแนวตั้งตรงลงมาจากกึ่งกลางเส้นแรก",
+        "d": "M56.38,43.88c1,1.12,1.25,3,1.25,4.62c0,1.62,0,32.75,0,34.62c0,1.87-0.13,9.13-0.13,11.76",
         "start": [
-          42,
-          38
+          56.38,
+          43.88
         ],
-        "end": [
-          42,
-          82
+        "numPos": [
+          50.75,
+          53.63
         ],
-        "direction": "down",
-        "d": "M 42,38 L 42,82"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -2010,52 +2006,51 @@
     "char": "ウ",
     "romaji": "u",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Titik vertikal pendek di atas tengah",
-        "hintTh": "แต้มจุดแนวตั้งสั้นตรงกลางบน",
+        "d": "M53.25,14.62c1,1.12,1.25,3,1.25,4.62c0,1.62,0,10.76,0,12.64",
         "start": [
-          50,
-          18
+          53.25,
+          14.62
         ],
-        "end": [
-          50,
-          28
+        "numPos": [
+          42.75,
+          15.13
         ],
-        "direction": "down",
-        "d": "M 50,18 L 50,28"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal pendek di sebelah kiri",
-        "hintTh": "ลากเส้นแนวตั้งสั้นทางซ้าย",
+        "d": "M26.5,31.25c1,1.12,1.22,3,1.25,4.62c0.09,4.45,0.29,10.95,0.45,16.37c0.07,2.5,0.14,4.77,0.18,6.5",
         "start": [
-          30,
-          36
+          26.5,
+          31.25
         ],
-        "end": [
-          30,
-          48
+        "numPos": [
+          18,
+          27
         ],
-        "direction": "down",
-        "d": "M 30,36 L 30,48"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis horizontal ke kanan lalu tekuk menyapu miring ke kiri bawah",
-        "hintTh": "ลากเส้นแนวนอนไปขวาแล้วหักมุมโค้งลงซ้าย",
+        "d": "M29.12,35.88c19.38-2.25,40.25-4.25,49-5.5c8.75-1.25,8.28,0.84,6.25,6.88c-5,14.88-20.12,43.5-41,56.62",
         "start": [
-          30,
-          38
+          29.12,
+          35.88
         ],
-        "end": [
-          38,
-          80
+        "numPos": [
+          32.75,
+          32.5
         ],
-        "direction": "hook_left",
-        "d": "M 30,38 L 72,34 L 70,44 Q 64,68 38,80"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -2063,52 +2058,51 @@
     "char": "エ",
     "romaji": "e",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar bagian atas",
-        "hintTh": "ลากเส้นแนวนอนด้านบน",
+        "d": "M31.87,35.68c2.32,0.71,5.14,0.66,7.48,0.29c8.57-1.35,22.4-2.85,33.66-3.85c2.26-0.2,4.52-0.19,6.77,0.22",
         "start": [
-          30,
-          26
+          31.87,
+          35.68
         ],
-        "end": [
-          70,
-          26
+        "numPos": [
+          25.41,
+          32.63
         ],
-        "direction": "right",
-        "d": "M 30,26 L 70,26"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal lurus di tengah menghubungkan kedua garis",
-        "hintTh": "ลากเส้นแนวตั้งตรงกลางเชื่อมสองเส้น",
+        "d": "M53.34,38.13c1,1.12,1.31,3,1.25,4.62c-0.18,4.74-0.51,12.89-0.83,22.25c-0.08,2.31-0.16,4.7-0.23,7.12",
         "start": [
-          50,
-          26
+          53.34,
+          38.13
         ],
-        "end": [
-          50,
-          74
+        "numPos": [
+          45.66,
+          44.13
         ],
-        "direction": "down",
-        "d": "M 50,26 L 50,74"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis horizontal mendatar bagian bawah (sedikit lebih panjang)",
-        "hintTh": "ลากเส้นแนวนอนด้านล่าง (ยาวกว่าเล็กน้อย)",
+        "d": "M19,75.46c3.41,0.94,7.57,0.88,11.01,0.39c17.78-2.48,34.53-3.86,50.55-3.9c3.34-0.01,7.23,0.42,10.46,1.8",
         "start": [
-          24,
-          74
+          19,
+          75.46
         ],
-        "end": [
-          76,
-          74
+        "numPos": [
+          14.16,
+          69.5
         ],
-        "direction": "right",
-        "d": "M 24,74 L 76,74"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -2116,52 +2110,51 @@
     "char": "オ",
     "romaji": "o",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal mendatar dari kiri ke kanan",
-        "hintTh": "ลากเส้นแนวนอนจากซ้ายไปขวา",
+        "d": "M19.5,37.85c3.91,1.78,7.55,1.55,11.01,1.02c18.03-2.75,34.4-4.5,50.55-5.41c3.34-0.19,6.35,0.17,10.46,1.38",
         "start": [
-          24,
-          34
+          19.5,
+          37.85
         ],
-        "end": [
-          76,
-          32
+        "numPos": [
+          15.41,
+          33
         ],
-        "direction": "right",
-        "d": "M 24,34 L 76,32"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal turun memotong garis pertama dengan sentakan kait ke kiri",
-        "hintTh": "ลากเส้นแนวตั้งตัดเส้นแรกแล้วสะบัดขึ้นซ้าย",
+        "d": "M60.38,16.38c1.32,1.49,1.65,3.97,1.65,6.12c0,8-0.25,46.23-0.25,58.63c0,20.38-5.88,7.5-9.25,5.5",
         "start": [
-          56,
-          18
+          60.38,
+          16.38
         ],
-        "end": [
-          56,
-          80
+        "numPos": [
+          50.04,
+          14.88
         ],
-        "direction": "down_hook",
-        "d": "M 56,18 L 56,76 Q 56,80 48,78"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis diagonal miring meluncur ke kiri bawah",
-        "hintTh": "ลากเส้นทแยงเฉียงลงซ้ายล่าง",
+        "d": "M60.29,36.38c0,1.62-1.64,3.61-3.62,6c-7.88,9.5-21.12,22.75-34.62,33",
         "start": [
-          54,
-          40
+          60.29,
+          36.38
         ],
-        "end": [
-          26,
-          78
+        "numPos": [
+          45.41,
+          46.13
         ],
-        "direction": "down_left",
-        "d": "M 54,40 L 26,78"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -2169,37 +2162,269 @@
     "char": "カ",
     "romaji": "ka",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal ke kanan lalu tekuk miring ke kiri bawah dengan sentakan",
-        "hintTh": "ลากเส้นแนวนอนไปขวาแล้วหักมุมลงซ้ายพร้อมสะบัดปลาย",
+        "d": "M25.5,40.62c1.88,1.25,4.51,1.87,7.12,1.5c17.88-2.5,32.78-4.51,42.5-5.88c7.12-1,10.59,0.24,8.62,7.88c-2.12,8.25-4.47,17.81-9.25,29.12c-10.49,24.88-14.11,14.51-19.24,11.88",
         "start": [
-          26,
-          34
+          25.5,
+          40.62
         ],
-        "end": [
-          46,
-          78
+        "numPos": [
+          18.13,
+          41.13
         ],
-        "direction": "hook_left",
-        "d": "M 26,34 L 66,30 L 62,40 Q 56,66 46,78"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis diagonal melengkung dari atas menyapu ke kiri bawah",
-        "hintTh": "ลากเส้นโค้งทแยงจากบนลงล่างซ้าย",
+        "d": "M55.88,17.12c0.88,1.62,1.29,3.83,0.75,6.75c-4.25,22.88-15.88,45.25-30.25,58.88",
         "start": [
-          44,
-          20
+          55.88,
+          17.12
         ],
-        "end": [
-          24,
-          76
+        "numPos": [
+          46.25,
+          17.25
         ],
-        "direction": "down_left",
-        "d": "M 44,20 Q 42,52 24,76"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "キ": {
+    "char": "キ",
+    "romaji": "ki",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M27,40.5c1.75,0.62,4.77,1.09,7.25,0.38c11.75-3.38,30.62-8.13,37.5-9.88c2.62-0.67,6.75-1.12,9-1",
+        "start": [
+          27,
+          40.5
+        ],
+        "numPos": [
+          19.75,
+          37.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M19.5,65.8c2.28,0.84,6.24,1.18,9.46,0.17c17.79-5.59,32.67-9.09,49.17-12.99c3.43-0.81,8.81-1.52,11.74-1.35",
+        "start": [
+          19.5,
+          65.8
+        ],
+        "numPos": [
+          17.13,
+          61.13
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M48.87,16.75c2.5,1.75,3.43,3.24,3.88,6.12c2.12,13.62,6.38,45.38,8.25,59.25c0.4,3,1,8.38,1.38,11.12",
+        "start": [
+          48.87,
+          16.75
+        ],
+        "numPos": [
+          41,
+          16.88
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "ク": {
+    "char": "ク",
+    "romaji": "ku",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M50,19.62c0.38,1.5,0.34,3.48-0.5,5.12c-4.12,8.12-7.88,15.5-16.12,24.12",
+        "start": [
+          50,
+          19.62
+        ],
+        "numPos": [
+          42,
+          17.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M51.25,28.62c2.62,0.25,5.67-0.39,7.62-0.88c6-1.5,9.75-2.38,15.12-3.88c5.79-1.62,7.53-0.42,5.12,4.88c-10.36,22.88-26.24,44.14-48.61,60.51",
+        "start": [
+          51.25,
+          28.62
+        ],
+        "numPos": [
+          54.75,
+          24.63
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ケ": {
+    "char": "ケ",
+    "romaji": "ke",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M40.96,17.88c0.44,1.9,0.39,4.42-0.59,6.5c-4.82,10.31-9.21,19.67-18.87,30.62",
+        "start": [
+          40.96,
+          17.88
+        ],
+        "numPos": [
+          32.5,
+          17.38
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M37.88,37.62c2.12,0.88,4.15,1.04,6.62,0.5c12.62-2.75,25.5-4.88,35.75-6.5c3.61-0.57,6.25-0.75,9.25-0.5",
+        "start": [
+          37.88,
+          37.62
+        ],
+        "numPos": [
+          41.5,
+          34.75
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M64.46,38.88c0.44,1.9,0.5,4.27-0.08,6.5c-3.63,13.75-9.25,31.25-24.63,43.87",
+        "start": [
+          64.46,
+          38.88
+        ],
+        "numPos": [
+          56.25,
+          44
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "コ": {
+    "char": "コ",
+    "romaji": "ko",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M30.13,35c1.75,1,3.01,2.18,6.5,1.62c14.25-2.25,29.62-4.25,37.38-5.5c9.37-1.51,9.88,0.25,8,7.5c-2.77,10.71-5.25,22.12-7,34.88",
+        "start": [
+          30.13,
+          35
+        ],
+        "numPos": [
+          22.88,
+          32
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M27.5,77.38c2.62,1.12,4.38,1.51,8.25,1c11.38-1.5,22.62-3,33.75-3.38c4-0.13,5.88,0,9.62,0.5",
+        "start": [
+          27.5,
+          77.38
+        ],
+        "numPos": [
+          23.88,
+          72.88
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "サ": {
+    "char": "サ",
+    "romaji": "sa",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M16.5,44.34c2.84,1.27,4.77,1.91,8.93,1.13c17.2-3.22,40.45-5.35,58.53-5.34c4.33,0,6.92,0.37,10.42,0.82",
+        "start": [
+          16.5,
+          44.34
+        ],
+        "numPos": [
+          11.88,
+          39.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M36.63,23.38c1.12,1.38,1.19,2.5,1.25,4.75c0.25,9,0.38,20.25,0.75,28.88c0.14,3.25,0.38,7.12,0.38,9.25",
+        "start": [
+          36.63,
+          23.38
+        ],
+        "numPos": [
+          27,
+          21.63
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M69.63,16.62c1.5,2,1.62,2.87,1.62,6.25c0,8.25-0.16,9-0.16,15.88c0,23.25-9.34,42.5-23.21,53",
+        "start": [
+          69.63,
+          16.62
+        ],
+        "numPos": [
+          60.63,
+          16.13
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -2207,52 +2432,51 @@
     "char": "シ",
     "romaji": "shi",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Titik pendek atas miring ke bawah",
-        "hintTh": "แต้มจุดสั้นบนสุด",
+        "d": "M39.87,19.75c5.14,1.57,9.79,6.01,11.5,8.62",
         "start": [
-          32,
-          28
+          39.87,
+          19.75
         ],
-        "end": [
-          42,
-          34
+        "numPos": [
+          34,
+          19.13
         ],
-        "direction": "down_right",
-        "d": "M 32,28 L 42,34"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Titik pendek kedua di bawahnya sejajar",
-        "hintTh": "แต้มจุดสั้นจุดที่สองขนานกัน",
+        "d": "M26,42.62c3.25,0.88,10.25,5.5,12.25,8.13",
         "start": [
-          28,
-          48
+          26,
+          42.62
         ],
-        "end": [
-          38,
-          54
+        "numPos": [
+          23.38,
+          38.63
         ],
-        "direction": "down_right",
-        "d": "M 28,48 L 38,54"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Tarik garis menyapu dari kiri bawah melesat ke kanan atas",
-        "hintTh": "ลากเส้นปัดจากล่างซ้ายพุ่งขึ้นขวาบน",
+        "d": "M33,85c3.75,0.88,7.12,0.49,10.38-1.38c17.87-10.24,32.37-23.87,46.12-42.87",
         "start": [
-          24,
-          78
+          33,
+          85
         ],
-        "end": [
-          74,
-          32
+        "numPos": [
+          27.38,
+          78.63
         ],
-        "direction": "up_right",
-        "d": "M 24,78 Q 42,66 74,32"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -2260,37 +2484,37 @@
     "char": "ス",
     "romaji": "su",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal ke kanan lalu tekuk menyapu ke kiri bawah",
-        "hintTh": "ลากเส้นแนวนอนไปขวาแล้วหักมุมลงซ้าย",
+        "d": "M30.13,29.38c1.75,1.5,4.15,1.98,6.62,1.38c13.25-3.25,24.25-5.62,31.25-7.38c7-1.76,8.64,1.16,6.5,5.75c-11.24,24.12-28.37,45.87-53.5,57.25",
         "start": [
-          30,
-          32
+          30.13,
+          29.38
         ],
-        "end": [
-          42,
-          78
+        "numPos": [
+          23.63,
+          27.75
         ],
-        "direction": "hook_left",
-        "d": "M 30,32 L 68,28 L 42,78"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis diagonal pendek meluncur ke kanan bawah",
-        "hintTh": "ลากเส้นทแยงสั้นลงขวาล่าง",
+        "d": "M61,57.25c11,7.38,21,17,28,28.62",
         "start": [
-          48,
-          54
+          61,
+          57.25
         ],
-        "end": [
-          76,
-          78
+        "numPos": [
+          65.76,
+          55.75
         ],
-        "direction": "down_right",
-        "d": "M 48,54 L 76,78"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -2298,37 +2522,37 @@
     "char": "セ",
     "romaji": "se",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal ke kanan lalu tekuk vertikal ke bawah dengan sentakan",
-        "hintTh": "ลากเส้นแนวนอนไปขวาแล้วหักลงพร้อมสะบัดขึ้น",
+        "d": "M17,49.38c3.12,1.5,5.04,2.18,8.62,1.38c23.5-5.25,31.24-7.43,50.62-11.62c23.12-5,6.5,7.75-3.25,18.12",
         "start": [
-          26,
-          40
+          17,
+          49.38
         ],
-        "end": [
-          50,
-          76
+        "numPos": [
+          13.51,
+          45.13
         ],
-        "direction": "hook_left",
-        "d": "M 26,40 L 72,34 L 72,66 Q 72,76 62,76 L 50,76"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis vertikal di kiri turun melintasi garis pertama",
-        "hintTh": "ลากเส้นแนวตั้งทางซ้ายตัดเส้นแรก",
+        "d": "M42.38,19.5c2,2.25,2.15,3.5,2.12,6.62c-0.12,17.5-0.88,31.75-0.88,41.12c0,14,3.13,16.99,12.38,17.12c8.38,0.12,14.12,0.12,18,0.12c3.88,0,7.5-0.5,10.5-1.12",
         "start": [
-          42,
-          22
+          42.38,
+          19.5
         ],
-        "end": [
-          42,
-          80
+        "numPos": [
+          34.13,
+          17.63
         ],
-        "direction": "down",
-        "d": "M 42,22 L 42,80"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -2336,37 +2560,37 @@
     "char": "ソ",
     "romaji": "so",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Titik miring pendek di kiri atas",
-        "hintTh": "แต้มจุดเฉียงสั้นที่มุมซ้ายบน",
+        "d": "M23.5,25.5c3.92,4.1,7.71,9.93,10.75,17.88",
         "start": [
-          36,
-          30
+          23.5,
+          25.5
         ],
-        "end": [
-          46,
-          44
+        "numPos": [
+          20.5,
+          22.38
         ],
-        "direction": "down_right",
-        "d": "M 36,30 L 46,44"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis diagonal menyapu dari kanan atas ke kiri bawah",
-        "hintTh": "ลากเส้นทแยงปัดจากขวาบนลงซ้ายล่าง",
+        "d": "M83.5,21c1.25,2.5,1.3,4.44,0.12,8.5c-5.87,20.38-26.24,49.5-45.62,61.25",
         "start": [
-          68,
-          26
+          83.5,
+          21
         ],
-        "end": [
-          32,
-          78
+        "numPos": [
+          74.13,
+          19.5
         ],
-        "direction": "down_left",
-        "d": "M 68,26 Q 54,58 32,78"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
@@ -2374,52 +2598,103 @@
     "char": "タ",
     "romaji": "ta",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis diagonal miring pendek di kiri atas",
-        "hintTh": "ลากเส้นเฉียงสั้นที่มุมซ้ายบน",
+        "d": "M48.83,19.75c0.43,1.72,0.39,4-0.58,5.89c-4.77,9.34-9.1,17.82-18.63,27.73",
         "start": [
-          42,
-          20
+          48.83,
+          19.75
         ],
-        "end": [
-          28,
-          44
+        "numPos": [
+          41.38,
+          17.25
         ],
-        "direction": "down_left",
-        "d": "M 42,20 L 28,44"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal ke kanan lalu tekuk menyapu ke kiri bawah",
-        "hintTh": "ลากเส้นแนวนอนไปขวาแล้วหักมุมลงซ้าย",
+        "d": "M49.75,30.38c2.75,0.5,5,0,7.62-0.62c6.02-1.43,10.5-2.62,15.88-4.12c5.79-1.62,8.22,0.31,5.88,5.62c-10.88,24.62-22.13,43.99-50.13,59.99",
         "start": [
-          28,
-          38
+          49.75,
+          30.38
         ],
-        "end": [
-          46,
-          80
+        "numPos": [
+          54.75,
+          26
         ],
-        "direction": "hook_left",
-        "d": "M 28,38 L 74,32 L 68,44 Q 60,68 46,80"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis diagonal pendek melintasi bagian dalam ke kanan bawah",
-        "hintTh": "ลากเส้นเฉียงสั้นด้านในลงขวาล่าง",
+        "d": "M43.38,45.62c6.75,3.5,10.62,7.88,14.75,15.25",
         "start": [
-          38,
-          52
+          43.38,
+          45.62
         ],
-        "end": [
-          70,
-          72
+        "numPos": [
+          45.13,
+          43.5
         ],
-        "direction": "down_right",
-        "d": "M 38,52 L 70,72"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "チ": {
+    "char": "チ",
+    "romaji": "chi",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M69.76,15.25c-0.38,2.62-2.01,4.37-3.88,5.38c-7.88,4.25-18.62,9.75-35.5,13.25",
+        "start": [
+          69.76,
+          15.25
+        ],
+        "numPos": [
+          61.76,
+          12.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M18.5,51.5c2.88,0.88,4.39,1.65,7.88,1.25c22-2.5,36.38-4.25,56.12-4.88c4.88-0.15,7.88,0.51,10.88,1.51",
+        "start": [
+          18.5,
+          51.5
+        ],
+        "numPos": [
+          13.63,
+          46.75
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M54.88,30.75c0.88,0.75,1.75,2.49,1.75,4.75c0,6.03,0.03,11.25,0.03,18.27c0,14.98-5.03,29.48-16.53,39.23",
+        "start": [
+          54.88,
+          30.75
+        ],
+        "numPos": [
+          47.76,
+          37.63
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -2427,52 +2702,1161 @@
     "char": "ツ",
     "romaji": "tsu",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Titik miring pertama di kiri atas",
-        "hintTh": "แต้มจุดเฉียงจุดแรกซ้ายบน",
+        "d": "M21.5,31.38c2.38,3,4.5,9.38,4.88,13.88",
         "start": [
-          32,
-          28
+          21.5,
+          31.38
         ],
-        "end": [
-          40,
-          40
+        "numPos": [
+          16.62,
+          27.13
         ],
-        "direction": "down_right",
-        "d": "M 32,28 L 40,40"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Titik miring kedua di kanannya",
-        "hintTh": "แต้มจุดเฉียงจุดที่สองถัดไปทางขวา",
+        "d": "M45.62,23.75c3.38,3.5,6.62,9.5,7,14.88",
         "start": [
-          48,
-          32
+          45.62,
+          23.75
         ],
-        "end": [
-          56,
-          44
+        "numPos": [
+          38.75,
+          20.88
         ],
-        "direction": "down_right",
-        "d": "M 48,32 L 56,44"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Tarik garis diagonal menyapu dari kanan atas meluncur ke kiri bawah",
-        "hintTh": "ลากเส้นทแยงปัดจากขวาบนลงซ้ายล่าง",
+        "d": "M84.62,27.88c0.75,2.25,0.39,5.26-0.75,8c-7.63,18.37-21.25,41.12-46,52.5",
         "start": [
-          74,
-          24
+          84.62,
+          27.88
         ],
-        "end": [
+        "numPos": [
+          75.62,
+          25.75
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "テ": {
+    "char": "テ",
+    "romaji": "te",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M36.5,21.5c2.12,1.25,4.38,1.59,7.25,1.25c10.62-1.25,16.88-2.25,24.62-3.25c3.73-0.48,5.63-0.5,8.13-0.25",
+        "start": [
+          36.5,
+          21.5
+        ],
+        "numPos": [
+          29.38,
+          19.25
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M20,44.12c2.88,1,5.26,1.05,7.5,0.75c22.38-3,37-5.62,54.13-6.12c5.62-0.16,7.75,0,10.38,0.62",
+        "start": [
+          20,
+          44.12
+        ],
+        "numPos": [
+          16.38,
+          39.75
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M58,43.25c0.88,1,1.32,2.63,1.12,4.38c-1.74,15.37-11.62,34.99-24.62,41.87",
+        "start": [
+          58,
+          43.25
+        ],
+        "numPos": [
+          50.38,
+          49.88
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "ト": {
+    "char": "ト",
+    "romaji": "to",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M44,16.38c1.25,1.12,2.12,3.25,2.12,5.5c0,26.12,0,53.5,0,57.62c0,4.12,0,10.5,0,13.38",
+        "start": [
+          44,
+          16.38
+        ],
+        "numPos": [
+          37.37,
+          14.38
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M49.24,43.12c11.75,4.12,18.25,10.62,24.5,18.75",
+        "start": [
+          49.24,
+          43.12
+        ],
+        "numPos": [
+          52.25,
+          39.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ナ": {
+    "char": "ナ",
+    "romaji": "na",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M18.5,44.12c2.62,1,4.77,1.17,9.12,0.5c19.38-3,37.75-4.75,52.38-5.62c3.75-0.22,8.88-0.25,11.88,0.12",
+        "start": [
+          18.5,
+          44.12
+        ],
+        "numPos": [
+          14.26,
+          40.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M53.26,14.5c1.75,1.25,2.75,3,2.75,6c0,3,0.12,21.5,0.12,24.25c0,20-6,37.62-18.38,49.12",
+        "start": [
+          53.26,
+          14.5
+        ],
+        "numPos": [
+          45.01,
+          13.75
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ニ": {
+    "char": "ニ",
+    "romaji": "ni",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M32.63,34.69c2.5,1.19,4.33,1.6,7.45,1.35c11.55-0.91,18.3-2.41,27.04-3.18c2.64-0.23,6.27-0.16,8.39,0.08",
+        "start": [
+          32.63,
+          34.69
+        ],
+        "numPos": [
+          26.01,
+          33.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M20,74.88c2.62,1,4.78,1.45,9.12,0.75c20.25-3.25,36.5-3.88,52.38-3.88c3.75,0,8,1,11.12,2.38",
+        "start": [
+          20,
+          74.88
+        ],
+        "numPos": [
+          15.76,
+          68.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ヌ": {
+    "char": "ヌ",
+    "romaji": "nu",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M33.38,27.62c2.75,1.25,5.38,1.16,8.5,0.62c10.12-1.75,19-3.12,28.62-5c6.67-1.3,7.75-0.12,5.38,5.62c-6.7,16.22-20.63,40.52-48.88,57.89",
+        "start": [
+          33.38,
+          27.62
+        ],
+        "numPos": [
+          27.25,
+          24.38
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M44.88,46.38c12,6.75,22.38,15.38,30.62,28.12",
+        "start": [
+          44.88,
+          46.38
+        ],
+        "numPos": [
+          35.13,
+          44.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ネ": {
+    "char": "ネ",
+    "romaji": "ne",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M51.38,12.38c3.38,2.12,8,5.88,11,10.88",
+        "start": [
+          51.38,
+          12.38
+        ],
+        "numPos": [
+          45.25,
+          11.25
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M26.88,36.16c2.62,1.46,5.45,1.93,8.5,1.19c10.75-2.6,20.75-4.98,30.88-7.5c6.53-1.62,7.81,1.27,4.62,4.68c-11.63,12.47-22.76,23.35-48.88,37.97",
+        "start": [
+          26.88,
+          36.16
+        ],
+        "numPos": [
+          18.88,
+          32.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M54.38,54.12c1.38,1.75,1.62,3.5,1.62,6c0,2.5,0,27.5,0,29.38c0,1.88,0,4,0,6.88",
+        "start": [
+          54.38,
+          54.12
+        ],
+        "numPos": [
+          49.25,
+          63.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M65.38,53.62c12.5,6,19.88,11.75,24.88,18.88",
+        "start": [
+          65.38,
+          53.62
+        ],
+        "numPos": [
+          64.75,
+          50.88
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "ノ": {
+    "char": "ノ",
+    "romaji": "no",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 1,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M72.37,25.25c0.75,2,0.92,4.89,0.25,7.25c-7.12,25-25.38,44.75-43.62,56.88",
+        "start": [
+          72.37,
+          25.25
+        ],
+        "numPos": [
+          63.5,
+          24.25
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      }
+    ]
+  },
+  "ハ": {
+    "char": "ハ",
+    "romaji": "ha",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M39.33,36.88c0.38,1.14,0.46,2.88-0.12,4.14c-6.33,13.73-13.33,23.86-22.21,32.23",
+        "start": [
+          39.33,
+          36.88
+        ],
+        "numPos": [
+          27.76,
+          35
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M65.5,36.38c13,9.12,23.12,22.62,28,33.38",
+        "start": [
+          65.5,
+          36.38
+        ],
+        "numPos": [
+          58.51,
+          33.75
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ヒ": {
+    "char": "ヒ",
+    "romaji": "hi",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M35.38,44.5c1.75,1.38,4.51,2.19,6.88,1.88c10.24-1.38,17.24-2.88,24.24-4.26c3.01-0.59,7.12-1,9.38-0.88",
+        "start": [
+          35.38,
+          44.5
+        ],
+        "numPos": [
+          36.88,
+          41.88
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M31,17.62c1.38,1.26,1.88,3.38,1.88,6.13c0,2.75-0.88,44-0.88,47.25c0,9.75,4,14.62,13.75,14.62c6,0,16.38,0.12,21.38,0c5-0.12,9.5-0.62,13.5-1.5",
+        "start": [
+          31,
+          17.62
+        ],
+        "numPos": [
+          23.88,
+          15.13
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "フ": {
+    "char": "フ",
+    "romaji": "fu",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 1,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M24.5,30c1.88,1.88,3.5,2.04,6.5,1.62c14.5-2,29-4.38,43.75-6.88c6.82-1.16,10.58,2.29,6.88,9.12c-10.38,19.14-21.25,39.52-50.01,53.64",
+        "start": [
+          24.5,
+          30
+        ],
+        "numPos": [
+          21.63,
+          24.88
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      }
+    ]
+  },
+  "ヘ": {
+    "char": "ヘ",
+    "romaji": "he",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 1,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M15.5,49.02c2.78,1.55,5.39,0.64,6.95-0.9c4.05-4.01,9.47-8.3,12-10.88c3.16-3.23,7.32-5.26,12.01-1.16c11.25,9.82,25.03,21.45,35.78,30.36c4.28,3.55,7.71,6.85,11.25,9.56",
+        "start": [
+          15.5,
+          49.02
+        ],
+        "numPos": [
+          11.76,
+          43.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      }
+    ]
+  },
+  "ホ": {
+    "char": "ホ",
+    "romaji": "ho",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M22.63,40.38c2.62,1,4.75,1.71,9.12,1.25c17.75-1.88,29.25-2.75,45.38-3.88c3.74-0.26,7.38-0.12,11.12,0.62",
+        "start": [
+          22.63,
+          40.38
+        ],
+        "numPos": [
+          16.01,
+          38.25
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M53.75,17.12c1.38,1.88,1.38,4.5,1.38,7.38c0,2.88-0.12,46.62-0.12,51.88c0,23.12-6.25,11.25-9.75,9.62",
+        "start": [
+          53.75,
+          17.12
+        ],
+        "numPos": [
+          44.76,
+          15.75
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M27.38,59.38c0.5,9.25-1.38,16.62-6.38,21.88",
+        "start": [
+          27.38,
+          59.38
+        ],
+        "numPos": [
+          21.51,
+          57.13
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M73.25,52.75c10.88,9.63,15.5,17.63,16.63,24.87",
+        "start": [
+          73.25,
+          52.75
+        ],
+        "numPos": [
+          65.51,
+          51.13
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "マ": {
+    "char": "マ",
+    "romaji": "ma",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M21.5,33.75c1.88,1.88,3.5,1.99,6.5,1.62c19.62-2.38,33.5-4,51.25-6.38c6.85-0.92,9.37,1.67,4.38,7.62c-7.12,8.5-17.88,20-28.75,31.62",
+        "start": [
+          21.5,
+          33.75
+        ],
+        "numPos": [
+          17.88,
+          27.88
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M43.38,58.88c8.43,6.5,16.6,15.93,20.25,26.25",
+        "start": [
+          43.38,
+          58.88
+        ],
+        "numPos": [
+          36.12,
+          59.12
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ミ": {
+    "char": "ミ",
+    "romaji": "mi",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M41.87,20c10.4,2.57,20.5,6.3,25,10.38",
+        "start": [
+          41.87,
+          20
+        ],
+        "numPos": [
+          34.63,
+          19.25
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M42,46.88c10.72,2.69,21.11,6.6,25.75,10.88",
+        "start": [
+          42,
+          46.88
+        ],
+        "numPos": [
+          34.38,
+          46.13
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M36.5,75c15.71,4.49,30.95,11,37.75,18.12",
+        "start": [
+          36.5,
+          75
+        ],
+        "numPos": [
+          31.88,
+          71.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "ム": {
+    "char": "ム",
+    "romaji": "mu",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M53.84,22.5c0.88,1.75,0.78,4.57-0.38,6.88c-9.25,18.38-16.19,30.96-25.25,45.75c-3.75,6.12-3,8.38,4.38,7.12c7.38-1.26,46.62-8.12,49.62-8.88",
+        "start": [
+          53.84,
+          22.5
+        ],
+        "numPos": [
+          45.71,
+          21
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M72.21,60.12c6.88,6.38,13.62,14.88,16,25.38",
+        "start": [
+          72.21,
+          60.12
+        ],
+        "numPos": [
+          66.46,
+          57.25
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "メ": {
+    "char": "メ",
+    "romaji": "me",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M73.38,19.12c0.88,1.75,0.48,4.44-0.38,6.88c-7.75,22.12-21.75,47.62-45,62.88",
+        "start": [
+          73.38,
+          19.12
+        ],
+        "numPos": [
+          64.26,
+          16
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M39.51,39.5c16.54,7.76,32.12,18,38.5,30.88",
+        "start": [
+          39.51,
+          39.5
+        ],
+        "numPos": [
+          33.76,
+          37.38
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "モ": {
+    "char": "モ",
+    "romaji": "mo",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M27.88,26.19c2.5,1.19,4.33,1.6,7.45,1.35c11.55-0.91,21.93-2.16,32.79-3.93c2.62-0.42,6.27-0.41,8.39-0.17",
+        "start": [
+          27.88,
+          26.19
+        ],
+        "numPos": [
+          20.88,
+          23.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M17.5,54.38c2.62,1,4.78,1.45,9.12,0.75c20.26-3.25,33.88-5.38,51.64-6.13c3.75-0.16,7.38,0.25,11.12,0.88",
+        "start": [
+          17.5,
+          54.38
+        ],
+        "numPos": [
+          13.38,
+          49.38
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M48.76,29.88c1.12,1.62,1.42,3.62,1.42,6.12c0,6.53-0.65,33.56-0.65,35.88c0,7.67,3.09,11.08,10.53,11.76c5.33,0.49,12.31,0.24,16.37,0c4.46-0.26,6.52-0.74,9.59-1.43",
+        "start": [
+          48.76,
+          29.88
+        ],
+        "numPos": [
+          42.13,
+          35.38
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "ヤ": {
+    "char": "ヤ",
+    "romaji": "ya",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M18,45.75c2.12,1.62,6.15,2.35,10.12,1.38c18.88-4.62,33.39-7.83,48.88-11.88c22-5.75,1.5,14.25-2.75,20",
+        "start": [
+          18,
+          45.75
+        ],
+        "numPos": [
+          14.63,
+          40.75
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M38.47,19.38c1.65,1.4,2.54,2.67,3.18,5.21c0.64,2.54,11.95,52.9,12.59,55.57c0.64,2.67,2.16,9.16,3.05,12.46",
+        "start": [
+          38.47,
+          19.38
+        ],
+        "numPos": [
+          30.26,
+          19.25
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ユ": {
+    "char": "ユ",
+    "romaji": "yu",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M29.5,35.38c2.38,1.5,5.14,2.08,9.25,1.5c13.25-1.88,18.02-2.4,27.62-4c6.75-1.12,7.78,0.16,6.5,6.38c-2.38,11.5-4.88,24.5-6.5,34.5",
+        "start": [
+          29.5,
+          35.38
+        ],
+        "numPos": [
+          23.25,
+          31.88
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M17,76.88c2.75,1.5,4.76,2.05,9.12,1.5c22.62-2.88,36-3.88,54.12-3.88c3.75,0,7.38,0.5,11.12,1.12",
+        "start": [
+          17,
+          76.88
+        ],
+        "numPos": [
+          13.88,
+          71.75
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ヨ": {
+    "char": "ヨ",
+    "romaji": "yo",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M29.13,30.12c2.38,1.5,5.12,1.98,9.25,1.5c14-1.62,26.71-3.04,36.38-4.25c6-0.75,6.88,0.5,6.5,6.38c-1,15.51-1.89,30.63-3.01,42.25",
+        "start": [
+          29.13,
+          30.12
+        ],
+        "numPos": [
+          23.38,
+          28
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M29.25,52.88c2.38,1.5,5.12,1.98,9.25,1.5c10.5-1.22,22.81-2.29,31.11-3.04c2.77-0.25,5.27,0.04,7.77,0.54",
+        "start": [
+          29.25,
+          52.88
+        ],
+        "numPos": [
+          22.25,
+          51.75
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M23.5,78.84c2.75,1.3,4.74,1.68,9.12,1.3c12.5-1.08,29.37-2.9,41.38-2.9c3.38,0,5.62,0,9.38,0.54",
+        "start": [
+          23.5,
+          78.84
+        ],
+        "numPos": [
+          19.75,
+          74
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "ラ": {
+    "char": "ラ",
+    "romaji": "ra",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M38.63,21.06c2.07,1.86,4.43,2.53,8.05,2.15c9.2-0.96,14.34-2.01,21.57-2.95c2.41-0.31,4.13-0.53,6.51-0.19",
+        "start": [
+          38.63,
+          21.06
+        ],
+        "numPos": [
+          33.13,
+          19
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M26,41.89c2.38,1.7,5.12,2.24,9.25,1.7c14-1.84,31.21-4.95,40.88-6.32c6-0.85,8.14,0.62,6.25,5.72c-6.88,18.62-22,38.25-45.25,48.62",
+        "start": [
+          26,
+          41.89
+        ],
+        "numPos": [
+          22.75,
+          37.38
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "リ": {
+    "char": "リ",
+    "romaji": "ri",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M35,18.38c1.12,1.5,1.62,3,1.62,4.88c0,1.88,0,25,0,27c0,2,0,6.12,0,7.75",
+        "start": [
+          35,
+          18.38
+        ],
+        "numPos": [
+          28.62,
+          15.88
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M71,15.38c1.5,1.25,2.38,3.12,2.38,5.38c0,2.26-0.12,28.88-0.12,32.88c0,19.62-9.5,32.25-21.75,40.38",
+        "start": [
+          71,
+          15.38
+        ],
+        "numPos": [
+          62,
+          13.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ル": {
+    "char": "ル",
+    "romaji": "ru",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M34.38,31.88c1.12,1.5,1.72,3,1.62,4.88c-1.12,22.88-8.88,40.62-17.5,49.5",
+        "start": [
+          34.38,
+          31.88
+        ],
+        "numPos": [
+          29.01,
+          28.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M56.51,19.62c1.5,1.25,2.38,3.12,2.38,5.38c0,2.26-0.12,47.62-0.12,51.62c0,10.5,0.52,10.21,9.38,2.75c9.5-8,16.5-14.62,26.38-25.62",
+        "start": [
+          56.51,
+          19.62
+        ],
+        "numPos": [
+          50.13,
+          16.88
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "レ": {
+    "char": "レ",
+    "romaji": "re",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 1,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M34.5,19.75c1.5,1.25,2.38,3.12,2.38,5.38c0,2.26-0.12,50.12-0.12,54.12c-0.02,8.75-0.14,8.63,9.36,3.75c13.23-6.79,33.38-22.5,43.25-33.5",
+        "start": [
+          34.5,
+          19.75
+        ],
+        "numPos": [
+          27.87,
+          16.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      }
+    ]
+  },
+  "ロ": {
+    "char": "ロ",
+    "romaji": "ro",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M25,33.25c1.5,1.25,2.16,3.14,2.38,5.38c0.96,10.07,2.14,23.67,3.14,34.88c0.31,3.4,0.59,6.58,0.86,9.38",
+        "start": [
+          25,
+          33.25
+        ],
+        "numPos": [
+          18.38,
+          39.75
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M28.13,36.12c9.25-1,37.62-3.12,45.62-4.25c8-1.13,9.57,0.53,8.38,6.62c-2.13,10.89-4.13,21.89-6.75,34.89",
+        "start": [
+          28.13,
+          36.12
+        ],
+        "numPos": [
+          30.51,
+          32.25
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M32,78.12c5.38-0.5,33.62-3,36.5-3c2.88,0,7.88-0.25,11.5,0.25",
+        "start": [
           32,
-          80
+          78.12
         ],
-        "direction": "down_left",
-        "d": "M 74,24 Q 56,58 32,80"
+        "numPos": [
+          35.13,
+          73.63
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "ワ": {
+    "char": "ワ",
+    "romaji": "wa",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M25,23.62c1.5,1.25,2.16,3.14,2.38,5.38c0.96,10.07,0.89,8.17,1.89,19.38c0.31,3.4,0.59,6.58,0.86,9.38",
+        "start": [
+          25,
+          23.62
+        ],
+        "numPos": [
+          17.88,
+          25.75
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M27.75,26.38c3.12,0.38,5.16,0.22,8.23-0.06c13.77-1.29,27.15-2.32,41.65-3.7c8.04-0.76,9.44,0.51,8.38,6.62c-4.76,27.26-20.64,47.64-43.88,61.51",
+        "start": [
+          27.75,
+          26.38
+        ],
+        "numPos": [
+          30.38,
+          22.25
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "ヲ": {
+    "char": "ヲ",
+    "romaji": "wo",
+    "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M30.24,25.14c2.38,1.7,5.11,2.13,9.25,1.7c12.32-1.29,21.94-2.6,30.48-3.64c2.81-0.34,5.51-0.65,8.14-0.93",
+        "start": [
+          30.24,
+          25.14
+        ],
+        "numPos": [
+          27,
+          20.38
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M29,46.69c2.25,1.44,4.44,1.9,8.05,1.4c8.19-1.15,19.93-2.64,28.56-3.79c2.38-0.31,4.65-0.62,6.75-0.92",
+        "start": [
+          29,
+          46.69
+        ],
+        "numPos": [
+          25.12,
+          43
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M78,22.88c0.88,2,0.62,4.64,0.12,7c-4.88,22.5-23.5,47.12-44.12,60.74",
+        "start": [
+          78,
+          22.88
+        ],
+        "numPos": [
+          79.25,
+          18.88
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
@@ -2480,257 +3864,3151 @@
     "char": "ン",
     "romaji": "n",
     "script": "katakana",
+    "meaning": "",
+    "meaningTh": "",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Titik miring pendek di kiri",
-        "hintTh": "แต้มจุดเฉียงสั้นๆ ทางซ้าย",
+        "d": "M26.5,24.88c5.76,2.15,12.68,8.47,15.75,14.25",
         "start": [
-          34,
-          38
+          26.5,
+          24.88
         ],
-        "end": [
-          44,
-          48
+        "numPos": [
+          22.37,
+          22.13
         ],
-        "direction": "down_right",
-        "d": "M 34,38 L 44,48"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Tarik garis menyapu dari kiri bawah melesat ke kanan atas",
-        "hintTh": "ลากเส้นปัดจากล่างซ้ายพุ่งขึ้นขวาบน",
+        "d": "M28.62,83.75c2.5,1.62,5.12,0.96,7.75-0.62c20.13-12.13,35-24.63,49.63-41.13",
         "start": [
-          28,
-          76
+          28.62,
+          83.75
         ],
-        "end": [
-          74,
-          36
+        "numPos": [
+          22.5,
+          76.13
         ],
-        "direction": "up_right",
-        "d": "M 28,76 Q 44,64 74,36"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
   "一": {
     "char": "一",
-    "romaji": "ichi",
+    "romaji": "ichi / hito",
     "script": "kanji",
+    "meaning": "Satu",
+    "meaningTh": "หนึ่ง",
     "strokeCount": 1,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik satu garis horizontal mantap dari kiri ke kanan",
-        "hintTh": "ลากเส้นแนวนอนตรงจากซ้ายไปขวา",
+        "d": "M11,54.25c3.19,0.62,6.25,0.75,9.73,0.5c20.64-1.5,50.39-5.12,68.58-5.24c3.6-0.02,5.77,0.24,7.57,0.49",
         "start": [
-          20,
-          50
+          11,
+          54.25
         ],
-        "end": [
-          80,
-          50
+        "numPos": [
+          4.25,
+          54.13
         ],
-        "direction": "right",
-        "d": "M 20,50 L 80,50"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       }
     ]
   },
   "二": {
     "char": "二",
-    "romaji": "ni",
+    "romaji": "ni / futa",
     "script": "kanji",
+    "meaning": "Dua",
+    "meaningTh": "สอง",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal atas lebih pendek",
-        "hintTh": "ลากเส้นแนวนอนเส้นบนสั้นกว่า",
+        "d": "M25.25,32.4c1.77,0.37,4.78,0.56,6.55,0.37c10.82-1.15,28.82-3.4,41.24-3.76c2.95-0.09,4.73,0.18,6.21,0.36",
         "start": [
-          32,
-          36
+          25.25,
+          32.4
         ],
-        "end": [
-          68,
-          36
+        "numPos": [
+          17.5,
+          33.13
         ],
-        "direction": "right",
-        "d": "M 32,36 L 68,36"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal bawah lebih panjang",
-        "hintTh": "ลากเส้นแนวนอนเส้นล่างยาวกว่า",
+        "d": "M12,80.75c2.37,0.5,6.73,0.67,9.09,0.5c23.79-1.75,45.04-4.12,67.49-4.74c3.95-0.11,6.32,0.24,8.3,0.49",
         "start": [
-          20,
-          68
+          12,
+          80.75
         ],
-        "end": [
-          80,
-          68
+        "numPos": [
+          3.5,
+          81.5
         ],
-        "direction": "right",
-        "d": "M 20,68 L 80,68"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       }
     ]
   },
   "三": {
     "char": "三",
-    "romaji": "san",
+    "romaji": "san / mi",
     "script": "kanji",
+    "meaning": "Tiga",
+    "meaningTh": "สาม",
     "strokeCount": 3,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis horizontal atas berukuran sedang",
-        "hintTh": "ลากเส้นแนวนอนเส้นบนขนาดปานกลาง",
+        "d": "M27.5,23.65c3.09,0.73,6.29,0.36,9.4,0.06c10.2-1,27-2.94,38.97-3.57c3.06-0.16,6.09-0.2,9.14,0.23",
         "start": [
-          28,
-          30
+          27.5,
+          23.65
         ],
-        "end": [
-          72,
-          30
+        "numPos": [
+          18,
+          25.78
         ],
-        "direction": "right",
-        "d": "M 28,30 L 72,30"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis horizontal tengah paling pendek",
-        "hintTh": "ลากเส้นแนวนอนเส้นกลางสั้นที่สุด",
+        "d": "M28.75,55.14c3.13,0.76,6.46,0.43,9.64,0.2c10.03-0.72,23.97-2.63,34.73-3.12c2.7-0.12,5.45-0.16,8.13,0.3",
         "start": [
-          34,
-          50
+          28.75,
+          55.14
         ],
-        "end": [
-          66,
-          50
+        "numPos": [
+          18.75,
+          57.13
         ],
-        "direction": "right",
-        "d": "M 34,50 L 66,50"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis horizontal bawah paling panjang dan mantap",
-        "hintTh": "ลากเส้นแนวนอนเส้นล่างยาวที่สุด",
+        "d": "M13,87.83c3.94,1.01,7.72,0.96,11.75,0.72c18.41-1.07,41.27-3.39,61.12-4.07c3.63-0.13,7.2-0.1,10.75,0.78",
         "start": [
-          18,
-          72
+          13,
+          87.83
         ],
-        "end": [
-          82,
-          72
+        "numPos": [
+          3.75,
+          91.63
         ],
-        "direction": "right",
-        "d": "M 18,72 L 82,72"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       }
     ]
   },
-  "人": {
-    "char": "人",
-    "romaji": "hito",
+  "四": {
+    "char": "四",
+    "romaji": "shi / yon",
     "script": "kanji",
+    "meaning": "Empat",
+    "meaningTh": "สี่",
+    "strokeCount": 5,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M14.5,31.48c1.51,1.51,2.25,3.27,2.53,5.2c1.14,7.9,2.61,25.18,4.39,40.83c0.29,2.55,0.34,3.81,0.64,6.24",
+        "start": [
+          14.5,
+          31.48
+        ],
+        "numPos": [
+          8.75,
+          40.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M17.85,34.04c21.65-1.92,51.52-3.92,67.82-4.3c4.85-0.11,6.31,2.62,6.04,5.38c-0.9,9.02-4.17,28.29-6.41,39.62c-0.49,2.49-0.94,4.6-1.3,6.13",
+        "start": [
+          17.85,
+          34.04
+        ],
+        "numPos": [
+          20.75,
+          29.13
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M40.5,36c0.08,0.64,0.12,1.65-0.16,2.57c-2.22,7.3-5.1,14.55-13.35,22.68",
+        "start": [
+          40.5,
+          36
+        ],
+        "numPos": [
+          31.25,
+          41.63
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M59.75,34.25c0.8,1.05,1.44,2.29,1.49,3.92c0.11,3.62,0.05,7.05,0.05,9.89c0,6.94,0.71,7.54,9.47,7.54c4.99,0,8.86-0.72,10.25-1.72",
+        "start": [
+          59.75,
+          34.25
+        ],
+        "numPos": [
+          52.25,
+          40.13
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M22.73,79.32c13.77-0.57,43.64-1.8,61.18-2.08",
+        "start": [
+          22.73,
+          79.32
+        ],
+        "numPos": [
+          27.25,
+          75.63
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      }
+    ]
+  },
+  "五": {
+    "char": "五",
+    "romaji": "go / itsu",
+    "script": "kanji",
+    "meaning": "Lima",
+    "meaningTh": "ห้า",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M31.75,23.15c2.8,0.67,5.54,0.42,8.36,0.12c9.3-0.99,22.18-2.4,34.14-3.21c2.49-0.17,5.04-0.33,7.5,0.2",
+        "start": [
+          31.75,
+          23.15
+        ],
+        "numPos": [
+          24.5,
+          24.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M55.75,25.25c0.62,1.25,1.02,3.01,0.5,5c-3.12,11.88-14,44.12-19.75,59",
+        "start": [
+          55.75,
+          25.25
+        ],
+        "numPos": [
+          47.5,
+          33.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M25.5,55.25c2.07,1.24,4.73,1.03,7,0.81c15.49-1.45,29.89-3.03,42.25-4.06c3-0.25,4.25,1.75,3.5,3.75c-2.24,5.96-6,20.75-7.75,31.5",
+        "start": [
+          25.5,
+          55.25
+        ],
+        "numPos": [
+          18.5,
+          57.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M11.25,90.5c3.04,0.81,6.52,0.63,9.63,0.41c15.71-1.1,43.9-2.8,67.75-3.8c3.41-0.14,6.9-0.4,10.25,0.39",
+        "start": [
+          11.25,
+          90.5
+        ],
+        "numPos": [
+          3.5,
+          91.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "六": {
+    "char": "六",
+    "romaji": "roku / mui",
+    "script": "kanji",
+    "meaning": "Enam",
+    "meaningTh": "หก",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M51.87,17.5c1.78,1.78,2.71,3.48,2.71,6.5c0,6.46,0.12,9.16,0.12,14.35",
+        "start": [
+          51.87,
+          17.5
+        ],
+        "numPos": [
+          42.25,
+          17.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M13.5,42.13c3.27,0.74,7.11,0.89,9.93,0.64c21.56-1.9,41.78-5.02,61.41-5.47c4.8-0.11,7.49,0.31,11.06,1.07",
+        "start": [
+          13.5,
+          42.13
+        ],
+        "numPos": [
+          5.5,
+          43.63
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M38.11,58.6c0.51,1.37,0.42,3.67-0.49,5.29C33.38,71.38,24,82.38,15.41,88.75",
+        "start": [
+          38.11,
+          58.6
+        ],
+        "numPos": [
+          27.5,
+          58.63
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M70.16,59.92c9.96,8.61,18.18,18.54,23.16,28.99",
+        "start": [
+          70.16,
+          59.92
+        ],
+        "numPos": [
+          60.5,
+          58.63
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "七": {
+    "char": "七",
+    "romaji": "shichi / nana",
+    "script": "kanji",
+    "meaning": "Tujuh",
+    "meaningTh": "เจ็ด",
     "strokeCount": 2,
     "strokes": [
       {
         "order": 1,
-        "hint": "Tarik garis diagonal melengkung dari atas menyapu ke kiri bawah",
-        "hintTh": "ลากเส้นโค้งทแยงจากบนลงซ้ายล่าง",
+        "d": "M15.5,51.75c1.82,0.5,4.38,0.88,6.96,0.5c16.91-2.45,50.92-8.12,64.44-8.74c3.02-0.14,4.84,0.24,6.35,0.49",
         "start": [
-          50,
-          18
+          15.5,
+          51.75
         ],
-        "end": [
-          22,
-          82
+        "numPos": [
+          8.5,
+          53.5
         ],
-        "direction": "down_left",
-        "d": "M 50,18 Q 44,52 22,82"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Mulai dari tengah garis pertama, tarik garis diagonal menyangga ke kanan bawah",
-        "hintTh": "เริ่มจากกึ่งกลางเส้นแรก ลากเส้นทแยงค้ำลงขวาล่าง",
+        "d": "M43,20c1.38,1.38,2.15,3.25,2.15,5.26C45.15,29.5,45,71.84,45,76c0,10.5,2.25,12.25,20.25,12.25c18.75,0,20-3.75,20-2.75",
         "start": [
-          44,
-          46
+          43,
+          20
         ],
-        "end": [
-          78,
-          82
+        "numPos": [
+          34.5,
+          19.63
         ],
-        "direction": "down_right",
-        "d": "M 44,46 L 78,82"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "八": {
+    "char": "八",
+    "romaji": "hachi / ya",
+    "script": "kanji",
+    "meaning": "Delapan",
+    "meaningTh": "แปด",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M37.22,45c0.28,1.5,0.2,3.21-0.86,5.48c-4.23,9.02-11.48,20.4-24.1,32.02",
+        "start": [
+          37.22,
+          45
+        ],
+        "numPos": [
+          27.75,
+          42.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M48,27.25c9.38,0.25,21.12,30,37.27,45.72c3.79,3.69,6.73,5.66,9.98,7.03",
+        "start": [
+          48,
+          27.25
+        ],
+        "numPos": [
+          51.75,
+          22.63
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "九": {
+    "char": "九",
+    "romaji": "kyuu / ku",
+    "script": "kanji",
+    "meaning": "Sembilan",
+    "meaningTh": "เก้า",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M41.88,14.38c1,1.38,1.5,3.25,1.5,5.12c0,40.13-9.12,57.5-28.5,68.75",
+        "start": [
+          41.88,
+          14.38
+        ],
+        "numPos": [
+          32.5,
+          14.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M13.5,45.75c2.88,0.85,5.78,0.05,8.58-0.66c8.47-2.14,39.88-9.79,40.92-9.84c2.5-0.12,4.75,0.5,4.25,4.75c-0.5,4.25-5.5,20.75-7,32.5c-2.23,17.46,2,19.37,18.21,19.37c13.79,0,19.01-1.07,19.27-10.12",
+        "start": [
+          13.5,
+          45.75
+        ],
+        "numPos": [
+          5.5,
+          46.63
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "十": {
+    "char": "十",
+    "romaji": "juu / too",
+    "script": "kanji",
+    "meaning": "Sepuluh",
+    "meaningTh": "สิบ",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M11.88,50.98c3.18,0.89,6.62,0.61,9.87,0.35c19.92-1.58,45.23-4.76,63.38-5.82c3.85-0.23,7.23-0.07,11,0.56",
+        "start": [
+          11.88,
+          50.98
+        ],
+        "numPos": [
+          5.5,
+          52.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M52.22,11.63c1.4,1.4,2.2,3.96,2.2,6.26c0,1.13-0.03,51.22-0.19,73.41c-0.03,3.96-0.06,6.83-0.08,8.08",
+        "start": [
+          52.22,
+          11.63
+        ],
+        "numPos": [
+          42.75,
+          12.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "百": {
+    "char": "百",
+    "romaji": "hyaku",
+    "script": "kanji",
+    "meaning": "Ratus",
+    "meaningTh": "ร้อย",
+    "strokeCount": 6,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M16.13,20.23c2.22,0.54,6.29,0.75,8.51,0.54c21.49-2.02,41.86-4.39,59.22-4.98c3.7-0.12,5.92,0.26,7.77,0.53",
+        "start": [
+          16.13,
+          20.23
+        ],
+        "numPos": [
+          8.25,
+          21.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M52.31,21.75c0.19,1.38,0.19,2.5-0.38,3.93c-1.65,4.19-4.81,9.19-8.66,14.68",
+        "start": [
+          52.31,
+          21.75
+        ],
+        "numPos": [
+          42.5,
+          28.63
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M30.75,42.82c0.96,0.96,1.64,2.45,1.72,4.19c0.41,8.74,0.96,32.92,1.18,43.74c0.05,2.48,0.08,4.12,0.1,4.5",
+        "start": [
+          30.75,
+          42.82
+        ],
+        "numPos": [
+          23.5,
+          51.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M33.55,44.8c10.35-1.37,35.73-4.38,38.78-4.59c3.15-0.22,4.92,1.17,4.92,4.24c0,4.48-0.68,32-0.92,44.06c-0.06,3.02-0.1,5.05-0.11,5.48",
+        "start": [
+          33.55,
+          44.8
+        ],
+        "numPos": [
+          33.5,
+          41.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M34.14,66.95c10.24-1.08,32.11-3.2,41.44-3.57",
+        "start": [
+          34.14,
+          66.95
+        ],
+        "numPos": [
+          37.5,
+          63.1
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M34.97,92.87c8.78-0.87,30.53-2.12,40.06-2.39",
+        "start": [
+          34.97,
+          92.87
+        ],
+        "numPos": [
+          37.5,
+          89.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      }
+    ]
+  },
+  "千": {
+    "char": "千",
+    "romaji": "sen",
+    "script": "kanji",
+    "meaning": "Ribu",
+    "meaningTh": "พัน",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M70.38,10.17c-0.13,1.58-0.83,2.64-2.17,3.67c-5.71,4.41-21.46,11.91-41.57,16.82",
+        "start": [
+          70.38,
+          10.17
+        ],
+        "numPos": [
+          61.75,
+          8.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M12.13,50.83c3.36,0.94,7.21,0.75,10.63,0.49c17.76-1.34,37.63-4.16,66.24-4.94c3.08-0.08,6.08-0.14,9.13,0.38",
+        "start": [
+          12.13,
+          50.83
+        ],
+        "numPos": [
+          5.25,
+          52.63
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M54.56,25.25c1.03,1.03,2.01,3,2.01,5.18c0,0.9-0.07,46.38-0.19,63.58c-0.02,2.93-0.04,5.04-0.06,5.99",
+        "start": [
+          54.56,
+          25.25
+        ],
+        "numPos": [
+          48.5,
+          35.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "万": {
+    "char": "万",
+    "romaji": "man",
+    "script": "kanji",
+    "meaning": "Puluh ribu (10.000)",
+    "meaningTh": "หมื่น",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M14.38,24.73c2.3,0.54,6.52,0.78,8.81,0.54c21.57-2.27,44.44-5.64,64.9-5.98c3.83-0.06,6.12,0.26,8.04,0.53",
+        "start": [
+          14.38,
+          24.73
+        ],
+        "numPos": [
+          7.5,
+          26.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M51,41.5c1.45,0.7,3.19,1.43,5.19,1.74c7.31,1.14,17.05,1.94,22.64,1.5c4.64-0.37,6.38,1.08,5.17,4.73C77.88,68,72.75,78.75,63.87,90.4c-7.6,9.97-10.12,3.22-12.62,0.2",
+        "start": [
+          51,
+          41.5
+        ],
+        "numPos": [
+          57.5,
+          41.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M51.75,25.5c0.5,2,0.22,3.78-0.21,5.89C48.95,43.8,34.75,73.38,13.56,87.97",
+        "start": [
+          51.75,
+          25.5
+        ],
+        "numPos": [
+          43.5,
+          33.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "円": {
+    "char": "円",
+    "romaji": "en / maru",
+    "script": "kanji",
+    "meaning": "Yen / Lingkaran",
+    "meaningTh": "เยน / วงกลม",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M21.75,19.8c0.91,0.91,1.47,3.23,1.5,5.45c0.2,13.9,0.03,47.69,0.03,62.5c0,2-0.03,4.99-0.03,6",
+        "start": [
+          21.75,
+          19.8
+        ],
+        "numPos": [
+          16.5,
+          28.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M24.06,21.56c15.07-1.68,49.46-5.58,57.92-6.31c2.9-0.25,4.78,1.88,4.78,4.27c0,13.48,0,53.21,0,67.48c0,9.75-4.25,6.5-8.5,1.5",
+        "start": [
+          24.06,
+          21.56
+        ],
+        "numPos": [
+          24.75,
+          17.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M52.25,20.75c0.88,0.88,1.5,2,1.5,3.71c0,6.76,0,27.54,0,31.04",
+        "start": [
+          52.25,
+          20.75
+        ],
+        "numPos": [
+          45.5,
+          29.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M24.75,59.75c14.62-1.75,43-4.25,60.5-5.25",
+        "start": [
+          24.75,
+          59.75
+        ],
+        "numPos": [
+          28.5,
+          56.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
       }
     ]
   },
   "日": {
     "char": "日",
-    "romaji": "hi / nichi",
+    "romaji": "nichi / hi",
     "script": "kanji",
+    "meaning": "Matahari / Hari",
+    "meaningTh": "วัน / พระอาทิตย์",
     "strokeCount": 4,
     "strokes": [
       {
         "order": 1,
-        "hint": "Garis vertikal kiri turun",
-        "hintTh": "ลากเส้นแนวตั้งทางซ้ายลงมา",
+        "d": "M31.5,24.5c1.12,1.12,1.74,2.75,1.74,4.75c0,1.6-0.16,38.11-0.09,53.5c0.02,3.82,0.05,6.35,0.09,6.75",
         "start": [
-          30,
-          24
+          31.5,
+          24.5
         ],
-        "end": [
-          30,
-          78
+        "numPos": [
+          25.25,
+          32.63
         ],
-        "direction": "down",
-        "d": "M 30,24 L 30,78"
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
       },
       {
         "order": 2,
-        "hint": "Garis atas ke kanan lalu tekuk turun vertikal di sisi kanan",
-        "hintTh": "ลากเส้นแนวนอนไปขวาแล้วหักมุมลงมา",
+        "d": "M33.48,26c0.8-0.05,37.67-3.01,40.77-3.25c3.19-0.25,5,1.75,5,4.25c0,4-0.22,40.84-0.23,56c0,3.48,0,5.72,0,6",
         "start": [
-          30,
-          24
+          33.48,
+          26
         ],
-        "end": [
-          70,
-          78
+        "numPos": [
+          34.5,
+          22.5
         ],
-        "direction": "hook_down",
-        "d": "M 30,24 L 70,24 L 70,78"
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
       },
       {
         "order": 3,
-        "hint": "Garis horizontal tengah menutup bagian dalam",
-        "hintTh": "ลากเส้นแนวนอนตรงกลาง",
+        "d": "M34.22,55.25c7.78-0.5,35.9-2.5,44.06-2.75",
         "start": [
-          30,
-          50
+          34.22,
+          55.25
         ],
-        "end": [
-          70,
-          50
+        "numPos": [
+          37.5,
+          51.5
         ],
-        "direction": "right",
-        "d": "M 30,50 L 70,50"
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
       },
       {
         "order": 4,
-        "hint": "Garis horizontal bawah mengunci kotak",
-        "hintTh": "ลากเส้นแนวนอนด้านล่างปิดกรอบ",
+        "d": "M34.23,86.5c10.52-0.75,34.15-2.12,43.81-2.25",
         "start": [
-          30,
-          78
+          34.23,
+          86.5
         ],
-        "end": [
-          70,
-          78
+        "numPos": [
+          37.5,
+          83.5
         ],
-        "direction": "right",
-        "d": "M 30,78 L 70,78"
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "月": {
+    "char": "月",
+    "romaji": "getsu / tsuki",
+    "script": "kanji",
+    "meaning": "Bulan",
+    "meaningTh": "เดือน / พระจันทร์",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M34.25,16.25c1,1,1.48,2.38,1.5,4c0.38,33.62,2.38,59.38-11,73.25",
+        "start": [
+          34.25,
+          16.25
+        ],
+        "numPos": [
+          27.5,
+          23.43
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M36.25,19c4.12-0.62,31.49-4.78,33.25-5c4-0.5,5.5,1.12,5.5,4.75c0,2.76-0.5,49.25-0.5,69.5c0,13-6.25,4-8.75,1.75",
+        "start": [
+          36.25,
+          19
+        ],
+        "numPos": [
+          37.5,
+          15.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M37.25,38c10.25-1.5,27.25-3.75,36.25-4.5",
+        "start": [
+          37.25,
+          38
+        ],
+        "numPos": [
+          40,
+          33.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M37,58.25c8.75-1.12,27-3.5,36.25-4",
+        "start": [
+          37,
+          58.25
+        ],
+        "numPos": [
+          40,
+          54.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "火": {
+    "char": "火",
+    "romaji": "ka / hi",
+    "script": "kanji",
+    "meaning": "Api",
+    "meaningTh": "ไฟ",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M24.25,34c3.27,3.33,8.5,13,9.5,17.75",
+        "start": [
+          24.25,
+          34
+        ],
+        "numPos": [
+          16.5,
+          32.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M83,27.25c0.5,1.38,0.22,2.74-0.5,4.25c-2.38,5-7.5,12.12-12.75,17.25",
+        "start": [
+          83,
+          27.25
+        ],
+        "numPos": [
+          74.5,
+          26.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M52.5,14.25c1,1.25,1.5,3.12,1.5,5C54,69,39.62,80,21,91.5",
+        "start": [
+          52.5,
+          14.25
+        ],
+        "numPos": [
+          41.5,
+          14.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M52.75,50c12.49,14.06,25.01,28.42,33.62,36.13c2.7,2.42,4.9,4.02,8.38,4.87",
+        "start": [
+          52.75,
+          50
+        ],
+        "numPos": [
+          55.25,
+          67.13
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "水": {
+    "char": "水",
+    "romaji": "sui / mizu",
+    "script": "kanji",
+    "meaning": "Air",
+    "meaningTh": "น้ำ",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M52.77,15.08c1.08,1.08,1.67,2.49,1.76,5.52c0.4,14.55-0.26,62.16-0.26,67.12c0,9.78-7.52,0.03-9.02-1.22",
+        "start": [
+          52.77,
+          15.08
+        ],
+        "numPos": [
+          43.75,
+          15.38
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M17.5,45.75c1.75,0.62,3.73,0.43,5.25,0C25.88,44.88,36.09,41,38.59,40s4.47,1.24,3.75,3.5C39,54,28.25,69,19,74.75",
+        "start": [
+          17.5,
+          45.75
+        ],
+        "numPos": [
+          10.25,
+          47.28
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M81.22,27.5c-0.22,1.25-0.72,2.25-1.52,2.97c-5.64,5.1-12.45,9.78-22.45,13.78",
+        "start": [
+          81.22,
+          27.5
+        ],
+        "numPos": [
+          83.75,
+          24.28
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M57,46c8.82,10.73,19.23,21.46,28.42,27.42c2.16,1.4,4.52,3,7.08,3.58",
+        "start": [
+          57,
+          46
+        ],
+        "numPos": [
+          64,
+          51.03
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "木": {
+    "char": "木",
+    "romaji": "moku / ki",
+    "script": "kanji",
+    "meaning": "Pohon / Kayu",
+    "meaningTh": "ต้นไม้ / ไม้",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M19.5,39.86c2.45,0.57,5.23,0.8,8.04,0.57C40.75,39.38,63,36.5,79.78,36.15c2.8-0.06,4.54,0.1,7.34,0.5",
+        "start": [
+          19.5,
+          39.86
+        ],
+        "numPos": [
+          12.5,
+          41.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M51.75,10.5c1.19,1.19,2,3,2,5c0,8.65,0,55.15-0.14,74.75c-0.03,4.19-0.07,7.15-0.11,8.25",
+        "start": [
+          51.75,
+          10.5
+        ],
+        "numPos": [
+          42.5,
+          11.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M50.75,39.5c0,1.12-0.61,2.44-1.42,3.95C41.75,57.5,26.7,73.93,15.75,80.25",
+        "start": [
+          50.75,
+          39.5
+        ],
+        "numPos": [
+          37.5,
+          50.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M54.5,39c4.62,6,23,25.75,31.76,34.61c2.27,2.29,4.61,4.39,7.49,5.64",
+        "start": [
+          54.5,
+          39
+        ],
+        "numPos": [
+          66.5,
+          49.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "金": {
+    "char": "金",
+    "romaji": "kin / kane",
+    "script": "kanji",
+    "meaning": "Emas / Uang",
+    "meaningTh": "ทอง / เงิน",
+    "strokeCount": 8,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M51.75,11.88c0.25,1.52-0.22,3.57-0.8,4.84C47.73,23.79,33.13,47.1,14.5,58",
+        "start": [
+          51.75,
+          11.88
+        ],
+        "numPos": [
+          43.25,
+          13.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M52.25,18.25c9.5,7.5,34.14,30.88,37.21,32.67c3.12,1.82,4.14,2.66,5.54,2.83",
+        "start": [
+          52.25,
+          18.25
+        ],
+        "numPos": [
+          60.5,
+          21.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M34.02,47.08c1.69,0.65,3.85,0.36,5.6,0.21c6.91-0.6,14.33-1.69,23.99-2.64c2.07-0.2,4.1-0.4,6.15,0.12",
+        "start": [
+          34.02,
+          47.08
+        ],
+        "numPos": [
+          42.5,
+          43.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M30.18,64.96c1.95,0.67,4.47,0.31,6.47,0.12c9.24-0.87,17.42-1.58,31.35-2.53c2.3-0.16,4.68-0.36,6.96,0.08",
+        "start": [
+          30.18,
+          64.96
+        ],
+        "numPos": [
+          21.5,
+          66.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M51.47,48.82c0.89,0.85,0.89,3.76,0.89,4.43c0,3.64,0.27,38.71,0.22,39.82",
+        "start": [
+          51.47,
+          48.82
+        ],
+        "numPos": [
+          56.5,
+          54.5
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M31,74.75c3.25,3,7.48,9.27,8.5,12",
+        "start": [
+          31,
+          74.75
+        ],
+        "numPos": [
+          23.5,
+          78.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      },
+      {
+        "order": 7,
+        "d": "M73.01,72.11c0.24,1.14,0.11,2.46-0.54,3.51C70.38,79,66.44,83.22,63,86",
+        "start": [
+          73.01,
+          72.11
+        ],
+        "numPos": [
+          78.5,
+          74.5
+        ],
+        "hint": "Goresan ke-7",
+        "hintTh": "เส้นขีดที่ 7"
+      },
+      {
+        "order": 8,
+        "d": "M18.5,94.86c2.88,1.01,6.41,0.4,9.37,0.15c16.55-1.42,32.95-2.12,51.51-3c3.13-0.15,6.32-0.27,9.38,0.59",
+        "start": [
+          18.5,
+          94.86
+        ],
+        "numPos": [
+          10.5,
+          96.5
+        ],
+        "hint": "Goresan ke-8",
+        "hintTh": "เส้นขีดที่ 8"
+      }
+    ]
+  },
+  "土": {
+    "char": "土",
+    "romaji": "do / tsuchi",
+    "script": "kanji",
+    "meaning": "Tanah",
+    "meaningTh": "ดิน",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M26.63,50.89c1.63,0.4,4.64,0.6,6.26,0.4C43.5,50,62.12,48,75.66,46.92c2.71-0.22,4.36,0.19,5.72,0.39",
+        "start": [
+          26.63,
+          50.89
+        ],
+        "numPos": [
+          19.5,
+          51.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M52.17,17.37c1.17,1.17,2.02,3.13,2.02,4.64c0,10.25,0.14,61.06,0.14,63.36",
+        "start": [
+          52.17,
+          17.37
+        ],
+        "numPos": [
+          41.5,
+          17.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M15.38,87.73c2.12,0.54,6.01,0.73,8.12,0.54C46,86.25,69,84.62,90.34,83.79c3.53-0.14,5.65,0.26,7.41,0.53",
+        "start": [
+          15.38,
+          87.73
+        ],
+        "numPos": [
+          6.5,
+          86.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "年": {
+    "char": "年",
+    "romaji": "nen / toshi",
+    "script": "kanji",
+    "meaning": "Tahun",
+    "meaningTh": "ปี",
+    "strokeCount": 6,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M40.01,11.89c0.24,1.61-0.01,2.86-0.84,4.46c-2.53,4.84-6.91,11.4-15.86,19.62",
+        "start": [
+          40.01,
+          11.89
+        ],
+        "numPos": [
+          32.25,
+          11.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M39.13,23.62c2.25,0.38,4.4,0.18,5.79,0.03c11.7-1.27,21.33-2.9,33.22-4.07c2.3-0.23,4.2,0,5.35,0.26",
+        "start": [
+          39.13,
+          23.62
+        ],
+        "numPos": [
+          46.5,
+          19.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M30.13,43.59c1.36,0.33,3.87,0.46,5.21,0.33c10.91-1.05,28.53-3.42,40.78-4.26c2.26-0.15,3.63,0.16,4.76,0.32",
+        "start": [
+          30.13,
+          43.59
+        ],
+        "numPos": [
+          31.5,
+          41.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M33.75,44.5c1,1.25,1,1.97,1.01,3.5C34.8,52.33,35,65.29,35,66.25",
+        "start": [
+          33.75,
+          44.5
+        ],
+        "numPos": [
+          27.5,
+          53.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M13.88,67.74c1.97,0.47,5.61,0.66,7.57,0.47c20.21-2.03,36.35-4.62,66.65-5.31c3.29-0.08,5.26,0.22,6.91,0.46",
+        "start": [
+          13.88,
+          67.74
+        ],
+        "numPos": [
+          6.5,
+          69.5
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M56.56,25.46c1.12,1.12,1.79,3.54,1.79,4.94c0,0.89-0.05,44.26-0.13,61.6c-0.01,3.12-0.03,5.39-0.05,6.38",
+        "start": [
+          56.56,
+          25.46
+        ],
+        "numPos": [
+          50.5,
+          33.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      }
+    ]
+  },
+  "時": {
+    "char": "時",
+    "romaji": "ji / toki",
+    "script": "kanji",
+    "meaning": "Waktu / Jam",
+    "meaningTh": "เวลา / นาฬิกา",
+    "strokeCount": 10,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M16,29.84c0.75,0.66,1.21,1.62,1.21,3.07c0,1.18-0.16,30.08-0.21,40.85c-0.01,2.42-0.02,3.95-0.02,4.08",
+        "start": [
+          16,
+          29.84
+        ],
+        "numPos": [
+          9.75,
+          39.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M17.78,30.74c4.65-0.63,16.12-2.07,17.6-2.25c1.52-0.18,3,1.5,2.88,2.57c-0.24,2.17-0.36,24.9-0.35,40.79c0,1.63-0.12,3.35-0.12,4.43",
+        "start": [
+          17.78,
+          30.74
+        ],
+        "numPos": [
+          18.5,
+          27.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M18.75,52c4.5-0.75,13.5-2.12,18.22-2.35",
+        "start": [
+          18.75,
+          52
+        ],
+        "numPos": [
+          21.5,
+          48.13
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M17.8,74.52c6.2-0.92,11.45-1.89,18.94-2.7",
+        "start": [
+          17.8,
+          74.52
+        ],
+        "numPos": [
+          21.33,
+          70.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M51.44,29.03c1.37,0.44,3.63,0.34,5,0.19c9.79-1.09,16.34-2.34,25.62-3.08c2.27-0.18,3.9-0.04,5.04,0.18",
+        "start": [
+          51.44,
+          29.03
+        ],
+        "numPos": [
+          45.5,
+          27.13
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M67.59,11.37c0.89,0.9,1.59,2.24,1.59,3.75c0,8.39,0.03,27.02,0.03,27.6",
+        "start": [
+          67.59,
+          11.37
+        ],
+        "numPos": [
+          58.5,
+          11.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      },
+      {
+        "order": 7,
+        "d": "M45.38,45.35c1.49,0.44,4.21,0.59,5.71,0.44c11.29-1.16,25.66-3.29,39.2-3.99c2.48-0.13,3.97,0.21,5.21,0.43",
+        "start": [
+          45.38,
+          45.35
+        ],
+        "numPos": [
+          45.75,
+          42.13
+        ],
+        "hint": "Goresan ke-7",
+        "hintTh": "เส้นขีดที่ 7"
+      },
+      {
+        "order": 8,
+        "d": "M46,60.99c1.43,0.46,4.04,0.58,5.49,0.46c12.01-1.07,26.89-3.07,39.07-3.89c2.38-0.16,4.41,0.22,5.6,0.44",
+        "start": [
+          46,
+          60.99
+        ],
+        "numPos": [
+          44.25,
+          57.13
+        ],
+        "hint": "Goresan ke-8",
+        "hintTh": "เส้นขีดที่ 8"
+      },
+      {
+        "order": 9,
+        "d": "M78.07,46.08c1.11,1.11,1.66,2.56,1.71,5.06c0.23,12.03-0.09,34.43-0.09,38.52c0,9.83-5.42,2.19-7.66-0.04",
+        "start": [
+          78.07,
+          46.08
+        ],
+        "numPos": [
+          71.25,
+          54.13
+        ],
+        "hint": "Goresan ke-9",
+        "hintTh": "เส้นขีดที่ 9"
+      },
+      {
+        "order": 10,
+        "d": "M56.75,70.38c2.87,1.76,6.55,6.38,7.27,9.12",
+        "start": [
+          56.75,
+          70.38
+        ],
+        "numPos": [
+          47.25,
+          76.63
+        ],
+        "hint": "Goresan ke-10",
+        "hintTh": "เส้นขีดที่ 10"
+      }
+    ]
+  },
+  "分": {
+    "char": "分",
+    "romaji": "fun / bun / wa",
+    "script": "kanji",
+    "meaning": "Menit / Membagi",
+    "meaningTh": "นาที / ส่วน",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M41.12,19.38c0.25,1.24-0.44,3.01-1.1,4.08C34.31,32.72,27.13,40.62,13,51.25",
+        "start": [
+          41.12,
+          19.38
+        ],
+        "numPos": [
+          32.5,
+          19.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M54.69,13.75c7.56-0.12,20.68,19.17,29.41,25.95c3.07,2.39,6.02,4.05,10.4,5.3",
+        "start": [
+          54.69,
+          13.75
+        ],
+        "numPos": [
+          50.5,
+          11.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M29.35,55.37c2.42,0.83,4.97,0.75,7.42,0.37c11.06-1.7,28.87-5.3,34.1-5.76c3.69-0.33,5.08,1.48,4.88,3.77c-0.54,6.05-5.94,29.03-10.5,36.3c-4.99,7.96-5.74,4.21-9.84-0.49",
+        "start": [
+          29.35,
+          55.37
+        ],
+        "numPos": [
+          30.5,
+          52.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M49.12,57.25c0.15,1.49,0.06,2.72-0.56,4.08C43.5,72.5,35.75,82,22.5,90.75",
+        "start": [
+          49.12,
+          57.25
+        ],
+        "numPos": [
+          39.5,
+          65.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "人": {
+    "char": "人",
+    "romaji": "jin / hito",
+    "script": "kanji",
+    "meaning": "Orang",
+    "meaningTh": "คน",
+    "strokeCount": 2,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M54.5,20c0.37,2.12,0.23,4.03-0.22,6.27C51.68,39.48,38.25,72.25,16.5,87.25",
+        "start": [
+          54.5,
+          20
+        ],
+        "numPos": [
+          45.5,
+          19.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M46,54.25c6.12,6,25.51,22.24,35.52,29.72c3.66,2.73,6.94,4.64,11.48,5.53",
+        "start": [
+          46,
+          54.25
+        ],
+        "numPos": [
+          52.5,
+          55.63
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      }
+    ]
+  },
+  "男": {
+    "char": "男",
+    "romaji": "dan / otoko",
+    "script": "kanji",
+    "meaning": "Laki-laki",
+    "meaningTh": "ผู้ชาย",
+    "strokeCount": 7,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M26.5,14.25c0.88,0.88,1.56,1.99,1.73,2.98c0.84,4.77,2.47,16.75,3.34,26.04c0.18,1.95,0.37,2.37,0.55,4.23",
+        "start": [
+          26.5,
+          14.25
+        ],
+        "numPos": [
+          18.75,
+          19.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M29,15.95c11.38-1.45,41.21-4.57,49.56-4.71c3.9-0.07,5.44,1.51,4.91,5.29c-0.45,3.21-3.15,15.19-4.94,22.23c-0.41,1.62-0.79,2.99-1.4,4.19",
+        "start": [
+          29,
+          15.95
+        ],
+        "numPos": [
+          31.5,
+          12.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M54,15.97c0.77,0.77,1,1.91,1,2.79c0.02,6.32,0.2,22,0.2,22.75",
+        "start": [
+          54,
+          15.97
+        ],
+        "numPos": [
+          47.5,
+          24.13
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M30.98,30.82C45,29.12,57.12,28,80.53,26.34",
+        "start": [
+          30.98,
+          30.82
+        ],
+        "numPos": [
+          34,
+          27.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M32.87,44.74c11.38-1.24,28.38-2.99,44.14-3.7",
+        "start": [
+          32.87,
+          44.74
+        ],
+        "numPos": [
+          34.5,
+          41.5
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M19.98,60.98c2.15,0.67,4.58,0.78,6.77,0.53c13.46-1.53,42.24-5.66,51.88-6.86c5.26-0.66,6.86,1.04,5.72,6.27c-1.92,8.83-9,27.39-15.66,33.19c-5.11,4.45-7.44,2.14-9.69-0.86",
+        "start": [
+          19.98,
+          60.98
+        ],
+        "numPos": [
+          11.5,
+          63.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      },
+      {
+        "order": 7,
+        "d": "M53.22,46.43c0.28,1.32,0.29,3.04-0.2,4.57C49.12,63.12,38,81.25,17.14,92.06",
+        "start": [
+          53.22,
+          46.43
+        ],
+        "numPos": [
+          45.5,
+          52.5
+        ],
+        "hint": "Goresan ke-7",
+        "hintTh": "เส้นขีดที่ 7"
+      }
+    ]
+  },
+  "女": {
+    "char": "女",
+    "romaji": "jo / onna",
+    "script": "kanji",
+    "meaning": "Perempuan",
+    "meaningTh": "ผู้หญิง",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M53.21,18.37c0.54,2.13,0.26,3.41-0.25,5.25C50.38,33,42.62,52.75,35.75,64c-1.39,2.27-1,3.5,1,3.5c11.63,0,28.46,7.48,38.83,16.41c2.56,2.21,4.68,4.51,6.17,6.84",
+        "start": [
+          53.21,
+          18.37
+        ],
+        "numPos": [
+          45,
+          17.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M69.62,42.18c0.5,1.7,0.63,3.57-0.01,5.93C65.93,61.8,54.61,81.6,27,91.75",
+        "start": [
+          69.62,
+          42.18
+        ],
+        "numPos": [
+          68.5,
+          37.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M13.88,50.43c3.48,1.39,7.26,0.85,10.88,0.53c19.52-1.7,42.04-4.08,60.61-4.63c3.66-0.11,7.21-0.1,10.62,1.42",
+        "start": [
+          13.88,
+          50.43
+        ],
+        "numPos": [
+          5.5,
+          51.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "子": {
+    "char": "子",
+    "romaji": "shi / ko",
+    "script": "kanji",
+    "meaning": "Anak",
+    "meaningTh": "เด็ก",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M33.28,19.04c1.84,0.71,3.7,0.86,5.4,0.63c4.95-0.67,27.95-4.58,29.86-4.92c3.46-0.62,4.06,1.36,2.11,3.58c-1.95,2.22-11.41,13.17-16.35,17.19",
+        "start": [
+          33.28,
+          19.04
+        ],
+        "numPos": [
+          25.5,
+          20.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M52.48,37.74c6.42,2.97,11.75,30.73,5.24,52.57c-2.8,9.38-8.09,2.96-10.47,0.99",
+        "start": [
+          52.48,
+          37.74
+        ],
+        "numPos": [
+          44.5,
+          42.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M12.25,51.48c3.75,1.14,8.79,1.03,12.48,0.49c16.77-2.47,42.86-5.84,58.53-6.75c4.26-0.25,9.11-0.34,13.11,0.57",
+        "start": [
+          12.25,
+          51.48
+        ],
+        "numPos": [
+          4.5,
+          53.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "学": {
+    "char": "学",
+    "romaji": "gaku / mana",
+    "script": "kanji",
+    "meaning": "Studi / Sekolah",
+    "meaningTh": "เรียน / ศึกษา",
+    "strokeCount": 8,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M29.5,17.25c3.5,3,6.5,7.25,7.75,9.75",
+        "start": [
+          29.5,
+          17.25
+        ],
+        "numPos": [
+          20.25,
+          13.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M49,12c1.25,2,4.75,8.25,5.25,11.5",
+        "start": [
+          49,
+          12
+        ],
+        "numPos": [
+          39.75,
+          8.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M75,11c0.25,1.75-0.12,2.75-0.75,4.25c-1.29,3.1-4.25,7.38-6.5,9.75",
+        "start": [
+          75,
+          11
+        ],
+        "numPos": [
+          66.5,
+          8.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M21.25,33.75c-0.12,4.75-2,12.5-3.75,16.25",
+        "start": [
+          21.25,
+          33.75
+        ],
+        "numPos": [
+          14.5,
+          34.63
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M23.5,36.5c17-1.62,42.38-5.5,60-5.75c9.5-0.13,4.12,5.12,0,9",
+        "start": [
+          23.5,
+          36.5
+        ],
+        "numPos": [
+          24.5,
+          32.5
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M37.25,46.5c1,0.25,3.75,0.25,5.5-0.25s18.25-4,20-4s2.75,0.75,1,2.25S54.5,53.5,53,54.75",
+        "start": [
+          37.25,
+          46.5
+        ],
+        "numPos": [
+          29.25,
+          48.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      },
+      {
+        "order": 7,
+        "d": "M50.75,55.75c4,8.75,7.18,24.67,1.75,38c-2.75,6.75-7.75,1.25-9.75-2",
+        "start": [
+          50.75,
+          55.75
+        ],
+        "numPos": [
+          44.5,
+          58.63
+        ],
+        "hint": "Goresan ke-7",
+        "hintTh": "เส้นขีดที่ 7"
+      },
+      {
+        "order": 8,
+        "d": "M15.75,67.75c1.75,1,4.64,1.36,7.5,1c15.88-2,44.43-6.25,61.37-5.5c2.5,0.11,4.72,0.25,6.39,1",
+        "start": [
+          15.75,
+          67.75
+        ],
+        "numPos": [
+          8.5,
+          72.5
+        ],
+        "hint": "Goresan ke-8",
+        "hintTh": "เส้นขีดที่ 8"
+      }
+    ]
+  },
+  "生": {
+    "char": "生",
+    "romaji": "sei / i",
+    "script": "kanji",
+    "meaning": "Hidup / Lahir",
+    "meaningTh": "มีชีวิต / เกิด",
+    "strokeCount": 5,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M31.26,25.89c0.36,1.36,0.35,2.65-0.05,3.79c-2.34,6.69-7.24,17.22-14.96,24.19",
+        "start": [
+          31.26,
+          25.89
+        ],
+        "numPos": [
+          22.75,
+          25.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M31.13,40.67c2.37,0.33,4.03,0.07,5.64-0.12c9.5-1.1,25.15-4.12,35.35-5.83c2.51-0.42,4.86-0.73,7.38-0.33",
+        "start": [
+          31.13,
+          40.67
+        ],
+        "numPos": [
+          36,
+          37.28
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M52.31,12.63c1.28,1.28,2.01,3.12,2.01,5.23c0,4.01,0,65.14,0,69.77",
+        "start": [
+          52.31,
+          12.63
+        ],
+        "numPos": [
+          42.5,
+          10.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M29.38,64.03c2.64,0.67,5.38,0.31,8.04-0.02C49.45,62.51,62.16,61,72.5,59.86c2.38-0.26,4.99-0.76,7.38-0.23",
+        "start": [
+          29.38,
+          64.03
+        ],
+        "numPos": [
+          21.5,
+          66.13
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M15.75,90.25c3.04,0.75,6.21,0.94,8.4,0.8C40.62,90,68.12,86.5,83.3,85.75c3.63-0.18,7.68,0,10.07,0.73",
+        "start": [
+          15.75,
+          90.25
+        ],
+        "numPos": [
+          8.5,
+          89.5
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      }
+    ]
+  },
+  "先": {
+    "char": "先",
+    "romaji": "sen / saki",
+    "script": "kanji",
+    "meaning": "Lebih dulu / Ujung",
+    "meaningTh": "ก่อน / หน้า",
+    "strokeCount": 6,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M37.51,21c0.07,0.62,0.15,1.61-0.14,2.49C35.25,29.88,31.62,37.38,24.5,45",
+        "start": [
+          37.51,
+          21
+        ],
+        "numPos": [
+          29.5,
+          20.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M38.13,32.04c1.5,0.09,3.95-0.16,4.64-0.22c6.48-0.57,20.36-1.82,27.82-2.94c1.65-0.25,3.66-0.13,5.16,0.27",
+        "start": [
+          38.13,
+          32.04
+        ],
+        "numPos": [
+          42.5,
+          28.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M52.81,12.38c1.28,1.28,2.01,3.12,2.01,4.75c0,0.75-0.05,31.92-0.07,32.87",
+        "start": [
+          52.81,
+          12.38
+        ],
+        "numPos": [
+          43.5,
+          11.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M15.88,53.26c3.42,0.98,7.15,0.5,10.62,0.22c15.99-1.3,38.99-3.55,59-4.4c2.94-0.13,5.84-0.03,8.75,0.47",
+        "start": [
+          15.88,
+          53.26
+        ],
+        "numPos": [
+          7.5,
+          54.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M45.18,55.68c0.32,1.45,0.15,2.48-0.15,3.85C43.24,67.65,35,86.62,20,96.38",
+        "start": [
+          45.18,
+          55.68
+        ],
+        "numPos": [
+          36.75,
+          62.13
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M60.49,53.62c1.07,1.07,1.38,2.71,1.38,4.98c0,7.78-0.22,14.88-0.22,21.89c0,15.14,1.1,16.04,15.85,16.04c14.62,0,15.64-1.78,15.64-11.29",
+        "start": [
+          60.49,
+          53.62
+        ],
+        "numPos": [
+          53.5,
+          65.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      }
+    ]
+  },
+  "校": {
+    "char": "校",
+    "romaji": "kou",
+    "script": "kanji",
+    "meaning": "Sekolah",
+    "meaningTh": "โรงเรียน",
+    "strokeCount": 10,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M11.53,40.68c1.1,0.32,2.6,0.45,4.53,0.32c5.4-0.35,16.57-3,23.14-4.04c1.25-0.2,2.3-0.18,3.07,0",
+        "start": [
+          11.53,
+          40.68
+        ],
+        "numPos": [
+          5.5,
+          41.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M28.99,17.25c1.07,1.07,1.76,3.25,1.76,5.25c0,0.77-0.03,48.09-0.18,65.25c-0.03,3.03-0.05,5.16-0.07,6",
+        "start": [
+          28.99,
+          17.25
+        ],
+        "numPos": [
+          18.75,
+          16.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M30.25,40.75c0,1.25-0.49,2.66-0.96,3.77C25.28,53.91,20.88,62.25,15,70",
+        "start": [
+          30.25,
+          40.75
+        ],
+        "numPos": [
+          19.5,
+          52.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M33.75,51.25c2.75,1.5,6,5.25,7.25,7.75",
+        "start": [
+          33.75,
+          51.25
+        ],
+        "numPos": [
+          35.5,
+          49.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M66.39,15.5c0.99,0.99,1.38,1.88,1.38,3.62c0,4.25-0.02,7.62-0.08,10.41",
+        "start": [
+          66.39,
+          15.5
+        ],
+        "numPos": [
+          58.5,
+          12.5
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M48.12,31.71c2.3,0.29,3.9,0.44,6.09,0.2c10.28-1.16,20.32-2.66,32.45-3.53c2.35-0.17,4.03-0.01,5.33,0.32",
+        "start": [
+          48.12,
+          31.71
+        ],
+        "numPos": [
+          47.25,
+          28.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      },
+      {
+        "order": 7,
+        "d": "M59.24,38.93c0.2,0.53,0.06,2.27-0.4,3.14C57,45.5,53.75,49.5,50,52.5",
+        "start": [
+          59.24,
+          38.93
+        ],
+        "numPos": [
+          50.5,
+          41.5
+        ],
+        "hint": "Goresan ke-7",
+        "hintTh": "เส้นขีดที่ 7"
+      },
+      {
+        "order": 8,
+        "d": "M79.27,38.5c4.34,3.07,8.73,8.68,10.9,12.41",
+        "start": [
+          79.27,
+          38.5
+        ],
+        "numPos": [
+          70.5,
+          40.5
+        ],
+        "hint": "Goresan ke-8",
+        "hintTh": "เส้นขีดที่ 8"
+      },
+      {
+        "order": 9,
+        "d": "M79.15,49.18c0.35,1.32,0.17,2.62-0.54,4.18C72.25,67.25,58.75,83.25,44,91.25",
+        "start": [
+          79.15,
+          49.18
+        ],
+        "numPos": [
+          71.5,
+          50.5
+        ],
+        "hint": "Goresan ke-9",
+        "hintTh": "เส้นขีดที่ 9"
+      },
+      {
+        "order": 10,
+        "d": "M55.95,55.88c6.3,3.37,21.64,22.12,31.45,30.33c2.64,2.21,5.07,4.15,8.6,4.44",
+        "start": [
+          55.95,
+          55.88
+        ],
+        "numPos": [
+          61.5,
+          58.5
+        ],
+        "hint": "Goresan ke-10",
+        "hintTh": "เส้นขีดที่ 10"
+      }
+    ]
+  },
+  "本": {
+    "char": "本",
+    "romaji": "hon / moto",
+    "script": "kanji",
+    "meaning": "Buku / Dasar",
+    "meaningTh": "หนังสือ / รากฐาน",
+    "strokeCount": 5,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M20.5,33.5c1.93,0.62,4.91,1.07,8.1,0.75C42.43,32.88,66,30.75,79.64,30c3.2-0.18,7.22,0.25,9.23,0.5",
+        "start": [
+          20.5,
+          33.5
+        ],
+        "numPos": [
+          13.5,
+          34.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M52.1,11.12c1.25,1.25,2.05,3.23,2.05,4.99c0,0.84,0,57.16-0.02,76.76c-0.01,3.96-0.01,6.42-0.02,6.62",
+        "start": [
+          52.1,
+          11.12
+        ],
+        "numPos": [
+          42.5,
+          11.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M51.75,33.5c0,1-0.41,2.22-1.29,3.88C43.62,50.25,30.12,65.5,13.25,75.5",
+        "start": [
+          51.75,
+          33.5
+        ],
+        "numPos": [
+          38.5,
+          44.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M54.75,35.5c4.92,5.74,23.48,23.33,32.85,31.27c2.58,2.18,5.16,4.41,8.52,5.23",
+        "start": [
+          54.75,
+          35.5
+        ],
+        "numPos": [
+          66.5,
+          43.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M33.88,73.92c1.5,0.46,2.74,0.75,5.3,0.59c9.95-0.63,21.2-2.13,27.96-2.95c1.93-0.23,3.62-0.31,6-0.02",
+        "start": [
+          33.88,
+          73.92
+        ],
+        "numPos": [
+          26.5,
+          77.5
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      }
+    ]
+  },
+  "上": {
+    "char": "上",
+    "romaji": "jou / ue",
+    "script": "kanji",
+    "meaning": "Atas",
+    "meaningTh": "บน",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M52.31,15.88c1.15,1.15,2.01,3.12,2.01,5.12c0,0.82-0.22,63.62-0.25,64.63",
+        "start": [
+          52.31,
+          15.88
+        ],
+        "numPos": [
+          43.5,
+          16.28
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M58,44.75c7-0.62,14.25-2.5,17.75-3c1.38-0.2,3.5-0.38,4.75,0",
+        "start": [
+          58,
+          44.75
+        ],
+        "numPos": [
+          60.25,
+          41.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M13.38,88.28c3.6,1.15,7.45,0.62,11.13,0.34c16.23-1.23,41.16-2.66,60.24-2.92c3.65-0.05,7.47-0.32,11,0.82",
+        "start": [
+          13.38,
+          88.28
+        ],
+        "numPos": [
+          5.5,
+          88.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "下": {
+    "char": "下",
+    "romaji": "ka / shita",
+    "script": "kanji",
+    "meaning": "Bawah",
+    "meaningTh": "ล่าง",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M13.25,22.5c0.94,0.23,5.18,0.96,7.74,0.75c17.87-1.5,46.54-4.75,66.38-4.75c2.92,0,6.42,0.75,7.88,1.25",
+        "start": [
+          13.25,
+          22.5
+        ],
+        "numPos": [
+          6.5,
+          22.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M52.97,23.25c0.93,1.07,1.56,2.75,1.56,5.3c0,8.65-0.2,39.42-0.27,57.2c-0.02,3.86-0.02,5.89-0.02,8.25",
+        "start": [
+          52.97,
+          23.25
+        ],
+        "numPos": [
+          46.75,
+          33.13
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M67.83,37.17C72.75,39.5,79.88,47.62,82,52.12",
+        "start": [
+          67.83,
+          37.17
+        ],
+        "numPos": [
+          62.5,
+          32.13
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "中": {
+    "char": "中",
+    "romaji": "chuu / naka",
+    "script": "kanji",
+    "meaning": "Tengah / Dalam",
+    "meaningTh": "กลาง / ใน",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M19.89,36.87c1,1,1.74,2.25,2.01,3.65c1.13,5.71,2.58,13.06,4.17,22.97c0.27,1.68,0.55,4.43,0.83,6.26",
+        "start": [
+          19.89,
+          36.87
+        ],
+        "numPos": [
+          14.5,
+          45.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M23.33,39.51C37.12,37.62,70.88,34,84,33.24c4.38-0.25,6,1.14,5.12,4.42c-1.53,5.7-5.61,20.18-6.12,22.09",
+        "start": [
+          23.33,
+          39.51
+        ],
+        "numPos": [
+          24.5,
+          35.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M27.74,64.84C40.12,63.62,61.86,62.2,79,60.77c2.36-0.2,5.75-0.27,7.25-0.27",
+        "start": [
+          27.74,
+          64.84
+        ],
+        "numPos": [
+          30.5,
+          60.75
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M52.5,11.5c1.44,1.44,2.25,3.5,2.25,5.06c0,0.9,0.06,56.6-0.15,76.69c-0.03,3.3-0.07,5.6-0.1,6.5",
+        "start": [
+          52.5,
+          11.5
+        ],
+        "numPos": [
+          43.5,
+          12.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "大": {
+    "char": "大",
+    "romaji": "dai / oo",
+    "script": "kanji",
+    "meaning": "Besar",
+    "meaningTh": "ใหญ่",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M19.38,48.25c1.49,0.51,5.03,0.89,7.6,0.49C41.12,46.5,63,43,77.19,42.44c2.7-0.11,4.87-0.06,7.31,0.33",
+        "start": [
+          19.38,
+          48.25
+        ],
+        "numPos": [
+          12.75,
+          49.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M49.5,18c0.88,2.12,1.03,4.16,0.99,6.32C50,57,37.75,81.12,18,91.75",
+        "start": [
+          49.5,
+          18
+        ],
+        "numPos": [
+          40.5,
+          18.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M49.5,46c9,10.5,28.5,36.25,37.49,43.28c3.06,2.39,5.62,3.75,7.01,3.97",
+        "start": [
+          49.5,
+          46
+        ],
+        "numPos": [
+          61.5,
+          55.63
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "小": {
+    "char": "小",
+    "romaji": "shou / chii",
+    "script": "kanji",
+    "meaning": "Kecil",
+    "meaningTh": "เล็ก",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M54.71,18.37c1.4,1.4,2.26,3.13,2.26,5.77c0,14.56-0.26,54.91-0.26,59.87c0,11.25-7.21,1.5-8.71,0.25",
+        "start": [
+          54.71,
+          18.37
+        ],
+        "numPos": [
+          45.5,
+          16.13
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M31.95,47.68c0.17,0.82,0.1,1.72-0.34,2.9C29.5,56.38,24.38,66.25,16.75,73",
+        "start": [
+          31.95,
+          47.68
+        ],
+        "numPos": [
+          31,
+          43.28
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M80.96,47.12C86.62,52,95.25,64.62,97,72",
+        "start": [
+          80.96,
+          47.12
+        ],
+        "numPos": [
+          72.5,
+          43.28
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "白": {
+    "char": "白",
+    "romaji": "haku / shiro",
+    "script": "kanji",
+    "meaning": "Putih",
+    "meaningTh": "สีขาว",
+    "strokeCount": 5,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M55,13c0.38,1.5,0,3.25-0.57,4.29C51.32,22.93,46,31.12,36.81,40.22",
+        "start": [
+          55,
+          13
+        ],
+        "numPos": [
+          46.5,
+          13.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M25.5,40.47c1.14,1.14,1.63,2.81,1.63,4.63c0,1.55,0.95,32.47,1.32,47.14c0.06,2.58,0.13,4.66,0.18,6",
+        "start": [
+          25.5,
+          40.47
+        ],
+        "numPos": [
+          17.5,
+          48.13
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M28.27,43.98c13.98-1.73,39.08-4.47,49.67-5.48c5.19-0.5,7.37,0.76,7.06,5.38c-0.62,9.12-2.09,30.3-3.29,46.88c-0.17,2.42-0.33,4.65-0.46,6.57",
+        "start": [
+          28.27,
+          43.98
+        ],
+        "numPos": [
+          29.5,
+          40.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M29.13,67.44C42.25,66,72.38,63.62,82.57,63.4",
+        "start": [
+          29.13,
+          67.44
+        ],
+        "numPos": [
+          32.5,
+          63
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M29.69,94.49C43,93.75,66.62,92,80.19,91.41",
+        "start": [
+          29.69,
+          94.49
+        ],
+        "numPos": [
+          32.5,
+          91.5
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      }
+    ]
+  },
+  "国": {
+    "char": "国",
+    "romaji": "koku / kuni",
+    "script": "kanji",
+    "meaning": "Negara",
+    "meaningTh": "ประเทศ",
+    "strokeCount": 8,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M19,16.82c1.09,1.09,1.61,2.51,1.61,4.41c0,14.65-0.22,44.9-0.22,71.53c0,1.95-0.06,3.86-0.09,5.75",
+        "start": [
+          19,
+          16.82
+        ],
+        "numPos": [
+          12.5,
+          25.63
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M21.52,18.67C41.38,16.75,74.03,13.5,85,13.5c3.38,0,5,1.85,5,5.25c0,15.36-0.04,47.89-0.08,70.62c0,1.68,0,3.31,0,4.88",
+        "start": [
+          21.52,
+          18.67
+        ],
+        "numPos": [
+          22.5,
+          14.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M35.12,33.88c1.32,0.28,4.2,0.44,5.51,0.28c10.47-1.29,20.62-2.54,28.62-3.13c2.02-0.15,3.88-0.19,5.56,0.04",
+        "start": [
+          35.12,
+          33.88
+        ],
+        "numPos": [
+          27.75,
+          35.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M52.8,34.89c0.96,0.97,1.47,2.48,1.47,3.81c0,3.99-0.13,24.74-0.09,33.55",
+        "start": [
+          52.8,
+          34.89
+        ],
+        "numPos": [
+          45.75,
+          43.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M37.58,52.16c1.79,0.22,3.41,0.14,5.36-0.08c7.56-0.83,17.56-1.99,25.38-2.8c1.25-0.13,4.02-0.15,5.89,0.17",
+        "start": [
+          37.58,
+          52.16
+        ],
+        "numPos": [
+          30.5,
+          54.13
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M31.08,75.14c1.54,0.36,3.85,0.28,5.19,0.16c9.98-0.92,25.85-2.67,37.03-3.54c2.15-0.17,5.04-0.18,6.12,0.13",
+        "start": [
+          31.08,
+          75.14
+        ],
+        "numPos": [
+          29.25,
+          70.63
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      },
+      {
+        "order": 7,
+        "d": "M67.75,56.62c3,1.75,6.12,5.12,8,8.38",
+        "start": [
+          67.75,
+          56.62
+        ],
+        "numPos": [
+          77.25,
+          60.13
+        ],
+        "hint": "Goresan ke-7",
+        "hintTh": "เส้นขีดที่ 7"
+      },
+      {
+        "order": 8,
+        "d": "M21.5,93.01c14.25-0.51,48.38-1.89,67-2.51",
+        "start": [
+          21.5,
+          93.01
+        ],
+        "numPos": [
+          25.5,
+          88.63
+        ],
+        "hint": "Goresan ke-8",
+        "hintTh": "เส้นขีดที่ 8"
+      }
+    ]
+  },
+  "目": {
+    "char": "目",
+    "romaji": "moku / me",
+    "script": "kanji",
+    "meaning": "Mata",
+    "meaningTh": "ตา",
+    "strokeCount": 5,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M29.75,19.05c1.35,1.35,1.86,3.21,1.86,5.47c0,1.77,0.19,42.37,0.06,60.23c-0.04,4.91-0.06,8.11-0.06,8.36",
+        "start": [
+          29.75,
+          19.05
+        ],
+        "numPos": [
+          22.5,
+          26.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M32.54,21.39c10.92-1.23,38.33-4.11,41.42-4.38c3.25-0.28,5.54,1.25,5.54,4.18c0,8.95-0.26,39.93-0.26,64.82c0,3,0.01,3.75,0.01,6",
+        "start": [
+          32.54,
+          21.39
+        ],
+        "numPos": [
+          36.5,
+          17.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M33.05,43.64c12.45-1.51,34.83-3.51,45.18-4.09",
+        "start": [
+          33.05,
+          43.64
+        ],
+        "numPos": [
+          37.5,
+          39.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M32.9,65.95C44.25,65,66,62.88,77.72,62.56",
+        "start": [
+          32.9,
+          65.95
+        ],
+        "numPos": [
+          37.5,
+          62
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M33,90.5c9.75-0.5,33.25-2.5,44.79-2.53",
+        "start": [
+          33,
+          90.5
+        ],
+        "numPos": [
+          37.5,
+          86
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      }
+    ]
+  },
+  "口": {
+    "char": "口",
+    "romaji": "kou / kuchi",
+    "script": "kanji",
+    "meaning": "Mulut / Pintu masuk",
+    "meaningTh": "ปาก / ทางเข้า",
+    "strokeCount": 3,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M22.25,33.25c1.25,1.25,2,2.88,2.26,4.43c1.16,7.03,3.15,23.61,4.68,37.85C29.46,78.09,29.73,80.6,30,83",
+        "start": [
+          22.25,
+          33.25
+        ],
+        "numPos": [
+          15.5,
+          40.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M25.29,35.67c17.46-2.17,41.59-5.04,55.49-5.93c3.94-0.25,6.33,2.72,5.72,5.14c-2.25,8.87-6.62,26.5-9,38.87",
+        "start": [
+          25.29,
+          35.67
+        ],
+        "numPos": [
+          28.5,
+          30.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M30.25,77.75c10.5-0.5,30.53-2.3,44.99-3.04c2.05-0.11,3.99-0.18,5.76-0.21",
+        "start": [
+          30.25,
+          77.75
+        ],
+        "numPos": [
+          34.5,
+          72.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      }
+    ]
+  },
+  "手": {
+    "char": "手",
+    "romaji": "shu / te",
+    "script": "kanji",
+    "meaning": "Tangan",
+    "meaningTh": "มือ",
+    "strokeCount": 4,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M61.48,11.5c0.02,1-0.61,1.88-1.67,2.9c-3.27,3.15-13.69,8.23-28.57,11.85",
+        "start": [
+          61.48,
+          11.5
+        ],
+        "numPos": [
+          53.5,
+          11.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M26.38,42.92c1.8,0.46,3.61,0.67,5.68,0.38C46,41.38,58.4,39,71.37,37.75c1.92-0.19,4.62-0.38,7.25,0.04",
+        "start": [
+          26.38,
+          42.92
+        ],
+        "numPos": [
+          17.5,
+          45.5
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M13.27,62.87c2.71,0.63,4.86,0.6,7.22,0.38c22.63-2.12,46.13-5.62,67.7-7c2.01-0.13,4.83,0,7.46,0.37",
+        "start": [
+          13.27,
+          62.87
+        ],
+        "numPos": [
+          5.5,
+          66.5
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M48.88,23.55C60.38,31,62.73,63.66,57.83,89.87c-2.08,11.13-8.64,2.34-9.89,1.17",
+        "start": [
+          48.88,
+          23.55
+        ],
+        "numPos": [
+          44.5,
+          32.5
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      }
+    ]
+  },
+  "車": {
+    "char": "車",
+    "romaji": "sha / kuruma",
+    "script": "kanji",
+    "meaning": "Mobil / Kendaraan",
+    "meaningTh": "รถยนต์",
+    "strokeCount": 7,
+    "strokes": [
+      {
+        "order": 1,
+        "d": "M26,26c2.85,0.69,6.1,0.14,8.98-0.1c11.09-0.93,25.8-2.64,38.89-3.51c2.68-0.18,5.22-0.16,7.88,0.23",
+        "start": [
+          26,
+          26
+        ],
+        "numPos": [
+          17.25,
+          26.5
+        ],
+        "hint": "Goresan ke-1",
+        "hintTh": "เส้นขีดที่ 1"
+      },
+      {
+        "order": 2,
+        "d": "M27.5,37.92c0.81,0.5,1.83,2.39,1.98,3.05c0.85,3.73,1.83,11.31,2.95,18.54c0.32,2.09,0.41,3.2,0.75,5.24",
+        "start": [
+          27.5,
+          37.92
+        ],
+        "numPos": [
+          20.25,
+          45.13
+        ],
+        "hint": "Goresan ke-2",
+        "hintTh": "เส้นขีดที่ 2"
+      },
+      {
+        "order": 3,
+        "d": "M30.36,39.49c14.52-1.61,36.14-4.11,47.63-4.5c3.46-0.12,4.17,1.57,4.03,3.08c-0.42,4.32-2.01,13.81-3.5,20.19c-0.21,0.89-0.51,1.87-0.76,3",
+        "start": [
+          30.36,
+          39.49
+        ],
+        "numPos": [
+          33,
+          36.28
+        ],
+        "hint": "Goresan ke-3",
+        "hintTh": "เส้นขีดที่ 3"
+      },
+      {
+        "order": 4,
+        "d": "M32.5,51.25c13.75-1.5,34.25-3.75,47-4.25",
+        "start": [
+          32.5,
+          51.25
+        ],
+        "numPos": [
+          35.5,
+          48.13
+        ],
+        "hint": "Goresan ke-4",
+        "hintTh": "เส้นขีดที่ 4"
+      },
+      {
+        "order": 5,
+        "d": "M34.25,63.25C46,61.62,65,59.75,77,59.25",
+        "start": [
+          34.25,
+          63.25
+        ],
+        "numPos": [
+          35.5,
+          60.13
+        ],
+        "hint": "Goresan ke-5",
+        "hintTh": "เส้นขีดที่ 5"
+      },
+      {
+        "order": 6,
+        "d": "M16,77.86c3.62,0.89,7.38,0.77,10.63,0.39c18.51-2.14,39.85-4.55,57.12-5.45c3.05-0.16,6.5-0.05,9.5,0.63",
+        "start": [
+          16,
+          77.86
+        ],
+        "numPos": [
+          6.75,
+          80.5
+        ],
+        "hint": "Goresan ke-6",
+        "hintTh": "เส้นขีดที่ 6"
+      },
+      {
+        "order": 7,
+        "d": "M52.5,11.51c1.36,1.36,2.06,2.78,2.14,6.02c0.03,1.07-0.07,48.79-0.19,70.7c-0.02,4.27-0.05,7.36-0.07,8.65",
+        "start": [
+          52.5,
+          11.51
+        ],
+        "numPos": [
+          43.5,
+          11.5
+        ],
+        "hint": "Goresan ke-7",
+        "hintTh": "เส้นขีดที่ 7"
       }
     ]
   }

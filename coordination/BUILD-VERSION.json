@@ -1,7 +1,7 @@
 {
-  "version": "m025-684",
-  "claimedBy": "branch feat/kawan-bicara-pedagogy-roast-mascot-m025-684",
-  "claimedAt": "2026-10-27T19:45:00.000Z",
-  "reason": "feat(japanese): smart placement gate, kakijun stroke order writing studio, and multi-device UI/UX overhaul",
+  "version": "m025-685",
+  "claimedBy": "branch feat/kanjivg-authentic-kakijun-studio-m025-685",
+  "claimedAt": "2026-10-27T20:50:42.583Z",
+  "reason": "feat(japanese): authentic KanjiVG stroke order vector engine & calligraphy studio",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
