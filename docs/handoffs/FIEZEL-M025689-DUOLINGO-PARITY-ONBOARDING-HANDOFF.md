@@ -1,8 +1,8 @@
 # DOSSIER SERAH TERIMA RESMI (MANDATORY HANDOFF)
-**ID Rilis**: `FIEZEL-M025689-DUOLINGO-PARITY-ONBOARDING`  
-**Nomor Build**: `m025-689` (Hexa-Sync Terverifikasi Selaras)  
-**Tanggal**: 2026-10-28  
-**Inisiator**: AI Systems Architecture & Learning Retention Arbiter  
+**ID Rilis**: `FIEZEL-M025689-DUOLINGO-PARITY-ONBOARDING`
+**Nomor Build**: `m025-689` (Hexa-Sync Terverifikasi Selaras)
+**Tanggal**: 2026-10-28
+**Inisiator**: AI Systems Architecture & Learning Retention Arbiter
 **Status**: 100% LULUS AUDIT EMPIRIS (PLAYWRIGHT & QUALITY GATES)
 
 ---
