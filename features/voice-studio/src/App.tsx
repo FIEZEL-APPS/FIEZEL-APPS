@@ -198,6 +198,7 @@ export default function App() {
   const playbackSettleRef = useRef<(() => void) | null>(null);
   const mochiContainerRef = useRef<HTMLDivElement | null>(null);
   const mochiInstanceRef = useRef<any>(null);
+  const mochiSpeechCadenceTimerRef = useRef<number | null>(null);
   const [is3dMochiReady, setIs3dMochiReady] = useState<boolean>(false);
 
   // Gemini Live multi-key pool & mid-call auto-failover bookkeeping
@@ -2700,52 +2701,125 @@ export default function App() {
     };
   }, [activeTab, prereqStatus.isReady]);
 
-  // Synchronize 3D Mochi Mascot expressions, aura & gestures with live call state
+  // Synchronize 3D Mochi Mascot expressions, aura & gestures with live call state & AI speech mimicry
   useEffect(() => {
     const m = mochiInstanceRef.current;
     if (!m) return;
     try {
-      if (isAiThinking && callStateKey !== 'speaking') {
-        // m025-637: visible "listening / thinking" while the real AI composes its reply.
-        m.setMood?.('dots');
-        m.setBadge?.('chat_blue');
-        m.setAura?.('blue');
-        m.retractHands?.();
-        m.triggerEarWiggle?.(1.1);
-      } else if (callStateKey === 'speaking') {
-        m.setMood?.('happy');
-        m.setBadge?.('chat_purple');
-        m.setAura?.('purple');
-        m.triggerHop?.(0.26);
-        m.triggerHandGesture?.('wave', 1.4);
-        m.triggerEarWiggle?.(1.3);
-      } else if (callStateKey === 'recording') {
-        m.setMood?.('dots');
-        m.setBadge?.('chat_purple');
-        m.setAura?.('purple');
-        m.triggerEarWiggle?.(1.2);
-      } else if (callStateKey === 'waiting') {
-        m.setMood?.('dots');
-        m.setBadge?.('chat_blue');
-        m.setAura?.('blue');
-        m.triggerEarWiggle?.(1.1);
-        m.retractHands?.();
-      } else if (callStateKey === 'live') {
-        m.setMood?.('dots');
-        m.setBadge?.('chat_purple');
-        m.setAura?.('purple');
-        m.retractHands?.();
+      if (callStateKey === 'speaking') {
+        const spokenText = (liveAiDraft.trim() || lastAiTurn?.text || activeScenario.openingLine || '').toLowerCase();
+
+        // Emotional Tone Analysis for AI Speech Mimicry
+        const isRoasting = /kanebo|robot|kaku|buku teks|watashi wa|nerjemahin|terjemah|mikir|lama|tegang|santai aja|waduh|aduh|教科書|硬い|ロボット|ちょっと|不自然|ウケる|じゃん|でしょ|マジで|うーん|stiff|wooden|detour|ramble/i.test(spokenText);
+        const isLaughing = /haha|wkwk|hehe|lol|あはは|ふふ|笑/i.test(spokenText);
+        const isPraise = /bagus|keren|gitu dong|mantap|hebat|cakep|pinter|nah gitu|good job|awesome|great|perfect|spot on|nailed it|すばらしい|いいね|すごい|さすが|バッチリ|そうそう/i.test(spokenText);
+        const isQuestion = /[?？]/.test(spokenText);
+
+        // Keep mouth moving in real-time synced to speech
+        m.setTalking?.(true);
+
+        if (isRoasting) {
+          m.setMood?.('wink');
+          m.setBadge?.('chat_purple');
+          m.setAura?.('amber');
+          m.triggerHop?.(0.34);
+          m.triggerHandGesture?.('wave', 2.6);
+          m.triggerEarWiggle?.(1.5);
+          m.triggerJiggle?.(0.26);
+        } else if (isLaughing) {
+          m.setMood?.('happy');
+          m.setBadge?.('chat_purple');
+          m.setAura?.('pink');
+          m.triggerHop?.(0.40);
+          m.triggerHandGesture?.('cheer', 2.8);
+          m.triggerEarWiggle?.(1.5);
+        } else if (isPraise) {
+          m.setMood?.('happy');
+          m.setBadge?.('chat_blue');
+          m.setAura?.('gold');
+          m.triggerHop?.(0.36);
+          m.triggerHandGesture?.('cheer', 3.0);
+          m.triggerEarWiggle?.(1.3);
+        } else if (isQuestion) {
+          m.setMood?.('dots');
+          m.setBadge?.('chat_blue');
+          m.setAura?.('purple');
+          m.triggerEarWiggle?.(1.4);
+          m.triggerHandGesture?.('wave', 1.6);
+        } else {
+          m.setMood?.('happy');
+          m.setBadge?.('chat_purple');
+          m.setAura?.('purple');
+          m.triggerHop?.(0.24);
+          m.triggerHandGesture?.('wave', 1.8);
+          m.triggerEarWiggle?.(1.2);
+        }
+
+        // Active speech mimic cadence watchdog: periodic subtle ear wiggles & bobbing while speaking
+        if (mochiSpeechCadenceTimerRef.current) {
+          window.clearInterval(mochiSpeechCadenceTimerRef.current);
+        }
+        mochiSpeechCadenceTimerRef.current = window.setInterval(() => {
+          const inst = mochiInstanceRef.current;
+          if (!inst) return;
+          try {
+            inst.setTalking?.(true);
+            const r = Math.random();
+            if (r < 0.45) {
+              inst.triggerEarWiggle?.(0.85 + Math.random() * 0.4);
+            } else if (r < 0.75) {
+              inst.triggerJiggle?.(0.14);
+            }
+          } catch {
+            // Ignore
+          }
+        }, 1350);
       } else {
-        m.setMood?.('dots');
-        m.setBadge?.('chat_purple');
-        m.setAura?.('purple');
-        m.setFx?.(null);
+        if (mochiSpeechCadenceTimerRef.current) {
+          window.clearInterval(mochiSpeechCadenceTimerRef.current);
+          mochiSpeechCadenceTimerRef.current = null;
+        }
+        m.setTalking?.(false);
         m.retractHands?.();
+
+        if (isAiThinking) {
+          // Visible "listening / thinking" while AI composes reply
+          m.setMood?.('dots');
+          m.setBadge?.('chat_blue');
+          m.setAura?.('blue');
+          m.triggerEarWiggle?.(1.1);
+        } else if (callStateKey === 'recording') {
+          m.setMood?.('dots');
+          m.setBadge?.('chat_purple');
+          m.setAura?.('purple');
+          m.triggerEarWiggle?.(1.2);
+        } else if (callStateKey === 'waiting') {
+          m.setMood?.('dots');
+          m.setBadge?.('chat_blue');
+          m.setAura?.('blue');
+          m.triggerEarWiggle?.(1.1);
+        } else if (callStateKey === 'live') {
+          m.setMood?.('dots');
+          m.setBadge?.('chat_purple');
+          m.setAura?.('purple');
+        } else {
+          m.setMood?.('dots');
+          m.setBadge?.('chat_purple');
+          m.setAura?.('purple');
+          m.setFx?.(null);
+        }
       }
     } catch {
       // Ignore
     }
-  }, [callStateKey, is3dMochiReady, isAiThinking]);
+
+    return () => {
+      if (mochiSpeechCadenceTimerRef.current) {
+        window.clearInterval(mochiSpeechCadenceTimerRef.current);
+        mochiSpeechCadenceTimerRef.current = null;
+      }
+    };
+  }, [callStateKey, is3dMochiReady, isAiThinking, liveAiDraft, lastAiTurn?.text]);
 
   const activeAiLiveText = liveAiDraft.trim() || lastAiTurn?.text || activeScenario.openingLine;
   const activeAiSubtitle = translateAndPhoneticizeLiveText(

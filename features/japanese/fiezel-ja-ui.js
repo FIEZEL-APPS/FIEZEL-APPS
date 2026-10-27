@@ -150,8 +150,8 @@
         var romaji = row[i], kana = row[i + 1];
         if (!kana) { cells += '<span class="kana-cell is-empty" aria-hidden="true"></span>'; continue; }
         var shown = script === 'katakana' ? toKatakana(kana) : kana;
-        cells += '<span class="kana-cell" role="listitem" aria-label="' + esc(shown + ' ' + romaji) + '">' +
-          '<b lang="ja">' + esc(shown) + '</b><small class="ja-romaji">' + esc(romaji) + '</small></span>';
+        cells += '<button type="button" class="kana-cell" onclick="if(window.FiezelKakijunStudio)window.FiezelKakijunStudio.open(\'' + esc(shown) + '\')" aria-label="' + esc(shown + ' ' + romaji) + '">' +
+          '<b lang="ja">' + esc(shown) + '</b><small class="ja-romaji">' + esc(romaji) + '</small></button>';
       }
       return cells;
     }).join('');
@@ -161,6 +161,21 @@
     var host = root.document && root.document.getElementById('jaKanaChart');
     if (host) host.outerHTML = kanaChartMarkup();
     applyPrefs();
+  }
+  function kakijunBannerMarkup() {
+    return '<div class="ja-kakijun-banner card">' +
+      '<div class="ja-kakijun-banner-left">' +
+        '<div class="ja-kakijun-icon-bubble" aria-hidden="true">筆</div>' +
+        '<div class="ja-kakijun-banner-text">' +
+          '<h3>Kakijun Studio (書き順)</h3>' +
+          '<p>' + esc(t('jepang.kakijun-desc', 'Latihan menulis goresan Hiragana, Katakana & Kanji di atas kertas kotak Genkō Yōshi.')) + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<button type="button" class="ja-kakijun-banner-btn" onclick="if(window.FiezelKakijunStudio)window.FiezelKakijunStudio.open(\'あ\')">' +
+        '<span>' + esc(t('jepang.kakijun-mulai', 'Mulai Menulis')) + '</span>' +
+        '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>' +
+      '</button>' +
+    '</div>';
   }
   function kanaChartMarkup() {
     function tab(which, labelKey) {
@@ -176,7 +191,7 @@
   }
   function kanaViewBody() {
     /* Kana tidak punya furigana; di tabel ini hanya romaji yang bisa disembunyikan. */
-    return togglesMarkup('romaji') + kanaChartMarkup();
+    return kakijunBannerMarkup() + togglesMarkup('romaji') + kanaChartMarkup();
   }
 
   /* ---------- Kartu Renshū: kana (aktif) + "Segera hadir" ---------- */
