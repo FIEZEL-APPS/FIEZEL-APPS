@@ -191,15 +191,15 @@
   </url>
   <url>
     <loc>https://fiezel.my.id/llms.txt</loc>
-    <lastmod>2026-09-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://fiezel.my.id/llms-full.txt</loc>
-    <lastmod>2026-09-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://fiezel.my.id/sentinel/</loc>

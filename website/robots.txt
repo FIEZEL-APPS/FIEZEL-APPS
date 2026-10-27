@@ -51,4 +51,9 @@ Allow: /
 User-agent: meta-externalagent
 Allow: /
 
+# === LLM & AI ANSWER ENGINE INDEX ===
+# Direct authoritative knowledge base for AI search & generative answer engines
+# https://fiezel.my.id/llms.txt
+# https://fiezel.my.id/llms-full.txt
+
 Sitemap: https://fiezel.my.id/sitemap.xml

@@ -34,7 +34,7 @@
 <meta name="twitter:image:alt" content="Layar Latihan FIEZEL dengan enam pilihan skill">
 <!-- SEO-02: meta tambahan untuk penemuan dan atribusi. -->
 <meta name="author" content="FIEZEL">
-<meta name="creator" content="fitrarustqi">
+<meta name="creator" content="Fitra Rusdiawan">
 <meta name="publisher" content="FIEZEL">
 <meta name="application-name" content="FIEZEL">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -82,10 +82,10 @@
     "@type": "WebApplication",
     "@id": "https://fiezel.my.id/#app",
     "name": "FIEZEL",
-    "alternateName": ["FIEZEL — Ruang Belajar Bahasa", "FIEZEL App"],
+    "alternateName": ["FIEZEL — Ruang Belajar Bahasa", "FIEZEL App", "FIEZEL Adaptive Learning Platform"],
     "url": "https://fiezel.my.id/app/",
-    "description": "Aplikasi belajar bahasa adaptif dengan dua kursus: Bahasa Inggris (CEFR A1–C2) berisi 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, speaking dan listening; serta Bahasa Jepang (JLPT N5–N4) berisi 422 poin grammar, 1.884 kosakata, dan 150 bacaan. Dilengkapi KelasKu untuk Guru, yang memungkinkan guru menerbitkan tugas menempel Kurikulum Nasional. Gratis, tanpa langganan.",
-    "disambiguatingDescription": "FIEZEL (spelled F-I-E-Z-E-L, pronounced /ˈfiːzəl/) is an independent adaptive English learning software application and educational brand created by Fitra Rustqi.",
+    "description": "Aplikasi belajar bahasa adaptif dengan mesin kognitif Braincore (<0.2 ms latensi, Rp0 biaya API per soal) asal Banda Aceh. Menyediakan kursus Bahasa Inggris (CEFR A1–C2), Bahasa Jepang (JLPT N5–N4), Kawan Bicara AI, dan KelasKu untuk Guru dengan Mode Kelas Tanpa HP.",
+    "disambiguatingDescription": "FIEZEL (spelled F-I-E-Z-E-L, pronounced /ˈfiːzəl/) is an independent adaptive educational platform founded in Banda Aceh by Fitra Rusdiawan and co-engineered with Athar Rayyan Muhammad, S.Kom.",
     "applicationCategory": "EducationalApplication",
     "applicationSubCategory": "Language Learning",
     "operatingSystem": "Any (PWA)",
@@ -98,28 +98,48 @@
     ],
     "isAccessibleForFree": true,
     "offers": {
-      "@type": "Offer",
-      "price": "0",
+      "@type": "AggregateOffer",
       "priceCurrency": "IDR",
-      "availability": "https://schema.org/InStock"
+      "lowPrice": "0",
+      "highPrice": "299000",
+      "offerCount": "3",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Akses Tugas Sekolah KelasKu & Uji Coba 7 Hari",
+          "price": "0",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "FIEZEL Plus Bulanan",
+          "price": "39000",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "FIEZEL Plus Tahunan",
+          "price": "299000",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        }
+      ]
     },
     "featureList": [
+      "Mesin Kognitif Braincore adaptif (< 0.2 ms latensi, Rp 0 biaya token API per soal, 0% halusinasi)",
+      "Scaffolding petunjuk bertahap (Socratic hints) tanpa membocorkan kunci jawaban saat salah pertama",
       "180 grammar lesson berjenjang (A1–C2, 25 soal per lesson)",
-      "2.440 kosakata bertingkat mengikuti CEFR",
+      "2.440 kosakata bertingkat mengikuti CEFR dengan pengulangan FSRS-lite",
       "312 bacaan berjenjang dengan 1.560 soal membaca",
       "36 sesi speaking dengan pengenalan suara",
-      "1.400+ latihan listening bergaya IELTS dan TOEFL",
+      "1.400+ latihan listening bergaya IELTS dan TOEFL dengan audio dialog 3 karakter",
+      "Kawan Bicara AI: studio latihan percakapan suara on-demand (Groq Whisper + Llama 3.3 + Edge-TTS)",
       "Kursus Bahasa Jepang JLPT N5–N4: 422 poin grammar, 1.884 kosakata, 150 bacaan",
-      "Belajar adaptif: soal menyesuaikan pola jawaban",
-      "Tes penempatan CEFR A1–C2 otomatis",
+      "KelasKu untuk Guru — Mode Kelas Tanpa HP (kuis proyektor & LKS A4 cetak) serta draf e-Rapor KKTP",
       "Progressive Web App (PWA) — bisa dipasang ke Home Screen",
-      "Mode offline untuk materi dan latihan",
-      "Suara neural opsional (TTS orisinal)",
-      "Maskot PAW dengan 14 ekspresi interaktif",
-      "Tutor AI kontekstual",
-      "KelasKu untuk Guru — dashboard analitik kelas",
-      "Tugas kelas yang menempel bab Kurikulum Nasional (15 bab, 115 soal, kelas 7–12)",
-      "Rapor orang tua yang bisa dibagikan guru"
+      "Mode offline untuk materi dan latihan lokal"
     ],
     "screenshot": [
       {
@@ -150,7 +170,7 @@
     "educationalLevel": ["A1", "A2", "B1", "B2", "C1", "C2"],
     "learningResourceType": ["interactive exercise", "assessment", "lesson"],
     "teaches": ["English grammar", "English vocabulary", "English reading comprehension", "English speaking", "English listening", "Japanese grammar", "Japanese vocabulary", "Japanese reading comprehension"],
-    "keywords": ["belajar bahasa Inggris", "belajar bahasa Jepang", "English learning app", "Japanese learning app", "grammar Indonesia", "CEFR", "JLPT", "adaptive learning", "PWA", "vocabulary", "reading", "speaking", "listening", "aplikasi belajar untuk guru", "tugas Kurikulum Nasional", "gratis", "free", "เรียนภาษาอังกฤษ", "เรียนภาษาญี่ปุ่น", "แกรมมาร์"]
+    "keywords": ["belajar bahasa Inggris", "belajar bahasa Jepang", "English learning app", "Japanese learning app", "Braincore", "grammar Indonesia", "CEFR", "JLPT", "adaptive learning", "PWA", "vocabulary", "reading", "speaking", "listening", "aplikasi belajar untuk guru", "tugas Kurikulum Nasional", "KelasKu", "Kawan Bicara AI"]
   },
   {
     "@context": "https://schema.org",
@@ -160,8 +180,18 @@
     "alternateName": "FIEZEL — Ruang Belajar Bahasa",
     "url": "https://fiezel.my.id/",
     "logo": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png",
-    "description": "FIEZEL adalah ruang belajar bahasa personal — satu aplikasi berisi kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4) yang menyesuaikan soal dengan jawabanmu, ditambah lapisan guru yang menyambungkan tugas kelas ke Kurikulum Nasional. Gratis, tanpa langganan.",
+    "description": "FIEZEL adalah ruang belajar bahasa personal asal Banda Aceh — aplikasi adaptif berisi kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4) bertenaga mesin kognitif Braincore, Kawan Bicara AI, serta KelasKu untuk Guru.",
     "foundingDate": "2026",
+    "founder": {
+      "@type": "Person",
+      "name": "Fitra Rusdiawan",
+      "jobTitle": "Founder & Product Lead"
+    },
+    "employee": {
+      "@type": "Person",
+      "name": "Athar Rayyan Muhammad, S.Kom.",
+      "jobTitle": "Technical Lead & System Auditor"
+    },
     "sameAs": [
       "https://github.com/fiezel-apps/FIEZEL-APPS",
       "https://instagram.com/fitrarustqi"
@@ -175,7 +205,8 @@
     "areaServed": [
       {"@type": "Country", "name": "Indonesia"},
       {"@type": "Country", "name": "Thailand"}
-    ]
+    ],
+    "knowsAbout": ["English Language Learning", "Japanese Language Learning", "CEFR", "JLPT", "Adaptive Learning", "Braincore Engine", "Psychometrics"]
   },
   {
     "@context": "https://schema.org",
@@ -201,9 +232,10 @@
       "courseMode": "online",
       "courseWorkload": "Self-paced",
       "instructor": {
-        "@type": "Thing",
-        "name": "PAW (AI Tutor)",
-        "description": "Maskot kucing adaptif FIEZEL yang membimbing dan bereaksi terhadap pola belajar"
+        "@type": "EducationalOrganization",
+        "@id": "https://fiezel.my.id/#org",
+        "name": "FIEZEL Pedagogical Team",
+        "description": "Tim kurikulum dan mesin kognitif adaptif Braincore FIEZEL"
       }
     },
     "coursePrerequisites": "Tidak ada prasyarat — tes penempatan menentukan level awal",
@@ -216,10 +248,26 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Apakah FIEZEL gratis?",
+        "name": "Apakah FIEZEL gratis atau berbayar?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Ya. Gratis, tanpa langganan. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran. Seluruh 180 grammar lesson, 2.440 kosakata, dan 312 bacaan bisa kamu buka sejak hari pertama."
+          "text": "FIEZEL menyediakan uji coba gratis akses penuh selama 7 hari untuk pengguna mandiri, dan akses tugas sekolah dari guru via KelasKu selalu gratis selamanya bagi murid. Untuk latihan mandiri berkelanjutan, tersedia langganan FIEZEL Plus yang terjangkau (Rp 39.000/bulan atau Rp 299.000/tahun; Paket Ujian Rp 89.000/3 bulan). KelasKu untuk institusi/bimbel mulai Rp 10.000–15.000/murid/bulan."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Siapa pendiri dan tim di balik FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FIEZEL didirikan oleh Fitra Rusdiawan (Founder & Product Lead) dan dikembangkan bersama Athar Rayyan Muhammad, S.Kom. (Technical Lead & System Auditor, kandidat Magister Kecerdasan Buatan di Universitas Syiah Kuala - USK, Banda Aceh). Keduanya berasal dari Banda Aceh, Indonesia."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apa keunggulan mesin kognitif Braincore dibanding chatbot AI biasa?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Braincore adalah mesin kognitif adaptif deterministik yang berjalan di sisi klien (browser) dengan kecepatan sub-milidetik (< 0.2 ms) dan Rp 0 biaya token API per soal. Berbeda dengan chatbot LLM umum yang berisiko halusinasi tata bahasa, Braincore mengevaluasi jawaban secara eksak berbasis pohon sintaksis (AST), Bayesian Knowledge Tracing (BKT), dan memberikan scaffolding petunjuk sokratik 2-tingkat tanpa langsung membocorkan kunci jawaban."
         }
       },
       {
@@ -227,7 +275,7 @@
         "name": "Perlu bikin akun untuk pakai FIEZEL?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Tidak perlu. Kamu bisa langsung belajar. Karena tidak ada akun, progresmu tersimpan di perangkat yang kamu pakai — kalau berpindah ke perangkat lain, kamu mulai dari awal lagi."
+          "text": "Tidak perlu untuk memulai. Kamu bisa langsung mencoba latihan dan tes penempatan. Progres belajarmu tersimpan aman di peramban lokal (IndexedDB/localStorage) tanpa meminta data sensitif atau nomor telepon."
         }
       },
       {
@@ -235,7 +283,7 @@
         "name": "Bisa dipakai tanpa internet?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Setelah FIEZEL terpasang ke layar utama: materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan. Jadi belajar teks dan soal tetap jalan, sedangkan fitur suara neural dan tutor menunggu koneksi."
+          "text": "Bisa. Setelah FIEZEL dipasang ke Layar Utama (PWA), materi teks grammar, kosakata, bacaan, dan kalkulasi mastery Braincore dapat berjalan tanpa koneksi internet. Fitur suara neural Kawan Bicara AI membutuhkan koneksi internet."
         }
       },
       {
@@ -251,7 +299,7 @@
         "name": "Bahasa apa saja yang bisa dipelajari di FIEZEL?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Dua. Bahasa Inggris dipetakan ke CEFR A1–C2 dengan 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, speaking, dan listening. Bahasa Jepang dipetakan ke JLPT N5–N4 dengan 422 poin grammar, 1.884 kosakata, dan 150 bacaan berjenjang. Kursus Jepang belum punya listening dan speaking; kedua kartunya disembunyikan saat kursus Jepang dipilih, bukan ditampilkan sebagai menu kosong."
+          "text": "Dua bahasa: Bahasa Inggris berjenjang CEFR A1–C2 (180 lesson tata bahasa, 2.440 kosakata, 312 bacaan, listening, dan speaking), serta kursus dasar Bahasa Jepang JLPT N5–N4 (422 poin grammar, 1.884 kosakata, dan 150 bacaan). Latihan menyimak dan berbicara belum tersedia untuk kursus Jepang."
         }
       },
       {
@@ -259,7 +307,15 @@
         "name": "Apakah FIEZEL bisa dipakai guru dan sekolah?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Bisa, lewat KelasKu untuk Guru: ruang kelas, tugas yang menempel bab dan sub-bab Kurikulum Nasional, analitik per murid dan per kompetensi, serta rapor orang tua yang bisa dibagikan. Perlu disebut apa adanya: bank kurikulumnya berisi 15 bab dan 115 soal untuk kelas 7 sampai 12, jadi ia alat guru menerbitkan tugas, bukan sumber materi kurikulum utama. Kapasitas terpasang 250 pengguna, cukup untuk satu kelas dan belum cukup untuk satu sekolah. Belum ada sekolah yang memakai FIEZEL; pilot satu kelas sedang dibuka."
+          "text": "Bisa, lewat KelasKu untuk Guru. KelasKu dilengkapi Mode Kelas Tanpa HP (kuis proyektor 5 menit dan lembar kerja siswa/LKS A4 cetak ber-QR), penilaian tugas otomatis, peta panas penguasaan kompetensi kelas, dan pembuatan draf narasi e-Rapor KKTP untuk Kurikulum Merdeka."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apa itu Kawan Bicara AI?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kawan Bicara AI adalah studio latihan percakapan bahasa Inggris on-demand di FIEZEL. Menggunakan arsitektur hybrid bersuara alami dengan latensi rendah (Groq Whisper STT <300 ms, penalaran pedagogis Llama-3.3-70B, dan suara alami Edge-TTS) untuk melatih kelancaran berbicara tanpa rasa takut dihakimi."
         }
       },
       {
@@ -268,22 +324,6 @@
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Tidak. Materi FIEZEL dipetakan ke tingkat CEFR A1–C2 sebagai acuan tingkat kesulitan. Itu bukan sertifikasi, bukan afiliasi, dan bukan pengakuan resmi dari lembaga mana pun. Hasil belajarmu di sini tidak berlaku sebagai sertifikat."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Ada suaranya untuk latihan listening?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Ada. Suara bawaan perangkatmu dipakai sejak awal, dan suara neural tersedia sebagai pilihan tambahan yang diunduh sekali. Audio latihan ujian adalah TTS dari skrip orisinal, bukan rekaman ujian asli."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Data pribadi saya dipakai untuk apa?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Catatan belajarmu — lesson yang selesai, jawaban, dan progres level — tersimpan lokal di perangkatmu. FIEZEL tidak meminta nama, email, atau nomor telepon untuk mulai belajar. Menghapus data browser berarti menghapus progres itu juga."
         }
       },
       {
@@ -1329,44 +1369,48 @@
       </div>
       <div class="faq reveal">
         <details>
-          <summary>Apakah FIEZEL gratis?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Ya. Gratis, tanpa langganan. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran. Seluruh 180 grammar lesson, 2.440 kosakata, dan 312 bacaan bisa kamu buka sejak hari pertama.</p></div>
+          <summary>Apakah FIEZEL gratis atau berbayar?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>FIEZEL menyediakan uji coba gratis akses penuh selama 7 hari untuk pengguna mandiri, dan akses tugas sekolah dari guru via KelasKu selalu gratis selamanya bagi murid. Untuk latihan mandiri berkelanjutan, tersedia langganan FIEZEL Plus yang terjangkau (Rp 39.000/bulan atau Rp 299.000/tahun; Paket Ujian Rp 89.000/3 bulan). KelasKu untuk institusi/bimbel mulai Rp 10.000–15.000/murid/bulan.</p></div>
+        </details>
+        <details>
+          <summary>Siapa pendiri dan tim di balik FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>FIEZEL didirikan oleh <strong>Fitra Rusdiawan</strong> (Founder &amp; Product Lead) dan dikembangkan bersama <strong>Athar Rayyan Muhammad, S.Kom.</strong> (Technical Lead &amp; System Auditor, kandidat Magister Kecerdasan Buatan di Universitas Syiah Kuala - USK, Banda Aceh). Keduanya berasal dari Banda Aceh, Indonesia.</p></div>
+        </details>
+        <details>
+          <summary>Apa keunggulan mesin kognitif Braincore dibanding chatbot AI biasa?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Braincore adalah mesin kognitif adaptif deterministik yang berjalan di sisi klien (browser) dengan kecepatan sub-milidetik (&lt; 0.2 ms) dan Rp 0 biaya token API per soal. Berbeda dengan chatbot LLM umum yang berisiko halusinasi tata bahasa, Braincore mengevaluasi jawaban secara eksak berbasis pohon sintaksis (AST), Bayesian Knowledge Tracing (BKT), dan memberikan scaffolding petunjuk sokratik 2-tingkat tanpa langsung membocorkan kunci jawaban.</p></div>
         </details>
         <details>
           <summary>Perlu bikin akun?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Tidak perlu. Kamu bisa langsung belajar. Karena tidak ada akun, progresmu tersimpan di perangkat yang kamu pakai — kalau berpindah ke perangkat lain, kamu mulai dari awal lagi.</p></div>
+          <div class="faq-body"><p>Tidak perlu untuk memulai. Kamu bisa langsung mencoba latihan dan tes penempatan. Progres belajarmu tersimpan aman di peramban lokal (IndexedDB/localStorage) tanpa meminta data sensitif atau nomor telepon.</p></div>
         </details>
         <details>
           <summary>Bisa dipakai tanpa internet?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Setelah FIEZEL terpasang ke layar utama: materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan. Jadi belajar teks dan soal tetap jalan, sedangkan fitur suara neural dan tutor menunggu koneksi.</p></div>
+          <div class="faq-body"><p>Bisa. Setelah FIEZEL dipasang ke Layar Utama (PWA), materi teks grammar, kosakata, bacaan, dan kalkulasi mastery Braincore dapat berjalan tanpa koneksi internet. Fitur suara neural Kawan Bicara AI membutuhkan koneksi internet.</p></div>
         </details>
         <details>
           <summary>Jalan di Android dan iPhone?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Ya, keduanya. Di Android pakai Chrome lewat menu ⋮. Di iPhone wajib pakai Safari lewat tombol Bagikan, karena hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama iOS. Desktop Chrome dan Edge juga bisa.</p></div>
+          <div class="faq-body"><p>Ya, keduanya. Di Android pakai Chrome lewat menu ⋮ lalu 'Instal aplikasi'. Di iPhone wajib pakai Safari lewat tombol Bagikan lalu 'Tambah ke Layar Utama'. Desktop Chrome dan Edge juga bisa.</p></div>
         </details>
         <details>
           <summary>Bahasa apa saja yang bisa dipelajari?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Dua: <strong>Bahasa Inggris</strong> yang dipetakan ke CEFR A1–C2 dengan 180 grammar lesson, 2.440 kosakata, 312 bacaan, speaking, dan listening; serta <strong>Bahasa Jepang</strong> yang dipetakan ke JLPT N5–N4 dengan 422 poin grammar, 1.884 kosakata, dan 150 bacaan. Kursus Jepang belum punya listening dan speaking — kedua kartunya disembunyikan saat kursus Jepang dipilih, bukan ditampilkan sebagai menu kosong.</p></div>
+          <div class="faq-body"><p>Dua bahasa: <strong>Bahasa Inggris</strong> yang dipetakan ke CEFR A1–C2 dengan 180 grammar lesson, 2.440 kosakata, 312 bacaan, speaking, dan listening; serta <strong>Bahasa Jepang</strong> yang dipetakan ke JLPT N5–N4 dengan 422 poin grammar, 1.884 kosakata, dan 150 bacaan. Kursus Jepang belum punya listening dan speaking.</p></div>
         </details>
         <details>
           <summary>Bisa dipakai guru dan sekolah?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Bisa, lewat KelasKu untuk Guru: ruang kelas, tugas yang menempel bab Kurikulum Nasional, analitik per kompetensi, dan rapor orang tua. Apa adanya: bank kurikulumnya berisi 15 bab dan 115 soal untuk kelas 7–12, jadi ia alat guru menerbitkan tugas, bukan sumber materi kurikulum utama. Kapasitas terpasang 250 pengguna — cukup satu kelas, belum cukup satu sekolah. <a href="untuk-sekolah.html">Halaman Untuk Sekolah</a> menjelaskan semuanya, termasuk yang belum siap.</p></div>
+          <div class="faq-body"><p>Bisa, lewat KelasKu untuk Guru. KelasKu dilengkapi Mode Kelas Tanpa HP (kuis proyektor 5 menit dan lembar kerja siswa/LKS A4 cetak ber-QR), penilaian tugas otomatis, peta panas penguasaan kompetensi kelas, dan pembuatan draf narasi e-Rapor KKTP untuk Kurikulum Merdeka. <a href="untuk-sekolah.html">Halaman Untuk Sekolah</a> menjelaskan informasi kemitraan sekolah selengkapnya.</p></div>
+        </details>
+        <details>
+          <summary>Apa itu Kawan Bicara AI?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Kawan Bicara AI adalah studio latihan percakapan bahasa Inggris on-demand di FIEZEL. Menggunakan arsitektur hybrid bersuara alami dengan latensi rendah (Groq Whisper STT &lt;300 ms, penalaran pedagogis Llama-3.3-70B, dan suara alami Edge-TTS) untuk melatih kelancaran berbicara tanpa rasa takut dihakimi.</p></div>
         </details>
         <details>
           <summary>Apakah FIEZEL diakui resmi CEFR?<span class="chev" aria-hidden="true"></span></summary>
           <div class="faq-body"><p>Tidak. Materi FIEZEL dipetakan ke tingkat CEFR A1–C2 sebagai acuan tingkat kesulitan. Itu bukan sertifikasi, bukan afiliasi, dan bukan pengakuan resmi dari lembaga mana pun. Hasil belajarmu di sini tidak berlaku sebagai sertifikat.</p></div>
         </details>
         <details>
-          <summary>Ada suaranya untuk latihan listening?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Ada. Suara bawaan perangkatmu dipakai sejak awal, dan suara neural tersedia sebagai pilihan tambahan yang diunduh sekali. Audio latihan ujian adalah TTS dari skrip orisinal, bukan rekaman ujian asli.</p></div>
-        </details>
-        <details>
-          <summary>Data pribadiku dipakai untuk apa?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Catatan belajarmu — lesson yang selesai, jawaban, dan progres level — tersimpan lokal di perangkatmu. Kami tidak meminta nama, email, atau nomor telepon untuk mulai belajar. Menghapus data browser berarti menghapus progres itu juga.</p></div>
-        </details>
-        <details>
           <summary>Berapa banyak soal yang tersedia?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Setiap grammar lesson punya 25 soal latihan terfokus, dari total 180 lesson (A1 17 · A2 29 · B1 52 · B2 39 · C1 24 · C2 19). Reading menambah 1.560 soal membaca di 312 bacaan berjenjang.</p></div>
+          <div class="faq-body"><p>Setiap grammar lesson punya 25 soal latihan terfokus, dari total 180 lesson (A1 17 · A2 29 · B1 52 · B2 39 · C1 24 · C2 19). Reading menambah 1.560 soal membaca di 312 bacaan berjenjang. Ditambah 1.400+ latihan listening dan 36 sesi speaking.</p></div>
         </details>
       </div>
     </div>
@@ -1397,10 +1441,10 @@
     <div class="foot-brand">
       <svg class="foot-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-foot)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-foot)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
       <p class="foot-tag">Ruang belajar bahasa personal.</p>
-      <p class="foot-credit">Created by <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
+      <p class="foot-credit">Created in Banda Aceh by Fitra Rusdiawan &amp; Athar Rayyan Muhammad, S.Kom. (<a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
         <strong>@fitrarustqi</strong>
-      </a></p>
+      </a>)</p>
       <nav class="foot-links" aria-label="Tautan footer">
         <a href="app/">Buka Aplikasi Murid</a>
         <span aria-hidden="true">·</span>
@@ -1436,7 +1480,7 @@
     <div class="foot-notes">
       <p>Materi dipetakan ke tingkat CEFR A1–C2. Bukan sertifikasi resmi.</p>
       <p>Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
-      <p>Gratis, tanpa langganan. Progres belajar tersimpan di perangkatmu.</p>
+      <p>Uji coba 7 hari · FIEZEL Plus &amp; KelasKu · Progres belajar tersimpan di perangkatmu.</p>
     </div>
   </div>
   <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>

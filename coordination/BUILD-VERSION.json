@@ -1,7 +1,7 @@
 {
-  "version": "m025-678",
-  "claimedBy": "branch fix/kawan-bicara-pacing-glitch-vad-m025-678",
-  "claimedAt": "2026-10-27T15:47:17.784Z",
-  "reason": "fix(voice-studio): kalibrasi tempo bicara 0.88x, anti-glitch jitter buffer 120ms, dan VAD jeda berpikir 4.5s",
+  "version": "m025-679",
+  "claimedBy": "branch feat/seo-geo-aeo-indexing",
+  "claimedAt": "2026-10-27T16:22:33.086Z",
+  "reason": "feat(seo): comprehensive GEO, AEO, and AI search indexing overhaul",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>About FIEZEL — Free Adaptive English Learning App</title>
-<meta name="description" content="FIEZEL is a free adaptive English learning app with CEFR-aligned grammar, vocabulary, reading, speaking, and listening practice. Works offline as a PWA.">
+<title>About FIEZEL — Adaptive Language Platform &amp; Braincore Engine</title>
+<meta name="description" content="Official overview of FIEZEL: adaptive language platform with client-side Braincore cognitive engine (&lt;0.2ms latency, Rp0 API cost), Kawan Bicara AI, and KelasKu teacher workspace.">
 <meta name="theme-color" content="#FFF9EE">
 <link rel="icon" href="../assets/brand/fiezel-icon.svg" type="image/svg+xml">
 <link rel="icon" href="../assets/brand/fiezel-icon-192.png" type="image/png">
@@ -22,17 +22,17 @@
 <meta property="og:locale:alternate" content="id_ID">
 <meta property="og:locale:alternate" content="th_TH">
 <meta property="og:site_name" content="FIEZEL">
-<meta property="og:title" content="About FIEZEL — Free Adaptive English Learning App">
-<meta property="og:description" content="FIEZEL is a free adaptive English learning app with CEFR-aligned grammar, vocabulary, reading, speaking, and listening practice. Works offline as a PWA.">
+<meta property="og:title" content="About FIEZEL — Adaptive Language Platform &amp; Braincore Engine">
+<meta property="og:description" content="Official overview of FIEZEL: adaptive language platform with client-side Braincore cognitive engine (&lt;0.2ms latency, Rp0 API cost), Kawan Bicara AI, and KelasKu teacher workspace.">
 <meta property="og:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="FIEZEL English learning application home interface and learning skills">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="About FIEZEL — Free Adaptive English Learning App">
-<meta name="twitter:description" content="FIEZEL is a free adaptive English learning app with CEFR-aligned grammar, vocabulary, reading, speaking, and listening practice.">
+<meta name="twitter:title" content="About FIEZEL — Adaptive Language Platform &amp; Braincore Engine">
+<meta name="twitter:description" content="Official overview of FIEZEL: adaptive language platform with client-side Braincore cognitive engine (&lt;0.2ms latency, Rp0 API cost), Kawan Bicara AI, and KelasKu teacher workspace.">
 <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
-<meta name="author" content="FIEZEL">
+<meta name="author" content="Fitra Rusdiawan, Athar Rayyan Muhammad, S.Kom.">
 <meta name="publisher" content="FIEZEL">
 <meta name="application-name" content="FIEZEL">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -69,20 +69,44 @@
     "@type": "WebApplication",
     "@id": "https://fiezel.my.id/#app",
     "name": "FIEZEL",
-    "alternateName": ["Fiezel", "FIEZEL App", "FIEZEL English Learning App"],
+    "alternateName": ["Fiezel", "FIEZEL App", "FIEZEL Adaptive Learning Platform"],
     "url": "https://fiezel.my.id/app/",
-    "description": "FIEZEL is a free adaptive English learning app with CEFR-aligned grammar, vocabulary, reading, speaking, and listening practice. Features Braincore adaptive intelligence, offline PWA support, and classroom tools.",
-    "disambiguatingDescription": "FIEZEL (spelled F-I-E-Z-E-L, pronounced /ˈfiːzəl/) is an independent educational software application and English-learning brand created by Fitra Rustqi.",
+    "description": "FIEZEL is an adaptive language learning platform powered by the client-side Braincore cognitive engine (<0.2ms latency, Rp0 API cost per drill, 0% grammatical hallucination). Features multi-skill English practice, Kawan Bicara AI voice studio, and the KelasKu teacher workspace.",
+    "disambiguatingDescription": "FIEZEL (spelled F-I-E-Z-E-L, pronounced /ˈfiːzəl/) is an independent adaptive educational platform founded in Banda Aceh by Fitra Rusdiawan and co-engineered with Athar Rayyan Muhammad, S.Kom. Not affiliated with diesel fuel, diesel engines, Diesel clothing, or fizzle.",
     "applicationCategory": "EducationalApplication",
     "applicationSubCategory": "Language Learning",
     "operatingSystem": "Any (PWA)",
     "browserRequirements": "Requires modern web browser with Service Worker support",
     "isAccessibleForFree": true,
     "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD",
-      "availability": "https://schema.org/InStock"
+      "@type": "AggregateOffer",
+      "priceCurrency": "IDR",
+      "lowPrice": "0",
+      "highPrice": "299000",
+      "offerCount": "3",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "7-Day Free Trial & School Homework Access",
+          "price": "0",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "FIEZEL Plus Monthly",
+          "price": "39000",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "FIEZEL Plus Annual",
+          "price": "299000",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        }
+      ]
     },
     "inLanguage": ["en", "id", "th", "ja"],
     "availableLanguage": [
@@ -91,13 +115,15 @@
     ],
     "provider": {"@id": "https://fiezel.my.id/#org"},
     "featureList": [
+      "Braincore client-side cognitive engine (< 0.2 ms evaluation, Rp 0 API cost per practice question, 0% grammatical hallucination)",
+      "2-tier Socratic hint scaffolding without answer key leakage on initial mistakes",
+      "Multi-exam psychometric engine (IELTS, TOEFL, CPNS/CASN, BUMN, UTBK-SNBT)",
       "180 CEFR-aligned grammar lessons (4,500 exercises)",
-      "2,440 vocabulary items with spaced repetition",
+      "2,440 vocabulary items with FSRS-lite spaced repetition",
       "312 graded reading passages with 1,560 comprehension questions",
-      "36 speaking sessions with speech recognition",
-      "1,400+ IELTS and TOEFL-style listening exercises",
-      "Adaptive placement diagnostic test",
-      "Braincore adaptive pedagogical intelligence",
+      "1,400+ IELTS and TOEFL-style listening exercises with 3-character dialog audio",
+      "Kawan Bicara AI: on-demand voice conversation studio (Groq Whisper + Llama 3.3 + Edge-TTS)",
+      "KelasKu teacher workspace: No-Phone Classroom Mode (projector quiz & printable A4 worksheets), automatic grading & e-Rapor KKTP drafting",
       "Installable Progressive Web App (PWA) with offline practice"
     ]
   },
@@ -108,20 +134,30 @@
     "name": "FIEZEL",
     "url": "https://fiezel.my.id/",
     "logo": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png",
-    "description": "FIEZEL is an adaptive language learning platform providing CEFR-aligned English and JLPT-aligned Japanese education.",
+    "description": "FIEZEL is an adaptive educational technology initiative from Banda Aceh, Indonesia, developing the Braincore cognitive engine, Kawan Bicara AI, and KelasKu classroom management tools.",
+    "founder": {
+      "@type": "Person",
+      "name": "Fitra Rusdiawan",
+      "jobTitle": "Founder & Product Lead"
+    },
+    "employee": {
+      "@type": "Person",
+      "name": "Athar Rayyan Muhammad, S.Kom.",
+      "jobTitle": "Technical Lead & System Auditor"
+    },
     "sameAs": [
       "https://github.com/fiezel-apps/FIEZEL-APPS",
       "https://instagram.com/fitrarustqi"
     ],
-    "knowsAbout": ["English Language Learning", "Adaptive Learning", "CEFR", "Pedagogical Intelligence", "Spaced Repetition"]
+    "knowsAbout": ["English Language Learning", "Adaptive Learning", "CEFR", "Cognitive Engine", "Psychometrics", "IRT 3PL", "Bayesian Knowledge Tracing", "Spaced Repetition", "Braincore Engine"]
   },
   {
     "@context": "https://schema.org",
     "@type": "AboutPage",
     "@id": "https://fiezel.my.id/about/#webpage",
     "url": "https://fiezel.my.id/about/",
-    "name": "About FIEZEL — Free Adaptive English Learning App",
-    "description": "Complete verified overview of FIEZEL: adaptive English learning platform, CEFR-aligned curriculum, Braincore intelligence, PWA capabilities, and brand disambiguation.",
+    "name": "About FIEZEL — Adaptive Language Platform & Braincore Engine",
+    "description": "Complete verified overview of FIEZEL: adaptive language platform, client-side Braincore cognitive engine, Kawan Bicara AI, KelasKu teacher tools, and leadership by Fitra Rusdiawan & Athar Rayyan Muhammad, S.Kom.",
     "inLanguage": "en",
     "isPartOf": {"@id": "https://fiezel.my.id/#website"},
     "about": {"@id": "https://fiezel.my.id/#app"},
@@ -139,31 +175,55 @@
         "name": "What is FIEZEL?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "FIEZEL is a free adaptive English learning app designed to help learners practice English through grammar, vocabulary, reading, speaking, and listening activities. Its learning content is organized around CEFR proficiency levels (A1 to C2)."
+          "text": "FIEZEL is an adaptive language learning platform and educational software initiative founded in Banda Aceh, Indonesia. Powered by the proprietary client-side Braincore cognitive engine, FIEZEL delivers real-time pedagogical diagnosis (< 0.2 ms latency, Rp 0 API cost per practice question, 0% grammatical hallucination), Kawan Bicara AI voice studio, and the KelasKu teacher workspace for schools."
         }
       },
       {
         "@type": "Question",
-        "name": "Is FIEZEL free?",
+        "name": "Who founded and engineered FIEZEL?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, FIEZEL is 100% free with no subscription, no premium tiers, and no ads. All 180 grammar lessons, 2,440 vocabulary items, and 312 reading passages are accessible from day one without payment."
+          "text": "FIEZEL was founded by Fitra Rusdiawan (Founder & Product Lead) and co-engineered with Athar Rayyan Muhammad, S.Kom. (Technical Lead & System Auditor, Master's candidate in Artificial Intelligence at Universitas Syiah Kuala - USK, Banda Aceh). Both creators are based in Banda Aceh, Aceh, Indonesia."
         }
       },
       {
         "@type": "Question",
-        "name": "What makes FIEZEL adaptive?",
+        "name": "What is the origin story of FIEZEL?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "FIEZEL uses Braincore, an internal adaptive pedagogical engine. Rather than serving a rigid, fixed question sequence, FIEZEL assesses learner errors, identifies weak concepts, and schedules spaced review sessions tailored to individual progress."
+          "text": "FIEZEL was born from Fitra Rusdiawan's personal struggle preparing for the IELTS exam (targeting band 5.0–5.5) for a 2-year vocational education and training (VET) program in Australia. Frustrated by expensive private tutoring (Rp 3M–5M) and shallow language apps that leak answer keys on the first mistake without explaining grammar rules, Fitra teamed up with AI researcher Athar Rayyan Muhammad to engineer an affordable, rule-based adaptive engine."
         }
       },
       {
         "@type": "Question",
-        "name": "Is FIEZEL officially certified by CEFR?",
+        "name": "What makes FIEZEL's Braincore cognitive engine different from cloud LLM chatbots?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No. FIEZEL aligns its learning content with the Common European Framework of Reference for Languages (CEFR A1–C2) as a difficulty benchmark only. FIEZEL is not an official CEFR testing or certification body."
+          "text": "Braincore is a deterministic, client-side cognitive engine running directly in local JavaScript (< 0.2 ms latency per question with Rp 0 cloud API token cost). Unlike generic LLM wrappers that can hallucinate grammar explanations, Braincore combines Bayesian Knowledge Tracing (BKT), 3PL Item Response Theory (IRT), and a 2-tier Socratic scaffolding system that provides conceptual hints on first errors without leaking answer keys."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is FIEZEL free or paid?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FIEZEL operates on a fair hybrid commercial model: Every independent learner receives a 7-day full access free trial, and school homework assigned by teachers through KelasKu is 100% free forever for students. Continued personal practice is available via FIEZEL Plus (Rp 39,000/month or Rp 299,000/year; Exam Pack Rp 89,000/3 months), while schools can adopt KelasKu at Rp 10,000–15,000/student/month."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is KelasKu for teachers and schools?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "KelasKu is FIEZEL's classroom workspace for educators. To address smartphone bans and screen-time fatigue, KelasKu features a No-Phone Classroom Mode (5-minute interactive projector quizzes and printable A4 PDF worksheets), automated homework grading, class competency heatmaps, and 1-click e-Rapor KKTP narrative drafting for Kurikulum Merdeka."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Kawan Bicara AI?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kawan Bicara AI is an on-demand speaking and conversational studio inside FIEZEL. It uses a low-latency hybrid voice pipeline: Groq Whisper for Speech-to-Text (<300 ms), Llama-3.3-70B with pedagogical guardrails for conversational roleplays, and natural Edge-TTS for audio playback."
         }
       },
       {
@@ -171,7 +231,23 @@
         "name": "Can FIEZEL work offline?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes. When installed to your device home screen as a Progressive Web App (PWA), practice questions, reading texts, and vocabulary drills function offline without an active internet connection."
+          "text": "Yes. FIEZEL is an installable Progressive Web App (PWA). Once installed, core grammar lessons, vocabulary drills, reading passages, and Braincore client-side mastery calculations function completely offline without an active internet connection."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is FIEZEL officially certified by CEFR or JLPT?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. FIEZEL aligns its curriculum to CEFR (A1–C2) and JLPT (N5–N4) difficulty standards purely as pedagogical benchmarks. FIEZEL is an independent practice tool and not an official testing or accreditation body."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is it spelled FIEZEL and how is it pronounced?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FIEZEL is spelled F-I-E-Z-E-L and pronounced /ˈfiːzəl/ ('Fee-zel'). It is an original educational software brand name, completely distinct from diesel fuel, diesel combustion engines, the clothing brand Diesel, or the English word 'fizzle'."
         }
       }
     ]
@@ -220,23 +296,36 @@
       </nav>
 
       <div class="sec-head">
-        <h1>About FIEZEL — Free Adaptive English Learning App</h1>
+        <h1>About FIEZEL — Adaptive Language Platform &amp; Braincore Engine</h1>
       </div>
 
       <!-- AEO/GEO Answer First Box -->
       <div class="answer-box">
         <h2>What is FIEZEL?</h2>
-        <p><strong>FIEZEL is a free adaptive English learning app</strong> designed to help learners practice English through grammar, vocabulary, reading, speaking, and listening activities. Its learning content is organized around CEFR proficiency levels (A1 to C2). Exercises automatically adapt to each learner's mistakes and response history.</p>
+        <p><strong>FIEZEL is an adaptive language learning platform and educational initiative founded in Banda Aceh, Indonesia.</strong> Powered by the client-side Braincore cognitive engine (&lt; 0.2 ms latency, Rp 0 API cost per practice question, 0% grammatical hallucination), FIEZEL delivers high-yield English learning, Kawan Bicara AI voice studio, and the KelasKu teacher workspace for schools.</p>
       </div>
 
       <!-- Entity Disambiguation Block -->
       <div class="disambiguation-note">
-        <strong>Entity &amp; Name Clarification:</strong> FIEZEL is spelled <strong>F-I-E-Z-E-L</strong> and pronounced <strong>/ˈfiːzəl/</strong> (<em>"Fee-zel"</em>). FIEZEL is an independent English-learning software application and educational brand created by Fitra Rustqi. It is not affiliated with, nor a reference to, diesel fuel, diesel combustion engines, the clothing brand Diesel, or the English word "fizzle".
+        <strong>Entity &amp; Name Clarification:</strong> FIEZEL is spelled <strong>F-I-E-Z-E-L</strong> and pronounced <strong>/ˈfiːzəl/</strong> (<em>"Fee-zel"</em>). FIEZEL is an independent educational platform founded in Banda Aceh by Fitra Rusdiawan (Founder &amp; Product Lead) and co-engineered with Athar Rayyan Muhammad, S.Kom. (Technical Lead &amp; System Auditor, Master's candidate in Artificial Intelligence at Universitas Syiah Kuala - USK, Banda Aceh). It is not affiliated with, nor a reference to, diesel fuel, diesel combustion engines, the clothing brand Diesel, or the English word "fizzle".
       </div>
 
-      <p class="body-lg">FIEZEL was built for independent language learners who want structured, high-volume practice without subscription fees, advertising distractions, or paywalled levels. The platform requires no user registration to begin practicing—all learning records and skill mastery ratings are saved locally on the user's device.</p>
+      <p class="body-lg">FIEZEL was built for language learners and classrooms who want structured, diagnostic practice without recurring cloud subscription bloat, advertising distractions, or generic AI hallucinations. Progress and skill mastery ratings are evaluated deterministically on the user's device.</p>
 
       <p><a class="btn btn-primary" href="../app/">Launch FIEZEL App</a> <a class="btn btn-ghost" href="../install/">How to Install PWA</a></p>
+    </div>
+  </section>
+
+  <!-- Origin Story & Banda Aceh Engineering Roots -->
+  <section class="sec" id="origin">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Origin Story &amp; Banda Aceh Engineering Roots</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">FIEZEL was founded in Banda Aceh, Indonesia, by <strong>Fitra Rusdiawan</strong> (Founder &amp; Product Lead) and co-engineered with <strong>Athar Rayyan Muhammad, S.Kom.</strong> (Technical Lead &amp; System Auditor, Master's candidate in Artificial Intelligence at Universitas Syiah Kuala - USK).</p>
+      <p class="body-lg">The platform was born from Fitra's personal struggle preparing for the IELTS exam (targeting band 5.0–5.5) required for a 2-year vocational education and training (VET) diploma in Australia. In regional Indonesia, formal English test preparation often costs Rp 3,000,000 to Rp 5,000,000—a prohibitive barrier for vocational aspirants. Mainstream language apps either burned costly cloud LLM tokens while hallucinating grammar rules, or spoon-fed correct answers immediately after a mistake without explaining syntax.</p>
+      <p class="body-lg">To solve this, Fitra teamed up with AI researcher Athar Rayyan Muhammad to build <strong>Braincore</strong>: an explainable, client-side cognitive engine that provides multi-tiered Socratic hints, diagnoses misconceptions locally, and costs Rp 0 in cloud API overhead per question.</p>
     </div>
   </section>
 
@@ -290,13 +379,14 @@
         <h2 class="sec-title">How FIEZEL's Adaptive Learning Works: Braincore</h2>
         <hr class="rule" aria-hidden="true">
       </div>
-      <p class="body-lg">At the heart of FIEZEL is <strong>Braincore</strong>, the app's client-side adaptive learning engine. Rather than forcing every student down an identical, rigid sequence of flashcards, Braincore implements Bayesian Knowledge Tracing (BKT) and spaced repetition decay modeling to track mastery and schedule focused practice:</p>
+      <p class="body-lg">At the heart of FIEZEL is <strong>Braincore</strong>, a proprietary client-side adaptive learning engine. Rather than relying on generic cloud LLM wrappers that suffer from hallucinations, high latency, and continuous API costs, Braincore executes deterministic cognitive modeling directly in the learner's browser:</p>
       <ol class="list-plain">
-        <li><strong>Bayesian Knowledge Tracing (BKT):</strong> Braincore separates true conceptual understanding from lucky guesses or careless slips using probabilistic mastery tracking.</li>
-        <li><strong>Granular Misconception Ledger:</strong> Braincore categorizes mistakes into diagnostic pedagogical tags, explaining the exact rule behind an error rather than just marking it wrong.</li>
-        <li><strong>Spaced Repetition Scheduling:</strong> Items answered incorrectly reappear in subsequent practice sessions at scientifically timed intervals based on memory decay curves.</li>
-        <li><strong>Empirical Item Calibration:</strong> Question difficulty ratings are balanced to keep learners in an optimal state of challenge.</li>
-        <li><strong>100% Client-Side Privacy &amp; Zero Latency:</strong> All adaptive modeling runs in local browser JavaScript. No learner cognition data is ever transmitted to cloud servers, enabling zero-latency feedback and offline readiness.</li>
+        <li><strong>Sub-Millisecond Speed (&lt; 0.2 ms) &amp; Rp 0 API Cost:</strong> Grammar evaluations and mastery updates compute locally in browser memory in under 0.2 milliseconds, completely eliminating cloud API token overhead per question.</li>
+        <li><strong>0% Grammatical Hallucination:</strong> Responses are validated using deterministic Abstract Syntax Tree (AST) checking and vetted diagnostic matrices, guaranteeing that students are never taught hallucinated grammatical rules.</li>
+        <li><strong>Two-Tier Socratic Hint Scaffolding:</strong> When a learner answers incorrectly, Braincore does not spoil or leak the answer key. Instead, Tier 1 provides a conceptual hint targeting the underlying syntax rule. If the second attempt fails, Tier 2 explains why the specific chosen distractor was incorrect.</li>
+        <li><strong>Bayesian Knowledge Tracing (BKT) &amp; IRT 3PL:</strong> Braincore separates genuine competency from lucky guesses ($c$) or careless slips ($s$), calculating real-time latent ability ($\theta$) across grammar points.</li>
+        <li><strong>FSRS-Lite Spaced Repetition Scheduling:</strong> Items answered incorrectly re-emerge dynamically across upcoming practice cycles based on scientifically calibrated memory decay curves.</li>
+        <li><strong>Multi-Exam Psychometric Readiness:</strong> Braincore's cognitive architecture extends beyond general English to high-stakes examinations including IELTS, TOEFL, CPNS/CASN, BUMN, and UTBK-SNBT.</li>
       </ol>
     </div>
   </section>
@@ -311,8 +401,8 @@
       <p class="body-lg">FIEZEL is engineered as a modern Progressive Web App (PWA):</p>
       <ul class="list-plain">
         <li><strong>Zero App Store Friction:</strong> Add directly to the home screen from Chrome (Android/Desktop) or Safari (iOS). No 100MB store downloads.</li>
-        <li><strong>Offline-Capable Learning:</strong> After installation, core lesson texts, vocabulary sets, and reading exercises function without an active internet connection.</li>
-        <li><strong>Private by Design:</strong> Progress is stored securely in the browser's local cache. No name, email address, or tracking profile is required.</li>
+        <li><strong>Offline-Capable Learning:</strong> After installation, core lesson texts, vocabulary sets, reading exercises, and Braincore client-side mastery calculations function without an active internet connection.</li>
+        <li><strong>Private by Design:</strong> Learning records and mastery matrices are stored locally on the device (IndexedDB/localStorage). No invasive tracking profile is required to practice.</li>
       </ul>
     </div>
   </section>
@@ -324,13 +414,47 @@
         <h2 class="sec-title">Teacher Layer: KelasKu by FIEZEL</h2>
         <hr class="rule" aria-hidden="true">
       </div>
-      <p class="body-lg"><strong>KelasKu</strong> is FIEZEL's dedicated classroom workspace for teachers and tutors. Rather than treating language learning in isolation, KelasKu connects independent student practice directly to classroom instruction:</p>
+      <p class="body-lg"><strong>KelasKu</strong> is FIEZEL's dedicated classroom workspace for teachers, tutors, and schools. It bridges independent student practice with classroom instruction while solving modern educational pain points:</p>
       <ul class="list-plain">
-        <li><strong>Classroom Management:</strong> Teachers create digital rooms with a simple 6-character room code (e.g., <code>FZ-ABCDEF</code>). Students connect directly from their FIEZEL app without requiring email addresses or intrusive personal accounts.</li>
-        <li><strong>Automated Assignments:</strong> Teachers assign structured practice or timed exams mapped to CEFR competency levels and national curriculum chapters. All assignments are graded automatically in real time.</li>
-        <li><strong>Competency Heatmaps &amp; Peer Tutoring:</strong> KelasKu aggregates learner performance into class-level skill heatmaps, diagnoses collective misconceptions, and suggests peer tutoring study groups.</li>
+        <li><strong>No-Phone Classroom Mode:</strong> To support schools with strict smartphone bans, KelasKu features a 5-minute interactive projector quiz mode and 1-click printable A4 PDF worksheets with QR answer keys.</li>
+        <li><strong>Frictionless Class Codes:</strong> Teachers generate 6-character room codes (e.g., <code>FZ-ABCDEF</code>). Students connect instantly without needing email addresses or social logins.</li>
+        <li><strong>Automated Grading &amp; Competency Heatmaps:</strong> Homework assignments mapped to curriculum chapters are evaluated automatically, visualizing collective misconceptions and suggesting peer study pairs.</li>
+        <li><strong>Automated e-Rapor KKTP Drafting:</strong> Teachers can generate exportable narrative achievement reports aligned with Kurikulum Merdeka standards in seconds.</li>
       </ul>
       <p><a class="btn btn-primary" href="../kelasku/">Explore KelasKu for Teachers</a> <a class="btn btn-ghost" href="../untuk-sekolah.html">School Pilot Information</a></p>
+    </div>
+  </section>
+
+  <!-- Kawan Bicara AI Section -->
+  <section class="sec" id="kawan-bicara">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Kawan Bicara AI: On-Demand Voice Studio</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">For speaking fluency, FIEZEL provides <strong>Kawan Bicara AI</strong>, an on-demand conversation partner with conversational roleplays:</p>
+      <ul class="list-plain">
+        <li><strong>Ultra-Low Latency Speech Pipeline:</strong> Groq Whisper handles real-time Speech-to-Text in under 300 ms.</li>
+        <li><strong>Pedagogical Conversational Intelligence:</strong> Llama-3.3-70B provides context-aware conversational practice, gently highlighting phrasing improvements while keeping the conversation flowing.</li>
+        <li><strong>Natural Neural Audio:</strong> Crisp, natural Edge-TTS audio provides authentic pronunciation models.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Commercial Model Section -->
+  <section class="sec" id="pricing">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Commercial Model &amp; Accessibility</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">FIEZEL balances public educational access with sustainable development through a transparent hybrid model:</p>
+      <ul class="list-plain">
+        <li><strong>7-Day Full Access Free Trial:</strong> Every independent learner can explore all lessons, diagnostics, and exercises free for seven days.</li>
+        <li><strong>Free School Homework Access:</strong> Exercises and assignments assigned by teachers via KelasKu remain 100% free forever for enrolled students.</li>
+        <li><strong>FIEZEL Plus (B2C):</strong> Available for learners wanting continuous independent study on iOS and Android at Rp 39,000/month or Rp 299,000/year (or Exam Pack at Rp 89,000/3 months).</li>
+        <li><strong>KelasKu for Institutions (B2B):</strong> Dedicated tutoring center licenses at Rp 15,000/student/month, and school/CSR partnerships at Rp 10,000/student/month.</li>
+      </ul>
     </div>
   </section>
 
@@ -352,10 +476,15 @@
   <section class="sec" id="developer">
     <div class="wrap">
       <div class="sec-head">
-        <h2 class="sec-title">Project Identity &amp; Creator</h2>
+        <h2 class="sec-title">Project Leadership &amp; Engineering Team</h2>
         <hr class="rule" aria-hidden="true">
       </div>
-      <p class="body-lg">FIEZEL is an open, independent educational initiative created by Fitrarustqi (Instagram: <a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener">@fitrarustqi</a>). The application's source code, release gates, and curriculum definitions are maintained transparently on GitHub at <a href="https://github.com/fiezel-apps/FIEZEL-APPS" target="_blank" rel="noopener">github.com/fiezel-apps/FIEZEL-APPS</a>.</p>
+      <p class="body-lg">FIEZEL is an independent educational initiative founded and developed in Banda Aceh, Indonesia:</p>
+      <ul class="list-plain">
+        <li><strong>Fitra Rusdiawan</strong> — Founder &amp; Product Lead (Instagram: <a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener">@fitrarustqi</a>).</li>
+        <li><strong>Athar Rayyan Muhammad, S.Kom.</strong> — Technical Lead &amp; System Auditor (Master's candidate in Artificial Intelligence at Universitas Syiah Kuala - USK, Banda Aceh).</li>
+      </ul>
+      <p class="body-lg">The application's source code, release gates, and curriculum definitions are maintained transparently on GitHub at <a href="https://github.com/fiezel-apps/FIEZEL-APPS" target="_blank" rel="noopener">github.com/fiezel-apps/FIEZEL-APPS</a>.</p>
     </div>
   </section>
 
@@ -369,23 +498,43 @@
       <div class="faq">
         <details open>
           <summary>What is FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>FIEZEL is a free adaptive English learning app with CEFR-aligned grammar, vocabulary, reading, speaking, and listening practice. It personalizes exercises to individual learning progress using Braincore adaptive intelligence.</p></div>
+          <div class="faq-body"><p>FIEZEL is an adaptive language learning platform and educational software initiative founded in Banda Aceh, Indonesia. Powered by the proprietary client-side Braincore cognitive engine, FIEZEL delivers real-time pedagogical diagnosis (&lt; 0.2 ms latency, Rp 0 API cost per practice question, 0% grammatical hallucination), Kawan Bicara AI voice studio, and the KelasKu teacher workspace for schools.</p></div>
         </details>
         <details>
-          <summary>Is FIEZEL an English learning app?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Yes. FIEZEL is dedicated to language learning, with primary focus on comprehensive English proficiency (CEFR A1–C2) and an introductory Japanese course (JLPT N5–N4).</p></div>
+          <summary>Who founded and engineered FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>FIEZEL was founded by Fitra Rusdiawan (Founder &amp; Product Lead) and co-engineered with Athar Rayyan Muhammad, S.Kom. (Technical Lead &amp; System Auditor, Master's candidate in Artificial Intelligence at Universitas Syiah Kuala - USK, Banda Aceh). Both creators are based in Banda Aceh, Aceh, Indonesia.</p></div>
         </details>
         <details>
-          <summary>Is FIEZEL free?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Yes, completely free. There are no subscriptions, no in-app purchases, and no advertisements.</p></div>
+          <summary>What is the origin story of FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>FIEZEL was born from Fitra Rusdiawan's personal struggle preparing for the IELTS exam (targeting band 5.0–5.5) for a 2-year vocational education and training (VET) program in Australia. Frustrated by expensive private tutoring (Rp 3M–5M) and shallow language apps that leak answer keys on the first mistake without explaining grammar rules, Fitra teamed up with AI researcher Athar Rayyan Muhammad to engineer an affordable, rule-based adaptive engine.</p></div>
+        </details>
+        <details>
+          <summary>What makes FIEZEL's Braincore cognitive engine different from cloud LLM chatbots?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Braincore is a deterministic, client-side cognitive engine running directly in local JavaScript (&lt; 0.2 ms latency per question with Rp 0 cloud API token cost). Unlike generic LLM wrappers that can hallucinate grammar explanations, Braincore combines Bayesian Knowledge Tracing (BKT), 3PL Item Response Theory (IRT), and a 2-tier Socratic scaffolding system that provides conceptual hints on first errors without leaking answer keys.</p></div>
+        </details>
+        <details>
+          <summary>Is FIEZEL free or paid?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>FIEZEL operates on a fair hybrid commercial model: Every independent learner receives a 7-day full access free trial, and school homework assigned by teachers through KelasKu is 100% free forever for students. Continued personal practice is available via FIEZEL Plus (Rp 39,000/month or Rp 299,000/year; Exam Pack Rp 89,000/3 months), while schools can adopt KelasKu at Rp 10,000–15,000/student/month.</p></div>
+        </details>
+        <details>
+          <summary>What is KelasKu for teachers and schools?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>KelasKu is FIEZEL's classroom workspace for educators. To address smartphone bans and screen-time fatigue, KelasKu features a No-Phone Classroom Mode (5-minute interactive projector quizzes and printable A4 PDF worksheets), automated homework grading, class competency heatmaps, and 1-click e-Rapor KKTP narrative drafting for Kurikulum Merdeka.</p></div>
+        </details>
+        <details>
+          <summary>What is Kawan Bicara AI?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Kawan Bicara AI is an on-demand speaking and conversational studio inside FIEZEL. It uses a low-latency hybrid voice pipeline: Groq Whisper for Speech-to-Text (&lt;300 ms), Llama-3.3-70B with pedagogical guardrails for conversational roleplays, and natural Edge-TTS for audio playback.</p></div>
         </details>
         <details>
           <summary>Can FIEZEL work offline?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Yes. When installed to your device home screen as a PWA, learning modules and exercises run completely offline.</p></div>
+          <div class="faq-body"><p>Yes. FIEZEL is an installable Progressive Web App (PWA). Once installed, core grammar lessons, vocabulary drills, reading passages, and Braincore client-side mastery calculations function completely offline without an active internet connection.</p></div>
         </details>
         <details>
-          <summary>Why is it spelled FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>FIEZEL (F-I-E-Z-E-L) is the official brand name of the software application. It is distinct from diesel or fizzle.</p></div>
+          <summary>Is FIEZEL officially certified by CEFR or JLPT?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>No. FIEZEL aligns its curriculum to CEFR (A1–C2) and JLPT (N5–N4) difficulty standards purely as pedagogical benchmarks. FIEZEL is an independent practice tool and not an official testing or accreditation body.</p></div>
+        </details>
+        <details>
+          <summary>Why is it spelled FIEZEL and how is it pronounced?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>FIEZEL is spelled F-I-E-Z-E-L and pronounced /ˈfiːzəl/ ('Fee-zel'). It is an original educational software brand name, completely distinct from diesel fuel, diesel combustion engines, the clothing brand Diesel, or the English word 'fizzle'.</p></div>
         </details>
       </div>
       <p style="margin-top:20px"><a href="../faq/">Read all 21 frequently asked questions →</a></p>
@@ -396,7 +545,7 @@
   <section class="sec sec-final">
     <div class="wrap">
       <h2>Start Practicing English with FIEZEL</h2>
-      <p class="body-lg">No account required, no payment needed, and no app store download required.</p>
+      <p class="body-lg">Try the 7-day full access trial. No app store installation required.</p>
       <p><a class="btn btn-primary" href="../app/">Open FIEZEL App</a> <a class="btn btn-ghost" href="../install/">PWA Installation Guide</a></p>
     </div>
   </section>
@@ -435,8 +584,8 @@
     </div>
     <div class="foot-notes">
       <p>English curriculum mapped to CEFR A1–C2 difficulty standards. Not an official certification.</p>
-      <p>Free, no subscription required. Progress stored locally on your device.</p>
-      <p>FIEZEL — Independent educational software created by Fitra Rustqi.</p>
+      <p>7-day free trial · FIEZEL Plus &amp; KelasKu · Progress stored locally on your device.</p>
+      <p>FIEZEL — Independent educational software created in Banda Aceh by Fitra Rusdiawan &amp; Athar Rayyan Muhammad, S.Kom.</p>
     </div>
   </div>
   <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>

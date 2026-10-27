@@ -83,7 +83,7 @@
     "@id": "https://fiezel.my.id/#app",
     "name": "FIEZEL",
     "url": "https://fiezel.my.id/app/",
-    "description": "Aplikasi belajar bahasa adaptif dengan dua kursus: Bahasa Inggris dipetakan ke CEFR A1–C2, dan Bahasa Jepang dipetakan ke JLPT N5–N4. Antarmuka tersedia dalam Bahasa Indonesia dan Bahasa Thai. Gratis, tanpa langganan, dan bisa dipakai tanpa internet setelah dipasang.",
+    "description": "Aplikasi belajar bahasa adaptif dengan mesin kognitif Braincore asal Banda Aceh. Membimbing jawaban dengan petunjuk bertahap tanpa membuka kunci jawaban saat salah pertama, dilengkapi Kawan Bicara AI dan panel guru KelasKu.",
     "applicationCategory": "EducationalApplication",
     "applicationSubCategory": "Language Learning",
     "operatingSystem": "Any (PWA)",
@@ -108,11 +108,21 @@
     "@id": "https://fiezel.my.id/#org",
     "name": "FIEZEL",
     "url": "https://fiezel.my.id/",
+    "founder": {
+      "@type": "Person",
+      "name": "Fitra Rusdiawan",
+      "jobTitle": "Founder & Product Lead"
+    },
+    "employee": {
+      "@type": "Person",
+      "name": "Athar Rayyan Muhammad, S.Kom.",
+      "jobTitle": "Technical Lead & System Auditor"
+    },
     "areaServed": [
       {"@type": "Country", "name": "Indonesia"},
       {"@type": "Country", "name": "Thailand"}
     ],
-    "knowsAbout": ["English Language Learning", "Japanese Language Learning", "CEFR", "JLPT", "Adaptive Learning"]
+    "knowsAbout": ["English Language Learning", "Japanese Language Learning", "CEFR", "JLPT", "Adaptive Learning", "Braincore Engine"]
   },
   {
     "@context": "https://schema.org",
@@ -162,7 +172,23 @@
         "name": "Apa itu FIEZEL?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "FIEZEL adalah aplikasi web belajar bahasa yang menyesuaikan soal berikutnya dari jawabanmu. Ada dua kursus di dalamnya: Bahasa Inggris yang dipetakan ke tingkat CEFR A1–C2, dan Bahasa Jepang yang dipetakan ke JLPT N5–N4. Gratis, tanpa langganan, dan tanpa akun."
+          "text": "FIEZEL adalah aplikasi web belajar bahasa adaptif asal Banda Aceh yang menyesuaikan soal berikutnya dari jawabanmu menggunakan mesin kognitif Braincore. Dilengkapi kursus Bahasa Inggris, Kawan Bicara AI untuk latihan percakapan, dan ruang kerja guru KelasKu."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Siapa pendiri dan tim di balik FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FIEZEL didirikan di Banda Aceh oleh Fitra Rusdiawan (Founder & Perancang Produk) bersama Athar Rayyan Muhammad, S.Kom. (Technical Lead & System Auditor, mahasiswa Magister S2 Kecerdasan Buatan di Universitas Syiah Kuala - USK)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apa keunggulan mesin Braincore FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Mesin Braincore berjalan langsung di perangkat murid (<0,2 ms) dengan biaya API Rp0 per butir latihan dan bebas halusinasi tata bahasa, menggunakan pemodelan psikometri IRT 3PL, BKT, dan bimbingan bertahap 2 langkah tanpa membocorkan kunci jawaban saat salah pertama."
         }
       },
       {
@@ -186,7 +212,7 @@
         "name": "Apakah FIEZEL gratis?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Gratis sepenuhnya. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran, dan tidak ada iklan. Seluruh materi Inggris dan Jepang bisa dibuka sejak hari pertama."
+          "text": "FIEZEL menyediakan masa percobaan gratis 7 hari penuh, dan pengerjaan tugas sekolah dari guru selalu gratis. Untuk belajar mandiri intensif tersedia paket langganan FIEZEL Plus dan Paket Ujian, serta langganan KelasKu untuk bimbel dan sekolah."
         }
       },
       {
@@ -226,7 +252,7 @@
         "name": "Apakah ada fitur untuk guru?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Ada. KelasKu adalah panel guru di dalam FIEZEL untuk membuat kelas, mengundang murid dengan kode, dan melihat progres per murid. Pratinjaunya bisa dibuka di fiezel.my.id/app/?teacher=preview."
+          "text": "Ada. KelasKu adalah panel guru di dalam FIEZEL untuk membuat kelas, menerbitkan tugas yang tersambung ke Kurikulum Merdeka Fase D, ekspor draf Rapor KKTP e-Rapor, serta Mode Kelas Tanpa HP (kuis proyektor 5 menit & cetak lembar soal A4). Pratinjaunya bisa dibuka di fiezel.my.id/app/?teacher=preview."
         }
       }
     ]
@@ -273,15 +299,22 @@
         <h1>Tentang FIEZEL</h1>
       </div>
 
-      <!-- Paragraf pembuka SENGAJA berbentuk definisi satu kalimat lalu rinciannya:
-           itu bentuk yang paling mudah dikutip utuh oleh ringkasan AI dan featured
-           snippet, dan ia juga bentuk yang paling jujur — pembaca manusia mendapat
-           jawabannya di baris pertama, bukan setelah tiga paragraf pemanasan. -->
-      <p class="body-lg"><strong>FIEZEL adalah aplikasi web belajar bahasa yang menyesuaikan soal berikutnya dari jawaban murid.</strong> Di dalamnya ada dua kursus: <strong>Bahasa Inggris</strong> yang dipetakan ke tingkat <strong>CEFR A1–C2</strong>, dan <strong>Bahasa Jepang</strong> yang dipetakan ke <strong>JLPT N5–N4</strong>. Antarmukanya tersedia dalam <strong>Bahasa Indonesia</strong> dan <strong>Bahasa Thai</strong>. Gratis, tanpa langganan, tanpa iklan, dan bisa dipakai tanpa internet setelah dipasang ke layar utama.</p>
+      <p class="body-lg"><strong>FIEZEL adalah aplikasi web belajar bahasa adaptif asal Banda Aceh yang menyesuaikan soal berikutnya dari kemampuan nyata murid.</strong> Digerakkan oleh mesin kognitif <strong>Braincore</strong>, FIEZEL melatih penguasaan Bahasa Inggris lewat bimbingan bertahap 2 langkah tanpa menyuapi kunci jawaban, dilengkapi studio percakapan <strong>Kawan Bicara AI</strong>, serta ruang kerja guru <strong>KelasKu</strong> (lengkap dengan Mode Kelas Tanpa HP). Tersedia masa percobaan gratis dan akses tugas sekolah gratis, dengan paket mandiri FIEZEL Plus.</p>
 
-      <p class="body-lg">FIEZEL dibuat untuk murid yang belajar sendiri: tidak ada kelas, tidak ada jadwal, tidak ada biaya. Yang menggantikan guru adalah urutan soalnya — setiap jawaban memperbarui perkiraan tingkat kemampuan, dan soal berikutnya dipilih dari perkiraan itu, bukan dari daftar tetap.</p>
+      <p class="body-lg">FIEZEL dibuat untuk murid yang belajar mandiri maupun terhubung dengan kelas: urutan latihan tidak kaku, melainkan dinamis memperbarui estimasi kemampuan siswa secara matematis, menghadirkan tantangan optimal di zona belajar efektif.</p>
 
       <p><a class="btn btn-primary" href="app/">Buka aplikasi FIEZEL</a> <a class="btn btn-ghost" href="install/">Cara memasang di ponsel</a></p>
+    </div>
+  </section>
+
+  <section class="sec" id="asal-usul">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Asal-Usul &amp; Dua Talenta Lokal Banda Aceh</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">FIEZEL lahir dari pengalaman nyata <strong>Fitra Rusdiawan</strong> di Banda Aceh saat mempersiapkan skor IELTS (~5,0–5,5) untuk program kuliah vokasi 2 tahun (Vocational Education and Training - VET) di Australia. Menghadapi les privat yang mahal dan aplikasi kuis populer yang membuang waktu mengulang dasar serta menyuapi kunci jawaban tanpa mendidik penalaran, Fitra merancang alur belajar adaptif berbasis pemahaman mandiri.</p>
+      <p class="body-lg">Dalam pengembangan teknologinya, Fitra bermitra dengan <strong>Athar Rayyan Muhammad, S.Kom.</strong>, putra daerah Banda Aceh lulusan S1 Ilmu Komputer yang sedang menempuh studi Magister (S2) Kecerdasan Buatan di Universitas Syiah Kuala (USK). Athar bertindak sebagai <em>Technical Lead &amp; System Auditor</em>, membimbing arsitektur sistem, memvalidasi keamanan kode, dan mengawal lebih dari 320 pengujian otomatis (automated test suites) agar mesin Braincore berjalan stabil dan andal.</p>
     </div>
   </section>
 
@@ -336,13 +369,15 @@
         <h2 class="sec-title">Keunggulan Utama: Mesin Kognitif Adaptif Braincore</h2>
         <hr class="rule" aria-hidden="true">
       </div>
-      <p class="body-lg">Perbedaan mendasar antara FIEZEL dan aplikasi kuis biasa terletak pada mesin adaptifnya: <strong>Braincore</strong>. FIEZEL bukan sekadar bank soal linier, melainkan sistem pemodelan kognitif yang berjalan langsung di peramban murid (100% client-side):</p>
+      <p class="body-lg">Perbedaan mendasar antara FIEZEL dan aplikasi kuis biasa terletak pada mesin adaptifnya: <strong>Braincore</strong>. FIEZEL bukan sekadar bank soal linier atau pembungkus API LLM berbayar yang boros token. Braincore adalah sistem pemodelan kognitif yang berjalan langsung di peramban murid (100% client-side):</p>
       <ol class="list-plain">
-        <li><strong>Bayesian Knowledge Tracing (BKT):</strong> Alih-alih hanya menghitung persentase jawaban benar, Braincore membedakan antara pemahaman konsep sejati versus tebakan beruntung atau kekeliruan teledor.</li>
-        <li><strong>Buku Besar Miskonsepsi (Misconception Ledger):</strong> Setiap kesalahan dianalisis akarnya. Pengecoh soal dikaitkan ke diagnosis pedagogis spesifik, sehingga murid paham *mengapa* salah, bukan cuma diberi tanda silang.</li>
-        <li><strong>Pengulangan Berjarak Dinamis (Spaced Repetition):</strong> Mengikuti kurva retensi memori. Kesalahan hari ini otomatis dijadwalkan kembali pada target harian berikutnya sebelum ingatan memudar.</li>
-        <li><strong>Privasi Penuh &amp; Tanpa Jeda (0 ms):</strong> Seluruh pemodelan belajar diproses lokal di HP murid tanpa dikirim ke cloud pihak ketiga, memastikan privasi mutlak dan performa instan tanpa koneksi internet terus menerus.</li>
-        <li><strong>Jembatan Telemetri ke Guru (KelasKu):</strong> Di ruang kelas, agregat analitik Braincore memetakan kelemahan kolektif siswa menjadi peta kompetensi guru untuk intervensi remedial terarah.</li>
+        <li><strong>Keputusan Instan di Bawah 0,2 milidetik:</strong> Seluruh logika adaptif dan diagnostik berjalan lokal di perangkat murid tanpa jeda tunggu jaringan cloud.</li>
+        <li><strong>Biaya API Rp0 per Butir Latihan:</strong> Latihan harian tidak membakar kuota API berbayar, menjaga sistem tetap hemat dan berkelanjutan.</li>
+        <li><strong>Bebas Halusinasi Tata Bahasa (0% Halusinasi):</strong> Penilaian sintaksis dan tata bahasa dievaluasi secara deterministik berbasis aturan linguistik yang terverifikasi, bukan tebakan generatif.</li>
+        <li><strong>Bimbingan Bertahap 2 Langkah (Adaptive Scaffolding):</strong> Saat murid salah pada percobaan pertama, kunci jawaban tidak dibocorkan; Braincore memberikan petunjuk diagnostik agar nalar murid terbangun mandiri (Eureka Moment).</li>
+        <li><strong>Pelacakan Kemampuan IRT &amp; BKT:</strong> Mengombinasikan Item Response Theory 3PL dan Bayesian Knowledge Tracing untuk membedakan antara pemahaman sejati dan tebakan untung-untungan.</li>
+        <li><strong>Pengulangan Berjarak FSRS-Lite:</strong> Memproyeksikan kurva peluruhan memori Ebbinghaus, menjadwalkan ulang materi tepat sebelum daya ingat memudar.</li>
+        <li><strong>Skalabilitas Lintas Ujian:</strong> Mesin Braincore dirancang terpisah dari bank materi bahasa, siap diperluas untuk latihan adaptif Seleksi CPNS/CASN (SKD), BUMN, dan UTBK-SNBT.</li>
       </ol>
     </div>
   </section>
@@ -353,7 +388,8 @@
         <h2 class="sec-title">KelasKu — Ruang Kerja untuk Guru</h2>
         <hr class="rule" aria-hidden="true">
       </div>
-      <p class="body-lg">Guru dan tutor bisa membuat ruang kelas digital dengan kode unik, menerbitkan tugas latihan atau ujian berwaktu yang menempel pada Kurikulum Nasional dan CEFR, serta melihat analitik dan miskonsepsi tiap murid tanpa perlu mengoreksi manual.</p>
+      <p class="body-lg">Guru dan tutor bisa membuat ruang kelas digital dengan kode 6 karakter, menerbitkan tugas latihan yang selaras dengan Kurikulum Merdeka Fase D, melihat peta penguasaan kelas secara otomatis, serta mengekspor draf Rapor KKTP e-Rapor siap salin.</p>
+      <p class="body-lg"><strong>Mode Kelas Tanpa HP:</strong> Untuk sekolah yang melarang siswa membawa ponsel, guru dapat menjalankan kuis interaktif 5 menit lewat proyektor kelas atau mencetak lembar kerja A4 otomatis dalam satu klik.</p>
       <p><a class="btn btn-primary" href="kelasku/">Pelajari KelasKu untuk Guru</a> <a class="btn btn-ghost" href="app/?teacher=preview">Buka Demo Guru</a></p>
     </div>
   </section>
@@ -364,12 +400,18 @@
         <h2 class="sec-title">Pertanyaan yang sering muncul</h2>
         <hr class="rule" aria-hidden="true">
       </div>
-      <!-- Teks di bawah WAJIB sepadan dengan blok FAQPage di kepala halaman. Rich result yang
-           menjanjikan jawaban yang tidak ada di halaman melanggar pedoman Google. -->
       <div class="faq">
         <details open>
           <summary>Apa itu FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>FIEZEL adalah aplikasi web belajar bahasa yang menyesuaikan soal berikutnya dari jawabanmu. Ada dua kursus di dalamnya: Bahasa Inggris yang dipetakan ke tingkat CEFR A1–C2, dan Bahasa Jepang yang dipetakan ke JLPT N5–N4. Gratis, tanpa langganan, dan tanpa akun.</p></div>
+          <div class="faq-body"><p>FIEZEL adalah aplikasi web belajar bahasa adaptif asal Banda Aceh yang menyesuaikan soal berikutnya dari jawabanmu menggunakan mesin kognitif Braincore. Dilengkapi kursus Bahasa Inggris, Kawan Bicara AI untuk latihan percakapan, dan ruang kerja guru KelasKu.</p></div>
+        </details>
+        <details>
+          <summary>Siapa pendiri dan tim di balik FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>FIEZEL didirikan di Banda Aceh oleh Fitra Rusdiawan (Founder &amp; Perancang Produk) bersama Athar Rayyan Muhammad, S.Kom. (Technical Lead &amp; System Auditor, mahasiswa Magister S2 Kecerdasan Buatan di Universitas Syiah Kuala - USK).</p></div>
+        </details>
+        <details>
+          <summary>Apa keunggulan mesin Braincore FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Mesin Braincore berjalan langsung di perangkat murid (&lt;0,2 ms) dengan biaya API Rp0 per butir latihan dan bebas halusinasi tata bahasa, menggunakan pemodelan psikometri IRT 3PL, BKT, dan bimbingan bertahap 2 langkah tanpa membocorkan kunci jawaban saat salah pertama.</p></div>
         </details>
         <details>
           <summary>Apakah FIEZEL mengajar bahasa Jepang?<span class="chev" aria-hidden="true"></span></summary>
@@ -381,7 +423,7 @@
         </details>
         <details>
           <summary>Apakah FIEZEL gratis?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Gratis sepenuhnya. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran, dan tidak ada iklan. Seluruh materi Inggris dan Jepang bisa dibuka sejak hari pertama.</p></div>
+          <div class="faq-body"><p>FIEZEL menyediakan masa percobaan gratis 7 hari penuh, dan pengerjaan tugas sekolah dari guru selalu gratis. Untuk belajar mandiri intensif tersedia paket langganan FIEZEL Plus dan Paket Ujian, serta langganan KelasKu untuk bimbel dan sekolah.</p></div>
         </details>
         <details>
           <summary>Perlu membuat akun untuk memakai FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
@@ -401,9 +443,11 @@
         </details>
         <details>
           <summary>Apakah ada fitur untuk guru?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Ada. KelasKu adalah panel guru di dalam FIEZEL untuk membuat kelas, mengundang murid dengan kode, dan melihat progres per murid. Pratinjaunya bisa dibuka di fiezel.my.id/app/?teacher=preview.</p></div>
+          <div class="faq-body"><p>Ada. KelasKu adalah panel guru di dalam FIEZEL untuk membuat kelas, menerbitkan tugas yang tersambung ke Kurikulum Merdeka Fase D, ekspor draf Rapor KKTP e-Rapor, serta Mode Kelas Tanpa HP (kuis proyektor 5 menit &amp; cetak lembar soal A4). Pratinjaunya bisa dibuka di fiezel.my.id/app/?teacher=preview.</p></div>
         </details>
       </div>
+    </div>
+  </section>
     </div>
   </section>
 
