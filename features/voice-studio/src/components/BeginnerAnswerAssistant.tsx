@@ -82,8 +82,8 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             <Sparkles className="w-3.5 h-3.5 text-[#8C2233] shrink-0" />
             <span className="text-xs font-semibold text-[#5C4E3C] truncate">
               {locale === 'th'
-                ? 'ให้ Fiezel ช่วยตอบอย่างเป็นธรรมชาติ'
-                : 'Sini, biar Fiezel bantuin kamu jawab lebih natural'}
+                ? 'แนวทางตอบธรรมชาติ · Fiezel Copilot'
+                : 'Bantuan Jawaban Natural · Fiezel Copilot'}
             </span>
           </div>
           <button
@@ -130,7 +130,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
       data-testid="beginner-answer-assistant"
       data-copilot-source={showLoadingState ? 'loading' : 'ai-realtime'}
       data-copilot-collapsed="false"
-      aria-label="Sini, biar Fiezel bantuin kamu jawab lebih natural"
+      aria-label={locale === 'th' ? 'แนวทางตอบธรรมชาติ · Fiezel Copilot' : 'Bantuan Jawaban Natural · Fiezel Copilot'}
       className="w-full space-y-1.5"
     >
       {/* Baris Header Bantuan: Judul Natural + Badge Status + Tombol Sembunyikan & Variasi Baru */}
@@ -139,12 +139,12 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1C1611] tracking-[-0.01em] min-w-0">
             <Sparkles className="w-3.5 h-3.5 text-[#8C2233] shrink-0" />
             <span className="sm:hidden truncate">
-              {locale === 'th' ? 'Biar Fiezel bantu jawab' : 'Biar Fiezel bantu jawab natural'}
+              {locale === 'th' ? 'แนวทางตอบ · Fiezel' : 'Bantuan Jawaban · Fiezel'}
             </span>
             <span className="hidden sm:inline truncate">
               {locale === 'th'
-                ? 'ตรงนี้ ให้ Fiezel ช่วยตอบอย่างเป็นธรรมชาติ'
-                : 'Sini, biar Fiezel bantuin kamu jawab lebih natural'}
+                ? 'แนวทางตอบธรรมชาติ · Fiezel Copilot'
+                : 'Bantuan Jawaban Natural · Fiezel Copilot'}
             </span>
           </span>
 
@@ -284,7 +284,8 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               <div
                 data-testid="beginner-reply-card-0"
                 onClick={() => onSelectForInput(activeCard.text)}
-                className="w-full cursor-pointer space-y-1 text-left"
+                title="Ketuk untuk memilih balasan ini"
+                className="w-full cursor-pointer space-y-1 text-left rounded-xl transition-colors hover:bg-[#FAF6EE] p-0.5"
               >
                 <div
                   data-testid="teleprompter-target-text"
