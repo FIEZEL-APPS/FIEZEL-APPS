@@ -50,6 +50,14 @@ AddType font/woff2 .woff2
   </IfModule>
 </FilesMatch>
 
+# SEO: Hapus header Last-Modified pada berkas HTML agar mesin pencari (Googlebot)
+# tidak menganggap homepage/landing page sebagai artikel bertanggal (mencegah tanggal muncul di snippet SERP).
+<FilesMatch "\.(html|htm)$">
+  <IfModule mod_headers.c>
+    Header unset Last-Modified
+  </IfModule>
+</FilesMatch>
+
 # Aset berat ber-hash: aman di-cache setahun, dan memang harus — 119 MB model
 # suara tidak boleh diunduh ulang tiap kunjungan.
 <FilesMatch "\.(onnx|wasm|bin|woff2)$">
