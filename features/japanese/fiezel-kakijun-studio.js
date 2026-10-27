@@ -29,6 +29,7 @@
   var overlayEl = null;
   var pickerOpen = false;
   var activePickerTab = 'hiragana';
+  var isCharacterCompleted = false;
 
   function T(key, fallback) {
     if (root.FiezelI18n && typeof root.FiezelI18n.t === 'function') {
@@ -99,16 +100,16 @@
   function drawGrid(w, h) {
     if (!ctx) return;
     ctx.save();
-    // Warm washi paper base
-    ctx.fillStyle = '#FAF7F2';
+    // Warm authentic washi paper base
+    ctx.fillStyle = '#FAF8F5';
     ctx.fillRect(0, 0, w, h);
 
     var pad = 12;
     var gw = w - pad * 2;
     var gh = h - pad * 2;
 
-    // Diagonal guidelines (subtle light sand for kanji balance)
-    ctx.strokeStyle = '#EBE2D8';
+    // Diagonal guidelines (subtle light stone for kanji balance)
+    ctx.strokeStyle = '#E8E2D9';
     ctx.lineWidth = 1.0;
     ctx.setLineDash([4, 4]);
 
@@ -120,7 +121,7 @@
     ctx.stroke();
 
     // Center crosshairs (horizontal & vertical)
-    ctx.strokeStyle = '#D9CEC3';
+    ctx.strokeStyle = '#DCD3C7';
     ctx.lineWidth = 1.3;
     ctx.setLineDash([6, 6]);
 
@@ -132,7 +133,7 @@
     ctx.stroke();
 
     // Outer bounding grid square
-    ctx.strokeStyle = '#C9BCB0';
+    ctx.strokeStyle = '#D1C7BA';
     ctx.lineWidth = 1.6;
     ctx.setLineDash([]);
     ctx.strokeRect(pad, pad, gw, gh);
@@ -154,12 +155,12 @@
     var scaleX = w / 109;
     var scaleY = h / 109;
 
-    // In Guided mode, draw ghost watermark of full character (見本 / Mihon)
+    // In Guided mode, draw authentic calligraphy shadow of full character (見本 / Mihon)
     if (activeMode === 'guided' && !isDemoPlaying) {
       ctx.save();
       ctx.scale(scaleX, scaleY);
-      ctx.strokeStyle = '#E2D9CE';
-      ctx.lineWidth = 4.2;
+      ctx.strokeStyle = '#94A3B8'; // Crisp, authentic slate-400 calligraphy shadow
+      ctx.lineWidth = 6.2;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       for (var k = 0; k < data.strokes.length; k++) {
@@ -173,8 +174,8 @@
     // Draw completed strokes in deep obsidian Sumi black ink
     ctx.save();
     ctx.scale(scaleX, scaleY);
-    ctx.strokeStyle = '#1E293B';
-    ctx.lineWidth = 5.2;
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 6.8;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     for (var i = 0; i < completedStrokes.length; i++) {
@@ -188,11 +189,11 @@
     }
     ctx.restore();
 
-    // Draw active user drawing trail (Japanese Carmine Crimson)
+    // Draw active user drawing trail in deep obsidian Sumi ink
     if (userPoints.length > 1) {
       ctx.save();
-      ctx.strokeStyle = '#BE123C';
-      ctx.lineWidth = Math.max(7, w * 0.042);
+      ctx.strokeStyle = '#0F172A';
+      ctx.lineWidth = Math.max(6.8, w * 0.046);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.beginPath();
@@ -226,19 +227,18 @@
     }
 
     var html = '';
-    // Highlight target stroke in warm coral amber with animated pulsing dash
-    html += '<path d="' + target.d + '" fill="none" stroke="#E11D48" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />';
-    html += '<path d="' + target.d + '" fill="none" stroke="#FDE68A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 6"><animate attributeName="stroke-dashoffset" from="30" to="0" dur="1.2s" repeatCount="indefinite" /></path>';
+    // Subtle dashed flow guideline indicating stroke trajectory (does NOT obscure shadow or drawing)
+    html += '<path d="' + target.d + '" fill="none" stroke="#64748B" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 5" opacity="0.75" />';
 
     // Position of stroke order number badge
     var nx = (target.numPos && target.numPos[0]) || (target.start && target.start[0]) || 50;
     var ny = (target.numPos && target.numPos[1]) || (target.start && target.start[1]) || 50;
     var order = target.order || (activeStrokeIndex + 1);
 
-    // Number badge circle with subtle attention ripple
-    html += '<circle cx="' + nx + '" cy="' + ny + '" r="6.2" fill="none" stroke="#BE123C" stroke-width="1.2" opacity="0.6"><animate attributeName="r" values="4.8;8.5;4.8" dur="1.8s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.8s" repeatCount="indefinite" /></circle>';
-    html += '<circle cx="' + nx + '" cy="' + ny + '" r="5.0" fill="#BE123C" />';
-    html += '<text x="' + nx + '" y="' + ny + '" font-size="4.8" font-weight="800" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central">' + order + '</text>';
+    // Number badge circle with pulsating locator ring
+    html += '<circle cx="' + nx + '" cy="' + ny + '" r="7.5" fill="none" stroke="#E11D48" stroke-width="1.8" opacity="0.8"><animate attributeName="r" values="5;11;5" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.9;0.1;0.9" dur="1.5s" repeatCount="indefinite" /></circle>';
+    html += '<circle cx="' + nx + '" cy="' + ny + '" r="5.6" fill="#E11D48" />';
+    html += '<text x="' + nx + '" y="' + ny + '" font-size="5.2" font-weight="800" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central">' + order + '</text>';
 
     guideSvgEl.innerHTML = html;
   }
@@ -307,10 +307,14 @@
     if (!btn) return;
     if (playing) {
       btn.classList.add('is-playing');
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg><span>' + T('jepang.kakijun-berhenti', 'Hentikan') + '</span>';
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>' +
+                      '<span class="kakijun-text-full">' + T('jepang.kakijun-berhenti', 'Hentikan') + '</span>' +
+                      '<span class="kakijun-text-short">' + T('jepang.kakijun-stop-pendek', 'Stop') + '</span>';
     } else {
       btn.classList.remove('is-playing');
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>' + T('jepang.kakijun-animasi', 'Lihat Contoh') + '</span>';
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>' +
+                      '<span class="kakijun-text-full">' + T('jepang.kakijun-animasi', 'Lihat Contoh') + '</span>' +
+                      '<span class="kakijun-text-short">' + T('jepang.kakijun-animasi-pendek', 'Contoh') + '</span>';
     }
   }
 
@@ -464,14 +468,21 @@
     } catch (_) {}
 
     // Show celebratory next button
+    isCharacterCompleted = true;
     var actionBtn = overlayEl && overlayEl.querySelector('#kakijunNextActionBtn');
     if (actionBtn) {
       actionBtn.classList.remove('kakijun-btn-primary');
       actionBtn.classList.add('kakijun-btn-success');
-      actionBtn.innerHTML = '<span>' + T('jepang.kakijun-lanjut', 'Lanjut ke Huruf Berikutnya →') + '</span>';
-      actionBtn.onclick = function () {
-        nextCharacter();
-      };
+      actionBtn.innerHTML = '<span class="kakijun-text-full">' + T('jepang.kakijun-lanjut', 'Lanjut ke Huruf Berikutnya →') + '</span>' +
+                            '<span class="kakijun-text-short">' + T('jepang.kakijun-lanjut-pendek', 'Lanjut →') + '</span>';
+    }
+  }
+
+  function handleNextActionClick() {
+    if (isCharacterCompleted) {
+      nextCharacter();
+    } else {
+      resetCanvas();
     }
   }
 
@@ -504,6 +515,7 @@
 
   function resetCanvas() {
     stopDemoAnimation();
+    isCharacterCompleted = false;
     activeStrokeIndex = 0;
     completedStrokes = [];
     userPoints = [];
@@ -513,8 +525,8 @@
     if (actionBtn) {
       actionBtn.classList.remove('kakijun-btn-success');
       actionBtn.classList.add('kakijun-btn-primary');
-      actionBtn.innerHTML = '<span>' + T('jepang.kakijun-ulangi', 'Ulangi dari Awal') + '</span>';
-      actionBtn.onclick = resetCanvas;
+      actionBtn.innerHTML = '<span class="kakijun-text-full">' + T('jepang.kakijun-ulangi', 'Ulangi dari Awal') + '</span>' +
+                            '<span class="kakijun-text-short">' + T('jepang.kakijun-ulangi-pendek', 'Ulangi') + '</span>';
     }
     redraw();
   }
@@ -530,15 +542,23 @@
     }
   }
 
+  function getActiveScriptChars() {
+    var chars = getCharsByScript(activeScript);
+    if (!chars || chars.length === 0) {
+      chars = getAllChars();
+    }
+    return chars;
+  }
+
   function nextCharacter() {
-    var all = getAllChars();
+    var all = getActiveScriptChars();
     var idx = all.indexOf(activeChar);
     var nextIdx = (idx + 1) % all.length;
     setCharacter(all[nextIdx]);
   }
 
   function prevCharacter() {
-    var all = getAllChars();
+    var all = getActiveScriptChars();
     var idx = all.indexOf(activeChar);
     var prevIdx = (idx - 1 + all.length) % all.length;
     setCharacter(all[prevIdx]);
@@ -553,6 +573,7 @@
     activeStrokeIndex = 0;
     completedStrokes = [];
     userPoints = [];
+    isCharacterCompleted = false;
 
     // Update UI headers
     if (overlayEl) {
@@ -567,10 +588,23 @@
       }
       var countEl = overlayEl.querySelector('#kakijunStrokeTotal');
       if (countEl) countEl.textContent = data.strokeCount + ' ' + T('jepang.kakijun-goresan', 'goresan');
+
+      // Update mobile pill
+      var mobileGlyphEl = overlayEl.querySelector('#kakijunMobileGlyph');
+      if (mobileGlyphEl) mobileGlyphEl.textContent = data.char;
+      var mobileRomajiEl = overlayEl.querySelector('#kakijunMobileRomaji');
+      if (mobileRomajiEl) mobileRomajiEl.textContent = data.romaji;
     }
 
     setFeedback(T('jepang.kakijun-petunjuk-awal', 'Goreskan mengikuti nomor dan arah panah'), 'normal');
     updateStrokeListUI();
+    var actionBtn = overlayEl && overlayEl.querySelector('#kakijunNextActionBtn');
+    if (actionBtn) {
+      actionBtn.classList.remove('kakijun-btn-success');
+      actionBtn.classList.add('kakijun-btn-primary');
+      actionBtn.innerHTML = '<span class="kakijun-text-full">' + T('jepang.kakijun-ulangi', 'Ulangi dari Awal') + '</span>' +
+                            '<span class="kakijun-text-short">' + T('jepang.kakijun-ulangi-pendek', 'Ulangi') + '</span>';
+    }
     redraw();
     speakJapanese(data.char);
   }
@@ -664,13 +698,27 @@
       '<div class="kakijun-modal">' +
         '<div class="kakijun-header">' +
           '<div class="kakijun-header-left">' +
-            '<span class="kakijun-badge">Kakijun Studio</span>' +
-            '<h2 class="kakijun-title">' + T('jepang.kakijun-judul', 'Studio Menulis & Urutan Goresan') + '</h2>' +
+            '<div class="kakijun-brand-wrap">' +
+              '<span class="kakijun-badge">Kakijun Studio</span>' +
+              '<h2 class="kakijun-title">' + T('jepang.kakijun-judul', 'Studio Menulis & Urutan Goresan') + '</h2>' +
+            '</div>' +
+            // Mobile character pill in top header (no vertical waste)
+            '<div class="kakijun-mobile-char-pill" id="kakijunMobileCharPill">' +
+              '<span class="kakijun-mobile-glyph" id="kakijunMobileGlyph" lang="ja">' + c + '</span>' +
+              '<span class="kakijun-mobile-romaji" id="kakijunMobileRomaji">' + r + '</span>' +
+              '<button type="button" class="kakijun-mobile-audio-btn" id="kakijunMobileAudioBtn" aria-label="Dengarkan pengucapan">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>' +
+              '</button>' +
+            '</div>' +
           '</div>' +
           '<div class="kakijun-header-right">' +
+            '<button type="button" class="kakijun-info-toggle-btn" id="kakijunInfoToggleBtn" aria-label="Lihat Informasi Huruf">' +
+              '<span>📋 ' + T('jepang.kakijun-info', 'Info') + '</span>' +
+            '</button>' +
             '<button type="button" class="kakijun-header-btn" id="kakijunOpenPickerBtn">' +
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>' +
-              '<span>' + T('jepang.kakijun-pilih-huruf', 'Pilih Huruf') + '</span>' +
+              '<span class="kakijun-text-full">' + T('jepang.kakijun-pilih-huruf', 'Pilih Huruf') + '</span>' +
+              '<span class="kakijun-text-short">' + T('jepang.kakijun-huruf', 'Huruf') + '</span>' +
             '</button>' +
             '<button type="button" class="kakijun-close-btn" id="kakijunCloseBtn" aria-label="' + T('jepang.kakijun-tutup', 'Tutup Studio') + '">' +
               '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
@@ -678,8 +726,16 @@
           '</div>' +
         '</div>' +
         '<div class="kakijun-body">' +
-          // Left Panel: Character Profile & Breakdown
-          '<div class="kakijun-info-panel">' +
+          // Drawer backdrop for mobile bottom sheet
+          '<div class="kakijun-drawer-backdrop" id="kakijunDrawerBackdrop"></div>' +
+          // Left Panel: Character Profile & Breakdown (Desktop Side Column / Mobile Bottom Sheet)
+          '<div class="kakijun-info-panel" id="kakijunInfoPanel">' +
+            '<div class="kakijun-drawer-handle-bar">' +
+              '<div class="kakijun-drawer-pill"></div>' +
+              '<button type="button" class="kakijun-drawer-close-btn" id="kakijunDrawerCloseBtn" aria-label="' + T('jepang.kakijun-tutup-info', 'Tutup panel info') + '">' +
+                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+              '</button>' +
+            '</div>' +
             '<div class="kakijun-char-card">' +
               '<div class="kakijun-char-display">' +
                 '<span class="kakijun-char-glyph" id="kakijunCharGlyph" lang="ja">' + c + '</span>' +
@@ -712,16 +768,25 @@
               '<svg class="kakijun-guide-overlay" id="kakijunGuideSvg" viewBox="0 0 109 109" preserveAspectRatio="none"></svg>' +
             '</div>' +
             '<div class="kakijun-toolbar">' +
+              '<button type="button" class="kakijun-mobile-nav-btn" id="kakijunMobilePrevBtn" aria-label="Huruf Sebelumnya">' +
+                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+              '</button>' +
               '<button type="button" class="kakijun-btn kakijun-btn-demo" id="kakijunDemoBtn" aria-label="Lihat contoh animasi goresan">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>' +
-                '<span>' + T('jepang.kakijun-animasi', 'Lihat Contoh') + '</span>' +
+                '<span class="kakijun-text-full">' + T('jepang.kakijun-animasi', 'Lihat Contoh') + '</span>' +
+                '<span class="kakijun-text-short">' + T('jepang.kakijun-animasi-pendek', 'Contoh') + '</span>' +
               '</button>' +
               '<button type="button" class="kakijun-btn kakijun-btn-ghost" id="kakijunUndoBtn" aria-label="Batalkan goresan terakhir">' +
                 '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>' +
-                '<span>' + T('jepang.kakijun-urungkan', 'Urungkan') + '</span>' +
+                '<span class="kakijun-text-full">' + T('jepang.kakijun-urungkan', 'Urungkan') + '</span>' +
+                '<span class="kakijun-text-short">' + T('jepang.kakijun-urungkan-pendek', 'Batal') + '</span>' +
               '</button>' +
               '<button type="button" class="kakijun-btn kakijun-btn-primary" id="kakijunNextActionBtn">' +
-                '<span>' + T('jepang.kakijun-ulangi', 'Ulangi dari Awal') + '</span>' +
+                '<span class="kakijun-text-full">' + T('jepang.kakijun-ulangi', 'Ulangi dari Awal') + '</span>' +
+                '<span class="kakijun-text-short">' + T('jepang.kakijun-ulangi-pendek', 'Ulangi') + '</span>' +
+              '</button>' +
+              '<button type="button" class="kakijun-mobile-nav-btn" id="kakijunMobileNextBtn" aria-label="Huruf Berikutnya">' +
+                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
               '</button>' +
             '</div>' +
             '<div class="kakijun-footer-nav">' +
@@ -754,6 +819,7 @@
     completedStrokes = [];
     userPoints = [];
     isDemoPlaying = false;
+    isCharacterCompleted = false;
     pickerOpen = false;
 
     // Remove existing if any
@@ -771,6 +837,21 @@
     setupCanvas();
     updateStrokeListUI();
 
+    // Drawer toggle for mobile bottom sheet
+    function toggleInfoDrawer(forceState) {
+      var panel = overlayEl && overlayEl.querySelector('#kakijunInfoPanel');
+      var backdrop = overlayEl && overlayEl.querySelector('#kakijunDrawerBackdrop');
+      if (!panel || !backdrop) return;
+      var shouldOpen = typeof forceState === 'boolean' ? forceState : !panel.classList.contains('is-open');
+      if (shouldOpen) {
+        panel.classList.add('is-open');
+        backdrop.classList.add('is-open');
+      } else {
+        panel.classList.remove('is-open');
+        backdrop.classList.remove('is-open');
+      }
+    }
+
     // Event Bindings
     var closeBtn = document.getElementById('kakijunCloseBtn');
     if (closeBtn) closeBtn.addEventListener('click', close);
@@ -779,7 +860,38 @@
       overlayEl.addEventListener('click', function (e) {
         if (e.target === overlayEl) close();
       });
+
+      // Strict mobile gesture / pinch-to-zoom locks
+      overlayEl.addEventListener('touchmove', function (e) {
+        if (e.touches && e.touches.length > 1) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      overlayEl.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+      overlayEl.addEventListener('gesturechange', function (e) { e.preventDefault(); });
+      overlayEl.addEventListener('gestureend', function (e) { e.preventDefault(); });
     }
+
+    var infoToggleBtn = document.getElementById('kakijunInfoToggleBtn');
+    if (infoToggleBtn) infoToggleBtn.addEventListener('click', function () {
+      toggleInfoDrawer();
+    });
+
+    var drawerCloseBtn = document.getElementById('kakijunDrawerCloseBtn');
+    if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', function () {
+      toggleInfoDrawer(false);
+    });
+
+    var drawerBackdrop = document.getElementById('kakijunDrawerBackdrop');
+    if (drawerBackdrop) drawerBackdrop.addEventListener('click', function () {
+      toggleInfoDrawer(false);
+    });
+
+    var mobileAudioBtn = document.getElementById('kakijunMobileAudioBtn');
+    if (mobileAudioBtn) mobileAudioBtn.addEventListener('click', function () {
+      speakJapanese(activeChar);
+    });
 
     var pickerBtn = document.getElementById('kakijunOpenPickerBtn');
     if (pickerBtn) pickerBtn.addEventListener('click', function () {
@@ -797,14 +909,23 @@
     var undoBtn = document.getElementById('kakijunUndoBtn');
     if (undoBtn) undoBtn.addEventListener('click', undoLastStroke);
 
+    // Single unified handler for next/reset action button
     var nextActionBtn = document.getElementById('kakijunNextActionBtn');
-    if (nextActionBtn) nextActionBtn.addEventListener('click', resetCanvas);
+    if (nextActionBtn) nextActionBtn.addEventListener('click', handleNextActionClick);
 
+    // Desktop footer navigation
     var prevBtn = document.getElementById('kakijunPrevBtn');
     if (prevBtn) prevBtn.addEventListener('click', prevCharacter);
 
     var nextBtn = document.getElementById('kakijunNextBtn');
     if (nextBtn) nextBtn.addEventListener('click', nextCharacter);
+
+    // Mobile toolbar navigation
+    var mobilePrevBtn = document.getElementById('kakijunMobilePrevBtn');
+    if (mobilePrevBtn) mobilePrevBtn.addEventListener('click', prevCharacter);
+
+    var mobileNextBtn = document.getElementById('kakijunMobileNextBtn');
+    if (mobileNextBtn) mobileNextBtn.addEventListener('click', nextCharacter);
 
     var modeBtns = overlayEl.querySelectorAll('[data-kakijun-mode]');
     for (var m = 0; m < modeBtns.length; m++) {

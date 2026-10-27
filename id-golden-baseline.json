@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-27T21:08:53.659Z",
+  "generatedAt": "2026-10-27T21:55:44.264Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "6f7f5e03b33742917af73b5f6ac7dad6b4fafd92bc1bb39009731a04cf72b567",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 6103,
-    "sha256": "b5e4961b7afea7a9d4695f33e4fce83353b473b2857caf6b45fbf91eed0f30b8",
+    "count": 6110,
+    "sha256": "208bf1702b35d02cc0099554fe0e28f4bc0b29a1fa8b768ea0431e811b9bd6d6",
     "list": [
       "\n        <div class=\"hint-sheet-handle\" aria-hidden=\"true\"></div>\n        <div class=\"hint-popover-header\">\n          <div style=\"display:flex;align-items:center;gap:6px\">\n            <i data-lucide=\"info\"></i>\n            <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>\n          </div>\n          <span class=\"hint-level-pill\">${currentLvl}/4</span>\n          <button type=\"button\" id=\"hintCloseBtn\" class=\"hint-close-btn\" aria-label=\"${FiezelI18n.t('modal.tutup', 'Tutup')}\"><i data-lucide=\"x\"></i></button>\n        </div>\n        <div class=\"hint-step-indicator\" aria-hidden=\"true\">\n          ${[1,2,3,4].map(i => ",
       "\n        <div style=\"display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 0;\">\n          <div class=\"fz-qr-scanner-box\" id=\"fzQrScannerBox\" data-testid=\"qr-scanner-box\">\n            <video id=\"qrScanVideo\" class=\"fz-qr-video\" playsinline autoplay muted></video>\n            <div class=\"fz-qr-reticle\" id=\"fzQrReticle\">\n              <div class=\"fz-qr-corner fz-qr-corner-tl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-tr\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-bl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-br\"></div>\n              <div class=\"fz-qr-laser\"></div>\n            </div>\n            <div class=\"fz-qr-cam-fallback\" id=\"fzQrCamFallback\" style=\"display:none;\">\n              <i data-lucide=\"camera\" style=\"width:30px;height:30px;color:#64748B;\"></i>\n              <p style=\"font-size:11px;line-height:1.3;margin:0;color:#CBD5E1;\">${FiezelI18n.t('social3.scan-cam-err','Kamera belum aktif.')}</p>\n            </div>\n          </div>\n          <input type=\"file\" id=\"qrFileInput\" accept=\"image/*\" style=\"display:none;\" onchange=\"handleQrFilePicked(event)\">\n          <button type=\"button\" class=\"btn-scan-gallery\" onclick=\"$('qrFileInput')?.click()\" data-testid=\"qr-gallery-btn\" style=\"display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:260px;padding:8px 12px;border-radius:10px;background:#F8FAFC;border:1.5px solid #CBD5E1;color:#0F172A !important;font-weight:700;font-size:12px;cursor:pointer;\">\n            <i data-lucide=\"image\" style=\"width:15px;height:15px;color:#0284C7;\"></i> ${FiezelI18n.t('social3.scan-from-gallery','Pilih dari Galeri Foto')}\n          </button>\n        </div>\n      ",
@@ -1030,6 +1030,9 @@
       "<button class=\"btn sm ghost\" data-a=\"go-passport\" data-testid=\"go-passport\">Paspor Belajar</button>",
       "<button class=\"btn sm ghost\" data-a=\"go-today\" data-testid=\"go-today\">Hari ini</button>",
       "<button class=\"btn sm\" data-a=\"import-legacy\" data-testid=\"import-legacy-btn\">Impor dari perangkat ini</button></div>",
+      "<button type=\"button\" class=\"kakijun-mobile-audio-btn\" id=\"kakijunMobileAudioBtn\" aria-label=\"Dengarkan pengucapan\">",
+      "<button type=\"button\" class=\"kakijun-mobile-nav-btn\" id=\"kakijunMobileNextBtn\" aria-label=\"Huruf Berikutnya\">",
+      "<button type=\"button\" class=\"kakijun-mobile-nav-btn\" id=\"kakijunMobilePrevBtn\" aria-label=\"Huruf Sebelumnya\">",
       "<button type=\"button\" class=\"kakijun-voice-btn\" id=\"kakijunVoiceBtn\" aria-label=\"Dengarkan pengucapan\">",
       "<div class=\"ai-booster-card\" onclick=\"go('${esc(weak.view)}')\">\n    <div>\n      <span class=\"ai-booster-tag\"><i class=\"fz-i\" data-fz-icon=\"flame\" style=\"width:12px;height:12px\"></i> ${esc(FiezelI18n.t('latihan.booster-tag'))}</span>\n      <b style=\"display:block;font-size:13px;color:var(--text);margin:2px 0\">${esc(nama)}</b>\n      <small style=\"color:var(--muted);font-size:11px\">${esc(FiezelI18n.t('latihan.booster-sub',{akurasi:weak.akurasi,menit:AI_BOOSTER_MENIT}))}</small>\n    </div>\n    <button type=\"button\" class=\"text-button\" style=\"font-weight:700;color:var(--accent);font-size:12px\">${esc(FiezelI18n.t('latihan.booster-cta'))} <i data-lucide=\"arrow-right\"></i></button>\n  </div>",
       "<div class=\"ai-booster-card\" onclick=\"openGrammarLesson('${esc(bingung.from)}')\">\n    <div>\n      <span class=\"ai-booster-tag\"><i class=\"fz-i\" data-fz-icon=\"flame\" style=\"width:12px;height:12px\"></i> ${esc(FiezelI18n.t('latihan.booster-tag-tertukar'))}</span>\n      <b style=\"display:block;font-size:13px;color:var(--text);margin:2px 0\">${esc(namaFrom)}</b>\n      <small style=\"color:var(--muted);font-size:11px\">${esc(FiezelI18n.t('latihan.booster-sub-tertukar',{lawan:namaTo,persen:bingung.persen}))}</small>\n    </div>\n    <button type=\"button\" class=\"text-button\" style=\"font-weight:700;color:var(--accent);font-size:12px\">${esc(FiezelI18n.t('latihan.booster-cta'))} <i data-lucide=\"arrow-right\"></i></button>\n  </div>",
@@ -3573,6 +3576,7 @@
       "Lanjut luring sebagai {nama}",
       "Lanjut tanpa akun",
       "Lanjut tanpa akun. Masuk kapan saja lewat Pengaturan.",
+      "Lanjut →",
       "Lanjut, aku masih kuat",
       "Lanjut, boleh naik tingkat",
       "Lanjutkan latihan lintas skill supaya gambarnya semakin jelas.",
@@ -5260,6 +5264,7 @@
       "Ulangan Harian (10 Soal · 25 Menit)",
       "Ulangan Harian (10 soal) siap diterbitkan.",
       "Ulangan yang gagal ia kerjakan di kelas",
+      "Ulangi",
       "Ulangi Misi",
       "Ulangi Sekarang",
       "Ulangi Uji Nyata ▶",
@@ -5614,9 +5619,11 @@
       "jepang.kakijun-berikutnya",
       "jepang.kakijun-coba-lagi",
       "jepang.kakijun-lanjut",
+      "jepang.kakijun-lanjut-pendek",
       "jepang.kakijun-mulai-dari",
       "jepang.kakijun-sebelumnya",
       "jepang.kakijun-ulangi",
+      "jepang.kakijun-ulangi-pendek",
       "jepang.kata-hari-ini",
       "jlpt.analisis-soal",
       "jlpt.jawaban-benar",
