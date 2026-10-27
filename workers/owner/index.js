@@ -3361,7 +3361,7 @@ function renderLearnerDirectory(m) {
   const activeStudents = d.learners.filter(x => (Number(x.evidenceCount) || 0) > 0).length;
   const googleAccounts = d.learners.filter(x => !!x.email).length;
   const guestAccounts = totalStudents - googleAccounts;
-  
+
   const learnerKpis = `
     <div class="stat-mini-deck" style="margin-bottom:16px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
       <div class="stat-mini" style="padding:10px 14px;border-left:3px solid var(--blue);">
@@ -3394,7 +3394,7 @@ function renderLearnerDirectory(m) {
     const emailCell = x.email
       ? `<span class="mail-pill">✉️ ${esc(x.email)}</span>`
       : '<span class="empty-dash">—</span>';
-    
+
     const masteryItem = BRAINCORE_GLOSSARY[x.lastMastery];
     const masteryText = masteryItem ? masteryItem.label : (x.lastMastery || '—');
     const masteryCell = x.lastMastery
@@ -3616,13 +3616,13 @@ function renderCurriculumSyncSection(m, masterAlert, curriculumStatus) {
     <section>
       <span class="card-full-inner" id="curriculum-sync" style="scroll-margin-top:80px;display:block;"></span>
       <h2><span>📚 Sinkronisasi Master Kurikulum &amp; Bank Soal</span><span class="section-badge">Master Control</span></h2>
-      
+
       ${masterAlert || ''}
 
       ${realCountsHtml}
 
       <div class="note" style="margin-bottom:16px;line-height:1.6;">
-        Pusat kendali aktivasi satu-klik untuk <b>17 Mata Pelajaran Nasional</b>, <b>Bahasa Inggris Kurikulum Merdeka (Fase A–F)</b>, dan <b>Bank Soal</b>. 
+        Pusat kendali aktivasi satu-klik untuk <b>17 Mata Pelajaran Nasional</b>, <b>Bahasa Inggris Kurikulum Merdeka (Fase A–F)</b>, dan <b>Bank Soal</b>.
         Begitu diaktifkan, seluruh akun guru di <b>KelasKu</b> langsung terhubung dengan katalog Bab Buku Ajar lengkap, tanpa perlu konfigurasi manual dari pihak guru.
       </div>
 

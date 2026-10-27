@@ -303,7 +303,7 @@ learner_kpis_code = """  // High-level student sync & cohort intelligence cards
   const activeStudents = d.learners.filter(x => (Number(x.evidenceCount) || 0) > 0).length;
   const googleAccounts = d.learners.filter(x => !!x.email).length;
   const guestAccounts = totalStudents - googleAccounts;
-  
+
   const learnerKpis = `
     <div class="stat-mini-deck" style="margin-bottom:16px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
       <div class="stat-mini" style="padding:10px 14px;border-left:3px solid var(--blue);">

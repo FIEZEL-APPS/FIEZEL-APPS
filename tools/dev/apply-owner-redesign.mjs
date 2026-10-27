@@ -1523,7 +1523,7 @@ const newLearnerDirectoryAndDetail = `function renderLearnerDirectory(m) {
     const emailCell = x.email
       ? \`<span class="mail-pill">✉️ \${esc(x.email)}</span>\`
       : '<span class="empty-dash">—</span>';
-    
+
     const masteryItem = BRAINCORE_GLOSSARY[x.lastMastery];
     const masteryText = masteryItem ? masteryItem.label : (x.lastMastery || '—');
     const masteryCell = x.lastMastery
@@ -1667,7 +1667,7 @@ const oldQualitySectionEnd = code.indexOf('${limitRows(m, \'Data quality\')}\n  
 
 if (oldUsersSectionStart !== -1 && oldQualitySectionEnd !== -1) {
   const fullQualityEnd = oldQualitySectionEnd + '${limitRows(m, \'Data quality\')}\n    </div>\n  </section>'.length;
-  
+
   const upgradedSections = `<section>
     <span id="users"></span>
     <h2><span>\${ICONS.activity} Active users (DAU / WAU / MAU)</span><span class="section-badge">Keaktifan</span></h2>
