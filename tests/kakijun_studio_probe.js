@@ -7,8 +7,8 @@ const path = require('path');
 const { chromium } = require('playwright');
 const assert = require('assert');
 
-const PORT = 8089;
 const ROOT = path.resolve(__dirname, '..');
+let activePort = 8089;
 
 const MIME = {
   '.html': 'text/html',
@@ -39,8 +39,13 @@ const server = http.createServer((req, res) => {
 });
 
 async function runProbe() {
-  await new Promise((resolve) => server.listen(PORT, resolve));
-  console.log(`Probe server running at http://localhost:${PORT}`);
+  await new Promise((resolve) => {
+    server.listen(0, () => {
+      activePort = server.address().port;
+      resolve();
+    });
+  });
+  console.log(`Probe server running at http://localhost:${activePort}`);
 
   const browser = await chromium.launch({ headless: true });
   const report = { viewports: [], checks: [] };
@@ -82,7 +87,7 @@ async function runProbe() {
         }));
       });
 
-      await page.goto(`http://localhost:${PORT}/index.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`http://localhost:${activePort}/index.html`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(2000);
 
       // Dismiss splash and auth if present and navigate to kana
@@ -187,14 +192,65 @@ async function runProbe() {
       console.log(`  ✓ ${vp.name}: Goresan 1 berhasil digambar & tervalidasi!`);
 
       // Test Mode Switcher: Switch to Recall mode
-      await page.locator('[data-kakijun-mode="recall"]').click();
-      await page.waitForTimeout(200);
+      if (vp.name === 'Mobile') {
+        // Open drawer on mobile to access mode switcher
+        await page.locator('#kakijunInfoToggleBtn').click();
+        await page.waitForTimeout(300);
+        const isDrawerOpen = await page.locator('#kakijunInfoPanel').evaluate(el => el.classList.contains('is-open'));
+        assert.ok(isDrawerOpen, 'Mobile: Drawer info panel harus terbuka');
+        console.log(`  ✓ Mobile: Bottom sheet drawer info berhasil dibuka`);
+
+        // Capture drawer screenshot
+        const drawerShot = path.join(ROOT, 'reports/kakijun-studio-mobile-drawer.png');
+        await page.screenshot({ path: drawerShot });
+
+        await page.locator('[data-kakijun-mode="recall"]').click();
+        await page.waitForTimeout(200);
+
+        // Close drawer
+        await page.locator('#kakijunDrawerCloseBtn').click();
+        await page.waitForTimeout(300);
+      } else {
+        await page.locator('[data-kakijun-mode="recall"]').click();
+        await page.waitForTimeout(200);
+      }
+
       const isRecallActive = await page.locator('[data-kakijun-mode="recall"]').evaluate((el) => el.classList.contains('is-active'));
       assert.ok(isRecallActive, `${vp.name}: Mode recall harus aktif`);
       console.log(`  ✓ ${vp.name}: Mode Ingatan (Recall) berhasil diaktifkan`);
 
-      // Test Next Character
-      await page.locator('#kakijunNextBtn').click();
+      // Switch back to Guided mode to capture authentic calligraphy shadow
+      if (vp.name === 'Mobile') {
+        await page.locator('#kakijunInfoToggleBtn').click();
+        await page.waitForTimeout(200);
+        await page.locator('[data-kakijun-mode="guided"]').click();
+        await page.waitForTimeout(200);
+        await page.locator('#kakijunDrawerCloseBtn').click();
+        await page.waitForTimeout(200);
+      } else {
+        await page.locator('[data-kakijun-mode="guided"]').click();
+        await page.waitForTimeout(200);
+      }
+
+      // Check Mobile Zero-Scroll
+      if (vp.name === 'Mobile') {
+        const scrollCheck = await page.evaluate(() => {
+          const modal = document.querySelector('.kakijun-modal');
+          return {
+            clientHeight: modal ? modal.clientHeight : 0,
+            scrollHeight: modal ? modal.scrollHeight : 0
+          };
+        });
+        assert.ok(scrollCheck.scrollHeight <= scrollCheck.clientHeight + 2, `Mobile: Zero-scroll invariant violated (${scrollCheck.scrollHeight} > ${scrollCheck.clientHeight})`);
+        console.log(`  ✓ Mobile: Zero-Scroll terbukti (${scrollCheck.scrollHeight}px <= ${scrollCheck.clientHeight}px)`);
+      }
+
+      // Test Next Character (viewport-aware locator)
+      if (vp.name === 'Mobile') {
+        await page.locator('#kakijunMobileNextBtn').click();
+      } else {
+        await page.locator('#kakijunNextBtn').click();
+      }
       await page.waitForTimeout(300);
       const nextChar = await page.locator('#kakijunCharGlyph').textContent();
       assert.strictEqual(nextChar, 'い', `${vp.name}: Karakter berikutnya harus い`);
@@ -213,7 +269,7 @@ async function runProbe() {
     console.log(`\nTesting Smart Placement Onboarding Gate...`);
     const obContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
     const obPage = await obContext.newPage();
-    await obPage.goto(`http://localhost:${PORT}/index.html`, { waitUntil: 'domcontentloaded' });
+    await obPage.goto(`http://localhost:${activePort}/index.html`, { waitUntil: 'domcontentloaded' });
     await obPage.waitForTimeout(1000);
 
     // Launch Onboarding programmatically
