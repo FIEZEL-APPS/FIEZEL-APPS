@@ -1,11 +1,11 @@
 # DOKUMEN SERAH TERIMA TEKNIS (HANDOFF DOSSIER)
 # FIEZEL RELEASE BUILD m025-704: PWA COLD-BOOT ZERO-BLOCKER & DUOLINGO-PARITY QUICK-WIN LESSON
 
-**Tanggal Rilis**: 28 Oktober 2026  
-**Nomor Versi Build**: `m025-704`  
-**Branch Fitur**: `feat/pwa-recovery-epic`  
-**Worktree Terisolasi**: `c:\Users\hp\fiezel-pwa-recovery-53c29b7d`  
-**Baseline Hulu**: `origin/main` commit `62ad7eb7` (`m025-703`)  
+**Tanggal Rilis**: 28 Oktober 2026
+**Nomor Versi Build**: `m025-704`
+**Branch Fitur**: `feat/pwa-recovery-epic`
+**Worktree Terisolasi**: `c:\Users\hp\fiezel-pwa-recovery-53c29b7d`
+**Baseline Hulu**: `origin/main` commit `62ad7eb7` (`m025-703`)
 **Penulis/Agen**: Antigravity Assistant (Session `53c29b7d-5d4c-4f0d-80c6-971cc3705aa0`)
 
 ---

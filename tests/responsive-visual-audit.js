@@ -34,7 +34,7 @@ async function runResponsiveAudit() {
   console.log(`[RESPONSIVE AUDIT] Server running on http://127.0.0.1:${port}`);
 
   const browser = await chromium.launch({ headless: true });
-  
+
   // Test 1: Mobile 390x844
   console.log('[AUDIT 1] Testing Mobile (390x844)...');
   const mobileCtx = await browser.newContext({ viewport: { width: 390, height: 844 } });
@@ -42,7 +42,7 @@ async function runResponsiveAudit() {
   await mobilePage.goto(`http://127.0.0.1:${port}/index.html`);
   await mobilePage.locator('.fiezel-ob').waitFor({ state: 'visible', timeout: 8000 });
   await mobilePage.screenshot({ path: path.join(__dirname, 'mobile-ob-step0.png') });
-  
+
   // Advance to dual-gate on mobile
   await mobilePage.locator('[data-ob-locale="id"]').click();
   await mobilePage.waitForTimeout(800);
@@ -57,9 +57,9 @@ async function runResponsiveAudit() {
   await mobilePage.waitForTimeout(500);
   await mobilePage.locator('[data-ob-advance]').click();
   await mobilePage.waitForTimeout(800);
-  
+
   await mobilePage.screenshot({ path: path.join(__dirname, 'mobile-dual-gate.png') });
-  
+
   // Check that dual-gate buttons are above the fold (within 844px)
   const mobileBtnBox = await mobilePage.locator('[data-ob-beginner]').boundingBox();
   console.log('[AUDIT 1] Mobile beginner button bounding box:', mobileBtnBox);
@@ -73,7 +73,7 @@ async function runResponsiveAudit() {
   await mobilePage.locator('[data-ob-beginner]').click();
   await mobilePage.locator('.quiz-shell').waitFor({ state: 'visible', timeout: 8000 });
   await mobilePage.screenshot({ path: path.join(__dirname, 'mobile-quickwin-q1.png') });
-  
+
   await mobilePage.close();
   await mobileCtx.close();
   console.log('[AUDIT 1] Mobile test closed cleanly.');
@@ -85,11 +85,11 @@ async function runResponsiveAudit() {
   desktopPage.on('console', msg => console.log('[DESKTOP LOG]', msg.type(), msg.text()));
   desktopPage.on('pageerror', err => console.log('[DESKTOP ERROR]', err));
   await desktopPage.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: 'domcontentloaded' });
-  
+
   // Wait up to 10s for splash transition
   await desktopPage.locator('.fiezel-ob').waitFor({ state: 'visible', timeout: 10000 });
   await desktopPage.screenshot({ path: path.join(__dirname, 'desktop-ob-step0.png') });
-  
+
   // Check desktop container width to prevent void
   const obWidth = await desktopPage.evaluate(() => {
     const el = document.querySelector('.fiezel-ob');
@@ -113,12 +113,12 @@ async function runResponsiveAudit() {
   await desktopPage.waitForTimeout(800);
 
   await desktopPage.screenshot({ path: path.join(__dirname, 'desktop-dual-gate.png') });
-  
+
   // Start quick win on desktop
   await desktopPage.locator('[data-ob-beginner]').click();
   await desktopPage.locator('.quiz-shell').waitFor({ state: 'visible', timeout: 8000 });
   await desktopPage.screenshot({ path: path.join(__dirname, 'desktop-quickwin-q1.png') });
-  
+
   const quizWidth = await desktopPage.evaluate(() => {
     const el = document.querySelector('.quiz-shell');
     return el ? el.getBoundingClientRect().width : 0;
@@ -127,7 +127,7 @@ async function runResponsiveAudit() {
 
   await desktopPage.close();
   await desktopCtx.close();
-  
+
   await browser.close();
   server.close();
   console.log('>>> RESPONSIVE AUDIT COMPLETED SUCCESSFULLY! <<<');

@@ -9,7 +9,7 @@ function createServer(rootDir) {
     let reqPath = decodeURI(req.url.split('?')[0]);
     if (reqPath === '/' || reqPath === '') reqPath = '/index.html';
     const filePath = path.join(rootDir, reqPath.replace(/^\//, ''));
-    
+
     fs.readFile(filePath, (err, data) => {
       if (err) {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -37,7 +37,7 @@ function createServer(rootDir) {
 async function runTest() {
   const rootDir = path.resolve(__dirname, '..');
   const server = createServer(rootDir);
-  
+
   const testPort = 32000 + Math.floor(Math.random() * 10000);
   await new Promise((resolve) => server.listen(testPort, '127.0.0.1', resolve));
   const port = server.address().port;
@@ -60,7 +60,7 @@ async function runTest() {
   try {
     console.log('[PROBE 1] Cold-boot navigation to index.html with clean storage...');
     await page.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: 'domcontentloaded' });
-    
+
     // Wait for brand splash to transition to onboarding dialog
     await page.locator('.fiezel-ob').waitFor({ state: 'visible', timeout: 10000 });
     await page.waitForTimeout(500);
@@ -200,7 +200,7 @@ async function runTest() {
       await opt.waitFor({ state: 'visible', timeout: 8000 });
       console.log(`[PROBE 5] Answering Question ${q} (choice ${ansIdx})...`);
       await opt.click();
-      
+
       // Wait for confidence popup or next button to appear
       const confOrNext = page.locator('#confidencePop button, #quizNext:not([disabled])').first();
       await confOrNext.waitFor({ state: 'visible', timeout: 6000 });
