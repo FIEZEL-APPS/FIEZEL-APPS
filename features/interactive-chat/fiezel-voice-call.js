@@ -158,17 +158,17 @@
     ja: {
       keita: {
         id: 'keita',
-        name: 'フィゼル先生',
+        name: 'Keita Senpai (健太先輩)',
         shortName: 'Keita',
         voice: 'ja-JP-KeitaNeural',
         gender: 'male',
         role: 'Percakapan & Pola Kalimat',
         avatarIcon: 'sensei',
-        label: 'Sensei Keita'
+        label: 'Keita Senpai'
       },
       nanami: {
         id: 'nanami',
-        name: 'ナナミ先生',
+        name: 'Sensei Nanami (ナナミ先生)',
         shortName: 'Nanami',
         voice: 'ja-JP-NanamiNeural',
         gender: 'female',
@@ -178,6 +178,67 @@
       }
     }
   };
+
+  function getCanonicalPersonas() {
+    var scenariosModule = (root && root.FiezelVoiceScenarios) ||
+      (typeof globalThis !== 'undefined' && globalThis.FiezelVoiceScenarios) ||
+      (typeof window !== 'undefined' && window.FiezelVoiceScenarios);
+    if (!scenariosModule) {
+      try {
+        if (typeof require === 'function') scenariosModule = require('./fiezel-voice-scenarios.js');
+      } catch (_) {}
+    }
+    if (scenariosModule && scenariosModule.VOICE_PERSONAS) {
+      var vp = scenariosModule.VOICE_PERSONAS;
+      return {
+        en: {
+          alex: {
+            id: 'alex',
+            name: vp.coach_alex ? vp.coach_alex.name : PERSONAS.en.alex.name,
+            shortName: vp.coach_alex ? vp.coach_alex.shortName : PERSONAS.en.alex.shortName,
+            voice: vp.coach_alex ? vp.coach_alex.edgeVoice : PERSONAS.en.alex.voice,
+            gender: 'male',
+            role: 'Speaking & Confidence Coach',
+            avatarIcon: 'coach',
+            label: 'Coach Alex'
+          },
+          sarah: {
+            id: 'sarah',
+            name: vp.coach_sarah ? vp.coach_sarah.name : PERSONAS.en.sarah.name,
+            shortName: vp.coach_sarah ? vp.coach_sarah.shortName : PERSONAS.en.sarah.shortName,
+            voice: vp.coach_sarah ? vp.coach_sarah.edgeVoice : PERSONAS.en.sarah.voice,
+            gender: 'female',
+            role: 'Pronunciation & Fluency Coach',
+            avatarIcon: 'coach',
+            label: 'Coach Sarah'
+          }
+        },
+        ja: {
+          keita: {
+            id: 'keita',
+            name: vp.keita ? vp.keita.name : PERSONAS.ja.keita.name,
+            shortName: vp.keita ? vp.keita.shortName : PERSONAS.ja.keita.shortName,
+            voice: vp.keita ? vp.keita.edgeVoice : PERSONAS.ja.keita.voice,
+            gender: 'male',
+            role: 'Percakapan & Pola Kalimat',
+            avatarIcon: 'sensei',
+            label: 'Keita Senpai'
+          },
+          nanami: {
+            id: 'nanami',
+            name: vp.nanami ? vp.nanami.name : PERSONAS.ja.nanami.name,
+            shortName: vp.nanami ? vp.nanami.shortName : PERSONAS.ja.nanami.shortName,
+            voice: vp.nanami ? vp.nanami.edgeVoice : PERSONAS.ja.nanami.voice,
+            gender: 'female',
+            role: 'Percakapan Sehari-hari & Keigo',
+            avatarIcon: 'sensei',
+            label: 'Sensei Nanami'
+          }
+        }
+      };
+    }
+    return PERSONAS;
+  }
 
   function resolvePersona(course, val) {
     var s = (val && typeof val === 'object' && val.id) ? String(val.id) : String(val || '');
@@ -192,7 +253,8 @@
       c = (course === 'en') ? 'en' : 'ja';
     }
 
-    var bank = PERSONAS[c];
+    var personasBank = getCanonicalPersonas();
+    var bank = personasBank[c] || personasBank.ja;
     if (!s) {
       try {
         var stored = localStorage.getItem('fz_persona_' + c);
@@ -264,7 +326,7 @@
       prereqStatus: { isReady: true },
       latestDiagnosis: null,
       sampleUtterances: [],
-      partnerName: 'フィゼル先生',
+      partnerName: 'Keita Senpai (健太先輩)',
       partnerAvatar: renderIcon('sensei', { size: 24, filled: true }),
       isMuted: false,
       showSubtitles: true,
@@ -291,6 +353,9 @@
     var recognitionRestartTimer = null;
     var isRecognitionRunning = false;
     var isPermissionPending = false;
+    var RECOGNITION_BACKOFF_DELAYS = [80, 250, 600, 1200, 2000];
+    var MAX_CONSECUTIVE_SR_ERRORS = 6;
+    var recognitionConsecutiveErrors = 0;
     var aiSpeechStartTime = 0;
     var aiCurrentSpeakingText = '';
     var mediaStreamToken = 0;
@@ -868,6 +933,7 @@
 
         rec.onstart = function () {
           isRecognitionRunning = true;
+          recognitionConsecutiveErrors = 0;
         };
         rec.onaudiostart = function () {
           kineticSpeechLevel = Math.max(kineticSpeechLevel, 0.35);
@@ -946,19 +1012,22 @@
         };
 
         rec.onerror = function (event) {
+          var errType = event ? event.error : '';
           // Gracefully ignore expected harmless events
-          if (event && (event.error === 'no-speech' || event.error === 'aborted')) {
+          if (errType === 'no-speech' || errType === 'aborted') {
             return;
           }
-          if (event && event.error === 'not-allowed') {
+          recognitionConsecutiveErrors++;
+          if (errType === 'not-allowed') {
             isPermissionPending = true;
             showMicPermissionModal(function () {
               isPermissionPending = false;
+              recognitionConsecutiveErrors = 0;
               startRecognition();
             });
             return;
           }
-          emit('error', event ? event.error : 'speech_recognition_error');
+          emit('error', errType || 'speech_recognition_error');
         };
 
         rec.onend = function () {
@@ -970,13 +1039,25 @@
           resultOffset = 0;
           lastResultsLength = 0;
           if (!isDestroyed && state.status !== STATE.IDLE && !isPermissionPending) {
+            // Bug #18 & #23: Circuit breaker after MAX_CONSECUTIVE_SR_ERRORS to prevent tight loop & freeze
+            if (recognitionConsecutiveErrors >= MAX_CONSECUTIVE_SR_ERRORS) {
+              if (typeof console !== 'undefined' && console.warn) {
+                console.warn('[VoiceCall] SpeechRecognition circuit breaker triggered after ' + recognitionConsecutiveErrors + ' consecutive errors. Revealing text input fallback.');
+              }
+              showCallTextInputDock(true);
+              return;
+            }
+
+            var delayIdx = Math.min(recognitionConsecutiveErrors, RECOGNITION_BACKOFF_DELAYS.length - 1);
+            var restartDelay = RECOGNITION_BACKOFF_DELAYS[delayIdx];
+
             if (recognitionRestartTimer) clearTimeout(recognitionRestartTimer);
             recognitionRestartTimer = setTimeout(function () {
               recognitionRestartTimer = null;
               if (!isDestroyed && state.status !== STATE.IDLE && !isPermissionPending && recognition) {
                 try { recognition.start(); } catch (_) {}
               }
-            }, 80);
+            }, restartDelay);
           }
         };
 
@@ -996,6 +1077,7 @@
     }
 
     function stopRecognition() {
+      recognitionConsecutiveErrors = 0;
       isRecognitionRunning = false;
       if (recognitionRestartTimer) {
         clearTimeout(recognitionRestartTimer);
@@ -1033,8 +1115,19 @@
     }
 
     // --- Turn Processing & Hands-free Loop ---
-    function commitUserTurn() {
-      if (state.status !== STATE.LISTENING) return;
+    function commitUserTurn(overrideText) {
+      if (typeof overrideText === 'string' && overrideText.trim()) {
+        pendingTranscript = overrideText.trim();
+        state.currentTranscript = pendingTranscript;
+        emit('transcript', pendingTranscript, true, 'user');
+        updateSubtitleUI(pendingTranscript, 'user');
+      }
+      if (state.status !== STATE.LISTENING) {
+        if (state.status === STATE.SPEAKING) {
+          interrupt('user_text_input');
+        }
+        setStatus(STATE.LISTENING);
+      }
       var text = pendingTranscript.trim();
       if (!text) {
         // Bug #13 & Zero-Loss Input: Dilarang memalsukan/mengarang kalimat murid saat input kosong
@@ -1616,7 +1709,7 @@
       var resolved = resolvePersona(state.course, opts.persona || opts.personaId || opts.partnerPersona || opts.partnerVoice || state.persona);
       state.persona = resolved.id;
       state.partnerVoice = resolved.voice;
-      state.partnerName = opts.partnerName || (resolved.id === 'keita' && state.course === 'ja' ? 'フィゼル先生' : resolved.name);
+      state.partnerName = opts.partnerName || resolved.name || (resolved.id === 'keita' ? 'Keita Senpai (健太先輩)' : 'Coach Alex');
       state.partnerAvatar = opts.partnerAvatar || (state.course === 'ja'
         ? renderIcon('sensei', { size: 24, filled: true })
         : renderIcon('coach', { size: 24, filled: true }));
@@ -1922,7 +2015,7 @@
       if (overlayEl) unmountOverlay();
 
       var course = state.course;
-      var partnerName = state.partnerName || (course === 'ja' ? 'フィゼル先生' : 'Coach Alex');
+      var partnerName = state.partnerName || (course === 'ja' ? 'Keita Senpai (健太先輩)' : 'Coach Alex');
 
       var scenarioMetaHtml = '';
       if (state.scenario) {
@@ -2020,11 +2113,25 @@
         '<div class="fzc-call-sample-container" id="fzcCallSampleContainer"></div>' +
         '</div>' +
 
+        // Fallback Text Input Dock (Bug #23: When SpeechRecognition is unavailable or failing)
+        '<div class="fzc-call-text-input-wrap is-hidden" id="fzcCallTextInputWrap">' +
+        '<form class="fzc-call-text-form" id="fzcCallTextForm">' +
+        '<input type="text" class="fzc-call-text-input" id="fzcCallTextInput" placeholder="' + esc(course === 'ja' ? t('call_input_ja', 'Ketik ucapanmu di sini...') : t('call_input_en', 'Type your speech here...')) + '" autocomplete="off" />' +
+        '<button type="submit" class="fzc-call-text-submit" id="fzcCallTextSubmit" aria-label="' + esc(t('call_send_text', 'Kirim Ucapan')) + '">' +
+        renderIcon('send', { size: 16 }) +
+        '</button>' +
+        '</form>' +
+        '</div>' +
+
         // Bottom Action Dock
         '<div class="fzc-call-dock">' +
         '<button type="button" class="fzc-call-ctrl-btn" id="fzcCallBtnMute" aria-label="' + esc(t('call_mute_mic', 'Bisukan Mikrofon')) + '">' +
         '<span class="fzc-call-btn-circle">' + renderIcon('mic', { size: 22 }) + '</span>' +
         '<span class="fzc-call-btn-lbl" id="fzcCallMuteLabel">' + t('call_lbl_mute', 'Mute') + '</span>' +
+        '</button>' +
+        '<button type="button" class="fzc-call-ctrl-btn" id="fzcCallBtnKeyboard" aria-label="' + esc(t('call_keyboard_toggle', 'Ketik Teks')) + '">' +
+        '<span class="fzc-call-btn-circle">' + renderIcon('chat', { size: 20 }) + '</span>' +
+        '<span class="fzc-call-btn-lbl" id="fzcCallKeyboardLabel">' + t('call_lbl_type', 'Ketik') + '</span>' +
         '</button>' +
         '<button type="button" class="fzc-call-ctrl-btn is-active" id="fzcCallBtnSub" aria-label="' + esc(t('call_toggle_sub', 'Teks Terjemahan')) + '">' +
         '<span class="fzc-call-btn-circle">' + renderIcon('translate', { size: 22 }) + '</span>' +
@@ -2042,6 +2149,11 @@
       overlayEl = div;
       bindOverlayEvents(div);
       updatePedagogyUI();
+
+      var hasSpeechRec = Boolean(root.SpeechRecognition || root.webkitSpeechRecognition);
+      if (!hasSpeechRec) {
+        showCallTextInputDock(true);
+      }
     }
 
     function closeCallUI(immediate) {
@@ -2180,6 +2292,54 @@
           });
         })(personaBtns[pb]);
       }
+
+      // Fallback Text Input Dock Controls (Bug #23)
+      var btnKeyboard = container.querySelector('#fzcCallBtnKeyboard');
+      var textWrap = container.querySelector('#fzcCallTextInputWrap');
+      var textInput = container.querySelector('#fzcCallTextInput');
+      var textForm = container.querySelector('#fzcCallTextForm');
+
+      if (btnKeyboard && textWrap) {
+        btnKeyboard.onclick = function () {
+          unlockAudio();
+          var isHidden = textWrap.classList.contains('is-hidden');
+          textWrap.classList.toggle('is-hidden', !isHidden);
+          btnKeyboard.classList.toggle('is-active', isHidden);
+          if (isHidden && textInput) {
+            try { textInput.focus(); } catch (_) {}
+          }
+        };
+      }
+
+      if (textForm && textInput) {
+        textForm.onsubmit = function (e) {
+          if (e && e.preventDefault) e.preventDefault();
+          unlockAudio();
+          var val = (textInput.value || '').trim();
+          if (val) {
+            textInput.value = '';
+            commitUserTurn(val);
+          }
+        };
+      }
+    }
+
+    function showCallTextInputDock(show) {
+      if (!overlayEl) return;
+      var textWrap = overlayEl.querySelector('#fzcCallTextInputWrap');
+      var btnKeyboard = overlayEl.querySelector('#fzcCallBtnKeyboard');
+      if (textWrap) {
+        textWrap.classList.toggle('is-hidden', !show);
+      }
+      if (btnKeyboard) {
+        btnKeyboard.classList.toggle('is-active', !!show);
+      }
+      if (show) {
+        var textInput = overlayEl.querySelector('#fzcCallTextInput');
+        if (textInput) {
+          try { textInput.focus(); } catch (_) {}
+        }
+      }
     }
 
     function setPersona(personaKey) {
@@ -2192,7 +2352,7 @@
       }
       state.persona = resolved.id;
       state.partnerVoice = resolved.voice;
-      state.partnerName = (resolved.id === 'keita' && state.course === 'ja') ? 'フィゼル先生' : resolved.name;
+      state.partnerName = resolved.name || (resolved.id === 'keita' ? 'Keita Senpai (健太先輩)' : 'Coach Alex');
       state.partnerAvatar = state.course === 'ja'
         ? renderIcon('sensei', { size: 24, filled: true })
         : renderIcon('coach', { size: 24, filled: true });
@@ -2385,9 +2545,12 @@
         return resolvePersona(state.course, state.persona);
       },
       getPersonas: function (c) {
-        return PERSONAS[c || state.course || 'ja'];
+        var p = getCanonicalPersonas();
+        return p[c || state.course || 'ja'];
       },
       PERSONAS: PERSONAS,
+      getConsecutiveErrors: function () { return recognitionConsecutiveErrors; },
+      showCallTextInputDock: showCallTextInputDock,
       showMicPermissionModal: showMicPermissionModal,
       _testSetStatus: function (status, meta) {
         if (status === STATE.SPEAKING && meta && meta.reply && meta.reply.text) {
@@ -2425,6 +2588,7 @@
     setPersona: function (persona) { return defaultInstance.setPersona(persona); },
     getPersona: function () { return defaultInstance.getPersona(); },
     getPersonas: function (c) { return defaultInstance.getPersonas(c); },
+    showCallTextInputDock: function (show) { return defaultInstance.showCallTextInputDock(show); },
     showMicPermissionModal: function (onRetry) { return defaultInstance.showMicPermissionModal(onRetry); },
     on: function (evt, fn) { defaultInstance.on(evt, fn); },
     off: function (evt, fn) { defaultInstance.off(evt, fn); },
@@ -2432,7 +2596,7 @@
     unlockAudio: function () { return defaultInstance.unlockAudio(); },
     playSpeech: function (text, course) { return defaultInstance.playSpeech(text, course); },
     _testSetStatus: function (status, meta) { return defaultInstance._testSetStatus(status, meta); },
-    _testCommitTurn: function () { return defaultInstance._testCommitTurn(); },
+    _testCommitTurn: function (overrideText) { return defaultInstance._testCommitTurn(overrideText); },
     _testSimulateTurn: function (text) { return defaultInstance._testSimulateTurn(text); },
     _testSetState: function (patch) { return defaultInstance._testSetState(patch); }
   };

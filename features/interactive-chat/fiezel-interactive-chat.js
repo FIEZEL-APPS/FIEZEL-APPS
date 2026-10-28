@@ -966,10 +966,13 @@
         if (g.id === 'g1') done = /availability|check|book|reserve|room|weekend/.test(fullText);
         else if (g.id === 'g2') done = /hang on|rate|deluxe|queen|breakfast|wifi|price|second/.test(fullText);
         else if (g.id === 'g3') done = /name|catch you later|thank|confirm|book it/.test(fullText);
+      } else if (scenario.id === 'intro') {
+        if (g.id === 'g1') done = /はじめまして|hajimemashite|nice to meet|hello|hi/.test(fullText);
+        else if (g.id === 'g2') done = /から来ました|出身|kara kimashita|from|live in|student|kerja|murid/.test(fullText);
+        else if (g.id === 'g3') done = /よろしく|yoroshiku|please|senang/.test(fullText);
       } else {
-        if (g.id === 'g1') done = userMsgCount >= 1;
-        else if (g.id === 'g2') done = userMsgCount >= 2;
-        else if (g.id === 'g3') done = userMsgCount >= 3;
+        // Zero-Dumbing: dilarang meluluskan target hanya berdasar jumlah pesan semata
+        done = false;
       }
       return { id: g.id, text: g.text, done: done };
     });
@@ -1178,7 +1181,7 @@
             translation: t('chat_off_ramen_trans1', 'Baik, dimengerti! Bagaimana dengan tingkat kematangan mienya? Bisa pilih biasa, keras, atau lembut.'),
             grammarNote: t('chat_off_ramen_note1', '「どうなさいますか」(Dou nasaimasu ka) adalah bentuk sangat sopan dari「どうしますか」(Bagaimana maunya).'),
             suggestions: [
-              { text: '硬めでお願いします！', furigana: '[硬](かた)めでお願い(ねが)いします！', romaji: 'Katame de onegai shimasu!', translation: t('chat_sug_katame', 'Minta yang agak keras ya!') },
+              { text: '硬めでお願いします！', furigana: '[硬](かた)めで[願](ねが)いします！', romaji: 'Katame de onegai shimasu!', translation: t('chat_sug_katame', 'Minta yang agak keras ya!') },
               { text: '普通で大丈夫です。', furigana: '[普通](ふつう)で[大丈夫](だいじょうぶ)です。', romaji: 'Futsuu de daijoubu desu.', translation: t('chat_sug_futsuu', 'Biasa saja tidak apa-apa.') },
               { text: 'トッピングに味玉も追加できますか？', furigana: 'トッピングに[味玉](あじたま)も[追加](ついか)できますか？', romaji: 'Toppingu ni ajitama mo tsuika dekimasu ka?', translation: t('chat_sug_ajitam', 'Bisa tambah topping telur rebus berbumbu?') }
             ]
@@ -1619,7 +1622,7 @@
     }
   }
 
-  // Canonical Interactive Chat & Voice Call Personas
+  // Canonical Interactive Chat & Voice Call Personas (DRY Single-Source from FiezelVoiceScenarios)
   var PERSONAS = {
     en: {
       alex: {
@@ -1646,17 +1649,17 @@
     ja: {
       keita: {
         id: 'keita',
-        name: 'フィゼル先生',
+        name: 'Keita Senpai (健太先輩)',
         shortName: 'Keita',
         voice: 'ja-JP-KeitaNeural',
         gender: 'male',
         role: 'Percakapan & Pola Kalimat',
         avatarIcon: 'sensei',
-        label: 'Sensei Keita'
+        label: 'Keita Senpai'
       },
       nanami: {
         id: 'nanami',
-        name: 'ナナミ先生',
+        name: 'Sensei Nanami (ナナミ先生)',
         shortName: 'Nanami',
         voice: 'ja-JP-NanamiNeural',
         gender: 'female',
@@ -1666,6 +1669,60 @@
       }
     }
   };
+
+  function getCanonicalPersonas() {
+    var scenariosModule = root.FiezelVoiceScenarios;
+    if (scenariosModule && scenariosModule.VOICE_PERSONAS) {
+      var vp = scenariosModule.VOICE_PERSONAS;
+      return {
+        en: {
+          alex: {
+            id: 'alex',
+            name: vp.coach_alex ? vp.coach_alex.name : PERSONAS.en.alex.name,
+            shortName: vp.coach_alex ? vp.coach_alex.shortName : PERSONAS.en.alex.shortName,
+            voice: vp.coach_alex ? vp.coach_alex.edgeVoice : PERSONAS.en.alex.voice,
+            gender: 'male',
+            role: 'Speaking & Confidence Coach',
+            avatarIcon: 'coach',
+            label: 'Coach Alex'
+          },
+          sarah: {
+            id: 'sarah',
+            name: vp.coach_sarah ? vp.coach_sarah.name : PERSONAS.en.sarah.name,
+            shortName: vp.coach_sarah ? vp.coach_sarah.shortName : PERSONAS.en.sarah.shortName,
+            voice: vp.coach_sarah ? vp.coach_sarah.edgeVoice : PERSONAS.en.sarah.voice,
+            gender: 'female',
+            role: 'Pronunciation & Fluency Coach',
+            avatarIcon: 'coach',
+            label: 'Coach Sarah'
+          }
+        },
+        ja: {
+          keita: {
+            id: 'keita',
+            name: vp.keita ? vp.keita.name : PERSONAS.ja.keita.name,
+            shortName: vp.keita ? vp.keita.shortName : PERSONAS.ja.keita.shortName,
+            voice: vp.keita ? vp.keita.edgeVoice : PERSONAS.ja.keita.voice,
+            gender: 'male',
+            role: 'Percakapan & Pola Kalimat',
+            avatarIcon: 'sensei',
+            label: 'Keita Senpai'
+          },
+          nanami: {
+            id: 'nanami',
+            name: vp.nanami ? vp.nanami.name : PERSONAS.ja.nanami.name,
+            shortName: vp.nanami ? vp.nanami.shortName : PERSONAS.ja.nanami.shortName,
+            voice: vp.nanami ? vp.nanami.edgeVoice : PERSONAS.ja.nanami.voice,
+            gender: 'female',
+            role: 'Percakapan Sehari-hari & Keigo',
+            avatarIcon: 'sensei',
+            label: 'Sensei Nanami'
+          }
+        }
+      };
+    }
+    return PERSONAS;
+  }
 
   function resolvePersona(course, val) {
     var s = (val && typeof val === 'object' && val.id) ? String(val.id) : String(val || '');
@@ -1680,7 +1737,7 @@
       c = (course === 'en') ? 'en' : 'ja';
     }
 
-    var bank = PERSONAS[c];
+    var bank = getCanonicalPersonas()[c];
     if (!s) {
       try {
         var stored = localStorage.getItem('fz_persona_' + c);
@@ -1807,7 +1864,14 @@
     initScenario(state.scenarioId);
   }
 
+  var saveStateTimer = null;
   function saveState() {
+    if (saveStateTimer) clearTimeout(saveStateTimer);
+    saveStateTimer = setTimeout(flushSaveState, 300);
+  }
+
+  function flushSaveState() {
+    saveStateTimer = null;
     try {
       if (state.scenarioId && state.messages) {
         if (state.messages.length > MAX_SCENARIO_MESSAGES) {
@@ -1824,7 +1888,28 @@
         nudgeDismissedAt: state.nudgeDismissedAt || 0,
         selectedPersonas: state.selectedPersonas
       }));
-    } catch (_) {}
+    } catch (err) {
+      // Bug #25: QuotaExceededError protection — prune oldest inactive histories
+      if (err && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014)) {
+        try {
+          var activeKey = histKeyFor(state.course, state.scenarioId);
+          var histKeys = Object.keys(state.scenarioHistories || {});
+          for (var hIdx = 0; hIdx < histKeys.length; hIdx++) {
+            if (histKeys[hIdx] !== activeKey) {
+              delete state.scenarioHistories[histKeys[hIdx]];
+            }
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            scenarioId: state.scenarioId,
+            scenarioHistories: state.scenarioHistories,
+            correctionMode: state.correctionMode === true,
+            autoVoice: state.autoVoice !== false,
+            nudgeDismissedAt: state.nudgeDismissedAt || 0,
+            selectedPersonas: state.selectedPersonas
+          }));
+        } catch (_) {}
+      }
+    }
   }
 
   function getScenario(id) {
@@ -2203,6 +2288,24 @@
 
   var lastXpAwardAt = 0;
 
+  // Bug #35: Calculate adaptive speaking credibility weight via Braincore FiezelSpeakingAdaptive
+  function computeSpeakingKappa(isOk, latencyMs, replays) {
+    var adaptive = root.FiezelSpeakingAdaptive;
+    if (adaptive && typeof adaptive.evidence === 'function') {
+      try {
+        var ev = adaptive.evidence({
+          coverage: isOk ? 0.95 : 0.40,
+          latencyMs: latencyMs || 2500,
+          replays: replays || 0
+        });
+        if (ev && typeof ev.kappa === 'number') {
+          return ev.kappa;
+        }
+      } catch (_) {}
+    }
+    return isOk ? 0.6 : 0.35;
+  }
+
   // Dispatch real telemetry for a conversational turn (chat text or voice call turn)
   // Bug #9: Support tri-state verdict (true | false | null) and rate-limited XP farming guard
   function dispatchSpeakingTurnTelemetry(userText, scenarioId, hint, isVoice, meta) {
@@ -2247,8 +2350,8 @@
     callUpdateMastery('speaking', conceptId, isOk, latencyMs, null, Date.now());
     callUpdateMastery('speaking', fluencyConcept, isOk, latencyMs, null, Date.now());
 
-    // 2. bktRecord with Bayesian Knowledge Tracing credibility weight
-    var kappa = isOk ? 0.6 : 0.35;
+    // 2. bktRecord with Bayesian Knowledge Tracing credibility weight from FiezelSpeakingAdaptive
+    var kappa = computeSpeakingKappa(isOk, latencyMs, 0);
     callBktRecord(conceptId, isOk, kappa, 1.2);
     callBktRecord(fluencyConcept, isOk, kappa, 1.1);
 
@@ -2601,7 +2704,7 @@
     // (telemetri + ajakan koreksi); tampilnya diatur renderMarkup.
     var hint = checkMisconception(trimmed, reqCourse);
     var userMsg = {
-      id: 'msg-user-' + Date.now(),
+      id: 'msg-user-' + Date.now() + '-' + (++msgSeqCounter) + '-' + Math.random().toString(36).slice(2, 6),
       role: 'user',
       text: trimmed,
       hint: hint,
@@ -2722,7 +2825,7 @@
       currentPersona = resolvePersona(course, options.persona || options.personaId);
       setPersona(currentPersona.id, course);
     }
-    var partnerName = (currentPersona.id === 'keita' && course === 'ja') ? 'フィゼル先生' : currentPersona.name;
+    var partnerName = currentPersona.name || (currentPersona.id === 'keita' ? 'Keita Senpai (健太先輩)' : 'Sensei');
     var partnerAvatar = course === 'ja'
       ? icon('sensei', { size: 24, filled: true })
       : icon('coach', { size: 24, filled: true });
@@ -2816,12 +2919,23 @@
     scrollBottom(false);
   }
 
+  var msgSeqCounter = 0;
+
   function deliverAssistantReply(replyObj, reqScenarioId, userMsgId, reqCourse) {
-    state.isThinking = false;
+    var course = reqCourse || state.course;
+    var sid = reqScenarioId || state.scenarioId;
+    var onScreen = sid === state.scenarioId && course === state.course;
+
+    // Bug #16: Hanya reset isThinking dan replySource jika balasan milik skenario yang aktif di layar
+    if (onScreen) {
+      state.isThinking = false;
+      state.replySource = (replyObj && replyObj.source) || 'offline';
+    }
+
     var r = replyObj || {};
-    state.replySource = r.source || 'offline';
     var assistantMsg = {
-      id: 'msg-asst-' + Date.now(),
+      // Bug #33: Cegah tabrakan ID pesan dalam 1ms
+      id: 'msg-asst-' + Date.now() + '-' + (++msgSeqCounter) + '-' + Math.random().toString(36).slice(2, 6),
       role: 'assistant',
       text: r.text,
       furigana: r.furigana,
@@ -3569,27 +3683,11 @@
     return false;
   }
 
-  function renderMarkup() {
+  function renderFeedContent(currentSc) {
+    currentSc = currentSc || getScenario(state.scenarioId);
     var course = state.course;
-    var scList = SCENARIOS[course] || SCENARIOS.ja;
-    var currentSc = getScenario(state.scenarioId);
-    var level = getLearnerLevel();
     var currentPersona = getActivePersona(course);
-    var partnerName = (currentPersona.id === 'keita' && course === 'ja') ? 'フィゼル先生' : currentPersona.name;
-
-    var partnerAvatar = icon(currentPersona.avatarIcon || (course === 'ja' ? 'sensei' : 'coach'), { size: 24, filled: true, className: 'fzc-avatar-svg' });
-
-    var partnerSub = currentPersona.role || (course === 'ja'
-      ? t('chat_partner_sub_ja', 'Partner Percakapan Jepang • Fiezel-sensei')
-      : t('chat_partner_sub_en', 'Native English Speaking Partner'));
-
-    // Scenario Carousel
-    var chipsHtml = scList.map(function (sc) {
-      var isActive = sc.id === state.scenarioId ? ' is-active' : '';
-      return '<button type="button" class="fzc-scenario-chip fzc-scenario-pill' + isActive + '" data-scenario="' + sc.id + '">' +
-        '<span class="fzc-scenario-chip-icon">' + icon(sc.icon, { size: 16 }) + '</span> <span class="fzc-scenario-chip-title">' + esc(sc.title) + '</span>' +
-        '</button>';
-    }).join('');
+    var partnerName = currentPersona.name || (currentPersona.id === 'keita' ? 'Keita Senpai (健太先輩)' : 'Sensei');
 
     // Scenario Mission Checkpoints Tracker
     var currentGoals = evaluateGoalProgress(currentSc, state.messages);
@@ -3774,6 +3872,42 @@
       '</div>'
     ) : '';
 
+    return (
+      '<div class="fzc-scenario-card">' +
+      '<div class="fzc-scenario-card-head">' +
+      '<span class="fzc-scenario-card-icon">' + icon(currentSc.icon || currentSc.id, { size: 20 }) + '</span> <span>' + esc(currentSc.title) + ' (' + esc(currentSc.label || currentSc.title) + ')</span>' +
+      '</div>' +
+      '<p class="fzc-scenario-card-desc">' + esc(currentSc.desc) + '</p>' +
+      goalsHtml +
+      '</div>' +
+      msgsHtml +
+      typingHtml +
+      sourceNoteHtml()
+    );
+  }
+
+  function renderMarkup() {
+    var course = state.course;
+    var scList = SCENARIOS[course] || SCENARIOS.ja;
+    var currentSc = getScenario(state.scenarioId);
+    var level = getLearnerLevel();
+    var currentPersona = getActivePersona(course);
+    var partnerName = currentPersona.name || (currentPersona.id === 'keita' ? 'Keita Senpai (健太先輩)' : 'Sensei');
+
+    var partnerAvatar = icon(currentPersona.avatarIcon || (course === 'ja' ? 'sensei' : 'coach'), { size: 24, filled: true, className: 'fzc-avatar-svg' });
+
+    var partnerSub = currentPersona.role || (course === 'ja'
+      ? t('chat_partner_sub_ja', 'Partner Percakapan Jepang • Fiezel-sensei')
+      : t('chat_partner_sub_en', 'Native English Speaking Partner'));
+
+    // Scenario Carousel
+    var chipsHtml = scList.map(function (sc) {
+      var isActive = sc.id === state.scenarioId ? ' is-active' : '';
+      return '<button type="button" class="fzc-scenario-chip fzc-scenario-pill' + isActive + '" data-scenario="' + sc.id + '">' +
+        '<span class="fzc-scenario-chip-icon">' + icon(sc.icon, { size: 16 }) + '</span> <span class="fzc-scenario-chip-title">' + esc(sc.title) + '</span>' +
+        '</button>';
+    }).join('');
+
     var micActive = state.isListening ? ' is-listening' : '';
     var inputPlaceholder = course === 'ja'
       ? t('chat_placeholder_ja', 'Ketik dalam bahasa Jepang (kana/romaji) atau klik mic...')
@@ -3783,7 +3917,7 @@
       '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
 
     return (
-      '<section class="fade fzc-container fzc-chat-wrapper">' +
+      '<section class="fade fzc-container fzc-chat-wrapper" data-active-scenario="' + esc(state.scenarioId) + '" data-active-course="' + esc(course) + '">' +
       '<div class="fzc-header">' +
       '<div class="fzc-partner-bar">' +
       '<button type="button" class="fzc-btn-back" id="fzcBtnBack" aria-label="' + esc(t('chat_back_btn_aria', 'Kembali')) + '" title="' + esc(t('chat_back_btn_aria', 'Kembali')) + '">' +
@@ -3817,16 +3951,7 @@
       '</div>' +
 
       '<div class="fzc-feed" id="fzcFeed">' +
-      '<div class="fzc-scenario-card">' +
-      '<div class="fzc-scenario-card-head">' +
-      '<span class="fzc-scenario-card-icon">' + icon(currentSc.icon || currentSc.id, { size: 20 }) + '</span> <span>' + esc(currentSc.title) + ' (' + esc(currentSc.label || currentSc.title) + ')</span>' +
-      '</div>' +
-      '<p class="fzc-scenario-card-desc">' + esc(currentSc.desc) + '</p>' +
-      goalsHtml +
-      '</div>' +
-      msgsHtml +
-      typingHtml +
-      sourceNoteHtml() +
+      renderFeedContent(currentSc) +
       '</div>' +
       '<button type="button" class="fzc-floating-new-msg is-hidden" id="fzcNewMsgBtn" aria-label="' + esc(t('chat_new_msg_pill', 'Pesan Baru ↓')) + '">' +
       icon('arrow-down', { size: 14 }) + ' <span>' + esc(t('chat_new_msg_pill', 'Pesan Baru ↓')) + '</span>' +
@@ -3850,6 +3975,69 @@
       '</div>' +
       '</section>'
     );
+  }
+
+  function bindFeedEvents(feed) {
+    if (!feed) return;
+
+    // Suggestion Chips
+    feed.querySelectorAll('.fzc-suggestion-chip').forEach(function (btn) {
+      btn.onclick = function () {
+        unlockAudioContext();
+        var text = btn.getAttribute('data-send');
+        if (text) sendMessage(text);
+      };
+    });
+
+    // Actions (Audio, Translate, Shadowing)
+    feed.querySelectorAll('.fzc-action-btn').forEach(function (btn) {
+      btn.onclick = function () {
+        unlockAudioContext();
+        var act = btn.getAttribute('data-action');
+        var mid = btn.getAttribute('data-id');
+        if (act === 'audio') {
+          var targetMsg = null;
+          for (var i = 0; i < state.messages.length; i++) {
+            if (state.messages[i].id === mid) {
+              targetMsg = state.messages[i];
+              break;
+            }
+          }
+          if (state.audioPlayingId === mid) {
+            stopVoice();
+          } else if (targetMsg) {
+            speakAssistantMessage(targetMsg, { userInitiated: true });
+          } else {
+            var tAudio = btn.getAttribute('data-text');
+            playVoice(tAudio, mid, { userInitiated: true });
+          }
+        } else if (act === 'translate') {
+          var targetMsg = null;
+          for (var i = 0; i < state.messages.length; i++) {
+            if (state.messages[i].id === mid) {
+              targetMsg = state.messages[i];
+              break;
+            }
+          }
+          if (targetMsg) {
+            targetMsg.showTranslation = !targetMsg.showTranslation;
+            var box = document.getElementById('fzcReveal-' + mid);
+            if (box) box.classList.toggle('is-hidden', !targetMsg.showTranslation);
+          }
+        } else if (act === 'shadow') {
+          var tShadow = btn.getAttribute('data-text');
+          startShadowing(mid, tShadow);
+        }
+      };
+    });
+
+    // Quota Info CTA inside feed
+    var quotaInfoBtn = feed.querySelector('#fzcBtnQuotaInfo');
+    if (quotaInfoBtn) {
+      quotaInfoBtn.onclick = function () {
+        showQuotaExhaustedModal();
+      };
+    }
   }
 
   function bindEvents(container) {
@@ -4073,56 +4261,8 @@
       };
     }
 
-    // Suggestion Chips
-    container.querySelectorAll('.fzc-suggestion-chip').forEach(function (btn) {
-      btn.onclick = function () {
-        unlockAudioContext();
-        var text = btn.getAttribute('data-send');
-        if (text) sendMessage(text);
-      };
-    });
-
-    // Actions (Audio, Translate, Shadowing)
-    container.querySelectorAll('.fzc-action-btn').forEach(function (btn) {
-      btn.onclick = function () {
-        unlockAudioContext();
-        var act = btn.getAttribute('data-action');
-        var mid = btn.getAttribute('data-id');
-        if (act === 'audio') {
-          var targetMsg = null;
-          for (var i = 0; i < state.messages.length; i++) {
-            if (state.messages[i].id === mid) {
-              targetMsg = state.messages[i];
-              break;
-            }
-          }
-          if (state.audioPlayingId === mid) {
-            stopVoice();
-          } else if (targetMsg) {
-            speakAssistantMessage(targetMsg, { userInitiated: true });
-          } else {
-            var tAudio = btn.getAttribute('data-text');
-            playVoice(tAudio, mid, { userInitiated: true });
-          }
-        } else if (act === 'translate') {
-          var targetMsg = null;
-          for (var i = 0; i < state.messages.length; i++) {
-            if (state.messages[i].id === mid) {
-              targetMsg = state.messages[i];
-              break;
-            }
-          }
-          if (targetMsg) {
-            targetMsg.showTranslation = !targetMsg.showTranslation;
-            var box = document.getElementById('fzcReveal-' + mid);
-            if (box) box.classList.toggle('is-hidden', !targetMsg.showTranslation);
-          }
-        } else if (act === 'shadow') {
-          var tShadow = btn.getAttribute('data-text');
-          startShadowing(mid, tShadow);
-        }
-      };
-    });
+    // Feed event delegation & interactive bindings
+    bindFeedEvents(container.querySelector('#fzcFeed'));
 
     // Wheel event delegation: allow scrolling the chat feed even when mouse/trackpad cursor is over header, dock padding, or empty margins
     container.addEventListener('wheel', function (e) {
@@ -4162,11 +4302,71 @@
     }
   }
 
+  function syncHeaderControls(container) {
+    if (!container) return;
+    var corrBtn = container.querySelector('#fzcToggleCorrection');
+    if (corrBtn) {
+      corrBtn.classList.toggle('is-active', state.correctionMode === true);
+      corrBtn.setAttribute('aria-pressed', state.correctionMode === true ? 'true' : 'false');
+    }
+    var voiceBtn = container.querySelector('#fzcToggleVoice');
+    if (voiceBtn) {
+      voiceBtn.classList.toggle('is-active', state.autoVoice !== false);
+      voiceBtn.setAttribute('aria-pressed', state.autoVoice !== false ? 'true' : 'false');
+    }
+    var micBtn = container.querySelector('#fzcBtnMic');
+    if (micBtn) {
+      micBtn.classList.toggle('is-listening', Boolean(state.isListening));
+    }
+    var speakerDockBtn = container.querySelector('#fzcBtnSpeakerDock');
+    if (speakerDockBtn) {
+      speakerDockBtn.classList.toggle('is-muted', state.autoVoice === false);
+    }
+  }
+
+  function patchFeed(container) {
+    if (!container) return;
+    var feed = container.querySelector('#fzcFeed');
+    if (!feed) return;
+
+    var wasNearBottom = (feed.scrollHeight - feed.scrollTop - feed.clientHeight) < 85;
+    var savedScrollTop = feed.scrollTop;
+
+    var currentSc = getScenario(state.scenarioId);
+    feed.innerHTML = renderFeedContent(currentSc);
+    bindFeedEvents(feed);
+    syncHeaderControls(container);
+
+    var newMsgBtn = container.querySelector('#fzcNewMsgBtn');
+    if (wasNearBottom) {
+      feed.scrollTop = feed.scrollHeight;
+      if (newMsgBtn) newMsgBtn.classList.add('is-hidden');
+    } else {
+      feed.scrollTop = savedScrollTop;
+      if (newMsgBtn) newMsgBtn.classList.remove('is-hidden');
+    }
+  }
+
   function updateUI() {
     var doc = getDoc();
     if (!doc) return;
     var mountPoint = doc.getElementById('app');
     if (!mountPoint) return;
+
+    // Bug #17: Incremental feed patch if the active chat container is already mounted
+    // Preserves input draft, IME composition, textarea height, and scroll anchor.
+    var activeContainer = mountPoint.querySelector('.fzc-container');
+    if (activeContainer &&
+        activeContainer.getAttribute('data-active-scenario') === state.scenarioId &&
+        activeContainer.getAttribute('data-active-course') === state.course &&
+        activeContainer.querySelector('#fzcFeed') &&
+        !state.nudgeOpen) {
+      patchFeed(activeContainer);
+      if (typeof root.enhanceUI === 'function') {
+        try { root.enhanceUI(); } catch (_) {}
+      }
+      return;
+    }
 
     // Zero-Loss Draft & Focus Preservation
     var draftText = '';
@@ -4348,7 +4548,7 @@
         var nowLegacy = Date.now();
 
         callUpdateMastery('speaking', compId, isOk, latency, null, nowLegacy);
-        callBktRecord(compId, isOk, isOk ? 0.6 : 0.35, 1.2);
+        callBktRecord(compId, isOk, computeSpeakingKappa(isOk, latency, 0), 1.2);
         callMisconceptionRecord(compId, hintLegacy, isOk);
 
         saveChatHistoryRecord({

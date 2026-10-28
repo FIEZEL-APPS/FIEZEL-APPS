@@ -2429,6 +2429,61 @@ body.fz-ja-no-romaji .fzc-romaji {
   transform: scale(0.96);
 }
 
+/* ── Fallback Text Input Dock for Voice Call (Bug #23) ── */
+.fzc-call-text-input-wrap {
+  width: calc(100% - 32px);
+  max-width: 440px;
+  margin: 0 auto 12px;
+  position: relative;
+  z-index: 15;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.fzc-call-text-input-wrap.is-hidden {
+  display: none !important;
+}
+.fzc-call-text-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 24, 28, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 4px 6px 4px 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.fzc-call-text-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 8px 0;
+}
+.fzc-call-text-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+.fzc-call-text-submit {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6F00, #E65100);
+  border: none;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.fzc-call-text-submit:active {
+  transform: scale(0.92);
+}
+
 /* ── Ergonomic Call Controls Dock ── */
 .fzc-call-dock {
   display: flex;
