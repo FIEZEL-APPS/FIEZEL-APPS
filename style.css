@@ -6289,7 +6289,8 @@ body.fz-auth-open{overflow:hidden}
 .fiezel-ob-furigana-pill:hover{background:#f1f5f9;color:#0f172a}
 .fiezel-ob-furigana-pill.is-active{background:#0f172a !important;border-color:#0f172a !important;color:#ffffff !important;box-shadow:0 1px 4px rgba(15,23,42,0.2)}
 .fiezel-ja-kana-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;background:#f1f5f9;padding:3px;border-radius:10px;border:1px solid #e2e8f0;width:100%;box-sizing:border-box}
-body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn{display:flex;align-items:center;justify-content:center;padding:6px 10px;min-height:34px;background:transparent !important;border:none !important;border-radius:7px !important;cursor:pointer;transition:all .15s cubic-bezier(0.16,1,0.3,1);box-sizing:border-box;width:100%;box-shadow:none !important;outline:none}
+body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn{display:flex;align-items:center;justify-content:center;padding:6px 10px;min-height:34px;background:transparent !important;border:none !important;border-radius:7px !important;cursor:pointer;transition:all .15s cubic-bezier(0.16,1,0.3,1);box-sizing:border-box;width:100%;box-shadow:none !important}
+body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn:focus-visible{outline:2px solid #2563eb !important;outline-offset:2px !important}
 body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn .fz-kana-btn-badge{font-size:.78rem;font-weight:600;color:#64748b !important;letter-spacing:-0.01em;line-height:1;transition:color .15s ease}
 body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn:hover .fz-kana-btn-badge{color:#0f172a !important}
 body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected{background:#ffffff !important;box-shadow:0 1px 3px rgba(15,23,42,0.12),0 1px 2px rgba(15,23,42,0.06) !important}
