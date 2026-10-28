@@ -1,6 +1,6 @@
 # DOSSIER SERAH TERIMA RESMI (MANDATORY HANDOFF)
-**ID Rilis**: `FIEZEL-M025689-DUOLINGO-PARITY-ONBOARDING`
-**Nomor Build**: `m025-689` (Hexa-Sync Terverifikasi Selaras)
+**ID Rilis**: `FIEZEL-M025690-DUOLINGO-PARITY-ONBOARDING`
+**Nomor Build**: `m025-690` (Hexa-Sync Terverifikasi Selaras)
 **Tanggal**: 2026-10-28
 **Inisiator**: AI Systems Architecture & Learning Retention Arbiter
 **Status**: 100% LULUS AUDIT EMPIRIS (PLAYWRIGHT & QUALITY GATES)
@@ -104,9 +104,9 @@ Exit Code: 0
 | **Thai Leak Detector** | `node tests/th-ui-leak-test.js` | **PASS** | 27 berkas, 4557 kunci selaras tanpa bocor |
 | **Indonesian Golden Baseline** | `node tests/id-golden-snapshot-test.js` | **PASS** | Baseline emas utuh, nol mutasi liar |
 | **Placement IRT Accuracy** | `node tests/placement-accuracy-test.js` | **PASS** | 1000 trial simulasi IRT 3PL & ladder valid |
-| **Curriculum Cache Version** | `node tests/curriculum-cache-version-test.js` | **PASS** | 33 penegasan, 3 halaman, build `m025-689` |
+| **Curriculum Cache Version** | `node tests/curriculum-cache-version-test.js` | **PASS** | 33 penegasan, 3 halaman, build `m025-690` |
 | **Gate Registry** | `node tests/gate-registry-test.js` | **PASS** | 10 pass, 0 fail |
-| **Hexa-Sync Arbiter** | `node tools/bump-build.mjs --check` | **PASS** | 6 titik terverifikasi `Selaras` pada `m025-689` |
+| **Hexa-Sync Arbiter** | `node tools/bump-build.mjs --check` | **PASS** | 6 titik terverifikasi `Selaras` pada `m025-690` |
 
 ---
 
@@ -133,4 +133,4 @@ Exit Code: 0
 7. `tools/dev/duolingo-onboarding-probe.js`:
    - Skrip audit empiris headless Chromium Playwright 2 skenario (Pemula & Berpengalaman).
 8. `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`:
-   - Kenaikan nomor versi build resmi ke `m025-689`.
+   - Kenaikan nomor versi build resmi ke `m025-690`.

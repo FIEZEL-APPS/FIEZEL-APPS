@@ -9341,15 +9341,16 @@ function showAuthGate(at,next){
       try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
       try{self.FiezelOnboarding?.markLocaleSelected?.(self,value)}catch(_){}
     },
-    onDone:({role,classCode})=>{
+    onDone:(detail)=>{
+      const {role,classCode,via,action,isNew,handle,email}=detail||{};
       /* Bahasa layar yang dipakai saat masuk dihitung sebagai pilihan: perkenalan tidak
          menanyakannya lagi. Kode KelasKu dari layar masuk dipakai persis seperti kode yang
          dulu diketik di perkenalan - disimpan, lalu guru diberi tahu murid ini bergabung. */
       try{self.FiezelOnboarding?.markLocaleSelected?.(self,self.FiezelI18n?.getLocale?.()||'id')}catch(_){}
       try{
-        const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+        const gEmail=self.FiezelGoogle?.rememberedEmail?.()||email||'';
         const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
-        const h=acc?.handle;
+        const h=acc?.handle||handle||'';
         if(gEmail){
           activateAccountState('g_'+gEmail.replace(/[^A-Za-z0-9_-]/g,'_').slice(0,64));
         }else if(h){
@@ -9357,6 +9358,48 @@ function showAuthGate(at,next){
           if(!state.userName||state.userName===FALLBACK_LEARNER_NAME)state.userName=h;
           try{rememberSocialHandle(h)}catch(_){}
           save();
+        }
+        /* m025-688: Murid yang login (bukan pendaftaran akun baru pertama kali) adalah murid lama
+           atau pengguna akun yang kembali. Mereka tidak boleh dipaksa mengulang onboarding 6 langkah
+           (nama, kursus, tujuan, tes penempatan) di HP baru/sesudah keluar. Tandai onboarding selesai
+           dan pastikan nama terisi agar langsung masuk ke Beranda (Homepage). */
+        const isReturningStudent = role === 'murid' && (
+          action === 'masuk' ||
+          (via === 'google' && action !== 'daftar') ||
+          isNew === false ||
+          (state && (state.totalAnswered > 0 || state.placementDone || (state.history && state.history.length > 0)))
+        );
+        if(isReturningStudent){
+          const fallbackGName=gEmail?gEmail.split('@')[0].replace(/[._-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'';
+          const finalName=String(state?.userName||h||fallbackGName||'').trim()||'Murid';
+          if(!state.userName||state.userName===FALLBACK_LEARNER_NAME){
+            state.userName=finalName;
+            save();
+          }
+          try{
+            const onbLocale=self.FiezelI18n?.getLocale?.()||state?.preferences?.learnerLocale||'id';
+            const onbCourse=state?.preferences?.targetLang||'en';
+            if(self.FiezelOnboarding?.markCompleted){
+              self.FiezelOnboarding.markCompleted(self,{
+                at:Date.now(),
+                via:via==='google'?'google_login':'account_login',
+                name:finalName,
+                locale:onbLocale,
+                role:'murid',
+                course:onbCourse
+              });
+            }else{
+              const ob=JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}');
+              ob.done=true;
+              ob.at=Date.now();
+              ob.via=via==='google'?'google_login':'account_login';
+              ob.name=finalName;
+              ob.locale=onbLocale;
+              ob.role='murid';
+              ob.course=onbCourse;
+              localStorage.setItem('fiezel-onboarding-v1',JSON.stringify(ob));
+            }
+          }catch(_){}
         }
       }catch(_){}
       if(role==='murid'&&classCode){
