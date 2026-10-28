@@ -2639,21 +2639,31 @@ body.fz-lux .notification-panel,
   font-weight: 800 !important;
 }
 
-/* 6. ONBOARDING SHEETS (High Contrast Dark Theme) */
-.fiezel-sheet {
-  background: #14141E !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  color: #F8FAFC !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
-}
+/* 6. ONBOARDING SHEETS (High Contrast Dark Theme for Mobile) */
+@media (max-width: 767px) {
+  .fiezel-sheet {
+    background: #14141E !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: #F8FAFC !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+  }
 
-.fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
-html body .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
-html body:not(.fz-teacher-mode) #app .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
-html body:not(.fz-teacher-mode) #app .fiezel-sheet:not(.fiezel-language-sheet) h2 {
-  color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
-  font-weight: 800 !important;
+  .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
+  html body .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
+  html body:not(.fz-teacher-mode) #app .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
+  html body:not(.fz-teacher-mode) #app .fiezel-sheet:not(.fiezel-language-sheet) h2 {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    font-weight: 800 !important;
+  }
+
+  .fiezel-body {
+    color: #CBD5E1 !important;
+  }
+
+  .fiezel-note {
+    color: #94A3B8 !important;
+  }
 }
 
 /* Language Sheet Title on Daylight Background */
@@ -2669,14 +2679,6 @@ html body:not(.fz-teacher-mode) #app .fiezel-language-sheet h2,
   color: #0F172A !important;
   -webkit-text-fill-color: #0F172A !important;
   font-weight: 800 !important;
-}
-
-.fiezel-body {
-  color: #CBD5E1 !important;
-}
-
-.fiezel-note {
-  color: #94A3B8 !important;
 }
 
 /* Onboarding Carousel Pills (High Contrast Dark Cards) */

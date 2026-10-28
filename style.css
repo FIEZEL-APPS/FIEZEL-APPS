@@ -6406,6 +6406,127 @@ body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected .fz-kana-bt
     border-radius: 18px !important;
     padding: 16px 20px !important;
     background: #FFFFFF !important;
+    color: #0F172A !important;
+  }
+  body .fiezel-sheet .fiezel-title,
+  body .fiezel-sheet h2,
+  html body #app .fiezel-sheet .fiezel-title,
+  html body #app .fiezel-sheet h2 {
+    color: #0F172A !important;
+    -webkit-text-fill-color: #0F172A !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 4px !important;
+  }
+  body .fiezel-sheet .fiezel-body,
+  html body #app .fiezel-sheet .fiezel-body {
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
+    font-size: 14px !important;
+  }
+  body .fiezel-sheet .fiezel-note,
+  html body #app .fiezel-sheet .fiezel-note {
+    color: #64748B !important;
+    -webkit-text-fill-color: #64748B !important;
+  }
+  body .fiezel-sheet .fiezel-field label,
+  body .fiezel-sheet .fiezel-field-label {
+    color: #64748B !important;
+    -webkit-text-fill-color: #64748B !important;
+  }
+  body .fiezel-sheet .fiezel-field input {
+    background: #F8FAFC !important;
+    color: #0F172A !important;
+    -webkit-text-fill-color: #0F172A !important;
+    border: 1.5px solid #CBD5E1 !important;
+  }
+}
+
+/* Shinobi-grade Placement Path Selection (Step 4) */
+.fiezel-placement-path-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 6px 0 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fiezel-path-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fiezel-path-badge {
+  font-family: var(--fz-heading, system-ui);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.fiezel-path-desc {
+  margin: 2px 0 8px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #94A3B8;
+}
+
+.fiezel-path-count {
+  font-weight: 700;
+  color: #FFD21E;
+}
+
+.fiezel-path-card .fiezel-btn {
+  min-height: 40px !important;
+  padding: 8px 14px !important;
+  font-size: 0.88rem !important;
+  border-radius: 10px !important;
+}
+
+@media (min-width: 768px) {
+  .fiezel-placement-path-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+    margin: 8px 0 14px !important;
+  }
+  .fiezel-path-card {
+    background: #F8FAFC !important;
+    border: 1.5px solid #E2E8F0 !important;
+    border-radius: 14px !important;
+    padding: 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+  .fiezel-path-card:hover {
+    border-color: #CBD5E1 !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06) !important;
+  }
+  .fiezel-path-badge {
+    color: #0F172A !important;
+    font-size: 0.96rem !important;
+  }
+  .fiezel-path-desc {
+    color: #475569 !important;
+    font-size: 0.8rem !important;
+    flex: 1 1 auto !important;
+  }
+  .fiezel-path-count {
+    color: #0F172A !important;
+    background: #FEF08A !important;
+    padding: 1px 6px !important;
+    border-radius: 6px !important;
   }
 }
 

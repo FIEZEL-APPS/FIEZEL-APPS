@@ -1,7 +1,7 @@
 {
-  "version": "m025-695",
-  "claimedBy": "branch feat/kawan-bicara-zero-dumbing-and-audio-hardening-m025-694",
-  "claimedAt": "2026-10-28T02:48:01.857Z",
-  "reason": "fix(kawan-bicara): zero-dumbing invariant, acoustic barge-in & secure nonce bridge (m025-695)",
+  "version": "m025-696",
+  "claimedBy": "branch feat/shinobi-minimalist-universal-onboarding-m025-698",
+  "claimedAt": "2026-10-28T03:01:30.325Z",
+  "reason": "fix(onboarding): shinobi-grade universal zero-scroll onboarding",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

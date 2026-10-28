@@ -73,6 +73,24 @@ Setiap agent yang melakukan audit bug, meninjau penalaran kuis, atau mengevaluas
 2. **Wajib Probe Headless Playwright**: Setiap temuan WAJIB dibuktikan melalui skrip probe peramban Chromium Playwright (`tools/dev/*probe.js` atau `tests/*probe.js`) yang melakukan klik tombol layaknya murid sungguhan dan membaca `state.history`, `localStorage`, serta basis data IndexedDB secara langsung.
 3. **Validasi Dua Arah**: Jalankan probe pembanding sebelum perbaikan dan sesudah perbaikan untuk memastikan solusi terbukti menyelesaikan masalah tanpa regresi.
 
+## Mandatory Protocol: Fast-Track PWA Screenshot & Latest-Build Invariant (Tangkapan Layar Kilat & Build Terkini)
+Setiap kali pengguna meminta tangkapan layar (screenshot), inspeksi visual, atau preview antarmuka aplikasi:
+1. **Kecepatan Eksekusi Ekstrem (Wajib Kilat & Anti-Blokir)**:
+   - DILARANG KERAS menahan, menunda, atau memperlambat permintaan screenshot pengguna dengan alur rilis formal yang panjang (dilarang menunggu alur CI GitHub Actions ~8 menit hanya untuk mengambil gambar preview).
+   - Pengambilan tangkapan layar HARUS selesai dalam hitungan detik secara lokal melalui runner resmi:
+     ```bash
+     node tools/dev/quick-screenshot.mjs --view=<home|kana|chat|vocab|grammar> --device=<mobile|desktop|tablet> [--live]
+     ```
+2. **Wajib Berdasarkan Build PWA Terkini (Zero-Stale-Cache Invariant)**:
+   - Seluruh screenshot WAJIB diambil berdasarkan **BUILD TERBARU** aplikasi (`coordination/BUILD-VERSION.json` dan `sw.js` aktif), BUKAN tampilan lawas yang tersangkut di cache peramban.
+   - Peramban headless Playwright WAJIB menggunakan header `Cache-Control: no-cache, no-store, must-revalidate` dan konteks bersih terisolasi agar aset CSS, JS, dan HTML 100% merefleksikan perubahan kode terakhir.
+   - Bila pengguna meminta screenshot langsung pada PWA produksi yang live (`--live`), pastikan versi CDN target (`https://fiezel.my.id/app/`) cocok dengan build termutakhir.
+3. **Penyuntikan State & Pembersihan Otomatis (Zero-Modal Blocker)**:
+   - Runner WAJIB otomatis menyuntikkan sesi autentikasi dan preferensi kursus di `localStorage` (`fiezel-auth-v1`, `fiezel-onboarding-v1`, `fz_target_course`), serta menyingkirkan elemen modal pengganggu (`#fzRitual`, `#modal`, `.modal-backdrop`, `.fiezel-ob`, `.fz-tour`) agar hasil tangkapan layar langsung menampilkan permukaan inti UI yang rapi tanpa terhalang popup.
+4. **Alur Kerja Pemisahan (Preview Visual Duluan, Rilis CI Kemudian)**:
+   - Jika pengguna meminta penyesuaian UI dan screenshot, terapkan perubahan kode secara lokal lalu AMBIL SCREENSHOT SEKETIKA untuk dievaluasi oleh pengguna.
+   - Jangan menjalankan bump build formal dan CI Pull Request sebelum pengguna menyetujui hasil visual dari screenshot tersebut.
+
 ## Mandatory Protocol: PWA Release Arbiter & Anti-Ghost-Deploy (Wajib Bump Build)
 Setiap kali menyelesaikan fitur, perbaikan bug, konten kuis, atau pembaruan UI/UX di FIEZEL:
 1. **ZERO Ghost Releases (Pantangan Rilis Hantu)**:
