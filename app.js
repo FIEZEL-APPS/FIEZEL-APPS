@@ -11862,9 +11862,9 @@ function todayHomeMarkup(){
   /* Home Cockpit: Render pure daylight Tactile Clay interface directly */
   return `<div class="today-home-cockpit fz-edu-cockpit tactile-home-cockpit">
   ${homeTop}
-  ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
   ${conversationPartnerHomeCardMarkup()}
   ${heroQuestCard}
+  ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
   ${braincoreHomeCardMarkup()}
   ${progresBelajarCard}
   ${quickPracticeCard}

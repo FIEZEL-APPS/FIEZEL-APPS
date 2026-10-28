@@ -981,6 +981,8 @@
     var selectedRole = storedRole(target);
     var typedClassCode = '';
     var selectedCourse = normalizeCourse(storedCourse(target));
+    var selectedKanaPref = 'learning';
+    var selectedFurigana = true;
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
@@ -1260,7 +1262,7 @@
       var html;
       if (step === LANGUAGE_STEP) html = languageMarkup(target, selectedLocale, localeBusy);
       else if (step === 1) html = nameMarkup(target, typedName);
-      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse);
+      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse, selectedKanaPref, selectedFurigana);
       else if (step === 2) html = carouselMarkup(target, slide);
       else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel);
       else if (step === 4) html = placementMarkup(target);
@@ -1360,7 +1362,7 @@
       if (closed) return;
       closed = true;
       clearMascotTimers();
-      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode, course: selectedCourse });
+      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode, course: selectedCourse, kanaPreference: selectedKanaPref, furigana: selectedFurigana });
       // Serah terima hanya pada penyelesaian sungguhan; skip/placement keluar lewat fade
       // lama (§2.3: dilewati pada kurangi-gerak dan pada jalur tes penempatan).
       var handedOff = via === 'finish' ? beginHandoff() : false;
@@ -1557,6 +1559,7 @@
             });
           })(localeButtons[l]);
         }
+        var jaPanel = host.querySelector('[data-ob-ja-panel]');
         host.querySelectorAll('[data-ob-course]').forEach(function (b) {
           b.addEventListener('click', function () {
             selectedCourse = normalizeCourse(b.getAttribute('data-ob-course'));
@@ -1567,6 +1570,70 @@
             });
             var nextBtn = host.querySelector('[data-ob-advance]');
             if (nextBtn && selectedCourse) nextBtn.removeAttribute('disabled');
+            if (jaPanel) {
+              if (selectedCourse === 'ja') {
+                jaPanel.style.display = 'flex';
+                if (typeof microReact === 'function') microReact('observing', 600, 'curious');
+              } else {
+                jaPanel.style.display = 'none';
+              }
+            }
+          });
+        });
+        host.querySelectorAll('[data-ob-kana]').forEach(function (kb) {
+          kb.addEventListener('click', function () {
+            selectedKanaPref = kb.getAttribute('data-ob-kana') || 'learning';
+            selectedFurigana = selectedKanaPref !== 'fluent';
+            host.querySelectorAll('[data-ob-kana]').forEach(function (x) {
+              var on = x === kb;
+              if (x.classList && typeof x.classList.toggle === 'function') x.classList.toggle('is-selected', on);
+              x.setAttribute('aria-checked', on ? 'true' : 'false');
+            });
+            updateFuriganaUI();
+          });
+        });
+        var furiToggle = host.querySelector('[data-ob-toggle-furigana]');
+        if (furiToggle) {
+          furiToggle.addEventListener('click', function () {
+            selectedFurigana = !selectedFurigana;
+            updateFuriganaUI();
+          });
+        }
+        function updateFuriganaUI() {
+          var pill = host.querySelector('[data-ob-toggle-furigana]');
+          var card = host.querySelector('[data-ob-sentence-card]');
+          var status = host.querySelector('[data-ob-furi-status]');
+          if (pill) {
+            if (pill.classList && typeof pill.classList.toggle === 'function') {
+              pill.classList.toggle('is-active', selectedFurigana);
+            }
+            pill.setAttribute('aria-pressed', selectedFurigana ? 'true' : 'false');
+          }
+          if (card && card.classList && typeof card.classList.toggle === 'function') {
+            card.classList.toggle('hide-furigana', !selectedFurigana);
+          }
+          if (status) status.textContent = selectedFurigana ? 'ON' : 'OFF';
+        }
+        host.querySelectorAll('.fz-ob-ruby').forEach(function (rubyEl) {
+          rubyEl.addEventListener('click', function () {
+            var word = rubyEl.getAttribute('data-word') || '';
+            var reading = rubyEl.getAttribute('data-reading') || '';
+            var meaning = rubyEl.getAttribute('data-meaning') || '';
+            var chip = host.querySelector('[data-ob-inspection-chip]');
+            if (chip) {
+              chip.style.display = 'flex';
+              var wEl = chip.querySelector('[data-ob-chip-word]');
+              var rEl = chip.querySelector('[data-ob-chip-reading]');
+              var mEl = chip.querySelector('[data-ob-chip-meaning]');
+              if (wEl) wEl.textContent = word;
+              if (rEl) rEl.textContent = '[' + reading + ']';
+              if (mEl) mEl.textContent = meaning;
+            }
+            host.querySelectorAll('.fz-ob-ruby').forEach(function (r) {
+              if (r.classList && typeof r.classList.remove === 'function') r.classList.remove('is-active');
+            });
+            if (rubyEl.classList && typeof rubyEl.classList.add === 'function') rubyEl.classList.add('is-active');
+            if (typeof microReact === 'function') microReact('observing', 600, 'curious');
           });
         });
         var nameInput = host.querySelector('[data-ob-name]');
