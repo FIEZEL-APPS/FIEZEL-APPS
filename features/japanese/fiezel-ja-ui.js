@@ -211,7 +211,19 @@
         (showGojuon ? '<section class="ja-kana-section is-gojuon"><h2 class="kana-heading">' + esc(t('jepang.kana-dasar')) + '</h2>' +
         '<div class="kana-grid" role="list">' + kanaRows(GOJUON) + '</div></section>' : '') +
         (showDakuten ? '<section class="ja-kana-section is-dakuten"><h2 class="kana-heading">' + esc(t('jepang.kana-dakuten')) + '</h2>' +
-        '<div class="kana-grid" role="list">' + kanaRows(DAKUTEN) + '</div></section>' : '') +
+        '<div class="kana-grid" role="list">' + kanaRows(DAKUTEN) + '</div>' +
+        '<aside class="ja-kana-guide-box" aria-label="' + esc(t('jepang.kana-guide-title')) + '">' +
+          '<div class="ja-kana-guide-badge">' + esc(t('jepang.kana-guide-badge')) + '</div>' +
+          '<h3 class="ja-kana-guide-title">' + esc(t('jepang.kana-guide-title')) + '</h3>' +
+          '<p class="ja-kana-guide-desc">' + esc(t('jepang.kana-guide-desc')) + '</p>' +
+          '<div class="ja-kana-guide-pairs">' +
+            '<span><b>か (k)</b> ➔ <b>が (g)</b></span>' +
+            '<span><b>さ (s)</b> ➔ <b>ざ (z)</b></span>' +
+            '<span><b>た (t)</b> ➔ <b>だ (d)</b></span>' +
+            '<span><b>は (h)</b> ➔ <b>ば (b) / ぱ (p)</b></span>' +
+          '</div>' +
+        '</aside>' +
+        '</section>' : '') +
       '</div></div>';
   }
   function kanaViewBody() {

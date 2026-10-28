@@ -1,7 +1,7 @@
 # FIEZEL HANDOFF DOSSIER: SHINOBI-GRADE MINIMALIST JAPANESE ONBOARDING & ZERO-SCROLL
-**Nomor Build**: `m025-694`  
-**Branch**: `feat/shinobi-minimalist-japanese-onboarding-m025-694`  
-**Tanggal**: 2026-10-28  
+**Nomor Build**: `m025-694`
+**Branch**: `feat/shinobi-minimalist-japanese-onboarding-m025-694`
+**Tanggal**: 2026-10-28
 **Status Gate**: 100% HIJAU (Hexa-Sync verified, 5 local quality gates pass)
 
 ---
@@ -19,6 +19,12 @@ Berdasarkan inspeksi visual mockup dan arahan eksplisit pengguna (*"HILANGKAN IN
    - Menjamin seluruh konten dan tombol aksi utama `[data-ob-advance]` ("Lanjut") tampak 100% di dalam *viewport* tanpa perlu scrolling di seluruh perangkat.
    - Pada iPhone SE (375x667), media query `@media (max-height: 700px)` secara cerdas menyembunyikan panggung maskot (`.fiezel-stage { display: none !important; }`) dan teks catatan non-esensial (`.fiezel-note { display: none !important; }`), menghemat ruang vertikal >150px sehingga `advBottom: 525.9px <= 667px` (`fits: true`).
    - Pada layar standar mobile (iPhone 14/15 390x844), `advBottom: 757.9px <= 844px` (`fits: true`).
+4. **Pembersihan Kartu Raksasa Home ("今日の言葉 · KATA HARI INI")**:
+   - Menghapus komponen `wordOfDayMarkup` dari kokpit beranda utama (`todayHomeMarkup`) di `app.js` karena mengganggu aliran mata dan memakan ruang lipatan pertama (*above-the-fold*). Salinan tetap dipertahankan tersembunyi di dalam `.fz-tactile-audit-vault` agar integritas penelusuran audit tetap terpenuhi.
+5. **Eliminasi Void & Optimalisasi Tata Letak Panel Kana Desktop**:
+   - Mengatasi ruang kosong melompong (*empty void*) di sebelah kanan tabel Dakuon (25 huruf vs 46 huruf Gojūon) dengan menghadirkan wadah panduan fonetik eksklusif (`.ja-kana-guide-box`) yang menerangkan hukum penambahan tanda tenten (゛) dan maru (゜).
+   - Memperbaiki posisi bilah navigasi kiri (`nav.bottomnav`) di desktop agar terkunci mantap (`position: fixed !important; z-index: 100 !important;`), menghilangkan kolom kosong selebar 232px yang sebelumnya tertinggal.
+   - Memberikan kontras tajam pada kartu huruf Kana (`.kana-cell b` charcoal `#0F172A`, `.kana-cell small` slate `#64748B`, latar putih `#FFFFFF` bertepi `#E2E8F0`), mengeliminasi regresi teks putih pada latar terang.
 
 ---
 
@@ -81,6 +87,15 @@ Pengujian empiris dilakukan menggunakan skrip probe `tools/dev/probe-japanese-on
    - Sinkronisasi Hexa-Sync resmi versi `m025-694`.
 5. `tools/dev/probe-japanese-onboarding.mjs`:
    - Skrip probe otomasi Playwright dengan asersi zero-scroll (390x844 & 375x667), kontras warna tombol Kana, dan tiadanya badge Braincore di chip kata.
+6. `app.js`:
+   - Menghapus rendering visible `wordOfDayMarkup` dari `todayHomeMarkup` (disimpan tersembunyi di `.fz-tactile-audit-vault`).
+   - Mendaftarkan `.fz-view-kana` saat navigasi ke layar Kana untuk memicu ekspansi kolom desktop.
+7. `features/japanese/fiezel-ja-ui.js`, `fiezel-2.css`:
+   - Penambahan wadah panduan fonetik `.ja-kana-guide-box` dan tata letak grid seimbang 2-kolom pada resolusi desktop.
+8. `features/ui/fiezel-tactile-clay.css`, `features/ui/mobile-edge-fit.css`, `features/japanese/fiezel-kakijun-studio.css`:
+   - Penataan kontras warna daylight clay untuk aksara Kana (`#0F172A`), fiksasi bilah navigasi kiri di desktop (`position: fixed !important`), dan perluasan kontainer utama ke 1160px.
+9. `features/i18n/copy-id-bahasa.js`, `features/i18n/copy-th-bahasa.js`:
+   - Pendaftaran kunci terjemahan dwibahasa untuk tips fonetik Kana (`jepang.kana-guide-badge`, `jepang.kana-guide-title`, `jepang.kana-guide-desc`).
 
 ---
 

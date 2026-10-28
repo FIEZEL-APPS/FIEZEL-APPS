@@ -4601,15 +4601,21 @@ html body .ja-kana .kana-tab[aria-selected="true"] {
   font-weight: 800 !important;
 }
 .ja-kana .kana-cell {
-  background: #181826 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+}
+.ja-kana .kana-cell.is-empty {
+  background: transparent !important;
+  border: none !important;
   box-shadow: none !important;
 }
 .ja-kana .kana-cell b {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 .ja-kana .kana-cell small {
-  color: #FFE02E !important;
+  color: #64748B !important;
   font-weight: 700 !important;
 }
 

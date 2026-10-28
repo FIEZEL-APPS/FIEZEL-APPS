@@ -587,6 +587,20 @@ body.fz-ja-no-furigana ruby.ja-word rt,body.fz-ja-no-furigana ruby.ja-word rp{di
   outline-offset: 2px;
 }
 
+.ja-kana {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.ja-kana-section {
+  background: #FFFFFF !important;
+  border: 1.5px solid #F1F5F9 !important;
+  border-radius: 20px !important;
+  padding: 18px 20px 22px !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+}
+
 .ja-kana .kana-cell {
   aspect-ratio: 1 / 1;
   max-width: 76px;
@@ -594,15 +608,81 @@ body.fz-ja-no-furigana ruby.ja-word rt,body.fz-ja-no-furigana ruby.ja-word rp{di
   margin: 0 auto;
 }
 
+.ja-kana-guide-box {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  border: 1.5px solid #E2E8F0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+}
+
+.ja-kana-guide-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #7E2D3B;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.ja-kana-guide-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+
+.ja-kana-guide-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #475569;
+  margin: 0 0 12px;
+}
+
+.ja-kana-guide-pairs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+  font-size: 12px;
+}
+
+.ja-kana-guide-pairs span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  color: #334155;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ja-kana-guide-pairs b {
+  color: #0F172A;
+}
+
 @media (min-width: 900px) {
   .ja-kana-layout {
     display: grid !important;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) !important;
-    gap: 28px !important;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) !important;
+    gap: 24px !important;
     align-items: start !important;
   }
   .ja-kana-layout .kana-heading {
     margin-top: 6px !important;
+  }
+  .ja-kana .kana-cell {
+    max-width: 84px !important;
   }
 }
 

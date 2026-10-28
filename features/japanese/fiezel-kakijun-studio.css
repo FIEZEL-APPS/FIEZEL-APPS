@@ -680,6 +680,17 @@ button.kana-cell:active {
   box-shadow: inset 0 -1px 0 var(--line-soft);
 }
 
+button.kana-cell b,
+.kana-cell b {
+  color: #0F172A !important;
+}
+
+button.kana-cell small,
+.kana-cell small {
+  color: #64748B !important;
+  font-weight: 700 !important;
+}
+
 /* ==========================================================================
    書き順アニメーション (Stroke Order Demonstration Animation)
    ========================================================================== */
