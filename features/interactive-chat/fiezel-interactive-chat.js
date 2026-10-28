@@ -77,10 +77,32 @@
         }
       }
 
-      // Direct native mounting into #app, zero iframe
-      if (api && typeof api.mount === 'function') {
-        api.mount(mountPoint);
+      var locale = 'id';
+      try {
+        if (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th') {
+          locale = 'th';
+        }
+      } catch (_) {}
+      var existingFrame = mountPoint.querySelector('#fzMitraKaiwaStudioFrame');
+      if (existingFrame && existingFrame.getAttribute('data-lang') === lang && existingFrame.getAttribute('data-locale') === locale) {
+        return;
       }
+      var pageBuild = '';
+      try {
+        pageBuild = String(root.FIEZEL_PAGE_BUILD || '');
+      } catch (_) {}
+      var nonce = '';
+      try {
+        if (api && api.StudioBridge && typeof api.StudioBridge.begin === 'function') {
+          nonce = api.StudioBridge.begin();
+        }
+      } catch (_) {}
+      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
+      var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
+      mountPoint.innerHTML =
+        '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
+        '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone *; autoplay *; camera *" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
+        '</div>';
     };
   }
 }(typeof globalThis !== 'undefined' ? globalThis : window, function (root) {
