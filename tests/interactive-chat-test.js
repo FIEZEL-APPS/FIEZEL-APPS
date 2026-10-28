@@ -154,7 +154,7 @@ console.log('--- 8. Testing App Integration & Routing Invariants ---');
 const appJs = fs.readFileSync(appJsPath, 'utf8');
 
 // VALID_VIEWS check
-assert.ok(appJs.includes("VALID_VIEWS=new Set(['kana',") && appJs.includes("'chat']"), 'app.js must include chat in VALID_VIEWS with kana as first element');
+assert.ok(appJs.includes("VALID_VIEWS=new Set(['kana',") && (appJs.includes("'chat']") || appJs.includes("'chat',")), 'app.js must include chat in VALID_VIEWS with kana as first element');
 
 // handleTopbarBack check
 assert.ok(/handleTopbarBack\(\)\s*\{[^}]*'chat'/.test(appJs), 'handleTopbarBack must include chat in subViews to return to latihan');

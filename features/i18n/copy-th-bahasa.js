@@ -291,6 +291,7 @@
     'jepang.moshi-card-note': '模試 · จำลองการสอบทางการ JLPT N5–N1',
     'jepang.kata-hari-ini': '今日の言葉 · คำศัพท์วันนี้',
     'jepang.kanji-modal-title': 'ฝึกฝนตัวอักษรคันจิ',
+    'jepang.loading-story': 'กำลังเตรียมบทเรียนนิทาน...',
     'jepang.moshi-modal-title': 'จำลองข้อสอบ JLPT Moshi',
     'jepang.kanji-empty': 'ยังไม่มีข้อมูลคันจิสำหรับระดับนี้',
     'jepang.moshi-empty': 'คลังข้อสอบจำลอง JLPT อยู่ระหว่างการจัดเตรียม',

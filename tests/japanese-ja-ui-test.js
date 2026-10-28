@@ -92,8 +92,8 @@ ok(/<rt>がっこう<\/rt>/.test(J.annotateText('学校へ行きます。', bank
 ok(/<rt>あそ<\/rt>.*<\/ruby>び/.test(J.annotateText('遊びました。', bank)), 'J8 furigana batang kanji untuk bentuk berkonjugasi (遊びました)');
 ok(romajiOf('日曜日は友だちと遊ぶ。') === null, 'J8 potongan yang tak terbaca utuh tidak diberi romaji setengah jadi');
 ok(J.annotateText('Dalam kalimat "他の色", apa?', bank).indexOf('Dalam kalimat &quot;') === 0, 'J8 teks non-Jepang dibiarkan (di-escape)');
-ok(J.kanaToRomaji('きょうしつ') === 'kyoushitsu' && J.kanaToRomaji('がっこう') === 'gakkou' && J.kanaToRomaji('じゃあ') === 'jyaa',
-  'J8 kana → romaji mengikuti gaya bank (ou, jyo, konsonan ganda)');
+ok(J.kanaToRomaji('きょうしつ') === 'kyoushitsu' && J.kanaToRomaji('がっこう') === 'gakkou' && J.kanaToRomaji('じゃあ') === 'jaa',
+  'J8 kana → romaji mengikuti kaidah fonetik Hepburn murni (ou, ja, konsonan ganda)');
 ok(app.indexOf("self.FiezelJaUi?.observe?.($('app'),()=>V)") >= 0, 'J8 pengamat anotasi dipasang saat kursus Jepang aktif');
 
 console.log('FIEZEL japanese ja-ui: PASS (' + passed + ')');

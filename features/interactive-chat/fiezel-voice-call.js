@@ -97,6 +97,42 @@
     return String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim();
   }
 
+  function stripEmojisAndEmotWords(text) {
+    if (!text) return '';
+    return String(text)
+      .replace(/[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1FA70}-\u{1FAFF}\u{FE00}-\u{FE0F}]/gu, '')
+      .replace(/\*[^*]+\*/g, '')
+      .replace(/\b(?:smiling|grinning|beaming|laughing|winking)\s+face(?:\s+with\s+[^.,!?:;]+)?/gi, '')
+      .replace(/\b(?:face\s+with\s+tears\s+of\s+joy|rofl|lol|lmao)\b/gi, '')
+      .replace(/\b(?:wajah\s+tersenyum|senyum\s+lebar|tertawa|senyuman)\b/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  function formatJaFurigana(text) {
+    try {
+      if (typeof root !== 'undefined' && root.FiezelInteractiveChat && typeof root.FiezelInteractiveChat.formatFurigana === 'function') {
+        return root.FiezelInteractiveChat.formatFurigana(text);
+      }
+      if (typeof window !== 'undefined' && window.FiezelInteractiveChat && typeof window.FiezelInteractiveChat.formatFurigana === 'function') {
+        return window.FiezelInteractiveChat.formatFurigana(text);
+      }
+    } catch (_) {}
+    return esc(stripFurigana(text));
+  }
+
+  function getJaRomaji(text) {
+    try {
+      if (typeof root !== 'undefined' && root.FiezelInteractiveChat && typeof root.FiezelInteractiveChat.getRomaji === 'function') {
+        return root.FiezelInteractiveChat.getRomaji(text);
+      }
+      if (typeof window !== 'undefined' && window.FiezelInteractiveChat && typeof window.FiezelInteractiveChat.getRomaji === 'function') {
+        return window.FiezelInteractiveChat.getRomaji(text);
+      }
+    } catch (_) {}
+    return '';
+  }
+
   var ECHO_MIN_CHARS = 8;
   var ECHO_WINDOW_MS = 1800;
 
@@ -527,7 +563,7 @@
 
     function playSpeech(text, course) {
       var cv = chatVoice();
-      var clean = stripFurigana(text);
+      var clean = stripEmojisAndEmotWords(stripFurigana(text));
       if (!clean || !cv || typeof cv.speak !== 'function') return Promise.resolve(false);
       var isJa = course === 'ja';
       var started = false;
@@ -548,7 +584,7 @@
         persona: state.persona,
         onSentenceStart: function (i, sentence) {
           aiSpeechStartTime = Date.now();
-          aiCurrentSpeakingText = stripFurigana(sentence || clean);
+          aiCurrentSpeakingText = stripEmojisAndEmotWords(stripFurigana(sentence || clean));
           if (!started) {
             started = true;
             emit('speechStart', { isJa: isJa, text: clean, persona: state.persona, voice: state.partnerVoice });
@@ -2108,6 +2144,7 @@
         // Live Subtitle Card
         '<div class="fzc-call-subtitle-card" id="fzcCallSubtitleCard">' +
         '<div class="fzc-call-sub-text fzc-call-transcript-text" id="fzcCallSubText">' + t('call_sub_connecting', 'Mempersiapkan audio...') + '</div>' +
+        '<div class="fzc-call-sub-romaji fzc-romaji" id="fzcCallSubRomaji" style="display:none;"></div>' +
         '<div class="fzc-call-sub-trans" id="fzcCallSubTrans"></div>' +
         '<div class="fzc-call-diag-container" id="fzcCallDiagContainer"></div>' +
         '<div class="fzc-call-sample-container" id="fzcCallSampleContainer"></div>' +
@@ -2434,16 +2471,43 @@
     }
 
     function updateSubtitleUI(text, role, translation) {
-      var displayText = stripFurigana(text);
+      var isJa = (state.course === 'ja' || /[\u3040-\u30ff\u4e00-\u9faf]/.test(text));
+      var isConversational = role === 'assistant' || role === 'user';
+      var clean = isJa ? stripEmojisAndEmotWords(text) : String(text || '').trim();
+      var displayText = stripFurigana(clean);
+
       if (orbInstance && typeof orbInstance.setTranscript === 'function') {
         orbInstance.setTranscript(displayText, translation, role);
       }
       if (!overlayEl) return;
       var subText = overlayEl.querySelector('#fzcCallSubText');
+      var subRomaji = overlayEl.querySelector('#fzcCallSubRomaji');
       var subTrans = overlayEl.querySelector('#fzcCallSubTrans');
 
       if (subText) {
         subText.textContent = displayText || '';
+        if (isJa && isConversational) {
+          subText.innerHTML = formatJaFurigana(clean);
+          subText.classList.add('fzc-japanese-text');
+        } else {
+          subText.classList.remove('fzc-japanese-text');
+        }
+      }
+
+      if (subRomaji) {
+        if (isJa && isConversational) {
+          var roma = getJaRomaji(clean);
+          if (roma) {
+            subRomaji.textContent = roma;
+            subRomaji.style.display = 'block';
+          } else {
+            subRomaji.textContent = '';
+            subRomaji.style.display = 'none';
+          }
+        } else {
+          subRomaji.textContent = '';
+          subRomaji.style.display = 'none';
+        }
       }
 
       if (subTrans) {

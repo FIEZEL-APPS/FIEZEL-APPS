@@ -300,6 +300,7 @@
     'jepang.moshi-card-note': '模試 · simulasi resmi JLPT N5–N1',
     'jepang.kata-hari-ini': '今日の言葉 · kata hari ini',
     'jepang.kanji-modal-title': 'Latihan Huruf Kanji',
+    'jepang.loading-story': 'Menyiapkan modul cerita...',
     'jepang.moshi-modal-title': 'Simulasi Ujian JLPT Moshi',
     'jepang.kanji-empty': 'Belum ada data kanji untuk level ini.',
     'jepang.moshi-empty': 'Bank soal simulasi JLPT sedang disiapkan.',

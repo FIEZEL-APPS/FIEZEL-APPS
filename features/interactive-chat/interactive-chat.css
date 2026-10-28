@@ -1604,6 +1604,27 @@ body.fz-ja-no-romaji .fzc-romaji {
   line-height: 1.25;
 }
 
+.fzc-suggestion-chip .fzc-chip-romaji {
+  font-size: 0.72rem;
+  color: #574A50;
+  font-style: italic;
+  display: block;
+  line-height: 1.25;
+  margin-top: 2px;
+}
+
+body.fz-ja-no-romaji .fzc-suggestion-chip .fzc-chip-romaji {
+  display: none !important;
+}
+
+.fzc-suggestion-chip .fzc-chip-trans {
+  font-size: 0.72rem;
+  color: var(--fzc-ink-muted);
+  display: block;
+  line-height: 1.25;
+  margin-top: 2px;
+}
+
 /* ── User Misconception Hint Callout ── */
 .fzc-user-hint {
   background: #FFF4F2;
@@ -3038,6 +3059,37 @@ body.fz-ja-no-romaji .fzc-romaji {
   font-weight: 600;
   color: #FDFAF3;
   line-height: 1.4;
+}
+
+.fzc-call-sub-romaji {
+  font-size: 0.78rem;
+  color: #E2D7DD;
+  font-style: italic;
+  margin-top: 4px;
+  line-height: 1.35;
+  display: none;
+}
+
+.fzc-call-sub-text.fzc-japanese-text ruby {
+  ruby-align: center !important;
+  ruby-position: over !important;
+  -webkit-ruby-position: before !important;
+}
+
+.fzc-call-sub-text.fzc-japanese-text rt {
+  font-size: 0.65em !important;
+  color: #FCD34D !important;
+  font-weight: 700 !important;
+  display: ruby-text !important;
+  text-align: center !important;
+}
+
+body.fz-ja-no-furigana .fzc-call-sub-text rt {
+  display: none !important;
+}
+
+body.fz-ja-no-romaji .fzc-call-sub-romaji {
+  display: none !important;
 }
 
 .fzc-call-sub-trans {
