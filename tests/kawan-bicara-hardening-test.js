@@ -430,6 +430,296 @@ console.log('\n--- TEST 10: Persona DRY Canonical Consistency & Furigana Fix ---
   console.log('✓ Persona DRY canonical consistency and furigana repair verified.');
 }
 
+// --- TEST 11: Anti-Iframe Cloaking & Native DOM Integrity Verification ---
+console.log('\n--- TEST 11: Anti-Iframe Cloaking & Native DOM Integrity Verification ---');
+{
+  class MockDOMElement {
+    constructor(tag, id = '', className = '') {
+      this.tagName = (tag || 'DIV').toUpperCase();
+      this.id = id;
+      this.classList = {
+        _classes: new Set(className ? className.split(/\s+/).filter(Boolean) : []),
+        add: (...cls) => cls.forEach(c => this.classList._classes.add(c)),
+        remove: (...cls) => cls.forEach(c => this.classList._classes.delete(c)),
+        toggle: (c, force) => {
+          if (force === undefined) {
+            if (this.classList._classes.has(c)) this.classList._classes.delete(c);
+            else this.classList._classes.add(c);
+          } else if (force) {
+            this.classList._classes.add(c);
+          } else {
+            this.classList._classes.delete(c);
+          }
+          return this.classList._classes.has(c);
+        },
+        contains: (c) => this.classList._classes.has(c)
+      };
+      this.children = [];
+      this.parentNode = null;
+      this.style = {
+        setProperty: (k, v) => { this.style[k] = v; },
+        removeProperty: (k) => { delete this.style[k]; }
+      };
+      this.attributes = {};
+      this._listeners = {};
+      this.textContent = '';
+      this._innerHTML = '';
+    }
+
+    get className() {
+      return Array.from(this.classList._classes).join(' ');
+    }
+
+    set className(val) {
+      this.classList._classes = new Set(String(val || '').split(/\s+/).filter(Boolean));
+    }
+
+    get innerHTML() {
+      return this._innerHTML || '';
+    }
+
+    set innerHTML(html) {
+      this._innerHTML = String(html || '');
+      this.children = [];
+      if (!html) return;
+      const tagRegex = /<([a-zA-Z0-9]+)\s*([^>]*)>(?:([^<]*)(?:<\/\1>)?)?/g;
+      let match;
+      while ((match = tagRegex.exec(html)) !== null) {
+        const tag = match[1];
+        if (tag.startsWith('/')) continue;
+        const attrs = match[2] || '';
+        const text = match[3] ? match[3].trim() : '';
+        const idMatch = /id=["']([^"']+)["']/.exec(attrs);
+        const classMatch = /class=["']([^"']+)["']/.exec(attrs);
+        const el = new MockDOMElement(tag, idMatch ? idMatch[1] : '', classMatch ? classMatch[1] : '');
+        const attrRegex = /([a-zA-Z0-9_-]+)=["']([^"']*)["']/g;
+        let am;
+        while ((am = attrRegex.exec(attrs)) !== null) {
+          el.setAttribute(am[1], am[2]);
+        }
+        if (text) el.textContent = text;
+        el.parentNode = this;
+        this.children.push(el);
+      }
+    }
+
+    setAttribute(k, v) { this.attributes[k] = String(v); }
+    getAttribute(k) { return this.attributes[k] !== undefined ? this.attributes[k] : null; }
+    removeAttribute(k) { delete this.attributes[k]; }
+
+    appendChild(child) {
+      child.parentNode = this;
+      this.children.push(child);
+      return child;
+    }
+
+    removeChild(child) {
+      const idx = this.children.indexOf(child);
+      if (idx >= 0) {
+        this.children.splice(idx, 1);
+        child.parentNode = null;
+      }
+      return child;
+    }
+
+    remove() {
+      if (this.parentNode) this.parentNode.removeChild(this);
+    }
+
+    contains(child) {
+      if (this === child) return true;
+      for (const c of this.children) {
+        if (c === child || (c.contains && c.contains(child))) return true;
+      }
+      return false;
+    }
+
+    addEventListener(evt, fn) {
+      if (!this._listeners[evt]) this._listeners[evt] = [];
+      this._listeners[evt].push(fn);
+    }
+
+    removeEventListener(evt, fn) {
+      if (!this._listeners[evt]) return;
+      this._listeners[evt] = this._listeners[evt].filter(f => f !== fn);
+    }
+
+    click() {
+      const evt = { type: 'click', target: this, preventDefault: () => {}, stopPropagation: () => {} };
+      if (typeof this.onclick === 'function') this.onclick(evt);
+      const handlers = this._listeners['click'] || [];
+      handlers.forEach(h => h(evt));
+    }
+
+    querySelector(sel) {
+      if (sel.includes(',')) {
+        const parts = sel.split(',').map(s => s.trim());
+        for (const p of parts) {
+          const found = this._findFirst(p);
+          if (found) return found;
+        }
+        return null;
+      }
+      return this._findFirst(sel);
+    }
+
+    querySelectorAll(sel) {
+      const res = [];
+      this._findAll(sel, res);
+      return res;
+    }
+
+    _matches(sel) {
+      if (!sel) return false;
+      if (sel.includes('[') && sel.includes(']')) {
+        const idx = sel.indexOf('[');
+        const pre = sel.slice(0, idx);
+        const post = sel.slice(idx);
+        if (pre && !this._matches(pre)) return false;
+        const inside = post.slice(1, -1);
+        const eqIdx = inside.indexOf('=');
+        if (eqIdx !== -1) {
+          const attrName = inside.slice(0, eqIdx);
+          let attrVal = inside.slice(eqIdx + 1);
+          if ((attrVal.startsWith('"') && attrVal.endsWith('"')) || (attrVal.startsWith("'") && attrVal.endsWith("'"))) {
+            attrVal = attrVal.slice(1, -1);
+          }
+          return this.getAttribute(attrName) === attrVal;
+        }
+        return this.getAttribute(inside) !== null;
+      }
+      if (sel.startsWith('#')) return this.id === sel.slice(1);
+      if (sel.startsWith('.')) return this.classList.contains(sel.slice(1));
+      return this.tagName.toLowerCase() === sel.toLowerCase();
+    }
+
+    _findFirst(sel) {
+      if (this._matches(sel)) return this;
+      for (const child of this.children) {
+        if (child instanceof MockDOMElement) {
+          const found = child._findFirst(sel);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    _findAll(sel, res) {
+      if (this._matches(sel)) res.push(this);
+      for (const child of this.children) {
+        if (child instanceof MockDOMElement) {
+          child._findAll(sel, res);
+        }
+      }
+    }
+  }
+
+  // Setup DOM container for native mounting
+  const appEl = new MockDOMElement('DIV', 'app');
+  const bodyEl = new MockDOMElement('BODY');
+  bodyEl.appendChild(appEl);
+
+  global.document.body = bodyEl;
+  global.document.documentElement = new MockDOMElement('HTML');
+  global.document.getElementById = (id) => bodyEl.querySelector('#' + id);
+  global.document.querySelector = (sel) => bodyEl.querySelector(sel);
+  global.document.querySelectorAll = (sel) => bodyEl.querySelectorAll(sel);
+  global.document.createElement = (tag) => new MockDOMElement(tag);
+
+  let navigatedTo = null;
+  global.state = { view: 'chat', _previousView: 'latihan' };
+  global.go = function (v) {
+    navigatedTo = v;
+    global.state.view = v;
+  };
+
+  // 11.1 Native Chat Mounting: calling root.interactiveChatView() directly mounts native DOM to #app
+  assert.strictEqual(typeof global.interactiveChatView, 'function', 'interactiveChatView must be exported on root');
+  global.interactiveChatView();
+
+  const mountedContainer = document.getElementById('fzcContainer');
+  const mountedFeed = document.getElementById('fzcFeed');
+  const mountedInput = document.getElementById('fzcInput');
+
+  assert.ok(mountedContainer, 'Native #fzcContainer must be directly mounted to DOM');
+  assert.strictEqual(mountedContainer.tagName, 'SECTION', '#fzcContainer must be a semantic SECTION element');
+  assert.ok(mountedFeed, 'Native #fzcFeed must be directly mounted to DOM');
+  assert.strictEqual(mountedFeed.tagName, 'DIV', '#fzcFeed must be a DIV element');
+  assert.ok(mountedInput, 'Native #fzcInput must be directly mounted to DOM');
+  assert.strictEqual(mountedInput.tagName, 'TEXTAREA', '#fzcInput must be a TEXTAREA element');
+  assert.ok(appEl.contains(mountedContainer), '#fzcContainer must be mounted inside #app container');
+
+  // 11.2 Anti-Iframe Cloaking Assertion
+  const mountedIframe = document.querySelector('iframe');
+  const allIframes = document.querySelectorAll('iframe');
+  const legacyFrame = document.getElementById('fzMitraKaiwaStudioFrame');
+  const legacyFrameQuery = document.querySelector('#fzMitraKaiwaStudioFrame');
+
+  assert.strictEqual(mountedIframe, null, 'document.querySelector("iframe") must be strictly null (Anti-Iframe Cloaking)');
+  assert.strictEqual(allIframes.length, 0, 'document.querySelectorAll("iframe") must return exactly 0 elements');
+  assert.strictEqual(appEl.innerHTML.includes('<iframe'), false, 'Mounted #app innerHTML must contain zero <iframe> tags');
+  assert.strictEqual(legacyFrame, null, 'Legacy frame #fzMitraKaiwaStudioFrame must be completely nonexistent via getElementById');
+  assert.strictEqual(legacyFrameQuery, null, 'Legacy frame #fzMitraKaiwaStudioFrame must be completely nonexistent via querySelector');
+
+  // Source-level audit for zero iframe in interactive-chat mounting
+  const fs = require('fs');
+  const path = require('path');
+  const chatFile = path.join(__dirname, '..', 'features', 'interactive-chat', 'fiezel-interactive-chat.js');
+  const chatJs = fs.readFileSync(chatFile, 'utf8');
+  assert(!chatJs.includes('<iframe id="fzMitraKaiwaStudioFrame"'), 'Zero <iframe id="fzMitraKaiwaStudioFrame"> in fiezel-interactive-chat.js');
+  assert(!chatJs.includes('fzMitraKaiwaStudioFrame" data-lang'), 'Zero fzMitraKaiwaStudioFrame mounting markup in fiezel-interactive-chat.js');
+
+  // 11.3 Scenario Switching (Native)
+  const ramenChip = appEl.querySelector('.fzc-scenario-chip[data-scenario="ramen"]');
+  assert.ok(ramenChip, 'Scenario chip for ramen must exist in scenarios rail');
+  ramenChip.click();
+  assert.strictEqual(chatEngine.getState().scenarioId, 'ramen', 'Clicking scenario chip must natively update state.scenarioId to "ramen"');
+
+  const konbiniChip = appEl.querySelector('.fzc-scenario-chip[data-scenario="konbini"]');
+  assert.ok(konbiniChip, 'Scenario chip for konbini must exist');
+  konbiniChip.click();
+  assert.strictEqual(chatEngine.getState().scenarioId, 'konbini', 'Clicking scenario chip must natively update state.scenarioId to "konbini"');
+
+  // 11.4 Scenario Goal Tracking (Native & Zero-Dumbing)
+  const ramenScenario = {
+    id: 'ramen',
+    goals: [
+      { id: 'g1', text: 'Pilih varian kuah' },
+      { id: 'g2', text: 'Tentukan tekstur mie' },
+      { id: 'g3', text: 'Selesai / terima kasih' }
+    ]
+  };
+  const ramenUserTurns = [
+    { role: 'user', text: '豚骨ラーメンをお願いします' },
+    { role: 'assistant', text: 'かしこまりました。麺の硬さはいかがなさいますか？' },
+    { role: 'user', text: '硬めでお願いします！' },
+    { role: 'assistant', text: 'へい、お待ち！' },
+    { role: 'user', text: 'ごちそうさまでした！美味しかったです。' }
+  ];
+  const evaluatedGoals = chatEngine.evaluateGoalProgress(ramenScenario, ramenUserTurns);
+  assert.ok(Array.isArray(evaluatedGoals), 'evaluateGoalProgress must return array of evaluated goals');
+  assert.strictEqual(evaluatedGoals.length, 3, 'Must evaluate all 3 scenario goals');
+  assert.strictEqual(evaluatedGoals[0].done, true, 'Goal 1 (kuah selection) completed');
+  assert.strictEqual(evaluatedGoals[1].done, true, 'Goal 2 (tekstur mie) completed');
+  assert.strictEqual(evaluatedGoals[2].done, true, 'Goal 3 (salam selesai) completed');
+
+  // Negative test: unrelated input must NOT falsely complete goals (Zero-Potemkin)
+  const unmatchingTurns = [{ role: 'user', text: 'こんにちは、いい天気ですね' }];
+  const falseGoals = chatEngine.evaluateGoalProgress(ramenScenario, unmatchingTurns);
+  assert.strictEqual(falseGoals[0].done, false, 'Unrelated message must not complete goal 1');
+  assert.strictEqual(falseGoals[1].done, false, 'Unrelated message must not complete goal 2');
+  assert.strictEqual(falseGoals[2].done, false, 'Unrelated message must not complete goal 3');
+
+  // 11.5 Back Navigation (Native)
+  const backBtn = appEl.querySelector('#fzcBtnBack');
+  assert.ok(backBtn, '#fzcBtnBack must exist in chat header');
+  backBtn.click();
+  assert.strictEqual(navigatedTo, 'latihan', 'Clicking #fzcBtnBack must navigate back to previous view (latihan)');
+  assert.strictEqual(chatEngine.isMounted(), false, 'Chat engine must cleanly unmount upon back navigation');
+
+  console.log('✓ Anti-Iframe Cloaking, Native DOM Integrity, Scenario Switching, Goal Tracking, and Back Navigation verified.');
+}
+
 console.log('\n======================================================');
-console.log('ALL KAWAN BICARA HARDENING TESTS PASSED SUCCESSFULLY! (10/10)');
+console.log('ALL KAWAN BICARA HARDENING TESTS PASSED SUCCESSFULLY! (11/11)');
 console.log('======================================================\n');

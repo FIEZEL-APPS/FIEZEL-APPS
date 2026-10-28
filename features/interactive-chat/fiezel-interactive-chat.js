@@ -20,7 +20,6 @@
     root.FiezelInteractiveChat = api;
     root.interactiveChatView = function () {
       // Pastikan seluruh sisa overlay panggilan lama (legacy fzcCallOverlay) dibersihkan
-      // sehingga tidak menimpa atau menutupi tampilan bersih Studio Suara (call.html).
       try {
         var oldOverlay = document.getElementById('fzcCallOverlay');
         if (oldOverlay && oldOverlay.parentNode) oldOverlay.parentNode.removeChild(oldOverlay);
@@ -28,48 +27,60 @@
           root.FiezelVoiceCall.stop();
         }
       } catch (_) {}
+
       var mountPoint = typeof document !== 'undefined' ? document.getElementById('app') : null;
       if (!mountPoint) return;
+
       if (typeof document !== 'undefined') {
-        if (document.documentElement) document.documentElement.classList.add('fz-view-chat');
-        if (document.body) document.body.classList.add('fz-view-chat');
+        if (document.documentElement) {
+          document.documentElement.classList.add('fz-view-chat');
+        }
+        if (document.body) {
+          document.body.classList.add('fz-view-chat');
+          document.body.classList.remove('fz-stage-home');
+        }
       }
-      var lang = 'en';
+
+      // Sinkronisasi target course aktif ('ja' atau 'en')
+      var lang = 'ja';
       try {
-        if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
+        if (typeof root.activeTargetLang === 'function') {
+          var atl = root.activeTargetLang();
+          if (atl === 'ja' || atl === 'en') lang = atl;
+        } else if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
           lang = 'ja';
-        } else if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function' && root.FiezelI18n.getCourse() === 'ja') {
-          lang = 'ja';
-        } else if (typeof localStorage !== 'undefined' && localStorage.getItem('fz_target_course') === 'ja') {
-          lang = 'ja';
+        } else if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
+          var c = root.FiezelI18n.getCourse();
+          if (c === 'ja' || c === 'en') lang = c;
+        } else if (typeof localStorage !== 'undefined') {
+          var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel-active-course') || localStorage.getItem('fiezel_target_lang');
+          if (stored === 'ja' || stored === 'en') lang = stored;
         }
       } catch (_) {}
-      var locale = 'id';
+
       try {
-        if (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th') {
-          locale = 'th';
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('fiezel-active-course', lang);
+          localStorage.setItem('fz_target_course', lang);
         }
       } catch (_) {}
-      var existingFrame = mountPoint.querySelector('#fzMitraKaiwaStudioFrame');
-      if (existingFrame && existingFrame.getAttribute('data-lang') === lang && existingFrame.getAttribute('data-locale') === locale) {
-        return;
+
+      if (api && typeof api.getState === 'function') {
+        var chatState = api.getState();
+        if (chatState && chatState.course !== lang) {
+          chatState.course = lang;
+          if (typeof api.initScenario === 'function') {
+            var scList = typeof api.getScenarios === 'function' ? api.getScenarios(lang) : null;
+            var defaultSid = (scList && scList[0] && scList[0].id) ? scList[0].id : (lang === 'ja' ? 'scen_ja_n5_kissaten' : 'intro');
+            api.initScenario(defaultSid);
+          }
+        }
       }
-      var pageBuild = '';
-      try {
-        pageBuild = String(root.FIEZEL_PAGE_BUILD || '');
-      } catch (_) {}
-      var nonce = '';
-      try {
-        if (api && api.StudioBridge && typeof api.StudioBridge.begin === 'function') {
-          nonce = api.StudioBridge.begin();
-        }
-      } catch (_) {}
-      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
-      var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
-      mountPoint.innerHTML =
-        '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
-        '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone *; autoplay *; camera *" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
-        '</div>';
+
+      // Direct native mounting into #app, zero iframe
+      if (api && typeof api.mount === 'function') {
+        api.mount(mountPoint);
+      }
     };
   }
 }(typeof globalThis !== 'undefined' ? globalThis : window, function (root) {
@@ -129,12 +140,15 @@
         if (atl === 'ja') return 'ja';
         if (atl === 'en') return 'en';
       }
+      if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
+        return 'ja';
+      }
       if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
         var c = root.FiezelI18n.getCourse();
         if (c === 'ja') return 'ja';
         if (c === 'en') return 'en';
       }
-      var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel_target_lang') || localStorage.getItem('fiezel_course');
+      var stored = (typeof localStorage !== 'undefined') && (localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel-active-course') || localStorage.getItem('fiezel_target_lang') || localStorage.getItem('fiezel_course'));
       if (stored === 'ja') return 'ja';
       if (stored === 'en') return 'en';
     } catch (_) {}
@@ -1950,14 +1964,16 @@
     if (state.scenarioId && state.messages && state.messages.length > 0) {
       state.scenarioHistories[histKeyFor(state.course, state.scenarioId)] = state.messages;
     }
-    state.scenarioId = id;
+    var currentSc = getScenario(id);
+    var resolvedId = (currentSc && currentSc.id) ? currentSc.id : id;
+    state.scenarioId = resolvedId;
     state.replySource = '';
-    var histKey = histKeyFor(state.course, id);
+    var histKey = histKeyFor(state.course, resolvedId);
     var cached = state.scenarioHistories && state.scenarioHistories[histKey];
     if (cached && cached.length > 0 && isMatchingCourse(cached, state.course)) {
       state.messages = cached;
     } else {
-      state.messages = [starterMessage(id)];
+      state.messages = [starterMessage(resolvedId)];
       state.scenarioHistories[histKey] = state.messages;
     }
   }
@@ -3914,7 +3930,7 @@
       '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
 
     return (
-      '<section class="fade fzc-container fzc-chat-wrapper" data-active-scenario="' + esc(state.scenarioId) + '" data-active-course="' + esc(course) + '">' +
+      '<section id="fzcContainer" class="fade fzc-container fzc-chat-wrapper" data-active-scenario="' + esc(state.scenarioId) + '" data-active-course="' + esc(course) + '">' +
       '<div class="fzc-header">' +
       '<div class="fzc-partner-bar">' +
       '<button type="button" class="fzc-btn-back" id="fzcBtnBack" aria-label="' + esc(t('chat_back_btn_aria', 'Kembali')) + '" title="' + esc(t('chat_back_btn_aria', 'Kembali')) + '">' +
@@ -4673,6 +4689,7 @@
         if (document.documentElement) document.documentElement.classList.add('fz-view-chat');
         if (document.body) {
           document.body.classList.add('fz-view-chat');
+          document.body.classList.remove('fz-stage-home');
         }
       }
       var mountPoint = el || document.getElementById('app');
@@ -4850,7 +4867,9 @@
     getPersonas: function (c) {
       var course = c || state.course || 'ja';
       return PERSONAS[course === 'ja' ? 'ja' : 'en'] || PERSONAS.ja;
-    }
+    },
+    isMounted: function () { return isChatMounted; },
+    isChatMounted: function () { return isChatMounted; }
   };
 
   // Auto-teardown on mobile app switch / page hide / tab backgrounding
