@@ -1,9 +1,9 @@
 # FIEZEL · Handoff Dossier: Universal Japanese Furigana Ruby & Phonetic Romaji Overhaul
 
-**Nomor Rilis**: `m025-703`  
-**Branch**: `feat/universal-ja-furigana-romaji-m025-702`  
-**Otoritas**: OWNER / Subagent 5 (QA Empirical Probe & Content Integrity Gatekeeper)  
-**Status**: SELESAI & TERVERIFIKASI EMPIRIS PENUH (100% HIJAU)  
+**Nomor Rilis**: `m025-703`
+**Branch**: `feat/universal-ja-furigana-romaji-m025-702`
+**Otoritas**: OWNER / Subagent 5 (QA Empirical Probe & Content Integrity Gatekeeper)
+**Status**: SELESAI & TERVERIFIKASI EMPIRIS PENUH (100% HIJAU)
 
 ---
 
@@ -11,7 +11,7 @@
 
 Pembaruan arsitektural berskala besar ini mereformasi total seluruh ekosistem bahasa Jepang di FIEZEL Apps dengan jaminan **Zero-Bare-Kanji Invariant** (0% kanji tanpa furigana) dan **100% Phonetic Romaji Availability** di seluruh permukaan aplikasi murid (180 teks bacaan, cerita berjenjang/Graded Stories N5, kuis miskonsepsi Braincore, dan obrolan interaktif AI Kaiwa).
 
-Sebelum rilis ini, kanji dalam bacaan dan latihan sering kali gundul (bare kanji) tanpa furigana ruby, romaji kerap kali kosong (`undefined`/`null`), transliterasi fonetik mengalami anomali (misal `jya`/`jyu` alih-alih Hepburn murni `ja`/`ju`, partikel `wa`/`o`/`e` bocor sebagai `ha`/`wo`/`he`, dan kata-kata berkana kecil terputus di tengah jalan). 
+Sebelum rilis ini, kanji dalam bacaan dan latihan sering kali gundul (bare kanji) tanpa furigana ruby, romaji kerap kali kosong (`undefined`/`null`), transliterasi fonetik mengalami anomali (misal `jya`/`jyu` alih-alih Hepburn murni `ja`/`ju`, partikel `wa`/`o`/`e` bocor sebagai `ha`/`wo`/`he`, dan kata-kata berkana kecil terputus di tengah jalan).
 
 Melalui kolaborasi orkestrator multi-agent (Subagent 1 s/d 5), FIEZEL kini dipersenjatai dengan:
 1. **Master Japanese Lexicon & Kanji Engine** (`fiezel-ja-dictionary.js`): 6.128 kata majemuk, 1.561 batang okurigana, 1.653 kanji tunggal, 20 pola penghitung counter numerik.

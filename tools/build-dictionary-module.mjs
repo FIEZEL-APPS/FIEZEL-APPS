@@ -195,4 +195,3 @@ console.log('File size: ' + (stat.size / 1024).toFixed(1) + ' KB');
 console.log('WORDS:', wordsEntries.length);
 console.log('STEMS:', stemsEntries.length);
 console.log('SINGLE:', Object.keys(sortedSingle).length);
-
