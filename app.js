@@ -8580,14 +8580,6 @@ function startWelcomeExperience(){
         dismissBootSplash();
         return openApp();
       }
-      /* m025-703 ZERO-MODAL COLLISION & FIRST-TOUCH SERENITY (AGENTS.md):
-         Murid baru (onboarding belum selesai) WAJIB disambut langsung oleh dialog onboarding,
-         bebas dari tabrakan izin notifikasi atau dinding login Google di detik pertama.
-         Semua pengenalan dan latihan awal bisa dinikmati tanpa login. */
-      if(!onboardingDone){
-        dismissBootSplash();
-        if(showOnboarding(at)?.shown===true)return null;
-      }
       if(authGateNeeded()){showAuthGate(at,proceed);return null}
       /* m025-576: penanda lokal bilang "sudah masuk", tetapi server boleh berkata lain
          (penanda sisa kunjungan di browser, sesi kedaluwarsa). Jawabannya sudah ditanyakan
@@ -8602,7 +8594,10 @@ function startWelcomeExperience(){
       bootAuthVerdictUsed=true;
       if(bootAuth==='signed-out'){forgetLocalAuth();showAuthGate(at,proceed);return null}
       followUpAuthCheck(bootAuth);
-      if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
+      if(!onboardingDone){
+        dismissBootSplash();
+        if(showOnboarding(at)?.shown===true)return null;
+      }
       if(askLearnerNameIfMissing(at))return null;
       maybeSyncLearnerName(at);
       return startNotificationInvitation()
@@ -9345,6 +9340,13 @@ function teacherPreviewActive(){
 }
 function authGateNeeded(){
   if(teacherPreviewActive())return false;
+  /* m025-704 / AGENTS.md Rule 7: Zero-Modal Collision & First-Touch Serenity
+     Murid baru (onboarding belum selesai) WAJIB menikmati pengalaman selamat datang & latihan pertama dulu. */
+  try{
+    if(self.FiezelOnboarding && typeof self.FiezelOnboarding.completed === 'function' && !self.FiezelOnboarding.completed(self)){
+      return false;
+    }
+  }catch(_){}
   const A=self.FiezelAuthScreen;
   if(!A||typeof A.show!=='function')return false;
   if(A.readSession(self))return false;
