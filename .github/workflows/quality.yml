@@ -812,6 +812,16 @@ jobs:
           node tests/ai-conversation-task-test.js
           # M025-649: gerbang fonetik Jepang, furigana ruby, romaji wa/o/e eksak, dan anti-bocor emoji.
           node tests/japanese-phonetics-test.js
+          # M025-703: Master Japanese Dictionary (6,128 compounds + stems + single kanji)
+          node tests/japanese-dictionary-test.js
+          # M025-703: Universal Japanese Furigana & Phonetic Hepburn Romaji Engine
+          node tests/japanese-universal-furigana-test.js
+          # M025-703: Graded Story Reader integration & ruby/romaji verification
+          node tests/story-reader-integration-test.js
+          # M025-703: Story Reader to Braincore bridge telemetry & BKT/Misconception ledger
+          node tests/story-brain-bridge-test.js
+          # M025-703: Interactive Kaiwa Chat universal furigana ruby & romaji live subtitles
+          node tests/interactive-chat-universal-furigana-test.js
           # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat
           # sesudah gerbang kontrak task karena keduanya menguji berkas yang sama dari dua sisi:
           # yang di atas menjaga bentuk PERMINTAAN (klien tidak mengirim prompt), yang ini menjaga
