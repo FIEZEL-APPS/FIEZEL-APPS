@@ -1,0 +1,1015 @@
+{
+  "schema": "fiezel-chokai-storyboard-plates-v1",
+  "generatedAt": "2026-10-27T23:07:04.278Z",
+  "totalPlates": 63,
+  "plates": [
+    {
+      "id": "jlpt-n5-m1-01",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Instruksi Belajar di Kelas",
+      "situation": "Guru perempuan sedang memberikan instruksi tugas kepada murid laki-laki di dalam kelas.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A bright Japanese school classroom bathed in soft morning light, wooden desks and chalkboards. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m1-01.webp"
+    },
+    {
+      "id": "jlpt-n5-m1-02",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Membeli Buah di Supermarket",
+      "situation": "Dua orang mahasiswa laki-laki dan perempuan sedang berbelanja bahan makanan untuk acara makan bersama.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A clean, brightly illuminated modern Japanese supermarket aisle with neatly arranged fresh produce. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m1-02.webp"
+    },
+    {
+      "id": "jlpt-n5-m1-03",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Janji Bertemu di Stasiun",
+      "situation": "Seorang wanita dan seorang pria menelepon untuk menentukan lokasi bertemu di stasiun kereta.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A calm Japanese transit station platform with scenic railway lines and soft natural daylight. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m1-03.webp"
+    },
+    {
+      "id": "jlpt-n5-m1-04",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Memilih Payung Saat Hari Hujan",
+      "situation": "Ibu dan anak laki-lakinya berbicara sebelum anak berangkat ke sekolah saat cuaca mendung.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A bright Japanese school classroom bathed in soft morning light, wooden desks and chalkboards. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m1-04.webp"
+    },
+    {
+      "id": "jlpt-n5-m2-01",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Alasan Tidak Datang ke Pesta",
+      "situation": "Seorang pria bertanya kepada temannya mengapa kemarin temannya tidak hadir di pesta.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m2-01.webp"
+    },
+    {
+      "id": "jlpt-n5-m2-02",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Mencari Kunci Rumah",
+      "situation": "Seorang pria mencari kuncinya yang hilang dan bertanya kepada temannya.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A minimalist Japanese apartment interior with warm tatami mats and soft ambient daylight. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m2-02.webp"
+    },
+    {
+      "id": "jlpt-n5-m2-03",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Jadwal Kursus Bahasa Jepang",
+      "situation": "Seorang siswa menanyakan jadwal kelas bahasa Jepang kepada staf resepsionis sekolah bahasa.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A bright Japanese school classroom bathed in soft morning light, wooden desks and chalkboards. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m2-03.webp"
+    },
+    {
+      "id": "jlpt-n5-m2-04",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Minuman Favorit",
+      "situation": "Di sebuah kafe, seorang pria dan wanita membicarakan minuman yang akan dipesan.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A cozy minimalist Kyoto cafe with light timber hinoki tables and delicate porcelain cups. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m2-04.webp"
+    },
+    {
+      "id": "jlpt-n5-m3-01",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Masuk ke Ruang Guru / Kantor",
+      "situation": "Seorang murid hendak mengetuk pintu dan masuk ke dalam ruangan guru.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A bright Japanese school classroom bathed in soft morning light, wooden desks and chalkboards. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m3-01.webp"
+    },
+    {
+      "id": "jlpt-n5-m3-02",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Berpamitan Meninggalkan Rumah",
+      "situation": "Seorang anak bersiap-siap berangkat sekolah dan berpamitan kepada ibunya di rumah.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A bright Japanese school classroom bathed in soft morning light, wooden desks and chalkboards. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m3-02.webp"
+    },
+    {
+      "id": "jlpt-n5-m3-03",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Memberikan Hadiah / Oleh-oleh",
+      "situation": "Anda memberikan bingkisan kue oleh-oleh kepada teman Anda.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m3-03.webp"
+    },
+    {
+      "id": "jlpt-n5-m4-01",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Komentar Cuaca Hari Ini",
+      "situation": "Seseorang menyapa Anda di halte bus membicarakan hawa dingin hari ini.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A picturesque Japanese street during gentle rain, transparent umbrellas and reflective wet asphalt. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m4-01.webp"
+    },
+    {
+      "id": "jlpt-n5-m4-02",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Menanyakan Kepemilikan Barang",
+      "situation": "Seseorang menunjuk sebuah tas tertinggal di atas bangku kelas.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A bright Japanese school classroom bathed in soft morning light, wooden desks and chalkboards. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m4-02.webp"
+    },
+    {
+      "id": "jlpt-n5-m4-03",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Ajakan Minum Teh Bersama",
+      "situation": "Teman sekelas mengajak Anda untuk pergi minum teh setelah selesai kuliah.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A bright Japanese school classroom bathed in soft morning light, wooden desks and chalkboards. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m4-03.webp"
+    },
+    {
+      "id": "jlpt-n5-m4-04",
+      "type": "jlpt_listening",
+      "level": "N5",
+      "title": "Menanyakan Hasil Tes Kemarin",
+      "situation": "Teman sekelas menanyakan bagaimana ujian yang baru berlangsung kemarin.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A bright Japanese school classroom bathed in soft morning light, wooden desks and chalkboards. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n5-m4-04.webp"
+    },
+    {
+      "id": "jlpt-n4-m1-01",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Tugas Part-time di Restoran",
+      "situation": "Manajer restoran memberikan instruksi persiapan sebelum restoran buka kepada staf paruh waktu baru.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A traditional Japanese restaurant dining area with sliding shoji paper doors and warm cedar wood. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m1-01.webp"
+    },
+    {
+      "id": "jlpt-n4-m1-02",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Petunjuk Meminum Obat dari Dokter",
+      "situation": "Seorang dokter menjelaskan aturan minum obat flu kepada pasien di klinik.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A clean, welcoming Japanese medical clinic reception with quiet, comforting architectural lighting. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m1-02.webp"
+    },
+    {
+      "id": "jlpt-n4-m1-03",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Memilih Kereta ke Bandara",
+      "situation": "Seorang wanita bertanya kepada staf stasiun tentang kereta tercepat dan termurah menuju bandara Narita.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A calm Japanese transit station platform with scenic railway lines and soft natural daylight. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m1-03.webp"
+    },
+    {
+      "id": "jlpt-n4-m1-04",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Persiapan Pesta Perpisahan",
+      "situation": "Dua orang rekan kerja sedang membagi tugas belanja untuk pesta perpisahan seorang kolega.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A clean, brightly illuminated modern Japanese supermarket aisle with neatly arranged fresh produce. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m1-04.webp"
+    },
+    {
+      "id": "jlpt-n4-m2-01",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Alasan Keterlambatan Tiba di Kantor",
+      "situation": "Seorang karyawan laki-laki meminta maaf kepada atasannya karena terlambat tiba di kantor.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m2-01.webp"
+    },
+    {
+      "id": "jlpt-n4-m2-02",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Kesan Menonton Film Bioskop",
+      "situation": "Dua orang teman baru saja keluar dari bioskop dan saling membicarakan film yang mereka tonton.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A serene cinema foyer in central Tokyo with gentle architectural lighting and cinematic poster frames. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m2-02.webp"
+    },
+    {
+      "id": "jlpt-n4-m2-03",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Tempat yang Batal Dikunjungi di Kyoto",
+      "situation": "Seorang wanita menceritakan perjalanan wisatanya ke Kyoto kepada teman kantornya.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m2-03.webp"
+    },
+    {
+      "id": "jlpt-n4-m2-04",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Kesulitan Belajar Bahasa Jepang",
+      "situation": "Seorang mahasiswa asing berbicara dengan gurunya mengenai bagian tersulit dalam belajar bahasa Jepang.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m2-04.webp"
+    },
+    {
+      "id": "jlpt-n4-m3-01",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Meminta Izin Pulang Lebih Awal",
+      "situation": "Anda sedang berada di tempat kerja paruh waktu dan merasa badan demam sehingga ingin pamit pulang cepat.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m3-01.webp"
+    },
+    {
+      "id": "jlpt-n4-m3-02",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Menolak Ajakan Secara Sopan",
+      "situation": "Teman mengajak Anda nonton bioskop malam ini, tapi Anda sudah ada janji lain.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A serene cinema foyer in central Tokyo with gentle architectural lighting and cinematic poster frames. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m3-02.webp"
+    },
+    {
+      "id": "jlpt-n4-m3-03",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Ucapan Setelah Ditraktir Makan Malam",
+      "situation": "Atasan di kantor mentraktir Anda makan malam di restoran setelah lembur selesai.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m3-03.webp"
+    },
+    {
+      "id": "jlpt-n4-m4-01",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Menawarkan Bantuan Membawa Barang",
+      "situation": "Rekan kantor melihat Anda membawa banyak kardus dokumen tebal.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m4-01.webp"
+    },
+    {
+      "id": "jlpt-n4-m4-02",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Mengonfirmasi Jam Rapat Besok",
+      "situation": "Rekan kerja bertanya memastikan jam berapa rapat direksi dimulai besok pagi.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m4-02.webp"
+    },
+    {
+      "id": "jlpt-n4-m4-03",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Tawaran Tambah Kopi",
+      "situation": "Tuan rumah menawarkan secangkir kopi lagi kepada tamu yang berkunjung.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A cozy minimalist Kyoto cafe with light timber hinoki tables and delicate porcelain cups. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m4-03.webp"
+    },
+    {
+      "id": "jlpt-n4-m4-04",
+      "type": "jlpt_listening",
+      "level": "N4",
+      "title": "Menanyakan Arah Jalan ke Stasiun",
+      "situation": "Seseorang di jalan menyapa Anda dan menanyakan arah menuju stasiun terdekat.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A calm Japanese transit station platform with scenic railway lines and soft natural daylight. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n4-m4-04.webp"
+    },
+    {
+      "id": "jlpt-n3-m1-01",
+      "type": "jlpt_listening",
+      "level": "N3",
+      "title": "Persiapan Rapat Divisi Sore Ini",
+      "situation": "Di kantor, seorang kepala seksi sedang memberikan instruksi persiapan rapat sore kepada staf perempuan.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n3-m1-01.webp"
+    },
+    {
+      "id": "jlpt-n3-m1-02",
+      "type": "jlpt_listening",
+      "level": "N3",
+      "title": "Pengembalian dan Pemesanan Buku di Perpustakaan",
+      "situation": "Seorang mahasiswa laki-laki sedang berbicara dengan petugas resepsionis di loket perpustakaan kampus.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A quiet Japanese library interior with floor-to-ceiling wooden bookshelves and warm study lamps. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n3-m1-02.webp"
+    },
+    {
+      "id": "jlpt-n3-m2-01",
+      "type": "jlpt_listening",
+      "level": "N3",
+      "title": "Alasan Utama Pindah Apartemen",
+      "situation": "Sepasang rekan kerja sedang mengobrol saat jam istirahat mengenai apartemen baru si pria.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A minimalist Japanese apartment interior with warm tatami mats and soft ambient daylight. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n3-m2-01.webp"
+    },
+    {
+      "id": "jlpt-n3-m2-02",
+      "type": "jlpt_listening",
+      "level": "N3",
+      "title": "Perubahan Jadwal Pemotretan Klub Fotografi",
+      "situation": "Dua anggota klub fotografi kampus sedang mendiskusikan jadwal kegiatan pemotretan akhir pekan.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n3-m2-02.webp"
+    },
+    {
+      "id": "jlpt-n3-m3-01",
+      "type": "jlpt_listening",
+      "level": "N3",
+      "title": "Meminta Izin Pengumpulan Laporan Terlambat",
+      "situation": "Di ruang dosen, seorang mahasiswa menjelaskan kendala laptop rusak menjelang tenggat pengumpulan laporan sore ini.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n3-m3-01.webp"
+    },
+    {
+      "id": "jlpt-n3-m3-02",
+      "type": "jlpt_listening",
+      "level": "N3",
+      "title": "Menawarkan Bantuan kepada Atasan",
+      "situation": "Di lobi gedung kantor, staf perempuan melihat kepala seksinya hendak mengangkat tumpukan kardus brosur seorang diri.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n3-m3-02.webp"
+    },
+    {
+      "id": "jlpt-n3-m4-01",
+      "type": "jlpt_listening",
+      "level": "N3",
+      "title": "Merespons Pujian atas Presentasi",
+      "situation": "Rekan kerja memuji kejelasan grafik dalam presentasi yang baru saja Anda sampaikan.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n3-m4-01.webp"
+    },
+    {
+      "id": "jlpt-n3-m4-02",
+      "type": "jlpt_listening",
+      "level": "N3",
+      "title": "Menanggapi Kekhawatiran Tertinggal Kereta Ekspres",
+      "situation": "Teman seperjalanan panik melihat jam karena kereta ekspres akan berangkat dalam 5 menit.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A calm Japanese transit station platform with scenic railway lines and soft natural daylight. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n3-m4-02.webp"
+    },
+    {
+      "id": "jlpt-n2-m1-01",
+      "type": "jlpt_listening",
+      "level": "N2",
+      "title": "Revisi Dokumen Penawaran Harga sebelum Dikirim",
+      "situation": "Seorang kepala divisi sedang memeriksa draf surat penawaran harga bersama staf perempuan.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n2-m1-01.webp"
+    },
+    {
+      "id": "jlpt-n2-m1-02",
+      "type": "jlpt_listening",
+      "level": "N2",
+      "title": "Penanganan Darurat Keluhan Barang Pecah",
+      "situation": "Di divisi layanan pelanggan toko daring, staf perempuan melapor kepada kepala seksi mengenai keluhan pembeli.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n2-m1-02.webp"
+    },
+    {
+      "id": "jlpt-n2-m2-01",
+      "type": "jlpt_listening",
+      "level": "N2",
+      "title": "Penyebab Rendahnya Pembelian Ulang Minuman Baru",
+      "situation": "Dua staf pemasaran sedang menganalisis hasil survei konsumen atas produk minuman herbal baru.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A cozy minimalist Kyoto cafe with light timber hinoki tables and delicate porcelain cups. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n2-m2-01.webp"
+    },
+    {
+      "id": "jlpt-n2-m2-02",
+      "type": "jlpt_listening",
+      "level": "N2",
+      "title": "Kriteria Pemilihan Pembicara Simposium",
+      "situation": "Seorang profesor dan mahasiswi pascasarjana sedang memilih pembicara tamu untuk simposium lingkungan di universitas.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n2-m2-02.webp"
+    },
+    {
+      "id": "jlpt-n2-m3-01",
+      "type": "jlpt_listening",
+      "level": "N2",
+      "title": "Menolak Permintaan Diskon Tambahan dari Klien",
+      "situation": "Seorang staf penjualan berkonsultasi dengan kepala divisi sebelum membalas permintaan potongan harga tambahan dari mitra bisnis.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n2-m3-01.webp"
+    },
+    {
+      "id": "jlpt-n2-m3-02",
+      "type": "jlpt_listening",
+      "level": "N2",
+      "title": "Inti Keberatan terhadap Sistem Jadwal Kerja Baru",
+      "situation": "Dua perawat klinik sedang mendiskusikan uji coba aturan penjadwalan shift baru sebelum rapat staf dimulai.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n2-m3-02.webp"
+    },
+    {
+      "id": "jlpt-n2-m4-01",
+      "type": "jlpt_listening",
+      "level": "N2",
+      "title": "Merespons Dugaan Kuat Atasan (～ないはずがない)",
+      "situation": "Kepala seksi heran mengapa Yamada belum mengikuti prosedur baru yang sudah diumumkan kemarin.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n2-m4-01.webp"
+    },
+    {
+      "id": "jlpt-n2-m4-02",
+      "type": "jlpt_listening",
+      "level": "N2",
+      "title": "Menanggapi Penolakan Jadwal Secara Halus",
+      "situation": "Mitra bisnis dari perusahaan lain menanggapi usulan jadwal rapat hari Rabu melalui telepon.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n2-m4-02.webp"
+    },
+    {
+      "id": "jlpt-n1-m1-01",
+      "type": "jlpt_listening",
+      "level": "N1",
+      "title": "Penyesuaian Strategi Peluncuran Aplikasi Keuangan",
+      "situation": "Manajer produk melaporkan hasil uji beban server menjelang peluncuran aplikasi baru kepada kepala divisi.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n1-m1-01.webp"
+    },
+    {
+      "id": "jlpt-n1-m1-02",
+      "type": "jlpt_listening",
+      "level": "N1",
+      "title": "Revisi Analisis Data Disertasi Pascasarjana",
+      "situation": "Seorang mahasiswi program doktor berkonsultasi dengan profesor pembimbing mengenai naskah draf disertasinya.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n1-m1-02.webp"
+    },
+    {
+      "id": "jlpt-n1-m2-01",
+      "type": "jlpt_listening",
+      "level": "N1",
+      "title": "Faktor Penghambat Sinergi Pasca-Merger Perusahaan Logistik",
+      "situation": "Dua analis industri sedang membahas kinerja keuangan dua perusahaan logistik daerah setahun setelah bergabung.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n1-m2-01.webp"
+    },
+    {
+      "id": "jlpt-n1-m2-02",
+      "type": "jlpt_listening",
+      "level": "N1",
+      "title": "Kekhawatiran Kurator atas Pameran Restorasi Digital",
+      "situation": "Seorang jurnalis perempuan mewawancarai kepala divisi konservasi museum mengenai proyeksi restorasi digital lukisan kuno.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n1-m2-02.webp"
+    },
+    {
+      "id": "jlpt-n1-m3-01",
+      "type": "jlpt_listening",
+      "level": "N1",
+      "title": "Ralat Angka Buklet secara Elegan di Awal Rapat Klien",
+      "situation": "Sesaat sebelum rapat dengan klien dimulai, staf junior menyadari angka pada buklet cetak masih memakai angka sementara.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n1-m3-01.webp"
+    },
+    {
+      "id": "jlpt-n1-m3-02",
+      "type": "jlpt_listening",
+      "level": "N1",
+      "title": "Kritik atas Efektivitas Subsidi Renovasi Rumah Kosong",
+      "situation": "Dua perencana tata kota mendiskusikan kebijakan baru pemerintah kota mengenai subsidi perbaikan bangunan tua tak berpenghuni.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A minimalist Japanese apartment interior with warm tatami mats and soft ambient daylight. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n1-m3-02.webp"
+    },
+    {
+      "id": "jlpt-n1-m4-01",
+      "type": "jlpt_listening",
+      "level": "N1",
+      "title": "Merespons Litotes Bisnis N1 (あながち～ない)",
+      "situation": "Kepala divisi menimbang apakah tenggat ketat yang diminta klien sebenarnya masih mungkin disanggupi.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n1-m4-01.webp"
+    },
+    {
+      "id": "jlpt-n1-m4-02",
+      "type": "jlpt_listening",
+      "level": "N1",
+      "title": "Merespons Kritik Birokrasi Berlebihan (本末転倒)",
+      "situation": "Rekan kerja mengeluhkan alur persetujuan keamanan internal yang berlapis-lapis hingga menghambat pekerjaan utama.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-n1-m4-02.webp"
+    },
+    {
+      "id": "jlpt-c2-m1-01",
+      "type": "jlpt_listening",
+      "level": "N1+",
+      "title": "Mitigasi Klausul Paten Turunan Menjelang Penandatanganan Aliansi",
+      "situation": "Kepala divisi hukum dan negosiator utama meninjau draf akhir nota kesepahaman riset bersama pada malam sebelum seremoni penandatanganan.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-c2-m1-01.webp"
+    },
+    {
+      "id": "jlpt-c2-m1-02",
+      "type": "jlpt_listening",
+      "level": "N1+",
+      "title": "Penanganan Sengketa Telaah Sejawat di Dewan Redaksi Jurnal",
+      "situation": "Pemimpin redaksi jurnal akademik (profesor) dan redaktur pelaksana membahas naskah kontroversial yang mendapat penilaian bertolak belakang dari dua penelaah.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-c2-m1-02.webp"
+    },
+    {
+      "id": "jlpt-c2-m2-01",
+      "type": "jlpt_listening",
+      "level": "N1+",
+      "title": "Titik Buta Automasi AI terhadap Pewarisan Keahlian Pengrajin",
+      "situation": "Dalam program diskusi mendalam, seorang pewawancara menanyakan dampak sistem inspeksi AI di pabrik lensa presisi kepada sosiolog industri.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-c2-m2-01.webp"
+    },
+    {
+      "id": "jlpt-c2-m2-02",
+      "type": "jlpt_listening",
+      "level": "N1+",
+      "title": "Kritik Sastra terhadap Terjemahan Modern Novel Klasik",
+      "situation": "Dua kritikus sastra sedang mengulas edisi saduran bahasa modern dari sebuah novel psikologis era Meiji.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A quiet Japanese library interior with floor-to-ceiling wooden bookshelves and warm study lamps. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-c2-m2-02.webp"
+    },
+    {
+      "id": "jlpt-c2-m3-01",
+      "type": "jlpt_listening",
+      "level": "N1+",
+      "title": "Diplomasi Ruang Rapat Direksi Menangguhkan Ekspansi Serentak",
+      "situation": "Penasihat eksternal baru saja mengusulkan pembukaan cabang di tiga negara sekaligus; kepala divisi membisikkan arahan kepada ketua tim perencanaan sebelum ia angkat bicara.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-c2-m3-01.webp"
+    },
+    {
+      "id": "jlpt-c2-m3-02",
+      "type": "jlpt_listening",
+      "level": "N1+",
+      "title": "Sikap Kritis terhadap Transparansi Ekstrem di Dalam Organisasi",
+      "situation": "Dua konsultan manajemen mendiskusikan tren perusahaan yang merekam serta membuka seluruh obrolan rapat penjajakan ke semua karyawan.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "A sleek Tokyo corporate office meeting space with floor-to-ceiling glass windows overlooking the city. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-c2-m3-02.webp"
+    },
+    {
+      "id": "jlpt-c2-m4-01",
+      "type": "jlpt_listening",
+      "level": "N1+",
+      "title": "Merespons Idiom Klasik C2 (二の足を踏む・渡りに船)",
+      "situation": "Profesor gembira menceritakan tawaran kolaborasi riset dari lembaga luar di saat anggaran laboratorium sedang seret.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-c2-m4-01.webp"
+    },
+    {
+      "id": "jlpt-c2-m4-02",
+      "type": "jlpt_listening",
+      "level": "N1+",
+      "title": "Menanggapi Kerendahan Hati Tingkat Tinggi (買いかぶり・根回し)",
+      "situation": "Rekan senior merendah saat dipuji berhasil menyatukan kesepakatan negosiasi yang pelik.",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "An authentic Japanese everyday environment with exquisite architectural perspective and peaceful atmosphere. A serene and authentic scene set in Japan, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Wide-angle establishing shot showcasing Japanese architecture, clean cedar wood textures, and atmospheric perspective.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Cinematic Kyoto Travertine Anime"
+      },
+      "suggestedLocalFilename": "chokai_plate_jlpt-c2-m4-02.webp"
+    },
+    {
+      "id": "news-2026-10-28-shinkansen",
+      "type": "daily_news_chokai",
+      "level": "N5-N4",
+      "title": "Uji Coba Kereta Cepat Otomatis di Jalur Tokyo",
+      "headline": "JR東日本、新幹線の自動運転の試験に成功",
+      "aspectRatio": "16:9",
+      "geminiPrompt": {
+        "prompt": "Modern Tokyo train platform and futuristic sleek Shinkansen bullet train during daytime, pristine Japanese transit architecture, warm sunlight casting gentle shadows on concrete platform, high-end Japanese anime background art, Makoto Shinkai atmospheric depth, Studio Ghibli handcrafted painterly warmth, soft natural daylight travertine ambient lighting (#FDFAF3 tones), pristine architectural line art, golden hour sunlight filtering through lush greenery, clean composition, 8k resolution visual fidelity. Clean, professional news broadcast visual plate.",
+        "negativePrompt": "deformed hands, extra fingers, mutated limbs, distorted anime eyes, facial anomalies, text, words, letters, kanji watermark, subtitles, speech bubbles, blurry textures, oversaturated neon lights, dark empty voids, low quality 3d render, cgi claymation",
+        "aspectRatio": "16:9",
+        "safetySettings": "strict",
+        "targetStyle": "Modern Tokyo Shinkansen Architecture"
+      },
+      "suggestedLocalFilename": "news_plate_news-2026-10-28-shinkansen.webp"
+    }
+  ]
+}

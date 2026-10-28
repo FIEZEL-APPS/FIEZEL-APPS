@@ -144,3 +144,102 @@ When the user brings a Google Stitch design:
 ## Git Protection Rule
 - **WAJIB PULL REQUEST (PR)**: Setiap kali ada perbaikan bug, penambahan fitur, atau perubahan apapun yang akan digabungkan (merge) ke branch `main`, **WAJIB membuat Pull Request (PR) terlebih dahulu**. DILARANG KERAS melakukan push atau merge langsung ke `main` tanpa melalui PR.
 - **NEVER COMMIT OR PUSH REDESIGN**: Jangan pernah melakukan `git commit` maupun `git push` untuk seluruh aset, berkas, mockup, dan kode redesign ini ke repositori git tanpa perintah tertulis eksplisit dari pengguna. Seluruh hasil kerja tetap berada di lingkungan lokal/preview.
+
+
+## 11. AI Voice Studio Entrypoint Purity & True Mitra Kaiwa Invariant (Haram Menghapus Voice Studio)
+1. **Pintu Masuk Resmi Kawan Bicara / Mitra Kaiwa Studio (`call.html`)**:
+   - `call.html` adalah sub-aplikasi resmi FIEZEL (paket Vite/React terisolasi) yang menjadi tuan rumah AI Voice Call Studio, Gemini Live WebSockets (`wss://fiezel.my.id/api/live-call`), audio ducking, duplex interruption, dan maskot resmi 3D Volumetric Daifuku Mochi Three.js (`mochi-mascot/fiezel-mochi.js`).
+   - Kawan Bicara (`state.view === 'chat'`) WAJIB me-mount `call.html` ke `#app` melalui `#fzMitraKaiwaStudioFrame` lengkap dengan sinkronisasi bahasa (`lang`), token nonce aman (`StudioBridge`), dan parameter build (`?v=m025-XXX`).
+   - DILARANG KERAS merombak atau mengganti `call.html` dengan obrolan teks usang tahun 2026. Fitur Kawan Bicara adalah AI Voice Studio interaktif dua arah.
+2. **Eliminasi Total Maskot PAW Kucing Kuning Lama**:
+   - DILARANG KERAS memunculkan kembali gambar atau aset maskot kucing kuning PAW lama di layar mana pun (baik di Kawan Bicara, latihan kuis, onboarding, maupun home).
+   - Seluruh avatar dan visualisasi maskot WAJIB menggunakan Mochi (3D WebGL Three.js companion atau render resmi Mochi).
+3. **Haram Menyelubungi Fitur Native Lain di Balik Iframe Bohongan (Anti-Duplicate Wrappers)**:
+   - Modul pembelajaran native (Kana, Kanji, Vocab, Grammar, Reading, Writing, Story) WAJIB me-render langsung ke `#app` via DOM native dan DILARANG dibungkus ke dalam iframe tiruan.
+
+## 12. Multi-Agent Concurrency & Zero-Collision Deployment Protocol (Protokol Anti-Tabrakan Antar-Agent)
+Di lingkungan di mana beberapa agent bekerja secara simultan di workspace dan repositori yang sama, setiap agent WAJIB mematuhi protokol anti-tabrakan berikut:
+
+1. **Mandatory Isolated Git Worktree (Haram Bekerja Bersama di Root Directory)**:
+   - DILARANG melakukan pengeditan berkas rilis langsung di root workspace `c:\Users\hp\fiezel-apps` jika ada agent lain yang sedang aktif bekerja atau ada perubahan tak berkomitmen milik pengguna.
+   - Setiap agent WAJIB membuat worktree terisolasi di direktori saudara:
+     ```bash
+     git worktree add ../fiezel-<topik>-<agentShortId> -b feat/<topik>-m025-XXX origin/main
+     ```
+   - Seluruh siklus edit, unit test, build-bump, dan commit dijalankan 100% di dalam worktree tersebut, menjaga root workspace tetap steril.
+
+2. **Pre-Bump Concurrency Probe (Pencegahan Tabrakan Nomor Build)**:
+   - DILARANG berasumsi nomor build berikutnya hanya `origin/main + 1`.
+   - Sebelum menjalankan `bump-build.mjs`, agent WAJIB memeriksa PR terbuka milik agent lain:
+     ```bash
+     gh pr list --repo FIEZEL-APPS/FIEZEL-APPS --state open --json number,title,headRefName
+     ```
+   - Jika ada PR terbuka yang mengklaim versi `m025-699`, maka agent yang baru WAJIB mengklaim versi di atasnya (`m025-700`). Tidak boleh ada dua PR aktif dengan nomor build yang sama.
+
+3. **Sequential Merge Queue & Deploy Interlock (Antrian Tunggal Merge ke Main)**:
+   - DILARANG menggabungkan (merge) PR ke `main` saat pipeline `FIEZEL Quality Gate` atau `FIEZEL Deploy Site` milik agent lain sedang berjalan di branch `main`.
+   - Periksa alur kerja aktif sebelum merge:
+     ```bash
+     gh run list --repo FIEZEL-APPS/FIEZEL-APPS --branch main --limit 3
+     ```
+   - Jika ada run yang sedang `in_progress`, agent WAJIB menunggu hingga statusnya `completed` dan terbit di server produksi. Menggabungkan PR saat deploy sedang berjalan akan memicu *race condition* pada Service Worker cache (`sw.js`) dan berisiko menimpa berkas rilis dengan aset lama.
+
+4. **Mandatory Fast-Forward / Rebase Sebelum Merge**:
+   - Jika ada agent lain yang berhasil merge ke `main` lebih dulu, PR milik agent yang tertinggal WAJIB di-rebase atau diselaraskan dengan commit terbaru `origin/main`:
+     ```bash
+     git fetch origin main && git rebase origin/main
+     ```
+   - Selaraskan kembali nomor build jika versi sebelumnya sudah terpakai oleh agent yang mendahului.
+
+5. **Post-Release Teardown Hygiene**:
+   - Setelah PR berhasil dimerge dan bita server terverifikasi via `curl.exe`, agent WAJIB membersihkan worktree lokalnya:
+     ```bash
+     git worktree remove ../fiezel-<topik>-<agentShortId>
+     ```
+
+6. **Pre-PR Rebase & Conflict-Free Invariant (Haram PR Berstatus CONFLICTING)**:
+   - Sebelum membuka PR atau meminta merge, agent WAJIB melakukan:
+     ```bash
+     git fetch origin main && git rebase origin/main
+     ```
+   - Periksa status mergeable PR:
+     ```bash
+     gh pr view <nomor-pr> --json mergeable
+     ```
+   - DILARANG membiarkan PR berstatus `"CONFLICTING"`. Jika `main` telah diperbarui oleh PR lain, PR yang tertinggal WAJIB langsung di-rebase di atas commit `origin/main` terbaru.
+
+## 13. Zero-Crash DOM Defensive Guard & Null-Dereference Invariant
+1. **Defensive Guard pada Seluruh Handler DOM Global**:
+   - Seluruh fungsi pengendali dialog/DOM global (`openModal()`, `closeModal()`, `setApp()`, `syncNavActivePill()`, dll.) WAJIB memeriksa keberadaan elemen target sebelum manipulasi:
+     ```javascript
+     const modal = $('modal');
+     if (!modal) return;
+     modal.classList.remove('hidden');
+     ```
+   - DILARANG KERAS memanggil `.classList.add/remove()`, `.setAttribute()`, atau `.focus()` langsung tanpa *null guard*.
+   - Kegagalan dialog atau perubahan elemen DOM tidak boleh melempar `TypeError: Cannot read properties of null (reading 'classList')` yang dapat membekukan *event loop* antarmuka murid.
+
+## 14. Route & View-Reachability Purity (Haram Dangling Views di `VALID_VIEWS`)
+1. **Integritas Penyelarasan Rute**:
+   - Setiap rute yang terdaftar di `VALID_VIEWS` (`app.js`) WAJIB memiliki fungsi tampilan yang valid dan aktif di `renderInner()`.
+   - DILARANG menambahkan nama view ke `VALID_VIEWS` tanpa implementasi fungsi render aktif.
+   - DILARANG meninggalkan alias view usang atau eksperimen mati yang tidak memiliki pintu masuk pengguna yang sah (mencegah kegagalan *view-reachability gate* di CI).
+
+## 15. All-Point Query String & Cache Version Alignment (Octa-Sync Invariant)
+1. **Penyelarasan Query Param Seluruh HTML**:
+   - Selain 6 titik resmi Hexa-Sync, seluruh berkas HTML turunan (`call.html`, `features/voice-studio/call.html`, dll.) yang memuat berkas CSS atau JavaScript dengan query string `?v=m025-XXX` WAJIB diselaraskan dengan nomor build kanonikal.
+   - Setiap rilis WAJIB lulus verifikasi:
+     ```bash
+     node tests/curriculum-cache-version-test.js
+     ```
+   - DILARANG menyisakan aset dengan parameter query versi lama yang dapat memicu serving aset basi dari cache service worker peramban murid.
+
+## 16. State Initialization & Persistence Invariant (Zero-Undefined State)
+1. **Inisialisasi Penuh Pasca Onboarding**:
+   - Alur onboarding pengguna baru WAJIB menginisialisasi seluruh state inti secara utuh sebelum murid diarahkan ke layar Home:
+     - `state.level = 1;`
+     - `state.placementDone = true;`
+     - `state.streak = 1;`
+     - `state.gems = state.gems || { balance: 120 };`
+   - Data state WAJIB diikat dan disimpan ke `localStorage` melalui `save()`.
+   - DILARANG melepaskan murid ke layar Home dengan nilai `state.level === undefined` atau state parsial yang merusak render dashboard kurikulum dan menjebak murid ke dalam *infinite onboarding loop*.

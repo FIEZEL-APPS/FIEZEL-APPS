@@ -1,7 +1,7 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-28T13:01:02.594Z",
-  "root": "C:\\Users\\hp\\fiezel-pwa-recovery-53c29b7d",
+  "generatedAt": "2026-10-28T15:38:07.738Z",
+  "root": "C:\\Users\\hp\\fiezel-resolve-pr761",
   "files": {
     "grammar-explanations-id.json": "6f7f5e03b33742917af73b5f6ac7dad6b4fafd92bc1bb39009731a04cf72b567",
     "grammar-misconception-id.json": "5c4b511ae931bc101067bd9a7760273ad62b5d33e653bfd5ae0abebb72ea82a5",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 6152,
-    "sha256": "fddbcd6d9e6215f34bc888699a17a9b03c4d9ff5dfc0d2d0bb97e354ee02e91d",
+    "count": 6154,
+    "sha256": "30889d99b12f3d474f27067fbaa4b9d1f83af5a92dba50d68ca42ba7a3fa9ef8",
     "list": [
       "\n        <div class=\"hint-sheet-handle\" aria-hidden=\"true\"></div>\n        <div class=\"hint-popover-header\">\n          <div style=\"display:flex;align-items:center;gap:6px\">\n            <i data-lucide=\"info\"></i>\n            <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>\n          </div>\n          <span class=\"hint-level-pill\">${currentLvl}/4</span>\n          <button type=\"button\" id=\"hintCloseBtn\" class=\"hint-close-btn\" aria-label=\"${FiezelI18n.t('modal.tutup', 'Tutup')}\"><i data-lucide=\"x\"></i></button>\n        </div>\n        <div class=\"hint-step-indicator\" aria-hidden=\"true\">\n          ${[1,2,3,4].map(i => ",
       "\n        <div style=\"display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 0;\">\n          <div class=\"fz-qr-scanner-box\" id=\"fzQrScannerBox\" data-testid=\"qr-scanner-box\">\n            <video id=\"qrScanVideo\" class=\"fz-qr-video\" playsinline autoplay muted></video>\n            <div class=\"fz-qr-reticle\" id=\"fzQrReticle\">\n              <div class=\"fz-qr-corner fz-qr-corner-tl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-tr\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-bl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-br\"></div>\n              <div class=\"fz-qr-laser\"></div>\n            </div>\n            <div class=\"fz-qr-cam-fallback\" id=\"fzQrCamFallback\" style=\"display:none;\">\n              <i data-lucide=\"camera\" style=\"width:30px;height:30px;color:#64748B;\"></i>\n              <p style=\"font-size:11px;line-height:1.3;margin:0;color:#CBD5E1;\">${FiezelI18n.t('social3.scan-cam-err','Kamera belum aktif.')}</p>\n            </div>\n          </div>\n          <input type=\"file\" id=\"qrFileInput\" accept=\"image/*\" style=\"display:none;\" onchange=\"handleQrFilePicked(event)\">\n          <button type=\"button\" class=\"btn-scan-gallery\" onclick=\"$('qrFileInput')?.click()\" data-testid=\"qr-gallery-btn\" style=\"display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:260px;padding:8px 12px;border-radius:10px;background:#F8FAFC;border:1.5px solid #CBD5E1;color:#0F172A !important;font-weight:700;font-size:12px;cursor:pointer;\">\n            <i data-lucide=\"image\" style=\"width:15px;height:15px;color:#0284C7;\"></i> ${FiezelI18n.t('social3.scan-from-gallery','Pilih dari Galeri Foto')}\n          </button>\n        </div>\n      ",
@@ -6152,6 +6152,7 @@
       "✓ KUNCI JAWABAN TEPAT",
       "✗ Jawaban Anda: Pilihan ",
       "✨ 4 Modul Latihan",
+      "✨ Kosakata Dikuasai",
       "「おはようございます、ミズキさん。<ruby class=\"fz-story-token\" onclick=\"window.FiezelStoryReader.inspectWord(\\'今日\\',\\'きょう\\',\\'hari ini\\')\">今日<rt>きょう</rt></ruby>も<ruby class=\"fz-story-token\" onclick=\"window.FiezelStoryReader.inspectWord(\\'元気\\',\\'げんき\\',\\'sehat / bersemangat\\')\">元気<rt>げんき</rt></ruby>ですね。<ruby class=\"fz-story-token\" onclick=\"window.FiezelStoryReader.inspectWord(\\'お茶\\',\\'おちゃ\\',\\'teh hijau Jepang\\')\">お茶<rt>おちゃ</rt></ruby>をどうぞ。」",
       "「待ち合わせしよう」(Machiawase shiyou) adalah ajakan santai untuk janjian bertemu di suatu tempat.",
       "今日の言葉 · kata hari ini",
@@ -6161,6 +6162,7 @@
       "言葉 · kosakata",
       "🌟 N4 · Dasar Lanjut",
       "👆 Ketuk kanji bergaris untuk arti & BKT",
+      "👆 Ketuk kanji bergaris untuk melihat arti",
       "👑 N1 · Mahir Lanjut",
       "💡 Analisis & Pembahasan Soal:",
       "💡 Belajarmu tetap bisa lanjut! Latihan Soal, Kosakata Flashcard, Tata Bahasa, dan Pustaka tetap bisa kamu akses tanpa batas.",

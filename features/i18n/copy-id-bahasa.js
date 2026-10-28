@@ -348,6 +348,7 @@
     'kursus-ja.writing.rubrik-intro': 'Penilaian tata bahasa, partikel, keakuratan kalimat, dan kesesuaian topik.',
     'kursus-ja.home.peta-cefr': 'Peta progres JLPT N5 – N1',
     'kursus-ja.home.peta-cefr-sub': 'Jalur penguasaan bertahap JLPT N5 sampai N1',
+    'story.btn_start': 'Mulai Membaca →',
     'story.btn_next': 'Lanjut ke Adegan Berikutnya →',
     'story.btn_prev': '← Sebelumnya',
     'story.btn_quiz': 'Mulai Kuis Akhir →',
@@ -355,6 +356,9 @@
     'story.btn_reread': '↺ Baca Ulang',
     'story.library_title': 'Perpustakaan Cerita Bergambar N5',
     'story.library_lead': 'Kisah bertingkat multi-adegan (Graded Readers) terhubung ke Braincore BKT.',
-    'story.hint_tap': '👆 Ketuk kanji bergaris untuk arti & BKT'
+    'story.hint_tap': '👆 Ketuk kanji bergaris untuk arti & BKT',
+    'story.vocab_mastered': '✨ Kosakata Dikuasai',
+    'story.vocab_saved': 'Progres kata tersimpan',
+    'story.vocab_saving': 'Menyimpan progres kata...'
   });
 })();

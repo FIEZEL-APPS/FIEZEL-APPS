@@ -159,7 +159,20 @@ async function main() {
       return new Promise(res => { img.onload = img.onerror = res; });
     }));
   });
-  await page.waitForTimeout(400);
+
+  if (targetView === 'chat') {
+    try {
+      const frameEl = await page.waitForSelector('#fzMitraKaiwaStudioFrame', { timeout: 5000 });
+      if (frameEl) {
+        const frame = await frameEl.contentFrame();
+        if (frame) {
+          await frame.waitForSelector('[data-testid="mochi-3d-stage"] canvas', { timeout: 7000 });
+          await page.waitForTimeout(600);
+        }
+      }
+    } catch (_) {}
+  }
+  await page.waitForTimeout(600);
 
   const outPath = path.isAbsolute(customName) ? customName : path.join(artifactDir, customName);
   await page.screenshot({ path: outPath, fullPage: false });
