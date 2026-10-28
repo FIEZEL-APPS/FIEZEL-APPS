@@ -339,6 +339,7 @@
     'jepang.kakijun-suara': 'ฟังเสียง',
     'jepang.kakijun-sempurna': 'สมบูรณ์แบบ! ตัวอักษร ',
     'jepang.kakijun-berhasil-ditulis': ' เขียนถูกต้องแล้ว!',
+    'story.btn_start': 'เริ่มอ่าน →',
     'story.btn_next': 'ไปยังฉากถัดไป →',
     'story.btn_prev': '← ก่อนหน้า',
     'story.btn_quiz': 'เริ่มทำแบบทดสอบ →',
@@ -346,6 +347,9 @@
     'story.btn_reread': '↺ อ่านซ้ำ',
     'story.library_title': 'ห้องสมุดนิทานภาพ N5',
     'story.library_lead': 'นิทานแบบแบ่งฉาก (Graded Readers) เชื่อมต่อกับ Braincore BKT',
-    'story.hint_tap': '👆 แตะคันจิที่มีเส้นใต้เพื่อดูความหมายและ BKT'
+    'story.hint_tap': '👆 แตะคันจิที่มีเส้นใต้เพื่อดูความหมายและ BKT',
+    'story.vocab_mastered': '✨ เชี่ยวชาญคำศัพท์แล้ว',
+    'story.vocab_saved': 'บันทึกความคืบหน้าคำศัพท์แล้ว',
+    'story.vocab_saving': 'กำลังบันทึกความคืบหน้าคำศัพท์...'
   });
 })();
