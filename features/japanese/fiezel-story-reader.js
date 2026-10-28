@@ -28,7 +28,8 @@
   var activeStoryId = 'mizuki-maiko';
   var activeSceneIndex = 0;
   var isPlaying = false;
-  var playTimer = null;
+  var currentAudio = null;
+  var autoAdvanceTimer = null;
   var hideFurigana = false;
 
   var STORY_COPY_ID = {
@@ -44,7 +45,10 @@
     'story.asakusa_title': '浅草の猫',
     'story.asakusa_subtitle': 'Kucing Penjaga Kuil Asakusa',
     'story.shinkansen_title': 'はじめての新幹線',
-    'story.shinkansen_subtitle': 'Perjalanan Shinkansen Pertama'
+    'story.shinkansen_subtitle': 'Perjalanan Shinkansen Pertama',
+    'story.quiz_speaker_name': 'Instruktur Ujian',
+    'story.quiz_audio_role': 'Audio Pertanyaan Soal (Bahasa Jepang)',
+    'story.autoplay_label': 'Putar Otomatis'
   };
 
   var STORY_COPY_TH = {
@@ -60,7 +64,10 @@
     'story.asakusa_title': '浅草の猫',
     'story.asakusa_subtitle': 'แมวผู้พิทักษ์วัดอาซากุสะ',
     'story.shinkansen_title': 'はじめての新幹線',
-    'story.shinkansen_subtitle': 'การเดินทางด้วยชินคันเซ็นครั้งแรก'
+    'story.shinkansen_subtitle': 'การเดินทางด้วยชินคันเซ็นครั้งแรก',
+    'story.quiz_speaker_name': 'ผู้คุมสอบ',
+    'story.quiz_audio_role': 'เสียงคำถามแบบทดสอบ (ภาษาญี่ปุ่น)',
+    'story.autoplay_label': 'เล่นอัตโนมัติ'
   };
 
   var STORY_COPY_EN = {
@@ -76,7 +83,10 @@
     'story.asakusa_title': 'The Cat of Asakusa',
     'story.asakusa_subtitle': 'The Guardian Cat of Asakusa Temple',
     'story.shinkansen_title': 'First Time on the Shinkansen',
-    'story.shinkansen_subtitle': 'First Time on the Shinkansen'
+    'story.shinkansen_subtitle': 'First Time on the Shinkansen',
+    'story.quiz_speaker_name': 'Exam Instructor',
+    'story.quiz_audio_role': 'Quiz Question Audio (Japanese)',
+    'story.autoplay_label': 'Auto-play'
   };
 
   try {
@@ -549,16 +559,18 @@
     }
   });
 
-  /* Ilustrasi storyboard raster per adegan (berkas fisik di assets/stories/).
-     Adegan kuis memakai ulang ilustrasi adegan terakhir (tidak membocorkan jawaban).
-     Bila berkas gagal dimuat (offline tanpa cache), <img> disembunyikan dan SVG
-     vektor cadangan tetap tampil di belakangnya. */
+  /* Ilustrasi storyboard raster per adegan (JPG) dan audio narasi otentik (MP3) di assets/stories/.
+     Dihasilkan via ElevenLabs Neural Studio dengan intonasi pedagogis terkalibrasi peran karakter.
+     Adegan 1-4 narasi bertahap, Adegan 5 kuis pemahaman & pembacaan soal.
+     Bila berkas gambar gagal dimuat (offline tanpa cache), SVG vektor cadangan tetap tampil. */
   var SCENE_IMAGE_BASE = './assets/stories/';
+  var SCENE_AUDIO_BASE = './assets/stories/';
   STORIES.forEach(function (s) {
     var prefix = s.id === 'mizuki-maiko' ? 'mizuki' : (s.id === 'asakusa-neko' ? 'asakusa' : 'shinkansen');
     s.scenes.forEach(function (sc, i) {
       var n = sc.isQuiz ? 4 : i + 1;
       sc.imageSrc = SCENE_IMAGE_BASE + prefix + '-' + n + '.jpg';
+      sc.audioSrc = SCENE_AUDIO_BASE + prefix + '-' + (i + 1) + '.mp3';
     });
     s.coverSrc = s.scenes[0].imageSrc;
   });
@@ -654,15 +666,18 @@
             '</div>' +
             '<div class="fz-audio-console">' +
               '<div class="fz-speaker-row">' +
-                '<div id="fzSpeakerAvatar" class="fz-speaker-avatar">' + scene.avatar + '</div>' +
+                '<div id="fzSpeakerAvatar" class="fz-speaker-avatar' + (isPlaying ? ' speaking' : '') + '">' + scene.avatar + '</div>' +
                 '<div class="fz-speaker-meta">' +
                   '<div class="fz-speaker-name">' + scene.speaker + '</div>' +
                   '<div class="fz-speaker-role">' + scene.role + '</div>' +
                 '</div>' +
+                '<div class="fz-autoplay-badge" title="' + t('story.autoplay_label', 'Putar Otomatis') + '">' +
+                  '<span class="fz-autoplay-dot"></span> ' + t('story.autoplay_label', 'Putar Otomatis') +
+                '</div>' +
               '</div>' +
               '<div class="fz-play-controls">' +
-                '<button type="button" id="fzBtnPlay" class="fz-btn-play" onclick="window.FiezelStoryReader.toggleAudio()" aria-label="Putar Dialog">▶</button>' +
-                '<div class="fz-progress-bar-wrap" onclick="window.FiezelStoryReader.seekAudio(event)">' +
+                '<button type="button" id="fzBtnPlay" class="fz-btn-play' + (isPlaying ? ' playing' : '') + '" onclick="window.FiezelStoryReader.toggleAudio()" aria-label="' + (isPlaying ? 'Jeda Audio' : 'Putar Dialog') + '">' + (isPlaying ? '⏸' : '▶') + '</button>' +
+                '<div class="fz-progress-bar-wrap" onclick="window.FiezelStoryReader.seekAudio(event)" title="Geser durasi audio">' +
                   '<div id="fzAudioProgress" class="fz-progress-bar-fill"></div>' +
                 '</div>' +
               '</div>' +
@@ -709,6 +724,21 @@
               sceneArtHtml(scene.svgArt, scene.imageSrc, scene.title) +
               '<div class="fz-scene-overlay"></div>' +
               '<span class="fz-scene-tag">' + scene.tag + '</span>' +
+            '</div>' +
+            '<div class="fz-audio-console">' +
+              '<div class="fz-speaker-row">' +
+                '<div id="fzSpeakerAvatar" class="fz-speaker-avatar' + (isPlaying ? ' speaking' : '') + '">🎓</div>' +
+                '<div class="fz-speaker-meta">' +
+                  '<div class="fz-speaker-name">' + t('story.quiz_speaker_name', 'Instruktur Ujian') + '</div>' +
+                  '<div class="fz-speaker-role">' + t('story.quiz_audio_role', 'Audio Pertanyaan Soal (Bahasa Jepang)') + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="fz-play-controls">' +
+                '<button type="button" id="fzBtnPlay" class="fz-btn-play' + (isPlaying ? ' playing' : '') + '" onclick="window.FiezelStoryReader.toggleAudio()" aria-label="' + (isPlaying ? 'Jeda Audio' : 'Dengarkan Pertanyaan') + '">' + (isPlaying ? '⏸' : '▶') + '</button>' +
+                '<div class="fz-progress-bar-wrap" onclick="window.FiezelStoryReader.seekAudio(event)" title="Geser durasi audio">' +
+                  '<div id="fzAudioProgress" class="fz-progress-bar-fill"></div>' +
+                '</div>' +
+              '</div>' +
             '</div>' +
           '</div>' +
           '<div class="fz-reader-card">' +
@@ -784,6 +814,7 @@
   }
 
   function getMountTarget() {
+    if (typeof document === 'undefined') return null;
     return document.getElementById('fzStoryContainer') || document.getElementById('app');
   }
 
@@ -791,7 +822,7 @@
     activeStoryId = id;
     currentView = 'story';
     activeSceneIndex = 0;
-    if (isPlaying) toggleAudio();
+    stopAudio();
     var target = getMountTarget();
     if (target) renderStory(target);
     try { window.scrollTo(0, 0); } catch (_) {}
@@ -799,7 +830,7 @@
 
   function openLibrary() {
     currentView = 'library';
-    if (isPlaying) toggleAudio();
+    stopAudio();
     var target = getMountTarget();
     if (target) renderLibrary(target);
     try { window.scrollTo(0, 0); } catch (_) {}
@@ -809,7 +840,7 @@
     var story = getStoryById(activeStoryId);
     if (idx < 0 || idx >= story.scenes.length) return;
     activeSceneIndex = idx;
-    if (isPlaying) toggleAudio();
+    stopAudio();
     var target = getMountTarget();
     if (target) renderStory(target);
     try { window.scrollTo(0, 0); } catch (_) {}
@@ -932,39 +963,179 @@
     }
   }
 
-  function toggleAudio() {
-    isPlaying = !isPlaying;
+  function stopAudio() {
+    isPlaying = false;
+    if (autoAdvanceTimer) {
+      clearTimeout(autoAdvanceTimer);
+      autoAdvanceTimer = null;
+    }
+    if (currentAudio) {
+      try {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio.onended = null;
+        currentAudio.ontimeupdate = null;
+        currentAudio.onerror = null;
+      } catch (_) {}
+      currentAudio = null;
+    }
+    updatePlayUi(false, 0);
+  }
+
+  function updatePlayUi(playing, pct) {
+    if (typeof document === 'undefined') return;
     var btn = document.getElementById('fzBtnPlay');
     var avatar = document.getElementById('fzSpeakerAvatar');
     var prog = document.getElementById('fzAudioProgress');
+    if (btn) {
+      btn.innerText = playing ? '⏸' : '▶';
+      btn.setAttribute('aria-label', playing ? 'Jeda Audio' : 'Putar Dialog');
+      if (playing) btn.classList.add('playing');
+      else btn.classList.remove('playing');
+    }
+    if (avatar) {
+      if (playing) avatar.classList.add('speaking');
+      else avatar.classList.remove('speaking');
+    }
+    if (prog && typeof pct === 'number') {
+      prog.style.width = Math.max(0, Math.min(100, pct)) + '%';
+    }
+  }
 
-    if (isPlaying) {
-      if (btn) btn.innerText = '⏸';
-      if (avatar) avatar.classList.add('speaking');
-      var progress = 0;
-      playTimer = setInterval(function () {
-        progress += 4;
-        if (prog) prog.style.width = progress + '%';
-        if (progress >= 100) {
-          toggleAudio();
-          if (prog) prog.style.width = '0%';
+  function playSceneAudio(sceneIdx) {
+    var story = getStoryById(activeStoryId);
+    if (!story || !story.scenes || sceneIdx < 0 || sceneIdx >= story.scenes.length) {
+      stopAudio();
+      return;
+    }
+    var scene = story.scenes[sceneIdx];
+    if (!scene || !scene.audioSrc) {
+      stopAudio();
+      return;
+    }
+
+    if (currentAudio) {
+      try {
+        currentAudio.pause();
+        currentAudio.onended = null;
+        currentAudio.ontimeupdate = null;
+        currentAudio.onerror = null;
+      } catch (_) {}
+      currentAudio = null;
+    }
+
+    try {
+      if (typeof Audio === 'undefined') {
+        isPlaying = true;
+        updatePlayUi(true, 0);
+        return;
+      }
+      currentAudio = new Audio(scene.audioSrc);
+      isPlaying = true;
+      updatePlayUi(true, 0);
+
+      currentAudio.ontimeupdate = function () {
+        if (!currentAudio) return;
+        var dur = currentAudio.duration;
+        var cur = currentAudio.currentTime;
+        if (dur > 0) {
+          var pct = (cur / dur) * 100;
+          updatePlayUi(true, pct);
         }
-      }, 250);
+      };
+
+      currentAudio.onended = function () {
+        updatePlayUi(false, 100);
+        handleSceneAudioEnded(sceneIdx);
+      };
+
+      currentAudio.onerror = function () {
+        console.warn('[FiezelStoryReader] Gagal memuat berkas audio:', scene.audioSrc);
+        stopAudio();
+      };
+
+      var p = currentAudio.play();
+      if (p !== undefined) {
+        p.catch(function (err) {
+          console.warn('[FiezelStoryReader] Autoplay ditolak/tertahan:', err);
+          isPlaying = false;
+          updatePlayUi(false, 0);
+        });
+      }
+    } catch (e) {
+      console.warn('[FiezelStoryReader] Audio init error:', e);
+      stopAudio();
+    }
+  }
+
+  function handleSceneAudioEnded(endedSceneIdx) {
+    var story = getStoryById(activeStoryId);
+    if (endedSceneIdx < 3) {
+      // Adegan 1, 2, atau 3 selesai: Lanjut otomatis ke adegan berikutnya (1 -> 2 -> 3 -> 4)
+      var nextIdx = endedSceneIdx + 1;
+      autoAdvanceTimer = setTimeout(function () {
+        activeSceneIndex = nextIdx;
+        var target = getMountTarget();
+        if (target) renderStory(target);
+        playSceneAudio(nextIdx);
+      }, 700);
+    } else if (endedSceneIdx === 3) {
+      // Adegan 4 selesai: Transisi halus ke Adegan 5 (Kuis Pemahaman Akhir)
+      autoAdvanceTimer = setTimeout(function () {
+        activeSceneIndex = 4;
+        var target = getMountTarget();
+        if (target) renderStory(target);
+        // Putar audio pertanyaan kuis
+        if (story && story.scenes && story.scenes[4] && story.scenes[4].audioSrc) {
+          playSceneAudio(4);
+        } else {
+          stopAudio();
+        }
+      }, 1200);
     } else {
-      if (btn) btn.innerText = '▶';
-      if (avatar) avatar.classList.remove('speaking');
-      if (playTimer) clearInterval(playTimer);
+      // Audio kuis selesai
+      stopAudio();
+    }
+  }
+
+  function toggleAudio() {
+    if (isPlaying) {
+      if (currentAudio) {
+        try { currentAudio.pause(); } catch (_) {}
+      }
+      if (autoAdvanceTimer) {
+        clearTimeout(autoAdvanceTimer);
+        autoAdvanceTimer = null;
+      }
+      isPlaying = false;
+      updatePlayUi(false);
+    } else {
+      if (currentAudio && currentAudio.paused && currentAudio.currentTime > 0 && currentAudio.currentTime < (currentAudio.duration || 0)) {
+        isPlaying = true;
+        updatePlayUi(true);
+        var p = currentAudio.play();
+        if (p !== undefined) {
+          p.catch(function () {
+            playSceneAudio(activeSceneIndex);
+          });
+        }
+      } else {
+        playSceneAudio(activeSceneIndex);
+      }
     }
   }
 
   function seekAudio(e) {
+    if (!currentAudio || !currentAudio.duration) return;
     var bar = e.currentTarget;
     if (!bar) return;
     var rect = bar.getBoundingClientRect();
     var x = e.clientX - rect.left;
-    var pct = Math.max(0, Math.min(100, Math.round((x / rect.width) * 100)));
-    var prog = document.getElementById('fzAudioProgress');
-    if (prog) prog.style.width = pct + '%';
+    var ratio = Math.max(0, Math.min(1, x / rect.width));
+    try {
+      currentAudio.currentTime = ratio * currentAudio.duration;
+      updatePlayUi(isPlaying, ratio * 100);
+    } catch (_) {}
   }
 
   return {
@@ -978,6 +1149,13 @@
     closePopover: closePopover,
     evaluateQuiz: evaluateQuiz,
     toggleAudio: toggleAudio,
-    seekAudio: seekAudio
+    seekAudio: seekAudio,
+    stopAudio: stopAudio,
+    playSceneAudio: playSceneAudio,
+    handleSceneAudioEnded: handleSceneAudioEnded,
+    getCurrentAudio: function () { return currentAudio; },
+    getIsPlaying: function () { return isPlaying; },
+    getActiveSceneIndex: function () { return activeSceneIndex; },
+    getActiveStoryId: function () { return activeStoryId; }
   };
 }));

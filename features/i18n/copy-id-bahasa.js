@@ -359,6 +359,9 @@
     'story.hint_tap': '👆 Ketuk kanji bergaris untuk arti & BKT',
     'story.vocab_mastered': '✨ Kosakata Dikuasai',
     'story.vocab_saved': 'Progres kata tersimpan',
-    'story.vocab_saving': 'Menyimpan progres kata...'
+    'story.vocab_saving': 'Menyimpan progres kata...',
+    'story.autoplay_label': 'Putar Otomatis',
+    'story.quiz_speaker_name': 'Instruktur Ujian',
+    'story.quiz_audio_role': 'Audio Pertanyaan Soal (Bahasa Jepang)'
   });
 })();

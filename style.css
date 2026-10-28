@@ -11120,6 +11120,28 @@ html body #app .result-alasan li{color:#4B5563 !important}
   color: #64748B;
   font-weight: 600;
 }
+.fz-autoplay-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #0284C7;
+  background: #E0F2FE;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  margin-left: auto;
+  user-select: none;
+}
+.fz-autoplay-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0284C7;
+  display: inline-block;
+  animation: fz-pulse 1.6s infinite ease-in-out;
+}
 .fz-play-controls {
   display: flex;
   align-items: center;
@@ -11138,7 +11160,11 @@ html body #app .result-alasan li{color:#4B5563 !important}
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 3px 8px rgba(2, 132, 199, 0.3);
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.fz-btn-play.playing {
+  background: #0369A1;
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.45);
 }
 .fz-btn-play:active {
   transform: scale(0.92);

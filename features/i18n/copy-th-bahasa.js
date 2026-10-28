@@ -350,6 +350,9 @@
     'story.hint_tap': '👆 แตะคันจิที่มีเส้นใต้เพื่อดูความหมายและ BKT',
     'story.vocab_mastered': '✨ เชี่ยวชาญคำศัพท์แล้ว',
     'story.vocab_saved': 'บันทึกความคืบหน้าคำศัพท์แล้ว',
-    'story.vocab_saving': 'กำลังบันทึกความคืบหน้าคำศัพท์...'
+    'story.vocab_saving': 'กำลังบันทึกความคืบหน้าคำศัพท์...',
+    'story.autoplay_label': 'เล่นอัตโนมัติ',
+    'story.quiz_speaker_name': 'ผู้คุมสอบ',
+    'story.quiz_audio_role': 'เสียงคำถามแบบทดสอบ (ภาษาญี่ปุ่น)'
   });
 })();

@@ -1,7 +1,7 @@
 {
-  "version": "m025-706",
-  "claimedBy": "branch fix/restore-mitra-kaiwa-voice-studio-m025-706",
-  "claimedAt": "2026-10-28T16:49:14.852Z",
-  "reason": "fix(kawan-bicara): restore AI Voice Studio and 3D Mochi companion",
+  "version": "m025-707",
+  "claimedBy": "branch feat/story-voice-autoplay-m025-707",
+  "claimedAt": "2026-10-28T17:36:09.697Z",
+  "reason": "feat(japanese): elevenlabs neural voice & sequential autoplay for n5 graded reader (m025-707)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
