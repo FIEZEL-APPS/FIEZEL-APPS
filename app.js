@@ -15971,12 +15971,15 @@ function makeListeningQuestion(item){
 async function buildPlacement(){
   const all=[],seen=new Set();
   const listeningItems=await loadPlacementListening();
+  const isJaCourse=(typeof activeTargetLang==='function'&&activeTargetLang()==='ja')||(typeof jaCourseOn==='function'&&jaCourseOn());
   for(const level of LEVELS){
     const plan=placementBlueprint()[level];
-    const srcLevel=(typeof jaCourseOn==='function'&&jaCourseOn()&&level==='C2')?'C1':level;
+    const srcLevel=(isJaCourse&&level==='C2')?'C1':level;
+    let grammarCandidates=grammarItemsForLevel(srcLevel);
+    if(!grammarCandidates.length&&srcLevel==='C2')grammarCandidates=grammarItemsForLevel('C1');
     const candidates={
       vocab:shuffle(V.filter(v=>v.level===srcLevel&&v.meaning)),
-      grammar:shuffle(grammarItemsForLevel(srcLevel)),
+      grammar:shuffle(grammarCandidates),
       listening:shuffle(listeningItems.filter(x=>x.level===level||x.level===srcLevel||x.cefr===level||x.cefr===srcLevel))
     };
     const build={
@@ -16038,15 +16041,19 @@ async function startPlacement(){
 }
 async function startLevelPlacement(level){
   const targetLevel=LEVELS.includes(String(level||''))?String(level):'A1';
-  const srcLevel=(typeof jaCourseOn==='function'&&jaCourseOn()&&targetLevel==='C2')?'C1':targetLevel;
+  const isJaCourse=(typeof activeTargetLang==='function'&&activeTargetLang()==='ja')||(typeof jaCourseOn==='function'&&jaCourseOn());
+  const srcLevel=(isJaCourse&&targetLevel==='C2')?'C1':targetLevel;
   let listeningItems=[];
   try{listeningItems=await loadPlacementListening()}catch(_){}
   const seen=new Set();
   const qs=[];
 
+  let grammarCandidates=grammarItemsForLevel(srcLevel);
+  if(!grammarCandidates.length&&srcLevel==='C2')grammarCandidates=grammarItemsForLevel('C1');
+
   const candidates={
     vocab:shuffle(V.filter(v=>v.level===srcLevel&&v.meaning)),
-    grammar:shuffle(grammarItemsForLevel(srcLevel)),
+    grammar:shuffle(grammarCandidates),
     listening:shuffle((listeningItems||[]).filter(x=>x.level===targetLevel||x.level===srcLevel||x.cefr===targetLevel||x.cefr===srcLevel))
   };
 
@@ -16114,8 +16121,8 @@ function startQuickWinLesson(lang) {
         id: 'qw-ja-1',
         type: 'choice',
         level: 'A1',
-        question: t('quiz.quickwin-ja-q1', 'Dengarkan suara dan pilih huruf Hiragana yang tepat: (a)'),
-        options: ['あ (a)', 'い (i)', 'う (u)', 'え (e)'],
+        question: t('quiz.quickwin-ja-q1', 'Dengarkan suara audio dan pilih huruf Hiragana yang tepat:'),
+        options: ['あ', 'い', 'う', 'え'],
         answerIndex: 0,
         audio: 'あ',
         skill: 'hiragana_basics',
@@ -16130,8 +16137,8 @@ function startQuickWinLesson(lang) {
         id: 'qw-ja-2',
         type: 'choice',
         level: 'A1',
-        question: t('quiz.quickwin-ja-q2', 'Pilih huruf Hiragana untuk bunyi vokal (i):'),
-        options: ['あ (a)', 'い (i)', 'お (o)', 'か (ka)'],
+        question: t('quiz.quickwin-ja-q2', 'Dengarkan suara audio dan tentukan huruf Hiragana yang tepat:'),
+        options: ['あ', 'い', 'お', 'か'],
         answerIndex: 1,
         audio: 'い',
         skill: 'hiragana_basics',
@@ -16146,7 +16153,7 @@ function startQuickWinLesson(lang) {
         id: 'qw-ja-3',
         type: 'choice',
         level: 'A1',
-        question: t('quiz.quickwin-ja-q3', 'Gabungkan kedua huruf yang baru kamu pelajari: あ (a) + い (i) = あい. Apa arti kata ini?'),
+        question: t('quiz.quickwin-ja-q3', 'Gabungkan kedua huruf yang baru kamu pelajari: あ + い = あい. Apa arti kata ini?'),
         options: [t('quiz.quickwin-opt-love', 'Cinta / Kasih sayang'), t('quiz.quickwin-opt-thanks', 'Terima kasih'), t('quiz.quickwin-opt-morning', 'Selamat pagi'), t('quiz.quickwin-opt-water', 'Air')],
         answerIndex: 0,
         audio: 'あい',
@@ -16777,7 +16784,7 @@ function quizLoop(cfg){
     }
     return `<span class="question-main">${formattedStem}</span>`;
   };
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(!MEASURE&&!cfg.placement&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(!MEASURE&&!cfg.placement&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,(MEASURE||cfg.placement)?'':q.focus.phonetic)}</span>${(q.focus.phonetic&&!MEASURE&&!cfg.placement)?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   const hintBtn=$('quizGrammarHint');
   if(hintBtn){

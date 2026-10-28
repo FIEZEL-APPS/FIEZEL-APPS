@@ -9640,7 +9640,7 @@ button.fz-coach-bubble,
 /* 2. Topbar: 100% Full-Width Edge-to-Edge */
 .topbar,
 header.topbar {
-  position: sticky !important;
+  position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
@@ -12106,4 +12106,395 @@ body.fz-view-story #topContextTitle {
 .fz-story-card-item:hover .fz-story-cta-btn {
   color: #0369A1;
   transform: translateX(3px);
+}
+
+
+/* ==========================================================================
+   M025-712: UNIVERSAL MOBILE UI/UX AUDIT & ZERO-CUTOFF INVARIANT
+   Enforcing Rule 5.3 (Zero-Scroll Thumb Zone) & Rule 4.5 (Anti-Leak Purity)
+   ========================================================================== */
+
+/* 1. Global Non-Drifting Topbar across Mobile and Desktop */
+.topbar,
+header.topbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 100 !important;
+  box-sizing: border-box !important;
+}
+
+body:not(.fz-stage-quiz):not(.fz-lesson-mode) #app,
+body:not(.fz-stage-quiz):not(.fz-lesson-mode) .view-container,
+body:not(.fz-stage-quiz):not(.fz-lesson-mode) section.fade:not(.quiz-shell) {
+  padding-top: calc(58px + env(safe-area-inset-top, 0px)) !important;
+}
+
+/* Hide global topbar cleanly in quiz / practice sessions */
+body.fz-stage-quiz header.topbar,
+body.fz-stage-quiz main.app > .topbar,
+body.fz-lesson-mode header.topbar,
+body.fz-lesson-mode main.app > .topbar {
+  display: none !important;
+}
+
+body.fz-stage-quiz #app,
+body.fz-lesson-mode #app {
+  padding-top: 0 !important;
+}
+
+/* Ensure top context wrap never collapses on non-home views */
+body:not(.fz-stage-home):not(.fz-stage-quiz):not(.fz-lesson-mode) #topContextWrap {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 38px !important;
+}
+
+/* 2. Practice Session & Quiz Shell Zero-Cutoff on Mobile */
+.quiz-topbar,
+body.fz-stage-quiz .quiz-topbar,
+body.fz-lux.fz-stage-quiz .quiz-topbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 500 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  padding: max(4px, env(safe-area-inset-top, 4px)) 14px 4px !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1.5px solid #E2E8F0 !important;
+}
+
+.quiz-shell {
+  padding-top: calc(52px + env(safe-area-inset-top, 4px)) !important;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (max-width: 640px) {
+  .quiz-shell > .card,
+  .quiz-shell .card,
+  body.fz-stage-quiz .quiz-shell > .card {
+    padding: 10px 12px !important;
+    border-radius: 20px !important;
+    margin: 0 auto !important;
+    max-width: 440px !important;
+  }
+
+  .quiz-stage {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin: 0 0 6px !important;
+  }
+
+  .quiz-stage .fz-paw-above {
+    flex: 0 0 auto !important;
+    width: 64px !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    aspect-ratio: 1 / 1 !important;
+    margin: 0 auto 2px !important;
+  }
+
+  .quiz-stage .fz-paw-above fiezel-mascot,
+  .quiz-stage .fz-paw-above .fz-paw-panel,
+  .quiz-stage fiezel-mascot {
+    width: 64px !important;
+    height: 64px !important;
+    max-width: 64px !important;
+    max-height: 64px !important;
+    min-height: 0 !important;
+  }
+
+  .quiz-bubble {
+    padding: 4px 8px !important;
+    margin: 0 !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  .quiz-shell .question {
+    margin: 2px 0 6px !important;
+    font-size: clamp(0.92rem, 3.6vw, 1.05rem) !important;
+    line-height: 1.35 !important;
+  }
+
+  .quiz-shell .options {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .quiz-shell .option,
+  .quiz-shell button.option {
+    min-height: 44px !important;
+    padding: 6px 12px !important;
+    font-size: 0.95rem !important;
+    border-radius: 12px !important;
+  }
+
+  .vocab-focus {
+    margin: 2px auto 6px !important;
+    padding: 4px 12px !important;
+  }
+}
+
+/* Suppress all phonetic romaji leaks during quiz / tests */
+.quiz-shell .ja-romaji,
+body.fz-stage-quiz .vocab-focus .phonetic,
+.quiz-card .ja-romaji {
+  display: none !important;
+}
+
+/* 3. Onboarding Full Viewport Fit & Zero-Scroll on Mobile */
+@media (max-width: 640px) {
+  .fiezel-ob {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .fiezel-ob-reveal {
+    padding: 6px 14px 4px !important;
+  }
+
+  .fiezel-ob-reveal .fiezel-wordmark {
+    width: min(30vw, 88px) !important;
+  }
+
+  .fiezel-topbar {
+    min-height: 28px !important;
+    padding: 2px 12px !important;
+  }
+
+  body .fiezel-ob .fiezel-stage {
+    padding: 2px 12px !important;
+    margin: 0 auto !important;
+  }
+
+  body .fiezel-ob .fiezel-stage-art {
+    gap: 8px !important;
+    margin: 2px 0 4px !important;
+  }
+
+  body .fiezel-ob .fiezel-ob-mascot {
+    flex: 0 0 50px !important;
+    width: 50px !important;
+    height: 50px !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
+  }
+
+  body .fiezel-ob .fiezel-ob-mascot fiezel-mascot,
+  body .fiezel-ob .fiezel-ob-mascot .fiezel-ob-paw,
+  body .fiezel-ob .fiezel-ob-mascot .fz-mascot {
+    width: 50px !important;
+    height: 50px !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
+  }
+
+  body .fiezel-ob .fiezel-greet-bubble {
+    padding: 6px 10px !important;
+    font-size: 11.5px !important;
+    line-height: 1.3 !important;
+    border-radius: 12px !important;
+  }
+
+  body .fiezel-sheet {
+    padding: 6px 12px 14px !important;
+    gap: 4px !important;
+  }
+
+  body .fiezel-sheet .fiezel-title {
+    font-size: 1.15rem !important;
+    margin: 2px 0 4px !important;
+  }
+
+  .fiezel-course-grid,
+  .fiezel-goal-grid {
+    gap: 6px !important;
+    margin: 4px 0 !important;
+  }
+
+  .fiezel-course-card,
+  .fiezel-goal-card {
+    padding: 8px 12px !important;
+    min-height: 44px !important;
+    border-radius: 12px !important;
+  }
+
+  .fiezel-ja-onboarding-panel {
+    padding: 6px 10px !important;
+    margin: 4px 0 !important;
+    gap: 4px !important;
+  }
+
+  .fiezel-placement-path-grid {
+    gap: 8px !important;
+    margin: 4px 0 8px !important;
+  }
+
+  .fiezel-path-card {
+    padding: 8px 12px !important;
+    border-radius: 14px !important;
+    gap: 3px !important;
+  }
+
+  .fiezel-path-card .fiezel-btn {
+    min-height: 38px !important;
+    padding: 6px 12px !important;
+    font-size: 0.88rem !important;
+  }
+
+  body .fiezel-sheet .fiezel-btn {
+    min-height: 42px !important;
+    padding: 8px 14px !important;
+    font-size: 0.95rem !important;
+  }
+}
+
+
+/* Mobile Compact Optimization for Onboarding Viewports (Height <= 750px) */
+@media (max-width: 640px) or (max-height: 750px) {
+  body .fiezel-ob .fiezel-stage {
+    padding: 2px 8px !important;
+    margin: 2px auto 4px !important;
+  }
+
+  body .fiezel-ob .fiezel-stage-art {
+    gap: 6px !important;
+    margin: 0 !important;
+  }
+
+  body .fiezel-ob .fiezel-ob-mascot {
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+  }
+
+  body .fiezel-ob .fiezel-ob-mascot fiezel-mascot,
+  body .fiezel-ob .fiezel-ob-mascot .fiezel-ob-paw,
+  body .fiezel-ob .fiezel-ob-mascot .fz-mascot {
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+  }
+
+  body .fiezel-ob .fiezel-greet-bubble {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+
+  body .fiezel-sheet {
+    padding: 4px 10px 12px !important;
+    gap: 3px !important;
+    margin: 0 auto !important;
+  }
+
+  body .fiezel-sheet .fiezel-title {
+    font-size: 1.1rem !important;
+    margin: 1px 0 3px !important;
+  }
+
+  .fiezel-course-grid {
+    gap: 4px !important;
+    margin: 2px 0 !important;
+  }
+
+  .fiezel-course-card {
+    padding: 6px 10px !important;
+    min-height: 40px !important;
+  }
+
+  .fiezel-course-flag {
+    width: 22px !important;
+    height: 16px !important;
+  }
+
+  .fiezel-course-text b {
+    font-size: 0.9rem !important;
+  }
+
+  .fiezel-course-text small {
+    font-size: 0.72rem !important;
+  }
+
+  .fiezel-ja-onboarding-panel {
+    padding: 4px 8px !important;
+    margin: 2px 0 !important;
+    gap: 2px !important;
+  }
+
+  .fiezel-ja-kana-options button {
+    min-height: 30px !important;
+    padding: 3px 6px !important;
+    font-size: 11.5px !important;
+  }
+
+  .fiezel-goal-grid {
+    gap: 4px !important;
+    margin: 2px 0 !important;
+  }
+
+  .fiezel-goal-card {
+    padding: 6px 10px !important;
+    min-height: 38px !important;
+  }
+
+  .fiezel-note {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    margin: 1px 0 !important;
+  }
+
+  .fiezel-placement-path-grid {
+    gap: 6px !important;
+    margin: 2px 0 4px !important;
+  }
+
+  .fiezel-path-card {
+    padding: 6px 10px !important;
+    border-radius: 12px !important;
+    gap: 2px !important;
+  }
+
+  .fiezel-path-badge {
+    font-size: 0.88rem !important;
+  }
+
+  .fiezel-path-desc {
+    font-size: 0.75rem !important;
+    margin: 0 0 2px !important;
+  }
+
+  .fiezel-path-card .fiezel-btn {
+    min-height: 34px !important;
+    padding: 4px 10px !important;
+    font-size: 0.82rem !important;
+  }
+
+  body .fiezel-sheet .fiezel-btn {
+    min-height: 40px !important;
+    padding: 6px 12px !important;
+    font-size: 0.92rem !important;
+  }
 }
