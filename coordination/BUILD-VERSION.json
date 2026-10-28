@@ -1,7 +1,7 @@
 {
-  "version": "m025-702",
-  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
-  "claimedAt": "2026-10-28T10:50:09.803Z",
-  "reason": "bot(heal): auto-synchronize release boundary",
+  "version": "m025-703",
+  "claimedBy": "branch feat/universal-ja-furigana-romaji-m025-702",
+  "claimedAt": "2026-10-28T11:26:42.212Z",
+  "reason": "feat(japanese): universal furigana ruby and phonetic hepburn romaji overhaul (m025-703)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
