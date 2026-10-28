@@ -522,6 +522,35 @@
     return VOICE_PERSONAS[id] || null;
   }
 
+  var PREREQ_ACK_KEY = 'fiezel-kaiwa-prereq-ack-v1'; // pengakuan murid, BUKAN bukti mastery
+
+  function readRealMastery(cId) {
+    // 1. Braincore host (sumber kebenaran)
+    try {
+      var st = typeof root.__getFiezelState === 'function' ? root.__getFiezelState() : null;
+      var comp = st && st.competencies && st.competencies[cId];
+      if (comp) return Number(comp.pMasteryDecayed != null ? comp.pMasteryDecayed : comp.pMastery);
+    } catch (_) {}
+    // 2. Modul BKT resmi (skema miliknya sendiri)
+    try {
+      var BKT = root.FiezelMasteryBKT;
+      if (BKT && typeof BKT.read === 'function') {
+        var b = BKT.read();
+        if (b && b.skills && b.skills[cId] && typeof b.skills[cId].p === 'number') return b.skills[cId].p;
+      }
+    } catch (_) {}
+    try {
+      var rawBkt = localStorage.getItem('fiezel-mastery-bkt-v1');
+      if (rawBkt) {
+        var bktData = JSON.parse(rawBkt);
+        if (bktData && bktData.skills && bktData.skills[cId] && typeof bktData.skills[cId].p === 'number') {
+          return bktData.skills[cId].p;
+        }
+      }
+    } catch (_) {}
+    return null; // belum ada bukti sama sekali
+  }
+
   /**
    * Smart Prerequisite Bypass:
    * Checks student's competency mastery in Braincore (or localStorage).
@@ -529,87 +558,91 @@
    */
   function checkPrerequisiteStatus(brainStateOrNull, prereqCompetencyId) {
     var cId = prereqCompetencyId;
-    var bState = brainStateOrNull;
-    if (typeof brainStateOrNull === 'string' && !prereqCompetencyId) {
+    if (typeof brainStateOrNull === 'string') {
       cId = brainStateOrNull;
-      bState = null;
     }
     if (!cId) {
-      return { isReady: true, pMastery: 1.0, stateLabel: 'MASTERED' };
+      return { isReady: true, pMastery: 1.0, stateLabel: 'MASTERED', acknowledged: false };
     }
-    var p = 0.25;
-    var stateLabel = 'NOT_EXPOSED';
+    var sc = getScenario(cId);
+    if (sc && sc.prereqCompetencyId) {
+      cId = sc.prereqCompetencyId;
+    }
 
-    // 1. Try passing brainState
-    if (bState && bState.competencies && bState.competencies[cId]) {
-      var c = bState.competencies[cId];
+    var p = null;
+    if (brainStateOrNull && typeof brainStateOrNull === 'object' && brainStateOrNull.competencies && brainStateOrNull.competencies[cId]) {
+      var c = brainStateOrNull.competencies[cId];
       p = Number(c.pMasteryDecayed != null ? c.pMasteryDecayed : (c.pMastery || 0.25));
-      stateLabel = c.state || (p >= 0.8 ? 'MASTERED' : (p >= 0.6 ? 'DEVELOPING' : 'PRACTICING'));
     } else {
-      // 2. Read from localStorage BKT store or initial seed map
-      try {
-        var rawBkt = localStorage.getItem('fiezel-mastery-bkt-v1');
-        if (rawBkt) {
-          var bktData = JSON.parse(rawBkt);
-          if (bktData && bktData.skills && bktData.skills[cId]) {
-            p = Number(bktData.skills[cId].p || 0.25);
-          }
-        }
-      } catch (_) {}
-
-      // Built-in seed benchmarks:
-      // vocab_daily_a2 (Cafe): seed 0.74 >= 0.60 -> Bypass directly!
-      // vocab_academic_b1 (IELTS): seed 0.68 >= 0.60 -> Bypass directly!
-      // vocab_ja_cafe_n5 (Kissaten): seed 0.65 >= 0.60 -> Bypass directly!
-      // vocab_travel_a2 (Past trip): seed 0.42 < 0.60 -> Locked until warmup!
-      // vocab_ja_campus_n4 (Senpai): seed 0.38 < 0.60 -> Locked until warmup!
-      if (p === 0.25) {
-        var SEED_MAP = {
-          vocab_daily_a2: 0.74,
-          vocab_academic_b1: 0.68,
-          vocab_ja_cafe_n5: 0.65,
-          vocab_travel_a2: 0.42,
-          vocab_ja_campus_n4: 0.38
-        };
-        if (SEED_MAP[cId] != null) {
-          p = SEED_MAP[cId];
-        }
-      }
-      stateLabel = p >= 0.8 ? 'MASTERED' : (p >= 0.6 ? 'DEVELOPING' : 'PRACTICING');
+      p = readRealMastery(cId);
     }
 
+    // Baseline priors for standard competencies if no observations yet
+    var SEED_MAP = {
+      vocab_daily_a2: 0.74,
+      vocab_academic_b1: 0.68,
+      vocab_ja_cafe_n5: 0.65,
+      vocab_travel_a2: 0.42,
+      vocab_ja_campus_n4: 0.38
+    };
+    if (p == null && SEED_MAP[cId] != null) {
+      p = SEED_MAP[cId];
+    }
+
+    var acknowledged = false;
+    try {
+      var rawAck = localStorage.getItem(PREREQ_ACK_KEY);
+      var ackObj = rawAck ? JSON.parse(rawAck) : {};
+      acknowledged = !!(ackObj[cId] || (prereqCompetencyId && ackObj[prereqCompetencyId]) || (typeof brainStateOrNull === 'string' && ackObj[brainStateOrNull]));
+    } catch (_) {}
+
+    if (acknowledged && (p == null || p < 0.75)) {
+      p = 0.75;
+    }
+
+    if (p == null) {
+      // Tidak ada bukti: tampilkan drawer kosakata; murid boleh melanjutkan setelah membaca
+      return { isReady: acknowledged, pMastery: null, stateLabel: 'NOT_EXPOSED', acknowledged: acknowledged };
+    }
+
+    var stateLabel = p >= 0.8 ? 'MASTERED' : (p >= 0.6 ? 'DEVELOPING' : 'PRACTICING');
     return {
-      isReady: p >= 0.60,
+      isReady: p >= 0.60 || acknowledged,
       pMastery: Number(p.toFixed(3)),
-      stateLabel: stateLabel
+      stateLabel: stateLabel,
+      acknowledged: acknowledged
     };
   }
 
   /**
-   * Unlock vocabulary prerequisite in Braincore storage
+   * Catat pengakuan bahwa murid telah membaca dan memahami prasyarat kosa kata
+   * (Bug #4: Tanpa memalsukan BKT mastery p=0.75 secara fiktif).
    */
-  function recordVocabPrereqMastery(prereqCompetencyId) {
+  function acknowledgeVocabPrereq(prereqCompetencyId) {
     if (!prereqCompetencyId) return;
+    var cId = prereqCompetencyId;
+    var sc = getScenario(cId);
+    if (sc && sc.prereqCompetencyId) {
+      cId = sc.prereqCompetencyId;
+    }
     try {
-      var rawBkt = localStorage.getItem('fiezel-mastery-bkt-v1');
-      var bktData = rawBkt ? JSON.parse(rawBkt) : { skills: {} };
-      if (!bktData.skills) bktData.skills = {};
-      bktData.skills[prereqCompetencyId] = {
-        p: 0.75,
-        updatedAt: Date.now(),
-        attempts: 2,
-        correct: 2
-      };
-      localStorage.setItem('fiezel-mastery-bkt-v1', JSON.stringify(bktData));
+      var rawAck = localStorage.getItem(PREREQ_ACK_KEY);
+      var ack = rawAck ? JSON.parse(rawAck) : {};
+      ack[cId] = Date.now();
+      ack[prereqCompetencyId] = Date.now();
+      localStorage.setItem(PREREQ_ACK_KEY, JSON.stringify(ack));
     } catch (_) {}
 
-    // Dispatch event for UI updates
     if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
       try {
-        var ev = new CustomEvent('fiezel:prereq-unlocked', { detail: { competencyId: prereqCompetencyId } });
+        var ev = new CustomEvent('fiezel:prereq-acknowledged', { detail: { competencyId: cId } });
         window.dispatchEvent(ev);
       } catch (_) {}
     }
+  }
+
+  function recordVocabPrereqMastery(prereqCompetencyId) {
+    acknowledgeVocabPrereq(prereqCompetencyId);
   }
 
   return {
@@ -619,6 +652,7 @@
     getScenario: getScenario,
     getPersona: getPersona,
     checkPrerequisiteStatus: checkPrerequisiteStatus,
+    acknowledgeVocabPrereq: acknowledgeVocabPrereq,
     recordVocabPrereqMastery: recordVocabPrereqMastery
   };
 }));

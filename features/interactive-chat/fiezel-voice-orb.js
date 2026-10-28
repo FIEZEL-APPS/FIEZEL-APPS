@@ -102,7 +102,7 @@
       if (this.partnerAvatar.indexOf('<svg') >= 0 || this.partnerAvatar.indexOf('<img') >= 0) {
         avatarHtml = '<div class="fzc-call-partner-avatar" style="display:flex;align-items:center;justify-content:center;">' + this.partnerAvatar + '</div>';
       } else if (this.partnerAvatar.startsWith('http') || this.partnerAvatar.startsWith('./') || this.partnerAvatar.startsWith('/')) {
-        avatarHtml = '<img class="fzc-call-partner-avatar" src="' + this.partnerAvatar + '" alt="' + this.partnerName + '">';
+        avatarHtml = '<img class="fzc-call-partner-avatar" src="' + this.partnerAvatar + '" alt="' + this._escapeHtml(this.partnerName) + '">';
       } else {
         avatarHtml = '<div class="fzc-call-partner-avatar" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;">' + this.partnerAvatar + '</div>';
       }
@@ -297,7 +297,10 @@
    * @param {'connecting' | 'listening' | 'thinking' | 'speaking'} nextState
    */
   VoiceOrb.prototype.setState = function (nextState) {
-    if (!STATES[nextState.toUpperCase()] && nextState !== this.state) return;
+    // Bug #32: Safe guard against non-string / undefined state input
+    if (!nextState || typeof nextState !== 'string') return;
+    var upper = nextState.toUpperCase();
+    if (!STATES[upper] && nextState !== this.state) return;
     this.state = nextState;
 
     if (this.centerpieceEl) {
@@ -338,11 +341,17 @@
    */
   VoiceOrb.prototype.attachStream = function (mediaStream) {
     try {
+      // Bug #21: Make attachStream idempotent, prevent leaking previous nodes / RAF loops
+      this.detachStream();
+
       var AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
-      if (!this.audioContext) this.audioContext = new AudioCtx();
+      if (!this.audioContext || this.audioContext.state === 'closed') {
+        this.audioContext = window.__fiezelSharedAudioContext || new AudioCtx();
+        window.__fiezelSharedAudioContext = this.audioContext;
+      }
       if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
+        try { this.audioContext.resume(); } catch (_) {}
       }
 
       this.analyser = this.audioContext.createAnalyser();
@@ -353,8 +362,9 @@
       this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
 
       var self = this;
+      var pollToken = ++this._pollTokenCounter;
       function pollAudio() {
-        if (!self.analyser) return;
+        if (self._pollTokenCounter !== pollToken || !self.analyser) return;
         self.analyser.getByteFrequencyData(self.dataArray);
         var sum = 0;
         for (var i = 0; i < self.dataArray.length; i++) {
@@ -364,13 +374,15 @@
         var normalized = Math.min(1, avg / 128);
         self.setVolume(normalized);
 
-        if (self.audioSource) {
-          requestAnimationFrame(pollAudio);
+        if (self.audioSource && self._pollTokenCounter === pollToken) {
+          self.streamRafId = requestAnimationFrame(pollAudio);
         }
       }
-      requestAnimationFrame(pollAudio);
+      this.streamRafId = requestAnimationFrame(pollAudio);
     } catch (e) {
-      console.warn('[FiezelVoiceOrb] Audio stream attach error:', e);
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('[FiezelVoiceOrb] Audio stream attach error:', e);
+      }
     }
   };
 
@@ -379,6 +391,11 @@
    */
   VoiceOrb.prototype.detachStream = function () {
     try {
+      this._pollTokenCounter = (this._pollTokenCounter || 0) + 1;
+      if (this.streamRafId) {
+        if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(this.streamRafId);
+        this.streamRafId = null;
+      }
       if (this.audioSource) {
         this.audioSource.disconnect();
         this.audioSource = null;

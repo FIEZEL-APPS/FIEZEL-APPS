@@ -97,18 +97,27 @@
     return String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim();
   }
 
+  var ECHO_MIN_CHARS = 8;
+  var ECHO_WINDOW_MS = 1800;
+
   // Acoustic Echo Discriminator: identifies if mic transcription is an echo of the AI's own words
-  function isAcousticEcho(heardText, aiSpokenText) {
+  // Bug #11: Short answers (Yes, Hai, OK, etc.) must NEVER be discarded as echo
+  function isAcousticEcho(heardText, aiSpokenText, aiFinishedAt) {
     if (!heardText || !aiSpokenText) return false;
+    if (aiFinishedAt && (Date.now() - aiFinishedAt) > ECHO_WINDOW_MS) return false;
+
     var u = String(heardText).toLowerCase().replace(/[\s\p{P}\u3000-\u303F]/gu, '');
     var a = String(aiSpokenText).toLowerCase().replace(/[\s\p{P}\u3000-\u303F]/gu, '');
     if (!u || !a) return false;
-    if (a.indexOf(u) >= 0 || u.indexOf(a) >= 0) return true;
-    if (u.length >= 2) {
-      if (a.indexOf(u.slice(0, Math.min(u.length, 6))) >= 0) return true;
-      if (a.indexOf(u.slice(-Math.min(u.length, 6))) >= 0) return true;
+    if (u.length < ECHO_MIN_CHARS) return false;
+    if (a.indexOf(u) >= 0 && u.length >= 12) return true;
+
+    var uUnits = u.length >= 4 ? [u.slice(0, 4), u.slice(2, 6), u.slice(-4)] : [u];
+    var matchCount = 0;
+    for (var i = 0; i < uUnits.length; i++) {
+      if (a.indexOf(uUnits[i]) >= 0) matchCount++;
     }
-    return false;
+    return (matchCount / uUnits.length) >= 0.8 && u.length >= 10;
   }
 
   // Pure Math RMS calculator for audio samples
@@ -330,7 +339,8 @@
     }
 
     function setStatus(nextStatus, meta, force) {
-      if (state.status === nextStatus) return;
+      // Bug #27: Return true if already in the target status (idempotent success)
+      if (state.status === nextStatus) return true;
       if (!force && !canTransition(nextStatus)) {
         if (typeof console !== 'undefined' && console.warn) {
           console.warn('[VoiceCall] Illegal state transition:', state.status, '->', nextStatus);
@@ -720,21 +730,36 @@
             }
           }
 
-          // 2. Speaking State: Detect Polite Interruption (Barge-in via acoustic analyser)
+          // 2. Speaking State: Detect Polite Interruption (Barge-in via acoustic analyser + time hold)
+          // Bug #5: Pre-ducking berbasis waktu (120ms hold, 650ms confirm timeout)
           if (state.status === STATE.SPEAKING && analyserNode) {
             var timeSpeaking = Date.now() - (aiSpeechStartTime || 0);
-            if (timeSpeaking >= (CONFIG.acousticRefractoryMs || 950)) {
+            if (timeSpeaking >= (CONFIG.acousticRefractoryMs || 350)) {
               if (rms > CONFIG.interruptThreshold) {
-                loudFramesCount++;
-                if (loudFramesCount >= CONFIG.interruptConsecutiveFrames) {
-                  loudFramesCount = 0;
-                  interrupt('user_acoustic_barge_in');
+                var nowTs = Date.now();
+                if (!loudSince) loudSince = nowTs;
+                if ((nowTs - loudSince) >= (CONFIG.interruptHoldMs || 120)) {
+                  var cvBarge = chatVoice();
+                  if (cvBarge && typeof cvBarge.duck === 'function') {
+                    cvBarge.duck(0.25);
+                  }
+                  if (!duckTimer) {
+                    duckTimer = setTimeout(function () {
+                      duckTimer = null;
+                      if (state.status === STATE.SPEAKING) {
+                        var cvRestore = chatVoice();
+                        if (cvRestore && typeof cvRestore.duck === 'function') {
+                          cvRestore.duck(1.0);
+                        }
+                      }
+                    }, CONFIG.interruptConfirmMs || 650);
+                  }
                 }
               } else {
-                loudFramesCount = Math.max(0, loudFramesCount - 1);
+                loudSince = 0;
               }
             } else {
-              loudFramesCount = 0;
+              loudSince = 0;
             }
           }
         }
@@ -805,20 +830,23 @@
       return course === 'ja' ? String(s || '').replace(/\s+/g, '').length / 2 : normalizeUnits(s, 'en').length;
     }
 
-    /** Transkrip yang ≥55% unitnya ada di balasan AI yang sedang diputar = gema speaker, bukan murid. */
+    /** Transkrip yang ≥80% unitnya ada di balasan AI dan panjangnya signifikan = gema speaker. */
+    // Bug #11: Jangan drop jawaban pendek murid (< 4 unit)
     function isEchoOfAi(transcript) {
       if (!currentAiText || !transcript) return false;
+      var a = normalizeUnits(transcript, state.course);
+      if (a.length < 4) return false;
+
       var cleanA = String(transcript).toLowerCase().replace(/[\u30a1-\u30f6]/g, function (m) { return String.fromCharCode(m.charCodeAt(0) - 0x60); }).trim();
       var cleanAi = String(currentAiText).toLowerCase().replace(/[\u30a1-\u30f6]/g, function (m) { return String.fromCharCode(m.charCodeAt(0) - 0x60); }).trim();
-      if (cleanAi && (cleanAi.indexOf(cleanA) !== -1 || cleanA.indexOf(cleanAi) !== -1)) return true;
-      var a = normalizeUnits(transcript, state.course);
-      if (!a.length) return false;
+      if (cleanA.length >= 12 && cleanAi && cleanAi.indexOf(cleanA) !== -1) return true;
+
       var b = normalizeUnits(currentAiText, state.course);
       var set = {};
       for (var i = 0; i < b.length; i++) set[b[i]] = true;
       var hit = 0;
       for (var j = 0; j < a.length; j++) if (set[a[j]]) hit++;
-      return hit / a.length >= 0.55;
+      return (hit / a.length) >= 0.80;
     }
 
     function clearDuck() {
@@ -888,6 +916,9 @@
             // Barge-in lewat token SR: tolak gema suara AI sendiri dan token kosong.
             if (isEchoOfAi(fresh) || countWords(fresh, state.course) < CONFIG.minBargeInWords) return;
             interrupt('user_speech_token_barge_in');
+            // Bug #22: Bersihkan sisa transkrip sesi lama agar tidak menggabung ke ujaran baru
+            transcriptCarry = '';
+            sessionFinals = '';
             pendingTranscript = fresh;
             state.currentTranscript = fresh;
             utteranceStartedAt = Date.now();
@@ -1006,12 +1037,10 @@
       if (state.status !== STATE.LISTENING) return;
       var text = pendingTranscript.trim();
       if (!text) {
-        if (hasUserSpoken) {
-          text = state.course === 'ja' ? 'もしもし、聞こえますか？' : 'Hello, can you hear me?';
-        } else {
-          hasUserSpoken = false;
-          return;
-        }
+        // Bug #13 & Zero-Loss Input: Dilarang memalsukan/mengarang kalimat murid saat input kosong
+        hasUserSpoken = false;
+        updateSubtitleUI(t('call_not_caught', 'Suara belum tertangkap jelas, silakan ulangi...'), 'status');
+        return;
       }
 
       // Reset turn buffer (hasil SR sesi berjalan sampai di sini sudah dikirim)
@@ -1280,7 +1309,23 @@
       updatePedagogyUI();
 
       // Speak AI response
+      // Bug #6: Speaking watchdog prevents hands-free call from hanging permanently if speech stalls
+      var aiSpeakingWatchdog = setTimeout(function () {
+        aiSpeakingWatchdog = null;
+        if (state.status === STATE.SPEAKING && !isDestroyed) {
+          currentAiText = '';
+          clearDuck();
+          setStatus(STATE.LISTENING);
+          updateSubtitleUI(t('call_listening_hint', 'Mendengarkan... Silakan bicara.'), 'status');
+          ensureRecognitionRunning();
+        }
+      }, 18000);
+
       playSpeech(speechText, state.course).then(function () {
+        if (aiSpeakingWatchdog) {
+          clearTimeout(aiSpeakingWatchdog);
+          aiSpeakingWatchdog = null;
+        }
         currentAiText = '';
         clearDuck();
         // Hands-Free Loop: If still in speaking state, return to listening after natural pause
@@ -1643,7 +1688,8 @@
     }
 
     function end() {
-      if (state.status === STATE.IDLE && isDestroyed) return;
+      // Bug #8: Prevent duplicate call session recording and multiple teardown passes
+      if (isDestroyed) return;
       isDestroyed = true;
 
       releaseWakeLock();
@@ -2091,10 +2137,12 @@
         btnUnlock.onclick = function (e) {
           if (e) e.stopPropagation();
           var voiceScenarios = getVoiceScenarios();
-          if (voiceScenarios && typeof voiceScenarios.recordVocabPrereqMastery === 'function' && state.prereqCompetencyId) {
+          if (voiceScenarios && typeof voiceScenarios.acknowledgeVocabPrereq === 'function' && state.prereqCompetencyId) {
+            voiceScenarios.acknowledgeVocabPrereq(state.prereqCompetencyId);
+          } else if (voiceScenarios && typeof voiceScenarios.recordVocabPrereqMastery === 'function' && state.prereqCompetencyId) {
             voiceScenarios.recordVocabPrereqMastery(state.prereqCompetencyId);
           }
-          state.prereqStatus = { isReady: true, pMastery: 0.75, stateLabel: 'DEVELOPING' };
+          state.prereqStatus = { isReady: true, pMastery: null, stateLabel: 'ACKNOWLEDGED', acknowledged: true };
           var overlay = container.querySelector('.fzc-call-prereq-overlay') || container.querySelector('#fzcCallPrereqOverlay');
           if (overlay && overlay.parentNode) {
             overlay.parentNode.removeChild(overlay);
@@ -2315,6 +2363,7 @@
       getState: function () {
         return Object.assign({}, state);
       },
+      setStatus: setStatus,
       on: on,
       off: off,
       start: start,
@@ -2360,6 +2409,7 @@
     STATE: STATE,
     PERSONAS: PERSONAS,
     createEngine: createVoiceCallEngine,
+    createVoiceCallEngine: createVoiceCallEngine,
     start: function (options) { return defaultInstance.start(options); },
     startCall: function (options) { return defaultInstance.start(options); },
     end: function () { return defaultInstance.end(); },
