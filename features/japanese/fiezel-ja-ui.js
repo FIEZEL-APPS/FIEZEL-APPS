@@ -611,7 +611,13 @@
     });
 
     var romaji = '';
-    if (complete) {
+    var isExam = false;
+    try {
+      if (root.state && (root.state.view === 'test' || root.state.view === 'exam')) isExam = true;
+      if (root.document && (root.document.body?.classList?.contains('fz-exam-mode') || root.document.querySelector('.quiz-shell, #placementSoal'))) isExam = true;
+    } catch (_) {}
+
+    if (complete && !isExam) {
       romaji = parts.join(' ')
         .replace(/\s+([.,!?)」』"])/g, '$1')
         .replace(/([「『"(])\s+/g, '$1')

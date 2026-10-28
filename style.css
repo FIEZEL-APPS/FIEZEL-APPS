@@ -10408,6 +10408,16 @@ body.fz-view-library .section-head,
 /* ==========================================================================
    KOSAKATA HUB OVERHAUL (IMG_2620 Clean Cohesive Layout)
    ========================================================================== */
+/* Anti-Leak Exam Purity (Rule 4.5): No romaji or hints in placement/exam mode */
+body.fz-view-test .ja-romaji,
+body.fz-exam-mode .ja-romaji,
+body:has(.quiz-shell) .ja-romaji,
+body:has(#placementSoal) .ja-romaji,
+.quiz-shell .ja-romaji,
+.quiz-card .ja-romaji {
+  display: none !important;
+}
+
 .vocab-hub-page {
   display: flex;
   flex-direction: column;
@@ -10417,6 +10427,22 @@ body.fz-view-library .section-head,
   margin: 0 auto;
   padding: 8px 0 24px;
   box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .vocab-hub-page {
+    max-width: 880px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) !important;
+    gap: 20px !important;
+    align-items: start !important;
+  }
+}
+@media (min-width: 1024px) {
+  .vocab-hub-page {
+    max-width: 980px !important;
+    gap: 24px !important;
+  }
 }
 .vocab-hero-card {
   background: #FFFFFF !important;

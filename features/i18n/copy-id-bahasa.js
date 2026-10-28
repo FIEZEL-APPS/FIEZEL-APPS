@@ -362,6 +362,8 @@
     'story.vocab_saving': 'Menyimpan progres kata...',
     'story.autoplay_label': 'Putar Otomatis',
     'story.quiz_speaker_name': 'Instruktur Ujian',
-    'story.quiz_audio_role': 'Audio Pertanyaan Soal (Bahasa Jepang)'
+    'story.quiz_audio_role': 'Audio Pertanyaan Soal (Bahasa Jepang)',
+    'story.library_card_sub': 'Graded Readers N5 · Cerita Bergambar',
+    'story.library_card_title': 'Cerita Bergambar N5'
   });
 })();
