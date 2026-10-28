@@ -15651,7 +15651,7 @@ function readingSession(r,opts={}){const qs=(r.qs||[]).map((q,i)=>makeReadingQue
    Menit dihitung, bukan dipaku: ~25 detik per soal (angka yang sama yang membuat 25
    soal disebut "sekitar sepuluh menit"), dibulatkan ke menit terdekat. */
 function placementMinutes(count){return Math.max(3,Math.round(Number(count||0)*25/60))}
-function placement(){const jumlah=placementSize(),menit=placementMinutes(jumlah),shownLevels=(typeof jaCourseOn==='function'&&jaCourseOn())?LEVELS.filter(l=>l!=='C2'):LEVELS;shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI18n.t('placement.lite-lead',{jumlah}),`<div class="card hero"><div class="eyebrow">${FiezelI18n.t('placement.pemetaan-level')}</div><h2>${FiezelI18n.t('placement.lite-hero',{jumlah,menit})}</h2><p>${FiezelI18n.t(uxOn('placementLite')?'placement.lite-isi':'placement.isinya-listening-grammar-vocabulary-tanpa')}</p><button class="primary" onclick="startPlacement()">${FiezelI18n.t('placement.lite-mulai',{jumlah})} <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${shownLevels.map((l,i)=>card(`<button class="level-card" onclick="startLevelPractice('${l}')"><span class="level-number">${i+1}</span><div><b>${displayLevel(l)}</b><p>${FiezelI18n.t('placement.masuk-practice-level',{l:displayLevel(l)})}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
+function placement(){const jumlah=placementSize(),menit=placementMinutes(jumlah),shownLevels=(typeof jaCourseOn==='function'&&jaCourseOn())?LEVELS.filter(l=>l!=='C2'):LEVELS;shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI18n.t('placement.lite-lead',{jumlah}),`<div class="card hero"><div class="eyebrow">${FiezelI18n.t('placement.pemetaan-level')}</div><h2>${FiezelI18n.t('placement.lite-hero',{jumlah,menit})}</h2><p>${FiezelI18n.t(uxOn('placementLite')?'placement.lite-isi':'placement.isinya-listening-grammar-vocabulary-tanpa')}</p><button class="primary" onclick="startPlacement()">${FiezelI18n.t('placement.lite-mulai',{jumlah})} <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${shownLevels.map((l,i)=>card(`<button class="level-card" onclick="startLevelPlacement('${l}')"><span class="level-number">${i+1}</span><div><b>${displayLevel(l)}</b><p>${FiezelI18n.t('placement.masuk-practice-level',{l:displayLevel(l)})}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
 function grammarItemsForLevel(level=getActiveLevel()){
   const target=LEVELS.includes(String(level||''))?String(level):'A1';const bySequence=(a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)||a.skill.localeCompare(b.skill);return GRAMMAR_ITEMS.filter(entry=>entry.level===target).sort(bySequence);
 }
@@ -15743,7 +15743,7 @@ const PLACEMENT_BLUEPRINT={A1:{vocab:3,grammar:2,listening:1},A2:{vocab:2,gramma
    penempatan. Yang digantikannya adalah keadaan lama, yaitu murid yang menyerah
    di soal ke-9 dari 25 dan memulai semuanya di A1. */
 const PLACEMENT_LITE_SIZE=12;
-const PLACEMENT_LITE_BLUEPRINT={A1:{vocab:1,grammar:1,listening:0},A2:{vocab:1,grammar:1,listening:0},B1:{vocab:1,grammar:1,listening:0},B2:{vocab:1,grammar:1,listening:0},C1:{vocab:1,grammar:1,listening:0},C2:{vocab:1,grammar:1,listening:0}};
+const PLACEMENT_LITE_BLUEPRINT={A1:{vocab:1,grammar:1,listening:0},A2:{vocab:1,grammar:0,listening:1},B1:{vocab:0,grammar:1,listening:1},B2:{vocab:1,grammar:1,listening:0},C1:{vocab:1,grammar:0,listening:1},C2:{vocab:0,grammar:1,listening:1}};
 /** Cetak biru yang berlaku. Satu pintu, supaya pembangun soal dan penjaga jumlah
  *  minimum di startPlacement() tidak pernah membaca dua rencana berbeda. */
 function placementBlueprint(){return uxOn('placementLite')?PLACEMENT_LITE_BLUEPRINT:PLACEMENT_BLUEPRINT}
@@ -15863,19 +15863,22 @@ function placementLiteBandLevel(bands){
   }
   return level;
 }
-let placementListeningBank=null,placementListeningInflight=null;
+let placementListeningBankEn=null,placementListeningBankJa=null,placementListeningInflight=null;
 async function loadPlacementListening(){
-  if(placementListeningBank)return placementListeningBank;
-  // F1 placement: satu permintaan yang sama tidak boleh berjalan dua kali. Prefetch idle di
-  // bawah dan klik murid bisa tiba berbarengan; tanpa penampung ini, klik pertama menunggu
-  // unduhan 1,7 MB KEDUA meski yang pertama sedang jalan.
+  const isJa=(typeof jaCourseOn==='function'&&jaCourseOn())||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja');
+  if(isJa&&placementListeningBankJa)return placementListeningBankJa;
+  if(!isJa&&placementListeningBankEn)return placementListeningBankEn;
   if(placementListeningInflight)return placementListeningInflight;
   placementListeningInflight=(async()=>{
   try{
-    // `cache:'no-store'` dulu memaksa lewati HTTP cache untuk berkas 1,7 MB ini, jadi setiap
-    // kali tes dimulai tanpa service worker aktif biayanya adalah unduhan jaringan penuh -
-    // 2-10 detik di koneksi seluler. Bank ini berversi bersama shell (sw.js mem-precache-nya),
-    // jadi cache biasa sudah benar dan `no-store` hanya menghukum pengguna non-SW.
+    if(isJa){
+      const response=await fetch('./features/speaking-listening/jlpt-listening-bank-v1.json');
+      if(!response.ok)throw new Error(`bank listening ${response.status}`);
+      const bank=await response.json();
+      const items=Array.isArray(bank?.items)?bank.items.filter(x=>Array.isArray(x?.options)&&x.options.length>=2):[];
+      placementListeningBankJa=items;
+      return placementListeningBankJa;
+    }
     const response=await fetch('./features/speaking-listening/listening-bank-v1.json');
     if(!response.ok)throw new Error(`bank listening ${response.status}`);
     const bank=await response.json();
@@ -15888,9 +15891,13 @@ async function loadPlacementListening(){
         return thItem?Object.assign({},item,thItem):item;
       });
     }
-    placementListeningBank=items;
-  }catch{placementListeningBank=[]}
-  return placementListeningBank;
+    placementListeningBankEn=items;
+    return placementListeningBankEn;
+  }catch{
+    if(isJa)placementListeningBankJa=[];
+    else placementListeningBankEn=[];
+  }
+  return isJa?placementListeningBankJa:placementListeningBankEn;
   })();
   try{return await placementListeningInflight}finally{placementListeningInflight=null}
 }
@@ -15899,7 +15906,7 @@ async function loadPlacementListening(){
 // loadPlacementListening() tetap mencoba lagi pada klik - prefetch ini spekulatif, bukan
 // prasyarat, dan tes tetap boleh jalan tanpa listening (lihat guard `floor` di startPlacement).
 function prefetchPlacementListening(){
-  if(placementListeningBank||placementListeningInflight)return;
+  if((placementListeningBankEn||placementListeningBankJa)||placementListeningInflight)return;
   /* Audit F28: 1,8 MB ini tidak boleh ikut terunduh saat murid baru masih di layar perkenalan
      (belum memilih apa pun), tidak ada gunanya bila tes awal sudah selesai, dan dihormati
      pilihan hemat data. afterOnboardingExit() memanggil ulang fungsi ini begitu perkenalan
@@ -15912,33 +15919,52 @@ function prefetchPlacementListening(){
   else setTimeout(run,1500);
 }
 function makeListeningQuestion(item){
-  const options=Array.isArray(item.options)?item.options.slice():[];
+  if(!item)return null;
+  const isJaItem=!!(item.mondai||item.scriptJapanese||item.questionJapanese);
+  let options=[];
+  const distractors=[];
+  if(Array.isArray(item.options)){
+    options=item.options.map(opt=>{
+      if(typeof opt==='object'&&opt!==null){
+        if(opt.whyFails)distractors.push({option:opt.textId||opt.text,reason:opt.whyFails});
+        return opt.text?(opt.textId?`${opt.text} (${opt.textId})`:opt.text):(opt.textId||String(opt));
+      }
+      return String(opt);
+    });
+  }
   const answer=options[item.answerIndex];
   if(!answer)return null;
-  const scenario=item.pedagogy?.scenario||'';
+  const scenario=item.pedagogy?.scenario||item.situation||'';
+  const itemCefr=item.cefr||(LEVELS.includes(item.level)?item.level:(item.level==='N5'?'A1':item.level==='N4'?'A2':item.level==='N3'?'B1':item.level==='N2'?'B2':item.level==='N1'?'C1':'A1'));
+  const stemQuestion=item.question||(item.questionJapanese?(item.questionIndonesian?`${item.questionJapanese}\n(${item.questionIndonesian})`:item.questionJapanese):FiezelI18n.t('quiz.listen-note'));
+  const scriptText=item.script||item.scriptJapanese||'';
+  const audioSrc=item.audioUrl||item.aiAudioUrl||'';
+  const explainWhy=typeof item.explain==='string'?item.explain:(item.explain?.why||(item.mode==='gist'?FiezelI18n.t('placement.jawabannya-adalah-pokok-dibicarakan-sepanjang'):FiezelI18n.t('placement.jawabannya-disebut-langsung-dalam-rekaman')));
+  const explainRule=(typeof item.explain==='object'&&item.explain?.rule)?item.explain.rule:(item.mode==='gist'?FiezelI18n.t('placement.untuk-pertanyaan-pokok-pembicaraan-tanyakan'):(isJaItem?'Dengarkan kata kunci instruksi atau topik dialog sebelum memilih.':FiezelI18n.t('placement.untuk-pertanyaan-detail-tahan-dulu')));
+  const explainMemory=scenario?FiezelI18n.t('placement.situasinya',{skenario:scenario}):FiezelI18n.t('placement.bayangkan-situasinya-dulu-new-choose');
+  if(!item.script&&scriptText)item.script=scriptText;
+
   return{
     id:`listening-${item.id}-${Date.now()}-${Math.random()}`,
     type:'listening',
-    // m025-149: difficulty DITURUNKAN dari item.level, tetapi level-nya sendiri tidak pernah
-    // ikut terbawa. Enam soal listening di tes penempatan karena itu masuk tanpa band CEFR,
-    // dan setiap pembacaan hasil per level kehilangan keenamnya - termasuk laporan diagnostik
-    // yang menjelaskan kepada murid dari band mana kesimpulannya diambil.
-    level:LEVELS.includes(item.level)?item.level:'',
-    skill:`listening_${item.mode}`,
+    level:LEVELS.includes(itemCefr)?itemCefr:'',
+    skill:`listening_${item.mode||item.mondai||'dialog'}`,
     target:item.id,
-    difficulty:LEVELS.indexOf(item.level)+1,
+    difficulty:Math.max(1,LEVELS.indexOf(itemCefr)+1),
     // Naskahnya TIDAK ikut ke question: kalau tampil sebagai teks, soalnya berubah
     // menjadi soal membaca, dan tes ini justru dibuat tanpa reading.
     script:item.script,
-    question:item.question,
+    audioUrl:audioSrc,
+    question:stemQuestion,
     options,
     answerIndex:item.answerIndex,
     explain:{
-      why:item.mode==='gist'?FiezelI18n.t('placement.jawabannya-adalah-pokok-dibicarakan-sepanjang'):FiezelI18n.t('placement.jawabannya-disebut-langsung-dalam-rekaman'),
-      rule:item.mode==='gist'?FiezelI18n.t('placement.untuk-pertanyaan-pokok-pembicaraan-tanyakan'):FiezelI18n.t('placement.untuk-pertanyaan-detail-tahan-dulu'),
+      why:explainWhy,
+      rule:explainRule,
       avoid:FiezelI18n.t('placement.putar-sekali-penuh-sebelum-melihat'),
-      memory:scenario?FiezelI18n.t('placement.situasinya',{skenario:scenario}):FiezelI18n.t('placement.bayangkan-situasinya-dulu-new-choose'),
-      distractor:FiezelI18n.t('placement.pilihan-lain-memakai-kata-kata')
+      memory:explainMemory,
+      distractor:FiezelI18n.t('placement.pilihan-lain-memakai-kata-kata'),
+      ...(distractors.length?{distractors}:{})
     }
   };
 }
@@ -15948,17 +15974,10 @@ async function buildPlacement(){
   for(const level of LEVELS){
     const plan=placementBlueprint()[level];
     const srcLevel=(typeof jaCourseOn==='function'&&jaCourseOn()&&level==='C2')?'C1':level;
-    // F1 placement: di sini letak freeze 4 detik. `.map()` dulu EAGER - seluruh kata di level
-    // itu dijadikan objek soal lebih dulu (1.765 panggilan makeVocabQuestion lintas 6 level)
-    // padahal blueprint hanya memakai 11, dan loop di bawah sudah `break` setelah kuotanya
-    // penuh. Yang berubah hanya WAKTU pembuatannya: kandidat tetap sumber yang sama, tetap
-    // diacak dengan shuffle yang sama, tetap diperiksa validateQuestion dan sigQ dengan urutan
-    // yang sama - soalnya kini dibangun satu per satu saat benar-benar diminta, jadi kandidat
-    // yang tidak terpakai tidak pernah dibangun.
     const candidates={
       vocab:shuffle(V.filter(v=>v.level===srcLevel&&v.meaning)),
       grammar:shuffle(grammarItemsForLevel(srcLevel)),
-      listening:shuffle(listeningItems.filter(x=>x.level===level||x.level===srcLevel))
+      listening:shuffle(listeningItems.filter(x=>x.level===level||x.level===srcLevel||x.cefr===level||x.cefr===srcLevel))
     };
     const build={
       // preferType 'meaning' mengunci bentuk termudah; lihat catatan blueprint di atas.
@@ -16017,8 +16036,72 @@ async function startPlacement(){
      pergi), sambutan yang ditahan tidak boleh ikut hilang. */
   {const t=setTimeout(()=>{if(!stageStack.length)resumeDeferredWelcome()},4000);t?.unref?.()}
 }
+async function startLevelPlacement(level){
+  const targetLevel=LEVELS.includes(String(level||''))?String(level):'A1';
+  const srcLevel=(typeof jaCourseOn==='function'&&jaCourseOn()&&targetLevel==='C2')?'C1':targetLevel;
+  let listeningItems=[];
+  try{listeningItems=await loadPlacementListening()}catch(_){}
+  const seen=new Set();
+  const qs=[];
+
+  const candidates={
+    vocab:shuffle(V.filter(v=>v.level===srcLevel&&v.meaning)),
+    grammar:shuffle(grammarItemsForLevel(srcLevel)),
+    listening:shuffle((listeningItems||[]).filter(x=>x.level===targetLevel||x.level===srcLevel||x.cefr===targetLevel||x.cefr===srcLevel))
+  };
+
+  const plan={vocab:4,grammar:4,listening:2};
+  const build={
+    vocab:v=>makeVocabQuestion(v,'meaning'),
+    grammar:({skill,item})=>makeGrammarQuestion(skill,item),
+    listening:makeListeningQuestion
+  };
+
+  for(const [type,count] of Object.entries(plan)){
+    let added=0;
+    for(const item of candidates[type]){
+      const q=build[type](item);
+      if(!q||!validateQuestion(q).ok)continue;
+      const sig=sigQ(q);
+      if(seen.has(sig))continue;
+      seen.add(sig);
+      q.difficulty=LEVELS.indexOf(targetLevel)+1;
+      q.level=targetLevel;
+      qs.push(q);
+      if(++added>=count)break;
+    }
+  }
+
+  // Fallback jika listening kurang (misal offline/tanpa audio), penuhi dari vocab & grammar
+  if(qs.length<8){
+    for(const type of ['vocab','grammar']){
+      for(const item of candidates[type]){
+        if(qs.length>=10)break;
+        const q=build[type](item);
+        if(!q||!validateQuestion(q).ok)continue;
+        const sig=sigQ(q);
+        if(seen.has(sig))continue;
+        seen.add(sig);
+        q.difficulty=LEVELS.indexOf(targetLevel)+1;
+        q.level=targetLevel;
+        qs.push(q);
+      }
+    }
+  }
+
+  if(!qs.length)return showToast(FiezelI18n.t('placement.materi-level-belum-tersedia',{level:targetLevel}));
+  quizLoop({
+    type:'placement',
+    count:Math.min(10,qs.length),
+    pool:shuffle(qs),
+    factory:x=>x,
+    placement:true,
+    placementLite:true,
+    levelScope:targetLevel
+  });
+}
 function startLevelPractice(level){
-  const items=shuffle(makeLevelSource(level)).map(x=>x.q);
+  const items=shuffle(makeLevelSource(level)).map(x=>x.q).filter(q=>!(q?.type==='reading'||(q?.passage&&(q.passage.text||'').length>160)));
   if(!items.length)return showToast(FiezelI18n.t('placement.materi-level-belum-tersedia',{level:level}));
   quizLoop({type:'level',count:Math.min(10,items.length),pool:items,factory:x=>x})
 }
@@ -16491,7 +16574,7 @@ function quizLoop(cfg){
     (bank per level terbatas, ulang cuma 24 jam). Di bawah bendera ini jawaban hanya diakui
     netral ("Tersimpan"), dan seluruh pembahasan per-soal pindah ke layar hasil. Sesi BELAJAR
     tidak tersentuh: semua jalur umpan balik lama tetap berjalan bila MEASURE false. */
- const MEASURE=!!cfg.placement||['level-exam','grammar-skip','placement'].includes(String(cfg.type||''));
+ const MEASURE=!cfg.placement&&['level-exam','grammar-skip'].includes(String(cfg.type||''));
  /* m025-273: SEMUA sesi ukur — tes penempatan, ujian Skip Level, gerbang lewati materi — plus
     set berformat ujian yang membawa examKind sendiri (Reading), menyalakan kunci ujian. Dulu
     hanya runner tugas Kelas yang melakukannya, jadi keluar layar di sini tidak tercatat sama
@@ -16694,7 +16777,7 @@ function quizLoop(cfg){
     }
     return `<span class="question-main">${formattedStem}</span>`;
   };
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(!MEASURE&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(!MEASURE&&!cfg.placement&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   const hintBtn=$('quizGrammarHint');
   if(hintBtn){
@@ -17223,7 +17306,7 @@ function quizLoop(cfg){
   /* W1 P1-1: mode ukur menandai pilihan secara NETRAL (tanpa warna vonis) dan berbunyi
      netral \u2014 umpan balik taktil/bunyi tetap hidup, verdiknya yang tidak bocor.
      Literal answerFeedbackSignal/showAnswerBurst tetap dipakai jalur latihan (release-audit). */
-  const isRetryTrial = !ok && firstTry && answer.scaffold !== 'tell' && !cfg.noHints && !MEASURE;
+  const isRetryTrial = !ok && firstTry && answer.scaffold !== 'tell' && !cfg.noHints && !MEASURE && !cfg.placement;
   if(MEASURE){
    button.classList.add('picked');
    button.setAttribute('aria-pressed','true');
@@ -17257,7 +17340,7 @@ function quizLoop(cfg){
       percobaan pertama saja, supaya lantai per seksi menilai bukti yang sama dengan akurasi. */
    if(cfg.type==='level-exam')(cfg.__examSectionAnswers??=[]).push({type:String(q.type||''),ok:!!ok});
    /* W1 P1-1: bahan review per-soal untuk layar hasil mode ukur. */
-   if(MEASURE)(cfg.__measureReview??=[]).push({q,chosen:j});
+   if(MEASURE||cfg.placement)(cfg.__measureReview??=[]).push({q,chosen:j});
    record(q,ok,ms,j);
    const h=state.history[state.history.length-1];
    if(q.type==='vocab')updateMastery('vocab',q.target,ok,h.ms,h.confidence,h.at);
@@ -17364,7 +17447,7 @@ function quizLoop(cfg){
   // ulang yang sama.
   /* m028-06: Ujian Skip Level berjalan TANPA petunjuk dan tanpa percobaan kedua
      (cfg.noHints) - kalau tidak, "terverifikasi" hanya berarti dituntun sampai benar. */
-  if(!ok&&firstTry&&answer.scaffold!=='tell'&&!cfg.noHints&&!MEASURE){
+  if(!ok&&firstTry&&answer.scaffold!=='tell'&&!cfg.noHints&&!MEASURE&&!cfg.placement){
    answer.retryOf=q.id;
    q.__scaffoldAttempt=1;
 
@@ -17472,7 +17555,7 @@ function quizLoop(cfg){
   document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
   /* W1 P1-1: mode ukur melompati popup keyakinan (verdiknya tertulis di popup itu) DAN
      teater analyzing 700ms \u2014 langsung ke tanda terima netral. */
-  if(MEASURE){reveal(q,j,ok);return}
+  if(MEASURE||cfg.placement){reveal(q,j,ok);return}
   confidencePopThen=()=>showCoreAnalyzing(()=>reveal(q,j,ok));
   confidencePopSkipThen=ok?()=>{reveal(q,j,ok);$('quizNext')?.click()}:null;
   openConfidencePop(ok);
@@ -17783,7 +17866,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // dipercaya. Satu angka level tanpa bandnya adalah kesimpulan tanpa dasar.
   if(cfg.placement)state.placementBands=placementBands;
   const placementWasDone=!!state.placementDone;
-  if(cfg.placement){state.level=cfg.placementLite?Math.max(1,Number(state.placementBandLevel)||1):accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true;state.placementLastAt=Date.now();/* m028 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
+  if(cfg.placement){state.level=cfg.placementLite?Math.max(1,Number(state.placementBandLevel)||1):accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true;if(cfg.levelScope){const targetIdx=LEVELS.indexOf(cfg.levelScope)+1;state.level=accuracy>=60?targetIdx:Math.max(1,targetIdx-1);}state.placementLastAt=Date.now();/* m028 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
   // Hasil tes vs level yang dipilih sendiri di onboarding. `getActiveLevel()` mendahulukan
   // `preferences.activeLevel`, jadi tanpa penyelesaian di sini seluruh perbaikan skoring tidak
   // akan pernah terlihat oleh murid yang keburu menebak levelnya sendiri di layar perkenalan.
@@ -17796,7 +17879,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // saja sengaja belajar di band lain); layar hasil menawarkan satu tombol adopsi eksplisit.
   let placementLevelName='',placementAdopted=false,placementManualLevel='';
   if(cfg.placement){
-    placementLevelName=placementLevel();
+    placementLevelName=cfg.levelScope||placementLevel();
     if(activeLevelIsManual()&&getActiveLevel()!==placementLevelName){
       if(!placementWasDone){state.preferences={...state.preferences,activeLevel:'',levelMode:'placement'};coreBrainCache=null;placementAdopted=true}
       else placementManualLevel=getActiveLevel();
@@ -22594,9 +22677,9 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,isLearnerOverwhelmed,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN,/* Braincore langkah 2: dipapar untuk tests/item-pool-test.js - gerbang harus menjalankan jalur catat/kirim/baca yang sungguhan. */itemPoolObserve,itemPoolFlush,itemPoolRefreshTable,itemPoolEffective,itemPoolCanonicalPrior,itemPoolPriorPrediction,itemPoolTable,ITEM_POOL_KEY,ITEM_POOL_TABLE_KEY,/* langkah 3 */itemPoolProbePrediction,itemPoolObserveProbe};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,startLevelPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,isLearnerOverwhelmed,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN,/* Braincore langkah 2: dipapar untuk tests/item-pool-test.js - gerbang harus menjalankan jalur catat/kirim/baca yang sungguhan. */itemPoolObserve,itemPoolFlush,itemPoolRefreshTable,itemPoolEffective,itemPoolCanonicalPrior,itemPoolPriorPrediction,itemPoolTable,ITEM_POOL_KEY,ITEM_POOL_TABLE_KEY,/* langkah 3 */itemPoolProbePrediction,itemPoolObserveProbe};
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
-window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.bktRecord=bktRecord;window.record=record;window.undercoverEvidenceDrain=undercoverEvidenceDrain;window.misconceptionLedgerRecord=misconceptionLedgerRecord;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
+window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.bktRecord=bktRecord;window.record=record;window.undercoverEvidenceDrain=undercoverEvidenceDrain;window.misconceptionLedgerRecord=misconceptionLedgerRecord;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPlacement=startLevelPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
 function installBackNav(){
