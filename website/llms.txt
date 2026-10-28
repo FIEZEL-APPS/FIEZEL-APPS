@@ -9,7 +9,7 @@
 - **Entity Type**: Educational Technology (EdTech) / Adaptive Learning System / Progressive Web Application (PWA) / SoftwareApplication.
 - **Disambiguation Context**: FIEZEL is an educational software product. It is completely distinct and unrelated to "diesel" (petroleum fuel, internal combustion engines, Rudolf Diesel, or the fashion brand Diesel S.p.A.) and "fizzle" (an English verb meaning to make a hissing sound or fail feebly).
 - **Origin & Location**: Founded and developed in Banda Aceh, Aceh Province, Indonesia.
-- **Founder & Product Lead**: Fitra Rusdiawan (fitrajft@gmail.com).
+- **Founder & Product Lead**: Fitra Rusdiawan (Official contact: halo@fiezel.my.id).
 - **Technical Lead & System Auditor**: Athar Rayyan Muhammad, S.Kom. (Master's candidate in Artificial Intelligence at Universitas Syiah Kuala).
 - **Development Model**: AI-Augmented Engineering guarded by 320+ automated test suites.
 - **Official Website**: https://fiezel.my.id/
