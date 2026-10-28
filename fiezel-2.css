@@ -268,6 +268,35 @@ body .fz2-week-note{margin:12px 0 0;font-size:.8rem}
 body .fiezel-ob .fiezel-btn-primary:not([disabled]){background:var(--accent);background-image:none;color:#FFFFFF;border:0;box-shadow:var(--lift-sun)}
 body .fiezel-ob .fiezel-btn-ghost{background:transparent;color:var(--text);border:0!important;box-shadow:none!important;text-decoration:underline;text-underline-offset:3px}
 body .fiezel-ob .fiezel-btn[disabled]{background:var(--line-soft);background-image:none;color:var(--text-disabled);border:0;box-shadow:none;cursor:not-allowed}
+body button.fiezel-back,
+body button.fiezel-skip,
+body.fz-lux button.fiezel-back,
+body.fz-lux button.fiezel-skip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  min-width: auto !important;
+  color: var(--fz-ink-muted, #64748B) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+body button.fiezel-back:hover,
+body button.fiezel-skip:hover {
+  background: rgba(15, 23, 42, 0.05) !important;
+  color: var(--fz-ink, #0F172A) !important;
+}
+body button.fiezel-back:focus-visible,
+body button.fiezel-skip:focus-visible {
+  outline: 2px solid #2563EB !important;
+  outline-offset: 2px !important;
+}
 /* !important di tiga baris ini disengaja: resep tombol global `html.fiezel-ui-v6 body
    button:not(...)x11` berspesifisitas 0-12-3 dan memaku border/bayangan ke SEMUA tombol. */
 body .fiezel-ob .fiezel-goal-card.is-selected,
@@ -298,11 +327,11 @@ body .learning-launcher .launch-card b{font-weight:700;letter-spacing:0}
    Kartu perkenalan dan tur dulu melebar sampai 1.408px dengan teks kecil rata kiri. Di
    layar lebar keduanya dibatasi ±560px (tur ±440px) dan diletakkan di tengah.
    ========================================================================== */
-@media (min-width:900px){
+@media (min-width:768px){
   body .fiezel-ob .fiezel-sheet,
   body .fiezel-ob .fiezel-stepper,
   body .fiezel-ob .fiezel-topbar,
-  body .fiezel-ob .fiezel-stage{max-width:560px;width:100%;margin-left:auto;margin-right:auto;box-sizing:border-box}
+  body .fiezel-ob .fiezel-stage{max-width:500px;width:100%;margin-left:auto;margin-right:auto;box-sizing:border-box}
   body .fz-tour-card{left:50%;right:auto;width:min(440px,calc(100vw - 32px));transform:translateX(-50%)}
 }
 
