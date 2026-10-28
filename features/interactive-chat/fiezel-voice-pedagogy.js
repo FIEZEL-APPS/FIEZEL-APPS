@@ -33,15 +33,41 @@
     HALF_LIFE_DAYS: 30.0
   };
 
+  // Bug #1 & #2: Hasil "tidak dinilai". Analyzer deterministik hanya berwenang menyatakan SALAH
+  // untuk pola yang ia kenali secara eksplisit. Selain itu ia DIAM (ok: null) — penilaian final
+  // adalah hak AI (turn.mistakeSignal). Zero-Dumbing: tidak ada pujian tanpa bukti.
+  function undecided(text) {
+    return {
+      ok: null,
+      userExactTranscript: text,
+      misconceptionId: null,
+      whyFailsId: null,
+      whyFailsTh: null,
+      missingTokens: [],
+      syntacticCorrection: null,
+      naturalReformulation: null,
+      pedagogicalFeedbackId: null,
+      pedagogicalFeedbackTh: null,
+      aiReply: null,
+      aiReplyTranslationId: null,
+      aiReplyTranslationTh: null
+    };
+  }
+
+  // Analyzer kalengan ini dirancang HANYA untuk skenario terukur 'scen_*'.
+  function isScopedScenario(sId) {
+    return typeof sId === 'string' && sId.indexOf('scen_') === 0;
+  }
+
   /**
    * Deterministic linguistic analyzer fallback & augmentation for Zero-Dumbing Invariant
    */
   function analyzeUtterancePedagogy(rawTranscript, scenarioId, targetLang) {
     var text = String(rawTranscript || '').trim();
     var lower = text.toLowerCase();
-    var words = text.split(/\s+/).filter(Boolean);
     var sId = scenarioId || '';
     var lang = targetLang || (sId.indexOf('ja') >= 0 ? 'ja' : 'en');
+    if (!text || !isScopedScenario(sId)) return undecided(text);
 
     if (lang === 'en') {
       // 1. Check morphological overregularization (goed, buyed, eated, seed)
@@ -119,8 +145,8 @@
         };
       }
 
-      // 3. Incomplete clause or word order
-      if (words.length < 5 || /^went\s+i\b/i.test(lower) || /\band\s+later\s+go\s+library\b/i.test(lower)) {
+      // 3. Incomplete clause or word order (pola salah eksplisit, tanpa batas panjang kata)
+      if (/^went\s+i\b/i.test(lower) || /\band\s+later\s+go\s+library\b/i.test(lower)) {
         return {
           ok: false,
           accuracyScore: 45,
@@ -156,45 +182,61 @@
         };
       }
 
-      // Accurate English response (Haram Dumbing Down - Genuine Praise Only for Correct Answers)
-      return {
-        ok: true,
-        accuracyScore: 94,
-        grammarScore: 95,
-        fluencyScore: 92,
-        vocabUsageScore: 94,
-        userExactTranscript: text,
-        misconceptionId: null,
-        whyFailsId: null,
-        whyFailsTh: null,
-        missingTokens: [],
-        syntacticCorrection: null,
-        naturalReformulation: text,
-        pedagogicalFeedbackId:
-          'Struktur kalimat, pemilihan tense, dan penghubung klausa sudah akurat serta terdengar natural.',
-        pedagogicalFeedbackTh:
-          'โครงสร้างประโยค การเลือกใช้ Tense และการเชื่อมประโยคถูกต้องและเป็นธรรมชาติมาก',
-        aiReply: sId.indexOf('ielts') >= 0
-          ? 'Excellent point. Your use of a concessive clause with "Although" clearly contrasts the benefits and drawbacks. Do you think governments should regulate remote work hours in the future?'
-          : sId.indexOf('past') >= 0
-            ? 'That sounds like an awesome weekend in Bandung! Street food in the mountain air is the best. Which dish was your favorite?'
-            : 'One iced latte coming right up! Best of luck preparing your presentation with your team this afternoon. What is your presentation topic about?',
-        aiReplyTranslationId: sId.indexOf('ielts') >= 0
-          ? 'Poin yang sangat tajam. Penggunaan klausa konsesif "Although" mempertentangkan kelebihan dan kekurangan dengan sangat jelas. Menurutmu apakah pemerintah perlu mengatur jam kerja jarak jauh di masa depan?'
-          : sId.indexOf('past') >= 0
-            ? 'Terdengar seperti akhir pekan yang luar biasa di Bandung! Jajanan kaki lima di udara pegunungan memang paling nikmat. Makanan mana yang paling kamu sukai?'
-            : 'Satu iced latte segera disiapkan! Semoga sukses menyiapkan presentasi bersama timmu sore ini. Apa topik presentasi kalian?',
-        aiReplyTranslationTh: sId.indexOf('ielts') >= 0
-          ? 'เป็นประเด็นที่ยอดเยี่ยมมาก การใช้ประโยค "Although" ช่วยเปรียบเทียบข้อดีและข้อเสียได้ชัดเจน คุณคิดว่ารัฐบาลควรกำหนดกฎหมายชั่วโมงการทำงานทางไกลในอนาคตไหมคะ?'
-          : sId.indexOf('past') >= 0
-            ? 'ฟังดูเป็นวันหยุดสุดสัปดาห์ที่ยอดเยี่ยมที่บันดุงเลย! อาหารริมทางท่ามกลางอากาศบนภูเขาคือที่สุดแล้ว ชอบเมนูไหนมากที่สุดครับ?'
-            : 'ลาเต้เย็น 1 แก้วได้แล้วครับ! ขอให้การเตรียมงานนำเสนอกับทีมช่วงบ่ายนี้ราบรื่นนะ หัวข้อที่นำเสนอเกี่ยวกับเรื่องอะไรครับ?'
-      };
+      // Zero-Dumbing Target Fulfillment: Hanya nyatakan ok: true bila memenuhi bukti target pembelajaran skenario
+      var meetsTargetEn = false;
+      if (sId.indexOf('cafe') >= 0 && /(would\s+like|'d\s+like)/i.test(lower) && /\bam\s+(meeting|working|preparing|going|heading)\b/i.test(lower)) {
+        meetsTargetEn = true;
+      } else if (sId.indexOf('past') >= 0 && /\b(went|ate|saw|took|visited)\b/i.test(lower) && text.split(/\s+/).length >= 6) {
+        meetsTargetEn = true;
+      } else if (sId.indexOf('ielts') >= 0 && /\b(although|whereas|while)\b/i.test(lower) && !/\bbut\b/i.test(lower)) {
+        meetsTargetEn = true;
+      }
+
+      if (meetsTargetEn) {
+        return {
+          ok: true,
+          accuracyScore: 94,
+          grammarScore: 95,
+          fluencyScore: 92,
+          vocabUsageScore: 94,
+          userExactTranscript: text,
+          misconceptionId: null,
+          whyFailsId: null,
+          whyFailsTh: null,
+          missingTokens: [],
+          syntacticCorrection: null,
+          naturalReformulation: text,
+          pedagogicalFeedbackId:
+            'Struktur kalimat, pemilihan tense, dan penghubung klausa sudah akurat serta terdengar natural.',
+          pedagogicalFeedbackTh:
+            'โครงสร้างประโยค การเลือกใช้ Tense และการเชื่อมประโยคถูกต้องและเป็นธรรมชาติมาก',
+          aiReply: sId.indexOf('ielts') >= 0
+            ? 'Excellent point. Your use of a concessive clause with "Although" clearly contrasts the benefits and drawbacks. Do you think governments should regulate remote work hours in the future?'
+            : sId.indexOf('past') >= 0
+              ? 'That sounds like an awesome weekend in Bandung! Street food in the mountain air is the best. Which dish was your favorite?'
+              : 'One iced latte coming right up! Best of luck preparing your presentation with your team this afternoon. What is your presentation topic about?',
+          aiReplyTranslationId: sId.indexOf('ielts') >= 0
+            ? 'Poin yang sangat tajam. Penggunaan klausa konsesif "Although" mempertentangkan kelebihan dan kekurangan dengan sangat jelas. Menurutmu apakah pemerintah perlu mengatur jam kerja jarak jauh di masa depan?'
+            : sId.indexOf('past') >= 0
+              ? 'Terdengar seperti akhir pekan yang luar biasa di Bandung! Jajanan kaki lima di udara pegunungan memang paling nikmat. Makanan mana yang paling kamu sukai?'
+              : 'Satu iced latte segera disiapkan! Semoga sukses menyiapkan presentasi bersama timmu sore ini. Apa topik presentasi kalian?',
+          aiReplyTranslationTh: sId.indexOf('ielts') >= 0
+            ? 'เป็นประเด็นที่ยอดเยี่ยมมาก การใช้ประโยค "Although" ช่วยเปรียบเทียบข้อดีและข้อเสียได้ชัดเจน คุณคิดว่ารัฐบาลควรกำหนดกฎหมายชั่วโมงการทำงานทางไกลในอนาคตไหมคะ?'
+            : sId.indexOf('past') >= 0
+              ? 'ฟังดูเป็นวันหยุดสุดสัปดาห์ที่ยอดเยี่ยมที่บันดุงเลย! อาหารริมทางท่ามกลางอากาศบนภูเขาคือที่สุดแล้ว ชอบเมนูไหนมากที่สุดครับ?'
+              : 'ลาเต้เย็น 1 แก้วได้แล้วครับ! ขอให้การเตรียมงานนำเสนอกับทีมช่วงบ่ายนี้ราบรื่นนะ หัวข้อที่นำเสนอเกี่ยวกับเรื่องอะไรครับ?'
+        };
+      }
+
+      // Zero-Dumbing: Kalimat bahasa Inggris yang tidak cocok dengan pola salah eksplisit di atas
+      // diserahkan ke AI. Tidak ada pujian tanpa bukti (ok: null).
+      return undecided(text);
     }
 
     // Japanese (Kaiwa N5–N4)
     var isN4 = sId.indexOf('n4') >= 0;
-    if (/飲むです|するたら|コーヒーに/.test(text) || (!/を|ので|から|ください|お願いします|たら/.test(text) && text.length < 10)) {
+    // Bug #1 & #15: Hanya deteksi pola salah nyata. "コーヒーにします" adalah bahasa Jepang yang sah.
+    if (/飲むです|するたら|コーヒーにください/.test(text)) {
       return {
         ok: false,
         accuracyScore: 50,
@@ -234,34 +276,47 @@
       };
     }
 
-    // Accurate Japanese response
-    return {
-      ok: true,
-      accuracyScore: 95,
-      grammarScore: 96,
-      fluencyScore: 92,
-      vocabUsageScore: 95,
-      userExactTranscript: text,
-      misconceptionId: null,
-      whyFailsId: null,
-      whyFailsTh: null,
-      missingTokens: [],
-      syntacticCorrection: null,
-      naturalReformulation: text,
-      pedagogicalFeedbackId:
-        'Penggunaan partikel, konjugasi kata kerja sopan, dan intonasi kalimat sudah tepat.',
-      pedagogicalFeedbackTh:
-        'การใช้คำช่วย การผันกริยารูปสุภาพ และโครงสร้างประโยคถูกต้องสมบูรณ์',
-      aiReply: isN4
-        ? 'いい質問だね！毎日30分ずつ重要な文法を復習するのがおすすめだよ。今週の金曜日、図書館で一緒に練習しない？'
-        : 'かしこまりました！ホットコーヒーをお一つと、チーズケーキをお一つですね。店内でお召し上がりですか？',
-      aiReplyTranslationId: isN4
-        ? 'Pertanyaan yang bagus! Aku sarankan kamu mengulang tata bahasa penting 30 menit setiap hari. Jumat minggu ini, mau latihan bersama di perpustakaan?'
-        : 'Baik, dimengerti! Satu kopi panas dan satu cheesecake ya. Apakah ingin dinikmati di dalam kafe?',
-      aiReplyTranslationTh: isN4
-        ? 'เป็นคำถามที่ดีเลย! แนะนำให้ทบทวนไวยากรณ์สำคัญวันละ 30 นาทีนะ วันศุกร์นี้มาฝึกด้วยกันที่ห้องสมุดไหม?'
-        : 'รับทราบค่ะ! กาแฟร้อน 1 ที่ และชีสเค้ก 1 ที่นะคะ รับประทานที่ร้านใช่ไหมคะ?'
-    };
+    // Zero-Dumbing Target Fulfillment: Hanya nyatakan ok: true bila terbukti memenuhi target skenario
+    var meetsTargetJa = false;
+    if (sId.indexOf('kissaten') >= 0 && /(を|お).*(ください|お願いします)/.test(text)) {
+      meetsTargetJa = true;
+    } else if (isN4 && /(ので|から).*(したらいい|どうすれば)/.test(text)) {
+      meetsTargetJa = true;
+    }
+
+    if (meetsTargetJa) {
+      return {
+        ok: true,
+        accuracyScore: 95,
+        grammarScore: 96,
+        fluencyScore: 92,
+        vocabUsageScore: 95,
+        userExactTranscript: text,
+        misconceptionId: null,
+        whyFailsId: null,
+        whyFailsTh: null,
+        missingTokens: [],
+        syntacticCorrection: null,
+        naturalReformulation: text,
+        pedagogicalFeedbackId:
+          'Penggunaan partikel, konjugasi kata kerja sopan, dan intonasi kalimat sudah tepat.',
+        pedagogicalFeedbackTh:
+          'การใช้คำช่วย การผันกริยารูปสุภาพ และโครงสร้างประโยคถูกต้องสมบูรณ์',
+        aiReply: isN4
+          ? 'いい質問だね！毎日30分ずつ重要な文法を復習するのがおすすめだよ。今週の金曜日、図書館で一緒に練習しない？'
+          : 'かしこまりました！ホットコーヒーをお一つと、チーズケーキをお一つですね。店内でお召し上がりですか？',
+        aiReplyTranslationId: isN4
+          ? 'Pertanyaan yang bagus! Aku sarankan kamu mengulang tata bahasa penting 30 menit setiap hari. Jumat minggu ini, mau latihan bersama di perpustakaan?'
+          : 'Baik, dimengerti! Satu kopi panas dan satu cheesecake ya. Apakah ingin dinikmati di dalam kafe?',
+        aiReplyTranslationTh: isN4
+          ? 'เป็นคำถามที่ดีเลย! แนะนำให้ทบทวนไวยากรณ์สำคัญวันละ 30 นาทีนะ วันศุกร์นี้มาฝึกด้วยกันที่ห้องสมุดไหม?'
+          : 'รับทราบค่ะ! กาแฟร้อน 1 ที่ และชีสเค้ก 1 ที่นะคะ รับประทานที่ร้านใช่ไหมคะ?'
+      };
+    }
+
+    // Zero-Dumbing: Kalimat bahasa Jepang yang tidak cocok dengan pola salah eksplisit
+    // diserahkan ke AI. Tidak ada pujian tanpa bukti (ok: null).
+    return undecided(text);
   }
 
   /**
@@ -313,12 +368,25 @@
   function recordPedagogicalAttempt(params) {
     var p = params || {};
     var cid = String(p.competencyId || '').trim();
-    if (!cid) return null;
+    // Bug #1 & #15: Tolak verdict non-boolean (termasuk ok: null dari undecided)
+    if (!cid || typeof p.ok !== 'boolean') return null;
 
-    var ok = Boolean(p.ok);
+    var ok = p.ok;
     var now = Date.now();
 
-    // 1. Update BKT in localStorage
+    // Rute ke Host Braincore Gateway bila berjalan di aplikasi web Fiezel
+    if (typeof root.updateMastery === 'function') {
+      try {
+        root.updateMastery('speaking', cid, ok, p.latencyMs || 2500, p.confidence || null, now);
+      } catch (_) {}
+    }
+    if (typeof root.bktRecord === 'function') {
+      try {
+        root.bktRecord(cid, ok, ok ? 0.10 : 0.20, 0.20);
+      } catch (_) {}
+    }
+
+    // Simulasi in-memory / storage fallback untuk node test harness
     var bktBefore = BRAINCORE_PARAMS.P_INIT;
     var bktAfter = BRAINCORE_PARAMS.P_INIT;
     try {

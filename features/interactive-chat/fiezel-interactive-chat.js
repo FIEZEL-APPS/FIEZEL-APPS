@@ -58,7 +58,13 @@
       try {
         pageBuild = String(root.FIEZEL_PAGE_BUILD || '');
       } catch (_) {}
-      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
+      var nonce = '';
+      try {
+        if (api && api.StudioBridge && typeof api.StudioBridge.begin === 'function') {
+          nonce = api.StudioBridge.begin();
+        }
+      } catch (_) {}
+      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
       var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
       mountPoint.innerHTML =
         '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
@@ -2195,26 +2201,53 @@
     }
   }
 
+  var lastXpAwardAt = 0;
+
   // Dispatch real telemetry for a conversational turn (chat text or voice call turn)
-  function dispatchSpeakingTurnTelemetry(userText, scenarioId, hint, isVoice) {
+  // Bug #9: Support tri-state verdict (true | false | null) and rate-limited XP farming guard
+  function dispatchSpeakingTurnTelemetry(userText, scenarioId, hint, isVoice, meta) {
     var cleanText = String(userText || '').trim();
     if (!cleanText) return;
 
+    var m = meta || {};
     var sid = scenarioId || state.scenarioId || 'free';
-    var isJa = (state.course === 'ja');
-    var conceptId = (isJa ? 'ja_kaiwa_' : 'en_kaiwa_') + sid;
+    var course = m.course || (m.competencyId && m.competencyId.indexOf('en') >= 0 ? 'en' : (state.course || 'ja'));
+    var isJa = (course === 'ja');
+    var conceptId = m.competencyId || ((isJa ? 'ja_kaiwa_' : 'en_kaiwa_') + sid);
     var fluencyConcept = (isJa ? 'ja_speaking_fluency' : 'en_speaking_fluency');
 
-    var hasMisconception = !!hint;
-    var isOk = !hasMisconception;
-    var latencyMs = isVoice ? 2800 : 4500;
+    var verdict = (m.verdict !== undefined) ? m.verdict : (!hint);
+    var latencyMs = m.latencyMs || (isVoice ? 2800 : 4500);
+
+    var wordCount = isJa
+      ? Math.max(1, Math.round(cleanText.replace(/\s+/g, '').length / 2.5))
+      : Math.max(1, cleanText.split(/\s+/).filter(Boolean).length);
+
+    // Save verbatim turn in history (Zero-Loss)
+    saveChatHistoryRecord({
+      id: 'turn_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      type: 'turn',
+      course: course,
+      scenarioId: sid,
+      isVoice: !!isVoice,
+      userText: cleanText,
+      ok: verdict === true,
+      judged: verdict !== null,
+      misconception: hint ? hint.id : null,
+      wordsSpoken: wordCount,
+      timestamp: Date.now()
+    });
+
+    // Zero-Dumbing Invariant: If verdict is undecided (null), DO NOT praise or penalize in BKT/updateMastery!
+    if (verdict === null) return;
+
+    var isOk = (verdict === true);
 
     // 1. updateMastery with actual ok status and speaking bucket
     callUpdateMastery('speaking', conceptId, isOk, latencyMs, null, Date.now());
     callUpdateMastery('speaking', fluencyConcept, isOk, latencyMs, null, Date.now());
 
     // 2. bktRecord with Bayesian Knowledge Tracing credibility weight
-    // Correct speech has higher credibility (kappa 0.60), erroneous speech has weaker (kappa 0.35)
     var kappa = isOk ? 0.6 : 0.35;
     callBktRecord(conceptId, isOk, kappa, 1.2);
     callBktRecord(fluencyConcept, isOk, kappa, 1.1);
@@ -2222,30 +2255,16 @@
     // 3. Misconception Ledger
     callMisconceptionRecord(conceptId, hint, isOk);
 
-    // 4. Calculate word count and record turn to fzc_chat_history_v1 (Zero-Loss)
-    var wordCount = isJa
-      ? Math.max(1, Math.round(cleanText.replace(/\s+/g, '').length / 2.5))
-      : Math.max(1, cleanText.split(/\s+/).filter(Boolean).length);
-
-    saveChatHistoryRecord({
-      id: 'turn_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-      type: 'turn',
-      course: state.course,
-      scenarioId: sid,
-      isVoice: !!isVoice,
-      userText: cleanText, // Zero-Loss State: exact student utterance preserved
-      ok: isOk,
-      misconception: hint ? hint.id : null,
-      wordsSpoken: wordCount,
-      timestamp: Date.now()
-    });
-
-    // 5. XP syncing
-    var appState = (typeof root.__getFiezelState === 'function') ? root.__getFiezelState() : (root.state || null);
-    if (appState && typeof appState.xp === 'number') {
-      appState.xp += (isOk ? 5 : 2);
-      if (typeof root.save === 'function') {
-        try { root.save(); } catch (_) {}
+    // 4. Rate-limited XP (+5 for correct speech with 20s cooldown)
+    var now = Date.now();
+    if (isOk && (now - lastXpAwardAt >= 20000)) {
+      lastXpAwardAt = now;
+      var appState = (typeof root.__getFiezelState === 'function') ? root.__getFiezelState() : (root.state || null);
+      if (appState && typeof appState.xp === 'number') {
+        appState.xp += 5;
+        if (typeof root.save === 'function') {
+          try { root.save(); } catch (_) {}
+        }
       }
     }
   }
@@ -4210,6 +4229,244 @@
     }
   }
 
+  // ===== FzStudioBridge — single secure entrance for Voice Studio iframe bridge =====
+  var FzStudioBridge = (function () {
+    var sessionNonce = '';
+    var lastSeq = -1;
+    var shellSeq = 0;
+    var seenTurnIds = Object.create(null);
+    var acceptedAt = [];
+    var lastAcceptAt = 0;
+    var TURN_TTL_MS = 24 * 60 * 60 * 1000;
+
+    function makeNonce() {
+      try {
+        var bytes = new Uint8Array(16);
+        (root.crypto || (root.window && root.window.crypto) || root.msCrypto).getRandomValues(bytes);
+        var s = '';
+        for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+        return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      } catch (_) {
+        return 'nonce_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+      }
+    }
+
+    function begin() {
+      sessionNonce = makeNonce();
+      lastSeq = -1;
+      shellSeq = 0;
+      acceptedAt = [];
+      lastAcceptAt = 0;
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem('fz.studio.nonce', sessionNonce);
+          var raw = sessionStorage.getItem('fz.studio.turns');
+          var saved = raw ? JSON.parse(raw) : {};
+          var now = Date.now();
+          Object.keys(saved).forEach(function (k) {
+            if (now - saved[k] < TURN_TTL_MS) seenTurnIds[k] = saved[k];
+          });
+        }
+      } catch (_) {}
+      return sessionNonce;
+    }
+
+    function getFrame() {
+      return typeof document !== 'undefined' ? document.getElementById('fzMitraKaiwaStudioFrame') : null;
+    }
+
+    function send(type, payload) {
+      var f = getFrame();
+      if (!f || !f.contentWindow || !sessionNonce) return;
+      var targetOrigin = root.location && root.location.origin && root.location.origin !== 'null'
+        ? root.location.origin
+        : '*';
+      try {
+        f.contentWindow.postMessage({
+          v: 1,
+          type: type,
+          nonce: sessionNonce,
+          seq: shellSeq++,
+          sentAt: Date.now(),
+          payload: payload || {}
+        }, targetOrigin);
+      } catch (_) {}
+    }
+
+    function ack(forSeq, turnId, accepted, reason, pAfter) {
+      send('fz.shell.ack', {
+        forSeq: forSeq,
+        turnId: turnId || null,
+        accepted: accepted,
+        reason: reason || null,
+        pAfter: pAfter == null ? null : pAfter
+      });
+    }
+
+    var ID_RE = /^[a-z0-9_:.-]{1,80}$/i;
+    function str(v, max) {
+      return typeof v === 'string' && v.length <= max ? v : null;
+    }
+
+    function validateAttempt(p) {
+      if (!p || typeof p !== 'object') return 'schema';
+      if (!str(p.turnId, 80) || !ID_RE.test(p.competencyId || '') || !str(p.scenarioId, 80)) return 'schema';
+      if (p.course !== 'en' && p.course !== 'ja') return 'schema';
+      if (p.verdict !== true && p.verdict !== false && p.verdict !== null) return 'schema';
+      if (typeof p.userTranscript !== 'string' || p.userTranscript.length > 500) return 'schema';
+      if (p.misconceptionId != null && !ID_RE.test(p.misconceptionId)) return 'schema';
+      return null;
+    }
+
+    function readMastery(cid) {
+      try {
+        var BKT = root.FiezelMasteryBKT;
+        var st = BKT && typeof BKT.read === 'function' ? BKT.read() : null;
+        return st && st.skills && st.skills[cid] ? Number(st.skills[cid].p) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function onMessage(evt) {
+      if (!evt) return;
+      var f = getFrame();
+      var isSameOrigin = !root.location || !root.location.origin || root.location.origin === 'null' || evt.origin === root.location.origin;
+      if (!isSameOrigin) return;
+
+      var m = evt.data;
+      if (!m || typeof m !== 'object') return;
+
+      // Backward compatibility for legacy FIEZEL_VOICE_STUDIO_ATTEMPT
+      if (m.type === 'FIEZEL_VOICE_STUDIO_ATTEMPT' && m.payload) {
+        var pLegacy = m.payload;
+        var compId = String(pLegacy.competencyId || 'kaiwa_general').replace(/[^a-z0-9_:-]/gi, '').slice(0, 80);
+        if (!compId) return;
+        var isOk = Boolean(pLegacy.ok);
+        var hintLegacy = (!isOk && pLegacy.misconceptionId) ? { id: String(pLegacy.misconceptionId).slice(0, 80) } : null;
+        var latency = Math.max(300, Math.min(120000, Number(pLegacy.latencyMs) || 3000));
+        var nowLegacy = Date.now();
+
+        callUpdateMastery('speaking', compId, isOk, latency, null, nowLegacy);
+        callBktRecord(compId, isOk, isOk ? 0.6 : 0.35, 1.2);
+        callMisconceptionRecord(compId, hintLegacy, isOk);
+
+        saveChatHistoryRecord({
+          id: 'turn_' + nowLegacy + '_' + Math.random().toString(36).slice(2, 6),
+          type: 'turn',
+          course: state.course,
+          scenarioId: pLegacy.scenarioId || state.scenarioId,
+          isVoice: true,
+          userText: String(pLegacy.userTranscript || '').slice(0, 500),
+          ok: isOk,
+          judged: true,
+          misconception: hintLegacy ? hintLegacy.id : null,
+          timestamp: nowLegacy
+        });
+        if (typeof root.brainSyncFlush === 'function') {
+          try { root.brainSyncFlush(); } catch (_) {}
+        }
+        return;
+      }
+
+      // Secure v1 Nonce Protocol
+      if (m.v !== 1) return;
+      if (sessionNonce && m.nonce !== sessionNonce) return;
+      if (f && f.contentWindow && evt.source !== f.contentWindow) return;
+      if (typeof m.seq !== 'number') return;
+
+      var now = Date.now();
+      if (m.seq <= lastSeq || Math.abs(now - (Number(m.sentAt) || 0)) > 60000) {
+        ack(m.seq, null, false, 'seq');
+        return;
+      }
+      lastSeq = m.seq;
+
+      switch (m.type) {
+        case 'fz.studio.hello':
+          send('fz.shell.ready', {
+            learnerLevel: getLearnerLevel(),
+            correctionMode: state.correctionMode === true,
+            persona: getActivePersona(state.course).id,
+            allowTelemetry: true
+          });
+          return;
+
+        case 'fz.studio.attempt': {
+          var p = m.payload;
+          var err = validateAttempt(p);
+          if (err) { ack(m.seq, p && p.turnId, false, err); return; }
+          if (seenTurnIds[p.turnId]) { ack(m.seq, p.turnId, false, 'replay'); return; }
+          acceptedAt = acceptedAt.filter(function (t) { return now - t < 600000; });
+          if (now - lastAcceptAt < 2000 || acceptedAt.length >= 60) { ack(m.seq, p.turnId, false, 'rate'); return; }
+          seenTurnIds[p.turnId] = now;
+          lastAcceptAt = now;
+          acceptedAt.push(now);
+          try {
+            if (typeof sessionStorage !== 'undefined') {
+              sessionStorage.setItem('fz.studio.turns', JSON.stringify(seenTurnIds));
+            }
+          } catch (_) {}
+
+          var hint = (p.verdict === false && p.misconceptionId) ? { id: p.misconceptionId } : null;
+          dispatchSpeakingTurnTelemetry(p.userTranscript, p.scenarioId, hint, true, {
+            verdict: p.verdict,
+            latencyMs: p.latencyMs,
+            competencyId: p.competencyId,
+            hintsUsed: p.hintsUsed || 0
+          });
+          ack(m.seq, p.turnId, true, null, readMastery(p.competencyId));
+          return;
+        }
+
+        case 'fz.studio.call_end': {
+          var c = m.payload || {};
+          if (!str(c.callId, 80)) { ack(m.seq, null, false, 'schema'); return; }
+          recordCallSession({
+            course: c.course,
+            scenarioId: c.scenarioId,
+            durationSeconds: c.durationSeconds,
+            turns: c.turnsTotal,
+            turnsJudged: c.turnsJudged,
+            turnsOk: c.turnsOk,
+            interruptedCount: c.interruptedCount,
+            wordsSpoken: c.wordsSpoken,
+            userUtterances: Array.isArray(c.userUtterances) ? c.userUtterances.slice(0, 60) : []
+          });
+          if (typeof root.brainSyncFlush === 'function') {
+            try { root.brainSyncFlush(); } catch (_) {}
+          }
+          ack(m.seq, null, true);
+          return;
+        }
+
+        case 'fz.studio.error':
+          if (typeof console !== 'undefined' && console.warn) {
+            console.warn('[FzStudioBridge] studio error:', m.payload);
+          }
+          return;
+      }
+    }
+
+    function end() {
+      send('fz.shell.bye', {});
+      sessionNonce = '';
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.removeItem('fz.studio.nonce');
+        }
+      } catch (_) {}
+    }
+
+    return {
+      begin: begin,
+      end: end,
+      send: send,
+      pushConfig: function (cfg) { send('fz.shell.config', cfg); },
+      onMessage: onMessage
+    };
+  })();
+
   // --- Public API ---
   var api = {
     mount: function (el) {
@@ -4233,6 +4490,7 @@
     },
     unmount: function () {
       isChatMounted = false;
+      FzStudioBridge.end();
       stopVoice();
       stopShadowingAudio();
       if (state.isListening && state.recognition) {
@@ -4386,6 +4644,7 @@
     dispatchSpeakingTurnTelemetry: dispatchSpeakingTurnTelemetry,
     dispatchShadowingTelemetry: dispatchShadowingTelemetry,
     dispatchBraincoreTelemetry: dispatchBraincoreTelemetry,
+    StudioBridge: FzStudioBridge,
     CHAT_HISTORY_KEY: CHAT_HISTORY_KEY,
     PERSONAS: PERSONAS,
     setPersona: setPersona,
@@ -4420,36 +4679,20 @@
   }
 
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
-    window.addEventListener('message', function (evt) {
-      try {
-        var msg = evt && evt.data;
-        if (!msg || msg.type !== 'FIEZEL_VOICE_STUDIO_ATTEMPT' || !msg.payload) return;
-        var p = msg.payload;
-        var compId = p.competencyId || 'kaiwa_general';
-        var isOk = Boolean(p.ok);
-        if (typeof root.updateMastery === 'function') {
-          try {
-            root.updateMastery(compId, isOk, {
-              source: 'voice-studio',
-              misconceptionId: p.misconceptionId || null,
-              userTranscript: p.userTranscript || ''
-            });
-          } catch (_) {}
+    // Bug #3 & Bagian 3A: Single secure listener via FzStudioBridge
+    window.addEventListener('message', FzStudioBridge.onMessage);
+
+    // Bug #26: Multi-tab course switch synchronization
+    window.addEventListener('storage', function (e) {
+      if (!e) return;
+      if (e.key === 'fiezel-active-course' && e.newValue && e.newValue !== state.course) {
+        state.course = e.newValue;
+        if (isChatMounted) {
+          initScenario(SCENARIOS[state.course] ? SCENARIOS[state.course][0].id : (state.course === 'ja' ? 'scen_ja_n5_kissaten' : 'intro'));
         }
-        if (typeof root.bktRecord === 'function') {
-          try {
-            root.bktRecord(compId, isOk, {
-              source: 'voice-studio',
-              misconceptionId: p.misconceptionId || null,
-              whyFailsId: p.whyFailsId || null
-            });
-          } catch (_) {}
-        }
-        if (typeof root.brainSyncFlush === 'function') {
-          try { root.brainSyncFlush(); } catch (_) {}
-        }
-      } catch (_) {}
+      }
     });
+
     window.addEventListener('pagehide', function () {
       if (isChatMounted) api.unmount();
     });

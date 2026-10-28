@@ -52,6 +52,46 @@
   var activeAudio = null;
   var activeSource = null;
   var activeAbortController = null;
+  var activeGainNode = null;
+  var currentDuckLevel = 1.0;
+  var ownedAudios = [];
+
+  function registerOwnedAudio(a) {
+    if (a && ownedAudios.indexOf(a) === -1) {
+      ownedAudios.push(a);
+      try { a.volume = currentDuckLevel; } catch (_) {}
+    }
+  }
+
+  function unregisterOwnedAudio(a) {
+    var idx = ownedAudios.indexOf(a);
+    if (idx >= 0) ownedAudios.splice(idx, 1);
+  }
+
+  // Bug #5: Dynamic acoustic ducking support
+  function duck(level) {
+    var lvl = typeof level === 'number' ? Math.max(0, Math.min(1, level)) : 1.0;
+    currentDuckLevel = lvl;
+    if (activeAudio) {
+      try { activeAudio.volume = lvl; } catch (_) {}
+    }
+    for (var i = 0; i < ownedAudios.length; i++) {
+      try { ownedAudios[i].volume = lvl; } catch (_) {}
+    }
+    if (activeGainNode) {
+      try {
+        var ctx = root.__fiezelSharedAudioContext;
+        if (ctx && ctx.currentTime != null) {
+          activeGainNode.gain.cancelScheduledValues(ctx.currentTime);
+          activeGainNode.gain.setValueAtTime(activeGainNode.gain.value, ctx.currentTime);
+          activeGainNode.gain.linearRampToValueAtTime(lvl, ctx.currentTime + 0.05);
+        } else {
+          activeGainNode.gain.value = lvl;
+        }
+      } catch (_) {}
+    }
+    return lvl;
+  }
 
   // Cache in-memory hasil prefetch dari server neural voice
   // Key: (persona)::(sentence) -> Promise<object|null>
@@ -121,7 +161,8 @@
     if (!t) return [];
     var parts;
     if (course === 'ja') {
-      parts = t.match(/(?:……|…|[^\s。！？!?…‥〜~]+)[。！？!?…‥〜~]*[」』）]*/g) || [t];
+      // Bug #34: Simbol 〜 / ~ adalah pelantang intonasi/partikel percakapan ramah, bukan pemutus kalimat
+      parts = t.match(/(?:……|…|[^\s。！？!?…‥]+)[。！？!?…‥]*[」』）]*/g) || [t];
     } else {
       var guarded = t
         .replace(EN_ABBREV_RE, function (m) { return m.slice(0, -1) + DOT_MARK; })
@@ -207,34 +248,12 @@
       list.push('http://127.0.0.1:3000/api/tts/line');
     }
 
-    if (root.FIEZEL_TTS_CONFIG && root.FIEZEL_TTS_CONFIG.endpoint) {
-      list.push(root.FIEZEL_TTS_CONFIG.endpoint);
-    }
-    if (root.__FIEZEL_TTS_LINE_ENDPOINT) {
-      list.push(root.__FIEZEL_TTS_LINE_ENDPOINT);
-    }
-    if (serverEndpoint && serverEndpoint !== DEFAULT_ENDPOINT) {
-      list.push(serverEndpoint);
-    }
-
     if (root.location && root.location.origin && root.location.origin !== 'null' && root.location.protocol !== 'file:') {
       if (root.FIEZEL_CURRICULUM_CONFIG && root.FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl) {
         var base = String(root.FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl).replace(/\/+$/, '');
         list.push(base + '/api/tts/line');
-      } else if (!isLocal) {
-        list.push('https://fiezel-apps.onrender.com/api/tts/line');
       }
-
-      if (root.location.pathname) {
-        var baseDir = root.location.pathname.replace(/\/[^/]*$/, '');
-        if (baseDir && baseDir !== '/') {
-          list.push(root.location.origin + baseDir + '/api/tts/line/index.php');
-        }
-      }
-      list.push(root.location.origin + '/app/api/tts/line/index.php');
-      if (!isLocal) {
-        list.push('https://fiezel-apps.onrender.com/api/tts/line');
-      }
+      list.push(root.location.origin + '/api/tts/line');
     } else {
       list.push('/api/tts/line');
     }
@@ -527,11 +546,24 @@
       }
 
       activeAudio = audio;
+      registerOwnedAudio(audio);
+      try { audio.volume = currentDuckLevel; } catch (_) {}
       var settled = false;
+
+      // Bug #6: Audio playback watchdog (15s max per chunk)
+      var watchdogTimer = setTimeout(function () {
+        cleanup();
+        resolve(myToken === token);
+      }, 15000);
 
       function cleanup() {
         if (settled) return;
         settled = true;
+        if (watchdogTimer) {
+          clearTimeout(watchdogTimer);
+          watchdogTimer = null;
+        }
+        unregisterOwnedAudio(audio);
         if (activeAudio === audio) activeAudio = null;
         audio.ontimeupdate = null;
         audio.onended = null;
@@ -597,7 +629,11 @@
             }
             var src = ctx.createBufferSource();
             src.buffer = audioBuf;
-            src.connect(ctx.destination);
+            var gainNode = ctx.createGain();
+            try { gainNode.gain.value = currentDuckLevel; } catch (_) {}
+            src.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            activeGainNode = gainNode;
             activeSource = src;
             // WebAudio zero-gap scheduling: selesaikan sebelum ekor hening container
             var playDuration = Math.max(0.1, audioBuf.duration - 0.20);
@@ -864,15 +900,29 @@
     if (typeof document !== 'undefined' && typeof document.querySelectorAll === 'function') {
       try {
         var audios = document.querySelectorAll('audio');
-        for (var a = 0; a < audios.length; a++) {
+        for (var i = 0; i < audios.length; i++) {
           try {
-            audios[a].pause();
-            audios[a].muted = true;
-            audios[a].volume = 0;
-            audios[a].currentTime = 0;
+            audios[i].pause();
+            audios[i].muted = true;
+            audios[i].volume = 0;
+            audios[i].currentTime = 0;
           } catch (_) {}
         }
       } catch (_) {}
+    }
+    for (var oa = 0; oa < ownedAudios.length; oa++) {
+      try {
+        ownedAudios[oa].pause();
+        ownedAudios[oa].muted = true;
+        ownedAudios[oa].volume = 0;
+        ownedAudios[oa].currentTime = 0;
+        ownedAudios[oa].src = '';
+      } catch (_) {}
+    }
+    ownedAudios = [];
+    if (activeGainNode) {
+      try { activeGainNode.disconnect(); } catch (_) {}
+      activeGainNode = null;
     }
     var vs = voiceSay();
     if (vs && typeof vs.stop === 'function') { try { vs.stop(); } catch (_) {} }
@@ -896,6 +946,7 @@
   return {
     speak: speak,
     stop: stop,
+    duck: duck,
     prefetch: prefetch,
     isAvailable: isAvailable,
     splitSentences: splitSentences,

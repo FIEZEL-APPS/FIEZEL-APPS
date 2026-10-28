@@ -28,6 +28,22 @@ export const BRAINCORE_PARAMS = {
 const STORAGE_KEY = 'fiezel-braincore-voice-v1';
 const TAB_ID = `tab_${Math.random().toString(36).slice(2, 10)}_${Date.now()}`;
 
+let studioNonce: string | null = null;
+let studioSeq: number = 0;
+
+export function getStudioNonce(): string {
+  if (studioNonce !== null) return studioNonce;
+  try {
+    if (typeof window !== 'undefined' && window.location && window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      studioNonce = params.get('nonce') || '';
+    }
+  } catch {
+    studioNonce = '';
+  }
+  return studioNonce || '';
+}
+
 /**
  * IRT 3PL Success Probability: P = c + (1 - c) / (1 + exp(-a * (theta - b)))
  */
@@ -437,36 +453,61 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
       window.dispatchEvent(
         new CustomEvent('fiezel:voice-studio:attempt', { detail: eventPayload })
       );
-      const hostWin =
-        window.parent && window.parent !== window ? (window.parent as any) : (window as any);
-      try {
-        if (typeof hostWin.bktRecord === 'function') {
-          hostWin.bktRecord(
-            String(eventPayload.competencyId || 'kaiwa_general'),
-            Boolean(eventPayload.ok),
+      const isIframe = window.parent && window.parent !== window;
+      if (!isIframe) {
+        // Standalone window mode: update local window if available
+        try {
+          const w = window as any;
+          if (typeof w.bktRecord === 'function') {
+            w.bktRecord(
+              String(eventPayload.competencyId || 'kaiwa_general'),
+              Boolean(eventPayload.ok),
+              {
+                source: 'voice-studio',
+                misconceptionId: eventPayload.misconceptionId || null,
+              }
+            );
+          }
+        } catch {
+          // Ignore
+        }
+      } else {
+        // Iframe mode: Shell handles Braincore state via secure nonce protocol & fallback
+        const targetOrigin =
+          window.location.origin && window.location.origin !== 'null' ? window.location.origin : '*';
+        const nonce = getStudioNonce();
+        if (nonce) {
+          window.parent.postMessage(
             {
-              source: 'voice-studio',
-              misconceptionId: eventPayload.misconceptionId || null,
-            }
+              v: 1,
+              type: 'fz.studio.attempt',
+              nonce: nonce,
+              seq: studioSeq++,
+              sentAt: Date.now(),
+              payload: {
+                turnId: eventPayload.id || `turn_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                competencyId: String(eventPayload.competencyId || 'kaiwa_general'),
+                scenarioId: String(eventPayload.scenarioId || 'scen_ja_n5_kissaten'),
+                course:
+                  eventPayload.competencyId?.includes('ja') || (eventPayload as any).course === 'ja'
+                    ? 'ja'
+                    : 'en',
+                verdict:
+                  typeof (eventPayload as any).verdict === 'boolean' || (eventPayload as any).verdict === null
+                    ? (eventPayload as any).verdict
+                    : Boolean(eventPayload.ok),
+                userTranscript: String(eventPayload.userTranscript || '').slice(0, 500),
+                misconceptionId: eventPayload.misconceptionId || null,
+                latencyMs: eventPayload.latencyMs || 3000,
+                hintsUsed: eventPayload.hintsUsed || 0,
+              },
+            },
+            targetOrigin
           );
         }
-        if (typeof hostWin.updateMastery === 'function') {
-          hostWin.updateMastery(
-            String(eventPayload.competencyId || 'kaiwa_general'),
-            Boolean(eventPayload.ok),
-            {
-              source: 'voice-studio',
-              misconceptionId: eventPayload.misconceptionId || null,
-            }
-          );
-        }
-      } catch {
-        // Ignore cross-origin frame access if any
-      }
-      if (window.parent && window.parent !== window) {
         window.parent.postMessage(
           { type: 'FIEZEL_VOICE_STUDIO_ATTEMPT', payload: eventPayload },
-          '*'
+          targetOrigin
         );
       }
     }
