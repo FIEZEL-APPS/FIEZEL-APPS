@@ -58,6 +58,7 @@ All test suites passed 100% locally before release bump and commit:
 - `features/interactive-chat/fiezel-voice-call.js`
 - `features/interactive-chat/interactive-chat.css`
 - `tests/kawan-bicara-hardening-test.js`
+- `tests/voice-call-two-way-test.js`
 - `id-golden-baseline.json`
 - `coordination/BUILD-VERSION.json`
 - `sw.js`
