@@ -1,5 +1,10 @@
 # FIEZEL M025-706 Handoff: Pemulihan Penuh Kawan Bicara (Mitra Kaiwa Studio) & Maskot 3D Mochi Three.js
 
+## Otoritas & Status
+- **Authority**: OWNER / MASTER
+- **Status**: VERIFIED & READY FOR PRODUCTION
+- **Scope**: Restoration of AI Voice Studio (`call.html`) and Three.js 3D Mochi Companion in Kawan Bicara
+
 ## Ringkasan Eksekutif
 Rilis build `m025-706` memulihkan secara menyeluruh sub-aplikasi kanonikal AI Voice Studio (`call.html`) sebagai pintu masuk resmi untuk fitur **Kawan Bicara / Mitra Kaiwa** (`state.view === 'chat'`), mengeliminasi total regresi commit `387e8fd1` (PR #762) yang salah menafsirkan Rule 11 dengan memaksakan chat teks usang, mengeliminasi selamanya maskot kucing kuning PAW lama dari PWA, dan memastikan rendering kanvas WebGL 3D Three.js Mochi companion aktif di perangkat mobile dan desktop.
 
@@ -28,7 +33,8 @@ Rilis build `m025-706` memulihkan secara menyeluruh sub-aplikasi kanonikal AI Vo
 
 ---
 
-## Protokol Deployment & Penyelarasan PR
-- Worktree terisolasi: `C:\Users\hp\fiezel-resolve-pr761`
-- Rebase branch di atas `origin/main` terbaru (`63e699cb`, m025-704).
-- Bebas konflik: Status PR #761 kembali `MERGEABLE`.
+## Langkah Berikutnya & Roadmap (Next Steps)
+1. Gabungkan (merge) PR #766 ke `main`.
+2. Pantau workflow `FIEZEL Deploy Site` hingga selesai dan terbit di produksi.
+3. Lakukan verifikasi fisik endpoint produksi via `curl.exe -s https://fiezel.my.id/app/coordination/BUILD-VERSION.json`.
+4. Refresh Service Worker di PWA murid untuk menyajikan shell dan aset `m025-706` terbaru.

@@ -393,6 +393,14 @@ const HEURISTIC_PATH_ALLOWLIST = [
     prefix: 'mochi-mascot/three.module.js',
     reason: 'Pustaka 3D Three.js ES module resmi pihak ketiga untuk perenderan maskot 3D Mochi secara offline di PWA. '
       + 'Entropi di dalamnya adalah string konstanta shader, encoding WebGL, dan tabel matematika matriks — bukan rahasia atau kredensial.'
+  },
+  {
+    prefix: 'assets/brand/paw-mochi-idle.svg',
+    reason: 'Asset visual resmi maskot Mochi beresolusi tinggi dalam format SVG dengan citra biner Mochi yang dienkode Base64 untuk tampilan fallback maskot tanpa kucing kuning.'
+  },
+  {
+    prefix: 'assets/brand/paw-mochi-speaking.svg',
+    reason: 'Asset visual resmi maskot Mochi mode berbicara dalam format SVG dengan citra biner Mochi yang dienkode Base64 untuk tampilan fallback maskot tanpa kucing kuning.'
   }
 ];
 
