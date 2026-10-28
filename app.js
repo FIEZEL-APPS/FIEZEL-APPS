@@ -8594,10 +8594,7 @@ function startWelcomeExperience(){
       bootAuthVerdictUsed=true;
       if(bootAuth==='signed-out'){forgetLocalAuth();showAuthGate(at,proceed);return null}
       followUpAuthCheck(bootAuth);
-      if(!onboardingDone){
-        dismissBootSplash();
-        if(showOnboarding(at)?.shown===true)return null;
-      }
+      if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
       if(askLearnerNameIfMissing(at))return null;
       maybeSyncLearnerName(at);
       return startNotificationInvitation()
@@ -12865,6 +12862,7 @@ async function validateLearnerNameAvailability(name){
 window.validateLearnerNameAvailability=validateLearnerNameAvailability;
 
 function showOnboarding(now=Date.now()){
+  try{dismissBootSplash()}catch(_){}
   /* Audit F23 (2026-09-23): "Buka Demo Guru" (?teacher=preview) dan guru terverifikasi tidak
      pernah melihat perkenalan MURID. openApp() memanggil showBrandSplash() tanpa argumen,
      dan jalur bawaannya membuka perkenalan - jadi pengunjung demo mendarat di pemilih
