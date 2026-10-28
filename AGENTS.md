@@ -91,6 +91,30 @@ Setiap kali pengguna meminta tangkapan layar (screenshot), inspeksi visual, atau
    - Jika pengguna meminta penyesuaian UI dan screenshot, terapkan perubahan kode secara lokal lalu AMBIL SCREENSHOT SEKETIKA untuk dievaluasi oleh pengguna.
    - Jangan menjalankan bump build formal dan CI Pull Request sebelum pengguna menyetujui hasil visual dari screenshot tersebut.
 
+## Mandatory Protocol: Universal Multi-Device UI/UX & Anti-Blind-Coding Invariant (Standar Mutlak UI/UX Multi-Perangkat)
+Setiap agent yang membuat, mengubah, atau mendesain antarmuka (UI/UX) di FIEZEL:
+1. **DILARANG "Blind Coding" (Anti-Asumsi Tanpa Uji Visual Nyata)**:
+   - DILARANG KERAS berasumsi tata letak sudah rapi hanya karena sintaks CSS valid atau unit test lolos.
+   - Unit test HANYA menguji keberadaan string, BUKAN proporsi visual, kerapian, atau kenyamanan pengguna.
+   - Setiap fitur UI baru atau perubahan layout WAJIB dibuktikan secara visual pada minimal 2 mode perangkat utama via Playwright:
+     a) **Mobile**: `390 × 844 px` (iPhone standar) & `375 × 667 px` (iPhone SE).
+     b) **Desktop**: `1280 × 800 px` atau `1440 × 900 px`.
+2. **Dilarang Memperlakukan Desktop sebagai "Mobile yang Dilebarkan" (Anti-Void Invariant)**:
+   - Desktop memiliki rasio layar dan modalitas interaksi (mouse/keyboard) yang berbeda dengan layar ponsel. DILARANG KERAS membiarkan ruang kosong melompong (*empty void*) yang membuat aplikasi terlihat rusak.
+   - Pada tata letak multi-kolom desktop (seperti tabel Kana atau dasbor materi): jika kolom kiri tinggi (misal 10 baris) dan kolom kanan pendek (misal 5 baris), kolom kanan **WAJIB diisi elemen bermakna** (*panduan fonetik*, *ringkasan materi*, atau *indikator penguasaan*) agar tinggi kedua kolom seimbang dan proporsional.
+   - Bilah navigasi samping (*sidebar rail* selebar 232px) di desktop ($\ge 768\text{px}$) WAJIB memiliki `position: fixed !important; z-index: 100 !important;` agar terkunci di sisi kiri viewport dan tidak meninggalkan lorong kosong 232px akibat elemen jatuh ke dasar dokumen.
+3. **Pemberlakuan Zona Jempol & Lipatan Layar Mobile (Zero-Scroll & Thumb Zone)**:
+   - Pada perangkat mobile, aksi pembelajaran utama (*CTA Mulai Belajar*, *Kawan Bicara Kaiwa*, *Peta Belajar*, atau tombol *Lanjut*) WAJIB tampak di atas lipatan layar pertama (*above-the-fold*).
+   - DILARANG KERAS menaruh kartu raksasa non-esensial di bagian atas layar mobile yang mendorong tombol belajar utama keluar dari layar pandangan pertama murid.
+4. **Validasi Kontras Komputasi Ketat (Haram Teks Putih di Latar Terang / Zero Low-Contrast)**:
+   - DILARANG KERAS menggunakan `color: #FFFFFF !important` pada kartu atau wadah yang berlatar terang (`#FFFFFF`, `#FFFDF7`, `#F8FAFC`).
+   - Teks pada elemen daylight WAJIB menggunakan warna charcoal tegas (`#0F172A`) dengan teks sekunder slate (`#64748B` / `#475569`).
+   - Setiap agent WAJIB memastikan kontras warna terhitung (*computed color*) kontras $\ge 4.5:1$ terhadap latar belakangnya.
+5. **Keselarasan Sinkronisasi JavaScript View & Selektor CSS (Hexa-Class Binding)**:
+   - Tata letak desktop di `fiezel-tactile-clay.css` bergantung pada penanda kelas di `<body>` (seperti `.fz-view-kana`, `.fz-view-latihan`, `.fz-stage-home`).
+   - Setiap kali rute/layar baru dibuat atau dialihkan di `app.js`, fungsi `renderInner()` WAJIB mendaftarkan penanda kelasnya (misal `document.body?.classList?.toggle?.('fz-view-kana', state.view==='kana')`).
+   - DILARANG membiarkan media query CSS desktop mati/menciut ke 680px hanya karena kelas penanda body lupa dipasang di JavaScript.
+
 ## Mandatory Protocol: PWA Release Arbiter & Anti-Ghost-Deploy (Wajib Bump Build)
 Setiap kali menyelesaikan fitur, perbaikan bug, konten kuis, atau pembaruan UI/UX di FIEZEL:
 1. **ZERO Ghost Releases (Pantangan Rilis Hantu)**:
