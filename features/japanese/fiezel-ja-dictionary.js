@@ -3,8 +3,8 @@
  * Master Japanese Lexicon & Kanji Engine for FIEZEL Apps.
  *
  * Indexed:
- *   - WORDS: 6128 compound kanji & expressions (sorted longest first)
- *   - STEMS: 1561 okurigana stems for conjugated verbs & adjectives
+ *   - WORDS: 6234 compound kanji & expressions (sorted longest first)
+ *   - STEMS: 1563 okurigana stems for conjugated verbs & adjectives
  *   - SINGLE: 1653 single kanji entries (Zero-Bare-Kanji guarantee)
  *   - COUNTERS: numeric patterns & units (時, 分, 日, 月, 年, 回, 人, 歳, 階, 円, etc.)
  *
@@ -18,6 +18,10 @@
     "kana": "おせわになっております",
     "romaji": "o-sewa ni natte orimasu"
   },
+  "ちょっと待ってください": {
+    "kana": "ちょっとまってください",
+    "romaji": "chotto matte kudasai"
+  },
   "ありがとうございます": {
     "kana": "ありがとうございます",
     "romaji": "arigatou gozaimasu"
@@ -30,9 +34,21 @@
     "kana": "インスタントラーメン",
     "romaji": "insutantoraamen"
   },
+  "お待たせいたしました": {
+    "kana": "おまたせいたしました",
+    "romaji": "omataseitashimashita"
+  },
   "よろしくお願いします": {
     "kana": "よろしくおねがいします",
     "romaji": "yoroshiku onegaishimasu"
+  },
+  "気にしないでください": {
+    "kana": "きにしないでください",
+    "romaji": "ki ni shinaide kudasai"
+  },
+  "無理しないでください": {
+    "kana": "むりしないでください",
+    "romaji": "muri shinaide kudasai"
   },
   "おはようございます": {
     "kana": "おはようございます",
@@ -54,6 +70,10 @@
     "kana": "トイレットペーパー",
     "romaji": "toirettopeepaa"
   },
+  "少々お待ちください": {
+    "kana": "しょうしょうおまちください",
+    "romaji": "shoushou omachi kudasai"
+  },
   "打ち合わせをします": {
     "kana": "うちあわせをします",
     "romaji": "uchiawase o shimasu"
@@ -61,6 +81,10 @@
   "断らざるを得ません": {
     "kana": "ことわらざるをえません",
     "romaji": "kotowarazaru o emasen"
+  },
+  "気をつけてください": {
+    "kana": "きをつけてください",
+    "romaji": "ki o tsukete kudasai"
   },
   "絞らざるを得ません": {
     "kana": "しぼらざるをえません",
@@ -81,6 +105,18 @@
   "オレンジジュース": {
     "kana": "オレンジジュース",
     "romaji": "orenjijyuusu"
+  },
+  "お待たせしました": {
+    "kana": "おまたせしました",
+    "romaji": "omataseshimashita"
+  },
+  "お腹が空きました": {
+    "kana": "おなかがすきました",
+    "romaji": "onaka ga sukimashita"
+  },
+  "かしこまりました": {
+    "kana": "かしこまりました",
+    "romaji": "kashikomarimashita"
   },
   "ガソリンスタンド": {
     "kana": "ガソリンスタンド",
@@ -122,9 +158,21 @@
     "kana": "きりかえましょう",
     "romaji": "kirikaemashou"
   },
+  "手伝ってください": {
+    "kana": "てつだってください",
+    "romaji": "tetsudatte kudasai"
+  },
+  "承知いたしました": {
+    "kana": "しょうちいたしました",
+    "romaji": "shouchiitashimashita"
+  },
   "読みませんでした": {
     "kana": "よみませんでした",
     "romaji": "yomimasen deshita"
+  },
+  "頑張ってください": {
+    "kana": "がんばってください",
+    "romaji": "ganbatte kudasai"
   },
   "アイスクリーム": {
     "kana": "アイスクリーム",
@@ -162,6 +210,18 @@
     "kana": "おねがいします",
     "romaji": "onegaishimasu"
   },
+  "お久しぶりです": {
+    "kana": "おひさしぶりです",
+    "romaji": "ohisashiburi desu"
+  },
+  "お疲れ様でした": {
+    "kana": "おつかれさまでした",
+    "romaji": "otsukaresama deshita"
+  },
+  "お邪魔しました": {
+    "kana": "おじゃましました",
+    "romaji": "ojamashimashita"
+  },
   "お預かりします": {
     "kana": "おあずかりします",
     "romaji": "oazukari shimasu"
@@ -169,6 +229,10 @@
   "カセットテープ": {
     "kana": "カセットテープ",
     "romaji": "kasettoteepu"
+  },
+  "ご馳走様でした": {
+    "kana": "ごちそうさまでした",
+    "romaji": "gochisousama deshita"
   },
   "じゃありません": {
     "kana": "じゃありません",
@@ -205,6 +269,10 @@
   "でんわをかける": {
     "kana": "でんわをかける",
     "romaji": "denwa o kakeru"
+  },
+  "どうでしょうか": {
+    "kana": "どうでしょうか",
+    "romaji": "dou deshou ka"
   },
   "なかったでした": {
     "kana": "なかったでした",
@@ -266,6 +334,18 @@
     "kana": "つくってあります",
     "romaji": "tsukutte arimasu"
   },
+  "入ってください": {
+    "kana": "はいってください",
+    "romaji": "haitte kudasai"
+  },
+  "入れてください": {
+    "kana": "いれてください",
+    "romaji": "irete kudasai"
+  },
+  "出してください": {
+    "kana": "だしてください",
+    "romaji": "dashite kudasai"
+  },
   "分からなかった": {
     "kana": "わからなかった",
     "romaji": "wakaranakatta"
@@ -282,6 +362,10 @@
     "kana": "まちあわせする",
     "romaji": "machiawase suru"
   },
+  "待ってください": {
+    "kana": "まってください",
+    "romaji": "matte kudasai"
+  },
   "拡大生産者責任": {
     "kana": "かくだいせいさんものせきにん",
     "romaji": "kakudaiseisan mono sekinin"
@@ -289,6 +373,18 @@
   "持って行きます": {
     "kana": "もっていきます",
     "romaji": "motte ikimasu"
+  },
+  "描いてください": {
+    "kana": "かいてください",
+    "romaji": "kaite kudasai"
+  },
+  "撮ってください": {
+    "kana": "とってください",
+    "romaji": "totte kudasai"
+  },
+  "教えてください": {
+    "kana": "おしえてください",
+    "romaji": "oshiete kudasai"
   },
   "断片的情報消費": {
     "kana": "だんぺんてきじょうほうしょうひ",
@@ -302,9 +398,17 @@
     "kana": "まいげつだいついたちようび",
     "romaji": "maigetsudai tsuitachi youbi"
   },
+  "消してください": {
+    "kana": "けしてください",
+    "romaji": "keshite kudasai"
+  },
   "深海熱水噴出孔": {
     "kana": "しんかいねっすいふんしゅつあな",
     "romaji": "shinkai nessui funshutsu ana"
+  },
+  "知っていますか": {
+    "kana": "しっていますか",
+    "romaji": "shitte imasu ka"
   },
   "立ってください": {
     "kana": "たってください",
@@ -321,6 +425,10 @@
   "落としちゃった": {
     "kana": "おとしちゃった",
     "romaji": "otoshichatta"
+  },
+  "行ってください": {
+    "kana": "いってください",
+    "romaji": "itte kudasai"
   },
   "解読技術確立後": {
     "kana": "かいどくぎじゅつかくりつのち",
@@ -353,6 +461,10 @@
   "アイスティー": {
     "kana": "アイスティー",
     "romaji": "aisuteii"
+  },
+  "いかがですか": {
+    "kana": "いかがですか",
+    "romaji": "ikaga desu ka"
   },
   "いただきます": {
     "kana": "いただきます",
@@ -393,6 +505,14 @@
   "お疲れ様です": {
     "kana": "おつかれさまです",
     "romaji": "otsukaresama desu"
+  },
+  "お腹が空いた": {
+    "kana": "おなかがすいた",
+    "romaji": "onaka ga suita"
+  },
+  "お邪魔します": {
+    "kana": "おじゃまします",
+    "romaji": "ojamashimasu"
   },
   "お風呂に入る": {
     "kana": "おふろにはいる",
@@ -554,6 +674,10 @@
     "kana": "のりかえます",
     "romaji": "norikaemasu"
   },
+  "了解しました": {
+    "kana": "りょうかいしました",
+    "romaji": "ryoukaishimashita"
+  },
   "事前登録制度": {
     "kana": "じぜんとうろくせいど",
     "romaji": "jizentouroku seido"
@@ -606,6 +730,14 @@
     "kana": "きょうどうけんきゅうおぼえがき",
     "romaji": "kyoudoukenkyuu oboegaki"
   },
+  "出かけました": {
+    "kana": "でかけました",
+    "romaji": "dekakemashita"
+  },
+  "出てください": {
+    "kana": "でてください",
+    "romaji": "dete kudasai"
+  },
   "分かりますか": {
     "kana": "わかりますか",
     "romaji": "wakarimasuka"
@@ -654,6 +786,10 @@
     "kana": "よるじゅういちじいこう",
     "romaji": "yoru juuichi jiikou"
   },
+  "失礼しました": {
+    "kana": "しつれいしました",
+    "romaji": "shitsureishimashita"
+  },
   "始めましょう": {
     "kana": "はじめましょう",
     "romaji": "hajimemashou"
@@ -686,6 +822,10 @@
     "kana": "ひはんてきどっかいりょく",
     "romaji": "hihanteki dokkairyoku"
   },
+  "承知しました": {
+    "kana": "しょうちしました",
+    "romaji": "shouchishimashita"
+  },
   "抗菌薬耐性菌": {
     "kana": "こうきんくすりたいせいきん",
     "romaji": "koukin kusuri taisei kin"
@@ -710,6 +850,10 @@
     "kana": "じきにおこなって",
     "romaji": "jiki ni okonatte"
   },
+  "来てください": {
+    "kana": "きてください",
+    "romaji": "kite kudasai"
+  },
   "来週公開予定": {
     "kana": "らいしゅうこうかいよてい",
     "romaji": "raishuu koukaiyotei"
@@ -721,6 +865,10 @@
   "毎日入力作業": {
     "kana": "まいにちにゅうりょくさぎょう",
     "romaji": "mainichi nyuuryoku sagyou"
+  },
+  "気にしないで": {
+    "kana": "きにしないで",
+    "romaji": "ki ni shinaide"
   },
   "気を付けます": {
     "kana": "きをつけます",
@@ -738,6 +886,10 @@
     "kana": "むけいしさんとうし",
     "romaji": "mukei shisan toushi"
   },
+  "無理しないで": {
+    "kana": "むりしないで",
+    "romaji": "muri shinaide"
+  },
   "生命起源仮説": {
     "kana": "せいめいきげんかせつ",
     "romaji": "seimei kigen kasetsu"
@@ -754,6 +906,10 @@
     "kana": "ねむれなかった",
     "romaji": "nemurenakatta"
   },
+  "知っています": {
+    "kana": "しっています",
+    "romaji": "shitte imasu"
+  },
   "組み立てます": {
     "kana": "くみたてます",
     "romaji": "kumitatemasu"
@@ -765,6 +921,14 @@
   "翻訳不可能性": {
     "kana": "ほんやくふかのうせい",
     "romaji": "honyaku fukanousei"
+  },
+  "落としました": {
+    "kana": "おとしました",
+    "romaji": "otoshimashita"
+  },
+  "行かなかった": {
+    "kana": "いかなかった",
+    "romaji": "ikanakatta"
   },
   "言っています": {
     "kana": "いっています",
@@ -854,6 +1018,10 @@
     "kana": "おばあさん",
     "romaji": "obaasan"
   },
+  "お久しぶり": {
+    "kana": "おひさしぶり",
+    "romaji": "ohisashiburi"
+  },
   "お祖母さん": {
     "kana": "おばあさん",
     "romaji": "obaasan"
@@ -913,6 +1081,10 @@
   "こんばんは": {
     "kana": "こんばんは",
     "romaji": "konbanwa"
+  },
+  "ご覧になる": {
+    "kana": "ごらんになる",
+    "romaji": "goran ni naru"
   },
   "さようなら": {
     "kana": "さようなら",
@@ -981,6 +1153,10 @@
   "つまらない": {
     "kana": "つまらない",
     "romaji": "tsumaranai"
+  },
+  "どうですか": {
+    "kana": "どうですか",
+    "romaji": "dou desu ka"
   },
   "ドライバー": {
     "kana": "ドライバー",
@@ -1089,6 +1265,10 @@
   "もらいます": {
     "kana": "もらいます",
     "romaji": "moraimasu"
+  },
+  "モンスター": {
+    "kana": "モンスター",
+    "romaji": "monsutaa"
   },
   "ヨーロッパ": {
     "kana": "ヨーロッパ",
@@ -1202,6 +1382,14 @@
     "kana": "せんれいこうそくせい",
     "romaji": "senrei kousoku sei"
   },
+  "入りました": {
+    "kana": "はいりました",
+    "romaji": "hairimashita"
+  },
+  "入れました": {
+    "kana": "いれました",
+    "romaji": "iremashita"
+  },
   "入居希望者": {
     "kana": "にゅうきょきぼうしゃ",
     "romaji": "nyuukyo kibousha"
@@ -1237,6 +1425,10 @@
   "出かけます": {
     "kana": "でかけます",
     "romaji": "dekakemasu"
+  },
+  "出しました": {
+    "kana": "だしました",
+    "romaji": "dashimashita"
   },
   "出来上がる": {
     "kana": "できあがる",
@@ -1305,6 +1497,10 @@
   "受け入れる": {
     "kana": "うけいれる",
     "romaji": "ukeireru"
+  },
+  "召し上がる": {
+    "kana": "めしあがる",
+    "romaji": "meshiagaru"
   },
   "同時進出案": {
     "kana": "どうじしんしゅつあん",
@@ -1466,6 +1662,10 @@
     "kana": "そうじします",
     "romaji": "soujishimasu"
   },
+  "描きました": {
+    "kana": "かきました",
+    "romaji": "kakimashita"
+  },
   "揺るぎない": {
     "kana": "ゆるぎない",
     "romaji": "yuruginai"
@@ -1473,6 +1673,10 @@
   "損なわれた": {
     "kana": "そこなわれた",
     "romaji": "sokonawareta"
+  },
+  "撮りました": {
+    "kana": "とりました",
+    "romaji": "torimashita"
   },
   "政策立案者": {
     "kana": "せいさくりつあんもの",
@@ -1526,6 +1730,10 @@
     "kana": "きじょうのくうろん",
     "romaji": "kijou no kuuron"
   },
+  "来なかった": {
+    "kana": "こなかった",
+    "romaji": "konakatta"
+  },
   "来週土曜日": {
     "kana": "らいしゅうどようび",
     "romaji": "raishuu doyoubi"
@@ -1578,6 +1786,10 @@
     "kana": "みんかんじぎょうしゃ",
     "romaji": "minkan jigyousha"
   },
+  "気をつけて": {
+    "kana": "きをつけて",
+    "romaji": "ki o tsukete"
+  },
   "気をつける": {
     "kana": "きをつける",
     "romaji": "ki o tsukeru"
@@ -1601,6 +1813,14 @@
   "海洋生態系": {
     "kana": "かいようせいたいけい",
     "romaji": "kaiyou seitaikei"
+  },
+  "消えました": {
+    "kana": "きえました",
+    "romaji": "kiemashita"
+  },
+  "消しました": {
+    "kana": "けしました",
+    "romaji": "keshimashita"
   },
   "消費時間帯": {
     "kana": "しょうひじかんたい",
@@ -1694,6 +1914,10 @@
     "kana": "かがくてきちしき",
     "romaji": "kagakuteki chishiki"
   },
+  "空きました": {
+    "kana": "あきました",
+    "romaji": "akimashita"
+  },
   "競争的資金": {
     "kana": "きょうそうてきしきん",
     "romaji": "kyousou teki shikin"
@@ -1734,6 +1958,10 @@
     "kana": "けっこんきねんび",
     "romaji": "kekkonkinenbi"
   },
+  "続けようよ": {
+    "kana": "つづけようよ",
+    "romaji": "tsuzukeyou yo"
+  },
   "維持管理費": {
     "kana": "いじかんりひ",
     "romaji": "ijikanri hi"
@@ -1758,6 +1986,10 @@
     "kana": "じてんしゃつうがく",
     "romaji": "jitenshatsuugaku"
   },
+  "落ちました": {
+    "kana": "おちました",
+    "romaji": "ochimashita"
+  },
   "薬剤耐性菌": {
     "kana": "やくざいたいせいきん",
     "romaji": "yakuzai taisei kin"
@@ -1765,6 +1997,10 @@
   "行いました": {
     "kana": "おこないました",
     "romaji": "okonaimashita"
+  },
+  "行きました": {
+    "kana": "いきました",
+    "romaji": "ikimashita"
   },
   "行き届いて": {
     "kana": "いきとどいて",
@@ -1797,6 +2033,10 @@
   "言語共同体": {
     "kana": "げんごきょうどうたい",
     "romaji": "gengo kyoudoutai"
+  },
+  "話しました": {
+    "kana": "はなしました",
+    "romaji": "hanashimashita"
   },
   "認知言語学": {
     "kana": "にんちげんごがく",
@@ -1885,6 +2125,14 @@
   "面白かった": {
     "kana": "おもしろかった",
     "romaji": "omoshirokatta"
+  },
+  "頂きました": {
+    "kana": "いただきました",
+    "romaji": "itadakimashita"
+  },
+  "頑張ります": {
+    "kana": "がんばります",
+    "romaji": "ganbarimasu"
   },
   "顧問弁理士": {
     "kana": "こもんべんりし",
@@ -2182,6 +2430,10 @@
     "kana": "スマトラ",
     "romaji": "sumatora"
   },
+  "スライム": {
+    "kana": "スライム",
+    "romaji": "suraimu"
+  },
   "スリッパ": {
     "kana": "スリッパ",
     "romaji": "surippa"
@@ -2249,6 +2501,10 @@
   "でしょう": {
     "kana": "でしょう",
     "romaji": "deshou"
+  },
+  "ですから": {
+    "kana": "ですから",
+    "romaji": "desu kara"
   },
   "デパート": {
     "kana": "デパート",
@@ -2369,6 +2625,10 @@
   "ましょう": {
     "kana": "ましょう",
     "romaji": "mashou"
+  },
+  "マッチ箱": {
+    "kana": "まっちばこ",
+    "romaji": "matchibako"
   },
   "まとめる": {
     "kana": "まとめる",
@@ -2598,6 +2858,10 @@
     "kana": "ちゅうとはんぱ",
     "romaji": "chuutohanpa"
   },
+  "久しぶり": {
+    "kana": "ひさしぶり",
+    "romaji": "hisashiburi"
+  },
   "乗っても": {
     "kana": "のっても",
     "romaji": "notte mo"
@@ -2609,6 +2873,10 @@
   "了承する": {
     "kana": "りょうしょうする",
     "romaji": "ryoushou suru"
+  },
+  "了解です": {
+    "kana": "りょうかいです",
+    "romaji": "ryoukai desu"
   },
   "予備在庫": {
     "kana": "よびざいこ",
@@ -3094,6 +3362,10 @@
     "kana": "だします",
     "romaji": "dashimasu"
   },
+  "出ました": {
+    "kana": "でました",
+    "romaji": "demashita"
+  },
   "出力制御": {
     "kana": "しゅつりょくせいぎょ",
     "romaji": "shutsuryoku seigyo"
@@ -3553,6 +3825,10 @@
   "地震避難": {
     "kana": "じしんひなん",
     "romaji": "jishin hinan"
+  },
+  "坊ちゃん": {
+    "kana": "ぼっちゃん",
+    "romaji": "botchan"
   },
   "基調講演": {
     "kana": "きちょうこうえん",
@@ -4118,6 +4394,10 @@
     "kana": "さいたくすいしょう",
     "romaji": "saitaku suishou"
   },
+  "描きます": {
+    "kana": "かきます",
+    "romaji": "kakimasu"
+  },
   "提示方法": {
     "kana": "ていじほうほう",
     "romaji": "teiji houhou"
@@ -4125,6 +4405,14 @@
   "換えます": {
     "kana": "かえます",
     "romaji": "kaemasu"
+  },
+  "撮らない": {
+    "kana": "とらない",
+    "romaji": "toranai"
+  },
+  "撮ります": {
+    "kana": "とります",
+    "romaji": "torimasu"
   },
   "操作する": {
     "kana": "そうさする",
@@ -4297,6 +4585,14 @@
   "条項削除": {
     "kana": "じょうこうさくじょ",
     "romaji": "joukou sakujo"
+  },
+  "来ました": {
+    "kana": "きました",
+    "romaji": "kimashita"
+  },
+  "来られる": {
+    "kana": "こられる",
+    "romaji": "korareru"
   },
   "東西南北": {
     "kana": "とうざいなんぼく",
@@ -5194,6 +5490,10 @@
     "kana": "ぜったいないしょ",
     "romaji": "zettai naisho"
   },
+  "続けよう": {
+    "kana": "つづけよう",
+    "romaji": "tsuzukeyou"
+  },
   "緊張する": {
     "kana": "きんちょうする",
     "romaji": "kinchou suru"
@@ -5353,6 +5653,10 @@
   "行います": {
     "kana": "おこないます",
     "romaji": "okonaimasu"
+  },
+  "行かない": {
+    "kana": "いかない",
+    "romaji": "ikanai"
   },
   "行きます": {
     "kana": "いきます",
@@ -5845,6 +6149,10 @@
   "道路工事": {
     "kana": "どうろこうじ",
     "romaji": "dourokouji"
+  },
+  "違う言語": {
+    "kana": "ちがうげんご",
+    "romaji": "chigau gengo"
   },
   "違反する": {
     "kana": "いはんする",
@@ -6513,6 +6821,10 @@
   "お返事": {
     "kana": "おへんじ",
     "romaji": "o-henji"
+  },
+  "お邪魔": {
+    "kana": "おじゃま",
+    "romaji": "o-jama"
   },
   "お釣り": {
     "kana": "おつり",
@@ -7702,6 +8014,10 @@
     "kana": "なんだと",
     "romaji": "nan da to"
   },
+  "何でも": {
+    "kana": "なんでも",
+    "romaji": "nandemo"
+  },
   "何十冊": {
     "kana": "なんじゅうさつ",
     "romaji": "nanjuu satsu"
@@ -7729,6 +8045,10 @@
   "併せて": {
     "kana": "あわせて",
     "romaji": "awasete"
+  },
+  "使い方": {
+    "kana": "つかいかた",
+    "romaji": "tsukaikata"
   },
   "使用量": {
     "kana": "しようりょう",
@@ -7818,9 +8138,17 @@
     "kana": "こうごうせい",
     "romaji": "kougousei"
   },
+  "入って": {
+    "kana": "はいって",
+    "romaji": "haitte"
+  },
   "入れた": {
     "kana": "いれた",
     "romaji": "ireta"
+  },
+  "入れて": {
+    "kana": "いれて",
+    "romaji": "irete"
   },
   "入れる": {
     "kana": "いれる",
@@ -7993,6 +8321,10 @@
   "冷蔵庫": {
     "kana": "れいぞうこ",
     "romaji": "reizouko"
+  },
+  "出して": {
+    "kana": "だして",
+    "romaji": "dashite"
   },
   "出ます": {
     "kana": "でます",
@@ -9250,6 +9582,10 @@
     "kana": "すいせんじょう",
     "romaji": "suisenjou"
   },
+  "描いて": {
+    "kana": "かいて",
+    "romaji": "kaite"
+  },
   "提携校": {
     "kana": "ていけいこう",
     "romaji": "teikeikou"
@@ -9265,6 +9601,14 @@
   "揺れる": {
     "kana": "ゆれる",
     "romaji": "yureru"
+  },
+  "撮った": {
+    "kana": "とった",
+    "romaji": "totta"
+  },
+  "撮って": {
+    "kana": "とって",
+    "romaji": "totte"
   },
   "撮影会": {
     "kana": "さつえいかい",
@@ -9550,9 +9894,21 @@
     "kana": "むらたし",
     "romaji": "murata shi"
   },
+  "来ない": {
+    "kana": "こない",
+    "romaji": "konai"
+  },
   "来ます": {
     "kana": "きます",
     "romaji": "kimasu"
+  },
+  "来よう": {
+    "kana": "こよう",
+    "romaji": "koyou"
+  },
+  "来れる": {
+    "kana": "これる",
+    "romaji": "koreru"
   },
   "来場者": {
     "kana": "らいじょうしゃ",
@@ -9838,9 +10194,17 @@
     "kana": "あびる",
     "romaji": "abiru"
   },
+  "消えて": {
+    "kana": "きえて",
+    "romaji": "kiete"
+  },
   "消える": {
     "kana": "きえる",
     "romaji": "kieru"
+  },
+  "消して": {
+    "kana": "けして",
+    "romaji": "keshite"
   },
   "消費者": {
     "kana": "しょうひしゃ",
@@ -10446,6 +10810,10 @@
     "kana": "がいぜんせい",
     "romaji": "gaizensei"
   },
+  "行こう": {
+    "kana": "いこう",
+    "romaji": "ikou"
+  },
   "行って": {
     "kana": "いって",
     "romaji": "itte"
@@ -10673,6 +11041,10 @@
   "説明会": {
     "kana": "せつめいかい",
     "romaji": "setsumeikai"
+  },
+  "読み方": {
+    "kana": "よみかた",
+    "romaji": "yomikata"
   },
   "読んだ": {
     "kana": "よんだ",
@@ -11854,6 +12226,10 @@
     "kana": "ガム",
     "romaji": "gamu"
   },
+  "から": {
+    "kana": "から",
+    "romaji": "kara"
+  },
   "かれ": {
     "kana": "かれ",
     "romaji": "kare"
@@ -12034,6 +12410,10 @@
     "kana": "まだ",
     "romaji": "mada"
   },
+  "まで": {
+    "kana": "まで",
+    "romaji": "made"
+  },
   "ミリ": {
     "kana": "ミリ",
     "romaji": "miri"
@@ -12065,6 +12445,10 @@
   "よむ": {
     "kana": "よむ",
     "romaji": "yomu"
+  },
+  "より": {
+    "kana": "より",
+    "romaji": "yori"
   },
   "よる": {
     "kana": "よる",
@@ -12978,6 +13362,10 @@
     "kana": "こんかい",
     "romaji": "konkai"
   },
+  "今夜": {
+    "kana": "こんや",
+    "romaji": "konya"
+  },
   "今年": {
     "kana": "ことし",
     "romaji": "kotoshi"
@@ -13218,9 +13606,21 @@
     "kana": "たいけん",
     "romaji": "taiken"
   },
+  "何か": {
+    "kana": "なにか",
+    "romaji": "nanika"
+  },
+  "何で": {
+    "kana": "なんで",
+    "romaji": "nande"
+  },
   "何に": {
     "kana": "なにに",
     "romaji": "nani ni"
+  },
+  "何も": {
+    "kana": "なにも",
+    "romaji": "nanimo"
   },
   "何を": {
     "kana": "なにを",
@@ -13921,6 +14321,10 @@
   "出た": {
     "kana": "でた",
     "romaji": "deta"
+  },
+  "出て": {
+    "kana": "でて",
+    "romaji": "dete"
   },
   "出る": {
     "kana": "でる",
@@ -16754,6 +17158,10 @@
     "kana": "けいさい",
     "romaji": "keisai"
   },
+  "描く": {
+    "kana": "かく",
+    "romaji": "kaku"
+  },
   "提供": {
     "kana": "ていきょう",
     "romaji": "teikyou"
@@ -16789,6 +17197,10 @@
   "撤退": {
     "kana": "てったい",
     "romaji": "tettai"
+  },
+  "撮る": {
+    "kana": "とる",
+    "romaji": "toru"
   },
   "操作": {
     "kana": "そうさ",
@@ -17425,6 +17837,10 @@
   "条件": {
     "kana": "じょうけん",
     "romaji": "jouken"
+  },
+  "来て": {
+    "kana": "きて",
+    "romaji": "kite"
   },
   "来る": {
     "kana": "くる",
@@ -19197,6 +19613,10 @@
   "管理": {
     "kana": "かんり",
     "romaji": "kanri"
+  },
+  "範囲": {
+    "kana": "はんい",
+    "romaji": "han'i"
   },
   "簡単": {
     "kana": "かんたん",
@@ -21105,6 +21525,10 @@
   "還元": {
     "kana": "かんげん",
     "romaji": "kangen"
+  },
+  "邪魔": {
+    "kana": "じゃま",
+    "romaji": "jama"
   },
   "郊外": {
     "kana": "こうがい",
@@ -24875,7 +25299,7 @@
   "克": "かつ",
   "児": "じ",
   "兜": "かぶと",
-  "入": "い",
+  "入": "はい",
   "全": "ぜん",
   "八": "はち",
   "公": "こう",
@@ -25298,6 +25722,7 @@
   "接": "せっ",
   "控": "ひか",
   "措": "そ",
+  "描": "か",
   "提": "てい",
   "揚": "あ",
   "換": "か",
@@ -25312,6 +25737,7 @@
   "摘": "てき",
   "撃": "げき",
   "撤": "てつ",
+  "撮": "と",
   "撻": "たつ",
   "擁": "よう",
   "操": "みさお",
@@ -25479,7 +25905,7 @@
   "浴": "あ",
   "海": "うみ",
   "浸": "しん",
-  "消": "き",
+  "消": "け",
   "涯": "がい",
   "涼": "すず",
   "淘": "とう",
@@ -33028,6 +33454,23 @@
 
   var YOON = { 'ゃ': 'a', 'ゅ': 'u', 'ょ': 'o' };
 
+  var COMPOUNDS = {
+    'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+    'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+    'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+    'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+    'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+    'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+    'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+    'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+    'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+    'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+    'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
+    'ふぁ': 'fa', 'ふぃ': 'fi', 'ふぇ': 'fe', 'ふぉ': 'fo',
+    'てぃ': 'ti', 'でぃ': 'di', 'うぃ': 'wi', 'うぇ': 'we',
+    'しぇ': 'she', 'ちぇ': 'che', 'じぇ': 'je'
+  };
+
   var PUNCT = {
     '。': '.', '、': ',', '！': '!', '？': '?',
     '「': '"', '」': '"', '『': '"', '』': '"',
@@ -33048,7 +33491,7 @@
       var c = s[i], next = s[i + 1];
       if (c === 'っ') {
         var after = kanaToRomaji(s.slice(i + 1, i + 3 + (YOON[s[i + 2]] ? 1 : 0)));
-        out += after ? after[0] : '';
+        out += after ? (after.startsWith('ch') ? 't' : after[0]) : '';
         i += 1;
         continue;
       }
@@ -33062,12 +33505,18 @@
         i += 1;
         continue;
       }
+      var pair = s.slice(i, i + 2);
+      if (COMPOUNDS[pair]) {
+        out += COMPOUNDS[pair];
+        i += 2;
+        continue;
+      }
       var roma = KANA_ROMAJI[c];
       if (roma === undefined) return null;
       if (next && YOON[next]) {
         var stem = roma.slice(0, -1);
         if (stem === 'sh' || stem === 'ch' || stem === 'j') {
-          roma = (stem === 'j' ? 'jy' : stem) + YOON[next];
+          roma = stem + YOON[next];
         } else {
           roma = stem + 'y' + YOON[next];
         }
