@@ -6797,8 +6797,8 @@ header.topbar .active-level-control::after,
   }
 }
 @media (min-width: 1100px) {
-  html body:is(.fz-stage-home, .fz-view-latihan, .fz-stage-map, .fz-view-profile):not(.fz-teacher-mode),
-  html body:has(#app > .library-page):not(.fz-teacher-mode) {
+  html body:is(.fz-stage-home, .fz-view-latihan, .fz-stage-map, .fz-view-profile, .fz-view-kana):not(.fz-teacher-mode),
+  html body:has(#app > .library-page, #jaKanaChart, .ja-kana):not(.fz-teacher-mode) {
     --fz-col: 1160px;
   }
 }
@@ -6856,6 +6856,8 @@ header.topbar .active-level-control::after,
 
   /* RAIL (tablet): navigasi menempel di kiri, di bawah topbar, ikon di atas label. */
   html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav {
+    position: fixed !important;
+    z-index: 100 !important;
     top: calc(56px + env(safe-area-inset-top, 0px)) !important;
     bottom: 0 !important;
     left: 0 !important;
