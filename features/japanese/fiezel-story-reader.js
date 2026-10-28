@@ -7,7 +7,7 @@
  * Desain & Invarian Pedagogis:
  * 1. Multi-Scene Progression: Tiap cerita memiliki 5 adegan terstruktur (Scene 1-4 narasi bertahap,
  *    Scene 5 kuis pemahaman & miskonsepsi). Visual adegan berganti mengikuti jalannya alur cerita.
- * 2. Perpustakaan Dokkai N5 Terkurasi: 3 judul cerita lengkap (Mizuki no Maiko, Asakusa no Neko, Shinkansen).
+ * 2. Perpustakaan Dokkai N5 Terkurasi: 3 judul cerita lengkap (舞妓の一日, 浅草の猫, はじめての新幹線).
  * 3. Zero-Loss Braincore BKT Telemetry: Setiap token <ruby> yang diketuk mengalirkan pembaruan
  *    penguasaan kata ke BKT secara nyata (FiezelStoryBrainBridge.recordWordInteraction).
  * 4. Multi-Device Anti-Cutoff: Tinggi foto adegan terkontrol (<= 25-30% viewport mobile), seluruh teks
@@ -31,15 +31,116 @@
   var playTimer = null;
   var hideFurigana = false;
 
+  var STORY_COPY_ID = {
+    'story.btn_next': 'Lanjut ke Adegan Berikutnya →',
+    'story.btn_prev': '← Sebelumnya',
+    'story.btn_quiz': 'Mulai Kuis Akhir →',
+    'story.btn_library': 'Kembali ke Perpustakaan ✓',
+    'story.btn_reread': '↺ Baca Ulang',
+    'story.hint_tap': '👆 Ketuk kanji bergaris untuk melihat arti',
+    'story.btn_start': 'Mulai Membaca →',
+    'story.mizuki_title': '舞妓の一日',
+    'story.mizuki_subtitle': 'Keseharian Mizuki di Kyoto',
+    'story.asakusa_title': '浅草の猫',
+    'story.asakusa_subtitle': 'Kucing Penjaga Kuil Asakusa',
+    'story.shinkansen_title': 'はじめての新幹線',
+    'story.shinkansen_subtitle': 'Perjalanan Shinkansen Pertama'
+  };
+
+  var STORY_COPY_TH = {
+    'story.btn_next': 'ไปยังฉากถัดไป →',
+    'story.btn_prev': '← ก่อนหน้า',
+    'story.btn_quiz': 'เริ่มทำแบบทดสอบ →',
+    'story.btn_library': 'กลับสู่ห้องสมุด ✓',
+    'story.btn_reread': '↺ อ่านซ้ำ',
+    'story.hint_tap': '👆 แตะคันจิที่มีเส้นใต้เพื่อดูความหมาย',
+    'story.btn_start': 'เริ่มอ่าน →',
+    'story.mizuki_title': '舞妓の一日',
+    'story.mizuki_subtitle': 'หนึ่งวันของไมโกะ มิซึกิ',
+    'story.asakusa_title': '浅草の猫',
+    'story.asakusa_subtitle': 'แมวผู้พิทักษ์วัดอาซากุสะ',
+    'story.shinkansen_title': 'はじめての新幹線',
+    'story.shinkansen_subtitle': 'การเดินทางด้วยชินคันเซ็นครั้งแรก'
+  };
+
+  var STORY_COPY_EN = {
+    'story.btn_next': 'Next Scene →',
+    'story.btn_prev': '← Previous',
+    'story.btn_quiz': 'Start Final Quiz →',
+    'story.btn_library': 'Back to Library ✓',
+    'story.btn_reread': '↺ Re-read',
+    'story.hint_tap': '👆 Tap underlined kanji to view meaning',
+    'story.btn_start': 'Start Reading →',
+    'story.mizuki_title': 'A Day in the Life of a Maiko',
+    'story.mizuki_subtitle': 'A Day in the Life of Maiko Mizuki',
+    'story.asakusa_title': 'The Cat of Asakusa',
+    'story.asakusa_subtitle': 'The Guardian Cat of Asakusa Temple',
+    'story.shinkansen_title': 'First Time on the Shinkansen',
+    'story.shinkansen_subtitle': 'First Time on the Shinkansen'
+  };
+
+  try {
+    var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
+    if (rootObj.FiezelI18n) {
+      if (typeof rootObj.FiezelI18n.overrideCopy === 'function') {
+        rootObj.FiezelI18n.overrideCopy('id', STORY_COPY_ID);
+        rootObj.FiezelI18n.overrideCopy('th', STORY_COPY_TH);
+      } else if (typeof rootObj.FiezelI18n.registerCopy === 'function') {
+        rootObj.FiezelI18n.registerCopy('id', STORY_COPY_ID);
+        rootObj.FiezelI18n.registerCopy('th', STORY_COPY_TH);
+      }
+    }
+  } catch (_) {}
+
   function t(k, fallback) {
     try {
       var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
-      if (rootObj.FiezelI18n && typeof rootObj.FiezelI18n.t === 'function') {
-        var res = rootObj.FiezelI18n.t(k);
-        if (res && res !== k) return res;
+      if (rootObj.FiezelI18n) {
+        var loc = typeof rootObj.FiezelI18n.getLocale === 'function' ? rootObj.FiezelI18n.getLocale() : 'id';
+        if (loc === 'en' && STORY_COPY_EN && STORY_COPY_EN[k]) {
+          return STORY_COPY_EN[k];
+        }
+        if (typeof rootObj.FiezelI18n.t === 'function') {
+          var res = rootObj.FiezelI18n.t(k);
+          if (res && res !== k) return res;
+        }
       }
     } catch (_) {}
+    if (STORY_COPY_ID && STORY_COPY_ID[k]) return STORY_COPY_ID[k];
     return fallback || k;
+  }
+
+  function getStorySubtitle(story) {
+    if (!story) return '';
+    var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
+    var loc = 'id';
+    try {
+      if (rootObj.FiezelI18n && typeof rootObj.FiezelI18n.getLocale === 'function') {
+        loc = rootObj.FiezelI18n.getLocale() || 'id';
+      }
+    } catch (_) {}
+
+    if (loc === 'en') {
+      if (story.subtitles && story.subtitles.en) return story.subtitles.en;
+      if (story.subtitleKey && STORY_COPY_EN && STORY_COPY_EN[story.subtitleKey]) {
+        return STORY_COPY_EN[story.subtitleKey];
+      }
+    }
+
+    if (story.subtitleKey) {
+      try {
+        if (rootObj.FiezelI18n && typeof rootObj.FiezelI18n.t === 'function') {
+          var val = rootObj.FiezelI18n.t(story.subtitleKey);
+          if (val && val !== story.subtitleKey) return val;
+        }
+      } catch (_) {}
+    }
+
+    if (story.subtitles && story.subtitles[loc]) {
+      return story.subtitles[loc];
+    }
+
+    return story.subtitle || (story.subtitles && story.subtitles.id) || '';
   }
 
   // Visual Scene Vector Generators (Studio Ghibli & Kyoto Travertine Palette)
@@ -199,8 +300,16 @@
   var STORIES = [
     {
       id: 'mizuki-maiko',
-      title: 'Mizuki no Maiko - 舞妓の一日',
-      subtitle: 'Keseharian Calon Geisha di Kyoto',
+      title: '舞妓の一日',
+      titleJpMarkup: '<ruby>舞妓<rt>まいこ</rt></ruby>の<ruby>一日<rt>いちにち</rt></ruby>',
+      titleJp: '舞妓の一日',
+      subtitleKey: 'story.mizuki_subtitle',
+      subtitle: 'Keseharian Mizuki di Kyoto',
+      subtitles: {
+        id: 'Keseharian Mizuki di Kyoto',
+        th: 'หนึ่งวันของไมโกะ มิซึกิ',
+        en: 'A Day in the Life of Maiko Mizuki'
+      },
       level: 'N5',
       category: 'Budaya & Tradisi',
       coverSvg: makeSceneSvg('mizuki-2', 'Mizuki Cover'),
@@ -215,7 +324,6 @@
           role: 'Calon Geisha / Maiko (17 Tahun)',
           avatar: '👘',
           jp: 'ミズキは17<ruby>歳<rt>さい</rt></ruby>の<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'舞妓\',\'まいこ\',\'calon geisha / maiko\')">舞妓<rt>まいこ</rt></ruby>です。<ruby>毎朝<rt>まいあさ</rt></ruby>、<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'部屋\',\'へや\',\'kamar / ruangan\')">部屋<rt>へや</rt></ruby>で<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'美しい\',\'うつくしい\',\'indah / cantik\')">美しい<rt>うつくしい</rt></ruby><ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'着物\',\'きもの\',\'pakaian kimono tradisional\')">着物<rt>きもの</rt></ruby>を<ruby>着<rt>き</rt></ruby>ます。',
-          romaji: 'Mizuki wa 17-sai no maiko desu. Maiasa, heya de utsukushii kimono o kimasu.',
           id: 'Mizuki adalah seorang maiko berusia 17 tahun. Setiap pagi di kamarnya, dia mengenakan pakaian kimono yang indah.'
         },
         {
@@ -227,7 +335,6 @@
           role: 'Kisah Kyoto N5 (Comprehensible Input)',
           avatar: '🌸',
           jp: '<ruby>赤<rt>あか</rt></ruby>い<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'傘\',\'かさ\',\'payung tradisional\')">傘<rt>かさ</rt></ruby>を<ruby>持<rt>も</rt></ruby>って、<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'京都\',\'きょうと\',\'kota Kyoto\')">京都<rt>きょうと</rt></ruby>の<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'古い\',\'ふるい\',\'kuno / tua\')">古い<rt>ふるい</rt></ruby><ruby>道<rt>みち</rt></ruby>を<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'静かに\',\'しずかに\',\'dengan tenang\')">静かに<rt>しずかに</rt></ruby><ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'歩きます\',\'あるきます\',\'berjalan kaki\')">歩きます<rt>あるきます</rt></ruby>。',
-          romaji: 'Akai kasa o motte, Kyouto no furui michi o shizuka ni arukimasu.',
           id: 'Membawa payung merah, dia melangkah dengan tenang di jalanan batu kuno kota Kyoto.'
         },
         {
@@ -239,7 +346,6 @@
           role: 'Tuan Rumah Kedai Teh (Ochaya)',
           avatar: '🍵',
           jp: '「おはようございます、ミズキさん。<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'今日\',\'きょう\',\'hari ini\')">今日<rt>きょう</rt></ruby>も<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'元気\',\'げんき\',\'sehat / bersemangat\')">元気<rt>げんき</rt></ruby>ですね。<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'お茶\',\'おちゃ\',\'teh hijau Jepang\')">お茶<rt>おちゃ</rt></ruby>をどうぞ。」',
-          romaji: '「Ohayou gozaimasu, Mizuki-san. Kyou mo genki desu ne. Ocha o douzo.」',
           id: '"Selamat pagi, Mizuki-san. Hari ini bersemangat sekali ya. Mari minum teh hangatnya."'
         },
         {
@@ -251,19 +357,17 @@
           role: 'Instruktur Seni Budaya Tradisional',
           avatar: '🪭',
           jp: '<ruby>夕方<rt>ゆうがた</rt></ruby>、<ruby>先生<rt>せんせい</rt></ruby>と<ruby>一緒<rt>いっしょ</rt></ruby>に<ruby>伝統的<rt>でんとうてき</rt></ruby>な<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'踊り\',\'おどり\',\'tarian tradisional\')">踊り<rt>おどり</rt></ruby>と<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'音楽\',\'おんがく\',\'musik\')">音楽<rt>おんがく</rt></ruby>を<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'練習します\',\'れんしゅうします\',\'berlatih\')">練習します<rt>れんしゅうします</rt></ruby>。',
-          romaji: 'Yuugata, sensei to issho ni dentouteki na odori to ongaku o renshuu shimasu.',
           id: 'Menjelang sore, bersama sang pengajar dia tekun mendalami tarian tradisional dan musik.'
         },
         {
           index: 4,
           isQuiz: true,
           title: 'Kuis Pemahaman & Refleksi Cerita',
-          tag: 'Adegan 5 dari 5 · Evaluasi Kognitif BKT',
+          tag: 'Adegan 5 dari 5 · Kuis Pemahaman Cerita',
           svgArt: makeSceneSvg('mizuki-5', 'Refleksi Sore'),
           quiz: {
             id: 'quiz-mizuki-n5',
             questionJapanese: 'ミズキさんは <ruby>夕方<rt>ゆうがた</rt></ruby>、だれと <ruby>何<rt>なに</rt></ruby>を <ruby>練習<rt>れんしゅう</rt></ruby>しますか。',
-            romaji: 'Mizuki-san wa yuugata, dare to nani o renshuu shimasu ka.',
             stem: 'Pada sore hari, bersama siapa dan apa yang dilatih oleh Mizuki?',
             options: [
               { text: '<ruby>友<rt>とも</rt></ruby>だちと<ruby>部屋<rt>へや</rt></ruby>で<ruby>着物<rt>きもの</rt></ruby>を<ruby>着<rt>き</rt></ruby>る<ruby>練習<rt>れんしゅう</rt></ruby>', misconceptionId: 'wrong_activity_clothes', failWhy: 'Salah aktivitas: Memakai kimono dilakukan pada pagi hari di kamar rias.' },
@@ -278,8 +382,16 @@
     },
     {
       id: 'asakusa-neko',
-      title: 'Kuil Asakusa & Kucing Penjaga - 浅草の猫',
-      subtitle: 'Pertemuan Hangat di Halaman Kuil Tua',
+      title: '浅草の猫',
+      titleJpMarkup: '<ruby>浅草<rt>あさくさ</rt></ruby>の<ruby>猫<rt>ねこ</rt></ruby>',
+      titleJp: '浅草の猫',
+      subtitleKey: 'story.asakusa_subtitle',
+      subtitle: 'Kucing Penjaga Kuil Asakusa',
+      subtitles: {
+        id: 'Kucing Penjaga Kuil Asakusa',
+        th: 'แมวผู้พิทักษ์วัดอาซากุสะ',
+        en: 'The Guardian Cat of Asakusa Temple'
+      },
       level: 'N5',
       category: 'Kehidupan Sehari-hari',
       coverSvg: makeSceneSvg('asakusa', 'Asakusa Neko Cover'),
@@ -294,7 +406,6 @@
           role: 'Mahasiswa Tokyo',
           avatar: '👦',
           jp: 'ケンジは<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'朝\',\'あさ\',\'pagi hari\')">朝<rt>あさ</rt></ruby><ruby>早<rt>はや</rt></ruby>く、<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'有名\',\'ゆうめい\',\'terkenal\')">有名<rt>ゆうめい</rt></ruby>な<ruby>浅草<rt>あさくさ</rt></ruby>の<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'お寺\',\'おてら\',\'kuil Buddha\')">お寺<rt>おてら</rt></ruby>に<ruby>来<rt>き</rt></ruby>ました。<ruby>大<rt>おお</rt></ruby>きな<ruby>赤<rt>あか</rt></ruby>いちょうちんがあります。',
-          romaji: 'Kenji wa asa hayaku, yuumei na Asakusa no otera ni kimashita. Ookina akai chouchin ga arimasu.',
           id: 'Pagi-pagi sekali, Kenji datang ke kuil terkenal di Asakusa. Di sana ada lampion merah yang sangat besar.'
         },
         {
@@ -306,7 +417,6 @@
           role: 'Kisah Sehari-hari N5',
           avatar: '🐱',
           jp: '<ruby>門<rt>もん</rt></ruby>のそばに、<ruby>茶色<rt>ちゃいろ</rt></ruby>の<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'猫\',\'ねこ\',\'kucing\')">猫<rt>ねこ</rt></ruby>が<ruby>座<rt>すわ</rt></ruby>っています。みんなはその<ruby>猫<rt>ねこ</rt></ruby>を「ミカン」と<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'呼びます\',\'よびます\',\'memanggil\')">呼びます<rt>よびます</rt></ruby>。',
-          romaji: 'Mon no soba ni, chairo no neko ga suwatte imasu. Minna wa sono neko o 「Mikan」 to yobimasu.',
           id: 'Di dekat gerbang, seekor kucing belang duduk dengan tenang. Warga sekitar memanggil kucing itu "Mikan".'
         },
         {
@@ -318,7 +428,6 @@
           role: 'Mahasiswa Tokyo',
           avatar: '👦',
           jp: 'ケンジは<ruby>手<rt>て</rt></ruby>を<ruby>洗<rt>あら</rt></ruby>ってから、お<ruby>祈<rt>いの</rt></ruby>りをしました。<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'おみくじ\',\'おみくじ\',\'kertas ramalan kuil\')">おみくじ<rt>おみくじ</rt></ruby>を<ruby>引<rt>ひ</rt></ruby>くと、「<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'大吉\',\'だいきち\',\'sangat beruntung\')">大吉<rt>だいきち</rt></ruby>」が<ruby>出<rt>で</rt></ruby>ました。',
-          romaji: 'Kenji wa te o aratte kara, oinori o shimashita. Omikuji o hiku to, 「Daikichi」 ga demashita.',
           id: 'Setelah mencuci tangan, Kenji berdoa. Saat mengambil ramalan omikuji, keluar tulisan "Daikichi" (sangat beruntung).'
         },
         {
@@ -330,19 +439,17 @@
           role: 'Mahasiswa Tokyo',
           avatar: '👦',
           jp: '<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'お寺\',\'おてら\',\'kuil Buddha\')">お寺<rt>おてら</rt></ruby>の<ruby>前<rt>まえ</rt></ruby>の<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'店\',\'みせ\',\'kedai / toko\')">店<rt>みせ</rt></ruby>で、<ruby>温<rt>あたた</rt></ruby>かい<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'せんべい\',\'せんべい\',\'kerupuk beras tradisional Jepang\')">せんべい<rt>せんべい</rt></ruby>を<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'買いました\',\'かいました\',\'telah membeli\')">買いました<rt>かいました</rt></ruby>。ミカンにも<ruby>少<rt>すこ</rt></ruby>し<ruby>見<rt>み</rt></ruby>せてあげました。',
-          romaji: 'Otera no mae no mise de, atatakai senbei o kaimashita. Mikan ni mo sukoshi misete agemashita.',
           id: 'Di kedai depan kuil, dia membeli kerupuk senbei yang masih hangat dan memperlihatkannya ke Mikan.'
         },
         {
           index: 4,
           isQuiz: true,
           title: 'Kuis Pemahaman Kuil Asakusa',
-          tag: 'Adegan 5 dari 5 · Evaluasi Kognitif BKT',
+          tag: 'Adegan 5 dari 5 · Kuis Pemahaman Cerita',
           svgArt: makeSceneSvg('asakusa', 'Kuis Asakusa'),
           quiz: {
             id: 'quiz-asakusa-n5',
             questionJapanese: 'お<ruby>寺<rt>てら</rt></ruby>の<ruby>門<rt>もん</rt></ruby>のそばにいる <ruby>猫<rt>ねこ</rt></ruby>の<ruby>名前<rt>なまえ</rt></ruby>は<ruby>何<rt>なん</rt></ruby>ですか。',
-            romaji: 'Otera no mon no soba ni iru neko no namae wa nan desu ka.',
             stem: 'Siapakah nama kucing yang berada di dekat gerbang kuil?',
             options: [
               { text: '「リンゴ」という<ruby>名前<rt>なまえ</rt></ruby> (Apel)', misconceptionId: 'wrong_fruit_name', failWhy: 'Salah nama: Naskah menyebut nama kucing itu Mikan (jeruk), bukan Ringo.' },
@@ -357,8 +464,16 @@
     },
     {
       id: 'shinkansen-trip',
-      title: 'Kereta Shinkansen Pertama - はじめての新幹線',
-      subtitle: 'Teknologi Cepat & Panorama Gunung Fuji',
+      title: 'はじめての新幹線',
+      titleJpMarkup: 'はじめての<ruby>新幹線<rt>しんかんせん</rt></ruby>',
+      titleJp: 'はじめての新幹線',
+      subtitleKey: 'story.shinkansen_subtitle',
+      subtitle: 'Perjalanan Shinkansen Pertama',
+      subtitles: {
+        id: 'Perjalanan Shinkansen Pertama',
+        th: 'การเดินทางด้วยชินคันเซ็นครั้งแรก',
+        en: 'First Time on the Shinkansen'
+      },
       level: 'N5',
       category: 'Teknologi & Perjalanan',
       coverSvg: makeSceneSvg('shinkansen', 'Shinkansen Cover'),
@@ -373,7 +488,6 @@
           role: 'Pelajar',
           avatar: '🚄',
           jp: 'タロウは<ruby>朝<rt>あさ</rt></ruby>7<ruby>時<rt>じ</rt></ruby>に<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'東京駅\',\'とうきょうえき\',\'Stasiun Tokyo\')">東京駅<rt>とうきょうえき</rt></ruby>に<ruby>着<rt>つ</rt></ruby>きました。ホームに<ruby>白<rt>しろ</rt></ruby>い<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'新幹線\',\'しんかんせん\',\'kereta cepat Shinkansen\')">新幹線<rt>しんかんせん</rt></ruby>が<ruby>待<rt>ま</rt></ruby>っています。',
-          romaji: 'Tarou wa asa 7-ji ni Toukyou-eki ni tsukimashita. Houmu ni shiroi shinkansen ga matte imasu.',
           id: 'Taro tiba di Stasiun Tokyo pukul 7 pagi. Di peron, sebuah kereta Shinkansen putih sudah menunggu.'
         },
         {
@@ -385,7 +499,6 @@
           role: 'Penyiar Kereta Shinkansen',
           avatar: '👨‍✈️',
           jp: '「この<ruby>新幹線<rt>しんかんせん</rt></ruby>は、<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'最新\',\'さいしん\',\'terbaru / modern\')">最新<rt>さいしん</rt></ruby>の<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'自動運転\',\'じどううんてん\',\'kemudi otomatis\')">自動運転<rt>じどううんてん</rt></ruby>システムで<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'安全に\',\'あんぜんに\',\'dengan aman\')">安全に<rt>あんぜんに</rt></ruby><ruby>走<rt>はし</rt></ruby>ります。ごゆっくりお<ruby>過<rt>す</rt></ruby>ごしください。」',
-          romaji: '「Kono shinkansen wa, saishin no jidou unten shisutemu de anzen ni hashirimasu. Goyukkuri osugoshi kudasai.」',
           id: '"Kereta Shinkansen ini melaju aman dengan sistem kemudi otomatis terbaru. Selamat menikmati perjalanan Anda."'
         },
         {
@@ -397,7 +510,6 @@
           role: 'Pelajar',
           avatar: '🚄',
           jp: '<ruby>電車<rt>でんしゃ</rt></ruby>がスピードを<ruby>上<rt>あ</rt></ruby>げます。<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'窓\',\'まど\',\'jendela\')">窓<rt>まど</rt></ruby>の<ruby>外<rt>そと</rt></ruby>を<ruby>見<rt>み</rt></ruby>ると、<ruby>青<rt>あお</rt></ruby>い<ruby>空<rt>そら</rt></ruby>の<ruby>下<rt>した</rt></ruby>に<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'富士山\',\'ふじさん\',\'Gunung Fuji\')">富士山<rt>ふじさん</rt></ruby>がはっきりと<ruby>見<rt>み</rt></ruby>えました。',
-          romaji: 'Densha ga supiido o agemasu. Mado no soto o miru to, aoi sora no shita ni Fujisan ga hakkiri to miemashita.',
           id: 'Kereta menambah kecepatannya. Saat menatap ke luar jendela, di bawah langit biru Gunung Fuji terlihat sangat jelas.'
         },
         {
@@ -409,19 +521,17 @@
           role: 'Pelajar',
           avatar: '🚄',
           jp: 'たったの2<ruby>時間半<rt>じかんはん</rt></ruby>で、<ruby>新大阪駅<rt>しんおおさかえき</rt></ruby>に<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'到着\',\'とうちゃく\',\'tiba / sampai\')">到着<rt>とうちゃく</rt></ruby>しました。とても<ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'速くて\',\'はやくて\',\'cepat\')">速くて<rt>はやくて</rt></ruby><ruby class="fz-story-token" onclick="window.FiezelStoryReader.inspectWord(\'快適\',\'かいてき\',\'nyaman / menyenangkan\')">快適<rt>かいてき</rt></ruby>でした。',
-          romaji: 'Tatta no 2-jikanhan de, Shin-Oosaka-eki ni touchaku shimashita. Totemo hayakute kaiteki deshita.',
           id: 'Hanya dalam waktu 2,5 jam, kereta sudah tiba di Stasiun Shin-Osaka. Perjalanan yang sangat cepat dan nyaman.'
         },
         {
           index: 4,
           isQuiz: true,
           title: 'Kuis Pemahaman Shinkansen',
-          tag: 'Adegan 5 dari 5 · Evaluasi Kognitif BKT',
+          tag: 'Adegan 5 dari 5 · Kuis Pemahaman Cerita',
           svgArt: makeSceneSvg('shinkansen', 'Kuis Shinkansen'),
           quiz: {
             id: 'quiz-shinkansen-n5',
             questionJapanese: 'タロウさんは <ruby>電車<rt>でんしゃ</rt></ruby>の<ruby>窓<rt>まど</rt></ruby>から <ruby>何<rt>なに</rt></ruby>を<ruby>見<rt>み</rt></ruby>ましたか。',
-            romaji: 'Tarou-san wa densha no mado kara nani o mimashita ka.',
             stem: 'Apakah yang dilihat Taro melalui jendela kereta?',
             options: [
               { text: '<ruby>青<rt>あお</rt></ruby>い<ruby>海<rt>うみ</rt></ruby>と<ruby>白<rt>しろ</rt></ruby>い<ruby>船<rt>ふね</rt></ruby>', misconceptionId: 'wrong_sight_sea', failWhy: 'Salah objek pemandangan: Shinkansen jalur Tokaido melewati daratan dan Fuji, bukan laut lepas.' },
@@ -455,45 +565,17 @@
     var prefix = s.id === 'mizuki-maiko' ? 'mizuki' : (s.id === 'asakusa-neko' ? 'asakusa' : 'shinkansen');
     s.scenes.forEach(function (sc, i) {
       var n = sc.isQuiz ? 4 : i + 1;
-      sc.imageSrc = SCENE_IMAGE_BASE + prefix + '-' + n + '.webp';
+      sc.imageSrc = SCENE_IMAGE_BASE + prefix + '-' + n + '.jpg';
     });
     s.coverSrc = s.scenes[0].imageSrc;
   });
 
-  function esc(value) {
-    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
-  function getSceneRomaji(scene) {
-    if (!scene) return '';
-    if (scene.romaji) return scene.romaji;
-    var jp = scene.jp || (scene.quiz && scene.quiz.questionJapanese) || '';
-    if (!jp) return '';
-    try {
-      var kanaOnly = jp
-        .replace(/<ruby[^>]*>([\s\S]*?)<rt>([\s\S]*?)<\/rt><\/ruby>/gi, '$2')
-        .replace(/<[^>]+>/g, '');
-      var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
-      var jaUi = rootObj.FiezelJaUi;
-      if (!jaUi && typeof require === 'function') {
-        try { jaUi = require('./fiezel-ja-ui.js'); } catch (_) {}
-      }
-      if (jaUi && typeof jaUi.kanaToRomaji === 'function') {
-        var r = jaUi.kanaToRomaji(kanaOnly);
-        if (r) return r;
-      }
-    } catch (_) {}
-    return '';
-  }
-
   function sceneArtHtml(svg, src, alt) {
     var img = src
-      ? '<img class="fz-scene-img" src="' + src + '" alt="' + String(alt || '').replace(/\x22/g, '&quot;') +
-        '" loading="eager" decoding="async" onerror="this.style.display=\'none\'">'
+      ? '<img class="fz-scene-img" src="' + src + '" alt="' + String(alt || '').replace(/\x22/g, '&quot;') + '" loading="eager">'
       : '';
-    return '<div class="fz-scene-art-stack">' + (svg || '') + img + '</div>';
+    var fallback = svg ? '<div class="fz-scene-art-svg" style="display:none;">' + svg + '</div>' : '';
+    return '<div class="fz-scene-art-stack">' + img + fallback + '</div>';
   }
 
   function getStoryById(id) {
@@ -520,6 +602,8 @@
 
   function renderLibrary(container) {
     var cardsHtml = STORIES.map(function (s) {
+      var subtitle = getStorySubtitle(s);
+      var titleHtml = s.titleJpMarkup || s.title;
       return '' +
         '<div class="fz-story-card-item" onclick="window.FiezelStoryReader.openStory(\'' + s.id + '\')">' +
           '<div class="fz-story-thumb-wrap">' +
@@ -528,10 +612,11 @@
           '</div>' +
           '<div class="fz-story-card-body">' +
             '<span class="fz-story-cat-tag">' + s.category + '</span>' +
-            '<h3 class="fz-story-card-title">' + s.title + '</h3>' +
+            '<h3 class="fz-story-card-title">' + titleHtml + '</h3>' +
+            (subtitle ? '<div class="fz-story-card-subtitle">' + subtitle + '</div>' : '') +
             '<p class="fz-story-card-desc">' + s.description + '</p>' +
             '<div class="fz-story-card-foot">' +
-              '<span class="fz-story-cta-btn">Mulai Membaca →</span>' +
+              '<span class="fz-story-cta-btn">' + t('story.btn_start', 'Mulai Membaca →') + '</span>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -539,12 +624,6 @@
 
     var html = '' +
       '<div class="fz-story-library-wrap">' +
-        '<div class="fz-story-lib-head">' +
-          '<div class="fz-story-lib-head-text">' +
-            '<h2 class="fz-story-lib-title">' + t('story.library_title', 'Perpustakaan Cerita Bergambar N5') + '</h2>' +
-            '<p class="fz-story-lib-lead">' + t('story.library_lead', 'Kisah bertingkat multi-adegan (Graded Readers) terhubung ke Braincore BKT.') + '</p>' +
-          '</div>' +
-        '</div>' +
         '<div class="fz-story-cards-grid">' +
           cardsHtml +
         '</div>' +
@@ -606,7 +685,6 @@
             '<div class="fz-script-flow">' +
               '<div class="fz-sentence-block active">' +
                 '<div class="fz-sentence-jp">' + scene.jp + '</div>' +
-                '<div class="fz-sentence-romaji">' + esc(scene.romaji || getSceneRomaji(scene)) + '</div>' +
                 '<div class="fz-sentence-id">' + scene.id + '</div>' +
               '</div>' +
             '</div>' +
@@ -644,10 +722,8 @@
             '<div class="fz-story-quiz-card-inner">' +
               '<div class="fz-quiz-badge-row">' +
                 '<span class="fz-quiz-badge">Kuis Pemahaman Akhir</span>' +
-                '<span class="fz-quiz-safe-tag">Zero-Ghost • IRT 3PL</span>' +
               '</div>' +
               '<div class="fz-quiz-q-jp">' + q.questionJapanese + '</div>' +
-              (q.romaji ? '<div class="fz-sentence-romaji">' + esc(q.romaji) + '</div>' : '') +
               '<div class="fz-quiz-q-id">' + q.stem + '</div>' +
               '<div class="fz-quiz-options-grid">' +
                 optionsHtml +
@@ -674,9 +750,6 @@
               '<button type="button" class="fz-btn-furigana ' + (!hideFurigana ? 'active' : '') + '" id="fzBtnFurigana" onclick="window.FiezelStoryReader.toggleFurigana()" title="Sembunyikan / Tampilkan Furigana">' +
                 '<span>あA</span> Furigana' +
               '</button>' +
-              '<span class="fz-bkt-live-pill" title="Braincore BKT Aktif">' +
-                '<span class="fz-bkt-dot"></span> BKT Aktif' +
-              '</span>' +
             '</div>' +
           '</div>' +
           '<div class="fz-story-top-row2">' +
@@ -707,8 +780,8 @@
               '<span id="fzBktPercent" class="fz-bkt-ring-text">25%</span>' +
             '</div>' +
             '<div class="fz-bkt-info">' +
-              '<div class="fz-bkt-label">BRAINCORE BKT MASTERY</div>' +
-              '<div id="fzBktStatusMsg" class="fz-bkt-status">Mengalirkan telemetri...</div>' +
+              '<div class="fz-bkt-label">PENGUASAAN KATA</div>' +
+              '<div id="fzBktStatusMsg" class="fz-bkt-status">Menyimpan progres kata...</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -787,7 +860,7 @@
 
     if (ring) ring.style.strokeDashoffset = '75';
     if (percent) percent.innerText = '25%';
-    if (statusMsg) statusMsg.innerText = 'Injeksi Telemetri BKT...';
+    if (statusMsg) statusMsg.innerText = 'Menyimpan progres kata...';
 
     setTimeout(function () {
       var pLt = (record && record.pLt) || 0.72;
@@ -797,9 +870,9 @@
       if (percent) percent.innerText = pct + '%';
       if (statusMsg) {
         if (pct >= 60) {
-          statusMsg.innerHTML = '<b style="color:var(--emerald,#10b981);">✨ Telah Dikuasai (Prerequisite Bypass)</b>';
+          statusMsg.innerHTML = '<b style="color:var(--emerald,#10b981);">✨ Kosakata Dikuasai</b>';
         } else {
-          statusMsg.innerHTML = '<span style="color:var(--accent,#0284c7);">Memperbarui Bobot BKT...</span>';
+          statusMsg.innerHTML = '<span style="color:var(--accent,#0284c7);">Progres kata tersimpan</span>';
         }
       }
     }, 280);

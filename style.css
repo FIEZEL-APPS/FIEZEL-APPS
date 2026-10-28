@@ -6421,11 +6421,11 @@ body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected .fz-kana-bt
     box-sizing: border-box !important;
   }
   body .fiezel-ob .fiezel-ob-mascot {
-    flex: 0 0 120px !important;
-    width: 120px !important;
-    height: 120px !important;
-    max-width: 120px !important;
-    max-height: 120px !important;
+    flex: 0 0 200px !important;
+    width: 200px !important;
+    height: 200px !important;
+    max-width: 200px !important;
+    max-height: 200px !important;
     aspect-ratio: 1 / 1 !important;
     position: relative !important;
     overflow: visible !important;
@@ -6436,10 +6436,10 @@ body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected .fz-kana-bt
   body .fiezel-ob .fiezel-ob-mascot fiezel-mascot,
   body .fiezel-ob .fiezel-ob-mascot .fiezel-ob-paw,
   body .fiezel-ob .fiezel-ob-mascot .fz-mascot {
-    width: 120px !important;
-    height: 120px !important;
-    max-width: 120px !important;
-    max-height: 120px !important;
+    width: 200px !important;
+    height: 200px !important;
+    max-width: 200px !important;
+    max-height: 200px !important;
     overflow: visible !important;
   }
   body .fiezel-ob .fiezel-greet-bubble {
@@ -11244,27 +11244,7 @@ html body #app .result-alasan li{color:#4B5563 !important}
   user-select: none !important;
   line-height: 1 !important;
 }
-.fz-story-reader-wrap.hide-furigana rt,
-body.fz-ja-no-furigana .fz-story-reader-wrap rt,
-body.fz-ja-no-furigana .fz-sentence-jp rt,
-body.fz-ja-no-furigana .fz-quiz-q-jp rt,
-body.fz-ja-no-furigana .fz-quiz-opt-text rt {
-  display: none !important;
-}
-
-.fz-sentence-romaji {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #64748B;
-  letter-spacing: 0.01em;
-  margin-top: 6px;
-  line-height: 1.5;
-  transition: opacity 0.15s ease;
-}
-
-body.fz-ja-no-romaji .fz-sentence-romaji,
-body.fz-ja-no-romaji .fz-story-reader-wrap .ja-romaji {
+.fz-story-reader-wrap.hide-furigana rt {
   display: none !important;
 }
 
@@ -11599,10 +11579,23 @@ button.fz-btn-nav-next:active,
   }
   .fz-story-library-wrap {
     width: 100% !important;
-    max-width: 1040px !important;
+    max-width: 1140px !important;
     margin: 0 auto !important;
-    padding: 20px 24px 80px !important;
+    padding: 28px 24px 80px !important;
     box-sizing: border-box !important;
+  }
+  .fz-story-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 24px !important;
+    width: 100% !important;
+  }
+  .fz-story-card-item {
+    min-height: 430px !important;
+  }
+  .fz-story-thumb-wrap {
+    height: 190px !important;
+    max-height: 190px !important;
   }
   .fz-story-top-ctrls {
     display: flex !important;
@@ -11856,6 +11849,28 @@ body.fz-view-story .topbar-ornament-bg,
 body.fz-view-story header.topbar .topbar-ornament-bg {
   display: none !important;
 }
+body.fz-view-story #topContextWrap {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: center !important;
+  position: relative !important;
+  margin: 0 auto !important;
+}
+body.fz-view-story #topContextBackBtn {
+  position: absolute !important;
+  left: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  z-index: 10 !important;
+}
+body.fz-view-story #topContextTitle {
+  text-align: center !important;
+  margin: 0 auto !important;
+  display: block !important;
+  font-weight: 800 !important;
+}
 
 /* Perpustakaan Dokkai N5 (Story Library) - Tactile Clay & Daylight Hygiene */
 .fz-story-library-wrap {
@@ -11997,11 +12012,24 @@ body.fz-view-story header.topbar .topbar-ornament-bg {
   margin-bottom: 6px;
 }
 .fz-story-card-title {
-  font-size: 1.05rem;
+  font-size: 1.12rem;
   font-weight: 800;
   color: #0F172A;
+  line-height: 1.55;
+  margin-bottom: 2px;
+}
+.fz-story-card-title ruby rt {
+  font-size: 0.55em;
+  color: #64748B;
+  font-weight: 600;
+  line-height: 1;
+}
+.fz-story-card-subtitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0369A1;
   line-height: 1.35;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 .fz-story-card-desc {
   font-size: 0.82rem;
@@ -12027,3 +12055,5 @@ body.fz-view-story header.topbar .topbar-ornament-bg {
   color: #0369A1;
   transform: translateX(3px);
 }
+
+
