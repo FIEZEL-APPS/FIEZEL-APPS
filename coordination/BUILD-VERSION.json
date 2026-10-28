@@ -1,7 +1,7 @@
 {
-  "version": "m025-694",
+  "version": "m025-695",
   "claimedBy": "branch feat/shinobi-minimalist-japanese-onboarding-m025-694",
-  "claimedAt": "2026-10-28T01:44:51.921Z",
-  "reason": "fix(ja-onboarding): shinobi-grade minimalist zero-scroll onboarding (m025-694)",
+  "claimedAt": "2026-10-28T02:35:44.271Z",
+  "reason": "fix(onboarding): eliminate back-button overlap and tighten desktop gap (m025-695)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
