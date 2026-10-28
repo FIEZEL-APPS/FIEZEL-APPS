@@ -820,6 +820,8 @@ jobs:
           node tests/story-reader-integration-test.js
           # M025-703: Story Reader to Braincore bridge telemetry & BKT/Misconception ledger
           node tests/story-brain-bridge-test.js
+          # M025-707: Graded Story Reader ElevenLabs voice playback & sequential scene autoplay
+          node tests/story-voice-autoplay-test.js
           # M025-703: Interactive Kaiwa Chat universal furigana ruby & romaji live subtitles
           node tests/interactive-chat-universal-furigana-test.js
           # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat
