@@ -61,7 +61,7 @@
     }
   } catch (_) {}
 
-  function t(k, fallback) {
+  function storyT(k, fallback) {
     try {
       var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
       if (rootObj.FiezelI18n && typeof rootObj.FiezelI18n.t === 'function') {
@@ -571,8 +571,8 @@
       '<div class="fz-story-library-wrap">' +
         '<div class="fz-story-lib-head">' +
           '<div class="fz-story-lib-head-text">' +
-            '<h2 class="fz-story-lib-title">' + t('story.library_title', 'Perpustakaan Cerita Bergambar N5') + '</h2>' +
-            '<p class="fz-story-lib-lead">' + t('story.library_lead', 'Kisah bertingkat multi-adegan (Graded Readers) terhubung ke Braincore BKT.') + '</p>' +
+            '<h2 class="fz-story-lib-title">' + storyT('story.library_title', 'Perpustakaan Cerita Bergambar N5') + '</h2>' +
+            '<p class="fz-story-lib-lead">' + storyT('story.library_lead', 'Kisah bertingkat multi-adegan (Graded Readers) terhubung ke Braincore BKT.') + '</p>' +
           '</div>' +
         '</div>' +
         '<div class="fz-story-cards-grid">' +
@@ -631,7 +631,7 @@
           '<div class="fz-reader-card">' +
             '<div class="fz-reader-header">' +
               '<h3 class="fz-reader-title">' + scene.title + '</h3>' +
-              '<span class="fz-reader-hint">' + t('story.hint_tap', '👆 Ketuk kanji bergaris untuk arti & BKT') + '</span>' +
+              '<span class="fz-reader-hint">' + storyT('story.hint_tap', '👆 Ketuk kanji bergaris untuk arti & BKT') + '</span>' +
             '</div>' +
             '<div class="fz-script-flow">' +
               '<div class="fz-sentence-block active">' +
@@ -642,10 +642,10 @@
             '</div>' +
             '<div class="fz-story-nav-actions">' +
               (activeSceneIndex > 0 ?
-                '<button type="button" class="fz-btn-nav-prev" onclick="window.FiezelStoryReader.gotoScene(' + (activeSceneIndex - 1) + ')">' + t('story.btn_prev', '← Sebelumnya') + '</button>' :
+                '<button type="button" class="fz-btn-nav-prev" onclick="window.FiezelStoryReader.gotoScene(' + (activeSceneIndex - 1) + ')">' + storyT('story.btn_prev', '← Sebelumnya') + '</button>' :
                 '<div></div>') +
               '<button type="button" class="fz-btn-nav-next primary" onclick="window.FiezelStoryReader.gotoScene(' + (activeSceneIndex + 1) + ')">' +
-                (activeSceneIndex === story.scenes.length - 2 ? t('story.btn_quiz', 'Mulai Kuis Akhir →') : t('story.btn_next', 'Lanjut ke Adegan Berikutnya →')) +
+                (activeSceneIndex === story.scenes.length - 2 ? storyT('story.btn_quiz', 'Mulai Kuis Akhir →') : storyT('story.btn_next', 'Lanjut ke Adegan Berikutnya →')) +
               '</button>' +
             '</div>' +
           '</div>' +
@@ -684,8 +684,8 @@
               '</div>' +
               '<div id="fzFeedbackBanner" class="fz-feedback-banner"></div>' +
               '<div class="fz-story-nav-actions" style="margin-top:16px;">' +
-                '<button type="button" class="fz-btn-nav-prev" onclick="window.FiezelStoryReader.gotoScene(0)">' + t('story.btn_reread', '↺ Baca Ulang') + '</button>' +
-                '<button type="button" class="fz-btn-nav-next primary" onclick="window.FiezelStoryReader.openLibrary()">' + t('story.btn_library', 'Kembali ke Perpustakaan ✓') + '</button>' +
+                '<button type="button" class="fz-btn-nav-prev" onclick="window.FiezelStoryReader.gotoScene(0)">' + storyT('story.btn_reread', '↺ Baca Ulang') + '</button>' +
+                '<button type="button" class="fz-btn-nav-next primary" onclick="window.FiezelStoryReader.openLibrary()">' + storyT('story.btn_library', 'Kembali ke Perpustakaan ✓') + '</button>' +
               '</div>' +
             '</div>' +
           '</div>' +
