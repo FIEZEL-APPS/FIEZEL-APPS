@@ -1,7 +1,7 @@
 {
-  "version": "m025-698",
-  "claimedBy": "branch feat/update-contact-email-halo-m025-697",
-  "claimedAt": "2026-10-28T05:42:00.000Z",
-  "reason": "feat(website): update contact email to halo@fiezel.my.id",
+  "version": "m025-702",
+  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
+  "claimedAt": "2026-10-28T10:50:09.803Z",
+  "reason": "bot(heal): auto-synchronize release boundary",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
