@@ -2076,7 +2076,27 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
      bicara. Teksnya tetap rata kiri karena ini kalimat, bukan judul. */
   align-self:center;text-align:left;
 }
-@media (max-height:700px){.fiezel-stepper{padding-top:10px}.fiezel-ob-reveal{padding:18px 20px 14px}}
+@media (max-height:860px){
+  .fiezel-ob-reveal{padding:8px 16px 4px}
+  .fiezel-ob-reveal .fiezel-wordmark{width:min(30vw,100px)}
+  .fiezel-ob-word{font-size:1.25rem}
+  .fiezel-ob-tag{margin:1px 0 0;font-size:8.5px}
+  .fiezel-topbar{min-height:24px;padding:0 12px}
+  .fiezel-topbar .fiezel-back,.fiezel-topbar .fiezel-skip{min-height:30px;font-size:11.5px}
+  .fiezel-stepper{padding:2px 12px 1px}
+  .fiezel-stepper-eyebrow{font-size:9.5px}
+  .fiezel-stepper-names{font-size:10.5px;margin-top:1px}
+  .fiezel-segments{margin-top:3px}
+  .fiezel-stage{padding:0 12px !important;min-height:0 !important}
+  .fiezel-stage-art{gap:8px !important}
+  .fiezel-ob-mascot{--fz-ob-paw:46px !important;width:46px !important;height:46px !important}
+  .fiezel-ob-mascot fiezel-mascot,.fiezel-ob-mascot .fiezel-ob-paw,.fiezel-ob-mascot .fz-mascot{width:46px !important;height:46px !important}
+  .fiezel-greet-bubble{padding:3px 8px !important;font-size:11px !important;max-width:210px !important;line-height:1.25 !important}
+  .fiezel-sheet{margin:4px 10px max(6px,env(safe-area-inset-bottom));padding:8px 12px;gap:4px}
+  .fiezel-title{font-size:1.1rem;margin-bottom:0}
+  .fiezel-note{font-size:10.5px;line-height:1.2;margin:0}
+  .fiezel-btn{min-height:42px;padding:8px 14px;font-size:14.5px}
+}
 
 /* m028: lembar bawah selebar layar diganti kartu. Bottom sheet dipilih dulu supaya CTA
    terjangkau ibu jari - itu masih benar, dan tetap dijaga: kartu ini yang terakhir dalam
@@ -6252,14 +6272,62 @@ body.fz-auth-open{overflow:hidden}
 @media (max-height:680px){.fz-auth-hero.is-welcome{min-height:48vh}.fz-auth-hero.is-masuk{min-height:24vh}.fz-auth-hero.is-daftar{min-height:18vh}.fz-auth-paw{width:84px;height:84px}}
 @media (prefers-reduced-motion:reduce){.fz-auth,.fz-auth.is-leaving{animation:none}.fz-auth-hero{transition:none}}
 /* m025-367 · langkah kursus di perkenalan: dua kartu lebar (bendera + nama + isi kursus). */
-.fiezel-course-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0 10px}
+.fiezel-course-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:6px 0 4px;width:100%;box-sizing:border-box}
 /* .fiezel-goal-card menumpuk isinya ke bawah (column) dan mengecilkan semua span ke 13px;
    kartu kursus butuh baris: bendera di kiri, judul + isi di kanan. */
-.fiezel-ob .fiezel-course-card{flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;text-align:left;padding:16px 18px}
-.fiezel-ob .fiezel-course-card .fiezel-course-flag{flex:none;display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--fz-soft,#F6EFE7);font-size:30px;line-height:1}
-.fiezel-ob .fiezel-course-card .fiezel-course-text{display:flex;flex-direction:column;gap:3px;min-width:0;font-size:inherit}
-.fiezel-ob .fiezel-course-card .fiezel-course-text b{font-size:1.05rem}
-.fiezel-ob .fiezel-course-card .fiezel-course-text small{font-size:.84rem;font-weight:500;color:var(--fz-ink-muted,#6E635C);line-height:1.4}
+.fiezel-ob .fiezel-course-card{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;text-align:left;padding:6px 8px;min-height:42px;width:100%;min-width:0;box-sizing:border-box;border-radius:10px}
+.fiezel-ob .fiezel-course-card .fiezel-course-flag{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--fz-soft,#F6EFE7);font-size:18px;line-height:1}
+.fiezel-ob .fiezel-course-card .fiezel-course-text{display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden}
+.fiezel-ob .fiezel-course-card .fiezel-course-text b{font-size:.88rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fiezel-ob .fiezel-course-card .fiezel-course-text small{font-size:.68rem;font-weight:500;color:var(--fz-ink-muted,#6E635C);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* m025-693 SHINOBI-GRADE ONBOARDING: Kesiapan Aksara Jepang & Pratinjau Ketuk Kata <ruby> */
+.fiezel-ja-onboarding-panel{display:flex;flex-direction:column;gap:6px;margin:2px 0 6px;padding:8px 10px;background:#ffffff;border:1.5px solid #e2e8f0;border-radius:14px;box-shadow:0 3px 12px rgba(0,0,0,0.05);box-sizing:border-box;width:100%;text-align:left}
+.fz-ja-compact-header{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%}
+.fz-ja-compact-title{font-size:.78rem;font-weight:800;color:#0f172a;letter-spacing:-0.01em}
+.fiezel-ob-furigana-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:#ffffff;border:1px solid #cbd5e1;font-size:.68rem;font-weight:700;color:#64748b;cursor:pointer;transition:all .15s ease}
+.fiezel-ob-furigana-pill:hover{background:#f1f5f9;color:#0f172a}
+.fiezel-ob-furigana-pill.is-active{background:#0f172a !important;border-color:#0f172a !important;color:#ffffff !important;box-shadow:0 1px 4px rgba(15,23,42,0.2)}
+.fiezel-ja-kana-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;background:#f1f5f9;padding:3px;border-radius:10px;border:1px solid #e2e8f0;width:100%;box-sizing:border-box}
+body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn{display:flex;align-items:center;justify-content:center;padding:6px 10px;min-height:34px;background:transparent !important;border:none !important;border-radius:7px !important;cursor:pointer;transition:all .15s cubic-bezier(0.16,1,0.3,1);box-sizing:border-box;width:100%;box-shadow:none !important;outline:none}
+body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn .fz-kana-btn-badge{font-size:.78rem;font-weight:600;color:#64748b !important;letter-spacing:-0.01em;line-height:1;transition:color .15s ease}
+body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn:hover .fz-kana-btn-badge{color:#0f172a !important}
+body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected{background:#ffffff !important;box-shadow:0 1px 3px rgba(15,23,42,0.12),0 1px 2px rgba(15,23,42,0.06) !important}
+body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected .fz-kana-btn-badge{font-weight:800;color:#0f172a !important}
+.fiezel-ob-sentence-card{display:flex;flex-direction:column;gap:5px;padding:8px 10px;background:#ffffff;border:1.5px solid #e2e8f0;border-radius:11px;width:100%;box-sizing:border-box}
+.fz-ob-jp-row{display:flex;align-items:baseline;justify-content:space-between;gap:6px;flex-wrap:wrap;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif}
+.fz-ob-jp-line{display:inline-flex;align-items:baseline;gap:2px;font-size:1.18rem;font-weight:800;color:#0f172a;line-height:1.4}
+.fz-ob-ruby{display:inline-flex;flex-direction:row;align-items:baseline;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;padding:2px 7px;margin:0 2px;cursor:pointer;font-family:inherit;font-size:inherit;font-weight:inherit;color:#0f172a;transition:all .15s ease}
+.fz-ob-ruby:hover,.fz-ob-ruby.is-active{background:#eff6ff !important;border-color:#3b82f6 !important;box-shadow:0 0 0 2px rgba(59,130,246,0.2) !important}
+.fz-ob-ruby ruby{font-size:inherit;font-weight:800;color:#0f172a;margin:0;padding:0}
+.fz-ob-ruby rt{font-size:.64rem;font-weight:700;color:#2563eb;transform:translateY(-1px);transition:opacity .15s ease}
+.fiezel-ob-sentence-card.hide-furigana .fz-ob-ruby rt{opacity:0;visibility:hidden}
+.fz-ob-plain{font-size:inherit;font-weight:600;color:#334155;padding:0 2px}
+.fz-ob-id-line{font-size:.74rem;color:#64748b;font-style:italic;font-weight:500}
+.fz-ob-inspection-chip{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:4px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:.72rem;color:#334155;width:100%;box-sizing:border-box}
+.fz-chip-head{font-weight:800;color:#0f172a;font-size:.82rem}
+.fz-chip-head small{font-size:.72rem;color:#2563eb;font-weight:700;margin-left:2px}
+.fz-chip-sep{color:#cbd5e1;margin:0 2px}
+.fz-chip-mean{color:#475569;font-weight:600;font-size:.76rem}
+
+@media (max-height:860px){
+  .fiezel-sheet{margin:4px 10px max(6px,env(safe-area-inset-bottom)) !important;padding:8px 12px !important;gap:4px !important}
+  .fiezel-title{font-size:1.08rem !important;margin-bottom:0 !important}
+  .fiezel-btn{min-height:42px !important;padding:8px 14px !important;font-size:14.5px !important}
+}
+
+@media (max-height:700px){
+  .fiezel-ob-reveal{padding:4px 12px 2px !important}
+  .fiezel-topbar{min-height:20px !important}
+  .fiezel-stepper{padding:1px 12px 0 !important}
+  .fiezel-stage{display:none !important}
+  .fiezel-sheet{margin:2px 8px max(4px,env(safe-area-inset-bottom)) !important;padding:6px 10px !important;gap:3px !important}
+  .fiezel-title{font-size:1rem !important;margin-bottom:0 !important}
+  .fiezel-course-grid{margin:3px 0 2px !important;gap:4px !important}
+  .fiezel-ja-onboarding-panel{padding:6px 8px !important;gap:4px !important;margin:2px 0 4px !important}
+  .fiezel-note{display:none !important}
+  .fiezel-btn{min-height:38px !important;padding:6px 12px !important;font-size:14px !important}
+}
 
 /* ==========================================================================
    FIEZEL HOME DASHBOARD — SPORTS / LEAGUES REDESIGN (DARK + RADIANT ELECTRIC YELLOW)
