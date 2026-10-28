@@ -79,6 +79,23 @@ const code = `${banner}(function (root) {
 
   var YOON = { 'ゃ': 'a', 'ゅ': 'u', 'ょ': 'o' };
 
+  var COMPOUNDS = {
+    'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+    'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+    'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+    'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+    'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+    'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+    'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+    'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+    'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+    'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+    'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
+    'ふぁ': 'fa', 'ふぃ': 'fi', 'ふぇ': 'fe', 'ふぉ': 'fo',
+    'てぃ': 'ti', 'でぃ': 'di', 'うぃ': 'wi', 'うぇ': 'we',
+    'しぇ': 'she', 'ちぇ': 'che', 'じぇ': 'je'
+  };
+
   var PUNCT = {
     '。': '.', '、': ',', '！': '!', '？': '?',
     '「': '"', '」': '"', '『': '"', '』': '"',
@@ -99,7 +116,7 @@ const code = `${banner}(function (root) {
       var c = s[i], next = s[i + 1];
       if (c === 'っ') {
         var after = kanaToRomaji(s.slice(i + 1, i + 3 + (YOON[s[i + 2]] ? 1 : 0)));
-        out += after ? after[0] : '';
+        out += after ? (after.startsWith('ch') ? 't' : after[0]) : '';
         i += 1;
         continue;
       }
@@ -113,12 +130,18 @@ const code = `${banner}(function (root) {
         i += 1;
         continue;
       }
+      var pair = s.slice(i, i + 2);
+      if (COMPOUNDS[pair]) {
+        out += COMPOUNDS[pair];
+        i += 2;
+        continue;
+      }
       var roma = KANA_ROMAJI[c];
       if (roma === undefined) return null;
       if (next && YOON[next]) {
         var stem = roma.slice(0, -1);
         if (stem === 'sh' || stem === 'ch' || stem === 'j') {
-          roma = (stem === 'j' ? 'jy' : stem) + YOON[next];
+          roma = stem + YOON[next];
         } else {
           roma = stem + 'y' + YOON[next];
         }

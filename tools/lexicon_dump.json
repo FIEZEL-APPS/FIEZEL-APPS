@@ -24511,6 +24511,430 @@
     "行われる": {
       "kana": "おこなわれる",
       "romaji": "okonawareru"
+    },
+    "邪魔": {
+      "kana": "じゃま",
+      "romaji": "jama"
+    },
+    "お邪魔": {
+      "kana": "おじゃま",
+      "romaji": "o-jama"
+    },
+    "お邪魔します": {
+      "kana": "おじゃまします",
+      "romaji": "ojamashimasu"
+    },
+    "お邪魔しました": {
+      "kana": "おじゃましました",
+      "romaji": "ojamashimashita"
+    },
+    "坊ちゃん": {
+      "kana": "ぼっちゃん",
+      "romaji": "botchan"
+    },
+    "マッチ箱": {
+      "kana": "まっちばこ",
+      "romaji": "matchibako"
+    },
+    "来ました": {
+      "kana": "きました",
+      "romaji": "kimashita"
+    },
+    "来て": {
+      "kana": "きて",
+      "romaji": "kite"
+    },
+    "来てください": {
+      "kana": "きてください",
+      "romaji": "kite kudasai"
+    },
+    "来ない": {
+      "kana": "こない",
+      "romaji": "konai"
+    },
+    "来なかった": {
+      "kana": "こなかった",
+      "romaji": "konakatta"
+    },
+    "来よう": {
+      "kana": "こよう",
+      "romaji": "koyou"
+    },
+    "来られる": {
+      "kana": "こられる",
+      "romaji": "korareru"
+    },
+    "来れる": {
+      "kana": "これる",
+      "romaji": "koreru"
+    },
+    "行きました": {
+      "kana": "いきました",
+      "romaji": "ikimashita"
+    },
+    "行ってください": {
+      "kana": "いってください",
+      "romaji": "itte kudasai"
+    },
+    "行かない": {
+      "kana": "いかない",
+      "romaji": "ikanai"
+    },
+    "行かなかった": {
+      "kana": "いかなかった",
+      "romaji": "ikanakatta"
+    },
+    "行こう": {
+      "kana": "いこう",
+      "romaji": "ikou"
+    },
+    "空きました": {
+      "kana": "あきました",
+      "romaji": "akimashita"
+    },
+    "お腹が空きました": {
+      "kana": "おなかがすきました",
+      "romaji": "onaka ga sukimashita"
+    },
+    "お腹が空いた": {
+      "kana": "おなかがすいた",
+      "romaji": "onaka ga suita"
+    },
+    "今夜": {
+      "kana": "こんや",
+      "romaji": "konya"
+    },
+    "範囲": {
+      "kana": "はんい",
+      "romaji": "han'i"
+    },
+    "モンスター": {
+      "kana": "モンスター",
+      "romaji": "monsutaa"
+    },
+    "スライム": {
+      "kana": "スライム",
+      "romaji": "suraimu"
+    },
+    "続けよう": {
+      "kana": "つづけよう",
+      "romaji": "tsuzukeyou"
+    },
+    "続けようよ": {
+      "kana": "つづけようよ",
+      "romaji": "tsuzukeyou yo"
+    },
+    "違う言語": {
+      "kana": "ちがうげんご",
+      "romaji": "chigau gengo"
+    },
+    "何でも": {
+      "kana": "なんでも",
+      "romaji": "nandemo"
+    },
+    "何か": {
+      "kana": "なにか",
+      "romaji": "nanika"
+    },
+    "何も": {
+      "kana": "なにも",
+      "romaji": "nanimo"
+    },
+    "何で": {
+      "kana": "なんで",
+      "romaji": "nande"
+    },
+    "話しました": {
+      "kana": "はなしました",
+      "romaji": "hanashimashita"
+    },
+    "読み方": {
+      "kana": "よみかた",
+      "romaji": "yomikata"
+    },
+    "使い方": {
+      "kana": "つかいかた",
+      "romaji": "tsukaikata"
+    },
+    "お疲れ様でした": {
+      "kana": "おつかれさまでした",
+      "romaji": "otsukaresama deshita"
+    },
+    "失礼しました": {
+      "kana": "しつれいしました",
+      "romaji": "shitsureishimashita"
+    },
+    "かしこまりました": {
+      "kana": "かしこまりました",
+      "romaji": "kashikomarimashita"
+    },
+    "承知いたしました": {
+      "kana": "しょうちいたしました",
+      "romaji": "shouchiitashimashita"
+    },
+    "承知しました": {
+      "kana": "しょうちしました",
+      "romaji": "shouchishimashita"
+    },
+    "了解しました": {
+      "kana": "りょうかいしました",
+      "romaji": "ryoukaishimashita"
+    },
+    "了解です": {
+      "kana": "りょうかいです",
+      "romaji": "ryoukai desu"
+    },
+    "お待たせしました": {
+      "kana": "おまたせしました",
+      "romaji": "omataseshimashita"
+    },
+    "お待たせいたしました": {
+      "kana": "おまたせいたしました",
+      "romaji": "omataseitashimashita"
+    },
+    "気をつけてください": {
+      "kana": "きをつけてください",
+      "romaji": "ki o tsukete kudasai"
+    },
+    "気をつけて": {
+      "kana": "きをつけて",
+      "romaji": "ki o tsukete"
+    },
+    "気にしないでください": {
+      "kana": "きにしないでください",
+      "romaji": "ki ni shinaide kudasai"
+    },
+    "気にしないで": {
+      "kana": "きにしないで",
+      "romaji": "ki ni shinaide"
+    },
+    "無理しないでください": {
+      "kana": "むりしないでください",
+      "romaji": "muri shinaide kudasai"
+    },
+    "無理しないで": {
+      "kana": "むりしないで",
+      "romaji": "muri shinaide"
+    },
+    "頑張ってください": {
+      "kana": "がんばってください",
+      "romaji": "ganbatte kudasai"
+    },
+    "頑張ります": {
+      "kana": "がんばります",
+      "romaji": "ganbarimasu"
+    },
+    "久しぶり": {
+      "kana": "ひさしぶり",
+      "romaji": "hisashiburi"
+    },
+    "お久しぶり": {
+      "kana": "おひさしぶり",
+      "romaji": "ohisashiburi"
+    },
+    "お久しぶりです": {
+      "kana": "おひさしぶりです",
+      "romaji": "ohisashiburi desu"
+    },
+    "ご馳走様でした": {
+      "kana": "ごちそうさまでした",
+      "romaji": "gochisousama deshita"
+    },
+    "頂きました": {
+      "kana": "いただきました",
+      "romaji": "itadakimashita"
+    },
+    "いかがですか": {
+      "kana": "いかがですか",
+      "romaji": "ikaga desu ka"
+    },
+    "どうですか": {
+      "kana": "どうですか",
+      "romaji": "dou desu ka"
+    },
+    "どうでしょうか": {
+      "kana": "どうでしょうか",
+      "romaji": "dou deshou ka"
+    },
+    "知っています": {
+      "kana": "しっています",
+      "romaji": "shitte imasu"
+    },
+    "知っていますか": {
+      "kana": "しっていますか",
+      "romaji": "shitte imasu ka"
+    },
+    "教えてください": {
+      "kana": "おしえてください",
+      "romaji": "oshiete kudasai"
+    },
+    "手伝ってください": {
+      "kana": "てつだってください",
+      "romaji": "tetsudatte kudasai"
+    },
+    "待ってください": {
+      "kana": "まってください",
+      "romaji": "matte kudasai"
+    },
+    "ちょっと待ってください": {
+      "kana": "ちょっとまってください",
+      "romaji": "chotto matte kudasai"
+    },
+    "少々お待ちください": {
+      "kana": "しょうしょうおまちください",
+      "romaji": "shoushou omachi kudasai"
+    },
+    "召し上がる": {
+      "kana": "めしあがる",
+      "romaji": "meshiagaru"
+    },
+    "ご覧になる": {
+      "kana": "ごらんになる",
+      "romaji": "goran ni naru"
+    },
+    "撮ります": {
+      "kana": "とります",
+      "romaji": "torimasu"
+    },
+    "撮りました": {
+      "kana": "とりました",
+      "romaji": "torimashita"
+    },
+    "撮って": {
+      "kana": "とって",
+      "romaji": "totte"
+    },
+    "撮ってください": {
+      "kana": "とってください",
+      "romaji": "totte kudasai"
+    },
+    "撮った": {
+      "kana": "とった",
+      "romaji": "totta"
+    },
+    "撮る": {
+      "kana": "とる",
+      "romaji": "toru"
+    },
+    "撮らない": {
+      "kana": "とらない",
+      "romaji": "toranai"
+    },
+    "描きます": {
+      "kana": "かきます",
+      "romaji": "kakimasu"
+    },
+    "描きました": {
+      "kana": "かきました",
+      "romaji": "kakimashita"
+    },
+    "描いて": {
+      "kana": "かいて",
+      "romaji": "kaite"
+    },
+    "描いてください": {
+      "kana": "かいてください",
+      "romaji": "kaite kudasai"
+    },
+    "描く": {
+      "kana": "かく",
+      "romaji": "kaku"
+    },
+    "入れました": {
+      "kana": "いれました",
+      "romaji": "iremashita"
+    },
+    "入れて": {
+      "kana": "いれて",
+      "romaji": "irete"
+    },
+    "入れてください": {
+      "kana": "いれてください",
+      "romaji": "irete kudasai"
+    },
+    "入りました": {
+      "kana": "はいりました",
+      "romaji": "hairimashita"
+    },
+    "入って": {
+      "kana": "はいって",
+      "romaji": "haitte"
+    },
+    "入ってください": {
+      "kana": "はいってください",
+      "romaji": "haitte kudasai"
+    },
+    "出しました": {
+      "kana": "だしました",
+      "romaji": "dashimashita"
+    },
+    "出して": {
+      "kana": "だして",
+      "romaji": "dashite"
+    },
+    "出してください": {
+      "kana": "だしてください",
+      "romaji": "dashite kudasai"
+    },
+    "出ました": {
+      "kana": "でました",
+      "romaji": "demashita"
+    },
+    "出て": {
+      "kana": "でて",
+      "romaji": "dete"
+    },
+    "出てください": {
+      "kana": "でてください",
+      "romaji": "dete kudasai"
+    },
+    "出かけました": {
+      "kana": "でかけました",
+      "romaji": "dekakemashita"
+    },
+    "消しました": {
+      "kana": "けしました",
+      "romaji": "keshimashita"
+    },
+    "消して": {
+      "kana": "けして",
+      "romaji": "keshite"
+    },
+    "消してください": {
+      "kana": "けしてください",
+      "romaji": "keshite kudasai"
+    },
+    "消えました": {
+      "kana": "きえました",
+      "romaji": "kiemashita"
+    },
+    "消えて": {
+      "kana": "きえて",
+      "romaji": "kiete"
+    },
+    "から": {
+      "kana": "から",
+      "romaji": "kara"
+    },
+    "まで": {
+      "kana": "まで",
+      "romaji": "made"
+    },
+    "より": {
+      "kana": "より",
+      "romaji": "yori"
+    },
+    "ですから": {
+      "kana": "ですから",
+      "romaji": "desu kara"
+    },
+    "落としました": {
+      "kana": "おとしました",
+      "romaji": "otoshimashita"
+    },
+    "落ちました": {
+      "kana": "おちました",
+      "romaji": "ochimashita"
     }
   },
   "stems": {
@@ -24835,7 +25259,7 @@
     "運": "はこ",
     "次": "つぎ",
     "乗": "の",
-    "入": "い",
+    "入": "はい",
     "割": "わ",
     "青": "あお",
     "赤": "あか",
@@ -24868,7 +25292,7 @@
     "降": "お",
     "書": "か",
     "掛": "か",
-    "消": "き",
+    "消": "け",
     "着": "き",
     "切": "き",
     "結婚": "けっこん",
@@ -26074,7 +26498,9 @@
     "鼻": "はな",
     "齟": "そ",
     "齢": "れい",
-    "齬": "ご"
+    "齬": "ご",
+    "撮": "と",
+    "描": "か"
   },
   "single": {
     "私": {
