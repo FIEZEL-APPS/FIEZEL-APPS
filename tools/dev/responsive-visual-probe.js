@@ -1,4 +1,5 @@
-const { chromium } = require('c:/Users/hp/fiezel-apps/node_modules/playwright');
+let chromium;
+try { chromium = require('playwright').chromium; } catch(e) { chromium = require('c:/Users/hp/fiezel-apps/node_modules/playwright').chromium; }
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -27,7 +28,7 @@ function createServer(baseDir) {
 }
 
 async function runResponsiveAudit() {
-  const rootDir = path.resolve(__dirname, '..');
+  const rootDir = path.resolve(__dirname, '../..');
   const server = createServer(rootDir);
   const port = 37500 + Math.floor(Math.random() * 5000);
   await new Promise(r => server.listen(port, '127.0.0.1', r));

@@ -1,7 +1,12 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require('playwright');
+let chromium;
+try {
+  chromium = require('playwright').chromium;
+} catch (e) {
+  chromium = require('c:/Users/hp/fiezel-apps/node_modules/playwright').chromium;
+}
 
 // Simple static file server
 function createServer(rootDir) {
@@ -35,7 +40,7 @@ function createServer(rootDir) {
 }
 
 async function runTest() {
-  const rootDir = path.resolve(__dirname, '..');
+  const rootDir = path.resolve(__dirname, '../..');
   const server = createServer(rootDir);
 
   const testPort = 32000 + Math.floor(Math.random() * 10000);

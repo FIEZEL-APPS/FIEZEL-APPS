@@ -46,7 +46,7 @@ Rilis `m025-704` ini secara tuntas memulihkan 100% alur pengguna baru tanpa hamb
 
 Semua pengujian dijalankan di dalam worktree `c:\Users\hp\fiezel-pwa-recovery-53c29b7d`:
 
-1. **`node tests/cold-boot-zero-blocker-test.js`**:
+1. **`node tools/dev/cold-boot-zero-blocker-probe.js`**:
    - `[PROBE 1]` Cold-boot navigation with clean storage: PASS (No auth lock, onboarding active, zero 404s).
    - `[PROBE 2]` Step 0 (Language: id) $\rightarrow$ Step 1 (Name) $\rightarrow$ Step 2 (Course: ja) $\rightarrow$ Step 3 (Goal): PASS.
    - `[PROBE 3]` Dual-Gate fork validation: PASS (`data-ob-beginner` & `data-ob-placement` visible).
@@ -55,7 +55,7 @@ Semua pengujian dijalankan di dalam worktree `c:\Users\hp\fiezel-pwa-recovery-53
    - `[PROBE 6]` Victory Stage & State Transition: PASS (`state.level = 1`, `state.gems = 30`, `placementDone = true`).
    - **Hasil Akhir**: `>>> ALL COLD-BOOT & DUOLINGO-PARITY CHECKS PASSED 100%! <<<`
 
-2. **`node tests/responsive-visual-audit.js`**:
+2. **`node tools/dev/responsive-visual-probe.js`**:
    - `[AUDIT 1]` Mobile Viewport (`390 x 844`): Button box `{ x: 38, y: 498, width: 314, height: 40 }` $\rightarrow$ Above the fold!
    - `[AUDIT 2]` Desktop Viewport (`1280 x 800`): Full width 1280px container, centered card max-width 500px, background `#F8F9FA`, topographic accents $\rightarrow$ PASS.
    - **Hasil Akhir**: `>>> RESPONSIVE AUDIT COMPLETED SUCCESSFULLY! <<<`
@@ -85,5 +85,5 @@ Semua pengujian dijalankan di dalam worktree `c:\Users\hp\fiezel-pwa-recovery-53
    - Menambahkan `versiYangDiklaimDiOpenPR()` via `gh pr list` dan dukungan `FIEZEL_MIN_BUILD` untuk mencegah tabrakan nomor build multi-agent secara otomatis.
 4. `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`:
    - Ditingkatkan ke versi build resmi `m025-704`.
-5. `tests/cold-boot-zero-blocker-test.js` & `tests/responsive-visual-audit.js`:
-   - Test suite permanen untuk mengunci integritas cold-boot dan tampilan multi-device.
+5. `tools/dev/cold-boot-zero-blocker-probe.js` & `tools/dev/responsive-visual-probe.js`:
+   - Empirical probe suite permanen untuk mengunci integritas cold-boot dan tampilan multi-device.
