@@ -106,7 +106,17 @@
       require('../i18n/copy-id-feat-b.js');
     } catch (loadError) { I18N = null; }
   }
-  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+  function T(key, params, fallback) {
+    if (typeof params === 'string' && fallback === undefined) {
+      fallback = params;
+      params = undefined;
+    }
+    if (I18N && typeof I18N.t === 'function') {
+      var res = I18N.t(key, params, fallback);
+      if (res && res !== key) return res;
+    }
+    return fallback !== undefined ? fallback : String(key);
+  }
 
   var STORAGE_KEY = 'fiezel-onboarding-v1';
 
@@ -852,9 +862,20 @@
       + stepper(4)
       + greet(env, 'encouraging', T('onboarding.santai-this-bukan-ujian-can'))
       + '<div class="fiezel-sheet" data-ob-step="4">'
-      + T('onboarding.apa-level-lang-you')
-      + T(facts.lite ? 'onboarding.tes-awal-isi-lite' : 'onboarding.isinya-item-listening-grammar-and', { soal: facts.soal, menit: facts.menit })
-      + btn(T('onboarding.btn-placement'), 'data-ob-primary')
+      + '<h2 class="fiezel-title">' + escapeHtml(T('onboarding.path-choice-title')) + '</h2>'
+      + '<p class="fiezel-body" style="margin-bottom:16px;">' + escapeHtml(T('onboarding.path-choice-desc')) + '</p>'
+      + '<div class="fiezel-placement-path-grid">'
+      + '<div class="fiezel-path-card is-beginner" data-ob-path="beginner">'
+      + '<div class="fiezel-path-badge">🌱 ' + escapeHtml(T('onboarding.path-beginner-title')) + '</div>'
+      + '<p class="fiezel-path-desc">' + escapeHtml(T('onboarding.path-beginner-desc')) + '</p>'
+      + '<button type="button" class="fiezel-btn fiezel-btn-primary" data-ob-beginner>' + escapeHtml(T('onboarding.path-beginner-btn')) + '</button>'
+      + '</div>'
+      + '<div class="fiezel-path-card is-test" data-ob-path="test">'
+      + '<div class="fiezel-path-badge">🎯 ' + escapeHtml(T('onboarding.path-test-title')) + '</div>'
+      + '<p class="fiezel-path-desc"><span class="fiezel-path-count">' + facts.soal + ' soal</span> ' + escapeHtml(T('onboarding.path-test-desc', { soal: facts.soal })) + '</p>'
+      + '<button type="button" class="fiezel-btn fiezel-btn-primary" data-ob-primary>' + escapeHtml(T('onboarding.path-test-btn')) + '</button>'
+      + '</div>'
+      + '</div>'
       + (last ? btn(T('onboarding.btn-skip-test'), 'data-ob-skip', 'ghost')
         : btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost'))
       + '</div>';
@@ -936,6 +957,7 @@
     var nameOnly = opts.nameOnly === true;
     if (!nameOnly && opts.force !== true && completed(target)) return { shown: false, reason: 'completed' };
     if (nameOnly && !needsName(target)) return { shown: false, reason: 'named' };
+    if (doc.querySelector && doc.querySelector('.fiezel-ob')) return { shown: false, reason: 'already_visible' };
 
     var host = doc.createElement('div');
     host.className = 'fiezel-ob';
@@ -1622,6 +1644,23 @@
             startPlacementNow();
           }
           : advance);
+        var beginnerBtn = host.querySelector('[data-ob-beginner]');
+        if (beginnerBtn) {
+          beginnerBtn.addEventListener('click', function () {
+            pose('excited');
+            finish('beginner');
+          });
+        }
+        var pathCards = host.querySelectorAll('[data-ob-path]');
+        for (var pIdx = 0; pIdx < pathCards.length; pIdx++) {
+          (function (card) {
+            card.addEventListener('click', function (e) {
+              if (e && e.target && e.target.tagName === 'BUTTON') return;
+              var btnEl = card.querySelector('button');
+              if (btnEl) btnEl.click();
+            });
+          })(pathCards[pIdx]);
+        }
         var prev = host.querySelector('[data-ob-carousel-prev]');
         if (prev && !prev.hasAttribute('disabled')) prev.addEventListener('click', function () {
           pendingSlideDir = -1; // tatapan memimpin ke kiri sebelum turun ke isi slide
