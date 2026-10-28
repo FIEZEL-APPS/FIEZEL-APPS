@@ -1049,6 +1049,45 @@ test('murid dengan kode kelas (dari layar masuk) memilih kursus lalu langsung se
   assert.strictEqual(onboarding.storedClassCode(env), 'FZ-ABC234', 'kode kelas harus tersimpan');
 });
 
+test('KUNCI: pilihan kursus Jepang menyajikan panel kesiapan Kana dan pratinjau <ruby> interaktif', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true, onFinish() {} });
+  typeName(run, 'Kenji');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'di langkah kursus');
+
+  const jaPanel = run.element.querySelector('[data-ob-ja-panel]');
+  assert.ok(jaPanel, 'panel pratinjau jepang terpasang di DOM');
+
+  const kanaOptions = run.element.querySelectorAll('[data-ob-kana]');
+  assert.strictEqual(kanaOptions.length, 2, 'dua opsi kesiapan kana (learning & fluent)');
+  assert.strictEqual(kanaOptions[0].getAttribute('data-ob-kana'), 'learning');
+  assert.strictEqual(kanaOptions[1].getAttribute('data-ob-kana'), 'fluent');
+
+  const furiToggle = run.element.querySelector('[data-ob-toggle-furigana]');
+  assert.ok(furiToggle, 'tombol alih furigana terpasang');
+
+  const rubyElements = run.element.querySelectorAll('[data-ob-ruby]');
+  assert.ok(rubyElements.length >= 2, 'kata beranotasi ruby terpasang untuk dicoba');
+  assert.strictEqual(rubyElements[0].getAttribute('data-word'), '東京');
+
+  // Pilih opsi sudah hafal kana -> furigana mati
+  kanaOptions[1].listeners.click[0]();
+
+  // Pilih kursus Jepang dan selesaikan onboarding
+  run.element.querySelector('[data-ob-course="ja"]').listeners.click[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  run.element.querySelector('[data-ob-skip]').listeners.click[0]();
+
+  const rec = JSON.parse(env.localStorage.getItem(onboarding.STORAGE_KEY) || '{}');
+  assert.strictEqual(rec.course, 'ja', 'kursus ja tersimpan');
+  assert.strictEqual(rec.kanaPreference, 'fluent', 'kanaPreference fluent tersimpan');
+  assert.strictEqual(rec.furigana, false, 'furigana false tersimpan');
+
+  const jaDisp = JSON.parse(env.localStorage.getItem('fiezel-ja-display-v1') || '{}');
+  assert.strictEqual(jaDisp.furigana, false, 'fiezel-ja-display-v1 ikut tersinkron');
+});
+
 test('gate onboarding sudah terdaftar di CI', () => {
   const workflow = fs.readFileSync('./.github/workflows/quality.yml', 'utf8');
   assert.ok(/node tests\/onboarding-test\.js/.test(workflow));

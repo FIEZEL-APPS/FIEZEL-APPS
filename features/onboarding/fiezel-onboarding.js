@@ -370,6 +370,9 @@
       if (!store || typeof store.setItem !== 'function') return;
       var previous = readRecord(env) || {};
       var name = normalizeName((detail && detail.name) || previous.name);
+      var course = normalizeCourse((detail && detail.course) || previous.course);
+      var kanaPref = String((detail && detail.kanaPreference) || previous.kanaPreference || 'learning');
+      var furi = detail && typeof detail.furigana === 'boolean' ? detail.furigana : (previous.furigana !== false);
       store.setItem(STORAGE_KEY, JSON.stringify({
         done: true,
         at: Number(detail && detail.at) || 0,
@@ -380,8 +383,21 @@
         level: String((detail && detail.level) || ''),
         role: normalizeRole((detail && detail.role) || previous.role),
         classCode: String((detail && detail.classCode) || previous.classCode || ''),
-        course: normalizeCourse((detail && detail.course) || previous.course)
+        course: course,
+        kanaPreference: kanaPref,
+        furigana: furi
       }));
+      if (course === 'ja') {
+        try {
+          var jaDisp = {};
+          try { jaDisp = JSON.parse(store.getItem('fiezel-ja-display-v1') || '{}') || {}; } catch(_) {}
+          jaDisp.furigana = furi;
+          store.setItem('fiezel-ja-display-v1', JSON.stringify(jaDisp));
+          if (env && env.FiezelJaUi && typeof env.FiezelJaUi.applyPrefs === 'function') {
+            env.FiezelJaUi.applyPrefs();
+          }
+        } catch(_) {}
+      }
     } catch (_) { /* penyimpanan penuh tidak boleh mengurung murid di onboarding */ }
   }
 
@@ -738,7 +754,59 @@
   // bawaan — murid Jepang yang menekan Lanjut tanpa membaca dulu diam-diam berakhir di
   // kursus Inggris, persis keluhan yang membuat langkah ini ada.
   // ---------------------------------------------------------------------------------------
-  function courseMarkup(env, selected) {
+  function jaCourseTryoutMarkup(kanaPref, furiOn, isJa) {
+    kanaPref = kanaPref || 'learning';
+    var isLearning = kanaPref !== 'fluent';
+    var furiActive = furiOn !== undefined ? (furiOn === true) : isLearning;
+
+    return '<div class="fiezel-ja-onboarding-panel" data-ob-ja-panel style="' + (isJa ? 'display:flex;' : 'display:none;') + '">'
+      + '<div class="fiezel-ja-kana-query">'
+      + '<div class="fiezel-ja-query-badge">' + escapeHtml(T('onboarding.ja-query-badge', 'Pengaturan Tampilan Jepang')) + '</div>'
+      + '<h3 class="fiezel-ja-subhead">' + escapeHtml(T('onboarding.ja-kana-title', 'Sudah bisa membaca Hiragana & Katakana?')) + '</h3>'
+      + '<p class="fiezel-ja-explain">' + escapeHtml(T('onboarding.ja-kana-desc', 'FIEZEL menyesuaikan tampilan furigana (bantuan bacaan di atas kanji) sesuai kebutuhan belajarmu.')) + '</p>'
+      + '<div class="fiezel-ja-kana-options" role="radiogroup" aria-label="Kesiapan Aksara Jepang">'
+      + '<button type="button" role="radio" aria-checked="' + (isLearning ? 'true' : 'false') + '" class="fiezel-kana-btn' + (isLearning ? ' is-selected' : '') + '" data-ob-kana="learning">'
+      + '<span class="fz-kana-btn-badge">' + escapeHtml(T('onboarding.ja-opt-learn-badge', 'FURIGANA AKTIF')) + '</span>'
+      + '<span class="fz-kana-btn-title">' + escapeHtml(T('onboarding.ja-opt-learn-title', 'Masih Pemula Huruf')) + '</span>'
+      + '<span class="fz-kana-btn-desc">' + escapeHtml(T('onboarding.ja-opt-learn-desc', 'Baru mulai kana. Furigana selalu mendampingi setiap kanji.')) + '</span>'
+      + '</button>'
+      + '<button type="button" role="radio" aria-checked="' + (!isLearning ? 'true' : 'false') + '" class="fiezel-kana-btn' + (!isLearning ? ' is-selected' : '') + '" data-ob-kana="fluent">'
+      + '<span class="fz-kana-btn-badge">' + escapeHtml(T('onboarding.ja-opt-fluent-badge', 'TAMPILAN BERSIH')) + '</span>'
+      + '<span class="fz-kana-btn-title">' + escapeHtml(T('onboarding.ja-opt-fluent-title', 'Sudah Hafal Kana')) + '</span>'
+      + '<span class="fz-kana-btn-desc">' + escapeHtml(T('onboarding.ja-opt-fluent-desc', 'Kanji tampil bersih. Cukup ketuk kata bila ingin intip bacaan.')) + '</span>'
+      + '</button>'
+      + '</div>'
+      + '</div>'
+      + '<div class="fiezel-ja-tryout-section">'
+      + '<div class="fiezel-ja-tryout-header">'
+      + '<div class="fiezel-ja-tryout-title-row">'
+      + '<span class="fz-tryout-label">' + escapeHtml(T('onboarding.ja-tryout-title', 'Coba Langsung di Sini')) + '</span>'
+      + '<button type="button" class="fiezel-ob-furigana-pill' + (furiActive ? ' is-active' : '') + '" data-ob-toggle-furigana aria-pressed="' + (furiActive ? 'true' : 'false') + '" aria-label="Alihkan Furigana">'
+      + '<span class="fz-pill-text">Furigana:</span> <strong data-ob-furi-status>' + (furiActive ? 'ON' : 'OFF') + '</strong>'
+      + '</button>'
+      + '</div>'
+      + '<p class="fz-tryout-caption">' + escapeHtml(T('onboarding.ja-tryout-desc', 'Ketuk kata untuk melihat bacaan, terjemahan, dan sinyal Braincore.')) + '</p>'
+      + '</div>'
+      + '<div class="fiezel-ob-sentence-card' + (furiActive ? '' : ' hide-furigana') + '" data-ob-sentence-card>'
+      + '<div class="fz-ob-jp-line" aria-label="Tokyo e ikimasu">'
+      + '<button type="button" class="fz-ob-ruby is-active" data-ob-ruby data-word="東京" data-reading="とうきょう" data-meaning="Tokyo (Ibu kota Jepang)"><ruby>東京<rt>とうきょう</rt></ruby></button>'
+      + '<span class="fz-ob-plain">へ</span>'
+      + '<button type="button" class="fz-ob-ruby" data-ob-ruby data-word="行き" data-reading="いき" data-meaning="pergi (bentuk dasar: 行く)"><ruby>行<rt>い</rt></ruby>き</button>'
+      + '<span class="fz-ob-plain">ます。</span>'
+      + '</div>'
+      + '<div class="fz-ob-id-line">Saya pergi ke Tokyo.</div>'
+      + '<div class="fz-ob-inspection-chip" data-ob-inspection-chip style="display:flex;">'
+      + '<span class="fz-chip-head"><b data-ob-chip-word>東京</b> <small data-ob-chip-reading>[とうきょう]</small></span>'
+      + '<span class="fz-chip-sep">·</span>'
+      + '<span class="fz-chip-mean" data-ob-chip-meaning>Tokyo (Ibu kota Jepang)</span>'
+      + '<span class="fz-chip-bkt"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Braincore BKT P(L)=0.85</span>'
+      + '</div>'
+      + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  function courseMarkup(env, selected, kanaPref, furiOn) {
     var pick = normalizeCourse(selected);
     var cards = COURSES.map(function (c) {
       var on = c.id === pick;
@@ -755,6 +823,7 @@
       + '<div class="fiezel-sheet" data-ob-step="course">'
       + '<h2 class="fiezel-title">' + escapeHtml(T('onboarding.course-title')) + '</h2>'
       + '<div class="fiezel-course-grid" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.course-aria')) + '">' + cards + '</div>'
+      + jaCourseTryoutMarkup(kanaPref, furiOn, pick === 'ja')
       + '<p class="fiezel-note">' + escapeHtml(T('onboarding.course-note')) + '</p>'
       + btn(T('onboarding.next'), 'data-ob-advance' + (pick ? '' : ' disabled'))
       + '</div>';
@@ -981,6 +1050,8 @@
     var selectedRole = storedRole(target);
     var typedClassCode = '';
     var selectedCourse = normalizeCourse(storedCourse(target));
+    var selectedKanaPref = 'learning';
+    var selectedFurigana = true;
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
@@ -1260,7 +1331,7 @@
       var html;
       if (step === LANGUAGE_STEP) html = languageMarkup(target, selectedLocale, localeBusy);
       else if (step === 1) html = nameMarkup(target, typedName);
-      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse);
+      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse, selectedKanaPref, selectedFurigana);
       else if (step === 2) html = carouselMarkup(target, slide);
       else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel);
       else if (step === 4) html = placementMarkup(target);
@@ -1360,7 +1431,7 @@
       if (closed) return;
       closed = true;
       clearMascotTimers();
-      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode, course: selectedCourse });
+      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode, course: selectedCourse, kanaPreference: selectedKanaPref, furigana: selectedFurigana });
       // Serah terima hanya pada penyelesaian sungguhan; skip/placement keluar lewat fade
       // lama (§2.3: dilewati pada kurangi-gerak dan pada jalur tes penempatan).
       var handedOff = via === 'finish' ? beginHandoff() : false;
@@ -1557,6 +1628,7 @@
             });
           })(localeButtons[l]);
         }
+        var jaPanel = host.querySelector('[data-ob-ja-panel]');
         host.querySelectorAll('[data-ob-course]').forEach(function (b) {
           b.addEventListener('click', function () {
             selectedCourse = normalizeCourse(b.getAttribute('data-ob-course'));
@@ -1567,6 +1639,70 @@
             });
             var nextBtn = host.querySelector('[data-ob-advance]');
             if (nextBtn && selectedCourse) nextBtn.removeAttribute('disabled');
+            if (jaPanel && jaPanel.style) {
+              if (selectedCourse === 'ja') {
+                jaPanel.style.display = 'flex';
+                if (typeof microReact === 'function') microReact('observing', 600, 'curious');
+              } else {
+                jaPanel.style.display = 'none';
+              }
+            }
+          });
+        });
+        host.querySelectorAll('[data-ob-kana]').forEach(function (kb) {
+          kb.addEventListener('click', function () {
+            selectedKanaPref = kb.getAttribute('data-ob-kana') || 'learning';
+            selectedFurigana = selectedKanaPref !== 'fluent';
+            host.querySelectorAll('[data-ob-kana]').forEach(function (x) {
+              var on = x === kb;
+              if (x.classList && typeof x.classList.toggle === 'function') x.classList.toggle('is-selected', on);
+              x.setAttribute('aria-checked', on ? 'true' : 'false');
+            });
+            updateFuriganaUI();
+          });
+        });
+        var furiToggle = host.querySelector('[data-ob-toggle-furigana]');
+        if (furiToggle) {
+          furiToggle.addEventListener('click', function () {
+            selectedFurigana = !selectedFurigana;
+            updateFuriganaUI();
+          });
+        }
+        function updateFuriganaUI() {
+          var pill = host.querySelector('[data-ob-toggle-furigana]');
+          var card = host.querySelector('[data-ob-sentence-card]');
+          var status = host.querySelector('[data-ob-furi-status]');
+          if (pill) {
+            if (pill.classList && typeof pill.classList.toggle === 'function') {
+              pill.classList.toggle('is-active', selectedFurigana);
+            }
+            pill.setAttribute('aria-pressed', selectedFurigana ? 'true' : 'false');
+          }
+          if (card && card.classList && typeof card.classList.toggle === 'function') {
+            card.classList.toggle('hide-furigana', !selectedFurigana);
+          }
+          if (status) status.textContent = selectedFurigana ? 'ON' : 'OFF';
+        }
+        host.querySelectorAll('[data-ob-ruby]').forEach(function (rubyEl) {
+          rubyEl.addEventListener('click', function () {
+            var word = rubyEl.getAttribute('data-word') || '';
+            var reading = rubyEl.getAttribute('data-reading') || '';
+            var meaning = rubyEl.getAttribute('data-meaning') || '';
+            var chip = host.querySelector('[data-ob-inspection-chip]');
+            if (chip) {
+              if (chip.style) chip.style.display = 'flex';
+              var wEl = chip.querySelector('[data-ob-chip-word]');
+              var rEl = chip.querySelector('[data-ob-chip-reading]');
+              var mEl = chip.querySelector('[data-ob-chip-meaning]');
+              if (wEl) wEl.textContent = word;
+              if (rEl) rEl.textContent = '[' + reading + ']';
+              if (mEl) mEl.textContent = meaning;
+            }
+            host.querySelectorAll('[data-ob-ruby]').forEach(function (r) {
+              if (r.classList && typeof r.classList.remove === 'function') r.classList.remove('is-active');
+            });
+            if (rubyEl.classList && typeof rubyEl.classList.add === 'function') rubyEl.classList.add('is-active');
+            if (typeof microReact === 'function') microReact('observing', 600, 'curious');
           });
         });
         var nameInput = host.querySelector('[data-ob-name]');

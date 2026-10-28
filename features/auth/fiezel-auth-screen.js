@@ -338,7 +338,14 @@
         G.renderButton(slot, function (res) {
           if (res && res.ok) {
             var code = classCodeFromForm();
-            finish({ role: 'murid', via: 'google', classCode: code || '' });
+            finish({
+              role: 'murid',
+              via: 'google',
+              action: ui.screen,
+              isNew: !!(res && res.linked),
+              email: (res && res.email) || '',
+              classCode: code || ''
+            });
           } else if (note) note.textContent = (res && res.message) || t('auth.layar.galat-umum', 'Belum berhasil. Coba lagi, ya.');
         }, { locale: locale(), text: ui.screen === 'daftar' ? 'signup_with' : 'signin_with', width: Math.min(360, Math.max(240, (container.clientWidth || 320))) })
           .then(function (r) { if (r && !r.ok) gagal(); }, gagal);
@@ -377,7 +384,14 @@
         if (!res || !res.ok) { ui.error = accountError(res); paint(); return; }
         var role = (A.role && A.role()) === 'teacher' ? 'guru' : 'murid';
         if (guru && role !== 'guru') { ui.error = t('auth.layar.galat-bukan-guru', 'Akun ini akun murid. Pilih tab Murid untuk masuk.'); paint(); return; }
-        finish({ role: role, via: 'akun', classCode: role === 'murid' ? (code || '') : '' });
+        finish({
+          role: role,
+          via: 'akun',
+          action: ui.screen,
+          isNew: daftar,
+          handle: handle,
+          classCode: role === 'murid' ? (code || '') : ''
+        });
       }, function () {
         ui.busy = false; ui.error = accountError({ error: 'unavailable' }); paint();
       });
