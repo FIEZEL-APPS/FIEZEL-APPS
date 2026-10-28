@@ -353,6 +353,8 @@
     'story.vocab_saving': 'กำลังบันทึกความคืบหน้าคำศัพท์...',
     'story.autoplay_label': 'เล่นอัตโนมัติ',
     'story.quiz_speaker_name': 'ผู้คุมสอบ',
-    'story.quiz_audio_role': 'เสียงคำถามแบบทดสอบ (ภาษาญี่ปุ่น)'
+    'story.quiz_audio_role': 'เสียงคำถามแบบทดสอบ (ภาษาญี่ปุ่น)',
+    'story.library_card_sub': 'Graded Readers N5 · หนังสืออ่านนอกเวลา',
+    'story.library_card_title': 'หนังสือนิทานภาพ N5'
   });
 })();

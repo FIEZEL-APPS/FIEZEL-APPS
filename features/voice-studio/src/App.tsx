@@ -2757,6 +2757,9 @@ export default function App() {
         if (cancelled || !MochiCtor || !mochiContainerRef.current) return;
 
         mochiContainerRef.current.innerHTML = '';
+        const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 640;
+        const mochiWidth = isMobileScreen ? 140 : 200;
+        const mochiHeight = isMobileScreen ? 130 : 180;
         const inst = new MochiCtor(mochiContainerRef.current, {
           mood: 'dots',
           badge: 'chat_purple',
@@ -2764,8 +2767,8 @@ export default function App() {
           showHands: true,
           showEars: true,
           showTail: false,
-          width: 84,
-          height: 80,
+          width: mochiWidth,
+          height: mochiHeight,
         });
         mochiInstanceRef.current = inst;
         setIs3dMochiReady(true);
@@ -3307,13 +3310,13 @@ export default function App() {
                             } catch {}
                           }
                         }}
-                        title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi'}
-                        className="relative w-[84px] h-[80px] flex items-center justify-center cursor-pointer select-none shrink-0"
+                        title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi (Mitra Kaiwa 3D)'}
+                        className="relative w-[140px] sm:w-[200px] h-[130px] sm:h-[180px] flex items-center justify-center cursor-pointer select-none shrink-0"
                       >
                         <div
                           ref={mochiContainerRef}
                           data-testid="mochi-3d-stage"
-                          className="w-[84px] h-[80px] flex items-center justify-center"
+                          className="w-[140px] sm:w-[200px] h-[130px] sm:h-[180px] flex items-center justify-center"
                         />
                         <img
                           src={
@@ -3331,7 +3334,7 @@ export default function App() {
                           }}
                           alt="Mochi"
                           style={{ display: is3dMochiReady ? 'none' : 'block' }}
-                          className="w-12 h-12 rounded-full object-contain p-1 bg-white shadow-2xs"
+                          className="w-20 sm:w-28 h-20 sm:h-28 rounded-full object-contain p-1"
                         />
                       </div>
 
