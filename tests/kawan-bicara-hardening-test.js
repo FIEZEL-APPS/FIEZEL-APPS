@@ -363,7 +363,10 @@ console.log('\n--- TEST 8: Goal Evaluation Rules (Intro Regex & Anti-Fake Comple
   ];
   // Verify that fake message-count logic userMsgCount >= 1/2/3 is banned
   const fs = require('fs');
-  const chatJs = fs.readFileSync('C:/Users/hp/fiezel-kawan-bicara-p2/features/interactive-chat/fiezel-interactive-chat.js', 'utf8');
+  const path = require('path');
+  const chatFile = path.join(__dirname, '..', 'features', 'interactive-chat', 'fiezel-interactive-chat.js');
+  const callFile = path.join(__dirname, '..', 'features', 'interactive-chat', 'fiezel-voice-call.js');
+  const chatJs = fs.readFileSync(chatFile, 'utf8');
   assert(!chatJs.includes('userMsgCount >= 1'), 'Arbitrary userMsgCount >= 1 banned from goal progress');
   assert(!chatJs.includes('userMsgCount >= 2'), 'Arbitrary userMsgCount >= 2 banned from goal progress');
   assert(!chatJs.includes('userMsgCount >= 3'), 'Arbitrary userMsgCount >= 3 banned from goal progress');
@@ -393,7 +396,9 @@ console.log('\n--- TEST 9: FiezelSpeakingAdaptive.evidence() Kappa Calculation -
 
   // Verify chatJs uses computeSpeakingKappa instead of hardcoded isOk ? 0.6 : 0.35
   const fs = require('fs');
-  const chatJs = fs.readFileSync('C:/Users/hp/fiezel-kawan-bicara-p2/features/interactive-chat/fiezel-interactive-chat.js', 'utf8');
+  const path = require('path');
+  const chatFile = path.join(__dirname, '..', 'features', 'interactive-chat', 'fiezel-interactive-chat.js');
+  const chatJs = fs.readFileSync(chatFile, 'utf8');
   assert(chatJs.includes('computeSpeakingKappa'), 'Interactive chat uses computeSpeakingKappa');
   assert(!chatJs.includes('var kappa = isOk ? 0.6 : 0.35;'), 'Hardcoded kappa scalar replaced with adaptive computation');
 
@@ -410,8 +415,11 @@ console.log('\n--- TEST 10: Persona DRY Canonical Consistency & Furigana Fix ---
 
   // Check no leftover フィゼル先生 across interactive chat files
   const fs = require('fs');
-  const chatJs = fs.readFileSync('C:/Users/hp/fiezel-kawan-bicara-p2/features/interactive-chat/fiezel-interactive-chat.js', 'utf8');
-  const callJs = fs.readFileSync('C:/Users/hp/fiezel-kawan-bicara-p2/features/interactive-chat/fiezel-voice-call.js', 'utf8');
+  const path = require('path');
+  const chatFile = path.join(__dirname, '..', 'features', 'interactive-chat', 'fiezel-interactive-chat.js');
+  const callFile = path.join(__dirname, '..', 'features', 'interactive-chat', 'fiezel-voice-call.js');
+  const chatJs = fs.readFileSync(chatFile, 'utf8');
+  const callJs = fs.readFileSync(callFile, 'utf8');
   assert(!chatJs.includes('フィゼル先生'), 'Zero フィゼル先生 in fiezel-interactive-chat.js');
   assert(!callJs.includes('フィゼル先生'), 'Zero フィゼル先生 in fiezel-voice-call.js');
 

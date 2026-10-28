@@ -1,7 +1,7 @@
 {
   "schema": "id-golden-baseline/1",
   "generatedAt": "2026-10-28T04:47:52.335Z",
-  "root": "C:\\Users\\hp\\fiezel-kawan-bicara-p2",
+  "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "6f7f5e03b33742917af73b5f6ac7dad6b4fafd92bc1bb39009731a04cf72b567",
     "grammar-misconception-id.json": "5c4b511ae931bc101067bd9a7760273ad62b5d33e653bfd5ae0abebb72ea82a5",
