@@ -1,0 +1,125 @@
+[
+  {
+    "id": "news-2026-10-28-shinkansen",
+    "date": "2026-10-28",
+    "category": "Teknologi",
+    "level": "N5-N4",
+    "title": "Uji Coba Kereta Cepat Otomatis di Jalur Tokyo",
+    "situation": "Stasiun Berita NHK menyiarkan laporan tentang uji coba Shinkansen tanpa masinis, kemudian dua mahasiswa (Rian dan Sakura) mendiskusikan dampaknya.",
+    "headline": {
+      "ja": "JR東日本、新幹線の自動運転の試験に成功",
+      "reading": "JRひがしにほん、しんかんせんの じどううんてんの しけんに せいこう",
+      "id": "JR East Berhasil Melakukan Uji Coba Kereta Shinkansen Beroperasi Otomatis"
+    },
+    "scriptFormal": {
+      "speaker": "Instruktur (Penyiar Berita)",
+      "speakerRole": "instructor",
+      "sentences": [
+        {
+          "index": 0,
+          "ja": "みなさん、こんにちは。きょうのニュースをお伝えします。",
+          "reading": "みなさん、こんにちは。きょうの ニュースを おつたえします。",
+          "id": "Halo semuanya. Berikut kami sampaikan warta berita hari ini.",
+          "tokens": [
+            { "kanji": "今日", "furigana": "きょう", "id": "hari ini" },
+            { "kanji": "お伝えします", "furigana": "おつたえします", "id": "menyampaikan (formal/keigo)" }
+          ]
+        },
+        {
+          "index": 1,
+          "ja": "JR東日本は、新しい新幹線の自動運転システムの試験を行いました。",
+          "reading": "JRひがしにほんは、あたらしい しんかんせんの じどううんてん システムの しけんを おこないました。",
+          "id": "JR East telah menyelenggarakan uji coba sistem kemudi otomatis untuk kereta Shinkansen baru.",
+          "tokens": [
+            { "kanji": "JR東日本", "furigana": "JRひがしにほん", "id": "Perusahaan Kereta JR East" },
+            { "kanji": "新しい", "furigana": "あたらしい", "id": "baru" },
+            { "kanji": "新幹線", "furigana": "しんかんせん", "id": "kereta cepat Shinkansen" },
+            { "kanji": "自動運転", "furigana": "じどううんてん", "id": "kemudi otomatis" },
+            { "kanji": "試験", "furigana": "しけん", "id": "uji coba / ujian" },
+            { "kanji": "行いました", "furigana": "おこないました", "id": "menyelenggarakan / melaksanakan" }
+          ]
+        },
+        {
+          "index": 2,
+          "ja": "将来、運転士が乗っていなくても、安全に走ることができます。",
+          "reading": "しょうらい、うんてんしが のっていなくても、あんぜんに はしることが できます。",
+          "id": "Di masa depan, meskipun masinis tidak berada di dalam kereta, kereta dapat melaju dengan aman.",
+          "tokens": [
+            { "kanji": "将来", "furigana": "しょうらい", "id": "masa depan" },
+            { "kanji": "運転士", "furigana": "うんてんし", "id": "masinis / pengemudi kereta" },
+            { "kanji": "乗って", "furigana": "のって", "id": "naik / berada di dalam kendaraan" },
+            { "kanji": "安全に", "furigana": "あんぜんに", "id": "secara aman" },
+            { "kanji": "走る", "furigana": "はしる", "id": "melaju / berlari" }
+          ]
+        }
+      ]
+    },
+    "scriptCasual": {
+      "speakerA": "Rian (Mahasiswa)",
+      "speakerB": "Sakura (Mahasiswi)",
+      "dialogue": [
+        {
+          "speaker": "Rian",
+          "avatar": "rian",
+          "ja": "ねえサクラ、今のニュース見た？新幹線が自動で動くんだって！",
+          "reading": "ねえサクラ、いまの ニュース みた？しんかんせんが じどうで うごくんだって！",
+          "id": "Eh Sakura, kamu lihat berita barusan? Katanya Shinkansen bakal jalan otomatis lho!",
+          "tokens": [
+            { "kanji": "今", "furigana": "いま", "id": "sekarang / barusan" },
+            { "kanji": "見た", "furigana": "みた", "id": "melihat (bentuk lampau kasual)" },
+            { "kanji": "自動", "furigana": "じどう", "id": "otomatis" },
+            { "kanji": "動く", "furigana": "うごく", "id": "bergerak / beroperasi" }
+          ]
+        },
+        {
+          "speaker": "Sakura",
+          "avatar": "sakura",
+          "ja": "うん、見たよ！すごい技術だよね。でも、運転士さんがいないと、ちょっとドキドキしない？",
+          "reading": "うん、みたよ！すごい ぎじゅつだよね。でも、うんてんしさんが いないと、ちょっと ドキドキしない？",
+          "id": "Iya, aku lihat! Teknologinya keren ya. Tapi kalau nggak ada masinisnya, agak bikin deg-degan nggak sih?",
+          "tokens": [
+            { "kanji": "技術", "furigana": "ぎじゅつ", "id": "teknologi / keahlian" },
+            { "kanji": "運転士", "furigana": "うんてんし", "id": "masinis" },
+            { "kanji": "ドキドキ", "furigana": "どきどき", "id": "deg-degan / gugup berdebar" }
+          ]
+        },
+        {
+          "speaker": "Rian",
+          "avatar": "rian",
+          "ja": "たしかに！でもAIが全部チェックしてるから、事故は人間より減るらしいよ。",
+          "reading": "たしかに！でも AIが ぜんぶ チェックしてるから、じこは にんげんより へるらしいよ。",
+          "id": "Benar juga! Tapi karena semua diperiksa AI, katanya kecelakaan bakal lebih sedikit dibanding kelalaian manusia.",
+          "tokens": [
+            { "kanji": "事故", "furigana": "じこ", "id": "kecelakaan" },
+            { "kanji": "人間", "furigana": "にんげん", "id": "manusia" },
+            { "kanji": "減る", "furigana": "へる", "id": "berkurang / menurun" }
+          ]
+        },
+        {
+          "speaker": "Sakura",
+          "avatar": "sakura",
+          "ja": "そっか。来年京都に行くとき、乗れるといいね！",
+          "reading": "そっか。らいねん きょうとに いくとき、のれると いいね！",
+          "id": "Ooh begitu ya. Tahun depan pas kita ke Kyoto, semoga sudah bisa kita naiki ya!",
+          "tokens": [
+            { "kanji": "来年", "furigana": "らいねん", "id": "tahun depan" },
+            { "kanji": "京都", "furigana": "きょうと", "id": "Kyoto" },
+            { "kanji": "乗れる", "furigana": "のれる", "id": "bisa naik (bentuk potensial)" }
+          ]
+        }
+      ]
+    },
+    "quiz": {
+      "questionJapanese": "ニュースと会話の内容について、正しいものはどれですか。",
+      "questionIndonesian": "Manakah pernyataan yang BENAR mengenai isi berita dan percakapan di atas?",
+      "options": [
+        { "id": 1, "text": "新幹線はすでに全部自動で走っている", "textId": "Shinkansen sudah sepenuhnya berjalan otomatis di semua rute", "misconceptionId": "tense_already_completed" },
+        { "id": 2, "text": "JR東日本が自動運転の試験に成功した", "textId": "JR East telah berhasil melakukan uji coba sistem kemudi otomatis", "misconceptionId": null },
+        { "id": 3, "text": "サクラは自動運転の電車に乗りたくないと言った", "textId": "Sakura bilang dia sama sekali tidak mau naik kereta otomatis", "misconceptionId": "overgeneralized_sentiment" },
+        { "id": 4, "text": "リアンは来月京都に旅行する予定である", "textId": "Rian berencana liburan ke Kyoto bulan depan", "misconceptionId": "time_frame_confusion" }
+      ],
+      "answerIndex": 1,
+      "explain": "Penyiar menyatakan 'JR東日本は、新しい新幹線の自動運転システムの試験を行いました' (JR East berhasil melakukan uji coba). Pilihan 1 salah karena baru uji coba, pilihan 3 salah karena Sakura berharap bisa naik tahun depan, pilihan 4 salah karena mereka berencana tahun depan (来年), bukan bulan depan."
+    }
+  }
+]
