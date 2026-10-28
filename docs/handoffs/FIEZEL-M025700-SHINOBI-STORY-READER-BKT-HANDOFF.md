@@ -1,8 +1,8 @@
 # FIEZEL HANDOFF DOSSIER: SHINOBI GRADED READER & BRAINCORE BKT SUITE
-**Build Tag**: `m025-700`  
-**Branch**: `fix/universal-onboarding-multi-device-m025-699`  
-**Pull Request**: `#761`  
-**Tanggal**: 2026-10-28  
+**Build Tag**: `m025-700`
+**Branch**: `fix/universal-onboarding-multi-device-m025-699`
+**Pull Request**: `#761`
+**Tanggal**: 2026-10-28
 
 ---
 

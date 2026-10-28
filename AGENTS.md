@@ -192,6 +192,3 @@ Di lingkungan di mana beberapa agent bekerja secara simultan di workspace dan re
      - `state.gems = state.gems || { balance: 120 };`
    - Data state WAJIB diikat dan disimpan ke `localStorage` melalui `save()`.
    - DILARANG melepaskan murid ke layar Home dengan nilai `state.level === undefined` atau state parsial yang merusak render dashboard kurikulum dan menjebak murid ke dalam *infinite onboarding loop*.
-
-
-
