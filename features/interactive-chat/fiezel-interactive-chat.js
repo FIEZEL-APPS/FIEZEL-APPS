@@ -1864,14 +1864,11 @@
     initScenario(state.scenarioId);
   }
 
-  var saveStateTimer = null;
   function saveState() {
-    if (saveStateTimer) clearTimeout(saveStateTimer);
-    saveStateTimer = setTimeout(flushSaveState, 300);
+    flushSaveState();
   }
 
   function flushSaveState() {
-    saveStateTimer = null;
     try {
       if (state.scenarioId && state.messages) {
         if (state.messages.length > MAX_SCENARIO_MESSAGES) {
