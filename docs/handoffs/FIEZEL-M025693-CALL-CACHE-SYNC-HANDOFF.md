@@ -1,6 +1,6 @@
 # FIEZEL-M025693 — Sinkronisasi Cache Version Query call.html & voice-studio (`m025-693`)
 
-**Status:** Siap review OWNER & Merge via Pull Request.  
+**Status:** Siap review OWNER & Merge via Pull Request.
 **Build:** `m025-693` (Hexa-Sync Selaras di semua titik rilis).
 
 ---
