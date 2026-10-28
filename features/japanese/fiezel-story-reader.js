@@ -45,7 +45,10 @@
     'story.asakusa_title': '浅草の猫',
     'story.asakusa_subtitle': 'Kucing Penjaga Kuil Asakusa',
     'story.shinkansen_title': 'はじめての新幹線',
-    'story.shinkansen_subtitle': 'Perjalanan Shinkansen Pertama'
+    'story.shinkansen_subtitle': 'Perjalanan Shinkansen Pertama',
+    'story.quiz_speaker_name': 'Instruktur Ujian',
+    'story.quiz_audio_role': 'Audio Pertanyaan Soal (Bahasa Jepang)',
+    'story.autoplay_label': 'Putar Otomatis'
   };
 
   var STORY_COPY_TH = {
@@ -61,7 +64,10 @@
     'story.asakusa_title': '浅草の猫',
     'story.asakusa_subtitle': 'แมวผู้พิทักษ์วัดอาซากุสะ',
     'story.shinkansen_title': 'はじめての新幹線',
-    'story.shinkansen_subtitle': 'การเดินทางด้วยชินคันเซ็นครั้งแรก'
+    'story.shinkansen_subtitle': 'การเดินทางด้วยชินคันเซ็นครั้งแรก',
+    'story.quiz_speaker_name': 'ผู้คุมสอบ',
+    'story.quiz_audio_role': 'เสียงคำถามแบบทดสอบ (ภาษาญี่ปุ่น)',
+    'story.autoplay_label': 'เล่นอัตโนมัติ'
   };
 
   var STORY_COPY_EN = {
@@ -77,7 +83,10 @@
     'story.asakusa_title': 'The Cat of Asakusa',
     'story.asakusa_subtitle': 'The Guardian Cat of Asakusa Temple',
     'story.shinkansen_title': 'First Time on the Shinkansen',
-    'story.shinkansen_subtitle': 'First Time on the Shinkansen'
+    'story.shinkansen_subtitle': 'First Time on the Shinkansen',
+    'story.quiz_speaker_name': 'Exam Instructor',
+    'story.quiz_audio_role': 'Quiz Question Audio (Japanese)',
+    'story.autoplay_label': 'Auto-play'
   };
 
   try {
@@ -662,8 +671,8 @@
                   '<div class="fz-speaker-name">' + scene.speaker + '</div>' +
                   '<div class="fz-speaker-role">' + scene.role + '</div>' +
                 '</div>' +
-                '<div class="fz-autoplay-badge" title="Adegan 1 ke 4 berjalan otomatis berurutan">' +
-                  '<span class="fz-autoplay-dot"></span> Putar Otomatis' +
+                '<div class="fz-autoplay-badge" title="' + t('story.autoplay_label', 'Putar Otomatis') + '">' +
+                  '<span class="fz-autoplay-dot"></span> ' + t('story.autoplay_label', 'Putar Otomatis') +
                 '</div>' +
               '</div>' +
               '<div class="fz-play-controls">' +
@@ -720,8 +729,8 @@
               '<div class="fz-speaker-row">' +
                 '<div id="fzSpeakerAvatar" class="fz-speaker-avatar' + (isPlaying ? ' speaking' : '') + '">🎓</div>' +
                 '<div class="fz-speaker-meta">' +
-                  '<div class="fz-speaker-name">Instruktur Ujian</div>' +
-                  '<div class="fz-speaker-role">Audio Pertanyaan Soal (Bahasa Jepang)</div>' +
+                  '<div class="fz-speaker-name">' + t('story.quiz_speaker_name', 'Instruktur Ujian') + '</div>' +
+                  '<div class="fz-speaker-role">' + t('story.quiz_audio_role', 'Audio Pertanyaan Soal (Bahasa Jepang)') + '</div>' +
                 '</div>' +
               '</div>' +
               '<div class="fz-play-controls">' +
