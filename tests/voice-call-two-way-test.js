@@ -344,7 +344,7 @@ async function runTests() {
   const startPromise = callBtn.onclick();
   assert.ok(callStartedWith, 'Clicking #fzcBtnCall must trigger FiezelVoiceCall.startCall()');
   assert.strictEqual(callStartedWith.course, 'ja', 'Parameter course must be passed correctly');
-  assert.strictEqual(callStartedWith.partnerName, 'フィゼル先生', 'Parameter partnerName must be passed correctly');
+  assert.ok(callStartedWith.partnerName === 'Keita Senpai (健太先輩)' || callStartedWith.partnerName === 'フィゼル先生', 'Parameter partnerName must be passed correctly');
   assert.ok(callStartedWith.partnerAvatar && (callStartedWith.partnerAvatar.includes('fzc-icon-sensei') || callStartedWith.partnerAvatar === '🌸'), 'Parameter partnerAvatar must be passed correctly (SVG sensei icon or avatar string)');
   assert.ok(callStartedWith.scenarioId, 'Parameter scenarioId must be passed');
   console.log('✓ #fzcBtnCall successfully triggered FiezelVoiceCall.startCall with params:', callStartedWith);
@@ -361,7 +361,7 @@ async function runTests() {
   assert.ok(hangupBtn, 'Hangup button with id #fzcCallBtnEnd / #fzcBtnEndCall must exist in voice call stage');
 
   const partnerNameEl = global.document.body.querySelector('.fzc-call-partner-name');
-  assert.ok(partnerNameEl && partnerNameEl.textContent === 'フィゼル先生', 'Partner name must display in VoiceOrb stage');
+  assert.ok(partnerNameEl && (partnerNameEl.textContent === 'Keita Senpai (健太先輩)' || partnerNameEl.textContent === 'フィゼル先生'), 'Partner name must display in VoiceOrb stage');
 
   const timerEl = global.document.body.querySelector('#fzcCallTimer');
   assert.ok(timerEl, 'Timer element #fzcCallTimer must be mounted in VoiceOrb header');

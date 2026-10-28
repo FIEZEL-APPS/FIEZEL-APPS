@@ -1,7 +1,7 @@
 {
-  "version": "m025-696",
-  "claimedBy": "branch feat/shinobi-minimalist-universal-onboarding-m025-698",
-  "claimedAt": "2026-10-28T03:01:30.325Z",
-  "reason": "fix(onboarding): shinobi-grade universal zero-scroll onboarding",
+  "version": "m025-697",
+  "claimedBy": "branch feat/kawan-bicara-medium-hardening-m025-697",
+  "claimedAt": "2026-10-28T04:48:34.601Z",
+  "reason": "fix(kawan-bicara): speech backoff, goal rules & adaptive speaking telemetry (m025-697)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
