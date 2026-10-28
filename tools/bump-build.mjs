@@ -214,13 +214,16 @@ function versiYangPernahDiklaimDiHulu() {
 
 /* Rule 12.2: Pre-Bump Concurrency Probe untuk mendeteksi nomor build yang diklaim PR terbuka */
 function versiYangDiklaimDiOpenPR() {
+  if (process.env.FIEZEL_IGNORE_OPEN_PRS === '1') return new Set();
   try {
     const raw = execSync('gh pr list --repo FIEZEL-APPS/FIEZEL-APPS --state open --json title,headRefName', {
       cwd: ROOT, encoding: 'utf8', timeout: 15000, stdio: ['ignore', 'pipe', 'ignore']
     });
     const prs = JSON.parse(raw);
     const set = new Set();
+    const currentBranch = pengklaim().replace(/^branch\s+/, '').trim();
     for (const pr of prs) {
+      if (pr.headRefName === currentBranch) continue;
       const teks = (pr.title || '') + ' ' + (pr.headRefName || '');
       const matches = teks.match(/m025-\d+/g);
       if (matches) {

@@ -1,7 +1,7 @@
 {
-  "version": "m025-710",
-  "claimedBy": "branch feat/placement-pedagogy-epic",
-  "claimedAt": "2026-10-28T19:51:18.101Z",
-  "reason": "feat(placement): activate pedagogical feedback drawer and balanced vocab-grammar-listening pool (m025-710)",
+  "version": "m025-711",
+  "claimedBy": "branch feat/story-fixes-m025-711",
+  "claimedAt": "2026-10-28T20:53:44.581Z",
+  "reason": "fix(japanese): pwa artwork permanence and elevenlabs phonetic pedagogy (m025-711)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

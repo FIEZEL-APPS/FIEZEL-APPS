@@ -559,17 +559,18 @@
     }
   });
 
-  /* Ilustrasi storyboard raster per adegan (JPG) dan audio narasi otentik (MP3) di assets/stories/.
-     Dihasilkan via ElevenLabs Neural Studio dengan intonasi pedagogis terkalibrasi peran karakter.
+  /* Ilustrasi storyboard raster per adegan (WebP precached) dan audio narasi otentik (MP3) di assets/stories/.
+     Dihasilkan via ElevenLabs Neural Studio dengan intonasi pedagogis terkalibrasi peran karakter & fonetik hiragana N5.
      Adegan 1-4 narasi bertahap, Adegan 5 kuis pemahaman & pembacaan soal.
-     Bila berkas gambar gagal dimuat (offline tanpa cache), SVG vektor cadangan tetap tampil. */
+     PWA Permanence Invariant: SVG vektor selalu ter-render instan tanpa jeda download,
+     dan diperkaya oleh WebP yang ter-precache di shell PWA. */
   var SCENE_IMAGE_BASE = './assets/stories/';
   var SCENE_AUDIO_BASE = './assets/stories/';
   STORIES.forEach(function (s) {
     var prefix = s.id === 'mizuki-maiko' ? 'mizuki' : (s.id === 'asakusa-neko' ? 'asakusa' : 'shinkansen');
     s.scenes.forEach(function (sc, i) {
       var n = sc.isQuiz ? 4 : i + 1;
-      sc.imageSrc = SCENE_IMAGE_BASE + prefix + '-' + n + '.jpg';
+      sc.imageSrc = SCENE_IMAGE_BASE + prefix + '-' + n + '.webp';
       sc.audioSrc = SCENE_AUDIO_BASE + prefix + '-' + (i + 1) + '.mp3';
     });
     s.coverSrc = s.scenes[0].imageSrc;
@@ -577,10 +578,24 @@
 
   function sceneArtHtml(svg, src, alt) {
     var img = src
-      ? '<img class="fz-scene-img" src="' + src + '" alt="' + String(alt || '').replace(/\x22/g, '&quot;') + '" loading="eager">'
+      ? '<img class="fz-scene-img" src="' + src + '" alt="' + String(alt || '').replace(/\x22/g, '&quot;') + '" loading="eager" decoding="async">'
       : '';
-    var fallback = svg ? '<div class="fz-scene-art-svg" style="display:none;">' + svg + '</div>' : '';
-    return '<div class="fz-scene-art-stack">' + img + fallback + '</div>';
+    var fallback = svg ? '<div class="fz-scene-art-svg">' + svg + '</div>' : '';
+    return '<div class="fz-scene-art-stack">' + fallback + img + '</div>';
+  }
+
+  function preloadStoryAudio(story) {
+    if (!story || !Array.isArray(story.scenes)) return;
+    try {
+      if (typeof Audio === 'undefined') return;
+      story.scenes.forEach(function (sc) {
+        if (sc && sc.audioSrc) {
+          var a = new Audio();
+          a.preload = 'auto';
+          a.src = sc.audioSrc;
+        }
+      });
+    } catch (_) {}
   }
 
   function getStoryById(id) {
@@ -596,6 +611,8 @@
       activeStoryId = targetStoryId;
       currentView = 'story';
       activeSceneIndex = 0;
+      var s = getStoryById(targetStoryId);
+      preloadStoryAudio(s);
     }
 
     if (currentView === 'library') {
@@ -823,6 +840,8 @@
     currentView = 'story';
     activeSceneIndex = 0;
     stopAudio();
+    var s = getStoryById(id);
+    preloadStoryAudio(s);
     var target = getMountTarget();
     if (target) renderStory(target);
     try { window.scrollTo(0, 0); } catch (_) {}
