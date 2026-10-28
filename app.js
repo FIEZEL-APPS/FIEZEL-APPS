@@ -8512,7 +8512,10 @@ function startNotificationInvitation(){
 // sudah menjaga diri sendiri (sekali per hari / sekali selesai) lewat pemeriksaan di dalam
 // modulnya masing-masing.
 let pendingAfterGate=null;let pendingAfterGateFn=null;/* v06 2026-08-29: penundaan generik \u2014 kuis apa pun yang diminta saat gerbang akun menutup layar dijalankan ulang setelah gerbang selesai/dilewati. */
-function afterOnboardingExit(action){try{prefetchPlacementListening()}catch(_){}
+function afterOnboardingExit(action){
+  try{prefetchPlacementListening()}catch(_){}
+  try{document.body?.classList?.remove?.('fz-auth-open');}catch(_){}
+  try{document.body?.classList?.remove?.('auth-locked');}catch(_){}
   if(isVerifiedTeacher()){
     if(state.view!=='tutor')go('tutor');
     return;
@@ -8577,8 +8580,14 @@ function startWelcomeExperience(){
         dismissBootSplash();
         return openApp();
       }
-      /* m025-367 LOGIN WAJIB: sesudah splash, SEBELUM perkenalan - dan juga untuk murid lama
-         yang perkenalannya sudah selesai. Lihat authGateNeeded(). */
+      /* m025-703 ZERO-MODAL COLLISION & FIRST-TOUCH SERENITY (AGENTS.md):
+         Murid baru (onboarding belum selesai) WAJIB disambut langsung oleh dialog onboarding,
+         bebas dari tabrakan izin notifikasi atau dinding login Google di detik pertama.
+         Semua pengenalan dan latihan awal bisa dinikmati tanpa login. */
+      if(!onboardingDone){
+        dismissBootSplash();
+        if(showOnboarding(at)?.shown===true)return null;
+      }
       if(authGateNeeded()){showAuthGate(at,proceed);return null}
       /* m025-576: penanda lokal bilang "sudah masuk", tetapi server boleh berkata lain
          (penanda sisa kunjungan di browser, sesi kedaluwarsa). Jawabannya sudah ditanyakan
@@ -12824,25 +12833,32 @@ async function validateLearnerNameAvailability(name){
   const core=socialCore();
   if(!core)return {ok:true};
   if(typeof navigator!=='undefined'&&navigator.onLine===false)return {ok:true};
-  try{await core.ensureAnon()}catch(_){}
-  try{
-    const me=await core.api.profileMe();
-    if(me&&me.ok&&me.data?.profile?.handle&&me.data.profile.handle.toLowerCase()===cand.toLowerCase()){
+
+  // Graceful quick check with 1200ms deadline to prevent freezing first-time users on slow/unreachable network (Rule 3.2)
+  return Promise.race([
+    (async () => {
+      try{await core.ensureAnon()}catch(_){}
+      try{
+        const me=await core.api.profileMe();
+        if(me&&me.ok&&me.data?.profile?.handle&&me.data.profile.handle.toLowerCase()===cand.toLowerCase()){
+          return {ok:true};
+        }
+      }catch(_){}
+      try{
+        const chk=await core.api.profileCheck(cand);
+        const avail=(chk?.data?.available!==undefined)?chk.data.available:(chk?.data?.data?.available!==undefined?chk.data.data.available:(chk?.available!==undefined?chk.available:true));
+        if(chk&&chk.ok&&avail===false){
+          return {
+            ok:false,
+            error:'handle_taken',
+            message:FiezelI18n.t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.')
+          };
+        }
+      }catch(_){}
       return {ok:true};
-    }
-  }catch(_){}
-  try{
-    const chk=await core.api.profileCheck(cand);
-    const avail=(chk?.data?.available!==undefined)?chk.data.available:(chk?.data?.data?.available!==undefined?chk.data.data.available:(chk?.available!==undefined?chk.available:true));
-    if(chk&&chk.ok&&avail===false){
-      return {
-        ok:false,
-        error:'handle_taken',
-        message:FiezelI18n.t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.')
-      };
-    }
-  }catch(_){}
-  return {ok:true};
+    })(),
+    new Promise(resolve => setTimeout(() => resolve({ok:true}), 1200))
+  ]);
 }
 window.validateLearnerNameAvailability=validateLearnerNameAvailability;
 
@@ -15979,7 +15995,12 @@ function startQuickWinLesson(lang) {
         answerIndex: 0,
         audio: 'あ',
         skill: 'hiragana_basics',
-        explanation: t('quiz.quickwin-ja-exp1', 'Huruf あ dibaca a, merupakan huruf vokal pertama dalam bahasa Jepang.')
+        explain: {
+          why: 'Huruf あ berbunyi a, merupakan huruf vokal pertama dalam bahasa Jepang.',
+          rule: 'Gojūon vokal bahasa Jepang dimulai dari deret A-I-U-E-O.',
+          distractor: 'Pilihan lain merupakan huruf vokal い (i), う (u), dan え (e).',
+          memory: 'Bayangkan huruf あ menyerupai bentuk bulat buah apel (a).'
+        }
       },
       {
         id: 'qw-ja-2',
@@ -15990,7 +16011,12 @@ function startQuickWinLesson(lang) {
         answerIndex: 1,
         audio: 'い',
         skill: 'hiragana_basics',
-        explanation: t('quiz.quickwin-ja-exp2', 'Huruf い dibaca i. Huruf ini terdiri dari dua goresan melengkung.')
+        explain: {
+          why: 'Huruf い berbunyi i, ditulis dengan dua goresan melengkung.',
+          rule: 'Huruf い merupakan vokal kedua dalam deretan vokal dasar Hiragana.',
+          distractor: 'Pilihan lain adalah vokal あ (a), お (o), dan konsonan か (ka).',
+          memory: 'Dua goresan い terlihat sejajar seperti dua pilar atau jari telunjuk (i).'
+        }
       },
       {
         id: 'qw-ja-3',
@@ -16001,7 +16027,12 @@ function startQuickWinLesson(lang) {
         answerIndex: 0,
         audio: 'あい',
         skill: 'hiragana_vocab',
-        explanation: t('quiz.quickwin-ja-exp3', 'Hebat! あい (ai) berarti cinta. Kamu baru saja berhasil membaca kata bahasa Jepang pertamamu!')
+        explain: {
+          why: 'あい (ai) berarti cinta atau kasih sayang dalam bahasa Jepang.',
+          rule: 'Penggabungan vokal hiragana あ (a) dan い (i) membentuk kosakata utuh: ai (cinta).',
+          distractor: 'Terima kasih adalah arigatou, selamat pagi adalah ohayou, dan air adalah mizu.',
+          memory: 'Ingat: AI = Aku Ingin mencintaimu (Cinta).'
+        }
       }
     ];
   } else {
@@ -16015,7 +16046,12 @@ function startQuickWinLesson(lang) {
         answerIndex: 0,
         audio: 'Hello',
         skill: 'greetings',
-        explanation: t('quiz.quickwin-en-exp1', 'Hello adalah sapaan paling umum dan ramah untuk menyapa siapa saja.')
+        explain: {
+          why: 'Hello adalah sapaan paling umum dan ramah dalam bahasa Inggris.',
+          rule: 'Kata sapaan digunakan saat pertama kali bertemu seseorang.',
+          distractor: 'Goodbye digunakan saat berpisah, sedangkan never dan behind bukan kata sapaan.',
+          memory: 'Hello digunakan untuk menyapa teman atau siapa pun.'
+        }
       },
       {
         id: 'qw-en-2',
@@ -16026,7 +16062,12 @@ function startQuickWinLesson(lang) {
         answerIndex: 1,
         audio: 'Good morning',
         skill: 'greetings',
-        explanation: t('quiz.quickwin-en-exp2', 'Good morning digunakan untuk mengucapkan selamat pagi sejak terbit matahari hingga tengah hari.')
+        explain: {
+          why: 'Good morning digunakan untuk menyapa selamat pagi hingga tengah hari.',
+          rule: 'Waktu pagi (morning) dipasangkan dengan kata sifat good menjadi Good morning.',
+          distractor: 'Good evening untuk petang/malam, good night untuk menjelang tidur, dan goodbye untuk perpisahan.',
+          memory: 'Morning = pagi, jadi Good morning = Selamat pagi.'
+        }
       },
       {
         id: 'qw-en-3',
@@ -16037,7 +16078,12 @@ function startQuickWinLesson(lang) {
         answerIndex: 0,
         audio: 'Thank you',
         skill: 'polite_expressions',
-        explanation: t('quiz.quickwin-en-exp3', 'Thank you adalah cara paling sopan untuk menunjukkan rasa terima kasih.')
+        explain: {
+          why: 'Thank you adalah ungkapan baku untuk berterima kasih dalam bahasa Inggris.',
+          rule: 'Ungkapan kesopanan diekspresikan setelah menerima bantuan atau pemberian.',
+          distractor: 'Excuse me adalah permisi, please adalah tolong, dan sorry adalah maaf.',
+          memory: 'Thank you = Terima kasih.'
+        }
       }
     ];
   }
@@ -16053,6 +16099,8 @@ function startQuickWinLesson(lang) {
     type: 'quick_win',
     count: pool.length,
     pool: pool,
+    allowCrossLevel: true,
+    preserveOrder: true,
     factory: x => x
   });
 }

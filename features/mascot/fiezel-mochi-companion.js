@@ -778,10 +778,10 @@
       base = './';
     }
     var candidatePaths = [
-      './mochi-mascot/fiezel-mochi.js',
-      base + 'mochi-mascot/fiezel-mochi.js',
       new URL('mochi-mascot/fiezel-mochi.js', window.location.href).href,
-      '/app/mochi-mascot/fiezel-mochi.js'
+      base + 'mochi-mascot/fiezel-mochi.js',
+      '/app/mochi-mascot/fiezel-mochi.js',
+      './mochi-mascot/fiezel-mochi.js'
     ];
     function tryNext(idx) {
       if (idx >= candidatePaths.length) {
