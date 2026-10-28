@@ -1,7 +1,7 @@
 {
-  "version": "m025-708",
-  "claimedBy": "branch feat/restore-3d-mochi-voice-studio-and-fix-anomalies-m025-708",
-  "claimedAt": "2026-10-28T18:36:57.661Z",
-  "reason": "fix(ui-voice): restore 3d mochi companion and resolve 7 fatal pwa anomalies",
+  "version": "m025-709",
+  "claimedBy": "branch feat/placement-pedagogy-epic",
+  "claimedAt": "2026-10-28T19:51:18.101Z",
+  "reason": "feat(placement): activate pedagogical feedback drawer and balanced vocab-grammar-listening pool (m025-709)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
