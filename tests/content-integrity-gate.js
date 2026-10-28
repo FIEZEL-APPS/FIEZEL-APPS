@@ -161,6 +161,21 @@ for (const story of reader.STORIES) {
     assert.ok(size > 10 * 1024, `[Asset Violation] Berkas ${sc.imageSrc} terlalu kecil (${size} B)`);
   }
 }
+
+// Gate 3d: Real Pedagogical Audio Pipeline — seluruh 15 adegan (1-4 naratif + 5 kuis) WAJIB memiliki audioSrc berkas fisik nyata di disk > 10 KB.
+let totalAudios = 0;
+for (const story of reader.STORIES) {
+  for (let sIdx = 0; sIdx < story.scenes.length; sIdx++) {
+    const sc = story.scenes[sIdx];
+    assert.ok(sc.audioSrc, `[Audio Violation] Adegan ${sIdx} cerita ${story.id} tidak memiliki audioSrc!`);
+    const absAudio = path.join(ROOT, sc.audioSrc.replace(/^\.\//, ''));
+    assert.ok(fs.existsSync(absAudio), `[Audio Violation] Berkas audio ${sc.audioSrc} (${story.id}) TIDAK ADA di disk!`);
+    const size = fs.statSync(absAudio).size;
+    assert.ok(size > 10 * 1024, `[Audio Violation] Berkas audio ${sc.audioSrc} terlalu kerdil (${size} B)`);
+    totalAudios++;
+  }
+}
+console.log(`  ✓ ${totalAudios} berkas audio narasi (ElevenLabs AI Voice Studio) terverifikasi fisik di disk (> 10 KB).`);
 console.log(`  ✓ ${totalScenes} adegan naratif terverifikasi (SVG valid, unik, berkas raster nyata bila dipakai).`);
 console.log('PASS: Gate 3 (Real Asset Purity) Lulus 100%.\n');
 
