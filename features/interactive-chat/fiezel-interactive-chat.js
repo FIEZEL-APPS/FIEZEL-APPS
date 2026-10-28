@@ -20,6 +20,7 @@
     root.FiezelInteractiveChat = api;
     root.interactiveChatView = function () {
       // Pastikan seluruh sisa overlay panggilan lama (legacy fzcCallOverlay) dibersihkan
+      // sehingga tidak menimpa atau menutupi tampilan bersih Studio Suara (call.html).
       try {
         var oldOverlay = document.getElementById('fzcCallOverlay');
         if (oldOverlay && oldOverlay.parentNode) oldOverlay.parentNode.removeChild(oldOverlay);
@@ -27,60 +28,48 @@
           root.FiezelVoiceCall.stop();
         }
       } catch (_) {}
-
       var mountPoint = typeof document !== 'undefined' ? document.getElementById('app') : null;
       if (!mountPoint) return;
-
       if (typeof document !== 'undefined') {
-        if (document.documentElement) {
-          document.documentElement.classList.add('fz-view-chat');
-        }
-        if (document.body) {
-          document.body.classList.add('fz-view-chat');
-          document.body.classList.remove('fz-stage-home');
-        }
+        if (document.documentElement) document.documentElement.classList.add('fz-view-chat');
+        if (document.body) document.body.classList.add('fz-view-chat');
       }
-
-      // Sinkronisasi target course aktif ('ja' atau 'en')
-      var lang = 'ja';
+      var lang = 'en';
       try {
-        if (typeof root.activeTargetLang === 'function') {
-          var atl = root.activeTargetLang();
-          if (atl === 'ja' || atl === 'en') lang = atl;
-        } else if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
+        if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
           lang = 'ja';
-        } else if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
-          var c = root.FiezelI18n.getCourse();
-          if (c === 'ja' || c === 'en') lang = c;
-        } else if (typeof localStorage !== 'undefined') {
-          var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel-active-course') || localStorage.getItem('fiezel_target_lang');
-          if (stored === 'ja' || stored === 'en') lang = stored;
+        } else if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function' && root.FiezelI18n.getCourse() === 'ja') {
+          lang = 'ja';
+        } else if (typeof localStorage !== 'undefined' && localStorage.getItem('fz_target_course') === 'ja') {
+          lang = 'ja';
         }
       } catch (_) {}
-
+      var locale = 'id';
       try {
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('fiezel-active-course', lang);
-          localStorage.setItem('fz_target_course', lang);
+        if (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th') {
+          locale = 'th';
         }
       } catch (_) {}
-
-      if (api && typeof api.getState === 'function') {
-        var chatState = api.getState();
-        if (chatState && chatState.course !== lang) {
-          chatState.course = lang;
-          if (typeof api.initScenario === 'function') {
-            var scList = typeof api.getScenarios === 'function' ? api.getScenarios(lang) : null;
-            var defaultSid = (scList && scList[0] && scList[0].id) ? scList[0].id : (lang === 'ja' ? 'scen_ja_n5_kissaten' : 'intro');
-            api.initScenario(defaultSid);
-          }
+      var existingFrame = mountPoint.querySelector('#fzMitraKaiwaStudioFrame');
+      if (existingFrame && existingFrame.getAttribute('data-lang') === lang && existingFrame.getAttribute('data-locale') === locale) {
+        return;
+      }
+      var pageBuild = '';
+      try {
+        pageBuild = String(root.FIEZEL_PAGE_BUILD || '');
+      } catch (_) {}
+      var nonce = '';
+      try {
+        if (api && api.StudioBridge && typeof api.StudioBridge.begin === 'function') {
+          nonce = api.StudioBridge.begin();
         }
-      }
-
-      // Direct native mounting into #app, zero iframe
-      if (api && typeof api.mount === 'function') {
-        api.mount(mountPoint);
-      }
+      } catch (_) {}
+      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
+      var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
+      mountPoint.innerHTML =
+        '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
+        '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone *; autoplay *; camera *" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
+        '</div>';
     };
   }
 }(typeof globalThis !== 'undefined' ? globalThis : window, function (root) {
@@ -140,15 +129,12 @@
         if (atl === 'ja') return 'ja';
         if (atl === 'en') return 'en';
       }
-      if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
-        return 'ja';
-      }
       if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
         var c = root.FiezelI18n.getCourse();
         if (c === 'ja') return 'ja';
         if (c === 'en') return 'en';
       }
-      var stored = (typeof localStorage !== 'undefined') && (localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel-active-course') || localStorage.getItem('fiezel_target_lang') || localStorage.getItem('fiezel_course'));
+      var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel_target_lang') || localStorage.getItem('fiezel_course');
       if (stored === 'ja') return 'ja';
       if (stored === 'en') return 'en';
     } catch (_) {}
@@ -220,9 +206,9 @@
           translation: t('chat_sc_ramen_trans', 'Selamat datang di kedai ramen kami! Untuk berapa orang? Apakah sudah siap memesan?'),
           grammarNote: t('chat_sc_ramen_note', 'Frasa「お決まりですか」(Okimari desu ka) adalah bentuk sopan keigo dari "apakah sudah memutuskan/memilih".'),
           suggestions: [
-            { text: '一人です。豚骨ラーメンを一つください。', furigana: '[一人](ひとり)です。[豚骨](とんこつ)ラーメンを[一](ひと)つください。', romaji: 'Hitori desu. Tonkotsu raamen o hitotsu kudasai.', translation: t('chat_sug_ramen_order', 'Satu orang. Minta tonkotsu ramen 1 porsi.') },
-            { text: 'おすすめのラーメンは何ですか？', furigana: 'おすすめのラーメンは[何](なん)ですか？', romaji: 'Osusume no raamen wa nan desu ka?', translation: t('chat_sug_ramen_rec', 'Apa ramen yang direkomendasikan?') },
-            { text: 'お水を一杯いただけますか？', furigana: 'お[水](みず)を[一杯](いっぱい)いただけますか？', romaji: 'Omizu o ippai itadakemasu ka?', translation: t('chat_sug_ramen_water', 'Boleh saya minta segelas air putih?') }
+            { text: '一人です。豚骨ラーメンを一つください。', romaji: 'Hitori desu. Tonkotsu raamen o hitotsu kudasai.', translation: t('chat_sug_ramen_order', 'Satu orang. Minta tonkotsu ramen 1 porsi.') },
+            { text: 'おすすめのラーメンは何ですか？', romaji: 'Osusume no raamen wa nan desu ka?', translation: t('chat_sug_ramen_rec', 'Apa ramen yang direkomendasikan?') },
+            { text: 'お水を一杯いただけますか？', romaji: 'Omizu o ippai itadakemasu ka?', translation: t('chat_sug_ramen_water', 'Boleh saya minta segelas air putih?') }
           ]
         }
       },
@@ -244,9 +230,9 @@
           translation: t('chat_sc_konbini_trans', 'Selamat datang! Apakah makanannya mau dihangatkan? Punya kartu poin?'),
           grammarNote: t('chat_sc_konbini_note', '「温めますか」(Atatamemasu ka) selalu ditanyakan saat membeli bento atau onigiri di minimarket.'),
           suggestions: [
-            { text: 'はい、温めてください。', furigana: 'はい、[温](あたた)めてください。', romaji: 'Hai, atatamete kudasai.', translation: t('chat_sug_konb_heat', 'Ya, tolong dihangatkan.') },
-            { text: 'いいえ、大丈夫です。袋もお願いします。', furigana: 'いいえ、[大丈夫](だいじょうぶ)です。[袋](ふくろ)もお[願](ねが)いします。', romaji: 'Iie, daijoubu desu. Fukuro mo onegai shimasu.', translation: t('chat_sug_konb_bag', 'Tidak perlu. Tolong plastiknya juga.') },
-            { text: 'お箸を二膳もらえますか？', furigana: 'お[箸](はし)を[二膳](にぜん)もらえますか？', romaji: 'Ohashi o nizen moraemasu ka?', translation: t('chat_sug_konb_chopsticks', 'Boleh minta sumpit dua pasang?') }
+            { text: 'はい、温めてください。', romaji: 'Hai, atatamete kudasai.', translation: t('chat_sug_konb_heat', 'Ya, tolong dihangatkan.') },
+            { text: 'いいえ、大丈夫です。袋もお願いします。', romaji: 'Iie, daijoubu desu. Fukuro mo onegai shimasu.', translation: t('chat_sug_konb_bag', 'Tidak perlu. Tolong plastiknya juga.') },
+            { text: 'お箸を二膳もらえますか？', romaji: 'Ohashi o nizen moraemasu ka?', translation: t('chat_sug_konb_chopsticks', 'Boleh minta sumpit dua pasang?') }
           ]
         }
       },
@@ -268,9 +254,9 @@
           translation: t('chat_sc_dir_trans_ja', 'Permisi, apakah ada yang bisa dibantu? Mau pergi ke mana? Akan saya bantu tunjukkan jalannya!'),
           grammarNote: t('chat_sc_dir_note_ja', '「どちらへ行きたいですか」(Dochira e ikitai desu ka) lebih halus daripada「どこ」(doko).'),
           suggestions: [
-            { text: 'すみません、新宿駅はどこですか？', furigana: 'すみません、[新宿駅](しんじゅくえき)はどこですか？', romaji: 'Sumimasen, Shinjuku-eki wa doko desu ka?', translation: t('chat_sug_dir_shinjuku', 'Permisi, stasiun Shinjuku di mana ya?') },
-            { text: 'ここから歩いてどのくらいかかりますか？', furigana: 'ここから[歩](ある)いてどのくらいかかりますか？', romaji: 'Koko kara aruite dono kurai kakarimasu ka?', translation: t('chat_sug_dir_time', 'Berapa lama jalan kaki dari sini?') },
-            { text: 'この電車は渋谷に行きますか？', furigana: 'この[電車](でんしゃ)は[渋谷](しぶや)に[行](い)きますか？', romaji: 'Kono densha wa Shibuya ni ikimasu ka?', translation: t('chat_sug_dir_train', 'Apakah kereta ini menuju ke Shibuya?') }
+            { text: 'すみません、新宿駅はどこですか？', romaji: 'Sumimasen, Shinjuku-eki wa doko desu ka?', translation: t('chat_sug_dir_shinjuku', 'Permisi, stasiun Shinjuku di mana ya?') },
+            { text: 'ここから歩いてどのくらいかかりますか？', romaji: 'Koko kara aruite dono kurai kakarimasu ka?', translation: t('chat_sug_dir_time', 'Berapa lama jalan kaki dari sini?') },
+            { text: 'この電車は渋谷に行きますか？', romaji: 'Kono densha wa Shibuya ni ikimasu ka?', translation: t('chat_sug_dir_train', 'Apakah kereta ini menuju ke Shibuya?') }
           ]
         }
       },
@@ -292,9 +278,9 @@
           translation: t('chat_sc_intro_trans', 'Salam kenal! Nama saya Fiezel. Saya tinggal di Tokyo. Siapa namamu dan dari mana asalmu?'),
           grammarNote: t('chat_sc_intro_note', 'Selalu awali perkenalan dengan「初めまして」(Hajimemashite) dan akhiri dengan「よろしくお願いします」(Yoroshiku onegaishimasu).'),
           suggestions: [
-            { text: '初めまして！インドネシアから来ました。', furigana: '[初](はじ)めまして！インドネシアから[来](き)ました。', romaji: 'Hajimemashite! Indoneshia kara kimashita.', translation: t('chat_sug_intro_origin', 'Salam kenal! Saya berasal dari Indonesia.') },
-            { text: '学生です。日本語を勉強し始めたばかりです。', furigana: '[学生](がくせい)です。[日本語](にほんご)を[勉強](べんきょう)し[始](はじ)めたばかりです。', romaji: 'Gakusei desu. Nihongo o benkyou shihajimeta bakari desu.', translation: t('chat_sug_intro_student', 'Saya pelajar. Baru mulai belajar bahasa Jepang.') },
-            { text: 'よろしくお願いします！', furigana: 'よろしくお[願](ねが)いします！', romaji: 'Yoroshiku onegaishimasu!', translation: t('chat_sug_intro_pleased', 'Senang berkenalan dengan Anda / Mohon bantuannya!') }
+            { text: '初めまして！インドネシアから来ました。', romaji: 'Hajimemashite! Indoneshia kara kimashita.', translation: t('chat_sug_intro_origin', 'Salam kenal! Saya berasal dari Indonesia.') },
+            { text: '学生です。日本語を勉強し始めたばかりです。', romaji: 'Gakusei desu. Nihongo o benkyou shihajimeta bakari desu.', translation: t('chat_sug_intro_student', 'Saya pelajar. Baru mulai belajar bahasa Jepang.') },
+            { text: 'よろしくお願いします！', romaji: 'Yoroshiku onegaishimasu!', translation: t('chat_sug_intro_pleased', 'Senang berkenalan dengan Anda / Mohon bantuannya!') }
           ]
         }
       },
@@ -682,286 +668,12 @@
     ]
   };
 
-  // --- Master Phonetics & Universal Furigana Ruby Engine ---
-  var _staticJaDict = (function () {
-    try {
-      if (typeof require === 'function') {
-        return require('../japanese/fiezel-ja-dictionary.js');
-      }
-    } catch (_) {}
-    return null;
-  })();
-
-  function getJaDict() {
-    return (typeof root !== 'undefined' && root && root.FiezelJaDictionary) ||
-      (typeof globalThis !== 'undefined' && globalThis && globalThis.FiezelJaDictionary) ||
-      (typeof window !== 'undefined' && window && window.FiezelJaDictionary) ||
-      _staticJaDict;
-  }
-
-  function getJaUi() {
-    return (typeof root !== 'undefined' && root && root.FiezelJaUi) ||
-      (typeof globalThis !== 'undefined' && globalThis && globalThis.FiezelJaUi) ||
-      (typeof window !== 'undefined' && window && window.FiezelJaUi);
-  }
-
-  var CONVERSATION_EXTRAS = {
-    '初めまして': { kana: 'はじめまして', romaji: 'hajimemashite' },
-    '初め': { kana: 'はじめ', romaji: 'hajime' },
-    'ご出身': { kana: 'ごしゅっしん', romaji: 'goshusshin' },
-    '出身': { kana: 'しゅっしん', romaji: 'shusshin' },
-    '何名様': { kana: 'なんめいさま', romaji: 'nanmeisama' },
-    '何名': { kana: 'なんめい', romaji: 'nanmei' },
-    'ご予約': { kana: 'ごよやく', romaji: 'goyoyaku' },
-    'ご注文': { kana: 'ごちゅうもん', romaji: 'gochuumon' },
-    'お決まり': { kana: 'おきまり', romaji: 'okimari' },
-    'お名前': { kana: 'おなまえ', romaji: 'onamae' },
-    'お電話': { kana: 'おでんわ', romaji: 'odenwa' },
-    'お話し': { kana: 'おはなし', romaji: 'ohanashi' },
-    'お箸': { kana: 'おはし', romaji: 'ohashi' },
-    '二膳': { kana: 'にぜん', romaji: 'nizen' },
-    'お届け先': { kana: 'おとどけさき', romaji: 'otodokesaki' },
-    '届け先': { kana: 'とどけさき', romaji: 'todokesaki' },
-    'お届け': { kana: 'おとどけ', romaji: 'otodoke' },
-    'お水': { kana: 'おみず', romaji: 'omizu' },
-    'お困り': { kana: 'おこまり', romaji: 'okomari' },
-    'お持ち': { kana: 'おもち', romaji: 'omochi' },
-    'お疲れ様': { kana: 'おつかれさま', romaji: 'otsukaresama' },
-    'お疲れ': { kana: 'おつかれ', romaji: 'otsukare' },
-    '和食': { kana: 'わしょく', romaji: 'washoku' },
-    'さくら亭': { kana: 'さくらてい', romaji: 'Sakuratei' },
-    'ハチ公前': { kana: 'はちこうまえ', romaji: 'Hachikou-mae' },
-    'ハチ公': { kana: 'はちこう', romaji: 'Hachikou' },
-    '豚骨': { kana: 'とんこつ', romaji: 'tonkotsu' }
-  };
-
-  var KANJI_EXTRAS = /[\u3400-\u4dbf\u4e00-\u9fff\u3005]/;
-
-  function stripEmojisAndEmotWords(text) {
-    if (!text) return '';
-    return String(text)
-      .replace(/[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1FA70}-\u{1FAFF}\u{FE00}-\u{FE0F}]/gu, '')
-      .replace(/\*[^*]+\*/g, '')
-      .replace(/\b(?:smiling|grinning|beaming|laughing|winking)\s+face(?:\s+with\s+[^.,!?:;]+)?/gi, '')
-      .replace(/\b(?:face\s+with\s+tears\s+of\s+joy|rofl|lol|lmao)\b/gi, '')
-      .replace(/\b(?:wajah\s+tersenyum|senyum\s+lebar|tertawa|senyuman)\b/gi, '')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
-  }
-
-  function lookupJaWord(word) {
-    if (CONVERSATION_EXTRAS[word]) return CONVERSATION_EXTRAS[word];
-    var d = getJaDict();
-    return d && typeof d.lookupWord === 'function' ? d.lookupWord(word) : null;
-  }
-
-  function lookupJaStem(stem) {
-    var d = getJaDict();
-    return d && typeof d.lookupStem === 'function' ? d.lookupStem(stem) : null;
-  }
-
-  function lookupJaSingle(ch) {
-    var d = getJaDict();
-    return d && typeof d.lookupSingle === 'function' ? d.lookupSingle(ch) : null;
-  }
-
-  function jaKanaToRomaji(kana) {
-    var d = getJaDict();
-    if (d && typeof d.kanaToRomaji === 'function') {
-      return d.kanaToRomaji(kana);
-    }
-    var u = getJaUi();
-    if (u && typeof u.kanaToRomaji === 'function') {
-      return u.kanaToRomaji(kana);
-    }
-    return kana;
-  }
-
-  // Tokenize Japanese text into ruby segments using Master Lexicon & Stems
-  function tokenizeToRuby(text) {
-    var s = stripEmojisAndEmotWords(text);
-    if (!s) return [];
-    var tokens = [];
-    var i = 0;
-
-    while (i < s.length) {
-      // 1. Bracketed furigana [Kanji](reading)
-      if (s[i] === '[') {
-        var closeB = s.indexOf(']', i);
-        if (closeB > i && s[closeB + 1] === '(') {
-          var closeP = s.indexOf(')', closeB + 2);
-          if (closeP > closeB + 2) {
-            var kanji = s.slice(i + 1, closeB);
-            var kana = s.slice(closeB + 2, closeP);
-            tokens.push({
-              kanji: kanji,
-              kana: kana,
-              ruby: true,
-              html: '<ruby>' + esc(kanji) + '<rt>' + esc(kana) + '</rt></ruby>',
-              romaji: jaKanaToRomaji(kana) || kana
-            });
-            i = closeP + 1;
-            continue;
-          }
-        }
-      }
-
-      // 2. Non-kanji characters (kana, punctuation, whitespace, Latin)
-      if (!KANJI_EXTRAS.test(s[i])) {
-        var j = i + 1;
-        while (j < s.length && !KANJI_EXTRAS.test(s[j]) && s[j] !== '[') {
-          j++;
-        }
-        var chunk = s.slice(i, j);
-        tokens.push({
-          text: chunk,
-          ruby: false,
-          html: esc(chunk),
-          romaji: jaKanaToRomaji(chunk.trim()) || chunk
-        });
-        i = j;
-        continue;
-      }
-
-      // 3. Kanji compound matching using Master Dictionary
-      var matched = false;
-      for (var len = Math.min(10, s.length - i); len >= 2; len--) {
-        var piece = s.substr(i, len);
-        var w = lookupJaWord(piece);
-        if (w && w.kana) {
-          var m = piece.match(/^([㐀-䶿一-鿿々]+)([぀-ゟ]+)$/);
-          var rHtml = '';
-          if (m && w.kana.length > m[2].length && w.kana.slice(-m[2].length) === m[2]) {
-            var stemKana = w.kana.slice(0, w.kana.length - m[2].length);
-            rHtml = '<ruby>' + esc(m[1]) + '<rt>' + esc(stemKana) + '</rt></ruby>' + esc(m[2]);
-          } else {
-            rHtml = '<ruby>' + esc(piece) + '<rt>' + esc(w.kana) + '</rt></ruby>';
-          }
-          tokens.push({
-            kanji: piece,
-            kana: w.kana,
-            ruby: true,
-            html: rHtml,
-            romaji: w.romaji || jaKanaToRomaji(w.kana)
-          });
-          i += len;
-          matched = true;
-          break;
-        }
-      }
-      if (matched) continue;
-
-      // 4. Okurigana stem match (e.g. 住 in 住んでいます, 困 in 困っている)
-      var ch = s[i];
-      var st = lookupJaStem(ch);
-      if (st) {
-        tokens.push({
-          kanji: ch,
-          kana: st,
-          ruby: true,
-          html: '<ruby>' + esc(ch) + '<rt>' + esc(st) + '</rt></ruby>',
-          romaji: jaKanaToRomaji(st)
-        });
-        i += 1;
-        continue;
-      }
-
-      // 5. Single Kanji lookup
-      var sg = lookupJaSingle(ch);
-      if (sg && sg.kana) {
-        tokens.push({
-          kanji: ch,
-          kana: sg.kana,
-          ruby: true,
-          html: '<ruby>' + esc(ch) + '<rt>' + esc(sg.kana) + '</rt></ruby>',
-          romaji: sg.romaji || jaKanaToRomaji(sg.kana)
-        });
-      } else {
-        tokens.push({
-          text: ch,
-          ruby: false,
-          html: esc(ch),
-          romaji: ''
-        });
-      }
-      i += 1;
-    }
-
-    return tokens;
-  }
-
-  // Convert bracketed furigana `[Kanji](reading)` to HTML ruby OR auto-annotate bare kanji
+  // Convert bracketed furigana `[Kanji](reading)` to HTML ruby
   function formatFurigana(text) {
     if (!text) return '';
-    var tokens = tokenizeToRuby(text);
-    return tokens.map(function (tk) { return tk.html; }).join('');
-  }
-
-  // Generate phonetically accurate Hepburn Romaji with topic & direction particle recognition
-  function getRomaji(text) {
-    if (!text) return '';
-    var tokens = tokenizeToRuby(text);
-    var parts = [];
-    for (var i = 0; i < tokens.length; i++) {
-      var tk = tokens[i];
-      var prev = tokens[i - 1];
-      var next = tokens[i + 1];
-
-      if (tk.ruby) {
-        if (tk.romaji) parts.push(tk.romaji);
-        continue;
-      }
-
-      var str = tk.text;
-      var pTokens = [];
-      var buf = '';
-      for (var c = 0; c < str.length; c++) {
-        var ch = str[c];
-        var prevChar = str[c - 1] || (prev ? (prev.kanji || prev.text).slice(-1) : '');
-
-        // Topic particle は -> "wa"
-        if (ch === 'は' && (prevChar || buf) && !/[はをへがにでともの]/.test(prevChar)) {
-          if (buf) { pTokens.push(jaKanaToRomaji(buf)); buf = ''; }
-          pTokens.push('wa');
-          continue;
-        }
-        // Object particle を -> "o"
-        if (ch === 'を' && (prevChar || buf)) {
-          if (buf) { pTokens.push(jaKanaToRomaji(buf)); buf = ''; }
-          pTokens.push('o');
-          continue;
-        }
-        // Direction particle へ -> "e"
-        if (ch === 'へ' && (prevChar || buf) && /(?:駅|学校|大学|店|カフェ|日本|東京|渋谷|どこ|あそこ|家)$/.test(buf || (prev ? prev.kanji || prev.text : ''))) {
-          if (buf) { pTokens.push(jaKanaToRomaji(buf)); buf = ''; }
-          pTokens.push('e');
-          continue;
-        }
-        buf += ch;
-      }
-      if (buf) {
-        var segs = buf.split(/(\s+|[.,!?:;?？!！「」『』()（）])/);
-        segs.forEach(function (seg) {
-          if (!seg || /^\s+$/.test(seg)) {
-            if (seg) pTokens.push(seg);
-            return;
-          }
-          if (/^[.,!?:;?？!！「」『』()（）]+$/.test(seg)) {
-            pTokens.push(seg);
-            return;
-          }
-          var r = jaKanaToRomaji(seg);
-          pTokens.push(r != null ? r : seg);
-        });
-      }
-      if (pTokens.length) parts.push(pTokens.join(' '));
-    }
-
-    return parts.join(' ')
-      .replace(/\s+([.,!?:;?？!！])/g, '$1')
-      .replace(/([「『"(])\s+/g, '$1')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
+    return esc(text).replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, kanji, kana) {
+      return '<ruby>' + kanji + '<rt>' + kana + '</rt></ruby>';
+    });
   }
 
   // --- Pronunciation & Levenshtein Similarity Evaluator ---
@@ -2238,16 +1950,14 @@
     if (state.scenarioId && state.messages && state.messages.length > 0) {
       state.scenarioHistories[histKeyFor(state.course, state.scenarioId)] = state.messages;
     }
-    var currentSc = getScenario(id);
-    var resolvedId = (currentSc && currentSc.id) ? currentSc.id : id;
-    state.scenarioId = resolvedId;
+    state.scenarioId = id;
     state.replySource = '';
-    var histKey = histKeyFor(state.course, resolvedId);
+    var histKey = histKeyFor(state.course, id);
     var cached = state.scenarioHistories && state.scenarioHistories[histKey];
     if (cached && cached.length > 0 && isMatchingCourse(cached, state.course)) {
       state.messages = cached;
     } else {
-      state.messages = [starterMessage(resolvedId)];
+      state.messages = [starterMessage(id)];
       state.scenarioHistories[histKey] = state.messages;
     }
   }
@@ -4008,31 +3718,17 @@
     var msgsHtml = state.messages.map(function (msg, idx) {
       if (msg.role === 'user') {
         var voiceTag = msg.isVoice ? '<span class="fzc-voice-tag" title="' + esc(t('chat_voice_tag', 'Diucapkan lewat panggilan')) + '">' + icon('mic', { size: 12, className: 'fzc-inline-icon' }) + ' </span>' : '';
-        var isJaUser = (state.course === 'ja' || /[\u3040-\u30ff\u4e00-\u9faf]/.test(msg.text));
-        var userBubbleClass = isJaUser ? ' fzc-japanese-text' : '';
-        var userDisplayText = isJaUser ? formatFurigana(msg.furigana || msg.text) : esc(msg.text);
-        var userRomaji = isJaUser ? (msg.romaji || getRomaji(msg.text)) : '';
-        var userRomajiHtml = userRomaji ? '<span class="fzc-romaji">' + esc(userRomaji) + '</span>' : '';
         return '<div class="fzc-msg-row is-user">' +
           '<div class="fzc-msg-box">' +
-          '<div class="fzc-bubble fzc-bubble-user' + userBubbleClass + '">' +
-          '<span class="fzc-message-text">' + voiceTag + userDisplayText + '</span>' +
-          userRomajiHtml +
-          '</div>' +
+          '<div class="fzc-bubble fzc-bubble-user fzc-message-text">' + voiceTag + esc(msg.text) + '</div>' +
           userFeedbackHtml(msg) +
           '</div>' +
           '</div>';
       }
 
       // Assistant Message
-      var isJaAssistant = (state.course === 'ja' || /[\u3040-\u30ff\u4e00-\u9faf]/.test(msg.text));
-      var displayText = isJaAssistant
-        ? formatFurigana(msg.furigana || msg.text)
-        : (msg.furigana ? formatFurigana(msg.furigana) : esc(msg.text));
-      var asstRomaji = isJaAssistant
-        ? (msg.romaji || getRomaji(msg.text))
-        : (msg.romaji || '');
-      var romajiHtml = asstRomaji ? '<span class="fzc-romaji">' + esc(asstRomaji) + '</span>' : '';
+      var displayText = msg.furigana ? formatFurigana(msg.furigana) : esc(msg.text);
+      var romajiHtml = msg.romaji ? '<span class="fzc-romaji">' + esc(msg.romaji) + '</span>' : '';
       var isTranslateHidden = msg.showTranslation ? '' : ' is-hidden';
       var isPlaying = state.audioPlayingId === msg.id ? ' is-playing' : '';
       var isShadowing = state.shadowingMsgId === msg.id ? ' is-shadowing' : '';
@@ -4126,16 +3822,9 @@
       var suggestionsHtml = '';
       if (idx === state.messages.length - 1 && Array.isArray(msg.suggestions) && msg.suggestions.length > 0) {
         var chips = msg.suggestions.map(function (sg) {
-          var isJaSg = (state.course === 'ja' || /[\u3040-\u30ff\u4e00-\u9faf]/.test(sg.text));
-          var chipMain = isJaSg ? formatFurigana(sg.furigana || sg.text) : esc(sg.text);
-          var chipRomajiVal = isJaSg ? (sg.romaji || getRomaji(sg.text)) : '';
-          var chipRomajiHtml = chipRomajiVal ? '<span class="fzc-romaji fzc-chip-romaji">' + esc(chipRomajiVal) + '</span>' : '';
-          var chipTransVal = sg.translation ? esc(sg.translation) : '';
-          var chipTransHtml = chipTransVal ? '<span class="fzc-chip-trans">' + chipTransVal + '</span>' : '';
-          return '<button type="button" class="fzc-suggestion-chip fzc-chip' + (isJaSg ? ' is-ja' : '') + '" data-send="' + esc(sg.text) + '">' +
-            '<strong class="fzc-chip-main' + (isJaSg ? ' fzc-japanese-text' : '') + '">' + chipMain + '</strong>' +
-            chipRomajiHtml +
-            chipTransHtml +
+          return '<button type="button" class="fzc-suggestion-chip fzc-chip" data-send="' + esc(sg.text) + '">' +
+            '<strong class="fzc-chip-main">' + esc(sg.text) + '</strong>' +
+            '<span>' + esc(sg.translation || sg.romaji || '') + '</span>' +
             '</button>';
         }).join('');
         suggestionsHtml = '<div class="fzc-suggestions-row">' + chips + '</div>';
@@ -4225,7 +3914,7 @@
       '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
 
     return (
-      '<section id="fzcContainer" class="fade fzc-container fzc-chat-wrapper" data-active-scenario="' + esc(state.scenarioId) + '" data-active-course="' + esc(course) + '">' +
+      '<section class="fade fzc-container fzc-chat-wrapper" data-active-scenario="' + esc(state.scenarioId) + '" data-active-course="' + esc(course) + '">' +
       '<div class="fzc-header">' +
       '<div class="fzc-partner-bar">' +
       '<button type="button" class="fzc-btn-back" id="fzcBtnBack" aria-label="' + esc(t('chat_back_btn_aria', 'Kembali')) + '" title="' + esc(t('chat_back_btn_aria', 'Kembali')) + '">' +
@@ -4984,7 +4673,6 @@
         if (document.documentElement) document.documentElement.classList.add('fz-view-chat');
         if (document.body) {
           document.body.classList.add('fz-view-chat');
-          document.body.classList.remove('fz-stage-home');
         }
       }
       var mountPoint = el || document.getElementById('app');
@@ -5074,7 +4762,6 @@
     deliverAssistantReply: deliverAssistantReply,
     formatFurigana: formatFurigana,
     parseFuriganaRuby: formatFurigana,
-    getRomaji: getRomaji,
     checkMisconception: checkMisconception,
     detectMisconception: function (text, course) {
       var m = checkMisconception(text, course);
@@ -5163,9 +4850,7 @@
     getPersonas: function (c) {
       var course = c || state.course || 'ja';
       return PERSONAS[course === 'ja' ? 'ja' : 'en'] || PERSONAS.ja;
-    },
-    isMounted: function () { return isChatMounted; },
-    isChatMounted: function () { return isChatMounted; }
+    }
   };
 
   // Auto-teardown on mobile app switch / page hide / tab backgrounding
