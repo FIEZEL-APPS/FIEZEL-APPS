@@ -212,12 +212,37 @@ function versiYangPernahDiklaimDiHulu() {
   }
 }
 
+/* Rule 12.2: Pre-Bump Concurrency Probe untuk mendeteksi nomor build yang diklaim PR terbuka */
+function versiYangDiklaimDiOpenPR() {
+  try {
+    const raw = execSync('gh pr list --repo FIEZEL-APPS/FIEZEL-APPS --state open --json title,headRefName', {
+      cwd: ROOT, encoding: 'utf8', timeout: 15000, stdio: ['ignore', 'pipe', 'ignore']
+    });
+    const prs = JSON.parse(raw);
+    const set = new Set();
+    for (const pr of prs) {
+      const teks = (pr.title || '') + ' ' + (pr.headRefName || '');
+      const matches = teks.match(/m025-\d+/g);
+      if (matches) {
+        for (const m of matches) set.add(m);
+      }
+    }
+    return set;
+  } catch {
+    return new Set();
+  }
+}
+
 const hulu = versiHulu();
 const lokal = versiSumber();
 const dasar = hulu && nomor(hulu) >= nomor(lokal) ? hulu : lokal;
 
-const diklaim = versiYangPernahDiklaimDiHulu();
-let kandidat = nomor(dasar) + 1;
+const diklaim = versiYangPernahDiklaimDiHulu() || new Set();
+const diklaimPR = versiYangDiklaimDiOpenPR();
+for (const v of diklaimPR) diklaim.add(v);
+
+const minTarget = process.env.FIEZEL_MIN_BUILD ? nomor(process.env.FIEZEL_MIN_BUILD) : 0;
+let kandidat = Math.max(nomor(dasar) + 1, minTarget);
 const dilompati = [];
 while (diklaim && diklaim.has('m025-' + kandidat) && dilompati.length < 50) {
   dilompati.push('m025-' + kandidat);
