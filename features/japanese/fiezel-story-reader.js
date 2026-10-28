@@ -92,22 +92,15 @@
     }
   } catch (_) {}
 
-  function t(k, fallback) {
+  function t(k, fb, params) {
+    var s;
     try {
-      var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
-      if (rootObj.FiezelI18n) {
-        var loc = typeof rootObj.FiezelI18n.getLocale === 'function' ? rootObj.FiezelI18n.getLocale() : 'id';
-        if (loc === 'en' && STORY_COPY_EN && STORY_COPY_EN[k]) {
-          return STORY_COPY_EN[k];
-        }
-        if (typeof rootObj.FiezelI18n.t === 'function') {
-          var res = rootObj.FiezelI18n.t(k);
-          if (res && res !== k) return res;
-        }
-      }
+      var I = (typeof self !== 'undefined' ? self : (typeof globalThis !== 'undefined' ? globalThis : this)).FiezelI18n;
+      s = I && I.t ? I.t(k, params) : undefined;
     } catch (_) {}
-    if (STORY_COPY_ID && STORY_COPY_ID[k]) return STORY_COPY_ID[k];
-    return fallback || k;
+    if (s === undefined || s === k) s = fb == null ? k : fb;
+    if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m; });
+    return s;
   }
 
   function getStorySubtitle(story) {
