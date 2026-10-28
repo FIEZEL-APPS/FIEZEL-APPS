@@ -22,6 +22,90 @@ const KANJI_REGEX = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3005]/;
 const KANJI_DICT = {
   // Conversational Greetings, Introductions & Common Phrases
   'はじめまして': { kana: 'はじめまして', romaji: 'hajimemashite' },
+  'こんにちは': { kana: 'こんにちは', romaji: 'konnichiwa' },
+  'こんばんは': { kana: 'こんばんは', romaji: 'konbanwa' },
+  'じゃあ': { kana: 'じゃあ', romaji: 'jaa' },
+  '準備': { kana: 'じゅんび', romaji: 'junbi' },
+  '坊ちゃん': { kana: 'ぼっちゃん', romaji: 'botchan' },
+  '上司': { kana: 'じょうし', romaji: 'joushi' },
+  '神社': { kana: 'じんじゃ', romaji: 'jinja' },
+  '邪魔': { kana: 'じゃま', romaji: 'jama' },
+  'お茶': { kana: 'おちゃ', romaji: 'o-cha' },
+  '教室': { kana: 'きょうしつ', romaji: 'kyoushitsu' },
+  '読書': { kana: 'どくしょ', romaji: 'dokusho' },
+  'マッチ箱': { kana: 'まっちばこ', romaji: 'matchibako' },
+  '箱': { kana: 'はこ', romaji: 'hako' },
+  '待って': { kana: 'まって', romaji: 'matte' },
+  '遠い': { kana: 'とおい', romaji: 'tooi' },
+  'お父さん': { kana: 'おとうさん', romaji: 'otousan' },
+  'じゃありません': { kana: 'じゃありません', romaji: 'ja arimasen' },
+  'ではありません': { kana: 'ではありません', romaji: 'dewa arimasen' },
+  'です': { kana: 'です', romaji: 'desu' },
+  'でした': { kana: 'でした', romaji: 'deshita' },
+  'でしょう': { kana: 'でしょう', romaji: 'deshou' },
+  'ください': { kana: 'ください', romaji: 'kudasai' },
+  'ペン': { kana: 'ぺん', romaji: 'pen' },
+  'ベッド': { kana: 'べっど', romaji: 'beddo' },
+  'コーヒー': { kana: 'こーひー', romaji: 'koohii' },
+  'パーティー': { kana: 'ぱーてぃー', romaji: 'paatii' },
+  'ジュース': { kana: 'じゅーす', romaji: 'juusu' },
+  'スマホ': { kana: 'すまほ', romaji: 'sumaho' },
+  'ちょっと': { kana: 'ちょっと', romaji: 'chotto' },
+  '来て': { kana: 'きて', romaji: 'kite' },
+  '来てください': { kana: 'きてください', romaji: 'kite kudasai' },
+  'マッチ': { kana: 'まっち', romaji: 'matchi' },
+  'スイッチ': { kana: 'すいっち', romaji: 'suitchi' },
+  'こっち': { kana: 'こっち', romaji: 'kotchi' },
+  'ぼっちゃん': { kana: 'ぼっちゃん', romaji: 'botchan' },
+  'きれい': { kana: 'きれい', romaji: 'kirei' },
+  'わたし': { kana: 'わたし', romaji: 'watashi' },
+  'ぼく': { kana: 'ぼく', romaji: 'boku' },
+  'おれ': { kana: 'おれ', romaji: 'ore' },
+  'きみ': { kana: 'きみ', romaji: 'kimi' },
+  'かれ': { kana: 'かれ', romaji: 'kare' },
+  'かのじょ': { kana: 'かのじょ', romaji: 'kanojo' },
+  'これ': { kana: 'これ', romaji: 'kore' },
+  'それ': { kana: 'それ', romaji: 'sore' },
+  'あれ': { kana: 'あれ', romaji: 'are' },
+  'どれ': { kana: 'どれ', romaji: 'dore' },
+  'だれ': { kana: 'だれ', romaji: 'dare' },
+  'なに': { kana: 'なに', romaji: 'nani' },
+  'どこ': { kana: 'どこ', romaji: 'doko' },
+  'あそこ': { kana: 'あそこ', romaji: 'asoko' },
+  'こちら': { kana: 'こちら', romaji: 'kochira' },
+  'そちら': { kana: 'そちら', romaji: 'sochira' },
+  'あちら': { kana: 'あちら', romaji: 'achira' },
+  'どちら': { kana: 'どちら', romaji: 'dochira' },
+  'きょう': { kana: 'きょう', romaji: 'kyou' },
+  'きのう': { kana: 'きのう', romaji: 'kinou' },
+  'あした': { kana: 'あした', romaji: 'ashita' },
+  'いま': { kana: 'いま', romaji: 'ima' },
+  'がめん': { kana: 'がめん', romaji: 'gamen' },
+  'がっこう': { kana: 'がっこう', romaji: 'gakkou' },
+  'がくせい': { kana: 'がくせい', romaji: 'gakusei' },
+  'せんせい': { kana: 'せんせい', romaji: 'sensei' },
+  'ともだち': { kana: 'ともだち', romaji: 'tomodachi' },
+  'ほん': { kana: 'ほん', romaji: 'hon' },
+  'てんき': { kana: 'てんき', romaji: 'tenki' },
+  'じかん': { kana: 'じかん', romaji: 'jikan' },
+  'にほんご': { kana: 'にほんご', romaji: 'nihongo' },
+  'いく': { kana: 'いく', romaji: 'iku' },
+  'いきます': { kana: 'いきます', romaji: 'ikimasu' },
+  'いきました': { kana: 'いきました', romaji: 'ikimashita' },
+  'くる': { kana: 'くる', romaji: 'kuru' },
+  'きます': { kana: 'きます', romaji: 'kimasu' },
+  'きました': { kana: 'きました', romaji: 'kimashita' },
+  'たべる': { kana: 'たべる', romaji: 'taberu' },
+  'たべます': { kana: 'たべます', romaji: 'tabemasu' },
+  'たべました': { kana: 'たべました', romaji: 'tabemashita' },
+  'のむ': { kana: 'のむ', romaji: 'nomu' },
+  'のみます': { kana: 'のみます', romaji: 'nomimasu' },
+  'のみました': { kana: 'のみました', romaji: 'nomimashita' },
+  'よむ': { kana: 'よむ', romaji: 'yomu' },
+  'よみます': { kana: 'よみます', romaji: 'yomimasu' },
+  'よみました': { kana: 'よみました', romaji: 'yomimashita' },
+  'すき': { kana: 'すき', romaji: 'suki' },
+  'だいすき': { kana: 'だいすき', romaji: 'daisuki' },
   'よろしくお願': { kana: 'よろしくおねが', romaji: 'yoroshiku onega' },
   'よろしくお願いします': { kana: 'よろしくおねがいします', romaji: 'yoroshiku onegaishimasu' },
   'お世話': { kana: 'おせわ', romaji: 'o-sewa' },
@@ -691,6 +775,7 @@ const YOON_MAP = {
   'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
   'ふぁ': 'fa', 'ふぃ': 'fi', 'ふぇ': 'fe', 'ふぉ': 'fo',
   'てぃ': 'ti', 'でぃ': 'di', 'うぃ': 'wi', 'うぇ': 'we',
+  'しぇ': 'she', 'ちぇ': 'che', 'じぇ': 'je',
 };
 
 // Convert Katakana to Hiragana
@@ -727,22 +812,28 @@ export function tokenizeJapaneseToRuby(rawText) {
   // Sort dictionary keys by descending length
   const dictKeys = Object.keys(KANJI_DICT).sort((a, b) => b.length - a.length);
 
+  function findDictMatch(str, pos) {
+    for (let k = 0; k < dictKeys.length; k++) {
+      const w = dictKeys[k];
+      if (str.startsWith(w, pos)) return w;
+    }
+    return null;
+  }
+
   while (i < clean.length) {
     // 1. Try dictionary match (longest match first)
-    let matched = false;
-    for (const word of dictKeys) {
-      if (clean.startsWith(word, i)) {
-        tokens.push({
-          text: word,
-          ruby: KANJI_DICT[word].kana,
-          isKanji: KANJI_REGEX.test(word),
-        });
-        i += word.length;
-        matched = true;
-        break;
-      }
+    const matchedWord = findDictMatch(clean, i);
+    if (matchedWord) {
+      tokens.push({
+        text: matchedWord,
+        ruby: KANJI_DICT[matchedWord].kana,
+        romaji: KANJI_DICT[matchedWord].romaji,
+        isKanji: KANJI_REGEX.test(matchedWord),
+        isDictWord: true,
+      });
+      i += matchedWord.length;
+      continue;
     }
-    if (matched) continue;
 
     // 2. Try single kanji stem match
     const ch = clean[i];
@@ -759,7 +850,7 @@ export function tokenizeJapaneseToRuby(rawText) {
 
     // 3. Non-kanji segment (kana, Latin, punctuation, spaces)
     let j = i;
-    while (j < clean.length && !KANJI_REGEX.test(clean[j])) {
+    while (j < clean.length && !KANJI_REGEX.test(clean[j]) && !findDictMatch(clean, j)) {
       j += 1;
     }
     const nonKanjiChunk = clean.slice(i, j);
@@ -887,10 +978,15 @@ export function toPhoneticRomaji(text) {
     const tk = tokens[idx];
     const prevTk = tokens[idx - 1];
 
+    if (tk.isDictWord && tk.romaji) {
+      parts.push(tk.romaji);
+      continue;
+    }
+
     if (tk.isKanji) {
-      const reading = tk.ruby || KANJI_SINGLE_CHAR_STEMS[tk.text] || '';
+      const reading = tk.romaji || (tk.ruby ? kanaStringToRomaji(tk.ruby) : (KANJI_SINGLE_CHAR_STEMS[tk.text] ? kanaStringToRomaji(KANJI_SINGLE_CHAR_STEMS[tk.text]) : ''));
       if (reading) {
-        parts.push(kanaStringToRomaji(reading));
+        parts.push(reading);
       }
       continue;
     }
@@ -906,21 +1002,16 @@ export function toPhoneticRomaji(text) {
     let buffer = '';
     for (let c = 0; c < str.length; c++) {
       const char = str[c];
-      const prevChar = str[c - 1] || (prevTk ? prevTk.text.slice(-1) : '');
       const nextChar = str[c + 1] || '';
 
       // Topic particle は -> "wa"
-      // Rules for は -> wa:
-      // 1. Immediately after kanji (e.g. 私は -> watashi wa, 今日は -> kyou wa)
-      // 2. After noun/particle (これ/それ/あれ/だれ/なに/さん/くん/ちゃん/の/て/で/に/と/から/より)
-      // 3. Isolated は with spaces or punctuation around it
       if (char === 'は') {
-        const isAfterKanji = (c === 0 && prevTk && prevTk.isKanji);
-        const isFollowedByPunctOrEnd = !nextChar || /[。、！？!?\s]/.test(nextChar);
+        const isAfterWordToken = (c === 0 && prevTk);
         const prevWord = buffer || (prevTk ? prevTk.text : '');
-        const isAfterNounOrPronoun = /(?:これ|それ|あれ|どれ|だれ|なに|私|僕|俺|君|あなた|彼|彼女|さん|くん|ちゃん|人|学生|先生|先輩|友達|家族|今日|今|明日|昨日|天気|時間|本|駅|電車|勉強|テスト|練習|の|て|で|に|と|から)$/.test(prevWord);
+        const isLaughter = /^[あアはハ]+$/.test(prevWord);
+        const isMother = prevWord === 'はは' || prevWord === 'ハハ';
 
-        if (isAfterKanji || (isAfterNounOrPronoun && isFollowedByPunctOrEnd) || isAfterNounOrPronoun) {
+        if (!isLaughter && !isMother && (isAfterWordToken || buffer.length > 0)) {
           if (buffer) {
             parts.push(kanaStringToRomaji(buffer));
             buffer = '';
@@ -942,10 +1033,14 @@ export function toPhoneticRomaji(text) {
 
       // Direction particle へ -> "e"
       if (char === 'へ') {
-        const isAfterKanji = (c === 0 && prevTk && prevTk.isKanji);
+        const isAfterWordToken = (c === 0 && prevTk);
         const prevWord = buffer || (prevTk ? prevTk.text : '');
-        const isAfterPlace = /(?:駅|学校|大学|図書館|家|部屋|店|カフェ|日本|東京|大阪|京都|どこ|あそこ)$/.test(prevWord);
-        if (isAfterKanji || isAfterPlace) {
+        const nextPart = str.slice(c + 1);
+        const isNextMotionVerb = /^(?:行|いく|来|くる|帰|かえ|向|むか|出|で)/.test(nextPart);
+        const isNextPunctOrEnd = !nextChar || /[。、！？!?\s~]/.test(nextChar);
+        const isPlace = /(?:駅|えき|学校|がっこう|大学|だいがく|図書館|としょかん|家|いえ|うち|部屋|へや|店|みせ|カフェ|かふぇ|日本|にほん|東京|とうきょう|大阪|おおさか|京都|きょうと|どこ|あそこ|こちら|そちら|あちら|どちら|外|そと|中|なか|前|まえ|上|うえ|下|した)$/.test(prevWord);
+
+        if (isPlace || (isNextMotionVerb && (buffer.length > 0 || isAfterWordToken)) || (isAfterWordToken && isNextPunctOrEnd)) {
           if (buffer) {
             parts.push(kanaStringToRomaji(buffer));
             buffer = '';
@@ -973,36 +1068,40 @@ export function toPhoneticRomaji(text) {
 
   // Common phrase post-polishing for 100% natural vocal flow
   romaji = romaji
-    .replace(/\bwatashi ha\b/gi, 'watashi wa')
-    .replace(/\bboku ha\b/gi, 'boku wa')
-    .replace(/\bore ha\b/gi, 'ore wa')
-    .replace(/\bkimi ha\b/gi, 'kimi wa')
-    .replace(/\banata ha\b/gi, 'anata wa')
-    .replace(/\bkore ha\b/gi, 'kore wa')
-    .replace(/\bsore ha\b/gi, 'sore wa')
-    .replace(/\bare ha\b/gi, 'are wa')
-    .replace(/\bkyou ha\b/gi, 'kyou wa')
-    .replace(/\bashita ha\b/gi, 'ashita wa')
-    .replace(/\bkinou ha\b/gi, 'kinou wa')
-    .replace(/\bima ha\b/gi, 'ima wa')
-    .replace(/\btenki ha\b/gi, 'tenki wa')
-    .replace(/\btesuto ha\b/gi, 'tesuto wa')
+    // Particle は -> wa
+    .replace(/\b([A-Za-z]+)\s+ha\b/gi, (match, word) => {
+      if (word.toLowerCase() === 'ha') return match; // preserve laughter "ha ha ha"
+      return `${word} wa`;
+    })
+    .replace(/\b(watashi|boku|ore|kimi|anata|kare|kanojo|kore|sore|are|dore|dare|nani|kyou|ashita|kinou|ima|gamen|tenki|jikan|nihongo|gakkou|tomodachi|sensei|gakusei|hon|densha|eki|sochira|kochira|achira|dochira|inu|neko|sakana)ha\b/gi, '$1 wa')
+    // Direction particle へ -> e
+    .replace(/\b(gakkou|nihon|tokyo|eki|ie|uchi|heya|mise|kaisha|daigaku|toshokan|doko|asoko|kochira|sochira|achira|dochira|mae|ushiro|ue|shita|soto|naka)\s+he\b/gi, '$1 e')
+    .replace(/\b(gakkou|nihon|tokyo|eki|ie|uchi|heya|mise|kaisha|daigaku|toshokan|doko|asoko|kochira|sochira|achira|dochira)he\b/gi, '$1 e')
+    // Object particle を -> o
+    .replace(/\b([A-Za-z]+)wo\b/gi, '$1 o')
+    .replace(/\bwo\b/gi, 'o')
+    // Greetings & set phrases
     .replace(/\bkonnichiha\b/gi, 'konnichiwa')
     .replace(/\bkonbanha\b/gi, 'konbanwa')
+    .replace(/\bdewaha\b/gi, 'dewa')
+    .replace(/\bdeha\b/gi, 'dewa')
     .replace(/\bdewa arimasen\b/gi, 'dewa arimasen')
     .replace(/\bja arimasen\b/gi, 'ja arimasen')
-    .replace(/\bwo\b/gi, 'o')
-    .replace(/\bdesune\b/gi, 'desu ne')
-    .replace(/\bdesuyo\b/gi, 'desu yo')
-    .replace(/\bdesuka\b/gi, 'desu ka')
-    .replace(/([A-Za-z]+)(kara|made|yori|toshite)\b/gi, '$1 $2')
-    .replace(/([A-Za-z]+)(san|kun|chan|sensei|senpai)\b/gi, '$1-$2')
-    .replace(/([A-Za-z]+)\s+ha\b/gi, (match, word) => {
-      // If preceding word is a known particle or noun, " ha" is particle " wa"
-      if (['san', 'kun', 'chan', 'hito', 'tachi', 'no', 'de', 'ni', 'to', 'te', 'kara', 'yori', 'ga', 'wa'].includes(word.toLowerCase())) {
-        return `${word} wa`;
-      }
-      return match;
+    .replace(/\bjya arimasen\b/gi, 'ja arimasen')
+    .replace(/\bjya\b/gi, 'ja')
+    .replace(/\bjyo\b/gi, 'jo')
+    .replace(/\bjyu\b/gi, 'ju')
+    // Strict elimination of jya/jyu/jyo everywhere
+    .replace(/jy([auo])/gi, 'j$1')
+    // Sokuon before ch -> tch
+    .replace(/cch/gi, 'tch')
+    .replace(/\bc(ch[aeiou])/gi, '$1')
+    // Auxiliary endings spacing
+    .replace(/\b(desu|deshita|masu|mashita|masen)(ne|yo|ka)\b/gi, '$1 $2')
+    .replace(/\b([A-Za-z]+)(kara|made|yori|toshite)\b/gi, '$1 $2')
+    .replace(/\b([A-Za-z]+)(san|kun|chan|sensei|senpai)\b/gi, (match, prefix, suffix) => {
+      if (/^(?:bot|ot|otou|okaa|onii|onee|oji|ojii|obaa|oba)$/i.test(prefix)) return match;
+      return `${prefix}-${suffix}`;
     });
 
   // STRICT INVARIANT: ZERO KANJI LEAKAGE IN ROMAJI

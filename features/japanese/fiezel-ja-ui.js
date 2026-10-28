@@ -314,6 +314,22 @@
     return base;
   }());
   var YOON = { 'ゃ': 'a', 'ゅ': 'u', 'ょ': 'o' };
+  var COMPOUNDS = {
+    'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+    'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+    'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+    'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+    'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+    'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+    'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+    'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+    'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+    'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+    'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
+    'ふぁ': 'fa', 'ふぃ': 'fi', 'ふぇ': 'fe', 'ふぉ': 'fo',
+    'てぃ': 'ti', 'でぃ': 'di', 'うぃ': 'wi', 'うぇ': 'we',
+    'しぇ': 'she', 'ちぇ': 'che', 'じぇ': 'je'
+  };
   var PUNCT = {
     '。': '.', '、': ',', '！': '!', '？': '?',
     '「': '"', '」': '"', '『': '"', '』': '"',
@@ -326,29 +342,50 @@
     'の': 'no', 'や': 'ya', 'か': 'ka', 'ね': 'ne', 'よ': 'yo',
     'から': 'kara', 'まで': 'made'
   };
-  var JA_RUN_RE = /[぀-ヿ㐀-䶿一-鿿々　-〿！-／：-？～\s_()（）]+/g;
-  var HAS_JA_RE = /[぀-ヿ㐀-䶿一-鿿]/;
+  var JA_RUN_RE = /[0-9぀-ヿ㐀-䶿一-鿿々　-〿！-／：-？～\s_()（）]+/g;
+  var HAS_JA_RE = /[0-9぀-ヿ㐀-䶿一-鿿]/;
 
   function toHiragana(text) {
     return String(text).replace(/[ァ-ヶ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x60); });
   }
-  /** Kana → romaji gaya bank FIEZEL (ou, jyo). Mengembalikan null bila ada huruf yang tak terbaca. */
+  /** Kana → romaji gaya Hepburn standar (ou, ja/ju/jo, konsonan ganda, sokuon tch). Mengembalikan null bila ada huruf yang tak terbaca. */
   function kanaToRomaji(kana) {
     var s = toHiragana(kana), out = '', i = 0;
     while (i < s.length) {
       var c = s[i], next = s[i + 1];
+      if (/[0-9a-zA-Z\-_]/.test(c)) {
+        out += c;
+        i += 1;
+        continue;
+      }
       if (c === 'っ') {
-        var after = kanaToRomaji(s.slice(i + 1, i + 3 + (YOON[s[i + 2]] ? 1 : 0)));
-        out += after ? after[0] : '';
+        var peek2 = s.slice(i + 1, i + 3);
+        var nextRoma = COMPOUNDS[peek2] || KANA_ROMAJI[s[i + 1]];
+        if (nextRoma) {
+          out += nextRoma.charAt(0) === 'c' ? 't' : nextRoma.charAt(0);
+        }
         i += 1; continue;
       }
-      if (c === 'ー') { out += out.slice(-1) === '' ? '' : out.slice(-1); i += 1; continue; }
+      if (c === 'ー') {
+        var lastChar = out.slice(-1).toLowerCase();
+        if (/[aeiou]/.test(lastChar)) {
+          out += lastChar;
+        }
+        i += 1;
+        continue;
+      }
       if (PUNCT[c] !== undefined) { out += PUNCT[c]; i += 1; continue; }
+      var pair = s.slice(i, i + 2);
+      if (COMPOUNDS[pair]) {
+        out += COMPOUNDS[pair];
+        i += 2;
+        continue;
+      }
       var roma = KANA_ROMAJI[c];
       if (roma === undefined) return null;
       if (next && YOON[next]) {
         var stem = roma.slice(0, -1);
-        if (stem === 'sh' || stem === 'ch' || stem === 'j') roma = (stem === 'j' ? 'jy' : stem) + YOON[next];
+        if (stem === 'sh' || stem === 'ch' || stem === 'j') roma = stem + YOON[next];
         else roma = stem + 'y' + YOON[next];
         i += 2;
       } else i += 1;
@@ -358,29 +395,53 @@
     return out;
   }
 
-  var lexicon = { source: null, words: null, stems: null };
+  function getMasterDictionary() {
+    if (root.FiezelJaDictionary) return root.FiezelJaDictionary;
+    if (typeof require === 'function') {
+      try { return require('./fiezel-ja-dictionary.js'); } catch (_) {
+        try { return require('./features/japanese/fiezel-ja-dictionary.js'); } catch (_) {}
+      }
+    }
+    return null;
+  }
+
+  var lexicon = { source: null, master: null, words: null, stems: null, single: null, maxLen: 12 };
   function cleanEntryWord(word) { return String(word || '').replace(/（[^）]*）|\([^)]*\)/g, '').trim(); }
   function buildLexicon(pool) {
-    if (lexicon.source === pool && lexicon.words) return lexicon;
-    var words = Object.create(null), stems = Object.create(null);
-    (pool || []).forEach(function (v) {
-      var reading = splitPhonetic(v && v.phonetic);
-      if (!reading) return;
-      var word = cleanEntryWord(v.word), kana = cleanEntryWord(reading.kana);
-      if (!word || !kana || !/^[぀-ヿ㐀-䶿一-鿿々]+$/.test(word)) return;
-      if (word.length < 2 && !KANJI_RE.test(word)) return;
-      if (!words[word]) words[word] = { kana: kana, romaji: reading.romaji };
-      // Batang kanji: 遊ぶ (あそぶ) → 遊 = あそ, dipakai untuk bentuk berkonjugasi.
-      var m = word.match(/^([㐀-䶿一-鿿々]+)([぀-ゟ]+)$/);
-      if (m && kana.length > m[2].length && kana.slice(-m[2].length) === m[2]) {
-        var stemKana = kana.slice(0, kana.length - m[2].length);
-        if (!stems[m[1]]) stems[m[1]] = stemKana;
-      }
-    });
-    // Kata fungsi & kosa kata dasar kuis yang tidak selalu ada di bank kosakata JLPT.
+    var master = getMasterDictionary();
+    if (lexicon.source === pool && lexicon.master === master && lexicon.words) return lexicon;
+    var words = Object.create(null), stems = Object.create(null), single = Object.create(null);
+
+    // 1. Ingest Master Dictionary if available (Universal Baseline when pool is not explicitly restricted)
+    if (master && (!Array.isArray(pool) || pool.__useUniversalMaster)) {
+      if (master.WORDS) Object.assign(words, master.WORDS);
+      if (master.STEMS) Object.assign(stems, master.STEMS);
+      if (master.SINGLE) Object.assign(single, master.SINGLE);
+    }
+
+    // 2. Overlay active pool (if provided, e.g. V)
+    if (Array.isArray(pool)) {
+      pool.forEach(function (v) {
+        var reading = splitPhonetic(v && v.phonetic);
+        if (!reading) return;
+        var word = cleanEntryWord(v.word), kana = cleanEntryWord(reading.kana);
+        if (!word || !kana || !/^[0-9\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\u3005]+$/.test(word)) return;
+        if (word.length < 2 && !KANJI_RE.test(word)) return;
+        var cleanRoma = reading.romaji ? reading.romaji.replace(/\bjy([auo])/gi, 'j$1').replace(/jy([auo])/gi, 'j$1') : reading.romaji;
+        words[word] = { kana: kana, romaji: cleanRoma };
+        // Batang kanji: 遊ぶ (あそぶ) → 遊 = あそ, dipakai untuk bentuk berkonjugasi.
+        var m = word.match(/^([㐀-䶿一-鿿々]+)([぀-ゟ]+)$/);
+        if (m && kana.length > m[2].length && kana.slice(-m[2].length) === m[2]) {
+          var stemKana = kana.slice(0, kana.length - m[2].length);
+          if (!stems[m[1]]) stems[m[1]] = stemKana;
+        }
+      });
+    }
+
+    // 3. Functional vocabulary & common words
     [
       ['です', 'desu'], ['でした', 'deshita'], ['でしょう', 'deshou'], ['ではありません', 'dewa arimasen'],
-      ['じゃありません', 'jya arimasen'], ['ください', 'kudasai'], ['ません', 'masen'], ['ました', 'mashita'],
+      ['じゃありません', 'ja arimasen'], ['ください', 'kudasai'], ['ません', 'masen'], ['ました', 'mashita'],
       ['ましょう', 'mashou'], ['いかが', 'ikaga'],
       ['ありませんでした', 'arimasen deshita'], ['ありません', 'arimasen'], ['ありました', 'arimashita'],
       ['ませんでした', 'masen deshita'], ['なかったでした', 'nakatta deshita'], ['なかった', 'nakatta'],
@@ -393,11 +454,21 @@
       ['あさ', 'asa'], ['ひる', 'hiru'], ['よる', 'yoru'], ['ゆうがた', 'yuugata'], ['いま', 'ima'],
       ['きのう', 'kinou'], ['きょう', 'kyou'], ['あした', 'ashita'], ['から', 'kara'], ['まで', 'made'],
       ['しゃべる', 'shaberu'], ['しゃべります', 'shaberimasu'], ['おじいさん', 'ojiisan'], ['おばあさん', 'obaasan'],
-      ['ともだち', 'tomodachi'], ['がっこう', 'gakkou'], ['せんせい', 'sensei'], ['がくせい', 'gakusei']
+      ['ともだち', 'tomodachi'], ['がっこう', 'gakkou'], ['せんせい', 'sensei'], ['がくせい', 'gakusei'],
+      ['わたし', 'watashi'], ['ぼく', 'boku'], ['おれ', 'ore'], ['きみ', 'kimi'], ['あなた', 'anata'],
+      ['かれ', 'kare'], ['かのじょ', 'kanojo'], ['これ', 'kore'], ['それ', 'sore'], ['あれ', 'are'],
+      ['どれ', 'dore'], ['だれ', 'dare'], ['なに', 'nani'], ['どこ', 'doko'], ['あそこ', 'asoko'],
+      ['こちら', 'kochira'], ['そちら', 'sochira'], ['あちら', 'achira'], ['どちら', 'dochira'],
+      ['がめん', 'gamen'], ['てんき', 'tenki'], ['きれい', 'kirei'],
+      ['いきます', 'ikimasu'], ['いきました', 'ikimashita'], ['いく', 'iku'],
+      ['きます', 'kimasu'], ['きました', 'kimashita'], ['くる', 'kuru'],
+      ['たべます', 'tabemasu'], ['たべました', 'tabemashita'], ['たべる', 'taberu'],
+      ['のみます', 'nomimasu'], ['のみました', 'nomimashita'], ['のむ', 'nomu'],
+      ['わかります', 'wakarimasu'], ['わかりました', 'wakarimashita'], ['わかる', 'wakaru']
     ].forEach(function (pair) {
       if (!words[pair[0]]) words[pair[0]] = { kana: pair[0], romaji: pair[1] };
     });
-    lexicon = { source: pool, words: words, stems: stems, maxLen: 12 };
+    lexicon = { source: pool, master: master, words: words, stems: stems, single: single, maxLen: 12 };
     return lexicon;
   }
   /** Pecah satu potongan Jepang jadi token: {text, kana|null, romaji|null, ruby:boolean}. */
@@ -419,8 +490,8 @@
 
       var prev = tokens.length ? tokens[tokens.length - 1] : null;
 
-      // Partikel は / を / へ
-      if (/[はをへ]/.test(run[i]) && prev && !prev.space && !prev.punct && !prev.particle && !prev.blank) {
+      // Partikel は / を / へ (hanya bila bukan diikuti kana kecil)
+      if (/[はをへ]/.test(run[i]) && prev && !prev.space && !prev.punct && !prev.particle && !prev.blank && !/[ぁぃぅぇぉっゃゅょゎ]/.test(run[i + 1])) {
         tokens.push({ text: run[i], romaji: PARTICLES[run[i]], particle: true });
         i += 1;
         continue;
@@ -429,18 +500,31 @@
       var hit = null;
       for (var len = Math.min(lex.maxLen, run.length - i); len >= 2 || (len === 1 && KANJI_RE.test(run[i])); len--) {
         var piece = run.substr(i, len);
-        if (lex.words[piece]) {
-          hit = { text: piece, kana: lex.words[piece].kana, romaji: lex.words[piece].romaji, ruby: KANJI_RE.test(piece) };
-          break;
-        }
+        // Bila kanji diikuti okurigana (misal 遊 + びました), dahulukan batang konjugasi (stems)
         if (KANJI_RE.test(piece) && /^[㐀-䶿一-鿿々]+$/.test(piece) && lex.stems[piece]) {
           var tailMatch = run.slice(i + len).match(/^[ぁ-ん]*/);
           var tail = tailMatch ? tailMatch[0] : '';
           var cut = tail.search(/[はをへがにでともの]/);
           if (cut > 0) tail = tail.slice(0, cut);
           else if (cut === 0) tail = '';
-          var kana = lex.stems[piece] + tail;
-          hit = { text: piece, kana: lex.stems[piece], tail: tail, romaji: kanaToRomaji(kana), ruby: true };
+          if (tail.length > 0) {
+            var kana = lex.stems[piece] + tail;
+            hit = { text: piece, kana: lex.stems[piece], tail: tail, romaji: kanaToRomaji(kana), ruby: true };
+            break;
+          }
+        }
+        if (lex.words[piece]) {
+          hit = { text: piece, kana: lex.words[piece].kana, romaji: lex.words[piece].romaji, ruby: KANJI_RE.test(piece) };
+          break;
+        }
+        if (KANJI_RE.test(piece) && /^[㐀-䶿一-鿿々]+$/.test(piece) && lex.stems[piece]) {
+          var tailMatch2 = run.slice(i + len).match(/^[ぁ-ん]*/);
+          var tail2 = tailMatch2 ? tailMatch2[0] : '';
+          var cut2 = tail2.search(/[はをへがにでともの]/);
+          if (cut2 > 0) tail2 = tail2.slice(0, cut2);
+          else if (cut2 === 0) tail2 = '';
+          var kana2 = lex.stems[piece] + tail2;
+          hit = { text: piece, kana: lex.stems[piece], tail: tail2, romaji: kanaToRomaji(kana2), ruby: true };
           break;
         }
         if (len === 1) break;
@@ -453,8 +537,22 @@
 
       var c = run[i];
       if (KANJI_RE.test(c)) {
-        tokens.push({ text: c, kana: null, romaji: null, ruby: false });
+        var sInfo = lex.single && lex.single[c];
+        if (sInfo && sInfo.kana) {
+          tokens.push({ text: c, kana: sInfo.kana, romaji: sInfo.romaji || kanaToRomaji(sInfo.kana), ruby: true });
+        } else {
+          tokens.push({ text: c, kana: null, romaji: null, ruby: false });
+        }
         i += 1;
+        continue;
+      }
+      if (/[0-9]/.test(c)) {
+        var numStr = '';
+        while (i < run.length && /[0-9]/.test(run[i])) {
+          numStr += run[i];
+          i += 1;
+        }
+        tokens.push({ text: numStr, romaji: numStr });
         continue;
       }
       if (PUNCT[c] !== undefined) {
@@ -462,7 +560,7 @@
         i += 1;
         continue;
       }
-      if (PARTICLES[c] && prev && !prev.punct && !prev.space && !prev.blank) {
+      if (PARTICLES[c] && prev && !prev.punct && !prev.space && !prev.blank && !/[ぁぃぅぇぉっゃゅょゎ]/.test(run[i + 1])) {
         tokens.push({ text: c, romaji: PARTICLES[c], particle: true });
         i += 1;
         continue;
@@ -470,7 +568,8 @@
 
       // Deret kana bebas sampai token lain.
       var j = i + 1;
-      while (j < run.length && /[぀-ヿ]/.test(run[j]) && !lex.words[run.substr(j, 2)] && !PARTICLES[run[j]]) {
+      while (j < run.length && /[぀-ヿ]/.test(run[j])) {
+        if (PARTICLES[run[j]] && !/[ぁぃぅぇぉっゃゅょゎ]/.test(run[j + 1]) && !lex.words[run.substr(j, 2)]) break;
         j += 1;
       }
       var free = run.slice(i, j);
@@ -490,18 +589,24 @@
         html += esc(tk.text);
       }
 
-      if (tk.romaji == null) {
+      var tkRoma = tk.romaji;
+      if (!tkRoma) {
+        if (tk.kana) tkRoma = kanaToRomaji(tk.kana);
+        else if (!KANJI_RE.test(tk.text)) tkRoma = kanaToRomaji(tk.text);
+      }
+
+      if (tkRoma == null) {
         complete = false;
       } else if (tk.punct) {
-        if (parts.length && tk.romaji !== '"') {
-          parts[parts.length - 1] += tk.romaji;
+        if (parts.length && tkRoma !== '"') {
+          parts[parts.length - 1] += tkRoma;
         } else {
-          parts.push(tk.romaji);
+          parts.push(tkRoma);
         }
       } else if (tk.space) {
         // dipelihara lewat join
       } else {
-        parts.push(tk.romaji);
+        parts.push(tkRoma);
       }
     });
 
@@ -516,7 +621,7 @@
     }
 
     return '<span class="ja-run" lang="ja"><span class="ja-run-text">' + html + '</span>' +
-      (romaji && /[a-z]/i.test(romaji) ? '<span class="ja-romaji ja-run-romaji" lang="ja-Latn">' + esc(romaji) + '</span>' : '') + '</span>';
+      (romaji && /[a-z0-9]/i.test(romaji) ? '<span class="ja-romaji ja-run-romaji" lang="ja-Latn">' + esc(romaji) + '</span>' : '') + '</span>';
   }
   /** Versi murni (tanpa DOM) dari anotasi satu teks - dipakai annotate() dan gerbang uji. */
   function annotateText(value, pool) {
@@ -553,7 +658,7 @@
   }
 
   /* ---------- Pengamat: setiap soal, jawaban, dan pembahasan di layar kuis ---------- */
-  var ZONES = '.quiz-shell,.flash-face';
+  var ZONES = '.quiz-shell,.flash-face,.passage,#quizPassage,.passage-reading,.card-reading';
   var observer = null, pending = false, lexiconSource = null;
   function scan(appEl) {
     pending = false;
