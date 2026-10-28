@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-28T14:46:49.326Z",
+  "generatedAt": "2026-10-28T15:04:24.646Z",
   "root": "C:\\Users\\hp\\fiezel-resolve-pr761",
   "files": {
     "grammar-explanations-id.json": "6f7f5e03b33742917af73b5f6ac7dad6b4fafd92bc1bb39009731a04cf72b567",
@@ -19,7 +19,7 @@
   },
   "literals": {
     "count": 6154,
-    "sha256": "116a66e7b4e1c40e41192669895273bffaa187efce3921a7f53026bfd1438960",
+    "sha256": "dd644107a0039bc50ece7b96990b666ff1a8d960a7754c322da0147255965da7",
     "list": [
       "\n        <div class=\"hint-sheet-handle\" aria-hidden=\"true\"></div>\n        <div class=\"hint-popover-header\">\n          <div style=\"display:flex;align-items:center;gap:6px\">\n            <i data-lucide=\"info\"></i>\n            <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>\n          </div>\n          <span class=\"hint-level-pill\">${currentLvl}/4</span>\n          <button type=\"button\" id=\"hintCloseBtn\" class=\"hint-close-btn\" aria-label=\"${FiezelI18n.t('modal.tutup', 'Tutup')}\"><i data-lucide=\"x\"></i></button>\n        </div>\n        <div class=\"hint-step-indicator\" aria-hidden=\"true\">\n          ${[1,2,3,4].map(i => ",
       "\n        <div style=\"display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 0;\">\n          <div class=\"fz-qr-scanner-box\" id=\"fzQrScannerBox\" data-testid=\"qr-scanner-box\">\n            <video id=\"qrScanVideo\" class=\"fz-qr-video\" playsinline autoplay muted></video>\n            <div class=\"fz-qr-reticle\" id=\"fzQrReticle\">\n              <div class=\"fz-qr-corner fz-qr-corner-tl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-tr\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-bl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-br\"></div>\n              <div class=\"fz-qr-laser\"></div>\n            </div>\n            <div class=\"fz-qr-cam-fallback\" id=\"fzQrCamFallback\" style=\"display:none;\">\n              <i data-lucide=\"camera\" style=\"width:30px;height:30px;color:#64748B;\"></i>\n              <p style=\"font-size:11px;line-height:1.3;margin:0;color:#CBD5E1;\">${FiezelI18n.t('social3.scan-cam-err','Kamera belum aktif.')}</p>\n            </div>\n          </div>\n          <input type=\"file\" id=\"qrFileInput\" accept=\"image/*\" style=\"display:none;\" onchange=\"handleQrFilePicked(event)\">\n          <button type=\"button\" class=\"btn-scan-gallery\" onclick=\"$('qrFileInput')?.click()\" data-testid=\"qr-gallery-btn\" style=\"display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:260px;padding:8px 12px;border-radius:10px;background:#F8FAFC;border:1.5px solid #CBD5E1;color:#0F172A !important;font-weight:700;font-size:12px;cursor:pointer;\">\n            <i data-lucide=\"image\" style=\"width:15px;height:15px;color:#0284C7;\"></i> ${FiezelI18n.t('social3.scan-from-gallery','Pilih dari Galeri Foto')}\n          </button>\n        </div>\n      ",
@@ -1032,7 +1032,6 @@
       "<article class=\"fsl-card\"><span class=\"fsl-kicker\">${T('fsl.speaking-exam-kicker', 'Latihan berformat ujian')}</span><h2>IELTS &amp; TOEFL Speaking</h2><p>${T('fsl.speaking-exam-desc', '{count} set untuk level {level}, lengkap dengan waktu menyiapkan dan waktu bicara seperti ujian aslinya.', {count: this.repo.examFor(active).length, level: esc(active)})}</p><p class=\"fsl-privacy\">${esc(this.repo.examHonestyText())}</p><div class=\"fsl-actions\"><button class=\"fsl-primary\" data-open=\"speaking_exam\">${T('fsl.speaking-exam-start-btn', 'Mulai latihan ujian')}</button></div></article>",
       "<article class=\"fsl-card\"><span class=\"fsl-kicker\">${T('fsl.speaking-exam-kicker', 'Latihan berformat ujian')}</span><h2>IELTS &amp; TOEFL Speaking</h2><p>${T('fsl.speaking-exam-empty', 'Belum ada set untuk level {level}.', {level: esc(active)})}</p></article>",
       "<audio class=\"fsl-audio\" controls src=\"{url}\"></audio><p class=\"fsl-privacy\">Audio hanya berada di memory browser dan URL blob sementara; tidak disimpan ke state.</p>",
-      "<b style=\"color:var(--emerald,#10b981);\">✨ Kosakata Dikuasai</b>",
       "<b>🎯 Tips Menyimak:</b> Perhatikan kata penunjuk instruksi, waktu, serta kata sambung (<i>しかし</i>, <i>でも</i>, <i>じゃあ</i>) yang kerap membalik atau menegaskan keputusan tokoh.",
       "<button class=\"btn clay sm\" data-a=\"generate\" data-testid=\"generate-btn\">Buat kandidat soal</button>",
       "<button class=\"btn ghost\" data-a=\"go-passport\">Lihat Paspor Belajar</button></div></div>",
@@ -6153,6 +6152,7 @@
       "✓ KUNCI JAWABAN TEPAT",
       "✗ Jawaban Anda: Pilihan ",
       "✨ 4 Modul Latihan",
+      "✨ Kosakata Dikuasai",
       "「おはようございます、ミズキさん。<ruby class=\"fz-story-token\" onclick=\"window.FiezelStoryReader.inspectWord(\\'今日\\',\\'きょう\\',\\'hari ini\\')\">今日<rt>きょう</rt></ruby>も<ruby class=\"fz-story-token\" onclick=\"window.FiezelStoryReader.inspectWord(\\'元気\\',\\'げんき\\',\\'sehat / bersemangat\\')\">元気<rt>げんき</rt></ruby>ですね。<ruby class=\"fz-story-token\" onclick=\"window.FiezelStoryReader.inspectWord(\\'お茶\\',\\'おちゃ\\',\\'teh hijau Jepang\\')\">お茶<rt>おちゃ</rt></ruby>をどうぞ。」",
       "「待ち合わせしよう」(Machiawase shiyou) adalah ajakan santai untuk janjian bertemu di suatu tempat.",
       "今日の言葉 · kata hari ini",

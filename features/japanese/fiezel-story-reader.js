@@ -860,7 +860,7 @@
 
     if (ring) ring.style.strokeDashoffset = '75';
     if (percent) percent.innerText = '25%';
-    if (statusMsg) statusMsg.innerText = 'Menyimpan progres kata...';
+    if (statusMsg) statusMsg.innerText = t('story.vocab_saving', 'Menyimpan progres kata...');
 
     setTimeout(function () {
       var pLt = (record && record.pLt) || 0.72;
@@ -870,9 +870,9 @@
       if (percent) percent.innerText = pct + '%';
       if (statusMsg) {
         if (pct >= 60) {
-          statusMsg.innerHTML = '<b style="color:var(--emerald,#10b981);">✨ Kosakata Dikuasai</b>';
+          statusMsg.innerHTML = '<b style="color:var(--emerald,#10b981);">' + t('story.vocab_mastered', '✨ Kosakata Dikuasai') + '</b>';
         } else {
-          statusMsg.innerHTML = '<span style="color:var(--accent,#0284c7);">Progres kata tersimpan</span>';
+          statusMsg.innerHTML = '<span style="color:var(--accent,#0284c7);">' + t('story.vocab_saved', 'Progres kata tersimpan') + '</span>';
         }
       }
     }, 280);
