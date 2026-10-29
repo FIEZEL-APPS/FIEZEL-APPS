@@ -87,6 +87,8 @@
     'auth.layar.selamat-datang': 'Selamat datang',
     'auth.layar.sudah-akun': 'Sudah punya akun?',
     'auth.layar.sudah-guru': 'Sudah punya akun guru?',
+    'auth.layar.tamu': 'Masuk sebagai Pengunjung / Tamu',
+    'auth.layar.tamu-hint': 'Belajar langsung tanpa akun. Progres tersimpan di perangkat ini.',
     'auth.layar.ulangi-sandi': 'Ulangi kata sandi',
     'auth.layar.welcome-lead': 'Belajar Bahasa Inggris dan Bahasa Jepang adaptif. Masuk sekali, progresmu ikut ke HP mana pun.',
     /* --- m025-464 progres ikut akun (sinkron berizin) --- */

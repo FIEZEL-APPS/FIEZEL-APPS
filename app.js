@@ -3090,7 +3090,7 @@ function confirmQuizExit(){
   openModal(`<div class="modal-mark">FIEZEL</div><h2>${measure?FiezelI18n.t('quiz.exit-exam-title'):FiezelI18n.t('quiz.exit-normal-title')}</h2><p>${esc(line)}</p><div class="modal-actions"><button type="button" id="quizExitConfirm">${FiezelI18n.t('quiz.exit-confirm-btn')}</button><button type="button" class="primary" id="quizExitStay">${FiezelI18n.t('quiz.exit-stay-btn')}</button></div>`);
   $('quizExitStay').onclick=closeModal;
   setTimeout(()=>{try{$('quizExitStay')?.focus()}catch(_){}},30);/* v31 2026-08-29: fokus awal ke tombol AMAN (Lanjut belajar), bukan yang destruktif */
-  $('quizExitConfirm').onclick=()=>{closeModal();doExit();if(measure)setTimeout(()=>{try{showToast(FiezelI18n.t('quiz.exit-cooldown-toast'),'warn')}catch(_){}},600)};
+  $('quizExitConfirm').onclick=()=>{closeModal();if(typeof window.__closeFeedbackSheet==='function')window.__closeFeedbackSheet();doExit();if(measure)setTimeout(()=>{try{showToast(FiezelI18n.t('quiz.exit-cooldown-toast'),'warn')}catch(_){}},600)};
 }
 window.confirmQuizExit=confirmQuizExit;
 let confidencePopThen=null;
@@ -6652,7 +6652,14 @@ function setApp(html){
   // Opsional-berantai dengan sengaja: harness tes menjalankan app.js di atas DOM
   // tiruan yang tidak punya <body>, dan penandaan panggung tidak boleh pernah menjadi
   // alasan sebuah layar gagal digambar.
-  document.body?.classList?.toggle?.('fz-stage-quiz',String(html).includes('quiz-shell'));
+  const isQuiz = String(html).includes('quiz-shell');
+  document.body?.classList?.toggle?.('fz-stage-quiz', isQuiz);
+  if (isQuiz) {
+    document.body?.classList?.remove?.('fz-stage-home');
+  } else if (String(html).includes('home-page')) {
+    document.body?.classList?.remove?.('fz-stage-quiz');
+    try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  }
   enhanceUI();
   // D5 T2: setiap ganti layar SPA, fokus keyboard/pembaca layar tertinggal di elemen yang
   // baru saja dihancurkan (jatuh diam-diam ke <body>) - pengguna harus Tab dari nol.
@@ -9389,6 +9396,8 @@ function showAuthGate(at,next){
            (nama, kursus, tujuan, tes penempatan) di HP baru/sesudah keluar. Tandai onboarding selesai
            dan pastikan nama terisi agar langsung masuk ke Beranda (Homepage). */
         const isReturningStudent = role === 'murid' && (
+          via === 'guest' ||
+          via === 'local_bypass' ||
           action === 'masuk' ||
           (via === 'google' && action !== 'daftar') ||
           isNew === false ||
@@ -11955,41 +11964,6 @@ function todayHomeMarkup(){
       </div>
     </section>`;
 
-  /* Classroom Task Banner (Official KelasKu Emerald Identity) */
-  const kelaskuCard = `
-    <section class="class-bar fz-vissol-kelasku-bar" role="button" tabindex="0" aria-label="${esc(FiezelI18n.t('home.classroom-card'))}" onclick="showToast(FiezelI18n.t('home.classroom-tutup'))" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showToast(FiezelI18n.t('home.classroom-tutup'))}">
-      <div class="fz-vissol-kelasku-bg-curve" aria-hidden="true">
-        <svg viewBox="0 0 240 90" width="240" height="90" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="fzKelaskuDuneGrad" x1="1" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#A7F3D0" stop-opacity="0.35"/>
-              <stop offset="60%" stop-color="#D1FAE5" stop-opacity="0.2"/>
-              <stop offset="100%" stop-color="#F0FDF4" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <path d="M 40 90 C 70 50, 110 40, 150 60 C 180 75, 210 65, 240 80 L 240 90 Z" fill="url(#fzKelaskuDuneGrad)"/>
-        </svg>
-      </div>
-      <div class="fz-vissol-kelasku-left">
-        <div class="fz-vissol-kelasku-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
-          </svg>
-        </div>
-        <div class="fz-vissol-kelasku-info">
-          <div class="fz-vissol-kelasku-tag-row">
-            <span class="fz-vissol-kelasku-pill">KelasKu • ${esc(FiezelI18n.t('kelasku.strip-tugas-aktif'))}</span>
-          </div>
-          <h3 class="fz-vissol-kelasku-title">${esc(FiezelI18n.t('kelasku.strip-latihan-materi'))}</h3>
-          <p class="fz-vissol-kelasku-sub">${esc(FiezelI18n.t('kelasku.strip-sinkron-guru'))}</p>
-        </div>
-      </div>
-      <button type="button" class="fz-vissol-kelasku-btn" onclick="event.stopPropagation();showToast(FiezelI18n.t('home.classroom-tutup'))">
-        <span>${esc(FiezelI18n.t('home.segera'))}</span>
-        <span aria-hidden="true">➔</span>
-      </button>
-    </section>`;
-
   /* Home Cockpit: Render pure daylight Tactile Clay interface directly */
   return `<div class="today-home-cockpit fz-edu-cockpit tactile-home-cockpit">
   ${homeTop}
@@ -11998,7 +11972,6 @@ function todayHomeMarkup(){
   ${braincoreHomeCardMarkup()}
   ${progresBelajarCard}
   ${quickPracticeCard}
-  ${kelaskuCard}
   <div class="fz-tactile-audit-vault" style="display:none !important;" aria-hidden="true">
     ${card1Hero}
     ${card2Hero}
@@ -16648,7 +16621,7 @@ function quizLoop(cfg){
   * lagi, ia butuh satu hal dijelaskan sekali dengan tenang.
   */
  const teach=info=>{
-  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked,planned})}"><span>${asked}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><span class="quiz-teach-flag">${FiezelI18n.t('quiz.teach-flag')}</span></div><div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>${FiezelI18n.t('quiz.reteach-label')}</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">${FiezelI18n.t('quiz.reteach-intro')} ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${formatRuleForDisplay(esc(info.rule))}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">${FiezelI18n.t('quiz.reteach-ready')} <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
+  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked,planned})}"><div class="quiz-progress-text"><span class="quiz-progress-num">${asked}</span><span class="quiz-progress-sep">/</span><span class="quiz-progress-total">${planned}</span></div><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><span class="quiz-teach-flag">${FiezelI18n.t('quiz.teach-flag')}</span></div><div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>${FiezelI18n.t('quiz.reteach-label')}</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">${FiezelI18n.t('quiz.reteach-intro')} ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${formatRuleForDisplay(esc(info.rule))}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">${FiezelI18n.t('quiz.reteach-ready')} <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   /* R6 perbaikan-14: kartu ajar-ulang dibuka lewat quizNext yang sudah menyetel start, jadi
      lama MEMBACA kartu ikut terhitung sebagai waktu jawab soal berikutnya - mencemari bukti
@@ -16690,6 +16663,7 @@ function quizLoop(cfg){
     }
   }catch{}
   q=(cfg.placement||cfg.preserveOrder)?remaining[0]:(tutorPick(remaining,tutor,{forceConcept,avoidConcept:lastConcept,cfg})||remaining[0]);
+  window.__activeQuizQuestion=q;
   const at=remaining.indexOf(q);if(at>=0)remaining.splice(at,1);
   forceConcept='';
   /* m025-577 Alasan Soal: dibaca SEBELUM olmProbeConsume - sesudahnya antrean probe sudah
@@ -16736,6 +16710,8 @@ function quizLoop(cfg){
      Semua id (quizExit/quizNext/quizListen/quizListenNote/quizStem/options/feedback/tutorTurn)
      dan literal quiz-shell/quiz-mascot TETAP — kontrak r2/paw/lesson-experience. */
   $('quizFloatingBar')?.remove();
+  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   document.getElementById('quizScaffoldNudge')?.remove();
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
   /* P1-1 (audit UX 2026-10): milestone penyemangat di tengah jalan pada sesi panjang (>=10 soal). */
@@ -16784,8 +16760,9 @@ function quizLoop(cfg){
     }
     return `<span class="question-main">${formattedStem}</span>`;
   };
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(!MEASURE&&!cfg.placement&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,(MEASURE||cfg.placement)?'':q.focus.phonetic)}</span>${(q.focus.phonetic&&!MEASURE&&!cfg.placement)?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><div class="quiz-progress-text"><span class="quiz-progress-num">${asked+1}</span><span class="quiz-progress-sep">/</span><span class="quiz-progress-total">${planned}</span></div><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(!MEASURE&&!cfg.placement&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,(MEASURE||cfg.placement)?'':q.focus.phonetic)}</span>${(q.focus.phonetic&&!MEASURE&&!cfg.placement)?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
+  if(state?.targetLang==='ja'||q.type==='vocab'){$('quizGrammarHint')?.remove();}
   const hintBtn=$('quizGrammarHint');
   if(hintBtn){
     hintBtn.onclick=(e)=>{
@@ -17017,6 +16994,98 @@ function quizLoop(cfg){
    enhanceUI();
   };
 
+  /** Centered Pop-up Modal untuk Petunjuk Guru pada kesalahan pertama */
+  const showTutorHintModal=(questionObj,lastPickIndex,clueText)=>{
+   document.getElementById('tutorHintModalBackdrop')?.remove();
+   document.getElementById('tutorHintModal')?.remove();
+
+   const gd=stepTutorGuidance(questionObj);
+   const cleanDash=s=>String(s||'').replace(/\s*[—–]\s*/g,', ').replace(/,\s*,/g,', ');
+
+   let stepsHtml='';
+   if(gd&&Array.isArray(gd.steps)&&gd.steps.length){
+     stepsHtml=`<div class="tutor-modal-steps">
+       <div class="tutor-modal-steps-eyebrow"><i data-lucide="compass"></i> <span>${esc(FiezelI18n.t('tutor.tuntunan-eyebrow','TUNTUNAN LANGKAH'))}</span></div>
+       <div class="tutor-modal-steps-list">
+         ${gd.steps.map((s,idx)=>{
+           let stepText=cleanDash(s?.ask||'');
+           stepText=stepText.replace(/^(Langkah|ขั้นตอนที่)\s*\d+\s*:\s*/i,'').trim();
+           const pfxStr=FiezelI18n.t('brain-step.step-prefix',{n:idx+1})||`Langkah ${idx+1}: `;
+           return `<div class="tutor-modal-step-item">
+             <span class="tutor-modal-step-num">${idx+1}</span>
+             <div class="tutor-modal-step-text">
+               <span class="tutor-modal-step-pfx">${esc(pfxStr)}</span>
+               <span class="tutor-modal-step-desc">${esc(stepText)}</span>
+             </div>
+           </div>`;
+         }).join('')}
+       </div>
+     </div>`;
+   }
+
+   const backdrop=document.createElement('div');
+   backdrop.id='tutorHintModalBackdrop';
+   backdrop.className='tutor-hint-backdrop';
+
+   const modal=document.createElement('div');
+   modal.id='tutorHintModal';
+   modal.className='tutor-hint-modal';
+   modal.setAttribute('role','dialog');
+   modal.setAttribute('aria-modal','true');
+   modal.setAttribute('aria-label',FiezelI18n.t('quiz.petunjuk-guru','Petunjuk Guru'));
+
+   const displayClue=clueText||questionObj.__diagnosticClue||'';
+
+   modal.innerHTML=`<div class="tutor-modal-card">
+     <div class="tutor-modal-header">
+       <div class="tutor-modal-badge">
+         <i data-lucide="graduation-cap"></i>
+         <span>${esc(FiezelI18n.t('quiz.petunjuk-guru','Petunjuk Guru'))}</span>
+       </div>
+       <button type="button" id="tutorModalCloseX" class="tutor-modal-close-x" aria-label="${esc(FiezelI18n.t('modal.tutup','Tutup'))}">
+         <i data-lucide="x"></i>
+       </button>
+     </div>
+     <div class="tutor-modal-body">
+       <div class="tutor-modal-callout">
+         <div class="tutor-modal-callout-icon"><i data-lucide="lightbulb"></i></div>
+         <div class="tutor-modal-callout-content">
+           <h4 class="tutor-modal-callout-title">${esc(FiezelI18n.t('quiz.coba-lagi-title','Coba lagi — pilih jawaban lain'))}</h4>
+           ${displayClue?`<p class="tutor-modal-callout-text">${esc(displayClue)}</p>`:''}
+         </div>
+       </div>
+       ${stepsHtml}
+     </div>
+     <div class="tutor-modal-footer">
+       <button type="button" id="tutorModalRetryBtn" class="tutor-modal-retry-btn">
+         <i data-lucide="rotate-ccw"></i>
+         <span>${esc(FiezelI18n.t('quiz.coba-lagi-btn','Coba Lagi'))}</span>
+       </button>
+     </div>
+   </div>`;
+
+   document.body.appendChild(backdrop);
+   document.body.appendChild(modal);
+
+   const dismissModal=()=>{
+     backdrop.classList.add('is-closing');
+     modal.classList.add('is-closing');
+     setTimeout(()=>{
+       backdrop.remove();
+       modal.remove();
+     },220);
+   };
+
+   backdrop.onclick=dismissModal;
+   modal.querySelector('#tutorModalCloseX').onclick=dismissModal;
+   modal.querySelector('#tutorModalRetryBtn').onclick=()=>{
+     haptic('tap');
+     dismissModal();
+   };
+
+   enhanceUI();
+  };
+
   /** Format perbandingan jawaban murid vs kunci jawaban dengan sorotan diff kata. */
   const formatDiffPicks=(cleanUser,cleanCorr,question)=>{
     if(!cleanUser||!cleanCorr||cleanUser===cleanCorr){
@@ -17140,7 +17209,14 @@ function quizLoop(cfg){
     document.querySelectorAll('.option')[j]?.classList.add('wrong');
   }
   const turn=tutorCompose(q,j,ok,answer.scaffold||'tell',forced?'reteach':answer.move,answer.timing);
-  const f=$('feedback');f.classList.remove('hidden','feedback-success','feedback-error');f.classList.add(ok?'feedback-success':'feedback-error');
+  let f=$('feedback');
+  if(!f){
+    f=document.createElement('div');
+    f.id='feedback';
+    f.className='feedback hidden';
+    document.body.appendChild(f);
+  }
+  f.classList.remove('hidden','feedback-success','feedback-error');f.classList.add(ok?'feedback-success':'feedback-error');
   /* m025-377 (Opsi 1, bagian C): saat jawaban SALAH, tampilkan langsung alasan kenapa pilihan
      yang DIKLIK murid belum tepat (whyFailsId pilihan itu), bukan cuma menyembunyikannya di
      lipatan "bandingkan pilihan lain". Alasan benar tetap tampil lewat "Intinya" di bawah. */
@@ -17165,12 +17241,31 @@ function quizLoop(cfg){
     }
   }
 
-  let whyText=q.explain?.why||FiezelI18n.t('quiz.fallback-context');
+  let whyText=q.explain?.why||'';
   if(!ok){
-    if(/susunan kalimat sudah tepat/i.test(whyText)||whyText===FiezelI18n.t('grammar.susunan-kalimat-tepat','Urutan kata dan bentuk tata bahasa yang tepat.')){
+    if(!whyText||/susunan kalimat sudah tepat/i.test(whyText)||whyText===FiezelI18n.t('grammar.susunan-kalimat-tepat','Urutan kata dan bentuk tata bahasa yang tepat.')){
       whyText=q.explain?.rule
         ? FiezelI18n.t(q.type==='token-order'?'quiz.why-kalimat-tepat':'quiz.why-bentuk-tepat',{jawaban:cleanCorrect})
-        : FiezelI18n.t('quiz.fallback-context');
+        : '';
+    }
+  }
+
+  // Pedagogical zero-empty invariant for "INTINYA:"
+  if(!whyText||!String(whyText).trim()||whyText===FiezelI18n.t('quiz.fallback-context')){
+    if(q.explain?.rule&&String(q.explain.rule).trim()){
+      whyText=String(q.explain.rule).trim();
+    }else if(cleanCorrect){
+      if(q.type==='vocab'||q.target){
+        const wordLabel=q.focus?.word||q.targetWord||q.target||'';
+        const candidate=FiezelI18n.t('quiz-vocab.kalimat-paling-pas-dimaknai-coba',{word:wordLabel,arti:cleanCorrect});
+        whyText=(candidate&&!candidate.includes('quiz-vocab.'))
+          ? candidate
+          : FiezelI18n.t('quiz.vocab-why-correct',{word:wordLabel||cleanCorrect,meaning:cleanCorrect,posNote:''});
+      }else{
+        whyText=FiezelI18n.t('quiz.clean-correct-takeaway',{correct:cleanCorrect});
+      }
+    }else{
+      whyText=FiezelI18n.t('quiz.fallback-context');
     }
   }
 
@@ -17241,7 +17336,74 @@ function quizLoop(cfg){
       karena kunci ujian bisa menyala di antara jawaban dan pembahasan. */
    const stampText=(q.__memoryStamp&&memoryStampAllowed(cfg,MEASURE))?memoryStampText(q.__memoryStamp):'';
    const stampHtml=stampText?`<div class="feedback-stamp" data-testid="memory-stamp" data-stamp="${esc(q.__memoryStamp.kind)}">${esc(stampText)}</div>`:'';
-    f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}<p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p>${ruleText?`<details class="acc feedback-rule-details"><summary><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.lihat-aturan-lengkap','Lihat aturan lengkap')}</summary><div class="feedback-rule-body"><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${formatRuleForDisplay(esc(ruleText))}</p></div></details>`:''}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+    f.classList.remove('hidden');
+    f.classList.add('feedback-sheet', ok ? 'feedback-sheet-correct' : 'feedback-sheet-wrong', ok ? 'is-correct' : 'is-wrong');
+    let bd = document.getElementById('feedbackBackdrop');
+    if(!bd){
+      bd = document.createElement('div');
+      bd.id = 'feedbackBackdrop';
+      bd.className = 'feedback-sheet-backdrop';
+      document.body.appendChild(bd);
+    }
+    bd.classList.add('is-active');
+
+    // [CRITICAL ZERO-BLUR INVARIANT]
+    // Pindahkan #feedback langsung ke document.body agar tidak terjebak dalam stacking context
+    // lokal milik .card / .fade yang memiliki animasi transform/opacity.
+    // Menjadi sibling langsung dari bd di document.body menjamin z-index 10000 > 9998,
+    // sehingga backdrop TIDAK PERNAH menutupi atau memburamkan lembar umpan balik!
+    if (f.parentElement !== document.body) {
+      document.body.appendChild(f);
+    }
+
+    const closeFeedbackSheet = (advance = true) => {
+      window.__closeFeedbackSheet = null;
+      bd?.classList.remove('is-active');
+      f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
+      f.classList.add('hidden');
+      $('quizFloatingBar')?.remove();
+      if (advance) {
+        $('quizNext')?.click();
+      }
+    };
+    window.__closeFeedbackSheet = () => closeFeedbackSheet(false);
+
+    bd.onclick = () => closeFeedbackSheet(true);
+
+    f.innerHTML=`<div class="feedback-sheet-drag-handle" aria-hidden="true"></div><div class="feedback-sheet-header"><div class="feedback-status-pill ${ok?'is-correct':'is-wrong'}"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}<button type="button" id="feedbackSheetClose" class="feedback-sheet-close-btn" aria-label="${esc(FiezelI18n.t('modal.tutup','Tutup'))}"><i data-lucide="x"></i></button></div><div class="feedback-sheet-body"><div class="feedback-sheet-hero"><div class="feedback-answer-line">${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`<span class="feedback-answer-wrong">${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}</span> <span class="feedback-answer-sep">•</span> <span class="feedback-answer-correct">${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.</span>`}</div>${pickedWhyFails?`<div class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</div>`:''}${stepGuidanceHtml}<div class="feedback-takeaway-card"><div class="takeaway-badge"><i data-lucide="lightbulb"></i> <span>${FiezelI18n.t('quiz.intinya')}</span></div><p class="takeaway-text">${esc(whyText)}</p></div></div><details class="feedback-drawer-details"><summary class="feedback-drawer-summary"><span class="drawer-summary-label"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.pembahasan-lengkap','Pembahasan & Aturan Lengkap')}</span><i data-lucide="chevron-down" class="drawer-chevron"></i></summary><div class="feedback-drawer-content">${ruleText?`<div class="feedback-rule-box feedback-rule-pill"><span class="rule-kicker"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.aturannya','Aturan Tata Bahasa')}</span><div class="rule-content">${formatRuleForDisplay(esc(ruleText))}</div></div>`:''}${(q.explain?.distractor||q.explain?.distractors)?`<div class="feedback-distractor-box"><span class="distractor-kicker">${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</span><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</div>`:''}<div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="zap"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button type="button" class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button></div></details></div><div class="feedback-sheet-footer">${!ok?`<div class="feedback-sheet-secondary-row"><button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button><button type="button" id="quizSheetExplain" class="feedback-sheet-explain-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.buka-pembahasan','Buka Pembahasan')}</span></button></div>`:`<button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button>`}<button type="button" id="quizSheetNext" class="feedback-sheet-next-btn ${ok?'btn-correct':'btn-wrong'}"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button></div>`;
+
+    const sheetCloseBtn = $('feedbackSheetClose');
+    if(sheetCloseBtn){
+      sheetCloseBtn.onclick=()=>{
+        haptic('tap');
+        $('quizExit')?.click();
+      };
+    }
+    const sheetExitBtn = $('quizSheetExit');
+    if(sheetExitBtn){
+      sheetExitBtn.onclick=()=>{
+        haptic('tap');
+        $('quizExit')?.click();
+      };
+    }
+    const sheetExplainBtn = $('quizSheetExplain');
+    if(sheetExplainBtn){
+      sheetExplainBtn.onclick=()=>{
+        haptic('tap');
+        const details = f.querySelector('.feedback-drawer-details');
+        if(details){
+          details.open = true;
+          try{details.scrollIntoView({behavior:'smooth',block:'nearest'})}catch(_){}
+        }
+      };
+    }
+    const sheetNextBtn = $('quizSheetNext');
+    if(sheetNextBtn){
+      sheetNextBtn.onclick=()=>{
+        haptic('tap');
+        closeFeedbackSheet(true);
+      };
+    }
   /* Audit G6: sesudah pembahasan jawaban SALAH dibuka, giliran tutor dulu (a) mengulang
      kalimat "Mengapa kurang tepat?" yang sama persis di kotak pembahasan tepat di atasnya,
      dan (b) pada tangga probe/hint menutup dengan "Sekarang coba jawab lagi ya" padahal semua
@@ -17255,7 +17417,8 @@ function quizLoop(cfg){
   }
   answer.locked=true;
   $('quizNext').disabled=false;
-  showQuizFloatingNext();
+  $('quizFloatingBar')?.remove();
+  if(!f.classList.contains('feedback-sheet')){showQuizFloatingNext();}
   // R2-5: popup keyakinan TIDAK lagi dibuka di sini - ia sudah selesai SEBELUM panel
   // analyzing berjalan (lihat answer()), jadi pembahasan ini tercat di layar yang bersih.
   $('aiExplainBtn').onclick=()=>explainWithAI(q,j);
@@ -17461,6 +17624,9 @@ function quizLoop(cfg){
    document.getElementById('quizScaffoldNudge')?.remove();
    document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
 
+   let hintClueReason='';
+   let nudgeText='';
+
    if(q.type==='token-order'){
      const submitBtn=button;
      if(submitBtn){
@@ -17486,13 +17652,14 @@ function quizLoop(cfg){
      });
 
      q.__diagnosticClue=diagnoseTokenOrderMistake(q,{hideKey:true});
+     hintClueReason=q.__diagnosticClue||'';
+     nudgeText=hintClueReason||FiezelI18n.t('quiz.scaffold-retry-token-banner','Belum tepat, coba susun ulang lalu periksa lagi yuk');
    }else{
      button.disabled=true;
      button.classList.add('was-tried');
      if(!button.querySelector('.tried-tag')){
        button.insertAdjacentHTML('beforeend',` <span class="tried-tag">${FiezelI18n.t('quiz.sudah-dicoba','Sudah dicoba')}</span>`);
      }
-     let nudgeText='';
      const userChoice=q.options?.[j];
      let rawReason='';
      if(Array.isArray(q.explain?.distractors)){
@@ -17510,7 +17677,9 @@ function quizLoop(cfg){
      /* Audit pedagogi 2026-10-11 (P2): nudge ini tampil SEBELUM jawaban dibuka, jadi kuncinya
         disamarkan; dan pada kalimat "Pilihan “X” kurang tepat:" kutipan pembuka “X” di awal
         alasan tidak diulang ("Pilihan “can” kurang tepat: “can” “last night” ..."). */
-     let cleanReason=grammarHideKey(String(rawReason||'').trim(),q.options?.[q.answerIndex],userChoice).replace(/\.+$/,'');
+     let cleanReason=grammarHideKey(String(rawReason||'').trim(),q.options?.[q.answerIndex],userChoice);
+     cleanReason=cleanReason.replace(/\.+$/,'');
+     hintClueReason=cleanReason;
      const pickQuoted=`“${String(userChoice??'').trim()}”`;
      if(answer.scaffold!=='probe'&&cleanReason.toLowerCase().startsWith(pickQuoted.toLowerCase())){
        const rest=cleanReason.slice(pickQuoted.length).trim();
@@ -17543,8 +17712,9 @@ function quizLoop(cfg){
    }
 
    const mirip=answer.scaffold==='worked'?grammarSimilarExample(q):null;
+   const turn=tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing,{session:tutor,similar:mirip});
    showQuizFloatingRetry(q,j);
-   speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing,{session:tutor,similar:mirip}),{retry:true,similar:!!mirip});
+   showTutorHintModal(q,j,hintClueReason||nudgeText);
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
    enhanceUI();
    return;
@@ -17559,10 +17729,17 @@ function quizLoop(cfg){
   if(ttHost){ttHost.classList.add('hidden');ttHost.innerHTML=''}
   document.getElementById('quizScaffoldNudge')?.remove();
   $('quizFloatingBar')?.remove();
+  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
   /* W1 P1-1: mode ukur melompati popup keyakinan (verdiknya tertulis di popup itu) DAN
      teater analyzing 700ms \u2014 langsung ke tanda terima netral. */
   if(MEASURE||cfg.placement){reveal(q,j,ok);return}
+  if(!ok&&!firstTry){
+    // Percobaan kedua yang salah: langsung buka feedback bottom sheet dengan TOMBOL LANJUT dan TOMBOL BUKA PEMBAHASAN
+    reveal(q,j,false);
+    return;
+  }
   confidencePopThen=()=>showCoreAnalyzing(()=>reveal(q,j,ok));
   confidencePopSkipThen=ok?()=>{reveal(q,j,ok);$('quizNext')?.click()}:null;
   openConfidencePop(ok);
@@ -17745,6 +17922,8 @@ function quizLoop(cfg){
  // selamanya sebagai "sedang berjalan".
  enterStage('quiz',{draw:()=>draw(),leave:()=>{
   $('quizFloatingBar')?.remove();
+  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   if(!cfg.__finished)abandonActiveSession('quiz_exit')
  }});
  draw();
