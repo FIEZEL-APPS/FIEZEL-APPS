@@ -861,7 +861,7 @@ html body:not(.fz-teacher-mode) .flash-back h3.flash-meaning,
      tidak pernah benar-benar terangkat dari latarnya. Scrim gelap turunan --text
      memisahkan keduanya tanpa menambah satu elemen pun. */
   position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(18px);
-  display:grid;place-items:center;z-index:100;opacity:0;pointer-events:none;transition:opacity var(--dur-l) var(--ease);
+  display:grid;place-items:center;z-index:2500 !important;opacity:0;pointer-events:none;transition:opacity var(--dur-l) var(--ease);
   padding:20px;
 }
 .welcome.show,.modal.show{opacity:1;pointer-events:auto}
@@ -12567,7 +12567,8 @@ body.fz-stage-quiz .vocab-focus .phonetic,
 }
 
 /* 2. Slide-Up Bottom Sheet Container */
-#feedback.feedback-sheet {
+#feedback.feedback-sheet,
+body > #feedback.feedback-sheet {
   position: fixed !important;
   left: 0 !important;
   right: 0 !important;
@@ -12580,13 +12581,31 @@ body.fz-stage-quiz .vocab-focus .phonetic,
   border-radius: 28px 28px 0 0 !important;
   background: #FFFFFF !important;
   color: #0F172A !important;
-  box-shadow: 0 -12px 40px rgba(15, 23, 42, 0.16), 0 -2px 8px rgba(0, 0, 0, 0.04) !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  box-shadow: 0 -12px 40px rgba(15, 23, 42, 0.2), 0 -2px 8px rgba(0, 0, 0, 0.06) !important;
   display: flex !important;
   flex-direction: column !important;
   max-height: 85vh !important;
   animation: fzFeedbackSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) both !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
+}
+
+@media (min-width: 768px) {
+  #feedback.feedback-sheet,
+  body > #feedback.feedback-sheet {
+    left: 232px !important;
+    right: 0 !important;
+    width: min(680px, calc(100% - 256px)) !important;
+    max-width: 680px !important;
+    margin: 0 auto !important;
+    border-radius: 28px 28px 0 0 !important;
+  }
 }
 
 @keyframes fzFeedbackSlideUp {

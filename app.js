@@ -6658,7 +6658,7 @@ function setApp(html){
     document.body?.classList?.remove?.('fz-stage-home');
   } else if (String(html).includes('home-page')) {
     document.body?.classList?.remove?.('fz-stage-quiz');
-    try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+    try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);document.body.querySelectorAll('body > #feedback.feedback-sheet').forEach(el=>el.remove());}catch(_){}
   }
   enhanceUI();
   // D5 T2: setiap ganti layar SPA, fokus keyboard/pembaca layar tertinggal di elemen yang
@@ -16743,7 +16743,7 @@ function quizLoop(cfg){
      Semua id (quizExit/quizNext/quizListen/quizListenNote/quizStem/options/feedback/tutorTurn)
      dan literal quiz-shell/quiz-mascot TETAP — kontrak r2/paw/lesson-experience. */
   $('quizFloatingBar')?.remove();
-  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);document.body.querySelectorAll('body > #feedback.feedback-sheet').forEach(el=>el.remove());}catch(_){}
   const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   document.getElementById('quizScaffoldNudge')?.remove();
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
@@ -17260,12 +17260,28 @@ function quizLoop(cfg){
       document.body.appendChild(bd);
     }
     bd.classList.add('is-active');
-    bd.onclick = () => {
-      bd.classList.remove('is-active');
-      f.classList.add('hidden');
+
+    // [CRITICAL ZERO-BLUR INVARIANT]
+    // Pindahkan #feedback langsung ke document.body agar tidak terjebak dalam stacking context
+    // lokal milik .card / .fade yang memiliki animasi transform/opacity.
+    // Menjadi sibling langsung dari bd di document.body menjamin z-index 10000 > 9998,
+    // sehingga backdrop TIDAK PERNAH menutupi atau memburamkan lembar umpan balik!
+    if (f.parentElement !== document.body) {
+      document.body.appendChild(f);
+    }
+
+    const closeFeedbackSheet = () => {
+      bd?.classList.remove('is-active');
       f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
+      f.classList.add('hidden');
+      if (f.parentElement === document.body) {
+        f.remove();
+      }
+      $('quizFloatingBar')?.remove();
       $('quizNext')?.click();
     };
+
+    bd.onclick = closeFeedbackSheet;
 
     f.innerHTML=`<div class="feedback-sheet-drag-handle" aria-hidden="true"></div><div class="feedback-sheet-header"><div class="feedback-status-pill ${ok?'is-correct':'is-wrong'}"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}</div><div class="feedback-sheet-hero"><div class="feedback-answer-line">${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`<span class="feedback-answer-wrong">${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}</span> <span class="feedback-answer-sep">•</span> <span class="feedback-answer-correct">${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.</span>`}</div>${pickedWhyFails?`<div class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</div>`:''}${stepGuidanceHtml}<div class="feedback-takeaway-card"><div class="takeaway-badge"><i data-lucide="lightbulb"></i> <span>${FiezelI18n.t('quiz.intinya')}</span></div><p class="takeaway-text">${esc(whyText)}</p></div></div><details class="feedback-drawer-details"><summary class="feedback-drawer-summary"><span class="drawer-summary-label"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.pembahasan-lengkap','Pembahasan & Aturan Lengkap')}</span><i data-lucide="chevron-down" class="drawer-chevron"></i></summary><div class="feedback-drawer-content">${ruleText?`<div class="feedback-rule-box"><span class="rule-kicker"><i data-lucide="scale"></i> ${FiezelI18n.t('quiz.aturannya','Aturan Tata Bahasa')}</span><div class="rule-content">${formatRuleForDisplay(esc(ruleText))}</div></div>`:''}${(q.explain?.distractor||q.explain?.distractors)?`<div class="feedback-distractor-box"><span class="distractor-kicker">${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</span><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</div>`:''}<div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="zap"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button type="button" class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button></div></details><div class="feedback-sheet-footer"><button type="button" id="quizSheetNext" class="feedback-sheet-next-btn ${ok?'btn-correct':'btn-wrong'}"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button></div>`;
 
@@ -17273,11 +17289,7 @@ function quizLoop(cfg){
     if(sheetNextBtn){
       sheetNextBtn.onclick=()=>{
         haptic('tap');
-        bd?.classList.remove('is-active');
-        f.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');
-        f.classList.add('hidden');
-        $('quizFloatingBar')?.remove();
-        $('quizNext')?.click();
+        closeFeedbackSheet();
       };
     }
   /* Audit G6: sesudah pembahasan jawaban SALAH dibuka, giliran tutor dulu (a) mengulang
@@ -17597,7 +17609,7 @@ function quizLoop(cfg){
   if(ttHost){ttHost.classList.add('hidden');ttHost.innerHTML=''}
   document.getElementById('quizScaffoldNudge')?.remove();
   $('quizFloatingBar')?.remove();
-  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);document.body.querySelectorAll('body > #feedback.feedback-sheet').forEach(el=>el.remove());}catch(_){}
   const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
   /* W1 P1-1: mode ukur melompati popup keyakinan (verdiknya tertulis di popup itu) DAN
@@ -17785,7 +17797,7 @@ function quizLoop(cfg){
  // selamanya sebagai "sedang berjalan".
  enterStage('quiz',{draw:()=>draw(),leave:()=>{
   $('quizFloatingBar')?.remove();
-  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);document.body.querySelectorAll('body > #feedback.feedback-sheet').forEach(el=>el.remove());}catch(_){}
   const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   if(!cfg.__finished)abandonActiveSession('quiz_exit')
  }});
