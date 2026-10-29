@@ -91,6 +91,8 @@
     'auth.layar.selamat-datang': 'ยินดีต้อนรับ',
     'auth.layar.sudah-akun': 'มีบัญชีแล้วใช่ไหม?',
     'auth.layar.sudah-guru': 'มีบัญชีครูแล้วใช่ไหม?',
+    'auth.layar.tamu': 'เข้าสู่ระบบในฐานะผู้เยี่ยมชม',
+    'auth.layar.tamu-hint': 'เรียนได้ทันทีโดยไม่ต้องมีบัญชี ความคืบหน้าจะบันทึกไว้ในเครื่องนี้',
     'auth.layar.ulangi-sandi': 'ยืนยันรหัสผ่าน',
     'auth.layar.welcome-lead': 'เรียนภาษาอังกฤษและภาษาญี่ปุ่นแบบปรับตัว เข้าสู่ระบบครั้งเดียว ความคืบหน้าของคุณตามไปทุกเครื่อง',
     /* --- m025-464 progres ikut akun (sinkron berizin) --- */

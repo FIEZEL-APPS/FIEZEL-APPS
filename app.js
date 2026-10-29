@@ -9453,6 +9453,8 @@ function showAuthGate(at,next){
            (nama, kursus, tujuan, tes penempatan) di HP baru/sesudah keluar. Tandai onboarding selesai
            dan pastikan nama terisi agar langsung masuk ke Beranda (Homepage). */
         const isReturningStudent = role === 'murid' && (
+          via === 'guest' ||
+          via === 'local_bypass' ||
           action === 'masuk' ||
           (via === 'google' && action !== 'daftar') ||
           isNew === false ||
