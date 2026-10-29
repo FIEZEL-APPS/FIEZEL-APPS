@@ -794,12 +794,21 @@ html body:not(.fz-teacher-mode) .flash-back h3.flash-meaning,
   padding:max(10px,env(safe-area-inset-top)) 0 var(--sp-3);background:rgba(var(--bg-rgb),.9);backdrop-filter:blur(14px)
 }
 .quiz-exit{min-width:44px;min-height:44px}
-.quiz-progress{display:grid;grid-template-columns:auto auto;justify-content:center;align-items:baseline;gap:2px 4px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
-.quiz-progress span{font-size:var(--fs-body)}
-.quiz-progress em{font-style:normal;color:var(--muted-soft)}
-/* bar 4px --sun di bawah teks n/25: lapisan sekilas-pandang, teksnya tetap yang utama.
+.quiz-progress{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;text-align:center !important;font-weight:700 !important;font-variant-numeric:tabular-nums !important;min-width:0 !important}
+.quiz-progress-text{display:inline-flex !important;flex-direction:row !important;align-items:center !important;justify-content:center !important;gap:4px !important;white-space:nowrap !important;font-variant-numeric:tabular-nums !important;line-height:1 !important}
+.quiz-progress-text *,
+.quiz-progress span,
+.quiz-progress em,
+.quiz-progress-num,
+.quiz-progress-sep,
+.quiz-progress-total{display:inline-block !important;white-space:nowrap !important;line-height:1 !important;font-size:var(--fs-body,16px) !important}
+.quiz-progress em,
+.quiz-progress-sep,
+.quiz-progress-total{font-style:normal !important;color:#64748B !important;font-weight:700 !important}
+.quiz-progress-num{color:#0F172A !important;font-weight:800 !important}
+/* bar 5px --sun di bawah teks n/25: lapisan sekilas-pandang, teksnya tetap yang utama.
    Isi = soal TERJAWAB (scaleX var(--p) dipasang inline oleh draw()/teach). */
-.quiz-progress-bar{grid-column:1/-1;display:block;height:4px;width:min(220px,100%);margin:4px auto 0;
+.quiz-progress-bar{display:block;height:5px;width:min(200px,85%);margin:4px auto 0;
   background:var(--line-soft);border-radius:var(--radius-pill);overflow:hidden}
 .quiz-progress-bar b{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--sun-deep));
   border-radius:var(--radius-pill);transform:scaleX(var(--p,0));transform-origin:left;transition:transform var(--dur-xl) var(--ease)} /* i15: isi progres = resep --dur-xl (O4 §9) */
@@ -8795,14 +8804,22 @@ body:has(.home-today) .quiz-topbar,
 
 .quiz-topbar span,
 .quiz-progress span,
+.quiz-progress-text,
+.quiz-progress-num,
 .stage-counter {
   color: #0F172A !important;
   font-weight: 800 !important;
+  white-space: nowrap !important;
+  display: inline-block !important;
 }
 
 .quiz-topbar em,
-.quiz-progress em {
+.quiz-progress em,
+.quiz-progress-sep,
+.quiz-progress-total {
   color: #64748B !important;
+  white-space: nowrap !important;
+  display: inline-block !important;
 }
 
 .quiz-exit {
@@ -12867,29 +12884,126 @@ body > #feedback.feedback-sheet {
   display: block !important;
 }
 
+/* Scrollable Body inside Feedback Sheet to prevent footer from overflowing */
+.feedback-sheet-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 4px 18px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+/* Header Close [×] Button */
+.feedback-sheet-close-btn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #475569 !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  transition: all 0.15s ease !important;
+}
+.feedback-sheet-close-btn:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+.feedback-sheet-close-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
 /* 7. Docked Thumb Zone Action Footer */
 .feedback-sheet-footer {
-  padding: 8px 18px max(12px, env(safe-area-inset-bottom, 12px)) !important;
+  padding: 10px 18px max(12px, env(safe-area-inset-bottom, 12px)) !important;
   background: #FFFFFF !important;
-  border-top: 1px solid #F1F5F9 !important;
+  border-top: 1px solid #E2E8F0 !important;
   flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 20 !important;
+}
+
+.feedback-sheet-exit-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  height: 48px !important;
+  padding: 0 16px !important;
+  border-radius: 999px !important;
+  background: #F1F5F9 !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #475569 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  transition: all 0.15s ease !important;
+}
+.feedback-sheet-exit-btn:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+.feedback-sheet-exit-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.feedback-sheet-explain-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  height: 48px !important;
+  padding: 0 16px !important;
+  border-radius: 999px !important;
+  background: #FFFBEB !important;
+  border: 1.5px solid #FDE68A !important;
+  color: #B45309 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  transition: all 0.15s ease !important;
+}
+.feedback-sheet-explain-btn:hover {
+  background: #FEF3C7 !important;
+}
+.feedback-sheet-explain-btn svg {
+  width: 16px !important;
+  height: 16px !important;
 }
 
 .feedback-sheet-next-btn {
-  display: flex !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
-  width: 100% !important;
-  height: 50px !important;
-  min-height: 50px !important;
+  flex: 1 1 auto !important;
+  height: 48px !important;
+  min-height: 48px !important;
   border-radius: 999px !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 16px !important;
+  font-size: 15px !important;
   font-weight: 800 !important;
   cursor: pointer !important;
   border: none !important;
   outline: none !important;
+  white-space: nowrap !important;
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease !important;
   box-sizing: border-box !important;
 }
@@ -12908,6 +13022,253 @@ body > #feedback.feedback-sheet {
 
 .feedback-sheet-next-btn:active {
   transform: scale(0.98) !important;
+}
+
+/* Centered Petunjuk Guru Pop-up Modal */
+.tutor-hint-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 99998 !important;
+  animation: fzFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+.tutor-hint-backdrop.is-closing {
+  animation: fzFadeOut 0.18s ease forwards !important;
+}
+.tutor-hint-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(440px, calc(100vw - 32px)) !important;
+  max-height: min(85vh, 640px) !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  animation: fzModalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  box-sizing: border-box !important;
+}
+.tutor-hint-modal.is-closing {
+  animation: fzModalPopOut 0.18s ease forwards !important;
+}
+@keyframes fzFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fzFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes fzModalPopIn {
+  0% { transform: translate(-50%, -46%) scale(0.95); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+@keyframes fzModalPopOut {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -48%) scale(0.96); opacity: 0; }
+}
+.tutor-modal-card {
+  background: #FFFFFF !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 1.5px solid #E2E8F0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: min(85vh, 640px) !important;
+}
+.tutor-modal-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 18px 10px !important;
+  border-bottom: 1px solid #F1F5F9 !important;
+  flex-shrink: 0 !important;
+}
+.tutor-modal-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #ECFDF5 !important;
+  border: 1px solid #A7F3D0 !important;
+  color: #065F46 !important;
+  padding: 5px 12px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+}
+.tutor-modal-badge svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: #059669 !important;
+}
+.tutor-modal-close-x {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #64748B !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+.tutor-modal-close-x:hover {
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+.tutor-modal-close-x svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+.tutor-modal-body {
+  padding: 14px 18px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+.tutor-modal-callout {
+  display: flex !important;
+  gap: 12px !important;
+  padding: 12px 14px !important;
+  background: #FFFBEB !important;
+  border: 1.5px solid #FDE68A !important;
+  border-radius: 16px !important;
+  align-items: flex-start !important;
+}
+.tutor-modal-callout-icon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #F59E0B !important;
+  color: #D97706 !important;
+  display: grid !important;
+  place-items: center !important;
+  flex-shrink: 0 !important;
+}
+.tutor-modal-callout-icon svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+.tutor-modal-callout-content {
+  flex: 1 1 auto !important;
+}
+.tutor-modal-callout-title {
+  margin: 0 0 4px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #92400E !important;
+  line-height: 1.35 !important;
+}
+.tutor-modal-callout-text {
+  margin: 0 !important;
+  font-size: 13px !important;
+  color: #78350F !important;
+  line-height: 1.5 !important;
+  font-weight: 600 !important;
+}
+.tutor-modal-steps {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+}
+.tutor-modal-steps-eyebrow {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  color: #64748B !important;
+  margin-bottom: 10px !important;
+  text-transform: uppercase !important;
+}
+.tutor-modal-steps-eyebrow svg {
+  width: 13px !important;
+  height: 13px !important;
+  color: #3B82F6 !important;
+}
+.tutor-modal-steps-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+.tutor-modal-step-item {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+.tutor-modal-step-num {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  background: #FEF3C7 !important;
+  border: 1.5px solid #D97706 !important;
+  color: #92400E !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  display: grid !important;
+  place-items: center !important;
+  flex-shrink: 0 !important;
+  margin-top: 2px !important;
+}
+.tutor-modal-step-text {
+  flex: 1 1 auto !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: #1E293B !important;
+}
+.tutor-modal-step-pfx {
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  white-space: nowrap !important;
+  margin-right: 4px !important;
+}
+.tutor-modal-step-desc {
+  font-weight: 600 !important;
+  color: #334155 !important;
+}
+.tutor-modal-footer {
+  padding: 12px 18px 16px !important;
+  border-top: 1px solid #F1F5F9 !important;
+  background: #FFFFFF !important;
+  flex-shrink: 0 !important;
+}
+.tutor-modal-retry-btn {
+  width: 100% !important;
+  height: 48px !important;
+  background: #0284C7 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 999px !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35) !important;
+  transition: transform 0.15s ease, background 0.15s ease !important;
+}
+.tutor-modal-retry-btn:hover {
+  background: #0369A1 !important;
+}
+.tutor-modal-retry-btn:active {
+  transform: scale(0.98) !important;
+}
+.tutor-modal-retry-btn svg {
+  width: 18px !important;
+  height: 18px !important;
 }
 
 /* Hide floating bar when bottom sheet is active */

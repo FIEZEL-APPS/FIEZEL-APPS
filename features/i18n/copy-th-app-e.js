@@ -117,6 +117,10 @@
     'tutor.ladder-hint': 'เคล็ดลับช่วยจำ',
     'tutor.ladder-worked': 'ตัวอย่างคล้ายกันจากข้ออื่น',
     'tutor.ladder-worked-now': 'ทีนี้ใช้ขั้นตอนเดียวกันกับข้อของคุณ',
-    'quiz.pill-penguasaan': 'ความชำนาญ {persen}%'
+    'quiz.pill-penguasaan': 'ความชำนาญ {persen}%',
+    'quiz.coba-lagi-title': 'ลองอีกครั้ง — เลือกคำตอบอื่น',
+    'quiz.coba-lagi-btn': 'ลองอีกครั้ง',
+    'quiz.buka-pembahasan': 'เปิดคำอธิบาย',
+    'quiz.keluar': 'ออก'
   });
 }());

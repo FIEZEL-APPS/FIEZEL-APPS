@@ -117,6 +117,10 @@
     'tutor.ladder-hint': 'Pegangan ingatan',
     'tutor.ladder-worked': 'Contoh mirip dari soal lain',
     'tutor.ladder-worked-now': 'Sekarang pakai langkah yang sama untuk soalmu.',
-    'quiz.pill-penguasaan': 'Penguasaan {persen}%'
+    'quiz.pill-penguasaan': 'Penguasaan {persen}%',
+    'quiz.coba-lagi-title': 'Coba lagi — pilih jawaban lain',
+    'quiz.coba-lagi-btn': 'Coba Lagi',
+    'quiz.buka-pembahasan': 'Buka Pembahasan',
+    'quiz.keluar': 'Keluar'
   });
 }());
