@@ -8587,34 +8587,6 @@ function startWelcomeExperience(){
         dismissBootSplash();
         return openApp();
       }
-      const isLocalHostDev = typeof location !== 'undefined' && !!location && (
-        location.hostname === 'localhost' || 
-        location.hostname === '127.0.0.1' ||
-        String(location.search || '').includes('bypass_auth') ||
-        String(location.search || '').includes('dev=1')
-      );
-      if (isLocalHostDev) {
-        onboardingDone = true;
-        if (!state.userName || state.userName === 'Teman Belajar') {
-          state.userName = 'Penguji Lokal';
-        }
-        state.level = state.level || 1;
-        state.placementDone = true;
-        state.streak = state.streak || 1;
-        state.gems = state.gems || { balance: 120 };
-        try { if (typeof save === 'function') save(); } catch (_) {}
-        try {
-          if (self.FiezelOnboarding?.markCompleted) {
-            self.FiezelOnboarding.markCompleted(self, {
-              at: Date.now(),
-              via: 'local_bypass',
-              name: state?.userName || 'Penguji Lokal',
-              locale: 'id',
-              role: 'murid'
-            });
-          }
-        } catch (_) {}
-      }
       if(authGateNeeded()){showAuthGate(at,proceed);return null}
       /* m025-576: penanda lokal bilang "sudah masuk", tetapi server boleh berkata lain
          (penanda sisa kunjungan di browser, sesi kedaluwarsa). Jawabannya sudah ditanyakan
@@ -9372,30 +9344,6 @@ function teacherPreviewActive(){
 }
 function authGateNeeded(){
   if(teacherPreviewActive())return false;
-  /* m025-719: Bypass otomatis untuk pengujian di localhost / 127.0.0.1 agar pengembang tidak terhalang Google OAuth origin_mismatch */
-  const isLocalHost = typeof location !== 'undefined' && !!location && (
-    location.hostname === 'localhost' || 
-    location.hostname === '127.0.0.1' || 
-    String(location.search || '').includes('bypass_auth') || 
-    String(location.search || '').includes('dev=1')
-  );
-  if (isLocalHost) {
-    const A = self.FiezelAuthScreen;
-    if (A && typeof A.saveSession === 'function') {
-      try { A.saveSession(self, { role: 'murid', via: 'local_bypass' }); } catch (_) {}
-    }
-    try {
-      if (typeof state !== 'undefined' && state) {
-        if (!state.userName || state.userName === 'Teman Belajar') state.userName = 'Penguji Lokal';
-        state.level = state.level || 1;
-        state.placementDone = true;
-        state.streak = state.streak || 1;
-        state.gems = state.gems || { balance: 120 };
-        if (typeof save === 'function') save();
-      }
-    } catch (_) {}
-    return false;
-  }
   /* m025-704 / AGENTS.md Rule 7: Zero-Modal Collision & First-Touch Serenity
      Murid baru (onboarding belum selesai) WAJIB menikmati pengalaman selamat datang & latihan pertama dulu. */
   try{
@@ -9411,11 +9359,6 @@ function authGateNeeded(){
   return true;
 }
 function showAuthGate(at,next){
-  /* m025-719: Bypass total auth gate di localhost agar pengembang langsung masuk beranda tanpa login modal */
-  if (typeof location !== 'undefined' && !!location && (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || String(location.search || '').includes('bypass_auth'))) {
-    if (typeof next === 'function') try { next(); } catch (_) {}
-    return null;
-  }
   /* m025-576: murid sedang melewati layar masuk, jadi jawaban server dari awal boot sudah basi -
      proceed() sesudah masuk tidak boleh menunggunya lagi. */
   bootAuthVerdictUsed=true;
@@ -17313,16 +17256,16 @@ function quizLoop(cfg){
       whyText=String(q.explain.rule).trim();
     }else if(cleanCorrect){
       if(q.type==='vocab'||q.target){
-        const wordLabel=q.focus?.word||q.targetWord||q.target||'Kata ini';
+        const wordLabel=q.focus?.word||q.targetWord||q.target||'';
         const candidate=FiezelI18n.t('quiz-vocab.kalimat-paling-pas-dimaknai-coba',{word:wordLabel,arti:cleanCorrect});
         whyText=(candidate&&!candidate.includes('quiz-vocab.'))
           ? candidate
-          : `Arti yang paling tepat untuk "${wordLabel}" adalah "${cleanCorrect}". Pahami konteks kalimat secara menyeluruh.`;
+          : FiezelI18n.t('quiz.vocab-why-correct',{word:wordLabel||cleanCorrect,meaning:cleanCorrect,posNote:''});
       }else{
-        whyText=`Jawaban yang paling tepat adalah "${cleanCorrect}". Perhatikan pola kalimat dan maknanya secara utuh.`;
+        whyText=FiezelI18n.t('quiz.clean-correct-takeaway',{correct:cleanCorrect});
       }
     }else{
-      whyText=FiezelI18n.t('quiz.fallback-context')||'Pahami makna dan konteks kalimat secara menyeluruh.';
+      whyText=FiezelI18n.t('quiz.fallback-context');
     }
   }
 
@@ -17413,15 +17356,17 @@ function quizLoop(cfg){
       document.body.appendChild(f);
     }
 
-    const closeFeedbackSheet = () => {
+    const closeFeedbackSheet = (advance = true) => {
       bd?.classList.remove('is-active');
       f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
       f.classList.add('hidden');
       $('quizFloatingBar')?.remove();
-      $('quizNext')?.click();
+      if (advance) {
+        $('quizNext')?.click();
+      }
     };
 
-    bd.onclick = closeFeedbackSheet;
+    bd.onclick = () => closeFeedbackSheet(true);
 
     f.innerHTML=`<div class="feedback-sheet-drag-handle" aria-hidden="true"></div><div class="feedback-sheet-header"><div class="feedback-status-pill ${ok?'is-correct':'is-wrong'}"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}<button type="button" id="feedbackSheetClose" class="feedback-sheet-close-btn" aria-label="${esc(FiezelI18n.t('common.tutup','Tutup'))}"><i data-lucide="x"></i></button></div><div class="feedback-sheet-body"><div class="feedback-sheet-hero"><div class="feedback-answer-line">${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`<span class="feedback-answer-wrong">${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}</span> <span class="feedback-answer-sep">•</span> <span class="feedback-answer-correct">${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.</span>`}</div>${pickedWhyFails?`<div class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</div>`:''}${stepGuidanceHtml}<div class="feedback-takeaway-card"><div class="takeaway-badge"><i data-lucide="lightbulb"></i> <span>${FiezelI18n.t('quiz.intinya')}</span></div><p class="takeaway-text">${esc(whyText)}</p></div></div><details class="feedback-drawer-details"><summary class="feedback-drawer-summary"><span class="drawer-summary-label"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.pembahasan-lengkap','Pembahasan & Aturan Lengkap')}</span><i data-lucide="chevron-down" class="drawer-chevron"></i></summary><div class="feedback-drawer-content">${ruleText?`<div class="feedback-rule-box"><span class="rule-kicker"><i data-lucide="scale"></i> ${FiezelI18n.t('quiz.aturannya','Aturan Tata Bahasa')}</span><div class="rule-content">${formatRuleForDisplay(esc(ruleText))}</div></div>`:''}${(q.explain?.distractor||q.explain?.distractors)?`<div class="feedback-distractor-box"><span class="distractor-kicker">${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</span><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</div>`:''}<div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="zap"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button type="button" class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button></div></details></div><div class="feedback-sheet-footer">${!ok?`<div class="feedback-sheet-secondary-row"><button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button><button type="button" id="quizSheetExplain" class="feedback-sheet-explain-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.buka-pembahasan','Buka Pembahasan')}</span></button></div>`:`<button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button>`}<button type="button" id="quizSheetNext" class="feedback-sheet-next-btn ${ok?'btn-correct':'btn-wrong'}"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button></div>`;
 
@@ -17429,7 +17374,7 @@ function quizLoop(cfg){
     if(sheetCloseBtn){
       sheetCloseBtn.onclick=()=>{
         haptic('tap');
-        closeFeedbackSheet();
+        closeFeedbackSheet(false);
         $('quizExit')?.click();
       };
     }
@@ -17437,7 +17382,7 @@ function quizLoop(cfg){
     if(sheetExitBtn){
       sheetExitBtn.onclick=()=>{
         haptic('tap');
-        closeFeedbackSheet();
+        closeFeedbackSheet(false);
         $('quizExit')?.click();
       };
     }
@@ -17456,7 +17401,7 @@ function quizLoop(cfg){
     if(sheetNextBtn){
       sheetNextBtn.onclick=()=>{
         haptic('tap');
-        closeFeedbackSheet();
+        closeFeedbackSheet(true);
       };
     }
   /* Audit G6: sesudah pembahasan jawaban SALAH dibuka, giliran tutor dulu (a) mengulang

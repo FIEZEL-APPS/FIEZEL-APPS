@@ -86,10 +86,6 @@
     if (session && (session.via === 'guest' || session.via === 'local_bypass')) {
       return Promise.resolve({ ok: true, signedIn: true, user: { role: 'murid', handle: 'Pengunjung' } });
     }
-    var isLocalHost = typeof location !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    if (isLocalHost) {
-      return Promise.resolve({ ok: true, signedIn: true, user: { role: 'murid', handle: 'penguji_lokal', email: 'penguji@localhost' } });
-    }
     try { base = String(((w.FIEZEL_CF_CONFIG || {}).base) || '').trim().replace(/\/$/, ''); } catch (_) {}
     if (!base || typeof w.fetch !== 'function') return Promise.resolve(null);
     return w.fetch(base + '/api/auth/session', { credentials: 'include', mode: 'cors', cache: 'no-store' })
@@ -174,10 +170,7 @@
   }
 
   function welcomeBody() {
-    var isLocalHost = typeof location !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-    var devBtn = isLocalHost ? '<div class="fz-auth-local-dev" style="margin:14px 0 16px;padding:12px;background:#FFFBEB;border:1.5px dashed #F59E0B;border-radius:14px;text-align:center;"><p style="margin:0 0 8px;font-size:12px;font-weight:600;color:#B45309;">🛠️ Mode Pengujian Lokal Terdeteksi</p><button type="button" class="fz-auth-bypass-btn" data-auth-bypass style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#FFFFFF;border:none;border-radius:999px;padding:12px 18px;font-weight:700;font-size:14px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(245,158,11,0.25);"><span>⚡ Masuk & Lewati Login (Uji Lokal)</span></button></div>' : '';
     return '<h1 class="fz-auth-title">' + esc(t('auth.layar.selamat-datang', 'Selamat datang')) + '</h1>'
-      + devBtn
       + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Belajar Bahasa Inggris dan Bahasa Jepang adaptif. Masuk sekali, progresmu ikut ke HP mana pun.')) + '</p>'
       + '<div class="fz-auth-next-row"><button type="button" class="fz-auth-next fz-plain" data-auth-go="masuk" data-testid="auth-continue">'
       + '<span>' + esc(t('auth.layar.lanjut', 'Lanjut')) + '</span><span class="fz-auth-next-dot">' + icon('arrow') + '</span></button></div>'
@@ -189,7 +182,6 @@
   }
   function formBody(ui) {
     var daftar = ui.screen === 'daftar', guru = ui.role === 'guru';
-    var isLocalHost = typeof location !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
     var html = '<h1 class="fz-auth-title is-underlined">' + esc(daftar ? t('auth.layar.daftar', 'Daftar') : t('auth.layar.masuk', 'Masuk')) + '</h1>'
       + roleTabs(ui.role);
     if (!guru) {
@@ -197,14 +189,6 @@
         + '<button type="button" class="fz-auth-guest-btn" data-auth-guest data-testid="auth-guest-top" style="width:100%;padding:12px 18px;background:#F8FAFC;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:14px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">'
         + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#475569;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
         + '<span>' + esc(t('auth.layar.tamu', 'Masuk sebagai Pengunjung / Tamu')) + '</span>'
-        + '</button>'
-        + '</div>';
-    }
-    if (isLocalHost) {
-      html += '<div class="fz-auth-local-dev" style="margin:14px 0 16px;padding:12px;background:#FFFBEB;border:1.5px dashed #F59E0B;border-radius:14px;text-align:center;">'
-        + '<p style="margin:0 0 8px;font-size:12px;font-weight:600;color:#B45309;">🛠️ Mode Pengujian Lokal Terdeteksi</p>'
-        + '<button type="button" class="fz-auth-bypass-btn" data-auth-bypass style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#FFFFFF;border:none;border-radius:999px;padding:12px 18px;font-weight:700;font-size:14px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(245,158,11,0.25);">'
-        + '<span>⚡ Masuk & Lewati Login (Uji Lokal)</span>'
         + '</button>'
         + '</div>';
     }
@@ -367,18 +351,6 @@
       if (googleGagal) { gagal(); return; }
       if (nativeBtn) {
         nativeBtn.onclick = function () {
-          var isLocalHost = typeof location !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-          if (isLocalHost) {
-            finish({
-              role: ui.role || 'murid',
-              via: 'local_bypass',
-              action: ui.screen,
-              isNew: false,
-              handle: 'penguji_lokal',
-              email: 'penguji@localhost'
-            });
-            return;
-          }
           if (env.google && env.google.accounts && env.google.accounts.id && typeof env.google.accounts.id.prompt === 'function') {
             try { env.google.accounts.id.prompt(); } catch (_) {}
           } else if (note) {

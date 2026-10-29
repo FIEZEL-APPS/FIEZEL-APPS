@@ -121,6 +121,7 @@
     'quiz.coba-lagi-title': 'ลองอีกครั้ง — เลือกคำตอบอื่น',
     'quiz.coba-lagi-btn': 'ลองอีกครั้ง',
     'quiz.buka-pembahasan': 'เปิดคำอธิบาย',
-    'quiz.keluar': 'ออก'
+    'quiz.keluar': 'ออก',
+    'quiz.clean-correct-takeaway': 'คำตอบที่ถูกต้องคือ "{correct}" โปรดสังเกตรูปแบบประโยคและความหมายโดยรวม'
   });
 }());

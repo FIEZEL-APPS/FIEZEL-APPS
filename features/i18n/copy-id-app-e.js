@@ -121,6 +121,7 @@
     'quiz.coba-lagi-title': 'Coba lagi — pilih jawaban lain',
     'quiz.coba-lagi-btn': 'Coba Lagi',
     'quiz.buka-pembahasan': 'Buka Pembahasan',
-    'quiz.keluar': 'Keluar'
+    'quiz.keluar': 'Keluar',
+    'quiz.clean-correct-takeaway': 'Jawaban yang tepat: "{correct}". Perhatikan pola kalimat dan maknanya secara utuh.'
   });
 }());

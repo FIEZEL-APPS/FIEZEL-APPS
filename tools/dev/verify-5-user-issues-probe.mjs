@@ -118,7 +118,7 @@ async function run() {
   await page.evaluate(() => {
     const q = window.__activeQuizQuestion;
     const opts = document.querySelectorAll('.option');
-    const wrongIdx = q.answerIndex === 0 ? 1 : 0;
+    const wrongIdx = Array.from(opts).findIndex((_, idx) => idx !== q.answerIndex);
     opts[wrongIdx].click();
   });
 
@@ -302,7 +302,7 @@ async function run() {
   await dPage.evaluate(() => {
     const q = window.__activeQuizQuestion;
     const opts = document.querySelectorAll('.option');
-    const wrongIdx = q.answerIndex === 0 ? 1 : 0;
+    const wrongIdx = Array.from(opts).findIndex((_, idx) => idx !== q.answerIndex);
     opts[wrongIdx].click();
   });
   await dPage.waitForTimeout(600);
