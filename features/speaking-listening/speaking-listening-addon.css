@@ -790,10 +790,14 @@ body.fz-stage-sl.fsl-session-active .fsl-card-listening,
 body.fsl-session-active .fsl-card-listening,
 body.fz-stage-sl.fsl-session-active .fsl-card-speaking,
 body.fsl-session-active .fsl-card-speaking {
-  flex: 0 1 auto !important;
-  min-height: 0 !important;
-  padding: 14px 16px !important;
-  overflow-y: visible !important;
+  flex: 1 1 auto !important;
+  min-height: calc(100dvh - var(--fz-topbar-h, 65px) - 60px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 16px 18px !important;
+  box-sizing: border-box !important;
+  margin-bottom: 0 !important;
 }
 
 /* ANTI-COLLISION PADDING: Mencegah tombol mengambang "Lanjut" menabrak naskah/gem-footer */
@@ -953,12 +957,15 @@ body.fz-stage-sl.fsl-session-active .fz-coach-bubble {
   }
   .fsl-card-listening .fsl-mascot-slot,
   body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-mascot-slot {
-    min-height: 60px !important;
-    max-height: 76px !important;
+    min-height: 96px !important;
+    max-height: 130px !important;
+    height: 110px !important;
   }
   .fsl-card-listening .fsl-mascot-slot .fsl-mascot,
   .fsl-card-listening .fsl-mascot-slot fiezel-mascot {
-    max-width: 120px !important;
+    width: clamp(110px, 28vw, 136px) !important;
+    height: 100% !important;
+    max-width: 140px !important;
   }
   .fsl-card-listening .fsl-audio-actions,
   body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-audio-actions {
@@ -1001,9 +1008,12 @@ body.fz-stage-sl.fsl-session-active .fz-coach-bubble {
     margin: 0 0 4px 0 !important;
   }
   .fsl-card-speaking .fsl-mascot-strip .fsl-mascot-slot,
-  .fsl-card-speaking .fsl-mascot-strip .fsl-mascot {
-    width: 42px !important;
-    height: 42px !important;
+  .fsl-card-speaking .fsl-mascot-strip .fsl-mascot,
+  .fsl-card-speaking .fsl-mascot-strip fiezel-mascot {
+    width: clamp(100px, 26vw, 130px) !important;
+    height: clamp(90px, 24vw, 116px) !important;
+    min-height: 90px !important;
+    border-radius: 20px !important;
   }
   .fsl-card-speaking .fsl-prompt {
     font-size: 1.02rem !important;

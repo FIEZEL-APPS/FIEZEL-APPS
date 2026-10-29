@@ -80,8 +80,8 @@ body.fz-lux .quiz-next,body .quiz-next{border-radius:999px;background:var(--text
 body.fz-lux .quiz-next:disabled,body .quiz-next:disabled{background:var(--panel-soft);color:var(--text-disabled);border-color:var(--line);box-shadow:none}
 body.fz-lux .question,body .question{font-family:var(--fz-display);font-weight:700;letter-spacing:-.01em;font-size:1.35rem;line-height:1.45;white-space:pre-line;word-break:break-word}
 body.fz-lux .options,body .options{gap:12px;counter-reset:fz2opt}
-body.fz-lux .option,body .option{border-radius:18px;border:1.5px solid var(--line);background:var(--panel);box-shadow:var(--lift-line);min-height:56px;padding:14px 16px 14px 60px;font-weight:600;font-size:1.02rem;line-height:1.45;word-break:break-word;position:relative}
-body.fz-lux .option::before,body .option::before{counter-increment:fz2opt;content:counter(fz2opt,upper-alpha);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:11px;background:var(--panel-soft);color:var(--muted);display:grid;place-items:center;font-size:.8rem;font-weight:700}
+body.fz-lux .option,body .option{display:flex!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;gap:14px!important;border-radius:18px;border:1.5px solid var(--line);background:var(--panel);box-shadow:var(--lift-line);min-height:56px;padding:10px 16px!important;font-weight:600;font-size:1.02rem;line-height:1.45;word-break:break-word;position:relative}
+body.fz-lux .option::before,body .option::before{counter-increment:fz2opt;content:counter(fz2opt,upper-alpha);position:static!important;left:auto!important;top:auto!important;transform:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 32px!important;width:32px!important;min-width:32px!important;height:32px!important;border-radius:11px;background:var(--panel-soft);color:var(--muted);font-size:.8rem;font-weight:700;margin:0!important}
 body.fz-lux .option[data-choice="0"]::before,body .option[data-choice="0"]::before{content:"A"}
 body.fz-lux .option[data-choice="1"]::before,body .option[data-choice="1"]::before{content:"B"}
 body.fz-lux .option[data-choice="2"]::before,body .option[data-choice="2"]::before{content:"C"}
@@ -715,38 +715,41 @@ body.fz-ja-no-furigana ruby.ja-word rt,body.fz-ja-no-furigana ruby.ja-word rp{di
   }
 }
 
-/* 4. Modal Bottom Sheet Drawer di Mobile (< 768px) vs Centered Dialog di Tablet & Desktop */
+/* 4. Modal Centered Dialog di Mobile (< 768px) & Desktop — zero clipping, zero offscreen overflow */
 @media (max-width: 767px) {
-  #modal.modal {
-    align-items: flex-end !important;
-    padding: 0 !important;
+  #modal.modal.hidden,
+  #modal.hidden {
+    display: none !important;
+  }
+  #modal.modal:not(.hidden) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
     background: rgba(15, 10, 8, 0.65) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
   }
   #modalPanel.modal-panel {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    border-radius: 24px 24px 0 0 !important;
-    border-left: none !important;
-    border-right: none !important;
-    border-bottom: none !important;
-    margin: 0 !important;
-    max-height: min(88dvh, 720px) !important;
-    padding: 14px 18px calc(18px + env(safe-area-inset-bottom, 12px)) !important;
-    box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.28) !important;
-    animation: fzBottomSheetUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    width: min(calc(100vw - 32px), 380px) !important;
+    max-width: 380px !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    margin: auto !important;
+    max-height: min(84dvh, 600px) !important;
+    padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 8px)) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35) !important;
+    animation: fzModalPopCenter 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
     touch-action: pan-y !important;
     box-sizing: border-box !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
   #modalPanel::before {
-    content: "";
-    display: block;
-    width: 38px;
-    height: 4.5px;
-    background: #CBD5E1;
-    border-radius: 999px;
-    margin: 0 auto 12px;
+    display: none !important;
   }
   .kanji-modal-grid {
     display: grid !important;
@@ -761,6 +764,11 @@ body.fz-ja-no-furigana ruby.ja-word rt,body.fz-ja-no-furigana ruby.ja-word rp{di
     margin: 12px 0 !important;
     flex-wrap: wrap !important;
   }
+}
+
+@keyframes fzModalPopCenter {
+  from { transform: scale(0.94); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 @keyframes fzBottomSheetUp {

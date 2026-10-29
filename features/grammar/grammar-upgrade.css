@@ -1366,13 +1366,15 @@ body .lesson-example h3,
 
   .quiz-shell .option {
     min-height: 54px !important;
-    padding: 14px 18px 14px 62px !important;
+    padding: 10px 16px !important;
+    gap: 14px !important;
     font-size: 1.05rem !important;
     font-weight: 600 !important;
     border-radius: 16px !important;
     text-align: left !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: flex-start !important;
     position: relative !important;
     box-sizing: border-box !important;
     color: var(--text, #1E293B) !important;
@@ -1389,18 +1391,22 @@ body .lesson-example h3,
   }
 
   .quiz-shell .option::before {
-    position: absolute !important;
-    left: 14px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
     width: 32px !important;
+    min-width: 32px !important;
     height: 32px !important;
     border-radius: 10px !important;
+    flex: 0 0 32px !important;
     flex-shrink: 0 !important;
-    display: grid !important;
-    place-items: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     font-size: 0.85rem !important;
     font-weight: 800 !important;
+    margin: 0 !important;
   }
 
   .quiz-shell .option .tried-tag {

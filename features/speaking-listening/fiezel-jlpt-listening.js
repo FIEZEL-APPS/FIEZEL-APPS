@@ -2893,13 +2893,12 @@
             ) +
           '</div>' +
 
-          '<!-- Feedback Slot -->' +
-          '<div id="jlptFeedbackSlot"></div>' +
-
           '<!-- Dynamic Swipe Cues -->' +
           '<div class="jlpt-swipe-cue jlpt-cue-prev" id="jlptCuePrev">' + t('jlpt.prev-question', '◀ Soal Sebelumnya') + '</div>' +
           '<div class="jlpt-swipe-cue jlpt-cue-next" id="jlptCueNext">' + t('jlpt.next-question', 'Soal Berikutnya ▶') + '</div>' +
         '</div>' +
+        '<!-- Feedback Slot in Fixed Thumb Dock -->' +
+        '<div id="jlptFeedbackSlot"></div>' +
       '</div>';
 
     // Initialize gestures on the newly rendered card

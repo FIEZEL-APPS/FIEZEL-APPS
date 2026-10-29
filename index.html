@@ -421,19 +421,79 @@ html.fz-booting body{overflow:hidden}
       padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
     }
 
-    /* Anti-Ruang Hampa (Zero Void Space): eliminate bottom void across all panels */
-    body, body.fz-lux, body.fz-stage-map .app, body.fz-stage-quiz .app,
-    body.fz-stage-sl .app, body.fz-stage-hub .app, main.app, .app, .view-container, #app {
+    /* Universal Anti-Overscroll & Natural Viewport Fit (Eliminates voids & over-scrolling) */
+    html, body {
+      overscroll-behavior: none !important;
+      overscroll-behavior-y: none !important;
+    }
+
+    html.fz-app-open #fiezelBootSplash,
+    body.fz-app-open #fiezelBootSplash,
+    #fiezelBootSplash.dismissed,
+    #fiezelBootSplash.is-leaving {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    main.app,
+    .app {
+      min-height: 100dvh !important;
+      box-sizing: border-box !important;
+      padding-bottom: calc(var(--bottomnav-h, 62px) + env(safe-area-inset-bottom, 12px) + 12px) !important;
+    }
+
+    body.fz-lesson-mode main.app,
+    body.fz-stage-quiz main.app,
+    body:has(.quiz-shell) main.app {
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 12px)) !important;
+    }
+
+    #app {
+      min-height: calc(100dvh - var(--fz-topbar-h, 65px) - var(--bottomnav-h, 62px) - env(safe-area-inset-bottom, 12px) - 24px) !important;
+      display: flex !important;
+      flex-direction: column !important;
       padding-bottom: 0 !important;
     }
+
+    body.fz-lesson-mode #app,
+    body.fz-stage-quiz #app {
+      min-height: calc(100dvh - var(--fz-topbar-h, 65px) - env(safe-area-inset-bottom, 12px) - 20px) !important;
+    }
+
     #app > section, #app > div, #app > article, main.app > section, main.app > div,
     section.fade, .classroom-page, .home-page, .home-today,
     .learner-flow-page, .skills-lab-page, .skills-page, .writing-page, .library-page,
-    .ask-page, .progress-page, .profile-page, .settings-page, .view-page, .view-container {
-      min-height: auto !important;
-      padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
-      scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+    .ask-page, .progress-page, .profile-page, .settings-page, .view-page, .view-container,
+    .vocab-hub-page, .exam-page {
+      padding-bottom: 4px !important;
+      margin-bottom: 0 !important;
+      scroll-padding-bottom: 0 !important;
     }
+
+    /* Single-task & practice sessions gracefully fill available viewport height (Zero Void) */
+    .skills-page,
+    .quiz-shell,
+    .writing-page,
+    .exam-shell,
+    .exam-page,
+    .paw-arena-shell,
+    .speaking-session {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      flex: 1 0 auto !important;
+      min-height: calc(100dvh - var(--fz-topbar-h, 65px) - var(--bottomnav-h, 62px) - env(safe-area-inset-bottom, 12px) - 24px) !important;
+      box-sizing: border-box !important;
+    }
+
+    body.fz-lesson-mode .quiz-shell,
+    body.fz-stage-quiz .quiz-shell,
+    body.fz-lesson-mode .skills-page {
+      min-height: calc(100dvh - var(--fz-topbar-h, 65px) - env(safe-area-inset-bottom, 12px) - 20px) !important;
+    }
+
     .home-today .today-home-cockpit, .today-home-cockpit, .ch-student,
     .classroom-shell, .learner-flow-shell, .paw-arena-shell, .tutor-center-shell,
     .teacher-shell-root, .progress-container, #socialHomeSlot, .fz2-social,
@@ -442,10 +502,287 @@ html.fz-booting body{overflow:hidden}
       padding-bottom: 0 !important;
       margin-bottom: 0 !important;
     }
-    .modal-panel, .welcome-panel, .notification-panel, .listening-modal-box {
-      max-height: min(720px, 86vh) !important;
-      padding-bottom: 20px !important;
-      margin-bottom: 0 !important;
+    .modal-panel, .welcome-panel, .notification-panel {
+      max-height: min(600px, 84dvh) !important;
+      padding-bottom: 18px !important;
+      margin: auto !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* JLPT Japanese Listening: Fullscreen Mobile Experience (Zero-Popup Cutoff Invariant) */
+    @media (max-width: 768px) {
+      #listeningPanelModal.listening-modal,
+      .listening-modal {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        max-width: 100vw !important;
+        max-height: 100dvh !important;
+        background: #FBF7F3 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        z-index: 2500 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+      }
+      #listeningPanelModal .listening-modal-box,
+      .listening-modal-box {
+        position: relative !important;
+        inset: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        background: #FBF7F3 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 100% !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .listening-topbar {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 20 !important;
+        background: #FBF7F3 !important;
+        border-bottom: 1px solid rgba(232, 223, 211, 0.8) !important;
+        padding: max(8px, env(safe-area-inset-top, 8px)) 16px 8px !important;
+        flex-shrink: 0 !important;
+      }
+      .listening-body {
+        flex: 1 1 auto !important;
+        padding: 4px 6px calc(84px + env(safe-area-inset-bottom, 12px)) 6px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        box-sizing: border-box !important;
+      }
+      .jlpt-mobile-card {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 12px 10px 14px 10px !important;
+        gap: 8px !important;
+        border-radius: 20px !important;
+        border: 1.5px solid #E8DFD3 !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+      }
+      .jlpt-options-list {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        box-sizing: border-box !important;
+      }
+      .jlpt-opt-btn,
+      .jlpt-option-btn {
+        width: 100% !important;
+        min-height: 52px !important;
+        height: auto !important;
+        max-height: none !important;
+        padding: 12px 14px !important;
+        gap: 12px !important;
+        border-radius: 16px !important;
+        box-sizing: border-box !important;
+      }
+      .jlpt-opt-badge {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        font-size: 13px !important;
+        font-weight: 800 !important;
+        border-radius: 8px !important;
+      }
+      .jlpt-opt-ja {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        line-height: 1.35 !important;
+      }
+        font-size: 14px !important;
+        line-height: 1.35 !important;
+        font-weight: 700 !important;
+      }
+      /* Thumb-Zone Feedback Dock for JLPT Listening */
+      .jlpt-feedback-banner {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        z-index: 3000 !important;
+        background: #FFFFFF !important;
+        border-top: 2px solid #E8DFD3 !important;
+        padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 12px)) 16px !important;
+        margin: 0 !important;
+        border-radius: 20px 20px 0 0 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        box-sizing: border-box !important;
+      }
+      .jlpt-fb-next-btn {
+        min-height: 48px !important;
+        height: 48px !important;
+        min-width: 120px !important;
+        padding: 0 20px !important;
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        border-radius: 999px !important;
+        background: #10B981 !important;
+        color: #FFFFFF !important;
+        cursor: pointer !important;
+      }
+    }
+
+    /* Universal Floating Next Bar Thumb-Zone Invariant Across All Practice Sessions */
+    html body #app .quiz-shell #quizFloatingBar.quiz-floating-bar,
+    .quiz-shell #quizFloatingBar,
+    .quiz-floating-bar {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 12px)) 16px !important;
+      background: rgba(255, 253, 249, 0.98) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border-top: 1.5px solid #E8DFD3 !important;
+      z-index: 9999 !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      pointer-events: auto !important;
+      box-sizing: border-box !important;
+    }
+    #quizFloatingBar .quiz-floating-next-btn,
+    .quiz-floating-bar .quiz-floating-next-btn,
+    .quiz-floating-bar button {
+      width: 100% !important;
+      max-width: 440px !important;
+      height: 52px !important;
+      min-height: 52px !important;
+      border-radius: 999px !important;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+      color: #FFFFFF !important;
+      font-size: 16px !important;
+      font-weight: 800 !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      cursor: pointer !important;
+    }
+
+    /* Universal Invariant: Zero-Overlap Option Badges Across All Practice & Exam Sessions */
+    body .option,
+    body .quiz-shell .option,
+    body .options .option,
+    body button.option,
+    .quiz-shell button.option,
+    .options button.option {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      text-align: left !important;
+      gap: 14px !important;
+      min-height: 52px !important;
+      padding: 10px 16px !important;
+      box-sizing: border-box !important;
+      width: 100% !important;
+      position: relative !important;
+    }
+
+    body .option::before,
+    body .quiz-shell .option::before,
+    body .options .option::before,
+    body button.option::before,
+    .quiz-shell button.option::before,
+    .options button.option::before {
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      transform: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 32px !important;
+      min-width: 32px !important;
+      max-width: 32px !important;
+      height: 32px !important;
+      min-height: 32px !important;
+      border-radius: 10px !important;
+      flex: 0 0 32px !important;
+      margin: 0 !important;
+      line-height: 1 !important;
+      font-size: 0.85rem !important;
+      font-weight: 800 !important;
+      box-sizing: border-box !important;
+    }
+
+    body .option:has(.option-badge)::before,
+    body .option:has(.fsl-option-badge)::before {
+      display: none !important;
+    }
+
+    /* Universal Invariant: Prominent & Well-Proportioned Mascot Across All Practice Sections */
+    .quiz-stage .fz-paw-above,
+    .quiz-stage .fz-paw-slot,
+    .quiz-mascot,
+    .fsl-card-speaking .fsl-mascot-strip,
+    .writing-stage,
+    .lesson-stage-paw {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      overflow: visible !important;
+    }
+
+    .quiz-stage .fz-paw-above,
+    .quiz-stage .fz-paw-slot,
+    .quiz-mascot {
+      width: clamp(130px, 34vw, 160px) !important;
+      height: clamp(110px, 28vw, 136px) !important;
+      min-height: 110px !important;
+      max-height: 150px !important;
+      aspect-ratio: 16 / 14 !important;
+      margin: 0 auto 6px auto !important;
+    }
+
+    .quiz-stage .fz-paw-above fiezel-mascot,
+    .quiz-stage .fz-paw-above .fz-paw-panel,
+    .quiz-stage fiezel-mascot,
+    .quiz-stage .fz-paw-slot fiezel-mascot,
+    .quiz-mascot fiezel-mascot,
+    .quiz-mascot .coach-strip-face,
+    .quiz-mascot .coach-strip-mascot {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      min-height: 110px !important;
+      display: block !important;
     }
 
     /* Scroll Performance & Hardware-Accelerated Native Compositing:

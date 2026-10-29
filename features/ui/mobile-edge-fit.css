@@ -1845,11 +1845,13 @@ html body #app .today-card.fz-stadium-card {
 }
 
 /* ==========================================================================
-   HIGH-CONTRAST DARK THEME OVERHAUL
+   HIGH-CONTRAST DARK THEME OVERHAUL (Strictly scoped to dark/lux mode only)
    Ensures zero invisible dark-on-dark text across the entire application.
    ========================================================================== */
 
-:root {
+body.theme-dark,
+body.fz-lux,
+[data-theme="dark"] {
   --bg: #0A0A0E !important;
   --text: #F8FAFC !important;
   --ink: #F8FAFC !important;
@@ -1867,6 +1869,39 @@ html body #app .today-card.fz-stadium-card {
   --line-strong: rgba(255, 255, 255, 0.2) !important;
 }
 
+body.theme-dark .home-section-head h2,
+body.theme-dark .section-head h1,
+body.fz-lux .home-section-head h2,
+body.fz-lux .section-head h1 {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+/* Default Daylight Palette (Strict Rule 5.4: Zero White-on-White / Zero White-on-Cream text) */
+body:not(.theme-dark):not(.fz-lux) {
+  --bg: #FBF7F3;
+  --text: #0F172A !important;
+  --ink: #0F172A !important;
+  --black: #0F172A !important;
+  --ambient-text: #0F172A !important;
+}
+
+body:not(.theme-dark):not(.fz-lux) .home-section-head h2,
+body:not(.theme-dark):not(.fz-lux) .section-head h1 {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+.paw-arena-brand,
+.paw-arena-top b {
+  color: #0F172A !important;
+}
+body.theme-dark .paw-arena-brand,
+body.scene-night .paw-arena-brand,
+body.theme-dark .paw-arena-top b {
+  color: #F8FAFC !important;
+}
+
 html, body {
   background: #FAF8F5 !important;
   color: #0F172A !important;
@@ -1879,12 +1914,6 @@ html, body {
 .learning-launcher,
 .home-today {
   color: #0F172A !important;
-}
-
-.home-section-head h2,
-.section-head h1 {
-  color: #FFFFFF !important;
-  font-weight: 800 !important;
 }
 
 .section-head p,
@@ -4863,20 +4892,50 @@ button.level-picker-card {
    Eliminate stacked padding-bottom and artificial min-height that create
    empty black void space below cards across all panels and screens.
    ========================================================================== */
-body,
-body.fz-lux,
-body.fz-stage-map .app,
-body.fz-stage-quiz .app,
-body.fz-stage-sl .app,
-body.fz-stage-hub .app,
+/* ==========================================================================
+   UNIVERSAL ANTI-OVERSCROLL & NATURAL VIEWPORT FIT (Eliminates voids & over-scrolling)
+   ========================================================================== */
+html, body {
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+}
+
+html.fz-app-open #fiezelBootSplash,
+body.fz-app-open #fiezelBootSplash,
+#fiezelBootSplash.dismissed,
+#fiezelBootSplash.is-leaving {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 main.app,
-.app,
-.view-container,
+.app {
+  min-height: 100dvh !important;
+  box-sizing: border-box !important;
+  padding-bottom: calc(var(--bottomnav-h, 62px) + env(safe-area-inset-bottom, 12px) + 12px) !important;
+}
+
+body.fz-lesson-mode main.app,
+body.fz-stage-quiz main.app,
+body:has(.quiz-shell) main.app {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 12px)) !important;
+}
+
 #app {
+  min-height: calc(100dvh - var(--fz-topbar-h, 65px) - var(--bottomnav-h, 62px) - env(safe-area-inset-bottom, 12px) - 24px) !important;
+  display: flex !important;
+  flex-direction: column !important;
   padding-bottom: 0 !important;
 }
 
-/* Screen containers: bottom padding exactly matches fixed bottombar (~60px) + safe-area breathing space */
+body.fz-lesson-mode #app,
+body.fz-stage-quiz #app {
+  min-height: calc(100dvh - var(--fz-topbar-h, 65px) - env(safe-area-inset-bottom, 12px) - 20px) !important;
+}
+
+/* Eliminate nested trailing padding to prevent endless overscrolling past content */
 #app > section,
 #app > div,
 #app > article,
@@ -4896,10 +4955,35 @@ section.fade,
 .profile-page,
 .settings-page,
 .view-page,
-.view-container {
+.view-container,
+.vocab-hub-page,
+.exam-page {
   min-height: auto !important;
-  padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
-  scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+  padding-bottom: 4px !important;
+  margin-bottom: 0 !important;
+  scroll-padding-bottom: 0 !important;
+}
+
+/* Single-task & practice sessions gracefully fill available viewport height (Zero Void) */
+.skills-page,
+.quiz-shell,
+.writing-page,
+.exam-shell,
+.exam-page,
+.paw-arena-shell,
+.speaking-session {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  flex: 1 0 auto !important;
+  min-height: calc(100dvh - var(--fz-topbar-h, 65px) - var(--bottomnav-h, 62px) - env(safe-area-inset-bottom, 12px) - 24px) !important;
+  box-sizing: border-box !important;
+}
+
+body.fz-lesson-mode .quiz-shell,
+body.fz-stage-quiz .quiz-shell,
+body.fz-lesson-mode .skills-page {
+  min-height: calc(100dvh - var(--fz-topbar-h, 65px) - env(safe-area-inset-bottom, 12px) - 20px) !important;
 }
 
 /* Remove any nested padding-bottom on child wrappers */
@@ -5945,4 +6029,368 @@ html body .skill-page-hero button.active-level-control small {
   font-size: 11px !important;
   font-weight: 500 !important;
   line-height: 1.35 !important;
+}
+
+/* ==========================================================================
+   UNIVERSAL INVARIANT: ZERO-OVERLAP OPTION BADGES ACROSS ALL PRACTICE SESSIONS
+   ========================================================================== */
+body .option,
+body .quiz-shell .option,
+body .options .option,
+body button.option,
+.quiz-shell button.option,
+.options button.option {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  gap: 14px !important;
+  min-height: 52px !important;
+  padding: 10px 16px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  position: relative !important;
+}
+
+body .option::before,
+body .quiz-shell .option::before,
+body .options .option::before,
+body button.option::before,
+.quiz-shell button.option::before,
+.options button.option::before {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  border-radius: 10px !important;
+  flex: 0 0 32px !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  box-sizing: border-box !important;
+}
+
+body .option:has(.option-badge)::before,
+body .option:has(.fsl-option-badge)::before {
+  display: none !important;
+}
+
+body .option > span:not(.option-badge):not(.fsl-option-badge):not(.tried-tag) {
+  flex: 1 1 auto !important;
+  word-break: break-word !important;
+  line-height: 1.4 !important;
+}
+
+/* ==========================================================================
+   UNIVERSAL INVARIANT: PROMINENT & WELL-PROPORTIONED MASCOT ACROSS ALL PRACTICE SECTIONS
+   ========================================================================== */
+.quiz-stage .fz-paw-above,
+.quiz-stage .fz-paw-slot,
+.quiz-mascot,
+.fsl-card-speaking .fsl-mascot-strip,
+.writing-stage,
+.lesson-stage-paw {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: visible !important;
+}
+
+.quiz-stage .fz-paw-above,
+.quiz-stage .fz-paw-slot,
+.quiz-mascot {
+  width: clamp(130px, 34vw, 160px) !important;
+  height: clamp(110px, 28vw, 136px) !important;
+  min-height: 110px !important;
+  max-height: 150px !important;
+  aspect-ratio: 16 / 14 !important;
+  margin: 0 auto 6px auto !important;
+}
+
+.quiz-stage .fz-paw-above fiezel-mascot,
+.quiz-stage .fz-paw-above .fz-paw-panel,
+.quiz-stage fiezel-mascot,
+.quiz-stage .fz-paw-slot fiezel-mascot,
+.quiz-mascot fiezel-mascot,
+.quiz-mascot .coach-strip-face,
+.quiz-mascot .coach-strip-mascot {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  min-height: 110px !important;
+  display: block !important;
+}
+
+.writing-stage,
+.writing-stage .lesson-stage-paw {
+  width: clamp(130px, 34vw, 160px) !important;
+  height: clamp(110px, 28vw, 136px) !important;
+  min-height: 110px !important;
+  margin: 0 auto 10px auto !important;
+}
+
+.writing-stage .writing-mascot,
+.writing-stage fiezel-mascot {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 110px !important;
+  display: block !important;
+}
+
+.fsl-card-speaking .fsl-mascot-strip .fsl-mascot-slot,
+.fsl-card-speaking .fsl-mascot-strip .fsl-mascot,
+.fsl-card-speaking .fsl-mascot-strip fiezel-mascot {
+  width: clamp(100px, 26vw, 130px) !important;
+  height: clamp(90px, 24vw, 116px) !important;
+  min-height: 90px !important;
+  border-radius: 20px !important;
+}
+
+.fsl-card-listening .fsl-mascot-slot,
+.fsl-card-listening .fsl-mascot-slot .fsl-mascot,
+.fsl-card-listening .fsl-mascot-slot fiezel-mascot {
+  width: clamp(110px, 28vw, 136px) !important;
+  height: 100% !important;
+  min-height: 96px !important;
+  max-width: 140px !important;
+}
+
+/* JLPT Chokai Listening Modal: Universal Mobile Fullscreen & Thumb-Zone Invariant */
+@media (max-width: 768px) {
+  #listeningPanelModal.listening-modal,
+  .listening-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #FFF9EE !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    z-index: 2500 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    overflow: hidden !important;
+  }
+  #listeningPanelModal .listening-modal-box,
+  .listening-modal-box {
+    position: relative !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #FFF9EE !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 100% !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .listening-topbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 20 !important;
+    background: #FFF9EE !important;
+    border-bottom: 1px solid rgba(232, 223, 211, 0.8) !important;
+    padding: max(8px, env(safe-area-inset-top, 8px)) 16px 8px !important;
+    flex-shrink: 0 !important;
+  }
+  .listening-body {
+    flex: 1 1 auto !important;
+    padding: 4px 6px calc(84px + env(safe-area-inset-bottom, 12px)) 6px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    box-sizing: border-box !important;
+  }
+  .jlpt-mobile-card {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px 10px 14px 10px !important;
+    gap: 8px !important;
+    border-radius: 18px !important;
+    border: 1.5px solid #E8DFD3 !important;
+    box-shadow: 0 4px 12px rgba(36, 26, 17, 0.06) !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+  .jlpt-mascot-slot {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: clamp(100px, 26vw, 125px) !important;
+    min-height: 100px !important;
+    margin: 0 auto !important;
+  }
+  .jlpt-mascot-slot .jlpt-mascot,
+  .jlpt-mascot-slot fiezel-mascot {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 220px !important;
+    margin: 0 auto !important;
+  }
+  .jlpt-situation-chip,
+  .jlpt-audio-row,
+  .jlpt-question-block {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .jlpt-options-list {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    box-sizing: border-box !important;
+  }
+  .jlpt-opt-btn,
+  .jlpt-option-btn {
+    width: 100% !important;
+    min-height: 52px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 10px 14px !important;
+    gap: 12px !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+  }
+  .jlpt-opt-badge {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    border-radius: 8px !important;
+  }
+  .jlpt-opt-ja {
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+    font-weight: 700 !important;
+  }
+  .jlpt-question-ja {
+    display: block !important;
+    width: 100% !important;
+    writing-mode: horizontal-tb !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    font-size: 15px !important;
+    line-height: 1.4 !important;
+    text-align: left !important;
+  }
+  .jlpt-feedback-banner {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    z-index: 3000 !important;
+    background: #FFFFFF !important;
+    border-top: 2px solid #E8DFD3 !important;
+    box-shadow: 0 -8px 24px rgba(36, 26, 17, 0.16) !important;
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 12px)) 16px !important;
+    margin: 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .jlpt-fb-next-btn {
+    min-height: 48px !important;
+    height: 48px !important;
+    min-width: 120px !important;
+    padding: 0 22px !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    border-radius: 999px !important;
+    background: #10B981 !important;
+    color: #FFFFFF !important;
+    cursor: pointer !important;
+  }
+}
+
+/* Universal Floating Next Bar Thumb-Zone Invariant Across All Practice Sessions */
+html body #app .quiz-shell #quizFloatingBar.quiz-floating-bar,
+.quiz-shell #quizFloatingBar,
+.quiz-floating-bar {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 12px)) 16px !important;
+  background: rgba(255, 253, 249, 0.98) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-top: 1.5px solid #E8DFD3 !important;
+  box-shadow: 0 -6px 24px rgba(36, 26, 17, 0.14) !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  pointer-events: auto !important;
+  box-sizing: border-box !important;
+}
+#quizFloatingBar .quiz-floating-next-btn,
+.quiz-floating-bar .quiz-floating-next-btn,
+.quiz-floating-bar button {
+  width: 100% !important;
+  max-width: 440px !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: #FFFFFF !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
 }
