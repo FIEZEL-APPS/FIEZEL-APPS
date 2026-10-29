@@ -126,20 +126,29 @@
   }
 
   function t(key, fallback, vars) {
-    if (root && root.FiezelI18n && typeof root.FiezelI18n.t === 'function') {
-      var res = root.FiezelI18n.t(key, vars);
-      if (res && res !== key) return res;
-    }
-    var map = getLocale() === 'th' ? COPY_TH : COPY_ID;
-    var str = map[key] || fallback || key;
-    if (vars && typeof vars === 'object') {
-      for (var k in vars) {
-        if (Object.prototype.hasOwnProperty.call(vars, k)) {
-          str = str.replace(new RegExp('\\{' + k + '\\}', 'g'), String(vars[k]));
+    var s;
+    try {
+      var I = (typeof self !== 'undefined' ? self : (typeof root !== 'undefined' ? root : this)).FiezelI18n;
+      s = I && I.t ? I.t(key, vars) : undefined;
+    } catch (_) {}
+    if (s === undefined || s === key) {
+      var loc = 'id';
+      try {
+        if (typeof getLocale === 'function') loc = getLocale();
+        else {
+          var I2 = (typeof self !== 'undefined' ? self : (typeof root !== 'undefined' ? root : this)).FiezelI18n;
+          if (I2 && typeof I2.getLocale === 'function') loc = I2.getLocale();
         }
-      }
+      } catch (_) {}
+      var map = loc === 'th' ? (typeof COPY_TH !== 'undefined' ? COPY_TH : {}) : (typeof COPY_ID !== 'undefined' ? COPY_ID : {});
+      s = map[key] || (fallback == null ? key : fallback);
     }
-    return str;
+    if (vars && typeof vars === 'object') {
+      s = String(s).replace(/\{(\w+)\}/g, function (m, n) {
+        return Object.prototype.hasOwnProperty.call(vars, n) ? String(vars[n]) : m;
+      });
+    }
+    return s;
   }
 
   function isLocalEnv() {
