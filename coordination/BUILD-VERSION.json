@@ -1,7 +1,7 @@
 {
-  "version": "m025-714",
-  "claimedBy": "branch feat/seo-kawan-bicara-efficiency-m025-718",
-  "claimedAt": "2026-10-29T08:35:43.839Z",
-  "reason": "feat(seo): embed kawan bicara zero-friction teleprompter and chatgpt comparative lore (m025-714)",
+  "version": "m025-715",
+  "claimedBy": "branch fix/voice-connection-mobile-stutter-m025-715",
+  "claimedAt": "2026-10-29T09:36:20.690Z",
+  "reason": "fix(voice-studio): harden connection and inject ChatGPT superiority lore (m025-715)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -127,10 +127,11 @@ export function playFiezelSfx(name: FiezelSfxName): void {
 
   try {
     const candidateUrls = [
-      `/assets/audio/sfx/${name}.mp3`,
       `./assets/audio/sfx/${name}.mp3`,
-      `../../assets/audio/sfx/${name}.mp3`,
-      `/assets/audio/sfx/${name}.ogg`,
+      `/app/assets/audio/sfx/${name}.mp3`,
+      `assets/audio/sfx/${name}.mp3`,
+      `/assets/audio/sfx/${name}.mp3`,
+      `./assets/audio/sfx/${name}.ogg`,
     ];
 
     let tried = 0;
