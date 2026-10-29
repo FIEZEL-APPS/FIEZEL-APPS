@@ -1,7 +1,7 @@
 {
-  "version": "m025-712",
-  "claimedBy": "branch feat/mobile-ui-and-pedagogy-audit-m025-712",
-  "claimedAt": "2026-10-28T21:54:43.325Z",
-  "reason": "fix(mobile-ui): eliminate mobile cutoffs, topbar drift, and japanese test leaks",
+  "version": "m025-713",
+  "claimedBy": "branch feat/mobile-void-overscroll-m025-713",
+  "claimedAt": "2026-10-29T05:48:50.590Z",
+  "reason": "fix(mobile-ui): multi-device responsive edge-fit, widened ergonomic practice cards, and thumb-docked next button (m025-713)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -166,8 +166,8 @@
 /* m025-42: one scale, always. The viewport tag alone is ignored by iOS Safari, so the
    layout is pinned here as well and the gestures are refused in fiezel-zoom-lock.js.
    touch-action:manipulation is what removes the double-tap-to-zoom delay and action. */
-html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;overscroll-behavior-x:none;overscroll-behavior-y:auto}
-html,body{touch-action:manipulation;overscroll-behavior-x:none;overscroll-behavior-y:auto}
+html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;overscroll-behavior-x:none;overscroll-behavior-y:none;overscroll-behavior:none}
+html,body{touch-action:manipulation;overscroll-behavior-x:none;overscroll-behavior-y:none;overscroll-behavior:none}
 /* m025-43 OWNER: a long press anywhere popped the iOS selection/copy callout on top
    of the lesson. Selection is off app-wide; real text fields keep it, because a
    field you cannot select text in is broken. */
@@ -400,7 +400,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .option{
   display:flex;align-items:center;gap:12px;
   text-align:left;background:var(--panel);border:1.5px solid var(--line);
-  min-height:52px;padding:var(--sp-4);border-radius:var(--radius-md);
+  min-height:52px;padding:12px 16px 12px 58px !important;border-radius:var(--radius-md);
   position:relative;transition:transform var(--dur-s) var(--ease-spring),
   background var(--dur-s) var(--ease),border-color var(--dur-s) var(--ease),
   box-shadow var(--dur-s) var(--ease);
@@ -6711,7 +6711,7 @@ html, body {
 /* Home Page Canvas & Shell Resets */
 html:has(.home-today),
 body:has(.home-today) {
-  scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+  scroll-padding-bottom: 0 !important;
   background: #FAF8F5 !important;
   color: #0F172A !important;
 }
@@ -6733,14 +6733,14 @@ html.has-home-today #globalSky {
   background: #FAF8F5 !important;
   color: #0F172A !important;
   min-height: auto !important;
-  padding: 10px 10px calc(84px + env(safe-area-inset-bottom, 12px)) 10px !important;
+  padding: 10px 10px 4px 10px !important;
   position: relative !important;
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow-x: clip !important;
   overflow-y: visible !important;
-  scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom, 12px)) !important;
+  scroll-padding-bottom: 0 !important;
 }
 
 .home-today .today-home-cockpit {
@@ -7417,11 +7417,13 @@ details[open] .fz-drawer-arrow {
 }
 
 
-/* Ensure body and app container have sufficient bottom padding so content is never covered by bottomnav */
-main.app,
-.view-container,
-#app {
-  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+/* Single bottomnav clearance on main.app only (Anti-Void & Zero Over-scroll) */
+main.app {
+  padding-bottom: calc(62px + env(safe-area-inset-bottom, 12px) + 12px) !important;
+}
+#app,
+.view-container {
+  padding-bottom: 0 !important;
 }
 
 /* Hide bottomnav when listening modal or detail sheet is active or in lesson mode */
@@ -7678,14 +7680,14 @@ main.app {
   color: #0F172A !important;
 }
 
-/* Page containers */
+/* Page containers (Zero Void & Anti-Overscroll) */
 section.fade,
 .classroom-page,
 .home-page {
   background: #FAF8F5 !important;
   color: #0F172A !important;
   min-height: auto !important;
-  padding-bottom: calc(80px + env(safe-area-inset-bottom, 12px)) !important;
+  padding-bottom: 0 !important;
 }
 
 /* Bottom Nav Scrim */
@@ -12129,7 +12131,7 @@ header.topbar {
 body:not(.fz-stage-quiz):not(.fz-lesson-mode) #app,
 body:not(.fz-stage-quiz):not(.fz-lesson-mode) .view-container,
 body:not(.fz-stage-quiz):not(.fz-lesson-mode) section.fade:not(.quiz-shell) {
-  padding-top: calc(58px + env(safe-area-inset-top, 0px)) !important;
+  padding-top: 0 !important;
 }
 
 /* Hide global topbar cleanly in quiz / practice sessions */
@@ -12197,24 +12199,34 @@ body.fz-lux.fz-stage-quiz .quiz-topbar {
     margin: 0 0 6px !important;
   }
 
-  .quiz-stage .fz-paw-above {
+  .quiz-stage .fz-paw-above,
+  .quiz-stage .fz-paw-slot,
+  .quiz-mascot {
     flex: 0 0 auto !important;
-    width: 64px !important;
-    height: 64px !important;
-    min-height: 64px !important;
-    max-height: 64px !important;
-    aspect-ratio: 1 / 1 !important;
-    margin: 0 auto 2px !important;
+    width: clamp(130px, 34vw, 160px) !important;
+    height: clamp(110px, 28vw, 136px) !important;
+    min-height: 110px !important;
+    max-height: 150px !important;
+    aspect-ratio: 16 / 14 !important;
+    margin: 0 auto 6px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
 
   .quiz-stage .fz-paw-above fiezel-mascot,
   .quiz-stage .fz-paw-above .fz-paw-panel,
-  .quiz-stage fiezel-mascot {
-    width: 64px !important;
-    height: 64px !important;
-    max-width: 64px !important;
-    max-height: 64px !important;
-    min-height: 0 !important;
+  .quiz-stage fiezel-mascot,
+  .quiz-stage .fz-paw-slot fiezel-mascot,
+  .quiz-mascot fiezel-mascot,
+  .quiz-mascot .coach-strip-face,
+  .quiz-mascot .coach-strip-mascot {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    min-height: 110px !important;
+    display: block !important;
   }
 
   .quiz-bubble {
@@ -12240,10 +12252,25 @@ body.fz-lux.fz-stage-quiz .quiz-topbar {
 
   .quiz-shell .option,
   .quiz-shell button.option {
-    min-height: 44px !important;
-    padding: 6px 12px !important;
+    min-height: 48px !important;
+    padding: 8px 14px !important;
+    gap: 12px !important;
     font-size: 0.95rem !important;
     border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+
+  .quiz-shell .option::before,
+  .quiz-shell button.option::before {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    flex: 0 0 32px !important;
+    margin: 0 !important;
   }
 
   .vocab-focus {

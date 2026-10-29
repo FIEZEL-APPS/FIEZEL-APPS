@@ -494,15 +494,17 @@
   border-radius: 24px !important;
   border: 1px solid rgba(226, 232, 240, 0.9) !important;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2) !important;
-  width: 92% !important;
-  max-width: 480px !important;
-  max-height: 90vh !important;
-  max-height: 90dvh !important;
-  padding: 24px 20px !important;
+  width: min(calc(100vw - 32px), 380px) !important;
+  max-width: 380px !important;
+  max-height: min(84dvh, 580px) !important;
+  margin: auto !important;
+  padding: 20px 18px !important;
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
-  overflow: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
 }
 
 #modalPanel:has(.lesson-prereq-gateway-sheet) h2,
