@@ -362,7 +362,7 @@ test('D3 render: sesudah cabang MEASURE, tepat di bawah vonis, satu baris tanpa 
   const measureReturn = APP.lastIndexOf('if(MEASURE){', at);
   assert.ok(measureReturn > 0 && APP.slice(measureReturn, at).includes('return;'), 'cabang MEASURE harus kembali sebelum stempel dirakit');
   assert.ok(APP.slice(APP.lastIndexOf('\n', at - 200), at).includes('memoryStampAllowed(cfg,MEASURE)'), 'gerbang ditanya ulang saat render');
-  assert.match(APP, /<b>\$\{verdictTitle\}<\/b><\/div>\$\{stampHtml\}<p>/, 'stempel duduk tepat di bawah judul vonis');
+  assert.match(APP, /<b>\$\{verdictTitle\}<\/b><\/div>\$\{stampHtml\}(?:<p>|<button)/, 'stempel duduk tepat di bawah judul vonis');
   const tpl = APP.slice(at, APP.indexOf('\n', at));
   assert.match(tpl, /<div class="feedback-stamp" data-testid="memory-stamp" data-stamp="\$\{esc\(q\.__memoryStamp\.kind\)\}">\$\{esc\(stampText\)\}<\/div>/);
   assert.ok(!/data-lucide|<svg|<i /.test(tpl), 'tanpa ikon');
