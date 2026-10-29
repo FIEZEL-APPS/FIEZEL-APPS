@@ -274,13 +274,25 @@
       height: size.h
     });
 
-    // Wire up tactile tap & click feedback
+    // Wire up tactile tap & click feedback (supports Mochi SOS in quiz sessions)
     mochi.onTap = function () {
+      try {
+        if (global.FiezelMochiVoiceSos && typeof global.FiezelMochiVoiceSos.handleMochiTap === 'function') {
+          var handled = global.FiezelMochiVoiceSos.handleMochiTap(mochi, detectSession(pool.host));
+          if (handled) return;
+        }
+      } catch (_) {}
       interactTouch(mochi);
     };
 
     viewport.addEventListener('click', function (e) {
       e.stopPropagation();
+      try {
+        if (global.FiezelMochiVoiceSos && typeof global.FiezelMochiVoiceSos.handleMochiTap === 'function') {
+          var handled = global.FiezelMochiVoiceSos.handleMochiTap(mochi, detectSession(pool.host));
+          if (handled) return;
+        }
+      } catch (_) {}
       interactTouch(mochi);
     });
 

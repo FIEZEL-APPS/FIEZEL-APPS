@@ -1,7 +1,7 @@
 {
-  "version": "m025-713",
-  "claimedBy": "branch feat/mobile-void-overscroll-m025-713",
-  "claimedAt": "2026-10-29T05:48:50.590Z",
-  "reason": "fix(mobile-ui): multi-device responsive edge-fit, widened ergonomic practice cards, and thumb-docked next button (m025-713)",
+  "version": "m025-714",
+  "claimedBy": "branch feat/mochi-in-quiz-voice-sos-m025-714",
+  "claimedAt": "2026-10-29T07:05:40.840Z",
+  "reason": "feat(brain): in-quiz live mochi voice sos lifeline with first-touch placement welcome pass (m025-714)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

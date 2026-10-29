@@ -1,0 +1,486 @@
+/**
+ * FIEZEL · features/ui/mochi-voice-sos.css
+ * Styles for In-Quiz Mochi Live Voice SOS Lifeline & Socratic Voice Pod.
+ *
+ * Invariants:
+ * 1. Mobile Zero-Cutoff: Max height <= 26% viewport (<= 180px on standard mobile),
+ *    never obscuring question stem, options, or Braincore feedback cards above.
+ * 2. High Contrast: Charcoal text #0F172A on warm daylight cream #FFFDF7 and gold #FEF3C7.
+ * 3. 60 FPS Hardware-Accelerated transitions (transform/opacity only).
+ * 4. Desktop Split/Dock: Anchored neatly on wide screens without layout shifts.
+ */
+
+/* ── 1. Idle Nudge Bubble ── */
+.fz-mochi-sos-nudge-bubble {
+  position: absolute;
+  top: -38px;
+  right: 12px;
+  background: #FFFDF7;
+  color: #0F172A;
+  border: 1.5px solid #F59E0B;
+  box-shadow: 0 4px 14px rgba(27, 20, 24, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  z-index: 40;
+  animation: fzMochiNudgeBounce 2.4s ease-in-out infinite;
+  white-space: nowrap;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.fz-mochi-sos-nudge-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 24px;
+  width: 10px;
+  height: 6px;
+  background: #FFFDF7;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.fz-mochi-nudge-sparkle {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.fz-mochi-nudge-close {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 2px;
+  margin-left: 4px;
+  cursor: pointer;
+  line-height: 1;
+}
+.fz-mochi-nudge-close:hover {
+  color: #0F172A;
+}
+
+@keyframes fzMochiNudgeBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ── 2. Floating Bottom Pod (Mobile & Tablet) ── */
+.fz-mochi-sos-pod {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9995;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  padding: 0 12px 12px 12px;
+}
+
+.fz-mochi-pod-scrim {
+  display: none; /* No full blocking scrim so question and Braincore feedback remain visible */
+}
+
+.fz-mochi-pod-content {
+  pointer-events: auto;
+  background: #FFFDF7;
+  border: 2px solid #FDE68A;
+  border-bottom: 0;
+  border-radius: 20px 20px 16px 16px;
+  box-shadow: 0 -8px 28px rgba(27, 20, 24, 0.16), 0 -2px 8px rgba(217, 119, 6, 0.12);
+  padding: 12px 16px;
+  max-width: 580px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fz-pod-enter {
+  animation: fzPodSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fz-pod-exit {
+  animation: fzPodSlideDown 0.20s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+@keyframes fzPodSlideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fzPodSlideDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* ── 3. Pod Header ── */
+.fz-mochi-pod-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.fz-mochi-pod-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fz-mochi-pod-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #FEF3C7;
+  flex-shrink: 0;
+}
+
+.fz-mochi-pod-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.fz-mochi-pod-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fz-mochi-pod-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  display: inline-block;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  animation: fzLiveDotPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes fzLiveDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.7;
+  }
+}
+
+.fz-mochi-pod-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #B45309;
+  letter-spacing: 0.02em;
+}
+
+.fz-mochi-pod-end-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #FEE2E2;
+  border: 1px solid #FCA5A5;
+  color: #991B1B;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.fz-mochi-pod-end-btn:hover {
+  background: #FECACA;
+}
+.fz-mochi-pod-end-btn:active {
+  transform: scale(0.96);
+}
+
+/* ── 4. Pod Body & Waveform ── */
+.fz-mochi-pod-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.fz-mochi-pod-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+.wave-bar {
+  width: 3.5px;
+  border-radius: 9999px;
+  background: #D97706;
+  animation: fzWaveMotion 1.2s ease-in-out infinite;
+}
+
+.bar-1 { height: 10px; animation-delay: 0.1s; }
+.bar-2 { height: 18px; animation-delay: 0.25s; }
+.bar-3 { height: 24px; animation-delay: 0.4s; }
+.bar-4 { height: 16px; animation-delay: 0.15s; }
+.bar-5 { height: 12px; animation-delay: 0.3s; }
+
+@keyframes fzWaveMotion {
+  0%, 100% {
+    transform: scaleY(0.4);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.fz-mochi-pod-speech {
+  font-size: 13.5px;
+  line-height: 1.42;
+  color: #1E293B;
+  background: #FFF9EE;
+  border: 1px solid #FEF3C7;
+  border-radius: 12px;
+  padding: 8px 12px;
+  flex: 1;
+}
+
+/* ── 5. Desktop Dock (Split-Screen Harmony) ── */
+@media (min-width: 1024px) {
+  .fz-mochi-sos-pod {
+    bottom: 24px;
+    right: 28px;
+    left: auto;
+    width: 360px;
+    padding: 0;
+  }
+
+  .fz-mochi-pod-content {
+    border-radius: 20px;
+    border: 2px solid #FDE68A;
+    box-shadow: 0 12px 32px rgba(27, 20, 24, 0.14), 0 2px 8px rgba(217, 119, 6, 0.1);
+  }
+}
+
+/* ── 6. Tactile "Ketuk aku" / "แตะฉันสิ" Badge beside Mochi ── */
+.fz-mochi-tap-badge {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  border: 1.5px solid #F59E0B;
+  color: #92400E;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.22), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  z-index: 50;
+  animation: fzTapBadgeFloat 2.6s ease-in-out infinite;
+  white-space: nowrap;
+  pointer-events: auto;
+  user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fz-mochi-tap-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.3);
+}
+
+.fz-mochi-tap-badge:active {
+  transform: scale(0.96);
+}
+
+.fz-mochi-tap-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.7);
+  animation: fzLiveDotPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes fzTapBadgeFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* ── 7. Intro Pop-up Education (Shown Max 2 Times) ── */
+.fz-mochi-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fzIntroFadeIn 0.22s ease-out forwards;
+}
+
+@keyframes fzIntroFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fz-mochi-intro-card {
+  background: #FFFDF7;
+  border: 2px solid #FDE68A;
+  border-radius: 24px;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22), 0 4px 16px rgba(217, 119, 6, 0.14);
+  max-width: 420px;
+  width: 100%;
+  padding: 24px 20px;
+  box-sizing: border-box;
+  animation: fzIntroCardPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  text-align: center;
+}
+
+@keyframes fzIntroCardPop {
+  from {
+    transform: scale(0.92) translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.fz-mochi-intro-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.fz-mochi-intro-mochi {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #FEF3C7;
+  border: 2px solid #FCD34D;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.15);
+}
+
+.fz-mochi-intro-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.3;
+}
+
+.fz-mochi-intro-desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #334155;
+  margin: 0 0 20px 0;
+}
+
+.fz-mochi-intro-action {
+  display: flex;
+  justify-content: center;
+}
+
+.fz-mochi-intro-action button {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fz-mochi-intro-action button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.38);
+}
+.fz-mochi-intro-action button:active {
+  transform: translateY(1px);
+}
+
+/* ── 8. Zero-Text Minimalist Audio Pod ── */
+.fz-zero-text-pod .fz-pod-minimal {
+  padding: 10px 14px;
+  max-width: 440px;
+}
+
+.fz-mochi-pod-live-status {
+  font-size: 11.5px;
+  color: #64748B;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.fz-mochi-pod-live-status.is-success {
+  color: #059669;
+  font-weight: 700;
+}
+
+.fz-mochi-pod-wave-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 28px;
+  margin-top: 6px;
+  padding: 4px 0;
+  background: #FFF9EE;
+  border-radius: 12px;
+  border: 1px solid #FEF3C7;
+}
+
+.bar-6 { height: 14px; animation-delay: 0.35s; }
+.bar-7 { height: 8px; animation-delay: 0.2s; }

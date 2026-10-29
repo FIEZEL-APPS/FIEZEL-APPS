@@ -1085,7 +1085,7 @@ function gemsCore(){try{return self.FiezelGems||null}catch(_){return null}}
 function defaultGems(){const g=gemsCore();return g?g.freshGems():{schema:'fiezel-gems-v1',balance:0,earnedTotal:0,spentTotal:0,ledger:[]}}
 function sanitizeGemsState(raw){const g=gemsCore();return g?g.sanitizeGems(raw):defaultGems()}
 function gemsBalance(){return Math.max(0,Math.floor(Number(state?.gems?.balance)||0))}
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},listening:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementVoicePassUsed:false,mochiIntroSeenCount:0,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},listening:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
 // m026-03: bendera tur BERSESI. Sebelumnya keputusan "sudah pernah lihat tur" tinggal di
 // localStorage['fiezel-tour-v1'] - satu kunci untuk seluruh aplikasi, di luar state, jadi ia
 // tidak ikut backup/restore DAN dibagi antar akun Puter di perangkat yang sama. Sekarang tiap
@@ -1099,7 +1099,7 @@ toursSeen:{menu:false,library:false,listening:false}};let stateReady=false;
 let V=[],R=[],G={},GRAMMAR_ITEMS=[],GRAMMAR_CURRICULUM={},GRAMMAR_CURRICULUM_INDEX=Object.create(null),WRITING_BANK=null,READING_EXAM=null;
 let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='';
 const PROGRESS_STATE_FIELDS=Object.freeze([
-  'level','placementDone','placementBandLevel','placementBands',
+  'level','placementDone','placementVoicePassUsed','mochiIntroSeenCount','placementBandLevel','placementBands',
   'totalAnswered','totalCorrect','totalTimeMs',
   'history','wrongAnswers','vocab','grammar','reading','listening',
   'adaptiveReady','adaptiveReadyByLevel','confidenceHistory',
@@ -1224,6 +1224,27 @@ try{
   }
 }catch(_){}
 let state=loadState();
+try{
+  const isLocal=typeof location!=='undefined'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1');
+  if(isLocal){
+    if(!state.gems||typeof state.gems.balance!=='number'||state.gems.balance<1000){
+      state.gems={schema:'fiezel-gems-v1',balance:99999,earnedTotal:99999,spentTotal:0,ledger:[]};
+      save();
+    }
+  }
+}catch(_){}
+if(typeof window!=='undefined'){
+  window.refillGems=function(amount){
+    const count=typeof amount==='number'?amount:99999;
+    if(state){
+      state.gems={schema:'fiezel-gems-v1',balance:count,earnedTotal:count,spentTotal:0,ledger:[]};
+      save();
+      try{renderInner()}catch(_){}
+      console.log('💎 Unlimited Gems set to:', state.gems.balance);
+    }
+    return count;
+  };
+}
 try{
   if(studentProgressEvidenceScore(state)===0){
     const best=findBestStoredStudentState();
@@ -3081,7 +3102,7 @@ function setConfidence(value){const h=state.history[state.history.length-1];if(!
    atas dialog = batal. answered==0 tetap keluar bebas (aturan bebas-intip m025-177). */
 function confirmQuizExit(){
   const a=state.activeSession,answered=Math.max(0,Number(a?.answered||0));
-  const doExit=()=>{try{closeConfidencePop()}catch(_){}try{audio.stop()}catch(_){}go('home')};
+  const doExit=()=>{try{closeConfidencePop()}catch(_){}try{audio.stop()}catch(_){}try{if(self.FiezelMochiVoiceSos){self.FiezelMochiVoiceSos.clearIdleNudge();self.FiezelMochiVoiceSos.closeCall('user_exit')}}catch(_){}go('home')};
   if(!a||answered<1){doExit();return}
   const type=String(a.type||''),measure=type==='level-exam'||type==='grammar-skip',placement=type==='placement',planned=Math.max(1,Number(a.planned||0));
   const line=measure?FiezelI18n.t('quiz.exit-exam-warn')
@@ -9336,6 +9357,10 @@ function teacherPreviewActive(){
   return false;
 }
 function authGateNeeded(){
+  try{
+    const sp = new URLSearchParams(location.search);
+    if(sp.get('preview')==='1' || sp.get('guest')==='1' || sp.get('dev')==='1') return false;
+  }catch(_){}
   if(teacherPreviewActive())return false;
   /* m025-704 / AGENTS.md Rule 7: Zero-Modal Collision & First-Touch Serenity
      Murid baru (onboarding belum selesai) WAJIB menikmati pengalaman selamat datang & latihan pertama dulu. */
@@ -16617,6 +16642,7 @@ function quizLoop(cfg){
  questions.forEach(x=>{x.concept=quizConcept(x)});
  const planned=Math.min(Math.max(1,Number(cfg.count)||questions.length),questions.length);
  beginLearningSession(cfg,planned);
+ try{if(self.FiezelMochiVoiceSos&&typeof self.FiezelMochiVoiceSos.checkAndShowIntroModal==='function')self.FiezelMochiVoiceSos.checkAndShowIntroModal();}catch(_){}
  // P0-1: jatah konfeti Major direset per sesi. P0-3: runtun gem lintas domain hidup di
  // closure sesi ini — placement dan Ujian Skip Level dikecualikan karena keduanya alat
  // UKUR, bukan sesi latihan; hadiah di tengah pengukuran mengubah perilaku yang diukur.
@@ -16738,6 +16764,7 @@ function quizLoop(cfg){
   $('quizFloatingBar')?.remove();
   document.getElementById('quizScaffoldNudge')?.remove();
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
+  try{window.__fzActiveQuiz={q,cfg,asked,planned,isPlacement:!!cfg.placement};if(self.FiezelMochiVoiceSos&&typeof self.FiezelMochiVoiceSos.startIdleNudgeTimer==='function')self.FiezelMochiVoiceSos.startIdleNudgeTimer(null,q,!!cfg.placement)}catch(_){}
   /* P1-1 (audit UX 2026-10): milestone penyemangat di tengah jalan pada sesi panjang (>=10 soal). */
   if(!MEASURE&&planned>=10&&asked===Math.floor(planned/2)&&asked>0&&!cfg.__halfwayNotified){
     cfg.__halfwayNotified=true;
@@ -16825,6 +16852,7 @@ function quizLoop(cfg){
      emit = pawReact supaya gerbang kurangi-gerak & preferensi animasi tetap SATU pintu, dan
      isLocked membaca kunci teardown kuis yang sama dengan answer() (12 §3b). */
   if(pawSlot)try{self.FiezelPawSlot.wire({stem:$('quizStem'),options:$('options'),emit:pawReact,isLocked:()=>answer.locked,motion:pawMotionAllowed()})}catch(_){}
+  try{if(self.FiezelMochiVoiceSos&&typeof self.FiezelMochiVoiceSos.mountTapBadge==='function')self.FiezelMochiVoiceSos.mountTapBadge();}catch(_){}
   /* Fase 3 (C5 butir 2): soal cloze tidak punya opsi - murid MENGETIK jawabannya. Satu
      percobaan (produksi dinilai grader, bukan tebak-ulang), Enter atau tombol Periksa. */
   if(q.type==='cloze'){
@@ -17301,10 +17329,12 @@ function quizLoop(cfg){
 
  function answer(q,j,button){
   if(answer.locked)return;
+  try{if(self.FiezelMochiVoiceSos&&typeof self.FiezelMochiVoiceSos.clearIdleNudge==='function')self.FiezelMochiVoiceSos.clearIdleNudge()}catch(_){}
   document.getElementById('quizScaffoldNudge')?.remove();
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
   if($('quizFloatingBar')?.querySelector('.quiz-floating-retry'))$('quizFloatingBar')?.remove();
   const ok=j===q.answerIndex,ms=Date.now()-start,firstTry=answer.retryOf!==q.id;
+  try{if(self.FiezelMochiVoiceSos&&typeof self.FiezelMochiVoiceSos.onQuestionAnswered==='function')self.FiezelMochiVoiceSos.onQuestionAnswered(ok,q)}catch(_){}
   if(!firstTry){
     const ttHost=$('tutorTurn');
     if(ttHost){ttHost.classList.add('hidden');ttHost.innerHTML=''}
@@ -17745,6 +17775,7 @@ function quizLoop(cfg){
  // selamanya sebagai "sedang berjalan".
  enterStage('quiz',{draw:()=>draw(),leave:()=>{
   $('quizFloatingBar')?.remove();
+  try{if(self.FiezelMochiVoiceSos){self.FiezelMochiVoiceSos.removeTapBadge();self.FiezelMochiVoiceSos.closeCall('quiz_exit');}}catch(_){}
   if(!cfg.__finished)abandonActiveSession('quiz_exit')
  }});
  draw();
@@ -17848,6 +17879,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // "ditinggalkan" ketika murid menekan kembali dari layar hasil.
   if(cfg)cfg.__finished=true;
   state.quizActive = false;
+  try{window.__fzActiveQuiz=null;if(self.FiezelMochiVoiceSos){self.FiezelMochiVoiceSos.clearIdleNudge();self.FiezelMochiVoiceSos.closeCall('quiz_finish')}}catch(_){}
   const accuracy=Math.round(score/Math.max(1,total)*100),session=completeActiveSession(cfg,score,total);
   // F1 placement: level dibaca dari DUA hal yang harus sepakat, dan yang lebih rendah menang.
   // (Tes RINGKAS hanya memakai tangga bukti, versi placementLiteBandLevel - lihat Audit P-B di

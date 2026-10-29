@@ -84,6 +84,7 @@
     'auth.layar.lupa-murid': 'ยังไม่มีการกู้คืนอัตโนมัติ เข้าสู่ระบบด้วย Google หากบัญชีของคุณเชื่อมไว้ หรือขอความช่วยเหลือจากครู',
     'auth.layar.masuk': 'เข้าสู่ระบบ',
     'auth.layar.memproses': 'กำลังดำเนินการ…',
+    'auth.layar.mode-pratinjau': 'เข้าสู่ระบบทันที (โหมดทดลอง / แขก) →',
     'auth.layar.murid': 'นักเรียน',
     'auth.layar.nama-pengguna': 'ชื่อผู้ใช้',
     'auth.layar.opsional': '(ไม่บังคับ)',

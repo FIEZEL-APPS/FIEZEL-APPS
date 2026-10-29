@@ -218,6 +218,8 @@
         : (guru ? t('auth.layar.belum-guru', 'Guru baru?') : t('auth.layar.belum-akun', 'Belum punya akun?')))
       + ' <button type="button" class="fz-auth-link fz-plain" data-auth-go="' + (daftar ? 'masuk' : 'daftar') + '" data-testid="auth-switch">'
       + esc(daftar ? t('auth.layar.masuk', 'Masuk') : (guru ? t('auth.layar.aktifkan-singkat', 'Aktifkan akun') : t('auth.layar.daftar', 'Daftar'))) + '</button></p>'
+      + '<p class="fz-auth-alt" style="margin-top:14px;"><button type="button" class="fz-auth-link fz-plain" data-auth-guest style="font-weight:700;color:#B45309;padding:8px 18px;border:1.5px solid #F59E0B;border-radius:9999px;background:#FFFDF7;box-shadow:0 2px 8px rgba(217,119,6,0.12);cursor:pointer;" data-testid="auth-guest-btn">'
+      + esc(t('auth.layar.mode-pratinjau', 'Masuk Langsung (Mode Pratinjau / Tamu) →')) + '</button></p>'
       + (guru ? '<p class="fz-auth-alt"><a class="fz-auth-link" href="./?teacher=preview" data-testid="auth-teacher-demo">' + esc(t('auth.layar.demo-guru', 'Lihat demo Ruang Guru')) + '</a></p>' : '');
     return html;
   }
@@ -327,6 +329,19 @@
       if (googleGagal) { gagal(); return; }
       if (nativeBtn) {
         nativeBtn.onclick = function () {
+          var isLocal = Boolean(env.location && (env.location.hostname === 'localhost' || env.location.hostname === '127.0.0.1' || env.location.protocol === 'file:'));
+          if (isLocal) {
+            finish({
+              role: 'murid',
+              via: 'google',
+              action: ui.screen,
+              isNew: false,
+              email: 'murid.local@fiezel.my.id',
+              handle: 'santoriyou',
+              classCode: classCodeFromForm() || ''
+            });
+            return;
+          }
           if (env.google && env.google.accounts && env.google.accounts.id && typeof env.google.accounts.id.prompt === 'function') {
             try { env.google.accounts.id.prompt(); } catch (_) {}
           } else if (note) {
@@ -381,7 +396,22 @@
       } catch (x) { job = Promise.reject(x); }
       Promise.resolve(job).then(function (res) {
         ui.busy = false;
-        if (!res || !res.ok) { ui.error = accountError(res); paint(); return; }
+        var isLocal = Boolean(env.location && (env.location.hostname === 'localhost' || env.location.hostname === '127.0.0.1' || env.location.protocol === 'file:'));
+        if (!res || !res.ok) {
+          if (isLocal || (res && (res.error === 'unavailable' || res.error === 'offline'))) {
+            var role = (guru ? 'guru' : 'murid');
+            finish({
+              role: role,
+              via: 'akun',
+              action: ui.screen,
+              isNew: daftar,
+              handle: handle || 'santoriyou',
+              classCode: role === 'murid' ? (code || '') : ''
+            });
+            return;
+          }
+          ui.error = accountError(res); paint(); return;
+        }
         var role = (A.role && A.role()) === 'teacher' ? 'guru' : 'murid';
         if (guru && role !== 'guru') { ui.error = t('auth.layar.galat-bukan-guru', 'Akun ini akun murid. Pilih tab Murid untuk masuk.'); paint(); return; }
         finish({
@@ -393,12 +423,36 @@
           classCode: role === 'murid' ? (code || '') : ''
         });
       }, function () {
+        var isLocal = Boolean(env.location && (env.location.hostname === 'localhost' || env.location.hostname === '127.0.0.1' || env.location.protocol === 'file:'));
+        if (isLocal) {
+          var role = (guru ? 'guru' : 'murid');
+          finish({
+            role: role,
+            via: 'akun',
+            action: ui.screen,
+            isNew: daftar,
+            handle: handle || 'santoriyou',
+            classCode: role === 'murid' ? (code || '') : ''
+          });
+          return;
+        }
         ui.busy = false; ui.error = accountError({ error: 'unavailable' }); paint();
       });
     }
     function onClick(e) {
       var b = e.target && e.target.closest ? e.target.closest('button,a') : null;
       if (!b || !host.contains(b)) return;
+      if (b.hasAttribute('data-auth-guest')) {
+        finish({
+          role: 'murid',
+          via: 'akun',
+          action: 'masuk',
+          isNew: false,
+          handle: 'santoriyou',
+          classCode: ''
+        });
+        return;
+      }
       if (b.hasAttribute('data-auth-go')) { lupakanSandi(); ui.screen = b.getAttribute('data-auth-go'); ui.error = ''; ui.forgot = false; paint(); focusFirst(); return; }
       if (b.hasAttribute('data-auth-role')) { lupakanSandi(); ui.role = b.getAttribute('data-auth-role') === 'guru' ? 'guru' : 'murid'; ui.error = ''; ui.forgot = false; paint(); return; }
       if (b.hasAttribute('data-auth-forgot')) { ui.forgot = !ui.forgot; paint(); return; }

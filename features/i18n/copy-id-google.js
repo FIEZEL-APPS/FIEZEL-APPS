@@ -80,6 +80,7 @@
     'auth.layar.lupa-murid': 'Belum ada pemulihan otomatis. Masuk dengan Google bila akunmu tertaut, atau minta bantuan gurumu.',
     'auth.layar.masuk': 'Masuk',
     'auth.layar.memproses': 'Memproses…',
+    'auth.layar.mode-pratinjau': 'Masuk Langsung (Mode Pratinjau / Tamu) →',
     'auth.layar.murid': 'Murid',
     'auth.layar.nama-pengguna': 'Nama pengguna',
     'auth.layar.opsional': '(opsional)',

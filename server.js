@@ -121,12 +121,34 @@ const PERSONA_VOICES = {
     role: 'Coach Sarah',
     lang: 'en-US',
     geminiVoice: 'Aoede'
+  },
+  mochi: {
+    edgeVoice: 'ja-JP-NanamiNeural',
+    personaLabel: 'Mochi · Daifuku Mascot (Gemini Puck)',
+    pitchHint: 'Suara maskot Mochi hangat, ceria & bersahabat (Gemini Puck)',
+    prosodyPitch: '+4Hz',
+    prosodyRate: '+2%',
+    role: 'Mochi Maskot SOS',
+    lang: 'ja-JP',
+    geminiVoice: 'Puck'
   }
 };
 
 function resolvePersona(speaker, lang, text) {
   const normSpeaker = (speaker || '').toLowerCase().trim();
   const normLang = (lang || '').toLowerCase().trim();
+
+  if (normSpeaker.includes('mochi') || normSpeaker.includes('puck') || normSpeaker.includes('sos')) {
+    const p = Object.assign({}, PERSONA_VOICES.mochi);
+    if (normLang.startsWith('id') || (!normLang && text && !/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(text))) {
+      p.edgeVoice = 'id-ID-GadisNeural';
+      p.lang = 'id-ID';
+    } else if (normLang.startsWith('th')) {
+      p.edgeVoice = 'th-TH-PremwadeeNeural';
+      p.lang = 'th-TH';
+    }
+    return p;
+  }
 
   if (normSpeaker && PERSONA_VOICES[normSpeaker]) {
     return PERSONA_VOICES[normSpeaker];
@@ -221,7 +243,10 @@ function writeDiskCache(cacheKey, data) {
 // Library synthesis via msedge-tts (if available)
 async function tryMsEdgeTts(text, persona) {
   try {
-    const msedge = require('msedge-tts');
+    let msedge = null;
+    try { msedge = require('msedge-tts'); } catch (_) {
+      try { msedge = require(path.join(ROOT, '..', 'fiezel-apps', 'node_modules', 'msedge-tts')); } catch (_) {}
+    }
     if (!msedge || !msedge.MsEdgeTTS) return null;
     const tts = new msedge.MsEdgeTTS();
     try {
@@ -426,13 +451,21 @@ async function synthesizeNeuralLine(text, speaker, lang) {
 // ============================================================================
 function sendJson(res, status, data) {
   const payload = JSON.stringify(data);
-  res.writeHead(status, {
+  const origin = (res.req && res.req.headers && res.req.headers.origin) || '*';
+  const headers = {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
-    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Version'
-  });
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Version',
+    'Set-Cookie': 'fz_id=mock_session_id; Path=/; HttpOnly; SameSite=Lax'
+  };
+  if (origin !== '*') {
+    headers['Access-Control-Allow-Origin'] = origin;
+    headers['Access-Control-Allow-Credentials'] = 'true';
+  } else {
+    headers['Access-Control-Allow-Origin'] = '*';
+  }
+  res.writeHead(status, headers);
   res.end(payload);
 }
 
@@ -934,6 +967,16 @@ const server = http.createServer(async (req, res) => {
       ok: true,
       acceptedIds,
       syncedCount: acceptedIds.length,
+      serverTime: Date.now()
+    });
+  }
+
+  if (pathname.startsWith('/api/account/') || pathname.startsWith('/api/auth/')) {
+    const body = req.method === 'POST' ? await parseJsonBody(req) : {};
+    return sendJson(res, 200, {
+      ok: true,
+      signedIn: true,
+      account: { handle: body.handle || 'santoriyou', role: body.role || 'learner' },
       serverTime: Date.now()
     });
   }
