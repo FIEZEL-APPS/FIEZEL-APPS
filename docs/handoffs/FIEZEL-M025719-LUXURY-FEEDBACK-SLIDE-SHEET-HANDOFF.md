@@ -3,10 +3,10 @@
 ## 1. Executive Summary & Problem Scope
 Sesuai arahan eksplisit pengguna pada sesi sebelumnya:
 1. **Feedback UI/UX Overhaul & Zero-Blur Stacking Context Fix**:
-   - *Masalah Sebelumnya*: 
+   - *Masalah Sebelumnya*:
      a. Tampilan umpan balik lama berupa kotak monolitik gelap (`#14141C`) di dalam alur DOM kartu, menyebabkan tinggi konten melampaui 1000px, menciptakan rongga kosong (*void*) tak berguna, dan memaksa murid men-scroll panjang ke bawah lipatan layar hanya untuk menyentuh tombol "Lanjut →".
      b. Ketika sheet umpan balik pertama kali diterapkan, seluruh tampilan menjadi **buram dan tidak bisa diklik** karena `#feedbackBackdrop` dengan `backdrop-filter: blur(4px)` di-append ke `document.body`, sementara `#feedback` masih terjebak di dalam `.card` dan `.fade` yang memiliki animasi `transform`/`opacity` (membentuk CSS Stacking Context lokal). Akibatnya, backdrop berada di atas sheet dan memburamkan seluruh teks.
-   - *Solusi Terealisasi*: 
+   - *Solusi Terealisasi*:
      a. Pindahkan `#feedback` langsung ke `document.body` saat jawaban dievaluasi (`document.body.appendChild(f)`). Hal ini menjadikan `#feedback` (z-index 10000) sebagai sibling langsung dari `#feedbackBackdrop` (z-index 9998) di level root body, menjamin lembar umpan balik 100% jernih (*crystal sharp*, filter: none), bebas blur, dan interaktif seketika.
      b. Transformasi total menjadi **Luxury Slide-Up Bottom Sheet** berstandar Apple/Duolingo (`#feedback.feedback-sheet`) dengan backdrop tembus pandang lembut (`.feedback-sheet-backdrop`), palet daylight porcelain (`#FFFFFF`, `#0F172A`, emerald `#10B981` sukses, rose `#E11D48` keliru), zero-scroll thumb zone (verdik + konfirmasi jawaban + inti kesimpulan selalu di atas lipatan layar), accordion drawer lipat untuk pembahasan mendalam/aturan/trik, dan tombol aksi "Lanjut →" yang terikat kuat di zona jangkauan jempol.
 2. **Topbar Anomaly saat Memulai Latihan dari Home**:
