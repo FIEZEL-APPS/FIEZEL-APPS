@@ -128,7 +128,7 @@ export class FiezelMochi {
     this.renderer = new THREE.WebGLRenderer({
       antialias: true, // Universal hardware MSAA: silky-smooth silhouette on mobile & desktop
       alpha: true,
-      preserveDrawingBuffer: true,
+      preserveDrawingBuffer: false, // Set to false to eliminate mobile GPU stall due to ReadPixels
       powerPreference: 'high-performance'
     });
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!

@@ -907,6 +907,18 @@ export function recordSpeakingAttempt(
   };
 }
 
+function resolveSyncApiBase(): string {
+  try {
+    if (typeof window !== 'undefined') {
+      const isLocalHost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(window.location?.hostname || '');
+      if (isLocalHost) return '';
+      const cfg = (window as any).FIEZEL_CF_CONFIG;
+      if (cfg && cfg.base) return String(cfg.base).replace(/\/$/, '');
+    }
+  } catch (_) {}
+  return 'https://api.fiezel.my.id';
+}
+
 export async function brainSyncFlush(
   state: BraincoreStoreState
 ): Promise<{ nextState: BraincoreStoreState; flushedCount: number }> {
@@ -914,7 +926,8 @@ export async function brainSyncFlush(
     return { nextState: state, flushedCount: 0 };
   }
   try {
-    const res = await fetch('/api/braincore/sync', {
+    const syncUrl = `${resolveSyncApiBase()}/api/braincore/sync`;
+    const res = await fetch(syncUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -923,9 +936,15 @@ export async function brainSyncFlush(
       }),
     });
     if (!res.ok) {
-      return { nextState: state, flushedCount: 0 };
+      // If server returns error, cap syncQueue to 40 items to prevent local storage quota crash
+      const capped = state.syncQueue.length > 40 ? state.syncQueue.slice(-30) : state.syncQueue;
+      const updated = saveBraincoreState({
+        ...state,
+        syncQueue: capped,
+      });
+      return { nextState: updated, flushedCount: 0 };
     }
-    const data = await res.json();
+    const data = await res.json().catch(() => null);
     const acceptedList: string[] = Array.isArray(data?.acceptedIds)
       ? data.acceptedIds
       : data?.ok
@@ -939,7 +958,12 @@ export async function brainSyncFlush(
     });
     return { nextState: updated, flushedCount: acceptedIds.size };
   } catch {
-    return { nextState: state, flushedCount: 0 };
+    const capped = state.syncQueue.length > 40 ? state.syncQueue.slice(-30) : state.syncQueue;
+    const updated = saveBraincoreState({
+      ...state,
+      syncQueue: capped,
+    });
+    return { nextState: updated, flushedCount: 0 };
   }
 }
 

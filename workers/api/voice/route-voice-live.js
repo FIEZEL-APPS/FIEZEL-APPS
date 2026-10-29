@@ -404,11 +404,11 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
     return hedgeResult;
   }
 
-  // Final safety fallback on key #3
+  // Final safety fallback on key #3 (gemini-3.1-flash-lite)
   const keyFallback = activePool[2 % activePool.length];
   const finalRes = await invokeSingleGeminiJson({
     key: keyFallback,
-    model: COPILOT_MODELS[2],
+    model: COPILOT_MODELS[1],
     promptText,
     temperature,
     maxOutputTokens,
@@ -526,7 +526,8 @@ export async function routeVoicePartnerTurn(ctx) {
 
   const prompt = [
     `You are ${personaName} on a live voice call (${scenarioTitle}). Target: ${langSpec}.`,
-    `[FIEZEL ECOSYSTEM]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku cat who loves onigiri. If asked about Fiezel or who made it, answer proudly, enthusiastically, and accurately with witty persona!`,
+    `[FIEZEL ECOSYSTEM & IDENTITY]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku cat who loves onigiri.`,
+    `[WHY FIEZEL CRUSHES CHATGPT VOICE]: ChatGPT Voice is 'blind audio' (no subtitles, no hints, no Kanji phonetics) where beginners waste 70% of study time in 'The Interruption Trap' asking for translations. FIEZEL gives Zero-Friction Flow: instant on-screen subtitles and translations, Furigana & Romaji phonetics for Kanji, and 3 beginner answer hints with audio preview, training speaking muscles 100% of the time! If asked about Fiezel, its maker, or ChatGPT vs Fiezel, answer proudly, enthusiastically, and wittily in character!`,
     `[MANDATORY SASSY PEDAGOGY: GURU KEJAM TAPI BAIK HATI / TOUGH LOVE & TSUNDERE]:`,
     `- STRICT RULE: You are BANNED from speaking like a polite corporate chatbot or boring textbook bot.`,
     `- EVERY TURN MUST START WITH A SASSY/PLAYFUL REACTION matching ${personaName}:`,
@@ -571,9 +572,22 @@ export async function routeVoicePartnerTurn(ctx) {
   });
 }
 
+/**
+ * Handler POST /api/braincore/sync
+ * Idempotently acknowledges voice telemetry queue from student client.
+ */
+export async function routeVoiceBraincoreSync(ctx) {
+  const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
+  const body = readRes?.value || {};
+  const attempts = Array.isArray(body?.attempts) ? body.attempts : [];
+  const acceptedIds = attempts.map((a) => a && a.id).filter(Boolean);
+  return jsonResponse({ ok: true, acceptedIds, count: acceptedIds.length });
+}
+
 export const ROUTES = [
   ['POST', '/api/voice/live-session', routeVoiceLiveSession],
   ['POST', '/api/voice/report-drop', routeVoiceReportDrop],
   ['POST', '/api/voice/copilot-assist', routeVoiceCopilotAssist],
   ['POST', '/api/voice/partner-turn', routeVoicePartnerTurn],
+  ['POST', '/api/braincore/sync', routeVoiceBraincoreSync],
 ];

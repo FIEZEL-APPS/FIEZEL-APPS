@@ -232,12 +232,17 @@ export function resolveLiveCallWebSocketUrls(): string[] {
 
   if (typeof localStorage !== 'undefined') {
     try {
-      const userKey = localStorage.getItem('fz_gemini_api_key');
+      const userKey =
+        localStorage.getItem('fz_gemini_api_key') ||
+        localStorage.getItem('gemini_api_key') ||
+        localStorage.getItem('GEMINI_API_KEY');
       if (userKey && userKey.trim().length > 10) {
+        const cleanKey = encodeURIComponent(userKey.trim());
         urls.push(
-          `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${encodeURIComponent(
-            userKey.trim()
-          )}`
+          `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?key=${cleanKey}`
+        );
+        urls.push(
+          `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${cleanKey}`
         );
       }
     } catch {
@@ -267,6 +272,8 @@ export interface GeminiLiveSessionInfo {
  * On localhost/127.0.0.1 preview server, tries same-origin (`""`) first so local
  * 16-key Gemini endpoints respond directly without cross-origin blocks; in production,
  * routes directly to Cloudflare Worker (`api.fiezel.my.id`).
+ * Strict Invariant: NEVER routes to same-origin `""` in remote production because
+ * static cPanel hosts return 404 HTML pages for `/api/*` endpoints.
  */
 export function resolveVoiceApiCandidateBases(): string[] {
   const bases: string[] = [];
@@ -279,13 +286,10 @@ export function resolveVoiceApiCandidateBases(): string[] {
       ? window.FIEZEL_CF_CONFIG.base
       : 'https://api.fiezel.my.id');
 
-  if (isLocalHost) {
-    bases.push('');
-  }
   if (cfBase) {
     bases.push(cfBase.replace(/\/$/, ''));
   }
-  if (!isLocalHost) {
+  if (isLocalHost) {
     bases.push('');
   }
   return Array.from(new Set(bases));
@@ -1706,7 +1710,8 @@ export async function resolveAiReply(
         .map((h) => `${h.speaker === 'ai' ? 'You' : 'Learner'}: ${h.text.trim().slice(0, 240)}`);
       const promptText = [
         `You are ${params.persona.name}, a witty, tough-love speaking mentor in FIEZEL. Scenario: "${params.scenario.titleId}".`,
-        `[FIEZEL ECOSYSTEM]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh; powered by Braincore Engine; mascot is Mochi the Daifuku cat. If asked about Fiezel or its maker, answer proudly with witty lore!`,
+        `[FIEZEL ECOSYSTEM & IDENTITY]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh; powered by Braincore Engine; mascot is Mochi the Daifuku cat.`,
+        `[WHY FIEZEL CRUSHES CHATGPT VOICE]: ChatGPT Voice is 'blind audio' (no subtitles, no hints, no Kanji phonetics) where users waste 70% of time in 'The Interruption Trap' asking for translations. FIEZEL gives Zero-Friction Flow: instant subtitles & translations, Furigana & Romaji phonetics for Kanji, and 3 beginner answer hints with audio preview, training vocal muscles 100% of the time! If asked about Fiezel or ChatGPT vs Fiezel, articulate this passionately in character!`,
         `[MANDATORY SASSY REACTION DIRECTIVE]: Do not talk like a stiff corporate robot. Every turn MUST start with an expressive 1-3 word vocal reaction or sassy banter matching ${params.persona.name} (Nanami: "あら？ちょっと硬すぎ！", "あはは！カチコチじゃん！", "えーっ！教科書丸出し！"; Keita: "マジで！？ウケる！", "ちょ、硬い硬い！リラックスして！"; Alex: "Haha, whoa! Stiff as a board!", "Come on, don't overthink in your head!"; Sarah: "A bit roundabout, don't you think?", "Direct and sharp—much better!"). Playfully roast stiff textbook habits ("kanebo kering", overusing "watashi wa", word-by-word translation), then IMMEDIATELY provide the punchy ultra-natural native phrase! Praise natural speech proudly ("Nah gitu dong!").`,
         `Reply in ${langLabel}, 1-2 lively conversational sentences (max 18 words) directly reacting to the learner and asking a follow-up question.`,
         'ABSOLUTE BAN ON EMOJIS & EMOTICONS: Pure clean spoken words only.',

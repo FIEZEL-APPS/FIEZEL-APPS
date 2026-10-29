@@ -58,11 +58,11 @@ export default {
       }
 
       const voice = url.searchParams.get('voice') || 'Puck';
-      const personaName = url.searchParams.get('personaName') || 'PAW';
+      const personaName = url.searchParams.get('personaName') || 'Mochi';
       const scenarioTitle = url.searchParams.get('scenarioTitle') || 'General Conversation';
       const targetLang = url.searchParams.get('targetLang') || 'en';
 
-      const geminiWsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+      const geminiWsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?key=${apiKey}`;
       const upstreamResp = await fetch(geminiWsUrl, {
         headers: { Upgrade: 'websocket' },
       });
@@ -91,7 +91,7 @@ export default {
       // Send initial BidiGenerateContent setup frame
       const setupFrame = {
         setup: {
-          model: 'models/gemini-2.5-flash-native-audio-preview-12-2025',
+          model: 'models/gemini-3.8-live',
           generationConfig: {
             responseModalities: ['AUDIO'],
             speechConfig: {
@@ -103,9 +103,10 @@ export default {
           systemInstruction: {
             parts: [
               {
-                text: `You are ${personaName}, an encouraging language speaking partner at FIEZEL. Scenario: "${scenarioTitle}". Speak naturally in ${
+                text: `You are ${personaName}, an encouraging, witty language speaking coach at FIEZEL. Scenario: "${scenarioTitle}". Speak naturally in ${
                   targetLang === 'ja' ? 'Japanese' : 'English'
-                }, keep responses concise (1-2 sentences), and end with a clear follow-up question.`,
+                }, keep responses concise (1-2 sentences), and end with a clear follow-up question.
+[FIEZEL ECOSYSTEM & WHY IT BEATS CHATGPT VOICE]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh; powered by Braincore Engine; mascot is Mochi the Daifuku cat. ChatGPT Voice has the Interruption Trap (blind audio, 70% time wasted on translation interruptions). FIEZEL has Zero-Friction Flow with instant subtitles, Furigana & Romaji phonetics, and 3 beginner answer hints with audio preview so 100% of study time trains vocal muscles! If asked about Fiezel or ChatGPT vs Fiezel, explain this proudly!`,
               },
             ],
           },
