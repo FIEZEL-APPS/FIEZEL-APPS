@@ -79,10 +79,27 @@ Many contemporary educational applications simply wrap commercial Large Language
 ## 4. Hybrid AI Audio Pipeline: Kawan Bicara AI
 
 For conversational and oral fluency training, FIEZEL pairs Braincore with an optimized, on-demand AI voice pipeline:
-- **Speech Recognition (STT)**: Fast conversational transcription powered by Groq Whisper.
-- **Conversational Logic**: Guardrailed dialogue synthesis powered by Llama-3.3, calibrated to provide constructive grammatical corrections in conversational context.
+- **Speech Recognition (STT)**: Fast conversational transcription powered by Groq Whisper (<300 ms).
+- **Conversational Logic**: Guardrailed dialogue synthesis powered by Llama-3.3 and Gemini Live WebSockets, calibrated to provide constructive natural reformulations without leaking answers or disrupting flow.
 - **Neural Text-to-Speech (TTS)**: Low-latency, natural vocalization via Edge-TTS and HTML5 Web Audio API.
 - **Quota & Cost Management**: Cloud voice generation is bounded strictly within the premium **Kawan Bicara AI** voice studio. Average monthly API cost per active speaking learner is calibrated between Rp 2,500 and Rp 4,500, preserving gross margins above 85% on paid plans.
+
+### 4.1 Resolving the "Interruption Dilemma" in Language Learning Dialogue
+General conversational voice systems (such as ChatGPT Voice) function as blind-audio phone calls. When deployed for language acquisition, this model creates critical inefficiencies:
+1. **The Pre-Existing Fluency Prerequisite**: To sustain an audio-only two-way conversation, the learner must already possess strong auditory listening comprehension in the target language. Non-fluent learners who encounter unfamiliar vocabulary must repeatedly interrupt the dialogue to ask for manual translations (*"What did that sentence mean in Indonesian?"*) and prompt the AI for suggested replies (*"How do I say 'I agree'?"*).
+2. **Conversational Rhythm Destruction**: This stop-and-start pattern wastes the majority of the user's practice time on administrative clarifications rather than spoken repetition, increasing cognitive fatigue and learner hesitation.
+3. **Absence of Visual Orthographic Scaffolding**: For non-Latin scripts (e.g. Japanese Kanji), general audio assistants offer zero on-screen phonetic support during live calls, completely paralyzing beginner learners who have not yet mastered the writing system.
+
+### 4.2 FIEZEL's Zero-Friction Multimodal Teleprompter Architecture
+Kawan Bicara replaces the blind-audio paradigm with a synchronized teleprompter stage:
+- **Automatic Real-Time Subtitles & Native Translations**: As the partner speaks, full original transcripts and immediate Indonesian/Thai translations appear dynamically below the avatar. Zero interruptions are required to understand conversational context.
+- **Synchronized Furigana & Hepburn Romaji**: Japanese Kanji expressions are automatically augmented with Ruby text (Furigana) and phonetic Romaji. Absolute beginners who cannot read Kanji can articulate spoken responses with authentic Tokyo pronunciation immediately.
+- **Beginner Answer Assistant (3-Tier Native Reply Cards)**: Rather than confronting an intimidating silence when it is their turn to speak, learners are presented with 3 curated native responses:
+  - *Tier 1 (Short & Easy)*: Concise, high-confidence conversational response.
+  - *Tier 2 (Natural Native)*: Idiomatic, culturally natural phrasing as spoken by native speakers.
+  - *Tier 3 (Answer + Follow-Up)*: Response paired with a reciprocal question to maintain dialogue momentum.
+- **Audio Pronunciation Preview ("Dengar Contoh")**: Each reply card includes an instantaneous audio sample button, allowing learners to hear the pitch accent and prosody before vocalizing into the microphone.
+- **100% Focused Fluency Training**: By eliminating manual translation requests, 100% of the session duration is dedicated to active vocalization and muscle memory development.
 
 ---
 
