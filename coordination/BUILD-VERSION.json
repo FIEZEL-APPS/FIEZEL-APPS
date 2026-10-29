@@ -1,7 +1,7 @@
 {
-  "version": "m025-731",
-  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
-  "claimedAt": "2026-10-29T15:45:12.229Z",
-  "reason": "bot(heal): auto-synchronize release boundary",
+  "version": "m025-732",
+  "claimedBy": "branch feat/feedback-slide-sheet-m025-719",
+  "claimedAt": "2026-10-29T15:56:49.142Z",
+  "reason": "fix(a11y): add focus-visible replacement for feedback next button",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
