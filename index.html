@@ -269,6 +269,7 @@ html.fz-booting body{overflow:hidden}
        dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
        atas ukuran wajah pembimbing lama tanpa perlu !important. -->
   <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
+  <link rel="stylesheet" href="./features/mascot/mochi-voice-sos.css">
   <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
   <link rel="stylesheet" href="./fiezel-2.css">
   <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
@@ -361,6 +362,15 @@ html.fz-booting body{overflow:hidden}
     body.scene-night .quiz-topbar {
       background: rgba(27, 20, 24, 0.98) !important;
       border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    body.fz-stage-quiz header.topbar,
+    body.fz-lesson-mode header.topbar,
+    body:has(.quiz-shell) header.topbar,
+    body.fz-stage-quiz #topContextWrap,
+    body.fz-lesson-mode #topContextWrap,
+    body:has(.quiz-shell) #topContextWrap {
+      display: none !important;
     }
 
     #app > section.quiz-shell,
@@ -1786,6 +1796,8 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/speaking-listening/fiezel-jlpt-listening.js"></script>
   <!-- 3D Mochi Companion Engine (Three.js Volumetric Mascot for All Surfaces) -->
   <script defer src="./features/mascot/fiezel-mochi-companion.js"></script>
+  <!-- In-Quiz Mochi Live Voice SOS Lifeline Engine -->
+  <script defer src="./features/mascot/fiezel-mochi-voice-sos.js"></script>
   <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
        BOLEH menyentuh `window.FiezelAnalytics` — nama itu milik modul analytics
        privasi-maksimal yang disuntik app.js di idle, dan `<script defer>` di sini selalu
@@ -1794,5 +1806,31 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/ui/skeleton-helpers.js"></script>
   <script defer src="./features/ui/fiezel-boot-tail.js"></script>
   <script defer src="./features/ui/fiezel-update-prompt.js"></script>
+  <script>
+    (function () {
+      if (typeof location !== 'undefined' && location.search && (location.search.indexOf('test=mochi') !== -1 || location.search.indexOf('autostart=mochi') !== -1)) {
+        var tries = 0;
+        function checkReady() {
+          tries++;
+          var data = typeof window.__getFiezelData === 'function' ? window.__getFiezelData() : null;
+          var isJa = typeof window.jaCourseOn === 'function' && window.jaCourseOn();
+          if ((isJa || (data && data.vocab > 0)) && typeof window.startVocabQuiz === 'function') {
+            try {
+              var splash = document.getElementById('fiezelBootSplash');
+              if (splash) splash.remove();
+              var ritual = document.getElementById('fzRitual');
+              if (ritual) ritual.remove();
+              document.documentElement.classList.remove('fz-booting');
+              document.body.classList.remove('fz-booting', 'fz-auth-open');
+              window.startVocabQuiz();
+              return;
+            } catch (_) {}
+          }
+          if (tries < 60) setTimeout(checkReady, 100);
+        }
+        window.addEventListener('load', function () { setTimeout(checkReady, 100); });
+      }
+    })();
+  </script>
 </body>
 </html>
