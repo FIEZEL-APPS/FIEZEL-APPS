@@ -628,6 +628,9 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/version') {
     return sendJson(res, 200, { status: 'ok', build: 'local-dev', timestamp: Date.now() });
   }
+  if (pathname === '/api/auth/session') {
+    return sendJson(res, 200, { ok: true, signedIn: true, user: { role: 'murid', handle: 'penguji_lokal', email: 'penguji@localhost' } });
+  }
   if (pathname === '/api/feedback' && req.method === 'POST') {
     await parseJsonBody(req);
     return sendJson(res, 200, { ok: true, receivedAt: Date.now() });
@@ -977,7 +980,7 @@ const server = http.createServer(async (req, res) => {
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     res.writeHead(200, {
       'Content-Type': contentType,
-      'Cache-Control': ext === '.json' || ext === '.js' ? 'no-cache' : 'public, max-age=300'
+      'Cache-Control': 'no-cache, no-store, must-revalidate'
     });
     fs.createReadStream(filePath).pipe(res);
   });
