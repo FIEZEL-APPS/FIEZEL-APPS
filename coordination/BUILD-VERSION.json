@@ -1,7 +1,7 @@
 {
-  "version": "m025-733",
-  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
-  "claimedAt": "2026-10-29T16:00:20.487Z",
-  "reason": "bot(heal): auto-synchronize release boundary",
+  "version": "m025-734",
+  "claimedBy": "branch feat/feedback-slide-sheet-m025-719",
+  "claimedAt": "2026-10-29T16:09:58.487Z",
+  "reason": "fix(quiz): replace invalid lucide scale icon with book-open and octa-sync m025-734",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
