@@ -3090,7 +3090,7 @@ function confirmQuizExit(){
   openModal(`<div class="modal-mark">FIEZEL</div><h2>${measure?FiezelI18n.t('quiz.exit-exam-title'):FiezelI18n.t('quiz.exit-normal-title')}</h2><p>${esc(line)}</p><div class="modal-actions"><button type="button" id="quizExitConfirm">${FiezelI18n.t('quiz.exit-confirm-btn')}</button><button type="button" class="primary" id="quizExitStay">${FiezelI18n.t('quiz.exit-stay-btn')}</button></div>`);
   $('quizExitStay').onclick=closeModal;
   setTimeout(()=>{try{$('quizExitStay')?.focus()}catch(_){}},30);/* v31 2026-08-29: fokus awal ke tombol AMAN (Lanjut belajar), bukan yang destruktif */
-  $('quizExitConfirm').onclick=()=>{closeModal();doExit();if(measure)setTimeout(()=>{try{showToast(FiezelI18n.t('quiz.exit-cooldown-toast'),'warn')}catch(_){}},600)};
+  $('quizExitConfirm').onclick=()=>{closeModal();if(typeof window.__closeFeedbackSheet==='function')window.__closeFeedbackSheet();doExit();if(measure)setTimeout(()=>{try{showToast(FiezelI18n.t('quiz.exit-cooldown-toast'),'warn')}catch(_){}},600)};
 }
 window.confirmQuizExit=confirmQuizExit;
 let confidencePopThen=null;
@@ -17357,6 +17357,7 @@ function quizLoop(cfg){
     }
 
     const closeFeedbackSheet = (advance = true) => {
+      window.__closeFeedbackSheet = null;
       bd?.classList.remove('is-active');
       f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
       f.classList.add('hidden');
@@ -17365,6 +17366,7 @@ function quizLoop(cfg){
         $('quizNext')?.click();
       }
     };
+    window.__closeFeedbackSheet = () => closeFeedbackSheet(false);
 
     bd.onclick = () => closeFeedbackSheet(true);
 
@@ -17374,7 +17376,6 @@ function quizLoop(cfg){
     if(sheetCloseBtn){
       sheetCloseBtn.onclick=()=>{
         haptic('tap');
-        closeFeedbackSheet(false);
         $('quizExit')?.click();
       };
     }
@@ -17382,7 +17383,6 @@ function quizLoop(cfg){
     if(sheetExitBtn){
       sheetExitBtn.onclick=()=>{
         haptic('tap');
-        closeFeedbackSheet(false);
         $('quizExit')?.click();
       };
     }
@@ -17624,7 +17624,7 @@ function quizLoop(cfg){
    document.getElementById('quizScaffoldNudge')?.remove();
    document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
 
-   let cleanReason='';
+   let hintClueReason='';
    let nudgeText='';
 
    if(q.type==='token-order'){
@@ -17651,9 +17651,9 @@ function quizLoop(cfg){
        }
      });
 
-     cleanReason=diagnoseTokenOrderMistake(q,{hideKey:true})||'';
-     nudgeText=cleanReason||FiezelI18n.t('quiz.scaffold-retry-token-banner','Belum tepat, coba susun ulang lalu periksa lagi yuk');
-     q.__diagnosticClue=cleanReason;
+     q.__diagnosticClue=diagnoseTokenOrderMistake(q,{hideKey:true});
+     hintClueReason=q.__diagnosticClue||'';
+     nudgeText=hintClueReason||FiezelI18n.t('quiz.scaffold-retry-token-banner','Belum tepat, coba susun ulang lalu periksa lagi yuk');
    }else{
      button.disabled=true;
      button.classList.add('was-tried');
@@ -17677,7 +17677,9 @@ function quizLoop(cfg){
      /* Audit pedagogi 2026-10-11 (P2): nudge ini tampil SEBELUM jawaban dibuka, jadi kuncinya
         disamarkan; dan pada kalimat "Pilihan “X” kurang tepat:" kutipan pembuka “X” di awal
         alasan tidak diulang ("Pilihan “can” kurang tepat: “can” “last night” ..."). */
-     cleanReason=grammarHideKey(String(rawReason||'').trim(),q.options?.[q.answerIndex],userChoice).replace(/\.+$/,'');
+     let cleanReason=grammarHideKey(String(rawReason||'').trim(),q.options?.[q.answerIndex],userChoice);
+     cleanReason=cleanReason.replace(/\.+$/,'');
+     hintClueReason=cleanReason;
      const pickQuoted=`“${String(userChoice??'').trim()}”`;
      if(answer.scaffold!=='probe'&&cleanReason.toLowerCase().startsWith(pickQuoted.toLowerCase())){
        const rest=cleanReason.slice(pickQuoted.length).trim();
@@ -17712,7 +17714,7 @@ function quizLoop(cfg){
    const mirip=answer.scaffold==='worked'?grammarSimilarExample(q):null;
    const turn=tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing,{session:tutor,similar:mirip});
    showQuizFloatingRetry(q,j);
-   showTutorHintModal(q,j,cleanReason||nudgeText);
+   showTutorHintModal(q,j,hintClueReason||nudgeText);
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
    enhanceUI();
    return;

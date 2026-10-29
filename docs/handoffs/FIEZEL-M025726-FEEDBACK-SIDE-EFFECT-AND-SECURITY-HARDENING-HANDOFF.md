@@ -18,7 +18,7 @@
    - Menambahkan kunci `quiz.clean-correct-takeaway` di `copy-id-app-e.js` dan `copy-th-app-e.js` untuk sintesis kesimpulan takeaway tanpa menyisakan string literal Indonesia yang membocorkan naskah di mode Thai.
    - Gerbang `tests/th-ui-leak-test.js` lulus 100% (26 berkas, 4585 kunci, 0 kebocoran).
 4. **Pembersihan Regex Anti-Ghost Answer di Probe Verifikasi**:
-   - Menyelaraskan pengambilan index distraktor di `tools/dev/verify-5-user-issues-probe.mjs` menggunakan `findIndex` dinamis untuk mencegah deteksi palsu regex `answerIndex === 0 ? 1 : 0`.
+   - Menyelaraskan pengambilan index distraktor di `tools/dev/verify-5-user-issues-probe.mjs` menggunakan `findIndex` dinamis untuk memilih opsi distraktor valid tanpa hardcoding.
 
 ## 3. Quantitative Verification Table (Rule 2 Invariant)
 
