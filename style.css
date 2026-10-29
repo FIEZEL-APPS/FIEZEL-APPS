@@ -13051,10 +13051,14 @@ body > #feedback.feedback-sheet {
   font-weight: 800 !important;
   cursor: pointer !important;
   border: none !important;
-  outline: none !important;
   white-space: nowrap !important;
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease !important;
   box-sizing: border-box !important;
+}
+
+.feedback-sheet-next-btn:focus-visible {
+  outline: 3px solid #2563EB !important;
+  outline-offset: 2px !important;
 }
 
 @media (min-width: 641px) {
