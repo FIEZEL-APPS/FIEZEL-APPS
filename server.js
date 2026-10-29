@@ -1020,7 +1020,7 @@ const server = http.createServer(async (req, res) => {
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     res.writeHead(200, {
       'Content-Type': contentType,
-      'Cache-Control': ext === '.json' || ext === '.js' ? 'no-cache' : 'public, max-age=300'
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
     });
     fs.createReadStream(filePath).pipe(res);
   });
