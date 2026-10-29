@@ -98,12 +98,17 @@ async function run() {
     // Check if on same horizontal line
     const isSingleLine = numRect && totalRect && Math.abs(numRect.y - totalRect.y) < 2;
 
+    const exitLabel = document.querySelector('.quiz-exit-label');
+    const grammarHint = document.getElementById('quizGrammarHint');
+
     return {
       text: txtEl ? txtEl.innerText.replace(/\s+/g, ' ').trim() : null,
       isSingleLine,
       txtWidth: txtRect ? txtRect.width : null,
       txtHeight: txtRect ? txtRect.height : null,
       hasToggle: !!toggleEl,
+      exitLabelVisible: exitLabel ? (window.getComputedStyle(exitLabel).display !== 'none') : false,
+      hasGrammarHint: !!grammarHint && (window.getComputedStyle(grammarHint).display !== 'none'),
     };
   });
   console.log('✅ Issue 1 & 2 Header Counter & Toggle Info:', headerCounterInfo);
@@ -193,6 +198,13 @@ async function run() {
     const nextBtn = document.getElementById('quizSheetNext');
     const closeX = document.getElementById('feedbackSheetClose');
     const footer = document.querySelector('.feedback-sheet-footer');
+    const diffWrong = document.querySelector('.diff-word-wrong');
+    const diffCorrect = document.querySelector('.diff-word-correct');
+    const floatingBar = document.getElementById('quizFloatingBar');
+
+    const nextRect = nextBtn ? nextBtn.getBoundingClientRect() : null;
+    const isNextCutoff = nextRect ? nextRect.right > 390 : false;
+
     return {
       sheetInDOM: !!sheet,
       sheetVisible: !!sheet && sheet.classList.contains('feedback-sheet'),
@@ -203,8 +215,13 @@ async function run() {
       explainBtnText: explainBtn ? explainBtn.innerText.trim() : null,
       hasNextBtn: !!nextBtn,
       nextBtnText: nextBtn ? nextBtn.innerText.trim() : null,
+      nextBtnWidth: nextRect ? nextRect.width : null,
+      isNextCutoff,
       hasCloseX: !!closeX,
       footerPosition: footer ? window.getComputedStyle(footer).position : null,
+      floatingBarVisible: floatingBar ? (window.getComputedStyle(floatingBar).display !== 'none') : false,
+      diffWrongColor: diffWrong ? window.getComputedStyle(diffWrong).color : null,
+      diffCorrectColor: diffCorrect ? window.getComputedStyle(diffCorrect).color : null,
     };
   });
   console.log('✅ Issue 4 Feedback Sheet Info:', feedbackSheetInfo);
@@ -216,6 +233,19 @@ async function run() {
     if (explainBtn) explainBtn.click();
   });
   await page.waitForTimeout(500);
+
+  const deepDiveInfo = await page.evaluate(() => {
+    const drawer = document.querySelector('.feedback-drawer-details');
+    const content = document.querySelector('.feedback-drawer-content');
+    const memory = document.querySelector('.feedback-memory-box');
+    const memoryP = memory ? memory.querySelector('p, span') : null;
+    return {
+      isOpen: drawer ? drawer.open : false,
+      contentVisible: !!content,
+      memoryColor: memoryP ? window.getComputedStyle(memoryP).color : null,
+    };
+  });
+  console.log('✅ Deep dive drawer info:', deepDiveInfo);
 
   const deepDiveShot = path.join(artifactDir, 'mobile-feedback-deep-dive-opened.png');
   await page.screenshot({ path: deepDiveShot, fullPage: false });
