@@ -106,8 +106,8 @@ assert(R.length>=300&&new Set(R.map(r=>r.id)).size===R.length,'reading bank shra
 for(const r of R)for(const q of r.qs||[]){assert(Array.isArray(q[1])&&q[1].length>=2,'reading question has too few options');const opts=q[1].map(x=>String(x).trim().toLowerCase());assert(new Set(opts).size===opts.length,`duplicate reading options in ${r.id}`);assert(Number.isInteger(q[2])&&q[2]>=0&&q[2]<q[1].length,`invalid reading answer in ${r.id}`)}
 
 const elements={};
-function element(id){return elements[id] ||= {id,innerHTML:'',textContent:'',onclick:null,disabled:false,classList:{add(){},remove(){},toggle(){}},addEventListener(){},querySelector(){return null},focus(){}};}
-const document={baseURI:'http://localhost/',getElementById:element,querySelector(){return null},querySelectorAll(){return []},createElement(){return {className:'',textContent:'',disabled:false,onclick:null,classList:{add(){},remove(){},toggle(){}},append(){},addEventListener(){}}}};
+function element(id){return elements[id] ||= {id,innerHTML:'',textContent:'',onclick:null,disabled:false,remove(){},classList:{add(){},remove(){},toggle(){}},addEventListener(){},querySelector(){return null},focus(){}};}
+const document={baseURI:'http://localhost/',getElementById:element,querySelector(){return null},querySelectorAll(){return []},createElement(){return {className:'',textContent:'',disabled:false,onclick:null,remove(){},classList:{add(){},remove(){},toggle(){}},append(){},addEventListener(){}}}};
 const store={};
 const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]};const Notification=function(title,options){this.title=title;this.options=options;this.close=()=>{};};Notification.permission='granted';Notification.requestPermission=async()=>Notification.permission;
 // m025-114: stub ini dulu memangkas path menjadi nama berkas saja, jadi bank listening di

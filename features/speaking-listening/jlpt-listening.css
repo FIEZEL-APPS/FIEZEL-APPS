@@ -2525,13 +2525,17 @@
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 8px !important;
-  padding: 4px 14px !important;
+  gap: 6px !important;
+  padding: 4px 10px !important;
   min-height: 38px !important;
   height: 38px !important;
   background: #FBF7F3 !important;
   border-bottom: 1px solid rgba(232, 223, 211, 0.8) !important;
   box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 /* Furigana Tri-State Segmented Control */
@@ -2545,12 +2549,13 @@
   gap: 2px !important;
   height: 30px !important;
   box-sizing: border-box !important;
+  flex-shrink: 0 !important;
 }
 
 .jlpt-mode-btn {
   border: none !important;
   background: transparent !important;
-  padding: 3px 10px !important;
+  padding: 3px 8px !important;
   height: 26px !important;
   min-height: 26px !important;
   border-radius: 999px !important;
@@ -2563,6 +2568,7 @@
   line-height: 1 !important;
   box-sizing: border-box !important;
   box-shadow: none !important;
+  white-space: nowrap !important;
 }
 
 .jlpt-mode-btn:hover {
