@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { chromium } from 'file:///C:/Users/hp/fiezel-apps/node_modules/playwright/index.mjs';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -43,7 +43,7 @@ async function run() {
     }));
   });
 
-  await page.goto('http://localhost:3000/', { waitUntil: 'domcontentloaded' });
+  await page.goto('http://127.0.0.1:3000/', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(600);
 
   // Clean overlays
@@ -273,7 +273,7 @@ async function run() {
     localStorage.setItem('fz_state_v1', JSON.stringify({ level: 1, jaLevel: 'A1', placementDone: true, view: 'home' }));
   });
 
-  await dPage.goto('http://localhost:3000/', { waitUntil: 'domcontentloaded' });
+  await dPage.goto('http://127.0.0.1:3000/', { waitUntil: 'domcontentloaded' });
   await dPage.waitForTimeout(600);
 
   await dPage.evaluate(() => {

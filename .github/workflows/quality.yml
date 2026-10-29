@@ -474,6 +474,8 @@ jobs:
           # memperluas kontrak yang sama dengan tests/paw-mascot-test.js: satu sumber bentuk,
           # dan sekarang juga satu bingkai statis per state.
           node tests/mascot-reduced-motion-test.js
+          # m025-717: Mochi Live Voice SOS Lifeline duplex voice & Socratic guidance in-quiz unit tests.
+          node tests/mochi-voice-sos-test.js
           # Lima gerbang redesign maskot PAW (spec §35 "New regression nets" + A-10).
           # Ditaruh tepat sesudah tests/paw-mascot-test.js karena kelimanya memperluas kontrak
           # yang gerbang itu mulai jaga: satu sumber bentuk (geometri + checksum ekspor),

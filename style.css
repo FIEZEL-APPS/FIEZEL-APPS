@@ -1503,8 +1503,8 @@ button.setup-link{display:block;width:100%;margin:6px 0;padding:10px 14px;color:
    kekuatannya di kalimat, bukan di visual. Tanpa ikon, bar, atau animasi. */
 .feedback-stamp{margin:-2px 0 8px;font-size:12px;line-height:1.45;font-weight:500;letter-spacing:.01em;color:var(--muted);font-variant-numeric:tabular-nums}
 :lang(th) .feedback-stamp{font-size:13px;line-height:1.6;letter-spacing:normal}
-.diff-word-wrong{display:inline-flex;align-items:center;justify-content:center;min-width:28px;color:#991B1B !important;background:#FEE2E2 !important;border:1.5px solid #FCA5A5 !important;border-bottom:2.5px solid #EF4444 !important;padding:2px 8px;margin:0 4px;border-radius:6px;font-weight:800;text-decoration:none;box-sizing:border-box}
-.diff-word-correct{display:inline-flex;align-items:center;justify-content:center;min-width:28px;color:#14532D !important;background:#DCFCE7 !important;border:1.5px solid #86EFAC !important;border-bottom:2.5px solid #22C55E !important;padding:2px 8px;margin:0 4px;border-radius:6px;font-weight:800;box-sizing:border-box}
+.diff-word-wrong{display:inline-flex;align-items:center;justify-content:center;min-width:28px;color:#7F1D1D !important;background:#FEE2E2 !important;border:1.5px solid #F87171 !important;border-bottom:2.5px solid #DC2626 !important;padding:2px 8px;margin:0 4px;border-radius:6px;font-weight:800;text-decoration:none;box-sizing:border-box}
+.diff-word-correct{display:inline-flex;align-items:center;justify-content:center;min-width:28px;color:#064E3B !important;background:#D1FAE5 !important;border:1.5px solid #34D399 !important;border-bottom:2.5px solid #059669 !important;padding:2px 8px;margin:0 4px;border-radius:6px;font-weight:800;box-sizing:border-box}
 .token-nudge-shake{animation:nudgeShake .45s cubic-bezier(.36,.07,.19,.97) both;border-color:#F59E0B!important;box-shadow:0 0 8px rgba(245,158,11,.45)!important}
 @keyframes nudgeShake{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(3px,0,0)}30%,50%,70%{transform:translate3d(-3px,0,0)}40%,60%{transform:translate3d(3px,0,0)}}
 .token-submit-retry{background:#F59E0B!important;border-color:#D97706!important;color:#181826!important;font-weight:700!important}
@@ -2098,8 +2098,8 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
   .fiezel-segments{margin-top:3px}
   .fiezel-stage{padding:0 12px !important;min-height:0 !important}
   .fiezel-stage-art{gap:8px !important}
-  .fiezel-ob-mascot{--fz-ob-paw:46px !important;width:46px !important;height:46px !important}
-  .fiezel-ob-mascot fiezel-mascot,.fiezel-ob-mascot .fiezel-ob-paw,.fiezel-ob-mascot .fz-mascot{width:46px !important;height:46px !important}
+  .fiezel-ob-mascot{--fz-ob-paw:114px !important;width:114px !important;height:108px !important;flex:0 0 114px !important}
+  .fiezel-ob-mascot fiezel-mascot,.fiezel-ob-mascot .fiezel-ob-paw,.fiezel-ob-mascot .fz-mascot{width:114px !important;height:108px !important}
   .fiezel-greet-bubble{padding:3px 8px !important;font-size:11px !important;max-width:210px !important;line-height:1.25 !important}
   .fiezel-sheet{margin:4px 10px max(6px,env(safe-area-inset-bottom));padding:8px 12px;gap:4px}
   .fiezel-title{font-size:1.1rem;margin-bottom:0}
@@ -12192,8 +12192,13 @@ body:not(.fz-stage-quiz):not(.fz-lesson-mode) section.fade:not(.quiz-shell) {
 /* Hide global topbar cleanly in quiz / practice sessions */
 body.fz-stage-quiz header.topbar,
 body.fz-stage-quiz main.app > .topbar,
+body.fz-stage-quiz #topContextWrap,
 body.fz-lesson-mode header.topbar,
-body.fz-lesson-mode main.app > .topbar {
+body.fz-lesson-mode main.app > .topbar,
+body.fz-lesson-mode #topContextWrap,
+body:has(.quiz-shell) header.topbar,
+body:has(.quiz-shell) main.app > .topbar,
+body:has(.quiz-shell) #topContextWrap {
   display: none !important;
 }
 
@@ -12387,20 +12392,20 @@ body.fz-stage-quiz .vocab-focus .phonetic,
   }
 
   body .fiezel-ob .fiezel-ob-mascot {
-    flex: 0 0 50px !important;
-    width: 50px !important;
-    height: 50px !important;
-    max-width: 50px !important;
-    max-height: 50px !important;
+    flex: 0 0 114px !important;
+    width: 114px !important;
+    height: 108px !important;
+    max-width: 114px !important;
+    max-height: 108px !important;
   }
 
   body .fiezel-ob .fiezel-ob-mascot fiezel-mascot,
   body .fiezel-ob .fiezel-ob-mascot .fiezel-ob-paw,
   body .fiezel-ob .fiezel-ob-mascot .fz-mascot {
-    width: 50px !important;
-    height: 50px !important;
-    max-width: 50px !important;
-    max-height: 50px !important;
+    width: 114px !important;
+    height: 108px !important;
+    max-width: 114px !important;
+    max-height: 108px !important;
   }
 
   body .fiezel-ob .fiezel-greet-bubble {
@@ -12477,20 +12482,20 @@ body.fz-stage-quiz .vocab-focus .phonetic,
   }
 
   body .fiezel-ob .fiezel-ob-mascot {
-    flex: 0 0 44px !important;
-    width: 44px !important;
-    height: 44px !important;
-    max-width: 44px !important;
-    max-height: 44px !important;
+    flex: 0 0 98px !important;
+    width: 98px !important;
+    height: 92px !important;
+    max-width: 98px !important;
+    max-height: 92px !important;
   }
 
   body .fiezel-ob .fiezel-ob-mascot fiezel-mascot,
   body .fiezel-ob .fiezel-ob-mascot .fiezel-ob-paw,
   body .fiezel-ob .fiezel-ob-mascot .fz-mascot {
-    width: 44px !important;
-    height: 44px !important;
-    max-width: 44px !important;
-    max-height: 44px !important;
+    width: 98px !important;
+    height: 92px !important;
+    max-width: 98px !important;
+    max-height: 92px !important;
   }
 
   body .fiezel-ob .fiezel-greet-bubble {
@@ -12771,7 +12776,8 @@ body > #feedback.feedback-sheet {
 }
 
 .feedback-answer-wrong {
-  color: #BE123C !important;
+  color: #7F1D1D !important;
+  font-weight: 700 !important;
 }
 
 .feedback-answer-sep {
@@ -12780,7 +12786,8 @@ body > #feedback.feedback-sheet {
 }
 
 .feedback-answer-correct {
-  color: #065F46 !important;
+  color: #064E3B !important;
+  font-weight: 700 !important;
 }
 
 .feedback-takeaway-card {
@@ -12821,35 +12828,21 @@ body > #feedback.feedback-sheet {
 
 /* 6. Expandable Drawer for Deep Dive */
 .feedback-drawer-details {
-  border-top: 1px solid #F1F5F9 !important;
-  border-bottom: 1px solid #F1F5F9 !important;
-  background: #FFFFFF !important;
+  border: none !important;
+  background: transparent !important;
   flex-shrink: 1 !important;
   overflow: hidden !important;
 }
 
+.feedback-drawer-details summary,
 .feedback-drawer-summary {
-  list-style: none !important;
-  cursor: pointer !important;
-  padding: 9px 18px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  font-size: 12.5px !important;
-  font-weight: 700 !important;
-  color: #475569 !important;
-  user-select: none !important;
-  background: #FAFAF9 !important;
-  transition: background 0.15s ease !important;
-}
-
-.feedback-drawer-summary::-webkit-details-marker {
   display: none !important;
 }
 
-.feedback-drawer-summary:hover {
-  background: #F5F5F4 !important;
-  color: #0F172A !important;
+.feedback-drawer-details[open] {
+  border-top: 1px solid #E2E8F0 !important;
+  margin-top: 12px !important;
+  padding-top: 8px !important;
 }
 
 .drawer-summary-label {
@@ -13211,6 +13204,48 @@ body.has-feedback-sheet-open #quizFloatingBar {
   visibility: hidden !important;
 }
 
+/* Daylight Harmonization for Japanese Furigana/Romaji Toggle */
+.ja-display {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  margin: 0 0 10px !important;
+  padding: 3px !important;
+  border-radius: 999px !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+.ja-display .ja-toggle {
+  min-height: 28px !important;
+  height: 28px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: #64748B !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease !important;
+}
+.ja-display .ja-toggle[aria-pressed="true"],
+.ja-display .ja-toggle.active {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1), 0 1px 2px rgba(15, 23, 42, 0.06) !important;
+}
+.ja-display .ja-toggle[aria-pressed="false"] {
+  background: transparent !important;
+  color: #64748B !important;
+}
+
 /* Hide Grammar Hint Button in Japanese quizzes */
 body.fz-lang-ja #quizGrammarHint,
 .fz-lang-ja .grammar-hint-btn,
@@ -13218,6 +13253,21 @@ body.fz-lang-ja #quizGrammarHint,
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+/* Hide Quiz Topbar when Petunjuk Guru Modal is open */
+body.has-tutor-modal .quiz-topbar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Ensure global modal dialogs sit ABOVE feedback sheet */
+#modal.modal {
+  z-index: 10002 !important;
+}
+.modal-backdrop {
+  z-index: 10001 !important;
 }
 
 /* Centered Petunjuk Guru Pop-up Modal */
@@ -13419,19 +13469,14 @@ body.fz-lang-ja #quizGrammarHint,
 }
 .tutor-modal-step-text {
   flex: 1 1 auto !important;
-  font-size: 13px !important;
+  font-size: 13.5px !important;
   line-height: 1.5 !important;
   color: #1E293B !important;
-}
-.tutor-modal-step-pfx {
-  font-weight: 800 !important;
-  color: #0F172A !important;
-  white-space: nowrap !important;
-  margin-right: 4px !important;
+  font-weight: 600 !important;
 }
 .tutor-modal-step-desc {
+  color: #1E293B !important;
   font-weight: 600 !important;
-  color: #334155 !important;
 }
 .tutor-modal-footer {
   padding: 12px 18px 16px !important;
