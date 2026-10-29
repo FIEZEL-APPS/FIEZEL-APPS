@@ -1,7 +1,7 @@
 {
-  "version": "m025-716",
-  "claimedBy": "branch feat/feedback-slide-sheet-m025-719",
-  "claimedAt": "2026-10-29T16:18:58.622Z",
-  "reason": "fix(release): advance to m025-716 with exact base+1 release boundary",
+  "version": "m025-717",
+  "claimedBy": "branch fix/mobile-boot-and-quiz-ui-m025-721",
+  "claimedAt": "2026-10-29T19:42:29.520Z",
+  "reason": "feat(quiz): in-quiz live mochi voice sos lifeline, auth login restoration, and luxury feedback sheet",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -28,6 +28,25 @@
     'nav.home': 'Home',
     'nav.vocab': 'Vocab',
     'nav.grammar': 'Grammar',
-    'nav.reading': 'Reading'
+    'nav.reading': 'Reading',
+
+    // features/mascot/fiezel-mochi-voice-sos.js — Mochi Live Voice SOS Lifeline (Thai)
+    'mochi-sos.bubble-tap': 'แตะฉันสิ',
+    'mochi-sos.bubble-title': 'คุยสดกับโมจิเพื่อขอคำแนะนำ',
+    'mochi-sos.badge-free': 'ฟรี',
+    'mochi-sos.call-title': 'โมจิคอลล์',
+    'mochi-sos.call-listening': 'โมจิกำลังฟังอยู่...',
+    'mochi-sos.call-speaking': 'โมจิกำลังอธิบาย...',
+    'mochi-sos.call-close-title': 'แตะเพื่อวางสาย',
+    'mochi-sos.toast-insufficient': 'เจมไม่พอ ({balance}/{cost} 💎) ฝึกฝนต่อเพื่อสะสมเจมนะ!',
+    'mochi-sos.toast-refund': 'สายสั้น: คืน {cost} เจมแล้ว 💎',
+    'mochi-sos.toast-cashback': 'สุดยอด! ตอบถูก: รับเงินคืน +{reward} เจม! 🎉',
+    'mochi-sos.intro-title': 'ตัวช่วยเสียงสดโมจิ! ✨',
+    'mochi-sos.intro-body': 'หากสงสัยข้อไหน แตะโมจิเพื่อรับคำอธิบายเสียงแบบไม่บอกคำตอบตรงๆ ได้เลย!',
+    'mochi-sos.intro-btn': 'เข้าใจแล้ว เริ่มฝึกเลย!',
+    'mochi-sos.guide-rule-prefix': 'คำแนะนำจากโมจิ: ',
+    'mochi-sos.guide-concept-prefix': 'ข้อนี้ทดสอบแนวคิด "{concept}" ลองดูรูปแบบคำหรือคำช่วยนะ!',
+    'mochi-sos.guide-default': 'โมจิพร้อมช่วย! ลองสังเกตคำช่วยบอกเวลาหรือทิศทางในประโยคนี้นะ!',
+    'mochi-sos.exam-locked': 'ทำด้วยตัวเองนะ โมจิพักผ่อนระหว่างทำแบบทดสอบจ้า!'
   });
 }());

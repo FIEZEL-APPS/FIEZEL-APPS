@@ -3081,7 +3081,7 @@ function setConfidence(value){const h=state.history[state.history.length-1];if(!
    atas dialog = batal. answered==0 tetap keluar bebas (aturan bebas-intip m025-177). */
 function confirmQuizExit(){
   const a=state.activeSession,answered=Math.max(0,Number(a?.answered||0));
-  const doExit=()=>{try{closeConfidencePop()}catch(_){}try{audio.stop()}catch(_){}go('home')};
+  const doExit=()=>{try{self.FiezelMochiVoiceSos?.closeCall?.('user_exit');self.FiezelMochiVoiceSos?.removeThoughtBubble?.();}catch(_){}try{closeConfidencePop()}catch(_){}try{audio.stop()}catch(_){}go('home')};
   if(!a||answered<1){doExit();return}
   const type=String(a.type||''),measure=type==='level-exam'||type==='grammar-skip',placement=type==='placement',planned=Math.max(1,Number(a.planned||0));
   const line=measure?FiezelI18n.t('quiz.exit-exam-warn')
@@ -8580,8 +8580,20 @@ function startWelcomeExperience(){
   }
   let onboardingDone=true;
   try{onboardingDone=self.FiezelOnboarding?.completed?.(self)!==false}catch{}
+  let proceedCalled=false;
+  const safeWatchdog=setTimeout(()=>{
+    try{
+      if(!proceedCalled&&!appOpened&&(!document.getElementById('app')?.innerHTML||document.getElementById('app').innerHTML.length===0)){
+        proceedCalled=true;
+        dismissBootSplash();
+        if(typeof proceed==='function')proceed();
+      }
+    }catch(_){}
+  },2200);
   return showBrandSplash(Date.now(),at=>{
     const proceed=()=>{
+      proceedCalled=true;
+      clearTimeout(safeWatchdog);
       if(isVerifiedTeacher()){
         state.view='tutor';
         dismissBootSplash();
@@ -11745,27 +11757,6 @@ function todayHomeMarkup(){
     </div>
   </section>`;
 
-  /* KelasKu Task Strip */
-  const kelaskuStrip = `<section class="fz-stitch-kelasku" onclick="showToast(FiezelI18n.t('home.classroom-tutup'))">
-    <div class="kelasku-strip-left">
-      <div class="kelasku-strip-icon">
-        <i class="fz-i" data-fz-icon="classroom"></i>
-      </div>
-      <div class="kelasku-strip-text">
-        <div class="kelasku-strip-meta">
-          <span class="kelasku-meta-brand">KelasKu</span>
-          <span>•</span>
-          <span class="kelasku-meta-due">${esc(FiezelI18n.t('kelasku.strip-tugas-aktif'))}</span>
-        </div>
-        <div class="kelasku-strip-title">${FiezelI18n.t('kelasku.strip-latihan-materi')}</div>
-        <div class="kelasku-strip-sub">${FiezelI18n.t('kelasku.strip-sinkron-guru')}</div>
-      </div>
-    </div>
-    <button type="button" class="kelasku-strip-btn" onclick="event.stopPropagation();showToast(FiezelI18n.t('home.classroom-tutup'))">
-      <span>${esc(FiezelI18n.t('home.segera'))}</span>
-      <span aria-hidden="true">➔</span>
-    </button>
-  </section>`;
 
   /* Hero Quest Card (Tactile Clay Quest Card) - m025-577 "Rencana Fiezel hari ini".
      Lihat blok HERO di atas todayHomeMarkup: kata paling rawan lupa menggantikan kata hari
@@ -12758,11 +12749,22 @@ function dismissBootSplash(){
   try{self.__fiezelBootSplash?.clearRecovery?.()}catch(_){}
   try{self.__fiezelBootSplash?.clearWatchdog?.()}catch(_){}
   try{const r=self.document?.getElementById?.('fiezelBootRecovery');if(r)r.remove()}catch(_){}
-  try{if(self.FiezelSplash?.disposeBootSplash?.(self))return true}catch(_){}
+  try{self.FiezelSplash?.disposeBootSplash?.(self)}catch(_){}
+  try{self.__fiezelBootSplash?.dismiss?.()}catch(_){}
   try{
-    self.__fiezelBootSplash?.dismiss?.();
-    return true
-  }catch(_){return false}
+    const bs=self.document?.getElementById?.('fiezelBootSplash');
+    if(bs&&bs.parentNode)bs.parentNode.removeChild(bs);
+  }catch(_){}
+  try{
+    self.document?.querySelectorAll?.('.fiezel-splash')?.forEach?.(s=>s.remove?.());
+  }catch(_){}
+  try{
+    self.document?.documentElement?.classList?.remove?.('fz-booting');
+  }catch(_){}
+  try{
+    self.__fiezelBootSplashDismissed=true;
+  }catch(_){}
+  return true;
 }
 window.dismissBootSplash=dismissBootSplash;
 /* Peluncuran DINGIN vs hangat.
@@ -16621,7 +16623,7 @@ function quizLoop(cfg){
   * lagi, ia butuh satu hal dijelaskan sekali dengan tenang.
   */
  const teach=info=>{
-  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked,planned})}"><div class="quiz-progress-text"><span class="quiz-progress-num">${asked}</span><span class="quiz-progress-sep">/</span><span class="quiz-progress-total">${planned}</span></div><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><span class="quiz-teach-flag">${FiezelI18n.t('quiz.teach-flag')}</span></div><div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>${FiezelI18n.t('quiz.reteach-label')}</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">${FiezelI18n.t('quiz.reteach-intro')} ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${formatRuleForDisplay(esc(info.rule))}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">${FiezelI18n.t('quiz.reteach-ready')} <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
+  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked,planned})}"><div class="quiz-progress-text"><span class="quiz-progress-num">${asked}</span><span class="quiz-progress-sep">/</span><span class="quiz-progress-total">${planned}</span></div><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><div id="quizTopbarGem" class="quiz-topbar-gem"><span class="gem-icon">💎</span><span id="quizTopbarGemCount" class="gem-count">${(typeof state!=='undefined'&&state?.gems?.balance!=null)?Number(state.gems.balance).toLocaleString('id-ID'):'120'}</span></div><span class="quiz-teach-flag">${FiezelI18n.t('quiz.teach-flag')}</span></div><div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>${FiezelI18n.t('quiz.reteach-label')}</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">${FiezelI18n.t('quiz.reteach-intro')} ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${formatRuleForDisplay(esc(info.rule))}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">${FiezelI18n.t('quiz.reteach-ready')} <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   /* R6 perbaikan-14: kartu ajar-ulang dibuka lewat quizNext yang sudah menyetel start, jadi
      lama MEMBACA kartu ikut terhitung sebagai waktu jawab soal berikutnya - mencemari bukti
@@ -16760,7 +16762,7 @@ function quizLoop(cfg){
     }
     return `<span class="question-main">${formattedStem}</span>`;
   };
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><div class="quiz-progress-text"><span class="quiz-progress-num">${asked+1}</span><span class="quiz-progress-sep">/</span><span class="quiz-progress-total">${planned}</span></div><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(!MEASURE&&!cfg.placement&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,(MEASURE||cfg.placement)?'':q.focus.phonetic)}</span>${(q.focus.phonetic&&!MEASURE&&!cfg.placement)?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><div class="quiz-progress-text"><span class="quiz-progress-num">${asked+1}</span><span class="quiz-progress-sep">/</span><span class="quiz-progress-total">${planned}</span></div><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><div id="quizTopbarGem" class="quiz-topbar-gem"><span class="gem-icon">💎</span><span id="quizTopbarGemCount" class="gem-count">${(typeof state!=='undefined'&&state?.gems?.balance!=null)?Number(state.gems.balance).toLocaleString('id-ID'):'120'}</span></div>${(!MEASURE&&!cfg.placement&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,(MEASURE||cfg.placement)?'':q.focus.phonetic)}</span>${(q.focus.phonetic&&!MEASURE&&!cfg.placement)?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}${alasanSoalTag(q,cfg,MEASURE)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   if(state?.targetLang==='ja'||q.type==='vocab'){$('quizGrammarHint')?.remove();}
   const hintBtn=$('quizGrammarHint');
@@ -16900,6 +16902,27 @@ function quizLoop(cfg){
     }
    };
   }
+  /* In-Quiz Live Mochi Voice SOS Lifeline wiring */
+  if(!MEASURE&&!cfg.placement&&!cfg.noHints){
+    try{
+      if(self.FiezelMochiVoiceSos){
+        self.FiezelMochiVoiceSos.mountThoughtBubble(q);
+        self.FiezelMochiVoiceSos.showIntroIfNeeded();
+        self.FiezelMochiVoiceSos.updateTopbarGem();
+      }
+      setTimeout(()=>{
+        try{
+          if(self.FiezelMochiVoiceSos){
+            self.FiezelMochiVoiceSos.mountThoughtBubble(q);
+            self.FiezelMochiVoiceSos.showIntroIfNeeded();
+            self.FiezelMochiVoiceSos.updateTopbarGem();
+          }
+        }catch(_){}
+      },150);
+    }catch(_){}
+  }else{
+    try{if(self.FiezelMochiVoiceSos){self.FiezelMochiVoiceSos.closeCall('exam_mode');self.FiezelMochiVoiceSos.removeThoughtBubble()}}catch(_){}
+  }
   $('quizNext').onclick=()=>{if(answer.locked){$('quizFloatingBar')?.remove();document.querySelector('.quiz-shell')?.classList.remove('has-retry-active');closeConfidencePop();answer.locked=false;audio.stop();asked++;lastConcept=quizConcept(q);start=Date.now();draw()}};
  };
 
@@ -16998,6 +17021,7 @@ function quizLoop(cfg){
   const showTutorHintModal=(questionObj,lastPickIndex,clueText)=>{
    document.getElementById('tutorHintModalBackdrop')?.remove();
    document.getElementById('tutorHintModal')?.remove();
+   document.body.classList.add('has-tutor-modal');
 
    const gd=stepTutorGuidance(questionObj);
    const cleanDash=s=>String(s||'').replace(/\s*[—–]\s*/g,', ').replace(/,\s*,/g,', ');
@@ -17009,12 +17033,10 @@ function quizLoop(cfg){
        <div class="tutor-modal-steps-list">
          ${gd.steps.map((s,idx)=>{
            let stepText=cleanDash(s?.ask||'');
-           stepText=stepText.replace(/^(Langkah|ขั้นตอนที่)\s*\d+\s*:\s*/i,'').trim();
-           const pfxStr=FiezelI18n.t('brain-step.step-prefix',{n:idx+1})||`Langkah ${idx+1}: `;
+           stepText=stepText.replace(/^(Langkah|ขั้นตอนที่)\s*\d+[\s:]*/i,'').trim();
            return `<div class="tutor-modal-step-item">
              <span class="tutor-modal-step-num">${idx+1}</span>
              <div class="tutor-modal-step-text">
-               <span class="tutor-modal-step-pfx">${esc(pfxStr)}</span>
                <span class="tutor-modal-step-desc">${esc(stepText)}</span>
              </div>
            </div>`;
@@ -17068,6 +17090,7 @@ function quizLoop(cfg){
    document.body.appendChild(modal);
 
    const dismissModal=()=>{
+     document.body.classList.remove('has-tutor-modal');
      backdrop.classList.add('is-closing');
      modal.classList.add('is-closing');
      setTimeout(()=>{
@@ -17174,6 +17197,7 @@ function quizLoop(cfg){
 
  /** Membuka jawaban dan seluruh penjelasannya. Jalur akhir untuk satu soal. */
  const reveal=(q,j,ok,{forced=false}={})=>{
+  try{if(self.FiezelMochiVoiceSos&&typeof self.FiezelMochiVoiceSos.onQuestionAnswered==='function'){self.FiezelMochiVoiceSos.onQuestionAnswered(ok,q)}}catch(_){}
   q.__diagnosticClue='';
   document.getElementById('quizScaffoldNudge')?.remove();
   document.querySelector('.quiz-shell')?.classList.remove('has-retry-active');
@@ -17331,6 +17355,11 @@ function quizLoop(cfg){
    whyText = stripDash(whyText);
    if(pickedWhyFails) pickedWhyFails = stripDash(pickedWhyFails);
    const ruleText = q.explain?.rule ? stripDash(q.explain.rule) : '';
+   let finalTakeaway = whyText;
+   if (!finalTakeaway || !finalTakeaway.trim()) {
+     finalTakeaway = pickedWhyFails || (q.explain?.rule ? stripDash(q.explain.rule) : '') || (q.explain?.tip ? stripDash(q.explain.tip) : '') || (q.meaning ? ('Arti kata "' + cleanCorrect + '" adalah ' + q.meaning + '.') : '') || 'Perhatikan konteks kalimat dan pilihan kata yang paling tepat.';
+   }
+   const cleanAnsIntro = String(FiezelI18n.t('quiz.answer-paling-tepat-adalah') || '').replace(/^[.\s]+/, '');
    /* m025-565 Stempel Ingatan: satu baris meta tepat di bawah vonis. Bukan <p> supaya tidak
       ikut aturan warna paragraf pembahasan; gerbang memoryStampAllowed ditanya ulang di sini
       karena kunci ujian bisa menyala di antara jawaban dan pembahasan. */
@@ -17356,6 +17385,24 @@ function quizLoop(cfg){
       document.body.appendChild(f);
     }
 
+    const advanceToNextQuestion = () => {
+      window.__closeFeedbackSheet = null;
+      try {
+        bd?.classList.remove('is-active');
+        f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
+        f.classList.add('hidden');
+      } catch (_) {}
+      $('quizFloatingBar')?.remove();
+      document.querySelector('.quiz-shell')?.classList.remove('has-retry-active');
+      try { closeConfidencePop(); } catch (_) {}
+      answer.locked = false;
+      try { audio.stop(); } catch (_) {}
+      asked++;
+      lastConcept = quizConcept(q);
+      start = Date.now();
+      draw();
+    };
+
     const closeFeedbackSheet = (advance = true) => {
       window.__closeFeedbackSheet = null;
       bd?.classList.remove('is-active');
@@ -17363,47 +17410,111 @@ function quizLoop(cfg){
       f.classList.add('hidden');
       $('quizFloatingBar')?.remove();
       if (advance) {
-        $('quizNext')?.click();
+        advanceToNextQuestion();
       }
     };
     window.__closeFeedbackSheet = () => closeFeedbackSheet(false);
 
-    bd.onclick = () => closeFeedbackSheet(true);
+    bd.onclick = (e) => {
+      e?.stopPropagation?.();
+      advanceToNextQuestion();
+    };
 
-    f.innerHTML=`<div class="feedback-sheet-drag-handle" aria-hidden="true"></div><div class="feedback-sheet-header"><div class="feedback-status-pill ${ok?'is-correct':'is-wrong'}"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}<button type="button" id="feedbackSheetClose" class="feedback-sheet-close-btn" aria-label="${esc(FiezelI18n.t('modal.tutup','Tutup'))}"><i data-lucide="x"></i></button></div><div class="feedback-sheet-body"><div class="feedback-sheet-hero"><div class="feedback-answer-line">${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`<span class="feedback-answer-wrong">${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}</span> <span class="feedback-answer-sep">•</span> <span class="feedback-answer-correct">${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.</span>`}</div>${pickedWhyFails?`<div class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</div>`:''}${stepGuidanceHtml}<div class="feedback-takeaway-card"><div class="takeaway-badge"><i data-lucide="lightbulb"></i> <span>${FiezelI18n.t('quiz.intinya')}</span></div><p class="takeaway-text">${esc(whyText)}</p></div></div><details class="feedback-drawer-details"><summary class="feedback-drawer-summary"><span class="drawer-summary-label"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.pembahasan-lengkap','Pembahasan & Aturan Lengkap')}</span><i data-lucide="chevron-down" class="drawer-chevron"></i></summary><div class="feedback-drawer-content">${ruleText?`<div class="feedback-rule-box feedback-rule-pill"><span class="rule-kicker"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.aturannya','Aturan Tata Bahasa')}</span><div class="rule-content">${formatRuleForDisplay(esc(ruleText))}</div></div>`:''}${(q.explain?.distractor||q.explain?.distractors)?`<div class="feedback-distractor-box"><span class="distractor-kicker">${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</span><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</div>`:''}<div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="zap"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button type="button" class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button></div></details></div><div class="feedback-sheet-footer">${!ok?`<div class="feedback-sheet-secondary-row"><button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button><button type="button" id="quizSheetExplain" class="feedback-sheet-explain-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.buka-pembahasan','Buka Pembahasan')}</span></button></div>`:`<button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button>`}<button type="button" id="quizSheetNext" class="feedback-sheet-next-btn ${ok?'btn-correct':'btn-wrong'}"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button></div>`;
+    f.innerHTML=`<div class="feedback-sheet-drag-handle" aria-hidden="true"></div><div class="feedback-sheet-header"><div class="feedback-status-pill ${ok?'is-correct':'is-wrong'}"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}<button type="button" id="feedbackSheetClose" class="feedback-sheet-close-btn" aria-label="${esc(FiezelI18n.t('modal.tutup','Tutup'))}"><i data-lucide="x"></i></button></div><div class="feedback-sheet-body"><div class="feedback-sheet-hero"><div class="feedback-answer-line">${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`<span class="feedback-answer-wrong">${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}</span> <span class="feedback-answer-sep">•</span> <span class="feedback-answer-correct">${esc(cleanAnsIntro)} ${correctPickRender}.</span>`}</div>${pickedWhyFails?`<div class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</div>`:''}${stepGuidanceHtml}<div class="feedback-takeaway-card"><div class="takeaway-badge"><i data-lucide="lightbulb"></i> <span>${FiezelI18n.t('quiz.intinya')}</span></div><p class="takeaway-text">${esc(finalTakeaway)}</p></div></div><details class="feedback-drawer-details"><summary class="feedback-drawer-summary"><span class="drawer-summary-label"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.pembahasan-lengkap','Pembahasan & Aturan Lengkap')}</span><i data-lucide="chevron-down" class="drawer-chevron"></i></summary><div class="feedback-drawer-content">${ruleText?`<div class="feedback-rule-box feedback-rule-pill"><span class="rule-kicker"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.aturannya','Aturan Tata Bahasa')}</span><div class="rule-content">${formatRuleForDisplay(esc(ruleText))}</div></div>`:''}${(q.explain?.distractor||q.explain?.distractors)?`<div class="feedback-distractor-box"><span class="distractor-kicker">${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</span><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</div>`:''}<div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="zap"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button type="button" class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button></div></details></div><div class="feedback-sheet-footer">${!ok?`<div class="feedback-sheet-secondary-row"><button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button><button type="button" id="quizSheetExplain" class="feedback-sheet-explain-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.buka-pembahasan','Buka Pembahasan')}</span></button></div>`:`<button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button>`}<button type="button" id="quizSheetNext" class="feedback-sheet-next-btn ${ok?'btn-correct':'btn-wrong'}"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button></div>`;
 
     const sheetCloseBtn = $('feedbackSheetClose');
     if(sheetCloseBtn){
-      sheetCloseBtn.onclick=()=>{
+      sheetCloseBtn.onclick=(e)=>{
+        e?.stopPropagation?.();
         haptic('tap');
-        $('quizExit')?.click();
+        advanceToNextQuestion();
       };
     }
     const sheetExitBtn = $('quizSheetExit');
     if(sheetExitBtn){
-      sheetExitBtn.onclick=()=>{
+      sheetExitBtn.onclick=(e)=>{
+        e?.stopPropagation?.();
         haptic('tap');
-        $('quizExit')?.click();
+        closeFeedbackSheet(false);
+        confirmQuizExit();
       };
     }
     const sheetExplainBtn = $('quizSheetExplain');
     if(sheetExplainBtn){
-      sheetExplainBtn.onclick=()=>{
+      sheetExplainBtn.onclick=(e)=>{
+        e?.stopPropagation?.();
         haptic('tap');
         const details = f.querySelector('.feedback-drawer-details');
         if(details){
-          details.open = true;
-          try{details.scrollIntoView({behavior:'smooth',block:'nearest'})}catch(_){}
+          details.open = !details.open;
+          if(details.open){
+            try{details.scrollIntoView({behavior:'smooth',block:'nearest'})}catch(_){}
+          }
         }
       };
     }
     const sheetNextBtn = $('quizSheetNext');
     if(sheetNextBtn){
-      sheetNextBtn.onclick=()=>{
+      sheetNextBtn.onclick=(e)=>{
+        e?.stopPropagation?.();
         haptic('tap');
-        closeFeedbackSheet(true);
+        advanceToNextQuestion();
       };
     }
+
+    // Touch gesture: swipe down to dismiss
+    let sheetTouchStartY = 0;
+    let sheetTouchCurrentY = 0;
+    let sheetIsDragging = false;
+
+    const onSheetTouchStart = (e) => {
+      if (!e.touches || !e.touches[0]) return;
+      sheetTouchStartY = e.touches[0].clientY;
+      sheetTouchCurrentY = sheetTouchStartY;
+      const bodyEl = f.querySelector('.feedback-sheet-body');
+      const isTopArea = e.target.closest('.feedback-sheet-header, .feedback-sheet-drag-handle');
+      if (isTopArea || !bodyEl || bodyEl.scrollTop <= 0) {
+        sheetIsDragging = true;
+      } else {
+        sheetIsDragging = false;
+      }
+    };
+
+    const onSheetTouchMove = (e) => {
+      if (!sheetIsDragging || !e.touches || !e.touches[0]) return;
+      sheetTouchCurrentY = e.touches[0].clientY;
+      const deltaY = sheetTouchCurrentY - sheetTouchStartY;
+      if (deltaY > 0) {
+        f.style.transform = `translateY(${deltaY}px)`;
+        f.style.transition = 'none';
+      }
+    };
+
+    const onSheetTouchEnd = () => {
+      if (!sheetIsDragging) return;
+      sheetIsDragging = false;
+      const deltaY = sheetTouchCurrentY - sheetTouchStartY;
+      if (deltaY > 60) {
+        f.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+        f.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+          f.style.transform = '';
+          f.style.transition = '';
+          advanceToNextQuestion();
+        }, 220);
+      } else {
+        f.style.transition = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+        f.style.transform = 'translateY(0)';
+        setTimeout(() => {
+          f.style.transform = '';
+          f.style.transition = '';
+        }, 200);
+      }
+    };
+
+    f.addEventListener('touchstart', onSheetTouchStart, { passive: true });
+    f.addEventListener('touchmove', onSheetTouchMove, { passive: true });
+    f.addEventListener('touchend', onSheetTouchEnd, { passive: true });
   /* Audit G6: sesudah pembahasan jawaban SALAH dibuka, giliran tutor dulu (a) mengulang
      kalimat "Mengapa kurang tepat?" yang sama persis di kotak pembahasan tepat di atasnya,
      dan (b) pada tangga probe/hint menutup dengan "Sekarang coba jawab lagi ya" padahal semua
@@ -18026,6 +18137,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // Menandai sesi selesai supaya pemulih stage kuis tidak lagi menutupnya sebagai
   // "ditinggalkan" ketika murid menekan kembali dari layar hasil.
   if(cfg)cfg.__finished=true;
+  try{self.FiezelMochiVoiceSos?.closeCall?.('quiz_finished');self.FiezelMochiVoiceSos?.removeThoughtBubble?.();}catch(_){}
   state.quizActive = false;
   const accuracy=Math.round(score/Math.max(1,total)*100),session=completeActiveSession(cfg,score,total);
   // F1 placement: level dibaca dari DUA hal yang harus sepakat, dan yang lebih rendah menang.

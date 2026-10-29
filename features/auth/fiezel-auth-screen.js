@@ -68,7 +68,7 @@
     var rec = {
       v: 1, signedIn: true, at: Date.now(),
       role: ROLES.indexOf(d.role) !== -1 ? d.role : 'murid',
-      via: d.via === 'google' ? 'google' : (d.via === 'guest' || d.via === 'local_bypass' ? 'guest' : 'akun')
+      via: d.via === 'google' ? 'google' : 'akun'
     };
     try { (env || root).localStorage.setItem(SESSION_KEY, JSON.stringify(rec)); } catch (_) {}
     return rec;
@@ -82,10 +82,6 @@
    */
   function checkServer(env) {
     var w = env || root, base = '';
-    var session = readSession(w);
-    if (session && (session.via === 'guest' || session.via === 'local_bypass')) {
-      return Promise.resolve({ ok: true, signedIn: true, user: { role: 'murid', handle: 'Pengunjung' } });
-    }
     try { base = String(((w.FIEZEL_CF_CONFIG || {}).base) || '').trim().replace(/\/$/, ''); } catch (_) {}
     if (!base || typeof w.fetch !== 'function') return Promise.resolve(null);
     return w.fetch(base + '/api/auth/session', { credentials: 'include', mode: 'cors', cache: 'no-store' })
@@ -173,25 +169,12 @@
     return '<h1 class="fz-auth-title">' + esc(t('auth.layar.selamat-datang', 'Selamat datang')) + '</h1>'
       + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Belajar Bahasa Inggris dan Bahasa Jepang adaptif. Masuk sekali, progresmu ikut ke HP mana pun.')) + '</p>'
       + '<div class="fz-auth-next-row"><button type="button" class="fz-auth-next fz-plain" data-auth-go="masuk" data-testid="auth-continue">'
-      + '<span>' + esc(t('auth.layar.lanjut', 'Lanjut')) + '</span><span class="fz-auth-next-dot">' + icon('arrow') + '</span></button></div>'
-      + '<div class="fz-auth-guest-box" style="margin:14px 0 0;text-align:center;">'
-      + '<button type="button" class="fz-auth-guest-btn fz-plain" data-auth-guest data-testid="auth-guest-welcome" style="color:#64748B;font-weight:600;font-size:13px;cursor:pointer;text-decoration:underline;">'
-      + esc(t('auth.layar.tamu', 'Masuk sebagai Pengunjung / Tamu'))
-      + '</button>'
-      + '</div>';
+      + '<span>' + esc(t('auth.layar.lanjut', 'Lanjut')) + '</span><span class="fz-auth-next-dot">' + icon('arrow') + '</span></button></div>';
   }
   function formBody(ui) {
     var daftar = ui.screen === 'daftar', guru = ui.role === 'guru';
     var html = '<h1 class="fz-auth-title is-underlined">' + esc(daftar ? t('auth.layar.daftar', 'Daftar') : t('auth.layar.masuk', 'Masuk')) + '</h1>'
       + roleTabs(ui.role);
-    if (!guru) {
-      html += '<div class="fz-auth-guest-box" style="margin:12px 0 10px;text-align:center;">'
-        + '<button type="button" class="fz-auth-guest-btn" data-auth-guest data-testid="auth-guest-top" style="width:100%;padding:12px 18px;background:#F8FAFC;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:14px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">'
-        + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#475569;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
-        + '<span>' + esc(t('auth.layar.tamu', 'Masuk sebagai Pengunjung / Tamu')) + '</span>'
-        + '</button>'
-        + '</div>';
-    }
     if (!guru) {
       var googleBtnLabel = daftar
         ? t('auth.layar.google-daftar', 'Daftar dengan Google')
@@ -230,13 +213,6 @@
     html += '<p class="fz-auth-error" role="alert" data-auth-error>' + esc(ui.error || '') + '</p>'
       + submit(daftar ? (guru ? t('auth.layar.aktifkan', 'Aktifkan akun guru') : t('auth.layar.daftar', 'Daftar')) : t('auth.layar.masuk', 'Masuk'), ui.busy)
       + '</form>'
-      + (guru ? '' : '<div class="fz-auth-guest-box" style="margin:16px 0 10px;text-align:center;">'
-        + '<button type="button" class="fz-auth-guest-btn" data-auth-guest data-testid="auth-guest" style="width:100%;padding:12px 18px;background:#F8FAFC;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:14px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05);transition:all 0.15s ease;">'
-        + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#64748B;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
-        + '<span>' + esc(t('auth.layar.tamu', 'Masuk sebagai Pengunjung / Tamu')) + '</span>'
-        + '</button>'
-        + '<p style="margin:6px 0 0;font-size:11.5px;color:#64748B;">' + esc(t('auth.layar.tamu-hint', 'Belajar langsung tanpa akun. Progres tersimpan di perangkat ini.')) + '</p>'
-        + '</div>')
       + '<p class="fz-auth-alt">' + esc(daftar
         ? (guru ? t('auth.layar.sudah-guru', 'Sudah punya akun guru?') : t('auth.layar.sudah-akun', 'Sudah punya akun?'))
         : (guru ? t('auth.layar.belum-guru', 'Guru baru?') : t('auth.layar.belum-akun', 'Belum punya akun?')))
@@ -423,17 +399,6 @@
     function onClick(e) {
       var b = e.target && e.target.closest ? e.target.closest('button,a') : null;
       if (!b || !host.contains(b)) return;
-      if (b.hasAttribute('data-auth-guest') || b.hasAttribute('data-auth-bypass')) {
-        finish({
-          role: 'murid',
-          via: 'guest',
-          action: 'guest',
-          isNew: false,
-          handle: 'Pengunjung',
-          email: ''
-        });
-        return;
-      }
       if (b.hasAttribute('data-auth-go')) { lupakanSandi(); ui.screen = b.getAttribute('data-auth-go'); ui.error = ''; ui.forgot = false; paint(); focusFirst(); return; }
       if (b.hasAttribute('data-auth-role')) { lupakanSandi(); ui.role = b.getAttribute('data-auth-role') === 'guru' ? 'guru' : 'murid'; ui.error = ''; ui.forgot = false; paint(); return; }
       if (b.hasAttribute('data-auth-forgot')) { ui.forgot = !ui.forgot; paint(); return; }

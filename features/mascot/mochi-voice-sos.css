@@ -1,0 +1,847 @@
+/* ============================================================================
+   features/mascot/mochi-voice-sos.css — Mochi Voice SOS & Socratic Lifeline UI
+   Strict Invariants:
+   - Rule 2 (Zero-Potemkin): High tactile polish, authentic active states.
+   - Rule 5 (Anti-Void Desktop): Split-Screen & centered card (740-980px), zero void.
+   - Rule 5 (Zero-Overlap Mobile): Safe thumb-zone, zero facial overlap on Mochi.
+   ============================================================================ */
+
+/* ── 1. Comic Thought Bubble ("Ketuk aku" / "แตะฉันสิ") ── */
+.fz-paw-slot,
+.quiz-stage .fz-paw-slot,
+.quiz-stage .fz-paw-above,
+.quiz-shell .fz-paw-side,
+.quiz-shell .fz-paw-side .fz-paw-slot {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.fz-mochi-thought-bubble {
+  position: absolute !important;
+  top: -8px !important;
+  left: 6px !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 50 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBEB 100%) !important;
+  border: 1.5px solid #F59E0B !important;
+  border-radius: 12px 12px 3px 12px !important;
+  padding: 4px 10px !important;
+  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.16) !important;
+  animation: fzThoughtFloat 2.6s ease-in-out infinite !important;
+  transform-origin: bottom right !important;
+  box-sizing: border-box !important;
+  text-decoration: none !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  min-height: 0 !important;
+  height: auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease !important;
+}
+
+/* Auto-hide cleanly during active voice call */
+.fz-mochi-thought-bubble.is-call-active {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: scale(0.8) translateY(-4px) !important;
+}
+
+.fz-mochi-thought-bubble:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.22);
+}
+
+.fz-mochi-thought-bubble:active {
+  transform: scale(0.95);
+}
+
+.fz-thought-dot {
+  width: 5px !important;
+  height: 5px !important;
+  border-radius: 50% !important;
+  background: #10B981 !important;
+  box-shadow: 0 0 4px rgba(16, 185, 129, 0.8) !important;
+  animation: fzLiveDotPulse 1.4s ease-in-out infinite !important;
+  flex-shrink: 0 !important;
+}
+
+.fz-thought-text {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #92400E !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+
+/* Comic Thought Trail: points down-right from bubble toward Mochi */
+.fz-thought-trail-1 {
+  position: absolute;
+  right: 2px;
+  bottom: -4px;
+  width: 4px;
+  height: 4px;
+  background: #FFFFFF;
+  border: 1px solid #F59E0B;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.fz-thought-trail-2 {
+  position: absolute;
+  right: -2px;
+  bottom: -8px;
+  width: 2.5px;
+  height: 2.5px;
+  background: #FFFFFF;
+  border: 0.8px solid #F59E0B;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes fzThoughtFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes fzLiveDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.75;
+  }
+}
+
+/* ── 2. Minimalist Under-Mochi Soundwave Visualizer (Active Call) ── */
+.fz-mochi-voice-under {
+  position: absolute !important;
+  bottom: -8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2.5px !important;
+  height: 24px !important;
+  padding: 2px 10px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #F59E0B !important;
+  border-radius: 999px !important;
+  box-shadow: 0 3px 12px rgba(217, 119, 6, 0.18) !important;
+  z-index: 30 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  animation: fzVoiceBarPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  transition: transform 0.15s ease, background 0.15s ease !important;
+}
+
+.fz-mochi-voice-under:hover {
+  transform: translateX(-50%) scale(1.05) !important;
+  background: #FFFBEB !important;
+}
+
+.fz-mochi-voice-under:active {
+  transform: translateX(-50%) scale(0.96) !important;
+}
+
+.fz-mochi-voice-under .sw-bar {
+  display: inline-block !important;
+  width: 2.2px !important;
+  border-radius: 1px !important;
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%) !important;
+  transform-origin: center !important;
+  animation: fzSoundwaveListening 1.1s ease-in-out infinite !important;
+}
+
+.fz-mochi-voice-under .sw-bar.b-1 { height: 4px !important; animation-delay: 0.0s; }
+.fz-mochi-voice-under .sw-bar.b-2 { height: 7px !important; animation-delay: 0.15s; }
+.fz-mochi-voice-under .sw-bar.b-3 { height: 10px !important; animation-delay: 0.3s; }
+.fz-mochi-voice-under .sw-bar.b-4 { height: 7px !important; animation-delay: 0.45s; }
+.fz-mochi-voice-under .sw-bar.b-5 { height: 9px !important; animation-delay: 0.2s; }
+.fz-mochi-voice-under .sw-bar.b-6 { height: 6px !important; animation-delay: 0.35s; }
+.fz-mochi-voice-under .sw-bar.b-7 { height: 3px !important; animation-delay: 0.1s; }
+
+/* When Mochi is speaking (emerald harmonic pulse) */
+.fz-mochi-voice-under.is-speaking .sw-bar {
+  background: linear-gradient(180deg, #10B981 0%, #059669 100%) !important;
+  animation: fzSoundwaveSpeaking 0.5s ease-in-out infinite alternate !important;
+}
+
+.fz-mochi-voice-under.is-speaking .sw-bar.b-1 { animation-delay: 0.05s; }
+.fz-mochi-voice-under.is-speaking .sw-bar.b-2 { animation-delay: 0.15s; }
+.fz-mochi-voice-under.is-speaking .sw-bar.b-3 { animation-delay: 0.25s; }
+.fz-mochi-voice-under.is-speaking .sw-bar.b-4 { animation-delay: 0.1s; }
+.fz-mochi-voice-under.is-speaking .sw-bar.b-5 { animation-delay: 0.2s; }
+.fz-mochi-voice-under.is-speaking .sw-bar.b-6 { animation-delay: 0.3s; }
+.fz-mochi-voice-under.is-speaking .sw-bar.b-7 { animation-delay: 0.12s; }
+
+@keyframes fzVoiceBarPopIn {
+  from {
+    transform: translateX(-50%) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fzSoundwaveListening {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes fzSoundwaveSpeaking {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1.4); }
+}
+
+/* ── 3. Gem Wallet in Quiz Topbar ── */
+.quiz-topbar-gem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #FFFBEB;
+  border: 1.2px solid #FDE68A;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #92400E;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.quiz-topbar-gem .gem-icon {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.quiz-topbar-gem .gem-count {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ── 4. Welcome Educational Modal ── */
+.fz-mochi-sos-intro-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fzMochiFadeIn 0.2s ease-out;
+}
+
+.fz-mochi-sos-intro-card {
+  background: #FFFDF8;
+  border: 1.8px solid #FDE68A;
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(46, 39, 36, 0.16);
+  width: 100%;
+  max-width: 360px;
+  padding: 24px 20px;
+  text-align: center;
+  animation: fzCardPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.fz-mochi-sos-intro-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FEF3C7;
+  border-radius: 20px;
+}
+
+.fz-mochi-sos-intro-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 8px;
+}
+
+.fz-mochi-sos-intro-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #475569;
+  margin: 0 0 20px;
+}
+
+.fz-mochi-sos-intro-btn {
+  width: 100%;
+  padding: 12px 16px;
+  background: #F59E0B;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+.fz-mochi-sos-intro-btn:hover {
+  background: #D97706;
+  transform: translateY(-1px);
+}
+
+.fz-mochi-sos-intro-btn:active {
+  transform: scale(0.98);
+}
+
+@keyframes fzMochiFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fzCardPopIn {
+  from {
+    transform: scale(0.9) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── 5. Universal Multi-Device & Split-Screen Architecture (Rule 5 §2) ── */
+
+/* Global Topbar Horizontal Alignment (Mobile, Tablet, Desktop) */
+body.fz-stage-quiz .quiz-topbar,
+body.fz-lux.fz-stage-quiz .quiz-topbar,
+body .quiz-shell .quiz-topbar,
+.quiz-topbar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+/* ── Unified Responsive Topbar (Mobile, Tablet, Desktop) ── */
+.quiz-topbar,
+body.fz-stage-quiz .quiz-topbar,
+body.fz-lux.fz-stage-quiz .quiz-topbar,
+html body #app .quiz-shell .quiz-topbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  z-index: 500 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: max(8px, env(safe-area-inset-top, 8px)) 16px 8px !important;
+  height: auto !important;
+  min-height: 54px !important;
+  max-height: none !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1.5px solid #F1F5F9 !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+}
+
+.quiz-topbar .quiz-exit,
+body .quiz-topbar #quizExit {
+  flex: 0 0 38px !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  border-radius: 12px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  background: #F8FAFC !important;
+  color: #475569 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+  transition: all 0.15s ease !important;
+}
+
+.quiz-topbar .quiz-exit:hover {
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+.quiz-topbar .quiz-exit:active {
+  transform: scale(0.95) !important;
+}
+
+.quiz-topbar .quiz-exit svg,
+.quiz-topbar .quiz-exit i {
+  width: 20px !important;
+  height: 20px !important;
+  stroke-width: 2.2 !important;
+}
+
+.quiz-topbar .quiz-exit-label {
+  display: none !important;
+}
+
+.quiz-topbar .quiz-progress,
+body .quiz-topbar .quiz-progress {
+  flex: 1 1 auto !important;
+  max-width: 280px !important;
+  margin: 0 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.quiz-topbar .quiz-progress-label {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.quiz-topbar .quiz-progress-label .quiz-progress-num,
+.quiz-topbar .quiz-progress > span {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1 !important;
+}
+
+.quiz-topbar .quiz-progress-label .quiz-progress-sep {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #94A3B8 !important;
+  line-height: 1 !important;
+}
+
+.quiz-topbar .quiz-progress-label .quiz-progress-total,
+.quiz-topbar .quiz-progress > em {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+}
+
+.quiz-topbar .quiz-progress-bar {
+  display: block !important;
+  width: 100% !important;
+  max-width: 140px !important;
+  height: 4px !important;
+  margin: 3px auto 0 !important;
+  background: #E2E8F0 !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+}
+
+.quiz-topbar .quiz-progress-bar b {
+  display: block !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, #F59E0B, #EA580C) !important;
+  border-radius: 999px !important;
+}
+
+.quiz-topbar .quiz-topbar-gem,
+body .quiz-topbar #quizTopbarGem {
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  background: #FFFBEB !important;
+  border: 1.2px solid #FDE68A !important;
+  padding: 3px 9px !important;
+  border-radius: 999px !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: #92400E !important;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08) !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  box-sizing: border-box !important;
+}
+
+.quiz-topbar #quizGrammarHint {
+  flex: 0 0 38px !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 12px !important;
+  border: 1.5px solid #FDE68A !important;
+  background: #FFFBEB !important;
+  color: #D97706 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 6px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+.quiz-shell,
+html body #app .quiz-shell {
+  padding-top: calc(66px + env(safe-area-inset-top, 8px)) !important;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Japanese Furigana / Romaji Toggle Bar on Quiz */
+.ja-quiz-display {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 0 14px !important;
+  z-index: 20 !important;
+}
+
+.ja-quiz-display .ja-display {
+  display: inline-flex !important;
+  background: #F1F5F9 !important;
+  padding: 3px !important;
+  border-radius: 999px !important;
+  border: 1px solid #E2E8F0 !important;
+  gap: 2px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+}
+
+.ja-quiz-display .ja-toggle {
+  background: transparent !important;
+  color: #64748B !important;
+  border: none !important;
+  padding: 4px 12px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  min-height: 0 !important;
+  height: 26px !important;
+  transition: all 0.15s ease !important;
+}
+
+.ja-quiz-display .ja-toggle[aria-pressed="true"] {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.1) !important;
+}
+
+/* Tablet & Desktop Topbar: Fixed, Full-Width, Edge-Aligned */
+@media (min-width: 768px) {
+  .quiz-topbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 max(28px, calc((100vw - 1440px) / 2)) !important;
+    height: 54px !important;
+    box-sizing: border-box !important;
+    border-bottom: 1.5px solid #F1F5F9 !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+  }
+
+  .quiz-topbar .quiz-progress {
+    flex: 0 1 440px !important;
+    margin: 0 16px !important;
+  }
+
+  .quiz-topbar .quiz-topbar-gem {
+    margin-left: auto !important;
+  }
+}
+
+/* Tablet (768px - 1024px): Centered single-column luxury card with expansive breathing room */
+@media (min-width: 768px) and (max-width: 1024px) {
+  body.fz-stage-quiz #app,
+  body:has(.quiz-shell) #app,
+  #app:has(.quiz-shell) {
+    max-width: clamp(740px, 92vw, 940px) !important;
+    width: 92% !important;
+    margin: 0 auto !important;
+    padding: 0 24px !important;
+    box-sizing: border-box !important;
+  }
+
+  .quiz-shell {
+    max-width: clamp(740px, 92vw, 940px) !important;
+    width: 92% !important;
+    margin: 0 auto !important;
+    padding-top: 76px !important;
+    box-sizing: border-box !important;
+  }
+
+  .quiz-shell > .card:not(.card-reading),
+  body.fz-stage-quiz .quiz-shell > .card {
+    max-width: 100% !important;
+    margin: 0 auto 20px auto !important;
+    padding: 36px 42px !important;
+    border-radius: 28px !important;
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.07) !important;
+  }
+
+  .quiz-shell .question,
+  .quiz-shell #quizStem {
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+    margin: 10px 0 20px !important;
+  }
+
+  .quiz-shell .options {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .quiz-shell .option {
+    min-height: 64px !important;
+    font-size: 16.5px !important;
+    font-weight: 600 !important;
+    padding: 16px 20px !important;
+    border-radius: 18px !important;
+  }
+
+  .quiz-stage {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .quiz-stage .fz-paw-above {
+    flex: 0 0 180px !important;
+    width: 180px !important;
+    height: 155px !important;
+    margin: 0 !important;
+  }
+
+  .fz-mochi-thought-bubble {
+    padding: 6px 14px !important;
+    border-radius: 16px 16px 4px 16px !important;
+  }
+
+  .fz-thought-text {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+  }
+}
+
+/* Desktop (1025px+): Wide True Two-Column / Split-Screen Architecture (Anti-Void & Expansive) */
+@media (min-width: 1025px) {
+  body.fz-stage-quiz #app,
+  body:has(.quiz-shell) #app,
+  #app:has(.quiz-shell) {
+    max-width: clamp(1200px, 94vw, 1560px) !important;
+    width: 94% !important;
+    margin: 0 auto !important;
+    padding: 0 32px !important;
+    box-sizing: border-box !important;
+  }
+
+  .quiz-shell {
+    max-width: clamp(1200px, 94vw, 1560px) !important;
+    width: 94% !important;
+    margin: 0 auto !important;
+    padding-top: 80px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* When has-paw-side is active: expansive, spacious split-screen grid */
+  .quiz-shell.has-paw-side {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.4fr) 380px !important;
+    column-gap: 36px !important;
+    align-items: stretch !important;
+  }
+
+  .quiz-shell.has-paw-side > .quiz-topbar {
+    grid-column: 1 / -1 !important;
+  }
+
+  .quiz-shell.has-paw-side > .card:not(.card-reading) {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 48px 56px !important;
+    border-radius: 32px !important;
+    box-shadow: 0 14px 44px rgba(15, 23, 42, 0.08) !important;
+    min-height: 480px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+
+  .quiz-shell .question,
+  .quiz-shell #quizStem {
+    font-size: clamp(1.8rem, 2.6vw, 2.6rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+    color: #0F172A !important;
+    margin: 12px 0 24px !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .quiz-shell .question-instruction {
+    font-size: 1.15rem !important;
+    font-weight: 600 !important;
+    color: #64748B !important;
+    margin-bottom: 8px !important;
+  }
+
+  .quiz-shell .vocab-focus-word {
+    font-size: clamp(2.4rem, 3.8vw, 3.6rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+  }
+
+  .quiz-shell.has-paw-side > .fz-paw-side {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: stretch !important;
+    position: sticky !important;
+    top: 80px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #FFFDF8 !important;
+    border: 2px solid #FDE68A !important;
+    border-radius: 32px !important;
+    padding: 44px 32px !important;
+    box-shadow: 0 14px 40px rgba(217, 119, 6, 0.09) !important;
+    min-height: 480px !important;
+    box-sizing: border-box !important;
+    --fz-paw-size: 240px !important;
+  }
+
+  .quiz-shell.has-paw-side > .fz-paw-side fiezel-mascot {
+    width: 240px !important;
+    height: 240px !important;
+  }
+
+  /* Desktop Comic Thought Bubble: Prominent, Generous, Zero-Overlap */
+  .fz-mochi-thought-bubble {
+    top: -12px !important;
+    left: 20px !important;
+    right: auto !important;
+    padding: 8px 18px !important;
+    border-radius: 18px 18px 5px 18px !important;
+    gap: 8px !important;
+    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.2) !important;
+  }
+
+  .fz-thought-dot {
+    width: 7px !important;
+    height: 7px !important;
+  }
+
+  .fz-thought-text {
+    font-size: 14.5px !important;
+    font-weight: 800 !important;
+  }
+
+  .fz-thought-trail-1 {
+    right: 5px !important;
+    bottom: -6px !important;
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  .fz-thought-trail-2 {
+    right: 1px !important;
+    bottom: -12px !important;
+    width: 4px !important;
+    height: 4px !important;
+  }
+
+  /* Single centered card fallback if no side paw */
+  .quiz-shell:not(.has-paw-side) > .card:not(.card-reading) {
+    max-width: 1100px !important;
+    margin: 0 auto !important;
+    padding: 48px 56px !important;
+    border-radius: 32px !important;
+    box-shadow: 0 14px 44px rgba(15, 23, 42, 0.08) !important;
+  }
+
+  .quiz-shell .options {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 20px !important;
+  }
+
+  .quiz-shell .option {
+    min-height: 72px !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    padding: 18px 24px !important;
+    border-radius: 20px !important;
+  }
+
+  .quiz-stage {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 24px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .quiz-stage .fz-paw-above {
+    flex: 0 0 200px !important;
+    width: 200px !important;
+    height: 170px !important;
+    margin: 0 !important;
+  }
+}

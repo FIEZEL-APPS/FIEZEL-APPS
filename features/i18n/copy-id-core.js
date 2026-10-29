@@ -50,6 +50,25 @@
     'nav.home': 'Home',
     'nav.vocab': 'Vocab',
     'nav.grammar': 'Grammar',
-    'nav.reading': 'Reading'
+    'nav.reading': 'Reading',
+
+    // features/mascot/fiezel-mochi-voice-sos.js — Mochi Live Voice SOS Lifeline
+    'mochi-sos.bubble-tap': 'Ketuk aku',
+    'mochi-sos.bubble-title': 'Diskusi suara langsung dengan Mochi',
+    'mochi-sos.badge-free': 'Gratis',
+    'mochi-sos.call-title': 'Bantuan Suara Mochi',
+    'mochi-sos.call-listening': 'Mochi sedang mendengar...',
+    'mochi-sos.call-speaking': 'Mochi sedang menjelaskan...',
+    'mochi-sos.call-close-title': 'Ketuk untuk tutup panggilan',
+    'mochi-sos.toast-insufficient': 'Gem belum cukup ({balance}/{cost} 💎). Selesaikan latihan untuk kumpulkan Gem!',
+    'mochi-sos.toast-refund': 'Panggilan singkat: {cost} Gem dikembalikan 💎',
+    'mochi-sos.toast-cashback': 'Sugoi! Jawaban benar: Cashback +{reward} Gem didapatkan! 🎉',
+    'mochi-sos.intro-title': 'Bantuan Suara Langsung Mochi! ✨',
+    'mochi-sos.intro-body': 'Jika merasa bingung saat latihan, cukup ketuk Mochi untuk berdiskusi dan meminta panduan suara tanpa merusak kuis!',
+    'mochi-sos.intro-btn': 'Paham, Mulai Latihan!',
+    'mochi-sos.guide-rule-prefix': 'Tips dari Mochi: ',
+    'mochi-sos.guide-concept-prefix': 'Pertanyaan ini melatih konsep "{concept}". Perhatikan pola kata kerja atau partikel penanda ya!',
+    'mochi-sos.guide-default': 'Mochi siap bantu! Coba perhatikan partikel penunjuk waktu atau arah di kalimat ini ya!',
+    'mochi-sos.exam-locked': 'Tes mandiri: Mochi istirahat dulu saat ujian/tes awal ya!'
   });
 }());
