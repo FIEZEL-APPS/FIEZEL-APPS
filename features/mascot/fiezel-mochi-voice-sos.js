@@ -71,7 +71,10 @@
   var _audioWarmBound = false;
   var _outTranscript = '';
   var _leakGuardHits = 0;
-  var _greetTimer = null;
+  var _silenceTimer = null;
+  var _lastUserSpeechAt = 0;
+  var _silencePromptFired = false;
+  var SILENCE_PROMPT_MS = 5500;
 
   var COPY_ID = {
     'mochi-sos.bubble-tap': 'Ketuk aku',
@@ -984,7 +987,7 @@
       this.closeCall(reason || 'session_end');
       this.removeThoughtBubble();
       clearPrewarm();
-      if (_greetTimer) { clearTimeout(_greetTimer); _greetTimer = null; }
+      if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
       _session = { active: false, key: '', locked: false, cfg: null, greeted: false };
       _attempts = [];
       _currentQ = null;
@@ -1080,89 +1083,16 @@
       playChime('tap');
       hapticTap(12);
       bounceMascot();
-      if (_greetTimer) { clearTimeout(_greetTimer); _greetTimer = null; this._clearGreeting(); }
       this.toggleCall(getActiveQuestion(null), {});
       return true;
     },
 
-    // ─── Sapaan proaktif saat masuk sesi (tanpa membuka Gemini Live) ────────
+    // ─── Masuk sesi latihan: Wajah Mochi bersih tanpa balon bacaan & tanpa suara robot TTS ───
     greetOnEntry: function (q, ctx) {
       if (_session.greeted || _session.locked || isExamLocked()) return false;
-      var doc = getDoc();
-      if (!doc) return false;
       _session.greeted = true;
-      var kind = detectExerciseType(q || _currentQ, ctx || _currentCtx);
-      var keyByKind = { listening: 'mochi-sos.greet-listening', reading: 'mochi-sos.greet-reading', vocab: 'mochi-sos.greet-vocab',
-        grammar: 'mochi-sos.greet-grammar', kanji: 'mochi-sos.greet-kanji', build: 'mochi-sos.greet-build' };
-      var useKind = Math.random() < 0.6 && keyByKind[kind];
-      var GREET_VARIANTS = ['mochi-sos.greet-1', 'mochi-sos.greet-2', 'mochi-sos.greet-3'];
-      var greetKey = useKind ? keyByKind[kind] : GREET_VARIANTS[Math.floor(Math.random() * GREET_VARIANTS.length)];
-      var text = t(greetKey);
-
-      this.mountThoughtBubble(q);
-      var bubble = doc.getElementById('fzMochiThoughtBubble');
-      if (bubble) {
-        bubble.classList.add('is-greeting');
-        var span = bubble.querySelector('.fz-thought-text');
-        if (span) span.textContent = text;
-        bubble.setAttribute('aria-label', text);
-      }
-      try { this._updateMochiMascotPose('happy'); } catch (_) {}
-
-      var self = this;
-      _greetTimer = setTimeout(function () { _greetTimer = null; self._clearGreeting(); }, GREETING_VISIBLE_MS);
-
-      // Cue suara ringan: CF TTS (bila tersedia) → speechSynthesis → senyap bila autoplay diblok.
-      this._playGreetingCue(t('mochi-sos.greet-cue'));
-      return true;
-    },
-
-    _clearGreeting: function () {
-      var doc = getDoc();
-      if (!doc) return;
-      var bubble = doc.getElementById('fzMochiThoughtBubble');
-      if (!bubble) return;
-      bubble.classList.remove('is-greeting');
-      var span = bubble.querySelector('.fz-thought-text');
-      if (span) span.textContent = t('mochi-sos.bubble-tap', 'Ketuk aku');
-      bubble.setAttribute('aria-label', t('mochi-sos.bubble-tap', 'Ketuk aku'));
       try { this._updateMochiMascotPose('idle'); } catch (_) {}
-    },
-
-    _playGreetingCue: function (text) {
-      var state = getState();
-      if (state && state.preferences && state.preferences.feedbackSounds === false) return;
-      var ctx = _audioCtx;
-      if (ctx && ctx.state === 'running') playChime('greet'); // hanya bila konteks sudah hidup oleh gesture
-      var locale = getLocale();
-      var self = this;
-      var viaSynth = function () {
-        try {
-          if (!root.speechSynthesis || !root.SpeechSynthesisUtterance) return;
-          var ut = new root.SpeechSynthesisUtterance(text);
-          ut.lang = locale === 'th' ? 'th-TH' : 'id-ID';
-          ut.rate = 1.08; ut.pitch = 1.2; ut.volume = 0.9;
-          ut.onstart = function () { self._setVoiceVisualizerSpeaking(true); };
-          ut.onend = ut.onerror = function () { self._setVoiceVisualizerSpeaking(false); };
-          root.speechSynthesis.speak(ut); // bila diblokir autoplay: onerror 'not-allowed' → senyap
-        } catch (_) {}
-      };
-      var cf = root.FiezelCfTtsTransport;
-      var cfVoice = root.FIEZEL_CF_CONFIG && root.FIEZEL_CF_CONFIG.ttsGreetingVoiceId;
-      if (cf && typeof cf.render === 'function' && cfVoice && cf.mode && cf.mode() === 'on') {
-        cf.render({ text: text, locale: locale, contentType: 'sentence', voiceId: cfVoice }).then(function (res) {
-          if (!res || !res.ok || !res.url) { viaSynth(); return; }
-          try {
-            var a = new Audio(res.url);
-            a.volume = 0.9;
-            _currentAudio = a;
-            var p = a.play();
-            if (p && typeof p.catch === 'function') p.catch(function () { /* autoplay diblokir → cukup balon kata */ });
-          } catch (_) { viaSynth(); }
-        }).catch(viaSynth);
-        return;
-      }
-      viaSynth();
+      return true;
     },
 
     // ─── Panggilan ──────────────────────────────────────────────────────────
@@ -1273,7 +1203,12 @@
           var sum = 0;
           for (var i = 0; i < float32.length; i++) sum += float32[i] * float32[i];
           var rms = Math.sqrt(sum / float32.length);
-          if (rms > 0.02 && _activeAudioSources.length > 0) stopAllActiveAudioSources(); // barge-in lokal
+          if (rms > 0.02) {
+            _lastUserSpeechAt = Date.now();
+            _silencePromptFired = false;
+            if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+            if (_activeAudioSources.length > 0) stopAllActiveAudioSources(); // barge-in lokal
+          }
 
           var pcmBase64 = resampleAndConvertToPcm16Base64(float32, inRate, 16000);
           if (pcmBase64) {
@@ -1312,12 +1247,21 @@
       _ws = ws;
       var gotAnyAudio = false;
 
+      var openingSent = false;
       var sendOpeningTurn = function () {
-        if (!_ws || _ws.readyState !== 1) return;
+        if (openingSent || !_ws || _ws.readyState !== 1) return;
+        openingSent = true;
+        _lastUserSpeechAt = Date.now();
+        _silencePromptFired = false;
         try {
           _ws.send(JSON.stringify({
             clientContent: {
-              turns: [{ role: 'user', parts: [{ text: '[Instruksi: Murid baru saja mengetukmu. Sapa 1 kalimat ceria sebagai Mochi, lalu beri SATU petunjuk awal sokratik untuk soal di konteks. Jangan sebut huruf/teks jawaban benar.]' }] }],
+              turns: [{
+                role: 'user',
+                parts: [{
+                  text: '[SISTEM: Murid baru saja mengetuk Mochi untuk meminta bantuan secara langsung. Buka sesi SEGERA dengan menyapa 1 kalimat ceria sebagai Mochi dan tanyakan apa yang membingungkan atau beri 1 petunjuk awal sokratik tanpa menyebut huruf/kunci jawaban!]'
+                }]
+              }],
               turnComplete: true
             }
           }));
@@ -1423,16 +1367,73 @@
       var self = this;
       source.onended = function () {
         _activeAudioSources = _activeAudioSources.filter(function (s) { return s !== source; });
-        if (_activeAudioSources.length === 0) self._setVoiceVisualizerSpeaking(false);
+        if (_activeAudioSources.length === 0) {
+          self._setVoiceVisualizerSpeaking(false);
+          self._onMochiSpeechEnded();
+        }
       };
     },
 
+    _onMochiSpeechEnded: function () {
+      if (!_activeCall || !_activeCall.active) return;
+      _lastUserSpeechAt = Date.now();
+      this._scheduleSilenceCheck();
+    },
+
+    _scheduleSilenceCheck: function (delayMs) {
+      if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+      if (!_activeCall || !_activeCall.active || !_ws || _ws.readyState !== 1) return;
+      var self = this;
+      var wait = typeof delayMs === 'number' ? delayMs : SILENCE_PROMPT_MS;
+      _silenceTimer = setTimeout(function () {
+        self._checkSilenceAndPrompt();
+      }, wait);
+    },
+
+    _checkSilenceAndPrompt: function () {
+      if (!_activeCall || !_activeCall.active || !_ws || _ws.readyState !== 1) return;
+      if (_activeAudioSources.length > 0) return; // Mochi is still speaking
+      var now = Date.now();
+      if (now - _lastUserSpeechAt >= SILENCE_PROMPT_MS && !_silencePromptFired) {
+        _silencePromptFired = true;
+        var promptText = (getLocale() === 'th')
+          ? 'พูดคุยได้เลยนะถ้าต้องการให้โมจิช่วย'
+          : t('mochi-sos.silence-prompt', 'Silakan bicara jika ingin bantuan dari aku');
+        try {
+          _ws.send(JSON.stringify({
+            clientContent: {
+              turns: [{
+                role: 'user',
+                parts: [{
+                  text: '[SISTEM: Murid belum bersuara setelah kamu menunggu. Ucapkan persis kalimat ini dengan nada ramah menggemaskan: "' + promptText + '"]'
+                }]
+              }],
+              turnComplete: true
+            }
+          }));
+        } catch (_) {}
+        _lastUserSpeechAt = Date.now();
+        this._scheduleSilenceCheck(10000);
+      }
+    },
+
+    triggerSilencePrompt: function () {
+      this._checkSilenceAndPrompt();
+    },
+
     _fallbackSpeechTurn: function (q) {
-      var initialAdvice = this.buildSocraticGuidance(q);
-      this.speakMochiTurn(initialAdvice);
+      try {
+        if (typeof root.showToast === 'function') {
+          root.showToast(t('mochi-sos.connecting', 'Menyambungkan Mochi...'), 'info');
+        }
+      } catch (_) {}
     },
 
     closeCall: function (reason) {
+      if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+      _silencePromptFired = false;
+      _lastUserSpeechAt = 0;
+
       if (!_activeCall) return;
       var call = _activeCall;
       _activeCall = null;
@@ -1473,7 +1474,6 @@
         try { _currentAudio.pause(); } catch (_) {}
         _currentAudio = null;
       }
-      try { if (root.speechSynthesis) root.speechSynthesis.cancel(); } catch (_) {}
     },
 
     toggleCall: function (q, opts) {
@@ -1507,39 +1507,24 @@
     },
 
     speakMochiTurn: function (text, onComplete) {
-      if (!this.isCallActive()) return;
-      var self = this;
-      self._setVoiceVisualizerSpeaking(true);
-
-      // Web Speech Synthesis (Graceful fallback)
-      if (root.speechSynthesis && root.SpeechSynthesisUtterance) {
-        try {
-          root.speechSynthesis.cancel();
-          var isThai = getLocale() === 'th';
-          var ut = new root.SpeechSynthesisUtterance(text);
-          ut.lang = isThai ? 'th-TH' : 'id-ID';
-          ut.rate = 1.05;
-          ut.pitch = 1.15;
-
-          ut.onend = function () {
-            self._setVoiceVisualizerSpeaking(false);
-            if (typeof onComplete === 'function') onComplete();
-          };
-          ut.onerror = function () {
-            self._setVoiceVisualizerSpeaking(false);
-            if (typeof onComplete === 'function') onComplete();
-          };
-
-          root.speechSynthesis.speak(ut);
-          return;
-        } catch (_) {}
-      }
-
-      // Fallback timer when speech synthesis unavailable
-      setTimeout(function () {
-        self._setVoiceVisualizerSpeaking(false);
+      if (!this.isCallActive() || !_ws || _ws.readyState !== 1) {
         if (typeof onComplete === 'function') onComplete();
-      }, 2200);
+        return;
+      }
+      try {
+        _ws.send(JSON.stringify({
+          clientContent: {
+            turns: [{
+              role: 'user',
+              parts: [{
+                text: '[SISTEM: Katakan pesan ini sebagai Mochi secara singkat dan ramah: "' + String(text || '').replace(/"/g, '\\"') + '"]'
+              }]
+            }],
+            turnComplete: true
+          }
+        }));
+      } catch (_) {}
+      if (typeof onComplete === 'function') onComplete();
     },
 
     _setVoiceVisualizerSpeaking: function (isSpeaking) {

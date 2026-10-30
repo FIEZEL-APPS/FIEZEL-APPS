@@ -81,6 +81,7 @@
     'mochi-sos.greet-build': 'Halo! Ayo susun kalimatnya! Mulai dari subjek dan partikelnya. Ketuk aku kalau macet!',
     'mochi-sos.greet-cue': 'Halo! Mochi siap menemani. Ketuk aku kalau bingung ya!',
     'mochi-sos.leak-correction': '[SISTEM FIEZEL: Kamu hampir membocorkan kunci jawaban. DILARANG menyebut huruf pilihan atau teks jawaban benar. Ulangi dalam 1 kalimat sebagai petunjuk sokratik saja.]',
-    'mochi-sos.connecting': 'Menyambungkan Mochi...'
+    'mochi-sos.connecting': 'Menyambungkan Mochi...',
+    'mochi-sos.silence-prompt': 'Silakan bicara jika ingin bantuan dari aku'
   });
 }());
