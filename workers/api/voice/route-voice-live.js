@@ -42,10 +42,12 @@ function parseKeys(env) {
  */
 async function mintEphemeralToken(apiKey) {
   const now = Date.now();
+  const expireAt = now + 30 * 60e3;
+  const newSessionExpireAt = now + 2 * 60e3;
   const body = {
     uses: 1,
-    expireTime: new Date(now + 30 * 60e3).toISOString(),
-    newSessionExpireTime: new Date(now + 2 * 60e3).toISOString(),
+    expireTime: new Date(expireAt).toISOString(),
+    newSessionExpireTime: new Date(newSessionExpireAt).toISOString(),
   };
 
   const controller = new AbortController();
@@ -65,7 +67,7 @@ async function mintEphemeralToken(apiKey) {
 
     const json = await res.json().catch(() => ({}));
     if (res.ok && json && typeof json.name === 'string' && json.name.startsWith('auth_tokens/')) {
-      return { ok: true, token: json.name };
+      return { ok: true, token: json.name, expireAt, newSessionExpireAt };
     }
 
     const isQuota = res.status === 429 || JSON.stringify(json).toLowerCase().includes('quota');
@@ -118,14 +120,20 @@ export async function routeVoiceLiveSession(ctx) {
     if (result.ok) {
       _poolIndex = (currentIdx + 1) % totalKeys;
       _cooldownMap.delete(key);
-      return jsonResponse({
-        ok: true,
-        token: result.token,
-        model: DEFAULT_LIVE_MODEL,
-        endpoint: DEFAULT_CONSTRAINED_ENDPOINT,
-        keyIndex: currentIdx + 1,
-        totalKeys,
-      });
+      return jsonResponse(
+        {
+          ok: true,
+          token: result.token,
+          model: DEFAULT_LIVE_MODEL,
+          endpoint: DEFAULT_CONSTRAINED_ENDPOINT,
+          keyIndex: currentIdx + 1,
+          totalKeys,
+          expireAt: result.expireAt,
+          newSessionExpireAt: result.newSessionExpireAt,
+          serverNow: Date.now(),
+        },
+        { headers: { 'cache-control': 'no-store' } }
+      );
     }
 
     lastFailReason = result.reason;

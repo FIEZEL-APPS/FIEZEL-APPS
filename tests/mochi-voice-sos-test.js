@@ -13,7 +13,7 @@ import vm from 'node:vm';
 
 console.log('[TEST] Starting Mochi Voice SOS Comprehensive Unit Tests...');
 
-const ROOT = process.cwd();
+const ROOT = (typeof import.meta.dirname === 'string') ? path.resolve(import.meta.dirname, '..') : process.cwd();
 const SOS_PATH = path.join(ROOT, 'features', 'mascot', 'fiezel-mochi-voice-sos.js');
 
 assert.ok(fs.existsSync(SOS_PATH), 'fiezel-mochi-voice-sos.js must exist on disk at ' + SOS_PATH);
@@ -47,6 +47,11 @@ const sandbox = {
   console,
   setTimeout,
   clearTimeout,
+  setInterval,
+  clearInterval,
+  fetch: () => Promise.resolve({ ok: false }),
+  navigator: {},
+  WebSocket: undefined,
   Date,
   Math,
   Number,
@@ -64,7 +69,9 @@ const sandbox = {
     querySelector: () => null,
     querySelectorAll: () => [],
     createElement: mockElement,
-    body: { appendChild: () => {} }
+    body: { appendChild: () => {} },
+    addEventListener: () => {},
+    removeEventListener: () => {}
   },
   FiezelI18n: {
     getLocale: () => 'id',
@@ -163,4 +170,40 @@ assert.ok(!code.includes('mediaChunks'), 'Must not use broken deprecated mediaCh
 assert.ok(code.includes('fz_gemini_api_key'), 'Must prioritize reading student personal Gemini API key from localStorage');
 console.log('  ✓ Gemini Live Duplex Protocol & Puck Voice Invariants verified');
 
-console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (8/8)! <<<');
+// 9. API kontrak baru (lifecycle, tap binding, konteks, leak guard)
+['onQuizSessionStart','onQuizSessionEnd','setActiveQuestion','noteAttempt','greetOnEntry','bindMascotTap','handleMascotTap','prewarm']
+  .forEach(m => assert.strictEqual(typeof MochiSos[m], 'function', `Method ${m} must be a function`));
+console.log('  ✓ Lifecycle & tap API verified (8 new methods)');
+
+// 10. Prompt generator: konteks dalam & zero-answer-key
+assert.ok(code.includes('buildQuizContextSnapshot'), 'Deep context extractor must exist');
+assert.ok(code.includes('NASKAH AUDIO'), 'Listening script must be injected to system prompt');
+assert.ok(code.includes('Teks bacaan acuan'), 'Reading passage must be injected to system prompt');
+assert.ok(!/answerIndex[^\n]*systemInstruction|systemInstruction[^\n]*answerIndex/.test(code), 'answerIndex must never reach systemInstruction');
+assert.ok(code.includes('transcriptLeaks') && code.includes('outputTranscription'), 'Runtime leak guard on output transcription must exist');
+console.log('  ✓ Deep context & zero-answer-key prompt verified');
+
+// 11. Exam lock via examLockActive()
+sandbox.examLockActive = () => true;
+const lockedViaCore = MochiSos.canCall();
+assert.strictEqual(lockedViaCore.allowed, false, 'examLockActive() must lock SOS');
+assert.strictEqual(lockedViaCore.reason, 'exam_lock');
+sandbox.examLockActive = () => false;
+sandbox.state.quizType = 'level-exam';
+assert.strictEqual(MochiSos.canCall().allowed, false, 'state.quizType=level-exam must lock SOS');
+sandbox.state.quizType = 'practice';
+console.log('  ✓ Exam lock via examLockActive()/state.quizType verified');
+
+// 12. Session start on exam cfg → false (locked), on practice → true
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'placement', placement: true }), false, 'Placement session must lock');
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'adaptive', measure: false }), true, 'Practice session must arm SOS');
+MochiSos.onQuizSessionEnd('test');
+console.log('  ✓ Session lifecycle lock semantics verified');
+
+// 13. Mascot tap plumbing
+assert.ok(code.includes("'mochi-tap'"), 'Must listen to mochi-tap CustomEvent from 3D renderer');
+assert.ok(/addEventListener\('pointerdown'[\s\S]{0,400}true\)/.test(code), 'pointerdown must be capture-phase');
+assert.ok(code.includes('fz-mochi-tap-bounce'), 'Tap bounce feedback class must be applied');
+console.log('  ✓ Direct mascot tap plumbing verified');
+
+console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (13/13)! <<<');

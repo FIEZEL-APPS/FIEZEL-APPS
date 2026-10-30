@@ -3081,7 +3081,7 @@ function setConfidence(value){const h=state.history[state.history.length-1];if(!
    atas dialog = batal. answered==0 tetap keluar bebas (aturan bebas-intip m025-177). */
 function confirmQuizExit(){
   const a=state.activeSession,answered=Math.max(0,Number(a?.answered||0));
-  const doExit=()=>{try{self.FiezelMochiVoiceSos?.closeCall?.('user_exit');self.FiezelMochiVoiceSos?.removeThoughtBubble?.();}catch(_){}try{closeConfidencePop()}catch(_){}try{audio.stop()}catch(_){}go('home')};
+  const doExit=()=>{try{self.FiezelMochiVoiceSos?.onQuizSessionEnd?.('user_exit')}catch(_){}try{closeConfidencePop()}catch(_){}try{audio.stop()}catch(_){}go('home')};
   if(!a||answered<1){doExit();return}
   const type=String(a.type||''),measure=type==='level-exam'||type==='grammar-skip',placement=type==='placement',planned=Math.max(1,Number(a.planned||0));
   const line=measure?FiezelI18n.t('quiz.exit-exam-warn')
@@ -16854,6 +16854,17 @@ function quizLoop(cfg){
     hanya runner tugas Kelas yang melakukannya, jadi keluar layar di sini tidak tercatat sama
     sekali dan pembimbing tetap bisa ditanya di tengah ujian. */
  try{const lk=String(cfg.examKind||'')||(String(cfg.type||'')==='placement'||cfg.placement?'placement':(['level-exam','grammar-skip'].includes(String(cfg.type||''))?'level_exam':''));if(lk)examLockBegin(lk,{});}catch(_){}
+ try{
+   self.FiezelMochiVoiceSos?.onQuizSessionStart?.({
+     type:String(cfg.type||''),
+     measure:MEASURE,
+     placement:!!cfg.placement,
+     noHints:!!cfg.noHints,
+     examKind:String(cfg.examKind||''),
+     context:cfg.context||null,
+     planned:Number(cfg.count)||0
+   });
+ }catch(_){}
  /* Audit P-A 2026-10-04: mode ukur tanpa bantuan. Lampu petunjuk tata bahasa dan arti kata
     susun-kata tidak dirender di bawah MEASURE/noHints (lihat topbar di draw() dan renderTokenOrder);
     popover petunjuk yang masih terbuka dari sesi belajar sebelumnya ditutup di sini. Probe audit:
@@ -17195,24 +17206,27 @@ function quizLoop(cfg){
     }
    };
   }
-  /* In-Quiz Live Mochi Voice SOS Lifeline wiring */
-  if(!MEASURE&&!cfg.placement&&!cfg.noHints){
-    try{
-      if(self.FiezelMochiVoiceSos){
-        self.FiezelMochiVoiceSos.mountThoughtBubble(q);
-        self.FiezelMochiVoiceSos.showIntroIfNeeded();
-        self.FiezelMochiVoiceSos.updateTopbarGem();
-      }
-      setTimeout(()=>{
-        try{
-          if(self.FiezelMochiVoiceSos){
-            self.FiezelMochiVoiceSos.mountThoughtBubble(q);
-            self.FiezelMochiVoiceSos.showIntroIfNeeded();
-            self.FiezelMochiVoiceSos.updateTopbarGem();
-          }
-        }catch(_){}
-      },150);
-    }catch(_){}
+  /* In-Quiz Live Mochi Voice SOS Lifeline wiring — konteks penuh + sapaan proaktif */
+  if(!MEASURE&&!cfg.placement&&!cfg.noHints&&!cfg.examKind){
+    const mochiCtx={
+      cfgType:String(cfg.type||''),
+      type:String(q.type||''),
+      context:cfg.context||null,
+      asked,planned,
+      level:(()=>{try{return getActiveLevel()}catch(_){return String(state?.level||'')}})(),
+      targetLang:String(state?.preferences?.targetLang||'en')
+    };
+    const wireMochi=()=>{
+      const S=self.FiezelMochiVoiceSos;if(!S)return;
+      S.setActiveQuestion?.(q,mochiCtx);
+      S.mountThoughtBubble(q);
+      S.updateTopbarGem();
+      if(asked===0){S.greetOnEntry?.(q,mochiCtx);}
+      else{S.showIntroIfNeeded();}
+      S.prewarm?.();
+    };
+    try{wireMochi()}catch(_){}
+    setTimeout(()=>{try{wireMochi()}catch(_){}},150);
   }else{
     try{if(self.FiezelMochiVoiceSos){self.FiezelMochiVoiceSos.closeCall('exam_mode');self.FiezelMochiVoiceSos.removeThoughtBubble()}}catch(_){}
   }
@@ -17968,6 +17982,7 @@ function quizLoop(cfg){
      netral \u2014 umpan balik taktil/bunyi tetap hidup, verdiknya yang tidak bocor.
      Literal answerFeedbackSignal/showAnswerBurst tetap dipakai jalur latihan (release-audit). */
   const isRetryTrial = !ok && firstTry && answer.scaffold !== 'tell' && !cfg.noHints && !MEASURE && !cfg.placement;
+  try{self.FiezelMochiVoiceSos?.noteAttempt?.(q,j,ok,{firstTry:!!firstTry,retry:isRetryTrial})}catch(_){}
   if(MEASURE){
    button.classList.add('picked');
    button.setAttribute('aria-pressed','true');
@@ -18515,7 +18530,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // Menandai sesi selesai supaya pemulih stage kuis tidak lagi menutupnya sebagai
   // "ditinggalkan" ketika murid menekan kembali dari layar hasil.
   if(cfg)cfg.__finished=true;
-  try{self.FiezelMochiVoiceSos?.closeCall?.('quiz_finished');self.FiezelMochiVoiceSos?.removeThoughtBubble?.();}catch(_){}
+  try{self.FiezelMochiVoiceSos?.onQuizSessionEnd?.('quiz_finished')}catch(_){}
   state.quizActive = false;
   const accuracy=Math.round(score/Math.max(1,total)*100),session=completeActiveSession(cfg,score,total);
   // F1 placement: level dibaca dari DUA hal yang harus sepakat, dan yang lebih rendah menang.
