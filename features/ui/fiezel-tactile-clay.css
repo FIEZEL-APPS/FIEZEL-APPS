@@ -4964,8 +4964,8 @@ html body:not(.fz-teacher-mode) #app #quizScaffoldNudge svg,
   flex-shrink: 0 !important;
 }
 
-/* 4. Feedback & Explanation Sheet */
-#feedback {
+/* 4. Feedback & Explanation Sheet (Non-sheet legacy dark fallback) */
+#feedback:not(.feedback-sheet) {
   background: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 20px !important;
@@ -4973,13 +4973,13 @@ html body:not(.fz-teacher-mode) #app #quizScaffoldNudge svg,
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3) !important;
   color: #F8FAFC !important;
 }
-#feedback .feedback-title {
+#feedback:not(.feedback-sheet) .feedback-title {
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
   margin-bottom: 12px !important;
 }
-#feedback .feedback-title b {
+#feedback:not(.feedback-sheet) .feedback-title b {
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
   font-size: 17px !important;
@@ -4987,7 +4987,7 @@ html body:not(.fz-teacher-mode) #app #quizScaffoldNudge svg,
 }
 /* m025-565 Stempel Ingatan: baris meta tipis tepat di bawah vonis, warna muted lembar ini
    (sama dengan details p.muted). Ditarik mendekati judul seperti dateline, bukan blok baru. */
-#feedback .feedback-stamp {
+#feedback:not(.feedback-sheet) .feedback-stamp {
   margin: -6px 0 10px !important;
   font-size: 12px !important;
   line-height: 1.45 !important;
@@ -4996,76 +4996,76 @@ html body:not(.fz-teacher-mode) #app #quizScaffoldNudge svg,
   color: #94A3B8 !important;
   -webkit-text-fill-color: #94A3B8 !important;
 }
-:lang(th) #feedback .feedback-stamp {
+:lang(th) #feedback:not(.feedback-sheet) .feedback-stamp {
   font-size: 13px !important;
   line-height: 1.6 !important;
   letter-spacing: normal !important;
 }
-#feedback p {
+#feedback:not(.feedback-sheet) p {
   color: #F1F5F9 !important;
   font-size: 13.5px !important;
   line-height: 1.55 !important;
   margin: 6px 0 !important;
 }
-#feedback p strong {
+#feedback:not(.feedback-sheet) p strong {
   color: #38BDF8 !important;
 }
-#feedback .feedback-your-pick {
+#feedback:not(.feedback-sheet) .feedback-your-pick {
   background: rgba(239, 68, 68, 0.14) !important;
   border-left: 3px solid #EF4444 !important;
   padding: 8px 12px !important;
   border-radius: 8px !important;
   color: #FECACA !important;
 }
-#feedback .feedback-your-pick strong {
+#feedback:not(.feedback-sheet) .feedback-your-pick strong {
   color: #F87171 !important;
 }
-#feedback .feedback-rule-pill {
+#feedback:not(.feedback-sheet) .feedback-rule-pill {
   background: rgba(56, 189, 248, 0.12) !important;
   border: 1px solid rgba(56, 189, 248, 0.3) !important;
   border-radius: 10px !important;
   padding: 8px 12px !important;
   color: #E0F2FE !important;
 }
-#feedback .feedback-rule-pill strong {
+#feedback:not(.feedback-sheet) .feedback-rule-pill strong {
   color: #38BDF8 !important;
 }
-#feedback details {
+#feedback:not(.feedback-sheet) details {
   background: rgba(255, 255, 255, 0.05) !important;
   border-radius: 10px !important;
   padding: 8px 12px !important;
   margin: 10px 0 !important;
 }
-#feedback details summary {
+#feedback:not(.feedback-sheet) details summary {
   color: #FCD34D !important;
   font-weight: 700 !important;
   cursor: pointer !important;
   font-size: 13px !important;
 }
-#feedback details p.muted {
+#feedback:not(.feedback-sheet) details p.muted {
   color: #94A3B8 !important;
   font-size: 12.5px !important;
   margin-top: 6px !important;
 }
-#feedback .feedback-memory-box {
+#feedback:not(.feedback-sheet) .feedback-memory-box {
   background: rgba(251, 191, 36, 0.12) !important;
   border: 1px solid rgba(251, 191, 36, 0.3) !important;
   border-radius: 12px !important;
   padding: 12px 14px !important;
   margin: 12px 0 !important;
 }
-#feedback .feedback-memory-kicker {
+#feedback:not(.feedback-sheet) .feedback-memory-kicker {
   color: #FCD34D !important;
   font-weight: 800 !important;
   font-size: 13px !important;
 }
-#feedback .feedback-memory-content {
+#feedback:not(.feedback-sheet) .feedback-memory-content {
   color: #FEF3C7 !important;
   font-size: 13.5px !important;
   font-weight: 600 !important;
   line-height: 1.5 !important;
 }
-#feedback .ai-btn {
+#feedback:not(.feedback-sheet) .ai-btn {
   background: linear-gradient(135deg, #6366F1, #8B5CF6) !important;
   color: #FFFFFF !important;
   font-weight: 800 !important;

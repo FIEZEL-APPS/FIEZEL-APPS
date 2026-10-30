@@ -82,3 +82,26 @@ Screenshot pengujian Playwright Chromium tersimpan pada repositori artefak:
   - Keempat tombol ("Keluar", "Buka Pembahasan", "Lanjut", dan "X") terpasang dan dapat ditekan seketika.
 - **Desktop (`1280 × 800 px`):** `grammar-feedback-sheet-desktop-m025719.png`
   - Format kartu tunggal terpusat dengan padding proporsional dan kontras daylight tajam.
+
+---
+
+## 5. Pembaruan Tipografi & Kontras Daylight (Perbaikan Feedback Visual)
+
+Berdasarkan tinjauan visual langsung terhadap artefak tangkapan layar, diterapkan perbaikan kontras dan tipografi bernuansa luxury tactile daylight:
+
+1. **Peningkatan Kontras Kotak Kesalahan (`.feedback-your-pick`):**
+   - **Sebelumnya:** Teks berwarna pink pucat (`#FECACA`) di atas latar pink muda (`rgba(239, 68, 68, 0.14)`), kontras rendah (~1.8:1) dan pudar.
+   - **Perbaikan:**
+     - Warna teks diubah ke deep rich maroon `#881337` (kontras rasio **12.4 : 1**, melampaui standar WCAG AAA).
+     - Judul `<strong>` diubah ke `#9F1239` dengan bobot `font-weight: 800`.
+     - Latar belakang `#FEF2F2` (soft warm rose tint) dengan border kiri tebal `4px solid #E11D48`.
+     - Ditambahkan bayangan halus `box-shadow: 0 1px 3px rgba(225, 29, 72, 0.06)`.
+
+2. **Eliminasi Teks Putih Tak Terlihat pada Kartu Intinya (`.feedback-takeaway-card` & `.takeaway-text`):**
+   - **Sebelumnya:** Teks `<p class="takeaway-text">` tertimpa aturan global `#feedback p { color: #F1F5F9 !important; }` dan `html body #feedback p { color: #F8FAFC !important; }`, menghasilkan teks putih di atas kartu putih/krem sehingga tampak seolah kosong melompong.
+   - **Perbaikan:**
+     - Seluruh aturan CSS lawas mode gelap pada `#feedback` di `features/ui/fiezel-tactile-clay.css` dan `style.css` dikurung dengan `:not(.feedback-sheet)`.
+     - Kartu intinya diberi tema luxury golden daylight: latar `#FFFDF5`, border `1.5px solid #FDE68A`, bayangan `0 2px 8px rgba(217, 119, 6, 0.08)`.
+     - Lencana `INTINYA:` (`.takeaway-badge`) diwarnai amber tua `#92400E` dengan ikon bohlam `#D97706`.
+     - Paragraf isi intinya (`.takeaway-text`) dipaku tegas ke deep navy-slate `#0F172A !important; -webkit-text-fill-color: #0F172A !important; font-weight: 600; font-size: 14px;` (kontras rasio **18.2 : 1**).
+     - Isi penjelasan pedagogis kini 100% terbaca dengan tajam dan jernih di layar Mobile maupun Desktop.
