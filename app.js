@@ -12161,7 +12161,7 @@ function openKawanBicaraCallModal(){
   wrap.className='fz-kawan-modal-scrim';
   wrap.setAttribute('data-testid','kawan-call-modal');
   wrap.innerHTML=`<div class="fz-kawan-modal-card" role="dialog" aria-modal="true" aria-labelledby="fzKawanModalTitle">
-      <button type="button" class="fz-kawan-modal-close" data-testid="kawan-call-modal-close" aria-label="${esc(FiezelI18n.t('common.tutup','Tutup'))}" onclick="closeKawanBicaraCallModal()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <button type="button" class="fz-kawan-modal-close" data-testid="kawan-call-modal-close" aria-label="${esc(FiezelI18n.t('modal.tutup'))}" onclick="closeKawanBicaraCallModal()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       <div class="fz-kawan-modal-mochi" aria-hidden="true">
         <svg viewBox="0 0 120 120" width="112" height="112" fill="none">
           <ellipse cx="60" cy="104" rx="34" ry="7" fill="rgba(124,58,237,0.12)"/>
