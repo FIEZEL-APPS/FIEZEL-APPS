@@ -124,6 +124,7 @@
   // Aplikasi sendiri memakai enam tingkat ini (lihat LEVELS di app.js); didaftarkan di sini
   // apa adanya karena ini standar eksternal, bukan logika produk yang bisa berubah diam-diam.
   var CEFR_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+  var JLPT_LEVELS = Object.freeze(['N5', 'N4', 'N3', 'N2', 'N1']);
 
   // Langkah terakhir (ringkasan). Ditulis sekali supaya penjepit di goStep() dan pemeriksaan
   // "sudah di ujung" pada tombol lewati-langkah tidak bisa menyimpang satu sama lain -
@@ -878,7 +879,8 @@
       return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
         + '<b>' + escapeHtml(g.label) + '</b></button>';
     }).join('');
-    var levelRow = selectedGoal ? '<div class="fiezel-level-row" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-level-aria')) + '">' + CEFR_LEVELS.map(function (lv) {
+    var levelList = (activeCourse === 'ja') ? JLPT_LEVELS : CEFR_LEVELS;
+    var levelRow = selectedGoal ? '<div class="fiezel-level-row" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-level-aria')) + '">' + levelList.map(function (lv) {
       var selected = lv === selectedLevel;
       return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
     }).join('') + '</div>' : '';
@@ -1858,6 +1860,7 @@
   return {
     STORAGE_KEY: STORAGE_KEY,
     CEFR_LEVELS: CEFR_LEVELS,
+    JLPT_LEVELS: JLPT_LEVELS,
     CAROUSEL_SLIDES: CAROUSEL_SLIDES,
     MASCOT_SLIDES: MASCOT_SLIDES,
     MASCOT_CHAIN: MASCOT_CHAIN,

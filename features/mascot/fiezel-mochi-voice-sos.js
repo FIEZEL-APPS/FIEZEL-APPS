@@ -26,6 +26,7 @@
   }
   if (root) {
     root.FiezelMochiVoiceSos = api;
+    root.FiezelMochiVoiceSOS = api;
   }
 })(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this), function (root) {
   'use strict';
@@ -591,7 +592,15 @@
       ws.onmessage = function (event) {
         // Hanya menandai setupComplete; pesan lain dibuang sampai socket diadopsi.
         try {
-          if (typeof event.data === 'string' && event.data.indexOf('setupComplete') !== -1) _hotWsSetupComplete = true;
+          var str = '';
+          if (typeof event.data === 'string') {
+            str = event.data;
+          } else if (typeof ArrayBuffer !== 'undefined' && event.data instanceof ArrayBuffer) {
+            str = (typeof TextDecoder !== 'undefined') ? new TextDecoder().decode(event.data) : '';
+          }
+          if (str && str.indexOf('setupComplete') !== -1) {
+            _hotWsSetupComplete = true;
+          }
         } catch (_) {}
       };
       ws.onerror = function () {};
@@ -800,6 +809,8 @@
   }
 
   var apiInstance = {
+    _LIVE_VOICE: LIVE_VOICE,
+    _LIVE_MODEL: LIVE_MODEL,
     isCallActive: function () {
       return !!(_activeCall && _activeCall.active);
     },
@@ -1292,7 +1303,11 @@
         if (self.isCallActive() && !gotAnyAudio) self._fallbackSpeechTurn(q);
       };
 
-      if (setupAlreadyComplete) sendOpeningTurn();
+      if (setupAlreadyComplete || _hotWsSetupComplete) {
+        sendOpeningTurn();
+      } else if (ws.readyState === 1 && ws.__fzHot) {
+        try { ws.send(buildSetupFrame(q, _currentCtx)); } catch (_) {}
+      }
     },
 
     _handleLiveWsMessage: function (event, q, onSetupComplete, onAudio) {
