@@ -8555,14 +8555,16 @@ function afterOnboardingExit(action){
     state.placementDone = true;
     state.placementBandLevel = 1;
     state.streak = Math.max(Number(state.streak)||0, 1);
-    const prevGemBal = (state.gems && typeof state.gems.balance === 'number') ? state.gems.balance : ((typeof state.gems === 'number' && !Number.isNaN(state.gems)) ? state.gems : 120);
-    state.gems = { balance: prevGemBal + 15 };
+    const curBal = Number(state.gems?.balance) || 0;
+    state.gems = { schema: 'fiezel-gems-v1', balance: curBal > 0 ? curBal : 100, earnedTotal: Math.max(curBal, 100), spentTotal: 0, ledger: [] };
     save();
-    try { render(); } catch (_) {}
-    if (!appOpened) openApp();
-    setTimeout(() => {
-      try { startQuickWinLesson(activeTargetLang()); } catch (_) { go('home'); }
-    }, 300);
+    appOpened = true;
+    try { dismissBootSplash(); } catch (_) {}
+    try {
+      startQuickWinLesson(activeTargetLang());
+    } catch (_) {
+      go('home');
+    }
     return;
   }
   /* m025-262 PENDAFTARAN SEKALI: begitu perkenalan selesai, nama yang baru saja diketik
@@ -8572,17 +8574,27 @@ function afterOnboardingExit(action){
   // Peran dari perkenalan: hanya guru terverifikasi yang mendarat di Tutor Action Center.
   // Pengguna tanpa kode undangan diarahkan ke modal aktivasi guru.
   if(action==='home'){try{const role=self.FiezelOnboarding?.storedRole?.(self)||'murid';const verified=isVerifiedTeacher();if(role==='guru'&&!verified){showToast('Akses Guru memerlukan kode undangan resmi.');setTimeout(()=>{try{openFiezelAuthModal('teacher')}catch{}},420)}else{if(state.preferences?.role!==role){state.preferences={...state.preferences,role:verified?role:'murid'};save()}if(role==='guru'&&verified)setTimeout(()=>{try{go('tutor')}catch{}},420)}}catch{}}
-  if(action!=='placement'){
-    state.level=state.level||1;
-    if(state.placementDone===undefined)state.placementDone=true;
-    state.streak=Math.max(Number(state.streak)||0,1);
-    if(!state.gems||typeof state.gems!=='object'||typeof state.gems.balance!=='number'){
-      state.gems={balance:(typeof state.gems==='number'&&!Number.isNaN(state.gems))?state.gems:120};
-    }
+  if(action==='placement'){
+    const curBal = Number(state.gems?.balance) || 0;
+    state.gems = { schema: 'fiezel-gems-v1', balance: curBal > 0 ? curBal : 100, earnedTotal: Math.max(curBal, 100), spentTotal: 0, ledger: [] };
     save();
+    appOpened=true;
+    try{dismissBootSplash()}catch(_){}
+    if(document.body?.classList?.contains?.('auth-locked')){
+      pendingAfterGateFn=()=>startPlacement();
+      return;
+    }
+    pendingAfterGate=null;
+    startPlacement();
+    return;
   }
+  state.level=state.level||1;
+  if(state.placementDone===undefined)state.placementDone=true;
+  state.streak=Math.max(Number(state.streak)||0,1);
+  const curBal = Number(state.gems?.balance) || 0;
+  state.gems = { schema: 'fiezel-gems-v1', balance: curBal > 0 ? curBal : 100, earnedTotal: Math.max(curBal, 100), spentTotal: 0, ledger: [] };
+  save();
   if(!appOpened)openApp();
-  if(action==='placement'){/* q19-P2a 2026-08-29: kalau gerbang akun sedang menutup layar, penempatan menunggu lewat pendingAfterGate (jalur 'placement' setelah gate selesai) — memulai kuis di balik gerbang membuat pushLayer ditolak dan mode lesson tidak pernah menyala. */if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>startPlacement();/* v38 2026-08-29: cabang defensif ini dulu memarkir niat di pendingAfterGate yang tak pernah dikonsumsi setelah gerbang turun — sekarang lewat jalur generik runPendingAfterGateFn. */return}pendingAfterGate=null;startPlacement();return}
   if(action==='classroom'){go('classroom');return}
   go('home');return;
 }
@@ -12977,7 +12989,10 @@ function showOnboarding(now=Date.now()){
         const label=journey?journey.buildGoalProfile(goal).label:goal;
         // `selfAssessedLevel` adalah perkiraan MURID SENDIRI, bukan hasil pengukuran - karena
         // itu tidak pernah menyentuh state.level, yang hanya diisi tes penempatan asli.
-        const selectedLevel=LEVELS.includes(String(level||''))?String(level):'';
+        const jlptMap={N5:'A1',N4:'A2',N3:'B1',N2:'B2',N1:'C1'};
+        const rawLevel=String(level||'');
+        const cefrEquivalent=jlptMap[rawLevel]||rawLevel;
+        const selectedLevel=LEVELS.includes(cefrEquivalent)?cefrEquivalent:(LEVELS.includes(rawLevel)?rawLevel:'');
         state.preferences={...state.preferences,goalProfile:id,selfAssessedLevel:selectedLevel,activeLevel:selectedLevel||state.preferences.activeLevel||'',levelMode:selectedLevel?'manual':state.preferences.levelMode||'placement'};
         // m025-166: level yang dipilih di sini belum terbukti. Gerbangnya TIDAK dibuka di atas
         // perkenalan (lapisan bertumpuk adalah jebakan) - ia hanya dipasang, lalu muncul
@@ -12997,7 +13012,7 @@ function showOnboarding(now=Date.now()){
         })();
       },
       onPlacement:()=>afterOnboardingExit('placement'),
-      onFinish:()=>afterOnboardingExit('home')
+      onFinish:(data)=>afterOnboardingExit(data?.via==='beginner'?'beginner':'home')
     })
   }catch(_){return null}
 }
@@ -16517,7 +16532,8 @@ function startQuickWinLesson(lang) {
   state.placementDone = true;
   state.placementBandLevel = 1;
   state.streak = Math.max(Number(state.streak)||0, 1);
-  state.gems = (Number(state.gems)||0) + 15;
+  const curBal = (state.gems && typeof state.gems.balance === 'number') ? state.gems.balance : 100;
+  state.gems = { balance: curBal };
   save();
   quizLoop({
     type: 'quick_win',

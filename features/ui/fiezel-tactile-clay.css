@@ -1203,7 +1203,7 @@ body:has(.home-today) #app,
 
 .home-page.home-today,
 .home-today {
-  padding: 10px 12px calc(84px + env(safe-area-inset-bottom, 12px)) 12px !important;
+  padding: 10px 12px calc(96px + env(safe-area-inset-bottom, 16px)) 12px !important;
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;

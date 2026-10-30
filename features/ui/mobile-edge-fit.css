@@ -4988,12 +4988,11 @@ body.fz-stage-quiz #app {
 #app > section,
 #app > div,
 #app > article,
-main.app > section,
+main.app > section:not(.home-today),
 main.app > div,
-section.fade,
+section.fade:not(.home-today),
 .classroom-page,
-.home-page,
-.home-today,
+.home-page:not(.home-today),
 .learner-flow-page,
 .skills-lab-page,
 .skills-page,
@@ -5011,6 +5010,14 @@ section.fade,
   padding-bottom: 4px !important;
   margin-bottom: 0 !important;
   scroll-padding-bottom: 0 !important;
+}
+
+.home-today,
+.home-page.home-today {
+  min-height: auto !important;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 16px)) !important;
+  margin-bottom: 0 !important;
+  scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom, 16px)) !important;
 }
 
 /* Single-task & practice sessions gracefully fill available viewport height (Zero Void) */
