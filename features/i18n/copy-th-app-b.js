@@ -168,6 +168,23 @@
     'settings.toast-report-sent': 'ส่งรายงานภาพรวมไปยัง Creator Hub แล้ว',
     'settings.toast-report-queued': 'บันทึกรายงานไว้ในคิวแล้ว และจะลองส่งใหม่อีกครั้ง',
     /* m025-365 · งานที่ครูถอน */
-    'notif.tugas-ditarik': 'ครูถอนงาน “{title}” แล้ว คุณไม่ต้องทำงานนี้'
+    'notif.tugas-ditarik': 'ครูถอนงาน “{title}” แล้ว คุณไม่ต้องทำงานนี้',
+
+    /* m025-719 · ข้อความสองทางระหว่างผู้พัฒนากับผู้เรียน */
+    'owner.section-title': 'ข้อความจากทีมนักพัฒนา',
+    'owner.default-title': 'ข้อความจากทีม Fiezel',
+    'owner.dev-team': 'ทีมนักพัฒนา Fiezel',
+    'owner.your-reply': 'คำตอบของคุณ',
+    'owner.open-reply': 'เปิดและตอบกลับ',
+    'owner.gem-bonus': 'แนบโบนัส GEM แล้ว',
+    'owner.reply-label': 'ตอบกลับทีมนักพัฒนาโดยตรง:',
+    'owner.reply-placeholder': 'เขียนความคิดเห็น ข้อเสนอแนะ หรือข้อความตอบกลับที่นี่...',
+    'owner.reply-btn': 'ส่งคำตอบ',
+    'owner.sending': 'กำลังส่ง...',
+    'owner.reply-empty': 'กรุณากรอกข้อความตอบกลับก่อน',
+    'owner.reply-fail-net': 'ส่งคำตอบไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่อ',
+    'owner.reply-success': 'ส่งคำตอบของคุณไปยังทีมนักพัฒนาเรียบร้อยแล้ว!',
+    'owner.reply-fail': 'ส่งคำตอบไม่สำเร็จ',
+    'owner.reply-err': 'เกิดข้อผิดพลาดในการส่งคำตอบ'
   });
 }());
