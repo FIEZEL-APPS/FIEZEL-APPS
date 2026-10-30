@@ -9380,6 +9380,17 @@ function authGateNeeded(){
     if(A&&typeof A.saveSession==='function'){
       try{A.saveSession(self,{role:'murid',via:'local_test',name:'Pengguna Uji'})}catch(_){}
     }
+    try{
+      localStorage.setItem('fiezel-onboarding-v1',JSON.stringify({done:true,at:Date.now(),via:'local_test',name:'Pengguna Uji',course:'ja'}));
+      setLearnerName('Pengguna Uji');
+      state.level=state.level||1;
+      state.placementDone=true;
+      state.streak=state.streak||1;
+      state.name=state.name||'Pengguna Uji';
+      state.gems=state.gems||{balance:120};
+      state.view='home';
+      save();
+    }catch(_){}
     return false;
   }
   /* m025-704 / AGENTS.md Rule 7: Zero-Modal Collision & First-Touch Serenity
@@ -12910,7 +12921,7 @@ function showOnboarding(now=Date.now()){
      pernah melihat perkenalan MURID. openApp() memanggil showBrandSplash() tanpa argumen,
      dan jalur bawaannya membuka perkenalan - jadi pengunjung demo mendarat di pemilih
      bahasa, nama, lalu peran sebelum demonya muncul. Terukur di Chromium. */
-  try{if(isVerifiedTeacher())return null}catch(_){}
+  try{if(isVerifiedTeacher()||isLocalTestServer())return null}catch(_){}
   const onboarding=self.FiezelOnboarding;
   if(!onboarding||typeof onboarding.show!=='function')return null;
   try{
@@ -12973,6 +12984,7 @@ window.showOnboarding=showOnboarding;
  * supaya jalur boot tahu apakah ia perlu menahan langkah berikutnya.
  */
 function askLearnerNameIfMissing(now=Date.now()){
+  if(isLocalTestServer())return false;
   if(!learnerNameMissing())return false;
   const onboarding=self.FiezelOnboarding;
   if(!onboarding||typeof onboarding.show!=='function')return false;

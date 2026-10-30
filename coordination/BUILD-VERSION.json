@@ -1,7 +1,7 @@
 {
-  "version": "m025-722",
-  "claimedBy": "branch feat/tutor-hint-popup-m025-721",
-  "claimedAt": "2026-10-30T13:42:51.939Z",
-  "reason": "fix(quiz): luxury petunjuk guru popup modal on wrong answer and eliminate inline under-card scrap",
+  "version": "m025-723",
+  "claimedBy": "branch feat/local-bypass-m025-723",
+  "claimedAt": "2026-10-30T14:25:42.396Z",
+  "reason": "fix(auth): auto-bypass auth and onboarding to direct home dashboard on local test server",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
