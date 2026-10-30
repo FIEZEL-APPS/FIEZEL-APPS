@@ -35,14 +35,33 @@ function env(name, fallback = '') {
 }
 
 function changedFiles() {
+  if (env('FIEZEL_GUARD_FILES')) {
+    return env('FIEZEL_GUARD_FILES').split('\n').map((s) => s.trim()).filter(Boolean);
+  }
   const base = env('BASE_SHA');
   if (!base) throw new Error('BASE_SHA is required');
   return sh('git', ['diff', '--name-only', `${base}...HEAD`]).split('\n').filter(Boolean);
 }
 
 function addedDiff() {
+  if (env('FIEZEL_GUARD_DIFF_FILE')) {
+    return fs.readFileSync(env('FIEZEL_GUARD_DIFF_FILE'), 'utf8');
+  }
+  if (env('FIEZEL_GUARD_DIFF')) {
+    return env('FIEZEL_GUARD_DIFF');
+  }
   const base = env('BASE_SHA');
   return sh('git', ['diff', '--unified=0', `${base}...HEAD`]);
+}
+
+function commitSubjects() {
+  if (env('FIEZEL_GUARD_COMMITS') || env('FIEZEL_GUARD_FILES')) {
+    return env('FIEZEL_GUARD_COMMITS');
+  }
+  const base = env('BASE_SHA');
+  if (!base) return '';
+  const r = sh('git', ['log', '--format=%s', `${base}..HEAD`], { allowFailure: true });
+  return r.status === 0 ? r.stdout : '';
 }
 
 function fileText(path, ref = 'HEAD') {
@@ -68,6 +87,184 @@ function isVoiceSensitive(path) {
   return /^(features\/(neural-voice|tutor-classroom)\/|neural-voice-|speaking-listening-|sw\.js$|app\.js$)/.test(path);
 }
 
+/**
+ * Memecah output `git diff --unified=0` menjadi peta per-berkas:
+ *   path -> { hunks: string[], added: string[], removed: string[] }
+ */
+function parseDiffByFile(diffText) {
+  const map = new Map();
+  let current = null;
+  for (const rawLine of String(diffText || '').split('\n')) {
+    const line = rawLine.replace(/\r$/, '');
+    const mPlus = line.match(/^\+\+\+\s+b\/(.+)$/);
+    if (mPlus) {
+      const p = mPlus[1].trim();
+      if (!map.has(p)) map.set(p, { hunks: [], added: [], removed: [] });
+      current = map.get(p);
+      continue;
+    }
+    if (line.startsWith('diff --git ') || line.startsWith('--- ')) continue;
+    if (!current) continue;
+    if (line.startsWith('@@')) current.hunks.push(line);
+    else if (line.startsWith('+')) current.added.push(line.slice(1));
+    else if (line.startsWith('-')) current.removed.push(line.slice(1));
+  }
+  return map;
+}
+
+/**
+ * Ekstraksi cakupan (scope) yang dideklarasikan secara EKSPLISIT:
+ * 1) Header conventional commit `tipe(scope1-scope2): ...` pada PR_TITLE dan judul commit.
+ * 2) Token izin eksplisit `[ALLOW-PROTECTED: auth, pwa, ci, onboarding, all]` pada PR_TITLE / PR_BODY / commit.
+ * Sengaja TIDAK mencocokkan kata bebas di badan PR agar teks boilerplate tidak memberi izin palsu.
+ */
+function extractDeclaredScopes(prTitle, prBody, commitsText) {
+  const scopes = new Set();
+  const headers = [String(prTitle || ''), ...String(commitsText || '').split('\n')]
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  for (const h of headers) {
+    const m = h.match(/^[a-z]+\(([^)]+)\)!?:/i);
+    if (m) {
+      for (const tok of m[1].toLowerCase().split(/[-/,+&\s_]+/).filter(Boolean)) {
+        scopes.add(tok);
+      }
+    }
+  }
+
+  const combined = [prTitle, prBody, commitsText].map((s) => String(s || '')).join('\n');
+  for (const m of combined.matchAll(/\[ALLOW-PROTECTED:\s*([^\]]+)\]/gi)) {
+    for (const tok of m[1].toLowerCase().split(/[,/\s+|]+/).filter(Boolean)) {
+      scopes.add(tok);
+    }
+  }
+  if (/\[ALLOW-MASS-DELETE\]/i.test(combined)) {
+    scopes.add('allow_mass_delete');
+  }
+  return scopes;
+}
+
+function hasAnyScope(declared, allowedList) {
+  if (declared.has('all') || declared.has('*')) return true;
+  return allowedList.some((s) => declared.has(s));
+}
+
+function isSwDiffOnlyBumpOrAssets(entry) {
+  if (!entry) return false;
+  const changed = [...entry.added, ...entry.removed].map((s) => s.trim()).filter(Boolean);
+  if (changed.length === 0) return true;
+  return changed.every((line) => (
+    /^const\s+SW_REV\s*=/.test(line) ||
+    /^['"]\.\/[^'"]+['"]\s*,?$/.test(line) ||
+    /^\/\*/.test(line) ||
+    /^\/\//.test(line)
+  ));
+}
+
+function isQualityYmlAdditiveTestRegistration(entry) {
+  if (!entry) return false;
+  const removedGates = entry.removed.filter((l) => /\bnode\s+(?:tests\/|[A-Za-z0-9_./-]+(?:test|audit|selftest|simulation))/.test(l));
+  if (removedGates.length > 0) return false;
+  const allChanged = [...entry.added, ...entry.removed].map((s) => s.trim()).filter(Boolean);
+  if (allChanged.length === 0) return true;
+  return allChanged.every((line) => (
+    /^#/.test(line) ||
+    /^-\s*name:/.test(line) ||
+    /^run:\s*\|?$/.test(line) ||
+    /^(?:run:\s*)?node\s+tests\/[A-Za-z0-9_.-]+\.(?:js|mjs)$/.test(line)
+  ));
+}
+
+/**
+ * A10 Cross-Domain Collateral Damage Guard:
+ * Menolak PR yang diam-diam menyentuh permukaan kritis (Auth/Boot, Onboarding,
+ * PWA Standalone/Landing, CI Workflows/Guardians) di luar cakupan tugasnya.
+ */
+function auditCollateralScope(files, diffText) {
+  const declared = extractDeclaredScopes(env('PR_TITLE'), env('PR_BODY'), commitSubjects());
+  const byFile = parseDiffByFile(diffText);
+  const violations = [];
+
+  // 1. Auth & Boot Gate Protection
+  const authScopes = ['auth', 'login', 'boot', 'security', 'account', 'session', 'stabilize', 'guardrails', 'guardrail'];
+  const authFiles = files.filter((p) => /^features\/auth\//.test(p));
+  const appEntry = byFile.get('app.js');
+  const authFnRe = /\b(isLocalTestServer|authGateNeeded|showAuthGate|bootAuthVerdict|primeBootAuthVerdict|followUpAuthCheck|forgetLocalAuth|verifyAuthSession)\b/;
+  const appTouchesAuth = appEntry
+    ? [...appEntry.hunks, ...appEntry.added, ...appEntry.removed].some((l) => authFnRe.test(l))
+    : false;
+
+  if ((authFiles.length > 0 || appTouchesAuth) && !hasAnyScope(declared, authScopes)) {
+    const touched = [...authFiles, ...(appTouchesAuth ? ['app.js (auth/boot gate functions)'] : [])].join(', ');
+    violations.push(
+      `COLLATERAL_AUTH_TOUCH: PR menyentuh permukaan kritis Auth/Boot [${touched}] padahal scope PR (${[...declared].join(',') || 'none'}) bukan auth/boot. ` +
+      'Dilarang mengubah kode login/boot saat mengerjakan fitur lain (gunakan ?fz_real_auth=1 untuk uji auth lokal, atau tambahkan [ALLOW-PROTECTED: auth] bila memang diminta).'
+    );
+  }
+
+  // 2. Onboarding Gate Protection
+  const obScopes = ['onboarding', 'onboard', 'welcome', 'auth', 'boot', 'stabilize', 'guardrails', 'guardrail'];
+  const obFiles = files.filter((p) => /^features\/onboarding\//.test(p));
+  const obFnRe = /\b(showOnboarding|askLearnerNameIfMissing)\b/;
+  const appTouchesOb = appEntry
+    ? [...appEntry.hunks, ...appEntry.added, ...appEntry.removed].some((l) => obFnRe.test(l))
+    : false;
+
+  if ((obFiles.length > 0 || appTouchesOb) && !hasAnyScope(declared, obScopes)) {
+    const touched = [...obFiles, ...(appTouchesOb ? ['app.js (showOnboarding/askLearnerNameIfMissing)'] : [])].join(', ');
+    violations.push(
+      `COLLATERAL_ONBOARDING_TOUCH: PR menyentuh permukaan kritis Onboarding [${touched}] di luar scope (${[...declared].join(',') || 'none'}). ` +
+      'Tambahkan scope onboarding atau [ALLOW-PROTECTED: onboarding] bila memang diminta.'
+    );
+  }
+
+  // 3. PWA Standalone, Manifest, Service Worker Logic, & Landing Surface Protection
+  const pwaScopes = ['pwa', 'manifest', 'sw', 'cache', 'offline', 'website', 'landing', 'seo', 'install', 'stabilize', 'guardrails', 'guardrail'];
+  const pwaDirectFiles = files.filter((p) => p === 'manifest.json' || /^website\//.test(p));
+  const swTouchedLogic = files.includes('sw.js') && !isSwDiffOnlyBumpOrAssets(byFile.get('sw.js'));
+
+  if ((pwaDirectFiles.length > 0 || swTouchedLogic) && !hasAnyScope(declared, pwaScopes)) {
+    const touched = [...pwaDirectFiles, ...(swTouchedLogic ? ['sw.js (runtime logic beyond SW_REV/ASSETS)'] : [])].join(', ');
+    violations.push(
+      `COLLATERAL_PWA_TOUCH: PR menyentuh permukaan PWA Standalone / Landing [${touched}] di luar scope (${[...declared].join(',') || 'none'}). ` +
+      'Tambahkan scope pwa/website atau [ALLOW-PROTECTED: pwa] bila memang diminta.'
+    );
+  }
+
+  // 4. CI Workflows & Release Governance Protection
+  const ciScopes = ['ci', 'workflow', 'workflows', 'gate', 'gates', 'guardian', 'guardians', 'governance', 'bot', 'stabilize', 'guardrails', 'guardrail'];
+  const ciFiles = files.filter((p) => {
+    if (p === '.github/workflows/quality.yml') {
+      return !isQualityYmlAdditiveTestRegistration(byFile.get(p));
+    }
+    return /^\.github\/workflows\//.test(p) || p === 'tools/fiezel-guardians.mjs' || p === 'tools/bump-build.mjs' || p === 'release-audit.py';
+  });
+
+  if (ciFiles.length > 0 && !hasAnyScope(declared, ciScopes)) {
+    violations.push(
+      `COLLATERAL_CI_GOVERNANCE_TOUCH: PR memodifikasi penjaga CI/rilis [${ciFiles.join(', ')}] di luar scope (${[...declared].join(',') || 'none'}). ` +
+      'Mendaftarkan tes baru di quality.yml diizinkan, namun menghapus gerbang atau mengubah workflow wajib ber-scope ci atau [ALLOW-PROTECTED: ci].'
+    );
+  }
+
+  // 5. Mass Runtime Deletion Guard (> 500 baris dihapus pada runtime inti tanpa deklarasi)
+  let runtimeDeletedLines = 0;
+  for (const [f, entry] of byFile.entries()) {
+    if (/^(app\.js|style\.css|fiezel-2\.css|index\.html|features\/)/.test(f)) {
+      runtimeDeletedLines += entry.removed.length;
+    }
+  }
+  const massDeleteScopes = ['refactor', 'cleanup', 'remove', 'deprecate', 'allow_mass_delete', 'stabilize'];
+  if (runtimeDeletedLines > 500 && !hasAnyScope(declared, massDeleteScopes)) {
+    violations.push(
+      `MASS_RUNTIME_DELETION: PR menghapus ${runtimeDeletedLines} baris pada berkas runtime inti tanpa scope refactor/cleanup atau token [ALLOW-MASS-DELETE].`
+    );
+  }
+
+  return { declared: [...declared], violations, runtimeDeletedLines };
+}
+
 function report(title, classification = '') {
   console.log(`# ${title}`);
   if (classification) console.log(`classification: ${classification}`);
@@ -87,6 +284,15 @@ function selfTest() {
   if (!secretSamples.every((s) => patterns.some((p) => p.test(s)))) throw new Error('secret pattern self-test failed');
   if (parseDiag("var DIAG_BUILD = 'm025-49';") !== 49) throw new Error('DIAG parser self-test failed');
   if (parseSw("const SW_REV='m025-49-test';") !== 49) throw new Error('SW parser self-test failed');
+
+  const sampleScopes = extractDeclaredScopes('fix(grammar-quiz): polish hint', 'body with auth word', '');
+  if (!sampleScopes.has('grammar') || sampleScopes.has('auth')) {
+    throw new Error('scope extractor self-test failed: prose must not grant auth scope');
+  }
+  const overrideScopes = extractDeclaredScopes('fix(grammar): touch gate', '[ALLOW-PROTECTED: auth]', '');
+  if (!overrideScopes.has('auth')) {
+    throw new Error('scope extractor self-test failed: ALLOW-PROTECTED token must grant scope');
+  }
   console.log('FIEZEL guardian self-test PASS');
 }
 
@@ -103,7 +309,9 @@ function secretPatterns() {
 function runA9() {
   const files = changedFiles();
   const diff = addedDiff();
-  sh('git', ['diff', '--check', `${env('BASE_SHA')}...HEAD`]);
+  if (!env('FIEZEL_GUARD_FILES')) {
+    sh('git', ['diff', '--check', `${env('BASE_SHA')}...HEAD`]);
+  }
 
   const added = diff.split('\n').filter((l) => l.startsWith('+') && !l.startsWith('+++'));
   for (const line of added) {
@@ -126,7 +334,9 @@ function runA9() {
 
 function runA10() {
   const files = changedFiles();
-  sh('git', ['diff', '--check', `${env('BASE_SHA')}...HEAD`]);
+  if (!env('FIEZEL_GUARD_FILES')) {
+    sh('git', ['diff', '--check', `${env('BASE_SHA')}...HEAD`]);
+  }
   const sensitive = files.filter(isVoiceSensitive);
   const tests = files.filter((p) => /(^|\/)(.*test.*\.(?:js|mjs)|.*\.spec\.(?:js|mjs))$/.test(p) || p.startsWith('.github/workflows/'));
 
@@ -137,8 +347,14 @@ function runA10() {
   const addedAssertions = diff.split('\n').filter((l) => /^\+(?!\+)/.test(l) && /(assert|jq -e|grep -F|throw new Error)/.test(l)).length;
   if (deletedAssertions > addedAssertions + 5) warn(`assertion surface shrank materially (removed=${deletedAssertions}, added=${addedAssertions}); MASTER should confirm property changes are intentional`);
 
+  const scopeAudit = auditCollateralScope(files, diff);
+  note(`declared_scopes=${scopeAudit.declared.join(',') || 'none'}; runtime_deleted_lines=${scopeAudit.runtimeDeletedLines}`);
+  for (const v of scopeAudit.violations) {
+    error(v);
+  }
+
   note(`sensitive_files=${sensitive.length}; companion_test_or_workflow_files=${tests.length}`);
-  report('A10 Regression Watcher', 'PASS_WITH_RISK_REPORT');
+  report('A10 Regression Watcher', state.errors.length ? 'BLOCK' : 'PASS_WITH_RISK_REPORT');
 }
 
 function runA11() {
@@ -199,7 +415,8 @@ function runA8() {
   const runUrl = args.url || env('FAILED_RUN_URL', '');
   const text = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8') : '';
   const signatures = [
-    ['branch freshness / merge boundary', /(does not contain current main|merge-base|merge-tree|behind)/i],
+    ['collateral scope violation (unauthorized auth/PWA/CI touch)', /(COLLATERAL_AUTH_TOUCH|COLLATERAL_ONBOARDING_TOUCH|COLLATERAL_PWA_TOUCH|COLLATERAL_CI_GOVERNANCE_TOUCH|MASS_RUNTIME_DELETION)/i],
+    ['branch freshness / merge boundary', /(does not contain current main|does not contain current origin\/main|merge-base|merge-tree|behind)/i],
     ['release marker coherence', /(DIAG_BUILD|SW_REV|release boundary|pwa-release-coherence)/i],
     ['assertion / regression', /(AssertionError|assertion|expected .* actual|jq: error|FAIL:)/i],
     ['timeout / latency', /(timeout|timed out|latency|RTF)/i],
@@ -217,7 +434,7 @@ function runA8() {
   console.log('This report is deterministic triage, not an AI-generated root-cause claim. MASTER/repair agent should confirm the first causal error before patching.');
   console.log('');
   const lines = text.split('\n').filter(Boolean);
-  const interesting = lines.filter((l) => /(error|fail|assert|timeout|expected|actual|fatal|not found|denied)/i.test(l)).slice(-25);
+  const interesting = lines.filter((l) => /(error|fail|assert|timeout|expected|actual|fatal|not found|denied|COLLATERAL_)/i.test(l)).slice(-25);
   if (interesting.length) {
     console.log('<details><summary>Failed-log signal excerpt</summary>');
     console.log('');

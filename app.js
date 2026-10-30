@@ -9360,6 +9360,7 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
 function isLocalTestServer(){
   try{
     if(typeof location==='undefined')return false;
+    if(/(?:^|[?&])fz_real_auth=1(?:&|$)/.test(String(location.search||'')))return false;
     const h=location.hostname,p=location.port;
     if(h==='localhost'||h==='127.0.0.1'||h==='0.0.0.0'||h.startsWith('192.168.')||h.startsWith('10.')||h.endsWith('.local'))return true;
     if(p==='3000'||p==='3005'||p==='4173'||p==='5173')return true;

@@ -616,6 +616,8 @@ jobs:
           node tests/sw-nav-shell-first-test.js
           node tests/pwa-release-coherence-test.js
           node tests/pwa-standalone-ecosystem-test.js
+          node tests/critical-surface-protection-test.js
+          node tests/collateral-scope-guard-test.js
           # m025-492: kartu pembaruan membaca coordination/BUILD-VERSION.json sebagai sinyal
           # UTAMA. Gerbang ini menegakkan bahwa jalur aset cangkang yang cache-first tidak
           # pernah membekukan penanda itu: jaringan selalu ditempuh, salinan tidak ditulis,

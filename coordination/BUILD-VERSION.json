@@ -1,7 +1,7 @@
 {
-  "version": "m025-727",
-  "claimedBy": "branch fix/pwa-standalone-ecosystem-m025-727",
-  "claimedAt": "2026-10-30T17:45:11.487Z",
-  "reason": "fix(pwa): ecosystem standalone web app manifest, redirect guard, and service worker parity (m025-727)",
+  "version": "m025-728",
+  "claimedBy": "branch feat/stabilize-guardrails-m025-728",
+  "claimedAt": "2026-10-30T19:04:52.817Z",
+  "reason": "feat(stabilize-auth-pwa-ci): harden CI gates, collateral scope guard, and live PWA verification (m025-728)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
