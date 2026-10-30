@@ -1,6 +1,6 @@
-# FIEZEL Build m025-719 Handoff: Perbaikan Interaktivitas Lembar Umpan Balik Grammar & Bypass Auth Uji Lokal
+# FIEZEL Build m025-720 Handoff: Perbaikan Interaktivitas Lembar Umpan Balik Grammar & Bypass Auth Uji Lokal
 
-**Versi Build:** `m025-719` (Berdasarkan `origin/main` commit `bf121662` `m025-718`)
+**Versi Build:** `m025-720` (Berdasarkan `origin/main` commit `555a065b` `m025-719`)
 **Tanggal:** 30 Oktober 2026
 **Otoritas:** FIEZEL-APPS Core Engineering & Pedagogical Standard
 
@@ -42,7 +42,7 @@ Pengguna melaporkan kendala kritis pada sesi latihan Grammar saat menguji di per
 | **Content Integrity Gate** | `node tests/content-integrity-gate.js` | 4 dari 4 gerbang lulus 100% hijau | **LULUS** |
 | **View Reachability Gate** | `node tests/view-reachability-test.js` | 67 dari 67 pemeriksaan lulus (20 layar, 24 nama view) | **LULUS** |
 | **Mochi Voice SOS Unit Tests** | `node tests/mochi-voice-sos-test.js` | 8 dari 8 unit test lulus 100% | **LULUS** |
-| **Penyelarasan Build Version (Hexa-Sync & Octa-Sync)** | `m025-719` selaras di seluruh berkas PWA | `node tools/bump-build.mjs --check` dan `curriculum-cache-version-test.js` valid 100% | **LULUS** |
+| **Penyelarasan Build Version (Hexa-Sync & Octa-Sync)** | `m025-720` selaras di seluruh berkas PWA | `node tools/bump-build.mjs --check` dan `curriculum-cache-version-test.js` valid 100% | **LULUS** |
 
 ---
 
