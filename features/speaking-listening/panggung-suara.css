@@ -1152,6 +1152,8 @@
     opacity: 0;
     transform: translateY(-440px) scale(1) rotate(var(--rot-end, 15deg));
   }
+}
+
 /* High-contrast fixes for dark theme cards in Listening & Speaking */
 html body .fsl-card:not(.fsl-card-listening) h1,
 html body .fsl-card:not(.fsl-card-listening) h2,

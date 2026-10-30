@@ -3,14 +3,14 @@ name: FIEZEL A9 A14 Autonomous Guardians
 on:
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened, ready_for_review, edited]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
   pull-requests: read
 
 concurrency:
-  group: a9-a14-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -21,6 +21,8 @@ jobs:
     # yang menggantung membakar enam jam dalam diam (lihat
     # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
+    outputs:
+      diag: ${{ steps.audit.outputs.diag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,11 +33,24 @@ jobs:
       - name: Guardian engine self-test
         run: node tools/fiezel-guardians.mjs self-test
       - name: Security and secret-boundary audit
+        id: audit
+        shell: bash
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_DRAFT: ${{ github.event.pull_request.draft }}
-        run: node tools/fiezel-guardians.mjs a9
+        run: |
+          set +e
+          node tools/fiezel-guardians.mjs a9 2>&1 | tee /tmp/a9.out
+          rc=${PIPESTATUS[0]}
+          set -e
+          {
+            echo 'diag<<EOF_A9'
+            grep -E '^(ERROR|WARN):' /tmp/a9.out | head -n 15 || true
+            echo 'EOF_A9'
+          } >> "$GITHUB_OUTPUT"
+          exit "$rc"
       - name: Existing auth and response-policy regressions
         run: |
           node tests/puter-auth-coop-test.js
@@ -48,6 +63,8 @@ jobs:
     # yang menggantung membakar enam jam dalam diam (lihat
     # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
+    outputs:
+      diag: ${{ steps.audit.outputs.diag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,16 +72,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Diff and assertion-surface audit
+      - name: Diff, collateral scope, and assertion-surface audit
+        id: audit
+        shell: bash
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
-        run: node tools/fiezel-guardians.mjs a10
-      - name: High-value cross-cutting regressions
+        run: |
+          set +e
+          node tools/fiezel-guardians.mjs a10 2>&1 | tee /tmp/a10.out
+          rc=${PIPESTATUS[0]}
+          set -e
+          {
+            echo 'diag<<EOF_A10'
+            grep -E '^(ERROR|WARN):' /tmp/a10.out | head -n 15 || true
+            echo 'EOF_A10'
+          } >> "$GITHUB_OUTPUT"
+          exit "$rc"
+      - name: High-value cross-cutting and critical surface regressions
         run: |
           node tests/diag-search-test.js
           node tests/pwa-cache-test.js
           node tests/pwa-release-coherence-test.js
+          node tests/critical-surface-protection-test.js
+          node tests/collateral-scope-guard-test.js
 
   a11-release-readiness-auditor:
     name: A11 Release Readiness Auditor
@@ -73,6 +105,8 @@ jobs:
     # yang menggantung membakar enam jam dalam diam (lihat
     # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
+    outputs:
+      diag: ${{ steps.audit.outputs.diag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -81,10 +115,23 @@ jobs:
         with:
           node-version: '22'
       - name: Freshness, merge-tree, and release-boundary audit
+        id: audit
+        shell: bash
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
-        run: node tools/fiezel-guardians.mjs a11
+        run: |
+          set +e
+          node tools/fiezel-guardians.mjs a11 2>&1 | tee /tmp/a11.out
+          rc=${PIPESTATUS[0]}
+          set -e
+          {
+            echo 'diag<<EOF_A11'
+            grep -E '^(ERROR|WARN):' /tmp/a11.out | head -n 15 || true
+            echo 'EOF_A11'
+          } >> "$GITHUB_OUTPUT"
+          exit "$rc"
 
   a13-handoff-keeper:
     name: A13 Handoff Keeper
@@ -93,6 +140,8 @@ jobs:
     # yang menggantung membakar enam jam dalam diam (lihat
     # tests/workflow-timeout-gate-test.js).
     timeout-minutes: 20
+    outputs:
+      diag: ${{ steps.audit.outputs.diag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -101,14 +150,27 @@ jobs:
         with:
           node-version: '22'
       - name: Handoff continuity audit
+        id: audit
+        shell: bash
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
-        run: node tools/fiezel-guardians.mjs a13
+        run: |
+          set +e
+          node tools/fiezel-guardians.mjs a13 2>&1 | tee /tmp/a13.out
+          rc=${PIPESTATUS[0]}
+          set -e
+          {
+            echo 'diag<<EOF_A13'
+            grep -E '^(ERROR|WARN):' /tmp/a13.out | head -n 15 || true
+            echo 'EOF_A13'
+          } >> "$GITHUB_OUTPUT"
+          exit "$rc"
 
   a14-autonomous-review:
     name: A14 Autonomous Review
-    if: always()
+    if: ${{ !cancelled() }}
     needs:
       - a9-security-sentinel
       - a10-regression-watcher
@@ -131,6 +193,10 @@ jobs:
           A10: ${{ needs.a10-regression-watcher.result }}
           A11: ${{ needs.a11-release-readiness-auditor.result }}
           A13: ${{ needs.a13-handoff-keeper.result }}
+          A9_DIAG: ${{ needs.a9-security-sentinel.outputs.diag }}
+          A10_DIAG: ${{ needs.a10-regression-watcher.outputs.diag }}
+          A11_DIAG: ${{ needs.a11-release-readiness-auditor.outputs.diag }}
+          A13_DIAG: ${{ needs.a13-handoff-keeper.outputs.diag }}
           PR_DRAFT: ${{ github.event.pull_request.draft }}
         shell: bash
         run: |
@@ -160,6 +226,16 @@ jobs:
             echo "| A11 Release Readiness Auditor | $A11 |"
             echo "| A13 Handoff Keeper | $A13 |"
             echo
+            if [[ -n "${A9_DIAG}${A10_DIAG}${A11_DIAG}${A13_DIAG}" ]]; then
+              echo '### Guardian Findings & Remediation Report'
+              echo '```text'
+              [[ -n "$A9_DIAG" ]] && printf '[A9 Security Sentinel]\n%s\n' "$A9_DIAG"
+              [[ -n "$A10_DIAG" ]] && printf '[A10 Regression Watcher]\n%s\n' "$A10_DIAG"
+              [[ -n "$A11_DIAG" ]] && printf '[A11 Release Readiness Auditor]\n%s\n' "$A11_DIAG"
+              [[ -n "$A13_DIAG" ]] && printf '[A13 Handoff Keeper]\n%s\n' "$A13_DIAG"
+              echo '```'
+              echo
+            fi
             echo 'A14 is an autonomous deterministic reviewer. It may block or recommend MASTER review, but it never grants merge/deploy authority and never substitutes for required physical evidence.'
           } > /tmp/a14-review.md
           cat /tmp/a14-review.md >> "$GITHUB_STEP_SUMMARY"

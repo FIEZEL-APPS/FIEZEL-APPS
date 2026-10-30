@@ -1082,6 +1082,14 @@ header.topbar,
   box-shadow: 0 3px 0 #CBD5E1 !important;
   cursor: pointer !important;
   white-space: nowrap !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  width: auto !important;
+  min-width: auto !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+  transition: all 0.12s ease !important;
+  overflow: visible !important;
 }
 
 #fzCourseSwitchBtn[style*="display: none"],
@@ -1092,15 +1100,6 @@ header.topbar,
 #topGamifyCluster[style*="display: none"],
 #topGamifyCluster[style*="display:none"] {
   display: none !important;
-}
-  height: 44px !important;
-  min-height: 44px !important;
-  width: auto !important;
-  min-width: auto !important;
-  flex-shrink: 0 !important;
-  line-height: 1 !important;
-  transition: all 0.12s ease !important;
-  overflow: visible !important;
 }
 
 .btn-course-selector:hover,

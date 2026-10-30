@@ -20,8 +20,8 @@ const TYPES = {
 const server = http.createServer((req, res) => {
   let rel = decodeURIComponent(req.url.split('?')[0]);
   if (rel === '/' || rel === '') rel = '/index.html';
-  const file = path.join(ROOT, rel.replace(/^\/+/, ''));
-  if (!file.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
+  const file = path.resolve(ROOT, rel.replace(/^\/+/, ''));
+  if (!file.toLowerCase().startsWith(path.resolve(ROOT).toLowerCase())) { res.writeHead(403); res.end(); return; }
   fs.readFile(file, (err, buf) => {
     if (err) { res.writeHead(404); res.end('not found'); return; }
     res.writeHead(200, { 'content-type': TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream' });

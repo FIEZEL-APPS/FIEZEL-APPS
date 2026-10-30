@@ -1,5 +1,19 @@
 # Antigravity Workspace Guidelines for FIEZEL-APPS
 
+## 0. IRONCLAD SCOPE ISOLATION, PROTECTED SURFACES, & ZERO-RED-MERGE MANDATE (ATURAN MUTLAK #0)
+Setiap agent di workspace ini WAJIB tunduk pada penegakan mekanis CI dan GitHub Branch Protection berikut:
+1. **Hanya Sentuh Cakupan Tugas (Zero Collateral Damage)**:
+   - Jika diminta memperbaiki `grammar`, `vocab`, `kana`, atau `quiz`, **DILARANG KERAS** menyentuh permukaan terproteksi di luar tugas:
+     - **Auth & Boot**: `features/auth/**`, serta fungsi `isLocalTestServer`, `authGateNeeded`, `showAuthGate`, `bootAuthVerdict`, `primeBootAuthVerdict`, `verifyAuthSession` di `app.js`.
+     - **Onboarding**: `features/onboarding/**`, `showOnboarding`, `askLearnerNameIfMissing`.
+     - **PWA Standalone & Landing**: `manifest.json`, `website/**`, dan logika runtime `sw.js` di luar baris `SW_REV` / daftar `ASSETS`.
+     - **CI & Governance**: `.github/workflows/**` (kecuali menambah baris `node tests/...` baru di `quality.yml`), `tools/fiezel-guardians.mjs`, `tools/bump-build.mjs`.
+   - `A10 Regression Watcher` (`tools/fiezel-guardians.mjs a10`) **MEMBLOKIR OTOMATIS** setiap PR yang menyentuh permukaan di atas tanpa scope judul commit/PR yang sesuai (`fix(auth):`, `fix(pwa):`, `fix(ci):`) atau token izin eksplisit `[ALLOW-PROTECTED: auth|onboarding|pwa|ci]`.
+2. **Cara Menguji Login & Onboarding Asli Tanpa Mengubah Kode Auth**:
+   - Server uji lokal bawaan melewati login sesuai mandat owner (`m025-723`). Untuk menguji layar Login & Onboarding produksi secara utuh di peramban lokal/Playwright, tambahkan parameter `?fz_real_auth=1` (contoh: `http://127.0.0.1:4173/?fz_real_auth=1`). **DILARANG** memodifikasi kode `authGateNeeded()` demi mengetes fitur lain.
+3. **Zero-Red-Merge & Mandatory Branch Protection (`enforce_admins: true`, `strict: true`)**:
+   - Branch `main` dikunci secara mesin di GitHub: **NOL direct push**, cabang PR wajib *up-to-date* terhadap `origin/main` terbaru, dan seluruh 10 gerbang wajib (`quality`, `A6`, `A7`, `A9`, `A10`, `A11`, `A13`, `A14`, `Auto PR Review & Invariant Audit`, `MASTER-only authority`) **WAJIB 100% HIJAU** sebelum merge diizinkan.
+
 ## Motion & Video Animation Guidelines (Remotion & Three.js 3D Master)
 
 Whenever the user requests animation, motion graphics, commercial 3D film, or video generation:
