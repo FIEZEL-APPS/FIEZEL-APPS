@@ -10,6 +10,16 @@
 <link rel="icon" href="../../assets/brand/fiezel-icon.svg" type="image/svg+xml">
 <link rel="icon" href="../../assets/brand/fiezel-icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="../../assets/brand/fiezel-icon-192.png">
+<link rel="manifest" href="../../manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="FIEZEL">
+<script>
+if(window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)){
+  window.location.replace('../../app/');
+}
+</script>
 <!-- AI-15-F04/F07/F08 (W3-WEB): hreflang timbal-balik id/th (x-default = halaman id yang sudah terindeks) + canonical + og:url + og:locale th_TH. -->
 <link rel="alternate" hreflang="id" href="https://fiezel.my.id/install/">
 <link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/install/">
@@ -306,6 +316,12 @@
 </script>
 
 <script src="../../site.js?v=20260903-hula02" defer></script>
-
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('../../app/sw.js',{scope:'/app/',updateViaCache:'none'}).catch(function(){});
+  });
+}
+</script>
 </body>
 </html>
