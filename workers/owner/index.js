@@ -3498,7 +3498,7 @@ function renderLearnerMessagesCard(d, m) {
       <input type="hidden" name="action" value="send_learner_message">
       <input type="hidden" name="learner" value="${esc(targetSub)}">
       <input type="hidden" name="period" value="${esc(m.period || '7d')}">
-      
+
       <div style="font-size:14px;font-weight:700;color:var(--text-main);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
         <span>💬</span> <span>Kirim Pesan Langsung &amp; Suntik Reward GEM</span>
       </div>

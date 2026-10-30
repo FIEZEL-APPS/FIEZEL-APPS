@@ -220,4 +220,3 @@ export const ROUTES = [
   ['POST', OWNER_SEND_MESSAGE_PATH, routeOwnerSendMessage],
   ['GET', OWNER_LEARNER_MESSAGES_PATH, routeOwnerLearnerMessages]
 ];
-
