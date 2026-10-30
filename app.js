@@ -22769,7 +22769,7 @@ function renderNotifListMarkup(teacher,requests,social,invite){
       const isUnread=!m.is_read&&m.sender==='owner';
       const time=m.created_at?`<small>${esc(notifTimeLabel(m.created_at))}</small>`:'';
       const gemBadge=m.gem_amount>0?` · <span style="color:#b45309;font-weight:700;">+${esc(String(m.gem_amount))} GEM</span>`:'';
-      return `<li class="notif-item is-owner-msg${isUnread?' is-unread':''}" data-testid="notif-owner-msg-${esc(m.id)}"><span class="notif-icon" style="background:#2563eb;color:#fff;font-weight:800;font-size:14px;"><i data-lucide="mail" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(m.title||t('owner.default-title','Pesan Tim Fiezel'))}</b><small>${m.sender==='owner'?t('owner.dev-team','Tim Pengembang'):t('owner.your-reply','Balasan Kamu')}${gemBadge}</small>${time}</div><button type="button" class="notif-cta" onclick="openOwnerMessageModal('${esc(m.id)}')" style="background:#2563eb;color:#fff;">${t('owner.open-reply','Buka & Balas')}</button></li>`;
+      return `<li class="notif-item is-owner-msg${isUnread?' is-unread':''}" data-testid="notif-owner-msg-${esc(m.id)}"><span class="notif-icon" style="background:#2563eb;color:#fff;font-weight:800;font-size:14px;"><i data-lucide="mail-open" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(m.title||t('owner.default-title','Pesan Tim Fiezel'))}</b><small>${m.sender==='owner'?t('owner.dev-team','Tim Pengembang'):t('owner.your-reply','Balasan Kamu')}${gemBadge}</small>${time}</div><button type="button" class="notif-cta" onclick="openOwnerMessageModal('${esc(m.id)}')" style="background:#2563eb;color:#fff;">${t('owner.open-reply','Buka & Balas')}</button></li>`;
     }).join('');
   }
   return list;
