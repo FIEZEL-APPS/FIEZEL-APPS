@@ -12,7 +12,7 @@ import path from 'path';
 import { chromium } from 'playwright';
 
 const rootDir = process.cwd();
-const artifactDir = 'C:/Users/hp/.gemini/antigravity/brain/34adf302-d779-4926-bf02-97e0549d924d';
+const artifactDir = process.env.ARTIFACT_DIR || 'C:/Users/hp/.gemini/antigravity/brain/4c759766-7170-46d2-b12f-2017cc49bf5f';
 
 // Load latest build version from single source of truth
 let latestBuild = 'unknown';

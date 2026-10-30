@@ -8045,6 +8045,131 @@ html body #app .fz-kawan-card.fz-vissol-kawan-card::after {
   margin-left: 2px !important;
 }
 
+/* ── Kawan Bicara v2 (Gambar Referensi 1) ── */
+html body #app .fz-kawan-card.fz-kawan-card-v2 {
+  display: grid !important;
+  grid-template-columns: 52px minmax(0, 1fr) auto !important;
+  grid-template-areas: "icon body right" !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 16px 16px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #F3E8FF !important;
+  border-radius: 24px !important;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.08) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, border-color 0.22s ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+html body #app .fz-kawan-card.fz-kawan-card-v2::after {
+  display: none !important;
+}
+html body #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-icon { grid-area: icon !important; }
+html body #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-body { grid-area: body !important; }
+html body #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-right { grid-area: right !important; }
+html body #app .fz-kawan-card.fz-kawan-card-v2:hover,
+html body #app .fz-kawan-card.fz-kawan-card-v2:focus-visible {
+  transform: translateY(-2px) scale(1.008) !important;
+  border-color: #DDD6FE !important;
+  box-shadow: 0 14px 36px rgba(124, 58, 237, 0.14) !important;
+  outline: none !important;
+}
+html body #app .fz-kawan-card.fz-kawan-card-v2:active { transform: translateY(0) scale(0.995) !important; }
+.fz-kawan-v2-icon {
+  width: 52px !important; height: 52px !important; border-radius: 50% !important;
+  background: #F5F3FF !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.12) !important;
+  flex-shrink: 0 !important;
+}
+.fz-kawan-v2-body { min-width: 0 !important; display: flex !important; flex-direction: column !important; gap: 5px !important; }
+.fz-kawan-v2-pill {
+  align-self: flex-start !important;
+  display: inline-flex !important; align-items: center !important;
+  padding: 3px 10px !important; border-radius: 999px !important;
+  background: #F3E8FF !important; color: #7C3AED !important;
+  font-size: 11px !important; font-weight: 700 !important; letter-spacing: 0.01em !important; line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+.fz-kawan-v2-title {
+  margin: 0 !important; font-size: 18px !important; font-weight: 800 !important; color: #0F172A !important; line-height: 1.2 !important;
+  display: flex !important; align-items: baseline !important; gap: 8px !important; flex-wrap: wrap !important;
+}
+.fz-kawan-v2-meta { font-size: 11px !important; font-weight: 600 !important; color: #8B5CF6 !important; }
+.fz-kawan-v2-desc { margin: 0 !important; font-size: 13px !important; color: #64748B !important; line-height: 1.4 !important; }
+.fz-kawan-v2-right { display: flex !important; align-items: center !important; gap: 6px !important; flex-shrink: 0 !important; }
+.fz-kawan-v2-bubbles { display: block !important; filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.18)) !important; transition: transform 0.25s ease !important; }
+.fz-kawan-card-v2:hover .fz-kawan-v2-bubbles { transform: translateY(-2px) rotate(-3deg) !important; }
+.fz-kawan-v2-chevron { display: flex !important; transition: transform 0.2s ease !important; }
+.fz-kawan-card-v2:hover .fz-kawan-v2-chevron { transform: translateX(3px) !important; }
+@media (min-width: 768px) {
+  .fz-kawan-card.fz-kawan-card-v2 { padding: 22px 24px !important; gap: 18px !important; grid-template-columns: 56px minmax(0, 1fr) auto !important; }
+  .fz-kawan-v2-title { font-size: 20px !important; }
+}
+@media (max-width: 380px) {
+  .fz-kawan-v2-bubbles svg { width: 48px !important; height: 42px !important; }
+}
+
+/* ── Modal "Telepon aku sekarang" ── */
+.fz-kawan-modal-scrim {
+  position: fixed !important; inset: 0 !important; z-index: 12000 !important;
+  display: flex !important; align-items: center !important; justify-content: center !important; padding: 20px !important;
+  background: rgba(46, 26, 71, 0.46) !important;
+  backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;
+  animation: fzKawanScrimIn 0.22s ease-out !important;
+  box-sizing: border-box !important;
+}
+.fz-kawan-modal-scrim.is-leaving { animation: fzKawanScrimOut 0.2s ease-in forwards !important; }
+.fz-kawan-modal-card {
+  position: relative !important; width: 100% !important; max-width: 340px !important;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAF7FF 100%) !important;
+  border: 1.5px solid #EDE9FE !important; border-radius: 28px !important;
+  padding: 28px 22px 22px !important; text-align: center !important;
+  box-shadow: 0 24px 60px rgba(76, 29, 149, 0.28) !important;
+  animation: fzKawanCardIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
+}
+.fz-kawan-modal-close {
+  position: absolute !important; top: 12px !important; right: 12px !important; width: 34px !important; height: 34px !important; border-radius: 50% !important;
+  border: none !important; background: #F5F3FF !important; color: #6D28D9 !important; cursor: pointer !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+}
+.fz-kawan-modal-mochi { display: flex !important; justify-content: center !important; animation: fzKawanMochiBob 2.4s ease-in-out infinite !important; }
+.fz-kawan-modal-title { margin: 6px 0 6px !important; font-size: 22px !important; font-weight: 800 !important; color: #0F172A !important; letter-spacing: -0.01em !important; }
+.fz-kawan-modal-sub { margin: 0 0 22px !important; font-size: 13.5px !important; color: #64748B !important; line-height: 1.45 !important; }
+.fz-kawan-modal-phone {
+  position: relative !important; width: 84px !important; height: 84px !important; border-radius: 50% !important; border: none !important; cursor: pointer !important;
+  background: radial-gradient(circle at 30% 30%, #34D399 0%, #10B981 55%, #059669 100%) !important;
+  box-shadow: 0 10px 26px rgba(16, 185, 129, 0.45), 0 0 0 6px rgba(252, 211, 77, 0.35) !important;
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  animation: fzKawanPhoneShake 1.6s ease-in-out infinite !important;
+  transition: transform 0.15s ease !important;
+}
+.fz-kawan-modal-phone:active { transform: scale(0.94) !important; }
+.fz-kawan-modal-phone.is-dialing { animation: none !important; filter: saturate(1.2) !important; }
+.fz-kawan-ring {
+  position: absolute !important; inset: -6px !important; border-radius: 50% !important;
+  border: 2px solid rgba(250, 204, 21, 0.75) !important;
+  animation: fzKawanRingWave 1.8s ease-out infinite !important;
+  pointer-events: none !important;
+}
+.fz-kawan-ring.r2 { animation-delay: 0.6s !important; } .fz-kawan-ring.r3 { animation-delay: 1.2s !important; }
+.fz-kawan-modal-cta { margin-top: 12px !important; font-size: 14px !important; font-weight: 700 !important; color: #065F46 !important; }
+.fz-kawan-modal-later { margin-top: 14px !important; background: none !important; border: none !important; color: #94A3B8 !important; font-size: 13px !important; cursor: pointer !important; text-decoration: underline !important; }
+@keyframes fzKawanScrimIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes fzKawanScrimOut { from { opacity: 1 } to { opacity: 0 } }
+@keyframes fzKawanCardIn { from { opacity: 0; transform: translateY(18px) scale(0.92) } to { opacity: 1; transform: none } }
+@keyframes fzKawanMochiBob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+@keyframes fzKawanPhoneShake { 0%,100% { transform: rotate(0) } 10% { transform: rotate(-10deg) } 20% { transform: rotate(10deg) } 30% { transform: rotate(-8deg) } 40% { transform: rotate(8deg) } 50% { transform: rotate(0) } }
+@keyframes fzKawanRingWave { 0% { transform: scale(1); opacity: 0.9 } 100% { transform: scale(1.9); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) {
+  .fz-kawan-modal-phone, .fz-kawan-ring, .fz-kawan-modal-mochi { animation: none !important; }
+}
+
 /* 4. Progres Belajar Section */
 .fz-vissol-progress-section {
   width: 100% !important;

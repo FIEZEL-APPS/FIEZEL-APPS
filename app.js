@@ -12094,95 +12094,110 @@ function conversationPartnerChatSnapshot(course){
 function conversationPartnerHomeCardMarkup(){
   const course=jaCourseOn()?'ja':'en';
   const snap=conversationPartnerChatSnapshot(course);
-  const isTh = (typeof FiezelI18n !== 'undefined' && FiezelI18n && FiezelI18n.getLocale && FiezelI18n.getLocale() === 'th');
   const nama=FiezelI18n.t('chat.nama');
-  const icons=self.FiezelChatIcons;
-  let avatar='';try{avatar=icons&&typeof icons.icon==='function'?icons.icon(course==='ja'?'sensei':'coach',{size:30,filled:true}):''}catch{}
-  if(!avatar)avatar='<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 12.5z" fill="#F59E0B"/><circle cx="9" cy="9" r="1.2" fill="#fff"/><circle cx="12" cy="9" r="1.2" fill="#fff"/><circle cx="15" cy="9" r="1.2" fill="#fff"/></svg>';
   const lanjut=snap.userTurns>0;
-  const lencana=[
-    `<span class="fz-kawan-badge is-live"><span class="fz-kawan-dot" aria-hidden="true"></span>${esc(FiezelI18n.t('home.kawan.badge-online'))}</span>`,
-    `<span class="fz-kawan-badge">${esc(lanjut?FiezelI18n.t('home.kawan.badge-lanjut',{n:snap.userTurns}):FiezelI18n.t('home.kawan.badge-baru'))}</span>`,
-    snap.correctionOn?`<span class="fz-kawan-badge is-koreksi">${esc(FiezelI18n.t('home.kawan.badge-koreksi'))}</span>`:''
-  ].join('');
-  return `<section class="fz-kawan-card fz-vissol-kawan-card" data-testid="kawan-bicara-home-card" data-course="${course}" tabindex="0" onclick="go('chat')" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();go('chat')}" aria-label="${esc(FiezelI18n.t('home.kawan.aria',{nama}))}">
-    <div class="fz-vissol-kawan-bg-curve" aria-hidden="true">
-      <svg viewBox="0 0 160 90" width="160" height="90" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="fzKawanDuneGrad" x1="1" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#EDE9FE" stop-opacity="0.65"/>
-            <stop offset="70%" stop-color="#F5F3FF" stop-opacity="0.30"/>
-            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <path d="M 30 0 C 70 20, 95 45, 115 65 C 130 80, 145 88, 160 90 L 160 0 Z" fill="url(#fzKawanDuneGrad)"/>
-      </svg>
+  const badge=FiezelI18n.t('home.kawan.badge-cta','Ayooo latih speaking kamu!');
+  const title=FiezelI18n.t('chat.title','Kawan Bicara');
+  const desc=FiezelI18n.t('home.kawan.desc','Ngobrol dua arah seperti dengan teman. Koreksi bisa kamu nyalakan kapan saja.');
+  const meta=lanjut?FiezelI18n.t('home.kawan.badge-lanjut',{n:snap.userTurns}):'';
+  return `<section class="fz-kawan-card fz-kawan-card-v2" data-testid="kawan-bicara-home-card" data-course="${course}" role="button" tabindex="0" onclick="openKawanBicaraCallModal()" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();openKawanBicaraCallModal()}" aria-label="${esc(FiezelI18n.t('home.kawan.aria',{nama}))}">
+    <div class="fz-kawan-v2-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-3.8 3.2V14H7.5A2.5 2.5 0 0 1 5 11.5z" fill="#8B5CF6"/><circle cx="9.3" cy="8.6" r="1.1" fill="#fff"/><circle cx="12" cy="8.6" r="1.1" fill="#fff"/><circle cx="14.7" cy="8.6" r="1.1" fill="#fff"/></svg>
     </div>
-    <div class="fz-vissol-kawan-left">
-      <div class="fz-vissol-kawan-icon" aria-hidden="true">
-        <svg viewBox="0 0 40 40" width="30" height="30" style="display:block; overflow:visible;">
-          <defs>
-            <linearGradient id="fzKawanIcoBack" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#C4B5FD"/><stop offset="100%" stop-color="#A78BFA"/>
-            </linearGradient>
-            <linearGradient id="fzKawanIcoFront" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#7C3AED"/>
-            </linearGradient>
-            <filter id="fzKawanIcoShad" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="2" stdDeviation="1.6" flood-color="#6D28D9" flood-opacity="0.28"/>
-            </filter>
-          </defs>
-          <path d="M14 6 h16 a6 6 0 0 1 6 6 v7 a6 6 0 0 1 -6 6 h-1 l1.5 4.5 -6.5 -4.5 h-4 a6 6 0 0 1 -6 -6 v-7 a6 6 0 0 1 6 -6 z" fill="url(#fzKawanIcoBack)" opacity="0.75"/>
-          <g filter="url(#fzKawanIcoShad)">
-            <path d="M9 13 h16 a6 6 0 0 1 6 6 v7 a6 6 0 0 1 -6 6 h-8 l-6.5 4.5 1.5 -4.5 h-3 a6 6 0 0 1 -6 -6 v-7 a6 6 0 0 1 6 -6 z" fill="url(#fzKawanIcoFront)"/>
-            <path d="M9 14.2 h16 a4.8 4.8 0 0 1 4.6 3.4" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1.4" stroke-linecap="round"/>
-          </g>
-          <circle cx="11.5" cy="22.5" r="2" fill="#FFFFFF"/>
-          <circle cx="17" cy="22.5" r="2" fill="#FFFFFF"/>
-          <circle cx="22.5" cy="22.5" r="2" fill="#FFFFFF"/>
+    <div class="fz-kawan-v2-body">
+      <span class="fz-kawan-v2-pill" data-testid="kawan-bicara-pill">${esc(badge)}</span>
+      <h3 class="fz-kawan-v2-title">${esc(title)}${meta?`<small class="fz-kawan-v2-meta">${esc(meta)}</small>`:''}</h3>
+      <p class="fz-kawan-v2-desc">${esc(desc)}</p>
+    </div>
+    <div class="fz-kawan-v2-right" aria-hidden="true">
+      <span class="fz-kawan-v2-bubbles">
+        <svg viewBox="0 0 64 56" width="64" height="56" fill="none">
+          <path d="M8 12a8 8 0 0 1 8-8h22a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8H24l-9 7v-7h-1a8 8 0 0 1-6-8z" fill="#93C5FD"/>
+          <path d="M22 26a7 7 0 0 1 7-7h20a7 7 0 0 1 7 7v10a7 7 0 0 1-7 7h-5l8 6-13-6H29a7 7 0 0 1-7-7z" fill="#C4B5FD"/>
+          <circle cx="36" cy="31" r="1.6" fill="#fff"/><circle cx="41" cy="31" r="1.6" fill="#fff"/><circle cx="46" cy="31" r="1.6" fill="#fff"/>
         </svg>
-      </div>
-      <div class="fz-vissol-kawan-text">
-        <div class="fz-vissol-kawan-badge">${isTh ? 'มาฝึกพูดกันเถอะ!' : 'Ayooo latih speaking kamu!'}</div>
-        <h2 class="fz-vissol-kawan-title">${esc(nama)}</h2>
-        <p class="fz-vissol-kawan-desc">${isTh ? 'คุยโต้ตอบสองทางเหมือนเพื่อน สามารถเปิดการแก้ไขได้ตลอดเวลา' : 'Ngobrol dua arah seperti dengan teman. Koreksi bisa kamu nyalakan kapan saja.'}</p>
-      </div>
+      </span>
+      <span class="fz-kawan-v2-chevron"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#94A3B8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
     </div>
-    <div class="fz-vissol-kawan-right" aria-hidden="true">
-      <svg viewBox="0 0 90 70" width="70" height="54" style="display:block; overflow:visible;">
-        <defs>
-          <filter id="chatShad" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#8B5CF6" flood-opacity="0.12"/>
-          </filter>
-        </defs>
-        <g filter="url(#chatShad)">
-          <path d="M12 10 C12 4.5 16.5 0 22 0 L54 0 C59.5 0 64 4.5 64 10 L64 30 C64 35.5 59.5 40 54 40 L34 40 L20 50 L22 40 C16.5 40 12 35.5 12 30 Z" fill="#93C5FD"/>
-          <circle cx="28" cy="20" r="2.5" fill="#FFFFFF"/>
-          <circle cx="38" cy="20" r="2.5" fill="#FFFFFF"/>
-          <circle cx="48" cy="20" r="2.5" fill="#FFFFFF"/>
-        </g>
-        <g transform="translate(24, 18)" filter="url(#chatShad)">
-          <path d="M6 8 C6 3.6 9.6 0 14 0 L46 0 C50.4 0 54 3.6 54 8 L54 26 C54 30.4 50.4 34 46 34 L32 34 L22 42 L24 34 C19.6 34 16 30.4 16 26 Z" fill="#C4B5FD"/>
-          <circle cx="27" cy="17" r="2" fill="#FFFFFF"/>
-          <circle cx="34" cy="17" r="2" fill="#FFFFFF"/>
-          <circle cx="41" cy="17" r="2" fill="#FFFFFF"/>
-        </g>
-      </svg>
-      <span class="fz-vissol-chevron">›</span>
-    </div>
-    <!-- Hidden test selector preservation -->
     <div style="display:none;" aria-hidden="true">
-      <div class="fz-kawan-avatar">${avatar}</div>
-      <div class="fz-kawan-body">
-        <h2 class="fz-kawan-title">${esc(nama)}</h2>
-        <span class="fz-kawan-tag" lang="${course==='ja'?'ja':'en'}">${esc(FiezelI18n.t('chat.nama-tag'))}</span>
-        <p class="fz-kawan-lead">${esc(FiezelI18n.t('chat.lead'))}</p>
-        <div class="fz-kawan-badges">${lencana}</div>
-      </div>
+      <button type="button" class="fz-kawan-cta" data-testid="kawan-bicara-cta" onclick="event.stopPropagation();go('chat')">→</button>
     </div>
-    <button type="button" class="fz-kawan-cta" data-testid="kawan-bicara-cta" onclick="event.stopPropagation();go('chat')" style="display:none;" aria-hidden="true">${esc(lanjut?FiezelI18n.t('home.kawan.cta-lanjut'):FiezelI18n.t('home.kawan.cta-mulai'))}→</button>
   </section>`;
 }
+
+/* ── Pop-up "Telepon aku sekarang" + auto-start Telepon Live ─────────────── */
+function playKawanRingtone(){
+  try{
+    if(state.preferences?.feedbackSounds===false)return;
+    const AC=self.AudioContext||self.webkitAudioContext;if(!AC)return;
+    const ctx=self.__fzKawanRingCtx||(self.__fzKawanRingCtx=new AC());
+    if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+    const t0=ctx.currentTime;
+    const beep=(f,at,dur,g)=>{const o=ctx.createOscillator(),v=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(f,at);v.gain.setValueAtTime(0.0001,at);v.gain.exponentialRampToValueAtTime(g,at+0.012);v.gain.exponentialRampToValueAtTime(0.0001,at+dur);o.connect(v);v.connect(ctx.destination);o.start(at);o.stop(at+dur+0.02)};
+    beep(880,t0,0.16,0.07);beep(1174.66,t0+0.02,0.16,0.05);
+    beep(880,t0+0.24,0.16,0.07);beep(1174.66,t0+0.26,0.16,0.05);
+    beep(1318.51,t0+0.56,0.22,0.06);
+  }catch(_){}
+}
+function closeKawanBicaraCallModal(){
+  const el=$('fzKawanCallModal');if(!el)return false;
+  el.classList.add('is-leaving');
+  setTimeout(()=>{try{el.remove()}catch(_){}},220);
+  document.removeEventListener('keydown',kawanModalEsc,true);
+  return true;
+}
+function kawanModalEsc(e){if(e.key==='Escape'){closeKawanBicaraCallModal()}}
+function openKawanBicaraCallModal(){
+  if($('fzKawanCallModal'))return false;
+  haptic('tap');uiSfx('open');
+  const course=jaCourseOn()?'ja':'en';
+  const persona=course==='ja'?'Sensei Nanami':'Coach Alex';
+  const title=FiezelI18n.t('home.kawan.modal-title','Telepon aku sekarang');
+  const sub=FiezelI18n.t('home.kawan.modal-sub','Latih refleks bicaramu secara alami tanpa takut salah.');
+  const cta=FiezelI18n.t('home.kawan.modal-cta','Telepon {persona}',{persona});
+  const later=FiezelI18n.t('home.kawan.modal-later','Nanti dulu');
+  const wrap=document.createElement('div');
+  wrap.id='fzKawanCallModal';
+  wrap.className='fz-kawan-modal-scrim';
+  wrap.setAttribute('data-testid','kawan-call-modal');
+  wrap.innerHTML=`<div class="fz-kawan-modal-card" role="dialog" aria-modal="true" aria-labelledby="fzKawanModalTitle">
+      <button type="button" class="fz-kawan-modal-close" data-testid="kawan-call-modal-close" aria-label="${esc(FiezelI18n.t('common.tutup','Tutup'))}" onclick="closeKawanBicaraCallModal()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="fz-kawan-modal-mochi" aria-hidden="true">
+        <svg viewBox="0 0 120 120" width="112" height="112" fill="none">
+          <ellipse cx="60" cy="104" rx="34" ry="7" fill="rgba(124,58,237,0.12)"/>
+          <path d="M60 22C36 22 22 42 22 70c0 24 17 30 38 30s38-6 38-30c0-28-14-48-38-48z" fill="#FFFDF8" stroke="#DDD6FE" stroke-width="3"/>
+          <ellipse cx="40" cy="72" rx="7" ry="4.5" fill="#FDA4AF"/><ellipse cx="80" cy="72" rx="7" ry="4.5" fill="#FDA4AF"/>
+          <circle cx="46" cy="60" r="5" fill="#0F172A"/><circle cx="74" cy="60" r="5" fill="#0F172A"/>
+          <path d="M53 70c3 4 11 4 14 0" stroke="#0F172A" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M28 52C28 34 40 22 60 22s32 12 32 30" stroke="#3B82F6" stroke-width="4" stroke-linecap="round"/>
+          <rect x="22" y="48" width="9" height="16" rx="4.5" fill="#2563EB"/><rect x="89" y="48" width="9" height="16" rx="4.5" fill="#2563EB"/>
+        </svg>
+      </div>
+      <h3 id="fzKawanModalTitle" class="fz-kawan-modal-title">${esc(title)}</h3>
+      <p class="fz-kawan-modal-sub">${esc(sub)}</p>
+      <button type="button" class="fz-kawan-modal-phone" id="fzKawanModalPhone" data-testid="kawan-call-modal-phone" aria-label="${esc(cta)}" style="position:relative;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #34D399 0%, #10B981 55%, #059669 100%) !important;box-shadow:0 10px 26px rgba(16,185,129,0.45),0 0 0 6px rgba(252,211,77,0.35);display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;outline:none;">
+        <span class="fz-kawan-ring r1" aria-hidden="true"></span><span class="fz-kawan-ring r2" aria-hidden="true"></span><span class="fz-kawan-ring r3" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="#ffffff" style="display:block;margin:auto;" aria-hidden="true"><path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="#ffffff"/></svg>
+      </button>
+      <div class="fz-kawan-modal-cta">${esc(cta)}</div>
+      <button type="button" class="fz-kawan-modal-later" style="margin-top:14px;background:none;border:none;color:#94A3B8;font-size:13px;cursor:pointer;text-decoration:underline;" onclick="closeKawanBicaraCallModal()">${esc(later)}</button>
+    </div>`;
+  wrap.addEventListener('click',e=>{if(e.target===wrap)closeKawanBicaraCallModal()});
+  document.body.appendChild(wrap);
+  document.addEventListener('keydown',kawanModalEsc,true);
+  const phone=wrap.querySelector('#fzKawanModalPhone');
+  phone.onclick=()=>{
+    phone.disabled=true;phone.classList.add('is-dialing');
+    haptic('confirm');playKawanRingtone();
+    try{sessionStorage.setItem('fz_kawan_autocall','1')}catch(_){}
+    try{self.FiezelInteractiveChat?.StudioBridge?.send?.('fz.shell.autocall',{at:Date.now()})}catch(_){}
+    setTimeout(()=>{closeKawanBicaraCallModal();go('chat')},520);
+  };
+  requestAnimationFrame(()=>{try{phone.focus({preventScroll:true})}catch(_){}});
+  return true;
+}
+window.openKawanBicaraCallModal=openKawanBicaraCallModal;
+window.closeKawanBicaraCallModal=closeKawanBicaraCallModal;
 function braincoreHomeCardMarkup(){
   return ''; /* User request: HILANGKAN SELURUH KARTU TENTANG KATA BRAINCORE HARI INI DI HALAMAN PANEL HOME */
   if(jaCourseOn())return '';

@@ -209,10 +209,17 @@ export default function App() {
   const mochiInstanceRef = useRef<any>(null);
   const mochiSpeechCadenceTimerRef = useRef<number | null>(null);
   const [is3dMochiReady, setIs3dMochiReady] = useState<boolean>(false);
+  const [mochi3dFailed, setMochi3dFailed] = useState<boolean>(false);
 
   // Gemini Live multi-key pool & mid-call auto-failover bookkeeping
   const liveUserDraftRef = useRef<string>('');
   const liveAiDraftRef = useRef<string>('');
+  const [liveAiTranslationDraft, setLiveAiTranslationDraft] = useState<string>('');
+  const liveSentenceTransMapRef = useRef<Map<string, { id: string; th: string }>>(new Map());
+  const copilotSeqRef = useRef<number>(0);
+  const copilotEarlyTimerRef = useRef<number | null>(null);
+  const [autoCallNeedsTap, setAutoCallNeedsTap] = useState<boolean>(false);
+  const autoCallProcessedRef = useRef<boolean>(false);
   const isLiveConnectedRef = useRef<boolean>(false);
   const userHungUpRef = useRef<boolean>(false);
   const currentLiveSessionRef = useRef<{ token?: string; keyIndex?: number; totalKeys?: number } | null>(null);
@@ -339,6 +346,35 @@ export default function App() {
       .replace(/\s*\([^)]*\)\s*/g, '')
       .trim();
 
+  const splitSentences = (text: string, lang: 'en' | 'ja'): string[] => {
+    const clean = (text || '').trim();
+    if (!clean) return [];
+    if (lang === 'ja') {
+      const matched = clean.match(/[^。！？\n]+[。！？\n]?/g);
+      return matched ? matched.map((s) => s.trim()).filter(Boolean) : [clean];
+    }
+    const matched = clean.match(/[^.!?\n]+(?:[.!?]+|\n|$)/g);
+    return matched ? matched.map((s) => s.trim()).filter(Boolean) : [clean];
+  };
+
+  const updateLiveAiTranslationDraft = (fullAiText: string) => {
+    const sentences = splitSentences(fullAiText, activeScenario.targetLang);
+    const targetLoc = locale === 'th' ? 'th' : 'id';
+    const combined = sentences
+      .map((raw) => {
+        const s = raw.trim();
+        const cached = liveSentenceTransMapRef.current.get(s);
+        if (cached && (targetLoc === 'th' ? cached.th : cached.id)) {
+          return targetLoc === 'th' ? cached.th : cached.id;
+        }
+        const local = translateAndPhoneticizeLiveText(s, activeScenario.targetLang);
+        return targetLoc === 'th' ? local.translationTh : local.translationId;
+      })
+      .filter(Boolean)
+      .join(' ');
+    setLiveAiTranslationDraft(combined);
+  };
+
   const triggerRealtimeCopilotForAi = async (
     aiLine: string,
     lastUserLine: string,
@@ -348,6 +384,7 @@ export default function App() {
       personaOverride?: typeof activePersona;
       forceVariation?: boolean;
       excludeTexts?: string[];
+      isDebouncedStreaming?: boolean;
     }
   ) => {
     const cleanAi = String(aiLine || '').trim();
@@ -362,9 +399,11 @@ export default function App() {
     ) {
       return;
     }
-    lastCopilotAiKeyRef.current = dedupKey;
 
-    if (copilotAbortRef.current) {
+    const currentSeq = ++copilotSeqRef.current;
+
+    // Do NOT abort an in-flight request if the AI text is a streaming debounce of the same utterance
+    if (!opts?.isDebouncedStreaming && copilotAbortRef.current) {
       try {
         copilotAbortRef.current.abort();
       } catch {
@@ -374,7 +413,7 @@ export default function App() {
     const controller = new AbortController();
     copilotAbortRef.current = controller;
 
-    if (!opts?.forceVariation) {
+    if (!opts?.forceVariation && copilotCardsRef.current.length === 0) {
       setIsGeneratingCopilot(true);
       setCopilotSource('loading');
     }
@@ -392,19 +431,20 @@ export default function App() {
         excludeTexts: opts?.excludeTexts,
         signal: controller.signal,
       });
-      if (controller.signal.aborted) return;
-      const validCards = (res.replies || res.cards || []).filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
+      if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
+      const validCards = (res.replies || res.cards || []);
       if (validCards.length > 0) {
+        lastCopilotAiKeyRef.current = dedupKey;
         setCopilotCards(validCards);
         setCopilotSource('ai-realtime');
-      } else {
-        setCopilotCards([]);
       }
     } catch {
-      if (controller.signal.aborted) return;
+      if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
     } finally {
       if (copilotAbortRef.current === controller) {
         copilotAbortRef.current = null;
+      }
+      if (copilotSeqRef.current === currentSeq) {
         setIsGeneratingCopilot(false);
       }
     }
@@ -2263,7 +2303,32 @@ export default function App() {
             setLiveAiDraft(liveAiDraftRef.current);
           }
 
-          // Real-Time Streaming Copilot Trigger while Partner AI is still speaking in Telepon Live
+          // Sentence-Level Streaming Translation Pipeline
+          const currentAiStreaming = liveAiDraftRef.current;
+          if (currentAiStreaming) {
+            const rawSentences = splitSentences(currentAiStreaming, activeScenario.targetLang);
+            const targetLoc = locale === 'th' ? 'th' : 'id';
+            rawSentences.forEach((rawSent, idx) => {
+              const s = rawSent.trim();
+              if (!s) return;
+              const isCompleted = idx < rawSentences.length - 1 || /[.?!。？！\n]$/.test(s);
+              if (isCompleted && !liveSentenceTransMapRef.current.has(s)) {
+                liveSentenceTransMapRef.current.set(s, { id: '', th: '' });
+                void fetchLiveTranslation(s, targetLoc).then((translated) => {
+                  if (translated) {
+                    const existing = liveSentenceTransMapRef.current.get(s) || { id: '', th: '' };
+                    if (targetLoc === 'th') existing.th = translated;
+                    else existing.id = translated;
+                    liveSentenceTransMapRef.current.set(s, existing);
+                    updateLiveAiTranslationDraft(liveAiDraftRef.current);
+                  }
+                }).catch(() => {});
+              }
+            });
+            updateLiveAiTranslationDraft(currentAiStreaming);
+          }
+
+          // Real-Time Streaming Copilot Trigger with 320ms Debounce
           const streamingAiDraft = liveAiDraftRef.current.trim();
           const minStreamChars = activeScenario.targetLang === 'ja' ? 6 : 14;
           if (
@@ -2272,22 +2337,33 @@ export default function App() {
             /[。？！.?!]\s*$/.test(streamingAiDraft)
           ) {
             liveEarlyCopilotTriggeredRef.current = true;
-            const latestUserSpoken =
-              liveUserDraftRef.current.trim() ||
-              [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
-              '';
-            const liveHist: Array<{ speaker: 'ai' | 'user'; text: string }> = [
-              ...turnsRef.current
-                .slice(-7)
-                .map((tr) => ({ speaker: tr.speaker, text: tr.text })),
-              { speaker: 'ai', text: streamingAiDraft },
-            ];
-            void triggerRealtimeCopilotRef.current(streamingAiDraft, latestUserSpoken, liveHist);
+            if (copilotEarlyTimerRef.current) {
+              window.clearTimeout(copilotEarlyTimerRef.current);
+            }
+            copilotEarlyTimerRef.current = window.setTimeout(() => {
+              const latestUserSpoken =
+                liveUserDraftRef.current.trim() ||
+                [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
+                '';
+              const liveHist: Array<{ speaker: 'ai' | 'user'; text: string }> = [
+                ...turnsRef.current
+                  .slice(-7)
+                  .map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+                { speaker: 'ai', text: streamingAiDraft },
+              ];
+              void triggerRealtimeCopilotRef.current(streamingAiDraft, latestUserSpoken, liveHist, {
+                isDebouncedStreaming: true,
+              });
+            }, 320);
           }
 
           // Turn Complete — evaluate learner utterance and record Braincore mastery
           const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
           if (isGoogleTurnComplete || msg.type === 'turn_complete') {
+            if (copilotEarlyTimerRef.current) {
+              window.clearTimeout(copilotEarlyTimerRef.current);
+              copilotEarlyTimerRef.current = null;
+            }
             liveEarlyCopilotTriggeredRef.current = false;
             const uText = (liveUserDraftRef.current || msg.userTranscript || '').trim();
             const aText = (liveAiDraftRef.current || msg.aiTranscript || '').trim();
@@ -2295,6 +2371,7 @@ export default function App() {
             liveAiDraftRef.current = '';
             setLiveUserDraft('');
             setLiveAiDraft('');
+            setLiveAiTranslationDraft('');
 
             if (uText) {
               const evalParams = {
@@ -2365,11 +2442,22 @@ export default function App() {
             }
 
             if (aText) {
+              // Compose turn translation instantly from completed sentence translations
+              const sentences = splitSentences(aText, activeScenario.targetLang);
+              const composedId = sentences
+                .map((s) => liveSentenceTransMapRef.current.get(s.trim())?.id || '')
+                .filter(Boolean)
+                .join(' ');
+              const composedTh = sentences
+                .map((s) => liveSentenceTransMapRef.current.get(s.trim())?.th || '')
+                .filter(Boolean)
+                .join(' ');
+
               const autoTrans = translateAndPhoneticizeLiveText(
                 aText,
                 activeScenario.targetLang,
-                msg.aiTranslationId,
-                msg.aiTranslationTh
+                composedId || msg.aiTranslationId,
+                composedTh || msg.aiTranslationTh
               );
               const aiTurnId = `live_ai_${Date.now() + 1}`;
               setTurns((prev) => [
@@ -2378,8 +2466,8 @@ export default function App() {
                   id: aiTurnId,
                   speaker: 'ai',
                   text: aText,
-                  translationId: autoTrans.translationId,
-                  translationTh: autoTrans.translationTh,
+                  translationId: composedId || autoTrans.translationId,
+                  translationTh: composedTh || autoTrans.translationTh,
                   audioBase64: msg.aiAudioBase64 || undefined,
                   timestamp: Date.now() + 1,
                   replySource: 'ai',
@@ -2399,25 +2487,28 @@ export default function App() {
               ];
               void triggerRealtimeCopilotRef.current(aText, lastUserForCopilot, updatedHist);
 
-              // Background fetch real Google GTX translations asynchronously to replace approximations
-              void Promise.all([
-                fetchLiveTranslation(aText, 'id'),
-                fetchLiveTranslation(aText, 'th'),
-              ]).then(([idTrans, thTrans]) => {
-                if (idTrans || thTrans) {
-                  setTurns((prev) =>
-                    prev.map((t) =>
-                      t.id === aiTurnId
-                        ? {
-                            ...t,
-                            translationId: idTrans || t.translationId,
-                            translationTh: thTrans || t.translationTh,
-                          }
-                        : t
-                    )
-                  );
-                }
-              }).catch(() => {});
+              // If sentences did not cover full paragraph translation, backfill with GTX
+              if (!composedId || (locale === 'th' && !composedTh)) {
+                void Promise.all([
+                  composedId ? Promise.resolve(composedId) : fetchLiveTranslation(aText, 'id'),
+                  composedTh ? Promise.resolve(composedTh) : fetchLiveTranslation(aText, 'th'),
+                ]).then(([idTrans, thTrans]) => {
+                  if (idTrans || thTrans) {
+                    setTurns((prev) =>
+                      prev.map((t) =>
+                        t.id === aiTurnId
+                          ? {
+                              ...t,
+                              translationId: idTrans || t.translationId,
+                              translationTh: thTrans || t.translationTh,
+                            }
+                          : t
+                      )
+                    );
+                  }
+                }).catch(() => {});
+              }
+              liveSentenceTransMapRef.current.clear();
             }
           }
         } catch {
@@ -2679,6 +2770,47 @@ export default function App() {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
+  // Auto-Call Orchestration (Triggered from Home Screen "Telepon aku sekarang" Modal)
+  useEffect(() => {
+    const checkAutoCall = () => {
+      if (autoCallProcessedRef.current) return;
+      let shouldAuto = false;
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        shouldAuto = urlParams.get('autoCall') === '1' || sessionStorage.getItem('fz_kawan_autocall') === '1';
+        if (shouldAuto) {
+          sessionStorage.removeItem('fz_kawan_autocall');
+        }
+      } catch {
+        // Ignore
+      }
+      if (shouldAuto && !isLiveConnected && !isLiveConnecting) {
+        autoCallProcessedRef.current = true;
+        void startLiveCall().catch(() => {
+          setAutoCallNeedsTap(true);
+        });
+      }
+    };
+
+    const handleWindowMsg = (e: MessageEvent) => {
+      if (!e.data) return;
+      if (e.data.type === 'fz.shell.autocall') {
+        if (!isLiveConnected && !isLiveConnecting) {
+          void startLiveCall().catch(() => {
+            setAutoCallNeedsTap(true);
+          });
+        }
+      }
+    };
+
+    window.addEventListener('message', handleWindowMsg);
+    const timer = window.setTimeout(checkAutoCall, 350);
+    return () => {
+      window.removeEventListener('message', handleWindowMsg);
+      window.clearTimeout(timer);
+    };
+  }, [isLiveConnected, isLiveConnecting]);
+
   const handleManualSync = async () => {
     setSyncingNow(true);
     const { nextState } = await brainSyncFlush(brainState);
@@ -2775,6 +2907,7 @@ export default function App() {
         inst.triggerEarWiggle?.(1.3);
       } catch {
         setIs3dMochiReady(false);
+        setMochi3dFailed(true);
       }
     };
 
@@ -2918,8 +3051,12 @@ export default function App() {
   const activeAiSubtitle = translateAndPhoneticizeLiveText(
     activeAiLiveText,
     activeScenario.targetLang,
-    liveAiDraft.trim() ? undefined : lastAiTurn?.translationId || activeScenario.openingTranslationId,
-    liveAiDraft.trim() ? undefined : lastAiTurn?.translationTh || activeScenario.openingTranslationTh
+    liveAiDraft.trim()
+      ? (locale === 'id' && liveAiTranslationDraft ? liveAiTranslationDraft : (liveAiTranslationDraft || undefined))
+      : lastAiTurn?.translationId || activeScenario.openingTranslationId,
+    liveAiDraft.trim()
+      ? (locale === 'th' && liveAiTranslationDraft ? liveAiTranslationDraft : undefined)
+      : lastAiTurn?.translationTh || activeScenario.openingTranslationTh
   );
 
   const activeUserLiveText = liveUserDraft.trim() || lastUserTurn?.text || '';
@@ -3316,26 +3453,35 @@ export default function App() {
                         <div
                           ref={mochiContainerRef}
                           data-testid="mochi-3d-stage"
-                          className="w-[140px] sm:w-[200px] h-[130px] sm:h-[180px] flex items-center justify-center"
+                          className="w-[140px] sm:w-[200px] h-[130px] sm:h-[180px] flex items-center justify-center relative"
                         />
-                        <img
-                          src={
-                            isPlayingAiAudio
-                              ? './assets/brand/paw-mochi-speaking.svg'
-                              : './assets/brand/paw-mochi-idle.svg'
-                          }
-                          onError={(e) => {
-                            const fallback = isPlayingAiAudio
-                              ? './assets/brand/paw-mochi-speaking.svg'
-                              : './assets/brand/paw-mochi-idle.svg';
-                            if (e.currentTarget.getAttribute('src') !== fallback) {
-                              e.currentTarget.setAttribute('src', fallback);
+                        {!is3dMochiReady && !mochi3dFailed && (
+                          <div
+                            aria-hidden="true"
+                            className="absolute pointer-events-none w-20 sm:w-28 h-20 sm:h-28 rounded-full bg-gradient-to-br from-[#EEDFCC]/60 to-[#DFCEB7]/50 animate-pulse shadow-inner flex items-center justify-center"
+                          >
+                            <span className="text-[10px] font-semibold text-[#8C7A65] tracking-wider uppercase">Mochi</span>
+                          </div>
+                        )}
+                        {mochi3dFailed && (
+                          <img
+                            src={
+                              isPlayingAiAudio
+                                ? './assets/brand/paw-mochi-speaking.svg'
+                                : './assets/brand/paw-mochi-idle.svg'
                             }
-                          }}
-                          alt="Mochi"
-                          style={{ display: is3dMochiReady ? 'none' : 'block' }}
-                          className="w-20 sm:w-28 h-20 sm:h-28 rounded-full object-contain p-1"
-                        />
+                            onError={(e) => {
+                              const fallback = isPlayingAiAudio
+                                ? './assets/brand/paw-mochi-speaking.svg'
+                                : './assets/brand/paw-mochi-idle.svg';
+                              if (e.currentTarget.getAttribute('src') !== fallback) {
+                                e.currentTarget.setAttribute('src', fallback);
+                              }
+                            }}
+                            alt="Mochi Fallback"
+                            className="absolute pointer-events-none w-20 sm:w-28 h-20 sm:h-28 rounded-full object-contain p-1"
+                          />
+                        )}
                       </div>
 
                       <div
@@ -4279,6 +4425,23 @@ export default function App() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Floating CTA when Auto-Call requires user interaction on browser mic policy */}
+      {autoCallNeedsTap && !isLiveConnected && !isLiveConnecting && (
+        <div className="fixed bottom-24 inset-x-4 sm:inset-x-auto sm:right-6 z-50 flex items-center justify-center pointer-events-auto">
+          <button
+            type="button"
+            onClick={() => {
+              setAutoCallNeedsTap(false);
+              void startLiveCall();
+            }}
+            className="px-5 py-3 rounded-2xl bg-[#1C1611] text-white font-bold text-sm shadow-xl flex items-center gap-2.5 animate-bounce border border-[#FF9800]/40 cursor-pointer"
+          >
+            <Phone className="w-4 h-4 text-[#FF9800]" />
+            <span>Sambungkan Telepon Live Sekarang</span>
+          </button>
         </div>
       )}
     </div>
