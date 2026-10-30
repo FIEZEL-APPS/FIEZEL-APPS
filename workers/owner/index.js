@@ -3560,11 +3560,11 @@ function renderLearnerDetail(m) {
   }
   const d = m.learnerDetail;
   if (!d || d.state === 'unconfigured') {
-    return `<div class="note">BELUM DIKONFIGURASI — lihat catatan di daftar murid.</div>`;
+    return `<div class="note">BELUM DIKONFIGURASI — lihat catatan di daftar murid.</div>` + renderLearnerMessagesCard(d, m);
   }
   if (d.state === 'unavailable') {
     return `<div class="warn">${esc(UNAVAILABLE_TEXT.toUpperCase())}. Subrequest ke
-      <code>/api/owner/learner-evidence</code> gagal${d.status ? ` (status ${esc(d.status)})` : ''}.</div>`;
+      <code>/api/owner/learner-evidence</code> gagal${d.status ? ` (status ${esc(d.status)})` : ''}.</div>` + renderLearnerMessagesCard(d, m);
   }
   if (d.state === 'not-migrated' || !d.summary) {
     return `<div class="note">PENGUKURAN BELUM TERSEDIA untuk murid ini.</div>` + renderLearnerMessagesCard(d, m);
