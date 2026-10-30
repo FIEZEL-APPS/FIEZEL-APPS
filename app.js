@@ -8617,10 +8617,7 @@ function startWelcomeExperience(){
         return null;
       }
       bootAuthVerdictUsed=true;
-      if(bootAuth==='signed-out'){
-        if(isLocalTestServer()){return proceed();}
-        forgetLocalAuth();showAuthGate(at,proceed);return null
-      }
+      if(bootAuth==='signed-out'){forgetLocalAuth();showAuthGate(at,proceed);return null}
       followUpAuthCheck(bootAuth);
       if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
       if(askLearnerNameIfMissing(at))return null;
@@ -9514,6 +9511,7 @@ function primeBootAuthVerdict(){
 /** 'signed-out' = server tegas berkata belum masuk; 'pending' = jawaban belum tiba; 'none' = lanjut. */
 function bootAuthVerdict(){
   if(bootAuthVerdictUsed)return 'none';
+  if(typeof isLocalTestServer==='function'&&isLocalTestServer())return 'none';
   if(!bootAuthVerdictPromise)primeBootAuthVerdict();
   if(!bootAuthVerdictPromise)return 'none';
   if(bootAuthVerdictValue===null)return 'pending';
