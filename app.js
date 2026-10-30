@@ -3094,7 +3094,7 @@ function confirmQuizExit(){
 }
 window.confirmQuizExit=confirmQuizExit;
 let confidencePopThen=null;
-function closeConfidencePop(){
+function closeConfidencePop(now=false){
   // Menutup popup MEMBATALKAN kelanjutan yang belum diambil (keluar kuis / pindah soal):
   // reveal untuk soal yang layarnya sudah pergi hanya akan menggambar ke DOM mati.
   confidencePopThen=null;
@@ -3104,6 +3104,11 @@ function closeConfidencePop(){
   try{$('quizFloatingBar')?.remove()}catch(_){}
   const pop=$('confidencePop');if(!pop)return;
   pop.classList.add('is-out');
+  if(now){
+    try{pop.remove()}catch(_){}
+    try{syncDialogContainment()}catch(_){}
+    return;
+  }
   setTimeout(()=>{try{pop.remove()}catch(_){}
     /* P0-1 (audit UX 2026-10): setelah popup benar-benar dibuang dari DOM, kembalikan
        interaktivitas cangkang kuis — inert dicabut, aria-hidden dilepas. */
@@ -3114,7 +3119,7 @@ function openConfidencePop(ok){
   // Kelanjutan dititipkan pemanggil SEBELUM popup dibuka; closeConfidencePop() membatalkan
   // titipan (itu tugasnya untuk jalan keluar), jadi di sini ia diselamatkan dulu.
   const then=confidencePopThen;
-  closeConfidencePop();
+  closeConfidencePop(true);
   confidencePopThen=then;
   const pop=document.createElement('div');
   pop.id='confidencePop';pop.className='confidence-pop';
@@ -3161,7 +3166,7 @@ function confidencePopAnswered(value){
 let confidencePopSkipThen=null;
 function confidencePopSkip(){
   const skip=confidencePopSkipThen;confidencePopSkipThen=null;confidencePopThen=null;
-  closeConfidencePop();
+  closeConfidencePop(true);
   if(typeof skip==='function'){skip();return}
   $('quizNext')?.click()
 }
@@ -3169,7 +3174,7 @@ window.confidencePopSkip=confidencePopSkip;
 function confidencePopNext(){
   confidencePopSkipThen=null;
   const then=confidencePopThen;confidencePopThen=null;
-  closeConfidencePop();
+  closeConfidencePop(true);
   if(typeof then==='function'){then();return}
   $('quizNext')?.click()
 }
@@ -8612,7 +8617,10 @@ function startWelcomeExperience(){
         return null;
       }
       bootAuthVerdictUsed=true;
-      if(bootAuth==='signed-out'){forgetLocalAuth();showAuthGate(at,proceed);return null}
+      if(bootAuth==='signed-out'){
+        if(isLocalTestServer()){return proceed();}
+        forgetLocalAuth();showAuthGate(at,proceed);return null
+      }
       followUpAuthCheck(bootAuth);
       if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
       if(askLearnerNameIfMissing(at))return null;
@@ -9350,6 +9358,17 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
        murid di sinyal lemah tidak terkunci dari materinya sendiri. Kebenarannya diperiksa
        ke server begitu online (verifyAuthSession).
      - modul layar masuk tidak termuat: gagal TERBUKA, bukan mengurung murid di layar kosong. */
+function isLocalTestServer(){
+  try{
+    if(typeof location==='undefined')return false;
+    const h=location.hostname,p=location.port;
+    if(h==='localhost'||h==='127.0.0.1'||h==='0.0.0.0'||h.startsWith('192.168.')||h.startsWith('10.')||h.endsWith('.local'))return true;
+    if(p==='3000'||p==='3005'||p==='4173'||p==='5173')return true;
+  }catch(_){}
+  return false;
+}
+window.isLocalTestServer=isLocalTestServer;
+
 function teacherPreviewActive(){
   try{if(new URL(location.href).searchParams.get('teacher')==='preview')return true}catch(_){}
   try{if(sessionStorage.getItem('fz-teacher-preview')==='1')return true}catch(_){}
@@ -9357,6 +9376,13 @@ function teacherPreviewActive(){
 }
 function authGateNeeded(){
   if(teacherPreviewActive())return false;
+  if(isLocalTestServer()){
+    const A=self.FiezelAuthScreen;
+    if(A&&typeof A.saveSession==='function'){
+      try{A.saveSession(self,{role:'murid',via:'local_test',name:'Pengguna Uji'})}catch(_){}
+    }
+    return false;
+  }
   /* m025-704 / AGENTS.md Rule 7: Zero-Modal Collision & First-Touch Serenity
      Murid baru (onboarding belum selesai) WAJIB menikmati pengalaman selamat datang & latihan pertama dulu. */
   try{
@@ -16963,6 +16989,7 @@ function quizLoop(cfg){
      dan literal quiz-shell/quiz-mascot TETAP — kontrak r2/paw/lesson-experience. */
   $('quizFloatingBar')?.remove();
   try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  document.querySelectorAll('body > #feedback').forEach(el=>el.remove());
   const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   document.getElementById('quizScaffoldNudge')?.remove();
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
@@ -17448,6 +17475,11 @@ function quizLoop(cfg){
  /** Membuka jawaban dan seluruh penjelasannya. Jalur akhir untuk satu soal. */
  const reveal=(q,j,ok,{forced=false}={})=>{
   try{if(self.FiezelMochiVoiceSos&&typeof self.FiezelMochiVoiceSos.onQuestionAnswered==='function'){self.FiezelMochiVoiceSos.onQuestionAnswered(ok,q)}}catch(_){}
+  try{
+    document.getElementById('tutorHintModalBackdrop')?.remove();
+    document.getElementById('tutorHintModal')?.remove();
+    document.body.classList.remove('has-tutor-modal');
+  }catch(_){}
   q.__diagnosticClue='';
   document.getElementById('quizScaffoldNudge')?.remove();
   document.querySelector('.quiz-shell')?.classList.remove('has-retry-active');
@@ -17494,11 +17526,27 @@ function quizLoop(cfg){
   /* m025-377 (Opsi 1, bagian C): saat jawaban SALAH, tampilkan langsung alasan kenapa pilihan
      yang DIKLIK murid belum tepat (whyFailsId pilihan itu), bukan cuma menyembunyikannya di
      lipatan "bandingkan pilihan lain". Alasan benar tetap tampil lewat "Intinya" di bawah. */
-  const userPickDisplay=(q.type==='token-order'&&q.__userTokenAnswer)
-    ? q.__userTokenAnswer
-    : (q.options?.[j]!==undefined ? String(q.options[j]) : (q.__userTokenAnswer||''));
-  const cleanUserPick=String(userPickDisplay||'').replace(/\.+$/,'');
-  const cleanCorrect=String(q.options?.[q.answerIndex]||'').replace(/\.+$/,'');
+  let resolvedCorrect = '';
+  if (q.type === 'token-order') {
+    resolvedCorrect = q.fullSentence || (Array.isArray(q.tokens) ? q.tokens.join(' ') : '') || q.blankAnswer || q.options?.[q.answerIndex] || '';
+  } else if (q.type === 'cloze') {
+    resolvedCorrect = q.clozeAnswer || q.answer || q.options?.[q.answerIndex] || '';
+  } else {
+    resolvedCorrect = (q.options && q.answerIndex != null && q.options[q.answerIndex] != null)
+      ? String(q.options[q.answerIndex])
+      : (q.targetWord || q.target || q.correct || q.fullSentence || '');
+  }
+  const cleanCorrect = String(resolvedCorrect || '').replace(/\.+$/, '').trim();
+
+  let resolvedUserPick = '';
+  if (q.type === 'token-order') {
+    resolvedUserPick = q.__userTokenAnswer || (Array.isArray(q.__placedTokens) ? q.__placedTokens.join(' ') : '');
+  } else if (q.type === 'cloze') {
+    resolvedUserPick = q.__typedAnswer || '';
+  } else {
+    resolvedUserPick = (q.options && j != null && q.options[j] != null) ? String(q.options[j]) : (q.__userTokenAnswer || '');
+  }
+  const cleanUserPick = String(resolvedUserPick || '').replace(/\.+$/, '').trim();
 
   const tokenDiagnosis=(!ok&&q.type==='token-order')?diagnoseTokenOrderMistake(q):'';
   let pickedWhyFails='';
@@ -17506,11 +17554,11 @@ function quizLoop(cfg){
     if(tokenDiagnosis){
       pickedWhyFails=tokenDiagnosis;
     }else if(Array.isArray(q.explain?.distractors)){
-      const found=grammarReasonEntry(q,q.options?.[j]||userPickDisplay);
+      const found=grammarReasonEntry(q,q.options?.[j]||resolvedUserPick);
       if(found&&found.reason)pickedWhyFails=String(found.reason).trim();
     }
     if(!pickedWhyFails){
-      const tutorWhy=tutorWhyFails(q, userPickDisplay);
+      const tutorWhy=tutorWhyFails(q, resolvedUserPick);
       if(tutorWhy)pickedWhyFails=tutorWhy;
     }
   }
@@ -17605,9 +17653,37 @@ function quizLoop(cfg){
    whyText = stripDash(whyText);
    if(pickedWhyFails) pickedWhyFails = stripDash(pickedWhyFails);
    const ruleText = q.explain?.rule ? stripDash(q.explain.rule) : '';
-   let finalTakeaway = whyText;
+   let finalTakeaway = '';
+   const candidateTakeaways = [
+     whyText,
+     q.explain?.why,
+     q.explain?.whyCorrect,
+     q.explain?.whyCorrectId,
+     q.explain?.rule,
+     q.explain?.ruleId,
+     q.explain?.clue,
+     q.explain?.tip,
+     q.explain?.memory,
+     pickedWhyFails,
+     q.meaning ? ('Arti kata "' + cleanCorrect + '" adalah ' + q.meaning + '.') : ''
+   ];
+   for (const cand of candidateTakeaways) {
+     if (cand && String(cand).trim() && String(cand).trim() !== FiezelI18n.t('quiz.fallback-context')) {
+       finalTakeaway = stripDash(String(cand).trim());
+       break;
+     }
+   }
    if (!finalTakeaway || !finalTakeaway.trim()) {
-     finalTakeaway = pickedWhyFails || (q.explain?.rule ? stripDash(q.explain.rule) : '') || (q.explain?.tip ? stripDash(q.explain.tip) : '') || (q.meaning ? ('Arti kata "' + cleanCorrect + '" adalah ' + q.meaning + '.') : '') || 'Perhatikan konteks kalimat dan pilihan kata yang paling tepat.';
+     const isTh = (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.() === 'th');
+     if (isTh) {
+       finalTakeaway = cleanCorrect 
+         ? `รูปประโยคที่ถูกต้องคือ "${cleanCorrect}" ตามบริบทของประโยคนี้`
+         : 'สังเกตบริบทของประโยคและเลือกคำตอบที่เหมาะสมที่สุด';
+     } else {
+       finalTakeaway = cleanCorrect 
+         ? `Bentuk yang paling tepat untuk melengkapi kalimat ini adalah "${cleanCorrect}".`
+         : 'Perhatikan konteks kalimat dan bentuk kata yang paling sesuai dengan polanya.';
+     }
    }
    const cleanAnsIntro = String(FiezelI18n.t('quiz.answer-paling-tepat-adalah') || '').replace(/^[.\s]+/, '');
    /* m025-565 Stempel Ingatan: satu baris meta tepat di bawah vonis. Bukan <p> supaya tidak
@@ -17629,8 +17705,11 @@ function quizLoop(cfg){
     // [CRITICAL ZERO-BLUR INVARIANT]
     // Pindahkan #feedback langsung ke document.body agar tidak terjebak dalam stacking context
     // lokal milik .card / .fade yang memiliki animasi transform/opacity.
-    // Menjadi sibling langsung dari bd di document.body menjamin z-index 10000 > 9998,
+    // Menjadi sibling langsung dari bd di document.body menjamin z-index 2147482500 > 2147482400,
     // sehingga backdrop TIDAK PERNAH menutupi atau memburamkan lembar umpan balik!
+    document.querySelectorAll('body > #feedback').forEach(el => {
+      if (el !== f) el.remove();
+    });
     if (f.parentElement !== document.body) {
       document.body.appendChild(f);
     }
@@ -17641,10 +17720,13 @@ function quizLoop(cfg){
         bd?.classList.remove('is-active');
         f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
         f.classList.add('hidden');
+        if (f.parentElement === document.body) {
+          f.remove();
+        }
       } catch (_) {}
       $('quizFloatingBar')?.remove();
       document.querySelector('.quiz-shell')?.classList.remove('has-retry-active');
-      try { closeConfidencePop(); } catch (_) {}
+      try { closeConfidencePop(true); } catch (_) {}
       answer.locked = false;
       try { audio.stop(); } catch (_) {}
       asked++;
@@ -17655,9 +17737,14 @@ function quizLoop(cfg){
 
     const closeFeedbackSheet = (advance = true) => {
       window.__closeFeedbackSheet = null;
-      bd?.classList.remove('is-active');
-      f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
-      f.classList.add('hidden');
+      try {
+        bd?.classList.remove('is-active');
+        f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
+        f.classList.add('hidden');
+        if (f.parentElement === document.body) {
+          f.remove();
+        }
+      } catch (_) {}
       $('quizFloatingBar')?.remove();
       if (advance) {
         advanceToNextQuestion();
@@ -17670,47 +17757,47 @@ function quizLoop(cfg){
       advanceToNextQuestion();
     };
 
-    f.innerHTML=`<div class="feedback-sheet-drag-handle" aria-hidden="true"></div><div class="feedback-sheet-header"><div class="feedback-status-pill ${ok?'is-correct':'is-wrong'}"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}<button type="button" id="feedbackSheetClose" class="feedback-sheet-close-btn" aria-label="${esc(FiezelI18n.t('modal.tutup','Tutup'))}"><i data-lucide="x"></i></button></div><div class="feedback-sheet-body"><div class="feedback-sheet-hero"><div class="feedback-answer-line">${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`<span class="feedback-answer-wrong">${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}</span> <span class="feedback-answer-sep">•</span> <span class="feedback-answer-correct">${esc(cleanAnsIntro)} ${correctPickRender}.</span>`}</div>${pickedWhyFails?`<div class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</div>`:''}${stepGuidanceHtml}<div class="feedback-takeaway-card"><div class="takeaway-badge"><i data-lucide="lightbulb"></i> <span>${FiezelI18n.t('quiz.intinya')}</span></div><p class="takeaway-text">${esc(finalTakeaway)}</p></div></div><details class="feedback-drawer-details"><summary class="feedback-drawer-summary"><span class="drawer-summary-label"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.pembahasan-lengkap','Pembahasan & Aturan Lengkap')}</span><i data-lucide="chevron-down" class="drawer-chevron"></i></summary><div class="feedback-drawer-content">${ruleText?`<div class="feedback-rule-box feedback-rule-pill"><span class="rule-kicker"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.aturannya','Aturan Tata Bahasa')}</span><div class="rule-content">${formatRuleForDisplay(esc(ruleText))}</div></div>`:''}${(q.explain?.distractor||q.explain?.distractors)?`<div class="feedback-distractor-box"><span class="distractor-kicker">${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</span><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</div>`:''}<div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="zap"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button type="button" class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button></div></details></div><div class="feedback-sheet-footer">${!ok?`<div class="feedback-sheet-secondary-row"><button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button><button type="button" id="quizSheetExplain" class="feedback-sheet-explain-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.buka-pembahasan','Buka Pembahasan')}</span></button></div>`:`<button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button>`}<button type="button" id="quizSheetNext" class="feedback-sheet-next-btn ${ok?'btn-correct':'btn-wrong'}"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button></div>`;
+    const displayAnswer = cleanCorrect || resolvedCorrect || (q.options ? String(q.options[0]) : '');
+    const answerLineHtml = ok
+      ? FiezelI18n.t('quiz.correct-answer', { answer: `<strong>${esc(displayAnswer)}</strong>` })
+      : `<span class="feedback-answer-wrong">${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}</span> <span class="feedback-answer-sep">•</span> <span class="feedback-answer-correct">${esc(cleanAnsIntro)} ${correctPickRender}.</span>`;
 
-    const sheetCloseBtn = $('feedbackSheetClose');
-    if(sheetCloseBtn){
-      sheetCloseBtn.onclick=(e)=>{
-        e?.stopPropagation?.();
+    f.innerHTML=`<div class="feedback-sheet-drag-handle" aria-hidden="true"></div><div class="feedback-sheet-header"><div class="feedback-status-pill ${ok?'is-correct':'is-wrong'}"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}<button type="button" id="feedbackSheetClose" class="feedback-sheet-close-btn" aria-label="${esc(FiezelI18n.t('modal.tutup','Tutup'))}"><i data-lucide="x"></i></button></div><div class="feedback-sheet-body"><div class="feedback-sheet-hero"><div class="feedback-answer-line">${answerLineHtml}</div>${pickedWhyFails?`<div class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</div>`:''}${stepGuidanceHtml}<div class="feedback-takeaway-card"><div class="takeaway-badge"><i data-lucide="lightbulb"></i> <span>${FiezelI18n.t('quiz.intinya')}</span></div><p class="takeaway-text">${esc(finalTakeaway)}</p></div></div><details class="feedback-drawer-details"><summary class="feedback-drawer-summary"><span class="drawer-summary-label"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.pembahasan-lengkap','Pembahasan & Aturan Lengkap')}</span><i data-lucide="chevron-down" class="drawer-chevron"></i></summary><div class="feedback-drawer-content">${ruleText?`<div class="feedback-rule-box feedback-rule-pill"><span class="rule-kicker"><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.aturannya','Aturan Tata Bahasa')}</span><div class="rule-content">${formatRuleForDisplay(esc(ruleText))}</div></div>`:''}${(q.explain?.distractor||q.explain?.distractors)?`<div class="feedback-distractor-box"><span class="distractor-kicker">${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</span><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</div>`:''}<div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="zap"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button type="button" class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button></div></details></div><div class="feedback-sheet-footer"><div class="feedback-sheet-secondary-row"><button type="button" id="quizSheetExit" class="feedback-sheet-exit-btn"><i data-lucide="x"></i> <span>${FiezelI18n.t('quiz.keluar','Keluar')}</span></button><button type="button" id="quizSheetExplain" class="feedback-sheet-explain-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.buka-pembahasan','Buka Pembahasan')}</span></button></div><button type="button" id="quizSheetNext" class="feedback-sheet-next-btn ${ok?'btn-correct':'btn-wrong'}"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button></div>`;
+
+    const bindSheetBtn = (id, handler) => {
+      const btn = document.getElementById(id);
+      if(!btn) return;
+      let handled = false;
+      btn.ontouchend = (e) => {
+        handled = true;
+        e.stopPropagation();
+        e.preventDefault();
         haptic('tap');
-        advanceToNextQuestion();
+        handler(e);
       };
-    }
-    const sheetExitBtn = $('quizSheetExit');
-    if(sheetExitBtn){
-      sheetExitBtn.onclick=(e)=>{
-        e?.stopPropagation?.();
+      btn.onclick = (e) => {
+        if(handled) { handled = false; return; }
+        e.stopPropagation();
         haptic('tap');
-        closeFeedbackSheet(false);
-        confirmQuizExit();
+        handler(e);
       };
-    }
-    const sheetExplainBtn = $('quizSheetExplain');
-    if(sheetExplainBtn){
-      sheetExplainBtn.onclick=(e)=>{
-        e?.stopPropagation?.();
-        haptic('tap');
-        const details = f.querySelector('.feedback-drawer-details');
-        if(details){
-          details.open = !details.open;
-          if(details.open){
-            try{details.scrollIntoView({behavior:'smooth',block:'nearest'})}catch(_){}
-          }
+    };
+
+    bindSheetBtn('feedbackSheetClose', advanceToNextQuestion);
+    bindSheetBtn('quizSheetExit', () => {
+      closeFeedbackSheet(false);
+      confirmQuizExit();
+    });
+    bindSheetBtn('quizSheetExplain', () => {
+      const details = f.querySelector('.feedback-drawer-details');
+      if(details){
+        details.open = !details.open;
+        if(details.open){
+          try{details.scrollIntoView({behavior:'smooth',block:'nearest'})}catch(_){}
         }
-      };
-    }
-    const sheetNextBtn = $('quizSheetNext');
-    if(sheetNextBtn){
-      sheetNextBtn.onclick=(e)=>{
-        e?.stopPropagation?.();
-        haptic('tap');
-        advanceToNextQuestion();
-      };
-    }
+      }
+    });
+    bindSheetBtn('quizSheetNext', advanceToNextQuestion);
 
     // Touch gesture: swipe down to dismiss
     let sheetTouchStartY = 0;
@@ -17719,6 +17806,10 @@ function quizLoop(cfg){
 
     const onSheetTouchStart = (e) => {
       if (!e.touches || !e.touches[0]) return;
+      if (e.target.closest('button, a, input, select, textarea, details, summary, .feedback-sheet-footer, .feedback-sheet-close-btn, .feedback-sheet-secondary-row, .feedback-sheet-exit-btn, .feedback-sheet-explain-btn, .feedback-sheet-next-btn')) {
+        sheetIsDragging = false;
+        return;
+      }
       sheetTouchStartY = e.touches[0].clientY;
       sheetTouchCurrentY = sheetTouchStartY;
       const bodyEl = f.querySelector('.feedback-sheet-body');
@@ -18075,7 +18166,7 @@ function quizLoop(cfg){
    const mirip=answer.scaffold==='worked'?grammarSimilarExample(q):null;
    const turn=tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing,{session:tutor,similar:mirip});
    showQuizFloatingRetry(q,j);
-   showTutorHintModal(q,j,hintClueReason||nudgeText);
+   speak(turn,{retry:true,similar:!!mirip});
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
    enhanceUI();
    return;
@@ -18091,16 +18182,12 @@ function quizLoop(cfg){
   document.getElementById('quizScaffoldNudge')?.remove();
   $('quizFloatingBar')?.remove();
   try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  document.querySelectorAll('body > #feedback').forEach(el=>el.remove());
   const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
   /* W1 P1-1: mode ukur melompati popup keyakinan (verdiknya tertulis di popup itu) DAN
      teater analyzing 700ms \u2014 langsung ke tanda terima netral. */
   if(MEASURE||cfg.placement){reveal(q,j,ok);return}
-  if(!ok&&!firstTry){
-    // Percobaan kedua yang salah: langsung buka feedback bottom sheet dengan TOMBOL LANJUT dan TOMBOL BUKA PEMBAHASAN
-    reveal(q,j,false);
-    return;
-  }
   confidencePopThen=()=>showCoreAnalyzing(()=>reveal(q,j,ok));
   confidencePopSkipThen=ok?()=>{reveal(q,j,ok);$('quizNext')?.click()}:null;
   openConfidencePop(ok);
@@ -18284,6 +18371,7 @@ function quizLoop(cfg){
  enterStage('quiz',{draw:()=>draw(),leave:()=>{
   $('quizFloatingBar')?.remove();
   try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
+  document.querySelectorAll('body > #feedback').forEach(el=>el.remove());
   const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
   if(!cfg.__finished)abandonActiveSession('quiz_exit')
  }});
