@@ -69,6 +69,18 @@
     'mochi-sos.guide-rule-prefix': 'Tips dari Mochi: ',
     'mochi-sos.guide-concept-prefix': 'Pertanyaan ini melatih konsep "{concept}". Perhatikan pola kata kerja atau partikel penanda ya!',
     'mochi-sos.guide-default': 'Mochi siap bantu! Coba perhatikan partikel penunjuk waktu atau arah di kalimat ini ya!',
-    'mochi-sos.exam-locked': 'Tes mandiri: Mochi istirahat dulu saat ujian/tes awal ya!'
+    'mochi-sos.exam-locked': 'Tes mandiri: Mochi istirahat dulu saat ujian/tes awal ya!',
+    'mochi-sos.greet-1': 'Halo! Mochi siap temani latihanmu hari ini! Kalau bingung, ketuk aku langsung ya! ✨',
+    'mochi-sos.greet-2': 'Semangat! Ada Mochi di sini. Jangan ragu ketuk aku kalau butuh petunjuk!',
+    'mochi-sos.greet-3': 'Yuk mulai! Aku di sini kalau kamu mau diskusi soalnya. Ketuk aku kapan saja!',
+    'mochi-sos.greet-listening': 'Halo! Sesi mendengarkan nih. Dengarkan dulu baik-baik, kalau ada yang samar ketuk aku ya!',
+    'mochi-sos.greet-reading': 'Halo! Ada bacaan hari ini. Baca santai dulu, kalau ada kata sulit ketuk aku!',
+    'mochi-sos.greet-vocab': 'Halo! Waktunya kosakata! Kalau ada kata yang asing, ketuk aku, kita bahas maknanya!',
+    'mochi-sos.greet-grammar': 'Halo! Sesi tata bahasa dimulai! Perhatikan partikel dan bentuk kata kerja. Ketuk aku kalau bingung!',
+    'mochi-sos.greet-kanji': 'Halo! Sesi kanji! Lihat bentuk dan bunyinya pelan-pelan. Ketuk aku kalau butuh petunjuk!',
+    'mochi-sos.greet-build': 'Halo! Ayo susun kalimatnya! Mulai dari subjek dan partikelnya. Ketuk aku kalau macet!',
+    'mochi-sos.greet-cue': 'Halo! Mochi siap menemani. Ketuk aku kalau bingung ya!',
+    'mochi-sos.leak-correction': '[SISTEM FIEZEL: Kamu hampir membocorkan kunci jawaban. DILARANG menyebut huruf pilihan atau teks jawaban benar. Ulangi dalam 1 kalimat sebagai petunjuk sokratik saja.]',
+    'mochi-sos.connecting': 'Menyambungkan Mochi...'
   });
 }());

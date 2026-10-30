@@ -1,7 +1,7 @@
 {
-  "version": "m025-723",
-  "claimedBy": "branch feat/local-bypass-m025-723",
-  "claimedAt": "2026-10-30T14:25:42.396Z",
-  "reason": "fix(auth): auto-bypass auth and onboarding to direct home dashboard on local test server",
+  "version": "m025-724",
+  "claimedBy": "branch feat/mochi-voice-sos-m025-724",
+  "claimedAt": "2026-10-30T15:22:50.836Z",
+  "reason": "feat(voice-sos): direct mascot tap, proactive greeting, deep context, and sub-second prewarm",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
