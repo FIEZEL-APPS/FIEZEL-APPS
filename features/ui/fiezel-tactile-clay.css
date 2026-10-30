@@ -8046,7 +8046,7 @@ html body #app .fz-kawan-card.fz-vissol-kawan-card::after {
 }
 
 /* ── Kawan Bicara v2 (Gambar Referensi 1) ── */
-html body #app .fz-kawan-card.fz-kawan-card-v2 {
+:root #app .fz-kawan-card.fz-kawan-card-v2 {
   display: grid !important;
   grid-template-columns: 52px minmax(0, 1fr) auto !important;
   grid-template-areas: "icon body right" !important;
@@ -8065,20 +8065,20 @@ html body #app .fz-kawan-card.fz-kawan-card-v2 {
   box-sizing: border-box !important;
   width: 100% !important;
 }
-html body #app .fz-kawan-card.fz-kawan-card-v2::after {
+:root #app .fz-kawan-card.fz-kawan-card-v2::after {
   display: none !important;
 }
-html body #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-icon { grid-area: icon !important; }
-html body #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-body { grid-area: body !important; }
-html body #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-right { grid-area: right !important; }
-html body #app .fz-kawan-card.fz-kawan-card-v2:hover,
-html body #app .fz-kawan-card.fz-kawan-card-v2:focus-visible {
+:root #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-icon { grid-area: icon !important; }
+:root #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-body { grid-area: body !important; }
+:root #app .fz-kawan-card.fz-kawan-card-v2 .fz-kawan-v2-right { grid-area: right !important; }
+:root #app .fz-kawan-card.fz-kawan-card-v2:hover,
+:root #app .fz-kawan-card.fz-kawan-card-v2:focus-visible {
   transform: translateY(-2px) scale(1.008) !important;
   border-color: #DDD6FE !important;
   box-shadow: 0 14px 36px rgba(124, 58, 237, 0.14) !important;
   outline: none !important;
 }
-html body #app .fz-kawan-card.fz-kawan-card-v2:active { transform: translateY(0) scale(0.995) !important; }
+:root #app .fz-kawan-card.fz-kawan-card-v2:active { transform: translateY(0) scale(0.995) !important; }
 .fz-kawan-v2-icon {
   width: 52px !important; height: 52px !important; border-radius: 50% !important;
   background: #F5F3FF !important;
