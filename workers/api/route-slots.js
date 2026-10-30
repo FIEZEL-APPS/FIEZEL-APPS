@@ -143,6 +143,8 @@ import { ROUTES as GOOGLE_AUTH_ROUTES } from './route-auth-google.js';
 import { ROUTES as STAGE_ROUTES } from './stage/route-stage.js';
 /* --- SLOT 14: GEMINI LIVE POOL (voice/route-voice-live.js) — /api/voice/* [TERPASANG] */
 import { ROUTES as VOICE_LIVE_ROUTES } from './voice/route-voice-live.js';
+/* --- SLOT 15: INJEKSI & KLAIM REWARD GEM (route-gem-grant.js) — /api/gems/claim, /api/owner/grant-gems [TERPASANG] */
+import { ROUTES as GEM_GRANT_ROUTES } from './route-gem-grant.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
@@ -158,4 +160,5 @@ export const EXTRA_ROUTES = [
   ...GOOGLE_AUTH_ROUTES,      /* SLOT 12 */
   ...STAGE_ROUTES,            /* SLOT 13 */
   ...VOICE_LIVE_ROUTES,       /* SLOT 14 */
+  ...GEM_GRANT_ROUTES,        /* SLOT 15 */
 ];

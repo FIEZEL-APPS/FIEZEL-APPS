@@ -32,6 +32,8 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/activity': 100000,
   '/api/push/subscribe': 8192,
   '/api/feedback': 8192,
+  '/api/gems/claim': 2048,
+  '/api/owner/grant-gems': 4096,
   // --- endpoint fase ini -----------------------------------------------------
   '/api/auth/anon': 512,
   '/api/auth/claim': 2048,

@@ -27,6 +27,7 @@ sini yang menjadi urutan resmi.
 | `0016_item_pool_probe.sql` | `fiezel-evidence` (binding `EVIDENCE_DB`) | `item_pool_probe_daily` |
 | `0017_social_friend_idx.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — hanya indeks)* |
 | `0018_quota_ai_chat.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — kolom `ai_chat_used`/`ai_chat_held` di `quota_daily`)* |
+| `0019_gem_grant.sql` | `fiezel-core` (binding `CORE_DB`) | `gem_grant` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `tests/d1-schema-contract-test.js` **menurunkan** peta itu
@@ -116,6 +117,8 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0017_social_friend_id
 # --- fiezel-core: bucket kuota Ngobrol AI (WAJIB sebelum deploy Worker yang memuat aiChat;
 #     .github/workflows/deploy-api-worker.yml menerapkannya otomatis bila kolomnya belum ada) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0018_quota_ai_chat.sql
+# --- fiezel-core: tabel injeksi dan klaim reward GEM per-murid dari server ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0019_gem_grant.sql
 ```
 
 `0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,

@@ -8314,6 +8314,7 @@ if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
 /* Audit F23: demo guru tidak ditawari pengingat belajar murid. */
 if(!deferWelcomeUntilStageExit&&!(()=>{try{return !!self.FiezelTeacherShell?.previewAllowed?.()}catch(_){return false}})())offerNotificationInvitation('after_onboarding');
 try{maybeRegisterStudentOnce()}catch(_){}
+try{setTimeout(checkPendingGemGrants,1200)}catch(_){}
 armOfflineVoiceAutoload();
 // Creator Report menunggu SDK-nya, bukan menyerah. Antrean laporan dulu pasti terkirim
 // 1,2 detik setelah boot karena js.puter.com selalu sudah selesai dieksekusi sebelum
@@ -13691,6 +13692,77 @@ function gemsHook(){
       return true;
     }
   };
+}
+
+let pendingGemGrantsChecking = false;
+async function checkPendingGemGrants() {
+  if (pendingGemGrantsChecking) return false;
+  if (!CORE_WORKER_URL) return false;
+  pendingGemGrantsChecking = true;
+  try {
+    const res = await coreWorkerExec('/api/gems/claim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    if (!res.ok) return false;
+    const data = await res.json().catch(() => ({}));
+    if (data && data.ok && Array.isArray(data.grants) && data.grants.length > 0) {
+      let totalGems = 0;
+      const reasons = [];
+      const hook = gemsHook();
+      for (const g of data.grants) {
+        const amt = Math.max(0, Math.floor(Number(g.amount) || 0));
+        if (amt > 0) {
+          totalGems += amt;
+          if (hook && typeof hook.award === 'function') {
+            hook.award(amt, g.reason || 'reward_grant', { streak: state.streak, level: getActiveLevel() });
+          } else {
+            state.gems = (Number(state.gems) || 0) + amt;
+            save();
+          }
+          if (g.reason) reasons.push(String(g.reason));
+        }
+      }
+      if (totalGems > 0) {
+        save();
+        try {
+          showGemRewardModal(totalGems, reasons.join(', ') || 'Hadiah Belajar');
+        } catch (_) {}
+      }
+      return true;
+    }
+  } catch (_) {
+    return false;
+  } finally {
+    pendingGemGrantsChecking = false;
+  }
+  return false;
+}
+
+function showGemRewardModal(totalGems, reasonText) {
+  const modalHtml = `
+    <div class="modal-mark">FIEZEL REWARD</div>
+    <div class="card" style="text-align:center;padding:24px 16px;border:2px solid #2563eb;box-shadow:0 10px 25px -5px rgba(37,99,235,0.25);">
+      <div style="font-size:42px;margin-bottom:8px;">💎</div>
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 8px 0;">+${esc(String(totalGems))} GEM Diterima!</h2>
+      <p style="font-size:14px;color:#334155;margin:0 0 14px 0;line-height:1.5;">
+        Selamat! Kamu menerima bonus reward GEM resmi dari Tim Pengembang Fiezel.
+      </p>
+      <div style="background:#f1f5f9;border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:12px;color:#475569;border:1px dashed #cbd5e1;">
+        <b>Keterangan:</b> ${esc(reasonText)}
+      </div>
+      <button type="button" class="primary" onclick="closeModal();" style="width:100%;font-weight:700;padding:12px;">
+        Terima Kasih, Lanjut Belajar!
+      </button>
+    </div>
+  `;
+  try {
+    openModal(modalHtml);
+    uiSfx('streak_5');
+    pawReact('reward', { kind: 'gems' });
+    refreshNotifBadge();
+  } catch (_) {}
 }
 async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="skillsLab()" aria-label="${esc(FiezelI18n.t('skillslab.btn-back','Kembali'))}"><i data-lucide="arrow-left"></i><span>${esc(FiezelI18n.t('skillslab.btn-back','Kembali'))}</span></button><div class="skill-topbar-actions"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('student.skills-title', FiezelI18n.t('latihan.bicara-dengar')))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}/* m025-273: kunci ujian dilepas SESUDAH pemberitahuan Puter, bukan sebelumnya — dua gerbang (quota-notice-a11y, puter-popup-once) mengunci bentuk pembuka callback ini karena di sinilah pemberitahuan boleh muncul, dan menyisipkan apa pun di depannya memerahkan keduanya. */try{examLockEnd('listening_exam');examLockEnd('speaking_exam')}catch(_){}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. *//* m025-273: pintu ujian Skills Lab. Addon memanggil this.open('listening_exam'/'speaking_exam')
      dari kartunya sendiri, jadi membungkus properti instans menangkap SEMUA jalur masuknya —
@@ -22691,7 +22763,7 @@ function startNotifPolling(){
   try{
     document.addEventListener('visibilitychange',()=>{
       try{if(document.visibilityState!=='visible')return}catch(_){return}
-      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){}
+      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{checkPendingGemGrants()}catch(_){}
     });
     self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){}});
     if(typeof BroadcastChannel!=='undefined'){
@@ -22729,7 +22801,7 @@ function startNotifPolling(){
   try{refreshFriendRequestCount()}catch(_){}
   return true;
 }
-window.openNotifications=openNotifications;window.renderNotifSheet=renderNotifSheet;window.notifAcceptFriend=notifAcceptFriend;window.notifRejectFriend=notifRejectFriend;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;
+window.openNotifications=openNotifications;window.renderNotifSheet=renderNotifSheet;window.notifAcceptFriend=notifAcceptFriend;window.notifRejectFriend=notifRejectFriend;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;window.checkPendingGemGrants=checkPendingGemGrants;window.showGemRewardModal=showGemRewardModal;
 /* ---------------------------------------------------------------- LAPIS AKUN (§21/§22/§27) */
 /**
  * Lembar akun: masuk, daftar, dan aktivasi guru. SATU lembar tiga mode, bukan tiga layar —
