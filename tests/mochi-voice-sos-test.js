@@ -206,4 +206,11 @@ assert.ok(/addEventListener\('pointerdown'[\s\S]{0,400}true\)/.test(code), 'poin
 assert.ok(code.includes('fz-mochi-tap-bounce'), 'Tap bounce feedback class must be applied');
 console.log('  ✓ Direct mascot tap plumbing verified');
 
-console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (13/13)! <<<');
+// 14. Zero Browser TTS & Pure Gemini Live Silence Prompt Invariant
+assert.ok(!code.includes('speechSynthesis'), 'Must eliminate all browser speechSynthesis robot TTS');
+assert.ok(!code.includes('SpeechSynthesisUtterance'), 'Must eliminate all SpeechSynthesisUtterance robot TTS');
+assert.ok(code.includes('Silakan bicara jika ingin bantuan dari aku'), 'Silence prompt must invite learner to speak');
+assert.ok(typeof MochiSos.triggerSilencePrompt === 'function', 'triggerSilencePrompt must be exposed');
+console.log('  ✓ Zero Browser TTS & Silence Prompt Invariant verified');
+
+console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (14/14)! <<<');

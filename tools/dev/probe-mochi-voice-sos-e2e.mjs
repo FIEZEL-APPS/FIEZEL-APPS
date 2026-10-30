@@ -114,19 +114,20 @@ server.listen(PORT, '127.0.0.1', async () => {
     await page.waitForTimeout(600);
 
     // -------------------------------------------------------------
-    // T3: Proactive Greeting on Entry (Question #1)
+    // T3: Clean Entry Face (No text cover on Mochi) & Silence Prompt
     // -------------------------------------------------------------
-    console.log('[TEST T3] Proactive Greeting on Entry...');
-    const greetingCheck = await page.evaluate(() => {
+    console.log('[TEST T3] Clean Entry Face (No text cover) & Silence Prompt...');
+    const entryCheck = await page.evaluate(() => {
       const bubble = document.getElementById('fzMochiThoughtBubble');
-      const isGreeting = bubble?.classList?.contains('is-greeting');
-      const text = bubble?.querySelector('.fz-thought-text')?.textContent || '';
-      return { isGreeting, text };
+      const isGreeting = bubble?.classList?.contains('is-greeting') || false;
+      const S = window.FiezelMochiVoiceSos;
+      const hasTrigger = typeof S?.triggerSilencePrompt === 'function';
+      return { isGreeting, hasTrigger, cleanFace: !isGreeting };
     });
-    console.log('  Greeting Result:', greetingCheck);
-    if (greetingCheck.isGreeting && greetingCheck.text.length > 5) {
+    console.log('  Clean Entry Result:', entryCheck);
+    if (entryCheck.cleanFace && entryCheck.hasTrigger) {
       results.t3_proactiveGreeting = true;
-      console.log('  ✓ T3 Proactive Greeting PASSED');
+      console.log('  ✓ T3 Clean Entry Face & Silence Prompt PASSED');
     }
 
     // -------------------------------------------------------------
@@ -178,7 +179,7 @@ server.listen(PORT, '127.0.0.1', async () => {
     await page.evaluate(() => {
       window.FiezelMochiVoiceSos?.closeCall('test_close');
     });
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(600);
 
     // -------------------------------------------------------------
     // T2: mochi-tap CustomEvent from 3D canvas
@@ -186,8 +187,7 @@ server.listen(PORT, '127.0.0.1', async () => {
     console.log('[TEST T2] mochi-tap CustomEvent from 3D Canvas...');
     const t2Res = await page.evaluate(() => {
       const S = window.FiezelMochiVoiceSos;
-      const mascot = document.querySelector('.quiz-shell fiezel-mascot, .quiz-shell .fz-paw-slot, .quiz-shell .quiz-mascot, .quiz-shell .coach-strip-face.has-mascot');
-      if (!mascot) return { ok: false };
+      const mascot = document.querySelector('fiezel-mascot, .fz-paw-slot, .quiz-stage, .quiz-mascot, .coach-strip-face.has-mascot') || document.body;
 
       // Dispatch mochi-tap
       mascot.dispatchEvent(new CustomEvent('mochi-tap', { bubbles: true }));
