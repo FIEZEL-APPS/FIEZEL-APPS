@@ -239,6 +239,23 @@
     'settings.toast-report-sent': 'Laporan agregat terkirim ke Creator Hub',
     'settings.toast-report-queued': 'Laporan disimpan di antrean dan akan dicoba lagi',
     /* m025-365 · tugas yang ditarik guru. */
-    'notif.tugas-ditarik': 'Tugas “{title}” ditarik oleh gurumu. Kamu tidak perlu mengerjakannya.'
+    'notif.tugas-ditarik': 'Tugas “{title}” ditarik oleh gurumu. Kamu tidak perlu mengerjakannya.',
+
+    /* m025-719 · pesan dua arah owner & murid */
+    'owner.section-title': 'Pesan Tim Pengembang',
+    'owner.default-title': 'Pesan Tim Fiezel',
+    'owner.dev-team': 'Tim Pengembang Fiezel',
+    'owner.your-reply': 'Balasan Kamu',
+    'owner.open-reply': 'Buka & Balas',
+    'owner.gem-bonus': 'GEM Bonus Terlampir',
+    'owner.reply-label': 'Balas Langsung ke Tim Pengembang:',
+    'owner.reply-placeholder': 'Tulis masukan, kritik, saran, atau ucapan balasan di sini...',
+    'owner.reply-btn': 'Kirim Balasan',
+    'owner.sending': 'Mengirim...',
+    'owner.reply-empty': 'Tuliskan pesan balasan terlebih dahulu',
+    'owner.reply-fail-net': 'Gagal mengirim balasan. Cek koneksi.',
+    'owner.reply-success': 'Balasanmu berhasil terkirim ke Tim Pengembang!',
+    'owner.reply-fail': 'Gagal mengirim balasan.',
+    'owner.reply-err': 'Terjadi kesalahan saat mengirim balasan.'
   });
 }());

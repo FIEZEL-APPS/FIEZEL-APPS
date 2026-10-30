@@ -145,6 +145,8 @@ import { ROUTES as STAGE_ROUTES } from './stage/route-stage.js';
 import { ROUTES as VOICE_LIVE_ROUTES } from './voice/route-voice-live.js';
 /* --- SLOT 15: INJEKSI & KLAIM REWARD GEM (route-gem-grant.js) — /api/gems/claim, /api/owner/grant-gems [TERPASANG] */
 import { ROUTES as GEM_GRANT_ROUTES } from './route-gem-grant.js';
+/* --- SLOT 16: PESAN OWNER-MURID & REWARD (route-learner-messages.js) — /api/learner/messages*, /api/owner/send-message, /api/owner/learner-messages [TERPASANG] */
+import { ROUTES as LEARNER_MESSAGES_ROUTES } from './route-learner-messages.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
@@ -161,4 +163,5 @@ export const EXTRA_ROUTES = [
   ...STAGE_ROUTES,            /* SLOT 13 */
   ...VOICE_LIVE_ROUTES,       /* SLOT 14 */
   ...GEM_GRANT_ROUTES,        /* SLOT 15 */
+  ...LEARNER_MESSAGES_ROUTES, /* SLOT 16 */
 ];
