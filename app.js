@@ -13753,7 +13753,7 @@ function showGemRewardModal(totalGems, reasonText) {
         <b>Keterangan:</b> ${esc(reasonText)}
       </div>
       <button type="button" class="primary" onclick="closeModal();" style="width:100%;font-weight:700;padding:12px;">
-        Terima Kasih, Lanjut Belajar! ✨
+        Terima Kasih, Lanjut Belajar!
       </button>
     </div>
   `;
