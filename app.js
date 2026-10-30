@@ -7842,6 +7842,8 @@ function cfShadowProbe(path,options,answer){
 // tetapi ia perlu diketahui siapa pun yang mengandalkannya sebagai killswitch.
 async function corePuterExec(path,options={}){const url=(self.CORE_WORKER_URL||'')+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await (self.awaitPuter?self.awaitPuter():null);if(sdk?.workers?.exec)return sdk.workers.exec(url,options);return cfWorkerFetch(path,options)}
 async function coreWorkerExec(path,options={}){
+  const p=String(path||'');
+  if(p.startsWith('/api/learner/')||p.startsWith('/api/gems/')||p.startsWith('/api/owner/'))return cfWorkerFetch(path,options);
   const mode=cfEndpointMode(path);
   if(mode==='off')return corePuterExec(path,options);
   return cfWorkerFetch(path,options);
@@ -13719,7 +13721,7 @@ function gemsHook(){
 }
 
 let pendingGemGrantsChecking = false;
-async function checkPendingGemGrants() {
+async function checkPendingGemGrants(silent = false) {
   if (pendingGemGrantsChecking) return false;
   if (!CORE_WORKER_URL) return false;
   pendingGemGrantsChecking = true;
@@ -13751,7 +13753,8 @@ async function checkPendingGemGrants() {
       if (totalGems > 0) {
         save();
         try {
-          showGemRewardModal(totalGems, reasons.join(', ') || 'Hadiah Belajar');
+          if (!silent) showGemRewardModal(totalGems, reasons.join(', ') || 'Hadiah Belajar');
+          else refreshNotifBadge();
         } catch (_) {}
       }
       return true;
@@ -13807,12 +13810,15 @@ async function pollOwnerMessages(force) {
       const prevUnread = ownerMessagesUnreadCount;
       cachedOwnerMessages = data.messages;
       ownerMessagesUnreadCount = cachedOwnerMessages.filter(m => m.sender === 'owner' && !m.is_read).length;
-      if (ownerMessagesUnreadCount > prevUnread) {
+      if (ownerMessagesUnreadCount > 0) {
         const latestMsg = cachedOwnerMessages.find(m => m.sender === 'owner' && !m.is_read);
-        if (latestMsg) {
+        if (latestMsg && (ownerMessagesUnreadCount > prevUnread || force)) {
           try {
-            showToast('Pesan dari Tim Pengembang Fiezel: ' + (latestMsg.title || ''));
             uiSfx('notif_general') || uiSfx('notif');
+            openOwnerMessageModal(latestMsg.id);
+            if (latestMsg.gem_amount > 0) {
+              checkPendingGemGrants(true);
+            }
           } catch (_) {}
         }
       }
@@ -23032,6 +23038,7 @@ function startNotifPolling(){
     else if(typeof document==='undefined'||document.visibilityState==='visible'){
       try{if(navigator&&navigator.onLine!==false){socialNotifyPoll(false);refreshFriendRequestCount()}}catch(_){}
     }
+    try{if(navigator&&navigator.onLine!==false){pollOwnerMessages(false);checkPendingGemGrants(true)}}catch(_){}
   },NOTIF_POLL_MS);
   notifPollTimer?.unref?.();
   try{
