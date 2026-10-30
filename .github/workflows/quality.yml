@@ -705,6 +705,7 @@ jobs:
           # MERAH (diuji dengan fixture rusak, bukan hanya fixture benar).
           node tests/d1-schema-contract-test.js
           node tests/remote-gem-grant-test.js
+          node tests/owner-learner-messaging-test.js
           # E9: penjaga jembatan edge. Dijalankan tepat sesudah dua gerbang kontrak Worker
           # karena ia menguji berkas yang sama (`workers/api/index.js`, `route-health.js`) dari
           # sisi ketiga: siapa yang BOLEH memanggil Worker sama sekali. Selama zona

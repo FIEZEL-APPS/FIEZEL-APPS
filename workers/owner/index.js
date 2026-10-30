@@ -1243,15 +1243,20 @@ function sanitizeLearnerSummary(raw) {
 async function readLearnerDetail(env, period, sub, fetchImpl) {
   if (!SUB_RE.test(String(sub || ''))) return null;
   const days = EVIDENCE_PERIOD_DAYS[period] || 7;
-  const res = await ownerApiFetch(env, '/api/owner/learner-evidence?sub=' + encodeURIComponent(sub) + '&days=' + days, fetchImpl);
-  if (res.state !== 'ok') return { state: res.state, status: res.status, learner: null, summary: null };
+  const [res, msgRes] = await Promise.all([
+    ownerApiFetch(env, '/api/owner/learner-evidence?sub=' + encodeURIComponent(sub) + '&days=' + days, fetchImpl),
+    ownerApiFetch(env, '/api/owner/learner-messages?sub=' + encodeURIComponent(sub), fetchImpl).catch(() => null)
+  ]);
+  const messages = (msgRes && msgRes.state === 'ok' && msgRes.body && Array.isArray(msgRes.body.messages)) ? msgRes.body.messages : [];
+  if (res.state !== 'ok') return { state: res.state, status: res.status, learner: { sub }, summary: null, messages };
   const body = res.body;
-  if (!body || body.migrated === false) return { state: 'not-migrated', learner: null, summary: null };
+  if (!body || body.migrated === false) return { state: 'not-migrated', learner: { sub }, summary: null, messages };
   return {
     state: 'measured',
     range: body.range || null,
     learner: sanitizeLearnerRow(Object.assign({ sub }, body.learner || {})),
     summary: sanitizeLearnerSummary(body.summary),
+    messages,
   };
 }
 
@@ -3438,6 +3443,117 @@ function renderLearnerDirectory(m) {
       bukan perilaku normal untuk murid baru.</div>`;
 }
 
+function renderLearnerMessagesCard(d, m) {
+  const targetSub = (d && d.learner && d.learner.sub) || m.learnerSub || '';
+  const messages = (d && Array.isArray(d.messages)) ? d.messages : [];
+  const action = m.teacherAction;
+  let alertHtml = '';
+  if (action && action.action === 'learner_message') {
+    if (action.ok) {
+      alertHtml = `<div class="note" style="border-left-color:var(--emerald);color:var(--emerald);background:var(--emerald-subtle);padding:12px 16px;margin-bottom:14px;border-radius:var(--radius-md);">
+        <b>${ICONS.check} Terkirim:</b> ${esc(action.message)}
+      </div>`;
+    } else {
+      alertHtml = `<div class="warn" style="padding:12px 16px;margin-bottom:14px;border-radius:var(--radius-md);">
+        <b>❌ Gagal:</b> ${esc(action.message)}${action.error ? ` (kode: ${esc(action.error)})` : ''}
+      </div>`;
+    }
+  }
+
+  let threadHtml = '';
+  if (messages.length === 0) {
+    threadHtml = `<div style="text-align:center;padding:24px 16px;color:var(--text-muted);font-size:13px;background:var(--bg-subtle);border-radius:var(--radius-md);border:1px dashed var(--card-border);">
+      Belum ada riwayat pesan langsung dengan murid ini. Kirimkan apresiasi, masukan, atau reward GEM pertama di bawah ini.
+    </div>`;
+  } else {
+    threadHtml = `<div style="display:flex;flex-direction:column;gap:12px;max-height:360px;overflow-y:auto;padding:8px 4px;margin-bottom:14px;">` +
+      messages.map((msg) => {
+        const isOwner = msg.sender === 'owner';
+        const bubbleBg = isOwner ? '#eff6ff' : '#f8fafc';
+        const bubbleBorder = isOwner ? '#bfdbfe' : '#e2e8f0';
+        const senderBadge = isOwner
+          ? `<span style="font-size:11px;font-weight:700;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:999px;">👑 Tim Pengembang / Owner</span>`
+          : `<span style="font-size:11px;font-weight:700;color:#0f766e;background:#ccfbf1;padding:2px 8px;border-radius:999px;">🧑‍🎓 Balasan Murid</span>`;
+        const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) + ' WIB' : '—';
+        const gemBadge = msg.gem_amount > 0
+          ? `<div style="margin-top:6px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;">
+              <span>💎</span> <span>+${esc(String(msg.gem_amount))} GEM Disuntikkan Langsung</span>
+             </div>`
+          : '';
+        return `<div style="background:${bubbleBg};border:1px solid ${bubbleBorder};border-radius:var(--radius-md);padding:12px 16px;align-self:${isOwner ? 'flex-end' : 'flex-start'};width:100%;max-width:92%;box-shadow:var(--shadow-sm);box-sizing:border-box;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+            ${senderBadge}
+            <span style="font-size:11px;color:var(--text-muted);">${esc(timeStr)}</span>
+          </div>
+          <div style="font-size:13.5px;font-weight:700;color:var(--text-main);margin-bottom:4px;">${esc(msg.title || 'Pesan')}</div>
+          <div style="font-size:13px;color:var(--text-main);line-height:1.6;white-space:pre-wrap;">${esc(msg.content)}</div>
+          ${gemBadge}
+        </div>`;
+      }).join('') +
+      `</div>`;
+  }
+
+  const formHtml = `
+    <form method="GET" action="/" style="margin-top:12px;background:var(--bg-subtle);border:1px solid var(--card-border);border-radius:var(--radius-md);padding:16px;">
+      <input type="hidden" name="action" value="send_learner_message">
+      <input type="hidden" name="learner" value="${esc(targetSub)}">
+      <input type="hidden" name="period" value="${esc(m.period || '7d')}">
+      
+      <div style="font-size:14px;font-weight:700;color:var(--text-main);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <span>💬</span> <span>Kirim Pesan Langsung &amp; Suntik Reward GEM</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;margin-bottom:12px;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">Judul Pesan</label>
+          <input type="text" name="msg_title" value="Apresiasi &amp; Hadiah Belajar dari Tim Fiezel" maxlength="120" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid var(--card-border);border-radius:6px;font-size:13px;background:var(--card-bg);color:var(--text-main);" required>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">💎 Suntik GEM Langsung (PWA Instant Grant)</label>
+          <select name="gem_amount" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid var(--card-border);border-radius:6px;font-size:13px;background:var(--card-bg);color:var(--text-main);">
+            <option value="0">0 GEM (Hanya Kirim Pesan Teks)</option>
+            <option value="50">+50 GEM (Reward Partisipasi)</option>
+            <option value="100" selected>+100 GEM (Reward Feedback / Review)</option>
+            <option value="250">+250 GEM (Reward Prestasi Istimewa)</option>
+            <option value="500">+500 GEM (Grand Prize / Bug Bounty)</option>
+            <option value="1000">+1000 GEM (Mitra Kehormatan)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">Alasan Pemberian GEM (Muncul di Pop-up Perayaan Murid)</label>
+        <input type="text" name="gem_reason" value="Apresiasi Masukan &amp; Semangat Belajar Bersama Tim Fiezel" maxlength="160" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid var(--card-border);border-radius:6px;font-size:13px;background:var(--card-bg);color:var(--text-main);">
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">Isi Pesan Interaktif (Murid dapat membalas langsung dari PWA)</label>
+        <textarea name="msg_content" rows="4" placeholder="Tuliskan apresiasi, pertanyaan, atau masukan untuk murid..." style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--card-border);border-radius:6px;font-size:13px;background:var(--card-bg);color:var(--text-main);font-family:inherit;resize:vertical;" required></textarea>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;">
+        <button type="submit" class="btn" style="background:#2563eb;color:#ffffff;padding:10px 20px;font-weight:700;font-size:13px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
+          <span>🚀</span> <span>Kirim Pesan &amp; Suntikkan ke PWA</span>
+        </button>
+      </div>
+    </form>
+  `;
+
+  return `
+    <div class="evidence-box" style="margin-top:20px;background:#ffffff;border:1.5px solid #93c5fd;box-shadow:var(--shadow-sm);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid var(--card-border);padding-bottom:10px;margin-bottom:14px;">
+        <h3 style="margin:0;font-size:16px;font-weight:800;color:var(--text-main);display:flex;align-items:center;gap:8px;">
+          <span>📬</span> <span>Saluran Komunikasi Dua Arah &amp; Suntik Reward GEM</span>
+        </h3>
+        <span class="section-badge" style="background:#eff6ff;color:#2563eb;border-color:#bfdbfe;">Owner &harr; Murid Sync</span>
+      </div>
+      ${alertHtml}
+      ${threadHtml}
+      ${formHtml}
+    </div>
+  `;
+}
+
 function renderLearnerDetail(m) {
   if (!m.learnerSub) {
     return `<div class="note">💡 <b>Pilih salah satu murid</b> pada tabel di atas untuk membuka riwayat bukti belajar adaptif Braincore secara mendalam.</div>`;
@@ -3451,13 +3567,13 @@ function renderLearnerDetail(m) {
       <code>/api/owner/learner-evidence</code> gagal${d.status ? ` (status ${esc(d.status)})` : ''}.</div>`;
   }
   if (d.state === 'not-migrated' || !d.summary) {
-    return `<div class="note">PENGUKURAN BELUM TERSEDIA untuk murid ini.</div>`;
+    return `<div class="note">PENGUKURAN BELUM TERSEDIA untuk murid ini.</div>` + renderLearnerMessagesCard(d, m);
   }
   const name = esc(learnerLabel(d.learner));
   const s2 = d.summary;
   if (!s2.measured) {
     return `<h3>${name}</h3><div class="note">BELUM ADA PENGUKURAN pada periode ini untuk murid
-      ini. Ia mungkin aktif di periode lain — coba rentang yang lebih panjang.</div>`;
+      ini. Ia mungkin aktif di periode lain — coba rentang yang lebih panjang.</div>` + renderLearnerMessagesCard(d, m);
   }
   const decisionRows = (s2.recentDecisions || []).map((x) => {
     const decItem = BRAINCORE_GLOSSARY[x.decision];
@@ -3521,6 +3637,7 @@ function renderLearnerDetail(m) {
     <h3 style="margin-top:18px;">Keputusan Braincore Terakhir</h3>
     <div class="table-wrap"><table><tr><th>Hari</th><th>Keputusan AI</th><th>Level CEFR</th><th>Hasil</th><th>Rekomendasi</th>
       <th>Δ Mastery</th><th>Kepatuhan</th></tr>${decisionRows}</table></div>
+    ${renderLearnerMessagesCard(d, m)}
   </div>`;
 }
 
@@ -6105,6 +6222,52 @@ async function handle(request, env, ctx, nowMs) {
         error: seedRes.error || null,
         message: seedRes.message || 'Seluruh 17 Mapel Nasional (Fase A–F), Kurikulum Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil diaktifkan dan disinkronkan 100%! Seluruh akun guru di KelasKu dapat langsung mengakses Bab Buku Ajar dan Bank Soal.'
       };
+    } else if (action === 'send_learner_message') {
+      const targetSub = url.searchParams.get('learner') || url.searchParams.get('sub') || '';
+      const msgTitle = url.searchParams.get('msg_title') || 'Apresiasi & Hadiah Belajar dari Tim Fiezel';
+      const msgContent = url.searchParams.get('msg_content') || '';
+      const gemAmount = Math.max(0, parseInt(url.searchParams.get('gem_amount') || '0', 10) || 0);
+      const gemReason = url.searchParams.get('gem_reason') || msgTitle;
+
+      if (!targetSub) {
+        teacherAction = {
+          ok: false,
+          action: 'learner_message',
+          message: 'Gagal mengirim pesan: sub murid tidak ditemukan.'
+        };
+      } else if (!msgContent.trim()) {
+        teacherAction = {
+          ok: false,
+          action: 'learner_message',
+          message: 'Gagal mengirim pesan: isi pesan tidak boleh kosong.'
+        };
+      } else {
+        const sendRes = await ownerApiFetch(env, '/api/owner/send-message', fetchImpl, {
+          method: 'POST',
+          body: {
+            sub: targetSub,
+            title: msgTitle,
+            content: msgContent,
+            gem_amount: gemAmount,
+            reason: gemReason
+          }
+        });
+        if (sendRes.state === 'ok' && sendRes.body && sendRes.body.ok) {
+          const gemNote = gemAmount > 0 ? ` plus ${gemAmount} GEM langsung disuntikkan ke PWA murid!` : '!';
+          teacherAction = {
+            ok: true,
+            action: 'learner_message',
+            message: `Pesan berhasil dikirim${gemNote}`
+          };
+        } else {
+          teacherAction = {
+            ok: false,
+            action: 'learner_message',
+            message: 'Gagal mengirim pesan ke server backend. Cek koneksi API.',
+            error: (sendRes.body && sendRes.body.error) || sendRes.state
+          };
+        }
+      }
     }
 
     // Murid terpilih adalah PARAMETER KUERI pada rute yang sudah ada, bukan rute baru.

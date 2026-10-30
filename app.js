@@ -8314,7 +8314,7 @@ if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
 /* Audit F23: demo guru tidak ditawari pengingat belajar murid. */
 if(!deferWelcomeUntilStageExit&&!(()=>{try{return !!self.FiezelTeacherShell?.previewAllowed?.()}catch(_){return false}})())offerNotificationInvitation('after_onboarding');
 try{maybeRegisterStudentOnce()}catch(_){}
-try{setTimeout(checkPendingGemGrants,1200)}catch(_){}
+try{setTimeout(()=>{try{checkPendingGemGrants();pollOwnerMessages()}catch(_){}},1200)}catch(_){}
 armOfflineVoiceAutoload();
 // Creator Report menunggu SDK-nya, bukan menyerah. Antrean laporan dulu pasti terkirim
 // 1,2 detik setelah boot karena js.puter.com selalu sudah selesai dieksekusi sebelum
@@ -13762,6 +13762,184 @@ function showGemRewardModal(totalGems, reasonText) {
     uiSfx('streak_5');
     pawReact('reward', { kind: 'gems' });
     refreshNotifBadge();
+  } catch (_) {}
+}
+
+let cachedOwnerMessages = [];
+let ownerMessagesUnreadCount = 0;
+let ownerMessagesPolling = false;
+
+async function pollOwnerMessages(force) {
+  if (ownerMessagesPolling) return false;
+  if (!CORE_WORKER_URL) return false;
+  ownerMessagesPolling = true;
+  try {
+    const res = await coreWorkerExec('/api/learner/messages', {
+      method: 'GET'
+    });
+    if (!res.ok) return false;
+    const data = await res.json().catch(() => ({}));
+    if (data && data.ok && Array.isArray(data.messages)) {
+      const prevUnread = ownerMessagesUnreadCount;
+      cachedOwnerMessages = data.messages;
+      ownerMessagesUnreadCount = cachedOwnerMessages.filter(m => m.sender === 'owner' && !m.is_read).length;
+      if (ownerMessagesUnreadCount > prevUnread) {
+        const latestMsg = cachedOwnerMessages.find(m => m.sender === 'owner' && !m.is_read);
+        if (latestMsg) {
+          try {
+            showToast('Pesan dari Tim Pengembang Fiezel: ' + (latestMsg.title || ''));
+            uiSfx('notif_general') || uiSfx('notif');
+          } catch (_) {}
+        }
+      }
+      refreshNotifBadge();
+      return true;
+    }
+  } catch (_) {
+    return false;
+  } finally {
+    ownerMessagesPolling = false;
+  }
+  return false;
+}
+
+function openOwnerMessageModal(focusMsgId) {
+  const messages = Array.isArray(cachedOwnerMessages) ? cachedOwnerMessages : [];
+  if (messages.length === 0) return;
+  const target = (focusMsgId && messages.find(m => m.id === focusMsgId)) || messages[0];
+  if (!target) return;
+
+  if (messages.some(m => m.sender === 'owner' && !m.is_read)) {
+    markOwnerMessagesRead();
+  }
+
+  const threadItems = messages.slice().reverse().map(m => {
+    const isOwner = m.sender === 'owner';
+    const bg = isOwner ? '#eff6ff' : '#f8fafc';
+    const border = isOwner ? '#bfdbfe' : '#e2e8f0';
+    const senderTitle = isOwner ? t('owner.dev-team', 'Tim Pengembang Fiezel') : t('owner.your-reply', 'Balasan Kamu');
+    const time = m.created_at ? `<small style="color:#64748b;font-size:11px;">${esc(notifTimeLabel(m.created_at))}</small>` : '';
+    const gemNotice = m.gem_amount > 0
+      ? `<div style="margin-top:6px;display:inline-flex;align-items:center;gap:6px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;">
+          <span>💎</span> <span>+${esc(String(m.gem_amount))} ${t('owner.gem-bonus', 'GEM Bonus Terlampir')}</span>
+        </div>`
+      : '';
+    return `
+      <div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <b style="font-size:12px;color:${isOwner ? '#1e40af' : '#0f766e'};">${esc(senderTitle)}</b>
+          ${time}
+        </div>
+        <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px;">${esc(m.title || t('owner.default-title', 'Pesan'))}</div>
+        <div style="font-size:13px;color:#334155;line-height:1.5;white-space:pre-wrap;">${esc(m.content)}</div>
+        ${gemNotice}
+      </div>
+    `;
+  }).join('');
+
+  const replyToId = target.id;
+  const modalHtml = `
+    <div class="modal-mark">FIEZEL DIALOG</div>
+    <div class="card" style="padding:18px 16px;max-width:480px;width:100%;box-sizing:border-box;">
+      <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+        <h3 style="margin:0;font-size:16px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:6px;">
+          <span>📬</span> <span>${t('owner.section-title', 'Pesan Tim Pengembang')}</span>
+        </h3>
+        <button type="button" class="text-button" onclick="closeModal();" style="font-size:13px;padding:4px 8px;">✕</button>
+      </div>
+
+      <div style="max-height:240px;overflow-y:auto;padding-right:4px;margin-bottom:14px;">
+        ${threadItems}
+      </div>
+
+      <div style="border-top:1px solid #e2e8f0;padding-top:12px;">
+        <label for="fzLearnerReplyInput" style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">
+          ${t('owner.reply-label', 'Balas Langsung ke Tim Pengembang:')}
+        </label>
+        <textarea id="fzLearnerReplyInput" rows="3" placeholder="${esc(t('owner.reply-placeholder', 'Tulis masukan, kritik, saran, atau ucapan balasan di sini...'))}" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;font-size:13px;font-family:inherit;color:#0f172a;resize:vertical;"></textarea>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;">
+          <button type="button" class="text-button" onclick="closeModal();">${t('modal.tutup', 'Tutup')}</button>
+          <button type="button" id="fzBtnSendReply" class="primary" onclick="sendOwnerMessageReply('${esc(replyToId)}');" style="font-weight:700;padding:8px 16px;border-radius:8px;">
+            ${t('owner.reply-btn', 'Kirim Balasan')}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  try {
+    openModal(modalHtml);
+    enhanceUI();
+  } catch (_) {}
+}
+
+async function sendOwnerMessageReply(replyToId) {
+  const input = $('fzLearnerReplyInput');
+  if (!input) return;
+  const text = String(input.value || '').trim();
+  if (!text) {
+    showToast(t('owner.reply-empty', 'Tuliskan pesan balasan terlebih dahulu'));
+    return;
+  }
+  const btn = $('fzBtnSendReply');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = t('owner.sending', 'Mengirim...');
+  }
+  try {
+    const res = await coreWorkerExec('/api/learner/messages/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        replyToId: replyToId || null,
+        title: 'Balasan Pengguna',
+        content: text
+      })
+    });
+    if (!res.ok) {
+      showToast(t('owner.reply-fail-net', 'Gagal mengirim balasan. Cek koneksi.'));
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = t('owner.reply-btn', 'Kirim Balasan');
+      }
+      return;
+    }
+    const data = await res.json().catch(() => ({}));
+    if (data && data.ok) {
+      showToast(t('owner.reply-success', 'Balasanmu berhasil terkirim ke Tim Pengembang!'));
+      uiSfx('task_complete');
+      closeModal();
+      await pollOwnerMessages(true);
+    } else {
+      showToast(t('owner.reply-fail', 'Gagal mengirim balasan.'));
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = t('owner.reply-btn', 'Kirim Balasan');
+      }
+    }
+  } catch (err) {
+    showToast(t('owner.reply-err', 'Terjadi kesalahan saat mengirim balasan.'));
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = t('owner.reply-btn', 'Kirim Balasan');
+    }
+  }
+}
+
+async function markOwnerMessagesRead() {
+  ownerMessagesUnreadCount = 0;
+  if (Array.isArray(cachedOwnerMessages)) {
+    cachedOwnerMessages.forEach(m => {
+      if (m.sender === 'owner') m.is_read = 1;
+    });
+  }
+  refreshNotifBadge();
+  try {
+    await coreWorkerExec('/api/learner/messages/read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    });
   } catch (_) {}
 }
 async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="skillsLab()" aria-label="${esc(FiezelI18n.t('skillslab.btn-back','Kembali'))}"><i data-lucide="arrow-left"></i><span>${esc(FiezelI18n.t('skillslab.btn-back','Kembali'))}</span></button><div class="skill-topbar-actions"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('student.skills-title', FiezelI18n.t('latihan.bicara-dengar')))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}/* m025-273: kunci ujian dilepas SESUDAH pemberitahuan Puter, bukan sebelumnya — dua gerbang (quota-notice-a11y, puter-popup-once) mengunci bentuk pembuka callback ini karena di sinilah pemberitahuan boleh muncul, dan menyisipkan apa pun di depannya memerahkan keduanya. */try{examLockEnd('listening_exam');examLockEnd('speaking_exam')}catch(_){}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. *//* m025-273: pintu ujian Skills Lab. Addon memanggil this.open('listening_exam'/'speaking_exam')
@@ -22522,6 +22700,7 @@ function notifUnreadTotal(){
   }catch(_){n+=socialUnreadCount()}
   n+=Math.max(0,Number(socialRequestCount)||0);
   if(socialPendingInvite())n+=1;
+  n+=Math.max(0,Number(ownerMessagesUnreadCount)||0);
   return n;
 }
 let lastGlobalInputAt=0;
@@ -22585,6 +22764,14 @@ function renderNotifListMarkup(teacher,requests,social,invite){
       list+=`<li class="notif-section">${t('notif.section-social','Teman')}</li>`+filteredSocial.slice(0,20).map(notifItemMarkup).join('');
     }
   }
+  if(cachedOwnerMessages&&cachedOwnerMessages.length){
+    list+=`<li class="notif-section">${t('owner.section-title','Pesan Tim Pengembang')}</li>`+cachedOwnerMessages.slice(0,5).map(m=>{
+      const isUnread=!m.is_read&&m.sender==='owner';
+      const time=m.created_at?`<small>${esc(notifTimeLabel(m.created_at))}</small>`:'';
+      const gemBadge=m.gem_amount>0?` · <span style="color:#b45309;font-weight:700;">+${esc(String(m.gem_amount))} GEM</span>`:'';
+      return `<li class="notif-item is-owner-msg${isUnread?' is-unread':''}" data-testid="notif-owner-msg-${esc(m.id)}"><span class="notif-icon" style="background:#2563eb;color:#fff;font-weight:800;font-size:14px;"><i data-lucide="mail" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(m.title||t('owner.default-title','Pesan Tim Fiezel'))}</b><small>${m.sender==='owner'?t('owner.dev-team','Tim Pengembang'):t('owner.your-reply','Balasan Kamu')}${gemBadge}</small>${time}</div><button type="button" class="notif-cta" onclick="openOwnerMessageModal('${esc(m.id)}')" style="background:#2563eb;color:#fff;">${t('owner.open-reply','Buka & Balas')}</button></li>`;
+    }).join('');
+  }
   return list;
 }
 let notifLoading=false;
@@ -22594,7 +22781,7 @@ function renderNotifSheet(){
   const requests=Array.isArray(notifCachedRequests)?notifCachedRequests:[];
   const social=notify?notify.inbox():[];
   const invite=socialPendingInvite();
-  const total=teacher.length+requests.length+social.length+(invite?1:0);
+  const total=teacher.length+requests.length+social.length+(invite?1:0)+(cachedOwnerMessages&&cachedOwnerMessages.length?cachedOwnerMessages.length:0);
   const list=renderNotifListMarkup(teacher,requests,social,invite);
   const loadingHtml=`<div class="notif-loading" data-testid="notif-loading"><span class="notif-spinner"></span><p style="font-size:13px;margin:0;font-weight:600;">${t('notif.loading','Memuat kabar terbaru...')}</p></div>`;
   const emptyHtml=`<p class="notif-empty" data-testid="notif-empty"><i data-lucide="bell-off" aria-hidden="true"></i>${t('notif.empty','Belum ada kabar. Tugas dari guru, teman baru, dan sorakan akan muncul di sini.')}</p>`;
@@ -22647,7 +22834,8 @@ async function openNotifications(){
     await Promise.allSettled([
       inboxPoll(true),
       socialNotifyPoll(true),
-      refreshFriendRequestCount(true)
+      refreshFriendRequestCount(true),
+      pollOwnerMessages(true)
     ]);
   }catch(_){}
   finally{
@@ -22679,7 +22867,7 @@ function openAssignmentFromNotif(id){
   if(state.view!=='learn')go('learn');
   return true;
 }
-function notifMarkAllRead(){try{inboxCore()?.markAllRead()}catch(_){}try{socialNotifyCore()?.markAllRead()}catch(_){}closeModal();refreshNotifBadge();return true}
+function notifMarkAllRead(){try{inboxCore()?.markAllRead()}catch(_){}try{socialNotifyCore()?.markAllRead()}catch(_){}try{markOwnerMessagesRead()}catch(_){}closeModal();refreshNotifBadge();return true}
 async function inboxPoll(force){
   const inbox=inboxCore();if(!inbox)return null;
   let r=null;try{r=await inbox.poll(force)}catch(_){r=null}
@@ -22763,9 +22951,9 @@ function startNotifPolling(){
   try{
     document.addEventListener('visibilitychange',()=>{
       try{if(document.visibilityState!=='visible')return}catch(_){return}
-      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{checkPendingGemGrants()}catch(_){}
+      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{checkPendingGemGrants()}catch(_){};try{pollOwnerMessages()}catch(_){}
     });
-    self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){}});
+    self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{pollOwnerMessages()}catch(_){}});
     if(typeof BroadcastChannel!=='undefined'){
       const bc=new BroadcastChannel('fiezel-assignment-sync');
       bc.onmessage=(ev)=>{
@@ -22801,7 +22989,7 @@ function startNotifPolling(){
   try{refreshFriendRequestCount()}catch(_){}
   return true;
 }
-window.openNotifications=openNotifications;window.renderNotifSheet=renderNotifSheet;window.notifAcceptFriend=notifAcceptFriend;window.notifRejectFriend=notifRejectFriend;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;window.checkPendingGemGrants=checkPendingGemGrants;window.showGemRewardModal=showGemRewardModal;
+window.openNotifications=openNotifications;window.renderNotifSheet=renderNotifSheet;window.notifAcceptFriend=notifAcceptFriend;window.notifRejectFriend=notifRejectFriend;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;window.checkPendingGemGrants=checkPendingGemGrants;window.showGemRewardModal=showGemRewardModal;window.pollOwnerMessages=pollOwnerMessages;window.openOwnerMessageModal=openOwnerMessageModal;window.sendOwnerMessageReply=sendOwnerMessageReply;window.markOwnerMessagesRead=markOwnerMessagesRead;
 /* ---------------------------------------------------------------- LAPIS AKUN (§21/§22/§27) */
 /**
  * Lembar akun: masuk, daftar, dan aktivasi guru. SATU lembar tiga mode, bukan tiga layar —

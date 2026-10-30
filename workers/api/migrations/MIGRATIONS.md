@@ -119,6 +119,8 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0017_social_friend_id
 wrangler d1 execute fiezel-core --remote --file=migrations/0018_quota_ai_chat.sql
 # --- fiezel-core: tabel injeksi dan klaim reward GEM per-murid dari server ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0019_gem_grant.sql
+# --- fiezel-core: sistem pesan 2-arah antara Owner dan Murid + lampiran GEM ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0020_owner_learner_messages.sql
 ```
 
 `0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,
