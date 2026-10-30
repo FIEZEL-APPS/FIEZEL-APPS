@@ -17245,8 +17245,8 @@ function quizLoop(cfg){
   // hanya pada giliran retry (saat tutor benar-benar menahan); gerak halus dihormati lewat
   // gerbang ganda prefers-reduced-motion + preferensi app (pola yang sama dengan quizLoop).
   if(retry)try{
-   const scrollTarget=host||document.getElementById('quizScaffoldNudge');
-   scrollTarget.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'});
+   const scrollTarget=document.getElementById('quizScaffoldNudge');
+   if(scrollTarget)scrollTarget.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'});
   }catch{}
   enhanceUI();
  };
@@ -17364,6 +17364,10 @@ function quizLoop(cfg){
          <i data-lucide="rotate-ccw"></i>
          <span>${esc(FiezelI18n.t('quiz.coba-lagi-btn','Coba Lagi'))}</span>
        </button>
+       <button type="button" id="tutorModalGiveUpBtn" class="tutor-modal-giveup-btn">
+         <i data-lucide="help-circle"></i>
+         <span>${esc(FiezelI18n.t('quiz.retry-giveup-btn','Buka Pembahasan'))}</span>
+       </button>
      </div>
    </div>`;
 
@@ -17380,12 +17384,31 @@ function quizLoop(cfg){
      },220);
    };
 
-   backdrop.onclick=dismissModal;
-   modal.querySelector('#tutorModalCloseX').onclick=dismissModal;
-   modal.querySelector('#tutorModalRetryBtn').onclick=()=>{
-     haptic('tap');
-     dismissModal();
+   const bindModalBtn=(el,handler)=>{
+     if(!el)return;
+     let handled=false;
+     el.ontouchend=(e)=>{
+       handled=true;
+       e.stopPropagation();
+       e.preventDefault();
+       haptic('tap');
+       handler();
+     };
+     el.onclick=(e)=>{
+       if(handled){handled=false;return;}
+       e.stopPropagation();
+       haptic('tap');
+       handler();
+     };
    };
+
+   backdrop.onclick=dismissModal;
+   bindModalBtn(modal.querySelector('#tutorModalCloseX'),dismissModal);
+   bindModalBtn(modal.querySelector('#tutorModalRetryBtn'),dismissModal);
+   bindModalBtn(modal.querySelector('#tutorModalGiveUpBtn'),()=>{
+     dismissModal();
+     reveal(questionObj,lastPickIndex,false,{forced:true});
+   });
 
    enhanceUI();
   };
@@ -18171,6 +18194,7 @@ function quizLoop(cfg){
    const turn=tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing,{session:tutor,similar:mirip});
    showQuizFloatingRetry(q,j);
    speak(turn,{retry:true,similar:!!mirip});
+   showTutorHintModal(q,j,hintClueReason||nudgeText);
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
    enhanceUI();
    return;
