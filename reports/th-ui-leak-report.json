@@ -1,21 +1,21 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-30T13:45:02.615Z",
+  "generatedAt": "2026-10-30T14:25:01.361Z",
   "files": {
     "app.js": {
       "leaks": 3,
       "budget": 3,
       "sample": [
         {
-          "line": 12319,
+          "line": 12330,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 13218,
+          "line": 13230,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 14099,
+          "line": 14111,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         }
       ]
