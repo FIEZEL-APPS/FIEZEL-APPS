@@ -8555,7 +8555,8 @@ function afterOnboardingExit(action){
     state.placementDone = true;
     state.placementBandLevel = 1;
     state.streak = Math.max(Number(state.streak)||0, 1);
-    state.gems = (Number(state.gems)||0) + 15;
+    const prevGemBal = (state.gems && typeof state.gems.balance === 'number') ? state.gems.balance : ((typeof state.gems === 'number' && !Number.isNaN(state.gems)) ? state.gems : 120);
+    state.gems = { balance: prevGemBal + 15 };
     save();
     try { render(); } catch (_) {}
     if (!appOpened) openApp();
@@ -8571,6 +8572,15 @@ function afterOnboardingExit(action){
   // Peran dari perkenalan: hanya guru terverifikasi yang mendarat di Tutor Action Center.
   // Pengguna tanpa kode undangan diarahkan ke modal aktivasi guru.
   if(action==='home'){try{const role=self.FiezelOnboarding?.storedRole?.(self)||'murid';const verified=isVerifiedTeacher();if(role==='guru'&&!verified){showToast('Akses Guru memerlukan kode undangan resmi.');setTimeout(()=>{try{openFiezelAuthModal('teacher')}catch{}},420)}else{if(state.preferences?.role!==role){state.preferences={...state.preferences,role:verified?role:'murid'};save()}if(role==='guru'&&verified)setTimeout(()=>{try{go('tutor')}catch{}},420)}}catch{}}
+  if(action!=='placement'){
+    state.level=state.level||1;
+    if(state.placementDone===undefined)state.placementDone=true;
+    state.streak=Math.max(Number(state.streak)||0,1);
+    if(!state.gems||typeof state.gems!=='object'||typeof state.gems.balance!=='number'){
+      state.gems={balance:(typeof state.gems==='number'&&!Number.isNaN(state.gems))?state.gems:120};
+    }
+    save();
+  }
   if(!appOpened)openApp();
   if(action==='placement'){/* q19-P2a 2026-08-29: kalau gerbang akun sedang menutup layar, penempatan menunggu lewat pendingAfterGate (jalur 'placement' setelah gate selesai) — memulai kuis di balik gerbang membuat pushLayer ditolak dan mode lesson tidak pernah menyala. */if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>startPlacement();/* v38 2026-08-29: cabang defensif ini dulu memarkir niat di pendingAfterGate yang tak pernah dikonsumsi setelah gerbang turun — sekarang lewat jalur generik runPendingAfterGateFn. */return}pendingAfterGate=null;startPlacement();return}
   if(action==='classroom'){go('classroom');return}
@@ -8621,6 +8631,7 @@ function startWelcomeExperience(){
       bootAuthVerdictUsed=true;
       if(bootAuth==='signed-out'){forgetLocalAuth();showAuthGate(at,proceed);return null}
       followUpAuthCheck(bootAuth);
+      try{onboardingDone=self.FiezelOnboarding?.completed?.(self)!==false}catch{}
       if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
       if(askLearnerNameIfMissing(at))return null;
       maybeSyncLearnerName(at);
@@ -9394,13 +9405,6 @@ function authGateNeeded(){
     }catch(_){}
     return false;
   }
-  /* m025-704 / AGENTS.md Rule 7: Zero-Modal Collision & First-Touch Serenity
-     Murid baru (onboarding belum selesai) WAJIB menikmati pengalaman selamat datang & latihan pertama dulu. */
-  try{
-    if(self.FiezelOnboarding && typeof self.FiezelOnboarding.completed === 'function' && !self.FiezelOnboarding.completed(self)){
-      return false;
-    }
-  }catch(_){}
   const A=self.FiezelAuthScreen;
   if(!A||typeof A.show!=='function')return false;
   if(A.readSession(self))return false;
@@ -9445,21 +9449,27 @@ function showAuthGate(at,next){
            atau pengguna akun yang kembali. Mereka tidak boleh dipaksa mengulang onboarding 6 langkah
            (nama, kursus, tujuan, tes penempatan) di HP baru/sesudah keluar. Tandai onboarding selesai
            dan pastikan nama terisi agar langsung masuk ke Beranda (Homepage). */
+        const hasLocalProgress = Boolean(
+          state && (state.totalAnswered > 0 || state.placementDone || (Array.isArray(state.history) && state.history.length > 0))
+        );
         const isReturningStudent = role === 'murid' && (
           via === 'guest' ||
           via === 'local_bypass' ||
-          action === 'masuk' ||
-          (via === 'google' && action !== 'daftar') ||
-          isNew === false ||
-          (state && (state.totalAnswered > 0 || state.placementDone || (state.history && state.history.length > 0)))
+          (via === 'google' ? (isNew === false || hasLocalProgress) : (action === 'masuk' || isNew === false || hasLocalProgress))
         );
         if(isReturningStudent){
           const fallbackGName=gEmail?gEmail.split('@')[0].replace(/[._-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'';
           const finalName=String(state?.userName||h||fallbackGName||'').trim()||'Murid';
           if(!state.userName||state.userName===FALLBACK_LEARNER_NAME){
             state.userName=finalName;
-            save();
           }
+          state.level=state.level||1;
+          if(!state.placementDone)state.placementDone=true;
+          state.streak=Math.max(Number(state.streak)||0,1);
+          if(!state.gems||typeof state.gems!=='object'||typeof state.gems.balance!=='number'){
+            state.gems={balance:(typeof state.gems==='number'&&!Number.isNaN(state.gems))?state.gems:120};
+          }
+          save();
           try{
             const onbLocale=self.FiezelI18n?.getLocale?.()||state?.preferences?.learnerLocale||'id';
             const onbCourse=state?.preferences?.targetLang||'en';

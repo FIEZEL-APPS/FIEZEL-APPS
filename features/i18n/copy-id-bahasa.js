@@ -152,6 +152,8 @@
   I18N.registerCopy('id', {
     // Mitra Kaiwa (m025-596): nama fitur percakapan untuk kursus Jepang
     'kursus-ja.chat.nama': 'Mitra Kaiwa',
+    'kursus-ja.journey.goal-exam-label': 'Ujian Bahasa Jepang',
+    'kursus-ja.journey.goal-everyday-label': 'Bahasa Jepang harian',
     'kursus-ja.chat.nama-tag': '会話パートナー',
     'kursus-ja.chat.title': 'Mitra Kaiwa',
     'kursus-ja.chat.label': 'Mitra Kaiwa',

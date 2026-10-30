@@ -851,8 +851,28 @@
   // ---------------------------------------------------------------------------------------
   // Step 3: Goal Selection + CEFR self-report
   // ---------------------------------------------------------------------------------------
-  function goalMarkup(env, selectedGoal, selectedLevel) {
-    var goals = goalOptions(env);
+  function goalMarkup(env, selectedGoal, selectedLevel, selectedCourse) {
+    var activeCourse = selectedCourse ? normalizeCourse(selectedCourse) : storedCourse(env);
+    var goals = goalOptions(env).map(function (g) {
+      if (activeCourse !== 'ja') return g;
+      if (g.id === 'exam_foundation') {
+        var jaExam = T('kursus-ja.journey.goal-exam-label');
+        return {
+          id: g.id,
+          label: (jaExam && jaExam !== 'kursus-ja.journey.goal-exam-label') ? jaExam : g.label,
+          description: g.description
+        };
+      }
+      if (g.id === 'everyday') {
+        var jaDaily = T('kursus-ja.journey.goal-everyday-label');
+        return {
+          id: g.id,
+          label: (jaDaily && jaDaily !== 'kursus-ja.journey.goal-everyday-label') ? jaDaily : g.label,
+          description: g.description
+        };
+      }
+      return g;
+    });
     var cards = goals.map(function (g) {
       var selected = g.id === selectedGoal;
       return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
@@ -1320,7 +1340,7 @@
       else if (step === 1) html = nameMarkup(target, typedName);
       else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse, selectedKanaPref, selectedFurigana);
       else if (step === 2) html = carouselMarkup(target, slide);
-      else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel);
+      else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel, selectedCourse);
       else if (step === 4) html = placementMarkup(target);
       else if (step === 5) html = scheduleMarkup(target);
       else html = summaryMarkup(target, typedName, selectedGoal, selectedLevel, reduceMotion);
@@ -1859,6 +1879,7 @@
     scheduleMarkup: scheduleMarkup,
     summaryMarkup: summaryMarkup,
     completed: completed,
+    markCompleted: markCompleted,
     storedName: storedName,
     storedRole: storedRole,
     normalizeRole: normalizeRole,
