@@ -1,0 +1,31 @@
+{
+  "name": "FIEZEL Personal English OS",
+  "short_name": "FIEZEL",
+  "id": "/app/",
+  "start_url": "/app/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1B1418",
+  "theme_color": "#1B1418",
+  "description": "Ruang belajar bahasa adaptif FIEZEL: kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4).",
+  "icons": [
+    {
+      "src": "assets/brand/fiezel-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/brand/fiezel-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/brand/fiezel-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
