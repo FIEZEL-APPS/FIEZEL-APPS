@@ -103,9 +103,17 @@ concurrency:
 permissions:
   contents: read
 jobs:
-  quality:
+  # ==========================================================================
+  # ARSITEKTUR 5 MEJA PEMERIKSA PARALEL (m025-729)
+  # ==========================================================================
+  # Seluruh 100% gerbang mutu yang sebelumnya mengantre di satu runner (~9,5m)
+  # dibagi rata ke 5 runner paralel (quality-shard-1 s/d quality-shard-5) tanpa
+  # menghapus, men-skip, atau melunakkan SATU PUN tes. Job penutup `quality`
+  # mempertahankan nama status check wajib GitHub Branch Protection ("quality")
+  # dan hanya hijau bila KELIMA meja lulus 100%.
+  quality-shard-1:
+    name: 'Meja 1 — Syntax, Release Audit & Content'
     runs-on: ubuntu-latest
-
     # ======================================================================
     # KENAPA ADA BATAS WAKTU — DAN KENAPA ANGKANYA 45
     # ======================================================================
@@ -148,8 +156,7 @@ jobs:
     #
     # Yang MENEGAKKAN keberadaan batas ini di seluruh workflow:
     # `tests/workflow-timeout-gate-test.js`.
-    timeout-minutes: 45
-
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -180,14 +187,11 @@ jobs:
       # FINAL-AUDIT-REPORT.json yang baru saja ditulisnya.
       - name: Release audit (Python)
         run: python3 release-audit.py
-      - name: Core validation
+      - name: 'Core validation (Shard 1/4)'
         env:
-          # Memberi izin kepada tests/release-audit-gate-test.js untuk memakai ulang laporan dari step
-          # di atas alih-alih menjalankan audit menit-menitan dua kali. Gerbang itu TIDAK percaya
-          # pada flag ini sendirian: ia memverifikasi sha256 app.js + version di dalam laporan
-          # cocok dengan berkas kerja saat ini, dan menjalankan auditnya sendiri kalau tidak.
           FIEZEL_RELEASE_AUDIT_REPORT_FRESH: '1'
         run: |
+          node tests/release-audit-gate-test.js
           node validator.js
           node tests/regression-test.js
           node content-audit.js
@@ -397,6 +401,23 @@ jobs:
           node tests/kurikulum-integritas-test.js
           node tests/teacher-demo-preview-test.js
           node tests/progress-sync-test.js
+
+  quality-shard-2:
+    name: 'Meja 2 — Core UI, PWA & Braincore A'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+      - name: 'Core validation (Shard 2/4)'
+        run: |
           node tests/kelas-tanpa-hp-test.js
           node tests/rapor-kktp-test.js
           node tests/tka-membaca-test.js
@@ -618,6 +639,23 @@ jobs:
           node tests/pwa-standalone-ecosystem-test.js
           node tests/critical-surface-protection-test.js
           node tests/collateral-scope-guard-test.js
+
+  quality-shard-3:
+    name: 'Meja 3 — Core UX, Voice & Cloudflare Harness'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+      - name: 'Core validation (Shard 3/4)'
+        run: |
           # m025-492: kartu pembaruan membaca coordination/BUILD-VERSION.json sebagai sinyal
           # UTAMA. Gerbang ini menegakkan bahwa jalur aset cangkang yang cache-first tidak
           # pernah membekukan penanda itu: jaringan selalu ditempuh, salinan tidak ditulis,
@@ -902,7 +940,23 @@ jobs:
           # baru dan membuat CI merah karena jaringan, bukan karena kode. Cara
           # menjalankannya ada di reports/add-a5-e2e.md dan tools/cf-live-runner.md.
           node tests/e2e-bridge-selftest.js
-          node tests/release-audit-gate-test.js
+
+  quality-shard-4:
+    name: 'Meja 4 — Governance, Deploy, Jepang & Kurikulum'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+      - name: 'Core validation (Shard 4/4)'
+        run: |
           node tests/cf-transport-test.js
           # Kill switch server (`GET /api/config`): penggabungan AND (server hanya bisa
           # mematikan), protokol 1.7 wajib cocok, cermin maks 5 menit di sessionStorage,
@@ -1032,121 +1086,6 @@ jobs:
       # keduanya berjalan sungguhan dan MERAH kalau kontraknya patah — gerbangnya sendiri
       # yang menegakkan itu (`tests/cf-live-contract-test.js` exit 1 pada assert gagal;
       # `tests/staging-live-test.js` exit 1 bahkan bila base URL diisi tapi tidak sah).
-      - name: 'CF live contract gate (SKIP kecuali workflow_dispatch dengan cf_live_base)'
-        # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
-        # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
-        # Yang perlu dijaga hanya DUA langkah yang bisa menembak sistem hidup dan
-        # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
-        # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
-        # penyakitnya. (Temuan tests/workflow-actor-gate-test.js, 28 Agu 2026.)
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
-        env:
-          # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
-          # TIDAK ADA nilai bawaan berupa URL di sini, dan itu diperiksa oleh
-          # `tests/no-network-test.js`: satu `|| 'https://…'` akan mengubah CI publik menjadi
-          # penembak produksi pada setiap push.
-          FIEZEL_CF_LIVE_BASE: ${{ github.event.inputs.cf_live_base }}
-          # Laporan diarahkan keluar dari working tree (gerbang lain memeriksa pohon tetap
-          # bersih) dan ke tempat yang bisa diunggah sebagai artefak.
-          FIEZEL_CF_LIVE_REPORT: ${{ runner.temp }}/CF-LIVE-REPORT.json
-        run: |
-          if [ -z "${FIEZEL_CF_LIVE_BASE}" ]; then
-            echo '::notice title=tests/cf-live-contract-test.js SKIP::FIEZEL_CF_LIVE_BASE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
-            {
-              echo '### tests/cf-live-contract-test.js — **SKIP** (bukan PASS)'
-              echo ''
-              echo 'Alasan: `FIEZEL_CF_LIVE_BASE` tidak diset, jadi tidak ada Worker hidup untuk diuji.'
-              echo 'Yang BELUM terbukti pada jalan ini: rute terpasang di edge, `Set-Cookie fz_id` lolos utuh'
-              echo 'melewati Cloudflare, `ALLOWED_ORIGINS`/`COOKIE_DOMAIN` benar-benar ter-deploy, cap byte'
-              echo 'ditegakkan sebelum body dibaca. Semua itu saat ini hanya diuji di atas stub.'
-              echo ''
-              echo 'Cara menjalankannya: Actions → FIEZEL Quality Gate → Run workflow → isi `cf_live_base`.'
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "Menjalankan gerbang live SUNGGUHAN terhadap ${FIEZEL_CF_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
-            echo "### tests/cf-live-contract-test.js — dijalankan terhadap \`${FIEZEL_CF_LIVE_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          node tests/cf-live-contract-test.js --report
-      - name: 'Staging live gate (SKIP kecuali workflow_dispatch dengan staging_base)'
-        # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
-        # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
-        # Yang perlu dijaga hanya DUA langkah yang bisa menembak sistem hidup dan
-        # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
-        # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
-        # penyakitnya. (Temuan tests/workflow-actor-gate-test.js, 28 Agu 2026.)
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
-        env:
-          FIEZEL_STAGING_BASE: ${{ github.event.inputs.staging_base }}
-          # Rahasia header jembatan HANYA boleh datang dari repository secret, tidak
-          # pernah dari berkas di repo dan tidak pernah dari input yang terlihat di UI.
-          # Kalau secret-nya belum dipasang, nilainya kosong dan gerbangnya SKIP.
-          FIEZEL_STAGING_EDGE: ${{ secrets.FIEZEL_STAGING_EDGE }}
-        run: |
-          if [ -z "${FIEZEL_STAGING_BASE}" ] || [ -z "${FIEZEL_STAGING_EDGE}" ]; then
-            echo '::notice title=tests/staging-live-test.js SKIP::FIEZEL_STAGING_BASE dan/atau secret FIEZEL_STAGING_EDGE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini.'
-            {
-              echo '### tests/staging-live-test.js — **SKIP** (bukan PASS)'
-              echo ''
-              echo 'Alasan: `FIEZEL_STAGING_BASE` dan/atau secret `FIEZEL_STAGING_EDGE` tidak terisi.'
-              echo 'Gerbang ini MENULIS state (kuota harian, objek audio, baris analytics), jadi ia hanya boleh'
-              echo 'menembak lingkungan staging yang terpisah dari data murid — dan ia menolak berjalan kalau'
-              echo '`/health` tidak mengaku staging.'
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "Menjalankan gerbang staging SUNGGUHAN terhadap ${FIEZEL_STAGING_BASE} (dipilih manual lewat workflow_dispatch)."
-            echo "### tests/staging-live-test.js — dijalankan terhadap \`${FIEZEL_STAGING_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          node tests/staging-live-test.js
-      - name: 'AI live verify (SKIP kecuali workflow_dispatch dengan ai_live_base)'
-        # Penjaga aktor per-LANGKAH, alasannya sama dengan dua langkah live di atas —
-        # dengan satu tambahan yang khas langkah ini: ia MEMBELANJAKAN UANG. Setiap
-        # tipe task adalah satu panggilan Workers AI sungguhan, dan jatah neuron itu
-        # milik AKUN, bukan per-pemicu. Kalau langkah ini pernah jalan tiap push, satu
-        # PR ramai bisa menghabiskan jatah harian akun dan mematikan AI untuk murid.
-        # `tests/no-network-test.js` blok 2d memeriksa dari sisi lain bahwa langkah ini hanya
-        # ada dalam bentuk bergerbang aktor + workflow_dispatch.
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
-        env:
-          # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
-          FIEZEL_AI_LIVE_BASE: ${{ github.event.inputs.ai_live_base }}
-          FIEZEL_AI_LIVE_REPORT: ${{ runner.temp }}/AI-LIVE-REPORT.json
-        run: |
-          if [ -z "${FIEZEL_AI_LIVE_BASE}" ]; then
-            echo '::notice title=ai-live-verify SKIP::FIEZEL_AI_LIVE_BASE kosong — kontrak AI Cloudflare TIDAK diuji terhadap model sungguhan pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
-            {
-              echo '### tools/ai-live-verify.mjs — **SKIP** (bukan PASS)'
-              echo ''
-              echo 'Alasan: `FIEZEL_AI_LIVE_BASE` tidak diset. Langkah ini berbayar, jadi ia mati secara bawaan.'
-              echo 'Yang BELUM terbukti pada jalan ini: model Workers AI sungguhan menjawab, jawabannya LOLOS'
-              echo 'kontrak mutu kami dan sampai ke murid (bukan diganti fallback), kedua bentuk jawaban provider'
-              echo 'terbaca di runtime nyata, dan `quotaCharged` benar sebagai FAKTA — jatah di `/api/quota` naik'
-              echo 'tepat sebanyak jawaban provider yang sukses. Semua itu saat ini hanya diuji di atas stub.'
-              echo ''
-              echo 'Cara menjalankannya: Actions → FIEZEL Quality Gate → Run workflow → isi `ai_live_base`.'
-              echo 'Biaya sekali jalan: ±US$0.002 dan ±244 neuron; batasi dengan `FIEZEL_AI_LIVE_TASKS`.'
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "Menjalankan pembukti AI live SUNGGUHAN terhadap ${FIEZEL_AI_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
-            echo "### tools/ai-live-verify.mjs — dijalankan terhadap \`${FIEZEL_AI_LIVE_BASE}\` (BERBAYAR)" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          node tools/ai-live-verify.mjs --report
-      - name: 'Bukti gerbang live (artefak — supaya hasilnya bisa DIBACA, bukan hanya hijau)'
-        # Kenapa langkah ini ada: kedua gerbang live di atas menghasilkan bukti terkaya di
-        # seluruh workflow ini — assert per assert terhadap sistem yang sungguhan hidup —
-        # lalu bukti itu tenggelam di tengah log job yang panjang, di belakang keluaran
-        # simulasi adaptivitas yang berukuran puluhan ribu baris. Centang hijau BUKAN bukti:
-        # ia tidak memberi tahu assert mana yang lulus, berapa panggilan model yang terjadi,
-        # atau berapa kuota yang terpakai. Audit rilis 30 Agu 2026 tersandung persis di situ.
-        # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
-        if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
-        uses: actions/upload-artifact@v4
-        with:
-          name: fiezel-bukti-live
-          path: |
-            ${{ runner.temp }}/CF-LIVE-REPORT.json
-            ${{ runner.temp }}/AI-LIVE-REPORT.json
-          if-no-files-found: ignore
-          retention-days: 30
       - name: 'Gerbang hulu yang sempat tidak terdaftar (braincore fase 2 + lapisan game/UX)'
         # Ditemukan tests/gate-registry-test.js saat merge 28 Agu 2026: lima belas berkas uji
         # mendarat bersama braincore fase 2 dan lapisan game/UX tanpa pernah dipanggil CI.
@@ -1316,6 +1255,136 @@ jobs:
         # dengan token FZG- di PR #428. Gerbang menuntut ketiga lapisnya bersama: endpoint,
         # pengikat klien, dan kendali di konsol yang penangan aksinya benar-benar ada.
         run: node tests/curriculum-seed-reachable-test.js
+
+  quality-shard-5:
+    name: 'Meja 5 — Jepang Surface, Wave Simulators & Live Gates'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+      - name: 'CF live contract gate (SKIP kecuali workflow_dispatch dengan cf_live_base)'
+        # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
+        # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
+        # Yang perlu dijaga hanya DUA langkah yang bisa menembak sistem hidup dan
+        # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
+        # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
+        # penyakitnya. (Temuan tests/workflow-actor-gate-test.js, 28 Agu 2026.)
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        env:
+          # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
+          # TIDAK ADA nilai bawaan berupa URL di sini, dan itu diperiksa oleh
+          # `tests/no-network-test.js`: satu `|| 'https://…'` akan mengubah CI publik menjadi
+          # penembak produksi pada setiap push.
+          FIEZEL_CF_LIVE_BASE: ${{ github.event.inputs.cf_live_base }}
+          # Laporan diarahkan keluar dari working tree (gerbang lain memeriksa pohon tetap
+          # bersih) dan ke tempat yang bisa diunggah sebagai artefak.
+          FIEZEL_CF_LIVE_REPORT: ${{ runner.temp }}/CF-LIVE-REPORT.json
+        run: |
+          if [ -z "${FIEZEL_CF_LIVE_BASE}" ]; then
+            echo '::notice title=tests/cf-live-contract-test.js SKIP::FIEZEL_CF_LIVE_BASE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
+            {
+              echo '### tests/cf-live-contract-test.js — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_CF_LIVE_BASE` tidak diset, jadi tidak ada Worker hidup untuk diuji.'
+              echo 'Yang BELUM terbukti pada jalan ini: rute terpasang di edge, `Set-Cookie fz_id` lolos utuh'
+              echo 'melewati Cloudflare, `ALLOWED_ORIGINS`/`COOKIE_DOMAIN` benar-benar ter-deploy, cap byte'
+              echo 'ditegakkan sebelum body dibaca. Semua itu saat ini hanya diuji di atas stub.'
+              echo ''
+              echo 'Cara menjalankannya: Actions → FIEZEL Quality Gate → Run workflow → isi `cf_live_base`.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan gerbang live SUNGGUHAN terhadap ${FIEZEL_CF_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### tests/cf-live-contract-test.js — dijalankan terhadap \`${FIEZEL_CF_LIVE_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node tests/cf-live-contract-test.js --report
+      - name: 'Staging live gate (SKIP kecuali workflow_dispatch dengan staging_base)'
+        # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
+        # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
+        # Yang perlu dijaga hanya DUA langkah yang bisa menembak sistem hidup dan
+        # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
+        # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
+        # penyakitnya. (Temuan tests/workflow-actor-gate-test.js, 28 Agu 2026.)
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        env:
+          FIEZEL_STAGING_BASE: ${{ github.event.inputs.staging_base }}
+          # Rahasia header jembatan HANYA boleh datang dari repository secret, tidak
+          # pernah dari berkas di repo dan tidak pernah dari input yang terlihat di UI.
+          # Kalau secret-nya belum dipasang, nilainya kosong dan gerbangnya SKIP.
+          FIEZEL_STAGING_EDGE: ${{ secrets.FIEZEL_STAGING_EDGE }}
+        run: |
+          if [ -z "${FIEZEL_STAGING_BASE}" ] || [ -z "${FIEZEL_STAGING_EDGE}" ]; then
+            echo '::notice title=tests/staging-live-test.js SKIP::FIEZEL_STAGING_BASE dan/atau secret FIEZEL_STAGING_EDGE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini.'
+            {
+              echo '### tests/staging-live-test.js — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_STAGING_BASE` dan/atau secret `FIEZEL_STAGING_EDGE` tidak terisi.'
+              echo 'Gerbang ini MENULIS state (kuota harian, objek audio, baris analytics), jadi ia hanya boleh'
+              echo 'menembak lingkungan staging yang terpisah dari data murid — dan ia menolak berjalan kalau'
+              echo '`/health` tidak mengaku staging.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan gerbang staging SUNGGUHAN terhadap ${FIEZEL_STAGING_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### tests/staging-live-test.js — dijalankan terhadap \`${FIEZEL_STAGING_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node tests/staging-live-test.js
+      - name: 'AI live verify (SKIP kecuali workflow_dispatch dengan ai_live_base)'
+        # Penjaga aktor per-LANGKAH, alasannya sama dengan dua langkah live di atas —
+        # dengan satu tambahan yang khas langkah ini: ia MEMBELANJAKAN UANG. Setiap
+        # tipe task adalah satu panggilan Workers AI sungguhan, dan jatah neuron itu
+        # milik AKUN, bukan per-pemicu. Kalau langkah ini pernah jalan tiap push, satu
+        # PR ramai bisa menghabiskan jatah harian akun dan mematikan AI untuk murid.
+        # `tests/no-network-test.js` blok 2d memeriksa dari sisi lain bahwa langkah ini hanya
+        # ada dalam bentuk bergerbang aktor + workflow_dispatch.
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        env:
+          # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
+          FIEZEL_AI_LIVE_BASE: ${{ github.event.inputs.ai_live_base }}
+          FIEZEL_AI_LIVE_REPORT: ${{ runner.temp }}/AI-LIVE-REPORT.json
+        run: |
+          if [ -z "${FIEZEL_AI_LIVE_BASE}" ]; then
+            echo '::notice title=ai-live-verify SKIP::FIEZEL_AI_LIVE_BASE kosong — kontrak AI Cloudflare TIDAK diuji terhadap model sungguhan pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
+            {
+              echo '### tools/ai-live-verify.mjs — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_AI_LIVE_BASE` tidak diset. Langkah ini berbayar, jadi ia mati secara bawaan.'
+              echo 'Yang BELUM terbukti pada jalan ini: model Workers AI sungguhan menjawab, jawabannya LOLOS'
+              echo 'kontrak mutu kami dan sampai ke murid (bukan diganti fallback), kedua bentuk jawaban provider'
+              echo 'terbaca di runtime nyata, dan `quotaCharged` benar sebagai FAKTA — jatah di `/api/quota` naik'
+              echo 'tepat sebanyak jawaban provider yang sukses. Semua itu saat ini hanya diuji di atas stub.'
+              echo ''
+              echo 'Cara menjalankannya: Actions → FIEZEL Quality Gate → Run workflow → isi `ai_live_base`.'
+              echo 'Biaya sekali jalan: ±US$0.002 dan ±244 neuron; batasi dengan `FIEZEL_AI_LIVE_TASKS`.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan pembukti AI live SUNGGUHAN terhadap ${FIEZEL_AI_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### tools/ai-live-verify.mjs — dijalankan terhadap \`${FIEZEL_AI_LIVE_BASE}\` (BERBAYAR)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node tools/ai-live-verify.mjs --report
+      - name: 'Bukti gerbang live (artefak — supaya hasilnya bisa DIBACA, bukan hanya hijau)'
+        # Kenapa langkah ini ada: kedua gerbang live di atas menghasilkan bukti terkaya di
+        # seluruh workflow ini — assert per assert terhadap sistem yang sungguhan hidup —
+        # lalu bukti itu tenggelam di tengah log job yang panjang, di belakang keluaran
+        # simulasi adaptivitas yang berukuran puluhan ribu baris. Centang hijau BUKAN bukti:
+        # ia tidak memberi tahu assert mana yang lulus, berapa panggilan model yang terjadi,
+        # atau berapa kuota yang terpakai. Audit rilis 30 Agu 2026 tersandung persis di situ.
+        # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
+        if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiezel-bukti-live
+          path: |
+            ${{ runner.temp }}/CF-LIVE-REPORT.json
+            ${{ runner.temp }}/AI-LIVE-REPORT.json
+          if-no-files-found: ignore
+          retention-days: 30
       - name: 'Kontrak pemasangan backend: env lengkap, CORS tertutup, lifespan tertutupi'
         # Backend backend/ dipasang permanen di cPanel, dan tiga cacat di jalur itu semuanya
         # GAGAL DALAM DIAM - API menjawab 200 sementara yang penting tidak terjadi. Diukur,
@@ -1474,3 +1543,33 @@ jobs:
         # `if: always()` disengaja: jalan yang MERAH justru yang paling perlu dibaca.
         if: always() && github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
         run: node tools/print-live-evidence.mjs "$RUNNER_TEMP/CF-LIVE-REPORT.json" "$RUNNER_TEMP/AI-LIVE-REPORT.json"
+
+
+  quality:
+    name: 'quality'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [quality-shard-1, quality-shard-2, quality-shard-3, quality-shard-4, quality-shard-5]
+    if: always()
+    steps:
+      - name: 'Verifikasi kelulusan 100% dari kelima meja pemeriksa paralel'
+        shell: bash
+        run: |
+          s1="${{ needs.quality-shard-1.result }}"
+          s2="${{ needs.quality-shard-2.result }}"
+          s3="${{ needs.quality-shard-3.result }}"
+          s4="${{ needs.quality-shard-4.result }}"
+          s5="${{ needs.quality-shard-5.result }}"
+          {
+            echo "### Rekap 5 Meja Pemeriksa Paralel (FIEZEL Quality Gate)"
+            echo "- Meja 1 (Syntax, Release Audit & Content): **$s1**"
+            echo "- Meja 2 (Core UI, PWA & Braincore A): **$s2**"
+            echo "- Meja 3 (Core UX, Voice & CF Harness): **$s3**"
+            echo "- Meja 4 (Governance, Deploy, Jepang & Kurikulum): **$s4**"
+            echo "- Meja 5 (Jepang Surface, Simulators & Live Gates): **$s5**"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$s1" != "success" ] || [ "$s2" != "success" ] || [ "$s3" != "success" ] || [ "$s4" != "success" ] || [ "$s5" != "success" ]; then
+            echo "::error::Salah satu meja pemeriksa gagal atau dibatalkan ($s1, $s2, $s3, $s4, $s5)."
+            exit 1
+          fi
+          echo "KELIMA MEJA PEMERIKSA LULUS 100% HIJAU."

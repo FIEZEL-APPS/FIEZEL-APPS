@@ -9,9 +9,20 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
-import { chromium } from 'playwright';
+import { createRequire } from 'module';
 
 const rootDir = process.cwd();
+const req = createRequire(import.meta.url);
+let pwPkg = null;
+for (const cand of [
+  'playwright',
+  path.join(rootDir, 'node_modules/playwright'),
+  path.resolve(rootDir, '../fiezel-apps/node_modules/playwright')
+]) {
+  try { pwPkg = req(cand); break; } catch (_) {}
+}
+if (!pwPkg) throw new Error('playwright module not found in workspace or sibling fiezel-apps');
+const { chromium } = pwPkg;
 const artifactDir = process.env.ARTIFACT_DIR || 'C:/Users/hp/.gemini/antigravity/brain/4c759766-7170-46d2-b12f-2017cc49bf5f';
 
 // Load latest build version from single source of truth
@@ -119,10 +130,10 @@ async function main() {
 
   const page = await ctx.newPage();
 
-  // Abort slow external tracking/3rd party scripts to load instantly in < 2 seconds
+  // Abort slow external tracking/3rd party scripts & heavy ONNX models to load instantly in < 2 seconds
   await page.route('**/*', (route) => {
     const url = route.request().url();
-    if (url.includes('puter.com') || url.includes('google-analytics') || url.includes('googletagmanager') || url.includes('clarity.ms')) {
+    if (url.includes('puter.com') || url.includes('google-analytics') || url.includes('googletagmanager') || url.includes('clarity.ms') || url.endsWith('.onnx') || url.includes('/vendor/supertonic')) {
       return route.abort();
     }
     return route.continue();

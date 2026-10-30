@@ -9799,8 +9799,9 @@ header.topbar {
 }
 
 .fz-auth-google {
-  min-height: 38px !important;
-  height: 38px !important;
+  min-height: 44px !important;
+  height: auto !important;
+  position: relative !important;
 }
 
 .fz-auth-or {

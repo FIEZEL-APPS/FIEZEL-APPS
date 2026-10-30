@@ -1,7 +1,7 @@
 {
-  "version": "m025-728",
-  "claimedBy": "branch feat/stabilize-guardrails-m025-728",
-  "claimedAt": "2026-10-30T19:04:52.817Z",
-  "reason": "feat(stabilize-auth-pwa-ci): harden CI gates, collateral scope guard, and live PWA verification (m025-728)",
+  "version": "m025-729",
+  "claimedBy": "branch fix/auth-onboarding-ci-m025-729",
+  "claimedAt": "2026-10-30T20:21:15.093Z",
+  "reason": "fix(auth-onboarding-ci): restore auth-first boot, new-vs-returning onboarding, daylight UI, and 5-way parallel CI",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

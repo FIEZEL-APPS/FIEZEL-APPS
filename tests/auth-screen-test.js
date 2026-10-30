@@ -238,7 +238,15 @@ test('B6 skrip dimuat index.html sebelum app.js dan di-precache sw.js', () => {
 /* ------------------------------------------------------------------ C. Chromium */
 
 function loadPlaywright() {
-  for (const id of ['playwright', '/opt/node22/lib/node_modules/playwright', '/usr/lib/node_modules/playwright', '/usr/local/lib/node_modules/playwright']) {
+  const candidates = [
+    'playwright',
+    path.join(ROOT, 'node_modules/playwright'),
+    path.resolve(ROOT, '../fiezel-apps/node_modules/playwright'),
+    '/opt/node22/lib/node_modules/playwright',
+    '/usr/lib/node_modules/playwright',
+    '/usr/local/lib/node_modules/playwright'
+  ];
+  for (const id of candidates) {
     try { return require(id); } catch (_) {}
   }
   return null;
@@ -278,7 +286,11 @@ async function browserGates() {
   const origin = ORIGIN;
   async function open(url) {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
-    await ctx.route('**/*', (r) => (r.request().url().startsWith(origin + '/') ? r.fulfill(fromDisk(r.request().url())) : r.abort()));
+    await ctx.route('**/*', (r) => {
+      const u = r.request().url();
+      if (!u.startsWith(origin + '/') || u.endsWith('.onnx') || u.includes('/vendor/supertonic')) return r.abort();
+      return r.fulfill(fromDisk(u));
+    });
     const page = await ctx.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));

@@ -2668,30 +2668,61 @@ body.fz-lux .notification-panel,
   font-weight: 800 !important;
 }
 
-/* 6. ONBOARDING SHEETS (High Contrast Dark Theme for Mobile) */
+/* 6. ONBOARDING SHEETS (Daylight Porcelain & Travertine High-Contrast Mobile Theme) */
 @media (max-width: 767px) {
   .fiezel-sheet {
-    background: #14141E !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    color: #F8FAFC !important;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+    background: #FFFFFF !important;
+    border: 1.5px solid #E2E8F0 !important;
+    border-radius: 22px !important;
+    color: #0F172A !important;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08) !important;
+    padding: 20px 18px !important;
   }
 
   .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
   html body .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
   html body:not(.fz-teacher-mode) #app .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
   html body:not(.fz-teacher-mode) #app .fiezel-sheet:not(.fiezel-language-sheet) h2 {
-    color: #FFFFFF !important;
-    -webkit-text-fill-color: #FFFFFF !important;
+    color: #0F172A !important;
+    -webkit-text-fill-color: #0F172A !important;
     font-weight: 800 !important;
   }
 
   .fiezel-body {
-    color: #CBD5E1 !important;
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
   }
 
   .fiezel-note {
-    color: #94A3B8 !important;
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
+  }
+
+  .fiezel-ob .fiezel-course-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .fiezel-ob .fiezel-course-card {
+    padding: 12px 14px !important;
+    min-height: 60px !important;
+  }
+
+  .fiezel-ob .fiezel-course-text small {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.35 !important;
+    font-size: 0.78rem !important;
+  }
+
+  .fiezel-ob .fiezel-goal-card.is-selected {
+    padding-right: 34px !important;
+  }
+
+  .fiezel-ob .fiezel-goal-card b {
+    font-size: 0.84rem !important;
+    line-height: 1.25 !important;
   }
 }
 
@@ -2710,62 +2741,62 @@ html body:not(.fz-teacher-mode) #app .fiezel-language-sheet h2,
   font-weight: 800 !important;
 }
 
-/* Onboarding Carousel Pills (High Contrast Dark Cards) */
+/* Onboarding Carousel Pills (High Contrast Daylight Cards) */
 .fiezel-carousel-item {
-  background: #202030 !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
   border-radius: 14px !important;
-  color: #FFFFFF !important;
+  color: #0F172A !important;
   padding: 12px 14px !important;
 }
 
 .fiezel-carousel-item span {
-  color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
   font-weight: 700 !important;
 }
 
 .fiezel-carousel-item i,
 .fiezel-carousel-item .fiezel-glyph,
 .fiezel-carousel-item svg {
-  color: #F59E0B !important;
-  fill: #F59E0B !important;
+  color: #B45309 !important;
+  fill: #B45309 !important;
 }
 
 .fiezel-carousel-arrow {
-  background: #202030 !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
-  color: #FFFFFF !important;
+  background: #F8FAFC !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
 }
 
 .fiezel-carousel-arrow[disabled] {
-  background: #181824 !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: #64748B !important;
+  background: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  color: #94A3B8 !important;
   opacity: 0.6 !important;
 }
 
 .fiezel-language-kicker {
-  color: #FFE02E !important;
+  color: #8E3046 !important;
 }
 
 .fiezel-goal-choice {
-  background: #202030 !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #FFFFFF !important;
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #0F172A !important;
 }
 
 .fiezel-goal-choice.is-selected {
-  border-color: #FFE02E !important;
-  background: #2A2A40 !important;
+  border-color: #8E3046 !important;
+  background: #FDF2F4 !important;
 }
 
 .fiezel-goal-choice b {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
 .fiezel-goal-choice small {
-  color: #94A3B8 !important;
+  color: #475569 !important;
 }
 
 /* Onboarding Language Choice Cards (Centered, Tactile White Cards with High-Contrast Obsidian Text) */
@@ -2834,13 +2865,21 @@ button.fiezel-language-choice {
 }
 
 .fiezel-field input {
-  background: #202030 !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #FFFFFF !important;
+  background: #F8FAFC !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 14px !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+}
+
+.fiezel-field input::placeholder {
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
 }
 
 .fiezel-field span {
-  color: #CBD5E1 !important;
+  color: #334155 !important;
+  font-weight: 700 !important;
 }
 
 /* 7. Universal Primary Button High-Contrast */
@@ -3515,6 +3554,11 @@ fiezel-mascot:has(canvas) .fz-svg,
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+/* Instant 0ms & Reduced-Motion Official Daifuku Mochi Fallback in Onboarding */
+.fiezel-ob-mascot:not(:has(.fz-mochi-viewport canvas)) {
+  background: url('../../assets/brand/mochi-mascot-headset.png') center / contain no-repeat !important;
 }
 
 /* Home Cockpit & Onboarding: 3D Mochi companion allowed and active */
@@ -4908,6 +4952,11 @@ body.fz-app-open #fiezelBootSplash,
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+/* Instant 0ms & Reduced-Motion Official Daifuku Mochi Fallback in Onboarding */
+.fiezel-ob-mascot:not(:has(.fz-mochi-viewport canvas)) {
+  background: url('../../assets/brand/mochi-mascot-headset.png') center / contain no-repeat !important;
 }
 
 main.app,
