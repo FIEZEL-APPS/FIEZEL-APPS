@@ -1,7 +1,7 @@
 {
-  "version": "m025-717",
-  "claimedBy": "branch fix/mobile-boot-and-quiz-ui-m025-721",
-  "claimedAt": "2026-10-29T19:42:29.520Z",
-  "reason": "feat(quiz): in-quiz live mochi voice sos lifeline, auth login restoration, and luxury feedback sheet",
+  "version": "m025-718",
+  "claimedBy": "branch feat/remote-gem-inject-m025-722",
+  "claimedAt": "2026-10-30T10:06:43.994Z",
+  "reason": "feat(gems): remote gem inject, auto-claim protocol, and mochi celebration modal",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
