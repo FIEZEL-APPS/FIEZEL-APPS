@@ -27,9 +27,13 @@ const COPILOT_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-flash-lite', 'gemi
 const DEFAULT_CONSTRAINED_ENDPOINT =
   'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained';
 
-// Map in-memory untuk status cooldown kunci per worker instance
+// Map in-memory untuk status cooldown kunci per worker instance (Live Session)
 const _cooldownMap = new Map(); // key -> timestamp ms
 let _poolIndex = Math.floor(Math.random() * 16);
+
+// Terisolasi: status cooldown dan rotasi pool khusus Copilot agar tidak merebut kuota Live Voice
+const _copilotCooldownMap = new Map(); // key -> timestamp ms
+let _copilotPoolIndex = Math.floor(Math.random() * 16);
 
 function parseKeys(env) {
   const raw = String(env?.GEMINI_LIVE_KEYS || env?.GEMINI_API_KEY || '').trim();
@@ -292,12 +296,12 @@ async function invokeSingleGeminiJson({
     parentSignal?.removeEventListener('abort', onParentAbort);
 
     if (res.status === 429) {
-      _cooldownMap.set(key, Date.now() + 65000);
+      _copilotCooldownMap.set(key, Date.now() + 25000);
       return { ok: false, reason: `HTTP 429 (${model})` };
     }
     if (!res.ok) {
       if (res.status !== 404) {
-        _cooldownMap.set(key, Date.now() + 15000);
+        _copilotCooldownMap.set(key, Date.now() + 10000);
       }
       return { ok: false, reason: `HTTP ${res.status} (${model})` };
     }
@@ -309,7 +313,7 @@ async function invokeSingleGeminiJson({
     }
     const cleanedJson = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
     const parsed = JSON.parse(cleanedJson);
-    _cooldownMap.delete(key);
+    _copilotCooldownMap.delete(key);
     return { ok: true, parsed: Array.isArray(parsed) ? parsed[0] : parsed, model };
   } catch (err) {
     clearTimeout(timer);
@@ -323,14 +327,14 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
   const totalKeys = keys.length;
   const healthyKeys = [];
   for (let i = 0; i < totalKeys; i++) {
-    const idx = (_poolIndex + i) % totalKeys;
+    const idx = (_copilotPoolIndex + i) % totalKeys;
     const k = keys[idx];
-    if (now >= (_cooldownMap.get(k) || 0)) {
+    if (now >= (_copilotCooldownMap.get(k) || 0)) {
       healthyKeys.push(k);
     }
   }
   const activePool = healthyKeys.length > 0 ? healthyKeys : keys;
-  _poolIndex = (_poolIndex + 1) % totalKeys;
+  _copilotPoolIndex = (_copilotPoolIndex + 1) % totalKeys;
 
   const raceAbort = new AbortController();
   let lastReason = 'unknown';

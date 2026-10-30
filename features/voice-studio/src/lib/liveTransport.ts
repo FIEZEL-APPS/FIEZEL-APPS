@@ -366,7 +366,119 @@ export interface RealtimeCopilotAssistResult {
   cards: BeginnerReplyCard[];
 }
 
+const COPILOT_CACHE_MAX = 60;
 const _copilotTurnCache = new Map<string, RealtimeCopilotAssistResult>();
+function copilotCacheSet(key: string, value: RealtimeCopilotAssistResult): void {
+  if (_copilotTurnCache.has(key)) _copilotTurnCache.delete(key);
+  _copilotTurnCache.set(key, value);
+  while (_copilotTurnCache.size > COPILOT_CACHE_MAX) {
+    const oldest = _copilotTurnCache.keys().next().value;
+    if (oldest === undefined) break;
+    _copilotTurnCache.delete(oldest);
+  }
+}
+
+let _copilotServerCooldownUntil = 0;
+
+type CopilotIntent = 'yesno' | 'choice' | 'wh_where' | 'wh_what' | 'wh_why' | 'wh_how' | 'wh_when' | 'wh_who' | 'greeting' | 'statement';
+
+function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotIntent {
+  const s = aiText.toLowerCase();
+  if (targetLang === 'ja') {
+    if (/(こんにちは|おはよう|こんばんは|はじめまして|元気)/.test(s)) return 'greeting';
+    if (/どこ/.test(s)) return 'wh_where';
+    if (/(なに|何)/.test(s)) return 'wh_what';
+    if (/(なぜ|どうして)/.test(s)) return 'wh_why';
+    if (/(どう|どんな|どのように)/.test(s)) return 'wh_how';
+    if (/(いつ|何時)/.test(s)) return 'wh_when';
+    if (/(だれ|誰)/.test(s)) return 'wh_who';
+    if (/(それとも|どっち|どちら)/.test(s)) return 'choice';
+    if (/(か[？?]|ますか|ですか)/.test(s)) return 'yesno';
+    return 'statement';
+  }
+  if (/^(hi|hello|hey|good (morning|afternoon|evening)|nice to meet)/.test(s)) return 'greeting';
+  if (/\bor\b.*\?/.test(s)) return 'choice';
+  if (/\bwhere\b/.test(s)) return 'wh_where';
+  if (/\bwhy\b/.test(s)) return 'wh_why';
+  if (/\bhow\b/.test(s)) return 'wh_how';
+  if (/\bwhen\b/.test(s)) return 'wh_when';
+  if (/\bwho\b/.test(s)) return 'wh_who';
+  if (/\bwhat\b/.test(s)) return 'wh_what';
+  if (/^(do|does|did|are|is|was|were|can|could|would|will|have|has|should)\b.*\?/.test(s)) return 'yesno';
+  return 'statement';
+}
+
+function extractTopicWord(aiText: string, targetLang: TargetLang): string {
+  if (targetLang === 'ja') {
+    const m = aiText.match(/([一-龯ぁ-んァ-ン]{2,6})(?:は|が|を|に|について)/);
+    return m ? m[1] : '';
+  }
+  const stop = new Set(['the', 'a', 'an', 'your', 'you', 'do', 'does', 'did', 'what', 'where', 'how', 'why', 'when', 'who', 'is', 'are', 'about', 'like', 'this', 'that', 'there', 'here', 'today', 'and', 'or', 'to', 'of', 'in', 'on', 'for', 'with', 'it', 'me', 'my', 'we', 'so', 'any', 'some']);
+  const words = aiText.toLowerCase().replace(/[^a-z\s']/g, ' ').split(/\s+/).filter((w) => w.length > 3 && !stop.has(w));
+  return words.length ? words[words.length - 1] : '';
+}
+
+/**
+ * Fallback kontekstual lokal: dipakai HANYA bila jalur AI realtime gagal/timeout.
+ * Bukan template statis buta — bentuknya dipilih dari intent kalimat AI + topik yang terdeteksi,
+ * sehingga kartu tidak pernah kosong berapa pun jumlah giliran.
+ */
+export function buildContextualFallbackCards(params: {
+  aiText: string;
+  targetLang: TargetLang;
+  locale: LearnerLocale;
+  lastUserText?: string;
+}): BeginnerReplyCard[] {
+  const ai = stripEmojisAndEmotWords(params.aiText || '').trim();
+  const intent = detectAiIntent(ai, params.targetLang);
+  const topic = extractTopicWord(ai, params.targetLang);
+  const th = params.locale === 'th';
+  type Tpl = { easy: [string, string, string]; mission: [string, string, string]; rescue: [string, string, string] };
+  const EN: Record<CopilotIntent, Tpl> = {
+    greeting: { easy: ["Hi! I'm good, thanks.", 'hai, aim gud, teng-ks', 'Hai! Aku baik, terima kasih.'], mission: ["Hello! I'm doing great today. How about you?", 'helo, aim duing greit tudei. hau abaut yu?', 'Halo! Hari ini aku baik banget. Kamu gimana?'], rescue: ["I'm okay. And you, how's your day?", 'aim okei. end yu, haus yor dei?', 'Aku oke. Kamu sendiri, harimu gimana?'] },
+    yesno: { easy: ['Yes, I do.', 'yes, ai du', 'Ya, iya.'], mission: [`Yes, I really like ${topic || 'it'}.`, `yes, ai rili laik ${topic || 'it'}`, `Ya, aku suka banget ${topic || 'itu'}.`], rescue: ['Not really. Do you?', 'not rili. du yu?', 'Nggak terlalu. Kalau kamu?'] },
+    choice: { easy: ['The first one, please.', 'de ferst wan, pliz', 'Yang pertama saja.'], mission: ["I'd prefer the second one, actually.", 'aid prifer de sekend wan, ekcuali', 'Aku lebih pilih yang kedua sih.'], rescue: ["Hmm, I'm not sure. Which one do you like?", 'hm, aim not syur. wich wan du yu laik?', 'Hmm, aku belum yakin. Kamu suka yang mana?'] },
+    wh_where: { easy: ["I'm from Indonesia.", 'aim from indonisia', 'Aku dari Indonesia.'], mission: [`It's near my house, in the city center.`, 'its nir mai haus, in de siti senter', 'Dekat rumahku, di pusat kota.'], rescue: ['Near here. Where do you usually go?', 'nir hir. wer du yu yuzuali gou?', 'Dekat sini. Kamu biasanya ke mana?'] },
+    wh_what: { easy: [`I like ${topic || 'music'}.`, `ai laik ${topic || 'myuzik'}`, `Aku suka ${topic || 'musik'}.`], mission: [`My favorite is ${topic || 'coffee'}, because it makes me relax.`, `mai feivrit iz ${topic || 'kofi'}, bikoz it meiks mi rileks`, `Favoritku ${topic || 'kopi'}, karena bikin aku santai.`], rescue: ["That's a good question. What about you?", 'dets e gud kwesten. wat abaut yu?', 'Pertanyaan bagus. Kalau kamu?'] },
+    wh_why: { easy: ["Because it's fun.", 'bikoz its fan', 'Karena seru.'], mission: ['Because I want to talk with people from other countries.', 'bikoz ai wont tu tok wid pipel from ader kantris', 'Karena aku ingin ngobrol dengan orang dari negara lain.'], rescue: ["Honestly, I'm not sure yet. Why do you ask?", 'onestli, aim not syur yet. wai du yu ask?', 'Jujur aku belum yakin. Kenapa kamu tanya?'] },
+    wh_how: { easy: ['Pretty good.', 'priti gud', 'Lumayan baik.'], mission: ['I usually go by motorbike, it takes about twenty minutes.', 'ai yuzuali gou bai motorbaik, it teiks abaut twenti minits', 'Biasanya aku naik motor, sekitar dua puluh menit.'], rescue: ["It's a bit hard for me. How do you do it?", 'its e bit hard for mi. hau du yu du it?', 'Agak susah buatku. Kamu caranya gimana?'] },
+    wh_when: { easy: ['Usually in the morning.', 'yuzuali in de morning', 'Biasanya pagi hari.'], mission: ['Maybe this weekend, if the weather is nice.', 'meibi dis wikend, if de weder iz nais', 'Mungkin akhir pekan ini, kalau cuacanya bagus.'], rescue: ["I'm not sure yet. When is good for you?", 'aim not syur yet. wen iz gud for yu?', 'Belum pasti. Kapan yang cocok buat kamu?'] },
+    wh_who: { easy: ['My best friend.', 'mai best frend', 'Sahabatku.'], mission: ['Mostly my family and my classmates.', 'mostli mai femili end mai klasmeits', 'Kebanyakan keluargaku dan teman sekelas.'], rescue: ['Just me, actually. Who do you go with?', 'jast mi, ekcuali. hu du yu gou wid?', 'Cuma aku sih. Kamu biasanya sama siapa?'] },
+    statement: { easy: ['Oh, I see!', 'ou, ai si', 'Oh, begitu!'], mission: ["That sounds interesting. I didn't know that.", 'det saunds intresting. ai dident nou det', 'Kedengarannya menarik. Aku baru tahu.'], rescue: ['Really? Can you tell me more?', 'rili? ken yu tel mi mor?', 'Oh ya? Bisa cerita lebih banyak?'] },
+  };
+  const JA: Record<CopilotIntent, Tpl> = {
+    greeting: { easy: ['こんにちは！元気です。', 'konnichiwa! genki desu', 'Halo! Aku baik.'], mission: ['こんにちは。今日はとても元気です。あなたは？', 'konnichiwa. kyou wa totemo genki desu. anata wa?', 'Halo. Hari ini aku sehat sekali. Kamu?'], rescue: ['元気です。あなたはどうですか？', 'genki desu. anata wa dou desu ka?', 'Aku baik. Kamu bagaimana?'] },
+    yesno: { easy: ['はい、そうです。', 'hai, sou desu', 'Ya, benar.'], mission: [`はい、${topic || 'それ'}が大好きです。`, `hai, ${topic || 'sore'} ga daisuki desu`, `Ya, aku suka sekali ${topic || 'itu'}.`], rescue: ['いいえ、あまり。あなたは？', 'iie, amari. anata wa?', 'Tidak terlalu. Kalau kamu?'] },
+    choice: { easy: ['一つ目をお願いします。', 'hitotsume o onegai shimasu', 'Yang pertama, tolong.'], mission: ['二つ目のほうがいいです。', 'futatsume no hou ga ii desu', 'Yang kedua lebih baik.'], rescue: ['うーん、どちらがおすすめですか？', 'uun, dochira ga osusume desu ka?', 'Hmm, kamu rekomendasikan yang mana?'] },
+    wh_where: { easy: ['インドネシアから来ました。', 'indoneshia kara kimashita', 'Aku dari Indonesia.'], mission: ['家の近くの駅の前です。', 'ie no chikaku no eki no mae desu', 'Di depan stasiun dekat rumahku.'], rescue: ['この近くです。あなたはどこに行きますか？', 'kono chikaku desu. anata wa doko ni ikimasu ka?', 'Dekat sini. Kamu pergi ke mana?'] },
+    wh_what: { easy: [`${topic || '音楽'}が好きです。`, `${topic || 'ongaku'} ga suki desu`, `Aku suka ${topic || 'musik'}.`], mission: [`一番好きなのは${topic || 'コーヒー'}です。リラックスできますから。`, `ichiban suki na no wa ${topic || 'koohii'} desu. rirakkusu dekimasu kara`, `Yang paling kusuka ${topic || 'kopi'}, karena bisa santai.`], rescue: ['いい質問ですね。あなたは何が好きですか？', 'ii shitsumon desu ne. anata wa nani ga suki desu ka?', 'Pertanyaan bagus. Kamu suka apa?'] },
+    wh_why: { easy: ['楽しいからです。', 'tanoshii kara desu', 'Karena menyenangkan.'], mission: ['外国の人と話したいからです。', 'gaikoku no hito to hanashitai kara desu', 'Karena aku ingin bicara dengan orang asing.'], rescue: ['まだよく分かりません。どうしてですか？', 'mada yoku wakarimasen. doushite desu ka?', 'Aku belum tahu pasti. Kenapa?'] },
+    wh_how: { easy: ['まあまあです。', 'maamaa desu', 'Lumayan.'], mission: ['バイクで行きます。二十分ぐらいです。', 'baiku de ikimasu. nijuppun gurai desu', 'Aku naik motor, sekitar 20 menit.'], rescue: ['ちょっと難しいです。あなたはどうしますか？', 'chotto muzukashii desu. anata wa dou shimasu ka?', 'Agak sulit. Kamu bagaimana?'] },
+    wh_when: { easy: ['朝です。', 'asa desu', 'Pagi hari.'], mission: ['今週末、天気がよかったら。', 'konshuumatsu, tenki ga yokattara', 'Akhir pekan ini, kalau cuacanya bagus.'], rescue: ['まだ決めていません。いつがいいですか？', 'mada kimete imasen. itsu ga ii desu ka?', 'Belum kuputuskan. Kapan yang baik?'] },
+    wh_who: { easy: ['友だちです。', 'tomodachi desu', 'Temanku.'], mission: ['家族とクラスメートです。', 'kazoku to kurasumeeto desu', 'Keluarga dan teman sekelas.'], rescue: ['一人です。あなたはだれと行きますか？', 'hitori desu. anata wa dare to ikimasu ka?', 'Sendiri. Kamu pergi dengan siapa?'] },
+    statement: { easy: ['そうですか！', 'sou desu ka!', 'Oh begitu!'], mission: ['それは面白いですね。知りませんでした。', 'sore wa omoshiroi desu ne. shirimasen deshita', 'Itu menarik ya. Aku tidak tahu.'], rescue: ['本当ですか？もっと教えてください。', 'hontou desu ka? motto oshiete kudasai', 'Benarkah? Ceritakan lebih banyak.'] },
+  };
+  const tpl = (params.targetLang === 'ja' ? JA : EN)[intent];
+  const meta: Array<{ tier: 'easy' | 'mission' | 'rescue'; badgeId: string; badgeTh: string; row: [string, string, string] }> = [
+    { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย', row: tpl.easy },
+    { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ', row: tpl.mission },
+    { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ', row: tpl.rescue },
+  ];
+  const stamp = Date.now();
+  return meta.map((m, i) => ({
+    id: `fb_ctx_${stamp}_${i}`,
+    tier: m.tier,
+    badgeId: m.badgeId,
+    badgeTh: m.badgeTh,
+    text: m.row[0],
+    pronunciation: m.row[1],
+    hintId: m.row[2],
+    hintTh: th ? m.row[2] : m.row[2],
+    isRealtimeAi: false,
+    isOfflineFallback: true,
+    wordBreakdown: [],
+  }));
+}
 
 function normalizeServerCopilotCards(
   rawList: unknown,
@@ -406,10 +518,6 @@ function normalizeServerCopilotCards(
   return out;
 }
 
-/**
- * Generates 100% real-time AI reply assistance (ZERO static templates) tailored specifically
- * to the exact utterance Partner AI just spoke + recent conversation context.
- */
 export async function requestRealtimeCopilotAssist(params: {
   aiText?: string;
   aiQuestionText?: string;
@@ -422,107 +530,91 @@ export async function requestRealtimeCopilotAssist(params: {
   variationSeed?: number;
   excludeTexts?: string[];
   signal?: AbortSignal;
+  budgetMs?: number;
 }): Promise<RealtimeCopilotAssistResult> {
+  const empty: RealtimeCopilotAssistResult = { ok: false, source: 'ai-realtime', aiMeaningId: '', aiMeaningTh: '', replies: [], cards: [] };
   const cleanAiText = stripEmojisAndEmotWords(params.aiText || params.aiQuestionText || '').trim();
-  if (!cleanAiText || params.signal?.aborted) {
-    return {
-      ok: false,
-      source: 'ai-realtime',
-      aiMeaningId: '',
-      aiMeaningTh: '',
-      replies: [],
-      cards: [],
-    };
-  }
+  if (!cleanAiText || params.signal?.aborted) return empty;
 
   const variationSeed = params.variationSeed || 0;
   const cacheKey = `${params.targetLang}::${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
   if (variationSeed === 0 && (!params.excludeTexts || params.excludeTexts.length === 0)) {
     const cached = _copilotTurnCache.get(cacheKey);
-    if (cached && cached.replies.length > 0) {
-      return cached;
-    }
+    if (cached && cached.replies.length > 0) return cached;
   }
 
-  // 1) Fast-Path: Optional learner personal Gemini API key direct generation (gemini-3-flash-preview sub-second)
+  const fallback = (): RealtimeCopilotAssistResult => {
+    const cards = buildContextualFallbackCards({
+      aiText: cleanAiText,
+      targetLang: params.targetLang,
+      locale: params.locale,
+      lastUserText: params.lastUserText,
+    });
+    const meaning = translateAndPhoneticizeLiveText(cleanAiText, params.targetLang);
+    return {
+      ok: true,
+      source: 'ai-realtime',
+      aiMeaningId: meaning.translationId || '',
+      aiMeaningTh: meaning.translationTh || '',
+      replies: cards,
+      cards,
+    };
+  };
+
+  const budgetMs = Math.max(1500, Math.min(params.budgetMs ?? 4200, 8000));
+  const deadline = Date.now() + budgetMs;
+
+  // 1) Fast-Path: kunci Gemini pribadi murid (gemini-3-flash-preview)
   let userGeminiKey = '';
   try {
     if (typeof localStorage !== 'undefined') {
-      userGeminiKey = (
-        localStorage.getItem('fz_gemini_api_key') ||
-        localStorage.getItem('gemini_api_key') ||
-        localStorage.getItem('GEMINI_API_KEY') ||
-        ''
-      ).trim();
+      userGeminiKey = (localStorage.getItem('fz_gemini_api_key') || localStorage.getItem('gemini_api_key') || localStorage.getItem('GEMINI_API_KEY') || '').trim();
     }
   } catch {
     // Ignore
   }
-
   if (userGeminiKey.length > 10 && !params.signal?.aborted) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6500);
+    const timer = setTimeout(() => controller.abort(), Math.min(4000, deadline - Date.now()));
     try {
-      const langSpec =
-        params.targetLang === 'ja'
-          ? 'Japanese (N5-N3, Kanji+Hiragana, NO emojis; word-spaced Hepburn Romaji in pronunciation)'
-          : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
+      const langSpec = params.targetLang === 'ja'
+        ? 'Japanese (N5-N3, Kanji+Hiragana, NO emojis; word-spaced Hepburn Romaji in pronunciation)'
+        : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
       const learnerLangName = params.locale === 'th' ? 'Thai' : 'Indonesian';
+      const hist = (params.history || []).slice(-6).map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner AI'}: "${h.text}"`).join('\n');
       const prompt = [
-        `Partner AI just said: "${cleanAiText}".`,
-        params.lastUserText ? `Learner previously said: "${params.lastUserText}".` : '',
+        `Speech Copilot (${params.scenario.titleId}). Target: ${langSpec}.`,
+        hist ? `Context:\n${hist}` : '',
+        params.lastUserText ? `Learner said: "${params.lastUserText}"` : '',
+        `Partner AI said: "${cleanAiText}"`,
         params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
-        `Generate 3 real-time natural spoken reply options in ${langSpec} that directly answer "${cleanAiText}" (easy=short, mission=natural detail, rescue=answer+follow-up question). NEVER use unrelated templates.`,
-        `Translate "${cleanAiText}" into ${learnerLangName} as "aiMeaning". Translate each reply into ${learnerLangName} as "hint".`,
-        'JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","badgeId":"Singkat & Mudah","badgeTh":"สั้นและง่าย","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","badgeId":"Alami & Kontekstual","badgeTh":"เป็นธรรมชาติ","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","badgeId":"Jawab + Tanya Balik","badgeTh":"ตอบและถามกลับ","text":"...","pronunciation":"...","hint":"..."}]}',
-      ]
-        .filter(Boolean)
-        .join('\n');
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(
-          userGeminiKey
-        )}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: {
-              responseMimeType: 'application/json',
-              temperature: variationSeed > 0 ? 0.7 : 0.4,
-              maxOutputTokens: 750,
-              thinkingConfig: { thinkingBudget: 0 },
-            },
-          }),
-          signal: controller.signal,
-        }
-      );
+        `Generate 3 spontaneous spoken replies directly answering it (easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back). Translate it into aiMeaning (${learnerLangName}); each reply's first-person translation in hint (${learnerLangName}).`,
+        `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"..."}]}`,
+      ].filter(Boolean).join('\n');
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(userGeminiKey)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json', temperature: variationSeed > 0 ? 0.75 : 0.45, maxOutputTokens: 600, thinkingConfig: { thinkingBudget: 0 } },
+        }),
+        signal: controller.signal,
+      });
       clearTimeout(timer);
       if (res.ok) {
         const data = await res.json();
-        const rawTxt = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const parsedRaw = JSON.parse(rawTxt);
-        const parsed = Array.isArray(parsedRaw) ? parsedRaw[0] : parsedRaw;
-        const rawReplies = Array.isArray(parsed?.replies) ? parsed.replies : [];
-        const normalizedReplies = rawReplies.map((r: any) => ({
-          ...r,
-          hintId: params.locale === 'th' ? (r.hintId || r.hint || '') : (r.hint || r.hintId || ''),
-          hintTh: params.locale === 'th' ? (r.hint || r.hintTh || '') : (r.hintTh || r.hint || ''),
-        }));
-        const cards = normalizeServerCopilotCards(normalizedReplies, params.targetLang);
+        const raw = String(data?.candidates?.[0]?.content?.parts?.[0]?.text || '').replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+        const parsed = raw ? JSON.parse(raw) : null;
+        const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
         if (cards.length > 0) {
-          const meaningText = stripEmojisAndEmotWords(String(parsed?.aiMeaning || parsed?.aiMeaningId || parsed?.aiMeaningTh || '')).trim();
+          const meaning = stripEmojisAndEmotWords(String(parsed?.aiMeaning || '')).trim();
           const result: RealtimeCopilotAssistResult = {
-            ok: true,
-            source: 'ai-realtime',
-            aiMeaningId: params.locale === 'th' ? String(parsed?.aiMeaningId || meaningText) : meaningText,
-            aiMeaningTh: params.locale === 'th' ? meaningText : String(parsed?.aiMeaningTh || meaningText),
-            replies: cards,
-            cards,
+            ok: true, source: 'ai-realtime',
+            aiMeaningId: params.locale === 'id' ? meaning : '',
+            aiMeaningTh: params.locale === 'th' ? meaning : '',
+            replies: cards, cards,
           };
-          if (variationSeed === 0) {
-            _copilotTurnCache.set(cacheKey, result);
-          }
+          if (variationSeed === 0) copilotCacheSet(cacheKey, result);
           return result;
         }
       }
@@ -531,12 +623,13 @@ export async function requestRealtimeCopilotAssist(params: {
     }
   }
 
+  // 2) Server pool — dilewati sementara bila server baru saja menjawab 503/429 (circuit breaker 20 dtk)
   const payload = {
     aiText: cleanAiText,
-    lastUserText: (params.lastUserText || '').trim().slice(0, 320),
-    scenarioId: params.scenario.id,
+    lastUserText: params.lastUserText || '',
     scenarioTitle: params.scenario.titleId,
-    level: params.scenario.level,
+    scenarioId: params.scenario.id,
+    personaName: params.persona?.name || '',
     targetLang: params.targetLang,
     locale: params.locale,
     history: (params.history || []).slice(-6),
@@ -544,22 +637,18 @@ export async function requestRealtimeCopilotAssist(params: {
     excludeTexts: params.excludeTexts || [],
   };
 
-  // 2) Server 16-Key Gemini Pool (/api/voice/copilot-assist on Local or Cloudflare Worker)
+  if (Date.now() < _copilotServerCooldownUntil) {
+    return fallback();
+  }
+
   for (const base of resolveVoiceApiCandidateBases()) {
-    if (params.signal?.aborted) {
-      return {
-        ok: false,
-        source: 'ai-realtime',
-        aiMeaningId: '',
-        aiMeaningTh: '',
-        replies: [],
-        cards: [],
-      };
-    }
+    if (params.signal?.aborted) return empty;
+    const remaining = deadline - Date.now();
+    if (remaining < 600) break;
     const controller = new AbortController();
     const onAbort = () => controller.abort();
     params.signal?.addEventListener('abort', onAbort, { once: true });
-    const timer = setTimeout(() => controller.abort(), 7500);
+    const timer = setTimeout(() => controller.abort(), remaining);
     try {
       const res = await fetch(`${base}/api/voice/copilot-assist`, {
         method: 'POST',
@@ -570,24 +659,22 @@ export async function requestRealtimeCopilotAssist(params: {
       });
       clearTimeout(timer);
       params.signal?.removeEventListener('abort', onAbort);
+      if (res.status === 429 || res.status === 503) {
+        const ra = Number(res.headers.get('retry-after') || 0);
+        _copilotServerCooldownUntil = Date.now() + (ra > 0 ? Math.min(ra, 60) * 1000 : 20000);
+        continue;
+      }
       if (res.ok) {
         const data = await res.json();
-        const cards = normalizeServerCopilotCards(
-          data?.replies || data?.suggestions,
-          params.targetLang
-        );
+        const cards = normalizeServerCopilotCards(data?.replies || data?.suggestions, params.targetLang);
         if (cards.length > 0) {
           const result: RealtimeCopilotAssistResult = {
-            ok: true,
-            source: 'ai-realtime',
+            ok: true, source: 'ai-realtime',
             aiMeaningId: stripEmojisAndEmotWords(String(data?.aiMeaningId || '')).trim(),
             aiMeaningTh: stripEmojisAndEmotWords(String(data?.aiMeaningTh || '')).trim(),
-            replies: cards,
-            cards,
+            replies: cards, cards,
           };
-          if (variationSeed === 0) {
-            _copilotTurnCache.set(cacheKey, result);
-          }
+          if (variationSeed === 0) copilotCacheSet(cacheKey, result);
           return result;
         }
       }
@@ -597,17 +684,8 @@ export async function requestRealtimeCopilotAssist(params: {
     }
   }
 
-  // 3) Online AI unavailable or network offline:
-  //    Strict invariant: NEVER substitute offline templates. Return empty list so UI
-  //    shows transparent AI connection status / retry prompt.
-  return {
-    ok: false,
-    source: 'ai-realtime',
-    aiMeaningId: '',
-    aiMeaningTh: '',
-    replies: [],
-    cards: [],
-  };
+  // 3) Tidak ada AI realtime dalam budget → kartu kontekstual lokal (tidak pernah kosong).
+  return fallback();
 }
 
 /**

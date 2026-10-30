@@ -83,8 +83,18 @@
           locale = 'th';
         }
       } catch (_) {}
+      var autoCall = '';
+      try {
+        if (root.sessionStorage && root.sessionStorage.getItem('fz_kawan_autocall') === '1') {
+          autoCall = '1';
+          root.sessionStorage.removeItem('fz_kawan_autocall');
+        }
+      } catch (_) {}
       var existingFrame = mountPoint.querySelector('#fzMitraKaiwaStudioFrame');
       if (existingFrame && existingFrame.getAttribute('data-lang') === lang && existingFrame.getAttribute('data-locale') === locale) {
+        if (autoCall && api && api.StudioBridge && typeof api.StudioBridge.send === 'function') {
+          api.StudioBridge.send('fz.shell.autocall', { at: Date.now() });
+        }
         return;
       }
       var pageBuild = '';
@@ -97,7 +107,7 @@
           nonce = api.StudioBridge.begin();
         }
       } catch (_) {}
-      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
+      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (autoCall ? '&autoCall=1' : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
       var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
       mountPoint.innerHTML =
         '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
