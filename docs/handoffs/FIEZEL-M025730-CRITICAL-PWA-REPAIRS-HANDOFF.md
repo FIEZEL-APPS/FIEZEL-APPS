@@ -1,8 +1,8 @@
 # FIEZEL HANDOFF DOSSIER: M025-730 CRITICAL PWA REPAIRS
-**Tanggal**: 31 Oktober 2026  
-**Build Target**: `m025-730`  
-**Branch**: `feat/m025-730-critical-pwa-repairs`  
-**Status CI**: Ready for Pull Request (All 6 empirical probes & local gates 100% GREEN)  
+**Tanggal**: 31 Oktober 2026
+**Build Target**: `m025-730`
+**Branch**: `feat/m025-730-critical-pwa-repairs`
+**Status CI**: Ready for Pull Request (All 6 empirical probes & local gates 100% GREEN)
 
 ---
 
@@ -68,7 +68,7 @@
 
 ## 2. Bukti Pengujian Empiris Nyata (Playwright Probe Verification)
 
-Runner probe: `node tools/dev/probe-m025-730-verification.mjs`  
+Runner probe: `node tools/dev/probe-m025-730-verification.mjs`
 Hasil eksekusi:
 ```
 --- STARTING PROBE-M025-730 VERIFICATION ---

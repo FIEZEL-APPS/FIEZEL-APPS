@@ -1,6 +1,6 @@
 /**
  * tools/dev/probe-m025-730-verification.mjs
- * 
+ *
  * Empirical Playwright Probe to verify the 5 critical PWA repairs:
  * 1. Onboarding Japanese course shows JLPT N5–N1 chips (not CEFR A1–C2).
  * 2. Onboarding "Mulai dari Nol" gives 100 gems initial gift and directly launches foundation practice without Home flash.
@@ -136,7 +136,7 @@ async function run() {
     // Verify chips: MUST be N5, N4, N3, N2, N1!
     const chips = await page.locator('[data-ob-level]').allTextContents();
     console.log('Rendered level chips for Japanese course:', chips);
-    
+
     if (chips.includes('A1') || chips.includes('C2')) {
       throw new Error(`FAIL: Found English CEFR levels in Japanese onboarding: ${chips.join(', ')}`);
     }
@@ -283,7 +283,7 @@ async function run() {
   const sosResult = await page.evaluate(async () => {
     const sosModule = window.FiezelMochiVoiceSos || window.FiezelMochiVoiceSOS;
     if (!sosModule) return { ok: false, reason: 'no_sos_module' };
-    
+
     // Test the ArrayBuffer decoding in openHotSocket & message handling
     let hotCompleteDetected = false;
     const fakeWs = {
@@ -334,7 +334,7 @@ async function run() {
     const modalPanel = document.getElementById('modalPanel');
     const actions = document.querySelector('.modal-actions.settings-actions');
     const folds = document.querySelectorAll('.settings-fold');
-    
+
     if (!modalPanel) return { ok: false, reason: 'no_modal_panel' };
 
     const style = window.getComputedStyle(modalPanel);
