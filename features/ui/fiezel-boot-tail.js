@@ -13,19 +13,45 @@
 (function () {
   'use strict';
 
+  var isLocal = typeof location !== 'undefined' && (
+    location.hostname === 'localhost' ||
+    location.hostname === '127.0.0.1' ||
+    location.hostname === '0.0.0.0' ||
+    location.hostname.startsWith('192.168.') ||
+    location.hostname.startsWith('10.') ||
+    location.hostname.endsWith('.local') ||
+    location.port === '3000' ||
+    location.port === '3005'
+  );
+
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (reg) {
-      if (reg) {
-        try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
-        setTimeout(function () {
-          try {
-            reg.update().then(function () {
-              try { self.FiezelUpdatePrompt?.check?.(false); } catch (_) {}
-            }).catch(function () {});
-          } catch (_) {}
-        }, 2000);
+    if (isLocal) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        for (var i = 0; i < regs.length; i++) {
+          try { regs[i].unregister(); } catch (_) {}
+        }
+      }).catch(function () {});
+      if (typeof caches !== 'undefined') {
+        caches.keys().then(function (keys) {
+          for (var i = 0; i < keys.length; i++) {
+            try { caches.delete(keys[i]); } catch (_) {}
+          }
+        }).catch(function () {});
       }
-    }).catch(function () {});
+    } else {
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (reg) {
+        if (reg) {
+          try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
+          setTimeout(function () {
+            try {
+              reg.update().then(function () {
+                try { self.FiezelUpdatePrompt?.check?.(false); } catch (_) {}
+              }).catch(function () {});
+            } catch (_) {}
+          }, 2000);
+        }
+      }).catch(function () {});
+    }
   }
 }());
 

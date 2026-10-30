@@ -77,6 +77,7 @@ for (const v of views) {
 /* ------------------------------------------------------- (3) pintu dari berkas produksi --- */
 function walk(dir, out) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '.git') continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(full, out);
     else if (/\.(js|html)$/.test(entry.name)) out.push(full);

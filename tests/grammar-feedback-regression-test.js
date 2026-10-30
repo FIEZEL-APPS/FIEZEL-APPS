@@ -206,7 +206,11 @@ const submit = async page => { await page.evaluate(() => document.getElementById
 const openReveal = async page => { await page.evaluate(() => document.querySelector('#confidencePop .confidence-go')?.click()); await page.waitForTimeout(900); };
 async function tokenQ(page) {
   await page.evaluate(() => { window.__gt.q = null; window.startTokenOrderSession(); });
-  await page.waitForTimeout(1500);
+  try {
+    await page.waitForFunction(() => !!window.__gt?.q, null, { timeout: 10000 });
+  } catch (_) {
+    await page.waitForTimeout(1500);
+  }
   return page.evaluate(() => { const q = window.__gt.q; return q && { tokens: q.tokens.slice(), distractors: q.distractors.slice() }; });
 }
 async function mcQ(page) {

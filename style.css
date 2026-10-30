@@ -12611,7 +12611,7 @@ body.fz-stage-quiz .vocab-focus .phonetic,
   background: rgba(15, 23, 42, 0.42) !important;
   backdrop-filter: blur(4px) !important;
   -webkit-backdrop-filter: blur(4px) !important;
-  z-index: 9998 !important;
+  z-index: 2147482400 !important;
   opacity: 0 !important;
   pointer-events: none !important;
   transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -12629,7 +12629,7 @@ body > #feedback.feedback-sheet {
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  z-index: 10000 !important;
+  z-index: 2147482500 !important;
   width: 100% !important;
   max-width: 100% !important;
   margin: 0 !important;
@@ -12967,6 +12967,17 @@ body > #feedback.feedback-sheet {
   align-items: center !important;
   gap: 8px !important;
   width: 100% !important;
+}
+
+.feedback-sheet-exit-btn,
+.feedback-sheet-explain-btn,
+.feedback-sheet-next-btn,
+.feedback-sheet-close-btn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 .feedback-sheet-exit-btn {
