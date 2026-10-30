@@ -13012,7 +13012,7 @@ function showOnboarding(now=Date.now()){
         })();
       },
       onPlacement:()=>afterOnboardingExit('placement'),
-      onFinish:(data)=>afterOnboardingExit(data?.via==='beginner'?'beginner':'home')
+      onFinish:()=>afterOnboardingExit('home')
     })
   }catch(_){return null}
 }
