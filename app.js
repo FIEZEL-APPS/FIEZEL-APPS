@@ -17676,11 +17676,11 @@ function quizLoop(cfg){
    if (!finalTakeaway || !finalTakeaway.trim()) {
      const isTh = (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.() === 'th');
      if (isTh) {
-       finalTakeaway = cleanCorrect 
+       finalTakeaway = cleanCorrect
          ? `รูปประโยคที่ถูกต้องคือ "${cleanCorrect}" ตามบริบทของประโยคนี้`
          : 'สังเกตบริบทของประโยคและเลือกคำตอบที่เหมาะสมที่สุด';
      } else {
-       finalTakeaway = cleanCorrect 
+       finalTakeaway = cleanCorrect
          ? `Bentuk yang paling tepat untuk melengkapi kalimat ini adalah "${cleanCorrect}".`
          : 'Perhatikan konteks kalimat dan bentuk kata yang paling sesuai dengan polanya.';
      }
