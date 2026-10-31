@@ -29,27 +29,249 @@ const IS_MOBILE = typeof window !== 'undefined' && (
 const SKIN_RES = 1024;
 const BADGE_SCALE = 1;
 
+// Real-time Formant & Viseme Analyzer (adapted from wass08/wawa-lipsync MIT)
+export const VISEMES = {
+  sil: 'viseme_sil',
+  PP: 'viseme_PP',
+  FF: 'viseme_FF',
+  TH: 'viseme_TH',
+  DD: 'viseme_DD',
+  kk: 'viseme_kk',
+  CH: 'viseme_CH',
+  SS: 'viseme_SS',
+  nn: 'viseme_nn',
+  RR: 'viseme_RR',
+  aa: 'viseme_aa',
+  E: 'viseme_E',
+  I: 'viseme_I',
+  O: 'viseme_O',
+  U: 'viseme_U'
+};
+
+const VISEMES_STATES = {
+  viseme_sil: 'silence',
+  viseme_PP: 'plosive',
+  viseme_FF: 'fricative',
+  viseme_TH: 'fricative',
+  viseme_DD: 'plosive',
+  viseme_kk: 'plosive',
+  viseme_CH: 'fricative',
+  viseme_SS: 'fricative',
+  viseme_nn: 'plosive',
+  viseme_RR: 'fricative',
+  viseme_aa: 'vowel',
+  viseme_E: 'vowel',
+  viseme_I: 'vowel',
+  viseme_O: 'vowel',
+  viseme_U: 'vowel'
+};
+
+function avgArr(arr) {
+  return arr && arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+}
+
+export class WawaLipsyncAnalyzer {
+  constructor({ analyser = null, sampleRate = 24000, fftSize = 2048, historySize = 10 } = {}) {
+    this.analyser = null;
+    this.fftSize = fftSize;
+    this.historySize = historySize;
+    this.sampleRate = sampleRate;
+    this.binWidth = sampleRate / fftSize;
+    this.dataArray = null;
+    this.history = [];
+    this.features = null;
+    this.viseme = VISEMES.sil;
+    this.state = 'silence';
+    this.visemeStartTime = 0;
+    this.maxVisemeDuration = 100;
+    this.bands = [
+      { start: 50, end: 200 },    // Band 1: Low energy
+      { start: 200, end: 400 },   // Band 2: F1 lower
+      { start: 400, end: 800 },   // Band 3: F1 mid
+      { start: 800, end: 1500 },  // Band 4: F2 front
+      { start: 1500, end: 2500 }, // Band 5: F2/F3
+      { start: 2500, end: 4000 }, // Band 6: Fricatives
+      { start: 4000, end: 8000 }  // Band 7: High fricatives
+    ];
+    if (analyser) this.setAnalyser(analyser, sampleRate);
+  }
+
+  setAnalyser(analyser, sampleRate) {
+    this.analyser = analyser || null;
+    if (!this.analyser) {
+      this.dataArray = null;
+      this.viseme = VISEMES.sil;
+      this.state = 'silence';
+      this.history = [];
+      return;
+    }
+    this.fftSize = this.analyser.fftSize || 2048;
+    this.sampleRate = sampleRate || (this.analyser.context && this.analyser.context.sampleRate) || 24000;
+    this.binWidth = this.sampleRate / this.fftSize;
+    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.history = [];
+  }
+
+  extractFeatures() {
+    if (!this.analyser || !this.dataArray) return null;
+    try {
+      this.analyser.getByteFrequencyData(this.dataArray);
+    } catch (_) {
+      return null;
+    }
+
+    const bandEnergies = this.bands.map(({ start, end }) => {
+      const startBin = Math.max(0, Math.round(start / this.binWidth));
+      const endBin = Math.min(Math.round(end / this.binWidth), this.dataArray.length - 1);
+      if (endBin <= startBin) return 0;
+      let sum = 0;
+      for (let i = startBin; i < endBin; i++) sum += this.dataArray[i];
+      return (sum / (endBin - startBin)) / 255;
+    });
+
+    let sumAmplitude = 0;
+    let weightedSum = 0;
+    for (let i = 0; i < this.dataArray.length; i++) {
+      const freq = i * this.binWidth;
+      const amp = this.dataArray[i] / 255;
+      sumAmplitude += amp;
+      weightedSum += freq * amp;
+    }
+    const centroid = sumAmplitude > 0 ? weightedSum / sumAmplitude : 0;
+    const volume = avgArr(bandEnergies);
+    const deltaBands = bandEnergies.map((energy, idx) => {
+      if (this.history.length < 2) return 0;
+      return energy - this.history[this.history.length - 2].bands[idx];
+    });
+
+    const features = { bands: bandEnergies, deltaBands, volume, centroid };
+    if (sumAmplitude > 0) {
+      this.history.push(features);
+      if (this.history.length > this.historySize) this.history.shift();
+    }
+    return features;
+  }
+
+  getAveragedFeatures() {
+    const len = this.history.length || 1;
+    const sum = { volume: 0, centroid: 0, bands: Array(this.bands.length).fill(0) };
+    for (const f of this.history) {
+      sum.volume += f.volume;
+      sum.centroid += f.centroid;
+      f.bands.forEach((b, i) => { sum.bands[i] += b; });
+    }
+    const bands = sum.bands.map((b) => b / len);
+    return { volume: sum.volume / len, centroid: sum.centroid / len, bands, deltaBands: bands };
+  }
+
+  computeVisemeScores(current, avg, dVolume, dCentroid) {
+    const scores = {
+      viseme_sil: 0, viseme_PP: 0, viseme_FF: 0, viseme_TH: 0, viseme_DD: 0,
+      viseme_kk: 0, viseme_CH: 0, viseme_SS: 0, viseme_nn: 0, viseme_RR: 0,
+      viseme_aa: 0, viseme_E: 0, viseme_I: 0, viseme_O: 0, viseme_U: 0
+    };
+    const b7 = current.bands[6];
+
+    if (avg.volume < 0.06 && current.volume < 0.06) {
+      scores.viseme_sil = 1.0;
+    }
+
+    Object.entries(VISEMES_STATES).forEach(([v, st]) => {
+      if (st === 'plosive') {
+        if (dVolume < 0.01) scores[v] -= 0.5;
+        if (avg.volume < 0.2) scores[v] += 0.2;
+        if (dCentroid > 1000) scores[v] += 0.2;
+      }
+    });
+
+    if (current.centroid > 1000 && current.centroid < 8000) {
+      if (current.centroid > 7000) scores.viseme_DD += 0.6;
+      else if (current.centroid > 5000) scores.viseme_kk += 0.6;
+      else if (current.centroid > 4000) {
+        scores.viseme_PP += 1.0;
+        if (b7 > 0.25 && current.centroid < 6000) scores.viseme_DD += 1.4;
+      } else scores.viseme_nn += 0.6;
+    }
+
+    if (dCentroid > 1000 && current.centroid > 6000 && avg.centroid > 5000) {
+      if (current.bands[6] > 0.4 && avg.bands[6] > 0.3) scores.viseme_FF = 0.7;
+    }
+
+    if (avg.volume > 0.05 && avg.centroid < 6000 && current.centroid < 6000) {
+      const [b1, b2, b3, b4, b5] = avg.bands;
+      const gapB1B2 = Math.abs(b1 - b2);
+      const maxGapB2B3B4 = Math.max(Math.abs(b2 - b3), Math.abs(b2 - b4), Math.abs(b3 - b4));
+      if (b3 > 0.07 || b4 > 0.07) {
+        if (b4 > b3) scores.viseme_aa = 0.8 + (b3 > b2 ? 0.2 : 0);
+        if (b3 > b2 && b3 > b4) scores.viseme_I = 0.7;
+        if (gapB1B2 < 0.25) scores.viseme_U = 0.7;
+        if (maxGapB2B3B4 < 0.25) scores.viseme_O = 0.9;
+        if (b2 > b3 && b3 > b4) scores.viseme_E = 1.0;
+        if (b3 < 0.2 && b4 > 0.3) scores.viseme_I = 0.7;
+        if (b3 > 0.25 && b5 > 0.25) scores.viseme_O = 0.7;
+        if (b3 < 0.15 && b5 < 0.15) scores.viseme_U = 0.7;
+      }
+    }
+    return scores;
+  }
+
+  processAudio() {
+    const feat = this.extractFeatures();
+    this.features = feat;
+    if (!feat || feat.volume < 0.025) {
+      this.state = 'silence';
+      this.viseme = VISEMES.sil;
+      return this.viseme;
+    }
+    const current = this.history[this.history.length - 1] || feat;
+    const avg = this.getAveragedFeatures();
+    const scores = this.computeVisemeScores(current, avg, current.volume - avg.volume, current.centroid - avg.centroid);
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const dur = now - this.visemeStartTime;
+    if (this.viseme && scores[this.viseme] != null) {
+      let boost = 1.0;
+      if (dur <= 100) boost = 1.3;
+      else boost = Math.max(0.5, 1.0 - (dur - this.maxVisemeDuration) / 1000);
+      scores[this.viseme] *= boost;
+    }
+    let maxScore = -Infinity;
+    let top = VISEMES.sil;
+    for (const k in scores) {
+      if (scores[k] > maxScore) { maxScore = scores[k]; top = k; }
+    }
+    if (top !== this.viseme) this.visemeStartTime = now;
+    this.viseme = top;
+    this.state = VISEMES_STATES[top] || 'silence';
+    return this.viseme;
+  }
+}
+
 export class FiezelMochi {
   constructor(container, options = {}) {
     this.container = typeof container === 'string' ? document.querySelector(container) : container;
     if (!this.container) throw new Error('FiezelMochi: Container element not found');
 
+    // Voice Companion Strict 2-Motion Mode (Kawan Bicara & Mochi SOS):
+    // Only permits (1) Open-eyes Idle ('dots' + hidden hands) and (2) Open-eyes Greeting ('dots' + 'wave' both hands out).
+    this.voiceCompanionStrictMode = !!options.voiceCompanionStrictMode;
+
     // State Configuration
-    this.mood = options.mood || 'dots';             // 'dots', 'wink', 'happy', 'hearts', 'sleepy', 'pout'
+    this.mood = this.voiceCompanionStrictMode ? 'dots' : (options.mood || 'dots'); // 'dots', 'wink', 'happy', 'hearts', 'sleepy', 'pout'
     this.badge = options.badge || null;             // null, 'chat_purple', 'chat_blue', 'alert', 'online'
-    this.fx = options.fx || null;                   // null, 'orbit', 'stars', 'hearts'
+    this.fx = this.voiceCompanionStrictMode ? null : (options.fx || null); // null, 'orbit', 'stars', 'hearts'
     this.aura = options.aura || null;               // null, 'purple', 'blue', 'amber', 'green', 'pink'
     this.currentAccessory = options.accessory || null; // null, 'headset', 'glasses', 'pencil'
     this.isTalking = false;
     this.talkDuration = 0;
     this.talkTimer = 0;
     this.isThinking = false;
+    this.wawaLipsync = new WawaLipsyncAnalyzer();
     this.showHands = options.showHands ?? true;
     this.showEars = options.showEars ?? true;
     this.showTail = options.showTail ?? false;
 
     // Dynamic Autonomous Idle Expressions
-    this.autoExpressions = (options.autoExpressions !== false);
+    this.autoExpressions = this.voiceCompanionStrictMode ? false : (options.autoExpressions !== false);
     this.expressionTimer = 0;
     this.nextExpression = 3.2 + Math.random() * 2.0;
     this.holdMoodUntil = 0;
@@ -1755,8 +1977,50 @@ export class FiezelMochi {
     }
   }
 
+  setVoiceCompanionStrictMode(enabled) {
+    this.voiceCompanionStrictMode = !!enabled;
+    if (this.voiceCompanionStrictMode) {
+      this.autoExpressions = false;
+      this.setFx(null);
+      this.setBadge(null);
+      this.setAura(null);
+      if (this.mood !== 'dots') {
+        this.mood = 'dots';
+        this.updateFaceVisibility();
+        this.updateSkinBlush();
+      }
+      if (this.handState !== 'hidden' && this.handState !== 'wave') {
+        this.retractHands();
+      }
+    }
+  }
+
+  attachAudioAnalyser(analyser, sampleRate = 48000) {
+    if (this.wawaLipsync) {
+      this.wawaLipsync.attachAnalyser(analyser, sampleRate);
+    }
+  }
+
+  detachAudioAnalyser() {
+    if (this.wawaLipsync) {
+      this.wawaLipsync.detachAnalyser();
+    }
+  }
+
   setThinking(isThinking) {
     this.isThinking = !!isThinking;
+    if (this.voiceCompanionStrictMode) {
+      if (this.mood !== 'dots') {
+        this.mood = 'dots';
+        this.updateFaceVisibility();
+      }
+      this.setBadge(null);
+      this.setAura(null);
+      this.targetRot.z = 0;
+      this.targetRot.y = 0;
+      this.retractHands();
+      return;
+    }
     if (this.isThinking) {
       this.setBadge('chat_purple');
       this.setAura('purple');
@@ -1786,6 +2050,65 @@ export class FiezelMochi {
       }
     }
 
+    const hasLiveAnalyser = !!(this.wawaLipsync && this.wawaLipsync.analyser);
+
+    if (this.isTalking && hasLiveAnalyser && this.mood !== 'pout' && this.mood !== 'sleepy') {
+      this.talkTimer = (this.talkTimer || 0) + dt;
+      const viseme = this.wawaLipsync.processAudio();
+      const feat = this.wawaLipsync.features;
+      const vol = feat ? Math.max(0, Math.min(1, feat.volume * 1.9)) : 0;
+      const lerp = Math.min(1, Math.max(0.18, dt * 22));
+
+      if (!this._mouthLerp) {
+        this._mouthLerp = { hx: 1, hy: 1, ox: 0.9, oy: 1.15, wx: 1, wy: 1 };
+      }
+      const L = this._mouthLerp;
+
+      if (viseme === VISEMES.aa || viseme === VISEMES.E || viseme === VISEMES.I) {
+        // Open / Mid / Wide Vowel -> mouthHappy
+        const targetHx = viseme === VISEMES.I ? (1.10 + vol * 0.16) : (viseme === VISEMES.E ? (1.02 + vol * 0.14) : (0.94 + vol * 0.18));
+        const targetHy = viseme === VISEMES.aa ? (1.02 + vol * 0.30) : (viseme === VISEMES.E ? (0.86 + vol * 0.22) : (0.68 + vol * 0.16));
+        L.hx += (targetHx - L.hx) * lerp;
+        L.hy += (targetHy - L.hy) * lerp;
+        if (this.mouthHappy) {
+          this.mouthHappy.visible = true;
+          this.mouthHappy.position.y = -0.10 - vol * 0.016;
+          this.mouthHappy.scale.set(L.hx, L.hy, 1.0);
+        }
+        if (this.mouthO) this.mouthO.visible = false;
+        if (this.mouthW) this.mouthW.visible = false;
+      } else if (viseme === VISEMES.O || viseme === VISEMES.U || viseme === VISEMES.CH || viseme === VISEMES.RR) {
+        // Rounded Vowel / Affricate -> mouthO
+        const tight = (viseme === VISEMES.U);
+        const targetOx = tight ? (0.72 + vol * 0.18) : (0.94 + vol * 0.28);
+        const targetOy = tight ? (0.88 + vol * 0.22) : (1.12 + vol * 0.34);
+        L.ox += (targetOx - L.ox) * lerp;
+        L.oy += (targetOy - L.oy) * lerp;
+        if (this.mouthO) {
+          this.mouthO.visible = true;
+          this.mouthO.position.y = -0.10 - vol * 0.010;
+          this.mouthO.scale.set(L.ox, L.oy, 1.0);
+        }
+        if (this.mouthHappy) this.mouthHappy.visible = false;
+        if (this.mouthW) this.mouthW.visible = false;
+      } else {
+        // Bilabial closure (PP), Frics/Stops (FF, SS, TH, DD, kk), Nasal (nn), or micro-pause (sil) -> mouthW
+        const compressed = (viseme === VISEMES.PP || viseme === VISEMES.nn);
+        const targetWx = compressed ? 0.90 : (1.02 + vol * 0.08);
+        const targetWy = compressed ? 0.72 : (0.94 + vol * 0.10);
+        L.wx += (targetWx - L.wx) * lerp;
+        L.wy += (targetWy - L.wy) * lerp;
+        if (this.mouthW) {
+          this.mouthW.visible = true;
+          this.mouthW.position.y = -0.10 - vol * 0.008;
+          this.mouthW.scale.set(L.wx, L.wy, 1.0);
+        }
+        if (this.mouthHappy) this.mouthHappy.visible = false;
+        if (this.mouthO) this.mouthO.visible = false;
+      }
+      return;
+    }
+
     if (this.isTalking) {
       this.talkTimer = (this.talkTimer || 0) + dt;
       const syllableWave = Math.sin(this.talkTimer * 14.0) * 0.55 + Math.sin(this.talkTimer * 22.0) * 0.25 + 0.20;
@@ -1802,6 +2125,7 @@ export class FiezelMochi {
         if (this.mouthW) {
           this.mouthW.visible = !isOpen;
           this.mouthW.position.y = -0.10 - mouthOpen * 0.02;
+          this.mouthW.scale.set(1.0, 1.0, 1.0);
         }
         if (this.mouthO) {
           this.mouthO.visible = false;
@@ -1820,9 +2144,11 @@ export class FiezelMochi {
       }
       if (this.mouthHappy) {
         this.mouthHappy.visible = (this.mood === 'happy');
+        if (this.mood === 'happy') this.mouthHappy.scale.set(1.0, 1.0, 1.0);
       }
       if (this.mouthO) {
         this.mouthO.visible = false;
+        this.mouthO.scale.set(0.9, 1.15, 1.0);
       }
     }
   }
@@ -1984,6 +2310,19 @@ export class FiezelMochi {
   }
 
   setMood(m) {
+    if (this.voiceCompanionStrictMode) {
+      const wasPoutStrict = (this.mood === 'pout' || this.mood === 'sleepy');
+      this.mood = 'dots';
+      this.updateFaceVisibility();
+      if (wasPoutStrict) this.updateSkinBlush();
+      this.triggerJiggle(0.14);
+      if (m === 'wink' || m === 'happy' || m === 'hearts') {
+        this.triggerHandGesture('wave', 2.2);
+      } else {
+        this.retractHands();
+      }
+      return;
+    }
     const wasPout = (this.mood === 'pout' || this.mood === 'sleepy');
     this.mood = m;
     this.updateFaceVisibility();
@@ -2015,6 +2354,13 @@ export class FiezelMochi {
    * @param {number} durationSeconds
    */
   triggerHandGesture(type, durationSeconds = 3.5) {
+    if (this.voiceCompanionStrictMode) {
+      if (!type || type === 'hidden' || type === 'pout' || type === 'sad') {
+        this.retractHands();
+        return;
+      }
+      type = 'wave';
+    }
     if (this.handState !== type) this.handGestureTime = 0; // restart choreography
     this.handState = type;
     this.handTimer = durationSeconds;
@@ -2028,12 +2374,14 @@ export class FiezelMochi {
   }
 
   setBadge(b) {
+    if (this.voiceCompanionStrictMode) b = null;
     this.badge = b;
     this.drawBadge();
     this.badgeLag.velY = 0.75;
   }
 
   setFx(f) {
+    if (this.voiceCompanionStrictMode) f = null;
     this.fx = f;
     this.orbitGroup.visible = (f === 'orbit');
     for (const p of this.particles) {
@@ -2119,6 +2467,18 @@ export class FiezelMochi {
   }
 
   preset(name) {
+    if (this.voiceCompanionStrictMode) {
+      this.setMood('dots');
+      this.setBadge(null);
+      this.setFx(null);
+      this.setAura(null);
+      if (name === 'welcome' || name === 'celebrate' || name === 'love') {
+        this.triggerHandGesture('wave', 2.2);
+      } else {
+        this.retractHands();
+      }
+      return;
+    }
     switch (name) {
       case 'welcome':
         this.setMood('wink');
@@ -2798,6 +3158,7 @@ export class FiezelMochi {
 
   destroy() {
     this._running = false;
+    this.detachAudioAnalyser();
     if (this._visibilityObserver) {
       try { this._visibilityObserver.disconnect(); } catch (_) {}
       this._visibilityObserver = null;

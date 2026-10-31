@@ -5,6 +5,7 @@ interface JapaneseRubyDisplayProps {
   text: string;
   targetLang?: 'en' | 'ja';
   showRomaji?: boolean;
+  showFurigana?: boolean;
   className?: string;
   rubyClassName?: string;
   romajiClassName?: string;
@@ -15,6 +16,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
   text,
   targetLang,
   showRomaji = true,
+  showFurigana = true,
   className = '',
   rubyClassName = '',
   romajiClassName = '',
@@ -29,14 +31,19 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
     return <span className={className}>{clean}</span>;
   }
 
-  const furiganaHtml = renderFuriganaHtml(clean);
-  const romaji = toPhoneticRomaji(clean);
+  const examBodyLock =
+    typeof document !== 'undefined' && Boolean(document.body?.classList?.contains('fz-exam-mode'));
+  const allowFurigana = showFurigana && !examBodyLock;
+  const allowRomaji = showRomaji && !examBodyLock;
+
+  const furiganaHtml = renderFuriganaHtml(clean, { hideFurigana: !allowFurigana });
+  const romaji = allowRomaji ? toPhoneticRomaji(clean) : '';
 
   const Component = as;
 
   return (
     <Component className={`fz-ja-display-wrap ${as === 'span' ? 'inline-block align-middle' : 'space-y-0.5'} ${className}`}>
-      {/* 1. Baris Teks Utama dengan Furigana Ruby di atas Kanji */}
+      {/* 1. Baris Teks Utama dengan Furigana Ruby di atas Kanji (otomatis tersembunyi di Mode Ujian) */}
       <span
         lang="ja"
         data-testid="japanese-ruby-text"
@@ -45,7 +52,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
       />
 
       {/* 2. Baris Romaji Fonetik Eksak (partikel は = wa, を = o, へ = e) */}
-      {showRomaji && romaji && (
+      {allowRomaji && romaji && (
         <span
           lang="ja-Latn"
           data-testid="japanese-romaji-text"

@@ -82,6 +82,18 @@
     'mochi-sos.greet-cue': 'Halo! Mochi siap menemani. Ketuk aku kalau bingung ya!',
     'mochi-sos.leak-correction': '[SISTEM FIEZEL: Kamu hampir membocorkan kunci jawaban. DILARANG menyebut huruf pilihan atau teks jawaban benar. Ulangi dalam 1 kalimat sebagai petunjuk sokratik saja.]',
     'mochi-sos.connecting': 'Menyambungkan Mochi...',
-    'mochi-sos.silence-prompt': 'Silakan bicara jika ingin bantuan dari aku'
+    'mochi-sos.conn-connecting': 'Sedang menghubungkan Mochi...',
+    'mochi-sos.conn-reconnecting': 'Menyambungkan ulang koneksi suara Mochi...',
+    'mochi-sos.conn-offline': 'Koneksi internet terputus — Mochi menunggu jaringan kembali',
+    'mochi-sos.conn-quota': 'Kuota API AI penuh — mengalihkan jalur koneksi...',
+    'mochi-sos.conn-error': 'Koneksi AI bermasalah — Ketuk untuk coba lagi',
+    'mochi-sos.conn-retry': 'Coba lagi',
+    'mochi-sos.silence-prompt': 'Silakan bicara jika ingin bantuan dari aku',
+    'mochi-sos.toggle-on-title': 'Bantuan suara Mochi aktif (ketuk untuk matikan)',
+    'mochi-sos.toggle-off-title': 'Bantuan suara Mochi nonaktif (ketuk untuk aktifkan)',
+    'mochi-sos.toggle-on-badge': 'Mochi ON',
+    'mochi-sos.toggle-off-badge': 'Mochi OFF',
+    'mochi-sos.toast-disabled': 'Bantuan suara Mochi dinonaktifkan',
+    'mochi-sos.toast-enabled': 'Bantuan suara Mochi diaktifkan'
   });
 }());

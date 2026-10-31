@@ -59,7 +59,6 @@ import { JapaneseRubyDisplay } from './components/JapaneseRubyDisplay';
 import { stripEmojisAndEmotWords } from './lib/japanesePhonetics';
 import {
   evaluateTurnLocal,
-  resampleAndConvertToPcm16Base64,
   type LiveTransportMode,
   pcm16Base64ToAudioBuffer,
   reportGeminiLiveSessionDrop,
@@ -71,6 +70,8 @@ import {
   synthesizeFlexibleTts,
   warmUpVoiceServices,
 } from './lib/liveTransport';
+import { HandyHumanVad, float32At16kToPcm16Base64 } from './lib/handyVad';
+import { SileroNeuralVadGate } from './lib/sileroVadGate';
 
 // 44-byte silent WAV used to "unlock" one persistent <audio> element inside a user tap.
 // iOS Safari / Android WebView only allow later programmatic play() on an element that
@@ -182,6 +183,11 @@ export default function App() {
   const [syncingNow, setSyncingNow] = useState<boolean>(false);
   const [isUserSpeakingLive, setIsUserSpeakingLive] = useState<boolean>(false);
   const userSpeakingTimerRef = useRef<number | null>(null);
+  const handyVadRef = useRef<HandyHumanVad>(new HandyHumanVad());
+  const sileroVadGateRef = useRef<SileroNeuralVadGate | null>(null);
+  const lastHandySpeechAtRef = useRef<number>(0);
+  const liveAnalyserRef = useRef<AnalyserNode | null>(null);
+  const ttsAnalyserRef = useRef<AnalyserNode | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
   const liveAudioCtxRef = useRef<AudioContext | null>(null);
@@ -852,6 +858,28 @@ export default function App() {
     }
   };
 
+  const getOrAttachAnalyser = (
+    ctx: AudioContext,
+    holderRef: React.MutableRefObject<AnalyserNode | null>
+  ): AudioNode => {
+    try {
+      if (typeof ctx.createAnalyser !== 'function') return ctx.destination;
+      if (!holderRef.current || (holderRef.current as any).context !== ctx) {
+        const an = ctx.createAnalyser();
+        an.fftSize = 2048;
+        an.smoothingTimeConstant = 0.5;
+        an.connect(ctx.destination);
+        holderRef.current = an;
+      }
+      if (mochiInstanceRef.current?.attachAudioAnalyser) {
+        mochiInstanceRef.current.attachAudioAnalyser(holderRef.current, ctx.sampleRate || 24000);
+      }
+      return holderRef.current;
+    } catch {
+      return ctx.destination;
+    }
+  };
+
   /** Plays base64 MP3 through the gesture-unlocked Web Audio context (autoplay-immune). */
   const playNeuralBase64ViaWebAudio = async (
     audioBase64: string,
@@ -887,7 +915,7 @@ export default function App() {
       const src = ctx.createBufferSource();
       src.buffer = decoded;
       src.playbackRate.value = targetRate;
-      src.connect(ctx.destination);
+      src.connect(getOrAttachAnalyser(ctx, ttsAnalyserRef));
       ttsSourceNodeRef.current = src;
       src.onended = () => {
         if (ttsSourceNodeRef.current === src) ttsSourceNodeRef.current = null;
@@ -1483,6 +1511,22 @@ export default function App() {
 
         rec.onresult = (event: any) => {
           if (isDisposed) return;
+          // Neural Human-Voice VAD Cross-Check:
+          // Reject street traffic, passing motorcycles, horns, fans, wind, or ambient noise
+          // that causes browser SpeechRecognition to hallucinate phantom syllables and freeze Fiezel.
+          const hasLiveMicTrack = Boolean(
+            micStreamRef.current &&
+              micStreamRef.current.getAudioTracks().some((tr) => tr.readyState === 'live' && tr.enabled)
+          );
+          if (sileroVadGateRef.current?.isActive()) {
+            if (Date.now() - sileroVadGateRef.current.getLastHumanSpeechAt() > 2800) {
+              return;
+            }
+          } else if (hasLiveMicTrack) {
+            if (Date.now() - lastHandySpeechAtRef.current > 2800) {
+              return;
+            }
+          }
           let transcript = '';
           for (let i = 0; i < event.results.length; i++) {
             transcript += event.results[i][0].transcript;
@@ -1865,6 +1909,44 @@ export default function App() {
         if (res && res.getAudioTracks && res.getAudioTracks().length > 0) {
           stream = res;
           micStreamRef.current = stream;
+        } else {
+          // If first-time permission dialog took >1200ms, attach neural VAD as soon as user clicks Allow
+          void getStreamPromise
+            .then((lateStream) => {
+              if (!lateStream || userHungUpRef.current) {
+                try {
+                  lateStream?.getTracks().forEach((tr) => tr.stop());
+                } catch {}
+                return;
+              }
+              micStreamRef.current = lateStream;
+              const activeCtx = liveAudioCtxRef.current;
+              if (activeCtx && !sileroVadGateRef.current) {
+                const lateGate = new SileroNeuralVadGate();
+                sileroVadGateRef.current = lateGate;
+                void lateGate.start(lateStream, activeCtx, {
+                  isMicMuted: () => isMicMutedRef.current,
+                  isAiPlaying: () => isPlayingAiAudioRef.current,
+                  onHumanSpeechState: (speaking) => setIsUserSpeakingLive(speaking),
+                  onHumanBargeIn: () => interruptAiAndStartListening(),
+                  onSpeechPcm16kBase64: (pcmBase64) => {
+                    if (wsRef.current?.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+                      wsRef.current.send(
+                        JSON.stringify({
+                          realtimeInput: { audio: { mimeType: 'audio/pcm;rate=16000', data: pcmBase64 } },
+                        })
+                      );
+                    }
+                  },
+                  onSpeechEnded: () => {
+                    if (wsRef.current?.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+                      wsRef.current.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
+                    }
+                  },
+                });
+              }
+            })
+            .catch(() => {});
         }
       } catch (micErr) {
         console.warn('[VoiceStudio] Non-blocking mic stream notice (SpeechRecognition will handle speech):', micErr);
@@ -1894,54 +1976,104 @@ export default function App() {
 
         const source = liveCtx.createMediaStreamSource(stream);
         let workletInitialized = false;
+        handyVadRef.current.reset();
+        lastHandySpeechAtRef.current = 0;
+        try {
+          (window as any).__fzVoiceStudioHandyVad = handyVadRef.current;
+        } catch {
+          // Ignore
+        }
+
+        // Start Self-Hosted Silero Neural VAD v5 (ONNX Runtime Web WASM + 14-frame pre-roll)
+        sileroVadGateRef.current?.destroy();
+        const sileroGate = new SileroNeuralVadGate();
+        sileroVadGateRef.current = sileroGate;
+        void sileroGate.start(stream, liveCtx, {
+          isMicMuted: () => isMicMutedRef.current,
+          isAiPlaying: () => isPlayingAiAudioRef.current,
+          onHumanSpeechState: (speaking) => {
+            setIsUserSpeakingLive(speaking);
+          },
+          onHumanBargeIn: () => {
+            interruptAiAndStartListening();
+          },
+          onSpeechPcm16kBase64: (pcmBase64) => {
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+              wsRef.current.send(
+                JSON.stringify({
+                  realtimeInput: {
+                    audio: {
+                      mimeType: 'audio/pcm;rate=16000',
+                      data: pcmBase64,
+                    },
+                  },
+                })
+              );
+            }
+          },
+          onSpeechEnded: () => {
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+              wsRef.current.send(
+                JSON.stringify({
+                  realtimeInput: {
+                    audioStreamEnd: true,
+                  },
+                })
+              );
+            }
+          },
+        });
 
         const handleMicPcmData = (float32: Float32Array) => {
           if (isMicMutedRef.current) return;
-          // Hitung volume untuk indikator visual user speaking
-          let sum = 0;
-          const step = Math.max(1, Math.floor(float32.length / 64));
-          let count = 0;
-          for (let i = 0; i < float32.length; i += step) {
-            sum += float32[i] * float32[i];
-            count++;
-          }
-          const rms = Math.sqrt(sum / count);
+          // Once Silero Neural VAD v5 WASM is active, it exclusively owns 16kHz human-speech streaming & barge-in.
+          // HandyHumanVad acts solely as zero-latency DSP fallback during ~120ms WASM boot or non-WASM environments.
+          if (sileroVadGateRef.current?.isActive()) return;
 
           // ACOUSTIC ECHO & ANTI-COLLISION SUPPRESSION:
           // Saat AI sedang aktif bicara melalui speaker perangkat:
           if (isPlayingAiAudioRef.current) {
-            // Redam pantulan suara speaker ke mikrofon agar tidak dipantulkan kembali
-            // ke Gemini Live (mencegah echo / feedback loop).
-            // DILARANG memotong pemutaran audio AI sendiri dengan ambang batas RMS mic tunggal!
-            // Interupsi (barge-in) ditangani secara cerdas oleh model server Gemini Live
-            // (serverContent.interrupted) atau sentuhan langsung murid pada tombol/layar.
             return;
           }
 
-          if (rms > 0.018) {
+          const vadRes = handyVadRef.current.processSamples(
+            float32,
+            liveCtx.sampleRate || 48000,
+            false
+          );
+
+          if (vadRes.inSpeech) {
+            lastHandySpeechAtRef.current = Date.now();
             setIsUserSpeakingLive(true);
             if (userSpeakingTimerRef.current) window.clearTimeout(userSpeakingTimerRef.current);
             userSpeakingTimerRef.current = window.setTimeout(() => {
               setIsUserSpeakingLive(false);
-            }, 500);
+            }, 450);
           }
 
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-            const pcmBase64 = resampleAndConvertToPcm16Base64(
-              float32,
-              liveCtx.sampleRate || 48000,
-              16000
-            );
-            wsRef.current.send(
-              JSON.stringify({
-                realtimeInput: {
-                  audio: {
-                    mimeType: 'audio/pcm;rate=16000',
-                    data: pcmBase64,
+            if (vadRes.speechPcm16k && vadRes.speechPcm16k.length > 0) {
+              const pcmBase64 = float32At16kToPcm16Base64(vadRes.speechPcm16k);
+              wsRef.current.send(
+                JSON.stringify({
+                  realtimeInput: {
+                    audio: {
+                      mimeType: 'audio/pcm;rate=16000',
+                      data: pcmBase64,
+                    },
                   },
-                },
-              })
-            );
+                })
+              );
+            }
+            if (vadRes.speechEnded) {
+              wsRef.current.send(
+                JSON.stringify({
+                  realtimeInput: {
+                    audioStreamEnd: true,
+                  },
+                })
+              );
+            }
           }
         };
 
@@ -2256,7 +2388,7 @@ export default function App() {
             const duration = buffer.duration;
             nextStartTimeRef.current = startAt + duration;
 
-            source.connect(ctx.destination);
+            source.connect(getOrAttachAnalyser(ctx, liveAnalyserRef));
             source.start(startAt);
 
             activeSourcesRef.current.push(source);
@@ -2575,6 +2707,11 @@ export default function App() {
   const stopLiveCall = () => {
     userHungUpRef.current = true;
     isLiveConnectedRef.current = false;
+    sileroVadGateRef.current?.destroy();
+    sileroVadGateRef.current = null;
+    lastHandySpeechAtRef.current = 0;
+    liveAnalyserRef.current = null;
+    handyVadRef.current.reset();
     setIsUserSpeakingLive(false);
     if (userSpeakingTimerRef.current) {
       window.clearTimeout(userSpeakingTimerRef.current);
@@ -2894,17 +3031,24 @@ export default function App() {
         const mochiHeight = isMobileScreen ? 130 : 180;
         const inst = new MochiCtor(mochiContainerRef.current, {
           mood: 'dots',
-          badge: 'chat_purple',
+          badge: null,
           aura: 'purple',
           showHands: true,
           showEars: true,
           showTail: false,
+          autoExpressions: false,
+          voiceCompanionStrictMode: true,
           width: mochiWidth,
           height: mochiHeight,
         });
+        inst.setVoiceCompanionStrictMode?.(true);
+        if (liveAnalyserRef.current && liveAudioCtxRef.current) {
+          inst.attachAudioAnalyser?.(liveAnalyserRef.current, liveAudioCtxRef.current.sampleRate || 24000);
+        } else if (ttsAnalyserRef.current && ttsAudioCtxRef.current) {
+          inst.attachAudioAnalyser?.(ttsAnalyserRef.current, ttsAudioCtxRef.current.sampleRate || 24000);
+        }
         mochiInstanceRef.current = inst;
         setIs3dMochiReady(true);
-        inst.triggerEarWiggle?.(1.3);
       } catch {
         setIs3dMochiReady(false);
         setMochi3dFailed(true);
@@ -2917,6 +3061,7 @@ export default function App() {
       cancelled = true;
       if (mochiInstanceRef.current) {
         try {
+          mochiInstanceRef.current.detachAudioAnalyser?.();
           mochiInstanceRef.current.destroy?.();
         } catch {
           // Ignore
@@ -2927,61 +3072,23 @@ export default function App() {
     };
   }, [activeTab, prereqStatus.isReady]);
 
-  // Synchronize 3D Mochi Mascot expressions, aura & gestures with live call state & AI speech mimicry
+  // Strict 2-Motion Open-Eyes Rule for Kawan Bicara 3D Mochi:
+  // Motion #1: Idle (open eyes 'dots' + hands retracted)
+  // Motion #2: Greeting / Speaking (open eyes 'dots' + gentle hand wave + real-time wawa-lipsync mouth)
   useEffect(() => {
     const m = mochiInstanceRef.current;
     if (!m) return;
     try {
+      m.setVoiceCompanionStrictMode?.(true);
+      m.setMood?.('dots');
+      m.setBadge?.(null);
+      m.setFx?.(null);
+      m.setAura?.('purple');
+
       if (callStateKey === 'speaking') {
-        const spokenText = (liveAiDraft.trim() || lastAiTurn?.text || activeScenario.openingLine || '').toLowerCase();
-
-        // Emotional Tone Analysis for AI Speech Mimicry
-        const isRoasting = /kanebo|robot|kaku|buku teks|watashi wa|nerjemahin|terjemah|mikir|lama|tegang|santai aja|waduh|aduh|教科書|硬い|ロボット|ちょっと|不自然|ウケる|じゃん|でしょ|マジで|うーん|stiff|wooden|detour|ramble/i.test(spokenText);
-        const isLaughing = /haha|wkwk|hehe|lol|あはは|ふふ|笑/i.test(spokenText);
-        const isPraise = /bagus|keren|gitu dong|mantap|hebat|cakep|pinter|nah gitu|good job|awesome|great|perfect|spot on|nailed it|すばらしい|いいね|すごい|さすが|バッチリ|そうそう/i.test(spokenText);
-        const isQuestion = /[?？]/.test(spokenText);
-
-        // Keep mouth moving in real-time synced to speech
         m.setTalking?.(true);
+        m.triggerHandGesture?.('wave', 2.2);
 
-        if (isRoasting) {
-          m.setMood?.('wink');
-          m.setBadge?.('chat_purple');
-          m.setAura?.('amber');
-          m.triggerHop?.(0.34);
-          m.triggerHandGesture?.('wave', 2.6);
-          m.triggerEarWiggle?.(1.5);
-          m.triggerJiggle?.(0.26);
-        } else if (isLaughing) {
-          m.setMood?.('happy');
-          m.setBadge?.('chat_purple');
-          m.setAura?.('pink');
-          m.triggerHop?.(0.40);
-          m.triggerHandGesture?.('cheer', 2.8);
-          m.triggerEarWiggle?.(1.5);
-        } else if (isPraise) {
-          m.setMood?.('happy');
-          m.setBadge?.('chat_blue');
-          m.setAura?.('gold');
-          m.triggerHop?.(0.36);
-          m.triggerHandGesture?.('cheer', 3.0);
-          m.triggerEarWiggle?.(1.3);
-        } else if (isQuestion) {
-          m.setMood?.('dots');
-          m.setBadge?.('chat_blue');
-          m.setAura?.('purple');
-          m.triggerEarWiggle?.(1.4);
-          m.triggerHandGesture?.('wave', 1.6);
-        } else {
-          m.setMood?.('happy');
-          m.setBadge?.('chat_purple');
-          m.setAura?.('purple');
-          m.triggerHop?.(0.24);
-          m.triggerHandGesture?.('wave', 1.8);
-          m.triggerEarWiggle?.(1.2);
-        }
-
-        // Active speech mimic cadence watchdog: periodic subtle ear wiggles & bobbing while speaking
         if (mochiSpeechCadenceTimerRef.current) {
           window.clearInterval(mochiSpeechCadenceTimerRef.current);
         }
@@ -2989,17 +3096,14 @@ export default function App() {
           const inst = mochiInstanceRef.current;
           if (!inst) return;
           try {
+            inst.setVoiceCompanionStrictMode?.(true);
+            inst.setMood?.('dots');
             inst.setTalking?.(true);
-            const r = Math.random();
-            if (r < 0.45) {
-              inst.triggerEarWiggle?.(0.85 + Math.random() * 0.4);
-            } else if (r < 0.75) {
-              inst.triggerJiggle?.(0.14);
-            }
+            inst.triggerHandGesture?.('wave', 1.8);
           } catch {
             // Ignore
           }
-        }, 1350);
+        }, 2200);
       } else {
         if (mochiSpeechCadenceTimerRef.current) {
           window.clearInterval(mochiSpeechCadenceTimerRef.current);
@@ -3007,33 +3111,6 @@ export default function App() {
         }
         m.setTalking?.(false);
         m.retractHands?.();
-
-        if (isAiThinking) {
-          // Visible "listening / thinking" while AI composes reply
-          m.setMood?.('dots');
-          m.setBadge?.('chat_blue');
-          m.setAura?.('blue');
-          m.triggerEarWiggle?.(1.1);
-        } else if (callStateKey === 'recording') {
-          m.setMood?.('dots');
-          m.setBadge?.('chat_purple');
-          m.setAura?.('purple');
-          m.triggerEarWiggle?.(1.2);
-        } else if (callStateKey === 'waiting') {
-          m.setMood?.('dots');
-          m.setBadge?.('chat_blue');
-          m.setAura?.('blue');
-          m.triggerEarWiggle?.(1.1);
-        } else if (callStateKey === 'live') {
-          m.setMood?.('dots');
-          m.setBadge?.('chat_purple');
-          m.setAura?.('purple');
-        } else {
-          m.setMood?.('dots');
-          m.setBadge?.('chat_purple');
-          m.setAura?.('purple');
-          m.setFx?.(null);
-        }
       }
     } catch {
       // Ignore
@@ -3441,9 +3518,9 @@ export default function App() {
                           const m = mochiInstanceRef.current;
                           if (m) {
                             try {
-                              m.triggerHop?.(0.28);
-                              m.triggerHandGesture?.('wave', 1.2);
-                              m.triggerEarWiggle?.(1.3);
+                              m.setVoiceCompanionStrictMode?.(true);
+                              m.setMood?.('dots');
+                              m.triggerHandGesture?.('wave', 1.8);
                             } catch {}
                           }
                         }}
@@ -3639,6 +3716,7 @@ export default function App() {
                           <JapaneseRubyDisplay
                             text={activeAiLiveText}
                             targetLang={activeScenario.targetLang}
+                            showFurigana={!isMeasureMode}
                             showRomaji={!isMeasureMode}
                             className="text-[15px] sm:text-[17px] font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
                             rubyClassName="text-[15px] sm:text-[17px]"
@@ -3786,6 +3864,7 @@ export default function App() {
                                 <JapaneseRubyDisplay
                                   text={turn.text}
                                   targetLang={activeScenario.targetLang}
+                                  showFurigana={!isMeasureMode}
                                   showRomaji={!isMeasureMode}
                                   className="text-sm font-medium text-[#1C1611] break-words leading-snug"
                                   rubyClassName="text-sm font-medium"
@@ -3825,7 +3904,8 @@ export default function App() {
                             <JapaneseRubyDisplay
                               text={turn.text}
                               targetLang={activeScenario.targetLang}
-                              showRomaji={true}
+                              showFurigana={!isMeasureMode}
+                              showRomaji={!isMeasureMode}
                               className="text-sm font-medium text-white break-words"
                               rubyClassName="text-sm font-medium text-white"
                               romajiClassName="text-xs text-[#FFE082] font-medium mt-0.5"

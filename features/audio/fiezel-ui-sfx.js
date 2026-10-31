@@ -564,6 +564,30 @@
    * memanggilnya saat menutup) menjaga invarian: satu tayangan = maksimal satu bunyi,
    * dan tidak ada bunyi liar setelah splash tertutup (m025-84).
    */
+  var MOCHI_UNIQUE_CHARACTER_SFX = {
+    paw_greet: true,
+    paw_appear: true,
+    paw_encourage: true,
+    paw_celebrate: true
+  };
+
+  function isMochiVoiceSurfaceSuppressed(env) {
+    try {
+      var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+      if (typeof target.__getFiezelState === 'function') {
+        var st = target.__getFiezelState();
+        if (st && st.view === 'chat') return true;
+      }
+      var loc = target.location && String(target.location.pathname || '');
+      if (loc && /\/call\.html$/i.test(loc)) return true;
+      var sos = target.FiezelMochiVoiceSos || target.FiezelMochiVoiceSOS;
+      if (sos && typeof sos.isSosSurfaceActive === 'function' && sos.isSosSurfaceActive()) {
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
   function playOnce(name, env, options) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
     var key = resolve(name);
@@ -574,6 +598,7 @@
       }
       return false;
     }
+    if (MOCHI_UNIQUE_CHARACTER_SFX[key] && isMochiVoiceSurfaceSuppressed(target)) return false;
     var opts = options || {};
     var windowMs = Number(opts.windowMs);
     if (!isFinite(windowMs) || windowMs <= 0) windowMs = DEFAULT_MOTIF_WINDOW_MS;
@@ -616,6 +641,7 @@
       return false;
     }
     if (key === 'page_transition') return false;
+    if (MOCHI_UNIQUE_CHARACTER_SFX[key] && isMochiVoiceSurfaceSuppressed(target)) return false;
     if (!ready(target, false)) return false;
     if (running()) {
       preloadHot(target);

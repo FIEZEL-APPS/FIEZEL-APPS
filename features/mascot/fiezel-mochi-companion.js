@@ -135,9 +135,37 @@
     return 'quiz';
   }
 
+  function isVoiceCompanionOrSosContext() {
+    try {
+      var st = typeof global.__getFiezelState === 'function' ? global.__getFiezelState() : null;
+      if (st && st.view === 'chat') return true;
+      if (global.FiezelMochiVoiceSos && typeof global.FiezelMochiVoiceSos.isSosSurfaceActive === 'function') {
+        if (global.FiezelMochiVoiceSos.isSosSurfaceActive()) return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  function syncStrictModeOnMochi(m) {
+    if (!m || typeof m.setVoiceCompanionStrictMode !== 'function') return isVoiceCompanionOrSosContext();
+    var strict = isVoiceCompanionOrSosContext();
+    if (!!m.voiceCompanionStrictMode !== strict) {
+      m.setVoiceCompanionStrictMode(strict);
+    }
+    return strict;
+  }
+
   function applySessionAccessories(m, host) {
     if (!m || typeof m.setAccessory !== 'function') return;
+    var strict = syncStrictModeOnMochi(m);
     var session = detectSession(host);
+    if (strict) {
+      if (session === 'reading') m.setAccessory('glasses');
+      else if (session === 'writing') m.setAccessory('pencil');
+      else m.setAccessory(null);
+      m.setAura(null);
+      return;
+    }
     if (session === 'home') {
       m.setAccessory('headset');
       m.setAura('gold');
@@ -221,6 +249,25 @@
   function interactTouch(m, overrideIndex) {
     var mochi = m || pool.mochi;
     if (!mochi) return null;
+
+    if (syncStrictModeOnMochi(mochi)) {
+      try {
+        clearTimeout(_touchFxTimer);
+        if (typeof mochi.setMood === 'function') mochi.setMood('dots');
+        if (typeof mochi.setBadge === 'function') mochi.setBadge(null);
+        if (typeof mochi.setFx === 'function') mochi.setFx(null);
+        if (typeof mochi.setAura === 'function') mochi.setAura(null);
+        if (typeof mochi.triggerHandGesture === 'function') mochi.triggerHandGesture('wave', 2.0);
+      } catch (_) {}
+      return {
+        sfx: null,
+        mood: 'dots',
+        gesture: 'wave',
+        aura: null,
+        fx: null,
+        title: 'Open-Eyes Greeting'
+      };
+    }
 
     var now = Date.now();
     if (typeof overrideIndex !== 'number' && now - _lastInteractAt < 250) {
@@ -317,6 +364,27 @@
       }
       if (!host.__mochiInstance) return ret;
       var m = host.__mochiInstance;
+
+      if (syncStrictModeOnMochi(m)) {
+        host.__mochiHoldUntil = 0;
+        m.setMood('dots');
+        m.setBadge(null);
+        m.setFx(null);
+        m.setAura(null);
+        if (evt === 'speaking' || evt === 'talk' || evt === 'listening-start') {
+          if (typeof m.setTalking === 'function') m.setTalking(true, (detail && detail.duration) ? detail.duration : 0);
+          m.triggerHandGesture('wave', 2.2);
+        } else if (evt === 'speaking-stop' || evt === 'listening-stop') {
+          if (typeof m.setTalking === 'function') m.setTalking(false);
+          m.retractHands();
+        } else if (evt === 'greeting' || evt === 'lesson-start' || evt === 'session-start' || evt === 'welcome-back' || evt === 'hover-answer') {
+          m.triggerHandGesture('wave', 1.8);
+        } else {
+          m.retractHands();
+        }
+        applySessionAccessories(m, host);
+        return ret;
+      }
 
       switch (evt) {
         case 'correct':
@@ -487,6 +555,20 @@
       }
       if (!host.__mochiInstance) return ret;
       var m = host.__mochiInstance;
+
+      if (syncStrictModeOnMochi(m)) {
+        m.setMood('dots');
+        m.setBadge(null);
+        m.setFx(null);
+        m.setAura(null);
+        if (name === 'greeting' || name === 'lesson-start' || name === 'session-start' || name === 'welcome-back') {
+          m.triggerHandGesture('wave', 1.8);
+        } else {
+          m.retractHands();
+        }
+        applySessionAccessories(m, host);
+        return ret;
+      }
 
       // If hold timer is active, do not let low-priority states stomp active mood
       if (Date.now() < (host.__mochiHoldUntil || 0) &&
