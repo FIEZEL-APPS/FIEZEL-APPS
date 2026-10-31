@@ -129,13 +129,7 @@
     'mochi-sos.greet-build': 'Halo! Ayo susun kalimatnya! Mulai dari subjek dan partikelnya. Ketuk aku kalau macet!',
     'mochi-sos.greet-cue': 'Halo! Mochi siap menemani. Ketuk aku kalau bingung ya!',
     'mochi-sos.leak-correction': '[SISTEM FIEZEL: Kamu hampir membocorkan kunci jawaban. DILARANG menyebut huruf pilihan atau teks jawaban benar. Ulangi dalam 1 kalimat sebagai petunjuk sokratik saja.]',
-    'mochi-sos.connecting': 'Menyambungkan Mochi...',
-    'mochi-sos.surf-vocab': 'Flashcard Kosakata: ',
-    'mochi-sos.surf-chokai': 'Latihan Menyimak Chokai JLPT',
-    'mochi-sos.surf-fsl': 'Latihan Bicara & Dengar',
-    'mochi-sos.surf-writing': 'Latihan Menulis',
-    'mochi-sos.surf-kana': 'Latihan Aksara Hiragana & Katakana (Gojūon & Dakuon)',
-    'mochi-sos.surf-story': 'Cerita Bergambar Bahasa Jepang'
+    'mochi-sos.connecting': 'Menyambungkan Mochi...'
   };
 
   var COPY_TH = {
@@ -167,13 +161,7 @@
     'mochi-sos.greet-build': 'สวัสดี! มาเรียงประโยคกัน! เริ่มจากประธานและคำช่วย ติดตรงไหนแตะฉัน!',
     'mochi-sos.greet-cue': 'สวัสดี! โมจิพร้อมแล้ว สงสัยก็แตะฉันนะ!',
     'mochi-sos.leak-correction': '[SYSTEM FIEZEL: คุณเกือบเฉลยคำตอบ ห้ามพูดตัวอักษรตัวเลือกหรือข้อความคำตอบที่ถูก พูดใหม่เป็นคำใบ้แบบโสเครติส 1 ประโยค]',
-    'mochi-sos.connecting': 'กำลังเชื่อมต่อโมจิ...',
-    'mochi-sos.surf-vocab': 'แฟลชการ์ดคำศัพท์: ',
-    'mochi-sos.surf-chokai': 'ฝึกฟังภาษาญี่ปุ่น JLPT',
-    'mochi-sos.surf-fsl': 'ฝึกพูดและฟัง',
-    'mochi-sos.surf-writing': 'ฝึกเขียน',
-    'mochi-sos.surf-kana': 'ฝึกตัวอักษรฮิรางานะและคาตาคานะ',
-    'mochi-sos.surf-story': 'นิทานภาพภาษาญี่ปุ่น'
+    'mochi-sos.connecting': 'กำลังเชื่อมต่อโมจิ...'
   };
 
   // Safe registration in canonical FiezelI18n
@@ -2510,7 +2498,7 @@
         q: {
           id: 'flash-' + wordText,
           type: 'vocab',
-          stem: t('mochi-sos.surf-vocab', 'Flashcard Kosakata: ') + wordText,
+          stem: 'Flashcard Vocabulary: ' + wordText,
           focus: { word: wordText },
           explain: { rule: meaningEl ? ('Arti: ' + meaningEl.textContent.trim() + (exEl ? ' | Contoh: ' + exEl.textContent.trim() : '')) : '' }
         }
@@ -2523,7 +2511,7 @@
       var optEls = jlptModal.querySelectorAll('.jlpt-opt-btn, .jlpt-option');
       var opts = [];
       for (var i = 0; i < optEls.length; i++) opts.push(optEls[i].textContent.trim());
-      var qStr = qTextEl ? qTextEl.textContent.trim() : t('mochi-sos.surf-chokai', 'Latihan Menyimak Chokai JLPT');
+      var qStr = qTextEl ? qTextEl.textContent.trim() : 'Chokai JLPT';
       return {
         type: 'listening',
         q: {
@@ -2538,7 +2526,7 @@
     var fsl = doc.querySelector('.fsl-shell');
     if (fsl) {
       var promptEl = fsl.querySelector('.fsl-prompt, .fsl-question, h2, h3');
-      var pStr = promptEl ? promptEl.textContent.trim() : t('mochi-sos.surf-fsl', 'Latihan Bicara & Dengar');
+      var pStr = promptEl ? promptEl.textContent.trim() : 'Speaking & Listening Lab';
       return {
         type: 'listening',
         q: {
@@ -2552,7 +2540,7 @@
     var writingStage = doc.querySelector('.writing-stage');
     if (writingStage) {
       var wPrompt = writingStage.querySelector('h2, h3, .writing-prompt');
-      var wStr = wPrompt ? wPrompt.textContent.trim() : t('mochi-sos.surf-writing', 'Latihan Menulis');
+      var wStr = wPrompt ? wPrompt.textContent.trim() : 'Writing Studio';
       return {
         type: 'build',
         q: {
@@ -2570,7 +2558,7 @@
         q: {
           id: 'kana-chart-practice',
           type: 'kanji',
-          stem: t('mochi-sos.surf-kana', 'Latihan Aksara Hiragana & Katakana (Gojūon & Dakuon)')
+          stem: 'Hiragana & Katakana (Gojūon & Dakuon)'
         }
       };
     }
@@ -2578,7 +2566,7 @@
     var storyBox = doc.getElementById('fzStoryContainer');
     if (storyBox && storyBox.children.length > 0) {
       var sTitle = storyBox.querySelector('h1, h2, h3');
-      var sStr = sTitle ? sTitle.textContent.trim() : t('mochi-sos.surf-story', 'Cerita Bergambar Bahasa Jepang');
+      var sStr = sTitle ? sTitle.textContent.trim() : 'Graded Story Reader';
       return {
         type: 'reading',
         q: {

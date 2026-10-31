@@ -1,7 +1,7 @@
 # FIEZEL Release Handoff Dossier — `m025-731`
-**Title**: `feat(mascot): instant sub-second Mochi Live duplex, user voice detection & compact soundwave visualizer`  
-**Date**: 2026-10-31  
-**Build Version**: `m025-731`  
+**Title**: `feat(mascot): instant sub-second Mochi Live duplex, user voice detection & compact soundwave visualizer`
+**Date**: 2026-10-31
+**Build Version**: `m025-731`
 
 ---
 

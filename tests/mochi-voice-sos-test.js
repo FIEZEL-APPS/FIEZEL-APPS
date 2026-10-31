@@ -236,7 +236,7 @@ class MockWebSocket {
 }
 sandbox.WebSocket = MockWebSocket;
 sandbox.localStorage = {
-  getItem: (k) => (k === 'fz_gemini_api_key' ? 'AIzaSyTestKeyForUnitVerification12345' : null)
+  getItem: (k) => (k === 'fz_gemini_api_key' ? 'fz-mock-test-key-01' : null)
 };
 
 MochiSos.onQuizSessionStart({ type: 'grammar', measure: false });
