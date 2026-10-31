@@ -114,6 +114,12 @@
       minEvidence: 3,     // minimal butir bukti distraktor
       minSessions: 2,     // minimal sessionId berbeda
       minBelief: 0.7      // gerbang masuk status aktif
+    },
+
+    // Sumber: features/brain/fiezel-fsrs6.js -> FSRS6_DECAY, DEFAULT_DESIRED_RETENTION.
+    fsrs6: {
+      decayW20: 0.1542,        // w20 kurva lupa power-law FSRS-6
+      desiredRetention: 0.9    // target retensi ulangan FSRS-6
     }
   });
 
@@ -159,6 +165,10 @@
       minEvidence: { min: 2, max: 10, integer: true },   // <2 = menuduh dari satu slip
       minSessions: { min: 1, max: 6, integer: true },
       minBelief: { min: 0.5, max: 0.95 }                 // <0.5 = "lebih mungkin tidak"
+    },
+    fsrs6: {
+      decayW20: { min: 0.1, max: 0.8 },
+      desiredRetention: { min: 0.7, max: 0.97 }
     }
   });
 
@@ -217,7 +227,7 @@
     var config = {
       schema: SCHEMA,
       brainVersion: BRAIN_VERSION,
-      bkt: {}, difficulty: {}, memory: {}, misconception: {}
+      bkt: {}, difficulty: {}, memory: {}, misconception: {}, fsrs6: {}
     };
 
     function copySection(dst, src) {
@@ -230,6 +240,7 @@
     copySection(config.difficulty, DEFAULTS.difficulty);
     copySection(config.memory, DEFAULTS.memory);
     copySection(config.misconception, DEFAULTS.misconception);
+    copySection(config.fsrs6, DEFAULTS.fsrs6);
 
     function applyLeaf(target, bounds, key, value, path) {
       if (typeof value !== 'number' || !isFinite(value)) {
@@ -305,6 +316,7 @@
     difficulty: DEFAULTS.difficulty,
     memory: DEFAULTS.memory,
     misconception: DEFAULTS.misconception,
+    fsrs6: DEFAULTS.fsrs6,
     DEFAULTS: DEFAULTS,
     BOUNDS: BOUNDS,
     sanitize: sanitize

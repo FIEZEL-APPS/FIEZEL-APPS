@@ -100,7 +100,10 @@
   // Kesulitan soal dihitung dari SEMUA murid: FiezelItemPool mencatat jawaban-pertama per
   // soal (app.js itemPoolObserve) dan menerapkan tabel koreksi gabungan di
   // itemCalibrationEffective. Tabel kosong (server belum dinyalakan) = perilaku 3.13.0.
-  var BUNDLE_VERSION = '3.14.0';
+  // 3.14.0 → 3.15.0: fsrs6Shadow baru ('shadow'). FiezelFsrs6 menghitung kurva lupa power-law
+  // 21-parameter (FSRS-6) + 4 grade implisit kuis secara berdampingan di b.fsrs6 dan mengukur
+  // log-loss aktual vs FSRS-lite tanpa mengubah penulis jadwal nextReview bawaan.
+  var BUNDLE_VERSION = '3.15.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -137,6 +140,7 @@
     { file: 'fiezel-brain-manifest.js', global: 'FiezelBrainManifest', schema: SCHEMA, authorityKey: 'manifest' },
     { file: 'fiezel-confusion-matrix.js', global: 'FiezelConfusionMatrix', schema: 'fiezel-confusion-matrix-v1', authorityKey: 'confusionMap' },
     { file: 'fiezel-core-brain.js', global: 'FiezelCoreBrain', schema: 'fiezel-core-brain-v2', authorityKey: 'memory' },
+    { file: 'fiezel-fsrs6.js', global: 'FiezelFsrs6', schema: 'fiezel-fsrs6-v1', authorityKey: 'fsrs6Shadow' },
     { file: 'fiezel-evidence-credibility.js', global: 'FiezelEvidenceCredibility', schema: 'fiezel-evidence-credibility-v1', authorityKey: 'evidenceCredibility' },
     { file: 'fiezel-item-calibration.js', global: 'FiezelItemCalibration', schema: 'fiezel-item-calibration-v1', authorityKey: 'itemCalibration' },
     { file: 'fiezel-item-pool.js', global: 'FiezelItemPool', schema: 'fiezel-item-pool-v1', authorityKey: 'itemPool' },
@@ -182,6 +186,11 @@
     // otoritas yang naik tanpa pemuatan adalah peta yang bohong ke arah sebaliknya.
     targetLanguage: 'active',
     memory: 'active',
+    // Mesin memori FSRS-6 (21-parameter power-law + 4 grade implisit kuis). Berjalan di mode
+    // 'shadow' secara bawaan: setiap pemanggilan scheduleNext() memelihara sidecar b.fsrs6 dan
+    // mengadu log-loss out-of-sample terhadap FSRS-lite tanpa mengganti penulis b.nextReview
+    // sampai saklar aktivasi dinyalakan secara eksplisit.
+    fsrs6Shadow: 'shadow',
     // PAW ARENA (m025-279): bot lawan untuk tiga permainan arena. MURNI — seed→langkah
     // deterministik, tanpa DOM/jam/acak — dimuat index.html dan di-precache sw.js.
     //
