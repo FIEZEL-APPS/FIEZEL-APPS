@@ -22,6 +22,7 @@ const cfg = require('../features/brain/fiezel-brain-config.js');
 const bkt = require('../features/brain/fiezel-mastery-bkt.js');
 const brain = require('../features/brain/fiezel-core-brain.js');
 const ledger = require('../features/brain/fiezel-misconception-ledger.js');
+const fsrs6 = require('../features/brain/fiezel-fsrs6.js');
 
 const coreBrainSrc = fs.readFileSync(
   path.join(__fzRoot, 'features', 'brain', 'fiezel-core-brain.js'), 'utf8');
@@ -94,6 +95,11 @@ test('misconception default identik dengan ekspor FiezelMisconceptionLedger', ()
   assert.strictEqual(cfg.misconception.minEvidence, ledger.MIN_EVIDENCE);
   assert.strictEqual(cfg.misconception.minSessions, ledger.MIN_SESSIONS);
   assert.strictEqual(cfg.misconception.minBelief, ledger.ACTIVE_BELIEF);
+});
+
+test('fsrs6 default identik dengan ekspor FiezelFsrs6', () => {
+  assert.strictEqual(cfg.fsrs6.decayW20, fsrs6.FSRS6_DECAY);
+  assert.strictEqual(cfg.fsrs6.desiredRetention, fsrs6.DEFAULT_DESIRED_RETENTION);
 });
 
 // ======================================================================================

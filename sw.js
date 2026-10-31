@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-731-unified-grammar-20261002';
+const SW_REV='m025-732-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -130,6 +130,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // FASE 11: jembatan bicara→maskot ikut precache - ia anggota grup malas 'voice',
   // dan boot-order-test menagih setiap berkas malas ada di ASSETS agar offline utuh.
   './features/neural-voice/fiezel-speech-bridge.js',
+  './features/brain/fiezel-fsrs6.js',
   // [ADAPTASI] OA-7 / gelombang SFX m025-177: 27 sampel OGG pustaka bunyi FIEZEL ikut
   // precache shell - PWA offline-first, dan total ~370 KB lebih kecil dari satu foto: murid
   // offline yang jawabannya benar tetap berhak mendengarnya. (Catatan: jangan menulis

@@ -1,7 +1,7 @@
 {
-  "version": "m025-731",
-  "claimedBy": "branch feat/m025-731-mochi-voice-sos-duplex",
-  "claimedAt": "2026-10-31T02:21:58.676Z",
-  "reason": "feat(mascot): instant sub-second Mochi Live duplex, user voice detection & compact soundwave visualizer",
+  "version": "m025-732",
+  "claimedBy": "branch feat/brain-fsrs6-listening-due",
+  "claimedAt": "2026-10-31T06:45:33.589Z",
+  "reason": "feat(brain): FSRS-6 shadow memory engine & listening due-review queue",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
