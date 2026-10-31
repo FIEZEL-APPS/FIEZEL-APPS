@@ -38,13 +38,22 @@
  * sebagai keputusan "tolak yang aman", tidak pernah melempar exception ke pemanggil.
  */
 (function (root, factory) {
-  var api = factory();
+  var api = factory(root);
   if (typeof module === 'object' && module.exports) module.exports = api;
   if (root) root.FiezelProductionGrader = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
 
   var SCHEMA = 'fiezel-production-grader-v1';
+  var HAS_JA_RE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/;
+
+  function getJaConjugator() {
+    if (root && root.FiezelJaConjugator) return root.FiezelJaConjugator;
+    if (typeof require === 'function') {
+      try { return require('../japanese/fiezel-ja-conjugator.js'); } catch (_) {}
+    }
+    return null;
+  }
 
   // Sufiks morfemik bahasa Inggris yang paling sering menjadi inti lesson grammar
   // (agreement -s/-es, past -ed/-d, progressive -ing). Diurutkan dari yang terpanjang
@@ -159,6 +168,26 @@
     // grammar yang ingin ditangkap lesson, bukan jari yang meleset.
     if (isMorphemeMiss(answer, candidate)) {
       return { ok: false, distance: distance, rationale: 'brain3_production_morpheme_miss' };
+    }
+    // Selisih konjugasi / partikel bahasa Jepang (mis. 食べた vs 食べて, 食べます vs 食べました,
+    // *行いた vs 行った, *食べらない vs 食べない) ditolak SEBELUM toleransi jarak-1 dan membawa
+    // ID miskonsepsi sah untuk FiezelMisconceptionLedger.
+    if (HAS_JA_RE.test(answer) || HAS_JA_RE.test(candidate)) {
+      var jaConj = getJaConjugator();
+      if (jaConj && typeof jaConj.diagnoseJapaneseMorpheme === 'function') {
+        var jaDiag = jaConj.diagnoseJapaneseMorpheme(answer, candidate);
+        if (jaDiag && jaDiag.isMorphemeError) {
+          return {
+            ok: false,
+            distance: distance,
+            rationale: 'brain3_production_morpheme_miss',
+            misconception: jaDiag.misconception || null
+          };
+        }
+      }
+      // Dalam aksara Jepang (kana/kanji), selisih 1 karakter mengubah leksem atau tata bahasa,
+      // sehingga tidak boleh diloloskan sebagai near-match typo Latin.
+      return { ok: false, distance: distance, rationale: 'brain3_production_mismatch' };
     }
     if (distance > 1) {
       return { ok: false, distance: distance, rationale: 'brain3_production_mismatch' };
@@ -282,23 +311,28 @@
     // sendiri oleh murid bisa masuk ledger. Toleransi distance<=1 yang sama dipakai di sini
     // karena murid yang typo saat menulis miskonsepsinya tetap murid dengan miskonsepsi itu.
     var matchedDistractor = null;
-    for (var d = 0; d < distractors.length; d++) {
-      var item = distractors[d];
-      if (!item || typeof item.text !== 'string') continue;
-      var normDis = normalize(item.text);
-      if (!normDis) continue;
-      if (levenshtein(normAnswer, normDis) <= 1) {
-        matchedDistractor = { text: item.text, misconception: item.misconception };
-        break;
+    var isJaInput = HAS_JA_RE.test(normAnswer) || HAS_JA_RE.test(normTarget);
+    if (!isJaInput) {
+      for (var d = 0; d < distractors.length; d++) {
+        var item = distractors[d];
+        if (!item || typeof item.text !== 'string') continue;
+        var normDis = normalize(item.text);
+        if (!normDis) continue;
+        if (levenshtein(normAnswer, normDis) <= 1) {
+          matchedDistractor = { text: item.text, misconception: item.misconception };
+          break;
+        }
       }
+    } else if (primary && primary.misconception) {
+      matchedDistractor = { text: normAnswer, misconception: primary.misconception };
     }
 
     return {
       ok: false,
       distance: primary.distance,
       matchedDistractor: matchedDistractor,
-      rationale: matchedDistractor ? 'brain3_production_distractor_match' : primary.rationale,
-      // Salah yang cocok distraktor adalah bukti diagnostik kuat; salah bebas lebih ambigu.
+      rationale: (matchedDistractor && !isJaInput) ? 'brain3_production_distractor_match' : primary.rationale,
+      // Salah yang cocok distraktor atau terdiagnosa morfemiknya adalah bukti diagnostik kuat.
       confidence: matchedDistractor ? 0.9 : 0.7
     };
   }

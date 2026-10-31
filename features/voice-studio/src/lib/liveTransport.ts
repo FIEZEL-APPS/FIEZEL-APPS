@@ -286,11 +286,11 @@ export function resolveVoiceApiCandidateBases(): string[] {
       ? window.FIEZEL_CF_CONFIG.base
       : 'https://api.fiezel.my.id');
 
-  if (cfBase) {
-    bases.push(cfBase.replace(/\/$/, ''));
-  }
   if (isLocalHost) {
     bases.push('');
+  }
+  if (cfBase) {
+    bases.push(cfBase.replace(/\/$/, ''));
   }
   return Array.from(new Set(bases));
 }

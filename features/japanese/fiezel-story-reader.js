@@ -598,6 +598,94 @@
     } catch (_) {}
   }
 
+  function isStoryExamMode() {
+    try {
+      var r = typeof globalThis !== 'undefined' ? globalThis : {};
+      if (r.FiezelJaUi && typeof r.FiezelJaUi.isExamModeActive === 'function' && r.FiezelJaUi.isExamModeActive()) {
+        return true;
+      }
+      if (r.state && (r.state.view === 'test' || r.state.view === 'exam')) return true;
+      if (r.state && r.state.activeSession && (r.state.activeSession.measureMode || r.state.activeSession.placement || r.state.activeSession.noHints || r.state.activeSession.examKind)) return true;
+      if (typeof document !== 'undefined' && document.body && document.body.classList &&
+          typeof document.body.classList.contains === 'function' &&
+          document.body.classList.contains('fz-exam-mode')) return true;
+    } catch (_) {}
+    return false;
+  }
+
+  function fallbackSolveStoryFurigana(surface, rawReading) {
+    var text = String(surface || '');
+    var reading = String(rawReading || '').replace(/[\u30a1-\u30f6]/g, function (ch) {
+      return String.fromCharCode(ch.charCodeAt(0) - 0x60);
+    });
+    var kanjiRe = /^[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff々]$/;
+    if (!text || !reading) return [{ ruby: text }];
+    var hasKanji = false;
+    for (var i = 0; i < text.length; i++) {
+      if (kanjiRe.test(text[i])) { hasKanji = true; break; }
+    }
+    if (!hasKanji) return [{ ruby: text }];
+    var pre = 0;
+    while (pre < text.length && pre < reading.length && !kanjiRe.test(text[pre]) &&
+      text[pre].replace(/[\u30a1-\u30f6]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x60); }) === reading[pre]) {
+      pre++;
+    }
+    var suf = 0;
+    while (text.length - 1 - suf >= pre && reading.length - 1 - suf >= pre && !kanjiRe.test(text[text.length - 1 - suf]) &&
+      text[text.length - 1 - suf].replace(/[\u30a1-\u30f6]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x60); }) === reading[reading.length - 1 - suf]) {
+      suf++;
+    }
+    var out = [];
+    if (pre > 0) out.push({ ruby: text.slice(0, pre) });
+    var coreT = text.slice(pre, text.length - suf);
+    var coreR = reading.slice(pre, reading.length - suf);
+    if (coreT) out.push({ ruby: coreT, rt: coreR });
+    if (suf > 0) out.push({ ruby: text.slice(text.length - suf) });
+    return out;
+  }
+
+  function solveStoryFurigana(surface, reading) {
+    try {
+      var r = typeof globalThis !== 'undefined' ? globalThis : {};
+      if (r.FiezelJaUi && typeof r.FiezelJaUi.solveFuriganaSegments === 'function') {
+        return r.FiezelJaUi.solveFuriganaSegments(surface, reading);
+      }
+      if (typeof require === 'function') {
+        var jaUi = require('./fiezel-ja-ui.js');
+        if (jaUi && typeof jaUi.solveFuriganaSegments === 'function') {
+          return jaUi.solveFuriganaSegments(surface, reading);
+        }
+      }
+    } catch (_) {}
+    return fallbackSolveStoryFurigana(surface, reading);
+  }
+
+  /**
+   * Menyelaraskan seluruh tag <ruby ...>SURFACE<rt>READING</rt></ruby> di cerita:
+   * - Mengupas okurigana awalan/tengah/akhiran keluar dari <ruby> (mis. お茶 -> お + <ruby>茶<rt>ちゃ</rt></ruby>,
+   *   美しい -> <ruby>美<rt>うつく</rt></ruby>しい, 練習します -> <ruby>練習<rt>れんしゅう</rt></ruby>します)
+   *   sambil mempertahankan atribut .fz-story-token & onclick Braincore BKT.
+   * - Dalam Mode Ujian (Exam Purity), menanggalkan seluruh <rt> dan atribut klik intip arti kata.
+   */
+  function normalizeStoryRubyMarkup(rawHtml, forceExam) {
+    var html = String(rawHtml || '');
+    if (!html || html.indexOf('<ruby') === -1) return html;
+    var exam = forceExam === true || (forceExam === undefined && isStoryExamMode());
+    return html.replace(/<ruby(\s[^>]*)?>([^<]+)<rt(?:\s[^>]*)?>([^<]+)<\/rt><\/ruby>/g, function (_full, attrs, surface, reading) {
+      if (exam) return surface;
+      var attrStr = attrs || '';
+      var segs = solveStoryFurigana(surface, reading);
+      if (segs.length === 1 && segs[0].rt) {
+        return '<ruby' + attrStr + '>' + segs[0].ruby + '<rt>' + segs[0].rt + '</rt></ruby>';
+      }
+      var inner = segs.map(function (seg) {
+        if (!seg.rt) return seg.ruby;
+        return '<ruby>' + seg.ruby + '<rt>' + seg.rt + '</rt></ruby>';
+      }).join('');
+      return attrStr.trim() ? ('<span' + attrStr + '>' + inner + '</span>') : inner;
+    });
+  }
+
   function getStoryById(id) {
     for (var i = 0; i < STORIES.length; i++) {
       if (STORIES[i].id === id) return STORIES[i];
@@ -623,9 +711,10 @@
   }
 
   function renderLibrary(container) {
+    var exam = isStoryExamMode();
     var cardsHtml = STORIES.map(function (s) {
       var subtitle = getStorySubtitle(s);
-      var titleHtml = s.titleJpMarkup || s.title;
+      var titleHtml = normalizeStoryRubyMarkup(s.titleJpMarkup || s.title, exam);
       return '' +
         '<div class="fz-story-card-item" onclick="window.FiezelStoryReader.openStory(\'' + s.id + '\')">' +
           '<div class="fz-story-thumb-wrap">' +
@@ -658,6 +747,8 @@
     var story = getStoryById(activeStoryId);
     var scene = story.scenes[activeSceneIndex] || story.scenes[0];
     var isQuiz = !!scene.isQuiz;
+    var exam = isStoryExamMode();
+    var effectiveHideFurigana = exam ? true : hideFurigana;
 
     // Build scene stepper pills
     var stepperHtml = story.scenes.map(function (sc, idx) {
@@ -705,11 +796,11 @@
           '<div class="fz-reader-card">' +
             '<div class="fz-reader-header">' +
               '<h3 class="fz-reader-title">' + scene.title + '</h3>' +
-              '<span class="fz-reader-hint">' + t('story.hint_tap', '👆 Ketuk kanji bergaris untuk arti & BKT') + '</span>' +
+              (exam ? '' : '<span class="fz-reader-hint">' + t('story.hint_tap', '👆 Ketuk kanji bergaris untuk arti & BKT') + '</span>') +
             '</div>' +
             '<div class="fz-script-flow">' +
               '<div class="fz-sentence-block active">' +
-                '<div class="fz-sentence-jp">' + scene.jp + '</div>' +
+                '<div class="fz-sentence-jp">' + normalizeStoryRubyMarkup(scene.jp, exam) + '</div>' +
                 '<div class="fz-sentence-id">' + scene.id + '</div>' +
               '</div>' +
             '</div>' +
@@ -729,7 +820,7 @@
       var optionsHtml = q.options.map(function (opt, idx) {
         return '' +
           '<button type="button" class="fz-option-btn" onclick="window.FiezelStoryReader.evaluateQuiz(' + idx + ', this)">' +
-            '<span class="fz-quiz-opt-text">' + opt.text + '</span>' +
+            '<span class="fz-quiz-opt-text">' + normalizeStoryRubyMarkup(opt.text, exam) + '</span>' +
             '<span class="fz-opt-arrow">→</span>' +
           '</button>';
       }).join('');
@@ -763,7 +854,7 @@
               '<div class="fz-quiz-badge-row">' +
                 '<span class="fz-quiz-badge">Kuis Pemahaman Akhir</span>' +
               '</div>' +
-              '<div class="fz-quiz-q-jp">' + q.questionJapanese + '</div>' +
+              '<div class="fz-quiz-q-jp">' + normalizeStoryRubyMarkup(q.questionJapanese, exam) + '</div>' +
               '<div class="fz-quiz-q-id">' + q.stem + '</div>' +
               '<div class="fz-quiz-options-grid">' +
                 optionsHtml +
@@ -779,18 +870,19 @@
     }
 
     var html = '' +
-      '<div class="fz-story-reader-wrap ' + (hideFurigana ? 'hide-furigana' : '') + '">' +
+      '<div class="fz-story-reader-wrap ' + (effectiveHideFurigana ? 'hide-furigana' : '') + '">' +
         '<!-- Reader Topbar Controls -->' +
         '<div class="fz-story-top-ctrls">' +
           '<div class="fz-story-top-row1">' +
             '<button type="button" class="fz-story-tab-btn" onclick="window.FiezelStoryReader.openLibrary()">' +
               '<span>←</span> Perpustakaan' +
             '</button>' +
-            '<div class="fz-story-aux-ctrls">' +
-              '<button type="button" class="fz-btn-furigana ' + (!hideFurigana ? 'active' : '') + '" id="fzBtnFurigana" onclick="window.FiezelStoryReader.toggleFurigana()" title="Sembunyikan / Tampilkan Furigana">' +
-                '<span>あA</span> Furigana' +
-              '</button>' +
-            '</div>' +
+            (exam ? '' :
+              '<div class="fz-story-aux-ctrls">' +
+                '<button type="button" class="fz-btn-furigana ' + (!effectiveHideFurigana ? 'active' : '') + '" id="fzBtnFurigana" onclick="window.FiezelStoryReader.toggleFurigana()" title="Sembunyikan / Tampilkan Furigana">' +
+                  '<span>あA</span> Furigana' +
+                '</button>' +
+              '</div>') +
           '</div>' +
           '<div class="fz-story-top-row2">' +
             '<div class="fz-scene-stepper-wrap">' +
@@ -866,6 +958,7 @@
   }
 
   function toggleFurigana() {
+    if (isStoryExamMode()) return;
     hideFurigana = !hideFurigana;
     var readerWrap = document.querySelector('.fz-story-reader-wrap');
     var btn = document.getElementById('fzBtnFurigana');
@@ -878,6 +971,7 @@
   }
 
   function inspectWord(kanji, reading, meaning) {
+    if (isStoryExamMode()) return;
     var kEl = document.getElementById('fzPopKanji');
     var rEl = document.getElementById('fzPopReading');
     var mEl = document.getElementById('fzPopMeaning');
@@ -1159,6 +1253,7 @@
 
   return {
     STORIES: STORIES,
+    normalizeStoryRubyMarkup: normalizeStoryRubyMarkup,
     mount: mount,
     openStory: openStory,
     openLibrary: openLibrary,

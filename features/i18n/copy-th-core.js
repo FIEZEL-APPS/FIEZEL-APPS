@@ -60,6 +60,18 @@
     'mochi-sos.greet-cue': 'สวัสดี! โมจิพร้อมแล้ว สงสัยก็แตะฉันนะ!',
     'mochi-sos.leak-correction': '[SYSTEM FIEZEL: คุณเกือบเฉลยคำตอบ ห้ามพูดตัวอักษรตัวเลือกหรือข้อความคำตอบที่ถูก พูดใหม่เป็นคำใบ้แบบโสเครติส 1 ประโยค]',
     'mochi-sos.connecting': 'กำลังเชื่อมต่อโมจิ...',
-    'mochi-sos.silence-prompt': 'พูดคุยได้เลยนะถ้าต้องการให้โมจิช่วย'
+    'mochi-sos.conn-connecting': 'กำลังเชื่อมต่อเสียงโมจิ...',
+    'mochi-sos.conn-reconnecting': 'กำลังเชื่อมต่อเสียงโมจิใหม่...',
+    'mochi-sos.conn-offline': 'อินเทอร์เน็ตขาดหาย — โมจิรอสัญญาณกลับมา',
+    'mochi-sos.conn-quota': 'โควตา AI เต็ม — กำลังสลับช่องทางเชื่อมต่อ...',
+    'mochi-sos.conn-error': 'การเชื่อมต่อ AI ขัดข้อง — แตะเพื่อลองใหม่',
+    'mochi-sos.conn-retry': 'ลองใหม่',
+    'mochi-sos.silence-prompt': 'พูดคุยได้เลยนะถ้าต้องการให้โมจิช่วย',
+    'mochi-sos.toggle-on-title': 'ผู้ช่วยเสียงโมจิเปิดอยู่ (แตะเพื่อปิด)',
+    'mochi-sos.toggle-off-title': 'ผู้ช่วยเสียงโมจิปิดอยู่ (แตะเพื่อเปิด)',
+    'mochi-sos.toggle-on-badge': 'Mochi ON',
+    'mochi-sos.toggle-off-badge': 'Mochi OFF',
+    'mochi-sos.toast-disabled': 'ปิดผู้ช่วยเสียงโมจิแล้ว',
+    'mochi-sos.toast-enabled': 'เปิดผู้ช่วยเสียงโมจิแล้ว'
   });
 }());

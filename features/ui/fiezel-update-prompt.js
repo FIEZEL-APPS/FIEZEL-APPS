@@ -196,42 +196,73 @@
       body.textContent = 'Membersihkan cache lama & memasang pembaruan... Mohon tunggu sebentar.';
     }
     setSess('fiezel-apply-update', '1');
+    if (bestBuild) setSess('fiezel-target-build', bestBuild);
     var proceed = function () {
       var triggerWorker = function (w) {
         if (!w || typeof w.postMessage !== 'function') return false;
         try { w.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); return true; } catch (_) { return false; }
       };
 
-      if (pendingWorker && triggerWorker(pendingWorker)) {
-        setTimeout(reloadIfApproved, 1800);
+      var finishReload = function () {
+        try {
+          var pClean = purgeStaleCaches();
+          if (pClean && typeof pClean.then === 'function') {
+            pClean.then(reloadIfApproved).catch(reloadIfApproved);
+            return;
+          }
+        } catch (_) {}
+        reloadIfApproved();
+      };
+
+      var promoteWorker = function (w) {
+        if (!w) return false;
+        if (w.state === 'activated') {
+          finishReload();
+          return true;
+        }
+        var onState = function () {
+          if (w.state === 'installed') {
+            triggerWorker(w);
+          } else if (w.state === 'activated') {
+            if (typeof w.removeEventListener === 'function') w.removeEventListener('statechange', onState);
+            finishReload();
+          }
+        };
+        if (typeof w.addEventListener === 'function') {
+          w.addEventListener('statechange', onState);
+        }
+        if (w.state === 'installed' || !w.state) {
+          triggerWorker(w);
+          setTimeout(finishReload, 2200);
+          return true;
+        }
+        if (w.state === 'installing') {
+          setTimeout(finishReload, 12000);
+          return true;
+        }
+        triggerWorker(w);
+        setTimeout(finishReload, 2200);
+        return true;
+      };
+
+      if (pendingWorker && pendingWorker.state !== 'redundant' && promoteWorker(pendingWorker)) {
         return;
       }
 
       if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
         navigator.serviceWorker.getRegistration().then(function (reg) {
           if (!reg) {
-            reloadIfApproved();
+            finishReload();
             return;
           }
 
           // Kasus 1: Worker baru sudah berstatus waiting
-          if (reg.waiting && triggerWorker(reg.waiting)) {
-            setTimeout(reloadIfApproved, 1800);
+          if (reg.waiting && promoteWorker(reg.waiting)) {
             return;
           }
 
           // Kasus 2: Worker baru sedang menginstal (installing)
-          if (reg.installing) {
-            var inst = reg.installing;
-            var onState = function () {
-              if (inst.state === 'installed' || inst.state === 'activated') {
-                inst.removeEventListener('statechange', onState);
-                triggerWorker(inst);
-                setTimeout(reloadIfApproved, 1800);
-              }
-            };
-            inst.addEventListener('statechange', onState);
-            setTimeout(reloadIfApproved, 10000);
+          if (reg.installing && promoteWorker(reg.installing)) {
             return;
           }
 
@@ -240,29 +271,29 @@
           if (typeof reg.update === 'function') {
             reg.addEventListener('updatefound', function onUpdateFound() {
               reg.removeEventListener('updatefound', onUpdateFound);
-              var nw = reg.installing;
-              if (nw) {
+              var nw = reg.installing || reg.waiting;
+              if (nw && !handled) {
                 handled = true;
-                nw.addEventListener('statechange', function () {
-                  if (nw.state === 'installed' || nw.state === 'activated') {
-                    triggerWorker(nw);
-                    setTimeout(reloadIfApproved, 1800);
-                  }
-                });
+                promoteWorker(nw);
               }
             });
-            reg.update().catch(function () {});
+            Promise.resolve(reg.update()).then(function () {
+              if (!handled && (reg.waiting || reg.installing)) {
+                handled = true;
+                promoteWorker(reg.waiting || reg.installing);
+              }
+            }).catch(function () {});
           }
 
-          // Jaring pengaman: muat ulang setelah 4 detik jika tidak ada worker baru
+          // Jaring pengaman: muat ulang setelah 5 detik jika tidak ada worker baru
           setTimeout(function () {
-            if (!handled) reloadIfApproved();
-          }, 4000);
+            if (!handled) finishReload();
+          }, 5000);
         }).catch(function () {
-          reloadIfApproved();
+          finishReload();
         });
       } else {
-        reloadIfApproved();
+        finishReload();
       }
     };
     try {
@@ -317,7 +348,7 @@
   }
   function show(worker, remoteVersion, force) {
     if (worker) pendingWorker = worker;
-    if (!worker && remoteVersion && newerKind(remoteVersion)) {
+    if (remoteVersion && newerKind(remoteVersion)) {
       if (remoteVersion.build) bestBuild = remoteVersion.build;
       if (remoteVersion.version) bestRemote = remoteVersion.version;
     }
@@ -508,6 +539,21 @@
     if (started || !navigator.serviceWorker) return;
     started = true;
     bindReload();
+    var targetAfterApply = sess('fiezel-target-build');
+    if (targetAfterApply) {
+      if (!isNewerBuild(targetAfterApply, APP_BUILD)) {
+        dropSess('fiezel-target-build');
+        dropSess('fiezel-target-retry');
+      } else if (sess('fiezel-target-retry') !== '1') {
+        setSess('fiezel-target-retry', '1');
+        bestBuild = targetAfterApply;
+        resolveRegistration().then(function (reg) {
+          if (reg && (reg.waiting || reg.installing)) {
+            apply();
+          }
+        }).catch(function () {});
+      }
+    }
     check(true);
     setTimeout(function () { check(false); }, 2500);
     setTimeout(function () { check(false); }, 8000);

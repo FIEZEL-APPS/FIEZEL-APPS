@@ -7,6 +7,7 @@
  * - Rule 13: Zero-Crash DOM Defensive Guards.
  */
 import assert from 'node:assert';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -119,15 +120,16 @@ assert.strictEqual(prodDenied.allowed, false, 'Production call with 5 gems must 
 assert.strictEqual(prodDenied.reason, 'insufficient_gems', 'Reason must be insufficient_gems');
 console.log('  ✓ canCall gem wallet balance enforcement verified');
 
-// 5. Anti-Leak Exam Invariant (Rule 4 §5)
-const placementDenied = MochiSos.canCall({ isPlacement: true });
-assert.strictEqual(placementDenied.allowed, false, 'Placement test must strictly deny SOS call');
-assert.strictEqual(placementDenied.reason, 'exam_lock', 'Reason must be exam_lock');
+// 5. Placement Welcome Pass (First Impression) & Anti-Leak Exam Invariant
+const placementAllowed = MochiSos.canCall({ isPlacement: true });
+assert.strictEqual(placementAllowed.allowed, true, 'Placement test after onboarding must allow Mochi Voice SOS with Welcome Pass');
+assert.strictEqual(placementAllowed.isWelcomePass, true, 'Placement test must grant Welcome Pass');
+assert.strictEqual(placementAllowed.cost, 0, 'Placement test Welcome Pass cost must be 0');
 
 const measureDenied = MochiSos.canCall({ measureMode: true });
 assert.strictEqual(measureDenied.allowed, false, 'Measure mode must strictly deny SOS call');
 assert.strictEqual(measureDenied.reason, 'exam_lock', 'Reason must be exam_lock');
-console.log('  ✓ Anti-Leak Exam Invariant verified (Placement & Measure Mode locked)');
+console.log('  ✓ Placement Welcome Pass & Anti-Leak Exam Invariant verified');
 
 // 6. Socratic Scaffolding Guidance (Zero Spoiling)
 const sampleQuestion = {
@@ -194,8 +196,9 @@ assert.strictEqual(MochiSos.canCall().allowed, false, 'state.quizType=level-exam
 sandbox.state.quizType = 'practice';
 console.log('  ✓ Exam lock via examLockActive()/state.quizType verified');
 
-// 12. Session start on exam cfg → false (locked), on practice → true
-assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'placement', placement: true }), false, 'Placement session must lock');
+// 12. Session start on placement/practice → true (armed), on level-exam → false (locked)
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'placement', placement: true }), true, 'Placement session after onboarding must arm Mochi SOS');
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'level-exam', measure: true }), false, 'Level exam session must lock');
 assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'adaptive', measure: false }), true, 'Practice session must arm SOS');
 MochiSos.onQuizSessionEnd('test');
 console.log('  ✓ Session lifecycle lock semantics verified');
@@ -235,8 +238,11 @@ class MockWebSocket {
   }
 }
 sandbox.WebSocket = MockWebSocket;
+const localStore = { fz_gemini_api_key: 'fz-mock-test-key-01' };
 sandbox.localStorage = {
-  getItem: (k) => (k === 'fz_gemini_api_key' ? 'fz-mock-test-key-01' : null)
+  getItem: (k) => (Object.prototype.hasOwnProperty.call(localStore, k) ? localStore[k] : null),
+  setItem: (k, v) => { localStore[k] = String(v); },
+  removeItem: (k) => { delete localStore[k]; }
 };
 
 MochiSos.onQuizSessionStart({ type: 'grammar', measure: false });
@@ -265,4 +271,199 @@ MochiSos.onQuizSessionEnd('test_complete');
 assert.strictEqual(MochiSos.isCallActive(), false, 'Duplex Live must close cleanly when practice session ends');
 console.log('  ✓ Auto-Entry Activation, Session-Long Persistence & Personalized 2s Silence Prompt verified');
 
-console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (15/15)! <<<');
+// 16. Strict Domain Eligibility (ONLY grammar, reading, writing — NEVER vocab, listening, kana)
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'grammar', options: ['a', 'b'] }, { cfgType: 'grammar' }), true, 'Grammar must be eligible');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'reading', passage: 'Text' }, { cfgType: 'reading' }), true, 'Reading must be eligible');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'writing' }, { cfgType: 'writing' }), true, 'Writing must be eligible');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'vocab', options: ['a', 'b'] }, { cfgType: 'vocab' }), false, 'Vocabulary must NOT be eligible');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'listening', script: 'audio' }, { cfgType: 'listening' }), false, 'Listening must NOT be eligible');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'kana' }, { cfgType: 'kana' }), false, 'Kana must NOT be eligible');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'hiragana' }, { cfgType: 'hiragana' }), false, 'Hiragana must NOT be eligible');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'kanji' }, { cfgType: 'kanji' }), false, 'Kanji flashcard must NOT be eligible');
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'vocab', measure: false }), false, 'Vocab session must not arm Mochi SOS');
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'listening', measure: false }), false, 'Listening session must not arm Mochi SOS');
+console.log('  ✓ Strict Domain Eligibility (grammar/reading/writing ONLY) verified');
+
+// 17. Corner Card Toggle Persistence (fz_mochi_sos_enabled)
+assert.strictEqual(MochiSos.isMochiEnabled(), true, 'Mochi SOS enabled by default');
+MochiSos.setMochiEnabled(false, { silent: true });
+assert.strictEqual(MochiSos.isMochiEnabled(), false, 'Mochi SOS disabled when toggled off');
+assert.strictEqual(localStore.fz_mochi_sos_enabled, '0', 'localStorage persists 0');
+assert.strictEqual(MochiSos.canCall().allowed, false, 'canCall denied when user toggled Mochi off');
+assert.strictEqual(MochiSos.canCall().reason, 'mochi_disabled', 'Reason is mochi_disabled');
+MochiSos.toggleMochiEnabled();
+assert.strictEqual(MochiSos.isMochiEnabled(), true, 'toggleMochiEnabled restores active state');
+assert.strictEqual(localStore.fz_mochi_sos_enabled, '1', 'localStorage persists 1');
+console.log('  ✓ Corner Card Toggle persistence (#fzMochiCardToggle) verified');
+
+// 18. Zero-Answer-Leak Redaction & Runtime Transcript Leak Guard
+const spoilerQ = {
+  stem: 'Yesterday she ____ to Tokyo.',
+  options: ['go', 'went', 'goes', 'going'],
+  answerIndex: 1,
+  blankAnswer: 'went',
+  explain: {
+    rule: 'Karena ada penanda waktu Yesterday (lampau), gunakan bentuk V2 yaitu "went".',
+    why: 'Kata went menunjukkan aksi masa lampau yang sudah selesai.'
+  }
+};
+const redactedRule = MochiSos.redactAnswerFromHint(spoilerQ.explain.rule, spoilerQ);
+assert.ok(!/\bwent\b/i.test(redactedRule), 'redactAnswerFromHint must scrub exact answer key from explain.rule');
+const safeGuidance = MochiSos.buildSocraticGuidance(spoilerQ);
+assert.ok(!/\bwent\b/i.test(safeGuidance), 'buildSocraticGuidance must never leak the answer key');
+assert.strictEqual(MochiSos.transcriptLeaks('Jawabannya adalah went ya!', spoilerQ), true, 'transcriptLeaks must catch spoken answer key');
+assert.strictEqual(MochiSos.transcriptLeaks('Coba perhatikan kata keterangan waktu di awal kalimatnya!', spoilerQ), false, 'transcriptLeaks must allow pure Socratic clue');
+console.log('  ✓ Zero-Answer-Leak Redaction & Transcript Guard verified');
+
+// 19. Gemini Live Socratic Tool Calling Anti-Spoiler Guard
+const blockedTool = MochiSos._executeSocraticToolCall({
+  name: 'highlight_quiz_clue',
+  args: { clue_text: 'went', pedagogical_reason: 'spoiler test' }
+}, spoilerQ);
+assert.strictEqual(blockedTool.status, 'rejected_spoiler', 'highlight_quiz_clue must reject highlighting the answer key');
+console.log('  ✓ Socratic Tool Calling (highlight_quiz_clue) anti-spoiler guard verified');
+
+// 20. Self-Hosted Silero VAD v5 Bundle + Human Vocal-Band Noise Rejection
+const vadDir = path.join(ROOT, 'vendor', 'silero-vad');
+['bundle.min.js', 'vad.worklet.bundle.min.js', 'silero_vad_v5.onnx', 'ort-wasm-simd-threaded.js', 'ort-wasm-simd-threaded.wasm', 'LICENSE'].forEach(f => {
+  assert.ok(fs.existsSync(path.join(vadDir, f)), `Silero VAD asset ${f} must exist in vendor/silero-vad`);
+});
+// Low-frequency rumble / passing vehicle engine noise (~75 Hz) must NOT pass human voice band check
+const rumbleFrame = new Float32Array(2048);
+for (let i = 0; i < rumbleFrame.length; i++) {
+  rumbleFrame[i] = 0.25 * Math.sin((2 * Math.PI * 65 * i) / 16000);
+}
+const rumbleAnalysis = MochiSos.analyzeHumanVoiceBandFrame(rumbleFrame, 16000);
+assert.strictEqual(rumbleAnalysis.isHumanSpeech, false, '65Hz vehicle engine rumble must be rejected as non-human noise');
+
+// Broadband high-frequency hiss/clatter (>45% ZCR) must NOT pass human voice band check
+const clatterFrame = new Float32Array(2048);
+for (let i = 0; i < clatterFrame.length; i++) {
+  clatterFrame[i] = (i % 2 === 0 ? 0.2 : -0.2);
+}
+const clatterAnalysis = MochiSos.analyzeHumanVoiceBandFrame(clatterFrame, 16000);
+assert.strictEqual(clatterAnalysis.isHumanSpeech, false, 'High-ZCR mechanical clatter/wind hiss must be rejected as non-human noise');
+
+// Voiced vowel harmonic signal (~420 Hz F1 + 980 Hz F2 + 1650 Hz F3) MUST pass human voice band check
+const humanVowelFrame = new Float32Array(2048);
+for (let i = 0; i < humanVowelFrame.length; i++) {
+  const t = i / 16000;
+  humanVowelFrame[i] = 0.08 * Math.sin(2 * Math.PI * 220 * t) +
+                        0.15 * Math.sin(2 * Math.PI * 520 * t) +
+                        0.10 * Math.sin(2 * Math.PI * 1180 * t);
+}
+const humanAnalysis = MochiSos.analyzeHumanVoiceBandFrame(humanVowelFrame, 16000);
+assert.strictEqual(humanAnalysis.isHumanSpeech, true, 'Voiced human harmonic speech must pass vocal-band analysis');
+console.log('  ✓ Silero VAD v5 assets & Human Vocal-Band Noise Rejection verified');
+
+// 21. Wawa-Lipsync & Strict 2-Motion Open-Eyes Mochi Rule
+const mochiSrc = fs.readFileSync(path.join(ROOT, 'mochi-mascot', 'fiezel-mochi.js'), 'utf8');
+assert.ok(mochiSrc.includes('WawaLipsyncAnalyzer') && mochiSrc.includes('attachAudioAnalyser'), '3D Mochi must expose WawaLipsyncAnalyzer & attachAudioAnalyser');
+assert.ok(code.includes('attachAudioAnalyser'), 'Mochi Voice SOS must wire real-time formant viseme lipsync');
+assert.ok(!code.includes('paw_greet') && !code.includes('paw_encourage') && !code.includes('paw_celebrate'), 'Mochi Voice SOS must emit zero paw_* mascot vocalizations');
+console.log('  ✓ Wawa-Lipsync & Strict Zero-PAW Vocalization Rule verified');
+
+// 22. Home Front-Page Session Eligibility (level, adaptive, quick_win)
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'vocab', options: ['a', 'b'] }, { cfgType: 'level' }), true, 'Home level practice session must enable Mochi Voice SOS across all items');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'grammar', options: ['a', 'b'] }, { cfgType: 'adaptive' }), true, 'Home adaptive practice session must enable Mochi Voice SOS');
+assert.strictEqual(MochiSos.isMochiSosEligible({ type: 'vocab', options: ['a', 'b'] }, { cfgType: 'quick_win' }), true, 'Home quick_win practice session must enable Mochi Voice SOS');
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'level', measure: false }), true, 'onQuizSessionStart({ type: level }) must arm Mochi SOS');
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'adaptive', measure: false }), true, 'onQuizSessionStart({ type: adaptive }) must arm Mochi SOS');
+assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'quick_win', measure: false }), true, 'onQuizSessionStart({ type: quick_win }) must arm Mochi SOS');
+MochiSos.onQuizSessionEnd('home_test_done');
+console.log('  ✓ Home Front-Page Session Eligibility (level/adaptive/quick_win) verified');
+
+// 23. Full Question, Options & Explanation Connection in Snapshot & System Prompt
+const fullExplainQ = {
+  id: 'g-present-perfect-1',
+  type: 'grammar',
+  question: 'She ____ in Kyoto since 2021.',
+  options: ['live', 'lives', 'has lived', 'lived'],
+  answerIndex: 2,
+  explain: {
+    rule: 'Present Perfect (has/have + V3) digunakan bersama penanda "since + titik waktu awal".',
+    why: 'Kalimat memiliki kata "since 2021" yang menandakan aksi dimulai di masa lalu dan masih berlangsung hingga sekarang.',
+    distractor: 'Bentuk V2 "lived" hanya untuk kejadian masa lampau yang sudah selesai (misal: in 2021, bukan since 2021).',
+    distractors: {
+      live: 'Subjek "She" tunggal dan ada penanda durasi "since 2021".',
+      lived: 'Past simple tidak dipakai bersama "since 2021".'
+    },
+    memory: 'Ingat: SINCE + tahun awal -> HAS/HAVE + V3!'
+  }
+};
+const fullSnap = MochiSos.buildQuizContextSnapshot(fullExplainQ, { cfgType: 'grammar' });
+assert.strictEqual(fullSnap.stem, 'She ____ in Kyoto since 2021.', 'Snapshot must capture exact question stem');
+assert.deepStrictEqual(fullSnap.options, ['A) live', 'B) lives', 'C) has lived', 'D) lived'], 'Snapshot must capture all answer options');
+assert.ok(fullSnap.rule.includes('Present Perfect'), 'Snapshot must preserve full pedagogical rule for mentor');
+assert.ok(fullSnap.why.includes('since 2021'), 'Snapshot must preserve full pedagogical why-explanation');
+assert.ok(fullSnap.distractor.includes('lived'), 'Snapshot must preserve distractor explanation');
+assert.ok(fullSnap.distractorNotes.join(' ').includes('Past simple'), 'Snapshot must preserve per-option distractor breakdown');
+const fullSysPrompt = MochiSos.buildMochiSystemPrompt(fullExplainQ, 'id', { cfgType: 'grammar' });
+assert.ok(fullSysPrompt.includes('She ____ in Kyoto since 2021.'), 'System prompt must embed exact question stem');
+assert.ok(fullSysPrompt.includes('Present Perfect'), 'System prompt must embed pedagogical rule');
+assert.ok(fullSysPrompt.includes('since 2021'), 'System prompt must embed pedagogical why-explanation');
+assert.ok(fullSysPrompt.includes('HARAM MUTLAK'), 'System prompt must enforce anti-spoiler Socratic rule');
+console.log('  ✓ Full Question, Options & Explanation Connection verified');
+
+// 24. Top Connection Status Banner (offline, reconnecting, quota, error, connected)
+MochiSos.setConnectionStatus('offline', 'Koneksi internet terputus');
+assert.strictEqual(MochiSos.getConnectionStatus().state, 'offline', 'Connection status state must update to offline');
+MochiSos.setConnectionStatus('quota', 'Kuota API AI penuh');
+assert.strictEqual(MochiSos.getConnectionStatus().state, 'quota', 'Connection status state must update to quota');
+MochiSos.setConnectionStatus('connected', '');
+assert.strictEqual(MochiSos.getConnectionStatus().state, 'connected', 'Connection status state must update to connected');
+MochiSos.removeConnectionBanner();
+console.log('  ✓ Top Connection Status Banner state machine verified');
+
+// 25. 3-Stage Braincore × Mochi SOS Collaboration, Anti-Instant-Hint, & SMP-Level Language
+MochiSos.onQuizSessionStart({ type: 'grammar', measure: false });
+MochiSos.setActiveQuestion(fullExplainQ, { cfgType: 'grammar' });
+const stage1Collab = MochiSos.evaluateBraincoreStruggleState(fullExplainQ);
+assert.strictEqual(stage1Collab.stage, 1, 'Initial question entry with 0 wrong attempts must be Stage 1');
+assert.strictEqual(stage1Collab.isStruggling, false, 'Stage 1 must not mark learner as struggling');
+assert.strictEqual(stage1Collab.allowClueHighlight, false, 'Stage 1 must block direct clue highlighting so learner thinks first');
+const stage1Prompt = MochiSos.buildMochiSystemPrompt(fullExplainQ, 'id', { cfgType: 'grammar' });
+assert.ok(stage1Prompt.includes('SMP') && stage1Prompt.includes('istilah linguistik/akademik rumit'), 'System prompt must enforce SMP-level language and forbid academic jargon');
+const stage1ClueRes = MochiSos._executeSocraticToolCall({
+  name: 'highlight_quiz_clue',
+  args: { clue_text: 'since 2021', pedagogical_reason: 'Cek waktu' }
+}, fullExplainQ);
+assert.strictEqual(stage1ClueRes.status, 'deferred_think_first', 'Stage 1 must defer narrow clue highlighting so learner reads and thinks independently first');
+
+// Trigger 1st wrong attempt -> Stage 2 (SMP general concept explanation, still no narrow clue pointing)
+MochiSos.noteAttempt(fullExplainQ, 0, false, { misconceptionId: 'present-simple-vs-perfect' });
+const stage2Collab = MochiSos.evaluateBraincoreStruggleState(fullExplainQ);
+assert.strictEqual(stage2Collab.stage, 2, 'After 1st wrong attempt, Braincore collaboration must advance to Stage 2');
+assert.strictEqual(stage2Collab.isStruggling, false, 'Stage 2 still encourages concept understanding before intensive rescue');
+const stage2ClueRes = MochiSos._executeSocraticToolCall({
+  name: 'highlight_quiz_clue',
+  args: { clue_text: 'since 2021', pedagogical_reason: 'Cek waktu' }
+}, fullExplainQ);
+assert.strictEqual(stage2ClueRes.status, 'deferred_think_first', 'Stage 2 still defers narrow clue highlighting');
+
+// Trigger 2nd wrong attempt -> Stage 3 (Braincore × Mochi SOS Intensive Rescue unlocked)
+MochiSos.noteAttempt(fullExplainQ, 3, false, { misconceptionId: 'past-simple-with-since' });
+const stage3Collab = MochiSos.evaluateBraincoreStruggleState(fullExplainQ);
+assert.strictEqual(stage3Collab.stage, 3, 'After 2nd wrong attempt, Braincore collaboration must escalate to Stage 3');
+assert.strictEqual(stage3Collab.isStruggling, true, 'Stage 3 must mark learner as struggling');
+assert.strictEqual(stage3Collab.allowClueHighlight, true, 'Stage 3 must unlock targeted clue guidance');
+assert.ok(stage3Collab.diagnosticPacket.includes('KOLABORASI BRAINCORE × MOCHI SOS AKTIF'), 'Stage 3 diagnostic packet must include Braincore telemetry');
+const stage3Prompt = MochiSos.buildMochiSystemPrompt(fullExplainQ, 'id', { cfgType: 'grammar' });
+assert.ok(stage3Prompt.includes('KOLABORASI BRAINCORE × MOCHI SOS AKTIF'), 'System prompt in Stage 3 must inject Braincore diagnostic packet');
+const stage3SpoilerRes = MochiSos._executeSocraticToolCall({
+  name: 'highlight_quiz_clue',
+  args: { clue_text: 'has lived', pedagogical_reason: 'Jawaban benar' }
+}, fullExplainQ);
+assert.strictEqual(stage3SpoilerRes.status, 'rejected_spoiler', 'Even in Stage 3, highlighting the exact answer key must be rejected');
+const stage3ClueRes = MochiSos._executeSocraticToolCall({
+  name: 'highlight_quiz_clue',
+  args: { clue_text: 'since 2021', pedagogical_reason: 'Perhatikan kata penanda waktu ini ya!' }
+}, fullExplainQ);
+assert.ok(stage3ClueRes.status !== 'deferred_think_first' && stage3ClueRes.status !== 'rejected_spoiler', 'Stage 3 must unlock clue highlighting without deferring');
+MochiSos.onQuizSessionEnd('collab_test_done');
+console.log('  ✓ 3-Stage Braincore × Mochi SOS Collaboration & SMP-Level Language verified');
+
+execFileSync(process.execPath, [path.join(ROOT, 'tests', 'brain-fsrs-oracle.suite.cjs')], { stdio: 'inherit' });
+execFileSync(process.execPath, [path.join(ROOT, 'tests', 'japanese-grammar-conjugator.suite.cjs')], { stdio: 'inherit' });
+
+console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (25/25)! <<<');

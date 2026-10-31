@@ -5935,9 +5935,11 @@ function tutorObserve(session,q,pickedIndex,ok,ms,ctx={}){
   if(!tutorAvailable()||!session)return fallback;
   try{
     const T=self.FiezelTutorBrain;
+    const chosenOpt=String((q?.type==='token-order'&&q?.__userTokenAnswer)?q.__userTokenAnswer:(q?.options?.[pickedIndex]??''));
+    const dynMisc=(!ok&&q?.type==='token-order'&&q?.__detectedMisconceptionId&&chosenOpt)?Object.assign({},q?.optionMisconceptions||{},{[chosenOpt]:String(q.__detectedMisconceptionId)}):(q?.optionMisconceptions||null);
     const diagnosis=T.record(session,{
-      correct:ok,chosenOption:String((q?.type==='token-order'&&q?.__userTokenAnswer)?q.__userTokenAnswer:(q?.options?.[pickedIndex]??'')),
-      optionMisconceptions:q?.optionMisconceptions||null,
+      correct:ok,chosenOption:chosenOpt,
+      optionMisconceptions:dynMisc,
       skill:q?.skill||'',concept:quizConcept(q),ms,now:Date.now(),scored:ctx.scored!==false
     });
     // Fase 2 (B3 butir 5): setiap jawaban (ternilai maupun retry) menjadi bukti afek, lalu
@@ -6015,7 +6017,7 @@ function tutorIndonesian(text){
  * (selalu tersedia, selalu benar). Fungsi ini murni: tidak menyentuh DOM, jaringan, atau jam.
  */
 function tokenOrderInversionClue(placed,required){
-  const norm=w=>String(w||'').toLowerCase().replace(/^[^\w\s]+|[^\w\s]+$/g,'').trim();
+  const norm=w=>String(w||'').toLowerCase().replace(/^[^\p{L}\p{N}\s]+|[^\p{L}\p{N}\s]+$/gu,'').trim();
   const placedRaw=Array.isArray(placed)?placed.map(w=>String(w||'')):[];
   const requiredRaw=Array.isArray(required)?required.map(w=>String(w||'')):[];
   const p=placedRaw.map(norm).filter(Boolean),r=requiredRaw.map(norm).filter(Boolean);
@@ -6079,7 +6081,7 @@ function diagnoseTokenOrderMistake(q,opts={}){
     : ((Array.isArray(q.__requiredTokens)&&q.__requiredTokens.length)
         ? q.__requiredTokens
         : String(q.options?.[q.answerIndex]||q.options?.[0]||'').replace(/[.!?]/g,'').split(/\s+/).filter(Boolean));
-  const normWord=w=>String(w||'').toLowerCase().replace(/^[^\w\s]+|[^\w\s]+$/g,'').trim();
+  const normWord=w=>String(w||'').toLowerCase().replace(/^[^\p{L}\p{N}\s]+|[^\p{L}\p{N}\s]+$/gu,'').trim();
 
   // Kasus 2: Memilih Token Pengecoh (Distractor / Typo / Morfologi)
   /* Audit pedagogi 2026-10-11 (P1): pengecoh dihitung dari KELEBIHAN kata, bukan dari
@@ -6143,6 +6145,16 @@ function diagnoseTokenOrderMistake(q,opts={}){
   }
 
   // Kasus 3: Salah Urutan Kata (Word-Order Inversion)
+  if(q.__detectedMisconceptionId==='ja-sov-predicate-position-error'){
+    return isThai
+      ? 'ในประโยคภาษาญี่ปุ่น (โครงสร้าง SOV) คำกริยาหรือภาคแสดงหลักต้องวางไว้ท้ายสุดของประโยคนะจ๊ะ'
+      : 'Dalam kalimat bahasa Jepang (pola SOV), kata kerja atau predikat utama diletakkan di bagian paling akhir kalimat ya.';
+  }
+  if(q.__detectedMisconceptionId==='ja-particle-role-swap'){
+    return isThai
+      ? 'คู่คำนามกับคำช่วย (เช่น は, を, に, で) ยังสลับบทบาทกันอยู่นะจ๊ะ ลองดูอีกครั้งว่าคำไหนทำหน้าที่อะไร'
+      : 'Pasangan kata dan partikelnya (seperti は, を, に, で) masih tertukar perannya nih — cek kembali kata mana yang menempel pada tiap partikel ya.';
+  }
   /* Audit pedagogi 2026-10-11 (P4): aturan lesson TIDAK lagi ditempel ke diagnosis urutan.
      Aturannya tentang bentuk ("Bedakan RUTINITAS vs SEDANG BERLANGSUNG..."), padahal kesalahan
      di cabang ini murni posisi - murid yang menukar dua kata disuruh memperhatikan tense. Ia juga
@@ -6171,7 +6183,7 @@ function diagnoseTokenOrderMistake(q,opts={}){
  */
 function grammarReasonEntry(q,picked){
   const list=Array.isArray(q?.explain?.distractors)?q.explain.distractors:[];
-  const nw=w=>String(w??'').toLowerCase().replace(/[^\w\s]/g,'').replace(/\s+/g,' ').trim();
+  const nw=w=>String(w??'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'').replace(/\s+/g,' ').trim();
   const p=nw(picked);
   if(!p||!list.length)return null;
   const exact=list.find(x=>nw(x?.option)===p);
@@ -6194,8 +6206,9 @@ function grammarHideKey(text,key,ownOption=''){
   const src=String(text||''),k=String(key||'').trim();
   if(!src||!k)return src;
   const rx=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const hasCjk=s=>/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(s);
   const edge="[^A-Za-z0-9'\u2019]";
-  const word=s=>new RegExp(`(^|${edge})(${rx(s)})(?=${edge}|$)`,'gi');
+  const word=s=>hasCjk(s)?new RegExp(`()(${rx(s)})`,'gi'):new RegExp(`(^|${edge})(${rx(s)})(?=${edge}|$)`,'gi');
   const parts=[k,...k.split(/\s*[;/]\s*/).filter(x=>x.length>=3&&x!==k)];
   const own=String(ownOption||'').trim(),kept=[];
   let s=src;
@@ -10110,7 +10123,10 @@ function examWatchSync(){
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
 function dismissAllModalsDefensive(){
-  try{if(typeof closeModalNow==='function')closeModalNow()}catch(_){}
+  if(dismissAllModalsDefensive._busy)return;
+  dismissAllModalsDefensive._busy=true;
+  try{
+  try{if(modalOpen&&typeof closeModalNow==='function')closeModalNow()}catch(_){}
   try{
     const modal=$('modal');
     if(modal){modal.classList.remove('show');modal.classList.add('hidden')}
@@ -10147,6 +10163,7 @@ function dismissAllModalsDefensive(){
       if('inert' in nav)nav.inert=false;
     }
   }catch(_){}
+  }finally{dismissAllModalsDefensive._busy=false;}
 }
 window.dismissAllModalsDefensive=dismissAllModalsDefensive;
 
@@ -17168,6 +17185,7 @@ function quizLoop(cfg){
      q.__userTokenAnswer=detail?.userText||'';
      q.__unplacedTokens=detail?.unplacedTokens||[];
      q.__placedTokens=detail?.placedTokens||[];
+     q.__detectedMisconceptionId=detail?.misconceptionId||q.__detectedMisconceptionId||'';
      answer(q,isCorrect?q.answerIndex:-1,tokenWidget.querySelector('#tokenSubmitBtn')||tokenWidget);
    },{measure:MEASURE||!!cfg.noHints});
    host.appendChild(tokenWidget);
@@ -17249,7 +17267,7 @@ function quizLoop(cfg){
    };
   }
   /* In-Quiz Live Mochi Voice SOS Lifeline wiring — konteks penuh + sapaan proaktif */
-  if(!MEASURE&&!cfg.placement&&!cfg.noHints&&!cfg.examKind){
+  if(!MEASURE&&!cfg.noHints&&!cfg.examKind){
     const mochiCtx={
       cfgType:String(cfg.type||''),
       type:String(q.type||''),
@@ -19924,7 +19942,7 @@ function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');mo
 // bila memang tidak ada modal terbuka, supaya jalur kembali tahu tekanan itu belum terpakai
 // dan boleh meneruskannya ke lapisan di bawahnya.
 let modalReturnFocus=null;
-function closeModalNow(){if(!modalOpen)return false;try{dismissAllModalsDefensive()}catch(_){}try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}try{$('modalPanel')?.classList.remove('modal-connect-panel')}catch(_){}modalOpen=false;uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');if(modal)modal.classList.remove('show');modalCloseTimer=setTimeout(()=>{if(modal)modal.classList.add('hidden')},320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
+function closeModalNow(){if(!modalOpen)return false;modalOpen=false;try{dismissAllModalsDefensive()}catch(_){}try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}try{$('modalPanel')?.classList.remove('modal-connect-panel')}catch(_){}uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');if(modal)modal.classList.remove('show');modalCloseTimer=setTimeout(()=>{if(modal)modal.classList.add('hidden')},320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
 // Ditutup oleh aplikasi sendiri (tombol Batal/Tutup/Escape): layarnya berubah seketika, dan
 // entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
 // sudah tidak ada.

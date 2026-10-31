@@ -138,6 +138,7 @@
     { file: 'fiezel-confusion-matrix.js', global: 'FiezelConfusionMatrix', schema: 'fiezel-confusion-matrix-v1', authorityKey: 'confusionMap' },
     { file: 'fiezel-core-brain.js', global: 'FiezelCoreBrain', schema: 'fiezel-core-brain-v2', authorityKey: 'memory' },
     { file: 'fiezel-evidence-credibility.js', global: 'FiezelEvidenceCredibility', schema: 'fiezel-evidence-credibility-v1', authorityKey: 'evidenceCredibility' },
+    { file: 'fiezel-fsrs-bridge.js', global: 'FiezelFsrsOracle', schema: 'fiezel-fsrs-bridge-v1', authorityKey: 'fsrsOracle' },
     { file: 'fiezel-item-calibration.js', global: 'FiezelItemCalibration', schema: 'fiezel-item-calibration-v1', authorityKey: 'itemCalibration' },
     { file: 'fiezel-item-pool.js', global: 'FiezelItemPool', schema: 'fiezel-item-pool-v1', authorityKey: 'itemPool' },
     { file: 'fiezel-item-prior.js', global: 'FiezelItemPrior', schema: null, authorityKey: 'itemDifficultyPrior' },
@@ -301,6 +302,10 @@
     // memutus promote/hold/reject kandidat konten — modul ini hidup, hanya belum di jalur
     // keputusan otak. Langkah 2 roadmap otonomi yang memindahkannya ke sini.
     statGate: 'off',
+    // FSRS-6 reference oracle, jembatan eksak Half-Life (R=0.5) <-> Stability (R=0.9), dan
+    // optimizer personal threadless berpagar ketat (>= 200 ulasan lintas-hari + OOS logLoss):
+    // berjalan sebagai oracle/diagnostik bayangan tanpa menimpa jadwal bawaan Core Brain.
+    fsrsOracle: 'shadow',
     // Manifest sendiri deskriptif murni: ia tidak memutuskan apa-apa untuk murid,
     // maka jujurnya 'shadow' (informasi diagnostik), bukan 'active'.
     manifest: 'shadow'

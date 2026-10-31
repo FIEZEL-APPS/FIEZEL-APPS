@@ -50,16 +50,31 @@
   function writePrefs(prefs) {
     try { root.localStorage.setItem(STORE_KEY, JSON.stringify(prefs)); } catch (_) {}
   }
+  function isExamModeActive() {
+    try {
+      if (root.state && (root.state.view === 'test' || root.state.view === 'exam')) return true;
+      var ses = root.state && root.state.activeSession;
+      if (ses && (ses.measureMode || ses.placement || ses.noHints || ses.examKind)) return true;
+      if (root.document && root.document.body && root.document.body.classList &&
+          typeof root.document.body.classList.contains === 'function' &&
+          root.document.body.classList.contains('fz-exam-mode')) return true;
+      if (root.document && typeof root.document.querySelector === 'function' &&
+          root.document.querySelector('#placementSoal')) return true;
+    } catch (_) {}
+    return false;
+  }
+
   function applyPrefs() {
     var prefs = readPrefs();
+    var exam = isExamModeActive();
     var body = root.document && root.document.body;
-    if (body) {
-      body.classList.toggle('fz-ja-no-furigana', !prefs.furigana);
-      body.classList.toggle('fz-ja-no-romaji', !prefs.romaji);
+    if (body && body.classList && typeof body.classList.toggle === 'function') {
+      body.classList.toggle('fz-ja-no-furigana', exam ? true : !prefs.furigana);
+      body.classList.toggle('fz-ja-no-romaji', exam ? true : !prefs.romaji);
     }
-    if (root.document) {
+    if (root.document && typeof root.document.querySelectorAll === 'function') {
       root.document.querySelectorAll('[data-ja-toggle]').forEach(function (btn) {
-        btn.setAttribute('aria-pressed', prefs[btn.getAttribute('data-ja-toggle')] ? 'true' : 'false');
+        btn.setAttribute('aria-pressed', (!exam && prefs[btn.getAttribute('data-ja-toggle')]) ? 'true' : 'false');
       });
     }
     return prefs;
@@ -90,16 +105,176 @@
     if (parts.length !== 2 || !parts[0].trim()) return null;
     return { kana: parts[0].trim(), romaji: parts[1].trim() };
   }
-  /** Furigana hanya di atas kanji: okurigana di ujung (行きます → 行[い]きます) dibiarkan polos,
-   *  seperti di buku ajar dan aplikasi Jepang. */
-  function rubyHtml(text, kana, attrs) {
-    var open = '<ruby class="ja-word"' + (attrs || '') + '>';
-    var m = String(text).match(/^([\u3400-\u4dbf\u4e00-\u9fff\u3005]+)([\u3040-\u309f]+)$/);
-    if (m && kana.length > m[2].length && kana.slice(-m[2].length) === m[2]) {
-      return open + esc(m[1]) + '<rp>(</rp><rt>' + esc(kana.slice(0, kana.length - m[2].length)) +
-        '</rt><rp>)</rp></ruby>' + esc(m[2]);
+  var JUKUJIKUN_OVERRIDES = {
+    '今日': 'きょう', '明日': 'あした', '昨日': 'きのう',
+    '大人': 'おとな', '一人': 'ひとり', '二人': 'ふたり',
+    '二十歳': 'はたち', '二十日': 'はつか', '一日': 'ついたち',
+    '果物': 'くだもの', '眼鏡': 'めがね', '時計': 'とけい',
+    '土産': 'みやげ', 'お土産': 'おみやげ', '友達': 'ともだち',
+    '今朝': 'けさ', '今年': 'ことし', '梅雨': 'つゆ',
+    '部屋': 'へや', '八百屋': 'やおや', 'お母さん': 'おかあさん',
+    'お父さん': 'おとうさん', 'お兄さん': 'おにいさん', 'お姉さん': 'おねえさん',
+    '上手': 'じょうず', '下手': 'へた', '真面目': 'まじめ', '可愛い': 'かわいい'
+  };
+  var IS_KANJI_CHAR_RE = /^[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff々]$/;
+  function kataToHira(str) {
+    return String(str || '').replace(/[\u30a1-\u30f6]/g, function (ch) {
+      return String.fromCharCode(ch.charCodeAt(0) - 0x60);
+    });
+  }
+  function isKanjiChar(ch) {
+    return IS_KANJI_CHAR_RE.test(ch);
+  }
+  function solveConsecutiveKanjiCompound(kanjiStr, reading, singleKanjiMap) {
+    if (JUKUJIKUN_OVERRIDES[kanjiStr] === reading) {
+      return [{ ruby: kanjiStr, rt: reading }];
     }
-    return open + esc(text) + '<rp>(</rp><rt>' + esc(kana) + '</rt><rp>)</rp></ruby>';
+    if (!singleKanjiMap || kanjiStr.length <= 1) {
+      return [{ ruby: kanjiStr, rt: reading }];
+    }
+    function backtrack(kIdx, rIdx, acc) {
+      if (kIdx === kanjiStr.length && rIdx === reading.length) return acc;
+      if (kIdx >= kanjiStr.length || rIdx >= reading.length) return null;
+      var ch = kanjiStr[kIdx] === '々' && kIdx > 0 ? kanjiStr[kIdx - 1] : kanjiStr[kIdx];
+      var info = singleKanjiMap[ch];
+      var candidates = [];
+      if (info) {
+        if (Array.isArray(info.readings)) candidates = info.readings;
+        else if (info.kana) candidates = [info.kana];
+        else if (typeof info === 'string') candidates = [info];
+      }
+      var remKanji = kanjiStr.length - kIdx - 1;
+      for (var end = rIdx + 1; end <= reading.length && end <= rIdx + 4; end++) {
+        if (reading.length - end < remKanji) break;
+        var slice = reading.slice(rIdx, end);
+        if (candidates.indexOf(slice) !== -1) {
+          var hit = backtrack(kIdx + 1, end, acc.concat([{ ruby: kanjiStr[kIdx], rt: slice }]));
+          if (hit) return hit;
+        }
+      }
+      return null;
+    }
+    var solved = backtrack(0, 0, []);
+    if (solved) return solved;
+    return [{ ruby: kanjiStr, rt: reading }];
+  }
+  function solveCoreKanjiSegments(text, reading, singleKanjiMap) {
+    if (JUKUJIKUN_OVERRIDES[text] === reading) {
+      return [{ ruby: text, rt: reading }];
+    }
+    if (text.length === 1 && isKanjiChar(text[0])) {
+      return [{ ruby: text, rt: reading }];
+    }
+    var hasConsecutiveKanji = false;
+    var groups = [];
+    for (var i = 0; i < text.length; i++) {
+      var kj = isKanjiChar(text[i]);
+      if (kj && i > 0 && isKanjiChar(text[i - 1])) hasConsecutiveKanji = true;
+      if (!groups.length || groups[groups.length - 1].isKanji !== kj) {
+        groups.push({ text: text[i], isKanji: kj });
+      } else {
+        groups[groups.length - 1].text += text[i];
+      }
+    }
+    if (groups.length > 1) {
+      var escRe = function (s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
+      var greedyPat = '^' + groups.map(function (g) {
+        return g.isKanji ? '(.+)' : escRe(kataToHira(g.text));
+      }).join('') + '$';
+      var lazyPat = '^' + groups.map(function (g) {
+        return g.isKanji ? '(.+?)' : escRe(kataToHira(g.text));
+      }).join('') + '$';
+      var mG = new RegExp(greedyPat).exec(reading);
+      var mL = new RegExp(lazyPat).exec(reading);
+      if (mG && mL) {
+        var identical = true;
+        for (var m = 1; m < mG.length; m++) {
+          if (mG[m] !== mL[m]) { identical = false; break; }
+        }
+        if (identical) {
+          var segs = [], capIdx = 1;
+          for (var gIdx = 0; gIdx < groups.length; gIdx++) {
+            if (groups[gIdx].isKanji) {
+              segs = segs.concat(
+                hasConsecutiveKanji
+                  ? solveConsecutiveKanjiCompound(groups[gIdx].text, mG[capIdx++], singleKanjiMap)
+                  : [{ ruby: groups[gIdx].text, rt: mG[capIdx++] }]
+              );
+            } else {
+              segs.push({ ruby: groups[gIdx].text });
+            }
+          }
+          return segs;
+        }
+      }
+    }
+    return solveConsecutiveKanjiCompound(text, reading, singleKanjiMap);
+  }
+  /**
+   * Memecah pasangan (surface, rawReading) menjadi [{ ruby, rt? }] sehingga okurigana
+   * di awal, tengah, maupun akhir kata (お茶, 持ち運ぶ, 買いました, 練習します) tidak pernah
+   * digumpalkan ke dalam tag <ruby> bersama kanji.
+   */
+  function solveFuriganaSegments(surface, rawReading, singleKanjiMap) {
+    var text = String(surface || '');
+    var reading = kataToHira(rawReading);
+    if (!text || !reading) return [{ ruby: text }];
+    var hasAnyKanji = false;
+    for (var k = 0; k < text.length; k++) {
+      if (isKanjiChar(text[k])) { hasAnyKanji = true; break; }
+    }
+    if (!hasAnyKanji) return [{ ruby: text }];
+    if (JUKUJIKUN_OVERRIDES[text] === reading) {
+      if (!isKanjiChar(text[0]) && kataToHira(text[0]) === reading[0]) {
+        return [{ ruby: text[0] }].concat(
+          solveFuriganaSegments(text.slice(1), reading.slice(1), singleKanjiMap)
+        );
+      }
+      return [{ ruby: text, rt: reading }];
+    }
+    var prefixLen = 0;
+    while (
+      prefixLen < text.length &&
+      prefixLen < reading.length &&
+      !isKanjiChar(text[prefixLen]) &&
+      kataToHira(text[prefixLen]) === reading[prefixLen]
+    ) {
+      prefixLen++;
+    }
+    var suffixLen = 0;
+    while (
+      text.length - 1 - suffixLen >= prefixLen &&
+      reading.length - 1 - suffixLen >= prefixLen &&
+      !isKanjiChar(text[text.length - 1 - suffixLen]) &&
+      kataToHira(text[text.length - 1 - suffixLen]) === reading[reading.length - 1 - suffixLen]
+    ) {
+      suffixLen++;
+    }
+    if (prefixLen > 0 || suffixLen > 0) {
+      var out = [];
+      if (prefixLen > 0) out.push({ ruby: text.slice(0, prefixLen) });
+      var coreText = text.slice(prefixLen, text.length - suffixLen);
+      var coreReading = reading.slice(prefixLen, reading.length - suffixLen);
+      if (coreText) {
+        out = out.concat(solveCoreKanjiSegments(coreText, coreReading, singleKanjiMap));
+      }
+      if (suffixLen > 0) out.push({ ruby: text.slice(text.length - suffixLen) });
+      return out;
+    }
+    return solveCoreKanjiSegments(text, reading, singleKanjiMap);
+  }
+
+  /** Furigana hanya di atas kanji: okurigana di awal, tengah, dan ujung (お茶, 持ち運ぶ, 行きます)
+   *  dibiarkan polos di luar <ruby>, seperti di buku ajar Jepang standar. */
+  function rubyHtml(text, kana, attrs, singleKanjiMap) {
+    if (isExamModeActive()) return esc(text);
+    var openAttr = attrs || '';
+    var segs = solveFuriganaSegments(text, kana, singleKanjiMap);
+    return segs.map(function (seg) {
+      if (!seg.rt) return esc(seg.ruby);
+      return '<ruby class="ja-word"' + openAttr + '>' + esc(seg.ruby) +
+        '<rp>(</rp><rt>' + esc(seg.rt) + '</rt><rp>)</rp></ruby>';
+    }).join('');
   }
   function wordMarkup(word, phonetic) {
     var reading = splitPhonetic(phonetic);
@@ -611,10 +786,10 @@
     });
 
     var romaji = '';
-    var isExam = false;
+    var isExam = isExamModeActive();
     try {
-      if (root.state && (root.state.view === 'test' || root.state.view === 'exam')) isExam = true;
-      if (root.document && (root.document.body?.classList?.contains('fz-exam-mode') || root.document.querySelector('.quiz-shell, #placementSoal'))) isExam = true;
+      if (!isExam && root.document && typeof root.document.querySelector === 'function' &&
+          root.document.querySelector('.quiz-shell, #placementSoal')) isExam = true;
     } catch (_) {}
 
     if (complete && !isExam) {
@@ -640,7 +815,7 @@
     });
     return html + esc(String(value).slice(last));
   }
-  var SKIP_SELECTOR = 'ruby,rt,script,style,textarea,input,.ja-run,.ja-word,.ja-word-wrap,.ja-display,.ja-romaji,[data-ja-annotated]';
+  var SKIP_SELECTOR = 'ruby,rt,script,style,textarea,input,.ja-run,.ja-word,.ja-word-wrap,.ja-display,.ja-romaji,[data-ja-annotated],#fzMochiCardToggle,#fzMochiThoughtBubble,#fzMochiVoiceUnder';
   /** Anotasi semua teks Jepang di dalam `el` (sekali; node yang sudah dianotasi dilewati). */
   function annotate(el, pool) {
     if (!el || !root.document || typeof root.document.createTreeWalker !== 'function') return 0;
@@ -669,17 +844,23 @@
   function scan(appEl) {
     pending = false;
     if (!appEl) return;
+    var exam = isExamModeActive();
     var pool = typeof lexiconSource === 'function' ? lexiconSource() : lexiconSource;
     appEl.querySelectorAll(ZONES).forEach(function (zone) {
-      if (zone.classList.contains('quiz-shell') && !zone.querySelector('.ja-quiz-display')) {
-        var bar = root.document.createElement('div');
-        bar.className = 'ja-quiz-display';
-        bar.innerHTML = togglesMarkup();
-        var top = zone.querySelector('.quiz-topbar');
-        if (top && top.parentNode === zone) top.insertAdjacentElement('afterend', bar);
-        else zone.insertBefore(bar, zone.firstChild);
+      if (zone.classList.contains('quiz-shell')) {
+        var existingBar = zone.querySelector('.ja-quiz-display');
+        if (exam) {
+          if (existingBar && existingBar.parentNode) existingBar.parentNode.removeChild(existingBar);
+        } else if (!existingBar) {
+          var bar = root.document.createElement('div');
+          bar.className = 'ja-quiz-display';
+          bar.innerHTML = togglesMarkup();
+          var top = zone.querySelector('.quiz-topbar');
+          if (top && top.parentNode === zone) top.insertAdjacentElement('afterend', bar);
+          else zone.insertBefore(bar, zone.firstChild);
+        }
       }
-      annotate(zone, pool);
+      if (!exam) annotate(zone, pool);
     });
     applyPrefs();
   }
@@ -705,12 +886,66 @@
     return JLPT_BY_LEVEL[String(level || '')] || String(level || '');
   }
 
+  /**
+   * Adapter Tier-2 menghubungkan Lindera WASM (IPADIC via OPFS) ke Kuroshiro & FiezelJaUi
+   * secara on-demand tanpa membebani shell cache awal.
+   */
+  function createLinderaKuroshiroAnalyzer(options) {
+    var opts = options || {};
+    var dictUrl = opts.dictUrl || './assets/dict/lindera-ipadic.zip';
+    var tokenizer = null;
+    return {
+      isReady: function () { return tokenizer !== null; },
+      getTokenizer: function () { return tokenizer; },
+      init: async function () {
+        if (tokenizer) return;
+        var lindera = await import(opts.wasmModulePath || '/vendor/lindera-wasm/lindera_wasm.js');
+        var opfs = await import(opts.opfsModulePath || '/vendor/lindera-wasm/opfs.js');
+        if (typeof lindera.default === 'function') await lindera.default();
+        if (!(await opfs.hasDictionary('ipadic'))) {
+          await opfs.downloadDictionary(dictUrl, 'ipadic', { onProgress: opts.onProgress });
+        }
+        var files = await opfs.loadDictionaryFiles('ipadic');
+        var dictionary = lindera.loadDictionaryFromBytes(
+          files.metadata, files.dictTrie, files.dictValsIdx, files.dictVals,
+          files.dictWordsIdx, files.dictWords, files.matrixMtx, files.charDef, files.unk
+        );
+        var builder = new lindera.TokenizerBuilder();
+        builder.setDictionaryInstance(dictionary);
+        builder.setMode(lindera.Mode.normal());
+        tokenizer = builder.build();
+      },
+      parse: async function (str) {
+        if (!tokenizer) return [];
+        var raw = tokenizer.tokenize(String(str || ''));
+        return raw.map(function (tok) {
+          var d = tok.details || [];
+          return {
+            surface_form: tok.surface,
+            pos: d[0] || '',
+            pos_detail_1: d[1] || '',
+            pos_detail_2: d[2] || '',
+            pos_detail_3: d[3] || '',
+            conjugated_type: d[4] || '',
+            conjugated_form: d[5] || '',
+            basic_form: d[6] && d[6] !== '*' ? d[6] : tok.surface,
+            reading: d[7] && d[7] !== '*' ? d[7] : tok.surface,
+            pronunciation: d[8] && d[8] !== '*' ? d[8] : (d[7] && d[7] !== '*' ? d[7] : tok.surface)
+          };
+        });
+      }
+    };
+  }
+
   root.FiezelJaUi = {
     readPrefs: readPrefs,
     applyPrefs: applyPrefs,
+    isExamModeActive: isExamModeActive,
     toggle: toggle,
     togglesMarkup: togglesMarkup,
     splitPhonetic: splitPhonetic,
+    solveFuriganaSegments: solveFuriganaSegments,
+    rubyHtml: rubyHtml,
     wordMarkup: wordMarkup,
     phoneticMarkup: phoneticMarkup,
     toKatakana: toKatakana,
@@ -730,7 +965,8 @@
     annotate: annotate,
     annotateText: annotateText,
     observe: observe,
-    unobserve: unobserve
+    unobserve: unobserve,
+    createLinderaKuroshiroAnalyzer: createLinderaKuroshiroAnalyzer
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.FiezelJaUi;
 }(typeof self !== 'undefined' ? self : globalThis));

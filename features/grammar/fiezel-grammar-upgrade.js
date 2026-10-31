@@ -125,7 +125,7 @@
     //     karena bank kosakata hanya memuat bentuk dasar.
     // Dulu kamusnya literal Indonesia di sini, jadi murid Thai membaca "dia (pr)".
     const glossFor = (text) => {
-      const lower = text.toLowerCase().replace(/^[^\w]+|[^\w]+$/g, '');
+      const lower = text.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
       const fromQ = (q.gloss && (q.gloss[text] || q.gloss[lower])) || '';
       if (fromQ) return String(fromQ);
       const isThai = (self.FiezelI18n?.getLocale?.() === 'th');
@@ -291,12 +291,33 @@
     }
 
     submitBtn.onclick = () => {
-      const norm = (s) => String(s || '').toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
-      const userText = placedTokens.map(t => t.text).join(' ');
+      const HAS_CJK_RE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/;
+      const norm = (s) => {
+        const cleaned = String(s || '')
+          .toLowerCase()
+          .replace(/[^\p{L}\p{N}\s]/gu, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        return HAS_CJK_RE.test(cleaned) ? cleaned.replace(/\s+/g, '') : cleaned;
+      };
+      const placedTexts = placedTokens.map(t => t.text);
+      const userText = placedTexts.join(' ');
       const userNorm = norm(userText);
-      const correctText = (q.tokens || []).map(t => typeof t === 'object' && t.text ? t.text : String(t)).join(' ');
+      const targetTokenTexts = (q.tokens || []).map(t => typeof t === 'object' && t.text ? t.text : String(t));
+      const correctText = targetTokenTexts.join(' ');
       const targets = [correctText, q.options?.[0], ...(q.alternates || [])].filter(Boolean);
-      const isCorrect = userText === correctText || targets.some(tgt => norm(tgt) === userNorm);
+      let isCorrect = Boolean(userNorm) && (userText === correctText || targets.some(tgt => norm(tgt) === userNorm));
+      let detectedMisconceptionId = null;
+
+      if (!isCorrect && HAS_CJK_RE.test(correctText) && self.FiezelJaConjugator && typeof self.FiezelJaConjugator.validateJapaneseSentenceOrder === 'function') {
+        const jaVerdict = self.FiezelJaConjugator.validateJapaneseSentenceOrder(placedTexts, targetTokenTexts);
+        if (jaVerdict && jaVerdict.ok && !q.strictOrder) {
+          isCorrect = true;
+        } else if (jaVerdict && jaVerdict.misconception) {
+          detectedMisconceptionId = jaVerdict.misconception;
+          q.__detectedMisconceptionId = jaVerdict.misconception;
+        }
+      }
 
       const unplacedTokens = bankTokens.filter(t => !t.placed).map(t => t.text);
 
@@ -315,8 +336,9 @@
       if (typeof onComplete === 'function') {
         onComplete(isCorrect, {
           userText: userText,
-          placedTokens: placedTokens.map(t => t.text),
-          unplacedTokens: unplacedTokens
+          placedTokens: placedTexts,
+          unplacedTokens: unplacedTokens,
+          misconceptionId: detectedMisconceptionId
         });
       }
     };
