@@ -1,7 +1,7 @@
 {
-  "version": "m025-730",
-  "claimedBy": "branch feat/m025-730-critical-pwa-repairs",
-  "claimedAt": "2026-10-30T22:06:52.188Z",
-  "reason": "fix(onboarding-voice-sos-settings): JLPT chips, English home scroll, Gemini Live SOS, direct onboarding, settings overhaul [ALLOW-PROTECTED: onboarding]",
+  "version": "m025-731",
+  "claimedBy": "branch feat/m025-731-mochi-voice-sos-duplex",
+  "claimedAt": "2026-10-31T02:21:58.676Z",
+  "reason": "feat(mascot): instant sub-second Mochi Live duplex, user voice detection & compact soundwave visualizer",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

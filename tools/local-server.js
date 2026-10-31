@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
@@ -26,6 +27,45 @@ const MIME = {
 
 const server = http.createServer((req, res) => {
   let rel = decodeURIComponent(String(req.url || '/').split('?')[0]);
+
+  if (rel.startsWith('/api/voice/')) {
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      });
+      res.end();
+      return;
+    }
+    const chunks = [];
+    req.on('data', (c) => chunks.push(c));
+    req.on('end', () => {
+      const bodyBuf = Buffer.concat(chunks);
+      const upstreamReq = https.request('https://api.fiezel.my.id' + req.url, {
+        method: req.method || 'POST',
+        headers: {
+          'Content-Type': req.headers['content-type'] || 'application/json',
+          'Origin': 'https://fiezel.my.id',
+          'Content-Length': bodyBuf.length
+        }
+      }, (upstreamRes) => {
+        res.writeHead(upstreamRes.statusCode || 200, {
+          'Content-Type': upstreamRes.headers['content-type'] || 'application/json; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'Access-Control-Allow-Origin': '*'
+        });
+        upstreamRes.pipe(res);
+      });
+      upstreamReq.on('error', (err) => {
+        res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ ok: false, error: String(err && err.message || err) }));
+      });
+      upstreamReq.end(bodyBuf);
+    });
+    return;
+  }
+
   if (rel === '/' || rel === '') rel = '/index.html';
   const file = path.join(ROOT, path.normalize(rel).replace(/^(\.\.[/\\])+/, ''));
   
