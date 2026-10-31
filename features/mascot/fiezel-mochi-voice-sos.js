@@ -38,7 +38,7 @@
   var LIVE_VOICE = 'Puck';
   var TOKEN_REFRESH_MS = 95000;      // worker: newSessionExpireTime = 120s
   var TOKEN_STALE_MS = 110000;
-  var HOT_WS_IDLE_MS = 8000;
+  var HOT_WS_IDLE_MS = 55000;
   var TAP_DEDUPE_MS = 450;
   var TAP_MAX_DIST = 12;
   var TAP_MAX_MS = 600;
@@ -73,9 +73,32 @@
   var _outTranscript = '';
   var _leakGuardHits = 0;
   var _silenceTimer = null;
+  var _turnEndFallbackTimer = null;
+  var _shellGoneTimer = null;
+  var _reconnectTimer = null;
+  var _reconnectAttempts = 0;
   var _lastUserSpeechAt = 0;
+  var _lastMochiAudioEndedAt = 0;
+  var _modelTurnInProgress = false;
+  var _awaitingOpeningModelTurn = false;
+  var _openingModelTurnTimer = null;
+  var _userSpeakVisualTimer = null;
+  var _userSpeakingNow = false;
+  var _greetingPcmCache = null;
+  var _greetingWarmInFlight = false;
+  var _inFlightGreetChunks = [];
+  var _pipeWarmToActiveCall = false;
+  var _noiseFloorRms = 0;
+  var _consecutiveSpeechFrames = 0;
+  var _userAudioBurstActive = false;
+  var _audioStreamEndTimer = null;
+  var _lastBargeInAt = 0;
+  var _speechRec = null;
+  var _speechRecActive = false;
+  var _speechRecSubmitTimer = null;
   var _silencePromptFired = false;
-  var SILENCE_PROMPT_MS = 5500;
+  var _lastSilencePromptText = '';
+  var SILENCE_PROMPT_MS = 2000;
 
   var COPY_ID = {
     'mochi-sos.bubble-tap': 'Ketuk aku',
@@ -106,7 +129,13 @@
     'mochi-sos.greet-build': 'Halo! Ayo susun kalimatnya! Mulai dari subjek dan partikelnya. Ketuk aku kalau macet!',
     'mochi-sos.greet-cue': 'Halo! Mochi siap menemani. Ketuk aku kalau bingung ya!',
     'mochi-sos.leak-correction': '[SISTEM FIEZEL: Kamu hampir membocorkan kunci jawaban. DILARANG menyebut huruf pilihan atau teks jawaban benar. Ulangi dalam 1 kalimat sebagai petunjuk sokratik saja.]',
-    'mochi-sos.connecting': 'Menyambungkan Mochi...'
+    'mochi-sos.connecting': 'Menyambungkan Mochi...',
+    'mochi-sos.surf-vocab': 'Flashcard Kosakata: ',
+    'mochi-sos.surf-chokai': 'Latihan Menyimak Chokai JLPT',
+    'mochi-sos.surf-fsl': 'Latihan Bicara & Dengar',
+    'mochi-sos.surf-writing': 'Latihan Menulis',
+    'mochi-sos.surf-kana': 'Latihan Aksara Hiragana & Katakana (Gojūon & Dakuon)',
+    'mochi-sos.surf-story': 'Cerita Bergambar Bahasa Jepang'
   };
 
   var COPY_TH = {
@@ -138,7 +167,13 @@
     'mochi-sos.greet-build': 'สวัสดี! มาเรียงประโยคกัน! เริ่มจากประธานและคำช่วย ติดตรงไหนแตะฉัน!',
     'mochi-sos.greet-cue': 'สวัสดี! โมจิพร้อมแล้ว สงสัยก็แตะฉันนะ!',
     'mochi-sos.leak-correction': '[SYSTEM FIEZEL: คุณเกือบเฉลยคำตอบ ห้ามพูดตัวอักษรตัวเลือกหรือข้อความคำตอบที่ถูก พูดใหม่เป็นคำใบ้แบบโสเครติส 1 ประโยค]',
-    'mochi-sos.connecting': 'กำลังเชื่อมต่อโมจิ...'
+    'mochi-sos.connecting': 'กำลังเชื่อมต่อโมจิ...',
+    'mochi-sos.surf-vocab': 'แฟลชการ์ดคำศัพท์: ',
+    'mochi-sos.surf-chokai': 'ฝึกฟังภาษาญี่ปุ่น JLPT',
+    'mochi-sos.surf-fsl': 'ฝึกพูดและฟัง',
+    'mochi-sos.surf-writing': 'ฝึกเขียน',
+    'mochi-sos.surf-kana': 'ฝึกตัวอักษรฮิรางานะและคาตาคานะ',
+    'mochi-sos.surf-story': 'นิทานภาพภาษาญี่ปุ่น'
   };
 
   // Safe registration in canonical FiezelI18n
@@ -157,6 +192,7 @@
     try {
       if (typeof root.__getFiezelState === 'function') return root.__getFiezelState();
       if (root.state) return root.state;
+      if (typeof state !== 'undefined' && state) return state;
     } catch (_) {}
     return null;
   }
@@ -182,6 +218,108 @@
       if (typeof state.gems.balance === 'number') return state.gems.balance;
     }
     return 120;
+  }
+
+  function isGenericPlaceholderName(n) {
+    var s = String(n || '').trim().toLowerCase();
+    return !s || s === 'pengguna uji' || s === 'teman' || s === 'เพื่อน';
+  }
+
+  function snapshotRealLearnerNameFromStorage() {
+    try {
+      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+      if (!ls || typeof ls.getItem !== 'function') return '';
+      var cached = ls.getItem('fz_registered_learner_name');
+      if (cached && !isGenericPlaceholderName(cached)) return String(cached).trim();
+      var keys = ['fiezel-onboarding-v1', 'fiezel-auth-v1', 'fz_state_v1', 'fz_state_v1@en', 'fz_state_v1@ja', 'fiezel-v5'];
+      for (var i = 0; i < keys.length; i++) {
+        var raw = ls.getItem(keys[i]);
+        if (!raw) continue;
+        try {
+          var obj = JSON.parse(raw);
+          var cand = (obj && (obj.userName || obj.name || (obj.user && (obj.user.name || obj.user.handle)) || (obj.profile && obj.profile.name))) || '';
+          if (cand && !isGenericPlaceholderName(cand)) {
+            var clean = String(cand).trim();
+            try { ls.setItem('fz_registered_learner_name', clean); } catch (_) {}
+            return clean;
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  // Tangkap nama asli murid saat skrip dimuat & pasang pelindung pada setLearnerName
+  var _bootRealLearnerName = snapshotRealLearnerNameFromStorage();
+  try {
+    if (typeof root.setLearnerName === 'function' && !root.setLearnerName.__fzMochiWrapped) {
+      var _origSetLearnerName = root.setLearnerName;
+      var wrappedSetLearnerName = function (val) {
+        var s = String(val == null ? '' : val).trim();
+        var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+        if (s && !isGenericPlaceholderName(s)) {
+          _bootRealLearnerName = s;
+          try { if (ls) ls.setItem('fz_registered_learner_name', s); } catch (_) {}
+          return _origSetLearnerName.call(this, s);
+        }
+        var preserved = _bootRealLearnerName || snapshotRealLearnerNameFromStorage();
+        if (preserved && !isGenericPlaceholderName(preserved)) {
+          return _origSetLearnerName.call(this, preserved);
+        }
+        return _origSetLearnerName.call(this, val);
+      };
+      wrappedSetLearnerName.__fzMochiWrapped = true;
+      root.setLearnerName = wrappedSetLearnerName;
+    }
+  } catch (_) {}
+
+  function getRegisteredLearnerName() {
+    var fallbackCandidate = '';
+    try {
+      var st = getState();
+      if (st && st.userName && String(st.userName).trim()) {
+        var stName = String(st.userName).trim();
+        if (!isGenericPlaceholderName(stName)) return stName;
+        fallbackCandidate = stName;
+      }
+      if (st && st.profile && st.profile.name && String(st.profile.name).trim()) {
+        var pName = String(st.profile.name).trim();
+        if (!isGenericPlaceholderName(pName)) return pName;
+        if (!fallbackCandidate) fallbackCandidate = pName;
+      }
+      var storedReal = _bootRealLearnerName || snapshotRealLearnerNameFromStorage();
+      if (storedReal && !isGenericPlaceholderName(storedReal)) return storedReal;
+      if (root.FiezelAccount && typeof root.FiezelAccount.current === 'function') {
+        var acc = root.FiezelAccount.current();
+        var accName = (acc && (acc.name || acc.handle)) ? String(acc.name || acc.handle).trim() : '';
+        if (accName && !isGenericPlaceholderName(accName)) return accName;
+      }
+      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+      if (ls && typeof ls.getItem === 'function') {
+        var obRaw = ls.getItem('fiezel-onboarding-v1');
+        if (obRaw) {
+          var ob = JSON.parse(obRaw);
+          if (ob && ob.name && String(ob.name).trim() && !isGenericPlaceholderName(ob.name)) {
+            return String(ob.name).trim();
+          }
+        }
+        var authRaw = ls.getItem('fiezel-auth-v1');
+        if (authRaw) {
+          var au = JSON.parse(authRaw);
+          var auName = (au && au.name) || (au && au.user && (au.user.name || au.user.handle)) || (au && au.handle) || '';
+          if (auName && String(auName).trim() && !isGenericPlaceholderName(auName)) {
+            return String(auName).trim();
+          }
+        }
+      }
+      if (typeof root.learnerName === 'function') {
+        var ln = String(root.learnerName() || '').trim();
+        if (ln && !isGenericPlaceholderName(ln)) return ln;
+        if (ln && !fallbackCandidate) fallbackCandidate = ln;
+      }
+    } catch (_) {}
+    if (fallbackCandidate) return fallbackCandidate;
+    return getLocale() === 'th' ? 'เพื่อน' : 'Teman';
   }
 
   function t(key, fallback, vars) {
@@ -251,9 +389,9 @@
   function findMascotHost() {
     var doc = getDoc();
     if (!doc) return null;
-    return doc.querySelector('.fz-paw-side fiezel-mascot, .quiz-stage fiezel-mascot, .quiz-shell fiezel-mascot, fiezel-mascot') ||
-           doc.querySelector('.fz-paw-side .fz-paw-slot, .quiz-stage .fz-paw-slot, .quiz-shell .fz-paw-slot, .fz-paw-slot, .quiz-mascot, .coach-strip-face.has-mascot, .fz-mochi-avatar') ||
-           doc.querySelector('.quiz-stage');
+    return doc.querySelector('.fz-paw-side fiezel-mascot, .quiz-stage fiezel-mascot, .quiz-shell fiezel-mascot, .fsl-mascot-slot fiezel-mascot, .jlpt-mascot-slot fiezel-mascot, .writing-stage fiezel-mascot, fiezel-mascot') ||
+           doc.querySelector('.fz-paw-side .fz-paw-slot, .quiz-stage .fz-paw-slot, .quiz-shell .fz-paw-slot, .fz-paw-slot, .quiz-mascot, .jlpt-mascot-slot, .fsl-mascot-slot, .coach-strip-face.has-mascot, .fz-mochi-avatar') ||
+           doc.querySelector('.quiz-stage, .quiz-shell, .card-flashcard, .jlpt-mobile-card, .fsl-shell, .writing-stage');
   }
 
   function bounceMascot() {
@@ -268,7 +406,9 @@
   }
 
   function isInsideQuiz(target) {
-    try { return !!(target && target.closest && target.closest('.quiz-shell, .quiz-stage')); } catch (_) { return false; }
+    try {
+      return !!(target && target.closest && target.closest('.quiz-shell, .quiz-stage, .card-flashcard, .jlpt-mobile-card, #listeningPanelModal, .fsl-shell, .writing-stage, #fzStoryContainer, #jaKanaChart'));
+    } catch (_) { return false; }
   }
 
   function isMascotTarget(target) {
@@ -306,15 +446,26 @@
     var doc = getDoc();
     if (!doc || _audioWarmBound) return;
     _audioWarmBound = true;
-    var once = function (e) {
-      try { if (!isInsideQuiz(e.target)) return; } catch (_) {}
-      warmAudioContext();
-      doc.removeEventListener('pointerdown', once, true);
-      doc.removeEventListener('keydown', once, true);
-      _audioWarmBound = false;
+    var onGesture = function () {
+      var ctx = warmAudioContext();
+      try {
+        prewarmLiveSession(false);
+        if (hasSessionStorage() && !_hotWs && !(_activeCall && _activeCall.active)) {
+          openHotSocket();
+        }
+      } catch (_) {}
+      if (ctx && ctx.state === 'running') {
+        doc.removeEventListener('pointerdown', onGesture, true);
+        doc.removeEventListener('touchstart', onGesture, true);
+        doc.removeEventListener('click', onGesture, true);
+        doc.removeEventListener('keydown', onGesture, true);
+        _audioWarmBound = false;
+      }
     };
-    doc.addEventListener('pointerdown', once, true);
-    doc.addEventListener('keydown', once, true);
+    doc.addEventListener('pointerdown', onGesture, true);
+    doc.addEventListener('touchstart', onGesture, true);
+    doc.addEventListener('click', onGesture, true);
+    doc.addEventListener('keydown', onGesture, true);
   }
 
   function playTone(freq, durationSec, type, when, gainLevel) {
@@ -431,10 +582,11 @@
 
   function getUserGeminiApiKey() {
     try {
-      if (typeof localStorage !== 'undefined') {
-        var k = localStorage.getItem('fz_gemini_api_key') ||
-                localStorage.getItem('gemini_api_key') ||
-                localStorage.getItem('GEMINI_API_KEY');
+      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+      if (ls && typeof ls.getItem === 'function') {
+        var k = ls.getItem('fz_gemini_api_key') ||
+                ls.getItem('gemini_api_key') ||
+                ls.getItem('GEMINI_API_KEY');
         if (k && k.trim().length > 10) return k.trim();
       }
     } catch (_) {}
@@ -500,10 +652,174 @@
     return tryBase(0);
   }
 
+  function hasSessionStorage() {
+    try {
+      var ss = (root && root.sessionStorage) || (typeof sessionStorage !== 'undefined' ? sessionStorage : null);
+      return !!(ss && typeof ss.getItem === 'function');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function getGreetingCacheKey() {
+    return 'fz_mochi_greet_pcm_v1_' + getLocale() + '_' + String(getRegisteredLearnerName() || '').toLowerCase();
+  }
+
+  function getPrewarmedGreetingChunks() {
+    try {
+      var key = getGreetingCacheKey();
+      if (_greetingPcmCache && _greetingPcmCache.key === key && Array.isArray(_greetingPcmCache.chunks) && _greetingPcmCache.chunks.length > 0) {
+        return _greetingPcmCache.chunks;
+      }
+      var ss = (root && root.sessionStorage) || (typeof sessionStorage !== 'undefined' ? sessionStorage : null);
+      if (ss && typeof ss.getItem === 'function') {
+        var raw = ss.getItem(key);
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.chunks) && parsed.chunks.length > 0) {
+            _greetingPcmCache = { key: key, chunks: parsed.chunks };
+            return parsed.chunks;
+          }
+        }
+      }
+      if (hasSessionStorage()) {
+        var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+        if (ls && typeof ls.getItem === 'function') {
+          var rawLs = ls.getItem(key);
+          if (rawLs) {
+            var parsedLs = JSON.parse(rawLs);
+            if (parsedLs && Array.isArray(parsedLs.chunks) && parsedLs.chunks.length > 0) {
+              _greetingPcmCache = { key: key, chunks: parsedLs.chunks };
+              return parsedLs.chunks;
+            }
+          }
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  function warmGreetingAudioInBackground() {
+    if (!hasSessionStorage() || _greetingWarmInFlight) return;
+    if (getPrewarmedGreetingChunks()) return;
+    var WS = root.WebSocket || (typeof window !== 'undefined' ? window.WebSocket : null);
+    if (!WS) return;
+    _greetingWarmInFlight = true;
+    _inFlightGreetChunks = [];
+    _pipeWarmToActiveCall = false;
+    var targetKey = getGreetingCacheKey();
+    var learnerName = getRegisteredLearnerName();
+    var loc = getLocale();
+
+    fetchLiveSessionToken().then(function (session) {
+      if (!session || !session.ok || !session.endpoint) {
+        _greetingWarmInFlight = false;
+        _pipeWarmToActiveCall = false;
+        return;
+      }
+      try {
+        var ws = new WS(session.endpoint);
+        ws.binaryType = 'arraybuffer';
+        var collected = _inFlightGreetChunks;
+        var finished = false;
+        var finishWarm = function (saveIt) {
+          if (finished) return;
+          finished = true;
+          _greetingWarmInFlight = false;
+          _pipeWarmToActiveCall = false;
+          if (saveIt && collected.length > 0) {
+            _greetingPcmCache = { key: targetKey, chunks: collected.slice() };
+            var serialized = JSON.stringify({ chunks: collected, at: Date.now() });
+            try {
+              var ss = (root && root.sessionStorage) || (typeof sessionStorage !== 'undefined' ? sessionStorage : null);
+              if (ss && typeof ss.setItem === 'function') ss.setItem(targetKey, serialized);
+            } catch (_) {}
+            try {
+              var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+              if (ls && typeof ls.setItem === 'function') ls.setItem(targetKey, serialized);
+            } catch (_) {}
+          }
+          try { if (ws.readyState <= 1) ws.close(1000, 'greet_warmed'); } catch (_) {}
+        };
+        var safetyTimer = setTimeout(function () { finishWarm(collected.length > 0); }, 10000);
+        ws.onopen = function () {
+          try {
+            ws.send(JSON.stringify({
+              setup: {
+                model: LIVE_MODEL,
+                generationConfig: {
+                  responseModalities: ['AUDIO'],
+                  speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: LIVE_VOICE } } }
+                },
+                systemInstruction: {
+                  parts: [{
+                    text: 'Kamu adalah Mochi, mentor suara FIEZEL yang hangat, ekspresif, dan akrab seperti manusia asli. Bicara singkat 1 kalimat saja.'
+                  }]
+                }
+              }
+            }));
+          } catch (_) {
+            clearTimeout(safetyTimer);
+            finishWarm(false);
+          }
+        };
+        var handleWarmText = function (txt) {
+          try {
+            var msg = JSON.parse(txt);
+            if (msg.setupComplete) {
+              var greetLine = loc === 'th'
+                ? ('สวัสดีจ้ะ ' + learnerName + '! โมจิพร้อมช่วยแล้ว มาดูโจทย์ข้อนี้กันเลย!')
+                : ('Halo ' + learnerName + '! Mochi di sini siap bantu kamu, yuk kita lihat soal ini!');
+              ws.send(JSON.stringify({
+                realtimeInput: {
+                  text: '[SISTEM: Ucapkan sapaan pembuka singkat 1 kalimat ini dengan intonasi manusia asli yang ceria dan hangat: "' + greetLine + '"]'
+                }
+              }));
+              return;
+            }
+            var sc = msg.serverContent;
+            if (sc && sc.modelTurn && Array.isArray(sc.modelTurn.parts)) {
+              for (var i = 0; i < sc.modelTurn.parts.length; i++) {
+                var p = sc.modelTurn.parts[i];
+                if (p.inlineData && p.inlineData.data) {
+                  collected.push(p.inlineData.data);
+                  if (_pipeWarmToActiveCall && _activeCall && _activeCall.active) {
+                    try { apiInstance._scheduleAudioChunk(p.inlineData.data); } catch (_) {}
+                  }
+                }
+              }
+            }
+            if (sc && sc.turnComplete) {
+              clearTimeout(safetyTimer);
+              finishWarm(true);
+            }
+          } catch (_) {}
+        };
+        ws.onmessage = function (ev) {
+          if (typeof ev.data === 'string') handleWarmText(ev.data);
+          else if (typeof Blob !== 'undefined' && ev.data instanceof Blob && typeof ev.data.text === 'function') {
+            ev.data.text().then(handleWarmText).catch(function () {});
+          } else if (typeof ArrayBuffer !== 'undefined' && ev.data instanceof ArrayBuffer) {
+            try { handleWarmText(new TextDecoder().decode(ev.data)); } catch (_) {}
+          }
+        };
+        ws.onerror = function () { clearTimeout(safetyTimer); finishWarm(false); };
+        ws.onclose = function () { clearTimeout(safetyTimer); finishWarm(collected.length > 0); };
+      } catch (_) {
+        _greetingWarmInFlight = false;
+      }
+    }).catch(function () {
+      _greetingWarmInFlight = false;
+    });
+  }
+
   function prewarmLiveSession(force) {
-    if (!_session.active || _session.locked) return Promise.resolve(null);
+    if (_session.locked || isExamLocked()) return Promise.resolve(null);
     var age = Date.now() - _prewarm.fetchedAt;
     if (!force && _prewarm.session && _prewarm.session.ok && age < TOKEN_STALE_MS) {
+      if (hasSessionStorage() && !_hotWs && !(_activeCall && _activeCall.active)) {
+        setTimeout(function () { try { openHotSocket(); warmGreetingAudioInBackground(); } catch (_) {} }, 10);
+      }
       return Promise.resolve(_prewarm.session);
     }
     if (_prewarm.promise) return _prewarm.promise;
@@ -512,6 +828,9 @@
       if (session && session.ok) {
         _prewarm.session = session;
         _prewarm.fetchedAt = Date.now();
+        if (hasSessionStorage() && !_hotWs && !(_activeCall && _activeCall.active)) {
+          setTimeout(function () { try { openHotSocket(); warmGreetingAudioInBackground(); } catch (_) {} }, 10);
+        }
       } else {
         _prewarm.session = null;
         _prewarm.fetchedAt = 0;
@@ -537,7 +856,6 @@
     if (_prewarm.timer) clearInterval(_prewarm.timer);
     _prewarm.timer = setInterval(function () {
       try {
-        if (!_session.active) return;
         if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
         if (_activeCall && _activeCall.active) return;
         if (_hotWs) return; // token sudah dikonsumsi hot socket
@@ -571,9 +889,9 @@
     });
   }
 
-  // Dipanggil pada pointerdown (intent). Membuka WS + kirim setup SEBELUM pointerup.
+  // Membuka WS + kirim setup di latar belakang SEBELUM murid mengklik sesi latihan.
   function openHotSocket() {
-    if (_hotWs || (_activeCall && _activeCall.active) || !_session.active || _session.locked) return;
+    if (_hotWs || (_activeCall && _activeCall.active) || _session.locked || isExamLocked()) return;
     var WS = root.WebSocket || (typeof window !== 'undefined' ? window.WebSocket : null);
     if (!WS) return;
     var session = takePrewarmedSession();
@@ -585,21 +903,28 @@
       _hotWs = ws;
       _hotWsSetupComplete = false;
       ws.__fzHot = true;
+      ws.__fzSetupSent = false;
       ws.__fzKeyIndex = session.keyIndex || 0;
       ws.onopen = function () {
-        try { ws.send(buildSetupFrame(q, _currentCtx)); } catch (_) {}
+        try {
+          ws.__fzSetupSent = true;
+          ws.send(buildSetupFrame(q, _currentCtx));
+        } catch (_) {}
+      };
+      var checkHotSetupComplete = function (str) {
+        if (str && str.indexOf('setupComplete') !== -1) {
+          _hotWsSetupComplete = true;
+        }
       };
       ws.onmessage = function (event) {
         // Hanya menandai setupComplete; pesan lain dibuang sampai socket diadopsi.
         try {
-          var str = '';
           if (typeof event.data === 'string') {
-            str = event.data;
+            checkHotSetupComplete(event.data);
+          } else if (typeof Blob !== 'undefined' && event.data instanceof Blob && typeof event.data.text === 'function') {
+            event.data.text().then(checkHotSetupComplete).catch(function () {});
           } else if (typeof ArrayBuffer !== 'undefined' && event.data instanceof ArrayBuffer) {
-            str = (typeof TextDecoder !== 'undefined') ? new TextDecoder().decode(event.data) : '';
-          }
-          if (str && str.indexOf('setupComplete') !== -1) {
-            _hotWsSetupComplete = true;
+            checkHotSetupComplete((typeof TextDecoder !== 'undefined') ? new TextDecoder().decode(event.data) : '');
           }
         } catch (_) {}
       };
@@ -701,6 +1026,7 @@
 
   function buildMochiSystemPrompt(q, locale, ctx) {
     var s = buildQuizContextSnapshot(q, ctx);
+    var learnerName = getRegisteredLearnerName();
     var lang = locale === 'th' ? 'Thailand' : 'Indonesia';
     var target = s.targetLang === 'ja' ? 'Bahasa Jepang (JLPT)' : 'Bahasa Inggris (CEFR)';
     var kindLabel = {
@@ -709,8 +1035,9 @@
     }[s.kind] || 'Session';
 
     var lines = [
-      'Kamu adalah Mochi, maskot Daifuku bulat putih berpipi merah muda dan berheadphone biru dari FIEZEL. Kamu sahabat belajar yang ceria, hangat, sabar, dan sangat cerdas.',
-      'Berbicaralah HANYA dalam Bahasa ' + lang + ' (boleh mengutip kata/frasa ' + target + ' yang sedang dipelajari). Nada: ramah, bersemangat, menggemaskan, singkat (maksimal 2 kalimat / 15-30 kata per respons).',
+      'Kamu adalah Mochi, maskot Daifuku bulat putih berpipi merah muda dan berheadphone biru dari FIEZEL. Kamu mentor pribadi yang hidup dan membimbing murid bernama "' + learnerName + '" secara langsung sepanjang sesi latihan.',
+      'GAYA SUARA MANUSIA ASLI: Berbicaralah HANYA dalam Bahasa ' + lang + ' (boleh mengutip kata/frasa ' + target + ' yang sedang dipelajari) dengan intonasi seperti manusia asli yang hangat, ekspresif, akrab, sabar, dan tidak kaku seperti robot. Maksimal 2 kalimat singkat (15-30 kata) per giliran bicara agar murid punya ruang merespons.',
+      'Identitas peserta yang sedang kamu bimbing: "' + learnerName + '". Sapa dan panggil namanya secara natural saat membimbing.',
       '',
       '=== KONTEKS LAYAR SAAT INI (murid melihat persis ini) ===',
       'Kategori: ' + kindLabel + (s.progress ? ' | Item ' + s.progress : '') + (s.level ? ' | Grade: ' + s.level : '') + ' | Target: ' + target,
@@ -740,9 +1067,9 @@
       '6. Jika ditanya arti kata dari soal/bacaan (misal "kata kedua artinya apa?"), jawab langsung dan spesifik dari konteks di atas—kecuali kata itu adalah inti dari jawaban benar, maka beri sinonim/petunjuk konteksnya saja.',
       '7. Jika murid baru saja salah, jangan mengejek; validasi usahanya, lalu bongkar kenapa pilihan itu tidak cocok.',
       '8. Jangan mengarang fakta di luar konteks layar. Jika sesuatu tidak ada di konteks, katakan kamu tidak melihatnya di layar dan ajak murid membacanya bersama.',
-      '9. Saat pembaruan konteks tiba (soal berganti / murid memilih opsi), segera ikuti konteks terbaru.',
+      '9. Saat pembaruan konteks tiba (soal berganti / murid memilih opsi), segera ikuti konteks terbaru dan terus bimbing "' + learnerName + '" di sepanjang sesi latihan.',
       '',
-      'Saat sesi dibuka: sapa murid 1 kalimat ceria lalu berikan SATU petunjuk awal sokratik yang relevan dengan soal ini. Jangan bertanya "soalnya apa" — kamu sudah tahu.'
+      'Saat sesi dibuka: sapa "' + learnerName + '" 1 kalimat hangat seperti manusia asli lalu berikan SATU petunjuk awal sokratik yang relevan dengan soal ini dan akhiri dengan pertanyaan singkat agar ia menjawab dengan suaranya. Jangan bertanya "soalnya apa" — kamu sudah tahu.'
     ];
     return lines.filter(Boolean).join('\n');
   }
@@ -811,6 +1138,9 @@
   var apiInstance = {
     _LIVE_VOICE: LIVE_VOICE,
     _LIVE_MODEL: LIVE_MODEL,
+    _SILENCE_PROMPT_MS: SILENCE_PROMPT_MS,
+    getRegisteredLearnerName: getRegisteredLearnerName,
+    getLastSilencePrompt: function () { return _lastSilencePromptText; },
     isCallActive: function () {
       return !!(_activeCall && _activeCall.active);
     },
@@ -831,6 +1161,17 @@
       }
 
       var currentBalance = getGemBalance();
+
+      // Proactive auto-entry when user enters any practice session
+      if (opts.autoEntry) {
+        return {
+          allowed: true,
+          isWelcomePass: true,
+          cost: 0,
+          balance: currentBalance,
+          badge: t('mochi-sos.badge-free', 'Gratis')
+        };
+      }
 
       // Local development mode: allow testing without corrupting persistent state
       if (isLocalEnv()) {
@@ -968,6 +1309,7 @@
     // ─── Lifecycle hooks dari app.js ────────────────────────────────────────
     onQuizSessionStart: function (cfg) {
       cfg = cfg || {};
+      if (_shellGoneTimer) { clearTimeout(_shellGoneTimer); _shellGoneTimer = null; }
       var locked = !!(cfg.measure || cfg.placement || cfg.noHints || cfg.examKind ||
         ['placement', 'level-exam', 'grammar-skip'].indexOf(String(cfg.type || '')) !== -1);
       _session = {
@@ -995,6 +1337,9 @@
     },
 
     onQuizSessionEnd: function (reason) {
+      if (_shellGoneTimer) { clearTimeout(_shellGoneTimer); _shellGoneTimer = null; }
+      if (_reconnectTimer) { clearTimeout(_reconnectTimer); _reconnectTimer = null; }
+      if (_turnEndFallbackTimer) { clearTimeout(_turnEndFallbackTimer); _turnEndFallbackTimer = null; }
       this.closeCall(reason || 'session_end');
       this.removeThoughtBubble();
       clearPrewarm();
@@ -1006,19 +1351,29 @@
     },
 
     setActiveQuestion: function (q, ctx) {
+      if (_shellGoneTimer) { clearTimeout(_shellGoneTimer); _shellGoneTimer = null; }
       if (!_session.active) this.onQuizSessionStart({ type: ctx && ctx.cfgType });
-      if (_session.locked || isExamLocked()) return false;
-      var changed = q && q !== _currentQ;
-      _currentQ = q || null;
-      _currentCtx = ctx || null;
-      // Panggilan masih hidup saat soal berganti → beri tahu Mochi konteks barunya.
+      if (_session.locked || isExamLocked(ctx)) return false;
+      var prevSig = _currentQ ? (_currentQ.id || _currentQ.stem || _currentQ.question || _currentQ.prompt || '') : '';
+      var nextSig = q ? (q.id || q.stem || q.question || q.prompt || '') : '';
+      var changed = !!(q && (q !== _currentQ || (nextSig && nextSig !== prevSig)));
+      _currentQ = q || _currentQ || null;
+      _currentCtx = ctx || _currentCtx || null;
+      // Panggilan masih hidup saat soal berganti → tetap aktif sepanjang sesi latihan & bimbing soal baru.
       if (changed && this.isCallActive()) {
         _activeCall.question = q;
+        _activeCall.answered = false;
+        _activeCall.cashbackAwardedForQ = false;
+        _silencePromptFired = false;
+        _lastUserSpeechAt = Date.now();
+        stopAllActiveAudioSources();
+        this.renderUnderMochiVoiceVisualizer(true);
         var snap = buildQuizContextSnapshot(q, ctx);
-        sendContextUpdate('[PEMBARUAN: beralih ke item baru. Kategori: ' + snap.kind +
+        var learnerName = getRegisteredLearnerName();
+        sendContextUpdate('[PEMBARUAN: Beralih ke item baru bersama "' + learnerName + '". Kategori: ' + snap.kind +
           '. Teks: "' + snap.stem + '". Pilihan: ' + snap.options.join(' | ') +
           (snap.rule ? '. Aturan inti: ' + snap.rule : '') +
-          '. Sapa singkat dan beri satu petunjuk awal tanpa membocorkan jawaban.]');
+          '. Sapa "' + learnerName + '" secara singkat dengan suara manusia asli yang hangat, berikan 1 petunjuk awal sokratik tanpa membocorkan jawaban, dan akhiri dengan pertanyaan singkat agar ia menjawab dengan suaranya!]');
       }
       // Hot socket yang sudah dibuka memakai prompt soal lama → buang, pre-warm ulang.
       if (changed && _hotWs) { discardHotSocket(); prewarmLiveSession(true); }
@@ -1032,7 +1387,10 @@
       _attempts.push({ qid: q.id || q.target || q.question, idx: idx, text: text, ok: !!ok, at: Date.now() });
       if (_attempts.length > 40) _attempts.shift();
       if (this.isCallActive() && !ok && meta && meta.firstTry) {
-        sendContextUpdate('[PEMBARUAN: murid baru saja memilih "' + clip(text, 120) + '" dan itu SALAH. Validasi usahanya, jelaskan kenapa pilihan itu tidak cocok, lalu beri petunjuk eliminasi berikutnya. Jangan sebut huruf/teks jawaban benar.]');
+        _silencePromptFired = false;
+        _lastUserSpeechAt = Date.now();
+        var learnerName = getRegisteredLearnerName();
+        sendContextUpdate('[PEMBARUAN: Peserta "' + learnerName + '" baru saja memilih "' + clip(text, 120) + '" dan itu SALAH. Validasi usahanya dengan ramah seperti tutor manusia asli, jelaskan kenapa pilihan itu tidak cocok, lalu beri petunjuk eliminasi berikutnya dan tanyakan pendapatnya. Jangan sebut huruf/teks jawaban benar.]');
       }
     },
 
@@ -1094,21 +1452,46 @@
       playChime('tap');
       hapticTap(12);
       bounceMascot();
-      this.toggleCall(getActiveQuestion(null), {});
+      var activeQ = getActiveQuestion(null);
+      if (this.isCallActive()) {
+        if (!_ws || _ws.readyState !== 1) {
+          this._startGeminiLiveDuplex(activeQ);
+        } else {
+          _silencePromptFired = false;
+          _lastUserSpeechAt = Date.now();
+          var learnerName = getRegisteredLearnerName();
+          sendContextUpdate('[SISTEM: Peserta "' + learnerName + '" baru saja mengetuk Mochi untuk meminta petunjuk tambahan pada soal ini. Berikan 1 petunjuk sokratik yang lebih spesifik dengan suara manusia asli yang hangat tanpa membocorkan kunci jawaban, lalu tanyakan pendapatnya!]');
+        }
+      } else {
+        this.startCall(activeQ, { autoEntry: true });
+      }
       return true;
     },
 
-    // ─── Masuk sesi latihan: Wajah Mochi bersih tanpa balon bacaan & tanpa suara robot TTS ───
+    // ─── Masuk sesi latihan: Duplex Live langsung aktif seketika menyapa & membimbing murid ───
     greetOnEntry: function (q, ctx) {
-      if (_session.greeted || _session.locked || isExamLocked()) return false;
+      if (_session.locked || isExamLocked(ctx)) return false;
+      if (q) _currentQ = q;
+      if (ctx) _currentCtx = ctx;
       _session.greeted = true;
-      try { this._updateMochiMascotPose('idle'); } catch (_) {}
+      try { this._updateMochiMascotPose('happy'); } catch (_) {}
+      if (!this.isCallActive()) {
+        this.startCall(getActiveQuestion(q), { autoEntry: true });
+      } else {
+        this.renderUnderMochiVoiceVisualizer(true);
+      }
       return true;
     },
 
     // ─── Panggilan ──────────────────────────────────────────────────────────
     startCall: function (q, opts) {
+      opts = opts || {};
       if (this.isCallActive()) {
+        if (opts.autoEntry) {
+          if (q) this.setActiveQuestion(q, _currentCtx);
+          this.renderUnderMochiVoiceVisualizer(true);
+          return;
+        }
         this.closeCall('toggle');
         return;
       }
@@ -1123,14 +1506,20 @@
       var sessionId = 'sos-' + Date.now().toString(36);
       this.spendForCall(sessionId, can.isWelcomePass);
 
+      _reconnectAttempts = 0;
+      _silencePromptFired = false;
+      _lastUserSpeechAt = Date.now();
       _activeCall = {
         active: true,
         sessionId: sessionId,
         startedAt: Date.now(),
         isWelcomePass: !!can.isWelcomePass,
+        autoEntry: !!opts.autoEntry,
         question: q,
         answered: false,
-        firstAudioAt: 0
+        cashbackAwardedForQ: false,
+        firstAudioAt: 0,
+        lastSilencePrompt: ''
       };
       _outTranscript = '';
       _firstChunkPending = true;
@@ -1148,11 +1537,34 @@
     _startGeminiLiveDuplex: function (q) {
       var self = this;
 
-      // 1. Mikrofon — paralel, tidak pernah memblokir suara Mochi.
+      // 0. Putar sapaan suara AI Gemini Live (Puck 24kHz PCM) yang sudah di-buffer
+      //    SECARA INSTAN (<30ms, sepersekian detik) begitu sesi latihan diklik!
+      var prewarmedGreet = getPrewarmedGreetingChunks();
+      if (prewarmedGreet && prewarmedGreet.length > 0) {
+        if (_activeCall) _activeCall.playedInstantGreeting = true;
+        for (var gi = 0; gi < prewarmedGreet.length; gi++) {
+          this._scheduleAudioChunk(prewarmedGreet[gi]);
+        }
+      } else if (_greetingWarmInFlight) {
+        if (_activeCall) _activeCall.playedInstantGreeting = true;
+        _pipeWarmToActiveCall = true;
+        for (var fi = 0; fi < _inFlightGreetChunks.length; fi++) {
+          this._scheduleAudioChunk(_inFlightGreetChunks[fi]);
+        }
+      } else {
+        playChime('greet');
+        warmGreetingAudioInBackground();
+      }
+
+      // 1. Mikrofon + Parallel Web Speech Recognition — paralel, tidak pernah memblokir suara Mochi.
+      this._startParallelSpeechRecognition();
       if (typeof navigator !== 'undefined' && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
         navigator.mediaDevices.getUserMedia({
-          audio: { channelCount: 1, sampleRate: 16000, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+        }).catch(function () {
+          return navigator.mediaDevices.getUserMedia({ audio: true });
         }).then(function (stream) {
+          if (!stream) return;
           if (!self.isCallActive()) { stream.getTracks().forEach(function (tr) { tr.stop(); }); return; }
           _micStream = stream;
           self._wireMicrophoneStream(stream);
@@ -1161,7 +1573,7 @@
         });
       }
 
-      // 2. Jalur tercepat: adopsi hot socket yang dibuka saat pointerdown.
+      // 2. Jalur tercepat: adopsi hot socket yang sudah terbuka & setupComplete di latar belakang.
       if (_hotWs && _hotWs.readyState <= 1) {
         var ws = _hotWs;
         _hotWs = null;
@@ -1180,6 +1592,17 @@
         return;
       }
 
+      // 3b. Jalur sinkron instan jika kunci API tersedia langsung
+      var directKey = getUserGeminiApiKey();
+      if (directKey) {
+        this._connectLiveWebSocket(
+          'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?key=' + encodeURIComponent(directKey),
+          q,
+          0
+        );
+        return;
+      }
+
       // 4. Jalur dingin: fetch token sekarang (sambil earcon sudah berbunyi).
       fetchLiveSessionToken().then(function (session) {
         if (!self.isCallActive()) return;
@@ -1195,37 +1618,218 @@
       });
     },
 
+    _startParallelSpeechRecognition: function () {
+      var self = this;
+      this._stopParallelSpeechRecognition();
+      var SpeechRec = (root && (root.SpeechRecognition || root.webkitSpeechRecognition)) ||
+                      (typeof window !== 'undefined' ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null);
+      if (!SpeechRec) return;
+
+      _speechRecActive = true;
+      var accumulated = '';
+      var startCycle = function () {
+        if (!_speechRecActive || !_activeCall || !_activeCall.active) return;
+        try {
+          var rec = new SpeechRec();
+          rec.lang = getLocale() === 'th' ? 'th-TH' : 'id-ID';
+          rec.interimResults = true;
+          var isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent || '');
+          rec.continuous = !isAndroid;
+
+          rec.onspeechstart = function () {
+            if (!_speechRecActive || !_activeCall || !_activeCall.active) return;
+            var mochiBusy = (_activeAudioSources.length > 0) || _modelTurnInProgress || _awaitingOpeningModelTurn;
+            if (!mochiBusy) {
+              self._setVoiceVisualizerUserSpeaking(true);
+              _lastUserSpeechAt = Date.now();
+              _silencePromptFired = false;
+              if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+            }
+          };
+
+          rec.onresult = function (event) {
+            if (!_speechRecActive || !_activeCall || !_activeCall.active) return;
+            var mochiBusy = (_activeAudioSources.length > 0) || _modelTurnInProgress || _awaitingOpeningModelTurn || ((Date.now() - _lastMochiAudioEndedAt) < 300);
+            if (mochiBusy) return;
+            var tx = '';
+            for (var i = event.resultIndex || 0; i < event.results.length; i++) {
+              tx += event.results[i][0].transcript;
+            }
+            var clean = String(tx || '').replace(/\s+/g, ' ').trim();
+            if (!clean) return;
+            accumulated = clean;
+            self._setVoiceVisualizerUserSpeaking(true);
+            _lastUserSpeechAt = Date.now();
+            _silencePromptFired = false;
+            if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+
+            if (_speechRecSubmitTimer) clearTimeout(_speechRecSubmitTimer);
+            _speechRecSubmitTimer = setTimeout(function () {
+              _speechRecSubmitTimer = null;
+              var toSend = String(accumulated || '').trim();
+              accumulated = '';
+              if (!toSend || !_activeCall || !_activeCall.active) return;
+              if (_modelTurnInProgress || _activeAudioSources.length > 0) return;
+              if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete) {
+                var learnerName = getRegisteredLearnerName();
+                try {
+                  _ws.send(JSON.stringify({
+                    realtimeInput: {
+                      text: '[Peserta "' + learnerName + '" berkata: "' + toSend + '" — Jawab langsung dengan suara manusia asli yang hangat dan membimbing tanpa membocorkan kunci jawaban!]'
+                    }
+                  }));
+                } catch (_) {}
+              }
+            }, 850);
+          };
+
+          rec.onerror = function (evErr) {
+            var code = String((evErr && evErr.error) || '');
+            if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
+              _speechRecActive = false;
+            }
+          };
+
+          rec.onend = function () {
+            if (!_speechRecActive || !_activeCall || !_activeCall.active) return;
+            setTimeout(function () {
+              if (_speechRecActive && _activeCall && _activeCall.active) startCycle();
+            }, 180);
+          };
+
+          _speechRec = rec;
+          rec.start();
+        } catch (_) {}
+      };
+      startCycle();
+    },
+
+    _stopParallelSpeechRecognition: function () {
+      _speechRecActive = false;
+      if (_speechRecSubmitTimer) { clearTimeout(_speechRecSubmitTimer); _speechRecSubmitTimer = null; }
+      if (_speechRec) {
+        try {
+          _speechRec.onresult = null;
+          _speechRec.onend = null;
+          _speechRec.onerror = null;
+          _speechRec.onspeechstart = null;
+          _speechRec.stop();
+        } catch (_) {}
+        _speechRec = null;
+      }
+    },
+
     _wireMicrophoneStream: function (stream) {
+      var self = this;
       var ctx = getAudioContext();
       if (!ctx) return;
       try {
+        if (ctx.state === 'suspended') {
+          try { ctx.resume().catch(function () {}); } catch (_) {}
+        }
         var micSource = ctx.createMediaStreamSource(stream);
         _micSource = micSource;
         var proc = ctx.createScriptProcessor ? ctx.createScriptProcessor(2048, 1, 1) : null;
         if (!proc) return;
         _micProcessor = proc;
+        try { if (root) root.__fzMochiSosMicProcessor = proc; } catch (_) {}
         var inRate = ctx.sampleRate || 48000;
+        var preRollFrames = [];
 
         proc.onaudioprocess = function (e) {
           if (!_activeCall || !_activeCall.active) return;
-          if (!_ws || _ws.readyState !== 1) return;
+          if (ctx.state === 'suspended') {
+            try { ctx.resume().catch(function () {}); } catch (_) {}
+          }
           var float32 = e.inputBuffer.getChannelData(0);
 
           var sum = 0;
           for (var i = 0; i < float32.length; i++) sum += float32[i] * float32[i];
           var rms = Math.sqrt(sum / float32.length);
-          if (rms > 0.02) {
-            _lastUserSpeechAt = Date.now();
-            _silencePromptFired = false;
-            if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
-            if (_activeAudioSources.length > 0) stopAllActiveAudioSources(); // barge-in lokal
+
+          var mochiPlayingAudio = (_activeAudioSources.length > 0) || ((Date.now() - _lastMochiAudioEndedAt) < 220);
+          var scheduleBurstEnd = function () {
+            if (_audioStreamEndTimer) { clearTimeout(_audioStreamEndTimer); }
+            _audioStreamEndTimer = setTimeout(function () {
+              _audioStreamEndTimer = null;
+              _userAudioBurstActive = false;
+              if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && _activeAudioSources.length === 0) {
+                try {
+                  _ws.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
+                } catch (_) {}
+              }
+            }, 550);
+          };
+
+          // 1. Saat Mochi sedang memutar audio: izinkan User Barge-In jika murid bicara jelas (rms > 0.018 selama >= 2 frame)
+          if (mochiPlayingAudio) {
+            if (rms > 0.018) {
+              _consecutiveSpeechFrames++;
+              if (_consecutiveSpeechFrames >= 2) {
+                _lastBargeInAt = Date.now();
+                _modelTurnInProgress = false;
+                _awaitingOpeningModelTurn = false;
+                if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
+                stopAllActiveAudioSources();
+                self._setVoiceVisualizerUserSpeaking(true);
+                _lastUserSpeechAt = Date.now();
+                _silencePromptFired = false;
+                if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+                _userAudioBurstActive = true;
+                scheduleBurstEnd();
+              } else {
+                return;
+              }
+            } else {
+              _consecutiveSpeechFrames = 0;
+              return;
+            }
+          } else {
+            // 2. Saat Mochi mendengarkan: deteksi suara murid secara sensitif & akurat
+            if (_noiseFloorRms <= 0 || _noiseFloorRms > 0.004) {
+              _noiseFloorRms = Math.min(0.003, Math.max(0.0005, rms));
+            } else if (rms < _noiseFloorRms * 1.8) {
+              _noiseFloorRms = Math.min(0.004, _noiseFloorRms * 0.92 + rms * 0.08);
+            } else {
+              _noiseFloorRms = Math.min(0.004, _noiseFloorRms * 0.995 + rms * 0.005);
+            }
+            var speechThreshold = (_awaitingOpeningModelTurn || _modelTurnInProgress)
+              ? 0.014
+              : Math.max(0.006, _noiseFloorRms * 2.0);
+
+            if (rms > speechThreshold) {
+              _consecutiveSpeechFrames++;
+              self._setVoiceVisualizerUserSpeaking(true);
+              _lastUserSpeechAt = Date.now();
+              _silencePromptFired = false;
+              if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+              if (!_awaitingOpeningModelTurn || _consecutiveSpeechFrames >= 2) {
+                _awaitingOpeningModelTurn = false;
+                _userAudioBurstActive = true;
+                scheduleBurstEnd();
+              }
+            } else {
+              _consecutiveSpeechFrames = 0;
+            }
           }
 
+          if (!_ws || _ws.readyState !== 1 || !_ws.__fzSetupComplete) return;
           var pcmBase64 = resampleAndConvertToPcm16Base64(float32, inRate, 16000);
-          if (pcmBase64) {
+          if (!pcmBase64) return;
+
+          if (_userAudioBurstActive) {
+            while (preRollFrames.length > 0) {
+              var pre = preRollFrames.shift();
+              try {
+                _ws.send(JSON.stringify({ realtimeInput: { audio: { mimeType: 'audio/pcm;rate=16000', data: pre } } }));
+              } catch (_) {}
+            }
             try {
               _ws.send(JSON.stringify({ realtimeInput: { audio: { mimeType: 'audio/pcm;rate=16000', data: pcmBase64 } } }));
             } catch (_) {}
+          } else {
+            preRollFrames.push(pcmBase64);
+            if (preRollFrames.length > 3) preRollFrames.shift();
           }
         };
 
@@ -1256,21 +1860,44 @@
     _adoptLiveWebSocket: function (ws, q, setupAlreadyComplete) {
       var self = this;
       _ws = ws;
+      ws.__fzSetupComplete = !!(setupAlreadyComplete || _hotWsSetupComplete);
       var gotAnyAudio = false;
 
       var openingSent = false;
       var sendOpeningTurn = function () {
         if (openingSent || !_ws || _ws.readyState !== 1) return;
         openingSent = true;
+        ws.__fzSetupComplete = true;
         _lastUserSpeechAt = Date.now();
         _silencePromptFired = false;
+        _awaitingOpeningModelTurn = true;
+        if (_openingModelTurnTimer) clearTimeout(_openingModelTurnTimer);
+        _openingModelTurnTimer = setTimeout(function () {
+          _awaitingOpeningModelTurn = false;
+          _openingModelTurnTimer = null;
+        }, 5000);
+        var activeQ = getActiveQuestion(q);
+        var snap = buildQuizContextSnapshot(activeQ, _currentCtx);
+        var learnerName = getRegisteredLearnerName();
+        var playedInstant = !!(_activeCall && _activeCall.playedInstantGreeting);
+        var qContextStr = (snap.stem ? ' (Butir di layar: "' + snap.stem + '"' + (snap.options.length ? ' | Pilihan: ' + snap.options.join(' | ') : '') + (snap.rule ? ' | Aturan inti: ' + snap.rule : '') + ')' : '');
+        var openingInstruction;
+        if (getLocale() === 'th') {
+          openingInstruction = playedInstant
+            ? '[ระบบ: คุณเพิ่งทักทาย "' + learnerName + '" ไปแล้ว ตอนนี้ให้เข้าสู่คำใบ้สั้นๆ 1 ประโยคสำหรับโจทย์ข้อนี้ทันที' + qContextStr + ' โดยไม่ต้องพูดคำว่าสวัสดีซ้ำ ห้ามเฉลยคำตอบ และปิดท้ายด้วยคำถามสั้นๆ เพื่อชวนให้ "' + learnerName + '" ตอบด้วยเสียง!]'
+            : '[ระบบ: นักเรียนชื่อ "' + learnerName + '" เพิ่งเข้าสู่รอบฝึกซ้อม' + qContextStr + ' ทักทาย "' + learnerName + '" ทันทีด้วยเสียงเหมือนมนุษย์จริงๆ ที่อบอุ่นและเป็นกันเอง แนะนำใบ้สั้นๆ 1 ประโยคสำหรับโจทย์ข้อนี้โดยห้ามเฉลยคำตอบ แล้วปิดท้ายด้วยคำถามสั้นๆ เพื่อชวนให้ "' + learnerName + '" ตอบด้วยเสียง!]';
+        } else {
+          openingInstruction = playedInstant
+            ? '[SISTEM: Kamu baru saja menyapa "' + learnerName + '". Langsung berikan 1 kalimat petunjuk awal sokratik singkat untuk soal di layar' + qContextStr + ' tanpa mengulang sapaan "Halo" dan tanpa menyebut huruf/kunci jawaban, lalu akhiri dengan pertanyaan singkat agar "' + learnerName + '" menjawab dengan suaranya!]'
+            : '[SISTEM: Peserta bernama "' + learnerName + '" baru saja memasuki sesi latihan' + qContextStr + '. Sapa "' + learnerName + '" SEGERA dengan suara seperti manusia asli yang hangat, akrab, dan membimbing sebagai Mochi! Berikan 1 petunjuk awal sokratik singkat tanpa menyebut huruf/kunci jawaban, lalu akhiri dengan pertanyaan singkat agar "' + learnerName + '" menjawab dengan suaranya!]';
+        }
         try {
           _ws.send(JSON.stringify({
             clientContent: {
               turns: [{
                 role: 'user',
                 parts: [{
-                  text: '[SISTEM: Murid baru saja mengetuk Mochi untuk meminta bantuan secara langsung. Buka sesi SEGERA dengan menyapa 1 kalimat ceria sebagai Mochi dan tanyakan apa yang membingungkan atau beri 1 petunjuk awal sokratik tanpa menyebut huruf/kunci jawaban!]'
+                  text: openingInstruction
                 }]
               }],
               turnComplete: true
@@ -1281,14 +1908,21 @@
 
       if (ws.readyState === 0) {
         ws.onopen = function () {
-          if (!ws.__fzHot) { try { ws.send(buildSetupFrame(q, _currentCtx)); } catch (_) {} }
+          if (!ws.__fzSetupSent) {
+            ws.__fzSetupSent = true;
+            try { ws.send(buildSetupFrame(q, _currentCtx)); } catch (_) {}
+          }
         };
-      } else if (ws.readyState === 1 && !ws.__fzHot) {
+      } else if (ws.readyState === 1 && !ws.__fzSetupSent) {
+        ws.__fzSetupSent = true;
         try { ws.send(buildSetupFrame(q, _currentCtx)); } catch (_) {}
       }
 
       ws.onmessage = function (event) {
-        self._handleLiveWsMessage(event, q, sendOpeningTurn, function () { gotAnyAudio = true; });
+        self._handleLiveWsMessage(event, q, sendOpeningTurn, function () {
+          gotAnyAudio = true;
+          _reconnectAttempts = 0;
+        });
       };
       ws.onerror = function (e) { console.warn('[Mochi Voice SOS] WebSocket error:', e); };
       ws.onclose = function (ev) {
@@ -1299,13 +1933,24 @@
         var code = ev && ev.code;
         var reason = (ev && ev.reason) || '';
         if (code !== 1000) reportDrop(code, reason, ws.__fzKeyIndex);
-        // Putus sebelum satu pun audio tiba → jalur cadangan agar Mochi tidak bisu.
+        // Self-healing auto-reconnect jika sesi latihan masih berjalan
+        if (self.isCallActive() && _session.active && !_session.locked && _reconnectAttempts < 3) {
+          _reconnectAttempts++;
+          if (_reconnectTimer) clearTimeout(_reconnectTimer);
+          _reconnectTimer = setTimeout(function () {
+            if (self.isCallActive() && !_ws) {
+              self._startGeminiLiveDuplex(getActiveQuestion(q));
+            }
+          }, 500);
+          return;
+        }
         if (self.isCallActive() && !gotAnyAudio) self._fallbackSpeechTurn(q);
       };
 
       if (setupAlreadyComplete || _hotWsSetupComplete) {
         sendOpeningTurn();
-      } else if (ws.readyState === 1 && ws.__fzHot) {
+      } else if (ws.readyState === 1 && !ws.__fzSetupSent) {
+        ws.__fzSetupSent = true;
         try { ws.send(buildSetupFrame(q, _currentCtx)); } catch (_) {}
       }
     },
@@ -1317,13 +1962,28 @@
         try { msg = JSON.parse(rawText); } catch (_) { return; }
 
         if (msg.setupComplete) {
+          if (_ws) _ws.__fzSetupComplete = true;
           if (typeof onSetupComplete === 'function') onSetupComplete();
           return;
         }
         var sc = msg.serverContent;
         if (!sc) return;
 
-        if (sc.interrupted) { stopAllActiveAudioSources(); _outTranscript = ''; }
+        if (sc.interrupted) {
+          _modelTurnInProgress = false;
+          _awaitingOpeningModelTurn = false;
+          if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
+          stopAllActiveAudioSources();
+          _outTranscript = '';
+        }
+
+        // Deteksi suara murid dari transkrip input server Gemini Live
+        if (sc.inputTranscription && sc.inputTranscription.text && String(sc.inputTranscription.text).trim()) {
+          _lastUserSpeechAt = Date.now();
+          _silencePromptFired = false;
+          self._setVoiceVisualizerUserSpeaking(true);
+          if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+        }
 
         // Leak guard: transkrip keluaran model diperiksa incremental per giliran.
         if (sc.outputTranscription && sc.outputTranscription.text) {
@@ -1331,15 +1991,43 @@
           if (_outTranscript.length > 1200) _outTranscript = _outTranscript.slice(-1200);
           if (transcriptLeaks(_outTranscript, getActiveQuestion(q))) enforceLeakGuard(q);
         }
-        if (sc.turnComplete) _outTranscript = '';
 
         if (sc.modelTurn && sc.modelTurn.parts) {
+          if (_lastBargeInAt > 0 && (Date.now() - _lastBargeInAt) < 480) {
+            return;
+          }
+          _modelTurnInProgress = true;
+          _awaitingOpeningModelTurn = false;
+          if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
+          if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
           for (var i = 0; i < sc.modelTurn.parts.length; i++) {
             var part = sc.modelTurn.parts[i];
             if (part.inlineData && part.inlineData.data) {
               if (typeof onAudio === 'function') onAudio();
               self._scheduleAudioChunk(part.inlineData.data);
             }
+          }
+        }
+
+        if (sc.turnComplete) {
+          _modelTurnInProgress = false;
+          _awaitingOpeningModelTurn = false;
+          if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
+          _outTranscript = '';
+          if (_turnEndFallbackTimer) { clearTimeout(_turnEndFallbackTimer); _turnEndFallbackTimer = null; }
+          if (_activeAudioSources.length === 0) {
+            self._onMochiSpeechEnded();
+          } else {
+            var ctx = _audioCtx;
+            var remMs = ctx ? Math.max(40, Math.ceil((_nextAudioPlayTime - ctx.currentTime) * 1000) + 60) : 250;
+            _turnEndFallbackTimer = setTimeout(function () {
+              _turnEndFallbackTimer = null;
+              if (_activeAudioSources.length > 0) {
+                _activeAudioSources = [];
+                self._setVoiceVisualizerSpeaking(false);
+              }
+              self._onMochiSpeechEnded();
+            }, remMs);
           }
         }
       };
@@ -1384,15 +2072,19 @@
         _activeAudioSources = _activeAudioSources.filter(function (s) { return s !== source; });
         if (_activeAudioSources.length === 0) {
           self._setVoiceVisualizerSpeaking(false);
-          self._onMochiSpeechEnded();
+          if (!_modelTurnInProgress && !_awaitingOpeningModelTurn) {
+            if (_turnEndFallbackTimer) { clearTimeout(_turnEndFallbackTimer); _turnEndFallbackTimer = null; }
+            self._onMochiSpeechEnded();
+          }
         }
       };
     },
 
     _onMochiSpeechEnded: function () {
       if (!_activeCall || !_activeCall.active) return;
+      _lastMochiAudioEndedAt = Date.now();
       _lastUserSpeechAt = Date.now();
-      this._scheduleSilenceCheck();
+      this._scheduleSilenceCheck(SILENCE_PROMPT_MS);
     },
 
     _scheduleSilenceCheck: function (delayMs) {
@@ -1407,32 +2099,52 @@
 
     _checkSilenceAndPrompt: function () {
       if (!_activeCall || !_activeCall.active || !_ws || _ws.readyState !== 1) return;
-      if (_activeAudioSources.length > 0) return; // Mochi is still speaking
-      var now = Date.now();
-      if (now - _lastUserSpeechAt >= SILENCE_PROMPT_MS && !_silencePromptFired) {
-        _silencePromptFired = true;
-        var promptText = (getLocale() === 'th')
-          ? 'พูดคุยได้เลยนะถ้าต้องการให้โมจิช่วย'
-          : t('mochi-sos.silence-prompt', 'Silakan bicara jika ingin bantuan dari aku');
-        try {
-          _ws.send(JSON.stringify({
-            clientContent: {
-              turns: [{
-                role: 'user',
-                parts: [{
-                  text: '[SISTEM: Murid belum bersuara setelah kamu menunggu. Ucapkan persis kalimat ini dengan nada ramah menggemaskan: "' + promptText + '"]'
-                }]
-              }],
-              turnComplete: true
-            }
-          }));
-        } catch (_) {}
-        _lastUserSpeechAt = Date.now();
-        this._scheduleSilenceCheck(10000);
+      if (_activeAudioSources.length > 0 || _modelTurnInProgress) {
+        this._scheduleSilenceCheck(300);
+        return;
       }
+      if (_silencePromptFired) return;
+      var now = Date.now();
+      var elapsed = now - _lastUserSpeechAt;
+      if (elapsed < SILENCE_PROMPT_MS - 30) {
+        this._scheduleSilenceCheck(Math.max(50, SILENCE_PROMPT_MS - elapsed));
+        return;
+      }
+      _silencePromptFired = true;
+      _awaitingOpeningModelTurn = true;
+      if (_openingModelTurnTimer) clearTimeout(_openingModelTurnTimer);
+      _openingModelTurnTimer = setTimeout(function () {
+        _awaitingOpeningModelTurn = false;
+        _openingModelTurnTimer = null;
+      }, 4500);
+      var learnerName = getRegisteredLearnerName();
+      var fallbackHint = t('mochi-sos.silence-prompt', 'Silakan bicara jika ingin bantuan dari aku');
+      var promptText = (getLocale() === 'th')
+        ? ('รีบเปิดไมค์พูดออกมาเลยนะ ' + learnerName + '!')
+        : ('Segera buka suaramu, ' + learnerName + '!');
+      _lastSilencePromptText = promptText;
+      if (_activeCall) _activeCall.lastSilencePrompt = promptText;
+      try {
+        _ws.send(JSON.stringify({
+          clientContent: {
+            turns: [{
+              role: 'user',
+              parts: [{
+                text: '[SISTEM: Peserta bernama "' + learnerName + '" tidak terdeteksi bersuara selama 2 detik setelah kamu bertanya. Ucapkan persis kalimat ini dengan suara seperti manusia asli yang hangat dan menyemangati: "' + promptText + '" (' + fallbackHint + ')]'
+              }]
+            }],
+            turnComplete: true
+          }
+        }));
+      } catch (_) {}
+      _lastUserSpeechAt = Date.now();
     },
 
     triggerSilencePrompt: function () {
+      if (!_lastUserSpeechAt || (Date.now() - _lastUserSpeechAt) < SILENCE_PROMPT_MS) {
+        _lastUserSpeechAt = Date.now() - (SILENCE_PROMPT_MS + 50);
+      }
+      _silencePromptFired = false;
       this._checkSilenceAndPrompt();
     },
 
@@ -1445,9 +2157,20 @@
     },
 
     closeCall: function (reason) {
+      this._stopParallelSpeechRecognition();
       if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
+      if (_turnEndFallbackTimer) { clearTimeout(_turnEndFallbackTimer); _turnEndFallbackTimer = null; }
+      if (_reconnectTimer) { clearTimeout(_reconnectTimer); _reconnectTimer = null; }
+      if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
+      if (_userSpeakVisualTimer) { clearTimeout(_userSpeakVisualTimer); _userSpeakVisualTimer = null; }
+      if (_audioStreamEndTimer) { clearTimeout(_audioStreamEndTimer); _audioStreamEndTimer = null; }
+      _userAudioBurstActive = false;
+      _userSpeakingNow = false;
       _silencePromptFired = false;
       _lastUserSpeechAt = 0;
+      _modelTurnInProgress = false;
+      _awaitingOpeningModelTurn = false;
+      _pipeWarmToActiveCall = false;
 
       if (!_activeCall) return;
       var call = _activeCall;
@@ -1502,22 +2225,20 @@
     onQuestionAnswered: function (ok, q) {
       if (!this.isCallActive()) return;
       _activeCall.answered = true;
-      var self = this;
+      _silencePromptFired = false;
+      _lastUserSpeechAt = Date.now();
+      var learnerName = getRegisteredLearnerName();
 
       if (ok) {
         this._updateMochiMascotPose('happy');
-        if (!_activeCall.isWelcomePass) {
+        if (!_activeCall.isWelcomePass && !_activeCall.cashbackAwardedForQ) {
+          _activeCall.cashbackAwardedForQ = true;
           this.awardCashback();
         }
-        setTimeout(function () {
-          self.closeCall('answered_correct');
-          self.removeThoughtBubble();
-        }, 1800);
+        sendContextUpdate('[PEMBARUAN: Peserta "' + learnerName + '" baru saja menjawab BENAR pada soal ini! Berikan pujian singkat 1 kalimat dengan suara manusia asli yang hangat dan ceria, lalu ajak lanjut ke soal berikutnya!]');
       } else {
         this._updateMochiMascotPose('pout');
-        setTimeout(function () {
-          self.closeCall('answered_wrong');
-        }, 2600);
+        sendContextUpdate('[PEMBARUAN: Respons peserta "' + learnerName + '" belum tepat pada soal ini. Berikan semangat singkat yang hangat dan jelaskan secara ringkas poin kunci yang perlu diingat untuk soal berikutnya!]');
       }
     },
 
@@ -1547,8 +2268,37 @@
       if (!doc) return;
       var el = doc.getElementById('fzMochiVoiceUnder');
       if (el) {
-        if (isSpeaking) el.classList.add('is-speaking');
-        else el.classList.remove('is-speaking');
+        if (isSpeaking) {
+          el.classList.add('is-speaking');
+          if (!_userSpeakingNow) {
+            el.classList.remove('is-user-speaking');
+          }
+        } else {
+          el.classList.remove('is-speaking');
+        }
+      }
+    },
+
+    _setVoiceVisualizerUserSpeaking: function (isUserSpeaking) {
+      var doc = getDoc();
+      if (!doc) return;
+      var el = doc.getElementById('fzMochiVoiceUnder');
+      if (isUserSpeaking) {
+        _userSpeakingNow = true;
+        if (el) {
+          el.classList.add('is-user-speaking');
+        }
+        if (_userSpeakVisualTimer) clearTimeout(_userSpeakVisualTimer);
+        _userSpeakVisualTimer = setTimeout(function () {
+          _userSpeakVisualTimer = null;
+          _userSpeakingNow = false;
+          var curEl = getDoc() ? getDoc().getElementById('fzMochiVoiceUnder') : null;
+          if (curEl) curEl.classList.remove('is-user-speaking');
+        }, 450);
+      } else {
+        _userSpeakingNow = false;
+        if (_userSpeakVisualTimer) { clearTimeout(_userSpeakVisualTimer); _userSpeakVisualTimer = null; }
+        if (el) el.classList.remove('is-user-speaking');
       }
     },
 
@@ -1571,6 +2321,10 @@
       if (!slot) return;
       slot.style.position = 'relative';
       slot.style.overflow = 'visible';
+
+      if (this.isCallActive()) {
+        this.renderUnderMochiVoiceVisualizer(true);
+      }
 
       var self = this;
       var existing = doc.getElementById('fzMochiThoughtBubble');
@@ -1614,7 +2368,7 @@
       if (existing) existing.remove();
     },
 
-    // UI Mount: Minimalist Under-Mochi Soundwave
+    // UI Mount: Compact Centered Under-Mochi Soundwave Visualizer (Pill + Radiating Acoustic Arcs)
     renderUnderMochiVoiceVisualizer: function (visible) {
       var doc = getDoc();
       if (!doc) return;
@@ -1625,28 +2379,51 @@
         return;
       }
 
-      if (existing) return;
-
       var slot = findMascotHost();
       if (!slot) return;
+
+      if (existing) {
+        if (slot.contains(existing)) {
+          if (_activeAudioSources.length > 0) {
+            existing.classList.add('is-speaking');
+            existing.classList.remove('is-user-speaking');
+          } else {
+            existing.classList.remove('is-speaking');
+            if (_userSpeakingNow) existing.classList.add('is-user-speaking');
+            else existing.classList.remove('is-user-speaking');
+          }
+          return;
+        }
+        existing.remove();
+      }
 
       slot.style.position = 'relative';
       slot.style.overflow = 'visible';
 
       var wave = doc.createElement('div');
       wave.id = 'fzMochiVoiceUnder';
-      wave.className = 'fz-mochi-voice-under';
+      wave.className = 'fz-mochi-voice-under' + (_activeAudioSources.length > 0 ? ' is-speaking' : (_userSpeakingNow ? ' is-user-speaking' : ''));
       wave.setAttribute('aria-label', t('mochi-sos.call-title', 'Bantuan Suara Mochi'));
       wave.setAttribute('title', t('mochi-sos.call-close-title', 'Ketuk untuk tutup panggilan'));
 
       wave.innerHTML = [
-        '<span class="sw-bar b-1"></span>',
-        '<span class="sw-bar b-2"></span>',
-        '<span class="sw-bar b-3"></span>',
-        '<span class="sw-bar b-4"></span>',
-        '<span class="sw-bar b-5"></span>',
-        '<span class="sw-bar b-6"></span>',
-        '<span class="sw-bar b-7"></span>'
+        '<svg class="fz-sw-arc fz-sw-arc-l" viewBox="0 0 14 20" fill="none" aria-hidden="true">',
+        '  <path class="sw-wave-out" d="M6.2 2.2C2.2 6.0 2.2 14.0 6.2 17.8" stroke="currentColor" stroke-width="2.0" stroke-linecap="round"/>',
+        '  <path class="sw-wave-in" d="M10.8 5.0C8.0 7.4 8.0 12.6 10.8 15.0" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+        '</svg>',
+        '<span class="fz-sw-pill" aria-hidden="true">',
+        '  <span class="sw-bar b-1"></span>',
+        '  <span class="sw-bar b-2"></span>',
+        '  <span class="sw-bar b-3"></span>',
+        '  <span class="sw-bar b-4"></span>',
+        '  <span class="sw-bar b-5"></span>',
+        '  <span class="sw-bar b-6"></span>',
+        '  <span class="sw-bar b-7"></span>',
+        '</span>',
+        '<svg class="fz-sw-arc fz-sw-arc-r" viewBox="0 0 14 20" fill="none" aria-hidden="true">',
+        '  <path class="sw-wave-in" d="M3.2 5.0C6.0 7.4 6.0 12.6 3.2 15.0" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+        '  <path class="sw-wave-out" d="M7.8 2.2C11.8 6.0 11.8 14.0 7.8 17.8" stroke="currentColor" stroke-width="2.0" stroke-linecap="round"/>',
+        '</svg>'
       ].join('');
 
       var self = this;
@@ -1661,6 +2438,8 @@
 
     // UI Mount: Welcome Educational Modal
     showIntroIfNeeded: function () {
+      // Jangan tampilkan popup intro yang menghalangi layar saat panggilan live sudah aktif
+      if (this.isCallActive()) return;
       var state = getState();
       if (!state) return;
 
@@ -1717,26 +2496,164 @@
     }
   };
 
-  // Safe auto-mounting & self-healing observer for quiz lifecycle
+  function extractDomPracticeSurface(doc) {
+    if (!doc) return null;
+    // 1. Flashcards / Review Vocab
+    var flash = doc.querySelector('.card-flashcard');
+    if (flash) {
+      var wordEl = flash.querySelector('.word');
+      var meaningEl = flash.querySelector('.flash-meaning');
+      var exEl = flash.querySelector('.flash-example-en');
+      var wordText = wordEl ? wordEl.textContent.trim() : '';
+      return {
+        type: 'vocab',
+        q: {
+          id: 'flash-' + wordText,
+          type: 'vocab',
+          stem: t('mochi-sos.surf-vocab', 'Flashcard Kosakata: ') + wordText,
+          focus: { word: wordText },
+          explain: { rule: meaningEl ? ('Arti: ' + meaningEl.textContent.trim() + (exEl ? ' | Contoh: ' + exEl.textContent.trim() : '')) : '' }
+        }
+      };
+    }
+    // 2. JLPT Listening (Chokai) Modal
+    var jlptModal = doc.getElementById('listeningPanelModal');
+    if (jlptModal && (jlptModal.classList.contains('active') || jlptModal.classList.contains('open') || jlptModal.classList.contains('show')) && jlptModal.style.display !== 'none') {
+      var qTextEl = jlptModal.querySelector('#jlptQuestionText, .jlpt-question-text');
+      var optEls = jlptModal.querySelectorAll('.jlpt-opt-btn, .jlpt-option');
+      var opts = [];
+      for (var i = 0; i < optEls.length; i++) opts.push(optEls[i].textContent.trim());
+      var qStr = qTextEl ? qTextEl.textContent.trim() : t('mochi-sos.surf-chokai', 'Latihan Menyimak Chokai JLPT');
+      return {
+        type: 'listening',
+        q: {
+          id: 'jlpt-' + clip(qStr, 40),
+          type: 'listening',
+          stem: qStr,
+          options: opts
+        }
+      };
+    }
+    // 3. Speaking & Listening Skills Lab
+    var fsl = doc.querySelector('.fsl-shell');
+    if (fsl) {
+      var promptEl = fsl.querySelector('.fsl-prompt, .fsl-question, h2, h3');
+      var pStr = promptEl ? promptEl.textContent.trim() : t('mochi-sos.surf-fsl', 'Latihan Bicara & Dengar');
+      return {
+        type: 'listening',
+        q: {
+          id: 'fsl-' + clip(pStr, 40),
+          type: 'listening',
+          stem: pStr
+        }
+      };
+    }
+    // 4. Writing Studio / Kakijun
+    var writingStage = doc.querySelector('.writing-stage');
+    if (writingStage) {
+      var wPrompt = writingStage.querySelector('h2, h3, .writing-prompt');
+      var wStr = wPrompt ? wPrompt.textContent.trim() : t('mochi-sos.surf-writing', 'Latihan Menulis');
+      return {
+        type: 'build',
+        q: {
+          id: 'writing-' + clip(wStr, 40),
+          type: 'sentence-build',
+          stem: wStr
+        }
+      };
+    }
+    // 5. Kana Chart / Kakijun Modal
+    var kanaChart = doc.getElementById('jaKanaChart');
+    if (kanaChart) {
+      return {
+        type: 'kanji',
+        q: {
+          id: 'kana-chart-practice',
+          type: 'kanji',
+          stem: t('mochi-sos.surf-kana', 'Latihan Aksara Hiragana & Katakana (Gojūon & Dakuon)')
+        }
+      };
+    }
+    // 6. Graded Story Reader
+    var storyBox = doc.getElementById('fzStoryContainer');
+    if (storyBox && storyBox.children.length > 0) {
+      var sTitle = storyBox.querySelector('h1, h2, h3');
+      var sStr = sTitle ? sTitle.textContent.trim() : t('mochi-sos.surf-story', 'Cerita Bergambar Bahasa Jepang');
+      return {
+        type: 'reading',
+        q: {
+          id: 'story-' + clip(sStr, 40),
+          type: 'reading',
+          stem: sStr
+        }
+      };
+    }
+    return null;
+  }
+
+  // Safe auto-mounting & self-healing observer for quiz & practice lifecycle
   function checkAndAutoMount() {
     var doc = getDoc();
     if (!doc) return;
     var quizShell = doc.querySelector('.quiz-shell');
-    if (!quizShell) {
-      if (_session.active) apiInstance.onQuizSessionEnd('shell_gone');
+    var domSurface = quizShell ? null : extractDomPracticeSurface(doc);
+
+    if (!quizShell && !domSurface) {
+      if (_session.active && !_shellGoneTimer) {
+        _shellGoneTimer = setTimeout(function () {
+          _shellGoneTimer = null;
+          var d = getDoc();
+          if (d && !d.querySelector('.quiz-shell') && !extractDomPracticeSurface(d)) {
+            if (_session.active) apiInstance.onQuizSessionEnd('shell_gone');
+          }
+        }, 400);
+      }
       return;
     }
+
+    if (_shellGoneTimer) {
+      clearTimeout(_shellGoneTimer);
+      _shellGoneTimer = null;
+    }
+
     if (isExamLocked()) {
       apiInstance.removeThoughtBubble();
       return;
     }
+
+    // Jika berada di permukaan latihan non-quizLoop (Flashcard, Chokai, Kana, Speaking/Listening, Writing, Story)
+    if (!quizShell && domSurface) {
+      if (!_session.active) {
+        apiInstance.onQuizSessionStart({ type: domSurface.type });
+      }
+      apiInstance.setActiveQuestion(domSurface.q, { cfgType: domSurface.type });
+      apiInstance.mountThoughtBubble(domSurface.q);
+      if (!_session.greeted || !apiInstance.isCallActive()) {
+        apiInstance.greetOnEntry(domSurface.q, { cfgType: domSurface.type });
+      }
+      return;
+    }
+
     if (!_session.active) return; // menunggu onQuizSessionStart/setActiveQuestion dari app.js
     var bubble = doc.getElementById('fzMochiThoughtBubble');
     if (!bubble) apiInstance.mountThoughtBubble(getActiveQuestion(null));
+    if (apiInstance.isCallActive()) {
+      apiInstance.renderUnderMochiVoiceVisualizer(true);
+    } else if (!_session.greeted) {
+      apiInstance.greetOnEntry(getActiveQuestion(null), _currentCtx);
+    }
     apiInstance.bindMascotTap();
   }
 
   if (typeof document !== 'undefined') {
+    armAudioWarmup();
+    setTimeout(function () {
+      try {
+        prewarmLiveSession(false);
+        schedulePrewarmRefresh();
+      } catch (_) {}
+    }, 40);
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function () {
         setTimeout(checkAndAutoMount, 60);

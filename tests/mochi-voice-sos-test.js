@@ -210,7 +210,59 @@ console.log('  ✓ Direct mascot tap plumbing verified');
 assert.ok(!code.includes('speechSynthesis'), 'Must eliminate all browser speechSynthesis robot TTS');
 assert.ok(!code.includes('SpeechSynthesisUtterance'), 'Must eliminate all SpeechSynthesisUtterance robot TTS');
 assert.ok(code.includes('Silakan bicara jika ingin bantuan dari aku'), 'Silence prompt must invite learner to speak');
+assert.ok(code.includes('Segera buka suaramu, '), 'Silence prompt must include registered user name greeting');
+assert.strictEqual(MochiSos._SILENCE_PROMPT_MS, 2000, 'Silence prompt delay must be strictly 2000ms (2 seconds)');
 assert.ok(typeof MochiSos.triggerSilencePrompt === 'function', 'triggerSilencePrompt must be exposed');
-console.log('  ✓ Zero Browser TTS & Silence Prompt Invariant verified');
+console.log('  ✓ Zero Browser TTS & 2-Second Silence Prompt Invariant verified');
 
-console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (14/14)! <<<');
+// 15. Instant Auto-Active Duplex on Practice Entry & Session-Long Persistence
+sandbox.location.hostname = 'localhost';
+sandbox.FiezelI18n.getLocale = () => 'id';
+sandbox.state.userName = 'Fitra Pratama';
+assert.strictEqual(MochiSos.getRegisteredLearnerName(), 'Fitra Pratama', 'Must resolve registered user name from PWA state');
+
+const sentFrames = [];
+class MockWebSocket {
+  constructor(url) {
+    this.url = url;
+    this.readyState = 1;
+  }
+  send(data) {
+    sentFrames.push(JSON.parse(data));
+  }
+  close() {
+    this.readyState = 3;
+  }
+}
+sandbox.WebSocket = MockWebSocket;
+sandbox.localStorage = {
+  getItem: (k) => (k === 'fz_gemini_api_key' ? 'AIzaSyTestKeyForUnitVerification12345' : null)
+};
+
+MochiSos.onQuizSessionStart({ type: 'grammar', measure: false });
+MochiSos.setActiveQuestion(sampleQuestion, { cfgType: 'grammar' });
+MochiSos.greetOnEntry(sampleQuestion, { cfgType: 'grammar' });
+assert.strictEqual(MochiSos.isCallActive(), true, 'Duplex Live must activate automatically upon entering practice session');
+
+// Verify call stays active across questions (does NOT close on question answered)
+MochiSos.onQuestionAnswered(true, sampleQuestion);
+assert.strictEqual(MochiSos.isCallActive(), true, 'Duplex Live must remain active after answering a question correctly');
+MochiSos.onQuestionAnswered(false, sampleQuestion);
+assert.strictEqual(MochiSos.isCallActive(), true, 'Duplex Live must remain active after answering a question wrongly');
+
+// Verify 2-second silence prompt includes registered learner name
+MochiSos.triggerSilencePrompt();
+assert.strictEqual(MochiSos.getLastSilencePrompt(), 'Segera buka suaramu, Fitra Pratama!', 'Silence prompt must address user by registered PWA name');
+const lastSent = sentFrames[sentFrames.length - 1];
+assert.ok(
+  lastSent &&
+  lastSent.clientContent &&
+  JSON.stringify(lastSent.clientContent).includes('Segera buka suaramu, Fitra Pratama!'),
+  'WebSocket frame must transmit personalized 2-second silence prompt'
+);
+
+MochiSos.onQuizSessionEnd('test_complete');
+assert.strictEqual(MochiSos.isCallActive(), false, 'Duplex Live must close cleanly when practice session ends');
+console.log('  ✓ Auto-Entry Activation, Session-Long Persistence & Personalized 2s Silence Prompt verified');
+
+console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (15/15)! <<<');
