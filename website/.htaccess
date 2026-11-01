@@ -28,6 +28,14 @@
 
 Options -Indexes
 RewriteEngine On
+
+# 1. Alihkan www ke non-www kanonis (https://fiezel.my.id/)
+# Mengonsolidasikan domain www agar tidak memicu duplikasi konten dan status
+# "Halaman alternatif dengan tag kanonis yang tepat" di Google Search Console.
+RewriteCond %{HTTP_HOST} ^www\.fiezel\.my\.id$ [NC]
+RewriteRule ^(.*)$ https://fiezel.my.id/$1 [R=301,L]
+
+# 2. Paksa HTTPS untuk seluruh domain non-www
 RewriteCond %{HTTPS} !=on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 
