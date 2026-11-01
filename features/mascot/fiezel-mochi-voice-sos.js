@@ -31,8 +31,14 @@
 })(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this), function (root) {
   'use strict';
 
-  var GEM_COST = 10;
-  var CASHBACK_REWARD = 5;
+  var GEM_COST = 2;
+  var GEM_COST_OPENING_TURN = 2;
+  var GEM_COST_FOLLOWUP_TURN = 1;
+  var GEM_MAX_PER_QUESTION = 6;
+  var GEM_MIN_START_BALANCE = 2;
+  var GEM_COST_PER_QUESTION = 2;
+  var GEM_COST_PER_SESSION = 6;
+  var CASHBACK_REWARD = 2;
   var DAILY_FREE_SOS_LIMIT = 2;
   var MISTAP_THRESHOLD_MS = 6000;
   var LIVE_MODEL = 'models/gemini-3.8-live';
@@ -48,7 +54,7 @@
   var NON_TAP_SELECTOR = '#fzMochiThoughtBubble, #fzMochiVoiceUnder, #fzMochiCardToggle, #fzMochiConnBanner, .fz-mochi-card-toggle, .fz-mochi-conn-banner, .quiz-topbar, .options, .option';
   var MOCHI_ENABLED_STORAGE_KEY = 'fz_mochi_sos_enabled';
   var DIRECT_KEY_COOLDOWN_MS = 65000;
-  var OPENING_AUDIO_WATCHDOG_MS = 3200;
+  var OPENING_AUDIO_WATCHDOG_MS = 7000;
 
   function getDailySosUsage() {
     try {
@@ -142,6 +148,15 @@
   var _lastSilencePromptText = '';
   var _userAskedConceptOnCurrent = false;
   var _openingTurnCompletedForQ = false;
+  var _questionGemsMap = {};
+  var _freeQuestionSigs = {};
+  var _sessionGemsSpent = 0;
+  var _sessionVoiceTurns = 0;
+  var _sessionFreeQuestions = 0;
+  var _pendingBillingMode = 'auto';
+  var _currentTurnMetered = false;
+  var _isSilenceNudgeTurn = false;
+  var _pendingFollowupBillable = false;
   var SILENCE_PROMPT_MS = 2000;
 
   var COPY_ID = {
@@ -182,19 +197,31 @@
     'mochi-sos.conn-retry': 'Coba lagi',
     'mochi-sos.toggle-on-title': 'Nonaktifkan bantuan suara Mochi',
     'mochi-sos.toggle-off-title': 'Aktifkan bantuan suara Mochi',
+    'mochi-sos.toggle-label': 'Bantuan Mochi',
     'mochi-sos.toggle-on-badge': 'ON',
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'Bantuan suara Mochi dinonaktifkan',
-    'mochi-sos.toast-enabled': 'Bantuan suara Mochi diaktifkan',
-    'mochi-sos.modal-free-title': 'Bantuan Suara Mochi SOS ✨',
-    'mochi-sos.modal-gem-title': 'Bantuan Suara Mochi SOS 💎',
-    'mochi-sos.modal-free-body': '🎉 Kuota Gratis Harian Tersedia! (Sisa {remaining}x hari ini). Mochi akan membedah soal ini langsung dengan suara AI Gemini Live secara dua arah tanpa membocorkan kunci jawaban.',
-    'mochi-sos.modal-gem-body': 'Mochi akan membedah soal ini langsung dengan suara AI Gemini Live. Biaya: 10 Gem (Saldo kamu: {balance} 💎). Bonus Cashback: Jika jawabanmu benar di soal ini, kamu dapat cashback +5 Gem!',
-    'mochi-sos.modal-free-btn': 'Mulai Bantuan Gratis',
-    'mochi-sos.modal-gem-btn': 'Gunakan 10 Gem & Mulai',
+    'mochi-sos.toast-enabled': 'Bantuan suara Mochi aktif (0 💎 saat sambung · bayar sesuai suara AI)',
+    'mochi-sos.toast-zero-audio-safe': 'Belum ada suara AI yang diputar — 0 Gem terpakai! 💎',
+    'mochi-sos.toast-session-receipt': 'Bantuan Mochi selesai: {turns} respon suara · {gems} Gem terpakai 💎',
+    'mochi-sos.toast-session-free-receipt': 'Bantuan Mochi selesai: {turns} respon suara · Kuota Gratis Harian (0 💎)',
+    'mochi-sos.toast-out-of-gems': 'Gem belum cukup untuk soal berikutnya. Bantuan Mochi ditutup aman.',
+    'mochi-sos.modal-free-title': 'Bantuan Suara Mochi (Kuota Gratis)',
+    'mochi-sos.modal-gem-title': 'Bantuan Suara Mochi (Sesuai Kuota Suara)',
+    'mochi-sos.modal-free-body': 'Kamu punya {remaining}x bantuan suara gratis hari ini ({limit} soal/hari). Kuota hanya terpakai saat suara AI benar-benar keluar.',
+    'mochi-sos.modal-gem-body': 'Gem dihitung sesuai pemakaian suara AI (0 Gem saat menyambung/gagal suara). Saldo kamu: {balance} 💎.',
+    'mochi-sos.modal-free-btn': 'Mulai Gratis (0 💎)',
+    'mochi-sos.modal-gem-btn': 'Aktifkan (Mulai 0 💎)',
     'mochi-sos.modal-cancel-btn': 'Batal',
+    'mochi-sos.modal-row-free-quota': 'Kuota Gratis Hari Ini',
+    'mochi-sos.modal-row-connect-safe': 'Menyambung / Gagal Suara',
+    'mochi-sos.modal-row-connect-anti': 'Sambung (Anti-Hangus)',
+    'mochi-sos.modal-row-opening-ai': 'Bedah Soal Suara AI',
+    'mochi-sos.modal-row-followup': 'Tanya Lanjutan (Maks. {max} 💎)',
+    'mochi-sos.modal-row-cashback': 'Jawab Benar Soal Ini',
+    'mochi-sos.modal-unit-questions': 'soal',
     'mochi-sos.modal-insufficient-title': 'Gem Belum Cukup 💎',
-    'mochi-sos.modal-insufficient-body': 'Kamu membutuhkan 10 Gem untuk bantuan suara Mochi SOS (Saldo saat ini: {balance} 💎). Selesaikan soal latihan kuis untuk mengumpulkan Gem gratis atau tunggu kuota gratis harian besok!',
+    'mochi-sos.modal-insufficient-body': 'Kamu membutuhkan minimal 2 Gem untuk membedah soal dengan suara AI Mochi (Saldo saat ini: {balance} 💎). Selesaikan soal latihan untuk kumpulkan Gem gratis atau gunakan kuota gratis harian besok!',
     'mochi-sos.modal-insufficient-btn': 'Mengerti',
     'mochi-sos.bubble-wrong-hint': 'Psst, bingung di bagian ini? Ketuk Mochi untuk bedah kalimatnya bareng yuk!',
     'mochi-sos.bubble-correct-praise': 'Hebat! Analisis kamu tepat sekali! 🎉'
@@ -238,19 +265,31 @@
     'mochi-sos.conn-retry': 'ลองใหม่',
     'mochi-sos.toggle-on-title': 'ปิดผู้ช่วยเสียงโมจิ',
     'mochi-sos.toggle-off-title': 'เปิดผู้ช่วยเสียงโมจิ',
+    'mochi-sos.toggle-label': 'ตัวช่วยโมจิ',
     'mochi-sos.toggle-on-badge': 'ON',
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'ปิดผู้ช่วยเสียงโมจิแล้ว',
-    'mochi-sos.toast-enabled': 'เปิดผู้ช่วยเสียงโมจิแล้ว',
-    'mochi-sos.modal-free-title': 'ความช่วยเหลือเสียงจากโมจิ ✨',
-    'mochi-sos.modal-gem-title': 'ความช่วยเหลือเสียงจากโมจิ 💎',
-    'mochi-sos.modal-free-body': '🎉 สิทธิ์ฟรีรายวันเหลือ {remaining} ครั้งในวันนี้! โมจิจะวิเคราะห์โจทย์ข้อนี้ด้วยเสียง AI แบบสองทิศทางทันทีอย่างเป็นธรรมชาติโดยไม่สปอยล์เฉลย',
-    'mochi-sos.modal-gem-body': 'โมจิจะวิเคราะห์โจทย์ข้อนี้ด้วยเสียง AI Gemini Live ค่าบริการ: 10 Gem (ยอดปัจจุบัน: {balance} 💎) แคชแบ็ก: หากตอบถูกในข้อนี้ รับแคชแบ็ก +5 Gem ทันที!',
-    'mochi-sos.modal-free-btn': 'เริ่มใช้งานฟรี',
-    'mochi-sos.modal-gem-btn': 'ใช้ 10 Gem & เริ่ม',
+    'mochi-sos.toast-enabled': 'เปิดผู้ช่วยเสียงโมจิแล้ว (เชื่อมต่อ 0 💎 · คิดตามเสียง AI)',
+    'mochi-sos.toast-zero-audio-safe': 'ยังไม่มีเสียง AI เล่นออกมา — ใช้ 0 Gem! 💎',
+    'mochi-sos.toast-session-receipt': 'จบเซสชันโมจิ: เสียงตอบกลับ {turns} ครั้ง · ใช้ไป {gems} Gem 💎',
+    'mochi-sos.toast-session-free-receipt': 'จบเซสชันโมจิ: เสียงตอบกลับ {turns} ครั้ง · สิทธิ์ฟรีรายวัน (0 💎)',
+    'mochi-sos.toast-out-of-gems': 'เจมไม่พอสำหรับข้อถัดไป ปิดผู้ช่วยเสียงโมจิอย่างปลอดภัยแล้ว',
+    'mochi-sos.modal-free-title': 'ตัวช่วยเสียงโมจิ (โควตาฟรี)',
+    'mochi-sos.modal-gem-title': 'ตัวช่วยเสียงโมจิ (คิดตามโควตาเสียง)',
+    'mochi-sos.modal-free-body': 'คุณมีสิทธิ์ตัวช่วยเสียงฟรีเหลือ {remaining} ครั้งในวันนี้ ({limit} ข้อ/วัน) สิทธิ์จะถูกนับเมื่อเสียง AI ดังขึ้นจริงเท่านั้น',
+    'mochi-sos.modal-gem-body': 'คิดเจมตามเสียง AI ที่ใช้งานจริง (เชื่อมต่อ/เสียงไม่ติด = 0 Gem) ยอดของคุณ: {balance} 💎',
+    'mochi-sos.modal-free-btn': 'เริ่มฟรี (0 💎)',
+    'mochi-sos.modal-gem-btn': 'เปิดใช้งาน (เริ่ม 0 💎)',
     'mochi-sos.modal-cancel-btn': 'ยกเลิก',
-    'mochi-sos.modal-insufficient-title': 'Gem ยังไม่พอ 💎',
-    'mochi-sos.modal-insufficient-body': 'คุณต้องการ 10 Gem สำหรับความช่วยเหลือเสียงจากโมจิ (ยอดปัจจุบัน: {balance} 💎) ฝึกทำแบบฝึกหัดในควิซเพื่อสะสม Gem ฟรี หรือรอรีเซ็ตสิทธิ์ฟรีรายวันในวันพรุ่งนี้!',
+    'mochi-sos.modal-row-free-quota': 'โควตาฟรีวันนี้',
+    'mochi-sos.modal-row-connect-safe': 'เชื่อมต่อ / เสียงไม่ติด',
+    'mochi-sos.modal-row-connect-anti': 'เชื่อมต่อ (ป้องกันเจมเสียฟรี)',
+    'mochi-sos.modal-row-opening-ai': 'อธิบายโจทย์ด้วยเสียง AI',
+    'mochi-sos.modal-row-followup': 'ถามต่อ (สูงสุด {max} 💎)',
+    'mochi-sos.modal-row-cashback': 'ตอบถูกในข้อนี้',
+    'mochi-sos.modal-unit-questions': 'ข้อ',
+    'mochi-sos.modal-insufficient-title': 'เจมไม่พอ 💎',
+    'mochi-sos.modal-insufficient-body': 'คุณต้องมีอย่างน้อย 2 Gem เพื่อวิเคราะห์โจทย์ด้วยเสียง AI ของโมจิ (ยอดปัจจุบัน: {balance} 💎) ฝึกทำแบบฝึกหัดเพื่อสะสม Gem ฟรี หรือใช้สิทธิ์ฟรีรายวันในวันพรุ่งนี้!',
     'mochi-sos.modal-insufficient-btn': 'เข้าใจแล้ว',
     'mochi-sos.bubble-wrong-hint': 'ข้อนี้ติดตรงไหนไหม? แตะโมจิให้ช่วยวิเคราะห์ได้นะ!',
     'mochi-sos.bubble-correct-praise': 'ยอดเยี่ยมมาก! ตอบถูกแล้ว 🎉'
@@ -445,18 +484,15 @@
     return null;
   }
 
+  var _sessionMochiEnabled = false;
+  var _chargedQuestionSigs = {};
+
   function isMochiEnabledFromStorage() {
-    try {
-      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
-      if (ls && typeof ls.getItem === 'function') {
-        var v = ls.getItem(MOCHI_ENABLED_STORAGE_KEY);
-        if (v === '0' || v === 'false') return false;
-      }
-    } catch (_) {}
-    return true;
+    return !!_sessionMochiEnabled;
   }
 
   function writeMochiEnabledToStorage(enabled) {
+    _sessionMochiEnabled = !!enabled;
     try {
       var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
       if (ls && typeof ls.setItem === 'function') {
@@ -582,6 +618,17 @@
     };
   }
 
+  function isLocalEnv() {
+    try {
+      if (typeof root.isLocalTestServer === 'function' && root.isLocalTestServer()) return true;
+      if (typeof location !== 'undefined') {
+        var h = (location.hostname || '').toLowerCase();
+        if (h === 'localhost' || h === '127.0.0.1' || h === '::1' || h.endsWith('.local')) return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
   function removeConnectionBannerInternal() {
     if (_connBannerHideTimer) {
       clearTimeout(_connBannerHideTimer);
@@ -600,6 +647,10 @@
     if (!doc) return null;
     var st = _connStatus.state || 'idle';
     if (st === 'idle' || st === 'connected' || !isMochiEnabledFromStorage() || isExamLocked()) {
+      removeConnectionBannerInternal();
+      return null;
+    }
+    if (isLocalEnv() && (st === 'error' || st === 'reconnecting')) {
       removeConnectionBannerInternal();
       return null;
     }
@@ -626,7 +677,9 @@
       banner.id = 'fzMochiConnBanner';
       banner.setAttribute('role', 'status');
       banner.setAttribute('aria-live', 'polite');
-      if (host.firstChild) {
+      if (doc.body) {
+        doc.body.appendChild(banner);
+      } else if (host.firstChild) {
         try { host.insertBefore(banner, host.firstChild); } catch (_) { host.appendChild(banner); }
       } else {
         host.appendChild(banner);
@@ -641,6 +694,10 @@
       '<span class="fz-mcb-text">' + String(msg).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>',
       (showRetry ? '<button type="button" class="fz-mcb-retry" id="fzMochiConnRetryBtn">' + String(retryLabel).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</button>' : '')
     ].join('');
+    banner.onclick = function (e) {
+      if (e && e.target && e.target.id === 'fzMochiConnRetryBtn') return;
+      removeConnectionBannerInternal();
+    };
     var retryBtn = doc.getElementById('fzMochiConnRetryBtn');
     if (retryBtn) {
       retryBtn.onclick = function (e) {
@@ -674,7 +731,16 @@
       removeConnectionBannerInternal();
       return _connStatus;
     }
+    if (isLocalEnv() && (nextState === 'error' || nextState === 'reconnecting')) {
+      removeConnectionBannerInternal();
+      return _connStatus;
+    }
     renderConnectionBannerInternal();
+    if (nextState === 'error' || nextState === 'quota' || nextState === 'connecting' || nextState === 'reconnecting') {
+      _connBannerHideTimer = setTimeout(function () {
+        removeConnectionBannerInternal();
+      }, 4000);
+    }
     return _connStatus;
   }
 
@@ -1079,7 +1145,7 @@
         ok: true,
         directKey: true,
         keyIndex: 0,
-        endpoint: 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?key=' + encodeURIComponent(userKey)
+        endpoint: 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=' + encodeURIComponent(userKey)
       });
     }
 
@@ -1894,6 +1960,8 @@
 
   function sendContextUpdate(text) {
     if (!_ws || _ws.readyState !== 1) return false;
+    _currentTurnMetered = false;
+    _isSilenceNudgeTurn = false;
     try {
       _ws.send(JSON.stringify({
         clientContent: { turns: [{ role: 'user', parts: [{ text: text }] }], turnComplete: true }
@@ -1952,17 +2020,56 @@
     setMochiEnabled: function (enabled, opts) {
       opts = opts || {};
       var next = !!enabled;
+
+      if (next) {
+        var currentBalance = getGemBalance();
+        var hasFreeQuota = getDailySosUsage().count < DAILY_FREE_SOS_LIMIT;
+        if (!isLocalEnv() && !hasFreeQuota && !opts.useDailyFree && currentBalance < GEM_MIN_START_BALANCE) {
+          if (!opts.silent) {
+            try {
+              if (typeof root.showToast === 'function') {
+                root.showToast(t('mochi-sos.toast-insufficient', 'Gem belum cukup ({balance}/{cost} 💎). Selesaikan latihan untuk kumpulkan Gem!', {
+                  balance: currentBalance,
+                  cost: GEM_MIN_START_BALANCE
+                }), 'warn');
+              }
+            } catch (_) {}
+          }
+          var docDeny = getDoc();
+          var btnDeny = docDeny ? docDeny.getElementById('fzMochiCardToggle') : null;
+          if (btnDeny) this._syncCardToggleUi(btnDeny, false);
+          return false;
+        }
+      }
+
       writeMochiEnabledToStorage(next);
       syncCompanionStrictMode();
       var doc = getDoc();
       var btn = doc ? doc.getElementById('fzMochiCardToggle') : null;
       if (btn) this._syncCardToggleUi(btn, next);
 
+      var activeQ = getActiveQuestion(null);
+      var stage = doc ? (doc.querySelector('.quiz-stage') || (doc.getElementById('quizStem') ? doc.getElementById('quizStem').closest('.quiz-stage') : null)) : null;
+      var shell = doc ? doc.querySelector('.quiz-shell') : null;
+      var comp = root && root.FiezelMochiCompanion;
+      var mochiInst = comp && typeof comp.getInstance === 'function' ? comp.getInstance() : null;
+
       if (!next) {
         this.closeCall('user_disabled');
         this.removeThoughtBubble();
+        this.renderUnderMochiVoiceVisualizer(false);
         clearQuizClueHighlights();
         clearPrewarm();
+        if (stage) stage.classList.remove('is-teaching');
+        if (shell) shell.classList.remove('is-call-active');
+        if (mochiInst) {
+          try {
+            if (typeof mochiInst.setAccessory === 'function') mochiInst.setAccessory(null);
+            if (typeof mochiInst.setTalking === 'function') mochiInst.setTalking(false);
+            if (typeof mochiInst.retractHands === 'function') mochiInst.retractHands();
+            if (typeof mochiInst.startEarTwitchLoop === 'function') mochiInst.startEarTwitchLoop(3200);
+          } catch (_) {}
+        }
         if (!opts.silent) {
           try {
             if (typeof root.showToast === 'function') {
@@ -1973,16 +2080,28 @@
         return false;
       }
 
-      if (!opts.silent) {
+      // Next is true: 0 Gem dipotong saat aktivasi (Anti-Hangus; Gem dipotong hanya saat audio AI benar-benar terdengar!)
+      if (stage) stage.classList.add('is-teaching');
+      if (shell) shell.classList.add('is-call-active');
+      if (mochiInst) {
+        try {
+          if (typeof mochiInst.setVoiceCompanionStrictMode === 'function') mochiInst.setVoiceCompanionStrictMode(true);
+          if (typeof mochiInst.stopEarTwitchLoop === 'function') mochiInst.stopEarTwitchLoop();
+          if (typeof mochiInst.setAccessory === 'function') mochiInst.setAccessory('teacher');
+          if (typeof mochiInst.triggerHandGesture === 'function') mochiInst.triggerHandGesture('wave', 2.4);
+        } catch (_) {}
+      }
+      this.renderUnderMochiVoiceVisualizer(true);
+
+      if (!opts.silent && !opts.userConfirmed) {
         try {
           if (typeof root.showToast === 'function') {
-            root.showToast(t('mochi-sos.toast-enabled', 'Bantuan suara Mochi diaktifkan'), 'success');
+            root.showToast(t('mochi-sos.toast-enabled', 'Bantuan suara Mochi aktif (0 💎 saat sambung · bayar sesuai suara AI)'), 'success');
           }
         } catch (_) {}
       }
-      var activeQ = getActiveQuestion(null);
-      if (_session.active && !_session.locked && !isExamLocked() && isMochiSosEligible(activeQ, _currentCtx)) {
-        this.mountThoughtBubble(activeQ);
+
+      if (!opts.skipAutoStart && _session.active && !_session.locked && !isExamLocked() && isMochiSosEligible(activeQ, _currentCtx)) {
         prewarmLiveSession(true);
         if (!this.isCallActive()) {
           this.startCall(activeQ, { autoEntry: true });
@@ -2046,7 +2165,7 @@
         };
       }
 
-      if (!isMochiEnabledFromStorage()) {
+      if (opts.requireEnabled && !isMochiEnabledFromStorage()) {
         return {
           allowed: false,
           reason: 'mochi_disabled',
@@ -2059,7 +2178,7 @@
       var currentBalance = getGemBalance();
 
       // Proactive auto-entry or Placement Test Welcome Pass (First Impression after Onboarding)
-      if (opts.autoEntry || isPlacementSession(opts)) {
+      if (isPlacementSession(opts) || opts.isPlacement) {
         return {
           allowed: true,
           isWelcomePass: true,
@@ -2069,8 +2188,8 @@
         };
       }
 
-      // Local development mode: allow testing without corrupting persistent state
-      if (isLocalEnv()) {
+      // Local development mode: allow inspection without corrupting persistent state unless checking cost
+      if (isLocalEnv() && !opts.requireGems && !opts.realGems) {
         return {
           allowed: true,
           isWelcomePass: false,
@@ -2084,25 +2203,13 @@
         return { allowed: true, cost: 0, isWelcomePass: true, badge: t('mochi-sos.badge-free', 'Gratis') };
       }
 
-      // Welcome Pass for placement or first sessions
-      var isWelcomePass = !state.placementVoicePassUsed && (state.level === undefined || state.level <= 1);
-      if (isWelcomePass) {
-        return {
-          allowed: true,
-          isWelcomePass: true,
-          cost: 0,
-          balance: currentBalance,
-          badge: t('mochi-sos.badge-free', 'Gratis')
-        };
-      }
-
       var dailyUsage = getDailySosUsage();
       var hasDailyFree = dailyUsage.count < DAILY_FREE_SOS_LIMIT;
       if (opts.useDailyFree && hasDailyFree) {
         return {
           allowed: true,
           isDailyFree: true,
-          isWelcomePass: true,
+          isWelcomePass: false,
           remainingDailyFree: DAILY_FREE_SOS_LIMIT - dailyUsage.count,
           cost: 0,
           balance: currentBalance,
@@ -2133,42 +2240,180 @@
       };
     },
 
-    spendForCall: function (sessionId, isWelcomePass) {
-      var state = getState();
-      if (!state || isLocalEnv() || isWelcomePass) return { ok: true, spent: 0 };
-
-      var current = getGemBalance();
-      if (current >= GEM_COST) {
-        if (state.gems && typeof state.gems.balance === 'number') {
-          state.gems.balance -= GEM_COST;
-        } else if (typeof state.gems === 'number') {
-          state.gems -= GEM_COST;
-        } else {
-          state.gems = { balance: Math.max(0, current - GEM_COST) };
-        }
-        try { if (typeof root.save === 'function') root.save(); } catch (_) {}
-        this.updateTopbarGem();
-        return { ok: true, spent: GEM_COST };
-      }
-      return { ok: true, spent: 0 };
+    getMeteredSessionStats: function () {
+      return {
+        gemsSpent: _sessionGemsSpent,
+        voiceTurns: _sessionVoiceTurns,
+        freeQuestions: _sessionFreeQuestions,
+        openingCost: GEM_COST_OPENING_TURN,
+        followupCost: GEM_COST_FOLLOWUP_TURN,
+        maxPerQuestion: GEM_MAX_PER_QUESTION,
+        cashbackReward: CASHBACK_REWARD
+      };
     },
 
-    refundMisTap: function () {
+    meterDeliveredAiTurn: function (q, turnKind) {
+      if (_isSilenceNudgeTurn) {
+        return { ok: true, spent: 0, reason: 'silence_nudge' };
+      }
+      var activeQ = getActiveQuestion(q) || q;
+      var qSig = getQuestionSig(activeQ) || '__default_q__';
+      _sessionVoiceTurns++;
+      if (_activeCall) {
+        _activeCall.turnsDelivered = (_activeCall.turnsDelivered || 0) + 1;
+      }
+
+      if (_activeCall && _activeCall.isWelcomePass) {
+        return { ok: true, spent: 0, isWelcomePass: true };
+      }
+
+      // Daily Free SOS Pass covers all voice turns on that free question (only consumed once real audio plays!)
+      if (_freeQuestionSigs[qSig]) {
+        this._refreshLiveToggleBadge();
+        return { ok: true, spent: 0, isDailyFree: true };
+      }
+      var dailyUsage = getDailySosUsage();
+      if ((_pendingBillingMode === 'daily_free' || (_activeCall && _activeCall.useDailyFree)) && dailyUsage.count < DAILY_FREE_SOS_LIMIT) {
+        _freeQuestionSigs[qSig] = true;
+        incrementDailySosUsage();
+        _sessionFreeQuestions++;
+        this._refreshLiveToggleBadge();
+        return { ok: true, spent: 0, isDailyFree: true };
+      }
+
       var state = getState();
-      if (!state || isLocalEnv() || !_activeCall || _activeCall.isWelcomePass) return;
+      if (!state) return { ok: true, spent: 0 };
+
+      var alreadyOnQ = _questionGemsMap[qSig] || 0;
+      if (alreadyOnQ >= GEM_MAX_PER_QUESTION) {
+        this._refreshLiveToggleBadge();
+        return { ok: true, spent: 0, capped: true };
+      }
+
+      var desiredCost = (alreadyOnQ === 0 || turnKind === 'opening') ? GEM_COST_OPENING_TURN : GEM_COST_FOLLOWUP_TURN;
+      if (alreadyOnQ > 0 && turnKind === 'opening') {
+        // Already metered opening turn on this question (e.g. mid-question WS reconnect) -> 0 extra Gem!
+        return { ok: true, spent: 0, alreadyChargedOpening: true };
+      }
+      var cost = Math.min(desiredCost, GEM_MAX_PER_QUESTION - alreadyOnQ);
+      var current = getGemBalance();
+      var spent = Math.min(cost, Math.max(0, current));
+      if (spent <= 0) {
+        return { ok: false, spent: 0, reason: 'insufficient_gems' };
+      }
+
+      if (state.gems && typeof state.gems.balance === 'number') {
+        state.gems.balance = Math.max(0, state.gems.balance - spent);
+        if (typeof state.gems.spentTotal === 'number') state.gems.spentTotal += spent;
+        if (Array.isArray(state.gems.ledger)) {
+          state.gems.ledger.push({
+            at: Date.now(),
+            delta: -spent,
+            reason: alreadyOnQ === 0 ? 'mochi_sos_opening_voice' : 'mochi_sos_followup_voice',
+            sessionId: (_activeCall && _activeCall.sessionId) || (_session && _session.key) || 'quiz'
+          });
+          if (state.gems.ledger.length > 60) state.gems.ledger.shift();
+        }
+      } else if (typeof state.gems === 'number') {
+        state.gems = Math.max(0, state.gems - spent);
+      } else {
+        state.gems = { balance: Math.max(0, current - spent) };
+      }
+
+      _questionGemsMap[qSig] = alreadyOnQ + spent;
+      _chargedQuestionSigs[qSig] = true;
+      _sessionGemsSpent += spent;
+      if (_activeCall) {
+        _activeCall.gemsSpent = (_activeCall.gemsSpent || 0) + spent;
+      }
+      try { if (typeof root.save === 'function') root.save(); } catch (_) {}
+      this.updateTopbarGem();
+      this._refreshLiveToggleBadge();
+      return { ok: true, spent: spent };
+    },
+
+    _refreshLiveToggleBadge: function () {
+      var doc = getDoc();
+      if (!doc) return;
+      var btn = doc.getElementById('fzMochiCardToggle');
+      if (btn && isMochiEnabledFromStorage()) {
+        btn.removeAttribute('data-mochi-sig');
+        this._syncCardToggleUi(btn, true);
+      }
+    },
+
+    spendForQuestion: function (q) {
+      return this.meterDeliveredAiTurn(q, 'opening');
+    },
+
+    spendForCall: function (sessionId, isWelcomePass, customCost) {
+      var state = getState();
+      if (!state || isWelcomePass) return { ok: true, spent: 0 };
+      var activeQ = getActiveQuestion(null);
+      var qSig = getQuestionSig(activeQ);
+      if (qSig && _chargedQuestionSigs[qSig]) {
+        return { ok: true, spent: 0, alreadyChargedForQuestion: true };
+      }
+      var cost = (customCost != null && Number.isFinite(Number(customCost))) ? Number(customCost) : GEM_COST;
+      var current = getGemBalance();
+      if (current < cost) return { ok: false, spent: 0 };
+      if (state.gems && typeof state.gems.balance === 'number') {
+        state.gems.balance = Math.max(0, state.gems.balance - cost);
+        if (typeof state.gems.spentTotal === 'number') state.gems.spentTotal += cost;
+        if (Array.isArray(state.gems.ledger)) {
+          state.gems.ledger.push({
+            at: Date.now(),
+            delta: -cost,
+            reason: 'mochi_sos_opening_voice',
+            sessionId: sessionId || (_session && _session.key) || 'quiz'
+          });
+          if (state.gems.ledger.length > 60) state.gems.ledger.shift();
+        }
+      } else if (typeof state.gems === 'number') {
+        state.gems = Math.max(0, state.gems - cost);
+      } else {
+        state.gems = { balance: Math.max(0, current - cost) };
+      }
+      if (qSig) {
+        _chargedQuestionSigs[qSig] = true;
+        _questionGemsMap[qSig] = (_questionGemsMap[qSig] || 0) + cost;
+      }
+      _sessionGemsSpent += cost;
+      try { if (typeof root.save === 'function') root.save(); } catch (_) {}
+      this.updateTopbarGem();
+      return { ok: true, spent: cost };
+    },
+
+    spendForSession: function (customCost) {
+      // Deprecated upfront lump-sum charge replaced by post-audio-delivery metering (0 upfront burn).
+      if (customCost != null && Number(customCost) === 0) return { ok: true, spent: 0 };
+      return { ok: true, spent: 0, meteredMode: true };
+    },
+
+    refundMisTap: function (explicitAmount) {
+      var state = getState();
+      if (!state) return;
+      if (_activeCall && _activeCall.isWelcomePass) return;
+      var refundAmt = (typeof explicitAmount === 'number' && explicitAmount > 0)
+        ? explicitAmount
+        : ((_activeCall && typeof _activeCall.gemsSpent === 'number') ? _activeCall.gemsSpent : GEM_COST);
+      if (refundAmt <= 0) return;
       var current = getGemBalance();
       if (state.gems && typeof state.gems.balance === 'number') {
-        state.gems.balance += GEM_COST;
+        state.gems.balance += refundAmt;
+        if (typeof state.gems.spentTotal === 'number') {
+          state.gems.spentTotal = Math.max(0, state.gems.spentTotal - refundAmt);
+        }
       } else if (typeof state.gems === 'number') {
-        state.gems += GEM_COST;
+        state.gems += refundAmt;
       } else {
-        state.gems = { balance: current + GEM_COST };
+        state.gems = { balance: current + refundAmt };
       }
       try { if (typeof root.save === 'function') root.save(); } catch (_) {}
       this.updateTopbarGem();
       try {
         if (typeof root.showToast === 'function') {
-          root.showToast(t('mochi-sos.toast-refund', 'Panggilan singkat: {cost} Gem dikembalikan 💎', { cost: GEM_COST }), 'info');
+          root.showToast(t('mochi-sos.toast-refund', 'Panggilan singkat: {cost} Gem dikembalikan 💎', { cost: refundAmt }), 'info');
         }
       } catch (_) {}
     },
@@ -2179,6 +2424,18 @@
       var current = getGemBalance();
       if (state.gems && typeof state.gems.balance === 'number') {
         state.gems.balance += CASHBACK_REWARD;
+        if (typeof state.gems.earnedTotal === 'number') {
+          state.gems.earnedTotal += CASHBACK_REWARD;
+        }
+        if (Array.isArray(state.gems.ledger)) {
+          state.gems.ledger.push({
+            at: Date.now(),
+            delta: CASHBACK_REWARD,
+            reason: 'mochi_sos_correct_cashback',
+            sessionId: (_activeCall && _activeCall.sessionId) || (_session && _session.key) || 'quiz'
+          });
+          if (state.gems.ledger.length > 60) state.gems.ledger.shift();
+        }
       } else if (typeof state.gems === 'number') {
         state.gems += CASHBACK_REWARD;
       } else {
@@ -2196,10 +2453,16 @@
     updateTopbarGem: function () {
       var doc = getDoc();
       if (!doc) return;
-      var el = doc.getElementById('quizTopbarGemCount');
-      if (!el) return;
       var balance = getGemBalance();
-      el.textContent = balance.toLocaleString('id-ID');
+      var formatted = balance.toLocaleString('id-ID');
+      var el = doc.getElementById('quizTopbarGemCount');
+      if (el) el.textContent = formatted;
+      var modalBal = doc.getElementById('fzMochiModalBalance');
+      if (modalBal) modalBal.textContent = formatted;
+      var allGems = doc.querySelectorAll('.quiz-topbar-gem .gem-count, [data-gem-count]');
+      for (var i = 0; i < allGems.length; i++) {
+        allGems[i].textContent = formatted;
+      }
     },
 
     buildSocraticGuidance: function (q, learnerSpoken) {
@@ -2232,6 +2495,18 @@
         cfg: cfg,
         greeted: false
       };
+      _sessionMochiEnabled = false;
+      writeMochiEnabledToStorage(false);
+      _chargedQuestionSigs = {};
+      _questionGemsMap = {};
+      _freeQuestionSigs = {};
+      _sessionGemsSpent = 0;
+      _sessionVoiceTurns = 0;
+      _sessionFreeQuestions = 0;
+      _pendingBillingMode = 'auto';
+      _currentTurnMetered = false;
+      _isSilenceNudgeTurn = false;
+      _pendingFollowupBillable = false;
       _attempts = [];
       _currentQ = null;
       _currentCtx = null;
@@ -2259,12 +2534,24 @@
       this.closeCall(reason || 'session_end');
       this.removeThoughtBubble();
       this.removeCardToggle();
+      this.renderUnderMochiVoiceVisualizer(false);
       removeConnectionBannerInternal();
       _connStatus = { state: 'idle', message: '', updatedAt: 0 };
       clearQuizClueHighlights();
       clearPrewarm();
       if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
       _session = { active: false, key: '', locked: false, cfg: null, greeted: false };
+      _sessionMochiEnabled = false;
+      writeMochiEnabledToStorage(false);
+      _chargedQuestionSigs = {};
+      _questionGemsMap = {};
+      _freeQuestionSigs = {};
+      _sessionGemsSpent = 0;
+      _sessionVoiceTurns = 0;
+      _sessionFreeQuestions = 0;
+      _currentTurnMetered = false;
+      _isSilenceNudgeTurn = false;
+      _pendingFollowupBillable = false;
       _attempts = [];
       _currentQ = null;
       _currentCtx = null;
@@ -2304,6 +2591,9 @@
       if (changed) {
         _userAskedConceptOnCurrent = false;
         _openingTurnCompletedForQ = false;
+        _currentTurnMetered = false;
+        _pendingFollowupBillable = false;
+        _isSilenceNudgeTurn = false;
         clearQuizClueHighlights();
         if (evaluateBraincoreStruggleState(_currentQ).isStruggling) {
           autoHighlightQuestionClue(_currentQ);
@@ -2312,12 +2602,56 @@
       this.mountCardToggle(_currentQ);
       syncCompanionStrictMode();
 
+      var doc = getDoc();
+      var stage = doc ? (doc.querySelector('.quiz-stage') || (doc.getElementById('quizStem') ? doc.getElementById('quizStem').closest('.quiz-stage') : null)) : null;
+      var shell = doc ? doc.querySelector('.quiz-shell') : null;
+      var comp = root && root.FiezelMochiCompanion;
+      var mochiInst = comp && typeof comp.getInstance === 'function' ? comp.getInstance() : null;
+
       if (!isMochiEnabledFromStorage()) {
         this.closeCall('user_disabled');
         this.removeThoughtBubble();
+        this.renderUnderMochiVoiceVisualizer(false);
         removeConnectionBannerInternal();
+        if (stage) stage.classList.remove('is-teaching');
+        if (shell) shell.classList.remove('is-call-active');
+        if (mochiInst) {
+          try {
+            if (typeof mochiInst.setAccessory === 'function') mochiInst.setAccessory(null);
+            if (typeof mochiInst.setTalking === 'function') mochiInst.setTalking(false);
+            if (typeof mochiInst.retractHands === 'function') mochiInst.retractHands();
+            if (typeof mochiInst.startEarTwitchLoop === 'function') mochiInst.startEarTwitchLoop(3200);
+          } catch (_) {}
+        }
         return false;
       }
+
+      // Check balance on new question transition (only disable if neither free daily pass nor >= 2 Gems remain)
+      var qSigCheck = getQuestionSig(_currentQ);
+      var alreadyCovered = !!(qSigCheck && (_questionGemsMap[qSigCheck] || _freeQuestionSigs[qSigCheck]));
+      var hasDailyFreeRemain = (_pendingBillingMode === 'daily_free') && (getDailySosUsage().count < DAILY_FREE_SOS_LIMIT);
+      var currentBalance = getGemBalance();
+      if (!alreadyCovered && !hasDailyFreeRemain && !isLocalEnv() && currentBalance < GEM_COST_OPENING_TURN) {
+        this.setMochiEnabled(false, { silent: true });
+        try {
+          if (typeof root.showToast === 'function') {
+            root.showToast(t('mochi-sos.toast-out-of-gems', 'Gem belum cukup untuk soal berikutnya. Bantuan Mochi ditutup aman.'), 'warn');
+          }
+        } catch (_) {}
+        return false;
+      }
+
+      // 0 Gem deducted upfront on question switch! Metering occurs ONLY when AI audio starts playing for the new question.
+      if (stage) stage.classList.add('is-teaching');
+      if (shell) shell.classList.add('is-call-active');
+      if (mochiInst) {
+        try {
+          if (typeof mochiInst.setVoiceCompanionStrictMode === 'function') mochiInst.setVoiceCompanionStrictMode(true);
+          if (typeof mochiInst.stopEarTwitchLoop === 'function') mochiInst.stopEarTwitchLoop();
+          if (typeof mochiInst.setAccessory === 'function') mochiInst.setAccessory('teacher');
+        } catch (_) {}
+      }
+      this.renderUnderMochiVoiceVisualizer(true);
 
       // Panggilan masih hidup saat soal berganti → tetap aktif sepanjang sesi latihan & bimbing soal baru secara presisi.
       if (changed && this.isCallActive()) {
@@ -2364,6 +2698,7 @@
       if (this.isCallActive() && !ok) {
         _silencePromptFired = false;
         _lastUserSpeechAt = Date.now();
+        _pendingFollowupBillable = true;
         var learnerName = getRegisteredLearnerName();
         var snap = buildQuizContextSnapshot(q, _currentCtx);
         var bc = evaluateBraincoreStruggleState(q);
@@ -2471,6 +2806,7 @@
           _silencePromptFired = false;
           _lastUserSpeechAt = Date.now();
           _userAskedConceptOnCurrent = true;
+          _pendingFollowupBillable = true;
           var bcTap = evaluateBraincoreStruggleState(activeQ);
           if (bcTap.isStruggling) {
             autoHighlightQuestionClue(activeQ);
@@ -2485,9 +2821,105 @@
           );
         }
       } else {
-        this.showConfirmationModal(activeQ);
+        this.startCall(activeQ, { autoEntry: true });
       }
       return true;
+    },
+
+    playInstantGreeting: function () {
+      var self = this;
+      var ctx = getAudioContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume().catch(function () {});
+      }
+
+      this.renderUnderMochiVoiceVisualizer(true);
+      this._updateMochiMascotPose('greet');
+      try {
+        var comp = root && root.FiezelMochiCompanion;
+        var mochiInst = comp && typeof comp.getInstance === 'function' ? comp.getInstance() : null;
+        if (mochiInst && typeof mochiInst.triggerHandGesture === 'function') {
+          mochiInst.triggerHandGesture('wave', 2.4);
+        }
+      } catch (_) {}
+
+      var markSpeakingState = function (speaking) {
+        self._setVoiceVisualizerSpeaking(speaking);
+        if (!speaking && _activeAudioSources.length === 0) {
+          self._updateMochiMascotPose('idle');
+        }
+        try {
+          var c = root && root.FiezelMochiCompanion;
+          var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
+          if (m && typeof m.setTalking === 'function') m.setTalking(speaking);
+        } catch (_) {}
+      };
+
+      var loc = getLocale();
+      var audioSrc = loc === 'th' ? './assets/audio/sfx/mochi_greet_th.mp3' : './assets/audio/sfx/mochi_greet_id.mp3';
+
+      if (ctx && typeof fetch === 'function') {
+        fetch(audioSrc).then(function (res) {
+          if (!res || !res.ok) throw new Error('http_' + (res ? res.status : 0));
+          var ct = (res.headers && typeof res.headers.get === 'function' ? res.headers.get('content-type') : '') || '';
+          if (ct.indexOf('text/html') !== -1) throw new Error('html_response');
+          return res.arrayBuffer();
+        }).then(function (buf) {
+          if (!buf || buf.byteLength < 64) throw new Error('empty_audio');
+          return ctx.decodeAudioData(buf);
+        }).then(function (decoded) {
+          var source = ctx.createBufferSource();
+          source.buffer = decoded;
+          var targetNode = attachAnalyserToMochi(ctx) || ctx.destination;
+          source.connect(targetNode);
+          source.start(0);
+          _activeAudioSources.push(source);
+          markSpeakingState(true);
+          source.onended = function () {
+            _activeAudioSources = _activeAudioSources.filter(function (s) { return s !== source; });
+            if (_activeAudioSources.length === 0) {
+              markSpeakingState(false);
+            }
+          };
+        }).catch(function () {
+          try {
+            var audio = new Audio(audioSrc);
+            audio.currentTime = 0;
+            audio.onended = function () {
+              if (_activeAudioSources.length === 0) markSpeakingState(false);
+            };
+            audio.onerror = function () {
+              if (_activeAudioSources.length === 0) markSpeakingState(false);
+            };
+            var p = audio.play();
+            if (p && typeof p.then === 'function') {
+              p.then(function () {
+                markSpeakingState(true);
+              }).catch(function () {
+                if (_activeAudioSources.length === 0) markSpeakingState(false);
+              });
+            }
+          } catch (_) {
+            if (_activeAudioSources.length === 0) markSpeakingState(false);
+          }
+        });
+        return;
+      }
+
+      try {
+        var audioFallback = new Audio(audioSrc);
+        audioFallback.currentTime = 0;
+        audioFallback.onended = function () {
+          if (_activeAudioSources.length === 0) markSpeakingState(false);
+        };
+        audioFallback.onerror = function () {
+          if (_activeAudioSources.length === 0) markSpeakingState(false);
+        };
+        var pf = audioFallback.play();
+        if (pf && typeof pf.then === 'function') {
+          pf.then(function () { markSpeakingState(true); }).catch(function () {});
+        }
+      } catch (_) {}
     },
 
     showConfirmationModal: function (activeQ) {
@@ -2497,13 +2929,12 @@
       if (existing) existing.remove();
 
       var self = this;
-      var dailyUsage = getDailySosUsage();
-      var hasDailyFree = dailyUsage.count < DAILY_FREE_SOS_LIMIT;
-      var remainingFree = Math.max(0, DAILY_FREE_SOS_LIMIT - dailyUsage.count);
       var currentBalance = getGemBalance();
-      var loc = getLocale();
+      var dailyUsage = getDailySosUsage();
+      var remainingFree = Math.max(0, DAILY_FREE_SOS_LIMIT - dailyUsage.count);
+      var hasDailyFree = remainingFree > 0;
 
-      if (!hasDailyFree && currentBalance < GEM_COST) {
+      if (!hasDailyFree && currentBalance < GEM_MIN_START_BALANCE) {
         this.showInsufficientGemModal(currentBalance);
         return;
       }
@@ -2512,24 +2943,38 @@
       modal.id = 'fzMochiSosConfirmModal';
       modal.className = 'fz-mochi-sos-intro-scrim';
 
+      var isTh = getLocale() === 'th';
       var titleText = hasDailyFree
-        ? t('mochi-sos.modal-free-title', 'Bantuan Suara Mochi SOS ✨')
-        : t('mochi-sos.modal-gem-title', 'Bantuan Suara Mochi SOS 💎');
-
-      var bodyHtml = hasDailyFree
-        ? t('mochi-sos.modal-free-body', '🎉 Kuota Gratis Harian Tersedia! (Sisa {remaining}x hari ini). Mochi akan membedah soal ini langsung dengan suara AI Gemini Live secara dua arah tanpa membocorkan kunci jawaban.', { remaining: remainingFree })
-        : t('mochi-sos.modal-gem-body', 'Mochi akan membedah soal ini langsung dengan suara AI Gemini Live. Biaya: 10 Gem (Saldo kamu: {balance} 💎). Bonus Cashback: Jika jawabanmu benar di soal ini, kamu dapat cashback +5 Gem!', { balance: currentBalance });
-
-      var confirmBtnText = hasDailyFree
-        ? t('mochi-sos.modal-free-btn', 'Mulai Bantuan Gratis')
-        : t('mochi-sos.modal-gem-btn', 'Gunakan 10 Gem & Mulai');
-
+        ? t('mochi-sos.modal-free-title', 'Bantuan Suara Mochi (Kuota Gratis)')
+        : t('mochi-sos.modal-gem-title', 'Bantuan Suara Mochi (Sesuai Kuota Suara)');
+      var bodyText = hasDailyFree
+        ? t('mochi-sos.modal-free-body', 'Kamu punya {remaining}x bantuan suara gratis hari ini ({limit} soal/hari). Kuota hanya terpakai saat suara AI benar-benar keluar.', { remaining: remainingFree, limit: DAILY_FREE_SOS_LIMIT })
+        : t('mochi-sos.modal-gem-body', 'Gem dihitung sesuai pemakaian suara AI (0 Gem saat menyambung/gagal suara). Saldo kamu: {balance} 💎.', { balance: currentBalance });
       var cancelBtnText = t('mochi-sos.modal-cancel-btn', 'Batal');
+      var confirmBtnText = hasDailyFree
+        ? t('mochi-sos.modal-free-btn', 'Mulai Gratis (0 💎)')
+        : t('mochi-sos.modal-gem-btn', 'Aktifkan (Mulai 0 💎)');
+
+      var breakdownHtml = hasDailyFree
+        ? [
+            '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:12px;padding:8px 10px;margin:0 0 12px;text-align:left;font-size:11px;line-height:1.5;color:#065F46;">',
+            '  <div style="display:flex;justify-content:space-between;font-weight:700;"><span>' + t('mochi-sos.modal-row-free-quota', 'Kuota Gratis Hari Ini') + '</span><span>' + remainingFree + '/' + DAILY_FREE_SOS_LIMIT + ' ' + t('mochi-sos.modal-unit-questions', 'soal') + '</span></div>',
+            '  <div style="display:flex;justify-content:space-between;"><span>' + t('mochi-sos.modal-row-connect-safe', 'Menyambung / Gagal Suara') + '</span><strong>0 💎</strong></div>',
+            '</div>'
+          ].join('')
+        : [
+            '<div style="background:#FEFCE8;border:1px solid #FDE68A;border-radius:12px;padding:8px 10px;margin:0 0 12px;text-align:left;font-size:11px;line-height:1.55;color:#334155;">',
+            '  <div style="display:flex;justify-content:space-between;"><span>' + t('mochi-sos.modal-row-connect-anti', 'Sambung (Anti-Hangus)') + '</span><strong style="color:#059669;">0 💎</strong></div>',
+            '  <div style="display:flex;justify-content:space-between;"><span>' + t('mochi-sos.modal-row-opening-ai', 'Bedah Soal Suara AI') + '</span><strong>' + GEM_COST_OPENING_TURN + ' 💎</strong></div>',
+            '  <div style="display:flex;justify-content:space-between;"><span>' + t('mochi-sos.modal-row-followup', 'Tanya Lanjutan (Maks. {max} 💎)', { max: GEM_MAX_PER_QUESTION }) + '</span><strong>+' + GEM_COST_FOLLOWUP_TURN + ' 💎</strong></div>',
+            '  <div style="display:flex;justify-content:space-between;color:#059669;font-weight:700;"><span>' + t('mochi-sos.modal-row-cashback', 'Jawab Benar Soal Ini') + '</span><span>Cashback +' + CASHBACK_REWARD + ' 💎</span></div>',
+            '</div>'
+          ].join('');
 
       modal.innerHTML = [
-        '<div class="fz-mochi-sos-intro-card" role="dialog" aria-modal="true">',
-        '  <div class="fz-mochi-sos-intro-icon">',
-        '    <svg width="40" height="40" viewBox="0 0 100 100" fill="none">',
+        '<div class="fz-mochi-sos-intro-card" role="dialog" aria-modal="true" style="background:#FFFDF9;border:2px solid #FDE047;border-radius:20px;padding:16px 14px 14px;max-width:296px;width:calc(100% - 32px);box-shadow:0 12px 32px rgba(0,0,0,0.18);text-align:center;box-sizing:border-box;">',
+        '  <div class="fz-mochi-sos-intro-icon" style="width:46px;height:46px;margin:0 auto 6px;background:#FEF3C7;border-radius:14px;display:flex;align-items:center;justify-content:center;">',
+        '    <svg width="32" height="32" viewBox="0 0 100 100" fill="none">',
         '      <ellipse cx="50" cy="85" rx="30" ry="7" fill="rgba(217,119,6,0.15)"/>',
         '      <path d="M50 18C30 18 18 34 18 58C18 78 32 82 50 82C68 82 82 78 82 58C82 34 70 18 50 18Z" fill="#FFFDF8" stroke="#F59E0B" stroke-width="2.5"/>',
         '      <ellipse cx="32" cy="60" rx="6" ry="4" fill="#FDA4AF"/>',
@@ -2542,11 +2987,12 @@
         '      <rect x="76" y="40" width="6" height="12" rx="3" fill="#2563EB"/>',
         '    </svg>',
         '  </div>',
-        '  <h3 class="fz-mochi-sos-intro-title">' + titleText + '</h3>',
-        '  <p class="fz-mochi-sos-intro-body" style="font-size:13px;line-height:1.6;color:#475569;margin-bottom:20px;">' + bodyHtml + '</p>',
-        '  <div style="display:flex;gap:10px;justify-content:center;">',
-        '    <button type="button" class="fz-mochi-sos-btn-cancel" id="fzMochiSosConfirmCancel" style="flex:1;padding:12px;background:#F1F5F9;color:#475569;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;">' + cancelBtnText + '</button>',
-        '    <button type="button" class="fz-mochi-sos-btn-confirm" id="fzMochiSosConfirmOk" style="flex:1;padding:12px;background:#F59E0B;color:#FFF;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,0.25);">' + confirmBtnText + '</button>',
+        '  <h3 class="fz-mochi-sos-intro-title" style="font-size:15px;font-weight:800;color:#0F172A;margin:0 0 4px;line-height:1.25;">' + titleText + '</h3>',
+        '  <p class="fz-mochi-sos-intro-body" style="font-size:11.5px;line-height:1.45;color:#475569;margin:0 0 10px;font-weight:500;">' + bodyText + '</p>',
+        breakdownHtml,
+        '  <div style="display:flex;gap:8px;justify-content:center;">',
+        '    <button type="button" class="fz-mochi-sos-btn-cancel" id="fzMochiSosConfirmCancel" style="flex:1;height:36px;padding:0 10px;background:#FFFFFF;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 #CBD5E1;transition:all 0.15s ease;">' + cancelBtnText + '</button>',
+        '    <button type="button" class="fz-mochi-sos-btn-confirm" id="fzMochiSosConfirmOk" style="flex:1.5;height:36px;padding:0 10px;background:#FDE047;color:#0F172A;border:1.5px solid #EAB308;border-radius:10px;font-size:11.5px;font-weight:800;cursor:pointer;box-shadow:0 2px 0 #CA8A04;white-space:nowrap;transition:all 0.15s ease;">' + confirmBtnText + '</button>',
         '  </div>',
         '</div>'
       ].join('');
@@ -2555,21 +3001,32 @@
 
       var btnCancel = doc.getElementById('fzMochiSosConfirmCancel');
       if (btnCancel) {
-        btnCancel.onclick = function () {
+        btnCancel.onclick = function (e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
           modal.remove();
         };
       }
 
       var btnOk = doc.getElementById('fzMochiSosConfirmOk');
       if (btnOk) {
-        btnOk.onclick = function () {
-          modal.remove();
-          if (hasDailyFree) {
-            incrementDailySosUsage();
-            self.startCall(activeQ, { useDailyFree: true, userConfirmed: true });
-          } else {
-            self.startCall(activeQ, { userConfirmed: true });
+        btnOk.onclick = function (e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          var bal = getGemBalance();
+          var freshDaily = getDailySosUsage();
+          var useFreeNow = freshDaily.count < DAILY_FREE_SOS_LIMIT;
+          if (!useFreeNow && bal < GEM_MIN_START_BALANCE) {
+            modal.remove();
+            self.showInsufficientGemModal(bal);
+            return;
           }
+
+          // 0 Gem dipotong saat klik! Gem / kuota gratis hanya terhitung saat audio suara AI benar-benar diputar.
+          _pendingBillingMode = useFreeNow ? 'daily_free' : 'metered_gems';
+          modal.remove();
+
+          self.setMochiEnabled(true, { userConfirmed: true, useDailyFree: useFreeNow, skipAutoStart: true });
+          self.playInstantGreeting();
+          self.startCall(activeQ, { autoEntry: true, userConfirmed: true, useDailyFree: useFreeNow });
         };
       }
     },
@@ -2585,17 +3042,17 @@
       modal.className = 'fz-mochi-sos-intro-scrim';
 
       var titleText = t('mochi-sos.modal-insufficient-title', 'Gem Belum Cukup 💎');
-      var bodyHtml = t('mochi-sos.modal-insufficient-body', 'Kamu membutuhkan 10 Gem untuk bantuan suara Mochi SOS (Saldo saat ini: {balance} 💎). Selesaikan soal latihan kuis untuk mengumpulkan Gem gratis atau tunggu kuota gratis harian besok!', { balance: currentBalance });
+      var bodyHtml = t('mochi-sos.modal-insufficient-body', 'Kamu membutuhkan minimal 2 Gem untuk membedah soal dengan suara AI Mochi (Saldo saat ini: {balance} 💎). Selesaikan soal latihan untuk kumpulkan Gem gratis atau gunakan kuota gratis harian besok!', { balance: currentBalance });
       var closeBtnText = t('mochi-sos.modal-insufficient-btn', 'Mengerti');
 
       modal.innerHTML = [
-        '<div class="fz-mochi-sos-intro-card" role="dialog" aria-modal="true">',
-        '  <div class="fz-mochi-sos-intro-icon" style="background:#FEE2E2;">',
-        '    <span style="font-size:28px;">💎</span>',
+        '<div class="fz-mochi-sos-intro-card" role="dialog" aria-modal="true" style="background:#FFFDF9;border:2px solid #FCA5A5;border-radius:20px;padding:16px 14px 14px;max-width:270px;width:calc(100% - 36px);box-shadow:0 12px 32px rgba(0,0,0,0.18);text-align:center;box-sizing:border-box;">',
+        '  <div class="fz-mochi-sos-intro-icon" style="width:46px;height:46px;margin:0 auto 6px;background:#FEE2E2;border-radius:14px;display:flex;align-items:center;justify-content:center;">',
+        '    <span style="font-size:22px;">💎</span>',
         '  </div>',
-        '  <h3 class="fz-mochi-sos-intro-title">' + titleText + '</h3>',
-        '  <p class="fz-mochi-sos-intro-body" style="font-size:13px;line-height:1.6;color:#475569;margin-bottom:20px;">' + bodyHtml + '</p>',
-        '  <button type="button" class="fz-mochi-sos-intro-btn" id="fzMochiSosInsufficientClose" style="width:100%;padding:12px;background:#0F172A;color:#FFF;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;">' + closeBtnText + '</button>',
+        '  <h3 class="fz-mochi-sos-intro-title" style="font-size:15px;font-weight:800;color:#0F172A;margin:0 0 4px;">' + titleText + '</h3>',
+        '  <p class="fz-mochi-sos-intro-body" style="font-size:11.5px;line-height:1.45;color:#475569;margin:0 0 14px;">' + bodyHtml + '</p>',
+        '  <button type="button" class="fz-mochi-sos-intro-btn" id="fzMochiSosInsufficientClose" style="width:100%;height:36px;padding:0 12px;background:#0F172A;color:#FFF;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">' + closeBtnText + '</button>',
         '</div>'
       ].join('');
 
@@ -2643,9 +3100,19 @@
       q = getActiveQuestion(q);
       if (!isMochiSosEligible(q, _currentCtx)) return;
       this.mountCardToggle(q);
+      if (opts.userConfirmed) {
+        writeMochiEnabledToStorage(true);
+      }
       if (!isMochiEnabledFromStorage()) return;
 
-      var can = this.canCall(opts);
+      var useDailyFreeOpt = !!(opts.useDailyFree || _pendingBillingMode === 'daily_free');
+      var can = this.canCall({
+        isPlacement: opts.isPlacement,
+        requireGems: opts.requireGems,
+        realGems: opts.realGems,
+        requireEnabled: opts.requireEnabled,
+        useDailyFree: useDailyFreeOpt
+      });
       if (!can.allowed) {
         playTone(330, 0.2, 'sawtooth');
         try { if (typeof root.showToast === 'function') root.showToast(can.message, 'warn'); } catch (_) {}
@@ -2653,23 +3120,29 @@
       }
 
       var sessionId = 'sos-' + Date.now().toString(36);
-      this.spendForCall(sessionId, can.isWelcomePass);
+      // 0 Gem dipotong saat startCall! Gem/kuota dihitung HANYA ketika audio suara AI benar-benar diputar.
 
       _reconnectAttempts = 0;
       _silencePromptFired = false;
       _lastUserSpeechAt = Date.now();
       _openingTurnCompletedForQ = false;
       _userAudioBurstActive = false;
+      _currentTurnMetered = false;
+      _isSilenceNudgeTurn = false;
+      _pendingFollowupBillable = false;
       _activeCall = {
         active: true,
         sessionId: sessionId,
         startedAt: Date.now(),
         isWelcomePass: !!can.isWelcomePass,
+        useDailyFree: !!(useDailyFreeOpt || can.isDailyFree),
         autoEntry: !!opts.autoEntry,
         question: q,
         answered: false,
         cashbackAwardedForQ: false,
         firstAudioAt: 0,
+        turnsDelivered: 0,
+        gemsSpent: 0,
         lastSilencePrompt: ''
       };
       _outTranscript = '';
@@ -2680,7 +3153,25 @@
       this.renderUnderMochiVoiceVisualizer(true);
       this._updateMochiMascotPose('greet');
 
-      var bubble = getDoc() ? getDoc().getElementById('fzMochiThoughtBubble') : null;
+      var doc = getDoc();
+      if (doc) {
+        var stage = doc.querySelector('.quiz-stage');
+        if (stage) stage.classList.add('is-teaching');
+        var shell = doc.querySelector('.quiz-shell');
+        if (shell) shell.classList.add('is-call-active');
+      }
+      this.setRestingPawsVisible(false);
+      try {
+        var comp = root && root.FiezelMochiCompanion;
+        var mochiInst = comp && typeof comp.getInstance === 'function' ? comp.getInstance() : null;
+        if (mochiInst) {
+          if (typeof mochiInst.stopEarTwitchLoop === 'function') mochiInst.stopEarTwitchLoop();
+          if (typeof mochiInst.setAccessory === 'function') mochiInst.setAccessory('teacher');
+          if (typeof mochiInst.triggerHandGesture === 'function') mochiInst.triggerHandGesture('wave', 2.4);
+        }
+      } catch (_) {}
+
+      var bubble = doc ? doc.getElementById('fzMochiThoughtBubble') : null;
       if (bubble) bubble.classList.add('is-call-active');
 
       this._startGeminiLiveDuplex(q);
@@ -2751,7 +3242,7 @@
         var directKey = getUserGeminiApiKey();
         if (directKey) {
           this._connectLiveWebSocket(
-            'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?key=' + encodeURIComponent(directKey),
+            'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=' + encodeURIComponent(directKey),
             q,
             0,
             true
@@ -2833,6 +3324,9 @@
               if (_sileroVadActive && (Date.now() - _sileroLastSpeechProbAt) > 3600) return;
               if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete) {
                 _userAskedConceptOnCurrent = true;
+                _pendingFollowupBillable = true;
+                _currentTurnMetered = false;
+                _isSilenceNudgeTurn = false;
                 var activeSpokenQ = getActiveQuestion(null);
                 var bcSpoken = evaluateBraincoreStruggleState(activeSpokenQ);
                 if (bcSpoken.isStruggling) {
@@ -2937,6 +3431,7 @@
                 _userAudioBurstActive = false;
                 self._setVoiceVisualizerUserSpeaking(false);
                 if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && !_awaitingOpeningModelTurn && _activeAudioSources.length === 0) {
+                  _pendingFollowupBillable = true;
                   try {
                     _ws.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
                   } catch (_) {}
@@ -3117,6 +3612,7 @@
                       sileroSilenceStreak = 0;
                       self._setVoiceVisualizerUserSpeaking(false);
                       if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && !_awaitingOpeningModelTurn && _activeAudioSources.length === 0) {
+                        _pendingFollowupBillable = true;
                         try {
                           _ws.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
                         } catch (_) {}
@@ -3246,6 +3742,8 @@
         }
         _lastUserSpeechAt = Date.now();
         _silencePromptFired = false;
+        _currentTurnMetered = false;
+        _isSilenceNudgeTurn = false;
         _awaitingOpeningModelTurn = true;
         if (_openingModelTurnTimer) clearTimeout(_openingModelTurnTimer);
         _openingModelTurnTimer = setTimeout(function () {
@@ -3410,6 +3908,8 @@
         if (sc.interrupted) {
           _modelTurnInProgress = false;
           _awaitingOpeningModelTurn = false;
+          _currentTurnMetered = false;
+          _isSilenceNudgeTurn = false;
           if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
           stopAllActiveAudioSources();
           _outTranscript = '';
@@ -3420,6 +3920,7 @@
           if (!_sileroVadActive || (Date.now() - _sileroLastSpeechProbAt) < 3500) {
             _lastUserSpeechAt = Date.now();
             _silencePromptFired = false;
+            _pendingFollowupBillable = true;
             self._setVoiceVisualizerUserSpeaking(true);
             if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
           }
@@ -3444,6 +3945,12 @@
             var part = sc.modelTurn.parts[i];
             if (part.inlineData && part.inlineData.data) {
               if (typeof onAudio === 'function') onAudio();
+              if (!_currentTurnMetered) {
+                _currentTurnMetered = true;
+                var billKind = _pendingFollowupBillable ? 'followup' : 'opening';
+                _pendingFollowupBillable = false;
+                self.meterDeliveredAiTurn(getActiveQuestion(q) || q, billKind);
+              }
               self._scheduleAudioChunk(part.inlineData.data);
             }
           }
@@ -3452,6 +3959,8 @@
         if (sc.turnComplete) {
           _modelTurnInProgress = false;
           _awaitingOpeningModelTurn = false;
+          _currentTurnMetered = false;
+          _isSilenceNudgeTurn = false;
           if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
           _outTranscript = '';
           if (_turnEndFallbackTimer) { clearTimeout(_turnEndFallbackTimer); _turnEndFallbackTimer = null; }
@@ -3565,6 +4074,8 @@
         return;
       }
       _silencePromptFired = true;
+      _isSilenceNudgeTurn = true;
+      _currentTurnMetered = false;
       _awaitingOpeningModelTurn = true;
       if (_openingModelTurnTimer) clearTimeout(_openingModelTurnTimer);
       _openingModelTurnTimer = setTimeout(function () {
@@ -3603,11 +4114,93 @@
     },
 
     _fallbackSpeechTurn: function (q) {
-      try {
-        if (typeof root.showToast === 'function') {
-          root.showToast(t('mochi-sos.connecting', 'Menyambungkan Mochi...'), 'info');
-        }
-      } catch (_) {}
+      var self = this;
+      if (!this.isCallActive() || typeof fetch !== 'function') return;
+      var activeQ = getActiveQuestion(q) || q;
+      var guidance = String(this.buildSocraticGuidance(activeQ) || '').trim();
+      if (!guidance) return;
+
+      var loc = getLocale();
+      var speaker = loc === 'th' ? 'premwadee' : 'gadis';
+      var endpoints = [];
+      if (isLocalEnv()) {
+        endpoints.push('/api/tts/line');
+      }
+      var cfgEndpoint = root && root.FIEZEL_TTS_CONFIG && root.FIEZEL_TTS_CONFIG.endpoint;
+      if (cfgEndpoint) endpoints.push(cfgEndpoint);
+      endpoints.push('https://fiezel-apps.onrender.com/api/tts/line');
+
+      var tryNext = function (idx) {
+        if (idx >= endpoints.length || !self.isCallActive()) return;
+        var url = endpoints[idx];
+        var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        var timer = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (_) {} }, 5000) : null;
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: guidance, speaker: speaker, lang: loc === 'th' ? 'th' : 'id' }),
+          signal: ctrl ? ctrl.signal : undefined
+        }).then(function (res) {
+          if (timer) clearTimeout(timer);
+          if (!res || !res.ok) throw new Error('tts_http_' + (res ? res.status : 0));
+          var ct = (res.headers && typeof res.headers.get === 'function' ? res.headers.get('content-type') : '') || '';
+          if (ct.indexOf('audio/') !== -1) {
+            return res.arrayBuffer();
+          }
+          if (ct.indexOf('application/json') !== -1) {
+            return res.json().then(function (j) {
+              var b64 = j && (j.audioBase64 || j.audio_base64 || j.audio || j.data);
+              if (!b64 || typeof b64 !== 'string' || b64.length < 32) throw new Error('empty_json_audio');
+              var cleanB64 = b64.replace(/^data:audio\/[^;]+;base64,/, '');
+              var bin = atob(cleanB64);
+              var arr = new Uint8Array(bin.length);
+              for (var bi = 0; bi < bin.length; bi++) arr[bi] = bin.charCodeAt(bi);
+              return arr.buffer;
+            });
+          }
+          throw new Error('non_audio_ct');
+        }).then(function (buf) {
+          if (!buf || buf.byteLength < 64 || !self.isCallActive()) return;
+          var ctx = getAudioContext();
+          if (ctx) {
+            return ctx.decodeAudioData(buf.slice(0)).then(function (decoded) {
+              if (!self.isCallActive()) return;
+              var source = ctx.createBufferSource();
+              source.buffer = decoded;
+              var targetNode = attachAnalyserToMochi(ctx) || ctx.destination;
+              source.connect(targetNode);
+              source.start(0);
+              _activeAudioSources.push(source);
+              setConnectionStatusInternal('connected', '');
+              self._setVoiceVisualizerSpeaking(true);
+              self._updateMochiMascotPose('greet');
+              try {
+                var c = root && root.FiezelMochiCompanion;
+                var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
+                if (m && typeof m.setTalking === 'function') m.setTalking(true);
+              } catch (_) {}
+              self.meterDeliveredAiTurn(activeQ, 'opening');
+              source.onended = function () {
+                _activeAudioSources = _activeAudioSources.filter(function (s) { return s !== source; });
+                if (_activeAudioSources.length === 0) {
+                  self._setVoiceVisualizerSpeaking(false);
+                  self._updateMochiMascotPose('idle');
+                  try {
+                    var ce = root && root.FiezelMochiCompanion;
+                    var me = ce && typeof ce.getInstance === 'function' ? ce.getInstance() : null;
+                    if (me && typeof me.setTalking === 'function') me.setTalking(false);
+                  } catch (_) {}
+                }
+              };
+            });
+          }
+        }).catch(function () {
+          if (timer) clearTimeout(timer);
+          tryNext(idx + 1);
+        });
+      };
+
+      tryNext(0);
     },
 
     closeCall: function (reason) {
@@ -3625,6 +4218,9 @@
       _lastUserSpeechAt = 0;
       _modelTurnInProgress = false;
       _awaitingOpeningModelTurn = false;
+      _currentTurnMetered = false;
+      _isSilenceNudgeTurn = false;
+      _pendingFollowupBillable = false;
       _pipeWarmToActiveCall = false;
       _sileroVadActive = false;
       if (_sileroVad) {
@@ -3646,17 +4242,45 @@
       removeConnectionBannerInternal();
       _connStatus = { state: 'idle', message: '', updatedAt: 0 };
 
-      var duration = Date.now() - call.startedAt;
-      if (!call.answered && duration < MISTAP_THRESHOLD_MS && !call.isWelcomePass && reason !== 'answered_correct') {
-        this.refundMisTap();
+      if (reason === 'user_tapped' || reason === 'toggle' || reason === 'user_disabled') {
+        try {
+          if (typeof root.showToast === 'function') {
+            if (!call.turnsDelivered) {
+              root.showToast(t('mochi-sos.toast-zero-audio-safe', 'Belum ada suara AI yang diputar — 0 Gem terpakai! 💎'), 'info');
+            } else if ((call.gemsSpent || 0) > 0) {
+              root.showToast(t('mochi-sos.toast-session-receipt', 'Bantuan Mochi selesai: {turns} respon suara · {gems} Gem terpakai 💎', {
+                turns: call.turnsDelivered,
+                gems: call.gemsSpent
+              }), 'info');
+            } else if (call.useDailyFree) {
+              root.showToast(t('mochi-sos.toast-session-free-receipt', 'Bantuan Mochi selesai: {turns} respon suara · Kuota Gratis Harian (0 💎)', {
+                turns: call.turnsDelivered
+              }), 'info');
+            }
+          }
+        } catch (_) {}
       }
 
       playChime('disconnect');
       this.renderUnderMochiVoiceVisualizer(false);
+
+      var doc = getDoc();
+      if (doc) {
+        var stage = doc.querySelector('.quiz-stage');
+        if (stage) stage.classList.remove('is-teaching');
+        var shell = doc.querySelector('.quiz-shell');
+        if (shell) shell.classList.remove('is-call-active');
+      }
+      this.setRestingPawsVisible(true);
       try {
         var comp = root && root.FiezelMochiCompanion;
         var mochiInst = comp && typeof comp.getInstance === 'function' ? comp.getInstance() : null;
-        if (mochiInst && typeof mochiInst.setTalking === 'function') mochiInst.setTalking(false);
+        if (mochiInst) {
+          if (typeof mochiInst.setAccessory === 'function') mochiInst.setAccessory(null);
+          if (typeof mochiInst.setTalking === 'function') mochiInst.setTalking(false);
+          if (typeof mochiInst.retractHands === 'function') mochiInst.retractHands();
+          if (typeof mochiInst.startEarTwitchLoop === 'function') mochiInst.startEarTwitchLoop(3200);
+        }
       } catch (_) {}
       this._updateMochiMascotPose('idle');
 
@@ -3741,7 +4365,8 @@
 
       if (ok) {
         this._updateMochiMascotPose('greet');
-        if (!_activeCall.isWelcomePass && !_activeCall.cashbackAwardedForQ) {
+        var paidOnQ = (_questionGemsMap[getQuestionSig(activeQ)] || 0) > 0;
+        if (paidOnQ && !_activeCall.isWelcomePass && !_activeCall.cashbackAwardedForQ) {
           _activeCall.cashbackAwardedForQ = true;
           this.awardCashback();
         }
@@ -3752,8 +4377,12 @@
           (snap.memory ? 'Jangkar Ingatan: ' + snap.memory + '\n' : '') +
           'TUGAS: Berikan pujian singkat 1 kalimat dengan suara manusia asli yang hangat dan ceria, tegaskan 1 poin inti mengapa jawaban itu tepat sesuai penjelasan di layar, lalu ajak lanjut ke soal berikutnya!'
         );
+        // Pujian jawaban benar gratis (0 Gem tambahan)
+        _isSilenceNudgeTurn = true;
+        _pendingFollowupBillable = false;
       } else {
         this._updateMochiMascotPose('greet');
+        _pendingFollowupBillable = true;
         sendContextUpdate(
           '[PEMBARUAN: Respons peserta "' + learnerName + '" belum tepat pada soal "' + snap.stem + '".]\n' +
           (snap.rule ? 'Rumus/Pola Tata Bahasa di layar: ' + snap.rule + '\n' : '') +
@@ -3853,27 +4482,31 @@
       var titleText = isOn
         ? t('mochi-sos.toggle-on-title', 'Nonaktifkan bantuan suara Mochi')
         : t('mochi-sos.toggle-off-title', 'Aktifkan bantuan suara Mochi');
-      var badgeText = isOn
-        ? t('mochi-sos.toggle-on-badge', 'ON')
-        : t('mochi-sos.toggle-off-badge', 'OFF');
-      var stateSig = (isOn ? '1:' : '0:') + badgeText + ':' + titleText;
+      var labelText = t('mochi-sos.toggle-label', 'Bantuan Mochi');
+      var stateText = 'OFF';
+      if (isOn) {
+        if (_sessionGemsSpent > 0) {
+          stateText = 'ON · -' + _sessionGemsSpent + '💎';
+        } else if (_sessionFreeQuestions > 0) {
+          stateText = 'ON · ' + t('mochi-sos.badge-free', 'Gratis');
+        } else {
+          stateText = 'ON';
+        }
+      }
+      var stateSig = (isOn ? '1:' : '0:') + stateText + ':' + titleText;
       if (btn.getAttribute('data-mochi-sig') === stateSig) return;
       btn.setAttribute('data-mochi-sig', stateSig);
       btn.className = 'fz-mochi-card-toggle ' + (isOn ? 'is-on' : 'is-off');
-      btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+      btn.setAttribute('role', 'switch');
+      btn.setAttribute('aria-checked', isOn ? 'true' : 'false');
       btn.setAttribute('aria-label', titleText);
       btn.setAttribute('title', titleText);
       btn.innerHTML = [
-        '<svg class="fz-mct-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">',
-        '  <circle cx="12" cy="13" r="7.5" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="1.8"/>',
-        '  <circle cx="9.5" cy="12.2" r="1.15" fill="currentColor"/>',
-        '  <circle cx="14.5" cy="12.2" r="1.15" fill="currentColor"/>',
-        '  <path d="M10.2 15.1C10.9 15.8 13.1 15.8 13.8 15.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
-        '  <path class="fz-mct-wave" d="M18.6 6.2C20.1 7.5 20.8 9.2 20.8 11.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-        (isOn ? '' : '  <line class="fz-mct-slash" x1="4.5" y1="19.5" x2="19.5" y2="4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>'),
-        '</svg>',
-        '<span class="fz-mct-dot" aria-hidden="true"></span>',
-        '<span class="fz-mct-label">' + badgeText + '</span>'
+        '<span class="fz-mct-label">' + labelText + '</span>',
+        '<span class="fz-mct-switch" aria-hidden="true">',
+        '  <span class="fz-mct-state">' + stateText + '</span>',
+        '  <span class="fz-mct-knob"></span>',
+        '</span>'
       ].join('');
     },
 
@@ -3911,15 +4544,28 @@
       }
 
       var self = this;
-      var btn = doc.createElement('button');
-      btn.type = 'button';
+      var btn = doc.createElement('div');
       btn.id = 'fzMochiCardToggle';
+      btn.tabIndex = 0;
       this._syncCardToggleUi(btn, isOn);
-      btn.onclick = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+      var handleToggle = function (e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         hapticTap(10);
-        self.toggleMochiEnabled();
+        var currentlyOn = isMochiEnabledFromStorage();
+        if (!currentlyOn) {
+          self.showConfirmationModal(activeQ);
+        } else {
+          self.setMochiEnabled(false);
+        }
+      };
+      btn.onclick = handleToggle;
+      btn.onkeydown = function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleToggle(e);
+        }
       };
       card.appendChild(btn);
       return btn;
@@ -3932,69 +4578,27 @@
       if (existing) existing.remove();
     },
 
-    // UI Mount: Comic Thought Bubble (q di-resolve SAAT klik, bukan saat mount)
-    mountThoughtBubble: function (q) {
+    // UI Mount: Resting paws removed per user instruction
+    mountRestingPaws: function () {
+      this.removeRestingPaws();
+      return null;
+    },
+
+    setRestingPawsVisible: function (_visible) {
+      this.removeRestingPaws();
+    },
+
+    removeRestingPaws: function () {
       var doc = getDoc();
       if (!doc) return;
-      if (q) _currentQ = q;
-      var activeQ = getActiveQuestion(q);
-      if (isExamLocked() || !isMochiSosEligible(activeQ, _currentCtx)) {
-        this.removeThoughtBubble();
-        this.removeCardToggle();
-        return;
-      }
-      this.mountCardToggle(activeQ);
-      if (!isMochiEnabledFromStorage()) {
-        this.removeThoughtBubble();
-        return;
-      }
+      var existing = doc.getElementById('fzMochiRestingPaws');
+      if (existing) existing.remove();
+    },
 
-      var slot = findMascotHost();
-      if (!slot) return;
-      slot.style.position = 'relative';
-      slot.style.overflow = 'visible';
-
-      if (this.isCallActive()) {
-        this.renderUnderMochiVoiceVisualizer(true);
-      }
-
-      var self = this;
-      var existing = doc.getElementById('fzMochiThoughtBubble');
-      if (existing) {
-        if (slot.contains(existing)) {
-          if (this.isCallActive()) existing.classList.add('is-call-active');
-          else existing.classList.remove('is-call-active');
-          return;
-        }
-        existing.remove();
-      }
-
-      var bubble = doc.createElement('button');
-      bubble.type = 'button';
-      bubble.id = 'fzMochiThoughtBubble';
-      bubble.className = 'fz-mochi-thought-bubble' + (this.isCallActive() ? ' is-call-active' : '');
-      bubble.setAttribute('aria-hidden', 'false'); // slot induk aria-hidden=true (fiezel-paw-slot.js:132)
-      bubble.setAttribute('aria-label', t('mochi-sos.bubble-tap', 'Ketuk aku'));
-      bubble.setAttribute('title', t('mochi-sos.bubble-title', 'Diskusi suara langsung dengan Mochi'));
-      bubble.innerHTML = [
-        '<span class="fz-thought-trail-2" aria-hidden="true"></span>',
-        '<span class="fz-thought-trail-1" aria-hidden="true"></span>',
-        '<span class="fz-thought-dot" aria-hidden="true"></span>',
-        '<span class="fz-thought-text">' + t('mochi-sos.bubble-tap', 'Ketuk aku') + '</span>'
-      ].join('');
-
-      bubble.addEventListener('pointerdown', function () {
-        if (!isMochiEnabledFromStorage()) return;
-        warmAudioContext();
-        if (!self.isCallActive()) openHotSocket();
-      }, { passive: true });
-      bubble.onclick = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.handleMascotTap('bubble');
-      };
-
-      slot.appendChild(bubble);
+    // UI Mount: Comic Thought Bubble ("Ketuk aku" matikan sepenuhnya per instruksi owner)
+    mountThoughtBubble: function () {
+      this.removeThoughtBubble();
+      return null;
     },
 
     removeThoughtBubble: function () {
@@ -4002,6 +4606,8 @@
       if (!doc) return;
       var existing = doc.getElementById('fzMochiThoughtBubble');
       if (existing) existing.remove();
+      var allBubbles = doc.querySelectorAll('.fz-mochi-thought-bubble');
+      for (var i = 0; i < allBubbles.length; i++) allBubbles[i].remove();
     },
 
     // UI Mount: Compact Centered Under-Mochi Soundwave Visualizer (Pill + Radiating Acoustic Arcs)
@@ -4257,7 +4863,9 @@
       return;
     }
 
-    if (!_session.active) return; // menunggu onQuizSessionStart/setActiveQuestion dari app.js
+    if (!_session.active) {
+      apiInstance.onQuizSessionStart({ type: 'grammar' });
+    }
     var activeQ = getActiveQuestion(null);
     if (!isMochiSosEligible(activeQ, _currentCtx)) {
       apiInstance.removeThoughtBubble();
@@ -4268,15 +4876,27 @@
     apiInstance.mountCardToggle(activeQ);
     if (!isMochiEnabledFromStorage()) {
       apiInstance.removeThoughtBubble();
+      apiInstance.removeRestingPaws();
+      apiInstance.renderUnderMochiVoiceVisualizer(false);
+      var stage = doc.querySelector('.quiz-stage');
+      if (stage) stage.classList.remove('is-teaching');
+      try {
+        var comp = root && root.FiezelMochiCompanion;
+        var mochiInst = comp && typeof comp.getInstance === 'function' ? comp.getInstance() : null;
+        if (mochiInst) {
+          if (typeof mochiInst.setAccessory === 'function') mochiInst.setAccessory(null);
+          if (typeof mochiInst.setTalking === 'function') mochiInst.setTalking(false);
+          if (typeof mochiInst.retractHands === 'function') mochiInst.retractHands();
+          if (typeof mochiInst.startEarTwitchLoop === 'function') mochiInst.startEarTwitchLoop(3200);
+        }
+      } catch (_) {}
       if (apiInstance.isCallActive()) apiInstance.closeCall('user_disabled');
       return;
     }
-    var bubble = doc.getElementById('fzMochiThoughtBubble');
-    if (!bubble) apiInstance.mountThoughtBubble(activeQ);
+    apiInstance.removeRestingPaws();
+    apiInstance.removeThoughtBubble();
     if (apiInstance.isCallActive()) {
       apiInstance.renderUnderMochiVoiceVisualizer(true);
-    } else if (!_session.greeted) {
-      apiInstance.greetOnEntry(activeQ, _currentCtx);
     }
     apiInstance.bindMascotTap();
   }

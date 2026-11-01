@@ -17,34 +17,38 @@
 }
 
 .fz-mochi-thought-bubble {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Subtle speech bubble tail pointing downward to Mochi */
+.fz-mochi-thought-bubble::after {
+  content: '' !important;
   position: absolute !important;
-  top: -8px !important;
-  left: 6px !important;
-  right: auto !important;
-  bottom: auto !important;
-  z-index: 50 !important;
-  pointer-events: auto !important;
-  cursor: pointer !important;
-  user-select: none !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 5px !important;
-  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBEB 100%) !important;
-  border: 1.5px solid #F59E0B !important;
-  border-radius: 12px 12px 3px 12px !important;
-  padding: 4px 10px !important;
-  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.16) !important;
-  animation: fzThoughtFloat 2.6s ease-in-out infinite !important;
-  transform-origin: bottom right !important;
-  box-sizing: border-box !important;
-  text-decoration: none !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-  min-height: 0 !important;
-  height: auto !important;
-  min-width: 0 !important;
-  width: auto !important;
-  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease !important;
+  bottom: -5px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 5px solid transparent !important;
+  border-right: 5px solid transparent !important;
+  border-top: 5px solid #18181B !important;
+}
+
+.fz-mochi-thought-bubble::before {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -3.5px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 4px solid transparent !important;
+  border-right: 4px solid transparent !important;
+  border-top: 4px solid #FFFFFF !important;
+  z-index: 1 !important;
 }
 
 /* Auto-hide cleanly during active voice call */
@@ -52,60 +56,41 @@
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
-  transform: scale(0.8) translateY(-4px) !important;
+  transform: translateX(-50%) scale(0.8) translateY(-4px) !important;
 }
 
 .fz-mochi-thought-bubble:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.22);
+  transform: translateX(-50%) translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12) !important;
 }
 
 .fz-mochi-thought-bubble:active {
-  transform: scale(0.95);
+  transform: translateX(-50%) scale(0.95) !important;
 }
 
 .fz-thought-dot {
-  width: 5px !important;
-  height: 5px !important;
+  width: 6px !important;
+  height: 6px !important;
   border-radius: 50% !important;
-  background: #10B981 !important;
-  box-shadow: 0 0 4px rgba(16, 185, 129, 0.8) !important;
-  animation: fzLiveDotPulse 1.4s ease-in-out infinite !important;
+  background: #18181B !important;
+  box-shadow: none !important;
+  animation: fzLiveDotPulse 1.8s ease-in-out infinite !important;
   flex-shrink: 0 !important;
 }
 
 .fz-thought-text {
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  color: #92400E !important;
-  letter-spacing: 0.01em !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  color: #18181B !important;
+  letter-spacing: -0.01em !important;
   white-space: nowrap !important;
   line-height: 1 !important;
 }
 
-/* Comic Thought Trail: points down-right from bubble toward Mochi */
-.fz-thought-trail-1 {
-  position: absolute;
-  right: 2px;
-  bottom: -4px;
-  width: 4px;
-  height: 4px;
-  background: #FFFFFF;
-  border: 1px solid #F59E0B;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
+/* Obsolete trails hidden */
+.fz-thought-trail-1,
 .fz-thought-trail-2 {
-  position: absolute;
-  right: -2px;
-  bottom: -8px;
-  width: 2.5px;
-  height: 2.5px;
-  background: #FFFFFF;
-  border: 0.8px solid #F59E0B;
-  border-radius: 50%;
-  pointer-events: none;
+  display: none !important;
 }
 
 @keyframes fzThoughtFloat {
@@ -136,19 +121,49 @@ body.fz-stage-quiz .quiz-stage,
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 6px !important;
+  gap: 0px !important;
   margin: 0 auto 10px !important;
   width: 100% !important;
+  position: relative !important;
 }
 
-.quiz-stage .fz-paw-above,
-.quiz-stage .fz-paw-slot {
-  margin: 0 auto 10px !important;
+/* Mode Mengintip (Peeking): Mochi duduk pas di atas kotak hitam, dagu bawah sedikit di balik kotak hitam */
+.quiz-stage:not(.is-teaching) .fz-paw-above,
+.quiz-stage:not(.is-teaching) .fz-paw-slot {
+  margin: 0 auto -20px auto !important;
+  position: relative !important;
+  z-index: 2 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  position: relative !important;
   overflow: visible !important;
+  transition: margin 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Kotak Hitam Soal (Black Box / quiz-bubble) */
+.quiz-stage .quiz-bubble {
+  position: relative !important;
+  z-index: 5 !important;
+  overflow: visible !important;
+}
+
+.quiz-stage.is-teaching {
+  gap: 0px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Mode Mengajar (Teaching): Mochi melayang bangkit ke atas kotak hitam */
+.quiz-stage.is-teaching .fz-paw-above,
+.quiz-stage.is-teaching .fz-paw-slot {
+  margin: 0 auto 22px auto !important;
+  transform: translateY(-8px) !important;
+  position: relative !important;
+  z-index: 6 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  transition: margin 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .quiz-stage .quiz-bubble::before,
@@ -156,9 +171,21 @@ body.fz-stage-quiz .quiz-stage,
   display: none !important;
 }
 
+/* ── Resting Paws Completely Removed (User Directive: Hapus Tangan Mengintip) ── */
+.fz-mochi-resting-paws,
+.quiz-bubble > .fz-mochi-resting-paws,
+.quiz-stage .fz-mochi-resting-paws,
+.quiz-stage > .fz-mochi-resting-paws {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ── Minimalist Black & White Under-Mochi Soundwave Visualizer ── */
 .fz-mochi-voice-under {
   position: absolute !important;
-  bottom: 1px !important;
+  bottom: -12px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   display: inline-flex !important;
@@ -166,7 +193,7 @@ body.fz-stage-quiz .quiz-stage,
   justify-content: center !important;
   gap: 3px !important;
   height: auto !important;
-  padding: 2px 4px !important;
+  padding: 2px 6px !important;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -183,60 +210,57 @@ body.fz-stage-quiz .quiz-stage,
 }
 
 .fz-mochi-voice-under:hover {
-  transform: translateX(-50%) scale(1.06) !important;
+  transform: translateX(-50%) scale(1.08) !important;
 }
 
 .fz-mochi-voice-under:active {
   transform: translateX(-50%) scale(0.95) !important;
 }
 
-/* Center White Glowing Capsule Pill */
+/* Center White Capsule Pill with Solid Black Border */
 .fz-mochi-voice-under .fz-sw-pill {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 2px !important;
-  height: 17px !important;
-  padding: 2px 7.5px !important;
-  background: linear-gradient(180deg, #FFFFFF 0%, #FFFDF7 100%) !important;
-  border: 1.4px solid #FBBF24 !important;
+  gap: 2.5px !important;
+  height: 19px !important;
+  padding: 2px 9px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #18181B !important;
   border-radius: 999px !important;
-  box-shadow:
-    0 2px 9px rgba(245, 158, 11, 0.28),
-    0 0 6px rgba(251, 191, 36, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
   box-sizing: border-box !important;
   transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
 }
 
-/* Left & Right Radiating Soundwave Arcs (( )) — Bergema saat Mochi bersuara */
+/* Radiating Acoustic Soundwave Arcs (( )) in Solid Black */
 .fz-mochi-voice-under .fz-sw-arc {
-  width: 11px !important;
-  height: 16px !important;
-  color: #F59E0B !important;
+  width: 12px !important;
+  height: 17px !important;
+  color: #18181B !important;
   flex-shrink: 0 !important;
   overflow: visible !important;
   pointer-events: none !important;
-  filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.35)) !important;
 }
 
 .fz-mochi-voice-under .fz-sw-arc .sw-wave-in {
-  opacity: 0.32;
+  opacity: 0.35;
   transform-origin: center;
   transition: opacity 0.18s ease;
 }
 
 .fz-mochi-voice-under .fz-sw-arc .sw-wave-out {
-  opacity: 0.18;
+  opacity: 0.20;
   transform-origin: center;
   transition: opacity 0.18s ease;
 }
 
-/* 7 Symmetric Rounded Bars inside the Pill */
+/* 7 Symmetric Black Soundwave Bars */
 .fz-mochi-voice-under .sw-bar {
   display: inline-block !important;
-  width: 2px !important;
+  width: 2.2px !important;
   border-radius: 999px !important;
-  background: linear-gradient(180deg, #FBBF24 0%, #F59E0B 45%, #EA580C 100%) !important;
+  background: #18181B !important;
   transform-origin: center !important;
   animation: fzSoundwaveListening 1.05s ease-in-out infinite !important;
   transition: background 0.15s ease !important;
@@ -291,11 +315,18 @@ body.fz-stage-quiz .quiz-stage,
 .fz-mochi-voice-under.is-speaking .sw-bar.b-6 { animation-delay: 0.24s; }
 .fz-mochi-voice-under.is-speaking .sw-bar.b-7 { animation-delay: 0.10s; }
 
-/* Saat User Berbicara (.is-user-speaking): 7 bar di tengah berubah menjadi MERAH MAROON GELAP! */
+/* Saat User Berbicara (.is-user-speaking): 7 bar di tengah berubah menjadi MERAH CORAL VIBRAN & GLOWING! */
 .fz-mochi-voice-under.is-user-speaking .sw-bar,
 .fz-mochi-voice-under.is-speaking.is-user-speaking .sw-bar {
-  background: linear-gradient(180deg, #9B2C3E 0%, #7F1D2D 50%, #58111E 100%) !important;
-  animation: fzSoundwaveSpeaking 0.34s ease-in-out infinite alternate !important;
+  background: linear-gradient(180deg, #FF4D6D 0%, #E11D48 50%, #9F1239 100%) !important;
+  animation: fzSoundwaveSpeaking 0.28s ease-in-out infinite alternate !important;
+  box-shadow: 0 0 8px rgba(225, 29, 72, 0.45) !important;
+}
+
+.fz-mochi-voice-under.is-user-speaking .fz-sw-arc path,
+.fz-mochi-voice-under.is-speaking.is-user-speaking .fz-sw-arc path {
+  stroke: #E11D48 !important;
+  filter: drop-shadow(0 0 3px rgba(225, 29, 72, 0.45)) !important;
 }
 
 .fz-mochi-voice-under.is-user-speaking .sw-bar.b-1 { animation-delay: 0.03s; }
@@ -1041,93 +1072,114 @@ html body #app .quiz-shell {
   position: relative !important;
 }
 
-.fz-mochi-card-toggle {
+#fzMochiCardToggle,
+.fz-mochi-card-toggle,
+div#fzMochiCardToggle,
+button#fzMochiCardToggle {
+  all: unset !important;
   position: absolute !important;
-  top: 10px !important;
-  right: 10px !important;
+  top: 8px !important;
+  right: 8px !important;
   left: auto !important;
   bottom: auto !important;
   z-index: 45 !important;
   display: inline-flex !important;
   align-items: center !important;
-  justify-content: center !important;
-  gap: 4px !important;
-  height: 24px !important;
-  min-height: 24px !important;
-  max-height: 24px !important;
+  justify-content: flex-end !important;
+  gap: 5px !important;
+  height: 18px !important;
+  min-height: 0 !important;
+  max-height: 18px !important;
   width: auto !important;
   min-width: 0 !important;
-  padding: 0 7px 0 5px !important;
+  padding: 0 !important;
   margin: 0 !important;
-  border-radius: 999px !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.02em !important;
-  line-height: 1 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
   cursor: pointer !important;
   user-select: none !important;
+  -webkit-user-select: none !important;
   white-space: nowrap !important;
   box-sizing: border-box !important;
   pointer-events: auto !important;
   touch-action: manipulation !important;
-  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease !important;
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease !important;
 }
 
-.fz-mochi-card-toggle.is-on {
-  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBEB 100%) !important;
-  border: 1.3px solid #F59E0B !important;
-  color: #92400E !important;
-  box-shadow: 0 2px 7px rgba(217, 119, 6, 0.14) !important;
-  opacity: 1 !important;
-}
-
-.fz-mochi-card-toggle.is-off {
-  background: #F8FAFC !important;
-  border: 1.2px solid #CBD5E1 !important;
+.fz-mochi-card-toggle .fz-mct-label {
+  font-size: 9px !important;
+  font-weight: 700 !important;
   color: #64748B !important;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
-  opacity: 0.84 !important;
-}
-
-.fz-mochi-card-toggle:hover {
-  transform: translateY(-1px) scale(1.04) !important;
-  opacity: 1 !important;
-}
-
-.fz-mochi-card-toggle:active {
-  transform: scale(0.94) !important;
-}
-
-.fz-mochi-card-toggle .fz-mct-icon {
-  width: 13px !important;
-  height: 13px !important;
-  flex-shrink: 0 !important;
-  display: inline-block !important;
-}
-
-.fz-mochi-card-toggle .fz-mct-dot {
-  width: 5px !important;
-  height: 5px !important;
-  border-radius: 50% !important;
-  flex-shrink: 0 !important;
-  transition: background 0.18s ease, box-shadow 0.18s ease !important;
-}
-
-.fz-mochi-card-toggle.is-on .fz-mct-dot {
-  background: #10B981 !important;
-  box-shadow: 0 0 4px rgba(16, 185, 129, 0.75) !important;
-}
-
-.fz-mochi-card-toggle.is-off .fz-mct-dot {
-  background: #94A3B8 !important;
-  box-shadow: none !important;
-}
-
-.fz-mochi-card-toggle .fz-mct-state {
-  font-size: 9.5px !important;
-  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
   line-height: 1 !important;
-  letter-spacing: 0.03em !important;
+  user-select: none !important;
+}
+
+/* Kotak Hitam Saklar (#18181B) - Micro, Tiny & Sleek */
+.fz-mochi-card-toggle .fz-mct-switch {
+  position: relative !important;
+  width: 28px !important;
+  height: 15px !important;
+  border-radius: 999px !important;
+  background: #18181B !important; /* Kotak hitam selalu #18181B */
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  padding: 1.5px !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Teks ON / OFF di dalam kotak hitam */
+.fz-mochi-card-toggle .fz-mct-state {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 6px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1 !important;
+  user-select: none !important;
+  transition: opacity 0.18s ease !important;
+}
+
+/* Knob putih bulat */
+.fz-mochi-card-toggle .fz-mct-knob {
+  position: absolute !important;
+  top: 2px !important;
+  left: 2px !important;
+  width: 11px !important;
+  height: 11px !important;
+  border-radius: 50% !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* State: ON */
+.fz-mochi-card-toggle.is-on .fz-mct-state {
+  left: 4px !important;
+  right: auto !important;
+  color: #10B981 !important; /* Emerald green ON */
+}
+.fz-mochi-card-toggle.is-on .fz-mct-knob {
+  transform: translateX(13px) !important; /* Geser ke kanan saat ON */
+}
+
+/* State: OFF */
+.fz-mochi-card-toggle.is-off .fz-mct-state {
+  right: 4px !important;
+  left: auto !important;
+  color: #94A3B8 !important; /* Muted gray OFF */
+}
+.fz-mochi-card-toggle.is-off .fz-mct-knob {
+  transform: translateX(0) !important; /* Knob di kiri saat OFF */
 }
 
 .fz-mochi-card-toggle.is-nudge {
@@ -1136,17 +1188,13 @@ html body #app .quiz-shell {
 
 @keyframes fzMochiToggleNudge {
   0%, 100% { transform: scale(1); }
-  40% { transform: scale(1.16); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.25); }
+  40% { transform: scale(1.12); box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.18); }
 }
 
 @media (min-width: 768px) {
   .fz-mochi-card-toggle {
     top: 14px !important;
     right: 16px !important;
-    height: 26px !important;
-    min-height: 26px !important;
-    max-height: 26px !important;
-    padding: 0 9px 0 6px !important;
   }
 }
 
@@ -1171,7 +1219,7 @@ mark.fz-mochi-clue-highlight {
 /* ── 9. Top Connection Status Banner (#fzMochiConnBanner) ── */
 .fz-mochi-conn-banner {
   position: fixed !important;
-  top: 10px !important;
+  top: calc(56px + env(safe-area-inset-top, 0px) + 8px) !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   z-index: 9995 !important;

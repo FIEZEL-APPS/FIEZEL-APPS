@@ -79,17 +79,53 @@ import { SileroNeuralVadGate } from './lib/sileroVadGate';
 const SILENT_WAV =
   'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
 
-const KAWAN_BICARA_GEM_COST = 25;
+const KAWAN_BICARA_OPENING_GEM_COST = 3;
+const KAWAN_BICARA_TURN_GEM_COST = 2;
+const KAWAN_BICARA_MAX_SESSION_GEMS = 25;
+const KAWAN_BICARA_MIN_START_GEMS = KAWAN_BICARA_OPENING_GEM_COST;
+const KAWAN_BICARA_GEM_COST = KAWAN_BICARA_MAX_SESSION_GEMS;
+const DAILY_FREE_CALL_MAX_TURNS = 5;
 const MAX_CALL_DURATION_SEC = 300; // 5-minute maximum session duration
 const DAILY_FREE_CALL_LIMIT = 1;
 
+function resolveHostFiezelState(win: any): any {
+  if (!win) return null;
+  try {
+    if (typeof win.__getFiezelState === 'function') {
+      const s = win.__getFiezelState();
+      if (s && typeof s === 'object') return s;
+    }
+  } catch {}
+  try {
+    if (win.state && typeof win.state === 'object') return win.state;
+  } catch {}
+  return null;
+}
+
+function syncGemBadgeInDom(doc: Document | null | undefined, balance: number): void {
+  if (!doc) return;
+  try {
+    const formatted = Math.max(0, Math.floor(balance)).toLocaleString('id-ID');
+    const topEl = doc.getElementById('quizTopbarGemCount');
+    if (topEl) topEl.textContent = formatted;
+    const nodes = doc.querySelectorAll('.gem-count, [data-gem-count]');
+    nodes.forEach((n) => {
+      n.textContent = formatted;
+    });
+  } catch {}
+}
+
 function getHostGemBalance(): number {
   try {
-    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
-      const pState = (window.parent as any).state;
-      if (pState && pState.gems != null) {
-        if (typeof pState.gems.balance === 'number') return pState.gems.balance;
-        if (typeof pState.gems === 'number') return pState.gems;
+    if (typeof window !== 'undefined') {
+      const candidates =
+        window.parent && window.parent !== window ? [window.parent, window] : [window];
+      for (const w of candidates) {
+        const st = resolveHostFiezelState(w);
+        if (st && st.gems != null) {
+          if (typeof st.gems.balance === 'number') return st.gems.balance;
+          if (typeof st.gems === 'number') return st.gems;
+        }
       }
     }
   } catch {}
@@ -112,23 +148,57 @@ function getHostGemBalance(): number {
   return 120;
 }
 
-function deductHostGems(amount: number): boolean {
-  let deducted = false;
+function deductHostGems(amount: number, reason = 'kawan_bicara_ai_voice_turn'): number {
+  if (!amount || amount <= 0) return 0;
+  let actualDeducted = 0;
+  let updatedBalance: number | null = null;
+
   try {
-    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
-      const pWin = window.parent as any;
-      if (pWin.state && pWin.state.gems != null) {
-        if (typeof pWin.state.gems.balance === 'number') {
-          pWin.state.gems.balance = Math.max(0, pWin.state.gems.balance - amount);
-          deducted = true;
-        } else if (typeof pWin.state.gems === 'number') {
-          pWin.state.gems = Math.max(0, pWin.state.gems - amount);
-          deducted = true;
+    if (typeof window !== 'undefined') {
+      const candidates =
+        window.parent && window.parent !== window ? [window.parent, window] : [window];
+      for (const w of candidates) {
+        const pWin = w as any;
+        const st = resolveHostFiezelState(pWin);
+        if (st && st.gems != null) {
+          if (typeof st.gems.balance === 'number') {
+            const avail = Math.max(0, st.gems.balance);
+            const spend = actualDeducted > 0 ? actualDeducted : Math.min(amount, avail);
+            if (spend > 0) {
+              st.gems.balance = Math.max(0, avail - spend);
+              if (typeof st.gems.spentTotal === 'number') st.gems.spentTotal += spend;
+              if (Array.isArray(st.gems.ledger)) {
+                st.gems.ledger.push({
+                  at: Date.now(),
+                  delta: -spend,
+                  reason,
+                });
+                if (st.gems.ledger.length > 60) st.gems.ledger.shift();
+              }
+              actualDeducted = spend;
+              updatedBalance = st.gems.balance;
+            }
+          } else if (typeof st.gems === 'number') {
+            const avail = Math.max(0, st.gems);
+            const spend = actualDeducted > 0 ? actualDeducted : Math.min(amount, avail);
+            if (spend > 0) {
+              st.gems = Math.max(0, avail - spend);
+              actualDeducted = spend;
+              updatedBalance = st.gems;
+            }
+          }
+          if (actualDeducted > 0) {
+            try {
+              if (typeof pWin.save === 'function') pWin.save();
+            } catch {}
+            syncGemBadgeInDom(pWin.document, updatedBalance ?? st.gems?.balance ?? 0);
+            break;
+          }
         }
-        if (typeof pWin.save === 'function') pWin.save();
       }
     }
   } catch {}
+
   try {
     if (typeof localStorage !== 'undefined') {
       const keys = ['fz_state_v1', 'fz_state_v1@ja', 'fz_state_v1@en', 'fiezel-v5', 'fiezel-v4-state'];
@@ -139,20 +209,43 @@ function deductHostGems(amount: number): boolean {
           const parsed = JSON.parse(raw);
           if (parsed && parsed.gems != null) {
             if (typeof parsed.gems.balance === 'number') {
-              parsed.gems.balance = Math.max(0, parsed.gems.balance - amount);
-              localStorage.setItem(k, JSON.stringify(parsed));
-              deducted = true;
+              const avail = Math.max(0, parsed.gems.balance);
+              const spend = actualDeducted > 0 ? actualDeducted : Math.min(amount, avail);
+              if (spend > 0 || updatedBalance !== null) {
+                parsed.gems.balance =
+                  updatedBalance !== null ? updatedBalance : Math.max(0, avail - spend);
+                if (typeof parsed.gems.spentTotal === 'number' && actualDeducted === 0) {
+                  parsed.gems.spentTotal += spend;
+                }
+                localStorage.setItem(k, JSON.stringify(parsed));
+                if (actualDeducted === 0) {
+                  actualDeducted = spend;
+                  updatedBalance = parsed.gems.balance;
+                }
+              }
             } else if (typeof parsed.gems === 'number') {
-              parsed.gems = Math.max(0, parsed.gems - amount);
-              localStorage.setItem(k, JSON.stringify(parsed));
-              deducted = true;
+              const avail = Math.max(0, parsed.gems);
+              const spend = actualDeducted > 0 ? actualDeducted : Math.min(amount, avail);
+              if (spend > 0 || updatedBalance !== null) {
+                parsed.gems =
+                  updatedBalance !== null ? updatedBalance : Math.max(0, avail - spend);
+                localStorage.setItem(k, JSON.stringify(parsed));
+                if (actualDeducted === 0) {
+                  actualDeducted = spend;
+                  updatedBalance = parsed.gems;
+                }
+              }
             }
           }
         } catch {}
       }
     }
   } catch {}
-  return deducted;
+
+  if (updatedBalance !== null && typeof document !== 'undefined') {
+    syncGemBadgeInDom(document, updatedBalance);
+  }
+  return actualDeducted;
 }
 
 function getDailyFreeCallAvailable(): boolean {
@@ -331,6 +424,29 @@ export default function App() {
   const userHungUpRef = useRef<boolean>(false);
   const currentLiveSessionRef = useRef<{ token?: string; keyIndex?: number; totalKeys?: number } | null>(null);
   const liveReconnectAttemptsRef = useRef<number>(0);
+  const liveOpeningAudioWatchdogRef = useRef<number | null>(null);
+  const callBillingRef = useRef<{
+    active: boolean;
+    isDailyFree: boolean;
+    dailyFreeMarked: boolean;
+    aiVoiceTurnsDelivered: number;
+    gemsSpentThisCall: number;
+    turnMetered: boolean;
+    outOfGemsAfterTurn: boolean;
+  }>({
+    active: false,
+    isDailyFree: false,
+    dailyFreeMarked: false,
+    aiVoiceTurnsDelivered: 0,
+    gemsSpentThisCall: 0,
+    turnMetered: false,
+    outOfGemsAfterTurn: false,
+  });
+  const [liveBillingUi, setLiveBillingUi] = useState<{
+    isDailyFree: boolean;
+    turns: number;
+    gemsSpent: number;
+  }>({ isDailyFree: false, turns: 0, gemsSpent: 0 });
   const turnsRef = useRef(turns);
   turnsRef.current = turns;
   const brainStateRef = useRef(brainState);
@@ -350,6 +466,63 @@ export default function App() {
     cost: number;
   } | null>(null);
 
+  /**
+   * API-Quota-Proportional Post-Delivery Gem Metering:
+   * Charges 0 Gems on connect or failed audio. Deducts Gems (or marks Daily Free used)
+   * ONLY at the exact moment real AI neural audio starts playing on the learner's device.
+   */
+  const meterCallAiVoiceTurn = () => {
+    const b = callBillingRef.current;
+    if (!b.active || b.turnMetered) return;
+    b.turnMetered = true;
+    b.aiVoiceTurnsDelivered += 1;
+
+    if (b.isDailyFree && b.aiVoiceTurnsDelivered <= DAILY_FREE_CALL_MAX_TURNS) {
+      if (!b.dailyFreeMarked) {
+        markDailyFreeCallUsed();
+        b.dailyFreeMarked = true;
+      }
+      setLiveBillingUi({
+        isDailyFree: true,
+        turns: b.aiVoiceTurnsDelivered,
+        gemsSpent: b.gemsSpentThisCall,
+      });
+      return;
+    }
+
+    const remainingCap = Math.max(0, KAWAN_BICARA_MAX_SESSION_GEMS - b.gemsSpentThisCall);
+    const rawCost =
+      b.gemsSpentThisCall === 0 && !b.isDailyFree
+        ? KAWAN_BICARA_OPENING_GEM_COST
+        : KAWAN_BICARA_TURN_GEM_COST;
+    const desired = Math.min(rawCost, remainingCap);
+    if (desired > 0) {
+      const avail = getHostGemBalance();
+      const toSpend = Math.min(desired, Math.max(0, avail));
+      if (toSpend > 0) {
+        const spent = deductHostGems(
+          toSpend,
+          b.aiVoiceTurnsDelivered === 1
+            ? 'kawan_bicara_opening_voice'
+            : 'kawan_bicara_followup_voice'
+        );
+        b.gemsSpentThisCall += spent;
+      }
+      if (
+        getHostGemBalance() < KAWAN_BICARA_TURN_GEM_COST &&
+        b.gemsSpentThisCall < KAWAN_BICARA_MAX_SESSION_GEMS
+      ) {
+        b.outOfGemsAfterTurn = true;
+      }
+    }
+
+    setLiveBillingUi({
+      isDailyFree: b.isDailyFree,
+      turns: b.aiVoiceTurnsDelivered,
+      gemsSpent: b.gemsSpentThisCall,
+    });
+  };
+
   const requestStartLiveCall = () => {
     if (isLiveConnected || isLiveConnecting) return;
     const balance = getHostGemBalance();
@@ -364,12 +537,12 @@ export default function App() {
       });
       return;
     }
-    if (balance >= KAWAN_BICARA_GEM_COST) {
+    if (balance >= KAWAN_BICARA_MIN_START_GEMS) {
       setCallConfirmModal({
         isOpen: true,
         isDailyFree: false,
         balance,
-        cost: KAWAN_BICARA_GEM_COST,
+        cost: KAWAN_BICARA_OPENING_GEM_COST,
         remainingFree: 0,
       });
       return;
@@ -377,17 +550,24 @@ export default function App() {
     setInsufficientGemModal({
       isOpen: true,
       balance,
-      cost: KAWAN_BICARA_GEM_COST,
+      cost: KAWAN_BICARA_MIN_START_GEMS,
     });
   };
 
   const handleConfirmStartCall = () => {
     if (!callConfirmModal) return;
-    if (callConfirmModal.isDailyFree) {
-      markDailyFreeCallUsed();
-    } else {
-      deductHostGems(callConfirmModal.cost);
-    }
+    // 0 Gem dipotong saat klik tombol mulai! Kuota gratis / Gem baru terhitung saat audio AI benar-benar diputar.
+    const isFree = callConfirmModal.isDailyFree;
+    callBillingRef.current = {
+      active: true,
+      isDailyFree: isFree,
+      dailyFreeMarked: false,
+      aiVoiceTurnsDelivered: 0,
+      gemsSpentThisCall: 0,
+      turnMetered: false,
+      outOfGemsAfterTurn: false,
+    };
+    setLiveBillingUi({ isDailyFree: isFree, turns: 0, gemsSpent: 0 });
     setCallConfirmModal(null);
     void startLiveCall();
   };
@@ -997,7 +1177,7 @@ export default function App() {
    * screen and the learner can replay it with "Putar Suara" — never a robot voice.
    */
   const fetchNeuralVoice = async (text: string) => {
-    for (let attempt = 0; attempt < 3; attempt++) {
+    for (let attempt = 0; attempt < 2; attempt++) {
       const res = await synthesizeFlexibleTts({
         text,
         targetLang: activeScenario.targetLang,
@@ -1005,7 +1185,7 @@ export default function App() {
         force: attempt > 0,
       });
       if (res?.audioBase64) return res;
-      if (attempt < 2) await new Promise((r) => window.setTimeout(r, 350 * (attempt + 1)));
+      if (attempt < 1) await new Promise((r) => window.setTimeout(r, 250));
     }
     return null;
   };
@@ -1163,7 +1343,8 @@ export default function App() {
   const speakAiText = async (
     text: string,
     preloadedBase64?: string | null,
-    overrideRate?: number
+    overrideRate?: number,
+    opts?: { isManualReplay?: boolean }
   ) => {
     const cleanSpoken = stripEmojisAndEmotWords(text).trim();
     if (!cleanSpoken) return;
@@ -1209,6 +1390,10 @@ export default function App() {
         const ok = await playNeuralChunk(res.audioBase64, res.audioMimeType || 'audio/mpeg', targetRate);
         if (token !== speakTokenRef.current) return;
         if (ok) {
+          if (!anyPlayed && !opts?.isManualReplay && callBillingRef.current.active) {
+            callBillingRef.current.turnMetered = false;
+            meterCallAiVoiceTurn();
+          }
           anyPlayed = true;
           setStatusBanner(null);
         } else if (!anyPlayed) {
@@ -2048,6 +2233,23 @@ export default function App() {
 
   const startLiveCall = async (preAcquiredStream?: MediaStream) => {
     if (isLiveConnected || isLiveConnecting) return;
+    if (!callBillingRef.current.active) {
+      const autoFree = getDailyFreeCallAvailable();
+      callBillingRef.current = {
+        active: true,
+        isDailyFree: autoFree,
+        dailyFreeMarked: false,
+        aiVoiceTurnsDelivered: 0,
+        gemsSpentThisCall: 0,
+        turnMetered: false,
+        outOfGemsAfterTurn: false,
+      };
+      setLiveBillingUi({ isDailyFree: autoFree, turns: 0, gemsSpent: 0 });
+    }
+    if (liveOpeningAudioWatchdogRef.current) {
+      window.clearTimeout(liveOpeningAudioWatchdogRef.current);
+      liveOpeningAudioWatchdogRef.current = null;
+    }
     setCallViewMode('stage');
     try {
       if (mainScrollRef.current) {
@@ -2357,7 +2559,7 @@ export default function App() {
         // Fallback ke candidate URLs lokal jika ada
         const candidateUrls = resolveLiveCallWebSocketUrls();
         if (candidateUrls.length > 0) {
-          targetWsUrl = candidateUrls[0];
+          targetWsUrl = candidateUrls[liveReconnectAttemptsRef.current % candidateUrls.length];
           isGoogleLive = targetWsUrl.includes('generativelanguage.googleapis.com');
         } else {
           // Seluruh kunci sibuk atau offline -> masuk jalur cadangan Turn-by-Turn
@@ -2492,9 +2694,13 @@ export default function App() {
               }
             }, 1200);
 
-            // If brand new call, prompt AI to speak opening greeting immediately in Gemini Live voice
+            // Always prompt AI to speak an opening greeting on a fresh call (even when returning with prior conversation history!)
             const hasUserSpoken = turnsRef.current.some((t) => t.speaker === 'user');
-            if (!isReconnect && !hasUserSpoken && isGoogleLive) {
+            if (!isReconnect && isGoogleLive) {
+              callBillingRef.current.turnMetered = false;
+              const greetingDirective = hasUserSpoken
+                ? `[Instruction: The learner just called you back! Greet them warmly in 1-2 short, natural sentences with your signature witty personality as ${activePersona.name} in "${activeScenario.titleId}", briefly acknowledging your ongoing conversation above and asking a fun follow-up question so they can reply immediately.]`
+                : `[Instruction: Please begin our conversation now with your signature sassy, witty greeting as ${activePersona.name} in scenario "${activeScenario.titleId}". Say your opening line: "${activePersona.openingGreeting || activeScenario.openingLine}"]`;
               try {
                 ws.send(
                   JSON.stringify({
@@ -2504,7 +2710,7 @@ export default function App() {
                           role: 'user',
                           parts: [
                             {
-                              text: `[Instruction: Please begin our conversation now with your signature sassy, witty greeting as ${activePersona.name} in scenario "${activeScenario.titleId}". Say your opening line: "${activePersona.openingGreeting || activeScenario.openingLine}"]`,
+                              text: greetingDirective,
                             },
                           ],
                         },
@@ -2513,16 +2719,41 @@ export default function App() {
                     },
                   })
                 );
+                if (liveOpeningAudioWatchdogRef.current) {
+                  window.clearTimeout(liveOpeningAudioWatchdogRef.current);
+                }
+                liveOpeningAudioWatchdogRef.current = window.setTimeout(() => {
+                  liveOpeningAudioWatchdogRef.current = null;
+                  if (userHungUpRef.current || wsRef.current !== ws) return;
+                  void reportGeminiLiveSessionDrop(
+                    'opening_audio_watchdog_timeout',
+                    4008,
+                    currentLiveSessionRef.current?.keyIndex
+                  );
+                  try {
+                    ws.onclose = null;
+                    ws.onerror = null;
+                    ws.close(4008, 'opening_audio_watchdog');
+                  } catch {
+                    // Ignore
+                  }
+                  if (liveReconnectAttemptsRef.current < 2) {
+                    liveReconnectAttemptsRef.current += 1;
+                    void connectDuplex(false);
+                  } else {
+                    activateTurnByTurnLiveFallback();
+                  }
+                }, 7500);
               } catch {
                 // Ignore
               }
             }
           }
 
-          // Audio Extraction from Gemini Live or custom proxy
-          let incomingAudioBase64: string | null = null;
+          // Audio Extraction from Gemini Live or custom proxy (preserve EVERY PCM16 chunk in multi-part frames!)
+          const incomingAudioChunks: string[] = [];
           if (msg.type === 'audio' && msg.audio) {
-            incomingAudioBase64 = msg.audio;
+            incomingAudioChunks.push(msg.audio);
           } else if (msg.serverContent?.modelTurn?.parts) {
             // Commit user speech draft immediately as soon as AI begins its turn
             if (liveUserDraftRef.current.trim()) {
@@ -2530,7 +2761,7 @@ export default function App() {
             }
             for (const part of msg.serverContent.modelTurn.parts) {
               if (part?.inlineData?.data) {
-                incomingAudioBase64 = part.inlineData.data;
+                incomingAudioChunks.push(part.inlineData.data);
               }
               if (part?.text) {
                 liveAiDraftRef.current += part.text;
@@ -2539,40 +2770,49 @@ export default function App() {
             }
           }
 
-          if (incomingAudioBase64 && outputAudioCtxRef.current) {
+          if (incomingAudioChunks.length > 0 && outputAudioCtxRef.current) {
+            if (liveOpeningAudioWatchdogRef.current) {
+              window.clearTimeout(liveOpeningAudioWatchdogRef.current);
+              liveOpeningAudioWatchdogRef.current = null;
+            }
             const ctx = outputAudioCtxRef.current;
             if (ctx.state === 'suspended') {
               void ctx.resume().catch(() => {});
             }
-            const buffer = pcm16Base64ToAudioBuffer(ctx, incomingAudioBase64, 24000);
-            const source = ctx.createBufferSource();
-            source.buffer = buffer;
+            meterCallAiVoiceTurn();
 
-            // Jitter buffer lead: bila antrean kosong atau tertinggal, beri lead safety 80ms
-            // agar audio mengalir mulus tanpa gap atau distorsi.
-            const now = ctx.currentTime;
-            if (nextStartTimeRef.current < now + 0.02) {
-              nextStartTimeRef.current = now + 0.08;
-            }
-            const startAt = nextStartTimeRef.current;
-            const duration = buffer.duration;
-            nextStartTimeRef.current = startAt + duration;
+            for (const chunkB64 of incomingAudioChunks) {
+              const buffer = pcm16Base64ToAudioBuffer(ctx, chunkB64, 24000);
+              const source = ctx.createBufferSource();
+              source.buffer = buffer;
 
-            source.connect(getOrAttachAnalyser(ctx, liveAnalyserRef));
-            source.start(startAt);
-
-            activeSourcesRef.current.push(source);
-            setAiAudioPlaying(true);
-            source.onended = () => {
-              activeSourcesRef.current = activeSourcesRef.current.filter((s) => s !== source);
-              if (activeSourcesRef.current.length === 0) {
-                setAiAudioPlaying(false, 300);
+              // Jitter buffer lead: bila antrean kosong atau tertinggal, beri lead safety 80ms
+              // agar audio mengalir mulus tanpa gap atau distorsi.
+              const now = ctx.currentTime;
+              if (nextStartTimeRef.current < now + 0.02) {
+                nextStartTimeRef.current = now + 0.08;
               }
-            };
+              const startAt = nextStartTimeRef.current;
+              const duration = buffer.duration;
+              nextStartTimeRef.current = startAt + duration;
+
+              source.connect(getOrAttachAnalyser(ctx, liveAnalyserRef));
+              source.start(startAt);
+
+              activeSourcesRef.current.push(source);
+              setAiAudioPlaying(true);
+              source.onended = () => {
+                activeSourcesRef.current = activeSourcesRef.current.filter((s) => s !== source);
+                if (activeSourcesRef.current.length === 0) {
+                  setAiAudioPlaying(false, 300);
+                }
+              };
+            }
           }
 
           // Barge-in interruption from server
           if (msg.serverContent?.interrupted || msg.type === 'interrupted') {
+            callBillingRef.current.turnMetered = false;
             if (outputAudioCtxRef.current) {
               nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
             }
@@ -2662,6 +2902,18 @@ export default function App() {
           // Turn Complete — evaluate learner utterance and record Braincore mastery
           const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
           if (isGoogleTurnComplete || msg.type === 'turn_complete') {
+            callBillingRef.current.turnMetered = false;
+            if (callBillingRef.current.outOfGemsAfterTurn && callBillingRef.current.active) {
+              callBillingRef.current.outOfGemsAfterTurn = false;
+              const waitAudioMs = outputAudioCtxRef.current
+                ? Math.max(350, Math.ceil((nextStartTimeRef.current - outputAudioCtxRef.current.currentTime) * 1000) + 250)
+                : 400;
+              window.setTimeout(() => {
+                if (isLiveConnectedRef.current && !userHungUpRef.current) {
+                  stopLiveCall();
+                }
+              }, waitAudioMs);
+            }
             if (copilotEarlyTimerRef.current) {
               window.clearTimeout(copilotEarlyTimerRef.current);
               copilotEarlyTimerRef.current = null;
@@ -2877,6 +3129,44 @@ export default function App() {
   const stopLiveCall = () => {
     userHungUpRef.current = true;
     isLiveConnectedRef.current = false;
+    if (liveOpeningAudioWatchdogRef.current) {
+      window.clearTimeout(liveOpeningAudioWatchdogRef.current);
+      liveOpeningAudioWatchdogRef.current = null;
+    }
+    const billingSnap = callBillingRef.current;
+    if (billingSnap.active) {
+      const turnsCount = billingSnap.aiVoiceTurnsDelivered;
+      const spentGems = billingSnap.gemsSpentThisCall;
+      const wasFree = billingSnap.isDailyFree;
+      callBillingRef.current = {
+        active: false,
+        isDailyFree: false,
+        dailyFreeMarked: false,
+        aiVoiceTurnsDelivered: 0,
+        gemsSpentThisCall: 0,
+        turnMetered: false,
+        outOfGemsAfterTurn: false,
+      };
+      if (turnsCount === 0) {
+        setStatusBanner(
+          locale === 'th'
+            ? 'ยังไม่มีเสียง AI เล่นออกมา — ไม่ถูกหัก Gem (0 💎 ปลอดภัย)!'
+            : 'Belum ada suara AI yang diputar — 0 Gem terpakai (Saldo & Kuota Aman)!'
+        );
+      } else if (wasFree && spentGems === 0) {
+        setStatusBanner(
+          locale === 'th'
+            ? `จบการสนทนา: ${turnsCount} การตอบกลับเสียง AI · สิทธิ์ฟรีรายวัน (0 💎)`
+            : `Panggilan selesai: ${turnsCount} respon suara AI · Kuota Gratis Harian (0 💎)`
+        );
+      } else {
+        setStatusBanner(
+          locale === 'th'
+            ? `จบการสนทนา: ${turnsCount} การตอบกลับเสียง AI · ใช้ไป ${spentGems} 💎 ตามโควตาจริง`
+            : `Panggilan selesai: ${turnsCount} respon suara AI · ${spentGems} 💎 terpakai sesuai kuota suara`
+        );
+      }
+    }
     sileroVadGateRef.current?.destroy();
     sileroVadGateRef.current = null;
     lastHandySpeechAtRef.current = 0;
@@ -3520,7 +3810,7 @@ export default function App() {
               void brainSyncFlush(nextState).then(({ nextState: synced }) => setBrainState(synced));
             }}
             onSpeakSample={(sampleText) => {
-              void speakAiText(sampleText);
+              void speakAiText(sampleText, null, undefined, { isManualReplay: true });
             }}
           />
         ) : activeTab === 'call' ? (
@@ -3768,6 +4058,31 @@ export default function App() {
                                 : 'Siap bicara'}
                         </span>
                       </div>
+                      {isLiveConnected && (
+                        <div
+                          data-testid="ai-call-gem-meter-pill"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FEFCE8] border border-[#FDE68A] text-[11px] font-bold text-[#78350F] shadow-2xs"
+                          title={
+                            locale === 'th'
+                              ? 'ระบบคิด Gem ตามจำนวนเสียง AI ที่ตอบกลับจริง (เชื่อมต่อ 0 Gem)'
+                              : 'Meteran kuota suara AI real-time (Menyambung = 0 Gem)'
+                          }
+                        >
+                          {liveBillingUi.isDailyFree && liveBillingUi.gemsSpent === 0 ? (
+                            <span>
+                              {locale === 'th'
+                                ? `🎁 ฟรี · ${liveBillingUi.turns}/${DAILY_FREE_CALL_MAX_TURNS} ตอบ`
+                                : `🎁 Gratis · ${liveBillingUi.turns}/${DAILY_FREE_CALL_MAX_TURNS} respon`}
+                            </span>
+                          ) : (
+                            <span>
+                              {locale === 'th'
+                                ? `💎 ${liveBillingUi.gemsSpent} Gem · ${liveBillingUi.turns} ตอบ`
+                                : `💎 ${liveBillingUi.gemsSpent} Gem · ${liveBillingUi.turns} respon`}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Kontrol Panggilan Pill Ringkas */}
@@ -3787,7 +4102,7 @@ export default function App() {
                         type="button"
                         onClick={() => {
                           const lastAi = [...turns].reverse().find((tr) => tr.speaker === 'ai');
-                          if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64);
+                          if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64, undefined, { isManualReplay: true });
                         }}
                         className="px-3 py-1.5 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
                       >
@@ -3939,7 +4254,7 @@ export default function App() {
                       turnCount={turns.length}
                       onRefreshAssist={handleRefreshLiveAssist}
                       onSpeakSample={(sampleText, rate) => {
-                        void speakAiText(sampleText, null, rate ?? 0.92);
+                        void speakAiText(sampleText, null, rate ?? 0.92, { isManualReplay: true });
                       }}
                       onSelectForInput={(selectedText) => {
                         playFiezelSfx('button_tap');
@@ -4039,7 +4354,7 @@ export default function App() {
                               </div>
                               <button
                                 type="button"
-                                onClick={() => void speakAiText(turn.text, turn.audioBase64, 1.0)}
+                                onClick={() => void speakAiText(turn.text, turn.audioBase64, 1.0, { isManualReplay: true })}
                                 className="w-6 h-6 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] flex items-center justify-center text-[#5C4E3C] shrink-0 cursor-pointer mt-0.5"
                                 title="Putar suara"
                               >
@@ -4674,7 +4989,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Modal Konfirmasi Panggilan Kawan Bicara (Gem Transparency) */}
+      {/* Modal Konfirmasi Panggilan Kawan Bicara (API-Quota Metered Gem Transparency) */}
       {callConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="w-full max-w-sm rounded-3xl bg-[#FFFDF8] border-2 border-[#FDE68A] p-6 shadow-2xl text-center space-y-4">
@@ -4683,41 +4998,75 @@ export default function App() {
             </div>
             <div>
               <h3 className="text-base font-extrabold text-[#1C1611]">
-                {locale === 'th' ? 'โทรคุยสดกับ Kawan Bicara' : 'Mulai Panggilan Kawan Bicara'}
+                {callConfirmModal.isDailyFree
+                  ? locale === 'th'
+                    ? 'โทรคุยสดกับ Kawan Bicara (ฟรี)'
+                    : 'Panggilan Kawan Bicara (Kuota Gratis)'
+                  : locale === 'th'
+                    ? 'โทรคุยสดกับ Kawan Bicara (คิดตามเสียงจริง)'
+                    : 'Kawan Bicara (Sesuai Kuota Suara AI)'}
               </h3>
-              <p className="mt-2 text-xs leading-relaxed text-[#5C4E3C]">
+              <p className="mt-1.5 text-xs leading-relaxed text-[#5C4E3C]">
                 {callConfirmModal.isDailyFree ? (
                   locale === 'th' ? (
                     <>
-                      🎉 <strong>สิทธิ์ฟรีรายวันพร้อมใช้งาน!</strong> (เหลือ 1 ครั้งในวันนี้)
-                      <br />
-                      โทรพูดคุยแบบสองทิศทาง 5 นาทีด้วยเสียง AI Gemini Live
+                      🎉 <strong>สิทธิ์โทรฟรีรายวันพร้อมใช้งาน!</strong> (สูงสุด {DAILY_FREE_CALL_MAX_TURNS} การตอบกลับเสียง AI ฟรี · สิทธิ์จะถูกนับเมื่อเสียง AI ดังขึ้นจริงเท่านั้น)
                     </>
                   ) : (
                     <>
-                      🎉 <strong>1 Sesi Harian Gratis Tersedia!</strong>
-                      <br />
-                      Nikmati latihan percakapan dua arah selama <strong>5 menit</strong> dengan suara AI Gemini Live tanpa potong Gem.
+                      🎉 <strong>1 Sesi Harian Gratis Tersedia!</strong> Gratis hingga <strong>{DAILY_FREE_CALL_MAX_TURNS} respon suara AI</strong> (kuota hanya terpakai saat suara AI benar-benar keluar).
                     </>
                   )
+                ) : locale === 'th' ? (
+                  <>
+                    ไม่หัก Gem ล่วงหน้า! คิดตามจำนวนเสียงตอบกลับ AI จริง (ยอดของคุณ: <strong>{callConfirmModal.balance} 💎</strong>)
+                  </>
                 ) : (
-                  locale === 'th' ? (
-                    <>
-                      โทรพูดคุยสด 5 นาทีด้วยเสียง AI Gemini Live
-                      <br />
-                      ค่าบริการ: <strong>25 Gem</strong> (ยอดของคุณ: {callConfirmModal.balance} 💎)
-                    </>
-                  ) : (
-                    <>
-                      Sesi latihan percakapan dua arah hands-free selama <strong>5 menit</strong> dengan suara AI Google Gemini Live.
-                      <br />
-                      Biaya: <strong>25 Gem</strong> (Saldo kamu: {callConfirmModal.balance} 💎)
-                    </>
-                  )
+                  <>
+                    Tanpa potong di awal! Gem dihitung proporsional sesuai respon suara AI yang berhasil diputar (Saldo: <strong>{callConfirmModal.balance} 💎</strong>).
+                  </>
                 )}
               </p>
+
+              <div className="mt-3 rounded-2xl bg-[#FEFCE8] border border-[#FDE68A] px-3.5 py-2.5 text-left text-[11.5px] leading-relaxed text-[#3F3222] space-y-1">
+                {callConfirmModal.isDailyFree ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span>{locale === 'th' ? 'เชื่อมต่อ / เสียงไม่ติด' : 'Menyambung / Gagal Suara'}</span>
+                      <strong className="text-emerald-700">0 💎</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>{locale === 'th' ? `เสียง AI ตอบกลับ 1–${DAILY_FREE_CALL_MAX_TURNS} ครั้งแรก` : `Respon Suara AI 1–${DAILY_FREE_CALL_MAX_TURNS}`}</span>
+                      <strong className="text-emerald-700">{locale === 'th' ? 'ฟรี (0 💎)' : 'Gratis (0 💎)'}</strong>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-[#6E5E47]">
+                      <span>{locale === 'th' ? 'ตอบกลับถัดไป (ถ้าคุยต่อ)' : 'Lanjut Ngobrol Berikutnya'}</span>
+                      <span>+{KAWAN_BICARA_TURN_GEM_COST} 💎 / {locale === 'th' ? 'ตอบ' : 'respon'}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span>{locale === 'th' ? 'เชื่อมต่อ / เสียงไม่ติด' : 'Menyambung (Anti-Hangus)'}</span>
+                      <strong className="text-emerald-700">0 💎</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>{locale === 'th' ? 'ทักทาย & เสียงตอบแรก' : 'Sapaan & Respon Suara Awal'}</span>
+                      <strong>{KAWAN_BICARA_OPENING_GEM_COST} 💎</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>{locale === 'th' ? 'เสียงตอบกลับถัดไป' : 'Balasan Suara Berikutnya'}</span>
+                      <strong>+{KAWAN_BICARA_TURN_GEM_COST} 💎 / {locale === 'th' ? 'ตอบ' : 'respon'}</strong>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-[#6E5E47] pt-0.5 border-t border-[#FDE68A]/70">
+                      <span>{locale === 'th' ? 'เพดานสูงสุดต่อสาย (5 นาที)' : 'Batas Maks. Sesi (5 menit)'}</span>
+                      <span>{locale === 'th' ? `สูงสุด ${KAWAN_BICARA_MAX_SESSION_GEMS} 💎` : `Maks. ${KAWAN_BICARA_MAX_SESSION_GEMS} 💎`}</span>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-2 pt-2">
+            <div className="flex items-center gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => setCallConfirmModal(null)}
@@ -4731,8 +5080,8 @@ export default function App() {
                 className="flex-1 py-3 px-4 rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold text-xs shadow-md shadow-amber-500/25 cursor-pointer transition-all active:scale-[0.98]"
               >
                 {callConfirmModal.isDailyFree
-                  ? (locale === 'th' ? 'เริ่มใช้งานฟรี' : 'Mulai Panggilan Gratis')
-                  : (locale === 'th' ? 'ใช้ 25 Gem & เริ่ม' : 'Gunakan 25 Gem & Mulai')}
+                  ? (locale === 'th' ? 'เริ่มโทรฟรี (0 💎)' : 'Mulai Gratis (0 💎)')
+                  : (locale === 'th' ? 'เชื่อมต่อ (เริ่ม 0 💎)' : 'Sambungkan (Mulai 0 💎)')}
               </button>
             </div>
           </div>
@@ -4753,13 +5102,13 @@ export default function App() {
               <div className="mt-2 text-xs leading-relaxed text-[#5C4E3C]">
                 {locale === 'th' ? (
                   <>
-                    คุณต้องการ <strong>25 Gem</strong> สำหรับเซสชัน Kawan Bicara 5 นาที (ยอดปัจจุบัน: {insufficientGemModal.balance} 💎)
+                    คุณต้องมีอย่างน้อย <strong>{KAWAN_BICARA_MIN_START_GEMS} Gem</strong> สำหรับเสียงตอบแรกของ Kawan Bicara (ยอดปัจจุบัน: {insufficientGemModal.balance} 💎)
                     <br /><br />
                     ทำแบบฝึกหัดในควิซเพื่อสะสม Gem หรือรอรีเซ็ตสิทธิ์ฟรีรายวันในวันพรุ่งนี้!
                   </>
                 ) : (
                   <>
-                    Kamu membutuhkan <strong>25 Gem</strong> untuk sesi Kawan Bicara 5 menit (Saldo saat ini: {insufficientGemModal.balance} 💎).
+                    Kamu membutuhkan minimal <strong>{KAWAN_BICARA_MIN_START_GEMS} Gem</strong> untuk respon suara pertama Kawan Bicara (Saldo saat ini: {insufficientGemModal.balance} 💎).
                     <br /><br />
                     Selesaikan latihan soal di kuis untuk mengumpulkan Gem gratis atau tunggu kuota gratis harian besok!
                   </>

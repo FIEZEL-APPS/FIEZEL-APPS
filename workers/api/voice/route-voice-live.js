@@ -37,7 +37,7 @@ let _copilotPoolIndex = Math.floor(Math.random() * 16);
 
 // Rate limit in-memory per IP untuk mencegah pengurasan kuota Gemini Live & Copilot
 const _ipLiveCallMap = new Map();
-function checkLiveRateLimit(ip, limit = 12, windowMs = 60000) {
+function checkLiveRateLimit(ip, limit = 30, windowMs = 60000) {
   if (!ip) return true;
   const now = Date.now();
   const entry = _ipLiveCallMap.get(ip) || { count: 0, resetAt: now + windowMs };
@@ -52,10 +52,30 @@ function checkLiveRateLimit(ip, limit = 12, windowMs = 60000) {
   return entry.count <= limit;
 }
 
-function parseKeys(env) {
+export function parseKeys(env) {
   const raw = String(env?.GEMINI_LIVE_KEYS || env?.GEMINI_API_KEY || '').trim();
   if (!raw) return [];
   return raw.split(',').map((s) => s.trim()).filter((s) => s.length > 10);
+}
+
+/**
+ * Menyelesaikan kolam kunci API Gemini:
+ * 1. Cek kolam dinamis dari Cloudflare KV (CFG) key `cfg:gemini_live_keys` (disinkronkan dari Sentinel)
+ * 2. Fallback mulus ke secret env statis `GEMINI_LIVE_KEYS`
+ */
+export async function resolvePoolKeys(ctx) {
+  if (ctx?.env?.CFG && typeof ctx.env.CFG.get === 'function') {
+    try {
+      const kvRaw = await ctx.env.CFG.get('cfg:gemini_live_keys', { cacheTtl: 30 });
+      if (kvRaw && typeof kvRaw === 'string' && kvRaw.trim().length > 10) {
+        const parsed = kvRaw.split(',').map((s) => s.trim()).filter((s) => s.length > 10);
+        if (parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (_) {}
+  }
+  return parseKeys(ctx?.env);
 }
 
 /**
@@ -109,7 +129,7 @@ async function mintEphemeralToken(apiKey) {
  */
 export async function routeVoiceLiveSession(ctx) {
   const clientIp = (ctx.request && (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) || '';
-  if (!checkLiveRateLimit(clientIp, 12, 60000)) {
+  if (!checkLiveRateLimit(clientIp, 30, 60000)) {
     return jsonResponse(
       {
         ok: false,
@@ -121,7 +141,7 @@ export async function routeVoiceLiveSession(ctx) {
     );
   }
 
-  const keys = parseKeys(ctx.env);
+  const keys = await resolvePoolKeys(ctx);
   if (!keys.length) {
     return jsonResponse(
       {
@@ -207,7 +227,7 @@ export async function routeVoiceReportDrop(ctx) {
     reason.includes('quota') ||
     reason.includes('limit') ||
     reason.includes('exhausted');
-  const keys = parseKeys(ctx.env);
+  const keys = await resolvePoolKeys(ctx);
 
   if (keys.length > 0) {
     if (typeof body?.keyIndex === 'number' && body.keyIndex >= 1 && body.keyIndex <= keys.length) {
@@ -431,7 +451,7 @@ export async function routeVoiceCopilotAssist(ctx) {
     );
   }
 
-  const keys = parseKeys(ctx.env);
+  const keys = await resolvePoolKeys(ctx);
   if (!keys.length) {
     return jsonResponse({ ok: false, fallback: true, error: 'no_keys_configured' }, { status: 503 });
   }
@@ -514,7 +534,7 @@ export async function routeVoicePartnerTurn(ctx) {
     );
   }
 
-  const keys = parseKeys(ctx.env);
+  const keys = await resolvePoolKeys(ctx);
   if (!keys.length) {
     return jsonResponse({ ok: false, fallback: true, error: 'no_keys_configured' }, { status: 503 });
   }
@@ -598,10 +618,96 @@ export async function routeVoiceBraincoreSync(ctx) {
   return jsonResponse({ ok: true, acceptedIds, count: acceptedIds.length });
 }
 
+/**
+ * Handler POST /api/voice/sync-keys
+ * Menerima daftar kunci sehat yang otomatis dipush dari Gemini Key Sentinel.
+ * Disimpan langsung ke Cloudflare KV `CFG` (key `cfg:gemini_live_keys`)
+ * sehingga aktif di semua edge secara global dalam <= 30 detik tanpa perlu redeploy worker!
+ */
+export async function routeVoiceSyncKeys(ctx) {
+  const reqHeaders = ctx?.request?.headers;
+  const authHeader = (
+    reqHeaders?.get('x-sentinel-sync-key') ||
+    reqHeaders?.get('x-fiezel-owner-token') ||
+    reqHeaders?.get('authorization') ||
+    ''
+  ).trim();
+
+  const envOwnerHash = String(ctx?.env?.OWNER_TOKEN_HASH || '').trim().toLowerCase();
+  const envSyncKey = String(ctx?.env?.SENTINEL_SYNC_KEY || ctx?.env?.OWNER_TOKEN || '').trim();
+
+  let isAuthorized = false;
+
+  // 1. Verifikasi via sync key langsung jika disetel
+  if (envSyncKey && (authHeader === envSyncKey || authHeader === `Bearer ${envSyncKey}`)) {
+    isAuthorized = true;
+  }
+
+  // 2. Verifikasi via OWNER_TOKEN_HASH (sha256 konstan)
+  if (!isAuthorized && envOwnerHash) {
+    const rawToken = authHeader.replace(/^Bearer\s+/i, '').trim();
+    if (rawToken) {
+      const tokenBuffer = new TextEncoder().encode(rawToken);
+      const digestBuffer = await crypto.subtle.digest('SHA-256', tokenBuffer);
+      const digestHex = Array.from(new Uint8Array(digestBuffer))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+        .toLowerCase();
+      if (digestHex === envOwnerHash) {
+        isAuthorized = true;
+      }
+    }
+  }
+
+  // 3. Fallback dev lokal / bila env belum terpasang
+  if (!envOwnerHash && !envSyncKey) {
+    isAuthorized = true;
+  }
+
+  if (!isAuthorized) {
+    return jsonResponse(
+      { ok: false, error: 'forbidden_sync', message: 'Token otorisasi sync tidak valid.' },
+      { status: 403 }
+    );
+  }
+
+  const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
+  const body = readRes?.value || {};
+  const rawKeys = Array.isArray(body?.keys)
+    ? body.keys
+    : typeof body?.keys === 'string'
+    ? body.keys.split(',')
+    : [];
+
+  const validKeys = rawKeys
+    .map((k) => String(k || '').trim())
+    .filter((k) => k.length > 10 && (k.startsWith('AIza') || k.startsWith('AQ.')));
+
+  if (!validKeys.length) {
+    return jsonResponse(
+      { ok: false, error: 'no_valid_keys', message: 'Daftar kunci kosong atau tidak ada yang valid.' },
+      { status: 400 }
+    );
+  }
+
+  if (ctx?.env?.CFG && typeof ctx.env.CFG.put === 'function') {
+    await ctx.env.CFG.put('cfg:gemini_live_keys', validKeys.join(','));
+  }
+
+  return jsonResponse({
+    ok: true,
+    synchronized: true,
+    activeCount: validKeys.length,
+    timestamp: Date.now(),
+    message: `Berhasil menyinkronkan ${validKeys.length} API key aktif ke Cloudflare KV.`
+  });
+}
+
 export const ROUTES = [
   ['POST', '/api/voice/live-session', routeVoiceLiveSession],
   ['POST', '/api/voice/report-drop', routeVoiceReportDrop],
   ['POST', '/api/voice/copilot-assist', routeVoiceCopilotAssist],
   ['POST', '/api/voice/partner-turn', routeVoicePartnerTurn],
+  ['POST', '/api/voice/sync-keys', routeVoiceSyncKeys],
   ['POST', '/api/braincore/sync', routeVoiceBraincoreSync],
 ];
