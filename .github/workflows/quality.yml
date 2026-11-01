@@ -344,6 +344,7 @@ jobs:
           # memerahkan tepat keadaan itu. Ia hijau; yang hilang hanya barisnya.
           node tests/auth-account-test.js
           node tests/audio-locale-guard-test.js
+          node tests/fiezel-vault-test.js
           node tests/id-golden-snapshot-test.js
           node tests/locale-enum-test.js
           node tests/th-coverage-test.js
