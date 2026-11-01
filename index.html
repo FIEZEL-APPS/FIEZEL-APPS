@@ -879,8 +879,8 @@ html.fz-booting body{overflow:hidden}
       try {
         if (window.self !== window.top && (window.name === 'fzMitraKaiwaStudioFrame' || (window.frameElement && window.frameElement.id === 'fzMitraKaiwaStudioFrame') || /[?&]embed=1\b/.test(location.search))) {
           if (el) el.style.display = 'none';
-          if (doc.documentElement) doc.documentElement.style.background = '#FFF9EE';
-          if (doc.body) doc.body.style.background = '#FFF9EE';
+          if (doc.documentElement) doc.documentElement.style.background = '#FBF7F3';
+          if (doc.body) doc.body.style.background = '#FBF7F3';
           if (typeof window.fetch === 'function') {
             window.fetch('./call.html', { cache: 'reload' }).then(function (r) {
               return r && r.ok ? r.text() : '';

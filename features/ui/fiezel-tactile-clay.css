@@ -9162,7 +9162,7 @@ html body .fz-auth .fz-auth-hero.is-daftar {
 html body .fz-auth .fz-auth-lang {
   position: absolute !important;
   z-index: 3 !important;
-  top: max(12px, calc(env(safe-area-inset-top, 0px) + 8px)) !important;
+  top: max(20px, calc(env(safe-area-inset-top, 0px) + 12px)) !important;
   right: 16px !important;
   display: inline-flex !important;
   align-items: center !important;

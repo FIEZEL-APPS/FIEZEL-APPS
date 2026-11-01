@@ -1100,21 +1100,21 @@ html.fz-booting header.topbar {
 .fz-auth-hero.is-welcome {
   min-height: 46vh !important;
   max-height: 50vh !important;
-  padding: max(42px, calc(env(safe-area-inset-top, 0px) + 28px)) 20px 56px !important;
+  padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 56px !important;
 }
 
 .fz-auth-hero.is-masuk {
   flex: 0 0 auto !important;
-  min-height: 21vh !important;
-  max-height: 24vh !important;
-  padding: max(38px, calc(env(safe-area-inset-top, 0px) + 26px)) 20px 38px !important;
+  min-height: 24vh !important;
+  max-height: 28vh !important;
+  padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 38px !important;
 }
 
 .fz-auth-hero.is-daftar {
   flex: 0 0 auto !important;
-  min-height: 18vh !important;
-  max-height: 21vh !important;
-  padding: max(32px, calc(env(safe-area-inset-top, 0px) + 22px)) 20px 34px !important;
+  min-height: 20vh !important;
+  max-height: 24vh !important;
+  padding: max(42px, calc(env(safe-area-inset-top, 0px) + 30px)) 20px 34px !important;
 }
 
 .fz-auth-hero .fz-auth-brand .fiezel-wordmark {
