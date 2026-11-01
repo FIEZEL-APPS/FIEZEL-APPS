@@ -1,7 +1,7 @@
 {
-  "version": "m025-733",
-  "claimedBy": "branch feat/mochi-gemini-quota-and-gems-m025-733",
-  "claimedAt": "2026-11-01T09:00:57.863Z",
-  "reason": "fix(voice): Gemini Live ghost prewarm cleanup, 100-gem economy & confirmation modals (m025-733)",
+  "version": "m025-734",
+  "claimedBy": "branch feat/anti-tamper-and-forensic-watermark-m025-734",
+  "claimedAt": "2026-11-01T11:13:23.167Z",
+  "reason": "feat(security): anti-copy UI guard, domain origin lock & forensic zero-width watermark (m025-734)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

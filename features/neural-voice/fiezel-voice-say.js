@@ -199,7 +199,7 @@
   }
 
   function text(value) {
-    return String(value == null ? '' : value).trim();
+    return String(value == null ? '' : value).replace(/[\u200B\u200C\u200D\uFEFF]/g, '').trim();
   }
 
   /**

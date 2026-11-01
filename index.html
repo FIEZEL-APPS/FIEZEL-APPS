@@ -281,7 +281,6 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/ui/fiezel-tactile-clay.css">
   <link rel="stylesheet" href="./features/speaking-listening/panggung-suara.css">
   <link rel="stylesheet" href="./features/interactive-chat/interactive-chat.css">
-  <link rel="stylesheet" href="./features/interactive-chat/fiezel-voice-orb.css">
   <link rel="stylesheet" href="./features/japanese/fiezel-kakijun-studio.css">
   <style id="fz-contrast-guard">
     /* High contrast guard: prevent yellow-on-yellow or white-on-yellow illegible text */
@@ -1495,16 +1494,6 @@ html.fz-booting body{overflow:hidden}
        customElements.get('fiezel-mascot'). Kalau berkas ini datang belakangan, kedua
        tempat itu jatuh ke ikon paw cadangan dan tidak pernah naik lagi. -->
   <script defer src="./features/mascot/fiezel-mascot.js"></script>
-  <!-- [FASE 7] Lapisan slot PAW panel (12-lesson-layer.md). Dimuat SETELAH
-       fiezel-mascot.js (ia bertanya FiezelPaw.ready() sebelum memesan ruang) dan
-       SEBELUM app.js (render kuis membaca self.FiezelPawSlot pra-cat). Tanpa berkas
-       ini app.js jatuh mulus ke wajah quiz-mascot lama - tidak ada yang patah. -->
-  <script defer src="./features/mascot/fiezel-paw-slot.js"></script>
-  <!-- Lapisan outfit kontekstual PAW (G5' — registry terkurasi, 19-outfit-system).
-       Menyuntik item ke jangkar fz-outfit-* DARI LUAR komponen; deterministik,
-       bukan ekonomi hadiah; kill switch localStorage fzPawOutfits. Tanpa berkas
-       ini PAW tampil polos - tidak ada yang patah. -->
-  <script defer src="./features/mascot/fiezel-paw-outfit.js"></script>
   <!-- Living Intelligence: Braincore Presence Engine (FiezelPresenceEngine) -->
   <script defer src="./features/mascot/fiezel-presence-engine.js"></script>
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
@@ -1755,12 +1744,6 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/bug/fiezel-bug.js"></script>
   <script defer src="./features/tutor-action-center/fiezel-tutor-action-center.js"></script>
   <!-- ChatGPT-like Interactive Conversational Partner (Kaiwa & Speaking Partner) -->
-  <script defer src="./features/interactive-chat/fiezel-chat-icons.js"></script>
-  <script defer src="./features/interactive-chat/fiezel-voice-orb.js"></script>
-  <script defer src="./features/interactive-chat/fiezel-chat-voice.js"></script>
-  <script defer src="./features/interactive-chat/fiezel-voice-scenarios.js"></script>
-  <script defer src="./features/interactive-chat/fiezel-voice-pedagogy.js"></script>
-  <script defer src="./features/interactive-chat/fiezel-voice-call.js"></script>
   <script defer src="./features/interactive-chat/fiezel-interactive-chat.js"></script>
   <!-- Ruang Guru (cangkang guru terpisah). Wajib SEBELUM app.js: tutorCenterView() memasangnya,
        dan isVerifiedTeacher() menanyakan previewAllowed() saat Home digambar pertama kali. -->
@@ -1787,6 +1770,8 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
   <script defer src="./features/ui/fiezel-ui-manager.js"></script>
   <script defer src="./features/ui/fiezel-student-mode.js"></script>
+  <script defer src="./features/ui/fiezel-watermark.js"></script>
+  <script defer src="./features/ui/fiezel-anti-tamper.js"></script>
   <script defer src="./features/speaking-listening/fiezel-jlpt-listening.js"></script>
   <!-- 3D Mochi Companion Engine (Three.js Volumetric Mascot for All Surfaces) -->
   <script defer src="./features/mascot/fiezel-mochi-companion.js"></script>
