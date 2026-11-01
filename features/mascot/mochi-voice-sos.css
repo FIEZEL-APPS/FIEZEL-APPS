@@ -265,10 +265,6 @@ body.fz-stage-quiz .quiz-stage,
   animation: fzSoundwaveListening 1.05s ease-in-out infinite !important;
   transition: background 0.15s ease !important;
 }
-  transform-origin: center !important;
-  animation: fzSoundwaveListening 1.05s ease-in-out infinite !important;
-  transition: background 0.15s ease !important;
-}
 
 .fz-mochi-voice-under .sw-bar.b-1 { height: 3px !important; animation-delay: 0.0s; }
 .fz-mochi-voice-under .sw-bar.b-2 { height: 5.5px !important; animation-delay: 0.14s; }

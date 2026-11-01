@@ -1,9 +1,9 @@
-# FIEZEL RELEASE HANDOFF DOSSIER: M025-737
+# FIEZEL RELEASE HANDOFF DOSSIER: M025-735
 
-**Release Scope**: `fix(voice): mochi voice sos micro switch, proportional gems, and 18-key dynamic pool`  
-**Build Version**: `m025-737` (Hexa-Sync & Octa-Sync Aligned)  
-**Date**: 2026-11-02  
-**Status**: VERIFIED & READY FOR MERGE  
+**Release Scope**: `fix(voice): mochi voice sos micro switch, proportional gems, and 18-key dynamic pool`
+**Build Version**: `m025-735` (Hexa-Sync & Octa-Sync Aligned)
+**Date**: 2026-11-02
+**Status**: VERIFIED & READY FOR MERGE
 
 ---
 
@@ -14,7 +14,7 @@ Rilis ini merupakan penggabungan menyeluruh dari dua inisiatif kritis arsitektur
    - Saklar kartu mikro (`#fzMochiCardToggle` / `.fz-mochi-card-toggle`) berdimensi micro (28px × 15px), kapsul hitam legam `#18181B` dengan label "Bantuan Mochi" (9px) dan indikator teks `OFF`/`ON` (6px) di dalam lintasan saklar.
    - Peniadaan total balon komik petunjuk statis "Ketuk aku".
    - Penyelarasan modal konfirmasi interaktif berbingkai emas tipis `2px solid #FDE047` dengan icon Mochi lembut (`#FEF3C7`), tombol 36px berdampingan (`Batal` dan `Gunakan Gem & Mulai`).
-   - Sapaan instan Mochi Puck Voice Web Audio detik ke-0 (<100ms) via PCM pre-rendered.
+   - Sapaan instan Mochi Puck Voice Web Audio detik ke-0 (<100ms) via audio asset resmi.
    - Reaktivitas visualizer audio akustik yang seketika berubah warna merah coral gradien vibran saat murid berbicara.
 2. **Dynamic 18-Key Gemini Live Pool & KV Sentinel**:
    - Backend Cloudflare Worker (`workers/api/voice/route-voice-live.js`) dilengkapi sinkronisasi kunci dinamis KV Sentinel lintas worker dengan rate limit 30 koneksi/menit dan circuit breaker anti-kehabisan kuota.
@@ -41,19 +41,22 @@ Pengujian empiris dilakukan menggunakan Chromium Headless Playwright:
   - `tests/daily-gem-rewards-test.js`: PASS (7/7 tests)
   - `tests/voice-sync-keys-test.js`: PASS (5/5 tests)
   - `tests/voice-studio-ui-architecture-test.js`: PASS (5/5 tests)
-  - `tests/gate-registry-test.js`: PASS (10 pass, 0 fail, 413 active gates)
-  - `tests/curriculum-cache-version-test.js`: PASS (Octa-Sync aligned at `m025-737`)
+  - `tests/gate-registry-test.js`: PASS (10 pass, 0 fail, 415 active gates)
+  - `tests/curriculum-cache-version-test.js`: PASS (Octa-Sync aligned at `m025-735`)
+  - `tests/critical-surface-protection-test.js`: PASS (9 pass, 0 fail)
+  - `tests/secret-scan-test.js`: PASS (46/46 assert pass, 0 findings)
+  - `tests/i18n-kunci-hantu-test.js`: PASS (5834 keys pass, 0 ghost keys)
   - `tests/id-golden-snapshot-test.js`: PASS (100% baseline emas utuh)
-  - `tests/th-ui-leak-test.js`: PASS (4667 keys aligned, 0 leak)
+  - `tests/th-ui-leak-test.js`: PASS (4670 keys aligned, 0 leak)
 
 ---
 
 ## 3. Touched Files & Architecture Scope
 
 - **Core & Runtime Shell**:
-  - `coordination/BUILD-VERSION.json` (m025-737)
-  - `sw.js` (SW_REV m025-737)
-  - `core-config.js` (FIEZEL_PAGE_BUILD m025-737)
+  - `coordination/BUILD-VERSION.json` (m025-735)
+  - `sw.js` (SW_REV m025-735)
+  - `core-config.js` (FIEZEL_PAGE_BUILD m025-735)
   - `app.js` (Daily gem reward tracker & topbar integration)
   - `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html` (Query param sync)
 - **Mochi Voice SOS & Visuals**:

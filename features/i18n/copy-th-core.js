@@ -67,6 +67,7 @@
     'mochi-sos.conn-error': 'การเชื่อมต่อ AI ขัดข้อง — แตะเพื่อลองใหม่',
     'mochi-sos.conn-retry': 'ลองใหม่',
     'mochi-sos.silence-prompt': 'พูดคุยได้เลยนะถ้าต้องการให้โมจิช่วย',
+    'mochi-sos.toggle-label': 'ความช่วยเหลือโมจิ',
     'mochi-sos.toggle-on-title': 'ผู้ช่วยเสียงโมจิเปิดอยู่ (แตะเพื่อปิด)',
     'mochi-sos.toggle-off-title': 'ผู้ช่วยเสียงโมจิปิดอยู่ (แตะเพื่อเปิด)',
     'mochi-sos.toggle-on-badge': 'Mochi ON',
@@ -95,6 +96,8 @@
     'mochi-sos.modal-insufficient-body': 'คุณต้องมีอย่างน้อย 2 Gem เพื่อวิเคราะห์โจทย์ด้วยเสียง AI ของโมจิ (ยอดปัจจุบัน: {balance} 💎) ฝึกทำแบบฝึกหัดเพื่อสะสม Gem ฟรี หรือใช้สิทธิ์ฟรีรายวันในวันพรุ่งนี้!',
     'mochi-sos.modal-insufficient-btn': 'เข้าใจแล้ว',
     'mochi-sos.bubble-wrong-hint': 'ตรงนี้สับสนใช่ไหม? แตะโมจิมาช่วยกันดูประโยคนี้กันเถอะ!',
-    'mochi-sos.bubble-correct-praise': 'สุดยอดเลย! วิเคราะห์ได้แม่นยำมาก! 🎉'
+    'mochi-sos.bubble-correct-praise': 'สุดยอดเลย! วิเคราะห์ได้แม่นยำมาก! 🎉',
+    'daily-reward.login-bonus-toast': 'โบนัสเข้าสู่ระบบรายวัน: ได้รับ +5 Gem! 💎',
+    'daily-reward.study-10min-title': 'เป้าหมายเรียน 10 นาทีสำเร็จแล้ว! รับฟรี 20 Gem 🎉'
   });
 }());

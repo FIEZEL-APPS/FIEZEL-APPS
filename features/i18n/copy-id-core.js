@@ -89,6 +89,7 @@
     'mochi-sos.conn-error': 'Koneksi AI bermasalah — Ketuk untuk coba lagi',
     'mochi-sos.conn-retry': 'Coba lagi',
     'mochi-sos.silence-prompt': 'Silakan bicara jika ingin bantuan dari aku',
+    'mochi-sos.toggle-label': 'Bantuan Mochi',
     'mochi-sos.toggle-on-title': 'Bantuan suara Mochi aktif (ketuk untuk matikan)',
     'mochi-sos.toggle-off-title': 'Bantuan suara Mochi nonaktif (ketuk untuk aktifkan)',
     'mochi-sos.toggle-on-badge': 'Mochi ON',
@@ -117,6 +118,8 @@
     'mochi-sos.modal-insufficient-body': 'Kamu membutuhkan minimal 2 Gem untuk membedah soal dengan suara AI Mochi (Saldo saat ini: {balance} 💎). Selesaikan soal latihan untuk kumpulkan Gem gratis atau gunakan kuota gratis harian besok!',
     'mochi-sos.modal-insufficient-btn': 'Mengerti',
     'mochi-sos.bubble-wrong-hint': 'Psst, bingung di bagian ini? Ketuk Mochi untuk bedah kalimatnya bareng yuk!',
-    'mochi-sos.bubble-correct-praise': 'Hebat! Analisis kamu tepat sekali! 🎉'
+    'mochi-sos.bubble-correct-praise': 'Hebat! Analisis kamu tepat sekali! 🎉',
+    'daily-reward.login-bonus-toast': 'Bonus Login Harian: +5 Gem didapatkan! 💎',
+    'daily-reward.study-10min-title': 'Target Belajar Minimal 10 Menit Hari Ini Tercapai! 🎉'
   });
 }());
