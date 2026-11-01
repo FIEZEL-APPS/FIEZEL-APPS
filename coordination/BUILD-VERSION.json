@@ -1,7 +1,7 @@
 {
-  "version": "m025-732",
-  "claimedBy": "branch feat/handy-vad-socratic-mochi-m025-732",
-  "claimedAt": "2026-10-31T05:49:02.309Z",
-  "reason": "feat(voice-grammar-brain): Silero VAD v5, Socratic Mochi SOS, JA conjugator/okurigana & FSRS-6",
+  "version": "m025-733",
+  "claimedBy": "branch feat/mochi-gemini-quota-and-gems-m025-733",
+  "claimedAt": "2026-11-01T09:00:57.863Z",
+  "reason": "fix(voice): Gemini Live ghost prewarm cleanup, 100-gem economy & confirmation modals (m025-733)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

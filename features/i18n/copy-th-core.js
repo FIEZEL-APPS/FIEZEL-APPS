@@ -72,6 +72,18 @@
     'mochi-sos.toggle-on-badge': 'Mochi ON',
     'mochi-sos.toggle-off-badge': 'Mochi OFF',
     'mochi-sos.toast-disabled': 'ปิดผู้ช่วยเสียงโมจิแล้ว',
-    'mochi-sos.toast-enabled': 'เปิดผู้ช่วยเสียงโมจิแล้ว'
+    'mochi-sos.toast-enabled': 'เปิดผู้ช่วยเสียงโมจิแล้ว',
+    'mochi-sos.modal-free-title': 'ผู้ช่วยเสียงโมจิ SOS 💡',
+    'mochi-sos.modal-gem-title': 'ผู้ช่วยเสียงโมจิ SOS 💎',
+    'mochi-sos.modal-free-body': '✨ โควตาฟรีประจำวันพร้อมใช้! (เหลือ {remaining} ครั้งในวันนี้) โมจิจะช่วยวิเคราะห์ข้อนี้แบบสดๆ ด้วยเสียง AI สองทางโดยไม่เฉลยคำตอบ',
+    'mochi-sos.modal-gem-body': 'โมจิจะช่วยวิเคราะห์ข้อนี้แบบสดๆ ด้วยเสียง AI Gemini Live ค่าบริการ: 10 Gem (ยอดคงเหลือ: {balance} 💎) โบนัส: หากตอบถูกในข้อนี้ รับแคชแบ็กคืน +5 Gem ทันที!',
+    'mochi-sos.modal-free-btn': 'เริ่มใช้สิทธิ์ฟรี',
+    'mochi-sos.modal-gem-btn': 'ใช้ 10 Gem & เริ่มเลย',
+    'mochi-sos.modal-cancel-btn': 'ยกเลิก',
+    'mochi-sos.modal-insufficient-title': 'Gem ไม่เพียงพอ 💎',
+    'mochi-sos.modal-insufficient-body': 'คุณต้องการ 10 Gem เพื่อขอความช่วยเหลือด้วยเสียงจากโมจิ SOS (ยอดปัจจุบัน: {balance} 💎) ทำแบบฝึกหัดต่อเพื่อสะสม Gem ฟรี หรือรอโควตาฟรีประจำวันในวันพรุ่งนี้!',
+    'mochi-sos.modal-insufficient-btn': 'เข้าใจแล้ว',
+    'mochi-sos.bubble-wrong-hint': 'ตรงนี้สับสนใช่ไหม? แตะโมจิมาช่วยกันดูประโยคนี้กันเถอะ!',
+    'mochi-sos.bubble-correct-praise': 'สุดยอดเลย! วิเคราะห์ได้แม่นยำมาก! 🎉'
   });
 }());

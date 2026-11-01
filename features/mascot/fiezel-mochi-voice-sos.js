@@ -31,8 +31,9 @@
 })(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this), function (root) {
   'use strict';
 
-  var GEM_COST = 20;
+  var GEM_COST = 10;
   var CASHBACK_REWARD = 5;
+  var DAILY_FREE_SOS_LIMIT = 2;
   var MISTAP_THRESHOLD_MS = 6000;
   var LIVE_MODEL = 'models/gemini-3.8-live';
   var LIVE_VOICE = 'Puck';
@@ -48,6 +49,34 @@
   var MOCHI_ENABLED_STORAGE_KEY = 'fz_mochi_sos_enabled';
   var DIRECT_KEY_COOLDOWN_MS = 65000;
   var OPENING_AUDIO_WATCHDOG_MS = 3200;
+
+  function getDailySosUsage() {
+    try {
+      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+      if (!ls || typeof ls.getItem !== 'function') return { date: '', count: 0 };
+      var today = new Date().toISOString().slice(0, 10);
+      var storedDate = ls.getItem('fz_mochi_sos_daily_date') || '';
+      var storedCount = parseInt(ls.getItem('fz_mochi_sos_daily_count') || '0', 10);
+      if (storedDate !== today) {
+        return { date: today, count: 0 };
+      }
+      return { date: today, count: isNaN(storedCount) ? 0 : storedCount };
+    } catch (_) {
+      return { date: '', count: 0 };
+    }
+  }
+
+  function incrementDailySosUsage() {
+    try {
+      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+      if (!ls || typeof ls.setItem !== 'function') return;
+      var today = new Date().toISOString().slice(0, 10);
+      var usage = getDailySosUsage();
+      var nextCount = usage.date === today ? (usage.count + 1) : 1;
+      ls.setItem('fz_mochi_sos_daily_date', today);
+      ls.setItem('fz_mochi_sos_daily_count', String(nextCount));
+    } catch (_) {}
+  }
 
   var _activeCall = null;
   var _audioCtx = null;
@@ -156,7 +185,19 @@
     'mochi-sos.toggle-on-badge': 'ON',
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'Bantuan suara Mochi dinonaktifkan',
-    'mochi-sos.toast-enabled': 'Bantuan suara Mochi diaktifkan'
+    'mochi-sos.toast-enabled': 'Bantuan suara Mochi diaktifkan',
+    'mochi-sos.modal-free-title': 'Bantuan Suara Mochi SOS ✨',
+    'mochi-sos.modal-gem-title': 'Bantuan Suara Mochi SOS 💎',
+    'mochi-sos.modal-free-body': '🎉 Kuota Gratis Harian Tersedia! (Sisa {remaining}x hari ini). Mochi akan membedah soal ini langsung dengan suara AI Gemini Live secara dua arah tanpa membocorkan kunci jawaban.',
+    'mochi-sos.modal-gem-body': 'Mochi akan membedah soal ini langsung dengan suara AI Gemini Live. Biaya: 10 Gem (Saldo kamu: {balance} 💎). Bonus Cashback: Jika jawabanmu benar di soal ini, kamu dapat cashback +5 Gem!',
+    'mochi-sos.modal-free-btn': 'Mulai Bantuan Gratis',
+    'mochi-sos.modal-gem-btn': 'Gunakan 10 Gem & Mulai',
+    'mochi-sos.modal-cancel-btn': 'Batal',
+    'mochi-sos.modal-insufficient-title': 'Gem Belum Cukup 💎',
+    'mochi-sos.modal-insufficient-body': 'Kamu membutuhkan 10 Gem untuk bantuan suara Mochi SOS (Saldo saat ini: {balance} 💎). Selesaikan soal latihan kuis untuk mengumpulkan Gem gratis atau tunggu kuota gratis harian besok!',
+    'mochi-sos.modal-insufficient-btn': 'Mengerti',
+    'mochi-sos.bubble-wrong-hint': 'Psst, bingung di bagian ini? Ketuk Mochi untuk bedah kalimatnya bareng yuk!',
+    'mochi-sos.bubble-correct-praise': 'Hebat! Analisis kamu tepat sekali! 🎉'
   };
 
   var COPY_TH = {
@@ -200,7 +241,19 @@
     'mochi-sos.toggle-on-badge': 'ON',
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'ปิดผู้ช่วยเสียงโมจิแล้ว',
-    'mochi-sos.toast-enabled': 'เปิดผู้ช่วยเสียงโมจิแล้ว'
+    'mochi-sos.toast-enabled': 'เปิดผู้ช่วยเสียงโมจิแล้ว',
+    'mochi-sos.modal-free-title': 'ความช่วยเหลือเสียงจากโมจิ ✨',
+    'mochi-sos.modal-gem-title': 'ความช่วยเหลือเสียงจากโมจิ 💎',
+    'mochi-sos.modal-free-body': '🎉 สิทธิ์ฟรีรายวันเหลือ {remaining} ครั้งในวันนี้! โมจิจะวิเคราะห์โจทย์ข้อนี้ด้วยเสียง AI แบบสองทิศทางทันทีอย่างเป็นธรรมชาติโดยไม่สปอยล์เฉลย',
+    'mochi-sos.modal-gem-body': 'โมจิจะวิเคราะห์โจทย์ข้อนี้ด้วยเสียง AI Gemini Live ค่าบริการ: 10 Gem (ยอดปัจจุบัน: {balance} 💎) แคชแบ็ก: หากตอบถูกในข้อนี้ รับแคชแบ็ก +5 Gem ทันที!',
+    'mochi-sos.modal-free-btn': 'เริ่มใช้งานฟรี',
+    'mochi-sos.modal-gem-btn': 'ใช้ 10 Gem & เริ่ม',
+    'mochi-sos.modal-cancel-btn': 'ยกเลิก',
+    'mochi-sos.modal-insufficient-title': 'Gem ยังไม่พอ 💎',
+    'mochi-sos.modal-insufficient-body': 'คุณต้องการ 10 Gem สำหรับความช่วยเหลือเสียงจากโมจิ (ยอดปัจจุบัน: {balance} 💎) ฝึกทำแบบฝึกหัดในควิซเพื่อสะสม Gem ฟรี หรือรอรีเซ็ตสิทธิ์ฟรีรายวันในวันพรุ่งนี้!',
+    'mochi-sos.modal-insufficient-btn': 'เข้าใจแล้ว',
+    'mochi-sos.bubble-wrong-hint': 'ข้อนี้ติดตรงไหนไหม? แตะโมจิให้ช่วยวิเคราะห์ได้นะ!',
+    'mochi-sos.bubble-correct-praise': 'ยอดเยี่ยมมาก! ตอบถูกแล้ว 🎉'
   };
 
   // Safe registration in canonical FiezelI18n
@@ -1115,158 +1168,15 @@
   }
 
   function warmGreetingAudioInBackground() {
-    if (!hasSessionStorage() || _greetingWarmInFlight) return;
-    if (_activeCall && _activeCall.active) return;
-    if (getPrewarmedGreetingChunks()) return;
-    var WS = root.WebSocket || (typeof window !== 'undefined' ? window.WebSocket : null);
-    if (!WS) return;
-    _greetingWarmInFlight = true;
-    _inFlightGreetChunks = [];
-    _pipeWarmToActiveCall = false;
-    var targetKey = getGreetingCacheKey();
-    var learnerName = getRegisteredLearnerName();
-    var loc = getLocale();
-
-    // Gunakan jalur server pool (skipDirectKey: true) agar tidak membebani kuota kunci langsung murid
-    fetchLiveSessionToken({ skipDirectKey: true }).then(function (session) {
-      if (!session || !session.ok || !session.endpoint) {
-        _greetingWarmInFlight = false;
-        _pipeWarmToActiveCall = false;
-        return;
-      }
-      try {
-        var ws = new WS(session.endpoint);
-        ws.binaryType = 'arraybuffer';
-        var collected = _inFlightGreetChunks;
-        var finished = false;
-        var finishWarm = function (saveIt) {
-          if (finished) return;
-          finished = true;
-          _greetingWarmInFlight = false;
-          _pipeWarmToActiveCall = false;
-          if (saveIt && collected.length > 0) {
-            _greetingPcmCache = { key: targetKey, chunks: collected.slice() };
-            var serialized = JSON.stringify({ chunks: collected, at: Date.now() });
-            try {
-              var ss = (root && root.sessionStorage) || (typeof sessionStorage !== 'undefined' ? sessionStorage : null);
-              if (ss && typeof ss.setItem === 'function') ss.setItem(targetKey, serialized);
-            } catch (_) {}
-            try {
-              var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
-              if (ls && typeof ls.setItem === 'function') ls.setItem(targetKey, serialized);
-            } catch (_) {}
-          }
-          try { if (ws.readyState <= 1) ws.close(1000, 'greet_warmed'); } catch (_) {}
-        };
-        var safetyTimer = setTimeout(function () { finishWarm(collected.length > 0); }, 10000);
-        ws.onopen = function () {
-          try {
-            ws.send(JSON.stringify({
-              setup: {
-                model: LIVE_MODEL,
-                generationConfig: {
-                  responseModalities: ['AUDIO'],
-                  speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: LIVE_VOICE } } }
-                },
-                systemInstruction: {
-                  parts: [{
-                    text: 'Kamu adalah Mochi, mentor suara FIEZEL yang hangat, ekspresif, dan akrab seperti manusia asli. Bicara singkat 1 kalimat saja.'
-                  }]
-                }
-              }
-            }));
-          } catch (_) {
-            clearTimeout(safetyTimer);
-            finishWarm(false);
-          }
-        };
-        var handleWarmText = function (txt) {
-          try {
-            var msg = JSON.parse(txt);
-            if (msg.setupComplete) {
-              var greetLine = loc === 'th'
-                ? ('สวัสดีจ้ะ ' + learnerName + '! โมจิพร้อมช่วยแล้ว มาดูโจทย์ข้อนี้กันเลย!')
-                : ('Halo ' + learnerName + '! Mochi di sini siap bantu kamu, yuk kita lihat soal ini!');
-              ws.send(JSON.stringify({
-                clientContent: {
-                  turns: [{
-                    role: 'user',
-                    parts: [{
-                      text: '[SISTEM: Ucapkan sapaan pembuka singkat 1 kalimat ini dengan intonasi manusia asli yang ceria dan hangat: "' + greetLine + '"]'
-                    }]
-                  }],
-                  turnComplete: true
-                }
-              }));
-              return;
-            }
-            var sc = msg.serverContent;
-            if (sc && sc.modelTurn && Array.isArray(sc.modelTurn.parts)) {
-              for (var i = 0; i < sc.modelTurn.parts.length; i++) {
-                var p = sc.modelTurn.parts[i];
-                if (p.inlineData && p.inlineData.data) {
-                  collected.push(p.inlineData.data);
-                  if (_pipeWarmToActiveCall && _activeCall && _activeCall.active) {
-                    try { apiInstance._scheduleAudioChunk(p.inlineData.data); } catch (_) {}
-                  }
-                }
-              }
-            }
-            if (sc && sc.turnComplete) {
-              clearTimeout(safetyTimer);
-              finishWarm(true);
-            }
-          } catch (_) {}
-        };
-        ws.onmessage = function (ev) {
-          if (typeof ev.data === 'string') handleWarmText(ev.data);
-          else if (typeof Blob !== 'undefined' && ev.data instanceof Blob && typeof ev.data.text === 'function') {
-            ev.data.text().then(handleWarmText).catch(function () {});
-          } else if (typeof ArrayBuffer !== 'undefined' && ev.data instanceof ArrayBuffer) {
-            try { handleWarmText(new TextDecoder().decode(ev.data)); } catch (_) {}
-          }
-        };
-        ws.onerror = function () { clearTimeout(safetyTimer); finishWarm(false); };
-        ws.onclose = function () { clearTimeout(safetyTimer); finishWarm(collected.length > 0); };
-      } catch (_) {
-        _greetingWarmInFlight = false;
-      }
-    }).catch(function () {
-      _greetingWarmInFlight = false;
-    });
+    // Ghost traffic elimination: background WebSocket connections and token minting
+    // are completely disabled to prevent 429 quota exhaustion and policy violations.
+    return;
   }
 
   function prewarmLiveSession(force) {
-    if (_session.locked || isExamLocked() || !isMochiEnabledFromStorage()) return Promise.resolve(null);
-    if (_session.cfg && isSessionTypeIneligible(_session.cfg.type)) return Promise.resolve(null);
-    try { warmGreetingAudioInBackground(); } catch (_) {}
-    var age = Date.now() - _prewarm.fetchedAt;
-    if (!force && _prewarm.session && _prewarm.session.ok && age < TOKEN_STALE_MS) {
-      if (hasSessionStorage() && !_hotWs && !(_activeCall && _activeCall.active) && isSosSurfaceActiveInternal() && getActiveQuestion(null)) {
-        setTimeout(function () { try { openHotSocket(); } catch (_) {} }, 10);
-      }
-      return Promise.resolve(_prewarm.session);
-    }
-    if (_prewarm.promise) return _prewarm.promise;
-    _prewarm.promise = fetchLiveSessionToken().then(function (session) {
-      _prewarm.promise = null;
-      if (session && session.ok) {
-        _prewarm.session = session;
-        _prewarm.fetchedAt = Date.now();
-        if (hasSessionStorage() && !_hotWs && !(_activeCall && _activeCall.active) && isSosSurfaceActiveInternal() && getActiveQuestion(null)) {
-          setTimeout(function () { try { openHotSocket(); } catch (_) {} }, 10);
-        }
-      } else {
-        _prewarm.session = null;
-        _prewarm.fetchedAt = 0;
-      }
-      return _prewarm.session;
-    }).catch(function () {
-      _prewarm.promise = null;
-      _prewarm.session = null;
-      return null;
-    });
-    return _prewarm.promise;
+    // Ghost traffic elimination: background WebSocket and token pre-fetching are disabled.
+    // Audio calls are connected on-demand when user explicitly initiates/confirms a call.
+    return Promise.resolve(null);
   }
 
   function takePrewarmedSession() {
@@ -1279,18 +1189,7 @@
   }
 
   function schedulePrewarmRefresh() {
-    if (_prewarm.timer) clearInterval(_prewarm.timer);
-    _prewarm.timer = setInterval(function () {
-      try {
-        if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
-        if (!isMochiEnabledFromStorage() || !isSosSurfaceActiveInternal()) return;
-        if (_activeCall && _activeCall.active) return;
-        if (_hotWs) return; // token sudah dikonsumsi hot socket
-        var age = Date.now() - _prewarm.fetchedAt;
-        if (!_prewarm.session || age >= TOKEN_REFRESH_MS) prewarmLiveSession(true);
-      } catch (_) {}
-    }, 15000);
-    try { if (_prewarm.timer && _prewarm.timer.unref) _prewarm.timer.unref(); } catch (_) {}
+    if (_prewarm.timer) { clearInterval(_prewarm.timer); _prewarm.timer = null; }
   }
 
   function clearPrewarm() {
@@ -1356,69 +1255,9 @@
     });
   }
 
-  // Membuka WS + kirim setup di latar belakang HANYA jika soal aktif sudah tersedia (`q !== null`).
+  // Membuka WS + kirim setup di latar belakang dinonaktifkan demi perlindungan kuota Gemini API.
   function openHotSocket() {
-    if (_hotWs || (_activeCall && _activeCall.active) || _session.locked || isExamLocked() || !isMochiEnabledFromStorage()) return;
-    if (_session.cfg && isSessionTypeIneligible(_session.cfg.type)) return;
-    var q = getActiveQuestion(null);
-    if (!q) return;
-    var WS = root.WebSocket || (typeof window !== 'undefined' ? window.WebSocket : null);
-    if (!WS) return;
-    var session = takePrewarmedSession();
-    if (!session) { prewarmLiveSession(true); return; }
-    var qSig = getQuestionSig(q);
-    try {
-      var ws = new WS(session.endpoint);
-      ws.binaryType = 'arraybuffer';
-      _hotWs = ws;
-      _hotWsSetupComplete = false;
-      ws.__fzHot = true;
-      ws.__fzSetupSent = false;
-      ws.__fzBoundQSig = qSig;
-      ws.__fzDirectKey = !!session.directKey;
-      ws.__fzKeyIndex = session.keyIndex || 0;
-      ws.onopen = function () {
-        try {
-          var latestQ = getActiveQuestion(q);
-          ws.__fzBoundQSig = getQuestionSig(latestQ);
-          ws.__fzSetupSent = true;
-          ws.send(buildSetupFrame(latestQ, _currentCtx));
-        } catch (_) {}
-      };
-      var checkHotSetupComplete = function (str) {
-        if (str && str.indexOf('setupComplete') !== -1) {
-          _hotWsSetupComplete = true;
-        }
-      };
-      ws.onmessage = function (event) {
-        // Hanya menandai setupComplete; pesan lain dibuang sampai socket diadopsi.
-        try {
-          if (typeof event.data === 'string') {
-            checkHotSetupComplete(event.data);
-          } else if (typeof Blob !== 'undefined' && event.data instanceof Blob && typeof event.data.text === 'function') {
-            event.data.text().then(checkHotSetupComplete).catch(function () {});
-          } else if (typeof ArrayBuffer !== 'undefined' && event.data instanceof ArrayBuffer) {
-            checkHotSetupComplete((typeof TextDecoder !== 'undefined') ? new TextDecoder().decode(event.data) : '');
-          }
-        } catch (_) {}
-      };
-      ws.onerror = function () {};
-      ws.onclose = function (ev) {
-        if (ws.__fzDirectKey && ev && ev.code && ev.code !== 1000) {
-          markDirectKeyQuotaCooldown();
-        }
-        if (_hotWs === ws) { _hotWs = null; _hotWsSetupComplete = false; }
-      };
-      if (_hotWsIdleTimer) clearTimeout(_hotWsIdleTimer);
-      _hotWsIdleTimer = setTimeout(function () {
-        if (_hotWs === ws && !(_activeCall && _activeCall.active)) {
-          discardHotSocket();
-          prewarmLiveSession(true);
-        }
-      }, HOT_WS_IDLE_MS);
-    } catch (_) {
-      _hotWs = null;
-    }
+    return;
   }
 
   function discardHotSocket() {
@@ -2257,12 +2096,27 @@
         };
       }
 
+      var dailyUsage = getDailySosUsage();
+      var hasDailyFree = dailyUsage.count < DAILY_FREE_SOS_LIMIT;
+      if (opts.useDailyFree && hasDailyFree) {
+        return {
+          allowed: true,
+          isDailyFree: true,
+          isWelcomePass: true,
+          remainingDailyFree: DAILY_FREE_SOS_LIMIT - dailyUsage.count,
+          cost: 0,
+          balance: currentBalance,
+          badge: t('mochi-sos.badge-free', 'Gratis')
+        };
+      }
+
       if (currentBalance >= GEM_COST) {
         return {
           allowed: true,
           isWelcomePass: false,
           cost: GEM_COST,
           balance: currentBalance,
+          remainingDailyFree: Math.max(0, DAILY_FREE_SOS_LIMIT - dailyUsage.count),
           badge: GEM_COST + ' 💎'
         };
       }
@@ -2394,10 +2248,6 @@
       syncCompanionStrictMode();
       this.bindMascotTap();
       armAudioWarmup();
-      if (isMochiEnabledFromStorage()) {
-        prewarmLiveSession(true);
-        schedulePrewarmRefresh();
-      }
       return true;
     },
 
@@ -2635,12 +2485,131 @@
           );
         }
       } else {
-        this.startCall(activeQ, { autoEntry: true });
+        this.showConfirmationModal(activeQ);
       }
       return true;
     },
 
-    // ─── Masuk sesi latihan: Duplex Live langsung aktif seketika menyapa & membimbing murid ───
+    showConfirmationModal: function (activeQ) {
+      var doc = getDoc();
+      if (!doc) return;
+      var existing = doc.getElementById('fzMochiSosConfirmModal');
+      if (existing) existing.remove();
+
+      var self = this;
+      var dailyUsage = getDailySosUsage();
+      var hasDailyFree = dailyUsage.count < DAILY_FREE_SOS_LIMIT;
+      var remainingFree = Math.max(0, DAILY_FREE_SOS_LIMIT - dailyUsage.count);
+      var currentBalance = getGemBalance();
+      var loc = getLocale();
+
+      if (!hasDailyFree && currentBalance < GEM_COST) {
+        this.showInsufficientGemModal(currentBalance);
+        return;
+      }
+
+      var modal = doc.createElement('div');
+      modal.id = 'fzMochiSosConfirmModal';
+      modal.className = 'fz-mochi-sos-intro-scrim';
+
+      var titleText = hasDailyFree
+        ? t('mochi-sos.modal-free-title', 'Bantuan Suara Mochi SOS ✨')
+        : t('mochi-sos.modal-gem-title', 'Bantuan Suara Mochi SOS 💎');
+
+      var bodyHtml = hasDailyFree
+        ? t('mochi-sos.modal-free-body', '🎉 Kuota Gratis Harian Tersedia! (Sisa {remaining}x hari ini). Mochi akan membedah soal ini langsung dengan suara AI Gemini Live secara dua arah tanpa membocorkan kunci jawaban.', { remaining: remainingFree })
+        : t('mochi-sos.modal-gem-body', 'Mochi akan membedah soal ini langsung dengan suara AI Gemini Live. Biaya: 10 Gem (Saldo kamu: {balance} 💎). Bonus Cashback: Jika jawabanmu benar di soal ini, kamu dapat cashback +5 Gem!', { balance: currentBalance });
+
+      var confirmBtnText = hasDailyFree
+        ? t('mochi-sos.modal-free-btn', 'Mulai Bantuan Gratis')
+        : t('mochi-sos.modal-gem-btn', 'Gunakan 10 Gem & Mulai');
+
+      var cancelBtnText = t('mochi-sos.modal-cancel-btn', 'Batal');
+
+      modal.innerHTML = [
+        '<div class="fz-mochi-sos-intro-card" role="dialog" aria-modal="true">',
+        '  <div class="fz-mochi-sos-intro-icon">',
+        '    <svg width="40" height="40" viewBox="0 0 100 100" fill="none">',
+        '      <ellipse cx="50" cy="85" rx="30" ry="7" fill="rgba(217,119,6,0.15)"/>',
+        '      <path d="M50 18C30 18 18 34 18 58C18 78 32 82 50 82C68 82 82 78 82 58C82 34 70 18 50 18Z" fill="#FFFDF8" stroke="#F59E0B" stroke-width="2.5"/>',
+        '      <ellipse cx="32" cy="60" rx="6" ry="4" fill="#FDA4AF"/>',
+        '      <ellipse cx="68" cy="60" rx="6" ry="4" fill="#FDA4AF"/>',
+        '      <circle cx="37" cy="50" r="4.5" fill="#0F172A"/>',
+        '      <circle cx="63" cy="50" r="4.5" fill="#0F172A"/>',
+        '      <path d="M46 58C48 60 52 60 54 58" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>',
+        '      <path d="M22 44C22 28 32 18 50 18C68 18 78 28 78 44" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>',
+        '      <rect x="18" y="40" width="6" height="12" rx="3" fill="#2563EB"/>',
+        '      <rect x="76" y="40" width="6" height="12" rx="3" fill="#2563EB"/>',
+        '    </svg>',
+        '  </div>',
+        '  <h3 class="fz-mochi-sos-intro-title">' + titleText + '</h3>',
+        '  <p class="fz-mochi-sos-intro-body" style="font-size:13px;line-height:1.6;color:#475569;margin-bottom:20px;">' + bodyHtml + '</p>',
+        '  <div style="display:flex;gap:10px;justify-content:center;">',
+        '    <button type="button" class="fz-mochi-sos-btn-cancel" id="fzMochiSosConfirmCancel" style="flex:1;padding:12px;background:#F1F5F9;color:#475569;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;">' + cancelBtnText + '</button>',
+        '    <button type="button" class="fz-mochi-sos-btn-confirm" id="fzMochiSosConfirmOk" style="flex:1;padding:12px;background:#F59E0B;color:#FFF;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,0.25);">' + confirmBtnText + '</button>',
+        '  </div>',
+        '</div>'
+      ].join('');
+
+      doc.body.appendChild(modal);
+
+      var btnCancel = doc.getElementById('fzMochiSosConfirmCancel');
+      if (btnCancel) {
+        btnCancel.onclick = function () {
+          modal.remove();
+        };
+      }
+
+      var btnOk = doc.getElementById('fzMochiSosConfirmOk');
+      if (btnOk) {
+        btnOk.onclick = function () {
+          modal.remove();
+          if (hasDailyFree) {
+            incrementDailySosUsage();
+            self.startCall(activeQ, { useDailyFree: true, userConfirmed: true });
+          } else {
+            self.startCall(activeQ, { userConfirmed: true });
+          }
+        };
+      }
+    },
+
+    showInsufficientGemModal: function (currentBalance) {
+      var doc = getDoc();
+      if (!doc) return;
+      var existing = doc.getElementById('fzMochiSosInsufficientModal');
+      if (existing) existing.remove();
+
+      var modal = doc.createElement('div');
+      modal.id = 'fzMochiSosInsufficientModal';
+      modal.className = 'fz-mochi-sos-intro-scrim';
+
+      var titleText = t('mochi-sos.modal-insufficient-title', 'Gem Belum Cukup 💎');
+      var bodyHtml = t('mochi-sos.modal-insufficient-body', 'Kamu membutuhkan 10 Gem untuk bantuan suara Mochi SOS (Saldo saat ini: {balance} 💎). Selesaikan soal latihan kuis untuk mengumpulkan Gem gratis atau tunggu kuota gratis harian besok!', { balance: currentBalance });
+      var closeBtnText = t('mochi-sos.modal-insufficient-btn', 'Mengerti');
+
+      modal.innerHTML = [
+        '<div class="fz-mochi-sos-intro-card" role="dialog" aria-modal="true">',
+        '  <div class="fz-mochi-sos-intro-icon" style="background:#FEE2E2;">',
+        '    <span style="font-size:28px;">💎</span>',
+        '  </div>',
+        '  <h3 class="fz-mochi-sos-intro-title">' + titleText + '</h3>',
+        '  <p class="fz-mochi-sos-intro-body" style="font-size:13px;line-height:1.6;color:#475569;margin-bottom:20px;">' + bodyHtml + '</p>',
+        '  <button type="button" class="fz-mochi-sos-intro-btn" id="fzMochiSosInsufficientClose" style="width:100%;padding:12px;background:#0F172A;color:#FFF;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;">' + closeBtnText + '</button>',
+        '</div>'
+      ].join('');
+
+      doc.body.appendChild(modal);
+
+      var btnClose = doc.getElementById('fzMochiSosInsufficientClose');
+      if (btnClose) {
+        btnClose.onclick = function () {
+          modal.remove();
+        };
+      }
+    },
+
+    // ─── Masuk sesi latihan: Sapaan visual hangat Mochi siap menemani murid ───
     greetOnEntry: function (q, ctx) {
       if (_session.locked || isExamLocked(ctx)) return false;
       if (q) _currentQ = q;
@@ -2651,10 +2620,10 @@
       if (!isMochiEnabledFromStorage()) return false;
       _session.greeted = true;
       try { this._updateMochiMascotPose('greet'); } catch (_) {}
-      if (!this.isCallActive()) {
-        this.startCall(activeQ, { autoEntry: true });
-      } else {
+      if (this.isCallActive()) {
         this.renderUnderMochiVoiceVisualizer(true);
+      } else {
+        this.mountThoughtBubble(activeQ);
       }
       return true;
     },
@@ -3731,7 +3700,38 @@
     },
 
     onQuestionAnswered: function (ok, q) {
-      if (!this.isCallActive()) return;
+      if (!this.isCallActive()) {
+        var activeQ = getActiveQuestion(q);
+        var doc = getDoc();
+        var loc = getLocale();
+        if (!ok) {
+          // Murid baru saja menjawab salah saat panggilan suara tidak aktif.
+          // Mochi bersikap proaktif layaknya tutor sungguhan tanpa memakan kuota token otomatis:
+          try { this._updateMochiMascotPose('think'); } catch (_) {}
+          var bubble = doc ? doc.getElementById('fzMochiThoughtBubble') : null;
+          var hintText = t('mochi-sos.bubble-wrong-hint');
+          if (bubble) {
+            var txtEl = bubble.querySelector('.fz-thought-text');
+            if (txtEl) txtEl.textContent = hintText;
+          } else {
+            this.mountThoughtBubble(activeQ);
+          }
+          var mascotEl = doc ? (doc.getElementById('fzMochiMascotVoiceSos') || doc.querySelector('.fz-mochi-avatar') || doc.querySelector('.fz-mochi-viewport')) : null;
+          if (mascotEl) {
+            mascotEl.classList.remove('fz-mochi-hint-pulse');
+            void mascotEl.offsetWidth;
+            mascotEl.classList.add('fz-mochi-hint-pulse');
+          }
+        } else {
+          try { this._updateMochiMascotPose('greet'); } catch (_) {}
+          var bubble = doc ? doc.getElementById('fzMochiThoughtBubble') : null;
+          if (bubble) {
+            var txtEl = bubble.querySelector('.fz-thought-text');
+            if (txtEl) txtEl.textContent = t('mochi-sos.bubble-correct-praise');
+          }
+        }
+        return;
+      }
       _activeCall.answered = true;
       _silencePromptFired = false;
       _lastUserSpeechAt = Date.now();
@@ -4283,17 +4283,6 @@
 
   if (typeof document !== 'undefined') {
     armAudioWarmup();
-    // Siapkan token sesi & audio sapaan sejak halaman dimuat agar begitu murid masuk latihan,
-    // sapaan suara Mochi langsung terdengar seketika (<100ms) tanpa jeda tunggu!
-    setTimeout(function () {
-      try {
-        if (isMochiEnabledFromStorage()) {
-          prewarmLiveSession(false);
-          warmGreetingAudioInBackground();
-          schedulePrewarmRefresh();
-        }
-      } catch (_) {}
-    }, 30);
 
     if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
       window.addEventListener('offline', function () {
@@ -4310,7 +4299,6 @@
           } else {
             removeConnectionBannerInternal();
             _connStatus = { state: 'idle', message: '', updatedAt: 0 };
-            prewarmLiveSession(true);
           }
         }
       });

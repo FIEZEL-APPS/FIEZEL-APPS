@@ -112,7 +112,7 @@ sandbox.location.hostname = 'fiezel.my.id';
 sandbox.state.gems.balance = 50;
 const prodAllowed = MochiSos.canCall();
 assert.strictEqual(prodAllowed.allowed, true, 'Production call with 50 gems must be allowed');
-assert.strictEqual(prodAllowed.cost, 20, 'Standard call cost is 20 gems');
+assert.strictEqual(prodAllowed.cost, 10, 'Standard call cost is 10 gems');
 
 sandbox.state.gems.balance = 5;
 const prodDenied = MochiSos.canCall();
@@ -155,13 +155,13 @@ sandbox.location.hostname = 'fiezel.my.id';
 sandbox.state.gems.balance = 40;
 const spendRes = MochiSos.spendForCall('test-session', false);
 assert.strictEqual(spendRes.ok, true, 'Spend call must succeed');
-assert.strictEqual(spendRes.spent, 20, 'Must spend 20 gems');
-assert.strictEqual(sandbox.state.gems.balance, 20, 'Balance must be deducted to 20');
+assert.strictEqual(spendRes.spent, 10, 'Must spend 10 gems');
+assert.strictEqual(sandbox.state.gems.balance, 30, 'Balance must be deducted to 30');
 
 // Award Cashback
 MochiSos.awardCashback();
-assert.strictEqual(sandbox.state.gems.balance, 25, 'Balance must increase by cashback (+5 gems)');
-console.log('  ✓ Gem Economy (Spend 20 & Cashback +5) verified');
+assert.strictEqual(sandbox.state.gems.balance, 35, 'Balance must increase by cashback (+5 gems)');
+console.log('  ✓ Gem Economy (Spend 10 & Cashback +5) verified');
 
 // 8. Gemini Live Duplex Voice Protocol & Puck Voice Setup Invariants
 assert.ok(code.includes('models/gemini-3.8-live'), 'Must use models/gemini-3.8-live for duplex live voice');
@@ -248,7 +248,11 @@ sandbox.localStorage = {
 MochiSos.onQuizSessionStart({ type: 'grammar', measure: false });
 MochiSos.setActiveQuestion(sampleQuestion, { cfgType: 'grammar' });
 MochiSos.greetOnEntry(sampleQuestion, { cfgType: 'grammar' });
-assert.strictEqual(MochiSos.isCallActive(), true, 'Duplex Live must activate automatically upon entering practice session');
+assert.strictEqual(MochiSos.isCallActive(), false, 'Duplex Live must NOT start automatically on entry to prevent ghost token burn');
+
+// Call activates upon explicit user start / confirmation
+MochiSos.startCall(sampleQuestion, { userConfirmed: true });
+assert.strictEqual(MochiSos.isCallActive(), true, 'Duplex Live activates upon student confirmation');
 
 // Verify call stays active across questions (does NOT close on question answered)
 MochiSos.onQuestionAnswered(true, sampleQuestion);
