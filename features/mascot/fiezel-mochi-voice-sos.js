@@ -201,10 +201,6 @@
     'mochi-sos.toggle-on-badge': 'ON',
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'Bantuan suara Mochi dinonaktifkan',
-    'mochi-sos.toast-enabled': 'Bantuan suara Mochi aktif (0 💎 saat sambung · bayar sesuai suara AI)',
-    'mochi-sos.toast-zero-audio-safe': 'Belum ada suara AI yang diputar — 0 Gem terpakai! 💎',
-    'mochi-sos.toast-session-receipt': 'Bantuan Mochi selesai: {turns} respon suara · {gems} Gem terpakai 💎',
-    'mochi-sos.toast-session-free-receipt': 'Bantuan Mochi selesai: {turns} respon suara · Kuota Gratis Harian (0 💎)',
     'mochi-sos.toast-out-of-gems': 'Gem belum cukup untuk soal berikutnya. Bantuan Mochi ditutup aman.',
     'mochi-sos.modal-free-title': 'Bantuan Suara Mochi (Kuota Gratis)',
     'mochi-sos.modal-gem-title': 'Bantuan Suara Mochi (Sesuai Kuota Suara)',
@@ -269,10 +265,6 @@
     'mochi-sos.toggle-on-badge': 'ON',
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'ปิดผู้ช่วยเสียงโมจิแล้ว',
-    'mochi-sos.toast-enabled': 'เปิดผู้ช่วยเสียงโมจิแล้ว (เชื่อมต่อ 0 💎 · คิดตามเสียง AI)',
-    'mochi-sos.toast-zero-audio-safe': 'ยังไม่มีเสียง AI เล่นออกมา — ใช้ 0 Gem! 💎',
-    'mochi-sos.toast-session-receipt': 'จบเซสชันโมจิ: เสียงตอบกลับ {turns} ครั้ง · ใช้ไป {gems} Gem 💎',
-    'mochi-sos.toast-session-free-receipt': 'จบเซสชันโมจิ: เสียงตอบกลับ {turns} ครั้ง · สิทธิ์ฟรีรายวัน (0 💎)',
     'mochi-sos.toast-out-of-gems': 'เจมไม่พอสำหรับข้อถัดไป ปิดผู้ช่วยเสียงโมจิอย่างปลอดภัยแล้ว',
     'mochi-sos.modal-free-title': 'ตัวช่วยเสียงโมจิ (โควตาฟรี)',
     'mochi-sos.modal-gem-title': 'ตัวช่วยเสียงโมจิ (คิดตามโควตาเสียง)',
@@ -2070,13 +2062,6 @@
             if (typeof mochiInst.startEarTwitchLoop === 'function') mochiInst.startEarTwitchLoop(3200);
           } catch (_) {}
         }
-        if (!opts.silent) {
-          try {
-            if (typeof root.showToast === 'function') {
-              root.showToast(t('mochi-sos.toast-disabled', 'Bantuan suara Mochi dinonaktifkan'), 'info');
-            }
-          } catch (_) {}
-        }
         return false;
       }
 
@@ -2092,14 +2077,6 @@
         } catch (_) {}
       }
       this.renderUnderMochiVoiceVisualizer(true);
-
-      if (!opts.silent && !opts.userConfirmed) {
-        try {
-          if (typeof root.showToast === 'function') {
-            root.showToast(t('mochi-sos.toast-enabled', 'Bantuan suara Mochi aktif (0 💎 saat sambung · bayar sesuai suara AI)'), 'success');
-          }
-        } catch (_) {}
-      }
 
       if (!opts.skipAutoStart && _session.active && !_session.locked && !isExamLocked() && isMochiSosEligible(activeQ, _currentCtx)) {
         prewarmLiveSession(true);
@@ -3276,6 +3253,19 @@
     _startParallelSpeechRecognition: function () {
       var self = this;
       this._stopParallelSpeechRecognition();
+      // Pada perangkat mobile (iPhone/Android PWA), ketika stream mikrofon perangkat keras sudah
+      // mengalirkan audio PCM 16kHz langsung ke Gemini Live melalui Silero/DSP VAD, jangan jalankan
+      // webkitSpeechRecognition secara paralel agar sesi mikrofon iOS/Android tidak berebut dan
+      // tidak menahan jeda berpikir pasca-bicara!
+      var isMobile = typeof navigator !== 'undefined' &&
+        (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
+      var hasLiveMicStream = !!(
+        _micStream &&
+        typeof _micStream.getAudioTracks === 'function' &&
+        _micStream.getAudioTracks().some(function (tr) { return tr && tr.readyState === 'live' && tr.enabled !== false; })
+      );
+      if (isMobile && hasLiveMicStream) return;
+
       var SpeechRec = (root && (root.SpeechRecognition || root.webkitSpeechRecognition)) ||
                       (typeof window !== 'undefined' ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null);
       if (!SpeechRec) return;
@@ -3350,7 +3340,7 @@
                   }));
                 } catch (_) {}
               }
-            }, 850);
+            }, 520);
           };
 
           rec.onerror = function (evErr) {
@@ -3426,6 +3416,8 @@
 
             var scheduleBurstEnd = function () {
               if (_audioStreamEndTimer) { clearTimeout(_audioStreamEndTimer); }
+              var isMob = typeof navigator !== 'undefined' &&
+                (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
               _audioStreamEndTimer = setTimeout(function () {
                 _audioStreamEndTimer = null;
                 _userAudioBurstActive = false;
@@ -3436,7 +3428,7 @@
                     _ws.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
                   } catch (_) {}
                 }
-              }, 520);
+              }, isMob ? 360 : 440);
             };
 
             if (mochiPlayingAudio) {
@@ -3590,12 +3582,17 @@
                   return;
                 }
               } else {
-                // Saat mendengarkan: wajib >= 5 frame (160ms, p >= 0.62) suara bicara manusia; bising kendaraan diabaikan total!
-                if (pSpeech >= 0.62 && rms >= 0.004) {
+                // Saat mendengarkan: wajib >= 4 frame (128ms, p >= 0.58) suara bicara manusia; bising kendaraan diabaikan total!
+                // Setiap frame di bawah ambang tersebut langsung menambah sileroSilenceStreak tanpa zona mati [0.42, 0.62)
+                // agar AGC mikrofon HP tidak menahan jeda berpikir pasca-bicara!
+                var isMobVad = typeof navigator !== 'undefined' &&
+                  (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
+                var silenceEndFrames = isMobVad ? 11 : 13;
+                if (pSpeech >= 0.58 && rms >= 0.004) {
                   _sileroLastSpeechProbAt = Date.now();
                   sileroSpeechStreak++;
                   sileroSilenceStreak = 0;
-                  if (sileroSpeechStreak >= 5) {
+                  if (sileroSpeechStreak >= 4) {
                     _userAskedConceptOnCurrent = true;
                     _userAudioBurstActive = true;
                     _lastUserSpeechAt = Date.now();
@@ -3603,11 +3600,11 @@
                     if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
                     self._setVoiceVisualizerUserSpeaking(true);
                   }
-                } else if (pSpeech < 0.42) {
+                } else {
                   sileroSpeechStreak = 0;
                   if (_userAudioBurstActive) {
                     sileroSilenceStreak++;
-                    if (sileroSilenceStreak >= 15) {
+                    if (sileroSilenceStreak >= silenceEndFrames) {
                       _userAudioBurstActive = false;
                       sileroSilenceStreak = 0;
                       self._setVoiceVisualizerUserSpeaking(false);
@@ -4241,25 +4238,6 @@
       _activeCall = null;
       removeConnectionBannerInternal();
       _connStatus = { state: 'idle', message: '', updatedAt: 0 };
-
-      if (reason === 'user_tapped' || reason === 'toggle' || reason === 'user_disabled') {
-        try {
-          if (typeof root.showToast === 'function') {
-            if (!call.turnsDelivered) {
-              root.showToast(t('mochi-sos.toast-zero-audio-safe', 'Belum ada suara AI yang diputar — 0 Gem terpakai! 💎'), 'info');
-            } else if ((call.gemsSpent || 0) > 0) {
-              root.showToast(t('mochi-sos.toast-session-receipt', 'Bantuan Mochi selesai: {turns} respon suara · {gems} Gem terpakai 💎', {
-                turns: call.turnsDelivered,
-                gems: call.gemsSpent
-              }), 'info');
-            } else if (call.useDailyFree) {
-              root.showToast(t('mochi-sos.toast-session-free-receipt', 'Bantuan Mochi selesai: {turns} respon suara · Kuota Gratis Harian (0 💎)', {
-                turns: call.turnsDelivered
-              }), 'info');
-            }
-          }
-        } catch (_) {}
-      }
 
       playChime('disconnect');
       this.renderUnderMochiVoiceVisualizer(false);

@@ -19,9 +19,9 @@
     <link rel="preconnect" href="https://api.fiezel.my.id" crossorigin />
     <link rel="dns-prefetch" href="https://translate.googleapis.com" />
     <link rel="dns-prefetch" href="https://api.fiezel.my.id" />
-    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css?v=m025-735" />
+    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css?v=m025-736" />
     <!-- Read-only host runtime config (never modified by Voice Studio) -->
-    <script src="./core-config.js?v=m025-735" defer></script>
+    <script src="./core-config.js?v=m025-736" defer></script>
     <style>
       html, body {
         height: 100%;
@@ -44,45 +44,17 @@
   <body class="bg-[#FFF9EE] text-[#241A11] antialiased h-full w-full overflow-hidden fixed inset-0">
     <div id="fiezel-voice-studio-root"></div>
     <script>
-      // PWA Auto-Updater Guard: Memastikan perangkat mengaktifkan Service Worker terbaru
-      // tanpa menahan generasi shell lama (fiezel-shell-*) yang menimpa UI baru.
+      // PWA Coherent Update Guard: Delegasikan pemeriksaan pembaruan ke cangkang induk
+      // (FiezelUpdatePrompt) agar tidak pernah memicu skipWaiting sepihak atau menghapus
+      // SHELL_CACHE baru saat Kawan Bicara sedang terbuka di dalam iframe.
       (function () {
-        if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistration().then(function (reg) {
-            if (!reg) return;
-            reg.update().catch(function () {});
-            if (reg.waiting) {
-              try { reg.waiting.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-            }
-            reg.addEventListener('updatefound', function () {
-              var newWorker = reg.installing;
-              if (newWorker) {
-                newWorker.addEventListener('statechange', function () {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    try { newWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-                  }
-                });
-              }
-            });
-          }).catch(function () {});
-          navigator.serviceWorker.addEventListener('controllerchange', function () {
-            if (!window.__fzRefreshed) {
-              window.__fzRefreshed = true;
-              if (typeof caches !== 'undefined' && caches.keys) {
-                caches.keys().then(function (keys) {
-                  var oldShells = keys.filter(function (k) { return k.indexOf('fiezel-shell-') === 0; });
-                  return Promise.all(oldShells.map(function (k) { return caches.delete(k); }));
-                }).catch(function () {}).then(function () {
-                  window.location.reload();
-                });
-              } else {
-                window.location.reload();
-              }
-            }
-          });
-        }
+        try {
+          if (window.top && window.top !== window && window.top.FiezelUpdatePrompt && typeof window.top.FiezelUpdatePrompt.check === 'function') {
+            window.top.FiezelUpdatePrompt.check(false);
+          }
+        } catch (_) {}
       })();
     </script>
-    <script type="module" src="./features/voice-studio/dist/voice-studio.js?v=m025-735"></script>
+    <script type="module" src="./features/voice-studio/dist/voice-studio.js?v=m025-736"></script>
   </body>
 </html>

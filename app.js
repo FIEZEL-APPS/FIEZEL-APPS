@@ -12860,6 +12860,9 @@ function dismissBootSplash(){
   try{
     self.__fiezelBootSplashDismissed=true;
   }catch(_){}
+  try{
+    syncStatusBarColor();
+  }catch(_){}
   return true;
 }
 window.dismissBootSplash=dismissBootSplash;

@@ -60,7 +60,7 @@
 }
 
 /* 1. GLOBAL CANVAS & TYPOGRAPHY */
-html, body,
+html:not(.fz-booting), html:not(.fz-booting) body,
 main.app, .app, #app,
 .home-today, .home-page,
 .classroom-page, .progress-page, .profile-page,

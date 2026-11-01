@@ -1837,6 +1837,26 @@ export default function App() {
       return;
     }
 
+    const isMobileDevice =
+      typeof navigator !== 'undefined' &&
+      (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
+    const hasLiveHardwareMic = Boolean(
+      micStreamRef.current &&
+        micStreamRef.current.getAudioTracks().some((tr) => tr.readyState === 'live' && tr.enabled)
+    );
+
+    // On mobile PWA devices (iPhone/Android), when Gemini Live ws-duplex is active with a live
+    // hardware microphone stream, native 16kHz PCM audio is already streamed directly to Gemini Live
+    // via Silero/Handy VAD (~352ms end-of-speech turn completion). Running webkitSpeechRecognition
+    // in parallel on mobile causes OS audio-session contention and 3.2s-4.5s "jeda berpikir" delay!
+    if (isMobileDevice && liveTransportMode === 'ws-duplex' && hasLiveHardwareMic) {
+      setIsWaitingAfterSpeech(false);
+      setIsListeningLiveSpeech(true);
+      return () => {
+        setIsWaitingAfterSpeech(false);
+      };
+    }
+
     const SpeechRec =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRec) {
@@ -1846,6 +1866,16 @@ export default function App() {
     let isDisposed = false;
     let accumulatedSpeech = '';
     let speechPrefix = '';
+
+    const computeSpeechSilenceWaitMs = (text: string, isFinalResult = false) => {
+      const incomplete = isGrammaticallyIncomplete(text, activeScenario.targetLang);
+      if (isMobileDevice) {
+        if (isFinalResult && !incomplete) return 700;
+        return incomplete ? 1400 : 950;
+      }
+      if (isFinalResult && !incomplete) return 1100;
+      return incomplete ? 2100 : 1350;
+    };
 
     const startListeningCycle = () => {
       if (isDisposed) return;
@@ -1883,8 +1913,12 @@ export default function App() {
             }
           }
           let transcript = '';
+          let lastIsFinal = false;
           for (let i = 0; i < event.results.length; i++) {
             transcript += event.results[i][0].transcript;
+            if (i === event.results.length - 1 && event.results[i].isFinal) {
+              lastIsFinal = true;
+            }
           }
           const clean = (speechPrefix ? speechPrefix + ' ' + transcript : transcript)
             .replace(/\s+/g, ' ')
@@ -1899,8 +1933,7 @@ export default function App() {
             if (liveSilenceTimerRef.current) {
               window.clearTimeout(liveSilenceTimerRef.current);
             }
-            // Pacing patience: 3200ms baseline, 4500ms if grammatically incomplete or thinking filler
-            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 4500 : 3200;
+            const silenceWaitMs = computeSpeechSilenceWaitMs(clean, lastIsFinal);
             setIsWaitingAfterSpeech(true);
             liveSilenceTimerRef.current = window.setTimeout(() => {
               if (isDisposed) return;
@@ -1965,14 +1998,10 @@ export default function App() {
 
         rec.onend = () => {
           if (isDisposed) return;
-          // Anti-Premature Cutoff: If the learner has spoken something, NEVER force-submit on browser onend!
-          // Chrome often terminates recognition prematurely after 700-1000ms pause.
-          // We preserve accumulated speech into speechPrefix, keep/start the patient silence timer,
-          // and seamlessly restart recognition cycle so the learner can finish their thought undisturbed!
           if (accumulatedSpeech.trim()) {
             speechPrefix = accumulatedSpeech.trim();
             if (!liveSilenceTimerRef.current) {
-              const silenceWaitMs = isGrammaticallyIncomplete(speechPrefix, activeScenario.targetLang) ? 4500 : 3200;
+              const silenceWaitMs = computeSpeechSilenceWaitMs(speechPrefix, true);
               setIsWaitingAfterSpeech(true);
               liveSilenceTimerRef.current = window.setTimeout(() => {
                 if (isDisposed) return;
@@ -2100,11 +2129,21 @@ export default function App() {
             setLiveUserDraft(clean);
             setInputText(clean);
 
-            // Auto-submit after patient silence once user has spoken a phrase (or tap stop to send immediately)
+            // Auto-submit after snappy silence once user has spoken a phrase (or tap stop to send immediately)
             if (pttSilenceTimerRef.current) {
               window.clearTimeout(pttSilenceTimerRef.current);
             }
-            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 4800 : 3500;
+            const isMobilePtt =
+              typeof navigator !== 'undefined' &&
+              (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
+            const incompletePtt = isGrammaticallyIncomplete(clean, activeScenario.targetLang);
+            const pttSilenceWaitMs = isMobilePtt
+              ? incompletePtt
+                ? 1500
+                : 1050
+              : incompletePtt
+                ? 2400
+                : 1600;
             pttSilenceTimerRef.current = window.setTimeout(() => {
               stopPttRecording();
             }, pttSilenceWaitMs);
@@ -4989,82 +5028,22 @@ export default function App() {
         </div>
       )}
 
-      {/* Modal Konfirmasi Panggilan Kawan Bicara (API-Quota Metered Gem Transparency) */}
+      {/* Modal Konfirmasi Panggilan Kawan Bicara (Ringkas & Jelas) */}
       {callConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="w-full max-w-sm rounded-3xl bg-[#FFFDF8] border-2 border-[#FDE68A] p-6 shadow-2xl text-center space-y-4">
             <div className="w-14 h-14 mx-auto rounded-2xl bg-[#FEF3C7] flex items-center justify-center text-2xl shadow-inner">
-              {callConfirmModal.isDailyFree ? '✨' : '💎'}
+              💎
             </div>
             <div>
               <h3 className="text-base font-extrabold text-[#1C1611]">
-                {callConfirmModal.isDailyFree
-                  ? locale === 'th'
-                    ? 'โทรคุยสดกับ Kawan Bicara (ฟรี)'
-                    : 'Panggilan Kawan Bicara (Kuota Gratis)'
-                  : locale === 'th'
-                    ? 'โทรคุยสดกับ Kawan Bicara (คิดตามเสียงจริง)'
-                    : 'Kawan Bicara (Sesuai Kuota Suara AI)'}
+                {locale === 'th' ? 'Kawan Bicara' : 'Kawan Bicara'}
               </h3>
               <p className="mt-1.5 text-xs leading-relaxed text-[#5C4E3C]">
-                {callConfirmModal.isDailyFree ? (
-                  locale === 'th' ? (
-                    <>
-                      🎉 <strong>สิทธิ์โทรฟรีรายวันพร้อมใช้งาน!</strong> (สูงสุด {DAILY_FREE_CALL_MAX_TURNS} การตอบกลับเสียง AI ฟรี · สิทธิ์จะถูกนับเมื่อเสียง AI ดังขึ้นจริงเท่านั้น)
-                    </>
-                  ) : (
-                    <>
-                      🎉 <strong>1 Sesi Harian Gratis Tersedia!</strong> Gratis hingga <strong>{DAILY_FREE_CALL_MAX_TURNS} respon suara AI</strong> (kuota hanya terpakai saat suara AI benar-benar keluar).
-                    </>
-                  )
-                ) : locale === 'th' ? (
-                  <>
-                    ไม่หัก Gem ล่วงหน้า! คิดตามจำนวนเสียงตอบกลับ AI จริง (ยอดของคุณ: <strong>{callConfirmModal.balance} 💎</strong>)
-                  </>
-                ) : (
-                  <>
-                    Tanpa potong di awal! Gem dihitung proporsional sesuai respon suara AI yang berhasil diputar (Saldo: <strong>{callConfirmModal.balance} 💎</strong>).
-                  </>
-                )}
+                {locale === 'th'
+                  ? 'ฟีเจอร์นี้ใช้ Gem และสามารถรับ Gem ฟรีได้จากการฝึกประจำวัน'
+                  : 'Fitur ini memakai Gem, dan Gem bisa diakses gratis dari latihan harian.'}
               </p>
-
-              <div className="mt-3 rounded-2xl bg-[#FEFCE8] border border-[#FDE68A] px-3.5 py-2.5 text-left text-[11.5px] leading-relaxed text-[#3F3222] space-y-1">
-                {callConfirmModal.isDailyFree ? (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <span>{locale === 'th' ? 'เชื่อมต่อ / เสียงไม่ติด' : 'Menyambung / Gagal Suara'}</span>
-                      <strong className="text-emerald-700">0 💎</strong>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>{locale === 'th' ? `เสียง AI ตอบกลับ 1–${DAILY_FREE_CALL_MAX_TURNS} ครั้งแรก` : `Respon Suara AI 1–${DAILY_FREE_CALL_MAX_TURNS}`}</span>
-                      <strong className="text-emerald-700">{locale === 'th' ? 'ฟรี (0 💎)' : 'Gratis (0 💎)'}</strong>
-                    </div>
-                    <div className="flex items-center justify-between text-[11px] text-[#6E5E47]">
-                      <span>{locale === 'th' ? 'ตอบกลับถัดไป (ถ้าคุยต่อ)' : 'Lanjut Ngobrol Berikutnya'}</span>
-                      <span>+{KAWAN_BICARA_TURN_GEM_COST} 💎 / {locale === 'th' ? 'ตอบ' : 'respon'}</span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <span>{locale === 'th' ? 'เชื่อมต่อ / เสียงไม่ติด' : 'Menyambung (Anti-Hangus)'}</span>
-                      <strong className="text-emerald-700">0 💎</strong>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>{locale === 'th' ? 'ทักทาย & เสียงตอบแรก' : 'Sapaan & Respon Suara Awal'}</span>
-                      <strong>{KAWAN_BICARA_OPENING_GEM_COST} 💎</strong>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>{locale === 'th' ? 'เสียงตอบกลับถัดไป' : 'Balasan Suara Berikutnya'}</span>
-                      <strong>+{KAWAN_BICARA_TURN_GEM_COST} 💎 / {locale === 'th' ? 'ตอบ' : 'respon'}</strong>
-                    </div>
-                    <div className="flex items-center justify-between text-[11px] text-[#6E5E47] pt-0.5 border-t border-[#FDE68A]/70">
-                      <span>{locale === 'th' ? 'เพดานสูงสุดต่อสาย (5 นาที)' : 'Batas Maks. Sesi (5 menit)'}</span>
-                      <span>{locale === 'th' ? `สูงสุด ${KAWAN_BICARA_MAX_SESSION_GEMS} 💎` : `Maks. ${KAWAN_BICARA_MAX_SESSION_GEMS} 💎`}</span>
-                    </div>
-                  </>
-                )}
-              </div>
             </div>
             <div className="flex items-center gap-2 pt-1">
               <button
@@ -5079,9 +5058,7 @@ export default function App() {
                 onClick={handleConfirmStartCall}
                 className="flex-1 py-3 px-4 rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold text-xs shadow-md shadow-amber-500/25 cursor-pointer transition-all active:scale-[0.98]"
               >
-                {callConfirmModal.isDailyFree
-                  ? (locale === 'th' ? 'เริ่มโทรฟรี (0 💎)' : 'Mulai Gratis (0 💎)')
-                  : (locale === 'th' ? 'เชื่อมต่อ (เริ่ม 0 💎)' : 'Sambungkan (Mulai 0 💎)')}
+                {locale === 'th' ? 'เชื่อมต่อ' : 'Sambungkan'}
               </button>
             </div>
           </div>

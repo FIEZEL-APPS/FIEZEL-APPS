@@ -169,7 +169,7 @@ export class HandyHumanVad {
     this.threshold = typeof opts.threshold === 'number' ? opts.threshold : 0.50;
     this.bargeInThreshold = typeof opts.bargeInThreshold === 'number' ? opts.bargeInThreshold : 0.62;
     this.prefillFrames = typeof opts.prefillFrames === 'number' ? opts.prefillFrames : 15;
-    this.hangoverFrames = typeof opts.hangoverFrames === 'number' ? opts.hangoverFrames : 16;
+    this.hangoverFrames = typeof opts.hangoverFrames === 'number' ? opts.hangoverFrames : 11;
     this.onsetFrames = typeof opts.onsetFrames === 'number' ? opts.onsetFrames : 3;
     this.bargeInOnsetFrames = typeof opts.bargeInOnsetFrames === 'number' ? opts.bargeInOnsetFrames : 4;
 

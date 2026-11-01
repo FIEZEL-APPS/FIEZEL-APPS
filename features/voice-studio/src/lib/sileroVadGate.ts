@@ -216,23 +216,29 @@ export class SileroNeuralVadGate {
               return;
             }
           } else {
-            // Listening state: require >= 5 frames (160ms) with pSpeech >= 0.62 & rms >= 0.004
-            if (pSpeech >= 0.62 && rms >= 0.004) {
+            // Listening state: require >= 4 frames (128ms) with pSpeech >= 0.58 & rms >= 0.004.
+            // Any frame below that threshold increments silenceStreak without a [0.42, 0.62) dead-zone,
+            // so mobile AGC post-speech air never stalls turn completion.
+            const isMobile =
+              typeof navigator !== 'undefined' &&
+              (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
+            const endSilenceFrames = isMobile ? 11 : 13; // ~352ms mobile, ~416ms desktop
+            if (pSpeech >= 0.58 && rms >= 0.004) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
-              if (speechStreak >= 5) {
+              if (speechStreak >= 4) {
                 burstOpen = true;
                 if (!this.confirmedSpeaking) {
                   this.confirmedSpeaking = true;
                 }
                 cb.onHumanSpeechState(true);
               }
-            } else if (pSpeech < 0.42) {
+            } else {
               speechStreak = 0;
               if (burstOpen) {
                 silenceStreak += 1;
-                if (silenceStreak >= 15) {
+                if (silenceStreak >= endSilenceFrames) {
                   burstOpen = false;
                   silenceStreak = 0;
                   this.confirmedSpeaking = false;

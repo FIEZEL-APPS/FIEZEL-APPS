@@ -39,6 +39,74 @@
         }).catch(function () {});
       }
     } else {
+      var parseBuildNum = function (v) {
+        var m = String(v == null ? '' : v).match(/(?:^|fiezel-shell-)m(\d+)-(\d+)/i);
+        return m ? (parseInt(m[1], 10) * 100000 + parseInt(m[2], 10)) : null;
+      };
+      var pingControllerRev = function () {
+        return new Promise(function (resolve) {
+          try {
+            var ctrl = navigator.serviceWorker && navigator.serviceWorker.controller;
+            if (!ctrl || typeof MessageChannel === 'undefined') { resolve(''); return; }
+            var ch = new MessageChannel();
+            var done = false;
+            var finish = function (v) { if (done) return; done = true; resolve(String(v || '')); };
+            ch.port1.onmessage = function (e) { finish(e && e.data && e.data.swRev); };
+            setTimeout(function () { finish(''); }, 900);
+            ctrl.postMessage({ type: 'FIEZEL_HEALTH_PING' }, [ch.port2]);
+          } catch (_) { resolve(''); }
+        });
+      };
+      var sweepStaleShellCaches = function () {
+        if (typeof caches === 'undefined' || typeof caches.keys !== 'function') return;
+        var pageBuild = String(self.FIEZEL_PAGE_BUILD || '');
+        var pageNum = parseBuildNum(pageBuild);
+        pingControllerRev().then(function (activeRev) {
+          var activeNum = parseBuildNum(activeRev);
+          var activeShellName = activeRev ? ('fiezel-shell-' + activeRev) : '';
+          var keepMinNum = (activeNum !== null && pageNum !== null)
+            ? Math.max(activeNum, pageNum)
+            : (activeNum !== null ? activeNum : pageNum);
+          caches.keys().then(function (names) {
+            for (var i = 0; i < names.length; i++) {
+              var name = names[i];
+              if (name.indexOf('fiezel-shell-') === 0) {
+                if (activeShellName && name === activeShellName) continue;
+                var nNum = parseBuildNum(name);
+                // Jangan pernah menghapus cangkang rilis baru (> keepMinNum) yang sedang di-precache worker waiting/installing
+                if (nNum !== null && keepMinNum !== null && nNum >= keepMinNum && (!activeShellName || nNum > activeNum)) continue;
+                if (nNum !== null && keepMinNum !== null && nNum < keepMinNum) {
+                  try { caches.delete(name); } catch (_) {}
+                }
+              }
+            }
+          }).catch(function () {});
+          // Pemulihan split-brain otomatis satu kali: bila controller SW aktif sudah berada di
+          // generasi yang lebih baru daripada halaman yang tertahan di memori iOS standalone PWA,
+          // muat ulang halaman dengan aman saat murid belum memulai sesi soal.
+          if (activeNum !== null && pageNum !== null && activeNum > pageNum) {
+            try {
+              var stage = self.FiezelStage;
+              var inLesson = !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
+              var healedKey = 'fiezel-healed-rev';
+              var alreadyHealed = sessionStorage.getItem(healedKey) === activeRev;
+              if (!inLesson && !alreadyHealed) {
+                sessionStorage.setItem(healedKey, activeRev);
+                location.reload();
+              } else if (inLesson) {
+                self.FiezelUpdatePrompt?.check?.(true);
+              }
+            } catch (_) {}
+          }
+        }).catch(function () {});
+      };
+      sweepStaleShellCaches();
+      window.addEventListener('pageshow', function (ev) {
+        if (ev && ev.persisted) sweepStaleShellCaches();
+      });
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') sweepStaleShellCaches();
+      });
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (reg) {
         if (reg) {
           try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}

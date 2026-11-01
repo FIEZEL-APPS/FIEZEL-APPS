@@ -88,11 +88,12 @@
     }
     return false;
   }
-  /* Nomor build halaman ('m025-491') diparse jadi satu bilangan bulat supaya m025-1000
-   * tetap dinilai lebih baru daripada m025-999 (perbandingan string akan salah). Nomor
-   * build bertipe BEDA dari semver: keduanya tidak pernah dibandingkan silang. */
+  /* Nomor build halaman ('m025-491' atau nama cache 'fiezel-shell-m025-491-...') diparse
+   * jadi satu bilangan bulat supaya m025-1000 tetap dinilai lebih baru daripada m025-999
+   * (perbandingan string akan salah). Nomor build bertipe BEDA dari semver: keduanya tidak
+   * pernah dibandingkan silang. */
   function parseBuild(v) {
-    var m = String(v == null ? '' : v).match(/^m(\d+)-(\d+)/i);
+    var m = String(v == null ? '' : v).match(/(?:^|fiezel-shell-)m(\d+)-(\d+)/i);
     return m ? (parseInt(m[1], 10) * 100000 + parseInt(m[2], 10)) : null;
   }
   function isNewerBuild(remote, cur) {
@@ -145,17 +146,15 @@
       return Promise.all(names.map(function (name) {
         // Cangkang shell versi lama yang bukan target rilis baru
         if (name.indexOf('fiezel-shell-') === 0) {
-          // Bila target rilis baru sudah diketahui, hanya cangkang target rilis baru yang dipertahankan
-          if (target && name.indexOf(target) !== -1) {
+          var cacheBuildNum = parseBuild(name);
+          var appBuildNum = parseBuild(APP_BUILD);
+          // Jangan pernah menghapus cangkang rilis yang lebih baru dari build halaman aktif!
+          if (cacheBuildNum !== null && appBuildNum !== null && cacheBuildNum > appBuildNum) {
             return Promise.resolve();
           }
-          // Bila target rilis baru belum tercatat eksplisit, periksa apakah cangkang ini lebih baru dari build halaman aktif
-          if (!target) {
-            var cacheBuildNum = parseBuild(name);
-            var appBuildNum = parseBuild(APP_BUILD);
-            if (cacheBuildNum !== null && appBuildNum !== null && cacheBuildNum > appBuildNum) {
-              return Promise.resolve();
-            }
+          // Bila target rilis baru sudah diketahui, pertahankan cangkang target rilis baru
+          if (target && name.indexOf(target) !== -1) {
+            return Promise.resolve();
           }
           // Selain cangkang rilis baru, SEMUA cangkang shell lama WAJIB dihapus bersih!
           return caches.delete(name);
@@ -411,18 +410,31 @@
 
   function fetchRemoteVersion() {
     var out = { version: '', build: '' };
+    var liveConfigBuild = '';
     return Promise.all([
       fetch('./VERSION.json?t=' + Date.now(), { cache: 'no-store' })
         .then(function (r) { return r && r.ok ? r.json() : null; })
         .then(function (v) { out.version = String((v && v.version) || ''); })
         .catch(function () {}),
       /* Sinyal UTAMA: build halaman yang benar-benar terbit (lihat catatan APP_BUILD di atas).
-       * Gagal mengambilnya bukan kegagalan - VERSION.json masih jadi cadangan. */
+       * Gagal mengambilnya bukan kegagalan - VERSION.json & core-config.js jadi cadangan. */
       fetch('./coordination/BUILD-VERSION.json?t=' + Date.now(), { cache: 'no-store' })
         .then(function (r) { return r && r.ok ? r.json() : null; })
         .then(function (v) { out.build = String((v && v.version) || ''); })
+        .catch(function () {}),
+      /* Sinyal produksi langsung: coordination/ dikecualikan rsync (site-exclude.txt),
+       * sedangkan core-config.js selalu terbit di server produksi dan menuliskan FIEZEL_PAGE_BUILD. */
+      fetch('./core-config.js?__fz_live_build=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r && r.ok && typeof r.text === 'function' ? r.text() : ''; })
+        .then(function (txt) {
+          var m = String(txt || '').match(/FIEZEL_PAGE_BUILD\s*=\s*['"](m\d+-\d+)['"]/i);
+          if (m && m[1]) liveConfigBuild = m[1];
+        })
         .catch(function () {})
-    ]).then(function () { return out; });
+    ]).then(function () {
+      if (!out.build && liveConfigBuild) out.build = liveConfigBuild;
+      return out;
+    });
   }
 
   function watchRegistration(reg, remoteVersion) {
