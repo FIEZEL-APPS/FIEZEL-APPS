@@ -112,11 +112,11 @@ sandbox.location.hostname = 'fiezel.my.id';
 sandbox.state.gems.balance = 50;
 const prodAllowed = MochiSos.canCall();
 assert.strictEqual(prodAllowed.allowed, true, 'Production call with 50 gems must be allowed');
-assert.strictEqual(prodAllowed.cost, 10, 'Standard call cost is 10 gems');
+assert.strictEqual(prodAllowed.cost, 2, 'Metered opening AI voice turn cost is 2 gems');
 
-sandbox.state.gems.balance = 5;
+sandbox.state.gems.balance = 0;
 const prodDenied = MochiSos.canCall();
-assert.strictEqual(prodDenied.allowed, false, 'Production call with 5 gems must be denied');
+assert.strictEqual(prodDenied.allowed, false, 'Production call with 0 gems must be denied');
 assert.strictEqual(prodDenied.reason, 'insufficient_gems', 'Reason must be insufficient_gems');
 console.log('  ✓ canCall gem wallet balance enforcement verified');
 
@@ -150,18 +150,18 @@ assert.ok(typeof thHint === 'string' && thHint.length > 5, 'TH guidance must ret
 assert.ok(!thHint.includes("dY'Z"), 'TH guidance must not contain corrupted bytes');
 console.log('  ✓ Socratic Scaffolding (Indonesian & Thai) verified without spoiling');
 
-// 7. Gem Economy: Spend, Refund, and Cashback
+// 7. Gem Economy: Metered Opening Turn Spend & Cashback
 sandbox.location.hostname = 'fiezel.my.id';
 sandbox.state.gems.balance = 40;
 const spendRes = MochiSos.spendForCall('test-session', false);
 assert.strictEqual(spendRes.ok, true, 'Spend call must succeed');
-assert.strictEqual(spendRes.spent, 10, 'Must spend 10 gems');
-assert.strictEqual(sandbox.state.gems.balance, 30, 'Balance must be deducted to 30');
+assert.strictEqual(spendRes.spent, 2, 'Must spend 2 gems on delivered opening voice turn');
+assert.strictEqual(sandbox.state.gems.balance, 38, 'Balance must be deducted to 38');
 
 // Award Cashback
 MochiSos.awardCashback();
-assert.strictEqual(sandbox.state.gems.balance, 35, 'Balance must increase by cashback (+5 gems)');
-console.log('  ✓ Gem Economy (Spend 10 & Cashback +5) verified');
+assert.strictEqual(sandbox.state.gems.balance, 40, 'Balance must increase by cashback (+2 gems)');
+console.log('  ✓ Gem Economy (Metered Opening 2 & Cashback +2) verified');
 
 // 8. Gemini Live Duplex Voice Protocol & Puck Voice Setup Invariants
 assert.ok(code.includes('models/gemini-3.8-live'), 'Must use models/gemini-3.8-live for duplex live voice');
@@ -289,12 +289,15 @@ assert.strictEqual(MochiSos.onQuizSessionStart({ type: 'listening', measure: fal
 console.log('  ✓ Strict Domain Eligibility (grammar/reading/writing ONLY) verified');
 
 // 17. Corner Card Toggle Persistence (fz_mochi_sos_enabled)
-assert.strictEqual(MochiSos.isMochiEnabled(), true, 'Mochi SOS enabled by default');
+assert.strictEqual(MochiSos.isMochiEnabled(), false, 'Mochi SOS disabled by default on session start');
+MochiSos.setMochiEnabled(true, { silent: true });
+assert.strictEqual(MochiSos.isMochiEnabled(), true, 'Mochi SOS enabled when toggled on');
+assert.strictEqual(localStore.fz_mochi_sos_enabled, '1', 'localStorage persists 1');
 MochiSos.setMochiEnabled(false, { silent: true });
 assert.strictEqual(MochiSos.isMochiEnabled(), false, 'Mochi SOS disabled when toggled off');
 assert.strictEqual(localStore.fz_mochi_sos_enabled, '0', 'localStorage persists 0');
-assert.strictEqual(MochiSos.canCall().allowed, false, 'canCall denied when user toggled Mochi off');
-assert.strictEqual(MochiSos.canCall().reason, 'mochi_disabled', 'Reason is mochi_disabled');
+assert.strictEqual(MochiSos.canCall({ requireEnabled: true }).allowed, false, 'canCall denied when user toggled Mochi off');
+assert.strictEqual(MochiSos.canCall({ requireEnabled: true }).reason, 'mochi_disabled', 'Reason is mochi_disabled');
 MochiSos.toggleMochiEnabled();
 assert.strictEqual(MochiSos.isMochiEnabled(), true, 'toggleMochiEnabled restores active state');
 assert.strictEqual(localStore.fz_mochi_sos_enabled, '1', 'localStorage persists 1');
@@ -467,7 +470,34 @@ assert.ok(stage3ClueRes.status !== 'deferred_think_first' && stage3ClueRes.statu
 MochiSos.onQuizSessionEnd('collab_test_done');
 console.log('  ✓ 3-Stage Braincore × Mochi SOS Collaboration & SMP-Level Language verified');
 
+// 26. API-Quota-Proportional Post-Delivery Gem Metering (Zero-Upfront Anti-Hangus)
+sandbox.location.hostname = 'fiezel.my.id';
+sandbox.state.gems.balance = 50;
+MochiSos.onQuizSessionStart({ type: 'grammar', measure: false });
+MochiSos.setActiveQuestion(fullExplainQ, { cfgType: 'grammar' });
+MochiSos.startCall(fullExplainQ, { userConfirmed: true, useDailyFree: false });
+assert.strictEqual(sandbox.state.gems.balance, 50, 'startCall must deduct 0 Gems upfront before AI audio plays');
+MochiSos.closeCall('user_tapped');
+assert.strictEqual(sandbox.state.gems.balance, 50, 'Closing call with 0 delivered AI audio turns must burn 0 Gems');
+
+MochiSos.startCall(fullExplainQ, { userConfirmed: true, useDailyFree: false });
+const openBill = MochiSos.meterDeliveredAiTurn(fullExplainQ, 'opening');
+assert.strictEqual(openBill.spent, 2, 'First delivered AI explanation turn must meter 2 Gems');
+assert.strictEqual(sandbox.state.gems.balance, 48, 'Balance must update to 48 after opening AI audio plays');
+for (let f = 0; f < 4; f++) {
+  const fu = MochiSos.meterDeliveredAiTurn(fullExplainQ, 'followup');
+  assert.strictEqual(fu.spent, 1, 'Each follow-up AI voice turn must meter +1 Gem');
+}
+assert.strictEqual(sandbox.state.gems.balance, 44, 'Balance after opening (2) + 4 follow-ups (4) must be 44 (6 Gems total)');
+const cappedBill = MochiSos.meterDeliveredAiTurn(fullExplainQ, 'followup');
+assert.strictEqual(cappedBill.spent, 0, 'Per-question Gem cap (6 Gems max) must prevent runaway deduction');
+assert.strictEqual(cappedBill.capped, true, 'Must report capped: true at 6 Gems');
+assert.strictEqual(sandbox.state.gems.balance, 44, 'Balance must stay 44 at per-question cap');
+MochiSos.onQuizSessionEnd('metered_test_done');
+sandbox.location.hostname = 'localhost';
+console.log('  ✓ Post-Delivery API-Quota Gem Metering (0 upfront, 2 opening, +1 follow-up, 6 max cap) verified');
+
 execFileSync(process.execPath, [path.join(ROOT, 'tests', 'brain-fsrs-oracle.suite.cjs')], { stdio: 'inherit' });
 execFileSync(process.execPath, [path.join(ROOT, 'tests', 'japanese-grammar-conjugator.suite.cjs')], { stdio: 'inherit' });
 
-console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (25/25)! <<<');
+console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (26/26)! <<<');

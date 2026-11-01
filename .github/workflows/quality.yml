@@ -499,6 +499,9 @@ jobs:
           node tests/mascot-reduced-motion-test.js
           # m025-717: Mochi Live Voice SOS Lifeline duplex voice & Socratic guidance in-quiz unit tests.
           node tests/mochi-voice-sos-test.js
+          # m025-737: Daily Gem Rewards & Gemini Sentinel Dynamic 18-Key Pool
+          node tests/daily-gem-rewards-test.js
+          node tests/voice-sync-keys-test.js
           # Lima gerbang redesign maskot PAW (spec §35 "New regression nets" + A-10).
           # Ditaruh tepat sesudah tests/paw-mascot-test.js karena kelimanya memperluas kontrak
           # yang gerbang itu mulai jaga: satu sumber bentuk (geometri + checksum ekspor),

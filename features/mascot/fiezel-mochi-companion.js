@@ -159,6 +159,15 @@
     if (!m || typeof m.setAccessory !== 'function') return;
     var strict = syncStrictModeOnMochi(m);
     var session = detectSession(host);
+
+    // Mochi Voice SOS Teaching Mode: Wajib kacamata + headset ('teacher') saat saklar aktif
+    var sos = (typeof root !== 'undefined' ? root.FiezelMochiVoiceSos : (typeof globalThis !== 'undefined' ? globalThis.FiezelMochiVoiceSos : (typeof window !== 'undefined' ? window.FiezelMochiVoiceSos : null)));
+    if (sos && typeof sos.isMochiEnabled === 'function' && sos.isMochiEnabled()) {
+      m.setAccessory('teacher');
+      m.setAura(null);
+      return;
+    }
+
     if (strict) {
       if (session === 'reading') m.setAccessory('glasses');
       else if (session === 'writing') m.setAccessory('pencil');

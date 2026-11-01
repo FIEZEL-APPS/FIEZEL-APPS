@@ -144,15 +144,20 @@ async function main() {
 
   await page.evaluate(async ({ course, view, story, scene }) => {
     const style = document.createElement('style');
-    style.textContent = '.fiezel-ob, .ob-onboarding-layer, #onboardingHost, .fz-auth, .fiezel-splash, #fiezelBootSplash, .fz-tour, #fzRitual, .fz-ritual, #modal, #modalPanel, .modal-backdrop, .modal { display: none !important; pointer-events: none !important; }';
+    style.textContent = '.fiezel-ob, .ob-onboarding-layer, #onboardingHost, .fz-auth, .fiezel-splash, #fiezelBootSplash, .fz-tour, #fzRitual, .fz-ritual, #modal, #modalPanel, .modal-backdrop, .modal, .toast, #toast, .toast-container, .toast-box { display: none !important; pointer-events: none !important; }';
     document.head.appendChild(style);
-    document.querySelectorAll('#fiezelBootSplash, #fiezelSplash, .fiezel-splash, .fz-auth, #authModal, .modal-backdrop, .fiezel-ob, .ob-onboarding-layer, #onboardingHost, #authGate, .ob-language-dialog, #authScreen, #fzRitual, .fz-tour, #modal, #modalPanel').forEach(el => el.remove());
+    document.querySelectorAll('#fiezelBootSplash, #fiezelSplash, .fiezel-splash, .fz-auth, #authModal, .modal-backdrop, .fiezel-ob, .ob-onboarding-layer, #onboardingHost, #authGate, .ob-language-dialog, #authScreen, #fzRitual, .fz-tour, #modal, #modalPanel, .toast, #toast, .toast-container, .toast-box').forEach(el => el.remove());
     document.documentElement.classList.remove('fz-booting');
     document.body.classList.remove('fz-auth-open');
     document.documentElement.classList.add('fz-app-open');
     if (window.switchTargetLangStorage) window.switchTargetLangStorage(course);
     if (window.FiezelI18n?.setCourse) window.FiezelI18n.setCourse(course);
-    if (window.go) window.go(view);
+    if (view === 'quiz') {
+      if (typeof window.startAdaptive === 'function') window.startAdaptive('grammar');
+      else if (typeof window.startLevelPractice === 'function') window.startLevelPractice();
+    } else if (window.go) {
+      window.go(view);
+    }
     if (story && window.FiezelStoryReader) {
       await new Promise(r => setTimeout(r, 300));
       window.FiezelStoryReader.openStory(story);

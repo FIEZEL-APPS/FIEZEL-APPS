@@ -1959,8 +1959,9 @@ export class FiezelMochi {
 
   setAccessory(name) {
     this.currentAccessory = name;
-    if (this.headsetGroup) this.headsetGroup.visible = (name === 'headset');
-    if (this.glassesGroup) this.glassesGroup.visible = (name === 'glasses');
+    const isTeacher = (name === 'teacher' || name === 'teach' || name === 'study');
+    if (this.headsetGroup) this.headsetGroup.visible = (name === 'headset' || isTeacher);
+    if (this.glassesGroup) this.glassesGroup.visible = (name === 'glasses' || isTeacher);
     if (this.pencilGroup) this.pencilGroup.visible = (name === 'pencil');
 
     if (name !== 'pencil') {
@@ -2154,7 +2155,8 @@ export class FiezelMochi {
   }
 
   updateAccessoriesMotion(dt) {
-    if (this.currentAccessory === 'headset') {
+    const isTeacher = (this.currentAccessory === 'teacher' || this.currentAccessory === 'teach' || this.currentAccessory === 'study');
+    if (this.currentAccessory === 'headset' || isTeacher) {
       // Gentle, cozy, relaxing lofi listening groove (Single master phase, ZERO DIZZINESS)
       const lofiTime = this.time * 1.5;
 
@@ -2463,6 +2465,26 @@ export class FiezelMochi {
       this.earPhys.R.vz -= 4.5 * intensity;
       this.earPhys.R.vx -= 2.0 * intensity;
       this.earPhys.R.tipVel += 3.5 * intensity;
+    }
+  }
+
+  /**
+   * Periodic adorable ear twitching loop in idle/peeking mode.
+   * Auto-pauses during voice talking or waving to avoid unnatural motion clash.
+   */
+  startEarTwitchLoop(intervalMs = 3200) {
+    this.stopEarTwitchLoop();
+    this.earTwitchTimer = setInterval(() => {
+      if (this.showEars && !this.isDestroyed && !this.isTalking && this.handState !== 'wave') {
+        this.triggerEarWiggle(0.85);
+      }
+    }, intervalMs);
+  }
+
+  stopEarTwitchLoop() {
+    if (this.earTwitchTimer) {
+      clearInterval(this.earTwitchTimer);
+      this.earTwitchTimer = null;
     }
   }
 
@@ -2892,9 +2914,8 @@ export class FiezelMochi {
           P.rx = 0.0; P.ry = -0.08; P.rz = -0.16 + w;
           P.s = 1.0;
         } else {
-          P.x = -1.52; P.y = -0.26 + bob; P.z = 0.58;
-          P.rx = 0.05; P.ry = 0.35; P.rz = 0.25;
-          P.s = 0.88;
+          // Left paw remains cleanly retracted inside body (zero 4-paw collision anomaly)
+          P.s = 0.0;
         }
       } else if (this.currentAccessory === 'pencil') {
         if (lead) {
@@ -3158,6 +3179,7 @@ export class FiezelMochi {
 
   destroy() {
     this._running = false;
+    this.stopEarTwitchLoop();
     this.detachAudioAnalyser();
     if (this._visibilityObserver) {
       try { this._visibilityObserver.disconnect(); } catch (_) {}

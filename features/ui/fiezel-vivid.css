@@ -943,13 +943,20 @@ html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active .fz-i {
 }
 
 /* --- 9.9 Ritual Sheet Light Theme --- */
-.fz-ritual-sheet,
 #fzRitual,
-.fz-ritual,
+.fz-ritual {
+  background: rgba(27, 20, 24, 0.45) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.fz-ritual-sheet,
 .fz-ritual-card {
   background: #FFF9EE !important;
   border: 1.5px solid rgba(94, 20, 32, 0.18) !important;
-  box-shadow: 0 -10px 40px rgba(94, 20, 32, 0.12) !important;
+  box-shadow: 0 12px 40px rgba(94, 20, 32, 0.18) !important;
   color: #241A11 !important;
 }
 

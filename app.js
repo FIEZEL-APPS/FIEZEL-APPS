@@ -1085,7 +1085,7 @@ function gemsCore(){try{return self.FiezelGems||null}catch(_){return null}}
 function defaultGems(){const g=gemsCore();return g?g.freshGems():{schema:'fiezel-gems-v1',balance:0,earnedTotal:0,spentTotal:0,ledger:[]}}
 function sanitizeGemsState(raw){const g=gemsCore();return g?g.sanitizeGems(raw):defaultGems()}
 function gemsBalance(){return Math.max(0,Math.floor(Number(state?.gems?.balance)||0))}
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},listening:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},listening:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
 // m026-03: bendera tur BERSESI. Sebelumnya keputusan "sudah pernah lihat tur" tinggal di
 // localStorage['fiezel-tour-v1'] - satu kunci untuk seluruh aplikasi, di luar state, jadi ia
 // tidak ikut backup/restore DAN dibagi antar akun Puter di perangkat yang sama. Sekarang tiap
@@ -1714,7 +1714,7 @@ function sanitizeToursSeen(raw){
 }
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},listening:raw?.listening||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',learningIntensity:['santai','teladan','rajin'].includes(String(rawPreferences.learningIntensity||''))?String(rawPreferences.learningIntensity):(defaultPreferences.learningIntensity||'santai'),selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},listening:raw?.listening||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',learningIntensity:['santai','teladan','rajin'].includes(String(rawPreferences.learningIntensity||''))?String(rawPreferences.learningIntensity):(defaultPreferences.learningIntensity||'santai'),selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),dailyRewards:raw?.dailyRewards&&typeof raw.dailyRewards==='object'?raw.dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},toursSeen:sanitizeToursSeen(raw?.toursSeen)};
   /* R6 perbaikan-15/16: penghitung yang rusak TIDAK boleh menghapus bukti belajar.
      (1) Baris history yang korup (null/bukan objek) dibuang SATU-SATU di atas - dulu satu
      baris null membuat hs.map(h=>h.skill) melempar, loadState menangkapnya, dan SELURUH
@@ -2242,7 +2242,9 @@ function abandonActiveSession(reason='exit'){
 }
 function completeActiveSession(cfg,score,total){
   try{['placement','level_exam','reading_exam'].forEach(k=>examLockEnd(k))}catch(_){}
-  const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: selesai bersih = penanda dilepas. */return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
+  const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: selesai bersih = penanda dilepas. */
+  try{const today=studyDayKey(now,state);if(!state.dailyRewards||state.dailyRewards.date!==today){state.dailyRewards={date:today,loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0}}state.dailyRewards.studyTimeMs=(Number(state.dailyRewards.studyTimeMs)||0)+Math.max(0,now-started);checkDailyGemRewards(false)}catch(_){}
+  return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
 }
 /* ---- Gelombang 4 (Lane B): emisi telemetri belajar — OBSERVASI MURNI ---------------------
  * KENAPA di sini: record() adalah satu-satunya pintu commit jawaban ternilai, jadi emisi yang
@@ -2933,6 +2935,7 @@ function nextAttemptId(now){
 }
 function record(q,ok,ms,selectedIndex){
   const now=Date.now();state.totalAnswered++;if(ok)state.totalCorrect++;state.totalTimeMs+=ms||0;if(state.activeSession)state.activeSession.answered=Math.min(Number(state.activeSession.planned||10000),Number(state.activeSession.answered||0)+1);
+  try{const today=studyDayKey(now,state);if(!state.dailyRewards||state.dailyRewards.date!==today){state.dailyRewards={date:today,loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0}}state.dailyRewards.studyTimeMs=(Number(state.dailyRewards.studyTimeMs)||0)+Math.max(0,ms||0);checkDailyGemRewards(false)}catch(_){}
   /* W1 P1-2: cermin answered ke penanda percobaan-berjalan (lihat beginLearningSession). */
   if(state.inflightAttempt&&state.activeSession)state.inflightAttempt.answered=Number(state.activeSession.answered||0);
   const selected=(q.type==='token-order'&&q.__userTokenAnswer)?q.__userTokenAnswer:(q.type==='cloze'&&q.__typedAnswer)?q.__typedAnswer:q.options?.[selectedIndex];
@@ -8632,7 +8635,7 @@ function startWelcomeExperience(){
         if(typeof proceed==='function')proceed();
       }
     }catch(_){}
-  },2200);
+  },6500);
   return showBrandSplash(Date.now(),at=>{
     const proceed=()=>{
       proceedCalled=true;
@@ -13860,6 +13863,75 @@ function showGemRewardModal(totalGems, reasonText) {
     pawReact('reward', { kind: 'gems' });
     refreshNotifBadge();
   } catch (_) {}
+}
+
+function checkDailyGemRewards(silent = false) {
+  if (!state) return false;
+  const today = studyDayKey(Date.now(), state);
+  if (!state.dailyRewards || state.dailyRewards.date !== today) {
+    state.dailyRewards = {
+      date: today,
+      loginBonusClaimed: false,
+      study10MinClaimed: false,
+      studyTimeMs: 0
+    };
+  }
+  const dr = state.dailyRewards;
+  let awardedAny = false;
+
+  // 1. Bonus Login Harian: +5 Gem (1x per hari kalender)
+  if (!dr.loginBonusClaimed) {
+    dr.loginBonusClaimed = true;
+    const g = gemsCore();
+    if (g && typeof g.gemsEarn === 'function') {
+      state.gems = g.gemsEarn(state.gems, 5, 'daily_login_bonus', Date.now(), 'login-' + today, getActiveLevel());
+    } else {
+      if (state.gems && typeof state.gems.balance === 'number') state.gems.balance += 5;
+      else state.gems = (Number(state.gems) || 0) + 5;
+    }
+    save();
+    awardedAny = true;
+    try {
+      if (!silent && typeof showToast === 'function') {
+        showToast(t('daily-reward.login-bonus-toast', 'Bonus Login Harian: +5 Gem didapatkan! 💎'), 'success');
+        uiSfx?.('xp_gain');
+        pawReact?.('reward', { kind: 'gems' });
+      }
+    } catch (_) {}
+  }
+
+  // 2. Bonus Belajar Minimal 10 Menit Sehari: +20 Gem (1x per hari kalender)
+  if (!dr.study10MinClaimed) {
+    let todayStudyMs = Number(dr.studyTimeMs) || 0;
+    for (const h of state.history || []) {
+      if (studyDayKey(h.at || 0, state) === today) {
+        todayStudyMs += (Number(h.ms) || 0);
+      }
+    }
+    // 10 menit = 600.000 ms
+    if (todayStudyMs >= 10 * 60 * 1000) {
+      dr.study10MinClaimed = true;
+      const g = gemsCore();
+      if (g && typeof g.gemsEarn === 'function') {
+        state.gems = g.gemsEarn(state.gems, 20, 'daily_study_10min', Date.now(), 'study10-' + today, getActiveLevel());
+      } else {
+        if (state.gems && typeof state.gems.balance === 'number') state.gems.balance += 20;
+        else state.gems = (Number(state.gems) || 0) + 20;
+      }
+      save();
+      awardedAny = true;
+      try {
+        if (!silent) {
+          showGemRewardModal(20, t('daily-reward.study-10min-title', 'Target Belajar Minimal 10 Menit Hari Ini Tercapai! 🎉'));
+          uiSfx?.('streak_5');
+          quizMajorCelebrate?.();
+          pawReact?.('reward', { kind: 'gems' });
+        }
+      } catch (_) {}
+    }
+  }
+
+  return awardedAny;
 }
 
 let cachedOwnerMessages = [];
@@ -23152,13 +23224,13 @@ function startNotifPolling(){
     else if(typeof document==='undefined'||document.visibilityState==='visible'){
       try{if(navigator&&navigator.onLine!==false){socialNotifyPoll(false);refreshFriendRequestCount()}}catch(_){}
     }
-    try{if(navigator&&navigator.onLine!==false){pollOwnerMessages(false);checkPendingGemGrants(true)}}catch(_){}
+    try{if(navigator&&navigator.onLine!==false){pollOwnerMessages(false);checkPendingGemGrants(true);checkDailyGemRewards(true)}}catch(_){}
   },NOTIF_POLL_MS);
   notifPollTimer?.unref?.();
   try{
     document.addEventListener('visibilitychange',()=>{
       try{if(document.visibilityState!=='visible')return}catch(_){return}
-      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{checkPendingGemGrants()}catch(_){};try{pollOwnerMessages()}catch(_){}
+      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{checkPendingGemGrants()}catch(_){};try{checkDailyGemRewards(false)}catch(_){};try{pollOwnerMessages()}catch(_){}
     });
     self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{pollOwnerMessages()}catch(_){}});
     if(typeof BroadcastChannel!=='undefined'){
@@ -23196,7 +23268,7 @@ function startNotifPolling(){
   try{refreshFriendRequestCount()}catch(_){}
   return true;
 }
-window.openNotifications=openNotifications;window.renderNotifSheet=renderNotifSheet;window.notifAcceptFriend=notifAcceptFriend;window.notifRejectFriend=notifRejectFriend;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;window.checkPendingGemGrants=checkPendingGemGrants;window.showGemRewardModal=showGemRewardModal;window.pollOwnerMessages=pollOwnerMessages;window.openOwnerMessageModal=openOwnerMessageModal;window.sendOwnerMessageReply=sendOwnerMessageReply;window.markOwnerMessagesRead=markOwnerMessagesRead;
+window.openNotifications=openNotifications;window.renderNotifSheet=renderNotifSheet;window.notifAcceptFriend=notifAcceptFriend;window.notifRejectFriend=notifRejectFriend;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;window.checkPendingGemGrants=checkPendingGemGrants;window.checkDailyGemRewards=checkDailyGemRewards;window.showGemRewardModal=showGemRewardModal;window.pollOwnerMessages=pollOwnerMessages;window.openOwnerMessageModal=openOwnerMessageModal;window.sendOwnerMessageReply=sendOwnerMessageReply;window.markOwnerMessagesRead=markOwnerMessagesRead;
 /* ---------------------------------------------------------------- LAPIS AKUN (§21/§22/§27) */
 /**
  * Lembar akun: masuk, daftar, dan aktivasi guru. SATU lembar tiga mode, bukan tiga layar —

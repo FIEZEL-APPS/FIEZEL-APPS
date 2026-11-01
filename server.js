@@ -733,6 +733,20 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 200, { ok: true, shifted: true });
   }
 
+  if (pathname === '/api/voice/sync-keys' && req.method === 'POST') {
+    const body = await parseJsonBody(req);
+    const rawKeys = Array.isArray(body?.keys) ? body.keys : (typeof body?.keys === 'string' ? body.keys.split(',') : []);
+    const valid = rawKeys.filter((k) => k && typeof k === 'string' && k.length > 10);
+    if (valid.length > 0) {
+      geminiKeys = valid;
+      try {
+        fs.writeFileSync(KEYS_FILE, JSON.stringify(valid, null, 2), 'utf8');
+      } catch (_) {}
+      return sendJson(res, 200, { ok: true, synchronized: true, activeCount: valid.length });
+    }
+    return sendJson(res, 400, { ok: false, error: 'no_valid_keys' });
+  }
+
   if ((pathname === '/api/voice/copilot-assist' || pathname === '/api/voice-call/assist') && req.method === 'POST') {
     const body = await parseJsonBody(req);
     const targetLang = body.targetLang === 'en' ? 'en' : 'ja';

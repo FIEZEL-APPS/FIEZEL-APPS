@@ -1,7 +1,7 @@
 {
-  "version": "m025-734",
-  "claimedBy": "branch feat/anti-tamper-and-forensic-watermark-m025-734",
-  "claimedAt": "2026-11-01T11:13:23.167Z",
-  "reason": "feat(security): anti-copy UI guard, domain origin lock & forensic zero-width watermark (m025-734)",
+  "version": "m025-737",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-11-01T18:09:17.254Z",
+  "reason": "fix(voice): mochi voice sos micro switch, proportional gems, and 18-key dynamic pool",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
