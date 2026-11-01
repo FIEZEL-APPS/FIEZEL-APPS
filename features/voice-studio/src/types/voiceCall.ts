@@ -14,7 +14,7 @@ export interface VoicePersona {
   name: string;
   roleId: string;
   roleTh: string;
-  geminiVoice: 'Puck' | 'Kore' | 'Charon' | 'Fenrir' | 'Zephyr';
+  geminiVoice: 'Puck' | 'Kore' | 'Charon' | 'Fenrir' | 'Zephyr' | 'Aoede';
   edgeVoice: string;
   targetLang: TargetLang;
   levelRange: string;
@@ -170,6 +170,61 @@ export interface BrainSyncQueueItem {
   measureMode: boolean;
 }
 
+export type LearnerCharacterArchetype =
+  | 'hesitant_shy'
+  | 'fast_careless'
+  | 'stiff_textbook'
+  | 'balanced_growing'
+  | 'confident_natural';
+
+export interface ChronicGrammarWeakness {
+  misconceptionId: string;
+  labelId: string;
+  labelTh: string;
+  hits: number;
+  resolvedHits: number;
+  lastBrokenUtterance: string;
+  targetFixPattern: string;
+  lastSeenAt: number;
+  active: boolean;
+}
+
+export interface MentorSessionMemoryEntry {
+  sessionId: string;
+  timestamp: number;
+  scenarioId: string;
+  personaId: string;
+  targetLang: TargetLang;
+  turnCount: number;
+  durationSec: number;
+  mistakesCaught: string[];
+  strengthsObserved: string[];
+  topicsDiscussed: string[];
+  mentorTakeaway: string;
+}
+
+export interface DualBrainMemoryState {
+  userBrain: {
+    learnerName: string;
+    activeCourseLevel: string;
+    characterArchetype: LearnerCharacterArchetype;
+    characterNoteId: string;
+    characterNoteTh: string;
+    personalFacts: string[];
+    verifiedStrengths: string[];
+    chronicWeaknesses: Record<string, ChronicGrammarWeakness>;
+    updatedAt: number;
+  };
+  mentorBrain: {
+    totalMentoredTurns: number;
+    activeFocusAssignment: string;
+    lastRoastTheme: string;
+    rapportNotes: string[];
+    sessionSummaries: MentorSessionMemoryEntry[];
+    updatedAt: number;
+  };
+}
+
 export interface BraincoreStoreState {
   version: number;
   updatedAt: number;
@@ -183,4 +238,5 @@ export interface BraincoreStoreState {
   totalVoiceMinutes: number;
   totalSpeakingSeconds: number;
   completedCallSessions: number;
+  dualBrainMemory?: DualBrainMemoryState;
 }

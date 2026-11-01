@@ -3,11 +3,23 @@
  * and Persistent Conversation Memory Invariants.
  */
 import assert from 'node:assert';
-import { synthesizeNaturalReformulation } from '../features/voice-studio/src/lib/liveTransport.ts';
+import {
+  evaluateTurnLocal,
+  sanitizeHallucinatedTranscript,
+  sanitizeSpokenTextForClassicTts,
+  synthesizeNaturalReformulation,
+} from '../features/voice-studio/src/lib/liveTransport.ts';
 import {
   translateAndPhoneticizeLiveText,
   fetchLiveTranslation,
 } from '../features/voice-studio/src/lib/liveCallHelper.ts';
+import {
+  buildBraincoreCognitiveDossier,
+  finalizeCallSessionMemory,
+  loadBraincoreState,
+  recordSpeakingAttempt,
+} from '../features/voice-studio/src/lib/braincore.ts';
+import { CALL_SCENARIOS, VOICE_PERSONAS } from '../features/voice-studio/src/data/callScenarios.ts';
 
 async function run() {
   console.log('=== FIEZEL VOICE STUDIO REFORMULATION & TRANSLATION TEST ===\n');
@@ -140,8 +152,230 @@ async function run() {
     console.warn('Network translation fetch skipped (offline environment):', err.message);
   }
 
+  // 5. Acoustic Script Lock & Classic TTS Laugh Sanitizer
+  console.log('--- TEST 5: Acoustic Script Lock & Classic TTS Laugh Sanitizer ---');
+  assert.strictEqual(
+    sanitizeHallucinatedTranscript('Привет как дела', 'ja', 'id'),
+    '',
+    'Russian Cyrillic ASR hallucination must be completely rejected in Japanese mode'
+  );
+  assert.strictEqual(
+    sanitizeHallucinatedTranscript('Здравствуйте, я говорю по-русски', 'en', 'id'),
+    '',
+    'Russian Cyrillic ASR hallucination must be completely rejected in English mode'
+  );
+  assert.strictEqual(
+    sanitizeHallucinatedTranscript('Aku mau pesan ホットコーヒー satu ya', 'ja', 'id'),
+    'Aku mau pesan ホットコーヒー satu ya',
+    'Valid Indonesian + Japanese code-switching must be preserved intact'
+  );
+  assert.strictEqual(
+    sanitizeSpokenTextForClassicTts('Haha! Stop right there, say: I went to Bandung.', 'en'),
+    'Stop right there, say: I went to Bandung.',
+    'Leading literal Haha! must be stripped before classic Edge-TTS synthesis'
+  );
+  assert.strictEqual(
+    sanitizeSpokenTextForClassicTts('あはは！ちょっと待って、「飲みます」って言ってごらん！', 'ja'),
+    'ちょっと待って、「飲みます」って言ってごらん！',
+    'Leading literal あはは！ must be stripped before classic Edge-TTS synthesis'
+  );
+  console.log('✓ PASS\n');
+
+  // 6. Live Grammar Interception & Echo Redemption
+  console.log('--- TEST 6: Live Grammar Interception & Echo Redemption ---');
+  const jaKissaten = CALL_SCENARIOS.find((s) => s.id === 'scen_ja_n5_kissaten');
+  const enCafe = CALL_SCENARIOS.find((s) => s.id === 'scen_en_a2_cafe');
+  const nanami = VOICE_PERSONAS.nanami;
+  const alex = VOICE_PERSONAS.coach_alex;
+
+  const grammarTraps = [
+    {
+      text: 'きのうラーメンを食べますでした',
+      scenario: jaKissaten,
+      persona: nanami,
+      targetLang: 'ja',
+      expectedMisconception: 'polite_past_masu_deshita',
+    },
+    {
+      text: 'ラーメンは美味しいでした',
+      scenario: jaKissaten,
+      persona: nanami,
+      targetLang: 'ja',
+      expectedMisconception: 'i_adj_past_deshita',
+    },
+    {
+      text: 'ホットコーヒーを飲むです',
+      scenario: jaKissaten,
+      persona: nanami,
+      targetLang: 'ja',
+      expectedMisconception: 'verb_plus_desu',
+    },
+    {
+      text: 'I am agree with your idea',
+      scenario: enCafe,
+      persona: alex,
+      targetLang: 'en',
+      expectedMisconception: 'stative_verb_continuous',
+    },
+    {
+      text: 'i like mine jobe',
+      scenario: enCafe,
+      persona: alex,
+      targetLang: 'en',
+      expectedMisconception: 'possessive_pronoun_mine_noun',
+    },
+  ];
+
+  for (const trap of grammarTraps) {
+    const ev = evaluateTurnLocal({
+      text: trap.text,
+      scenario: trap.scenario,
+      persona: trap.persona,
+      targetLang: trap.targetLang,
+      locale: 'id',
+      measureMode: false,
+      history: [],
+    });
+    assert.strictEqual(ev.ok, false, `Grammar trap "${trap.text}" must be marked ok=false`);
+    assert.strictEqual(
+      ev.misconceptionId,
+      trap.expectedMisconception,
+      `Grammar trap "${trap.text}" must detect ${trap.expectedMisconception}`
+    );
+    assert.ok(
+      ev.syntacticCorrection && ev.syntacticCorrection.length > 0,
+      `Grammar trap "${trap.text}" must produce a syntacticCorrection`
+    );
+    assert.ok(
+      !ev.aiReply.includes('Nice energy!') && !ev.aiReply.includes('いい調子だね'),
+      `Grammar trap "${trap.text}" must NEVER receive false praise in aiReply: "${ev.aiReply}"`
+    );
+  }
+  console.log('✓ PASS\n');
+
+  // 7. Host Braincore Strength/Weakness Snapshot + Dual-Brain Memory Dossier
+  console.log('--- TEST 7: Host Braincore Strength/Weakness Snapshot & Dual-Brain Memory ---');
+  const mockStore = new Map();
+  const mockLocalStorage = {
+    get length() {
+      return mockStore.size;
+    },
+    key: (idx) => Array.from(mockStore.keys())[idx] ?? null,
+    getItem: (k) => (mockStore.has(k) ? mockStore.get(k) : null),
+    setItem: (k, v) => mockStore.set(k, String(v)),
+    removeItem: (k) => mockStore.delete(k),
+  };
+  globalThis.localStorage = mockLocalStorage;
+  globalThis.window = globalThis.window || {};
+  globalThis.window.localStorage = mockLocalStorage;
+
+  // Seed host PWA BKT & Misconception Ledger in canonical main-app format
+  globalThis.localStorage.setItem(
+    'fiezel-lname-sync-v1',
+    JSON.stringify({ name: 'Rian Pratama' })
+  );
+  globalThis.localStorage.setItem(
+    'fiezel-mastery-bkt-v1@ja',
+    JSON.stringify({
+      schema: 'fiezel-mastery-bkt-v1',
+      lessons: {
+        'jp-n5-particles-wa-ga': { L: 0.89, n: 14, lastAt: Date.now(), gatePassedAt: Date.now() },
+        'jp-n5-verb-masu': { L: 0.32, n: 6, lastAt: Date.now(), gatePassedAt: null },
+      },
+    })
+  );
+  globalThis.localStorage.setItem(
+    'fiezel-misconception-ledger-v1@ja',
+    JSON.stringify({
+      schema: 'fiezel-misconception-ledger-v1',
+      entries: {
+        ja_particle_ni_for_action_place: {
+          hits: 5,
+          sessions: 2,
+          lastHitAt: Date.now(),
+          cleanStreak: 0,
+          logOdds: 0.92,
+          everActive: true,
+        },
+      },
+    })
+  );
+
+  let brainState = loadBraincoreState();
+  const attemptOut = recordSpeakingAttempt(brainState, {
+    competencyId: jaKissaten.competencyId,
+    scenarioId: jaKissaten.id,
+    targetLang: 'ja',
+    userExactTranscript: 'I am building a language app called Fiezel. きのうラーメンを食べますでした',
+    ok: false,
+    grammarScore: 52,
+    fluencyScore: 68,
+    vocabUsageScore: 70,
+    accuracyScore: 60,
+    misconceptionId: 'polite_past_masu_deshita',
+    correctionPattern: 'きのうラーメンを食べました',
+    hintsUsed: 0,
+    confidence: 0.85,
+    measureMode: false,
+  });
+  brainState = finalizeCallSessionMemory(attemptOut.nextState, {
+    scenario: jaKissaten,
+    personaId: 'nanami',
+    turns: [
+      { id: 't1', speaker: 'ai', text: 'いらっしゃい！何にする？', timestamp: Date.now() - 5000 },
+      {
+        id: 't2',
+        speaker: 'user',
+        text: 'I am building a language app called Fiezel. きのうラーメンを食べますでした',
+        timestamp: Date.now() - 2000,
+      },
+    ],
+    durationSec: 45,
+  });
+
+  const dossier = buildBraincoreCognitiveDossier(brainState, jaKissaten, 'id');
+  console.log('Generated Braincore Dossier Preview:\n' + dossier.slice(0, 650) + '...\n');
+
+  assert.ok(dossier.includes('Rian Pratama'), 'Dossier must include learner name from host PWA');
+  assert.ok(
+    dossier.includes('TITIK PINTAR MURID (Verified Strengths') &&
+      dossier.includes('Partikel Dasar は / が / を'),
+    'Dossier must surface host BKT strengths (jp-n5-particles-wa-ga)'
+  );
+  assert.ok(
+    dossier.includes('TITIK LEMAH & MISKONSEPSI AKTIF') &&
+      dossier.includes('Konjugasi Kata Kerja Sopan (〜ます / 〜ました)') &&
+      dossier.includes('Partikel Lokasi Aksi (で vs に)'),
+    'Dossier must surface host BKT weaknesses and active misconception ledger entries'
+  );
+  assert.ok(
+    dossier.includes('building a language app called Fiezel'),
+    'Dual-Brain Memory must extract and remember learner personal facts across calls'
+  );
+  assert.ok(
+    brainState.dualBrainMemory.mentorBrain.sessionSummaries.length === 1 &&
+      Boolean(brainState.dualBrainMemory.userBrain.chronicWeaknesses.polite_past_masu_deshita),
+    'Dual-Brain Memory must persist session summaries and chronic grammar weaknesses'
+  );
+
+  // Verify host ledger schema integrity was preserved when bridging attempt back to host PWA
+  const hostLedgerAfter = JSON.parse(
+    globalThis.localStorage.getItem('fiezel-misconception-ledger-v1@ja')
+  );
+  assert.strictEqual(
+    hostLedgerAfter.schema,
+    'fiezel-misconception-ledger-v1',
+    'Host misconception ledger schema must remain intact'
+  );
+  assert.ok(
+    hostLedgerAfter.entries &&
+      Object.keys(hostLedgerAfter.entries).some((k) => k.includes('polite_past_masu_deshita')),
+    'Voice attempt misconception must write into canonical host ledger entries'
+  );
+  console.log('✓ PASS\n');
+
   console.log('================================================================');
-  console.log('ALL REFORMULATION & TRANSLATION TESTS PASSED (100%)!');
+  console.log('ALL REFORMULATION, GRAMMAR, & BRAINCORE DOSSIER TESTS PASSED!');
   console.log('================================================================');
 }
 

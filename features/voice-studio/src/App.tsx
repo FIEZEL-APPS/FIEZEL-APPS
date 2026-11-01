@@ -30,7 +30,9 @@ import {
 import {
   abilityThetaFromMastery,
   brainSyncFlush,
+  buildBraincoreCognitiveDossier,
   checkPrerequisiteStatus,
+  finalizeCallSessionMemory,
   loadBraincoreState,
   recordSpeakingAttempt,
   recordVocabPrereqMastery,
@@ -66,6 +68,7 @@ import {
   requestRealtimeCopilotAssist,
   resolveAiReply,
   resolveLiveCallWebSocketUrls,
+  sanitizeHallucinatedTranscript,
   splitIntoSpeechChunks,
   synthesizeFlexibleTts,
   warmUpVoiceServices,
@@ -1490,7 +1493,11 @@ export default function App() {
   };
 
   const commitLiveUserTurn = (textToCommit: string) => {
-    const uText = textToCommit.trim();
+    const uText = sanitizeHallucinatedTranscript(
+      textToCommit,
+      activeScenario.targetLang,
+      locale
+    ).trim();
     if (!uText) return;
 
     liveUserDraftRef.current = '';
@@ -1503,6 +1510,11 @@ export default function App() {
       targetLang: activeScenario.targetLang,
       locale,
       measureMode: isMeasureMode,
+      learnerDossier: buildBraincoreCognitiveDossier(
+        brainStateRef.current,
+        activeScenario,
+        locale
+      ),
       history: turnsRef.current.slice(-6).map((tItem) => ({
         speaker: tItem.speaker,
         text: tItem.text,
@@ -1526,6 +1538,7 @@ export default function App() {
       confidence: 0.85,
       measureMode: isMeasureMode,
     });
+    brainStateRef.current = outcome.nextState;
     setBrainState(outcome.nextState);
     if (isMeasureMode) {
       playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
@@ -1603,6 +1616,11 @@ export default function App() {
         targetLang: activeScenario.targetLang,
         locale,
         measureMode: isMeasureMode,
+        learnerDossier: buildBraincoreCognitiveDossier(
+          brainStateRef.current,
+          activeScenario,
+          locale
+        ),
         history: turns.slice(-6).map((tItem) => ({
           speaker: tItem.speaker,
           text: tItem.text,
@@ -2648,6 +2666,29 @@ export default function App() {
                     .join('\n')}\nCRITICAL MEMORY DIRECTIVE: If the learner asks about past topics or previous conversations (e.g. "Do you remember what about our previous conversation?" or mentions what they are building or working on), YOU MUST warmly and specifically recall the exact facts they mentioned above (such as building a language app, BKT algorithm, English/Japanese focus, school pilot testing, etc.)! Never say you just met or forgot!`
                 : '';
 
+            const cognitiveDossier = buildBraincoreCognitiveDossier(
+              brainStateRef.current,
+              activeScenario,
+              locale
+            );
+
+            const allowedAsrLangs =
+              activeScenario.targetLang === 'ja'
+                ? ['ja-JP', locale === 'th' ? 'th-TH' : 'id-ID']
+                : ['en-US', locale === 'th' ? 'th-TH' : 'id-ID'];
+            const customVocabTerms = Array.from(
+              new Set([
+                'Fiezel',
+                'Mochi',
+                'Sensei Nanami',
+                'Keita Senpai',
+                'Coach Alex',
+                'Coach Sarah',
+                'Braincore',
+                ...activeScenario.vocabPrereqs.map((v) => v.term),
+              ])
+            ).slice(0, 32);
+
             const pacingDirective =
               speechRate <= 0.95
                 ? `\n\n[MANDATORY PACING & ENUNCIATION FOR LEARNER]: You are speaking to a language learner. Speak at a CALM, RELAXED, UNHURRIED, and GENTLE pace (around 0.85x speed). Articulate every syllable, mora, and grammatical particle (such as は, が, を, に, で) with crystal-clear clarity. Insert natural breathing pauses between phrases so the learner can easily follow and understand every word without feeling rushed. NEVER rush your words.`
@@ -2670,11 +2711,14 @@ export default function App() {
                     },
                   },
                   outputAudioTranscription: {},
-                  inputAudioTranscription: {},
+                  inputAudioTranscription: {
+                    languageCodes: allowedAsrLangs,
+                    customVocabulary: customVocabTerms,
+                  },
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak with your signature sassy tough-love personality (roasting stiffness playfully, dropping colloquial phrasing, no robotic formality, leading every turn with a sassy reaction) as ${activePersona.name}. Keep in character.${pacingDirective}${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: a "Guru Galak Tapi Penuh Perhatian" (sharp, witty, deeply caring mentor). Intercept spoken grammar/particle/tense errors immediately with contextual tough-love and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Keep 85%+ of turns composed without forced every-turn laughter ("Haha/あはは"), and shift accents/dialects naturally when teaching or demonstrating contrast.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
                       },
                     ],
                   },
@@ -2737,9 +2781,14 @@ export default function App() {
             const hasUserSpoken = turnsRef.current.some((t) => t.speaker === 'user');
             if (!isReconnect && isGoogleLive) {
               callBillingRef.current.turnMetered = false;
+              const dualMem = brainStateRef.current.dualBrainMemory;
+              const priorSessionsCount = dualMem?.mentorBrain?.sessionSummaries?.length || 0;
+              const nextFocusNote = dualMem?.mentorBrain?.activeFocusAssignment || '';
               const greetingDirective = hasUserSpoken
-                ? `[Instruction: The learner just called you back! Greet them warmly in 1-2 short, natural sentences with your signature witty personality as ${activePersona.name} in "${activeScenario.titleId}", briefly acknowledging your ongoing conversation above and asking a fun follow-up question so they can reply immediately.]`
-                : `[Instruction: Please begin our conversation now with your signature sassy, witty greeting as ${activePersona.name} in scenario "${activeScenario.titleId}". Say your opening line: "${activePersona.openingGreeting || activeScenario.openingLine}"]`;
+                ? `[Instruction: The learner just called you back! Greet them naturally in 1-2 short, composed sentences as ${activePersona.name} in "${activeScenario.titleId}", briefly acknowledging your ongoing conversation above and asking a sharp follow-up question so they can reply immediately. Do NOT start with forced "Haha!" laughter.]`
+                : priorSessionsCount > 0 && nextFocusNote
+                ? `[Instruction: Begin our call now as ${activePersona.name} in scenario "${activeScenario.titleId}". Deliver your opening greeting ("${activePersona.openingGreeting || activeScenario.openingLine}") with composed mentor authority (no forced "Haha!"), and briefly remind the learner of today's Braincore focus: ${nextFocusNote}]`
+                : `[Instruction: Begin our conversation now with composed, sharp, caring mentor energy as ${activePersona.name} in scenario "${activeScenario.titleId}" (do NOT start with forced "Haha!"). Say your opening line: "${activePersona.openingGreeting || activeScenario.openingLine}"]`;
               try {
                 ws.send(
                   JSON.stringify({
@@ -2867,12 +2916,28 @@ export default function App() {
             setAiAudioPlaying(false, 0);
           }
 
-          // Real-time transcriptions
+          // Real-time transcriptions (with Acoustic & Script Lock against Russian/foreign ASR hallucinations)
           if (msg.serverContent?.inputTranscription?.text) {
-            liveUserDraftRef.current += msg.serverContent.inputTranscription.text;
-            setLiveUserDraft(liveUserDraftRef.current);
+            const cleanChunk = sanitizeHallucinatedTranscript(
+              msg.serverContent.inputTranscription.text,
+              activeScenario.targetLang,
+              locale
+            );
+            if (cleanChunk) {
+              liveUserDraftRef.current = sanitizeHallucinatedTranscript(
+                liveUserDraftRef.current + msg.serverContent.inputTranscription.text,
+                activeScenario.targetLang,
+                locale
+              );
+              setLiveUserDraft(liveUserDraftRef.current);
+            }
           } else if (msg.type === 'input_transcription' || msg.type === 'user_transcript') {
-            liveUserDraftRef.current = msg.fullText || msg.text || '';
+            const cleanFull = sanitizeHallucinatedTranscript(
+              msg.fullText || msg.text || '',
+              activeScenario.targetLang,
+              locale
+            );
+            liveUserDraftRef.current = cleanFull;
             setLiveUserDraft(liveUserDraftRef.current);
           }
 
@@ -2958,7 +3023,11 @@ export default function App() {
               copilotEarlyTimerRef.current = null;
             }
             liveEarlyCopilotTriggeredRef.current = false;
-            const uText = (liveUserDraftRef.current || msg.userTranscript || '').trim();
+            const uText = sanitizeHallucinatedTranscript(
+              liveUserDraftRef.current || msg.userTranscript || '',
+              activeScenario.targetLang,
+              locale
+            ).trim();
             const aText = (liveAiDraftRef.current || msg.aiTranscript || '').trim();
             liveUserDraftRef.current = '';
             liveAiDraftRef.current = '';
@@ -2974,6 +3043,11 @@ export default function App() {
                 targetLang: activeScenario.targetLang,
                 locale,
                 measureMode: isMeasureMode,
+                learnerDossier: buildBraincoreCognitiveDossier(
+                  brainStateRef.current,
+                  activeScenario,
+                  locale
+                ),
                 history: turnsRef.current.slice(-6).map((tItem) => ({
                   speaker: tItem.speaker,
                   text: tItem.text,
@@ -2997,6 +3071,7 @@ export default function App() {
                 confidence: 0.85,
                 measureMode: isMeasureMode,
               });
+              brainStateRef.current = outcome.nextState;
               setBrainState(outcome.nextState);
               if (isMeasureMode) {
                 playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
@@ -3317,6 +3392,20 @@ export default function App() {
     setIsLiveConnected(false);
     setIsLiveConnecting(false);
     setIsPlayingAiAudio(false);
+    if (turnsRef.current.some((t) => t.speaker === 'user')) {
+      try {
+        const updatedBrain = finalizeCallSessionMemory(brainStateRef.current, {
+          scenario: activeScenario,
+          personaId: activePersona.id,
+          turns: turnsRef.current,
+          durationSec: callDurationSec,
+        });
+        brainStateRef.current = updatedBrain;
+        setBrainState(updatedBrain);
+      } catch {
+        // Ignore
+      }
+    }
   };
 
   const toggleMuteMic = async () => {

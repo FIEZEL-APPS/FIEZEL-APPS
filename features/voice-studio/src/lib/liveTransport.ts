@@ -831,6 +831,78 @@ export function synthesizeNaturalReformulation(
 }
 
 /**
+ * Acoustic & Script Sanitizer — Rejects Russian/Cyrillic and unrelated foreign-script ASR hallucinations
+ * before they can pollute live transcripts, trigger Russian replies, or enter Braincore memory.
+ */
+export function sanitizeHallucinatedTranscript(
+  rawText: string,
+  targetLang: TargetLang = 'ja',
+  locale: LearnerLocale = 'id'
+): string {
+  const text = String(rawText || '');
+  if (!text.trim()) return '';
+
+  // Forbidden scripts that indicate unconstrained multilingual ASR misfire (Cyrillic, Arabic, Devanagari, Hangul, Hebrew, Greek)
+  const forbiddenScriptRegex =
+    /[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F\uAC00-\uD7AF\u1100-\u11FF]/g;
+
+  const forbiddenMatches = text.match(forbiddenScriptRegex);
+  if (forbiddenMatches && forbiddenMatches.length > 0) {
+    const stripped = text.replace(forbiddenScriptRegex, ' ').replace(/\s{2,}/g, ' ').trim();
+    // If no valid Latin/Japanese/Thai letters remain (or it was predominantly Cyrillic/foreign), reject completely
+    const validScriptRegex =
+      targetLang === 'ja'
+        ? locale === 'th'
+          ? /[A-Za-z\u3040-\u30FF\u4E00-\u9FAF\u0E00-\u0E7F]/g
+          : /[A-Za-z\u3040-\u30FF\u4E00-\u9FAF]/g
+        : locale === 'th'
+          ? /[A-Za-z\u0E00-\u0E7F]/g
+          : /[A-Za-z]/g;
+    const validMatches = stripped.match(validScriptRegex) || [];
+    if (validMatches.length < 2 || forbiddenMatches.length >= validMatches.length) {
+      return '';
+    }
+    return stripped;
+  }
+
+  // If locale is Indonesian ('id'), Thai script should also be stripped from ASR hallucinations
+  if (locale !== 'th' && /[\u0E00-\u0E7F]/.test(text)) {
+    const stripped = text.replace(/[\u0E00-\u0E7F]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+    return stripped.length >= 2 ? stripped : '';
+  }
+
+  return text;
+}
+
+/**
+ * Classic TTS Sanitizer — Removes literal laugh tokens ("haha", "wkwk", "あはは") before sending
+ * to classical `/api/tts/line` (Edge-TTS) so the synthesizer never spells out robotic laughter.
+ */
+export function sanitizeSpokenTextForClassicTts(
+  rawText: string,
+  targetLang: TargetLang
+): string {
+  let clean = stripEmojisAndEmotWords(rawText).trim();
+  if (!clean) return '';
+  if (targetLang === 'ja') {
+    clean = clean
+      .replace(/^(?:あはは+|アハハ+|ハハハ+|ふふふ+|フフフ+|えへへ+)[！!、,。\s]*/u, '')
+      .replace(/[（(]\s*(?:笑|わら|w+)\s*[）)]/giu, '')
+      .trim();
+  } else {
+    clean = clean
+      .replace(/^(?:ha\s*ha(?:\s*ha)*|he\s*he|hahaha+|haha+|hehe+|wkwk(?:wk)*)[!,.\s—-]*/i, '')
+      .replace(/\b(?:hahaha+|haha|hehe|wkwk(?:wk)*)\b[!,.\s]*/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    if (clean.length > 0 && /^[a-z]/.test(clean)) {
+      clean = clean.charAt(0).toUpperCase() + clean.slice(1);
+    }
+  }
+  return clean || stripEmojisAndEmotWords(rawText).trim();
+}
+
+/**
  * Client-side pedagogical evaluator enforcing the FIEZEL Braincore Zero-Dumbing Invariant:
  * - Zero false praise (`ok: false` whenever morphological, syntactic, particle, or pragmatic misconceptions occur)
  * - Exact `misconceptionId`, `whyFailsId`, `whyFailsTh`, and `syntacticCorrection`
@@ -880,6 +952,12 @@ export function evaluateUtteranceClientSide(params: {
     const hasModalToError = /\b(can\s+to|must\s+to|should\s+to|will\s+to|would\s+to|could\s+to)\b/i.test(
       lower
     );
+    const hasPossessiveMineNoun =
+      /\bmine\s+(job|jobe|work|house|home|friend|friends|family|brother|sister|car|school|office|hobby|life|name|team|project|idea)\b/i.test(
+        lower
+      );
+    const hasItIsLookOrSimilarWith =
+      /\b(it\s+is\s+look|it's\s+look|similar\s+with)\b/i.test(lower);
     const hasBareWantRequest =
       /\b(i\s+want\s+(hot\s+|iced\s+|a\s+)?(coffee|tea|latte|water|cake|drink|food)|give\s+me\s+coffee)\b/i.test(
         lower
@@ -957,6 +1035,8 @@ export function evaluateUtteranceClientSide(params: {
       hasBrokenWordOrderOrPrep ||
       hasPastTenseError ||
       hasModalToError ||
+      hasPossessiveMineNoun ||
+      hasItIsLookOrSimilarWith ||
       hasBareWantRequest ||
       isTooShort ||
       isOffTopicOrGibberish
@@ -985,16 +1065,16 @@ export function evaluateUtteranceClientSide(params: {
         syntacticCorrection =
           "I'd like a hot coffee, please. After this, I am meeting my friend at the library.";
       } else if (hasBePlusBaseVerb) {
-        misconceptionId = 'EN_REDUNDANT_BE_BEFORE_VERB';
+        misconceptionId = 'stative_verb_continuous';
         whyFailsId =
-          'Miskonsepsi To Be + Kata Kerja Dasar: Jangan menaruh "am/is/are" di depan kata kerja murni seperti "want" atau "agree". Gunakan langsung "I agree..." atau bentuk sopan "I would like...".';
+          'Miskonsepsi To Be + Kata Kerja Dasar: Jangan menaruh "am/is/are" di depan kata kerja murni seperti "want", "think", atau "agree". Gunakan langsung "I agree...", "I think...", atau bentuk sopan "I would like...".';
         whyFailsTh =
-          'ความเข้าใจผิดเรื่อง To Be + กริยาแท้: ห้ามใส่ "am/is/are" หน้ากริยาแท้ เช่น want หรือ agree ให้ใช้ "I agree..." หรือ "I would like..."';
+          'ความเข้าใจผิดเรื่อง To Be + กริยาแท้: ห้ามใส่ "am/is/are" หน้ากริยาแท้ เช่น want, think หรือ agree ให้ใช้ "I agree..." หรือ "I would like..."';
         syntacticCorrection = scenarioId.includes('ielts')
           ? 'I agree that remote work is good because it saves commuting time.'
           : "I'd like a hot coffee, please.";
       } else if (hasDoubleConjunction) {
-        misconceptionId = 'EN_DOUBLE_CONJUNCTION_ALTHOUGH_BUT';
+        misconceptionId = 'double_conjunction_although_but';
         whyFailsId =
           'Miskonsepsi Konjungsi Ganda (Although ... but): Dalam tata bahasa Inggris, klausa yang diawali "Although" tidak boleh diikuti "but" pada klausa utama. Hapus kata "but".';
         whyFailsTh =
@@ -1002,7 +1082,7 @@ export function evaluateUtteranceClientSide(params: {
         syntacticCorrection =
           'Although remote work saves commuting time, employees can feel lonely at home.';
       } else if (hasMissingAuxProgressive) {
-        misconceptionId = 'EN_MISSING_BE_AUX_PROGRESSIVE';
+        misconceptionId = 'missing_be_auxiliary_continuous';
         whyFailsId =
           'Miskonsepsi Present Continuous Tanpa Auxiliary (To Be): Kata kerja "-ing" (seperti "meeting" / "going") wajib didahului "am/is/are" ("I am meeting...").';
         whyFailsTh =
@@ -1018,13 +1098,27 @@ export function evaluateUtteranceClientSide(params: {
         syntacticCorrection =
           'Yesterday I went to Bandung with my family, and I was very happy.';
       } else if (hasPastTenseError) {
-        misconceptionId = 'EN_PAST_TENSE_IRREGULAR_OR_BASE';
+        misconceptionId = 'past_tense_irregular_goed';
         whyFailsId =
           'Miskonsepsi Morfologi Past Simple: Untuk menceritakan pengalaman lampau, gunakan kata kerja bentuk kedua (V2 irregular: "went", "bought", "ate", bukan "go/goed", "buy/buyed", atau "eat/eated").';
         whyFailsTh =
           'ความเข้าใจผิดเรื่อง Past Simple: เมื่อเล่าเหตุการณ์ในอดีต ต้องใช้กริยาช่องที่ 2 (went, bought, ate ไม่ใช่ go/goed หรือ eat/eated)';
         syntacticCorrection =
           'Last weekend I went to Bandung with my family and we ate delicious local food.';
+      } else if (hasPossessiveMineNoun) {
+        misconceptionId = 'possessive_pronoun_mine_noun';
+        whyFailsId =
+          'Miskonsepsi Kata Ganti Kepemilikan: Jangan gunakan "mine" di depan kata benda (seperti "mine job"). Gunakan possessive determiner "my" sebelum kata benda ("my job").';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่องคำแสดงความเป็นเจ้าของ: ห้ามใช้ "mine" หน้าคำนามโดยตรง ให้ใช้ "my" หน้าคำนาม ("my job")';
+        syntacticCorrection = 'I like my job.';
+      } else if (hasItIsLookOrSimilarWith) {
+        misconceptionId = 'preposition_collocation_similar_with';
+        whyFailsId =
+          'Miskonsepsi Verba Kopula & Preposisi Pasangan: Jangan gunakan "it is look" (gunakan "it looks") dan pasangan tepat untuk "similar" adalah "similar to" (bukan "similar with").';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่องกริยาและบุพบท: ห้ามใช้ "it is look" (ต้องใช้ "it looks") และคำว่า "similar" ต้องคู่กับ "to" ("similar to")';
+        syntacticCorrection = 'It looks similar to Duolingo.';
       } else if (hasBareWantRequest) {
         misconceptionId = 'EN_PRAGMATIC_BARE_WANT';
         whyFailsId =
@@ -1034,7 +1128,7 @@ export function evaluateUtteranceClientSide(params: {
         syntacticCorrection =
           "I'd like an iced latte, please. Afterward, I plan to read at the library.";
       } else if (hasSubjectDrop || hasModalToError) {
-        misconceptionId = 'EN_CLAUSE_SUBJECT_OMISSION';
+        misconceptionId = hasModalToError ? 'modal_plus_to_infinitive' : 'EN_CLAUSE_SUBJECT_OMISSION';
         whyFailsId =
           'Miskonsepsi Sintaksis Klausa: Kata hubung "because" wajib diikuti Subjek eksplisit ("because it is..."), dan modal verb tidak boleh diikuti "to".';
         whyFailsTh =
@@ -1064,14 +1158,12 @@ export function evaluateUtteranceClientSide(params: {
       }
 
       const aiReply = scenarioId.includes('cafe')
-        ? 'I see! To make your sentence natural and grammatically accurate, try using "I would like..." and "I am meeting... at the library." Could you try saying it again?'
+        ? `Hold on! Drop the direct translation—use "I would like..." and "I am meeting... at the library." Say it back to me cleanly right now: "${syntacticCorrection}"`
         : scenarioId.includes('past') || scenarioId.includes('weekend')
-          ? 'Nice try! Remember to start with the subject "I" followed by the past tense verb like "went to..." and "ate...". Could you tell me again about your trip?'
+          ? `Wait right there! For past events, use the real past tense verb like "went to..." and "ate...". Repeat this sentence aloud first: "${syntacticCorrection}"`
           : scenarioId.includes('ielts')
-            ? 'Good point! Just a quick grammar tip: say "I agree" (without "am") and avoid using "Although" together with "but". Could you rephrase your argument?'
-            : scenarioId.includes('free')
-              ? 'Haha, I hear you! Could you say that again in a full sentence so I can catch every word?'
-              : 'Good effort! Try expressing that again using the suggested sentence structure so your meaning is clear.';
+            ? `Hold on—let's fix that grammar slip right now: say "I agree" (never "I am agree") and don't pair "Although" with "but". Repeat cleanly: "${syntacticCorrection}"`
+            : `Hold on, your grammar slipped there! Don't translate word-by-word in your head. Repeat this natural sentence out loud right now: "${syntacticCorrection}"`;
 
       return {
         ok: false,
@@ -1096,16 +1188,14 @@ export function evaluateUtteranceClientSide(params: {
         }`,
         aiReply,
         aiReplyTranslationId: scenarioId.includes('cafe')
-          ? 'Begitu! Agar kalimatmu alami dan tepat secara tata bahasa, coba gunakan "I would like..." serta "I am meeting... at the library." Bisa coba ucapkan sekali lagi?'
+          ? `Tunggu dulu! Jangan terjemahkan mentah—gunakan "I would like..." serta "I am meeting... at the library." Coba ulangi kalimat yang benar sekarang: "${syntacticCorrection}"`
           : scenarioId.includes('past') || scenarioId.includes('weekend')
-            ? 'Usaha yang bagus! Ingat untuk mengawali dengan subjek "I" diikuti kata kerja lampau seperti "went to..." dan "ate...". Bisa ceritakan lagi perjalananmu?'
+            ? `Stop sebentar! Untuk cerita masa lalu, wajib pakai kata kerja lampau V2 seperti "went to..." dan "ate...". Ulangi dengan lantang dulu: "${syntacticCorrection}"`
             : scenarioId.includes('ielts')
-              ? 'Poin yang menarik! Catatan tata bahasa singkat: gunakan "I agree" (tanpa "am") dan jangan gunakan "Although" bersamaan dengan "but". Bisa ucapkan ulang argumenmu?'
-              : scenarioId.includes('free')
-                ? 'Haha, aku mengerti maksudmu! Bisa coba ucapkan lagi dalam kalimat utuh biar aku bisa dengar setiap katanya?'
-                : 'Usaha yang bagus! Coba ucapkan kembali dengan pola kalimat yang disarankan agar maknanya jelas.',
+              ? `Tunggu dulu—kita luruskan grammar-mu sekarang: katakan "I agree" (tanpa "am") dan jangan gabungkan "Although" dengan "but". Ulangi dengan bersih: "${syntacticCorrection}"`
+              : `Tunggu sebentar, grammar-mu meleset! Jangan terjemahkan kata-per-kata di kepala. Coba ulangi kalimat natural ini sekarang: "${syntacticCorrection}"`,
         aiReplyTranslationTh:
-          'ลองพูดอีกครั้งตามโครงสร้างประโยคที่แนะนำเพื่อให้ถูกต้องตามหลักไวยากรณ์นะ',
+          'เดี๋ยวก่อน ไวยากรณ์ยังคลาดเคลื่อนอยู่ ลองพูดทวนประโยคที่ถูกต้องตามคำแนะนำนี้อีกครั้งนะ',
         nextSuggestedReplies: [],
       };
     }
@@ -1148,6 +1238,19 @@ export function evaluateUtteranceClientSide(params: {
       exact
     ) || /\b(nomu|taberu|iku|kuru|suru|miru|kau|yomu)\s+desu\b/i.test(lower);
 
+  const hasPolitePastMasuDeshita =
+    /(行きます|食べます|飲みます|見ます|言います|します|来ます|買います|読みます|書きます|話します|勉強します)でした/u.test(
+      exact
+    ) || /\b(ikimasu|tabemasu|nomimasu|shimasu|kimasu)\s+deshita\b/i.test(lower);
+
+  const hasIAdjPastDeshita =
+    /(美味しい|おいしい|いい|良い|忙しい|楽しい|面白い|難しい|易しい|高い|安い|暑い|寒い)でした/u.test(
+      exact
+    ) || /\b(oishii|ii|tanoshii|isogashii|muzukashii)\s+deshita\b/i.test(lower);
+
+  const hasOverusedWatashiWa =
+    (exact.match(/私は|わたしは|\bwatashi\s+wa\b/gi) || []).length >= 2;
+
   const hasWrongObjectParticle =
     /(コーヒー|紅茶|水|お茶|ラテ|ケーキ|パン|サンドイッチ|メニュー|注文)(に|が)(くだもの|一つ|二つ|お願い|ください|飲む|飲みます|食べる|食べます)/u.test(
       exact
@@ -1189,6 +1292,9 @@ export function evaluateUtteranceClientSide(params: {
 
   if (
     hasVerbDictPlusDesu ||
+    hasPolitePastMasuDeshita ||
+    hasIAdjPastDeshita ||
+    hasOverusedWatashiWa ||
     hasWrongObjectParticle ||
     hasWrongTaraConjugation ||
     hasWrongLocationParticle ||
@@ -1204,13 +1310,29 @@ export function evaluateUtteranceClientSide(params: {
     let syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
     const missingTokens: string[] = [];
 
-    if (hasVerbDictPlusDesu || hasWrongObjectParticle) {
+    if (hasPolitePastMasuDeshita) {
+      misconceptionId = 'polite_past_masu_deshita';
+      whyFailsId =
+        'Miskonsepsi Bentuk Lampau Sopan (×～ますでした): Kata kerja bentuk ～ます TIDAK BOLEH ditempel 「でした」 (seperti 「×食べますでした / ×行きますでした」). Ubah langsung akhiran ～ます menjadi 「～ました」（「○食べました / ○行きました」).';
+      whyFailsTh =
+        'ความเข้าใจผิดเรื่องรูปอดีตสุภาพ (×～ますでした): ห้ามเติม 「でした」 หลังกริยารูป ～ます โดยตรง ต้องผันเป็น 「～ました」（「○食べました / ○行きました」）';
+      syntacticCorrection = synthesizeNaturalReformulation(exact, 'ja', misconceptionId);
+      missingTokens.push('～ました (bukan ～ますでした)');
+    } else if (hasIAdjPastDeshita) {
+      misconceptionId = 'i_adj_past_deshita';
+      whyFailsId =
+        'Miskonsepsi Kata Sifat-い Lampau (×～いでした): Kata sifat berakhiran い (seperti 美味しい / いい) tidak boleh langsung diikuti 「でした」. Ubah akhiran い menjadi 「かったです」（「○美味しかったです / ○よかったです」).';
+      whyFailsTh =
+        'ความเข้าใจผิดเรื่องคำคุณศัพท์ -い รูปอดีต: ห้ามวาง 「でした」 หลังคำคุณศัพท์ -い โดยตรง ต้องเปลี่ยน い เป็น 「かったです」（「○美味しかったです」）';
+      syntacticCorrection = synthesizeNaturalReformulation(exact, 'ja', misconceptionId);
+      missingTokens.push('～かったです (bukan ～いでした)');
+    } else if (hasVerbDictPlusDesu || hasWrongObjectParticle) {
       misconceptionId =
         hasVerbDictPlusDesu && hasWrongObjectParticle
           ? 'JA_PARTICLE_NI_AND_VERB_DICT_DESU'
           : hasVerbDictPlusDesu
-            ? 'JA_MORPH_VERB_DICT_PLUS_DESU'
-            : 'JA_PARTICLE_DIRECT_OBJECT_O';
+            ? 'verb_plus_desu'
+            : 'particle_o_missing';
       whyFailsId =
         'Miskonsepsi Partikel Objek & Konjugasi Masu-kei: (1) Objek pesanan wajib ditandai partikel 「を」 (bukan 「に」). (2) Kata kerja bentuk kamus seperti 「飲む」 TIDAK BOLEH langsung ditambah 「です」（「×飲むです」 salah; gunakan 「飲みます」 atau pola pesanan sopan 「ホットコーヒーを一つお願いします」).';
       whyFailsTh =
@@ -1218,7 +1340,7 @@ export function evaluateUtteranceClientSide(params: {
       syntacticCorrection = 'ホットコーヒーを一つお願いします。';
       missingTokens.push('を (partikel objek)', '〜をお願いします / 飲みます');
     } else if (hasWrongTaraConjugation) {
-      misconceptionId = 'JA_CONJUGATION_TARA_TA_FORM';
+      misconceptionId = 'tara_conditional_conjugation';
       whyFailsId =
         'Miskonsepsi Konjugasi Pengandaian/Saran (〜たら): Pola 「〜たらいいですか」 wajib dibentuk dari Ta-form (bentuk lampau biasa), bukan bentuk kamus + たら. Ubah 「×勉強するたら」 menjadi 「○勉強したら」（する → した + ら = したら）dan tambahkan 「どうやって」 untuk menanyakan cara.';
       whyFailsTh =
@@ -1226,7 +1348,7 @@ export function evaluateUtteranceClientSide(params: {
       syntacticCorrection = '来週テストがあるので、どうやって勉強したらいいですか？';
       missingTokens.push('勉強したら (Ta-form + ら)', 'どうやって');
     } else if (hasWrongLocationParticle) {
-      misconceptionId = 'JA_PARTICLE_NI_VS_DE_OR_WA';
+      misconceptionId = 'particle_confusion_ni_de';
       whyFailsId =
         'Miskonsepsi Partikel Lokasi Aktivitas: Untuk tempat berlangsungnya aksi aktif (seperti belajar atau minum di kafe), gunakan partikel 「で」 (mis. 「図書館で勉強します」), bukan 「に」.';
       whyFailsTh =
@@ -1235,6 +1357,13 @@ export function evaluateUtteranceClientSide(params: {
         ? '図書館で一緒に勉強してもいいですか？'
         : '店内でホットコーヒーを飲みます。';
       missingTokens.push('で (partikel lokasi aksi)');
+    } else if (hasOverusedWatashiWa) {
+      misconceptionId = 'overuse_watashi_wa';
+      whyFailsId =
+        'Kebiasaan Kaku Buku Teks (Mengulang 私は): Dalam percakapan Jepang alami, jangan mengulang 「私は (watashi wa)」 di setiap kalimat bila subjek pembicara sudah jelas.';
+      whyFailsTh =
+        'การพูด 私は (watashi wa) ซ้ำทุกประโยคทำให้ฟังดูแข็งทื่อเหมือนตำราเรียน ในภาษาญี่ปุ่นธรรมชาติสามารถละประธานเมื่อรู้กันอยู่แล้วได้';
+      syntacticCorrection = exact.replace(/(?:私は|わたしは)\s*/g, '').trim() || exact;
     } else if (isGibberishJa || isTooShortJa) {
       misconceptionId = 'JA_OFF_TOPIC_OR_INCOMPLETE';
       whyFailsId =
@@ -1258,12 +1387,8 @@ export function evaluateUtteranceClientSide(params: {
     }
 
     const aiReply = scenarioId.includes('senpai')
-      ? 'なるほど！テストの相談ですね。「勉強するたら」ではなく、タ形を使って「どうやって勉強したらいいですか？」と言ってみましょう！もう一度どうぞ。'
-      : scenarioId.includes('free')
-        ? (lacksPoliteEnding
-            ? 'なるほど！丁寧な表現として、文末に「〜です」や「〜ます」をつけてもう一度言ってみましょう！'
-            : 'なるほど！もう一度ゆっくり話してみてね。どんなことでも大歓迎だよ！')
-        : 'なるほど！注文するときは助詞の「を」を使って、「ホットコーヒーを一つお願いします」や「飲みます」と言ってみましょうか？';
+      ? `ちょっと待った！「勉強するたら」じゃなくて、タ形を使って「${syntacticCorrection}」って言ってみて！もう一回どうぞ！`
+      : `ちょっと待って、今の文法はおかしいわよ！正しくは「${syntacticCorrection}」よ。ほら、今すぐもう一回声に出して言ってみて！`;
 
     return {
       ok: false,
@@ -1282,14 +1407,10 @@ export function evaluateUtteranceClientSide(params: {
       pedagogicalFeedbackTh: whyFailsTh,
       aiReply,
       aiReplyTranslationId: scenarioId.includes('senpai')
-        ? 'Begitu! Konsultasi soal ujian ya. Bukan "benkyou suru tara", melainkan gunakan bentuk lampau (Ta-form) menjadi "dou yatte benkyou shitara ii desu ka?". Yuk coba ucapkan sekali lagi!'
-        : scenarioId.includes('free')
-          ? (lacksPoliteEnding
-              ? 'Begitu! Untuk ungkapan sopan, yuk coba akhiri kalimat dengan "~desu" atau "~masu" sekali lagi!'
-              : 'Begitu! Yuk coba bicara sekali lagi dengan santai. Cerita apa saja boleh kok!')
-          : 'Begitu! Saat memesan, mari gunakan partikel objek "o" menjadi "Hotto kōhī o hitotsu onegaishimasu" atau "nomimasu". Yuk coba ucapkan lagi!',
+        ? `Tunggu dulu! Bukan "benkyou suru tara", tapi pakai bentuk Ta menjadi "${syntacticCorrection}". Ayo coba ulangi sekali lagi sekarang!`
+        : `Tunggu sebentar, grammar-mu barusan keliru! Yang benar adalah "${syntacticCorrection}". Ayo, langsung ucapkan ulang kalimat yang benar sekarang!`,
       aiReplyTranslationTh:
-        'เข้าใจแล้วค่ะ! ลองพูดใหม่อีกครั้งโดยใช้โครงสร้างและคำช่วยที่ถูกต้องตามคำแนะนำนะคะ',
+        'เดี๋ยวก่อน ไวยากรณ์เมื่อกี้ผิดนะ! ต้องพูดว่า "' + syntacticCorrection + '" ลองพูดทวนอีกครั้งเดี๋ยวนี้เลย!',
       nextSuggestedReplies: [],
     };
   }
@@ -1651,6 +1772,7 @@ export interface TurnEvaluationParams {
   locale: LearnerLocale;
   measureMode: boolean;
   history: Array<{ speaker: 'ai' | 'user'; text: string }>;
+  learnerDossier?: string;
 }
 
 /**
@@ -1707,6 +1829,7 @@ export async function resolveAiReply(
           targetLang: params.targetLang,
           locale: params.locale,
           history: params.history.slice(-6),
+          learnerDossier: params.learnerDossier || undefined,
         }),
         mode: 'cors',
         signal: controller.signal,
@@ -1784,15 +1907,22 @@ export async function resolveAiReply(
         .slice(-6)
         .map((h) => `${h.speaker === 'ai' ? 'You' : 'Learner'}: ${h.text.trim().slice(0, 240)}`);
       const promptText = [
-        `You are ${params.persona.name}, a witty, tough-love speaking mentor in FIEZEL. Scenario: "${params.scenario.titleId}".`,
+        `You are ${params.persona.name}, a sharp, observant, deeply caring speaking mentor ("guru galak tapi penuh perhatian") in FIEZEL. Scenario: "${params.scenario.titleId}".`,
         `[FIEZEL ECOSYSTEM & IDENTITY]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh; powered by Braincore Engine; mascot is Mochi the Daifuku cat.`,
-        `[WHY FIEZEL CRUSHES CHATGPT VOICE]: ChatGPT Voice is 'blind audio' (no subtitles, no hints, no Kanji phonetics) where users waste 70% of time in 'The Interruption Trap' asking for translations. FIEZEL gives Zero-Friction Flow: instant subtitles & translations, Furigana & Romaji phonetics for Kanji, and 3 beginner answer hints with audio preview, training vocal muscles 100% of the time! If asked about Fiezel or ChatGPT vs Fiezel, articulate this passionately in character!`,
-        `[MANDATORY SASSY REACTION DIRECTIVE]: Do not talk like a stiff corporate robot. Every turn MUST start with an expressive 1-3 word vocal reaction or sassy banter matching ${params.persona.name} (Nanami: "あら？ちょっと硬すぎ！", "あはは！カチコチじゃん！", "えーっ！教科書丸出し！"; Keita: "マジで！？ウケる！", "ちょ、硬い硬い！リラックスして！"; Alex: "Haha, whoa! Stiff as a board!", "Come on, don't overthink in your head!"; Sarah: "A bit roundabout, don't you think?", "Direct and sharp—much better!"). Playfully roast stiff textbook habits ("kanebo kering", overusing "watashi wa", word-by-word translation), then IMMEDIATELY provide the punchy ultra-natural native phrase! Praise natural speech proudly ("Nah gitu dong!").`,
-        `Reply in ${langLabel}, 1-2 lively conversational sentences (max 18 words) directly reacting to the learner and asking a follow-up question.`,
+        `[WHY FIEZEL CRUSHES CHATGPT VOICE]: ChatGPT Voice is 'blind audio' (no subtitles, no hints, no Kanji phonetics) where users waste 70% of time in 'The Interruption Trap' asking for translations. FIEZEL gives Zero-Friction Flow: instant subtitles & translations, Furigana & Romaji phonetics for Kanji, and 3 beginner answer hints with audio preview, training vocal muscles 100% of the time!`,
+        params.learnerDossier || '',
+        `[RUTHLESS CARING MENTOR & MANDATORY LIVE GRAMMAR INTERCEPTION]:
+- NEVER laugh on every turn! Do NOT start replies with "Haha!" or "あはは！". Stay composed, sharp, and genuinely attentive.
+- ZERO SILENT PASS ON GRAMMAR ERRORS: If the learner's last message has ANY grammar, particle, conjugation, or tense error (e.g. "×食べますでした", "×行くです/飲むです", "×美味しいでした", "×図書館に勉強する", "×勉強するたら", "×I am agree", "×I am want", "×I meeting", "×goed / ×eat yesterday", "×Although... but...", "×mine job", "×similar with", or word-by-word translation), STOP them immediately!
+  1) Call out the exact grammar slip with dry, contextual tough-love wit (never insult their dignity; if they admit "aku belum tahu", teach warmly).
+  2) Give the exact natural native sentence.
+  3) Demand ECHO REDEMPTION: require them to repeat the corrected sentence out loud right now ("Coba ulangi sekali lagi: '...'!" / "もう一回言ってみて：『...』！" / "Say it back to me cleanly right now: '...'!"), and make Option 1 ("easy") in "replies" that exact corrected sentence!
+- If the learner's grammar is clean and natural, praise them with earned mentor pride and advance the conversation with a sharp question or dialect/accent nuance.`,
+        `Reply in ${langLabel}, 1-3 punchy spoken sentences (max 25 words).`,
         'ABSOLUTE BAN ON EMOJIS & EMOTICONS: Pure clean spoken words only.',
         historyLines.length ? `Conversation so far:\n${historyLines.join('\n')}` : '',
         `Learner (last message): "${params.text}"`,
-        'Also generate "replies": 3 real-time spoken reply suggestions (easy, mission, rescue) that directly answer YOUR new aiReply (never generic templates).',
+        'Also generate "replies": 3 real-time spoken reply suggestions (easy, mission, rescue) that directly answer YOUR new aiReply (if you demanded Echo Redemption of a corrected sentence, Option 1 "easy" MUST be that exact corrected sentence!).',
         `Respond ONLY with valid JSON: {"aiReply":"...","aiReplyTranslationId":"...","aiReplyTranslationTh":"...","replies":[{"tier":"easy","badgeId":"Singkat & Mudah","badgeTh":"สั้นและง่าย","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"mission","badgeId":"Alami & Kontekstual","badgeTh":"เป็นธรรมชาติ","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."},{"tier":"rescue","badgeId":"Jawab + Tanya Balik","badgeTh":"ตอบและถามกลับ","text":"...","pronunciation":"...","hintId":"...","hintTh":"..."}]}`,
       ]
         .filter(Boolean)
@@ -2120,8 +2250,13 @@ export async function synthesizeViaGeminiLiveWav(params: {
   if (!wsEndpoint) return null;
 
   const voiceName =
-    params.persona?.geminiVoice || (params.targetLang === 'ja' ? 'Kore' : 'Puck');
+    params.persona?.geminiVoice || (params.targetLang === 'ja' ? 'Aoede' : 'Puck');
   const langLabel = params.targetLang === 'ja' ? 'natural Japanese' : 'natural English';
+  const personaStyle =
+    params.persona?.speakingStyle ||
+    (params.targetLang === 'ja'
+      ? 'Expressive, warm, sharp-witted Tokyo mentor with natural pitch accent and dynamic regional dialect capability'
+      : 'Expressive, charismatic native speaking coach with natural conversational rhythm');
 
   return new Promise((resolve) => {
     let settled = false;
@@ -2189,7 +2324,7 @@ export async function synthesizeViaGeminiLiveWav(params: {
               systemInstruction: {
                 parts: [
                   {
-                    text: `You are a native ${langLabel} voice actor. Read ONLY the exact text inside quotes verbatim with warm, natural human prosody. Never add extra words, greetings, or commentary.`,
+                    text: `You are ${params.persona?.name || 'a charismatic native mentor'}, performing spoken dialogue in ${langLabel}. Vocal profile: ${personaStyle}. Perform ONLY the exact line inside quotes with vivid human prosody, natural breath, and authentic emotional inflection. Never spell out literal laugh words like "h-a-h-a"—if a chuckle is present, render it acoustically as a subtle, genuine human sound. Never add extra words outside the quotes.`,
                   },
                 ],
               },
@@ -2218,7 +2353,7 @@ export async function synthesizeViaGeminiLiveWav(params: {
                     role: 'user',
                     parts: [
                       {
-                        text: `Read verbatim in ${langLabel}: "${cleanText}"`,
+                        text: `Perform naturally in ${langLabel}: "${cleanText}"`,
                       },
                     ],
                   },
@@ -2298,7 +2433,7 @@ export async function synthesizeFlexibleTts(params: {
   /** Retry path: ignore the short failure cooldown. */
   force?: boolean;
 }): Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> {
-  const cleanSpokenText = stripEmojisAndEmotWords(params.text).trim();
+  const cleanSpokenText = sanitizeSpokenTextForClassicTts(params.text, params.targetLang);
   if (!cleanSpokenText) return null;
 
   const speakerMap: Record<string, string> = {

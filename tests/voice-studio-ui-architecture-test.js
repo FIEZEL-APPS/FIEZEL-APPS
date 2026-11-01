@@ -153,6 +153,90 @@ expectedOrnaments.forEach(ornament => {
 });
 console.log('✓ All 5 official Fiezel brand ornaments verified.\n');
 
+// --- TEST 6: Ruthless Caring Mentor Pedagogy, Restrained Laughter & Dynamic Accent Shifting ---
+console.log('--- TEST 6: Ruthless Caring Mentor Pedagogy, Restrained Laughter & Dynamic Accent Shifting ---');
+const SCENARIOS_TS = path.join(VS_SRC, 'data', 'callScenarios.ts');
+const LIVE_TRANSPORT_TS = path.join(VS_SRC, 'lib', 'liveTransport.ts');
+const BRAINCORE_TS = path.join(VS_SRC, 'lib', 'braincore.ts');
+const ROUTE_VOICE_LIVE_JS = path.join(BASE_DIR, 'workers', 'api', 'voice', 'route-voice-live.js');
+
+const scenariosContent = fs.readFileSync(SCENARIOS_TS, 'utf-8');
+const liveTransportContent = fs.readFileSync(LIVE_TRANSPORT_TS, 'utf-8');
+const braincoreContent = fs.readFileSync(BRAINCORE_TS, 'utf-8');
+const routeVoiceLiveContent = fs.readFileSync(ROUTE_VOICE_LIVE_JS, 'utf-8');
+
+assert.ok(
+  scenariosContent.includes("id: 'nanami'") && scenariosContent.includes("geminiVoice: 'Aoede'"),
+  'Sensei Nanami uses Aoede Gemini Live voice for expressive vocal delivery'
+);
+assert.ok(
+  scenariosContent.includes('GLOBAL DIRECTIVE 1 — STRICT ACOUSTIC & LANGUAGE LOCK (ZERO FOREIGN HALLUCINATION)') &&
+  scenariosContent.includes('GLOBAL DIRECTIVE 2 — "GURU GALAK TAPI PENUH PERHATIAN" & MANDATORY LIVE GRAMMAR CORRECTION') &&
+  scenariosContent.includes('GLOBAL DIRECTIVE 3 — RESTRAINED NATURAL HUMOR & ZERO ROBOTIC LAUGHTER') &&
+  scenariosContent.includes('GLOBAL DIRECTIVE 4 — DYNAMIC ACCENT SHIFTING, DIALECT ACTING & VOCAL CONTRAST'),
+  'callScenarios.ts enforces all 4 global mentor directives without requiring user prompting'
+);
+assert.ok(
+  !scenariosContent.includes('Always start your reply with a natural reaction ("Haha!"') &&
+  !scenariosContent.includes('Always start with a lively reaction ("あはは！"'),
+  'callScenarios.ts eliminates creepy mandatory every-turn laughter directives'
+);
+assert.ok(
+  scenariosContent.includes('Kansai-ben') &&
+  scenariosContent.includes('Hakata-ben') &&
+  scenariosContent.includes('ECHO REDEMPTION'),
+  'callScenarios.ts enables global dialect shifting and Echo Redemption grammar interception'
+);
+assert.ok(
+  routeVoiceLiveContent.includes('learnerDossier') &&
+  routeVoiceLiveContent.includes('Echo Redemption'),
+  'route-voice-live.js integrates Braincore learnerDossier and Echo Redemption into partner-turn and copilot endpoints'
+);
+console.log('✓ Mentor pedagogy, restrained laughter, and dynamic accent directives verified.\n');
+
+// --- TEST 7: Acoustic Language Lock, Russian/Cyrillic Filter & Expressive TTS ---
+console.log('--- TEST 7: Acoustic Language Lock, Russian/Cyrillic Filter & Expressive TTS ---');
+assert.ok(
+  appContent.includes('inputAudioTranscription: {\n                    languageCodes: allowedAsrLangs,\n                    customVocabulary: customVocabTerms,\n                  }'),
+  'App.tsx locks Gemini Live inputAudioTranscription to explicit BCP-47 languageCodes and customVocabulary'
+);
+assert.ok(
+  liveTransportContent.includes('export function sanitizeHallucinatedTranscript(') &&
+  liveTransportContent.includes('\\u0400-\\u052F'),
+  'liveTransport.ts sanitizes Cyrillic/Russian ASR hallucinations before turn processing'
+);
+assert.ok(
+  liveTransportContent.includes('export function sanitizeSpokenTextForClassicTts('),
+  'liveTransport.ts strips literal laugh tokens before classic Edge-TTS synthesis'
+);
+assert.ok(
+  !liveTransportContent.includes('Read ONLY the exact text inside quotes verbatim'),
+  'synthesizeViaGeminiLiveWav uses expressive vocal acting prompt instead of robotic verbatim reading'
+);
+console.log('✓ Acoustic language lock, Cyrillic filter, and expressive TTS verified.\n');
+
+// --- TEST 8: Host Braincore Bridge & Dual-Brain Persistent Memory ---
+console.log('--- TEST 8: Host Braincore Bridge & Dual-Brain Persistent Memory ---');
+assert.ok(
+  braincoreContent.includes('export function buildBraincoreCognitiveDossier(') &&
+  braincoreContent.includes('export function finalizeCallSessionMemory(') &&
+  braincoreContent.includes('export function inferLearnerCharacterProfile('),
+  'braincore.ts exports cognitive dossier builder, session memory finalizer, and learner character profiler'
+);
+assert.ok(
+  braincoreContent.includes('TITIK PINTAR MURID (Verified Strengths') &&
+  braincoreContent.includes('TITIK LEMAH & MISKONSEPSI AKTIF (Weaknesses & Grammar Traps') &&
+  braincoreContent.includes('MEMORI OTAK USER (Fakta & Cerita Murid Lintas Sesi)') &&
+  braincoreContent.includes('FOKUS INSTRUKSI GURU HARI INI:'),
+  'buildBraincoreCognitiveDossier exposes learner strengths, weaknesses, dual-brain memory, and mandatory focus directive'
+);
+assert.ok(
+  appContent.includes('const cognitiveDossier = buildBraincoreCognitiveDossier(') &&
+  appContent.includes('const updatedBrain = finalizeCallSessionMemory(brainStateRef.current, {'),
+  'App.tsx injects Braincore cognitive dossier into live session and persists session memory on call end'
+);
+console.log('✓ Host Braincore strength/weakness dossier and dual-brain memory verified.\n');
+
 console.log('================================================================');
-console.log('ALL VOICE STUDIO UI ARCHITECTURE & LIFECYCLE TESTS PASSED (5/5)!');
+console.log('ALL VOICE STUDIO UI ARCHITECTURE & LIFECYCLE TESTS PASSED (8/8)!');
 console.log('================================================================');
