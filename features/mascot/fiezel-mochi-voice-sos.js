@@ -1192,36 +1192,7 @@
   }
 
   function getPrewarmedGreetingChunks() {
-    try {
-      var key = getGreetingCacheKey();
-      if (_greetingPcmCache && _greetingPcmCache.key === key && Array.isArray(_greetingPcmCache.chunks) && _greetingPcmCache.chunks.length > 0) {
-        return _greetingPcmCache.chunks;
-      }
-      var ss = (root && root.sessionStorage) || (typeof sessionStorage !== 'undefined' ? sessionStorage : null);
-      if (ss && typeof ss.getItem === 'function') {
-        var raw = ss.getItem(key);
-        if (raw) {
-          var parsed = JSON.parse(raw);
-          if (parsed && Array.isArray(parsed.chunks) && parsed.chunks.length > 0) {
-            _greetingPcmCache = { key: key, chunks: parsed.chunks };
-            return parsed.chunks;
-          }
-        }
-      }
-      if (hasSessionStorage()) {
-        var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
-        if (ls && typeof ls.getItem === 'function') {
-          var rawLs = ls.getItem(key);
-          if (rawLs) {
-            var parsedLs = JSON.parse(rawLs);
-            if (parsedLs && Array.isArray(parsedLs.chunks) && parsedLs.chunks.length > 0) {
-              _greetingPcmCache = { key: key, chunks: parsedLs.chunks };
-              return parsedLs.chunks;
-            }
-          }
-        }
-      }
-    } catch (_) {}
+    // Dinonaktifkan agar chunk sapaan statis/cache tidak pernah bertabrakan dengan suara live Gemini (Puck).
     return null;
   }
 
@@ -1962,7 +1933,21 @@
     } catch (_) { return false; }
   }
 
+  var _fallbackTtsAbort = null;
+
   function stopAllActiveAudioSources() {
+    if (_fallbackTtsAbort) {
+      try { _fallbackTtsAbort.abort(); } catch (_) {}
+      _fallbackTtsAbort = null;
+    }
+    if (_currentAudio) {
+      try {
+        _currentAudio.onended = null;
+        _currentAudio.onerror = null;
+        _currentAudio.pause();
+      } catch (_) {}
+      _currentAudio = null;
+    }
     for (var i = 0; i < _activeAudioSources.length; i++) {
       try {
         _activeAudioSources[i].onended = null;
@@ -2804,7 +2789,6 @@
     },
 
     playInstantGreeting: function () {
-      var self = this;
       var ctx = getAudioContext();
       if (ctx && ctx.state === 'suspended') {
         ctx.resume().catch(function () {});
@@ -2819,84 +2803,9 @@
           mochiInst.triggerHandGesture('wave', 2.4);
         }
       } catch (_) {}
-
-      var markSpeakingState = function (speaking) {
-        self._setVoiceVisualizerSpeaking(speaking);
-        if (!speaking && _activeAudioSources.length === 0) {
-          self._updateMochiMascotPose('idle');
-        }
-        try {
-          var c = root && root.FiezelMochiCompanion;
-          var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
-          if (m && typeof m.setTalking === 'function') m.setTalking(speaking);
-        } catch (_) {}
-      };
-
-      var loc = getLocale();
-      var audioSrc = loc === 'th' ? './assets/audio/sfx/mochi_greet_th.mp3' : './assets/audio/sfx/mochi_greet_id.mp3';
-
-      if (ctx && typeof fetch === 'function') {
-        fetch(audioSrc).then(function (res) {
-          if (!res || !res.ok) throw new Error('http_' + (res ? res.status : 0));
-          var ct = (res.headers && typeof res.headers.get === 'function' ? res.headers.get('content-type') : '') || '';
-          if (ct.indexOf('text/html') !== -1) throw new Error('html_response');
-          return res.arrayBuffer();
-        }).then(function (buf) {
-          if (!buf || buf.byteLength < 64) throw new Error('empty_audio');
-          return ctx.decodeAudioData(buf);
-        }).then(function (decoded) {
-          var source = ctx.createBufferSource();
-          source.buffer = decoded;
-          var targetNode = attachAnalyserToMochi(ctx) || ctx.destination;
-          source.connect(targetNode);
-          source.start(0);
-          _activeAudioSources.push(source);
-          markSpeakingState(true);
-          source.onended = function () {
-            _activeAudioSources = _activeAudioSources.filter(function (s) { return s !== source; });
-            if (_activeAudioSources.length === 0) {
-              markSpeakingState(false);
-            }
-          };
-        }).catch(function () {
-          try {
-            var audio = new Audio(audioSrc);
-            audio.currentTime = 0;
-            audio.onended = function () {
-              if (_activeAudioSources.length === 0) markSpeakingState(false);
-            };
-            audio.onerror = function () {
-              if (_activeAudioSources.length === 0) markSpeakingState(false);
-            };
-            var p = audio.play();
-            if (p && typeof p.then === 'function') {
-              p.then(function () {
-                markSpeakingState(true);
-              }).catch(function () {
-                if (_activeAudioSources.length === 0) markSpeakingState(false);
-              });
-            }
-          } catch (_) {
-            if (_activeAudioSources.length === 0) markSpeakingState(false);
-          }
-        });
-        return;
-      }
-
-      try {
-        var audioFallback = new Audio(audioSrc);
-        audioFallback.currentTime = 0;
-        audioFallback.onended = function () {
-          if (_activeAudioSources.length === 0) markSpeakingState(false);
-        };
-        audioFallback.onerror = function () {
-          if (_activeAudioSources.length === 0) markSpeakingState(false);
-        };
-        var pf = audioFallback.play();
-        if (pf && typeof pf.then === 'function') {
-          pf.then(function () { markSpeakingState(true); }).catch(function () {});
-        }
-      } catch (_) {}
+      // PENTING: Jangan pernah memutar berkas MP3 sapaan statis (mochi_greet_id.mp3 / mochi_greet_th.mp3)
+      // bersamaan dengan koneksi Gemini Live (suara Puck), karena akan menyebabkan dua suara berbeda
+      // intonasi bertabrakan di speaker murid saat pertama kali Mochi SOS diaktifkan!
     },
 
     showConfirmationModal: function (activeQ) {
@@ -3002,7 +2911,6 @@
           modal.remove();
 
           self.setMochiEnabled(true, { userConfirmed: true, useDailyFree: useFreeNow, skipAutoStart: true });
-          self.playInstantGreeting();
           self.startCall(activeQ, { autoEntry: true, userConfirmed: true, useDailyFree: useFreeNow });
         };
       }
@@ -3124,6 +3032,8 @@
       };
       _outTranscript = '';
       _firstChunkPending = true;
+      stopAllActiveAudioSources();
+      try { if (typeof root.stopSpeaking === 'function') root.stopSpeaking(); } catch (_) {}
 
       syncCompanionStrictMode();
       warmAudioContext();
@@ -3175,21 +3085,29 @@
         }
       }
 
-      // 1. Mikrofon + Parallel Web Speech Recognition — paralel, dipagari Silero Neural VAD v5.
-      this._startParallelSpeechRecognition();
+      // 1. Mikrofon — aliran audio PCM 16kHz langsung ke Gemini Live melalui Silero Neural VAD v5 / DSP.
+      //    Parallel Web Speech Recognition hanya dipakai sebagai cadangan bila getUserMedia gagal/tidak tersedia,
+      //    sehingga tidak pernah mengirim 2 giliran ganda atau berebut mikrofon di HP/PWA.
       if (typeof navigator !== 'undefined' && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
         navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         }).catch(function () {
           return navigator.mediaDevices.getUserMedia({ audio: true });
         }).then(function (stream) {
-          if (!stream) return;
+          if (!stream) {
+            self._startParallelSpeechRecognition();
+            return;
+          }
           if (!self.isCallActive()) { stream.getTracks().forEach(function (tr) { tr.stop(); }); return; }
+          self._stopParallelSpeechRecognition();
           _micStream = stream;
           self._wireMicrophoneStream(stream);
         }).catch(function (err) {
           console.warn('[Mochi Voice SOS] Mic permission unavailable (listen-only mode):', err);
+          self._startParallelSpeechRecognition();
         });
+      } else {
+        this._startParallelSpeechRecognition();
       }
 
       // 2. Jalur tercepat: adopsi hot socket HANYA jika terikat pada soal aktif yang sama (__fzBoundQSig cocok).
@@ -3810,6 +3728,10 @@
         self._handleLiveWsMessage(event, q, sendOpeningTurn, function () {
           gotAnyAudio = true;
           _reconnectAttempts = 0;
+          if (_fallbackTtsAbort) {
+            try { _fallbackTtsAbort.abort(); } catch (_) {}
+            _fallbackTtsAbort = null;
+          }
           if (_connStatus.state !== 'connected' && _connStatus.state !== 'idle') {
             setConnectionStatusInternal('connected', '');
           }
@@ -4129,8 +4051,13 @@
 
       var tryNext = function (idx) {
         if (idx >= endpoints.length || !self.isCallActive()) return;
+        if ((_ws && _ws.readyState <= 1) || _activeAudioSources.length > 0) return;
         var url = endpoints[idx];
         var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        if (_fallbackTtsAbort) {
+          try { _fallbackTtsAbort.abort(); } catch (_) {}
+        }
+        _fallbackTtsAbort = ctrl;
         var timer = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (_) {} }, 5000) : null;
         fetch(url, {
           method: 'POST',
@@ -4158,10 +4085,13 @@
           throw new Error('non_audio_ct');
         }).then(function (buf) {
           if (!buf || buf.byteLength < 64 || !self.isCallActive()) return;
+          if ((_ws && _ws.readyState === 1) || _activeAudioSources.length > 0) return;
           var ctx = getAudioContext();
           if (ctx) {
             return ctx.decodeAudioData(buf.slice(0)).then(function (decoded) {
               if (!self.isCallActive()) return;
+              if ((_ws && _ws.readyState === 1) || _activeAudioSources.length > 0) return;
+              stopAllActiveAudioSources();
               var source = ctx.createBufferSource();
               source.buffer = decoded;
               var targetNode = attachAnalyserToMochi(ctx) || ctx.destination;

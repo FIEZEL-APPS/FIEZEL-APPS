@@ -1,7 +1,7 @@
 {
-  "version": "m025-737",
-  "claimedBy": "branch feat/voice-mentor-brain",
-  "claimedAt": "2026-11-01T20:09:51.561Z",
-  "reason": "feat(voice): ruthless caring mentor pedagogy, Braincore strength-weakness dossier, dual-brain memory & language lock",
+  "version": "m025-738",
+  "claimedBy": "branch feat/iphone-pwa-build-version-sync-m025-738",
+  "claimedAt": "2026-11-01T20:31:50.292Z",
+  "reason": "fix(pwa,voice): iphone 15 pwa build-version sync, stale shell purge, and mochi sos single-voice greeting (m025-738) [ALLOW-PROTECTED: pwa]",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

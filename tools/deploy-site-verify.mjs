@@ -49,7 +49,7 @@ async function ambil(url) {
     // `cache: 'no-store'` + parameter pengacak: kita sedang menguji apa yang BARU diunggah,
     // jadi jawaban dari cache mana pun adalah jawaban atas pertanyaan yang salah.
     const r = await fetch(url + (url.includes('?') ? '&' : '?') + '_fz=' + Date.now(),
-      { signal: ac.signal, cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } });
+      { signal: ac.signal, cache: 'no-store', headers: { 'Cache-Control': 'no-cache', 'Referer': BASE + '/' } });
     const body = await r.text();
     return { ok: r.ok, status: r.status, body };
   } catch (e) {
@@ -67,18 +67,22 @@ async function sekaliJalan() {
   const reqs = [
     ambil(BASE + '/core-config.js'),
     ambil(BASE + '/sw.js'),
-    ambil(BASE + '/manifest.json')
+    ambil(BASE + '/manifest.json'),
+    ambil(BASE + '/coordination/BUILD-VERSION.json')
   ];
   if (ROOT_ORIGIN) {
     reqs.push(ambil(ROOT_ORIGIN + '/manifest.json'));
     reqs.push(ambil(ROOT_ORIGIN + '/'));
   }
-  const [cfg, sw, appManifestRes, rootManifestRes, rootHtmlRes] = await Promise.all(reqs);
+  const [cfg, sw, appManifestRes, buildVerRes, rootManifestRes, rootHtmlRes] = await Promise.all(reqs);
+  const buildVerJson = buildVerRes && buildVerRes.ok ? parseJsonAman(buildVerRes.body) : null;
   return {
     cfg,
     sw,
     appManifestRes,
     appManifest: appManifestRes && appManifestRes.ok ? parseJsonAman(appManifestRes.body) : null,
+    buildVerRes: buildVerRes || null,
+    buildVer: buildVerJson && buildVerJson.version ? String(buildVerJson.version) : null,
     rootManifestRes: rootManifestRes || null,
     rootManifest: rootManifestRes && rootManifestRes.ok ? parseJsonAman(rootManifestRes.body) : null,
     rootHtmlRes: rootHtmlRes || null,
@@ -94,10 +98,10 @@ async function main() {
   let hasil = null;
   for (let i = 1; i <= (strict ? RETRIES : 1); i++) {
     hasil = await sekaliJalan();
-    const cocok = strict && hasil.page === WANT_PAGE && hasil.swRev === WANT_SW;
+    const cocok = strict && hasil.page === WANT_PAGE && hasil.swRev === WANT_SW && hasil.buildVer === WANT_PAGE;
     if (!strict || cocok) break;
     if (i < RETRIES) {
-      console.log(`percobaan ${i}/${RETRIES}: produksi masih menyajikan page=${hasil.page} sw=${hasil.swRev}` +
+      console.log(`percobaan ${i}/${RETRIES}: produksi masih menyajikan page=${hasil.page} sw=${hasil.swRev} buildVer=${hasil.buildVer}` +
         ` (diharapkan page=${WANT_PAGE} sw=${WANT_SW}) — menunggu ${RETRY_DELAY_MS / 1000}s`);
       await tidur(RETRY_DELAY_MS);
     }
@@ -107,6 +111,7 @@ async function main() {
   catat('  base               : ' + BASE);
   catat('  /core-config.js    : HTTP ' + hasil.cfg.status + (hasil.cfg.error ? ' (' + hasil.cfg.error + ')' : ''));
   catat('  /sw.js             : HTTP ' + hasil.sw.status + (hasil.sw.error ? ' (' + hasil.sw.error + ')' : ''));
+  catat('  /BUILD-VERSION.json: HTTP ' + (hasil.buildVerRes?.status ?? 0) + ' version=' + (hasil.buildVer || 'TIDAK TERBACA'));
   catat('  /app/manifest.json : HTTP ' + hasil.appManifestRes.status + ' display=' + (hasil.appManifest?.display || 'TIDAK TERBACA'));
   if (ROOT_ORIGIN && hasil.rootManifestRes && hasil.rootHtmlRes) {
     catat('  root /manifest.json: HTTP ' + hasil.rootManifestRes.status +
@@ -132,6 +137,9 @@ async function main() {
   if (!hasil.sw.ok) masalah.push(`sw.js tidak terambil (HTTP ${hasil.sw.status}${hasil.sw.error ? ' ' + hasil.sw.error : ''})`);
   if (hasil.cfg.ok && hasil.page !== WANT_PAGE) masalah.push(`build halaman produksi '${hasil.page}' != '${WANT_PAGE}' yang baru diterbitkan`);
   if (hasil.sw.ok && hasil.swRev !== WANT_SW) masalah.push(`revisi shell produksi '${hasil.swRev}' != '${WANT_SW}' yang baru diterbitkan`);
+  if (!hasil.buildVerRes?.ok || hasil.buildVer !== WANT_PAGE) {
+    masalah.push(`coordination/BUILD-VERSION.json produksi '${hasil.buildVer}' != '${WANT_PAGE}' (HTTP ${hasil.buildVerRes?.status ?? 0}) — deteksi update iOS PWA akan tertahan`);
+  }
   /* Invarian rilis repo: SW_REV berawalan build halaman. Kalau produksi menyajikan pasangan
    * yang tidak sepadan, murid bisa memegang shell dan halaman dari dua generasi berbeda. */
   if (hasil.page && hasil.swRev && !String(hasil.swRev).startsWith(String(hasil.page))) {
