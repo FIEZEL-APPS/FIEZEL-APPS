@@ -1,7 +1,7 @@
 {
-  "version": "m025-736",
-  "claimedBy": "branch feat/iphone-pwa-cache-voice-latency-m025-736",
-  "claimedAt": "2026-11-01T19:38:11.284Z",
-  "reason": "fix(pwa,voice): pwa stale cache auto sweep, iphone 15 splash black bar, and mobile kaiwa latency (m025-736) [ALLOW-PROTECTED: pwa]",
+  "version": "m025-737",
+  "claimedBy": "branch feat/voice-mentor-brain",
+  "claimedAt": "2026-11-01T20:09:51.561Z",
+  "reason": "feat(voice): ruthless caring mentor pedagogy, Braincore strength-weakness dossier, dual-brain memory & language lock",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
