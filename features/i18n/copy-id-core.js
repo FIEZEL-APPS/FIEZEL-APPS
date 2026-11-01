@@ -94,6 +94,18 @@
     'mochi-sos.toggle-on-badge': 'Mochi ON',
     'mochi-sos.toggle-off-badge': 'Mochi OFF',
     'mochi-sos.toast-disabled': 'Bantuan suara Mochi dinonaktifkan',
-    'mochi-sos.toast-enabled': 'Bantuan suara Mochi diaktifkan'
+    'mochi-sos.toast-enabled': 'Bantuan suara Mochi diaktifkan',
+    'mochi-sos.modal-free-title': 'Bantuan Suara Mochi SOS 💡',
+    'mochi-sos.modal-gem-title': 'Bantuan Suara Mochi SOS 💎',
+    'mochi-sos.modal-free-body': '✨ Kuota Gratis Harian Tersedia! (Sisa {remaining}x hari ini). Mochi akan membedah soal ini langsung dengan suara AI Gemini Live secara dua arah tanpa membocorkan kunci jawaban.',
+    'mochi-sos.modal-gem-body': 'Mochi akan membedah soal ini langsung dengan suara AI Gemini Live. Biaya: 10 Gem (Saldo kamu: {balance} 💎). Bonus Cashback: Jika jawabanmu benar di soal ini, kamu dapat cashback +5 Gem!',
+    'mochi-sos.modal-free-btn': 'Mulai Bantuan Gratis',
+    'mochi-sos.modal-gem-btn': 'Gunakan 10 Gem & Mulai',
+    'mochi-sos.modal-cancel-btn': 'Batal',
+    'mochi-sos.modal-insufficient-title': 'Gem Belum Cukup 💎',
+    'mochi-sos.modal-insufficient-body': 'Kamu membutuhkan 10 Gem untuk bantuan suara Mochi SOS (Saldo saat ini: {balance} 💎). Selesaikan soal latihan kuis untuk mengumpulkan Gem gratis atau tunggu kuota gratis harian besok!',
+    'mochi-sos.modal-insufficient-btn': 'Mengerti',
+    'mochi-sos.bubble-wrong-hint': 'Psst, bingung di bagian ini? Ketuk Mochi untuk bedah kalimatnya bareng yuk!',
+    'mochi-sos.bubble-correct-praise': 'Hebat! Analisis kamu tepat sekali! 🎉'
   });
 }());

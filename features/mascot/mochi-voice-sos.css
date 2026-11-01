@@ -454,6 +454,27 @@ body.fz-stage-quiz .quiz-stage,
   transform: scale(0.98);
 }
 
+.fz-mochi-sos-btn-cancel:hover {
+  background: #E2E8F0 !important;
+}
+
+.fz-mochi-sos-btn-confirm:hover {
+  background: #D97706 !important;
+  transform: translateY(-1px);
+}
+
+@keyframes fzMochiHintPulse {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.08) rotate(-3deg); }
+  50% { transform: scale(1.08) rotate(3deg); }
+  75% { transform: scale(1.04) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.fz-mochi-hint-pulse {
+  animation: fzMochiHintPulse 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @keyframes fzMochiFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

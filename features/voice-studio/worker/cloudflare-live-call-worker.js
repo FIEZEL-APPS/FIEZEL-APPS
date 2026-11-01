@@ -6,16 +6,30 @@
  * and provides a serverless HTTP POST fallback when WebSocket is unavailable.
  */
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+function getCorsHeaders(request) {
+  const origin = request.headers.get('Origin') || '';
+  const isAllowed = (
+    origin.startsWith('https://fiezel.my.id') ||
+    origin.startsWith('https://www.fiezel.my.id') ||
+    origin.startsWith('https://api.fiezel.my.id') ||
+    origin.startsWith('http://localhost') ||
+    origin.startsWith('http://127.0.0.1')
+  );
+
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : 'https://fiezel.my.id',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Vary': 'Origin',
+  };
+}
 
 export default {
   async fetch(request, env) {
+    const corsHeaders = getCorsHeaders(request);
+
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: CORS_HEADERS });
+      return new Response(null, { status: 204, headers: corsHeaders });
     }
 
     const url = new URL(request.url);
@@ -25,6 +39,12 @@ export default {
       url.pathname.endsWith('/api/live-call') ||
       url.pathname.endsWith('/ws/live-call')
     ) {
+      // Validasi origin WebSocket agar tidak dibajak situs lain
+      const origin = request.headers.get('Origin') || '';
+      if (origin && !origin.startsWith('https://fiezel.my.id') && !origin.startsWith('https://www.fiezel.my.id') && !origin.startsWith('http://localhost') && !origin.startsWith('http://127.0.0.1')) {
+        return new Response('Akses WebSocket ditolak: Origin tidak sah.', { status: 403 });
+      }
+
       const upgradeHeader = request.headers.get('Upgrade');
       if (!upgradeHeader || upgradeHeader.toLowerCase() !== 'websocket') {
         return new Response(
@@ -36,7 +56,7 @@ export default {
           }),
           {
             status: 200,
-            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           }
         );
       }
@@ -188,7 +208,7 @@ export default {
       }),
       {
         status: 200,
-        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   },

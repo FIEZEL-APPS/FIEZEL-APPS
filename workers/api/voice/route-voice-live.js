@@ -336,84 +336,40 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
   const activePool = healthyKeys.length > 0 ? healthyKeys : keys;
   _copilotPoolIndex = (_copilotPoolIndex + 1) % totalKeys;
 
-  const raceAbort = new AbortController();
   let lastReason = 'unknown';
 
-  // Hedged Dual-Key Execution:
-  // Primary fires immediately on gemini-3-flash-preview (~1.5s-2.1s).
-  // If primary takes >750ms or fails early, hedged backup fires on key #2 in parallel.
+  // Sequential Key Execution:
+  // Primary fires immediately on gemini-3-flash-preview.
+  // Only if primary fails (rate limit 429, timeout), sequentially fail over to secondary key #2.
+  // Zero parallel duplicate requests to prevent 429 quota spikes.
   const keyPrimary = activePool[0];
+  const resPrimary = await invokeSingleGeminiJson({
+    key: keyPrimary,
+    model: COPILOT_MODELS[0],
+    promptText,
+    temperature,
+    maxOutputTokens,
+  });
+
+  if (resPrimary && resPrimary.ok) {
+    return resPrimary;
+  }
+  lastReason = resPrimary?.reason || lastReason;
+
+  // Sequential failover on key #2
   const keyHedge = activePool[1 % activePool.length];
-  let hedgeTimer = null;
-
-  const hedgeResult = await new Promise((resolve) => {
-    let settled = false;
-    let pending = 1;
-    let hedgeStarted = false;
-
-    const finishSuccess = (winner) => {
-      if (settled) return;
-      settled = true;
-      if (hedgeTimer) clearTimeout(hedgeTimer);
-      raceAbort.abort();
-      resolve(winner);
-    };
-
-    const startHedge = () => {
-      if (settled || hedgeStarted) return;
-      hedgeStarted = true;
-      pending += 1;
-      invokeSingleGeminiJson({
-        key: keyHedge,
-        model: COPILOT_MODELS[0],
-        promptText,
-        temperature,
-        maxOutputTokens,
-        parentSignal: raceAbort.signal,
-      }).then((resB) => {
-        if (resB.ok) {
-          finishSuccess(resB);
-        } else {
-          lastReason = resB.reason || lastReason;
-          pending -= 1;
-          if (pending === 0 && !settled) {
-            settled = true;
-            resolve(null);
-          }
-        }
-      });
-    };
-
-    hedgeTimer = setTimeout(startHedge, 750);
-
-    invokeSingleGeminiJson({
-      key: keyPrimary,
+  if (keyHedge !== keyPrimary) {
+    const resHedge = await invokeSingleGeminiJson({
+      key: keyHedge,
       model: COPILOT_MODELS[0],
       promptText,
       temperature,
       maxOutputTokens,
-      parentSignal: raceAbort.signal,
-    }).then((resA) => {
-      if (resA.ok) {
-        finishSuccess(resA);
-      } else {
-        lastReason = resA.reason || lastReason;
-        if (hedgeTimer) {
-          clearTimeout(hedgeTimer);
-          hedgeTimer = null;
-        }
-        startHedge();
-        pending -= 1;
-        if (pending === 0 && !settled) {
-          settled = true;
-          resolve(null);
-        }
-      }
     });
-  });
-
-  if (hedgeResult && hedgeResult.ok) {
-    return hedgeResult;
+    if (resHedge && resHedge.ok) {
+      return resHedge;
+    }
+    lastReason = resHedge?.reason || lastReason;
   }
 
   // Final safety fallback on key #3 (gemini-3.1-flash-lite)

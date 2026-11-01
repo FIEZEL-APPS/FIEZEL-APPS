@@ -79,6 +79,107 @@ import { SileroNeuralVadGate } from './lib/sileroVadGate';
 const SILENT_WAV =
   'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
 
+const KAWAN_BICARA_GEM_COST = 25;
+const MAX_CALL_DURATION_SEC = 300; // 5-minute maximum session duration
+const DAILY_FREE_CALL_LIMIT = 1;
+
+function getHostGemBalance(): number {
+  try {
+    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+      const pState = (window.parent as any).state;
+      if (pState && pState.gems != null) {
+        if (typeof pState.gems.balance === 'number') return pState.gems.balance;
+        if (typeof pState.gems === 'number') return pState.gems;
+      }
+    }
+  } catch {}
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const keys = ['fz_state_v1', 'fz_state_v1@ja', 'fz_state_v1@en', 'fiezel-v5', 'fiezel-v4-state'];
+      for (const k of keys) {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.gems != null) {
+            if (typeof parsed.gems.balance === 'number') return parsed.gems.balance;
+            if (typeof parsed.gems === 'number') return parsed.gems;
+          }
+        } catch {}
+      }
+    }
+  } catch {}
+  return 120;
+}
+
+function deductHostGems(amount: number): boolean {
+  let deducted = false;
+  try {
+    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+      const pWin = window.parent as any;
+      if (pWin.state && pWin.state.gems != null) {
+        if (typeof pWin.state.gems.balance === 'number') {
+          pWin.state.gems.balance = Math.max(0, pWin.state.gems.balance - amount);
+          deducted = true;
+        } else if (typeof pWin.state.gems === 'number') {
+          pWin.state.gems = Math.max(0, pWin.state.gems - amount);
+          deducted = true;
+        }
+        if (typeof pWin.save === 'function') pWin.save();
+      }
+    }
+  } catch {}
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const keys = ['fz_state_v1', 'fz_state_v1@ja', 'fz_state_v1@en', 'fiezel-v5', 'fiezel-v4-state'];
+      for (const k of keys) {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.gems != null) {
+            if (typeof parsed.gems.balance === 'number') {
+              parsed.gems.balance = Math.max(0, parsed.gems.balance - amount);
+              localStorage.setItem(k, JSON.stringify(parsed));
+              deducted = true;
+            } else if (typeof parsed.gems === 'number') {
+              parsed.gems = Math.max(0, parsed.gems - amount);
+              localStorage.setItem(k, JSON.stringify(parsed));
+              deducted = true;
+            }
+          }
+        } catch {}
+      }
+    }
+  } catch {}
+  return deducted;
+}
+
+function getDailyFreeCallAvailable(): boolean {
+  try {
+    if (typeof localStorage === 'undefined') return true;
+    const today = new Date().toISOString().slice(0, 10);
+    const storedDate = localStorage.getItem('fz_kawan_bicara_daily_date');
+    const storedCount = parseInt(localStorage.getItem('fz_kawan_bicara_daily_count') || '0', 10);
+    if (storedDate !== today) return true;
+    return storedCount < DAILY_FREE_CALL_LIMIT;
+  } catch {
+    return true;
+  }
+}
+
+function markDailyFreeCallUsed(): void {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    const today = new Date().toISOString().slice(0, 10);
+    const storedDate = localStorage.getItem('fz_kawan_bicara_daily_date');
+    const storedCount = parseInt(localStorage.getItem('fz_kawan_bicara_daily_count') || '0', 10);
+    const nextCount = storedDate === today ? (storedCount + 1) : 1;
+    localStorage.setItem('fz_kawan_bicara_daily_date', today);
+    localStorage.setItem('fz_kawan_bicara_daily_count', String(nextCount));
+  } catch {}
+}
+
 export default function App() {
   const [brainState, setBrainState] = useState<BraincoreStoreState>(() => loadBraincoreState());
   const [activeTab, setActiveTab] = useState<'home' | 'call' | 'braincore'>(() => {
@@ -234,6 +335,62 @@ export default function App() {
   turnsRef.current = turns;
   const brainStateRef = useRef(brainState);
   brainStateRef.current = brainState;
+
+  const [callConfirmModal, setCallConfirmModal] = useState<{
+    isOpen: boolean;
+    isDailyFree: boolean;
+    balance: number;
+    cost: number;
+    remainingFree: number;
+  } | null>(null);
+
+  const [insufficientGemModal, setInsufficientGemModal] = useState<{
+    isOpen: boolean;
+    balance: number;
+    cost: number;
+  } | null>(null);
+
+  const requestStartLiveCall = () => {
+    if (isLiveConnected || isLiveConnecting) return;
+    const balance = getHostGemBalance();
+    const hasDailyFree = getDailyFreeCallAvailable();
+    if (hasDailyFree) {
+      setCallConfirmModal({
+        isOpen: true,
+        isDailyFree: true,
+        balance,
+        cost: 0,
+        remainingFree: 1,
+      });
+      return;
+    }
+    if (balance >= KAWAN_BICARA_GEM_COST) {
+      setCallConfirmModal({
+        isOpen: true,
+        isDailyFree: false,
+        balance,
+        cost: KAWAN_BICARA_GEM_COST,
+        remainingFree: 0,
+      });
+      return;
+    }
+    setInsufficientGemModal({
+      isOpen: true,
+      balance,
+      cost: KAWAN_BICARA_GEM_COST,
+    });
+  };
+
+  const handleConfirmStartCall = () => {
+    if (!callConfirmModal) return;
+    if (callConfirmModal.isDailyFree) {
+      markDailyFreeCallUsed();
+    } else {
+      deductHostGems(callConfirmModal.cost);
+    }
+    setCallConfirmModal(null);
+    void startLiveCall();
+  };
 
   /** Unlocks Web Audio + one persistent HTMLAudioElement inside a user gesture. */
   const primeAudioPlayback = () => {
@@ -610,10 +767,23 @@ export default function App() {
   useEffect(() => {
     if (!isLiveConnected) return;
     const interval = setInterval(() => {
-      setCallDurationSec((s) => s + 1);
+      setCallDurationSec((s) => {
+        const next = s + 1;
+        if (next >= MAX_CALL_DURATION_SEC) {
+          stopLiveCall();
+          setStatusBanner({
+            type: 'info',
+            message:
+              locale === 'th'
+                ? 'เซสชันการโทร 5 นาทีสิ้นสุดลงแล้ว! พักสักครู่หรือเริ่มเซสชันใหม่ได้เสมอ'
+                : 'Sesi latihan percakapan 5 menit telah selesai! Istirahat sejenak atau mulai sesi baru.',
+          });
+        }
+        return next;
+      });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isLiveConnected]);
+  }, [isLiveConnected, locale]);
 
   useEffect(() => {
     return () => {
@@ -2923,9 +3093,7 @@ export default function App() {
       }
       if (shouldAuto && !isLiveConnected && !isLiveConnecting) {
         autoCallProcessedRef.current = true;
-        void startLiveCall().catch(() => {
-          setAutoCallNeedsTap(true);
-        });
+        requestStartLiveCall();
       }
     };
 
@@ -2933,9 +3101,7 @@ export default function App() {
       if (!e.data) return;
       if (e.data.type === 'fz.shell.autocall') {
         if (!isLiveConnected && !isLiveConnecting) {
-          void startLiveCall().catch(() => {
-            setAutoCallNeedsTap(true);
-          });
+          requestStartLiveCall();
         }
       }
     };
@@ -3633,7 +3799,7 @@ export default function App() {
                         <button
                           type="button"
                           disabled={isLiveConnecting}
-                          onClick={() => void startLiveCall()}
+                          onClick={() => requestStartLiveCall()}
                           className="px-4 py-1.5 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-60"
                           title="Mulai panggilan suara dua arah hands-free (bebas bicara langsung)"
                         >
@@ -4508,6 +4674,111 @@ export default function App() {
         </div>
       )}
 
+      {/* Modal Konfirmasi Panggilan Kawan Bicara (Gem Transparency) */}
+      {callConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-3xl bg-[#FFFDF8] border-2 border-[#FDE68A] p-6 shadow-2xl text-center space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#FEF3C7] flex items-center justify-center text-2xl shadow-inner">
+              {callConfirmModal.isDailyFree ? '✨' : '💎'}
+            </div>
+            <div>
+              <h3 className="text-base font-extrabold text-[#1C1611]">
+                {locale === 'th' ? 'โทรคุยสดกับ Kawan Bicara' : 'Mulai Panggilan Kawan Bicara'}
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[#5C4E3C]">
+                {callConfirmModal.isDailyFree ? (
+                  locale === 'th' ? (
+                    <>
+                      🎉 <strong>สิทธิ์ฟรีรายวันพร้อมใช้งาน!</strong> (เหลือ 1 ครั้งในวันนี้)
+                      <br />
+                      โทรพูดคุยแบบสองทิศทาง 5 นาทีด้วยเสียง AI Gemini Live
+                    </>
+                  ) : (
+                    <>
+                      🎉 <strong>1 Sesi Harian Gratis Tersedia!</strong>
+                      <br />
+                      Nikmati latihan percakapan dua arah selama <strong>5 menit</strong> dengan suara AI Gemini Live tanpa potong Gem.
+                    </>
+                  )
+                ) : (
+                  locale === 'th' ? (
+                    <>
+                      โทรพูดคุยสด 5 นาทีด้วยเสียง AI Gemini Live
+                      <br />
+                      ค่าบริการ: <strong>25 Gem</strong> (ยอดของคุณ: {callConfirmModal.balance} 💎)
+                    </>
+                  ) : (
+                    <>
+                      Sesi latihan percakapan dua arah hands-free selama <strong>5 menit</strong> dengan suara AI Google Gemini Live.
+                      <br />
+                      Biaya: <strong>25 Gem</strong> (Saldo kamu: {callConfirmModal.balance} 💎)
+                    </>
+                  )
+                )}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setCallConfirmModal(null)}
+                className="flex-1 py-3 px-4 rounded-xl bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#475569] font-bold text-xs cursor-pointer transition-colors"
+              >
+                {locale === 'th' ? 'ยกเลิก' : 'Batal'}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmStartCall}
+                className="flex-1 py-3 px-4 rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold text-xs shadow-md shadow-amber-500/25 cursor-pointer transition-all active:scale-[0.98]"
+              >
+                {callConfirmModal.isDailyFree
+                  ? (locale === 'th' ? 'เริ่มใช้งานฟรี' : 'Mulai Panggilan Gratis')
+                  : (locale === 'th' ? 'ใช้ 25 Gem & เริ่ม' : 'Gunakan 25 Gem & Mulai')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Gem Belum Cukup */}
+      {insufficientGemModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-3xl bg-[#FFFDF8] border-2 border-red-200 p-6 shadow-2xl text-center space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-red-100 flex items-center justify-center text-2xl shadow-inner">
+              💎
+            </div>
+            <div>
+              <h3 className="text-base font-extrabold text-[#1C1611]">
+                {locale === 'th' ? 'Gem ยังไม่พอ' : 'Gem Belum Cukup'}
+              </h3>
+              <div className="mt-2 text-xs leading-relaxed text-[#5C4E3C]">
+                {locale === 'th' ? (
+                  <>
+                    คุณต้องการ <strong>25 Gem</strong> สำหรับเซสชัน Kawan Bicara 5 นาที (ยอดปัจจุบัน: {insufficientGemModal.balance} 💎)
+                    <br /><br />
+                    ทำแบบฝึกหัดในควิซเพื่อสะสม Gem หรือรอรีเซ็ตสิทธิ์ฟรีรายวันในวันพรุ่งนี้!
+                  </>
+                ) : (
+                  <>
+                    Kamu membutuhkan <strong>25 Gem</strong> untuk sesi Kawan Bicara 5 menit (Saldo saat ini: {insufficientGemModal.balance} 💎).
+                    <br /><br />
+                    Selesaikan latihan soal di kuis untuk mengumpulkan Gem gratis atau tunggu kuota gratis harian besok!
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setInsufficientGemModal(null)}
+                className="w-full py-3 px-4 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] text-white font-bold text-xs shadow-md cursor-pointer transition-colors"
+              >
+                {locale === 'th' ? 'เข้าใจแล้ว' : 'Mengerti'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Floating CTA when Auto-Call requires user interaction on browser mic policy */}
       {autoCallNeedsTap && !isLiveConnected && !isLiveConnecting && (
         <div className="fixed bottom-24 inset-x-4 sm:inset-x-auto sm:right-6 z-50 flex items-center justify-center pointer-events-auto">
@@ -4515,7 +4786,7 @@ export default function App() {
             type="button"
             onClick={() => {
               setAutoCallNeedsTap(false);
-              void startLiveCall();
+              requestStartLiveCall();
             }}
             className="px-5 py-3 rounded-2xl bg-[#1C1611] text-white font-bold text-sm shadow-xl flex items-center gap-2.5 animate-bounce border border-[#FF9800]/40 cursor-pointer"
           >
