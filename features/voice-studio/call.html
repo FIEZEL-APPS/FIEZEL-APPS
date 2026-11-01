@@ -13,8 +13,8 @@
     <link rel="preconnect" href="https://api.fiezel.my.id" crossorigin />
     <link rel="dns-prefetch" href="https://translate.googleapis.com" />
     <link rel="dns-prefetch" href="https://api.fiezel.my.id" />
-    <link rel="stylesheet" href="./dist/voice-studio.css?v=m025-735" />
-    <script src="../../core-config.js?v=m025-735" defer></script>
+    <link rel="stylesheet" href="./dist/voice-studio.css?v=m025-736" />
+    <script src="../../core-config.js?v=m025-736" defer></script>
     <style>
       html, body {
         height: 100%;
@@ -38,42 +38,13 @@
     <div id="fiezel-voice-studio-root"></div>
     <script>
       (function () {
-        if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistration().then(function (reg) {
-            if (!reg) return;
-            reg.update().catch(function () {});
-            if (reg.waiting) {
-              try { reg.waiting.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-            }
-            reg.addEventListener('updatefound', function () {
-              var newWorker = reg.installing;
-              if (newWorker) {
-                newWorker.addEventListener('statechange', function () {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    try { newWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-                  }
-                });
-              }
-            });
-          }).catch(function () {});
-          navigator.serviceWorker.addEventListener('controllerchange', function () {
-            if (!window.__fzRefreshed) {
-              window.__fzRefreshed = true;
-              if (typeof caches !== 'undefined' && caches.keys) {
-                caches.keys().then(function (keys) {
-                  var oldShells = keys.filter(function (k) { return k.indexOf('fiezel-shell-') === 0; });
-                  return Promise.all(oldShells.map(function (k) { return caches.delete(k); }));
-                }).catch(function () {}).then(function () {
-                  window.location.reload();
-                });
-              } else {
-                window.location.reload();
-              }
-            }
-          });
-        }
+        try {
+          if (window.top && window.top !== window && window.top.FiezelUpdatePrompt && typeof window.top.FiezelUpdatePrompt.check === 'function') {
+            window.top.FiezelUpdatePrompt.check(false);
+          }
+        } catch (_) {}
       })();
     </script>
-    <script type="module" src="./dist/voice-studio.js?v=m025-735"></script>
+    <script type="module" src="./dist/voice-studio.js?v=m025-736"></script>
   </body>
 </html>

@@ -15,13 +15,20 @@ button, a, [role="button"], .launch-card, .quiz-option, .choice-btn, .token-chip
   html {
     overflow-x: clip !important;
     overflow-y: auto !important;
-    background: #FFF9EE !important;
     -webkit-overflow-scrolling: touch;
   }
   body {
     overflow-x: clip !important;
     overflow-y: visible !important;
+  }
+  html:not(.fz-booting),
+  html:not(.fz-booting) body {
     background: #FFF9EE !important;
+  }
+  html.fz-booting,
+  html.fz-booting body {
+    background: #1B1418 !important;
+    background-color: #1B1418 !important;
   }
 
   main.app,

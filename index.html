@@ -165,10 +165,10 @@
   <!-- m025-246: preload Fredoka DICABUT bersama keluarga fontnya. Judul hero beranda
        sekarang memakai Plus Jakarta Sans, yang sudah di-preload satu baris di atas. -->
   <style id="fiezelBootCritical">
-html.fz-booting,html.fz-booting body{background:#FBF7F3}
+html.fz-booting,html.fz-booting body{background:#1B1418}
 html.fz-booting,html.fz-booting body{overscroll-behavior:none;overscroll-behavior-x:none}
 html.fz-booting body{overflow:hidden}
-#fiezelBootSplash{contain:layout style paint}
+#fiezelBootSplash{contain:layout style paint;top:calc(-1 * env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
 #fiezelBootSplash:not(.is-leaving){animation:none}
 #fiezelBootSplash .fiezel-logo{position:absolute;left:calc(50% - 31vmin);top:calc(50% - 31vmin);width:62vmin;height:62vmin}
 /* Ketukan koreografi v4. Nilai ini WAJIB sama dengan tabel di
@@ -797,6 +797,11 @@ html.fz-booting body{overflow:hidden}
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-x: none !important;
       overscroll-behavior-y: auto !important;
+    }
+    html.fz-booting,
+    html.fz-booting body {
+      background: #1B1418 !important;
+      background-color: #1B1418 !important;
     }
     html:not(.fz-booting),
     html:not(.fz-booting) body {

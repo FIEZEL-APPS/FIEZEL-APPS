@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-735-unified-grammar-20261002';
+const SW_REV='m025-736-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -247,31 +247,41 @@ self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>
 // dengan DUA pengecualian keras: (1) CACHE aktif tidak pernah disentuh; (2) cache basi
 // yang masih menyimpan bita model neural (path /vendor/) DIPERTAHANKAN - model 152 MB
 // itu mahal diunduh ulang dan siklus hidupnya milik lapisan neural, bukan SW ini.
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(async k=>{
-  if(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE)return caches.delete(k);
-  // Wave 1 i18n: generasi cache locale th yang basi ikut dibersihkan di sini - kalau kontrak
-  // konten th naik (v1 -> v2), byte generasi lama tidak boleh menumpuk di kuota perangkat
-  // (tekanan kuota iOS, AI-13 F07). Awalannya sengaja spesifik 'fiezel-locale-th-' supaya
-  // cache stabil lain (fiezel-v*, fiezel-r2-audio-v1, dst) tidak pernah tersentuh aturan ini.
-  if(k.startsWith('fiezel-locale-th-')&&k!==LOCALE_TH_CACHE)return caches.delete(k);
-  if(k===CACHE){
-    try{
-      const runtime=await caches.open(k);
-      const items=await runtime.keys();
-      for(const r of items){
-        if(String(r.url||'').includes('/features/curriculum/fz-api.js'))await runtime.delete(r);
-      }
-    }catch{}
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(async keys=>{
+  await Promise.all(keys.map(async k=>{
+    if(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE)return caches.delete(k);
+    // Wave 1 i18n: generasi cache locale th yang basi ikut dibersihkan di sini - kalau kontrak
+    // konten th naik (v1 -> v2), byte generasi lama tidak boleh menumpuk di kuota perangkat
+    // (tekanan kuota iOS, AI-13 F07). Awalannya sengaja spesifik 'fiezel-locale-th-' supaya
+    // cache stabil lain (fiezel-v*, fiezel-r2-audio-v1, dst) tidak pernah tersentuh aturan ini.
+    if(k.startsWith('fiezel-locale-th-')&&k!==LOCALE_TH_CACHE)return caches.delete(k);
+    if(k===CACHE){
+      try{
+        const runtime=await caches.open(k);
+        const items=await runtime.keys();
+        for(const r of items){
+          const u=String(r.url||'');
+          let p='';
+          try{p=new URL(u).pathname}catch{}
+          if(!u.includes('/vendor/')&&(u.includes('/features/curriculum/fz-api.js')||(p&&shellUrls.has(p))))await runtime.delete(r);
+        }
+      }catch{}
+    }
+    if(k.startsWith('fiezel-v')&&k!==CACHE){
+      try{
+        const stale=await caches.open(k);
+        const entries=await stale.keys();
+        const holdsNeural=entries.some(req=>{try{return new URL(req.url||req).pathname.includes('/vendor/')}catch{return false}});
+        if(!holdsNeural)return caches.delete(k);
+      }catch{}
+    }
+  }));
+  // Jaring pemulihan otomatis: bila klien generasi lama (mis. m025-734) sempat menghapus
+  // SHELL_CACHE tepat sebelum FIEZEL_SKIP_WAITING, isi ulang SHELL_CACHE seketika saat activate.
+  if(!keys.includes(SHELL_CACHE)){
+    try{const c=await caches.open(SHELL_CACHE);await c.addAll(shellRequests())}catch{}
   }
-  if(k.startsWith('fiezel-v')&&k!==CACHE){
-    try{
-      const stale=await caches.open(k);
-      const entries=await stale.keys();
-      const holdsNeural=entries.some(req=>{try{return new URL(req.url||req).pathname.includes('/vendor/')}catch{return false}});
-      if(!holdsNeural)return caches.delete(k);
-    }catch{}
-  }
-})))));
+})));
 /* Halaman luring yang DISINTESIS, bukan diambil dari cache.
    Disengaja: kalau ia berupa berkas ter-precache, ia akan hilang persis pada satu-satunya
    keadaan yang membutuhkannya (cache kosong). Naskahnya Indonesia karena murid FIEZEL
@@ -311,6 +321,7 @@ self.addEventListener('fetch',e=>{
   // modul memperlakukan sinyal ini sebagai tidak ada dan jatuh ke jaring pengaman
   // kandidat-worker yang memang benar saat luring.
   if(requestUrl.pathname.toLowerCase().endsWith('/coordination/build-version.json')){e.respondWith(fetch(e.request).then(r=>r&&r.ok?r:new Response('',{status:503})).catch(()=>new Response('',{status:503})));return}
+  if(requestUrl.searchParams.has('__fz_live_build')){e.respondWith(fetch(new Request(e.request,{cache:'no-store'})).then(r=>r&&r.ok?r:new Response('',{status:503})).catch(()=>new Response('',{status:503})));return}
   // m025-150 indeks audio TIDAK boleh cache-first.
   //
   // Batch aset mendarat di antara rilis, sedangkan SHELL_CACHE hanya berganti saat SW_REV
@@ -375,15 +386,7 @@ self.addEventListener('fetch',e=>{
     jaringan. Di sana tidak ada apa pun untuk disajikan, jadi anggaran waktu tidak akan
     menolong - ia hanya akan mengganti menunggu dengan layar kosong.
      ============================================================================== */
-  if(requestUrl.pathname.toLowerCase().endsWith('/call.html')||requestUrl.pathname.toLowerCase().includes('/features/voice-studio/dist/')){
-    responsePromise=fetch(new Request(e.request,{cache:'no-cache'})).then(r=>{
-      if(r&&r.ok){
-        const copy=r.clone();
-        caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy).catch(()=>{}));
-      }
-      return r;
-    }).catch(()=>caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true}));
-  }else if(e.request.mode==='navigate'){
+  if(e.request.mode==='navigate'){
     /* Entri permintaan ITU SENDIRI lebih dulu, `./index.html` hanya sebagai cadangan rute
        tak dikenal. Bentuk pertama perbaikan ini menyajikan `./index.html` untuk SETIAP
        navigasi - dan itu akan membuat `creator-report-dashboard.html` dan
