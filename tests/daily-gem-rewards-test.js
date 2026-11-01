@@ -98,11 +98,13 @@ function checkDailyGemRewards(silent = false) {
   // 2. Bonus Belajar Minimal 10 Menit Sehari: +20 Gem (1x per hari kalender)
   if (!dr.study10MinClaimed) {
     let todayStudyMs = Number(dr.studyTimeMs) || 0;
+    let historyStudyMs = 0;
     for (const h of state.history || []) {
       if (studyDayKey(h.at || 0, state) === today) {
-        todayStudyMs += (Number(h.ms) || 0);
+        historyStudyMs += (Number(h.ms) || 0);
       }
     }
+    todayStudyMs = Math.max(todayStudyMs, historyStudyMs);
     // 10 menit = 600.000 ms
     if (todayStudyMs >= 10 * 60 * 1000) {
       dr.study10MinClaimed = true;
@@ -141,13 +143,14 @@ assert.strictEqual(awarded2, false, 'Second daily check must award nothing');
 assert.strictEqual(sandbox.state.gems.balance, 125, 'Balance must remain 125');
 console.log('  ✓ Daily Login Bonus idempotency (1x daily) verified');
 
-// 4. Studying 5 minutes (300,000 ms) does NOT unlock the 10-minute bonus
+// 4. Studying 5 minutes (300,000 ms) does NOT unlock the 10-minute bonus even if history also has 5 minutes (anti-double-counting)
 sandbox.state.dailyRewards.studyTimeMs = 300000;
+sandbox.state.history = [{ at: Date.now(), ms: 300000 }];
 const awarded3 = sandbox.checkDailyGemRewards(true);
-assert.strictEqual(awarded3, false, '5 minutes study must not award 10-minute bonus');
+assert.strictEqual(awarded3, false, '5 minutes study + 5 minutes history must NOT double-count to 10 min');
 assert.strictEqual(sandbox.state.gems.balance, 125, 'Balance remains 125');
 assert.strictEqual(sandbox.state.dailyRewards.study10MinClaimed, false, 'study10MinClaimed still false');
-console.log('  ✓ Under-threshold study time (< 10 min) does not trigger reward');
+console.log('  ✓ Under-threshold study time (< 10 min) does not trigger reward and prevents double counting');
 
 // 5. Studying 6 more minutes (total 11 min = 660,000 ms) triggers +20 Gem Study Bonus
 sandbox.state.dailyRewards.studyTimeMs = 660000;

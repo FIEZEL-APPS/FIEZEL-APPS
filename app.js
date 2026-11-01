@@ -13903,11 +13903,13 @@ function checkDailyGemRewards(silent = false) {
   // 2. Bonus Belajar Minimal 10 Menit Sehari: +20 Gem (1x per hari kalender)
   if (!dr.study10MinClaimed) {
     let todayStudyMs = Number(dr.studyTimeMs) || 0;
+    let historyStudyMs = 0;
     for (const h of state.history || []) {
       if (studyDayKey(h.at || 0, state) === today) {
-        todayStudyMs += (Number(h.ms) || 0);
+        historyStudyMs += (Number(h.ms) || 0);
       }
     }
+    todayStudyMs = Math.max(todayStudyMs, historyStudyMs);
     // 10 menit = 600.000 ms
     if (todayStudyMs >= 10 * 60 * 1000) {
       dr.study10MinClaimed = true;
