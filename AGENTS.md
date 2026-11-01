@@ -257,3 +257,20 @@ Di lingkungan di mana beberapa agent bekerja secara simultan di workspace dan re
      - `state.gems = state.gems || { balance: 120 };`
    - Data state WAJIB diikat dan disimpan ke `localStorage` melalui `save()`.
    - DILARANG melepaskan murid ke layar Home dengan nilai `state.level === undefined` atau state parsial yang merusak render dashboard kurikulum dan menjebak murid ke dalam *infinite onboarding loop*.
+
+## 17. Mandatory Protocol: Anti-Theft, Anti-Tamper & Forensic Watermark Invariant (Protokol Pertahanan Intelektual FIEZEL)
+Setiap agent (baik Antigravity, Cloud AI, GitHub Actions Bot, maupun multi-agent subinstances) yang memodifikasi fitur, kuis, atau antarmuka di repositori FIEZEL:
+1. **Integritas Steganografi Forensik (Watermark Zero-Width Wajib Terpasang)**:
+   - DILARANG KERAS menghapus atau menonaktifkan pemanggilan `FiezelWatermark.watermarkText()` di dalam fungsi `renderQuizQuestionContent()` (`app.js`).
+   - Setiap kali membuat jenis soal atau modul evaluasi baru, teks soal WAJIB disaring melalui modul `features/ui/fiezel-watermark.js`.
+   - Pada pipa audio TTS (`features/neural-voice/fiezel-voice-say.js`), pembersihan karakter tak terlihat via `FiezelWatermark.strip()` WAJIB dipertahankan agar suara sintesis AI tetap jernih tanpa jeda artifisial.
+2. **Integritas Anti-Tamper, Anti-Copy & Domain Origin Lock**:
+   - DILARANG KERAS mencabut atau menonaktifkan `features/ui/fiezel-anti-tamper.js` dari `index.html` dan precache `ASSETS` di `sw.js`.
+   - Aturan seleksi CSS (`user-select: none !important`) pada kartu dan bubble soal kuis (`.question`, `#quizStem`, `.quiz-bubble`, `.options`) serta pemblokir tombol pintas DevTools (`F12`, `Ctrl+Shift+I/J/C`, `Ctrl+U`, `Ctrl+S`) WAJIB selalu aktif saat aplikasi diakses di domain publik (`fiezel.my.id`).
+   - Lingkungan lokal (`localhost`, `127.0.0.1`, Playwright headless runner) tetap diizinkan membuka DevTools melalui verifikasi `isLocalOrTest()`.
+3. **Penegakan Otomatis CI (Hard Machine Enforcement)**:
+   - Seluruh perubahan wajib selalu meloloskan gerbang uji proteksi:
+     ```bash
+     node tests/anti-tamper-and-watermark-test.js
+     ```
+   - Setiap PR yang merusak atau membocorkan proteksi kekayaan intelektual ini akan diblokir secara otomatis oleh CI Gate di GitHub Actions.
