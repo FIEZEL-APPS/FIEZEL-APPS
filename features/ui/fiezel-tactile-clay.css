@@ -179,8 +179,8 @@ button.primary:disabled {
 }
 
 /* 6. TACTILE 3D SECONDARY BUTTONS */
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle),
-.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle) {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native),
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native) {
   background: #FFFFFF !important;
   border: 2px solid var(--card-border) !important;
   border-radius: 14px !important;
@@ -192,8 +192,8 @@ button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.o
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
 }
 
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):active,
-.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):active {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):active,
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):active {
   transform: translateY(2px) !important;
   box-shadow: 0 2px 0 var(--card-bevel) !important;
 }
@@ -9083,4 +9083,194 @@ html body #app .today-home-cockpit {
   .fz-motion-aura {
     animation: none !important;
   }
+}
+
+/* ==========================================================================
+   m025-739 · NATIVE iOS/ANDROID PWA TOPBAR & HERO SEAM ELIMINATION
+   Ensures zero horizontal cut/seam below the status bar across Splash,
+   Welcome/Login/Register (.fz-auth-hero), Onboarding (.fiezel-ob-reveal),
+   and protects .fz-auth controls (.fz-auth-lang, .fz-auth-role, .fz-auth-link)
+   from generic 3D clay button overrides.
+   ========================================================================== */
+html body #fiezelBootSplash .fiezel-splash-brand,
+html body .fiezel-splash-dark .fiezel-splash-brand {
+  background: linear-gradient(180deg, #1B1418 0%, #1B1418 72px, rgba(27, 20, 24, 0) 168px),
+              radial-gradient(circle at 50% 48%, #251D22 0%, #1B1418 55%, #120C0F 100%) !important;
+  background-color: #1B1418 !important;
+}
+
+html body #fiezelBootSplash .fz-auth-topo,
+html body #fiezelBootSplash .fz-splash-canvas,
+html body .fiezel-splash-brand .fz-auth-topo,
+html body .fiezel-splash-brand .fz-splash-canvas {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0px, transparent 28px, rgba(0, 0, 0, 0.35) 84px, #000 156px) !important;
+  mask-image: linear-gradient(180deg, transparent 0px, transparent 28px, rgba(0, 0, 0, 0.35) 84px, #000 156px) !important;
+}
+
+html body .fz-auth:not(.is-leaving) {
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+html body .fz-auth .fz-auth-hero,
+html body .fiezel-ob .fiezel-ob-reveal {
+  background: #1B1418 !important;
+  background-color: #1B1418 !important;
+}
+
+html body .fz-auth .fz-auth-hero::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 52px !important;
+  background: linear-gradient(180deg, #1B1418 0%, #1B1418 18px, rgba(27, 20, 24, 0) 100%) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+html body .fz-auth .fz-auth-hero::after,
+html body .fiezel-ob .fiezel-ob-reveal::before {
+  top: 56% !important;
+  height: 136px !important;
+  background: radial-gradient(closest-side, rgba(255, 199, 0, 0.14), rgba(255, 199, 0, 0)) !important;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0px, transparent 28px, #000 84px) !important;
+  mask-image: linear-gradient(180deg, transparent 0px, transparent 28px, #000 84px) !important;
+}
+
+html body .fz-auth .fz-auth-hero .fz-auth-topo,
+html body .fiezel-ob .fiezel-ob-reveal .fz-auth-topo {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0px, transparent 24px, rgba(0, 0, 0, 0.35) 72px, #000 132px) !important;
+  mask-image: linear-gradient(180deg, transparent 0px, transparent 24px, rgba(0, 0, 0, 0.35) 72px, #000 132px) !important;
+}
+
+html body .fz-auth .fz-auth-hero.is-welcome {
+  min-height: 46vh !important;
+  max-height: 50vh !important;
+  padding: max(42px, calc(env(safe-area-inset-top, 0px) + 28px)) 20px 56px !important;
+}
+
+html body .fz-auth .fz-auth-hero.is-masuk {
+  min-height: 21vh !important;
+  max-height: 24vh !important;
+  padding: max(38px, calc(env(safe-area-inset-top, 0px) + 26px)) 20px 38px !important;
+}
+
+html body .fz-auth .fz-auth-hero.is-daftar {
+  min-height: 18vh !important;
+  max-height: 21vh !important;
+  padding: max(32px, calc(env(safe-area-inset-top, 0px) + 22px)) 20px 34px !important;
+}
+
+/* Native glass pill language switcher (ID | ไทย) */
+html body .fz-auth .fz-auth-lang {
+  position: absolute !important;
+  z-index: 3 !important;
+  top: max(12px, calc(env(safe-area-inset-top, 0px) + 8px)) !important;
+  right: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+  padding: 3px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+html body .fz-auth .fz-auth-lang button {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: rgba(253, 250, 243, 0.72) !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  padding: 5px 11px !important;
+  min-height: 26px !important;
+  height: 26px !important;
+  border-radius: 999px !important;
+  transform: none !important;
+}
+
+html body .fz-auth .fz-auth-lang button.is-on {
+  background: #FDFAF3 !important;
+  color: #1B1418 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Native iOS Segmented Control for Role Tabs (Murid | Guru) */
+html body .fz-auth .fz-auth-roles {
+  display: flex !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  border-radius: 12px !important;
+  background: #EFE7DE !important;
+  border: 0 !important;
+  box-shadow: inset 0 1px 2px rgba(27, 20, 24, 0.06) !important;
+}
+
+html body .fz-auth .fz-auth-role {
+  flex: 1 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #6E635C !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  padding: 8px 12px !important;
+  min-height: 36px !important;
+  border-radius: 9px !important;
+  transform: none !important;
+}
+
+html body .fz-auth .fz-auth-role.is-on {
+  background: #FFFFFF !important;
+  color: #1B1418 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(27, 20, 24, 0.12) !important;
+}
+
+/* Native inline links, password eye button & welcome next button */
+html body .fz-auth .fz-auth-link,
+html body .fz-auth .fz-auth-alt button {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #9B3A4A !important;
+  font-weight: 700 !important;
+  padding: 4px 4px !important;
+  min-height: 0 !important;
+  height: auto !important;
+  border-radius: 6px !important;
+  transform: none !important;
+}
+
+html body .fz-auth .fz-auth-eye {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #64748B !important;
+  padding: 6px !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  width: 32px !important;
+  border-radius: 8px !important;
+  transform: none !important;
+}
+
+html body .fz-auth .fz-auth-next {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  border: 1.5px solid #E8DFD3 !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 8px 20px -8px rgba(27, 20, 24, 0.12) !important;
+  border-radius: 999px !important;
+  padding: 6px 6px 6px 20px !important;
+  min-height: 56px !important;
+  color: #1B1418 !important;
 }
