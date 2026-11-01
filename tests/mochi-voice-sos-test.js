@@ -497,7 +497,14 @@ MochiSos.onQuizSessionEnd('metered_test_done');
 sandbox.location.hostname = 'localhost';
 console.log('  ✓ Post-Delivery API-Quota Gem Metering (0 upfront, 2 opening, +1 follow-up, 6 max cap) verified');
 
+// 27. Zero Dual-Voice Collision on First Activation (No mochi_greet_id.mp3 overlap with Gemini Live Puck)
+assert.ok(
+  !/fetch\(\s*audioSrc\s*\)/.test(code) && !/new\s+Audio\(\s*audioSrc\s*\)/.test(code),
+  'playInstantGreeting must NOT play static mochi_greet_*.mp3 on top of Gemini Live Puck voice'
+);
+console.log('  ✓ Zero Dual-Voice Collision on First Activation verified');
+
 execFileSync(process.execPath, [path.join(ROOT, 'tests', 'brain-fsrs-oracle.suite.cjs')], { stdio: 'inherit' });
 execFileSync(process.execPath, [path.join(ROOT, 'tests', 'japanese-grammar-conjugator.suite.cjs')], { stdio: 'inherit' });
 
-console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (26/26)! <<<');
+console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (27/27)! <<<');

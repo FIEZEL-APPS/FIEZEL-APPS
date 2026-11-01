@@ -33,7 +33,12 @@ php.ini
 .cpanel.yml
 .github/
 node_modules/
-coordination/
+# coordination/BUILD-VERSION.json WAJIB ikut terbit ke produksi: klien PWA terpasang
+# (khususnya iOS standalone yang berjalan di m025-734/735) melakukan fetch ke
+# `./coordination/BUILD-VERSION.json?t=...` sebagai sinyal utama deteksi versi baru.
+# Yang dikecualikan hanya berkas koordinasi internal non-runtime.
+coordination/CLAIMS.json
+coordination/braincore-contract.json
 tools/
 workers/
 deploy/

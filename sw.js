@@ -53,8 +53,18 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-737-unified-grammar-20261002';
+const SW_REV='m025-738-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
+async function ensureShellCoherence(){
+  try{
+    const keys=await caches.keys();
+    await Promise.all(keys.map(k=>(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE)?caches.delete(k):Promise.resolve()));
+    const c=await caches.open(SHELL_CACHE);
+    const hasIndex=await c.match('./index.html',{ignoreSearch:true});
+    const hasApp=await c.match('./app.js',{ignoreSearch:true});
+    if(!hasIndex||!hasApp)await c.addAll(shellRequests());
+  }catch{}
+}
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
 // datang dari worker yang benar-benar melayani halaman.
@@ -65,6 +75,7 @@ self.addEventListener('message',event=>{
   // yang ia minta, dan halaman sudah siap memuat ulang di controllerchange.
   if(event?.data?.type==='FIEZEL_SKIP_WAITING'){self.skipWaiting();return}
   if(event?.data?.type!=='FIEZEL_HEALTH_PING')return;
+  try{event.waitUntil?.(ensureShellCoherence())}catch{}
   const reply={type:'FIEZEL_HEALTH_PONG',swRev:SW_REV};
   // Balas lewat port yang dikirim halaman bila ada; kalau tidak, lewat klien pengirimnya.
   if(event.ports&&event.ports[0])event.ports[0].postMessage(reply);
@@ -240,7 +251,7 @@ const shellRequests=()=>ASSETS.map(asset=>new Request(asset,{cache:'reload'}));
 // Do not skipWaiting here. A new release is allowed to activate only after clients
 // using the previous worker are gone, preventing a controller-generation swap in
 // the middle of a live installed-PWA document.
-self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>c.addAll(shellRequests()))));
+self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>c.addAll(shellRequests())).catch(async err=>{try{await caches.delete(SHELL_CACHE)}catch{}throw err})));
 // Because activation is no longer forced over live old clients, stale dedicated
 // shell caches can be removed here. The stable neural/runtime CACHE is preserved.
 // D16 (D7 T-5): activate membersihkan cache fiezel-v* basi yang bukan revisi aktif,
@@ -433,7 +444,7 @@ self.addEventListener('fetch',e=>{
     // Non-navigation shell assets remain cache-first within this exact generation.
     // Missing shell bytes are refetched into this generation, never borrowed from
     // legacy shell entries that still happen to exist in the stable runtime cache.
-    responsePromise=caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.status===200){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy).catch(()=>{}))}return r}));
+    responsePromise=caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true}).then(c=>c||fetch(new Request(e.request,{cache:'reload'})).then(r=>{if(r&&r.status===200){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy).catch(()=>{}))}return r}));
   }else{
     responsePromise=caches.match(e.request,{cacheName:CACHE}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.status===200&&!isNeuralAsset(e.request)){const copy=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,copy).catch(()=>{}))}return r}));
   }

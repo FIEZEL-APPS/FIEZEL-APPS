@@ -135,6 +135,11 @@ check('B berkas gerbang uji MEMANG terbuang (kalau tidak, ratusan berkas CI ikut
   polaKecuali.some((p) => dibuang(p, 'reports/production-release-command-report.md')),
   'pola *-test.js dan reports/');
 
+check('B coordination/BUILD-VERSION.json TIDAK ikut terbuang (dipakai fiezel-update-prompt.js untuk deteksi update iOS PWA)',
+  !polaKecuali.some((p) => dibuang(p, 'coordination/BUILD-VERSION.json')) &&
+  polaKecuali.some((p) => dibuang(p, 'coordination/CLAIMS.json')),
+  'coordination/BUILD-VERSION.json ikut terbit ke produksi sementara CLAIMS.json dikecualikan');
+
 /* ---------------------------------------------------------------- (F) kecualian vs rujukan */
 /* Cek ASSETS di atas hanya melihat 157 berkas precache. Aplikasi juga memuat berkas LAIN
  * secara malas (`design/` dipakai fiezel-splash.js dan fiezel-ui-sfx.js), dan berkas seperti

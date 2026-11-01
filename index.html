@@ -1027,6 +1027,16 @@ html.fz-booting body{overflow:hidden}
           try { doc.documentElement.classList.remove('fz-booting'); } catch (x) {}
           try { var sp = doc.getElementById('fiezelBootSplash'); if (sp && sp.parentNode) sp.parentNode.removeChild(sp); } catch (x) {}
         });
+        window.addEventListener('load', function () {
+          setTimeout(function () {
+            try {
+              if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
+                navigator.serviceWorker.getRegistration().then(function (r) { if (r && r.update) r.update(); }).catch(function () {});
+              }
+              if (window.FiezelUpdatePrompt && window.FiezelUpdatePrompt.check) window.FiezelUpdatePrompt.check(true);
+            } catch (x) {}
+          }, 1200);
+        });
       } catch (e) {}
     })();
   </script>

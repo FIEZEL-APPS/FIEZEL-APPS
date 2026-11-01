@@ -80,6 +80,24 @@
                 }
               }
             }
+            // Deteksi cangkang aktif yang tercemar aset HTTP disk cache lama di iOS WebKit:
+            // bila DIAG_BUILD di dalam activeShellName lebih tua daripada activeRev, bersihkan dan isi ulang via SW.
+            if (activeShellName && activeNum !== null && typeof caches.open === 'function') {
+              caches.open(activeShellName).then(function (c) {
+                return c.match('./features/neural-voice/fiezel-diag-panel.js');
+              }).then(function (res) {
+                return res ? res.text() : '';
+              }).then(function (txt) {
+                if (!txt) return;
+                var m = txt.match(/DIAG_BUILD\s*=\s*[\x22\x27](m\d+-\d+)[\x22\x27]/i);
+                var diagNum = m ? parseBuildNum(m[1]) : null;
+                if (diagNum !== null && diagNum < activeNum) {
+                  caches.delete(activeShellName).then(function () {
+                    return pingControllerRev();
+                  }).catch(function () {});
+                }
+              }).catch(function () {});
+            }
           }).catch(function () {});
           // Pemulihan split-brain otomatis satu kali: bila controller SW aktif sudah berada di
           // generasi yang lebih baru daripada halaman yang tertahan di memori iOS standalone PWA,
@@ -100,12 +118,27 @@
           }
         }).catch(function () {});
       };
+      var checkSwUpdateNow = function () {
+        sweepStaleShellCaches();
+        try {
+          if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
+            navigator.serviceWorker.getRegistration().then(function (reg) {
+              if (reg && typeof reg.update === 'function') {
+                reg.update().then(function () {
+                  try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
+                }).catch(function () {});
+              }
+            }).catch(function () {});
+          }
+          self.FiezelUpdatePrompt?.check?.(true);
+        } catch (_) {}
+      };
       sweepStaleShellCaches();
       window.addEventListener('pageshow', function (ev) {
-        if (ev && ev.persisted) sweepStaleShellCaches();
+        if (ev && ev.persisted) checkSwUpdateNow();
       });
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') sweepStaleShellCaches();
+        if (document.visibilityState === 'visible') checkSwUpdateNow();
       });
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (reg) {
         if (reg) {

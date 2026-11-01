@@ -409,8 +409,13 @@
   }
 
   function fetchRemoteVersion() {
-    var out = { version: '', build: '' };
+    var _b = '';
     var liveConfigBuild = '';
+    var out = {
+      version: '',
+      get build() { return (liveConfigBuild && (!_b || isNewerBuild(liveConfigBuild, _b))) ? liveConfigBuild : _b; },
+      set build(v) { if (v && (!_b || isNewerBuild(v, _b))) _b = String(v); }
+    };
     return Promise.all([
       fetch('./VERSION.json?t=' + Date.now(), { cache: 'no-store' })
         .then(function (r) { return r && r.ok ? r.json() : null; })
