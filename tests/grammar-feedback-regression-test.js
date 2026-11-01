@@ -172,8 +172,8 @@ async function boot(browser, locale) {
     } catch (_) {}
   });
   await page.goto(ORIGIN + '/');
-  await page.waitForFunction(() => typeof window.startTokenOrderSession === 'function' && self.FiezelGrammarUpgrade && self.FiezelTutorBrain, null, { timeout: 60000 });
-  await page.waitForTimeout(3000);
+  await page.waitForFunction(() => typeof window.startTokenOrderSession === 'function' && self.FiezelGrammarUpgrade && self.FiezelTutorBrain && (window.__fiezelBootSplashDismissed || window.appOpened), null, { timeout: 60000 }).catch(() => {});
+  await page.waitForTimeout(1000);
   await page.evaluate(() => {
     document.getElementById('fiezelBootSplash')?.remove();
     document.documentElement.classList.remove('fz-booting');
@@ -418,8 +418,8 @@ async function sectionB() {
         await window.startPlacement();
         const sleep = ms => new Promise(res => setTimeout(res, ms));
         let screens = 0, hint = 0, gloss = 0;
-        for (let i = 0; i < 40 && !st.placementDone; i++) {
-          await sleep(80);
+        for (let i = 0; i < 80 && !st.placementDone; i++) {
+          await sleep(100);
           const opts = [...document.querySelectorAll('#options .option')];
           if (!opts.length) continue;
           screens++;

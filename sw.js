@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-739-unified-grammar-20261002';
+const SW_REV='m025-740-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
@@ -398,19 +398,17 @@ self.addEventListener('fetch',e=>{
     menolong - ia hanya akan mengganti menunggu dengan layar kosong.
      ============================================================================== */
   if(e.request.mode==='navigate'){
-    /* Entri permintaan ITU SENDIRI lebih dulu, `./index.html` hanya sebagai cadangan rute
-       tak dikenal. Bentuk pertama perbaikan ini menyajikan `./index.html` untuk SETIAP
-       navigasi - dan itu akan membuat `creator-report-dashboard.html` dan
-       `creator-report-setup.html` (keduanya ada di ASSETS, keduanya halaman sungguhan)
-       tidak pernah bisa dibuka lagi. Membaca kunci yang sama dengan yang ditulis juga
-       membuat revalidasi latar benar-benar menyegarkan yang disajikan, bukan kunci lain
-       yang tidak pernah dibaca. */
-    const cangkang=()=>caches.match(e.request,{cacheName:SHELL_CACHE})
-      .then(c=>c||caches.match('./index.html',{cacheName:SHELL_CACHE}));
+    // Navigasi mandiri via SHELL_CACHE (ignoreSearch: true; sub-HTML mandiri tidak jatuh ke index.html).
+    const cleanNavUrl=requestUrl.origin+requestUrl.pathname;
+    const isSubHtml=/\/(call|misi|kurikulum|undercover|creator-report-dashboard|creator-report-setup)\.html$/i.test(requestUrl.pathname);
+    const cangkang=()=>caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true})
+      .then(c=>c||(requestUrl.search?caches.match(cleanNavUrl,{cacheName:SHELL_CACHE}):null))
+      .then(c=>c||(isSubHtml?null:caches.match('./index.html',{cacheName:SHELL_CACHE})));
     const segarkan=fetch(new Request(e.request,{cache:'reload'})).then(r=>{
       if(r&&r.ok){
         const copy=r.clone();
-        caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy));
+        const putKey=(requestUrl.search&&isSubHtml)?new Request(cleanNavUrl):e.request;
+        caches.open(SHELL_CACHE).then(cache=>cache.put(putKey,copy));
       }
       return r;
     });

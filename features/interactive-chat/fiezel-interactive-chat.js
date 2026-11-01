@@ -113,6 +113,35 @@
         '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
         '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone *; autoplay *; camera *" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
         '</div>';
+      try {
+        var mountedFrame = root.document && root.document.getElementById('fzMitraKaiwaStudioFrame');
+        if (mountedFrame && typeof mountedFrame.addEventListener === 'function' && typeof root.fetch === 'function') {
+          var healed = false;
+          mountedFrame.addEventListener('load', function () {
+            if (healed) return;
+            try {
+              var fDoc = mountedFrame.contentDocument || (mountedFrame.contentWindow && mountedFrame.contentWindow.document);
+              if (fDoc && fDoc.getElementById && fDoc.getElementById('fiezelBootSplash')) {
+                healed = true;
+                var sp = fDoc.getElementById('fiezelBootSplash');
+                if (sp) sp.style.display = 'none';
+                root.fetch('./call.html', { cache: 'reload' }).then(function (r) {
+                  return r && r.ok ? r.text() : '';
+                }).then(function (html) {
+                  if (html && html.indexOf('fiezelBootSplash') === -1) {
+                    var docToWrite = mountedFrame.contentDocument || (mountedFrame.contentWindow && mountedFrame.contentWindow.document);
+                    if (docToWrite) {
+                      docToWrite.open();
+                      docToWrite.write(html);
+                      docToWrite.close();
+                    }
+                  }
+                }).catch(function () {});
+              }
+            } catch (_) {}
+          });
+        }
+      } catch (_) {}
     };
   }
 }(typeof globalThis !== 'undefined' ? globalThis : window, function (root) {
