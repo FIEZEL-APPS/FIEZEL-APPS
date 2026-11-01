@@ -114,3 +114,19 @@ AddDefaultCharset UTF-8
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
+
+# ==========================================================================
+# ANTI-SCRAPING & ANTI-HOTLINKING SHIELD (BANK SOAL & ASET AUDIO)
+# ==========================================================================
+# Mencegah bot, crawler, dan skrip curl dari luar men-download berkas JSON kurikulum
+# dan audio MP3 secara massal.
+# Hanya permintaan sah dari dalam peramban resmi FIEZEL atau aplikasi WebView yang diizinkan.
+<IfModule mod_rewrite.c>
+  RewriteCond %{REQUEST_URI} !/(manifest\.json|\.well-known/) [NC]
+  RewriteCond %{REQUEST_URI} \.(json|mp3)$ [NC]
+  RewriteCond %{HTTP_REFERER} !^https?://(www\.)?fiezel\.my\.id [NC]
+  RewriteCond %{HTTP_REFERER} !^https?://(localhost|127\.0\.0\.1) [NC]
+  RewriteCond %{HTTP_REFERER} !^android-app:// [NC]
+  RewriteCond %{HTTP_USER_AGENT} !(FiezelApp|FiezelPWA) [NC]
+  RewriteRule ^.*$ - [F,L]
+</IfModule>

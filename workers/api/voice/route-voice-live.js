@@ -35,6 +35,23 @@ let _poolIndex = Math.floor(Math.random() * 16);
 const _copilotCooldownMap = new Map(); // key -> timestamp ms
 let _copilotPoolIndex = Math.floor(Math.random() * 16);
 
+// Rate limit in-memory per IP untuk mencegah pengurasan kuota Gemini Live & Copilot
+const _ipLiveCallMap = new Map();
+function checkLiveRateLimit(ip, limit = 12, windowMs = 60000) {
+  if (!ip) return true;
+  const now = Date.now();
+  const entry = _ipLiveCallMap.get(ip) || { count: 0, resetAt: now + windowMs };
+  if (now > entry.resetAt) {
+    entry.count = 1;
+    entry.resetAt = now + windowMs;
+    _ipLiveCallMap.set(ip, entry);
+    return true;
+  }
+  entry.count++;
+  _ipLiveCallMap.set(ip, entry);
+  return entry.count <= limit;
+}
+
 function parseKeys(env) {
   const raw = String(env?.GEMINI_LIVE_KEYS || env?.GEMINI_API_KEY || '').trim();
   if (!raw) return [];
@@ -91,6 +108,19 @@ async function mintEphemeralToken(apiKey) {
  * Handler POST /api/voice/live-session
  */
 export async function routeVoiceLiveSession(ctx) {
+  const clientIp = (ctx.request && (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) || '';
+  if (!checkLiveRateLimit(clientIp, 12, 60000)) {
+    return jsonResponse(
+      {
+        ok: false,
+        error: 'rate_limited',
+        fallback: true,
+        message: 'Rate limit exceeded. Please wait 1 minute before requesting another voice token.',
+      },
+      { status: 429 }
+    );
+  }
+
   const keys = parseKeys(ctx.env);
   if (!keys.length) {
     return jsonResponse(
@@ -393,6 +423,14 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
  * yang menjawab langsung ucapan terbaru Partner AI + konteks percakapan.
  */
 export async function routeVoiceCopilotAssist(ctx) {
+  const clientIp = (ctx.request && (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) || '';
+  if (!checkLiveRateLimit(clientIp, 35, 60000)) {
+    return jsonResponse(
+      { ok: false, fallback: true, error: 'rate_limited', message: 'Rate limit exceeded for copilot.' },
+      { status: 429 }
+    );
+  }
+
   const keys = parseKeys(ctx.env);
   if (!keys.length) {
     return jsonResponse({ ok: false, fallback: true, error: 'no_keys_configured' }, { status: 503 });
@@ -468,6 +506,14 @@ export async function routeVoiceCopilotAssist(ctx) {
  * dalam 1 panggilan tunggal berlatensi rendah.
  */
 export async function routeVoicePartnerTurn(ctx) {
+  const clientIp = (ctx.request && (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) || '';
+  if (!checkLiveRateLimit(clientIp, 35, 60000)) {
+    return jsonResponse(
+      { ok: false, fallback: true, error: 'rate_limited', message: 'Rate limit exceeded for partner turn.' },
+      { status: 429 }
+    );
+  }
+
   const keys = parseKeys(ctx.env);
   if (!keys.length) {
     return jsonResponse({ ok: false, fallback: true, error: 'no_keys_configured' }, { status: 503 });
