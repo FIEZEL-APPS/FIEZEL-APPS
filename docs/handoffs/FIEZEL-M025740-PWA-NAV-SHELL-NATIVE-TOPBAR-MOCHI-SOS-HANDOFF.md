@@ -1,8 +1,8 @@
 # FIEZEL m025-740 Handoff Dossier: PWA Navigation Cache Fix, Native Status Bar & Topbar Geometry, Mochi SOS Zero-Collision & Clean Voice Studio
 
-**Build Version**: `m025-740`  
-**Target Release**: Production (`https://fiezel.my.id/app/`)  
-**Date**: 2026-11-02  
+**Build Version**: `m025-740`
+**Target Release**: Production (`https://fiezel.my.id/app/`)
+**Date**: 2026-11-02
 **Scope**: `fix(auth): [ALLOW-PROTECTED: auth|onboarding|pwa] resolve PWA shell cache, native header geometry, topbars, and mochi voice sos`
 
 ---
@@ -10,7 +10,7 @@
 ## 1. Ringkasan Temuan Audit & Solusi Tuntas
 1. **PWA Sub-Document Navigation Cache Miss (`call.html` Menampilkan Splash Screen)**:
    - **Penyebab**: Di `sw.js`, penangan navigasi Service Worker memanggil `caches.match(e.request, { cacheName: SHELL_CACHE })` tanpa opsi `{ ignoreSearch: true }`. Ketika PWA iframe memanggil `call.html?embed=1&tab=call&lang=ja...`, query string menyebabkan cache miss, sehingga fallback navigasi langsung menyajikan `./index.html` (dengan splash screen boot `#1B1418`).
-   - **Solusi**: 
+   - **Solusi**:
      - Menambahkan `{ ignoreSearch: true }` pada pencarian `SHELL_CACHE`.
      - Normalisasi rute URL pathname bersih (`cleanNavUrl`).
      - Menambahkan pengecekan eksplisit agar sub-dokumen kanonikal (`call.html`, `misi.html`, `kurikulum.html`) tidak pernah jatuh (fallback) ke `./index.html`.
@@ -24,7 +24,7 @@
      - Menghapus lapisan kabut hitam buatan (`mask-image` dan `.fz-auth-hero::before`) yang memotong garis lengkung secara anomali di layar Masuk, Daftar, Selamat Datang, dan Splash.
 
 3. **Eliminasi Pop-up Hitam & Suara Ganda Bertabrakan pada Mochi SOS**:
-   - **Penyebab**: 
+   - **Penyebab**:
      - Mengetuk tombol toggle Mochi SOS memunculkan `fzMochiSosConfirmModal` modal hitam panjang berisi rincian kuota dan anti-hangus.
      - Saat pertama kali diaktifkan, `OPENING_AUDIO_WATCHDOG_MS` atau fallback token memanggil `_fallbackSpeechTurn` (Edge TTS wanita `gadis`), sementara koneksi WebSocket Gemini Live (suara `Puck`) juga tersambung dan memutar audio live secara bersamaan.
    - **Solusi**:

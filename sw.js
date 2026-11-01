@@ -398,13 +398,7 @@ self.addEventListener('fetch',e=>{
     menolong - ia hanya akan mengganti menunggu dengan layar kosong.
      ============================================================================== */
   if(e.request.mode==='navigate'){
-    /* Entri permintaan ITU SENDIRI lebih dulu, `./index.html` hanya sebagai cadangan rute
-       tak dikenal. Bentuk pertama perbaikan ini menyajikan `./index.html` untuk SETIAP
-       navigasi - dan itu akan membuat `creator-report-dashboard.html`,
-       `creator-report-setup.html`, dan `call.html?embed=1...` (iframe Kawan Bicara / Mitra Kaiwa)
-       jatuh ke `./index.html` dan menampilkan layar splash di dalam iframe. Pencarian
-       mengabaikan query string (`ignoreSearch: true` + pencocokan pathname murni) dan
-       sub-dokumen `.html` mandiri tidak pernah jatuh ke `./index.html`. */
+    // Navigasi mandiri via SHELL_CACHE (ignoreSearch: true; sub-HTML mandiri tidak jatuh ke index.html).
     const cleanNavUrl=requestUrl.origin+requestUrl.pathname;
     const isSubHtml=/\/(call|misi|kurikulum|undercover|creator-report-dashboard|creator-report-setup)\.html$/i.test(requestUrl.pathname);
     const cangkang=()=>caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true})

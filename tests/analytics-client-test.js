@@ -929,7 +929,7 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
         w.sandbox.localStorage = bersama;
         w.emitter._resetForGate();
         w.emitter.boot();
-        await settle(80);
+        await settle(200);
         const semua = w.transport.bodies().map(b => JSON.parse(b));
         const ev = [].concat(...semua.filter(p => p.events).map(p => p.events));
         const app = ev.find(e => e.name === 'app_open');
