@@ -1,7 +1,7 @@
 {
-  "version": "m025-738",
-  "claimedBy": "branch feat/iphone-pwa-build-version-sync-m025-738",
-  "claimedAt": "2026-11-01T20:31:50.292Z",
-  "reason": "fix(pwa,voice): iphone 15 pwa build-version sync, stale shell purge, and mochi sos single-voice greeting (m025-738) [ALLOW-PROTECTED: pwa]",
+  "version": "m025-739",
+  "claimedBy": "branch feat/topbar-hero-seam-elimination-m025-739",
+  "claimedAt": "2026-11-01T21:08:31.904Z",
+  "reason": "fix(ui,pwa): eliminate topbar status-bar seam on splash/auth/onboarding and restore native auth controls",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

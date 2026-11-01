@@ -6205,24 +6205,26 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
    Kepala MENGECIL dari Selamat datang → Masuk → Daftar, persis seperti referensinya.
    ========================================================================== */
 body.fz-auth-open{overflow:hidden}
-.fz-auth{position:fixed;inset:0;z-index:2147481950;display:flex;flex-direction:column;background:var(--bg,#FBF7F3);color:var(--text,#2E2724);overflow-y:auto;overscroll-behavior:contain;animation:fzAuthIn .32s cubic-bezier(.2,.8,.2,1) both}
+.fz-auth{position:fixed;inset:0;z-index:2147481950;display:flex;flex-direction:column;background:var(--bg,#FBF7F3);color:var(--text,#2E2724);overflow-y:auto;overscroll-behavior:contain;opacity:1}
 .fz-auth.is-leaving{animation:fzAuthOut .24s ease both}
 @keyframes fzAuthIn{from{opacity:0}to{opacity:1}}
 @keyframes fzAuthOut{to{opacity:0;transform:translateY(8px)}}
 .fz-auth-hero{position:relative;flex:0 0 auto;overflow:hidden;color:var(--fz-on-core,#FDFAF3);
-  background:radial-gradient(120% 90% at 30% 0%,var(--fz-core-soft,#2A2126) 0%,var(--fz-core,#1B1418) 70%);
+  background:#1B1418;background-color:#1B1418;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
   padding:max(28px,calc(env(safe-area-inset-top) + 16px)) 20px 64px;transition:min-height .35s cubic-bezier(.2,.8,.2,1)}
 .fz-auth-hero.is-welcome{min-height:58vh}
 .fz-auth-hero.is-masuk{min-height:30vh}
 .fz-auth-hero.is-daftar{min-height:22vh}
 .fz-auth-topo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.fz-auth-hero .fz-auth-topo,.fiezel-ob-reveal .fz-auth-topo{-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 24px,rgba(0,0,0,.35) 72px,#000 132px);mask-image:linear-gradient(180deg,transparent 0px,transparent 24px,rgba(0,0,0,.35) 72px,#000 132px)}
 .fz-auth-topo path,
 .fz-auth-topo line,
 .fz-auth-topo circle{fill:none !important;stroke:rgba(255,199,0,.24) !important;stroke-width:1.1 !important;stroke-linecap:round !important;stroke-linejoin:round !important}
 .fz-auth-topo .accent{stroke:rgba(255,215,0,.55) !important;stroke-width:1.4 !important}
 .fz-auth-topo .whisper{stroke:rgba(255,199,0,.14) !important;stroke-width:0.95 !important}
-.fz-auth-hero::after{content:"";position:absolute;left:50%;top:40%;width:min(80vw,340px);height:220px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,199,0,.22),rgba(255,199,0,0))}
+.fz-auth-hero::before{content:"";position:absolute;top:0;left:0;right:0;height:52px;background:linear-gradient(180deg,#1B1418 0%,#1B1418 18px,rgba(27,20,24,0) 100%);pointer-events:none;z-index:1}
+.fz-auth-hero::after{content:"";position:absolute;left:50%;top:56%;width:min(76vw,320px);height:136px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,199,0,.15),rgba(255,199,0,0));-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,#000 84px);mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,#000 84px)}
 .fz-auth-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:58px;z-index:2}
 .fz-auth-wave path{fill:var(--bg,#FBF7F3)}
 .fz-auth-brand{position:relative;z-index:1}
@@ -9572,7 +9574,8 @@ button.fz-coach-bubble,
 
 /* Tekstur topografi emas pada header onboarding (.fiezel-ob-reveal) seperti Auth Login */
 .fiezel-ob-reveal {
-  background: radial-gradient(120% 90% at 30% 0%, var(--fz-core-soft, #2A2126) 0%, var(--fz-core, #1B1418) 70%) !important;
+  background: #1B1418 !important;
+  background-color: #1B1418 !important;
 }
 .fiezel-ob-reveal .fz-auth-topo {
   position: absolute !important;
@@ -9765,9 +9768,9 @@ header.topbar {
 
 .fz-auth-hero.is-masuk {
   flex: 0 0 auto !important;
-  min-height: 14vh !important;
-  max-height: 16vh !important;
-  padding: max(14px, calc(env(safe-area-inset-top) + 8px)) 20px 24px !important;
+  min-height: 21vh !important;
+  max-height: 24vh !important;
+  padding: max(38px, calc(env(safe-area-inset-top, 0px) + 26px)) 20px 38px !important;
 }
 
 .fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
