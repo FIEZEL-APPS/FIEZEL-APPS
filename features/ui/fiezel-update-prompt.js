@@ -140,6 +140,7 @@
    * agar rilis baru dimuat bersih tanpa tertinggal aset CSS/JS usang.
    * Aset suara neural (/vendor/) tetap dijaga agar unduhan 152 MB tidak terbuang. */
   function purgeStaleCaches() {
+    var includeCurrentShell = !!arguments[0];
     if (typeof caches === 'undefined' || !caches.keys) return Promise.resolve();
     return caches.keys().then(function (names) {
       var target = bestBuild || '';
@@ -150,6 +151,11 @@
           var appBuildNum = parseBuild(APP_BUILD);
           // Jangan pernah menghapus cangkang rilis yang lebih baru dari build halaman aktif!
           if (cacheBuildNum !== null && appBuildNum !== null && cacheBuildNum > appBuildNum) {
+            return Promise.resolve();
+          }
+          // Jangan menghapus cangkang halaman aktif sebelum worker baru activated agar
+          // controller lama tidak kehilangan cangkangnya jika pemasangan masih berlangsung.
+          if (!includeCurrentShell && cacheBuildNum !== null && appBuildNum !== null && cacheBuildNum === appBuildNum) {
             return Promise.resolve();
           }
           // Bila target rilis baru sudah diketahui, pertahankan cangkang target rilis baru
@@ -204,7 +210,7 @@
 
       var finishReload = function () {
         try {
-          var pClean = purgeStaleCaches();
+          var pClean = purgeStaleCaches(true);
           if (pClean && typeof pClean.then === 'function') {
             pClean.then(reloadIfApproved).catch(reloadIfApproved);
             return;

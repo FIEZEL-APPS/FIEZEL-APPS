@@ -1,7 +1,7 @@
 {
-  "version": "m025-739",
-  "claimedBy": "branch feat/topbar-hero-seam-elimination-m025-739",
-  "claimedAt": "2026-11-01T21:08:31.904Z",
-  "reason": "fix(ui,pwa): eliminate topbar status-bar seam on splash/auth/onboarding and restore native auth controls",
+  "version": "m025-740",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-11-01T22:49:27.848Z",
+  "reason": "fix(auth): [ALLOW-PROTECTED: auth|onboarding|pwa] resolve PWA shell cache, native header geometry, topbars, and mochi voice sos",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

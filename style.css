@@ -6217,14 +6217,13 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth-hero.is-masuk{min-height:30vh}
 .fz-auth-hero.is-daftar{min-height:22vh}
 .fz-auth-topo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
-.fz-auth-hero .fz-auth-topo,.fiezel-ob-reveal .fz-auth-topo{-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 24px,rgba(0,0,0,.35) 72px,#000 132px);mask-image:linear-gradient(180deg,transparent 0px,transparent 24px,rgba(0,0,0,.35) 72px,#000 132px)}
+.fz-auth-hero .fz-auth-topo,.fiezel-ob-reveal .fz-auth-topo{opacity:.95}
 .fz-auth-topo path,
 .fz-auth-topo line,
 .fz-auth-topo circle{fill:none !important;stroke:rgba(255,199,0,.24) !important;stroke-width:1.1 !important;stroke-linecap:round !important;stroke-linejoin:round !important}
 .fz-auth-topo .accent{stroke:rgba(255,215,0,.55) !important;stroke-width:1.4 !important}
 .fz-auth-topo .whisper{stroke:rgba(255,199,0,.14) !important;stroke-width:0.95 !important}
-.fz-auth-hero::before{content:"";position:absolute;top:0;left:0;right:0;height:52px;background:linear-gradient(180deg,#1B1418 0%,#1B1418 18px,rgba(27,20,24,0) 100%);pointer-events:none;z-index:1}
-.fz-auth-hero::after{content:"";position:absolute;left:50%;top:56%;width:min(76vw,320px);height:136px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,199,0,.15),rgba(255,199,0,0));-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,#000 84px);mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,#000 84px)}
+.fz-auth-hero::after{content:"";position:absolute;left:50%;top:56%;width:min(76vw,320px);height:136px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,199,0,.15),rgba(255,199,0,0))}
 .fz-auth-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:58px;z-index:2}
 .fz-auth-wave path{fill:var(--bg,#FBF7F3)}
 .fz-auth-brand{position:relative;z-index:1}
@@ -12219,11 +12218,22 @@ body.fz-lesson-mode #app {
   padding-top: 0 !important;
 }
 
-/* Ensure top context wrap never collapses on non-home views */
-body:not(.fz-stage-home):not(.fz-stage-quiz):not(.fz-lesson-mode) #topContextWrap {
+/* Ensure top context wrap never collapses on non-home views, but hide in classroom and quiz */
+body:not(.fz-stage-home):not(.fz-view-classroom):not(.fz-stage-quiz):not(.fz-lesson-mode) #topContextWrap {
   display: flex !important;
   align-items: center !important;
   min-height: 38px !important;
+}
+
+body.fz-view-classroom #topContextWrap,
+body.fz-view-classroom header.topbar #topContextWrap {
+  display: none !important;
+}
+
+/* Hide noisy ornament background in topbar across all views for pure native app finish */
+.topbar-ornament-bg,
+header.topbar .topbar-ornament-bg {
+  display: none !important;
 }
 
 /* 2. Practice Session & Quiz Shell Zero-Cutoff on Mobile & Multi-Device Topbar */
@@ -12238,10 +12248,10 @@ body.fz-lux.fz-stage-quiz .quiz-topbar {
   width: 100% !important;
   box-sizing: border-box !important;
   margin: 0 !important;
-  height: 52px !important;
-  min-height: 52px !important;
-  max-height: 52px !important;
-  padding: max(4px, env(safe-area-inset-top, 4px)) 16px 4px !important;
+  height: calc(54px + env(safe-area-inset-top, 0px)) !important;
+  min-height: calc(54px + env(safe-area-inset-top, 0px)) !important;
+  max-height: calc(54px + env(safe-area-inset-top, 0px)) !important;
+  padding: env(safe-area-inset-top, 0px) 16px 0 16px !important;
   background: rgba(255, 255, 255, 0.98) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
@@ -12262,7 +12272,7 @@ body.fz-lux.fz-stage-quiz .quiz-topbar {
 }
 
 .quiz-shell {
-  padding-top: calc(54px + env(safe-area-inset-top, 4px)) !important;
+  padding-top: calc(58px + env(safe-area-inset-top, 0px)) !important;
   padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
 }
 

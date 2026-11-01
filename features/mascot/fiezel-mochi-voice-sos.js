@@ -202,20 +202,6 @@
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'Bantuan suara Mochi dinonaktifkan',
     'mochi-sos.toast-out-of-gems': 'Gem belum cukup untuk soal berikutnya. Bantuan Mochi ditutup aman.',
-    'mochi-sos.modal-free-title': 'Bantuan Suara Mochi (Kuota Gratis)',
-    'mochi-sos.modal-gem-title': 'Bantuan Suara Mochi (Sesuai Kuota Suara)',
-    'mochi-sos.modal-free-body': 'Kamu punya {remaining}x bantuan suara gratis hari ini ({limit} soal/hari). Kuota hanya terpakai saat suara AI benar-benar keluar.',
-    'mochi-sos.modal-gem-body': 'Gem dihitung sesuai pemakaian suara AI (0 Gem saat menyambung/gagal suara). Saldo kamu: {balance} 💎.',
-    'mochi-sos.modal-free-btn': 'Mulai Gratis (0 💎)',
-    'mochi-sos.modal-gem-btn': 'Aktifkan (Mulai 0 💎)',
-    'mochi-sos.modal-cancel-btn': 'Batal',
-    'mochi-sos.modal-row-free-quota': 'Kuota Gratis Hari Ini',
-    'mochi-sos.modal-row-connect-safe': 'Menyambung / Gagal Suara',
-    'mochi-sos.modal-row-connect-anti': 'Sambung (Anti-Hangus)',
-    'mochi-sos.modal-row-opening-ai': 'Bedah Soal Suara AI',
-    'mochi-sos.modal-row-followup': 'Tanya Lanjutan (Maks. {max} 💎)',
-    'mochi-sos.modal-row-cashback': 'Jawab Benar Soal Ini',
-    'mochi-sos.modal-unit-questions': 'soal',
     'mochi-sos.modal-insufficient-title': 'Gem Belum Cukup 💎',
     'mochi-sos.modal-insufficient-body': 'Kamu membutuhkan minimal 2 Gem untuk membedah soal dengan suara AI Mochi (Saldo saat ini: {balance} 💎). Selesaikan soal latihan untuk kumpulkan Gem gratis atau gunakan kuota gratis harian besok!',
     'mochi-sos.modal-insufficient-btn': 'Mengerti',
@@ -266,20 +252,6 @@
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'ปิดผู้ช่วยเสียงโมจิแล้ว',
     'mochi-sos.toast-out-of-gems': 'เจมไม่พอสำหรับข้อถัดไป ปิดผู้ช่วยเสียงโมจิอย่างปลอดภัยแล้ว',
-    'mochi-sos.modal-free-title': 'ตัวช่วยเสียงโมจิ (โควตาฟรี)',
-    'mochi-sos.modal-gem-title': 'ตัวช่วยเสียงโมจิ (คิดตามโควตาเสียง)',
-    'mochi-sos.modal-free-body': 'คุณมีสิทธิ์ตัวช่วยเสียงฟรีเหลือ {remaining} ครั้งในวันนี้ ({limit} ข้อ/วัน) สิทธิ์จะถูกนับเมื่อเสียง AI ดังขึ้นจริงเท่านั้น',
-    'mochi-sos.modal-gem-body': 'คิดเจมตามเสียง AI ที่ใช้งานจริง (เชื่อมต่อ/เสียงไม่ติด = 0 Gem) ยอดของคุณ: {balance} 💎',
-    'mochi-sos.modal-free-btn': 'เริ่มฟรี (0 💎)',
-    'mochi-sos.modal-gem-btn': 'เปิดใช้งาน (เริ่ม 0 💎)',
-    'mochi-sos.modal-cancel-btn': 'ยกเลิก',
-    'mochi-sos.modal-row-free-quota': 'โควตาฟรีวันนี้',
-    'mochi-sos.modal-row-connect-safe': 'เชื่อมต่อ / เสียงไม่ติด',
-    'mochi-sos.modal-row-connect-anti': 'เชื่อมต่อ (ป้องกันเจมเสียฟรี)',
-    'mochi-sos.modal-row-opening-ai': 'อธิบายโจทย์ด้วยเสียง AI',
-    'mochi-sos.modal-row-followup': 'ถามต่อ (สูงสุด {max} 💎)',
-    'mochi-sos.modal-row-cashback': 'ตอบถูกในข้อนี้',
-    'mochi-sos.modal-unit-questions': 'ข้อ',
     'mochi-sos.modal-insufficient-title': 'เจมไม่พอ 💎',
     'mochi-sos.modal-insufficient-body': 'คุณต้องมีอย่างน้อย 2 Gem เพื่อวิเคราะห์โจทย์ด้วยเสียง AI ของโมจิ (ยอดปัจจุบัน: {balance} 💎) ฝึกทำแบบฝึกหัดเพื่อสะสม Gem ฟรี หรือใช้สิทธิ์ฟรีรายวันในวันพรุ่งนี้!',
     'mochi-sos.modal-insufficient-btn': 'เข้าใจแล้ว',
@@ -1934,11 +1906,20 @@
   }
 
   var _fallbackTtsAbort = null;
+  var _fallbackTtsSource = null;
 
   function stopAllActiveAudioSources() {
     if (_fallbackTtsAbort) {
       try { _fallbackTtsAbort.abort(); } catch (_) {}
       _fallbackTtsAbort = null;
+    }
+    if (_fallbackTtsSource) {
+      try {
+        _fallbackTtsSource.onended = null;
+        _fallbackTtsSource.stop();
+        _fallbackTtsSource.disconnect();
+      } catch (_) {}
+      _fallbackTtsSource = null;
     }
     if (_currentAudio) {
       try {
@@ -2809,111 +2790,7 @@
     },
 
     showConfirmationModal: function (activeQ) {
-      var doc = getDoc();
-      if (!doc) return;
-      var existing = doc.getElementById('fzMochiSosConfirmModal');
-      if (existing) existing.remove();
-
-      var self = this;
-      var currentBalance = getGemBalance();
-      var dailyUsage = getDailySosUsage();
-      var remainingFree = Math.max(0, DAILY_FREE_SOS_LIMIT - dailyUsage.count);
-      var hasDailyFree = remainingFree > 0;
-
-      if (!hasDailyFree && currentBalance < GEM_MIN_START_BALANCE) {
-        this.showInsufficientGemModal(currentBalance);
-        return;
-      }
-
-      var modal = doc.createElement('div');
-      modal.id = 'fzMochiSosConfirmModal';
-      modal.className = 'fz-mochi-sos-intro-scrim';
-
-      var isTh = getLocale() === 'th';
-      var titleText = hasDailyFree
-        ? t('mochi-sos.modal-free-title', 'Bantuan Suara Mochi (Kuota Gratis)')
-        : t('mochi-sos.modal-gem-title', 'Bantuan Suara Mochi (Sesuai Kuota Suara)');
-      var bodyText = hasDailyFree
-        ? t('mochi-sos.modal-free-body', 'Kamu punya {remaining}x bantuan suara gratis hari ini ({limit} soal/hari). Kuota hanya terpakai saat suara AI benar-benar keluar.', { remaining: remainingFree, limit: DAILY_FREE_SOS_LIMIT })
-        : t('mochi-sos.modal-gem-body', 'Gem dihitung sesuai pemakaian suara AI (0 Gem saat menyambung/gagal suara). Saldo kamu: {balance} 💎.', { balance: currentBalance });
-      var cancelBtnText = t('mochi-sos.modal-cancel-btn', 'Batal');
-      var confirmBtnText = hasDailyFree
-        ? t('mochi-sos.modal-free-btn', 'Mulai Gratis (0 💎)')
-        : t('mochi-sos.modal-gem-btn', 'Aktifkan (Mulai 0 💎)');
-
-      var breakdownHtml = hasDailyFree
-        ? [
-            '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:12px;padding:8px 10px;margin:0 0 12px;text-align:left;font-size:11px;line-height:1.5;color:#065F46;">',
-            '  <div style="display:flex;justify-content:space-between;font-weight:700;"><span>' + t('mochi-sos.modal-row-free-quota', 'Kuota Gratis Hari Ini') + '</span><span>' + remainingFree + '/' + DAILY_FREE_SOS_LIMIT + ' ' + t('mochi-sos.modal-unit-questions', 'soal') + '</span></div>',
-            '  <div style="display:flex;justify-content:space-between;"><span>' + t('mochi-sos.modal-row-connect-safe', 'Menyambung / Gagal Suara') + '</span><strong>0 💎</strong></div>',
-            '</div>'
-          ].join('')
-        : [
-            '<div style="background:#FEFCE8;border:1px solid #FDE68A;border-radius:12px;padding:8px 10px;margin:0 0 12px;text-align:left;font-size:11px;line-height:1.55;color:#334155;">',
-            '  <div style="display:flex;justify-content:space-between;"><span>' + t('mochi-sos.modal-row-connect-anti', 'Sambung (Anti-Hangus)') + '</span><strong style="color:#059669;">0 💎</strong></div>',
-            '  <div style="display:flex;justify-content:space-between;"><span>' + t('mochi-sos.modal-row-opening-ai', 'Bedah Soal Suara AI') + '</span><strong>' + GEM_COST_OPENING_TURN + ' 💎</strong></div>',
-            '  <div style="display:flex;justify-content:space-between;"><span>' + t('mochi-sos.modal-row-followup', 'Tanya Lanjutan (Maks. {max} 💎)', { max: GEM_MAX_PER_QUESTION }) + '</span><strong>+' + GEM_COST_FOLLOWUP_TURN + ' 💎</strong></div>',
-            '  <div style="display:flex;justify-content:space-between;color:#059669;font-weight:700;"><span>' + t('mochi-sos.modal-row-cashback', 'Jawab Benar Soal Ini') + '</span><span>Cashback +' + CASHBACK_REWARD + ' 💎</span></div>',
-            '</div>'
-          ].join('');
-
-      modal.innerHTML = [
-        '<div class="fz-mochi-sos-intro-card" role="dialog" aria-modal="true" style="background:#FFFDF9;border:2px solid #FDE047;border-radius:20px;padding:16px 14px 14px;max-width:296px;width:calc(100% - 32px);box-shadow:0 12px 32px rgba(0,0,0,0.18);text-align:center;box-sizing:border-box;">',
-        '  <div class="fz-mochi-sos-intro-icon" style="width:46px;height:46px;margin:0 auto 6px;background:#FEF3C7;border-radius:14px;display:flex;align-items:center;justify-content:center;">',
-        '    <svg width="32" height="32" viewBox="0 0 100 100" fill="none">',
-        '      <ellipse cx="50" cy="85" rx="30" ry="7" fill="rgba(217,119,6,0.15)"/>',
-        '      <path d="M50 18C30 18 18 34 18 58C18 78 32 82 50 82C68 82 82 78 82 58C82 34 70 18 50 18Z" fill="#FFFDF8" stroke="#F59E0B" stroke-width="2.5"/>',
-        '      <ellipse cx="32" cy="60" rx="6" ry="4" fill="#FDA4AF"/>',
-        '      <ellipse cx="68" cy="60" rx="6" ry="4" fill="#FDA4AF"/>',
-        '      <circle cx="37" cy="50" r="4.5" fill="#0F172A"/>',
-        '      <circle cx="63" cy="50" r="4.5" fill="#0F172A"/>',
-        '      <path d="M46 58C48 60 52 60 54 58" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>',
-        '      <path d="M22 44C22 28 32 18 50 18C68 18 78 28 78 44" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>',
-        '      <rect x="18" y="40" width="6" height="12" rx="3" fill="#2563EB"/>',
-        '      <rect x="76" y="40" width="6" height="12" rx="3" fill="#2563EB"/>',
-        '    </svg>',
-        '  </div>',
-        '  <h3 class="fz-mochi-sos-intro-title" style="font-size:15px;font-weight:800;color:#0F172A;margin:0 0 4px;line-height:1.25;">' + titleText + '</h3>',
-        '  <p class="fz-mochi-sos-intro-body" style="font-size:11.5px;line-height:1.45;color:#475569;margin:0 0 10px;font-weight:500;">' + bodyText + '</p>',
-        breakdownHtml,
-        '  <div style="display:flex;gap:8px;justify-content:center;">',
-        '    <button type="button" class="fz-mochi-sos-btn-cancel" id="fzMochiSosConfirmCancel" style="flex:1;height:36px;padding:0 10px;background:#FFFFFF;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 #CBD5E1;transition:all 0.15s ease;">' + cancelBtnText + '</button>',
-        '    <button type="button" class="fz-mochi-sos-btn-confirm" id="fzMochiSosConfirmOk" style="flex:1.5;height:36px;padding:0 10px;background:#FDE047;color:#0F172A;border:1.5px solid #EAB308;border-radius:10px;font-size:11.5px;font-weight:800;cursor:pointer;box-shadow:0 2px 0 #CA8A04;white-space:nowrap;transition:all 0.15s ease;">' + confirmBtnText + '</button>',
-        '  </div>',
-        '</div>'
-      ].join('');
-
-      doc.body.appendChild(modal);
-
-      var btnCancel = doc.getElementById('fzMochiSosConfirmCancel');
-      if (btnCancel) {
-        btnCancel.onclick = function (e) {
-          if (e) { e.preventDefault(); e.stopPropagation(); }
-          modal.remove();
-        };
-      }
-
-      var btnOk = doc.getElementById('fzMochiSosConfirmOk');
-      if (btnOk) {
-        btnOk.onclick = function (e) {
-          if (e) { e.preventDefault(); e.stopPropagation(); }
-          var bal = getGemBalance();
-          var freshDaily = getDailySosUsage();
-          var useFreeNow = freshDaily.count < DAILY_FREE_SOS_LIMIT;
-          if (!useFreeNow && bal < GEM_MIN_START_BALANCE) {
-            modal.remove();
-            self.showInsufficientGemModal(bal);
-            return;
-          }
-
-          // 0 Gem dipotong saat klik! Gem / kuota gratis hanya terhitung saat audio suara AI benar-benar diputar.
-          _pendingBillingMode = useFreeNow ? 'daily_free' : 'metered_gems';
-          modal.remove();
-
-          self.setMochiEnabled(true, { userConfirmed: true, useDailyFree: useFreeNow, skipAutoStart: true });
-          self.startCall(activeQ, { autoEntry: true, userConfirmed: true, useDailyFree: useFreeNow });
-        };
-      }
+      this.setMochiEnabled(true, { userConfirmed: true });
     },
 
     showInsufficientGemModal: function (currentBalance) {
@@ -3911,6 +3788,18 @@
     },
 
     _scheduleAudioChunk: function (base64Pcm16) {
+      if (_fallbackTtsSource) {
+        try {
+          _fallbackTtsSource.onended = null;
+          _fallbackTtsSource.stop();
+          _fallbackTtsSource.disconnect();
+        } catch (_) {}
+        _fallbackTtsSource = null;
+      }
+      if (_fallbackTtsAbort) {
+        try { _fallbackTtsAbort.abort(); } catch (_) {}
+        _fallbackTtsAbort = null;
+      }
       var ctx = getAudioContext();
       if (!ctx) return;
       if (ctx.state === 'suspended') ctx.resume().catch(function () {});
@@ -4035,6 +3924,7 @@
     _fallbackSpeechTurn: function (q) {
       var self = this;
       if (!this.isCallActive() || typeof fetch !== 'function') return;
+      if ((_ws && _ws.readyState <= 1) || _activeAudioSources.length > 0) return;
       var activeQ = getActiveQuestion(q) || q;
       var guidance = String(this.buildSocraticGuidance(activeQ) || '').trim();
       if (!guidance) return;
@@ -4085,15 +3975,16 @@
           throw new Error('non_audio_ct');
         }).then(function (buf) {
           if (!buf || buf.byteLength < 64 || !self.isCallActive()) return;
-          if ((_ws && _ws.readyState === 1) || _activeAudioSources.length > 0) return;
+          if ((_ws && _ws.readyState <= 1) || _activeAudioSources.length > 0) return;
           var ctx = getAudioContext();
           if (ctx) {
             return ctx.decodeAudioData(buf.slice(0)).then(function (decoded) {
               if (!self.isCallActive()) return;
-              if ((_ws && _ws.readyState === 1) || _activeAudioSources.length > 0) return;
+              if ((_ws && _ws.readyState <= 1) || _activeAudioSources.length > 0) return;
               stopAllActiveAudioSources();
               var source = ctx.createBufferSource();
               source.buffer = decoded;
+              _fallbackTtsSource = source;
               var targetNode = attachAnalyserToMochi(ctx) || ctx.destination;
               source.connect(targetNode);
               source.start(0);
@@ -4108,6 +3999,7 @@
               } catch (_) {}
               self.meterDeliveredAiTurn(activeQ, 'opening');
               source.onended = function () {
+                if (_fallbackTtsSource === source) _fallbackTtsSource = null;
                 _activeAudioSources = _activeAudioSources.filter(function (s) { return s !== source; });
                 if (_activeAudioSources.length === 0) {
                   self._setVoiceVisualizerSpeaking(false);
@@ -4464,7 +4356,7 @@
         hapticTap(10);
         var currentlyOn = isMochiEnabledFromStorage();
         if (!currentlyOn) {
-          self.showConfirmationModal(activeQ);
+          self.setMochiEnabled(true, { userConfirmed: true });
         } else {
           self.setMochiEnabled(false);
         }

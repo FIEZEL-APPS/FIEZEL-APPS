@@ -3802,7 +3802,7 @@ export default function App() {
                 title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์ AI' : 'Ganti Karakter & Gaya Bicara AI'}
               >
                 <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-                <span className="max-w-[120px] sm:max-w-[160px] truncate">
+                <span className="max-w-[70px] xs:max-w-[100px] sm:max-w-[160px] truncate">
                   {formatPersonaShortName(activePersona.name)}
                 </span>
                 <svg className="w-3 h-3 text-[#8C7A65]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -3875,7 +3875,7 @@ export default function App() {
               data-testid="btn-open-braincore"
               onClick={() => handleTabChange('braincore')}
               title="Analitik Braincore"
-              className="px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#5C4E3C] font-mono text-[11px] font-semibold tabular-nums cursor-pointer transition-all"
+              className="hidden xs:inline-flex px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#5C4E3C] font-mono text-[11px] font-semibold tabular-nums cursor-pointer transition-all"
             >
               {Math.round(currentMasteryP * 100)}%
             </button>
@@ -4120,9 +4120,7 @@ export default function App() {
                           <div
                             aria-hidden="true"
                             className="absolute pointer-events-none w-20 sm:w-28 h-20 sm:h-28 rounded-full bg-gradient-to-br from-[#EEDFCC]/60 to-[#DFCEB7]/50 animate-pulse shadow-inner flex items-center justify-center"
-                          >
-                            <span className="text-[10px] font-semibold text-[#8C7A65] tracking-wider uppercase">Mochi</span>
-                          </div>
+                          />
                         )}
                         {mochi3dFailed && (
                           <img
