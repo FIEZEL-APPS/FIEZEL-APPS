@@ -1666,10 +1666,13 @@ function recordSkipExamPass(s=state,level='',detail={}){
   const mistakes={...trust.probation.mistakesByLevel};delete mistakes[target];
   trust.probation.mistakesByLevel=mistakes;
   const previous=trust.exams[target]||{attempts:0};
-  trust.exams[target]={...previous,attempts:Math.max(1,Math.floor(Number(previous.attempts||0))+(detail.countAttempt===false?0:1)),passed:true,lastAt:now,lastScore:Math.max(0,Math.floor(Number(detail.score||0))),lastTotal:Math.max(0,Math.floor(Number(detail.total||0))),lastAccuracy:Math.max(0,Math.min(100,Math.floor(Number(detail.accuracy||0)))),cooldownUntil:0,weakSkill:''};
+  trust.exams[target]={...previous,attempts:Math.max(1,Math.floor(Number(previous.attempts||0))+(detail.countAttempt===false?0:1)),passed:true,lastAt:now,lastScore:Math.max(0,Math.floor(Number(detail.score||0))),lastTotal:Math.max(0,Math.floor(Number(detail.total||0))),lastAccuracy:Math.max(0,Math.min(100,Math.floor(Number(detail.accuracy||0)))),cooldownUntil:0,weakSkill:'',syncStatus:'pending_reconciliation'};
   trust.locked=false;
   trust.pendingNotice=null;
   s.levelTrust=trust;
+  if(self.FiezelOfflineLease&&typeof self.FiezelOfflineLease.refreshLease==='function'){
+    try{self.FiezelOfflineLease.refreshLease(s.ownerUuid,LEVELS.slice(0,LEVELS.indexOf(trust.verified)+1))}catch(_){}
+  }
   s.preferences={...(s.preferences||{}),activeLevel:trust.verified,levelMode:'manual'};
   return true;
 }
@@ -4725,6 +4728,19 @@ async function brainSyncFlush(){
     const st=brainSyncRead(),terkirim=Array.isArray(st.sent)?st.sent:[];
     const hidup=new Set((state.history||[]).map(h=>h&&h.attemptId).filter(Boolean));
     brainSyncWrite({...st,sent:[...terkirim,...batch.map(x=>x.attemptId)].filter(id=>hidup.has(id)).slice(-BRAIN_SYNC_SENT_MAX),lastPushedAt:Date.now(),saving:false,lastErrorAt:0,rejected:(Number(st.rejected)||0)+ditolak,owner:st.owner||(typeof progressSyncOwner==='function'?progressSyncOwner():''),timezone:tz,syncAttempts:0});
+    try{
+      if(state.levelTrust?.exams){
+        for(const k of Object.keys(state.levelTrust.exams)){
+          if(state.levelTrust.exams[k]?.syncStatus==='pending_reconciliation'){
+            state.levelTrust.exams[k].syncStatus='reconciled';
+            state.levelTrust.exams[k].reconciledAt=Date.now();
+          }
+        }
+      }
+      if(self.FiezelOfflineLease&&typeof self.FiezelOfflineLease.refreshLease==='function'){
+        self.FiezelOfflineLease.refreshLease(state.ownerUuid,LEVELS);
+      }
+    }catch(_){}
     /* Satu flush = satu batch 50; sisa antrean menyusul tanpa menunggu sesi berikutnya. */
     if(batch.length>=BRAIN_SYNC_BATCH)queueBrainSyncFlush(1500);
     return true;
@@ -6465,7 +6481,24 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
    berjalan dan #app kosong selamanya di balik chrome yang terlihat hidup. 20 detik cukup
    longgar untuk 3G nyata; lewat itu murid berhak diberi kartu galat + tombol Coba lagi. */
  const bankTimeout=()=>{try{return typeof AbortSignal!=='undefined'&&typeof AbortSignal.timeout==='function'?{signal:AbortSignal.timeout(20000)}:{}}catch(_){return{}}};
- const get=async f=>{const r=await fetch(new URL(f,root),bankTimeout());if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster,_misconceptions,grammarVocabMapRaw;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM,_misconceptions,grammarVocabMapRaw]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root),optional('content/grammar-vocab-map-v1.json',null)]);if(grammarMaster&&Array.isArray(grammarMaster.templates))self.__grammarTemplatesCache=grammarMaster.templates;if(grammarVocabMapRaw&&self.FiezelGrammarVocabBridge?.setGrammarVocabMap)self.FiezelGrammarVocabBridge.setGrammarVocabMap(grammarVocabMapRaw);GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
+ const get=async f=>{
+   if(self.FiezelOfflineVault&&typeof self.FiezelOfflineVault.getBank==='function'){
+     try{
+       const cachedVault=await self.FiezelOfflineVault.getBank(f);
+       if(cachedVault)return cachedVault;
+     }catch(_){}
+   }
+   const r=await fetch(new URL(f,root),bankTimeout());
+   if(!r.ok)throw Error(`${f}: ${r.status}`);
+   let bankData=await r.json();
+   if(self.FiezelOfflineVault&&typeof self.FiezelOfflineVault.decryptIfEncrypted==='function'){
+     bankData=await self.FiezelOfflineVault.decryptIfEncrypted(bankData);
+   }
+   if(self.FiezelOfflineVault&&typeof self.FiezelOfflineVault.saveBank==='function'){
+     try{self.FiezelOfflineVault.saveBank(f,bankData)}catch(_){}
+   }
+   return bankData;
+ };const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster,_misconceptions,grammarVocabMapRaw;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM,_misconceptions,grammarVocabMapRaw]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root),optional('content/grammar-vocab-map-v1.json',null)]);if(grammarMaster&&Array.isArray(grammarMaster.templates))self.__grammarTemplatesCache=grammarMaster.templates;if(grammarVocabMapRaw&&self.FiezelGrammarVocabBridge?.setGrammarVocabMap)self.FiezelGrammarVocabBridge.setGrammarVocabMap(grammarVocabMapRaw);GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
   // dipakai Grammar Hub. Sebelumnya Core Brain hanya punya graph keluarga - lima keluarga
   // bahkan hilang darinya - jadi diagnosis akar masalah tidak pernah bisa menunjuk lesson.
   try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
@@ -9667,11 +9700,21 @@ async function ensureSearchIndex(){
   if(searchIndexCache)return searchIndexCache;
   if(!self.FiezelSearch)return null;
   try{
-    const [g,v,r]=await Promise.all([
-      fetch('./grammar-templates.json',{credentials:'same-origin'}).then(x=>x.json()),
-      fetch('./vocabulary-master.json',{credentials:'same-origin'}).then(x=>x.json()),
-      fetch('./reading-bank.json',{credentials:'same-origin'}).then(x=>x.json())
-    ]);
+    let g=G,v=V,r=R;
+    if(!g||!v||!r){
+      const loadBank=async(file)=>{
+        if(self.FiezelOfflineVault&&typeof self.FiezelOfflineVault.getBank==='function'){
+          const vaultItem=await self.FiezelOfflineVault.getBank(file);
+          if(vaultItem)return vaultItem;
+        }
+        return fetch('./'+file,{credentials:'same-origin'}).then(x=>x.json());
+      };
+      [g,v,r]=await Promise.all([
+        g?Promise.resolve(g):loadBank('grammar-templates.json'),
+        v?Promise.resolve(v):loadBank('vocabulary-master.json'),
+        r?Promise.resolve(r):loadBank('reading-bank.json')
+      ]);
+    }
     searchIndexCache=self.FiezelSearch.buildIndex({grammar:g,vocabulary:vocabForLocale(v),reading:r});/* W4-MERGE AI-06 F10: fetch mentah ini melewati normalisasi load(), jadi overlay th harus lewat helper BERSAMA yang sama */
     return searchIndexCache;
   }catch{return null}
