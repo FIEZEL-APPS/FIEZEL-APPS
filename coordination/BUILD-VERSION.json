@@ -1,7 +1,7 @@
 {
-  "version": "m025-744",
-  "claimedBy": "branch feat/security-hardening-m025-744",
-  "claimedAt": "2026-11-02T07:43:52.595Z",
-  "reason": "fix(security): [ALLOW-PROTECTED: auth] client-side anti-tamper, dual-layer steganography & state integrity guard",
+  "version": "m025-745",
+  "claimedBy": "branch feat/offline-vault-m025-745",
+  "claimedAt": "2026-11-02T08:16:47.841Z",
+  "reason": "fix(security): [ALLOW-PROTECTED: auth] hybrid offline vault, encrypted question bank cache & offline lease manager",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
