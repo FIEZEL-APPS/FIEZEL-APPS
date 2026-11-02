@@ -410,7 +410,6 @@ self.addEventListener('fetch',e=>{
     menolong - ia hanya akan mengganti menunggu dengan layar kosong.
      ============================================================================== */
   if(e.request.mode==='navigate'){
-    // Navigasi mandiri via SHELL_CACHE (ignoreSearch: true; sub-HTML mandiri tidak jatuh ke index.html).
     const cleanNavUrl=requestUrl.origin+requestUrl.pathname;
     const isSubHtml=/\/(call|misi|kurikulum|undercover|creator-report-dashboard|creator-report-setup)\.html$/i.test(requestUrl.pathname);
     const isUpdateNav=requestUrl.searchParams.has('fz_upd')||requestUrl.searchParams.has('__fz_fresh')||requestUrl.searchParams.has('fz_healed');
