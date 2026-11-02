@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-752-unified-grammar-20261002';
+const SW_REV='m025-753-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
@@ -131,6 +131,18 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
   // offline yang beralih ke th kehilangan satu-satunya pemuat aset th-nya.
   './features/i18n/fiezel-th-loader.js',
+  './features/i18n/locales/en/ui.json',
+  './features/i18n/locales/en/quiz.json',
+  './features/i18n/locales/en/grammar.json',
+  './features/i18n/locales/en/vocab.json',
+  './features/i18n/locales/id/ui.json',
+  './features/i18n/locales/id/quiz.json',
+  './features/i18n/locales/id/grammar.json',
+  './features/i18n/locales/id/vocab.json',
+  './features/i18n/locales/th/ui.json',
+  './features/i18n/locales/th/quiz.json',
+  './features/i18n/locales/th/grammar.json',
+  './features/i18n/locales/th/vocab.json',
   // brain-learning-infra: lima modul infrastruktur belajar + lane telemetri (config, events,
   // queue, transport). Aturan sama dengan modul brain lain - masuk precache HANYA setelah
   // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404, dan
@@ -398,7 +410,6 @@ self.addEventListener('fetch',e=>{
     menolong - ia hanya akan mengganti menunggu dengan layar kosong.
      ============================================================================== */
   if(e.request.mode==='navigate'){
-    // Navigasi mandiri via SHELL_CACHE (ignoreSearch: true; sub-HTML mandiri tidak jatuh ke index.html).
     const cleanNavUrl=requestUrl.origin+requestUrl.pathname;
     const isSubHtml=/\/(call|misi|kurikulum|undercover|creator-report-dashboard|creator-report-setup)\.html$/i.test(requestUrl.pathname);
     const isUpdateNav=requestUrl.searchParams.has('fz_upd')||requestUrl.searchParams.has('__fz_fresh')||requestUrl.searchParams.has('fz_healed');

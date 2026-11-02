@@ -1,7 +1,7 @@
 {
-  "version": "m025-752",
-  "claimedBy": "branch feat/invariants-lock-m025-752",
-  "claimedAt": "2026-11-02T19:00:52.979Z",
-  "reason": "fix(ci,quality): [ALLOW-PROTECTED: ci] lock tri-core invariants gate for owner wire, stale shell, and auth csp (m025-752)",
+  "version": "m025-753",
+  "claimedBy": "branch feat/i18n-universal-pivot",
+  "claimedAt": "2026-11-02T19:53:02.978Z",
+  "reason": "feat(i18n): [ALLOW-PROTECTED: ci,pwa] universal english pivot & clean global matrix",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -3,10 +3,13 @@
   "private": true,
   "version": "5.19.0",
   "dependencies": {
+    "i18next": "^26.7.1",
     "msedge-tts": "^2.1.0",
     "web-push": "3.6.7"
   },
   "scripts": {
+    "i18n:extract": "i18next",
+    "i18n:matrix": "node tools/i18n-localize-matrix.mjs",
     "i18n:sync": "node tools/sync-th-i18n.js --sync",
     "i18n:check": "node tools/sync-th-i18n.js --check",
     "mascot:export": "node tools/export-mascot.mjs",
@@ -49,6 +52,7 @@
     "opencode:fresh-user": "node tools/opencode-reset.js --fresh-user"
   },
   "devDependencies": {
+    "i18next-parser": "^9.0.2",
     "playwright": "^1.63.0"
   }
 }

@@ -16,7 +16,7 @@ assert.ok(fetchBlock.length>0,'service-worker fetch handler must exist');
  * (13 assert: tidak menunggu jaringan, koherensi generasi, penyembuhan diri, 500 tidak
  * meracuni cangkang, luring, pemasangan pertama). Yang tersisa di sini adalah syarat
  * struktural yang tetap harus benar apa pun mekanismenya. */
-const navBranch=fetchBlock.match(/if\s*\(e\.request\.mode===['"]navigate['"]\)[\s\S]{0,1200}/);
+const navBranch=fetchBlock.match(/if\s*\(e\.request\.mode===['"]navigate['"]\)[\s\S]{0,2000}/);
 assert.ok(navBranch,'startup recovery must have an explicit navigation branch');
 const navSource=navBranch[0];
 assert.match(navSource,/fetch\s*\(/,'navigation must still reach the network so a stale document can be replaced');

@@ -5417,6 +5417,24 @@ body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font
   --fz-heading:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-body:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
+:root:lang(km){
+  --fz-display:'Noto Sans Khmer','Khmer OS Battambang','FZ Instrument Serif',serif;
+  --fz-display-round:'Noto Sans Khmer','FZ Plus Jakarta Sans',-apple-system,sans-serif;
+  --fz-heading:'Noto Sans Khmer','FZ Plus Jakarta Sans',-apple-system,sans-serif;
+  --fz-body:'Noto Sans Khmer','FZ Plus Jakarta Sans',-apple-system,sans-serif;
+}
+:root:lang(ja){
+  --fz-display:'Noto Sans JP','Hiragino Sans','Meiryo','FZ Instrument Serif',serif;
+  --fz-display-round:'Noto Sans JP','FZ Plus Jakarta Sans',-apple-system,sans-serif;
+  --fz-heading:'Noto Sans JP','FZ Plus Jakarta Sans',-apple-system,sans-serif;
+  --fz-body:'Noto Sans JP','FZ Plus Jakarta Sans',-apple-system,sans-serif;
+}
+:root:lang(ru){
+  --fz-display:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  --fz-display-round:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  --fz-heading:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+}
 
 /* Lantai line-height Thai (AI-05 F03 / AI-04 F06): sara atas + tanda nada
    menumpuk sampai 3 tingkat; di bawah ±1.35 baris display saling tabrak dan
