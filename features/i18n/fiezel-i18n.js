@@ -194,7 +194,7 @@
       var fs = require('fs');
       var localesDir = path.join(__dirname, 'locales');
       if (fs.existsSync(localesDir)) {
-        SUPPORTED.forEach(function (loc) {
+        ['id', 'en'].forEach(function (loc) {
           var dir = path.join(localesDir, loc);
           if (fs.existsSync(dir)) {
             ['ui', 'quiz', 'grammar', 'vocab'].forEach(function (ns) {

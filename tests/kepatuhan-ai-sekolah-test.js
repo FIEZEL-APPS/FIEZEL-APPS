@@ -10,6 +10,7 @@
  * C1  alat kapasitas membaca ritme dari kode, dan tabel di dokumen sama dengan keluaran alat
  * C2  hitungan: 250 murid sudah melewati paket gratis; plafon AI lebih sempit dari jumlah murid
  */
+const { pathToFileURL } = require('url');
 const __fzRoot = require('path').join(__dirname, '..');
 const fs = require('fs');
 const path = require('path');
@@ -67,7 +68,7 @@ check('A5 rapor dan analisis butir tanpa AI', () => {
 });
 
 check('C1 alat kapasitas membaca kode; dokumen = keluaran alat', async () => {
-  const K = await import(path.join(__fzRoot, 'tools/kapasitas-sekolah.mjs'));
+  const K = await import(pathToFileURL(path.join(__fzRoot, 'tools/kapasitas-sekolah.mjs')).href);
   const kode = K.bacaKode();
   assert.ok(kode.notifPollMs > 0 && kode.stagePollMs > 0 && kode.guruSyncMs > 0 && kode.neuronCap > 0);
   const doc = read('docs/KAPASITAS-SEKOLAH.md');
@@ -75,7 +76,7 @@ check('C1 alat kapasitas membaca kode; dokumen = keluaran alat', async () => {
 });
 
 check('C2 temuan kapasitas', async () => {
-  const K = await import(path.join(__fzRoot, 'tools/kapasitas-sekolah.mjs'));
+  const K = await import(pathToFileURL(path.join(__fzRoot, 'tools/kapasitas-sekolah.mjs')).href);
   const r250 = K.hitung(250), r1000 = K.hitung(1000);
   assert.strictEqual(r250.gratis.cukup, false, '250 murid aktif melewati paket gratis');
   assert.ok(r250.muridAiTerlayani < 250, 'plafon AI lebih sempit dari 250 murid');
