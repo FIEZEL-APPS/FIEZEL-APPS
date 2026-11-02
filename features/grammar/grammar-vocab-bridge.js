@@ -746,11 +746,11 @@
     const current = getActiveIntensity(s);
 
     const html = `
-      <div class="modal-intensity-sheet first-time-intensity" style="position:relative;">
-        <button type="button" class="modal-close-icon" onclick="closeModal()" aria-label="Tutup" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.06);border:none;border-radius:999px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#475569;z-index:20;"><i data-lucide="x"></i></button>
-        <div class="modal-mark">FIEZEL</div>
-        <h2>${t('scaffold.onboarding-title', 'Pilih Ritme Belajarmu')}</h2>
-        <p class="muted">${t('scaffold.onboarding-desc', 'Tentukan berapa banyak kosakata kunci yang ingin kamu kuasai per materi grammar.')}</p>
+      <div class="modal-intensity-sheet first-time-intensity" style="position:relative;padding-top:6px;">
+        <button type="button" class="modal-close-icon" onclick="closeModal()" aria-label="Tutup" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:999px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#E2E8F0;z-index:20;"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+        <div class="modal-mark" style="margin-bottom:4px;">FIEZEL</div>
+        <h2 style="padding:0 44px;margin:0 auto 6px;line-height:1.25;">${t('scaffold.onboarding-title', 'Pilih Ritme Belajarmu')}</h2>
+        <p class="muted" style="padding:0 12px;margin:0 0 10px;">${t('scaffold.onboarding-desc', 'Tentukan berapa banyak kosakata kunci yang ingin kamu kuasai per materi grammar.')}</p>
         
         <div class="modal-intensity-options">
           ${Object.values(LEARNING_INTENSITY_LEVELS).map(lvl => {

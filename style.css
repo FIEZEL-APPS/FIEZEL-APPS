@@ -8424,6 +8424,44 @@ body:has(.home-today) #modalPanel h2,
   background: rgba(255, 255, 255, 0.08) !important;
 }
 
+/* Settings Modal Actions Bar in Dark Sheet */
+.modal-panel .modal-actions.settings-actions,
+#modalPanel .modal-actions.settings-actions,
+body.fz-lux .modal-actions.settings-actions,
+body:has(.home-today) .modal-actions.settings-actions {
+  background: rgba(20, 20, 28, 0.95) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  backdrop-filter: blur(16px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+.modal-panel .modal-actions.settings-actions button#settingsCancel,
+#modalPanel .modal-actions.settings-actions button#settingsCancel,
+body.fz-lux .modal-actions.settings-actions button#settingsCancel,
+body:has(.home-today) .modal-actions.settings-actions button#settingsCancel {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #F8FAFC !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.modal-panel .modal-actions.settings-actions button#settingsCancel:hover,
+#modalPanel .modal-actions.settings-actions button#settingsCancel:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #FFFFFF !important;
+}
+
+.modal-panel .modal-actions.settings-actions button#settingsSave,
+#modalPanel .modal-actions.settings-actions button#settingsSave,
+body.fz-lux .modal-actions.settings-actions button#settingsSave,
+body:has(.home-today) .modal-actions.settings-actions button#settingsSave {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  color: #0F172A !important;
+  font-weight: 700 !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35) !important;
+}
+
 /* Recovery kontras: tombol "Tolak" pada kartu permintaan teman (di atas kartu putih #F8FAFC ganti teks kuning jadi slate 500/600 #64748B, kontras > 5:1 AA) */
 .modal-panel #connectRequestsList .text-button,
 #modalPanel #connectRequestsList .text-button,

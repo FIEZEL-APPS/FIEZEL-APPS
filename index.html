@@ -171,7 +171,8 @@ html.fz-booting body{overflow:hidden}
 #fiezelBootSplash{contain:layout style paint;top:calc(-1 * env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
 #fiezelBootSplash:not(.is-leaving){animation:none}
 #fiezelBootSplash .fiezel-splash-brand{background:linear-gradient(180deg,#1B1418 0%,#1B1418 72px,rgba(27,20,24,0) 168px),radial-gradient(circle at 50% 48%,#251D22 0%,#1B1418 55%,#120C0F 100%);background-color:#1B1418}
-#fiezelBootSplash .fz-auth-topo,#fiezelBootSplash .fz-splash-canvas{-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px);mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px)}
+#fiezelBootSplash .fz-splash-canvas{-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px);mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px)}
+#fiezelBootSplash .fz-auth-topo{-webkit-mask-image:none !important;mask-image:none !important}
 #fiezelBootSplash .fiezel-logo{position:absolute;left:calc(50% - 31vmin);top:calc(50% - 31vmin);width:62vmin;height:62vmin}
 /* Ketukan koreografi v4. Nilai ini WAJIB sama dengan tabel di
    features/brand/fiezel-choreography.js; tests/splash-choreography-test.js gagal kalau
@@ -1046,6 +1047,18 @@ html.fz-booting body{overflow:hidden}
           (doc.body || doc.documentElement).appendChild(recovery);
         } catch (e) {}
       }
+      try {
+        if (window.location && window.location.search && (window.location.search.indexOf('fz_upd=') !== -1 || window.location.search.indexOf('fz_healed=') !== -1)) {
+          var cleanSearch = window.location.search
+            .replace(/([?&])fz_upd=\d+(&?)/, '$1')
+            .replace(/([?&])fz_healed=\d+(&?)/, '$1')
+            .replace(/[?&]$/, '');
+          var cleanUrl = window.location.pathname + (cleanSearch ? ('?' + cleanSearch.replace(/^[?&]/, '')) : '') + (window.location.hash || '');
+          if (window.history && typeof window.history.replaceState === 'function') {
+            window.history.replaceState({}, document.title, cleanUrl);
+          }
+        }
+      } catch (_) {}
       window.__fiezelBootSplash = { at: startedAt, dismiss: dismiss, clearRecovery: clearRecovery, clearWatchdog: clearWatchdog };
       try {
         window.addEventListener('pageshow', function (e) {
