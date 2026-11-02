@@ -41,7 +41,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // bertambah - runtime i18n (features/i18n/fiezel-i18n.js) dan copy-map Indonesia (copy-id-*.js)
 // masuk shell supaya murid Indonesia offline tetap membaca kalimat byte-identik begitu literal
 // pindah ke copy-map. Konsekuensi yang disadari dan diterima: kenaikan revisi ini memaksa SEMUA
-// perangkat terpasang mengunduh ulang cangkang Â±9,7 MB (AI-13 F03). Aset Thai SENGAJA
+// perangkat terpasang mengunduh ulang cangkang -¦9,7 MB (AI-13 F03). Aset Thai SENGAJA
 // TIDAK ikut ASSETS - ia hidup di cache locale terpisah (LOCALE_TH_CACHE di bawah) yang
 // diisi halaman on-demand, meniru pola neural-prepare, sehingga murid Indonesia tidak
 // pernah membayar byte Thai.
@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-750-unified-grammar-20261002';
+const SW_REV='m025-751-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
@@ -118,7 +118,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // offline-first dan copy-map yang tidak ter-precache berarti murid id offline kehilangan
   // seluruh naskah antarmukanya. Daftar domain copy-id di bawah adalah daftar FINAL Wave 2
   // (W2-INT merekonsiliasi nama provisional lama copy-id-login/home/dst yang tidak pernah
-  // dibuat â€” handoff W2-APP-B Â§2 / W2-FEAT-B Â§1, koordinasi impl/handoff/W1-SW.md) dan
+  // dibuat GÇö handoff W2-APP-B -º2 / W2-FEAT-B -º1, koordinasi impl/handoff/W1-SW.md) dan
   // setiap path sudah diverifikasi ada di disk oleh skrip W2-INT. Aturan lama tetap
   // berlaku keras di sini: cache.addAll gagal total bila satu saja 404, jadi gelombang ini
   // baru boleh dirilis setelah SEMUA berkas ini benar-benar ada di repo. Aset Thai
@@ -127,7 +127,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // titik koma di dalam komentar array ini - pwa-cache-test memotong daftar di situ.)
   './features/i18n/fiezel-i18n.js','./features/i18n/copy-id-core.js','./features/i18n/copy-id-app-a.js','./features/i18n/copy-id-app-b.js','./features/i18n/copy-id-app-c.js','./features/i18n/copy-id-app-d.js','./features/i18n/copy-id-app-e.js','./features/i18n/copy-id-app-f.js','./features/i18n/copy-id-feat-c.js','./features/i18n/copy-id-feat-d.js','./features/i18n/copy-id-grammar-labels.js','./features/mascot/fiezel-paw-outfit.js','./features/i18n/copy-id-feat-a.js','./features/i18n/copy-id-feat-b.js','./features/i18n/copy-id-gems.js','./features/i18n/copy-id-quota.js','./features/i18n/copy-id-worker.js','./features/i18n/copy-id-settings-locale.js','./features/i18n/copy-id-redesign.js','./features/i18n/copy-id-student.js','./features/i18n/copy-id-proctor.js','./features/i18n/copy-id-bahasa.js','./features/i18n/copy-id-classjoin.js','./features/i18n/copy-id-sekolah.js','./features/i18n/copy-id-google.js','./features/i18n/copy-id-pawarena.js','./features/i18n/copy-id-friend.js','./features/social/fiezel-qr.js','./features/social/jsqr.js','./features/speaking-listening/panggung-suara.css','./features/i18n/copy-id-stage.js','./features/speaking-listening/fiezel-panggung-suara.js','./features/speaking-listening/fiezel-webrtc-stage.js',
   // W4-QA (handoff W4-MERGE butir 3): loader th dimuat SEMUA locale dari index.html (guard
-  // locale ada DI DALAM berkasnya, ia baru bertindak saat getLocale()==='th') â€” jadi ia
+  // locale ada DI DALAM berkasnya, ia baru bertindak saat getLocale()==='th') GÇö jadi ia
   // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
   // offline yang beralih ke th kehilangan satu-satunya pemuat aset th-nya.
   './features/i18n/fiezel-th-loader.js',
@@ -138,7 +138,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   './features/brain/fiezel-stat-gate.js','./features/brain/fiezel-brain-manifest.js','./features/brain/fiezel-brain-config.js','./features/brain/fiezel-learning-metrics.js','./features/brain/fiezel-metrics-digest.js','./features/brain/fiezel-retention-probe.js','./features/brain/fiezel-attempt-record.js','./features/brain/fiezel-policy-verdict.js','./features/brain/fiezel-nof1.js','./features/brain/fiezel-param-ledger.js','./features/brain/fiezel-self-tune.js','./features/brain/fiezel-question-memory.js','./features/brain/fiezel-target-language.js','./features/japanese/fiezel-ja-dictionary.js','./features/japanese/fiezel-ja-ui.js','./features/japanese/fiezel-kakijun-data.js','./features/japanese/fiezel-kakijun-studio.js','./features/japanese/fiezel-kakijun-studio.css','./features/japanese/fiezel-story-brain-bridge.js','./features/japanese/fiezel-story-reader.js','./features/japanese/story-timings.json','./features/brain/fiezel-question-allocator.js',
   './features/telemetry/fiezel-telemetry-config.js','./features/telemetry/fiezel-learning-events.js','./features/telemetry/fiezel-learning-queue.js','./features/telemetry/fiezel-learning-transport.js','./features/telemetry/fiezel-braincore-evidence.js',
   './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js',
-  // FASE 11: jembatan bicaraâ†’maskot ikut precache - ia anggota grup malas 'voice',
+  // FASE 11: jembatan bicaraGåÆmaskot ikut precache - ia anggota grup malas 'voice',
   // dan boot-order-test menagih setiap berkas malas ada di ASSETS agar offline utuh.
   './features/neural-voice/fiezel-speech-bridge.js',
   // [ADAPTASI] OA-7 / gelombang SFX m025-177: 27 sampel OGG pustaka bunyi FIEZEL ikut
@@ -193,18 +193,18 @@ const isLocaleThAsset=request=>{
   if(!request?.url)return false;
   try{
     const p=new URL(request.url).pathname;
-    // W4-QA (handoff impl/handoff/W4-MERGE.md): regex dataset diperluas grammarâ†’
-    // (grammar|vocabulary) supaya /vocabulary-th.json root ikut tercakup â€” tanpa ini murid
-    // th offline kehilangan arti kosakata (temuan W4-MERGE Â§3 butir 2). CATATAN: bentuk
+    // W4-QA (handoff impl/handoff/W4-MERGE.md): regex dataset diperluas grammarGåÆ
+    // (grammar|vocabulary) supaya /vocabulary-th.json root ikut tercakup GÇö tanpa ini murid
+    // th offline kehilangan arti kosakata (temuan W4-MERGE -º3 butir 2). CATATAN: bentuk
     // persis usulan handoff (`(?:grammar|vocabulary)-[a-z0-9-]*-th`) TIDAK cocok dengan
-    // /vocabulary-th.json â€” ia menuntut segmen ekstra di antara nama dan -th â€” jadi segmen
+    // /vocabulary-th.json GÇö ia menuntut segmen ekstra di antara nama dan -th GÇö jadi segmen
     // tengahnya dibuat opsional per-kata: (?:-[a-z0-9]+)*?-th (diverifikasi replika matcher
     // atas 17 entri manifest locale-assets-th.json, semua tercakup). naskah-th-brain.js
     // (tabel naskah Thai modul brain, W3-BRAIN-TH) juga belum cocok pola mana pun, jadi
-    // ditambah pencocok prefix naskah-th- â€” pola prefix, bukan nama literal, mengikuti
+    // ditambah pencocok prefix naskah-th- GÇö pola prefix, bukan nama literal, mengikuti
     // konvensi copy-th- di atasnya agar berkas naskah th berikutnya otomatis tercakup.
     // m025-230: sidecar BANK SOAL th (speaking/listening/writing/reading-exam/misconception/
-    // cloze/reading-bank) tidak pernah cocok pola mana pun di atas â€” pola dataset menuntut
+    // cloze/reading-bank) tidak pernah cocok pola mana pun di atas GÇö pola dataset menuntut
     // nama diawali grammar|vocabulary. Empat di antaranya SUDAH terdaftar di manifest sejak
     // W3 tetapi tidak pernah tercakup matcher, jadi murid th offline kehilangan seluruh bank
     // soalnya diam-diam. Ditutup dengan pola direktori + sufiks (bukan daftar literal),
@@ -345,7 +345,7 @@ self.addEventListener('fetch',e=>{
   // jaringan dulu, salinan di cache locale jadi jaring pengaman luring. Ia SENGAJA tidak masuk
   // ASSETS: daftar aset th akan bertambah antar-gelombang konten, dan memversikannya bersama
   // shell berarti tiap perubahan daftar th memaksa SEMUA murid (termasuk Indonesia) mengunduh
-  // ulang cangkang Â±9,7 MB (AI-13 F03) - persis yang lapisan ini hindari.
+  // ulang cangkang -¦9,7 MB (AI-13 F03) - persis yang lapisan ini hindari.
   if(requestUrl.pathname.toLowerCase().endsWith('/features/i18n/locale-assets-th.json')){e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(LOCALE_TH_CACHE).then(cache=>cache.put(e.request,copy));return r}return caches.match(e.request,{cacheName:LOCALE_TH_CACHE}).then(c=>c||r)}).catch(()=>caches.match(e.request,{cacheName:LOCALE_TH_CACHE})));return}
   if(requestUrl.origin!==self.location.origin){
     // Third-party SDK/API traffic is deliberately left to the browser. The
@@ -460,7 +460,7 @@ self.addEventListener('push',event=>{
   // m025-117: service worker tidak punya akses ke state murid, jadi teks cadangan di sini
   // TIDAK boleh menyebut nama siapa pun. Sapaan bernama datang dari payload push yang
   // memang membawanya; cadangan ini hanya berlaku saat payload-nya kosong atau rusak.
-  let payload={title:'Hei kamu! ðŸ‘‹',body:'Kemana aja nih, sepi banget nggak ada kamu. Luang 2 menit yuk?',url:'./',tag:'chat-study-daily'};
+  let payload={title:'Hei kamu! =ƒæï',body:'Kemana aja nih, sepi banget nggak ada kamu. Luang 2 menit yuk?',url:'./',tag:'chat-study-daily'};
   try{
     if(event.data){
       const parsed=event.data.json();
@@ -470,7 +470,7 @@ self.addEventListener('push',event=>{
     try{payload.body=event.data?.text?.()||payload.body}catch{}
   }
   const options={body:String(payload.body||'').slice(0,280),tag:String(payload.tag||'chat-study-daily').slice(0,64),renotify:false,icon:'./apple-touch-icon.png',badge:'./favicon-64.png',data:{url:payload.url||'./'}};
-  event.waitUntil(self.registration.showNotification(String(payload.title||'Hei kamu! ðŸ‘‹').slice(0,80),options));
+  event.waitUntil(self.registration.showNotification(String(payload.title||'Hei kamu! =ƒæï').slice(0,80),options));
 });
 
 /* ===== m025-235: UNDUHAN SUARA NEURAL YANG TIDAK IKUT MATI SAAT APLIKASI DITUTUP =====
