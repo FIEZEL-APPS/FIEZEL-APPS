@@ -1563,6 +1563,10 @@ function sanitizeLevelTrust(raw){
     const e=rawExams[key]&&typeof rawExams[key]==='object'?rawExams[key]:{};
     exams[String(key)]={attempts:clamp(e.attempts,999),passed:!!e.passed,lastAt:clamp(e.lastAt),lastScore:clamp(e.lastScore,999),lastTotal:clamp(e.lastTotal,999),lastAccuracy:clamp(e.lastAccuracy,100),cooldownUntil:clamp(e.cooldownUntil),weakSkill:String(e.weakSkill||'').slice(0,80)};
   }
+  // Anti-tamper verification: verified level from exam requires exam pass record
+  if(verified!=="A1"&&src.verifiedSource==="exam"&&(!exams[verified]||!exams[verified].passed)){
+    verified="A1";
+  }
   const demotions=(Array.isArray(src.demotions)?src.demotions:[]).filter(x=>x&&typeof x==='object').map(x=>({from:LEVELS.includes(String(x.from||''))?String(x.from):'',to:LEVELS.includes(String(x.to||''))?String(x.to):'',at:clamp(x.at),mistakes:clamp(x.mistakes,9999)})).filter(x=>x.from).slice(-10);
   const notice=src.pendingNotice&&typeof src.pendingNotice==='object'&&LEVELS.includes(String(src.pendingNotice.from||''))?{from:String(src.pendingNotice.from),to:LEVELS.includes(String(src.pendingNotice.to||''))?String(src.pendingNotice.to):'A1',at:clamp(src.pendingNotice.at)}:null;
   return{...base,verified,verifiedSource:['exam','placement'].includes(String(src.verifiedSource||''))?String(src.verifiedSource):'',locked:!!src.locked,probation:{level:LEVELS.includes(String(probation.level||''))?String(probation.level):'',mistakesByLevel,startedAt:clamp(probation.startedAt),lastMistakeAt:clamp(probation.lastMistakeAt)},exams,demotions,pendingNotice:notice};
@@ -1712,9 +1716,36 @@ function sanitizeToursSeen(raw){
   if(src.menu===undefined&&legacyTourSeen())next.menu=true;
   return next;
 }
+function computeStateIntegrity(s){
+  try{
+    const u=String(s?.ownerUuid||"anon");
+    const lvl=Number(s?.level||1);
+    const ver=String(s?.levelTrust?.verified||"A1");
+    const tot=Number(s?.totalAnswered||0);
+    const gems=Number(s?.gems?.balance||0);
+    const str=u+":"+lvl+":"+ver+":"+tot+":"+gems;
+    let h=0x811c9dc5;
+    for(let i=0;i<str.length;i++){
+      h^=str.charCodeAt(i);
+      h=(h*0x01000193)>>>0;
+    }
+    return "fz_sig_"+h.toString(16);
+  }catch(_){return "";}
+}
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
   const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},listening:raw?.listening||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',learningIntensity:['santai','teladan','rajin'].includes(String(rawPreferences.learningIntensity||''))?String(rawPreferences.learningIntensity):(defaultPreferences.learningIntensity||'santai'),selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),dailyRewards:raw?.dailyRewards&&typeof raw.dailyRewards==='object'?raw.dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  if(raw&&raw._integrity&&typeof computeStateIntegrity==="function"){
+    const expectedSig=computeStateIntegrity(raw);
+    if(raw._integrity!==expectedSig){
+      if(next.levelTrust&&next.levelTrust.verified!=="A1"&&(!next.totalAnswered||next.totalAnswered<10)){
+        next.levelTrust.verified="A1";
+      }
+      if(next.level>1&&(!next.totalAnswered||next.totalAnswered<5)){
+        next.level=1;
+      }
+    }
+  }
   /* R6 perbaikan-15/16: penghitung yang rusak TIDAK boleh menghapus bukti belajar.
      (1) Baris history yang korup (null/bukan objek) dibuang SATU-SATU di atas - dulu satu
      baris null membuat hs.map(h=>h.skill) melempar, loadState menangkapnya, dan SELURUH
@@ -1910,6 +1941,7 @@ function saveFlushWrite(){
   try{stateMergeExternal()}catch(_){}
   state.stateRevision=Math.max(0,Math.floor(Number(state.stateRevision)||0))+1;
   if(activeAccountUuid)state.ownerUuid=activeAccountUuid;
+  if(typeof computeStateIntegrity==="function")state._integrity=computeStateIntegrity(state);
   try{
     const lang=(function(){try{return self.FiezelTargetLanguage?.normalize?.(state?.preferences?.targetLang)||'en'}catch(_){return state?.preferences?.targetLang==='ja'?'ja':'en'}}());
     /* Bahasa bawaan menulis SATU blob utuh ke kunci dasar - persis perilaku sebelum sumbu
