@@ -80,8 +80,8 @@ export async function routeOwnerGrantGems(ctx) {
 
   let targetSub = String(body.sub || '').trim();
 
-  // Resolusi dari email bila sub tidak disertakan langsung
-  if (!targetSub && body.email) {
+  // Resolusi kanonikal dari email bila tersedia (misal akun Google resmi)
+  if (body.email) {
     const emailNorm = String(body.email).trim().toLowerCase();
     const row = await db.prepare(
       'SELECT sub FROM auth_email WHERE email = ?1 LIMIT 1'
@@ -89,7 +89,7 @@ export async function routeOwnerGrantGems(ctx) {
     if (row && row.sub) targetSub = String(row.sub);
   }
 
-  // Resolusi dari handle sosial (misal: 'zara')
+  // Resolusi dari handle sosial (misal: 'zara') bila sub belum ditemukan
   if (!targetSub && body.handle) {
     const handleNorm = String(body.handle).trim().replace(/^@/, '').toLowerCase();
     const row = await db.prepare(
