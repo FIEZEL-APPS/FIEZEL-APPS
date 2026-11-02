@@ -25,8 +25,41 @@
   var VAULT_SALT = 'FIEZEL_CORE_VAULT_AES256_SALT_V1';
   var VAULT_SEED = 'FZ-BRAIN-MASTER-2026-FITRA-SECURITY-SHIELD';
 
+  // Dynamic Ephemeral Session Key (RAM only, zero disk persistence)
+  var _dynamicSessionKey = null;
+  var _dynamicSessionKeyExpiresAt = 0;
+
   // Memory fallback storage for non-IndexedDB or test environments
   var _memoryStore = {};
+
+  /**
+   * Dynamic Key Management
+   */
+  function setDynamicSessionKey(keyOrSeed, durationMs) {
+    if (!keyOrSeed) return false;
+    _dynamicSessionKey = keyOrSeed;
+    _dynamicSessionKeyExpiresAt = durationMs ? Date.now() + durationMs : Date.now() + (24 * 60 * 60 * 1000);
+    return true;
+  }
+
+  function getDynamicSessionKey() {
+    if (_dynamicSessionKey && Date.now() < _dynamicSessionKeyExpiresAt) {
+      return _dynamicSessionKey;
+    }
+    _dynamicSessionKey = null;
+    return null;
+  }
+
+  function clearDynamicSessionKey() {
+    _dynamicSessionKey = null;
+    _dynamicSessionKeyExpiresAt = 0;
+  }
+
+  function getDeviceBoundSalt(ownerUuid) {
+    if (!ownerUuid || typeof ownerUuid !== 'string') return VAULT_SALT;
+    var sanitized = ownerUuid.trim().replace(/[^a-zA-Z0-9_-]/g, '');
+    return VAULT_SALT + ':' + (sanitized.slice(0, 16) || 'DEV0');
+  }
 
   /**
    * Helper: Base64 encoding and decoding cross-environment
@@ -61,6 +94,10 @@
    * Derive AES-256-GCM Key (Node & Browser compatible)
    */
   async function getCryptoKey(seed, salt) {
+    var dynamicKey = getDynamicSessionKey();
+    if (dynamicKey && !seed) {
+      seed = dynamicKey;
+    }
     seed = seed || VAULT_SEED;
     salt = salt || VAULT_SALT;
 
@@ -339,6 +376,10 @@
     isEncryptedPayload: isEncryptedPayload,
     decryptIfEncrypted: decryptIfEncrypted,
     clearVault: clearVault,
+    setDynamicSessionKey: setDynamicSessionKey,
+    getDynamicSessionKey: getDynamicSessionKey,
+    clearDynamicSessionKey: clearDynamicSessionKey,
+    getDeviceBoundSalt: getDeviceBoundSalt,
     VAULT_SALT: VAULT_SALT,
     VAULT_SEED: VAULT_SEED
   };

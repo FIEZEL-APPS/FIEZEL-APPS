@@ -1666,7 +1666,16 @@ function recordSkipExamPass(s=state,level='',detail={}){
   const mistakes={...trust.probation.mistakesByLevel};delete mistakes[target];
   trust.probation.mistakesByLevel=mistakes;
   const previous=trust.exams[target]||{attempts:0};
-  trust.exams[target]={...previous,attempts:Math.max(1,Math.floor(Number(previous.attempts||0))+(detail.countAttempt===false?0:1)),passed:true,lastAt:now,lastScore:Math.max(0,Math.floor(Number(detail.score||0))),lastTotal:Math.max(0,Math.floor(Number(detail.total||0))),lastAccuracy:Math.max(0,Math.min(100,Math.floor(Number(detail.accuracy||0)))),cooldownUntil:0,weakSkill:'',syncStatus:'pending_reconciliation'};
+  const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+  let examReceipt = null;
+  if(self.FiezelExamVerifier&&typeof self.FiezelExamVerifier.createSubmission==='function'){
+    try{
+      const sub=self.FiezelExamVerifier.createSubmission({ownerUuid:s.ownerUuid,level:target,score:detail.score,total:detail.total,accuracy:detail.accuracy});
+      examReceipt=self.FiezelExamVerifier.signReceipt(sub,isOnline);
+    }catch(_){}
+  }
+  const syncStatus = (examReceipt&&examReceipt.status==='verified_server')?'verified_server':'pending_reconciliation';
+  trust.exams[target]={...previous,attempts:Math.max(1,Math.floor(Number(previous.attempts||0))+(detail.countAttempt===false?0:1)),passed:true,lastAt:now,lastScore:Math.max(0,Math.floor(Number(detail.score||0))),lastTotal:Math.max(0,Math.floor(Number(detail.total||0))),lastAccuracy:Math.max(0,Math.min(100,Math.floor(Number(detail.accuracy||0)))),cooldownUntil:0,weakSkill:'',syncStatus:syncStatus,receipt:examReceipt};
   trust.locked=false;
   trust.pendingNotice=null;
   s.levelTrust=trust;
@@ -4734,6 +4743,15 @@ async function brainSyncFlush(){
           if(state.levelTrust.exams[k]?.syncStatus==='pending_reconciliation'){
             state.levelTrust.exams[k].syncStatus='reconciled';
             state.levelTrust.exams[k].reconciledAt=Date.now();
+            if(self.FiezelExamVerifier&&state.levelTrust.exams[k].receipt){
+              try{
+                const recRes=self.FiezelExamVerifier.reconcileProvisionalReceipt(state.levelTrust.exams[k].receipt);
+                if(recRes&&recRes.ok){
+                  state.levelTrust.exams[k].receipt=recRes.reconciledReceipt;
+                  state.levelTrust.exams[k].syncStatus='verified_server';
+                }
+              }catch(_){}
+            }
           }
         }
       }

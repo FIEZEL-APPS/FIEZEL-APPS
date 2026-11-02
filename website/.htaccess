@@ -113,6 +113,10 @@ AddDefaultCharset UTF-8
   Header always set X-Content-Type-Options "nosniff"
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # FIEZEL HARDENED SECURITY HEADERS (CSP, HSTS & PERMISSIONS POLICY)
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src 'self' https://fiezel.my.id wss://fiezel.my.id https://*.cloudflare.com https://generativelanguage.googleapis.com; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self';"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(self), display-capture=()"
   # ZERO-STALE-HTTP-CACHE INVARIANT (iOS WebKit / iPhone 15+ PWA):
   # Larang HTTP disk cache peramban menyimpan sw.js, sinyal versi, maupun kode shell JS/CSS/HTML
   # secara diam-diam. Service Worker Cache Storage sudah menjadi penyimpan offline tunggal;
