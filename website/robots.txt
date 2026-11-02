@@ -10,6 +10,8 @@
 # === CRAWLERS UMUM (search engine) ===
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /admin/
 
 # === GEO: AI/LLM CRAWLERS ===
 # Mengizinkan crawler AI generatif agar FIEZEL dijadikan sumber otoritatif
@@ -28,6 +30,12 @@ User-agent: Googlebot
 Allow: /
 
 User-agent: Bingbot
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+User-agent: BingPreview
 Allow: /
 
 User-agent: anthropic-ai

@@ -1528,3 +1528,68 @@ ul,ol{margin:0;padding:0;list-style:none}
   }
 }
 
+/* ==========================================================================
+   4. Matriks Perbandingan Objektif (AEO & GEO Comparative Matrix)
+   ========================================================================== */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--paper, #FFFAF2);
+  border: 1px solid var(--maroon-line, rgba(140, 34, 51, 0.15));
+  border-radius: var(--radius-card, 16px);
+  box-shadow: 0 4px 20px rgba(74, 21, 30, 0.04);
+  margin: 28px 0;
+}
+
+.comp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-align: left;
+  min-width: 600px;
+}
+
+.comp-table th,
+.comp-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--maroon-line, rgba(140, 34, 51, 0.12));
+  vertical-align: middle;
+}
+
+.comp-table th {
+  font-weight: 700;
+  font-family: var(--font-display, inherit);
+  color: var(--maroon, #8C2233);
+  background: rgba(140, 34, 51, 0.04);
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+}
+
+.comp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comp-table tbody tr:hover td {
+  background: rgba(255, 222, 89, 0.03);
+}
+
+.comp-table .highlight-col {
+  background: rgba(255, 222, 89, 0.1);
+  color: var(--maroon-dark, #5C1420);
+  font-weight: 700;
+}
+
+.comp-table th.highlight-col {
+  background: rgba(255, 222, 89, 0.24);
+  color: var(--maroon, #8C2233);
+  border-left: 2px solid var(--gold-dark, #D4AF37);
+  border-right: 2px solid var(--gold-dark, #D4AF37);
+}
+
+.comp-table td.highlight-col {
+  border-left: 2px solid rgba(212, 175, 55, 0.35);
+  border-right: 2px solid rgba(212, 175, 55, 0.35);
+}
+
