@@ -131,6 +131,18 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
   // offline yang beralih ke th kehilangan satu-satunya pemuat aset th-nya.
   './features/i18n/fiezel-th-loader.js',
+  './features/i18n/locales/en/ui.json',
+  './features/i18n/locales/en/quiz.json',
+  './features/i18n/locales/en/grammar.json',
+  './features/i18n/locales/en/vocab.json',
+  './features/i18n/locales/id/ui.json',
+  './features/i18n/locales/id/quiz.json',
+  './features/i18n/locales/id/grammar.json',
+  './features/i18n/locales/id/vocab.json',
+  './features/i18n/locales/th/ui.json',
+  './features/i18n/locales/th/quiz.json',
+  './features/i18n/locales/th/grammar.json',
+  './features/i18n/locales/th/vocab.json',
   // brain-learning-infra: lima modul infrastruktur belajar + lane telemetri (config, events,
   // queue, transport). Aturan sama dengan modul brain lain - masuk precache HANYA setelah
   // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404, dan

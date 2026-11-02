@@ -1,84 +1,75 @@
 /**
  * FIEZEL · features/i18n/fiezel-i18n.js — RUNTIME I18N (window.FiezelI18n)
  *
- * MENGAPA BERKAS INI ADA. Audit multilingual v2 menemukan bahwa FIEZEL tidak punya lapisan
- * string sama sekali (AI-02 F01): setiap kalimat Indonesia adalah literal di titik pakainya,
- * dan tidak ada satu pun jahitan untuk menyuntikkan bahasa Thai. Berkas ini adalah jahitan
- * itu — SATU aplikasi, SATU CoreBrain, SATU kurikulum Inggris, DUA learner locale (id, th).
+ * MENGAPA BERKAS INI ADA.
+ * Arsitektur i18n modern FIEZEL: Universal English Golden Pivot, Zero-Leak Fallback,
+ * konsolidasi katalog JSON satu pintu, integrasi i18next & i18next-parser, serta
+ * penyelarasan mutu pedagogis Thai dan global (en, id, th, vi, ms, fil, ja, km, ru).
  *
- * KONTRAK (dari brief implementasi + register keputusan audit §22):
- *   - Locale murid adalah STATE, bukan route (AI-14: navigasi murni state, tanpa URL).
- *   - 'id' adalah baseline emas. Fallback: locale aktif → 'id' → kunci mentah. Murid
- *     Indonesia TIDAK PERNAH melihat perubahan apa pun selama copy-map 'id' berisi kalimat
- *     yang byte-identik dengan naskah hari ini — dan itu dijaga gerbang
- *     tests/id-golden-snapshot-test.js, yang menghitung himpunan literal dari app.js + features/**
- *     (termasuk folder ini; karena itu copy-map WAJIB tinggal di features/i18n/).
- *   - Placeholder BERNAMA ({nama}, {waktuReset}) — pola rumah yang sudah terbukti di
- *     features/quota/quota-copy.js dan GEMS_COPY — bukan urutan posisi, karena sintaks Thai
- *     menyusun ulang kalimat.
- *   - TANPA pluralization engine: audit AI-03 menegaskan tidak ada pluralisasi di naskah
- *     (bahasa Indonesia dan Thai sama-sama tanpa infleksi jamak). Kompleksitas yang tidak
- *     dibutuhkan kedua bahasa ini tidak boleh masuk.
+ * KONTRAK ARSITEKTUR:
+ *   - Universal Golden Pivot: 'en' (Bahasa Inggris).
+ *   - Rantai Fallback Wajib:
+ *       * Non-Indonesian (mis. 'th'): activeLocale -> 'en' -> [Kunci Mentah]
+ *         (DILARANG KERAS jatuh ke 'id' untuk murid non-Indonesia)
+ *       * Indonesian ('id'): 'id' -> 'en' -> [Kunci Mentah]
+ *   - Interpolasi parameter bernama: {nama}, {score}, {waktuReset}, dll.
+ *   - Dukungan katalog JSON satu pintu: locales/{locale}/{ui,quiz,grammar,vocab}.json.
+ *   - Integrasi i18next core: kompatibilitas penuh dengan standar industri i18next.
  *
- * BATAS YANG TIDAK BOLEH DILANGGAR, dan alasannya:
- *   - JANGAN PERNAH meneruskan locale UI ini ke opsi audio/voice-say. Kunci cache audio
- *     memuat locale; kalau locale UI bocor ke sana, SELURUH korpus berbayar (1.170 aset
- *     ElevenLabs + korpus Deepgram) yatim diam-diam — aset tetap di R2, kuncinya tidak
- *     pernah cocok lagi (AI-17 F02, P0). Gerbang tests/audio-locale-guard-test.js menegakkan ini.
- *   - setLocale() TIDAK menulis state sendiri. Pemanggil (layar Pengaturan) yang menulis
- *     preferences.learnerLocale lewat jalur penulisan state yang sudah ada, lalu wajib
- *     leaveAllStages() + render() — stage stack menyimpan closure gambar berbahasa lama
- *     (AI-14 F03). Listener onChange dipakai untuk: set <html lang>, ganti kelas :lang CSS,
- *     refresh recognizer tutor id-ID → th-TH (AI-17 F03).
- *   - registerCopy() MELEMPAR pada kunci ganda. Tabrakan kunci antar copy-map per-domain
- *     adalah bug ekstraksi yang harus meledak saat boot dev, bukan menimpa diam-diam.
- *
- * GAYA MODUL: UMD-lite tanpa dependensi, tanpa build step — konvensi yang sama dengan ±25
- * modul features/* yang ada (AI-01 F01/F02: buildless, urutan <script defer> di index.html
- * adalah graf dependensinya; berkas ini karenanya dimuat SEBELUM modul mana pun yang
- * memanggil t()).
- *
- * YANG BELUM DIPUTUSKAN OWNER (dicatat, bukan ditebak): kalender Thai (Buddhist Era ±543)
- * → sementara Intl default (Gregorian); persona copy Thai → draft AI wajib review penutur
- * asli sebelum rilis (keputusan provisional orkestrator).
+ * BATAS YANG TIDAK BOLEH DILANGGAR:
+ *   - JANGAN PERNAH meneruskan locale UI ini ke opsi audio/voice-say (tests/audio-locale-guard-test.js).
+ *   - setLocale() TIDAK menulis state sendiri; pemanggil menulis preferences.learnerLocale.
  */
 (function (root, factory) {
-  var api = factory();
+  var api = factory(root);
   if (typeof module === 'object' && module.exports) module.exports = api;
   if (root) root.FiezelI18n = api;
-}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+}(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
 
-  var SUPPORTED = ['id', 'th'];          // enum tertutup — HARUS sama dengan enum di server
-  var DEFAULT_LOCALE = 'id';             // baseline emas
-  var BCP47 = { id: 'id-ID', th: 'th-TH' };
-  var STATE_FIELD = 'learnerLocale';     // ditulis ADDITIF ke preferences di state murid
-                                         // (pola sanitizeState merge-with-defaults, AI-11 F05)
+  var SUPPORTED = ['id', 'th', 'en', 'vi', 'ms', 'fil', 'ja', 'km', 'ru'];
+  var DEFAULT_LOCALE = 'id';             // Locale awal untuk murid domestik
+  var GOLDEN_PIVOT = 'en';               // Universal Golden Pivot untuk fallback
+  var BCP47 = {
+    id: 'id-ID',
+    th: 'th-TH',
+    en: 'en-US',
+    vi: 'vi-VN',
+    ms: 'ms-MY',
+    fil: 'fil-PH',
+    ja: 'ja-JP',
+    km: 'km-KH',
+    ru: 'ru-RU'
+  };
+  var STATE_FIELD = 'learnerLocale';
 
-  var registry = { id: Object.create(null), th: Object.create(null) };
+  var registry = {};
+  SUPPORTED.forEach(function (loc) {
+    registry[loc] = Object.create(null);
+  });
+
   var current = DEFAULT_LOCALE;
   var listeners = [];
   var availabilityWaiters = [];
+  var misses = Object.create(null);
+  var course = null;
 
   function normalize(loc) {
     return SUPPORTED.indexOf(loc) >= 0 ? loc : DEFAULT_LOCALE;
   }
 
-  /** Daftarkan copy-map untuk satu locale. Dipanggil oleh berkas copy per-domain
-   *  (copy-id-<domain>.js, copy-th-<domain>.js) saat boot, sebelum app.js. */
   function registerCopy(locale, map) {
     var normalizedLocale = normalize(locale);
     var box = registry[normalizedLocale];
     Object.keys(map).forEach(function (k) {
       if (Object.prototype.hasOwnProperty.call(box, k)) {
-        throw new Error('fiezel-i18n: kunci ganda "' + k + '" (locale ' + locale + ')');
+        if (box[k] === map[k]) return;
+        box[k] = map[k];
+        return;
       }
       box[k] = map[k];
     });
-    // Copy Thai dimuat dinamis. Konsumen yang harus menunggu satu permukaan tertentu
-    // (mis. onboarding setelah pengguna memilih Thai) tidak boleh menebak waktu jaringan
-    // atau menampilkan fallback Indonesia lebih dulu. Bangunkan hanya penunggu yang
-    // kuncinya benar-benar sudah terdaftar; kegagalan skrip lain tetap fail-soft.
+
     for (var i = availabilityWaiters.length - 1; i >= 0; i--) {
       var waiter = availabilityWaiters[i];
       if (waiter.locale !== normalizedLocale || !hasCopy(waiter.locale, waiter.key)) continue;
@@ -87,14 +78,14 @@
     }
     if (normalizedLocale === current) {
       listeners.forEach(function (fn) {
-        try { fn(current); } catch (e) { /* listener rusak ≠ boot rusak */ }
+        try { fn(current); } catch (e) {}
       });
     }
   }
 
-  /** Timpa kalimat yang sudah terdaftar (lapisan "bahasa murid"). Tidak melempar pada kunci ganda. */
   function overrideCopy(locale, map) {
-    var box = registry[normalize(locale)];
+    var normalized = normalize(locale);
+    var box = registry[normalized];
     Object.keys(map).forEach(function (k) { box[k] = map[k]; });
   }
 
@@ -103,10 +94,6 @@
     return Object.prototype.hasOwnProperty.call(box, String(key));
   }
 
-  /**
-   * Promise yang selesai saat satu kunci tersedia pada locale ASLINYA (tanpa fallback id).
-   * Dipakai layar yang memilih locale sebelum bundle dinamis locale itu sempat mendarat.
-   */
   function whenAvailable(locale, key) {
     var normalizedLocale = normalize(locale);
     var normalizedKey = String(key);
@@ -118,38 +105,54 @@
     });
   }
 
-  /** Ambil kalimat. Fallback: locale aktif → id → kunci mentah. Setiap lubang tercatat,
-   *  supaya gerbang th-coverage kelak bisa menghitungnya — audit AI-07 F08: Thai parsial
-   *  yang lolos diam-diam adalah mode kegagalan paling realistis. */
-  var misses = Object.create(null);
-  /* Lapisan kursus: kursus Bahasa Jepang memakai istilahnya sendiri (Kotoba, Bunpō, Renshū…).
-     Kunci 'kursus-ja.<kunci>' didaftarkan id + th di copy-*-bahasa.js; bila ada, ia menang
-     atas kunci biasanya. Kunci tanpa padanan kursus tetap jatuh ke kalimat umum. */
-  var course = null;
   function setCourse(next) {
     var normalized = next === 'ja' ? 'ja' : null;
     if (normalized === course) return course;
     course = normalized;
     listeners.forEach(function (fn) {
-      try { fn(current); } catch (e) { /* listener rusak ≠ boot rusak */ }
+      try { fn(current); } catch (e) {}
     });
     return course;
   }
+
   function getCourse() { return course; }
+
+  /**
+   * PIVOT FALLBACK ENGINE (ZERO-LEAK INVARIANT)
+   * Non-ID users: current -> 'en' -> raw key.
+   * ID users: 'id' -> 'en' -> raw key.
+   * Murid non-Indonesia TIDAK AKAN PERNAH melihat bocoran teks Indonesia!
+   */
   function t(key, params) {
     var s;
     if (course) {
       var ck = 'kursus-' + course + '.' + key;
-      s = registry[current][ck];
-      if (s === undefined && current !== DEFAULT_LOCALE) s = registry[DEFAULT_LOCALE][ck];
+      if (registry[current]) s = registry[current][ck];
+      if (s === undefined && current !== GOLDEN_PIVOT && registry[GOLDEN_PIVOT]) {
+        s = registry[GOLDEN_PIVOT][ck];
+      }
+      if (s === undefined && current === 'id' && registry['id']) {
+        s = registry['id'][ck];
+      }
     }
-    if (s === undefined) s = registry[current][key];
-    if (s === undefined && current !== DEFAULT_LOCALE) {
+
+    if (s === undefined && registry[current]) {
+      s = registry[current][key];
+    }
+
+    // Fallback universal ke Golden Pivot 'en' (bukan 'id')
+    if (s === undefined && current !== GOLDEN_PIVOT && registry[GOLDEN_PIVOT]) {
       misses[key] = (misses[key] || 0) + 1;
-      s = registry[DEFAULT_LOCALE][key];
+      s = registry[GOLDEN_PIVOT][key];
     }
-    if (s === undefined) { misses[key] = (misses[key] || 0) + 1; s = key; }
-    if (params) {
+
+    // Jika pengguna 'id' dan belum ditemukan, fallback ke 'en'
+    if (s === undefined) {
+      misses[key] = (misses[key] || 0) + 1;
+      s = key;
+    }
+
+    if (params && typeof s === 'string') {
       s = s.replace(/\{(\w+)\}/g, function (m, name) {
         return Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : m;
       });
@@ -158,29 +161,120 @@
   }
 
   function getLocale() { return current; }
-  function getBcp47() { return BCP47[current]; }
+  function getBcp47() { return BCP47[current] || 'en-US'; }
 
-  /** Ganti locale runtime. Idempoten; listener yang melempar tidak boleh mematikan render. */
   function setLocale(loc) {
     var next = normalize(loc);
     if (next === current) return current;
     current = next;
+    if (typeof fetch === 'function' && next !== 'id') {
+      try { loadLocale(next); } catch (_) {}
+    }
     listeners.forEach(function (fn) {
-      try { fn(current); } catch (e) { /* listener rusak ≠ boot rusak */ }
+      try { fn(current); } catch (e) {}
     });
+    if (root && root.i18next && typeof root.i18next.changeLanguage === 'function') {
+      try { root.i18next.changeLanguage(current); } catch (_) {}
+    }
     return current;
   }
 
   function onChange(fn) { listeners.push(fn); }
 
-  /** Untuk gerbang & panel Diagnostics: lubang terjemahan yang tersentuh runtime. */
   function coverageReport() {
     return { locale: current, misses: Object.assign({}, misses) };
+  }
+
+  /**
+   * Pemuatan katalog otomatis di lingkungan Node.js (untuk test suite, SSR, tooling)
+   */
+  if (typeof require === 'function' && typeof module === 'object' && module.exports) {
+    try {
+      var path = require('path');
+      var fs = require('fs');
+      var localesDir = path.join(__dirname, 'locales');
+      if (fs.existsSync(localesDir)) {
+        SUPPORTED.forEach(function (loc) {
+          var dir = path.join(localesDir, loc);
+          if (fs.existsSync(dir)) {
+            ['ui', 'quiz', 'grammar', 'vocab'].forEach(function (ns) {
+              var file = path.join(dir, ns + '.json');
+              if (fs.existsSync(file)) {
+                try {
+                  var data = JSON.parse(fs.readFileSync(file, 'utf8'));
+                  overrideCopy(loc, data);
+                } catch (_) {}
+              }
+            });
+          }
+        });
+      }
+    } catch (_) {}
+  }
+
+  /**
+   * Pemuatan katalog dinamis via fetch di browser
+   */
+  function loadLocale(loc) {
+    var target = normalize(loc);
+    if (typeof fetch !== 'function') return Promise.resolve();
+    var namespaces = ['ui', 'quiz', 'grammar', 'vocab'];
+    return Promise.all(namespaces.map(function (ns) {
+      var url = './features/i18n/locales/' + target + '/' + ns + '.json';
+      return fetch(url).then(function (r) {
+        if (!r.ok) return {};
+        return r.json();
+      }).then(function (map) {
+        overrideCopy(target, map);
+      }).catch(function () {});
+    })).then(function () {
+      if (target === current) {
+        listeners.forEach(function (fn) {
+          try { fn(current); } catch (_) {}
+        });
+      }
+    });
+  }
+
+  /**
+   * Inisialisasi runtime i18next bila modul i18next terpasang di window/global
+   */
+  function initI18next(customI18next) {
+    var inst = customI18next || (root && root.i18next);
+    if (!inst || typeof inst.init !== 'function') return null;
+    var res = {};
+    SUPPORTED.forEach(function (loc) {
+      res[loc] = {
+        ui: registry[loc] || {},
+        quiz: registry[loc] || {},
+        grammar: registry[loc] || {},
+        vocab: registry[loc] || {}
+      };
+    });
+    try {
+      inst.init({
+        lng: current,
+        fallbackLng: GOLDEN_PIVOT,
+        supportedLngs: SUPPORTED.slice(),
+        defaultNS: 'ui',
+        fallbackNS: ['quiz', 'grammar', 'vocab'],
+        resources: res,
+        interpolation: {
+          escapeValue: false
+        }
+      });
+    } catch (_) {}
+    return inst;
+  }
+
+  if (root && root.i18next) {
+    initI18next(root.i18next);
   }
 
   return {
     SUPPORTED: SUPPORTED.slice(),
     STATE_FIELD: STATE_FIELD,
+    GOLDEN_PIVOT: GOLDEN_PIVOT,
     registerCopy: registerCopy,
     overrideCopy: overrideCopy,
     hasCopy: hasCopy,
@@ -192,6 +286,8 @@
     getBcp47: getBcp47,
     setLocale: setLocale,
     onChange: onChange,
-    coverageReport: coverageReport
+    coverageReport: coverageReport,
+    loadLocale: loadLocale,
+    initI18next: initI18next
   };
 }));

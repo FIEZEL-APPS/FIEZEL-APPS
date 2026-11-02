@@ -326,6 +326,7 @@ jobs:
           node tests/qr-scanner-test.js
           node tests/student-single-registration-test.js
           node tests/th-ui-leak-test.js
+          node tests/i18n-leak-guard-test.js
           node tests/i18n-kunci-hantu-test.js
           # Arah ketiga cacat i18n: kunci terdaftar DAN dipanggil, tetapi objek parameternya
           # memuat nama placeholder kembar — nilai pertama hilang tanpa suara. Lahir dari
