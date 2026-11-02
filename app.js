@@ -9867,7 +9867,7 @@ let vtViewPaint=false;
 function captureActiveElement(container){try{const act=document.activeElement;if(act&&container&&container.contains(act)&&/^(INPUT|TEXTAREA)$/i.test(act.tagName||'')){return{id:act.id,name:act.name,testId:act.getAttribute('data-testid'),val:act.value,s:act.selectionStart,e:act.selectionEnd}}}catch(_){}return null}
 function restoreActiveElement(container,saved){if(!saved||!container)return;try{let r=null;if(saved.id)r=container.querySelector('#'+saved.id);if(!r&&saved.testId)r=container.querySelector('[data-testid="'+saved.testId+'"]');if(!r&&saved.name)r=container.querySelector('[name="'+saved.name+'"]');if(r){if(saved.val!=null&&r.value!==saved.val)r.value=saved.val;r.focus();if(typeof r.setSelectionRange==='function'&&saved.s!=null)r.setSelectionRange(saved.s,saved.e)}}catch(_){}}
 const TAB_PARENT={chat:'latihan',nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online',profile:'online'};
-function syncNavActivePill(targetEl){try{const pill=document.getElementById('navActivePill'),nav=document.querySelector('.bottomnav');if(!pill||!nav)return;let activeEl=targetEl;if(!activeEl||!activeEl.getBoundingClientRect||!nav.contains(activeEl)){const curV=(typeof state!=='undefined'&&state?.view)?state.view:'home';activeEl=nav.querySelector('.nav.active')||nav.querySelector(`[data-view="${curV}"]`)||(TAB_PARENT[curV]?nav.querySelector(`[data-view="${TAB_PARENT[curV]}"]`):null)||(curV==='profile'?nav.querySelector('[data-view="online"]'):null)||(curV==='home'?nav.querySelector('[data-view="home"]'):null)}if(!activeEl){pill.style.setProperty('opacity','0','important');return}const navRect=nav.getBoundingClientRect();if(navRect.width===0){pill.style.setProperty('opacity','0','important');return}const elRect=activeEl.getBoundingClientRect();if(elRect.width===0){activeEl._pillRetries=(activeEl._pillRetries||0)+1;if(activeEl._pillRetries<=8){requestAnimationFrame(()=>syncNavActivePill(activeEl))}return}activeEl._pillRetries=0;const left=elRect.left-navRect.left;pill.style.setProperty('width',elRect.width+'px','important');/* m025-575: di tablet/desktop navigasi menjadi rail/sidebar vertikal (fiezel-tactile-clay.css 15.8), jadi pil ikut bergerak 2D; di dok HP tetap geser horizontal. */if(getComputedStyle(nav).flexDirection==='column'){const top=elRect.top-navRect.top+nav.scrollTop;pill.style.setProperty('top','0px','important');pill.style.setProperty('height',elRect.height+'px','important');pill.style.setProperty('transform',`translate3d(${left}px,${top}px,0)`,'important')}else{pill.style.removeProperty('top');pill.style.removeProperty('height');pill.style.setProperty('transform',`translateX(${left}px)`,'important')}pill.style.setProperty('opacity','1','important');nav.classList.add('pill-synced')}catch(_){}}
+function syncNavActivePill(targetEl){try{const pill=document.getElementById('navActivePill'),nav=document.querySelector('.bottomnav');if(!pill||!nav)return;let activeEl=targetEl;if(!activeEl||!activeEl.getBoundingClientRect||!nav.contains(activeEl)){const curV=(typeof state!=='undefined'&&state?.view)?state.view:'home';activeEl=nav.querySelector(`[data-view="${curV}"]`)||(TAB_PARENT[curV]?nav.querySelector(`[data-view="${TAB_PARENT[curV]}"]`):null)||(curV==='profile'?nav.querySelector('[data-view="online"]'):null)||nav.querySelector('.nav.active')||nav.querySelector('[data-view="home"]')}if(!activeEl){pill.style.setProperty('opacity','0','important');return}const navRect=nav.getBoundingClientRect();if(navRect.width===0){pill.style.setProperty('opacity','0','important');requestAnimationFrame(()=>syncNavActivePill(activeEl));return}const elRect=activeEl.getBoundingClientRect();if(elRect.width===0){activeEl._pillRetries=(activeEl._pillRetries||0)+1;if(activeEl._pillRetries<=8){requestAnimationFrame(()=>syncNavActivePill(activeEl))}return}activeEl._pillRetries=0;const left=elRect.left-navRect.left;pill.style.setProperty('width',elRect.width+'px','important');/* m025-575: di tablet/desktop navigasi menjadi rail/sidebar vertikal (fiezel-tactile-clay.css 15.8), jadi pil ikut bergerak 2D; di dok HP tetap geser horizontal. */if(getComputedStyle(nav).flexDirection==='column'){const top=elRect.top-navRect.top+nav.scrollTop;pill.style.setProperty('top','0px','important');pill.style.setProperty('height',elRect.height+'px','important');pill.style.setProperty('transform',`translate3d(${left}px,${top}px,0)`,'important')}else{pill.style.removeProperty('top');pill.style.removeProperty('height');pill.style.setProperty('transform',`translateX(${left}px)`,'important')}pill.style.setProperty('opacity','1','important');nav.classList.add('pill-synced')}catch(_){}}
 window.syncNavActivePill=syncNavActivePill;
 try{window.addEventListener('resize',()=>syncNavActivePill(),{passive:true});window.addEventListener('orientationchange',()=>{syncNavActivePill();setTimeout(syncNavActivePill,120)},{passive:true})}catch(_){}
 /* m025-573: topbar mendapat tepi (garis + bayangan tipis) HANYA ketika isi halaman sudah lewat di bawahnya, pola app bar Material/iOS. Tanpa tepi, latar topbar yang nyaris sama dengan latar halaman membuat kartu tampak terpotong garis tak terlihat saat di-scroll. CSS-nya di fiezel-tactile-clay.css (header.topbar.is-scrolled).
@@ -12102,26 +12102,26 @@ function todayHomeMarkup(){
           <div class="fz-vissol-ring-wrap">
             <svg viewBox="0 0 80 80" width="76" height="76">
               <circle cx="40" cy="40" r="32" stroke="#F1F5F9" stroke-width="7" fill="none"/>
-              <circle cx="40" cy="40" r="32" stroke="#F59E0B" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="201.06" stroke-dashoffset="${(201.06 * (1 - Math.max(0.08, (rhythmPct || 67) / 100))).toFixed(2)}" transform="rotate(-90 40 40)"/>
+              <circle cx="40" cy="40" r="32" stroke="#F59E0B" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="201.06" stroke-dashoffset="${(201.06 * (1 - Math.max(0.08, (Number(rhythmPct) || 0) / 100))).toFixed(2)}" transform="rotate(-90 40 40)"/>
             </svg>
-            <div class="fz-vissol-ring-val">${rhythmPct || 67}%</div>
+            <div class="fz-vissol-ring-val">${Number(rhythmPct) || 0}%</div>
           </div>
         </div>
 
         <div class="fz-vissol-progress-info">
           <div class="fz-vissol-plan-kicker">${esc(FiezelI18n.t('home.ritual-mark'))}</div>
           <div class="fz-vissol-plan-count">
-            <b>${rhythmShown || 4} / ${rhythmTarget || 6}</b>
+            <b>${Number(rhythmShown) || 0} / ${rhythmTarget || 6}</b>
             <span>${isTh ? 'เส้นทาง' : 'Rute'}</span>
           </div>
           <div class="fz-vissol-progress-track">
-            <div class="fz-vissol-progress-fill" style="width: ${Math.max(10, rhythmPct || 67)}%;"></div>
+            <div class="fz-vissol-progress-fill" style="width: ${Math.max(0, Number(rhythmPct) || 0)}%;"></div>
           </div>
           <div class="fz-vissol-time-left">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
-            <span>± ${Math.max(8, Math.round(((rhythmTarget || 6) - (rhythmShown || 4)) * 8.5))} menit lagi</span>
+            <span>± ${Math.max(5, Math.round(((rhythmTarget || 6) - (Number(rhythmShown) || 0)) * 8.5))} menit lagi</span>
           </div>
         </div>
       </div>

@@ -75,18 +75,21 @@
   function reloadIfApproved() {
     if (sess('fiezel-apply-update') !== '1') return;
     dropSess('fiezel-apply-update');
+    var target = sess('fiezel-target-build') || bestBuild || '';
     dropSess('fiezel-target-build');
     dropSess('fiezel-target-retry');
     try { sessionStorage.removeItem('fiezel-healed-rev'); } catch (_) {}
-    // m025-742: Pada iOS Safari / WebKit Standalone PWA, reload biasa sering
+    if (target) setSess('fiezel-just-updated', target);
+    // m025-751: Pada iOS Safari / WebKit Standalone PWA, reload biasa sering
     // memulihkan dokumen dari memory page cache WebKit yang usang.
     // Mengganti href ke URL bernomor versi/timestamp memaksa WebKit merobohkan memory cache lama
     // dan meminta dokumen baru ke Service Worker yang baru aktif.
     var bustParam = 'fz_upd=' + Date.now();
     var curSearch = location.search ? (location.search + '&' + bustParam) : ('?' + bustParam);
+    var targetUrl = window.location.origin + window.location.pathname + curSearch + window.location.hash;
     try {
-      if (typeof window !== 'undefined' && window.location && typeof window.location.replace === 'function') {
-        window.location.replace(window.location.pathname + curSearch + window.location.hash);
+      if (typeof window !== 'undefined' && window.location && window.location.href) {
+        window.location.href = targetUrl;
         return;
       }
     } catch (_) {}
