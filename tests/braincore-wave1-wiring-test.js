@@ -54,7 +54,7 @@ const vault = home.indexOf('fz-tactile-audit-vault');
 const cardAt = home.indexOf('${braincoreHomeCardMarkup()}');
 check('Beranda merender kartu "Kata Braincore Hari Ini"', cardAt > 0);
 check('Kartu Beranda berada DI LUAR blok audit yang disembunyikan', cardAt > 0 && vault > 0 && cardAt < vault, `kartu@${cardAt} vault@${vault}`);
-check('Ringkasan Progres merender panel bukti belajar', /overview:`[^`]*\$\{braincoreProofPanelMarkup\(\)\}/.test(fnBody('progress')));
+check('Ringkasan Progres merender panel bukti belajar', /overview:`[^`]*\$\{(?:safePart\(\(\)=>)?braincoreProofPanelMarkup\(\)\)?\}/.test(fnBody('progress')));
 check('Hub Grammar merender satu baris fokus', fnBody('grammar').includes('${braincoreGrammarFocusLine()}'));
 check('Kata yang memudar diambil dari antrean review yang sama dengan tombol Segarkan', fnBody('braincoreFadingWords').includes('vocabReviewQueue()') && fnBody('braincoreHomeCardMarkup').includes('onclick="reviewVocab()"'));
 check('Arah belajar dibaca dari momentum Core Brain', fnBody('braincoreDirectionLine').includes('coreBrainSnapshot()'));

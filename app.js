@@ -23600,7 +23600,7 @@ async function notifSyncRound(){
    oleh SOCIAL_NOTIFY_MIN_GAP_MS=90000 agar tidak membebani kueri D1. Lantai server penugasan
    adalah 5 detik (ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS), dan timer ini diam total saat
    aplikasi tidak terlihat (visibilitychange). */
-const NOTIF_POLL_MS=3500;
+const NOTIF_POLL_MS=6000;
 function startNotifPolling(){
   if(notifPollTimer)return false;
   notifPollTimer=setInterval(()=>{

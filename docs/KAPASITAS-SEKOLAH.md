@@ -13,14 +13,14 @@ Yang benar-benar membatasi satu sekolah adalah tiga hal di bawah.
 
 ## 2. Hitungan (asumsi bawaan: 30 menit aplikasi terlihat per murid per hari, 3 pertanyaan AI, 32 murid per rombel, papan guru 60 menit per rombel)
 
-Ritme dari kode: polling murid 3.5 dtk, undangan panggung 12 dtk, papan guru 10 dtk. Plafon neuron AI akun 8000/hari.
+Ritme dari kode: polling murid 6 dtk, undangan panggung 12 dtk, papan guru 10 dtk. Plafon neuron AI akun 8000/hari.
 
 | Murid | Permintaan/hari | Paket gratis (100 rb/hari) | Neuron AI/hari | Plafon AI sekarang | Paket berbayar, AI untuk semua |
 |---|---|---|---|---|---|
-| 250 | 172.701 | **lewat** | 22.500 | **lewat** (cukup untuk ±88 murid) | ±US$8.03/bulan |
-| 500 | 345.403 | **lewat** | 45.000 | **lewat** (cukup untuk ±88 murid) | ±US$13.47/bulan |
-| 1000 | 690.806 | **lewat** | 90.000 | **lewat** (cukup untuk ±88 murid) | ±US$25.92/bulan |
-| 2000 | 1.381.251 | **lewat** | 180.000 | **lewat** (cukup untuk ±88 murid) | ±US$52.26/bulan |
+| 250 | 119.130 | **lewat** | 22.500 | **lewat** (cukup untuk ±88 murid) | ±US$8.03/bulan |
+| 500 | 238.260 | **lewat** | 45.000 | **lewat** (cukup untuk ±88 murid) | ±US$13.47/bulan |
+| 1000 | 476.520 | **lewat** | 90.000 | **lewat** (cukup untuk ±88 murid) | ±US$24.51/bulan |
+| 2000 | 952.680 | **lewat** | 180.000 | **lewat** (cukup untuk ±88 murid) | ±US$49.43/bulan |
 
 Catatan cara membaca:
 - Hitungan permintaan adalah **batas bawah**: satu ronde polling dihitung satu permintaan.
