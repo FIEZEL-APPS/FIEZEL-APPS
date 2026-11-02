@@ -166,12 +166,42 @@ html body:not(.fz-teacher-mode) .quick-practice-section,
 html body:not(.fz-teacher-mode) .fz-stitch-section,
 html body:not(.fz-teacher-mode) .fz-stitch-kelasku,
 html body:not(.fz-teacher-mode) .fz2-social,
-html body:not(.fz-teacher-mode) .card,
+html body:not(.fz-teacher-mode) .card:not(.modal-panel *):not(#modalPanel *):not(.settings-fold *):not(.settings-modal-wrapper *),
 html body:not(.fz-teacher-mode) .fz-drawer-inner {
   background: #FFFFFF !important;
   border: 1.5px solid rgba(94, 20, 32, 0.12) !important;
   box-shadow: 0 4px 18px rgba(94, 20, 32, 0.05) !important;
   color: #241A11 !important;
+}
+
+/* Modals & Settings Folds: Zero White Clashing Invariant */
+html body:not(.fz-teacher-mode) .modal-panel .card,
+html body:not(.fz-teacher-mode) #modalPanel .card,
+html body:not(.fz-teacher-mode) .settings-fold .card,
+html body:not(.fz-teacher-mode) .settings-scroll-body .card,
+html body:not(.fz-teacher-mode) .settings-fold-body .card,
+html body:not(.fz-teacher-mode) .fiezel-account-card,
+html body:not(.fz-teacher-mode) .storage-warning {
+  background: #1E1E2C !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+html body:not(.fz-teacher-mode) .modal-panel .card h1,
+html body:not(.fz-teacher-mode) .modal-panel .card h2,
+html body:not(.fz-teacher-mode) .modal-panel .card h3,
+html body:not(.fz-teacher-mode) .settings-fold .card h1,
+html body:not(.fz-teacher-mode) .settings-fold .card h2,
+html body:not(.fz-teacher-mode) .settings-fold .card h3 {
+  color: #FFFFFF !important;
+}
+
+html body:not(.fz-teacher-mode) .modal-panel .card p,
+html body:not(.fz-teacher-mode) .modal-panel .card .muted,
+html body:not(.fz-teacher-mode) .settings-fold .card p,
+html body:not(.fz-teacher-mode) .settings-fold .card .muted {
+  color: #94A3B8 !important;
 }
 
 html body:not(.fz-teacher-mode) .fz-aurora-vocab-zone,

@@ -4234,16 +4234,16 @@ html.fiezel-ui-v6 .launcher-shell{
    (min-height 58px, padding 7px seperti padding pill nav), dan tombolnya diperlakukan
    seperti .nav: satu baris, 44px sasaran sentuh, tanpa membungkus. */
 .modal-actions.settings-actions{
-  position:sticky;bottom:0;z-index:6;
+  position:relative;bottom:auto;z-index:6;
   display:flex;align-items:center;gap:8px;
   margin:16px 0 0;
-  padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));
   min-height:58px;box-sizing:border-box;
   width:100%;
-  background:var(--glass-solid,var(--panel));
+  background:#161622;
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-  border-top:1px solid var(--line);
-  box-shadow:0 -6px 16px rgba(36,26,17,.07)
+  border-top:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 -6px 16px rgba(0,0,0,0.4)
 }
 /* Tombol footer mengikuti ukuran tombol navigasi, bukan tombol aksi halaman: 44px sasaran
    sentuh tetap dihormati (kontrak a11y), tetapi paddingnya tidak lagi menumpuk di atasnya
@@ -7437,7 +7437,11 @@ main.app {
   padding-bottom: 0 !important;
 }
 
-/* Hide bottomnav when listening modal or detail sheet is active or in lesson mode */
+/* Hide bottomnav when listening modal or detail sheet is active or in lesson mode or before app open */
+html:not(.fz-app-open) nav.bottomnav,
+html:not(.fz-app-open) .bottomnav,
+body:not(.fz-app-open) nav.bottomnav,
+body:not(.fz-app-open) .bottomnav,
 body:has(#listeningPanelModal.open) .bottomnav,
 body:has(.listening-modal.open) .bottomnav,
 body:has(#jlptDetailSheet.open) .bottomnav,
@@ -8190,6 +8194,33 @@ html body #app .learning-launcher .launch-card svg,
   box-shadow: 0 4px 14px rgba(255, 224, 46, 0.35) !important;
 }
 
+/* Profile Subtabs (Equal flex width, zero clipping on mobile) */
+.progress-tabs.profile-tabs {
+  display: flex !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  background-image: none !important;
+}
+.progress-tabs.profile-tabs .progress-tab {
+  flex: 1 1 0 !important;
+  text-align: center !important;
+  padding: 9px 8px !important;
+  font-size: 0.82rem !important;
+  white-space: nowrap !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+}
+@media (max-width: 380px) {
+  .progress-tabs.profile-tabs .progress-tab {
+    padding: 8px 4px !important;
+    font-size: 0.76rem !important;
+    letter-spacing: -0.01em !important;
+  }
+}
+
 .progress-grid {
   display: flex !important;
   flex-direction: column !important;
@@ -8376,10 +8407,31 @@ html body #app .learning-launcher .launch-card svg,
 }
 
 /* 9. MODALS & SETTINGS PANELS */
+/* 9. MODALS & SETTINGS PANELS (m025-743 Lux Dark Architecture) */
+html.fz-modal-open,
+body.fz-modal-open {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+html.fz-modal-open nav.bottomnav,
+html.fz-modal-open .bottomnav,
+body.fz-modal-open nav.bottomnav,
+body.fz-modal-open .bottomnav,
+body:has(#modal.show) nav.bottomnav,
+body:has(#modal.show) .bottomnav {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 body.fz-lux .modal-panel,
 body:has(.home-today) .modal-panel,
 body.fz-lux #modalPanel,
-body:has(.home-today) #modalPanel {
+body:has(.home-today) #modalPanel,
+.modal-panel:has(.settings-modal-wrapper),
+#modalPanel:has(.settings-modal-wrapper) {
   background: #14141C !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 24px !important;
@@ -8387,79 +8439,291 @@ body:has(.home-today) #modalPanel {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85) !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
-  touch-action: pan-y !important;
   -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior-y: contain !important;
   max-width: min(520px, 100%) !important;
   box-sizing: border-box !important;
 }
 
-body.fz-lux .modal-panel h2,
-body:has(.home-today) .modal-panel h2,
-body.fz-lux #modalPanel h2,
-body:has(.home-today) #modalPanel h2,
-.modal-panel h2,
-.modal-panel h3 {
-  color: #FFFFFF !important;
+/* Dedicated settings modal wrapper inside modal panel */
+.modal-panel:has(.settings-modal-wrapper),
+#modalPanel:has(.settings-modal-wrapper) {
+  padding: 0 !important;
+  height: min(780px, 86dvh) !important;
+  max-height: 86dvh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-.modal-panel p,
-#modalPanel p,
-.modal-panel .muted,
-#modalPanel .muted {
-  color: #94A3B8 !important;
+@media (max-width: 640px) {
+  #modal:has(.settings-modal-wrapper) {
+    padding: 0 !important;
+    align-items: flex-end !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  .modal-panel:has(.settings-modal-wrapper),
+  #modalPanel:has(.settings-modal-wrapper) {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 88dvh !important;
+    max-height: 88dvh !important;
+    border-radius: 24px 24px 0 0 !important;
+    border-bottom: none !important;
+    align-self: flex-end !important;
+  }
 }
 
-.modal-panel .text-button,
-#modalPanel .text-button,
-.modal-panel .notif-readall,
-.modal-panel [data-testid="notif-close"] {
+.settings-modal-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.settings-head {
+  flex: 0 0 auto !important;
+  padding: 18px 20px 14px !important;
+  background: #14141C !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+}
+
+.settings-head-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-bottom: 4px !important;
+}
+
+.settings-head .modal-mark {
   color: #FFDE43 !important;
-  font-weight: 700 !important;
+  font-size: 0.76rem !important;
+  letter-spacing: 0.12em !important;
+  font-weight: 800 !important;
+  margin: 0 !important;
 }
 
-.modal-panel .text-button:hover,
-#modalPanel .text-button:hover {
-  color: #FFFFFF !important;
+.settings-close-x {
   background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 50% !important;
+  width: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #E2E8F0 !important;
+  cursor: pointer !important;
+  transition: background 0.15s ease, transform 0.1s ease !important;
+}
+
+.settings-close-x:active {
+  transform: scale(0.92) !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+.settings-close-x svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.settings-head h2 {
+  font-size: 1.55rem !important;
+  margin: 4px 0 2px !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.settings-head p {
+  color: #94A3B8 !important;
+  font-size: 0.85rem !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+}
+
+.settings-scroll-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 16px 20px 24px !important;
+  box-sizing: border-box !important;
+  background: #14141C !important;
+}
+
+/* Settings folds & cards */
+.settings-fold {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  margin: 0 0 10px 0 !important;
+  transition: border-color 0.15s ease !important;
+}
+
+.settings-fold[open] {
+  border-color: rgba(255, 222, 67, 0.25) !important;
+}
+
+.settings-fold summary {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  padding: 14px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  cursor: pointer !important;
+}
+
+.settings-fold-body {
+  padding: 4px 16px 16px !important;
+  background: transparent !important;
+}
+
+.settings-fold .card,
+.settings-scroll-body .card,
+.settings-fold .fiezel-account-card {
+  background: #1E1E2C !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  color: #FFFFFF !important;
+  padding: 14px !important;
+  margin-top: 10px !important;
+}
+
+.settings-fold .card h3,
+.settings-scroll-body .card h3 {
+  color: #FFFFFF !important;
+  font-size: 1.05rem !important;
+  margin: 0 0 4px !important;
+}
+
+.settings-fold .card p,
+.settings-scroll-body .card p,
+.settings-fold .card .muted,
+.settings-scroll-body .card .muted {
+  color: #94A3B8 !important;
+  font-size: 0.82rem !important;
+  line-height: 1.4 !important;
+}
+
+.settings-fold .setting-row,
+.settings-scroll-body .setting-row {
+  color: #FFFFFF !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 10px 0 !important;
+}
+
+.settings-fold .setting-row:last-child,
+.settings-scroll-body .setting-row:last-child {
+  border-bottom: none !important;
+}
+
+.settings-fold .setting-row b,
+.settings-scroll-body .setting-row b {
+  color: #FFFFFF !important;
+  font-size: 0.9rem !important;
+}
+
+.settings-fold .setting-row small,
+.settings-scroll-body .setting-row small {
+  color: #94A3B8 !important;
+  font-size: 0.78rem !important;
+}
+
+.settings-fold .setting-icon,
+.settings-scroll-body .setting-icon {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #FFDE43 !important;
+}
+
+.settings-fold input[type="text"],
+.settings-fold input[type="url"],
+.settings-fold select,
+.settings-scroll-body input[type="text"],
+.settings-scroll-body input[type="url"],
+.settings-scroll-body select {
+  background: #252536 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+  border-radius: 10px !important;
 }
 
 /* Settings Modal Actions Bar in Dark Sheet */
+.modal-actions.settings-actions,
+.settings-modal-wrapper .modal-actions.settings-actions,
 .modal-panel .modal-actions.settings-actions,
 #modalPanel .modal-actions.settings-actions,
 body.fz-lux .modal-actions.settings-actions,
 body:has(.home-today) .modal-actions.settings-actions {
-  background: rgba(20, 20, 28, 0.95) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  backdrop-filter: blur(16px) !important;
+  flex: 0 0 auto !important;
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+  background: #161622 !important;
   border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.45) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  z-index: 10 !important;
 }
 
+.modal-actions.settings-actions button#settingsCancel,
+.settings-modal-wrapper .modal-actions.settings-actions button#settingsCancel,
 .modal-panel .modal-actions.settings-actions button#settingsCancel,
 #modalPanel .modal-actions.settings-actions button#settingsCancel,
 body.fz-lux .modal-actions.settings-actions button#settingsCancel,
 body:has(.home-today) .modal-actions.settings-actions button#settingsCancel {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  height: 46px !important;
+  min-height: 46px !important;
   background: rgba(255, 255, 255, 0.08) !important;
   color: #F8FAFC !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 0.92rem !important;
+  transition: background 0.15s ease !important;
 }
 
+.modal-actions.settings-actions button#settingsCancel:hover,
+.settings-modal-wrapper .modal-actions.settings-actions button#settingsCancel:hover,
 .modal-panel .modal-actions.settings-actions button#settingsCancel:hover,
 #modalPanel .modal-actions.settings-actions button#settingsCancel:hover {
   background: rgba(255, 255, 255, 0.14) !important;
   color: #FFFFFF !important;
 }
 
+.modal-actions.settings-actions button#settingsSave,
+.settings-modal-wrapper .modal-actions.settings-actions button#settingsSave,
 .modal-panel .modal-actions.settings-actions button#settingsSave,
 #modalPanel .modal-actions.settings-actions button#settingsSave,
 body.fz-lux .modal-actions.settings-actions button#settingsSave,
 body:has(.home-today) .modal-actions.settings-actions button#settingsSave {
+  flex: 1.4 1 0 !important;
+  min-width: 0 !important;
+  height: 46px !important;
+  min-height: 46px !important;
   background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
   color: #0F172A !important;
-  font-weight: 700 !important;
   border: none !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
   box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35) !important;
+  transition: transform 0.1s ease, filter 0.15s ease !important;
 }
 
 /* Recovery kontras: tombol "Tolak" pada kartu permintaan teman (di atas kartu putih #F8FAFC ganti teks kuning jadi slate 500/600 #64748B, kontras > 5:1 AA) */

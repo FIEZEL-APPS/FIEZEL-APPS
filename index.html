@@ -168,7 +168,17 @@
 html.fz-booting,html.fz-booting body{background:#1B1418}
 html.fz-booting,html.fz-booting body{overscroll-behavior:none;overscroll-behavior-x:none}
 html.fz-booting body{overflow:hidden}
-#fiezelBootSplash{contain:layout style paint;top:calc(-1 * env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
+html.fz-booting nav.bottomnav,
+html.fz-booting .bottomnav,
+html.fz-booting header.topbar,
+html.fz-booting body:not(.fz-app-open) nav.bottomnav,
+html.fz-booting body:not(.fz-app-open) .bottomnav {
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+#fiezelBootSplash{contain:layout style paint;position:fixed !important;inset:0 !important;top:calc(-1 * env(safe-area-inset-top,0px)) !important;bottom:calc(-1 * env(safe-area-inset-bottom,0px)) !important;padding-top:0 !important;padding-bottom:0 !important;background-color:#1B1418 !important}
 #fiezelBootSplash:not(.is-leaving){animation:none}
 #fiezelBootSplash .fiezel-splash-brand{background:linear-gradient(180deg,#1B1418 0%,#1B1418 72px,rgba(27,20,24,0) 168px),radial-gradient(circle at 50% 48%,#251D22 0%,#1B1418 55%,#120C0F 100%);background-color:#1B1418}
 #fiezelBootSplash .fz-splash-canvas{-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px);mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px)}
@@ -431,10 +441,9 @@ html.fz-booting body{overflow:hidden}
       overscroll-behavior-y: none !important;
     }
 
-    html.fz-app-open #fiezelBootSplash,
-    body.fz-app-open #fiezelBootSplash,
-    #fiezelBootSplash.dismissed,
-    #fiezelBootSplash.is-leaving {
+    html.fz-app-open #fiezelBootSplash.dismissed,
+    body.fz-app-open #fiezelBootSplash.dismissed,
+    #fiezelBootSplash.dismissed {
       display: none !important;
       opacity: 0 !important;
       visibility: hidden !important;

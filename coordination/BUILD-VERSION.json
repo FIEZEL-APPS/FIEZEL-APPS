@@ -1,7 +1,7 @@
 {
-  "version": "m025-742",
-  "claimedBy": "branch fix/pwa-update-native-m025-742",
-  "claimedAt": "2026-11-02T05:07:53.848Z",
-  "reason": "fix(pwa): [ALLOW-PROTECTED: auth|pwa] fix iOS PWA cache invalidation, settings modal, topbar safe area, and progress view (m025-742)",
+  "version": "m025-743",
+  "claimedBy": "branch fix/splash-progress-profile-m025-743",
+  "claimedAt": "2026-11-02T06:48:16.767Z",
+  "reason": "fix(pwa): [ALLOW-PROTECTED: auth|pwa] fix settings modal scroll & sticky footer, splash double layer & seam, progress error, and profile latency (m025-743)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

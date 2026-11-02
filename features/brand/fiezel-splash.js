@@ -173,6 +173,7 @@
       }
     } catch (_) {}
     try {
+      target.__fiezelSplashActive = false;
       target.__fiezelBootSplashDismissed = true;
       if (typeof target.dispatchEvent === 'function' && typeof target.CustomEvent === 'function') {
         target.dispatchEvent(new target.CustomEvent('fiezel:splash-dismissed'));
@@ -703,6 +704,12 @@
     var now = Number(opts.now) || Date.now();
     var doc = target.document;
     if (!doc || typeof doc.createElement !== 'function') return { shown: false, reason: 'no_document' };
+    if (target.__fiezelSplashActive || (doc && doc.querySelector('.fiezel-splash[data-fiezel-boot-claimed="shown"], .fiezel-splash:not([data-fiezel-boot-splash])'))) {
+      return { shown: false, reason: 'already_active' };
+    }
+    if (opts.force !== true && target.__fiezelBootSplashDismissed) {
+      return { shown: false, reason: 'already_dismissed' };
+    }
     try {
       if (target.__fiezelBootSplash && typeof target.__fiezelBootSplash.clearRecovery === 'function') target.__fiezelBootSplash.clearRecovery();
     } catch (_) {}
@@ -749,6 +756,7 @@
       host.setAttribute('aria-label', t('splash.welcome-aria'));
       host.innerHTML = markup();
     }
+    try { target.__fiezelSplashActive = true; } catch (_) {}
 
     // Ketukan koreografi dipasang sebagai custom property. CSS jalur statis
     // membaca jeda animasinya dari sini; index.html menuliskan nilai yang sama
@@ -792,6 +800,7 @@
       if (closed) return;
       closed = true;
       ctl.closed = true;
+      try { target.__fiezelSplashActive = false; } catch (_) {}
       try {
         target.__fiezelBootSplashDismissed = true;
         if (typeof target.dispatchEvent === 'function' && typeof target.CustomEvent === 'function') {
@@ -816,6 +825,7 @@
       else remove();
     }
     function remove() {
+      try { target.__fiezelSplashActive = false; } catch (_) {}
       try { target.__fiezelBootSplashDismissed = true; } catch (_) {}
       try { if (host.parentNode) host.parentNode.removeChild(host); } catch (_) {}
     }
