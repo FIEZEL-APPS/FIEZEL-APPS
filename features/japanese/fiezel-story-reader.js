@@ -31,6 +31,10 @@
   var currentAudio = null;
   var autoAdvanceTimer = null;
   var hideFurigana = false;
+  var karaokeRafId = null;
+  var lastActiveCharIdx = -1;
+  var pendingSeekMs = null;
+  var cachedStoryTimings = {"schema_version":"1.0.0","generator":"Fiezel-ForcedAligner-Qwen3-Compatible","generated_at":"2026-11-02T08:46:11.310Z","stories":{"mizuki-maiko":{"title":"舞妓の一日","scenes":[{"scene_idx":0,"is_quiz":false,"audio_src":"./assets/stories/mizuki-1.mp3","audio_duration_ms":6920,"char_count":26,"char_timings":[{"char":"ミ","start_ms":25,"end_ms":220},{"char":"ズ","start_ms":220,"end_ms":416},{"char":"キ","start_ms":416,"end_ms":611},{"char":"は","start_ms":944,"end_ms":1132},{"char":"1","start_ms":1132,"end_ms":1320},{"char":"7","start_ms":1320,"end_ms":1508},{"char":"歳","start_ms":1508,"end_ms":1696},{"char":"の","start_ms":1696,"end_ms":1883},{"char":"舞","start_ms":1883,"end_ms":2071},{"char":"妓","start_ms":2071,"end_ms":2259},{"char":"で","start_ms":2259,"end_ms":2447},{"char":"す","start_ms":3318,"end_ms":3501},{"char":"毎","start_ms":3501,"end_ms":3684},{"char":"朝","start_ms":3684,"end_ms":3867},{"char":"部","start_ms":4222,"end_ms":4374},{"char":"屋","start_ms":4374,"end_ms":4527},{"char":"で","start_ms":4527,"end_ms":4679},{"char":"美","start_ms":4947,"end_ms":5123},{"char":"し","start_ms":5123,"end_ms":5299},{"char":"い","start_ms":5299,"end_ms":5475},{"char":"着","start_ms":5475,"end_ms":5651},{"char":"物","start_ms":5651,"end_ms":5828},{"char":"を","start_ms":5828,"end_ms":6004},{"char":"着","start_ms":6004,"end_ms":6180},{"char":"ま","start_ms":6180,"end_ms":6356},{"char":"す","start_ms":6356,"end_ms":6532}]},{"scene_idx":1,"is_quiz":false,"audio_src":"./assets/stories/mizuki-2.mp3","audio_duration_ms":5201,"char_count":21,"char_timings":[{"char":"赤","start_ms":25,"end_ms":216},{"char":"い","start_ms":216,"end_ms":406},{"char":"傘","start_ms":406,"end_ms":597},{"char":"を","start_ms":597,"end_ms":787},{"char":"持","start_ms":787,"end_ms":978},{"char":"っ","start_ms":1166,"end_ms":1246},{"char":"て","start_ms":1658,"end_ms":1835},{"char":"京","start_ms":1835,"end_ms":2011},{"char":"都","start_ms":2011,"end_ms":2188},{"char":"の","start_ms":2188,"end_ms":2364},{"char":"古","start_ms":2364,"end_ms":2541},{"char":"い","start_ms":2541,"end_ms":2717},{"char":"道","start_ms":2717,"end_ms":2894},{"char":"を","start_ms":3198,"end_ms":3399},{"char":"静","start_ms":3399,"end_ms":3599},{"char":"か","start_ms":3599,"end_ms":3800},{"char":"に","start_ms":3800,"end_ms":4000},{"char":"歩","start_ms":4000,"end_ms":4201},{"char":"き","start_ms":4201,"end_ms":4401},{"char":"ま","start_ms":4401,"end_ms":4602},{"char":"す","start_ms":4602,"end_ms":4802}]},{"scene_idx":2,"is_quiz":false,"audio_src":"./assets/stories/mizuki-3.mp3","audio_duration_ms":7384,"char_count":28,"char_timings":[{"char":"お","start_ms":25,"end_ms":202},{"char":"は","start_ms":202,"end_ms":379},{"char":"よ","start_ms":379,"end_ms":556},{"char":"う","start_ms":556,"end_ms":734},{"char":"ご","start_ms":734,"end_ms":911},{"char":"ざ","start_ms":911,"end_ms":1088},{"char":"い","start_ms":1088,"end_ms":1265},{"char":"ま","start_ms":1265,"end_ms":1442},{"char":"す","start_ms":1895,"end_ms":2089},{"char":"ミ","start_ms":2089,"end_ms":2283},{"char":"ズ","start_ms":2283,"end_ms":2478},{"char":"キ","start_ms":2478,"end_ms":2672},{"char":"さ","start_ms":2672,"end_ms":2866},{"char":"ん","start_ms":3484,"end_ms":3673},{"char":"今","start_ms":3673,"end_ms":3862},{"char":"日","start_ms":3862,"end_ms":4051},{"char":"も","start_ms":4051,"end_ms":4240},{"char":"元","start_ms":4240,"end_ms":4428},{"char":"気","start_ms":4428,"end_ms":4617},{"char":"で","start_ms":4617,"end_ms":4806},{"char":"す","start_ms":4806,"end_ms":4995},{"char":"ね","start_ms":4995,"end_ms":5184},{"char":"お","start_ms":5767,"end_ms":5966},{"char":"茶","start_ms":5966,"end_ms":6166},{"char":"を","start_ms":6166,"end_ms":6365},{"char":"ど","start_ms":6365,"end_ms":6564},{"char":"う","start_ms":6564,"end_ms":6764},{"char":"ぞ","start_ms":6764,"end_ms":6963}]},{"scene_idx":3,"is_quiz":false,"audio_src":"./assets/stories/mizuki-4.mp3","audio_duration_ms":6687,"char_count":23,"char_timings":[{"char":"夕","start_ms":25,"end_ms":222},{"char":"方","start_ms":222,"end_ms":419},{"char":"先","start_ms":419,"end_ms":616},{"char":"生","start_ms":897,"end_ms":1130},{"char":"と","start_ms":1130,"end_ms":1362},{"char":"一","start_ms":1362,"end_ms":1595},{"char":"緒","start_ms":1595,"end_ms":1827},{"char":"に","start_ms":1827,"end_ms":2060},{"char":"伝","start_ms":2060,"end_ms":2292},{"char":"統","start_ms":2788,"end_ms":3020},{"char":"的","start_ms":3020,"end_ms":3252},{"char":"な","start_ms":3252,"end_ms":3484},{"char":"踊","start_ms":3484,"end_ms":3716},{"char":"り","start_ms":3716,"end_ms":3948},{"char":"と","start_ms":4158,"end_ms":4399},{"char":"音","start_ms":4399,"end_ms":4639},{"char":"楽","start_ms":4639,"end_ms":4880},{"char":"を","start_ms":4880,"end_ms":5120},{"char":"練","start_ms":5120,"end_ms":5361},{"char":"習","start_ms":5361,"end_ms":5601},{"char":"し","start_ms":5601,"end_ms":5842},{"char":"ま","start_ms":5842,"end_ms":6082},{"char":"す","start_ms":6082,"end_ms":6323}]},{"scene_idx":4,"is_quiz":true,"audio_src":"./assets/stories/mizuki-5.mp3","audio_duration_ms":5851,"char_count":19,"char_timings":[{"char":"ミ","start_ms":25,"end_ms":259},{"char":"ズ","start_ms":259,"end_ms":492},{"char":"キ","start_ms":492,"end_ms":726},{"char":"さ","start_ms":1795,"end_ms":2013},{"char":"ん","start_ms":2013,"end_ms":2231},{"char":"は","start_ms":2231,"end_ms":2449},{"char":"夕","start_ms":2449,"end_ms":2667},{"char":"方","start_ms":2837,"end_ms":3038},{"char":"だ","start_ms":3038,"end_ms":3238},{"char":"れ","start_ms":3238,"end_ms":3439},{"char":"と","start_ms":3703,"end_ms":3894},{"char":"何","start_ms":3894,"end_ms":4085},{"char":"を","start_ms":4085,"end_ms":4276},{"char":"練","start_ms":4276,"end_ms":4467},{"char":"習","start_ms":4467,"end_ms":4659},{"char":"し","start_ms":4659,"end_ms":4850},{"char":"ま","start_ms":4850,"end_ms":5041},{"char":"す","start_ms":5041,"end_ms":5232},{"char":"か","start_ms":5232,"end_ms":5423}]}]},"asakusa-neko":{"title":"浅草の猫","scenes":[{"scene_idx":0,"is_quiz":false,"audio_src":"./assets/stories/asakusa-1.mp3","audio_duration_ms":9706,"char_count":35,"char_timings":[{"char":"ケ","start_ms":25,"end_ms":177},{"char":"ン","start_ms":177,"end_ms":329},{"char":"ジ","start_ms":329,"end_ms":480},{"char":"は","start_ms":480,"end_ms":632},{"char":"朝","start_ms":1319,"end_ms":1491},{"char":"早","start_ms":1491,"end_ms":1663},{"char":"く","start_ms":1663,"end_ms":1835},{"char":"有","start_ms":1835,"end_ms":2007},{"char":"名","start_ms":3059,"end_ms":3213},{"char":"な","start_ms":3213,"end_ms":3368},{"char":"浅","start_ms":3368,"end_ms":3522},{"char":"草","start_ms":3522,"end_ms":3677},{"char":"の","start_ms":3677,"end_ms":3831},{"char":"お","start_ms":3831,"end_ms":3985},{"char":"寺","start_ms":3985,"end_ms":4140},{"char":"に","start_ms":4140,"end_ms":4294},{"char":"来","start_ms":4967,"end_ms":5126},{"char":"ま","start_ms":5126,"end_ms":5285},{"char":"し","start_ms":5285,"end_ms":5444},{"char":"た","start_ms":5444,"end_ms":5603},{"char":"大","start_ms":5603,"end_ms":5762},{"char":"き","start_ms":5762,"end_ms":5921},{"char":"な","start_ms":7441,"end_ms":7590},{"char":"赤","start_ms":7590,"end_ms":7739},{"char":"い","start_ms":7739,"end_ms":7888},{"char":"ち","start_ms":7888,"end_ms":8036},{"char":"ょ","start_ms":8036,"end_ms":8185},{"char":"う","start_ms":8185,"end_ms":8334},{"char":"ち","start_ms":8334,"end_ms":8483},{"char":"ん","start_ms":8483,"end_ms":8632},{"char":"が","start_ms":8632,"end_ms":8781},{"char":"あ","start_ms":8781,"end_ms":8929},{"char":"り","start_ms":8929,"end_ms":9078},{"char":"ま","start_ms":9078,"end_ms":9227},{"char":"す","start_ms":9227,"end_ms":9376}]},{"scene_idx":1,"is_quiz":false,"audio_src":"./assets/stories/asakusa-2.mp3","audio_duration_ms":8684,"char_count":32,"char_timings":[{"char":"門","start_ms":25,"end_ms":183},{"char":"の","start_ms":183,"end_ms":341},{"char":"そ","start_ms":341,"end_ms":500},{"char":"ば","start_ms":500,"end_ms":658},{"char":"に","start_ms":658,"end_ms":816},{"char":"茶","start_ms":816,"end_ms":974},{"char":"色","start_ms":1749,"end_ms":1907},{"char":"の","start_ms":1907,"end_ms":2066},{"char":"猫","start_ms":2066,"end_ms":2224},{"char":"が","start_ms":2224,"end_ms":2382},{"char":"座","start_ms":2382,"end_ms":2541},{"char":"っ","start_ms":2541,"end_ms":2699},{"char":"て","start_ms":2699,"end_ms":2857},{"char":"い","start_ms":2857,"end_ms":3015},{"char":"ま","start_ms":3015,"end_ms":3174},{"char":"す","start_ms":3174,"end_ms":3332},{"char":"み","start_ms":4145,"end_ms":4291},{"char":"ん","start_ms":4291,"end_ms":4437},{"char":"な","start_ms":4437,"end_ms":4582},{"char":"は","start_ms":4582,"end_ms":4728},{"char":"そ","start_ms":5204,"end_ms":5377},{"char":"の","start_ms":5377,"end_ms":5549},{"char":"猫","start_ms":5549,"end_ms":5722},{"char":"を","start_ms":5722,"end_ms":5894},{"char":"ミ","start_ms":5894,"end_ms":6067},{"char":"カ","start_ms":7116,"end_ms":7292},{"char":"ン","start_ms":7292,"end_ms":7469},{"char":"と","start_ms":7469,"end_ms":7645},{"char":"呼","start_ms":7645,"end_ms":7821},{"char":"び","start_ms":7821,"end_ms":7997},{"char":"ま","start_ms":7997,"end_ms":8174},{"char":"す","start_ms":8174,"end_ms":8350}]},{"scene_idx":2,"is_quiz":false,"audio_src":"./assets/stories/asakusa-3.mp3","audio_duration_ms":8684,"char_count":34,"char_timings":[{"char":"ケ","start_ms":25,"end_ms":168},{"char":"ン","start_ms":168,"end_ms":311},{"char":"ジ","start_ms":311,"end_ms":453},{"char":"は","start_ms":453,"end_ms":596},{"char":"手","start_ms":596,"end_ms":739},{"char":"を","start_ms":1479,"end_ms":1629},{"char":"洗","start_ms":1629,"end_ms":1779},{"char":"っ","start_ms":1779,"end_ms":1929},{"char":"て","start_ms":1929,"end_ms":2080},{"char":"か","start_ms":2080,"end_ms":2230},{"char":"ら","start_ms":2230,"end_ms":2380},{"char":"お","start_ms":2380,"end_ms":2530},{"char":"祈","start_ms":3290,"end_ms":3440},{"char":"り","start_ms":3440,"end_ms":3591},{"char":"を","start_ms":3591,"end_ms":3741},{"char":"し","start_ms":3741,"end_ms":3891},{"char":"ま","start_ms":3891,"end_ms":4041},{"char":"し","start_ms":4041,"end_ms":4192},{"char":"た","start_ms":4192,"end_ms":4342},{"char":"お","start_ms":5327,"end_ms":5470},{"char":"み","start_ms":5470,"end_ms":5613},{"char":"く","start_ms":5613,"end_ms":5756},{"char":"じ","start_ms":5756,"end_ms":5900},{"char":"を","start_ms":5900,"end_ms":6043},{"char":"引","start_ms":6043,"end_ms":6186},{"char":"く","start_ms":6186,"end_ms":6329},{"char":"と","start_ms":7090,"end_ms":7238},{"char":"大","start_ms":7238,"end_ms":7386},{"char":"吉","start_ms":7386,"end_ms":7533},{"char":"が","start_ms":7533,"end_ms":7681},{"char":"出","start_ms":7681,"end_ms":7829},{"char":"ま","start_ms":7829,"end_ms":7977},{"char":"し","start_ms":7977,"end_ms":8124},{"char":"た","start_ms":8124,"end_ms":8272}]},{"scene_idx":3,"is_quiz":false,"audio_src":"./assets/stories/asakusa-4.mp3","audio_duration_ms":7384,"char_count":35,"char_timings":[{"char":"お","start_ms":25,"end_ms":161},{"char":"寺","start_ms":161,"end_ms":297},{"char":"の","start_ms":297,"end_ms":433},{"char":"前","start_ms":433,"end_ms":569},{"char":"の","start_ms":569,"end_ms":704},{"char":"店","start_ms":704,"end_ms":840},{"char":"で","start_ms":840,"end_ms":976},{"char":"温","start_ms":976,"end_ms":1112},{"char":"か","start_ms":1112,"end_ms":1248},{"char":"い","start_ms":1987,"end_ms":2113},{"char":"せ","start_ms":2113,"end_ms":2238},{"char":"ん","start_ms":2238,"end_ms":2364},{"char":"べ","start_ms":2364,"end_ms":2490},{"char":"い","start_ms":2490,"end_ms":2615},{"char":"を","start_ms":2615,"end_ms":2741},{"char":"買","start_ms":2741,"end_ms":2867},{"char":"い","start_ms":2867,"end_ms":2992},{"char":"ま","start_ms":2992,"end_ms":3118},{"char":"し","start_ms":3118,"end_ms":3244},{"char":"た","start_ms":3244,"end_ms":3369},{"char":"ミ","start_ms":3369,"end_ms":3495},{"char":"カ","start_ms":4270,"end_ms":4399},{"char":"ン","start_ms":4399,"end_ms":4528},{"char":"に","start_ms":4528,"end_ms":4656},{"char":"も","start_ms":4656,"end_ms":4785},{"char":"少","start_ms":5684,"end_ms":5817},{"char":"し","start_ms":5817,"end_ms":5949},{"char":"見","start_ms":5949,"end_ms":6082},{"char":"せ","start_ms":6082,"end_ms":6215},{"char":"て","start_ms":6215,"end_ms":6348},{"char":"あ","start_ms":6348,"end_ms":6480},{"char":"げ","start_ms":6480,"end_ms":6613},{"char":"ま","start_ms":6613,"end_ms":6746},{"char":"し","start_ms":6746,"end_ms":6878},{"char":"た","start_ms":6878,"end_ms":7011}]},{"scene_idx":4,"is_quiz":true,"audio_src":"./assets/stories/asakusa-5.mp3","audio_duration_ms":4876,"char_count":19,"char_timings":[{"char":"お","start_ms":25,"end_ms":215},{"char":"寺","start_ms":215,"end_ms":404},{"char":"の","start_ms":404,"end_ms":594},{"char":"門","start_ms":594,"end_ms":783},{"char":"の","start_ms":1351,"end_ms":1540},{"char":"そ","start_ms":1540,"end_ms":1730},{"char":"ば","start_ms":1730,"end_ms":1919},{"char":"に","start_ms":1919,"end_ms":2109},{"char":"い","start_ms":2109,"end_ms":2298},{"char":"る","start_ms":2298,"end_ms":2488},{"char":"猫","start_ms":2488,"end_ms":2677},{"char":"の","start_ms":2677,"end_ms":2866},{"char":"名","start_ms":2866,"end_ms":3056},{"char":"前","start_ms":3056,"end_ms":3245},{"char":"は","start_ms":3245,"end_ms":3435},{"char":"何","start_ms":3435,"end_ms":3624},{"char":"で","start_ms":3914,"end_ms":4105},{"char":"す","start_ms":4105,"end_ms":4296},{"char":"か","start_ms":4296,"end_ms":4487}]}]},"shinkansen-trip":{"title":"はじめての新幹線","scenes":[{"scene_idx":0,"is_quiz":false,"audio_src":"./assets/stories/shinkansen-1.mp3","audio_duration_ms":9149,"char_count":33,"char_timings":[{"char":"タ","start_ms":25,"end_ms":214},{"char":"ロ","start_ms":214,"end_ms":404},{"char":"ウ","start_ms":404,"end_ms":593},{"char":"は","start_ms":1409,"end_ms":1596},{"char":"朝","start_ms":1596,"end_ms":1782},{"char":"7","start_ms":1782,"end_ms":1969},{"char":"時","start_ms":1969,"end_ms":2155},{"char":"に","start_ms":2155,"end_ms":2342},{"char":"東","start_ms":2889,"end_ms":3056},{"char":"京","start_ms":3056,"end_ms":3223},{"char":"駅","start_ms":3223,"end_ms":3390},{"char":"に","start_ms":3390,"end_ms":3557},{"char":"着","start_ms":3557,"end_ms":3724},{"char":"き","start_ms":3724,"end_ms":3891},{"char":"ま","start_ms":3891,"end_ms":4058},{"char":"し","start_ms":4058,"end_ms":4225},{"char":"た","start_ms":4225,"end_ms":4392},{"char":"ホ","start_ms":5300,"end_ms":5472},{"char":"ー","start_ms":5472,"end_ms":5644},{"char":"ム","start_ms":5644,"end_ms":5815},{"char":"に","start_ms":5815,"end_ms":5987},{"char":"白","start_ms":6867,"end_ms":7033},{"char":"い","start_ms":7033,"end_ms":7199},{"char":"新","start_ms":7199,"end_ms":7365},{"char":"幹","start_ms":7365,"end_ms":7531},{"char":"線","start_ms":7531,"end_ms":7697},{"char":"が","start_ms":7697,"end_ms":7863},{"char":"待","start_ms":7863,"end_ms":8028},{"char":"っ","start_ms":8028,"end_ms":8194},{"char":"て","start_ms":8194,"end_ms":8360},{"char":"い","start_ms":8360,"end_ms":8526},{"char":"ま","start_ms":8526,"end_ms":8692},{"char":"す","start_ms":8692,"end_ms":8858}]},{"scene_idx":1,"is_quiz":false,"audio_src":"./assets/stories/shinkansen-2.mp3","audio_duration_ms":8545,"char_count":38,"char_timings":[{"char":"こ","start_ms":25,"end_ms":181},{"char":"の","start_ms":181,"end_ms":338},{"char":"新","start_ms":338,"end_ms":494},{"char":"幹","start_ms":494,"end_ms":651},{"char":"線","start_ms":651,"end_ms":807},{"char":"は","start_ms":807,"end_ms":963},{"char":"最","start_ms":963,"end_ms":1120},{"char":"新","start_ms":1120,"end_ms":1276},{"char":"の","start_ms":1696,"end_ms":1857},{"char":"自","start_ms":1857,"end_ms":2019},{"char":"動","start_ms":2019,"end_ms":2180},{"char":"運","start_ms":2180,"end_ms":2341},{"char":"転","start_ms":2556,"end_ms":2712},{"char":"シ","start_ms":2712,"end_ms":2867},{"char":"ス","start_ms":2867,"end_ms":3023},{"char":"テ","start_ms":3023,"end_ms":3179},{"char":"ム","start_ms":3179,"end_ms":3334},{"char":"で","start_ms":3334,"end_ms":3490},{"char":"安","start_ms":3490,"end_ms":3646},{"char":"全","start_ms":3646,"end_ms":3801},{"char":"に","start_ms":3801,"end_ms":3957},{"char":"走","start_ms":4477,"end_ms":4642},{"char":"り","start_ms":4642,"end_ms":4806},{"char":"ま","start_ms":4806,"end_ms":4971},{"char":"す","start_ms":4971,"end_ms":5135},{"char":"ご","start_ms":5135,"end_ms":5300},{"char":"ゆ","start_ms":5300,"end_ms":5464},{"char":"っ","start_ms":6431,"end_ms":6586},{"char":"く","start_ms":6586,"end_ms":6742},{"char":"り","start_ms":6742,"end_ms":6897},{"char":"お","start_ms":6897,"end_ms":7052},{"char":"過","start_ms":7279,"end_ms":7404},{"char":"ご","start_ms":7404,"end_ms":7529},{"char":"し","start_ms":7529,"end_ms":7654},{"char":"く","start_ms":7654,"end_ms":7778},{"char":"だ","start_ms":7778,"end_ms":7903},{"char":"さ","start_ms":7903,"end_ms":8028},{"char":"い","start_ms":8028,"end_ms":8153}]},{"scene_idx":2,"is_quiz":false,"audio_src":"./assets/stories/shinkansen-3.mp3","audio_duration_ms":9892,"char_count":39,"char_timings":[{"char":"電","start_ms":25,"end_ms":176},{"char":"車","start_ms":176,"end_ms":327},{"char":"が","start_ms":327,"end_ms":479},{"char":"ス","start_ms":479,"end_ms":630},{"char":"ピ","start_ms":630,"end_ms":781},{"char":"ー","start_ms":781,"end_ms":932},{"char":"ド","start_ms":932,"end_ms":1083},{"char":"を","start_ms":1083,"end_ms":1234},{"char":"上","start_ms":1234,"end_ms":1386},{"char":"げ","start_ms":1386,"end_ms":1537},{"char":"ま","start_ms":1537,"end_ms":1688},{"char":"す","start_ms":3157,"end_ms":3307},{"char":"窓","start_ms":3307,"end_ms":3458},{"char":"の","start_ms":3458,"end_ms":3608},{"char":"外","start_ms":3608,"end_ms":3758},{"char":"を","start_ms":3758,"end_ms":3909},{"char":"見","start_ms":3909,"end_ms":4059},{"char":"る","start_ms":4059,"end_ms":4209},{"char":"と","start_ms":4209,"end_ms":4360},{"char":"青","start_ms":4360,"end_ms":4510},{"char":"い","start_ms":5543,"end_ms":5697},{"char":"空","start_ms":5697,"end_ms":5852},{"char":"の","start_ms":5852,"end_ms":6006},{"char":"下","start_ms":6006,"end_ms":6160},{"char":"に","start_ms":6160,"end_ms":6314},{"char":"富","start_ms":6314,"end_ms":6469},{"char":"士","start_ms":6469,"end_ms":6623},{"char":"山","start_ms":6623,"end_ms":6777},{"char":"が","start_ms":7711,"end_ms":7869},{"char":"は","start_ms":7869,"end_ms":8028},{"char":"っ","start_ms":8028,"end_ms":8186},{"char":"き","start_ms":8186,"end_ms":8344},{"char":"り","start_ms":8344,"end_ms":8503},{"char":"と","start_ms":8503,"end_ms":8661},{"char":"見","start_ms":8661,"end_ms":8820},{"char":"え","start_ms":8820,"end_ms":8978},{"char":"ま","start_ms":8978,"end_ms":9136},{"char":"し","start_ms":9136,"end_ms":9295},{"char":"た","start_ms":9295,"end_ms":9453}]},{"scene_idx":3,"is_quiz":false,"audio_src":"./assets/stories/shinkansen-4.mp3","audio_duration_ms":8731,"char_count":31,"char_timings":[{"char":"た","start_ms":25,"end_ms":204},{"char":"っ","start_ms":204,"end_ms":382},{"char":"た","start_ms":382,"end_ms":561},{"char":"の","start_ms":561,"end_ms":740},{"char":"2","start_ms":740,"end_ms":918},{"char":"時","start_ms":918,"end_ms":1097},{"char":"間","start_ms":1097,"end_ms":1275},{"char":"半","start_ms":1275,"end_ms":1454},{"char":"で","start_ms":2352,"end_ms":2519},{"char":"新","start_ms":2519,"end_ms":2686},{"char":"大","start_ms":2686,"end_ms":2853},{"char":"阪","start_ms":2853,"end_ms":3019},{"char":"駅","start_ms":3019,"end_ms":3186},{"char":"に","start_ms":3186,"end_ms":3353},{"char":"到","start_ms":3353,"end_ms":3520},{"char":"着","start_ms":3520,"end_ms":3687},{"char":"し","start_ms":3687,"end_ms":3854},{"char":"ま","start_ms":3854,"end_ms":4020},{"char":"し","start_ms":4020,"end_ms":4187},{"char":"た","start_ms":4187,"end_ms":4354},{"char":"と","start_ms":5535,"end_ms":5696},{"char":"て","start_ms":5696,"end_ms":5856},{"char":"も","start_ms":5856,"end_ms":6017},{"char":"速","start_ms":6017,"end_ms":6177},{"char":"く","start_ms":6177,"end_ms":6338},{"char":"て","start_ms":6338,"end_ms":6498},{"char":"快","start_ms":7491,"end_ms":7659},{"char":"適","start_ms":7659,"end_ms":7827},{"char":"で","start_ms":7827,"end_ms":7996},{"char":"し","start_ms":7996,"end_ms":8164},{"char":"た","start_ms":8164,"end_ms":8332}]},{"scene_idx":4,"is_quiz":true,"audio_src":"./assets/stories/shinkansen-5.mp3","audio_duration_ms":4830,"char_count":19,"char_timings":[{"char":"タ","start_ms":25,"end_ms":189},{"char":"ロ","start_ms":189,"end_ms":353},{"char":"ウ","start_ms":353,"end_ms":516},{"char":"さ","start_ms":516,"end_ms":680},{"char":"ん","start_ms":1391,"end_ms":1555},{"char":"は","start_ms":1555,"end_ms":1718},{"char":"電","start_ms":1718,"end_ms":1882},{"char":"車","start_ms":1882,"end_ms":2045},{"char":"の","start_ms":2356,"end_ms":2543},{"char":"窓","start_ms":2543,"end_ms":2729},{"char":"か","start_ms":2729,"end_ms":2916},{"char":"ら","start_ms":2916,"end_ms":3103},{"char":"何","start_ms":3103,"end_ms":3290},{"char":"を","start_ms":3290,"end_ms":3476},{"char":"見","start_ms":3476,"end_ms":3663},{"char":"ま","start_ms":3663,"end_ms":3850},{"char":"し","start_ms":3850,"end_ms":4037},{"char":"た","start_ms":4037,"end_ms":4223},{"char":"か","start_ms":4223,"end_ms":4410}]}]}}};
 
   var STORY_COPY_ID = {
     'story.btn_next': 'Lanjut ke Adegan Berikutnya →',
@@ -686,6 +690,170 @@
     });
   }
 
+  var PUNCT_SET = new Set(['。', '、', '！', '？', '「', '」', ' ', '\t', '\n', '・', '—', '〜', '”', '“']);
+
+  function getSceneCharTimings(storyId, sceneIdx) {
+    if (cachedStoryTimings && cachedStoryTimings.stories && cachedStoryTimings.stories[storyId]) {
+      var sc = cachedStoryTimings.stories[storyId].scenes[sceneIdx];
+      return sc ? sc.char_timings : null;
+    }
+    return null;
+  }
+
+  function renderKaraokeSentenceMarkup(rawJpMarkup, exam, storyId, sceneIdx) {
+    var normalizedHtml = normalizeStoryRubyMarkup(rawJpMarkup, exam);
+    var inRt = false;
+    var inTag = false;
+    var charIdx = 0;
+    var output = '';
+
+    for (var i = 0; i < normalizedHtml.length; i++) {
+      if (normalizedHtml.slice(i).startsWith('<rt>') || normalizedHtml.slice(i).startsWith('<rt ')) {
+        inRt = true;
+        output += '<rt';
+        i += 2;
+        continue;
+      }
+      if (normalizedHtml.slice(i).startsWith('</rt>')) {
+        inRt = false;
+        output += '</rt>';
+        i += 4;
+        continue;
+      }
+      if (normalizedHtml[i] === '<') {
+        inTag = true;
+        output += normalizedHtml[i];
+        continue;
+      }
+      if (normalizedHtml[i] === '>') {
+        inTag = false;
+        output += normalizedHtml[i];
+        continue;
+      }
+
+      if (inTag || inRt) {
+        output += normalizedHtml[i];
+      } else {
+        var ch = normalizedHtml[i];
+        if (PUNCT_SET.has(ch)) {
+          output += '<span class="fz-karaoke-punct">' + ch + '</span>';
+        } else {
+          var cidx = charIdx++;
+          output += '<span class="fz-karaoke-char" data-cidx="' + cidx + '" onclick="window.FiezelStoryReader.seekToChar(' + cidx + ', event)" title="Lompat audio ke karakter ini">' + ch + '</span>';
+        }
+      }
+    }
+    return output;
+  }
+
+  function startKaraokeSync(storyId, sceneIdx) {
+    stopKaraokeSync();
+    lastActiveCharIdx = -1;
+    function tick() {
+      if (!currentAudio || currentAudio.paused) {
+        stopKaraokeSync();
+        return;
+      }
+      var curMs = currentAudio.currentTime * 1000;
+      updateKaraokeState(curMs, storyId, sceneIdx);
+      karaokeRafId = requestAnimationFrame(tick);
+    }
+    karaokeRafId = requestAnimationFrame(tick);
+  }
+
+  function stopKaraokeSync() {
+    if (karaokeRafId) {
+      cancelAnimationFrame(karaokeRafId);
+      karaokeRafId = null;
+    }
+  }
+
+  function applyKaraokeHighlight(activeIdx, passedBeforeMs, storyId, sceneIdx) {
+    var timings = getSceneCharTimings(storyId, sceneIdx);
+    if (!timings || timings.length === 0) return;
+
+    lastActiveCharIdx = activeIdx;
+    var charEls = document.querySelectorAll('.fz-sentence-jp .fz-karaoke-char, .fz-quiz-q-jp .fz-karaoke-char');
+    if (!charEls || charEls.length === 0) return;
+
+    for (var c = 0; c < charEls.length; c++) {
+      var el = charEls[c];
+      var cidx = parseInt(el.getAttribute('data-cidx'), 10);
+      if (isNaN(cidx) || !timings[cidx]) continue;
+
+      var t = timings[cidx];
+      if (cidx === activeIdx) {
+        el.classList.add('fz-karaoke-active');
+        el.classList.remove('fz-karaoke-passed', 'fz-karaoke-upcoming');
+      } else if (cidx < activeIdx || (typeof passedBeforeMs === 'number' && t.end_ms <= passedBeforeMs)) {
+        el.classList.add('fz-karaoke-passed');
+        el.classList.remove('fz-karaoke-active', 'fz-karaoke-upcoming');
+      } else {
+        el.classList.add('fz-karaoke-upcoming');
+        el.classList.remove('fz-karaoke-active', 'fz-karaoke-passed');
+      }
+    }
+  }
+
+  function updateKaraokeState(curMs, storyId, sceneIdx) {
+    if (pendingSeekMs !== null) {
+      if (curMs < pendingSeekMs - 250) {
+        return;
+      }
+      pendingSeekMs = null;
+    }
+
+    var timings = getSceneCharTimings(storyId, sceneIdx);
+    if (!timings || timings.length === 0) return;
+
+    var activeIdx = -1;
+    for (var i = 0; i < timings.length; i++) {
+      if (curMs >= timings[i].start_ms && curMs < timings[i].end_ms) {
+        activeIdx = i;
+        break;
+      }
+    }
+
+    if (activeIdx === lastActiveCharIdx && activeIdx !== -1) {
+      return;
+    }
+
+    applyKaraokeHighlight(activeIdx, curMs, storyId, sceneIdx);
+  }
+
+  function seekToChar(charIdx, event) {
+    if (event && typeof event.stopPropagation === 'function') {
+      event.stopPropagation();
+    }
+    var timings = getSceneCharTimings(activeStoryId, activeSceneIndex);
+    if (!timings || !timings[charIdx]) return;
+    var targetMs = timings[charIdx].start_ms;
+    var targetSec = targetMs / 1000;
+    pendingSeekMs = targetMs;
+
+    applyKaraokeHighlight(charIdx, targetMs, activeStoryId, activeSceneIndex);
+
+    var applySeekToAudio = function (audio) {
+      if (!audio) return;
+      try {
+        audio.currentTime = targetSec;
+      } catch (_) {}
+      if (audio.paused) {
+        var p = audio.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      }
+      isPlaying = true;
+      updatePlayUi(true, (targetSec / (audio.duration || targetSec || 1)) * 100);
+      startKaraokeSync(activeStoryId, activeSceneIndex);
+    };
+
+    if (!currentAudio) {
+      playSceneAudio(activeSceneIndex, targetSec);
+    } else {
+      applySeekToAudio(currentAudio);
+    }
+  }
+
   function getStoryById(id) {
     for (var i = 0; i < STORIES.length; i++) {
       if (STORIES[i].id === id) return STORIES[i];
@@ -800,7 +968,7 @@
             '</div>' +
             '<div class="fz-script-flow">' +
               '<div class="fz-sentence-block active">' +
-                '<div class="fz-sentence-jp">' + normalizeStoryRubyMarkup(scene.jp, exam) + '</div>' +
+                '<div class="fz-sentence-jp">' + renderKaraokeSentenceMarkup(scene.jp, exam, activeStoryId, activeSceneIndex) + '</div>' +
                 '<div class="fz-sentence-id">' + scene.id + '</div>' +
               '</div>' +
             '</div>' +
@@ -854,7 +1022,7 @@
               '<div class="fz-quiz-badge-row">' +
                 '<span class="fz-quiz-badge">Kuis Pemahaman Akhir</span>' +
               '</div>' +
-              '<div class="fz-quiz-q-jp">' + normalizeStoryRubyMarkup(q.questionJapanese, exam) + '</div>' +
+              '<div class="fz-quiz-q-jp">' + renderKaraokeSentenceMarkup(q.questionJapanese, exam, activeStoryId, 4) + '</div>' +
               '<div class="fz-quiz-q-id">' + q.stem + '</div>' +
               '<div class="fz-quiz-options-grid">' +
                 optionsHtml +
@@ -1115,7 +1283,7 @@
     }
   }
 
-  function playSceneAudio(sceneIdx) {
+  function playSceneAudio(sceneIdx, initialTimeSec) {
     var story = getStoryById(activeStoryId);
     if (!story || !story.scenes || sceneIdx < 0 || sceneIdx >= story.scenes.length) {
       stopAudio();
@@ -1145,6 +1313,19 @@
       }
       currentAudio = new Audio(scene.audioSrc);
       isPlaying = true;
+      var initSec = (typeof initialTimeSec === 'number' && initialTimeSec > 0) ? initialTimeSec : 0;
+      if (initSec > 0) {
+        pendingSeekMs = Math.round(initSec * 1000);
+        var applyInitialSeek = function () {
+          if (!currentAudio) return;
+          try {
+            currentAudio.currentTime = Math.min(initSec, (currentAudio.duration || initSec));
+          } catch (_) {}
+        };
+        currentAudio.addEventListener('loadedmetadata', applyInitialSeek, { once: true });
+        currentAudio.addEventListener('canplay', applyInitialSeek, { once: true });
+      }
+
       updatePlayUi(true, 0);
 
       currentAudio.ontimeupdate = function () {
@@ -1158,6 +1339,14 @@
       };
 
       currentAudio.onended = function () {
+        stopKaraokeSync();
+        var charEls = document.querySelectorAll('.fz-sentence-jp .fz-karaoke-char, .fz-quiz-q-jp .fz-karaoke-char');
+        if (charEls && charEls.length) {
+          charEls.forEach(function (el) {
+            el.classList.remove('fz-karaoke-active');
+            el.classList.add('fz-karaoke-passed');
+          });
+        }
         updatePlayUi(false, 100);
         handleSceneAudioEnded(sceneIdx);
       };
@@ -1169,11 +1358,23 @@
 
       var p = currentAudio.play();
       if (p !== undefined) {
-        p.catch(function (err) {
+        p.then(function () {
+          isPlaying = true;
+          if (initSec > 0) {
+            try { currentAudio.currentTime = initSec; } catch (_) {}
+          }
+          startKaraokeSync(activeStoryId, sceneIdx);
+          if (initSec > 0) {
+            updateKaraokeState(Math.round(initSec * 1000), activeStoryId, sceneIdx);
+          }
+        }).catch(function (err) {
           console.warn('[FiezelStoryReader] Autoplay ditolak/tertahan:', err);
           isPlaying = false;
           updatePlayUi(false, 0);
+          stopKaraokeSync();
         });
+      } else {
+        startKaraokeSync(activeStoryId, sceneIdx);
       }
     } catch (e) {
       console.warn('[FiezelStoryReader] Audio init error:', e);
@@ -1248,6 +1449,7 @@
     try {
       currentAudio.currentTime = ratio * currentAudio.duration;
       updatePlayUi(isPlaying, ratio * 100);
+      updateKaraokeState(currentAudio.currentTime * 1000, activeStoryId, activeSceneIndex);
     } catch (_) {}
   }
 
@@ -1267,6 +1469,12 @@
     stopAudio: stopAudio,
     playSceneAudio: playSceneAudio,
     handleSceneAudioEnded: handleSceneAudioEnded,
+    seekToChar: seekToChar,
+    getSceneCharTimings: getSceneCharTimings,
+    renderKaraokeSentenceMarkup: renderKaraokeSentenceMarkup,
+    startKaraokeSync: startKaraokeSync,
+    stopKaraokeSync: stopKaraokeSync,
+    updateKaraokeState: updateKaraokeState,
     getCurrentAudio: function () { return currentAudio; },
     getIsPlaying: function () { return isPlaying; },
     getActiveSceneIndex: function () { return activeSceneIndex; },

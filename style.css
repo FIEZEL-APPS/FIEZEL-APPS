@@ -11677,6 +11677,34 @@ html body #app .result-alasan li{color:#4B5563 !important}
   background: rgba(2, 132, 199, 0.12);
   color: #0284C7;
 }
+
+/* 60 FPS Character-Level Forced-Alignment Karaoke Highlighting */
+.fz-karaoke-char {
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: color 0.12s ease, text-shadow 0.12s ease, transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, color;
+}
+.fz-karaoke-char.fz-karaoke-active {
+  color: #D97706 !important; /* Luminous Golden Amber / Emerald */
+  text-shadow: 0 0 10px rgba(217, 119, 6, 0.5), 0 0 2px #B45309;
+  transform: scale(1.15) translateY(-1px);
+  font-weight: 800 !important;
+  position: relative;
+  z-index: 2;
+}
+.fz-karaoke-char.fz-karaoke-passed {
+  color: #0F172A;
+  opacity: 0.96;
+}
+.fz-karaoke-char.fz-karaoke-upcoming {
+  color: #475569;
+  opacity: 0.88;
+}
+.fz-karaoke-punct {
+  display: inline-block;
+}
 .fz-story-reader-wrap rt,
 .fz-sentence-jp rt,
 .fz-quiz-q-jp rt,
