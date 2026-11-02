@@ -294,6 +294,7 @@ html.fz-booting body:not(.fz-app-open) .bottomnav {
   <link rel="stylesheet" href="./features/speaking-listening/panggung-suara.css">
   <link rel="stylesheet" href="./features/interactive-chat/interactive-chat.css">
   <link rel="stylesheet" href="./features/japanese/fiezel-kakijun-studio.css">
+  <link rel="stylesheet" href="./features/phase2/phase2-style.css">
   <style id="fz-contrast-guard">
     /* High contrast guard: prevent yellow-on-yellow or white-on-yellow illegible text */
     .fz2-lvls span.is-now,
@@ -1652,6 +1653,10 @@ html.fz-booting body:not(.fz-app-open) .bottomnav {
   <!-- Japanese Graded Stories & Braincore Bridge -->
   <script defer src="./features/japanese/fiezel-story-brain-bridge.js"></script>
   <script defer src="./features/japanese/fiezel-story-reader.js"></script>
+  <!-- FIEZEL Computerized Adaptive Placement (CAT) Engine & Question Banks -->
+  <script defer src="./features/placement/fiezel-placement-bank-ja.js"></script>
+  <script defer src="./features/placement/fiezel-placement-bank-en.js"></script>
+  <script defer src="./features/placement/fiezel-adaptive-cat-engine.js"></script>
   <script defer src="./features/brain/fiezel-question-allocator.js"></script>
   <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
        Urutan penting: transport membaca queue, queue membaca events, semuanya membaca

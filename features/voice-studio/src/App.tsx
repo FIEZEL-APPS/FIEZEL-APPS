@@ -45,6 +45,7 @@ import { playFiezelSfx } from './lib/sfx';
 import { BraincoreTrendChart } from './components/BraincoreTrendChart';
 import { HomeRedesignView } from './components/HomeRedesignView';
 import { BeginnerAnswerAssistant } from './components/BeginnerAnswerAssistant';
+import { FiezelInCallVocabCapture } from './components/FiezelInCallVocabCapture';
 import {
   FiezelBrandCrest,
   FiezelCornerOrnament,
@@ -4354,6 +4355,20 @@ export default function App() {
                     )}
                   </div>
                 </section>
+
+                {/* 1.4 IN-CALL REAL-TIME VOCABULARY CAPTURE (Float HUD Toast) */}
+                <FiezelInCallVocabCapture
+                  activeAiText={activeAiLiveText}
+                  activeAiTranslation={
+                    locale === 'th'
+                      ? activeAiSubtitle.translationTh
+                      : activeAiSubtitle.translationId
+                  }
+                  userText={activeUserSubtitle?.text || ''}
+                  targetLang={activeScenario.targetLang}
+                  locale={locale}
+                  isCallActive={isLiveConnected || callStateKey !== 'ready' || turns.length > 0}
+                />
 
                 {/* 1.5 ZONA COPILOT JAWABAN AI REALTIME (Muncul Otomatis Saat Partner Bicara, Tersembunyi di Mode Ujian) */}
                 {!isMeasureMode && (
