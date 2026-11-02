@@ -1,10 +1,10 @@
-import type { CallScenario, LearnerLocale, TargetLang, VoicePersona } from '../types/voiceCall';
+import type { CallScenario, LearnerLocale, TargetLang, VoicePersona } from '../types/voiceCall.ts';
 import {
   type BeginnerReplyCard,
   generateDynamicContextualAiReply,
   translateAndPhoneticizeLiveText,
-} from './liveCallHelper';
-import { stripEmojisAndEmotWords, toPhoneticRomaji } from './japanesePhonetics';
+} from './liveCallHelper.ts';
+import { stripEmojisAndEmotWords, toPhoneticRomaji } from './japanesePhonetics.js';
 
 export type LiveTransportMode = 'ws-duplex' | 'turn-by-turn-fallback';
 
@@ -377,48 +377,350 @@ function copilotCacheSet(key: string, value: RealtimeCopilotAssistResult): void 
 
 let _copilotServerCooldownUntil = 0;
 
-type CopilotIntent = 'yesno' | 'choice' | 'wh_where' | 'wh_what' | 'wh_why' | 'wh_how' | 'wh_when' | 'wh_who' | 'greeting' | 'statement';
+export type CopilotSpeechAct =
+  | 'echo_redemption'
+  | 'invitation'
+  | 'choice'
+  | 'wh_how_long'
+  | 'wh_how_often'
+  | 'wh_how_many'
+  | 'wh_how_feel_day'
+  | 'wh_how_method'
+  | 'wh_where_origin'
+  | 'wh_where_action'
+  | 'wh_what_food'
+  | 'wh_what_general'
+  | 'wh_why'
+  | 'wh_when'
+  | 'wh_who'
+  | 'yesno_are'
+  | 'yesno_can'
+  | 'yesno_have'
+  | 'yesno_did'
+  | 'yesno_would'
+  | 'yesno_do'
+  | 'greeting'
+  | 'statement';
 
-function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotIntent {
-  const s = aiText.toLowerCase();
-  if (targetLang === 'ja') {
-    if (/(こんにちは|おはよう|こんばんは|はじめまして|元気)/.test(s)) return 'greeting';
-    if (/どこ/.test(s)) return 'wh_where';
-    if (/(なに|何)/.test(s)) return 'wh_what';
-    if (/(なぜ|どうして)/.test(s)) return 'wh_why';
-    if (/(どう|どんな|どのように)/.test(s)) return 'wh_how';
-    if (/(いつ|何時)/.test(s)) return 'wh_when';
-    if (/(だれ|誰)/.test(s)) return 'wh_who';
-    if (/(それとも|どっち|どちら)/.test(s)) return 'choice';
-    if (/(か[？?]|ますか|ですか)/.test(s)) return 'yesno';
-    return 'statement';
+export interface FocalClauseResult {
+  fullText: string;
+  focalText: string;
+  isEchoRedemption: boolean;
+  echoCorrectionTarget?: string;
+  choiceOptionA?: string;
+  choiceOptionB?: string;
+  extractedTopic?: string;
+}
+
+export function extractFocalClause(aiText: string, targetLang: TargetLang): FocalClauseResult {
+  const clean = stripEmojisAndEmotWords(aiText || '').trim();
+  if (!clean) {
+    return { fullText: '', focalText: '', isEchoRedemption: false };
   }
-  if (/^(hi|hello|hey|good (morning|afternoon|evening)|nice to meet)/.test(s)) return 'greeting';
-  if (/\bor\b.*\?/.test(s)) return 'choice';
-  if (/\bwhere\b/.test(s)) return 'wh_where';
-  if (/\bwhy\b/.test(s)) return 'wh_why';
-  if (/\bhow\b/.test(s)) return 'wh_how';
-  if (/\bwhen\b/.test(s)) return 'wh_when';
-  if (/\bwho\b/.test(s)) return 'wh_who';
-  if (/\bwhat\b/.test(s)) return 'wh_what';
-  if (/^(do|does|did|are|is|was|were|can|could|would|will|have|has|should)\b.*\?/.test(s)) return 'yesno';
+
+  // 1. Check for Echo Redemption correction request
+  const echoMatchEn = clean.match(
+    /(?:repeat|say (?:it|this)?(?:\s+back)?(?:\s+to me)?(?:\s+cleanly|\s+out loud)?|say after me|repeat after me)[:\s]+["'“‘『「]([^"'”’』」]+)["'”’』」]/i
+  );
+  const echoMatchJa =
+    clean.match(/(?:[「『"“])([^」』"”]+)[」』"”](?:と(?:言って(?:みて|ごらん)?|リピートして|読ん(?:でみて)?))/u) ||
+    clean.match(/(?:(?:もう一度|もう一回|リピートして|言ってみて|言ってごらん)[:：\s]*(?:[「『"“])([^」』"”]+)[」』"”])/u);
+  const echoMatchZh =
+    clean.match(/(?:[“"「『])([^”"」』]+)[”"」』](?:跟我读|重复一遍|读一遍)/u) ||
+    clean.match(/(?:(?:跟我读|再说一遍|重复一遍|读一遍)[:：\s]*(?:[“"「『])([^”"」』]+)[”"」』])/u);
+  const echoTarget = (echoMatchEn?.[1] || echoMatchJa?.[1] || echoMatchZh?.[1])?.trim();
+  if (echoTarget) {
+    return {
+      fullText: clean,
+      focalText: echoTarget,
+      isEchoRedemption: true,
+      echoCorrectionTarget: echoTarget,
+    };
+  }
+
+  // 2. Split into sentences to isolate terminal speech act
+  const isCjk = targetLang === 'ja' || targetLang === 'zh';
+  const splitRe = isCjk ? /([。！？!?\n]+)/ : /([.?!;\n]+)/;
+  const rawParts = clean.split(splitRe).map((p) => p.trim()).filter(Boolean);
+  const sentences: string[] = [];
+  for (let i = 0; i < rawParts.length; i += 2) {
+    const s = rawParts[i] + (rawParts[i + 1] || '');
+    if (s.trim()) sentences.push(s.trim());
+  }
+
+  const parseDetails = (focalText: string): FocalClauseResult => {
+    let choiceOptionA: string | undefined;
+    let choiceOptionB: string | undefined;
+
+    if (targetLang === 'ja') {
+      const mChoice = focalText.match(
+        /([^、。？！?]+?)(?:、?\s*それとも|\s*か、?\s*)([^、。？！?]+?)(?:のどちら|のどっち|ですか|がいい|[？?])/u
+      );
+      if (mChoice) {
+        choiceOptionA = mChoice[1].replace(/^(?:店内|お持ち帰り|アイス|ホット)/, (m) => m).trim();
+        choiceOptionB = mChoice[2].trim();
+      }
+    } else if (targetLang === 'zh') {
+      const mChoice = focalText.match(/([^，。？！?]+?)\s*还是\s*([^，。？！?]+?)(?:[？?]?)$/u);
+      if (mChoice) {
+        choiceOptionA = mChoice[1].replace(/^(?:你想(?:喝|吃|要)?|你(?:要|喜欢)?|想(?:喝|吃)?|喜欢)\s*/u, '').trim();
+        choiceOptionB = mChoice[2].replace(/[？?]$/u, '').trim();
+      }
+    } else {
+      const mChoice =
+        focalText.match(
+          /(?:(?:do you|would you)?\s*(?:prefer|rather|choose between|like|have|want))\s+([a-zA-Z\s]{2,20}?)\s+or\s+([a-zA-Z\s]{2,20}?)(?:[?.!]|$)/i
+        ) || focalText.match(/([a-zA-Z\s]{2,20}?)\s+or\s+([a-zA-Z\s]{2,20}?)(?:[?.!]|$)/i);
+      if (mChoice) {
+        choiceOptionA = mChoice[1].replace(/^(?:do you|would you|prefer|like|have|want|a|an|the)\s+/i, '').trim();
+        choiceOptionB = mChoice[2].replace(/^(?:a|an|the)\s+/i, '').trim();
+      }
+    }
+
+    let extractedTopic: string | undefined;
+    if (targetLang === 'ja') {
+      extractedTopic = focalText.match(/([一-龯ぁ-んァ-ン]{2,6})(?:は|が|を|に|について|のこと)/)?.[1];
+    } else if (targetLang === 'zh') {
+      extractedTopic = focalText.match(/([\u4e00-\u9fff]{2,4})(?:方面|的话|呢|吧)?/)?.[1];
+    } else {
+      const stop = new Set([
+        'the', 'a', 'an', 'your', 'you', 'do', 'does', 'did', 'what', 'where', 'how', 'why', 'when',
+        'who', 'is', 'are', 'about', 'like', 'this', 'that', 'there', 'here', 'today', 'and', 'or',
+        'to', 'of', 'in', 'on', 'for', 'with', 'it', 'me', 'my', 'we', 'so', 'any', 'some', 'usually', 'would',
+      ]);
+      const words = focalText
+        .toLowerCase()
+        .replace(/[^a-z\s']/g, ' ')
+        .split(/\s+/)
+        .filter((w) => w.length > 3 && !stop.has(w));
+      extractedTopic = words.length ? words[words.length - 1] : undefined;
+    }
+
+    return {
+      fullText: clean,
+      focalText,
+      isEchoRedemption: false,
+      choiceOptionA,
+      choiceOptionB,
+      extractedTopic,
+    };
+  };
+
+  if (sentences.length <= 1) {
+    return parseDetails(clean);
+  }
+
+  // Look backwards for the last sentence containing a question or proposal/invitation
+  for (let i = sentences.length - 1; i >= 0; i--) {
+    const s = sentences[i];
+    if (
+      /[?？]/.test(s) ||
+      /\b(why don't|shall we|let's|what about|how about|would you like|do you want|can we)\b/i.test(s) ||
+      /(?:ませんか|ない[？?]|ましょう|どうですか|いかがですか)/u.test(s) ||
+      /(?:要不要|好吗|怎么样|吧[？?]?)/u.test(s)
+    ) {
+      return parseDetails(s);
+    }
+  }
+
+  return parseDetails(sentences[sentences.length - 1]);
+}
+
+export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotSpeechAct {
+  const focal = extractFocalClause(aiText, targetLang);
+  if (focal.isEchoRedemption) return 'echo_redemption';
+
+  const s = focal.focalText.toLowerCase();
+
+  // 1. Invitations & Proposals
+  if (targetLang === 'ja') {
+    if (/(?:ませんか|ない[？?]|ましょう(?:か)?|どうですか|いかがですか)/u.test(focal.focalText)) {
+      return 'invitation';
+    }
+  } else if (targetLang === 'zh') {
+    if (/(?:要不要|我们一起|好吗|怎么样|吧[？?]?)/u.test(focal.focalText)) {
+      return 'invitation';
+    }
+  } else {
+    if (
+      /\b(why don't (?:we|you)|shall we|let's|how about|what about|care to join)\b/i.test(s) ||
+      (!/\b(what|where|when|why|how)\b/i.test(s) && /\b(would you like to|do you want to)\b/i.test(s))
+    ) {
+      return 'invitation';
+    }
+  }
+
+  // 2. Choice Questions (A or B)
+  if (targetLang === 'ja') {
+    if (/(?:それとも|どっち|どちら)/u.test(focal.focalText) || /か、?[^？?]*か[？?]/u.test(focal.focalText)) {
+      return 'choice';
+    }
+  } else if (targetLang === 'zh') {
+    if (/(?:还是|哪个|哪一个)/u.test(focal.focalText)) {
+      return 'choice';
+    }
+  } else {
+    if (/\bor\b.*\?/i.test(s) || /\b(which one|prefer|rather)\b.*\?/i.test(s)) {
+      return 'choice';
+    }
+  }
+
+  // 3. WH-Questions
+  // How long (Duration)
+  if (targetLang === 'ja') {
+    if (/(?:どのくらい|どれくらい|何年間|何ヶ月|何時間)/u.test(focal.focalText)) return 'wh_how_long';
+  } else if (targetLang === 'zh') {
+    if (/(?:多久|多长时间|多长)/u.test(focal.focalText)) return 'wh_how_long';
+  } else {
+    if (/\bhow long\b/i.test(s)) return 'wh_how_long';
+  }
+
+  // How often (Frequency)
+  if (targetLang === 'ja') {
+    if (/(?:頻度|何回|週に|月に)/u.test(focal.focalText)) return 'wh_how_often';
+  } else if (targetLang === 'zh') {
+    if (/(?:多久一次|经常|常常|几次)/u.test(focal.focalText)) return 'wh_how_often';
+  } else {
+    if (/\bhow often\b/i.test(s) || /\bhow many times\b/i.test(s)) return 'wh_how_often';
+  }
+
+  // How many / How much (Quantity)
+  if (targetLang === 'ja') {
+    if (/(?:いくつ|何人|いくら|何個|何枚|何本)/u.test(focal.focalText)) return 'wh_how_many';
+  } else if (targetLang === 'zh') {
+    if (/(?:多少|几个|几位|多少钱)/u.test(focal.focalText)) return 'wh_how_many';
+  } else {
+    if (/\bhow (many|much)\b/i.test(s)) return 'wh_how_many';
+  }
+
+  // How feel / day / state
+  if (targetLang === 'ja') {
+    if (/(?:どんな一日|調子はどう|元気(?:ですか)?|いかがお過ごし)/u.test(focal.focalText))
+      return 'wh_how_feel_day';
+  } else if (targetLang === 'zh') {
+    if (/(?:今天怎么样|过得怎么样|最近好吗|心情怎么样)/u.test(focal.focalText)) return 'wh_how_feel_day';
+  } else {
+    if (
+      /\bhow (was|is|has been) your (day|weekend|trip|morning|evening)\b/i.test(s) ||
+      /\bhow are you\b/i.test(s) ||
+      /\bhow('s| is) it going\b/i.test(s)
+    )
+      return 'wh_how_feel_day';
+  }
+
+  // How method
+  if (targetLang === 'ja') {
+    if (/(?:どうやって|どのように|どうすれば)/u.test(focal.focalText)) return 'wh_how_method';
+  } else if (targetLang === 'zh') {
+    if (/(?:怎么|如何|怎样)/u.test(focal.focalText)) return 'wh_how_method';
+  } else {
+    if (/\bhow (do|can|could|did|would) you\b/i.test(s) || /\bhow to\b/i.test(s)) return 'wh_how_method';
+  }
+
+  // Where (Origin vs Action)
+  if (targetLang === 'ja') {
+    if (/(?:出身はどこ|どこから来ました|どこ出身)/u.test(focal.focalText)) return 'wh_where_origin';
+    if (/どこ/.test(focal.focalText)) return 'wh_where_action';
+  } else if (targetLang === 'zh') {
+    if (/(?:哪里人|从哪里来|家乡在哪里)/u.test(focal.focalText)) return 'wh_where_origin';
+    if (/(?:哪里|哪儿|什么地方)/u.test(focal.focalText)) return 'wh_where_action';
+  } else {
+    if (/\bwhere (are you|do you come) from\b/i.test(s) || /\bwhere were you born\b/i.test(s))
+      return 'wh_where_origin';
+    if (/\bwhere\b/i.test(s)) return 'wh_where_action';
+  }
+
+  // What (Food vs General)
+  if (targetLang === 'ja') {
+    if (/(?:何にしますか|何を食べ|何を飲み|ご注文|おすすめ)/u.test(focal.focalText)) return 'wh_what_food';
+    if (/(?:なに|何)/u.test(focal.focalText)) return 'wh_what_general';
+  } else if (targetLang === 'zh') {
+    if (/(?:想喝什么|吃什么|点什么|要点什么)/u.test(focal.focalText)) return 'wh_what_food';
+    if (/什么/.test(focal.focalText)) return 'wh_what_general';
+  } else {
+    if (
+      /\bwhat\s+(?:can i|shall i|would you|do you)?\s*(?:get|get started|like|order|have)\b/i.test(s) ||
+      /\bwhat\s+(?:to drink|to eat|kind of (?:coffee|tea|food|drink))\b/i.test(s) ||
+      /\b(coffee|tea|order|drink|food|lunch|dinner|latte)\b.*\?/i.test(s)
+    )
+      return 'wh_what_food';
+    if (/\bwhat\b/i.test(s)) return 'wh_what_general';
+  }
+
+  // Why
+  if (targetLang === 'ja') {
+    if (/(?:なぜ|どうして|なんで)/u.test(focal.focalText)) return 'wh_why';
+  } else if (targetLang === 'zh') {
+    if (/(?:为什么|为何|怎么会)/u.test(focal.focalText)) return 'wh_why';
+  } else {
+    if (/\bwhy\b/i.test(s)) return 'wh_why';
+  }
+
+  // When
+  if (targetLang === 'ja') {
+    if (/(?:いつ|何時)/u.test(focal.focalText)) return 'wh_when';
+  } else if (targetLang === 'zh') {
+    if (/(?:什么时候|几点)/u.test(focal.focalText)) return 'wh_when';
+  } else {
+    if (/\bwhen\b/i.test(s) || /\bwhat time\b/i.test(s)) return 'wh_when';
+  }
+
+  // Who
+  if (targetLang === 'ja') {
+    if (/(?:だれ|誰)/u.test(focal.focalText)) return 'wh_who';
+  } else if (targetLang === 'zh') {
+    if (/(?:谁|跟谁)/u.test(focal.focalText)) return 'wh_who';
+  } else {
+    if (/\bwho\b/i.test(s) || /\bwith whom\b/i.test(s)) return 'wh_who';
+  }
+
+  // 4. Yes/No Questions with Auxiliary Matching
+  if (targetLang === 'ja') {
+    if (/(?:ましたか|でしたか)/u.test(focal.focalText)) return 'yesno_did';
+    if (/(?:ありますか|いますか)/u.test(focal.focalText)) return 'yesno_are';
+    if (/(?:ですか|でしょうか)/u.test(focal.focalText)) return 'yesno_are';
+    if (/(?:ますか)/u.test(focal.focalText)) return 'yesno_do';
+    if (/か[？?]|の[？?]/.test(focal.focalText)) return 'yesno_do';
+  } else if (targetLang === 'zh') {
+    if (/(?:有没有|有.*吗)/u.test(focal.focalText)) return 'yesno_have';
+    if (/(?:会不会|能.*吗|可以.*吗)/u.test(focal.focalText)) return 'yesno_can';
+    if (/(?:是不是|是.*吗)/u.test(focal.focalText)) return 'yesno_are';
+    if (/(?:去了吗|做了吗|过.*吗)/u.test(focal.focalText)) return 'yesno_did';
+    if (/(?:想不想|愿意.*吗)/u.test(focal.focalText)) return 'yesno_would';
+    if (/[吗不]/.test(focal.focalText)) return 'yesno_do';
+  } else {
+    if (/\b(are you|is it|is that|are they|aren't you|isn't it)\b/i.test(s)) return 'yesno_are';
+    if (/\b(can you|could you|can we|could we)\b/i.test(s)) return 'yesno_can';
+    if (/\b(have you|has it|haven't you)\b/i.test(s)) return 'yesno_have';
+    if (/\b(did you|were you|was it|didn't you)\b/i.test(s)) return 'yesno_did';
+    if (/\b(would you|will you|would it|won't you)\b/i.test(s)) return 'yesno_would';
+    if (/\b(do you|does it|don't you|doesn't it)\b/i.test(s)) return 'yesno_do';
+    if (/\?/.test(s)) return 'yesno_do';
+  }
+
+  // 5. Greeting (only if focal sentence itself is a greeting)
+  if (targetLang === 'ja') {
+    if (/^(?:こんにちは|おはよう(?:ございます)?|こんばんは|はじめまして)\b/u.test(focal.focalText))
+      return 'greeting';
+  } else if (targetLang === 'zh') {
+    if (/^(?:你好|早上好|下午好|晚上好|很高兴认识你)\b/u.test(focal.focalText)) return 'greeting';
+  } else {
+    if (/^(?:hi|hello|hey|good (?:morning|afternoon|evening)|nice to meet you)\b/i.test(s))
+      return 'greeting';
+  }
+
   return 'statement';
 }
 
-function extractTopicWord(aiText: string, targetLang: TargetLang): string {
-  if (targetLang === 'ja') {
-    const m = aiText.match(/([一-龯ぁ-んァ-ン]{2,6})(?:は|が|を|に|について)/);
-    return m ? m[1] : '';
-  }
-  const stop = new Set(['the', 'a', 'an', 'your', 'you', 'do', 'does', 'did', 'what', 'where', 'how', 'why', 'when', 'who', 'is', 'are', 'about', 'like', 'this', 'that', 'there', 'here', 'today', 'and', 'or', 'to', 'of', 'in', 'on', 'for', 'with', 'it', 'me', 'my', 'we', 'so', 'any', 'some']);
-  const words = aiText.toLowerCase().replace(/[^a-z\s']/g, ' ').split(/\s+/).filter((w) => w.length > 3 && !stop.has(w));
-  return words.length ? words[words.length - 1] : '';
+function capitalizeWord(w: string): string {
+  if (!w) return '';
+  return w.charAt(0).toUpperCase() + w.slice(1);
 }
 
 /**
- * Fallback kontekstual lokal: dipakai HANYA bila jalur AI realtime gagal/timeout.
- * Bukan template statis buta — bentuknya dipilih dari intent kalimat AI + topik yang terdeteksi,
- * sehingga kartu tidak pernah kosong berapa pun jumlah giliran.
+ * Fallback kontekstual lokal presisi: dipilih dari speech act kalimat AI penutup
+ * + topik/pilihan yang diekstrak secara spesifik.
+ * Menjamin kartu 1 · Singkat selalu menjawab pertanyaan/ajakan secara 100% nyambung.
  */
 export function buildContextualFallbackCards(params: {
   aiText: string;
@@ -426,41 +728,384 @@ export function buildContextualFallbackCards(params: {
   locale: LearnerLocale;
   lastUserText?: string;
 }): BeginnerReplyCard[] {
-  const ai = stripEmojisAndEmotWords(params.aiText || '').trim();
-  const intent = detectAiIntent(ai, params.targetLang);
-  const topic = extractTopicWord(ai, params.targetLang);
+  const focal = extractFocalClause(params.aiText || '', params.targetLang);
+  const act = detectAiIntent(params.aiText || '', params.targetLang);
   const th = params.locale === 'th';
-  type Tpl = { easy: [string, string, string]; mission: [string, string, string]; rescue: [string, string, string] };
-  const EN: Record<CopilotIntent, Tpl> = {
-    greeting: { easy: ["Hi! I'm good, thanks.", 'hai, aim gud, teng-ks', 'Hai! Aku baik, terima kasih.'], mission: ["Hello! I'm doing great today. How about you?", 'helo, aim duing greit tudei. hau abaut yu?', 'Halo! Hari ini aku baik banget. Kamu gimana?'], rescue: ["I'm okay. And you, how's your day?", 'aim okei. end yu, haus yor dei?', 'Aku oke. Kamu sendiri, harimu gimana?'] },
-    yesno: { easy: ['Yes, I do.', 'yes, ai du', 'Ya, iya.'], mission: [`Yes, I really like ${topic || 'it'}.`, `yes, ai rili laik ${topic || 'it'}`, `Ya, aku suka banget ${topic || 'itu'}.`], rescue: ['Not really. Do you?', 'not rili. du yu?', 'Nggak terlalu. Kalau kamu?'] },
-    choice: { easy: ['The first one, please.', 'de ferst wan, pliz', 'Yang pertama saja.'], mission: ["I'd prefer the second one, actually.", 'aid prifer de sekend wan, ekcuali', 'Aku lebih pilih yang kedua sih.'], rescue: ["Hmm, I'm not sure. Which one do you like?", 'hm, aim not syur. wich wan du yu laik?', 'Hmm, aku belum yakin. Kamu suka yang mana?'] },
-    wh_where: { easy: ["I'm from Indonesia.", 'aim from indonisia', 'Aku dari Indonesia.'], mission: [`It's near my house, in the city center.`, 'its nir mai haus, in de siti senter', 'Dekat rumahku, di pusat kota.'], rescue: ['Near here. Where do you usually go?', 'nir hir. wer du yu yuzuali gou?', 'Dekat sini. Kamu biasanya ke mana?'] },
-    wh_what: { easy: [`I like ${topic || 'music'}.`, `ai laik ${topic || 'myuzik'}`, `Aku suka ${topic || 'musik'}.`], mission: [`My favorite is ${topic || 'coffee'}, because it makes me relax.`, `mai feivrit iz ${topic || 'kofi'}, bikoz it meiks mi rileks`, `Favoritku ${topic || 'kopi'}, karena bikin aku santai.`], rescue: ["That's a good question. What about you?", 'dets e gud kwesten. wat abaut yu?', 'Pertanyaan bagus. Kalau kamu?'] },
-    wh_why: { easy: ["Because it's fun.", 'bikoz its fan', 'Karena seru.'], mission: ['Because I want to talk with people from other countries.', 'bikoz ai wont tu tok wid pipel from ader kantris', 'Karena aku ingin ngobrol dengan orang dari negara lain.'], rescue: ["Honestly, I'm not sure yet. Why do you ask?", 'onestli, aim not syur yet. wai du yu ask?', 'Jujur aku belum yakin. Kenapa kamu tanya?'] },
-    wh_how: { easy: ['Pretty good.', 'priti gud', 'Lumayan baik.'], mission: ['I usually go by motorbike, it takes about twenty minutes.', 'ai yuzuali gou bai motorbaik, it teiks abaut twenti minits', 'Biasanya aku naik motor, sekitar dua puluh menit.'], rescue: ["It's a bit hard for me. How do you do it?", 'its e bit hard for mi. hau du yu du it?', 'Agak susah buatku. Kamu caranya gimana?'] },
-    wh_when: { easy: ['Usually in the morning.', 'yuzuali in de morning', 'Biasanya pagi hari.'], mission: ['Maybe this weekend, if the weather is nice.', 'meibi dis wikend, if de weder iz nais', 'Mungkin akhir pekan ini, kalau cuacanya bagus.'], rescue: ["I'm not sure yet. When is good for you?", 'aim not syur yet. wen iz gud for yu?', 'Belum pasti. Kapan yang cocok buat kamu?'] },
-    wh_who: { easy: ['My best friend.', 'mai best frend', 'Sahabatku.'], mission: ['Mostly my family and my classmates.', 'mostli mai femili end mai klasmeits', 'Kebanyakan keluargaku dan teman sekelas.'], rescue: ['Just me, actually. Who do you go with?', 'jast mi, ekcuali. hu du yu gou wid?', 'Cuma aku sih. Kamu biasanya sama siapa?'] },
-    statement: { easy: ['Oh, I see!', 'ou, ai si', 'Oh, begitu!'], mission: ["That sounds interesting. I didn't know that.", 'det saunds intresting. ai dident nou det', 'Kedengarannya menarik. Aku baru tahu.'], rescue: ['Really? Can you tell me more?', 'rili? ken yu tel mi mor?', 'Oh ya? Bisa cerita lebih banyak?'] },
+  const topic = focal.extractedTopic || '';
+  const optA = focal.choiceOptionA ? capitalizeWord(focal.choiceOptionA) : '';
+  const echo = focal.echoCorrectionTarget || '';
+
+  type CardRow = [string, string, string, string]; // [text, pronunciation, hintId, hintTh]
+  type Tpl = { easy: CardRow; mission: CardRow; rescue: CardRow };
+
+  const EN: Record<CopilotSpeechAct, Tpl> = {
+    echo_redemption: {
+      easy: [echo, echo.toLowerCase(), `Ulangi: "${echo}"`, `พูดตาม: "${echo}"`],
+      mission: [`${echo}, got it.`, `${echo.toLowerCase()}, got it`, `Mengerti: "${echo}"`, `เข้าใจแล้ว: "${echo}"`],
+      rescue: [`${echo}. Did I say that right?`, `${echo.toLowerCase()}. did ai sei det rait?`, `"${echo}". Apakah pengucapanku sudah tepat?`, `"${echo}". ฉันออกเสียงถูกต้องไหม?`],
+    },
+    invitation: {
+      easy: ['Sure, I would love to!', 'syur, ai wud lav tu!', 'Tentu, aku mau banget!', 'ได้เลย ฉันอยากไปมาก!'],
+      mission: ["That sounds great, let's do it this week!", 'det saunds greit, lets du it dis wik!', 'Kedengarannya bagus, ayo minggu ini!', 'ฟังดูดีมาก ไปสัปดาห์นี้กันเถอะ!'],
+      rescue: ["I'd love to join! What time works best for you?", 'aid lav tu join! wat taim werks best for yu?', 'Aku mau ikut! Jam berapa yang cocok untukmu?', 'ฉันอยากไปด้วยจัง! คุณสะดวกกี่โมงดี?'],
+    },
+    choice: {
+      easy: [optA ? `${optA}, please.` : 'The first option, please.', optA ? `${optA.toLowerCase()}, pliz` : 'de ferst opsyen, pliz', optA ? `${optA}, tolong.` : 'Pilihan yang pertama saja.', optA ? `ขอเป็น${optA}ครับ/ค่ะ` : 'ขอตัวเลือกแรกครับ/ค่ะ'],
+      mission: [optA ? `I'd prefer ${optA}, because I really like the taste.` : "I'd prefer the first option, actually.", optA ? `aid prifer ${optA.toLowerCase()}, bikoz ai rili laik de teist` : 'aid prifer de ferst opsyen, ekcuali', optA ? `Aku lebih pilih ${optA}, karena suka rasanya.` : 'Aku lebih pilih opsi yang pertama sih.', optA ? `ฉันชอบ${optA}มากกว่า เพราะชอบรสชาตินี้` : 'ฉันขอเลือกอันแรกมากกว่านะ'],
+      rescue: [optA ? `I'll go with ${optA}. Which one do you recommend?` : "I'm not sure. Which one do you recommend?", optA ? `ail gou wid ${optA.toLowerCase()}. wich wan du yu rekomand?` : 'aim not syur. wich wan du yu rekomand?', optA ? `Aku pilih ${optA}. Menurutmu mana yang enak?` : 'Aku belum yakin. Menurutmu mana yang kamu rekomendasikan?', optA ? `ฉันเลือก${optA}นะ แล้วคุณแนะนำอันไหนล่ะ?` : 'ฉันยังไม่แน่ใจ คุณแนะนำอันไหนเหรอ?'],
+    },
+    wh_how_long: {
+      easy: ['For about two years now.', 'for abaut tu yirs nau', 'Sudah sekitar dua tahun sekarang.', 'ประมาณสองปีแล้วครับ/ค่ะ'],
+      mission: ["I've been working on it for about two years now.", 'aiv bin werking on it for abaut tu yirs nau', 'Aku sudah mengerjakannya sekitar dua tahun.', 'ฉันทำสิ่งนี้มาประมาณสองปีแล้ว'],
+      rescue: ['About two years. How long have you been doing it?', 'abaut tu yirs. hau long hev yu bin duing it?', 'Sekitar dua tahun. Kamu sendiri sudah berapa lama?', 'ประมาณสองปี แล้วคุณทำมานานแค่ไหนแล้วเหรอ?'],
+    },
+    wh_how_often: {
+      easy: ['Usually two or three times a week.', 'yuzuali tu or tri taims e wik', 'Biasanya dua atau tiga kali seminggu.', 'ปกติสองถึงสามครั้งต่อสัปดาห์ครับ/ค่ะ'],
+      mission: ['I try to do it two or three times a week.', 'ai trai tu du it tu or tri taims e wik', 'Aku usahakan dua atau tiga kali dalam seminggu.', 'ฉันพยายามทำให้ได้สองถึงสามครั้งต่อสัปดาห์'],
+      rescue: ['Two or three times a week. How often do you go?', 'tu or tri taims e wik. hau often du yu gou?', 'Dua atau tiga kali seminggu. Kamu sendiri seberapa sering?', 'สองถึงสามครั้งต่อสัปดาห์ แล้วคุณไปบ่อยแค่ไหนเหรอ?'],
+    },
+    wh_how_many: {
+      easy: ['Just a couple of them, actually.', 'jast e kapel of dem, ekcuali', 'Hanya beberapa saja sebenarnya.', 'แค่สองสามอันเท่านั้นเองครับ/ค่ะ'],
+      mission: ['Usually around two or three items is enough.', 'yuzuali eraund tu or tri aitems iz inaf', 'Biasanya sekitar dua atau tiga barang sudah cukup.', 'ปกติประมาณสองถึงสามอย่างก็พอแล้ว'],
+      rescue: ['Just two or three. How many do you usually need?', 'jast tu or tri. hau meni du yu yuzuali nid?', 'Cuma dua atau tiga. Kamu biasanya butuh berapa banyak?', 'แค่สองหรือสามอัน แล้วปกติคุณต้องใช้เท่าไหร่เหรอ?'],
+    },
+    wh_how_feel_day: {
+      easy: ['My day was pretty good, thanks!', 'mai dei waz priti gud, teng-ks!', 'Hariku menyenangkan, terima kasih!', 'วันนี้ของฉันราบรื่นดีมาก ขอบคุณนะ!'],
+      mission: ["It's been a busy but very productive day.", 'its bin e bizi bat veri produktiv dei', 'Hari yang sibuk tapi sangat produktif.', 'เป็นวันที่ยุ่งแต่มีประสิทธิภาพมากเลย'],
+      rescue: ['Pretty good so far! How has your day been?', 'priti gud sou far! hau hez yor dei bin?', 'Sejauh ini baik! Bagaimana dengan harimu?', 'จนถึงตอนนี้ก็ดีมากเลย! แล้ววันของคุณเป็นยังไงบ้าง?'],
+    },
+    wh_how_method: {
+      easy: ["I usually take the train, it's very convenient.", 'ai yuzuali teik de trein, its veri konvinient', 'Aku biasanya naik kereta, sangat praktis.', 'ฉันมักจะนั่งรถไฟไป สะดวกมากเลย'],
+      mission: ['I take the public train, which takes about twenty minutes.', 'ai teik de pablik trein, wich teiks abaut twenti minits', 'Aku naik kereta umum, sekitar dua puluh menit.', 'ฉันนั่งรถไฟ ใช้เวลาประมาณยี่สิบนาที'],
+      rescue: ['I usually go by train. How do you usually get there?', 'ai yuzuali gou bai trein. hau du yu yuzuali get der?', 'Biasanya naik kereta. Kamu biasanya ke sana naik apa?', 'ปกติฉันนั่งรถไฟ แล้วคุณเดินทางไปที่นั่นยังไงเหรอ?'],
+    },
+    wh_where_origin: {
+      easy: ["I'm from Indonesia.", 'aim from indonisia', 'Aku dari Indonesia.', 'ฉันมาจากประเทศอินโดนีเซีย'],
+      mission: ["I was born and raised in Indonesia.", 'ai waz born end reizd in indonisia', 'Aku lahir dan dibesarkan di Indonesia.', 'ฉันเกิดและเติบโตที่ประเทศอินโดนีเซีย'],
+      rescue: ["I'm from Indonesia. Have you ever visited there?", 'aim from indonisia. hev yu ever vizited der?', 'Aku dari Indonesia. Apakah kamu pernah berkunjung ke sana?', 'ฉันมาจากอินโดนีเซีย คุณเคยไปเที่ยวที่นั่นไหม?'],
+    },
+    wh_where_action: {
+      easy: ['At a quiet cafe near my house.', 'et e kwaiet kafei nir mai haus', 'Di kafe yang tenang dekat rumahku.', 'ที่คาเฟ่เงียบๆ แถวบ้านฉัน'],
+      mission: ['I usually go to a cozy place near the city center.', 'ai yuzuali gou tu e kouzi pleis nir de siti senter', 'Biasanya aku ke tempat nyaman dekat pusat kota.', 'ปกติฉันชอบไปร้านบรรยากาศสบายๆ แถวใจกลางเมือง'],
+      rescue: ['Near my neighborhood. Where do you usually like to go?', 'nir mai neiborhud. wer du yu yuzuali laik tu gou?', 'Dekat lingkunganku. Kamu sendiri biasanya suka ke mana?', 'แถวๆ บ้านฉัน แล้วปกติคุณชอบไปที่ไหนเหรอ?'],
+    },
+    wh_what_food: {
+      easy: ['Hot coffee, please.', 'hot kofi, pliz', 'Kopi panas, tolong.', 'ขอกาแฟร้อนครับ/ค่ะ'],
+      mission: ["I'd like an iced latte with less sugar, please.", 'aid laik en aist late wid les syugar, pliz', 'Saya mau es latte sedikit gula, tolong.', 'ขอลาเต้เย็นหวานน้อยครับ/ค่ะ'],
+      rescue: ["I'll have an iced latte. What drink do you recommend?", 'ail hev en aist late. wat drink du yu rekomand?', 'Aku pesan es latte. Minuman apa yang kamu rekomendasikan?', 'ฉันเอาลาเต้เย็น แล้วคุณแนะนำเครื่องดื่มอะไรเหรอ?'],
+    },
+    wh_what_general: {
+      easy: [topic ? `I really enjoy ${topic}.` : 'I enjoy learning new things.', topic ? `ai rili enjoy ${topic}` : 'ai enjoy lerning nyu tings', topic ? `Aku sangat menikmati ${topic}.` : 'Aku suka belajar hal-hal baru.', topic ? `ฉันชอบ${topic}มากเลย` : 'ฉันชอบเรียนรู้สิ่งใหม่ๆ'],
+      mission: [topic ? `My favorite thing is ${topic}, because it relaxes me.` : 'I love practicing languages because it opens my horizons.', topic ? `mai feivrit ting iz ${topic}, bikoz it rilekses mi` : 'ai lav praktising lenggwijez bikoz it opens mai horaizons', topic ? `Hal favoritku adalah ${topic}, karena bikin rileks.` : 'Aku suka latihan bahasa karena membuka wawasan.', topic ? `สิ่งที่ฉันชอบที่สุดคือ${topic} เพราะทำให้ผ่อนคลาย` : 'ฉันชอบฝึกภาษาเพราะช่วยเปิดโลกทัศน์'],
+      rescue: ["That's an interesting topic. What do you think about it?", 'dets en intresting topik. wat du yu tink abaut it?', 'Topik yang menarik. Bagaimana menurutmu tentang hal itu?', 'หัวข้อน่าสนใจมาก แล้วคุณคิดเห็นอย่างไรเกี่ยวกับเรื่องนี้?'],
+    },
+    wh_why: {
+      easy: ['Because it helps me improve my speaking skills.', 'bikoz it helps mi impruv mai spiking skilz', 'Karena itu membantuku meningkatkan kemampuan bicara.', 'เพราะช่วยให้ฉันพัฒนาทักษะการพูดได้ดีขึ้น'],
+      mission: ['Because I want to communicate fluently with people around the world.', 'bikoz ai wont tu komyunikeit fluently wid pipel eraund de werld', 'Karena aku ingin berkomunikasi lancar dengan orang dari berbagai negara.', 'เพราะฉันอยากสื่อสารกับผู้คนทั่วโลกได้อย่างคล่องแคล่ว'],
+      rescue: ["Because it's very useful for my future. Why do you ask?", 'bikoz its veri yusful for mai fyucur. wai du yu ask?', 'Karena sangat berguna untuk masa depanku. Kenapa kamu bertanya?', 'เพราะมันมีประโยชน์มากสำหรับอนาคตของฉัน ทำไมคุณถึงถามเหรอ?'],
+    },
+    wh_when: {
+      easy: ['Usually in the evening after work.', 'yuzuali in di ivning efter werk', 'Biasanya di malam hari sepulang kerja.', 'ปกติช่วงเย็นหลังเลิกงานครับ/ค่ะ'],
+      mission: ['I prefer doing it on weekends when I have more free time.', 'ai prifer duing it on wikendz wen ai hev mor fri taim', 'Aku lebih suka akhir pekan saat punya lebih banyak waktu luang.', 'ฉันชอบทำช่วงวันหยุดสุดสัปดาห์เพราะมีเวลาว่างมากกว่า'],
+      rescue: ['Mostly on weekends. When is the best time for you?', 'moustli on wikendz. wen iz de best taim for yu?', 'Kebanyakan di akhir pekan. Kapan waktu terbaik buatmu?', 'ส่วนใหญ่จะเป็นช่วงวันหยุด แล้วเวลาไหนสะดวกที่สุดสำหรับคุณเหรอ?'],
+    },
+    wh_who: {
+      easy: ['Usually with my friends or classmates.', 'yuzuali wid mai frendz or klasmeits', 'Biasanya bersama teman atau rekan sekelas.', 'ปกติไปกับเพื่อนหรือเพื่อนร่วมชั้นครับ/ค่ะ'],
+      mission: ['I often go with my close friends from school.', 'ai often gou wid mai klous frendz from skul', 'Aku sering pergi bersama teman dekat dari sekolah.', 'ฉันมักจะไปกับเพื่อนสนิทที่โรงเรียน'],
+      rescue: ['With my best friend. Who do you usually hang out with?', 'wid mai best frend. hu du yu yuzuali heng aut wid?', 'Bersama sahabatku. Kamu sendiri biasanya berkumpul dengan siapa?', 'ไปกับเพื่อนสนิท แล้วปกติคุณไปเที่ยวกับใครเหรอ?'],
+    },
+    yesno_are: {
+      easy: ['Yes, I am.', 'yes, ai em', 'Ya, betul.', 'ใช่ครับ/ค่ะ'],
+      mission: ['Yes, definitely. Everything is going smoothly.', 'yes, definitli. evriting iz gouing smudli', 'Ya, tentu saja. Semuanya berjalan lancar.', 'ใช่แน่นอน ทุกอย่างกำลังดำเนินไปด้วยดี'],
+      rescue: ['Yes, I am. Are you having a good day too?', 'yes, ai em. ar yu heving e gud dei tu?', 'Ya, betul. Apakah harimu juga menyenangkan?', 'ใช่เลย วันนี้ของคุณโอเคดีเหมือนกันไหม?'],
+    },
+    yesno_can: {
+      easy: ['Yes, I can do that.', 'yes, ai ken du det', 'Ya, saya bisa melakukannya.', 'ใช่ ฉันทำได้ครับ/ค่ะ'],
+      mission: ['Yes, I have some practice with that.', 'yes, ai hev sam praktis wid det', 'Ya, saya sudah beberapa kali melatihnya.', 'ใช่ ฉันเคยฝึกทำเรื่องนี้มาบ้างแล้ว'],
+      rescue: ['I think I can! Can you give me a quick tip?', 'ai tink ai ken! ken yu giv mi e kwik tip?', 'Kurasa bisa! Bisakah kamu beri sedikit tips?', 'คิดว่าทำได้นะ! คุณช่วยให้คำแนะนำสั้นๆ ได้ไหม?'],
+    },
+    yesno_have: {
+      easy: ['Yes, I have tried it before.', 'yes, ai hev traid it bifor', 'Ya, saya sudah pernah mencobanya.', 'ใช่ ฉันเคยลองมาก่อนแล้วครับ/ค่ะ'],
+      mission: ['Yes, I tried it a while ago and really enjoyed it.', 'yes, ai traid it e wail egou end rili enjoyd it', 'Ya, saya mencobanya beberapa waktu lalu dan sangat menikmatinya.', 'ใช่ ฉันเคยลองทำเมื่อไม่นานมานี้และชอบมากเลย'],
+      rescue: ['Yes, I have. Have you had a chance to try it?', 'yes, ai hev. hev yu hed e chens tu trai it?', 'Ya, sudah. Apakah kamu sudah sempat mencobanya?', 'ใช่ เคยแล้ว แล้วคุณมีโอกาสได้ลองหรือยัง?'],
+    },
+    yesno_did: {
+      easy: ['Yes, I did that recently.', 'yes, ai did det risentli', 'Ya, saya melakukannya baru-baru ini.', 'ใช่ ฉันเพิ่งทำสิ่งนั้นไปเมื่อเร็วๆ นี้'],
+      mission: ['Yes, I went there last week and it was great.', 'yes, ai went der last wik end it waz greit', 'Ya, saya pergi ke sana minggu lalu dan seru sekali.', 'ใช่ ฉันเพิ่งไปที่นั่นเมื่อสัปดาห์ก่อน และมันยอดเยี่ยมมาก'],
+      rescue: ['Yes, I did! Did you also do something fun?', 'yes, ai did! did yu olso du samting fan?', 'Ya, benar! Apakah kamu juga melakukan sesuatu yang seru?', 'ใช่ ฉันทำ! แล้วคุณได้ทำอะไรสนุกๆ บ้างไหม?'],
+    },
+    yesno_would: {
+      easy: ['Yes, I would really like that.', 'yes, ai wud rili laik det', 'Ya, saya sangat menyukainya.', 'ใช่ ฉันชอบแบบนั้นมากเลยครับ/ค่ะ'],
+      mission: ['Yes, I would love to, that sounds like a great plan.', 'yes, ai wud lav tu, det saunds laik e greit plen', 'Ya, saya ingin sekali, kedengarannya rencana bagus.', 'ใช่ อยากมากเลย ฟังดูเป็นแผนที่ยอดเยี่ยมมาก'],
+      rescue: ["I'd love to! Would that time work for you?", 'aid lav tu! wud det taim werk for yu?', 'Aku mau sekali! Apakah waktu itu pas untukmu?', 'ฉันอยากมากเลย! แล้วเวลานั้นสะดวกสำหรับคุณไหม?'],
+    },
+    yesno_do: {
+      easy: ['Yes, I do.', 'yes, ai du', 'Ya, tentu.', 'ใช่ครับ/ค่ะ'],
+      mission: [topic ? `Yes, I really enjoy ${topic}.` : 'Yes, I really enjoy it.', topic ? `yes, ai rili enjoy ${topic}` : 'yes, ai rili enjoy it', topic ? `Ya, aku suka banget ${topic}.` : 'Ya, aku sangat menyukainya.', topic ? `ใช่ ฉันชอบ${topic}มากเลย` : 'ใช่ ฉันชอบสิ่งนี้มากเลย'],
+      rescue: ['Yes, I do! Do you enjoy it as well?', 'yes, ai du! du yu enjoy it ez wel?', 'Ya, tentu! Apakah kamu juga menyukainya?', 'ใช่แน่นอน! แล้วคุณชอบเหมือนกันไหม?'],
+    },
+    greeting: {
+      easy: ['Hi! Good to see you today.', 'hai! gud tu si yu tudei', 'Hai! Senang bertemu denganmu hari ini.', 'สวัสดี! ดีใจที่ได้พบคุณวันนี้'],
+      mission: ["Hello! I'm feeling great and ready to practice.", 'helo! aim fiiling greit end redi tu praktis', 'Halo! Aku merasa prima dan siap berlatih.', 'สวัสดี! ฉันรู้สึกสดชื่นและพร้อมฝึกแล้ว'],
+      rescue: ['Hi there! How are you doing today?', 'hai der! hau ar yu duing tudei?', 'Hai! Bagaimana kabarmu hari ini?', 'สวัสดี! วันนี้คุณเป็นอย่างไรบ้าง?'],
+    },
+    statement: {
+      easy: ['That makes a lot of sense!', 'det meiks e lot of sens!', 'Itu sangat masuk akal!', 'ฟังดูสมเหตุสมผลมากเลย!'],
+      mission: ["That sounds really interesting, I hadn't thought about it that way.", 'det saunds rili intresting, ai hedent tot abaut it det wei', 'Kedengarannya sangat menarik, aku belum pernah terpikir seperti itu.', 'ฟังดูน่าสนใจมาก ฉันไม่เคยคิดในมุมนั้นมาก่อนเลย'],
+      rescue: ['Really? Could you tell me a bit more about that?', 'rili? kud yu tel mi e bit mor abaut det?', 'Benarkah? Bisakah ceritakan lebih banyak tentang itu?', 'จริงเหรอ? คุณช่วยเล่ารายละเอียดเพิ่มเติมให้ฟังหน่อยได้ไหม?'],
+    },
   };
-  const JA: Record<CopilotIntent, Tpl> = {
-    greeting: { easy: ['こんにちは！元気です。', 'konnichiwa! genki desu', 'Halo! Aku baik.'], mission: ['こんにちは。今日はとても元気です。あなたは？', 'konnichiwa. kyou wa totemo genki desu. anata wa?', 'Halo. Hari ini aku sehat sekali. Kamu?'], rescue: ['元気です。あなたはどうですか？', 'genki desu. anata wa dou desu ka?', 'Aku baik. Kamu bagaimana?'] },
-    yesno: { easy: ['はい、そうです。', 'hai, sou desu', 'Ya, benar.'], mission: [`はい、${topic || 'それ'}が大好きです。`, `hai, ${topic || 'sore'} ga daisuki desu`, `Ya, aku suka sekali ${topic || 'itu'}.`], rescue: ['いいえ、あまり。あなたは？', 'iie, amari. anata wa?', 'Tidak terlalu. Kalau kamu?'] },
-    choice: { easy: ['一つ目をお願いします。', 'hitotsume o onegai shimasu', 'Yang pertama, tolong.'], mission: ['二つ目のほうがいいです。', 'futatsume no hou ga ii desu', 'Yang kedua lebih baik.'], rescue: ['うーん、どちらがおすすめですか？', 'uun, dochira ga osusume desu ka?', 'Hmm, kamu rekomendasikan yang mana?'] },
-    wh_where: { easy: ['インドネシアから来ました。', 'indoneshia kara kimashita', 'Aku dari Indonesia.'], mission: ['家の近くの駅の前です。', 'ie no chikaku no eki no mae desu', 'Di depan stasiun dekat rumahku.'], rescue: ['この近くです。あなたはどこに行きますか？', 'kono chikaku desu. anata wa doko ni ikimasu ka?', 'Dekat sini. Kamu pergi ke mana?'] },
-    wh_what: { easy: [`${topic || '音楽'}が好きです。`, `${topic || 'ongaku'} ga suki desu`, `Aku suka ${topic || 'musik'}.`], mission: [`一番好きなのは${topic || 'コーヒー'}です。リラックスできますから。`, `ichiban suki na no wa ${topic || 'koohii'} desu. rirakkusu dekimasu kara`, `Yang paling kusuka ${topic || 'kopi'}, karena bisa santai.`], rescue: ['いい質問ですね。あなたは何が好きですか？', 'ii shitsumon desu ne. anata wa nani ga suki desu ka?', 'Pertanyaan bagus. Kamu suka apa?'] },
-    wh_why: { easy: ['楽しいからです。', 'tanoshii kara desu', 'Karena menyenangkan.'], mission: ['外国の人と話したいからです。', 'gaikoku no hito to hanashitai kara desu', 'Karena aku ingin bicara dengan orang asing.'], rescue: ['まだよく分かりません。どうしてですか？', 'mada yoku wakarimasen. doushite desu ka?', 'Aku belum tahu pasti. Kenapa?'] },
-    wh_how: { easy: ['まあまあです。', 'maamaa desu', 'Lumayan.'], mission: ['バイクで行きます。二十分ぐらいです。', 'baiku de ikimasu. nijuppun gurai desu', 'Aku naik motor, sekitar 20 menit.'], rescue: ['ちょっと難しいです。あなたはどうしますか？', 'chotto muzukashii desu. anata wa dou shimasu ka?', 'Agak sulit. Kamu bagaimana?'] },
-    wh_when: { easy: ['朝です。', 'asa desu', 'Pagi hari.'], mission: ['今週末、天気がよかったら。', 'konshuumatsu, tenki ga yokattara', 'Akhir pekan ini, kalau cuacanya bagus.'], rescue: ['まだ決めていません。いつがいいですか？', 'mada kimete imasen. itsu ga ii desu ka?', 'Belum kuputuskan. Kapan yang baik?'] },
-    wh_who: { easy: ['友だちです。', 'tomodachi desu', 'Temanku.'], mission: ['家族とクラスメートです。', 'kazoku to kurasumeeto desu', 'Keluarga dan teman sekelas.'], rescue: ['一人です。あなたはだれと行きますか？', 'hitori desu. anata wa dare to ikimasu ka?', 'Sendiri. Kamu pergi dengan siapa?'] },
-    statement: { easy: ['そうですか！', 'sou desu ka!', 'Oh begitu!'], mission: ['それは面白いですね。知りませんでした。', 'sore wa omoshiroi desu ne. shirimasen deshita', 'Itu menarik ya. Aku tidak tahu.'], rescue: ['本当ですか？もっと教えてください。', 'hontou desu ka? motto oshiete kudasai', 'Benarkah? Ceritakan lebih banyak.'] },
+
+  const JA: Record<CopilotSpeechAct, Tpl> = {
+    echo_redemption: {
+      easy: [echo, toPhoneticRomaji(echo), `Ulangi: 「${echo}」`, `พูดตาม: 「${echo}」`],
+      mission: [`${echo}、ですね。`, `${toPhoneticRomaji(echo)}, desu ne`, `Mengerti: 「${echo}」`, `เข้าใจแล้ว: 「${echo}」`],
+      rescue: [`${echo}。これで合っていますか？`, `${toPhoneticRomaji(echo)}. kore de atte imasu ka?`, `「${echo}」. Apakah ini sudah benar?`, `「${echo}」 ถูกต้องไหมครับ/ค่ะ?`],
+    },
+    invitation: {
+      easy: ['はい、ぜひ一緒にお願いします！', 'hai, zehi issho ni onegai shimasu!', 'Ya, mari kita lakukan bersama!', 'ได้เลย ไปด้วยกันนะ!'],
+      mission: ['いいですね！ちょうど時間が空いていますよ。', 'ii desu ne! choudo jikan ga aite imasu yo.', 'Bagus sekali! Pas banget aku ada waktu luang.', 'ดีเลย! ฉันกำลังว่างอยู่พอดีเลย'],
+      rescue: ['ぜひ行きたいです！何時ごろが都合がいいですか？', 'zehi ikitai desu! nanji goro ga tsugou ga ii desu ka?', 'Pasti mau ikut! Jam berapa yang cocok untukmu?', 'อยากไปมากเลย! คุณสะดวกประมาณกี่โมงดี?'],
+    },
+    choice: {
+      easy: [optA ? `${optA}をお願いします。` : '一つ目をお願いします。', optA ? `${toPhoneticRomaji(optA)} o onegai shimasu` : 'hitotsume o onegai shimasu', optA ? `Minta ${optA}, tolong.` : 'Yang pertama saja, tolong.', optA ? `ขอเป็น${optA}ครับ/ค่ะ` : 'ขอตัวเลือกแรกครับ/ค่ะ'],
+      mission: [optA ? `${optA}のほうが好きなので、そちらにします。` : '二つ目のほうがいいです。', optA ? `${toPhoneticRomaji(optA)} no hou ga suki na no de, sochira ni shimasu` : 'futatsume no hou ga ii desu', optA ? `Karena lebih suka ${optA}, aku pilih itu.` : 'Yang kedua lebih baik.', optA ? `ฉันชอบ${optA}มากกว่า เลยขอเลือกอันนี้นะ` : 'ฉันว่าอันที่สองดีกว่านะ'],
+      rescue: ['うーん、迷いますね。どちらがおすすめですか？', 'uun, mayoimasu ne. dochira ga osusume desu ka?', 'Hmm, bingung ya. Yang mana yang kamu rekomendasikan?', 'อืม เลือกยากจัง คุณแนะนำอันไหนเหรอ?'],
+    },
+    wh_how_long: {
+      easy: ['だいたい二年ぐらいになります。', 'daitai ninen gurai ni narimasu.', 'Kira-kira sudah dua tahun.', 'ประมาณสองปีแล้วครับ/ค่ะ'],
+      mission: ['二年ぐらい前からずっと続けていますよ。', 'ninen gurai mae kara zutto tsuzukete imasu yo.', 'Sudah terus menekuninya sejak dua tahun lalu.', 'ฉันทำต่อเนื่องมาตั้งแต่ประมาณสองปีก่อนแล้ว'],
+      rescue: ['二年ほどです。あなたはどのくらい続けていますか？', 'ninen hodo desu. anata wa dono kurai tsuzukete imasu ka?', 'Kira-kira dua tahun. Kalau kamu sudah berapa lama?', 'ประมาณสองปี แล้วคุณทำมานานแค่ไหนแล้วเหรอ?'],
+    },
+    wh_how_often: {
+      easy: ['週に二、三回ぐらいです。', 'shuu ni ni, sankai gurai desu.', 'Kira-kira dua atau tiga kali seminggu.', 'ประมาณสองถึงสามครั้งต่อสัปดาห์ครับ/ค่ะ'],
+      mission: ['だいたい週に二回か三回は行くようにしています。', 'daitai shuu ni nikai ka sankai wa iku you ni shite imasu.', 'Biasanya aku usahakan pergi 2-3 kali seminggu.', 'ปกติฉันพยายามไปให้ได้สัปดาห์ละสองหรือสามครั้ง'],
+      rescue: ['週に二回ほどです。あなたはどのくらいのペースですか？', 'shuu ni nikai hodo desu. anata wa dono kurai no peesu desu ka?', 'Sekitar dua kali seminggu. Kalau kamu bagaimana temponya?', 'ประมาณสองครั้งต่อสัปดาห์ แล้วคุณไปบ่อยแค่ไหนเหรอ?'],
+    },
+    wh_how_many: {
+      easy: ['二、三個ぐらいですね。', 'ni, sanko gurai desu ne.', 'Kira-kira dua atau tiga buah ya.', 'ประมาณสองหรือสามอันครับ/ค่ะ'],
+      mission: ['だいたい二つか三つぐらいを用意しています。', 'daitai futatsu ka mittsu gurai o youi shite imasu.', 'Biasanya saya siapkan sekitar dua atau tiga buah.', 'ปกติฉันเตรียมไว้ประมาณสองถึงสามอัน'],
+      rescue: ['二、三個です。あなたは普段どのくらい必要ですか？', 'ni, sanko desu. anata wa fudan dono kurai hitsuyou desu ka?', 'Dua atau tiga. Kamu biasanya perlu berapa banyak?', 'สองหรือสามอัน แล้วปกติคุณต้องใช้เท่าไหร่เหรอ?'],
+    },
+    wh_how_feel_day: {
+      easy: ['今日はとてもいい一日でしたよ。', 'kyou wa totemo ii ichinichi deshita yo.', 'Hari ini hari yang sangat menyenangkan.', 'วันนี้เป็นวันที่ดีมากเลยครับ/ค่ะ'],
+      mission: ['少し忙しかったですが、とても充実した一日でした。', 'sukoshi isogashikatta desu ga, totemo juujitsu shita ichinichi deshita.', 'Agak sibuk tapi hari yang sangat produktif.', 'ค่อนข้างยุ่งนิดหน่อยแต่ก็เป็นวันที่คุ้มค่ามากเลย'],
+      rescue: ['とても元気です！あなたの一日はどうでしたか？', 'totemo genki desu! anata no ichinichi wa dou deshita ka?', 'Sangat bersemangat! Bagaimana harimu?', 'ฉันสบายดีมากเลย! แล้ววันของคุณเป็นยังไงบ้าง?'],
+    },
+    wh_how_method: {
+      easy: ['いつも電車を使っています。とても便利ですよ。', 'itsumo densha o tsukatte imasu. totemo benri desu yo.', 'Selalu naik kereta. Sangat praktis lho.', 'ปกติฉันนั่งรถไฟไป สะดวกมากเลย'],
+      mission: ['電車で二十分くらいかけて通っています。', 'densha de nijuppun kurai kakete kayotte imasu.', 'Pergi naik kereta memakan waktu sekitar 20 menit.', 'ฉันนั่งรถไฟไป ใช้เวลาเดินทางประมาณยี่สิบนาที'],
+      rescue: ['電車で行きます。あなたはどうやって行きますか？', 'densha de ikimasu. anata wa dou yatte ikimasu ka?', 'Naik kereta. Kamu sendiri ke sana bagaimana caranya?', 'ฉันไปโดยรถไฟ แล้วคุณเดินทางไปอย่างไรเหรอ?'],
+    },
+    wh_where_origin: {
+      easy: ['インドネシアから来ました。', 'indoneshia kara kimashita.', 'Aku dari Indonesia.', 'ฉันมาจากประเทศอินโดนีเซีย'],
+      mission: ['インドネシアの生まれで、日本が大好きです。', 'indoneshia no umare de, nihon ga daisuki desu.', 'Lahir di Indonesia, dan sangat suka Jepang.', 'ฉันเกิดที่อินโดนีเซีย และชอบประเทศญี่ปุ่นมาก'],
+      rescue: ['インドネシアからです。行ったことがありますか？', 'indoneshia kara desu. itta koto ga arimasu ka?', 'Dari Indonesia. Pernahkah kamu ke sana?', 'มาจากอินโดนีเซียครับ/ค่ะ คุณเคยไปเที่ยวที่นั่นไหม?'],
+    },
+    wh_where_action: {
+      easy: ['家の近くの静かなカフェに行きます。', 'ie no chikaku no shizuka na kafe ni ikimasu.', 'Pergi ke kafe tenang dekat rumah.', 'ไปคาเฟ่เงียบๆ แถวบ้านครับ/ค่ะ'],
+      mission: ['駅の近くにある落ち着いたお店によく行きますよ。', 'eki no chikaku ni aru ochitsuita omise ni yoku ikimasu yo.', 'Sering pergi ke tempat nyaman dekat stasiun.', 'ฉันมักจะไปร้านบรรยากาศสงบๆ แถวสถานีรถไฟ'],
+      rescue: ['家の近くです。あなたは普段どこに行きますか？', 'ie no chikaku desu. anata wa fudan doko ni ikimasu ka?', 'Dekat rumahku. Kalau kamu biasanya ke mana?', 'แถวบ้านฉัน แล้วปกติคุณไปไหนเหรอ?'],
+    },
+    wh_what_food: {
+      easy: ['ホットコーヒーをお願いします。', 'hotto koohii o onegai shimasu.', 'Minta kopi panas, tolong.', 'ขอกาแฟร้อนครับ/ค่ะ'],
+      mission: ['アイスラテを一つ、テイクアウトでお願いします。', 'aisu rate o hitotsu, teikuauto de onegai shimasu.', 'Minta satu es latte, dibungkus (takeaway).', 'ขอลาเต้เย็นหนึ่งแก้ว สั่งกลับบ้านครับ/ค่ะ'],
+      rescue: ['アイスラテにします。一番人気は何ですか？', 'aisu rate ni shimasu. ichiban ninki wa nan desu ka?', 'Aku pilih es latte. Yang paling populer apa ya?', 'ฉันเอาลาเต้เย็น แล้วเมนูยอดนิยมที่สุดคืออะไรเหรอ?'],
+    },
+    wh_what_general: {
+      easy: [topic ? `${topic}がとても好きです。` : '新しいことを学ぶのが好きです。', topic ? `${toPhoneticRomaji(topic)} ga totemo suki desu.` : 'atarashii koto o manabu no ga suki desu.', topic ? `Sangat suka ${topic}.` : 'Suka belajar hal-hal baru.', topic ? `ฉันชอบ${topic}มากเลย` : 'ฉันชอบเรียนรู้สิ่งใหม่ๆ'],
+      mission: [topic ? `一番好きなのは${topic}です。リラックスできますから。` : '会話の練習をするのが一番楽しいですね。', topic ? `ichiban suki na no wa ${toPhoneticRomaji(topic)} desu. rirakkusu dekimasu kara.` : 'kaiwa no renshuu o suru no ga ichiban tanoshii desu ne.', topic ? `Yang paling kusuka ${topic}, karena bikin santai.` : 'Paling menyenangkan melatih percakapan.', topic ? `สิ่งที่ชอบที่สุดคือ${topic} เพราะทำให้ผ่อนคลาย` : 'การฝึกสนทนาเป็นสิ่งที่สนุกที่สุดเลย'],
+      rescue: ['面白いですね。あなたは何が一番おすすめですか？', 'omoshiroi desu ne. anata wa nani ga ichiban osusume desu ka?', 'Menarik ya. Menurutmu apa yang paling direkomendasikan?', 'น่าสนใจจัง แล้วคุณมีอะไรแนะนำเป็นพิเศษไหม?'],
+    },
+    wh_why: {
+      easy: ['会話の練習になって楽しいからです。', 'kaiwa no renshuu ni natte tanoshii kara desu.', 'Karena menyenangkan melatih percakapan.', 'เพราะได้ฝึกสนทนาแล้วสนุกดีครับ/ค่ะ'],
+      mission: ['世界中の人と自然に話せるようになりたいからです。', 'sekaijuu no hito to shizen ni hanaseru you ni naritai kara desu.', 'Karena ingin bisa bicara natural dengan orang sedunia.', 'เพราะฉันอยากพูดคุยกับผู้คนทั่วโลกได้อย่างเป็นธรรมชาติ'],
+      rescue: ['将来の役に立つからです。どうしてそう思ったのですか？', 'shourai no yaku ni tatsu kara desu. doushite sou omotta no desu ka?', 'Karena berguna untuk masa depan. Kenapa kamu bertanya?', 'เพราะมันมีประโยชน์ต่ออนาคต ทำไมคุณถึงคิดแบบนั้นเหรอ?'],
+    },
+    wh_when: {
+      easy: ['普段は仕事の後の夜です。', 'fudan wa shigoto no ato no yoru desu.', 'Biasanya malam hari sepulang kerja.', 'ปกติช่วงค่ำหลังเลิกงานครับ/ค่ะ'],
+      mission: ['時間がある週末にゆっくりやることが多いですね。', 'jikan ga aru shuumatsu ni yukkuri yaru koto ga ooi desu ne.', 'Sering melakukan santai di akhir pekan saat senggang.', 'ฉันมักจะทำอย่างสบายๆ ในช่วงวันหยุดสุดสัปดาห์'],
+      rescue: ['週末が多いです。あなたはいつ頃が一番いいですか？', 'shuumatsu ga ooi desu. anata wa itsugoro ga ichiban ii desu ka?', 'Banyakan akhir pekan. Kalau kamu kapan yang paling pas?', 'ส่วนใหญ่เป็นวันหยุดสุดสัปดาห์ แล้วคุณสะดวกช่วงไหนที่สุดเหรอ?'],
+    },
+    wh_who: {
+      easy: ['学校の友だちと一緒です。', 'gakkou no tomodachi to issho desu.', 'Bersama teman-teman sekolah.', 'ไปกับเพื่อนที่โรงเรียนครับ/ค่ะ'],
+      mission: ['仲のいい友だちや同僚と行くことが多いですね。', 'naka no ii tomodachi ya douryou to iku koto ga ooi desu ne.', 'Sering pergi dengan kawan akrab atau rekan kerja.', 'ฉันมักจะไปกับเพื่อนสนิทหรือเพื่อนร่วมงาน'],
+      rescue: ['親しい友だちとです。あなたは誰と過ごすことが多いですか？', 'shitashii tomodachi to desu. anata wa dare to sugosu koto ga ooi desu ka?', 'Dengan teman akrab. Kamu biasanya bersama siapa?', 'ไปกับเพื่อนสนิท แล้วปกติคุณมักจะใช้เวลาร่วมกับใครเหรอ?'],
+    },
+    yesno_are: {
+      easy: ['はい、その通りです。', 'hai, sono toori desu.', 'Ya, tepat sekali.', 'ใช่ เป็นไปตามนั้นเลยครับ/ค่ะ'],
+      mission: ['はい、順調に進んでいますよ。', 'hai, junchou ni susunde imasu yo.', 'Ya, berjalan lancar kok.', 'ใช่ ทุกอย่างกำลังดำเนินไปด้วยดี'],
+      rescue: ['はい、そうです！あなたはどうですか？', 'hai, sou desu! anata wa dou desu ka?', 'Ya, benar! Kalau kamu bagaimana?', 'ใช่เลยครับ/ค่ะ! แล้วคุณล่ะเป็นยังไงบ้าง?'],
+    },
+    yesno_can: {
+      easy: ['はい、大丈夫です、できますよ。', 'hai, daijoubu desu, dekimasu yo.', 'Ya, tidak apa-apa, saya bisa.', 'ใช่ ไม่เป็นไร ทำได้แน่นอนครับ/ค่ะ'],
+      mission: ['はい、少し練習したのでできますよ。', 'hai, sukoshi renshuu shita no de dekimasu yo.', 'Ya, karena sudah sedikit latihan, saya bisa.', 'ใช่ เพราะได้ฝึกมาบ้างแล้วเลยพอทำได้ครับ/ค่ะ'],
+      rescue: ['できると思います！何かコツはありますか？', 'dekiru to omoimasu! nanika kotsu wa arimasu ka?', 'Kurasa bisa! Ada tips atau kiatnya?', 'คิดว่าทำได้นะ! พอมีเคล็ดลับอะไรแนะนำไหม?'],
+    },
+    yesno_have: {
+      easy: ['はい、前に行ったことがあります。', 'hai, mae ni itta koto ga arimasu.', 'Ya, saya pernah ke sana sebelumnya.', 'ใช่ เคยไปมาก่อนแล้วครับ/ค่ะ'],
+      mission: ['はい、以前に体験してとても楽しかったですよ。', 'hai, izen ni taiken shite totemo tanoshikatta desu yo.', 'Ya, dulu pernah mencobanya dan menyenangkan sekali.', 'ใช่ เคยลองเมื่อก่อนและรู้สึกสนุกมากเลย'],
+      rescue: ['はい、ありますよ。あなたも試したことがありますか？', 'hai, arimasu yo. anata mo tameshita koto ga arimasu ka?', 'Ya, pernah. Apakah kamu juga pernah mencobanya?', 'ใช่ เคยนะ แล้วคุณเคยลองดูบ้างหรือยัง?'],
+    },
+    yesno_did: {
+      easy: ['はい、最近そうしましたよ。', 'hai, saikin sou shimashita yo.', 'Ya, baru-baru ini saya melakukannya.', 'ใช่ ฉันเพิ่งทำอย่างนั้นไปเมื่อเร็วๆ นี้ครับ/ค่ะ'],
+      mission: ['はい、先週行ってみてすごく良かったです。', 'hai, senshuu itte mite sugoku yokatta desu.', 'Ya, minggu lalu saya coba pergi dan bagus sekali.', 'ใช่ สัปดาห์ก่อนฉันลองไปดูแล้วรู้สึกดีมากๆ เลย'],
+      rescue: ['はい、そうでした！あなたもどこか行きましたか？', 'hai, sou deshita! anata mo dokoka ikimashita ka?', 'Ya, begitu! Kamu sendiri pergi ke suatu tempat juga?', 'ใช่ เป็นอย่างนั้นเลย! แล้วคุณได้ไปเที่ยวที่ไหนมาบ้างไหม?'],
+    },
+    yesno_would: {
+      easy: ['はい、ぜひお願いしたいです。', 'hai, zehi onegai shitai desu.', 'Ya, tentu saja saya ingin.', 'ใช่ อยากให้เป็นอย่างนั้นมากเลยครับ/ค่ะ'],
+      mission: ['はい、とても良さそうですね。ぜひそうしたいです。', 'hai, totemo yosasou desu ne. zehi sou shitai desu.', 'Ya, kedengarannya sangat bagus. Saya pasti ingin.', 'ใช่ ดูดีมากๆ เลย อยากทำแบบนั้นแน่นอนครับ/ค่ะ'],
+      rescue: ['ぜひ！その時間でご都合はよろしいですか？', 'zehi! sono jikan de go-tsugou wa yoroshii desu ka?', 'Tentu! Apakah di jam itu kamu ada waktu?', 'ยินดีเลย! แล้วเวลานั้นคุณสะดวกใช่ไหมครับ/ค่ะ?'],
+    },
+    yesno_do: {
+      easy: ['はい、よくそうします。', 'hai, yoku sou shimasu.', 'Ya, sering kali begitu.', 'ใช่ มักจะเป็นอย่างนั้นครับ/ค่ะ'],
+      mission: [topic ? `はい、${topic}が大好きです。` : 'はい、とても楽しんでやっていますよ。', topic ? `hai, ${toPhoneticRomaji(topic)} ga daisuki desu.` : 'hai, totemo tanoshinde yatte imasu yo.', topic ? `Ya, aku sangat suka ${topic}.` : 'Ya, aku sangat menikmatinya.', topic ? `ใช่ ฉันชอบ${topic}มากเลย` : 'ใช่ ฉันสนุกกับมันมากเลย'],
+      rescue: ['はい、そうです！あなたもよくしますか？', 'hai, sou desu! anata mo yoku shimasu ka?', 'Ya, benar! Kamu juga sering melakukannya?', 'ใช่เลย! แล้วคุณทำบ่อยเหมือนกันไหม?'],
+    },
+    greeting: {
+      easy: ['こんにちは！よろしくお願いします。', 'konnichiwa! yoroshiku onegai shimasu.', 'Halo! Senang bisa berbincang denganmu.', 'สวัสดี! ยินดีที่ได้คุยกันนะ'],
+      mission: ['こんにちは！今日も元気いっぱいですよ。', 'konnichiwa! kyou mo genki ippai desu yo.', 'Halo! Hari ini aku sangat bersemangat.', 'สวัสดี! วันนี้ฉันสดชื่นเต็มที่เลย'],
+      rescue: ['こんにちは！調子はいかがですか？', 'konnichiwa! choushi wa ikaga desu ka?', 'Halo! Bagaimana kabarmu?', 'สวัสดี! คุณสบายดีไหมวันนี้?'],
+    },
+    statement: {
+      easy: ['なるほど、よく分かります！', 'naruhodo, yoku wakarimasu!', 'Begitu rupanya, aku sangat paham!', 'อย่างนี้นี่เอง เข้าใจแจ่มแจ้งเลย!'],
+      mission: ['それは面白い視点ですね。とても勉強になります。', 'sore wa omoshiroi shiten desu ne. totemo benkyou ni narimasu.', 'Itu sudut pandang yang menarik, banyak belajar darinya.', 'เป็นมุมมองที่น่าสนใจมาก ได้ความรู้เพิ่มขึ้นเลย'],
+      rescue: ['そうなんですか？ぜひもっと詳しく聞かせてください。', 'sou nan desu ka? zehi motto kuwashiku kikasete kudasai.', 'Begitukah? Tolong ceritakan lebih detail lagi.', 'อย่างนั้นเหรอ? ช่วยเล่ารายละเอียดให้ฟังหน่อยได้ไหม?'],
+    },
   };
-  const tpl = (params.targetLang === 'ja' ? JA : EN)[intent];
-  const meta: Array<{ tier: 'easy' | 'mission' | 'rescue'; badgeId: string; badgeTh: string; row: [string, string, string] }> = [
+
+  const ZH: Record<CopilotSpeechAct, Tpl> = {
+    echo_redemption: {
+      easy: [echo, echo, `Ulangi: “${echo}”`, `พูดตาม: “${echo}”`],
+      mission: [`${echo}，对吧？`, `${echo}, duì ba?`, `Mengerti: “${echo}”`, `เข้าใจแล้ว: “${echo}”`],
+      rescue: [`${echo}。我读得对吗？`, `${echo}. Wǒ dú de duì ma?`, `“${echo}”. Apakah pengucapanku sudah benar?`, `“${echo}” ฉันอ่านถูกต้องไหม?`],
+    },
+    invitation: {
+      easy: ['好啊，我们一起去吧！', 'Hǎo a, wǒmen yīqǐ qù ba!', 'Boleh, ayo kita pergi sama-sama!', 'ดีเลย ไปด้วยกันเถอะ!'],
+      mission: ['太好了！我这几天正好有空呢。', 'Tài hǎo le! Wǒ zhè jǐ tiān zhènghǎo yǒu kòng ne.', 'Bagus sekali! Beberapa hari ini aku lagi luang.', 'ยอดไปเลย! ช่วงสองสามวันนี้ฉันว่างพอดี'],
+      rescue: ['好主意！你打算什么时候去呢？', 'Hǎo zhǔyì! Nǐ dǎsuàn shénme shíhòu qù ne?', 'Ide bagus! Kamu rencana kapan perginya?', 'ความคิดดีเลย! คุณตั้งใจจะไปตอนไหนเหรอ?'],
+    },
+    choice: {
+      easy: [optA ? `我要${optA}，谢谢。` : '我选第一个吧。', optA ? `Wǒ yào ${optA}, xièxie.` : 'Wǒ xuǎn dì yī gè ba.', optA ? `Saya mau ${optA}, terima kasih.` : 'Saya pilih yang pertama saja.', optA ? `ขอเป็น${optA} ขอบคุณครับ/ค่ะ` : 'ขอเลือกอันแรกครับ/ค่ะ'],
+      mission: [optA ? `我更喜欢${optA}，感觉味道很不错。` : '我选第一个，感觉挺好的。', optA ? `Wǒ gèng xǐhuān ${optA}, gǎnjué wèidào hěn bùcuò.` : 'Wǒ xuǎn dì yī gè, gǎnjué tǐng hǎo de.', optA ? `Aku lebih suka ${optA}, rasanya enak.` : 'Aku pilih yang pertama, rasanya oke.', optA ? `ฉันชอบ${optA}มากกว่า รู้สึกว่ารสชาติดีเลย` : 'ฉันเลือกอันแรก รู้สึกว่าน่าจะดี'],
+      rescue: ['这两个都不错，你平时更喜欢哪一个？', 'Zhè liǎng gè dōu bùcuò, nǐ píngshí gèng xǐhuān nǎ yī gè?', 'Dua-duanya oke, kamu biasanya lebih suka yang mana?', 'ทั้งสองอย่างดูดีทั้งคู่เลย คุณชอบอันไหนมากกว่าเหรอ?'],
+    },
+    wh_how_long: {
+      easy: ['大概有两年左右了。', 'Dàgài yǒu liǎng nián zuǒyòu le.', 'Kira-kira sudah dua tahun.', 'ประมาณสองปีแล้วครับ/ค่ะ'],
+      mission: ['我已经学了大概两年了，感觉挺有收获的。', 'Wǒ yǐjīng xué le dàgài liǎng nián le, gǎnjué tǐng yǒu shōuhuò de.', 'Aku sudah belajar sekitar dua tahun, terasa banyak hasilnya.', 'ฉันเรียนมาประมาณสองปีแล้ว รู้สึกว่าได้อะไรเยอะเลย'],
+      rescue: ['差不多两年了。你接触这个有多长时间了？', 'Chàbùduō liǎng nián le. Nǐ jiēchù zhè gè yǒu duō cháng shíjiān le?', 'Kurang lebih dua tahun. Kamu sudah berapa lama berkecimpung di hal ini?', 'เกือบสองปีแล้ว แล้วคุณสัมผัสกับสิ่งนี้มานานแค่ไหนแล้วเหรอ?'],
+    },
+    wh_how_often: {
+      easy: ['大概一周两三次吧。', 'Dàgài yī zhōu liǎng sān cì ba.', 'Kira-kira seminggu dua atau tiga kali.', 'ประมาณสัปดาห์ละสองถึงสามครั้งครับ/ค่ะ'],
+      mission: ['我一般一周去两到三次，尽量保持习惯。', 'Wǒ yībān yī zhōu qù liǎng dào sān cì, jǐnliàng bǎochí xíguàn.', 'Biasanya seminggu 2-3 kali, menjaga kebiasaan.', 'ปกติฉันพยายามไปสัปดาห์ละสองถึงสามครั้งเพื่อรักษาความเคยชิน'],
+      rescue: ['差不多一周两三次。你一般多久去一次？', 'Chàbùduō yī zhōu liǎng sān cì. Nǐ yībān duōjiǔ qù yī cì?', 'Sekitar seminggu 2-3 kali. Kamu biasanya seberapa sering?', 'ประมาณสัปดาห์ละสองถึงสามครั้ง แล้วคุณไปบ่อยแค่ไหนเหรอ?'],
+    },
+    wh_how_many: {
+      easy: ['大概两三个左右。', 'Dàgài liǎng sān gè zuǒyòu.', 'Kira-kira dua atau tiga buah.', 'ประมาณสองหรือสามอันครับ/ค่ะ'],
+      mission: ['一般准备两三个就差不多够用了。', 'Yībān zhǔnbèi liǎng sān gè jiù chàbùduō gòuyòng le.', 'Biasanya siapkan 2-3 buah sudah cukup.', 'ปกติเตรียมไว้สองถึงสามอันก็เพียงพอแล้ว'],
+      rescue: ['大概两三个吧。你一般需要多少？', 'Dàgài liǎng sān gè ba. Nǐ yībān xūyào duōshǎo?', 'Kira-kira dua atau tiga. Kamu biasanya perlu berapa?', 'ประมาณสองถึงสามอัน แล้วปกติคุณต้องใช้เท่าไหร่เหรอ?'],
+    },
+    wh_how_feel_day: {
+      easy: ['我今天过得挺充实的，谢谢！', 'Wǒ jīntiān guò de tǐng chōngshí de, xièxie!', 'Hariku sangat memuaskan, terima kasih!', 'วันนี้ของฉันรู้สึกมีคุณค่ามาก ขอบคุณนะ!'],
+      mission: ['今天稍微有点忙，不过整体挺顺利的。', 'Jīntiān shāowēi yǒudiǎn máng, bùguò zhěngtǐ tǐng shùnlì de.', 'Hari ini agak sibuk, tapi keseluruhannya lancar.', 'วันนี้ค่อนข้างยุ่งนิดหน่อย แต่โดยรวมราบรื่นดีมาก'],
+      rescue: ['挺好的！你今天过得怎么样？', 'Tǐng hǎo de! Nǐ jīntiān guò de zěnmeyàng?', 'Cukup baik! Bagaimana harimu hari ini?', 'ดีมากเลย! แล้ววันนี้ของคุณเป็นอย่างไรบ้าง?'],
+    },
+    wh_how_method: {
+      easy: ['我平时坐地铁去，挺方便的。', 'Wǒ píngshí zuò dìtiě qù, tǐng fāngbiàn de.', 'Biasanya naik kereta bawah tanah, praktis sekali.', 'ปกติฉันนั่งรถไฟใต้ดินไป สะดวกมากเลย'],
+      mission: ['我一般坐地铁，大概二十分钟就能到。', 'Wǒ yībān zuò dìtiě, dàgài èrshí fēnzhōng jiù néng dào.', 'Biasanya naik kereta bawah tanah, sekitar 20 menit sampai.', 'ปกติฉันนั่งรถไฟใต้ดิน ประมาณยี่สิบนาทีก็ถึงแล้ว'],
+      rescue: ['我坐地铁去。你平时是怎么过去的？', 'Wǒ zuò dìtiě qù. Nǐ píngshí shì zěnme guòqù de?', 'Naik kereta bawah tanah. Kamu sendiri biasanya ke sana naik apa?', 'ฉันนั่งรถไฟใต้ดินไป แล้วปกติคุณเดินทางไปอย่างไรเหรอ?'],
+    },
+    wh_where_origin: {
+      easy: ['我来自印度尼西亚。', 'Wǒ láizì Yìndùníxīyà.', 'Saya berasal dari Indonesia.', 'ฉันมาจากประเทศอินโดนีเซีย'],
+      mission: ['我是在印度尼西亚出生长大的。', 'Wǒ shì zài Yìndùníxīyà chūshēng zhǎngdà de.', 'Saya lahir dan besar di Indonesia.', 'ฉันเกิดและเติบโตที่ประเทศอินโดนีเซีย'],
+      rescue: ['我是印尼人。你以前去过那里吗？', 'Wǒ shì Yìnní rén. Nǐ yǐqián qù guò nàlǐ ma?', 'Saya orang Indonesia. Apakah kamu pernah ke sana sebelumnya?', 'ฉันเป็นคนอินโดนีเซีย คุณเคยไปที่นั่นมาก่อนไหม?'],
+    },
+    wh_where_action: {
+      easy: ['我平时常去家附近的一家小店。', 'Wǒ píngshí cháng qù jiā fùjìn de yī jiā xiǎodiàn.', 'Biasanya ke toko kecil dekat rumah.', 'ปกติฉันชอบไปร้านเล็กๆ แถวบ้าน'],
+      mission: ['我喜欢去市中心一家挺舒服的咖啡馆坐坐。', 'Wǒ xǐhuān qù shì zhōngxīn yī jiā tǐng shūfú de kāfēiguǎn zuòzuò.', 'Aku suka duduk di kafe nyaman di pusat kota.', 'ฉันชอบไปนั่งคาเฟ่สบายๆ แถวใจกลางเมือง'],
+      rescue: ['就在我家附近。你平时最喜欢去哪里？', 'Jiù zài wǒ jiā fùjìn. Nǐ píngshí zuì xǐhuān qù nǎlǐ?', 'Di dekat rumahku. Kamu sendiri paling suka ke mana?', 'อยู่ใกล้บ้านฉันเลย แล้วปกติคุณชอบไปที่ไหนที่สุดเหรอ?'],
+    },
+    wh_what_food: {
+      easy: ['我要一杯热咖啡，谢谢。', 'Wǒ yào yī bēi rè kāfēi, xièxie.', 'Saya mau secangkir kopi panas, terima kasih.', 'ขอเป็นกาแฟร้อนหนึ่งแก้ว ขอบคุณครับ/ค่ะ'],
+      mission: ['我要一杯冰拿铁，少糖少冰，谢谢。', 'Wǒ yào yī bēi bīng nátiě, shǎo táng shǎo bīng, xièxie.', 'Saya mau es latte, sedikit gula sedikit es, terima kasih.', 'ขอลาเต้เย็น หวานน้อยน้ำแข็งน้อย ขอบคุณครับ/ค่ะ'],
+      rescue: ['我点一杯冰拿铁。你们这里最受欢迎的是什么？', 'Wǒ diǎn yī bēi bīng nátiě. Nǐmen zhèlǐ zuì shòu huānyíng de shì shénme?', 'Aku pesan es latte. Yang paling laris di sini apa ya?', 'ฉันสั่งลาเต้เย็นแก้วหนึ่ง แล้วที่นี่อะไรขายดีที่สุดเหรอ?'],
+    },
+    wh_what_general: {
+      easy: [topic ? `我挺喜欢${topic}的。` : '我挺喜欢学新东西的。', topic ? `Wǒ tǐng xǐhuān ${topic} de.` : 'Wǒ tǐng xǐhuān xué xīn dōngxi de.', topic ? `Aku suka sekali ${topic}.` : 'Aku suka belajar hal baru.', topic ? `ฉันชอบ${topic}มากเลย` : 'ฉันชอบเรียนรู้สิ่งใหม่ๆ'],
+      mission: [topic ? `我最喜欢的就是${topic}，能让我放松下来。` : '平时最喜欢练练口语，很有成就感。', topic ? `Wǒ zuì xǐhuān de jiù shì ${topic}, néng ràng wǒ fàngsōng xiàlái.` : 'Píngshí zuì xǐhuān liànlian kǒuyǔ, hěn yǒu chéngjiùgǎn.', topic ? `Yang paling kusuka adalah ${topic}, bisa bikin rileks.` : 'Paling suka melatih percakapan, sangat memuaskan.', topic ? `สิ่งที่ฉันชอบที่สุดคือ${topic} เพราะทำให้ผ่อนคลาย` : 'ปกติชอบฝึกสนทนา รู้สึกว่าคุ้มค่ามากเลย'],
+      rescue: ['这个挺有意思的。你平时最推荐什么？', 'Zhè gè tǐng yǒu yìsi de. Nǐ píngshí zuì tuījiàn shénme?', 'Menarik ya. Kalau kamu paling rekomendasikan apa?', 'น่าสนใจดีจัง แล้วปกติคุณแนะนำอะไรที่สุดเหรอ?'],
+    },
+    wh_why: {
+      easy: ['因为这样能锻炼我的口语表达能力。', 'Yīnwèi zhèyàng néng duànliàn wǒ de kǒuyǔ biǎodá nénglì.', 'Karena ini melatih kemampuan bicaraku.', 'เพราะช่วยให้ฉันฝึกทักษะการพูดได้ดีขึ้น'],
+      mission: ['因为我想更自然地跟不同国家的人交流。', 'Yīnwèi wǒ xiǎng gèng zìrán de gēn bùtóng guójiā de rén jiāoliú.', 'Karena ingin bisa ngobrol natural dengan orang berbagai negara.', 'เพราะฉันอยากพูดคุยกับผู้คนจากประเทศต่างๆ ได้อย่างเป็นธรรมชาติ'],
+      rescue: ['因为这对我的未来很有帮助。你为什么这么问呢？', 'Yīnwèi zhè duì wǒ de wèilái hěn yǒu bāngzhù. Nǐ wèishénme zhème wèn ne?', 'Karena ini sangat membantu masa depanku. Kenapa kamu bertanya?', 'เพราะมันมีประโยชน์มากต่ออนาคตของฉัน ทำไมคุณถึงถามเหรอ?'],
+    },
+    wh_when: {
+      easy: ['一般是下班之后的晚上。', 'Yībān shì xiàbān zhīhòu de wǎnshàng.', 'Biasanya malam hari setelah jam kerja.', 'ปกติช่วงค่ำหลังเลิกงานครับ/ค่ะ'],
+      mission: ['我更喜欢周末有空的时候静下心来做。', 'Wǒ gèng xǐhuān zhōumò yǒu kòng de shíhòu jìng xià xīn lái zuò.', 'Lebih suka saat senggang di akhir pekan.', 'ฉันชอบทำช่วงวันหยุดสุดสัปดาห์ตอนมีเวลาว่าง'],
+      rescue: ['大多数是在周末。你一般什么时候最方便？', 'Dàduōshù shì zài zhōumò. Nǐ yībān shénme shíhòu zuì fāngbiàn?', 'Kebanyakan saat akhir pekan. Kamu sendiri kapan paling senggang?', 'ส่วนใหญ่จะเป็นช่วงวันหยุด แล้วคุณสะดวกช่วงไหนที่สุดเหรอ?'],
+    },
+    wh_who: {
+      easy: ['一般是和朋友或者同学一起。', 'Yībān shì hé péngyǒu huòzhě tóngxué yīqǐ.', 'Biasanya bersama teman atau rekan sekelas.', 'ปกติไปกับเพื่อนหรือเพื่อนร่วมชั้นครับ/ค่ะ'],
+      mission: ['我经常和学校里关系挺好的朋友一块儿去。', 'Wǒ jīngcháng hé xuéxiào lǐ guānxì tǐng hǎo de péngyǒu yīkuàir qù.', 'Sering pergi dengan kawan akrab di sekolah.', 'ฉันมักจะไปกับเพื่อนสนิทที่โรงเรียน'],
+      rescue: ['和我最好的朋友一起。你平时一般跟谁在一起？', 'Hé wǒ zuì hǎo de péngyǒu yīqǐ. Nǐ píngshí yībān gēn shéi zài yīqǐ?', 'Bersama sahabat terbaikku. Kamu sendiri biasanya kumpul sama siapa?', 'ไปกับเพื่อนสนิท แล้วปกติคุณชอบอยู่กับใครเหรอ?'],
+    },
+    yesno_are: {
+      easy: ['是的，确实是这样。', 'Shì de, quèshí shì zhèyàng.', 'Ya, memang begitu.', 'ใช่ เป็นอย่างนั้นจริงๆ ครับ/ค่ะ'],
+      mission: ['是的，目前一切都挺顺利的。', 'Shì de, mùqián yīqiè dōu tǐng shùnlì de.', 'Ya, saat ini semuanya berjalan lancar.', 'ใช่ ตอนนี้ทุกอย่างราบรื่นดีเลย'],
+      rescue: ['是的！你今天也过得挺顺心的吗？', 'Shì de! Nǐ jīntiān yě guò de tǐng shùnxīn de ma?', 'Ya! Apakah harimu hari ini juga lancar menyenangkan?', 'ใช่เลย! วันนี้ของคุณราบรื่นดีเหมือนกันไหม?'],
+    },
+    yesno_can: {
+      easy: ['没问题，我可以做到。', 'Méi wèntí, wǒ kěyǐ zuò dào.', 'Tidak masalah, saya bisa melakukannya.', 'ไม่มีปัญหา ฉันทำได้ครับ/ค่ะ'],
+      mission: ['可以的，我之前稍微练习过这个。', 'Kěyǐ de, wǒ zhīqián shāowēi liànxí guò zhè gè.', 'Bisa kok, sebelumnya saya sudah sempat melatih ini.', 'ทำได้นะ ก่อนหน้านี้ฉันเคยฝึกเรื่องนี้มาบ้าง'],
+      rescue: ['我想我可以！你有什么好建议吗？', 'Wǒ xiǎng wǒ kěyǐ! Nǐ yǒu shénme hǎo jiànyì ma?', 'Kurasa bisa! Kamu punya saran yang bagus?', 'ฉันคิดว่าทำได้นะ! คุณมีคำแนะนำดีๆ บ้างไหม?'],
+    },
+    yesno_have: {
+      easy: ['有的，我之前尝试过。', 'Yǒu de, wǒ zhīqián chángshì guò.', 'Pernah, saya sudah pernah mencobanya.', 'เคยครับ/ค่ะ ฉันเคยลองมาก่อนแล้ว'],
+      mission: ['有的，我之前去过一次，感觉印象很深。', 'Yǒu de, wǒ zhīqián qù guò yī cì, gǎnjué yìnxiàng hěn shēn.', 'Pernah, dulu pernah ke sana sekali dan sangat berkesan.', 'เคยนะ ฉันเคยไปครั้งหนึ่ง รู้สึกประทับใจมาก'],
+      rescue: ['去过一次呢。你之前有去体验过吗？', 'Qù guò yī cì ne. Nǐ zhīqián yǒu qù tǐyàn guò ma?', 'Pernah sekali. Kamu sebelumnya sudah pernah mengalaminya?', 'เคยไปครั้งหนึ่ง แล้วก่อนหน้านี้คุณเคยไปสัมผัสดูไหม?'],
+    },
+    yesno_did: {
+      easy: ['是的，我最近刚去过。', 'Shì de, wǒ zuìjìn gāng qù guò.', 'Ya, saya baru saja pergi baru-baru ini.', 'ใช่ ฉันเพิ่งไปมาเมื่อเร็วๆ นี้เองครับ/ค่ะ'],
+      mission: ['对呀，我上周去了一趟，感觉特别棒。', 'Duì ya, wǒ shàng zhōu qù le yī tàng, gǎnjué tèbié bàng.', 'Betul, saya pergi minggu lalu dan rasanya mantap sekali.', 'ใช่เลย สัปดาห์ก่อนฉันไปมา รู้สึกสุดยอดมาก'],
+      rescue: ['是的！你上周末过得也挺精彩吗？', 'Shì de! Nǐ shàng zhōumò guò de yě tǐng jīngcǎi ma?', 'Ya! Apakah akhir pekanmu juga seru?', 'ใช่เลย! แล้วสุดสัปดาห์ที่ผ่านมาของคุณสนุกสนานดีเหมือนกันไหม?'],
+    },
+    yesno_would: {
+      easy: ['好的，我非常愿意。', 'Hǎo de, wǒ fēicháng yuànyì.', 'Baik, saya sangat bersedia.', 'ดีเลย ฉันยินดีเป็นอย่างยิ่งครับ/ค่ะ'],
+      mission: ['太好了，听起来是一个非常好的提议。', 'Tài hǎo le, tīng qǐlái shì yī gè fēicháng hǎo de tíyì.', 'Mantap, kedengarannya usulan yang sangat bagus.', 'ยอดไปเลย ฟังดูเป็นข้อเสนอที่ยอดเยี่ยมมาก'],
+      rescue: ['我挺乐意的！那个时间你方便吗？', 'Wǒ tǐng lèyì de! Nà gè shíjiān nǐ fāngbiàn ma?', 'Saya senang sekali! Apakah di waktu itu kamu senggang?', 'ฉันยินดีเลยนะ! แล้วเวลานั้นคุณสะดวกไหม?'],
+    },
+    yesno_do: {
+      easy: ['是的，我挺喜欢的。', 'Shì de, wǒ tǐng xǐhuān de.', 'Ya, saya menyukainya.', 'ใช่ ฉันชอบสิ่งนี้ครับ/ค่ะ'],
+      mission: [topic ? `是的，我非常喜欢${topic}。` : '是的，我觉得这非常有意思。', topic ? `Shì de, wǒ fēicháng xǐhuān ${topic}.` : 'Shì de, wǒ juéde zhè fēicháng yǒu yìsi.', topic ? `Ya, saya sangat suka ${topic}.` : 'Ya, kurasa ini sangat menarik.', topic ? `ใช่ ฉันชอบ${topic}มากเลย` : 'ใช่ ฉันคิดว่าสิ่งนี้น่าสนใจมาก'],
+      rescue: ['是的！你平时也喜欢这个吗？', 'Shì de! Nǐ píngshí yě xǐhuān zhè gè ma?', 'Ya! Kamu sendiri biasanya suka ini juga?', 'ใช่เลย! แล้วปกติคุณชอบสิ่งนี้เหมือนกันไหม?'],
+    },
+    greeting: {
+      easy: ['你好！今天很高兴跟你聊天。', 'Nǐ hǎo! Jīntiān hěn gāoxìng gēn nǐ liáotiān.', 'Halo! Senang bisa mengobrol denganmu hari ini.', 'สวัสดี! วันนี้ยินดีที่ได้คุยกับคุณนะ'],
+      mission: ['你好呀！我今天状态挺不错的，准备好练习了。', 'Nǐ hǎo ya! Wǒ jīntiān zhuàngtài tǐng bùcuò de, zhǔnbèi hǎo liànxí le.', 'Halo! Keadaanku prima hari ini, siap berlatih.', 'สวัสดี! วันนี้ฉันรู้สึกดีมาก พร้อมฝึกแล้ว'],
+      rescue: ['你好！你今天过得怎么样？', 'Nǐ hǎo! Nǐ jīntiān guò de zěnmeyàng?', 'Halo! Bagaimana kabarmu hari ini?', 'สวัสดี! วันนี้ของคุณเป็นอย่างไรบ้าง?'],
+    },
+    statement: {
+      easy: ['原来是这样，确实很有道理！', 'Yuánlái shì zhèyàng, quèshí hěn yǒu dàolǐ!', 'Begitu rupanya, memang sangat masuk akal!', 'อย่างนี้นี่เอง ฟังดูสมเหตุสมผลจริงๆ!'],
+      mission: ['这个观点挺有意思的，我之前还真没这么想过。', 'Zhè gè guāndiǎn tǐng yǒu yìsi de, wǒ zhīqián hái zhēn méi zhème xiǎng guò.', 'Sudut pandang yang menarik, saya belum pernah terpikir begitu.', 'มุมมองนี้น่าสนใจมาก ฉันไม่เคยคิดแบบนี้มาก่อนเลย'],
+      rescue: ['真的吗？能跟我多分享一些细节吗？', 'Zhēn de ma? Néng gēn wǒ duō fēnxiǎng yīxiē xìjié ma?', 'Benarkah? Bisakah berbagi lebih banyak detail denganku?', 'จริงเหรอ? คุณช่วยเล่ารายละเอียดเพิ่มเติมให้ฟังหน่อยได้ไหม?'],
+    },
+  };
+
+  const table = params.targetLang === 'ja' ? JA : params.targetLang === 'zh' ? ZH : EN;
+  const tpl = table[act] || table.statement;
+
+  const meta: Array<{
+    tier: 'easy' | 'mission' | 'rescue';
+    badgeId: string;
+    badgeTh: string;
+    row: CardRow;
+  }> = [
     { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย', row: tpl.easy },
     { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ', row: tpl.mission },
     { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ', row: tpl.rescue },
   ];
+
   const stamp = Date.now();
   return meta.map((m, i) => ({
     id: `fb_ctx_${stamp}_${i}`,
@@ -470,7 +1115,7 @@ export function buildContextualFallbackCards(params: {
     text: m.row[0],
     pronunciation: m.row[1],
     hintId: m.row[2],
-    hintTh: th ? m.row[2] : m.row[2],
+    hintTh: th ? m.row[3] : m.row[2],
     isRealtimeAi: false,
     isOfflineFallback: true,
     wordBreakdown: [],
@@ -963,12 +1608,25 @@ export function evaluateUtteranceClientSide(params: {
         lower
       );
 
+    const isAffirmationEn =
+      /^(yes|no|sure|ok|okay|hi|hello|yep|nope|thanks|thank you|of course|why not|me too|i agree|hot coffee|iced coffee|iced tea|black coffee)[.!?]?$/i.test(
+        lower
+      ) ||
+      /^(yes please|no thank you|sounds great|sounds good|not really|not yet|hot coffee, please|hot coffee please|iced latte please|iced latte, please)[.!?]?$/i.test(
+        lower
+      ) ||
+      /\b(coffee|tea|latte|water|espresso)\s*,?\s*please\b/i.test(lower);
+
     const hasFiniteVerbOrGreeting =
-      /\b(am|is|are|was|were|be|been|have|has|had|do|does|did|will|would|could|should|can|may|might|must|like|love|prefer|want|need|live|stay|work|study|go|went|come|came|eat|ate|drink|drank|buy|bought|visit|visited|meet|met|see|saw|read|think|believe|agree|disagree|feel|felt|save|saves|help|helps|make|makes|take|took|order|have|had|hello|hi|good\s+morning|good\s+afternoon|thank\s+you|thanks|yes|sure)\b/i.test(
+      isAffirmationEn ||
+      /\b(am|is|are|was|were|be|been|have|has|had|do|does|did|will|would|could|should|can|may|might|must|like|love|prefer|want|need|live|stay|work|study|go|went|come|came|eat|ate|drink|drank|buy|bought|visit|visited|meet|met|see|saw|read|think|believe|agree|disagree|feel|felt|save|saves|help|helps|make|makes|take|took|order|have|had|hello|hi|good\s+morning|good\s+afternoon|thank\s+you|thanks|yes|sure|please|sounds|great|fine)\b/i.test(
         lower
       ) || /\b(i'd|i'm|i'll|we're|we've|it's|that's|there's|don't|doesn't|didn't)\b/i.test(lower);
 
     const hasScenarioRelevance = (() => {
+      if (isAffirmationEn) {
+        return true;
+      }
       if (scenarioId.includes('free')) {
         return true;
       }
@@ -1024,7 +1682,7 @@ export function evaluateUtteranceClientSide(params: {
     }
 
     const wordCount = exact.split(/\s+/).filter(Boolean).length;
-    const isTooShort = wordCount < 3;
+    const isTooShort = wordCount < 2 && !isAffirmationEn;
     const isOffTopicOrGibberish = !hasFiniteVerbOrGreeting || !hasScenarioRelevance;
 
     if (
@@ -1268,7 +1926,13 @@ export function evaluateUtteranceClientSide(params: {
       exact
     );
 
+  const isAffirmationJa =
+    /^(はい|ええ|うん|いいえ|大丈夫|了解|そうですね|そう|そうです|ホットで|アイスで|水で|コーヒーで|お茶で|ラテで)[。！？!?]?$/u.test(
+      exact
+    );
+
   const lacksPoliteEnding =
+    !isAffirmationJa &&
     !scenarioId.includes('free') &&
     exact.length > 4 &&
     !/(です|ます|ました|ません|ください|ませんか|でしょうか|ですか|お願いします|ありがとう|ありがとうございます|こんにちは|こんばんは|お疲れ様です|はい|ええ)[。！？!?]?$/u.test(
@@ -1277,18 +1941,19 @@ export function evaluateUtteranceClientSide(params: {
     !/\b(desu|masu|mashita|masen|kudasai|onegaishimasu|arigatou|arigato|hai)\b/i.test(lower);
 
   const isGibberishJa =
-    /^(あいうえお|かきくけこ|さしすせそ|たちつてと|なにぬねの|あ+|い+|う+|え+|お+|テスト)(です|ます)?[。！？!?]?$/u.test(
+    !isAffirmationJa &&
+    (/^(あいうえお|かきくけこ|さしすせそ|たちつてと|なにぬねの|あ+|い+|う+|え+|お+|テスト)(です|ます)?[。！？!?]?$/u.test(
       exact
     ) ||
     (!scenarioId.includes('free') &&
-      !/(コーヒー|紅茶|お茶|水|ラテ|ケーキ|パン|メニュー|店内|持ち帰り|一つ|二つ|お願い|ください|いくら|おすすめ|カード|現金|テスト|試験|勉強|文法|漢字|言葉|宿題|先生|先輩|一緒|図書館|質問|どう|いい|大丈夫|はい|ありがとう|すみません|こんにちは|お疲れ様)/u.test(
+      !/(コーヒー|紅茶|お茶|水|ラテ|ケーキ|パン|メニュー|店内|持ち帰り|ホット|アイス|一つ|二つ|お願い|ください|いくら|おすすめ|カード|現金|テスト|試験|勉強|文法|漢字|言葉|宿題|先生|先輩|一緒|図書館|質問|どう|いい|大丈夫|はい|ありがとう|すみません|こんにちは|お疲れ様)/u.test(
         exact
       ) &&
       !/\b(kohi|koohii|keki|kudasai|onegaishimasu|tesuto|benkyou|benkyo|sensei|senpai|hai|arigato)\b/i.test(
         lower
-      ));
+      )));
 
-  const isTooShortJa = exact.length < 4;
+  const isTooShortJa = exact.length < 3 && !isAffirmationJa;
 
   if (
     hasVerbDictPlusDesu ||
@@ -1564,6 +2229,7 @@ export function replyLooksLikeTargetLanguage(text: string, targetLang: TargetLan
   const tx = String(text || '');
   if (!tx.trim() || /[\u0E00-\u0E7F]/.test(tx)) return false;
   if (targetLang === 'ja') return /[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
+  if (targetLang === 'zh') return /[\u4e00-\u9fff]/.test(tx) && !/[\u3040-\u30ff]/.test(tx);
   return /[A-Za-z]/.test(tx) && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
 }
 

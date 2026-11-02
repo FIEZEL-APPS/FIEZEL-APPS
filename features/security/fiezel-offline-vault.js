@@ -254,6 +254,21 @@
   }
 
   /**
+   * Read active PWA build marker (empty in headless Node unit tests)
+   */
+  function currentPageBuild() {
+    try {
+      if (typeof globalThis !== 'undefined' && globalThis.FIEZEL_PAGE_BUILD) {
+        return String(globalThis.FIEZEL_PAGE_BUILD).trim();
+      }
+      if (typeof self !== 'undefined' && self.FIEZEL_PAGE_BUILD) {
+        return String(self.FIEZEL_PAGE_BUILD).trim();
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  /**
    * Save plain bank data encrypted into local IndexedDB
    */
   async function saveBank(bankKey, plainData) {
@@ -263,6 +278,7 @@
       var record = {
         bankKey: String(bankKey).trim(),
         envelope: envelope,
+        build: currentPageBuild(),
         savedAt: Date.now()
       };
 
@@ -324,6 +340,17 @@
       }
 
       if (!record || !record.envelope) return null;
+      var activeBuild = currentPageBuild();
+      if (activeBuild && String(record.build || '') !== activeBuild) {
+        delete _memoryStore[bankKey];
+        if (db) {
+          try {
+            var delTx = db.transaction(STORE_NAME, 'readwrite');
+            delTx.objectStore(STORE_NAME).delete(bankKey);
+          } catch (_) {}
+        }
+        return null;
+      }
       return await decryptData(record.envelope);
     } catch (err) {
       console.warn('[FiezelOfflineVault] Failed to decrypt bank from vault:', err.message);
@@ -346,6 +373,43 @@
       return await decryptData(data);
     }
     return data;
+  }
+
+  /**
+   * Purge only records whose stamped build differs from keepBuild (or currentPageBuild()),
+   * preserving records freshly saved during the current build's boot load().
+   */
+  async function purgeStaleBuilds(keepBuild) {
+    var targetBuild = String(keepBuild || currentPageBuild() || '').trim();
+    if (!targetBuild) return clearVault();
+    Object.keys(_memoryStore).forEach(function (k) {
+      var rec = _memoryStore[k];
+      if (!rec || String(rec.build || '') !== targetBuild) {
+        delete _memoryStore[k];
+      }
+    });
+    var db = await openDatabase();
+    if (!db) return true;
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction(STORE_NAME, 'readwrite');
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.openCursor();
+        req.onsuccess = function (e) {
+          var cursor = e && e.target ? e.target.result : null;
+          if (!cursor) return;
+          var val = cursor.value;
+          if (!val || String(val.build || '') !== targetBuild) {
+            try { cursor.delete(); } catch (_) {}
+          }
+          cursor.continue();
+        };
+        tx.oncomplete = function () { resolve(true); };
+        tx.onerror = function () { resolve(false); };
+      } catch (_) {
+        resolve(false);
+      }
+    });
   }
 
   /**
@@ -375,6 +439,7 @@
     getBank: getBank,
     isEncryptedPayload: isEncryptedPayload,
     decryptIfEncrypted: decryptIfEncrypted,
+    purgeStaleBuilds: purgeStaleBuilds,
     clearVault: clearVault,
     setDynamicSessionKey: setDynamicSessionKey,
     getDynamicSessionKey: getDynamicSessionKey,

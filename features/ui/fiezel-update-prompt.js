@@ -85,7 +85,11 @@
     // Mengganti href ke URL bernomor versi/timestamp memaksa WebKit merobohkan memory cache lama
     // dan meminta dokumen baru ke Service Worker yang baru aktif.
     var bustParam = 'fz_upd=' + Date.now();
-    var curSearch = location.search ? (location.search + '&' + bustParam) : ('?' + bustParam);
+    var cleanPairs = String(location.search || '').replace(/^\?/, '').split('&').filter(function (part) {
+      return part && !/^(?:fz_upd|fz_healed|__fz_fresh)=/i.test(part);
+    });
+    cleanPairs.push(bustParam);
+    var curSearch = '?' + cleanPairs.join('&');
     var targetUrl = window.location.origin + window.location.pathname + curSearch + window.location.hash;
     try {
       if (typeof window !== 'undefined' && window.location && window.location.href) {
@@ -159,6 +163,11 @@
    * Aset suara neural (/vendor/) tetap dijaga agar unduhan 152 MB tidak terbuang. */
   function purgeStaleCaches() {
     var includeCurrentShell = !!arguments[0];
+    try {
+      if (self.FiezelOfflineVault && typeof self.FiezelOfflineVault.clearVault === 'function') {
+        self.FiezelOfflineVault.clearVault();
+      }
+    } catch (_) {}
     if (typeof caches === 'undefined' || !caches.keys) return Promise.resolve();
     return caches.keys().then(function (names) {
       var target = bestBuild || '';
@@ -221,14 +230,17 @@
     setSess('fiezel-apply-update', '1');
     if (bestBuild) setSess('fiezel-target-build', bestBuild);
     var proceed = function () {
+      var finishing = false;
       var triggerWorker = function (w) {
         if (!w || typeof w.postMessage !== 'function') return false;
         try { w.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); return true; } catch (_) { return false; }
       };
 
-      var finishReload = function () {
+      var finishReload = function (dropActiveShell) {
+        if (finishing) return;
+        finishing = true;
         try {
-          var pClean = purgeStaleCaches(true);
+          var pClean = purgeStaleCaches(!!dropActiveShell);
           if (pClean && typeof pClean.then === 'function') {
             pClean.then(reloadIfApproved).catch(reloadIfApproved);
             return;
@@ -240,15 +252,32 @@
       var promoteWorker = function (w) {
         if (!w) return false;
         if (w.state === 'activated') {
-          finishReload();
+          finishReload(true);
           return true;
         }
+        var postInstallTimer = 0;
+        var installCeilingTimer = 0;
+        var armActivationCeiling = function () {
+          if (postInstallTimer) return;
+          postInstallTimer = setTimeout(function () {
+            finishReload(w.state === 'activated');
+          }, 4500);
+        };
         var onState = function () {
           if (w.state === 'installed') {
+            if (installCeilingTimer) { clearTimeout(installCeilingTimer); installCeilingTimer = 0; }
             triggerWorker(w);
+            armActivationCeiling();
           } else if (w.state === 'activated') {
+            if (installCeilingTimer) { clearTimeout(installCeilingTimer); installCeilingTimer = 0; }
+            if (postInstallTimer) { clearTimeout(postInstallTimer); postInstallTimer = 0; }
             if (typeof w.removeEventListener === 'function') w.removeEventListener('statechange', onState);
-            finishReload();
+            finishReload(true);
+          } else if (w.state === 'redundant') {
+            if (installCeilingTimer) { clearTimeout(installCeilingTimer); installCeilingTimer = 0; }
+            if (postInstallTimer) { clearTimeout(postInstallTimer); postInstallTimer = 0; }
+            if (typeof w.removeEventListener === 'function') w.removeEventListener('statechange', onState);
+            finishReload(false);
           }
         };
         if (typeof w.addEventListener === 'function') {
@@ -256,15 +285,22 @@
         }
         if (w.state === 'installed' || !w.state) {
           triggerWorker(w);
-          setTimeout(finishReload, 2200);
+          armActivationCeiling();
           return true;
         }
         if (w.state === 'installing') {
-          setTimeout(finishReload, 12000);
+          installCeilingTimer = setTimeout(function () {
+            if (w.state === 'installed') {
+              triggerWorker(w);
+              armActivationCeiling();
+            } else {
+              finishReload(w.state === 'activated');
+            }
+          }, 35000);
           return true;
         }
         triggerWorker(w);
-        setTimeout(finishReload, 2200);
+        armActivationCeiling();
         return true;
       };
 
@@ -275,7 +311,7 @@
       if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
         navigator.serviceWorker.getRegistration().then(function (reg) {
           if (!reg) {
-            finishReload();
+            finishReload(true);
             return;
           }
 
@@ -308,15 +344,15 @@
             }).catch(function () {});
           }
 
-          // Jaring pengaman: muat ulang setelah 5 detik jika tidak ada worker baru
+          // Jaring pengaman: muat ulang hanya jika setelah 6 detik tetap tidak ada worker baru
           setTimeout(function () {
-            if (!handled) finishReload();
-          }, 5000);
+            if (!handled && !(reg.waiting || reg.installing)) finishReload(false);
+          }, 6000);
         }).catch(function () {
-          finishReload();
+          finishReload(false);
         });
       } else {
-        finishReload();
+        finishReload(true);
       }
     };
     try {

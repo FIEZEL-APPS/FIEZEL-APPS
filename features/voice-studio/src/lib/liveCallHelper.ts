@@ -1,4 +1,4 @@
-import { toPhoneticRomaji, renderFuriganaHtml, stripEmojisAndEmotWords } from './japanesePhonetics';
+import { toPhoneticRomaji, renderFuriganaHtml, stripEmojisAndEmotWords } from './japanesePhonetics.js';
 
 export interface BeginnerReplyCard {
   id: string;

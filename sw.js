@@ -401,15 +401,19 @@ self.addEventListener('fetch',e=>{
     // Navigasi mandiri via SHELL_CACHE (ignoreSearch: true; sub-HTML mandiri tidak jatuh ke index.html).
     const cleanNavUrl=requestUrl.origin+requestUrl.pathname;
     const isSubHtml=/\/(call|misi|kurikulum|undercover|creator-report-dashboard|creator-report-setup)\.html$/i.test(requestUrl.pathname);
-    const isUpdateNav=requestUrl.searchParams.has('fz_upd')||requestUrl.searchParams.has('__fz_fresh');
+    const isUpdateNav=requestUrl.searchParams.has('fz_upd')||requestUrl.searchParams.has('__fz_fresh')||requestUrl.searchParams.has('fz_healed');
     const cangkang=()=>caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true})
       .then(c=>c||(requestUrl.search?caches.match(cleanNavUrl,{cacheName:SHELL_CACHE}):null))
       .then(c=>c||(isSubHtml?null:caches.match('./index.html',{cacheName:SHELL_CACHE})));
     const segarkan=fetch(new Request(e.request,{cache:'reload'})).then(r=>{
       if(r&&r.ok){
         const copy=r.clone();
-        const putKey=(requestUrl.search&&isSubHtml)?new Request(cleanNavUrl):e.request;
-        caches.open(SHELL_CACHE).then(cache=>cache.put(putKey,copy));
+        const copyIdx=(!isSubHtml&&isUpdateNav)?r.clone():null;
+        const putKey=(requestUrl.search&&(isSubHtml||isUpdateNav))?new Request(cleanNavUrl):e.request;
+        caches.open(SHELL_CACHE).then(cache=>{
+          cache.put(putKey,copy);
+          if(copyIdx)cache.put('./index.html',copyIdx).catch(()=>{});
+        });
       }
       return r;
     });
@@ -418,6 +422,7 @@ self.addEventListener('fetch',e=>{
       responsePromise=cangkang().then(c=>c||segarkan).catch(()=>halamanLuring());
     }else{
       // Navigasi pembaruan eksplisit (?fz_upd=...): jaringan WAJIB menang agar cangkang baru langsung terpasang.
+      try{e.waitUntil(ensureShellCoherence())}catch(_){}
       responsePromise=segarkan.catch(()=>cangkang()).then(c=>c||halamanLuring());
     }
   }else if(isNeuralAsset(e.request)){

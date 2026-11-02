@@ -460,6 +460,8 @@ jobs:
           node tests/anti-tamper-and-watermark-test.js
           node tests/offline-vault-and-lease-test.js
           node tests/security-hardening-85-test.js
+          node tests/progress-legacy-upgrade-gate-test.js
+          node tests/voice-copilot-relevance-gate-test.js
           node tests/contrast-test.js
           # Gerbang di atas dan di bawah baris ini semuanya membaca TEKS SUMBER dengan regex.
           # Itu sengaja - mereka murah dan berjalan di mana saja - tetapi ada satu kelas cacat

@@ -1174,7 +1174,11 @@ function loadState(key=activeStateStorageKey){
     const raw=JSON.parse(localStorage.getItem(key));
     const dasar=raw||defaultState;
     const lang=targetLangOfRaw(dasar);
-    if(lang==='en')return sanitizeState(dasar);
+    if(lang==='en'){
+      const bersihEn=sanitizeState(dasar);
+      bersihEn.preferences={...(bersihEn.preferences||{}),targetLang:'en'};
+      return bersihEn;
+    }
     const kunciProgres=progressStorageKey(key,lang);
     let progres=null;
     try{progres=JSON.parse(localStorage.getItem(kunciProgres))}catch(_){}
@@ -1248,7 +1252,18 @@ try{
   let targetCourse=null;
   try{targetCourse=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
   if((targetCourse==='ja'||targetCourse==='en')&&state?.preferences){
-    state.preferences.targetLang=targetCourse;
+    let dasar=null;
+    try{dasar=JSON.parse(localStorage.getItem(activeStateStorageKey))}catch(_){}
+    if(state.preferences.targetLang!==targetCourse||(dasar&&typeof dasar==='object'&&dasar.preferences?.targetLang!==targetCourse)){
+      if(dasar&&typeof dasar==='object'){
+        dasar.preferences={...(dasar.preferences||{}),targetLang:targetCourse};
+        try{localStorage.setItem(activeStateStorageKey,JSON.stringify(dasar))}catch(_){}
+        state=loadState(activeStateStorageKey);
+      }else{
+        state.preferences.targetLang=targetCourse;
+      }
+    }
+    try{syncTargetLangFamilyGraph?.(targetCourse)}catch(_){}
   }
 }catch(_){}
 stateReady=true;
@@ -1744,9 +1759,36 @@ function computeStateIntegrity(s){
     return "fz_sig_"+h.toString(16);
   }catch(_){return "";}
 }
+function parseHistoryTimestamp(v){
+  if(typeof v==='number'&&Number.isFinite(v)&&v>0)return Math.floor(v);
+  if(v instanceof Date){const t=v.getTime();return(Number.isFinite(t)&&t>0)?Math.floor(t):0}
+  if(typeof v==='string'&&v.trim()){
+    const asNum=Number(v);
+    if(Number.isFinite(asNum)&&asNum>0)return Math.floor(asNum);
+    const parsed=Date.parse(v);
+    if(Number.isFinite(parsed)&&parsed>0)return Math.floor(parsed);
+  }
+  return 0;
+}
+function normalizeHistoryRow(h){
+  if(!h||typeof h!=='object')return null;
+  const hasValidAt=typeof h.at==='number'&&Number.isFinite(h.at)&&h.at>0;
+  const hasBoolOk=typeof h.ok==='boolean';
+  const hasSkill=Boolean(h.skill||!h.lesson);
+  if(hasValidAt&&hasBoolOk&&hasSkill)return h;
+  const at=parseHistoryTimestamp(h.at)||parseHistoryTimestamp(h.timestamp);
+  const ok=hasBoolOk?h.ok:(typeof h.correct==='boolean'?h.correct:Boolean(h.ok));
+  const skill=String(h.skill||h.lesson||'').trim();
+  const next={...h,at,ok};
+  if(skill&&!next.skill)next.skill=skill;
+  if(skill&&!next.reviewKey)next.reviewKey=skill;
+  const target=String(h.target||h.item||h.id||skill||'').trim();
+  if(target&&!next.target)next.target=target;
+  return next;
+}
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},listening:raw?.listening||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',learningIntensity:['santai','teladan','rajin'].includes(String(rawPreferences.learningIntensity||''))?String(rawPreferences.learningIntensity):(defaultPreferences.learningIntensity||'santai'),selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),dailyRewards:raw?.dailyRewards&&typeof raw.dailyRewards==='object'?raw.dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},listening:raw?.listening||{},history:Array.isArray(raw?.history)?raw.history.map(normalizeHistoryRow).filter(Boolean):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory.filter(x=>x&&typeof x==='object'):[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory.filter(s=>s&&typeof s==='object'):[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',learningIntensity:['santai','teladan','rajin'].includes(String(rawPreferences.learningIntensity||''))?String(rawPreferences.learningIntensity):(defaultPreferences.learningIntensity||'santai'),selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),dailyRewards:raw?.dailyRewards&&typeof raw.dailyRewards==='object'?raw.dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},toursSeen:sanitizeToursSeen(raw?.toursSeen)};
   if(raw&&raw._integrity&&typeof computeStateIntegrity==="function"){
     const expectedSig=computeStateIntegrity(raw);
     if(raw._integrity!==expectedSig){
@@ -1774,6 +1816,10 @@ function sanitizeState(raw){
   }
   if(!Number.isFinite(next.totalAnswered)||next.totalAnswered<0)next.totalAnswered=0;
   if(!Number.isFinite(next.totalCorrect)||next.totalCorrect<0)next.totalCorrect=0;
+  if(next.totalCorrect===0&&next.history.length){
+    const healedCorrect=next.history.filter(h=>h&&h.ok===true).length;
+    if(healedCorrect>0)next.totalCorrect=healedCorrect;
+  }
   if(!Number.isFinite(next.totalTimeMs)||next.totalTimeMs<0)next.totalTimeMs=0;
   /* P0.3 State hygiene: pangkas riwayat pengerjaan yang lebih tua dari 90 hari bila tumpukan
      melebihi 500 butir, dengan jaminan minimal 200 butir terbaru tetap dipertahankan. */
@@ -1955,7 +2001,15 @@ function saveFlushWrite(){
   if(activeAccountUuid)state.ownerUuid=activeAccountUuid;
   if(typeof computeStateIntegrity==="function")state._integrity=computeStateIntegrity(state);
   try{
-    const lang=(function(){try{return self.FiezelTargetLanguage?.normalize?.(state?.preferences?.targetLang)||'en'}catch(_){return state?.preferences?.targetLang==='ja'?'ja':'en'}}());
+    const lang=(function(){
+      let stored=null;
+      try{stored=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
+      const rawLang=stored||state?.preferences?.targetLang||'en';
+      try{return self.FiezelTargetLanguage?.normalize?.(rawLang)||'en'}catch(_){return rawLang==='ja'?'ja':'en'}
+    }());
+    if(state&&state.preferences&&state.preferences.targetLang!==lang){
+      state.preferences={...state.preferences,targetLang:lang};
+    }
     /* Bahasa bawaan menulis SATU blob utuh ke kunci dasar - persis perilaku sebelum sumbu
        bahasa lahir, byte per byte. Lihat catatan panjang di atas loadState(). */
     if(lang==='en'){const json=JSON.stringify(state);localStorage.setItem(activeStateStorageKey,json);stateSyncMarkWritten(json);return}
@@ -2120,7 +2174,7 @@ async function activateAccountStateFromPuter(sdk=self.puter){
     if(appOpened)render();return true;
   }catch{return false}
 }
-function dayKey(ts){return new Date(ts).toISOString().slice(0,10)}
+function dayKey(ts){const n=parseHistoryTimestamp(ts);if(!n)return '';const d=new Date(n);return Number.isNaN(d.getTime())?'':d.toISOString().slice(0,10)}
 function activeAccountIdentifier(){return activeAccountUuid||''}
 function activateAccountState(rawId){
   const uuid=String(rawId||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
@@ -2241,7 +2295,7 @@ function studyDayKey(ts=Date.now(),sourceState=null){
 function studyHour(ts=Date.now(),sourceState=null){return jakartaStudyParts(ts,sourceState).hour}
 function recomputeMeaningfulDays(s){
   const byDay={};
-  for(const h of s.history||[]){const d=studyDayKey(h.at||Date.now(),s);byDay[d]=(byDay[d]||0)+1}
+  for(const h of s.history||[]){if(!h||typeof h!=='object')continue;const ts=parseHistoryTimestamp(h.at)||parseHistoryTimestamp(h.timestamp)||Date.now();const d=studyDayKey(ts,s);byDay[d]=(byDay[d]||0)+1}
   const days=Object.entries(byDay).filter(([,n])=>n>=MEANINGFUL_ATTEMPTS).map(([d])=>d).sort();
   s.learningDays=days;
   const today=studyDayKey(Date.now(),s);
@@ -4874,22 +4928,43 @@ function brainSyncApplyRebuild(hasil){
       const newItems=[];
       for(const rec of hasil.stream){
         if(!rec||!rec.attemptId||existingIds.has(rec.attemptId))continue;
-        newItems.push({
-          attemptId: rec.attemptId,
-          timestamp: rec.at||Date.now(),
-          correct: rec.ok===true,
-          type: rec.type||'practice',
-          lesson: rec.lesson||rec.skill||'',
-          restoredFromSync: true
-        });
+        const at=parseHistoryTimestamp(rec.at)||Date.now();
+        const ok=rec.ok===true;
+        const skill=String(rec.skill||rec.lesson||'').trim();
+        const lesson=String(rec.lesson||rec.skill||'').trim();
+        const target=String(rec.item||lesson||skill||'').trim();
+        const row={
+          attemptId:rec.attemptId,
+          at,
+          timestamp:at,
+          ok,
+          correct:ok,
+          type:rec.type||'practice',
+          skill,
+          lesson,
+          reviewKey:lesson||skill,
+          target,
+          restoredFromSync:true
+        };
+        if(rec.concept)row.concept=rec.concept;
+        if(rec.misconception)row.misconception=rec.misconception;
+        if(rec.timing)row.timing=rec.timing;
+        if(rec.sessionId)row.sessionId=rec.sessionId;
+        if(Number.isFinite(rec.kappa))row.kappa=rec.kappa;
+        if(Number.isFinite(rec.predicted))row.predicted=rec.predicted;
+        if(Number.isFinite(rec.difficulty))row.difficulty=rec.difficulty;
+        newItems.push(row);
       }
       if(newItems.length>0){
-        state.history=[...(state.history||[]),...newItems].sort((a,b)=>(a.timestamp||0)-(b.timestamp||0)).slice(-1000);
+        state.history=[...(state.history||[]).map(normalizeHistoryRow).filter(Boolean),...newItems]
+          .sort((a,b)=>(parseHistoryTimestamp(a.at)||parseHistoryTimestamp(a.timestamp))-(parseHistoryTimestamp(b.at)||parseHistoryTimestamp(b.timestamp)))
+          .slice(-1000);
         state.totalAnswered=Math.max(Number(state.totalAnswered||0),state.history.length);
-        state.totalCorrect=Math.max(Number(state.totalCorrect||0),state.history.filter(h=>h&&h.correct).length);
+        state.totalCorrect=Math.max(Number(state.totalCorrect||0),state.history.filter(h=>h&&(h.ok===true||h.correct===true)).length);
         save();
       }
     }
+    reconcileStateAfterBankLoad();
     return true;
   }catch{return false}
 }
@@ -6661,12 +6736,121 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;const kana=v.kana||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[0].trim():'');const kanji=v.kanji||v.word||'';const romaji=v.romaji||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[1].trim():'');return{id:v.id,word:v.word,kana,kanji,romaji,jlpt:v.jlpt||'',phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
   CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
+  reconcileStateAfterBankLoad();
   backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;
   /* m025-367: ganti kursus DI TENGAH perkenalan hanya butuh bank barunya. Ekor boot di bawah
      memanggil startWelcomeExperience(), dan karena perkenalan belum selesai, itu membuka
      perkenalan KEDUA di atas yang pertama - murid terlempar balik ke langkah nama. */
   if(opts&&opts.kontenSaja)return;
   startCelestialClock();startRoleResolution();startWelcomeExperience();startUpdateWatcher()}
+function reconcileStateAfterBankLoad(){
+  try{
+    if(!state||typeof state!=='object')return false;
+    state.vocab=state.vocab&&typeof state.vocab==='object'?state.vocab:{};
+    state.grammar=state.grammar&&typeof state.grammar==='object'?state.grammar:{};
+    state.reading=state.reading&&typeof state.reading==='object'?state.reading:{};
+    let dirty=false;
+    const vocabByKey=new Map();
+    if(Array.isArray(V)){
+      for(const v of V){
+        if(!v)continue;
+        if(v.id)vocabByKey.set(String(v.id),v);
+        if(v.word&&!vocabByKey.has(String(v.word)))vocabByKey.set(String(v.word),v);
+      }
+    }
+    const readingById=new Map();
+    if(Array.isArray(R)){
+      for(const r of R){if(r&&r.id)readingById.set(String(r.id),r)}
+    }
+    const hasGrammar=k=>Boolean(k&&G&&typeof G==='object'&&Object.prototype.hasOwnProperty.call(G,k));
+    const grouped={vocab:new Map(),grammar:new Map(),reading:new Map()};
+    if(Array.isArray(state.history)&&state.history.length){
+      const nextHist=[];
+      for(const rawRow of state.history){
+        let h=normalizeHistoryRow(rawRow);
+        if(!h)continue;
+        if(h!==rawRow)dirty=true;
+        const candSkill=String(h.reviewKey||h.skill||h.lesson||'').trim();
+        const candTarget=String(h.target||h.item||h.id||candSkill||'').trim();
+        let tp=String(h.type||'').trim();
+        if(!['vocab','grammar','reading','listening','speaking'].includes(tp)){
+          if(hasGrammar(candSkill))tp='grammar';
+          else if(vocabByKey.has(candTarget)||vocabByKey.has(candSkill))tp='vocab';
+          else if(readingById.has(candTarget)||readingById.has(candSkill)||candSkill.startsWith('reading_'))tp='reading';
+        }
+        if(tp&&tp!==h.type){h={...h,type:tp};dirty=true}
+        if(!LEVELS.includes(String(h.level||''))){
+          const infLvl=contentLevelFor(tp||h.type,(tp==='vocab'||tp==='reading')?(candTarget||candSkill):(candSkill||candTarget));
+          if(LEVELS.includes(String(infLvl||''))){h={...h,level:infLvl};dirty=true}
+        }
+        nextHist.push(h);
+        if(tp==='grammar'&&hasGrammar(candSkill)){
+          let arr=grouped.grammar.get(candSkill);if(!arr){arr=[];grouped.grammar.set(candSkill,arr)}arr.push(h);
+        }else if(tp==='vocab'){
+          const vHit=vocabByKey.get(candTarget)||vocabByKey.get(candSkill);
+          const vKey=vHit?.id||((candTarget&&candTarget!=='vocab')?candTarget:'');
+          if(vKey&&vocabByKey.has(vKey)){
+            let arr=grouped.vocab.get(vKey);if(!arr){arr=[];grouped.vocab.set(vKey,arr)}arr.push(h);
+          }
+        }else if(tp==='reading'){
+          const rHit=readingById.get(candTarget)||readingById.get(candSkill);
+          if(rHit?.id){
+            let arr=grouped.reading.get(rHit.id);if(!arr){arr=[];grouped.reading.set(rHit.id,arr)}arr.push(h);
+          }
+        }
+      }
+      if(dirty)state.history=nextHist;
+    }
+    for(const bucket of ['grammar','vocab','reading']){
+      const map=grouped[bucket];
+      for(const [key,rows] of map.entries()){
+        if(state[bucket]?.[key]?.total>0)continue;
+        const ordered=rows.slice().sort((a,b)=>(Number(a.at)||0)-(Number(b.at)||0));
+        const b={correct:0,total:0,streak:0,mastery:0,nextReview:0,stability:1,lapses:0,lapseBurden:0,lastSeen:0,lastWrong:0};
+        const itemDifficulty=memoryItemDifficulty(bucket,key);
+        for(const r of ordered){
+          const ok=r.ok===true;
+          const attemptAt=parseHistoryTimestamp(r.at)||Date.now();
+          const ms=Math.max(300,Math.min(120000,Number(r.ms)||6000));
+          const baseStability=Math.max(.25,Number(b.stability)||1),baseLapses=Math.max(0,Number(b.lapses)||0),baseLapseBurden=Math.max(0,Number(b.lapseBurden??b.lapses)||0),baseStabilityDays=Number(b.stabilityDays)>0?Number(b.stabilityDays):0,baseLastSeen=Math.max(0,Number(b.lastSeen)||0);
+          b.total++;
+          if(ok){b.correct++;b.streak++}else b.streak=0;
+          const accuracy=b.correct/Math.max(1,b.total);
+          b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));
+          scheduleNext(b,ok,ms,null,{now:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty});
+          b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty,ok,ms};
+        }
+        if(b.total>0){state[bucket][key]=b;dirty=true}
+      }
+    }
+    try{
+      const bkt=typeof bktRead==='function'?bktRead():null;
+      const lessons=bkt&&bkt.lessons&&typeof bkt.lessons==='object'?bkt.lessons:null;
+      if(lessons){
+        for(const [k,rec] of Object.entries(lessons)){
+          if(!hasGrammar(k)||state.grammar?.[k]?.total>0)continue;
+          const n=Math.max(0,Math.floor(Number(rec?.attempts||rec?.n||0)));
+          const pL=Number(rec?.pL??rec?.p);
+          if(n>0&&Number.isFinite(pL)){
+            const corr=Math.min(n,Math.max(0,Math.round(pL*n)));
+            const seen=parseHistoryTimestamp(rec?.updatedAt||rec?.lastAt)||Date.now();
+            const mast=Math.min(100,Math.round(pL*100*Math.min(1,n/3)));
+            const stab=mast>=MASTERY_THRESHOLD?30:Math.max(1,Math.round(pL*7));
+            state.grammar[k]={correct:corr,total:n,streak:corr>0?1:0,mastery:mast,nextReview:seen+stab*86400000,stability:stab,lapses:Math.max(0,n-corr),lapseBurden:Math.max(0,n-corr),lastSeen:seen,lastWrong:corr<n?seen:0};
+            dirty=true;
+          }
+        }
+      }
+    }catch(_){}
+    if(dirty){
+      state.adaptiveReadyByLevel=diagnosticReadinessMap(state);
+      state.adaptiveReady=!!state.adaptiveReadyByLevel[getActiveLevel(state)];
+      coreBrainCache=null;
+      save();
+    }
+    return dirty;
+  }catch(_){return false}
+}
 // m025-115: dua sistem ikon hidup berdampingan dengan sengaja. Set duotone FIEZEL
 // (features/ui/fiezel-icons.js) memegang kroma yang dilihat murid tiap hari - tab bar,
 // kartu modul, kartu skill, wajah pembimbing - karena di situlah kesan "template" dibuat
@@ -8006,6 +8190,11 @@ function checkPostUpdateCelebration(){
   try{
     const curBuild=self.FIEZEL_PAGE_BUILD;
     if(!curBuild)return;
+    const vaultKey='fiezel-vault-build-v1';
+    if(localStorage.getItem(vaultKey)!==curBuild){
+      localStorage.setItem(vaultKey,curBuild);
+      try{self.FiezelOfflineVault?.purgeStaleBuilds?.(curBuild)}catch(_){}
+    }
     const key='fiezel-last-seen-build-v1';
     const last=localStorage.getItem(key);
     if(!last){localStorage.setItem(key,curBuild);return}
@@ -14572,7 +14761,7 @@ function checkPrasasti(origin='app'){
 function prasastiGalleryMarkup(){
   const core=prasastiCore();if(!core)return '<p class="muted">'+FiezelI18n.t('prasasti.gagal-muat')+'</p>';
   const earned=prasastiState().earned||{};
-  const cells=core.BADGES.map(b=>{const at=earned[b.id];const when=at?new Date(at).toLocaleDateString(FiezelI18n.getLocale()==='th'?'th-TH':'id-ID',{day:'numeric',month:'short',year:'numeric'}):'';const bTitle=FiezelI18n.t('prasasti.title.'+b.id)||b.title;const bHint=FiezelI18n.t('prasasti.hint.'+b.id)||b.hint;return `<div class="prasasti-badge ${at?'is-earned':'is-locked'}" role="img" aria-label="${esc(bTitle)}: ${at?FiezelI18n.t('prasasti.aria-terukir',{kapan:when}):FiezelI18n.t('prasasti.aria-belum',{hint:bHint})}"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(bTitle)}</b><span class="prasasti-hint">${esc(at?when:bHint)}</span></div>`}).join('');
+  const cells=core.BADGES.map(b=>{const at=earned[b.id];const ts=parseHistoryTimestamp(at);const when=ts?new Date(ts).toLocaleDateString(FiezelI18n.getLocale()==='th'?'th-TH':'id-ID',{day:'numeric',month:'short',year:'numeric'}):'';const bTitle=FiezelI18n.t('prasasti.title.'+b.id)||b.title;const bHint=FiezelI18n.t('prasasti.hint.'+b.id)||b.hint;return `<div class="prasasti-badge ${ts?'is-earned':'is-locked'}" role="img" aria-label="${esc(bTitle)}: ${ts?FiezelI18n.t('prasasti.aria-terukir',{kapan:when}):FiezelI18n.t('prasasti.aria-belum',{hint:bHint})}"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(bTitle)}</b><span class="prasasti-hint">${esc(ts?when:bHint)}</span></div>`}).join('');
   return `<div class="prasasti-grid">${cells}</div><p class="map-note"><span>${FiezelI18n.t('prasasti.catatan-galeri')}</span></p>`;
 }
 /* W1 P0-2 (20-001): CTA utama tidak boleh menggantung menunggu popup sign-in. Dua pagar:
@@ -18976,7 +19165,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   if(typeof cfg?.onComplete==='function'){try{cfg.onComplete({score,total,accuracy,session})}catch(_){}}
 }
 function skillTimeline(){
- const byDay={};for(const h of (state.history||[]).filter(h=>historyMatchesActive(h))){const d=dayKey(h.at);const k=h.skill||h.type||'general';byDay[d]??={};byDay[d][k]??={total:0,correct:0};byDay[d][k].total++;if(h.ok)byDay[d][k].correct++}
+ const byDay={};for(const h of (state.history||[]).filter(h=>h&&typeof h==='object'&&historyMatchesActive(h))){const d=dayKey(h.at??h.timestamp);if(!d)continue;const k=h.skill||h.lesson||h.type||'general';byDay[d]??={};byDay[d][k]??={total:0,correct:0};byDay[d][k].total++;if(h.ok===true||h.correct===true)byDay[d][k].correct++}
  return byDay
 }
 function errorPatterns(){
@@ -18990,7 +19179,7 @@ function confusionPairs(){
 function diagnosticReport(){
  const buckets={Vocabulary:[],Grammar:[],Reading:[]};for(const h of (state.history||[]).filter(h=>historyMatchesActive(h))){const name=h.type==='vocab'?'Vocabulary':h.type==='grammar'?'Grammar':'Reading';buckets[name].push(h)}
  const rows=Object.entries(buckets).map(([name,hs])=>{const acc=hs.length?Math.round(hs.filter(h=>h.ok).length/hs.length*100):null;return {name,attempts:hs.length,accuracy:acc}});const active=getActiveLevel();return {level:active,estimatedLevel:placementLevel(),overall:rows.reduce((n,x)=>n+x.attempts,0)?Math.round(rows.reduce((n,x)=>n+x.attempts*(x.accuracy||0),0)/rows.reduce((n,x)=>n+x.attempts,0)):null,rows,weak:rows.filter(x=>x.attempts).sort((a,b)=>(a.accuracy??101)-(b.accuracy??101))[0],ready:state.adaptiveReady}}
-function confidenceCalibration(){const c=(state.confidenceHistory||[]).filter(x=>!x.level||x.level===getActiveLevel());return [1,2,3].map(level=>{const xs=c.filter(x=>x.confidence===level);return {level,n:xs.length,accuracy:xs.length?Math.round(xs.filter(x=>x.ok).length/xs.length*100):null,gap:xs.length?Math.round(Math.abs(level/3-xs.filter(x=>x.ok).length/xs.length)*100):null}})}
+function confidenceCalibration(){const c=(state.confidenceHistory||[]).filter(x=>x&&typeof x==='object'&&(!x.level||x.level===getActiveLevel()));return [1,2,3].map(level=>{const xs=c.filter(x=>x.confidence===level);return {level,n:xs.length,accuracy:xs.length?Math.round(xs.filter(x=>x.ok).length/xs.length*100):null,gap:xs.length?Math.round(Math.abs(level/3-xs.filter(x=>x.ok).length/xs.length)*100):null}})}
 /**
  * m025-117: kartu Core Brain v2 di tab Adaptive Engine.
  *
@@ -19518,8 +19707,9 @@ function weeklyActivityChartMarkup(){
 }
 function progress(){
  try {
-  state.grammar=state.grammar||{};state.vocab=state.vocab||{};state.reading=state.reading||{};state.history=state.history||[];
-  const active=getActiveLevel(),snapshot=buildLearningSnapshot()||{},acc=snapshot.totalAccuracy??0;const profile=getDiagnosticProfile()||{};
+  const safePart=(fn,fb='')=>{try{const out=fn();return out==null?fb:out}catch(e){console.warn('[progress part recovery]',e);return fb}};
+  state.grammar=state.grammar&&typeof state.grammar==='object'?state.grammar:{};state.vocab=state.vocab&&typeof state.vocab==='object'?state.vocab:{};state.reading=state.reading&&typeof state.reading==='object'?state.reading:{};state.history=Array.isArray(state.history)?state.history.map(normalizeHistoryRow).filter(Boolean):[];
+  const active=getActiveLevel(),snapshot=safePart(()=>buildLearningSnapshot(),{}),acc=snapshot.totalAccuracy??0;const profile=safePart(()=>getDiagnosticProfile(),{});
   const totalVocabLvl=(Array.isArray(V)?V.filter(x=>(x.level||'A1')===active).length:0);
   const totalGrammarLvl=(typeof grammarItemsForLevel==='function'?grammarItemsForLevel(active).length:0);
   const totalReadingLvl=(Array.isArray(R)?R.filter(x=>(x.level||'A1')===active).length:0);
@@ -19549,12 +19739,12 @@ function progress(){
   const readingHtml=readingSkills.map(k=>{const hs=(state.history||[]).filter(h=>h.skill===k&&historyMatchesActive(h,active));const a=hs.length?Math.round(hs.filter(h=>h.ok).length/hs.length*100):null;return `<div class="meter"><div class="row"><span>${esc(readingFocusLabel(k.replace('reading_','')))}</span><span>${a==null?'—':a+'%'} · ${hs.length} bukti</span></div><div class="bar"><i style="width:${a||0}%"></i></div></div>`}).join('');
   const progressFresh=!(Array.isArray(state.history)&&state.history.length);
   const tabContent={
-   overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${braincoreProofPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
+   overview:`<div class="grid progress-grid">${safePart(()=>cefrRoadmapMarkup())}${safePart(()=>weeklyActivityChartMarkup())}${safePart(()=>nextSessionPanelMarkup())}${safePart(()=>braincoreProofPanelMarkup())}${uxOn('personalJourneyTab')?safePart(()=>journeyMarkup()):''}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
     ${card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x?.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
-    ${card(`<details class="prasasti-fold"><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
+    ${card(`<details class="prasasti-fold"><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${safePart(()=>prasastiGalleryMarkup())}</details>`,'prasasti-gallery-card')}
     </div>`,
    analysis:`<div class="grid progress-grid">
-    ${confusionInsightMarkup()}
+    ${safePart(()=>confusionInsightMarkup())}
     ${card(`<h3>${FiezelI18n.t('progress.lab-kesalahan')}</h3>${patterns.length?patterns.map(x=>`<div class="row"><span>${esc(friendlySkillName(x.key))}</span><b>${FiezelI18n.t('progress.salah',{errors:x.errors,rate:Math.round(x.rate*100)})}</b></div>${x.common?`<p class="muted">${FiezelI18n.t('progress.pilihan-paling-sering-muncul-kali',{common:esc(x.common),count:x.count})}</p>`:''}`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pola-kesalahan-berulang')+'</p>'}`)}
     ${card(`<h3>${FiezelI18n.t('progress.pola-kesalahan')}</h3>${patterns.length?patterns.slice(0,4).map(x=>`<p><b>${esc(friendlySkillName(x.key))}</b>: ${FiezelI18n.t('progress.error-pattern',{errors:x.errors,common:x.common?FiezelI18n.t('progress.error-common-choice',{choice:esc(x.common),count:x.count}):FiezelI18n.t('progress.error-no-common')})}</p>`).join(''):'<p class="muted">'+FiezelI18n.t('progress.bukti-pending-cukup-for-menemukan')+'</p>'}`)}
     ${card(`<h3>${FiezelI18n.t('progress.weakness-heading')}</h3>${timelineHtml}`)}
@@ -19562,14 +19752,14 @@ function progress(){
     ${card(`<h3>${FiezelI18n.t('progress.jaringan-kekeliruan-vocab')}</h3>${pairs.length?`<div class="confusion-network">${pairs.map(x=>`<div class="confusion-node"><span>${esc(x.a)}</span><b><i data-lucide="arrow-left-right"></i></b><span>${esc(x.b)}</span><small>${x.count} tanda kebingungan</small></div>`).join('')}</div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pasangan-kata-terlihat')+'</p>'}`)}
     </div>`,
    adaptive:`<div class="grid progress-grid">
-    ${coreBrainPanelMarkup()}
+    ${safePart(()=>coreBrainPanelMarkup())}
     ${card(`<h3>${FiezelI18n.t('progress.kartu-rencana-latihan')}</h3>${(()=>{try{const p=buildAdaptivePolicy();if(!p)return '<p class="muted">Rencana latihan belum siap.</p>';const tahap=istilahMurid('mode',p.mode),band=istilahMurid('band',p.difficultyBand),tempo=istilahMurid('pace',p.pace);return `<div class="diag-grid">${tahap?`<div><b>${FiezelI18n.t('progress.label-tahap')}</b><br>${esc(tahap)}</div>`:''}<div><b>${FiezelI18n.t('progress.fokus')}</b><br>${esc(p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain||'grammar'))}</div><div><b>${FiezelI18n.t('progress.label-panjang-sesi')}</b><br>${FiezelI18n.t('progress.item-menit-2',{sessionSize:p.sessionSize||10,estimatedMinutes:p.estimatedMinutes||5})}</div>${band?`<div><b>${FiezelI18n.t('progress.label-tingkat-soal')}</b><br>${esc(band)}</div>`:''}<div><b>${FiezelI18n.t('progress.label-porsi-ulangan')}</b><br>${Math.round((p.reviewShare||0)*100)}%</div>${tempo?`<div><b>${FiezelI18n.t('progress.label-tempo')}</b><br>${esc(tempo)}</div>`:''}</div><p>${esc(p.summary||'')}</p><p class="muted">${FiezelI18n.t('progress.policy-bersifat-deterministik-dapat-diaudit')}</p>`}catch(_){return '<p class="muted">Rencana latihan adaptif siap setelah sesi pertama.</p>'}})()}`)}
     ${card(`<h3>${FiezelI18n.t('progress.kartu-hasil-sesi')}</h3>${(()=>{const o=state.policyOutcomeMeta?.last;if(!o)return '<p>'+FiezelI18n.t('progress.belum-ada-sesi-adaptive-punya')+'</p>';const hasil=istilahMurid('hasil',o.status),saran=istilahMurid('saran',o.recommendation);return `<div class="diag-grid">${hasil?`<div><b>${FiezelI18n.t('progress.label-hasil')}</b><br>${esc(hasil)}</div>`:''}<div><b>${FiezelI18n.t('progress.label-nilai')}</b><br>${Math.round(o.score)}/100</div><div><b>${FiezelI18n.t('progress.label-selesai')}</b><br>${Math.round(o.completionRate)}%</div><div><b>${FiezelI18n.t('progress.stat-accuracy')}</b><br>${o.accuracy==null?'-':Math.round(o.accuracy)+'%'}</div><div><b>${FiezelI18n.t('progress.target-hit')}</b><br>${Math.round(o.targetAdherence)}%</div>${saran?`<div><b>${FiezelI18n.t('progress.rekomendasi')}</b><br>${esc(saran)}</div>`:''}</div><p class="muted">${FiezelI18n.t('progress.outcome-menjadi-evidence-policy-upcoming')}</p>`})()}`)}
     ${card(`<h3>${FiezelI18n.t('progress.kartu-kebiasaan')}</h3><div class="diag-grid"><div><b>${FiezelI18n.t('progress.konsistensi-hari')}</b><br>${FiezelI18n.t('progress.hari-aktif',{consistency14d:evidence.behavior?.consistency14d||0,activeDays14:evidence.behavior?.activeDays14||0})}</div><div><b>${FiezelI18n.t('progress.evidence-speed-label')}</b><br>${evidence.behavior?.medianResponseMs==null?FiezelI18n.t('progress.evidence-speed-na'):FiezelI18n.t('progress.evidence-speed-value',{seconds:Math.round(evidence.behavior.medianResponseMs/100)/10})}</div>${evidence.confidence?.gap==null?''/* baris kalibrasi disembunyikan saat kosong: sumbernya state.confidenceHistory, dan sejak popup keyakinan dicabut dari semua sesi tidak ada lagi yang mengisinya - sama persis dengan alasan di panel OLM. Murid lama yang punya riwayat tetap melihat angkanya. */:`<div><b>${FiezelI18n.t('progress.evidence-calibration-label')}</b><br>${FiezelI18n.t('progress.evidence-calibration-gap',{gap:evidence.confidence.gap})}</div>`}<div><b>${FiezelI18n.t('progress.label-sesi-ditinggal')}</b><br>${FiezelI18n.t('progress.sesi',{abandonmentRate:evidence.behavior?.abandonmentRate||0,sessions30d:evidence.behavior?.sessions30d||0})}</div><div><b>${FiezelI18n.t('progress.waktu-study-dominan')}</b><br>${esc(FiezelI18n.t({'pagi':'progress.jendela-pagi','siang':'progress.jendela-siang','sore':'progress.jendela-sore','malam':'progress.jendela-malam','larut':'progress.jendela-larut','belum terbaca':'progress.jendela-belum-terbaca'}[evidence.behavior?.preferredStudyWindow]||'progress.jendela-belum-terbaca'))}</div><div><b>${FiezelI18n.t('progress.evidence-risk-label')}</b><br>${evidence.memory?.maxForgettingRisk||0}% · ${FiezelI18n.t('progress.rawan-materi',{count:evidence.memory?.highRiskCount||0})}</div></div><p class="muted">${FiezelI18n.t('progress.model-memakai-agregat-perilaku-hasil')}</p>`)}
     </div>`,
    readiness:`<div class="grid progress-grid">
-     ${card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)}
-     ${card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
+     ${card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${safePart(()=>academicReadinessMarkup())}`)}
+     ${card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${safePart(()=>unifiedSkillsMarkup())}`)}
      ${card(`<h3>${FiezelI18n.t('progress.peta-skill-reading')}</h3>${readingHtml}`)}
     </div>`
   };
@@ -19835,7 +20025,7 @@ async function setTargetLangPreference(next){
   }
   switchTargetLangStorage(value);
   try{localStorage.setItem(FIEZEL_TARGET_COURSE_KEY,value)}catch(_){}
-  try{await load()}catch(_){}
+  try{await load({kontenSaja:appOpened})}catch(_){}
   try{leaveAllStages()}catch(_){}
   closeModal();render();haptic('confirm');
   showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.'+value)}),'success');
@@ -19955,6 +20145,8 @@ async function clearAppCache(){
     const keys=await caches.keys();
     const targets=keys.filter(name=>String(name).startsWith('fiezel-')&&name!==dilindungi);
     for(const name of targets)await caches.delete(name);
+    try{const rc=await caches.open(dilindungi);if(rc&&typeof rc.keys==='function'){const rqs=await rc.keys();for(const rq of rqs){const u=String(rq?.url||rq||'');if(!u.includes('/vendor/'))await rc.delete?.(rq)}}}catch{}
+    try{await self.FiezelOfflineVault?.clearVault?.()}catch{}
     // JANGAN unregister service worker: halaman berikutnya akan kehilangan controller dan
     // kemampuan offline mati sampai registrasi ulang. update() cukup - ia memberi SW
     // kesempatan menemukan rilis baru, lalu reload mengisi shell dari jaringan.

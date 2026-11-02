@@ -24,6 +24,16 @@
     location.port === '3005'
   );
 
+  try {
+    if (typeof window !== 'undefined' && window.location && window.location.search && /(?:[?&])(?:fz_upd|fz_healed|__fz_fresh)=/i.test(window.location.search) && window.history && typeof window.history.replaceState === 'function') {
+      var cleanQsBoot = window.location.search.replace(/^\?/, '').split('&').filter(function (p) {
+        return p && !/^(?:fz_upd|fz_healed|__fz_fresh)=/i.test(p);
+      });
+      var nextHrefBoot = window.location.pathname + (cleanQsBoot.length ? ('?' + cleanQsBoot.join('&')) : '') + (window.location.hash || '');
+      window.history.replaceState(null, '', nextHrefBoot);
+    }
+  } catch (_) {}
+
   if ('serviceWorker' in navigator) {
     if (isLocal) {
       navigator.serviceWorker.getRegistrations().then(function (regs) {
@@ -61,6 +71,30 @@
         if (typeof caches === 'undefined' || typeof caches.keys !== 'function') return;
         var pageBuild = String(self.FIEZEL_PAGE_BUILD || '');
         var pageNum = parseBuildNum(pageBuild);
+        try {
+          if (pageBuild && typeof localStorage !== 'undefined' && localStorage.getItem('fz_boot_clean_build') !== pageBuild) {
+            localStorage.setItem('fz_boot_clean_build', pageBuild);
+            if (self.FiezelOfflineVault && typeof self.FiezelOfflineVault.purgeStaleBuilds === 'function') {
+              self.FiezelOfflineVault.purgeStaleBuilds(pageBuild);
+            }
+            caches.keys().then(function (allNames) {
+              allNames.forEach(function (nm) {
+                if (nm.indexOf('fiezel-v') === 0) {
+                  caches.open(nm).then(function (rc) {
+                    return rc.keys().then(function (reqs) {
+                      reqs.forEach(function (rq) {
+                        var u = (rq && rq.url) ? rq.url : String(rq || '');
+                        if (u.indexOf('/vendor/') === -1) {
+                          try { rc.delete(rq); } catch (_) {}
+                        }
+                      });
+                    });
+                  }).catch(function () {});
+                }
+              });
+            }).catch(function () {});
+          }
+        } catch (_) {}
         pingControllerRev().then(function (activeRev) {
           var activeNum = parseBuildNum(activeRev);
           var activeShellName = activeRev ? ('fiezel-shell-' + activeRev) : '';
@@ -81,17 +115,21 @@
               }
             }
             // Deteksi cangkang aktif yang tercemar aset HTTP disk cache lama di iOS WebKit:
-            // bila DIAG_BUILD di dalam activeShellName lebih tua daripada activeRev, bersihkan dan isi ulang via SW.
+            // periksa core-config.js DAN fiezel-diag-panel.js terhadap activeNum.
             if (activeShellName && activeNum !== null && typeof caches.open === 'function') {
               caches.open(activeShellName).then(function (c) {
-                return c.match('./features/neural-voice/fiezel-diag-panel.js');
-              }).then(function (res) {
-                return res ? res.text() : '';
-              }).then(function (txt) {
-                if (!txt) return;
-                var m = txt.match(/DIAG_BUILD\s*=\s*[\x22\x27](m\d+-\d+)[\x22\x27]/i);
-                var diagNum = m ? parseBuildNum(m[1]) : null;
-                if (diagNum !== null && diagNum < activeNum) {
+                return Promise.all([
+                  c.match('./core-config.js').then(function (r) { return r ? r.text() : ''; }).catch(function () { return ''; }),
+                  c.match('./features/neural-voice/fiezel-diag-panel.js').then(function (r) { return r ? r.text() : ''; }).catch(function () { return ''; })
+                ]);
+              }).then(function (texts) {
+                var cfgTxt = (texts && texts[0]) || '';
+                var diagTxt = (texts && texts[1]) || '';
+                var mCfg = cfgTxt.match(/FIEZEL_PAGE_BUILD\s*=\s*[\x22\x27](m\d+-\d+)[\x22\x27]/i);
+                var mDiag = diagTxt.match(/DIAG_BUILD\s*=\s*[\x22\x27](m\d+-\d+)[\x22\x27]/i);
+                var cfgNum = mCfg ? parseBuildNum(mCfg[1]) : null;
+                var diagNum = mDiag ? parseBuildNum(mDiag[1]) : null;
+                if ((cfgNum !== null && cfgNum < activeNum) || (diagNum !== null && diagNum < activeNum)) {
                   caches.delete(activeShellName).then(function () {
                     return pingControllerRev();
                   }).catch(function () {});
@@ -99,9 +137,9 @@
               }).catch(function () {});
             }
           }).catch(function () {});
-          // Pemulihan split-brain otomatis satu kali: bila controller SW aktif sudah berada di
-          // generasi yang lebih baru daripada halaman yang tertahan di memori iOS standalone PWA,
-          // muat ulang halaman dengan aman saat murid belum memulai sesi soal.
+          // Pemulihan split-brain dua arah:
+          // (A) activeNum > pageNum: controller SW sudah lebih baru daripada dokumen memori iOS PWA.
+          // (B) activeNum < pageNum: dokumen sudah memuat penanda build baru sementara controller SW lama masih menempel.
           if (activeNum !== null && pageNum !== null && activeNum > pageNum) {
             try {
               var stage = self.FiezelStage;
@@ -118,6 +156,35 @@
                 }
               } else if (inLesson) {
                 self.FiezelUpdatePrompt?.check?.(true);
+              }
+            } catch (_) {}
+          } else if (activeNum !== null && pageNum !== null && activeNum < pageNum) {
+            try {
+              var stageB = self.FiezelStage;
+              var inLessonB = !!(stageB && typeof stageB.lessonMode === 'function' && stageB.lessonMode() === true);
+              var promKey = 'fiezel-promoted-for';
+              if (!inLessonB && sessionStorage.getItem(promKey) !== pageBuild && navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
+                navigator.serviceWorker.getRegistration().then(function (reg) {
+                  if (!reg) return;
+                  var doPromote = function (w) {
+                    if (!w || sessionStorage.getItem(promKey) === pageBuild) return;
+                    sessionStorage.setItem(promKey, pageBuild);
+                    var onCtrl = function () {
+                      navigator.serviceWorker.removeEventListener('controllerchange', onCtrl);
+                      var bustB = window.location.pathname + '?fz_healed=' + Date.now() + window.location.hash;
+                      try { window.location.replace(bustB); } catch (_) { location.reload(); }
+                    };
+                    navigator.serviceWorker.addEventListener('controllerchange', onCtrl);
+                    try { w.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
+                  };
+                  if (reg.waiting) {
+                    doPromote(reg.waiting);
+                  } else if (typeof reg.update === 'function') {
+                    reg.update().then(function () {
+                      if (reg.waiting) doPromote(reg.waiting);
+                    }).catch(function () {});
+                  }
+                }).catch(function () {});
               }
             } catch (_) {}
           }
