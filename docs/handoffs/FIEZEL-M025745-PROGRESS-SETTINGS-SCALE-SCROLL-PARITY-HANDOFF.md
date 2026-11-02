@@ -1,5 +1,9 @@
 # FIEZEL m025-745 Handoff Dossier: Multi-Course Progress Parity, Settings Modal Sizing & Fluid Scroll, and Mobile Nav Proportions
 
+Status: READY FOR PRODUCTION
+Otoritas: MASTER / OWNER Mandate
+Nomor Build: m025-745
+
 ## 1. Executive Summary & Problem Resolution
 Berdasarkan laporan komprehensif pengguna terkait:
 1. **Ketimpangan Multi-Kursus Panel Progress ("progress di bagian kursus jepang berjalan normal baik dari segi tampilan dan semuanya, tapi pada kursus bahasa inggris tidak ada", "seharusnya apapun perbaikan harus selaras dan sinkron multi kursus")**:
@@ -7,13 +11,13 @@ Berdasarkan laporan komprehensif pengguna terkait:
    - **Solusi**: Peta Belajar dan tab Kesiapan kini **SELALU TAMPIL** untuk seluruh kursus (`en` maupun `ja`) terlepas dari apakah murid memiliki histori atau masih baru. Ditambahkan penghitungan kurikulum per level (`totalVocabLvl`, `totalGrammarLvl`, `totalReadingLvl`) sehingga rasio penguasaan (`0 / 339 kata (0%) · 0 materi A1 sudah punya bukti belajar` pada English A1, atau `0 / 1000 kata (0%)` pada Japanese N5) tersaji akurat dan simetris di kedua bahasa. Disertakan tombol CTA langsung menuju latihan level aktif.
 
 2. **Pengaturan Rusak, Scrolling Macet & Kartu Terlalu Kecil ("pengaturan rusak parah, dari segi css nya, scrollingnya... tampilan pengaturannya juga terlalu kecil kartunya")**:
-   - **Akar Masalah**: 
+   - **Akar Masalah**:
      a) Deadlock scrolling: `#modalPanel` memiliki aturan umum `max-height: min(600px, 84dvh) !important; overflow-y: auto !important;` di `index.html:518`, yang bertabrakan dengan inner scroll viewport `.settings-scroll-body { overflow-y: auto !important; }`. Kedua kontainer berebut gestur sentuh (dual-scroll collision) pada WebKit / iOS Safari.
      b) Ukuran kartu terlalu kecil: Kartu dibatasi 600px di layar desktop/tablet, dan elemen di dalamnya memiliki margin sempit.
      c) Kontras warna judul: Judul `.settings-head h2` mewarisi warna `var(--text)` dari `fiezel-lux.css` yang bernilai `#0F172A` (biru gelap hampir hitam). Pada kartu pengaturan berlatar gelap `#14141C`, judul menjadi tidak terbaca (invisibel).
    - **Solusi**:
      a) `.modal-panel:has(.settings-modal-wrapper)` diecualikan dari aturan generic modal dan diatur menjadi `overflow: hidden !important; display: flex !important; flex-direction: column !important;`, sehingga `.settings-scroll-body` menjadi satu-satunya viewport scroll yang bebas hambatan.
-     b) Ukuran modal diperluas menjadi `height: min(820px, 92dvh); max-height: 92dvh;` pada desktop dan `height: 92dvh; max-height: 92dvh;` pada ponsel, dengan padding lega pada lipatan (`.settings-fold`), input touch-friendly $\ge 46\text{px}$, dan ringkas tertata.
+     b) Ukuran modal diperluas menjadi `height: min(820px, 92dvh); max-height: 92dvh;` pada desktop dan `height: 92dvh; max-height: 92dvh;` pada ponsel, dengan padding lega pada lipatan (`.settings-fold`), input touch-friendly >= 46px, dan ringkas tertata.
      c) Kontras judul diperbaiki secara tegas dengan `.settings-head h2 { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-size: 1.55rem !important; }` dan subteks `#94A3B8`.
 
 3. **Proporsi Topbar dan Bottombar Terlalu Besar ("topbar dan bottombar juga sangat terlalu besar tidak sesuai dengan bentuk kartu")**:
@@ -69,3 +73,16 @@ Pengujian Playwright Chromium headless dilakukan dengan komparasi dua arah di ke
    - Penyesuaian padding buffer `#app` untuk ruang gerak kartu dan konten di atas dock.
 5. Versi Build Kanonikal:
    - `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`: diselaraskan ke `m025-745` (Octa-Sync compliant).
+
+---
+
+## 4. Authority & Invariant Governance (MASTER Authority)
+- **Zero Red Merge Mandate**: Seluruh 10 checks CI wajib hijau 100%.
+- **Protected Surface Isolation**: Modifikasi mematuhi batasan cakupan `[ALLOW-PROTECTED: auth|pwa]` tanpa efek samping ke modul autentikasi atau onboarding.
+- **Single Source of Truth**: Nomor versi build dikelola eksklusif melalui `tools/bump-build.mjs`.
+
+---
+
+## 5. Next Steps & Continuous Monitoring Roadmap
+- Monitor produksi pasca rilis melalui log CDN Cloudflare.
+- Pertahankan sinkronisasi data kurikulum dan validasi cache service worker di seluruh platform seluler (iOS Safari PWA & Android Chrome TWA).

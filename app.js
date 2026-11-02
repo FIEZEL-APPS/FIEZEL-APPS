@@ -8252,11 +8252,8 @@ function openApp(){
     state.view='tutor';
     try{self.FiezelTeacherShell?.ensureCss?.()}catch(_){}document.body?.classList?.add?.('fz-teacher-mode');
   }
-  // Sesi lama bisa saja masih memegang kelas kunci m025-34 di <body> (mis. tab yang dibuka
-  // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
-  // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
-  document.documentElement?.classList?.remove?.('fz-booting');document.body?.classList?.remove?.('fz-booting');document.documentElement?.classList?.add?.('fz-app-open');document.body?.classList?.add?.('fz-app-open');
-  document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();try{dismissBootSplash()}catch(_){}try{updateTopbarCourseButton()}catch(_){}
+  const cl=x=>x?.classList;cl(document.documentElement)?.remove('fz-booting');cl(document.body)?.remove('fz-booting','notification-locked');cl(document.documentElement)?.add('fz-app-open');cl(document.body)?.add('fz-app-open');
+  notifyAppUpdateIfNew();render();try{dismissBootSplash()}catch(_){}try{updateTopbarCourseButton()}catch(_){}
   // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka KelasKu untuk Guru
   try{checkUrlTeacherToken()}catch(_){}
   // PWA Shortcuts (?invite-hub=1, ?duel-hub=1): tangkap parameter pintasan PWA
