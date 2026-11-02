@@ -1,7 +1,7 @@
 {
-  "version": "m025-751",
-  "claimedBy": "branch feat/placement-adaptive-cat",
-  "claimedAt": "2026-11-02T10:43:37.958Z",
-  "reason": "feat(placement): [ALLOW-PROTECTED: ci|pwa] computerized adaptive placement cat engine and in-call vocab capture",
+  "version": "m025-752",
+  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
+  "claimedAt": "2026-11-02T10:48:59.776Z",
+  "reason": "bot(heal): auto-synchronize release boundary",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
