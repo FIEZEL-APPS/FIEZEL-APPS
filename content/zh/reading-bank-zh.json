@@ -1,0 +1,221 @@
+[
+  {
+    "id": "rzh0001",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "我的小狗 (Anjing Kecilku)",
+    "text": "我家有一只小狗。它的名字叫球球。球球很白，眼睛很大。它很喜欢和我一起玩。每天早上我给它吃东西。",
+    "topic": "hewan",
+    "qs": [
+      [
+        "Teks ini menceritakan tentang hewan apa?",
+        [
+          "Kucing",
+          "Anjing",
+          "Burung",
+          "Ikan"
+        ],
+        1,
+        {
+          "explanation": "Teks menyebutkan 我家有一只小狗 (Rumahku punya anjing kecil)."
+        }
+      ],
+      [
+        "Siapa nama anjing kecil tersebut?",
+        [
+          "Bai-bai",
+          "Qiu-qiu",
+          "Xiao-xiao",
+          "Hei-hei"
+        ],
+        1,
+        {
+          "explanation": "Namanya adalah 球球 (Qiu-qiu)."
+        }
+      ],
+      [
+        "Kapan penulis memberi makan anjingnya?",
+        [
+          "Pagi hari",
+          "Siang hari",
+          "Sore hari",
+          "Malam hari"
+        ],
+        0,
+        {
+          "explanation": "每天早上 (Setiap pagi)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0002",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "周末去北京 (Akhir Pekan ke Beijing)",
+    "text": "上个星期六，我和朋友坐高铁去北京旅游。高铁非常快，两个小时就到了。我们在北京吃了北京烤鸭，味道好极了。第二天我们还去了故宫。",
+    "topic": "perjalanan",
+    "qs": [
+      [
+        "Bagaimana penulis pergi ke Beijing?",
+        [
+          "Pesawat terbang",
+          "Kereta cepat",
+          "Bus",
+          "Mobil pribadi"
+        ],
+        1,
+        {
+          "explanation": "坐高铁 (Naik kereta cepat)."
+        }
+      ],
+      [
+        "Berapa lama perjalanan ke Beijing?",
+        [
+          "1 jam",
+          "2 jam",
+          "3 jam",
+          "4 jam"
+        ],
+        1,
+        {
+          "explanation": "两个小时就到了 (Dua jam sudah sampai)."
+        }
+      ],
+      [
+        "Makanan khas apa yang mereka cicipi?",
+        [
+          "Mie tarik",
+          "Bebek panggang Beijing",
+          "Hotpot",
+          "Dimsum"
+        ],
+        1,
+        {
+          "explanation": "北京烤鸭 (Bebek panggang Beijing)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0003",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "中国茶文化 (Budaya Teh Tiongkok)",
+    "text": "在中国，喝茶不仅是一种生活习惯，更是一种传统文化。中国人喝茶的历史可以追溯到几千年前。茶可以分为绿茶、红茶、乌龙茶等多种。喝茶能让人静心，也能促进健康。",
+    "topic": "budaya",
+    "qs": [
+      [
+        "Selain kebiasaan hidup, minum teh di Tiongkok mencerminkan apa?",
+        [
+          "Teknologi modern",
+          "Budaya tradisional",
+          "Olahraga",
+          "Komersial"
+        ],
+        1,
+        {
+          "explanation": "更是一种传统文化 (Bahkan merupakan budaya tradisional)."
+        }
+      ],
+      [
+        "Berikut ini adalah jenis teh yang disebutkan dalam teks, KECUALI:",
+        [
+          "Teh hijau",
+          "Teh merah",
+          "Teh Oolong",
+          "Teh boba"
+        ],
+        3,
+        {
+          "explanation": "Teks menyebutkan 绿茶 (hijau), 红茶 (merah), dan 乌龙茶 (Oolong)."
+        }
+      ],
+      [
+        "Apa manfaat minum teh yang disebutkan?",
+        [
+          "Membuat kaya",
+          "Menenangkan pikiran & menunjang kesehatan",
+          "Menghilangkan kantuk permanen",
+          "Menambah berat badan"
+        ],
+        1,
+        {
+          "explanation": "喝茶能让人静心，也能促进健康。"
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0004",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "互联网与移动支付 (Internet & Pembayaran Seluler)",
+    "text": "随着智能手机的普及，移动支付已经彻底改变了人们的消费模式。如今出门在外，人们只需要带一部手机，无论是乘坐公共交通、买菜购物还是餐厅用餐，扫码支付就能轻松完成。这种无现金生活极大提升了社会运行效率。",
+    "topic": "teknologi",
+    "qs": [
+      [
+        "Apa dampak utama dari popularitas ponsel pintar dalam teks?",
+        [
+          "Orang jarang bepergian",
+          "Mengubah pola konsumsi masyarakat",
+          "Mengurangi belanja",
+          "Menghilangkan transportasi umum"
+        ],
+        1,
+        {
+          "explanation": "彻底改变了人们的消费模式。"
+        }
+      ],
+      [
+        "Bagaimana cara orang membayar saat berbelanja menurut teks?",
+        [
+          "Uang koin",
+          "Kartu debit magnetik",
+          "Pindai kode QR (扫码)",
+          "Cek tunai"
+        ],
+        2,
+        {
+          "explanation": "扫码支付就能轻松完成。"
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0005",
+    "level": "C1",
+    "hsk": "HSK 5-6",
+    "title": "成语里的哲学智慧 (Kebijaksanaan Filosofis dalam Chengyu)",
+    "text": "汉语成语是中华文明长河中沉淀出的语言精华。许多成语背后都蕴含着深邃的人生哲理与辩证思维。例如“塞翁失马，焉知非福”，告诉人们祸福相依、凡事不可只看表面的辩证法则。深入理解成语，是领悟中华思想精神的必由之路。",
+    "topic": "filsafat",
+    "qs": [
+      [
+        "Apa inti pengajaran dari peribahasa “塞翁失马，焉知非福”?",
+        [
+          "Musibah dan berkah saling berdampingan",
+          "Kuda selalu lari",
+          "Jangan memelihara kuda di perbatasan",
+          "Kemalangan bersifat abadi"
+        ],
+        0,
+        {
+          "explanation": "祸福相依、凡事不可只看表面的辩证法则。"
+        }
+      ],
+      [
+        "Menurut teks, mengapa memahami Chengyu sangat penting?",
+        [
+          "Untuk lulus ujian matematika",
+          "Sebagai jalan memahami nilai pemikiran dan kebudayaan Tiongkok",
+          "Untuk berbisnis di pasar tradisional",
+          "Untuk menghafal angka"
+        ],
+        1,
+        {
+          "explanation": "是领悟中华思想精神的必由之路。"
+        }
+      ]
+    ]
+  }
+]

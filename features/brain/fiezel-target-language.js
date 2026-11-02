@@ -43,7 +43,7 @@
   // Daftar TERTUTUP dan sengaja pendek. Bahasa yang tidak ada di sini jatuh ke bawaan, bukan
   // melahirkan ruang kunci baru diam-diam — satu salah ketik tidak boleh diam-diam memisahkan
   // progres seorang murid ke tempat yang tidak pernah dibaca siapa pun lagi.
-  var LANGS = Object.freeze(['en', 'ja']);
+  var LANGS = Object.freeze(['en', 'ja', 'zh']);
 
   // Pemisah dipilih '@' karena ia TIDAK PERNAH muncul di kunci `fiezel-*-v1` mana pun: kunci
   // yang ada hanya memakai huruf kecil, angka, dan tanda hubung. Memakai '-' akan membuat

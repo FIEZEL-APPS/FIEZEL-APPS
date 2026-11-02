@@ -1,7 +1,7 @@
 {
-  "version": "m025-750",
-  "claimedBy": "branch feat/voice-duplex-fullphone-m025-752",
-  "claimedAt": "2026-11-02T14:04:44.355Z",
-  "reason": "fix(voice): [ALLOW-PROTECTED: auth|pwa] full-duplex phone call mic pipeline, zero-beep duplex, and mochi sos echo-tolerant barge-in",
+  "version": "m025-756",
+  "claimedBy": "branch feat/mandarin-m025-748",
+  "claimedAt": "2026-11-02T17:34:50.960Z",
+  "reason": "feat(mandarin): [ALLOW-PROTECTED: ci|pwa] 1:1 tutor character & braincore feedback alignment with exact distractors and step tutor triples",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
