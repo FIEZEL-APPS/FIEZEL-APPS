@@ -8430,8 +8430,8 @@ body.fz-lux .modal-panel,
 body:has(.home-today) .modal-panel,
 body.fz-lux #modalPanel,
 body:has(.home-today) #modalPanel,
-.modal-panel,
-#modalPanel {
+.modal-panel:has(.settings-modal-wrapper),
+#modalPanel:has(.settings-modal-wrapper) {
   background: #14141C !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 24px !important;
