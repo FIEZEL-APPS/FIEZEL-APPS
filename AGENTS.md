@@ -1,4 +1,4 @@
-# Antigravity Workspace Guidelines for FIEZEL-APPS
+﻿# Antigravity Workspace Guidelines for FIEZEL-APPS
 
 ## 0. IRONCLAD SCOPE ISOLATION, PROTECTED SURFACES, & ZERO-RED-MERGE MANDATE (ATURAN MUTLAK #0)
 Setiap agent di workspace ini WAJIB tunduk pada penegakan mekanis CI dan GitHub Branch Protection berikut:
@@ -26,13 +26,13 @@ Whenever the user requests animation, motion graphics, commercial 3D film, or vi
    - ZERO cropped text: Always enforce Title & Action Safe Zone margins ($\ge 64\text{px}$ horizontal, $\ge 120\text{px}$ vertical).
 3. **Mandatory 5-Act Gemini Choreography**:
    - Act I: Clean logo opening -> damped spring split ($\omega=15, \zeta=0.44$, 25% overshoot) -> 4 UI pills -> Z-axis push-through micro-tunneling.
-   - Act II: 3-tier iridescent glow (`#00E5FF` -> `#2979FF` -> `#FFD700`) + 360° trim sweep -> 3D golden curved telemetry ribbon landing at $t=14.5\text{s}$ with shockwave ring.
+   - Act II: 3-tier iridescent glow (`#00E5FF` -> `#2979FF` -> `#FFD700`) + 360Â° trim sweep -> 3D golden curved telemetry ribbon landing at $t=14.5\text{s}$ with shockwave ring.
    - Act III: Dark Eclipse Flip to `#1B1418` (>16:1 contrast) -> coral warning strobe (`#FF3045`) on tab switch -> Hollywood rack focus -> freehand glowing Circle-to-Search gesture around Rian Pratama.
-   - Act IV: 25° Dutch Angle macro framing on score 88 -> emerald breathing pulse on WhatsApp CTA -> 3D haptic card fold at $t=43.5\text{s}$.
+   - Act IV: 25Â° Dutch Angle macro framing on score 88 -> emerald breathing pulse on WhatsApp CTA -> 3D haptic card fold at $t=43.5\text{s}$.
    - Act V: Singularity implosion at $t=51.5\text{s}$ -> equalizer bar burst on "I" -> two-tone wordmark + "KelasKu untuk Guru" centered at $X=540.0\text{px}$ over daylight travertine quad `bgDay` (`#FDFAF3`).
 4. **Mandatory Audio Engineering (EBU R128)**:
    - Voiceover TTS spelled phonetically `"Fizel"` (female educator tone).
-   - Zero speech collision: atempo compression (1.10x–1.15x) ensuring $\ge 140\text{ms}$ breathing pockets.
+   - Zero speech collision: atempo compression (1.10xâ€“1.15x) ensuring $\ge 140\text{ms}$ breathing pockets.
    - Dynamic sidechain ducking: $-8.0\text{ dB}$ bed drop during speech ($150\text{ms}$ attack, $400\text{ms}$ release).
    - Integrated Loudness $-14.0 \pm 0.5\text{ LUFS}$, True Peak $\le -1.5\text{ dBTP}$.
 5. **Mandatory Frame-by-Frame Visual Inspection**:
@@ -143,11 +143,11 @@ Setiap kali menyelesaikan fitur, perbaikan bug, konten kuis, atau pembaruan UI/U
 
 ## Google Stitch Collaboration Rules
 When the user brings a Google Stitch design:
-1. **Always ask for the code export** (`<>` Code view) first — it's the most reliable handoff method.
+1. **Always ask for the code export** (`<>` Code view) first â€” it's the most reliable handoff method.
 2. **Convert HTML/Tailwind to React components** with proper hierarchy, props, and accessibility.
 3. **Enhance with animations**: scroll-triggered reveals, micro-interactions, parallax effects.
 4. **Organize exports** in `stitch-export/` directory, production code in `website/`.
-5. **Be specific in prompts**: Use exact color codes, font weights, spacing values — never "make it beautiful".
+5. **Be specific in prompts**: Use exact color codes, font weights, spacing values â€” never "make it beautiful".
 
 ## Vibe Coding Best Practices
 1. **Image-First Workflow**: Design images FIRST, then animate. Image-to-video gives more control than text-to-video.
@@ -274,3 +274,29 @@ Setiap agent (baik Antigravity, Cloud AI, GitHub Actions Bot, maupun multi-agent
      node tests/anti-tamper-and-watermark-test.js
      ```
    - Setiap PR yang merusak atau membocorkan proteksi kekayaan intelektual ini akan diblokir secara otomatis oleh CI Gate di GitHub Actions.
+
+## 18. Mandatory Protocol: Tri-Core Surfaces & Anti-Regression Quality Gates (Tiga Invarian Krusial PWA, Auth & Dashboard)
+Atas perintah OWNER, tiga kesalahan fatal berikut DILARANG KERAS terulang di repositori FIEZEL. Ketiganya dilindungi oleh penegakan mesin otomatis di CI Quality Gate dan guardian repo:
+
+1. **Invarian 1: Jalur Dashboard Owner ke Akun Murid (Owner-Learner Wire Invariant)**:
+   - **Tujuan**: Ketika Owner mengirim permata (gems) atau mengirim pesan dari Dashboard Owner ke murid via email Google atau handle sosial, data murid harus benar-benar bertambah dan terhubung.
+   - **Aturan Wajib**:
+     * API Owner di `workers/api/route-gem-grant.js` dan `workers/api/route-learner-messages.js` WAJIB mempertahankan pencarian ID kanonikal murid dari tabel `auth_email` (`SELECT sub FROM auth_email WHERE email = ...`). DILARANG menghapus pencarian ini.
+     * Skema data saldo murid di `features/speaking-listening/gems-core.js` WAJIB mempertahankan fungsi `sanitizeGems()` dan struktur `{ balance: number }`. DILARANG mengubahnya menjadi angka lepas atau objek yang merusak saldo murid.
+   - **Gerbang Penegak**: `node tests/owner-gem-wire-e2e-test.js` dan `node tests/tri-core-invariants-gate-test.js`.
+
+2. **Invarian 2: Shell PWA Bebas Tersangkut & Rehidrasi Progres (Zero-Stale-Shell & Offline Vault Invariant)**:
+   - **Tujuan**: Ketika aplikasi di-update ke versi baru, murid lama TIDAK BOLEH tersangkut di tampilan lama atau kehilangan progres belajarnya.
+   - **Aturan Wajib**:
+     * Service Worker di `sw.js` WAJIB memiliki aturan `isUpdateNav` yang mendeteksi parameter update (`fz_upd`, `__fz_fresh`, `fz_healed`) dengan strategi *network-first*. Cache lama tidak boleh menahan versi baru.
+     * Brankas IndexedDB `features/security/fiezel-offline-vault.js` WAJIB membatalkan materi jika nomor versinya berbeda dari halaman, dan fungsi `purgeStaleBuilds()` WAJIB membersihkan berkas materi lama saat update.
+     * Di `app.js`, fungsi `normalizeHistoryRow()` dan `parseHistoryTimestamp()` WAJIB menjaga riwayat belajar agar tidak menghasilkan `NaN` pada tanggal belajar murid lama.
+   - **Gerbang Penegak**: `node tests/progress-legacy-upgrade-gate-test.js` dan `node tests/tri-core-invariants-gate-test.js`.
+
+3. **Invarian 3: Login Google & Registrasi FIEZEL Bebas Blokir (Auth CSP Superset Invariant)**:
+   - **Tujuan**: Tombol "Masuk dengan Google" WAJIB selalu muncul dan berfungsi di semua HP/laptop, dan pendaftaran akun FIEZEL baru TIDAK BOLEH gagal dengan alasan *"Server belum bisa dihubungi"*.
+   - **Aturan Wajib**:
+     * Header `Content-Security-Policy` di `website/.htaccess` WAJIB menjadi SUPERSET dari `<meta>` CSP di `index.html`.
+     * `accounts.google.com` DILARANG KERAS dihapus dari `script-src`, `style-src`, dan `frame-src`.
+     * `connect-src` WAJIB mengizinkan `api.fiezel.my.id` (atau `https: wss:`). DILARANG memperketat CSP hingga memblokir panggilan API Cloudflare.
+   - **Gerbang Penegak**: `node tests/csp-header-superset-gate-test.js` dan `node tests/tri-core-invariants-gate-test.js`.
