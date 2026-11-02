@@ -8301,7 +8301,7 @@ function openApp(){
   // Mengambilnya lebih awal (mis. begitu DOM siap) justru merebut pita dari app.js dan
   // ~2,7 MB JSON kontennya di jaringan seluler, sehingga penghematannya hilang seluruhnya.
   try{self.FiezelLazy?.start?.()}catch{}
-  startReminderEngine();showBrandSplash();/* m025-308: probe /health DULU menyala hanya dengan syarat CORE_WORKER_URL ada. Sebelum
+  startReminderEngine();/* m025-743: duplicate showBrandSplash() call removed to guarantee single splash instance *//* m025-308: probe /health DULU menyala hanya dengan syarat CORE_WORKER_URL ada. Sebelum
    migrasi Cloudflare syarat itu praktis tidak pernah terpenuhi (CORE_CONFIG.workerUrl
    kosong), jadi cacatnya tidak terlihat. Sesudah migrasi, CORE_WORKER_URL diambil dari
    FIEZEL_CF_CONFIG.base yang SELALU terisi - jadi setiap boot menembakkan satu permintaan
@@ -19392,7 +19392,7 @@ function cefrRoadmapMarkup(){
   const nextLevel=roadmapLevels[activeIdx+1]||null;
   // Kemajuan menuju level berikutnya = porsi lesson grammar level aktif yang sudah menembus ambang unlock.
   let total=0,done=0;
-  try{const skills=grammarItemsForLevel(activeLevel).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);total=skills.length;done=skills.filter(k=>(state.grammar[k]?.mastery||0)>=GRAMMAR_UNLOCK_MASTERY).length}catch(_){}
+  try{const skills=grammarItemsForLevel(activeLevel).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);total=skills.length;done=skills.filter(k=>((state.grammar?.[k]?.mastery)||0)>=GRAMMAR_UNLOCK_MASTERY).length}catch(_){}
   const pct=total?Math.round(done/total*100):0;
   const streak=Number(state.streak)||0;
   const track=roadmapLevels.map((lvl,idx)=>`<span class="fz2-lvl${idx<activeIdx?' is-done':idx===activeIdx?' is-now':''}" style="${idx===activeIdx?`--p:${pct}`:''}">${esc(displayLevel(lvl))}</span>`).join('');
@@ -19408,7 +19408,7 @@ function cefrRoadmapMarkup(){
 function weeklyActivityChartMarkup(){
   const tl=skillTimeline();
   const today=new Date();today.setHours(12,0,0,0);
-  const dayNames=FiezelI18n.t('progress2.days').split(',');
+  const dayNames=String(FiezelI18n.t('progress2.days')||'Sen,Sel,Rab,Kam,Jum,Sab,Min').split(',');
   let activeDays=0,totalItems=0;
   const cells=[];
   for(let i=6;i>=0;i--){
@@ -19426,65 +19426,63 @@ function weeklyActivityChartMarkup(){
   </section>`;
 }
 function progress(){
- const active=getActiveLevel(),snapshot=buildLearningSnapshot(),acc=snapshot.totalAccuracy??0;const profile=getDiagnosticProfile();const map=[[FiezelI18n.t('progress.vocab'),'vocab',state.vocab],['Grammar','grammar',state.grammar],['Reading','reading',state.reading]];
- // m028 fase3 (PATCH-PLAN §5): peta belajar dulu TIGA kartu terpisah untuk tiga angka.
- // Tiga kartu berdampingan membuat perbandingan - satu-satunya alasan peta ini ada -
- // harus dikerjakan dengan mata melompat antar kotak. Sekarang satu kartu, tiga baris,
- // batangnya sejajar di kolom yang sama. Datanya persis sama: m% per domain.
- const mapRows=map.map(([name,type,bucket])=>{const items=Object.entries(bucket||{}).filter(([key,x])=>x?.total&&(contentLevelFor(type,key)||active)===active).map(([,x])=>x),m=items.length?Math.round(items.reduce((a,x)=>a+(x.mastery||0),0)/items.length):0;return `<div class="map-row"><span class="mi fz-i" data-fz-icon="${type}" aria-hidden="true"></span><span class="mn">${name}</span><span class="bar"><i style="width:${m}%"></i></span><strong class="mp">${m}%</strong><small class="me">${FiezelI18n.t('progress.materi-done-punya-bukti-study',{length:items.length,active:active})}</small></div>`}).join('');
- const mapCards=card(`<div class="map-rows">${mapRows}</div><p class="map-note">${pawFaceMarkup()}<span>${FiezelI18n.t('progress.peta-kemampuanmu-bukan-rapor-rendah')}</span></p>`);
- const tl=skillTimeline(),days=Object.keys(tl).sort().slice(-7);const timelineHtml=days.length?days.map(d=>{const x=tl[d];const vals=Object.entries(x).map(([k,v])=>`${esc(friendlySkillName(k))} ${Math.round(v.correct/v.total*100)}%`).join(' · ');return `<div class="timeline-row"><span>${d}</span><span>${vals}</span></div>`}).join(''):FiezelI18n.t('progress.class-muted-bukti-study-pending');
- const patterns=errorPatterns().slice(0,6);const conf=confidenceCalibration();const due=dueItems().sort((a,b)=>forgettingProbability(b[1])-forgettingProbability(a[1])).slice(0,8);const pairs=confusionPairs();const diag=diagnosticReport(),evidence=buildLearnerEvidenceModel();
- const readingSkills=['reading_inference','reading_detail','reading_vocabulary','reading_purpose','reading_comparison'];
- const readingHtml=readingSkills.map(k=>{const hs=(state.history||[]).filter(h=>h.skill===k&&historyMatchesActive(h,active));const a=hs.length?Math.round(hs.filter(h=>h.ok).length/hs.length*100):null;return `<div class="meter"><div class="row"><span>${esc(readingFocusLabel(k.replace('reading_','')))}</span><span>${a==null?'—':a+'%'} · ${hs.length} bukti</span></div><div class="bar"><i style="width:${a||0}%"></i></div></div>`}).join('');
- const diagHtml=diag.ready?`<p><b>${FiezelI18n.t('progress.perkiraan-level')}</b> ${diag.level}</p><p><b>${FiezelI18n.t('progress.akurasi-keseluruhan')}</b> ${diag.overall}%</p><div class="diag-grid">${diag.rows.map(x=>`<div><b>${x.name}</b><br>${FiezelI18n.t('progress.answer',{akurasi:x.accuracy==null?FiezelI18n.t('progress.belum-terukur'):x.accuracy+'%',attempts:x.attempts})}</div>`).join('')}</div><p class="muted">${diag.weak?FiezelI18n.t('progress.diag-priority',{name:esc(diag.weak.name)}):FiezelI18n.t('progress.diag-continue')}</p>`:'<p class="muted">'+FiezelI18n.t('progress.fiezel-belum-punya-cukup-bukti')+'</p>';
- // m025-85: this screen used to stack 17 cards in one uninterrupted scroll - the
- // OWNER complaint was exactly that: too long, no structure, nobody reads to the
- // bottom. Same data, same cards, now grouped into four tabs so each visit only
- // renders the section the learner actually came for. Kesehatan Instalasi moved
- // out entirely - it is app/install health, not learning progress, and now lives
- // in Settings (see openSettings()).
- /* Audit F15 (2026-09-23): murid baru dulu disambut dinding "Belum terukur" (lima kali), tabel
-    kesiapan yang kolomnya kosong, dan "Menunggu konten". Selama belum ada satu jawaban pun,
-    kedua modul itu diganti SATU kalimat yang menjelaskan kapan mereka muncul. */
- const progressFresh=!(Array.isArray(state.history)&&state.history.length);
- /* m025-463 audit kabel BrainCore D7: peta kekeliruan antar-pelajaran dari matriks BrainCore ikut tampil di
-    tab Analisis, tempat murid membaca kesalahannya, bukan hanya di tab ke-4. */
- const tabContent={
-  overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${braincoreProofPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
-   ${progressFresh&&!due.length?'':card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
-   ${card(`<details class="prasasti-fold"><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
-   </div>`,
-  analysis:`<div class="grid progress-grid">
-   ${confusionInsightMarkup()}
-   ${card(`<h3>${FiezelI18n.t('progress.lab-kesalahan')}</h3>${patterns.length?patterns.map(x=>`<div class="row"><span>${esc(friendlySkillName(x.key))}</span><b>${FiezelI18n.t('progress.salah',{errors:x.errors,rate:Math.round(x.rate*100)})}</b></div>${x.common?`<p class="muted">${FiezelI18n.t('progress.pilihan-paling-sering-muncul-kali',{common:esc(x.common),count:x.count})}</p>`:''}`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pola-kesalahan-berulang')+'</p>'}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.pola-kesalahan')}</h3>${patterns.length?patterns.slice(0,4).map(x=>`<p><b>${esc(friendlySkillName(x.key))}</b>: ${FiezelI18n.t('progress.error-pattern',{errors:x.errors,common:x.common?FiezelI18n.t('progress.error-common-choice',{choice:esc(x.common),count:x.count}):FiezelI18n.t('progress.error-no-common')})}</p>`).join(''):'<p class="muted">'+FiezelI18n.t('progress.bukti-pending-cukup-for-menemukan')+'</p>'}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.weakness-heading')}</h3>${timelineHtml}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.calibration-heading')}</h3>${conf.map(x=>`<div class="row"><span>${x.level===1?FiezelI18n.t('progress.calibration-1'):x.level===2?FiezelI18n.t('progress.calibration-2'):FiezelI18n.t('progress.calibration-3')}</span><span>${x.n?FiezelI18n.t('progress.calibration-stat',{accuracy:x.accuracy,gap:x.gap}):'—'}</span></div>`).join('<hr>')}<p class="muted">${FiezelI18n.t('progress.selisih-menunjukkan-jarak-antara-rasa')}</p>`)}
-   ${card(`<h3>${FiezelI18n.t('progress.jaringan-kekeliruan-vocab')}</h3>${pairs.length?`<div class="confusion-network">${pairs.map(x=>`<div class="confusion-node"><span>${esc(x.a)}</span><b><i data-lucide="arrow-left-right"></i></b><span>${esc(x.b)}</span><small>${x.count} tanda kebingungan</small></div>`).join('')}</div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pasangan-kata-terlihat')+'</p>'}`)}
-   </div>`,
-  adaptive:`<div class="grid progress-grid">
-   ${coreBrainPanelMarkup()}
-   ${card(`<h3>${FiezelI18n.t('progress.kartu-rencana-latihan')}</h3>${(()=>{const p=buildAdaptivePolicy();const tahap=istilahMurid('mode',p.mode),band=istilahMurid('band',p.difficultyBand),tempo=istilahMurid('pace',p.pace);return `<div class="diag-grid">${tahap?`<div><b>${FiezelI18n.t('progress.label-tahap')}</b><br>${esc(tahap)}</div>`:''}<div><b>${FiezelI18n.t('progress.fokus')}</b><br>${esc(p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain))}</div><div><b>${FiezelI18n.t('progress.label-panjang-sesi')}</b><br>${FiezelI18n.t('progress.item-menit-2',{sessionSize:p.sessionSize,estimatedMinutes:p.estimatedMinutes})}</div>${band?`<div><b>${FiezelI18n.t('progress.label-tingkat-soal')}</b><br>${esc(band)}</div>`:''}<div><b>${FiezelI18n.t('progress.label-porsi-ulangan')}</b><br>${Math.round(p.reviewShare*100)}%</div>${tempo?`<div><b>${FiezelI18n.t('progress.label-tempo')}</b><br>${esc(tempo)}</div>`:''}</div><p>${esc(p.summary)}</p><p class="muted">${FiezelI18n.t('progress.policy-bersifat-deterministik-dapat-diaudit')}</p>`})()}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.kartu-hasil-sesi')}</h3>${(()=>{const o=state.policyOutcomeMeta?.last;if(!o)return '<p>'+FiezelI18n.t('progress.belum-ada-sesi-adaptive-punya')+'</p>';const hasil=istilahMurid('hasil',o.status),saran=istilahMurid('saran',o.recommendation);return `<div class="diag-grid">${hasil?`<div><b>${FiezelI18n.t('progress.label-hasil')}</b><br>${esc(hasil)}</div>`:''}<div><b>${FiezelI18n.t('progress.label-nilai')}</b><br>${Math.round(o.score)}/100</div><div><b>${FiezelI18n.t('progress.label-selesai')}</b><br>${Math.round(o.completionRate)}%</div><div><b>${FiezelI18n.t('progress.stat-accuracy')}</b><br>${o.accuracy==null?'-':Math.round(o.accuracy)+'%'}</div><div><b>${FiezelI18n.t('progress.target-hit')}</b><br>${Math.round(o.targetAdherence)}%</div>${saran?`<div><b>${FiezelI18n.t('progress.rekomendasi')}</b><br>${esc(saran)}</div>`:''}</div><p class="muted">${FiezelI18n.t('progress.outcome-menjadi-evidence-policy-upcoming')}</p>`})()}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.kartu-kebiasaan')}</h3><div class="diag-grid"><div><b>${FiezelI18n.t('progress.konsistensi-hari')}</b><br>${FiezelI18n.t('progress.hari-aktif',{consistency14d:evidence.behavior.consistency14d,activeDays14:evidence.behavior.activeDays14})}</div><div><b>${FiezelI18n.t('progress.evidence-speed-label')}</b><br>${evidence.behavior.medianResponseMs==null?FiezelI18n.t('progress.evidence-speed-na'):FiezelI18n.t('progress.evidence-speed-value',{seconds:Math.round(evidence.behavior.medianResponseMs/100)/10})}</div>${evidence.confidence.gap==null?''/* baris kalibrasi disembunyikan saat kosong: sumbernya state.confidenceHistory, dan sejak popup keyakinan dicabut dari semua sesi tidak ada lagi yang mengisinya - sama persis dengan alasan di panel OLM. Murid lama yang punya riwayat tetap melihat angkanya. */:`<div><b>${FiezelI18n.t('progress.evidence-calibration-label')}</b><br>${FiezelI18n.t('progress.evidence-calibration-gap',{gap:evidence.confidence.gap})}</div>`}<div><b>${FiezelI18n.t('progress.label-sesi-ditinggal')}</b><br>${FiezelI18n.t('progress.sesi',{abandonmentRate:evidence.behavior.abandonmentRate,sessions30d:evidence.behavior.sessions30d})}</div><div><b>${FiezelI18n.t('progress.waktu-study-dominan')}</b><br>${esc(FiezelI18n.t({'pagi':'progress.jendela-pagi','siang':'progress.jendela-siang','sore':'progress.jendela-sore','malam':'progress.jendela-malam','larut':'progress.jendela-larut','belum terbaca':'progress.jendela-belum-terbaca'}[evidence.behavior.preferredStudyWindow]||'progress.jendela-belum-terbaca'))}</div><div><b>${FiezelI18n.t('progress.evidence-risk-label')}</b><br>${evidence.memory.maxForgettingRisk}% · ${FiezelI18n.t('progress.rawan-materi',{count:evidence.memory.highRiskCount})}</div></div><p class="muted">${FiezelI18n.t('progress.model-memakai-agregat-perilaku-hasil')}</p>`)}
-   </div>`,
-  readiness:`<div class="grid progress-grid">
-   ${progressFresh?card(`<h3>${FiezelI18n.t('progress.modul-menunggu-judul')}</h3><p class="muted">${FiezelI18n.t('progress.modul-menunggu-isi')}</p>`):`
-    ${card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)}
-    ${card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
-    ${card(`<h3>${FiezelI18n.t('progress.peta-skill-reading')}</h3>${readingHtml}`)}
-   `}
-   </div>`
- };
+ try {
+  state.grammar=state.grammar||{};state.vocab=state.vocab||{};state.reading=state.reading||{};state.history=state.history||[];
+  const active=getActiveLevel(),snapshot=buildLearningSnapshot()||{},acc=snapshot.totalAccuracy??0;const profile=getDiagnosticProfile()||{};const map=[[FiezelI18n.t('progress.vocab'),'vocab',state.vocab],['Grammar','grammar',state.grammar],['Reading','reading',state.reading]];
+  const mapRows=map.map(([name,type,bucket])=>{const items=Object.entries(bucket||{}).filter(([key,x])=>x?.total&&(contentLevelFor(type,key)||active)===active).map(([,x])=>x),m=items.length?Math.round(items.reduce((a,x)=>a+(x.mastery||0),0)/items.length):0;return `<div class="map-row"><span class="mi fz-i" data-fz-icon="${type}" aria-hidden="true"></span><span class="mn">${name}</span><span class="bar"><i style="width:${m}%"></i></span><strong class="mp">${m}%</strong><small class="me">${FiezelI18n.t('progress.materi-done-punya-bukti-study',{length:items.length,active:active})}</small></div>`}).join('');
+  const mapCards=card(`<div class="map-rows">${mapRows}</div><p class="map-note">${pawFaceMarkup()}<span>${FiezelI18n.t('progress.peta-kemampuanmu-bukan-rapor-rendah')}</span></p>`);
+  let tl={},days=[];try{tl=skillTimeline()||{};days=Object.keys(tl).sort().slice(-7);}catch(_){}
+  const timelineHtml=days.length?days.map(d=>{const x=tl[d]||{};const vals=Object.entries(x).map(([k,v])=>`${esc(friendlySkillName(k))} ${Math.round((v.correct||0)/(v.total||1)*100)}%`).join(' · ');return `<div class="timeline-row"><span>${d}</span><span>${vals}</span></div>`}).join(''):FiezelI18n.t('progress.class-muted-bukti-study-pending');
+  let patterns=[];try{patterns=(errorPatterns()||[]).slice(0,6);}catch(_){}
+  let conf=[];try{conf=confidenceCalibration()||[];}catch(_){}
+  let due=[];try{due=(dueItems()||[]).sort((a,b)=>forgettingProbability(b?.[1])-forgettingProbability(a?.[1])).slice(0,8);}catch(_){}
+  let pairs=[];try{pairs=confusionPairs()||[];}catch(_){}
+  let diag={ready:false};try{diag=diagnosticReport()||{ready:false};}catch(_){}
+  let evidence={behavior:{},confidence:{},memory:{}};try{evidence=buildLearnerEvidenceModel()||{behavior:{},confidence:{},memory:{}};}catch(_){}
+  if(!evidence.behavior)evidence.behavior={};if(!evidence.confidence)evidence.confidence={};if(!evidence.memory)evidence.memory={};
+  const readingSkills=['reading_inference','reading_detail','reading_vocabulary','reading_purpose','reading_comparison'];
+  const readingHtml=readingSkills.map(k=>{const hs=(state.history||[]).filter(h=>h.skill===k&&historyMatchesActive(h,active));const a=hs.length?Math.round(hs.filter(h=>h.ok).length/hs.length*100):null;return `<div class="meter"><div class="row"><span>${esc(readingFocusLabel(k.replace('reading_','')))}</span><span>${a==null?'—':a+'%'} · ${hs.length} bukti</span></div><div class="bar"><i style="width:${a||0}%"></i></div></div>`}).join('');
+  const progressFresh=!(Array.isArray(state.history)&&state.history.length);
+  const tabContent={
+   overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${braincoreProofPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
+    ${progressFresh&&!due.length?'':card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x?.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
+    ${card(`<details class="prasasti-fold"><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
+    </div>`,
+   analysis:`<div class="grid progress-grid">
+    ${confusionInsightMarkup()}
+    ${card(`<h3>${FiezelI18n.t('progress.lab-kesalahan')}</h3>${patterns.length?patterns.map(x=>`<div class="row"><span>${esc(friendlySkillName(x.key))}</span><b>${FiezelI18n.t('progress.salah',{errors:x.errors,rate:Math.round(x.rate*100)})}</b></div>${x.common?`<p class="muted">${FiezelI18n.t('progress.pilihan-paling-sering-muncul-kali',{common:esc(x.common),count:x.count})}</p>`:''}`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pola-kesalahan-berulang')+'</p>'}`)}
+    ${card(`<h3>${FiezelI18n.t('progress.pola-kesalahan')}</h3>${patterns.length?patterns.slice(0,4).map(x=>`<p><b>${esc(friendlySkillName(x.key))}</b>: ${FiezelI18n.t('progress.error-pattern',{errors:x.errors,common:x.common?FiezelI18n.t('progress.error-common-choice',{choice:esc(x.common),count:x.count}):FiezelI18n.t('progress.error-no-common')})}</p>`).join(''):'<p class="muted">'+FiezelI18n.t('progress.bukti-pending-cukup-for-menemukan')+'</p>'}`)}
+    ${card(`<h3>${FiezelI18n.t('progress.weakness-heading')}</h3>${timelineHtml}`)}
+    ${card(`<h3>${FiezelI18n.t('progress.calibration-heading')}</h3>${conf.map(x=>`<div class="row"><span>${x.level===1?FiezelI18n.t('progress.calibration-1'):x.level===2?FiezelI18n.t('progress.calibration-2'):FiezelI18n.t('progress.calibration-3')}</span><span>${x.n?FiezelI18n.t('progress.calibration-stat',{accuracy:x.accuracy,gap:x.gap}):'—'}</span></div>`).join('<hr>')}<p class="muted">${FiezelI18n.t('progress.selisih-menunjukkan-jarak-antara-rasa')}</p>`)}
+    ${card(`<h3>${FiezelI18n.t('progress.jaringan-kekeliruan-vocab')}</h3>${pairs.length?`<div class="confusion-network">${pairs.map(x=>`<div class="confusion-node"><span>${esc(x.a)}</span><b><i data-lucide="arrow-left-right"></i></b><span>${esc(x.b)}</span><small>${x.count} tanda kebingungan</small></div>`).join('')}</div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pasangan-kata-terlihat')+'</p>'}`)}
+    </div>`,
+   adaptive:`<div class="grid progress-grid">
+    ${coreBrainPanelMarkup()}
+    ${card(`<h3>${FiezelI18n.t('progress.kartu-rencana-latihan')}</h3>${(()=>{try{const p=buildAdaptivePolicy();if(!p)return '<p class="muted">Rencana latihan belum siap.</p>';const tahap=istilahMurid('mode',p.mode),band=istilahMurid('band',p.difficultyBand),tempo=istilahMurid('pace',p.pace);return `<div class="diag-grid">${tahap?`<div><b>${FiezelI18n.t('progress.label-tahap')}</b><br>${esc(tahap)}</div>`:''}<div><b>${FiezelI18n.t('progress.fokus')}</b><br>${esc(p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain||'grammar'))}</div><div><b>${FiezelI18n.t('progress.label-panjang-sesi')}</b><br>${FiezelI18n.t('progress.item-menit-2',{sessionSize:p.sessionSize||10,estimatedMinutes:p.estimatedMinutes||5})}</div>${band?`<div><b>${FiezelI18n.t('progress.label-tingkat-soal')}</b><br>${esc(band)}</div>`:''}<div><b>${FiezelI18n.t('progress.label-porsi-ulangan')}</b><br>${Math.round((p.reviewShare||0)*100)}%</div>${tempo?`<div><b>${FiezelI18n.t('progress.label-tempo')}</b><br>${esc(tempo)}</div>`:''}</div><p>${esc(p.summary||'')}</p><p class="muted">${FiezelI18n.t('progress.policy-bersifat-deterministik-dapat-diaudit')}</p>`}catch(_){return '<p class="muted">Rencana latihan adaptif siap setelah sesi pertama.</p>'}})()}`)}
+    ${card(`<h3>${FiezelI18n.t('progress.kartu-hasil-sesi')}</h3>${(()=>{const o=state.policyOutcomeMeta?.last;if(!o)return '<p>'+FiezelI18n.t('progress.belum-ada-sesi-adaptive-punya')+'</p>';const hasil=istilahMurid('hasil',o.status),saran=istilahMurid('saran',o.recommendation);return `<div class="diag-grid">${hasil?`<div><b>${FiezelI18n.t('progress.label-hasil')}</b><br>${esc(hasil)}</div>`:''}<div><b>${FiezelI18n.t('progress.label-nilai')}</b><br>${Math.round(o.score)}/100</div><div><b>${FiezelI18n.t('progress.label-selesai')}</b><br>${Math.round(o.completionRate)}%</div><div><b>${FiezelI18n.t('progress.stat-accuracy')}</b><br>${o.accuracy==null?'-':Math.round(o.accuracy)+'%'}</div><div><b>${FiezelI18n.t('progress.target-hit')}</b><br>${Math.round(o.targetAdherence)}%</div>${saran?`<div><b>${FiezelI18n.t('progress.rekomendasi')}</b><br>${esc(saran)}</div>`:''}</div><p class="muted">${FiezelI18n.t('progress.outcome-menjadi-evidence-policy-upcoming')}</p>`})()}`)}
+    ${card(`<h3>${FiezelI18n.t('progress.kartu-kebiasaan')}</h3><div class="diag-grid"><div><b>${FiezelI18n.t('progress.konsistensi-hari')}</b><br>${FiezelI18n.t('progress.hari-aktif',{consistency14d:evidence.behavior?.consistency14d||0,activeDays14:evidence.behavior?.activeDays14||0})}</div><div><b>${FiezelI18n.t('progress.evidence-speed-label')}</b><br>${evidence.behavior?.medianResponseMs==null?FiezelI18n.t('progress.evidence-speed-na'):FiezelI18n.t('progress.evidence-speed-value',{seconds:Math.round(evidence.behavior.medianResponseMs/100)/10})}</div>${evidence.confidence?.gap==null?''/* baris kalibrasi disembunyikan saat kosong: sumbernya state.confidenceHistory, dan sejak popup keyakinan dicabut dari semua sesi tidak ada lagi yang mengisinya - sama persis dengan alasan di panel OLM. Murid lama yang punya riwayat tetap melihat angkanya. */:`<div><b>${FiezelI18n.t('progress.evidence-calibration-label')}</b><br>${FiezelI18n.t('progress.evidence-calibration-gap',{gap:evidence.confidence.gap})}</div>`}<div><b>${FiezelI18n.t('progress.label-sesi-ditinggal')}</b><br>${FiezelI18n.t('progress.sesi',{abandonmentRate:evidence.behavior?.abandonmentRate||0,sessions30d:evidence.behavior?.sessions30d||0})}</div><div><b>${FiezelI18n.t('progress.waktu-study-dominan')}</b><br>${esc(FiezelI18n.t({'pagi':'progress.jendela-pagi','siang':'progress.jendela-siang','sore':'progress.jendela-sore','malam':'progress.jendela-malam','larut':'progress.jendela-larut','belum terbaca':'progress.jendela-belum-terbaca'}[evidence.behavior?.preferredStudyWindow]||'progress.jendela-belum-terbaca'))}</div><div><b>${FiezelI18n.t('progress.evidence-risk-label')}</b><br>${evidence.memory?.maxForgettingRisk||0}% · ${FiezelI18n.t('progress.rawan-materi',{count:evidence.memory?.highRiskCount||0})}</div></div><p class="muted">${FiezelI18n.t('progress.model-memakai-agregat-perilaku-hasil')}</p>`)}
+    </div>`,
+   readiness:`<div class="grid progress-grid">
+    ${progressFresh?card(`<h3>${FiezelI18n.t('progress.modul-menunggu-judul')}</h3><p class="muted">${FiezelI18n.t('progress.modul-menunggu-isi')}</p>`):`
+     ${card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)}
+     ${card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
+     ${card(`<h3>${FiezelI18n.t('progress.peta-skill-reading')}</h3>${readingHtml}`)}
+    `}
+    </div>`
+  };
 
- shell(FiezelI18n.t('progress.peta-study-lab'),FiezelI18n.t('progress.lihat-bagian-sudah-kuat-pola'),`
- ${card(`<div class="stats progress-stats"><div>${stat(FiezelI18n.t('progress.stat-accuracy'),acc+'%')}</div><div>${stat(FiezelI18n.t('progress.stat-streak'),FiezelI18n.t('progress.stat-streak-days',{days:state.streak}))}</div><div>${stat(FiezelI18n.t('progress.stat-today'),FiezelI18n.t('progress.stat-today-value',{count:Number(state.daily?.attempts)||0}))}</div><div>${stat(FiezelI18n.t('progress.stat-review'),due.length)}</div><div class="stat-gem-span">${stat(FiezelI18n.t('progress.stat-gem'),gemsBalance())}</div></div>`)}
- <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTabSafe()===id?' active':''}" role="tab" aria-selected="${progressTabSafe()===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
- <div id="progressTabPane" class="progress-tab-pane">${tabContent[progressTabSafe()]}</div>
- ${card(`<div class="row"><b><!-- Dibuat oleh Fitrarustqi -->${FiezelI18n.t('footer.dibuat-oleh',{nama:'Fitrarustqi'})}</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
- `);
- try{const c=document.querySelector('.progress-tabs'),b=document.querySelector('.progress-tab.active');if(c&&b&&b.offsetLeft>0){c.scrollLeft=Math.max(0,b.offsetLeft-(c.clientWidth-b.clientWidth)/2)}}catch(_){}
+  const activePane=tabContent[progressTabSafe()]||tabContent.overview||'';
+  shell(FiezelI18n.t('progress.peta-study-lab'),FiezelI18n.t('progress.lihat-bagian-sudah-kuat-pola'),`
+  ${card(`<div class="stats progress-stats"><div>${stat(FiezelI18n.t('progress.stat-accuracy'),acc+'%')}</div><div>${stat(FiezelI18n.t('progress.stat-streak'),FiezelI18n.t('progress.stat-streak-days',{days:state.streak}))}</div><div>${stat(FiezelI18n.t('progress.stat-today'),FiezelI18n.t('progress.stat-today-value',{count:Number(state.daily?.attempts)||0}))}</div><div>${stat(FiezelI18n.t('progress.stat-review'),due.length)}</div><div class="stat-gem-span">${stat(FiezelI18n.t('progress.stat-gem'),gemsBalance())}</div></div>`)}
+  <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTabSafe()===id?' active':''}" role="tab" aria-selected="${progressTabSafe()===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
+  <div id="progressTabPane" class="progress-tab-pane">${activePane}</div>
+  ${card(`<div class="row"><b><!-- Dibuat oleh Fitrarustqi -->${FiezelI18n.t('footer.dibuat-oleh',{nama:'Fitrarustqi'})}</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
+  `);
+  try{const c=document.querySelector('.progress-tabs'),b=document.querySelector('.progress-tab.active');if(c&&b&&b.offsetLeft>0){c.scrollLeft=Math.max(0,b.offsetLeft-(c.clientWidth-b.clientWidth)/2)}}catch(_){}
+ } catch(err) {
+  console.error('[progress render recovery]', err);
+  shell(FiezelI18n.t('nav.progres'),FiezelI18n.t('progress.lihat-bagian-sudah-kuat-pola'),card(`<h3>${FiezelI18n.t('nav.progres')}</h3><p class="muted">${FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')}</p><div style="margin-top:16px"><button class="btn btn-primary" onclick="go('latihan')">${FiezelI18n.t('umum.lanjut','Lanjut')}</button></div>`));
+ }
 }
 function validReportEndpoint(value){try{const u=new URL(String(value||'').trim());return u.protocol==='https:'&&u.hostname.endsWith('.puter.work')}catch{return false}}
 function reportId(){try{return crypto.randomUUID()}catch{return`${Date.now()}-${Math.random().toString(36).slice(2)}`}}
@@ -19807,7 +19805,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
      ke server SAAT diubah (bukan saat Simpan) karena janjinya "hilang dari papan seketika";
      tanpa profil/offline ia menolak jujur lewat toast dan kembali ke posisi semula. */
   const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>${FiezelI18n.t('settings.online-profile-label')}</b><small>${FiezelI18n.t('settings.online-profile-desc')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>${FiezelI18n.t('settings.private-mode-label')}</b><small>${FiezelI18n.t('settings.private-mode-desc')}</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="${FiezelI18n.t('settings.private-mode-aria')}"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="history"></i></span><span><b>${FiezelI18n.t('settings.brain-sync-label')}</b><small>${FiezelI18n.t(activeAccountUuid?'settings.brain-sync-desc':'settings.brain-sync-desc-no-account')}</small></span><input id="settingBrainSync" type="checkbox" ${state.preferences?.brainSync===true?'checked':''} ${activeAccountUuid?'':'disabled'} onchange="setBrainSyncPreference(this.checked)" aria-label="${FiezelI18n.t('settings.brain-sync-label')}"></label></div>`;
-  openModal(`<div class="settings-head"><div class="modal-mark">${FiezelI18n.t('student.settings-mark')}</div><h2>${FiezelI18n.t('settings.title',{name:esc(learnerName())})}</h2><p>${FiezelI18n.t('settings.all-can-diatur-dikelompokkan-each')}</p></div>`
+  openModal(`<div class="settings-modal-wrapper"><div class="settings-head"><div class="settings-head-bar"><div class="modal-mark">${FiezelI18n.t('student.settings-mark')}</div><button type="button" class="settings-close-x" onclick="closeModal()" aria-label="Tutup"><i data-lucide="x"></i></button></div><h2>${FiezelI18n.t('settings.title',{name:esc(learnerName())})}</h2><p>${FiezelI18n.t('settings.all-can-diatur-dikelompokkan-each')}</p></div><div class="settings-scroll-body" id="settingsScrollBody">`
     /* m025-262: fold ini dulu menawarkan 'Masuk / Daftar' kepada SETIAP murid — permukaan
        pendaftaran keempat, sesudah onboarding, gerbang Puter, dan Online & Teman. Sekarang
        ia hanya muncul untuk akun yang memang sudah ada (jalur aktivasi guru). */
@@ -19818,7 +19816,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
     +settingsFold(FiezelI18n.t('settings.online-fold-title'),grupOnline,false)
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
-    +`<div class="modal-actions settings-actions"><button id="settingsCancel">${FiezelI18n.t('settings.cancel-btn')}</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
+    +`</div><div class="modal-actions settings-actions"><button id="settingsCancel">${FiezelI18n.t('settings.cancel-btn')}</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div></div>`);
   $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});$('settingCheckUpdate')?.addEventListener('click',async()=>{const btn=$('settingCheckUpdate');if(btn){btn.disabled=true;btn.textContent='Memeriksa...';}try{const hasUpdate=await self.FiezelUpdatePrompt?.check?.(true);if(!hasUpdate){showToast('Aplikasi sudah versi terbaru ('+(self.FIEZEL_PAGE_BUILD||'')+').','success');if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="check"></i> Versi Terbaru ('+(self.FIEZEL_PAGE_BUILD||'')+')';enhanceUI();}}else{closeModal();}}catch(err){showToast('Gagal memeriksa: '+(err?.message||err),'warn');if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="refresh-cw"></i> Cek Pembaruan';enhanceUI();}}});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingTargetLang')?.addEventListener('change',event=>setTargetLangPreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
@@ -20016,13 +20014,13 @@ function bindUiSfxDelegation(){
 // benar-benar BARU dibuka yang mendorong entri: openSettings -> openReportPreview ->
 // openSettings hanya menukar isi panel yang sama, dan tiga entri untuk satu dialog akan
 // membuang dua tekanan kembali pada layar yang sudah tidak ada.
-function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');const panel=$('modalPanel');if(panel){panel.innerHTML=html;panel.scrollTop=0;}modal.classList.remove('hidden');enhanceUI();try{const appEl=$('app');if(appEl){appEl.setAttribute('aria-hidden','true');if('inert' in appEl)appEl.inert=true}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.setAttribute('aria-hidden','true');if('inert' in nav)nav.inert=true}}catch(_){}/* q17-S1 2026-08-29: dialog wajib mengelola fokus — fokus awal ke tombol pertama, dan fokus dikembalikan saat tutup (lihat closeModalNow). Trap Tab ada di modalTrapKeydown. */if(!wasOpen)modalReturnFocus=document.activeElement;(window.requestAnimationFrame||setTimeout)(()=>{modal.classList.add('show');try{const first=modal.querySelector('#modalPanel button,#modalPanel [href],#modalPanel input,#modalPanel select,#modalPanel textarea');(first||modal.querySelector('#modalPanel'))?.focus?.({preventScroll:true});if(panel)panel.scrollTop=0;}catch(_){}});if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
+function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);document.documentElement.classList.add('fz-modal-open');document.body?.classList?.add?.('fz-modal-open');const modal=$('modal');const panel=$('modalPanel');if(panel){panel.innerHTML=html;panel.scrollTop=0;}modal.classList.remove('hidden');enhanceUI();try{const appEl=$('app');if(appEl){appEl.setAttribute('aria-hidden','true');if('inert' in appEl)appEl.inert=true}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.setAttribute('aria-hidden','true');if('inert' in nav)nav.inert=true}}catch(_){}/* q17-S1 2026-08-29: dialog wajib mengelola fokus — fokus awal ke tombol pertama, dan fokus dikembalikan saat tutup (lihat closeModalNow). Trap Tab ada di modalTrapKeydown. */if(!wasOpen)modalReturnFocus=document.activeElement;(window.requestAnimationFrame||setTimeout)(()=>{modal.classList.add('show');try{const first=modal.querySelector('#modalPanel button,#modalPanel [href],#modalPanel input,#modalPanel select,#modalPanel textarea');(first||modal.querySelector('#modalPanel'))?.focus?.({preventScroll:true});if(panel)panel.scrollTop=0;}catch(_){}});if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
 // Penutup mentah. Ini yang dipegang riwayat, jadi ia TIDAK BOLEH menyentuh riwayat lagi -
 // kalau ia melakukannya, satu tekanan kembali akan memakan dua entri. Mengembalikan false
 // bila memang tidak ada modal terbuka, supaya jalur kembali tahu tekanan itu belum terpakai
 // dan boleh meneruskannya ke lapisan di bawahnya.
 let modalReturnFocus=null;
-function closeModalNow(){if(!modalOpen)return false;modalOpen=false;try{dismissAllModalsDefensive()}catch(_){}try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}try{$('modalPanel')?.classList.remove('modal-connect-panel')}catch(_){}uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');if(modal)modal.classList.remove('show');modalCloseTimer=setTimeout(()=>{if(modal)modal.classList.add('hidden')},320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
+function closeModalNow(){if(!modalOpen)return false;modalOpen=false;document.documentElement.classList.remove('fz-modal-open');document.body?.classList?.remove?.('fz-modal-open');try{dismissAllModalsDefensive()}catch(_){}try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}try{$('modalPanel')?.classList.remove('modal-connect-panel')}catch(_){}uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');if(modal)modal.classList.remove('show');modalCloseTimer=setTimeout(()=>{if(modal)modal.classList.add('hidden')},320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
 // Ditutup oleh aplikasi sendiri (tombol Batal/Tutup/Escape): layarnya berubah seketika, dan
 // entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
 // sudah tidak ada.
@@ -20645,7 +20643,25 @@ function socialCore(){try{return self.FiezelSocial||null}catch(_){return null}}
 function socialMicroMoment(kind){try{if(feedbackSoundsOn())uiSfx(kind==='cheer'?'xp_gain':'notif_achievement')}catch(_){}try{pawReact('reward',{kind:kind||'social'})}catch(_){}}
 function openOnlineView(){closeModal();go('online')}
 window.openOnlineView=openOnlineView;
-window.switchOnlineTab=id=>{if(!onlineTabs().some(([t])=>t===id))return;onlineTab=id;const root=$('onlineRoot');if(root&&(state.view==='online'||state.view==='profile')){document.querySelectorAll('.progress-tabs .progress-tab').forEach(b=>{const on=b.getAttribute('onclick')?.includes(`'${id}'`);b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false')});renderOnlineTab();return}render()};
+let _socialProbeFlagCache=null;
+window.switchOnlineTab=id=>{
+  if(!onlineTabs().some(([t])=>t===id))return;
+  onlineTab=id;
+  const root=$('onlineRoot');
+  if(root&&(state.view==='online'||state.view==='profile')){
+    document.querySelectorAll('.progress-tabs .progress-tab').forEach(b=>{
+      const on=b.getAttribute('onclick')?.includes(`'${id}'`);
+      b.classList.toggle('active',on);
+      b.setAttribute('aria-selected',on?'true':'false')
+    });
+    if(id==='teman'||id==='papan'){
+      root.innerHTML=`<div class="social-loading-skeleton" style="padding:16px 0;opacity:0.85">${card(`<p class="muted" style="display:flex;align-items:center;gap:10px;justify-content:center;padding:24px 16px;margin:0;"><span class="fz-spin">⏳</span> ${esc(FiezelI18n.t('social.loading','Memuat...'))}</p>`,'social-card')}</div>`;
+    }
+    renderOnlineTab();
+    return;
+  }
+  render();
+};
 window.switchOnlineBoard=id=>{onlineBoardTab=id==='liga'?'liga':'teman';if($('onlineRoot')&&(state.view==='online'||state.view==='profile')){renderOnlineTab();return}render()};
 window.toggleCardCollapse=function(cardId){
   try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
@@ -21068,7 +21084,7 @@ function tactileProfileCockpitMarkup(opts={}){
 }
 
 function onlineView(){
-  const tabs=`<div class="progress-tabs" role="tablist">${onlineTabs().map(([id,label])=>`<button type="button" class="progress-tab${onlineTab===id?' active':''}" role="tab" aria-selected="${onlineTab===id}" onclick="switchOnlineTab('${id}')">${id==='teman'?onlineTemanTabLabel(label):esc(label)}</button>`).join('')}</div>`;
+  const tabs=`<div class="progress-tabs profile-tabs" role="tablist">${onlineTabs().map(([id,label])=>`<button type="button" class="progress-tab${onlineTab===id?' active':''}" role="tab" aria-selected="${onlineTab===id}" onclick="switchOnlineTab('${id}')">${id==='teman'?onlineTemanTabLabel(label):esc(label)}</button>`).join('')}</div>`;
   /* m025-277 (§4a): pintu KEDUA ke PAW ARENA (selain kartu Home). Ditaruh di cangkang
      Profil, DI LUAR konten sosial yang bergantung flag/jaringan, supaya arena tetap bisa
      dibuka murid meski offline (arena itu offline-first). Untuk murid, bukan guru. */
@@ -21086,18 +21102,19 @@ async function renderOnlineTab(){
   const core=socialCore();
   const extra=onlineTab==='teman'?socialClassCardMarkup():'';
   if(onlineTab==='profil'){
-    let flag='off';
-    if(core){try{flag=await core.probeFlag()}catch(_){flag='off'}}
-    if(typeof navigator!=='undefined'&&navigator.onLine===false)flag='offline';
-    return put(tactileProfileCockpitMarkup({flag}));
+    const flag=_socialProbeFlagCache||'on';
+    if(core&&!_socialProbeFlagCache){core.probeFlag().then(f=>{_socialProbeFlagCache=f;}).catch(()=>{});}
+    return put(tactileProfileCockpitMarkup({flag:(typeof navigator!=='undefined'&&navigator.onLine===false)?'offline':flag}));
   }
   if(!core)return put(card(`<h3>${FiezelI18n.t('social.not-loaded-title')}</h3><p class="muted">${FiezelI18n.t('social.not-loaded-body')}</p>`,'social-card')+extra);
   if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard()+extra);
-  let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
+  let flag=_socialProbeFlagCache;
+  if(!flag){
+    try{flag=await core.probeFlag();_socialProbeFlagCache=flag;}catch(_){flag='off';}
+  }
   if(flag!=='on')return put(socialFlagOffCard(flag)+extra);
   try{await core.ensureAnon()}catch(_){}
-  // Lencana tab Teman disegarkan bersama isi tab (bukan satu ronde jaringan sendiri tiap render).
-  try{await refreshFriendRequestCount();updateTemanBadge()}catch(_){}
+  refreshFriendRequestCount().then(updateTemanBadge).catch(()=>{});
   try{
     if(onlineTab==='teman')return put(await socialTemanMarkup(core));
     if(onlineTab==='papan')return put(await socialPapanMarkup(core));
@@ -21398,22 +21415,24 @@ window.socialCreateProfile=socialCreateProfile;
 function socialClassCardMarkup(){const classCode=learnerClassCode();return card(`<div class="fz2-classrow"><div><h3>${FiezelI18n.t('social2.class-title')}</h3><p class="muted">${classCode?esc(FiezelI18n.t('social2.class-current',{code:classCode})):FiezelI18n.t('social2.class-desc')}</p></div><button type="button" class="${classCode?'':'primary'}" onclick="openJoinClassModal()" data-testid="teman-join-class"><i data-lucide="school"></i> ${classCode?FiezelI18n.t('social2.class-change'):FiezelI18n.t('social2.class-btn')}</button></div>`,'social-card')}
 function socialNeedProfileCard(){return card(`<h3>${FiezelI18n.t('social.need-profile-title')}</h3><p class="muted">${FiezelI18n.t('social.need-profile-body')}</p><div class="modal-actions"><button class="primary" onclick="switchOnlineTab('profil')"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`,'social-card')}
 async function socialTemanMarkup(core){
-  const fr=await core.api.friends();
+  let fr={ok:false},reqList=[],activeStages=[];
+  try {
+    const [friendsRes, requestsRes, stagesRes] = await Promise.all([
+      core.api.friends(),
+      core.api.friendRequests().catch(()=>({ok:false})),
+      core.api.stageActive().catch(()=>({ok:false}))
+    ]);
+    fr = friendsRes;
+    if (requestsRes?.ok && Array.isArray(requestsRes.data?.requests)) reqList = requestsRes.data.requests;
+    if (stagesRes?.ok && Array.isArray(stagesRes.data?.stages)) activeStages = stagesRes.data.stages;
+  } catch(e) {
+    fr = {ok:false, message: String(e?.message||e)};
+  }
   if(fr.error==='profile_required')return socialNeedProfileCard()+socialClassCardMarkup();
   if(!fr.ok)return card(`<h3>${FiezelI18n.t('social.friends-error-title')}</h3><p class="muted">${esc(fr.message)}</p>`,'social-card');
   const friends=Array.isArray(fr.data?.friends)?fr.data.friends:[];
   const cheers=Array.isArray(fr.data?.cheersToday)?fr.data.cheersToday:[];
-  // Kotak masuk permintaan teman di DALAM tab (spec owner). Angka yang sama dipakai
-  // lencana tab; diambil sekali di sini supaya tab dan lencana tidak bisa berbeda.
-  let reqList=[];
-  try{const rq=await core.api.friendRequests();reqList=rq.ok&&Array.isArray(rq.data?.requests)?rq.data.requests:[]}catch(_){reqList=[]}
   socialRequestCount=reqList.length;
-
-  let activeStages=[];
-  try{
-    const stg=await core.api.stageActive();
-    if(stg&&stg.ok&&Array.isArray(stg.data?.stages))activeStages=stg.data.stages;
-  }catch(_){activeStages=[]}
 
   // URL undangan ?invite=KODE dari share-sheet teman → prefill kolom tukar kode.
   let urlInvite='';try{urlInvite=String(new URLSearchParams(location.search).get('invite')||'').trim()}catch(_){urlInvite=''}
