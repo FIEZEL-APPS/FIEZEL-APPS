@@ -42,7 +42,7 @@ check('D4 dua pengingat lunak memakai jam terbaik', /ctx\.hour>=alrsSoftHour\(ct
 check('D4 jam tenang malam tetap ditegakkan sebelum aturan lain', /ctx\.hour<ALRS_QUIET_END_HOUR\|\|ctx\.hour>=ALRS_QUIET_START_HOUR/.test(decide));
 check('D4 konteks pengingat membawa jam terbaik', /bestWindowFrom:braincoreBestWindowFrom\(now\)/.test(app));
 // D7
-check('D7 tab Analisis menampilkan peta kekeliruan BrainCore', /analysis:`<div class="grid progress-grid">\n\s*\$\{[^}]*confusionInsightMarkup\(\)\}/.test(fnSrc('progress')));
+check('D7 tab Analisis menampilkan peta kekeliruan BrainCore', /analysis:`<div class="grid progress-grid">\n\s*\$\{[^}]*confusionInsightMarkup\(\)\)?\}/.test(fnSrc('progress')));
 
 console.log(`\nbraincore-wave3-reminder-analysis-test: ${pass}/${pass + fails.length} PASS`);
 if (fails.length) { console.error('GAGAL: ' + fails.join(' | ')); process.exit(1); }
