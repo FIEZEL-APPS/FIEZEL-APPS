@@ -110,7 +110,12 @@
               var alreadyHealed = sessionStorage.getItem(healedKey) === activeRev;
               if (!inLesson && !alreadyHealed) {
                 sessionStorage.setItem(healedKey, activeRev);
-                location.reload();
+                var bustUrl = window.location.pathname + '?fz_healed=' + Date.now() + window.location.hash;
+                try {
+                  window.location.replace(bustUrl);
+                } catch (_) {
+                  location.reload();
+                }
               } else if (inLesson) {
                 self.FiezelUpdatePrompt?.check?.(true);
               }

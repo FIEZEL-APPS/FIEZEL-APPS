@@ -976,7 +976,7 @@ header.topbar,
   background: rgba(253, 250, 243, 0.96) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border-bottom: 1px solid #E2E8F0 !important;
+  border-bottom: 1px solid transparent !important;
   box-shadow: none !important;
   padding: 8px 16px !important;
   min-height: 52px !important;
@@ -3228,16 +3228,18 @@ html body .progress-tab,
   background: transparent !important;
   color: #475569 !important;
   font-family: 'FZ Plus Jakarta Sans', 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 12px !important;
+  font-size: 11.5px !important;
   font-weight: 700 !important;
   border: none !important;
   border-radius: 9999px !important;
-  padding: 8px 16px !important;
+  padding: 8px 12px !important;
   box-shadow: none !important;
   cursor: pointer !important;
   transition: all 0.15s ease !important;
   white-space: nowrap !important;
-  flex: 1 1 0 !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  text-align: center !important;
 }
 
 html body #app .progress-tab.active,
@@ -9094,12 +9096,16 @@ html body .fiezel-splash-dark .fiezel-splash-brand {
   background-color: #1B1418 !important;
 }
 
-html body #fiezelBootSplash .fz-auth-topo,
 html body #fiezelBootSplash .fz-splash-canvas,
-html body .fiezel-splash-brand .fz-auth-topo,
 html body .fiezel-splash-brand .fz-splash-canvas {
   -webkit-mask-image: linear-gradient(180deg, transparent 0px, transparent 28px, rgba(0, 0, 0, 0.35) 84px, #000 156px) !important;
   mask-image: linear-gradient(180deg, transparent 0px, transparent 28px, rgba(0, 0, 0, 0.35) 84px, #000 156px) !important;
+}
+
+html body #fiezelBootSplash .fz-auth-topo,
+html body .fiezel-splash-brand .fz-auth-topo {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 
 html body .fz-auth:not(.is-leaving) {
