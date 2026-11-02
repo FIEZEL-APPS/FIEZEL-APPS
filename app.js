@@ -13893,12 +13893,22 @@ async function checkPendingGemGrants(silent = false) {
   if (!CORE_WORKER_URL) return false;
   pendingGemGrantsChecking = true;
   try {
-    const res = await coreWorkerExec('/api/gems/claim', {
+    try { await identityEvidenceEnsureAnon(); } catch(_) {}
+    let res = await coreWorkerExec('/api/gems/claim', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: '{}'
     });
-    if (!res.ok) return false;
+    if (res && res.status === 401) {
+      __identityAnonReady = false;
+      try { await identityEvidenceEnsureAnon(); } catch(_) {}
+      res = await coreWorkerExec('/api/gems/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}'
+      });
+    }
+    if (!res || !res.ok) return false;
     const data = await res.json().catch(() => ({}));
     if (data && data.ok && Array.isArray(data.grants) && data.grants.length > 0) {
       let totalGems = 0;
@@ -13908,10 +13918,40 @@ async function checkPendingGemGrants(silent = false) {
         const amt = Math.max(0, Math.floor(Number(g.amount) || 0));
         if (amt > 0) {
           totalGems += amt;
+          const gReason = String(g.reason || 'reward_grant').trim();
           if (hook && typeof hook.award === 'function') {
-            hook.award(amt, g.reason || 'reward_grant', { streak: state.streak, level: getActiveLevel() });
+            hook.award(amt, gReason, { streak: state.streak, level: getActiveLevel() });
           } else {
-            state.gems = (Number(state.gems) || 0) + amt;
+            const curBal = (typeof state.gems === 'object' && state.gems !== null && typeof state.gems.balance === 'number')
+              ? state.gems.balance
+              : (typeof state.gems === 'number' ? state.gems : 0);
+            const curEarned = (typeof state.gems === 'object' && state.gems !== null && typeof state.gems.earnedTotal === 'number')
+              ? state.gems.earnedTotal
+              : curBal;
+            const curSpent = (typeof state.gems === 'object' && state.gems !== null && typeof state.gems.spentTotal === 'number')
+              ? state.gems.spentTotal
+              : 0;
+            const curLedger = (typeof state.gems === 'object' && state.gems !== null && Array.isArray(state.gems.ledger))
+              ? state.gems.ledger
+              : [];
+            const gCore = gemsCore();
+            if (gCore && typeof gCore.gemsEarn === 'function') {
+              state.gems = gCore.gemsEarn(state.gems, amt, gReason, Date.now(), 'grant-' + (g.id || Date.now()), getActiveLevel());
+            } else {
+              state.gems = {
+                schema: 1,
+                balance: curBal + amt,
+                earnedTotal: curEarned + amt,
+                spentTotal: curSpent,
+                ledger: curLedger.concat([{
+                  at: Date.now(),
+                  delta: amt,
+                  reason: gReason.slice(0, 40),
+                  sessionId: 'grant-' + (g.id || Date.now()),
+                  level: getActiveLevel()
+                }]).slice(-50)
+              };
+            }
             save();
           }
           if (g.reason) reasons.push(String(g.reason));
@@ -13920,8 +13960,24 @@ async function checkPendingGemGrants(silent = false) {
       if (totalGems > 0) {
         save();
         try {
-          if (!silent) showGemRewardModal(totalGems, reasons.join(', ') || 'Hadiah Belajar');
-          else refreshNotifBadge();
+          const xVal = $('topbarXpVal');
+          if (xVal && (state.xp === undefined || state.xp === null)) {
+            xVal.textContent = String(gemsBalance());
+          }
+          refreshNotifBadge();
+        } catch (_) {}
+        try {
+          if (!silent) {
+            showGemRewardModal(totalGems, reasons.join(', ') || 'Hadiah Belajar');
+          } else {
+            try {
+              uiSfx('streak_5');
+              pawReact('reward', { kind: 'gems' });
+              if (typeof showToast === 'function') {
+                showToast(`+${totalGems} GEM berhasil ditambahkan ke saldo akunmu! 💎`, 'success');
+              }
+            } catch (_) {}
+          }
         } catch (_) {}
       }
       return true;
@@ -14039,10 +14095,18 @@ async function pollOwnerMessages(force) {
   if (!CORE_WORKER_URL) return false;
   ownerMessagesPolling = true;
   try {
-    const res = await coreWorkerExec('/api/learner/messages', {
+    try { await identityEvidenceEnsureAnon(); } catch(_) {}
+    let res = await coreWorkerExec('/api/learner/messages', {
       method: 'GET'
     });
-    if (!res.ok) return false;
+    if (res && res.status === 401) {
+      __identityAnonReady = false;
+      try { await identityEvidenceEnsureAnon(); } catch(_) {}
+      res = await coreWorkerExec('/api/learner/messages', {
+        method: 'GET'
+      });
+    }
+    if (!res || !res.ok) return false;
     const data = await res.json().catch(() => ({}));
     if (data && data.ok && Array.isArray(data.messages)) {
       const prevUnread = ownerMessagesUnreadCount;
@@ -14050,7 +14114,7 @@ async function pollOwnerMessages(force) {
       ownerMessagesUnreadCount = cachedOwnerMessages.filter(m => m.sender === 'owner' && !m.is_read).length;
       if (ownerMessagesUnreadCount > 0) {
         const latestMsg = cachedOwnerMessages.find(m => m.sender === 'owner' && !m.is_read);
-        if (latestMsg && (ownerMessagesUnreadCount > prevUnread || force)) {
+        if (latestMsg && (ownerMessagesUnreadCount > prevUnread || force || !modalOpen)) {
           try {
             uiSfx('notif_general') || uiSfx('notif');
             openOwnerMessageModal(latestMsg.id);
@@ -14138,6 +14202,13 @@ function openOwnerMessageModal(focusMsgId) {
   try {
     openModal(modalHtml);
     enhanceUI();
+    if (target && target.gem_amount > 0) {
+      try {
+        uiSfx('streak_5');
+        celebrate();
+        pawReact('reward', { kind: 'gems' });
+      } catch (_) {}
+    }
   } catch (_) {}
 }
 
@@ -23337,7 +23408,7 @@ async function notifSyncRound(){
    oleh SOCIAL_NOTIFY_MIN_GAP_MS=90000 agar tidak membebani kueri D1. Lantai server penugasan
    adalah 5 detik (ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS), dan timer ini diam total saat
    aplikasi tidak terlihat (visibilitychange). */
-const NOTIF_POLL_MS=6000;
+const NOTIF_POLL_MS=3500;
 function startNotifPolling(){
   if(notifPollTimer)return false;
   notifPollTimer=setInterval(()=>{
@@ -23357,9 +23428,9 @@ function startNotifPolling(){
   try{
     document.addEventListener('visibilitychange',()=>{
       try{if(document.visibilityState!=='visible')return}catch(_){return}
-      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{checkPendingGemGrants()}catch(_){};try{checkDailyGemRewards(false)}catch(_){};try{pollOwnerMessages()}catch(_){}
+      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{checkPendingGemGrants(false)}catch(_){};try{checkDailyGemRewards(false)}catch(_){};try{pollOwnerMessages(true)}catch(_){}
     });
-    self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{pollOwnerMessages()}catch(_){}});
+    self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){};try{checkPendingGemGrants(false)}catch(_){};try{pollOwnerMessages(true)}catch(_){}});
     if(typeof BroadcastChannel!=='undefined'){
       const bc=new BroadcastChannel('fiezel-assignment-sync');
       bc.onmessage=(ev)=>{
