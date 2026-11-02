@@ -23,7 +23,12 @@ import { readJsonFromCtx } from '../mw-guard.js';
 const GOOGLE_AUTH_TOKEN_API = 'https://generativelanguage.googleapis.com/v1alpha/auth_tokens';
 const GOOGLE_GEN_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const DEFAULT_LIVE_MODEL = 'gemini-3.8-live';
-const COPILOT_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
+const COPILOT_MODELS = [
+  'gemini-3.5-flash-lite',
+  'gemini-3.8-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-2.5-flash',
+];
 const DEFAULT_CONSTRAINED_ENDPOINT =
   'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained';
 
@@ -31,8 +36,8 @@ const DEFAULT_CONSTRAINED_ENDPOINT =
 const _cooldownMap = new Map(); // key -> timestamp ms
 let _poolIndex = Math.floor(Math.random() * 16);
 
-// Terisolasi: status cooldown dan rotasi pool khusus Copilot agar tidak merebut kuota Live Voice
-const _copilotCooldownMap = new Map(); // key -> timestamp ms
+// Terisolasi: status cooldown per (key::model) dan rotasi pool khusus Copilot
+const _copilotCooldownMap = new Map(); // `${key}::${model}` -> timestamp ms
 let _copilotPoolIndex = Math.floor(Math.random() * 16);
 
 // Rate limit in-memory per IP untuk mencegah pengurasan kuota Gemini Live & Copilot
@@ -256,7 +261,69 @@ function looksLikeTargetLang(text, targetLang) {
   const tx = cleanSpokenText(text);
   if (!tx || /[\u0E00-\u0E7F]/.test(tx)) return false;
   if (targetLang === 'ja') return /[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
+  if (targetLang === 'zh') return /[\u4e00-\u9fff]/.test(tx) && !/[\u3040-\u30ff]/.test(tx);
   return /[A-Za-z]/.test(tx) && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
+}
+
+/**
+ * Precision Speech-Act & Focal-Clause Analyzer for Spoken Copilot.
+ * Isolates the exact question or proposal from conversational filler / compliments
+ * so the learner's spoken options directly answer what was asked.
+ */
+export function extractFocalClause(aiText, targetLang = 'en') {
+  const clean = cleanSpokenText(aiText);
+  if (!clean) {
+    return { fullText: '', focalText: '', isEchoRedemption: false };
+  }
+
+  // 1. Echo Redemption detection
+  const echoMatchEn = clean.match(
+    /(?:repeat|say (?:it|this)?(?:\s+back)?(?:\s+to me)?(?:\s+cleanly|\s+out loud)?|say after me|repeat after me)[:\s]+["'“‘『「]([^"'”’』」]+)["'”’』」]/i
+  );
+  const echoMatchJa =
+    clean.match(/(?:[「『"“])([^」』"”]+)[」』"”](?:と(?:言って(?:みて|ごらん)?|リピートして|読ん(?:でみて)?))/u) ||
+    clean.match(/(?:(?:もう一度|もう一回|リピートして|言ってみて|言ってごらん)[:：\s]*(?:[「『"“])([^」』"”]+)[」』"”])/u);
+  const echoMatchZh =
+    clean.match(/(?:[“"「『])([^”"」』]+)[”"」』](?:跟我读|重复一遍|读一遍)/u) ||
+    clean.match(/(?:(?:跟我读|再说一遍|重复一遍|读一遍)[:：\s]*(?:[“"「『])([^”"」』]+)[”"」』])/u);
+  const echoTarget = (echoMatchEn?.[1] || echoMatchJa?.[1] || echoMatchZh?.[1])?.trim();
+  if (echoTarget) {
+    return {
+      fullText: clean,
+      focalText: echoTarget,
+      isEchoRedemption: true,
+      echoCorrectionTarget: echoTarget,
+    };
+  }
+
+  // 2. Sentence breakdown
+  const isCjk = targetLang === 'ja' || targetLang === 'zh';
+  const splitRe = isCjk ? /([。！？!?\n]+)/ : /([.?!;\n]+)/;
+  const rawParts = clean.split(splitRe).map((p) => p.trim()).filter(Boolean);
+  const sentences = [];
+  for (let i = 0; i < rawParts.length; i += 2) {
+    const s = rawParts[i] + (rawParts[i + 1] || '');
+    if (s.trim()) sentences.push(s.trim());
+  }
+
+  if (sentences.length <= 1) {
+    return { fullText: clean, focalText: clean, isEchoRedemption: false };
+  }
+
+  // Look backwards for the last sentence containing a question or proposal/invitation
+  for (let i = sentences.length - 1; i >= 0; i--) {
+    const s = sentences[i];
+    if (
+      /[?？]/.test(s) ||
+      /\b(why don't|shall we|let's|what about|how about|would you like|do you want|can we)\b/i.test(s) ||
+      /(?:ませんか|ない[？?]|ましょう|どうですか|いかがですか)/u.test(s) ||
+      /(?:要不要|好吗|怎么样|吧[？?]?)/u.test(s)
+    ) {
+      return { fullText: clean, focalText: s, isEchoRedemption: false };
+    }
+  }
+
+  return { fullText: clean, focalText: sentences[sentences.length - 1] || clean, isEchoRedemption: false };
 }
 
 function normalizeHistory(rawHistory) {
@@ -320,10 +387,9 @@ async function invokeSingleGeminiJson({
   }
   const timer = setTimeout(() => controller.abort(), 9500);
   try {
-    const thinkingConfig =
-      model === 'gemini-3-flash-preview'
-        ? { thinkingBudget: 0 }
-        : { thinkingLevel: 'MINIMAL' };
+    const thinkingConfig = model.startsWith('gemini-3')
+      ? { thinkingLevel: 'MINIMAL' }
+      : { thinkingBudget: 0 };
 
     const res = await fetch(
       `${GOOGLE_GEN_API_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
@@ -346,12 +412,12 @@ async function invokeSingleGeminiJson({
     parentSignal?.removeEventListener('abort', onParentAbort);
 
     if (res.status === 429) {
-      _copilotCooldownMap.set(key, Date.now() + 25000);
+      _copilotCooldownMap.set(key, Date.now() + 60000);
       return { ok: false, reason: `HTTP 429 (${model})` };
     }
     if (!res.ok) {
       if (res.status !== 404) {
-        _copilotCooldownMap.set(key, Date.now() + 10000);
+        _copilotCooldownMap.set(key, Date.now() + 15000);
       }
       return { ok: false, reason: `HTTP ${res.status} (${model})` };
     }
@@ -375,6 +441,8 @@ async function invokeSingleGeminiJson({
 async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOutputTokens = 700) {
   const now = Date.now();
   const totalKeys = keys.length;
+  if (!totalKeys) return { ok: false, reason: 'no_keys_configured' };
+
   const healthyKeys = [];
   for (let i = 0; i < totalKeys; i++) {
     const idx = (_copilotPoolIndex + i) % totalKeys;
@@ -388,53 +456,25 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
 
   let lastReason = 'unknown';
 
-  // Sequential Key Execution:
-  // Primary fires immediately on gemini-3-flash-preview.
-  // Only if primary fails (rate limit 429, timeout), sequentially fail over to secondary key #2.
-  // Zero parallel duplicate requests to prevent 429 quota spikes.
-  const keyPrimary = activePool[0];
-  const resPrimary = await invokeSingleGeminiJson({
-    key: keyPrimary,
-    model: COPILOT_MODELS[0],
-    promptText,
-    temperature,
-    maxOutputTokens,
-  });
-
-  if (resPrimary && resPrimary.ok) {
-    return resPrimary;
-  }
-  lastReason = resPrimary?.reason || lastReason;
-
-  // Sequential failover on key #2
-  const keyHedge = activePool[1 % activePool.length];
-  if (keyHedge !== keyPrimary) {
-    const resHedge = await invokeSingleGeminiJson({
-      key: keyHedge,
-      model: COPILOT_MODELS[0],
+  // Sequential Key & Model Failover: try up to 4 healthy key/model attempts
+  const maxAttempts = Math.min(4, activePool.length);
+  for (let a = 0; a < maxAttempts; a++) {
+    const key = activePool[a % activePool.length];
+    const model = COPILOT_MODELS[a % COPILOT_MODELS.length];
+    const res = await invokeSingleGeminiJson({
+      key,
+      model,
       promptText,
       temperature,
       maxOutputTokens,
     });
-    if (resHedge && resHedge.ok) {
-      return resHedge;
+    if (res && res.ok) {
+      return res;
     }
-    lastReason = resHedge?.reason || lastReason;
+    lastReason = res?.reason || lastReason;
   }
 
-  // Final safety fallback on key #3 (gemini-3.1-flash-lite)
-  const keyFallback = activePool[2 % activePool.length];
-  const finalRes = await invokeSingleGeminiJson({
-    key: keyFallback,
-    model: COPILOT_MODELS[1],
-    promptText,
-    temperature,
-    maxOutputTokens,
-  });
-  if (finalRes.ok) {
-    return finalRes;
-  }
-  return { ok: false, reason: finalRes.reason || lastReason };
+  return { ok: false, reason: lastReason };
 }
 
 /**
@@ -458,7 +498,7 @@ export async function routeVoiceCopilotAssist(ctx) {
 
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
-  const targetLang = body.targetLang === 'ja' ? 'ja' : 'en';
+  const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
   const locale = body.locale === 'th' ? 'th' : 'id';
   const targetLocaleName = locale === 'th' ? 'Thai' : 'Indonesian';
   const aiText = cleanSpokenText(body.aiText || body.aiQuestionText || '').slice(0, 500);
@@ -474,10 +514,25 @@ export async function routeVoiceCopilotAssist(ctx) {
     : [];
   const variationSeed = Number(body.variationSeed || 0);
 
+  const focal = extractFocalClause(aiText, targetLang);
+
   const langSpec =
     targetLang === 'ja'
       ? 'Japanese (natural spoken N5-N3, Kanji+Hiragana, NO emojis; "pronunciation" = word-spaced Hepburn Romaji)'
+      : targetLang === 'zh'
+      ? 'Mandarin Chinese (natural spoken HSK1-HSK3, Simplified Chinese characters, NO emojis; "pronunciation" = tone-marked Pinyin)'
       : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy Indonesian phonetic guide)';
+
+  const focalRule = focal.isEchoRedemption
+    ? `CRITICAL MANDATORY ECHO REDEMPTION: Partner AI demanded repeating the exact corrected phrase: "${focal.focalText}". Option 1 (tier="easy") MUST be that exact phrase: "${focal.focalText}"!`
+    : `FOCAL POINT TO ANSWER: "${focal.focalText}".
+CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
+- Option 1 MUST directly and specifically answer the focal point above ("${focal.focalText}").
+- NEVER give an evasive or mismatched answer (e.g. NEVER answer 'from Indonesia' to 'where do you study/hang out?', NEVER answer 'pretty good' to 'how long have you studied?', NEVER answer 'Yes, I do' to invitations like 'Why don't we...').
+- If asked a choice (A or B), choose one concrete option!
+- If asked an invitation/proposal, directly accept or decline!
+- If asked what food/drink/place, name a concrete item!
+- Option 1 must be concise (1 short sentence), direct, and completely conversational.`;
 
   const prompt = [
     `Speech Copilot (${scenarioTitle}). Target: ${langSpec}.`,
@@ -487,11 +542,11 @@ export async function routeVoiceCopilotAssist(ctx) {
       : '',
     lastUserText ? `Learner said: "${lastUserText}"` : '',
     `Partner AI said: "${aiText}"`,
+    focalRule,
     excludeList.length
       ? `Do NOT repeat: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
       : '',
-    `CRITICAL ECHO REDEMPTION RULE: If Partner AI's line ("${aiText}") corrects a grammar mistake and asks the learner to repeat a specific phrase out loud (e.g. "もう一回言ってみて：『...』" or "Say it back to me cleanly: '...'"), Option 1 (tier="easy") MUST be that exact corrected sentence!`,
-    `Generate 3 spontaneous spoken replies directly answering "${aiText}" (natural, conversational, punchy; NEVER textbook templates): easy=1 short clean sentence (or exact Echo Redemption repeat if requested), mission=natural reply with detail, rescue=reply + question back. Translate "${aiText}" into aiMeaning (${targetLocaleName}), and write natural first-person translation of each reply in hint (${targetLocaleName}).`,
+    `Generate 3 spontaneous spoken replies directly answering "${focal.focalText}" (natural, conversational, punchy; NEVER generic textbook templates): easy=1 short direct sentence (or exact Echo repeat if demanded), mission=natural reply with concrete detail, rescue=reply + follow-up question back. Translate "${aiText}" into aiMeaning (${targetLocaleName}), and write natural first-person translation of each reply in hint (${targetLocaleName}).`,
     `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
   ]
     .filter(Boolean)
@@ -542,7 +597,7 @@ export async function routeVoicePartnerTurn(ctx) {
 
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
-  const targetLang = body.targetLang === 'ja' ? 'ja' : 'en';
+  const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
   const locale = body.locale === 'th' ? 'th' : 'id';
   const targetLocaleName = locale === 'th' ? 'Thai' : 'Indonesian';
   const userText = cleanSpokenText(body.text || '').slice(0, 400);
@@ -550,7 +605,7 @@ export async function routeVoicePartnerTurn(ctx) {
     return badRequest('empty_user_text');
   }
 
-  const personaName = cleanSpokenText(body.personaName || (targetLang === 'ja' ? 'Nanami' : 'Alex')).slice(0, 40);
+  const personaName = cleanSpokenText(body.personaName || (targetLang === 'ja' ? 'Nanami' : targetLang === 'zh' ? 'Mei' : 'Alex')).slice(0, 40);
   const scenarioTitle = cleanSpokenText(body.scenarioTitle || 'Free Talk').slice(0, 100);
   const learnerDossier = typeof body.learnerDossier === 'string' ? body.learnerDossier.slice(0, 1800) : '';
   const historyLines = normalizeHistory(body.history);
@@ -558,6 +613,8 @@ export async function routeVoicePartnerTurn(ctx) {
   const langSpec =
     targetLang === 'ja'
       ? 'Japanese (lively native Tokyo spoken Japanese N5-N3, Kanji+Hiragana, NO emojis; reply "pronunciation" = word-spaced Hepburn Romaji)'
+      : targetLang === 'zh'
+      ? 'Mandarin Chinese (lively spoken Mandarin HSK1-HSK3, Simplified Chinese characters, NO emojis; reply "pronunciation" = tone-marked Pinyin)'
       : 'English (lively native conversational spoken English A2-B1, NO emojis; reply "pronunciation" = easy Indonesian phonetic guide)';
 
   const prompt = [

@@ -454,8 +454,63 @@ function parseJsonBody(req) {
   });
 }
 
-const LOCAL_COPILOT_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
+const LOCAL_COPILOT_MODELS = [
+  'gemini-3.5-flash-lite',
+  'gemini-3.8-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-2.5-flash',
+];
 const localKeyCooldowns = new Map();
+
+function extractFocalClause(aiText, targetLang = 'en') {
+  const clean = String(aiText || '')
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+    .replace(/\*[^*]{1,30}\*/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!clean) return { fullText: '', focalText: '', isEchoRedemption: false };
+
+  const echoMatchEn = clean.match(
+    /(?:repeat|say (?:it|this)?(?:\s+back)?(?:\s+to me)?(?:\s+cleanly|\s+out loud)?|say after me|repeat after me)[:\s]+["'“‘『「]([^"'”’』」]+)["'”’』」]/i
+  );
+  const echoMatchJa =
+    clean.match(/(?:[「『"“])([^」』"”]+)[」』"”](?:と(?:言って(?:みて|ごらん)?|リピートして|読ん(?:でみて)?))/u) ||
+    clean.match(/(?:(?:もう一度|もう一回|リピートして|言ってみて|言ってごらん)[:：\s]*(?:[「『"“])([^」』"”]+)[」』"”])/u);
+  const echoMatchZh =
+    clean.match(/(?:[“"「『])([^”"」』]+)[”"」』](?:跟我读|重复一遍|读一遍)/u) ||
+    clean.match(/(?:(?:跟我读|再说一遍|重复一遍|读一遍)[:：\s]*(?:[“"「『])([^”"」』]+)[”"」』])/u);
+  const echoTarget = (echoMatchEn?.[1] || echoMatchJa?.[1] || echoMatchZh?.[1])?.trim();
+  if (echoTarget) {
+    return { fullText: clean, focalText: echoTarget, isEchoRedemption: true };
+  }
+
+  const isCjk = targetLang === 'ja' || targetLang === 'zh';
+  const splitRe = isCjk ? /([。！？!?\n]+)/ : /([.?!;\n]+)/;
+  const rawParts = clean.split(splitRe).map((p) => p.trim()).filter(Boolean);
+  const sentences = [];
+  for (let i = 0; i < rawParts.length; i += 2) {
+    const s = rawParts[i] + (rawParts[i + 1] || '');
+    if (s.trim()) sentences.push(s.trim());
+  }
+
+  if (sentences.length <= 1) {
+    return { fullText: clean, focalText: clean, isEchoRedemption: false };
+  }
+
+  for (let i = sentences.length - 1; i >= 0; i--) {
+    const s = sentences[i];
+    if (
+      /[?？]/.test(s) ||
+      /\b(why don't|shall we|let's|what about|how about|would you like|do you want|can we)\b/i.test(s) ||
+      /(?:ませんか|ない[？?]|ましょう|どうですか|いかがですか)/u.test(s) ||
+      /(?:要不要|好吗|怎么样|吧[？?]?)/u.test(s)
+    ) {
+      return { fullText: clean, focalText: s, isEchoRedemption: false };
+    }
+  }
+
+  return { fullText: clean, focalText: sentences[sentences.length - 1] || clean, isEchoRedemption: false };
+}
 
 async function invokeLocalGeminiSingle({ key, model, promptText, temperature, maxOutputTokens = 750, parentSignal }) {
   const controller = new AbortController();
@@ -466,9 +521,9 @@ async function invokeLocalGeminiSingle({ key, model, promptText, temperature, ma
   }
   const timer = setTimeout(() => controller.abort(), 9500);
   try {
-    const thinkingConfig = model === 'gemini-3-flash-preview'
-      ? { thinkingBudget: 0 }
-      : { thinkingLevel: 'MINIMAL' };
+    const thinkingConfig = model.startsWith('gemini-3')
+      ? { thinkingLevel: 'MINIMAL' }
+      : { thinkingBudget: 0 };
     const gRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
       {
@@ -749,7 +804,7 @@ const server = http.createServer(async (req, res) => {
 
   if ((pathname === '/api/voice/copilot-assist' || pathname === '/api/voice-call/assist') && req.method === 'POST') {
     const body = await parseJsonBody(req);
-    const targetLang = body.targetLang === 'en' ? 'en' : 'ja';
+    const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
     const locale = body.locale === 'th' ? 'th' : 'id';
     const learnerLangName = locale === 'th' ? 'Thai' : 'Indonesian';
     const cleanText = (v) => String(v || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\*[^*]{1,30}\*/g, '').replace(/\s+/g, ' ').trim();
@@ -773,10 +828,25 @@ const server = http.createServer(async (req, res) => {
       : [];
     const variationSeed = Number(body.variationSeed || 0);
 
+    const focal = extractFocalClause(aiText, targetLang);
+
     const langSpec =
       targetLang === 'ja'
         ? 'Japanese (natural spoken N5-N3, Kanji+Hiragana, NO emojis; "pronunciation" = word-spaced Hepburn Romaji)'
+        : targetLang === 'zh'
+        ? 'Mandarin Chinese (natural spoken HSK1-HSK3, Simplified Chinese characters, NO emojis; "pronunciation" = tone-marked Pinyin)'
         : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy phonetic guide)';
+
+    const focalRule = focal.isEchoRedemption
+      ? `CRITICAL MANDATORY ECHO REDEMPTION: Partner AI demanded repeating the exact corrected phrase: "${focal.focalText}". Option 1 (tier="easy") MUST be that exact phrase: "${focal.focalText}"!`
+      : `FOCAL POINT TO ANSWER: "${focal.focalText}".
+CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
+- Option 1 MUST directly and specifically answer the focal point above ("${focal.focalText}").
+- NEVER give an evasive or mismatched answer (e.g. NEVER answer 'from Indonesia' to 'where do you study/hang out?', NEVER answer 'pretty good' to 'how long have you studied?', NEVER answer 'Yes, I do' to invitations like 'Why don't we...').
+- If asked a choice (A or B), choose one concrete option!
+- If asked an invitation/proposal, directly accept or decline!
+- If asked what food/drink/place, name a concrete item!
+- Option 1 must be concise (1 short sentence), direct, and completely conversational.`;
 
     // Optimized lean prompt for sub-2s generation with zero static templates
     const prompt = [
@@ -785,9 +855,10 @@ const server = http.createServer(async (req, res) => {
       historyLines.length ? `Recent context:\n${historyLines.join('\n')}` : '',
       lastUserText ? `Learner said previously: "${lastUserText}"` : '',
       `Partner AI JUST SPOKE: "${aiText}"`,
+      focalRule,
       excludeList.length ? `Provide 3 fresh angles (do not repeat: ${JSON.stringify(excludeList)}).` : '',
-      `Generate 3 spontaneous spoken replies directly answering "${aiText}" (natural, conversational, punchy; NEVER static textbook templates):`,
-      `- easy: 1 short natural sentence`,
+      `Generate 3 spontaneous spoken replies directly answering "${focal.focalText}" (natural, conversational, punchy; NEVER static textbook templates):`,
+      `- easy: 1 short natural sentence answering the focal point`,
       `- mission: contextual answer with concrete detail`,
       `- rescue: polite reply + a smart follow-up question back`,
       `Also translate "${aiText}" into ${learnerLangName} as "aiMeaning".`,
@@ -845,7 +916,7 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/voice/partner-turn' && req.method === 'POST') {
     const body = await parseJsonBody(req);
-    const targetLang = body.targetLang === 'en' ? 'en' : 'ja';
+    const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
     const locale = body.locale === 'th' ? 'th' : 'id';
     const learnerLangName = locale === 'th' ? 'Thai' : 'Indonesian';
     const cleanText = (v) => String(v || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\*[^*]{1,30}\*/g, '').replace(/\s+/g, ' ').trim();
@@ -857,7 +928,7 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 503, { ok: false, fallback: true, error: 'no_keys_configured' });
     }
 
-    const personaName = cleanText(body.personaName || (targetLang === 'ja' ? 'Nanami' : 'Alex')).slice(0, 40);
+    const personaName = cleanText(body.personaName || (targetLang === 'ja' ? 'Nanami' : targetLang === 'zh' ? 'Mei' : 'Alex')).slice(0, 40);
     const scenarioTitle = cleanText(body.scenarioTitle || 'Free Talk').slice(0, 100);
     const rawHist = Array.isArray(body.history) ? body.history : [];
     const historyLines = rawHist
@@ -868,6 +939,8 @@ const server = http.createServer(async (req, res) => {
     const langSpec =
       targetLang === 'ja'
         ? 'Japanese (lively native Tokyo spoken Japanese N5-N3, Kanji+Hiragana, NO emojis; reply "pronunciation" = word-spaced Hepburn Romaji)'
+        : targetLang === 'zh'
+        ? 'Mandarin Chinese (lively spoken Mandarin HSK1-HSK3, Simplified Chinese characters, NO emojis; reply "pronunciation" = tone-marked Pinyin)'
         : 'English (lively native conversational spoken English A2-B1, NO emojis; reply "pronunciation" = easy phonetic guide)';
 
     const prompt = [

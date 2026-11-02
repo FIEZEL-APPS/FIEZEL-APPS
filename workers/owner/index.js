@@ -3445,6 +3445,8 @@ function renderLearnerDirectory(m) {
 
 function renderLearnerMessagesCard(d, m) {
   const targetSub = (d && d.learner && d.learner.sub) || m.learnerSub || '';
+  const targetEmail = (d && d.learner && d.learner.email) || '';
+  const targetHandle = (d && d.learner && d.learner.handle) || '';
   const messages = (d && Array.isArray(d.messages)) ? d.messages : [];
   const action = m.teacherAction;
   let alertHtml = '';
@@ -3497,6 +3499,8 @@ function renderLearnerMessagesCard(d, m) {
     <form method="GET" action="/" style="margin-top:12px;background:var(--bg-subtle);border:1px solid var(--card-border);border-radius:var(--radius-md);padding:16px;">
       <input type="hidden" name="action" value="send_learner_message">
       <input type="hidden" name="learner" value="${esc(targetSub)}">
+      <input type="hidden" name="target_email" value="${esc(targetEmail)}">
+      <input type="hidden" name="target_handle" value="${esc(targetHandle)}">
       <input type="hidden" name="period" value="${esc(m.period || '7d')}">
 
       <div style="font-size:14px;font-weight:700;color:var(--text-main);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
@@ -6224,16 +6228,18 @@ async function handle(request, env, ctx, nowMs) {
       };
     } else if (action === 'send_learner_message') {
       const targetSub = url.searchParams.get('learner') || url.searchParams.get('sub') || '';
+      const targetEmail = url.searchParams.get('target_email') || url.searchParams.get('email') || '';
+      const targetHandle = url.searchParams.get('target_handle') || url.searchParams.get('handle') || '';
       const msgTitle = url.searchParams.get('msg_title') || 'Apresiasi & Hadiah Belajar dari Tim Fiezel';
       const msgContent = url.searchParams.get('msg_content') || '';
       const gemAmount = Math.max(0, parseInt(url.searchParams.get('gem_amount') || '0', 10) || 0);
       const gemReason = url.searchParams.get('gem_reason') || msgTitle;
 
-      if (!targetSub) {
+      if (!targetSub && !targetEmail && !targetHandle) {
         teacherAction = {
           ok: false,
           action: 'learner_message',
-          message: 'Gagal mengirim pesan: sub murid tidak ditemukan.'
+          message: 'Gagal mengirim pesan: sub/email murid tidak ditemukan.'
         };
       } else if (!msgContent.trim()) {
         teacherAction = {
@@ -6246,6 +6252,8 @@ async function handle(request, env, ctx, nowMs) {
           method: 'POST',
           body: {
             sub: targetSub,
+            email: targetEmail,
+            handle: targetHandle,
             title: msgTitle,
             content: msgContent,
             gem_amount: gemAmount,

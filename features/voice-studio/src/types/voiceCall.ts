@@ -1,5 +1,5 @@
 export type LearnerLocale = 'id' | 'th';
-export type TargetLang = 'en' | 'ja';
+export type TargetLang = 'en' | 'ja' | 'zh';
 export type MasteryStateName =
   | 'NOT_EXPOSED'
   | 'EXPOSED'

@@ -354,7 +354,7 @@ export default function App() {
   const copilotVariationSeedRef = useRef<number>(0);
   const copilotCardsRef = useRef<BeginnerReplyCard[]>([]);
   copilotCardsRef.current = copilotCards;
-  const liveEarlyCopilotTriggeredRef = useRef<boolean>(false);
+  const lastStreamedCopilotTextRef = useRef<string>('');
 
   const [isRecordingPtt, setIsRecordingPtt] = useState<boolean>(false);
   const [isListeningLiveSpeech, setIsListeningLiveSpeech] = useState<boolean>(false);
@@ -3005,13 +3005,13 @@ export default function App() {
 
           // Real-Time Streaming Copilot Trigger with 320ms Debounce
           const streamingAiDraft = liveAiDraftRef.current.trim();
-          const minStreamChars = activeScenario.targetLang === 'ja' ? 6 : 14;
+          const minStreamChars = activeScenario.targetLang === 'ja' || activeScenario.targetLang === 'zh' ? 6 : 12;
           if (
             streamingAiDraft.length >= minStreamChars &&
-            !liveEarlyCopilotTriggeredRef.current &&
+            streamingAiDraft !== lastStreamedCopilotTextRef.current &&
             /[。？！.?!]\s*$/.test(streamingAiDraft)
           ) {
-            liveEarlyCopilotTriggeredRef.current = true;
+            lastStreamedCopilotTextRef.current = streamingAiDraft;
             if (copilotEarlyTimerRef.current) {
               window.clearTimeout(copilotEarlyTimerRef.current);
             }
@@ -3051,7 +3051,7 @@ export default function App() {
               window.clearTimeout(copilotEarlyTimerRef.current);
               copilotEarlyTimerRef.current = null;
             }
-            liveEarlyCopilotTriggeredRef.current = false;
+            lastStreamedCopilotTextRef.current = '';
             const uText = sanitizeHallucinatedTranscript(
               liveUserDraftRef.current || msg.userTranscript || '',
               activeScenario.targetLang,

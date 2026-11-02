@@ -114,7 +114,16 @@ AddDefaultCharset UTF-8
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   # FIEZEL HARDENED SECURITY HEADERS (CSP, HSTS & PERMISSIONS POLICY)
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src 'self' https://fiezel.my.id wss://fiezel.my.id https://*.cloudflare.com https://generativelanguage.googleapis.com; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self';"
+  # m025-752 — INVARIAN SUPERSET CSP (insiden "Login Google mati di semua perangkat"):
+  # Header ini berlaku untuk SELURUH situs termasuk PWA /app/, dan peramban menegakkan
+  # IRISAN header + <meta> CSP. Maka header WAJIB superset dari meta CSP index.html:
+  #   - script-src/style-src/frame-src memuat https://accounts.google.com (tombol GSI),
+  #   - connect-src memuat https: wss: (api.fiezel.my.id: auth/anon, account/me, braincore,
+  #     copilot; Gemini Live wss; Google FedCM),
+  #   - media-src memuat origin audio (audio.fiezel.my.id, api.fiezel.my.id, workers.dev, jlpt.jp).
+  # m025-748 mempersempitnya dan memutus login Google + seluruh API. Gerbang:
+  # tests/csp-header-superset-gate-test.js.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: data: https://fiezel-audio.fitrajft.workers.dev https://audio.fiezel.my.id https://api.fiezel.my.id https://www.jlpt.jp; connect-src 'self' https: wss:; worker-src 'self' blob:; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self';"
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
   Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(self), display-capture=()"
   # ZERO-STALE-HTTP-CACHE INVARIANT (iOS WebKit / iPhone 15+ PWA):
