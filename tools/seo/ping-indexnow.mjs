@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * tools/seo/ping-indexnow.mjs
- * 
+ *
  * Submits FIEZEL canonical URLs to Microsoft Bing and IndexNow-enabled search engines
  * for instant priority crawling and generative AI indexation (Bing Copilot, ChatGPT, Perplexity).
- * 
+ *
  * Spec: https://www.indexnow.org/documentation
  */
 
