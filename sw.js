@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-748-unified-grammar-20261002';
+const SW_REV='m025-749-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
@@ -401,6 +401,7 @@ self.addEventListener('fetch',e=>{
     // Navigasi mandiri via SHELL_CACHE (ignoreSearch: true; sub-HTML mandiri tidak jatuh ke index.html).
     const cleanNavUrl=requestUrl.origin+requestUrl.pathname;
     const isSubHtml=/\/(call|misi|kurikulum|undercover|creator-report-dashboard|creator-report-setup)\.html$/i.test(requestUrl.pathname);
+    const isUpdateNav=requestUrl.searchParams.has('fz_upd')||requestUrl.searchParams.has('__fz_fresh');
     const cangkang=()=>caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true})
       .then(c=>c||(requestUrl.search?caches.match(cleanNavUrl,{cacheName:SHELL_CACHE}):null))
       .then(c=>c||(isSubHtml?null:caches.match('./index.html',{cacheName:SHELL_CACHE})));
@@ -412,21 +413,13 @@ self.addEventListener('fetch',e=>{
       }
       return r;
     });
-    try{e.waitUntil(segarkan.catch(()=>{}))}catch(_){}
-    /* JARING PENGAMAN LURING (P1 keandalan PWA).
-       Sampai sini cangkang selalu menang bila ada. Yang tersisa adalah satu batas yang
-       sebelumnya dijawab dengan penolakan mentah: LURING dan BELUM punya cangkang sama
-       sekali (pemasangan pertama, atau cache tergusur tekanan penyimpanan iOS). Di sana
-       murid mendapat halaman galat peramban - layar putih berbahasa Inggris tanpa satu
-       petunjuk pun.
-       Keberatan asli terhadap "fallback" tetap dihormati dan TIDAK dilanggar: yang dulu
-       dilarang adalah menyajikan CANGKANG KOSONG, karena itu menghasilkan layar kosong
-       permanen yang tidak bisa dibedakan dari aplikasi rusak. Halaman di bawah bukan
-       cangkang: ia disintesis di dalam service worker (tidak butuh satu byte pun dari
-       cache, jadi ia tetap ada justru pada kasus cache kosong), mengaku apa adanya, dan
-       tidak berpura-pura menjadi aplikasi. Statusnya 503 supaya peramban maupun alat ukur
-       tidak salah menghitungnya sebagai halaman yang berhasil dimuat. */
-    responsePromise=cangkang().then(c=>c||segarkan).catch(()=>halamanLuring());
+    if(!isUpdateNav){
+      try{e.waitUntil(segarkan.catch(()=>{}))}catch(_){}
+      responsePromise=cangkang().then(c=>c||segarkan).catch(()=>halamanLuring());
+    }else{
+      // Navigasi pembaruan eksplisit (?fz_upd=...): jaringan WAJIB menang agar cangkang baru langsung terpasang.
+      responsePromise=segarkan.catch(()=>cangkang()).then(c=>c||halamanLuring());
+    }
   }else if(isNeuralAsset(e.request)){
     // Neural runtime/model/voice assets are owned by the neural prepare layer and
     // stay in the stable runtime cache. A shell release never precaches/rewrites them.

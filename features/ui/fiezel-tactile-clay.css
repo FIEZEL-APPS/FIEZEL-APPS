@@ -308,6 +308,8 @@ html body:has(.home-today) .bottomnav,
     border-radius: 22px !important;
   }
   .bottomnav .nav {
+    position: relative !important;
+    z-index: 2 !important;
     height: 44px !important;
     min-height: 44px !important;
     padding: 3px 0 !important;
