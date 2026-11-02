@@ -1,7 +1,7 @@
 {
-  "version": "m025-747",
-  "claimedBy": "branch feat/story-forced-alignment-m025-747",
-  "claimedAt": "2026-11-02T09:06:56.438Z",
-  "reason": "feat(story): pre-computed character-level forced alignment karaoke engine (m025-747)",
+  "version": "m025-748",
+  "claimedBy": "branch feat/security-hardening-85-m025-748",
+  "claimedAt": "2026-11-02T09:47:21.148Z",
+  "reason": "fix(security): [ALLOW-PROTECTED: auth|pwa|ci] pre-encryption, dynamic session vault key, exam cryptographic receipt & csp hardening",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

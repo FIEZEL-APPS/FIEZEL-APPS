@@ -126,6 +126,16 @@ jobs:
           ssh-keyscan -p "${PORT:-22}" -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
           chmod 644 ~/.ssh/known_hosts
 
+      # FIEZEL_PRE_ENCRYPT_BANKS — pra-enkripsi bank materi publik sebelum diunggah ke hosting cPanel.
+      # Memastikan tidak ada JSON telanjang yang terunggah ke public_html/app.
+      - name: 'FIEZEL_PRE_ENCRYPT_BANKS — pra-enkripsi bank materi publik'
+        if: steps.creds.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/security/pre-encrypt-banks.mjs --encrypt
+          echo "Pra-enkripsi bank materi publik selesai: aset publik aman dari scraping."
+
       # FIEZEL_DEPLOY_STEP_ASSETS — gelombang PERTAMA: semua kecuali sw.js.
       # Penanda di nama langkah ini dibaca tests/deploy-site-gate-test.js untuk membuktikan urutannya.
       - name: 'FIEZEL_DEPLOY_STEP_ASSETS — unggah seluruh aset (sw.js sengaja ditahan)'
