@@ -7702,7 +7702,7 @@ section.fade,
   background: #FAF8F5 !important;
   color: #0F172A !important;
   min-height: auto !important;
-  padding-bottom: 0 !important;
+  padding-bottom: 24px !important;
 }
 
 /* Bottom Nav Scrim */
@@ -8448,8 +8448,8 @@ body:has(.home-today) #modalPanel,
 .modal-panel:has(.settings-modal-wrapper),
 #modalPanel:has(.settings-modal-wrapper) {
   padding: 0 !important;
-  height: min(780px, 86dvh) !important;
-  max-height: 86dvh !important;
+  height: min(820px, 92dvh) !important;
+  max-height: 92dvh !important;
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
@@ -8466,8 +8466,8 @@ body:has(.home-today) #modalPanel,
   #modalPanel:has(.settings-modal-wrapper) {
     max-width: 100% !important;
     width: 100% !important;
-    height: 88dvh !important;
-    max-height: 88dvh !important;
+    height: 92dvh !important;
+    max-height: 92dvh !important;
     border-radius: 24px 24px 0 0 !important;
     border-bottom: none !important;
     align-self: flex-end !important;
@@ -8532,16 +8532,26 @@ body:has(.home-today) #modalPanel,
   height: 18px !important;
 }
 
+body.fz-lux .modal-panel .settings-head h2,
+body.fz-lux #modalPanel .settings-head h2,
+.modal-panel .settings-head h2,
+#modalPanel .settings-head h2,
 .settings-head h2 {
   font-size: 1.55rem !important;
   margin: 4px 0 2px !important;
   color: #FFFFFF !important;
-  font-weight: 700 !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 800 !important;
   letter-spacing: -0.02em !important;
 }
 
+body.fz-lux .modal-panel .settings-head p,
+body.fz-lux #modalPanel .settings-head p,
+.modal-panel .settings-head p,
+#modalPanel .settings-head p,
 .settings-head p {
   color: #94A3B8 !important;
+  -webkit-text-fill-color: #94A3B8 !important;
   font-size: 0.85rem !important;
   line-height: 1.4 !important;
   margin: 0 !important;
@@ -8552,7 +8562,8 @@ body:has(.home-today) #modalPanel,
   overflow-y: auto !important;
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
-  padding: 16px 20px 24px !important;
+  overscroll-behavior: contain !important;
+  padding: 18px 20px 28px !important;
   box-sizing: border-box !important;
   background: #14141C !important;
 }
@@ -8561,8 +8572,8 @@ body:has(.home-today) #modalPanel,
 .settings-fold {
   background: #181824 !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 16px !important;
-  margin: 0 0 10px 0 !important;
+  border-radius: 18px !important;
+  margin: 0 0 14px 0 !important;
   transition: border-color 0.15s ease !important;
 }
 
@@ -8573,15 +8584,18 @@ body:has(.home-today) #modalPanel,
 .settings-fold summary {
   color: #FFFFFF !important;
   font-weight: 700 !important;
-  padding: 14px 16px !important;
+  font-size: 1.05rem !important;
+  padding: 16px 18px !important;
+  min-height: 52px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   cursor: pointer !important;
+  box-sizing: border-box !important;
 }
 
 .settings-fold-body {
-  padding: 4px 16px 16px !important;
+  padding: 6px 18px 20px !important;
   background: transparent !important;
 }
 
@@ -8590,10 +8604,10 @@ body:has(.home-today) #modalPanel,
 .settings-fold .fiezel-account-card {
   background: #1E1E2C !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   color: #FFFFFF !important;
-  padding: 14px !important;
-  margin-top: 10px !important;
+  padding: 18px !important;
+  margin-top: 14px !important;
 }
 
 .settings-fold .card h3,
@@ -8616,7 +8630,10 @@ body:has(.home-today) #modalPanel,
 .settings-scroll-body .setting-row {
   color: #FFFFFF !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  padding: 10px 0 !important;
+  padding: 14px 4px !important;
+  min-height: 50px !important;
+  font-size: 0.96rem !important;
+  box-sizing: border-box !important;
 }
 
 .settings-fold .setting-row:last-child,
@@ -8627,13 +8644,13 @@ body:has(.home-today) #modalPanel,
 .settings-fold .setting-row b,
 .settings-scroll-body .setting-row b {
   color: #FFFFFF !important;
-  font-size: 0.9rem !important;
+  font-size: 0.94rem !important;
 }
 
 .settings-fold .setting-row small,
 .settings-scroll-body .setting-row small {
   color: #94A3B8 !important;
-  font-size: 0.78rem !important;
+  font-size: 0.82rem !important;
 }
 
 .settings-fold .setting-icon,
@@ -8651,7 +8668,11 @@ body:has(.home-today) #modalPanel,
   background: #252536 !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #FFFFFF !important;
-  border-radius: 10px !important;
+  border-radius: 12px !important;
+  min-height: 46px !important;
+  font-size: 0.95rem !important;
+  padding: 10px 14px !important;
+  box-sizing: border-box !important;
 }
 
 /* Settings Modal Actions Bar in Dark Sheet */
