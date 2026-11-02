@@ -1,7 +1,7 @@
 {
-  "version": "m025-751",
-  "claimedBy": "branch fix/progress-legacy-state-m025-751",
-  "claimedAt": "2026-11-02T18:43:19.476Z",
-  "reason": "fix(auth,pwa,voice,gems): [ALLOW-PROTECTED: auth|pwa|ci] restore google auth & api csp, heal legacy progress, align copilot, wire owner gems",
+  "version": "m025-752",
+  "claimedBy": "branch feat/invariants-lock-m025-752",
+  "claimedAt": "2026-11-02T19:00:52.979Z",
+  "reason": "fix(ci,quality): [ALLOW-PROTECTED: ci] lock tri-core invariants gate for owner wire, stale shell, and auth csp (m025-752)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

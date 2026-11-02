@@ -262,6 +262,37 @@ function auditCollateralScope(files, diffText) {
     );
   }
 
+  // 6. Tri-Core Invariants Protection (Owner Wire, Zero-Stale-Shell, Auth CSP Superset)
+  // Mandat OWNER (m025-752): Tiga masalah krusial ini DILARANG KERAS terulang kembali:
+  // (a) Auth CSP Superset (Login Google & API Registrasi bebas blokir)
+  if (files.includes('website/.htaccess')) {
+    const ht = fileText('website/.htaccess');
+    if (!/script-src[^;]*accounts\.google\.com/.test(ht) || !/connect-src[^;]*(https:|api\.fiezel\.my\.id)/.test(ht)) {
+      violations.push('TRI_CORE_AUTH_CSP_BROKEN: website/.htaccess membuang accounts.google.com atau connect-src https: (mematikan login Google & registrasi). Dilarang merusak CSP superset.');
+    }
+  }
+  // (b) Zero-Stale-Shell & Offline Vault (PWA anti-tersangkut saat update)
+  if (files.includes('sw.js')) {
+    const sw = fileText('sw.js');
+    if (!/\bisUpdateNav\b/.test(sw) || !/\bfz_upd\b/.test(sw)) {
+      violations.push('TRI_CORE_SHELL_COHERENCE_BROKEN: sw.js membuang logika isUpdateNav / fz_upd (membuat shell PWA murid tersangkut di versi lama). Dilarang menghapus navigasi update.');
+    }
+  }
+  if (files.includes('features/security/fiezel-offline-vault.js')) {
+    const vt = fileText('features/security/fiezel-offline-vault.js');
+    if (!/\bpurgeStaleBuilds\b/.test(vt)) {
+      violations.push('TRI_CORE_VAULT_EVICTION_BROKEN: fiezel-offline-vault.js membuang purgeStaleBuilds (membuat bank offline tersangkut di build lama).');
+    }
+  }
+  // (c) Owner Dashboard <-> Learner Wire (Kirim permata & pesan ke sub/email Google)
+  if (files.includes('workers/api/route-gem-grant.js') || files.includes('workers/api/route-learner-messages.js')) {
+    const rg = fileText('workers/api/route-gem-grant.js');
+    const rm = fileText('workers/api/route-learner-messages.js');
+    if (!/SELECT sub FROM auth_email/.test(rg) || !/SELECT sub FROM auth_email/.test(rm)) {
+      violations.push('TRI_CORE_OWNER_WIRE_BROKEN: API owner membuang resolusi sub dari auth_email (memutus kirim permata/pesan ke email Google murid).');
+    }
+  }
+
   return { declared: [...declared], violations, runtimeDeletedLines };
 }
 
