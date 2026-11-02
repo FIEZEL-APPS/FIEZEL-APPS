@@ -32,6 +32,12 @@ Allow: /
 User-agent: Bingbot
 Allow: /
 
+User-agent: msnbot
+Allow: /
+
+User-agent: BingPreview
+Allow: /
+
 User-agent: anthropic-ai
 Allow: /
 
