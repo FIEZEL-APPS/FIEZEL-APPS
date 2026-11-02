@@ -2,9 +2,10 @@
 **Universal English Pivot, Zero-Leak Fallback, Konsolidasi Satu Pintu JSON, & Matriks Multi-Locale Global**
 
 - **Cabang Git**: `feat/i18n-universal-pivot` (Worktree terisolasi: `C:\Users\hp\fiezel-i18n-engine`)
-- **Basis**: `origin/main` (`e99e7af0`)
+- **Basis**: `origin/main` (`ef1d24f6`, `m025-752`)
+- **Versi Rilis**: `m025-753`
 - **Penerima Serah Terima**: Master Gatekeeper (`91aad2bc`) / Koordinator Arsitektur (`d1856b92`)
-- **Target Integrasi**: `fiezel-staging-preview`
+- **Target Integrasi**: `main` (PR #825)
 
 ---
 
