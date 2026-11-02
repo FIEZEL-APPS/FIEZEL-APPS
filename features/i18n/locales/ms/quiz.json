@@ -320,7 +320,7 @@
   "quiz.vocab-synonym-stem": "Which word is closest in meaning to this one?",
   "quiz.vocab-why-correct": "Basically, \"{word}\" means \"{meaning}\"{posNote}.",
   "quiz.vonis-benar": "Correct, awesome!",
-  "quiz.vonis-salah": "Belum tepat sepenuhnya, that's okay.",
+  "quiz.vonis-salah": "Kurang tepat sepenuhnya, tidak mengapa.",
   "quiz.weak-skill-note": " The one you missed the most: {weak}.",
   "quiz.why-bentuk-tepat": "The correct form is \"{jawaban}\".",
   "quiz.why-kalimat-tepat": "The correct sentence is \"{jawaban}\".",
