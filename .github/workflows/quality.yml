@@ -710,6 +710,7 @@ jobs:
           node tests/voice-call-ai-studio-port-test.js
           node tests/voice-call-studio-integration-test.js
           node tests/voice-studio-ui-architecture-test.js
+          node tests/voice-duplex-fullphone-contract-test.js
           node tests/kawan-bicara-hardening-test.js
           node tests/ios-pwa-mic-shadowing-test.js
           node tests/android-app-integrity-test.js

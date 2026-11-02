@@ -1,7 +1,7 @@
 {
-  "version": "m025-749",
-  "claimedBy": "branch fix/pwa-english-progress-m025-752",
-  "claimedAt": "2026-11-02T11:36:48.649Z",
-  "reason": "fix(pwa): [ALLOW-PROTECTED: auth|pwa] fix ios pwa update cache lock, home kemajuan zero values, and multi-course progress parity (m025-749)",
+  "version": "m025-750",
+  "claimedBy": "branch feat/voice-duplex-fullphone-m025-752",
+  "claimedAt": "2026-11-02T14:04:44.355Z",
+  "reason": "fix(voice): [ALLOW-PROTECTED: auth|pwa] full-duplex phone call mic pipeline, zero-beep duplex, and mochi sos echo-tolerant barge-in",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
