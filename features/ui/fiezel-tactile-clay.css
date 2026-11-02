@@ -292,6 +292,35 @@ html body:has(.home-today) .bottomnav,
   view-transition-name: bottomnav !important;
   overflow: visible !important;
 }
+@media (max-width: 640px) {
+  html body nav.bottomnav,
+  html body .bottomnav,
+  .bottomnav {
+    height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
+    max-height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .nav-active-pill,
+  #navActivePill {
+    top: 5px !important;
+    height: 44px !important;
+    border-radius: 22px !important;
+  }
+  .bottomnav .nav {
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 3px 0 !important;
+  }
+  .bottomnav .nav .fz-i,
+  .bottomnav .nav svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .bottomnav .nav span {
+    font-size: 10.5px !important;
+  }
+}
 ::view-transition-old(bottomnav),
 ::view-transition-new(bottomnav) {
   animation: none !important;
@@ -6345,6 +6374,25 @@ html body.fz-view-profile #fzCourseSwitchBtn {
 }
 html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-stage-home main.app.app {
   padding-top: calc(56px + env(safe-area-inset-top, 0px) + 4px) !important;
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+}
+@media (max-width: 640px) {
+  html body header.topbar,
+  html body.fz-lux header.topbar,
+  html body.fz-view-classroom header.topbar,
+  html body.fz-view-profile header.topbar,
+  html body.fz-view-progress header.topbar,
+  html body.fz-view-latihan header.topbar {
+    height: calc(50px + env(safe-area-inset-top, 0px)) !important;
+    min-height: calc(50px + env(safe-area-inset-top, 0px)) !important;
+    max-height: calc(50px + env(safe-area-inset-top, 0px)) !important;
+    padding: env(safe-area-inset-top, 0px) 12px 0 12px !important;
+    gap: 8px !important;
+  }
+  html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-stage-home main.app.app {
+    padding-top: calc(50px + env(safe-area-inset-top, 0px) + 4px) !important;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+  }
 }
 html body.fz-lesson-mode main.app.app,html body.fz-lux.fz-lesson-mode main.app.app,html body.fz-lux.fz-stage-quiz main.app.app,html body:has(.quiz-shell) main.app.app,html body.fz-view-chat main.app.app,html body.fz-lux.fz-view-chat main.app.app { padding-top: 0 !important; }
 html body.fz-lesson-mode header.topbar,

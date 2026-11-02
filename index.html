@@ -170,7 +170,6 @@ html.fz-booting,html.fz-booting body{overscroll-behavior:none;overscroll-behavio
 html.fz-booting body{overflow:hidden}
 html.fz-booting nav.bottomnav,
 html.fz-booting .bottomnav,
-html.fz-booting header.topbar,
 html.fz-booting body:not(.fz-app-open) nav.bottomnav,
 html.fz-booting body:not(.fz-app-open) .bottomnav {
   display:none !important;
@@ -515,12 +514,22 @@ html.fz-booting body:not(.fz-app-open) .bottomnav {
       padding-bottom: 0 !important;
       margin-bottom: 0 !important;
     }
-    .modal-panel, .welcome-panel, .notification-panel {
+    .modal-panel:not(:has(.settings-modal-wrapper)), .welcome-panel, .notification-panel {
       max-height: min(600px, 84dvh) !important;
       padding-bottom: 18px !important;
       margin: auto !important;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch !important;
+    }
+    .modal-panel:has(.settings-modal-wrapper),
+    #modalPanel:has(.settings-modal-wrapper) {
+      max-height: min(780px, 90dvh) !important;
+      height: min(780px, 90dvh) !important;
+      padding: 0 !important;
+      margin: auto !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
     }
 
     /* JLPT Japanese Listening: Fullscreen Mobile Experience (Zero-Popup Cutoff Invariant) */

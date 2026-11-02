@@ -1,7 +1,7 @@
 {
-  "version": "m025-744",
-  "claimedBy": "branch feat/security-hardening-m025-744",
-  "claimedAt": "2026-11-02T07:43:52.595Z",
-  "reason": "fix(security): [ALLOW-PROTECTED: auth] client-side anti-tamper, dual-layer steganography & state integrity guard",
+  "version": "m025-745",
+  "claimedBy": "branch fix/progress-settings-scale-scroll-m025-745",
+  "claimedAt": "2026-11-02T08:18:01.182Z",
+  "reason": "fix(pwa): [ALLOW-PROTECTED: auth|pwa] multi-course progress data parity, settings card scale, and nav proportions (m025-745)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
