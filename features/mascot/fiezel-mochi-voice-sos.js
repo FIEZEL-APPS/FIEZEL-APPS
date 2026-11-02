@@ -3328,15 +3328,11 @@
             if (ctx.state === 'suspended') {
               try { ctx.resume().catch(function () {}); } catch (_) {}
             }
-            // Jangan pernah memotong atau mengirim derau mikrofon saat sapaan/penjelasan pembuka sedang berjalan
-            if (!_openingTurnCompletedForQ || _awaitingOpeningModelTurn) {
-              _consecutiveSpeechFrames = 0;
-              return;
-            }
+            // Interupsi suara murid (barge-in) diizinkan kapan saja
             var float32 = e.inputBuffer.getChannelData(0);
             var v = analyzeHumanVoiceBandFrame(float32, inRate);
             var mochiPlayingAudio = (_activeAudioSources.length > 0) || ((Date.now() - _lastMochiAudioEndedAt) < 320);
-            var inOpeningGrace = _activeCall && _activeCall.startedAt && ((Date.now() - _activeCall.startedAt) < 3200);
+            var inOpeningGrace = _activeCall && _activeCall.startedAt && ((Date.now() - _activeCall.startedAt) < 300);
 
             var scheduleBurstEnd = function () {
               if (_audioStreamEndTimer) { clearTimeout(_audioStreamEndTimer); }
@@ -3360,14 +3356,14 @@
                 _consecutiveSpeechFrames = 0;
                 return;
               }
-              // Butuh >= 8 frame berturut-turut pita vokal manusia jelas & keras (tolak pantulan suara speaker Mochi sendiri)
-              if (v.isHumanSpeech && v.rms >= 0.038) {
+              // Echo-tolerant barge-in: pita vokal manusia terkonfirmasi >= 5 frame (~160ms, rms >= 0.016)
+              if (v.isHumanSpeech && v.rms >= 0.016) {
                 _consecutiveSpeechFrames++;
-                if (_consecutiveSpeechFrames >= 8) {
+                if (_consecutiveSpeechFrames >= 5) {
                   _lastBargeInAt = Date.now();
                   _modelTurnInProgress = false;
                   _awaitingOpeningModelTurn = false;
-                  _userAskedConceptOnCurrent = true;
+                  _openingTurnCompletedForQ = true;
                   if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
                   stopAllActiveAudioSources();
                   self._setVoiceVisualizerUserSpeaking(true);
@@ -3461,11 +3457,6 @@
             audioContext: ctx,
             onFrameProcessed: function (probs, frame) {
               if (!_activeCall || !_activeCall.active) return;
-              // Jangan pernah memotong giliran sapaan/penjelasan pembuka sebelum selesai diucapkan penuh
-              if (!_openingTurnCompletedForQ || _awaitingOpeningModelTurn) {
-                sileroSpeechStreak = 0;
-                return;
-              }
               var pSpeech = (probs && typeof probs.isSpeech === 'number') ? probs.isSpeech : 0;
               var n = frame ? frame.length : 0;
               var sq = 0;
@@ -3473,24 +3464,25 @@
               var rms = n > 0 ? Math.sqrt(sq / n) : 0;
               var pcmBase64 = n > 0 ? float32ToPcm16Base64(frame) : '';
               var mochiPlayingAudio = (_activeAudioSources.length > 0) || ((Date.now() - _lastMochiAudioEndedAt) < 320);
-              var inOpeningGrace = _activeCall && _activeCall.startedAt && ((Date.now() - _activeCall.startedAt) < 3200);
+              var inOpeningGrace = _activeCall && _activeCall.startedAt && ((Date.now() - _activeCall.startedAt) < 300);
 
               if (mochiPlayingAudio) {
                 if (inOpeningGrace) {
                   sileroSpeechStreak = 0;
                   return;
                 }
-                // Barge-in hanya diizinkan bila suara dekat mikrofon manusia asli terkonfirmasi >= 12 frame (384ms, p >= 0.88, rms >= 0.035)
-                // sehingga gema speaker laptop/HP tidak pernah memotong penjelasan Mochi sendiri!
-                if (pSpeech >= 0.88 && rms >= 0.035) {
+                // Echo-tolerant barge-in: saat audio Mochi sedang diputar di speaker HP/laptop,
+                // peredam gema hardware (AEC) meredam RMS mic. Deteksi vokal manusia cukup pada pSpeech >= 0.72 dan rms >= 0.014
+                // terkonfirmasi >= 6 frame (~192ms) agar murid bisa langsung menyela penjelasan secara instan.
+                if (pSpeech >= 0.72 && rms >= 0.014) {
                   _sileroLastSpeechProbAt = Date.now();
                   sileroSpeechStreak++;
                   sileroSilenceStreak = 0;
-                  if (sileroSpeechStreak >= 12) {
+                  if (sileroSpeechStreak >= 6) {
                     _lastBargeInAt = Date.now();
                     _modelTurnInProgress = false;
                     _awaitingOpeningModelTurn = false;
-                    _userAskedConceptOnCurrent = true;
+                    _openingTurnCompletedForQ = true;
                     if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
                     stopAllActiveAudioSources();
                     self._setVoiceVisualizerUserSpeaking(true);
@@ -3502,7 +3494,7 @@
                     return;
                   }
                 } else {
-                  if (pSpeech < 0.65) sileroSpeechStreak = 0;
+                  if (pSpeech < 0.55) sileroSpeechStreak = 0;
                   return;
                 }
               } else {
@@ -3859,7 +3851,7 @@
         }
 
         if (sc.modelTurn && sc.modelTurn.parts) {
-          if (_lastBargeInAt > 0 && (Date.now() - _lastBargeInAt) < 480) {
+          if (_userAudioBurstActive || (_lastBargeInAt > 0 && (Date.now() - _lastBargeInAt) < 600)) {
             return;
           }
           _modelTurnInProgress = true;

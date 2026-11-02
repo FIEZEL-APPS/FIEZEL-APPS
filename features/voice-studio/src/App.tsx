@@ -1827,6 +1827,31 @@ export default function App() {
 
   // Hands-free Continuous Voice Recognition for "Telepon Live"
   useEffect(() => {
+    // 1. In WebSocket Full-Duplex mode ("Telepon Live"), audio input is 100% handled
+    // by continuous hardware microphone PCM streaming via Silero/Handy VAD directly to Gemini Live WS.
+    // We MUST NEVER initialize or run browser SpeechRecognition in ws-duplex mode!
+    // Running SpeechRecognition causes OS audio focus renegotiation, mic cutoffs, and beeping on Android/iOS!
+    if (isLiveConnected && liveTransportMode === 'ws-duplex') {
+      if (liveSpeechRecRef.current) {
+        try {
+          liveSpeechRecRef.current.onresult = null;
+          liveSpeechRecRef.current.onend = null;
+          liveSpeechRecRef.current.onerror = null;
+          liveSpeechRecRef.current.stop();
+        } catch {}
+        liveSpeechRecRef.current = null;
+      }
+      if (liveSilenceTimerRef.current) {
+        window.clearTimeout(liveSilenceTimerRef.current);
+        liveSilenceTimerRef.current = null;
+      }
+      setIsWaitingAfterSpeech(false);
+      setIsListeningLiveSpeech(true);
+      return () => {
+        setIsWaitingAfterSpeech(false);
+      };
+    }
+
     const shouldListenHandsFree =
       isLiveConnected &&
       !isPlayingAiAudio &&
@@ -2332,8 +2357,8 @@ export default function App() {
           .catch(() => {
             return navigator.mediaDevices.getUserMedia({ audio: true });
           });
-        // Timeout 1200ms mencegah lock/hang pada iOS PWA standalone WebKit
-        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200));
+        // Timeout 4000ms memberi waktu cukup untuk negosiasi driver & dialog izin mic di Android/iOS
+        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
         const res = await Promise.race([getStreamPromise, timeoutPromise]);
         if (res && res.getAudioTracks && res.getAudioTracks().length > 0) {
           stream = res;
@@ -2779,7 +2804,7 @@ export default function App() {
 
             // Always prompt AI to speak an opening greeting on a fresh call (even when returning with prior conversation history!)
             const hasUserSpoken = turnsRef.current.some((t) => t.speaker === 'user');
-            if (!isReconnect && isGoogleLive) {
+            if (!isReconnect) {
               callBillingRef.current.turnMetered = false;
               const dualMem = brainStateRef.current.dualBrainMemory;
               const priorSessionsCount = dualMem?.mentorBrain?.sessionSummaries?.length || 0;
@@ -2831,7 +2856,7 @@ export default function App() {
                   } else {
                     activateTurnByTurnLiveFallback();
                   }
-                }, 7500);
+                }, 15000);
               } catch {
                 // Ignore
               }
@@ -2865,7 +2890,11 @@ export default function App() {
             }
             const ctx = outputAudioCtxRef.current;
             if (ctx.state === 'suspended') {
-              void ctx.resume().catch(() => {});
+              try {
+                await ctx.resume();
+              } catch {
+                // Ignore
+              }
             }
             meterCallAiVoiceTurn();
 
