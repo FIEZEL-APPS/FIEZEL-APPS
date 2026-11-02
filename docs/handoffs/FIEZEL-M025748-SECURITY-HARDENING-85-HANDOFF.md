@@ -1,7 +1,7 @@
 # FIEZEL Security Hardening (Target Skor 85+) — Handoff Dossier
 
-**Nomor Build**: `m025-748`  
-**Tanggal**: 2 November 2026  
+**Nomor Build**: `m025-748`<br>
+**Tanggal**: 2 November 2026<br>
 **Cakupan**: `fix(security): [ALLOW-PROTECTED: auth|pwa|ci] pre-encryption, dynamic session vault key, exam cryptographic receipt & csp hardening`
 
 ---
