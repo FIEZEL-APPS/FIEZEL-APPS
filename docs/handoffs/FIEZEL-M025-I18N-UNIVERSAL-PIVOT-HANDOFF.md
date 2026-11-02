@@ -54,6 +54,19 @@ Sebelum perombakan ini:
   6. Russia (`ru` - Русский)
 - CSS `style.css` diperbarui dengan font fallback multi-aksara non-Latin (`:root:lang(km)`, `:root:lang(ja)`, `:root:lang(ru)`) untuk menjamin zero-layout-shift.
 
+### Pilar 5: Purifikasi Total Master English (`locales/en/*.json`) & Zero Gado-Gado
+- Seluruh 4.674 kunci kanonikal di 4 namespace (`ui.json`, `quiz.json`, `grammar.json`, `vocab.json`) telah dimurnikan 100% menjadi fluent, natural educational English:
+  * Eliminasi tuntas sisa-sisa translasi regex gado-gado (campuran kata Indonesia-Inggris).
+  * 100% preservasi parameter kurung kurawal `{param}` (misal `{kata}`, `{soal}`, `{count}`).
+  * Nol kebocoran kata leksikal Indonesia pada teks prosa bahasa Inggris.
+- Tooling otomatis: `tools/purify-master-en.mjs` berbasis Gemini API (`gemini-3.5-flash-lite`) dengan disk caching dan audit blacklist kata Indonesia.
+
+### Pilar 6: Regenerasi Bersih 6 Bahasa Global Bebas-Mojibake & Paritas Kamus Presisi
+- Katalog 6 bahasa global (`ja`, `vi`, `ms`, `fil`, `km`, `ru`) diregenerasi bersih dari master English murni.
+- `tools/i18n-localize-matrix.mjs` diperbarui dengan pengurutan kamus terpanjang-ke-terpendek (`b.length - a.length`) untuk mencegah pemecahan frasa majemuk (contoh: `academic.task-interview-label`: `Interview practice` -> `面接の練習` (ja), `Latihan temu duga` (ms), bukan `Interview 練習`).
+- Bebas mojibake 100% (zero encoding rusak seperti `ç·´ç¿’`).
+- Penyelarasan kunci `academic.no-prediction-note` dan fallback non-terjemahan Thai ke English Golden Pivot (`en`) agar 100% bebas kata Indonesia.
+
 ---
 
 ## 3. Bukti Pengujian Empiris & Gerbang Mutu Lokal
@@ -98,7 +111,17 @@ node tools/dev/probe-i18n-pwa-integrity.mjs
 #   -> [3/4] SW Offline Fetch: 12 katalog JSON 200 OK; Offline Translation Zero Indonesian Leak
 #   -> [4/4] Cold-Boot Persistence: Page errors = 0, Network 404 = 0
 
-# 9. Penegakan Branch Protection & Scope Isolation (Rule #0)
+# 9. Gerbang Baru: I18N Global Purity & Non-ID Zero Leak Gate
+node tests/i18n-global-purity-test.js
+# Status: 100% HIJAU (PASS)
+#   -> PASS: Seluruh 36 berkas katalog JSON 9 bahasa dan 4 namespace ada dan valid
+#   -> PASS: Zero Mojibake pada seluruh katalog (termasuk ja, vi, ru, fil, km)
+#   -> PASS: Master English (en) 100% PURE & ZERO kebocoran kata Bahasa Indonesia
+#   -> PASS: Katalog Global Strict (ja, vi, ru, fil, km) ZERO kebocoran kata Bahasa Indonesia
+#   -> PASS: Katalog Thai (th) 100% bebas aksara Latin yang membocorkan Bahasa Indonesia
+#   -> PASS: Katalog Malaysia (ms) bebas kata Indonesia spesifik yang salah dalam konteks Melayu
+
+# 10. Penegakan Branch Protection & Scope Isolation (Rule #0)
 $env:BASE_SHA="origin/main"; node tools/fiezel-guardians.mjs a10
 # Status: PASS_WITH_RISK_REPORT (errors=0, warnings=0)
 ```
@@ -119,7 +142,9 @@ $env:BASE_SHA="origin/main"; node tools/fiezel-guardians.mjs a10
 10. `tests/th-ui-leak-test.js`: Perbaikan heuristik penelusuran nama folder (`e.name`).
 11. `style.css`: Penambahan tipografi multi-aksara non-Latin (`:root:lang(...)`).
 12. `package.json`: Penambahan script npm `i18n:extract` & `i18n:matrix`, serta dependensi `i18next` & `i18next-parser`.
-13. `.github/workflows/quality.yml`: Pendaftaran satu baris gerbang `tests/i18n-leak-guard-test.js`.
+13. `.github/workflows/quality.yml`: Pendaftaran satu baris gerbang `tests/i18n-leak-guard-test.js` dan satu baris `tests/i18n-global-purity-test.js`.
+14. `tests/i18n-global-purity-test.js`: Gerbang CI baru pengawas kemurnian master English dan pencegah kebocoran 50 kata leksikal Indonesia pada seluruh katalog non-ID.
+15. `tools/purify-master-en.mjs`: Script otomatisasi purifikasi master English berbasis Gemini API.
 
 ---
 

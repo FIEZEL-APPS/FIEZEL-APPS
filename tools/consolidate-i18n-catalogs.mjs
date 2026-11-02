@@ -319,8 +319,8 @@ const catalogs = {
 for (const k of keys) {
   const ns = getNamespace(k);
   const valId = storeId[k];
-  const valTh = polishThai(storeTh[k] || valId);
   const valEn = toEnglish(k, valId);
+  const valTh = storeTh[k] ? polishThai(storeTh[k]) : valEn;
 
   catalogs.id[ns][k] = valId;
   catalogs.th[ns][k] = valTh;
