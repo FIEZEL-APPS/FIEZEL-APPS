@@ -877,6 +877,12 @@ jobs:
           node tests/story-voice-autoplay-test.js
           # M025-747: Graded Story Reader character-level forced alignment timings integrity
           node tests/story-timings-integrity-test.js
+          # M025-748: Mandarin Course Master Blueprint, HSK curriculum, typography & Braincore bridge
+          node tests/mandarin-blueprint-integrity-test.js
+          # M025-756: Mandarin Pinyin Ruby engine & 3-line format integrity
+          node tests/mandarin-pinyin-ruby-test.js
+          # M025-756: Mandarin Tutor Character & Braincore feedback 1:1 alignment
+          node tests/mandarin-tutor-braincore-feedback-test.js
           # M025-703: Interactive Kaiwa Chat universal furigana ruby & romaji live subtitles
           node tests/interactive-chat-universal-furigana-test.js
           # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat

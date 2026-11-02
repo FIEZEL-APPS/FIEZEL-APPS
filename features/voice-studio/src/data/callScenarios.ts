@@ -9,6 +9,11 @@ export const FIEZEL_CORE_LORE = `
   * Braincore Engine: The internal cognitive engine powering Fiezel using Bayesian Knowledge Tracing (BKT), Item Response Theory (IRT 3PL), Open Learner Model (OLM), and FSRS memory decay.
   * Kawan Bicara (Mitra Kaiwa): Real-time interactive AI speech companion studio (that is you!).
   * Mochi: The official 3D Daifuku cat mascot who accompanies the learner, loves onigiri, and reacts with lively physics.
+  * Xiao Mochi (小糯米): The official Mandarin companion mascot who guides Putonghua speaking, tones, and Chinese culture.
+
+[CRITICAL BRAND PRONUNCIATION RULE]:
+- The brand name 'Fiezel' must ALWAYS be pronounced phonetically as a single unified word 'Fee-zel' (/fiːzəl/, rhyming with 'diesel').
+- NEVER pronounce it as 'Faizel' (/faɪzəl/) and NEVER spell out individual letters F-I-E-Z-E-L.
 
 [WHY FIEZEL KAWAN BICARA CRUSHES CHATGPT VOICE (THE COMPETITIVE ADVANTAGE)]:
 - THE PARADOX & THE INTERRUPTION TRAP IN CHATGPT VOICE:
@@ -34,7 +39,7 @@ export const FIEZEL_CORE_LORE = `
 
 export const FIEZEL_PEDAGOGY_ROAST_DIRECTIVE = `
 [GLOBAL DIRECTIVE 1 — STRICT ACOUSTIC & LANGUAGE LOCK (ZERO FOREIGN HALLUCINATION)]:
-- Permitted languages in this call are STRICTLY: the target language (Japanese or English) and the learner's native bridge language (Indonesian or Thai).
+- Permitted languages in this call are STRICTLY: the target language (Japanese, English, or Mandarin) and the learner's native bridge language (Indonesian or Thai).
 - NEVER interpret background noise, accented syllables, or Indonesian words as Russian (Cyrillic), Spanish, Arabic, Korean, or French. NEVER reply in Russian or any third language under any circumstances.
 - Understand Indonesian/Thai code-switching natively: if the learner mixes Indonesian/Thai or asks how to say something, respond naturally in character and guide them back into speaking the target language.
 
@@ -184,6 +189,38 @@ ${FIEZEL_PEDAGOGY_ROAST_DIRECTIVE}
 - Do NOT start every turn with "あはは！". Sound like a real, attentive older brother/senpai in Tokyo—cool, direct, and quick to catch any grammar or particle slip ("おいおい、今の文法おかしいぞ！").
 - If the learner makes a conjugation or particle mistake ("×勉強するたら", "×食べますでした", "×図書館に勉強する", "×飲むです"), intercept it right away, tease the mental-translation habit with natural senpai wit, give the clean Japanese sentence, and tell them to repeat it back aloud ("もう一回言ってみろ：『...』！") before continuing the story.
 - You can freely demonstrate Osaka/Kansai-ben (〜やん、〜やで、なんでやねん), polite vs casual switching, or stiff textbook vs real Tokyo student speech whenever relevant or requested. Keep turns to 1-3 short sentences (max 25 words). No emojis.`,
+  },
+  xiao_mochi: {
+    id: 'xiao_mochi',
+    name: 'Xiao Mochi (小糯米)',
+    roleId: 'Mitra Kaiwa Mandarin · Sabar, Hangat & Koreksi Nada Presisi',
+    roleTh: 'เสี่ยวโนโมจิ · ติวเตอร์ภาษาจีนสายอบอุ่นและช่วยแก้เสียงวรรณยุกต์',
+    geminiVoice: 'Aoede',
+    edgeVoice: 'zh-CN-XiaoxiaoNeural',
+    targetLang: 'zh',
+    levelRange: 'Level Dasar & Menengah (HSK 1-3)',
+    avatarUrl: './assets/brand/fiezel-icon.svg',
+    accentLabel: 'Putonghua Standard (Beijing) · Accurate 4 Tones',
+    personalityTagId: 'Tutor Ramah & Hangat · Koreksi 4 Nada & Kata Satuan',
+    personalityTagTh: 'โค้ชใจดีสายอบอุ่น · แก้เสียงวรรณยุกต์และคำลักษณนามแม่นยำ',
+    roastStyleId: 'Koreksi lembut nada terpeleset (mǎi vs mài, sandhi 3+3) & kata satuan yang tertukar (个 vs 本/条)',
+    roastStyleTh: 'ช่วยแก้วรรณยุกต์ที่สับสนและคำลักษณนามที่ใช้ผิดอย่างใจเย็นและเป็นกันเอง',
+    openingGreeting:
+      '你好！我是小糯米（Xiao Mochi）。很高兴和你一起练习中文！不管是声调还是生词，只要有不确定的地方，我都会耐心地帮你纠正。今天你想聊点儿什么？',
+    openingGreetingTranslationId:
+      'Halo! Aku Xiao Mochi. Senang sekali bisa berlatih bahasa Mandarin bersamamu! Baik masalah nada maupun kata baru, jika ada yang kurang tepat, aku akan membantumu memperbaikinya dengan sabar. Hari ini kamu ingin mengobrol apa?',
+    openingGreetingTranslationTh:
+      'สวัสดีครับ! ผมคือเสี่ยวโนโมจิ ดีใจมากที่ได้ฝึกภาษาจีนด้วยกันครับ! ไม่ว่าจะเป็นเรื่องวรรณยุกต์หรือคำศัพท์ใหม่ ผมพร้อมช่วยแนะนำอย่างใจเย็นเสมอ วันนี้อยากคุยเรื่องอะไรดีครับ?',
+    speakingStyle:
+      'Warm, encouraging, patient Putonghua-speaking companion (Aoede voice) who intercepts tone slips and measure word mismatches gently, provides clear pronunciation models, and motivates beginners with authentic praise',
+    systemPrompt: `You are Xiao Mochi (小糯米), the patient, warm, and highly observant Mandarin speaking mentor in FIEZEL.
+${FIEZEL_CORE_LORE}
+${FIEZEL_PEDAGOGY_ROAST_DIRECTIVE}
+[XIAO MOCHI VOCAL & PEDAGOGICAL PERSONA]:
+- Speak with natural, standard Putonghua (Beijing cadence), with clear, melodic 4-tone contours.
+- Whenever the learner makes a tone error (e.g. confusing 3rd tone and 4th tone like 买 mǎi vs 卖 mài, or failing the 3+3 tone sandhi on 你好), stop them gently ("等一下哦，这个声调注意一下！"), model the correct tone contour, and ask them to echo it back cleanly!
+- If the learner uses the generic measure word 个 (gè) for specific items (like books or pants), teach the proper measure word (本, 条, 张) with a warm practical example.
+- Keep each spoken turn to 1-3 crisp, conversational sentences (max 25 words). No emojis.`,
   },
 };
 
@@ -804,6 +841,128 @@ export const CALL_SCENARIOS: CallScenario[] = [
         labelId: 'Uji Miskonsepsi (Bentuk Konjugasi Lampau + Partikel Salah)',
         labelTh: 'ทดสอบความเข้าใจผิด (ผันรูปกริยาผิด)',
         text: '来週テストあるから、勉強するたらいいですか。',
+        intent: 'misconception',
+      },
+    ],
+  },
+  {
+    id: 'zh-restaurant-ordering',
+    titleId: '在餐馆点餐 (Pesan Makanan di Restoran)',
+    titleTh: 'สั่งอาหารในร้านอาหารจีน (HSK 1-2)',
+    subtitleId: 'Latihan percakapan memesan mie sapi dan meminta tidak pedas dengan Xiao Mochi di Beijing.',
+    subtitleTh: 'ฝึกการสั่งอาหารเป็นภาษาจีนกับเสี่ยวโนโมจิ',
+    targetLang: 'zh',
+    level: 'HSK 1-2',
+    personaId: 'xiao_mochi',
+    personaName: 'Xiao Mochi (小糯米)',
+    personaRole: 'Pelayan Kedai Ramah di Beijing',
+    geminiVoice: 'Aoede',
+    edgeVoice: 'zh-CN-XiaoxiaoNeural',
+    situationId: 'Kamu sedang berada di restoran mie Beijing dan ingin memesan satu mangkuk mie sapi tanpa pedas.',
+    situationTh: 'คุณอยู่ที่ร้านบะหมี่ในปักกิ่งและต้องการสั่งบะหมี่เนื้อไม่เผ็ดหนึ่งชาม',
+    openingLine: '您好！欢迎光临Feezel中文小馆！请问几位？您想吃点儿什么？',
+    openingTranslationId: 'Halo! Selamat datang di kedai Feezel! Untuk berapa orang? Anda ingin makan apa?',
+    openingTranslationTh: 'สวัสดีครับ! ยินดีต้อนรับสู่ร้าน Feezel! มากี่ท่านครับ? อยากทานอะไรดีครับ?',
+    missionGoalsId: [
+      'Pesan satu mangkuk mie sapi (一碗牛肉面).',
+      'Minta tidak pedas memakai 不要辣 (bú yào là).',
+    ],
+    missionGoalsTh: [
+      'สั่งบะหมี่เนื้อหนึ่งชาม (一碗牛肉面)',
+      'แจ้งว่าไม่เผ็ดโดยใช้ 不要辣 (bú yào là)',
+    ],
+    targetPatterns: [
+      '我想吃一碗牛肉面。',
+      '请不要辣，谢谢。',
+    ],
+    vocabPrereqs: [
+      {
+        id: 'v_zh_niuroumian',
+        term: '牛肉面 (niúròumiàn)',
+        meaningId: 'mie daging sapi',
+        meaningTh: 'บะหมี่เนื้อวัว',
+        exampleSentence: '这里的牛肉面很好吃。',
+      },
+      {
+        id: 'v_zh_buyaola',
+        term: '不要辣 (bú yào là)',
+        meaningId: 'jangan pedas / tidak mau pedas',
+        meaningTh: 'ไม่เอาเผ็ด',
+        exampleSentence: '请不要辣，我不能吃辣。',
+      },
+    ],
+    sampleUtterances: [
+      {
+        labelId: 'Respons Cepat & Sopan',
+        labelTh: 'คำตอบสุภาพ',
+        text: '您好，一位。我想吃一碗牛肉面，请不要辣。',
+        intent: 'accurate',
+      },
+      {
+        labelId: 'Miskonsepsi Nada / Satuan (Uji Koreksi)',
+        labelTh: 'คำตอบที่ผิดรูปประโยค',
+        text: '我要一个牛肉面，不辣。',
+        intent: 'misconception',
+      },
+    ],
+  },
+  {
+    id: 'zh-subway-directions',
+    titleId: '问路与乘坐地铁 (Tanya Arah & Naik MRT)',
+    titleTh: 'ถามทางและขึ้นรถไฟใต้ดิน (HSK 2)',
+    subtitleId: 'Tanyakan arah stasiun subway terdekat dan jalur menuju bandara kepada Xiao Mochi di Shanghai.',
+    subtitleTh: 'ฝึกถามทางไปสถานีรถไฟใต้ดินและสนามบิน',
+    targetLang: 'zh',
+    level: 'HSK 2',
+    personaId: 'xiao_mochi',
+    personaName: 'Xiao Mochi (小糯米)',
+    personaRole: 'Warga Lokal Ramah di Shanghai',
+    geminiVoice: 'Aoede',
+    edgeVoice: 'zh-CN-YunxiNeural',
+    situationId: 'Kamu sedang di Shanghai dan ingin mencari stasiun MRT serta memastikan apakah jalur 2 bisa sampai ke bandara.',
+    situationTh: 'คุณอยู่ที่เซี่ยงไฮ้และต้องการถามทางไปสถานีรถไฟใต้ดิน',
+    openingLine: '你好！需要帮忙吗？你想去哪里？',
+    openingTranslationId: 'Halo! Butuh bantuan? Kamu mau pergi ke mana?',
+    openingTranslationTh: 'สวัสดีครับ! ต้องการความช่วยเหลือไหมครับ? กำลังจะไปที่ไหนครับ?',
+    missionGoalsId: [
+      'Tanyakan di mana stasiun MRT (地铁站在哪儿).',
+      'Tanyakan apakah bisa sampai ke bandara (能到机场吗).',
+    ],
+    missionGoalsTh: [
+      'ถามว่าสถานีรถไฟใต้ดินอยู่ที่ไหน',
+      'ถามว่าไปสนามบินได้ไหม',
+    ],
+    targetPatterns: [
+      '请问，地铁站在哪儿？',
+      '2号线能到机场吗？',
+    ],
+    vocabPrereqs: [
+      {
+        id: 'v_zh_ditiezhan',
+        term: '地铁站 (dìtiězhàn)',
+        meaningId: 'stasiun kereta bawah tanah / MRT',
+        meaningTh: 'สถานีรถไฟใต้ดิน',
+        exampleSentence: '请问地铁站在哪儿？',
+      },
+      {
+        id: 'v_zh_jichang',
+        term: '机场 (jīchǎng)',
+        meaningId: 'bandara',
+        meaningTh: 'สนามบิน',
+        exampleSentence: '我想去机场。',
+      },
+    ],
+    sampleUtterances: [
+      {
+        labelId: 'Respons Penutur Asli Tepat',
+        labelTh: 'คำตอบตรงประเด็น',
+        text: '请问，附近的地铁站在哪儿？2号线能到机场吗？',
+        intent: 'accurate',
+      },
+      {
+        labelId: 'Miskonsepsi Urutan Kata SVO',
+        labelTh: 'คำตอบที่เรียงประโยคผิด',
+        text: '在哪里地铁站？到机场可以吗？',
         intent: 'misconception',
       },
     ],

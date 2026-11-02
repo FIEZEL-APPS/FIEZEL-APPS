@@ -1,0 +1,89 @@
+{
+  "schema": "FIEZEL-ZH-WRITING-PROMPTS-V1",
+  "version": "2.0.0",
+  "targetLang": "zh",
+  "prompts": [
+    {
+      "id": "w-zh-a1-01",
+      "level": "A1",
+      "hsk": "HSK 1",
+      "title": "自我介绍 (Perkenalan Diri)",
+      "targetChars": 40,
+      "minutes": 10,
+      "prompt": "请用汉语写一段简短的自我介绍，包含你的名字、国籍和职业。",
+      "id_hint": "Tuliskan perkenalan diri singkat dalam bahasa Mandarin: sebutkan nama, asal negara, dan pekerjaanmu.",
+      "keyVocab": [
+        "叫",
+        "是",
+        "哪国人",
+        "学生/工作"
+      ]
+    },
+    {
+      "id": "w-zh-a2-01",
+      "level": "A2",
+      "hsk": "HSK 2",
+      "title": "我的一天 (Keseharian Saya)",
+      "targetChars": 80,
+      "minutes": 15,
+      "prompt": "请写一写你平时一天的生活安排，包含早上起床、学习/工作和晚上的活动。",
+      "id_hint": "Ceritakan jadwal rutinitas harianmu: waktu bangun pagi, aktivitas belajar/bekerja, dan kegiatan malam hari.",
+      "keyVocab": [
+        "起床",
+        "吃早饭",
+        "去学校/公司",
+        "回家",
+        "睡觉"
+      ]
+    },
+    {
+      "id": "w-zh-b1-01",
+      "level": "B1",
+      "hsk": "HSK 3",
+      "title": "一次难忘的旅行 (Perjalanan Berkesan)",
+      "targetChars": 150,
+      "minutes": 20,
+      "prompt": "请描述一次令你难忘的旅行经历，说明你去哪儿、和谁去、做了什么以及感受如何。",
+      "id_hint": "Deskripsikan perjalanan wisatamu yang paling berkesan: lokasi, teman seperjalanan, kegiatan menarik, dan perasaanmu.",
+      "keyVocab": [
+        "旅游",
+        "风景",
+        "特色美食",
+        "印象深刻"
+      ]
+    },
+    {
+      "id": "w-zh-b2-01",
+      "level": "B2",
+      "hsk": "HSK 4",
+      "title": "关于环境保护的建议 (Saran Pelestarian Lingkungan)",
+      "targetChars": 250,
+      "minutes": 25,
+      "prompt": "针对现代城市的垃圾分类和节能减排问题，谈谈你的看法并提出两点建议。",
+      "id_hint": "Berikan pandangan serta 2 usulan konkret mengenai pemilahan sampah dan hemat energi di perkotaan modern.",
+      "keyVocab": [
+        "环境保护",
+        "垃圾分类",
+        "节约资源",
+        "提高意识"
+      ]
+    },
+    {
+      "id": "w-zh-c1-01",
+      "level": "C1",
+      "hsk": "HSK 5-6",
+      "title": "人工智能对未来就业的影响 (Dampak AI pada Lapangan Kerja)",
+      "targetChars": 400,
+      "minutes": 35,
+      "prompt": "结合当前科技发展，论述人工智能给传统行业带来的挑战与机遇，并分析个人应如何提升核心竞争力。",
+      "id_hint": "Uraikan tantangan dan peluang AI bagi industri tradisional, serta bagaimana individu harus mengembangkan kompetensi intinya.",
+      "keyVocab": [
+        "人工智能",
+        "机遇与挑战",
+        "颠覆性变革",
+        "终身学习",
+        "核心竞争力"
+      ]
+    }
+  ]
+}

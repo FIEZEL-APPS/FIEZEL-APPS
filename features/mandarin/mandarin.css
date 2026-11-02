@@ -1,0 +1,641 @@
+/**
+ * features/mandarin/mandarin.css
+ *
+ * FIEZEL MANDARIN DESIGN SYSTEM & TYPOGRAPHIC TOKENS
+ * Standar Tipografi CJK, 4 Nada Fonetik (WCAG AAA), Ruby Hanzi+Pinyin,
+ * 60 FPS Karaoke Highlighting, Studio Goresan (Stroke Order), dan UI Dashboard.
+ */
+
+:root {
+  --fz-font-cjk: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --fz-font-pinyin: "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* 4 Nada Mandarin + Nada Netral (WCAG AAA Contrast Standard) */
+  --fz-tone-1: #0284c7; /* Tone 1 (Datar/Tinggi 55 - Sky Blue) */
+  --fz-tone-1-bg: #e0f2fe;
+  --fz-tone-2: #16a34a; /* Tone 2 (Naik 35 - Emerald) */
+  --fz-tone-2-bg: #dcfce7;
+  --fz-tone-3: #ea580c; /* Tone 3 (Dipping/Turun-Naik 214 - Tangerine) */
+  --fz-tone-3-bg: #ffedd5;
+  --fz-tone-4: #dc2626; /* Tone 4 (Turun Tajam 51 - Crimson) */
+  --fz-tone-4-bg: #fee2e2;
+  --fz-tone-0: #64748b; /* Tone 0/5 (Netral/Ringan - Slate) */
+  --fz-tone-0-bg: #f1f5f9;
+
+  /* Tema Imperial Crimson & Warm Gold */
+  --fz-mandarin-crimson: #B91C1C;
+  --fz-mandarin-crimson-deep: #7F1D1D;
+  --fz-mandarin-gold: #F59E0B;
+  --fz-mandarin-gold-light: #FEF3C7;
+  --fz-mandarin-jade: #059669;
+}
+
+/* 1. Ruby Hanzi + Pinyin Layout Engine */
+.fz-ruby-hanzi {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: bottom;
+  line-height: 1.2;
+  margin: 0 2px;
+}
+
+.fz-ruby-pinyin {
+  font-family: var(--fz-font-pinyin);
+  font-size: 0.65em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.fz-ruby-char {
+  font-family: var(--fz-font-cjk);
+  font-size: 1.25em;
+  font-weight: 800;
+}
+
+/* 2. Indikator Warna Nada (Tone Color Modifiers) */
+.fz-tone-1 { color: var(--fz-tone-1); }
+.fz-tone-2 { color: var(--fz-tone-2); }
+.fz-tone-3 { color: var(--fz-tone-3); }
+.fz-tone-4 { color: var(--fz-tone-4); }
+.fz-tone-0 { color: var(--fz-tone-0); }
+
+.fz-tone-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fz-tone-badge-1 { background: var(--fz-tone-1-bg); color: var(--fz-tone-1); }
+.fz-tone-badge-2 { background: var(--fz-tone-2-bg); color: var(--fz-tone-2); }
+.fz-tone-badge-3 { background: var(--fz-tone-3-bg); color: var(--fz-tone-3); }
+.fz-tone-badge-4 { background: var(--fz-tone-4-bg); color: var(--fz-tone-4); }
+.fz-tone-badge-0 { background: var(--fz-tone-0-bg); color: var(--fz-tone-0); }
+
+/* 3. 60 FPS Character-Level Forced-Alignment Karaoke Highlighting */
+.fz-karaoke-char {
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: color 120ms cubic-bezier(0.4, 0, 0.2, 1), transform 120ms ease;
+  will-change: color, transform;
+}
+
+.fz-karaoke-char.active,
+.fz-karaoke-char.fz-karaoke-active {
+  color: #e11d48 !important;
+  transform: scale(1.08);
+  text-shadow: 0 0 12px rgba(225, 29, 72, 0.35);
+  font-weight: 800 !important;
+  position: relative;
+  z-index: 2;
+}
+
+.fz-karaoke-char.passed,
+.fz-karaoke-char.fz-karaoke-passed {
+  color: #0F172A;
+  opacity: 0.96;
+}
+
+.fz-karaoke-char.upcoming,
+.fz-karaoke-char.fz-karaoke-upcoming {
+  color: #475569;
+  opacity: 0.88;
+}
+
+/* 4. Hanzi Stroke Order Studio (Kakijun / 8 Goresan Dasar) */
+.fz-hanzi-stroke-canvas {
+  width: 220px;
+  height: 220px;
+  background: #FDFAF3;
+  border: 1.5px dashed rgba(185, 28, 28, 0.35);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  user-select: none;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.fz-stroke-grid-line {
+  stroke: rgba(185, 28, 28, 0.15);
+  stroke-dasharray: 4 4;
+}
+
+.fz-stroke-path {
+  fill: none;
+  stroke: #334155;
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 200ms ease;
+}
+
+.fz-stroke-path.active {
+  stroke: var(--fz-mandarin-crimson);
+}
+
+.fz-stroke-path.completed {
+  stroke: var(--fz-mandarin-jade);
+}
+
+.fz-stroke-num {
+  font-family: var(--fz-font-pinyin);
+  font-size: 12px;
+  font-weight: 800;
+  fill: var(--fz-mandarin-crimson);
+}
+
+/* 5. Dedicated Mandarin Hero Banner & Learning Hub */
+.fz-mandarin-hero-banner {
+  background: linear-gradient(135deg, #881337 0%, #BE123C 50%, #E11D48 100%);
+  border: 1px solid rgba(254, 205, 211, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  color: #FFFFFF;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(190, 18, 60, 0.25), 0 8px 10px -6px rgba(190, 18, 60, 0.2);
+}
+
+.fz-mandarin-hero-banner::after {
+  content: '中文';
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-family: var(--fz-font-cjk);
+  font-size: 130px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.fz-mandarin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.fz-mandarin-title {
+  font-family: var(--fz-font-cjk);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 0 0 8px 0;
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.fz-mandarin-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  margin: 0 0 18px 0;
+  max-width: 480px;
+}
+
+.fz-mandarin-hsk-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.fz-hsk-pill {
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.fz-hsk-pill:hover,
+.fz-hsk-pill.active {
+  background: #FFFFFF;
+  color: #BE123C;
+  border-color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 6. Mandarin 4-Grid Learning Hub */
+.fz-mandarin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 640px) {
+  .fz-mandarin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fz-mandarin-tile {
+  background: #FFFFFF;
+  border: 1.5px solid #F1F5F9;
+  border-radius: 16px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.fz-mandarin-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+  border-color: #CBD5E1;
+}
+
+.fz-mandarin-tile.tile-vocab { border-left: 5px solid #0284C7; }
+.fz-mandarin-tile.tile-grammar { border-left: 5px solid #16A34A; }
+.fz-mandarin-tile.tile-tones { border-left: 5px solid #EA580C; }
+.fz-mandarin-tile.tile-stroke { border-left: 5px solid #DC2626; }
+
+.fz-mandarin-tile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.fz-mandarin-tile-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--fz-font-cjk);
+}
+
+.tile-vocab .fz-mandarin-tile-icon { background: #E0F2FE; color: #0284C7; }
+.tile-grammar .fz-mandarin-tile-icon { background: #DCFCE7; color: #16A34A; }
+.tile-tones .fz-mandarin-tile-icon { background: #FFEDD5; color: #EA580C; }
+.tile-stroke .fz-mandarin-tile-icon { background: #FEE2E2; color: #DC2626; }
+
+.fz-mandarin-tile-arrow {
+  color: #94A3B8;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.fz-mandarin-tile-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fz-mandarin-tile-sub {
+  font-size: 13px;
+  color: #64748B;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 7. Modal Viewers Styling */
+.fz-mandarin-modal-content {
+  padding: 24px;
+}
+
+.fz-tone-selector-row {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+  justify-content: center;
+}
+
+.fz-tone-button {
+  flex: 1;
+  padding: 12px 8px;
+  border-radius: 12px;
+  border: 1.5px solid #E2E8F0;
+  background: #F8FAFC;
+  cursor: pointer;
+  text-align: center;
+  transition: all 150ms ease;
+}
+
+.fz-tone-button.active {
+  background: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.fz-tone-button.active.t1 { border-color: var(--fz-tone-1); }
+.fz-tone-button.active.t2 { border-color: var(--fz-tone-2); }
+.fz-tone-button.active.t3 { border-color: var(--fz-tone-3); }
+.fz-tone-button.active.t4 { border-color: var(--fz-tone-4); }
+
+.fz-tone-main-char {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--fz-font-pinyin);
+  display: block;
+}
+
+.fz-tone-desc {
+  font-size: 11px;
+  color: #64748B;
+  font-weight: 700;
+  margin-top: 4px;
+  display: block;
+}
+
+/* 8. Course Picker Modal Grid */
+.fz-course-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.fz-course-option-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 16px;
+  border: 2px solid #E2E8F0;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 180ms ease;
+  text-align: left;
+}
+
+.fz-course-option-card:hover {
+  border-color: #0284C7;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.fz-course-option-card.active {
+  border-color: #0284C7;
+  background: #F0F9FF;
+}
+
+.fz-course-option-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fz-course-flag-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border: 1px solid #E2E8F0;
+}
+
+
+/* ==========================================================================
+   FIEZEL MANDARIN ACADEMY WHOLE-APP THEME & INTEGRATION TOKENS
+   ========================================================================== */
+
+body.fz-course-zh #topBrandTag,
+body.fz-course-zh .fiezel-brand-tag {
+  background: linear-gradient(135deg, #BE123C 0%, #E11D48 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid #FDA4AF !important;
+  box-shadow: 0 2px 8px rgba(190, 18, 60, 0.25) !important;
+  letter-spacing: 0.04em !important;
+  font-family: var(--fz-font-cjk) !important;
+  font-weight: 800 !important;
+}
+
+body.fz-course-zh .course-switch-btn {
+  border-color: #FDA4AF !important;
+  background: #FFF1F2 !important;
+  color: #9F1239 !important;
+}
+
+body.fz-course-zh .active-level-control strong {
+  color: #BE123C !important;
+  font-weight: 800 !important;
+}
+
+body.fz-course-zh .fz-vissol-tile.is-vocab .fz-vissol-tile-icon {
+  background: #E0F2FE !important;
+  color: #0284C7 !important;
+  font-family: var(--fz-font-cjk) !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+}
+
+body.fz-course-zh .fz-vissol-tile.is-grammar .fz-vissol-tile-icon {
+  background: #DCFCE7 !important;
+  color: #16A34A !important;
+  font-family: var(--fz-font-cjk) !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+}
+
+body.fz-course-zh .fz-vissol-tile.is-reading .fz-vissol-tile-icon {
+  background: #FFEDD5 !important;
+  color: #EA580C !important;
+  font-family: var(--fz-font-cjk) !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+}
+
+body.fz-course-zh .fz-vissol-tile.is-listening .fz-vissol-tile-icon {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  font-family: var(--fz-font-cjk) !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+}
+
+body.fz-course-zh .bottomnav .nav.active {
+  color: #BE123C !important;
+}
+
+body.fz-course-zh #navActivePill {
+  background: #BE123C !important;
+}
+
+body.fz-course-zh .primary {
+  background: #BE123C !important;
+  border-color: #9F1239 !important;
+}
+
+body.fz-course-zh .primary:hover {
+  background: #9F1239 !important;
+}
+
+body.fz-course-zh .fz-aurora-word {
+  font-family: var(--fz-font-cjk) !important;
+  font-weight: 900 !important;
+}
+
+body.fz-course-zh .fz-kawan-card-v2[data-course="zh"] {
+  border-left: 4px solid #BE123C !important;
+}
+
+body.fz-course-zh .fz-kawan-card-v2[data-course="zh"] .fz-kawan-v2-pill {
+  background: #FFE4E6 !important;
+  color: #BE123C !important;
+  font-weight: 800 !important;
+}
+
+/* Mandarin Latihan Launcher Cards (100% Parity with Japanese Renshu) */
+.launch-icon.zh-glyph {
+  font-family: var(--fz-font-cjk);
+  font-size: 24px;
+  font-weight: 800;
+  color: #BE123C !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.fz-course-zh .learning-launcher .launch-card,
+body.fz-course-zh .launch-card {
+  border-radius: 18px !important;
+}
+
+body.fz-course-zh .launch-card .launch-icon {
+  background: #FFF1F2 !important;
+  border: 1px solid #FECDD3 !important;
+  color: #BE123C !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 8px rgba(190, 18, 60, 0.08) !important;
+}
+
+body.fz-course-zh .launch-card:hover {
+  border-color: rgba(190, 18, 60, 0.35) !important;
+}
+
+body.fz-course-zh .launch-card i[data-lucide="arrow-up-right"],
+body.fz-course-zh .launch-card svg {
+  color: #BE123C !important;
+}
+
+/* Mandarin Display Toggles (Pinyin / Hanzi) */
+.zh-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0 16px 0;
+}
+
+body.fz-course-zh .ja-toggle {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 9999px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+body.fz-course-zh .ja-toggle.active,
+body.fz-course-zh .ja-toggle[aria-pressed="true"] {
+  background: #FFF1F2 !important;
+  border-color: #FECDD3 !important;
+  color: #BE123C !important;
+  font-weight: 800 !important;
+}
+
+/* --- PINYIN RUBY ANNOTATION & GLOBAL DISPLAY TOGGLE ENGINE --- */
+ruby.zh-ruby {
+  ruby-position: over;
+  ruby-align: center;
+  font-family: var(--fz-font-cjk);
+  display: inline-flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  vertical-align: bottom;
+  margin: 0 1px;
+}
+
+rt.zh-rt {
+  font-family: var(--fz-font-pinyin);
+  font-size: 0.58em;
+  font-weight: 700;
+  color: #BE123C;
+  line-height: 1;
+  user-select: none;
+  display: block;
+  text-align: center;
+}
+
+body.fz-zh-no-pinyin rt.zh-rt {
+  display: none !important;
+}
+
+body.fz-zh-no-pinyin ruby.zh-ruby {
+  display: inline;
+}
+
+.fz-zh-three-line {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fz-zh-three-line .fz-zh-line-hz {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0F172A;
+  font-family: var(--fz-font-cjk);
+}
+
+.fz-zh-three-line .fz-zh-line-py {
+  font-size: 12px;
+  font-weight: 700;
+  color: #BE123C;
+  font-family: var(--fz-font-pinyin);
+}
+
+.fz-zh-three-line .fz-zh-line-id {
+  font-size: 12px;
+  color: #475569;
+}
+
+body.fz-zh-no-pinyin .fz-zh-three-line .fz-zh-line-py {
+  display: none !important;
+}
+
