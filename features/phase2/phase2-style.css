@@ -1,0 +1,297 @@
+/**
+ * FIEZEL Phase 2 — Modern Adaptive Placement & Voice Studio Stylesheet
+ *
+ * Features:
+ * 1. In-Call Real-Time Vocabulary Capture Float Toast (call.html)
+ * 2. FIEZEL Computerized Adaptive Placement (CAT) HUD & Step Tracker
+ * 3. FIEZEL IELTS Prep Hub & Band Score Badges (Band 4.0 - 9.0)
+ * 4. Task 1 Visual Data Chart Sandbox
+ * 5. Task 2 Essay Writing Workspace & Word Count Meter
+ */
+
+:root {
+  /* IELTS Official Band Score Tokens */
+  --fz-ielts-gold: #d97706;
+  --fz-ielts-gold-bg: #fef3c7;
+  --fz-ielts-emerald: #059669;
+  --fz-ielts-emerald-bg: #d1fae5;
+  --fz-ielts-sky: #0284c7;
+  --fz-ielts-sky-bg: #e0f2fe;
+  --fz-ielts-coral: #dc2626;
+  --fz-ielts-coral-bg: #fee2e2;
+
+  /* In-Call HUD Glassmorphism */
+  --fz-hud-toast-bg: rgba(27, 20, 24, 0.92);
+  --fz-hud-toast-border: rgba(255, 255, 255, 0.12);
+  --fz-hud-accent: #00e5ff;
+}
+
+/* ==========================================================================
+   1. IN-CALL REAL-TIME VOCABULARY CAPTURE (call.html)
+   ========================================================================== */
+
+.fz-in-call-capture {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--fz-hud-toast-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--fz-hud-toast-border);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  animation: fzFloatIn 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fzFloatIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.fz-capture-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fz-capture-word {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.fz-capture-meaning {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.fz-capture-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transition: transform 120ms ease, background 160ms ease;
+}
+
+.fz-capture-save-btn:hover {
+  background: linear-gradient(135deg, #0369a1, #1d4ed8);
+}
+
+.fz-capture-save-btn:active {
+  transform: scale(0.94);
+}
+
+/* ==========================================================================
+   2. FIEZEL ADAPTIVE PLACEMENT (CAT) ENGINE HUD
+   ========================================================================== */
+
+.fz-adaptive-placement-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.fz-adaptive-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.fz-adaptive-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7, #10b981);
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fz-adaptive-difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   3. FIEZEL IELTS PREP HUB & BAND SCORE BADGES
+   ========================================================================== */
+
+.fz-band-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: -0.01em;
+}
+
+.fz-band-pill.band-gold {
+  background: var(--fz-ielts-gold-bg);
+  color: var(--fz-ielts-gold);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+
+.fz-band-pill.band-emerald {
+  background: var(--fz-ielts-emerald-bg);
+  color: var(--fz-ielts-emerald);
+  border: 1px solid rgba(5, 150, 105, 0.25);
+}
+
+.fz-band-pill.band-sky {
+  background: var(--fz-ielts-sky-bg);
+  color: var(--fz-ielts-sky);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+
+/* ==========================================================================
+   4. TASK 1 DATA CHART SANDBOX & TASK 2 ESSAY WORKSPACE
+   ========================================================================== */
+
+.fz-ielts-workspace {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding: 20px;
+  background: var(--fz-bg-day, #fdfaf3);
+}
+
+@media (min-width: 900px) {
+  .fz-ielts-workspace {
+    grid-template-columns: 420px 1fr;
+    align-items: start;
+  }
+}
+
+.fz-ielts-prompt-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.fz-ielts-chart-container {
+  width: 100%;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px dashed #cbd5e1;
+  padding: 12px;
+}
+
+.fz-trend-vocab-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fz-trend-vocab-chip {
+  padding: 4px 10px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 120ms ease;
+}
+
+.fz-trend-vocab-chip:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.fz-ielts-essay-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fz-ielts-essay-editor {
+  width: 100%;
+  min-height: 480px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #1e293b;
+  resize: vertical;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+.fz-ielts-essay-editor:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.fz-word-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.fz-word-count-pill.target-reached {
+  background: var(--fz-ielts-emerald-bg);
+  color: var(--fz-ielts-emerald);
+}
+
+.fz-word-count-pill.under-target {
+  background: var(--fz-ielts-coral-bg);
+  color: var(--fz-ielts-coral);
+}

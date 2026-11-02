@@ -808,4 +808,930 @@ export const CALL_SCENARIOS: CallScenario[] = [
       },
     ],
   },
+,
+  {
+    "id": "scen_ja_trv_01",
+    "titleId": "Membeli & Menghangatkan Makanan di Konbini (Lawson/7-Eleven)",
+    "titleTh": "Membeli & Menghangatkan Makanan di Konbini (Lawson/7-Eleven)",
+    "subtitleId": "Travel & Survival: Minta kasir menghangatkan bento (atatamete kudasai).",
+    "subtitleTh": "Travel & Survival: Minta kasir menghangatkan bento (atatamete kudasai).",
+    "targetLang": "ja",
+    "level": "CEFR A1",
+    "difficultyB": 1.2,
+    "competencyId": "kaiwa_survival_conbini",
+    "competencyNameId": "Kaiwa: Travel & Survival",
+    "competencyNameTh": "การสนทนา: Travel & Survival",
+    "personaId": "nanami",
+    "isMeasureExam": false,
+    "situationId": "Kamu sedang berada di kasir konbini di Shinjuku pada malam hari. Kamu membawa onigiri, bento, dan sebotol teh hijau.",
+    "situationTh": "Kamu sedang berada di kasir konbini di Shinjuku pada malam hari. Kamu membawa onigiri, bento, dan sebotol teh hijau.",
+    "openingLine": "いらっしゃいませ！温めますか？袋はどうされますか？",
+    "openingTranslationId": "いらっしゃいませ！温めますか？袋はどうされますか？",
+    "openingTranslationTh": "いらっしゃいませ！温めますか？袋はどうされますか？",
+    "missionGoalsId": [
+      "Minta kasir menghangatkan bento (atatamete kudasai).",
+      "Tolak kantong plastik dengan sopan (fukuro wa kekkou desu).",
+      "Tanyakan apakah bisa membayar menggunakan Suica/kartu IC (Suica de ii desu ka)."
+    ],
+    "missionGoalsTh": [
+      "Minta kasir menghangatkan bento (atatamete kudasai).",
+      "Tolak kantong plastik dengan sopan (fukuro wa kekkou desu).",
+      "Tanyakan apakah bisa membayar menggunakan Suica/kartu IC (Suica de ii desu ka)."
+    ],
+    "targetPatterns": [
+      "～てください (~te kudasai - tolong)",
+      "～は結構です (~wa kekkou desu - tidak perlu)",
+      "～で払えますか (~de haraemasu ka - bisakah bayar dengan)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_trv_01_1",
+        "term": "温める",
+        "reading": "温める",
+        "meaningId": "atatameru - menghangatkan",
+        "meaningTh": "atatameru - menghangatkan",
+        "exampleSentence": "温めるを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_01_2",
+        "term": "お弁当",
+        "reading": "お弁当",
+        "meaningId": "obentou - kotak makan",
+        "meaningTh": "obentou - kotak makan",
+        "exampleSentence": "お弁当を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_01_3",
+        "term": "袋",
+        "reading": "袋",
+        "meaningId": "fukuro - kantong plastik",
+        "meaningTh": "fukuro - kantong plastik",
+        "exampleSentence": "袋を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_01_4",
+        "term": "結構です",
+        "reading": "結構です",
+        "meaningId": "kekkou desu - tidak perlu/cukup",
+        "meaningTh": "kekkou desu - tidak perlu/cukup",
+        "exampleSentence": "結構ですを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_01_5",
+        "term": "お会計",
+        "reading": "お会計",
+        "meaningId": "okaikei - pembayaran",
+        "meaningTh": "okaikei - pembayaran",
+        "exampleSentence": "お会計を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Minta kasir menghangatkan bento (atatamete kudasai).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_trv_02",
+    "titleId": "Bertanya Peron Kereta di Stasiun Besar",
+    "titleTh": "Bertanya Peron Kereta di Stasiun Besar",
+    "subtitleId": "Travel & Survival: Tanyakan jalur mana yang menuju Asakusa (Asakusa iki wa doko desu ka).",
+    "subtitleTh": "Travel & Survival: Tanyakan jalur mana yang menuju Asakusa (Asakusa iki wa doko desu ka).",
+    "targetLang": "ja",
+    "level": "CEFR A1",
+    "difficultyB": 1.2,
+    "competencyId": "kaiwa_station_directions",
+    "competencyNameId": "Kaiwa: Travel & Survival",
+    "competencyNameTh": "การสนทนา: Travel & Survival",
+    "personaId": "keita",
+    "isMeasureExam": false,
+    "situationId": "Kamu berada di Stasiun Shibuya dan ingin pergi ke Asakusa, tetapi bingung mencari jalur Ginza Line.",
+    "situationTh": "Kamu berada di Stasiun Shibuya dan ingin pergi ke Asakusa, tetapi bingung mencari jalur Ginza Line.",
+    "openingLine": "はい、どうされましたか？どちらへ行かれますか？",
+    "openingTranslationId": "はい、どうされましたか？どちらへ行かれますか？",
+    "openingTranslationTh": "はい、どうされましたか？どちらへ行かれますか？",
+    "missionGoalsId": [
+      "Tanyakan jalur mana yang menuju Asakusa (Asakusa iki wa doko desu ka).",
+      "Tanyakan peron nomor berapa (Nan-ban sen desu ka).",
+      "Ucapkan terima kasih dan pastikan arahnya benar."
+    ],
+    "missionGoalsTh": [
+      "Tanyakan jalur mana yang menuju Asakusa (Asakusa iki wa doko desu ka).",
+      "Tanyakan peron nomor berapa (Nan-ban sen desu ka).",
+      "Ucapkan terima kasih dan pastikan arahnya benar."
+    ],
+    "targetPatterns": [
+      "～はどこですか (~wa doko desu ka - di mana)",
+      "～に行きたいんですが (~ni ikitai n desu ga - saya ingin pergi ke)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_trv_02_1",
+        "term": "乗り換え",
+        "reading": "乗り換え",
+        "meaningId": "norikae - transit",
+        "meaningTh": "norikae - transit",
+        "exampleSentence": "乗り換えを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_02_2",
+        "term": "ホーム",
+        "reading": "ホーム",
+        "meaningId": "hoomu - peron",
+        "meaningTh": "hoomu - peron",
+        "exampleSentence": "ホームを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_02_3",
+        "term": "行き",
+        "reading": "行き",
+        "meaningId": "iki - tujuan",
+        "meaningTh": "iki - tujuan",
+        "exampleSentence": "行きを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_02_4",
+        "term": "銀座線",
+        "reading": "銀座線",
+        "meaningId": "Ginzasen - Jalur Ginza",
+        "meaningTh": "Ginzasen - Jalur Ginza",
+        "exampleSentence": "銀座線を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_02_5",
+        "term": "番線",
+        "reading": "番線",
+        "meaningId": "bansen - nomor jalur",
+        "meaningTh": "bansen - nomor jalur",
+        "exampleSentence": "番線を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Tanyakan jalur mana yang menuju Asakusa (Asakusa iki wa doko desu ka).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_trv_03",
+    "titleId": "Memesan Ramen dengan Kustomisasi Kuah & Mi",
+    "titleTh": "Memesan Ramen dengan Kustomisasi Kuah & Mi",
+    "subtitleId": "Travel & Survival: Pesan satu porsi chashu ramen (Chashuumen hitotsu).",
+    "subtitleTh": "Travel & Survival: Pesan satu porsi chashu ramen (Chashuumen hitotsu).",
+    "targetLang": "ja",
+    "level": "CEFR A2",
+    "difficultyB": 2,
+    "competencyId": "kaiwa_restaurant_ordering",
+    "competencyNameId": "Kaiwa: Travel & Survival",
+    "competencyNameTh": "การสนทนา: Travel & Survival",
+    "personaId": "keita",
+    "isMeasureExam": false,
+    "situationId": "Kamu duduk di counter kedai ramen tonkotsu. Pelayan meminta pesanan tingkat kekenyalan mi dan kuah.",
+    "situationTh": "Kamu duduk di counter kedai ramen tonkotsu. Pelayan meminta pesanan tingkat kekenyalan mi dan kuah.",
+    "openingLine": "へい、いらっしゃい！何にしましょう？麺の硬さはどうします？",
+    "openingTranslationId": "へい、いらっしゃい！何にしましょう？麺の硬さはどうします？",
+    "openingTranslationTh": "へい、いらっしゃい！何にしましょう？麺の硬さはどうします？",
+    "missionGoalsId": [
+      "Pesan satu porsi chashu ramen (Chashuumen hitotsu).",
+      "Minta mi agak keras / katame (men katame de).",
+      "Minta gyoza tambahan dan segelas air dingin (omizu)."
+    ],
+    "missionGoalsTh": [
+      "Pesan satu porsi chashu ramen (Chashuumen hitotsu).",
+      "Minta mi agak keras / katame (men katame de).",
+      "Minta gyoza tambahan dan segelas air dingin (omizu)."
+    ],
+    "targetPatterns": [
+      "～をお願いします (~o onegai shimasu)",
+      "～で (~de - dengan/dalam kondisi)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_trv_03_1",
+        "term": "麺",
+        "reading": "麺",
+        "meaningId": "men - mi",
+        "meaningTh": "men - mi",
+        "exampleSentence": "麺を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_03_2",
+        "term": "硬め",
+        "reading": "硬め",
+        "meaningId": "katame - agak keras",
+        "meaningTh": "katame - agak keras",
+        "exampleSentence": "硬めを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_03_3",
+        "term": "濃いめ",
+        "reading": "濃いめ",
+        "meaningId": "koime - kental/pekat",
+        "meaningTh": "koime - kental/pekat",
+        "exampleSentence": "濃いめを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_03_4",
+        "term": "替え玉",
+        "reading": "替え玉",
+        "meaningId": "kaedama - tambah mi",
+        "meaningTh": "kaedama - tambah mi",
+        "exampleSentence": "替え玉を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_03_5",
+        "term": "氷水",
+        "reading": "氷水",
+        "meaningId": "koorimizu - air es",
+        "meaningTh": "koorimizu - air es",
+        "exampleSentence": "氷水を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Pesan satu porsi chashu ramen (Chashuumen hitotsu).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_trv_04",
+    "titleId": "Check-in Hotel & Menitipkan Koper Sebelum Jam 3 Sore",
+    "titleTh": "Check-in Hotel & Menitipkan Koper Sebelum Jam 3 Sore",
+    "subtitleId": "Travel & Survival: Katakan kamu sudah reservasi atas nama kamu (Yoyaku shite aru [Nama] desu).",
+    "subtitleTh": "Travel & Survival: Katakan kamu sudah reservasi atas nama kamu (Yoyaku shite aru [Nama] desu).",
+    "targetLang": "ja",
+    "level": "CEFR A2",
+    "difficultyB": 2,
+    "competencyId": "kaiwa_hotel_checkin",
+    "competencyNameId": "Kaiwa: Travel & Survival",
+    "competencyNameTh": "การสนทนา: Travel & Survival",
+    "personaId": "nanami",
+    "isMeasureExam": false,
+    "situationId": "Kamu tiba di hotel jam 11 siang. Check-in baru bisa jam 3 sore. Kamu ingin menitipkan koper agar bisa jalan-jalan.",
+    "situationTh": "Kamu tiba di hotel jam 11 siang. Check-in baru bisa jam 3 sore. Kamu ingin menitipkan koper agar bisa jalan-jalan.",
+    "openingLine": "いらっしゃいませ。ご宿泊のお客様でしょうか？ご予約のお名前をお伺いできますか？",
+    "openingTranslationId": "いらっしゃいませ。ご宿泊のお客様でしょうか？ご予約のお名前をお伺いできますか？",
+    "openingTranslationTh": "いらっしゃいませ。ご宿泊のお客様でしょうか？ご予約のお名前をお伺いできますか？",
+    "missionGoalsId": [
+      "Katakan kamu sudah reservasi atas nama kamu (Yoyaku shite aru [Nama] desu).",
+      "Tanyakan apakah koper bisa dititipkan sampai jam check-in (Nimotsu o azukatte moraemasu ka).",
+      "Tanyakan jam sarapan besok pagi (Choushoku wa nanji kara desu ka)."
+    ],
+    "missionGoalsTh": [
+      "Katakan kamu sudah reservasi atas nama kamu (Yoyaku shite aru [Nama] desu).",
+      "Tanyakan apakah koper bisa dititipkan sampai jam check-in (Nimotsu o azukatte moraemasu ka).",
+      "Tanyakan jam sarapan besok pagi (Choushoku wa nanji kara desu ka)."
+    ],
+    "targetPatterns": [
+      "～てあります (~te arimasu - sudah dilakukan)",
+      "～てもらえますか (~te moraemasu ka - bisakah tolong)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_trv_04_1",
+        "term": "予約",
+        "reading": "予約",
+        "meaningId": "yoyaku - reservasi",
+        "meaningTh": "yoyaku - reservasi",
+        "exampleSentence": "予約を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_04_2",
+        "term": "預ける",
+        "reading": "預ける",
+        "meaningId": "azukeru - menitipkan",
+        "meaningTh": "azukeru - menitipkan",
+        "exampleSentence": "預けるを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_04_3",
+        "term": "荷物",
+        "reading": "荷物",
+        "meaningId": "nimotsu - koper/barang",
+        "meaningTh": "nimotsu - koper/barang",
+        "exampleSentence": "荷物を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_04_4",
+        "term": "チェックイン",
+        "reading": "チェックイン",
+        "meaningId": "chekkuin",
+        "meaningTh": "chekkuin",
+        "exampleSentence": "チェックインを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_04_5",
+        "term": "朝食",
+        "reading": "朝食",
+        "meaningId": "choushoku - sarapan",
+        "meaningTh": "choushoku - sarapan",
+        "exampleSentence": "朝食を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Katakan kamu sudah reservasi atas nama kamu (Yoyaku shite aru [Nama] desu).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_trv_05",
+    "titleId": "Membeli Obat Flu & Sakit Kepala di Apotek/Matsumoto Kiyoshi",
+    "titleTh": "Membeli Obat Flu & Sakit Kepala di Apotek/Matsumoto Kiyoshi",
+    "subtitleId": "Travel & Survival: Jelaskan gejala sakitmu (Nodo ga itakute, netsu ga arimasu).",
+    "subtitleTh": "Travel & Survival: Jelaskan gejala sakitmu (Nodo ga itakute, netsu ga arimasu).",
+    "targetLang": "ja",
+    "level": "CEFR A2",
+    "difficultyB": 2,
+    "competencyId": "kaiwa_pharmacy_medical",
+    "competencyNameId": "Kaiwa: Travel & Survival",
+    "competencyNameTh": "การสนทนา: Travel & Survival",
+    "personaId": "nanami",
+    "isMeasureExam": false,
+    "situationId": "Tenggorokanmu sakit, badan demam 38 derajat, dan kepalamu pusing saat liburan di Osaka.",
+    "situationTh": "Tenggorokanmu sakit, badan demam 38 derajat, dan kepalamu pusing saat liburan di Osaka.",
+    "openingLine": "こんにちは、お困りですか？どんな症状でしょうか？熱はありますか？",
+    "openingTranslationId": "こんにちは、お困りですか？どんな症状でしょうか？熱はありますか？",
+    "openingTranslationTh": "こんにちは、お困りですか？どんな症状でしょうか？熱はありますか？",
+    "missionGoalsId": [
+      "Jelaskan gejala sakitmu (Nodo ga itakute, netsu ga arimasu).",
+      "Tanyakan apakah obat ini menyebabkan kantuk (Nemuku narimasu ka).",
+      "Tanyakan aturan minumnya, berapa kali sehari (Ichi-nichi ni nan-kai nomimasu ka)."
+    ],
+    "missionGoalsTh": [
+      "Jelaskan gejala sakitmu (Nodo ga itakute, netsu ga arimasu).",
+      "Tanyakan apakah obat ini menyebabkan kantuk (Nemuku narimasu ka).",
+      "Tanyakan aturan minumnya, berapa kali sehari (Ichi-nichi ni nan-kai nomimasu ka)."
+    ],
+    "targetPatterns": [
+      "～て、～です (~te, ~desu - gabungan kondisi sakit)",
+      "～前に / ～後に (~mae ni / ~ato ni - sebelum/sesudah)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_trv_05_1",
+        "term": "風邪薬",
+        "reading": "風邪薬",
+        "meaningId": "kazegusuri - obat flu",
+        "meaningTh": "kazegusuri - obat flu",
+        "exampleSentence": "風邪薬を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_05_2",
+        "term": "症状",
+        "reading": "症状",
+        "meaningId": "shoujou - gejala",
+        "meaningTh": "shoujou - gejala",
+        "exampleSentence": "症状を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_05_3",
+        "term": "喉が痛い",
+        "reading": "喉が痛い",
+        "meaningId": "nodo ga itai - sakit tenggorokan",
+        "meaningTh": "nodo ga itai - sakit tenggorokan",
+        "exampleSentence": "喉が痛いを使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_05_4",
+        "term": "眠気",
+        "reading": "眠気",
+        "meaningId": "nemuke - rasa kantuk",
+        "meaningTh": "nemuke - rasa kantuk",
+        "exampleSentence": "眠気を使用します。"
+      },
+      {
+        "id": "v_roleplay_trv_05_5",
+        "term": "食後",
+        "reading": "食後",
+        "meaningId": "shokugo - sesudah makan",
+        "meaningTh": "shokugo - sesudah makan",
+        "exampleSentence": "食後を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Jelaskan gejala sakitmu (Nodo ga itakute, netsu ga arimasu).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_wrk_01",
+    "titleId": "Salam Pagi Hari Pertama & Tukar Menukar Kartu Nama (Meishi Koukan)",
+    "titleTh": "Salam Pagi Hari Pertama & Tukar Menukar Kartu Nama (Meishi Koukan)",
+    "subtitleId": "Work & Business: Perkenalkan diri dengan sopan lengkap dengan asal perusahaan dan posisi.",
+    "subtitleTh": "Work & Business: Perkenalkan diri dengan sopan lengkap dengan asal perusahaan dan posisi.",
+    "targetLang": "ja",
+    "level": "CEFR B1",
+    "difficultyB": 2.8,
+    "competencyId": "kaiwa_business_meishi",
+    "competencyNameId": "Kaiwa: Work & Business",
+    "competencyNameTh": "การสนทนา: Work & Business",
+    "personaId": "keita",
+    "isMeasureExam": false,
+    "situationId": "Hari pertama kamu bertugas di kantor klien di Roppongi. Kamu diperkenalkan kepada Buchou dan melakukan meishi koukan.",
+    "situationTh": "Hari pertama kamu bertugas di kantor klien di Roppongi. Kamu diperkenalkan kepada Buchou dan melakukan meishi koukan.",
+    "openingLine": "初めまして、開発部の佐藤です。本日からよろしくお願いします。名刺をいただけますか？",
+    "openingTranslationId": "初めまして、開発部の佐藤です。本日からよろしくお願いします。名刺をいただけますか？",
+    "openingTranslationTh": "初めまして、開発部の佐藤です。本日からよろしくお願いします。名刺をいただけますか？",
+    "missionGoalsId": [
+      "Perkenalkan diri dengan sopan lengkap dengan asal perusahaan dan posisi.",
+      "Ucapkan rumus meishi koukan (Choudai itashimasu / Yoroshiku onegai moushiagemasu).",
+      "Sampaikan komitmen untuk berkontribusi maksimal di proyek."
+    ],
+    "missionGoalsTh": [
+      "Perkenalkan diri dengan sopan lengkap dengan asal perusahaan dan posisi.",
+      "Ucapkan rumus meishi koukan (Choudai itashimasu / Yoroshiku onegai moushiagemasu).",
+      "Sampaikan komitmen untuk berkontribusi maksimal di proyek."
+    ],
+    "targetPatterns": [
+      "～と申します (~to moushimasu - nama saya adalah)",
+      "お目にかかれて光栄です (ome ni kakarete kouei desu)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_wrk_01_1",
+        "term": "名刺",
+        "reading": "名刺",
+        "meaningId": "meishi - kartu nama",
+        "meaningTh": "meishi - kartu nama",
+        "exampleSentence": "名刺を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_01_2",
+        "term": "頂戴いたします",
+        "reading": "頂戴いたします",
+        "meaningId": "choudai itashimasu - saya terima dengan hormat",
+        "meaningTh": "choudai itashimasu - saya terima dengan hormat",
+        "exampleSentence": "頂戴いたしますを使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_01_3",
+        "term": "担当",
+        "reading": "担当",
+        "meaningId": "tantou - penanggung jawab",
+        "meaningTh": "tantou - penanggung jawab",
+        "exampleSentence": "担当を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_01_4",
+        "term": "精一杯",
+        "reading": "精一杯",
+        "meaningId": "seiippai - sekuat tenaga",
+        "meaningTh": "seiippai - sekuat tenaga",
+        "exampleSentence": "精一杯を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_01_5",
+        "term": "ご指導",
+        "reading": "ご指導",
+        "meaningId": "goshidou - bimbingan",
+        "meaningTh": "goshidou - bimbingan",
+        "exampleSentence": "ご指導を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Perkenalkan diri dengan sopan lengkap dengan asal perusahaan dan posisi.",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_wrk_02",
+    "titleId": "Horenso: Melaporkan Kendala Bug & Meminta Penyesuaian Deadline",
+    "titleTh": "Horenso: Melaporkan Kendala Bug & Meminta Penyesuaian Deadline",
+    "subtitleId": "Work & Business: Awali dengan izin konsultasi (Ima, o-jikan yoroshii deshou ka).",
+    "subtitleTh": "Work & Business: Awali dengan izin konsultasi (Ima, o-jikan yoroshii deshou ka).",
+    "targetLang": "ja",
+    "level": "CEFR B1",
+    "difficultyB": 2.8,
+    "competencyId": "kaiwa_business_horenso",
+    "competencyNameId": "Kaiwa: Work & Business",
+    "competencyNameTh": "การสนทนา: Work & Business",
+    "personaId": "keita",
+    "isMeasureExam": false,
+    "situationId": "Ada bug kritis pada sistem autentikasi yang membutuhkan investigasi 2 hari tambahan sebelum rilis.",
+    "situationTh": "Ada bug kritis pada sistem autentikasi yang membutuhkan investigasi 2 hari tambahan sebelum rilis.",
+    "openingLine": "うん、どうした？何かトラブルでもあった？",
+    "openingTranslationId": "うん、どうした？何かトラブルでもあった？",
+    "openingTranslationTh": "うん、どうした？何かトラブルでもあった？",
+    "missionGoalsId": [
+      "Awali dengan izin konsultasi (Ima, o-jikan yoroshii deshou ka).",
+      "Jelaskan penyebab kendala dan opsi solusi yang sudah kamu siapkan.",
+      "Minta persetujuan pengunduran tanggal rilis 2 hari ke depan."
+    ],
+    "missionGoalsTh": [
+      "Awali dengan izin konsultasi (Ima, o-jikan yoroshii deshou ka).",
+      "Jelaskan penyebab kendala dan opsi solusi yang sudah kamu siapkan.",
+      "Minta persetujuan pengunduran tanggal rilis 2 hari ke depan."
+    ],
+    "targetPatterns": [
+      "～の件でご相談があるのですが (~no ken de gosoudan ga aru no desu ga)",
+      "～ため、～させていただきたい (~tame, ~sasete itadakitai)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_wrk_02_1",
+        "term": "進捗",
+        "reading": "進捗",
+        "meaningId": "shinchoku - progres",
+        "meaningTh": "shinchoku - progres",
+        "exampleSentence": "進捗を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_02_2",
+        "term": "原因",
+        "reading": "原因",
+        "meaningId": "gen'in - penyebab",
+        "meaningTh": "gen'in - penyebab",
+        "exampleSentence": "原因を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_02_3",
+        "term": "不具合",
+        "reading": "不具合",
+        "meaningId": "fuguai - bug/cacat",
+        "meaningTh": "fuguai - bug/cacat",
+        "exampleSentence": "不具合を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_02_4",
+        "term": "延期",
+        "reading": "延期",
+        "meaningId": "enki - penundaan",
+        "meaningTh": "enki - penundaan",
+        "exampleSentence": "延期を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_02_5",
+        "term": "対策",
+        "reading": "対策",
+        "meaningId": "taisaku - langkah penanggulangan",
+        "meaningTh": "taisaku - langkah penanggulangan",
+        "exampleSentence": "対策を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Awali dengan izin konsultasi (Ima, o-jikan yoroshii deshou ka).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_wrk_03",
+    "titleId": "Etiket Nomikai Kantor: Menuangkan Minuman & Membina Hubungan",
+    "titleTh": "Etiket Nomikai Kantor: Menuangkan Minuman & Membina Hubungan",
+    "subtitleId": "Work & Business: Ucapkan Otsukaresama desu dan tawarkan menuangkan bir ke gelas rekan (O-tsugi shimashou ka).",
+    "subtitleTh": "Work & Business: Ucapkan Otsukaresama desu dan tawarkan menuangkan bir ke gelas rekan (O-tsugi shimashou ka).",
+    "targetLang": "ja",
+    "level": "CEFR A2-B1",
+    "difficultyB": 3.6,
+    "competencyId": "kaiwa_social_nomikai",
+    "competencyNameId": "Kaiwa: Work & Business",
+    "competencyNameTh": "การสนทนา: Work & Business",
+    "personaId": "nanami",
+    "isMeasureExam": false,
+    "situationId": "Kalian sedang berada di Izakaya setelah presentasi proyek kuartal selesai. Suasana santai dan hangat.",
+    "situationTh": "Kalian sedang berada di Izakaya setelah presentasi proyek kuartal selesai. Suasana santai dan hangat.",
+    "openingLine": "プロジェクトお疲れ様でしたー！まずは乾杯しましょう！ビールでいいですか？",
+    "openingTranslationId": "プロジェクトお疲れ様でしたー！まずは乾杯しましょう！ビールでいいですか？",
+    "openingTranslationTh": "プロジェクトお疲れ様でしたー！まずは乾杯しましょう！ビールでいいですか？",
+    "missionGoalsId": [
+      "Ucapkan Otsukaresama desu dan tawarkan menuangkan bir ke gelas rekan (O-tsugi shimashou ka).",
+      "Ceritakan adaptasi kehidupan di Jepang dan makanan favoritmu.",
+      "Tanyakan rekomendasi tempat wisata akhir pekan di sekitar Kanto."
+    ],
+    "missionGoalsTh": [
+      "Ucapkan Otsukaresama desu dan tawarkan menuangkan bir ke gelas rekan (O-tsugi shimashou ka).",
+      "Ceritakan adaptasi kehidupan di Jepang dan makanan favoritmu.",
+      "Tanyakan rekomendasi tempat wisata akhir pekan di sekitar Kanto."
+    ],
+    "targetPatterns": [
+      "～ましょうか (~mashou ka - maukah saya...)",
+      "～にもう慣れました (~ni mou naremashita - sudah terbiasa dengan)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_wrk_03_1",
+        "term": "お疲れ様",
+        "reading": "お疲れ様",
+        "meaningId": "otsukaresama",
+        "meaningTh": "otsukaresama",
+        "exampleSentence": "お疲れ様を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_03_2",
+        "term": "乾杯",
+        "reading": "乾杯",
+        "meaningId": "kanpai - bersulang",
+        "meaningTh": "kanpai - bersulang",
+        "exampleSentence": "乾杯を使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_03_3",
+        "term": "注ぐ",
+        "reading": "注ぐ",
+        "meaningId": "tsugu - menuangkan minuman",
+        "meaningTh": "tsugu - menuangkan minuman",
+        "exampleSentence": "注ぐを使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_03_4",
+        "term": "慣れる",
+        "reading": "慣れる",
+        "meaningId": "nareru - terbiasa",
+        "meaningTh": "nareru - terbiasa",
+        "exampleSentence": "慣れるを使用します。"
+      },
+      {
+        "id": "v_roleplay_wrk_03_5",
+        "term": "お勧め",
+        "reading": "お勧め",
+        "meaningId": "osusume - rekomendasi",
+        "meaningTh": "osusume - rekomendasi",
+        "exampleSentence": "お勧めを使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Ucapkan Otsukaresama desu dan tawarkan menuangkan bir ke gelas rekan (O-tsugi shimashou ka).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_soc_01",
+    "titleId": "Mengajak Teman Hangout di Akhir Pekan",
+    "titleTh": "Mengajak Teman Hangout di Akhir Pekan",
+    "subtitleId": "Daily & Social: Ajak pergi melihat pameran seni atau ke taman Yoyogi (Doko ka ikanai?).",
+    "subtitleTh": "Daily & Social: Ajak pergi melihat pameran seni atau ke taman Yoyogi (Doko ka ikanai?).",
+    "targetLang": "ja",
+    "level": "CEFR A2",
+    "difficultyB": 2,
+    "competencyId": "kaiwa_casual_invitation",
+    "competencyNameId": "Kaiwa: Daily & Social",
+    "competencyNameTh": "การสนทนา: Daily & Social",
+    "personaId": "nanami",
+    "isMeasureExam": false,
+    "situationId": "Kalian sedang nongkrong di Starbucks Shibuya. Cuaca akhir pekan depan diprediksi sangat cerah.",
+    "situationTh": "Kalian sedang nongkrong di Starbucks Shibuya. Cuaca akhir pekan depan diprediksi sangat cerah.",
+    "openingLine": "ねえねえ、今週末って何か予定ある？天気いいらしいよ！",
+    "openingTranslationId": "ねえねえ、今週末って何か予定ある？天気いいらしいよ！",
+    "openingTranslationTh": "ねえねえ、今週末って何か予定ある？天気いいらしいよ！",
+    "missionGoalsId": [
+      "Ajak pergi melihat pameran seni atau ke taman Yoyogi (Doko ka ikanai?).",
+      "Tentukan jam dan stasiun tempat bertemu (Nanji ni doko de machiawase suru?).",
+      "Sepakati transportasi atau tempat makan siang bersama."
+    ],
+    "missionGoalsTh": [
+      "Ajak pergi melihat pameran seni atau ke taman Yoyogi (Doko ka ikanai?).",
+      "Tentukan jam dan stasiun tempat bertemu (Nanji ni doko de machiawase suru?).",
+      "Sepakati transportasi atau tempat makan siang bersama."
+    ],
+    "targetPatterns": [
+      "～に行かない？ (~ni ikanai? - mau pergi ke...?)",
+      "～にする (~ni suru - memutuskan memilih...)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_soc_01_1",
+        "term": "予定",
+        "reading": "予定",
+        "meaningId": "yotei - rencana",
+        "meaningTh": "yotei - rencana",
+        "exampleSentence": "予定を使用します。"
+      },
+      {
+        "id": "v_roleplay_soc_01_2",
+        "term": "待ち合わせ",
+        "reading": "待ち合わせ",
+        "meaningId": "machiawase - janji temu",
+        "meaningTh": "machiawase - janji temu",
+        "exampleSentence": "待ち合わせを使用します。"
+      },
+      {
+        "id": "v_roleplay_soc_01_3",
+        "term": "散歩",
+        "reading": "散歩",
+        "meaningId": "sanpo - jalan-jalan santai",
+        "meaningTh": "sanpo - jalan-jalan santai",
+        "exampleSentence": "散歩を使用します。"
+      },
+      {
+        "id": "v_roleplay_soc_01_4",
+        "term": "おごる",
+        "reading": "おごる",
+        "meaningId": "ogoru - mentraktir",
+        "meaningTh": "ogoru - mentraktir",
+        "exampleSentence": "おごるを使用します。"
+      },
+      {
+        "id": "v_roleplay_soc_01_5",
+        "term": "楽しみ",
+        "reading": "楽しみ",
+        "meaningId": "tanoshimi - antusias",
+        "meaningTh": "tanoshimi - antusias",
+        "exampleSentence": "楽しみを使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Ajak pergi melihat pameran seni atau ke taman Yoyogi (Doko ka ikanai?).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_soc_02",
+    "titleId": "Bertanya Aturan Pemilahan Sampah Apartemen ke Ibu Kost/Ooya-san",
+    "titleTh": "Bertanya Aturan Pemilahan Sampah Apartemen ke Ibu Kost/Ooya-san",
+    "subtitleId": "Daily & Social: Tanyakan hari apa jadwal sampah bakar (Moeru gomi wa nan-youbi desu ka).",
+    "subtitleTh": "Daily & Social: Tanyakan hari apa jadwal sampah bakar (Moeru gomi wa nan-youbi desu ka).",
+    "targetLang": "ja",
+    "level": "CEFR A2",
+    "difficultyB": 2,
+    "competencyId": "kaiwa_apartment_rules",
+    "competencyNameId": "Kaiwa: Daily & Social",
+    "competencyNameTh": "การสนทนา: Daily & Social",
+    "personaId": "nanami",
+    "isMeasureExam": false,
+    "situationId": "Kamu baru pindah ke apartemen di Tokyo dan bingung membedakan jadwal buang sampah plastik, kaleng, dan sampah bakar.",
+    "situationTh": "Kamu baru pindah ke apartemen di Tokyo dan bingung membedakan jadwal buang sampah plastik, kaleng, dan sampah bakar.",
+    "openingLine": "あら、お引越しお疲れ様でした。何か困ったことはありませんか？ゴミの分別は大丈夫？",
+    "openingTranslationId": "あら、お引越しお疲れ様でした。何か困ったことはありませんか？ゴミの分別は大丈夫？",
+    "openingTranslationTh": "あら、お引越しお疲れ様でした。何か困ったことはありませんか？ゴミの分別は大丈夫？",
+    "missionGoalsId": [
+      "Tanyakan hari apa jadwal sampah bakar (Moeru gomi wa nan-youbi desu ka).",
+      "Tanyakan cara membuang botol plastik PET (Petto botoru wa dou suteba ii desu ka).",
+      "Minta maaf dan berjanji akan mematuhi jadwal apartemen."
+    ],
+    "missionGoalsTh": [
+      "Tanyakan hari apa jadwal sampah bakar (Moeru gomi wa nan-youbi desu ka).",
+      "Tanyakan cara membuang botol plastik PET (Petto botoru wa dou suteba ii desu ka).",
+      "Minta maaf dan berjanji akan mematuhi jadwal apartemen."
+    ],
+    "targetPatterns": [
+      "どうすればいいですか (dou sureba ii desu ka - bagaimana sebaiknya...)",
+      "～てもいいですか (~te mo ii desu ka)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_soc_02_1",
+        "term": "燃えるゴミ",
+        "reading": "燃えるゴミ",
+        "meaningId": "moeru gomi - sampah bakar",
+        "meaningTh": "moeru gomi - sampah bakar",
+        "exampleSentence": "燃えるゴミを使用します。"
+      },
+      {
+        "id": "v_roleplay_soc_02_2",
+        "term": "分別",
+        "reading": "分別",
+        "meaningId": "bunbetsu - pemilahan",
+        "meaningTh": "bunbetsu - pemilahan",
+        "exampleSentence": "分別を使用します。"
+      },
+      {
+        "id": "v_roleplay_soc_02_3",
+        "term": "捨てる",
+        "reading": "捨てる",
+        "meaningId": "suteru - membuang",
+        "meaningTh": "suteru - membuang",
+        "exampleSentence": "捨てるを使用します。"
+      },
+      {
+        "id": "v_roleplay_soc_02_4",
+        "term": "袋",
+        "reading": "袋",
+        "meaningId": "fukuro - kantong",
+        "meaningTh": "fukuro - kantong",
+        "exampleSentence": "袋を使用します。"
+      },
+      {
+        "id": "v_roleplay_soc_02_5",
+        "term": "曜日",
+        "reading": "曜日",
+        "meaningId": "youbi - hari",
+        "meaningTh": "youbi - hari",
+        "exampleSentence": "曜日を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Tanyakan hari apa jadwal sampah bakar (Moeru gomi wa nan-youbi desu ka).",
+        "intent": "accurate"
+      }
+    ]
+  },
+  {
+    "id": "scen_ja_acd_01",
+    "titleId": "Konsultasi Tugas Akhir & Revisi Paper di Ruang Dosen",
+    "titleTh": "Konsultasi Tugas Akhir & Revisi Paper di Ruang Dosen",
+    "subtitleId": "Academic & Formal: Sampaikan salam pembuka hormat akademik (Shitsurei itashimasu).",
+    "subtitleTh": "Academic & Formal: Sampaikan salam pembuka hormat akademik (Shitsurei itashimasu).",
+    "targetLang": "ja",
+    "level": "CEFR B2",
+    "difficultyB": 3.6,
+    "competencyId": "kaiwa_academic_professor",
+    "competencyNameId": "Kaiwa: Academic & Formal",
+    "competencyNameTh": "การสนทนา: Academic & Formal",
+    "personaId": "keita",
+    "isMeasureExam": false,
+    "situationId": "Kamu sedang mendiskusikan topik tesis kamu mengenai integrasi AI pada pembelajaran bahasa kedua.",
+    "situationTh": "Kamu sedang mendiskusikan topik tesis kamu mengenai integrasi AI pada pembelajaran bahasa kedua.",
+    "openingLine": "どうぞ、入ってください。提出してもらったレポートの概要、拝見しましたよ。なかなか面白い着眼点ですね。",
+    "openingTranslationId": "どうぞ、入ってください。提出してもらったレポートの概要、拝見しましたよ。なかなか面白い着眼点ですね。",
+    "openingTranslationTh": "どうぞ、入ってください。提出してもらったレポートの概要、拝見しましたよ。なかなか面白い着眼点ですね。",
+    "missionGoalsId": [
+      "Sampaikan salam pembuka hormat akademik (Shitsurei itashimasu).",
+      "Jelaskan hipotesis riset dan data empiris yang sudah kamu kumpulkan.",
+      "Minta masukan profesor terkait metodologi kuesioner yang tepat."
+    ],
+    "missionGoalsTh": [
+      "Sampaikan salam pembuka hormat akademik (Shitsurei itashimasu).",
+      "Jelaskan hipotesis riset dan data empiris yang sudah kamu kumpulkan.",
+      "Minta masukan profesor terkait metodologi kuesioner yang tepat."
+    ],
+    "targetPatterns": [
+      "～についてご意見を伺いたいのですが (~ni tsuite go-iken o ukagaitai no desu ga)",
+      "～と考えております (~to kangaete orimasu)"
+    ],
+    "vocabPrereqs": [
+      {
+        "id": "v_roleplay_acd_01_1",
+        "term": "研究",
+        "reading": "研究",
+        "meaningId": "kenkyuu - riset",
+        "meaningTh": "kenkyuu - riset",
+        "exampleSentence": "研究を使用します。"
+      },
+      {
+        "id": "v_roleplay_acd_01_2",
+        "term": "着眼点",
+        "reading": "着眼点",
+        "meaningId": "chakuganten - sudut pandang",
+        "meaningTh": "chakuganten - sudut pandang",
+        "exampleSentence": "着眼点を使用します。"
+      },
+      {
+        "id": "v_roleplay_acd_01_3",
+        "term": "仮説",
+        "reading": "仮説",
+        "meaningId": "kasetsu - hipotesis",
+        "meaningTh": "kasetsu - hipotesis",
+        "exampleSentence": "仮説を使用します。"
+      },
+      {
+        "id": "v_roleplay_acd_01_4",
+        "term": "検証",
+        "reading": "検証",
+        "meaningId": "kenshou - verifikasi",
+        "meaningTh": "kenshou - verifikasi",
+        "exampleSentence": "検証を使用します。"
+      },
+      {
+        "id": "v_roleplay_acd_01_5",
+        "term": "ご教示",
+        "reading": "ご教示",
+        "meaningId": "gokyouji - bimbingan/arahan",
+        "meaningTh": "gokyouji - bimbingan/arahan",
+        "exampleSentence": "ご教示を使用します。"
+      }
+    ],
+    "sampleUtterances": [
+      {
+        "labelId": "Respons Alami (Native Flow)",
+        "labelTh": "คำตอบที่เป็นธรรมชาติ",
+        "text": "Sampaikan salam pembuka hormat akademik (Shitsurei itashimasu).",
+        "intent": "accurate"
+      }
+    ]
+  }
 ];
