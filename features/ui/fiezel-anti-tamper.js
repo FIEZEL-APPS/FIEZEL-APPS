@@ -31,16 +31,29 @@
 
   var doc = typeof root !== 'undefined' && root.document ? root.document : null;
 
+  function isLocalHost(h, p) {
+    if (!h) return false;
+    if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h.indexOf('192.168.') === 0 || h.indexOf('10.') === 0 || h.slice(-6) === '.local') return true;
+    if (p === '3000' || p === '3005' || p === '4173' || p === '5173' || p === '8080') return true;
+    return false;
+  }
+
   function isLocalOrTest() {
     try {
       if (typeof root === 'undefined' || !root.location) return true; // Node / test env
-      if (typeof navigator !== 'undefined' && navigator.webdriver) return true; // Headless Playwright / Puppeteer
       if (typeof root.isLocalTestServer === 'function' && root.isLocalTestServer()) return true;
 
       var h = (root.location.hostname || '').toLowerCase();
       var p = String(root.location.port || '');
-      if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h.indexOf('192.168.') === 0 || h.indexOf('10.') === 0 || h.slice(-6) === '.local') return true;
-      if (p === '3000' || p === '3005' || p === '4173' || p === '5173' || p === '8080') return true;
+      var isLocal = isLocalHost(h, p);
+
+      // Celah navigator.webdriver ditutup di domain produksi:
+      // navigator.webdriver HANYA diizinkan membypass proteksi bila berada di host lokal / dev runner!
+      // Pada domain produksi (fiezel.my.id, dsb), webdriver adalah bot scraper otomatis, BUKAN pengembang lokal.
+      if (isLocal) {
+        if (typeof navigator !== 'undefined' && navigator.webdriver) return true;
+        return true;
+      }
     } catch (_) {}
     return false;
   }
@@ -96,6 +109,8 @@
           '  -moz-user-select: none !important;',
           '  -ms-user-select: none !important;',
           '  user-select: none !important;',
+          '  -webkit-touch-callout: none !important;',
+          '  -webkit-user-drag: none !important;',
           '}',
           'input, textarea, [contenteditable="true"] {',
           '  -webkit-user-select: text !important;',
@@ -120,14 +135,17 @@
       }
     }, { capture: true, passive: false });
 
-    // 3. Cegat penyalinan (copy) pada konten pembelajaran kuis
+    // 3. Cegat penyalinan (copy) pada konten pembelajaran kuis dan bubuhkan stempel forensik
     doc.addEventListener('copy', function (e) {
       if (!e || !e.target) return;
       var target = e.target;
       if (target.closest && target.closest('.quiz-shell, #quizStem, .passage-reading')) {
         e.preventDefault();
         if (e.clipboardData) {
-          e.clipboardData.setData('text/plain', 'Protected Intellectual Property — FIEZEL (fiezel.my.id)');
+          var sig = (root && root.FiezelWatermark && typeof root.FiezelWatermark.getLearnerSignature === 'function')
+            ? root.FiezelWatermark.getLearnerSignature()
+            : 'verified';
+          e.clipboardData.setData('text/plain', 'Protected Intellectual Property — FIEZEL (fiezel.my.id) [' + sig + ']');
         }
       }
     }, { capture: true, passive: false });
@@ -193,6 +211,7 @@
 
   return {
     init: init,
+    isLocalHost: isLocalHost,
     isLocalOrTest: isLocalOrTest,
     isAllowedDomain: isAllowedDomain,
     verifyDomainIntegrity: verifyDomainIntegrity,

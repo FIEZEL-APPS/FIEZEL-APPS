@@ -126,6 +126,9 @@ export async function signCurriculumTicket(secret, claims, nowMs) {
   };
   if (claims && claims.subject_id) payload.subject_id = String(claims.subject_id);
   if (claims && claims.grade_id) payload.grade_id = String(claims.grade_id);
+  if (claims && claims.level) payload.level = String(claims.level);
+  if (claims && claims.verified_level) payload.verified_level = String(claims.verified_level);
+  if (claims && claims.exam_passed != null) payload.exam_passed = !!claims.exam_passed;
   if (!payload.sub || !payload.role) throw new Error('curriculum_ticket_claims_incomplete');
   const encoded = b64urlFromString(JSON.stringify(payload));
   const sig = await hmacSign(secret, encoded);

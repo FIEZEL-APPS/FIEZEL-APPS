@@ -78,10 +78,46 @@ test('Watermark: Single-word sentence handling', () => {
   assert.strictEqual(watermark.strip(marked), oneWord);
 });
 
+test('Watermark: Resilient Layer 2 survives zero-width stripping by attacker', () => {
+  const original = 'This is a proprietary grammar explanation from FIEZEL.';
+  const marked = watermark.watermarkText(original, 'fz:leaker_881');
+  assert.strictEqual(watermark.hasWatermark(marked), true);
+
+  // Penyerang mencoba menghapus watermark zero-width dengan regex
+  const strippedByAttacker = marked.replace(/[\u200B-\u200D\uFEFF]/g, '');
+  assert.strictEqual(watermark.hasWatermark(strippedByAttacker), true, 'Layer 2 harus mendeteksi watermark meski ZW dihapus');
+  assert.strictEqual(watermark.decode(strippedByAttacker), 'fz:leaker_881', 'Identitas pembocor tetap terbaca dari teks yang dibersihkan penyerang');
+
+  // strip() resmi mengembalikan teks bersih 100% untuk TTS dan evaluasi token
+  assert.strictEqual(watermark.strip(strippedByAttacker), original, 'strip() harus mengembalikan teks asli secara bersih');
+});
+
+test('Watermark: Homoglyph normalization', () => {
+  // Kalimat yang disisipi karakter kembar Sirilik (homoglyphs)
+  const homoglyphStr = 'She went to the l\u0456br\u0430r\u0443 yesterday.';
+  assert.strictEqual(watermark.hasWatermark(homoglyphStr), true, 'Homoglyph harus terdeteksi');
+  const cleaned = watermark.strip(homoglyphStr);
+  assert.strictEqual(cleaned, 'She went to the library yesterday.');
+});
+
 // 2. Anti-Tamper & Origin Shield
 test('Anti-Tamper: Local and test environments allowed', () => {
   assert.strictEqual(antiTamper.isLocalOrTest(), true, 'Lingkungan Node test harus terdeteksi sebagai local/test');
   assert.strictEqual(antiTamper.isAllowedDomain(), true, 'Lingkungan Node test harus diizinkan');
+});
+
+test('Anti-Tamper: navigator.webdriver locked out on production domains', () => {
+  assert.strictEqual(antiTamper.isLocalHost('localhost', '4173'), true, 'localhost adalah host lokal');
+  assert.strictEqual(antiTamper.isLocalHost('127.0.0.1', '5173'), true, '127.0.0.1 adalah host lokal');
+  assert.strictEqual(antiTamper.isLocalHost('fiezel.my.id', '443'), false, 'fiezel.my.id BUKAN host lokal');
+  assert.strictEqual(antiTamper.isLocalHost('www.fiezel.my.id', ''), false, 'www.fiezel.my.id BUKAN host lokal');
+});
+
+test('Anti-Tamper: Mobile iOS touch callout & drag prevention', () => {
+  const src = fs.readFileSync(path.join(__dirname, '../features/ui/fiezel-anti-tamper.js'), 'utf8');
+  assert.ok(src.includes('-webkit-touch-callout: none !important'), 'Harus memblokir menu long-press iOS');
+  assert.ok(src.includes('-webkit-user-drag: none !important'), 'Harus memblokir drag text/element');
+  assert.ok(src.includes('Protected Intellectual Property'), 'Harus memuat teks hak cipta saat penyalinan dicegat');
 });
 
 test('Anti-Tamper: Precache & index.html registration', () => {
