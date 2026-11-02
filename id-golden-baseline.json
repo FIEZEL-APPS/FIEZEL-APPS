@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-11-01T22:46:46.484Z",
+  "generatedAt": "2026-11-02T03:27:32.868Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "6f7f5e03b33742917af73b5f6ac7dad6b4fafd92bc1bb39009731a04cf72b567",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 6157,
-    "sha256": "974bd7db30f7c400e14095f21769d61b57f76ac5ebf134e7f5cd9891a94e1ea7",
+    "count": 6158,
+    "sha256": "8cf445a697c273a73966a935d79bf1ee3caafaf86e4661ca3fc6a9a63a994d38",
     "list": [
       "\n        <div class=\"hint-sheet-handle\" aria-hidden=\"true\"></div>\n        <div class=\"hint-popover-header\">\n          <div style=\"display:flex;align-items:center;gap:6px\">\n            <i data-lucide=\"info\"></i>\n            <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>\n          </div>\n          <span class=\"hint-level-pill\">${currentLvl}/4</span>\n          <button type=\"button\" id=\"hintCloseBtn\" class=\"hint-close-btn\" aria-label=\"${FiezelI18n.t('modal.tutup', 'Tutup')}\"><i data-lucide=\"x\"></i></button>\n        </div>\n        <div class=\"hint-step-indicator\" aria-hidden=\"true\">\n          ${[1,2,3,4].map(i => ",
       "\n        <div style=\"display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 0;\">\n          <div class=\"fz-qr-scanner-box\" id=\"fzQrScannerBox\" data-testid=\"qr-scanner-box\">\n            <video id=\"qrScanVideo\" class=\"fz-qr-video\" playsinline autoplay muted></video>\n            <div class=\"fz-qr-reticle\" id=\"fzQrReticle\">\n              <div class=\"fz-qr-corner fz-qr-corner-tl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-tr\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-bl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-br\"></div>\n              <div class=\"fz-qr-laser\"></div>\n            </div>\n            <div class=\"fz-qr-cam-fallback\" id=\"fzQrCamFallback\" style=\"display:none;\">\n              <i data-lucide=\"camera\" style=\"width:30px;height:30px;color:#64748B;\"></i>\n              <p style=\"font-size:11px;line-height:1.3;margin:0;color:#CBD5E1;\">${FiezelI18n.t('social3.scan-cam-err','Kamera belum aktif.')}</p>\n            </div>\n          </div>\n          <input type=\"file\" id=\"qrFileInput\" accept=\"image/*\" style=\"display:none;\" onchange=\"handleQrFilePicked(event)\">\n          <button type=\"button\" class=\"btn-scan-gallery\" onclick=\"$('qrFileInput')?.click()\" data-testid=\"qr-gallery-btn\" style=\"display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:260px;padding:8px 12px;border-radius:10px;background:#F8FAFC;border:1.5px solid #CBD5E1;color:#0F172A !important;font-weight:700;font-size:12px;cursor:pointer;\">\n            <i data-lucide=\"image\" style=\"width:15px;height:15px;color:#0284C7;\"></i> ${FiezelI18n.t('social3.scan-from-gallery','Pilih dari Galeri Foto')}\n          </button>\n        </div>\n      ",
@@ -4064,6 +4064,7 @@
       "Miskonsepsi Verba Ganda & Progressive: (1) Jangan gabungkan \"am\" dengan kata kerja dasar \"want\" (gunakan \"I would like a hot coffee\"). (2) Untuk rencana Present Continuous, wajib sertakan to be \"am\" sebelum V-ing (\"I am meeting my friend at the library\").",
       "Miskonsepsi Verba Kopula & Preposisi Pasangan: Jangan gunakan \"it is look\" (gunakan \"it looks\") dan pasangan tepat untuk \"similar\" adalah \"similar to\" (bukan \"similar with\").",
       "Mizuki adalah seorang maiko berusia 17 tahun. Setiap pagi di kamarnya, dia mengenakan pakaian kimono yang indah.",
+      "Mochi akan membedah soal ini langsung dengan suara AI Gemini Live. Biaya: 10 Gem (Saldo kamu: {balance} 💎). Bonus Cashback: Jika jawabanmu benar di soal ini, kamu dapat cashback +5 Gem!",
       "Mochi siap bantu! Coba perhatikan partikel penunjuk waktu atau arah di kalimat ini ya!",
       "Mode Latihan Mandiri",
       "Mode hemat — jawaban ini dari FIEZEL, bukan AI.",

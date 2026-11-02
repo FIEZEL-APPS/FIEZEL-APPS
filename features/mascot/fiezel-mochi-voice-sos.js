@@ -202,6 +202,10 @@
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'Bantuan suara Mochi dinonaktifkan',
     'mochi-sos.toast-out-of-gems': 'Gem belum cukup untuk soal berikutnya. Bantuan Mochi ditutup aman.',
+    'mochi-sos.modal-confirm-title': 'Bantuan Suara Mochi SOS',
+    'mochi-sos.modal-confirm-body': 'Mochi akan membedah soal ini langsung dengan suara AI Gemini Live. Biaya: 10 Gem (Saldo kamu: {balance} 💎). Bonus Cashback: Jika jawabanmu benar di soal ini, kamu dapat cashback +5 Gem!',
+    'mochi-sos.modal-confirm-cancel': 'Batal',
+    'mochi-sos.modal-confirm-ok': 'Gunakan 10 Gem & Mulai',
     'mochi-sos.modal-insufficient-title': 'Gem Belum Cukup 💎',
     'mochi-sos.modal-insufficient-body': 'Kamu membutuhkan minimal 2 Gem untuk membedah soal dengan suara AI Mochi (Saldo saat ini: {balance} 💎). Selesaikan soal latihan untuk kumpulkan Gem gratis atau gunakan kuota gratis harian besok!',
     'mochi-sos.modal-insufficient-btn': 'Mengerti',
@@ -252,6 +256,10 @@
     'mochi-sos.toggle-off-badge': 'OFF',
     'mochi-sos.toast-disabled': 'ปิดผู้ช่วยเสียงโมจิแล้ว',
     'mochi-sos.toast-out-of-gems': 'เจมไม่พอสำหรับข้อถัดไป ปิดผู้ช่วยเสียงโมจิอย่างปลอดภัยแล้ว',
+    'mochi-sos.modal-confirm-title': 'ตัวช่วยเสียงโมจิ SOS',
+    'mochi-sos.modal-confirm-body': 'โมจิจะช่วยวิเคราะห์โจทย์ข้อนี้สดๆ ด้วยเสียง AI Gemini Live ค่าบริการ: 10 Gem (ยอดของคุณ: {balance} 💎) โบนัสคืนเงิน: หากตอบถูกในข้อนี้ รับเงินคืน +5 Gem!',
+    'mochi-sos.modal-confirm-cancel': 'ยกเลิก',
+    'mochi-sos.modal-confirm-ok': 'ใช้ 10 Gem & เริ่มเลย',
     'mochi-sos.modal-insufficient-title': 'เจมไม่พอ 💎',
     'mochi-sos.modal-insufficient-body': 'คุณต้องมีอย่างน้อย 2 Gem เพื่อวิเคราะห์โจทย์ด้วยเสียง AI ของโมจิ (ยอดปัจจุบัน: {balance} 💎) ฝึกทำแบบฝึกหัดเพื่อสะสม Gem ฟรี หรือใช้สิทธิ์ฟรีรายวันในวันพรุ่งนี้!',
     'mochi-sos.modal-insufficient-btn': 'เข้าใจแล้ว',
@@ -610,11 +618,18 @@
     var doc = getDoc();
     if (!doc) return null;
     var st = _connStatus.state || 'idle';
-    if (st === 'idle' || st === 'connected' || !isMochiEnabledFromStorage() || isExamLocked()) {
+    if (st === 'idle' || st === 'connected' || !isMochiEnabledFromStorage() || isExamLocked() || st === 'error') {
       removeConnectionBannerInternal();
+      if (st === 'error') {
+        try {
+          if (typeof root.showToast === 'function') {
+            root.showToast(_connStatus.message || t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi'), 'warn');
+          }
+        } catch (_) {}
+      }
       return null;
     }
-    if (isLocalEnv() && (st === 'error' || st === 'reconnecting')) {
+    if (isLocalEnv() && (st === 'reconnecting' || st === 'connecting')) {
       removeConnectionBannerInternal();
       return null;
     }
@@ -2790,7 +2805,121 @@
     },
 
     showConfirmationModal: function (activeQ) {
-      this.setMochiEnabled(true, { userConfirmed: true });
+      var doc = getDoc();
+      if (!doc) return;
+      var existing = doc.getElementById('fzMochiSosConfirmScrim') || doc.getElementById('fzMochiSosConfirmModal');
+      if (existing) {
+        try { existing.remove(); } catch (_) {}
+      }
+
+      var self = this;
+      var currentBalance = getGemBalance();
+
+      if (currentBalance < 10) {
+        this.showInsufficientGemModal(currentBalance);
+        return;
+      }
+
+      // Pre-connect WebSocket in background so voice can play INSTANTLY when confirmed!
+      try {
+        if (!self.isCallActive()) {
+          openHotSocket();
+        }
+      } catch (_) {}
+
+      var scrim = doc.createElement('div');
+      scrim.id = 'fzMochiSosConfirmScrim';
+      scrim.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+
+      var titleText = t('mochi-sos.modal-confirm-title', 'Bantuan Suara Mochi SOS');
+      var bodyHtml = t('mochi-sos.modal-confirm-body', 'Mochi akan membedah soal ini langsung dengan suara AI Gemini Live. Biaya: 10 Gem (Saldo kamu: {balance} 💎). Bonus Cashback: Jika jawabanmu benar di soal ini, kamu dapat cashback +5 Gem!', {
+        balance: '<span id="fzMochiModalBalance" style="font-weight:700;color:#0F172A;">' + currentBalance + '</span>'
+      });
+      var cancelBtnText = t('mochi-sos.modal-confirm-cancel', 'Batal');
+      var confirmBtnText = t('mochi-sos.modal-confirm-ok', 'Gunakan 10 Gem & Mulai');
+
+      scrim.innerHTML = [
+        '<div id="fzMochiSosConfirmModal" role="dialog" aria-modal="true" style="position:relative;background:#FFFDF7;border:1.5px solid #FDE047;border-radius:24px;padding:26px 20px 20px;width:100%;max-width:320px;box-shadow:0 20px 45px -10px rgba(0,0,0,0.25);text-align:center;box-sizing:border-box;">',
+        '  <div style="width:54px;height:54px;margin:0 auto 10px;background:#FEF3C7;border:1.5px solid #FDE68A;border-radius:16px;display:flex;align-items:center;justify-content:center;">',
+        '    <svg width="38" height="38" viewBox="0 0 100 100" fill="none">',
+        '      <ellipse cx="50" cy="85" rx="30" ry="7" fill="rgba(217,119,6,0.15)"/>',
+        '      <path d="M50 18C30 18 18 34 18 58C18 78 32 82 50 82C68 82 82 78 82 58C82 34 70 18 50 18Z" fill="#FFFDF8" stroke="#F59E0B" stroke-width="2.5"/>',
+        '      <ellipse cx="32" cy="60" rx="6" ry="4" fill="#FDA4AF"/>',
+        '      <ellipse cx="68" cy="60" rx="6" ry="4" fill="#FDA4AF"/>',
+        '      <circle cx="37" cy="50" r="4.5" fill="#0F172A"/>',
+        '      <circle cx="63" cy="50" r="4.5" fill="#0F172A"/>',
+        '      <path d="M46 58C48 60 52 60 54 58" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>',
+        '      <path d="M22 44C22 28 32 18 50 18C68 18 78 28 78 44" stroke="#3B82F6" stroke-width="3.5" stroke-linecap="round"/>',
+        '      <rect x="17" y="38" width="7" height="13" rx="3.5" fill="#2563EB"/>',
+        '      <rect x="76" y="38" width="7" height="13" rx="3.5" fill="#2563EB"/>',
+        '    </svg>',
+        '  </div>',
+        '  <h3 style="font-size:19px;font-weight:800;color:#0F172A;margin:0 0 6px;letter-spacing:-0.02em;line-height:1.25;">' + titleText + '</h3>',
+        '  <div style="font-size:22px;line-height:1;margin:0 auto 10px;">💎</div>',
+        '  <p style="font-size:12.5px;line-height:1.55;color:#475569;margin:0 0 20px;font-weight:500;">' + bodyHtml + '</p>',
+        '  <div style="display:flex;gap:10px;justify-content:center;">',
+        '    <button type="button" id="fzMochiSosConfirmCancel" style="flex:1;height:42px;background:#FFFFFF;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:12px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 #CBD5E1;transition:all 0.15s ease;">' + cancelBtnText + '</button>',
+        '    <button type="button" id="fzMochiSosConfirmOk" style="flex:1.5;height:42px;background:#FFFFFF;color:#0F172A;border:1.5px solid #CBD5E1;border-radius:12px;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 2px 0 #CBD5E1;white-space:nowrap;transition:all 0.15s ease;">' + confirmBtnText + '</button>',
+        '  </div>',
+        '</div>'
+      ].join('');
+
+      doc.body.appendChild(scrim);
+
+      var btnCancel = doc.getElementById('fzMochiSosConfirmCancel');
+      if (btnCancel) {
+        btnCancel.onclick = function (e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          scrim.remove();
+        };
+      }
+
+      var btnOk = doc.getElementById('fzMochiSosConfirmOk');
+      if (btnOk) {
+        btnOk.onclick = function (e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          var bal = getGemBalance();
+          if (bal < 10) {
+            scrim.remove();
+            self.showInsufficientGemModal(bal);
+            return;
+          }
+
+          // 1. Resonansi AudioContext pada gesture user sinkron (zero audio delay)
+          try {
+            var ctx = getAudioContext();
+            if (ctx && ctx.state === 'suspended') ctx.resume().catch(function () {});
+          } catch (_) {}
+
+          // 2. Wire Pemotongan Saldo 10 Gem Instan
+          var state = getState();
+          if (state) {
+            if (state.gems && typeof state.gems.balance === 'number') {
+              state.gems.balance = Math.max(0, state.gems.balance - 10);
+              state.gems.spentTotal = (state.gems.spentTotal || 0) + 10;
+              if (Array.isArray(state.gems.ledger)) {
+                state.gems.ledger.push({ type: 'mochi_sos_session', amount: -10, timestamp: Date.now() });
+              }
+            } else if (typeof state.gems === 'number') {
+              state.gems = Math.max(0, state.gems - 10);
+            }
+            try { if (typeof root.save === 'function') root.save(); } catch (_) {}
+          }
+          _sessionGemsSpent = 10;
+
+          // 3. Update tampilan Gem di topbar secara langsung seketika
+          self.updateTopbarGem();
+
+          // 4. Tutup modal
+          scrim.remove();
+
+          // 5. Aktifkan saklar ke ON dan nyalakan visualizer
+          self.setMochiEnabled(true, { userConfirmed: true, skipAutoStart: true });
+
+          // 6. Mulai panggilan suara Mochi langsung seketika (tanpa jeda 1 detik)
+          self.startCall(activeQ, { autoEntry: true, userConfirmed: true });
+        };
+      }
     },
 
     showInsufficientGemModal: function (currentBalance) {
@@ -4282,17 +4411,8 @@
       var titleText = isOn
         ? t('mochi-sos.toggle-on-title', 'Nonaktifkan bantuan suara Mochi')
         : t('mochi-sos.toggle-off-title', 'Aktifkan bantuan suara Mochi');
-      var labelText = t('mochi-sos.toggle-label', 'Bantuan Mochi');
-      var stateText = 'OFF';
-      if (isOn) {
-        if (_sessionGemsSpent > 0) {
-          stateText = 'ON · -' + _sessionGemsSpent + '💎';
-        } else if (_sessionFreeQuestions > 0) {
-          stateText = 'ON · ' + t('mochi-sos.badge-free', 'Gratis');
-        } else {
-          stateText = 'ON';
-        }
-      }
+      var labelText = 'Bantuan mochi';
+      var stateText = isOn ? 'ON' : 'OFF';
       var stateSig = (isOn ? '1:' : '0:') + stateText + ':' + titleText;
       if (btn.getAttribute('data-mochi-sig') === stateSig) return;
       btn.setAttribute('data-mochi-sig', stateSig);
@@ -4356,7 +4476,7 @@
         hapticTap(10);
         var currentlyOn = isMochiEnabledFromStorage();
         if (!currentlyOn) {
-          self.setMochiEnabled(true, { userConfirmed: true });
+          self.showConfirmationModal(activeQ);
         } else {
           self.setMochiEnabled(false);
         }
