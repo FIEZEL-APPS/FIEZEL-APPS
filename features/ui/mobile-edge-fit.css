@@ -1046,107 +1046,99 @@ html.fz-booting header.topbar {
 }
 
 /* 4. Auth & Login Screen: 100% Viewport-Fit, High Contrast, Zero-Mascot */
-@media (max-width: 767px) {
-  .fz-auth {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    overflow-y: auto !important;
-    overscroll-behavior: contain !important;
-    scrollbar-width: none !important;
-    background: radial-gradient(120% 80% at 85% 10%, #FFFDF8 0%, rgba(248, 243, 233, 0.75) 45%, rgba(243, 232, 217, 0.40) 100%), radial-gradient(90% 60% at 15% 90%, rgba(243, 232, 217, 0.75) 0%, rgba(248, 243, 233, 0.45) 50%, transparent 100%), #F8F3E9 !important;
-    color: #1B1515 !important;
-    box-sizing: border-box !important;
-    z-index: 2147481950 !important;
-  }
+.fz-auth {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  scrollbar-width: none !important;
+  background: #FDFAF3 !important;
+  color: #1B1418 !important;
+  box-sizing: border-box !important;
+  z-index: 2147481950 !important;
 }
 
 .fz-auth::-webkit-scrollbar {
   display: none !important;
 }
 
-@media (max-width: 767px) {
-  .fz-auth-hero {
-    position: relative !important;
-    flex: 0 0 auto !important;
-    overflow: hidden !important;
-    background: #1B1515 !important;
-    background-color: #1B1515 !important;
-    color: #FFFDF8 !important;
-  }
+.fz-auth-hero {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  overflow: hidden !important;
+  background: #1B1418 !important;
+  background-color: #1B1418 !important;
+  color: #FDFAF3 !important;
+}
 
-  .fz-auth-hero::before,
-  .fz-auth-hero::after {
-    display: none !important;
-    content: none !important;
-  }
+.fz-auth-hero::before {
+  display: none !important;
+}
 
-  .fz-auth-hero .fz-auth-topo,
-  .fiezel-ob-reveal .fz-auth-topo,
-  .fiezel-splash-brand .fz-auth-topo {
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
-    opacity: 0.95 !important;
-  }
+.fz-auth-hero::after {
+  top: 56% !important;
+  height: 136px !important;
+  background: radial-gradient(closest-side, rgba(255, 199, 0, 0.15), rgba(255, 199, 0, 0)) !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
 
-  .fz-auth-hero.is-welcome {
-    min-height: 48vh !important;
-    max-height: 52vh !important;
-    padding: max(36px, calc(env(safe-area-inset-top, 0px) + 24px)) 20px 56px !important;
-  }
+.fz-auth-hero .fz-auth-topo,
+.fiezel-ob-reveal .fz-auth-topo,
+.fiezel-splash-brand .fz-auth-topo {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  opacity: 0.95 !important;
+}
 
-  .fz-auth-hero.is-masuk {
-    flex: 0 0 auto !important;
-    min-height: 24vh !important;
-    max-height: 28vh !important;
-    padding: max(36px, calc(env(safe-area-inset-top, 0px) + 24px)) 20px 38px !important;
-  }
+.fz-auth-hero.is-welcome {
+  min-height: 46vh !important;
+  max-height: 50vh !important;
+  padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 56px !important;
+}
 
-  .fz-auth-hero.is-daftar {
-    flex: 0 0 auto !important;
-    min-height: 20vh !important;
-    max-height: 24vh !important;
-    padding: max(32px, calc(env(safe-area-inset-top, 0px) + 20px)) 20px 34px !important;
-  }
+.fz-auth-hero.is-masuk {
+  flex: 0 0 auto !important;
+  min-height: 24vh !important;
+  max-height: 28vh !important;
+  padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 38px !important;
+}
 
-  .fz-auth-hero .fz-auth-brand .fiezel-wordmark {
-    width: min(46vw, 190px) !important;
-    display: block !important;
-    margin: 0 auto !important;
-  }
+.fz-auth-hero.is-daftar {
+  flex: 0 0 auto !important;
+  min-height: 20vh !important;
+  max-height: 24vh !important;
+  padding: max(42px, calc(env(safe-area-inset-top, 0px) + 30px)) 20px 34px !important;
+}
 
-  .fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
-    width: min(36vw, 140px) !important;
-  }
+.fz-auth-hero .fz-auth-brand .fiezel-wordmark {
+  width: min(44vw, 180px) !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
 
-  .fz-auth-wave {
-    position: absolute !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: -1px !important;
-    width: 100% !important;
-    height: 64px !important;
-    z-index: 2 !important;
-  }
+.fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
+  width: min(36vw, 140px) !important;
+}
 
-  .fz-auth-body {
-    flex: 1 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    padding: 12px 24px max(20px, env(safe-area-inset-bottom)) 24px !important;
-    max-width: 440px !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-    background: transparent !important;
-    color: #1B1515 !important;
-    box-sizing: border-box !important;
-  }
+.fz-auth-wave {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: -1px !important;
+  width: 100% !important;
+  height: 38px !important;
+  z-index: 2 !important;
+}
+
+.fz-auth-wave path {
+  fill: #FDFAF3 !important;
 }
 
 /* ZERO MASCOTS / PAW */
@@ -1161,236 +1153,95 @@ html.fz-booting header.topbar {
   pointer-events: none !important;
 }
 
-/* Titles & Descriptions: Mobile Baseline */
-@media (max-width: 767px) {
-  .fz-auth .fz-auth-title,
-  .fz-auth-body .fz-auth-title,
-  .fz-auth-body h1,
-  .fz-auth-body h2 {
-    color: #1B1418 !important;
-    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
-    font-size: 1.85rem !important;
-    font-weight: 800 !important;
-    line-height: 1.15 !important;
-    letter-spacing: -0.02em !important;
-    margin: 4px 0 10px 0 !important;
-  }
-
-  .fz-auth-title.is-underlined {
-    display: inline-block !important;
-    align-self: flex-start !important;
-    text-decoration: underline !important;
-    text-decoration-color: #9B3A4A !important;
-    text-decoration-thickness: 3.5px !important;
-    text-underline-offset: 7px !important;
-    text-decoration-skip-ink: none !important;
-  }
-
-  .fz-auth .fz-auth-lead,
-  .fz-auth-body .fz-auth-lead,
-  .fz-auth-body p:not(.fz-auth-or) {
-    color: #475569 !important;
-    font-size: 1rem !important;
-    line-height: 1.55 !important;
-    max-width: 36ch !important;
-    margin: 0 0 14px 0 !important;
-  }
-
-  .fz-auth-next-row {
-    margin-top: auto !important;
-    padding-top: 24px !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-  }
-
-  .fz-auth .fz-auth-next {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    border: 0 !important;
-    background: #922D43 !important;
-    box-shadow: 0 6px 20px -4px rgba(146, 45, 67, 0.40) !important;
-    color: #FFFDF8 !important;
-    font-family: inherit !important;
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
-    padding: 12px 24px !important;
-    border-radius: 9999px !important;
-    cursor: pointer !important;
-    transition: all 0.18s ease !important;
-  }
-
-  .fz-auth .fz-auth-next:hover {
-    background: #7A2437 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 8px 24px -4px rgba(146, 45, 67, 0.50) !important;
-  }
-
-  .fz-auth .fz-auth-next span {
-    color: #FFFDF8 !important;
-    font-weight: 700 !important;
-  }
+.fz-auth-body {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 6px 24px max(20px, env(safe-area-inset-bottom)) 24px !important;
+  max-width: 440px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  background: transparent !important;
+  color: #1B1418 !important;
+  box-sizing: border-box !important;
 }
 
-/* Titles & Descriptions: Desktop Grand Scale (min-width: 768px) */
-@media (min-width: 768px) {
-  .fz-auth-wave-h {
-    display: none !important;
-  }
-
-  .fz-auth-wave-v {
-    display: block !important;
-    position: absolute !important;
-    right: -1px !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    height: 100% !important;
-    width: 160px !important;
-    z-index: 5 !important;
-    pointer-events: none !important;
-  }
-
-  .fz-auth .fz-auth-welcome-container {
-    max-width: 680px !important;
-    width: 100% !important;
-    position: static !important;
-  }
-
-  .fz-auth .fz-auth-title,
-  .fz-auth-body .fz-auth-title,
-  .fz-auth-body h1 {
-    color: #1B1418 !important;
-    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
-    font-size: clamp(3.8rem, 5.2vw, 5rem) !important;
-    font-weight: 800 !important;
-    line-height: 1.04 !important;
-    letter-spacing: -0.04em !important;
-    margin: 0 0 24px 0 !important;
-  }
-
-  .fz-auth-title.is-underlined {
-    display: inline-block !important;
-    align-self: flex-start !important;
-    text-decoration: underline !important;
-    text-decoration-color: #9B3A4A !important;
-    text-decoration-thickness: 4px !important;
-    text-underline-offset: 8px !important;
-    text-decoration-skip-ink: none !important;
-  }
-
-  .fz-auth .fz-auth-lead,
-  .fz-auth-body .fz-auth-lead {
-    color: #5C4E4B !important;
-    font-size: 1.45rem !important;
-    line-height: 1.65 !important;
-    max-width: 44ch !important;
-    margin: 0 0 36px 0 !important;
-  }
-
-  .fz-auth .fz-auth-carousel-dots {
-    margin: 0 0 54px 0 !important;
-    gap: 12px !important;
-  }
-
-  .fz-auth .fz-auth-carousel-dots .fz-dot {
-    width: 10px !important;
-    height: 10px !important;
-  }
-
-  .fz-auth .fz-auth-carousel-dots .fz-dot.is-active {
-    width: 36px !important;
-  }
-
-  .fz-auth .fz-auth-next-row {
-    position: absolute !important;
-    bottom: 52px !important;
-    right: 68px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    z-index: 30 !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-  }
-
-  .fz-auth .fz-auth-next {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 14px !important;
-    border: 0 !important;
-    background: #922D43 !important;
-    box-shadow: 0 12px 36px -6px rgba(146, 45, 67, 0.45) !important;
-    color: #FFFDF8 !important;
-    font-family: inherit !important;
-    font-size: 1.25rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.01em !important;
-    padding: 20px 52px !important;
-    border-radius: 9999px !important;
-    cursor: pointer !important;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  .fz-auth .fz-auth-next:hover {
-    background: #7A2437 !important;
-    transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 16px 44px -6px rgba(146, 45, 67, 0.55) !important;
-  }
-
-  .fz-auth .fz-auth-next span {
-    color: #FFFDF8 !important;
-    font-weight: 800 !important;
-  }
-
-  .fz-auth-body .fz-auth-form,
-  .fz-auth-body .fz-auth-roles,
-  .fz-auth-body .fz-auth-google,
-  .fz-auth-body .fz-auth-or,
-  .fz-auth-body .fz-auth-alt,
-  .fz-auth-body .fz-auth-hint {
-    width: 100% !important;
-    max-width: 540px !important;
-  }
-
-  .fz-auth-body .fz-auth-input {
-    border-radius: 16px !important;
-    padding: 6px 16px !important;
-    min-height: 50px !important;
-  }
-
-  .fz-auth-body .fz-auth-input input[name] {
-    font-size: 1.06rem !important;
-    min-height: 44px !important;
-  }
-
-  .fz-auth-body .fz-auth-submit {
-    padding: 16px 28px !important;
-    font-size: 1.1rem !important;
-    margin-top: 14px !important;
-    border-radius: 9999px !important;
-    background: #922D43 !important;
-    color: #FFFDF8 !important;
-  }
-
-  .fz-btn-google-native {
-    max-width: 100% !important;
-    width: 100% !important;
-    height: 52px !important;
-    font-size: 1.04rem !important;
-  }
+/* Titles: Deep Ink (#1B1418) */
+.fz-auth .fz-auth-title,
+.fz-auth-body .fz-auth-title,
+.fz-auth-body h1,
+.fz-auth-body h2 {
+  color: #1B1418 !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+  font-size: 1.85rem !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  margin: 4px 0 10px 0 !important;
 }
 
-.fz-auth-next-arrow {
+.fz-auth-title.is-underlined {
+  display: inline-block !important;
+  align-self: flex-start !important;
+  text-decoration: underline !important;
+  text-decoration-color: #9B3A4A !important;
+  text-decoration-thickness: 3.5px !important;
+  text-underline-offset: 7px !important;
+  text-decoration-skip-ink: none !important;
+}
+
+/* Lead & Descriptions */
+.fz-auth .fz-auth-lead,
+.fz-auth-body .fz-auth-lead,
+.fz-auth-body p:not(.fz-auth-or) {
+  color: #475569 !important;
+  font-size: 1rem !important;
+  line-height: 1.55 !important;
+  max-width: 36ch !important;
+  margin: 0 0 14px 0 !important;
+}
+
+/* Action Rows & Next Button */
+.fz-auth-next-row {
+  margin-top: auto !important;
+  padding-top: 24px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
+.fz-auth .fz-auth-next {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #1B1418 !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  padding: 8px 6px 8px 12px !important;
+  cursor: pointer !important;
+}
+
+.fz-auth .fz-auth-next span {
+  color: #1B1418 !important;
+  font-weight: 800 !important;
+}
+
+.fz-auth-next-dot {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
   display: grid !important;
   place-items: center !important;
-  width: 20px !important;
-  height: 20px !important;
-  color: #FFFDF8 !important;
+  background: #9B3A4A !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 8px 20px rgba(155, 58, 74, 0.45) !important;
 }
 
-.fz-auth-next-arrow svg {
-  stroke: #FFFDF8 !important;
-  stroke-width: 2.2 !important;
-  fill: none !important;
+.fz-auth-next-dot svg {
+  stroke: #FFFFFF !important;
 }
 
 /* Role Tabs (Murid / Guru) */
@@ -1567,7 +1418,7 @@ html.fz-booting header.topbar {
   padding: 0 2px !important;
 }
 
-/* Primary Submit Button: Elegant Burgundy Pill */
+/* Primary Submit Button: High Contrast Golden Amber */
 .fz-auth .fz-auth-submit {
   width: 100% !important;
   margin-top: 14px !important;
@@ -1575,17 +1426,11 @@ html.fz-booting header.topbar {
   font-size: 1.05rem !important;
   font-weight: 800 !important;
   border-radius: 9999px !important;
-  background: #922D43 !important;
-  color: #FFFDF8 !important;
+  background: linear-gradient(135deg, #FFD94F 0%, #FFB800 100%) !important;
+  color: #101018 !important;
   border: none !important;
-  box-shadow: 0 6px 20px -4px rgba(146, 45, 67, 0.40) !important;
+  box-shadow: 0 6px 20px rgba(255, 184, 0, 0.4) !important;
   cursor: pointer !important;
-  transition: all 0.18s ease !important;
-}
-
-.fz-auth .fz-auth-submit:hover {
-  background: #7A2437 !important;
-  box-shadow: 0 8px 24px -4px rgba(146, 45, 67, 0.50) !important;
 }
 
 .fz-auth-error {
@@ -6633,1038 +6478,4 @@ html body #app .quiz-shell #quizFloatingBar.quiz-floating-bar,
   justify-content: center !important;
   gap: 8px !important;
   cursor: pointer !important;
-}
-
-
-/* ==========================================================================
-   PHASE 1 & PHASE 2 MASTER OVERRIDES:
-   - Universal Responsive Multi-Device Layout (Desktop 3-Column, Tablet Rail, Mobile)
-   - Welcome & Auth 50/50 Desktop Split + Mobile Topbar Non-Overlap
-   - Authentic 5-Step Onboarding Redesign (Warm Travertine #FAF5ED, Espresso Wave, Burgundy Luxury)
-   ========================================================================== */
-
-/* --- 1. Welcome & Auth Screen Cascade Overrides (beats fiezel-tactile-clay.css 0-3-2) --- */
-@media (max-width: 1023px) {
-  html body div.fz-auth[data-auth-screen] header.fz-auth-hero.is-welcome {
-    min-height: 48vh !important;
-    max-height: 54vh !important;
-    padding: max(62px, calc(env(safe-area-inset-top, 0px) + 48px)) 20px 58px !important;
-  }
-
-  html body div.fz-auth[data-auth-screen] header.fz-auth-hero.is-masuk,
-  html body div.fz-auth[data-auth-screen] header.fz-auth-hero.is-daftar {
-    min-height: 224px !important;
-    max-height: none !important;
-    padding: max(72px, calc(env(safe-area-inset-top, 0px) + 58px)) 20px 50px !important;
-  }
-}
-
-@media (min-width: 1024px) {
-  html body div.fz-auth[data-auth-screen] {
-    display: grid !important;
-    grid-template-columns: 50% 50% !important;
-    min-height: 100vh !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-  }
-
-  html body div.fz-auth[data-auth-screen] header.fz-auth-hero,
-  html body div.fz-auth[data-auth-screen] header.fz-auth-hero.is-welcome,
-  html body div.fz-auth[data-auth-screen] header.fz-auth-hero.is-masuk,
-  html body div.fz-auth[data-auth-screen] header.fz-auth-hero.is-daftar {
-    min-height: 100vh !important;
-    height: 100vh !important;
-    max-height: none !important;
-    padding: 48px 52px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-  }
-
-  html body div.fz-auth[data-auth-screen] .fz-auth-sheet {
-    min-height: 100vh !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    overflow-y: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: 48px 56px !important;
-    box-sizing: border-box !important;
-  }
-
-  html body div.fz-auth[data-auth-screen] .fz-auth-sheet > * {
-    width: 100% !important;
-    max-width: 420px !important;
-  }
-}
-
-/* --- 2. Desktop 3-Column Shell & Topbar Non-Overlap (>= 1024px) --- */
-@media (min-width: 1024px) {
-  html body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) #fzUniversalLayout > main.app,
-  html body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) #fzUniversalLayout > main.app.app {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  html body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) #fzUniversalLayout #app,
-  html body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) #fzUniversalLayout #app > .home-today,
-  html body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) #fzUniversalLayout #app > .home-page,
-  html body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) #fzUniversalLayout #app > section,
-  html body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) #fzUniversalLayout #app .today-home-cockpit,
-  html body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) #fzUniversalLayout #app .tactile-home-cockpit {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  html body #fzUniversalLayout .quiz-topbar,
-  html body.fz-stage-quiz #fzUniversalLayout .quiz-topbar,
-  html body.fz-lesson-mode #fzUniversalLayout .quiz-topbar,
-  html body:has(.quiz-shell) #fzUniversalLayout .quiz-topbar {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 16px !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 12px max(24px, calc((100% - 680px) / 2)) !important;
-    box-sizing: border-box !important;
-  }
-
-  html body #fzUniversalLayout .quiz-topbar .quiz-progress-wrap {
-    flex: 1 1 auto !important;
-    min-width: 120px !important;
-  }
-
-  html body.fz-stage-quiz #fzUniversalLayout > main.app.app,
-  html body.fz-lesson-mode #fzUniversalLayout > main.app.app,
-  html body:has(.quiz-shell) #fzUniversalLayout > main.app.app {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-
-  html body.fz-stage-quiz #fzUniversalLayout .quiz-shell,
-  html body.fz-lesson-mode #fzUniversalLayout .quiz-shell,
-  html body:has(.quiz-shell) #fzUniversalLayout .quiz-shell {
-    justify-content: flex-start !important;
-    gap: 16px !important;
-    max-width: 580px !important;
-    margin: 0 auto !important;
-  }
-
-  html body.fz-stage-quiz #fzUniversalLayout #feedback.feedback-sheet,
-  html body.fz-lesson-mode #fzUniversalLayout #feedback.feedback-sheet,
-  html body:has(.quiz-shell) #fzUniversalLayout #feedback.feedback-sheet {
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
-    max-width: 580px !important;
-    padding: 16px 24px !important;
-    border-radius: 20px 20px 0 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  html body #fzUniversalLayout main.app > header.topbar,
-  html body main.app > header.topbar {
-    position: sticky !important;
-    top: 0 !important;
-    left: auto !important;
-    right: auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 0 12px 0 !important;
-    box-sizing: border-box !important;
-    z-index: 30 !important;
-  }
-
-  html body #fzUniversalLayout main.app > header.topbar #topBrandWrap {
-    display: none !important;
-  }
-
-  html body aside#fzDesktopSidebar button.fz-sb-course {
-    background: #FFFDF9 !important;
-    border: 1.5px solid #E5DDD0 !important;
-    box-shadow: 0 2px 6px rgba(24, 18, 16, 0.04) !important;
-    border-radius: 14px !important;
-    padding: 9px 12px !important;
-    min-height: 44px !important;
-  }
-
-  html body aside#fzDesktopSidebar button.fz-sb-btn {
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    border-radius: 13px !important;
-    color: #4A3F39 !important;
-    -webkit-text-fill-color: #4A3F39 !important;
-    font-weight: 700 !important;
-    font-size: 0.92rem !important;
-    padding: 10px 14px !important;
-    min-height: 44px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-  }
-
-  html body aside#fzDesktopSidebar button.fz-sb-btn:hover:not(.is-active) {
-    background: #F3EDE3 !important;
-    color: #181210 !important;
-    -webkit-text-fill-color: #181210 !important;
-  }
-
-  html body aside#fzDesktopSidebar button.fz-sb-btn.is-active {
-    background: linear-gradient(180deg, #962436 0%, #711523 100%) !important;
-    color: #FFFFFF !important;
-    -webkit-text-fill-color: #FFFFFF !important;
-    box-shadow: 0 6px 16px -3px rgba(138, 28, 46, 0.34) !important;
-  }
-
-  html body aside#fzDesktopSidebar button.fz-sb-btn .fz-i {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 20px !important;
-    height: 20px !important;
-    color: inherit !important;
-  }
-
-  html body aside#fzDesktopSidebar button.fz-sb-btn.is-active svg {
-    stroke: #FFFFFF !important;
-    color: #FFFFFF !important;
-  }
-
-  html body aside#fzDesktopCompanion button.fz-comp-action-btn {
-    background: #FFFDF9 !important;
-    border: 1.5px solid #E5DDD0 !important;
-    box-shadow: 0 2px 8px rgba(24, 18, 16, 0.04) !important;
-    border-radius: 15px !important;
-    padding: 11px 14px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-  }
-
-  html body aside#fzDesktopCompanion button.fz-comp-action-btn:hover {
-    border-color: #8A1C2E !important;
-    background: #FFFFFF !important;
-  }
-
-  html body aside#fzDesktopCompanion .fz-action-svg-wrap {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 10px !important;
-    background: #FDF4F3 !important;
-    color: #8A1C2E !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-  }
-}
-
-/* --- 3. Authentic 5-Step Onboarding Redesign (Specificity 0-4-3+, beats all stylesheets) --- */
-html body div.fiezel-ob[role="dialog"] {
-  background: #FAF5ED !important;
-  background-color: #FAF5ED !important;
-  color: #181210 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  padding: 0 !important;
-}
-
-@media (max-width: 767px) {
-  html body div.fiezel-ob[role="dialog"] {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    max-width: 100vw !important;
-    max-height: 100dvh !important;
-    border-radius: 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-  }
-
-  html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal {
-    border-radius: 0 !important;
-  }
-}
-
-@media (min-width: 768px) {
-  html body div.fiezel-ob[role="dialog"] {
-    position: fixed !important;
-    inset: auto !important;
-    top: 50% !important;
-    left: 50% !important;
-    right: auto !important;
-    bottom: auto !important;
-    transform: translate(-50%, -50%) !important;
-    width: 420px !important;
-    max-width: calc(100vw - 32px) !important;
-    height: auto !important;
-    min-height: 636px !important;
-    max-height: calc(100dvh - 36px) !important;
-    border-radius: 30px !important;
-    background: #FAF5ED !important;
-    box-shadow: 0 28px 72px rgba(10, 6, 8, 0.46), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 9999px rgba(18, 13, 15, 0.78) !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-  }
-
-  html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal {
-    border-radius: 30px 30px 0 0 !important;
-  }
-}
-
-/* Header Espresso Canvas + Gold Topographic Lines + Diagonal S-Curve Wave */
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal {
-  position: relative !important;
-  background: linear-gradient(155deg, #211618 0%, #140D0F 100%) !important;
-  background-color: #181113 !important;
-  padding: max(20px, calc(env(safe-area-inset-top, 0px) + 14px)) 20px 80px !important;
-  border: 0 !important;
-  border-bottom: 0 !important;
-  box-shadow: none !important;
-  overflow: hidden !important;
-  flex-shrink: 0 !important;
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fz-auth-topo {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  fill: none !important;
-  stroke: rgba(218, 172, 84, 0.19) !important;
-  stroke-width: 1.05 !important;
-  opacity: 1 !important;
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
-  pointer-events: none !important;
-  z-index: 1 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-ob-header-row {
-  position: relative !important;
-  z-index: 3 !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  width: 100% !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-ob-brand-col {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 4px !important;
-  flex: 0 1 auto !important;
-  min-width: 0 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-ob-brand-col .fiezel-wordmark {
-  height: 24px !important;
-  width: auto !important;
-  max-width: 132px !important;
-  display: block !important;
-  margin: 0 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-ob-brand-col .fz-auth-tagline {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 0.70rem !important;
-  font-weight: 600 !important;
-  color: rgba(253, 250, 243, 0.86) !important;
-  -webkit-text-fill-color: rgba(253, 250, 243, 0.86) !important;
-  margin: 0 !important;
-  letter-spacing: -0.005em !important;
-  white-space: nowrap !important;
-  line-height: 1.2 !important;
-}
-
-/* Top-Right 5-Dot Connected Stepper (fixes fiezel-2.css width:100% desktop bug) */
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fiezel-stepper {
-  width: auto !important;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 2px 0 0 !important;
-  flex: 0 0 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-end !important;
-  gap: 6px !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fiezel-segments {
-  position: relative !important;
-  display: inline-flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 8px !important;
-  height: 12px !important;
-  width: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fiezel-segments::before {
-  content: "" !important;
-  position: absolute !important;
-  left: 4px !important;
-  right: 4px !important;
-  top: 50% !important;
-  height: 1.5px !important;
-  background: rgba(253, 250, 243, 0.25) !important;
-  transform: translateY(-50%) !important;
-  z-index: 0 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fiezel-segments i {
-  position: relative !important;
-  z-index: 1 !important;
-  width: 9px !important;
-  height: 9px !important;
-  min-width: 9px !important;
-  max-width: 9px !important;
-  flex: 0 0 9px !important;
-  border-radius: 50% !important;
-  background: #524644 !important;
-  background-image: none !important;
-  border: 1.5px solid rgba(253, 250, 243, 0.28) !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fiezel-segments i.is-done {
-  background: #A82538 !important;
-  border-color: rgba(253, 250, 243, 0.92) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fiezel-segments i.is-current {
-  box-shadow: 0 0 0 2px rgba(168, 37, 56, 0.35) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fiezel-stepper-eyebrow {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 0.73rem !important;
-  font-weight: 700 !important;
-  color: rgba(253, 250, 243, 0.85) !important;
-  -webkit-text-fill-color: rgba(253, 250, 243, 0.85) !important;
-  background: transparent !important;
-  border: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  line-height: 1 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fz-auth-wave {
-  position: absolute !important;
-  left: -1px !important;
-  right: -1px !important;
-  bottom: -2px !important;
-  width: calc(100% + 2px) !important;
-  height: 78px !important;
-  display: block !important;
-  fill: #FAF5ED !important;
-  color: #FAF5ED !important;
-  z-index: 2 !important;
-  pointer-events: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-reveal .fz-auth-wave path {
-  fill: #FAF5ED !important;
-}
-
-/* Floating Back Button & Daifuku Mochi Stage */
-html body div.fiezel-ob[role="dialog"] .fiezel-topbar {
-  position: relative !important;
-  width: 100% !important;
-  max-width: none !important;
-  height: 0 !important;
-  min-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: visible !important;
-  z-index: 8 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-topbar.is-bare {
-  display: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-topbar button.fiezel-back {
-  position: absolute !important;
-  top: 6px !important;
-  left: 16px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 3px !important;
-  min-height: 30px !important;
-  height: 30px !important;
-  padding: 3px 11px 3px 8px !important;
-  border-radius: 999px !important;
-  background: rgba(255, 253, 249, 0.94) !important;
-  border: 1px solid #E3D9CC !important;
-  color: #3A2E2A !important;
-  -webkit-text-fill-color: #3A2E2A !important;
-  font-size: 0.76rem !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 8px rgba(22, 17, 20, 0.08) !important;
-  cursor: pointer !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-topbar button.fiezel-back[hidden] {
-  display: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-stage {
-  position: relative !important;
-  margin: -60px auto 2px !important;
-  padding: 0 16px !important;
-  width: 100% !important;
-  max-width: 420px !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  background: transparent !important;
-  z-index: 5 !important;
-  flex-shrink: 0 !important;
-}
-
-/* Seamless Travertine Sheet (eliminates pale blue box border from mobile-edge-fit.css:2706) */
-html body div.fiezel-ob[role="dialog"] .fiezel-sheet {
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  padding: 4px 22px 24px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: 11px !important;
-  flex: 1 0 auto !important;
-  width: 100% !important;
-  max-width: 400px !important;
-  margin: 0 auto !important;
-  box-sizing: border-box !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-sheet .fiezel-title,
-html body div.fiezel-ob[role="dialog"] .fiezel-sheet h2 {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-weight: 800 !important;
-  font-size: 1.42rem !important;
-  line-height: 1.22 !important;
-  color: #181210 !important;
-  -webkit-text-fill-color: #181210 !important;
-  text-align: center !important;
-  margin: 0 !important;
-  letter-spacing: -0.02em !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-sheet .fiezel-body {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 0.87rem !important;
-  font-weight: 500 !important;
-  line-height: 1.44 !important;
-  color: #6B5E54 !important;
-  -webkit-text-fill-color: #6B5E54 !important;
-  text-align: center !important;
-  margin: -3px auto 4px !important;
-  max-width: 316px !important;
-}
-
-/* Step 1: Pill-Rounded Warm Travertine Name Input */
-html body div.fiezel-ob[role="dialog"] label.fiezel-name-box {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 11px !important;
-  background: #EFE8DC !important;
-  border: 1.5px solid #DFD5C6 !important;
-  border-radius: 999px !important;
-  padding: 6px 20px !important;
-  min-height: 54px !important;
-  margin: 6px 0 8px !important;
-  box-shadow: inset 0 1px 2px rgba(24, 18, 16, 0.03) !important;
-  box-sizing: border-box !important;
-}
-
-html body div.fiezel-ob[role="dialog"] label.fiezel-name-box:focus-within {
-  background: #FFFDF9 !important;
-  border-color: #8A1C2E !important;
-  box-shadow: 0 0 0 3px rgba(138, 28, 46, 0.14) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] label.fiezel-name-box .fiezel-field-icon {
-  color: #7D6E63 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-}
-
-html body div.fiezel-ob[role="dialog"] label.fiezel-name-box input.fiezel-input {
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  color: #181210 !important;
-  -webkit-text-fill-color: #181210 !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 0.98rem !important;
-  font-weight: 600 !important;
-  padding: 8px 0 !important;
-  width: 100% !important;
-}
-
-html body div.fiezel-ob[role="dialog"] label.fiezel-name-box input.fiezel-input::placeholder {
-  color: #8E8075 !important;
-  -webkit-text-fill-color: #8E8075 !important;
-  font-weight: 500 !important;
-}
-
-/* Luxury Burgundy Pill Primary CTA */
-html body div.fiezel-ob[role="dialog"] button.fiezel-btn-primary,
-html body div.fiezel-ob[role="dialog"] button[data-ob-advance],
-html body div.fiezel-ob[role="dialog"] button.fz-btn-main-start {
-  background: linear-gradient(180deg, #982537 0%, #6E1523 100%) !important;
-  background-color: #8A1C2E !important;
-  color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-weight: 700 !important;
-  font-size: 0.97rem !important;
-  min-height: 50px !important;
-  height: auto !important;
-  padding: 13px 24px !important;
-  margin-top: 4px !important;
-  box-shadow: 0 8px 20px rgba(110, 21, 35, 0.28) !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  transform: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-btn-primary:hover:not(:disabled),
-html body div.fiezel-ob[role="dialog"] button[data-ob-advance]:hover:not(:disabled),
-html body div.fiezel-ob[role="dialog"] button.fz-btn-main-start:hover:not(:disabled) {
-  background: linear-gradient(180deg, #A6293D 0%, #7C1828 100%) !important;
-  box-shadow: 0 10px 24px rgba(110, 21, 35, 0.34) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-btn-primary:disabled,
-html body div.fiezel-ob[role="dialog"] button[data-ob-advance]:disabled {
-  background: #DFD5C7 !important;
-  background-image: none !important;
-  color: #93867B !important;
-  -webkit-text-fill-color: #93867B !important;
-  box-shadow: none !important;
-  cursor: not-allowed !important;
-}
-
-/* Bottom 5-Dot Indicator */
-html body div.fiezel-ob[role="dialog"] .fiezel-dots {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  margin-top: auto !important;
-  padding-top: 8px !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-dots .fiezel-dot {
-  width: 7px !important;
-  height: 7px !important;
-  border-radius: 50% !important;
-  background: #DDD2C4 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-dots .fiezel-dot.is-active {
-  width: 8px !important;
-  height: 8px !important;
-  border-radius: 50% !important;
-  background: #8A1C2E !important;
-  transform: scale(1.14) !important;
-}
-
-/* Step 2: Language Course Cards (Zero Double Checkmark, Warm Ivory Surface) */
-html body div.fiezel-ob[role="dialog"] .fiezel-course-grid {
-  display: flex !important;
-  flex-direction: column !important;
-  grid-template-columns: 1fr !important;
-  gap: 10px !important;
-  width: 100% !important;
-  margin: 2px 0 4px !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-course-grid.is-hidden {
-  display: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-course-card {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  padding: 13px 16px !important;
-  min-height: 62px !important;
-  background: #FFFDF9 !important;
-  border: 1.5px solid #E5DCD0 !important;
-  border-radius: 18px !important;
-  box-shadow: 0 2px 8px rgba(24, 18, 16, 0.04) !important;
-  box-sizing: border-box !important;
-  width: 100% !important;
-  transform: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-course-card::after,
-html body div.fiezel-ob[role="dialog"] .fiezel-goal-card::after {
-  content: none !important;
-  display: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-course-card.is-selected {
-  border: 2px solid #8A1C2E !important;
-  background: #FDF6F5 !important;
-  box-shadow: 0 4px 14px rgba(138, 28, 46, 0.10) !important;
-  padding: 13px 16px !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-course-card .fiezel-course-text b {
-  color: #181210 !important;
-  -webkit-text-fill-color: #181210 !important;
-  font-size: 0.96rem !important;
-  font-weight: 700 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-course-card .fiezel-course-text small {
-  color: #7A6D63 !important;
-  -webkit-text-fill-color: #7A6D63 !important;
-  font-size: 0.78rem !important;
-  font-weight: 500 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-card-check {
-  width: 23px !important;
-  height: 23px !important;
-  border-radius: 50% !important;
-  border: 1.6px solid #D6CABE !important;
-  background: transparent !important;
-  color: transparent !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 12px !important;
-  font-weight: 800 !important;
-  flex-shrink: 0 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-course-card.is-selected .fz-card-check,
-html body div.fiezel-ob[role="dialog"] .fz-card-check.is-checked {
-  background: #8A1C2E !important;
-  border-color: #8A1C2E !important;
-  color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
-}
-
-/* Step 3: Clean Single Language Assistance Card (IPA & Furigana Switches) */
-html body div.fiezel-ob[role="dialog"] .fiezel-en-onboarding-panel,
-html body div.fiezel-ob[role="dialog"] .fiezel-ja-onboarding-panel {
-  background: #FFFDF9 !important;
-  border: 1.5px solid #E5DCD0 !important;
-  border-radius: 20px !important;
-  padding: 15px 16px !important;
-  gap: 11px !important;
-  box-shadow: 0 6px 18px rgba(24, 18, 16, 0.05) !important;
-  margin: 2px 0 4px !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-active-lang-pill {
-  cursor: pointer !important;
-  padding-bottom: 11px !important;
-  border-bottom: 1px solid #ECE3D7 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-active-lang-left b {
-  color: #181210 !important;
-  -webkit-text-fill-color: #181210 !important;
-  font-weight: 700 !important;
-  font-size: 0.95rem !important;
-}
-
-/* Unified Burgundy iOS Toggle Switch for Japanese Furigana Button */
-html body div.fiezel-ob[role="dialog"] button.fiezel-ob-furigana-pill {
-  position: relative !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 44px !important;
-  min-width: 44px !important;
-  height: 25px !important;
-  min-height: 25px !important;
-  border-radius: 999px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  cursor: pointer !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-ob-furigana-pill .fz-sr-furi {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-ob-furigana-pill .fz-switch-track {
-  position: relative !important;
-  display: block !important;
-  width: 44px !important;
-  height: 25px !important;
-  border-radius: 999px !important;
-  background: #D5CCC2 !important;
-  transition: background-color 0.2s ease !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-ob-furigana-pill.is-active .fz-switch-track {
-  background: #8A1C2E !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-ob-furigana-pill .fz-switch-thumb {
-  position: absolute !important;
-  top: 3px !important;
-  left: 3px !important;
-  width: 19px !important;
-  height: 19px !important;
-  border-radius: 50% !important;
-  background: #FFFFFF !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-ob-furigana-pill.is-active .fz-switch-thumb {
-  transform: translateX(19px) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ja-kana-options {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 8px !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-kana-btn {
-  background: #F4EDE2 !important;
-  border: 1.5px solid #E4DACB !important;
-  border-radius: 11px !important;
-  box-shadow: none !important;
-  padding: 7px 10px !important;
-  min-height: 36px !important;
-  color: #5C4F47 !important;
-  -webkit-text-fill-color: #5C4F47 !important;
-  font-size: 0.77rem !important;
-  font-weight: 700 !important;
-  text-align: center !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-kana-btn.is-selected {
-  background: #FDF6F5 !important;
-  border-color: #8A1C2E !important;
-  color: #8A1C2E !important;
-  -webkit-text-fill-color: #8A1C2E !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-sentence-card {
-  background: #F4EDE3 !important;
-  border: 1px solid #E5DCD0 !important;
-  border-radius: 14px !important;
-  padding: 12px 14px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: 6px !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fz-ob-ruby {
-  background: transparent !important;
-  border: 0 !important;
-  border-bottom: 1.5px dashed rgba(138, 28, 46, 0.35) !important;
-  border-radius: 4px !important;
-  box-shadow: none !important;
-  padding: 2px 4px !important;
-  min-height: 0 !important;
-  color: #181210 !important;
-  -webkit-text-fill-color: #181210 !important;
-  font-size: 1.16rem !important;
-  font-weight: 700 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fz-ob-ruby.is-active {
-  background: rgba(138, 28, 46, 0.08) !important;
-  border-bottom-style: solid !important;
-  border-bottom-color: #8A1C2E !important;
-}
-
-html body div.fiezel-ob[role="dialog"] ruby rt {
-  color: #8A1C2E !important;
-  -webkit-text-fill-color: #8A1C2E !important;
-  font-size: 0.68rem !important;
-  font-weight: 700 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-ob-sentence-card.hide-furigana ruby rt {
-  visibility: hidden !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-ob-plain {
-  color: #181210 !important;
-  font-size: 1.12rem !important;
-  font-weight: 600 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-ob-id-line {
-  display: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-ob-inspection-chip {
-  background: #FFFDF9 !important;
-  border: 1px solid #E5DCD0 !important;
-  border-radius: 999px !important;
-  padding: 3px 12px !important;
-  font-size: 0.78rem !important;
-  color: #4A3E37 !important;
-  gap: 6px !important;
-  align-items: center !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fz-ob-inspection-chip b {
-  color: #8A1C2E !important;
-}
-
-/* Step 4: 2x3 Goal Grid & Clean Lean Mode */
-html body div.fiezel-ob[role="dialog"].is-lean .fiezel-level-block {
-  display: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-goal-grid:not(.fiezel-language-grid) {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 10px !important;
-  width: 100% !important;
-  margin: 2px 0 4px !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-goal-card:not(.fiezel-language-choice) {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 7px !important;
-  padding: 13px 10px !important;
-  min-height: 84px !important;
-  background: #FFFDF9 !important;
-  border: 1.5px solid #E5DCD0 !important;
-  border-radius: 18px !important;
-  box-shadow: 0 2px 8px rgba(24, 18, 16, 0.04) !important;
-  text-align: center !important;
-  transform: none !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-goal-card:not(.fiezel-language-choice).is-selected {
-  padding: 13px 10px !important;
-  border: 2px solid #8A1C2E !important;
-  background: #FDF6F5 !important;
-  box-shadow: 0 4px 14px rgba(138, 28, 46, 0.11) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fiezel-goal-card .fz-goal-card-title {
-  color: #181210 !important;
-  -webkit-text-fill-color: #181210 !important;
-  font-size: 0.85rem !important;
-  font-weight: 700 !important;
-  line-height: 1.24 !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button[data-ob-step-skip] {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  color: #7A6D63 !important;
-  -webkit-text-fill-color: #7A6D63 !important;
-  font-size: 0.80rem !important;
-  font-weight: 600 !important;
-  min-height: 30px !important;
-  height: auto !important;
-  padding: 2px 10px !important;
-  margin-top: -2px !important;
-  align-self: center !important;
-  width: auto !important;
-}
-
-/* Step 5: Starting Path Cards + Underlined "Nanti Saja" + Burgundy "Mulai Belajar →" */
-html body div.fiezel-ob[role="dialog"] .fiezel-path-card {
-  background: #FFFDF9 !important;
-  border: 1.5px solid #E5DCD0 !important;
-  border-radius: 18px !important;
-  padding: 14px 16px !important;
-  box-shadow: 0 2px 8px rgba(24, 18, 16, 0.04) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] .fiezel-path-card.is-selected {
-  border: 2px solid #8A1C2E !important;
-  background: #FDF6F5 !important;
-  box-shadow: 0 4px 14px rgba(138, 28, 46, 0.11) !important;
-}
-
-html body div.fiezel-ob[role="dialog"] button.fz-skip-link {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  color: #3A2E2A !important;
-  -webkit-text-fill-color: #3A2E2A !important;
-  font-size: 0.86rem !important;
-  font-weight: 700 !important;
-  text-decoration: underline !important;
-  text-underline-offset: 3px !important;
-  min-height: 32px !important;
-  height: auto !important;
-  padding: 4px 12px !important;
-  width: auto !important;
 }

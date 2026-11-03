@@ -277,7 +277,7 @@
             if (installCeilingTimer) { clearTimeout(installCeilingTimer); installCeilingTimer = 0; }
             if (postInstallTimer) { clearTimeout(postInstallTimer); postInstallTimer = 0; }
             if (typeof w.removeEventListener === 'function') w.removeEventListener('statechange', onState);
-            finishReload(false);
+            finishReload(true);
           }
         };
         if (typeof w.addEventListener === 'function') {
