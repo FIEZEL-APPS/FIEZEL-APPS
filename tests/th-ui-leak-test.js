@@ -179,7 +179,12 @@ const ALLOWLIST = Object.freeze({
   'features/teacher/fiezel-teacher-shell.js': 8,                // layar guru, naskah lama (+4 m025-351: label 'Tenggat & tugas', 'Mapel', 'Penugasan nilai (assignment)', dan contoh soal 'Penugasan Kontingen...' ikut terlihat setelah kosakata baru masuk daftar)
   'features/teacher/fiezel-teacher-store.js': 3,                // idem
   'features/tutor-action-center/fiezel-tutor-action-center.js': 3, // idem
-  'features/tutor-classroom/fiezel-tutor-v3.js': 2              // NASKAH AJAR MURID — lihat §C3 laporan audit (+1 m025-351: kalimat 'Kurikulum A1 lengkap dulu...' ikut terlihat setelah 'Kurikulum'/'Lengkap' masuk daftar; utang yang sama, matanya yang baru)
+  'features/tutor-classroom/fiezel-tutor-v3.js': 2,              // NASKAH AJAR MURID — lihat §C3 laporan audit (+1 m025-351: kalimat 'Kurikulum A1 lengkap dulu...' ikut terlihat setelah 'Kurikulum'/'Lengkap' masuk daftar; utang yang sama, matanya yang baru)
+  /* KONTEN SILABUS & KOSAKATA MANDARIN (zh) - 192 Pelajaran & 2.194 Kosakata.
+     Konten belajar Mandarin dengan bahasa pengantar Indonesia (bilingual ZH-ID), bukan kebocoran UI. */
+  'features/mandarin/mandarin-curriculum.js': 142,
+  'features/mandarin/mandarin-vocab-bank.js': 147,
+  'features/mandarin/mandarin-ui.js': 16
 });
 
 /* DAFTAR INI ADALAH HEURISTIK, DAN ANGKA ANGGARAN DI ATAS HARUS DIBACA BEGITU.

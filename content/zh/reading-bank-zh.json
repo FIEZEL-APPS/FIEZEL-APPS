@@ -1,0 +1,2377 @@
+[
+  {
+    "id": "rzh0001",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "我的小狗 (Anjing Kecilku)",
+    "text": "我家有一只小狗。它的名字叫球球。球球很白，眼睛很大。它很喜欢和我一起玩。每天早上我给它吃东西。",
+    "topic": "hewan",
+    "qs": [
+      [
+        "Teks ini menceritakan tentang hewan apa?",
+        [
+          "Kucing",
+          "Anjing",
+          "Burung",
+          "Ikan"
+        ],
+        1,
+        {
+          "explanation": "Teks menyebutkan 我家有一只小狗 (Rumahku punya anjing kecil)."
+        }
+      ],
+      [
+        "Siapa nama anjing kecil tersebut?",
+        [
+          "Bai-bai",
+          "Qiu-qiu",
+          "Xiao-xiao",
+          "Hei-hei"
+        ],
+        1,
+        {
+          "explanation": "Namanya adalah 球球 (Qiu-qiu)."
+        }
+      ],
+      [
+        "Kapan penulis memberi makan anjingnya?",
+        [
+          "Pagi hari",
+          "Siang hari",
+          "Sore hari",
+          "Malam hari"
+        ],
+        0,
+        {
+          "explanation": "每天早上 (Setiap pagi)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0002",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "周末去北京 (Akhir Pekan ke Beijing)",
+    "text": "上个星期六，我和朋友坐高铁去北京旅游。高铁非常快，两个小时就到了。我们在北京吃了北京烤鸭，味道好极了。第二天我们还去了故宫。",
+    "topic": "perjalanan",
+    "qs": [
+      [
+        "Bagaimana penulis pergi ke Beijing?",
+        [
+          "Pesawat terbang",
+          "Kereta cepat",
+          "Bus",
+          "Mobil pribadi"
+        ],
+        1,
+        {
+          "explanation": "坐高铁 (Naik kereta cepat)."
+        }
+      ],
+      [
+        "Berapa lama perjalanan ke Beijing?",
+        [
+          "1 jam",
+          "2 jam",
+          "3 jam",
+          "4 jam"
+        ],
+        1,
+        {
+          "explanation": "两个小时就到了 (Dua jam sudah sampai)."
+        }
+      ],
+      [
+        "Makanan khas apa yang mereka cicipi?",
+        [
+          "Mie tarik",
+          "Bebek panggang Beijing",
+          "Hotpot",
+          "Dimsum"
+        ],
+        1,
+        {
+          "explanation": "北京烤鸭 (Bebek panggang Beijing)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0003",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "中国茶文化 (Budaya Teh Tiongkok)",
+    "text": "在中国，喝茶不仅是一种生活习惯，更是一种传统文化。中国人喝茶的历史可以追溯到几千年前。茶可以分为绿茶、红茶、乌龙茶等多种。喝茶能让人静心，也能促进健康。",
+    "topic": "budaya",
+    "qs": [
+      [
+        "Selain kebiasaan hidup, minum teh di Tiongkok mencerminkan apa?",
+        [
+          "Teknologi modern",
+          "Budaya tradisional",
+          "Olahraga",
+          "Komersial"
+        ],
+        1,
+        {
+          "explanation": "更是一种传统文化 (Bahkan merupakan budaya tradisional)."
+        }
+      ],
+      [
+        "Berikut ini adalah jenis teh yang disebutkan dalam teks, KECUALI:",
+        [
+          "Teh hijau",
+          "Teh merah",
+          "Teh Oolong",
+          "Teh boba"
+        ],
+        3,
+        {
+          "explanation": "Teks menyebutkan 绿茶 (hijau), 红茶 (merah), dan 乌龙茶 (Oolong)."
+        }
+      ],
+      [
+        "Apa manfaat minum teh yang disebutkan?",
+        [
+          "Membuat kaya",
+          "Menenangkan pikiran & menunjang kesehatan",
+          "Menghilangkan kantuk permanen",
+          "Menambah berat badan"
+        ],
+        1,
+        {
+          "explanation": "喝茶能让人静心，也能促进健康。"
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0004",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "互联网与移动支付 (Internet & Pembayaran Seluler)",
+    "text": "随着智能手机的普及，移动支付已经彻底改变了人们的消费模式。如今出门在外，人们只需要带一部手机，无论是乘坐公共交通、买菜购物还是餐厅用餐，扫码支付就能轻松完成。这种无现金生活极大提升了社会运行效率。",
+    "topic": "teknologi",
+    "qs": [
+      [
+        "Apa dampak utama dari popularitas ponsel pintar dalam teks?",
+        [
+          "Orang jarang bepergian",
+          "Mengubah pola konsumsi masyarakat",
+          "Mengurangi belanja",
+          "Menghilangkan transportasi umum"
+        ],
+        1,
+        {
+          "explanation": "彻底改变了人们的消费模式。"
+        }
+      ],
+      [
+        "Bagaimana cara orang membayar saat berbelanja menurut teks?",
+        [
+          "Uang koin",
+          "Kartu debit magnetik",
+          "Pindai kode QR (扫码)",
+          "Cek tunai"
+        ],
+        2,
+        {
+          "explanation": "扫码支付就能轻松完成。"
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0005",
+    "level": "C1",
+    "hsk": "HSK 5-6",
+    "title": "成语里的哲学智慧 (Kebijaksanaan Filosofis dalam Chengyu)",
+    "text": "汉语成语是中华文明长河中沉淀出的语言精华。许多成语背后都蕴含着深邃的人生哲理与辩证思维。例如“塞翁失马，焉知非福”，告诉人们祸福相依、凡事不可只看表面的辩证法则。深入理解成语，是领悟中华思想精神的必由之路。",
+    "topic": "filsafat",
+    "qs": [
+      [
+        "Apa inti pengajaran dari peribahasa “塞翁失马，焉知非福”?",
+        [
+          "Musibah dan berkah saling berdampingan",
+          "Kuda selalu lari",
+          "Jangan memelihara kuda di perbatasan",
+          "Kemalangan bersifat abadi"
+        ],
+        0,
+        {
+          "explanation": "祸福相依、凡事不可只看表面的辩证法则。"
+        }
+      ],
+      [
+        "Menurut teks, mengapa memahami Chengyu sangat penting?",
+        [
+          "Untuk lulus ujian matematika",
+          "Sebagai jalan memahami nilai pemikiran dan kebudayaan Tiongkok",
+          "Untuk berbisnis di pasar tradisional",
+          "Untuk menghafal angka"
+        ],
+        1,
+        {
+          "explanation": "是领悟中华思想精神的必由之路。"
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0006",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "我的朋友大卫 (Temanku David)",
+    "text": "我有一个朋友叫大卫。他是美国人，现在在北京学习汉语。大卫喜欢喝中国茶，也喜欢吃米饭。我们常常一起去图书馆看书。",
+    "topic": "perkenalan",
+    "qs": [
+      [
+        "Di mana David sekarang belajar bahasa Mandarin?",
+        [
+          "Di Shanghai",
+          "Di Beijing",
+          "Di Guangzhou",
+          "Di Taipei"
+        ],
+        1,
+        {
+          "explanation": "Teks menyatakan 大卫现在在北京学习汉语 (David sekarang di Beijing belajar bahasa Mandarin)."
+        }
+      ],
+      [
+        "Minuman apa yang disukai David?",
+        [
+          "Kopi",
+          "Susu",
+          "Teh Tiongkok",
+          "Jus buah"
+        ],
+        2,
+        {
+          "explanation": "Teks menyebutkan 大卫喜欢喝中国茶 (David suka minum teh Tiongkok)."
+        }
+      ],
+      [
+        "Ke mana penulis dan David sering pergi bersama?",
+        [
+          "Bioskop",
+          "Taman bermain",
+          "Pasar tradisional",
+          "Perpustakaan"
+        ],
+        3,
+        {
+          "explanation": "Teks menyatakan 我们常常一起去图书馆看书 (Kami sering bersama pergi ke perpustakaan membaca buku)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0007",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "小王的一家 (Keluarga Xiao Wang)",
+    "text": "小王家有四口人：爸爸、妈妈、姐姐和他。爸爸是老师，在学校工作。妈妈是医生，在医院工作。小王和姐姐都是学生。",
+    "topic": "keluarga",
+    "qs": [
+      [
+        "Ada berapa anggota keluarga di rumah Xiao Wang?",
+        [
+          "Tiga orang",
+          "Empat orang",
+          "Lima orang",
+          "Enam orang"
+        ],
+        1,
+        {
+          "explanation": "Teks menyebutkan 小王家有四口人 (Keluarga Xiao Wang ada empat orang)."
+        }
+      ],
+      [
+        "Di mana ayah Xiao Wang bekerja?",
+        [
+          "Di rumah sakit",
+          "Di kantor",
+          "Di sekolah",
+          "Di bank"
+        ],
+        2,
+        {
+          "explanation": "Teks menyatakan 爸爸是老师，在学校工作 (Ayah adalah guru, bekerja di sekolah)."
+        }
+      ],
+      [
+        "Apa profesi ibu Xiao Wang?",
+        [
+          "Dokter",
+          "Guru",
+          "Pedagang",
+          "Pramugari"
+        ],
+        0,
+        {
+          "explanation": "Teks menyebutkan 妈妈是医生 (Ibu adalah dokter)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0008",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "去商店买水果 (Pergi ke Toko Membeli Buah)",
+    "text": "今天下午，我和妈妈去商店买水果。商店里有很多苹果和香蕉。苹果一斤五块钱，香蕉一斤三块钱。妈妈买了三斤苹果和两斤香蕉。",
+    "topic": "belanja",
+    "qs": [
+      [
+        "Berapa harga satu kati (jin) buah apel?",
+        [
+          "Tiga yuan",
+          "Empat yuan",
+          "Lima yuan",
+          "Delapan yuan"
+        ],
+        2,
+        {
+          "explanation": "Teks menyebutkan 苹果一斤五块钱 (Apel satu kati 5 yuan)."
+        }
+      ],
+      [
+        "Kapan penulis dan ibunya pergi ke toko?",
+        [
+          "Pagi hari",
+          "Siang hari",
+          "Sore hari",
+          "Malam hari"
+        ],
+        2,
+        {
+          "explanation": "Teks menyebutkan 今天下午 (Sore hari ini)."
+        }
+      ],
+      [
+        "Berapa kati apel yang dibeli ibu?",
+        [
+          "Satu kati",
+          "Dua kati",
+          "Tiga kati",
+          "Empat kati"
+        ],
+        2,
+        {
+          "explanation": "Teks menyebutkan 妈妈买了三斤苹果 (Ibu membeli tiga kati apel)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0009",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "星期天的生活 (Kegiatan Hari Minggu)",
+    "text": "今天是星期天，天气很好。我不去学校。早上八点我起床，然后和哥哥在家里做作业。下午我们去公园踢足球。晚上八点半看电视。",
+    "topic": "kegiatan",
+    "qs": [
+      [
+        "Jam berapa penulis bangun pada hari Minggu?",
+        [
+          "Jam 7 pagi",
+          "Jam 8 pagi",
+          "Jam 9 pagi",
+          "Jam 10 pagi"
+        ],
+        1,
+        {
+          "explanation": "Teks menyatakan 早上八点我起床 (Pagi jam delapan saya bangun)."
+        }
+      ],
+      [
+        "Olahraga apa yang dilakukan penulis di taman?",
+        [
+          "Bola basket",
+          "Bulu tangkis",
+          "Berenang",
+          "Sepak bola"
+        ],
+        3,
+        {
+          "explanation": "Teks menyebutkan 下午我们去公园踢足球 (Sore hari kami pergi ke taman bermain sepak bola)."
+        }
+      ],
+      [
+        "Dengan siapa penulis mengerjakan PR di rumah?",
+        [
+          "Adik",
+          "Ibu",
+          "Kakak laki-laki",
+          "Teman"
+        ],
+        2,
+        {
+          "explanation": "和哥哥在家里做作业 (Bersama kakak laki-laki di rumah mengerjakan PR)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0010",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "中国菜 (Masakan Tiongkok)",
+    "text": "我很喜欢吃中国菜。北京烤鸭很好吃，饺子也很香。今天我和朋友去一家中国饭馆吃饭。服务员很客气。我们吃得很开心。",
+    "topic": "makanan",
+    "qs": [
+      [
+        "Makanan apa yang menurut penulis sangat enak?",
+        [
+          "Bebek panggang Beijing",
+          "Ayam goreng",
+          "Roti tawar",
+          "Sup jagung"
+        ],
+        0,
+        {
+          "explanation": "Teks menyebutkan 北京烤鸭很好吃 (Bebek panggang Beijing sangat enak)."
+        }
+      ],
+      [
+        "Dengan siapa penulis makan di restoran?",
+        [
+          "Ayah",
+          "Ibu",
+          "Teman",
+          "Guru"
+        ],
+        2,
+        {
+          "explanation": "我和朋友去一家中国饭馆 (Saya dan teman pergi ke sebuah restoran Tiongkok)."
+        }
+      ],
+      [
+        "Bagaimana sikap pelayan di restoran tersebut?",
+        [
+          "Galak",
+          "Sopan / ramah",
+          "Lambat",
+          "Acuh tak acuh"
+        ],
+        1,
+        {
+          "explanation": "服务员很客气 (Pelayan sangat sopan dan ramah)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0011",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "坐出租车 (Naik Taksi)",
+    "text": "李月要去火车站。她走到路边坐了一辆出租车。司机很热情，问她：“你去哪儿？”李月说：“请送我去火车站，谢谢。”二十分钟后到了。",
+    "topic": "transportasi",
+    "qs": [
+      [
+        "Ke mana Li Yue ingin pergi?",
+        [
+          "Bandara",
+          "Stasiun kereta api",
+          "Sekolah",
+          "Pasar"
+        ],
+        1,
+        {
+          "explanation": "李月要去火车站 (Li Yue mau pergi ke stasiun kereta api)."
+        }
+      ],
+      [
+        "Kendaraan apa yang dinaiki oleh Li Yue?",
+        [
+          "Bus",
+          "MRT",
+          "Taksi",
+          "Sepeda"
+        ],
+        2,
+        {
+          "explanation": "坐了一辆出租车 (Menaiki sebuah taksi)."
+        }
+      ],
+      [
+        "Berapa lama waktu perjalanan sampai ke tujuan?",
+        [
+          "10 menit",
+          "20 menit",
+          "30 menit",
+          "1 jam"
+        ],
+        1,
+        {
+          "explanation": "二十分钟后到了 (Dua puluh menit kemudian sampai)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0012",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "我的手表 (Jam Tanganku)",
+    "text": "这块黑色的手表是妈妈送给我的生日礼物。它非常漂亮，而且走得很准。每天看时间我都用它。我非常爱惜这块手表。",
+    "topic": "waktu",
+    "qs": [
+      [
+        "Warna apa jam tangan penulis?",
+        [
+          "Putih",
+          "Biru",
+          "Hitam",
+          "Merah"
+        ],
+        2,
+        {
+          "explanation": "这块黑色的手表 (Jam tangan berwarna hitam ini)."
+        }
+      ],
+      [
+        "Siapa yang memberikan hadiah ulang tahun tersebut?",
+        [
+          "Ayah",
+          "Ibu",
+          "Kakek",
+          "Sahabat"
+        ],
+        1,
+        {
+          "explanation": "妈妈送给我的生日礼物 (Hadiah ulang tahun dari ibu untukku)."
+        }
+      ],
+      [
+        "Bagaimana kondisi penunjuk waktu jam tangan itu?",
+        [
+          "Sering telat",
+          "Sangat akurat / tepat",
+          "Rusak",
+          "Mati"
+        ],
+        1,
+        {
+          "explanation": "走得很准 (Jalannya sangat akurat/tepat waktu)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0013",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "明天的天气 (Cuaca Besok)",
+    "text": "今天晚上我看电视上的天气预报。明天北京会下雨，天气很冷。最高气温只有十度。老师提醒大家出门要带雨伞，多穿衣服。",
+    "topic": "cuaca",
+    "qs": [
+      [
+        "Bagaimana cuaca di Beijing besok?",
+        [
+          "Cerah berawan",
+          "Hujan dan dingin",
+          "Bersalju tebal",
+          "Panas terik"
+        ],
+        1,
+        {
+          "explanation": "明天北京会下雨，天气很冷 (Besok Beijing akan hujan, cuaca sangat dingin)."
+        }
+      ],
+      [
+        "Berapa suhu maksimum besok?",
+        [
+          "5 derajat",
+          "10 derajat",
+          "15 derajat",
+          "20 derajat"
+        ],
+        1,
+        {
+          "explanation": "最高气温只有十度 (Suhu maksimum hanya 10 derajat)."
+        }
+      ],
+      [
+        "Benda apa yang diingatkan guru untuk dibawa besok?",
+        [
+          "Topi",
+          "Buku",
+          "Payung",
+          "Sepatu bot"
+        ],
+        2,
+        {
+          "explanation": "出门要带雨伞 (Keluar rumah harus membawa payung)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0014",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "听音乐 (Mendengarkan Musik)",
+    "text": "我哥哥最大的爱好是听音乐。他买了很多中文歌的CD。每天晚上做完功课以后，他都会在房间里听半个小时的音乐。",
+    "topic": "hobi",
+    "qs": [
+      [
+        "Apa hobi terbesar kakak laki-laki penulis?",
+        [
+          "Membaca komik",
+          "Mendengarkan musik",
+          "Bermain game",
+          "Memasak"
+        ],
+        1,
+        {
+          "explanation": "最大的爱好是听音乐 (Hobi terbesar adalah mendengarkan musik)."
+        }
+      ],
+      [
+        "Kapan kakak biasanya mendengarkan musik?",
+        [
+          "Sebelum sarapan",
+          "Saat di sekolah",
+          "Setelah selesai PR",
+          "Tengah malam"
+        ],
+        2,
+        {
+          "explanation": "做完功课以后 (Setelah selesai mengerjakan PR)."
+        }
+      ],
+      [
+        "Berapa lama kakak mendengarkan musik setiap malam?",
+        [
+          "15 menit",
+          "30 menit (setengah jam)",
+          "1 jam",
+          "2 jam"
+        ],
+        1,
+        {
+          "explanation": "听半个小时 (Mendengarkan selama setengah jam)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0015",
+    "level": "A1",
+    "hsk": "HSK 1",
+    "title": "我的小猫咪咪 (Kucingku Mimi)",
+    "text": "我家有一只小猫，它的名字叫咪咪。咪咪全身都是黄色的毛。它最喜欢喝牛奶，也喜欢在沙发上睡觉。它是一只非常可爱的猫。",
+    "topic": "hewan",
+    "qs": [
+      [
+        "Apa warna bulu kucing Mimi?",
+        [
+          "Hitam pekat",
+          "Kuning seluruh tubuh",
+          "Belang abu-abu",
+          "Putih bersih"
+        ],
+        1,
+        {
+          "explanation": "全身都是黄色的毛 (Seluruh badannya berbulu kuning)."
+        }
+      ],
+      [
+        "Minuman apa yang paling disukai Mimi?",
+        [
+          "Air teh",
+          "Susu",
+          "Air mineral",
+          "Kopi"
+        ],
+        1,
+        {
+          "explanation": "它最喜欢喝牛奶 (Ia paling suka minum susu)."
+        }
+      ],
+      [
+        "Di mana Mimi biasanya suka tidur?",
+        [
+          "Di kasur",
+          "Di atas sofa",
+          "Di bawah meja",
+          "Di depan pintu"
+        ],
+        1,
+        {
+          "explanation": "在沙发上睡觉 (Tidur di atas sofa)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0016",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "打篮球的快乐 (Kegembiraan Bermain Basket)",
+    "text": "张明从小就非常喜欢运动。虽然学习很忙，但他每个周末都会抽出两个小时和同学打篮球。他觉得运动不仅能锻炼身体，还能放松心情。",
+    "topic": "olahraga",
+    "qs": [
+      [
+        "Kapan Zhang Ming biasanya menyempatkan waktu bermain basket?",
+        [
+          "Setiap hari kerja",
+          "Setiap akhir pekan",
+          "Sebulan sekali",
+          "Saat liburan semester"
+        ],
+        1,
+        {
+          "explanation": "每个周末都会抽出两个小时 (Setiap akhir pekan menyempatkan 2 jam)."
+        }
+      ],
+      [
+        "Selain melatih fisik, apa manfaat olahraga menurut Zhang Ming?",
+        [
+          "Mencari uang",
+          "Menenangkan pikiran / rileks",
+          "Mendapat nilai bagus",
+          "Mengurangi tidur"
+        ],
+        1,
+        {
+          "explanation": "还能放松心情 (Juga bisa merilekskan pikiran)."
+        }
+      ],
+      [
+        "Dengan siapa Zhang Ming bermain basket?",
+        [
+          "Ayah dan adik",
+          "Teman sekelas",
+          "Pelatih profesional",
+          "Sendirian"
+        ],
+        1,
+        {
+          "explanation": "和同学打篮球 (Bermain basket bersama teman sekelas)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0017",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "去医院看病 (Pergi ke Rumah Sakit)",
+    "text": "昨天早上一起来，小李就觉得头疼、喉咙痛，还发烧了。妈妈马上带他去了附近的医院。医生检查后说他是感冒了，需要按时吃药并多喝水。",
+    "topic": "kesehatan",
+    "qs": [
+      [
+        "Gejala apa saja yang dialami Xiao Li kemarin pagi?",
+        [
+          "Sakit perut dan mual",
+          "Pusing, sakit tenggorokan, dan demam",
+          "Kaki patah",
+          "Sakit gigi"
+        ],
+        1,
+        {
+          "explanation": "觉得头疼、喉咙痛，还发烧了 (Merasa pusing, sakit tenggorokan, dan demam)."
+        }
+      ],
+      [
+        "Diagnosis apa yang diberikan oleh dokter kepada Xiao Li?",
+        [
+          "Alergi makanan",
+          "Kelelahan ringan",
+          "Flu / masuk angin",
+          "Asma"
+        ],
+        2,
+        {
+          "explanation": "医生检查后说他是感冒了 (Setelah periksa dokter bilang ia terkena flu)."
+        }
+      ],
+      [
+        "Nasihat apa yang diberikan dokter selain minum obat tepat waktu?",
+        [
+          "Banyak minum air",
+          "Langsung berolahraga",
+          "Tidur di lantai",
+          "Makan makanan pedas"
+        ],
+        0,
+        {
+          "explanation": "需要按时吃药并多喝水 (Perlu minum obat teratur dan banyak minum air)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0018",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "乘坐高铁去上海 (Naik Kereta Cepat ke Shanghai)",
+    "text": "上个星期，王先生第一次体验了中国的复兴号高速铁路。从北京到上海一千三百多公里，高铁只用了四个半小时。车厢里不仅干净安静，还提供免费的无线网络。",
+    "topic": "perjalanan",
+    "qs": [
+      [
+        "Berapa lama perjalanan kereta cepat dari Beijing ke Shanghai?",
+        [
+          "2 jam",
+          "4,5 jam",
+          "8 jam",
+          "12 jam"
+        ],
+        1,
+        {
+          "explanation": "高铁只用了四个半小时 (Kereta cepat hanya butuh 4 setengah jam)."
+        }
+      ],
+      [
+        "Fasilitas gratis apa yang disediakan di dalam gerbong kereta?",
+        [
+          "Makanan prasmanan",
+          "WiFi nirkabel gratis",
+          "Buku komik",
+          "Kamar tidur"
+        ],
+        1,
+        {
+          "explanation": "提供免费的无线网络 (Menyediakan internet nirkabel gratis)."
+        }
+      ],
+      [
+        "Berapa kira-kira jarak tempuh Beijing ke Shanghai pada teks?",
+        [
+          "500 km",
+          "800 km",
+          "1.300+ km",
+          "2.000 km"
+        ],
+        2,
+        {
+          "explanation": "一千三百多公里 (Seribu tiga ratus lebih kilometer)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0019",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "网上购物体验 (Pengalaman Belanja Daring)",
+    "text": "现在在中国生活非常方便。很多人喜欢在手机应用上网购。林娜昨天在淘宝上买了一双运动鞋，今天下午快递员就把包裹送到了家门口。如果尺码不合适还可以七天无理由退货。",
+    "topic": "belanja",
+    "qs": [
+      [
+        "Barang apa yang dibeli Lin Na secara daring kemarin?",
+        [
+          "Jaket tebal",
+          "Sepatu olahraga",
+          "Tas sekolah",
+          "Ponsel pintar"
+        ],
+        1,
+        {
+          "explanation": "买了一双运动鞋 (Membeli sepasang sepatu olahraga)."
+        }
+      ],
+      [
+        "Berapa lama paket pesanan Lin Na sampai ke rumah?",
+        [
+          "Hanya 1 hari (kemarin beli, hari ini sampai)",
+          "3 hari",
+          "1 minggu",
+          "2 minggu"
+        ],
+        0,
+        {
+          "explanation": "昨天买了，今天下午就送到了 (Kemarin beli, sore ini sudah diantar)."
+        }
+      ],
+      [
+        "Kemudahan apa yang didapatkan jika ukuran barang tidak sesuai?",
+        [
+          "Diberikan uang saku",
+          "Bisa retur tanpa syarat dalam 7 hari",
+          "Barang harus dibuang",
+          "Denda penggantian"
+        ],
+        1,
+        {
+          "explanation": "可以七天无理由退货 (Bisa retur tanpa syarat 7 hari)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0020",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "绿色出行保护环境 (Bepergian Hijau Menjaga Lingkungan)",
+    "text": "为了减少城市空气污染，越来越多的市民选择骑共享单车或者乘地铁上下班。这样不仅能避免早晚高峰的路上堵车，还能为环境保护贡献一份力量。",
+    "topic": "lingkungan",
+    "qs": [
+      [
+        "Mengapa banyak warga memilih sepeda sewa bersama atau MRT?",
+        [
+          "Karena tiket pesawat mahal",
+          "Untuk mengurangi polusi udara perkotaan",
+          "Karena tidak bisa menyetir",
+          "Karena dilarang berjalan kaki"
+        ],
+        1,
+        {
+          "explanation": "为了减少城市空气污染 (Demi mengurangi polusi udara kota)."
+        }
+      ],
+      [
+        "Manfaat apa yang langsung dirasakan warga saat berangkat kerja?",
+        [
+          "Menghindari macet jam sibuk",
+          "Dapat sarapan gratis",
+          "Mendapat teman baru",
+          "Bebas biaya parkir"
+        ],
+        0,
+        {
+          "explanation": "避免早晚高峰的路上堵车 (Menghindari kemacetan jam sibuk pagi/sore)."
+        }
+      ],
+      [
+        "Teks ini mengajak pembaca untuk mendukung gerakan apa?",
+        [
+          "Gaya hidup mewah",
+          "Perjalanan hijau / ramah lingkungan",
+          "Bekerja lembur",
+          "Membeli mobil baru"
+        ],
+        1,
+        {
+          "explanation": "绿色出行 (Perjalanan hijau/ramah lingkungan)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0021",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "大学图书馆 (Perpustakaan Universitas)",
+    "text": "我们学校的新图书馆是一栋五层高的白色大楼。一楼是借还书大厅和电子阅览室，二楼到四楼整齐地放着各种专业图书。每到期末考试周，很多学生都会早早来占座自习。",
+    "topic": "perpustakaan",
+    "qs": [
+      [
+        "Ada berapa lantai gedung perpustakaan universitas tersebut?",
+        [
+          "3 lantai",
+          "4 lantai",
+          "5 lantai",
+          "6 lantai"
+        ],
+        2,
+        {
+          "explanation": "一栋五层高的白色大楼 (Sebuah gedung putih setinggi 5 lantai)."
+        }
+      ],
+      [
+        "Apa fasilitas yang terdapat di lantai satu?",
+        [
+          "Kantin dan kafe",
+          "Aula peminjaman & ruang baca digital",
+          "Kamar asrama",
+          "Lapangan basket"
+        ],
+        1,
+        {
+          "explanation": "借还书大厅和电子阅览室 (Aula pinjam-kembali dan ruang baca elektronik)."
+        }
+      ],
+      [
+        "Kapan mahasiswa paling ramai datang pagi-pagi untuk mencari tempat?",
+        [
+          "Awal semester baru",
+          "Pekan ujian akhir semester",
+          "Hari libur nasional",
+          "Setiap hari Sabtu"
+        ],
+        1,
+        {
+          "explanation": "每到期末考试周 (Setiap tiba pekan ujian akhir)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0022",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "生日聚会 (Pesta Ulang Tahun Sahabat)",
+    "text": "昨天是李华的二十岁生日。几个好朋友为他在一家特色餐厅准备了惊喜派对。大家送给他一本精美的相册，里面记录了他们四年大学生活的所有美好瞬间。李华感动得流下了眼泪。",
+    "topic": "persahabatan",
+    "qs": [
+      [
+        "Berapa usia Li Hua yang dirayakan kemarin?",
+        [
+          "18 tahun",
+          "19 tahun",
+          "20 tahun",
+          "21 tahun"
+        ],
+        2,
+        {
+          "explanation": "李华的二十岁生日 (Ulang tahun ke-20 Li Hua)."
+        }
+      ],
+      [
+        "Hadiah apa yang diberikan teman-temannya kepada Li Hua?",
+        [
+          "Jam tangan emas",
+          "Album foto kenangan indah",
+          "Sepeda baru",
+          "Laptop"
+        ],
+        1,
+        {
+          "explanation": "一本精美的相册 (Sebuah album foto yang indah)."
+        }
+      ],
+      [
+        "Bagaimana reaksi emosional Li Hua saat menerima kejutan itu?",
+        [
+          "Biasa saja",
+          "Marah karena terkejut",
+          "Terharu hingga meneteskan air mata",
+          "Tertawa tanpa henti"
+        ],
+        2,
+        {
+          "explanation": "感动得流下了眼泪 (Terharu hingga meneteskan air mata)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0023",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "学做麻婆豆腐 (Belajar Memasak Mapo Tahu)",
+    "text": "陈阿姨非常擅长做川菜。今天下午她耐心地教我做地道的四川麻婆豆腐。主要原料是鲜嫩的白豆腐、牛肉末和豆瓣酱。出锅前还要撒上一层花椒粉，味道又麻又辣，特别下饭。",
+    "topic": "kuliner",
+    "qs": [
+      [
+        "Masakan khas daerah mana yang diajarkan oleh Bibi Chen?",
+        [
+          "Kanton (Guangdong)",
+          "Sichuan (Chuan)",
+          "Shandong (Lu)",
+          "Jiangsu"
+        ],
+        1,
+        {
+          "explanation": "地道的四川麻婆豆腐 (Mapo tahu Sichuan asli)."
+        }
+      ],
+      [
+        "Apa bumbu taburan terakhir sebelum masakan disajikan?",
+        [
+          "Gula pasir",
+          "Keju parut",
+          "Bubuk lada Sichuan (huajiao)",
+          "Kacang tanah"
+        ],
+        2,
+        {
+          "explanation": "撒上一层花椒粉 (Menaburkan selapis bubuk huajiao)."
+        }
+      ],
+      [
+        "Bagaimana sensasi rasa dari hidangan Mapo Tahu ini?",
+        [
+          "Manis dan gurih",
+          "Kebal/pedas (má là)",
+          "Asam segar",
+          "Pahit"
+        ],
+        1,
+        {
+          "explanation": "又麻又辣 (Mati rasa/kebal dan pedas)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0024",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "游览故宫 (Berwisata ke Kota Terlarang)",
+    "text": "北京故宫又叫紫禁城，是中国明清两代的皇家宫殿。红色的高墙、金黄色的琉璃瓦在阳光下显得格外壮丽。走在大殿之间，仿佛能感受到几百年前悠久的历史风貌。",
+    "topic": "wisata",
+    "qs": [
+      [
+        "Apa sebutan lain untuk Istana Kota Terlarang di Beijing?",
+        [
+          "頤和園",
+          "紫禁城 (Zijincheng)",
+          "圓明園",
+          "天壇"
+        ],
+        1,
+        {
+          "explanation": "又叫紫禁城 (Juga disebut Kota Terlarang / Zijincheng)."
+        }
+      ],
+      [
+        "Istana kerajaan ini digunakan pada era dinasti apa?",
+        [
+          "Dinasti Tang dan Song",
+          "Dinasti Ming dan Qing",
+          "Dinasti Han dan Qin",
+          "Dinasti Yuan saja"
+        ],
+        1,
+        {
+          "explanation": "中国明清两代的皇家宫殿 (Istana kerajaan dua dinasti Ming dan Qing)."
+        }
+      ],
+      [
+        "Warna apa dinding dan genteng yang menjadi ciri khas kemegahannya?",
+        [
+          "Dinding merah dan genteng kuning emas",
+          "Dinding biru dan genteng hijau",
+          "Dinding putih genteng abu",
+          "Dinding hitam genteng perak"
+        ],
+        0,
+        {
+          "explanation": "红色的高墙、金黄色的琉璃瓦 (Dinding tinggi merah dan genteng glasir kuning emas)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0025",
+    "level": "A2",
+    "hsk": "HSK 2",
+    "title": "北京的秋天 (Musim Gugur di Beijing)",
+    "text": "许多作家都说过，秋天是北京最美丽的季节。不仅天高气爽、气温宜人，香山上的枫叶也都渐渐变成了火红色。每年十月和十一月，成千上万的游客都会来这里登高赏叶。",
+    "topic": "musim",
+    "qs": [
+      [
+        "Kapan waktu terbaik untuk melihat daun maple merah di Fragrant Hills (Xiangshan)?",
+        [
+          "Bulan Januari - Februari",
+          "Bulan Mei - Juni",
+          "Bulan Oktober - November",
+          "Bulan Juli - Agustus"
+        ],
+        2,
+        {
+          "explanation": "每年十月和十一月 (Setiap Oktober dan November)."
+        }
+      ],
+      [
+        "Apa yang berubah warna menjadi merah menyala saat musim gugur?",
+        [
+          "Bunga sakura",
+          "Daun pohon maple (fengye)",
+          "Rumput lapangan",
+          "Air danau"
+        ],
+        1,
+        {
+          "explanation": "香山上的枫叶也都渐渐变成了火红色 (Daun maple di Xiangshan berangsur menjadi merah api)."
+        }
+      ],
+      [
+        "Bagaimana kondisi cuaca musim gugur di Beijing menurut teks?",
+        [
+          "Lembap dan panas",
+          "Dingin beku dan badai salju",
+          "Langit cerah udara sejuk nyaman",
+          "Hujan lebat terus menerus"
+        ],
+        2,
+        {
+          "explanation": "天高气爽、气温宜人 (Langit cerah tinggi dan udara sangat nyaman)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0026",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "移动支付的普及 (Populeritas Pembayaran Non-Tunai)",
+    "text": "在当今的中国社会，人们出门几乎不需要携带钱包和现金。无论是乘坐公交车、在高级商场购物，还是在路边摊买一套煎饼，只需要用智能手机扫描二维码就能轻松完成付款。移动支付不仅极大提高了交易效率，也改变了人们的生活方式。",
+    "topic": "teknologi",
+    "qs": [
+      [
+        "Alat apa yang paling utama digunakan masyarakat saat membayar belanjaan?",
+        [
+          "Cek bank",
+          "Uang tunai koin",
+          "Ponsel pintar dengan pindai kode QR",
+          "Kartu pos"
+        ],
+        2,
+        {
+          "explanation": "只需要用智能手机扫描二维码 (Hanya perlu smartphone memindai kode QR)."
+        }
+      ],
+      [
+        "Apa dampak utama dari kepopuleran pembayaran non-tunai?",
+        [
+          "Biaya hidup melonjak",
+          "Efisiensi transaksi meningkat drastis & gaya hidup berubah",
+          "Banyak toko tutup",
+          "Uang kartal dilarang beredar"
+        ],
+        1,
+        {
+          "explanation": "极大提高了交易效率，也改变了人们的生活方式 (Meningkatkan efisiensi dan mengubah gaya hidup)."
+        }
+      ],
+      [
+        "Apakah transaksi di warung kaki lima pinggir jalan juga menerima QR?",
+        [
+          "Hanya di mall mewah",
+          "Bisa di warung pinggir jalan (路边摊)",
+          "Hanya untuk turis asing",
+          "Dilarang di pinggir jalan"
+        ],
+        1,
+        {
+          "explanation": "在路边摊买一套煎饼也能轻松完成付款 (Beli jianbing di pinggir jalan pun mudah bayar)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0027",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "熬夜的危害 (Bahaya Begadang bagi Kesehatan)",
+    "text": "现代年轻人面临着巨大的学业与职场压力，熬夜刷手机或加班已经成为常态。然而，医学研究表明，长期睡眠不足不仅会导致免疫力下降、记忆力减退，还会显著增加心血管疾病的风险。专家建议，成年人每天应保证七到八小时的高质量睡眠。",
+    "topic": "kesehatan",
+    "qs": [
+      [
+        "Apa dampak buruk jangka panjang dari kebiasaan begadang?",
+        [
+          "Menambah nafsu makan",
+          "Daya tahan tubuh turun & risiko penyakit kardiovaskular",
+          "Kulit menjadi lebih kencang",
+          "Konsentrasi meningkat"
+        ],
+        1,
+        {
+          "explanation": "免疫力下降、记忆力减退，还会显著增加心血管疾病风险 (Imunitas turun & risiko kardiovaskular)."
+        }
+      ],
+      [
+        "Berapa durasi tidur berkualitas yang disarankan oleh para ahli bagi orang dewasa?",
+        [
+          "4–5 jam",
+          "5–6 jam",
+          "7–8 jam",
+          "9–10 jam"
+        ],
+        2,
+        {
+          "explanation": "保证七到八小时的高质量睡眠 (Memastikan 7 sampai 8 jam tidur berkualitas)."
+        }
+      ],
+      [
+        "Faktor apa yang sering membuat anak muda begadang menurut paragraf pertama?",
+        [
+          "Kurang hiburan",
+          "Tekanan studi/pekerjaan & main ponsel",
+          "Cuaca terlalu panas",
+          "Suara bising tetangga"
+        ],
+        1,
+        {
+          "explanation": "学业与职场压力，熬夜刷手机或加班 (Tekanan studi/karir, scrolling ponsel atau lembur)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0028",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "端午节吃粽子 (Hari Raya Perahu Naga & Makan Zongzi)",
+    "text": "农历五月初五是中国传统的端午节。这一天，人们会赛龙舟、挂艾草，并且一定要吃用竹叶包裹的粽子。关于端午节的起源，流传最广的是为了纪念两千多年前投江殉国的爱国诗人屈原。粽子的馅料南方偏甜北方偏咸，体现了多元的饮食文化。",
+    "topic": "budaya",
+    "qs": [
+      [
+        "Kapan Hari Raya Duanwu dirayakan menurut penanggalan lunar?",
+        [
+          "Tanggal 1 bulan 1",
+          "Tanggal 15 bulan 1",
+          "Tanggal 5 bulan 5",
+          "Tanggal 15 bulan 8"
+        ],
+        2,
+        {
+          "explanation": "农历五月初五 (Bulan 5 tanggal 5 lunar)."
+        }
+      ],
+      [
+        "Tokoh bersejarah siapa yang paling populer diperingati pada festival ini?",
+        [
+          "Penyair Qu Yuan",
+          "Filsuf Konfusius",
+          "Jenderal Guan Yu",
+          "Kaisar Qin Shi Huang"
+        ],
+        0,
+        {
+          "explanation": "纪念两千多年前投江殉国的爱国诗人屈原 (Mengenang penyair patriotik Qu Yuan)."
+        }
+      ],
+      [
+        "Bagaimana perbedaan cita rasa isi zongzi antara wilayah utara dan selatan?",
+        [
+          "Selatan manis, utara asin",
+          "Selatan asin, utara manis",
+          "Selatan pedas, utara asam",
+          "Semuanya hambar"
+        ],
+        0,
+        {
+          "explanation": "粽子的馅料南方偏甜北方偏咸 (Isian zongzi selatan cenderung manis, utara asin)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0029",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "自主学习与终身成长 (Belajar Mandiri & Pertumbuhan Seumur Hidup)",
+    "text": "在信息化时代，获取知识的途径变得极其丰富。网课、电子书和播客使每一个人都能按照自己的节奏学习新技能。真正拉开人与人之间差距的，不再是学校的文凭，而是是否具备持续学习的自主驱动力。终身学习者往往在变化莫测的未来更具竞争力。",
+    "topic": "pendidikan",
+    "qs": [
+      [
+        "Apa yang menjadi faktor pembeda utama antar-individu di era informasi?",
+        [
+          "Tingginya gedung sekolah",
+          "Kemampuan dan dorongan belajar mandiri secara berkelanjutan",
+          "Banyaknya follower media sosial",
+          "Uang saku bulanan"
+        ],
+        1,
+        {
+          "explanation": "是否具备持续学习的自主驱动力 (Apakah memiliki dorongan mandiri untuk terus belajar)."
+        }
+      ],
+      [
+        "Media digital apa yang disebutkan membantu orang belajar sesuai ritme sendiri?",
+        [
+          "Kelas daring, buku elektronik, dan podcast",
+          "Game konsol",
+          "Siaran berita TV kabel",
+          "Koran cetak pagi"
+        ],
+        0,
+        {
+          "explanation": "网课、电子书和播客 (Kursus daring, e-book, dan podcast)."
+        }
+      ],
+      [
+        "Mengapa pembelajar seumur hidup (lifelong learner) lebih unggul di masa depan?",
+        [
+          "Karena mereka tidak perlu bekerja",
+          "Karena mereka lebih adaptif dan kompetitif menghadapi perubahan",
+          "Karena mereka punya banyak gelar pajangan",
+          "Karena mereka tidak bisa digantikan komputer"
+        ],
+        1,
+        {
+          "explanation": "终身学习者往往在变化莫测的未来更具竞争力 (Lebih kompetitif di masa depan yang dinamis)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0030",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "垃圾分类新风尚 (Tren Baru Pemilahan Sampah)",
+    "text": "为了推动生态文明建设，各大城市全面推行生活垃圾分类制度。居民们在扔垃圾前，需要将废弃物分为四类：可回收物、有害垃圾、厨余垃圾和其他垃圾。刚开始大家觉得有些繁琐，但随着环保意识深入人心，分类投放已成为公民自觉的文明习惯。",
+    "topic": "lingkungan",
+    "qs": [
+      [
+        "Berapa kategori pemilahan sampah yang diterapkan di kota-kota besar Tiongkok?",
+        [
+          "2 kategori",
+          "3 kategori",
+          "4 kategori",
+          "6 kategori"
+        ],
+        2,
+        {
+          "explanation": "分为四类：可回收物、有害垃圾、厨余垃圾和其他垃圾 (Dibagi 4 kategori)."
+        }
+      ],
+      [
+        "Apa jenis sampah seperti sisa makanan dan kulit buah?",
+        [
+          "有害垃圾 (Sampah Berbahaya)",
+          "厨余垃圾 (Sampah Dapur/Organik)",
+          "可回收物 (Daur Ulang)",
+          "其他垃圾 (Lainnya)"
+        ],
+        1,
+        {
+          "explanation": "厨余垃圾 (Sampah dapur/sisa makanan)."
+        }
+      ],
+      [
+        "Bagaimana sikap warga setelah sistem ini berjalan beberapa waktu?",
+        [
+          "Menolak membuang sampah",
+          "Menjadi kebiasaan peradaban yang disadari sendiri",
+          "Membayar denda setiap hari",
+          "Pindah ke pedesaan"
+        ],
+        1,
+        {
+          "explanation": "已成为公民自觉的文明习惯 (Menjadi kebiasaan peradaban yang dijalankan secara sadar)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0031",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "志愿者的奉献精神 (Semangat Pengabdian Relawan)",
+    "text": "上周末，我们社区的三十多位青年志愿者前往养老院开展慰问活动。大家分工合作，有的帮老人们打扫房间修剪指甲，有的陪老人聊天倾听他们的年轻故事，还有的为老人表演精彩的合唱节目。看到老人们脸上的灿烂笑容，志愿者们感到所有付出都充满意义。",
+    "topic": "sosial",
+    "qs": [
+      [
+        "Ke mana para relawan muda pergi pada akhir pekan lalu?",
+        [
+          "Panti asuhan",
+          "Panti jompo (rumah lansia)",
+          "Rumah sakit jiwa",
+          "Pusat penampungan hewan"
+        ],
+        1,
+        {
+          "explanation": "前往养老院开展慰问活动 (Pergi ke panti jompo melakukan kunjungan simpati)."
+        }
+      ],
+      [
+        "Aktivitas apa saja yang dilakukan relawan bersama para lansia?",
+        [
+          "Meminta sumbangan dana",
+          "Bersih-bersih, mengobrol mendengar kisah, dan bernyanyi",
+          "Mengajarkan matematika",
+          "Menjual produk perawatan"
+        ],
+        1,
+        {
+          "explanation": "打扫房间、陪聊倾听故事、表演合唱 (Bersih kamar, ngobrol kisah masa muda, pertunjukan paduan suara)."
+        }
+      ],
+      [
+        "Bagaimana perasaan para relawan saat melihat senyum lansia?",
+        [
+          "Lelah dan menyesal",
+          "Merasa jerih payah mereka sangat bermakna",
+          "Bosan",
+          "Ingin cepat pulang"
+        ],
+        1,
+        {
+          "explanation": "感到所有付出都充满意义 (Merasa seluruh pengorbanan sarat makna)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0032",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "中国书法的魅力 (Pesona Seni Kaligrafi Tiongkok)",
+    "text": "中国书法不仅是一种文字书写技巧，更是一门凝结了东方哲学与美学意境的独特艺术。书写者通过毛笔、墨汁、宣纸和砚台（文房四宝），借由笔画的轻重缓急、浓淡干湿，抒发内心情感与气韵生动。历代大家如王羲之的行书，至今仍被世人奉为艺术殿堂的瑰宝。",
+    "topic": "seni",
+    "qs": [
+      [
+        "Apa saja yang dimaksud dengan \"Empat Pusaka Ruang Belajar\" (Wen Fang Si Bao)?",
+        [
+          "Buku, pensil, penghapus, penggaris",
+          "Kuas bulu, tinta bak, kertas Xuan, dan batu asahan tinta",
+          "Meja, kursi, lampu, jendela",
+          "Kamera, kanvas, cat minyak, palet"
+        ],
+        1,
+        {
+          "explanation": "毛笔、墨汁、宣纸和砚台 (Kuas, tinta, kertas Xuan, batu tinta)."
+        }
+      ],
+      [
+        "Siapa tokoh maestro kaligrafi gaya kursif (Xingshu) yang disebutkan dalam teks?",
+        [
+          "Li Bai",
+          "Wang Xizhi",
+          "Du Fu",
+          "Su Shi"
+        ],
+        1,
+        {
+          "explanation": "王羲之的行书 (Gaya Xingshu dari Wang Xizhi)."
+        }
+      ],
+      [
+        "Bagaimana kaligrafi mengekspresikan emosi seniman?",
+        [
+          "Melalui warna-warni cat air",
+          "Melalui tebal-tipis, cepat-lambat, dan pekat-encer tarikan kuas",
+          "Melalui lirik lagu yang ditempel",
+          "Melalui patung ukiran tanah liat"
+        ],
+        1,
+        {
+          "explanation": "借由笔画的轻重缓急、浓淡干湿 (Melalui tebal-tipis, cepat-lambat, pekat-kering kuas)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0033",
+    "level": "B1",
+    "hsk": "HSK 3",
+    "title": "学会倾听的力量 (Kekuatan Membaca & Mendengarkan Sesama)",
+    "text": "在人际交往中，很多人往往急于表达自己的观点，而忽略了倾听对方的心声。心理学研究发现，真正善于沟通的人，百分之七十的时间都在专注倾听。给予对方充分的尊重和理解，不仅能化解矛盾分歧，更能建立起深厚而持久的信任关系。",
+    "topic": "psikologi",
+    "qs": [
+      [
+        "Berapa persen waktu yang dihabiskan komunikator handal untuk mendengarkan?",
+        [
+          "Sekitar 30%",
+          "Sekitar 50%",
+          "Sekitar 70%",
+          "100% tanpa pernah bicara"
+        ],
+        2,
+        {
+          "explanation": "百分之七十的时间都在专注倾听 (70% waktu fokus mendengarkan)."
+        }
+      ],
+      [
+        "Manfaat utama mendengarkan dengan penuh empati dan hormat adalah?",
+        [
+          "Mendapat hadiah uang",
+          "Meredakan konflik dan membangun kepercayaan yang kokoh",
+          "Membuat lawan bicara bingung",
+          "Memenangkan perdebatan secara sepihak"
+        ],
+        1,
+        {
+          "explanation": "化解矛盾分歧，建立深厚持久的信任关系 (Meredakan konflik, bangun relasi saling percaya)."
+        }
+      ],
+      [
+        "Apa kesalahan umum kebanyakan orang dalam berkomunikasi menurut teks?",
+        [
+          "Terlalu banyak diam",
+          "Tergesa-gesa mengutarakan pendapat sendiri dan abaikan lawan",
+          "Berbicara terlalu pelan",
+          "Selalu menyetujui orang lain"
+        ],
+        1,
+        {
+          "explanation": "急于表达自己的观点，而忽略了倾听对方心声 (Terburu-buru bicara, abai mendengar)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0034",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "数字经济与就业变革 (Ekonomi Digital & Transformasi Lapangan Kerja)",
+    "text": "随着云计算、人工智能以及大数据技术的飞速演进，数字经济已然成为驱动全球产业革新的核心引擎。传统制造业正加速向智能化与柔性定制转型，催生了算法工程师、数字化管理师、全媒体运营师等数以百万计的新职业。然而，这一轮技术浪潮也对劳动力市场的数字技能重构提出了前所未有的严峻挑战。",
+    "topic": "ekonomi",
+    "qs": [
+      [
+        "Teknologi mutakhir apa yang menjadi mesin inti pendorong ekonomi digital?",
+        [
+          "Mesin uap dan telegraf",
+          "Komputasi awan, AI, dan data raya (Big Data)",
+          "Radio transistor analog",
+          "Pencetakan offset konvensional"
+        ],
+        1,
+        {
+          "explanation": "云计算、人工智能以及大数据技术 (Cloud, AI, dan Big Data)."
+        }
+      ],
+      [
+        "Contoh profesi baru apa yang lahir akibat transformasi industri cerdas?",
+        [
+          "Insinyur algoritma dan manajer digitalisasi",
+          "Petugas telegram morse",
+          "Penyalin dokumen manual",
+          "Pemasang rel kereta api uap"
+        ],
+        0,
+        {
+          "explanation": "算法工程师、数字化管理师 (Insinyur algoritma, digital manager)."
+        }
+      ],
+      [
+        "Tantangan utama yang dihadapi angkatan kerja di era ini adalah?",
+        [
+          "Kekurangan lowongan kerja kasar",
+          "Rekonstruksi dan peningkatan keterampilan digital",
+          "Larangan bekerja jarak jauh",
+          "Penghapusan bahasa pemrograman"
+        ],
+        1,
+        {
+          "explanation": "对劳动力市场的数字技能重构提出了前所未有的严峻挑战 (Rekonstruksi kecakapan digital pekerja)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0035",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "深空探测与月球背面揭秘 (Eksplorasi Antariksa & Sisi Jauh Bulan)",
+    "text": "中国嫦娥四号探测器成功在月球背面的冯·卡门撞击坑实现人类历史上的首次软着陆。由于月球自转与公转周期同步，月球背面始终背对地球，通信信号会被月体完全遮挡。科学家团队利用位于地月引力平衡点轨道上的“鹊桥”中继卫星，成功搭建起跨越数十万公里的稳定测控与数据通信链路。",
+    "topic": "sains",
+    "qs": [
+      [
+        "Prestasi bersejarah apa yang dicatatkan oleh wahana penjelajah Chang'e-4?",
+        [
+          "Mendarat pertama di planet Mars",
+          "Pendaratan lunak pertama umat manusia di sisi jauh Bulan",
+          "Mengorbit matahari terdekat",
+          "Membangun stasiun ruang angkasa di Jupiter"
+        ],
+        1,
+        {
+          "explanation": "首次在月球背面实现人类历史上的首次软着陆 (Pendaratan lunak perdana di sisi jauh bulan)."
+        }
+      ],
+      [
+        "Mengapa sinyal komunikasi dari sisi jauh Bulan tidak bisa langsung ke Bumi?",
+        [
+          "Karena terhalang oleh atmosfer Jupiter",
+          "Karena terhalang sepenuhnya oleh badan massa Bulan itu sendiri",
+          "Karena sinyal radio dilarang PBB",
+          "Karena temperatur bulan terlalu dingin"
+        ],
+        1,
+        {
+          "explanation": "月球背面始终背对地球，通信信号会被月体完全遮挡 (Terhalang oleh massa bulan)."
+        }
+      ],
+      [
+        "Satelit relai apa yang menjembatani komunikasi data antara Chang'e-4 dan stasiun Bumi?",
+        [
+          "Satelit Tiangong",
+          "Satelit Queqiao (鹊桥)",
+          "Satelit Beidou",
+          "Satelit Dongfanghong"
+        ],
+        1,
+        {
+          "explanation": "“鹊桥”中继卫星 (Satelit relai Queqiao)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0036",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "道法自然与现代生态伦理 (Konsep Dao Meniru Alam & Etika Ekologis)",
+    "text": "老子在《道德经》中提出“人法地，地法天，天法道，道法自然”的深刻命题。这一思想并不意味着人类应当在自然面前消极无为，而是强调人类活动必须敬畏自然规律，摒弃肆意掠夺与短视征服的功利心态。在当今全球面临气候危机与生物多样性锐减的背景下，东方道家智慧为构建可持续发展的人类命运共同体提供了历久弥新的思想资源。",
+    "topic": "filosofi",
+    "qs": [
+      [
+        "Apa inti makna dari ajaran \"Dao Fa Zi Ran\" menurut kutipan di atas?",
+        [
+          "Manusia harus menaklukkan alam dengan segala cara",
+          "Aktivitas manusia wajib menghormati dan selaras dengan hukum alam",
+          "Manusia dilarang menggunakan teknologi apa pun",
+          "Alam harus tunduk pada kehendak manusia"
+        ],
+        1,
+        {
+          "explanation": "人类活动必须敬畏自然规律，摒弃肆意掠夺 (Menghormati hukum alam, tinggalkan eksploitasi)."
+        }
+      ],
+      [
+        "Karya klasik Tiongkok apa yang memuat konsep filosofis tersebut?",
+        [
+          "Lun Yu karya Konfusius",
+          "Dao De Jing karya Laozi",
+          "Zhuangzi karya Zhuang Zhou",
+          "Shi Ji karya Sima Qian"
+        ],
+        1,
+        {
+          "explanation": "老子在《道德经》中提出 (Laozi dalam Dao De Jing)."
+        }
+      ],
+      [
+        "Relevansi ajaran ini terhadap dunia modern adalah sebagai rujukan bagi?",
+        [
+          "Ekspansi industri batu bara",
+          "Penyelesaian krisis iklim & pembangunan berkelanjutan",
+          "Perang tarif ekonomi global",
+          "Eksploitasi hutan hujan tropis"
+        ],
+        1,
+        {
+          "explanation": "应对气候危机与构建可持续发展 (Menjawab krisis iklim dan pembangunan berkelanjutan)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0037",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "心流体验与创造力释放 (Pengalaman Flow & Pelepasan Kreativitas)",
+    "text": "积极心理学家米哈里提出了“心流”（Flow）理论，用以描述个体在极度专注、物我两忘且挑战与技能高度匹配时达到的最优心理体验状态。处于心流中的人，时间知觉往往发生变形，内在动机得到极大激发，不仅能以更高的效率突破认知瓶颈，更能获得深沉持久的幸福感。在深度工作中主动构建心流触发条件，是现代知识劳动者破除焦虑的核心法宝。",
+    "topic": "psikologi",
+    "qs": [
+      [
+        "Kondisi apa yang menjadi syarat tercapainya kondisi \"Flow\" (心流)?",
+        [
+          "Tingkat kebosanan tinggi tanpa tugas",
+          "Tantangan tugas seimbang optimal dengan kapasitas keahlian diri",
+          "Bekerja sambil menonton TV",
+          "Diberikan imbalan uang tunai besar"
+        ],
+        1,
+        {
+          "explanation": "挑战与技能高度匹配 (Tantangan dan keterampilan cocok secara seimbang)."
+        }
+      ],
+      [
+        "Apa fenomena persepsi yang sering dialami seseorang ketika berada dalam Flow?",
+        [
+          "Persepsi waktu berubah/terdistorsi (terasa cepat berlalu)",
+          "Mendengar suara bisikan",
+          "Lupa nama sendiri",
+          "Merasa lapar berlebihan"
+        ],
+        0,
+        {
+          "explanation": "时间知觉往往发生变形 (Persepsi waktu mengalami distorsi)."
+        }
+      ],
+      [
+        "Mengapa Flow sangat berharga bagi pekerja intelektual masa kini?",
+        [
+          "Bisa tidur saat jam kerja",
+          "Membantu menembus kebuntuan kognitif dan mengatasi kecemasan",
+          "Mempercepat pengunduran diri",
+          "Menggantikan peran komputer"
+        ],
+        1,
+        {
+          "explanation": "突破认知瓶颈，破除焦虑 (Menembus hambatan kognitif & singkirkan cemas)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0038",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "老龄化社会与银发经济 (Masyarakat Menua & Ekonomi Silver)",
+    "text": "伴随着人均预期寿命延长与生育率持续走低，许多发达与发展中国家相继步入深度老龄化社会。这一人口结构性转变固然给医疗保障和养老金体系带来不容忽视的收支压力，但同时也催生了规模庞大的“银发经济”新蓝海。适老家居改造、康养旅居、健康智能监测等产业迎来了前所未有的蓬勃发展窗口期。",
+    "topic": "sosial",
+    "qs": [
+      [
+        "Apa pemicu utama terbentuknya masyarakat dengan struktur populasi menua?",
+        [
+          "Tingkat kelahiran melonjak drastis",
+          "Angka harapan hidup meningkat dan angka kelahiran menurun",
+          "Jumlah imigran meningkat",
+          "Penutupan fasilitas rumah sakit"
+        ],
+        1,
+        {
+          "explanation": "人均预期寿命延长与生育率持续走低 (Harapan hidup naik & fertilitas turun)."
+        }
+      ],
+      [
+        "Sektor industri apa yang berkembang pesat dalam \"Ekonomi Silver\" (银发经济)?",
+        [
+          "Konsol game remaja",
+          "Modifikasi rumah ramah lansia, wisata kebugaran, dan monitor medis pintar",
+          "Pakaian balita",
+          "Perlengkapan sekolah SD"
+        ],
+        1,
+        {
+          "explanation": "适老家居改造、康养旅居、健康智能监测 (Rumah lansia, wisata kesehatan, monitor medis)."
+        }
+      ],
+      [
+        "Tantangan utama yang dihadapi kas negara akibat penuaan populasi adalah?",
+        [
+          "Kelebihan pasokan guru TK",
+          "Beban pengeluaran jaminan kesehatan dan dana pensiun",
+          "Ketiadaan tanah pemakaman",
+          "Kekurangan bahan makanan pokok"
+        ],
+        1,
+        {
+          "explanation": "医疗保障和养老金体系带来收支压力 (Tekanan dana jaminan medis dan pensiun)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0039",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "传统榫卯结构的智慧 (Kearifan Struktur Sambungan Sunmao)",
+    "text": "中国古代木构建筑最引人赞叹的技术奇迹莫过于“榫卯”（Sǔnmǎo）连接。工匠们不用一颗铁钉，仅凭凹凸相嵌的木构件咬合，便能搭建起承受千年风雨的巍峨殿阁与宏伟木塔。这种柔性节点在遭遇强烈地震时，能通过微幅滑移和摩擦损耗消散大部分地震波能量，完美诠释了“以柔克刚”的东方工程力学智慧。",
+    "topic": "arsitektur",
+    "qs": [
+      [
+        "Apa ciri utama dari konstruksi kayu tradisional berstruktur Sunmao (榫卯)?",
+        [
+          "Menggunakan ribuan paku baja",
+          "Tanpa menggunakan satu pun paku besi, hanya sambungan kayu jantan-betina",
+          "Menggunakan perekat kimia modern",
+          "Hanya memakai semen dan batu bata"
+        ],
+        1,
+        {
+          "explanation": "不用一颗铁钉，仅凭凹凸相嵌的木构件咬合 (Tanpa paku besi, saling gigit tonjolan-cekungan)."
+        }
+      ],
+      [
+        "Bagaimana struktur fleksibel ini merespons gempa bumi berkekuatan tinggi?",
+        [
+          "Langsung runtuh seketika",
+          "Meredam energi gempa lewat gesekan mikro dan kelenturan sambungan",
+          "Terbang terbawa angin",
+          "Mengeras menjadi batu"
+        ],
+        1,
+        {
+          "explanation": "通过微幅滑移和摩擦损耗消散大部分地震波能量 (Menyerap energi gempa lewat friksi lentur)."
+        }
+      ],
+      [
+        "Prinsip filosofi mekanika apa yang tercermin dalam mahakarya arsitektur ini?",
+        [
+          "Kekerasan mutlak",
+          "Mengalahkan kekerasan dengan kelenturan (以柔克刚)",
+          "Kecepatan di atas ketahanan",
+          "Kepraktisan sekali pakai"
+        ],
+        1,
+        {
+          "explanation": "完美诠释了“以柔克刚”的工程力学智慧 (Menaklukkan kekerasan dengan kelenturan)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0040",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "短视频浪潮下的碎片化阅读 (Membaca Terfragmentasi di Era Video Pendek)",
+    "text": "在流媒体算法和十五秒竖屏视频充斥眼球的今天，受众的平均注意力集中时长已被大幅压缩至数秒以内。碎片化、感官刺激强烈的资讯虽然能带来即时的多巴胺奖赏，却也在无形中削弱了人们阅读长篇著作、进行逻辑思辨以及深度反省的核心心智能力。对抗算法操控、重拾深阅读习惯，是保护个体精神主体性的当务之急。",
+    "topic": "media",
+    "qs": [
+      [
+        "Dampak psikologis apa yang ditimbulkan oleh konsumsi video pendek terus-menerus?",
+        [
+          "Kemampuan konsentrasi makin panjang",
+          "Durasi perhatian terpangkas dan kemampuan berpikir kritis melemah",
+          "Menghafal buku dengan cepat",
+          "Mendapatkan ijazah akademis"
+        ],
+        1,
+        {
+          "explanation": "注意力集中时长大幅压缩，削弱长篇逻辑思辨能力 (Durasi atensi terpangkas, nalar kritis turun)."
+        }
+      ],
+      [
+        "Zat kimia otak apa yang dipicu secara instan oleh konten video pendek?",
+        [
+          "Serotonin jangka panjang",
+          "Dopamin instan",
+          "Melatonin tidur",
+          "Adrenalin bahaya"
+        ],
+        1,
+        {
+          "explanation": "即时的多巴胺奖赏 (Ganjaran dopamin instan)."
+        }
+      ],
+      [
+        "Apa saran solusi penulis untuk menjaga kemandirian pikiran individu?",
+        [
+          "Menghapus semua akun perbankan",
+          "Melawan jeratan algoritma dan membiasakan kembali membaca mendalam",
+          "Membeli kacamata hitam",
+          "Berhenti berteman di dunia nyata"
+        ],
+        1,
+        {
+          "explanation": "对抗算法操控、重拾深阅读习惯 (Melawan manipulasi algoritma, raih kembali deep reading)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0041",
+    "level": "B2",
+    "hsk": "HSK 4",
+    "title": "鲁迅与《狂人日记》的启蒙呼喊 (Seruan Pencerahan Lu Xun)",
+    "text": "作为中国现代文学的奠基人，鲁迅在五四新文化运动时期发表了第一篇现代白话文小说《狂人日记》。他以极为辛辣深刻的象征笔触，揭露了封建礼教“吃人”的虚伪本质，以狂人的视角对两千年未曾动摇的旧道德体系发起了颠覆性的思想批判。结尾那句振聋发聩的“救救孩子……”，成为整整一代中国启蒙知识分子最深沉的呐喊。",
+    "topic": "sastra",
+    "qs": [
+      [
+        "Karya apa yang diakui sebagai cerpen modern berbahasa sehari-hari (Vernakular/Baihua) pertama di Tiongkok?",
+        [
+          "Impian Paviliun Merah",
+          "Kisah Tiga Kerajaan",
+          "Catatan Orang Gila (狂人日记)",
+          "Batas Air"
+        ],
+        2,
+        {
+          "explanation": "第一篇现代白话文小说《狂人日记》 (Catatan Orang Gila / Kuangren Riji)."
+        }
+      ],
+      [
+        "Apa inti kritik sosial yang diangkat oleh Lu Xun dalam novel tersebut?",
+        [
+          "Kritik terhadap cuaca buruk",
+          "Membongkar kepalsuan norma feodal kuno yang mengekang kemanusiaan",
+          "Meminta sumbangan buku cerita",
+          "Mempromosikan masakan Shaoxing"
+        ],
+        1,
+        {
+          "explanation": "揭露了封建礼教“吃人”的虚伪本质 (Membongkar hakikat palsu norma feodal)."
+        }
+      ],
+      [
+        "Kalimat penutup ikonik apa yang menjadi seruan moral generasi intelektual masa itu?",
+        [
+          "Selamat tidur malam",
+          "Selamatkan anak-anak... (救救孩子……)",
+          "Uang adalah segalanya",
+          "Tutup semua sekolah"
+        ],
+        1,
+        {
+          "explanation": "结尾振聋发聩的“救救孩子……” (Seruan lantang: Selamatkan anak-anak...)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0042",
+    "level": "C1",
+    "hsk": "HSK 5",
+    "title": "汉字演变与中华文明基因 (Evolusi Hanzi & Gen Peradaban Tiongkok)",
+    "text": "汉字作为当今世界上唯一未曾中断、连续使用数千年的表意文字体系，其演进脉络经历了甲骨文、金文、大篆、小篆、隶书到楷书的蜕变。表意字符不仅具备超方言、超地域的跨时空凝聚力，使得幅员辽阔的中华大地上不同方言群体能够凭借统一的书面语彼此通晓，更在其形体结构的造字理据中，深深刻下了先民对于天文地理、伦理秩序与审美意象的具象沉淀。",
+    "topic": "linguistik",
+    "qs": [
+      [
+        "Keunikan utama aksara Hanzi dibandingkan aksara fonetik dunia lainnya adalah?",
+        [
+          "Baru diciptakan abad lalu",
+          "Satu-satunya sistem aksara ideografis berkesinambungan tanpa terputus ribuan tahun",
+          "Hanya bisa ditulis di atas batu",
+          "Tidak memiliki tata bahasa sama sekali"
+        ],
+        1,
+        {
+          "explanation": "唯一未曾中断、连续使用数千年的表意文字体系 (Satu-satunya sistem ideografis tanpa putus)."
+        }
+      ],
+      [
+        "Urutan kronologis perkembangan tipografi aksara Hanzi yang benar adalah?",
+        [
+          "Pinyin -> Latin -> Kanji",
+          "Aksara Tulang Ramal (Jiaguwen) -> Jinwen -> Zhuan -> Lishu -> Kaishu",
+          "Semen -> Kertas -> Digital",
+          "Batu -> Emas -> Minyak"
+        ],
+        1,
+        {
+          "explanation": "甲骨文、金文、大篆、小篆、隶书到楷书 (Jiaguwen, Jinwen, Zhuan, Lishu, Kaishu)."
+        }
+      ],
+      [
+        "Mengapa aksara Hanzi mampu menyatukan kelompok masyarakat dengan dialek berbeda?",
+        [
+          "Karena semua orang diwajibkan bisu",
+          "Karena sifat ideografis lintas-dialek yang menggunakan bahasa tulis terpadu",
+          "Karena dialek dilarang oleh kaisar",
+          "Karena aksara Hanzi hanya punya 10 huruf"
+        ],
+        1,
+        {
+          "explanation": "具备超方言、超地域的跨时空凝聚力，统一书面语 (Kekuatan kohesi lintas dialek)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0043",
+    "level": "C1",
+    "hsk": "HSK 5",
+    "title": "三星堆遗址与古蜀文明迷思 (Situs Sanxingdui & Peradaban Shu Kuno)",
+    "text": "四川广汉三星堆遗址的横空出世，以其造型奇绝的青铜纵目大面具、通高近四米的青铜神树以及工艺精湛的黄金面罩，彻底颠覆了以往学界关于中华文明单一起源于黄河流域的传统范式。古蜀先民以其无可比拟的丰富想象力与超凡冶金造诣，展现了一个独立且高度繁荣的青铜王国，有力印证了中华文明“多元一体”格局的深邃与辉煌。",
+    "topic": "arkeologi",
+    "qs": [
+      [
+        "Artefak perunggu spektakuler apa yang ditemukan di situs Sanxingdui?",
+        [
+          "Meriam perunggu",
+          "Topeng perunggu bermata melotot & pohon dewata perunggu",
+          "Pedang samurai",
+          "Koin uang logam romawi"
+        ],
+        1,
+        {
+          "explanation": "造型奇绝的青铜纵目大面具、青铜神树 (Topeng mata melotot & pohon dewa)."
+        }
+      ],
+      [
+        "Penemuan Sanxingdui merevisi paradigma sejarah tentang peradaban Tiongkok menjadi?",
+        [
+          "Berasal dari peradaban alien",
+          "Pola keberagaman terpadu (多元一体 - Multi-asal yang menyatu)",
+          "Berasal murni dari daratan Eropa",
+          "Tidak pernah memiliki zaman perunggu"
+        ],
+        1,
+        {
+          "explanation": "有力印证了中华文明“多元一体”格局 (Membuktikan pola kebhinekaan menyatu)."
+        }
+      ],
+      [
+        "Di provinsi manakah situs Sanxingdui berlokasi?",
+        [
+          "Provinsi Shandong",
+          "Provinsi Sichuan (Guanghan)",
+          "Provinsi Hainan",
+          "Provinsi Heilongjiang"
+        ],
+        1,
+        {
+          "explanation": "四川广汉三星堆遗址 (Situs Sanxingdui di Guanghan, Sichuan)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0044",
+    "level": "C1",
+    "hsk": "HSK 5",
+    "title": "通用人工智能时代的认知边界 (Batas Kognitif di Era AGI)",
+    "text": "大语言模型（LLM）的突破性演进正在将人工智能推向通用人工智能（AGI）的历史临界点。然而，深度神经网络基于统计概率预测下一个标记（Token）的归纳推理机制，究竟能否真正演化出人类专属的因果推理、意识体验与道德直觉，在当代认知科学与人工智能哲学家之间引发了激烈论战。“塞尔中文屋思想实验”在新时代的重构，不断提醒我们警惕将算法的拟人表象等同于真正的概念领悟。",
+    "topic": "kecerdasan_buatan",
+    "qs": [
+      [
+        "Apa dasar mekanisme pemrosesan model bahasa besar saat ini?",
+        [
+          "Memiliki jiwa biologis",
+          "Prediksi probabilitas statistik token berikutnya",
+          "Membaca pikiran manusia lewat gelombang otak",
+          "Menggunakan kalkulator manual"
+        ],
+        1,
+        {
+          "explanation": "基于统计概率预测下一个标记（Token）的归纳推理机制 (Prediksi probabilitas token berikutnya)."
+        }
+      ],
+      [
+        "Eksperimen pikiran klasik apa yang sering diangkat untuk menguji pemahaman makna sejati AI?",
+        [
+          "Kucing Schrodinger",
+          "Kamar Bahasa Mandarin Searle (Searle's Chinese Room)",
+          "Kapal Theseus",
+          "Dilema Kereta Trem"
+        ],
+        1,
+        {
+          "explanation": "“塞尔中文屋思想实验” (Searle's Chinese Room Argument)."
+        }
+      ],
+      [
+        "Kualitas kognitif apa yang masih dipertanyakan apakah bisa dimiliki mesin?",
+        [
+          "Kecepatan menghitung perkalian",
+          "Penalaran kausalitas sejati, kesadaran subjektif, dan intuisi moral",
+          "Kapasitas penyimpanan hard drive",
+          "Koneksi jaringan internet"
+        ],
+        1,
+        {
+          "explanation": "因果推理、意识体验与道德直觉 (Kausalitas sejati, kesadaran, intuisi moral)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0045",
+    "level": "C1",
+    "hsk": "HSK 5",
+    "title": "丝绸之路的千年回响 (Gema Ribuan Tahun Jalur Sutra)",
+    "text": "自西汉张骞“凿空”西域以降，古丝绸之路便不仅是一条横跨欧亚大陆的商贸走廊，更是一条交织着宗教哲学、科学技术、乐舞服饰与农业物种的文明互鉴大动脉。胡椒、葡萄、苜蓿的东传，丝绸、瓷器、造纸术的西渐，在驼铃声声中谱写了和平合作、开放包容的人类共同发展赞歌。重温这段跨文明对话史，对于当今破除“文明冲突论”具有深刻的启示价值。",
+    "topic": "diplomasi",
+    "qs": [
+      [
+        "Tokoh perintis diplomasi Dinasti Han Barat yang membuka Jalur Sutra adalah?",
+        [
+          "Laksamana Zheng He",
+          "Zhang Qian (张骞)",
+          "Xuanzang",
+          "Ban Chao"
+        ],
+        1,
+        {
+          "explanation": "自西汉张骞“凿空”西域以降 (Sejak Zhang Qian merintis Jalur Barat)."
+        }
+      ],
+      [
+        "Komoditas dan teknologi apa dari Tiongkok yang menyebar ke barat?",
+        [
+          "Kopi dan keju",
+          "Sutra, porselen, dan teknologi pembuatan kertas",
+          "Minyak bumi dan gas alam",
+          "Karet dan kelapa sawit"
+        ],
+        1,
+        {
+          "explanation": "丝绸、瓷器、造纸术的西渐 (Sutra, porselen, dan teknik membuat kertas)."
+        }
+      ],
+      [
+        "Pelajaran historis apa yang relevan bagi geopolitik global saat ini?",
+        [
+          "Perang dagang tak terhindarkan",
+          "Menolak tesis benturan peradaban melalui kerja sama damai & inklusif",
+          "Semua negara harus menutup perbatasan",
+          "Perdagangan hanya boleh dilakukan lewat laut"
+        ],
+        1,
+        {
+          "explanation": "破除“文明冲突论”，和平合作开放包容 (Meruntuhkan benturan peradaban lewat kerja sama damai)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0046",
+    "level": "C1",
+    "hsk": "HSK 5",
+    "title": "青藏高原的生态屏障功能 (Fungsi Perlindungan Ekologis Dataran Tinggi Qinghai-Tibet)",
+    "text": "青藏高原被誉为地球的“第三极”和“亚洲水塔”，是长江、黄河、澜沧江、印度河等大江大河的发源地，孕育着下游十数亿人口的生存与生计。然而，气候暖化正在加速该区域冰川的消融退缩与冻土退化，直接威胁着高寒脆弱生态系统的稳定。建立三江源国家公园等机制化保护红线，是对全人类气候适应性与水资源安全负责的战略抉择。",
+    "topic": "ekologi",
+    "qs": [
+      [
+        "Apa julukan geografis bergengsi bagi Dataran Tinggi Qinghai-Tibet?",
+        [
+          "Lembah Kematian",
+          "Kutub Ketiga (第三极) dan Menara Air Asia (亚洲水塔)",
+          "Benua Hilang Atlantis",
+          "Gurun Sahara Asia"
+        ],
+        1,
+        {
+          "explanation": "“第三极”和“亚洲水塔” (Kutub Ketiga dan Menara Air Asia)."
+        }
+      ],
+      [
+        "Ancaman lingkungan terberat yang dihadapi ekosistem rapuh dataran tinggi ini adalah?",
+        [
+          "Pencemaran plastik radioaktif",
+          "Pemanasan iklim yang mencairkan gletser dan mendegradasi permafrost",
+          "Tsunami samudra luas",
+          "Hujan asam belerang"
+        ],
+        1,
+        {
+          "explanation": "气候暖化正在加速冰川消融与冻土退化 (Pencairan gletser dan degradasi permafrost)."
+        }
+      ],
+      [
+        "Langkah konservasi strategis yang diambil untuk melindungi kawasan tersebut adalah?",
+        [
+          "Menutup semua aliran sungai",
+          "Mendirikan Taman Nasional Sanjiangyuan dengan batas merah ketat",
+          "Mengebor tambang batu bara besar",
+          "Membangun kawasan kasino"
+        ],
+        1,
+        {
+          "explanation": "建立三江源国家公园等机制化保护红线 (Mendirikan Taman Nasional Sanjiangyuan)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0047",
+    "level": "C1",
+    "hsk": "HSK 6",
+    "title": "网络巴尔干化与信息茧房 (Balkanisasi Siber & Ruang Gema Algoritma)",
+    "text": "随着算法推荐技术的精细化匹配，互联网正从最初承诺的“全球公共话语广场”蜕化为高度割裂的“信息茧房”与群落对立的“网络巴尔干化”。同质化观点的不断正反馈强化了群体极化与认知偏见，削弱了跨群体理性商谈与共识凝聚的基础。破茧而出的关键，在于培养受众的算法素养与批判性同理心，并在公共平台机制上引入多元异质视角的审慎设计。",
+    "topic": "sosiologi",
+    "qs": [
+      [
+        "Apa konsekuensi sosiologis dari jebakan \"Information Cocoon\" (信息茧房)?",
+        [
+          "Masyarakat semakin rukun dan toleran",
+          "Polarisasi opini kelompok, penguatan bias, dan lunturnya dialog rasional",
+          "Kecepatan internet turun drastis",
+          "Semua orang menjadi ahli komputer"
+        ],
+        1,
+        {
+          "explanation": "同质化观点强化群体极化与认知偏见，削弱共识 (Polarisasi kelompok dan penguatan bias)."
+        }
+      ],
+      [
+        "Istilah apa yang digunakan untuk menggambarkan perpecahan internet menjadi kubu-kubu terisolasi?",
+        [
+          "Globalisasi informasi",
+          "Balkanisasi Siber (网络巴尔干化)",
+          "Demokratisasi digital",
+          "Digitalisasi desa"
+        ],
+        1,
+        {
+          "explanation": "网络巴尔干化 (Balkanisasi Siber)."
+        }
+      ],
+      [
+        "Solusi apa yang diusulkan penulis untuk mengatasi fenomena ini?",
+        [
+          "Mematikan seluruh jaringan internet dunia",
+          "Melatih literasi algoritma, empati kritis, dan paparan perspektif majemuk",
+          "Hanya membaca satu koran pemerintah",
+          "Melarang penggunaan komputer bagi anak muda"
+        ],
+        1,
+        {
+          "explanation": "培养算法素养、批判性同理心与引入异质视角 (Literasi algoritma & empati kritis)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0048",
+    "level": "C1",
+    "hsk": "HSK 6",
+    "title": "神经可塑性与认知重构 (Neuroplastisitas & Restrukturisasi Kognitif)",
+    "text": "传统神经学曾长期固守成年大脑神经元结构固定不可逆的教条，然而现代神经生物学研究已经确证，大脑在终其一生的岁月中都具备显著的“神经可塑性”（Neuroplasticity）。无论是学习一门全新的语言、掌握复杂的乐器指法，还是经历重创后的功能补偿，有针对性的重复刺激均能促进突触新生并重组皮层功能网络，证明了人类心智永不停歇的重构潜能。",
+    "topic": "neurobiologi",
+    "qs": [
+      [
+        "Temuan revolusioner apa yang dibuktikan oleh neurobiologi modern mengenai otak dewasa?",
+        [
+          "Otak berhenti berkembang pada usia 12 tahun",
+          "Otak memiliki plastisitas saraf sepanjang hayat untuk merestrukturisasi jaringan",
+          "Otak tidak membutuhkan oksigen",
+          "Ukuran otak menentukan kecerdasan mutlak"
+        ],
+        1,
+        {
+          "explanation": "确证大脑在终其一生都具备显著的“神经可塑性” (Neuroplastisitas sepanjang hayat)."
+        }
+      ],
+      [
+        "Aktivitas apa saja yang mampu merangsang pembentukan sinapsis saraf baru?",
+        [
+          "Belajar bahasa baru, berlatih instrumen musik, dan stimulasi berulang",
+          "Tidur 20 jam sehari tanpa berpikir",
+          "Duduk melamun di ruang gelap",
+          "Mengonsumsi suplemen kimia berlebih"
+        ],
+        0,
+        {
+          "explanation": "学习新语言、掌握乐器指法、针对性重复刺激 (Belajar bahasa, alat musik, stimulasi)."
+        }
+      ],
+      [
+        "Arti mendasar dari konsep \"Neuroplastisitas\" bagi potensi manusia adalah?",
+        [
+          "Manusia tidak bisa berubah setelah dewasa",
+          "Potensi mental dan kognitif manusia senantiasa dapat direkonstruksi",
+          "Otak manusia identik dengan mesin komputer besi",
+          "Ingatan masa lalu akan hilang total"
+        ],
+        1,
+        {
+          "explanation": "证明了人类心智永不停歇的重构潜能 (Potensi restrukturisasi kognitif tanpa henti)."
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rzh0049",
+    "level": "C1",
+    "hsk": "HSK 6",
+    "title": "意境与留白的东方美学品格 (Konsep Yijing & Liubai dalam Estetika Timur)",
+    "text": "在宗白华先生的美学论述中，中国传统水墨山水画的最高境界乃是“意境”的生成。画家往往惜墨如金，在尺幅之间施以大面积的虚空“留白”（Liúbái）。这片空白非但不是空无一物的贫乏，反而是气韵流转、万象蕴藉的虚灵之府，使观赏者得以在象外之象、景外之景中生发出无限的诗意遐想，达致天人合一的高妙精神境界。",
+    "topic": "seni_estetika",
+    "qs": [
+      [
+        "Apa makna dari teknik \"Liubai\" (留白 - ruang kosong) dalam lukisan pemandangan Tiongkok?",
+        [
+          "Kekurangan cat air hitam",
+          "Ruang kosong bermakna tempat aliran energi dan imajinasi puitis tanpa batas",
+          "Kertas belum selesai digambar",
+          "Kesalahan goresan kuas yang ditutupi"
+        ],
+        1,
+        {
+          "explanation": "非空无一物，而是气韵流转、万象蕴藉的虚灵之府 (Tempat aliran energi & imajinasi puitis)."
+        }
+      ],
+      [
+        "Pencapaian spiritual tertinggi apa yang diraih penikmat seni melalui \"Yijing\" (意境)?",
+        [
+          "Mendapat kekayaan duniawi",
+          "Kesatuan harmonis antara manusia dan alam (天人合一)",
+          "Bisa menjual lukisan dengan harga mahal",
+          "Menjadi ahli biologi alam"
+        ],
+        1,
+        {
+          "explanation": "达致天人合一的高妙精神境界 (Mencapai kondisi spiritual Manusia Menyatu dengan Alam)."
+        }
+      ],
+      [
+        "Pakar estetika Tiongkok terkemuka siapa yang diacu dalam paragraf tersebut?",
+        [
+          "Zong Baihua (宗白华)",
+          "Qian Zhongshu",
+          "Lu Xun",
+          "Lin Yutang"
+        ],
+        0,
+        {
+          "explanation": "在宗白华先生的美学论述中 (Dalam ulasan estetika Zong Baihua)."
+        }
+      ]
+    ]
+  }
+]
