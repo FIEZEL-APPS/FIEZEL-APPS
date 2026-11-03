@@ -1,7 +1,7 @@
 {
-  "version": "m025-755",
-  "claimedBy": "branch chore/css-integrity-m025-755",
-  "claimedAt": "2026-11-03T04:17:11.305Z",
-  "reason": "chore(css): [ALLOW-PROTECTED: pwa,ci] purge dead marshmallow & micro-ui CSS, enforce anti-stacking CSS governance",
+  "version": "m025-756",
+  "claimedBy": "branch feat/universal-responsive-layout",
+  "claimedAt": "2026-11-03T05:11:51.060Z",
+  "reason": "feat(auth): [ALLOW-PROTECTED: auth|onboarding|pwa|ci] universal responsive welcome auth layout, 3d tactile google button & reactive 7-lang selector",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
