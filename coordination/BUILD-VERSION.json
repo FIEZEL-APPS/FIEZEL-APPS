@@ -1,7 +1,7 @@
 {
   "version": "m025-754",
-  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
-  "claimedAt": "2026-11-03T03:18:40.376Z",
-  "reason": "bot(heal): auto-synchronize release boundary",
+  "claimedBy": "branch chore/live-only-cleanup",
+  "claimedAt": "2026-11-03T03:18:43.589Z",
+  "reason": "chore(pwa): [ALLOW-PROTECTED: pwa,ci] purge dead legacy directories, live-only runtime scope & anti-zombie invariant",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
