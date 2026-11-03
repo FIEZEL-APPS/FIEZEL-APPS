@@ -144,7 +144,7 @@
   }
   function slogan() {
     return '<div class="fz-auth-slogan-wrap">'
-      + '<p class="fz-auth-tagline">Learn Beyond Languages.</p>'
+      + '<p class="fz-auth-tagline">' + esc(t('auth.layar.slogan', 'Learn Beyond Languages.')) + '</p>'
       + '</div>';
   }
   var ALL_LANGS = [
@@ -166,7 +166,7 @@
       + '<button type="button" data-auth-locale="th" aria-pressed="' + (cur === 'th' ? 'true' : 'false') + '"'
       + ' class="fz-plain fz-lang-seg' + (cur === 'th' ? ' is-on' : '') + '" lang="th">ไทย</button>'
       + (cur !== 'id' && cur !== 'th' ? '<button type="button" data-auth-locale="' + esc(curItem.id) + '" aria-pressed="true" class="fz-plain fz-lang-seg is-on" lang="' + esc(curItem.id) + '">' + esc(curItem.label) + '</button>' : '')
-      + '<button type="button" class="fz-plain fz-lang-seg fz-auth-lang-more" data-auth-lang-toggle aria-label="Pilihan bahasa lainnya">▾</button>'
+      + '<button type="button" class="fz-plain fz-lang-seg fz-auth-lang-more" data-auth-lang-toggle aria-label="' + esc(t('auth.layar.lang-more-aria', 'Pilihan bahasa lainnya')) + '">▾</button>'
       + '</div>'
       + '<div class="fz-auth-lang-dropdown" data-auth-lang-menu hidden>'
       + ALL_LANGS.map(function (l) {
@@ -216,7 +216,7 @@
   function welcomeBody() {
     return '<div class="fz-auth-welcome-container">'
       + '<h1 class="fz-auth-title">' + esc(t('auth.layar.selamat-datang', 'Welcome')) + '</h1>'
-      + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Learn languages in a simpler, more exciting, and more meaningful way.')) + '</p>'
+      + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Learn languages in an easier, more fun, and more meaningful way.')) + '</p>'
       + '<div class="fz-auth-carousel-dots" aria-hidden="true">'
       + '<span class="fz-dot is-active"></span><span class="fz-dot"></span><span class="fz-dot"></span>'
       + '</div>'

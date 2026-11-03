@@ -99,7 +99,27 @@ const EXACT_EN = {
   'undercover.doc-title': 'Undercover — FIEZEL Agent Desk',
   'undercover.back': 'Back to FIEZEL',
   'guru.toast-mengaktifkan': 'Activating KelasKu for Teachers access...',
-  'guru.toast-selamat-datang': 'Welcome, {nama}! KelasKu for Teachers is active.'
+  'guru.toast-selamat-datang': 'Welcome, {nama}! KelasKu for Teachers is active.',
+  'auth.layar.mulai-sekarang': 'Start Now',
+  'auth.layar.slogan': 'Learn Beyond Languages.',
+  'auth.layar.lang-more-aria': 'More language options',
+  'onboarding.course-zh': 'Mandarin Chinese',
+  'onboarding.course-zh-desc': 'Pinyin, HSK grammar, and daily tone mastery',
+  'onboarding.badge-coming-soon': 'Coming Soon',
+  'onboarding.btn-select': 'Select',
+  'onboarding.ja-kana-title': 'Furigana Assistance (Script)',
+  'onboarding.ja-furi-toggle-aria': 'Toggle furigana reading assistance',
+  'onboarding.ja-kana-group-aria': 'Choose Japanese furigana assistance option',
+  'onboarding.ja-opt-learn-title': 'Need Furigana',
+  'onboarding.ja-opt-learn-desc': 'Display romaji/kana readings above kanji',
+  'onboarding.ja-opt-fluent-title': 'Kana Fluent',
+  'onboarding.ja-opt-fluent-desc': 'Read kanji directly without furigana',
+  'onboarding.ja-example-translation': 'I go to Tokyo.',
+  'onboarding.ja-word-meaning-tokyo': 'Tokyo (Capital of Japan)',
+  'onboarding.ja-word-meaning-go': 'go (present/future)',
+  'onboarding.en-ipa-title': 'IPA Pronunciation Guide',
+  'onboarding.zh-pinyin-title': 'Pinyin & Tone Guide',
+  'onboarding.path-test-count': '{soal} questions'
 };
 
 // Pola penerjemahan cerdas untuk ratusan pola kalimat umum
