@@ -57,6 +57,8 @@ Audit komprehensif terhadap seluruh permukaan sambutan (*welcome screen*), auten
 ## 3. Bukti Verifikasi Mutu Empiris (100% HIJAU)
 
 Seluruh gerbang mutu lokal diuji dan lulus dengan predikat murni:
+- `node tests/i18n-global-purity-test.js`: **6/6 PASS** (100% PURE Master English, 0 Indonesian leaks on en, ja, vi, ru, fil, km, th, and ms).
+- `node tests/i18n-leak-guard-test.js`: **PASS** (Universal Pivot & Zero-Leak terverifikasi).
 - `node tests/th-coverage-test.js`: **258/258 PASS** (0 selisih, 0 kunci liar, 0 nilai kosong).
 - `node tests/th-ui-leak-test.js`: **PASS** (0 kebocoran naskah Indonesia di mode Thai).
 - `node tests/id-golden-snapshot-test.js`: **PASS** (13 locked files identik, 6.156 literal emas utuh, semua anchors sesuai).

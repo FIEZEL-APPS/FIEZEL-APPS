@@ -336,6 +336,17 @@ function toEnglish(key, idVal) {
 }
 
 // Inisialisasi struktur katalog
+// Baca existing locales/en jika ada, sehingga terjemahan bahasa Inggris kurasi golden tidak tertimpa
+const existingEn = { ui: {}, quiz: {}, grammar: {}, vocab: {} };
+for (const ns of ['ui', 'quiz', 'grammar', 'vocab']) {
+  const p = path.join(LOCALES_DIR, 'en', `${ns}.json`);
+  if (fs.existsSync(p)) {
+    try {
+      existingEn[ns] = JSON.parse(fs.readFileSync(p, 'utf8'));
+    } catch (e) {}
+  }
+}
+
 const catalogs = {
   id: { ui: {}, quiz: {}, grammar: {}, vocab: {} },
   th: { ui: {}, quiz: {}, grammar: {}, vocab: {} },
@@ -345,7 +356,14 @@ const catalogs = {
 for (const k of keys) {
   const ns = getNamespace(k);
   const valId = storeId[k];
-  const valEn = toEnglish(k, valId);
+  let valEn;
+  if (EXACT_EN[k]) {
+    valEn = EXACT_EN[k];
+  } else if (existingEn[ns] && existingEn[ns][k]) {
+    valEn = existingEn[ns][k];
+  } else {
+    valEn = toEnglish(k, valId);
+  }
   const valTh = storeTh[k] ? polishThai(storeTh[k]) : valEn;
 
   catalogs.id[ns][k] = valId;
