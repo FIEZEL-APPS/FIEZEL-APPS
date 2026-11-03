@@ -24,6 +24,7 @@
     'bahasa.penjelasan': 'Progres tiap bahasa berdiri sendiri. Berganti tidak menghapus apa pun.',
     'bahasa.en': 'Bahasa Inggris',
     'bahasa.ja': 'Bahasa Jepang',
+    'bahasa.zh': 'Bahasa Mandarin',
     'bahasa.en-catatan': 'Kursus lengkap',
     'bahasa.ja-catatan': 'Lengkap JLPT N5–N1 · kosakata, tata bahasa, bacaan, menulis & Chōkai',
     // m025-635: kursus Jepang kini lengkap tingkat JLPT N5–N1 untuk kosakata, tata bahasa,
