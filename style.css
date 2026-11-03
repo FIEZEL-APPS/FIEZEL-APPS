@@ -6393,7 +6393,9 @@ body.fz-auth-open{overflow:hidden}
 .fiezel-course-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:6px 0 4px;width:100%;box-sizing:border-box}
 /* .fiezel-goal-card menumpuk isinya ke bawah (column) dan mengecilkan semua span ke 13px;
    kartu kursus butuh baris: bendera di kiri, judul + isi di kanan. */
-.fiezel-ob .fiezel-course-card{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;text-align:left;padding:6px 8px;min-height:42px;width:100%;min-width:0;box-sizing:border-box;border-radius:10px}
+.fiezel-ob .fiezel-course-card{position:relative;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;text-align:left;padding:6px 8px;min-height:42px;width:100%;min-width:0;box-sizing:border-box;border-radius:10px}
+.fiezel-ob .fiezel-course-card.is-coming-soon{opacity:0.65;cursor:not-allowed;background:var(--fz-surface-dim,#f8fafc)}
+.fiezel-ob .fiezel-course-card .fiezel-course-badge{position:absolute;top:4px;right:6px;font-size:0.6rem;font-weight:700;line-height:1;padding:2px 5px;border-radius:4px;background:#e2e8f0;color:#475569;letter-spacing:0.02em}
 .fiezel-ob .fiezel-course-card .fiezel-course-flag{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--fz-soft,#F6EFE7);font-size:18px;line-height:1}
 .fiezel-ob .fiezel-course-card .fiezel-course-text{display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden}
 .fiezel-ob .fiezel-course-card .fiezel-course-text b{font-size:.88rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

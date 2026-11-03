@@ -172,6 +172,11 @@
     + '<circle cx="18" cy="12" r="7.2" fill="#BC002D"/>'
     + '</svg>';
 
+  var FLAG_ZH = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#DE2910"/>'
+    + '<polygon points="7,4 8,7 11,7 8.5,9 9.5,12 7,10 4.5,12 5.5,9 3,7 6,7" fill="#FFDE00"/>'
+    + '</svg>';
+
   var COURSE_STEP = 7;
   var COURSES = Object.freeze([
     Object.freeze({ id: 'en', flag: FLAG_EN, titleKey: 'onboarding.course-en', descKey: 'onboarding.course-en-desc' }),
@@ -411,10 +416,28 @@
   /** Daftar tujuan belajar ASLI aplikasi, dibaca dari FiezelPersonalJourney bila tersedia. */
   function goalOptions(env) {
     var journey = env && env.FiezelPersonalJourney;
-    if (!journey || typeof journey.buildGoalProfile !== 'function' || !Array.isArray(journey.GOAL_IDS)) return [];
-    return journey.GOAL_IDS.map(function (id) {
-      var profile = journey.buildGoalProfile(id);
-      return { id: profile.id, label: profile.label, description: (profile.prerequisites || []).join(' · ') };
+    if (!journey && typeof require === 'function') {
+      try { journey = require('../personal-journey/fiezel-personal-journey.js'); } catch (_) {}
+    }
+    if (!journey && typeof globalThis !== 'undefined' && globalThis.FiezelPersonalJourney) {
+      journey = globalThis.FiezelPersonalJourney;
+    }
+    if (journey && typeof journey.buildGoalProfile === 'function' && Array.isArray(journey.GOAL_IDS)) {
+      return journey.GOAL_IDS.map(function (id) {
+        var profile = journey.buildGoalProfile(id);
+        return { id: profile.id, label: profile.label, description: (profile.prerequisites || []).join(' · ') };
+      });
+    }
+    var FALLBACK_GOALS = [
+      { id: 'school', labelKey: 'journey.goal-school-label' },
+      { id: 'campus', labelKey: 'journey.goal-campus-label' },
+      { id: 'it', labelKey: 'journey.goal-it-label' },
+      { id: 'scholarship', labelKey: 'journey.goal-scholarship-label' },
+      { id: 'exam_foundation', labelKey: 'journey.goal-exam-label' },
+      { id: 'everyday', labelKey: 'journey.goal-everyday-label' }
+    ];
+    return FALLBACK_GOALS.map(function (g) {
+      return { id: g.id, label: T(g.labelKey), description: '' };
     });
   }
 
@@ -763,11 +786,11 @@
     return '<div class="fiezel-ja-onboarding-panel" data-ob-ja-panel style="' + (isJa ? 'display:flex;' : 'display:none;') + '">'
       + '<div class="fz-ja-compact-header">'
       + '<span class="fz-ja-compact-title">' + escapeHtml(T('onboarding.ja-kana-title', 'Bantuan Furigana (Aksara)')) + '</span>'
-      + '<button type="button" class="fiezel-ob-furigana-pill' + (furiActive ? ' is-active' : '') + '" data-ob-toggle-furigana aria-pressed="' + (furiActive ? 'true' : 'false') + '" aria-label="Alihkan Furigana">'
+      + '<button type="button" class="fiezel-ob-furigana-pill' + (furiActive ? ' is-active' : '') + '" data-ob-toggle-furigana aria-pressed="' + (furiActive ? 'true' : 'false') + '" aria-label="' + escapeHtml(T('onboarding.ja-furi-toggle-aria', 'Alihkan Furigana')) + '">'
       + '<span class="fz-pill-text">Furigana:</span> <strong data-ob-furi-status>' + (furiActive ? 'ON' : 'OFF') + '</strong>'
       + '</button>'
       + '</div>'
-      + '<div class="fiezel-ja-kana-options" role="radiogroup" aria-label="Kesiapan Aksara Jepang">'
+      + '<div class="fiezel-ja-kana-options" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.ja-kana-group-aria', 'Kesiapan Aksara Jepang')) + '">'
       + '<button type="button" role="radio" aria-checked="' + (isLearning ? 'true' : 'false') + '" class="fiezel-kana-btn' + (isLearning ? ' is-selected' : '') + '" data-ob-kana="learning">'
       + '<span class="fz-kana-btn-badge">' + escapeHtml(T('onboarding.ja-opt-learn-title', 'Butuh Furigana')) + '</span>'
       + '</button>'
@@ -778,17 +801,17 @@
       + '<div class="fiezel-ob-sentence-card' + (furiActive ? '' : ' hide-furigana') + '" data-ob-sentence-card>'
       + '<div class="fz-ob-jp-row">'
       + '<div class="fz-ob-jp-line" aria-label="Tokyo e ikimasu">'
-      + '<button type="button" class="fz-ob-ruby is-active" data-ob-ruby data-word="東京" data-reading="とうきょう" data-meaning="Tokyo"><ruby>東京<rt>とうきょう</rt></ruby></button>'
+      + '<button type="button" class="fz-ob-ruby is-active" data-ob-ruby data-word="東京" data-reading="とうきょう" data-meaning="' + escapeHtml(T('onboarding.ja-word-meaning-tokyo', 'Tokyo')) + '"><ruby>東京<rt>とうきょう</rt></ruby></button>'
       + '<span class="fz-ob-plain">へ</span>'
-      + '<button type="button" class="fz-ob-ruby" data-ob-ruby data-word="行き" data-reading="いき" data-meaning="pergi"><ruby>行<rt>い</rt></ruby>き</button>'
+      + '<button type="button" class="fz-ob-ruby" data-ob-ruby data-word="行き" data-reading="いき" data-meaning="' + escapeHtml(T('onboarding.ja-word-meaning-go', 'pergi')) + '"><ruby>行<rt>い</rt></ruby>き</button>'
       + '<span class="fz-ob-plain">ます。</span>'
       + '</div>'
-      + '<span class="fz-ob-id-line">"Saya pergi ke Tokyo."</span>'
+      + '<span class="fz-ob-id-line">' + escapeHtml(T('onboarding.ja-example-translation', '"Saya pergi ke Tokyo."')) + '</span>'
       + '</div>'
       + '<div class="fz-ob-inspection-chip" data-ob-inspection-chip style="display:flex;">'
       + '<span class="fz-chip-head"><b data-ob-chip-word>東京</b> <small data-ob-chip-reading>[とうきょう]</small></span>'
       + '<span class="fz-chip-sep">·</span>'
-      + '<span class="fz-chip-mean" data-ob-chip-meaning>Tokyo</span>'
+      + '<span class="fz-chip-mean" data-ob-chip-meaning>' + escapeHtml(T('onboarding.ja-word-meaning-tokyo', 'Tokyo')) + '</span>'
       + '</div>'
       + '</div>'
       + '</div>';
@@ -798,9 +821,10 @@
     var pick = normalizeCourse(selected);
     var cards = COURSES.map(function (c) {
       var on = c.id === pick;
-      return '<button type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" class="fiezel-goal-card fiezel-course-card' + (on ? ' is-selected' : '') + '" data-ob-course="' + c.id + '" data-testid="ob-course-' + c.id + '">'
+      var badge = c.comingSoon ? '<span class="fiezel-course-badge">' + escapeHtml(T('onboarding.badge-coming-soon', 'Segera Hadir')) + '</span>' : '';
+      return '<button type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" class="fiezel-goal-card fiezel-course-card' + (on ? ' is-selected' : '') + (c.comingSoon ? ' is-coming-soon' : '') + '" data-ob-course="' + c.id + '" data-testid="ob-course-' + c.id + '"' + (c.comingSoon ? ' aria-disabled="true"' : '') + '>'
         + '<span class="fiezel-course-flag" aria-hidden="true">' + c.flag + '</span>'
-        + '<span class="fiezel-course-text"><b>' + escapeHtml(T(c.titleKey)) + '</b><small>' + escapeHtml(T(c.descKey)) + '</small></span></button>';
+        + '<span class="fiezel-course-text"><b>' + escapeHtml(T(c.titleKey)) + '</b>' + badge + '<small>' + escapeHtml(T(c.descKey)) + '</small></span></button>';
     }).join('');
     return reveal(env)
       /* Sama dengan langkah tujuan: di alur ringkas satu-satunya jalan maju adalah memilih
@@ -950,7 +974,7 @@
       + '</div>'
       + '<div class="fiezel-path-card is-test" data-ob-path="test">'
       + '<div class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-test-title')) + '</div>'
-      + '<p class="fiezel-path-desc"><span class="fiezel-path-count">' + facts.soal + ' soal</span> ' + escapeHtml(T('onboarding.path-test-desc', { soal: facts.soal })) + '</p>'
+      + '<p class="fiezel-path-desc"><span class="fiezel-path-count">' + escapeHtml(T('onboarding.path-test-count', { soal: facts.soal }, facts.soal + ' soal')) + '</span> ' + escapeHtml(T('onboarding.path-test-desc', { soal: facts.soal })) + '</p>'
       + '<button type="button" class="fiezel-btn fiezel-btn-primary" data-ob-primary>' + escapeHtml(T('onboarding.path-test-btn')) + '</button>'
       + '</div>'
       + '</div>'

@@ -88,7 +88,29 @@ const MATRIX_DICTIONARY = {
   // Sapaan & Pesan Interaktif
   'Ask FIEZEL?': { vi: 'Hỏi FIEZEL?', ms: 'Tanya FIEZEL?', fil: 'Magtanong sa FIEZEL?', ja: 'FIEZELに質問する？', km: 'សួរ FIEZEL?', ru: 'Спросить FIEZEL?' },
   'Find your level': { vi: 'Xác định trình độ của bạn', ms: 'Cari tahap anda', fil: 'Alamin ang iyong antas', ja: 'レベルを判定する', km: 'ស្វែងរកកម្រិតរបស់អ្នក', ru: 'Определить свой уровень' },
-  'Tap me': { vi: 'Nhấn vào tôi', ms: 'Ketik saya', fil: 'I-tap ako', ja: 'タップしてね', km: 'ចុចលើខ្ញុំ', ru: 'Нажми на меня' }
+  'Tap me': { vi: 'Nhấn vào tôi', ms: 'Ketik saya', fil: 'I-tap ako', ja: 'タップしてね', km: 'ចុចលើខ្ញុំ', ru: 'Нажми на меня' },
+
+  // Auth & Onboarding Lengkap
+  'Start Now': { vi: 'Bắt đầu ngay', ms: 'Mula Sekarang', fil: 'Magsimula Ngayon', ja: '今すぐ始める', km: 'ចាប់ផ្តើមឥឡូវនេះ', ru: 'Начать сейчас' },
+  'Learn Beyond Languages.': { vi: 'Học nhiều hơn chỉ là ngôn ngữ.', ms: 'Belajar Lebih dari Sekadar Bahasa.', fil: 'Matuto Nang Higit Pa sa Wika Lamang.', ja: '言葉を超えて学ぶ。', km: 'រៀនលើសពីភាសា។', ru: 'Учитесь большему, чем просто язык.' },
+  'More language options': { vi: 'Tùy chọn ngôn ngữ khác', ms: 'Pilihan bahasa lain', fil: 'Higit pang mga opsyon sa wika', ja: 'その他の言語オプション', km: 'ជម្រើសភាសាបន្ថែម', ru: 'Другие языковые параметры' },
+  'Mandarin Chinese': { vi: 'Tiếng Trung (Quan thoại)', ms: 'Bahasa Cina Mandarin', fil: 'Wikang Mandarin Chinese', ja: '中国語（マンダリン）', km: 'ភាសាចិនកុកងឺ', ru: 'Китайский (мандарин)' },
+  'Pinyin, HSK grammar, and daily tone mastery': { vi: 'Bính âm, ngữ pháp HSK và làm chủ thanh điệu hàng ngày', ms: 'Pinyin, tatabahasa HSK, dan penguasaan nada harian', fil: 'Pinyin, gramatika ng HSK, at masteri sa tono araw-araw', ja: 'ピンイン、HSK文法、日常の声調マスター', km: 'ភីនអ៊ីន វេយ្យាករណ៍ HSK និងការគ្រប់គ្រងសម្លេងប្រចាំថ្ងៃ', ru: 'Пиньинь, грамматика HSK и отработка тонов' },
+  'Coming Soon': { vi: 'Sắp ra mắt', ms: 'Akan Datang', fil: 'Malapit Na', ja: '近日公開', km: 'មកដល់ឆាប់ៗនេះ', ru: 'Скоро появится' },
+  'Select': { vi: 'Chọn', ms: 'Pilih', fil: 'Piliin', ja: '選択', km: 'ជ្រើសរើស', ru: 'Выбрать' },
+  'Furigana Assistance (Script)': { vi: 'Hỗ trợ Furigana (Chữ viết)', ms: 'Bantuan Furigana (Skrip)', fil: 'Tulong sa Furigana (Titik)', ja: 'ふりがな補助（文字）', km: 'ជំនួយ Furigana (អក្សរ)', ru: 'Помощь с фуриганой (письмо)' },
+  'Toggle furigana reading assistance': { vi: 'Bật/tắt hỗ trợ đọc furigana', ms: 'Togol bantuan bacaan furigana', fil: 'I-toggle ang tulong sa pagbasa ng furigana', ja: 'ふりがな表示の切り替え', km: 'បិទបើកជំនួយការអាន furigana', ru: 'Переключить отображение фуриганы' },
+  'Choose Japanese furigana assistance option': { vi: 'Chọn tùy chọn hỗ trợ furigana tiếng Nhật', ms: 'Pilih pilihan bantuan furigana bahasa Jepun', fil: 'Pumili ng opsyon sa tulong sa furigana ng Hapon', ja: '日本語のふりがな設定を選択', km: 'ជ្រើសរើសជម្រើសជំនួយ furigana ភាសាជប៉ុន', ru: 'Выберите вариант фуриганы для японского' },
+  'Need Furigana': { vi: 'Cần Furigana', ms: 'Perlu Furigana', fil: 'Kailangan ng Furigana', ja: 'ふりがな必要', km: 'ត្រូវការ Furigana', ru: 'Нужна фуригана' },
+  'Display romaji/kana readings above kanji': { vi: 'Hiển thị cách đọc romaji/kana phía trên chữ Hán', ms: 'Papar bacaan romaji/kana di atas kanji', fil: 'Ipakita ang romaji/kana sa ibabaw ng kanji', ja: '漢字の上にふりがなを表示します', km: 'បង្ហាញការអាន romaji/kana ពីលើអក្សរកាន់ជី', ru: 'Показывать чтение ромадзи/кана над кандзи' },
+  'Kana Fluent': { vi: 'Thành thạo Kana', ms: 'Fasih Kana', fil: 'Bihasa sa Kana', ja: 'かな既習', km: 'ស្ទាត់ជំនាញ Kana', ru: 'Знаю кану' },
+  'Read kanji directly without furigana': { vi: 'Đọc chữ Hán trực tiếp không cần furigana', ms: 'Baca kanji terus tanpa furigana', fil: 'Basahin ang kanji nang direkta nang walang furigana', ja: 'ふりがななしで漢字を直接読みます', km: 'អានកាន់ជីដោយផ្ទាល់ដោយមិនចាំបាច់មាន furigana', ru: 'Читать кандзи напрямую без фуриганы' },
+  'I go to Tokyo.': { vi: 'Tôi đi Tokyo.', ms: 'Saya pergi ke Tokyo.', fil: 'Pumupunta ako sa Tokyo.', ja: '私は東京へ行きます。', km: 'ខ្ញុំទៅតូក្យូ។', ru: 'Я еду в Токио.' },
+  'Tokyo (Capital of Japan)': { vi: 'Tokyo (Thủ đô Nhật Bản)', ms: 'Tokyo (Ibu negara Jepun)', fil: 'Tokyo (Kabisera ng Hapon)', ja: '東京（日本の首都）', km: 'តូក្យូ (រាជធានីនៃប្រទេសជប៉ុន)', ru: 'Токио (столица Японии)' },
+  'go (present/future)': { vi: 'đi (hiện tại/tương lai)', ms: 'pergi (masa kini/hadapan)', fil: 'pumunta (kasalukuyan/hinaharap)', ja: '行く（現在・未来形）', km: 'ទៅ (បច្ចុប្បន្ន/អនាគត)', ru: 'идти / ехать (наст./буд.)' },
+  'IPA Pronunciation Guide': { vi: 'Hướng dẫn phát âm IPA', ms: 'Panduan Sebutan IPA', fil: 'Gabay sa Pagbigkas ng IPA', ja: 'IPA発音ガイド', km: 'ការណែនាំអំពីការបញ្ចេញសំឡេង IPA', ru: 'Руководство по произношению IPA' },
+  'Pinyin & Tone Guide': { vi: 'Hướng dẫn Bính âm & Thanh điệu', ms: 'Panduan Pinyin & Nada', fil: 'Gabay sa Pinyin at Tono', ja: 'ピンイン＆声調ガイド', km: 'ការណែនាំអំពីភីនអ៊ីន និងសម្លេង', ru: 'Руководство по пиньиню и тонам' },
+  '{soal} questions': { vi: '{soal} câu hỏi', ms: '{soal} soalan', fil: '{soal} mga tanong', ja: '{soal} 問', km: '{soal} សំណួរ', ru: '{soal} вопросов' }
 };
 
 // Urutkan kunci kamus dari terpanjang ke terpendek agar frasa majemuk tidak terpecah

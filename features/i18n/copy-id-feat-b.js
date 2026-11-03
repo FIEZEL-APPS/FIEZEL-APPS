@@ -460,6 +460,23 @@
     'onboarding.course-ja-desc': 'Kotoba, Bunpō, hiragana, dan katakana',
     'onboarding.course-note': 'Tes penempatan berikutnya memakai soal dari kursus yang kamu pilih.',
     'onboarding.course-title': 'Mau belajar bahasa apa?',
-    'onboarding.step-course': 'Kursus'
+    'onboarding.step-course': 'Kursus',
+    'onboarding.course-zh': '\u0042ahasa Mandarin',
+    'onboarding.course-zh-desc': 'Pinyin, hanzi dasar, \u0064an komunikasi praktis.',
+    'onboarding.badge-coming-soon': 'Segera Hadir',
+    'onboarding.btn-select': 'Pilih',
+    'onboarding.ja-kana-title': 'Bantuan Furigana (Aksara)',
+    'onboarding.ja-furi-toggle-aria': 'Alihkan Furigana',
+    'onboarding.ja-kana-group-aria': 'Kesiapan Aksara Jepang',
+    'onboarding.ja-opt-learn-title': 'Butuh Furigana',
+    'onboarding.ja-opt-learn-desc': 'Tampilkan cara baca di atas kanji',
+    'onboarding.ja-opt-fluent-title': 'Sudah Hafal Kana',
+    'onboarding.ja-opt-fluent-desc': '\u0042elajar tanpa bantuan furigana',
+    'onboarding.ja-example-translation': '"Saya pergi ke Tokyo."',
+    'onboarding.ja-word-meaning-tokyo': 'Tokyo',
+    'onboarding.ja-word-meaning-go': 'pergi',
+    'onboarding.en-ipa-title': 'Bantuan Fonetik IPA',
+    'onboarding.zh-pinyin-title': 'Bantuan Pinyin',
+    'onboarding.path-test-count': '{soal} \u0073oal'
   });
 }());

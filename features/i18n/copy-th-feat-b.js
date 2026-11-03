@@ -402,6 +402,23 @@
     'onboarding.course-ja-desc': 'คำศัพท์ (Kotoba) ไวยากรณ์ (Bunpō) ฮิรางานะ และคาตาคานะ',
     'onboarding.course-note': 'แบบทดสอบวัดระดับถัดไปจะใช้ข้อสอบจากคอร์สที่คุณเลือก',
     'onboarding.course-title': 'อยากเรียนภาษาอะไร?',
-    'onboarding.step-course': 'คอร์ส'
+    'onboarding.step-course': 'คอร์ส',
+    'onboarding.course-zh': 'ภาษาจีนกลาง',
+    'onboarding.course-zh-desc': 'พินอิน อักษรจีนพื้นฐาน และการสื่อสารใช้งานจริง',
+    'onboarding.badge-coming-soon': 'เร็วๆ นี้',
+    'onboarding.btn-select': 'เลือก',
+    'onboarding.ja-kana-title': 'ตัวช่วยฟูริงะนะ (เสียงอ่าน)',
+    'onboarding.ja-furi-toggle-aria': 'สลับฟูริงะนะ',
+    'onboarding.ja-kana-group-aria': 'ความพร้อมด้านอักษรญี่ปุ่น',
+    'onboarding.ja-opt-learn-title': 'ต้องการฟูริงะนะ',
+    'onboarding.ja-opt-learn-desc': 'แสดงเสียงอ่านบนตัวคันจิ',
+    'onboarding.ja-opt-fluent-title': 'จำคานะได้แล้ว',
+    'onboarding.ja-opt-fluent-desc': 'เรียนโดยไม่ใช้ฟูริงะนะ',
+    'onboarding.ja-example-translation': '"ฉันไปโตเกียว"',
+    'onboarding.ja-word-meaning-tokyo': 'โตเกียว',
+    'onboarding.ja-word-meaning-go': 'ไป',
+    'onboarding.en-ipa-title': 'ตัวช่วยสัทอักษร IPA',
+    'onboarding.zh-pinyin-title': 'ตัวช่วยพินอิน',
+    'onboarding.path-test-count': '{soal} ข้อ'
   });
 }());

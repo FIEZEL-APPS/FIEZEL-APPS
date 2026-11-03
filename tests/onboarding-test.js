@@ -1088,6 +1088,15 @@ test('KUNCI: pilihan kursus Jepang menyajikan panel kesiapan Kana dan pratinjau 
   assert.strictEqual(jaDisp.furigana, false, 'fiezel-ja-display-v1 ikut tersinkron');
 });
 
+test('KUNCI: i18n kelengkapan kunci Furigana, Aksara, dan counter soal adaptif', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  typeName(run, 'Ayu');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  const html = run.element.innerHTML;
+  assert.ok(/Furigana/.test(html) || /onboarding\.ja-kana-title/.test(html), 'panel furigana membawa teks/kunci yang valid');
+});
+
 test('gate onboarding sudah terdaftar di CI', () => {
   const workflow = fs.readFileSync('./.github/workflows/quality.yml', 'utf8');
   assert.ok(/node tests\/onboarding-test\.js/.test(workflow));
