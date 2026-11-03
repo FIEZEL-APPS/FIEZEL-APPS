@@ -52,7 +52,18 @@
   function esc(v) {
     return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
   }
-  function locale() { try { var i = I(); return (i && i.getLocale && i.getLocale()) === 'th' ? 'th' : 'id'; } catch (_) { return 'id'; } }
+  function locale() {
+    try {
+      var i = I();
+      if (i && typeof i.getLocale === 'function') {
+        var l = i.getLocale();
+        if (l) return l;
+      }
+      return 'id';
+    } catch (_) {
+      return 'id';
+    }
+  }
 
   /* ----------------------------------------------------------------- penanda sesi */
 
@@ -147,18 +158,20 @@
   ];
   function langSwitch() {
     var cur = locale();
+    var curItem = ALL_LANGS.filter(function (l) { return l.id === cur; })[0] || ALL_LANGS[0];
     return '<div class="fz-auth-lang-wrap">'
       + '<div class="fz-auth-lang" role="group" aria-label="Bahasa · Language">'
       + '<button type="button" data-auth-locale="id" aria-pressed="' + (cur === 'id' ? 'true' : 'false') + '"'
       + ' class="fz-plain fz-lang-seg' + (cur === 'id' ? ' is-on' : '') + '" lang="id">ID</button>'
       + '<button type="button" data-auth-locale="th" aria-pressed="' + (cur === 'th' ? 'true' : 'false') + '"'
       + ' class="fz-plain fz-lang-seg' + (cur === 'th' ? ' is-on' : '') + '" lang="th">ไทย</button>'
+      + (cur !== 'id' && cur !== 'th' ? '<button type="button" data-auth-locale="' + esc(curItem.id) + '" aria-pressed="true" class="fz-plain fz-lang-seg is-on" lang="' + esc(curItem.id) + '">' + esc(curItem.label) + '</button>' : '')
       + '<button type="button" class="fz-plain fz-lang-seg fz-auth-lang-more" data-auth-lang-toggle aria-label="Pilihan bahasa lainnya">▾</button>'
       + '</div>'
       + '<div class="fz-auth-lang-dropdown" data-auth-lang-menu hidden>'
       + ALL_LANGS.map(function (l) {
         return '<button type="button" data-auth-locale="' + l.id + '" class="fz-plain fz-lang-item' + (cur === l.id ? ' is-on' : '') + '" lang="' + l.id + '">'
-          + '<span class="fz-lang-flag">' + l.flag + '</span> <span class="fz-lang-name">' + l.name + '</span>'
+          + '<span class="fz-lang-flag">' + l.flag + '</span> <span class="fz-lang-name">' + esc(l.name) + '</span>'
           + (cur === l.id ? '<span class="fz-lang-check">✓</span>' : '') + '</button>';
       }).join('')
       + '</div>'
@@ -202,15 +215,15 @@
 
   function welcomeBody() {
     return '<div class="fz-auth-welcome-container">'
-      + '<h1 class="fz-auth-title">' + esc(t('auth.layar.selamat-datang', 'Selamat datang')) + '</h1>'
-      + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Belajar bahasa dengan cara yang lebih mudah, lebih seru, dan lebih bermakna.')) + '</p>'
+      + '<h1 class="fz-auth-title">' + esc(t('auth.layar.selamat-datang', 'Welcome')) + '</h1>'
+      + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Learn languages in a simpler, more exciting, and more meaningful way.')) + '</p>'
       + '<div class="fz-auth-carousel-dots" aria-hidden="true">'
       + '<span class="fz-dot is-active"></span><span class="fz-dot"></span><span class="fz-dot"></span>'
       + '</div>'
       + '<div class="fz-auth-next-row">'
       + '<button type="button" class="fz-auth-next fz-plain" data-auth-go="masuk" data-testid="auth-continue">'
-      + '<span class="fz-btn-text-desktop">' + esc(t('auth.layar.mulai-sekarang', 'Mulai Sekarang')) + '</span>'
-      + '<span class="fz-btn-text-mobile">' + esc(t('auth.layar.lanjut', 'Lanjut')) + '</span>'
+      + '<span class="fz-btn-text-desktop">' + esc(t('auth.layar.mulai-sekarang', 'Get Started')) + '</span>'
+      + '<span class="fz-btn-text-mobile">' + esc(t('auth.layar.lanjut', 'Continue')) + '</span>'
       + '<span class="fz-auth-next-arrow">' + icon('arrow') + '</span>'
       + '</button></div>'
       + '</div>';
