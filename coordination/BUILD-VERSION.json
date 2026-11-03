@@ -1,7 +1,7 @@
 {
-  "version": "m025-756",
-  "claimedBy": "branch feat/universal-responsive-layout",
-  "claimedAt": "2026-11-03T05:11:51.060Z",
-  "reason": "feat(auth): [ALLOW-PROTECTED: auth|onboarding|pwa|ci] universal responsive welcome auth layout, 3d tactile google button & reactive 7-lang selector",
+  "version": "m025-757",
+  "claimedBy": "branch fix/css-regression-sw-update-m025-757",
+  "claimedAt": "2026-11-03T06:41:22.639Z",
+  "reason": "fix(auth): [ALLOW-PROTECTED: auth|onboarding|pwa|ci] emergency hotfix revert desktop layout sprawl, deduplicate sw assets, fix update loop (m025-757)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

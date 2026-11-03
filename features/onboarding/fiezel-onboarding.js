@@ -172,19 +172,10 @@
     + '<circle cx="18" cy="12" r="7.2" fill="#BC002D"/>'
     + '</svg>';
 
-  var FLAG_ZH = '<svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="36" height="24" aria-hidden="true" focusable="false">'
-    + '<rect width="60" height="40" fill="#DE2910"/>'
-    + '<path d="M10 6l2.35 7.23-6.15-4.47h7.6L7.65 13.23z" fill="#FFDE00"/>'
-    + '<circle cx="20" cy="4" r="1.5" fill="#FFDE00"/>'
-    + '<circle cx="24" cy="8" r="1.5" fill="#FFDE00"/>'
-    + '<circle cx="24" cy="14" r="1.5" fill="#FFDE00"/>'
-    + '<circle cx="20" cy="18" r="1.5" fill="#FFDE00"/>'
-    + '</svg>';
-
   var COURSE_STEP = 7;
   var COURSES = Object.freeze([
-    Object.freeze({ id: 'en', flag: FLAG_EN, titleKey: 'onboarding.course-en', descKey: 'onboarding.course-en-sub' }),
-    Object.freeze({ id: 'ja', flag: FLAG_JA, titleKey: 'onboarding.course-ja', descKey: 'onboarding.course-ja-sub' })
+    Object.freeze({ id: 'en', flag: FLAG_EN, titleKey: 'onboarding.course-en', descKey: 'onboarding.course-en-desc' }),
+    Object.freeze({ id: 'ja', flag: FLAG_JA, titleKey: 'onboarding.course-ja', descKey: 'onboarding.course-ja-desc' })
   ]);
   function normalizeCourse(v) { return v === 'ja' || v === 'en' ? v : ''; }
 
@@ -458,7 +449,7 @@
   var TOPO = 'M121 120C122 123 118 128 115 131C112 133 106 134 102 134C98 135 94 136 90 135C85 135 76 135 74 132C72 130 77 124 77 120C78 116 77 113 79 110C81 107 84 103 88 102C92 101 100 101 103 103C107 104 107 109 110 112C113 115 121 117 121 120Z|M146 120C147 126 140 137 134 141C127 146 116 144 107 147C98 149 90 155 82 155C73 154 59 149 55 143C52 137 57 127 58 120C59 113 59 107 63 101C66 95 72 83 80 81C88 79 101 86 109 89C117 93 120 98 127 103C133 108 145 114 146 120Z|M171 120C172 131 164 146 154 153C144 159 126 154 112 159C98 163 83 180 71 179C59 178 45 162 39 152C33 142 35 130 35 120C36 110 38 101 44 91C50 80 59 60 70 58C82 56 100 73 113 78C126 84 139 83 149 90C159 97 171 109 171 120Z|M197 120C197 135 188 156 175 165C161 173 137 166 118 173C99 180 75 210 60 208C44 205 33 175 25 161C16 146 10 134 9 120C9 106 14 93 22 78C31 64 44 35 60 34C76 32 98 61 118 68C137 75 163 66 177 74C190 83 198 105 197 120Z|M225 120C223 140 209 163 193 175C177 187 151 183 126 193C102 203 67 240 48 236C28 232 21 188 10 169C-1 150 -16 138 -19 120C-21 102 -16 81 -4 63C7 45 30 13 51 12C72 11 97 47 123 55C149 62 190 46 207 57C224 68 228 100 225 120Z|M257 120C252 144 228 167 208 183C188 200 167 209 138 221C110 234 62 268 37 261C13 254 6 203 -8 179C-22 156 -42 142 -47 120C-52 98 -53 65 -38 44C-23 23 16 -3 44 -4C73 -6 99 28 131 35C163 43 217 26 238 40C259 54 262 96 257 120Z|M292 120C284 148 243 167 220 190C197 214 186 244 154 259C122 274 60 291 29 280C-1 269 -14 219 -31 192C-49 166 -69 148 -76 120C-84 92 -97 44 -77 22C-58 -1 4 -11 40 -14C77 -16 105 1 143 7C181 13 242 5 266 23C291 42 299 92 292 120Z|M328 120C318 152 259 167 233 197C207 228 208 289 173 305C138 320 63 309 24 293C-15 277 -38 237 -60 208C-82 180 -98 155 -108 120C-118 85 -144 21 -120 -2C-96 -26 -8 -14 38 -19C85 -24 116 -35 159 -30C201 -26 265 -17 293 8C321 34 338 88 328 120Z|M349 70C349 73 346 76 344 78C341 80 338 79 334 81C331 82 325 88 323 88C320 87 319 80 318 77C316 74 314 73 313 70C313 67 313 64 315 61C316 59 320 54 323 54C326 54 330 60 334 61C338 62 344 59 347 60C350 62 350 67 349 70Z|M371 70C369 76 361 80 356 85C351 89 348 93 341 96C334 100 321 108 315 106C309 104 308 90 305 84C302 78 296 76 295 70C293 64 291 55 295 50C298 45 310 40 318 40C325 40 330 48 339 49C347 51 361 46 366 49C372 53 372 64 371 70Z|M395 70C392 79 374 82 367 91C359 99 360 114 351 119C341 124 319 125 309 121C299 116 295 102 289 93C283 85 278 80 275 70C272 60 263 42 269 36C276 29 301 31 314 30C326 30 334 30 346 32C358 33 378 32 386 38C394 45 398 61 395 70Z|M422 70C417 82 389 84 379 98C369 111 376 144 363 150C351 156 319 141 304 134C288 126 277 116 268 105C259 94 255 84 250 70C245 56 230 27 240 19C250 11 291 25 310 23C330 21 340 5 357 6C373 7 397 15 408 26C418 37 427 58 422 70Z|M446 70C440 86 408 89 397 108C386 127 393 177 377 183C361 189 321 156 299 145C277 134 259 130 245 118C232 106 223 89 218 70C212 51 198 13 213 3C227 -6 280 18 307 14C333 9 349 -24 369 -24C390 -24 417 -2 430 13C442 29 451 54 446 70Z|M315 300C315 302 312 303 311 306C309 309 309 315 306 315C304 316 299 312 296 310C293 309 290 309 288 307C286 305 284 303 283 300C283 297 282 293 285 291C287 290 293 293 297 292C300 291 303 286 306 286C309 286 312 290 314 292C315 294 316 298 315 300Z|M328 300C328 305 330 310 327 316C325 321 319 329 313 330C307 331 297 324 291 321C285 319 280 318 275 314C269 311 261 305 260 300C260 295 267 288 272 284C278 281 285 282 292 280C298 278 306 270 312 271C318 271 327 278 330 283C332 288 329 295 328 300Z|M341 300C342 310 358 323 354 330C350 338 330 343 318 344C307 345 295 340 285 337C275 333 267 330 258 324C249 318 228 307 229 300C230 293 254 286 263 279C272 273 274 265 284 261C293 256 308 252 319 254C330 256 345 265 349 272C352 280 340 290 341 300Z'.split('|');
 
   function topo() {
-    return '<svg class="fz-auth-topo" viewBox="-20 -40 430 385" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
+    return '<svg class="fz-auth-topo" viewBox="-20 -25 430 370" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
       + TOPO.map(function (d) { return '<path d="' + d + '"/>'; }).join('') + '</svg>';
   }
 
@@ -467,33 +458,12 @@
   // tidak saling kenal. Wordmark diambil dari sumber tunggalnya (FiezelSplash) dengan
   // awalan id sendiri: id gradien bersifat global di dokumen, dan splash boleh masih ada di
   // DOM saat onboarding menggambar.
-  function reveal(env, stepNumber, visualOverride) {
-    var S = env && env.FiezelSplash;
-    var wm = S && typeof S.wordmarkMarkup === 'function'
-      ? S.wordmarkMarkup('fzob')
-      : '<svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzobIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzobGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="45%" stop-color="#F5CE45"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g fill="url(#fzobIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzobGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>';
-
-    var brand = '<div class="fz-ob-brand-col">'
-      + wm
-      + '<div class="fz-auth-tagline-wrap">'
-      + '<p class="fz-auth-tagline">Learn Beyond Languages.</p>'
-      + '</div>'
-      + '</div>';
-
-    var wave = '<svg class="fz-auth-wave" viewBox="0 0 390 150" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
-      + '<path d="M0,142 C58,98 118,80 188,72 C262,64 330,36 390,4 L390,150 L0,150 Z"></path>'
-      + '</svg>';
-
-    var stepIndicator = (typeof stepNumber !== 'undefined') ? stepper(stepNumber, visualOverride) : '';
-
-    return '<div class="fiezel-ob-reveal">'
-      + topo()
-      + '<div class="fz-ob-header-row">'
-      + brand
-      + stepIndicator
-      + '</div>'
-      + wave
-      + '</div>';
+  function reveal(env) {
+    var brand = env && env.FiezelSplash && typeof env.FiezelSplash.wordmarkMarkup === 'function'
+      ? env.FiezelSplash.wordmarkMarkup('fzob')
+      : '<p class="fiezel-ob-word">FIEZEL</p>';
+    return '<div class="fiezel-ob-reveal">' + topo() + brand
+      + '<p class="fiezel-ob-tag">' + escapeHtml(T('onboarding.brand-tag')) + '</p></div>';
   }
 
   // Stepper enam segmen. Murni turunan dari nomor langkah yang sudah ada - ia tidak
@@ -507,7 +477,7 @@
     for (i = 0; i < seq.length; i++) out.push(all[seq[i] - 1] || all[all.length - 1]);
     return out;
   }
-  function stepper(step, visualOverride) {
+  function stepper(step) {
     var labels = sequenceLabels();
     var seq = stepSequence();
     var pos = seq.indexOf(Number(step) || 1);
@@ -515,42 +485,27 @@
        dicari persis; nomor di luar urutan jatuh ke langkah terdekat yang lebih kecil. */
     if (pos < 0) { pos = 0; for (var s = 0; s < seq.length; s++) if (seq[s] <= (Number(step) || 1) && seq[s] !== COURSE_STEP) pos = s; }
     var current = Math.min(labels.length, Math.max(1, pos + 1));
-    var isLean = uxOn('leanIntro');
-    var vTotal = isLean ? 5 : labels.length;
-    var vCurrent = current;
-    if (isLean) {
-      if (visualOverride) vCurrent = visualOverride;
-      else if (Number(step) === NAME_STEP) vCurrent = 1;
-      else if (Number(step) === COURSE_STEP) vCurrent = 2;
-      else if (Number(step) === 3) vCurrent = 4;
-      else if (Number(step) === PLACEMENT_STEP) vCurrent = 5;
-    }
     var bars = '';
-    for (var i = 1; i <= vTotal; i++) {
-      var cls = i <= vCurrent ? (i === vCurrent ? ' class="is-done is-current"' : ' class="is-done"') : '';
-      bars += '<i' + cls + '></i>';
+    for (var i = 1; i <= labels.length; i++) {
+      bars += '<i' + (i <= current ? ' class="is-done"' : '') + '></i>';
     }
     return '<div class="fiezel-stepper">'
-      + '<div class="fiezel-segments" data-ob-top-dots role="progressbar" aria-valuemin="1" aria-valuemax="'
-      + labels.length + '" aria-valuenow="' + current + '" aria-label="' + T('onboarding.stepper-aria') + '">'
-      + bars + '</div>'
-      + '<span class="fiezel-stepper-eyebrow" data-ob-top-counter>' + vCurrent + ' / ' + vTotal + '</span>'
-      + '<span class="fiezel-stepper-names" style="display:none;"><b>' + escapeHtml(labels[current - 1]) + '</b>'
+      + '<span class="fiezel-stepper-eyebrow">' + T('onboarding.stepper-eyebrow', { current: current, total: labels.length }) + '</span>'
+      + '<span class="fiezel-stepper-names"><b>' + escapeHtml(labels[current - 1]) + '</b>'
       + (current < labels.length ? T('onboarding.upcoming') + escapeHtml(labels[current]) : T('onboarding.last-step')) + '</span>'
-      + '</div>';
+      + '<div class="fiezel-segments" role="progressbar" aria-valuemin="1" aria-valuemax="'
+      + labels.length + '" aria-valuenow="' + current + '" aria-label="' + T('onboarding.stepper-aria') + '">'
+      + bars + '</div></div>';
   }
 
   // Sapaan: maskot + gelembung. Teksnya berbeda tiap langkah supaya perkenalan terasa
   // ada yang menemani, bukan formulir enam halaman. Disembunyikan dari pembaca layar
   // HANYA maskotnya (di mascot()); kalimatnya tetap dibacakan karena ia informasi.
   function greet(env, pawState, text) {
-    return '<div class="fiezel-stage">'
-      + '<div class="fiezel-stage-art">'
-      + '<div class="fz-mochi-rays" aria-hidden="true"><span></span><span></span><span></span><span></span></div>'
+    return '<div class="fiezel-stage"><div class="fiezel-stage-art">'
       + mascot(env, pawState)
-      + '</div>'
-      + (text ? '<p class="fiezel-greet-bubble" style="display:none;">' + escapeHtml(text) + '</p>' : '')
-      + '</div>';
+      + '<p class="fiezel-greet-bubble">' + escapeHtml(text) + '</p>'
+      + '</div></div>';
   }
 
   function topbar(showBack, showSkip) {
@@ -725,7 +680,7 @@
   }
 
   function btn(label, attr, variant) {
-    return '<button type="button" class="fiezel-btn fz-plain fiezel-btn-' + (variant || 'primary') + '" ' + attr + '>'
+    return '<button type="button" class="fiezel-btn fiezel-btn-' + (variant || 'primary') + '" ' + attr + '>'
       + escapeHtml(label) + '</button>';
   }
 
@@ -738,7 +693,7 @@
     function choice(locale, flag, title, subtitle) {
       var active = selected === locale;
       var waiting = busy === locale;
-      return '<button type="button" class="fiezel-goal-card fiezel-language-choice fz-plain'
+      return '<button type="button" class="fiezel-goal-card fiezel-language-choice'
         + (active ? ' is-selected' : '') + '" data-ob-locale="' + locale + '"'
         + (waiting ? ' aria-busy="true" disabled' : '') + '>'
         + '<span class="fiezel-language-flag" aria-hidden="true">' + flag + '</span>'
@@ -771,27 +726,27 @@
   // kepala berkas. Tombol Lanjut dinonaktifkan sampai ada nama yang benar-benar bisa dipakai
   // (normalizeName mengembalikan sesuatu), sehingga spasi saja tidak lolos.
   // ---------------------------------------------------------------------------------------
-  var ICON_USER_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>';
-  var ICON_SPEAKER_SVG = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" fill-opacity="0.16"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.8 5.8a9 9 0 0 1 0 12.4"/></svg>';
-  var ICON_INFO_SVG = '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="8"/><line x1="10" y1="9" x2="10" y2="14"/><circle cx="10" cy="6.2" r="0.6" fill="currentColor"/></svg>';
-  var ICON_BOOK_SVG = '<svg viewBox="0 0 36 36" width="32" height="32" fill="none" aria-hidden="true"><path d="M6 9.5C6 8.1 7.1 7 8.5 7H16c1.1 0 2 .9 2 2v19c0-.8-.9-1.5-2-1.5H8.5C7.1 26.5 6 25.4 6 24V9.5Z" fill="#8A1C2E"/><path d="M30 9.5C30 8.1 28.9 7 27.5 7H20c-1.1 0-2 .9-2 2v19c0-.8.9-1.5 2-1.5h7.5c1.4 0 2.5-1.1 2.5-2.5V9.5Z" fill="#A62639"/><path d="M18 9v17.5" stroke="#FDFAF3" stroke-width="1.4"/></svg>';
-  var ICON_CLIPBOARD_SVG = '<svg viewBox="0 0 36 36" width="32" height="32" fill="none" aria-hidden="true"><rect x="8" y="7" width="20" height="24" rx="4" fill="#8A1C2E"/><rect x="13" y="4.5" width="10" height="5" rx="2.2" fill="#5D111D"/><circle cx="18" cy="7" r="1.2" fill="#FDFAF3"/><path d="M13.5 19.5l3 3 6-6.5" stroke="#FDFAF3" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
   function nameMarkup(env, typed) {
     var clean = normalizeName(typed);
-    return reveal(env, 1)
+    return reveal(env)
       + topbar(false, false)
+      + stepper(1)
+      // Langkah nama = sapaan. Maskot melambaikan tangan sekali (greeting), lalu diam di
+      // pose itu - bukan melambai terus-terusan di atas kolom yang sedang diisi.
       + greet(env, 'greeting', T('onboarding.senang-ketemu-you-kita-start'))
       + '<div class="fiezel-sheet" data-ob-step="name">'
-      + '<h2 class="fiezel-title">' + escapeHtml(T('onboarding.name-title-v2')) + '</h2>'
-      + '<p class="fiezel-body">' + escapeHtml(T('onboarding.name-subtitle-v2')) + '</p>'
-      + '<label class="fiezel-field fiezel-name-box"><span class="fz-name-icon-wrap"><span class="sr-only" style="display:none;">' + T('onboarding.name-field-label') + '</span><span class="fiezel-field-icon" aria-hidden="true">' + ICON_USER_SVG + '</span></span>'
-      + '<input type="text" class="fiezel-input" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
+      + T('onboarding.halo-me-fiezel-nama-you')
+      + '<label class="fiezel-field"><span>' + T('onboarding.name-field-label') + '</span>'
+      + '<input type="text" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
       + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
       + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '"></label>'
       + '<div class="fiezel-name-error" data-ob-name-error style="display:none;color:#ef4444;font-size:0.85rem;margin-top:6px;font-weight:600;line-height:1.4;"></div>'
+      // m025-242: kalimat panjang soal penyimpanan nama dilepas dari layar - ia benar, tapi
+      // ia juga yang membuat langkah pertama harus digulir. Janji yang sama tetap ada di
+      // Pengaturan, tempat nama itu bisa diganti.
+      // m025-367 OWNER: pilihan murid/guru dan kode KelasKu PINDAH ke layar masuk
+      // (features/auth/fiezel-auth-screen.js). Langkah ini kembali menanyakan satu hal.
       + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
-      + dots(5, 0)
       + '</div>';
   }
 
@@ -800,106 +755,65 @@
   // bawaan — murid Jepang yang menekan Lanjut tanpa membaca dulu diam-diam berakhir di
   // kursus Inggris, persis keluhan yang membuat langkah ini ada.
   // ---------------------------------------------------------------------------------------
-  function enCourseTryoutMarkup(isEn) {
-    return '<div class="fiezel-en-onboarding-panel" data-ob-en-panel style="' + (isEn ? 'display:flex;' : 'display:none;') + '">'
-      + '<div class="fz-active-lang-pill" data-ob-change-course role="button" tabindex="0">'
-      + '<div class="fz-active-lang-left"><span class="fiezel-course-flag" aria-hidden="true">' + FLAG_EN + '</span><b>' + escapeHtml(T('onboarding.course-en')) + '</b></div>'
-      + '<span class="fz-badge-active">' + escapeHtml(T('onboarding.badge-active')) + '</span>'
-      + '</div>'
-      + '<div class="fz-toggle-row">'
-      + '<span class="fz-toggle-label"><span class="fz-toggle-icon">' + ICON_SPEAKER_SVG + '</span> ' + escapeHtml(T('onboarding.ipa-label')) + '</span>'
-      + '<label class="fz-switch"><input type="checkbox" data-ob-toggle-ipa checked aria-label="IPA"><span class="fz-slider"></span></label>'
-      + '</div>'
-      + '<div class="fz-pronounce-preview-box" data-ob-en-preview>'
-      + '<div class="fz-preview-word">Hello</div>'
-      + '<div class="fz-preview-phonetic"><span data-ob-ipa-phonetic>/h\u0259\u02C8lo\u028A/ \u2014 </span>Halo</div>'
-      + '</div>'
-      + '<p class="fz-helper-note"><span class="fz-info-icon">' + ICON_INFO_SVG + '</span> ' + escapeHtml(T('onboarding.helper-toggle-note')) + '</p>'
-      + '</div>';
-  }
-
   function jaCourseTryoutMarkup(kanaPref, furiOn, isJa) {
     kanaPref = kanaPref || 'learning';
     var isLearning = kanaPref !== 'fluent';
     var furiActive = furiOn !== undefined ? (furiOn === true) : isLearning;
 
     return '<div class="fiezel-ja-onboarding-panel" data-ob-ja-panel style="' + (isJa ? 'display:flex;' : 'display:none;') + '">'
-      + '<div class="fz-active-lang-pill" data-ob-change-course role="button" tabindex="0">'
-      + '<div class="fz-active-lang-left"><span class="fiezel-course-flag" aria-hidden="true">' + FLAG_JA + '</span><b>' + escapeHtml(T('onboarding.course-ja')) + '</b></div>'
-      + '<span class="fz-badge-active">' + escapeHtml(T('onboarding.badge-active')) + '</span>'
-      + '</div>'
-      + '<div class="fz-ja-compact-header fz-toggle-row">'
-      + '<span class="fz-ja-compact-title fz-toggle-label"><span class="fz-toggle-icon">' + ICON_SPEAKER_SVG + '</span> ' + escapeHtml(T('onboarding.furi-label')) + '</span>'
-      + '<button type="button" class="fiezel-ob-furigana-pill fz-plain' + (furiActive ? ' is-active' : '') + '" data-ob-toggle-furigana aria-pressed="' + (furiActive ? 'true' : 'false') + '" aria-label="Furigana">'
-      + '<span class="fz-switch-track" aria-hidden="true"><span class="fz-switch-thumb"></span></span>'
-      + '<span class="fz-sr-furi"><span class="fz-pill-text">Furigana:</span> <strong data-ob-furi-status>' + (furiActive ? 'ON' : 'OFF') + '</strong></span>'
+      + '<div class="fz-ja-compact-header">'
+      + '<span class="fz-ja-compact-title">' + escapeHtml(T('onboarding.ja-kana-title', 'Bantuan Furigana (Aksara)')) + '</span>'
+      + '<button type="button" class="fiezel-ob-furigana-pill' + (furiActive ? ' is-active' : '') + '" data-ob-toggle-furigana aria-pressed="' + (furiActive ? 'true' : 'false') + '" aria-label="Alihkan Furigana">'
+      + '<span class="fz-pill-text">Furigana:</span> <strong data-ob-furi-status>' + (furiActive ? 'ON' : 'OFF') + '</strong>'
       + '</button>'
       + '</div>'
-      + '<div class="fiezel-ja-kana-options" role="radiogroup" aria-label="Kana">'
-      + '<button type="button" role="radio" aria-checked="' + (isLearning ? 'true' : 'false') + '" class="fiezel-kana-btn fz-plain' + (isLearning ? ' is-selected' : '') + '" data-ob-kana="learning">'
+      + '<div class="fiezel-ja-kana-options" role="radiogroup" aria-label="Kesiapan Aksara Jepang">'
+      + '<button type="button" role="radio" aria-checked="' + (isLearning ? 'true' : 'false') + '" class="fiezel-kana-btn' + (isLearning ? ' is-selected' : '') + '" data-ob-kana="learning">'
       + '<span class="fz-kana-btn-badge">' + escapeHtml(T('onboarding.ja-opt-learn-title', 'Butuh Furigana')) + '</span>'
       + '</button>'
-      + '<button type="button" role="radio" aria-checked="' + (!isLearning ? 'true' : 'false') + '" class="fiezel-kana-btn fz-plain' + (!isLearning ? ' is-selected' : '') + '" data-ob-kana="fluent">'
+      + '<button type="button" role="radio" aria-checked="' + (!isLearning ? 'true' : 'false') + '" class="fiezel-kana-btn' + (!isLearning ? ' is-selected' : '') + '" data-ob-kana="fluent">'
       + '<span class="fz-kana-btn-badge">' + escapeHtml(T('onboarding.ja-opt-fluent-title', 'Sudah Hafal Kana')) + '</span>'
       + '</button>'
       + '</div>'
       + '<div class="fiezel-ob-sentence-card' + (furiActive ? '' : ' hide-furigana') + '" data-ob-sentence-card>'
       + '<div class="fz-ob-jp-row">'
       + '<div class="fz-ob-jp-line" aria-label="Tokyo e ikimasu">'
-      + '<button type="button" class="fz-ob-ruby fz-plain is-active" data-ob-ruby data-word="\u6771\u4EAC" data-reading="\u3068\u3046\u304D\u3087\u3046" data-meaning="Tokyo"><ruby>\u6771\u4EAC<rt>\u3068\u3046\u304D\u3087\u3046</rt></ruby></button>'
-      + '<span class="fz-ob-plain">\u3078</span>'
-      + '<button type="button" class="fz-ob-ruby fz-plain" data-ob-ruby data-word="\u884C\u304D" data-reading="\u3044\u304D" data-meaning="pergi"><ruby>\u884C<rt>\u3044</rt></ruby>\u304D</button>'
-      + '<span class="fz-ob-plain">\u307E\u3059\u3002</span>'
+      + '<button type="button" class="fz-ob-ruby is-active" data-ob-ruby data-word="東京" data-reading="とうきょう" data-meaning="Tokyo"><ruby>東京<rt>とうきょう</rt></ruby></button>'
+      + '<span class="fz-ob-plain">へ</span>'
+      + '<button type="button" class="fz-ob-ruby" data-ob-ruby data-word="行き" data-reading="いき" data-meaning="pergi"><ruby>行<rt>い</rt></ruby>き</button>'
+      + '<span class="fz-ob-plain">ます。</span>'
       + '</div>'
-      + '<span class="fz-ob-id-line">"Tokyo"</span>'
+      + '<span class="fz-ob-id-line">"Saya pergi ke Tokyo."</span>'
       + '</div>'
       + '<div class="fz-ob-inspection-chip" data-ob-inspection-chip style="display:flex;">'
-      + '<span class="fz-chip-head"><b data-ob-chip-word>\u6771\u4EAC</b> <small data-ob-chip-reading>[\u3068\u3046\u304D\u3087\u3046]</small></span>'
-      + '<span class="fz-chip-sep">\u00B7</span>'
+      + '<span class="fz-chip-head"><b data-ob-chip-word>東京</b> <small data-ob-chip-reading>[とうきょう]</small></span>'
+      + '<span class="fz-chip-sep">·</span>'
       + '<span class="fz-chip-mean" data-ob-chip-meaning>Tokyo</span>'
       + '</div>'
       + '</div>'
-      + '<p class="fz-helper-note"><span class="fz-info-icon">' + ICON_INFO_SVG + '</span> ' + escapeHtml(T('onboarding.helper-toggle-note')) + '</p>'
       + '</div>';
   }
 
-  function courseMarkup(env, selected, kanaPref, furiOn, stage) {
+  function courseMarkup(env, selected, kanaPref, furiOn) {
     var pick = normalizeCourse(selected);
-    var showSettings = stage ? (stage === 'settings' && !!pick) : !!pick;
     var cards = COURSES.map(function (c) {
       var on = c.id === pick;
-      return '<button type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" class="fiezel-course-card fz-plain' + (on ? ' is-selected' : '') + '" data-ob-course="' + c.id + '" data-testid="ob-course-' + c.id + '">'
-        + '<div class="fz-course-card-left">'
+      return '<button type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" class="fiezel-goal-card fiezel-course-card' + (on ? ' is-selected' : '') + '" data-ob-course="' + c.id + '" data-testid="ob-course-' + c.id + '">'
         + '<span class="fiezel-course-flag" aria-hidden="true">' + c.flag + '</span>'
-        + '<span class="fiezel-course-text"><b>' + escapeHtml(T(c.titleKey)) + '</b><small>' + escapeHtml(T(c.descKey)) + '</small></span>'
-        + '</div>'
-        + '<div class="fz-card-check' + (on ? ' is-checked' : '') + '" aria-hidden="true">' + (on ? '\u2713' : '') + '</div>'
-        + '</button>';
+        + '<span class="fiezel-course-text"><b>' + escapeHtml(T(c.titleKey)) + '</b><small>' + escapeHtml(T(c.descKey)) + '</small></span></button>';
     }).join('');
-
-    var mandarinCard = '<div class="fiezel-course-card is-mandarin" data-ob-course-preview="zh">'
-      + '<div class="fz-course-card-left">'
-      + '<span class="fiezel-course-flag" aria-hidden="true">' + FLAG_ZH + '</span>'
-      + '<span class="fiezel-course-text"><b>' + escapeHtml(T('onboarding.course-zh')) + '</b><small>' + escapeHtml(T('onboarding.course-zh-sub')) + '</small></span>'
-      + '</div>'
-      + '<span class="fz-card-badge">' + escapeHtml(T('onboarding.course-soon')) + '</span>'
-      + '</div>';
-
-    return reveal(env, COURSE_STEP, showSettings ? 3 : 2)
+    return reveal(env)
+      /* Sama dengan langkah tujuan: di alur ringkas satu-satunya jalan maju adalah memilih
+         (satu ketukan) atau Kembali; di alur penuh "Lewati" global tetap ada. */
       + topbar(true, uxOn('leanIntro') ? false : undefined)
-      + greet(env, showSettings ? 'observing' : 'curious', T('onboarding.course-greet'))
+      + stepper(COURSE_STEP)
+      + greet(env, pick ? 'observing' : 'curious', T('onboarding.course-greet'))
       + '<div class="fiezel-sheet" data-ob-step="course">'
-      + '<h2 class="fiezel-title" data-ob-course-heading>' + escapeHtml(T(showSettings ? 'onboarding.lang-settings-title' : 'onboarding.course-title-v2')) + '</h2>'
-      + '<p class="fiezel-body" data-ob-course-sub>' + escapeHtml(T(showSettings ? 'onboarding.lang-settings-desc' : 'onboarding.course-desc-v2')) + '</p>'
-      + '<div class="fiezel-course-grid' + (showSettings ? ' is-hidden' : '') + '" data-ob-course-grid role="radiogroup" aria-label="' + escapeHtml(T('onboarding.course-aria')) + '" style="display:' + (showSettings ? 'none' : 'grid') + ';">'
-      + cards
-      + mandarinCard
-      + '</div>'
-      + jaCourseTryoutMarkup(kanaPref, furiOn, showSettings && pick === 'ja')
-      + enCourseTryoutMarkup(showSettings && pick === 'en')
-      + '<p class="fiezel-note" style="display:none;">' + escapeHtml(T('onboarding.course-note')) + '</p>'
-      + btn(T('onboarding.next-arrow'), 'data-ob-advance' + (pick ? '' : ' disabled'))
-      + dots(5, showSettings ? 2 : 1)
+      + '<h2 class="fiezel-title">' + escapeHtml(T('onboarding.course-title')) + '</h2>'
+      + '<div class="fiezel-course-grid" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.course-aria')) + '">' + cards + '</div>'
+      + jaCourseTryoutMarkup(kanaPref, furiOn, pick === 'ja')
+      + '<p class="fiezel-note">' + escapeHtml(T('onboarding.course-note')) + '</p>'
+      + btn(T('onboarding.next'), 'data-ob-advance' + (pick ? '' : ' disabled'))
       + '</div>';
   }
 
@@ -925,10 +839,10 @@
       + '<p class="fiezel-body">' + escapeHtml(T(slide.bodyKey)) + '</p>'
       + '<div class="fiezel-carousel-track">' + items + '</div>'
       + '<div class="fiezel-carousel-arrows">'
-      + '<button type="button" class="fiezel-carousel-arrow fz-plain" data-ob-carousel-prev' + (slideIndex === 0 ? ' disabled' : '') + '>'
+      + '<button type="button" class="fiezel-carousel-arrow" data-ob-carousel-prev' + (slideIndex === 0 ? ' disabled' : '') + '>'
       + glyph('chevron-left') + '</button>'
       + dots(CAROUSEL_SLIDES.length, slideIndex)
-      + '<button type="button" class="fiezel-carousel-arrow fz-plain" data-ob-carousel-next' + (isLast ? ' disabled' : '') + '>'
+      + '<button type="button" class="fiezel-carousel-arrow" data-ob-carousel-next' + (isLast ? ' disabled' : '') + '>'
       + glyph('chevron-right') + '</button>'
       + '</div>'
       + btn(T('onboarding.next-l523'), 'data-ob-advance')
@@ -940,15 +854,6 @@
   // ---------------------------------------------------------------------------------------
   function goalMarkup(env, selectedGoal, selectedLevel, selectedCourse) {
     var activeCourse = selectedCourse ? normalizeCourse(selectedCourse) : storedCourse(env);
-    var GOAL_ICONS = {
-      school: '<svg viewBox="0 0 36 36" width="30" height="30" fill="none" aria-hidden="true"><path d="M18 7L4 13.5L18 20L32 13.5L18 7Z" fill="#8A1C2E"/><path d="M9.5 16.5V23.5C9.5 26 13.3 28 18 28C22.7 28 26.5 26 26.5 23.5V16.5L18 20.5L9.5 16.5Z" fill="#6E1423"/><path d="M30 14.5V23" stroke="#E5A93C" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="24" r="1.8" fill="#E5A93C"/></svg>',
-      campus: '<svg viewBox="0 0 36 36" width="30" height="30" fill="none" aria-hidden="true"><path d="M18 6L6 12.5H30L18 6Z" fill="#6B6059"/><rect x="6" y="12.5" width="24" height="2.5" rx="0.8" fill="#8C7E74"/><rect x="9" y="15" width="3" height="11" fill="#7D716A"/><rect x="16.5" y="15" width="3" height="11" fill="#7D716A"/><rect x="24" y="15" width="3" height="11" fill="#7D716A"/><rect x="5" y="26" width="26" height="3" rx="1" fill="#5A504A"/></svg>',
-      exam_foundation: '<svg viewBox="0 0 36 36" width="30" height="30" fill="none" aria-hidden="true"><path d="M14 21L11 30L15.5 27.5L18 31L18 21" fill="#8A1C2E"/><path d="M22 21L25 30L20.5 27.5L18 31L18 21" fill="#A62639"/><circle cx="18" cy="14.5" r="8" fill="#B8B0A8"/><circle cx="18" cy="14.5" r="5.5" fill="#7D736B"/><circle cx="18" cy="14.5" r="2.2" fill="#EAE4DC"/></svg>',
-      everyday: '<svg viewBox="0 0 36 36" width="30" height="30" fill="none" aria-hidden="true"><path d="M15 8C9.5 8 5 11.6 5 16C5 18.1 6 20 7.7 21.4L6.5 25.5L10.8 23.4C12.1 23.8 13.5 24 15 24C20.5 24 25 20.4 25 16C25 11.6 20.5 8 15 8Z" fill="#8A1C2E"/><path d="M23 14C27.4 14 31 16.9 31 20.5C31 22.2 30.2 23.7 28.8 24.9L29.8 28.2L26.3 26.5C25.3 26.8 24.2 27 23 27C18.6 27 15 24.1 15 20.5C15 16.9 18.6 14 23 14Z" fill="#4A3F3A"/></svg>',
-      it: '<svg viewBox="0 0 36 36" width="30" height="30" fill="none" aria-hidden="true"><rect x="5" y="7" width="26" height="17" rx="2.5" fill="#4A3F3A"/><rect x="7.5" y="9.5" width="21" height="12" rx="1" fill="#CBD5E1"/><path d="M15 24H21L22.5 28.5H13.5L15 24Z" fill="#7D736B"/><rect x="11" y="28.5" width="14" height="2" rx="1" fill="#5A504A"/></svg>',
-      scholarship: '<svg viewBox="0 0 36 36" width="30" height="30" fill="none" aria-hidden="true"><path d="M11 8H25V15C25 18.9 21.9 22 18 22C14.1 22 11 18.9 11 15V8Z" fill="#E5A93C"/><path d="M11 10H7.5C6.7 10 6 10.7 6 11.5V13C6 15.5 8 17.5 10.5 17.5H11.5" stroke="#D4952A" stroke-width="2.2"/><path d="M25 10H28.5C29.3 10 30 10.7 30 11.5V13C30 15.5 28 17.5 25.5 17.5H24.5" stroke="#D4952A" stroke-width="2.2"/><rect x="16.2" y="22" width="3.6" height="4.5" fill="#C48720"/><rect x="12" y="26.5" width="12" height="3.2" rx="1.2" fill="#8A1C2E"/><path d="M18 11.5L19 13.7L21.3 14L19.6 15.6L20 17.9L18 16.8L16 17.9L16.4 15.6L14.7 14L17 13.7L18 11.5Z" fill="#FFF8E7"/></svg>'
-    };
-
     var goals = goalOptions(env).map(function (g) {
       if (activeCourse !== 'ja') return g;
       if (g.id === 'exam_foundation') {
@@ -969,47 +874,47 @@
       }
       return g;
     });
-    var GOAL_ORDER = ['school', 'campus', 'exam_foundation', 'everyday', 'it', 'scholarship'];
-    goals.sort(function (a, b) {
-      var ia = GOAL_ORDER.indexOf(a.id);
-      var ib = GOAL_ORDER.indexOf(b.id);
-      if (ia === -1) ia = 99;
-      if (ib === -1) ib = 99;
-      return ia - ib;
-    });
     var cards = goals.map(function (g) {
       var selected = g.id === selectedGoal;
-      var icon = GOAL_ICONS[g.id] || GOAL_ICONS.school;
-      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-goal-card fz-plain' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
-        + '<div class="fz-goal-card-icon" aria-hidden="true">' + icon + '</div>'
-        + '<b class="fz-goal-card-title">' + escapeHtml(g.label) + '</b>'
-        + (selected ? '<span class="fz-goal-check" aria-hidden="true">\u2713</span>' : '')
-        + '</button>';
+      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
+        + '<b>' + escapeHtml(g.label) + '</b></button>';
     }).join('');
     var levelList = (activeCourse === 'ja') ? JLPT_LEVELS : CEFR_LEVELS;
     var levelRow = selectedGoal ? '<div class="fiezel-level-row" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-level-aria')) + '">' + levelList.map(function (lv) {
       var selected = lv === selectedLevel;
-      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-level-chip fz-plain' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
+      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
     }).join('') + '</div>' : '';
-    return reveal(env, 3)
+    // Audit F18 (2026-09-23): kartu tujuan dan chip level dulu tanpa role/aria-checked -
+    // pembaca layar tidak tahu mana yang terpilih (kartu peran di langkah 1 sudah benar).
+    // Audit F05: "Kembali" kini ada di langkah ini (dulu tidak, padahal langkah sesudahnya
+    // punya), dan jalan lewatinya satu saja - "Lewati langkah ini" di bawah, yang tetap
+    // mengantar ke tawaran tes awal alih-alih menutup seluruh perkenalan.
+    return reveal(env)
       + topbar(true, uxOn('leanIntro') ? false : undefined)
+      + stepper(3)
+      // Selama tujuan belum dipilih maskot MENGAMATI pilihan (curious). Begitu tujuan
+      // terpilih dan enam chip level muncul, pekerjaannya berubah: ia menimbang jawaban
+      // murid, bukan lagi menawarkan pilihan - karena itu posenya juga berubah.
       + greet(env, selectedGoal ? 'observing' : 'curious',
         T('onboarding.tujuanmu-yang-menentukan-materi-mana'))
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + T('onboarding.apa-tujuan-you-study')
-      + '<p class="fiezel-body">' + escapeHtml(T('onboarding.goal-subtitle-v2')) + '</p>'
       + '<div class="fiezel-goal-grid" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-goal')) + '">' + cards + '</div>'
-      + (selectedGoal ? '<div class="fiezel-level-block"><p class="fiezel-note" style="margin-top:6px;font-weight:700;">' + escapeHtml(T('onboarding.step-level-aria')) + '</p>' + levelRow
-        + T('onboarding.level-perkiraan-singkat') + '</div>' : '')
-      + btn(T('onboarding.next-arrow'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
+      + (selectedGoal ? T('onboarding.apa-level-lang-you-inline') + levelRow
+        + T('onboarding.level-perkiraan-singkat') : '')
+      + btn(T('onboarding.next-l554'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
       + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
-      + dots(5, 3)
       + '</div>';
   }
 
   // ---------------------------------------------------------------------------------------
   // Step 4: Placement (mengarah ke tes 25 soal yang sungguhan, bukan versi 4-5 soal palsu)
   // ---------------------------------------------------------------------------------------
+  /* Audit F01/F04 (2026-09-22): jumlah soal tes awal dibaca dari sumber yang SAMA dengan tes
+     yang benar-benar dijalankan. Salinan lama memaku "25 soal listening" sementara
+     placement-lite (bendera bawaan) menjalankan 12 soal tanpa listening - janji pertama
+     produk meleset sejak angka pertamanya. Sumbernya fiezel-diagnostic-targets.js
+     (leveltest.totalQuestions / liteQuestions); app.js memakai angka yang sama. */
   function placementFacts(env) {
     var lite = uxOn('placementLite'), targets = null;
     try { targets = (env && env.FiezelDiagnosticTargets) || null; } catch (_) {}
@@ -1023,44 +928,34 @@
 
   function placementMarkup(env) {
     var facts = placementFacts(env);
+    // Audit F05: SATU jalan lewati per langkah. Dulu langkah ini punya tiga jalan keluar
+    // yang artinya berbeda ("Lewati" di pojok, "Lewati langkah ini", "Kembali"). Pada
+    // perkenalan ringkas (bawaan) ia langkah TERAKHIR, jadi kedua "lewati" berarti hal yang
+    // sama - yang tersisa satu: "Nanti saja" (data-ob-skip, menutup perkenalan). Urutan enam
+    // langkah lama (leanIntro mati) masih punya jadwal & ringkasan sesudahnya, jadi di sana
+    // "Lewati langkah ini" tetap berarti maju satu langkah.
     var seq = stepSequence(), last = seq[seq.length - 1] === PLACEMENT_STEP;
-    return reveal(env, 4)
+    return reveal(env)
       + topbar(true, last ? false : undefined)
+      + stepper(4)
       + greet(env, 'encouraging', T('onboarding.santai-this-bukan-ujian-can'))
       + '<div class="fiezel-sheet" data-ob-step="4">'
-      + '<h2 class="fiezel-title">' + escapeHtml(T('onboarding.path-title-v2')) + '</h2>'
-      + '<p class="fiezel-body">' + escapeHtml(T('onboarding.path-desc-v2')) + '</p>'
+      + '<h2 class="fiezel-title">' + escapeHtml(T('onboarding.path-choice-title')) + '</h2>'
+      + '<p class="fiezel-body" style="margin-bottom:16px;">' + escapeHtml(T('onboarding.path-choice-desc')) + '</p>'
       + '<div class="fiezel-placement-path-grid">'
-      + '<div class="fiezel-path-card is-beginner is-selected" data-ob-path="beginner" role="button" tabindex="0">'
-      + '<div class="fz-path-card-content">'
-      + '<span class="fz-path-icon" aria-hidden="true">' + ICON_BOOK_SVG + '</span>'
-      + '<div class="fz-path-texts">'
-      + '<b class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-beginner-title')) + '</b>'
-      + '<p class="fiezel-path-desc">' + escapeHtml(T('onboarding.path-beginner-desc-v2')) + '</p>'
+      + '<div class="fiezel-path-card is-beginner" data-ob-path="beginner">'
+      + '<div class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-beginner-title')) + '</div>'
+      + '<p class="fiezel-path-desc">' + escapeHtml(T('onboarding.path-beginner-desc')) + '</p>'
+      + '<button type="button" class="fiezel-btn fiezel-btn-primary" data-ob-beginner>' + escapeHtml(T('onboarding.path-beginner-btn')) + '</button>'
+      + '</div>'
+      + '<div class="fiezel-path-card is-test" data-ob-path="test">'
+      + '<div class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-test-title')) + '</div>'
+      + '<p class="fiezel-path-desc"><span class="fiezel-path-count">' + facts.soal + ' soal</span> ' + escapeHtml(T('onboarding.path-test-desc', { soal: facts.soal })) + '</p>'
+      + '<button type="button" class="fiezel-btn fiezel-btn-primary" data-ob-primary>' + escapeHtml(T('onboarding.path-test-btn')) + '</button>'
       + '</div>'
       + '</div>'
-      + '<div class="fz-path-radio" aria-hidden="true"><span class="fz-radio-dot"></span></div>'
-      + '<button type="button" class="fiezel-btn fz-plain fiezel-btn-primary" data-ob-beginner style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;">' + escapeHtml(T('onboarding.path-beginner-btn')) + '</button>'
-      + '</div>'
-      + '<div class="fiezel-path-card is-test" data-ob-path="test" role="button" tabindex="0">'
-      + '<div class="fz-path-card-content">'
-      + '<span class="fz-path-icon" aria-hidden="true">' + ICON_CLIPBOARD_SVG + '</span>'
-      + '<div class="fz-path-texts">'
-      + '<span class="fz-path-soal-pill">' + facts.soal + ' soal</span>'
-      + '<b class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-test-title')) + '</b>'
-      + '<p class="fiezel-path-desc"><span class="fiezel-path-count" style="display:none;">' + facts.soal + ' soal</span> ' + escapeHtml(T('onboarding.path-test-desc-v2')) + '</p>'
-      + '</div>'
-      + '</div>'
-      + '<div class="fz-path-radio" aria-hidden="true"><span class="fz-radio-dot"></span></div>'
-      + '<button type="button" class="fiezel-btn fz-plain fiezel-btn-primary" data-ob-primary style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;">' + escapeHtml(T('onboarding.path-test-btn')) + '</button>'
-      + '</div>'
-      + '</div>'
-      + '<div class="fz-placement-actions">'
-      + (last ? '<button type="button" class="fiezel-btn-ghost fz-plain fz-skip-link" data-ob-skip>' + escapeHtml(T('onboarding.skip-later-v2')) + '</button>'
-        : '<button type="button" class="fiezel-btn-ghost fz-plain fz-skip-link" data-ob-step-skip>' + escapeHtml(T('onboarding.btn-skip-step')) + '</button>')
-      + '<button type="button" class="fiezel-btn fz-plain fiezel-btn-primary fz-btn-main-start" data-ob-main-start>' + escapeHtml(T('onboarding.start-learn-arrow')) + '</button>'
-      + '</div>'
-      + dots(5, 4)
+      + (last ? btn(T('onboarding.btn-skip-test'), 'data-ob-skip', 'ghost')
+        : btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost'))
       + '</div>';
   }
 
@@ -1143,7 +1038,7 @@
     if (doc.querySelector && doc.querySelector('.fiezel-ob')) return { shown: false, reason: 'already_visible' };
 
     var host = doc.createElement('div');
-    host.className = 'fiezel-ob' + (uxOn('leanIntro') ? ' is-lean' : '');
+    host.className = 'fiezel-ob';
     var reduceMotion = prefersReducedMotion(target);
     if (reduceMotion) host.className += ' fiezel-ob-still';
     host.setAttribute('role', 'dialog');
@@ -1164,8 +1059,6 @@
     var selectedRole = storedRole(target);
     var typedClassCode = '';
     var selectedCourse = normalizeCourse(storedCourse(target));
-    var courseStage = selectedCourse ? 'settings' : 'pick';
-    var returnedToPick = false;
     var selectedKanaPref = 'learning';
     var selectedFurigana = true;
     var selectedGoal = '';
@@ -1447,7 +1340,7 @@
       var html;
       if (step === LANGUAGE_STEP) html = languageMarkup(target, selectedLocale, localeBusy);
       else if (step === 1) html = nameMarkup(target, typedName);
-      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse, selectedKanaPref, selectedFurigana, courseStage);
+      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse, selectedKanaPref, selectedFurigana);
       else if (step === 2) html = carouselMarkup(target, slide);
       else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel, selectedCourse);
       else if (step === 4) html = placementMarkup(target);
@@ -1701,12 +1594,6 @@
       }
       if (step === COURSE_STEP) {
         if (!selectedCourse) return;
-        if (returnedToPick && courseStage === 'pick') {
-          courseStage = 'settings';
-          returnedToPick = false;
-          paint();
-          return;
-        }
         if (typeof opts.onCourse === 'function') { try { opts.onCourse({ course: selectedCourse }); } catch (_) {} }
         /* Murid yang masuk dengan kode KelasKu (layar masuk) langsung ke kelasnya — perilaku
            yang sama dengan kode yang dulu diketik di langkah nama. */
@@ -1724,12 +1611,6 @@
 
     function back() {
       if (step === 2 && slide > 0) { slide -= 1; paint(); return; }
-      if (step === COURSE_STEP && courseStage === 'settings' && selectedCourse) {
-        courseStage = 'pick';
-        returnedToPick = true;
-        paint();
-        return;
-      }
       // Langkah nama tidak punya langkah sebelumnya, dan mundur ke sana dari langkah
       // berikutnya tidak menghapus nama yang sudah diberikan - kolomnya terisi kembali
       // apa adanya.
@@ -1757,88 +1638,23 @@
           })(localeButtons[l]);
         }
         var jaPanel = host.querySelector('[data-ob-ja-panel]');
-        var enPanel = host.querySelector('[data-ob-en-panel]');
-        var courseGrid = host.querySelector('[data-ob-course-grid]');
-        var ipaToggle = host.querySelector('[data-ob-toggle-ipa]');
-        if (ipaToggle) {
-          ipaToggle.addEventListener('change', function () {
-            var ipaSpan = host.querySelector('[data-ob-ipa-phonetic]');
-            if (ipaSpan && ipaSpan.style) ipaSpan.style.display = ipaToggle.checked ? 'inline' : 'none';
-          });
-        }
-        function syncCourseStageUI() {
-          var showSettings = courseStage === 'settings' && !!selectedCourse;
-          if (courseGrid) {
-            if (courseGrid.classList && typeof courseGrid.classList.toggle === 'function') {
-              courseGrid.classList.toggle('is-hidden', showSettings);
-            }
-            if (courseGrid.style) {
-              if (typeof courseGrid.style.setProperty === 'function') {
-                courseGrid.style.setProperty('display', showSettings ? 'none' : 'flex', 'important');
-              } else {
-                courseGrid.style.display = showSettings ? 'none' : 'grid';
-              }
-            }
-          }
-          if (enPanel && enPanel.style) enPanel.style.display = (showSettings && selectedCourse === 'en') ? 'flex' : 'none';
-          if (jaPanel && jaPanel.style) jaPanel.style.display = (showSettings && selectedCourse === 'ja') ? 'flex' : 'none';
-          var cHead = host.querySelector('[data-ob-course-heading]');
-          var cSub = host.querySelector('[data-ob-course-sub]');
-          if (cHead) cHead.textContent = T(showSettings ? 'onboarding.lang-settings-title' : 'onboarding.course-title-v2');
-          if (cSub) cSub.textContent = T(showSettings ? 'onboarding.lang-settings-desc' : 'onboarding.course-desc-v2');
-          var nextBtn = host.querySelector('[data-ob-advance]');
-          if (nextBtn) {
-            if (selectedCourse) nextBtn.removeAttribute('disabled');
-            else nextBtn.setAttribute('disabled', 'disabled');
-          }
-          if (uxOn('leanIntro')) {
-            var vNum = showSettings ? 3 : 2;
-            var topCounter = host.querySelector('[data-ob-top-counter]');
-            if (topCounter) topCounter.textContent = vNum + ' / 5';
-            var topDotsWrap = host.querySelector('[data-ob-top-dots]');
-            var topDots = topDotsWrap && topDotsWrap.querySelectorAll ? topDotsWrap.querySelectorAll('i') : [];
-            for (var ti = 0; ti < topDots.length; ti++) {
-              if (topDots[ti].classList && typeof topDots[ti].classList.toggle === 'function') {
-                topDots[ti].classList.toggle('is-done', ti < vNum);
-                topDots[ti].classList.toggle('is-current', ti === vNum - 1);
-              }
-            }
-          }
-          var dotEls = host.querySelectorAll('.fiezel-dots .fiezel-dot');
-          if (dotEls && dotEls.length === 5) {
-            var activeIdx = showSettings ? 2 : 1;
-            for (var di = 0; di < dotEls.length; di++) {
-              if (dotEls[di].classList && typeof dotEls[di].classList.toggle === 'function') {
-                dotEls[di].classList.toggle('is-active', di === activeIdx);
-              }
-            }
-          }
-        }
-        host.querySelectorAll('[data-ob-change-course]').forEach(function (chg) {
-          chg.addEventListener('click', function () {
-            courseStage = 'pick';
-            returnedToPick = true;
-            syncCourseStageUI();
-          });
-        });
         host.querySelectorAll('[data-ob-course]').forEach(function (b) {
           b.addEventListener('click', function () {
             selectedCourse = normalizeCourse(b.getAttribute('data-ob-course'));
-            courseStage = 'settings';
-            returnedToPick = false;
             host.querySelectorAll('[data-ob-course]').forEach(function (x) {
               var on = x === b;
               if (x.classList && typeof x.classList.toggle === 'function') x.classList.toggle('is-selected', on);
               x.setAttribute('aria-checked', on ? 'true' : 'false');
-              var chk = x.querySelector ? x.querySelector('.fz-card-check') : null;
-              if (chk) {
-                if (chk.classList && typeof chk.classList.toggle === 'function') chk.classList.toggle('is-checked', on);
-                chk.textContent = on ? '\u2713' : '';
-              }
             });
-            syncCourseStageUI();
-            if (selectedCourse && typeof microReact === 'function') {
-              microReact('observing', 600, 'curious');
+            var nextBtn = host.querySelector('[data-ob-advance]');
+            if (nextBtn && selectedCourse) nextBtn.removeAttribute('disabled');
+            if (jaPanel && jaPanel.style) {
+              if (selectedCourse === 'ja') {
+                jaPanel.style.display = 'flex';
+                if (typeof microReact === 'function') microReact('observing', 600, 'curious');
+              } else {
+                jaPanel.style.display = 'none';
+              }
             }
           });
         });
@@ -1980,35 +1796,15 @@
             finish('beginner');
           });
         }
-        var selectedPath = 'beginner';
         var pathCards = host.querySelectorAll('[data-ob-path]');
         for (var pIdx = 0; pIdx < pathCards.length; pIdx++) {
           (function (card) {
             card.addEventListener('click', function (e) {
               if (e && e.target && e.target.tagName === 'BUTTON') return;
-              var pathVal = card.getAttribute('data-ob-path') || 'beginner';
-              selectedPath = pathVal;
-              pathCards.forEach(function (c) {
-                if (c.classList && typeof c.classList.toggle === 'function') {
-                  c.classList.toggle('is-selected', c === card);
-                }
-              });
+              var btnEl = card.querySelector('button');
+              if (btnEl) btnEl.click();
             });
           })(pathCards[pIdx]);
-        }
-        var mainStartBtn = host.querySelector('[data-ob-main-start]');
-        if (mainStartBtn) {
-          mainStartBtn.addEventListener('click', function () {
-            if (selectedPath === 'test') {
-              var pBtn = host.querySelector('[data-ob-primary]');
-              if (pBtn) pBtn.click();
-              else startPlacementNow();
-            } else {
-              var bBtn = host.querySelector('[data-ob-beginner]');
-              if (bBtn) bBtn.click();
-              else finish('beginner');
-            }
-          });
         }
         var prev = host.querySelector('[data-ob-carousel-prev]');
         if (prev && !prev.hasAttribute('disabled')) prev.addEventListener('click', function () {

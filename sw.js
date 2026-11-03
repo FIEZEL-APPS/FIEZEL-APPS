@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-756-unified-grammar-20261002';
+const SW_REV='m025-757-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
@@ -160,7 +160,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // Termasuk aset RESERVED/RETIRED
   // (splash_paw_appear, stamp_thud) supaya cache dan direktori tidak pernah berbeda isi.
   './assets/audio/sfx/answer_correct.ogg','./assets/audio/sfx/answer_correct_perfect.ogg','./assets/audio/sfx/answer_wrong.ogg','./assets/audio/sfx/answer_wrong_retry.ogg','./assets/audio/sfx/button_tap.ogg','./assets/audio/sfx/error_system.ogg','./assets/audio/sfx/exam_complete.ogg','./assets/audio/sfx/exam_pass.ogg','./assets/audio/sfx/exam_result_reveal.ogg','./assets/audio/sfx/exam_score_tick.ogg','./assets/audio/sfx/lesson_complete.ogg','./assets/audio/sfx/lesson_start.ogg','./assets/audio/sfx/level_up.ogg','./assets/audio/sfx/notif_achievement.ogg','./assets/audio/sfx/notif_general.ogg','./assets/audio/sfx/notif_streak_reminder.ogg','./assets/audio/sfx/page_transition.ogg','./assets/audio/sfx/paw_appear.ogg','./assets/audio/sfx/paw_celebrate.ogg','./assets/audio/sfx/paw_encourage.ogg','./assets/audio/sfx/paw_greet.ogg','./assets/audio/sfx/splash_intro.ogg','./assets/audio/sfx/splash_paw_appear.ogg','./assets/audio/sfx/stamp_thud.ogg','./assets/audio/sfx/streak_5.ogg','./assets/audio/sfx/streak_10.ogg','./assets/audio/sfx/xp_gain.ogg',
-  './features/grammar/grammar-upgrade.css','./features/grammar/fiezel-grammar-upgrade.js','./features/grammar/grammar-vocab-bridge.css','./features/grammar/grammar-vocab-bridge.js','./features/i18n/grammar-sentence-translations.js','./content/grammar-vocab-map-v1.json','./features/ui/fiezel-tactile-clay.css','./call.html','./features/voice-studio/dist/voice-studio.js','./features/voice-studio/dist/voice-studio.css','./assets/brand/mochi-mascot-headset.png','./assets/brand/paw-mochi-idle.svg','./assets/brand/paw-mochi-speaking.svg',
+  './features/grammar/grammar-upgrade.css','./features/grammar/fiezel-grammar-upgrade.js','./features/grammar/grammar-vocab-bridge.css','./features/grammar/grammar-vocab-bridge.js','./features/i18n/grammar-sentence-translations.js','./content/grammar-vocab-map-v1.json','./features/ui/fiezel-tactile-clay.css','./call.html','./features/voice-studio/dist/voice-studio.js','./features/voice-studio/dist/voice-studio.css','./assets/brand/mochi-mascot-headset.png','./assets/brand/paw-mochi-speaking.svg',
   './features/brain/fiezel-fsrs-bridge.js',
   './features/japanese/fiezel-ja-conjugator.js',
   './assets/stories/mizuki-1.webp','./assets/stories/mizuki-2.webp','./assets/stories/mizuki-3.webp','./assets/stories/mizuki-4.webp','./assets/stories/asakusa-1.webp','./assets/stories/asakusa-2.webp','./assets/stories/asakusa-3.webp','./assets/stories/asakusa-4.webp','./assets/stories/shinkansen-1.webp','./assets/stories/shinkansen-2.webp','./assets/stories/shinkansen-3.webp','./assets/stories/shinkansen-4.webp'];
