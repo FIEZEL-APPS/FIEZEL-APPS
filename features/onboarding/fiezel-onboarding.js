@@ -790,7 +790,7 @@
       + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
       + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '"></label>'
       + '<div class="fiezel-name-error" data-ob-name-error style="display:none;color:#ef4444;font-size:0.85rem;margin-top:6px;font-weight:600;line-height:1.4;"></div>'
-      + btn(T('onboarding.next-arrow'), 'data-ob-advance' + (clean ? '' : ' disabled'))
+      + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
       + dots(5, 0)
       + '</div>';
   }
