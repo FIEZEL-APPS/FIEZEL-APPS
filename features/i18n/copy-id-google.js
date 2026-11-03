@@ -80,6 +80,7 @@
     'auth.layar.lupa-murid': 'Belum ada pemulihan otomatis. Masuk dengan Google bila akunmu tertaut, atau minta bantuan gurumu.',
     'auth.layar.masuk': 'Masuk',
     'auth.layar.memproses': 'Memproses…',
+    'auth.layar.mulai-sekarang': 'Mulai Sekarang',
     'auth.layar.murid': 'Murid',
     'auth.layar.nama-pengguna': 'Nama pengguna',
     'auth.layar.opsional': '(opsional)',
@@ -90,7 +91,7 @@
     'auth.layar.tamu': 'Masuk sebagai Pengunjung / Tamu',
     'auth.layar.tamu-hint': 'Belajar langsung tanpa akun. Progres tersimpan di perangkat ini.',
     'auth.layar.ulangi-sandi': 'Ulangi kata sandi',
-    'auth.layar.welcome-lead': 'Belajar Bahasa Inggris dan Bahasa Jepang adaptif. Masuk sekali, progresmu ikut ke HP mana pun.',
+    'auth.layar.welcome-lead': 'Belajar bahasa dengan cara yang lebih mudah, lebih seru, dan lebih bermakna.',
     /* --- m025-464 progres ikut akun (sinkron berizin) --- */
     'sinkron.judul': "Progres ikut akun",
     'sinkron.baru-saja': "baru saja",

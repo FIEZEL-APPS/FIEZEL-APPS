@@ -104,12 +104,16 @@
      titik-titik yang diganggu sinus, jadi berkasnya tidak memuat gambar apa pun. */
   var TOPO = 'M121 120C122 123 118 128 115 131C112 133 106 134 102 134C98 135 94 136 90 135C85 135 76 135 74 132C72 130 77 124 77 120C78 116 77 113 79 110C81 107 84 103 88 102C92 101 100 101 103 103C107 104 107 109 110 112C113 115 121 117 121 120Z|M146 120C147 126 140 137 134 141C127 146 116 144 107 147C98 149 90 155 82 155C73 154 59 149 55 143C52 137 57 127 58 120C59 113 59 107 63 101C66 95 72 83 80 81C88 79 101 86 109 89C117 93 120 98 127 103C133 108 145 114 146 120Z|M171 120C172 131 164 146 154 153C144 159 126 154 112 159C98 163 83 180 71 179C59 178 45 162 39 152C33 142 35 130 35 120C36 110 38 101 44 91C50 80 59 60 70 58C82 56 100 73 113 78C126 84 139 83 149 90C159 97 171 109 171 120Z|M197 120C197 135 188 156 175 165C161 173 137 166 118 173C99 180 75 210 60 208C44 205 33 175 25 161C16 146 10 134 9 120C9 106 14 93 22 78C31 64 44 35 60 34C76 32 98 61 118 68C137 75 163 66 177 74C190 83 198 105 197 120Z|M225 120C223 140 209 163 193 175C177 187 151 183 126 193C102 203 67 240 48 236C28 232 21 188 10 169C-1 150 -16 138 -19 120C-21 102 -16 81 -4 63C7 45 30 13 51 12C72 11 97 47 123 55C149 62 190 46 207 57C224 68 228 100 225 120Z|M257 120C252 144 228 167 208 183C188 200 167 209 138 221C110 234 62 268 37 261C13 254 6 203 -8 179C-22 156 -42 142 -47 120C-52 98 -53 65 -38 44C-23 23 16 -3 44 -4C73 -6 99 28 131 35C163 43 217 26 238 40C259 54 262 96 257 120Z|M292 120C284 148 243 167 220 190C197 214 186 244 154 259C122 274 60 291 29 280C-1 269 -14 219 -31 192C-49 166 -69 148 -76 120C-84 92 -97 44 -77 22C-58 -1 4 -11 40 -14C77 -16 105 1 143 7C181 13 242 5 266 23C291 42 299 92 292 120Z|M328 120C318 152 259 167 233 197C207 228 208 289 173 305C138 320 63 309 24 293C-15 277 -38 237 -60 208C-82 180 -98 155 -108 120C-118 85 -144 21 -120 -2C-96 -26 -8 -14 38 -19C85 -24 116 -35 159 -30C201 -26 265 -17 293 8C321 34 338 88 328 120Z|M349 70C349 73 346 76 344 78C341 80 338 79 334 81C331 82 325 88 323 88C320 87 319 80 318 77C316 74 314 73 313 70C313 67 313 64 315 61C316 59 320 54 323 54C326 54 330 60 334 61C338 62 344 59 347 60C350 62 350 67 349 70Z|M371 70C369 76 361 80 356 85C351 89 348 93 341 96C334 100 321 108 315 106C309 104 308 90 305 84C302 78 296 76 295 70C293 64 291 55 295 50C298 45 310 40 318 40C325 40 330 48 339 49C347 51 361 46 366 49C372 53 372 64 371 70Z|M395 70C392 79 374 82 367 91C359 99 360 114 351 119C341 124 319 125 309 121C299 116 295 102 289 93C283 85 278 80 275 70C272 60 263 42 269 36C276 29 301 31 314 30C326 30 334 30 346 32C358 33 378 32 386 38C394 45 398 61 395 70Z|M422 70C417 82 389 84 379 98C369 111 376 144 363 150C351 156 319 141 304 134C288 126 277 116 268 105C259 94 255 84 250 70C245 56 230 27 240 19C250 11 291 25 310 23C330 21 340 5 357 6C373 7 397 15 408 26C418 37 427 58 422 70Z|M446 70C440 86 408 89 397 108C386 127 393 177 377 183C361 189 321 156 299 145C277 134 259 130 245 118C232 106 223 89 218 70C212 51 198 13 213 3C227 -6 280 18 307 14C333 9 349 -24 369 -24C390 -24 417 -2 430 13C442 29 451 54 446 70Z|M315 300C315 302 312 303 311 306C309 309 309 315 306 315C304 316 299 312 296 310C293 309 290 309 288 307C286 305 284 303 283 300C283 297 282 293 285 291C287 290 293 293 297 292C300 291 303 286 306 286C309 286 312 290 314 292C315 294 316 298 315 300Z|M328 300C328 305 330 310 327 316C325 321 319 329 313 330C307 331 297 324 291 321C285 319 280 318 275 314C269 311 261 305 260 300C260 295 267 288 272 284C278 281 285 282 292 280C298 278 306 270 312 271C318 271 327 278 330 283C332 288 329 295 328 300Z|M341 300C342 310 358 323 354 330C350 338 330 343 318 344C307 345 295 340 285 337C275 333 267 330 258 324C249 318 228 307 229 300C230 293 254 286 263 279C272 273 274 265 284 261C293 256 308 252 319 254C330 256 345 265 349 272C352 280 340 290 341 300Z'.split('|');
   function topo() {
-    return '<svg class="fz-auth-topo" viewBox="-20 -25 430 370" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
+    return '<svg class="fz-auth-topo" viewBox="-20 -40 430 385" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
       + TOPO.map(function (d) { return '<path d="' + d + '"/>'; }).join('') + '</svg>';
   }
   function wave() {
-    return '<svg class="fz-auth-wave" viewBox="0 0 390 72" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
-      + '<path d="M0 34C62 4 128 0 186 22s118 50 204 8V72H0Z"/></svg>';
+    return '<svg class="fz-auth-wave fz-auth-wave-h" viewBox="0 0 390 80" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+      + '<path class="fz-wave-front" d="M0 44 C90 12 175 16 250 52 C310 76 355 64 390 34 L390 80 L0 80 Z" fill="#F8F3E9"/>'
+      + '</svg>'
+      + '<svg class="fz-auth-wave-v" viewBox="0 0 160 900" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+      + '<path class="fz-wave-front-v" d="M0 0 C70 180 130 360 80 540 C30 720 90 840 40 900 L160 900 L160 0 Z" fill="#F8F3E9"/>'
+      + '</svg>';
   }
   function icon(name) {
     var p = {
@@ -124,23 +128,54 @@
   }
   function brand(env) {
     var S = env && env.FiezelSplash;
-    var wm = S && typeof S.wordmarkMarkup === 'function' ? S.wordmarkMarkup('fzauth') : '<p class="fz-auth-word">FIEZEL</p>';
+    var wm = S && typeof S.wordmarkMarkup === 'function' ? S.wordmarkMarkup('fzauth') : '<svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzauthIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzauthGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="45%" stop-color="#F5CE45"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g fill="url(#fzauthIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzauthGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>';
     return '<div class="fz-auth-brand">' + wm + '</div>';
+  }
+  function slogan() {
+    return '<div class="fz-auth-slogan-wrap">'
+      + '<p class="fz-auth-tagline">Learn Beyond Languages.</p>'
+      + '</div>';
+  }
+  var ALL_LANGS = [
+    { id: 'id', label: 'ID', flag: '🇮🇩', name: 'Bahasa Indonesia' },
+    { id: 'en', label: 'EN', flag: '🇬🇧', name: 'English' },
+    { id: 'th', label: 'TH', flag: '🇹🇭', name: 'ภาษาไทย' },
+    { id: 'ja', label: 'JA', flag: '🇯🇵', name: '日本語' },
+    { id: 'ms', label: 'MS', flag: '🇲🇾', name: 'Bahasa Melayu' },
+    { id: 'vi', label: 'VI', flag: '🇻🇳', name: 'Tiếng Việt' },
+    { id: 'fil', label: 'FIL', flag: '🇵🇭', name: 'Filipino' }
+  ];
+  function langSwitch() {
+    var cur = locale();
+    return '<div class="fz-auth-lang-wrap">'
+      + '<div class="fz-auth-lang" role="group" aria-label="Bahasa · Language">'
+      + '<button type="button" data-auth-locale="id" aria-pressed="' + (cur === 'id' ? 'true' : 'false') + '"'
+      + ' class="fz-plain fz-lang-seg' + (cur === 'id' ? ' is-on' : '') + '" lang="id">ID</button>'
+      + '<button type="button" data-auth-locale="th" aria-pressed="' + (cur === 'th' ? 'true' : 'false') + '"'
+      + ' class="fz-plain fz-lang-seg' + (cur === 'th' ? ' is-on' : '') + '" lang="th">ไทย</button>'
+      + '<button type="button" class="fz-plain fz-lang-seg fz-auth-lang-more" data-auth-lang-toggle aria-label="Pilihan bahasa lainnya">▾</button>'
+      + '</div>'
+      + '<div class="fz-auth-lang-dropdown" data-auth-lang-menu hidden>'
+      + ALL_LANGS.map(function (l) {
+        return '<button type="button" data-auth-locale="' + l.id + '" class="fz-plain fz-lang-item' + (cur === l.id ? ' is-on' : '') + '" lang="' + l.id + '">'
+          + '<span class="fz-lang-flag">' + l.flag + '</span> <span class="fz-lang-name">' + l.name + '</span>'
+          + (cur === l.id ? '<span class="fz-lang-check">✓</span>' : '') + '</button>';
+      }).join('')
+      + '</div>'
+      + '</div>';
   }
   function paw(env, pose) {
     return '';
   }
-  function langSwitch() {
-    var cur = locale();
-    return '<div class="fz-auth-lang" role="group" aria-label="Bahasa · ภาษา">'
-      + [['id', 'ID'], ['th', 'ไทย']].map(function (l) {
-        return '<button type="button" data-auth-locale="' + l[0] + '" aria-pressed="' + (cur === l[0] ? 'true' : 'false') + '"'
-          + ' class="fz-plain' + (cur === l[0] ? ' is-on' : '') + '" lang="' + l[0] + '">' + l[1] + '</button>';
-      }).join('') + '</div>';
-  }
   function hero(env, screen) {
-    return '<header class="fz-auth-hero is-' + screen + '">' + topo() + langSwitch() + brand(env)
-      + wave() + '</header>';
+    return '<header class="fz-auth-hero is-' + screen + '">'
+      + topo()
+      + '<div class="fz-auth-hero-center">'
+      + brand(env)
+      + slogan()
+      + '</div>'
+      + wave()
+      + '</header>';
   }
   function field(o) {
     return '<label class="fz-auth-field">'
@@ -166,10 +201,19 @@
   }
 
   function welcomeBody() {
-    return '<h1 class="fz-auth-title">' + esc(t('auth.layar.selamat-datang', 'Selamat datang')) + '</h1>'
-      + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Belajar Bahasa Inggris dan Bahasa Jepang adaptif. Masuk sekali, progresmu ikut ke HP mana pun.')) + '</p>'
-      + '<div class="fz-auth-next-row"><button type="button" class="fz-auth-next fz-plain" data-auth-go="masuk" data-testid="auth-continue">'
-      + '<span>' + esc(t('auth.layar.lanjut', 'Lanjut')) + '</span><span class="fz-auth-next-dot">' + icon('arrow') + '</span></button></div>';
+    return '<div class="fz-auth-welcome-container">'
+      + '<h1 class="fz-auth-title">' + esc(t('auth.layar.selamat-datang', 'Selamat datang')) + '</h1>'
+      + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Belajar bahasa dengan cara yang lebih mudah, lebih seru, dan lebih bermakna.')) + '</p>'
+      + '<div class="fz-auth-carousel-dots" aria-hidden="true">'
+      + '<span class="fz-dot is-active"></span><span class="fz-dot"></span><span class="fz-dot"></span>'
+      + '</div>'
+      + '<div class="fz-auth-next-row">'
+      + '<button type="button" class="fz-auth-next fz-plain" data-auth-go="masuk" data-testid="auth-continue">'
+      + '<span class="fz-btn-text-desktop">' + esc(t('auth.layar.mulai-sekarang', 'Mulai Sekarang')) + '</span>'
+      + '<span class="fz-btn-text-mobile">' + esc(t('auth.layar.lanjut', 'Lanjut')) + '</span>'
+      + '<span class="fz-auth-next-arrow">' + icon('arrow') + '</span>'
+      + '</button></div>'
+      + '</div>';
   }
   function formBody(ui) {
     var daftar = ui.screen === 'daftar', guru = ui.role === 'guru';
@@ -222,8 +266,13 @@
     return html;
   }
   function markup(env, ui) {
-    return hero(env, ui.screen) + '<main class="fz-auth-body" data-auth-body>'
-      + (ui.screen === 'welcome' ? welcomeBody() : formBody(ui)) + '</main>';
+    return langSwitch() + hero(env, ui.screen) + '<main class="fz-auth-body" data-auth-body>'
+      + (ui.screen === 'welcome' ? welcomeBody() : formBody(ui))
+      + '<svg class="fz-cream-contours" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+      + '<path d="M-20,120 C80,80 180,140 280,100 C340,75 380,110 420,90 L420,220 L-20,220 Z" fill="#EBDDC8" opacity="0.38"/>'
+      + '<path d="M-20,150 C70,120 160,170 260,135 C330,110 370,145 420,125 L420,220 L-20,220 Z" fill="#E4D3BC" opacity="0.22"/>'
+      + '</svg>'
+      + '</main>';
   }
 
   /* ----------------------------------------------------------------- pesan galat */
@@ -407,9 +456,20 @@
         if (inp) { var show = inp.type === 'password'; inp.type = show ? 'text' : 'password'; b.setAttribute('aria-pressed', show ? 'true' : 'false'); }
         return;
       }
+      if (b.hasAttribute('data-auth-lang-toggle')) {
+        var menu = host.querySelector('[data-auth-lang-menu]');
+        if (menu) menu.hidden = !menu.hidden;
+        return;
+      }
       if (b.hasAttribute('data-auth-locale')) {
         var loc = b.getAttribute('data-auth-locale');
         if (typeof o.onLocale === 'function') { try { o.onLocale(loc); } catch (_) {} }
+        try {
+          var i18n = I();
+          if (i18n && typeof i18n.setLocale === 'function') {
+            i18n.setLocale(loc);
+          }
+        } catch (_) {}
         paint();
         try {
           var i18n = I();
@@ -419,6 +479,7 @@
             });
           }
         } catch (_) {}
+        return;
       }
     }
     function focusFirst() {

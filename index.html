@@ -1101,6 +1101,72 @@ html.fz-booting body:not(.fz-app-open) .bottomnav {
     <div class="sky-light"></div>
     <span id="globalCelestial" class="global-celestial sun" data-kind="sun"><i data-lucide="sun"></i></span>
   </div>
+  <div class="fz-universal-layout" id="fzUniversalLayout">
+    <!-- Col 1: Desktop Left Sidebar (>= 1024px) -->
+    <aside class="fz-desktop-sidebar" id="fzDesktopSidebar" aria-label="Navigasi Desktop">
+      <div class="fz-sb-brand">
+        <svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL">
+          <defs>
+            <linearGradient id="sbIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2E2724"/><stop offset="100%" stop-color="#1B1418"/></linearGradient>
+            <linearGradient id="sbGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="45%" stop-color="#F5CE45"/><stop offset="100%" stop-color="#F0C241"/></linearGradient>
+          </defs>
+          <g fill="url(#sbIv)">
+            <rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/>
+            <rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/>
+            <rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/>
+            <rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/>
+            <rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/>
+            <rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/>
+          </g>
+          <g fill="url(#sbGo)">
+            <rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/>
+          </g>
+        </svg>
+        <span class="fz-sb-kelasku">KelasKu</span>
+      </div>
+
+      <button type="button" class="course-switch-btn fz-sb-course fz-plain" onclick="toggleTargetCourse()" title="Ganti Kursus (Jepang / Inggris)">
+        <span class="course-switch-flag fz-sb-course-flag"><svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="18" height="13" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:2px"><clipPath id="fz-flag-en-sb"><rect width="60" height="40" rx="2"/></clipPath><g clip-path="url(#fz-flag-en-sb)"><path d="M0 0v40h60V0z" fill="#012169"/><path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/><path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/></g></svg></span>
+        <span class="course-switch-label fz-sb-course-name">English ▾</span>
+        <span class="fz-sb-course-arrow">⇅</span>
+      </button>
+
+      <nav class="fz-sb-navs" aria-label="Menu Samping">
+        <button type="button" class="fz-sb-btn fz-plain is-active" data-sb-view="home" onclick="go('home')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fz-i" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z"/></svg>
+          <span>Hari Ini</span>
+        </button>
+        <button type="button" class="fz-sb-btn fz-plain" data-sb-view="kana" onclick="go('kana')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fz-i" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h8"/></svg>
+          <span>Huruf / Kana</span>
+        </button>
+        <button type="button" class="fz-sb-btn fz-plain" data-sb-view="chat" onclick="go('chat')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fz-i" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Kawan Bicara</span>
+        </button>
+        <button type="button" class="fz-sb-btn fz-plain" data-sb-view="latihan" onclick="go('latihan')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fz-i" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+          <span>Latihan</span>
+        </button>
+        <button type="button" class="fz-sb-btn fz-plain" data-sb-view="progress" onclick="go('progress')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fz-i" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+          <span>Progres &amp; Misi</span>
+        </button>
+        <button type="button" class="fz-sb-btn fz-plain" data-sb-view="classroom" onclick="go('classroom')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fz-i" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+          <span>KelasKu</span>
+        </button>
+        <button type="button" class="fz-sb-btn fz-plain" data-sb-view="online" onclick="go('online')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fz-i" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>
+          <span>Profil</span>
+        </button>
+        <button type="button" class="fz-sb-btn fz-plain" data-sb-view="settings" onclick="openSettings()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fz-i" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Pengaturan</span>
+        </button>
+      </nav>
+    </aside>
+
   <main class="app">
     <header class="topbar">
       <!-- Ornamen Khas Fiezel (Dynamic Neural Net + Rising Solar Sparks + Contour Wave) -->
@@ -1187,6 +1253,90 @@ html.fz-booting body:not(.fz-app-open) .bottomnav {
          pemilik lain di wave ini; kelasnya tetap dipasang untuk dipindahkan ke CSS nanti. -->
     <div id="liveStatus" aria-live="polite" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0"></div>
   </main>
+
+  <!-- Col 3: Desktop Companion Hub (>= 1024px) -->
+  <aside class="fz-desktop-companion" id="fzDesktopCompanion" aria-label="Companion &amp; Status Hub">
+    <!-- Streak Card with 7-Day Tracker -->
+    <div class="fz-comp-card fz-comp-streak">
+      <div class="fz-comp-header">
+        <span class="fz-comp-icon">🔥</span>
+        <div class="fz-comp-title-grp">
+          <b class="fz-comp-streak-num" id="fzCompStreakNum">7 Hari</b>
+          <span class="fz-comp-sub">Berturut-turut!</span>
+        </div>
+      </div>
+      <div class="fz-comp-days" id="fzCompDays">
+        <div class="fz-comp-day is-active"><span class="fz-day-name">Sen</span><span class="fz-day-dot">✓</span></div>
+        <div class="fz-comp-day is-active"><span class="fz-day-name">Sel</span><span class="fz-day-dot">✓</span></div>
+        <div class="fz-comp-day is-active"><span class="fz-day-name">Rab</span><span class="fz-day-dot">✓</span></div>
+        <div class="fz-comp-day is-active"><span class="fz-day-name">Kam</span><span class="fz-day-dot">✓</span></div>
+        <div class="fz-comp-day is-active"><span class="fz-day-name">Jum</span><span class="fz-day-dot">✓</span></div>
+        <div class="fz-comp-day is-today"><span class="fz-day-name">Sab</span><span class="fz-day-dot">🔥</span></div>
+        <div class="fz-comp-day"><span class="fz-day-name">Min</span><span class="fz-day-dot">○</span></div>
+      </div>
+    </div>
+
+    <!-- Stats Grid: Gems & Level -->
+    <div class="fz-comp-stats-row">
+      <div class="fz-comp-stat-pill">
+        <span class="fz-stat-icon">💎</span>
+        <div class="fz-stat-text">
+          <b id="fzCompGems">120</b>
+          <small>Permata</small>
+        </div>
+      </div>
+      <div class="fz-comp-stat-pill">
+        <span class="fz-stat-icon">👑</span>
+        <div class="fz-stat-text">
+          <b id="fzCompLevel">Level 1</b>
+          <small>Pemula</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3D Mochi Companion & Daily Quest -->
+    <div class="fz-comp-card fz-comp-quest">
+      <div class="fz-comp-mochi-box">
+        <div class="fz-comp-mochi-avatar" id="fzCompMochiAvatar">
+          <span class="fz-mochi-emoji">🍡</span>
+        </div>
+        <div class="fz-comp-mochi-bubble">
+          <span>&ldquo;Ayo selesaikan 1 sesi lagi hari ini!&rdquo;</span>
+        </div>
+      </div>
+      <div class="fz-quest-bar-wrap">
+        <div class="fz-quest-label-row">
+          <span>Target Harian</span>
+          <b id="fzQuestPct">70%</b>
+        </div>
+        <div class="fz-quest-track">
+          <div class="fz-quest-fill" id="fzQuestFill" style="width: 70%;"></div>
+        </div>
+        <small class="fz-quest-sub">7 dari 10 menit belajar tercapai</small>
+      </div>
+    </div>
+
+    <!-- Quick Action Links -->
+    <div class="fz-comp-actions">
+      <button type="button" class="fz-comp-action-btn fz-plain" onclick="go('latihan')">
+        <span>⚔️</span>
+        <div class="fz-action-info">
+          <b>Tantang Teman</b>
+          <small>Duel belajar kosakata</small>
+        </div>
+        <span class="fz-action-arrow">&rarr;</span>
+      </button>
+      <button type="button" class="fz-comp-action-btn fz-plain" onclick="go('progress')">
+        <span>📜</span>
+        <div class="fz-action-info">
+          <b>Misi Harian</b>
+          <small>3 misi menunggu diselesaikan</small>
+        </div>
+        <span class="fz-action-arrow">&rarr;</span>
+      </button>
+    </div>
+  </aside>
+</div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="answerBurst" class="answer-burst hidden" role="status" aria-live="assertive" aria-atomic="true"></div>
