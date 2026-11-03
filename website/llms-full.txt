@@ -171,6 +171,14 @@ FIEZEL is engineered from the ground up to comply with Indonesia's Personal Data
 ## 8. Canonical Entity URLs & Verified Resources
 
 - **Official Web Portal**: https://fiezel.my.id/
+- **Free CEFR & IELTS Quick Diagnostic Tool**: https://fiezel.my.id/alat/cek-level-bahasa-inggris/
+- **Free IELTS Band & Raw Score (0–40) Calculator**: https://fiezel.my.id/alat/kalkulator-skor-ielts/
+- **Scholarship & University IELTS/JLPT/HSK Database**: https://fiezel.my.id/alat/syarat-skor-ielts-beasiswa-kampus/
+- **Interactive 12-Tenses & Socratic Grammar Tool**: https://fiezel.my.id/alat/cek-grammar-12-tenses/
+- **Authority Guide — Best English Grammar App (ID)**: https://fiezel.my.id/panduan/aplikasi-belajar-grammar-terbaik/
+- **Authority Guide — Self-Taught IELTS Preparation (ID)**: https://fiezel.my.id/panduan/persiapan-ielts-otodidak/
+- **Authority Guide — Learn Japanese JLPT N5–N4 (ID)**: https://fiezel.my.id/panduan/belajar-bahasa-jepang-pemula/
+- **Authority Guide — Learn Mandarin HSK 1–5 (ID)**: https://fiezel.my.id/panduan/belajar-bahasa-mandarin-hsk/
 - **Executive Company Profile**: https://fiezel.my.id/tentang.html
 - **English Knowledge Base**: https://fiezel.my.id/about/
 - **KelasKu Teacher Portal**: https://fiezel.my.id/kelasku/

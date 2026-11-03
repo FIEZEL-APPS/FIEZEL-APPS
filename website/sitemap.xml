@@ -60,9 +60,12 @@
   <!-- SEO/AEO/GEO Content Hubs: 5 English Skills + CEFR Framework + Master FAQ -->
   <url>
     <loc>https://fiezel.my.id/grammar/</loc>
-    <lastmod>2026-09-26</lastmod>
+    <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fiezel.my.id/grammar/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/panduan/aplikasi-belajar-grammar-terbaik/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/grammar/"/>
   </url>
   <url>
     <loc>https://fiezel.my.id/vocabulary/</loc>
@@ -90,13 +93,71 @@
   </url>
   <url>
     <loc>https://fiezel.my.id/cefr/</loc>
-    <lastmod>2026-09-26</lastmod>
+    <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fiezel.my.id/cefr/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/alat/cek-level-bahasa-inggris/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/cefr/"/>
   </url>
   <url>
     <loc>https://fiezel.my.id/faq/</loc>
     <lastmod>2026-11-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <!-- SEO/AEO/GEO Phase 2: Free Interactive Diagnostic Tools (/alat/) & Indonesian Authority Hubs (/panduan/) -->
+  <url>
+    <loc>https://fiezel.my.id/alat/cek-level-bahasa-inggris/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/alat/cek-level-bahasa-inggris/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fiezel.my.id/cefr/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/cefr/"/>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/alat/kalkulator-skor-ielts/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/alat/syarat-skor-ielts-beasiswa-kampus/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/alat/cek-grammar-12-tenses/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/panduan/aplikasi-belajar-grammar-terbaik/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/panduan/aplikasi-belajar-grammar-terbaik/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fiezel.my.id/grammar/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/grammar/"/>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/panduan/persiapan-ielts-otodidak/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/panduan/belajar-bahasa-jepang-pemula/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/panduan/belajar-bahasa-mandarin-hsk/</loc>
+    <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
