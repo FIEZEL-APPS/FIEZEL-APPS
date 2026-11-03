@@ -1251,7 +1251,7 @@ try{
 try{
   let targetCourse=null;
   try{targetCourse=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
-  if((targetCourse==='ja'||targetCourse==='en')&&state?.preferences){
+  if((targetCourse==='ja'||targetCourse==='en'||targetCourse==='zh')&&state?.preferences){
     let dasar=null;
     try{dasar=JSON.parse(localStorage.getItem(activeStateStorageKey))}catch(_){}
     if(state.preferences.targetLang!==targetCourse||(dasar&&typeof dasar==='object'&&dasar.preferences?.targetLang!==targetCourse)){
@@ -6684,6 +6684,57 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
         try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
       }
     }
+  }else if(activeTargetLang()==='zh'){
+    const zhBank=await optional('content/zh/grammar-templates-zh.json',null);
+    const zhGraph=await optional('content/zh/family-graph-zh.json',null);
+    const zhVocab=await optional('content/zh/vocabulary-master-zh.json',null);
+    if(zhVocab&&Array.isArray(zhVocab.words)&&zhVocab.words.length){
+      V=zhVocab.words;
+    }
+    const zhRead=await optional('content/zh/reading-bank-zh.json',null);
+    if(Array.isArray(zhRead)&&zhRead.length){
+      R=zhRead;
+    }
+    const zhWrite=await optional('content/zh/writing-prompts-zh.json',null);
+    if(zhWrite&&Array.isArray(zhWrite.prompts)&&zhWrite.prompts.length){
+      WRITING_BANK=zhWrite;
+    }
+    if(zhBank&&Array.isArray(zhBank.templates)&&zhBank.templates.length){
+      G=zhBank;
+      const rawFamilies=zhGraph?.families||{};
+      const zhLessons=[];
+      const skillLevelMap={};
+      for(const t of zhBank.templates){
+        const sk=String(t.skill||t.family||'').trim();
+        if(sk&&!skillLevelMap[sk])skillLevelMap[sk]=t.cefr||t.level||'A1';
+      }
+      const levelSeqCounter={A1:0,A2:0,B1:0,B2:0,C1:0,C2:0};
+      for(const [sk,prereqs] of Object.entries(rawFamilies)){
+        const lvl=skillLevelMap[sk]||'A1';
+        levelSeqCounter[lvl]=(levelSeqCounter[lvl]||0)+1;
+        const validPrereqs=(Array.isArray(prereqs)?prereqs:[]).filter(p=>p&&rawFamilies[p]);
+        zhLessons.push({
+          lessonId:sk,
+          skill:sk,
+          level:lvl,
+          sequence:levelSeqCounter[lvl],
+          unit:`${lvl}.${levelSeqCounter[lvl]}`,
+          title:friendlySkillName(sk),
+          prerequisites:validPrereqs
+        });
+      }
+      GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(zhLessons);
+      try{self.FiezelCoreBrain?.setFamilyGraph?.(rawFamilies)}catch{}
+      try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:zhLessons})}catch{}
+    }else{
+      let persistentZh=false;
+      try{persistentZh=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)==='zh'}catch(_){}
+      if(!persistentZh){
+        try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
+        state.preferences={...state.preferences,targetLang:'en'};
+        try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
+      }
+    }
   }else{
     GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);
     try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
@@ -6736,6 +6787,7 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;const kana=v.kana||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[0].trim():'');const kanji=v.kanji||v.word||'';const romaji=v.romaji||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[1].trim():'');return{id:v.id,word:v.word,kana,kanji,romaji,jlpt:v.jlpt||'',phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
   CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
+  try{window.CONTENT_BASE=CONTENT_BASE;window.V=V;window.G=G;window.R=R;window.GRAMMAR_ITEMS=GRAMMAR_ITEMS;}catch(_){}
   reconcileStateAfterBankLoad();
   backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;
   /* m025-367: ganti kursus DI TENGAH perkenalan hanya butuh bank barunya. Ekor boot di bawah
@@ -16885,7 +16937,8 @@ function startLevelPractice(level){
   quizLoop({type:'level',count:Math.min(10,items.length),pool:items,factory:x=>x})
 }
 function startQuickWinLesson(lang) {
-  const targetLang = (lang || activeTargetLang()) === 'ja' ? 'ja' : 'en';
+  const cur = (lang || activeTargetLang());
+  const targetLang = cur === 'ja' ? 'ja' : (cur === 'zh' ? 'zh' : 'en');
   let pool = [];
   if (targetLang === 'ja') {
     pool = [
@@ -16935,6 +16988,57 @@ function startQuickWinLesson(lang) {
           rule: 'Penggabungan vokal hiragana あ (a) dan い (i) membentuk kosakata utuh: ai (cinta).',
           distractor: 'Terima kasih adalah arigatou, selamat pagi adalah ohayou, dan air adalah mizu.',
           memory: 'Ingat: AI = Aku Ingin mencintaimu (Cinta).'
+        }
+      }
+    ];
+  } else if (targetLang === 'zh') {
+    pool = [
+      {
+        id: 'qw-zh-1',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-zh-q1', 'Pilih Hanzi yang tepat untuk salam Halo (Nǐ hǎo):'),
+        options: ['你好', '谢谢', '再见', '对不起'],
+        answerIndex: 0,
+        audio: '你好',
+        skill: 'zh_greetings',
+        explain: {
+          why: '你好 (Nǐ hǎo) adalah sapaan salam "Halo / Apa kabar" yang paling dasar dan lazim dalam bahasa Mandarin.',
+          rule: 'Gabungan kata 你 (kamu) + 好 (baik) membentuk salam ramah untuk menyapa seseorang.',
+          distractor: '谢谢 berarti terima kasih, 再见 berarti sampai jumpa, dan 对不起 berarti maaf.',
+          memory: 'Ingat: Nǐ (kamu) + Hǎo (baik) = Semoga kamu baik-baik saja (Halo).'
+        }
+      },
+      {
+        id: 'qw-zh-2',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-zh-q2', 'Bagaimana cara mengucapkan Terima kasih (Xièxie) dalam bahasa Mandarin?'),
+        options: ['不客气', '谢谢', '早上好', '没关系'],
+        answerIndex: 1,
+        audio: '谢谢',
+        skill: 'zh_polite_expressions',
+        explain: {
+          why: '谢谢 (Xièxie) adalah ungkapan terima kasih baku dalam bahasa Mandarin.',
+          rule: 'Pengulangan karakter 谢 (xiè) dengan nada netral di suku kata kedua membentuk rasa terima kasih yang santun.',
+          distractor: '不客气 berarti sama-sama, 早上好 berarti selamat pagi, dan 没关系 berarti tidak apa-apa.',
+          memory: 'Xièxie = Terima kasih!'
+        }
+      },
+      {
+        id: 'qw-zh-3',
+        type: 'choice',
+        level: 'A1',
+        question: t('quiz.quickwin-zh-q3', 'Pilih arti bahasa Indonesia yang tepat untuk kata 再见 (Zàijiàn):'),
+        options: ['Sampai jumpa', 'Selamat malam', 'Permisi', 'Tolong'],
+        answerIndex: 0,
+        audio: '再见',
+        skill: 'zh_farewell',
+        explain: {
+          why: '再见 (Zàijiàn) berarti sampai jumpa atau selamat tinggal.',
+          rule: '再 (lagi) + 见 (bertemu) secara harfiah bermakna "bertemu kembali".',
+          distractor: 'Pilihan lain merupakan arti dari kata sapaan waktu atau permohonan bantuan.',
+          memory: 'Zài (lagi) + Jiàn (lihat/jumpa) = Sampai jumpa lagi.'
         }
       }
     ];
@@ -20107,7 +20211,7 @@ function switchTargetLangStorage(value){
 }
 window.switchTargetLangStorage=switchTargetLangStorage;
 async function setTargetLangPreference(next){
-  const value=(next==='ja')?'ja':'en';
+  const value=(next==='ja')?'ja':(next==='zh'?'zh':'en');
   if(activeTargetLang()===value){
     try{localStorage.setItem(FIEZEL_TARGET_COURSE_KEY,value)}catch(_){}
     try{updateTopbarCourseButton()}catch(_){}
@@ -20128,19 +20232,21 @@ function updateTopbarCourseButton(){
   try{
     const currentLang=activeTargetLang();
     const isJa=(currentLang==='ja');
-    const flagSvg = isJa
-      ? '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="18" height="13" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:2px;box-shadow:0 0 1px rgba(0,0,0,0.4)"><rect width="36" height="24" rx="2" fill="#FFFFFF"/><circle cx="18" cy="12" r="7.2" fill="#BC002D"/></svg>'
-      : '<svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="18" height="13" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:2px;box-shadow:0 0 1px rgba(0,0,0,0.4)"><clipPath id="fz-flag-en-topbar"><rect width="60" height="40" rx="2"/></clipPath><g clip-path="url(#fz-flag-en-topbar)"><path d="M0 0v40h60V0z" fill="#012169"/><path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/><path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/></g></svg>';
+    const isZh=(currentLang==='zh');
+    const flagSvg = isZh
+      ? '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="18" height="13" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:2px;box-shadow:0 0 1px rgba(0,0,0,0.4)"><rect width="36" height="24" rx="2" fill="#DE2910"/><polygon points="6,3.6 7.8,9 3.2,5.6 8.8,5.6 4.2,9" fill="#FFDE00"/><circle cx="12" cy="2.4" r="0.8" fill="#FFDE00"/><circle cx="14.4" cy="4.8" r="0.8" fill="#FFDE00"/><circle cx="14.4" cy="8.4" r="0.8" fill="#FFDE00"/><circle cx="12" cy="10.8" r="0.8" fill="#FFDE00"/></svg>'
+      : (isJa
+        ? '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="18" height="13" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:2px;box-shadow:0 0 1px rgba(0,0,0,0.4)"><rect width="36" height="24" rx="2" fill="#FFFFFF"/><circle cx="18" cy="12" r="7.2" fill="#BC002D"/></svg>'
+        : '<svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="18" height="13" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:2px;box-shadow:0 0 1px rgba(0,0,0,0.4)"><clipPath id="fz-flag-en-topbar"><rect width="60" height="40" rx="2"/></clipPath><g clip-path="url(#fz-flag-en-topbar)"><path d="M0 0v40h60V0z" fill="#012169"/><path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/><path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/></g></svg>');
     document.querySelectorAll('.course-switch-flag').forEach(el => { el.innerHTML = flagSvg; });
     document.querySelectorAll('.course-switch-label').forEach(el => {
       el.style.display = 'inline-block';
-      el.textContent = isJa ? '日本語 ▾' : 'English ▾';
+      el.textContent = isZh ? '中文 ▾' : (isJa ? '日本語 ▾' : 'English ▾');
     });
     document.querySelectorAll('.course-switch-btn').forEach(btn => {
       btn.setAttribute('data-target-lang',currentLang);
-      const activeName=isJa?FiezelI18n.t('bahasa.ja'):FiezelI18n.t('bahasa.en');
-      const targetName=isJa?FiezelI18n.t('bahasa.en'):FiezelI18n.t('bahasa.ja');
-      btn.setAttribute('aria-label',FiezelI18n.t('topbar.course-switch-active',{aktif:activeName,tujuan:targetName}));
+      const activeName=isZh?FiezelI18n.t('bahasa.zh','Bahasa Mandarin'):isJa?FiezelI18n.t('bahasa.ja'):FiezelI18n.t('bahasa.en');
+      btn.setAttribute('aria-label',activeName);
       btn.title=FiezelI18n.t('topbar.course-switch-title');
     });
   }catch(_){}
@@ -20149,8 +20255,12 @@ window.updateTopbarCourseButton=updateTopbarCourseButton;
 
 window.toggleTargetCourse = async function(){
   try{
+    if(typeof FiezelMandarinUI!=='undefined'&&typeof FiezelMandarinUI.openCourseModal==='function'){
+      FiezelMandarinUI.openCourseModal();
+      return;
+    }
     const currentLang=activeTargetLang();
-    const nextLang=(currentLang==='ja')?'en':'ja';
+    const nextLang=(currentLang==='en')?'ja':(currentLang==='ja'?'zh':'en');
     await setTargetLangPreference(nextLang);
     updateTopbarCourseButton();
     try{haptic('confirm')}catch(_){}
