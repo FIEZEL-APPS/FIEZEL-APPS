@@ -1,4 +1,4 @@
-﻿# Antigravity Workspace Guidelines for FIEZEL-APPS
+# Antigravity Workspace Guidelines for FIEZEL-APPS
 
 ## 0. IRONCLAD SCOPE ISOLATION, PROTECTED SURFACES, & ZERO-RED-MERGE MANDATE (ATURAN MUTLAK #0)
 Setiap agent di workspace ini WAJIB tunduk pada penegakan mekanis CI dan GitHub Branch Protection berikut:
@@ -13,6 +13,23 @@ Setiap agent di workspace ini WAJIB tunduk pada penegakan mekanis CI dan GitHub 
    - Server uji lokal bawaan melewati login sesuai mandat owner (`m025-723`). Untuk menguji layar Login & Onboarding produksi secara utuh di peramban lokal/Playwright, tambahkan parameter `?fz_real_auth=1` (contoh: `http://127.0.0.1:4173/?fz_real_auth=1`). **DILARANG** memodifikasi kode `authGateNeeded()` demi mengetes fitur lain.
 3. **Zero-Red-Merge & Mandatory Branch Protection (`enforce_admins: true`, `strict: true`)**:
    - Branch `main` dikunci secara mesin di GitHub: **NOL direct push**, cabang PR wajib *up-to-date* terhadap `origin/main` terbaru, dan seluruh 10 gerbang wajib (`quality`, `A6`, `A7`, `A9`, `A10`, `A11`, `A13`, `A14`, `Auto PR Review & Invariant Audit`, `MASTER-only authority`) **WAJIB 100% HIJAU** sebelum merge diizinkan.
+
+## 0-B. LIVE-ONLY RUNTIME SCOPE & ANTI-ZOMBIE INVARIANT (ATURAN MUTLAK SSOT LIVE)
+Setiap agent di workspace ini WAJIB mematuhi batas wilayah berkas live produksi berikut:
+1. **Definisi Mutlak LIVE SSOT (Satu-satunya Sumber Kebenaran Hidup)**:
+   - DILARANG KERAS memindai, membaca, menganalisa, atau mengimpor berkas di luar cakupan Live Produksi.
+   - Wilayah Live Runtime Surface yang sah HANYA mencakup:
+     - **Halaman**: `index.html`, `call.html`, `kurikulum.html`, `misi.html`, `undercover.html`
+     - **Core Runtime & PWA**: `app.js`, `sw.js`, `core-config.js`, `manifest.json`
+     - **Fitur Pembelajaran**: `features/**`
+     - **Maskot 3D WebGL**: `mochi-mascot/**` (Three.js Mochi resmi)
+     - **Aset Aktif**: `assets/**`, `audio/**`, `design/**`, `content/**`
+     - **Backend & Worker**: `workers/**`, `backend/**`, `website/**`
+     - **Infrastruktur & Rilis**: `android/**`, `tests/**`, `.github/workflows/**`, `tools/bump-build.mjs`, `tools/fiezel-guardians.mjs`, `deploy/**`
+2. **Larangan Keras Mencampuradukkan Artefak Mati (Zero Zombie Code)**:
+   - DILARANG KERAS membuat folder mockup eksperimen baru di root workspace atau membangkitkan kembali file purwarupa pensiun.
+   - DILARANG KERAS mengimpor atau memunculkan kembali aset maskot kartun 2D PAW lama. Seluruh persona visual WAJIB menggunakan Mochi (3D Three.js WebGL / Mochi companion).
+   - Setiap agen yang mencampuradukkan file lama atau membawa kode mati ke dalam fitur baru dianggap melanggar integritas arsitektur.
 
 ## Motion & Video Animation Guidelines (Remotion & Three.js 3D Master)
 
