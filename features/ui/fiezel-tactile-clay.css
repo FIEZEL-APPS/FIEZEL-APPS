@@ -9182,18 +9182,16 @@ html body .fz-auth .fz-auth-hero::before {
 }
 
 html body .fz-auth .fz-auth-hero::after,
+html body .fz-auth .fz-auth-hero::before,
 html body .fiezel-ob .fiezel-ob-reveal::before {
-  top: 56% !important;
-  height: 136px !important;
-  background: radial-gradient(closest-side, rgba(255, 199, 0, 0.14), rgba(255, 199, 0, 0)) !important;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0px, transparent 28px, #000 84px) !important;
-  mask-image: linear-gradient(180deg, transparent 0px, transparent 28px, #000 84px) !important;
+  display: none !important;
+  content: none !important;
 }
 
 html body .fz-auth .fz-auth-hero .fz-auth-topo,
 html body .fiezel-ob .fiezel-ob-reveal .fz-auth-topo {
-  -webkit-mask-image: linear-gradient(180deg, transparent 0px, transparent 24px, rgba(0, 0, 0, 0.35) 72px, #000 132px) !important;
-  mask-image: linear-gradient(180deg, transparent 0px, transparent 24px, rgba(0, 0, 0, 0.35) 72px, #000 132px) !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 
 html body .fz-auth .fz-auth-hero.is-welcome {
@@ -9215,42 +9213,80 @@ html body .fz-auth .fz-auth-hero.is-daftar {
 }
 
 /* Native glass pill language switcher (ID | ไทย) */
-html body .fz-auth .fz-auth-lang {
-  position: absolute !important;
-  z-index: 3 !important;
-  top: max(20px, calc(env(safe-area-inset-top, 0px) + 12px)) !important;
-  right: 16px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 2px !important;
-  padding: 3px !important;
-  border-radius: 999px !important;
-  background: rgba(255, 255, 255, 0.10) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow: none !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+@media (max-width: 767px) {
+  html body .fz-auth .fz-auth-lang-wrap {
+    position: absolute !important;
+    z-index: 20 !important;
+    top: max(16px, calc(env(safe-area-inset-top, 0px) + 8px)) !important;
+    right: 14px !important;
+  }
+  html body .fz-auth .fz-auth-lang {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    padding: 3px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(215, 182, 109, 0.35) !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+  html body .fz-auth .fz-auth-lang button {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: rgba(253, 250, 243, 0.88) !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    padding: 5px 11px !important;
+    min-height: 26px !important;
+    height: 26px !important;
+    border-radius: 999px !important;
+    transform: none !important;
+  }
+  html body .fz-auth .fz-auth-lang button.is-on {
+    background: #FDFAF3 !important;
+    color: #1B1418 !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
+  }
 }
 
-html body .fz-auth .fz-auth-lang button {
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  color: rgba(253, 250, 243, 0.72) !important;
-  font-size: 0.75rem !important;
-  font-weight: 700 !important;
-  line-height: 1 !important;
-  padding: 5px 11px !important;
-  min-height: 26px !important;
-  height: 26px !important;
-  border-radius: 999px !important;
-  transform: none !important;
-}
-
-html body .fz-auth .fz-auth-lang button.is-on {
-  background: #FDFAF3 !important;
-  color: #1B1418 !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
+@media (min-width: 768px) {
+  html body .fz-auth .fz-auth-lang-wrap {
+    position: absolute !important;
+    top: 24px !important;
+    right: 36px !important;
+    z-index: 50 !important;
+  }
+  html body .fz-auth .fz-auth-lang {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 4px 8px !important;
+    border-radius: 9999px !important;
+    background: #FFFDF8 !important;
+    border: 1.5px solid #E2D9CE !important;
+    box-shadow: 0 4px 16px rgba(27, 21, 21, 0.08) !important;
+  }
+  html body .fz-auth .fz-auth-lang button {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    padding: 7px 16px !important;
+    color: #5C4E4B !important;
+    border-radius: 9999px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    min-height: 34px !important;
+    height: auto !important;
+  }
+  html body .fz-auth .fz-auth-lang button.is-on {
+    background: #922D43 !important;
+    color: #FFFDF8 !important;
+    box-shadow: 0 2px 10px rgba(146, 45, 67, 0.35) !important;
+  }
 }
 
 /* Native iOS Segmented Control for Role Tabs (Murid | Guru) */
@@ -9279,10 +9315,10 @@ html body .fz-auth .fz-auth-role {
 }
 
 html body .fz-auth .fz-auth-role.is-on {
-  background: #FFFFFF !important;
-  color: #1B1418 !important;
+  background: #922D43 !important;
+  color: #FFFDF8 !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 8px rgba(27, 20, 24, 0.12) !important;
+  box-shadow: 0 4px 14px -4px rgba(146, 45, 67, 0.35) !important;
 }
 
 /* Native inline links, password eye button & welcome next button */
@@ -9291,7 +9327,7 @@ html body .fz-auth .fz-auth-alt button {
   border: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
-  color: #9B3A4A !important;
+  color: #922D43 !important;
   font-weight: 700 !important;
   padding: 4px 4px !important;
   min-height: 0 !important;
@@ -9317,11 +9353,50 @@ html body .fz-auth .fz-auth-next {
   display: inline-flex !important;
   align-items: center !important;
   gap: 12px !important;
-  border: 1.5px solid #E8DFD3 !important;
-  background: #FFFFFF !important;
-  box-shadow: 0 8px 20px -8px rgba(27, 20, 24, 0.12) !important;
-  border-radius: 999px !important;
-  padding: 6px 6px 6px 20px !important;
-  min-height: 56px !important;
-  color: #1B1418 !important;
+  border: none !important;
+  background: #922D43 !important;
+  box-shadow: 0 6px 20px -4px rgba(146, 45, 67, 0.40) !important;
+  border-radius: 9999px !important;
+  padding: 12px 28px !important;
+  min-height: 48px !important;
+  color: #FFFDF8 !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+}
+
+html body .fz-auth .fz-auth-next:hover {
+  background: #7A2437 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 24px -4px rgba(146, 45, 67, 0.50) !important;
+}
+
+html body .fz-auth .fz-auth-next span {
+  color: #FFFDF8 !important;
+  font-weight: 700 !important;
+}
+
+html body .fz-auth-next-arrow {
+  display: grid !important;
+  place-items: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  color: #FFFDF8 !important;
+}
+
+html body .fz-auth-next-arrow svg {
+  stroke: #FFFDF8 !important;
+  stroke-width: 2.2 !important;
+  fill: none !important;
+}
+
+@media (min-width: 768px) {
+  html body .fz-auth .fz-auth-next-row {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    justify-content: flex-start !important;
+  }
+  html body .fz-auth .fz-auth-next {
+    padding: 16px 36px !important;
+    font-size: 1.1rem !important;
+  }
 }

@@ -6223,82 +6223,171 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
    Kepala MENGECIL dari Selamat datang → Masuk → Daftar, persis seperti referensinya.
    ========================================================================== */
 body.fz-auth-open{overflow:hidden}
-.fz-auth{position:fixed;inset:0;z-index:2147481950;display:flex;flex-direction:column;background:var(--bg,#FBF7F3);color:var(--text,#2E2724);overflow-y:auto;overscroll-behavior:contain;opacity:1}
+.fz-auth{position:fixed;inset:0;z-index:2147481950;display:flex;flex-direction:column;background:radial-gradient(120% 80% at 85% 10%, #FFFDF8 0%, rgba(248, 243, 233, 0.75) 45%, rgba(243, 232, 217, 0.40) 100%), radial-gradient(90% 60% at 15% 90%, rgba(243, 232, 217, 0.75) 0%, rgba(248, 243, 233, 0.45) 50%, transparent 100%), #F8F3E9 !important;color:#1B1515 !important;overflow-y:auto;overscroll-behavior:contain;opacity:1}
 .fz-auth.is-leaving{animation:fzAuthOut .24s ease both}
 @keyframes fzAuthIn{from{opacity:0}to{opacity:1}}
 @keyframes fzAuthOut{to{opacity:0;transform:translateY(8px)}}
-.fz-auth-hero{position:relative;flex:0 0 auto;overflow:hidden;color:var(--fz-on-core,#FDFAF3);
-  background:#1B1418;background-color:#1B1418;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+.fz-auth-hero{position:relative;flex:0 0 auto;overflow:hidden;color:#FFFDF8 !important;
+  background:#1B1515 !important;background-color:#1B1515 !important;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
   padding:max(28px,calc(env(safe-area-inset-top) + 16px)) 20px 64px;transition:min-height .35s cubic-bezier(.2,.8,.2,1)}
-.fz-auth-hero.is-welcome{min-height:58vh}
-.fz-auth-hero.is-masuk{min-height:30vh}
+.fz-auth-hero.is-welcome{min-height:48vh}
+.fz-auth-hero.is-masuk{min-height:28vh}
 .fz-auth-hero.is-daftar{min-height:22vh}
 .fz-auth-topo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .fz-auth-hero .fz-auth-topo,.fiezel-ob-reveal .fz-auth-topo{opacity:.95}
 .fz-auth-topo path,
 .fz-auth-topo line,
-.fz-auth-topo circle{fill:none !important;stroke:rgba(255,199,0,.24) !important;stroke-width:1.1 !important;stroke-linecap:round !important;stroke-linejoin:round !important}
-.fz-auth-topo .accent{stroke:rgba(255,215,0,.55) !important;stroke-width:1.4 !important}
-.fz-auth-topo .whisper{stroke:rgba(255,199,0,.14) !important;stroke-width:0.95 !important}
-.fz-auth-hero::after{content:"";position:absolute;left:50%;top:56%;width:min(76vw,320px);height:136px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,199,0,.15),rgba(255,199,0,0))}
-.fz-auth-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:58px;z-index:2}
-.fz-auth-wave path{fill:var(--bg,#FBF7F3)}
+.fz-auth-topo circle{fill:none !important;stroke:#D7B66D !important;stroke-width:1.1 !important;stroke-linecap:round !important;stroke-linejoin:round !important;opacity:0.24 !important}
+.fz-auth-topo .accent{stroke:#D7B66D !important;stroke-width:1.3 !important;opacity:0.4}
+.fz-auth-topo .whisper{stroke:#D7B66D !important;stroke-width:0.9 !important;opacity:0.16}
+.fz-auth-hero::after,
+.fz-auth-hero::before{display:none !important;content:none !important}
+.fz-auth-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:64px;z-index:2;pointer-events:none}
+.fz-auth-wave-h{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:64px;z-index:2;pointer-events:none;display:block}
+.fz-wave-back{fill:#EBDDC8 !important;opacity:0.45 !important}
+.fz-wave-front{fill:#F8F3E9 !important}
+.fz-wave-back-v{fill:#EBDDC8 !important;opacity:0.45 !important}
+.fz-wave-front-v{fill:#F8F3E9 !important}
+.fz-auth-wave-v{display:none}
+.fz-auth-hero-center{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;width:100%}
 .fz-auth-brand{position:relative;z-index:1}
-.fz-auth-brand .fiezel-wordmark{width:min(46vw,190px);display:block;margin:0 auto}
-.fz-auth-hero.is-daftar .fiezel-wordmark{width:min(34vw,140px)}
+.fz-auth-brand .fiezel-wordmark{width:min(48vw,190px);display:block;margin:0 auto}
+.fz-auth-hero.is-daftar .fiezel-wordmark{width:min(36vw,144px)}
 .fz-auth-word{margin:0;font-family:var(--fz-heading);font-weight:800;font-size:2rem;letter-spacing:.04em}
-.fz-auth-paw{position:relative;z-index:1;width:112px;height:112px;display:block}
-.fz-auth .fz-auth-lang{position:absolute;z-index:3;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:14px;display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.1);backdrop-filter:blur(4px)}
-.fz-auth .fz-auth-lang button{border:0;background:transparent;box-shadow:none;color:rgba(253,250,243,.78);font:inherit;font-size:.78rem;font-weight:700;padding:6px 11px;border-radius:999px;min-height:0;cursor:pointer}
-.fz-auth .fz-auth-lang button.is-on{background:var(--fz-on-core,#FDFAF3);color:var(--fz-core,#1B1418)}
-.fz-auth-body{position:relative;flex:1 0 auto;width:100%;max-width:460px;margin:0 auto;padding:6px 24px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
-.fz-auth-title{margin:6px 0 14px;font-family:var(--fz-heading);font-size:2rem;line-height:1.1;letter-spacing:-.02em;color:var(--text,#2E2724)}
-.fz-auth-title.is-underlined{display:inline-block;align-self:flex-start;text-decoration:underline;text-decoration-color:var(--accent,#9B3A4A);text-decoration-thickness:3px;text-underline-offset:7px;text-decoration-skip-ink:none}
-.fz-auth-lead{margin:0;color:var(--muted,#6E635C);font-size:1rem;line-height:1.55;max-width:34ch}
-.fz-auth-next-row{margin-top:auto;padding-top:28px;display:flex;justify-content:flex-end}
-.fz-auth .fz-auth-next{display:inline-flex;align-items:center;gap:12px;border:0;background:transparent;box-shadow:none;color:var(--text,#2E2724);font:inherit;font-weight:700;font-size:1rem;padding:6px 4px 6px 10px;cursor:pointer}
-.fz-auth-next-dot{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--accent,#9B3A4A);color:#fff;box-shadow:0 10px 22px -12px var(--accent,#9B3A4A)}
+.fz-auth-slogan-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;margin-top:2px}
+.fz-auth-tagline{margin:0;font-family:var(--fz-heading,'Plus Jakarta Sans',sans-serif);font-weight:700;font-size:1.15rem;color:#FFFDF8;letter-spacing:-0.01em;display:flex;flex-direction:column;align-items:center}
+.fz-auth-tagline-curve{width:140px;height:7px;display:block;margin-top:3px}
+.fz-auth .fz-auth-lang-wrap{position:absolute;z-index:10;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:14px}
+.fz-auth .fz-auth-lang{display:flex;align-items:center;gap:2px;padding:3px 6px;border-radius:9999px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(215,182,109,.35)}
+.fz-auth .fz-auth-lang button{border:0;background:transparent;box-shadow:none;color:rgba(255,253,248,.88);font:inherit;font-size:.82rem;font-weight:700;padding:5px 10px;border-radius:9999px;min-height:0;cursor:pointer;transition:all .15s ease}
+.fz-auth .fz-auth-lang button.is-on{background:#FFFDF8;color:#1B1515;box-shadow:0 2px 6px rgba(0,0,0,.22)}
+.fz-auth .fz-auth-lang-more{padding:5px 7px !important;color:#D7B66D !important;font-size:.78rem}
+.fz-lang-chevron{font-size:10px;opacity:0.75}
+.fz-auth-lang-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#FFFDF8;border:1.5px solid #EBDDC8;border-radius:16px;box-shadow:0 12px 32px rgba(27,21,21,0.18);padding:8px;display:flex;flex-direction:column;gap:2px;min-width:180px;z-index:20}
+.fz-auth-lang-dropdown[hidden]{display:none}
+.fz-lang-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;border:0;background:transparent;color:#1B1515;font-size:0.88rem;font-weight:600;cursor:pointer;width:100%;text-align:left;transition:background 0.15s ease}
+.fz-lang-item:hover{background:#F3E8D9}
+.fz-lang-item.is-on{background:#F9EFE2;color:#922D43;font-weight:800}
+.fz-lang-flag{font-size:1.15rem;line-height:1}
+.fz-lang-check{margin-left:auto;color:#922D43;font-weight:800}
+.fz-auth-body{position:relative;flex:1 0 auto;width:100%;max-width:460px;margin:0 auto;padding:16px 24px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;background:radial-gradient(120% 80% at 85% 10%, #FFFDF8 0%, rgba(248, 243, 233, 0.75) 45%, rgba(243, 232, 217, 0.40) 100%), radial-gradient(90% 60% at 15% 90%, rgba(243, 232, 217, 0.75) 0%, rgba(248, 243, 233, 0.45) 50%, transparent 100%), #F8F3E9 !important}
+.fz-cream-contours{position:absolute;bottom:0;left:0;right:0;width:100%;height:150px;pointer-events:none;z-index:0}
+.fz-auth-welcome-container{display:flex;flex-direction:column;height:100%;flex:1;position:relative;z-index:1}
+.fz-auth-title{margin:6px 0 12px;font-family:var(--fz-heading,'Plus Jakarta Sans',sans-serif);font-size:2.15rem;line-height:1.15;font-weight:800;letter-spacing:-.025em;color:#1B1515 !important}
+.fz-auth-title.is-underlined{display:inline-block;align-self:flex-start;text-decoration:none !important;border-bottom:3.5px solid #922D43 !important;padding-bottom:4px}
+.fz-auth-lead{margin:0;color:#5C4E4B !important;font-size:1.05rem;line-height:1.6;max-width:38ch}
+.fz-auth-carousel-dots{display:flex;gap:8px;align-items:center;margin:28px 0 20px}
+.fz-auth-carousel-dots .fz-dot{width:8px;height:8px;border-radius:50%;background:#D9CEC1;transition:all .2s ease}
+.fz-auth-carousel-dots .fz-dot.is-active{width:26px;border-radius:9999px;background:#922D43}
+.fz-auth-next-row{margin-top:auto;padding-top:24px;display:flex;justify-content:flex-end}
+.fz-auth .fz-auth-next{display:inline-flex;align-items:center;gap:12px;border:0;background:#922D43 !important;box-shadow:0 6px 20px -4px rgba(146,45,67,0.40) !important;color:#FFFDF8 !important;font:inherit;font-weight:700;font-size:1.05rem;padding:12px 24px;border-radius:9999px;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
+.fz-auth .fz-auth-next:hover{background:#7A2437 !important;transform:translateY(-1px);box-shadow:0 8px 24px -4px rgba(146,45,67,0.50) !important}
+.fz-auth .fz-auth-next:active{transform:translateY(1px)}
+.fz-btn-text-desktop{display:none}
+.fz-btn-text-mobile{display:inline}
+.fz-auth-next-arrow{display:grid;place-items:center;width:20px;height:20px}
+.fz-auth-next-arrow svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none}
 .fz-auth-i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.fz-auth-next-dot .fz-auth-i{width:22px;height:22px}
-.fz-auth-roles{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--line,#EFE7DE);margin:0 0 16px}
-.fz-auth .fz-auth-role{flex:1;border:0;background:transparent;box-shadow:none;color:var(--muted,#6E635C);font:inherit;font-weight:700;font-size:.92rem;padding:10px;border-radius:10px;cursor:pointer;min-height:0}
-.fz-auth .fz-auth-role.is-on{background:var(--panel,#fff);color:var(--text,#2E2724);box-shadow:0 4px 14px -10px rgba(0,0,0,.45)}
-.fz-auth-google{min-height:44px;display:flex;justify-content:center;align-items:center;position:relative;width:100%}
+.fz-auth-roles{display:flex;gap:6px;padding:5px;border-radius:14px;background:#EFE7DE;margin:0 0 18px}
+.fz-auth .fz-auth-role{flex:1;border:0;background:transparent;box-shadow:none;color:#6E635C;font:inherit;font-weight:700;font-size:.92rem;padding:10px;border-radius:11px;cursor:pointer;min-height:0;transition:all .18s ease}
+.fz-auth .fz-auth-role.is-on{background:#922D43 !important;color:#FFFDF8 !important;box-shadow:0 4px 14px -4px rgba(146,45,67,0.35) !important}
+.fz-auth-google{min-height:48px;display:flex;justify-content:center;align-items:center;position:relative;width:100%}
 .fz-auth-google[hidden]{display:none}
-.fz-btn-google-native{width:100%;max-width:360px;height:44px;min-height:44px;border-radius:999px;background:#FFFFFF;border:1.5px solid #E4D9CC;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;font-weight:700;font-size:.92rem;color:#2E2724;cursor:pointer;transition:background .18s,border-color .18s,transform .1s,box-shadow .18s;box-shadow:0 2px 6px rgba(46,39,36,.06);padding:0 16px;user-select:none;-webkit-user-select:none}
-.fz-btn-google-native:hover{background:#FAF6F0;border-color:#D3C4B3}
-.fz-btn-google-native:active{transform:translateY(1px);box-shadow:0 1px 2px rgba(46,39,36,.06)}
-.fz-btn-google-native .fz-google-svg{flex-shrink:0}
+.fz-btn-google-native{width:100%;max-width:380px;height:48px;min-height:48px;border-radius:9999px;border:1.5px solid #E2D7C8 !important;background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 42%,#FAF6EE 82%,#F3EBE0 100%) !important;box-shadow:0 4px 0 #D3C4B3,0 8px 20px rgba(27,21,21,0.10),inset 0 1.5px 1px #FFFFFF,inset 0 -1.5px 1px rgba(210,195,180,0.35) !important;display:flex;align-items:center;justify-content:center;gap:12px;font-family:'Plus Jakarta Sans',-apple-system,sans-serif;font-weight:700;font-size:.98rem;color:#1B1515;letter-spacing:-0.01em;text-shadow:0 1px 0 rgba(255,255,255,0.85);cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .14s cubic-bezier(.16,1,.3,1),box-shadow .14s cubic-bezier(.16,1,.3,1),background .14s ease,border-color .14s ease;position:relative;overflow:hidden;padding:0 20px}
+.fz-btn-google-native::before{content:"" !important;position:absolute !important;top:0 !important;left:0 !important;right:0 !important;height:50% !important;background:linear-gradient(180deg,rgba(255,255,255,0.75) 0%,rgba(255,255,255,0.15) 100%) !important;border-radius:9999px 9999px 0 0 !important;pointer-events:none !important;z-index:1 !important}
+.fz-btn-google-native .fz-google-svg,.fz-btn-google-native span{position:relative !important;z-index:2 !important}
+.fz-btn-google-native .fz-google-svg{flex-shrink:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.06))}
+.fz-btn-google-native:hover,.fz-auth-google:hover .fz-btn-google-native{transform:translateY(-2px) !important;background:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 45%,#FCF9F3 85%,#F6EFE5 100%) !important;border-color:#D8CCA8 !important;box-shadow:0 6px 0 #D3C4B3,0 12px 24px rgba(27,21,21,0.14),inset 0 1.5px 1px #FFFFFF,inset 0 -1.5px 1px rgba(210,195,180,0.35) !important}
+.fz-btn-google-native:active,.fz-auth-google:active .fz-btn-google-native{transform:translateY(4px) scale(0.99) !important;background:linear-gradient(180deg,#F3ECE1 0%,#FAF6EE 50%,#FFFFFF 100%) !important;border-color:#CFC0AF !important;box-shadow:0 0 0 #D3C4B3,0 2px 5px rgba(27,21,21,0.08),inset 0 2px 3px rgba(27,21,21,0.07) !important;transition:transform .08s ease,box-shadow .08s ease !important}
 .fz-auth-or[hidden]{display:none}
-.fz-auth-or{display:flex;align-items:center;gap:10px;margin:14px 0 4px;color:var(--muted,#6E635C);font-size:.8rem}
-.fz-auth-or::before,.fz-auth-or::after{content:"";flex:1;height:1px;background:var(--line,#EFE7DE)}
-.fz-auth-hint{margin:0 0 6px;color:var(--muted,#6E635C);font-size:.88rem;line-height:1.5}
+.fz-auth-or{display:flex;align-items:center;gap:12px;margin:16px 0 6px;color:#8C8077;font-size:.82rem;font-weight:600}
+.fz-auth-or::before,.fz-auth-or::after{content:"";flex:1;height:1px;background:#E8DFD5}
+.fz-auth-hint{margin:0 0 6px;color:#6E635C;font-size:.88rem;line-height:1.5}
 .fz-auth-form{display:flex;flex-direction:column;gap:14px;margin-top:6px}
 .fz-auth-field{display:flex;flex-direction:column;gap:6px}
-.fz-auth-label{font-weight:700;font-size:.9rem;color:var(--text,#2E2724)}
-.fz-auth-label small{font-weight:600;color:var(--muted,#6E635C)}
-.fz-auth-input{display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--line,#EFE7DE);padding:4px 0;color:var(--muted,#6E635C);transition:border-color .2s}
-.fz-auth-input:focus-within{border-bottom-color:var(--accent,#9B3A4A);color:var(--accent,#9B3A4A)}
-/* (0,3,1): harus menang atas `body.fz-lux input[type="text"]` (0,2,2) yang menggambar kotak putih. */
-.fz-auth .fz-auth-input input[name]{flex:1;min-width:0;border:0;border-radius:0;background:transparent;box-shadow:none;font:inherit;font-size:1rem;color:var(--text,#2E2724);padding:8px 0;min-height:40px;outline:none}
-.fz-auth .fz-auth-eye{border:0;background:transparent;box-shadow:none;color:var(--muted,#6E635C);padding:6px;min-height:0;cursor:pointer;border-radius:8px}
-.fz-auth .fz-auth-eye[aria-pressed="true"]{color:var(--accent,#9B3A4A)}
-.fz-auth-row{display:flex;justify-content:flex-end;margin-top:-4px}
-.fz-auth .fz-auth-link{border:0;background:transparent;box-shadow:none;padding:4px 2px;min-height:0;font:inherit;font-weight:700;font-size:.86rem;color:var(--accent,#9B3A4A);cursor:pointer;text-decoration:none}
-.fz-auth-note{margin:6px 0 0;font-size:.84rem;line-height:1.45;color:var(--muted,#6E635C);text-align:center}
-.fz-auth-note:empty{display:none}
-.fz-auth-note.is-info{text-align:left;background:var(--line,#EFE7DE);border-radius:12px;padding:10px 12px}
-.fz-auth-error{margin:0;color:#A1302A;font-size:.86rem;font-weight:600;line-height:1.45}
-.fz-auth-error:empty{display:none}
-.fz-auth .fz-auth-submit{width:100%;margin-top:6px;padding:15px 20px;font-size:1rem}
-.fz-auth-alt{margin:16px 0 0;text-align:center;color:var(--muted,#6E635C);font-size:.9rem}
-.fz-auth-alt + .fz-auth-alt{margin-top:4px}
-.fz-auth .fz-plain:focus-visible{outline:2px solid var(--accent,#9B3A4A);outline-offset:2px}
-/* Penanda fokus kolom: garis bawah menebal (bukan kotak) supaya tetap sejalan dengan bentuk
-   kolom bergaris. Selektornya SAMA dengan aturan outline:none di atas, jadi ia menang. */
+.fz-auth-label{font-weight:700;font-size:.9rem;color:#1B1515}
+.fz-auth-label small{font-weight:600;color:#8C8077}
+.fz-auth-input{display:flex;align-items:center;gap:10px;background:#FAF6EE;border:1.5px solid #E6DED4;border-radius:14px;padding:4px 14px;color:#8C8077;transition:background .18s,border-color .18s,box-shadow .18s}
+.fz-auth-input:has(input:focus-visible){background:#FFFDF8;border-color:#922D43;box-shadow:0 0 0 3px rgba(146,45,67,0.12);color:#922D43}
+.fz-auth .fz-auth-input input[name]{flex:1;min-width:0;border:0;border-radius:0;background:transparent;box-shadow:none;font:inherit;font-size:.98rem;font-weight:600;color:#1B1515;padding:9px 0;min-height:38px;outline:none}
 .fz-auth .fz-auth-input input[name]:focus-visible{box-shadow:inset 0 -2px 0 var(--accent,#9B3A4A)}
-@media (max-height:680px){.fz-auth-hero.is-welcome{min-height:48vh}.fz-auth-hero.is-masuk{min-height:24vh}.fz-auth-hero.is-daftar{min-height:18vh}.fz-auth-paw{width:84px;height:84px}}
+.fz-auth .fz-auth-eye{border:0;background:transparent;box-shadow:none;color:#8C8077;padding:6px;min-height:0;cursor:pointer;border-radius:8px}
+.fz-auth .fz-auth-eye[aria-pressed="true"]{color:#922D43}
+.fz-auth-row{display:flex;justify-content:flex-end;margin-top:-2px}
+.fz-auth .fz-auth-link{border:0;background:transparent;box-shadow:none;padding:4px 2px;min-height:0;font:inherit;font-weight:700;font-size:.88rem;color:#922D43;cursor:pointer;text-decoration:none}
+.fz-auth-note{margin:6px 0 0;font-size:.84rem;line-height:1.45;color:#6E635C;text-align:center}
+.fz-auth-note:empty{display:none}
+.fz-auth-note.is-info{text-align:left;background:#EFE7DE;border-radius:12px;padding:10px 12px}
+.fz-auth-error{margin:0;color:#B91C1C;font-size:.88rem;font-weight:700;line-height:1.45}
+.fz-auth-error:empty{display:none}
+.fz-auth .fz-auth-submit{width:100%;margin-top:8px;padding:14px 20px;font-size:1.02rem;font-weight:800;border-radius:9999px;background:#922D43 !important;border:none;color:#FFFDF8 !important;cursor:pointer;box-shadow:0 6px 20px -4px rgba(146,45,67,0.40) !important;transition:all .18s ease}
+.fz-auth .fz-auth-submit:hover{background:#7A2437 !important;transform:translateY(-1px);box-shadow:0 8px 24px -4px rgba(146,45,67,0.50) !important}
+.fz-auth .fz-auth-submit:active{transform:translateY(1px)}
+.fz-auth-alt{margin:16px 0 0;text-align:center;color:#6E635C;font-size:.92rem}
+.fz-auth-alt + .fz-auth-alt{margin-top:4px}
+.fz-auth .fz-plain:focus-visible{outline:2px solid #922D43;outline-offset:2px}
+
+/* DESKTOP & TABLET SPLIT-SCREEN AUTHENTIC REDESIGN (min-width: 768px) */
+@media (min-width: 768px) {
+  .fz-auth{display:grid !important;grid-template-columns:1fr 1fr !important;min-height:100vh !important;height:100vh !important;overflow:hidden !important;position:fixed !important;inset:0 !important}
+  .fz-auth-hero{min-height:100vh !important;height:100% !important;padding:48px 48px !important;justify-content:center !important;align-items:center !important;position:relative !important;background:#1B1515 !important}
+  .fz-auth-hero.is-welcome,.fz-auth-hero.is-masuk,.fz-auth-hero.is-daftar{min-height:100vh !important}
+  .fz-auth-wave-h{display:none !important}
+  .fz-auth-wave-v{display:block !important;position:absolute !important;right:-1px !important;top:0 !important;bottom:0 !important;height:100% !important;width:160px !important;z-index:5 !important;pointer-events:none !important}
+  .fz-auth-brand .fiezel-wordmark{width:220px !important}
+  .fz-auth-tagline{font-size:1.35rem !important}
+
+  /* Desktop Language Selector: Pojok Kanan Atas, Solid, Jelas, Tanpa Fading */
+  .fz-auth .fz-auth-lang-wrap{position:absolute !important;top:24px !important;right:36px !important;z-index:50 !important}
+  .fz-auth .fz-auth-lang{display:flex !important;align-items:center !important;gap:4px !important;padding:4px 8px !important;border-radius:9999px !important;background:#FFFDF8 !important;border:1.5px solid #E2D9CE !important;box-shadow:0 4px 16px rgba(27,21,21,0.08) !important}
+  .fz-auth .fz-auth-lang button{font-size:0.95rem !important;font-weight:700 !important;padding:7px 16px !important;color:#5C4E4B !important;border-radius:9999px !important;background:transparent !important;box-shadow:none !important}
+  .fz-auth .fz-auth-lang button.is-on{background:#922D43 !important;color:#FFFDF8 !important;box-shadow:0 2px 10px rgba(146,45,67,0.35) !important}
+  .fz-auth .fz-auth-lang-more{font-size:0.92rem !important;padding:7px 12px !important;color:#922D43 !important}
+  .fz-auth-lang-dropdown{top:calc(100% + 8px) !important;right:0 !important;min-width:210px !important;border-radius:18px !important;border:1.5px solid #E2D9CE !important;box-shadow:0 16px 36px rgba(27,21,21,0.16) !important}
+  .fz-lang-item{padding:10px 14px !important;font-size:0.92rem !important}
+
+  /* Desktop Content & Form Expansion: Lebar Mewah, Eksklusif, Tanpa Lahan Kosong */
+  .fz-auth-body{min-height:100vh !important;height:100% !important;display:flex !important;flex-direction:column !important;justify-content:center !important;align-items:center !important;max-width:none !important;margin:0 !important;padding:48px 80px !important;position:relative !important}
+  .fz-auth-welcome-container{height:auto !important;flex:0 0 auto !important;max-width:680px !important;width:100% !important;display:flex !important;flex-direction:column !important;justify-content:center !important;padding:24px 0 !important}
+  .fz-auth-title{font-size:4.5rem !important;font-weight:800 !important;line-height:1.06 !important;margin-bottom:26px !important;letter-spacing:-0.04em !important}
+  .fz-auth-lead{font-size:1.45rem !important;margin-bottom:38px !important;max-width:44ch !important;line-height:1.65 !important;color:#5C4E4B !important}
+  .fz-auth-carousel-dots{margin:0 0 32px 0 !important;gap:12px !important}
+  .fz-auth-carousel-dots .fz-dot{width:11px !important;height:11px !important}
+  .fz-auth-carousel-dots .fz-dot.is-active{width:38px !important}
+  .fz-btn-text-desktop{display:inline !important}
+  .fz-btn-text-mobile{display:none !important}
+  .fz-auth-next-row{position:absolute !important;bottom:52px !important;right:68px !important;margin:0 !important;padding:0 !important;z-index:20 !important;display:flex !important;justify-content:flex-end !important}
+  .fz-auth .fz-auth-next{padding:20px 52px !important;font-size:1.25rem !important;font-weight:800 !important;letter-spacing:-0.01em !important;border-radius:9999px !important;background:#922D43 !important;color:#FFFDF8 !important;box-shadow:0 12px 36px -6px rgba(146,45,67,0.45) !important;transition:all 0.22s cubic-bezier(0.16,1,0.3,1) !important}
+  .fz-auth .fz-auth-next:hover{background:#7A2437 !important;transform:translateY(-2px) scale(1.02) !important;box-shadow:0 16px 44px -6px rgba(146,45,67,0.55) !important}
+  .fz-auth-next-arrow{width:24px !important;height:24px !important}
+  .fz-auth-next-arrow svg{width:22px !important;height:22px !important;stroke-width:2.4 !important}
+
+  .fz-auth-body .fz-auth-form,
+  .fz-auth-body .fz-auth-roles,
+  .fz-auth-body .fz-auth-google,
+  .fz-auth-body .fz-auth-or,
+  .fz-auth-body .fz-auth-alt,
+  .fz-auth-body .fz-auth-hint{width:100% !important;max-width:540px !important}
+  .fz-auth-roles{padding:6px !important;margin:0 0 22px !important;border-radius:16px !important}
+  .fz-auth .fz-auth-role{font-size:1.02rem !important;padding:12px !important;border-radius:12px !important}
+  .fz-btn-google-native{max-width:100% !important;width:100% !important;height:52px !important;min-height:52px !important;font-size:1.04rem !important;border-radius:9999px !important}
+  .fz-auth-or{margin:22px 0 10px !important;font-size:0.88rem !important}
+  .fz-auth-form{gap:16px !important;width:100% !important;max-width:540px !important}
+  .fz-auth-label{font-size:0.96rem !important}
+  .fz-auth-input{border-radius:16px !important;padding:6px 16px !important;min-height:50px !important}
+  .fz-auth .fz-auth-input input[name]{font-size:1.06rem !important;min-height:44px !important}
+  .fz-auth .fz-auth-link{font-size:0.94rem !important}
+  .fz-auth .fz-auth-submit{padding:16px 28px !important;font-size:1.1rem !important;margin-top:14px !important;border-radius:9999px !important;background:#922D43 !important;color:#FFFDF8 !important;box-shadow:0 6px 20px -4px rgba(146,45,67,0.40) !important}
+  .fz-auth .fz-auth-submit:hover{background:#7A2437 !important}
+  .fz-auth-alt{font-size:1rem !important;margin-top:20px !important}
+}
+
+@media (max-height:680px) and (max-width:767px){
+  .fz-auth-hero.is-welcome{min-height:46vh}
+  .fz-auth-hero.is-masuk{min-height:24vh}
+  .fz-auth-hero.is-daftar{min-height:18vh}
+}
 @media (prefers-reduced-motion:reduce){.fz-auth,.fz-auth.is-leaving{animation:none}.fz-auth-hero{transition:none}}
 /* m025-367 · langkah kursus di perkenalan: dua kartu lebar (bendera + nama + isi kursus). */
 .fiezel-course-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:6px 0 4px;width:100%;box-sizing:border-box}
@@ -10090,53 +10179,155 @@ header.topbar {
 
 
 /* 4. Auth & Login Screen: 100% Viewport-Fit (No Scroll Required) */
-.fz-auth {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100dvh !important;
-  max-height: 100dvh !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain !important;
-  background: #FBF7F3 !important;
-  box-sizing: border-box !important;
-  z-index: 2147481950 !important;
+@media (max-width: 767px) {
+  .fz-auth {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    background: #FDFAF3 !important;
+    box-sizing: border-box !important;
+    z-index: 2147481950 !important;
+  }
+}
+@media (min-width: 768px) {
+  html body .fz-auth {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    background: #FDFAF3 !important;
+  }
+  html body .fz-auth-hero {
+    min-height: 100vh !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    background: #161114 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 48px 48px !important;
+    position: relative !important;
+  }
+  html body .fz-auth-hero.is-welcome,
+  html body .fz-auth-hero.is-masuk,
+  html body .fz-auth-hero.is-daftar {
+    min-height: 100vh !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    padding: 48px 48px !important;
+  }
+  html body .fz-auth-hero .fz-auth-brand .fiezel-wordmark {
+    width: 220px !important;
+  }
+  html body .fz-auth-wave-h {
+    display: none !important;
+  }
+  html body .fz-auth-wave-v {
+    display: block !important;
+    position: absolute !important;
+    right: -1px !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
+    width: 160px !important;
+    z-index: 5 !important;
+    pointer-events: none !important;
+  }
+  html body .fz-auth-body {
+    min-height: 100vh !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: radial-gradient(120% 80% at 85% 10%, #FFFDF8 0%, rgba(248, 243, 233, 0.75) 45%, rgba(243, 232, 217, 0.40) 100%), radial-gradient(90% 60% at 15% 90%, rgba(243, 232, 217, 0.75) 0%, rgba(248, 243, 233, 0.45) 50%, transparent 100%), #F8F3E9 !important;
+    padding: 48px 48px !important;
+    max-width: none !important;
+    margin: 0 !important;
+    position: relative !important;
+  }
+  html body .fz-auth-welcome-container {
+    max-width: 680px !important;
+    width: 100% !important;
+    justify-content: center !important;
+    position: static !important;
+    z-index: 1 !important;
+  }
+  html body .fz-auth-welcome-container .fz-auth-title {
+    font-size: clamp(3.8rem, 5.2vw, 5rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.04 !important;
+    letter-spacing: -0.04em !important;
+    color: #1B1515 !important;
+    margin-bottom: 24px !important;
+  }
+  html body .fz-auth-welcome-container .fz-auth-lead {
+    font-size: 1.45rem !important;
+    line-height: 1.65 !important;
+    max-width: 44ch !important;
+    color: #5C4E4B !important;
+    margin-bottom: 36px !important;
+  }
+  html body .fz-auth .fz-auth-next-row {
+    position: absolute !important;
+    bottom: 52px !important;
+    right: 68px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 30 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+  html body .fz-auth .fz-auth-submit {
+    background: #922D43 !important;
+    color: #FFFDF8 !important;
+    box-shadow: 0 6px 20px -4px rgba(146, 45, 67, 0.40) !important;
+  }
+  html body .fz-auth .fz-auth-submit:hover {
+    background: #7A2437 !important;
+  }
 }
 
-.fz-auth-hero.is-masuk {
-  flex: 0 0 auto !important;
-  min-height: 24vh !important;
-  max-height: 28vh !important;
-  padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 38px !important;
-}
+@media (max-width: 767px) {
+  .fz-auth-hero.is-masuk {
+    flex: 0 0 auto !important;
+    min-height: 24vh !important;
+    max-height: 28vh !important;
+    padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 38px !important;
+  }
 
-.fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
-  width: min(36vw, 140px) !important;
-}
+  .fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
+    width: min(36vw, 140px) !important;
+  }
 
-.fz-auth-wave {
-  height: 32px !important;
-}
+  .fz-auth-hero.is-welcome {
+    min-height: 48vh !important;
+    max-height: 52vh !important;
+  }
 
-.fz-auth-body {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  padding: 4px 20px max(16px, env(safe-area-inset-bottom)) 20px !important;
-  max-width: 440px !important;
-  margin: 0 auto !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.fz-auth-title {
-  font-size: 1.6rem !important;
-  line-height: 1.1 !important;
-  margin: 0 0 8px 0 !important;
+  .fz-auth-body {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 12px 24px max(20px, env(safe-area-inset-bottom)) 24px !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }
 
 .fz-auth-roles {
@@ -10191,28 +10382,33 @@ header.topbar {
   font-size: 0.8rem !important;
 }
 
-.fz-auth .fz-auth-submit {
-  width: 100% !important;
-  margin-top: 10px !important;
-  padding: 13px 20px !important;
-  font-size: 1rem !important;
-  font-weight: 800 !important;
-  border-radius: 9999px !important;
-  background: linear-gradient(135deg, #FFE048 0%, #FFB800 100%) !important;
-  color: #0F0E11 !important;
-  border: none !important;
-  box-shadow: 0 4px 18px rgba(255, 184, 0, 0.35) !important;
-  cursor: pointer !important;
-}
+@media (max-width: 767px) {
+  .fz-auth .fz-auth-submit {
+    width: 100% !important;
+    margin-top: 10px !important;
+    padding: 13px 20px !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    border-radius: 9999px !important;
+    background: #922D43 !important;
+    color: #FFFDF8 !important;
+    border: none !important;
+    box-shadow: 0 4px 18px rgba(146, 45, 67, 0.35) !important;
+    cursor: pointer !important;
+  }
+  .fz-auth .fz-auth-submit:hover {
+    background: #7A2437 !important;
+  }
 
-/* 5. Welcome Screen Compactness */
-.fz-auth-hero.is-welcome {
-  min-height: 45vh !important;
-  max-height: 50vh !important;
-}
-.fz-auth-hero.is-welcome .fz-auth-paw {
-  width: 90px !important;
-  height: 90px !important;
+  /* 5. Welcome Screen Compactness */
+  .fz-auth-hero.is-welcome {
+    min-height: 45vh !important;
+    max-height: 50vh !important;
+  }
+  .fz-auth-hero.is-welcome .fz-auth-paw {
+    width: 90px !important;
+    height: 90px !important;
+  }
 }
 
 /* m025-378: label soal ulangan lesson lain di sesi lesson 20 soal */
@@ -12637,8 +12833,11 @@ body.fz-lux.fz-stage-quiz .quiz-topbar {
   .quiz-topbar,
   body.fz-stage-quiz .quiz-topbar,
   body.fz-lux.fz-stage-quiz .quiz-topbar {
-    left: 232px !important;
-    width: calc(100% - 232px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    max-width: 580px !important;
+    width: 100% !important;
   }
 }
 
@@ -13048,12 +13247,14 @@ body > #feedback.feedback-sheet {
 @media (min-width: 768px) {
   #feedback.feedback-sheet,
   body > #feedback.feedback-sheet {
-    left: 232px !important;
+    left: 0 !important;
     right: 0 !important;
-    width: min(680px, calc(100% - 256px)) !important;
-    max-width: 680px !important;
+    width: 100% !important;
+    max-width: 580px !important;
     margin: 0 auto !important;
     border-radius: 28px 28px 0 0 !important;
+    border: 1.5px solid #E2E8F0 !important;
+    border-bottom: none !important;
   }
 }
 
@@ -13071,10 +13272,10 @@ body > #feedback.feedback-sheet {
 /* Desktop & Tablet Centering: Clean Docked Drawer */
 @media (min-width: 768px) {
   #feedback.feedback-sheet {
-    left: 232px !important;
+    left: 0 !important;
     right: 0 !important;
-    width: auto !important;
-    max-width: 620px !important;
+    width: 100% !important;
+    max-width: 580px !important;
     margin: 0 auto !important;
     border-radius: 28px 28px 0 0 !important;
     border: 1.5px solid #E2E8F0 !important;
@@ -14039,4 +14240,1387 @@ body.has-tutor-modal #tutorTurn {
 
 .tutor-turn * {
   color: #0F172A !important;
+}
+
+
+/* ==========================================================================
+   UNIVERSAL MULTI-DEVICE 3-COLUMN ADAPTIVE GRID & COMPANION HUB
+   - Mobile (< 768px): Floating .bottomnav, single-column natural fit.
+   - Tablet (768px - 1023px): Left Navigation Rail (88px) per Section 15.8.
+   - Desktop (>= 1024px): 3-Column Grid (240px Sidebar + 1fr Canvas + 340px Companion Hub).
+   ========================================================================== */
+
+.fz-universal-layout {
+  width: 100%;
+  min-height: 100dvh;
+  box-sizing: border-box;
+}
+
+/* By default (Mobile < 768px and Tablet 768px-1023px), desktop sidebars are hidden */
+.fz-desktop-sidebar,
+.fz-desktop-companion {
+  display: none !important;
+}
+
+/* ==========================================================================
+   DESKTOP (>= 1024px): 3-Column Adaptive Layout
+   ========================================================================== */
+@media (min-width: 1024px) {
+  body:not(.fz-teacher-mode) .fz-universal-layout {
+    display: grid !important;
+    grid-template-columns: 240px minmax(0, 1fr) 340px !important;
+    max-width: 1360px !important;
+    margin: 0 auto !important;
+    gap: 28px !important;
+    padding: 0 20px !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+  }
+
+  /* Desktop Sidebar (Col 1) */
+  body:not(.fz-teacher-mode) .fz-desktop-sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 240px !important;
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+    padding: 24px 12px 24px 0 !important;
+    box-sizing: border-box !important;
+    border-right: 1.5px solid #E2E8F0 !important;
+    z-index: 100 !important;
+  }
+
+  /* Main Workspace (Col 2) */
+  body:not(.fz-teacher-mode) main.app.app {
+    padding-left: 0 !important;
+    padding-bottom: 40px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100vh !important;
+  }
+
+  /* Hide bottomnav on Desktop because Sidebar provides full navigation */
+  body:not(.fz-teacher-mode):not(.fz-stage-quiz):not(.fz-lesson-mode) nav.bottomnav {
+    display: none !important;
+  }
+
+  /* Desktop Companion Hub (Col 3) */
+  body:not(.fz-teacher-mode) .fz-desktop-companion {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 340px !important;
+    position: sticky !important;
+    top: 24px !important;
+    height: fit-content !important;
+    max-height: calc(100vh - 48px) !important;
+    overflow-y: auto !important;
+    gap: 16px !important;
+    padding: 0 0 24px 0 !important;
+    box-sizing: border-box !important;
+    z-index: 90 !important;
+  }
+
+  /* Center canvas during quiz mode */
+  body.fz-stage-quiz .fz-universal-layout,
+  body.fz-lesson-mode .fz-universal-layout,
+  body:has(.quiz-shell) .fz-universal-layout {
+    display: block !important;
+    max-width: 580px !important;
+    margin: 0 auto !important;
+    padding: 0 16px !important;
+  }
+  body.fz-stage-quiz .fz-desktop-sidebar,
+  body.fz-stage-quiz .fz-desktop-companion,
+  body.fz-lesson-mode .fz-desktop-sidebar,
+  body.fz-lesson-mode .fz-desktop-companion,
+  body:has(.quiz-shell) .fz-desktop-sidebar,
+  body:has(.quiz-shell) .fz-desktop-companion {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   DESKTOP SIDEBAR STYLING
+   ========================================================================== */
+.fz-sb-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 0 8px;
+}
+.fz-sb-brand .fiezel-wordmark {
+  width: 118px;
+  height: auto;
+  display: block;
+}
+.fz-sb-kelasku {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif);
+  font-weight: 800;
+  font-size: 11px;
+  color: #059669;
+  background: #D1FAE5;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.fz-sb-course {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+.fz-sb-course:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+.fz-sb-course-flag {
+  display: flex;
+  align-items: center;
+}
+.fz-sb-course-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #1E293B;
+  flex: 1;
+  text-align: left;
+  margin-left: 8px;
+}
+.fz-sb-course-arrow {
+  color: #94A3B8;
+  font-size: 12px;
+}
+
+.fz-sb-navs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.fz-sb-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 0;
+  background: transparent;
+  color: #475569;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  user-select: none;
+}
+.fz-sb-btn:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+.fz-sb-btn.is-active {
+  background: #8A1C2E !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px -2px rgba(138, 28, 46, 0.35) !important;
+}
+.fz-sb-btn svg,
+.fz-sb-btn .fz-i {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.fz-sb-btn.is-active svg,
+.fz-sb-btn.is-active .fz-i {
+  stroke: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   DESKTOP COMPANION HUB STYLING
+   ========================================================================== */
+.fz-comp-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fz-comp-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fz-comp-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.fz-comp-title-grp {
+  display: flex;
+  flex-direction: column;
+}
+.fz-comp-streak-num {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.1;
+}
+.fz-comp-sub {
+  font-size: 0.76rem;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.fz-comp-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  background: #F8FAFC;
+  padding: 8px 6px;
+  border-radius: 12px;
+}
+.fz-comp-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.fz-day-name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748B;
+}
+.fz-day-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #E2E8F0;
+  color: #94A3B8;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.fz-comp-day.is-active .fz-day-dot {
+  background: #FEF3C7;
+  color: #D97706;
+}
+.fz-comp-day.is-today .fz-day-dot {
+  background: #F59E0B;
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+}
+
+.fz-comp-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.fz-comp-stat-pill {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+.fz-stat-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.fz-stat-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.fz-stat-text b {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fz-stat-text small {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748B;
+}
+
+.fz-comp-mochi-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.fz-comp-mochi-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FFFFFF 0%, #FEF3C7 50%, #FDE68A 100%);
+  border: 1.5px solid #F59E0B;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+  flex-shrink: 0;
+}
+.fz-comp-mochi-bubble {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.35;
+  position: relative;
+  flex: 1;
+}
+.fz-comp-mochi-bubble::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 14px;
+  width: 10px;
+  height: 10px;
+  background: #F8FAFC;
+  border-left: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+  transform: rotate(45deg);
+}
+
+.fz-quest-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fz-quest-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #475569;
+}
+.fz-quest-label-row b {
+  color: #059669;
+  font-weight: 800;
+}
+.fz-quest-track {
+  height: 8px;
+  background: #E2E8F0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.fz-quest-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981, #059669);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.fz-quest-sub {
+  font-size: 0.72rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.fz-comp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fz-comp-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+.fz-comp-action-btn:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  transform: translateY(-1px);
+}
+.fz-comp-action-btn > span:first-child {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.fz-action-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.fz-action-info b {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+.fz-action-info small {
+  font-size: 0.72rem;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fz-action-arrow {
+  color: #94A3B8;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+
+/* ==========================================================================
+   AUTHENTIC FIEZEL ONBOARDING REDESIGN (5-STEP FLOW & RESPONSIVE LUXURY)
+   ========================================================================== */
+
+body .fiezel-ob {
+  background: #FDFAF3 !important;
+  color: #161114 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+@media (min-width: 768px) {
+  body .fiezel-ob {
+    inset: auto !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: 430px !important;
+    max-width: calc(100vw - 32px) !important;
+    height: auto !important;
+    min-height: 640px !important;
+    max-height: calc(100dvh - 36px) !important;
+    border-radius: 30px !important;
+    background: #FDFAF3 !important;
+    box-shadow: 0 28px 72px rgba(10, 6, 8, 0.46), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 9999px rgba(18, 13, 15, 0.76) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding: 0 !important;
+  }
+
+  body .fiezel-ob .fiezel-ob-reveal {
+    border-radius: 30px 30px 0 0 !important;
+  }
+}
+
+/* Top Espresso Header + Organic Diagonal S-Curve Wave */
+body .fiezel-ob .fiezel-ob-reveal {
+  position: relative !important;
+  background: linear-gradient(160deg, #231815 0%, #140E0D 100%) !important;
+  padding: max(18px, calc(env(safe-area-inset-top, 0px) + 12px)) 20px 64px !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body .fiezel-ob .fz-ob-header-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  z-index: 3 !important;
+  gap: 12px !important;
+}
+
+body .fiezel-ob .fz-ob-brand-col {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 3px !important;
+}
+
+body .fiezel-ob .fz-ob-brand-col .fiezel-wordmark {
+  height: 23px !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+body .fiezel-ob .fz-ob-brand-col .fz-auth-tagline {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+  color: rgba(253, 250, 243, 0.86) !important;
+  margin: 0 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Connected Dot Stepper in Header Top-Right */
+body .fiezel-ob .fiezel-ob-reveal .fiezel-stepper {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 5px !important;
+  padding: 2px 0 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+body .fiezel-ob .fiezel-ob-reveal .fiezel-segments {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  height: 12px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+body .fiezel-ob .fiezel-ob-reveal .fiezel-segments::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 4px !important;
+  right: 4px !important;
+  top: 50% !important;
+  height: 1.5px !important;
+  background: rgba(253, 250, 243, 0.24) !important;
+  transform: translateY(-50%) !important;
+  z-index: 0 !important;
+}
+
+body .fiezel-ob .fiezel-ob-reveal .fiezel-segments i {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 9px !important;
+  height: 9px !important;
+  flex: 0 0 9px !important;
+  border-radius: 50% !important;
+  background: #5E534C !important;
+  border: 1.5px solid rgba(253, 250, 243, 0.25) !important;
+  box-sizing: border-box !important;
+  transition: all 0.22s ease !important;
+}
+
+body .fiezel-ob .fiezel-ob-reveal .fiezel-segments i.is-done {
+  background: #9E2436 !important;
+  border-color: rgba(253, 250, 243, 0.88) !important;
+}
+
+body .fiezel-ob .fiezel-ob-reveal .fiezel-stepper-eyebrow {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  color: rgba(253, 250, 243, 0.82) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+body .fiezel-ob .fiezel-ob-reveal .fz-auth-wave {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: -1px !important;
+  width: 100% !important;
+  height: 62px !important;
+  display: block !important;
+  fill: #FDFAF3 !important;
+  color: #FDFAF3 !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+/* Zero-Shift Floating Topbar ("Kembali") */
+body .fiezel-ob .fiezel-topbar {
+  position: relative !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  z-index: 7 !important;
+}
+
+body .fiezel-ob .fiezel-topbar.is-bare {
+  display: none !important;
+}
+
+body .fiezel-ob .fiezel-topbar .fiezel-back {
+  position: absolute !important;
+  top: 6px !important;
+  left: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  min-height: 32px !important;
+  padding: 4px 11px !important;
+  border-radius: 999px !important;
+  background: rgba(253, 250, 243, 0.92) !important;
+  border: 1px solid #E5DDD2 !important;
+  color: #3A2E2A !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(22, 17, 20, 0.08) !important;
+  cursor: pointer !important;
+}
+
+body .fiezel-ob .fiezel-topbar .fiezel-back:hover {
+  background: #FFFFFF !important;
+  border-color: #8A1C2E !important;
+  color: #8A1C2E !important;
+}
+
+/* Mochi Companion Overlapping Wave Boundary + Golden Accent Sparkles */
+body .fiezel-ob .fiezel-stage {
+  position: relative !important;
+  margin: -50px auto 0 !important;
+  padding: 0 16px 2px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: transparent !important;
+  z-index: 4 !important;
+  flex-shrink: 0 !important;
+}
+
+body .fiezel-ob .fiezel-stage-art {
+  position: relative !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+body .fiezel-ob .fz-mochi-rays {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 170px !important;
+  height: 150px !important;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  background: radial-gradient(circle, rgba(245, 178, 62, 0.18) 0%, rgba(253, 250, 243, 0) 68%) !important;
+  border-radius: 50% !important;
+}
+
+body .fiezel-ob .fz-mochi-rays span {
+  position: absolute !important;
+  display: block !important;
+  width: 11px !important;
+  height: 3px !important;
+  border-radius: 999px !important;
+  background: #E5A93C !important;
+}
+
+body .fiezel-ob .fz-mochi-rays span:nth-child(1) {
+  top: 32px !important;
+  right: 12px !important;
+  transform: rotate(-28deg) !important;
+}
+
+body .fiezel-ob .fz-mochi-rays span:nth-child(2) {
+  top: 44px !important;
+  right: 6px !important;
+  transform: rotate(-4deg) !important;
+}
+
+body .fiezel-ob .fz-mochi-rays span:nth-child(3) {
+  top: 56px !important;
+  right: 11px !important;
+  transform: rotate(18deg) !important;
+}
+
+body .fiezel-ob .fz-mochi-rays span:nth-child(4) {
+  display: none !important;
+}
+
+body .fiezel-ob .fiezel-ob-mascot {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 120px !important;
+  height: 112px !important;
+  max-width: 120px !important;
+  max-height: 112px !important;
+  flex: 0 0 120px !important;
+  filter: drop-shadow(0 10px 14px rgba(34, 22, 18, 0.14)) !important;
+}
+
+body .fiezel-ob .fiezel-ob-mascot fiezel-mascot,
+body .fiezel-ob .fiezel-ob-mascot .fiezel-ob-paw,
+body .fiezel-ob .fiezel-ob-mascot .fz-mascot {
+  width: 120px !important;
+  height: 112px !important;
+  max-width: 120px !important;
+  max-height: 112px !important;
+}
+
+/* Sheet Body & Typography */
+body .fiezel-ob .fiezel-sheet {
+  background: #FDFAF3 !important;
+  padding: 6px 22px 22px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  flex: 1 0 auto !important;
+  width: 100% !important;
+  max-width: 440px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+body .fiezel-ob .fiezel-sheet .fiezel-title,
+body .fiezel-ob .fiezel-sheet h2 {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.38rem !important;
+  line-height: 1.24 !important;
+  color: #181210 !important;
+  text-align: center !important;
+  margin: 0 !important;
+  letter-spacing: -0.02em !important;
+}
+
+body .fiezel-ob .fiezel-sheet .fiezel-body {
+  font-size: 0.86rem !important;
+  line-height: 1.45 !important;
+  color: #6E6259 !important;
+  text-align: center !important;
+  margin: -2px auto 4px !important;
+  max-width: 310px !important;
+}
+
+/* Step 1: Soft Warm Travertine Name Input */
+body .fiezel-ob .fiezel-name-box {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 11px !important;
+  background: #F6F2E9 !important;
+  border: 1.5px solid #E5DDD0 !important;
+  border-radius: 16px !important;
+  padding: 6px 16px !important;
+  min-height: 52px !important;
+  margin: 6px 0 8px !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+}
+
+body .fiezel-ob .fiezel-name-box:has(input:focus-visible) {
+  border-color: #8A1C2E !important;
+  box-shadow: 0 0 0 3px rgba(138, 28, 46, 0.14) !important;
+  background: #FFFFFF !important;
+}
+
+body .fiezel-ob .fz-name-icon-wrap,
+body .fiezel-ob .fiezel-field-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #7D6E63 !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+}
+
+body .fiezel-ob .fiezel-name-box input[data-ob-name],
+body .fiezel-ob .fiezel-name-box .fiezel-input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-size: 0.98rem !important;
+  font-weight: 600 !important;
+  color: #181210 !important;
+  width: 100% !important;
+  padding: 8px 0 !important;
+  margin: 0 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+body .fiezel-ob .fiezel-name-box input[data-ob-name]:focus-visible {
+  outline: 2px solid var(--focus-ring, #8A1C2E) !important;
+  outline-offset: 2px !important;
+}
+
+body .fiezel-ob .fiezel-name-box input[data-ob-name]::placeholder {
+  color: #9A8D82 !important;
+  font-weight: 500 !important;
+}
+
+/* Luxury Burgundy Pill CTA Button */
+body .fiezel-ob .fiezel-btn-primary,
+body .fiezel-ob button[data-ob-advance],
+body .fiezel-ob .fz-btn-main-start {
+  background: linear-gradient(180deg, #8E2232 0%, #6E1623 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 999px !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 0.96rem !important;
+  min-height: 48px !important;
+  padding: 12px 24px !important;
+  margin-top: 4px !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 18px rgba(110, 22, 35, 0.26) !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body .fiezel-ob .fiezel-btn-primary:hover:not(:disabled),
+body .fiezel-ob button[data-ob-advance]:hover:not(:disabled),
+body .fiezel-ob .fz-btn-main-start:hover:not(:disabled) {
+  background: linear-gradient(180deg, #9C2638 0%, #7A1927 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 22px rgba(110, 22, 35, 0.34) !important;
+}
+
+body .fiezel-ob .fiezel-btn-primary:disabled,
+body .fiezel-ob button[data-ob-advance]:disabled {
+  background: #DFD6CA !important;
+  color: #96897E !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Bottom 5-Dot Stepper Indicator */
+body .fiezel-ob .fiezel-dots {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  margin-top: 6px !important;
+}
+
+body .fiezel-ob .fiezel-dots .fiezel-dot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #DFD5C8 !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body .fiezel-ob .fiezel-dots .fiezel-dot.is-active {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #8A1C2E !important;
+  transform: scale(1.12) !important;
+}
+
+/* Step 2: Language Course Cards */
+body .fiezel-ob .fiezel-course-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 9px !important;
+  width: 100% !important;
+  margin: 2px 0 !important;
+}
+
+body .fiezel-ob .fiezel-course-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 11px 15px !important;
+  background: #FAF7F1 !important;
+  border: 1.5px solid #E6DDD1 !important;
+  border-radius: 16px !important;
+  min-height: 56px !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+body .fiezel-ob .fiezel-course-card:hover:not(.is-mandarin) {
+  border-color: #C9A255 !important;
+  background: #FFFFFF !important;
+}
+
+body .fiezel-ob .fiezel-course-card.is-selected {
+  border-color: #8A1C2E !important;
+  background: #FCF5F4 !important;
+  box-shadow: 0 4px 12px rgba(138, 28, 46, 0.09) !important;
+}
+
+body .fiezel-ob .fiezel-course-card.is-mandarin {
+  opacity: 0.85 !important;
+  cursor: default !important;
+}
+
+body .fiezel-ob .fz-course-card-left {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 13px !important;
+  min-width: 0 !important;
+}
+
+body .fiezel-ob .fiezel-course-flag {
+  width: 36px !important;
+  height: 26px !important;
+  border-radius: 7px !important;
+  overflow: hidden !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+}
+
+body .fiezel-ob .fiezel-course-flag svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+body .fiezel-ob .fiezel-course-card .fiezel-course-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  gap: 1px !important;
+}
+
+body .fiezel-ob .fiezel-course-card .fiezel-course-text b {
+  font-size: 0.94rem !important;
+  font-weight: 700 !important;
+  color: #181210 !important;
+}
+
+body .fiezel-ob .fiezel-course-card .fiezel-course-text small {
+  font-size: 0.76rem !important;
+  color: #7D7066 !important;
+  font-weight: 500 !important;
+}
+
+body .fiezel-ob .fz-card-check {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid #D5C9BE !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  transition: all 0.18s ease !important;
+  color: transparent !important;
+  background: transparent !important;
+}
+
+body .fiezel-ob .fiezel-course-card.is-selected .fz-card-check,
+body .fiezel-ob .fz-card-check.is-checked {
+  background: #8A1C2E !important;
+  border-color: #8A1C2E !important;
+  color: #FFFFFF !important;
+}
+
+body .fiezel-ob .fz-card-badge {
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  padding: 3px 9px !important;
+  border-radius: 999px !important;
+  background: #EFE7DB !important;
+  color: #7E7065 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Step 3: Language Assistance Settings Card (IPA & Furigana) */
+body .fiezel-ob .fiezel-en-onboarding-panel,
+body .fiezel-ob .fiezel-ja-onboarding-panel {
+  flex-direction: column !important;
+  gap: 10px !important;
+  background: #FAF7F2 !important;
+  border: 1.5px solid #E7DFD3 !important;
+  border-radius: 18px !important;
+  padding: 13px 15px !important;
+  margin: 2px 0 !important;
+  box-sizing: border-box !important;
+  box-shadow: 0 4px 14px rgba(28, 20, 16, 0.04) !important;
+}
+
+body .fiezel-ob .fz-active-lang-pill {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding-bottom: 9px !important;
+  border-bottom: 1px solid #ECE4D9 !important;
+}
+
+body .fiezel-ob .fz-active-lang-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #181210 !important;
+}
+
+body .fiezel-ob .fz-badge-active {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  background: #DCFCE7 !important;
+  color: #15803D !important;
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+}
+
+body .fiezel-ob .fz-toggle-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding: 2px 0 !important;
+}
+
+body .fiezel-ob .fz-toggle-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 0.86rem !important;
+  font-weight: 700 !important;
+  color: #181210 !important;
+}
+
+body .fiezel-ob .fz-toggle-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  color: #3A2E2A !important;
+}
+
+body .fiezel-ob .fz-switch {
+  position: relative !important;
+  display: inline-block !important;
+  width: 44px !important;
+  height: 25px !important;
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+}
+
+body .fiezel-ob .fz-switch input {
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+body .fiezel-ob .fz-slider {
+  position: absolute !important;
+  cursor: pointer !important;
+  inset: 0 !important;
+  background-color: #D5CCC2 !important;
+  transition: 0.22s ease !important;
+  border-radius: 999px !important;
+}
+
+body .fiezel-ob .fz-slider:before {
+  position: absolute !important;
+  content: "" !important;
+  height: 19px !important;
+  width: 19px !important;
+  left: 3px !important;
+  bottom: 3px !important;
+  background-color: #FFFFFF !important;
+  transition: 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18) !important;
+}
+
+body .fiezel-ob .fz-switch input:checked + .fz-slider {
+  background-color: #8A1C2E !important;
+}
+
+body .fiezel-ob .fz-switch input:checked + .fz-slider:before {
+  transform: translateX(19px) !important;
+}
+
+body .fiezel-ob .fz-pronounce-preview-box {
+  background: #F3ECE2 !important;
+  border: 1px solid #E6DDD0 !important;
+  border-radius: 13px !important;
+  padding: 11px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 3px !important;
+  text-align: center !important;
+}
+
+body .fiezel-ob .fz-preview-word {
+  font-size: 1.18rem !important;
+  font-weight: 800 !important;
+  color: #181210 !important;
+  line-height: 1.2 !important;
+}
+
+body .fiezel-ob .fz-preview-phonetic {
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  color: #6E6259 !important;
+}
+
+body .fiezel-ob .fz-helper-note {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  font-size: 0.75rem !important;
+  color: #6E6259 !important;
+  margin: 0 !important;
+  text-align: center !important;
+  line-height: 1.35 !important;
+}
+
+body .fiezel-ob .fz-info-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  color: #7D6E63 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Step 4: 2x3 Goal Selection Grid (Centered Icon + Label) */
+body .fiezel-ob .fiezel-goal-grid:not(.fiezel-language-grid) {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+  width: 100% !important;
+  margin: 2px 0 !important;
+}
+
+body .fiezel-ob .fiezel-goal-card:not(.fiezel-course-card):not(.fiezel-language-choice) {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 12px 10px !important;
+  background: #FAF7F1 !important;
+  border: 1.5px solid #E6DDD1 !important;
+  border-radius: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  text-align: center !important;
+  min-height: 80px !important;
+  box-sizing: border-box !important;
+}
+
+body .fiezel-ob .fiezel-goal-card:not(.fiezel-course-card):hover {
+  border-color: #C9A255 !important;
+  background: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+}
+
+body .fiezel-ob .fiezel-goal-card:not(.fiezel-course-card).is-selected {
+  border-color: #8A1C2E !important;
+  background: #FCF5F4 !important;
+  box-shadow: 0 4px 12px rgba(138, 28, 46, 0.1) !important;
+}
+
+body .fiezel-ob .fz-goal-card-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+body .fiezel-ob .fz-goal-card-title {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  color: #181210 !important;
+  line-height: 1.24 !important;
+  text-align: center !important;
+}
+
+body .fiezel-ob .fz-goal-check {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  width: 19px !important;
+  height: 19px !important;
+  border-radius: 50% !important;
+  background: #8A1C2E !important;
+  color: #FFFFFF !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 5px rgba(138, 28, 46, 0.25) !important;
+}
+
+/* Step 5: Starting Path Cards ("Mulai dari Nol" vs "Tes Penempatan") */
+body .fiezel-ob .fiezel-placement-path-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 4px 0 8px !important;
+}
+
+body .fiezel-ob .fiezel-path-card {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 13px 16px !important;
+  background: #FAF7F1 !important;
+  border: 1.5px solid #E6DDD1 !important;
+  border-radius: 18px !important;
+  cursor: pointer !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+body .fiezel-ob .fiezel-path-card:hover {
+  border-color: #C9A255 !important;
+  background: #FFFFFF !important;
+}
+
+body .fiezel-ob .fiezel-path-card.is-selected {
+  border-color: #8A1C2E !important;
+  background: #FCF5F4 !important;
+  box-shadow: 0 4px 14px rgba(138, 28, 46, 0.1) !important;
+}
+
+body .fiezel-ob .fz-path-card-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 13px !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+body .fiezel-ob .fz-path-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  flex-shrink: 0 !important;
+}
+
+body .fiezel-ob .fz-path-texts {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 2px !important;
+  text-align: left !important;
+  min-width: 0 !important;
+}
+
+body .fiezel-ob .fz-path-soal-pill {
+  display: inline-block !important;
+  font-size: 0.69rem !important;
+  font-weight: 800 !important;
+  color: #3D240E !important;
+  background: #F5C249 !important;
+  padding: 2px 9px !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+  margin-bottom: 1px !important;
+}
+
+body .fiezel-ob .fiezel-path-badge {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.96rem !important;
+  font-weight: 800 !important;
+  color: #181210 !important;
+}
+
+body .fiezel-ob .fiezel-path-desc {
+  font-size: 0.77rem !important;
+  color: #6E6259 !important;
+  margin: 0 !important;
+  line-height: 1.35 !important;
+}
+
+body .fiezel-ob .fz-path-radio {
+  width: 21px !important;
+  height: 21px !important;
+  border-radius: 50% !important;
+  border: 1.8px solid #D5C9BE !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  transition: all 0.18s ease !important;
+}
+
+body .fiezel-ob .fiezel-path-card.is-selected .fz-path-radio {
+  border-color: #8A1C2E !important;
+}
+
+body .fiezel-ob .fz-path-radio .fz-radio-dot {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  transition: all 0.18s ease !important;
+}
+
+body .fiezel-ob .fiezel-path-card.is-selected .fz-path-radio .fz-radio-dot {
+  background: #8A1C2E !important;
+}
+
+body .fiezel-ob .fz-placement-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+}
+
+body .fiezel-ob .fz-skip-link {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  color: #3A2E2A !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 12px !important;
+  min-height: 30px !important;
+  cursor: pointer !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+}
+
+body .fiezel-ob .fz-skip-link:hover {
+  color: #8A1C2E !important;
 }

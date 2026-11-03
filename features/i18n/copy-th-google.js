@@ -84,6 +84,7 @@
     'auth.layar.lupa-murid': 'ยังไม่มีการกู้คืนอัตโนมัติ เข้าสู่ระบบด้วย Google หากบัญชีของคุณเชื่อมไว้ หรือขอความช่วยเหลือจากครู',
     'auth.layar.masuk': 'เข้าสู่ระบบ',
     'auth.layar.memproses': 'กำลังดำเนินการ…',
+    'auth.layar.mulai-sekarang': 'เริ่มต้นทันที',
     'auth.layar.murid': 'นักเรียน',
     'auth.layar.nama-pengguna': 'ชื่อผู้ใช้',
     'auth.layar.opsional': '(ไม่บังคับ)',
@@ -94,7 +95,7 @@
     'auth.layar.tamu': 'เข้าสู่ระบบในฐานะผู้เยี่ยมชม',
     'auth.layar.tamu-hint': 'เรียนได้ทันทีโดยไม่ต้องมีบัญชี ความคืบหน้าจะบันทึกไว้ในเครื่องนี้',
     'auth.layar.ulangi-sandi': 'ยืนยันรหัสผ่าน',
-    'auth.layar.welcome-lead': 'เรียนภาษาอังกฤษและภาษาญี่ปุ่นแบบปรับตัว เข้าสู่ระบบครั้งเดียว ความคืบหน้าของคุณตามไปทุกเครื่อง',
+    'auth.layar.welcome-lead': 'เรียนภาษาอย่างง่ายดาย สนุกสนาน และมีความหมายยิ่งขึ้น',
     /* --- m025-464 progres ikut akun (sinkron berizin) --- */
     'sinkron.judul': "ความคืบหน้าตามบัญชี",
     'sinkron.baru-saja': "เมื่อสักครู่",
