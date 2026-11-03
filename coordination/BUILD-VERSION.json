@@ -1,7 +1,7 @@
 {
-  "version": "m025-753",
-  "claimedBy": "branch feat/i18n-universal-pivot",
-  "claimedAt": "2026-11-02T19:53:02.978Z",
-  "reason": "feat(i18n): [ALLOW-PROTECTED: ci,pwa] universal english pivot & clean global matrix",
+  "version": "m025-754",
+  "claimedBy": "branch chore/live-only-cleanup",
+  "claimedAt": "2026-11-03T03:18:43.589Z",
+  "reason": "chore(pwa): [ALLOW-PROTECTED: pwa,ci] purge dead legacy directories, live-only runtime scope & anti-zombie invariant",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

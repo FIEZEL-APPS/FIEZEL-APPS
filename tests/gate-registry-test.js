@@ -102,19 +102,6 @@ const EXCLUSIONS = new Map([
   /* m025-192: entri pengecualian th-coverage DIHAPUS sesuai instruksi entri itu sendiri -
      lubang th (69 template + 605 vocab) sudah ditutup di branch ini (103/103), gerbang
      didaftarkan ulang di quality.yml dan kembali mengikat. */
-  ['audit/bank-audit.js', {
-    class: 'alat-pelaporan',
-    reason:
-      'BUKAN gerbang: ia penghasil laporan. Ia menyisir empat bank soal, menulis ' +
-      'audit/BANK-SOAL-AUDIT.json, mencetak ringkasan temuan, lalu SELALU exit 0 — nol ' +
-      'assert, nol process.exitCode. Temuan yang ia hasilkan hari ini pun tidak nol (mis. ' +
-      'field "rule" yang masih Inggris), jadi mendaftarkannya di CI akan menambahkan satu ' +
-      'langkah yang hijau selamanya tanpa memandang apa yang ia temukan — tepat jenis ' +
-      'langkah yang membuat hitungan "gerbang hijau" berbohong. Sisi yang HARUS merah dari ' +
-      'bank soal dijaga oleh tests/bank-soal-audit-test.js (terdaftar) dan grammar-quality-audit.js ' +
-      '(terdaftar). Cara menjalankan alat ini: `node audit/bank-audit.js` (lihat ' +
-      'docs/handoffs/FIEZEL-M025125-SIDAK-BANK-SOAL-HANDOFF.md).'
-  }],
   ['adaptivity-simulation.js', {
     class: 'alat-pelaporan',
     reason:

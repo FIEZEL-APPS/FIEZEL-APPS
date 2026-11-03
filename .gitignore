@@ -194,3 +194,22 @@ tools/verify-batch.js
 
 # Android offline web runtime bundle (dihasilkan dinamis oleh tools/sync-android-assets.mjs)
 android/app/src/main/assets/public/
+
+# Eksperimen, Mockup, dan Studio Non-Produksi
+remotion/node_modules/
+remotion/*.mp4
+remotion/public/
+scratch/
+brag-output/
+mochi-mascot-studio/
+mochi-motion-v2/
+mochi-character-kit/
+mockups/
+tools/dev/probe-*.mjs
+tools/dev/probe-*.js
+tools/dev/probe-*.cjs
+tools/dev/test-*.mjs
+tools/dev/capture-*.mjs
+tools/dev/diagnose-*.mjs
+tools/dev/inspect-*.mjs
+tools/gemini-sentinel/
