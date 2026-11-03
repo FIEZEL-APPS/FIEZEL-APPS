@@ -31,6 +31,22 @@ Setiap agent di workspace ini WAJIB mematuhi batas wilayah berkas live produksi 
    - DILARANG KERAS mengimpor atau memunculkan kembali aset maskot kartun 2D PAW lama. Seluruh persona visual WAJIB menggunakan Mochi (3D Three.js WebGL / Mochi companion).
    - Setiap agen yang mencampuradukkan file lama atau membawa kode mati ke dalam fitur baru dianggap melanggar integritas arsitektur.
 
+## 0-C. CSS ARCHITECTURE, SPECIFICITY SANITY, & ZERO-STACKING INVARIANT (ATURAN MUTLAK CSS)
+Setiap agent yang mengubah tampilan UI, menambah fitur visual, atau memperbaiki bug pembelajaran WAJIB mematuhi aturan arsitektur CSS berikut:
+1. **Larangan Keras Menumpuk Berkas Override Baru (Zero Patch-CSS Sprawl)**:
+   - DILARANG KERAS membuat berkas CSS baru untuk menambal style yang sudah ada (misalnya `fiezel-3.css`, `style-fix.css`, `*-patch.css`, atau `override.css`).
+   - Setiap modifikasi visual WAJIB langsung disunting pada berkas sumber aslinya:
+     - Gaya spesifik fitur/modul -> langsung di `features/<fitur>/<fitur>.css` (contoh: `features/grammar/grammar-upgrade.css`, `features/interactive-chat/interactive-chat.css`).
+     - Gaya sistemik / UI global -> langsung di `features/ui/fiezel-tactile-clay.css` (desain sistem aktif) atau `style.css`.
+2. **Pencegahan Perangkap "Slipping Mask" & Spesifisitas Semu**:
+   - DILARANG membungkus selector komponen dengan rantai kelas multi-tingkat buatan yang rapuh (misalnya `.clay-theme .vivid-wrapper .custom-box button.option-btn`).
+   - Komponen UI inti (seperti `.option-btn`, `.card`, `.badge`, `.progress-bar`, umpan balik kuis) WAJIB membawa styling mandiri yang kokoh. Ketika agent lain memperbaiki atau menyederhanakan DOM di fitur grammar, vocab, atau kuis, styling tidak boleh mendadak rontok kembali ke visual lawas `style.css`.
+3. **Eliminasi Berkas Zombie & Larangan Menghidupkan Kembali Style Mati**:
+   - DILARANG meninggalkan berkas CSS mati di dalam repo tanpa dimuat di `index.html` atau `sw.js` (seluruh berkas seperti `fiezel-marshmallow.css` dan `micro-ui.css` telah dimusnahkan secara permanen).
+   - Jangan pernah menambahkan link stylesheet baru ke `index.html` tanpa konfirmasi arsitektur dan evaluasi First Contentful Paint (FCP).
+4. **Wajib Bump Build pada Perubahan CSS (Zero-Stale-Cache Invariant)**:
+   - Karena Service Worker (`sw.js`) mem-precache seluruh stylesheet aktif dalam `ASSETS`, setiap perubahan kode CSS WAJIB disertai bump build via `node tools/bump-build.mjs`. Tanpa bump build, peramban murid akan terus memuat CSS lama dari cache shell `fiezel-shell-v*` dan menyebabkan konflik visual.
+
 ## Motion & Video Animation Guidelines (Remotion & Three.js 3D Master)
 
 Whenever the user requests animation, motion graphics, commercial 3D film, or video generation:

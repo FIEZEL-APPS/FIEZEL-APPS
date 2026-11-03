@@ -6,7 +6,6 @@
 | --- | --- |
 | `fiezel-mascot.js` | DIPAKAI. Custom element `<fiezel-mascot>`, 14 state, SVG inline (tanpa fetch). Dimuat `defer` di `index.html` SEBELUM `fiezel-coach-bubble.js` dan `app.js`. Ikut di-precache `sw.js`. |
 | `fiezel-motion.css` | DIPAKAI. Token gerak + animasi 14 state + penempatan di aplikasi. Dimuat PALING AKHIR di antara stylesheet. Ikut di-precache. |
-| `micro-ui.css` | REFERENSI, BELUM DIPAKAI. Tidak dimuat `index.html`, tidak di-precache. Berisi toast, ring progres, checkmark, skeleton. Baca sebelum membuat komponen serupa dari nol. |
 
 ## Cara memanggil
 
