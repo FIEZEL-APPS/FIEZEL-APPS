@@ -1,21 +1,21 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-11-03T09:00:34.700Z",
+  "generatedAt": "2026-11-03T09:30:34.746Z",
   "files": {
     "app.js": {
       "leaks": 3,
       "budget": 3,
       "sample": [
         {
-          "line": 12668,
+          "line": 12687,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 13574,
+          "line": 13593,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 14597,
+          "line": 14616,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         }
       ]
@@ -193,6 +193,84 @@
         {
           "line": 153,
           "text": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “will be closed ... will open again”."
+        }
+      ]
+    },
+    "features/mandarin/mandarin-curriculum.js": {
+      "leaks": 142,
+      "budget": 142,
+      "sample": [
+        {
+          "line": 334,
+          "text": "Suara stabil tinggi seperti nada menyanyi"
+        },
+        {
+          "line": 341,
+          "text": "Suara naik seperti intonasi bertanya"
+        },
+        {
+          "line": 348,
+          "text": "Suara turun dalam ke dasar tenggorokan lalu sedikit mengayun naik."
+        },
+        {
+          "line": 355,
+          "text": "Suara jatuh tegas seperti memerintah atau menghentak"
+        },
+        {
+          "line": 392,
+          "text": "Latihan Pasangan Minimal (Minimal Pairs Discrimination)"
+        }
+      ]
+    },
+    "features/mandarin/mandarin-ui.js": {
+      "leaks": 16,
+      "budget": 16,
+      "sample": [
+        {
+          "line": 159,
+          "text": "1. Kosakata"
+        },
+        {
+          "line": 187,
+          "text": "🔊 Suara"
+        },
+        {
+          "line": 192,
+          "text": "Kosakata Inti Pelajaran"
+        },
+        {
+          "line": 249,
+          "text": "Jawaban Tepat!"
+        },
+        {
+          "line": 311,
+          "text": "Misi Percakapan Murid:"
+        }
+      ]
+    },
+    "features/mandarin/mandarin-vocab-bank.js": {
+      "leaks": 147,
+      "budget": 147,
+      "sample": [
+        {
+          "line": 90,
+          "text": "Nama saya Wang Ming."
+        },
+        {
+          "line": 755,
+          "text": "Sudah jam 9, tidurlah."
+        },
+        {
+          "line": 966,
+          "text": "Sekarang jam berapa?"
+        },
+        {
+          "line": 983,
+          "text": "Sekarang jam 3."
+        },
+        {
+          "line": 1086,
+          "text": "Sudah sarapan?"
         }
       ]
     },

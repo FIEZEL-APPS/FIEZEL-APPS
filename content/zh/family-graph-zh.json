@@ -1,0 +1,47 @@
+{
+  "schema": "fiezel-mandarin-family-graph-v1",
+  "target": "zh",
+  "catatan": "Graf prasyarat keluarga tata bahasa Mandarin 8 tingkat (12 keluarga gramatika), disuntikkan ke Core Brain lewat setFamilyGraph saat bahasa target = zh.",
+  "families": {
+    "core_syntax": [],
+    "interrogative_forms": [
+      "core_syntax"
+    ],
+    "pronouns_determiners": [
+      "core_syntax"
+    ],
+    "adjectives_adverbs": [
+      "core_syntax"
+    ],
+    "spatial_temporal": [
+      "core_syntax"
+    ],
+    "measure_classifiers": [
+      "core_syntax",
+      "pronouns_determiners"
+    ],
+    "aspectual_markers": [
+      "core_syntax",
+      "spatial_temporal"
+    ],
+    "special_sentence_patterns": [
+      "core_syntax",
+      "aspectual_markers"
+    ],
+    "verbal_complements": [
+      "core_syntax",
+      "aspectual_markers"
+    ],
+    "compound_conjunctions": [
+      "core_syntax",
+      "special_sentence_patterns"
+    ],
+    "advanced_discourse": [
+      "compound_conjunctions",
+      "verbal_complements"
+    ],
+    "idiomatic_chengyu": [
+      "advanced_discourse"
+    ]
+  }
+}

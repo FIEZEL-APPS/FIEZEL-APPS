@@ -41,20 +41,22 @@
         }
       }
 
-      // Sinkronisasi target course aktif ('ja' atau 'en')
+      // Sinkronisasi target course aktif ('ja', 'en', atau 'zh')
       var lang = 'ja';
       try {
         if (typeof root.activeTargetLang === 'function') {
           var atl = root.activeTargetLang();
-          if (atl === 'ja' || atl === 'en') lang = atl;
+          if (atl === 'ja' || atl === 'en' || atl === 'zh') lang = atl;
+        } else if (typeof root.zhCourseOn === 'function' && root.zhCourseOn()) {
+          lang = 'zh';
         } else if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
           lang = 'ja';
         } else if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
           var c = root.FiezelI18n.getCourse();
-          if (c === 'ja' || c === 'en') lang = c;
+          if (c === 'ja' || c === 'en' || c === 'zh') lang = c;
         } else if (typeof localStorage !== 'undefined') {
           var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel-active-course') || localStorage.getItem('fiezel_target_lang');
-          if (stored === 'ja' || stored === 'en') lang = stored;
+          if (stored === 'ja' || stored === 'en' || stored === 'zh') lang = stored;
         }
       } catch (_) {}
 
@@ -71,7 +73,7 @@
           chatState.course = lang;
           if (typeof api.initScenario === 'function') {
             var scList = typeof api.getScenarios === 'function' ? api.getScenarios(lang) : null;
-            var defaultSid = (scList && scList[0] && scList[0].id) ? scList[0].id : (lang === 'ja' ? 'scen_ja_n5_kissaten' : 'intro');
+            var defaultSid = (scList && scList[0] && scList[0].id) ? scList[0].id : (lang === 'zh' ? 'scen_zh_noodle_shop' : (lang === 'ja' ? 'scen_ja_n5_kissaten' : 'intro'));
             api.initScenario(defaultSid);
           }
         }
@@ -108,7 +110,7 @@
         }
       } catch (_) {}
       var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (autoCall ? '&autoCall=1' : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
-      var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
+      var titleText = lang === 'ja' ? 'Mitra Kaiwa' : (lang === 'zh' ? 'Xiao Mochi (小麻薯)' : 'Kawan Bicara');
       mountPoint.innerHTML =
         '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
         '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone *; autoplay *; camera *" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
@@ -200,6 +202,10 @@
         var atl = root.activeTargetLang();
         if (atl === 'ja') return 'ja';
         if (atl === 'en') return 'en';
+        if (atl === 'zh') return 'zh';
+      }
+      if (typeof root.zhCourseOn === 'function' && root.zhCourseOn()) {
+        return 'zh';
       }
       if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
         return 'ja';
@@ -208,12 +214,14 @@
         var c = root.FiezelI18n.getCourse();
         if (c === 'ja') return 'ja';
         if (c === 'en') return 'en';
+        if (c === 'zh') return 'zh';
       }
       var stored = (typeof localStorage !== 'undefined') && (localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel-active-course') || localStorage.getItem('fiezel_target_lang') || localStorage.getItem('fiezel_course'));
       if (stored === 'ja') return 'ja';
       if (stored === 'en') return 'en';
+      if (stored === 'zh') return 'zh';
     } catch (_) {}
-    return 'ja';
+    return 'zh';
   }
 
   function getLearnerLevel() {
@@ -737,6 +745,53 @@
           grammarNote: t('chat_sc_en_ielts_note', 'Academic speaking: Concessive clauses (Although..., [main clause]). Hindari "Although... but".'),
           suggestions: [
             { text: 'Although working remotely saves commuting time and improves focus, I believe a hybrid schedule is better because face-to-face meetings strengthen team collaboration.', translation: 'Meskipun kerja jarak jauh menghemat waktu perjalanan dan meningkatkan fokus, saya rasa jadwal hybrid lebih baik karena pertemuan langsung memperkuat kolaborasi tim.' }
+          ]
+        }
+      }
+    ],
+    zh: [
+      {
+        id: 'scen_zh_noodle_shop',
+        icon: 'soup',
+        title: '面馆点餐',
+        label: t('chat_sc_zh_noodle_lbl', 'Kedai Mie & Restoran'),
+        desc: t('chat_sc_zh_noodle_desc', 'Latihan memesan mie daging sapi, meminta tidak pedas, dan membayar.'),
+        goals: [
+          { id: 'g1', text: 'Pesan makanan dengan kata satuan (一碗牛肉面)' },
+          { id: 'g2', text: 'Minta preferensi rasa (不要辣)' },
+          { id: 'g3', text: 'Tanyakan harga atau minta bon (多少钱 / 买单)' }
+        ],
+        starter: {
+          text: '欢迎光临！请问几位？你想吃点儿什么？',
+          pinyin: 'Huānyíng guānglín! Qǐngwèn jǐ wèi? Nǐ xiǎng chī diǎnr shénme?',
+          translation: 'Selamat datang! Berapa orang? Mau makan apa?',
+          grammarNote: 'Frasa standar restoran:「欢迎光临」(selamat datang) dan kata tanya「几位」(berapa orang).',
+          suggestions: [
+            { text: '一位。我想来一碗牛肉面，不要辣。', pinyin: 'Yí wèi. Wǒ xiǎng lái yì wǎn niúròumiàn, bú yào là.', translation: 'Satu orang. Saya pesan semangkok mie daging sapi, tolong jangan pedas.' },
+            { text: '请问有什么推荐的菜吗？', pinyin: 'Qǐngwèn yǒu shénme tuījiàn de cài ma?', translation: 'Permisi, ada rekomendasi masakan enak di sini?' },
+            { text: '服务员，请给我一杯热水。', pinyin: 'Fúwùyuán, qǐng gěi wǒ yì bēi rè shuǐ.', translation: 'Pelayan, tolong beri saya segelas air hangat.' }
+          ]
+        }
+      },
+      {
+        id: 'scen_zh_free_talk',
+        icon: 'speaking',
+        title: '自由聊天',
+        label: t('chat_sc_zh_free_lbl', 'Obrolan Bebas'),
+        desc: t('chat_sc_zh_free_desc', 'Ngobrol santai seputar kegiatan sehari-hari, hobi, dan belajar Mandarin.'),
+        goals: [
+          { id: 'g1', text: 'Sapa Xiao Mochi (你好！很高兴认识你)' },
+          { id: 'g2', text: 'Ceritakan hobi atau kegiatanmu' },
+          { id: 'g3', text: 'Tanyakan kabar atau tanggapan balik' }
+        ],
+        starter: {
+          text: '你好！我是小麻薯。今天你想聊点儿什么呢？',
+          pinyin: 'Nǐ hǎo! Wǒ shì Xiǎo Máshǔ. Jīntiān nǐ xiǎng liáo diǎnr shénme ne?',
+          translation: 'Halo! Aku Xiao Mochi. Hari ini kamu mau ngobrol tentang apa?',
+          grammarNote: 'Partikel tanya santai「呢」(ne) di akhir kalimat untuk melembutkan intonasi.',
+          suggestions: [
+            { text: '你好！我想练习汉语口语，你能帮我纠正声调吗？', pinyin: 'Nǐ hǎo! Wǒ xiǎng liànxí Hànyǔ kǒuyǔ, nǐ néng bāng wǒ jiūzhèng shēngdiào ma?', translation: 'Halo! Aku ingin melatih percakapan Mandarin, bisakah kamu membantuku mengoreksi nada?' },
+            { text: '我今天学了几个新单词，感觉很有意思！', pinyin: 'Wǒ jīntiān xué le jǐ gè xīn dāncí, gǎnjué hěn yǒu yìsi!', translation: 'Hari ini aku belajar beberapa kata baru, rasanya sangat menarik!' }
           ]
         }
       }
@@ -2016,6 +2071,18 @@
         avatarIcon: 'sensei',
         label: 'Sensei Nanami'
       }
+    },
+    zh: {
+      xiao_mochi: {
+        id: 'xiao_mochi',
+        name: 'Xiao Mochi (小麻薯)',
+        shortName: 'Xiao Mochi',
+        voice: 'zh-CN-XiaoxiaoNeural',
+        gender: 'female',
+        role: 'Xiao Mochi AI Beijing & Putonghua Tutor',
+        avatarIcon: 'mochi',
+        label: 'Xiao Mochi'
+      }
     }
   };
 
@@ -2067,6 +2134,18 @@
             avatarIcon: 'sensei',
             label: 'Sensei Nanami'
           }
+        },
+        zh: {
+          xiao_mochi: {
+            id: 'xiao_mochi',
+            name: vp.xiao_mochi ? vp.xiao_mochi.name : PERSONAS.zh.xiao_mochi.name,
+            shortName: vp.xiao_mochi ? vp.xiao_mochi.shortName : PERSONAS.zh.xiao_mochi.shortName,
+            voice: vp.xiao_mochi ? vp.xiao_mochi.edgeVoice : PERSONAS.zh.xiao_mochi.voice,
+            gender: 'female',
+            role: 'Xiao Mochi AI Beijing & Putonghua Tutor',
+            avatarIcon: 'mochi',
+            label: 'Xiao Mochi'
+          }
         }
       };
     }
@@ -2082,20 +2161,24 @@
       c = 'en';
     } else if (s === 'keita' || s === 'nanami' || /keita|nanami|sensei/i.test(s)) {
       c = 'ja';
+    } else if (s === 'xiao_mochi' || /mochi|xiao/i.test(s) || course === 'zh') {
+      c = 'zh';
     } else {
-      c = (course === 'en') ? 'en' : 'ja';
+      c = (course === 'en') ? 'en' : ((course === 'zh') ? 'zh' : 'ja');
     }
 
-    var bank = getCanonicalPersonas()[c];
+    var bank = getCanonicalPersonas()[c] || getCanonicalPersonas().ja;
     if (!s) {
       try {
         var stored = localStorage.getItem('fz_persona_' + c);
         if (stored && bank[stored]) return bank[stored];
       } catch (_) {}
-      return bank[c === 'ja' ? 'keita' : 'alex'];
+      return bank[c === 'zh' ? 'xiao_mochi' : (c === 'ja' ? 'keita' : 'alex')] || bank.xiao_mochi || bank.keita || bank.alex;
     }
     if (bank[s]) return bank[s];
-    if (c === 'en') {
+    if (c === 'zh') {
+      return bank.xiao_mochi || Object.values(bank)[0];
+    } else if (c === 'en') {
       if (/sarah|aria/i.test(s)) return bank.sarah;
       if (/alex|guy/i.test(s)) return bank.alex;
       return bank.alex;
@@ -2195,6 +2278,8 @@
       if (pEn && PERSONAS.en[pEn]) state.selectedPersonas.en = pEn;
       var pJa = localStorage.getItem('fz_persona_ja');
       if (pJa && PERSONAS.ja[pJa]) state.selectedPersonas.ja = pJa;
+      var pZh = localStorage.getItem('fz_persona_zh');
+      if (pZh && PERSONAS.zh[pZh]) state.selectedPersonas.zh = pZh;
     } catch (_) {}
     state.course = getActiveCourse();
     // Kunci lama tanpa awalan kursus ('free') dulu disimpan BERDAMPINGAN dengan kunci
@@ -2259,7 +2344,7 @@
   }
 
   function getScenario(id) {
-    var list = SCENARIOS[state.course] || SCENARIOS.ja;
+    var list = SCENARIOS[state.course] || (state.course === 'zh' ? SCENARIOS.zh : (state.course === 'en' ? SCENARIOS.en : SCENARIOS.ja));
     for (var i = 0; i < list.length; i++) {
       if (list[i].id === id) return list[i];
     }
@@ -4257,7 +4342,7 @@
 
   function renderMarkup() {
     var course = state.course;
-    var scList = SCENARIOS[course] || SCENARIOS.ja;
+    var scList = SCENARIOS[course] || (course === 'zh' ? SCENARIOS.zh : (course === 'en' ? SCENARIOS.en : SCENARIOS.ja));
     var currentSc = getScenario(state.scenarioId);
     var level = getLearnerLevel();
     var currentPersona = getActivePersona(course);
@@ -5153,10 +5238,10 @@
     generateOfflineReply: generateOfflineReply,
     generateOfflineFallback: generateOfflineReply,
     getScenarios: function (course) {
-      return SCENARIOS[course] || SCENARIOS.ja;
+      return SCENARIOS[course] || (course === 'zh' ? SCENARIOS.zh : (course === 'en' ? SCENARIOS.en : SCENARIOS.ja));
     },
     createInitialState: function (course, scenarioId) {
-      var scList = SCENARIOS[course] || SCENARIOS.ja;
+      var scList = SCENARIOS[course] || (course === 'zh' ? SCENARIOS.zh : (course === 'en' ? SCENARIOS.en : SCENARIOS.ja));
       var sc = scList.find(function (s) { return s.id === scenarioId; }) || scList[0];
       return {
         course: course,
@@ -5223,7 +5308,7 @@
     getPersona: function (c) { return getActivePersona(c); },
     getPersonas: function (c) {
       var course = c || state.course || 'ja';
-      return PERSONAS[course === 'ja' ? 'ja' : 'en'] || PERSONAS.ja;
+      return PERSONAS[course === 'ja' ? 'ja' : (course === 'zh' ? 'zh' : 'en')] || PERSONAS.zh || PERSONAS.ja;
     },
     isMounted: function () { return isChatMounted; },
     isChatMounted: function () { return isChatMounted; }

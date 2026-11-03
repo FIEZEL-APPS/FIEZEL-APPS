@@ -3380,10 +3380,10 @@
                 return;
               }
             } else {
-              var minRms = _modelTurnInProgress ? 0.020 : 0.010;
+              var minRms = _modelTurnInProgress ? 0.012 : 0.003;
               if (v.isHumanSpeech && v.rms >= minRms) {
                 _consecutiveSpeechFrames++;
-                if (_consecutiveSpeechFrames >= 4) {
+                if (_consecutiveSpeechFrames >= 2) {
                   _userAskedConceptOnCurrent = true;
                   self._setVoiceVisualizerUserSpeaking(true);
                   _lastUserSpeechAt = Date.now();
@@ -4097,42 +4097,91 @@
         }).then(function (buf) {
           if (!buf || buf.byteLength < 64 || !self.isCallActive()) return;
           if ((_ws && _ws.readyState <= 1) || _activeAudioSources.length > 0) return;
+          var playViaAudioTag = function () {
+            try {
+              var blob = new Blob([buf], { type: 'audio/mp3' });
+              var blobUrl = URL.createObjectURL(blob);
+              var audioEl = new Audio(blobUrl);
+              audioEl.onended = function () {
+                URL.revokeObjectURL(blobUrl);
+                self._setVoiceVisualizerSpeaking(false);
+                self._updateMochiMascotPose('idle');
+                try {
+                  var ce = root && root.FiezelMochiCompanion;
+                  var me = ce && typeof ce.getInstance === 'function' ? ce.getInstance() : null;
+                  if (me && typeof me.setTalking === 'function') me.setTalking(false);
+                } catch (_) {}
+              };
+              audioEl.onerror = function () {
+                URL.revokeObjectURL(blobUrl);
+                self._setVoiceVisualizerSpeaking(false);
+                self._updateMochiMascotPose('idle');
+              };
+              audioEl.play().then(function () {
+                setConnectionStatusInternal('connected', '');
+                self._setVoiceVisualizerSpeaking(true);
+                self._updateMochiMascotPose('greet');
+                try {
+                  var c = root && root.FiezelMochiCompanion;
+                  var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
+                  if (m && typeof m.setTalking === 'function') m.setTalking(true);
+                } catch (_) {}
+                self.meterDeliveredAiTurn(activeQ, 'opening');
+              }).catch(function (e) {
+                console.warn('[Mochi Voice SOS] HTMLAudio play error:', e);
+              });
+            } catch (err) {
+              console.warn('[Mochi Voice SOS] playViaAudioTag failed:', err);
+            }
+          };
+
           var ctx = getAudioContext();
           if (ctx) {
-            return ctx.decodeAudioData(buf.slice(0)).then(function (decoded) {
-              if (!self.isCallActive()) return;
-              if ((_ws && _ws.readyState <= 1) || _activeAudioSources.length > 0) return;
-              stopAllActiveAudioSources();
-              var source = ctx.createBufferSource();
-              source.buffer = decoded;
-              _fallbackTtsSource = source;
-              var targetNode = attachAnalyserToMochi(ctx) || ctx.destination;
-              source.connect(targetNode);
-              source.start(0);
-              _activeAudioSources.push(source);
-              setConnectionStatusInternal('connected', '');
-              self._setVoiceVisualizerSpeaking(true);
-              self._updateMochiMascotPose('greet');
-              try {
-                var c = root && root.FiezelMochiCompanion;
-                var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
-                if (m && typeof m.setTalking === 'function') m.setTalking(true);
-              } catch (_) {}
-              self.meterDeliveredAiTurn(activeQ, 'opening');
-              source.onended = function () {
-                if (_fallbackTtsSource === source) _fallbackTtsSource = null;
-                _activeAudioSources = _activeAudioSources.filter(function (s) { return s !== source; });
-                if (_activeAudioSources.length === 0) {
-                  self._setVoiceVisualizerSpeaking(false);
-                  self._updateMochiMascotPose('idle');
-                  try {
-                    var ce = root && root.FiezelMochiCompanion;
-                    var me = ce && typeof ce.getInstance === 'function' ? ce.getInstance() : null;
-                    if (me && typeof me.setTalking === 'function') me.setTalking(false);
-                  } catch (_) {}
-                }
-              };
+            var resumePromise = (ctx.state === 'suspended' && typeof ctx.resume === 'function')
+              ? ctx.resume().catch(function () {})
+              : Promise.resolve();
+
+            return resumePromise.then(function () {
+              return ctx.decodeAudioData(buf.slice(0)).then(function (decoded) {
+                if (!self.isCallActive()) return;
+                if ((_ws && _ws.readyState <= 1) || _activeAudioSources.length > 0) return;
+                stopAllActiveAudioSources();
+                var source = ctx.createBufferSource();
+                source.buffer = decoded;
+                _fallbackTtsSource = source;
+                var targetNode = attachAnalyserToMochi(ctx) || ctx.destination;
+                source.connect(targetNode);
+                source.start(0);
+                _activeAudioSources.push(source);
+                setConnectionStatusInternal('connected', '');
+                self._setVoiceVisualizerSpeaking(true);
+                self._updateMochiMascotPose('greet');
+                try {
+                  var c = root && root.FiezelMochiCompanion;
+                  var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
+                  if (m && typeof m.setTalking === 'function') m.setTalking(true);
+                } catch (_) {}
+                self.meterDeliveredAiTurn(activeQ, 'opening');
+                source.onended = function () {
+                  if (_fallbackTtsSource === source) _fallbackTtsSource = null;
+                  _activeAudioSources = _activeAudioSources.filter(function (s) { return s !== source; });
+                  if (_activeAudioSources.length === 0) {
+                    self._setVoiceVisualizerSpeaking(false);
+                    self._updateMochiMascotPose('idle');
+                    try {
+                      var ce = root && root.FiezelMochiCompanion;
+                      var me = ce && typeof ce.getInstance === 'function' ? ce.getInstance() : null;
+                      if (me && typeof me.setTalking === 'function') me.setTalking(false);
+                    } catch (_) {}
+                  }
+                };
+              }).catch(function (decodeErr) {
+                console.warn('[Mochi Voice SOS] decodeAudioData failed, falling back to HTMLAudio:', decodeErr);
+                playViaAudioTag();
+              });
             });
+          } else {
+            playViaAudioTag();
           }
         }).catch(function () {
           if (timer) clearTimeout(timer);

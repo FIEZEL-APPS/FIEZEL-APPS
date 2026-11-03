@@ -129,6 +129,10 @@ export class SileroNeuralVadGate {
     return this.lastHumanSpeechAt;
   }
 
+  public markHumanSpeechAt(t: number = Date.now()): void {
+    this.lastHumanSpeechAt = t;
+  }
+
   public getLastSpeechProbability(): number {
     return this.lastProb;
   }

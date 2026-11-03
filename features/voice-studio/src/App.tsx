@@ -293,12 +293,12 @@ export default function App() {
     return 'call'; // Single unified Mitra Kaiwa / Kawan Bicara Call Room
   });
   const [selectedPersonaId, setSelectedPersonaId] = useState<string>(() => {
+    const initialLang = loadBraincoreState().targetLang || 'en';
     try {
       const saved = localStorage.getItem('fiezel_voice_persona_pref');
-      if (saved && VOICE_PERSONAS[saved]) return saved;
+      if (saved && VOICE_PERSONAS[saved] && VOICE_PERSONAS[saved].targetLang === initialLang) return saved;
     } catch {}
-    const initialLang = loadBraincoreState().targetLang || 'en';
-    return initialLang === 'ja' ? 'nanami' : 'coach_alex';
+    return initialLang === 'ja' ? 'nanami' : (initialLang === 'zh' ? 'xiao_mochi' : 'coach_alex');
   });
   const [showPersonaModal, setShowPersonaModal] = useState<boolean>(false);
   const [activeScenarioId, setActiveScenarioId] = useState<string>(() => {
@@ -1051,7 +1051,7 @@ export default function App() {
   const handleSelectTargetLang = (lang: TargetLang) => {
     playFiezelSfx('button_tap');
     stopLiveCall();
-    const defaultPersona = lang === 'ja' ? 'nanami' : 'coach_alex';
+    const defaultPersona = lang === 'ja' ? 'nanami' : (lang === 'zh' ? 'xiao_mochi' : 'coach_alex');
     setSelectedPersonaId(defaultPersona);
     try {
       localStorage.setItem('fiezel_voice_persona_pref', defaultPersona);
@@ -1939,22 +1939,6 @@ export default function App() {
 
         rec.onresult = (event: any) => {
           if (isDisposed) return;
-          // Neural Human-Voice VAD Cross-Check:
-          // Reject street traffic, passing motorcycles, horns, fans, wind, or ambient noise
-          // that causes browser SpeechRecognition to hallucinate phantom syllables and freeze Fiezel.
-          const hasLiveMicTrack = Boolean(
-            micStreamRef.current &&
-              micStreamRef.current.getAudioTracks().some((tr) => tr.readyState === 'live' && tr.enabled)
-          );
-          if (sileroVadGateRef.current?.isActive()) {
-            if (Date.now() - sileroVadGateRef.current.getLastHumanSpeechAt() > 2800) {
-              return;
-            }
-          } else if (hasLiveMicTrack) {
-            if (Date.now() - lastHandySpeechAtRef.current > 2800) {
-              return;
-            }
-          }
           let transcript = '';
           let lastIsFinal = false;
           for (let i = 0; i < event.results.length; i++) {
@@ -1966,50 +1950,56 @@ export default function App() {
           const clean = (speechPrefix ? speechPrefix + ' ' + transcript : transcript)
             .replace(/\s+/g, ' ')
             .trim();
-          if (clean) {
-            accumulatedSpeech = clean;
-            liveDictatedTextRef.current = clean;
-            setLiveUserDraft(clean);
-            setInputText(clean);
-            setIsUserSpeakingLive(true);
+          if (!clean) return;
 
-            if (liveSilenceTimerRef.current) {
-              window.clearTimeout(liveSilenceTimerRef.current);
-            }
-            const silenceWaitMs = computeSpeechSilenceWaitMs(clean, lastIsFinal);
-            setIsWaitingAfterSpeech(true);
-            liveSilenceTimerRef.current = window.setTimeout(() => {
-              if (isDisposed) return;
-              liveSilenceTimerRef.current = null;
-              setIsWaitingAfterSpeech(false);
-              setIsUserSpeakingLive(false);
-              const toSend = accumulatedSpeech.trim();
-              if (toSend) {
-                accumulatedSpeech = '';
-                speechPrefix = '';
-                liveDictatedTextRef.current = '';
-                try {
-                  rec.onend = null;
-                  rec.stop();
-                } catch {
-                  // Ignore
-                }
-                setIsListeningLiveSpeech(false);
-                if (
-                  wsRef.current &&
-                  wsRef.current.readyState === WebSocket.OPEN &&
-                  liveTransportMode === 'ws-duplex'
-                ) {
-                  submitLiveUserUtterance(toSend);
-                } else {
-                  void submitStudentTurnRef.current({
-                    text: toSend,
-                    speakingDurationSec: 3,
-                  });
-                }
-              }
-            }, silenceWaitMs);
+          // User spoke into microphone: update speech timestamps across all VAD monitors
+          lastHandySpeechAtRef.current = Date.now();
+          if (sileroVadGateRef.current?.isActive()) {
+            sileroVadGateRef.current.markHumanSpeechAt(Date.now());
           }
+
+          accumulatedSpeech = clean;
+          liveDictatedTextRef.current = clean;
+          setLiveUserDraft(clean);
+          setInputText(clean);
+          setIsUserSpeakingLive(true);
+
+          if (liveSilenceTimerRef.current) {
+            window.clearTimeout(liveSilenceTimerRef.current);
+          }
+          const silenceWaitMs = computeSpeechSilenceWaitMs(clean, lastIsFinal);
+          setIsWaitingAfterSpeech(true);
+          liveSilenceTimerRef.current = window.setTimeout(() => {
+            if (isDisposed) return;
+            liveSilenceTimerRef.current = null;
+            setIsWaitingAfterSpeech(false);
+            setIsUserSpeakingLive(false);
+            const toSend = accumulatedSpeech.trim();
+            if (toSend) {
+              accumulatedSpeech = '';
+              speechPrefix = '';
+              liveDictatedTextRef.current = '';
+              try {
+                rec.onend = null;
+                rec.stop();
+              } catch {
+                // Ignore
+              }
+              setIsListeningLiveSpeech(false);
+              if (
+                wsRef.current &&
+                wsRef.current.readyState === WebSocket.OPEN &&
+                liveTransportMode === 'ws-duplex'
+              ) {
+                submitLiveUserUtterance(toSend);
+              } else {
+                void submitStudentTurnRef.current({
+                  text: toSend,
+                  speakingDurationSec: 3,
+                });
+              }
+            }
+          }, silenceWaitMs);
         };
 
         rec.onerror = (evErr: any) => {
@@ -2017,9 +2007,12 @@ export default function App() {
           if (code === 'no-speech' || code === 'aborted') {
             return;
           }
-          // Transient 'no-speech' / 'aborted' are normal in a continuous call. Fatal codes used
-          // to be swallowed, so the loop restarted forever and the AI never heard anything.
-          if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
+          if (code === 'audio-capture') {
+            // Audio device momentarily busy or switching - do NOT mute the user
+            console.warn('[VoiceStudio] Transient audio-capture on mic stream, retaining active state');
+            return;
+          }
+          if (code === 'not-allowed' || code === 'service-not-allowed') {
             isDisposed = true;
             isMicMutedRef.current = true;
             setIsMicMuted(true);
@@ -2341,6 +2334,8 @@ export default function App() {
       // Ignore
     }
     primeAudioPlayback();
+    setIsMicMuted(false);
+    isMicMutedRef.current = false;
 
     // 1. Dapatkan mikrofon secara non-blocking jika peramban mengizinkan langsung
     let stream: MediaStream | null = preAcquiredStream || micStreamRef.current;
@@ -3896,6 +3891,18 @@ export default function App() {
                 }`}
               >
                 JA
+              </button>
+              <button
+                type="button"
+                data-testid="target-lang-zh"
+                onClick={() => handleSelectTargetLang('zh')}
+                className={`px-2.5 py-1 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
+                  targetLang === 'zh'
+                    ? 'bg-[#BE123C] text-white'
+                    : 'text-[#6E5E47] hover:text-[#1C1611]'
+                }`}
+              >
+                ZH
               </button>
             </div>
 

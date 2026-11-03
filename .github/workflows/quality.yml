@@ -1502,6 +1502,11 @@ jobs:
         # progres berdiri sendiri, kembali tidak menghapus apa pun, dan kunci Inggris
         # tidak bergeser sebita pun.
         run: node tests/target-lang-progress-isolation-test.js
+      - name: 'Mandarin: integritas cetak biru, pinyin ruby, dan feedback braincore'
+        run: |
+          node tests/mandarin-blueprint-integrity-test.js
+          node tests/mandarin-pinyin-ruby-test.js
+          node tests/mandarin-tutor-braincore-feedback-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +
