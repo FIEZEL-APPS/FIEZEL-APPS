@@ -117,55 +117,95 @@
 }
 </script>
 
+
+
+<link rel="preload" href="../../assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../tokens.css?v=20260903-hula02">
+<link rel="stylesheet" href="../../style.css?v=20260906-fzflow02">
 <style>
-  :root {
-    --bg: #FDFAF3; --bg-card: #F5EFE2; --ink: #1F1815; --ink-2: #594A44;
-    --ink-3: #8A7970; --maroon: #8C2233; --maroon-dark: #6D1926; --gold: #FFD94F;
-    --line: rgba(31, 24, 21, 0.12);
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.65; font-size: 16px; }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 36px 24px 80px; }
-  header.top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
-  .brand { font-weight: 800; font-size: 20px; letter-spacing: 0.04em; color: var(--maroon); text-decoration: none; }
-  .nav-links { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-size: 14px; font-weight: 600; }
-  .nav-links a { color: var(--ink-2); text-decoration: none; }
-  .nav-links a:hover { color: var(--maroon); text-decoration: underline; }
-  .cta { display: inline-block; background: var(--maroon); color: #fff !important; font-weight: 700; padding: 10px 18px; border-radius: 999px; text-decoration: none !important; font-size: 14px; }
-  .cta:hover { background: var(--maroon-dark); }
-  .kicker { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--maroon); margin: 0 0 8px; }
-  h1 { font-size: clamp(26px, 4.2vw, 40px); line-height: 1.18; letter-spacing: -0.02em; margin: 0 0 16px; }
-  h2 { font-size: clamp(20px, 2.8vw, 26px); margin: 40px 0 12px; padding-top: 12px; border-top: 1px solid var(--line); }
-  h3 { font-size: 18px; margin: 20px 0 8px; color: var(--maroon); }
-  p { margin: 0 0 14px; color: var(--ink); }
-  .tldr-box { background: var(--bg-card); border-left: 4px solid var(--maroon); border-radius: 12px; padding: 18px 22px; margin: 18px 0 28px; }
-  .tldr-box strong { color: var(--maroon); }
-  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; background: var(--bg-card); border-radius: 12px; overflow: hidden; font-size: 14.5px; }
-  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { background: rgba(140, 34, 51, 0.09); color: var(--maroon); font-weight: 800; }
-  .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin: 14px 0; }
-  .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 16px 0; }
-  .hub-link { display: block; background: var(--bg-card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; color: var(--ink); text-decoration: none; font-weight: 700; font-size: 14.5px; }
-  .hub-link:hover { border-color: var(--maroon); color: var(--maroon); }
-  .hub-link span { display: block; font-size: 13px; font-weight: 400; color: var(--ink-2); margin-top: 4px; }
-  footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-3); }
-  a { color: var(--maroon); }
+  /* Boutique CREAM · SOLAR · MAROON Extensions for Interactive Tools & Authority Hubs */
+  .brand-text{font-weight:800;letter-spacing:.02em;font-size:1.15rem;color:var(--maroon-mid,#8C2233)}
+  .crumbs{font-size:.86rem;color:var(--muted-soft,#8A4550);margin:0 0 18px;font-weight:600}
+  .crumbs a{color:var(--maroon-deep,#6D1926);text-decoration:underline}
+  .kicker{display:inline-block;font-size:var(--fs-micro,.75rem);font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--maroon-deep,#6D1926);background:var(--sun-soft,#FFF3C4);border:1px solid var(--gold-line,rgba(198,150,20,.38));border-radius:999px;padding:6px 15px;margin:0 0 16px}
+  main h1{font-size:clamp(1.85rem,4.5vw,2.75rem);line-height:1.12;letter-spacing:-.03em;color:var(--maroon-deep,#6D1926);margin:0 0 20px;text-wrap:balance}
+  main h2{font-size:clamp(1.38rem,3.2vw,1.95rem);line-height:1.2;letter-spacing:-.02em;color:var(--maroon-deep,#6D1926);margin:48px 0 14px;padding-top:20px;border-top:1px solid var(--line,#EFE0C6)}
+  main h3{font-size:1.14rem;line-height:1.3;color:var(--maroon-deep,#6D1926);margin:0 0 8px}
+  main p{margin:0 0 16px;color:var(--body,#7E3742);font-size:1.01rem;line-height:1.7}
+  main ul, main ol{margin:0 0 20px;padding-left:1.35rem;color:var(--body,#7E3742);line-height:1.75;list-style:disc}
+  main ol{list-style:decimal}
+  main li{margin-bottom:8px}
+  .tldr-box{position:relative;background:linear-gradient(168deg,#FFFDF8 0%,#FFF6E4 62%,#FFF1D2 100%);border:1px solid var(--maroon-line,rgba(140,34,51,.20));border-left:5px solid var(--maroon,#8C2233);border-radius:0 18px 18px 0;padding:22px 26px;margin:22px 0 32px;box-shadow:var(--shadow-sm)}
+  .tldr-box strong{color:var(--maroon-deep,#6D1926)}
+  .tool-card, .sim-card, .calc-box{position:relative;background:linear-gradient(168deg,#FFFDF8 0%,#FFF8EB 65%,#FFF2D6 100%);border:1.5px solid var(--maroon-line-strong,rgba(140,34,51,.42));border-radius:var(--radius-lg,22px);padding:28px;box-shadow:var(--shadow-lg);margin:24px 0 32px}
+  .calc-shell{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:22px;margin:24px 0 32px}
+  .calc-shell .calc-box{margin:0}
+  .progress-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:.84rem;font-weight:800;color:var(--maroon-mid,#7E3742);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line,#EFE0C6)}
+  .badge, .pill{display:inline-flex;align-items:center;background:var(--sun-grad,linear-gradient(180deg,#FFDE59,#FFA500));color:var(--maroon-deep,#6D1926);font-weight:800;font-size:.78rem;padding:4px 12px;border-radius:999px;border:1px solid var(--maroon,#8C2233);box-shadow:0 2px 0 var(--maroon,#8C2233)}
+  .q-prompt{font-size:1.18rem;font-weight:800;line-height:1.45;color:var(--maroon-deep,#6D1926);margin:14px 0 18px;padding:16px 20px;background:var(--cream-warm,#FFFDF8);border:1px solid var(--line,#EFE0C6);border-radius:14px}
+  .opt-grid{display:grid;gap:12px;margin:16px 0}
+  .opt-btn{text-align:left;background:var(--cream-warm,#FFFDF8);border:1.5px solid var(--maroon-line,rgba(140,34,51,.22));border-radius:14px;padding:14px 18px;font-size:.98rem;font-weight:700;color:var(--maroon-deep,#6D1926);cursor:pointer;font-family:var(--font);box-shadow:0 2px 0 rgba(140,34,51,.12);transition:transform .16s cubic-bezier(.34,1.4,.4,1),border-color .18s ease,background .18s ease,box-shadow .18s ease}
+  .opt-btn:hover{transform:translateY(-2px);border-color:var(--maroon,#8C2233);background:var(--sun-soft,#FFF3C4);box-shadow:0 4px 0 var(--maroon,#8C2233)}
+  .opt-btn.selected-ok{background:#E9F7F0;border-color:#1F6B4E;color:#1F6B4E;box-shadow:0 3px 0 #1F6B4E}
+  .opt-btn.selected-err{background:#FBEDEF;border-color:#8C2233;color:#8C2233;box-shadow:0 3px 0 #8C2233}
+  .feedback-box, .hint-box{background:var(--cream-warm,#FFFDF8);border:1.5px solid var(--maroon,#8C2233);border-radius:14px;padding:16px 20px;margin-top:14px;font-size:.95rem;color:var(--maroon-deep,#6D1926);display:none;box-shadow:var(--shadow-sm)}
+  .result-panel{display:none;background:var(--cream-warm,#FFFDF8);border:2px solid var(--maroon,#8C2233);border-radius:18px;padding:24px;margin-top:18px;box-shadow:var(--shadow-md)}
+  .result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:16px 0}
+  .stat-card{background:linear-gradient(180deg,#FFFDF8,#FFF3DC);border:1px solid var(--gold-line,rgba(198,150,20,.38));border-radius:14px;padding:16px;text-align:center}
+  .stat-card .lbl{font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--maroon-soft,#8A4550)}
+  .stat-card .val{font-size:1.75rem;font-weight:800;color:var(--maroon-deep,#6D1926);margin-top:4px}
+  .cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;border-radius:999px;font-weight:800;font-size:.96rem;color:var(--maroon-deep,#6D1926)!important;background:var(--sun-grad,linear-gradient(180deg,#FFDE59,#FFA500));border:2px solid var(--maroon,#8C2233);box-shadow:0 3px 0 var(--maroon,#8C2233),var(--shadow-sm);text-decoration:none!important;cursor:pointer;font-family:var(--font);transition:transform .16s cubic-bezier(.34,1.4,.4,1),box-shadow .18s ease}
+  .cta:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--maroon,#8C2233),var(--shadow-md)}
+  .cta-outline{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 20px;border-radius:999px;font-weight:700;font-size:.92rem;color:var(--maroon-deep,#6D1926)!important;background:var(--cream-warm,#FFFDF8);border:1.5px solid var(--maroon-line-strong,rgba(140,34,51,.42));box-shadow:0 3px 0 var(--maroon-line-strong,rgba(140,34,51,.42));text-decoration:none!important;cursor:pointer;font-family:var(--font)}
+  .input-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;padding:8px 12px;background:var(--cream-warm,#FFFDF8);border:1px solid var(--line,#EFE0C6);border-radius:12px}
+  .input-row label{font-weight:700;font-size:.94rem;color:var(--maroon-deep,#6D1926)}
+  .input-row input, .input-row select{padding:8px 12px;border:1.5px solid var(--maroon-line-strong,rgba(140,34,51,.42));border-radius:10px;font-size:1rem;font-weight:800;color:var(--maroon-deep,#6D1926);background:var(--sun-soft,#FFF3C4);width:116px;text-align:center;font-family:var(--font)}
+  .res-banner{background:var(--cream-warm,#FFFDF8);border:1.5px solid var(--maroon-line,rgba(140,34,51,.22));border-radius:16px;padding:18px;margin-top:16px;box-shadow:var(--shadow-sm)}
+  .res-big{font-size:2.1rem;font-weight:800;color:var(--maroon-deep,#6D1926);line-height:1.1;margin:6px 0 8px}
+  .filter-bar{background:linear-gradient(168deg,#FFFDF8 0%,#FFF8EB 65%,#FFF2D6 100%);border:1.5px solid var(--maroon-line-strong,rgba(140,34,51,.42));border-radius:var(--radius-lg,22px);padding:22px;margin:22px 0 26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;align-items:end;box-shadow:var(--shadow-md)}
+  .filter-group label{display:block;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--maroon-deep,#6D1926);margin-bottom:6px}
+  .filter-group input, .filter-group select{width:100%;padding:11px 14px;border:1.5px solid var(--maroon-line,rgba(140,34,51,.25));border-radius:12px;font-size:.95rem;font-family:var(--font);background:var(--cream-warm,#FFFDF8);color:var(--maroon-deep,#6D1926);font-weight:700}
+  .tab-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  .tab-btn{background:var(--cream-warm,#FFFDF8);border:1.5px solid var(--maroon-line,rgba(140,34,51,.25));border-radius:999px;padding:9px 16px;font-size:.88rem;font-weight:800;cursor:pointer;color:var(--maroon-deep,#6D1926);font-family:var(--font);transition:all .15s ease}
+  .tab-btn.active{background:var(--maroon,#8C2233);color:#FFF9EE;border-color:var(--maroon,#8C2233);box-shadow:0 2px 0 var(--maroon-deep,#6D1926)}
+  table{width:100%;border-collapse:collapse;margin:18px 0 28px;background:var(--cream-warm,#FFFDF8);border-radius:16px;overflow:hidden;border:1px solid var(--line,#EFE0C6);box-shadow:var(--shadow-sm);font-size:.93rem}
+  th, td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line,#EFE0C6);vertical-align:top;color:var(--body,#7E3742)}
+  th{background:var(--cream-deep,#FFF3DC);color:var(--maroon-deep,#6D1926);font-weight:800;font-size:.88rem;letter-spacing:.02em}
+  tr:last-child td{border-bottom:none}
+  .card{background:var(--cream-warm,#FFFDF8);border:1px solid var(--line,#EFE0C6);border-radius:16px;padding:20px 24px;margin:16px 0;box-shadow:var(--shadow-sm)}
+  .hub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:18px 0 32px}
+  .hub-link{display:block;background:linear-gradient(168deg,#FFFDF8 0%,#FFF6E4 100%);border:1px solid var(--maroon-line,rgba(140,34,51,.20));border-radius:16px;padding:18px 20px;color:var(--maroon-deep,#6D1926);text-decoration:none!important;font-weight:800;font-size:.98rem;box-shadow:var(--shadow-sm);transition:transform .16s cubic-bezier(.34,1.4,.4,1),border-color .18s ease,box-shadow .18s ease}
+  .hub-link:hover{transform:translateY(-3px);border-color:var(--maroon,#8C2233);box-shadow:var(--shadow-md)}
+  .hub-link span{display:block;font-size:.86rem;font-weight:500;color:var(--body,#7E3742);margin-top:6px;line-height:1.5}
+  @media (max-width:760px){.topnav>a:not(.btn):not(:first-child){display:none}.topbar-in{min-height:58px}.tool-card,.calc-box{padding:20px 16px;border-radius:18px}table{display:block;overflow-x:auto}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <a class="brand" href="/">FIEZEL</a>
-    <nav class="nav-links" aria-label="Navigasi Panduan Grammar">
-      <a href="/alat/cek-level-bahasa-inggris/">Cek Level CEFR</a>
-      <a href="/alat/cek-grammar-12-tenses/">Diagnostik 12 Tenses</a>
-      <a href="/panduan/persiapan-ielts-otodidak/">Panduan IELTS</a>
-      <a href="/grammar/">English Version</a>
-      <a class="cta" href="/app/">Mulai Belajar Gratis &rarr;</a>
-    </nav>
-  </header>
+<a class="skip" href="#main">Lewati ke konten utama</a>
 
-  <main>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="../../" aria-label="FIEZEL — Beranda">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/><rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/><rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/><rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/><path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/></g></svg>
+      <strong class="brand-text">FIEZEL</strong>
+    </a>
+    <nav class="topnav" aria-label="Navigasi utama">
+      <a href="../../">Beranda</a>
+      <a href="/alat/cek-level-bahasa-inggris/">Cek Level CEFR</a>
+      <a href="/alat/kalkulator-skor-ielts/">Kalkulator IELTS</a>
+      <a href="/panduan/aplikasi-belajar-grammar-terbaik/">Panduan Grammar</a>
+      <a class="btn btn-sm btn-primary" href="../../app/">Buka Aplikasi</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="sec" style="padding-top:36px;">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="../../">Beranda FIEZEL</a> <span aria-hidden="true">›</span> <span>Panduan Aplikasi Belajar Grammar Terbaik</span>
+      </nav>
     <p class="kicker">Panduan Evaluasi Objektif &amp; Kurikulum Terbuka &middot; 180 Lesson (4.500 Latihan)</p>
     <h1>Aplikasi Belajar Grammar Bahasa Inggris Terbaik: 6 Kriteria Objektif &amp; Bedah Metode Braincore</h1>
 
@@ -329,11 +369,67 @@
       <a class="hub-link" href="/panduan/persiapan-ielts-otodidak/">Panduan Persiapan IELTS Otodidak<span>Strategi mandiri 4-skill menuju Band 6.5–8.0.</span></a>
       <a class="hub-link" href="/grammar/">English Version: Grammar Curriculum<span>Read the English documentation of FIEZEL's 180 grammar lessons.</span></a>
     </div>
-  </main>
+      </div>
+  </section>
 
-  <footer>
-    <p>&copy; 2026 FIEZEL &middot; Dibangun di Banda Aceh oleh Fitra Rusdiawan &amp; Athar Rayyan Muhammad, S.Kom. &middot; <a href="/">Beranda</a> &middot; <a href="/app/">Aplikasi</a> &middot; <a href="/alat/cek-level-bahasa-inggris/">Tes Level CEFR</a> &middot; <a href="/faq/">FAQ</a></p>
-  </footer>
-</div>
+  <section class="sec sec-final" style="padding-top:12px;">
+    <div class="wrap">
+      <div class="stage final">
+        <p class="eyebrow">Ruang Belajar Bahasa Adaptif · Braincore Engine</p>
+        <h2>Mulai Belajar Grammar dari Level CEFR Anda Hari Ini</h2>
+        <p style="max-width:58ch;margin:10px auto 0;">Buka FIEZEL, jalankan tes penempatan adaptif 5 menit, dan kuasai 180 pelajaran tata bahasa Inggris dengan mesin Braincore.</p>
+        <div class="cta-row cta-center">
+          <a class="btn btn-primary" href="../../app/">Mulai Belajar di FIEZEL</a>
+          <a class="btn btn-ghost" href="../../install/">Cara Pasang Aplikasi</a>
+        </div>
+        <hr class="rule rule-center" aria-hidden="true">
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <svg class="foot-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-foot)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-foot)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
+      <p class="foot-tag">Ruang belajar bahasa personal bertenaga Braincore.</p>
+      <p class="foot-credit">Created in Banda Aceh by Fitra Rusdiawan &amp; Athar Rayyan Muhammad, S.Kom. · Kontak: <a href="mailto:halo@fiezel.my.id"><strong>halo@fiezel.my.id</strong></a></p>
+      <nav class="foot-links" aria-label="Tautan footer">
+        <a href="../../">Beranda</a>
+        <span aria-hidden="true">·</span>
+        <a href="../../app/">Buka Aplikasi</a>
+        <span aria-hidden="true">·</span>
+        <a href="/alat/cek-level-bahasa-inggris/">Cek Level CEFR</a>
+        <span aria-hidden="true">·</span>
+        <a href="/alat/kalkulator-skor-ielts/">Kalkulator IELTS</a>
+        <span aria-hidden="true">·</span>
+        <a href="/alat/syarat-skor-ielts-beasiswa-kampus/">Syarat Beasiswa</a>
+        <span aria-hidden="true">·</span>
+        <a href="/alat/cek-grammar-12-tenses/">Rumus 12 Tenses</a>
+        <span aria-hidden="true">·</span>
+        <a href="/panduan/aplikasi-belajar-grammar-terbaik/">Panduan Grammar</a>
+        <span aria-hidden="true">·</span>
+        <a href="/panduan/persiapan-ielts-otodidak/">Panduan IELTS</a>
+        <span aria-hidden="true">·</span>
+        <a href="/panduan/belajar-bahasa-jepang-pemula/">Panduan Jepang</a>
+        <span aria-hidden="true">·</span>
+        <a href="/panduan/belajar-bahasa-mandarin-hsk/">Panduan Mandarin</a>
+        <span aria-hidden="true">·</span>
+        <a href="../../kelasku/">KelasKu Guru</a>
+        <span aria-hidden="true">·</span>
+        <a href="../../faq/">FAQ</a>
+        <span aria-hidden="true">·</span>
+        <a href="../../privacy/">Privasi</a>
+        <span aria-hidden="true">·</span>
+        <a href="../../terms/">Ketentuan</a>
+      </nav>
+    </div>
+    <div class="foot-notes">
+      <p>Materi dan alat diagnostik dipetakan ke tingkat CEFR A1–C2 sebagai acuan belajar mandiri, bukan sertifikasi resmi.</p>
+      <p>Progres belajar tersimpan aman di perangkat pengguna.</p>
+    </div>
+  </div>
+  <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>
+</footer>
 </body>
 </html>
