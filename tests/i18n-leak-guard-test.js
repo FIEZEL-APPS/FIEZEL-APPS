@@ -39,6 +39,9 @@ for (const loc of ['id', 'th', 'en']) {
     assert.ok(fs.existsSync(p), `Katalog JSON ${loc}/${ns}.json wajib ada`);
     const data = JSON.parse(fs.readFileSync(p, 'utf8'));
     assert.ok(Object.keys(data).length > 0, `Katalog ${loc}/${ns}.json tidak boleh kosong`);
+    if (loc === 'th') {
+      FiezelI18n.overrideCopy('th', data);
+    }
   }
 }
 console.log('PASS: 12 katalog JSON ber-namespace (id, th, en x 4 NS) lengkap dan valid.');

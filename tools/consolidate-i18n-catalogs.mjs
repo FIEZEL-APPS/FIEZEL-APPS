@@ -64,11 +64,11 @@ function getNamespace(key) {
 function polishThai(text) {
   if (!text) return text;
   let s = text;
-  s = s.replace(/INTINYA\s*:/g, 'สรุปใจความสำคัญ:');
+  s = s.replace(/INTINYA(\s*:)?/g, (m, c) => c ? 'สรุปใจความสำคัญ:' : 'สรุปใจความสำคัญ');
   s = s.replace(/Mengapa kurang tepat\?/g, 'ทำไมตัวเลือกนี้ถึงยังไม่ถูกต้อง?');
-  s = s.replace(/Trik Cepat Ingat\s*:/g, 'เคล็ดลับช่วยจำง่าย ๆ:');
-  s = s.replace(/Aturan Tata Bahasa\s*:/g, 'โครงสร้างไวยากรณ์:');
-  s = s.replace(/TUNTUNAN LANGKAH\s*:/g, 'ขั้นตอนการคิดทีละสเต็ป:');
+  s = s.replace(/Trik Cepat Ingat(\s*:)?/g, (m, c) => c ? 'เคล็ดลับช่วยจำง่าย ๆ:' : 'เคล็ดลับช่วยจำง่าย ๆ');
+  s = s.replace(/Aturan Tata Bahasa(\s*:)?/g, (m, c) => c ? 'โครงสร้างไวยากรณ์:' : 'โครงสร้างไวยากรณ์');
+  s = s.replace(/TUNTUNAN LANGKAH(\s*:)?/g, (m, c) => c ? 'ขั้นตอนการคิดทีละสเต็ป:' : 'ขั้นตอนการคิดทีละสเต็ป');
   s = s.replace(/Coba lagi — pilih jawaban lain/g, 'ลองอีกครั้ง — เลือกคำตอบอื่นดูนะ');
   return s;
 }
@@ -76,6 +76,12 @@ function polishThai(text) {
 // Kamus terjemahan Bahasa Inggris tingkat lanjut (Pilar 1: English Golden Pivot)
 // Mengonversi naskah Indonesia menjadi naskah Inggris edukatif profesional
 const EXACT_EN = {
+  'quiz.trik-ingat': 'Memory Tip',
+  'quiz.intinya': 'Key Takeaway',
+  'quiz.mengapa-kurang-tepat': 'Why is this option incorrect?',
+  'quiz.aturan-tata-bahasa': 'Grammar Rule',
+  'quiz.tuntunan-langkah': 'Step-by-Step Guidance',
+  'quiz.coba-lagi': 'Try Again',
   'common.sapaan-netral': 'Friend',
   'common.toast-penyimpanan-penuh': 'Device storage is full — your progress cannot be saved. Free up space, then continue.',
   'nav.back-home-aria': 'Back to Home',
