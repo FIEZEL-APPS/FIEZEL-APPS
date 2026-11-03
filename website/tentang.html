@@ -82,6 +82,7 @@
     "@type": "WebApplication",
     "@id": "https://fiezel.my.id/#app",
     "name": "FIEZEL",
+    "alternateName": ["FIEZEL — Ruang Belajar Bahasa", "Fiezel", "Fizel", "Fzel", "Aplikasi Fizel", "Fizel App", "Fizel Bahasa Inggris", "Fisel", "Fezel", "FIEZEL App", "FIEZEL Adaptive Learning Platform"],
     "url": "https://fiezel.my.id/app/",
     "description": "Aplikasi belajar bahasa adaptif dengan mesin kognitif Braincore asal Banda Aceh. Membimbing jawaban dengan petunjuk bertahap tanpa membuka kunci jawaban saat salah pertama, dilengkapi Kawan Bicara AI dan panel guru KelasKu.",
     "applicationCategory": "EducationalApplication",
@@ -95,7 +96,7 @@
       "availability": "https://schema.org/InStock"
     },
     "inLanguage": ["id", "th"],
-    "teaches": ["English", "Japanese"],
+    "teaches": ["English", "Japanese", "Mandarin Chinese"],
     "availableLanguage": [
       {"@type": "Language", "name": "Indonesian", "alternateName": "id"},
       {"@type": "Language", "name": "Thai", "alternateName": "th"}
@@ -107,6 +108,7 @@
     "@type": "EducationalOrganization",
     "@id": "https://fiezel.my.id/#org",
     "name": "FIEZEL",
+    "alternateName": ["FIEZEL — Ruang Belajar Bahasa", "Fiezel", "Fizel", "Fzel", "Aplikasi Fizel", "Fizel App"],
     "url": "https://fiezel.my.id/",
     "founder": {
       "@type": "Person",
@@ -129,7 +131,7 @@
     "@type": "Course",
     "@id": "https://fiezel.my.id/#course-ja",
     "name": "Kursus Bahasa Jepang FIEZEL (JLPT N5–N4)",
-    "description": "Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis. Latihan menyimak dan berbicara belum tersedia untuk kursus ini.",
+    "description": "Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis, didukung audio dialog percakapan dan Kawan Bicara AI (Mitra Kaiwa Studio).",
     "url": "https://fiezel.my.id/tentang.html#jepang",
     "provider": {"@id": "https://fiezel.my.id/#org"},
     "inLanguage": ["id", "th"],
@@ -144,11 +146,29 @@
   },
   {
     "@context": "https://schema.org",
+    "@type": "Course",
+    "@id": "https://fiezel.my.id/#course-zh",
+    "name": "Kursus Bahasa Mandarin FIEZEL (HSK 1–5)",
+    "description": "Kursus Bahasa Mandarin mencakup 168 unit berjenjang HSK 1–5, pelafalan 4 nada dengan sinkronisasi karaoke 60 FPS, pinyin, hanzi, dan latihan percakapan suara bersama Xiao Mochi AI.",
+    "url": "https://fiezel.my.id/tentang.html#mandarin",
+    "provider": {"@id": "https://fiezel.my.id/#org"},
+    "inLanguage": ["id", "th"],
+    "teaches": "Mandarin Chinese",
+    "isAccessibleForFree": true,
+    "educationalLevel": ["HSK 1", "HSK 2", "HSK 3", "HSK 4", "HSK 5"],
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "online",
+      "courseWorkload": "PT20M"
+    }
+  },
+  {
+    "@context": "https://schema.org",
     "@type": "AboutPage",
     "@id": "https://fiezel.my.id/tentang.html#webpage",
     "url": "https://fiezel.my.id/tentang.html",
     "name": "Tentang FIEZEL",
-    "description": "Penjelasan lengkap tentang FIEZEL: dua kursus bahasa, cakupan materi, batas yang belum tersedia, dan cara memakainya.",
+    "description": "Penjelasan lengkap tentang FIEZEL (Fizel / Fzel): tiga kursus bahasa (Inggris, Jepang, Mandarin), mesin kognitif Braincore, Kawan Bicara AI, dan KelasKu untuk Guru.",
     "inLanguage": "id",
     "isPartOf": {"@id": "https://fiezel.my.id/#website"},
     "about": {"@id": "https://fiezel.my.id/#app"},
@@ -167,6 +187,14 @@
     "inLanguage": "id",
     "isPartOf": {"@id": "https://fiezel.my.id/tentang.html#webpage"},
     "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Apakah Fizel atau Fzel sama dengan FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya, benar. Fizel dan Fzel (serta variasi ejaan suara Fisel, Fezel, atau sebutan Aplikasi Fizel) merujuk langsung ke aplikasi belajar bahasa adaptif resmi FIEZEL (https://fiezel.my.id/). Nama FIEZEL dilafalkan /ˈfiːzəl/ ('Fi-zel') dalam bahasa Indonesia sehingga banyak murid dan guru mengetiknya secara fonetis sebagai Fizel atau Fzel. FIEZEL adalah platform edukasi bahasa independen asal Banda Aceh dan sama sekali tidak berkaitan dengan nama sungai Fizel di Rumania, situs kastel Fizel di Prancis, maupun aplikasi pihak ketiga seperti FSEL."
+        }
+      },
       {
         "@type": "Question",
         "name": "Apa itu FIEZEL?",
@@ -201,10 +229,10 @@
       },
       {
         "@type": "Question",
-        "name": "Apakah FIEZEL mengajar bahasa Jepang?",
+        "name": "Apakah FIEZEL mengajar bahasa Jepang dan Mandarin?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Ya. Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis. Latihan menyimak dan berbicara belum tersedia untuk Jepang — kedua kartu itu memang disembunyikan sampai materi dan suaranya siap."
+          "text": "Ya. Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis, didukung audio dialog percakapan dan Kawan Bicara AI (Mitra Kaiwa Studio). Selain itu, FIEZEL juga menyediakan kursus Bahasa Mandarin HSK 1–5 lengkap dengan latihan nada karaoke 60 FPS dan Xiao Mochi AI."
         }
       },
       {
@@ -220,7 +248,7 @@
         "name": "Apakah FIEZEL gratis?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "FIEZEL menyediakan masa percobaan gratis 7 hari penuh, dan pengerjaan tugas sekolah dari guru selalu gratis. Untuk belajar mandiri intensif tersedia paket langganan FIEZEL Plus dan Paket Ujian, serta langganan KelasKu untuk bimbel dan sekolah."
+          "text": "FIEZEL menyediakan masa percobaan gratis 7 hari penuh untuk pengguna mandiri, dan pengerjaan tugas sekolah dari guru via KelasKu selalu 100% gratis selamanya bagi murid. Untuk belajar mandiri intensif jangka panjang tersedia paket langganan FIEZEL Plus dan Paket Ujian, serta langganan KelasKu untuk bimbel dan sekolah."
         }
       },
       {
@@ -326,6 +354,20 @@
     </div>
   </section>
 
+  <section class="sec" id="klarifikasi-nama">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Klarifikasi Nama &amp; Ejaan: FIEZEL, Fizel, atau Fzel?</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <div style="background:var(--cream-deep,#FFF3DC);border-left:4px solid var(--maroon,#8C2233);padding:20px 24px;border-radius:0 12px 12px 0;margin:16px 0 24px;">
+        <p class="body-lg" style="margin:0;"><strong>Ejaan Resmi:</strong> Nama resmi aplikasi ini adalah <strong>FIEZEL</strong> (dieja huruf demi huruf: <em>F-I-E-Z-E-L</em>), dilafalkan secara fonetis sebagai <strong>/ˈfiːzəl/ ("Fi-zel")</strong>.</p>
+      </div>
+      <p class="body-lg">Banyak pelajar, mahasiswa, dan guru di Indonesia sering mengetikkan nama aplikasi ini sebagai <strong>"Fizel"</strong> (tanpa huruf <em>e</em>) atau singkatan <strong>"Fzel"</strong> (serta variasi lafal <em>Fisel</em> atau <em>Fezel</em>). Seluruh pencarian tersebut merujuk pada aplikasi belajar bahasa adaptif resmi <strong>FIEZEL</strong> (domain resmi: <code>https://fiezel.my.id/</code>).</p>
+      <p class="body-lg"><strong>Penting untuk Diketahui:</strong> Aplikasi FIEZEL (Fizel) adalah entitas teknologi pendidikan mandiri asal Banda Aceh, Indonesia. FIEZEL tidak memiliki kaitan apa pun dengan nama geografis sungai Fizel di Rumania (Râul Fizel), situs reruntuhan Castel Fizel di Prancis, maupun aplikasi pihak ketiga seperti FSEL.</p>
+    </div>
+  </section>
+
   <section class="sec" id="inggris">
     <div class="wrap">
       <div class="sec-head">
@@ -352,11 +394,27 @@
       <p class="body-lg">Kursus Bahasa Jepang berdiri di atas mesin adaptif yang sama, dengan bank materinya sendiri:</p>
       <ul class="list-plain">
         <li><strong>422 butir tata bahasa JLPT N5–N4</strong>, tersusun dalam 27 keluarga tata bahasa.</li>
-        <li><strong>1.884 kosakata</strong> Jepang dengan bacaan kana dan artinya.</li>
+        <li><strong>1.884 kosakata</strong> Jepang dengan bacaan kana, romaji, furigana, dan downstep pitch accent.</li>
         <li><strong>150 bacaan berjenjang</strong>.</li>
         <li><strong>54 prompt menulis</strong> dengan target jumlah karakter per tingkat.</li>
+        <li><strong>Studio Suara Mitra Kaiwa AI:</strong> Latihan percakapan lisan real-time dengan teleprompter terjemahan dan bantuan jawaban ramah pemula.</li>
       </ul>
-      <p class="body-lg"><strong>Yang belum ada, dan ditulis di sini supaya tidak jadi kejutan:</strong> latihan <em>menyimak</em> dan <em>berbicara</em> belum tersedia untuk Bahasa Jepang. Kedua kartu itu memang disembunyikan di dalam aplikasi ketika kursus Jepang dipilih — menawarkan latihan menyimak yang isinya audio Bahasa Inggris akan jauh lebih membingungkan daripada tidak menawarkannya sama sekali.</p>
+      <p class="body-lg">Kursus Bahasa Jepang telah dilengkapi audio dialog percakapan multi-karakter dan studio suara interaktif Kawan Bicara AI (Mitra Kaiwa Studio) dengan panduan cara baca Furigana dan Romaji.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="mandarin">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Kursus Bahasa Mandarin (HSK 1–5)</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Kursus Bahasa Mandarin FIEZEL dirancang untuk membangun penguasaan nada dan percakapan secara sistematis:</p>
+      <ul class="list-plain">
+        <li><strong>168 unit pelajaran HSK 1–5</strong> dari pemula hingga mahir.</li>
+        <li><strong>Pelatihan 4 Nada Pinyin</strong> dengan visualisasi ritme dan sinkronisasi karaoke visual 60 FPS.</li>
+        <li><strong>Percakapan Suara Xiao Mochi AI:</strong> Simulasi berbicara real-time dengan umpan balik nada dan pelafalan seketika.</li>
+      </ul>
     </div>
   </section>
 
@@ -426,6 +484,10 @@
       </div>
       <div class="faq">
         <details open>
+          <summary>Apakah "Fizel" atau "Fzel" sama dengan FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Ya, benar. <strong>Fizel</strong> dan <strong>Fzel</strong> (serta variasi ejaan suara <em>Fisel</em>, <em>Fezel</em>, atau sebutan <em>Aplikasi Fizel</em>) merujuk langsung ke aplikasi belajar bahasa adaptif resmi <strong>FIEZEL</strong> (situs: <code>https://fiezel.my.id/</code>). Karena nama FIEZEL dilafalkan <strong>/ˈfiːzəl/ ("Fi-zel")</strong> dalam bahasa Indonesia, banyak pengguna dan guru mengetiknya secara fonetis sebagai <strong>Fizel</strong> atau <strong>Fzel</strong>. FIEZEL adalah platform edukasi bahasa independen asal Banda Aceh dan sama sekali tidak berkaitan dengan nama sungai Fizel di Rumania, situs kastel Fizel di Prancis, maupun aplikasi pihak ketiga seperti FSEL.</p></div>
+        </details>
+        <details>
           <summary>Apa itu FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
           <div class="faq-body"><p>FIEZEL adalah aplikasi web belajar bahasa adaptif asal Banda Aceh yang menyesuaikan soal berikutnya dari jawabanmu menggunakan mesin kognitif Braincore. Dilengkapi kursus Bahasa Inggris, Kawan Bicara AI untuk latihan percakapan, dan ruang kerja guru KelasKu.</p></div>
         </details>
@@ -442,8 +504,8 @@
           <div class="faq-body"><p>Kawan Bicara AI adalah studio latihan percakapan suara interaktif di FIEZEL. Berbeda dengan asisten suara umum yang menuntut pengguna sudah paham dan sering membuang waktu karena pengguna harus menginterupsi AI untuk bertanya arti kata atau saran balasan, Kawan Bicara FIEZEL menyajikan alur bebas hambatan: terjemahan bahasa Indonesia langsung tampil di bawah ucapan lawan bicara, teks dibekali panduan fonetik (Furigana &amp; Romaji untuk Jepang), serta tersedia 3 opsi contekan jawaban natural (Beginner Answer Assistant) lengkap dengan tombol audio contoh pelafalan. Pemula yang belum lancar pun bisa langsung berbicara mengalir layaknya penutur asli tanpa jeda canggung.</p></div>
         </details>
         <details>
-          <summary>Apakah FIEZEL mengajar bahasa Jepang?<span class="chev" aria-hidden="true"></span></summary>
-          <div class="faq-body"><p>Ya. Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis. Latihan menyimak dan berbicara belum tersedia untuk Jepang — kedua kartu itu memang disembunyikan sampai materi dan suaranya siap.</p></div>
+          <summary>Apakah FIEZEL mengajar bahasa Jepang dan Mandarin?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Ya. Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis, didukung audio dialog percakapan dan Kawan Bicara AI (Mitra Kaiwa Studio). Selain itu, FIEZEL juga menyediakan kursus Bahasa Mandarin HSK 1–5 lengkap dengan latihan nada karaoke 60 FPS dan Xiao Mochi AI.</p></div>
         </details>
         <details>
           <summary>Apakah FIEZEL bisa dipakai murid di Thailand?<span class="chev" aria-hidden="true"></span></summary>
@@ -492,7 +554,7 @@
 <footer class="foot">
   <div class="wrap foot-in">
     <div class="foot-brand">
-      <p class="foot-tag">Ruang belajar bahasa personal — Inggris dan Jepang.</p>
+      <p class="foot-tag">Ruang belajar bahasa personal — Inggris, Jepang, dan Mandarin.</p>
       <p class="foot-credit">Kontak resmi: <a href="mailto:halo@fiezel.my.id"><strong>halo@fiezel.my.id</strong></a></p>
       <nav class="foot-links" aria-label="Tautan footer">
         <a href="./">Beranda</a>
@@ -513,9 +575,9 @@
       </nav>
     </div>
     <div class="foot-notes">
-      <p>Materi Inggris dipetakan ke CEFR A1–C2, materi Jepang ke JLPT N5–N4. Bukan sertifikasi resmi.</p>
+      <p>Materi Inggris dipetakan ke CEFR A1–C2, materi Jepang ke JLPT N5–N4, materi Mandarin ke HSK 1–5. Bukan sertifikasi resmi.</p>
       <p>Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
-      <p>Gratis, tanpa langganan. Progres belajar tersimpan di perangkatmu.</p>
+      <p>Coba gratis 7 hari akses penuh &amp; tugas sekolah gratis selamanya. Progres belajar tersimpan di perangkatmu.</p>
     </div>
   </div>
   <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>
