@@ -6613,6 +6613,58 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
   // `tests/japanese-bank-survives-load-test.js` menahan urutan ini: setiap penugasan G baru
   // di bawah sini akan membuatnya merah.
   if(CONTENT_CANARY){const canonical={version:APP_VERSION,vocabulary:V,reading:R,grammar:grammarMaster},now=Date.now();contentPromotionRuntime=CONTENT_PROMOTION?CONTENT_PROMOTION.evaluate(CONTENT_CANARY_CONFIG,state.contentCanaryMeta,now):contentPromotionRuntime;if(CONTENT_CANARY_CONFIG?.enabled&&CONTENT_CANARY_CONFIG?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordPromotionDecision(state.contentCanaryMeta,CONTENT_CANARY_CONFIG.canaryId,contentPromotionRuntime,new Date(now).toISOString());contentCanaryRuntime=await CONTENT_CANARY.prepare(canonical,CONTENT_CANARY_CONFIG,learnerName(),state.contentCanaryMeta,now,contentPromotionRuntime);state.contentCanaryMeta=contentCanaryRuntime.evidence||state.contentCanaryMeta;V=contentCanaryRuntime.dataset.vocabulary;R=contentCanaryRuntime.dataset.reading;grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;
+  if(activeTargetLang()==='zh'){
+    const zhBank=await optional('content/zh/grammar-templates-zh.json',null);
+    const zhGraph=await optional('content/zh/family-graph-zh.json',null);
+    const zhVocab=await optional('content/zh/vocabulary-master-zh.json',null);
+    if(zhVocab&&Array.isArray(zhVocab.words)&&zhVocab.words.length){
+      V=zhVocab.words;
+    }
+    const zhRead=await optional('content/zh/reading-bank-zh.json',null);
+    if(Array.isArray(zhRead)&&zhRead.length){
+      R=zhRead;
+    }
+    const zhWrite=await optional('content/zh/writing-prompts-zh.json',null);
+    if(zhWrite&&Array.isArray(zhWrite.prompts)&&zhWrite.prompts.length){
+      WRITING_BANK=zhWrite;
+    }
+    if(zhBank&&Array.isArray(zhBank.templates)&&zhBank.templates.length){
+      G=zhBank;
+      const rawFamilies=zhGraph?.families||{};
+      const zhLessons=[];
+      const skillLevelMap={};
+      for(const t of zhBank.templates){
+        const sk=String(t.skill||t.family||'').trim();
+        if(sk&&!skillLevelMap[sk])skillLevelMap[sk]=t.cefr||t.level||'A1';
+      }
+      const levelSeqCounter={A1:0,A2:0,B1:0,B2:0,C1:0,C2:0};
+      for(const [sk,prereqs] of Object.entries(rawFamilies)){
+        const lvl=skillLevelMap[sk]||'A1';
+        levelSeqCounter[lvl]=(levelSeqCounter[lvl]||0)+1;
+        const validPrereqs=(Array.isArray(prereqs)?prereqs:[]).filter(p=>p&&rawFamilies[p]);
+        zhLessons.push({
+          lessonId:sk,
+          skill:sk,
+          level:lvl,
+          sequence:levelSeqCounter[lvl],
+          unit:`${lvl}.${levelSeqCounter[lvl]}`,
+          title:friendlySkillName(sk),
+          prerequisites:validPrereqs
+        });
+      }
+      GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(zhLessons);
+      try{self.FiezelCoreBrain?.setFamilyGraph?.(rawFamilies)}catch{}
+      try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:zhLessons})}catch{}
+    }else{
+      let persistentZh=false;
+      try{persistentZh=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)==='zh'}catch(_){}
+      if(!persistentZh){
+        try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
+        state.preferences={...state.preferences,targetLang:'en'};
+        try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
+      }
+    }
+  }
   if(activeTargetLang()==='ja'){
     const jaBank=await optional('content/ja/grammar-templates-ja.json',null);
     const jaGraph=await optional('content/ja/family-graph-ja.json',null);
@@ -6684,58 +6736,7 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
         try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
       }
     }
-  }else if(activeTargetLang()==='zh'){
-    const zhBank=await optional('content/zh/grammar-templates-zh.json',null);
-    const zhGraph=await optional('content/zh/family-graph-zh.json',null);
-    const zhVocab=await optional('content/zh/vocabulary-master-zh.json',null);
-    if(zhVocab&&Array.isArray(zhVocab.words)&&zhVocab.words.length){
-      V=zhVocab.words;
-    }
-    const zhRead=await optional('content/zh/reading-bank-zh.json',null);
-    if(Array.isArray(zhRead)&&zhRead.length){
-      R=zhRead;
-    }
-    const zhWrite=await optional('content/zh/writing-prompts-zh.json',null);
-    if(zhWrite&&Array.isArray(zhWrite.prompts)&&zhWrite.prompts.length){
-      WRITING_BANK=zhWrite;
-    }
-    if(zhBank&&Array.isArray(zhBank.templates)&&zhBank.templates.length){
-      G=zhBank;
-      const rawFamilies=zhGraph?.families||{};
-      const zhLessons=[];
-      const skillLevelMap={};
-      for(const t of zhBank.templates){
-        const sk=String(t.skill||t.family||'').trim();
-        if(sk&&!skillLevelMap[sk])skillLevelMap[sk]=t.cefr||t.level||'A1';
-      }
-      const levelSeqCounter={A1:0,A2:0,B1:0,B2:0,C1:0,C2:0};
-      for(const [sk,prereqs] of Object.entries(rawFamilies)){
-        const lvl=skillLevelMap[sk]||'A1';
-        levelSeqCounter[lvl]=(levelSeqCounter[lvl]||0)+1;
-        const validPrereqs=(Array.isArray(prereqs)?prereqs:[]).filter(p=>p&&rawFamilies[p]);
-        zhLessons.push({
-          lessonId:sk,
-          skill:sk,
-          level:lvl,
-          sequence:levelSeqCounter[lvl],
-          unit:`${lvl}.${levelSeqCounter[lvl]}`,
-          title:friendlySkillName(sk),
-          prerequisites:validPrereqs
-        });
-      }
-      GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(zhLessons);
-      try{self.FiezelCoreBrain?.setFamilyGraph?.(rawFamilies)}catch{}
-      try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:zhLessons})}catch{}
-    }else{
-      let persistentZh=false;
-      try{persistentZh=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)==='zh'}catch(_){}
-      if(!persistentZh){
-        try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
-        state.preferences={...state.preferences,targetLang:'en'};
-        try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
-      }
-    }
-  }else{
+  }else if(activeTargetLang()!=='zh'){
     GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);
     try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
     try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
