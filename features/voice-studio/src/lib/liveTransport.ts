@@ -5,6 +5,7 @@ import {
   translateAndPhoneticizeLiveText,
 } from './liveCallHelper.ts';
 import { stripEmojisAndEmotWords, toPhoneticRomaji } from './japanesePhonetics.js';
+import { toPhoneticPinyin, containsHanzi, stripHanzi } from './mandarinPhonetics.ts';
 
 export type LiveTransportMode = 'ws-duplex' | 'turn-by-turn-fallback';
 
@@ -976,9 +977,9 @@ export function buildContextualFallbackCards(params: {
 
   const ZH: Record<CopilotSpeechAct, Tpl> = {
     echo_redemption: {
-      easy: [echo, echo, `Ulangi: “${echo}”`, `พูดตาม: “${echo}”`],
-      mission: [`${echo}，对吧？`, `${echo}, duì ba?`, `Mengerti: “${echo}”`, `เข้าใจแล้ว: “${echo}”`],
-      rescue: [`${echo}。我读得对吗？`, `${echo}. Wǒ dú de duì ma?`, `“${echo}”. Apakah pengucapanku sudah benar?`, `“${echo}” ฉันอ่านถูกต้องไหม?`],
+      easy: [echo, toPhoneticPinyin(echo), `Ulangi: “${toPhoneticPinyin(echo)}”`, `พูดตาม: “${toPhoneticPinyin(echo)}”`],
+      mission: [`${echo}，对吧？`, `${toPhoneticPinyin(echo)}, duì ba?`, `Mengerti: “${toPhoneticPinyin(echo)}”`, `เข้าใจแล้ว: “${toPhoneticPinyin(echo)}”`],
+      rescue: [`${echo}。我读得对吗？`, `${toPhoneticPinyin(echo)}. Wǒ dú de duì ma?`, `“${toPhoneticPinyin(echo)}”. Apakah pengucapanku sudah benar?`, `“${toPhoneticPinyin(echo)}” ฉันอ่านถูกต้องไหม?`],
     },
     invitation: {
       easy: ['好啊，我们一起去吧！', 'Hǎo a, wǒmen yīqǐ qù ba!', 'Boleh, ayo kita pergi sama-sama!', 'ดีเลย ไปด้วยกันเถอะ!'],
@@ -986,8 +987,8 @@ export function buildContextualFallbackCards(params: {
       rescue: ['好主意！你打算什么时候去呢？', 'Hǎo zhǔyì! Nǐ dǎsuàn shénme shíhòu qù ne?', 'Ide bagus! Kamu rencana kapan perginya?', 'ความคิดดีเลย! คุณตั้งใจจะไปตอนไหนเหรอ?'],
     },
     choice: {
-      easy: [optA ? `我要${optA}，谢谢。` : '我选第一个吧。', optA ? `Wǒ yào ${optA}, xièxie.` : 'Wǒ xuǎn dì yī gè ba.', optA ? `Saya mau ${optA}, terima kasih.` : 'Saya pilih yang pertama saja.', optA ? `ขอเป็น${optA} ขอบคุณครับ/ค่ะ` : 'ขอเลือกอันแรกครับ/ค่ะ'],
-      mission: [optA ? `我更喜欢${optA}，感觉味道很不错。` : '我选第一个，感觉挺好的。', optA ? `Wǒ gèng xǐhuān ${optA}, gǎnjué wèidào hěn bùcuò.` : 'Wǒ xuǎn dì yī gè, gǎnjué tǐng hǎo de.', optA ? `Aku lebih suka ${optA}, rasanya enak.` : 'Aku pilih yang pertama, rasanya oke.', optA ? `ฉันชอบ${optA}มากกว่า รู้สึกว่ารสชาติดีเลย` : 'ฉันเลือกอันแรก รู้สึกว่าน่าจะดี'],
+      easy: [optA ? `我要${optA}，谢谢。` : '我选第一个吧。', optA ? `Wǒ yào ${toPhoneticPinyin(optA)}, xièxie.` : 'Wǒ xuǎn dì yī gè ba.', optA ? `Saya mau ${toPhoneticPinyin(optA)}, terima kasih.` : 'Saya pilih yang pertama saja.', optA ? `ขอเป็น${toPhoneticPinyin(optA)} ขอบคุณครับ/ค่ะ` : 'ขอเลือกอันแรกครับ/ค่ะ'],
+      mission: [optA ? `我更喜欢${optA}，感觉味道很不错。` : '我选第一个，感觉挺好的。', optA ? `Wǒ gèng xǐhuān ${toPhoneticPinyin(optA)}, gǎnjué wèidào hěn bùcuò.` : 'Wǒ xuǎn dì yī gè, gǎnjué tǐng hǎo de.', optA ? `Aku lebih suka ${toPhoneticPinyin(optA)}, rasanya enak.` : 'Aku pilih yang pertama, rasanya oke.', optA ? `ฉันชอบ${toPhoneticPinyin(optA)}มากกว่า รู้สึกว่ารสชาติดีเลย` : 'ฉันเลือกอันแรก รู้สึกว่าน่าจะดี'],
       rescue: ['这两个都不错，你平时更喜欢哪一个？', 'Zhè liǎng gè dōu bùcuò, nǐ píngshí gèng xǐhuān nǎ yī gè?', 'Dua-duanya oke, kamu biasanya lebih suka yang mana?', 'ทั้งสองอย่างดูดีทั้งคู่เลย คุณชอบอันไหนมากกว่าเหรอ?'],
     },
     wh_how_long: {
@@ -1107,15 +1108,41 @@ export function buildContextualFallbackCards(params: {
   ];
 
   const stamp = Date.now();
+  const sanitizePron = (p: string, lang: TargetLang, fallbackText: string) => {
+    let cleanP = String(p || '').trim();
+    if (lang === 'zh') {
+      if (!cleanP || containsHanzi(cleanP)) {
+        cleanP = toPhoneticPinyin(cleanP || fallbackText);
+      }
+      return cleanP.replace(/[\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
+    }
+    if (lang === 'ja') {
+      if (!cleanP || /[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/.test(cleanP)) {
+        cleanP = toPhoneticRomaji(cleanP || fallbackText);
+      }
+      return cleanP.replace(/[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
+    }
+    return cleanP;
+  };
+
+  const sanitizeHint = (h: string, lang: TargetLang) => {
+    if (!h) return '';
+    return h.replace(/["'“‘「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'”’」』]/g, (_m, inner) => {
+      if (lang === 'zh') return `"${toPhoneticPinyin(inner)}"`;
+      if (lang === 'ja') return `"${toPhoneticRomaji(inner)}"`;
+      return inner;
+    }).replace(/[\u4e00-\u9fff\u3040-\u30ff]/g, '').replace(/\s{2,}/g, ' ').trim();
+  };
+
   return meta.map((m, i) => ({
     id: `fb_ctx_${stamp}_${i}`,
     tier: m.tier,
     badgeId: m.badgeId,
     badgeTh: m.badgeTh,
     text: m.row[0],
-    pronunciation: m.row[1],
-    hintId: m.row[2],
-    hintTh: th ? m.row[3] : m.row[2],
+    pronunciation: sanitizePron(m.row[1], params.targetLang, m.row[0]),
+    hintId: sanitizeHint(m.row[2], params.targetLang),
+    hintTh: sanitizeHint(th ? m.row[3] : m.row[2], params.targetLang),
     isRealtimeAi: false,
     isOfflineFallback: true,
     wordBreakdown: [],
@@ -1140,6 +1167,38 @@ function normalizeServerCopilotCards(
     if (!text || !replyLooksLikeTargetLanguage(text, targetLang)) continue;
     const meta = defaultMeta[out.length] || defaultMeta[0];
     const rawPron = stripEmojisAndEmotWords(String(item.pronunciation || item.phonetic || '')).trim();
+
+    // STRICT SANITIZATION: Zero Hanzi/Kanji in pronunciation
+    let safePron = '';
+    if (targetLang === 'zh') {
+      if (rawPron && !containsHanzi(rawPron)) {
+        safePron = rawPron;
+      } else {
+        safePron = toPhoneticPinyin(text);
+      }
+      safePron = safePron.replace(/[\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
+    } else if (targetLang === 'ja') {
+      if (rawPron && !/[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/.test(rawPron)) {
+        safePron = rawPron;
+      } else {
+        safePron = toPhoneticRomaji(text);
+      }
+      safePron = safePron.replace(/[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
+    } else {
+      safePron = rawPron || text;
+    }
+
+    const rawHintId = stripEmojisAndEmotWords(String(item.hintId || item.translationId || item.hint || '')).trim();
+    const rawHintTh = stripEmojisAndEmotWords(String(item.hintTh || item.translationTh || item.hint || rawHintId)).trim();
+
+    const sanitizeHint = (h: string) => {
+      return h.replace(/["'“‘「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'”’」』]/g, (_m, inner) => {
+        if (targetLang === 'zh') return `"${toPhoneticPinyin(inner)}"`;
+        if (targetLang === 'ja') return `"${toPhoneticRomaji(inner)}"`;
+        return inner;
+      }).replace(/[\u4e00-\u9fff\u3040-\u30ff]/g, '').replace(/\s{2,}/g, ' ').trim();
+    };
+
     out.push({
       id: String(item.id || `ai_rt_${Date.now()}_${out.length}`),
       tier:
@@ -1149,10 +1208,9 @@ function normalizeServerCopilotCards(
       badgeId: stripEmojisAndEmotWords(String(item.badgeId || item.levelLabel || meta.badgeId)).trim() || meta.badgeId,
       badgeTh: stripEmojisAndEmotWords(String(item.badgeTh || meta.badgeTh)).trim() || meta.badgeTh,
       text,
-      pronunciation:
-        rawPron || (targetLang === 'ja' ? toPhoneticRomaji(text) : text),
-      hintId: stripEmojisAndEmotWords(String(item.hintId || item.translationId || '')).trim(),
-      hintTh: stripEmojisAndEmotWords(String(item.hintTh || item.translationTh || item.hintId || '')).trim(),
+      pronunciation: safePron,
+      hintId: sanitizeHint(rawHintId),
+      hintTh: sanitizeHint(rawHintTh),
       isRealtimeAi: true,
       wordBreakdown: [],
     });

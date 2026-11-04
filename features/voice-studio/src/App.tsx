@@ -707,12 +707,16 @@ export default function App() {
     const sentences = splitSentences(fullAiText, activeScenario.targetLang);
     const targetLoc = locale === 'th' ? 'th' : 'id';
     const combined = sentences
-      .map((raw) => {
+      .map((raw, idx) => {
         const s = raw.trim();
+        if (!s) return '';
+        const isComplete = idx < sentences.length - 1 || /[.?!。？！\n]$/.test(s);
         const cached = liveSentenceTransMapRef.current.get(s);
         if (cached && (targetLoc === 'th' ? cached.th : cached.id)) {
           return targetLoc === 'th' ? cached.th : cached.id;
         }
+        // Avoid flashing rapid broken partial translations mid-word during streaming
+        if (!isComplete && s.length < 8) return '';
         const local = translateAndPhoneticizeLiveText(s, activeScenario.targetLang);
         return targetLoc === 'th' ? local.translationTh : local.translationId;
       })
@@ -1924,7 +1928,12 @@ export default function App() {
       if (isDisposed) return;
       try {
         const rec = new SpeechRec();
-        rec.lang = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
+        rec.lang =
+          activeScenario.targetLang === 'ja'
+            ? 'ja-JP'
+            : activeScenario.targetLang === 'zh'
+            ? 'zh-CN'
+            : 'en-US';
         rec.interimResults = true;
         // Android Chrome duplicates cumulative tokens when `continuous = true`; `onend` restarts
         // the cycle seamlessly on mobile while desktop keeps continuous open-mic recognition.
@@ -2370,6 +2379,17 @@ export default function App() {
               }
               micStreamRef.current = lateStream;
               const activeCtx = liveAudioCtxRef.current;
+              if (activeCtx) {
+                if (activeCtx.state === 'suspended') void activeCtx.resume().catch(() => {});
+                try {
+                  const source = activeCtx.createMediaStreamSource(lateStream);
+                  if (audioWorkletNodeRef.current) {
+                    source.connect(audioWorkletNodeRef.current);
+                  } else if (scriptProcessorRef.current) {
+                    source.connect(scriptProcessorRef.current);
+                  }
+                } catch {}
+              }
               if (activeCtx && !sileroVadGateRef.current) {
                 const lateGate = new SileroNeuralVadGate();
                 sileroVadGateRef.current = lateGate;
@@ -2382,14 +2402,22 @@ export default function App() {
                     if (wsRef.current?.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
                       wsRef.current.send(
                         JSON.stringify({
-                          realtimeInput: { audio: { mimeType: 'audio/pcm;rate=16000', data: pcmBase64 } },
+                          realtimeInput: {
+                            mediaChunks: [{ mimeType: 'audio/pcm;rate=16000', data: pcmBase64 }],
+                            audio: { mimeType: 'audio/pcm;rate=16000', data: pcmBase64 },
+                          },
                         })
                       );
                     }
                   },
                   onSpeechEnded: () => {
                     if (wsRef.current?.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-                      wsRef.current.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
+                      wsRef.current.send(
+                        JSON.stringify({
+                          realtimeInput: { audioStreamEnd: true },
+                          clientContent: { turns: [{ role: 'user', parts: [] }], turnComplete: true },
+                        })
+                      );
                     }
                   },
                 });
@@ -2451,6 +2479,12 @@ export default function App() {
               wsRef.current.send(
                 JSON.stringify({
                   realtimeInput: {
+                    mediaChunks: [
+                      {
+                        mimeType: 'audio/pcm;rate=16000',
+                        data: pcmBase64,
+                      },
+                    ],
                     audio: {
                       mimeType: 'audio/pcm;rate=16000',
                       data: pcmBase64,
@@ -2466,6 +2500,10 @@ export default function App() {
                 JSON.stringify({
                   realtimeInput: {
                     audioStreamEnd: true,
+                  },
+                  clientContent: {
+                    turns: [{ role: 'user', parts: [] }],
+                    turnComplete: true,
                   },
                 })
               );
@@ -2506,6 +2544,12 @@ export default function App() {
               wsRef.current.send(
                 JSON.stringify({
                   realtimeInput: {
+                    mediaChunks: [
+                      {
+                        mimeType: 'audio/pcm;rate=16000',
+                        data: pcmBase64,
+                      },
+                    ],
                     audio: {
                       mimeType: 'audio/pcm;rate=16000',
                       data: pcmBase64,
@@ -2519,6 +2563,10 @@ export default function App() {
                 JSON.stringify({
                   realtimeInput: {
                     audioStreamEnd: true,
+                  },
+                  clientContent: {
+                    turns: [{ role: 'user', parts: [] }],
+                    turnComplete: true,
                   },
                 })
               );
@@ -2695,6 +2743,8 @@ export default function App() {
             const allowedAsrLangs =
               activeScenario.targetLang === 'ja'
                 ? ['ja-JP', locale === 'th' ? 'th-TH' : 'id-ID']
+                : activeScenario.targetLang === 'zh'
+                ? ['zh-CN', 'cmn-Hans-CN', locale === 'th' ? 'th-TH' : 'id-ID']
                 : ['en-US', locale === 'th' ? 'th-TH' : 'id-ID'];
             const customVocabTerms = Array.from(
               new Set([
@@ -2704,6 +2754,7 @@ export default function App() {
                 'Keita Senpai',
                 'Coach Alex',
                 'Coach Sarah',
+                'Xiao Mochi',
                 'Braincore',
                 ...activeScenario.vocabPrereqs.map((v) => v.term),
               ])
@@ -2713,6 +2764,13 @@ export default function App() {
               speechRate <= 0.95
                 ? `\n\n[MANDATORY PACING & ENUNCIATION FOR LEARNER]: You are speaking to a language learner. Speak at a CALM, RELAXED, UNHURRIED, and GENTLE pace (around 0.85x speed). Articulate every syllable, mora, and grammatical particle (such as は, が, を, に, で) with crystal-clear clarity. Insert natural breathing pauses between phrases so the learner can easily follow and understand every word without feeling rushed. NEVER rush your words.`
                 : `\n\n[PACING & ENUNCIATION]: Speak clearly, warmly, and with natural articulation.`;
+
+            const targetLangLabel =
+              activeScenario.targetLang === 'ja'
+                ? 'Japanese'
+                : activeScenario.targetLang === 'zh'
+                ? 'Mandarin Chinese'
+                : 'English';
 
             ws.send(
               JSON.stringify({
@@ -2725,7 +2783,11 @@ export default function App() {
                         prebuiltVoiceConfig: {
                           voiceName:
                             activePersona.geminiVoice ||
-                            (activeScenario.targetLang === 'ja' ? 'Aoede' : 'Puck'),
+                            (activeScenario.targetLang === 'ja'
+                              ? 'Aoede'
+                              : activeScenario.targetLang === 'zh'
+                              ? 'Kore'
+                              : 'Puck'),
                         },
                       },
                     },
@@ -2738,7 +2800,7 @@ export default function App() {
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: a "Guru Galak Tapi Penuh Perhatian" (sharp, witty, deeply caring mentor). Intercept spoken grammar/particle/tense errors immediately with contextual tough-love and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Keep 85%+ of turns composed without forced every-turn laughter ("Haha/あはは"), and shift accents/dialects naturally when teaching or demonstrating contrast.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${targetLangLabel}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: a "Guru Galak Tapi Penuh Perhatian" (sharp, witty, observant, deeply caring mentor). Intercept spoken grammar/particle/tense/tone errors immediately with contextual tough-love and require Echo Redemption (make the learner repeat the corrected sentence aloud right now before moving on). Never speak like a bland generic AI. Keep 85%+ of turns composed without forced every-turn laughter ("Haha/あはは"), and speak with vivid natural personality in 2-4 spoken sentences (max 45 words). Shift accents/dialects naturally when teaching or demonstrating contrast.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
                       },
                     ],
                   },
@@ -4332,7 +4394,7 @@ export default function App() {
                   {/* Ucapan Partner AI Fokus Kontak Mata */}
                   <div
                     data-testid="live-translation-hud"
-                    className="w-full text-left pt-2 border-t border-[#EDE5D4]/80 space-y-1"
+                    className="w-full text-left pt-2 border-t border-[#EDE5D4]/80 space-y-2"
                   >
                     {isAiThinking ? (
                       <div
@@ -4361,16 +4423,16 @@ export default function App() {
                             targetLang={activeScenario.targetLang}
                             showFurigana={!isMeasureMode}
                             showRomaji={!isMeasureMode}
-                            className="text-[15px] sm:text-[17px] font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
+                            className="text-[15px] sm:text-[17px] font-semibold text-[#1C1611] tracking-[-0.01em] break-words"
                             rubyClassName="text-[15px] sm:text-[17px]"
-                            romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
+                            romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-1"
                           />
                         </div>
 
                         {!isMeasureMode && showTranslations && (
                           <p
                             data-testid="live-hud-ai-translation"
-                            className="text-xs sm:text-[13px] text-[#6E5E47] leading-snug break-words"
+                            className="text-xs sm:text-[13px] text-[#6E5E47] leading-relaxed break-words pt-0.5"
                           >
                             {locale === 'th'
                               ? activeAiSubtitle.translationTh

@@ -1,9 +1,10 @@
 import React from 'react';
 import { renderFuriganaHtml, toPhoneticRomaji, stripEmojisAndEmotWords } from '../lib/japanesePhonetics';
+import { renderMandarinRubyHtml, toPhoneticPinyin, containsHanzi } from '../lib/mandarinPhonetics';
 
-interface JapaneseRubyDisplayProps {
+export interface JapaneseRubyDisplayProps {
   text: string;
-  targetLang?: 'en' | 'ja';
+  targetLang?: 'en' | 'ja' | 'zh';
   showRomaji?: boolean;
   showFurigana?: boolean;
   className?: string;
@@ -25,42 +26,88 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
   const clean = stripEmojisAndEmotWords(text);
   if (!clean) return null;
 
-  const isJapanese = targetLang === 'ja' || /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF]/.test(clean);
-
-  if (!isJapanese) {
-    return <span className={className}>{clean}</span>;
-  }
-
   const examBodyLock =
     typeof document !== 'undefined' && Boolean(document.body?.classList?.contains('fz-exam-mode'));
   const allowFurigana = showFurigana && !examBodyLock;
   const allowRomaji = showRomaji && !examBodyLock;
 
-  const furiganaHtml = renderFuriganaHtml(clean, { hideFurigana: !allowFurigana });
-  const romaji = allowRomaji ? toPhoneticRomaji(clean) : '';
-
   const Component = as;
 
-  return (
-    <Component className={`fz-ja-display-wrap ${as === 'span' ? 'inline-block align-middle' : 'space-y-0.5'} ${className}`}>
-      {/* 1. Baris Teks Utama dengan Furigana Ruby di atas Kanji (otomatis tersembunyi di Mode Ujian) */}
-      <span
-        lang="ja"
-        data-testid="japanese-ruby-text"
-        className={`fz-ja-ruby-text leading-relaxed break-words block ${rubyClassName}`}
-        dangerouslySetInnerHTML={{ __html: furiganaHtml }}
-      />
+  // 1. MANDARIN CHINESE (targetLang === 'zh' OR explicitly contains Hanzi without Japanese Kana)
+  const isMandarin =
+    targetLang === 'zh' ||
+    (containsHanzi(clean) && !/[\u3040-\u30FF]/.test(clean) && targetLang !== 'ja');
 
-      {/* 2. Baris Romaji Fonetik Eksak (partikel は = wa, を = o, へ = e) */}
-      {allowRomaji && romaji && (
+  if (isMandarin) {
+    const rubyHtml = renderMandarinRubyHtml(clean, { hideRuby: !allowFurigana });
+    const pinyin = allowRomaji ? toPhoneticPinyin(clean) : '';
+
+    return (
+      <Component
+        className={`fz-zh-display-wrap ${
+          as === 'span' ? 'inline-block align-middle' : 'space-y-1'
+        } ${className}`}
+      >
+        {/* 1. Baris Teks Utama Mandarin dengan Pinyin Ruby di atas Hanzi */}
         <span
-          lang="ja-Latn"
-          data-testid="japanese-romaji-text"
-          className={`fz-ja-romaji-text block text-[11px] sm:text-xs text-[#8C6D1F] font-medium tracking-wide break-words leading-tight ${romajiClassName}`}
-        >
-          {romaji}
-        </span>
-      )}
-    </Component>
-  );
+          lang="zh-CN"
+          data-testid="mandarin-ruby-text"
+          className={`fz-zh-ruby-text leading-[2.2] pt-1 break-words block ${rubyClassName}`}
+          dangerouslySetInnerHTML={{ __html: rubyHtml }}
+        />
+
+        {/* 2. Baris Pinyin Fonetik Bersih Tanpa Hanzi */}
+        {allowRomaji && pinyin && (
+          <span
+            lang="zh-Latn"
+            data-testid="mandarin-pinyin-text"
+            className={`fz-zh-pinyin-text block text-[11px] sm:text-xs text-[#BE123C] font-semibold tracking-wide break-words leading-tight ${romajiClassName}`}
+          >
+            {pinyin}
+          </span>
+        )}
+      </Component>
+    );
+  }
+
+  // 2. JAPANESE (targetLang === 'ja' OR contains Kana/Kanji)
+  const isJapanese =
+    targetLang === 'ja' || /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF]/.test(clean);
+
+  if (isJapanese) {
+    const furiganaHtml = renderFuriganaHtml(clean, { hideFurigana: !allowFurigana });
+    const romaji = allowRomaji ? toPhoneticRomaji(clean) : '';
+
+    return (
+      <Component
+        className={`fz-ja-display-wrap ${
+          as === 'span' ? 'inline-block align-middle' : 'space-y-1'
+        } ${className}`}
+      >
+        {/* 1. Baris Teks Utama Jepang dengan Furigana Ruby di atas Kanji */}
+        <span
+          lang="ja"
+          data-testid="japanese-ruby-text"
+          className={`fz-ja-ruby-text leading-[2.2] pt-1 break-words block ${rubyClassName}`}
+          dangerouslySetInnerHTML={{ __html: furiganaHtml }}
+        />
+
+        {/* 2. Baris Romaji Fonetik Eksak Bersih Tanpa Kanji/Kana */}
+        {allowRomaji && romaji && (
+          <span
+            lang="ja-Latn"
+            data-testid="japanese-romaji-text"
+            className={`fz-ja-romaji-text block text-[11px] sm:text-xs text-[#8C6D1F] font-medium tracking-wide break-words leading-tight ${romajiClassName}`}
+          >
+            {romaji}
+          </span>
+        )}
+      </Component>
+    );
+  }
+
+  // 3. ENGLISH / LATIN (plain text)
+  return <span className={className}>{clean}</span>;
 };
+
+export const CjkRubyDisplay = JapaneseRubyDisplay;

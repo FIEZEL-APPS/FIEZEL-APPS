@@ -1,6 +1,6 @@
-import { CallScenario, VoicePersona } from '../types/voiceCall';
-import { FIEZEL_LIFE_CALL_SCENARIOS } from './fiezelLifeCallScenarios';
-import { IELTS_CALL_SCENARIOS } from './ieltsCallScenarios';
+import type { CallScenario, VoicePersona } from '../types/voiceCall.ts';
+import { FIEZEL_LIFE_CALL_SCENARIOS } from './fiezelLifeCallScenarios.ts';
+import { IELTS_CALL_SCENARIOS } from './ieltsCallScenarios.ts';
 
 export const FIEZEL_CORE_LORE = `
 [FIEZEL ECOSYSTEM & IDENTITY]:

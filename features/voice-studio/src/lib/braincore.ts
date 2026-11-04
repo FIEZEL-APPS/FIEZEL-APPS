@@ -1,4 +1,4 @@
-import {
+import type {
   BraincoreStoreState,
   CallScenario,
   CallTurn,
@@ -12,7 +12,7 @@ import {
   MisconceptionLedgerEntry,
   SpeakingSessionMetric,
   TargetLang,
-} from '../types/voiceCall';
+} from '../types/voiceCall.ts';
 
 /**
  * Canonical parameters from coordination/braincore-contract.json

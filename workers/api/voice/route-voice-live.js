@@ -352,14 +352,25 @@ function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id') {
     const text = cleanSpokenText(item.text || '');
     if (!looksLikeTargetLang(text, targetLang)) continue;
     const meta = defaultBadges[valid.length] || defaultBadges[0];
-    const hint = cleanSpokenText(item.hint || (locale === 'th' ? item.hintTh : item.hintId) || item.translation || '').slice(0, 260);
+    let hint = cleanSpokenText(item.hint || (locale === 'th' ? item.hintTh : item.hintId) || item.translation || '').slice(0, 260);
+    let pronunciation = cleanSpokenText(item.pronunciation || item.phonetic || '').slice(0, 260);
+
+    // CRITICAL: Clean any leaked Hanzi/Kanji from pronunciation and mother-tongue hints
+    if (targetLang === 'ja') {
+      pronunciation = pronunciation.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g, '').trim();
+      hint = hint.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '').trim();
+    } else if (targetLang === 'zh') {
+      pronunciation = pronunciation.replace(/[\u3400-\u4dbf\u4e00-\u9fff]/g, '').trim();
+      hint = hint.replace(/[\u3400-\u4dbf\u4e00-\u9fff]+/g, '').trim();
+    }
+
     valid.push({
       id: `ai_rt_${Date.now()}_${valid.length}`,
       tier: item.tier === 'easy' || item.tier === 'mission' || item.tier === 'rescue' ? item.tier : meta.tier,
       badgeId: cleanSpokenText(item.badgeId || item.labelId || meta.badgeId).slice(0, 40) || meta.badgeId,
       badgeTh: cleanSpokenText(item.badgeTh || item.labelTh || meta.badgeTh).slice(0, 40) || meta.badgeTh,
       text,
-      pronunciation: cleanSpokenText(item.pronunciation || item.phonetic || '').slice(0, 260),
+      pronunciation,
       hintId: locale === 'th' ? cleanSpokenText(item.hintId || hint).slice(0, 260) : hint,
       hintTh: locale === 'th' ? hint : cleanSpokenText(item.hintTh || hint).slice(0, 260),
       hint,
@@ -634,14 +645,14 @@ export async function routeVoicePartnerTurn(ctx) {
       ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
       : '',
     `Learner said: "${userText}"`,
-    `1) "aiReply": Reply as ${personaName} in 1-3 punchy spoken sentences (max 25 words, no emojis, no forced "Haha/あはは" starter). Translate into aiReplyTranslation (${targetLocaleName}).`,
-    `2) "replies": 3 spontaneous spoken replies the learner can say NEXT directly answering your new aiReply (if you demanded Echo Redemption, easy=exact corrected sentence to repeat; mission=detail; rescue=answer+question back). Translate each in hint (${targetLocaleName}).`,
+    `1) "aiReply": Reply as ${personaName} in 2-4 punchy spoken sentences (max 45 words, no emojis, no forced "Haha/あはは" starter). Deliver witty, sharp mentor pedagogy ("Guru Galak Tapi Penuh Perhatian") with tough-love correction when grammar/tone is wrong, and demand Echo Redemption. Translate into clean aiReplyTranslation (${targetLocaleName}) without raw Hanzi/Kanji.`,
+    `2) "replies": 3 spontaneous spoken replies the learner can say NEXT directly answering your new aiReply (if you demanded Echo Redemption, easy=exact corrected sentence to repeat; mission=detail; rescue=answer+question back). Translate each in hint (${targetLocaleName}). In pronunciation: 100% word-spaced Romaji for JA, 100% tone-marked Pinyin for ZH, ZERO Hanzi/Kanji!`,
     `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
   ]
     .filter(Boolean)
     .join('\n');
 
-  const gen = await runGeminiJsonWithPool(keys, prompt, 0.55, 600);
+  const gen = await runGeminiJsonWithPool(keys, prompt, 0.72, 700);
   if (!gen.ok || !gen.parsed) {
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
@@ -652,7 +663,12 @@ export async function routeVoicePartnerTurn(ctx) {
   }
 
   const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang, locale);
-  const aiReplyTranslation = cleanSpokenText(gen.parsed.aiReplyTranslation || gen.parsed.aiReplyTranslationId || gen.parsed.aiReplyTranslationTh || '');
+  let aiReplyTranslation = cleanSpokenText(gen.parsed.aiReplyTranslation || gen.parsed.aiReplyTranslationId || gen.parsed.aiReplyTranslationTh || '');
+  if (targetLang === 'ja') {
+    aiReplyTranslation = aiReplyTranslation.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '').trim();
+  } else if (targetLang === 'zh') {
+    aiReplyTranslation = aiReplyTranslation.replace(/[\u3400-\u4dbf\u4e00-\u9fff]+/g, '').trim();
+  }
 
   return jsonResponse({
     ok: true,
