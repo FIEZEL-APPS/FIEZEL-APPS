@@ -1,7 +1,7 @@
 {
-  "version": "m025-763",
-  "claimedBy": "branch fix/voice-studio-total-overhaul-m025-763",
-  "claimedAt": "2026-11-04T15:39:11.382Z",
-  "reason": "fix(voice): overhaul gemini live duplex mic streaming and cjk phonetics",
+  "version": "m025-764",
+  "claimedBy": "branch feat/voice-mentor-hood-m025-764",
+  "claimedAt": "2026-11-04T22:21:53.363Z",
+  "reason": "fix(voice): upgrade whiteboard pedagogical contrast, deeper comprehension quiz, and voice failsafe",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -67,13 +67,45 @@ const PRIORITY_VOICE_STUDIO_WORDS = {
   '職種': 'しょくしゅ',
   '塩気': 'しおけ',
   'お供': 'おとも',
+  '来た': 'きた',
+  '来て': 'きて',
+  '来る': 'くる',
+  '来ます': 'きます',
+  '堅苦しい': 'かたくるしい',
+  '堅苦しく': 'かたくるしく',
+  '教科書': 'きょうかしょ',
+  '日本語': 'にほんご',
+  '話したら': 'はなしたら',
+  '話して': 'はなして',
+  '話す': 'はなす',
+  'その場': 'そのば',
+  '入れる': 'いれる',
+  '入れて': 'いれて',
+  '正直': 'しょうじき',
+  '言いなさい': 'いいなさい',
+  '言って': 'いって',
+  '最近': 'さいきん',
+  '一番': 'いちばん',
+  '丸暗記': 'まるあんき',
+  '喋ったら': 'しゃべったら',
+  '喋って': 'しゃべって',
+  '喋る': 'しゃべる',
+  '図書館': 'としょかん',
+  '勉強': 'べんきょう',
+  '食堂': 'しょくどう',
+  '食べました': 'たべました',
+  '食べる': 'たべる',
+  'やっと': 'やっと',
+  'あんた': 'あんた',
+  'ねえ': 'ねえ',
+  'ちょっと': 'ちょっと',
+  'もっと': 'もっと',
+  'ちゃんと': 'ちゃんと',
 };
 
 if (dict && dict.WORDS) {
   for (const [wKey, wKana] of Object.entries(PRIORITY_VOICE_STUDIO_WORDS)) {
-    if (!dict.WORDS[wKey]) {
-      dict.WORDS[wKey] = { kana: wKana };
-    }
+    dict.WORDS[wKey] = { kana: wKana };
   }
 }
 
@@ -166,6 +198,13 @@ export function stripEmojisAndEmotWords(text) {
     .replace(/\*[^*]+\*/g, '')
     // Strip parenthetical emote descriptions like (laughing), (smiling face)
     .replace(/\([^)]*(?:laugh|smile|chuckle|giggle|sigh|wink|pause|face|happy|sad)[^)]*\)/gi, '')
+    // FIEZEL copy invariant: no em-dash / en-dash on screen (CJK -> 、, ranges -> -, else ", ")
+    .replace(/(\S)\s*[\u2014\u2013]+\s*(\S)/g, (m, a, b) => {
+      if (/[\u3040-\u30ff\u3400-\u9fff\uff00-\uffef]/.test(a + b)) return `${a}、${b}`;
+      if (/[A-Za-z0-9]/.test(a) && /[A-Za-z0-9]/.test(b) && !/\s/.test(m)) return `${a}-${b}`;
+      return `${a}, ${b}`;
+    })
+    .replace(/\s*[\u2014\u2013]+\s*/g, ' ')
     .replace(/\s{2,}/g, ' ')
     .trim();
 }
@@ -427,8 +466,15 @@ export function tokenizeJapaneseToRuby(rawText) {
       continue;
     }
 
-    // 3. Other particles
-    if (PARTICLES[ch] && prev && !prev.isPunct && !prev.isSpace && !/[ぁぃぅぇぉっゃゅょゎ]/.test(clean[i + 1])) {
+    // 3. Other particles (never split immediately after sokuon っ or at the start of a sentence)
+    if (
+      PARTICLES[ch] &&
+      prev &&
+      !prev.isPunct &&
+      !prev.isSpace &&
+      clean[i - 1] !== 'っ' &&
+      !/[ぁぃぅぇぉっゃゅょゎえ]/.test(clean[i + 1])
+    ) {
       tokens.push({ text: ch, isKanji: false, isParticle: true, romaji: PARTICLES[ch] });
       i++;
       continue;
@@ -453,7 +499,13 @@ export function tokenizeJapaneseToRuby(rawText) {
     // 5. Hiragana run
     let hira = '';
     while (i < clean.length && /[\u3040-\u309F]/.test(clean[i])) {
-      if (PARTICLES[clean[i]] && !/[ぁぃぅぇぉっゃゅょゎ]/.test(clean[i + 1]) && (!dict?.WORDS || !dict.WORDS[clean.substr(i, 2)])) {
+      if (
+        hira.length > 0 &&
+        clean[i - 1] !== 'っ' &&
+        PARTICLES[clean[i]] &&
+        !/[ぁぃぅぇぉっゃゅょゎ]/.test(clean[i + 1]) &&
+        (!dict?.WORDS || !dict.WORDS[clean.substr(i, 2)])
+      ) {
         break;
       }
       hira += clean[i];

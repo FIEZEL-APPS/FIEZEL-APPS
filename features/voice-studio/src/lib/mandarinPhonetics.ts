@@ -33,7 +33,7 @@ const PUNCT_MAP: Record<string, string> = {
   '”': '"',
   '‘': "'",
   '’': "'",
-  '—': '-',
+  '\u2014': ',',
   '…': '...',
 };
 
@@ -211,7 +211,7 @@ export function toPhoneticPinyin(rawText: string): string {
   let pinyin = parts
     .join(' ')
     .replace(/\s+(?:ér|r)\b/g, 'r')
-    .replace(/-\s+-/g, '—')
+    .replace(/,\s*,/g, ',')
     .replace(/\s+([.,!?:;~")\]}])/g, '$1')
     .replace(/([(\[{"])\s+/g, '$1')
     .replace(/\s{2,}/g, ' ')

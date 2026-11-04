@@ -270,8 +270,8 @@ const MISCONCEPTION_HUMAN_LABELS: Record<
     lang: 'ja',
   },
   ja_particle_ni_for_action_place: {
-    id: 'Partikel Lokasi Aksi (で vs に) — ×図書館に勉強する',
-    th: 'คำช่วยสถานที่ทำกิจกรรม (で vs に) — ×図書館に勉強する',
+    id: 'Partikel Lokasi Aksi (で vs に), ×図書館に勉強する',
+    th: 'คำช่วยสถานที่ทำกิจกรรม (で vs に), ×図書館に勉強する',
     fix: 'Tempat berlangsungnya aktivitas aktif WAJIB memakai で (✓図書館で勉強する)',
     lang: 'ja',
   },
@@ -543,11 +543,12 @@ function mergeHostBraincoreMastery(
 }
 
 function syncCompetencyToHostBkt(comp: CompetencyRecord): void {
-  if (typeof localStorage === 'undefined') return;
+  if (typeof localStorage === 'undefined' || !comp) return;
   try {
+    const cidStr = String(comp.competencyId || 'kaiwa_general');
     const isJa =
-      comp.competencyId.includes('_ja_') ||
-      comp.competencyId.startsWith('ja_') ||
+      cidStr.includes('_ja_') ||
+      cidStr.startsWith('ja_') ||
       localStorage.getItem('fz_target_course') === 'ja';
     const targetKeys = isJa
       ? ['fiezel-mastery-bkt-v1@ja', 'fiezel-mastery-bkt-v1']
@@ -964,15 +965,15 @@ export function inferLearnerCharacterProfile(
   noteId: string;
   noteTh: string;
 } {
-  const recent = Array.isArray(history) ? history.slice(-8) : [];
-  const sampleText = `${recent.map((r) => r.userExactTranscript).join(' ')} ${latestTranscript || ''}`;
+    const recent = Array.isArray(history) ? history.filter(Boolean).slice(-8) : [];
+    const sampleText = `${recent.map((r) => String(r?.userExactTranscript || '')).join(' ')} ${latestTranscript || ''}`;
   const watashiCount = (sampleText.match(/私は|わたしは|\bwatashi wa\b/gi) || []).length;
 
   if (watashiCount >= 2) {
     return {
       archetype: 'stiff_textbook',
       noteId:
-        'Karakter: Kaku Buku Teks ("Kanebo Kering") — sering mengulang subjek formal seperti 私は/watashi wa. Roasting kekakuannya dengan hangat dan ajari cara bicara ringkas ala penutur asli!',
+        'Karakter: Kaku Buku Teks ("Kanebo Kering"), sering mengulang subjek formal seperti 私は/watashi wa. Roasting kekakuannya dengan hangat dan ajari cara bicara ringkas ala penutur asli!',
       noteTh:
         'บุคลิก: ติดสำนวนตำราเรียน แข็งทื่อ ชอบพูดประธานซ้ำๆ แซวอย่างอบอุ่นแล้วสอนสำนวนธรรมชาติของเจ้าของภาษา',
     };
@@ -985,7 +986,7 @@ export function inferLearnerCharacterProfile(
       recent.reduce((sum, item) => sum + (item.fluencyScore || 0), 0) / recent.length;
     const avgWords =
       recent.reduce(
-        (sum, item) => sum + Math.max(1, item.userExactTranscript.trim().split(/\s+/).length),
+        (sum, item) => sum + Math.max(1, String(item?.userExactTranscript || '').trim().split(/\s+/).length),
         0
       ) / recent.length;
 
@@ -993,7 +994,7 @@ export function inferLearnerCharacterProfile(
       return {
         archetype: 'fast_careless',
         noteId:
-          'Karakter: Lancar tapi Ceroboh (Autopilot Tabrak Lari Grammar) — berani bicara cepat namun sering salah partikel/tenses karena terjemahan kata-per-kata di kepala. Tegur & roasting kebiasaan autopilotnya dengan tajam tapi peduli!',
+          'Karakter: Lancar tapi Ceroboh (Autopilot Tabrak Lari Grammar), berani bicara cepat namun sering salah partikel/tenses karena terjemahan kata-per-kata di kepala. Tegur & roasting kebiasaan autopilotnya dengan tajam tapi peduli!',
         noteTh:
           'บุคลิก: พูดคล่องแต่สะเพร่าเรื่องไวยากรณ์ มักแปลคำต่อคำในหัว ต้องเบรกและแก้ไวยากรณ์ทันทีอย่างเข้มงวดแต่จริงใจ',
       };
@@ -1003,7 +1004,7 @@ export function inferLearnerCharacterProfile(
       return {
         archetype: 'hesitant_shy',
         noteId:
-          'Karakter: Ragu-ragu & Hati-hati — kalimat masih pendek karena takut salah. Jangan mengintimidasi berlebihan; bangun kepercayaan dirinya sambil tetap mengoreksi salah grammar dengan jelas.',
+          'Karakter: Ragu-ragu & Hati-hati, kalimat masih pendek karena takut salah. Jangan mengintimidasi berlebihan; bangun kepercayaan dirinya sambil tetap mengoreksi salah grammar dengan jelas.',
         noteTh:
           'บุคลิก: ขี้อายและลังเล ประโยคสั้นเพราะกลัวผิด ให้กำลังใจควบคู่กับการแก้ไวยากรณ์อย่างชัดเจน',
       };
@@ -1013,7 +1014,7 @@ export function inferLearnerCharacterProfile(
       return {
         archetype: 'confident_natural',
         noteId:
-          'Karakter: Percaya Diri & Tajam — akurasi grammar tinggi. Tantang dengan tempo natural, idiom/slang asli, atau variasi dialek/aksen agar naik kelas!',
+          'Karakter: Percaya Diri & Tajam, akurasi grammar tinggi. Tantang dengan tempo natural, idiom/slang asli, atau variasi dialek/aksen agar naik kelas!',
         noteTh:
           'บุคลิก: มั่นใจและแม่นยำ ท้าทายด้วยความเร็วธรรมชาติ สำนวนเจ้าของภาษา หรือสำเนียงท้องถิ่น',
       };
@@ -1023,7 +1024,7 @@ export function inferLearnerCharacterProfile(
   return {
     archetype: 'balanced_growing',
     noteId:
-      'Karakter: Bertumbuh Stabil — responsif dalam percakapan. Tangkap setiap salah grammar seketika (wajib Echo Redemption) dan pancing kalimat yang lebih ekspresif.',
+      'Karakter: Bertumbuh Stabil, responsif dalam percakapan. Tangkap setiap salah grammar seketika (wajib Echo Redemption) dan pancing kalimat yang lebih ekspresif.',
     noteTh:
       'บุคลิก: กำลังพัฒนาอย่างสมดุล แก้ไวยากรณ์ที่ผิดทันทีและให้พูดทวนประโยคที่ถูกต้องเสมอ',
   };
@@ -1256,7 +1257,7 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
                 competencyId: String(eventPayload.competencyId || 'kaiwa_general'),
                 scenarioId: String(eventPayload.scenarioId || 'scen_ja_n5_kissaten'),
                 course:
-                  eventPayload.competencyId?.includes('ja') || (eventPayload as any).course === 'ja'
+                  String(eventPayload.competencyId || '').includes('ja') || (eventPayload as any).course === 'ja'
                     ? 'ja'
                     : 'en',
                 verdict:
@@ -1325,16 +1326,41 @@ export function loadBraincoreState(): BraincoreStoreState {
     if (!Array.isArray(parsed.speakingHistory)) {
       parsed.speakingHistory = [];
     } else {
-      parsed.speakingHistory = parsed.speakingHistory.filter(
-        (item) => !/^hist_[1-5]$/.test(String(item?.id || ''))
-      );
+      parsed.speakingHistory = parsed.speakingHistory
+        .filter((item) => item && typeof item === 'object' && !/^hist_[1-5]$/.test(String(item?.id || '')))
+        .map((item) => ({
+          ...item,
+          userExactTranscript: String(item.userExactTranscript || ''),
+          scenarioId: String(item.scenarioId || ''),
+          competencyId: String(item.competencyId || 'kaiwa_general'),
+        }));
     }
-    if (
-      parsed.misconceptionLedger &&
-      parsed.misconceptionLedger['speak_en_a2_past_trip::past_tense_irregular_goed']?.lastUtterance ===
-        'Last weekend I goed to Bandung with my brother.'
-    ) {
-      delete parsed.misconceptionLedger['speak_en_a2_past_trip::past_tense_irregular_goed'];
+    if (!parsed.misconceptionLedger || typeof parsed.misconceptionLedger !== 'object' || Array.isArray(parsed.misconceptionLedger)) {
+      parsed.misconceptionLedger = {};
+    } else {
+      const sanitizedLedger: Record<string, MisconceptionLedgerEntry> = {};
+      for (const [mKey, rawEntry] of Object.entries<any>(parsed.misconceptionLedger)) {
+        if (!rawEntry || typeof rawEntry !== 'object') continue;
+        if (
+          mKey === 'speak_en_a2_past_trip::past_tense_irregular_goed' &&
+          rawEntry.lastUtterance === 'Last weekend I goed to Bandung with my brother.'
+        ) {
+          continue;
+        }
+        const parts = String(mKey || '').split('::');
+        const safeCompId = String(rawEntry.competencyId || parts[0] || 'kaiwa_general');
+        const safeMiscId = String(rawEntry.misconceptionId || parts[1] || mKey || 'grammar_slip');
+        sanitizedLedger[mKey] = {
+          ...rawEntry,
+          competencyId: safeCompId,
+          misconceptionId: safeMiscId,
+          frequency: Math.max(1, Number(rawEntry.frequency ?? rawEntry.count ?? 1)),
+          lastUtterance: String(rawEntry.lastUtterance || ''),
+          correctionPattern: String(rawEntry.correctionPattern || ''),
+          resolved: Boolean(rawEntry.resolved),
+        };
+      }
+      parsed.misconceptionLedger = sanitizedLedger;
     }
     if (typeof parsed.totalSpeakingSeconds !== 'number' || parsed.totalSpeakingSeconds < 0) {
       parsed.totalSpeakingSeconds = parsed.speakingHistory.reduce(
@@ -1346,6 +1372,11 @@ export function loadBraincoreState(): BraincoreStoreState {
     if (parsed.competencies) {
       for (const cid of Object.keys(parsed.competencies)) {
         const c = parsed.competencies[cid];
+        if (!c || typeof c !== 'object') {
+          delete parsed.competencies[cid];
+          continue;
+        }
+        c.competencyId = String(c.competencyId || cid);
         if (c.lastAt) {
           const elapsedDays = Math.max(0, (now - c.lastAt) / 86400_000);
           c.pMasteryDecayed = bktDecay(c.pMastery, elapsedDays);
@@ -1970,22 +2001,24 @@ export function buildBraincoreCognitiveDossier(
     .sort((a, b) => (b.hits || 0) - (a.hits || 0));
   for (const cw of chronicList.slice(0, 3)) {
     const label = locale === 'th' ? cw.labelTh : cw.labelId;
-    const sample = cw.lastBrokenUtterance ? ` — Contoh salah murid: "${cw.lastBrokenUtterance}"` : '';
+    const sample = cw.lastBrokenUtterance ? `, Contoh salah murid: "${cw.lastBrokenUtterance}"` : '';
     const fix = cw.targetFixPattern ? ` → Perbaikan: "${cw.targetFixPattern}"` : '';
     weaknesses.push(`Miskonsepsi Berulang (${cw.hits}x): ${label}${sample}${fix}`);
   }
 
   // 2b. Unresolved Voice Studio misconceptionLedger entries
-  for (const entry of Object.values(state.misconceptionLedger || {})) {
+  for (const [mKey, entry] of Object.entries(state.misconceptionLedger || {})) {
     if (!entry || entry.resolved) continue;
-    const isJaEntry = entry.competencyId.includes('_ja_');
-    if (targetLang === 'ja' && !isJaEntry && entry.competencyId.includes('_en_')) continue;
+    const entryCompId = String(entry.competencyId || mKey.split('::')[0] || '');
+    const entryMiscId = String(entry.misconceptionId || mKey.split('::')[1] || mKey);
+    const isJaEntry = entryCompId.includes('_ja_') || entryCompId.startsWith('ja_');
+    if (targetLang === 'ja' && !isJaEntry && entryCompId.includes('_en_')) continue;
     if (targetLang === 'en' && isJaEntry) continue;
-    const h = humanizeMisconceptionId(entry.misconceptionId, locale, entry.competencyId);
-    const line = `jebakan ${h.label} (${entry.frequency}x, ucapan terakhir: "${entry.lastUtterance}")${
+    const h = humanizeMisconceptionId(entryMiscId, locale, entryCompId);
+    const line = `jebakan ${h.label} (${entry.frequency || 1}x, ucapan terakhir: "${entry.lastUtterance || ''}")${
       entry.correctionPattern || h.fix ? ` → seharusnya: ${entry.correctionPattern || h.fix}` : ''
     }`;
-    if (weaknesses.length < 5 && !weaknesses.some((w) => w.includes(h.label))) {
+    if (weaknesses.length < 5 && !weaknesses.some((w) => String(w || '').includes(h.label))) {
       weaknesses.push(line);
     }
   }
@@ -2045,7 +2078,7 @@ export function buildBraincoreCognitiveDossier(
   const personalFactsLine =
     mem.userBrain.personalFacts.length > 0
       ? mem.userBrain.personalFacts.join(' | ')
-      : 'Belum ada fakta pribadi tercatat — tanyakan dan ingat cerita/hobi/aktivitas murid!';
+      : 'Belum ada fakta pribadi tercatat, tanyakan dan ingat cerita/hobi/aktivitas murid!';
   const recentSessions = (mem.mentorBrain.sessionSummaries || [])
     .filter((s) => s.targetLang === targetLang)
     .slice(-2);
@@ -2057,23 +2090,23 @@ export function buildBraincoreCognitiveDossier(
               `[${new Date(s.timestamp).toLocaleDateString('id-ID')}: ${s.turnCount} gilir; ${s.mentorTakeaway}]`
           )
           .join(' ')
-      : 'Ini sesi awal bersama murid di bahasa ini — bangun kesan pertama sebagai guru galak tapi penuh perhatian!';
+      : 'Ini sesi awal bersama murid di bahasa ini, bangun kesan pertama sebagai guru galak tapi penuh perhatian!';
 
   return [
     '[FIEZEL BRAINCORE LIVE TELEMETRY & TWO-WAY MEMORY DOSSIER]:',
     `- Profil Murid: Nama="${learnerName}" | Level=${activeLevel} | Streak=${hostSnap.streakDays || 1} hari | Total Sesi Telepon=${state.completedCallSessions || 0}`,
     `- Pembacaan Karakter Murid (User Character Reading): ${locale === 'th' ? charProfile.noteTh : charProfile.noteId}`,
-    `- TITIK PINTAR MURID (Verified Strengths — akui & apresiasi saat relevan): ${
+    `- TITIK PINTAR MURID (Verified Strengths, akui & apresiasi saat relevan): ${
       strengths.length > 0 ? strengths.slice(0, 5).join(' ; ') : 'Sedang membangun fondasi percakapan awal'
     }`,
-    `- TITIK LEMAH & MISKONSEPSI AKTIF (Weaknesses & Grammar Traps — WAJIB diuji, ditegur jika terulang, dan diarahkan): ${
+    `- TITIK LEMAH & MISKONSEPSI AKTIF (Weaknesses & Grammar Traps, WAJIB diuji, ditegur jika terulang, dan diarahkan): ${
       weaknesses.length > 0
         ? weaknesses.slice(0, 6).join(' ; ')
         : 'Pantau ketepatan partikel/tenses dan cegah terjemahan kata-per-kata'
     }`,
     `- FOKUS INSTRUKSI GURU HARI INI: ${focusDirective}`,
     `- MEMORI OTAK USER (Fakta & Cerita Murid Lintas Sesi): ${personalFactsLine}`,
-    `- MEMORI OTAK AI MENTOR (Catatan Sesi Sebelumnya): ${sessionMemLine}`,
+    `- MEMORI OTAK MENTOR (Catatan Sesi Sebelumnya): ${sessionMemLine}`,
     `- KEWAJIBAN PENGGUNAAN DATA BRAINCORE: Kamu TERHUBUNG PENUH dengan otak aplikasi FIEZEL di atas. Jika murid bertanya "aku pintar di mana / lemah di mana / harus fokus apa?", sebutkan data nyata TITIK PINTAR dan TITIK LEMAH mereka secara spesifik! Saat ngobrol, pancing mereka memakai pola yang masih lemah agar mereka benar-benar naik level.`,
   ].join('\n');
 }
@@ -2135,6 +2168,69 @@ export async function brainSyncFlush(
       syncQueue: capped,
     });
     return { nextState: updated, flushedCount: 0 };
+  }
+}
+
+export function dispatchVoiceAppNavigation(
+  destination: string,
+  options?: { quickSession?: boolean; topic?: string; course?: string; reason?: string }
+): boolean {
+  const cleanDest = String(destination || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '')
+    .trim();
+  if (!cleanDest || typeof window === 'undefined') return false;
+
+  try {
+    const payload = {
+      destination: cleanDest,
+      course: options?.course ? String(options.course).toLowerCase() : undefined,
+      reason: options?.reason ? String(options.reason) : undefined,
+      quickSession: Boolean(options?.quickSession),
+      topic: String(options?.topic || '').slice(0, 120),
+      requestedAt: Date.now(),
+    };
+    const isIframe = window.parent && window.parent !== window;
+    if (isIframe) {
+      const targetOrigin =
+        window.location.origin && window.location.origin !== 'null' ? window.location.origin : '*';
+      const nonce = getStudioNonce();
+      if (nonce) {
+        window.parent.postMessage(
+          {
+            v: 1,
+            type: 'fz.studio.navigate',
+            nonce,
+            seq: studioSeq++,
+            sentAt: Date.now(),
+            payload,
+          },
+          targetOrigin
+        );
+      }
+      window.parent.postMessage(
+        {
+          type: 'FIEZEL_VOICE_STUDIO_NAVIGATE',
+          payload,
+        },
+        targetOrigin
+      );
+      return true;
+    }
+
+    // Standalone call.html fallback: navigate top-level window directly
+    if (cleanDest === 'kurikulum') {
+      window.location.href = './kurikulum.html';
+      return true;
+    }
+    if (cleanDest === 'misi') {
+      window.location.href = './misi.html';
+      return true;
+    }
+    window.location.href = `./index.html#${encodeURIComponent(cleanDest)}`;
+    return true;
+  } catch {
+    return false;
   }
 }
 
