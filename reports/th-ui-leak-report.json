@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-11-03T21:18:41.968Z",
+  "generatedAt": "2026-11-04T12:15:43.658Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -337,7 +337,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 731,
+          "line": 815,
           "text": "Pilih bahasa untuk melanjutkan"
         }
       ]
@@ -582,8 +582,8 @@
     }
   },
   "copyKeys": {
-    "id": 4698,
-    "th": 4522,
+    "id": 4701,
+    "th": 4525,
     "idTanpaTh": 0
   },
   "pass": true

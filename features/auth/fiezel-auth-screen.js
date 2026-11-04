@@ -120,9 +120,11 @@
   }
   function wave() {
     return '<svg class="fz-auth-wave fz-auth-wave-h" viewBox="0 0 390 80" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+      + '<path class="fz-wave-back" d="M0 32 C100 0 185 6 260 40 C318 66 358 52 390 22 L390 80 L0 80 Z" fill="#EBDDC8" opacity="0.45"/>'
       + '<path class="fz-wave-front" d="M0 44 C90 12 175 16 250 52 C310 76 355 64 390 34 L390 80 L0 80 Z" fill="#F8F3E9"/>'
       + '</svg>'
       + '<svg class="fz-auth-wave-v" viewBox="0 0 160 900" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+      + '<path class="fz-wave-back-v" d="M0 0 C50 180 110 360 60 540 C10 720 70 840 20 900 L160 900 L160 0 Z" fill="#EBDDC8" opacity="0.45"/>'
       + '<path class="fz-wave-front-v" d="M0 0 C70 180 130 360 80 540 C30 720 90 840 40 900 L160 900 L160 0 Z" fill="#F8F3E9"/>'
       + '</svg>';
   }
