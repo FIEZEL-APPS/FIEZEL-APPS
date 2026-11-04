@@ -1,4 +1,4 @@
-import { CallScenario } from '../types/voiceCall';
+import type { CallScenario } from '../types/voiceCall.ts';
 
 /**
  * FIEZEL · features/voice-studio/src/data/fiezel-lifeCallScenarios.ts

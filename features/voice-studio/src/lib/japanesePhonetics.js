@@ -671,13 +671,15 @@ export function toPhoneticRomaji(text) {
       return `${prefix}-${suffix}`;
     });
 
-  // STRICT INVARIANT: ZERO KANJI LEAKAGE IN ROMAJI
+  // STRICT INVARIANT: ZERO KANJI OR KANA LEAKAGE IN ROMAJI
   if (KANJI_REGEX.test(romaji)) {
     romaji = romaji.replace(/[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3005]/g, (k) => {
       const s = dict && typeof dict.lookupSingle === 'function' ? dict.lookupSingle(k) : null;
       return s && s.romaji ? s.romaji : '';
     });
   }
+  // Absolute fallback: strip any remaining CJK or Kana characters so pronunciation is 100% clean Latin
+  romaji = romaji.replace(/[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3005]/g, '');
 
   romaji = romaji.replace(/\s{2,}/g, ' ').trim();
 

@@ -268,12 +268,30 @@ body {
   }
 }
 
-/* Japanese Furigana & Ruby Typography */
-ruby.fz-ja-ruby {
+/* CJK Furigana & Pinyin Ruby Typography (Anti-Overlap Invariant) */
+.fz-ja-display-wrap,
+.fz-zh-display-wrap {
+  position: relative;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.fz-ja-ruby-text,
+.fz-zh-ruby-text {
+  line-height: 2.2 !important;
+  display: block;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+ruby.fz-ja-ruby,
+ruby.zh-ruby {
   ruby-position: over;
   display: inline-ruby;
   vertical-align: baseline;
+  line-height: 2.2 !important;
 }
+
 rt.fz-ja-rt {
   font-size: 0.62em;
   font-weight: 600;
@@ -281,8 +299,24 @@ rt.fz-ja-rt {
   line-height: 1;
   user-select: none;
   text-align: center;
+  margin-bottom: 2px;
 }
-.fz-ja-romaji-text {
+
+rt.zh-rt {
+  font-size: 0.62em;
+  font-weight: 700;
+  color: #BE123C;
+  line-height: 1;
+  user-select: none;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.fz-ja-romaji-text,
+.fz-zh-pinyin-text {
   font-feature-settings: "liga" 1;
   letter-spacing: 0.02em;
+  margin-top: 4px;
+  line-height: 1.4 !important;
+  display: block;
 }

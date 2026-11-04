@@ -1,4 +1,5 @@
 import { toPhoneticRomaji, renderFuriganaHtml, stripEmojisAndEmotWords } from './japanesePhonetics.js';
+import { toPhoneticPinyin, renderMandarinRubyHtml, containsHanzi, stripHanzi } from './mandarinPhonetics.ts';
 
 export interface BeginnerReplyCard {
   id: string;
@@ -830,9 +831,70 @@ export async function fetchLiveTranslation(
   return '';
 }
 
+function sanitizeTranslationOutput(text: string): string {
+  if (!text) return '';
+  // If translation contains raw Hanzi or Kanji embedded inside quotes or parens, convert or strip them
+  return text
+    .replace(/["'「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'」』]/g, (_match, inner) => {
+      if (/[\u4e00-\u9fff]/.test(inner)) {
+        const py = toPhoneticPinyin(inner);
+        return py ? `"${py}"` : '';
+      }
+      const ro = toPhoneticRomaji(inner);
+      return ro ? `"${ro}"` : '';
+    })
+    .replace(/[\u4e00-\u9fff\u3040-\u30ff]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function approximateMandarinToIndonesian(text: string): string {
+  if (text.includes('你好') && (text.includes('小糯米') || text.includes('练习中文') || text.includes('聊点儿什么'))) {
+    return 'Halo! Aku Xiao Mochi. Senang sekali bisa berlatih bahasa Mandarin bersamamu! Hari ini kamu ingin mengobrol apa?';
+  }
+  if (text.includes('今天') && (text.includes('聊什么') || text.includes('聊点儿什么'))) {
+    return 'Hari ini kamu ingin mengobrol tentang topik apa?';
+  }
+  if (text.includes('等一下') || text.includes('注意一下') || text.includes('声调')) {
+    return 'Tunggu sebentar, perhatikan nada pengucapanmu ya! Coba ulangi dengan nada yang tepat.';
+  }
+  if (text.includes('你说得') || text.includes('很棒') || text.includes('很好')) {
+    return 'Bagus sekali! Pengucapan dan kalimatmu barusan terdengar sangat alami!';
+  }
+  if (text.includes('想吃') || text.includes('想喝') || text.includes('咖啡') || text.includes('菜')) {
+    return 'Kedengarannya lezat! Kamu ingin makan atau minum apa hari ini?';
+  }
+  if (text.includes('在') && (text.includes('哪儿') || text.includes('哪里'))) {
+    return 'Di mana lokasinya atau tempat yang biasa kamu tuju?';
+  }
+  if (text.includes('做') && text.includes('什么')) {
+    return 'Apa yang sedang atau biasanya kamu lakukan?';
+  }
+  if (text.includes('为什么')) {
+    return 'Kenapa bisa begitu? Apa alasannya?';
+  }
+  if (text.includes('怎么样') || text.includes('好吗') || text.includes('吗') || text.includes('呢') || text.includes('？') || text.includes('?')) {
+    return 'Xiao Mochi menanyakan ceritamu lebih lanjut. Silakan jawab santai ya!';
+  }
+  return 'Xiao Mochi menanggapi dan mendengarkan ceritamu dengan hangat.';
+}
+
+function approximateMandarinToThai(text: string): string {
+  if (text.includes('你好') && (text.includes('小糯米') || text.includes('练习中文') || text.includes('聊点儿什么'))) {
+    return 'สวัสดีครับ! ผมคือเสี่ยวโนโมจิ ดีใจมากที่ได้ฝึกภาษาจีนด้วยกัน วันนี้อยากคุยเรื่องอะไรดีครับ?';
+  }
+  if (text.includes('等一下') || text.includes('注意一下') || text.includes('声调')) {
+    return 'เดี๋ยวก่อนนะ ระวังเสียงวรรณยุกต์ตรงนี้นิดนึง ลองออกเสียงตามให้ชัดเจนนะครับ!';
+  }
+  if (text.includes('怎么样') || text.includes('好吗') || text.includes('吗') || text.includes('呢') || text.includes('？') || text.includes('?')) {
+    return 'เสี่ยวโนโมจิกำลังถามความคิดเห็นของคุณอยู่ ตอบกลับได้สบายๆ เลยครับ!';
+  }
+  return 'เสี่ยวโนโมจิตอบรับเรื่องที่คุณเล่าอย่างอบอุ่น';
+}
+
 export function translateAndPhoneticizeLiveText(
   rawText: string,
-  targetLang: 'en' | 'ja',
+  targetLang: 'en' | 'ja' | 'zh',
   explicitTranslationId?: string,
   explicitTranslationTh?: string,
   explicitPronunciation?: string
@@ -850,43 +912,67 @@ export function translateAndPhoneticizeLiveText(
 
   const lower = clean.toLowerCase();
   for (const item of KNOWN_UTTERANCE_TRANSLATIONS) {
-    if (lower.includes(item.match.toLowerCase())) {
-      const furiganaHtml = targetLang === 'ja' ? renderFuriganaHtml(clean) : undefined;
+    const m = item.match.toLowerCase();
+    // Strict match: exact equality or starting with prefix and close in total length
+    if (lower === m || (lower.startsWith(m) && Math.abs(lower.length - m.length) <= 12)) {
+      const furiganaHtml = targetLang === 'ja' ? renderFuriganaHtml(clean) : targetLang === 'zh' ? renderMandarinRubyHtml(clean) : undefined;
       return {
         text: clean,
-        pronunciation: explicitPronunciation || (targetLang === 'ja' ? toPhoneticRomaji(clean) : approximateEnglishPhoneticId(clean)),
-        translationId: explicitTranslationId || item.translationId,
-        translationTh: explicitTranslationTh || item.translationTh,
+        pronunciation: explicitPronunciation || (targetLang === 'ja' ? toPhoneticRomaji(clean) : targetLang === 'zh' ? toPhoneticPinyin(clean) : approximateEnglishPhoneticId(clean)),
+        translationId: sanitizeTranslationOutput(explicitTranslationId || item.translationId),
+        translationTh: sanitizeTranslationOutput(explicitTranslationTh || item.translationTh),
         furiganaHtml,
       };
     }
   }
 
+  // Trigger non-blocking background translation hydration if not cached yet
+  const cachedId = liveTranslationCache.get(`id:${clean}`);
+  const cachedTh = liveTranslationCache.get(`th:${clean}`);
+  if (!cachedId && !explicitTranslationId && typeof window !== 'undefined') {
+    void fetchLiveTranslation(clean, 'id').catch(() => {});
+  }
+  if (!cachedTh && !explicitTranslationTh && typeof window !== 'undefined') {
+    void fetchLiveTranslation(clean, 'th').catch(() => {});
+  }
+
+  if (targetLang === 'zh') {
+    const pinyin = explicitPronunciation || toPhoneticPinyin(clean);
+    const idTrans = explicitTranslationId || cachedId || approximateMandarinToIndonesian(clean);
+    const thTrans = explicitTranslationTh || cachedTh || approximateMandarinToThai(clean);
+    const furiganaHtml = renderMandarinRubyHtml(clean);
+    return {
+      text: clean,
+      pronunciation: pinyin.replace(/[\u4e00-\u9fff]/g, '').trim(),
+      translationId: sanitizeTranslationOutput(idTrans),
+      translationTh: sanitizeTranslationOutput(thTrans),
+      furiganaHtml,
+    };
+  }
+
   if (targetLang === 'ja') {
     const romaji = explicitPronunciation || toPhoneticRomaji(clean);
-    const idTrans = explicitTranslationId || approximateJapaneseToIndonesian(clean);
-    const thTrans = explicitTranslationTh || approximateJapaneseToThai(clean);
+    const idTrans = explicitTranslationId || cachedId || approximateJapaneseToIndonesian(clean);
+    const thTrans = explicitTranslationTh || cachedTh || approximateJapaneseToThai(clean);
     const furiganaHtml = renderFuriganaHtml(clean);
     return {
       text: clean,
-      pronunciation: romaji,
-      translationId: idTrans,
-      translationTh: thTrans,
+      pronunciation: romaji.replace(/[\u3040-\u30ff\u4e00-\u9faf]/g, '').trim(),
+      translationId: sanitizeTranslationOutput(idTrans),
+      translationTh: sanitizeTranslationOutput(thTrans),
       furiganaHtml,
     };
   }
 
   const phoneticEn = explicitPronunciation || approximateEnglishPhoneticId(clean);
-  const cachedId = liveTranslationCache.get(`id:${clean}`);
-  const cachedTh = liveTranslationCache.get(`th:${clean}`);
   const idTrans = explicitTranslationId || cachedId || approximateEnglishToIndonesian(clean);
   const thTrans = explicitTranslationTh || cachedTh || approximateEnglishToThai(clean);
 
   return {
     text: clean,
     pronunciation: phoneticEn,
-    translationId: idTrans,
-    translationTh: thTrans,
+    translationId: sanitizeTranslationOutput(idTrans),
+    translationTh: sanitizeTranslationOutput(thTrans),
   };
 }
 

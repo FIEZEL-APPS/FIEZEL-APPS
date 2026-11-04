@@ -220,18 +220,17 @@ export class SileroNeuralVadGate {
               return;
             }
           } else {
-            // Listening state: require >= 4 frames (128ms) with pSpeech >= 0.58 & rms >= 0.004.
-            // Any frame below that threshold increments silenceStreak without a [0.42, 0.62) dead-zone,
-            // so mobile AGC post-speech air never stalls turn completion.
+            // Listening state: sensitive human vocal onset (>= 2 frames / 64ms with pSpeech >= 0.45 & rms >= 0.002).
+            // Guarantees quiet speech and laptop/headset built-in mics immediately open audio burst without clipping.
             const isMobile =
               typeof navigator !== 'undefined' &&
               (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
             const endSilenceFrames = isMobile ? 11 : 13; // ~352ms mobile, ~416ms desktop
-            if (pSpeech >= 0.58 && rms >= 0.004) {
+            if (pSpeech >= 0.45 && rms >= 0.002) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
-              if (speechStreak >= 4) {
+              if (speechStreak >= 2) {
                 burstOpen = true;
                 if (!this.confirmedSpeaking) {
                   this.confirmedSpeaking = true;

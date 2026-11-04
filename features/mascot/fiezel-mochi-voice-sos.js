@@ -3345,7 +3345,12 @@
                 if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && !_awaitingOpeningModelTurn && _activeAudioSources.length === 0) {
                   _pendingFollowupBillable = true;
                   try {
-                    _ws.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
+                    _ws.send(
+                      JSON.stringify({
+                        realtimeInput: { audioStreamEnd: true },
+                        clientContent: { turns: [{ role: 'user', parts: [] }], turnComplete: true },
+                      })
+                    );
                   } catch (_) {}
                 }
               }, isMob ? 360 : 440);
@@ -3527,7 +3532,12 @@
                       if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && !_awaitingOpeningModelTurn && _activeAudioSources.length === 0) {
                         _pendingFollowupBillable = true;
                         try {
-                          _ws.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
+                          _ws.send(
+                            JSON.stringify({
+                              realtimeInput: { audioStreamEnd: true },
+                              clientContent: { turns: [{ role: 'user', parts: [] }], turnComplete: true },
+                            })
+                          );
                         } catch (_) {}
                       }
                     }

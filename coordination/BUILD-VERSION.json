@@ -1,7 +1,7 @@
 {
-  "version": "m025-761",
-  "claimedBy": "branch feat/desktop-auth-m025-761",
-  "claimedAt": "2026-11-04T12:15:11.130Z",
-  "reason": "feat(desktop-auth): [ALLOW-PROTECTED: auth|onboarding|pwa|ci] universal desktop 50/50 split-screen & mochi cloud cushion parity",
+  "version": "m025-762",
+  "claimedBy": "branch fix/voice-studio-pedagogy-mic-pinyin-m025-762",
+  "claimedAt": "2026-11-04T13:36:19.872Z",
+  "reason": "fix(voice): [ALLOW-PROTECTED: auth|pwa|ci] restore ruthless mentor pedagogy, unblock duplex mic, and eliminate kanji leak in pinyin & translations",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

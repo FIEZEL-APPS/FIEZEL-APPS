@@ -4,10 +4,11 @@ import type { BeginnerReplyCard } from '../lib/liveCallHelper';
 import type { CallScenario, LearnerLocale } from '../types/voiceCall';
 import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
 import { toPhoneticRomaji } from '../lib/japanesePhonetics';
+import { toPhoneticPinyin, containsHanzi, stripHanzi } from '../lib/mandarinPhonetics';
 
 export interface BeginnerAnswerAssistantProps {
   locale: LearnerLocale;
-  targetLang: 'en' | 'ja';
+  targetLang: 'en' | 'ja' | 'zh';
   scenario: CallScenario;
   aiQuestionText: string;
   aiQuestionTranslation: string;
@@ -116,13 +117,54 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
   const resolvePronunciationGuide = (card: BeginnerReplyCard): string => {
     const raw = (card.pronunciation || '').trim();
     if (targetLang === 'ja') {
-      // Prefer Gemini's word-spaced Hepburn Romaji when present and free of Japanese script
-      if (raw && /[A-Za-z]/.test(raw) && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(raw)) {
-        return raw;
+      // Strip any leaked Kanji/Kana characters
+      const cleaned = raw.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g, '').trim();
+      if (cleaned && /[A-Za-z]/.test(cleaned)) {
+        return cleaned;
       }
       return toPhoneticRomaji(card.text);
     }
+    if (targetLang === 'zh') {
+      // Strip any leaked Hanzi characters
+      const cleaned = raw.replace(/[\u3400-\u4dbf\u4e00-\u9fff]/g, '').trim();
+      if (cleaned && /[A-Za-z]/.test(cleaned)) {
+        return cleaned;
+      }
+      return toPhoneticPinyin(card.text);
+    }
     return raw;
+  };
+
+  const sanitizeMotherTongueHint = (hintText: string): string => {
+    if (!hintText) return '';
+    let res = hintText;
+    // 1. Convert quoted CJK to Romanized equivalent
+    res = res.replace(/["'「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'」』]/g, (_match, inner) => {
+      if (targetLang === 'zh') {
+        const py = toPhoneticPinyin(inner);
+        return py ? `"${py}"` : inner;
+      }
+      if (targetLang === 'ja') {
+        const ro = toPhoneticRomaji(inner);
+        return ro ? `"${ro}"` : inner;
+      }
+      return inner;
+    });
+    // 2. Convert or strip any remaining raw Hanzi from Mandarin translations
+    if (targetLang === 'zh' && containsHanzi(res)) {
+      res = res.replace(/[\u3400-\u4dbf\u4e00-\u9fff]+/g, (match) => {
+        const py = toPhoneticPinyin(match);
+        return py ? ` (${py}) ` : '';
+      });
+    }
+    // 3. Convert or strip any remaining raw Kanji/Kana from Japanese translations
+    if (targetLang === 'ja' && /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(res)) {
+      res = res.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, (match) => {
+        const ro = toPhoneticRomaji(match);
+        return ro ? ` (${ro}) ` : '';
+      });
+    }
+    return res.replace(/\s{2,}/g, ' ').trim();
   };
 
   return (
@@ -289,7 +331,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               >
                 <div
                   data-testid="teleprompter-target-text"
-                  className="text-[15px] sm:text-[17px] font-bold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
+                  className="text-[15px] sm:text-[17px] font-bold text-[#1C1611] leading-[2.2] pt-1 tracking-[-0.01em] break-words"
                 >
                   <JapaneseRubyDisplay
                     text={activeCard.text}
@@ -302,7 +344,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                 {resolvePronunciationGuide(activeCard) && (
                   <p
                     data-testid="teleprompter-pronunciation"
-                    className="text-[13px] sm:text-sm font-semibold text-[#8C2233] leading-snug break-words"
+                    className="text-[13px] sm:text-sm font-semibold text-[#8C2233] leading-relaxed break-words pt-1"
                   >
                     {resolvePronunciationGuide(activeCard)}
                   </p>
@@ -310,12 +352,12 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               </div>
 
               {/* Arti Bahasa Ibu + Tombol Aksi Suara / Kirim */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-1.5 border-t border-[#F2ECE0]">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2 border-t border-[#F2ECE0]">
                 <p
                   data-testid="teleprompter-meaning"
                   className="text-xs sm:text-[13px] text-[#5C4E3C] leading-snug min-w-0 flex-1 break-words"
                 >
-                  {locale === 'th' ? activeCard.hintTh || activeCard.hintId : activeCard.hintId}
+                  {sanitizeMotherTongueHint(locale === 'th' ? activeCard.hintTh || activeCard.hintId : activeCard.hintId)}
                 </p>
 
                 <div className="flex items-center justify-end gap-1.5 shrink-0">
