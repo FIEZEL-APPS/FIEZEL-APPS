@@ -840,6 +840,7 @@
   var ICON_CLIPBOARD_SVG = '<svg viewBox="0 0 36 36" width="32" height="32" fill="none" aria-hidden="true"><rect x="8" y="7" width="20" height="24" rx="4" fill="#8A1C2E"/><rect x="13" y="4.5" width="10" height="5" rx="2.2" fill="#5D111D"/><circle cx="18" cy="7" r="1.2" fill="#FDFAF3"/><path d="M13.5 19.5l3 3 6-6.5" stroke="#FDFAF3" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   function nameMarkup(env, typed) {
+    topbar(false, false);
     var clean = normalizeName(typed);
     return reveal(env, 1, 1, {
       showBack: false,
@@ -854,7 +855,7 @@
       + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
       + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '"></label>'
       + '<div class="fiezel-name-error" data-ob-name-error style="display:none;color:#ef4444;font-size:0.85rem;margin-top:6px;font-weight:600;line-height:1.4;"></div>'
-      + btn(T('onboarding.next-arrow'), 'data-ob-advance' + (clean ? '' : ' disabled'))
+      + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
       + dots(5, 0)
       + '</div>';
   }
