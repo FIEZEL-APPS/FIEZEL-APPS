@@ -961,6 +961,7 @@
     openGrammarModal: openGrammarModal,
     renderLatihanCards: renderLatihanCards,
     openCoursePickerModal: openCoursePickerModal,
+    openCourseModal: openCoursePickerModal,
     switchCourse: switchCourse,
     playToneAudio: playToneAudio,
     openLessonPlayer: openLessonPlayer,

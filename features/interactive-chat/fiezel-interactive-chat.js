@@ -44,6 +44,10 @@
       // Sinkronisasi target course aktif ('ja', 'en', atau 'zh')
       var lang = 'ja';
       try {
+        if (typeof localStorage !== 'undefined') {
+          var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel-active-course') || localStorage.getItem('fiezel_target_lang');
+          if (stored === 'zh' || stored === 'ja' || stored === 'en') lang = stored;
+        }
         if (typeof root.activeTargetLang === 'function') {
           var atl = root.activeTargetLang();
           if (atl === 'ja' || atl === 'en' || atl === 'zh') lang = atl;
@@ -54,16 +58,16 @@
         } else if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
           var c = root.FiezelI18n.getCourse();
           if (c === 'ja' || c === 'en' || c === 'zh') lang = c;
-        } else if (typeof localStorage !== 'undefined') {
-          var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel-active-course') || localStorage.getItem('fiezel_target_lang');
-          if (stored === 'ja' || stored === 'en' || stored === 'zh') lang = stored;
         }
       } catch (_) {}
 
       try {
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem('fiezel-active-course', lang);
-          localStorage.setItem('fz_target_course', lang);
+          var curCourse = localStorage.getItem('fz_target_course');
+          if (!curCourse || (curCourse !== 'zh' && curCourse !== 'ja' && curCourse !== 'en')) {
+            localStorage.setItem('fz_target_course', lang);
+          }
         }
       } catch (_) {}
 

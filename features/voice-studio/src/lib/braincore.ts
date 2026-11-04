@@ -1068,7 +1068,7 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: 'i
     if (typeof window !== 'undefined' && window.location && window.location.search) {
       const params = new URLSearchParams(window.location.search);
       const langParam = params.get('lang') || params.get('course');
-      if (langParam === 'ja' || langParam === 'en') {
+      if (langParam === 'ja' || langParam === 'en' || langParam === 'zh') {
         targetLang = langParam;
       }
       const locParam = params.get('locale') || params.get('hl');
@@ -1078,7 +1078,7 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: 'i
     }
     if (!targetLang) {
       const courseRaw = localStorage.getItem('fz_target_course');
-      if (courseRaw === 'ja' || courseRaw === 'en') {
+      if (courseRaw === 'ja' || courseRaw === 'en' || courseRaw === 'zh') {
         targetLang = courseRaw;
       }
     }

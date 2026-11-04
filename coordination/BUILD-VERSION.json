@@ -1,7 +1,7 @@
 {
-  "version": "m025-759",
-  "claimedBy": "branch feat/voice-mic-stream-m025-759",
-  "claimedAt": "2026-11-03T09:29:32.753Z",
-  "reason": "fix(voice): [ALLOW-PROTECTED: auth|pwa|ci] microphone stream unblock, vad sensitivity calibration, and mandarin suite consolidation (m025-759)",
+  "version": "m025-760",
+  "claimedBy": "branch feat/mandarin-core-fix-m025-760",
+  "claimedAt": "2026-11-03T21:08:09.365Z",
+  "reason": "fix(mandarin): [ALLOW-PROTECTED: auth|pwa|ci] wire core app lifecycle, exam question pools, and voice studio for mandarin (m025-760)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
