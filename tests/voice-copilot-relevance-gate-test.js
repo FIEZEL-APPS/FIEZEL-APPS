@@ -308,4 +308,30 @@ test('Evaluation JA: Real Japanese conjugation errors are flagged', () => {
   assert.ok(res.misconceptionId === 'polite_past_masu_deshita' || res.whyFailsId.includes('でした'));
 });
 
+test('Open-Topic JA & ZH: Persona opening questions produce natural topic starters without temporal-topic or spaced-Pinyin bugs', () => {
+  const jaCards = buildContextualFallbackCards({
+    aiText:
+      'あら、来たわね。あなたの得意なところも、助詞や活用でつまずきやすい癖もちゃんと把握してるわよ。変な日本語を使ったらすぐ止めるから覚悟してね。今日は何から話す？',
+    targetLang: 'ja',
+    locale: 'id',
+  });
+  assert.equal(jaCards.length, 3);
+  assert.ok(!jaCards[0].text.includes('今日がとても好き'), `Must never mis-extract 今日 as liked object: ${jaCards[0].text}`);
+  assert.ok(!/\.\s*$/.test(jaCards[0].hintId) || jaCards[0].hintId.length > 18, `Must never have truncated hint: ${jaCards[0].hintId}`);
+  assert.ok(!/[\u3040-\u30ff\u4e00-\u9fff]/.test(jaCards[0].pronunciation), `Zero Kana/Kanji in JA pronunciation: ${jaCards[0].pronunciation}`);
+  assert.ok(!/[\u3040-\u30ff\u4e00-\u9fff]/.test(jaCards[0].hintId), `Zero Kana/Kanji in JA hintId: ${jaCards[0].hintId}`);
+
+  const zhCards = buildContextualFallbackCards({
+    aiText:
+      '你好！我是小糯米（Xiao Mochi）。很高兴和你一起练习中文！不管是声调还是生词，只要有不确定的地方，我都会耐心地帮你纠正。今天你想聊点儿什么？',
+    targetLang: 'zh',
+    locale: 'id',
+  });
+  assert.equal(zhCards.length, 3);
+  assert.ok(!zhCards[0].text.includes('今天你想的'), `Must never mis-extract 今天你想 as liked object: ${zhCards[0].text}`);
+  assert.ok(!/\bW\s+ǒ\b/.test(zhCards[0].pronunciation), `Must never split Pinyin tone vowels with spaces: ${zhCards[0].pronunciation}`);
+  assert.ok(!/[\u3400-\u4dbf\u4e00-\u9fff]/.test(zhCards[0].pronunciation), `Zero Hanzi in ZH pronunciation: ${zhCards[0].pronunciation}`);
+  assert.ok(!/[\u3400-\u4dbf\u4e00-\u9fff]/.test(zhCards[0].hintId), `Zero Hanzi in ZH hintId: ${zhCards[0].hintId}`);
+});
+
 console.log(`\n🎉 ALL ${passed} VOICE COPILOT RELEVANCE TESTS PASSED 100%!`);

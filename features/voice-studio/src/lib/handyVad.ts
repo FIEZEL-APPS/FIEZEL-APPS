@@ -288,13 +288,13 @@ export class HandyHumanVad {
     }
 
     // Sub-band energy integration (31.25 Hz per bin @ 16 kHz)
-    // Rumble: bins 1..8 (31 - 250 Hz: cars, motorcycles, wind, mic bumps)
+    // Sub-vocal rumble ONLY: bins 1..2 (31 - 62.5 Hz: wind, mic bumps, DC rumble; NEVER 85-250 Hz human F0!)
     let rumbleEnergy = 0;
-    for (let k = 1; k <= 8; k++) rumbleEnergy += this.powSpec[k];
+    for (let k = 1; k <= 2; k++) rumbleEnergy += this.powSpec[k];
 
-    // Human vocal formants F1/F2/F3: bins 11..115 (343 - 3594 Hz)
+    // Human vocal fundamental + formants F0/F1/F2/F3: bins 4..115 (125 - 3594 Hz)
     let vocalFormantEnergy = 0;
-    for (let k = 11; k <= 115; k++) vocalFormantEnergy += this.powSpec[k];
+    for (let k = 4; k <= 115; k++) vocalFormantEnergy += this.powSpec[k];
 
     // Upper vocal harmonic/F2/F3 band: bins 24..122 (750 - 3812 Hz)
     let upperVocalEnergy = 0;
@@ -350,10 +350,10 @@ export class HandyHumanVad {
     // 2) Sharp click / knock transient (crestFactor > 6.2)
     // 3) Virtually no energy in F1-F3 vocal tract band or pure single-frequency low horn beep
     if (
-      vocalToRumble < 0.22 ||
-      vocalFormantShare < 0.16 ||
-      crestFactor > 6.2 ||
-      upperVocalShare < 0.012
+      vocalToRumble < 0.14 ||
+      vocalFormantShare < 0.12 ||
+      crestFactor > 6.8 ||
+      upperVocalShare < 0.008
     ) {
       return {
         score: 0,
@@ -595,4 +595,31 @@ export function float32At16kToPcm16Base64(samples16k: Float32Array): string {
     binary += String.fromCharCode(...Array.from(bytes.subarray(i, Math.min(i + CHUNK, bytes.length))));
   }
   return btoa(binary);
+}
+
+/**
+ * Resamples arbitrary hardware sample-rate Float32 audio (e.g. 44.1kHz / 48kHz)
+ * directly to 16kHz 16-bit little-endian PCM base64 for continuous Gemini Live duplex streaming.
+ */
+export function resampleFloat32To16kPcmBase64(
+  inputSamples: Float32Array,
+  inputSampleRate: number
+): string {
+  if (!inputSamples || inputSamples.length === 0) return '';
+  const fromRate = inputSampleRate > 0 ? inputSampleRate : HANDY_VAD_SAMPLE_RATE;
+  if (fromRate === HANDY_VAD_SAMPLE_RATE) {
+    return float32At16kToPcm16Base64(inputSamples);
+  }
+  const ratio = fromRate / HANDY_VAD_SAMPLE_RATE;
+  const outLen = Math.max(1, Math.floor(inputSamples.length / ratio));
+  const resampled = new Float32Array(outLen);
+  for (let i = 0; i < outLen; i++) {
+    const start = Math.floor(i * ratio);
+    let end = Math.min(inputSamples.length, Math.floor((i + 1) * ratio));
+    if (end <= start) end = Math.min(inputSamples.length, start + 1);
+    let acc = 0;
+    for (let k = start; k < end; k++) acc += inputSamples[k];
+    resampled[i] = acc / (end - start);
+  }
+  return float32At16kToPcm16Base64(resampled);
 }

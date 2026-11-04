@@ -117,20 +117,37 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
   const resolvePronunciationGuide = (card: BeginnerReplyCard): string => {
     const raw = (card.pronunciation || '').trim();
     if (targetLang === 'ja') {
-      // Strip any leaked Kanji/Kana characters
-      const cleaned = raw.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g, '').trim();
-      if (cleaned && /[A-Za-z]/.test(cleaned)) {
-        return cleaned;
+      const deterministic = toPhoneticRomaji(card.text);
+      const hasCjk = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(raw);
+      if (!hasCjk && raw && /[A-Za-z]/.test(raw) && raw.length >= Math.max(3, Math.floor(deterministic.length * 0.6))) {
+        return raw;
       }
-      return toPhoneticRomaji(card.text);
+      return deterministic;
     }
     if (targetLang === 'zh') {
-      // Strip any leaked Hanzi characters
-      const cleaned = raw.replace(/[\u3400-\u4dbf\u4e00-\u9fff]/g, '').trim();
-      if (cleaned && /[A-Za-z]/.test(cleaned)) {
-        return cleaned;
+      const deterministic = toPhoneticPinyin(card.text);
+      const hasCjk = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(raw);
+      const hasCorruptZhToken = raw
+        .split(/\s+/)
+        .some((tok) => tok.toLowerCase().replace(/[^a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]/g, '') === 'zh');
+      if (
+        !hasCjk &&
+        !hasCorruptZhToken &&
+        raw &&
+        /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(raw) &&
+        raw.length >= Math.max(3, Math.floor(deterministic.length * 0.6))
+      ) {
+        return raw;
       }
-      return toPhoneticPinyin(card.text);
+      return deterministic;
+    }
+    // For English, avoid echoing the exact same Latin sentence twice if pronunciation === text
+    if (
+      raw &&
+      raw.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+        String(card.text || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+    ) {
+      return '';
     }
     return raw;
   };
@@ -331,7 +348,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               >
                 <div
                   data-testid="teleprompter-target-text"
-                  className="text-[15px] sm:text-[17px] font-bold text-[#1C1611] leading-[2.2] pt-1 tracking-[-0.01em] break-words"
+                  className="text-[15px] sm:text-[17px] font-bold text-[#1C1611] leading-relaxed pt-1 tracking-[-0.01em] break-words"
                 >
                   <JapaneseRubyDisplay
                     text={activeCard.text}

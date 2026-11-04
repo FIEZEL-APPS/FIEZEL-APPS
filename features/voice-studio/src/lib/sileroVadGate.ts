@@ -58,7 +58,16 @@ function loadSileroBundle(): Promise<{ vad: GlobalVadNamespace; baseHref: string
   if (typeof window === 'undefined' || typeof document === 'undefined' || typeof WebAssembly === 'undefined') {
     return Promise.resolve(null);
   }
-  const win = window as unknown as { vad?: GlobalVadNamespace; __fzSileroBaseHref?: string };
+  const win = window as unknown as {
+    vad?: GlobalVadNamespace;
+    ort?: unknown;
+    __fzSileroBaseHref?: string;
+  };
+  // @ricky0123/vad-web UMD bundle requires global `window.ort` (onnxruntime-web).
+  // Skip script injection cleanly when `window.ort` is not preloaded to avoid dead script tags and console errors.
+  if (!win.ort) {
+    return Promise.resolve(null);
+  }
   if (win.vad?.MicVAD && typeof win.vad.MicVAD.new === 'function') {
     return Promise.resolve({
       vad: win.vad,

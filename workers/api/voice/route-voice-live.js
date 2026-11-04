@@ -226,9 +226,14 @@ export async function routeVoiceLiveSession(ctx) {
 export async function routeVoiceReportDrop(ctx) {
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
+  const closeCode = Number(body?.code || 0);
+  // Ignore normal closures (1000/1005) and client payload schema errors (1007) so valid API keys are never poisoned
+  if (closeCode === 1000 || closeCode === 1005 || closeCode === 1007) {
+    return jsonResponse({ ok: true, shifted: false, ignoredClientClose: true });
+  }
   const reason = String(body?.reason || '').toLowerCase();
   const isQuota =
-    body?.code === 1011 ||
+    closeCode === 1011 ||
     reason.includes('quota') ||
     reason.includes('limit') ||
     reason.includes('exhausted');
@@ -357,11 +362,11 @@ function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id') {
 
     // CRITICAL: Clean any leaked Hanzi/Kanji from pronunciation and mother-tongue hints
     if (targetLang === 'ja') {
-      pronunciation = pronunciation.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g, '').trim();
-      hint = hint.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '').trim();
+      pronunciation = pronunciation.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g, '').replace(/\s{2,}/g, ' ').trim();
+      hint = hint.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '').replace(/\s{2,}/g, ' ').trim();
     } else if (targetLang === 'zh') {
-      pronunciation = pronunciation.replace(/[\u3400-\u4dbf\u4e00-\u9fff]/g, '').trim();
-      hint = hint.replace(/[\u3400-\u4dbf\u4e00-\u9fff]+/g, '').trim();
+      pronunciation = pronunciation.replace(/[\u3400-\u4dbf\u4e00-\u9fff]/g, '').replace(/\s{2,}/g, ' ').trim();
+      hint = hint.replace(/[\u3400-\u4dbf\u4e00-\u9fff]+/g, '').replace(/\s{2,}/g, ' ').trim();
     }
 
     valid.push({
@@ -412,7 +417,7 @@ async function invokeSingleGeminiJson({
           generationConfig: {
             responseMimeType: 'application/json',
             temperature,
-            maxOutputTokens: Math.min(maxOutputTokens, 750),
+            maxOutputTokens: Math.min(maxOutputTokens, 1024),
             thinkingConfig,
           },
         }),
@@ -564,7 +569,7 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
     .join('\n');
 
   const temp = variationSeed > 0 || excludeList.length > 0 ? 0.75 : 0.45;
-  const gen = await runGeminiJsonWithPool(keys, prompt, temp, 500);
+  const gen = await runGeminiJsonWithPool(keys, prompt, temp, 850);
   if (!gen.ok || !gen.parsed) {
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
@@ -652,7 +657,7 @@ export async function routeVoicePartnerTurn(ctx) {
     .filter(Boolean)
     .join('\n');
 
-  const gen = await runGeminiJsonWithPool(keys, prompt, 0.72, 700);
+  const gen = await runGeminiJsonWithPool(keys, prompt, 0.72, 950);
   if (!gen.ok || !gen.parsed) {
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
@@ -778,11 +783,74 @@ export async function routeVoiceSyncKeys(ctx) {
   });
 }
 
+/**
+ * Handler POST /api/voice/translate
+ * Menerjemahkan kalimat percakapan live secara akurat ke Bahasa Indonesia / Thailand
+ * menggunakan kolam kunci Gemini (menggantikan endpoint tidak resmi translate.googleapis.com yang HTTP 500),
+ * dengan jaminan NOL kebocoran aksara Kanji/Hanzi/Kana mentah.
+ */
+export async function routeVoiceTranslate(ctx) {
+  const clientIp = (ctx.request && (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) || '';
+  if (!checkLiveRateLimit(clientIp, 90, 60000)) {
+    return jsonResponse({ ok: false, error: 'rate_limited' }, { status: 429 });
+  }
+
+  const keys = await resolvePoolKeys(ctx);
+  if (!keys.length) {
+    return jsonResponse({ ok: false, error: 'no_keys_configured' }, { status: 503 });
+  }
+
+  const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
+  const body = readRes?.value || {};
+  const rawText = cleanSpokenText(body.text || '').slice(0, 600);
+  if (!rawText) {
+    return badRequest('empty_text');
+  }
+
+  const targetLocale = body.targetLocale === 'th' || body.locale === 'th' ? 'th' : 'id';
+  const targetLangName = targetLocale === 'th' ? 'natural conversational Thai' : 'natural conversational Indonesian';
+
+  const prompt = [
+    `Translate the following spoken language-tutor utterance accurately and naturally into ${targetLangName}.`,
+    `STRICT RULES:`,
+    `1) Translate the EXACT meaning and tone (including playful teasing, grammar corrections, or questions) — NEVER output generic summaries like "Mochi menanggapi...".`,
+    `2) ZERO raw Chinese Hanzi, Japanese Kanji, Hiragana, or Katakana characters in the output! If the speaker mentions a specific Japanese/Chinese word to repeat, write its Romanized reading (Romaji/Pinyin) in quotes alongside its ${targetLangName} meaning.`,
+    `Utterance: "${rawText}"`,
+    `JSON only: {"translatedText":"..."}`,
+  ].join('\n');
+
+  const gen = await runGeminiJsonWithPool(keys, prompt, 0.2, 450);
+  if (!gen.ok || !gen.parsed) {
+    return jsonResponse({ ok: false, reason: gen.reason }, { status: 503 });
+  }
+
+  let translatedText = cleanSpokenText(
+    gen.parsed.translatedText || gen.parsed.translation || gen.parsed.aiMeaning || ''
+  );
+  // Strip any stray CJK characters so beginners never see raw Kanji/Hanzi in the translation line
+  translatedText = translatedText
+    .replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  if (!translatedText) {
+    return jsonResponse({ ok: false, reason: 'empty_translation' }, { status: 503 });
+  }
+
+  return jsonResponse({
+    ok: true,
+    translatedText,
+    locale: targetLocale,
+    model: gen.model,
+  });
+}
+
 export const ROUTES = [
   ['POST', '/api/voice/live-session', routeVoiceLiveSession],
   ['POST', '/api/voice/report-drop', routeVoiceReportDrop],
   ['POST', '/api/voice/copilot-assist', routeVoiceCopilotAssist],
   ['POST', '/api/voice/partner-turn', routeVoicePartnerTurn],
+  ['POST', '/api/voice/translate', routeVoiceTranslate],
   ['POST', '/api/voice/sync-keys', routeVoiceSyncKeys],
   ['POST', '/api/braincore/sync', routeVoiceBraincoreSync],
 ];

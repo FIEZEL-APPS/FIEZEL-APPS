@@ -1,7 +1,7 @@
 {
-  "version": "m025-762",
-  "claimedBy": "branch fix/voice-studio-pedagogy-mic-pinyin-m025-762",
-  "claimedAt": "2026-11-04T13:36:19.872Z",
-  "reason": "fix(voice): [ALLOW-PROTECTED: auth|pwa|ci] restore ruthless mentor pedagogy, unblock duplex mic, and eliminate kanji leak in pinyin & translations",
+  "version": "m025-763",
+  "claimedBy": "branch fix/voice-studio-total-overhaul-m025-763",
+  "claimedAt": "2026-11-04T15:39:11.382Z",
+  "reason": "fix(voice): overhaul gemini live duplex mic streaming and cjk phonetics",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -52,7 +52,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
         <span
           lang="zh-CN"
           data-testid="mandarin-ruby-text"
-          className={`fz-zh-ruby-text leading-[2.2] pt-1 break-words block ${rubyClassName}`}
+          className={`fz-zh-ruby-text leading-[2.6] pt-1.5 break-words block ${rubyClassName}`}
           dangerouslySetInnerHTML={{ __html: rubyHtml }}
         />
 
@@ -61,7 +61,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
           <span
             lang="zh-Latn"
             data-testid="mandarin-pinyin-text"
-            className={`fz-zh-pinyin-text block text-[11px] sm:text-xs text-[#BE123C] font-semibold tracking-wide break-words leading-tight ${romajiClassName}`}
+            className={`fz-zh-pinyin-text block text-[11px] sm:text-xs text-[#BE123C] font-semibold tracking-wide break-words leading-relaxed ${romajiClassName}`}
           >
             {pinyin}
           </span>
@@ -81,14 +81,14 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
     return (
       <Component
         className={`fz-ja-display-wrap ${
-          as === 'span' ? 'inline-block align-middle' : 'space-y-1'
+          as === 'span' ? 'inline-block align-middle' : 'space-y-1.5'
         } ${className}`}
       >
         {/* 1. Baris Teks Utama Jepang dengan Furigana Ruby di atas Kanji */}
         <span
           lang="ja"
           data-testid="japanese-ruby-text"
-          className={`fz-ja-ruby-text leading-[2.2] pt-1 break-words block ${rubyClassName}`}
+          className={`fz-ja-ruby-text leading-[2.6] pt-1.5 break-words block ${rubyClassName}`}
           dangerouslySetInnerHTML={{ __html: furiganaHtml }}
         />
 
@@ -97,7 +97,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
           <span
             lang="ja-Latn"
             data-testid="japanese-romaji-text"
-            className={`fz-ja-romaji-text block text-[11px] sm:text-xs text-[#8C6D1F] font-medium tracking-wide break-words leading-tight ${romajiClassName}`}
+            className={`fz-ja-romaji-text block text-[11px] sm:text-xs text-[#8C6D1F] font-medium tracking-wide break-words leading-relaxed ${romajiClassName}`}
           >
             {romaji}
           </span>

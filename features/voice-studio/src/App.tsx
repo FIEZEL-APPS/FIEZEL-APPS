@@ -73,7 +73,11 @@ import {
   synthesizeFlexibleTts,
   warmUpVoiceServices,
 } from './lib/liveTransport';
-import { HandyHumanVad, float32At16kToPcm16Base64 } from './lib/handyVad';
+import {
+  HandyHumanVad,
+  float32At16kToPcm16Base64,
+  resampleFloat32To16kPcmBase64,
+} from './lib/handyVad';
 import { SileroNeuralVadGate } from './lib/sileroVadGate';
 
 // 44-byte silent WAV used to "unlock" one persistent <audio> element inside a user tap.
@@ -350,11 +354,13 @@ export default function App() {
   const [isGeneratingCopilot, setIsGeneratingCopilot] = useState<boolean>(false);
   const [isRefreshingAssist, setIsRefreshingAssist] = useState<boolean>(false);
   const copilotAbortRef = useRef<AbortController | null>(null);
+  const inFlightCopilotKeyRef = useRef<string>('');
   const lastCopilotAiKeyRef = useRef<string>('');
   const copilotVariationSeedRef = useRef<number>(0);
   const copilotCardsRef = useRef<BeginnerReplyCard[]>([]);
   copilotCardsRef.current = copilotCards;
   const lastStreamedCopilotTextRef = useRef<string>('');
+  const livePlaybackSafetyTimerRef = useRef<number | null>(null);
 
   const [isRecordingPtt, setIsRecordingPtt] = useState<boolean>(false);
   const [isListeningLiveSpeech, setIsListeningLiveSpeech] = useState<boolean>(false);
@@ -654,7 +660,12 @@ export default function App() {
   const activePersona: VoicePersona =
     VOICE_PERSONAS[selectedPersonaId] && VOICE_PERSONAS[selectedPersonaId].targetLang === targetLang
       ? VOICE_PERSONAS[selectedPersonaId]
-      : (VOICE_PERSONAS[activeScenario.personaId] || (targetLang === 'ja' ? VOICE_PERSONAS.nanami : VOICE_PERSONAS.coach_alex));
+      : (VOICE_PERSONAS[activeScenario.personaId] ||
+          (targetLang === 'ja'
+            ? VOICE_PERSONAS.nanami
+            : targetLang === 'zh'
+            ? VOICE_PERSONAS.xiao_mochi
+            : VOICE_PERSONAS.coach_alex));
 
   // Pre-render the scenario's opening line so the call starts speaking with zero lag
   // without sending concurrent TTS requests that queue on Render's single worker.
@@ -692,37 +703,48 @@ export default function App() {
       .replace(/\s*\([^)]*\)\s*/g, '')
       .trim();
 
-  const splitSentences = (text: string, lang: 'en' | 'ja'): string[] => {
+  const splitSentences = (text: string, lang: TargetLang): string[] => {
     const clean = (text || '').trim();
     if (!clean) return [];
-    if (lang === 'ja') {
-      const matched = clean.match(/[^。！？\n]+[。！？\n]?/g);
+    if (lang === 'ja' || lang === 'zh') {
+      const matched = clean.match(/[^。！？!?.\n]+[。！？!?.\n]?/g);
       return matched ? matched.map((s) => s.trim()).filter(Boolean) : [clean];
     }
     const matched = clean.match(/[^.!?\n]+(?:[.!?]+|\n|$)/g);
     return matched ? matched.map((s) => s.trim()).filter(Boolean) : [clean];
   };
 
+  const isGenericPlaceholderTranslation = (txt: string | null | undefined): boolean => {
+    const clean = String(txt || '').trim();
+    if (!clean) return true;
+    return /(menanggapi ceritamu|mendengarkan ceritamu|mendengarkan dan menanggapi|menanggapi dan mendengarkan|menanyakan (?:pendapat|ceritamu)|Silakan jawab (?:dengan )?santai|กำลังถามความคิดเห็น|กำลังรับฟัง|ตอบรับเรื่องที่คุณเล่าอย่างอบอุ่น)/i.test(
+      clean
+    );
+  };
+
   const updateLiveAiTranslationDraft = (fullAiText: string) => {
     const sentences = splitSentences(fullAiText, activeScenario.targetLang);
     const targetLoc = locale === 'th' ? 'th' : 'id';
-    const combined = sentences
-      .map((raw, idx) => {
-        const s = raw.trim();
-        if (!s) return '';
-        const isComplete = idx < sentences.length - 1 || /[.?!。？！\n]$/.test(s);
-        const cached = liveSentenceTransMapRef.current.get(s);
-        if (cached && (targetLoc === 'th' ? cached.th : cached.id)) {
-          return targetLoc === 'th' ? cached.th : cached.id;
-        }
-        // Avoid flashing rapid broken partial translations mid-word during streaming
-        if (!isComplete && s.length < 8) return '';
-        const local = translateAndPhoneticizeLiveText(s, activeScenario.targetLang);
-        return targetLoc === 'th' ? local.translationTh : local.translationId;
-      })
-      .filter(Boolean)
-      .join(' ');
-    setLiveAiTranslationDraft(combined);
+    const pieces: string[] = [];
+    sentences.forEach((raw, idx) => {
+      const s = raw.trim();
+      if (!s) return;
+      const isComplete = idx < sentences.length - 1 || /[.?!。？！\n]$/.test(s);
+      const cached = liveSentenceTransMapRef.current.get(s);
+      const cachedVal = cached ? (targetLoc === 'th' ? cached.th : cached.id) : '';
+      if (cachedVal && !isGenericPlaceholderTranslation(cachedVal)) {
+        if (pieces[pieces.length - 1] !== cachedVal) pieces.push(cachedVal);
+        return;
+      }
+      if (!isComplete && s.length < 8) return;
+      const local = translateAndPhoneticizeLiveText(s, activeScenario.targetLang);
+      const localVal = targetLoc === 'th' ? local.translationTh : local.translationId;
+      // Never stack generic placeholder strings across multiple sentences while /api/voice/translate is in flight!
+      if (localVal && !isGenericPlaceholderTranslation(localVal)) {
+        if (pieces[pieces.length - 1] !== localVal) pieces.push(localVal);
+      }
+    });
+    setLiveAiTranslationDraft(pieces.join(' '));
   };
 
   const triggerRealtimeCopilotForAi = async (
@@ -742,12 +764,13 @@ export default function App() {
     const scen = opts?.scenarioOverride || activeScenario;
     const pers = opts?.personaOverride || activePersona;
     const dedupKey = `${scen.id}::${scen.targetLang}::${cleanAi}::${lastUserLine}`;
-    if (
-      !opts?.forceVariation &&
-      lastCopilotAiKeyRef.current === dedupKey &&
-      copilotCardsRef.current.length > 0
-    ) {
-      return;
+    if (!opts?.forceVariation) {
+      if (lastCopilotAiKeyRef.current === dedupKey && copilotCardsRef.current.length > 0) {
+        return;
+      }
+      if (inFlightCopilotKeyRef.current === dedupKey) {
+        return;
+      }
     }
 
     const currentSeq = ++copilotSeqRef.current;
@@ -762,6 +785,7 @@ export default function App() {
     }
     const controller = new AbortController();
     copilotAbortRef.current = controller;
+    inFlightCopilotKeyRef.current = dedupKey;
 
     if (!opts?.forceVariation && copilotCardsRef.current.length === 0) {
       setIsGeneratingCopilot(true);
@@ -788,11 +812,40 @@ export default function App() {
         setCopilotCards(validCards);
         setCopilotSource('ai-realtime');
       }
+      if (res.aiMeaningId || res.aiMeaningTh) {
+        const cleanId = res.aiMeaningId && !isGenericPlaceholderTranslation(res.aiMeaningId) ? res.aiMeaningId : '';
+        const cleanTh = res.aiMeaningTh && !isGenericPlaceholderTranslation(res.aiMeaningTh) ? res.aiMeaningTh : '';
+        if (liveAiDraftRef.current.trim() === cleanAi) {
+          const draftMeaning = locale === 'th' ? (cleanTh || cleanId) : cleanId;
+          if (draftMeaning) setLiveAiTranslationDraft(draftMeaning);
+        }
+        if (cleanId || cleanTh) {
+          setTurns((prev) =>
+            prev.map((tr) => {
+              if (tr.speaker !== 'ai' || tr.text.trim() !== cleanAi) return tr;
+              return {
+                ...tr,
+                translationId:
+                  !tr.translationId || isGenericPlaceholderTranslation(tr.translationId)
+                    ? cleanId || tr.translationId
+                    : tr.translationId,
+                translationTh:
+                  !tr.translationTh || isGenericPlaceholderTranslation(tr.translationTh)
+                    ? cleanTh || tr.translationTh
+                    : tr.translationTh,
+              };
+            })
+          );
+        }
+      }
     } catch {
       if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
     } finally {
       if (copilotAbortRef.current === controller) {
         copilotAbortRef.current = null;
+        if (inFlightCopilotKeyRef.current === dedupKey) {
+          inFlightCopilotKeyRef.current = '';
+        }
       }
       if (copilotSeqRef.current === currentSeq) {
         setIsGeneratingCopilot(false);
@@ -865,8 +918,10 @@ export default function App() {
     }
 
     const initialLine = activePersona.openingGreeting || activeScenario.openingLine;
-    const initialTransId = activePersona.openingGreetingTransId || activeScenario.openingTranslationId;
-    const initialTransTh = activePersona.openingGreetingTransTh || activeScenario.openingTranslationTh;
+    const initialTransId =
+      activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId;
+    const initialTransTh =
+      activePersona.openingGreetingTranslationTh || activeScenario.openingTranslationTh;
     const effectiveTurns: CallTurn[] =
       loadedTurns && loadedTurns.length > 0
         ? loadedTurns
@@ -958,13 +1013,11 @@ export default function App() {
         const next = s + 1;
         if (next >= MAX_CALL_DURATION_SEC) {
           stopLiveCall();
-          setStatusBanner({
-            type: 'info',
-            message:
-              locale === 'th'
-                ? 'เซสชันการโทร 5 นาทีสิ้นสุดลงแล้ว! พักสักครู่หรือเริ่มเซสชันใหม่ได้เสมอ'
-                : 'Sesi latihan percakapan 5 menit telah selesai! Istirahat sejenak atau mulai sesi baru.',
-          });
+          setStatusBanner(
+            locale === 'th'
+              ? 'เซสชันการโทร 5 นาทีสิ้นสุดลงแล้ว! พักสักครู่หรือเริ่มเซสชันใหม่ได้เสมอ'
+              : 'Sesi latihan percakapan 5 menit telah selesai! Istirahat sejenak atau mulai sesi baru.'
+          );
         }
         return next;
       });
@@ -1002,8 +1055,10 @@ export default function App() {
       // Ignore
     }
     const lineToSay = activePersona.openingGreeting || activeScenario.openingLine;
-    const transId = activePersona.openingGreetingTransId || activeScenario.openingTranslationId;
-    const transTh = activePersona.openingGreetingTransTh || activeScenario.openingTranslationTh;
+    const transId =
+      activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId;
+    const transTh =
+      activePersona.openingGreetingTranslationTh || activeScenario.openingTranslationTh;
     const openingTurn: CallTurn = {
       id: `turn_open_${activeScenario.id}_${Date.now()}`,
       speaker: 'ai',
@@ -1100,8 +1155,8 @@ export default function App() {
       stopLiveCall();
     }
     const lineToSay = p.openingGreeting || matchingScen.openingLine;
-    const transId = p.openingGreetingTransId || matchingScen.openingTranslationId;
-    const transTh = p.openingGreetingTransTh || matchingScen.openingTranslationTh;
+    const transId = p.openingGreetingTranslationId || matchingScen.openingTranslationId;
+    const transTh = p.openingGreetingTranslationTh || matchingScen.openingTranslationTh;
     const newOpeningTurn: CallTurn = {
       id: `turn_open_${matchingScen.id}_${Date.now()}`,
       speaker: 'ai',
@@ -1136,8 +1191,8 @@ export default function App() {
       stopLiveCall();
     }
     const lineToSay = p.openingGreeting || scen.openingLine;
-    const transId = p.openingGreetingTransId || scen.openingTranslationId;
-    const transTh = p.openingGreetingTransTh || scen.openingTranslationTh;
+    const transId = p.openingGreetingTranslationId || scen.openingTranslationId;
+    const transTh = p.openingGreetingTranslationTh || scen.openingTranslationTh;
     const newOpeningTurn: CallTurn = {
       id: `turn_open_${scen.id}_${Date.now()}`,
       speaker: 'ai',
@@ -1439,8 +1494,12 @@ export default function App() {
     if (!lower) return false;
     const cleanChars = lower.replace(/\s+/g, '');
     if (lang === 'en') {
-      if (cleanChars.split(/\s+/).length < 3) return true;
+      if (t.trim().split(/\s+/).length < 3) return true;
       return /\b(and|or|but|because|so|if|as|with|to|for|in|on|at|of|from|by|about|a|an|the|i|you|we|they|he|she|it|my|your|our|their|is|are|was|were|have|has|had|do|did|does|can|could|will|would|like|want|would like|could i|can i|give me|i'd|i'm|we're|there's|that's|what|where|when|why|how|uh|um|umm|er|err|well|hmm|like)\s*$/i.test(lower);
+    }
+    if (lang === 'zh') {
+      if (cleanChars.length <= 2) return true;
+      return /(的|和|跟|但是|可是|因为|所以|如果|虽然|在|给|对|呃|嗯|那个|就是)\s*$/i.test(lower);
     }
     if (cleanChars.length <= 4) return true;
     return /([\u306f\u304c\u3092\u306b\u3078\u3067\u3068\u304b\u3089\u307e\u3067\u3088\u308a\u306e\u304b\u306d\u3088\u3051\u3069\u306e\u3067\u3066\u3067\u3057\u305f\u308a]|ええと|あの|あのう|その|そのう|えー|えっと|んー|まあ|うーん|そうですね|eeto|ano|anou|sono|etto|un)\s*$/i.test(lower);
@@ -1453,6 +1512,10 @@ export default function App() {
   const interruptAiAndStartListening = () => {
     speakTokenRef.current += 1;
     clearSpeechWatchdog();
+    if (livePlaybackSafetyTimerRef.current) {
+      window.clearTimeout(livePlaybackSafetyTimerRef.current);
+      livePlaybackSafetyTimerRef.current = null;
+    }
     stopNeuralBufferSource();
     if (activeSourcesRef.current.length > 0) {
       activeSourcesRef.current.forEach((src) => {
@@ -2159,7 +2222,12 @@ export default function App() {
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRec) {
         const recognition = new SpeechRec();
-        recognition.lang = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
+        recognition.lang =
+          activeScenario.targetLang === 'ja'
+            ? 'ja-JP'
+            : activeScenario.targetLang === 'zh'
+            ? 'zh-CN'
+            : 'en-US';
         recognition.interimResults = true;
         recognition.continuous = true;
 
@@ -2334,6 +2402,12 @@ export default function App() {
       window.clearTimeout(liveOpeningAudioWatchdogRef.current);
       liveOpeningAudioWatchdogRef.current = null;
     }
+    if (livePlaybackSafetyTimerRef.current) {
+      window.clearTimeout(livePlaybackSafetyTimerRef.current);
+      livePlaybackSafetyTimerRef.current = null;
+    }
+    // Hentikan pemutaran TTS klasik sebelumnya agar suara pembuka & mic live tidak bertabrakan
+    interruptAiAndStartListening();
     setCallViewMode('stage');
     try {
       if (mainScrollRef.current) {
@@ -2403,7 +2477,6 @@ export default function App() {
                       wsRef.current.send(
                         JSON.stringify({
                           realtimeInput: {
-                            mediaChunks: [{ mimeType: 'audio/pcm;rate=16000', data: pcmBase64 }],
                             audio: { mimeType: 'audio/pcm;rate=16000', data: pcmBase64 },
                           },
                         })
@@ -2415,7 +2488,6 @@ export default function App() {
                       wsRef.current.send(
                         JSON.stringify({
                           realtimeInput: { audioStreamEnd: true },
-                          clientContent: { turns: [{ role: 'user', parts: [] }], turnComplete: true },
                         })
                       );
                     }
@@ -2479,12 +2551,6 @@ export default function App() {
               wsRef.current.send(
                 JSON.stringify({
                   realtimeInput: {
-                    mediaChunks: [
-                      {
-                        mimeType: 'audio/pcm;rate=16000',
-                        data: pcmBase64,
-                      },
-                    ],
                     audio: {
                       mimeType: 'audio/pcm;rate=16000',
                       data: pcmBase64,
@@ -2501,10 +2567,6 @@ export default function App() {
                   realtimeInput: {
                     audioStreamEnd: true,
                   },
-                  clientContent: {
-                    turns: [{ role: 'user', parts: [] }],
-                    turnComplete: true,
-                  },
                 })
               );
             }
@@ -2514,20 +2576,43 @@ export default function App() {
         const handleMicPcmData = (float32: Float32Array) => {
           if (isMicMutedRef.current) return;
           // Once Silero Neural VAD v5 WASM is active, it exclusively owns 16kHz human-speech streaming & barge-in.
-          // HandyHumanVad acts solely as zero-latency DSP fallback during ~120ms WASM boot or non-WASM environments.
           if (sileroVadGateRef.current?.isActive()) return;
 
-          // ACOUSTIC ECHO & ANTI-COLLISION SUPPRESSION:
-          // Saat AI sedang aktif bicara melalui speaker perangkat:
+          const sampleRate = liveCtx.sampleRate || 48000;
+
+          // ACOUSTIC ECHO SUPPRESSION + INSTANT BARGE-IN:
+          // Saat AI sedang berbicara, cegah echo speaker masuk ke Gemini Live, tetapi izinkan
+          // murid menyela (barge-in) seketika saat HandyHumanVad mendeteksi vokal manusia nyata!
           if (isPlayingAiAudioRef.current) {
+            const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
+            const rms = bargeVad.lastMetrics?.rms ?? 0;
+            if (bargeVad.speechStarted || (bargeVad.inSpeech && rms >= 0.016)) {
+              interruptAiAndStartListening();
+              setIsUserSpeakingLive(true);
+              if (
+                wsRef.current &&
+                wsRef.current.readyState === WebSocket.OPEN &&
+                isLiveConnectedRef.current &&
+                bargeVad.speechPcm16k &&
+                bargeVad.speechPcm16k.length > 0
+              ) {
+                const pcmBase64 = float32At16kToPcm16Base64(bargeVad.speechPcm16k);
+                wsRef.current.send(
+                  JSON.stringify({
+                    realtimeInput: {
+                      audio: {
+                        mimeType: 'audio/pcm;rate=16000',
+                        data: pcmBase64,
+                      },
+                    },
+                  })
+                );
+              }
+            }
             return;
           }
 
-          const vadRes = handyVadRef.current.processSamples(
-            float32,
-            liveCtx.sampleRate || 48000,
-            false
-          );
+          const vadRes = handyVadRef.current.processSamples(float32, sampleRate, false);
 
           if (vadRes.inSpeech) {
             lastHandySpeechAtRef.current = Date.now();
@@ -2538,35 +2623,18 @@ export default function App() {
             }, 450);
           }
 
+          // Stream continuous 16kHz PCM directly to Gemini 3.8 Live's native server-side Automatic VAD
+          // so speech onset, natural pauses, and end-of-turn silence are detected without clipping!
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-            if (vadRes.speechPcm16k && vadRes.speechPcm16k.length > 0) {
-              const pcmBase64 = float32At16kToPcm16Base64(vadRes.speechPcm16k);
+            const pcmBase64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
+            if (pcmBase64) {
               wsRef.current.send(
                 JSON.stringify({
                   realtimeInput: {
-                    mediaChunks: [
-                      {
-                        mimeType: 'audio/pcm;rate=16000',
-                        data: pcmBase64,
-                      },
-                    ],
                     audio: {
                       mimeType: 'audio/pcm;rate=16000',
                       data: pcmBase64,
                     },
-                  },
-                })
-              );
-            }
-            if (vadRes.speechEnded) {
-              wsRef.current.send(
-                JSON.stringify({
-                  realtimeInput: {
-                    audioStreamEnd: true,
-                  },
-                  clientContent: {
-                    turns: [{ role: 'user', parts: [] }],
-                    turnComplete: true,
                   },
                 })
               );
@@ -2786,7 +2854,7 @@ export default function App() {
                             (activeScenario.targetLang === 'ja'
                               ? 'Aoede'
                               : activeScenario.targetLang === 'zh'
-                              ? 'Kore'
+                              ? 'Aoede'
                               : 'Puck'),
                         },
                       },
@@ -2933,10 +3001,9 @@ export default function App() {
               if (part?.inlineData?.data) {
                 incomingAudioChunks.push(part.inlineData.data);
               }
-              if (part?.text) {
-                liveAiDraftRef.current += part.text;
-                setLiveAiDraft(liveAiDraftRef.current);
-              }
+              // IMPORTANT: Gemini 3.8 Live emits internal English reasoning as { thought: true, text: "..." }
+              // inside modelTurn.parts while actual spoken words stream via outputTranscription.text!
+              // Never append modelTurn.parts[].text onto liveAiDraftRef when outputAudioTranscription is active!
             }
           }
 
@@ -2978,15 +3045,36 @@ export default function App() {
               source.onended = () => {
                 activeSourcesRef.current = activeSourcesRef.current.filter((s) => s !== source);
                 if (activeSourcesRef.current.length === 0) {
-                  setAiAudioPlaying(false, 300);
+                  if (livePlaybackSafetyTimerRef.current) {
+                    window.clearTimeout(livePlaybackSafetyTimerRef.current);
+                    livePlaybackSafetyTimerRef.current = null;
+                  }
+                  setAiAudioPlaying(false, 250);
                 }
               };
             }
+            // Wall-clock safety unlock: ensures mic streaming resumes promptly even if WebAudio onended is throttled
+            if (livePlaybackSafetyTimerRef.current) {
+              window.clearTimeout(livePlaybackSafetyTimerRef.current);
+            }
+            const remainingPlaybackMs = Math.max(
+              350,
+              Math.ceil((nextStartTimeRef.current - ctx.currentTime) * 1000) + 350
+            );
+            livePlaybackSafetyTimerRef.current = window.setTimeout(() => {
+              livePlaybackSafetyTimerRef.current = null;
+              activeSourcesRef.current = [];
+              setAiAudioPlaying(false, 0);
+            }, remainingPlaybackMs);
           }
 
           // Barge-in interruption from server
           if (msg.serverContent?.interrupted || msg.type === 'interrupted') {
             callBillingRef.current.turnMetered = false;
+            if (livePlaybackSafetyTimerRef.current) {
+              window.clearTimeout(livePlaybackSafetyTimerRef.current);
+              livePlaybackSafetyTimerRef.current = null;
+            }
             if (outputAudioCtxRef.current) {
               nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
             }
@@ -3047,7 +3135,7 @@ export default function App() {
               if (isCompleted && !liveSentenceTransMapRef.current.has(s)) {
                 liveSentenceTransMapRef.current.set(s, { id: '', th: '' });
                 void fetchLiveTranslation(s, targetLoc).then((translated) => {
-                  if (translated) {
+                  if (translated && !isGenericPlaceholderTranslation(translated)) {
                     const existing = liveSentenceTransMapRef.current.get(s) || { id: '', th: '' };
                     if (targetLoc === 'th') existing.th = translated;
                     else existing.id = translated;
@@ -3196,15 +3284,27 @@ export default function App() {
             }
 
             if (aText) {
-              // Compose turn translation instantly from completed sentence translations
+              // Compose turn translation from completed sentence translations (only if every sentence resolved cleanly)
               const sentences = splitSentences(aText, activeScenario.targetLang);
+              const allSentencesTranslatedId =
+                sentences.length > 0 &&
+                sentences.every((s) => {
+                  const val = liveSentenceTransMapRef.current.get(s.trim())?.id || '';
+                  return Boolean(val) && !isGenericPlaceholderTranslation(val);
+                });
+              const allSentencesTranslatedTh =
+                sentences.length > 0 &&
+                sentences.every((s) => {
+                  const val = liveSentenceTransMapRef.current.get(s.trim())?.th || '';
+                  return Boolean(val) && !isGenericPlaceholderTranslation(val);
+                });
               const composedId = sentences
                 .map((s) => liveSentenceTransMapRef.current.get(s.trim())?.id || '')
-                .filter(Boolean)
+                .filter((v) => Boolean(v) && !isGenericPlaceholderTranslation(v))
                 .join(' ');
               const composedTh = sentences
                 .map((s) => liveSentenceTransMapRef.current.get(s.trim())?.th || '')
-                .filter(Boolean)
+                .filter((v) => Boolean(v) && !isGenericPlaceholderTranslation(v))
                 .join(' ');
 
               const autoTrans = translateAndPhoneticizeLiveText(
@@ -3213,6 +3313,12 @@ export default function App() {
                 composedId || msg.aiTranslationId,
                 composedTh || msg.aiTranslationTh
               );
+              const initialTransId =
+                composedId ||
+                (!isGenericPlaceholderTranslation(autoTrans.translationId) ? autoTrans.translationId : '');
+              const initialTransTh =
+                composedTh ||
+                (!isGenericPlaceholderTranslation(autoTrans.translationTh) ? autoTrans.translationTh : '');
               const aiTurnId = `live_ai_${Date.now() + 1}`;
               setTurns((prev) => [
                 ...prev,
@@ -3220,8 +3326,8 @@ export default function App() {
                   id: aiTurnId,
                   speaker: 'ai',
                   text: aText,
-                  translationId: composedId || autoTrans.translationId,
-                  translationTh: composedTh || autoTrans.translationTh,
+                  translationId: initialTransId,
+                  translationTh: initialTransTh,
                   audioBase64: msg.aiAudioBase64 || undefined,
                   timestamp: Date.now() + 1,
                   replySource: 'ai',
@@ -3241,11 +3347,13 @@ export default function App() {
               ];
               void triggerRealtimeCopilotRef.current(aText, lastUserForCopilot, updatedHist);
 
-              // If sentences did not cover full paragraph translation, backfill with GTX
-              if (!composedId || (locale === 'th' && !composedTh)) {
+              // Always fetch full-utterance contextual translation whenever any sentence was incomplete
+              if (!allSentencesTranslatedId || (locale === 'th' && !allSentencesTranslatedTh)) {
                 void Promise.all([
-                  composedId ? Promise.resolve(composedId) : fetchLiveTranslation(aText, 'id'),
-                  composedTh ? Promise.resolve(composedTh) : fetchLiveTranslation(aText, 'th'),
+                  allSentencesTranslatedId ? Promise.resolve(composedId) : fetchLiveTranslation(aText, 'id'),
+                  locale === 'th' && !allSentencesTranslatedTh
+                    ? fetchLiveTranslation(aText, 'th')
+                    : Promise.resolve(composedTh),
                 ]).then(([idTrans, thTrans]) => {
                   if (idTrans || thTrans) {
                     setTurns((prev) =>
@@ -3332,6 +3440,10 @@ export default function App() {
     if (liveOpeningAudioWatchdogRef.current) {
       window.clearTimeout(liveOpeningAudioWatchdogRef.current);
       liveOpeningAudioWatchdogRef.current = null;
+    }
+    if (livePlaybackSafetyTimerRef.current) {
+      window.clearTimeout(livePlaybackSafetyTimerRef.current);
+      livePlaybackSafetyTimerRef.current = null;
     }
     const billingSnap = callBillingRef.current;
     if (billingSnap.active) {
@@ -3794,17 +3906,42 @@ export default function App() {
     };
   }, [callStateKey, is3dMochiReady, isAiThinking, liveAiDraft, lastAiTurn?.text]);
 
-  const activeAiLiveText = liveAiDraft.trim() || lastAiTurn?.text || activeScenario.openingLine;
-  const activeAiSubtitle = translateAndPhoneticizeLiveText(
+  const defaultOpeningText = activePersona.openingGreeting || activeScenario.openingLine;
+  const defaultOpeningTransId =
+    activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId;
+  const defaultOpeningTransTh =
+    activePersona.openingGreetingTranslationTh || activeScenario.openingTranslationTh;
+  const isStreamingAiLive = Boolean(liveAiDraft.trim());
+  const activeAiLiveText = liveAiDraft.trim() || lastAiTurn?.text || defaultOpeningText;
+  const rawSubtitleSourceId = isStreamingAiLive
+    ? liveAiTranslationDraft
+    : lastAiTurn
+    ? lastAiTurn.translationId || ''
+    : defaultOpeningTransId;
+  const rawSubtitleSourceTh = isStreamingAiLive
+    ? (locale === 'th' ? liveAiTranslationDraft : '')
+    : lastAiTurn
+    ? lastAiTurn.translationTh || ''
+    : defaultOpeningTransTh;
+  const computedAiSubtitle = translateAndPhoneticizeLiveText(
     activeAiLiveText,
     activeScenario.targetLang,
-    liveAiDraft.trim()
-      ? (locale === 'id' && liveAiTranslationDraft ? liveAiTranslationDraft : (liveAiTranslationDraft || undefined))
-      : lastAiTurn?.translationId || activeScenario.openingTranslationId,
-    liveAiDraft.trim()
-      ? (locale === 'th' && liveAiTranslationDraft ? liveAiTranslationDraft : undefined)
-      : lastAiTurn?.translationTh || activeScenario.openingTranslationTh
+    rawSubtitleSourceId || undefined,
+    rawSubtitleSourceTh || undefined
   );
+  const activeAiSubtitle = {
+    ...computedAiSubtitle,
+    translationId: rawSubtitleSourceId
+      ? computedAiSubtitle.translationId
+      : !isGenericPlaceholderTranslation(computedAiSubtitle.translationId)
+      ? computedAiSubtitle.translationId
+      : '',
+    translationTh: rawSubtitleSourceTh
+      ? computedAiSubtitle.translationTh
+      : !isGenericPlaceholderTranslation(computedAiSubtitle.translationTh)
+      ? computedAiSubtitle.translationTh
+      : '',
+  };
 
   const activeUserLiveText = liveUserDraft.trim() || lastUserTurn?.text || '';
   const activeUserSubtitle = activeUserLiveText
@@ -4571,7 +4708,7 @@ export default function App() {
                                   targetLang={activeScenario.targetLang}
                                   showFurigana={!isMeasureMode}
                                   showRomaji={!isMeasureMode}
-                                  className="text-sm font-medium text-[#1C1611] break-words leading-snug"
+                                  className="text-sm font-medium text-[#1C1611] break-words"
                                   rubyClassName="text-sm font-medium"
                                   romajiClassName="text-xs text-[#8C6D1F] font-medium mt-0.5"
                                 />
