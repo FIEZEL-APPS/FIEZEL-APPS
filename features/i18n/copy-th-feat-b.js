@@ -226,6 +226,9 @@
     'quiz.quickwin-en-exp2': 'Good morning ใช้เพื่อกล่าวสวัสดีตอนเช้าตั้งแต่พระอาทิตย์ขึ้นจนถึงเที่ยงวัน',
     'quiz.quickwin-en-q3': 'เมื่อมีคนช่วยเหลือคุณ ข้อใดคือคำขอบคุณที่เหมาะสม?',
     'quiz.quickwin-en-exp3': 'Thank you เป็นวิธีที่สุภาพที่สุดในการแสดงความขอบคุณ',
+    'quiz.quickwin-zh-q1': 'เลือกอักษรฮั่นจื้อที่ถูกต้องสำหรับคำทักทาย สวัสดี (N\u01d0 h\u01ceo):',
+    'quiz.quickwin-zh-q2': 'พูดคำว่า ขอบคุณ (Xi\u00e8xie) เป็นภาษาจีนกลางอย่างไร?',
+    'quiz.quickwin-zh-q3': 'เลือกความหมายที่ถูกต้องสำหรับคำว่า \u518d\u89c1 (Z\u00e0iji\u00e0n):',
 
     // ---------- coach.* (panel) ----------
     'coach.panel-aria': 'ผู้ช่วยสอน FIEZEL',
@@ -408,8 +411,8 @@
     'onboarding.next-arrow': 'ถัดไป \u2192',
     'onboarding.course-title-v2': 'เลือกภาษา',
     'onboarding.course-desc-v2': 'เลือกภาษาที่คุณต้องการเรียนใน FIEZEL',
-    'onboarding.course-en-sub': 'Learn in English',
-    'onboarding.course-ja-sub': '\u65E5\u672C\u8A9E\u3067\u5B66\u3076',
+    'onboarding.course-en-sub': '\u0E40\u0E23\u0E35\u0E22\u0E19\u0E20\u0E32\u0E29\u0E32\u0E2d\u0E31\u0E07\u0E01\u0E24\u0E29',
+    'onboarding.course-ja-sub': '\u0E40\u0E23\u0E35\u0E22\u0E19\u0E20\u0E32\u0E29\u0E32\u0E0F\u0E35\u0E48\u0E1b\u0E38\u0E48\u0E19',
     'onboarding.course-zh': 'ภาษาจีนกลาง',
     'onboarding.course-zh-sub': '\u4E2D\u6587\u5B66\u4E60',
     'onboarding.course-soon': 'เร็วๆ นี้',

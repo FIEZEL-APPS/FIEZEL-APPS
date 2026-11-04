@@ -229,6 +229,9 @@
     'quiz.quickwin-en-exp2': 'Good morning digunakan untuk mengucapkan selamat pagi sejak terbit matahari hingga tengah hari.',
     'quiz.quickwin-en-q3': 'Ketika seseorang membantumu, apa ungkapan terima kasih yang tepat?',
     'quiz.quickwin-en-exp3': 'Thank you adalah cara paling sopan untuk menunjukkan rasa terima kasih.',
+    'quiz.quickwin-zh-q1': 'Pilih Hanzi yang tepat untuk salam Halo (N\u01d0 h\u01ceo):',
+    'quiz.quickwin-zh-q2': 'Bagaimana cara mengucapkan Terima kasih (Xi\u00e8xie) dalam bahasa Mandarin?',
+    'quiz.quickwin-zh-q3': 'Pilih arti bahasa Indonesia yang tepat untuk kata \u518d\u89c1 (Z\u00e0iji\u00e0n):',
 
     // ---------- features/ui/fiezel-coach-bubble.js (4 titik; 44 lainnya di zona chunk beku, lihat handoff) ----------
     'coach.panel-aria': 'Pembimbing FIEZEL',
