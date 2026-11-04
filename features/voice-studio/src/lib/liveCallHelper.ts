@@ -49,6 +49,54 @@ const KNOWN_UTTERANCE_TRANSLATIONS: Array<{
   translationTh: string;
 }> = [
   {
+    match: "hey! glad you're on the line. no stiff textbook voice today—if your grammar slips, i'm stopping you on the spot. what's on your mind today?",
+    pronunciation: "Hei! Gled yur on de lain. Nou stif tekstbuk vois tudei.",
+    translationId:
+      'Hei! Bagus kamu sudah nyambung. Hari ini dilarang pakai suara buku teks kaku—kalau grammar-mu meleset, langsung kutegur di tempat ya. Lagi mikirin apa hari ini?',
+    translationTh:
+      'เฮ้! ดีใจที่โทรมา วันนี้ห้ามพูดเกร็งแบบตำราเรียนนะ ถ้าไวยากรณ์หลุดเมื่อไหร่ ฉันเบรกทันที วันนี้มีเรื่องอะไรในหัวเล่ามาได้เลย?',
+  },
+  {
+    match: "welcome. i've reviewed your braincore profile, so i know your strengths and where your grammar tends to slip. tell me, what challenge did you tackle this week?",
+    pronunciation: 'Welkam. Aiv rivyud yor Breinkor profail.',
+    translationId:
+      'Selamat datang. Aku sudah memeriksa profil Braincore-mu, jadi aku tahu di mana kekuatanmu dan di mana grammar-mu sering terpeleset. Ceritakan, tantangan apa yang kamu hadapi minggu ini?',
+    translationTh:
+      'ยินดีต้อนรับค่ะ ฉันดูโปรไฟล์ Braincore ของคุณแล้ว รู้ทั้งจุดแข็งและจุดที่ไวยากรณ์ของคุณมักพลาด เล่าให้ฟังหน่อยค่ะ สัปดาห์นี้คุณรับมือกับความท้าทายอะไรมา?',
+  },
+  {
+    match: 'あら、来たわね。あなたの得意なところも、助詞や活用でつまずきやすい癖もちゃんと把握してるわよ。変な日本語を使ったらすぐ止めるから覚悟してね。今日は何から話す？',
+    pronunciation: 'Ara, kita wa ne. Anata no tokui na tokoro mo...',
+    translationId:
+      'Ara, datang juga kamu. Aku sudah tahu bagian mana yang kamu jago, dan kebiasaan salah partikel atau konjugasi yang sering kamu ulang. Kalau bahasa Jepangmu aneh, langsung kustop di tempat ya! Hari ini mau bahas apa dulu?',
+    translationTh:
+      'อ้าว มาแล้วเหรอ ฉันรู้หมดแล้วนะว่าเธอเก่งตรงไหน และชอบพลาดคำช่วยหรือผันกริยาตรงไหน ถ้าพูดภาษาญี่ปุ่นแปลกๆ ฉันเบรกทันทีนะ เตรียมใจไว้เลย วันนี้จะคุยเรื่องอะไรก่อนดี?',
+  },
+  {
+    match: 'おっ、来たな後輩！お前の得意なパターンも、うっかり間違えやすい文法も全部チェック済みだぞ。変な直訳したらすぐツッコミ入れるからな！で、今日は何の話する？',
+    pronunciation: 'O, kita na kouhai! Omae no tokui na pataan mo...',
+    translationId:
+      'Woi, nongol juga lu! Bagian yang lu udah jago sama jebakan grammar yang sering bikin lu kepleset udah gua cek semua nih. Kalau lu ngomong terjemahan mentah yang salah, langsung gua potong di tempat ya! Gimana, hari ini mau ngobrolin apa?',
+    translationTh:
+      'โอ้ มาแล้วเหรอน้อง! จุดที่เอ็งเก่งกับไวยากรณ์ที่ชอบพลาด รุ่นพี่เช็กมาหมดแล้วนะ ถ้าเผลอพูดแปลตรงตัวผิดๆ มา ฉันเบรกทันทีเลยนะ! ว่าไง วันนี้จะคุยเรื่องอะไรกันดี?',
+  },
+  {
+    match: '你好！我是小糯米（xiao mochi）。很高兴和你一起练习中文！不管是声调还是生词，只要有不确定的地方，我都会耐心地帮你纠正。今天你想聊点儿什么？',
+    pronunciation: 'Nǐ hǎo! Wǒ shì Xiǎo Nuòmǐ.',
+    translationId:
+      'Halo! Aku Xiao Mochi. Senang sekali bisa berlatih bahasa Mandarin bersamamu! Baik masalah nada maupun kata baru, jika ada yang kurang tepat, aku akan membantumu memperbaikinya dengan sabar. Hari ini kamu ingin mengobrol apa?',
+    translationTh:
+      'สวัสดีครับ! ผมคือเสี่ยวโนโมจิ ดีใจมากที่ได้ฝึกภาษาจีนด้วยกันครับ! ไม่ว่าจะเป็นเรื่องวรรณยุกต์หรือคำศัพท์ใหม่ ผมพร้อมช่วยแนะนำอย่างใจเย็นเสมอ วันนี้อยากคุยเรื่องอะไรดีครับ?',
+  },
+  {
+    match: 'good morning. this is the speaking module of the international english language testing system. i will be your examiner today. may i confirm your full name, please?',
+    pronunciation: 'Gud morning. Dis iz de Spiking modyul.',
+    translationId:
+      'Selamat pagi. Ini adalah modul Speaking dari International English Language Testing System. Saya akan menjadi penguji Anda hari ini. Boleh saya konfirmasi nama lengkap Anda?',
+    translationTh:
+      'สวัสดีตอนเช้าครับ นี่คือพาร์ทการพูดของระบบทดสอบภาษาอังกฤษนานาชาติ IELTS ผมจะเป็นผู้คุมสอบของคุณในวันนี้ ขอทราบชื่อ-นามสกุลเต็มของคุณด้วยครับ?',
+  },
+  {
     match: 'where do you live',
     pronunciation: 'Hai der! Nais tu tok wit yu tudei. Wer du yu liv, end hu du yu liv wit et hom?',
     translationId:
@@ -775,8 +823,22 @@ function approximateEnglishToThai(text: string): string {
 
 const liveTranslationCache = new Map<string, string>();
 
+function resolveTranslationApiBase(): string {
+  try {
+    const win = typeof window !== 'undefined' ? (window as any) : null;
+    const cfg = win?.FIEZEL_CONFIG?.apiBaseUrl;
+    if (typeof cfg === 'string' && cfg.trim()) {
+      return cfg.trim().replace(/\/+$/, '');
+    }
+  } catch {
+    // Ignore
+  }
+  return 'https://api.fiezel.my.id';
+}
+
 /**
- * Fetches high-fidelity, natural translations in real-time using Google Translate GTX endpoint
+ * Fetches high-fidelity, natural translations in real-time via FIEZEL Worker `/api/voice/translate`
+ * (Gemini multi-key pool, zero CJK leak, zero unofficial translate.googleapis.com HTTP 500 errors)
  * with in-memory Map & localStorage caching. Safe for continuous live duplex calls.
  */
 export async function fetchLiveTranslation(
@@ -793,26 +855,40 @@ export async function fetchLiveTranslation(
     if (typeof localStorage !== 'undefined') {
       const stored = localStorage.getItem(`fz_trans_${cacheKey}`);
       if (stored) {
-        liveTranslationCache.set(cacheKey, stored);
-        return stored;
+        const cleanStored = sanitizeTranslationOutput(stored);
+        if (cleanStored) {
+          liveTranslationCache.set(cacheKey, cleanStored);
+          return cleanStored;
+        }
       }
     }
   } catch {
     // Ignore
   }
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5500);
   try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLocale}&dt=t&q=${encodeURIComponent(
-      clean
-    )}`;
-    const res = await fetch(url);
-    if (!res.ok) return '';
-    const data = await res.json();
-    if (Array.isArray(data) && Array.isArray(data[0])) {
-      const translated = data[0]
-        .map((chunk: any) => (chunk && chunk[0] ? chunk[0] : ''))
-        .join('')
-        .trim();
+    const apiBase = resolveTranslationApiBase();
+    const res = await fetch(`${apiBase}/api/voice/translate`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        text: clean,
+        targetLocale,
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = await res.json().catch(() => null);
+      const rawTranslated =
+        typeof data?.translatedText === 'string'
+          ? data.translatedText.trim()
+          : typeof data?.translation === 'string'
+            ? data.translation.trim()
+            : '';
+      const translated = sanitizeTranslationOutput(rawTranslated);
       if (translated) {
         liveTranslationCache.set(cacheKey, translated);
         try {
@@ -826,7 +902,7 @@ export async function fetchLiveTranslation(
       }
     }
   } catch {
-    // Return empty on network timeout
+    clearTimeout(timer);
   }
   return '';
 }

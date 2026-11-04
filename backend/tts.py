@@ -116,6 +116,27 @@ PERSONA_CONFIGS = {
         "pitch": "+0Hz",
         "rate": "-2%",
     },
+    "xiao_mochi": {
+        "edgeVoice": "zh-CN-XiaoxiaoNeural",
+        "lang": "zh-CN",
+        "personaLabel": "Xiao Mochi · Mitra Percakapan Mandarin (XiaoxiaoNeural)",
+        "pitch": "+2Hz",
+        "rate": "+0%",
+    },
+    "xiaoxiao": {
+        "edgeVoice": "zh-CN-XiaoxiaoNeural",
+        "lang": "zh-CN",
+        "personaLabel": "Xiao Mochi · Mitra Percakapan Mandarin (XiaoxiaoNeural)",
+        "pitch": "+2Hz",
+        "rate": "+0%",
+    },
+    "yunxi": {
+        "edgeVoice": "zh-CN-YunxiNeural",
+        "lang": "zh-CN",
+        "personaLabel": "Yunxi · Mitra Percakapan Mandarin (YunxiNeural)",
+        "pitch": "+2Hz",
+        "rate": "+1%",
+    },
 }
 
 AUDIO_CACHE = {}
@@ -139,7 +160,13 @@ def resolve_persona(speaker: Optional[str], lang: Optional[str], text: str):
         return PERSONA_CONFIGS["nanami"]
     if "ardi" in sp or "instruktur" in sp:
         return PERSONA_CONFIGS["instructor"]
+    if "xiao" in sp or "mochi" in sp or "mei" in sp:
+        return PERSONA_CONFIGS["xiao_mochi"]
+    if "yunxi" in sp:
+        return PERSONA_CONFIGS["yunxi"]
 
+    if lg.startswith("zh") or lg.startswith("cmn"):
+        return PERSONA_CONFIGS["xiao_mochi"]
     if lg.startswith("ja"):
         return PERSONA_CONFIGS["nanami"]
     if lg.startswith("id"):
@@ -147,8 +174,10 @@ def resolve_persona(speaker: Optional[str], lang: Optional[str], text: str):
     if lg.startswith("en"):
         return PERSONA_CONFIGS["coach_alex"]
 
-    if any(ord(c) >= 0x3040 for c in text):
+    if any(0x3040 <= ord(c) <= 0x30FF for c in text):
         return PERSONA_CONFIGS["nanami"]
+    if any(0x4E00 <= ord(c) <= 0x9FFF for c in text):
+        return PERSONA_CONFIGS["xiao_mochi"]
 
     return PERSONA_CONFIGS["coach_alex"]
 

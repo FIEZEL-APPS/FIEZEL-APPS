@@ -24,6 +24,59 @@ import MasterLexicon from './masterLexicon.js';
 // Resolve dictionary across Node, ESM, and browser window/global
 const dict = (typeof globalThis !== 'undefined' && globalThis.FiezelJaDictionary) || MasterLexicon;
 
+// High-priority pedagogical & conversational compounds for Mitra Kaiwa / Voice Studio
+const PRIORITY_VOICE_STUDIO_WORDS = {
+  '助詞': 'じょし',
+  '活用': 'かつよう',
+  '把握': 'はあく',
+  '覚悟': 'かくご',
+  '変な': 'へんな',
+  '直訳': 'ちょくやく',
+  '出来事': 'できごと',
+  '後輩': 'こうはい',
+  '先輩': 'せんぱい',
+  '文法': 'ぶんぽう',
+  '発音': 'はつおん',
+  '自然': 'しぜん',
+  '不自然': 'ふしぜん',
+  '表現': 'ひょうげん',
+  '敬語': 'けいご',
+  '丁寧': 'ていねい',
+  'タメ口': 'ためぐち',
+  '言い回し': 'いいまわし',
+  '語順': 'ごじゅん',
+  '文脈': 'ぶんみゃく',
+  '相槌': 'あいづち',
+  '得意': 'とくい',
+  '苦手': 'にがて',
+  '完璧': 'かんぺき',
+  '厳しい': 'きびしい',
+  '厳しく': 'きびしく',
+  '鍛える': 'きたえる',
+  '鍛えて': 'きたえて',
+  '指摘': 'してき',
+  '復唱': 'ふくしょう',
+  '言い直す': 'いいなおす',
+  '言い直して': 'いいなおして',
+  '引っ張って': 'ひっぱって',
+  '伸ばそう': 'のばそう',
+  '本気': 'ほんき',
+  '冗談': 'じょうだん',
+  '証拠': 'しょうこ',
+  '接客': 'せっきゃく',
+  '職種': 'しょくしゅ',
+  '塩気': 'しおけ',
+  'お供': 'おとも',
+};
+
+if (dict && dict.WORDS) {
+  for (const [wKey, wKana] of Object.entries(PRIORITY_VOICE_STUDIO_WORDS)) {
+    if (!dict.WORDS[wKey]) {
+      dict.WORDS[wKey] = { kana: wKana };
+    }
+  }
+}
+
 const KANJI_REGEX = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3005]/;
 
 const PARTICLES = {
@@ -318,18 +371,32 @@ export function tokenizeJapaneseToRuby(rawText) {
         else if (cut === 0) tail = '';
 
         if (tail.length > 0) {
-          const stemKana = dict.STEMS[piece];
-          const fullKana = stemKana + tail;
-          hit = {
-            text: piece + tail,
-            kanjiPart: piece,
-            ruby: stemKana,
-            tail: tail,
-            romaji: kanaStringToRomaji(fullKana),
-            isKanji: true,
-            isStemWithTail: true,
-          };
-          break;
+          let stemKana = dict.STEMS[piece];
+          // Irregular Ka-hen verb 来る (kuru / kita / kite / kimasu / konai / koyou / koi / kureba)
+          if (piece === '来') {
+            if (/^(?:た|て|たら|たり|ちゃ|ちま|ま)/.test(tail)) {
+              stemKana = 'き';
+            } else if (/^(?:な|よ|い|さ|ら|ず|ん)/.test(tail)) {
+              stemKana = 'こ';
+            } else if (/^(?:る|れ)/.test(tail)) {
+              stemKana = 'く';
+            } else {
+              stemKana = '';
+            }
+          }
+          if (stemKana) {
+            const fullKana = stemKana + tail;
+            hit = {
+              text: piece + tail,
+              kanjiPart: piece,
+              ruby: stemKana,
+              tail: tail,
+              romaji: kanaStringToRomaji(fullKana),
+              isKanji: true,
+              isStemWithTail: true,
+            };
+            break;
+          }
         }
       }
     }

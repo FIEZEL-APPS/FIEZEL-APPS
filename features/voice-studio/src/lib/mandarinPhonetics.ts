@@ -110,10 +110,10 @@ export function tokenizeMandarin(rawText: string): MandarinToken[] {
       continue;
     }
 
-    // 3. Latin / Alphanumeric acronyms
-    if (/[A-Za-z0-9]/.test(ch)) {
+    // 3. Latin / Alphanumeric / Pinyin accented words (keep intact, never split tone-marked vowels)
+    if (/[A-Za-z0-9āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüĀÁǍÀĒÉĚÈĪÍǏÌŌÓǑÒŪÚǓÙǕǗǙǛÜ']/u.test(ch)) {
       let alpha = '';
-      while (i < len && /[A-Za-z0-9]/.test(clean[i])) {
+      while (i < len && /[A-Za-z0-9āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüĀÁǍÀĒÉĚÈĪÍǏÌŌÓǑÒŪÚǓÙǕǗǙǛÜ']/u.test(clean[i])) {
         alpha += clean[i];
         i++;
       }
@@ -161,10 +161,31 @@ export function tokenizeMandarin(rawText: string): MandarinToken[] {
   return tokens;
 }
 
+const VOWEL_INITIAL_SYL_RE = /^[aāáǎàeēéěèoōóǒò]/i;
+
+function formatWordSyllablesForLine(wordText: string, rawPinyin: string): string {
+  const syls = rawPinyin.split(/\s+/).filter(Boolean);
+  if (syls.length <= 1) return rawPinyin;
+  if (wordText === '小糯米') return 'Xiǎo Nuòmǐ';
+
+  let out = syls[0];
+  for (let i = 1; i < syls.length; i++) {
+    const s = syls[i];
+    if ((s === 'ér' || s === 'er' || s === 'r') && wordText[i] === '儿') {
+      out += 'r';
+    } else if (VOWEL_INITIAL_SYL_RE.test(s)) {
+      out += "'" + s;
+    } else {
+      out += s;
+    }
+  }
+  return out;
+}
+
 /**
  * Converts Chinese Hanzi text to 100% clean, tone-marked, readable Pinyin:
- * - Words are properly spaced: "Nǐ hǎo! Wǒ shì Xiǎo Mòchí."
- * - Capitalizes start of sentences.
+ * - Words are properly spaced: "Nǐ hǎo! Wǒ shì Xiǎo Nuòmǐ."
+ * - Capitalizes start of sentences (including tone-marked initial vowels).
  * - Guarantees ZERO leftover Hanzi characters in the returned string!
  */
 export function toPhoneticPinyin(rawText: string): string {
@@ -177,7 +198,11 @@ export function toPhoneticPinyin(rawText: string): string {
   for (const tk of tokens) {
     if (tk.isSpace) continue;
     if (tk.pinyin) {
-      parts.push(tk.pinyin);
+      if (tk.isHanzi && tk.text.length > 1) {
+        parts.push(formatWordSyllablesForLine(tk.text, tk.pinyin));
+      } else {
+        parts.push(tk.pinyin);
+      }
     } else if (!tk.isHanzi) {
       parts.push(tk.text);
     }
@@ -185,13 +210,15 @@ export function toPhoneticPinyin(rawText: string): string {
 
   let pinyin = parts
     .join(' ')
-    .replace(/\s+([.,!?:;~])/g, '$1')
-    .replace(/([(\[{])\s+/g, '$1')
+    .replace(/\s+(?:ér|r)\b/g, 'r')
+    .replace(/-\s+-/g, '—')
+    .replace(/\s+([.,!?:;~")\]}])/g, '$1')
+    .replace(/([(\[{"])\s+/g, '$1')
     .replace(/\s{2,}/g, ' ')
     .trim();
 
-  // Capitalize after sentence-ending punctuation
-  pinyin = pinyin.replace(/(^|[.!?]\s+)([a-zà-ÿ])/g, (_m, p1, p2) => p1 + p2.toUpperCase());
+  // Capitalize after sentence-ending punctuation (including accented Pinyin vowels)
+  pinyin = pinyin.replace(/(^|[.!?]\s+)([a-z\u00C0-\u024F])/g, (_m, p1, p2) => p1 + p2.toUpperCase());
 
   // Strictly strip any rogue Hanzi that might have slipped through
   return pinyin.replace(ALL_HANZI_REGEX, '').trim();

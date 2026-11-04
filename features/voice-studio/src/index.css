@@ -278,7 +278,8 @@ body {
 
 .fz-ja-ruby-text,
 .fz-zh-ruby-text {
-  line-height: 2.2 !important;
+  line-height: 2.6 !important;
+  padding-top: 0.35em;
   display: block;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -289,34 +290,40 @@ ruby.zh-ruby {
   ruby-position: over;
   display: inline-ruby;
   vertical-align: baseline;
-  line-height: 2.2 !important;
+  margin-inline: 0.08em;
+  padding-inline: 0.03em;
+  line-height: 2.6 !important;
 }
 
 rt.fz-ja-rt {
-  font-size: 0.62em;
+  font-size: 0.58em;
   font-weight: 600;
   color: #8C6D1F;
-  line-height: 1;
+  line-height: 1.05;
+  padding-inline: 2px;
+  white-space: nowrap;
   user-select: none;
   text-align: center;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 rt.zh-rt {
-  font-size: 0.62em;
+  font-size: 0.58em;
   font-weight: 700;
   color: #BE123C;
-  line-height: 1;
+  line-height: 1.05;
+  padding-inline: 2px;
+  white-space: nowrap;
   user-select: none;
   text-align: center;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .fz-ja-romaji-text,
 .fz-zh-pinyin-text {
   font-feature-settings: "liga" 1;
   letter-spacing: 0.02em;
-  margin-top: 4px;
-  line-height: 1.4 !important;
+  margin-top: 6px;
+  line-height: 1.5 !important;
   display: block;
 }

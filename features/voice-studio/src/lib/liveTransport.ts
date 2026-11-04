@@ -342,6 +342,9 @@ export async function reportGeminiLiveSessionDrop(
   code?: number,
   keyIndex?: number
 ): Promise<void> {
+  if (code === 1000 || code === 1005 || code === 1007) {
+    return;
+  }
   const base = resolveVoiceApiCandidateBases()[0] ?? 'https://api.fiezel.my.id';
   try {
     await fetch(`${base}/api/voice/report-drop`, {
@@ -390,6 +393,7 @@ export type CopilotSpeechAct =
   | 'wh_where_origin'
   | 'wh_where_action'
   | 'wh_what_food'
+  | 'wh_what_talk'
   | 'wh_what_general'
   | 'wh_why'
   | 'wh_when'
@@ -480,9 +484,23 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
 
     let extractedTopic: string | undefined;
     if (targetLang === 'ja') {
-      extractedTopic = focalText.match(/([一-龯ぁ-んァ-ン]{2,6})(?:は|が|を|に|について|のこと)/)?.[1];
+      const jaStop = new Set([
+        '今日', '明日', '昨日', '今週末', '今週', '毎日', '最近', '普段', 'いつも',
+        'あなた', 'わたし', '私', '僕', '俺', '君', 'お前', '先生', '後輩',
+        'ところ', 'なに', '何', 'どこ', 'いつ', 'だれ', '誰', 'どう', 'それ', 'これ', 'あれ',
+        '変な日本語', '日本語', '直訳',
+      ]);
+      const rawTopic = focalText.match(/([一-龯ぁ-んァ-ン]{2,6})(?:は|が|を|に|について|のこと)/)?.[1];
+      extractedTopic = rawTopic && !jaStop.has(rawTopic) ? rawTopic : undefined;
     } else if (targetLang === 'zh') {
-      extractedTopic = focalText.match(/([\u4e00-\u9fff]{2,4})(?:方面|的话|呢|吧)?/)?.[1];
+      const zhStop = new Set([
+        '今天', '明天', '昨天', '最近', '平时', '现在', '我们', '你们', '他们',
+        '什么', '点儿', '点什么', '哪里', '怎么', '为什么', '今天你想', '你想', '想聊', '小糯米', '声调', '生词',
+      ]);
+      const rawTopic =
+        focalText.match(/(?:关于|喜欢|觉得|对|聊聊|谈谈)([\u4e00-\u9fff]{2,4})/u)?.[1] ||
+        focalText.match(/([\u4e00-\u9fff]{2,4})(?:方面|的话)/u)?.[1];
+      extractedTopic = rawTopic && !zhStop.has(rawTopic) ? rawTopic : undefined;
     } else {
       const stop = new Set([
         'the', 'a', 'an', 'your', 'you', 'do', 'does', 'did', 'what', 'where', 'how', 'why', 'when',
@@ -631,12 +649,14 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
     if (/\bwhere\b/i.test(s)) return 'wh_where_action';
   }
 
-  // What (Food vs General)
+  // What (Food vs Open Conversation Topic vs General)
   if (targetLang === 'ja') {
     if (/(?:何にしますか|何を食べ|何を飲み|ご注文|おすすめ)/u.test(focal.focalText)) return 'wh_what_food';
+    if (/(?:何から話す|何の話|何を話|どんな話|話したい)/u.test(focal.focalText)) return 'wh_what_talk';
     if (/(?:なに|何)/u.test(focal.focalText)) return 'wh_what_general';
   } else if (targetLang === 'zh') {
     if (/(?:想喝什么|吃什么|点什么|要点什么)/u.test(focal.focalText)) return 'wh_what_food';
+    if (/(?:聊点儿什么|聊点什么|聊什么|想聊|谈什么|说说什么)/u.test(focal.focalText)) return 'wh_what_talk';
     if (/什么/.test(focal.focalText)) return 'wh_what_general';
   } else {
     if (
@@ -645,6 +665,12 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
       /\b(coffee|tea|order|drink|food|lunch|dinner|latte)\b.*\?/i.test(s)
     )
       return 'wh_what_food';
+    if (
+      /\bwhat(?:'s| is) on your mind\b/i.test(s) ||
+      /\bwhat (?:do you want|would you like|shall we) (?:to )?talk about\b/i.test(s) ||
+      /\bwhat challenge did you tackle\b/i.test(s)
+    )
+      return 'wh_what_talk';
     if (/\bwhat\b/i.test(s)) return 'wh_what_general';
   }
 
@@ -795,6 +821,11 @@ export function buildContextualFallbackCards(params: {
       mission: ["I'd like an iced latte with less sugar, please.", 'aid laik en aist late wid les syugar, pliz', 'Saya mau es latte sedikit gula, tolong.', 'ขอลาเต้เย็นหวานน้อยครับ/ค่ะ'],
       rescue: ["I'll have an iced latte. What drink do you recommend?", 'ail hev en aist late. wat drink du yu rekomand?', 'Aku pesan es latte. Minuman apa yang kamu rekomendasikan?', 'ฉันเอาลาเต้เย็น แล้วคุณแนะนำเครื่องดื่มอะไรเหรอ?'],
     },
+    wh_what_talk: {
+      easy: ["I'd like to talk about my daily routine.", 'aid laik tu tok abaut mai deili rutin', 'Aku ingin ngobrol tentang rutinitasku sehari-hari.', 'ฉันอยากคุยเรื่องกิจวัตรประจำวันของฉันครับ/ค่ะ'],
+      mission: ['Actually, I had a really busy week and want to practice talking about it.', 'ekcuali, ai hed e rili bizi wik end wont tu praktis toking abaut it', 'Sebenarnya mingguku sangat padat dan aku ingin latihan menceritakannya.', 'ความจริงสัปดาห์นี้ฉันยุ่งมาก เลยอยากฝึกเล่าเรื่องนี้ดู'],
+      rescue: ["Let's talk about weekend plans! What do you usually do on weekends?", 'lets tok abaut wikend plenz! wat du yu yuzuali du on wikendz?', 'Ayo bahas rencana akhir pekan! Kamu biasanya ngapain saat akhir pekan?', 'มาคุยเรื่องแผนวันหยุดกันเถอะ! ปกติวันหยุดสุดสัปดาห์คุณทำอะไรเหรอ?'],
+    },
     wh_what_general: {
       easy: [topic ? `I really enjoy ${topic}.` : 'I enjoy learning new things.', topic ? `ai rili enjoy ${topic}` : 'ai enjoy lerning nyu tings', topic ? `Aku sangat menikmati ${topic}.` : 'Aku suka belajar hal-hal baru.', topic ? `ฉันชอบ${topic}มากเลย` : 'ฉันชอบเรียนรู้สิ่งใหม่ๆ'],
       mission: [topic ? `My favorite thing is ${topic}, because it relaxes me.` : 'I love practicing languages because it opens my horizons.', topic ? `mai feivrit ting iz ${topic}, bikoz it rilekses mi` : 'ai lav praktising lenggwijez bikoz it opens mai horaizons', topic ? `Hal favoritku adalah ${topic}, karena bikin rileks.` : 'Aku suka latihan bahasa karena membuka wawasan.', topic ? `สิ่งที่ฉันชอบที่สุดคือ${topic} เพราะทำให้ผ่อนคลาย` : 'ฉันชอบฝึกภาษาเพราะช่วยเปิดโลกทัศน์'],
@@ -913,9 +944,14 @@ export function buildContextualFallbackCards(params: {
       mission: ['アイスラテを一つ、テイクアウトでお願いします。', 'aisu rate o hitotsu, teikuauto de onegai shimasu.', 'Minta satu es latte, dibungkus (takeaway).', 'ขอลาเต้เย็นหนึ่งแก้ว สั่งกลับบ้านครับ/ค่ะ'],
       rescue: ['アイスラテにします。一番人気は何ですか？', 'aisu rate ni shimasu. ichiban ninki wa nan desu ka?', 'Aku pilih es latte. Yang paling populer apa ya?', 'ฉันเอาลาเต้เย็น แล้วเมนูยอดนิยมที่สุดคืออะไรเหรอ?'],
     },
+    wh_what_talk: {
+      easy: ['最近の出来事について話したいです。', 'saikin no dekigoto ni tsuite hanashitai desu.', 'Aku ingin cerita tentang kejadian belakangan ini.', 'อยากเล่าเรื่องราวที่เกิดขึ้นช่วงนี้ครับ/ค่ะ'],
+      mission: ['今週は仕事や勉強が忙しかったので、その話を聞いてほしいです。', 'konshuu wa shigoto ya benkyou ga isogashikatta no de, sono hanashi o kiite hoshii desu.', 'Minggu ini kerjaan dan belajar cukup padat, jadi ingin cerita soal itu.', 'สัปดาห์นี้ทั้งงานและการเรียนยุ่งมาก เลยอยากเล่าเรื่องนี้ให้ฟังครับ/ค่ะ'],
+      rescue: ['週末の予定について話しましょう！休みの日は何をしますか？', 'shuumatsu no yotei ni tsuite hanashimashou! yasumi no hi wa nani o shimasu ka?', 'Ayo bahas rencana akhir pekan! Saat hari libur kamu biasanya ngapain?', 'มาคุยเรื่องแผนสุดสัปดาห์กันเถอะ! วันหยุดปกติคุณทำอะไรเหรอ?'],
+    },
     wh_what_general: {
-      easy: [topic ? `${topic}がとても好きです。` : '新しいことを学ぶのが好きです。', topic ? `${toPhoneticRomaji(topic)} ga totemo suki desu.` : 'atarashii koto o manabu no ga suki desu.', topic ? `Sangat suka ${topic}.` : 'Suka belajar hal-hal baru.', topic ? `ฉันชอบ${topic}มากเลย` : 'ฉันชอบเรียนรู้สิ่งใหม่ๆ'],
-      mission: [topic ? `一番好きなのは${topic}です。リラックスできますから。` : '会話の練習をするのが一番楽しいですね。', topic ? `ichiban suki na no wa ${toPhoneticRomaji(topic)} desu. rirakkusu dekimasu kara.` : 'kaiwa no renshuu o suru no ga ichiban tanoshii desu ne.', topic ? `Yang paling kusuka ${topic}, karena bikin santai.` : 'Paling menyenangkan melatih percakapan.', topic ? `สิ่งที่ชอบที่สุดคือ${topic} เพราะทำให้ผ่อนคลาย` : 'การฝึกสนทนาเป็นสิ่งที่สนุกที่สุดเลย'],
+      easy: [topic ? `${topic}がとても好きです。` : '新しいことを学ぶのが好きです。', topic ? `${toPhoneticRomaji(topic)} ga totemo suki desu.` : 'atarashii koto o manabu no ga suki desu.', topic ? `Sangat suka "${toPhoneticRomaji(topic)}".` : 'Suka belajar hal-hal baru.', topic ? `ฉันชอบ "${toPhoneticRomaji(topic)}" มากเลย` : 'ฉันชอบเรียนรู้สิ่งใหม่ๆ'],
+      mission: [topic ? `一番好きなのは${topic}です。リラックスできますから。` : '会話の練習をするのが一番楽しいですね。', topic ? `ichiban suki na no wa ${toPhoneticRomaji(topic)} desu. rirakkusu dekimasu kara.` : 'kaiwa no renshuu o suru no ga ichiban tanoshii desu ne.', topic ? `Yang paling kusuka "${toPhoneticRomaji(topic)}", karena bikin santai.` : 'Paling menyenangkan melatih percakapan.', topic ? `สิ่งที่ชอบที่สุดคือ "${toPhoneticRomaji(topic)}" เพราะทำให้ผ่อนคลาย` : 'การฝึกสนทนาเป็นสิ่งที่สนุกที่สุดเลย'],
       rescue: ['面白いですね。あなたは何が一番おすすめですか？', 'omoshiroi desu ne. anata wa nani ga ichiban osusume desu ka?', 'Menarik ya. Menurutmu apa yang paling direkomendasikan?', 'น่าสนใจจัง แล้วคุณมีอะไรแนะนำเป็นพิเศษไหม?'],
     },
     wh_why: {
@@ -960,7 +996,7 @@ export function buildContextualFallbackCards(params: {
     },
     yesno_do: {
       easy: ['はい、よくそうします。', 'hai, yoku sou shimasu.', 'Ya, sering kali begitu.', 'ใช่ มักจะเป็นอย่างนั้นครับ/ค่ะ'],
-      mission: [topic ? `はい、${topic}が大好きです。` : 'はい、とても楽しんでやっていますよ。', topic ? `hai, ${toPhoneticRomaji(topic)} ga daisuki desu.` : 'hai, totemo tanoshinde yatte imasu yo.', topic ? `Ya, aku sangat suka ${topic}.` : 'Ya, aku sangat menikmatinya.', topic ? `ใช่ ฉันชอบ${topic}มากเลย` : 'ใช่ ฉันสนุกกับมันมากเลย'],
+      mission: [topic ? `はい、${topic}が大好きです。` : 'はい、とても楽しんでやっていますよ。', topic ? `hai, ${toPhoneticRomaji(topic)} ga daisuki desu.` : 'hai, totemo tanoshinde yatte imasu yo.', topic ? `Ya, aku sangat suka "${toPhoneticRomaji(topic)}".` : 'Ya, aku sangat menikmatinya.', topic ? `ใช่ ฉันชอบ "${toPhoneticRomaji(topic)}" มากเลย` : 'ใช่ ฉันสนุกกับมันมากเลย'],
       rescue: ['はい、そうです！あなたもよくしますか？', 'hai, sou desu! anata mo yoku shimasu ka?', 'Ya, benar! Kamu juga sering melakukannya?', 'ใช่เลย! แล้วคุณทำบ่อยเหมือนกันไหม?'],
     },
     greeting: {
@@ -1031,9 +1067,14 @@ export function buildContextualFallbackCards(params: {
       mission: ['我要一杯冰拿铁，少糖少冰，谢谢。', 'Wǒ yào yī bēi bīng nátiě, shǎo táng shǎo bīng, xièxie.', 'Saya mau es latte, sedikit gula sedikit es, terima kasih.', 'ขอลาเต้เย็น หวานน้อยน้ำแข็งน้อย ขอบคุณครับ/ค่ะ'],
       rescue: ['我点一杯冰拿铁。你们这里最受欢迎的是什么？', 'Wǒ diǎn yī bēi bīng nátiě. Nǐmen zhèlǐ zuì shòu huānyíng de shì shénme?', 'Aku pesan es latte. Yang paling laris di sini apa ya?', 'ฉันสั่งลาเต้เย็นแก้วหนึ่ง แล้วที่นี่อะไรขายดีที่สุดเหรอ?'],
     },
+    wh_what_talk: {
+      easy: ['我想聊聊我最近的日常生活。', 'Wǒ xiǎng liáoliao wǒ zuìjìn de rìcháng shēnghuó.', 'Aku ingin ngobrol soal keseharianku belakangan ini.', 'ฉันอยากคุยเรื่องชีวิตประจำวันช่วงนี้ครับ/ค่ะ'],
+      mission: ['这周我过得挺忙的，想用中文跟你分享一下。', 'Zhè zhōu wǒ guò de tǐng máng de, xiǎng yòng Zhōngwén gēn nǐ fēnxiǎng yīxià.', 'Minggu ini aku cukup sibuk, ingin menceritakannya pakai bahasa Mandarin.', 'สัปดาห์นี้ฉันยุ่งมาก อยากลองเล่าให้คุณฟังเป็นภาษาจีนดู'],
+      rescue: ['我们聊聊周末的安排吧！你周末一般喜欢做什么？', 'Wǒmen liáoliao zhōumò de ānpái ba! Nǐ zhōumò yībān xǐhuān zuò shénme?', 'Ayo ngobrol soal rencana akhir pekan! Kamu biasanya suka ngapain saat akhir pekan?', 'มาคุยเรื่องแผนวันหยุดสุดสัปดาห์กันเถอะ! ปกติวันเสาร์อาทิตย์คุณชอบทำอะไรเหรอ?'],
+    },
     wh_what_general: {
-      easy: [topic ? `我挺喜欢${topic}的。` : '我挺喜欢学新东西的。', topic ? `Wǒ tǐng xǐhuān ${topic} de.` : 'Wǒ tǐng xǐhuān xué xīn dōngxi de.', topic ? `Aku suka sekali ${topic}.` : 'Aku suka belajar hal baru.', topic ? `ฉันชอบ${topic}มากเลย` : 'ฉันชอบเรียนรู้สิ่งใหม่ๆ'],
-      mission: [topic ? `我最喜欢的就是${topic}，能让我放松下来。` : '平时最喜欢练练口语，很有成就感。', topic ? `Wǒ zuì xǐhuān de jiù shì ${topic}, néng ràng wǒ fàngsōng xiàlái.` : 'Píngshí zuì xǐhuān liànlian kǒuyǔ, hěn yǒu chéngjiùgǎn.', topic ? `Yang paling kusuka adalah ${topic}, bisa bikin rileks.` : 'Paling suka melatih percakapan, sangat memuaskan.', topic ? `สิ่งที่ฉันชอบที่สุดคือ${topic} เพราะทำให้ผ่อนคลาย` : 'ปกติชอบฝึกสนทนา รู้สึกว่าคุ้มค่ามากเลย'],
+      easy: [topic ? `我挺喜欢${topic}的。` : '我挺喜欢学新东西的。', topic ? `Wǒ tǐng xǐhuān ${toPhoneticPinyin(topic)} de.` : 'Wǒ tǐng xǐhuān xué xīn dōngxi de.', topic ? `Aku suka sekali "${toPhoneticPinyin(topic)}".` : 'Aku suka belajar hal baru.', topic ? `ฉันชอบ "${toPhoneticPinyin(topic)}" มากเลย` : 'ฉันชอบเรียนรู้สิ่งใหม่ๆ'],
+      mission: [topic ? `我最喜欢的就是${topic}，能让我放松下来。` : '平时最喜欢练练口语，很有成就感。', topic ? `Wǒ zuì xǐhuān de jiù shì ${toPhoneticPinyin(topic)}, néng ràng wǒ fàngsōng xiàlái.` : 'Píngshí zuì xǐhuān liànlian kǒuyǔ, hěn yǒu chéngjiùgǎn.', topic ? `Yang paling kusuka adalah "${toPhoneticPinyin(topic)}", bisa bikin rileks.` : 'Paling suka melatih percakapan, sangat memuaskan.', topic ? `สิ่งที่ฉันชอบที่สุดคือ "${toPhoneticPinyin(topic)}" เพราะทำให้ผ่อนคลาย` : 'ปกติชอบฝึกสนทนา รู้สึกว่าคุ้มค่ามากเลย'],
       rescue: ['这个挺有意思的。你平时最推荐什么？', 'Zhè gè tǐng yǒu yìsi de. Nǐ píngshí zuì tuījiàn shénme?', 'Menarik ya. Kalau kamu paling rekomendasikan apa?', 'น่าสนใจดีจัง แล้วปกติคุณแนะนำอะไรที่สุดเหรอ?'],
     },
     wh_why: {
@@ -1078,7 +1119,7 @@ export function buildContextualFallbackCards(params: {
     },
     yesno_do: {
       easy: ['是的，我挺喜欢的。', 'Shì de, wǒ tǐng xǐhuān de.', 'Ya, saya menyukainya.', 'ใช่ ฉันชอบสิ่งนี้ครับ/ค่ะ'],
-      mission: [topic ? `是的，我非常喜欢${topic}。` : '是的，我觉得这非常有意思。', topic ? `Shì de, wǒ fēicháng xǐhuān ${topic}.` : 'Shì de, wǒ juéde zhè fēicháng yǒu yìsi.', topic ? `Ya, saya sangat suka ${topic}.` : 'Ya, kurasa ini sangat menarik.', topic ? `ใช่ ฉันชอบ${topic}มากเลย` : 'ใช่ ฉันคิดว่าสิ่งนี้น่าสนใจมาก'],
+      mission: [topic ? `是的，我非常喜欢${topic}。` : '是的，我觉得这非常有意思。', topic ? `Shì de, wǒ fēicháng xǐhuān ${toPhoneticPinyin(topic)}.` : 'Shì de, wǒ juéde zhè fēicháng yǒu yìsi.', topic ? `Ya, saya sangat suka "${toPhoneticPinyin(topic)}".` : 'Ya, kurasa ini sangat menarik.', topic ? `ใช่ ฉันชอบ "${toPhoneticPinyin(topic)}" มากเลย` : 'ใช่ ฉันคิดว่าสิ่งนี้น่าสนใจมาก'],
       rescue: ['是的！你平时也喜欢这个吗？', 'Shì de! Nǐ píngshí yě xǐhuān zhè gè ma?', 'Ya! Kamu sendiri biasanya suka ini juga?', 'ใช่เลย! แล้วปกติคุณชอบสิ่งนี้เหมือนกันไหม?'],
     },
     greeting: {
@@ -1112,13 +1153,13 @@ export function buildContextualFallbackCards(params: {
     let cleanP = String(p || '').trim();
     if (lang === 'zh') {
       if (!cleanP || containsHanzi(cleanP)) {
-        cleanP = toPhoneticPinyin(cleanP || fallbackText);
+        cleanP = toPhoneticPinyin(fallbackText);
       }
       return cleanP.replace(/[\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
     }
     if (lang === 'ja') {
       if (!cleanP || /[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/.test(cleanP)) {
-        cleanP = toPhoneticRomaji(cleanP || fallbackText);
+        cleanP = toPhoneticRomaji(fallbackText);
       }
       return cleanP.replace(/[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
     }
@@ -1127,11 +1168,25 @@ export function buildContextualFallbackCards(params: {
 
   const sanitizeHint = (h: string, lang: TargetLang) => {
     if (!h) return '';
-    return h.replace(/["'“‘「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'”’」』]/g, (_m, inner) => {
-      if (lang === 'zh') return `"${toPhoneticPinyin(inner)}"`;
-      if (lang === 'ja') return `"${toPhoneticRomaji(inner)}"`;
-      return inner;
-    }).replace(/[\u4e00-\u9fff\u3040-\u30ff]/g, '').replace(/\s{2,}/g, ' ').trim();
+    return h
+      .replace(/["'“‘「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'”’」』]/g, (_m, inner) => {
+        if (lang === 'zh') return `"${toPhoneticPinyin(inner)}"`;
+        if (lang === 'ja') return `"${toPhoneticRomaji(inner)}"`;
+        return inner;
+      })
+      .replace(/[\u4e00-\u9fff\u3040-\u30ff]+/g, (run) => {
+        if (lang === 'zh') {
+          const py = toPhoneticPinyin(run);
+          return py ? `"${py}"` : '';
+        }
+        if (lang === 'ja') {
+          const ro = toPhoneticRomaji(run);
+          return ro ? `"${ro}"` : '';
+        }
+        return '';
+      })
+      .replace(/\s{2,}/g, ' ')
+      .trim();
   };
 
   return meta.map((m, i) => ({
@@ -1192,11 +1247,25 @@ function normalizeServerCopilotCards(
     const rawHintTh = stripEmojisAndEmotWords(String(item.hintTh || item.translationTh || item.hint || rawHintId)).trim();
 
     const sanitizeHint = (h: string) => {
-      return h.replace(/["'“‘「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'”’」』]/g, (_m, inner) => {
-        if (targetLang === 'zh') return `"${toPhoneticPinyin(inner)}"`;
-        if (targetLang === 'ja') return `"${toPhoneticRomaji(inner)}"`;
-        return inner;
-      }).replace(/[\u4e00-\u9fff\u3040-\u30ff]/g, '').replace(/\s{2,}/g, ' ').trim();
+      return h
+        .replace(/["'“‘「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'”’」』]/g, (_m, inner) => {
+          if (targetLang === 'zh') return `"${toPhoneticPinyin(inner)}"`;
+          if (targetLang === 'ja') return `"${toPhoneticRomaji(inner)}"`;
+          return inner;
+        })
+        .replace(/[\u4e00-\u9fff\u3040-\u30ff]+/g, (run) => {
+          if (targetLang === 'zh') {
+            const py = toPhoneticPinyin(run);
+            return py ? `"${py}"` : '';
+          }
+          if (targetLang === 'ja') {
+            const ro = toPhoneticRomaji(run);
+            return ro ? `"${ro}"` : '';
+          }
+          return '';
+        })
+        .replace(/\s{2,}/g, ' ')
+        .trim();
     };
 
     out.push({
@@ -1261,7 +1330,7 @@ export async function requestRealtimeCopilotAssist(params: {
     };
   };
 
-  const budgetMs = Math.max(1500, Math.min(params.budgetMs ?? 4200, 8000));
+  const budgetMs = Math.max(1500, Math.min(params.budgetMs ?? 7500, 10000));
   const deadline = Date.now() + budgetMs;
 
   // 1) Fast-Path: kunci Gemini pribadi murid (gemini-3-flash-preview)
@@ -1279,7 +1348,9 @@ export async function requestRealtimeCopilotAssist(params: {
     try {
       const langSpec = params.targetLang === 'ja'
         ? 'Japanese (N5-N3, Kanji+Hiragana, NO emojis; word-spaced Hepburn Romaji in pronunciation)'
-        : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
+        : params.targetLang === 'zh'
+          ? 'Mandarin Chinese (HSK1-HSK3, Simplified Chinese characters, NO emojis; tone-marked Pinyin in pronunciation)'
+          : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
       const learnerLangName = params.locale === 'th' ? 'Thai' : 'Indonesian';
       const hist = (params.history || []).slice(-6).map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner AI'}: "${h.text}"`).join('\n');
       const prompt = [
@@ -1359,9 +1430,12 @@ export async function requestRealtimeCopilotAssist(params: {
       });
       clearTimeout(timer);
       params.signal?.removeEventListener('abort', onAbort);
-      if (res.status === 429 || res.status === 503) {
+      if (res.status === 429) {
         const ra = Number(res.headers.get('retry-after') || 0);
-        _copilotServerCooldownUntil = Date.now() + (ra > 0 ? Math.min(ra, 60) * 1000 : 20000);
+        _copilotServerCooldownUntil = Date.now() + (ra > 0 ? Math.min(ra, 30) * 1000 : 8000);
+        continue;
+      }
+      if (res.status === 503) {
         continue;
       }
       if (res.ok) {
@@ -1530,6 +1604,16 @@ export function synthesizeNaturalReformulation(
     return text;
   }
 
+  if (targetLang === 'zh') {
+    text = text.replace(/^(\s*(呃|嗯|那个|就是)\s*[,，]*\s*)+/u, '');
+    text = text.replace(/(我|你|他|她|我们)是(喜欢|想|要|去|吃|喝|觉得|知道)/gu, '$1$2');
+    text = text.replace(/一个(咖啡|拿铁|美式|奶茶|茶|水|牛奶|果汁)/gu, '一杯$1');
+    text = text.replace(/不(吃|喝|去|看|买|做)了昨天/gu, '昨天没$1');
+    text = text.replace(/很非常/gu, '非常');
+    text = text.replace(/\s{2,}/g, ' ').trim();
+    return text;
+  }
+
   return text;
 }
 
@@ -1558,9 +1642,13 @@ export function sanitizeHallucinatedTranscript(
         ? locale === 'th'
           ? /[A-Za-z\u3040-\u30FF\u4E00-\u9FAF\u0E00-\u0E7F]/g
           : /[A-Za-z\u3040-\u30FF\u4E00-\u9FAF]/g
-        : locale === 'th'
-          ? /[A-Za-z\u0E00-\u0E7F]/g
-          : /[A-Za-z]/g;
+        : targetLang === 'zh'
+          ? locale === 'th'
+            ? /[A-Za-z\u4E00-\u9FFF\u0E00-\u0E7F]/g
+            : /[A-Za-z\u4E00-\u9FFF]/g
+          : locale === 'th'
+            ? /[A-Za-z\u0E00-\u0E7F]/g
+            : /[A-Za-z]/g;
     const validMatches = stripped.match(validScriptRegex) || [];
     if (validMatches.length < 2 || forbiddenMatches.length >= validMatches.length) {
       return '';
@@ -1948,6 +2036,93 @@ export function evaluateUtteranceClientSide(params: {
     };
   }
 
+  // Mandarin Chinese (zh) evaluation — Braincore Copula, Measure Word, Negation & Word-Order Diagnostics
+  if (targetLang === 'zh') {
+    const hasCopulaBeforeVerb = /(我|你|他|她|我们)是(喜欢|想|要|去|吃|喝|觉得|知道|学习|工作)/u.test(exact);
+    const hasWrongMeasureWordDrink = /一个(咖啡|拿铁|美式|奶茶|茶|水|牛奶|果汁)/u.test(exact);
+    const hasPastBuLeTrap = /不(吃|喝|去|看|买|做)了(昨天|刚才|上个)/u.test(exact);
+    const hasDoubleDegreeAdv = /很非常|非常很/u.test(exact);
+    const isTooShortZh = exact.replace(/[^\u4E00-\u9FFFA-Za-z0-9]/g, '').length < 1;
+
+    if (hasCopulaBeforeVerb || hasWrongMeasureWordDrink || hasPastBuLeTrap || hasDoubleDegreeAdv || isTooShortZh) {
+      let misconceptionId = 'ZH_GRAMMAR_SLIP';
+      let whyFailsId =
+        'Susunan kalimat Mandarin masih terpengaruh terjemahan kata-per-kata. Perhatikan kata bantu dan kata penggolong yang tepat.';
+      let whyFailsTh =
+        'โครงสร้างประโยคภาษาจีนยังแปลตรงตัวเกินไป โปรดสังเกตคำลักษณนามและรูปประโยคที่ถูกต้อง';
+      let syntacticCorrection = synthesizeNaturalReformulation(exact, 'zh') || scenario.sampleUtterances[0]?.text || '我想喝一杯冰美式咖啡。';
+
+      if (hasCopulaBeforeVerb) {
+        misconceptionId = 'zh_copula_shi_before_verb';
+        whyFailsId =
+          'Dalam bahasa Mandarin, jangan letakkan "是 (shì)" langsung di depan kata kerja seperti 喜欢/想/去. Langsung gunakan Subjek + Kata Kerja.';
+        whyFailsTh =
+          'ในภาษาจีน ห้ามวาง "是 (shì)" หน้าคำกริยาอย่าง 喜欢/想/去 ให้ใช้ ประธาน + กริยา ได้เลย';
+      } else if (hasWrongMeasureWordDrink) {
+        misconceptionId = 'zh_measure_word_ge_for_drink';
+        whyFailsId =
+          'Untuk minuman dalam cangkir/gelas, gunakan kata penggolong "一杯 (yī bēi)", bukan "一个 (yī gè)".';
+        whyFailsTh =
+          'สำหรับเครื่องดื่มในแก้วหรือถ้วย ต้องใช้คำลักษณนาม "一杯 (yī bēi)" ไม่ใช่ "一个 (yī gè)"';
+      } else if (hasPastBuLeTrap) {
+        misconceptionId = 'zh_past_negation_bu_vs_mei';
+        whyFailsId =
+          'Untuk menyatakan belum/tidak melakukan sesuatu di masa lampau, gunakan "没 (méi)" dan letakkan keterangan waktu sebelum kata kerja.';
+        whyFailsTh =
+          'การปฏิเสธเหตุการณ์ในอดีตต้องใช้ "没 (méi)" และวางคำบอกเวลาไว้หน้ากริยา';
+      } else if (hasDoubleDegreeAdv) {
+        misconceptionId = 'zh_double_degree_adverb';
+        whyFailsId =
+          'Jangan menumpuk dua kata keterangan tingkat seperti "很 (hěn)" dan "非常 (fēicháng)" bersamaan.';
+        whyFailsTh =
+          'ห้ามซ้อนคำวิเศษณ์บอกระดับ "很 (hěn)" กับ "非常 (fēicháng)" ในที่เดียวกัน';
+      }
+
+      const corrPinyin = toPhoneticPinyin(syntacticCorrection);
+      return {
+        ok: false,
+        accuracyScore: 52,
+        grammarScore: 46,
+        fluencyScore: 68,
+        vocabUsageScore: 66,
+        userExactTranscript: exact,
+        misconceptionId,
+        whyFailsId,
+        whyFailsTh,
+        missingTokens: [],
+        syntacticCorrection,
+        naturalReformulation: syntacticCorrection,
+        pedagogicalFeedbackId: whyFailsId,
+        pedagogicalFeedbackTh: whyFailsTh,
+        aiReply: `停一下！这句话不够地道哦。跟我清楚地读一遍：“${syntacticCorrection}”`,
+        aiReplyTranslationId: `Tunggu sebentar! Kalimat barusan belum alami. Coba ulangi dengan jelas bersamaku: "${corrPinyin}"`,
+        aiReplyTranslationTh: `เดี๋ยวก่อนนะ! ประโยคเมื่อกี้ยังไม่เป็นธรรมชาติ ลองพูดตามชัดๆ อีกครั้งนะ: "${corrPinyin}"`,
+        nextSuggestedReplies: [],
+      };
+    }
+
+    return {
+      ok: true,
+      accuracyScore: 94,
+      grammarScore: 95,
+      fluencyScore: 92,
+      vocabUsageScore: 92,
+      userExactTranscript: exact,
+      misconceptionId: null,
+      whyFailsId: null,
+      whyFailsTh: null,
+      missingTokens: [],
+      syntacticCorrection: null,
+      naturalReformulation: exact,
+      pedagogicalFeedbackId: 'Susunan kata, kata penggolong, dan pilihan kosakata Mandarin sudah tepat dan alami.',
+      pedagogicalFeedbackTh: 'การเรียงคำ คำลักษณนาม และการเลือกใช้คำศัพท์ภาษาจีนถูกต้องและเป็นธรรมชาติ',
+      aiReply: '说得很地道！那我们继续聊，你平时还喜欢做什么呢？',
+      aiReplyTranslationId: 'Pengucapanmu sangat alami! Yuk lanjut ngobrol, biasanya kamu suka melakukan kegiatan apa lagi?',
+      aiReplyTranslationTh: 'พูดได้เป็นธรรมชาติมากเลย! มาคุยกันต่อนะ ปกติคุณชอบทำกิจกรรมอะไรอีกบ้าง?',
+      nextSuggestedReplies: [],
+    };
+  }
+
   // Japanese (ja) evaluation — Strict Braincore Particle, Conjugation, & Register Diagnostics
   const hasVerbDictPlusDesu =
     /(飲む|食べる|行く|来る|する|見る|買う|読む|書く|話す|帰る|待つ|遊ぶ|休む|働く|勉強する|お願いする)\s*です/u.test(
@@ -2322,7 +2497,7 @@ export async function requestAiPartnerReply(params: {
   const buildInput = (withMode: boolean, withRole: boolean) => {
     const input: Record<string, unknown> = {
       message,
-      course: params.targetLang === 'ja' ? 'ja' : 'en',
+      course: params.targetLang === 'ja' ? 'ja' : params.targetLang === 'zh' ? 'zh' : 'en',
       level: mapScenarioLevel((params.scenario as { level?: string }).level),
     };
     if (withRole) input.scenarioId = mapScenarioToWorkerRole(params.scenario.id);
@@ -2625,7 +2800,9 @@ export async function resolveAiReply(
       const langLabel =
         params.targetLang === 'ja'
           ? 'Japanese (natural N5/N4, Kanji+Hiragana, NO emojis; word-spaced Hepburn Romaji in pronunciation)'
-          : 'English (natural A2/B1, NO emojis; easy phonetic guide in pronunciation)';
+          : params.targetLang === 'zh'
+            ? 'Mandarin Chinese (natural HSK1-HSK3, Simplified Chinese characters, NO emojis; tone-marked Pinyin in pronunciation)'
+            : 'English (natural A2/B1, NO emojis; easy phonetic guide in pronunciation)';
       const historyLines = params.history
         .filter((h) => h && h.text && h.text.trim())
         .slice(-6)
@@ -2775,7 +2952,9 @@ export async function resolveAiReply(
   const networkApologyReply =
     params.targetLang === 'ja'
       ? 'すみません、電波が少し途切れました。もう一度お話しいただけますか？'
-      : 'Sorry, the line glitched for a second. Could you say that again?';
+      : params.targetLang === 'zh'
+        ? '不好意思，信号刚才断了一下。你可以再说一遍吗？'
+        : 'Sorry, the line glitched for a second. Could you say that again?';
   const networkApologyTransId =
     'Maaf, koneksi sempat terputus sebentar. Bisa tolong ucapkan sekali lagi?';
   const networkApologyTransTh =
@@ -2828,17 +3007,18 @@ export function splitIntoSpeechChunks(text: string, targetLang: TargetLang, maxC
   // Edge-TTS natively synthesizes full conversational sentences with natural human prosody and zero awkward gaps.
   const singleLimit = 320;
   if (clean.length <= singleLimit) return [clean];
+  const isCjkLang = targetLang === 'ja' || targetLang === 'zh';
   const parts =
-    targetLang === 'ja'
+    isCjkLang
       ? clean.match(/[^。！？!?]+[。！？!?]*/g) || [clean]
       : clean.match(/[^.!?]+(?:[.!?]+["')\]]*|$)/g) || [clean];
-  const minLen = targetLang === 'ja' ? 10 : 24;
+  const minLen = isCjkLang ? 10 : 24;
   const chunks: string[] = [];
   let carry = '';
   for (const raw of parts) {
     const piece = raw.trim();
     if (!piece) continue;
-    const merged = carry ? `${carry}${targetLang === 'ja' ? '' : ' '}${piece}` : piece;
+    const merged = carry ? `${carry}${isCjkLang ? '' : ' '}${piece}` : piece;
     if (merged.length < minLen) {
       carry = merged;
       continue;
@@ -2847,12 +3027,12 @@ export function splitIntoSpeechChunks(text: string, targetLang: TargetLang, maxC
     carry = '';
   }
   if (carry) {
-    if (chunks.length) chunks[chunks.length - 1] += `${targetLang === 'ja' ? '' : ' '}${carry}`;
+    if (chunks.length) chunks[chunks.length - 1] += `${isCjkLang ? '' : ' '}${carry}`;
     else chunks.push(carry);
   }
   if (chunks.length > maxChunks) {
     const head = chunks.slice(0, maxChunks - 1);
-    head.push(chunks.slice(maxChunks - 1).join(targetLang === 'ja' ? '' : ' '));
+    head.push(chunks.slice(maxChunks - 1).join(isCjkLang ? '' : ' '));
     return head;
   }
   return chunks;
@@ -2974,13 +3154,21 @@ export async function synthesizeViaGeminiLiveWav(params: {
   if (!wsEndpoint) return null;
 
   const voiceName =
-    params.persona?.geminiVoice || (params.targetLang === 'ja' ? 'Aoede' : 'Puck');
-  const langLabel = params.targetLang === 'ja' ? 'natural Japanese' : 'natural English';
+    params.persona?.geminiVoice ||
+    (params.targetLang === 'ja' || params.targetLang === 'zh' ? 'Aoede' : 'Puck');
+  const langLabel =
+    params.targetLang === 'ja'
+      ? 'natural Japanese'
+      : params.targetLang === 'zh'
+        ? 'natural Putonghua Mandarin Chinese'
+        : 'natural English';
   const personaStyle =
     params.persona?.speakingStyle ||
     (params.targetLang === 'ja'
       ? 'Expressive, warm, sharp-witted Tokyo mentor with natural pitch accent and dynamic regional dialect capability'
-      : 'Expressive, charismatic native speaking coach with natural conversational rhythm');
+      : params.targetLang === 'zh'
+        ? 'Warm, crisp, expressive native Beijing/Putonghua Mandarin tutor with crystal-clear four-tone prosody'
+        : 'Expressive, charismatic native speaking coach with natural conversational rhythm');
 
   return new Promise((resolve) => {
     let settled = false;
@@ -3167,10 +3355,17 @@ export async function synthesizeFlexibleTts(params: {
     sensei_keita: 'keita',
     nanami: 'sensei_nanami',
     keita: 'keita',
+    xiao_mochi: 'xiao_mochi',
+    xiaoxiao: 'xiao_mochi',
+    yunxi: 'yunxi',
   };
   const speaker =
     (params.persona && speakerMap[params.persona.id]) ||
-    (params.targetLang === 'ja' ? 'sensei_nanami' : 'coach_alex');
+    (params.targetLang === 'ja'
+      ? 'sensei_nanami'
+      : params.targetLang === 'zh'
+        ? 'xiao_mochi'
+        : 'coach_alex');
 
   const cacheKey = `${speaker}:${params.targetLang}:${cleanSpokenText}`;
   const cached = _ttsMemoryCache.get(cacheKey);
@@ -3227,8 +3422,13 @@ export async function synthesizeFlexibleTts(params: {
               }
             } else if (contentType.includes('application/json')) {
               const json = await res.json();
+              const voiceNameResp = String(json?.voiceName || '').toLowerCase();
+              const isVoiceLangMismatch =
+                (params.targetLang === 'zh' && voiceNameResp && !voiceNameResp.startsWith('zh')) ||
+                (params.targetLang === 'ja' && voiceNameResp && !voiceNameResp.startsWith('ja')) ||
+                (params.targetLang === 'en' && voiceNameResp && !voiceNameResp.startsWith('en'));
               const b64 = json?.audioBase64 || json?.audio_base64 || json?.audio || json?.data;
-              if (typeof b64 === 'string' && b64.length > 32) {
+              if (!isVoiceLangMismatch && typeof b64 === 'string' && b64.length > 32) {
                 _ttsWarm = true;
                 _ttsConsecutiveFailures = 0;
                 _ttsCooldownUntil = 0;
