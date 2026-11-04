@@ -1046,99 +1046,120 @@ html.fz-booting header.topbar {
 }
 
 /* 4. Auth & Login Screen: 100% Viewport-Fit, High Contrast, Zero-Mascot */
-.fz-auth {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100dvh !important;
-  max-height: 100dvh !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain !important;
-  scrollbar-width: none !important;
-  background: #FDFAF3 !important;
-  color: #1B1418 !important;
-  box-sizing: border-box !important;
-  z-index: 2147481950 !important;
+@media (max-width: 767px) {
+  .fz-auth {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    scrollbar-width: none !important;
+    background: radial-gradient(120% 80% at 85% 10%, #FFFDF8 0%, rgba(248, 243, 233, 0.75) 45%, rgba(243, 232, 217, 0.40) 100%), radial-gradient(90% 60% at 15% 90%, rgba(243, 232, 217, 0.75) 0%, rgba(248, 243, 233, 0.45) 50%, transparent 100%), #F8F3E9 !important;
+    color: #1B1515 !important;
+    box-sizing: border-box !important;
+    z-index: 2147481950 !important;
+  }
 }
 
 .fz-auth::-webkit-scrollbar {
   display: none !important;
 }
 
-.fz-auth-hero {
-  position: relative !important;
-  flex: 0 0 auto !important;
-  overflow: hidden !important;
-  background: #1B1418 !important;
-  background-color: #1B1418 !important;
-  color: #FDFAF3 !important;
+@media (max-width: 767px) {
+  .fz-auth-hero {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
+    background: #1B1515 !important;
+    background-color: #1B1515 !important;
+    color: #FFFDF8 !important;
+  }
+
+  .fz-auth-hero::before,
+  .fz-auth-hero::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+  }
+
+  .fz-auth-hero .fz-auth-topo,
+  .fiezel-ob-reveal .fz-auth-topo,
+  .fiezel-splash-brand .fz-auth-topo {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    opacity: 0.95 !important;
+  }
+
+  .fz-auth-hero.is-welcome {
+    min-height: 48vh !important;
+    max-height: 52vh !important;
+    padding: max(36px, calc(env(safe-area-inset-top, 0px) + 24px)) 20px 56px !important;
+  }
+
+  .fz-auth-hero.is-masuk {
+    flex: 0 0 auto !important;
+    min-height: 24vh !important;
+    max-height: 28vh !important;
+    padding: max(36px, calc(env(safe-area-inset-top, 0px) + 24px)) 20px 38px !important;
+  }
+
+  .fz-auth-hero.is-daftar {
+    flex: 0 0 auto !important;
+    min-height: 20vh !important;
+    max-height: 24vh !important;
+    padding: max(32px, calc(env(safe-area-inset-top, 0px) + 20px)) 20px 34px !important;
+  }
+
+  .fz-auth-hero .fz-auth-brand .fiezel-wordmark {
+    width: min(46vw, 190px) !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+
+  .fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
+    width: min(36vw, 140px) !important;
+  }
+
+  .fz-auth-wave {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: -1px !important;
+    width: 100% !important;
+    height: 64px !important;
+    z-index: 2 !important;
+    filter: drop-shadow(0 -6px 14px rgba(0, 0, 0, 0.16)) !important;
+  }
+
+  .fz-auth-body {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 12px 24px max(20px, env(safe-area-inset-bottom)) 24px !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    background: transparent !important;
+    color: #1B1515 !important;
+    box-sizing: border-box !important;
+  }
 }
 
-.fz-auth-hero::before {
-  display: none !important;
+.fz-wave-back,
+.fz-wave-back-v {
+  fill: #EBDDC8 !important;
+  opacity: 0.45 !important;
 }
 
-.fz-auth-hero::after {
-  top: 56% !important;
-  height: 136px !important;
-  background: radial-gradient(closest-side, rgba(255, 199, 0, 0.15), rgba(255, 199, 0, 0)) !important;
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
-}
-
-.fz-auth-hero .fz-auth-topo,
-.fiezel-ob-reveal .fz-auth-topo,
-.fiezel-splash-brand .fz-auth-topo {
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
-  opacity: 0.95 !important;
-}
-
-.fz-auth-hero.is-welcome {
-  min-height: 46vh !important;
-  max-height: 50vh !important;
-  padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 56px !important;
-}
-
-.fz-auth-hero.is-masuk {
-  flex: 0 0 auto !important;
-  min-height: 24vh !important;
-  max-height: 28vh !important;
-  padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 38px !important;
-}
-
-.fz-auth-hero.is-daftar {
-  flex: 0 0 auto !important;
-  min-height: 20vh !important;
-  max-height: 24vh !important;
-  padding: max(42px, calc(env(safe-area-inset-top, 0px) + 30px)) 20px 34px !important;
-}
-
-.fz-auth-hero .fz-auth-brand .fiezel-wordmark {
-  width: min(44vw, 180px) !important;
-  display: block !important;
-  margin: 0 auto !important;
-}
-
-.fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
-  width: min(36vw, 140px) !important;
-}
-
-.fz-auth-wave {
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: -1px !important;
-  width: 100% !important;
-  height: 38px !important;
-  z-index: 2 !important;
-}
-
-.fz-auth-wave path {
-  fill: #FDFAF3 !important;
+.fz-wave-front,
+.fz-wave-front-v {
+  fill: #F8F3E9 !important;
 }
 
 /* ZERO MASCOTS / PAW */
@@ -1153,95 +1174,246 @@ html.fz-booting header.topbar {
   pointer-events: none !important;
 }
 
-.fz-auth-body {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  padding: 6px 24px max(20px, env(safe-area-inset-bottom)) 24px !important;
-  max-width: 440px !important;
-  margin: 0 auto !important;
-  width: 100% !important;
-  background: transparent !important;
-  color: #1B1418 !important;
-  box-sizing: border-box !important;
+/* Titles & Descriptions: Mobile Baseline */
+@media (max-width: 767px) {
+  .fz-auth .fz-auth-title,
+  .fz-auth-body .fz-auth-title,
+  .fz-auth-body h1,
+  .fz-auth-body h2 {
+    color: #1B1418 !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+    font-size: 1.85rem !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+    letter-spacing: -0.02em !important;
+    margin: 4px 0 10px 0 !important;
+  }
+
+  .fz-auth-title.is-underlined {
+    display: inline-block !important;
+    align-self: flex-start !important;
+    text-decoration: underline !important;
+    text-decoration-color: #9B3A4A !important;
+    text-decoration-thickness: 3.5px !important;
+    text-underline-offset: 7px !important;
+    text-decoration-skip-ink: none !important;
+  }
+
+  .fz-auth .fz-auth-lead,
+  .fz-auth-body .fz-auth-lead,
+  .fz-auth-body p:not(.fz-auth-or) {
+    color: #475569 !important;
+    font-size: 1rem !important;
+    line-height: 1.55 !important;
+    max-width: 36ch !important;
+    margin: 0 0 14px 0 !important;
+  }
+
+  .fz-auth-next-row {
+    margin-top: auto !important;
+    padding-top: 24px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+
+  .fz-auth .fz-auth-next {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    border: 0 !important;
+    background: linear-gradient(135deg, #7C1D3A, #581428) !important;
+    box-shadow: 0 8px 24px rgba(124, 29, 58, 0.35) !important;
+    color: #FFFDF8 !important;
+    font-family: inherit !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    padding: 12px 24px !important;
+    border-radius: 9999px !important;
+    cursor: pointer !important;
+    transition: all 0.18s ease !important;
+  }
+
+  .fz-auth .fz-auth-next:hover {
+    background: linear-gradient(135deg, #922D43, #6E1D30) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 28px rgba(124, 29, 58, 0.45) !important;
+  }
+
+  .fz-auth .fz-auth-next span {
+    color: #FFFDF8 !important;
+    font-weight: 700 !important;
+  }
 }
 
-/* Titles: Deep Ink (#1B1418) */
-.fz-auth .fz-auth-title,
-.fz-auth-body .fz-auth-title,
-.fz-auth-body h1,
-.fz-auth-body h2 {
-  color: #1B1418 !important;
-  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
-  font-size: 1.85rem !important;
-  font-weight: 800 !important;
-  line-height: 1.15 !important;
-  letter-spacing: -0.02em !important;
-  margin: 4px 0 10px 0 !important;
+/* Titles & Descriptions: Desktop Grand Scale (min-width: 768px) */
+@media (min-width: 768px) {
+  .fz-auth-wave-h {
+    display: none !important;
+  }
+
+  .fz-auth-wave-v {
+    display: block !important;
+    position: absolute !important;
+    right: -1px !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
+    width: 160px !important;
+    z-index: 5 !important;
+    pointer-events: none !important;
+    filter: drop-shadow(-8px 0 18px rgba(0, 0, 0, 0.18)) !important;
+  }
+
+  .fz-auth .fz-auth-welcome-container {
+    max-width: 560px !important;
+    width: 100% !important;
+    position: static !important;
+  }
+
+  .fz-auth .fz-auth-title,
+  .fz-auth-body .fz-auth-title,
+  .fz-auth-body h1 {
+    color: #1B1418 !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+    font-size: clamp(48px, 4.5vw, 64px) !important;
+    font-weight: 800 !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.03em !important;
+    margin: 0 0 16px 0 !important;
+  }
+
+  .fz-auth .fz-auth-title.is-underlined,
+  .fz-auth-body .fz-auth-title.is-underlined,
+  .fz-auth-body h1.is-underlined {
+    display: block !important;
+    align-self: center !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    font-size: clamp(34px, 3.2vw, 44px) !important;
+    margin: 0 0 22px 0 !important;
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    text-decoration: underline !important;
+    text-decoration-color: #922D43 !important;
+    text-decoration-thickness: 4px !important;
+    text-underline-offset: 8px !important;
+    text-decoration-skip-ink: none !important;
+  }
+
+  .fz-auth .fz-auth-lead,
+  .fz-auth-body .fz-auth-lead {
+    color: #5C4D56 !important;
+    font-size: 20px !important;
+    line-height: 1.5 !important;
+    max-width: 520px !important;
+    margin: 0 0 28px 0 !important;
+  }
+
+  .fz-auth .fz-auth-carousel-dots {
+    margin: 0 0 32px 0 !important;
+    gap: 12px !important;
+  }
+
+  .fz-auth .fz-auth-carousel-dots .fz-dot {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .fz-auth .fz-auth-carousel-dots .fz-dot.is-active {
+    width: 36px !important;
+  }
+
+  .fz-auth .fz-auth-next-row {
+    position: absolute !important;
+    bottom: 48px !important;
+    right: 48px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 30 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+
+  .fz-auth .fz-auth-next {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    border: 0 !important;
+    background: linear-gradient(135deg, #7C1D3A, #581428) !important;
+    box-shadow: 0 8px 24px rgba(124, 29, 58, 0.35) !important;
+    color: #FFFDF8 !important;
+    font-family: inherit !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+    padding: 18px 40px !important;
+    border-radius: 9999px !important;
+    cursor: pointer !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .fz-auth .fz-auth-next:hover {
+    background: linear-gradient(135deg, #922D43, #6E1D30) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 12px 32px rgba(124, 29, 58, 0.45) !important;
+  }
+
+  .fz-auth .fz-auth-next span {
+    color: #FFFDF8 !important;
+    font-weight: 700 !important;
+  }
+
+  .fz-auth-body .fz-auth-title.is-underlined,
+  .fz-auth-body .fz-auth-form,
+  .fz-auth-body .fz-auth-roles,
+  .fz-auth-body .fz-auth-google,
+  .fz-auth-body .fz-auth-or,
+  .fz-auth-body .fz-auth-alt,
+  .fz-auth-body .fz-auth-hint {
+    width: 100% !important;
+    max-width: 460px !important;
+  }
+
+  .fz-auth-body .fz-auth-input {
+    border-radius: 16px !important;
+    padding: 5px 15px !important;
+    min-height: 48px !important;
+  }
+
+  .fz-auth-body .fz-auth-input input[name] {
+    font-size: 1.02rem !important;
+    min-height: 42px !important;
+  }
+
+  .fz-auth-body .fz-auth-submit {
+    padding: 15px 28px !important;
+    font-size: 1.06rem !important;
+    margin-top: 10px !important;
+    border-radius: 9999px !important;
+    background: linear-gradient(135deg, #7C1D3A, #581428) !important;
+    color: #FFFDF8 !important;
+  }
+
+  .fz-btn-google-native {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 52px !important;
+    font-size: 1.02rem !important;
+  }
 }
 
-.fz-auth-title.is-underlined {
-  display: inline-block !important;
-  align-self: flex-start !important;
-  text-decoration: underline !important;
-  text-decoration-color: #9B3A4A !important;
-  text-decoration-thickness: 3.5px !important;
-  text-underline-offset: 7px !important;
-  text-decoration-skip-ink: none !important;
-}
-
-/* Lead & Descriptions */
-.fz-auth .fz-auth-lead,
-.fz-auth-body .fz-auth-lead,
-.fz-auth-body p:not(.fz-auth-or) {
-  color: #475569 !important;
-  font-size: 1rem !important;
-  line-height: 1.55 !important;
-  max-width: 36ch !important;
-  margin: 0 0 14px 0 !important;
-}
-
-/* Action Rows & Next Button */
-.fz-auth-next-row {
-  margin-top: auto !important;
-  padding-top: 24px !important;
-  display: flex !important;
-  justify-content: flex-end !important;
-}
-
-.fz-auth .fz-auth-next {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  color: #1B1418 !important;
-  font-size: 1.05rem !important;
-  font-weight: 800 !important;
-  padding: 8px 6px 8px 12px !important;
-  cursor: pointer !important;
-}
-
-.fz-auth .fz-auth-next span {
-  color: #1B1418 !important;
-  font-weight: 800 !important;
-}
-
-.fz-auth-next-dot {
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 50% !important;
+.fz-auth-next-arrow {
   display: grid !important;
   place-items: center !important;
-  background: #9B3A4A !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 8px 20px rgba(155, 58, 74, 0.45) !important;
+  width: 20px !important;
+  height: 20px !important;
+  color: #FFFDF8 !important;
 }
 
-.fz-auth-next-dot svg {
-  stroke: #FFFFFF !important;
+.fz-auth-next-arrow svg {
+  stroke: #FFFDF8 !important;
+  stroke-width: 2.2 !important;
+  fill: none !important;
 }
 
 /* Role Tabs (Murid / Guru) */
@@ -1268,9 +1440,9 @@ html.fz-booting header.topbar {
 }
 
 .fz-auth .fz-auth-role.is-on {
-  background: #FFFFFF !important;
-  color: #1B1418 !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14) !important;
+  background: #922D43 !important;
+  color: #FFFDF8 !important;
+  box-shadow: 0 4px 14px -4px rgba(146, 45, 67, 0.35) !important;
 }
 
 /* Google Sign-in Slot */
@@ -1418,7 +1590,7 @@ html.fz-booting header.topbar {
   padding: 0 2px !important;
 }
 
-/* Primary Submit Button: High Contrast Golden Amber */
+/* Primary Submit Button: Elegant Burgundy Pill */
 .fz-auth .fz-auth-submit {
   width: 100% !important;
   margin-top: 14px !important;
@@ -1426,11 +1598,17 @@ html.fz-booting header.topbar {
   font-size: 1.05rem !important;
   font-weight: 800 !important;
   border-radius: 9999px !important;
-  background: linear-gradient(135deg, #FFD94F 0%, #FFB800 100%) !important;
-  color: #101018 !important;
+  background: linear-gradient(135deg, #7C1D3A, #581428) !important;
+  color: #FFFDF8 !important;
   border: none !important;
-  box-shadow: 0 6px 20px rgba(255, 184, 0, 0.4) !important;
+  box-shadow: 0 8px 24px rgba(124, 29, 58, 0.35) !important;
   cursor: pointer !important;
+  transition: all 0.18s ease !important;
+}
+
+.fz-auth .fz-auth-submit:hover {
+  background: linear-gradient(135deg, #922D43, #6E1D30) !important;
+  box-shadow: 0 10px 28px rgba(124, 29, 58, 0.45) !important;
 }
 
 .fz-auth-error {
