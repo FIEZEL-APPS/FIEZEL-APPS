@@ -1,4 +1,10 @@
-import type { CallScenario, LearnerLocale, TargetLang, VoicePersona } from '../types/voiceCall.ts';
+import type {
+  CallScenario,
+  LearnerLocale,
+  TargetLang,
+  VoicePersona,
+  VoiceUiAction,
+} from '../types/voiceCall.ts';
 import {
   type BeginnerReplyCard,
   generateDynamicContextualAiReply,
@@ -36,6 +42,7 @@ export interface FlexibleTurnEvaluationResult {
    * 'ai-gemini-key' = learner's own Gemini key). Zero offline templates.
    */
   replySource?: 'ai' | 'ai-gemini-key';
+  uiAction?: VoiceUiAction;
 }
 
 declare global {
@@ -506,6 +513,8 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
         'the', 'a', 'an', 'your', 'you', 'do', 'does', 'did', 'what', 'where', 'how', 'why', 'when',
         'who', 'is', 'are', 'about', 'like', 'this', 'that', 'there', 'here', 'today', 'and', 'or',
         'to', 'of', 'in', 'on', 'for', 'with', 'it', 'me', 'my', 'we', 'so', 'any', 'some', 'usually', 'would',
+        'lately', 'recently', 'been', 'tripping', 'part', 'english', 'japanese', 'mandarin', 'chinese',
+        'real', 'talk', 'door', 'spot', 'voice', 'robot', 'textbook', 'leave', 'stiff', 'slips', 'calling',
       ]);
       const words = focalText
         .toLowerCase()
@@ -755,9 +764,185 @@ export function buildContextualFallbackCards(params: {
   locale: LearnerLocale;
   lastUserText?: string;
 }): BeginnerReplyCard[] {
+  const rawAi = String(params.aiText || '');
+  const th = params.locale === 'th';
+
+  // Special handler for proactive struggle diagnosis questions ("what part been tripping you up", "モヤモヤ", "头疼")
+  if (
+    /\b(tripping you up|struggl|confus|hardest part|messing you up|bothering you)\b/i.test(rawAi) ||
+    /(?:モヤモヤ|苦手|難しい|つまず|ややこしい|引っかか)/u.test(rawAi) ||
+    /(?:头疼|难懂|卡壳|搞混|最难)/u.test(rawAi)
+  ) {
+    if (params.targetLang === 'ja') {
+      return [
+        {
+          id: 'ctx_struggle_ja_1',
+          tier: 'easy',
+          badgeId: 'Singkat & Mudah',
+          badgeTh: 'สั้นและง่าย',
+          tierLabelId: '1 · Singkat',
+          tierLabelTh: '1 · สั้นและง่าย',
+          text: '助詞の「は」と「が」の使い分けが一番モヤモヤしています。',
+          pronunciation: 'Joshi no "wa" to "ga" no tsukaiwake ga ichiban moyamoya shite imasu.',
+          hintId: 'Perbedaan partikel "wa" dan "ga" yang paling bikin aku bingung.',
+          hintTh: 'การใช้คำช่วย "wa" กับ "ga" คือสิ่งที่ฉันสับสนที่สุด',
+          meaningId: 'Perbedaan partikel "wa" dan "ga" yang paling bikin aku bingung.',
+          meaningTh: 'การใช้คำช่วย "wa" กับ "ga" คือสิ่งที่ฉันสับสนที่สุด',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_struggle_ja_2',
+          tier: 'mission',
+          badgeId: 'Alami & Kontekstual',
+          badgeTh: 'เป็นธรรมชาติ',
+          tierLabelId: '2 · Alami',
+          tierLabelTh: '2 · เป็นธรรมชาติ',
+          text: '正直、動詞のて形と過去形の活用をすぐ口に出すのがまだ難しいです。',
+          pronunciation: 'Shoujiki, doushi no te-kei to kakokei no katsuyou o sugu kuchi ni dasu no ga mada muzukashii desu.',
+          hintId: 'Jujur, konjugasi kata kerja bentuk Te dan bentuk lampau masih sulit langsung kuucapkan.',
+          hintTh: 'พูดตามตรง การผันกริยารูป Te และรูปอดีตให้พูดออกมาได้ทันทียังยากอยู่',
+          meaningId: 'Jujur, konjugasi kata kerja bentuk Te dan bentuk lampau masih sulit langsung kuucapkan.',
+          meaningTh: 'พูดตามตรง การผันกริยารูป Te และรูปอดีตให้พูดออกมาได้ทันทียังยากอยู่',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_struggle_ja_3',
+          tier: 'rescue',
+          badgeId: 'Jawab + Tanya Balik',
+          badgeTh: 'ตอบและถามกลับ',
+          tierLabelId: '3 · + Tanya Balik',
+          tierLabelTh: '3 · + ถามกลับ',
+          text: '「に」と「で」の助詞でよく迷います。今すぐ一緒に練習できますか？',
+          pronunciation: '"Ni" to "de" no joshi de yoku mayoimasu. Ima sugu issho ni renshuu dekimasu ka?',
+          hintId: 'Aku sering bingung antara partikel "ni" dan "de". Bisa kita latih sekarang juga?',
+          hintTh: 'ฉันมักจะสับสนระหว่างคำช่วย "ni" กับ "de" เราฝึกด้วยกันตอนนี้เลยได้ไหม?',
+          meaningId: 'Aku sering bingung antara partikel "ni" dan "de". Bisa kita latih sekarang juga?',
+          meaningTh: 'ฉันมักจะสับสนระหว่างคำช่วย "ni" กับ "de" เราฝึกด้วยกันตอนนี้เลยได้ไหม?',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+      ];
+    }
+    if (params.targetLang === 'zh') {
+      return [
+        {
+          id: 'ctx_struggle_zh_1',
+          tier: 'easy',
+          badgeId: 'Singkat & Mudah',
+          badgeTh: 'สั้นและง่าย',
+          tierLabelId: '1 · Singkat',
+          tierLabelTh: '1 · สั้นและง่าย',
+          text: '我最头疼的是四个声调和“了”的用法。',
+          pronunciation: 'Wǒ zuì tóuténg de shì sì gè shēngdiào hé "le" de yòngfǎ.',
+          hintId: 'Yang paling bikin aku pusing itu empat nada dan cara pakai partikel "le".',
+          hintTh: 'สิ่งที่ฉันปวดหัวที่สุดคือวรรณยุกต์ทั้งสี่เสียงและการใช้ "le"',
+          meaningId: 'Yang paling bikin aku pusing itu empat nada dan cara pakai partikel "le".',
+          meaningTh: 'สิ่งที่ฉันปวดหัวที่สุดคือวรรณยุกต์ทั้งสี่เสียงและการใช้ "le"',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_struggle_zh_2',
+          tier: 'mission',
+          badgeId: 'Alami & Kontekstual',
+          badgeTh: 'เป็นธรรมชาติ',
+          tierLabelId: '2 · Alami',
+          tierLabelTh: '2 · เป็นธรรมชาติ',
+          text: '说实话，我经常把时间词放错位置，还容易用错量词。',
+          pronunciation: 'Shuō shíhuà, wǒ jīngcháng bǎ shíjiāncí fàng cuò wèizhì, hái róngyì yòng cuò liàngcí.',
+          hintId: 'Jujur, aku sering salah taruh posisi keterangan waktu dan salah pakai kata bantu bilangan.',
+          hintTh: 'พูดตามตรง ฉันมักวางคำบอกเวลาผิดตำแหน่งและใช้ลักษณนามผิดบ่อยๆ',
+          meaningId: 'Jujur, aku sering salah taruh posisi keterangan waktu dan salah pakai kata bantu bilangan.',
+          meaningTh: 'พูดตามตรง ฉันมักวางคำบอกเวลาผิดตำแหน่งและใช้ลักษณนามผิดบ่อยๆ',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_struggle_zh_3',
+          tier: 'rescue',
+          badgeId: 'Jawab + Tanya Balik',
+          badgeTh: 'ตอบและถามกลับ',
+          tierLabelId: '3 · + Tanya Balik',
+          tierLabelTh: '3 · + ถามกลับ',
+          text: '“不”和“没”的区别老是搞混，你能带我练一下吗？',
+          pronunciation: '"Bù" hé "méi" de qūbié lǎoshì gǎohùn, nǐ néng dài wǒ liàn yīxià ma?',
+          hintId: 'Bedanya "bù" dan "méi" sering ketukar terus, bisa bantu latih aku sebentar?',
+          hintTh: 'ฉันสับสนความแตกต่างระหว่าง "bù" กับ "méi" ตลอดเลย ช่วยพาฉันฝึกหน่อยได้ไหม?',
+          meaningId: 'Bedanya "bù" dan "méi" sering ketukar terus, bisa bantu latih aku sebentar?',
+          meaningTh: 'ฉันสับสนความแตกต่างระหว่าง "bù" กับ "méi" ตลอดเลย ช่วยพาฉันฝึกหน่อยได้ไหม?',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+      ];
+    }
+    return [
+      {
+        id: 'ctx_struggle_en_1',
+        tier: 'easy',
+        badgeId: 'Singkat & Mudah',
+        badgeTh: 'สั้นและง่าย',
+        tierLabelId: '1 · Singkat',
+        tierLabelTh: '1 · สั้นและง่าย',
+        text: 'Honestly, past tense and prepositions trip me up the most.',
+        pronunciation: 'onestli, past tens end prepozisyens trip mi ap de moust',
+        hintId: th
+          ? 'พูดตามตรง รูปอดีตและคำบุพบททำให้ฉันสับสนที่สุด'
+          : 'Jujur, past tense dan preposisi yang paling sering bikin aku kepleset.',
+        hintTh: 'พูดตามตรง รูปอดีตและคำบุพบททำให้ฉันสับสนที่สุด',
+        meaningId: th
+          ? 'พูดตามตรง รูปอดีตและคำบุพบททำให้ฉันสับสนที่สุด'
+          : 'Jujur, past tense dan preposisi yang paling sering bikin aku kepleset.',
+        meaningTh: 'พูดตามตรง รูปอดีตและคำบุพบททำให้ฉันสับสนที่สุด',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+      {
+        id: 'ctx_struggle_en_2',
+        tier: 'mission',
+        badgeId: 'Alami & Kontekstual',
+        badgeTh: 'เป็นธรรมชาติ',
+        tierLabelId: '2 · Alami',
+        tierLabelTh: '2 · เป็นธรรมชาติ',
+        text: 'For real, I always mix up when to use "am/is/are" versus action verbs.',
+        pronunciation: 'for ril, ai olweiz miks ap wen tu yuz em iz ar verses eksyen verbs',
+        hintId: th
+          ? 'เอาจริงๆ ฉันมักสับสนว่าเมื่อไหร่ควรใช้ am/is/are กับกริยาแท้'
+          : 'Serius, aku sering ketukar kapan harus pakai "am/is/are" lawan kata kerja langsung.',
+        hintTh: 'เอาจริงๆ ฉันมักสับสนว่าเมื่อไหร่ควรใช้ am/is/are กับกริยาแท้',
+        meaningId: th
+          ? 'เอาจริงๆ ฉันมักสับสนว่าเมื่อไหร่ควรใช้ am/is/are กับกริยาแท้'
+          : 'Serius, aku sering ketukar kapan harus pakai "am/is/are" lawan kata kerja langsung.',
+        meaningTh: 'เอาจริงๆ ฉันมักสับสนว่าเมื่อไหร่ควรใช้ am/is/are กับกริยาแท้',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+      {
+        id: 'ctx_struggle_en_3',
+        tier: 'rescue',
+        badgeId: 'Jawab + Tanya Balik',
+        badgeTh: 'ตอบและถามกลับ',
+        tierLabelId: '3 · + Tanya Balik',
+        tierLabelTh: '3 · + ถามกลับ',
+        text: 'Grammar tenses mess me up when I speak fast. Can we drill that right now?',
+        pronunciation: 'gremer tenses mes mi ap wen ai spik fast. ken wi dril det rait nau?',
+        hintId: th
+          ? 'เทนส์ไวยากรณ์ทำให้ฉันรวนเวลาพูดเร็วๆ เราฝึกเรื่องนี้กันตอนนี้เลยได้ไหม?'
+          : 'Tenses grammar bikin aku kacau pas ngomong cepat. Bisa kita latih itu sekarang?',
+        hintTh: 'เทนส์ไวยากรณ์ทำให้ฉันรวนเวลาพูดเร็วๆ เราฝึกเรื่องนี้กันตอนนี้เลยได้ไหม?',
+        meaningId: th
+          ? 'เทนส์ไวยากรณ์ทำให้ฉันรวนเวลาพูดเร็วๆ เราฝึกเรื่องนี้กันตอนนี้เลยได้ไหม?'
+          : 'Tenses grammar bikin aku kacau pas ngomong cepat. Bisa kita latih itu sekarang?',
+        meaningTh: 'เทนส์ไวยากรณ์ทำให้ฉันรวนเวลาพูดเร็วๆ เราฝึกเรื่องนี้กันตอนนี้เลยได้ไหม?',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+    ];
+  }
+
   const focal = extractFocalClause(params.aiText || '', params.targetLang);
   const act = detectAiIntent(params.aiText || '', params.targetLang);
-  const th = params.locale === 'th';
   const topic = focal.extractedTopic || '';
   const optA = focal.choiceOptionA ? capitalizeWord(focal.choiceOptionA) : '';
   const echo = focal.echoCorrectionTarget || '';
@@ -1330,6 +1515,13 @@ export async function requestRealtimeCopilotAssist(params: {
     };
   };
 
+  // Instant 0ms local copilot cards on initial scenario opening greeting (zero wasted API quota on mount)
+  if (!params.lastUserText && variationSeed === 0 && (!params.history || params.history.length <= 1)) {
+    const initialRes = fallback();
+    copilotCacheSet(cacheKey, initialRes);
+    return initialRes;
+  }
+
   const budgetMs = Math.max(1500, Math.min(params.budgetMs ?? 7500, 10000));
   const deadline = Date.now() + budgetMs;
 
@@ -1352,29 +1544,44 @@ export async function requestRealtimeCopilotAssist(params: {
           ? 'Mandarin Chinese (HSK1-HSK3, Simplified Chinese characters, NO emojis; tone-marked Pinyin in pronunciation)'
           : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
       const learnerLangName = params.locale === 'th' ? 'Thai' : 'Indonesian';
-      const hist = (params.history || []).slice(-6).map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner AI'}: "${h.text}"`).join('\n');
+      const hist = (params.history || []).slice(-6).map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner'}: "${h.text}"`).join('\n');
       const prompt = [
         `Speech Copilot (${params.scenario.titleId}). Target: ${langSpec}.`,
         hist ? `Context:\n${hist}` : '',
         params.lastUserText ? `Learner said: "${params.lastUserText}"` : '',
-        `Partner AI said: "${cleanAiText}"`,
+        `Partner said: "${cleanAiText}"`,
         params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
         `Generate 3 spontaneous spoken replies directly answering it (easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back). Translate it into aiMeaning (${learnerLangName}); each reply's first-person translation in hint (${learnerLangName}).`,
         `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"..."}]}`,
       ].filter(Boolean).join('\n');
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(userGeminiKey)}`, {
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Api-Revision': '2026-05-20',
+          'x-goog-api-key': userGeminiKey,
+        },
         body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: 'application/json', temperature: variationSeed > 0 ? 0.75 : 0.45, maxOutputTokens: 600, thinkingConfig: { thinkingBudget: 0 } },
+          model: 'gemini-3.1-flash-lite',
+          input: prompt,
+          response_mime_type: 'application/json',
+          generation_config: {
+            temperature: variationSeed > 0 ? 0.75 : 0.45,
+            max_output_tokens: 600,
+            thinking_level: 'minimal',
+          },
         }),
         signal: controller.signal,
       });
       clearTimeout(timer);
       if (res.ok) {
         const data = await res.json();
-        const raw = String(data?.candidates?.[0]?.content?.parts?.[0]?.text || '').replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+        const outputs = Array.isArray(data?.outputs) ? data.outputs : [];
+        const textOut = outputs.find((o: any) => o && o.type === 'text' && typeof o.text === 'string');
+        const raw = String(textOut?.text || data?.candidates?.[0]?.content?.parts?.[0]?.text || '')
+          .replace(/^```json\s*/i, '')
+          .replace(/```\s*$/i, '')
+          .trim();
         const parsed = raw ? JSON.parse(raw) : null;
         const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
         if (cards.length > 0) {
@@ -1394,7 +1601,7 @@ export async function requestRealtimeCopilotAssist(params: {
     }
   }
 
-  // 2) Server pool — dilewati sementara bila server baru saja menjawab 503/429 (circuit breaker 20 dtk)
+  // 2) Server pool, dilewati sementara bila server baru saja menjawab 503/429 (circuit breaker 20 dtk)
   const payload = {
     aiText: cleanAiText,
     lastUserText: params.lastUserText || '',
@@ -1618,7 +1825,7 @@ export function synthesizeNaturalReformulation(
 }
 
 /**
- * Acoustic & Script Sanitizer — Rejects Russian/Cyrillic and unrelated foreign-script ASR hallucinations
+ * Acoustic & Script Sanitizer, Rejects Russian/Cyrillic and unrelated foreign-script ASR hallucinations
  * before they can pollute live transcripts, trigger Russian replies, or enter Braincore memory.
  */
 export function sanitizeHallucinatedTranscript(
@@ -1666,7 +1873,7 @@ export function sanitizeHallucinatedTranscript(
 }
 
 /**
- * Classic TTS Sanitizer — Removes literal laugh tokens ("haha", "wkwk", "あはは") before sending
+ * Classic TTS Sanitizer, Removes literal laugh tokens ("haha", "wkwk", "あはは") before sending
  * to classical `/api/tts/line` (Edge-TTS) so the synthesizer never spells out robotic laughter.
  */
 export function sanitizeSpokenTextForClassicTts(
@@ -1855,7 +2062,7 @@ export function evaluateUtteranceClientSide(params: {
       if (hasBePlusBaseVerb && hasDoubleConjunction) {
         misconceptionId = 'EN_STATIVE_BE_AND_DOUBLE_CONJ';
         whyFailsId =
-          'Miskonsepsi Ganda: (1) Kata kerja "agree/want" adalah verba aktif/statif sehingga tidak boleh didahului "am/is/are" (gunakan "I agree", bukan "I am agree"). (2) Dalam satu kalimat kompleks, jangan gunakan "Although" dan "but" sekaligus—pilih salah satu.';
+          'Miskonsepsi Ganda: (1) Kata kerja "agree/want" adalah verba aktif/statif sehingga tidak boleh didahului "am/is/are" (gunakan "I agree", bukan "I am agree"). (2) Dalam satu kalimat kompleks, jangan gunakan "Although" dan "but" sekaligus, pilih salah satu.';
         whyFailsTh =
           'ความเข้าใจผิด 2 จุด: (1) ห้ามใช้ am/is/are นำหน้ากริยา agree/want (ต้องใช้ "I agree" ไม่ใช่ "I am agree") และ (2) ห้ามใช้ "Although" ร่วมกับ "but" ในประโยคเดียวกัน';
         syntacticCorrection =
@@ -1962,11 +2169,11 @@ export function evaluateUtteranceClientSide(params: {
       }
 
       const aiReply = scenarioId.includes('cafe')
-        ? `Hold on! Drop the direct translation—use "I would like..." and "I am meeting... at the library." Say it back to me cleanly right now: "${syntacticCorrection}"`
+        ? `Hold on! Drop the direct translation, use "I would like..." and "I am meeting... at the library." Say it back to me cleanly right now: "${syntacticCorrection}"`
         : scenarioId.includes('past') || scenarioId.includes('weekend')
           ? `Wait right there! For past events, use the real past tense verb like "went to..." and "ate...". Repeat this sentence aloud first: "${syntacticCorrection}"`
           : scenarioId.includes('ielts')
-            ? `Hold on—let's fix that grammar slip right now: say "I agree" (never "I am agree") and don't pair "Although" with "but". Repeat cleanly: "${syntacticCorrection}"`
+            ? `Hold on, let's fix that grammar slip right now: say "I agree" (never "I am agree") and don't pair "Although" with "but". Repeat cleanly: "${syntacticCorrection}"`
             : `Hold on, your grammar slipped there! Don't translate word-by-word in your head. Repeat this natural sentence out loud right now: "${syntacticCorrection}"`;
 
       return {
@@ -1992,11 +2199,11 @@ export function evaluateUtteranceClientSide(params: {
         }`,
         aiReply,
         aiReplyTranslationId: scenarioId.includes('cafe')
-          ? `Tunggu dulu! Jangan terjemahkan mentah—gunakan "I would like..." serta "I am meeting... at the library." Coba ulangi kalimat yang benar sekarang: "${syntacticCorrection}"`
+          ? `Tunggu dulu! Jangan terjemahkan mentah, gunakan "I would like..." serta "I am meeting... at the library." Coba ulangi kalimat yang benar sekarang: "${syntacticCorrection}"`
           : scenarioId.includes('past') || scenarioId.includes('weekend')
             ? `Stop sebentar! Untuk cerita masa lalu, wajib pakai kata kerja lampau V2 seperti "went to..." dan "ate...". Ulangi dengan lantang dulu: "${syntacticCorrection}"`
             : scenarioId.includes('ielts')
-              ? `Tunggu dulu—kita luruskan grammar-mu sekarang: katakan "I agree" (tanpa "am") dan jangan gabungkan "Although" dengan "but". Ulangi dengan bersih: "${syntacticCorrection}"`
+              ? `Tunggu dulu, kita luruskan grammar-mu sekarang: katakan "I agree" (tanpa "am") dan jangan gabungkan "Although" dengan "but". Ulangi dengan bersih: "${syntacticCorrection}"`
               : `Tunggu sebentar, grammar-mu meleset! Jangan terjemahkan kata-per-kata di kepala. Coba ulangi kalimat natural ini sekarang: "${syntacticCorrection}"`,
         aiReplyTranslationTh:
           'เดี๋ยวก่อน ไวยากรณ์ยังคลาดเคลื่อนอยู่ ลองพูดทวนประโยคที่ถูกต้องตามคำแนะนำนี้อีกครั้งนะ',
@@ -2036,7 +2243,7 @@ export function evaluateUtteranceClientSide(params: {
     };
   }
 
-  // Mandarin Chinese (zh) evaluation — Braincore Copula, Measure Word, Negation & Word-Order Diagnostics
+  // Mandarin Chinese (zh) evaluation, Braincore Copula, Measure Word, Negation & Word-Order Diagnostics
   if (targetLang === 'zh') {
     const hasCopulaBeforeVerb = /(我|你|他|她|我们)是(喜欢|想|要|去|吃|喝|觉得|知道|学习|工作)/u.test(exact);
     const hasWrongMeasureWordDrink = /一个(咖啡|拿铁|美式|奶茶|茶|水|牛奶|果汁)/u.test(exact);
@@ -2123,7 +2330,7 @@ export function evaluateUtteranceClientSide(params: {
     };
   }
 
-  // Japanese (ja) evaluation — Strict Braincore Particle, Conjugation, & Register Diagnostics
+  // Japanese (ja) evaluation, Strict Braincore Particle, Conjugation, & Register Diagnostics
   const hasVerbDictPlusDesu =
     /(飲む|食べる|行く|来る|する|見る|買う|読む|書く|話す|帰る|待つ|遊ぶ|休む|働く|勉強する|お願いする)\s*です/u.test(
       exact
@@ -2359,7 +2566,7 @@ const _ttsInFlight = new Map<
 
 // ---------------------------------------------------------------------------------------
 // REAL AI CONVERSATION PARTNER (m025 hotfix): Cloudflare Worker `fiezel-api` task
-// `conversation_turn` — the SAME production path used by Ngobrol AI in the main PWA.
+// `conversation_turn`, the SAME production path used by Ngobrol AI in the main PWA.
 // Before this, Voice Studio only answered from deterministic templates unless the learner
 // pasted a personal Gemini key, so in production the "AI" never actually replied.
 // Braincore grading stays 100% local (evaluateUtteranceClientSide); the Worker only writes
@@ -2385,7 +2592,7 @@ function getSameOriginParent(): Window | null {
       return window.parent as Window;
     }
   } catch {
-    // Cross-origin parent — ignore
+    // Cross-origin parent, ignore
   }
   return null;
 }
@@ -2404,7 +2611,7 @@ function resolveCfApiBase(): string {
   return String(cfg.base || '').trim().replace(/\/$/, '');
 }
 
-/** Idempotent anonymous identity cookie (`fz_id`) — required by the Worker quota gate. */
+/** Idempotent anonymous identity cookie (`fz_id`), required by the Worker quota gate. */
 export function ensureLearnerIdentity(): Promise<boolean> {
   if (_identityReady) return Promise.resolve(true);
   if (isLocalDevHost()) return Promise.resolve(false);
@@ -2615,8 +2822,6 @@ export function warmUpVoiceServices(): void {
           .then((r) => {
             if (r.ok) {
               _ttsWarm = true;
-              prewarmThinkingFillers('ja');
-              prewarmThinkingFillers('en');
             }
           })
           .catch(() => {});
@@ -2630,8 +2835,6 @@ export function warmUpVoiceServices(): void {
   window.setTimeout(() => {
     if (!_ttsWarm) ping();
     void ensureLearnerIdentity();
-    prewarmThinkingFillers('ja');
-    prewarmThinkingFillers('en');
   }, 250);
   // Keep the neural voice server awake while Voice Studio is open (free tier sleeps when idle).
   if (!_ttsKeepAliveTimer) {
@@ -2672,6 +2875,7 @@ export interface TurnEvaluationParams {
   measureMode: boolean;
   history: Array<{ speaker: 'ai' | 'user'; text: string }>;
   learnerDossier?: string;
+  callMode?: 'tutor_coach' | 'casual_chat';
 }
 
 /**
@@ -2688,17 +2892,78 @@ export function evaluateTurnLocal(params: TurnEvaluationParams): FlexibleTurnEva
   });
 }
 
-/**
- * Step 2 (network): the partner's spoken reply.
- *
- * HONESTY CONTRACT (m025-637): the reply ALWAYS comes from a real AI when one is reachable.
- * The old 850 ms race replaced the AI with a deterministic template on almost every turn
- * (production AI needs ~2-6 s), which produced off-topic lines such as "presentation with my
- * family" in a cafe. Now we wait for the AI (bounded by AI_PARTNER_TIMEOUT_MS); the UI hides
- * the wait with Mochi's thinking state + a short neural filler. Offline templates are purged;
- * if transient network drops occur, the partner asks to repeat in character with zero static cards.
- * No speculative TTS is started for a reply that may never be spoken.
- */
+function normalizeServerUiAction(raw: any): VoiceUiAction | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const actionType = String(raw.actionType || 'none').trim();
+  if (
+    actionType !== 'open_learning_popup' &&
+    actionType !== 'navigate_app' &&
+    actionType !== 'switch_call_mode'
+  ) {
+    return undefined;
+  }
+  const focusRaw = String(raw.focusType || 'grammar').trim();
+  const focusType = (['grammar', 'vocab', 'kanji', 'kana', 'sentence_drill'] as const).includes(
+    focusRaw as any
+  )
+    ? (focusRaw as VoiceUiAction['focusType'])
+    : 'grammar';
+  return {
+    actionType: actionType as VoiceUiAction['actionType'],
+    callMode:
+      raw.callMode === 'casual_chat'
+        ? 'casual_chat'
+        : raw.callMode === 'tutor_coach'
+          ? 'tutor_coach'
+          : undefined,
+    destination: typeof raw.destination === 'string' ? raw.destination.trim() : undefined,
+    bankTopicId: typeof raw.bankTopicId === 'string' ? raw.bankTopicId.trim() : undefined,
+    sourceLayer:
+      raw.sourceLayer === 'bank' || raw.sourceLayer === 'ai_dynamic' ? raw.sourceLayer : undefined,
+    topicTitle: typeof raw.topicTitle === 'string' ? raw.topicTitle.trim() : undefined,
+    focusType,
+    coachSpokenScript:
+      typeof raw.coachSpokenScript === 'string' ? raw.coachSpokenScript.trim() : undefined,
+    explanationText:
+      typeof raw.explanationText === 'string' ? raw.explanationText.trim() : undefined,
+    patternFormula: typeof raw.patternFormula === 'string' ? raw.patternFormula.trim() : undefined,
+    drillInstruction:
+      typeof raw.drillInstruction === 'string' ? raw.drillInstruction.trim() : undefined,
+    sampleTarget: typeof raw.sampleTarget === 'string' ? raw.sampleTarget.trim() : undefined,
+    leadText: typeof raw.leadText === 'string' ? raw.leadText.trim() : undefined,
+    triggerWord: typeof raw.triggerWord === 'string' ? raw.triggerWord.trim() : undefined,
+    triggerTag: typeof raw.triggerTag === 'string' ? raw.triggerTag.trim() : undefined,
+    wrongWord: typeof raw.wrongWord === 'string' ? raw.wrongWord.trim() : undefined,
+    wrongTag: typeof raw.wrongTag === 'string' ? raw.wrongTag.trim() : undefined,
+    rightWord: typeof raw.rightWord === 'string' ? raw.rightWord.trim() : undefined,
+    rightTag: typeof raw.rightTag === 'string' ? raw.rightTag.trim() : undefined,
+    tailText: typeof raw.tailText === 'string' ? raw.tailText.trim() : undefined,
+    secondLeadText: typeof raw.secondLeadText === 'string' ? raw.secondLeadText.trim() : undefined,
+    secondTriggerWord:
+      typeof raw.secondTriggerWord === 'string' ? raw.secondTriggerWord.trim() : undefined,
+    secondWrongWord: typeof raw.secondWrongWord === 'string' ? raw.secondWrongWord.trim() : undefined,
+    secondRightWord: typeof raw.secondRightWord === 'string' ? raw.secondRightWord.trim() : undefined,
+    secondTailText: typeof raw.secondTailText === 'string' ? raw.secondTailText.trim() : undefined,
+    secondCoachScript:
+      typeof raw.secondCoachScript === 'string' ? raw.secondCoachScript.trim() : undefined,
+    trapWrongSentence:
+      typeof raw.trapWrongSentence === 'string' ? raw.trapWrongSentence.trim() : undefined,
+    trapWrongToken: typeof raw.trapWrongToken === 'string' ? raw.trapWrongToken.trim() : undefined,
+    trapWrongReason:
+      typeof raw.trapWrongReason === 'string' ? raw.trapWrongReason.trim() : undefined,
+    drillMeaningPrompt:
+      typeof raw.drillMeaningPrompt === 'string' ? raw.drillMeaningPrompt.trim() : undefined,
+    drillTargetSentence:
+      typeof raw.drillTargetSentence === 'string' ? raw.drillTargetSentence.trim() : undefined,
+    drillBlocks: Array.isArray(raw.drillBlocks)
+      ? raw.drillBlocks.map((b: any) => String(b || '').trim()).filter(Boolean)
+      : undefined,
+    drillDistractors: Array.isArray(raw.drillDistractors)
+      ? raw.drillDistractors.map((b: any) => String(b || '').trim()).filter(Boolean)
+      : undefined,
+  };
+}
+
 export async function resolveAiReply(
   params: TurnEvaluationParams,
   localResult: FlexibleTurnEvaluationResult,
@@ -2707,26 +2972,29 @@ export async function resolveAiReply(
       aiReply: string,
       translationId: string,
       translationTh: string,
-      nextSuggestedReplies?: BeginnerReplyCard[]
+      nextSuggestedReplies?: BeginnerReplyCard[],
+      uiAction?: VoiceUiAction
     ) => void;
   }
 ): Promise<FlexibleTurnEvaluationResult> {
-  // 0) Unified 16-Key Gemini Partner + Real-Time Copilot Turn (/api/voice/partner-turn)
-  //    Generates BOTH Partner AI's spoken reply AND 3 bespoke Real-Time Copilot replies in ONE call!
+  // 0) Unified Gemini Partner + Real-Time Copilot Turn (/api/voice/partner-turn)
+  //    Generates BOTH Partner AI's spoken reply, 3 bespoke Real-Time Copilot replies, AND optional uiAction in ONE call!
   for (const base of resolveVoiceApiCandidateBases()) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 14000);
+    const timer = setTimeout(() => controller.abort(), 24000);
     try {
       const res = await fetch(`${base}/api/voice/partner-turn`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: params.text,
+          personaId: params.persona.id,
           personaName: params.persona.name,
           scenarioId: params.scenario.id,
           scenarioTitle: params.scenario.titleId,
           targetLang: params.targetLang,
           locale: params.locale,
+          callMode: params.callMode || 'tutor_coach',
           history: params.history.slice(-6),
           learnerDossier: params.learnerDossier || undefined,
         }),
@@ -2737,7 +3005,11 @@ export async function resolveAiReply(
       if (res.ok) {
         const data = await res.json();
         const partnerReply = stripEmojisAndEmotWords(String(data?.aiReply || '')).trim();
-        if (partnerReply && replyLooksLikeTargetLanguage(partnerReply, params.targetLang)) {
+        const uiAction = normalizeServerUiAction(data?.uiAction);
+        const isExplanation =
+          Boolean(data?.isExplanation) ||
+          Boolean(uiAction && uiAction.actionType === 'open_learning_popup');
+        if (partnerReply && (isExplanation || replyLooksLikeTargetLanguage(partnerReply, params.targetLang))) {
           const transId = stripEmojisAndEmotWords(String(data?.aiReplyTranslationId || '')).trim();
           const transTh = stripEmojisAndEmotWords(String(data?.aiReplyTranslationTh || '')).trim();
           const rtCards = normalizeServerCopilotCards(data?.replies, params.targetLang);
@@ -2757,7 +3029,8 @@ export async function resolveAiReply(
             partnerReply,
             transId,
             transTh,
-            rtCards.length > 0 ? rtCards : undefined
+            rtCards.length > 0 ? rtCards : undefined,
+            uiAction
           );
 
           const ttsRes = await synthesizeFlexibleTts({
@@ -2772,9 +3045,10 @@ export async function resolveAiReply(
             aiReplyTranslationTh: transTh,
             nextSuggestedReplies: rtCards.length > 0 ? rtCards : undefined,
             audioBase64: ttsRes?.audioBase64 || null,
-            audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
-            ttsEngine: ttsRes?.engine || 'fiezel-edge-tts-binary',
+            audioMimeType: ttsRes?.audioMimeType || 'audio/wav',
+            ttsEngine: ttsRes?.engine || 'gemini-3.8-flash-lite-tts',
             replySource: 'ai',
+            uiAction,
           };
         }
       }
@@ -2828,29 +3102,34 @@ export async function resolveAiReply(
       ]
         .filter(Boolean)
         .join('\n');
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(
-          userGeminiKey
-        )}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: promptText }] }],
-            generationConfig: {
-              responseMimeType: 'application/json',
-              temperature: 0.5,
-              maxOutputTokens: 750,
-              thinkingConfig: { thinkingBudget: 0 },
-            },
-          }),
-          signal: controller.signal,
-        }
-      );
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Api-Revision': '2026-05-20',
+          'x-goog-api-key': userGeminiKey,
+        },
+        body: JSON.stringify({
+          model: 'gemini-3.1-flash-lite',
+          input: promptText,
+          response_mime_type: 'application/json',
+          generation_config: {
+            temperature: 0.5,
+            max_output_tokens: 750,
+            thinking_level: 'minimal',
+          },
+        }),
+        signal: controller.signal,
+      });
       clearTimeout(timeout);
       if (res.ok) {
         const data = await res.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const outputs = Array.isArray(data?.outputs) ? data.outputs : [];
+        const textOut = outputs.find((o: any) => o && o.type === 'text' && typeof o.text === 'string');
+        const rawText = String(textOut?.text || data?.candidates?.[0]?.content?.parts?.[0]?.text || '')
+          .replace(/^```json\s*/i, '')
+          .replace(/```\s*$/i, '')
+          .trim();
         const parsedRaw = JSON.parse(rawText);
         const parsed = Array.isArray(parsedRaw) ? parsedRaw[0] : parsedRaw;
         let geminiReply = typeof parsed?.aiReply === 'string' ? parsed.aiReply.trim() : '';
@@ -2900,7 +3179,7 @@ export async function resolveAiReply(
   }
 
   // 2) Production AI partner (/api/ai/task conversation_turn fallback).
-  //    Never inject static template cards here — fire real-time Copilot assist in parallel with TTS!
+  //    Never inject static template cards here, fire real-time Copilot assist in parallel with TTS!
   const partner = await requestAiPartnerReply({
     text: params.text,
     scenario: params.scenario,
@@ -3053,7 +3332,7 @@ export function prewarmThinkingFillers(
   _targetLang: TargetLang,
   _persona?: VoicePersona
 ): void {
-  // Acoustic fillers intentionally disabled — AI replies directly without canned filler sounds
+  // Acoustic fillers intentionally disabled, AI replies directly without canned filler sounds
 }
 
 /**
@@ -3163,12 +3442,13 @@ export async function synthesizeViaGeminiLiveWav(params: {
         ? 'natural Putonghua Mandarin Chinese'
         : 'natural English';
   const personaStyle =
+    params.persona?.ttsStylePrompt ||
     params.persona?.speakingStyle ||
     (params.targetLang === 'ja'
-      ? 'Expressive, warm, sharp-witted Tokyo mentor with natural pitch accent and dynamic regional dialect capability'
+      ? 'Expressive, sassy, sharp-witted Tokyo-Osaka mentor with authentic Kansai/Tokyo pitch accent'
       : params.targetLang === 'zh'
-        ? 'Warm, crisp, expressive native Beijing/Putonghua Mandarin tutor with crystal-clear four-tone prosody'
-        : 'Expressive, charismatic native speaking coach with natural conversational rhythm');
+        ? 'Witty, brisk, expressive Beijing Putonghua Mandarin mentor with authentic erhua rhythm and crystal-clear four tones'
+        : 'Urban street-smart American English mentor with natural hood cadence, warm rasp, and witty older-brother sarcasm');
 
   return new Promise((resolve) => {
     let settled = false;
@@ -3236,7 +3516,7 @@ export async function synthesizeViaGeminiLiveWav(params: {
               systemInstruction: {
                 parts: [
                   {
-                    text: `You are ${params.persona?.name || 'a charismatic native mentor'}, performing spoken dialogue in ${langLabel}. Vocal profile: ${personaStyle}. Perform ONLY the exact line inside quotes with vivid human prosody, natural breath, and authentic emotional inflection. Never spell out literal laugh words like "h-a-h-a"—if a chuckle is present, render it acoustically as a subtle, genuine human sound. Never add extra words outside the quotes.`,
+                    text: `You are ${params.persona?.name || 'a charismatic native mentor'}, performing spoken dialogue in ${langLabel}. Vocal profile: ${personaStyle}. Perform ONLY the exact line inside quotes with vivid human prosody, natural breath, and authentic emotional inflection. Never spell out literal laugh words like "h-a-h-a", if a chuckle is present, render it acoustically as a subtle, genuine human sound. Never add extra words outside the quotes.`,
                   },
                 ],
               },
@@ -3335,8 +3615,60 @@ export async function synthesizeViaGeminiLiveWav(params: {
 }
 
 /**
- * Fast TTS synthesis with per-persona voice routing, in-memory audio cache, and
- * automatic zero-cold-start failover to Gemini 3.8 Live 18-key WAV synthesis.
+ * Primary Neural AI Voice Synthesis via FIEZEL Worker `/api/voice/gemini-tts`
+ * (`gemini-3.8-flash-lite-tts` / `gemini-3.8-flash-tts`, `audio/wav`, `speech_metadata.style`).
+ * Delivers genuine human prosody, authentic Hood American / Tokyo-Osaka Tsundere / Beijing Putonghua
+ * accents, and expressive sarcastic inflection, NEVER flat robotic Edge TTS!
+ */
+export async function synthesizeViaWorkerGeminiTts(params: {
+  text: string;
+  targetLang: TargetLang;
+  persona?: VoicePersona;
+}): Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> {
+  const cleanText = stripEmojisAndEmotWords(params.text || '').trim();
+  if (!cleanText) return null;
+
+  for (const base of resolveVoiceApiCandidateBases()) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 9000);
+    try {
+      const res = await fetch(`${base}/api/voice/gemini-tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: cleanText,
+          targetLang: params.targetLang,
+          personaId: params.persona?.id || '',
+          voiceName: params.persona?.geminiVoice || '',
+          stylePrompt: params.persona?.ttsStylePrompt || params.persona?.speakingStyle || '',
+        }),
+        mode: 'cors',
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (res.ok) {
+        const json = await res.json().catch(() => null);
+        const b64 = String(json?.audioBase64 || '').replace(/^data:audio\/[^;]+;base64,/, '');
+        if (b64.length > 64) {
+          return {
+            audioBase64: b64,
+            audioMimeType: String(json?.audioMimeType || 'audio/wav'),
+            engine: String(json?.engine || 'gemini-3.8-flash-lite-tts'),
+          };
+        }
+      }
+    } catch {
+      clearTimeout(timer);
+    }
+  }
+  return null;
+}
+
+/**
+ * Neural AI Voice Synthesis with per-persona accent styling and in-memory audio cache.
+ * Priority 1: Gemini 3.8 TTS (`/api/voice/gemini-tts` with `speech_metadata.style` accent & sarcasm).
+ * Priority 2: Gemini 3.8 Live WebSocket WAV (`synthesizeViaGeminiLiveWav`).
+ * Priority 3 (Last-Resort Emergency Only): Classic Edge TTS (`/api/tts/line`).
  */
 export async function synthesizeFlexibleTts(params: {
   text: string;
@@ -3367,7 +3699,7 @@ export async function synthesizeFlexibleTts(params: {
         ? 'xiao_mochi'
         : 'coach_alex');
 
-  const cacheKey = `${speaker}:${params.targetLang}:${cleanSpokenText}`;
+  const cacheKey = `gemini-tts:${speaker}:${params.targetLang}:${cleanSpokenText}`;
   const cached = _ttsMemoryCache.get(cacheKey);
   if (cached) {
     return cached;
@@ -3382,9 +3714,32 @@ export async function synthesizeFlexibleTts(params: {
 
   const requestPromise = (async () => {
     try {
+      // 1) PRIMARY: Genuine Gemini 3.8 Neural TTS with Persona Accent & Sarcastic Style!
+      const geminiTts = await synthesizeViaWorkerGeminiTts({
+        text: cleanSpokenText,
+        targetLang: params.targetLang,
+        persona: params.persona,
+      });
+      if (geminiTts) {
+        _ttsMemoryCache.set(cacheKey, geminiTts);
+        return geminiTts;
+      }
+
+      // 2) SECONDARY: Gemini 3.8 Live WebSocket WAV synthesis!
+      const liveWav = await synthesizeViaGeminiLiveWav({
+        text: cleanSpokenText,
+        targetLang: params.targetLang,
+        persona: params.persona,
+      });
+      if (liveWav) {
+        _ttsMemoryCache.set(cacheKey, liveWav);
+        return liveWav;
+      }
+
+      // 3) EMERGENCY LAST RESORT ONLY: Classic `/api/tts/line` if both Gemini neural pipelines are unreachable
       if (params.force || Date.now() >= _ttsCooldownUntil) {
         const controller = new AbortController();
-        const httpTimeoutMs = _ttsWarm ? 7500 : 4500;
+        const httpTimeoutMs = _ttsWarm ? 5500 : 3500;
         const timer = setTimeout(() => controller.abort(), httpTimeoutMs);
         try {
           const res = await fetch(endpoint, {
@@ -3453,17 +3808,6 @@ export async function synthesizeFlexibleTts(params: {
             _ttsCooldownUntil = Date.now() + 8000;
           }
         }
-      }
-
-      // Immediate zero-cold-start failover to Gemini 3.8 Live 18-key WAV synthesis!
-      const liveWav = await synthesizeViaGeminiLiveWav({
-        text: cleanSpokenText,
-        targetLang: params.targetLang,
-        persona: params.persona,
-      });
-      if (liveWav) {
-        _ttsMemoryCache.set(cacheKey, liveWav);
-        return liveWav;
       }
     } finally {
       _ttsInFlight.delete(cacheKey);

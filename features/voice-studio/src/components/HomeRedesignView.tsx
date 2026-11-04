@@ -356,7 +356,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <Phone className="w-5 h-5" />
             </span>
             <div className="mt-3">
-              <div className="text-sm font-bold text-[#241A11]">Telepon Live AI</div>
+              <div className="text-sm font-bold text-[#241A11]">Telepon Live Fiezel</div>
               <div className="text-xs text-[#6E5E47] mt-0.5">
                 {scenariosForLang.length} skenario aktif
               </div>
@@ -483,7 +483,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   onClick={() => onSelectScenarioAndCall(activeScenario.id)}
                   className="px-4 py-2.5 rounded-xl btn-sun-tactile text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>Latih di Panggilan AI</span>
+                  <span>Latih di Panggilan Suara</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>

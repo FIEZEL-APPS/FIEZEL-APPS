@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>FIEZEL — Studio Panggilan Suara AI & Real-Time Speaking</title>
+    <title>FIEZEL Kawan Bicara: Studio Panggilan Suara Real-Time</title>
     <meta
       name="description"
-      content="Sub-modul terisolasi FIEZEL AI Voice Call Studio dengan terjemahan real-time, bantuan jawaban pemula, Gemini Live WebSocket (wss://fiezel.my.id/api/live-call) + fallback Turn-by-Turn Audio, serta integrasi Braincore BKT & IRT 3PL."
+      content="Sub-modul terisolasi FIEZEL Kawan Bicara Voice Studio dengan terjemahan real-time, bantuan jawaban pemula, Gemini Live WebSocket (wss://fiezel.my.id/api/live-call) + fallback Turn-by-Turn Audio, serta integrasi Braincore BKT & IRT 3PL."
     />
-    <meta property="og:title" content="FIEZEL — Studio Panggilan Suara AI & Real-Time Speaking" />
+    <meta property="og:title" content="FIEZEL Kawan Bicara: Studio Panggilan Suara Real-Time" />
     <meta
       property="og:description"
-      content="Sub-modul terisolasi FIEZEL AI Voice Call Studio dengan terjemahan real-time, bantuan jawaban pemula, Gemini Live WebSocket (wss://fiezel.my.id/api/live-call) + fallback Turn-by-Turn Audio, serta integrasi Braincore BKT & IRT 3PL."
+      content="Sub-modul terisolasi FIEZEL Kawan Bicara Voice Studio dengan terjemahan real-time, bantuan jawaban pemula, Gemini Live WebSocket (wss://fiezel.my.id/api/live-call) + fallback Turn-by-Turn Audio, serta integrasi Braincore BKT & IRT 3PL."
     />
     <link rel="icon" type="image/svg+xml" href="./assets/brand/fiezel-icon.svg" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
@@ -19,9 +19,9 @@
     <link rel="preconnect" href="https://api.fiezel.my.id" crossorigin />
     <link rel="dns-prefetch" href="https://translate.googleapis.com" />
     <link rel="dns-prefetch" href="https://api.fiezel.my.id" />
-    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css?v=m025-763" />
+    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css?v=m025-764" />
     <!-- Read-only host runtime config (never modified by Voice Studio) -->
-    <script src="./core-config.js?v=m025-763" defer></script>
+    <script src="./core-config.js?v=m025-764" defer></script>
     <style>
       html, body {
         height: 100%;
@@ -50,17 +50,64 @@
   <body class="bg-[#FFF9EE] text-[#241A11] antialiased h-full w-full overflow-hidden fixed inset-0">
     <div id="fiezel-voice-studio-root"></div>
     <script>
-      // PWA Coherent Update Guard: Delegasikan pemeriksaan pembaruan ke cangkang induk
-      // (FiezelUpdatePrompt) agar tidak pernah memicu skipWaiting sepihak atau menghapus
-      // SHELL_CACHE baru saat Kawan Bicara sedang terbuka di dalam iframe.
+      // PWA Coherent Update & Zero-Stale-Cache Guard (iOS Standalone, Android WebAPK, Desktop):
+      // 1) Delegasikan pemeriksaan ke FiezelUpdatePrompt di cangkang induk bila berada di dalam iframe.
+      // 2) Verifikasi build live via ./core-config.js?__fz_live_build=<ts> (yang selalu mem-bypass
+      //    SHELL_CACHE di sw.js). Bila server menyajikan build lebih baru daripada build lokal yang
+      //    sedang berjalan, otomatis bersihkan cache shell lama & terapkan pembaruan agar user di HP/Desktop
+      //    tidak pernah terjebak di bundle voice-studio.js versi lama.
       (function () {
+        function parseBuildNum(v) {
+          var m = String(v == null ? '' : v).match(/m(\d+)-(\d+)/i);
+          return m ? (parseInt(m[1], 10) * 100000 + parseInt(m[2], 10)) : null;
+        }
         try {
           if (window.top && window.top !== window && window.top.FiezelUpdatePrompt && typeof window.top.FiezelUpdatePrompt.check === 'function') {
             window.top.FiezelUpdatePrompt.check(false);
           }
+          if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+          fetch('./core-config.js?__fz_live_build=' + Date.now(), { cache: 'no-store' })
+            .then(function (r) { return r && r.ok ? r.text() : ''; })
+            .then(function (txt) {
+              var m = String(txt || '').match(/FIEZEL_PAGE_BUILD\s*=\s*['"](m\d+-\d+)['"]/i);
+              var liveBuild = m && m[1] ? m[1] : '';
+              var localBuild = String(window.FIEZEL_PAGE_BUILD || '');
+              var liveNum = parseBuildNum(liveBuild);
+              var localNum = parseBuildNum(localBuild);
+              if (!liveNum || !localNum || liveNum <= localNum) return;
+              try {
+                if (sessionStorage.getItem('fz_voice_healed_build') === liveBuild) return;
+                sessionStorage.setItem('fz_voice_healed_build', liveBuild);
+              } catch (_) {}
+              if (window.top && window.top !== window && window.top.FiezelUpdatePrompt && typeof window.top.FiezelUpdatePrompt.apply === 'function') {
+                window.top.FiezelUpdatePrompt.apply();
+                return;
+              }
+              var cleanAndReload = function () {
+                var bust = 'fz_upd=' + Date.now();
+                var pairs = String(location.search || '').replace(/^\?/, '').split('&').filter(function (p) {
+                  return p && !/^(?:fz_upd|fz_healed|__fz_fresh)=/i.test(p);
+                });
+                pairs.push(bust);
+                location.replace(location.origin + location.pathname + '?' + pairs.join('&') + location.hash);
+              };
+              if (typeof caches !== 'undefined' && caches.keys) {
+                caches.keys().then(function (names) {
+                  return Promise.all(names.map(function (n) {
+                    if (n.indexOf('fiezel-shell-') === 0 && n.indexOf(liveBuild) === -1) {
+                      return caches.delete(n);
+                    }
+                    return Promise.resolve();
+                  }));
+                }).then(cleanAndReload).catch(cleanAndReload);
+              } else {
+                cleanAndReload();
+              }
+            })
+            .catch(function () {});
         } catch (_) {}
       })();
     </script>
-    <script type="module" src="./features/voice-studio/dist/voice-studio.js?v=m025-763"></script>
+    <script type="module" src="./features/voice-studio/dist/voice-studio.js?v=m025-764"></script>
   </body>
 </html>

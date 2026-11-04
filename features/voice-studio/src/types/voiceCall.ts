@@ -1,4 +1,4 @@
-export type LearnerLocale = 'id' | 'th';
+export type LearnerLocale = 'id' | 'th' | 'ja' | 'en' | 'zh';
 export type TargetLang = 'en' | 'ja' | 'zh';
 export type MasteryStateName =
   | 'NOT_EXPOSED'
@@ -21,6 +21,7 @@ export interface VoicePersona {
   avatarUrl: string;
   accentLabel: string;
   speakingStyle: string;
+  ttsStylePrompt?: string;
   systemPrompt: string;
   personalityTagId?: string;
   personalityTagTh?: string;
@@ -29,6 +30,52 @@ export interface VoicePersona {
   openingGreetingTranslationTh?: string;
   roastStyleId?: string;
   roastStyleTh?: string;
+}
+
+export type CallMode = 'tutor_coach' | 'casual_chat';
+
+export interface VoiceUiAction {
+  actionType: 'none' | 'open_learning_popup' | 'navigate_app' | 'switch_call_mode';
+  destination?: string;
+  callMode?: CallMode;
+  course?: TargetLang;
+  /** Layer 1 Fiezel Bank ID (e.g. 'en_since_for', 'en_did_does', 'ja_ni_de') or 'custom_dynamic' for Layer 2 AI */
+  bankTopicId?: string;
+  sourceLayer?: 'bank' | 'ai_dynamic';
+  topicTitle?: string;
+  focusType?: 'grammar' | 'vocab' | 'kanji_hanzi' | 'pronunciation' | 'kanji' | 'kana' | 'sentence_drill' | string;
+  explanationText?: string;
+  patternFormula?: string;
+  drillInstruction?: string;
+  sampleTarget?: string;
+  /** Dynamic AI Whiteboard Spotlight fields, generated on the fly for ANY learner question */
+  coachSpokenScript?: string;
+  leadText?: string;
+  triggerWord?: string;
+  triggerTag?: string;
+  wrongWord?: string;
+  wrongTag?: string;
+  rightWord?: string;
+  rightTag?: string;
+  tailText?: string;
+  trapWrongSentence?: string;
+  trapWrongToken?: string;
+  trapWrongReason?: string;
+  drillMeaningPrompt?: string;
+  drillTargetSentence?: string;
+  drillTrapSentence?: string;
+  drillBlocks?: string[];
+  drillDistractors?: string[];
+  /** Contoh ke-2 (Analogi Lebih Simpel) saat user klik "Masih bingung, kasih contoh lain" */
+  secondCoachScript?: string;
+  secondLeadText?: string;
+  secondTriggerWord?: string;
+  secondTriggerTag?: string;
+  secondWrongWord?: string;
+  secondWrongTag?: string;
+  secondRightWord?: string;
+  secondRightTag?: string;
+  secondTailText?: string;
 }
 
 export interface VocabPrereqItem {
@@ -99,6 +146,8 @@ export interface CallTurn {
   text: string;
   translationId?: string;
   translationTh?: string;
+  translationJa?: string;
+  translationZh?: string;
   timestamp: number;
   audioBase64?: string;
   audioMimeType?: string;

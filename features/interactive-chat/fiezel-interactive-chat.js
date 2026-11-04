@@ -4986,6 +4986,79 @@
       }
     }
 
+    var lastNavAt = 0;
+    var ALLOWED_STUDIO_VIEWS = {
+      home: 'home',
+      beranda: 'home',
+      grammar: 'grammar',
+      vocab: 'vocab',
+      kosakata: 'vocab',
+      kana: 'kana',
+      hiragana: 'kana',
+      katakana: 'kana',
+      kanji: 'writing',
+      hanzi: 'writing',
+      writing: 'writing',
+      menulis: 'writing',
+      reading: 'reading',
+      bacaan: 'reading',
+      listening: 'listening',
+      pendengaran: 'listening',
+      latihan: 'latihan',
+      quiz: 'latihan',
+      kuis: 'latihan',
+      test: 'test',
+      ujian: 'test',
+      story: 'story',
+      cerita: 'story',
+      progress: 'progress',
+      statistik: 'progress',
+      arena: 'arena',
+      classroom: 'classroom',
+      library: 'library',
+      tutor: 'tutor',
+      skills: 'skills'
+    };
+
+    function executeStudioNavigation(payload) {
+      if (!payload || typeof payload !== 'object') return false;
+      var nowNav = Date.now();
+      if (nowNav - lastNavAt < 400) return true;
+      var rawDest = String(payload.destination || payload.targetView || payload.view || '').trim().toLowerCase();
+      if (!rawDest) return false;
+
+      if (rawDest === 'kurikulum' || rawDest === 'curriculum') {
+        lastNavAt = nowNav;
+        api.unmount();
+        if (root.location) root.location.href = './kurikulum.html';
+        return true;
+      }
+      if (rawDest === 'misi' || rawDest === 'mission') {
+        lastNavAt = nowNav;
+        api.unmount();
+        if (root.location) root.location.href = './misi.html';
+        return true;
+      }
+
+      var mappedView = ALLOWED_STUDIO_VIEWS[rawDest];
+      if (!mappedView) return false;
+
+      lastNavAt = nowNav;
+      api.unmount();
+      if (typeof root.go === 'function') {
+        root.go(mappedView);
+        return true;
+      }
+      if (typeof go === 'function') {
+        go(mappedView);
+        return true;
+      }
+      if (root.location) {
+        root.location.href = './index.html?view=' + encodeURIComponent(mappedView);
+      }
+      return true;
+    }
+
     function onMessage(evt) {
       if (!evt) return;
       var f = getFrame();
@@ -4994,6 +5067,14 @@
 
       var m = evt.data;
       if (!m || typeof m !== 'object') return;
+
+      // Same-origin direct navigation command from Voice Studio (voice command / workbench module link)
+      if (m.type === 'FIEZEL_VOICE_STUDIO_NAVIGATE') {
+        if (!f || !f.contentWindow || evt.source === f.contentWindow || evt.source === root) {
+          executeStudioNavigation(m.payload || m);
+        }
+        return;
+      }
 
       // Backward compatibility for legacy FIEZEL_VOICE_STUDIO_ATTEMPT
       if (m.type === 'FIEZEL_VOICE_STUDIO_ATTEMPT' && m.payload) {
@@ -5095,6 +5176,12 @@
             try { root.brainSyncFlush(); } catch (_) {}
           }
           ack(m.seq, null, true);
+          return;
+        }
+
+        case 'fz.studio.navigate': {
+          var okNav = executeStudioNavigation(m.payload);
+          ack(m.seq, null, okNav, okNav ? null : 'invalid_dest');
           return;
         }
 
