@@ -53,8 +53,8 @@ test('setiap modul memiliki header revisi runtime dan dapat dimuat via UMD/Commo
       `${f}: header revisi runtime tidak ditemukan atau format tidak sah`
     );
     assert.ok(
-      /var _fzR='[0-9a-f]{16}',_fzA=\d+;/.test(src),
-      `${f}: token integritas revisi runtime tidak ditemukan`
+      /var _fzR='[0-9a-f]{16}',_fzA=\d+;/.test(src) && /function _fzG\(g,m\)/.test(src),
+      `${f}: token integritas revisi atau guard ekspor UMD (_fzG) tidak ditemukan`
     );
     const exported = require(abs);
     assert.ok(exported && typeof exported === 'object', `${f}: gagal diekspor sebagai objek UMD`);
