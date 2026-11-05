@@ -70,7 +70,6 @@ import { JapaneseRubyDisplay } from './components/JapaneseRubyDisplay';
 import { stripEmojisAndEmotWords, toPhoneticRomaji } from './lib/japanesePhonetics';
 import { toPhoneticPinyin } from './lib/mandarinPhonetics';
 import {
-  buildContextualFallbackCards,
   evaluateTurnLocal,
   type LiveTransportMode,
   pcm16Base64ToAudioBuffer,
@@ -549,6 +548,8 @@ export default function App() {
     drillInstruction: string;
     sampleTarget: string;
     uiAction?: VoiceUiAction;
+    preferredExerciseMode?: 'multiple_choice' | 'cloze_gap' | 'sentence_blocks';
+    quizSeed?: number;
   } | null>(null);
   const isWorkbenchOpenRef = useRef<boolean>(false);
   isWorkbenchOpenRef.current = Boolean(learningWorkbench?.isOpen);
@@ -894,35 +895,12 @@ export default function App() {
 
     const currentSeq = ++copilotSeqRef.current;
 
-    // 1. INSTANT 0ms ZERO-DELAY OPTIMISTIC COPILOT HYDRATION:
-    // Compute focal-clause contextual replies immediately and mount them synchronously
-    // so learner never waits 3-7s on network before seeing 1·Singkat, 2·Alami, 3·+Tanya Balik.
-    const optimisticCards = buildContextualFallbackCards({
-      aiText: cleanAi,
-      targetLang: scen.targetLang,
-      locale,
-      lastUserText: lastUserLine,
-      variationSeed: opts?.forceVariation ? copilotVariationSeedRef.current : 0,
-      excludeTexts: opts?.excludeTexts,
-    });
-    if (optimisticCards.length > 0) {
-      lastCopilotAiKeyRef.current = dedupKey;
-      setCopilotCards(optimisticCards);
-      setCopilotSource('ai-realtime');
-      if (!opts?.forceVariation) {
-        setIsGeneratingCopilot(false);
-      }
-    } else if (!opts?.forceVariation && copilotCardsRef.current.length === 0) {
-      setIsGeneratingCopilot(true);
-      setCopilotSource('loading');
-    }
-
-    // While AI speech is still streaming mid-turn, only update the instant 0ms optimistic cards above;
-    // do NOT fire 6-8 parallel network /api/voice/copilot-assist calls on partial sentences!
-    // The final turnComplete call will fire a single network upgrade once the full sentence is known.
-    if (opts?.isDebouncedStreaming) {
-      return;
-    }
+    // MANDAT USER: HAPUS TOTAL TEMPLATES!
+    // Tidak ada fallback template statis atau tebakan regex. 100% respon harus murni hasil generatif AI.
+    // Tampilkan loading shimmer/skeleton ("Meracik Jawaban...") saat panggilan AI sedang berlangsung.
+    setIsGeneratingCopilot(true);
+    setCopilotSource('loading');
+    setCopilotCards([]);
 
     if (copilotAbortRef.current) {
       try {
@@ -949,7 +927,8 @@ export default function App() {
         signal: controller.signal,
       });
       if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
-      const validCards = (res.replies || res.cards || []);
+      const rawList = res.replies || res.cards || [];
+      const validCards = rawList.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
       if (validCards.length > 0) {
         lastCopilotAiKeyRef.current = dedupKey;
         setCopilotCards(validCards);
@@ -958,10 +937,6 @@ export default function App() {
       if (res.aiMeaningId || res.aiMeaningTh) {
         const cleanId = res.aiMeaningId && !isGenericPlaceholderTranslation(res.aiMeaningId) ? res.aiMeaningId : '';
         const cleanTh = res.aiMeaningTh && !isGenericPlaceholderTranslation(res.aiMeaningTh) ? res.aiMeaningTh : '';
-        if (liveAiDraftRef.current.trim() === cleanAi) {
-          const draftMeaning = locale === 'th' ? (cleanTh || cleanId) : cleanId;
-          if (draftMeaning) setLiveAiTranslationDraft(draftMeaning);
-        }
         if (cleanId || cleanTh) {
           setTurns((prev) =>
             prev.map((tr) => {
@@ -1177,14 +1152,9 @@ export default function App() {
     setInputText('');
     lastCopilotAiKeyRef.current = '';
     const lineToSay = activePersona.openingGreeting || activeScenario.openingLine;
-    const initialCards = buildContextualFallbackCards({
-      aiText: lineToSay,
-      targetLang: activeScenario.targetLang,
-      locale,
-    });
-    setCopilotCards(initialCards);
-    setCopilotSource('ai-realtime');
-    setIsGeneratingCopilot(false);
+    setCopilotCards([]);
+    setCopilotSource('loading');
+    setIsGeneratingCopilot(true);
     const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
     try {
       if (typeof localStorage !== 'undefined') {
@@ -1770,6 +1740,14 @@ export default function App() {
       handleVoiceNavigateApp(earlyIntent.destination, 'live_commit_voice_command');
       return;
     }
+    if (
+      earlyIntent?.actionType === 'close_learning_popup' ||
+      earlyIntent?.actionType === 'reroll_quiz' ||
+      earlyIntent?.actionType === 'switch_exercise_mode'
+    ) {
+      executeVoiceUiAction(earlyIntent, uText);
+      return;
+    }
     if (earlyIntent?.actionType === 'open_learning_popup') {
       const reqSeq = ++workbenchSessionRef.current.turnSeq;
       workbenchSessionRef.current.dismissedByUser = false;
@@ -2017,6 +1995,36 @@ export default function App() {
 
   const executeVoiceUiAction = (uiAction?: VoiceUiAction, userHint = ''): boolean => {
     if (!uiAction || uiAction.actionType === 'none') return false;
+    if (uiAction.actionType === 'close_learning_popup') {
+      workbenchSessionRef.current.dismissedByUser = true;
+      isWorkbenchExplanationActiveRef.current = false;
+      setLearningWorkbench(null);
+      playFiezelSfx('button_tap');
+      return true;
+    }
+    if (uiAction.actionType === 'reroll_quiz') {
+      setLearningWorkbench((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          quizSeed: (prev.quizSeed || 0) + 1,
+        };
+      });
+      playFiezelSfx('button_tap');
+      return true;
+    }
+    if (uiAction.actionType === 'switch_exercise_mode' && uiAction.exerciseMode) {
+      const mode = uiAction.exerciseMode;
+      setLearningWorkbench((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          preferredExerciseMode: mode,
+        };
+      });
+      playFiezelSfx('button_tap');
+      return true;
+    }
     if (uiAction.actionType === 'switch_call_mode' && uiAction.callMode) {
       const nextMode: CallMode = uiAction.callMode === 'casual_chat' ? 'casual_chat' : 'tutor_coach';
       callModeRef.current = nextMode;
@@ -2038,7 +2046,38 @@ export default function App() {
     const s = String(utterance || '').trim().toLowerCase();
     if (!s || s.length < 4) return null;
 
-    // 0) Voice-Commanded Call Mode Switch (Mandate #1: Casual Chat vs Tutor Coach)
+    // 0-A) Voice Control while Learning Workbench (Papan Belajar) is OPEN
+    if (isWorkbenchOpenRef.current) {
+      if (
+        /\b(ganti\s+soal|soal\s+(?:baru|lain|beda)|coba\s+(?:ganti|soal\s+lain)|next\s+question|change\s+question|another\s+question|reroll)\b/i.test(
+          s
+        )
+      ) {
+        return { actionType: 'reroll_quiz' };
+      }
+      if (
+        /\b(tutup\s+(?:papan|pop[\s-]?up|whiteboard)|kembali\s+(?:ngobrol|bicara)|lanjut\s+(?:ngobrol|bicara)|close\s+whiteboard|sudah\s+paham|tutup\s+sekarang)\b/i.test(
+          s
+        )
+      ) {
+        return { actionType: 'close_learning_popup' };
+      }
+      if (/\b(susun\s+kata|susun\s+balok|mode\s+susun|balok\s+kata|word\s+blocks)\b/i.test(s)) {
+        return { actionType: 'switch_exercise_mode', exerciseMode: 'sentence_blocks' };
+      }
+      if (
+        /\b(isi\s+kata|isian\s+rumpang|cloze|isi\s+blank|titik[\s-]titik|lengkapi\s+kalimat|fill\s+in\s+the\s+blank)\b/i.test(
+          s
+        )
+      ) {
+        return { actionType: 'switch_exercise_mode', exerciseMode: 'cloze_gap' };
+      }
+      if (/\b(pilihan\s+ganda|mode\s+pilihan|multiple\s+choice|opsi\s+pilihan)\b/i.test(s)) {
+        return { actionType: 'switch_exercise_mode', exerciseMode: 'multiple_choice' };
+      }
+    }
+
+    // 0-B) Voice-Commanded Call Mode Switch (Mandate #1: Casual Chat vs Tutor Coach)
     if (
       /\b(chat\s+seperti\s+biasa|ngobrol\s+(?:santai|biasa\s+aja)|mode\s+(?:santai|kasual|casual|biasa|teman)|jangan\s+(?:ngajarin|koreksi)\s+dulu|just\s+chat\s+casually|casual\s+mode|chill\s+mode)\b/i.test(
         s
@@ -2110,9 +2149,21 @@ export default function App() {
       }
     }
 
-    // 2) Explicit request for interactive written learning popup OR any grammar/usage question
+    // 2-A) Explicit request to be tested / quizzed
+    const asksTestingOrQuiz =
+      /\b(tes\s+aku|coba\s+tes|uji\s+aku|coba\s+uji|kasih\s+soal|buatkan\s+(?:aku\s+)?latihan|coba\s+kasih\s+soal|kuiskan\s+aku|test\s+me|quiz\s+me)\b/i.test(
+        s
+      );
+    if (asksTestingOrQuiz) {
+      return {
+        actionType: 'open_learning_popup',
+        topicTitle: utterance.trim(),
+      };
+    }
+
+    // 2-B) Explicit request for interactive written learning popup OR any grammar/usage question
     const explicitPopupCmd =
-      /\b(pop[\s-]?up|papan tulis|whiteboard|latihan tulis|tulis langsung|ajarin tertulis|buka kartu belajar|munculkan latihan)\b/i.test(
+      /\b(pop[\s-]?up|papan tulis|papan belajar|whiteboard|latihan tulis|tulis langsung|ajarin tertulis|buka kartu belajar|munculkan latihan)\b/i.test(
         s
       );
     const asksGrammarOrStruggle =
@@ -2321,6 +2372,16 @@ export default function App() {
       }
       if (clientIntent?.actionType === 'switch_call_mode' && clientIntent.callMode) {
         executeVoiceUiAction(clientIntent, trimmed);
+      }
+      if (
+        clientIntent?.actionType === 'close_learning_popup' ||
+        clientIntent?.actionType === 'reroll_quiz' ||
+        clientIntent?.actionType === 'switch_exercise_mode'
+      ) {
+        setInputText('');
+        setLiveUserDraft('');
+        executeVoiceUiAction(clientIntent, trimmed);
+        return;
       }
       if (clientIntent?.actionType === 'open_learning_popup') {
         openLearningWorkbenchWithAction(clientIntent, trimmed);
@@ -4113,68 +4174,14 @@ export default function App() {
             setLiveAiDraft(liveAiDraftRef.current);
           }
 
-          // Sentence-Level Streaming Translation Pipeline (only on completed foreign-language sentences)
-          const currentAiStreaming = liveAiDraftRef.current;
-          if (currentAiStreaming) {
-            const isAlreadyIdStream =
-              /\b(adalah|sedangkan|gunakan|perhatikan|kalimat|karena|untuk|dalam|jangan|ketika|pakai|bedanya|artinya|lihat|papan|kata|contohnya|coba)\b/i.test(
-                currentAiStreaming
-              );
-            if (isAlreadyIdStream && String(locale || 'id').toLowerCase() === 'id') {
-              setLiveAiTranslationDraft(currentAiStreaming);
-            } else {
-              const rawSentences = splitSentences(currentAiStreaming, activeScenario.targetLang);
-              const targetLoc = String(locale || 'id').toLowerCase();
-              rawSentences.forEach((rawSent, idx) => {
-                const s = rawSent.trim();
-                if (!s || s.length < 10) return;
-                const isCompleted = idx < rawSentences.length - 1 || /[.?!。？！\n]$/.test(s);
-                if (isCompleted && !liveSentenceTransMapRef.current.has(s)) {
-                  liveSentenceTransMapRef.current.set(s, {});
-                  void fetchLiveTranslation(s, targetLoc)
-                    .then((translated) => {
-                      if (translated && !isGenericPlaceholderTranslation(translated)) {
-                        const existing = liveSentenceTransMapRef.current.get(s) || {};
-                        existing[targetLoc] = translated;
-                        liveSentenceTransMapRef.current.set(s, existing);
-                        updateLiveAiTranslationDraft(liveAiDraftRef.current);
-                      }
-                    })
-                    .catch(() => {});
-                }
-              });
-              updateLiveAiTranslationDraft(currentAiStreaming);
-            }
-
-            // Early-Trigger Streaming Copilot: Pre-hydrate answer cards while AI partner speaks!
-            if (currentAiStreaming.length >= 15) {
-              const hasSentenceBreak = /[.?!。？！\n]/.test(currentAiStreaming);
-              const hasQuestionMark = /[?？]/.test(currentAiStreaming);
-              if (hasSentenceBreak || (hasQuestionMark && currentAiStreaming.length >= 20)) {
-                if (copilotEarlyTimerRef.current) {
-                  window.clearTimeout(copilotEarlyTimerRef.current);
-                }
-                copilotEarlyTimerRef.current = window.setTimeout(() => {
-                  copilotEarlyTimerRef.current = null;
-                  const draft = liveAiDraftRef.current.trim();
-                  if (draft && draft !== lastStreamedCopilotTextRef.current) {
-                    lastStreamedCopilotTextRef.current = draft;
-                    const lastUserForCopilot =
-                      liveUserDraftRef.current ||
-                      [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
-                      '';
-                    const updatedHist: Array<{ speaker: 'ai' | 'user'; text: string }> = [
-                      ...turnsRef.current.slice(-6).map((tr) => ({ speaker: tr.speaker, text: tr.text })),
-                      { speaker: 'ai', text: draft },
-                    ];
-                    void triggerRealtimeCopilotRef.current(draft, lastUserForCopilot, updatedHist, {
-                      isDebouncedStreaming: true,
-                    });
-                  }
-                }, 160);
-              }
-            }
+          // MANDAT USER: Selama AI sedang berbicara, JANGAN jalankan terjemahan parsial yang berubah-ubah
+          // dan JANGAN buat bantuan jawaban dari kalimat terpotong/setengah matang!
+          // Biarkan layar menampilkan status "Sedang memuat terjemahan..." hingga AI selesai bicara.
+          if (copilotEarlyTimerRef.current) {
+            window.clearTimeout(copilotEarlyTimerRef.current);
+            copilotEarlyTimerRef.current = null;
           }
+          setLiveAiTranslationDraft('');
 
           // Turn Complete, evaluate learner utterance and record Braincore mastery
           const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
@@ -4216,6 +4223,14 @@ export default function App() {
               const spokenIntent = detectClientVoiceSystemIntent(uText);
               if (spokenIntent?.actionType === 'navigate_app' && spokenIntent.destination) {
                 handleVoiceNavigateApp(spokenIntent.destination, 'live_voice_command');
+                return;
+              }
+              if (
+                spokenIntent?.actionType === 'close_learning_popup' ||
+                spokenIntent?.actionType === 'reroll_quiz' ||
+                spokenIntent?.actionType === 'switch_exercise_mode'
+              ) {
+                executeVoiceUiAction(spokenIntent, uText);
                 return;
               }
               if (spokenIntent?.actionType === 'open_learning_popup') {
@@ -4307,46 +4322,8 @@ export default function App() {
                 /\b(adalah|sedangkan|gunakan|perhatikan|kalimat|karena|untuk|dalam|jangan|ketika|pakai|bedanya|artinya|lihat|papan|kata|contohnya|coba)\b/i.test(
                   aText
                 );
-              // Compose turn translation from completed sentence translations (only if every sentence resolved cleanly)
-              const sentences = splitSentences(aText, activeScenario.targetLang);
-              const allSentencesTranslatedId =
-                isAiIndonesianExplanation ||
-                (sentences.length > 0 &&
-                  sentences.every((s) => {
-                    const val = liveSentenceTransMapRef.current.get(s.trim())?.id || '';
-                    return Boolean(val) && !isGenericPlaceholderTranslation(val);
-                  }));
-              const allSentencesTranslatedTh =
-                sentences.length > 0 &&
-                sentences.every((s) => {
-                  const val = liveSentenceTransMapRef.current.get(s.trim())?.th || '';
-                  return Boolean(val) && !isGenericPlaceholderTranslation(val);
-                });
-              const composedId = isAiIndonesianExplanation
-                ? aText
-                : sentences
-                    .map((s) => liveSentenceTransMapRef.current.get(s.trim())?.id || '')
-                    .filter((v) => Boolean(v) && !isGenericPlaceholderTranslation(v))
-                    .join(' ');
-              const composedTh = sentences
-                .map((s) => liveSentenceTransMapRef.current.get(s.trim())?.th || '')
-                .filter((v) => Boolean(v) && !isGenericPlaceholderTranslation(v))
-                .join(' ');
-
-              const autoTrans = translateAndPhoneticizeLiveText(
-                aText,
-                activeScenario.targetLang,
-                composedId || msg.aiTranslationId,
-                composedTh || msg.aiTranslationTh,
-                undefined,
-                { syncOnly: true }
-              );
-              const initialTransId =
-                composedId ||
-                (!isGenericPlaceholderTranslation(autoTrans.translationId) ? autoTrans.translationId : '');
-              const initialTransTh =
-                composedTh ||
-                (!isGenericPlaceholderTranslation(autoTrans.translationTh) ? autoTrans.translationTh : '');
+              const initialTransId = isAiIndonesianExplanation ? aText : (msg.aiTranslationId || '');
+              const initialTransTh = msg.aiTranslationTh || '';
               const aiTurnId = `live_ai_${Date.now() + 1}`;
               setTurns((prev) => [
                 ...prev,
@@ -4375,18 +4352,9 @@ export default function App() {
               ];
               void triggerRealtimeCopilotRef.current(aText, lastUserForCopilot, updatedHist);
 
-              // Always fetch full-utterance contextual translation whenever active locale translation was incomplete
+              // Ambil terjemahan utuh kontekstual setelah AI selesai bicara (tanpa tebakan kamus parsial)
               const activeLoc = String(locale || 'id').toLowerCase();
-              const hasTransForLocale =
-                activeLoc === 'ja'
-                  ? false
-                  : activeLoc === 'zh'
-                  ? false
-                  : activeLoc === 'th'
-                  ? allSentencesTranslatedTh
-                  : allSentencesTranslatedId;
-
-              if (!hasTransForLocale) {
+              if (!isAiIndonesianExplanation) {
                 void fetchLiveTranslation(aText, activeLoc).then((trans) => {
                   if (trans && !isGenericPlaceholderTranslation(trans)) {
                     setTurns((prev) =>
@@ -4394,8 +4362,8 @@ export default function App() {
                         t.id === aiTurnId
                           ? {
                               ...t,
-                              translationId: activeLoc === 'id' ? trans : (t.translationId || (allSentencesTranslatedId ? composedId : t.translationId)),
-                              translationTh: activeLoc === 'th' ? trans : (t.translationTh || (allSentencesTranslatedTh ? composedTh : t.translationTh)),
+                              translationId: activeLoc === 'id' ? trans : t.translationId,
+                              translationTh: activeLoc === 'th' ? trans : t.translationTh,
                               translationJa: activeLoc === 'ja' ? trans : t.translationJa,
                               translationZh: activeLoc === 'zh' ? trans : t.translationZh,
                             }
@@ -4998,13 +4966,19 @@ export default function App() {
 
   const resolvedActiveAiMeaning = (() => {
     try {
-      // Mandat User: Selama AI sedang bicara (isStreamingAiLive || isPlayingAiAudio), jangan tampilkan
+      const loadingTranslationText =
+        locale === 'th'
+          ? 'กำลังแปล...'
+          : locale === 'ja'
+          ? '翻訳中...'
+          : locale === 'zh'
+          ? '正在翻译...'
+          : 'Sedang memuat terjemahan...';
+
+      // Mandat User: Selama AI sedang bicara atau memuat, jangan tampilkan
       // tebakan terjemahan berubah-ubah atau titik/koma Morse (, ! , :). Tampilkan "Sedang memuat terjemahan...".
-      if (isStreamingAiLive || isPlayingAiAudio) {
-        if (locale === 'th') return 'กำลังแปล...';
-        if (locale === 'ja') return '翻訳中...';
-        if (locale === 'zh') return '正在翻译...';
-        return 'Sedang memuat terjemahan...';
+      if (isStreamingAiLive || isPlayingAiAudio || isAiThinking) {
+        return loadingTranslationText;
       }
       let rawMeaning = '';
       if (locale === 'th') {
@@ -5021,14 +4995,14 @@ export default function App() {
         rawMeaning = activeAiSubtitle.translationId || activeAiSubtitle.translationTh || '';
       }
       if (/^[\s,.:;!?"'“”‘’()（）\-—]+$/.test(rawMeaning)) {
-        return '';
+        return loadingTranslationText;
       }
       if (rawMeaning && locale !== 'zh' && locale !== 'ja' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(rawMeaning)) {
         const cjkCount = (rawMeaning.match(/[\u4E00-\u9FFF\u3040-\u30FF]/g) || []).length;
         const latinWords = (rawMeaning.match(/[A-Za-zÀ-ÖØ-öø-ÿ]{2,}/g) || []).length;
         if (latinWords === 0 && cjkCount > 0) {
           // Untranslated CJK string: do not masquerade as Indonesian/Thai translation
-          return '';
+          return loadingTranslationText;
         }
         rawMeaning = rawMeaning.replace(/[\u4E00-\u9FFF\u3040-\u30FF]+/g, (cjkMatch) => {
           const phonetic =
@@ -5038,10 +5012,8 @@ export default function App() {
           return phonetic && phonetic !== cjkMatch ? phonetic : cjkMatch;
         });
       }
-      if (locale !== 'zh' && locale !== 'ja' && !hasRealLettersForMeaning(rawMeaning)) {
-        return hasRealLettersForMeaning(computedAiSubtitle.translationId)
-          ? computedAiSubtitle.translationId.trim()
-          : '';
+      if (!rawMeaning || !hasRealLettersForMeaning(rawMeaning) || isGenericPlaceholderTranslation(rawMeaning)) {
+        return loadingTranslationText;
       }
       return rawMeaning.trim();
     } catch {
@@ -6766,6 +6738,8 @@ export default function App() {
           patternFormula={learningWorkbench.patternFormula}
           drillInstruction={learningWorkbench.drillInstruction}
           sampleTarget={learningWorkbench.sampleTarget}
+          forcedExerciseMode={learningWorkbench.preferredExerciseMode}
+          externalQuizSeed={learningWorkbench.quizSeed}
           currentMasteryPct={Math.round(
             ((brainState.competencies[activeScenario.competencyId]?.pMasteryDecayed ??
               brainState.competencies[activeScenario.competencyId]?.pMastery ??

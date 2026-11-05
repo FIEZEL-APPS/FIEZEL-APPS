@@ -35,9 +35,17 @@ export interface VoicePersona {
 export type CallMode = 'tutor_coach' | 'casual_chat';
 
 export interface VoiceUiAction {
-  actionType: 'none' | 'open_learning_popup' | 'navigate_app' | 'switch_call_mode';
+  actionType:
+    | 'none'
+    | 'open_learning_popup'
+    | 'close_learning_popup'
+    | 'reroll_quiz'
+    | 'switch_exercise_mode'
+    | 'navigate_app'
+    | 'switch_call_mode';
   destination?: string;
   callMode?: CallMode;
+  exerciseMode?: 'multiple_choice' | 'cloze_gap' | 'sentence_blocks';
   course?: TargetLang;
   /** Layer 1 Fiezel Bank ID (e.g. 'en_since_for', 'en_did_does', 'ja_ni_de') or 'custom_dynamic' for Layer 2 AI */
   bankTopicId?: string;
