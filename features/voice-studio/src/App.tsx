@@ -3502,8 +3502,8 @@ export default function App() {
           .catch(() => {
             return navigator.mediaDevices.getUserMedia({ audio: true });
           });
-        // Beri waktu hingga 8000ms untuk dialog izin mic di Android/iOS
-        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000));
+        // Beri waktu 4000ms untuk dialog izin mic di Android/iOS
+        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
         const res = await Promise.race([getStreamPromise, timeoutPromise]);
         if (res && res.getAudioTracks && res.getAudioTracks().length > 0) {
           stream = res;
