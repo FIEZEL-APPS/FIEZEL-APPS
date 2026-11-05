@@ -9371,18 +9371,28 @@ body:has(.home-today) .quiz-topbar,
   background: rgba(148, 163, 184, 0.12) !important;
 }
 
-/* Light mode for question-instruction only on true light surfaces */
+/* Light mode for question-instruction only on true light surfaces outside dark bubbles */
 body:not(.theme-dark):not(.fz-lux) .card-light .question-instruction,
-body:not(.theme-dark):not(.fz-lux) .card:not(.quiz-bubble):not(.quiz-stage) .question-instruction {
+body:not(.theme-dark):not(.fz-lux) .card .question-instruction:not(.quiz-bubble *):not(.quiz-stage *):not(.speech-bubble *) {
   color: #475569 !important; /* Slate 600, high contrast on light backgrounds */
   background: rgba(100, 116, 139, 0.1) !important;
 }
 
-/* Inside dark quiz bubble/stage, instruction is ALWAYS light Slate 300 */
+/* Inside dark quiz bubble/stage/speech-bubble, instruction is ALWAYS light Slate 300 */
 .quiz-bubble .question-instruction,
 .quiz-stage .question-instruction,
-.speech-bubble .question-instruction {
+.speech-bubble .question-instruction,
+.card .quiz-bubble .question-instruction,
+.card .quiz-stage .question-instruction,
+.card .speech-bubble .question-instruction,
+body .card .quiz-bubble .question-instruction,
+body .card .quiz-stage .question-instruction,
+body .card .speech-bubble .question-instruction,
+body:not(.theme-dark):not(.fz-lux) .card .quiz-bubble .question-instruction,
+body:not(.theme-dark):not(.fz-lux) .card .quiz-stage .question-instruction,
+body:not(.theme-dark):not(.fz-lux) .card .speech-bubble .question-instruction {
   color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -9401,17 +9411,37 @@ body:not(.theme-dark):not(.fz-lux) .card:not(.quiz-bubble):not(.quiz-stage) .que
   letter-spacing: -0.01em !important;
 }
 
-/* Light mode for question-main only on true light surfaces */
+/* Light mode for question-main only on true light surfaces outside dark bubbles */
 body:not(.theme-dark):not(.fz-lux) .card-light .question-main,
-body:not(.theme-dark):not(.fz-lux) .card:not(.quiz-bubble):not(.quiz-stage) .question-main {
+body:not(.theme-dark):not(.fz-lux) .card .question-main:not(.quiz-bubble *):not(.quiz-stage *):not(.speech-bubble *) {
   color: #0F172A !important;
 }
 
-/* Inside dark quiz bubble/stage, main question is ALWAYS pure White */
+/* Inside dark quiz bubble/stage/speech-bubble, main question is ALWAYS pure White with high contrast */
 .quiz-bubble .question-main,
 .quiz-stage .question-main,
-.speech-bubble .question-main {
+.speech-bubble .question-main,
+.quiz-bubble #quizStem,
+.quiz-stage #quizStem,
+.speech-bubble #quizStem,
+.card .quiz-bubble .question-main,
+.card .quiz-stage .question-main,
+.card .speech-bubble .question-main,
+body .quiz-bubble .question-main,
+body .quiz-stage .question-main,
+body .speech-bubble .question-main,
+body .card .quiz-bubble .question-main,
+body .card .quiz-stage .question-main,
+body .card .speech-bubble .question-main,
+body:not(.theme-dark):not(.fz-lux) .card .quiz-bubble .question-main,
+body:not(.theme-dark):not(.fz-lux) .card .quiz-stage .question-main,
+body:not(.theme-dark):not(.fz-lux) .card .speech-bubble .question-main,
+body:not(.theme-dark):not(.fz-lux) .quiz-bubble .question-main,
+body:not(.theme-dark):not(.fz-lux) .quiz-stage .question-main,
+body:not(.theme-dark):not(.fz-lux) .speech-bubble .question-main {
   color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* Target Word / Error Token Highlight in Sentence Correction & Stem */
@@ -9440,7 +9470,7 @@ mark.target-word,
 }
 
 body:not(.theme-dark):not(.fz-lux) .card-light .target-word,
-body:not(.theme-dark):not(.fz-lux) .card:not(.quiz-bubble):not(.quiz-stage) .target-word {
+body:not(.theme-dark):not(.fz-lux) .card .target-word:not(.quiz-bubble *):not(.quiz-stage *):not(.speech-bubble *) {
   color: #92400E !important; /* Amber 800, high contrast on light */
   background: rgba(245, 158, 11, 0.18) !important;
   text-decoration-color: #D97706 !important;
@@ -9449,8 +9479,18 @@ body:not(.theme-dark):not(.fz-lux) .card:not(.quiz-bubble):not(.quiz-stage) .tar
 
 .quiz-bubble .target-word,
 .quiz-stage .target-word,
-.speech-bubble .target-word {
+.speech-bubble .target-word,
+.card .quiz-bubble .target-word,
+.card .quiz-stage .target-word,
+.card .speech-bubble .target-word,
+body .card .quiz-bubble .target-word,
+body .card .quiz-stage .target-word,
+body .card .speech-bubble .target-word,
+body:not(.theme-dark):not(.fz-lux) .card .quiz-bubble .target-word,
+body:not(.theme-dark):not(.fz-lux) .card .quiz-stage .target-word,
+body:not(.theme-dark):not(.fz-lux) .card .speech-bubble .target-word {
   color: #FEF3C7 !important;
+  -webkit-text-fill-color: #FEF3C7 !important;
   background: rgba(245, 158, 11, 0.32) !important;
   text-decoration-color: #FBBF24 !important;
   border-bottom-color: #F59E0B !important;

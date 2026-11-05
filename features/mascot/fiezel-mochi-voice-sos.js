@@ -1190,9 +1190,22 @@
   }
 
   function prewarmLiveSession(force) {
-    // Ghost traffic elimination: background WebSocket and token pre-fetching are disabled.
-    // Audio calls are connected on-demand when user explicitly initiates/confirms a call.
-    return Promise.resolve(null);
+    if (!force && _prewarm.session && (Date.now() - _prewarm.fetchedAt) < TOKEN_STALE_MS) {
+      return Promise.resolve(_prewarm.session);
+    }
+    if (_prewarm.promise) return _prewarm.promise;
+    _prewarm.promise = fetchLiveSessionToken({ skipDirectKey: !isDirectKeyAvailable() }).then(function (session) {
+      if (session && session.ok) {
+        _prewarm.session = session;
+        _prewarm.fetchedAt = Date.now();
+      }
+      _prewarm.promise = null;
+      return session;
+    }).catch(function () {
+      _prewarm.promise = null;
+      return null;
+    });
+    return _prewarm.promise;
   }
 
   function takePrewarmedSession() {
@@ -2820,10 +2833,10 @@
         return;
       }
 
-      // Pre-connect WebSocket in background so voice can play INSTANTLY when confirmed!
+      // Pre-warm live session token in memory while user reviews modal so Gemini Live connects INSTANTLY on confirm!
       try {
         if (!self.isCallActive()) {
-          openHotSocket();
+          prewarmLiveSession(true);
         }
       } catch (_) {}
 
@@ -2889,6 +2902,12 @@
           try {
             var ctx = getAudioContext();
             if (ctx && ctx.state === 'suspended') ctx.resume().catch(function () {});
+          } catch (_) {}
+
+          // Instant responsive audio chime on user confirmation
+          try {
+            playTone(523.25, 0.08, 'sine');
+            setTimeout(function () { playTone(659.25, 0.12, 'sine'); }, 85);
           } catch (_) {}
 
           // 2. Wire Pemotongan Saldo 10 Gem Instan
@@ -3150,6 +3169,38 @@
           );
           return;
         }
+      }
+
+      // 3c. Jalur pre-warm in-flight promise (menunggu fetch token yang sudah dipicu modal)
+      if (_prewarm.promise) {
+        _prewarm.promise.then(function (session) {
+          if (!self.isCallActive()) return;
+          if (session && session.ok && session.endpoint) {
+            self._connectLiveWebSocket(session.endpoint, q, session.keyIndex, !!session.isDirectKey);
+            prewarmLiveSession(true);
+          } else {
+            fetchLiveSessionToken({ skipDirectKey: !isDirectKeyAvailable() }).then(function (s2) {
+              if (!self.isCallActive()) return;
+              if (s2 && s2.ok && s2.endpoint) {
+                self._connectLiveWebSocket(s2.endpoint, q, s2.keyIndex, !!s2.isDirectKey);
+              } else {
+                setConnectionStatusInternal('error', t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi'));
+                self._fallbackSpeechTurn(q);
+              }
+            });
+          }
+        }).catch(function () {
+          fetchLiveSessionToken({ skipDirectKey: !isDirectKeyAvailable() }).then(function (s2) {
+            if (!self.isCallActive()) return;
+            if (s2 && s2.ok && s2.endpoint) {
+              self._connectLiveWebSocket(s2.endpoint, q, s2.keyIndex, !!s2.isDirectKey);
+            } else {
+              setConnectionStatusInternal('error', t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi'));
+              self._fallbackSpeechTurn(q);
+            }
+          });
+        });
+        return;
       }
 
       // 4. Jalur server pool (16-key rotation): fetch token sekarang.
