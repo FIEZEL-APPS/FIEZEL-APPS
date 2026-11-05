@@ -3098,6 +3098,8 @@
 
       if (typeof navigator !== 'undefined' && navigator.onLine === false) {
         setConnectionStatusInternal('offline', t('mochi-sos.conn-offline', 'Koneksi internet terputus — Mochi menunggu jaringan kembali aktif'));
+      } else {
+        setConnectionStatusInternal('connecting', t('mochi-sos.conn-connecting', 'Sedang menghubungkan Mochi...'));
       }
 
       // 0. Putar sapaan suara AI Gemini Live (Puck 24kHz PCM) SECARA INSTAN (<100ms) bila sudah siap utuh di cache;

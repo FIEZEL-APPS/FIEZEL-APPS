@@ -1,7 +1,7 @@
 {
-  "version": "m025-769",
+  "version": "m025-770",
   "claimedBy": "branch main",
-  "claimedAt": "2026-11-05T17:51:04.615Z",
-  "reason": "fix(voice): unified chat stream, inverted visual hierarchy, fixed copilot dock, and removed 5-min limit",
+  "claimedAt": "2026-11-05T18:37:36.215Z",
+  "reason": "fix(quiz,mascot): eliminate phantom srl-predict prompt and show connecting state on mochi sos",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
