@@ -24,6 +24,7 @@
     'settings.locale-catatan': 'Bahasa antarmuka aplikasi. Materi belajar bahasa Inggris tidak berubah.',
     'settings.locale-toast': 'Bahasa tampilan tersimpan.',
     'settings.locale-opsi-id': 'Bahasa Indonesia',
-    'settings.locale-opsi-th': 'ภาษาไทย'
+    'settings.locale-opsi-th': 'ภาษาไทย',
+    'settings.locale-opsi-ja': '日本語'
   });
 }());

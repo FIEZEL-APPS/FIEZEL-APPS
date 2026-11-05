@@ -131,6 +131,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
   // offline yang beralih ke th kehilangan satu-satunya pemuat aset th-nya.
   './features/i18n/fiezel-th-loader.js',
+  './features/i18n/fiezel-ja-loader.js',
   './features/i18n/locales/en/ui.json',
   './features/i18n/locales/en/quiz.json',
   './features/i18n/locales/en/grammar.json',

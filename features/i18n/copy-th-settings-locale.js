@@ -18,6 +18,7 @@
     'settings.locale-toast': 'บันทึกภาษาที่แสดงแล้ว',
     // AUTONYM — byte-identik dengan copy-id-settings-locale.js, jangan diterjemahkan
     'settings.locale-opsi-id': 'Bahasa Indonesia',
-    'settings.locale-opsi-th': 'ภาษาไทย'
+    'settings.locale-opsi-th': 'ภาษาไทย',
+    'settings.locale-opsi-ja': '日本語'
   });
 }());

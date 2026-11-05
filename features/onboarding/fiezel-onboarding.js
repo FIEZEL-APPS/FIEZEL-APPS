@@ -319,7 +319,7 @@
 
   function normalizeLocale(value) {
     var locale = String(value || '');
-    var supported = I18N && Array.isArray(I18N.SUPPORTED) ? I18N.SUPPORTED : ['id', 'th'];
+    var supported = I18N && Array.isArray(I18N.SUPPORTED) ? I18N.SUPPORTED : ['id', 'th', 'ja'];
     return supported.indexOf(locale) >= 0 ? locale : '';
   }
 
@@ -810,14 +810,16 @@
     return reveal(env)
       + topbar(false, false)
       + '<div class="fiezel-sheet fiezel-language-sheet" data-ob-step="language">'
-      + '<span class="fiezel-language-kicker">LANGUAGE · BAHASA · ภาษา</span>'
+      + '<span class="fiezel-language-kicker">LANGUAGE · BAHASA · ภาษา · 言語</span>'
       + '<h2 class="fiezel-title">Choose your language</h2>'
-      + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span></p>'
-      + '<div class="fiezel-goal-grid fiezel-language-grid" role="group" aria-label="Language / Bahasa / ภาษา">'
+      + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span><br><span lang="ja">言語を選択して続行してください</span></p>'
+      + '<div class="fiezel-goal-grid fiezel-language-grid" role="group" aria-label="Language / Bahasa / ภาษา / 言語">'
       + choice('id', FLAG_ID, 'Bahasa Indonesia', 'Indonesia')
       + choice('th', FLAG_TH, 'ภาษาไทย', 'ไทย')
+      + choice('ja', FLAG_JA, '日本語', '日本')
       + '</div>'
       + (busy === 'th' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span></p>' : '')
+      + (busy === 'ja' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Jepang · <span lang="ja">日本語データを準備中…</span></p>' : '')
       + '</div>';
   }
 
@@ -1702,17 +1704,17 @@
       try { opts.onLocale({ locale: locale, restored: false }); } catch (_) {}
       markLocaleSelected(target, locale);
 
-      // Bundle Indonesia sudah ada sejak boot. Copy Thai sengaja dinamis; jangan munculkan
+      // Bundle Indonesia sudah ada sejak boot. Copy Thai & Japanese sengaja dinamis; jangan munculkan
       // Step 1 dengan fallback Indonesia sambil unduhannya berjalan. Menunggu SATU kunci
       // onboarding cukup untuk membuktikan domain feat-b sudah siap. Tenggat tetap ada agar
       // kegagalan jaringan tidak mengurung pengguna pada layar penuh.
-      if (locale === 'th' && I18N && typeof I18N.hasCopy === 'function'
+      if ((locale === 'th' || locale === 'ja') && I18N && typeof I18N.hasCopy === 'function'
           && typeof I18N.whenAvailable === 'function'
-          && !I18N.hasCopy('th', 'onboarding.dialog-aria')) {
-        localeBusy = 'th';
+          && !I18N.hasCopy(locale, 'onboarding.dialog-aria')) {
+        localeBusy = locale;
         paint();
         try {
-          I18N.whenAvailable('th', 'onboarding.dialog-aria').then(function () {
+          I18N.whenAvailable(locale, 'onboarding.dialog-aria').then(function () {
             localeReady(locale, token);
           }, function () { localeReady(locale, token); });
         } catch (_) { localeReady(locale, token); return; }

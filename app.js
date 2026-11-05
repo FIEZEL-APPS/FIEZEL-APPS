@@ -13344,7 +13344,7 @@ function showOnboarding(now=Date.now()){
       // fiezel-th-loader. Onboarding sendiri menunggu copy feat-b Thai sebelum mengecat
       // langkah nama, sehingga tidak ada kilatan/fallback Bahasa Indonesia.
       onLocale:({locale})=>{
-        const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
+        const supported=(self.FiezelI18n?.SUPPORTED)||['id','th','ja'];
         const value=supported.includes(locale)?locale:'id';
         state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();
         try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
@@ -20013,7 +20013,7 @@ function settingsFold(title,body,open,extraClass){return `<details class="home-f
    salah tetap bisa mengenali nama bahasanya sendiri di daftar. */
 function learnerLocaleRowMarkup(){
   const active=(self.FiezelI18n?.getLocale?.())||'id';
-  const options=[['id',FiezelI18n.t('settings.locale-opsi-id')],['th',FiezelI18n.t('settings.locale-opsi-th')]]
+  const options=[['id',FiezelI18n.t('settings.locale-opsi-id')],['th',FiezelI18n.t('settings.locale-opsi-th')],['ja',FiezelI18n.t('settings.locale-opsi-ja')||'日本語']]
     .map(([value,label])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)}</option>`).join('');
   return `<label class="setting-row"><span class="setting-icon"><i data-lucide="languages"></i></span><span><b>${FiezelI18n.t('settings.locale-judul')}</b><small>${FiezelI18n.t('settings.locale-catatan')}</small></span><select id="settingLearnerLocale" aria-label="${FiezelI18n.t('settings.locale-judul')}">${options}</select></label>`;
 }
@@ -20025,7 +20025,7 @@ function learnerLocaleRowMarkup(){
    saat back) → closeModal + render() penuh → toast konfirmasi yang sudah berbahasa BARU.
    Nilai ini TIDAK PERNAH diteruskan ke opsi audio/voice (AI-17 F02, audio-locale-guard). */
 function setLearnerLocalePreference(next){
-  const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
+  const supported=(self.FiezelI18n?.SUPPORTED)||['id','th','ja'];
   const value=supported.includes(next)?next:'id';
   if((state.preferences?.learnerLocale||'id')===value)return true;
   state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();

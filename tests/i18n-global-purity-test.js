@@ -149,9 +149,33 @@ test('Katalog Malaysia (ms) bebas kata Indonesia spesifik yang salah dalam konte
   assert.deepStrictEqual(msSpecificLeaks, [], 'Katalog Malaysia memuat kata Indonesia spesifik:\n  ' + msSpecificLeaks.join('\n  '));
 });
 
+test('Katalog Japanese (ja) minimal 95% karakter Kanji/Kana autentik dan ZERO dummy text', () => {
+  const jaRegex = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/;
+  NAMESPACES.forEach(ns => {
+    const p = path.join(LOCALES_DIR, 'ja', `${ns}.json`);
+    assert(fs.existsSync(p), `Berkas hilang: ja/${ns}.json`);
+    const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+    const totalKeys = Object.keys(data).length;
+    let jaCount = 0;
+    const nonJa = [];
+
+    for (const [k, v] of Object.entries(data)) {
+      const valStr = String(v).trim();
+      if (jaRegex.test(valStr) || valStr.length <= 4 || /^[0-9\s.,!?:;/\\-_+*#@%$()]+$/.test(valStr)) {
+        jaCount++;
+      } else {
+        nonJa.push(`ja/${ns}.${k}: "${v}"`);
+      }
+    }
+
+    const pct = (jaCount / totalKeys) * 100;
+    assert(pct >= 95, `Katalog ja/${ns}.json hanya ${pct.toFixed(1)}% Jepang (< 95%):\n  Contoh non-JA: ` + nonJa.slice(0, 10).join('\n  '));
+  });
+});
+
 console.log('\n--- HASIL GERBANG I18N GLOBAL PURITY ---');
 if (failures === 0) {
-  console.log('SEMUA 6 GERBANG PURITAS I18N GLOBAL: 100% HIJAU (PASS)!');
+  console.log('SEMUA 7 GERBANG PURITAS I18N GLOBAL: 100% HIJAU (PASS)!');
   process.exit(0);
 } else {
   console.error(`TERDAPAT ${failures} KEGAGALAN PADA GERBANG PURITAS I18N GLOBAL!`);
