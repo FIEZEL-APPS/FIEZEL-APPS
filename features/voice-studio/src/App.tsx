@@ -459,6 +459,7 @@ export default function App() {
   const inputAudioCtxRef = useRef<AudioContext | null>(null);
   const outputAudioCtxRef = useRef<AudioContext | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
+  const micSourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const nextStartTimeRef = useRef<number>(0);
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
@@ -3146,6 +3147,287 @@ export default function App() {
     void speakAiText(lastAi?.text || activeScenario.openingLine);
   };
 
+  const handleMicPcmData = (float32: Float32Array) => {
+    if (isMicMutedRef.current) return;
+    // Once Silero Neural VAD v5 WASM is active, it exclusively owns 16kHz human-speech streaming & barge-in.
+    if (sileroVadGateRef.current?.isActive()) return;
+
+    const liveCtx = liveAudioCtxRef.current;
+    const sampleRate = liveCtx?.sampleRate || 48000;
+
+    // ACOUSTIC ECHO SUPPRESSION + INSTANT BARGE-IN:
+    // Saat AI sedang berbicara atau gema speaker masih memantul (<480ms setelah selesai bicara),
+    // cegah echo speaker masuk ke Gemini Live agar AI tidak menjawab suaranya sendiri!
+    if (
+      isPlayingAiAudioRef.current ||
+      isAiServerTurnOpenRef.current ||
+      Date.now() - lastAiPlayoutEndedAtRef.current < 480
+    ) {
+      if (isWorkbenchOpenRef.current || Date.now() - lastAiPlayoutEndedAtRef.current < 480) {
+        return;
+      }
+      const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
+      const rms = bargeVad.lastMetrics?.rms ?? 0;
+      if (bargeVad.speechStarted && rms >= 0.16) {
+        interruptAiAndStartListening();
+        if (!isUserSpeakingLiveRef.current) {
+          isUserSpeakingLiveRef.current = true;
+          setIsUserSpeakingLive(true);
+        }
+        if (
+          wsRef.current &&
+          wsRef.current.readyState === WebSocket.OPEN &&
+          isLiveConnectedRef.current &&
+          bargeVad.speechPcm16k &&
+          bargeVad.speechPcm16k.length > 0
+        ) {
+          const pcmBase64 = float32At16kToPcm16Base64(bargeVad.speechPcm16k);
+          wsRef.current.send(
+            JSON.stringify({
+              realtimeInput: {
+                audio: {
+                  mimeType: 'audio/pcm;rate=16000',
+                  data: pcmBase64,
+                },
+              },
+            })
+          );
+        }
+      } else if (!bargeVad.inSpeech) {
+        // Never retain speaker bleed in handyVad pre-roll buffer while AI is playing
+        handyVadRef.current.reset();
+      }
+      return;
+    }
+
+    const vadRes = handyVadRef.current.processSamples(float32, sampleRate, false);
+
+    if (vadRes.inSpeech) {
+      lastHandySpeechAtRef.current = Date.now();
+      if (!isUserSpeakingLiveRef.current) {
+        isUserSpeakingLiveRef.current = true;
+        setIsUserSpeakingLive(true);
+      }
+      if (userSpeakingTimerRef.current) window.clearTimeout(userSpeakingTimerRef.current);
+      userSpeakingTimerRef.current = window.setTimeout(() => {
+        isUserSpeakingLiveRef.current = false;
+        setIsUserSpeakingLive(false);
+      }, 450);
+    }
+
+    // Stream continuous 16kHz PCM directly to Gemini 3.8 Live's native server-side Automatic VAD
+    // so speech onset, natural pauses, and end-of-turn silence are detected without clipping!
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+      const pcmBase64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
+      if (pcmBase64) {
+        wsRef.current.send(
+          JSON.stringify({
+            realtimeInput: {
+              audio: {
+                mimeType: 'audio/pcm;rate=16000',
+                data: pcmBase64,
+              },
+            },
+          })
+        );
+      }
+    }
+  };
+
+  const connectMicStreamToLiveProcessing = async (stream: MediaStream, liveCtx: AudioContext) => {
+    micStreamRef.current = stream;
+    if (!stream || !stream.getAudioTracks || stream.getAudioTracks().length === 0) return;
+
+    stream.getAudioTracks().forEach((track) => {
+      track.enabled = !isMicMutedRef.current;
+    });
+
+    if (liveCtx.state === 'suspended') {
+      await liveCtx.resume().catch(() => {});
+    }
+
+    if (micSourceNodeRef.current) {
+      try {
+        micSourceNodeRef.current.disconnect();
+      } catch {}
+      micSourceNodeRef.current = null;
+    }
+
+    if (micSourceNodeRef.current) {
+      try {
+        micSourceNodeRef.current.disconnect();
+      } catch {
+        // Ignore
+      }
+      micSourceNodeRef.current = null;
+    }
+    if (audioWorkletNodeRef.current) {
+      try {
+        audioWorkletNodeRef.current.port.onmessage = null;
+        audioWorkletNodeRef.current.disconnect();
+      } catch {}
+      audioWorkletNodeRef.current = null;
+    }
+    if (scriptProcessorRef.current) {
+      try {
+        scriptProcessorRef.current.onaudioprocess = null;
+        scriptProcessorRef.current.disconnect();
+      } catch {}
+      scriptProcessorRef.current = null;
+    }
+
+    try {
+      const source = liveCtx.createMediaStreamSource(stream);
+      micSourceNodeRef.current = source;
+      handyVadRef.current.reset();
+      lastHandySpeechAtRef.current = 0;
+      try {
+        (window as any).__fzVoiceStudioHandyVad = handyVadRef.current;
+      } catch {}
+
+      // Start Self-Hosted Silero Neural VAD v5 if available
+      sileroVadGateRef.current?.destroy();
+      const sileroGate = new SileroNeuralVadGate();
+      sileroVadGateRef.current = sileroGate;
+      void sileroGate.start(stream, liveCtx, {
+        isMicMuted: () => isMicMutedRef.current,
+        isAiPlaying: () => isPlayingAiAudioRef.current,
+        isWorkbenchOpen: () => isWorkbenchOpenRef.current,
+        onHumanSpeechState: (speaking) => {
+          if (isUserSpeakingLiveRef.current !== speaking) {
+            isUserSpeakingLiveRef.current = speaking;
+            setIsUserSpeakingLive(speaking);
+          }
+        },
+        onHumanBargeIn: () => {
+          interruptAiAndStartListening();
+        },
+        onSpeechPcm16kBase64: (pcmBase64) => {
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+            wsRef.current.send(
+              JSON.stringify({
+                realtimeInput: {
+                  audio: {
+                    mimeType: 'audio/pcm;rate=16000',
+                    data: pcmBase64,
+                  },
+                },
+              })
+            );
+          }
+        },
+        onSpeechEnded: () => {
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+            wsRef.current.send(
+              JSON.stringify({
+                realtimeInput: {
+                  audioStreamEnd: true,
+                },
+              })
+            );
+          }
+        },
+      });
+
+      // iOS WebKit check: iOS Safari / Chrome on iOS / PWA standalone iOS
+      const isIOSWebKit =
+        typeof navigator !== 'undefined' &&
+        (/iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+          ((navigator as any).userAgentData?.platform === 'iOS') ||
+          (navigator.vendor &&
+            navigator.vendor.includes('Apple') &&
+            !navigator.userAgent.includes('CriOS') &&
+            !navigator.userAgent.includes('Chrome')));
+
+      let workletInitialized = false;
+
+      // On Android / Chromium / Desktop: Try AudioWorklet first
+      if (
+        !isIOSWebKit &&
+        liveCtx.audioWorklet &&
+        typeof liveCtx.audioWorklet.addModule === 'function' &&
+        typeof window !== 'undefined' &&
+        window.isSecureContext
+      ) {
+        try {
+          const workletCode = `
+            class LiveMicCaptureProcessor extends AudioWorkletProcessor {
+              constructor() {
+                super();
+                this.bufferSize = 2048;
+                this.buffer = new Float32Array(this.bufferSize);
+                this.bytesWritten = 0;
+              }
+              process(inputs) {
+                const input = inputs[0];
+                if (!input || !input[0]) return true;
+                const channelData = input[0];
+                let offset = 0;
+                while (offset < channelData.length) {
+                  const needed = this.bufferSize - this.bytesWritten;
+                  const toCopy = Math.min(needed, channelData.length - offset);
+                  this.buffer.set(channelData.subarray(offset, offset + toCopy), this.bytesWritten);
+                  this.bytesWritten += toCopy;
+                  offset += toCopy;
+                  if (this.bytesWritten >= this.bufferSize) {
+                    this.port.postMessage(this.buffer.slice(0));
+                    this.bytesWritten = 0;
+                  }
+                }
+                return true;
+              }
+            }
+            registerProcessor('live-mic-capture-processor', LiveMicCaptureProcessor);
+          `;
+          const blob = new Blob([workletCode], { type: 'application/javascript' });
+          const url = URL.createObjectURL(blob);
+          await liveCtx.audioWorklet.addModule(url);
+          URL.revokeObjectURL(url);
+
+          const workletNode = new AudioWorkletNode(liveCtx, 'live-mic-capture-processor');
+          audioWorkletNodeRef.current = workletNode;
+
+          workletNode.port.onmessage = (e: MessageEvent<Float32Array>) => {
+            handleMicPcmData(e.data);
+          };
+
+          source.connect(workletNode);
+          const dummyGain = liveCtx.createGain();
+          dummyGain.gain.value = 0;
+          workletNode.connect(dummyGain);
+          dummyGain.connect(liveCtx.destination);
+          workletInitialized = true;
+        } catch (workletErr) {
+          console.warn('AudioWorklet init fallback to ScriptProcessor:', workletErr);
+        }
+      }
+
+      // Fallback for Chromium or Direct for iOS WebKit: ScriptProcessorNode
+      if (!workletInitialized) {
+        const processor = liveCtx.createScriptProcessor(4096, 1, 1);
+        scriptProcessorRef.current = processor;
+        (window as any).__fzLiveProcessor = processor;
+
+        processor.onaudioprocess = (e) => {
+          if (liveCtx.state === 'suspended') {
+            void liveCtx.resume().catch(() => {});
+          }
+          handleMicPcmData(e.inputBuffer.getChannelData(0));
+        };
+
+        const muteGain = liveCtx.createGain();
+        // Positive tiny non-zero gain prevents Chrome & WebKit power-saving from throttling onaudioprocess
+        muteGain.gain.value = 0.00001;
+        source.connect(processor);
+        processor.connect(muteGain);
+        muteGain.connect(liveCtx.destination);
+      }
+    } catch (err: any) {
+      console.warn('Microphone node wiring error (SpeechRecognition handles voice):', err);
+    }
+  };
+
   const startLiveCall = async (preAcquiredStream?: MediaStream) => {
     if (
       isLiveConnected ||
@@ -3192,7 +3474,20 @@ export default function App() {
     setIsMicMuted(false);
     isMicMutedRef.current = false;
 
-    // 1. Dapatkan mikrofon secara non-blocking jika peramban mengizinkan langsung
+    // 1. Prime Unified Live AudioContext (native hardware rate for iOS & Desktop)
+    const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
+      liveAudioCtxRef.current = new CtxClass();
+    }
+    const liveCtx = liveAudioCtxRef.current;
+    inputAudioCtxRef.current = liveCtx;
+    outputAudioCtxRef.current = liveCtx;
+    nextStartTimeRef.current = liveCtx.currentTime;
+    if (liveCtx.state === 'suspended') {
+      void liveCtx.resume().catch(() => {});
+    }
+
+    // 2. Dapatkan mikrofon secara non-blocking jika peramban mengizinkan langsung
     let stream: MediaStream | null = preAcquiredStream || micStreamRef.current;
     if (!stream && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
       try {
@@ -3207,66 +3502,23 @@ export default function App() {
           .catch(() => {
             return navigator.mediaDevices.getUserMedia({ audio: true });
           });
-        // Timeout 4000ms memberi waktu cukup untuk negosiasi driver & dialog izin mic di Android/iOS
-        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
+        // Beri waktu hingga 8000ms untuk dialog izin mic di Android/iOS
+        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000));
         const res = await Promise.race([getStreamPromise, timeoutPromise]);
         if (res && res.getAudioTracks && res.getAudioTracks().length > 0) {
           stream = res;
-          micStreamRef.current = stream;
+          await connectMicStreamToLiveProcessing(stream, liveCtx);
         } else {
-          // If first-time permission dialog took >1200ms, attach neural VAD as soon as user clicks Allow
+          // Jika dialog izin sistem memakan waktu lebih lama, sambungkan seketika saat user klik Allow
           void getStreamPromise
-            .then((lateStream) => {
+            .then(async (lateStream) => {
               if (!lateStream || userHungUpRef.current) {
                 try {
                   lateStream?.getTracks().forEach((tr) => tr.stop());
                 } catch {}
                 return;
               }
-              micStreamRef.current = lateStream;
-              const activeCtx = liveAudioCtxRef.current;
-              if (activeCtx) {
-                if (activeCtx.state === 'suspended') void activeCtx.resume().catch(() => {});
-                try {
-                  const source = activeCtx.createMediaStreamSource(lateStream);
-                  if (audioWorkletNodeRef.current) {
-                    source.connect(audioWorkletNodeRef.current);
-                  } else if (scriptProcessorRef.current) {
-                    source.connect(scriptProcessorRef.current);
-                  }
-                } catch {}
-              }
-              if (activeCtx && !sileroVadGateRef.current) {
-                const lateGate = new SileroNeuralVadGate();
-                sileroVadGateRef.current = lateGate;
-                void lateGate.start(lateStream, activeCtx, {
-                  isMicMuted: () => isMicMutedRef.current,
-                  isAiPlaying: () => isPlayingAiAudioRef.current,
-                  isWorkbenchOpen: () => isWorkbenchOpenRef.current,
-                  onHumanSpeechState: (speaking) => setIsUserSpeakingLive(speaking),
-                  onHumanBargeIn: () => interruptAiAndStartListening(),
-                  onSpeechPcm16kBase64: (pcmBase64) => {
-                    if (wsRef.current?.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-                      wsRef.current.send(
-                        JSON.stringify({
-                          realtimeInput: {
-                            audio: { mimeType: 'audio/pcm;rate=16000', data: pcmBase64 },
-                          },
-                        })
-                      );
-                    }
-                  },
-                  onSpeechEnded: () => {
-                    if (wsRef.current?.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-                      wsRef.current.send(
-                        JSON.stringify({
-                          realtimeInput: { audioStreamEnd: true },
-                        })
-                      );
-                    }
-                  },
-                });
-              }
+              await connectMicStreamToLiveProcessing(lateStream, liveCtx);
             })
             .catch(() => {});
         }
@@ -3274,249 +3526,8 @@ export default function App() {
         console.warn('[VoiceStudio] Non-blocking mic stream notice (SpeechRecognition will handle speech):', micErr);
         micStreamRef.current = null;
       }
-    }
-
-    // 2. Prime Unified Live AudioContext (native hardware rate for iOS & Desktop)
-    const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
-      liveAudioCtxRef.current = new CtxClass();
-    }
-    const liveCtx = liveAudioCtxRef.current;
-    inputAudioCtxRef.current = liveCtx;
-    outputAudioCtxRef.current = liveCtx;
-    nextStartTimeRef.current = liveCtx.currentTime;
-    if (liveCtx.state === 'suspended') {
-      void liveCtx.resume().catch(() => {});
-    }
-
-    // 3. Sambungkan MediaStreamSource HANYA JIKA stream aktif tersedia
-    if (stream && stream.getAudioTracks().some((tr) => tr.readyState === 'live' && tr.enabled)) {
-      try {
-        if (liveCtx.state === 'suspended') {
-          await liveCtx.resume().catch(() => {});
-        }
-
-        const source = liveCtx.createMediaStreamSource(stream);
-        let workletInitialized = false;
-        handyVadRef.current.reset();
-        lastHandySpeechAtRef.current = 0;
-        try {
-          (window as any).__fzVoiceStudioHandyVad = handyVadRef.current;
-        } catch {
-          // Ignore
-        }
-
-        // Start Self-Hosted Silero Neural VAD v5 (ONNX Runtime Web WASM + 14-frame pre-roll)
-        sileroVadGateRef.current?.destroy();
-        const sileroGate = new SileroNeuralVadGate();
-        sileroVadGateRef.current = sileroGate;
-        void sileroGate.start(stream, liveCtx, {
-          isMicMuted: () => isMicMutedRef.current,
-          isAiPlaying: () => isPlayingAiAudioRef.current,
-          isWorkbenchOpen: () => isWorkbenchOpenRef.current,
-          onHumanSpeechState: (speaking) => {
-            if (isUserSpeakingLiveRef.current !== speaking) {
-              isUserSpeakingLiveRef.current = speaking;
-              setIsUserSpeakingLive(speaking);
-            }
-          },
-          onHumanBargeIn: () => {
-            interruptAiAndStartListening();
-          },
-          onSpeechPcm16kBase64: (pcmBase64) => {
-            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-              wsRef.current.send(
-                JSON.stringify({
-                  realtimeInput: {
-                    audio: {
-                      mimeType: 'audio/pcm;rate=16000',
-                      data: pcmBase64,
-                    },
-                  },
-                })
-              );
-            }
-          },
-          onSpeechEnded: () => {
-            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-              wsRef.current.send(
-                JSON.stringify({
-                  realtimeInput: {
-                    audioStreamEnd: true,
-                  },
-                })
-              );
-            }
-          },
-        });
-
-        const handleMicPcmData = (float32: Float32Array) => {
-          if (isMicMutedRef.current) return;
-          // Once Silero Neural VAD v5 WASM is active, it exclusively owns 16kHz human-speech streaming & barge-in.
-          if (sileroVadGateRef.current?.isActive()) return;
-
-          const sampleRate = liveCtx.sampleRate || 48000;
-
-          // ACOUSTIC ECHO SUPPRESSION + INSTANT BARGE-IN:
-          // Saat AI sedang berbicara atau gema speaker masih memantul (<480ms setelah selesai bicara),
-          // cegah echo speaker masuk ke Gemini Live agar AI tidak menjawab suaranya sendiri!
-          if (
-            isPlayingAiAudioRef.current ||
-            isAiServerTurnOpenRef.current ||
-            Date.now() - lastAiPlayoutEndedAtRef.current < 480
-          ) {
-            if (isWorkbenchOpenRef.current || Date.now() - lastAiPlayoutEndedAtRef.current < 480) {
-              return;
-            }
-            const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
-            const rms = bargeVad.lastMetrics?.rms ?? 0;
-            if (bargeVad.speechStarted && rms >= 0.16) {
-              interruptAiAndStartListening();
-              if (!isUserSpeakingLiveRef.current) {
-                isUserSpeakingLiveRef.current = true;
-                setIsUserSpeakingLive(true);
-              }
-              if (
-                wsRef.current &&
-                wsRef.current.readyState === WebSocket.OPEN &&
-                isLiveConnectedRef.current &&
-                bargeVad.speechPcm16k &&
-                bargeVad.speechPcm16k.length > 0
-              ) {
-                const pcmBase64 = float32At16kToPcm16Base64(bargeVad.speechPcm16k);
-                wsRef.current.send(
-                  JSON.stringify({
-                    realtimeInput: {
-                      audio: {
-                        mimeType: 'audio/pcm;rate=16000',
-                        data: pcmBase64,
-                      },
-                    },
-                  })
-                );
-              }
-            } else if (!bargeVad.inSpeech) {
-              // Never retain speaker bleed in handyVad pre-roll buffer while AI is playing
-              handyVadRef.current.reset();
-            }
-            return;
-          }
-
-          const vadRes = handyVadRef.current.processSamples(float32, sampleRate, false);
-
-          if (vadRes.inSpeech) {
-            lastHandySpeechAtRef.current = Date.now();
-            if (!isUserSpeakingLiveRef.current) {
-              isUserSpeakingLiveRef.current = true;
-              setIsUserSpeakingLive(true);
-            }
-            if (userSpeakingTimerRef.current) window.clearTimeout(userSpeakingTimerRef.current);
-            userSpeakingTimerRef.current = window.setTimeout(() => {
-              isUserSpeakingLiveRef.current = false;
-              setIsUserSpeakingLive(false);
-            }, 450);
-          }
-
-          // Stream continuous 16kHz PCM directly to Gemini 3.8 Live's native server-side Automatic VAD
-          // so speech onset, natural pauses, and end-of-turn silence are detected without clipping!
-          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-            const pcmBase64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
-            if (pcmBase64) {
-              wsRef.current.send(
-                JSON.stringify({
-                  realtimeInput: {
-                    audio: {
-                      mimeType: 'audio/pcm;rate=16000',
-                      data: pcmBase64,
-                    },
-                  },
-                })
-              );
-            }
-          }
-        };
-
-        // Try AudioWorklet first (Modern iOS Safari 14.5+ and Chromium)
-        if (
-          liveCtx.audioWorklet &&
-          typeof liveCtx.audioWorklet.addModule === 'function' &&
-          (typeof window !== 'undefined' && window.isSecureContext)
-        ) {
-          try {
-            const workletCode = `
-              class LiveMicCaptureProcessor extends AudioWorkletProcessor {
-                constructor() {
-                  super();
-                  this.bufferSize = 2048;
-                  this.buffer = new Float32Array(this.bufferSize);
-                  this.bytesWritten = 0;
-                }
-                process(inputs) {
-                  const input = inputs[0];
-                  if (!input || !input[0]) return true;
-                  const channelData = input[0];
-                  let offset = 0;
-                  while (offset < channelData.length) {
-                    const needed = this.bufferSize - this.bytesWritten;
-                    const toCopy = Math.min(needed, channelData.length - offset);
-                    this.buffer.set(channelData.subarray(offset, offset + toCopy), this.bytesWritten);
-                    this.bytesWritten += toCopy;
-                    offset += toCopy;
-                    if (this.bytesWritten >= this.bufferSize) {
-                      this.port.postMessage(this.buffer.slice(0));
-                      this.bytesWritten = 0;
-                    }
-                  }
-                  return true;
-                }
-              }
-              registerProcessor('live-mic-capture-processor', LiveMicCaptureProcessor);
-            `;
-            const blob = new Blob([workletCode], { type: 'application/javascript' });
-            const url = URL.createObjectURL(blob);
-            await liveCtx.audioWorklet.addModule(url);
-            URL.revokeObjectURL(url);
-
-            const workletNode = new AudioWorkletNode(liveCtx, 'live-mic-capture-processor');
-            audioWorkletNodeRef.current = workletNode;
-
-            workletNode.port.onmessage = (e: MessageEvent<Float32Array>) => {
-              handleMicPcmData(e.data);
-            };
-
-            source.connect(workletNode);
-            const dummyGain = liveCtx.createGain();
-            dummyGain.gain.value = 0;
-            workletNode.connect(dummyGain);
-            dummyGain.connect(liveCtx.destination);
-            workletInitialized = true;
-          } catch (workletErr) {
-            console.warn('AudioWorklet init fallback to ScriptProcessor:', workletErr);
-          }
-        }
-
-        if (!workletInitialized) {
-          // Fallback: ScriptProcessorNode
-          const processor = liveCtx.createScriptProcessor(4096, 1, 1);
-          scriptProcessorRef.current = processor;
-          (window as any).__fzLiveProcessor = processor;
-
-          processor.onaudioprocess = (e) => {
-            if (liveCtx.state === 'suspended') {
-              void liveCtx.resume().catch(() => {});
-            }
-            handleMicPcmData(e.inputBuffer.getChannelData(0));
-          };
-
-          const muteGain = liveCtx.createGain();
-          muteGain.gain.value = 0.00001; // Positive non-zero gain prevents Chrome power-saving from throttling onaudioprocess
-          source.connect(processor);
-          processor.connect(muteGain);
-          muteGain.connect(liveCtx.destination);
-        }
-      } catch (err: any) {
-        console.warn('Microphone node wiring error (SpeechRecognition handles voice):', err);
-      }
+    } else if (stream) {
+      await connectMicStreamToLiveProcessing(stream, liveCtx);
     }
 
     setStatusBanner(null);
@@ -4508,6 +4519,14 @@ export default function App() {
       window.clearInterval(liveKeepAliveTimerRef.current);
       liveKeepAliveTimerRef.current = null;
     }
+    if (micSourceNodeRef.current) {
+      try {
+        micSourceNodeRef.current.disconnect();
+      } catch {
+        // Ignore
+      }
+      micSourceNodeRef.current = null;
+    }
     if (audioWorkletNodeRef.current) {
       try {
         audioWorkletNodeRef.current.port.onmessage = null;
@@ -4635,16 +4654,9 @@ export default function App() {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
         });
-        micStreamRef.current = stream;
         const liveCtx = liveAudioCtxRef.current || inputAudioCtxRef.current;
         if (liveCtx) {
-          if (liveCtx.state === 'suspended') void liveCtx.resume().catch(() => {});
-          const source = liveCtx.createMediaStreamSource(stream);
-          if (audioWorkletNodeRef.current) {
-            source.connect(audioWorkletNodeRef.current);
-          } else if (scriptProcessorRef.current) {
-            source.connect(scriptProcessorRef.current);
-          }
+          await connectMicStreamToLiveProcessing(stream, liveCtx);
         }
       } catch (err) {
         console.warn('Re-acquire mic failed:', err);

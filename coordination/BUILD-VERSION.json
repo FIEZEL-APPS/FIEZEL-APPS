@@ -1,7 +1,7 @@
 {
-  "version": "m025-771",
-  "claimedBy": "branch feat/voice-generative-copilot-m025-771",
-  "claimedAt": "2026-11-05T19:55:59.522Z",
-  "reason": "feat(voice): 100% generative contextual copilot replies with zero static templates and streaming translation fix",
+  "version": "m025-772",
+  "claimedBy": "branch feat/mobile-mic-copilot-m025-772",
+  "claimedAt": "2026-11-05T23:28:14.344Z",
+  "reason": "fix(voice): mobile iOS/Android PWA mic pipeline resilience and ultra-fast copilot assist",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

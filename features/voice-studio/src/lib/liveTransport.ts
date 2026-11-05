@@ -2027,7 +2027,7 @@ export async function requestRealtimeCopilotAssist(params: {
     };
   };
 
-  const budgetMs = Math.max(1000, Math.min(params.budgetMs ?? 3500, 5000));
+  const budgetMs = Math.max(1000, Math.min(params.budgetMs ?? 10000, 15000));
   const deadline = Date.now() + budgetMs;
 
   // 1) Fast-Path: kunci Gemini pribadi murid (gemini-3-flash-preview)
