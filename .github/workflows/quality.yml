@@ -1552,6 +1552,8 @@ jobs:
         # pernah dipanggil CI (temuan D1 gate-sweep, 28 Agu 2026). Didaftarkan di sini
         # secara ADDITIVE per peta koordinasi D10 (quality.yml disentuh 5 PR terbuka).
         run: node adaptivity-simulation-v3.js
+      - name: 'Braincore runtime cold-boot byte budget & build revision gate'
+        run: node tests/brain-runtime-compact-gate-test.js
       - name: 'Cetak ulang bukti live di AKHIR log (bukan hanya di artefak)'
         # Artefak `fiezel-bukti-live` sudah menyimpan kedua laporan, tetapi mengunduh artefak
         # butuh perkakas; membaca log tidak. Dan letaknya menentukan: keluaran asli kedua
