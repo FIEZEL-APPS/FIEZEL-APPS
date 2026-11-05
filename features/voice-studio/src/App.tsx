@@ -540,6 +540,8 @@ export default function App() {
     sampleTarget: string;
     uiAction?: VoiceUiAction;
   } | null>(null);
+  const isWorkbenchOpenRef = useRef<boolean>(false);
+  isWorkbenchOpenRef.current = Boolean(learningWorkbench?.isOpen);
   const lastSystemIntentAtRef = useRef<{ key: string; at: number }>({ key: '', at: 0 });
 
   const safeBuildDossier = (
@@ -1939,26 +1941,8 @@ export default function App() {
       ? { ...(action || {}), sourceLayer: 'live_ws_native' }
       : action;
 
-    if (!isLiveActive) {
-      // ZERO AUDIO COLLISION: When client TTS speaks the Indonesian explanation in Turn-by-Turn mode, silence any overlapping stream!
-      isWorkbenchExplanationActiveRef.current = true;
-      interruptAiAndStartListening();
-      if (outputAudioCtxRef.current) {
-        nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
-      }
-      activeSourcesRef.current.forEach((s) => {
-        try {
-          s.stop();
-          s.disconnect();
-        } catch {}
-      });
-      activeSourcesRef.current = [];
-      setAiAudioPlaying(false, 0);
-    } else {
-      // In Gemini 3.8 Live full-duplex (`ws-duplex`), the live WebSocket stream is ALREADY speaking
-      // the Indonesian/Thai explanation natively, so NEVER cut its audio chunks!
-      isWorkbenchExplanationActiveRef.current = false;
-    }
+    // The learning workbench is visual. Opening it must NEVER kill or interrupt ongoing speech!
+    isWorkbenchExplanationActiveRef.current = false;
 
     const wbPayload = buildDefaultWorkbenchPayload(hintText, effectiveAction);
     setLearningWorkbench((prev) => {
@@ -3129,6 +3113,7 @@ export default function App() {
                 void lateGate.start(lateStream, activeCtx, {
                   isMicMuted: () => isMicMutedRef.current,
                   isAiPlaying: () => isPlayingAiAudioRef.current,
+                  isWorkbenchOpen: () => isWorkbenchOpenRef.current,
                   onHumanSpeechState: (speaking) => setIsUserSpeakingLive(speaking),
                   onHumanBargeIn: () => interruptAiAndStartListening(),
                   onSpeechPcm16kBase64: (pcmBase64) => {
@@ -3199,6 +3184,7 @@ export default function App() {
         void sileroGate.start(stream, liveCtx, {
           isMicMuted: () => isMicMutedRef.current,
           isAiPlaying: () => isPlayingAiAudioRef.current,
+          isWorkbenchOpen: () => isWorkbenchOpenRef.current,
           onHumanSpeechState: (speaking) => {
             if (isUserSpeakingLiveRef.current !== speaking) {
               isUserSpeakingLiveRef.current = speaking;
@@ -3243,12 +3229,13 @@ export default function App() {
           const sampleRate = liveCtx.sampleRate || 48000;
 
           // ACOUSTIC ECHO SUPPRESSION + INSTANT BARGE-IN:
-          // Saat AI sedang berbicara, cegah echo speaker masuk ke Gemini Live, tetapi izinkan
-          // murid menyela (barge-in) seketika saat HandyHumanVad mendeteksi vokal manusia nyata!
+          // Saat AI sedang berbicara, cegah echo speaker masuk ke Gemini Live.
+          // Jangan pernah memicu barge-in jika workbench sedang terbuka atau hanya getaran speaker!
           if (isPlayingAiAudioRef.current) {
+            if (isWorkbenchOpenRef.current) return;
             const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
             const rms = bargeVad.lastMetrics?.rms ?? 0;
-            if (bargeVad.speechStarted && rms >= 0.038) {
+            if (bargeVad.speechStarted && rms >= 0.075) {
               interruptAiAndStartListening();
               if (!isUserSpeakingLiveRef.current) {
                 isUserSpeakingLiveRef.current = true;
@@ -3853,11 +3840,14 @@ export default function App() {
               const source = ctx.createBufferSource();
               source.buffer = buffer;
 
-              // Jitter buffer lead: when starting a new burst or recovering from a network pause,
-              // schedule 220ms ahead so 100-180ms WebSocket packet jitter never causes micro-underruns!
+              // Seamless back-to-back chunk scheduling:
+              // If previous chunk is still playing or queued in the future (nextStartTime >= now),
+              // chain this chunk IMMEDIATELY at nextStartTime with ZERO gap!
+              // Only if nextStartTime has fallen behind (true buffer underrun/new burst),
+              // reset to now + 35ms lead to prevent start-of-buffer clipping.
               const now = ctx.currentTime;
-              if (nextStartTimeRef.current < now + 0.015) {
-                nextStartTimeRef.current = now + 0.22;
+              if (nextStartTimeRef.current < now) {
+                nextStartTimeRef.current = now + 0.035;
               }
               const startAt = nextStartTimeRef.current;
               const duration = buffer.duration;
@@ -6399,8 +6389,6 @@ export default function App() {
           onClose={() => {
             workbenchSessionRef.current.dismissedByUser = true;
             isWorkbenchExplanationActiveRef.current = false;
-            speakTokenRef.current += 1;
-            interruptAiAndStartListening();
             setLearningWorkbench(null);
           }}
           onResumeConversation={(completedSentence, finishedTopic) => {
@@ -6486,9 +6474,12 @@ export default function App() {
               0.35) || 0.35) * 100
           )}
           onSpeakPreview={(sampleText, spokenLang) => {
+            isWorkbenchExplanationActiveRef.current = true;
             void speakAiText(sampleText, null, 0.92, {
               isManualReplay: true,
               spokenLang: spokenLang || (locale === 'th' ? 'th' : locale === 'ja' ? 'ja' : 'id'),
+            }).finally(() => {
+              isWorkbenchExplanationActiveRef.current = false;
             });
           }}
           onRequestCustomTopic={(customQuestion, bankTopicId) => {

@@ -13,6 +13,7 @@ import { float32At16kToPcm16Base64 } from './handyVad';
 export interface SileroVadGateCallbacks {
   isMicMuted: () => boolean;
   isAiPlaying: () => boolean;
+  isWorkbenchOpen?: () => boolean;
   onHumanSpeechState: (speaking: boolean) => void;
   onHumanBargeIn: () => void;
   onSpeechPcm16kBase64: (pcmBase64: string) => void;
@@ -201,14 +202,19 @@ export class SileroNeuralVadGate {
           const pcmBase64 = n > 0 ? float32At16kToPcm16Base64(frame) : '';
 
           if (cb.isAiPlaying()) {
-            // While AI partner speaks: Robust echo-immune human voice barge-in
-            // (>= 8 frames = 256ms with neural speech probability >= 0.85 & rms >= 0.038).
+            // While AI partner speaks:
+            // 1. If visual learning workbench is open, student is looking at the card - NEVER barge-in interrupt!
+            // 2. High threshold (>= 14 frames = 448ms with neural speech prob >= 0.90 & rms >= 0.075).
             // Prevents laptop/phone speaker acoustic bleed from falsely cutting off AI playback.
-            if (pSpeech >= 0.85 && rms >= 0.038) {
+            if (cb.isWorkbenchOpen?.()) {
+              speechStreak = 0;
+              return;
+            }
+            if (pSpeech >= 0.90 && rms >= 0.075) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
-              if (speechStreak >= 8) {
+              if (speechStreak >= 14) {
                 burstOpen = true;
                 this.confirmedSpeaking = true;
                 cb.onHumanBargeIn();
@@ -221,7 +227,7 @@ export class SileroNeuralVadGate {
                 return;
               }
             } else {
-              if (pSpeech < 0.55) speechStreak = 0;
+              if (pSpeech < 0.60) speechStreak = 0;
               if (pcmBase64) {
                 preRollBase64.push(pcmBase64);
                 if (preRollBase64.length > MAX_PREROLL_FRAMES) preRollBase64.shift();
@@ -234,7 +240,8 @@ export class SileroNeuralVadGate {
             const isMobile =
               typeof navigator !== 'undefined' &&
               (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
-            const endSilenceFrames = isMobile ? 11 : 13; // ~352ms mobile, ~416ms desktop
+            // Natural pedagogical pause: 800-900ms allows foreign language learners to think/breathe without premature cutoff!
+            const endSilenceFrames = isMobile ? 26 : 28; // ~832ms mobile, ~896ms desktop
             if (pSpeech >= 0.45 && rms >= 0.002) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;

@@ -593,33 +593,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
     const hasRich = hasRichDynamicAction(uiAction);
     const query = (uiAction?.topicTitle || topicTitle || '').trim();
-    const spokenLang =
-      locale === 'th'
-        ? 'th'
-        : locale === 'ja'
-          ? 'ja'
-          : locale === 'zh'
-            ? 'zh'
-            : locale === 'en'
-              ? 'en'
-              : 'id';
-    const shouldAutoSpeakViaHttp =
-      !isLiveConnected && uiAction?.sourceLayer !== 'live_ws_native';
-
     if (hasRich) {
       const board = derivePedagogicalBoard(uiAction, query, targetLang, locale);
       setBoardState(board);
       setIsReady(true);
-      const speechKey = `${spokenLang}::${board.coachExplanation}`;
-      if (
-        board.coachExplanation &&
-        shouldAutoSpeakViaHttp &&
-        lastSpokenKeyRef.current !== speechKey &&
-        onSpeakPreviewRef.current
-      ) {
-        lastSpokenKeyRef.current = speechKey;
-        onSpeakPreviewRef.current(board.coachExplanation, spokenLang);
-      }
       return;
     }
 
@@ -631,20 +608,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       const board = derivePedagogicalBoard(uiAction, query, targetLang, locale);
       setBoardState(board);
       setIsReady(true);
-      const speechKey = `${spokenLang}::${board.coachExplanation}`;
-      if (
-        board.coachExplanation &&
-        shouldAutoSpeakViaHttp &&
-        lastSpokenKeyRef.current !== speechKey &&
-        onSpeakPreviewRef.current
-      ) {
-        lastSpokenKeyRef.current = speechKey;
-        onSpeakPreviewRef.current(board.coachExplanation, spokenLang);
-      }
     }, fallbackDelayMs);
 
     return () => clearTimeout(timer);
-  }, [isOpen, isLiveConnected, topicTitle, uiAction, targetLang, locale, isGeneratingTopic]);
+  }, [isOpen, topicTitle, uiAction, targetLang, locale, isGeneratingTopic]);
 
   if (!isOpen) return null;
 
