@@ -67,7 +67,8 @@ import {
   translateAndPhoneticizeLiveText,
 } from './lib/liveCallHelper';
 import { JapaneseRubyDisplay } from './components/JapaneseRubyDisplay';
-import { stripEmojisAndEmotWords } from './lib/japanesePhonetics';
+import { stripEmojisAndEmotWords, toPhoneticRomaji } from './lib/japanesePhonetics';
+import { toPhoneticPinyin } from './lib/mandarinPhonetics';
 import {
   buildContextualFallbackCards,
   evaluateTurnLocal,
@@ -4921,40 +4922,49 @@ export default function App() {
   };
 
   const resolvedActiveAiMeaning = (() => {
-    let rawMeaning = '';
-    if (isStreamingAiLive && liveAiTranslationDraft) {
-      rawMeaning = liveAiTranslationDraft;
-    } else if (locale === 'th') {
-      rawMeaning = activeAiSubtitle.translationTh || activeAiSubtitle.translationId || '';
-    } else if (locale === 'ja') {
-      rawMeaning =
-        activeAiSubtitle.translationJa ||
-        (activeScenario.targetLang === 'ja' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
-    } else if (locale === 'zh') {
-      rawMeaning =
-        activeAiSubtitle.translationZh ||
-        (activeScenario.targetLang === 'zh' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
-    } else {
-      rawMeaning = activeAiSubtitle.translationId || activeAiSubtitle.translationTh || '';
+    try {
+      let rawMeaning = '';
+      if (isStreamingAiLive && liveAiTranslationDraft) {
+        rawMeaning = liveAiTranslationDraft;
+      } else if (locale === 'th') {
+        rawMeaning = activeAiSubtitle.translationTh || activeAiSubtitle.translationId || '';
+      } else if (locale === 'ja') {
+        rawMeaning =
+          activeAiSubtitle.translationJa ||
+          (activeScenario.targetLang === 'ja' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
+      } else if (locale === 'zh') {
+        rawMeaning =
+          activeAiSubtitle.translationZh ||
+          (activeScenario.targetLang === 'zh' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
+      } else {
+        rawMeaning = activeAiSubtitle.translationId || activeAiSubtitle.translationTh || '';
+      }
+      if (rawMeaning && locale !== 'zh' && locale !== 'ja' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(rawMeaning)) {
+        const cjkCount = (rawMeaning.match(/[\u4E00-\u9FFF\u3040-\u30FF]/g) || []).length;
+        const latinWords = (rawMeaning.match(/[A-Za-zÀ-ÖØ-öø-ÿ]{2,}/g) || []).length;
+        if (latinWords === 0 && cjkCount > 0) {
+          // Untranslated CJK string: do not masquerade as Indonesian/Thai translation
+          return '';
+        }
+        rawMeaning = rawMeaning.replace(/[\u4E00-\u9FFF\u3040-\u30FF]+/g, (cjkMatch) => {
+          const phonetic =
+            activeScenario.targetLang === 'zh'
+              ? toPhoneticPinyin(cjkMatch)
+              : toPhoneticRomaji(cjkMatch);
+          return phonetic && phonetic !== cjkMatch ? phonetic : cjkMatch;
+        });
+      }
+      return rawMeaning.trim();
+    } catch {
+      return '';
     }
-    if (rawMeaning && locale !== 'zh' && locale !== 'ja' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(rawMeaning)) {
-      rawMeaning = rawMeaning.replace(/[\u4E00-\u9FFF\u3040-\u30FF]+/g, (cjkMatch) => {
-        const phonetic =
-          activeScenario.targetLang === 'zh'
-            ? toPhoneticPinyin(cjkMatch)
-            : toPhoneticRomaji(cjkMatch);
-        return phonetic && phonetic !== cjkMatch ? phonetic : cjkMatch;
-      });
-    }
-    return rawMeaning.trim();
   })();
 
   const isAiHudDuplicateMeaning = (() => {
     const normMeaning = (resolvedActiveAiMeaning || '').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
     const normSpeech = (activeAiLiveText || '').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
-    if (!normMeaning) return true;
-    if (normMeaning === normSpeech) return true;
-    // Also guard if AI accidentally spoke in Indonesian while target course is zh/ja/en
+    if (normMeaning && normMeaning === normSpeech) return true;
+    // Also guard if AI accidentally spoke in Indonesian while target course is zh/ja
     const cjkChars = (activeAiLiveText.match(/[\u4E00-\u9FFF\u3040-\u30FF]/g) || []).length;
     const latinWords = (activeAiLiveText.match(/[A-Za-zÀ-ÖØ-öø-ÿ]{2,}/g) || []).length;
     if (
@@ -5682,7 +5692,11 @@ export default function App() {
                         {!isMeasureMode && showTranslations && (
                           <p
                             data-testid="live-hud-ai-translation"
-                            className="text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
+                            className={
+                              resolvedActiveAiMeaning || isAiHudDuplicateMeaning
+                                ? 'text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words'
+                                : 'hidden'
+                            }
                           >
                             {resolvedActiveAiMeaning || activeAiLiveText}
                           </p>
