@@ -57,7 +57,7 @@ export function preflightResponse(env, request) {
     headers: {
       ...corsHeaders(env, origin),
       'access-control-allow-methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-      'access-control-allow-headers': 'content-type',
+      'access-control-allow-headers': 'content-type, authorization, x-requested-with, accept',
       'access-control-max-age': '86400'
     }
   });

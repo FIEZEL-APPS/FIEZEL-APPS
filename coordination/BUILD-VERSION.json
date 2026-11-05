@@ -1,7 +1,7 @@
 {
-  "version": "m025-768",
-  "claimedBy": "branch feat/fizel-exact-landing",
-  "claimedAt": "2026-11-05T16:45:06.549Z",
-  "reason": "feat(seo): [ALLOW-PROTECTED: pwa] exact-match landing hubs /fizel/ and /fzel/ with title and meta enhancements",
+  "version": "m025-769",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-11-05T17:51:04.615Z",
+  "reason": "fix(voice): unified chat stream, inverted visual hierarchy, fixed copilot dock, and removed 5-min limit",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

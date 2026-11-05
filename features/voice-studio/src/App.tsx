@@ -104,7 +104,7 @@ const KAWAN_BICARA_MAX_SESSION_GEMS = 25;
 const KAWAN_BICARA_MIN_START_GEMS = KAWAN_BICARA_OPENING_GEM_COST;
 const KAWAN_BICARA_GEM_COST = KAWAN_BICARA_MAX_SESSION_GEMS;
 const DAILY_FREE_CALL_MAX_TURNS = 5;
-const MAX_CALL_DURATION_SEC = 300; // 5-minute maximum session duration
+const MAX_CALL_DURATION_SEC = Infinity; // Bebas batas waktu percakapan (unlimited)
 const DAILY_FREE_CALL_LIMIT = 1;
 
 function resolveHostFiezelState(win: any): any {
@@ -1152,21 +1152,10 @@ export default function App() {
   useEffect(() => {
     if (!isLiveConnected) return;
     const interval = setInterval(() => {
-      setCallDurationSec((s) => {
-        const next = s + 1;
-        if (next >= MAX_CALL_DURATION_SEC) {
-          stopLiveCall();
-          setStatusBanner(
-            locale === 'th'
-              ? 'เซสชันการโทร 5 นาทีสิ้นสุดลงแล้ว! พักสักครู่หรือเริ่มเซสชันใหม่ได้เสมอ'
-              : 'Sesi latihan percakapan 5 menit telah selesai! Istirahat sejenak atau mulai sesi baru.'
-          );
-        }
-        return next;
-      });
+      setCallDurationSec((s) => s + 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, [isLiveConnected, locale]);
+  }, [isLiveConnected]);
 
   useEffect(() => {
     return () => {
@@ -5009,21 +4998,30 @@ export default function App() {
 
   const resolvedActiveAiMeaning = (() => {
     try {
+      // Mandat User: Selama AI sedang bicara (isStreamingAiLive || isPlayingAiAudio), jangan tampilkan
+      // tebakan terjemahan berubah-ubah atau titik/koma Morse (, ! , :). Tampilkan "Sedang memuat terjemahan...".
+      if (isStreamingAiLive || isPlayingAiAudio) {
+        if (locale === 'th') return 'กำลังแปล...';
+        if (locale === 'ja') return '翻訳中...';
+        if (locale === 'zh') return '正在翻译...';
+        return 'Sedang memuat terjemahan...';
+      }
       let rawMeaning = '';
-      if (isStreamingAiLive && hasRealLettersForMeaning(liveAiTranslationDraft)) {
-        rawMeaning = liveAiTranslationDraft;
-      } else if (locale === 'th') {
+      if (locale === 'th') {
         rawMeaning = activeAiSubtitle.translationTh || activeAiSubtitle.translationId || '';
       } else if (locale === 'ja') {
         rawMeaning =
           activeAiSubtitle.translationJa ||
-          (activeScenario.targetLang === 'ja' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
+          (activeScenario.targetLang === 'ja' ? '' : activeAiSubtitle.translationId || '');
       } else if (locale === 'zh') {
         rawMeaning =
           activeAiSubtitle.translationZh ||
-          (activeScenario.targetLang === 'zh' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
+          (activeScenario.targetLang === 'zh' ? '' : activeAiSubtitle.translationId || '');
       } else {
         rawMeaning = activeAiSubtitle.translationId || activeAiSubtitle.translationTh || '';
+      }
+      if (/^[\s,.:;!?"'“”‘’()（）\-—]+$/.test(rawMeaning)) {
+        return '';
       }
       if (rawMeaning && locale !== 'zh' && locale !== 'ja' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(rawMeaning)) {
         const cjkCount = (rawMeaning.match(/[\u4E00-\u9FFF\u3040-\u30FF]/g) || []).length;
@@ -5828,52 +5826,54 @@ export default function App() {
                       </div>
                     ) : (
                       <>
-                        {/* ATAS: Terjemahan bahasa user (Bahasa Indonesia / Jepang / Thai / dsb.) - BOLD & Kontras Tinggi */}
-                        {!isMeasureMode && showTranslations && (
-                          <p
-                            data-testid="live-hud-ai-translation"
-                            className={
-                              resolvedActiveAiMeaning || isAiHudDuplicateMeaning
-                                ? 'text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words'
-                                : 'hidden'
-                            }
-                          >
-                            {resolvedActiveAiMeaning || activeAiLiveText}
-                          </p>
-                        )}
-
-                        {/* BAWAH: Subtitle bahasa kursus (English, Japanese, Mandarin, dsb.) - font-normal, secondary color */}
+                        {/* ATAS: Subtitle bahasa kursus (English, Japanese, Mandarin, dsb.) - UTAMA, BOLD & Jelas */}
                         <div
                           data-testid="live-hud-ai-text"
                           data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
-                          className={
-                            !isMeasureMode && showTranslations
-                              ? isAiHudDuplicateMeaning
-                                ? 'hidden'
-                                : 'pt-0.5'
-                              : ''
-                          }
+                          className="pt-0.5"
                         >
-                          {(isMeasureMode || !showTranslations || !isAiHudDuplicateMeaning) && (
-                            <JapaneseRubyDisplay
-                              text={activeAiLiveText}
-                              targetLang={activeScenario.targetLang}
-                              showFurigana={!isMeasureMode}
-                              showRomaji={!isMeasureMode}
-                              className={
-                                !isMeasureMode && showTranslations && resolvedActiveAiMeaning
-                                  ? 'text-xs sm:text-[13px] text-[#6E5E47] leading-relaxed break-words font-normal'
-                                  : 'text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] break-words'
-                              }
-                              rubyClassName={
-                                !isMeasureMode && showTranslations && resolvedActiveAiMeaning
-                                  ? 'text-xs sm:text-[13px]'
-                                  : 'text-[15px] sm:text-[17px]'
-                              }
-                              romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
-                            />
-                          )}
+                          <JapaneseRubyDisplay
+                            text={activeAiLiveText}
+                            targetLang={activeScenario.targetLang}
+                            showFurigana={!isMeasureMode}
+                            showRomaji={!isMeasureMode}
+                            className="text-[17px] sm:text-[19px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
+                            rubyClassName="text-[17px] sm:text-[19px]"
+                            romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
+                          />
                         </div>
+
+                        {/* BAWAH: Terjemahan bahasa user (Bahasa Indonesia / Thai / dsb.) - Sekunder, sopan & ada tombol toggle */}
+                        {!isMeasureMode && showTranslations && resolvedActiveAiMeaning && !isAiHudDuplicateMeaning && (
+                          <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#EDE5D4]/60">
+                            <p
+                              data-testid="live-hud-ai-translation"
+                              className="text-xs sm:text-[13.5px] font-normal text-[#5C4E3C] leading-relaxed break-words"
+                            >
+                              {resolvedActiveAiMeaning}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setShowTranslations(false)}
+                              className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] shrink-0 font-medium cursor-pointer"
+                              title="Sembunyikan terjemahan"
+                            >
+                              👁️ Sembunyikan
+                            </button>
+                          </div>
+                        )}
+                        {!isMeasureMode && !showTranslations && (
+                          <div className="pt-0.5">
+                            <button
+                              type="button"
+                              onClick={() => setShowTranslations(true)}
+                              className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] font-medium cursor-pointer"
+                              title="Tampilkan terjemahan"
+                            >
+                              👁️ Tampilkan Arti
+                            </button>
+                          </div>
+                        )}
                       </>
                     )}
 
@@ -5889,103 +5889,36 @@ export default function App() {
                 </section>
                 </div>
 
-                {/* KOLOM KANAN (7 col desktop): Copilot Jawaban + Transkrip Riwayat */}
+                {/* KOLOM KANAN (7 col desktop): Transkrip Percakapan Mengalir Lancar */}
                 <div className="w-full lg:col-span-7 flex flex-col gap-3">
-                  {/* 1.5 ZONA COPILOT JAWABAN AI REALTIME (Muncul Otomatis Saat Partner Bicara, Tersembunyi di Mode Ujian) */}
-                  {!isMeasureMode && (
-                    <div className={`w-full ${callViewMode === 'stage' ? 'block' : 'hidden lg:block'}`}>
-                    <BeginnerAnswerAssistant
-                      locale={locale}
-                      targetLang={activeScenario.targetLang}
-                      scenario={activeScenario}
-                      aiQuestionText={activeAiLiveText}
-                      aiQuestionTranslation={resolvedActiveAiMeaning}
-                      lastUserText={lastUserTurn?.text || ''}
-                      cards={copilotCards}
-                      copilotSource={copilotSource}
-                      isGeneratingCopilot={isGeneratingCopilot || isAiThinking}
-                      isLiveConnected={isLiveConnected}
-                      isRecordingPtt={isRecordingPtt}
-                      isAnalyzingTurn={isAnalyzingTurn}
-                      isPlayingAiAudio={isPlayingAiAudio}
-                      isRefreshingAssist={isRefreshingAssist}
-                      turnCount={turns.length}
-                      onRefreshAssist={handleRefreshLiveAssist}
-                      onSpeakSample={(sampleText, rate) => {
-                        void speakAiText(sampleText, null, rate ?? 0.92, { isManualReplay: true });
-                      }}
-                      onSelectForInput={(selectedText) => {
-                        playFiezelSfx('button_tap');
-                        setInputText(selectedText);
-                      }}
-                      onSendDirect={(selectedText) => {
-                        playFiezelSfx('button_tap');
-                        const clean = selectedText.trim();
-                        if (!clean || isAnalyzingTurn) return;
-                        interruptAiAndStartListening();
-                        setInputText('');
-                        if (
-                          isLiveConnected &&
-                          wsRef.current &&
-                          wsRef.current.readyState === WebSocket.OPEN
-                        ) {
-                          submitLiveUserUtterance(clean);
-                        } else {
-                          void submitStudentTurn({ text: clean, speakingDurationSec: 3 });
-                        }
-                      }}
-                      onStartPttWithPrompt={(promptText) => {
-                        playFiezelSfx('button_tap');
-                        setInputText(promptText);
-                        if (isRecordingPtt) {
-                          stopPttRecording();
-                        } else {
-                          void startPttRecording();
-                        }
-                      }}
-                    />
-                  </div>
-                )}
+                  {/* 2. ALUR PERCAKAPAN RINGKAS (Mengalir Terpadu, WhatsApp-style) */}
+                  <section className="space-y-2.5 w-full pt-1 lg:max-h-[560px] lg:overflow-y-auto lg:pr-1">
+                    <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47] pb-1">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1C1611] uppercase tracking-wider">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#8C2233]" />
+                        <span>{locale === 'th' ? 'บันทึกการสนทนา' : 'Transkrip Percakapan'}</span>
+                      </span>
 
-                {/* 2. ALUR PERCAKAPAN RINGKAS (Tampil di Mode Riwayat atau saat Murid Ingin Membaca Transkrip) */}
-                <section className={`space-y-2.5 w-full pt-1 lg:max-h-[540px] lg:overflow-y-auto lg:pr-1 ${callViewMode === 'history' ? 'block' : 'hidden lg:block'}`}>
-                  <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47] pb-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        playFiezelSfx('button_tap');
-                        setCallViewMode('stage');
-                      }}
-                      className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1C1611] text-white font-semibold text-xs cursor-pointer hover:bg-[#332920] transition-colors shadow-2xs"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                      <span>{locale === 'th' ? 'กลับไปที่หน้าจอสด' : 'Kembali ke Panggung Live'}</span>
-                    </button>
-                    <span className="hidden lg:inline-flex items-center gap-1.5 text-xs font-bold text-[#1C1611] uppercase tracking-wider">
-                      <MessageSquare className="w-3.5 h-3.5 text-[#8C2233]" />
-                      <span>{locale === 'th' ? 'บันทึกการสนทนา' : 'Transkrip Percakapan'}</span>
-                    </span>
-
-                    <div className="flex items-center gap-3 shrink-0">
-                      {!isMeasureMode && (
+                      <div className="flex items-center gap-3 shrink-0">
+                        {!isMeasureMode && (
+                          <button
+                            type="button"
+                            onClick={() => setShowTranslations(!showTranslations)}
+                            className="font-medium text-[#6E5E47] hover:text-[#1C1611] cursor-pointer"
+                          >
+                            {showTranslations ? 'Sembunyikan Arti' : 'Tampilkan Arti'}
+                          </button>
+                        )}
                         <button
                           type="button"
-                          onClick={() => setShowTranslations(!showTranslations)}
-                          className="font-medium text-[#6E5E47] hover:text-[#1C1611] cursor-pointer"
+                          onClick={handleResetCallSession}
+                          className="font-medium text-[#6E5E47] hover:text-[#1C1611] flex items-center gap-1 cursor-pointer"
                         >
-                          {showTranslations ? 'Sembunyikan Arti' : 'Tampilkan Arti'}
+                          <RefreshCw className="w-3 h-3" />
+                          <span>Ulangi</span>
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={handleResetCallSession}
-                        className="font-medium text-[#6E5E47] hover:text-[#1C1611] flex items-center gap-1 cursor-pointer"
-                      >
-                        <RefreshCw className="w-3 h-3" />
-                        <span>Ulangi</span>
-                      </button>
+                      </div>
                     </div>
-                  </div>
 
                   <div
                     ref={transcriptContainerRef}
@@ -6019,22 +5952,7 @@ export default function App() {
                             key={turn.id}
                             className="bg-white/85 rounded-2xl rounded-tl-xs px-4 py-2.5 max-w-[90%] sm:max-w-[82%] shadow-[0_1px_3px_rgba(28,22,17,0.04)] break-words space-y-1.5"
                           >
-                            {/* ATAS: Terjemahan bahasa user (Bahasa Indonesia / Jepang / Thai / dsb.) - BOLD */}
-                            {!isMeasureMode &&
-                              showTranslations &&
-                              (turn.translationId || turn.translationTh || turn.translationJa || turn.translationZh) && (
-                                <p className="text-sm font-bold text-[#1C1611] leading-snug break-words">
-                                  {locale === 'th'
-                                    ? (turn.translationTh || turn.translationId)
-                                    : locale === 'ja'
-                                    ? (turn.translationJa || turn.translationId)
-                                    : locale === 'zh'
-                                    ? (turn.translationZh || turn.translationId)
-                                    : (turn.translationId || turn.translationTh)}
-                                </p>
-                              )}
-
-                            {/* BAWAH: Bahasa kursus (subtitle sekunder) */}
+                            {/* ATAS: Bahasa kursus (English, Japanese, Mandarin) - UTAMA & BOLD */}
                             <div className="flex items-start justify-between gap-2 pt-0.5">
                               <div className="min-w-0 flex-1">
                                 <JapaneseRubyDisplay
@@ -6042,9 +5960,9 @@ export default function App() {
                                   targetLang={activeScenario.targetLang}
                                   showFurigana={!isMeasureMode}
                                   showRomaji={!isMeasureMode}
-                                  className="text-xs text-[#6E5E47] font-normal leading-relaxed break-words"
-                                  rubyClassName="text-xs font-normal"
-                                  romajiClassName="text-[11px] text-[#8C6D1F] font-medium mt-0.5"
+                                  className="text-[15px] sm:text-[16px] font-bold text-[#1C1611] leading-snug break-words"
+                                  rubyClassName="text-[15px] sm:text-[16px] font-bold"
+                                  romajiClassName="text-xs text-[#8C6D1F] font-medium mt-0.5"
                                 />
                               </div>
                               <button
@@ -6056,6 +5974,21 @@ export default function App() {
                                 <Volume2 className="w-3 h-3" />
                               </button>
                             </div>
+
+                            {/* BAWAH: Terjemahan bahasa user (Bahasa Indonesia / Jepang / Thai / dsb.) - SEKUNDER */}
+                            {!isMeasureMode &&
+                              showTranslations &&
+                              (turn.translationId || turn.translationTh || turn.translationJa || turn.translationZh) && (
+                                <p className="text-xs sm:text-[13px] text-[#5C4E3C] font-normal leading-relaxed break-words pt-1 border-t border-[#EDE5D4]/50">
+                                  {locale === 'th'
+                                    ? (turn.translationTh || turn.translationId)
+                                    : locale === 'ja'
+                                    ? (turn.translationJa || turn.translationId)
+                                    : locale === 'zh'
+                                    ? (turn.translationZh || turn.translationId)
+                                    : (turn.translationId || turn.translationTh)}
+                                </p>
+                              )}
                           </div>
                         );
                       }
@@ -6284,6 +6217,61 @@ export default function App() {
           className="shrink-0 w-full z-30 bg-[#F6F3EC]/95 backdrop-blur-md border-t border-[#E8DFC8]/70 px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(28,22,17,0.04)]"
         >
           <div className="max-w-2xl lg:max-w-4xl mx-auto space-y-1.5">
+            {/* COPILOT TELEPROMPTER DOCK: Menempel langsung di atas input bar - NO SCROLL NEEDED */}
+            {!isMeasureMode && (
+              <div data-testid="docked-copilot-container" className="w-full pb-1">
+                <BeginnerAnswerAssistant
+                  locale={locale}
+                  targetLang={activeScenario.targetLang}
+                  scenario={activeScenario}
+                  aiQuestionText={activeAiLiveText}
+                  aiQuestionTranslation={resolvedActiveAiMeaning}
+                  lastUserText={lastUserTurn?.text || ''}
+                  cards={copilotCards}
+                  copilotSource={copilotSource}
+                  isGeneratingCopilot={isGeneratingCopilot || isAiThinking}
+                  isLiveConnected={isLiveConnected}
+                  isRecordingPtt={isRecordingPtt}
+                  isAnalyzingTurn={isAnalyzingTurn}
+                  isPlayingAiAudio={isPlayingAiAudio}
+                  isRefreshingAssist={isRefreshingAssist}
+                  turnCount={turns.length}
+                  onRefreshAssist={handleRefreshLiveAssist}
+                  onSpeakSample={(sampleText, rate) => {
+                    void speakAiText(sampleText, null, rate ?? 0.92, { isManualReplay: true });
+                  }}
+                  onSelectForInput={(selectedText) => {
+                    playFiezelSfx('button_tap');
+                    setInputText(selectedText);
+                  }}
+                  onSendDirect={(selectedText) => {
+                    playFiezelSfx('button_tap');
+                    const clean = selectedText.trim();
+                    if (!clean || isAnalyzingTurn) return;
+                    interruptAiAndStartListening();
+                    setInputText('');
+                    if (
+                      isLiveConnected &&
+                      wsRef.current &&
+                      wsRef.current.readyState === WebSocket.OPEN
+                    ) {
+                      submitLiveUserUtterance(clean);
+                    } else {
+                      void submitStudentTurn({ text: clean, speakingDurationSec: 3 });
+                    }
+                  }}
+                  onStartPttWithPrompt={(promptText) => {
+                    playFiezelSfx('button_tap');
+                    setInputText(promptText);
+                    if (isRecordingPtt) {
+                      stopPttRecording();
+                    } else {
+                      void startPttRecording();
+                    }
+                  }}
+                />
+              </div>
+            )}
             {(isLiveConnected || isRecordingPtt || isListeningLiveSpeech || liveUserDraft.trim()) && (
               <div
                 data-testid="live-voice-capture-banner"
