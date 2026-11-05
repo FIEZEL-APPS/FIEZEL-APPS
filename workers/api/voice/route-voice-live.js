@@ -58,11 +58,11 @@ const GOOGLE_AUTH_TOKEN_API = 'https://generativelanguage.googleapis.com/v1alpha
 const GOOGLE_INTERACTIONS_API = 'https://generativelanguage.googleapis.com/v1beta/interactions';
 const DEFAULT_LIVE_MODEL = 'gemini-3.8-live';
 const COPILOT_MODELS = [
-  'gemini-3-flash-preview',
-  'gemini-3.5-flash-lite',
-  'gemini-3.6-flash',
-  'gemini-3.5-flash',
   'gemini-3.1-flash-lite',
+  'gemini-3.5-flash-lite',
+  'gemini-3-flash-preview',
+  'gemini-3.5-flash',
+  'gemini-3.6-flash',
   'gemini-3.8-flash',
 ];
 const GEMINI_TTS_MODELS = [
@@ -527,16 +527,13 @@ async function invokeSingleGeminiJson({
     }
     parentSignal.addEventListener('abort', onParentAbort, { once: true });
   }
-  const timer = setTimeout(() => controller.abort(), 14500);
+  const timer = setTimeout(() => controller.abort(), 6500);
   try {
     const genCfg = {
-      max_output_tokens: Math.min(maxOutputTokens, 1800),
+      temperature: typeof temperature === 'number' ? temperature : 0.45,
+      max_output_tokens: Math.min(maxOutputTokens, 750),
+      thinking_level: 'minimal',
     };
-    if (!model.includes('lite')) {
-      genCfg.thinking_level = 'low';
-    } else {
-      genCfg.temperature = temperature;
-    }
 
     const res = await fetch(GOOGLE_INTERACTIONS_API, {
       method: 'POST',
@@ -848,8 +845,8 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
     }
   }
 
-  const HEDGE_DELAY_MS = totalKeys === 1 ? 2500 : 5500;
-  const OVERALL_DEADLINE_MS = 18000;
+  const HEDGE_DELAY_MS = 2500;
+  const OVERALL_DEADLINE_MS = 10000;
   const activeCandidates = healthyRestCandidates.length > 0 ? healthyRestCandidates : candidates;
   const maxAttempts = Math.min(totalKeys === 1 ? 2 : 3, activeCandidates.length);
   const overallController = new AbortController();
