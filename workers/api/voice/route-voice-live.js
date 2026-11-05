@@ -1582,10 +1582,10 @@ export async function routeVoicePartnerTurn(ctx) {
         `Target course: ${targetLang.toUpperCase()}. Learner UI language: ${targetLocaleName}. Mentor name: ${personaName}.`,
         `Learner question: "${userText}"`,
         `Build a JSON object with a visual teaching board answering "${userText}".`,
-        `Field rules: "aiReply" must be 100% in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'} (1 short sentence). "aiReplyTranslation" and "coachSpokenScript" must be 100% in ${targetLocaleName} (1 short sentence, max 14 words, no emojis, no em-dash, write "Verb ing" with a space, never say AI/bot), quoting the ${targetLang.toUpperCase()} target words.`,
+        `Field rules: "aiReply", "aiReplyTranslation", and "coachSpokenScript" must be 100% in ${targetLocaleName} (1 short sentence explaining the rule directly and clearly to the learner in their UI interface language ${targetLocaleName}, max 18 words, no emojis, no em-dash, write "Verb ing" with a space, never say AI/bot), quoting the ${targetLang.toUpperCase()} target words.`,
         `"sampleTarget": natural ${targetLang.toUpperCase()} sentence showing the rule. "trapWrongSentence": realistic mistake version of sampleTarget. "trapWrongReason": short reason in ${targetLocaleName}.`,
         `"drillMeaningPrompt": quiz prompt in ${targetLocaleName} for a DIFFERENT real-life situation. "drillTargetSentence": correct ${targetLang.toUpperCase()} sentence for that new situation (different from sampleTarget). "drillTrapSentence": wrong trap version of drillTargetSentence.`,
-        `JSON schema: {"aiReply":"...","aiReplyTranslation":"...","uiAction":{"actionType":"open_learning_popup","topicTitle":"...","patternFormula":"...","coachSpokenScript":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"..."}}`,
+        `JSON schema: {"aiReply":"...","aiReplyTranslation":"...","uiAction":{"actionType":"open_learning_popup","topicTitle":"...","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"..."}}`,
       ].join('\n')
     : [
         `You are ${personaName} on a live voice call (${scenarioTitle}). Target: ${langSpec}.`,
@@ -1593,12 +1593,13 @@ export async function routeVoicePartnerTurn(ctx) {
         `[FIEZEL ECOSYSTEM & IDENTITY]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku companion.`,
         learnerDossier,
         `[4 IRONCLAD MANDATES: ZERO EXCEPTIONS]:`,
-        `1) MULTILINGUAL INPUT ACCEPTED, SPOKEN OUTPUT ("aiReply") 100% LOCKED IN TARGET LANGUAGE (${targetLang.toUpperCase()}):
-   - The learner is 100% free to speak or type in Indonesian, English, Japanese, Mandarin, Thai, or mixed languages. Understand their exact meaning without complaining.
-   - HOWEVER, your "aiReply" MUST ALWAYS BE 100% in ${targetLang === 'ja' ? 'Japanese (Kanji+Kana)' : targetLang === 'zh' ? 'Simplified Chinese (Hanzi)' : 'English'} with 100% authentic native phrasing—even when explaining grammar or opening the whiteboard popup! NEVER write Indonesian or Thai sentences inside "aiReply"! Put the ${targetLocaleName} translation strictly in "aiReplyTranslation" and the written board explanation in "uiAction.explanationText" / "uiAction.coachSpokenScript".`,
+        `1) MULTILINGUAL INPUT ACCEPTED, DUAL-CONTEXT SPOKEN OUTPUT:
+   - The learner is 100% free to speak or type in Indonesian, English, Japanese, Mandarin, Thai, Vietnamese, Russian, or mixed languages. Understand their exact meaning without complaining.
+   - OUTSIDE OF POPUP EXPLANATIONS: your "aiReply" MUST ALWAYS BE 100% in ${targetLang === 'ja' ? 'Japanese (Kanji+Kana)' : targetLang === 'zh' ? 'Simplified Chinese (Hanzi)' : 'English'} with 100% authentic native phrasing.
+   - WHEN EXPLAINING VIA THE LEARNING POPUP (open_learning_popup): both "coachSpokenScript" and "aiReply" for this explanation turn MUST BE in the LEARNER'S interface language (${targetLocaleName}) so the learner understands the rule clearly! Put the written board explanation in "uiAction.explanationText" / "uiAction.coachSpokenScript".`,
         `2) ZERO APOLOGIES & REFUSE TO SWITCH LANGUAGE:`,
         `   - NEVER apologize ("I apologize", "I'm sorry", "Maaf", "すみません、AIなので"). You are a bold human-like mentor.`,
-        `   - If the learner tells you to speak another language, firmly refuse in ${targetLang.toUpperCase()} because we are in the ${targetLang.toUpperCase()} course right now, while telling them they can speak their own language freely and you understand every word.`,
+        `   - If the learner tells you to speak another language during normal conversation, firmly refuse in ${targetLang.toUpperCase()} because we are in the ${targetLang.toUpperCase()} course right now, while telling them they can speak their own language freely and you understand every word.`,
         `3) CLAP BACK ON PROFANITY / TRASH-TALK:`,
         `   - If the learner swears, curses, or trash-talks ("${userText}"), NEVER apologize and NEVER lecture like a corporate bot! Clap back / roast them back sharply with street-smart wit in ${targetLang.toUpperCase()}, mocking their weak roast and challenging them to argue with clean ${targetLang.toUpperCase()} grammar!`,
         `4) VOICE MODE SWITCHING & UNIVERSAL FIEZEL NAVIGATION + HYBRID 2-LAYER WHITEBOARD ("uiAction"):`,
@@ -1607,7 +1608,7 @@ export async function routeVoicePartnerTurn(ctx) {
         `   - PURE DYNAMIC WHITEBOARD POPUP (when learner asks a grammar/vocab/particle/tone question OR needs visual correction in tutor_coach mode):`,
         `     * Whenever the learner asks what a grammar point or word difference means, you MUST return actionType="open_learning_popup" with a board generated dynamically to match THAT exact question!`,
         `     * Fill ALL of: topicTitle, coachSpokenScript, patternFormula, leadText, triggerWord, triggerTag, wrongWord, wrongTag, rightWord, rightTag, tailText, sampleTarget, trapWrongSentence, trapWrongToken, trapWrongReason, drillMeaningPrompt, drillTargetSentence, drillTrapSentence.`,
-        `   - EXPLANATION LANGUAGE RULE: "aiReply" MUST ALWAYS stay 100% in ${targetLang.toUpperCase()} so the spoken voice and subtitle HUD stay in the target language, while "aiReplyTranslation", "uiAction.coachSpokenScript", "uiAction.explanationText", and "uiAction.trapWrongReason" are written in the LEARNER'S language (${targetLocaleName}).`,
+        `   - EXPLANATION LANGUAGE RULE: Outside of popups, "aiReply" stays 100% in ${targetLang.toUpperCase()}. When opening the learning popup ("open_learning_popup"), "aiReply", "coachSpokenScript", "aiReplyTranslation", "uiAction.explanationText", and "uiAction.trapWrongReason" MUST be in the LEARNER'S interface language (${targetLocaleName}).`,
         modeDirective,
         `[FIEZEL COPY RULES]: NEVER write an em-dash or en-dash character in any field (use a comma, colon, or a new sentence instead). NEVER write hyphenated "Verb-ing" (write "Verb ing" with a space). NEVER call yourself or the app "AI", "bot", "chatbot", "assistant" or "model" in any language; you are ${personaName}, a FIEZEL mentor, and the app is simply "Fiezel".`,
         historyLines.length
@@ -2135,14 +2136,19 @@ export async function routeVoiceGeminiTts(ctx) {
 
   const rawRequestedLang = String(body.spokenLang || body.speechLang || body.targetLang || 'en')
     .toLowerCase()
+    .split(/[-_]/)[0]
     .trim();
-  let effectiveLang = ['id', 'th', 'ja', 'zh', 'en'].includes(rawRequestedLang)
+  let effectiveLang = ['id', 'th', 'ja', 'zh', 'en', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(rawRequestedLang)
     ? rawRequestedLang
     : 'en';
 
-  // Auto-detect explanation language from the actual text so Indonesian/Thai explanations NEVER get spoken with foreign English prosody
+  // Auto-detect explanation language from the actual text so interface explanations NEVER get spoken with foreign prosody
   if (/[\u0E00-\u0E7F]{2,}/.test(cleanText)) {
     effectiveLang = 'th';
+  } else if (/[\u0400-\u04FF]{3,}/.test(cleanText)) {
+    effectiveLang = 'ru';
+  } else if (/[\u1EA0-\u1EF9]{2,}/.test(cleanText)) {
+    effectiveLang = 'vi';
   } else if (/[ぁ-んァ-ヶ]/.test(cleanText)) {
     effectiveLang = 'ja';
   } else if (/[\u4e00-\u9fff]/.test(cleanText)) {
@@ -2175,6 +2181,10 @@ export async function routeVoiceGeminiTts(ctx) {
       ? 'Warm, charismatic, crystal-clear native Indonesian language mentor speaking natural conversational Bahasa Indonesia, lively friendly Jakarta cadence, crisp pronunciation when quoting foreign example words, zero stiff robotic announcer tone'
       : effectiveLang === 'th'
       ? 'Warm, lively, crystal-clear native Thai language mentor speaking natural conversational Thai, friendly Bangkok cadence, crisp pronunciation when quoting foreign example words, zero robotic monotone'
+      : effectiveLang === 'vi'
+      ? 'Warm, lively, crystal-clear native Vietnamese language mentor speaking natural conversational Vietnamese, clear friendly cadence, crisp pronunciation when quoting foreign example words, zero robotic monotone'
+      : effectiveLang === 'ru'
+      ? 'Warm, expressive native Russian language mentor speaking natural conversational Russian, clear friendly articulation, crisp pronunciation when quoting foreign example words'
       : effectiveLang === 'ja'
       ? personaId === 'keita'
         ? 'Energetic street-smart Tokyo-Kansai Japanese senpai, witty sarcastic teasing, crisp natural conversational pitch accent, human warmth'
@@ -2187,10 +2197,10 @@ export async function routeVoiceGeminiTts(ctx) {
       ? 'Composed crisp British RP academic speaking examiner, measured cadence'
       : 'Charismatic urban street-smart American older-brother mentor, authentic hood cadence and natural AAVE-inflected rhythm, crisp contractions, witty sarcastic swagger, warm tough-love energy';
 
-  const style =
-    effectiveLang === 'id' || effectiveLang === 'th'
-      ? defaultStyle
-      : cleanSpokenText(body.stylePrompt || defaultStyle).slice(0, 260) || defaultStyle;
+  const isUiLanguageExplanation = ['id', 'th', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(effectiveLang);
+  const style = isUiLanguageExplanation
+    ? defaultStyle
+    : cleanSpokenText(body.stylePrompt || defaultStyle).slice(0, 260) || defaultStyle;
 
   const now = Date.now();
   const ttsCandidates = [];

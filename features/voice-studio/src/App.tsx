@@ -1782,6 +1782,8 @@ export default function App() {
       return;
     }
     if (earlyIntent?.actionType === 'open_learning_popup') {
+      const reqSeq = ++workbenchSessionRef.current.turnSeq;
+      workbenchSessionRef.current.dismissedByUser = false;
       openLearningWorkbenchWithAction(
         {
           ...earlyIntent,
@@ -1789,6 +1791,44 @@ export default function App() {
         },
         uText
       );
+      void (async () => {
+        try {
+          for (const base of resolveVoiceApiCandidateBases()) {
+            const res = await fetch(`${base}/api/voice/partner-turn`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                text: `[WHITEBOARD_REQUEST] ${uText}`,
+                forcePopup: true,
+                personaId: activePersona.id,
+                personaName: activePersona.name,
+                scenarioId: activeScenario.id,
+                scenarioTitle: activeScenario.titleId,
+                targetLang: activeScenario.targetLang,
+                locale,
+                callMode: 'tutor_coach',
+                history: turnsRef.current.slice(-4).map((t) => ({ speaker: t.speaker, text: t.text })),
+              }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (
+                reqSeq === workbenchSessionRef.current.turnSeq &&
+                !workbenchSessionRef.current.dismissedByUser &&
+                data?.uiAction?.actionType === 'open_learning_popup'
+              ) {
+                openLearningWorkbenchWithAction(
+                  { ...data.uiAction, sourceLayer: 'live_ws_native' },
+                  uText
+                );
+              }
+              break;
+            }
+          }
+        } catch {
+          // Ignore network fallback
+        }
+      })();
     }
 
     const evalParams = {
@@ -3530,12 +3570,53 @@ export default function App() {
               locale
             );
 
-            const allowedAsrLangs =
-              activeScenario.targetLang === 'ja'
-                ? ['ja-JP', locale === 'th' ? 'th-TH' : 'id-ID']
-                : activeScenario.targetLang === 'zh'
-                ? ['zh-CN', 'cmn-Hans-CN', locale === 'th' ? 'th-TH' : 'id-ID']
-                : ['en-US', locale === 'th' ? 'th-TH' : 'id-ID'];
+            const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
+            const learnerAsrBcp47 =
+              locCode === 'th'
+                ? 'th-TH'
+                : locCode === 'vi'
+                  ? 'vi-VN'
+                  : locCode === 'ru'
+                    ? 'ru-RU'
+                    : locCode === 'ja'
+                      ? 'ja-JP'
+                      : locCode === 'zh'
+                        ? 'zh-CN'
+                        : locCode === 'en'
+                          ? 'en-US'
+                          : locCode === 'ko'
+                            ? 'ko-KR'
+                            : locCode === 'ms'
+                              ? 'ms-MY'
+                              : 'id-ID';
+            const learnerUiLangName =
+              locCode === 'th'
+                ? 'Thai (ภาษาไทย)'
+                : locCode === 'vi'
+                  ? 'Vietnamese (Tiếng Việt)'
+                  : locCode === 'ru'
+                    ? 'Russian (Русский язык)'
+                    : locCode === 'ja'
+                      ? 'Japanese (日本語)'
+                      : locCode === 'zh'
+                        ? 'Mandarin Chinese (中文)'
+                        : locCode === 'en'
+                          ? 'English'
+                          : locCode === 'ko'
+                            ? 'Korean (한국어)'
+                            : locCode === 'ms'
+                              ? 'Malay (Bahasa Melayu)'
+                              : 'Bahasa Indonesia';
+
+            const allowedAsrLangs = Array.from(
+              new Set(
+                activeScenario.targetLang === 'ja'
+                  ? ['ja-JP', learnerAsrBcp47]
+                  : activeScenario.targetLang === 'zh'
+                    ? ['zh-CN', 'cmn-Hans-CN', learnerAsrBcp47]
+                    : ['en-US', learnerAsrBcp47]
+              )
+            );
             const customVocabTerms = Array.from(
               new Set([
                 'Fiezel',
@@ -3578,7 +3659,6 @@ export default function App() {
                   generationConfig: {
                     responseModalities: ['AUDIO'],
                     speechConfig: {
-                      languageCode: speechLangCode,
                       voiceConfig: {
                         prebuiltVoiceConfig: {
                           voiceName:
@@ -3610,7 +3690,7 @@ export default function App() {
                             properties: {
                               topicTitle: {
                                 type: 'STRING',
-                                description: 'Concise title of the grammar/vocab/tone concept in learner language',
+                                description: `Concise title of the grammar/vocab/tone concept in ${learnerUiLangName}`,
                               },
                               focusType: {
                                 type: 'STRING',
@@ -3618,7 +3698,7 @@ export default function App() {
                               },
                               explanationText: {
                                 type: 'STRING',
-                                description: '1-2 punchy sentences explaining the rule in learner language',
+                                description: `1-2 punchy sentences explaining the rule in ${learnerUiLangName}`,
                               },
                               patternFormula: {
                                 type: 'STRING',
@@ -3634,11 +3714,11 @@ export default function App() {
                               },
                               trapWrongReason: {
                                 type: 'STRING',
-                                description: 'Short reason in learner language explaining why trapWrongSentence is wrong',
+                                description: `Short reason in ${learnerUiLangName} explaining why trapWrongSentence is wrong`,
                               },
                               drillMeaningPrompt: {
                                 type: 'STRING',
-                                description: 'Comprehension quiz prompt in learner language testing a DIFFERENT real-world context',
+                                description: `Comprehension quiz prompt in ${learnerUiLangName} testing a DIFFERENT real-world context`,
                               },
                               drillTargetSentence: {
                                 type: 'STRING',
@@ -3683,7 +3763,7 @@ export default function App() {
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- You are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak with an Indonesian or foreign accent!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they confess confusion or ask for written practice, call \`open_interactive_learning_popup\` FIRST at the very start of your turn (putting the written explanation in ${locale === 'th' ? 'Thai' : 'Bahasa Indonesia'} inside the tool arguments) AND tell them aloud in 100% ${targetLangLabel} to try the card that just popped up on screen! When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT NATIVE SPOKEN OUTPUT LOCK]: The learner may speak to you in ${targetLangLabel}, Bahasa Indonesia, or Thai, and you understand every word. HOWEVER, YOUR SPOKEN VOICE MUST ALWAYS STAY 100% IN ${targetLangLabel.toUpperCase()} (${speechLangCode})—EVEN WHEN EXPLAINING GRAMMAR OR OPENING THE LEARNING POPUP! NEVER speak full sentences in Bahasa Indonesia or Thai aloud, because the FIEZEL UI automatically displays the bold Indonesian/Thai translation at the top of the screen and inside the learning popup!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
                       },
                     ],
                   },
@@ -5597,6 +5677,55 @@ export default function App() {
                                         data?.uiAction?.actionType === 'open_learning_popup'
                                       ) {
                                         openLearningWorkbenchWithAction(data.uiAction, focusQuery);
+                                        if (
+                                          isLiveConnectedRef.current &&
+                                          wsRef.current &&
+                                          wsRef.current.readyState === WebSocket.OPEN &&
+                                          !isAiServerTurnOpenRef.current
+                                        ) {
+                                          const spokenExplain =
+                                            data.uiAction.coachSpokenScript ||
+                                            data.uiAction.explanationText ||
+                                            data.aiReplyTranslation ||
+                                            data.aiReplyTranslationId ||
+                                            '';
+                                          const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
+                                          const uiLangName =
+                                            locCode === 'th'
+                                              ? 'Thai'
+                                              : locCode === 'vi'
+                                                ? 'Vietnamese'
+                                                : locCode === 'ru'
+                                                  ? 'Russian'
+                                                  : locCode === 'ja'
+                                                    ? 'Japanese'
+                                                    : locCode === 'zh'
+                                                      ? 'Mandarin Chinese'
+                                                      : locCode === 'en'
+                                                        ? 'English'
+                                                        : 'Bahasa Indonesia';
+                                          try {
+                                            wsRef.current.send(
+                                              JSON.stringify({
+                                                clientContent: {
+                                                  turns: [
+                                                    {
+                                                      role: 'user',
+                                                      parts: [
+                                                        {
+                                                          text: `[System Note: Learner opened the Papan Belajar popup for "${data.uiAction.topicTitle || focusQuery}". For this turn ONLY, explain this rule aloud in 1-2 short, natural sentences 100% in ${uiLangName}: "${spokenExplain}". Once they close the popup, switch 100% back to the course language!]`,
+                                                        },
+                                                      ],
+                                                    },
+                                                  ],
+                                                  turnComplete: true,
+                                                },
+                                              })
+                                            );
+                                          } catch {
+                                            // Ignore
+                                          }
+                                        }
                                       }
                                       break;
                                     }
@@ -6655,10 +6784,11 @@ export default function App() {
               0.35) || 0.35) * 100
           )}
           onSpeakPreview={(sampleText, spokenLang) => {
+            interruptAiAndStartListening();
             isWorkbenchExplanationActiveRef.current = true;
             void speakAiText(sampleText, null, 0.92, {
               isManualReplay: true,
-              spokenLang: spokenLang || (locale === 'th' ? 'th' : locale === 'ja' ? 'ja' : 'id'),
+              spokenLang: spokenLang || String(locale || 'id').toLowerCase().split(/[-_]/)[0],
             }).finally(() => {
               isWorkbenchExplanationActiveRef.current = false;
             });

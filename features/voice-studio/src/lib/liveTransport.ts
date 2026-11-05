@@ -2185,26 +2185,33 @@ export function sanitizeHallucinatedTranscript(
   const text = String(rawText || '');
   if (!text.trim()) return '';
 
-  // Forbidden scripts that indicate unconstrained multilingual ASR misfire (Cyrillic, Arabic, Devanagari, Hangul, Hebrew, Greek)
+  const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
+
+  // Forbidden scripts that indicate unconstrained multilingual ASR misfire (unless matching the learner's UI locale)
   const forbiddenScriptRegex =
-    /[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F\uAC00-\uD7AF\u1100-\u11FF]/g;
+    locCode === 'ru'
+      ? /[\u0370-\u03FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F\uAC00-\uD7AF\u1100-\u11FF]/g
+      : locCode === 'ko'
+        ? /[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F]/g
+        : locCode === 'ar'
+          ? /[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u0590-\u05FF\u0900-\u097F\uAC00-\uD7AF\u1100-\u11FF]/g
+          : /[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F\uAC00-\uD7AF\u1100-\u11FF]/g;
 
   const forbiddenMatches = text.match(forbiddenScriptRegex);
   if (forbiddenMatches && forbiddenMatches.length > 0) {
     const stripped = text.replace(forbiddenScriptRegex, ' ').replace(/\s{2,}/g, ' ').trim();
-    // If no valid Latin/Japanese/Thai letters remain (or it was predominantly Cyrillic/foreign), reject completely
     const validScriptRegex =
       targetLang === 'ja'
-        ? locale === 'th'
-          ? /[A-Za-z\u3040-\u30FF\u4E00-\u9FAF\u0E00-\u0E7F]/g
-          : /[A-Za-z\u3040-\u30FF\u4E00-\u9FAF]/g
+        ? locCode === 'th'
+          ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u3040-\u30FF\u4E00-\u9FAF\u0E00-\u0E7F]/g
+          : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u3040-\u30FF\u4E00-\u9FAF]/g
         : targetLang === 'zh'
-          ? locale === 'th'
-            ? /[A-Za-z\u4E00-\u9FFF\u0E00-\u0E7F]/g
-            : /[A-Za-z\u4E00-\u9FFF]/g
-          : locale === 'th'
-            ? /[A-Za-z\u0E00-\u0E7F]/g
-            : /[A-Za-z]/g;
+          ? locCode === 'th'
+            ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u4E00-\u9FFF\u0E00-\u0E7F]/g
+            : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u4E00-\u9FFF]/g
+          : locCode === 'th'
+            ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0E00-\u0E7F]/g
+            : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF]/g;
     const validMatches = stripped.match(validScriptRegex) || [];
     if (validMatches.length < 2 || forbiddenMatches.length >= validMatches.length) {
       return '';
@@ -2212,8 +2219,8 @@ export function sanitizeHallucinatedTranscript(
     return stripped;
   }
 
-  // If locale is Indonesian ('id'), Thai script should also be stripped from ASR hallucinations
-  if (locale !== 'th' && /[\u0E00-\u0E7F]/.test(text)) {
+  // If locale is not Thai ('th'), Thai script should also be stripped from ASR hallucinations
+  if (locCode !== 'th' && /[\u0E00-\u0E7F]/.test(text)) {
     const stripped = text.replace(/[\u0E00-\u0E7F]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
     return stripped.length >= 2 ? stripped : '';
   }
@@ -3814,22 +3821,26 @@ export async function synthesizeViaGeminiLiveWav(params: {
 
   if (!wsEndpoint) return null;
 
-  const rawLang = String(params.targetLang || 'en').toLowerCase().trim();
+  const rawLang = String(params.targetLang || 'en').toLowerCase().split(/[-_]/)[0].trim();
   const isIdSpeech =
     rawLang === 'id' ||
     /\b(adalah|sedangkan|gunakan|perhatikan|kalimat|karena|untuk|dalam|jangan|ketika|pakai|bedanya|artinya|lihat|papan|kata)\b/i.test(
       cleanText
     );
   const isThSpeech = rawLang === 'th' || /[\u0E00-\u0E7F]{2,}/.test(cleanText);
+  const isRuSpeech = rawLang === 'ru' || /[\u0400-\u04FF]{3,}/.test(cleanText);
+  const isViSpeech = rawLang === 'vi' || /[\u1EA0-\u1EF9]{2,}/.test(cleanText);
   const effectiveLang = isThSpeech
     ? 'th'
-    : isIdSpeech
-      ? 'id'
-      : rawLang === 'ja'
-        ? 'ja'
-        : rawLang === 'zh'
-          ? 'zh'
-          : 'en';
+    : isRuSpeech
+      ? 'ru'
+      : isViSpeech
+        ? 'vi'
+        : isIdSpeech
+          ? 'id'
+          : ['ja', 'zh', 'en', 'ko', 'ms', 'es', 'fr', 'de'].includes(rawLang)
+            ? rawLang
+            : 'en';
 
   const voiceName =
     params.persona?.geminiVoice ||
@@ -3839,23 +3850,35 @@ export async function synthesizeViaGeminiLiveWav(params: {
       ? 'natural conversational Bahasa Indonesia'
       : effectiveLang === 'th'
         ? 'natural conversational Thai'
-        : effectiveLang === 'ja'
-          ? 'natural Japanese'
-          : effectiveLang === 'zh'
-            ? 'natural Putonghua Mandarin Chinese'
-            : 'natural English';
+        : effectiveLang === 'vi'
+          ? 'natural conversational Vietnamese'
+          : effectiveLang === 'ru'
+            ? 'natural conversational Russian'
+            : effectiveLang === 'ms'
+              ? 'natural conversational Malay'
+              : effectiveLang === 'ko'
+                ? 'natural conversational Korean'
+                : effectiveLang === 'ja'
+                  ? 'natural Japanese'
+                  : effectiveLang === 'zh'
+                    ? 'natural Putonghua Mandarin Chinese'
+                    : 'natural English';
   const personaStyle =
     effectiveLang === 'id'
       ? 'Warm, charismatic native Indonesian language mentor speaking natural conversational Bahasa Indonesia with friendly Jakarta cadence and crisp foreign word quoting'
       : effectiveLang === 'th'
         ? 'Warm, lively native Thai language mentor speaking natural conversational Thai with friendly Bangkok cadence'
-        : params.persona?.ttsStylePrompt ||
-          params.persona?.speakingStyle ||
-          (effectiveLang === 'ja'
-            ? 'Expressive, sassy, sharp-witted Tokyo-Osaka mentor with authentic Kansai/Tokyo pitch accent'
-            : effectiveLang === 'zh'
-              ? 'Witty, brisk, expressive Beijing Putonghua Mandarin mentor with authentic erhua rhythm and crystal-clear four tones'
-              : 'Urban street-smart American English mentor with natural hood cadence, warm rasp, and witty older-brother sarcasm');
+        : effectiveLang === 'vi'
+          ? 'Warm, lively native Vietnamese language mentor speaking natural conversational Vietnamese with clear pronunciation'
+          : effectiveLang === 'ru'
+            ? 'Warm, expressive native Russian language mentor speaking natural conversational Russian with clear articulation'
+            : params.persona?.ttsStylePrompt ||
+              params.persona?.speakingStyle ||
+              (effectiveLang === 'ja'
+                ? 'Expressive, sassy, sharp-witted Tokyo-Osaka mentor with authentic Kansai/Tokyo pitch accent'
+                : effectiveLang === 'zh'
+                  ? 'Witty, brisk, expressive Beijing Putonghua Mandarin mentor with authentic erhua rhythm and crystal-clear four tones'
+                  : 'Urban street-smart American English mentor with natural hood cadence, warm rasp, and witty older-brother sarcasm');
 
   return new Promise((resolve) => {
     let settled = false;
@@ -3913,9 +3936,17 @@ export async function synthesizeViaGeminiLiveWav(params: {
               ? 'cmn-CN'
               : effectiveLang === 'th'
                 ? 'th-TH'
-                : effectiveLang === 'id'
-                  ? 'id-ID'
-                  : 'en-US';
+                : effectiveLang === 'vi'
+                  ? 'vi-VN'
+                  : effectiveLang === 'ru'
+                    ? 'ru-RU'
+                    : effectiveLang === 'ko'
+                      ? 'ko-KR'
+                      : effectiveLang === 'ms'
+                        ? 'ms-MY'
+                        : effectiveLang === 'id'
+                          ? 'id-ID'
+                          : 'en-US';
         ws?.send(
           JSON.stringify({
             setup: {
@@ -4046,8 +4077,8 @@ export async function synthesizeViaWorkerGeminiTts(params: {
   const cleanText = stripEmojisAndEmotWords(params.text || '').trim();
   if (!cleanText) return null;
 
-  const rawLang = String(params.targetLang || 'en').toLowerCase().trim();
-  const isNativeExplainLang = rawLang === 'id' || rawLang === 'th';
+  const rawLang = String(params.targetLang || 'en').toLowerCase().split(/[-_]/)[0].trim();
+  const isNativeExplainLang = ['id', 'th', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(rawLang);
 
   for (const base of resolveVoiceApiCandidateBases()) {
     const controller = new AbortController();

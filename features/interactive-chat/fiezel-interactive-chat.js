@@ -85,8 +85,20 @@
 
       var locale = 'id';
       try {
-        if (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th') {
-          locale = 'th';
+        var rawUiLoc = '';
+        if (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function') {
+          rawUiLoc = String(root.FiezelI18n.getLocale() || '').trim().toLowerCase();
+        }
+        if (!rawUiLoc && typeof localStorage !== 'undefined') {
+          rawUiLoc = String(
+            localStorage.getItem('fz_ui_lang') ||
+            localStorage.getItem('fiezel-ui-lang') ||
+            localStorage.getItem('fiezel_ui_lang') ||
+            ''
+          ).trim().toLowerCase();
+        }
+        if (rawUiLoc && /^[a-z]{2}(?:-[a-z]{2,4})?$/.test(rawUiLoc)) {
+          locale = rawUiLoc.split('-')[0];
         }
       } catch (_) {}
       var autoCall = '';

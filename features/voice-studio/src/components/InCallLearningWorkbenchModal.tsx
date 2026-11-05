@@ -502,33 +502,71 @@ export function derivePedagogicalBoard(
   let wrongSent = (action?.trapWrongSentence || '').trim();
 
   if (!rightSent || rightSent.includes('Bentuk alami')) {
-    if (/borrow|lend/i.test(lowerQ)) {
-      rightSent = 'Can I borrow your pen?';
-      wrongSent = 'Can I lend your pen?';
-    } else if (/hard/i.test(lowerQ)) {
-      rightSent = 'I study hard every day for the exam.';
-      wrongSent = 'I study hardly every day for the exam.';
-    } else if (/verb.*ing|sedang/i.test(lowerQ)) {
-      rightSent = 'I am studying English right now.';
-      wrongSent = 'I am study English right now.';
-    } else if (/since|for/i.test(lowerQ)) {
-      rightSent = 'I have lived here since 2020.';
-      wrongSent = 'I have lived here for 2020.';
+    if (targetLang === 'zh') {
+      if (/听|看|一下/i.test(lowerQ)) {
+        rightSent = '我想听听看。';
+        wrongSent = '我想听一下吧。';
+      } else if (/的/i.test(lowerQ)) {
+        rightSent = '这是我的书。';
+        wrongSent = '这是我书。';
+      } else {
+        rightSent = '我想听听看。';
+        wrongSent = '我想听一下吧。';
+      }
+    } else if (targetLang === 'ja') {
+      if (/で|に|図書館/i.test(lowerQ)) {
+        rightSent = '図書館で勉強します。';
+        wrongSent = '図書館に勉強します。';
+      } else if (/たら/i.test(lowerQ)) {
+        rightSent = '勉強したら分かります。';
+        wrongSent = '勉強するたら分かります。';
+      } else {
+        rightSent = '図書館で勉強します。';
+        wrongSent = '図書館に勉強します。';
+      }
     } else {
-      rightSent = 'I study hard every day for the exam.';
-      wrongSent = 'I study hardly every day for the exam.';
+      if (/borrow|lend/i.test(lowerQ)) {
+        rightSent = 'Can I borrow your pen?';
+        wrongSent = 'Can I lend your pen?';
+      } else if (/hard/i.test(lowerQ)) {
+        rightSent = 'I study hard every day for the exam.';
+        wrongSent = 'I study hardly every day for the exam.';
+      } else if (/verb.*ing|sedang/i.test(lowerQ)) {
+        rightSent = 'I am studying English right now.';
+        wrongSent = 'I am study English right now.';
+      } else if (/since|for/i.test(lowerQ)) {
+        rightSent = 'I have lived here since 2020.';
+        wrongSent = 'I have lived here for 2020.';
+      } else {
+        rightSent = 'I study hard every day for the exam.';
+        wrongSent = 'I study hardly every day for the exam.';
+      }
     }
   }
 
   if (!wrongSent || wrongSent === rightSent || wrongSent.includes('Bentuk kaku')) {
-    if (/\bborrow\b/i.test(rightSent)) {
-      wrongSent = rightSent.replace(/\bborrow\b/i, 'lend');
-    } else if (/\bhard\b/i.test(rightSent)) {
-      wrongSent = rightSent.replace(/\bhard\b/i, 'hardly');
-    } else if (/\b(am|is|are)\s+(\w+ing)\b/i.test(rightSent)) {
-      wrongSent = rightSent.replace(/\b(am|is|are)\s+(\w+)ing\b/i, '$1 $2');
+    if (targetLang === 'zh') {
+      wrongSent = rightSent.includes('听听看')
+        ? '我想听一下吧。'
+        : rightSent.includes('的')
+          ? rightSent.replace(/的/g, '')
+          : '我想听一下吧。';
+    } else if (targetLang === 'ja') {
+      wrongSent = rightSent.includes('で')
+        ? rightSent.replace(/で/, 'に')
+        : rightSent.includes('たら')
+          ? rightSent.replace(/したら/, 'するたら')
+          : '図書館に勉強します。';
     } else {
-      wrongSent = rightSent.replace(/\b(\w+)\b/, '$1 to');
+      if (/\bborrow\b/i.test(rightSent)) {
+        wrongSent = rightSent.replace(/\bborrow\b/i, 'lend');
+      } else if (/\bhard\b/i.test(rightSent)) {
+        wrongSent = rightSent.replace(/\bhard\b/i, 'hardly');
+      } else if (/\b(am|is|are)\s+(\w+ing)\b/i.test(rightSent)) {
+        wrongSent = rightSent.replace(/\b(am|is|are)\s+(\w+)ing\b/i, '$1 $2');
+      } else {
+        wrongSent = rightSent.replace(/\b(\w+)\b/, '$1 to');
+      }
     }
   }
 
@@ -641,19 +679,23 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
   const handleReplayVoice = () => {
     if (boardState?.coachExplanation && onSpeakPreview) {
-      const spokenLang =
-        locale === 'th'
-          ? 'th'
-          : locale === 'ja'
-            ? 'ja'
-            : locale === 'zh'
-              ? 'zh'
-              : locale === 'en'
-                ? 'en'
-                : 'id';
-      onSpeakPreview(boardState.coachExplanation, spokenLang);
+      const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
+      onSpeakPreview(boardState.coachExplanation, locCode);
     }
   };
+
+  useEffect(() => {
+    if (isReady && boardState?.coachExplanation && onSpeakPreviewRef.current) {
+      const key = `${boardState.topicTitle}::${boardState.coachExplanation}`;
+      if (lastSpokenKeyRef.current !== key) {
+        lastSpokenKeyRef.current = key;
+        if (!isLiveConnected) {
+          const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
+          onSpeakPreviewRef.current(boardState.coachExplanation, locCode);
+        }
+      }
+    }
+  }, [isReady, boardState, isLiveConnected, locale]);
 
   const handleResumeTalk = () => {
     const correctSent = boardState
@@ -783,10 +825,44 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 </div>
               </div>
 
-              {/* Baris 3: Suara Coach (Minimalis tanpa paragraf sampah) */}
+              {/* Baris 3: Penjelasan Inti Guru (Dalam Bahasa Interface Murid) */}
+              {boardState.coachExplanation && (
+                <div
+                  className="p-3 rounded-xl bg-[#FDF8EE] border border-[#E8DFC8] text-xs leading-relaxed text-[#4A3E30] font-medium"
+                  data-testid="wb-coach-explanation-box"
+                >
+                  <span className="font-bold text-[#8C2233] block mb-1">
+                    {locale === 'th'
+                      ? 'คำอธิบาย:'
+                      : locale === 'ja'
+                        ? '解説:'
+                        : locale === 'zh'
+                          ? '讲解说明:'
+                          : locale === 'vi'
+                            ? 'Giải thích:'
+                            : locale === 'ru'
+                              ? 'Объяснение:'
+                              : 'Penjelasan:'}
+                  </span>
+                  <p>{boardState.coachExplanation}</p>
+                </div>
+              )}
+
+              {/* Baris 4: Suara Coach */}
               <div className="flex items-center justify-between pt-1 text-xs">
                 <span className="font-bold text-[#4A3E30] truncate">
-                  {persona.name} sedang menjelaskan
+                  {persona.name}{' '}
+                  {locale === 'th'
+                    ? 'กำลังอธิบาย'
+                    : locale === 'ja'
+                      ? 'が説明中'
+                      : locale === 'zh'
+                        ? '正在讲解'
+                        : locale === 'vi'
+                          ? 'đang giải thích'
+                          : locale === 'ru'
+                            ? 'объясняет'
+                            : 'sedang menjelaskan'}
                 </span>
                 <button
                   type="button"
@@ -795,7 +871,19 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#EAE2D2] hover:bg-[#DDD3C0] text-[#3D3225] text-[11px] font-bold cursor-pointer transition-colors active:scale-95"
                 >
                   <span>🔊</span>
-                  <span>Ulangi Suara</span>
+                  <span>
+                    {locale === 'th'
+                      ? 'ฟังซ้ำ'
+                      : locale === 'ja'
+                        ? '音声再生'
+                        : locale === 'zh'
+                          ? '重播语音'
+                          : locale === 'vi'
+                            ? 'Nghe lại'
+                            : locale === 'ru'
+                              ? 'Повторить'
+                              : 'Ulangi Suara'}
+                  </span>
                 </button>
               </div>
             </div>

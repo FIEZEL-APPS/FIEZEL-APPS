@@ -1062,19 +1062,24 @@ export function getInitialBraincoreState(): BraincoreStoreState {
   };
 }
 
-function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: 'id' | 'th' } {
+function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: LearnerLocale } {
   try {
     let targetLang: TargetLang | undefined;
-    let learnerLocale: 'id' | 'th' | undefined;
+    let learnerLocale: LearnerLocale | undefined;
+    const isSupportedUiLocale = (val?: string | null): val is LearnerLocale => {
+      if (!val) return false;
+      const clean = String(val).trim().toLowerCase().split('-')[0];
+      return ['id', 'th', 'ja', 'en', 'zh', 'vi', 'ru', 'ko', 'ms', 'es', 'fr', 'de', 'ar'].includes(clean);
+    };
     if (typeof window !== 'undefined' && window.location && window.location.search) {
       const params = new URLSearchParams(window.location.search);
       const langParam = params.get('lang') || params.get('course');
       if (langParam === 'ja' || langParam === 'en' || langParam === 'zh') {
         targetLang = langParam;
       }
-      const locParam = params.get('locale') || params.get('hl');
-      if (locParam === 'th' || locParam === 'id') {
-        learnerLocale = locParam;
+      const locParam = params.get('locale') || params.get('hl') || params.get('ui_lang');
+      if (isSupportedUiLocale(locParam)) {
+        learnerLocale = String(locParam).trim().toLowerCase().split('-')[0] as LearnerLocale;
       }
     }
     if (!targetLang) {
@@ -1084,13 +1089,21 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: 'i
       }
     }
     if (!learnerLocale) {
+      const uiLangRaw =
+        localStorage.getItem('fz_ui_lang') ||
+        localStorage.getItem('fiezel-ui-lang') ||
+        localStorage.getItem('fiezel_ui_lang');
+      if (isSupportedUiLocale(uiLangRaw)) {
+        learnerLocale = String(uiLangRaw).trim().toLowerCase().split('-')[0] as LearnerLocale;
+      }
+    }
+    if (!learnerLocale) {
       const legacyRaw = localStorage.getItem('fiezel-v4-state');
       if (legacyRaw) {
         const legacy = JSON.parse(legacyRaw);
-        if (legacy?.learnerLocale === 'th' || legacy?.locale === 'th') {
-          learnerLocale = 'th';
-        } else if (legacy?.learnerLocale === 'id' || legacy?.locale === 'id') {
-          learnerLocale = 'id';
+        const legLoc = legacy?.learnerLocale || legacy?.locale || legacy?.uiLang;
+        if (isSupportedUiLocale(legLoc)) {
+          learnerLocale = String(legLoc).trim().toLowerCase().split('-')[0] as LearnerLocale;
         }
       }
     }
