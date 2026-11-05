@@ -763,9 +763,12 @@ export function buildContextualFallbackCards(params: {
   targetLang: TargetLang;
   locale: LearnerLocale;
   lastUserText?: string;
+  variationSeed?: number;
+  excludeTexts?: string[];
 }): BeginnerReplyCard[] {
   const rawAi = String(params.aiText || '');
   const th = params.locale === 'th';
+  const variationSeed = Number(params.variationSeed || 0);
 
   // Special handler for proactive struggle diagnosis questions ("what part been tripping you up", "モヤモヤ", "头疼")
   if (
@@ -774,6 +777,58 @@ export function buildContextualFallbackCards(params: {
     /(?:头疼|难懂|卡壳|搞混|最难)/u.test(rawAi)
   ) {
     if (params.targetLang === 'ja') {
+      if (variationSeed % 2 === 1) {
+        return [
+          {
+            id: 'ctx_struggle_ja_v2_1',
+            tier: 'easy',
+            badgeId: 'Singkat & Mudah',
+            badgeTh: 'สั้นและง่าย',
+            tierLabelId: '1 · Singkat',
+            tierLabelTh: '1 · สั้นและง่าย',
+            text: '動詞の活用と敬語の使い分けが一番難しいです。',
+            pronunciation: 'Doushi no katsuyou to keigo no tsukaiwake ga ichiban muzukashii desu.',
+            hintId: 'Konjugasi kata kerja dan penggunaan keigo yang paling sulit bagiku.',
+            hintTh: 'การผันคำกริยาและการใช้คำสุภาพเป็นสิ่งที่ยากที่สุดสำหรับฉัน',
+            meaningId: 'Konjugasi kata kerja dan penggunaan keigo yang paling sulit bagiku.',
+            meaningTh: 'การผันคำกริยาและการใช้คำสุภาพเป็นสิ่งที่ยากที่สุดสำหรับฉัน',
+            isRealtimeAi: false,
+            isOfflineFallback: true,
+          },
+          {
+            id: 'ctx_struggle_ja_v2_2',
+            tier: 'mission',
+            badgeId: 'Alami & Kontekstual',
+            badgeTh: 'เป็นธรรมชาติ',
+            tierLabelId: '2 · Alami',
+            tierLabelTh: '2 · เป็นธรรมชาติ',
+            text: '頭では分かっていても、早口で話されると聞き取れなくなります。',
+            pronunciation: 'Atama de wa wakatte itemo, hayakuchi de hanasareru to kikitorenaku narimasu.',
+            hintId: 'Di kepala paham, tapi kalau diajak bicara cepat aku jadi tidak bisa menangkap artinya.',
+            hintTh: 'ในหัวเข้าใจนะ แต่พอพูดเร็วๆ ฉันฟังไม่ทันเลย',
+            meaningId: 'Di kepala paham, tapi kalau diajak bicara cepat aku jadi tidak bisa menangkap artinya.',
+            meaningTh: 'ในหัวเข้าใจนะ แต่พอพูดเร็วๆ ฉันฟังไม่ทันเลย',
+            isRealtimeAi: false,
+            isOfflineFallback: true,
+          },
+          {
+            id: 'ctx_struggle_ja_v2_3',
+            tier: 'rescue',
+            badgeId: 'Jawab + Tanya Balik',
+            badgeTh: 'ตอบและถามกลับ',
+            tierLabelId: '3 · + Tanya Balik',
+            tierLabelTh: '3 · + ถามกลับ',
+            text: '言いたい単語がすぐに出てきません。ゆっくり話してもらえますか？',
+            pronunciation: 'Iitai tango ga sugu ni dete kimasen. Yukkuri hanashite moraemasu ka?',
+            hintId: 'Kata yang mau kuucapkan tidak langsung keluar. Bisakah bicara lebih pelan?',
+            hintTh: 'คำที่อยากพูดยังนึกไม่ออกทันที ช่วยพูดช้าลงหน่อยได้ไหมครับ/ค่ะ?',
+            meaningId: 'Kata yang mau kuucapkan tidak langsung keluar. Bisakah bicara lebih pelan?',
+            meaningTh: 'คำที่อยากพูดยังนึกไม่ออกทันที ช่วยพูดช้าลงหน่อยได้ไหมครับ/ค่ะ?',
+            isRealtimeAi: false,
+            isOfflineFallback: true,
+          },
+        ];
+      }
       return [
         {
           id: 'ctx_struggle_ja_1',
@@ -826,6 +881,58 @@ export function buildContextualFallbackCards(params: {
       ];
     }
     if (params.targetLang === 'zh') {
+      if (variationSeed % 2 === 1) {
+        return [
+          {
+            id: 'ctx_struggle_zh_v2_1',
+            tier: 'easy',
+            badgeId: 'Singkat & Mudah',
+            badgeTh: 'สั้นและง่าย',
+            tierLabelId: '1 · Singkat',
+            tierLabelTh: '1 · สั้นและง่าย',
+            text: '生词太多了，我经常记不住。',
+            pronunciation: 'Shēngcí tài duō le, wǒ jīngcháng jì bù zhù.',
+            hintId: 'Kosakata baru terlalu banyak, aku sering tidak ingat.',
+            hintTh: 'คำศัพท์ใหม่เยอะมาก ฉันมักจำไม่ค่อยได้',
+            meaningId: 'Kosakata baru terlalu banyak, aku sering tidak ingat.',
+            meaningTh: 'คำศัพท์ใหม่เยอะมาก ฉันมักจำไม่ค่อยได้',
+            isRealtimeAi: false,
+            isOfflineFallback: true,
+          },
+          {
+            id: 'ctx_struggle_zh_v2_2',
+            tier: 'mission',
+            badgeId: 'Alami & Kontekstual',
+            badgeTh: 'เป็นธรรมชาติ',
+            tierLabelId: '2 · Alami',
+            tierLabelTh: '2 · เป็นธรรมชาติ',
+            text: '听中国人说话语速太快，我有点反应不过来。',
+            pronunciation: 'Tīng Zhōngguórén shuōhuà yǔsù tài kuài, wǒ yǒudiǎn fǎnyìng bù guòlái.',
+            hintId: 'Mendengar orang Tiongkok bicara terlalu cepat, refleksku agak lambat.',
+            hintTh: 'ฟังคนจีนพูดเร็วมาก ฉันตามไม่ค่อยทันเลย',
+            meaningId: 'Mendengar orang Tiongkok bicara terlalu cepat, refleksku agak lambat.',
+            meaningTh: 'ฟังคนจีนพูดเร็วมาก ฉันตามไม่ค่อยทันเลย',
+            isRealtimeAi: false,
+            isOfflineFallback: true,
+          },
+          {
+            id: 'ctx_struggle_zh_v2_3',
+            tier: 'rescue',
+            badgeId: 'Jawab + Tanya Balik',
+            badgeTh: 'ตอบและถามกลับ',
+            tierLabelId: '3 · + Tanya Balik',
+            tierLabelTh: '3 · + ถามกลับ',
+            text: '我能听懂一点，但是不知道怎么回答。你能教我吗？',
+            pronunciation: 'Wǒ néng tīng dǒng yīdiǎn, dànshì bù zhīdào zěnme huídá. Nǐ néng jiāo wǒ ma?',
+            hintId: 'Aku paham sedikit tapi bingung bagaimana menjawabnya. Bisakah kamu ajari aku?',
+            hintTh: 'ฉันฟังเข้าใจนิดหน่อยแต่ไม่รู้จะตอบยังไง ช่วยสอนฉันหน่อยได้ไหม?',
+            meaningId: 'Aku paham sedikit tapi bingung bagaimana menjawabnya. Bisakah kamu ajari aku?',
+            meaningTh: 'ฉันฟังเข้าใจนิดหน่อยแต่ไม่รู้จะตอบยังไง ช่วยสอนฉันหน่อยได้ไหม?',
+            isRealtimeAi: false,
+            isOfflineFallback: true,
+          },
+        ];
+      }
       return [
         {
           id: 'ctx_struggle_zh_1',
@@ -872,6 +979,70 @@ export function buildContextualFallbackCards(params: {
           hintTh: 'ฉันสับสนความแตกต่างระหว่าง "bù" กับ "méi" ตลอดเลย ช่วยพาฉันฝึกหน่อยได้ไหม?',
           meaningId: 'Bedanya "bù" dan "méi" sering ketukar terus, bisa bantu latih aku sebentar?',
           meaningTh: 'ฉันสับสนความแตกต่างระหว่าง "bù" กับ "méi" ตลอดเลย ช่วยพาฉันฝึกหน่อยได้ไหม?',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+      ];
+    }
+    if (variationSeed % 2 === 1) {
+      return [
+        {
+          id: 'ctx_struggle_en_v2_1',
+          tier: 'easy',
+          badgeId: 'Singkat & Mudah',
+          badgeTh: 'สั้นและง่าย',
+          tierLabelId: '1 · Singkat',
+          tierLabelTh: '1 · สั้นและง่าย',
+          text: 'Vocabulary and word order are my biggest obstacles.',
+          pronunciation: 'vokebyuleri end werd order ar mai bigest obstakels',
+          hintId: th
+            ? 'คำศัพท์และลำดับคำเป็นอุปสรรคที่ใหญ่ที่สุดของฉัน'
+            : 'Kosakata dan urutan kata adalah rintangan terbesarku.',
+          hintTh: 'คำศัพท์และลำดับคำเป็นอุปสรรคที่ใหญ่ที่สุดของฉัน',
+          meaningId: th
+            ? 'คำศัพท์และลำดับคำเป็นอุปสรรคที่ใหญ่ที่สุดของฉัน'
+            : 'Kosakata dan urutan kata adalah rintangan terbesarku.',
+          meaningTh: 'คำศัพท์และลำดับคำเป็นอุปสรรคที่ใหญ่ที่สุดของฉัน',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_struggle_en_v2_2',
+          tier: 'mission',
+          badgeId: 'Alami & Kontekstual',
+          badgeTh: 'เป็นธรรมชาติ',
+          tierLabelId: '2 · Alami',
+          tierLabelTh: '2 · เป็นธรรมชาติ',
+          text: 'I hesitate a lot when forming questions under pressure.',
+          pronunciation: 'ai heziteit e lot wen forming kwescens ander presyer',
+          hintId: th
+            ? 'ฉันลังเลบ่อยมากเวลาสร้างประโยคคำถามตอนกดดัน'
+            : 'Aku sering ragu-ragu saat menyusun pertanyaan di bawah tekanan.',
+          hintTh: 'ฉันลังเลบ่อยมากเวลาสร้างประโยคคำถามตอนกดดัน',
+          meaningId: th
+            ? 'ฉันลังเลบ่อยมากเวลาสร้างประโยคคำถามตอนกดดัน'
+            : 'Aku sering ragu-ragu saat menyusun pertanyaan di bawah tekanan.',
+          meaningTh: 'ฉันลังเลบ่อยมากเวลาสร้างประโยคคำถามตอนกดดัน',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_struggle_en_v2_3',
+          tier: 'rescue',
+          badgeId: 'Jawab + Tanya Balik',
+          badgeTh: 'ตอบและถามกลับ',
+          tierLabelId: '3 · + Tanya Balik',
+          tierLabelTh: '3 · + ถามกลับ',
+          text: "I know the words in my head, but can't speak fast enough. Can you help me?",
+          pronunciation: 'ai nou de werds in mai hed, bat kent spik fast inaf. ken yu help mi?',
+          hintId: th
+            ? 'ฉันรู้คำศัพท์ในหัวแต่ยังพูดไม่เร็วพอ คุณช่วยฝึกให้ฉันหน่อยได้ไหม?'
+            : 'Aku tahu kata-katanya di kepala tapi belum bisa bicara cepat. Bisa bantu latih aku?',
+          hintTh: 'ฉันรู้คำศัพท์ในหัวแต่ยังพูดไม่เร็วพอ คุณช่วยฝึกให้ฉันหน่อยได้ไหม?',
+          meaningId: th
+            ? 'ฉันรู้คำศัพท์ในหัวแต่ยังพูดไม่เร็วพอ คุณช่วยฝึกให้ฉันหน่อยได้ไหม?'
+            : 'Aku tahu kata-katanya di kepala tapi belum bisa bicara cepat. Bisa bantu latih aku?',
+          meaningTh: 'ฉันรู้คำศัพท์ในหัวแต่ยังพูดไม่เร็วพอ คุณช่วยฝึกให้ฉันหน่อยได้ไหม?',
           isRealtimeAi: false,
           isOfflineFallback: true,
         },
@@ -945,6 +1116,8 @@ export function buildContextualFallbackCards(params: {
   const act = detectAiIntent(params.aiText || '', params.targetLang);
   const topic = focal.extractedTopic || '';
   const optA = focal.choiceOptionA ? capitalizeWord(focal.choiceOptionA) : '';
+  const optB = focal.choiceOptionB ? capitalizeWord(focal.choiceOptionB) : '';
+  const chosenOpt = variationSeed % 2 === 1 && optB ? optB : optA;
   const echo = focal.echoCorrectionTarget || '';
 
   type CardRow = [string, string, string, string]; // [text, pronunciation, hintId, hintTh]
@@ -962,9 +1135,9 @@ export function buildContextualFallbackCards(params: {
       rescue: ["I'd love to join! What time works best for you?", 'aid lav tu join! wat taim werks best for yu?', 'Aku mau ikut! Jam berapa yang cocok untukmu?', 'ฉันอยากไปด้วยจัง! คุณสะดวกกี่โมงดี?'],
     },
     choice: {
-      easy: [optA ? `${optA}, please.` : 'The first option, please.', optA ? `${optA.toLowerCase()}, pliz` : 'de ferst opsyen, pliz', optA ? `${optA}, tolong.` : 'Pilihan yang pertama saja.', optA ? `ขอเป็น${optA}ครับ/ค่ะ` : 'ขอตัวเลือกแรกครับ/ค่ะ'],
-      mission: [optA ? `I'd prefer ${optA}, because I really like the taste.` : "I'd prefer the first option, actually.", optA ? `aid prifer ${optA.toLowerCase()}, bikoz ai rili laik de teist` : 'aid prifer de ferst opsyen, ekcuali', optA ? `Aku lebih pilih ${optA}, karena suka rasanya.` : 'Aku lebih pilih opsi yang pertama sih.', optA ? `ฉันชอบ${optA}มากกว่า เพราะชอบรสชาตินี้` : 'ฉันขอเลือกอันแรกมากกว่านะ'],
-      rescue: [optA ? `I'll go with ${optA}. Which one do you recommend?` : "I'm not sure. Which one do you recommend?", optA ? `ail gou wid ${optA.toLowerCase()}. wich wan du yu rekomand?` : 'aim not syur. wich wan du yu rekomand?', optA ? `Aku pilih ${optA}. Menurutmu mana yang enak?` : 'Aku belum yakin. Menurutmu mana yang kamu rekomendasikan?', optA ? `ฉันเลือก${optA}นะ แล้วคุณแนะนำอันไหนล่ะ?` : 'ฉันยังไม่แน่ใจ คุณแนะนำอันไหนเหรอ?'],
+      easy: [chosenOpt ? `${chosenOpt}, please.` : 'The first option, please.', chosenOpt ? `${chosenOpt.toLowerCase()}, pliz` : 'de ferst opsyen, pliz', chosenOpt ? `${chosenOpt}, tolong.` : 'Pilihan yang pertama saja.', chosenOpt ? `ขอเป็น${chosenOpt}ครับ/ค่ะ` : 'ขอตัวเลือกแรกครับ/ค่ะ'],
+      mission: [chosenOpt ? `I'd prefer ${chosenOpt}, because I really like the taste.` : "I'd prefer the first option, actually.", chosenOpt ? `aid prifer ${chosenOpt.toLowerCase()}, bikoz ai rili laik de teist` : 'aid prifer de ferst opsyen, ekcuali', chosenOpt ? `Aku lebih pilih ${chosenOpt}, karena suka rasanya.` : 'Aku lebih pilih opsi yang pertama sih.', chosenOpt ? `ฉันชอบ${chosenOpt}มากกว่า เพราะชอบรสชาตินี้` : 'ฉันขอเลือกอันแรกมากกว่านะ'],
+      rescue: [chosenOpt ? `I'll go with ${chosenOpt}. Which one do you recommend?` : "I'm not sure. Which one do you recommend?", chosenOpt ? `ail gou wid ${chosenOpt.toLowerCase()}. wich wan du yu rekomand?` : 'aim not syur. wich wan du yu rekomand?', chosenOpt ? `Aku pilih ${chosenOpt}. Menurutmu mana yang enak?` : 'Aku belum yakin. Menurutmu mana yang kamu rekomendasikan?', chosenOpt ? `ฉันเลือก${chosenOpt}นะ แล้วคุณแนะนำอันไหนล่ะ?` : 'ฉันยังไม่แน่ใจ คุณแนะนำอันไหนเหรอ?'],
     },
     wh_how_long: {
       easy: ['For about two years now.', 'for abaut tu yirs nau', 'Sudah sekitar dua tahun sekarang.', 'ประมาณสองปีแล้วครับ/ค่ะ'],
@@ -1085,8 +1258,8 @@ export function buildContextualFallbackCards(params: {
       rescue: ['ぜひ行きたいです！何時ごろが都合がいいですか？', 'zehi ikitai desu! nanji goro ga tsugou ga ii desu ka?', 'Pasti mau ikut! Jam berapa yang cocok untukmu?', 'อยากไปมากเลย! คุณสะดวกประมาณกี่โมงดี?'],
     },
     choice: {
-      easy: [optA ? `${optA}をお願いします。` : '一つ目をお願いします。', optA ? `${toPhoneticRomaji(optA)} o onegai shimasu` : 'hitotsume o onegai shimasu', optA ? `Minta ${optA}, tolong.` : 'Yang pertama saja, tolong.', optA ? `ขอเป็น${optA}ครับ/ค่ะ` : 'ขอตัวเลือกแรกครับ/ค่ะ'],
-      mission: [optA ? `${optA}のほうが好きなので、そちらにします。` : '二つ目のほうがいいです。', optA ? `${toPhoneticRomaji(optA)} no hou ga suki na no de, sochira ni shimasu` : 'futatsume no hou ga ii desu', optA ? `Karena lebih suka ${optA}, aku pilih itu.` : 'Yang kedua lebih baik.', optA ? `ฉันชอบ${optA}มากกว่า เลยขอเลือกอันนี้นะ` : 'ฉันว่าอันที่สองดีกว่านะ'],
+      easy: [chosenOpt ? `${chosenOpt}をお願いします。` : '一つ目をお願いします。', chosenOpt ? `${toPhoneticRomaji(chosenOpt)} o onegai shimasu` : 'hitotsume o onegai shimasu', chosenOpt ? `Minta ${chosenOpt}, tolong.` : 'Yang pertama saja, tolong.', chosenOpt ? `ขอเป็น${chosenOpt}ครับ/ค่ะ` : 'ขอตัวเลือกแรกครับ/ค่ะ'],
+      mission: [chosenOpt ? `${chosenOpt}のほうが好きなので、そちらにします。` : '二つ目のほうがいいです。', chosenOpt ? `${toPhoneticRomaji(chosenOpt)} no hou ga suki na no de, sochira ni shimasu` : 'futatsume no hou ga ii desu', chosenOpt ? `Karena lebih suka ${chosenOpt}, aku pilih itu.` : 'Yang kedua lebih baik.', chosenOpt ? `ฉันชอบ${chosenOpt}มากกว่า เลยขอเลือกอันนี้นะ` : 'ฉันว่าอันที่สองดีกว่านะ'],
       rescue: ['うーん、迷いますね。どちらがおすすめですか？', 'uun, mayoimasu ne. dochira ga osusume desu ka?', 'Hmm, bingung ya. Yang mana yang kamu rekomendasikan?', 'อืม เลือกยากจัง คุณแนะนำอันไหนเหรอ?'],
     },
     wh_how_long: {
@@ -1208,8 +1381,8 @@ export function buildContextualFallbackCards(params: {
       rescue: ['好主意！你打算什么时候去呢？', 'Hǎo zhǔyì! Nǐ dǎsuàn shénme shíhòu qù ne?', 'Ide bagus! Kamu rencana kapan perginya?', 'ความคิดดีเลย! คุณตั้งใจจะไปตอนไหนเหรอ?'],
     },
     choice: {
-      easy: [optA ? `我要${optA}，谢谢。` : '我选第一个吧。', optA ? `Wǒ yào ${toPhoneticPinyin(optA)}, xièxie.` : 'Wǒ xuǎn dì yī gè ba.', optA ? `Saya mau ${toPhoneticPinyin(optA)}, terima kasih.` : 'Saya pilih yang pertama saja.', optA ? `ขอเป็น${toPhoneticPinyin(optA)} ขอบคุณครับ/ค่ะ` : 'ขอเลือกอันแรกครับ/ค่ะ'],
-      mission: [optA ? `我更喜欢${optA}，感觉味道很不错。` : '我选第一个，感觉挺好的。', optA ? `Wǒ gèng xǐhuān ${toPhoneticPinyin(optA)}, gǎnjué wèidào hěn bùcuò.` : 'Wǒ xuǎn dì yī gè, gǎnjué tǐng hǎo de.', optA ? `Aku lebih suka ${toPhoneticPinyin(optA)}, rasanya enak.` : 'Aku pilih yang pertama, rasanya oke.', optA ? `ฉันชอบ${toPhoneticPinyin(optA)}มากกว่า รู้สึกว่ารสชาติดีเลย` : 'ฉันเลือกอันแรก รู้สึกว่าน่าจะดี'],
+      easy: [chosenOpt ? `我要${chosenOpt}，谢谢。` : '我选第一个吧。', chosenOpt ? `Wǒ yào ${toPhoneticPinyin(chosenOpt)}, xièxie.` : 'Wǒ xuǎn dì yī gè ba.', chosenOpt ? `Saya mau ${toPhoneticPinyin(chosenOpt)}, terima kasih.` : 'Saya pilih yang pertama saja.', chosenOpt ? `ขอเป็น${toPhoneticPinyin(chosenOpt)} ขอบคุณครับ/ค่ะ` : 'ขอเลือกอันแรกครับ/ค่ะ'],
+      mission: [chosenOpt ? `我更喜欢${chosenOpt}，感觉味道很不错。` : '我选第一个，感觉挺好的。', chosenOpt ? `Wǒ gèng xǐhuān ${toPhoneticPinyin(chosenOpt)}, gǎnjué wèidào hěn bùcuò.` : 'Wǒ xuǎn dì yī gè, gǎnjué tǐng hǎo de.', chosenOpt ? `Aku lebih suka ${toPhoneticPinyin(chosenOpt)}, rasanya enak.` : 'Aku pilih yang pertama, rasanya oke.', chosenOpt ? `ฉันชอบ${toPhoneticPinyin(chosenOpt)}มากกว่า รู้สึกว่ารสชาติดีเลย` : 'ฉันเลือกอันแรก รู้สึกว่าน่าจะดี'],
       rescue: ['这两个都不错，你平时更喜欢哪一个？', 'Zhè liǎng gè dōu bùcuò, nǐ píngshí gèng xǐhuān nǎ yī gè?', 'Dua-duanya oke, kamu biasanya lebih suka yang mana?', 'ทั้งสองอย่างดูดีทั้งคู่เลย คุณชอบอันไหนมากกว่าเหรอ?'],
     },
     wh_how_long: {
@@ -1503,6 +1676,8 @@ export async function requestRealtimeCopilotAssist(params: {
       targetLang: params.targetLang,
       locale: params.locale,
       lastUserText: params.lastUserText,
+      variationSeed,
+      excludeTexts: params.excludeTexts,
     });
     const meaning = translateAndPhoneticizeLiveText(cleanAiText, params.targetLang);
     return {
@@ -1522,7 +1697,7 @@ export async function requestRealtimeCopilotAssist(params: {
     return initialRes;
   }
 
-  const budgetMs = Math.max(1500, Math.min(params.budgetMs ?? 7500, 10000));
+  const budgetMs = Math.max(1000, Math.min(params.budgetMs ?? 3500, 5000));
   const deadline = Date.now() + budgetMs;
 
   // 1) Fast-Path: kunci Gemini pribadi murid (gemini-3-flash-preview)

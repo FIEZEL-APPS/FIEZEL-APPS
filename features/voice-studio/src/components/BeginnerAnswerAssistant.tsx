@@ -60,9 +60,13 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
   const safeIndex = selectedIndex < visibleCards.length ? selectedIndex : 0;
   const activeCard = visibleCards[safeIndex] || null;
 
-  // Keep current teleprompter steady while learner is actively recording speech aloud
+  // ZERO-DISAPPEARING TELEPROMPTER INVARIANT:
+  // ONLY show full-surface skeleton shimmer when there are genuinely NO CARDS available at all!
+  // If activeCard exists, keep teleprompter rock-solid and responsive (never hide cards while user is reading!)
   const showLoadingState =
-    !isRecordingPtt && (isGeneratingCopilot || isRefreshingAssist || copilotSource === 'loading' || (!activeCard && isAnalyzingTurn));
+    !isRecordingPtt &&
+    !activeCard &&
+    (isGeneratingCopilot || isRefreshingAssist || copilotSource === 'loading' || isAnalyzingTurn);
 
   if (!showLoadingState && !activeCard) {
     return null;
@@ -198,20 +202,22 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
           <span
             data-testid="realtime-context-sync-badge"
             className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0 ${
-              showLoadingState
+              showLoadingState || isRefreshingAssist
                 ? 'bg-[#FFF4DB] text-[#8A5A00]'
                 : 'bg-[#E9F7F0] text-[#1F6E50]'
             }`}
           >
             <span
               className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                showLoadingState
+                showLoadingState || isRefreshingAssist
                   ? 'bg-[#E6A800] animate-ping'
                   : 'bg-[#2E8B69]'
               }`}
             />
             {showLoadingState ? (
               <span>{locale === 'th' ? 'กำลังสร้าง...' : 'Meracik Jawaban...'}</span>
+            ) : isRefreshingAssist ? (
+              <span>{locale === 'th' ? 'กำลังอัปเดต...' : 'Menyelaraskan...'}</span>
             ) : (
               <>
                 <span className="sm:hidden">{locale === 'th' ? 'สด' : 'Spontan'}</span>

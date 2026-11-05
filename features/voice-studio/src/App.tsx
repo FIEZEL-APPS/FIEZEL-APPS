@@ -69,6 +69,7 @@ import {
 import { JapaneseRubyDisplay } from './components/JapaneseRubyDisplay';
 import { stripEmojisAndEmotWords } from './lib/japanesePhonetics';
 import {
+  buildContextualFallbackCards,
   evaluateTurnLocal,
   type LiveTransportMode,
   pcm16Base64ToAudioBuffer,
@@ -887,7 +888,25 @@ export default function App() {
     copilotAbortRef.current = controller;
     inFlightCopilotKeyRef.current = dedupKey;
 
-    if (!opts?.forceVariation && copilotCardsRef.current.length === 0) {
+    // 1. INSTANT 0ms ZERO-DELAY OPTIMISTIC COPILOT HYDRATION:
+    // Compute focal-clause contextual replies immediately and mount them synchronously
+    // so learner never waits 3-7s on network before seeing 1·Singkat, 2·Alami, 3·+Tanya Balik.
+    const optimisticCards = buildContextualFallbackCards({
+      aiText: cleanAi,
+      targetLang: scen.targetLang,
+      locale,
+      lastUserText: lastUserLine,
+      variationSeed: opts?.forceVariation ? copilotVariationSeedRef.current : 0,
+      excludeTexts: opts?.excludeTexts,
+    });
+    if (optimisticCards.length > 0) {
+      lastCopilotAiKeyRef.current = dedupKey;
+      setCopilotCards(optimisticCards);
+      setCopilotSource('ai-realtime');
+      if (!opts?.forceVariation) {
+        setIsGeneratingCopilot(false);
+      }
+    } else if (!opts?.forceVariation && copilotCardsRef.current.length === 0) {
       setIsGeneratingCopilot(true);
       setCopilotSource('loading');
     }
@@ -1144,8 +1163,15 @@ export default function App() {
     setStatusBanner(null);
     setInputText('');
     lastCopilotAiKeyRef.current = '';
-    setCopilotCards([]);
-    setCopilotSource('loading');
+    const lineToSay = activePersona.openingGreeting || activeScenario.openingLine;
+    const initialCards = buildContextualFallbackCards({
+      aiText: lineToSay,
+      targetLang: activeScenario.targetLang,
+      locale,
+    });
+    setCopilotCards(initialCards);
+    setCopilotSource('ai-realtime');
+    setIsGeneratingCopilot(false);
     const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
     try {
       if (typeof localStorage !== 'undefined') {
@@ -1154,7 +1180,6 @@ export default function App() {
     } catch {
       // Ignore
     }
-    const lineToSay = activePersona.openingGreeting || activeScenario.openingLine;
     const transId =
       activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId;
     const transTh =
@@ -3954,6 +3979,35 @@ export default function App() {
                 }
               });
               updateLiveAiTranslationDraft(currentAiStreaming);
+            }
+
+            // Early-Trigger Streaming Copilot: Pre-hydrate answer cards while AI partner speaks!
+            if (currentAiStreaming.length >= 15) {
+              const hasSentenceBreak = /[.?!。？！\n]/.test(currentAiStreaming);
+              const hasQuestionMark = /[?？]/.test(currentAiStreaming);
+              if (hasSentenceBreak || (hasQuestionMark && currentAiStreaming.length >= 20)) {
+                if (copilotEarlyTimerRef.current) {
+                  window.clearTimeout(copilotEarlyTimerRef.current);
+                }
+                copilotEarlyTimerRef.current = window.setTimeout(() => {
+                  copilotEarlyTimerRef.current = null;
+                  const draft = liveAiDraftRef.current.trim();
+                  if (draft && draft !== lastStreamedCopilotTextRef.current) {
+                    lastStreamedCopilotTextRef.current = draft;
+                    const lastUserForCopilot =
+                      liveUserDraftRef.current ||
+                      [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
+                      '';
+                    const updatedHist: Array<{ speaker: 'ai' | 'user'; text: string }> = [
+                      ...turnsRef.current.slice(-6).map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+                      { speaker: 'ai', text: draft },
+                    ];
+                    void triggerRealtimeCopilotRef.current(draft, lastUserForCopilot, updatedHist, {
+                      isDebouncedStreaming: true,
+                    });
+                  }
+                }, 160);
+              }
             }
           }
 
