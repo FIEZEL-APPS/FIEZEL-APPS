@@ -2011,24 +2011,21 @@ export async function requestRealtimeCopilotAssist(params: {
       lastUserText: params.lastUserText,
       variationSeed,
       excludeTexts: params.excludeTexts,
-    });
+    }).map((c) => ({
+      ...c,
+      isRealtimeAi: false,
+      isOfflineFallback: true,
+    }));
     const meaning = translateAndPhoneticizeLiveText(cleanAiText, params.targetLang);
     return {
-      ok: true,
-      source: 'ai-realtime',
+      ok: false,
+      source: 'loading',
       aiMeaningId: meaning.translationId || '',
       aiMeaningTh: meaning.translationTh || '',
       replies: cards,
       cards,
     };
   };
-
-  // Instant 0ms local copilot cards on initial scenario opening greeting (zero wasted API quota on mount)
-  if (!params.lastUserText && variationSeed === 0 && (!params.history || params.history.length <= 1)) {
-    const initialRes = fallback();
-    copilotCacheSet(cacheKey, initialRes);
-    return initialRes;
-  }
 
   const budgetMs = Math.max(1000, Math.min(params.budgetMs ?? 3500, 5000));
   const deadline = Date.now() + budgetMs;
@@ -2145,12 +2142,11 @@ export async function requestRealtimeCopilotAssist(params: {
       });
       clearTimeout(timer);
       params.signal?.removeEventListener('abort', onAbort);
-      if (res.status === 429) {
-        const ra = Number(res.headers.get('retry-after') || 0);
-        _copilotServerCooldownUntil = Date.now() + (ra > 0 ? Math.min(ra, 30) * 1000 : 8000);
-        continue;
-      }
-      if (res.status === 503) {
+      if (!res.ok) {
+        if (res.status === 429) {
+          const ra = Number(res.headers.get('retry-after') || 0);
+          _copilotServerCooldownUntil = Date.now() + (ra > 0 ? Math.min(ra, 30) * 1000 : 8000);
+        }
         continue;
       }
       if (res.ok) {

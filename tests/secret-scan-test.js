@@ -491,11 +491,6 @@ const TOKEN_ALLOWLIST = [
     digest: '02a3b5155093b03b36e4776cb1618f16d49c71669f4cd1a621fa5ab51864cb71',
     file: 'features/voice-studio/dist/voice-studio.js',
     reason: 'Konstanta alfabet nanoid 64 karakter (ModuleSymbhasOwnPr-...) bawaan pustaka charting Recharts/Lucide untuk ID elemen DOM di memori, bukan rahasia atau kredensial.'
-  },
-  {
-    digest: '02a3b5155093b03b36e4776cb1618f16d49c71669f4cd1a621fa5ab51864cb71',
-    file: 'id-golden-baseline.json',
-    reason: 'Salinan konstanta alfabet nanoid 64 karakter bawaan bundle features/voice-studio/dist/voice-studio.js yang terekam pada snapshot id-golden-baseline.json.'
   }
 ];
 const ALLOWED_DIGESTS = new Map(TOKEN_ALLOWLIST.map((e) => [e.file + '::' + e.digest, e]));

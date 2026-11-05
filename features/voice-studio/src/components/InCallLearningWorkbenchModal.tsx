@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   LearnerLocale,
   TargetLang,
@@ -8,26 +8,80 @@ import {
 } from '../types/voiceCall';
 import { playFiezelSfx } from '../lib/sfx';
 
+export type WorkbenchContextMode =
+  | 'confusing_pair'   // Timbangan Konseptual / Dual Contrast Stream
+  | 'syntax_ribbon'    // Pita Kalimat Sintaksis Berwarna
+  | 'magic_character'  // Kanvas Kaligrafi Zen & Radikal
+  | 'tone_waveform'    // Kurva Nada Suara & Intonasi
+  | 'standard_clarity';// Penjelasan Kontekstual Bersih
+
+export type WorkbenchQuizMode = 'multiple_choice' | 'cloze_gap' | 'sentence_blocks';
+
+export interface DynamicQuizData {
+  prompt: string;
+  // Mode Pilihan Ganda (3-4 Opsi, Anti-Spoiling)
+  options: Array<{
+    id: string;
+    text: string;
+    isCorrect: boolean;
+    feedback: string;
+  }>;
+  // Mode Isian Rumpang (Fill-in-the-Blank / Cloze)
+  cloze: {
+    prefix: string;
+    blankWord: string;
+    suffix: string;
+    chips: string[];
+    feedback: string;
+  };
+  // Mode Susun Balok Kata (Sentence Builder)
+  blocks: {
+    correctOrder: string[];
+    pool: string[];
+    meaningId: string;
+    feedback: string;
+  };
+}
+
 export interface DynamicBoardState {
+  contextMode: WorkbenchContextMode;
   topicTitle: string;
   patternFormula: string;
   coachExplanation: string;
-  wrongSentence: string;
-  rightSentence: string;
-  wrongReason?: string;
-  quiz: {
-    prompt: string;
-    optionA: {
-      text: string;
-      isCorrect: boolean;
-      feedback: string;
-    };
-    optionB: {
-      text: string;
-      isCorrect: boolean;
-      feedback: string;
-    };
+  // Data Khusus Confusing Pair (Dual-Stream Contrast)
+  pairData?: {
+    termA: string;
+    descA: string;
+    colorA: string;
+    termB: string;
+    descB: string;
+    colorB: string;
+    keyAnalogy: string;
   };
+  // Data Khusus Syntax Ribbon
+  ribbonSegments?: Array<{
+    role: string;
+    word: string;
+    tagColor: string;
+  }>;
+  // Data Khusus Karakter / Kanji / Hanzi
+  characterData?: {
+    char: string;
+    reading: string;
+    meaning: string;
+    radical: string;
+    radicalMeaning: string;
+    strokesCount: number;
+  };
+  // Data Khusus Nada / Pelafalan
+  toneData?: {
+    word: string;
+    phonetic: string;
+    toneType: string;
+    toneShape: string;
+  };
+  // Kuis Interaktif Multi-Mode
+  quiz: DynamicQuizData;
 }
 
 export interface InCallLearningWorkbenchProps {
@@ -61,10 +115,12 @@ export interface InCallLearningWorkbenchProps {
   ) => any;
   onSendToMentor?: (writtenSentence: string) => void;
   onNavigateModule?: (destination: string) => void;
+  forcedExerciseMode?: 'multiple_choice' | 'cloze_gap' | 'sentence_blocks' | null;
+  externalQuizSeed?: number;
 }
 
 /**
- * Memeriksa apakah `uiAction` membawa data dinamis yang sudah lengkap dari backend Fiezel.
+ * Memeriksa apakah `uiAction` membawa data dinamis lengkap dari backend Fiezel.
  */
 export function hasRichDynamicAction(action?: VoiceUiAction): boolean {
   if (!action) return false;
@@ -83,519 +139,292 @@ export function hasRichDynamicAction(action?: VoiceUiAction): boolean {
 }
 
 /**
- * Membangun kuis uji pemahaman 2 opsi yang menantang dan mengecoh
- * untuk menguji kepahaman murid secara instan tanpa clutter.
+ * Menganalisis topik dan menurunkan Kanvas Kontekstual + Soal Interaktif Multi-Mode
+ * dengan prinsip ANTI-SPOILING (soal kuis selalu menguji transfer pemahaman baru).
  */
-function buildComprehensionChallengeQuiz(
-  topicTitle: string,
-  sampleRightSent: string,
-  sampleWrongSent: string,
+export function deriveContextualPedagogicalBoard(
+  action: VoiceUiAction | undefined,
+  rawQuery: string,
+  targetLang: TargetLang,
   locale: LearnerLocale,
-  lowerQ: string,
-  action?: VoiceUiAction
-): {
-  prompt: string;
-  optionA: { text: string; isCorrect: boolean; feedback: string };
-  optionB: { text: string; isCorrect: boolean; feedback: string };
-} {
-  const isThai = locale === 'th';
-  const isJa = locale === 'ja';
-  const isZh = locale === 'zh';
-  const isEn = locale === 'en';
+  seedVariant = 0
+): DynamicBoardState {
+  const query = (action?.topicTitle || rawQuery || '').trim();
+  const lowerQ = query.toLowerCase();
 
-  const makeQuizPair = (
-    prompt: string,
-    correctSent: string,
-    wrongSent: string,
-    rightFeedback: string,
-    wrongFeedback: string
-  ) => {
-    let hash = 0;
-    const seed = `${topicTitle}:${correctSent}`;
-    for (let i = 0; i < seed.length; i++) {
-      hash = (hash * 31 + seed.charCodeAt(i)) | 0;
-    }
-    const swapOrder = Math.abs(hash) % 2 === 1;
-    const rightOpt = { text: correctSent, isCorrect: true, feedback: rightFeedback };
-    const wrongOpt = { text: wrongSent, isCorrect: false, feedback: wrongFeedback };
+  // -------------------------------------------------------------
+  // 1. KASUS CONFUSING PAIR: DO VS THAT / DID VS DO
+  // -------------------------------------------------------------
+  if (/do\s*(?:vs|versus|sama|dan|ke)\s*that|do\s*that|did\s*(?:vs|versus|sama)\s*do/i.test(lowerQ)) {
     return {
-      prompt,
-      optionA: swapOrder ? wrongOpt : rightOpt,
-      optionB: swapOrder ? rightOpt : wrongOpt,
-    };
-  };
-
-  // 0. PRIORITAS UTAMA MUTLAK: Kalimat Kuis Dinamis Asli dari AI berdasar pertanyaan spesifik murid!
-  const dynCorrect = (action?.drillTargetSentence || '').trim();
-  const dynTrap = (action?.drillTrapSentence || '').trim();
-  if (dynCorrect.length > 4 && dynTrap.length > 4 && dynCorrect !== dynTrap) {
-    const prompt =
-      (action?.drillMeaningPrompt || '').trim() ||
-      (isThai
-        ? `ทดสอบความเข้าใจ: เลือกประโยคที่ถูกต้องสำหรับ "${topicTitle}":`
-        : isJa
-          ? `理解度テスト: 「${topicTitle}」について正しい文を選択してください:`
-          : isZh
-            ? `理解测试：请选择符合「${topicTitle}」的正确句子：`
-            : isEn
-              ? `Quick Check: Choose the correct sentence for "${topicTitle}":`
-              : `Tes Kepahaman: Pilih kalimat yang BENAR untuk "${topicTitle}":`);
-    const rightFeedback = isThai
-      ? 'ถูกต้องที่สุด! โครงสร้างประโยคถูกต้องและเป็นธรรมชาติ'
-      : isJa
-        ? '完璧です！自然な文法構造です。'
-        : isZh
-          ? '完全正确！句子结构自然准确。'
-          : isEn
-            ? 'Spot on! That sentence uses the exact right structure.'
-            : 'Tepat sekali! Susunan kalimat ini sudah benar dan alami.';
-    const wrongFeedback =
-      (action?.trapWrongReason || '').trim() ||
-      (isThai
-        ? 'ระวัง! ประโยคนี้มีจุดที่ผิดหลักไวยากรณ์'
-        : isJa
-          ? '注意！この文には文法の誤りがあります。'
-          : isZh
-            ? '注意！这个句子里有语法陷阱。'
-            : isEn
-              ? 'Watch out! That option contains the grammar trap.'
-              : 'Terkecoh! Kalimat ini mengandung jebakan penggunaan kata yang keliru.');
-    return makeQuizPair(prompt, dynCorrect, dynTrap, rightFeedback, wrongFeedback);
-  }
-
-  // 1. Kasus Verb ing / Present Continuous
-  if (
-    /verb.*ing|continuous|sedang|right now|studying|bentuk ing|penggunaan ing|กริยา.*ing|เติม\s*ing/i.test(lowerQ) ||
-    /verb.*ing|continuous|กริยา.*ing|เติม\s*ing/i.test(topicTitle)
-  ) {
-    const prompt = isThai
-      ? 'ทดสอบความเข้าใจ: ประโยคใดถูกต้องเมื่อทีมงานกำลังทดสอบระบบใหม่อยู่ในขณะนี้?'
-      : isJa
-      ? '理解度テスト: 現在新しいシステムをテストしている文として正しいのはどれ？'
-      : 'Tes Kepahaman: Manakah kalimat yang BENAR saat teknisi sedang menguji sistem baru saat ini?';
-    const correctSent = 'The engineers are currently testing the new security system.';
-    const trickyDistractor = 'The engineers are currently test the new security system.';
-    const rightFeedback = isThai
-      ? 'ยอดเยี่ยมมาก! หลัง are กริยาต้องเติม ing (testing) เสมอ'
-      : isJa
-      ? '正解！areの後は動詞ing形（testing）になります。'
-      : 'Tepat sekali! Setelah "are", kata kerja wajib memakai bentuk ing (testing).';
-    const wrongFeedback = isThai
-      ? 'ระวัง! หลัง to be ต้องใช้ testing ไม่ใช่ test'
-      : isJa
-      ? '注意！areの後は原型ではなくing形が必要です。'
-      : 'Terkecoh! Setelah to be "are", kata kerja wajib memakai bentuk ing (testing, bukan test).';
-
-    return {
-      prompt,
-      optionA: { text: correctSent, isCorrect: true, feedback: rightFeedback },
-      optionB: { text: trickyDistractor, isCorrect: false, feedback: wrongFeedback },
+      contextMode: 'confusing_pair',
+      topicTitle: 'Penggunaan "Do" vs "That"',
+      patternFormula: 'Do (Melakukan Tindakan) vs That (Merujuk Benda/Hal Tersebut)',
+      coachExplanation:
+        '"Do" adalah kata kerja tindakan (melakukan/mengerjakan), sedangkan "that" adalah kata penunjuk benda atau hal yang sedang dibicarakan. Sering dipadukan menjadi: "I do that" (Saya melakukan hal itu).',
+      pairData: {
+        termA: 'Do / Did',
+        descA: 'Kata kerja perbuatan (Aksi)',
+        colorA: '#FAF2E6',
+        termB: 'That',
+        descB: 'Kata penunjuk hal / objek (Benda)',
+        colorB: '#F4EFEA',
+        keyAnalogy: 'Do = Gerakannya (Aksi). That = Yang ditunjuk (Hal itu).',
+      },
+      quiz: {
+        prompt: 'Lengkapi kalimat: "Kemarin saya sudah menyelesaikan tugas itu."',
+        options: [
+          { id: 'opt_1', text: 'I did that homework yesterday.', isCorrect: true, feedback: 'Tepat sekali! "Did" untuk lampau, "that" merujuk tugas tersebut.' },
+          { id: 'opt_2', text: 'I that did homework yesterday.', isCorrect: false, feedback: 'Urutan terbalik! Kata kerja "did" diletakkan sebelum "that".' },
+          { id: 'opt_3', text: 'I do that yesterday.', isCorrect: false, feedback: 'Karena ada kata "yesterday", gunakan bentuk lampau "did", bukan "do".' },
+        ],
+        cloze: {
+          prefix: 'I really enjoyed the movie, so I will',
+          blankWord: 'do',
+          suffix: 'that again next weekend.',
+          chips: ['do', 'that', 'did'],
+          feedback: 'Keren! Setelah "will" gunakan kata kerja dasar "do", lalu "that" sebagai objek.',
+        },
+        blocks: {
+          correctOrder: ['Can', 'you', 'do', 'that', 'for', 'me?'],
+          pool: ['that', 'do', 'Can', 'for', 'you', 'me?', 'did'],
+          meaningId: 'Bisakah kamu melakukan hal itu untukku?',
+          feedback: 'Susunan sempurna! "Can you do that for me?"',
+        },
+      },
     };
   }
 
-  // 2. Kasus Hard versus Hardly
+  // -------------------------------------------------------------
+  // 2. KASUS CONFUSING PAIR: HARD VS HARDLY
+  // -------------------------------------------------------------
   if (/hard/i.test(lowerQ)) {
-    const prompt = isThai
-      ? 'ทดสอบความเข้าใจ: เลือกประโยคที่ถูกต้องสำหรับ "คุณหมอแทบจะไม่ได้นอนเลยระหว่างเข้าเวรฉุกเฉิน":'
-      : isJa
-      ? '理解度テスト: 「外科医は緊急当直中にほとんど眠らなかった」の正しい文はどれ？'
-      : 'Tes Kepahaman: Pilih kalimat yang BENAR untuk "Dokter bedah hampir tidak tidur selama tugas darurat":';
-    const correctSent = 'The dedicated surgeon hardly slept during the emergency shifts.';
-    const trickyDistractor = 'The dedicated surgeon hard slept during the emergency shifts.';
-    const rightFeedback = isThai
-      ? 'เก่งมาก! hardly วางไว้หน้ากริยาและแปลว่า "แทบจะไม่เลย"'
-      : isJa
-      ? '正解！hardlyは動詞の前で「ほとんど〜ない」という意味になります。'
-      : 'Tepat sekali! "Hardly" diletakkan sebelum kata kerja dan bermakna "hampir tidak sama sekali".';
-    const wrongFeedback = isThai
-      ? 'โดนหลอกแล้ว! ถ้าแปลว่าแทบไม่ได้นอน ต้องใช้ hardly slept ห้ามใช้ hard'
-      : isJa
-      ? '間違い！「ほとんど眠らない」はhardly sleptを使います。'
-      : 'Terkecoh! Jika maksudnya "hampir tidak pernah tidur", gunakan "hardly slept".';
-
     return {
-      prompt,
-      optionA: { text: correctSent, isCorrect: true, feedback: rightFeedback },
-      optionB: { text: trickyDistractor, isCorrect: false, feedback: wrongFeedback },
+      contextMode: 'confusing_pair',
+      topicTitle: 'Hard versus Hardly',
+      patternFormula: 'Work hard (giat/keras) vs Hardly work (hampir tidak)',
+      coachExplanation:
+        'Kata "hard" berarti giat atau bersungguh-sungguh. Sebaliknya, "hardly" bermakna hampir tidak sama sekali. Hati-hati, arti keduanya bertolak belakang 180 derajat!',
+      pairData: {
+        termA: 'Hard',
+        descA: 'Giat, keras, sungguh-sungguh',
+        colorA: '#FEF3C7',
+        termB: 'Hardly',
+        descB: 'Hampir tidak pernah sama sekali',
+        colorB: '#FDE8E4',
+        keyAnalogy: 'He works hard (Rajin banget) ≠ He hardly works (Pemalas, gak kerja).',
+      },
+      quiz: {
+        prompt: seedVariant % 2 === 0
+          ? 'Pilih kata yang tepat: "Chef itu bekerja ______ untuk menyiapkan hidangan pesta."'
+          : 'Pilih kata yang tepat: "Rian begitu kelelahan sampai dia ______ bisa membuka matanya."',
+        options: seedVariant % 2 === 0
+          ? [
+              { id: 'opt_1', text: 'The dedicated chef worked hard all evening.', isCorrect: true, feedback: 'Benar! "Worked hard" artinya bekerja giat dan bersungguh-sungguh.' },
+              { id: 'opt_2', text: 'The dedicated chef worked hardly all evening.', isCorrect: false, feedback: 'Terkecoh! "Hardly" artinya hampir tidak bekerja sama sekali.' },
+              { id: 'opt_3', text: 'The dedicated chef hardly working all evening.', isCorrect: false, feedback: 'Bentuk tata bahasa kurang tepat.' },
+            ]
+          : [
+              { id: 'opt_1', text: 'Rian was so exhausted that he could hardly open his eyes.', isCorrect: true, feedback: 'Tepat sekali! "Hardly" diletakkan sebelum kata kerja untuk arti "hampir tidak bisa".' },
+              { id: 'opt_2', text: 'Rian was so exhausted that he could hard open his eyes.', isCorrect: false, feedback: 'Gunakan "hardly" untuk arti hampir tidak bisa.' },
+              { id: 'opt_3', text: 'Rian was so exhausted that he hard opened his eyes.', isCorrect: false, feedback: 'Kata "hard" bukan bermakna hampir tidak.' },
+            ],
+        cloze: {
+          prefix: 'Athletes must train',
+          blankWord: 'hard',
+          suffix: 'every morning to win the trophy.',
+          chips: ['hard', 'hardly', 'hardness'],
+          feedback: 'Mantap! Untuk menyatakan usaha keras, selalu gunakan "hard".',
+        },
+        blocks: {
+          correctOrder: ['He', 'studied', 'hard', 'for', 'the', 'final', 'exam.'],
+          pool: ['hard', 'studied', 'He', 'for', 'the', 'hardly', 'final', 'exam.'],
+          meaningId: 'Dia belajar giat untuk ujian akhir.',
+          feedback: 'Susunan kalimat tepat sekali!',
+        },
+      },
     };
   }
 
-  // 3. Kasus Borrow versus Lend
+  // -------------------------------------------------------------
+  // 3. KASUS CONFUSING PAIR: BORROW VS LEND
+  // -------------------------------------------------------------
   if (/borrow|lend|pinjam/i.test(lowerQ)) {
-    const prompt = isThai
-      ? 'ทดสอบความเข้าใจ: เลือกประโยคที่ถูกต้องเมื่อคุณต้องการขอยืมแล็ปท็อปของเพื่อนร่วมงาน:'
-      : isJa
-      ? '理解度テスト: 同僚のノートPCを借りたい時の正しい表現はどれ？'
-      : 'Tes Kepahaman: Pilih kalimat yang BENAR saat kamu ingin meminjam laptop rekan kerjamu:';
-    const correctSent = 'Could I please borrow your laptop for thirty minutes?';
-    const trickyDistractor = 'Could I please lend your laptop for thirty minutes?';
-    const rightFeedback = isThai
-      ? 'ถูกต้อง! borrow คือการขอยืม ส่วน lend คือการให้ยืม'
-      : isJa
-      ? '正解！borrowは「借りる」、lendは「貸す」です。'
-      : 'Tepat sekali! "Borrow" digunakan saat kamu menerima pinjaman (meminjam).';
-    const wrongFeedback = isThai
-      ? 'ระวัง! lend แปลว่าให้ยืม ห้ามใช้เมื่อเราเป็นคนขอยืม'
-      : isJa
-      ? '間違い！自分が借りる時はlendではなくborrowを使います。'
-      : 'Terkecoh! "Lend" artinya meminjamkan ke orang lain, bukan meminjam.';
-
     return {
-      prompt,
-      optionA: { text: correctSent, isCorrect: true, feedback: rightFeedback },
-      optionB: { text: trickyDistractor, isCorrect: false, feedback: wrongFeedback },
-    };
-  }
-
-  // 4. Kasus Since versus For
-  if (/since|for/i.test(lowerQ)) {
-    const prompt = isThai
-      ? 'ทดสอบความเข้าใจ: ประโยคใดถูกต้องเมื่อระบุระยะเวลาการทำงานต่อเนื่องมา 8 ปี?'
-      : isJa
-      ? '理解度テスト: 8年間継続して働いている期間を表す正しい文はどれ？'
-      : 'Tes Kepahaman: Manakah kalimat yang BENAR saat menyatakan durasi pengalaman kerja 8 tahun?';
-    const correctSent = 'Our architect has been designing eco-friendly houses for eight years.';
-    const trickyDistractor = 'Our architect has been designing eco-friendly houses since eight years.';
-    const rightFeedback = isThai
-      ? 'ถูกต้อง! eight years คือช่วงระยะเวลารวม จึงต้องใช้ for'
-      : isJa
-      ? '正解！期間（8年間）にはforを使います。'
-      : 'Tepat sekali! "Eight years" adalah durasi total waktu, sehingga wajib memakai "for".';
-    const wrongFeedback = isThai
-      ? 'โดนหลอกแล้ว! ห้ามใช้ since กับช่วงความยาวของเวลา ให้ใช้ for'
-      : isJa
-      ? '間違い！期間にはsinceではなくforを使います。'
-      : 'Terkecoh! Jangan gunakan "since" untuk durasi angka waktu. Wajib gunakan "for"!';
-
-    return {
-      prompt,
-      optionA: { text: correctSent, isCorrect: true, feedback: rightFeedback },
-      optionB: { text: trickyDistractor, isCorrect: false, feedback: wrongFeedback },
-    };
-  }
-
-  // 5. Kasus Preposisi Waktu: In / On / At
-  if (/in.*on.*at|at.*on.*in|preposisi|waktu/i.test(lowerQ)) {
-    const prompt = isThai
-      ? 'ทดสอบความเข้าใจ: เลือกประโยคที่ถูกต้องสำหรับกำหนดการประชุม:'
-      : isJa
-      ? '理解度テスト: 会議のスケジュールとして正しい文はどれ？'
-      : 'Tes Kepahaman: Pilih kalimat yang BENAR untuk jadwal rapat:';
-    const correctSent = 'The international conference starts at 9 AM on Monday.';
-    const trickyDistractor = 'The international conference starts in 9 AM at Monday.';
-    const rightFeedback = isThai
-      ? 'ถูกต้อง! at ใช้กับเวลาเจาะจง (9 AM) และ on ใช้กับวัน (Monday)'
-      : isJa
-      ? '正解！時刻にはat、曜日にはonを使います。'
-      : 'Tepat sekali! "At" untuk titik jam (9 AM) dan "on" untuk nama hari (Monday).';
-    const wrongFeedback = isThai
-      ? 'ระวัง! เวลาเจาะจงต้องใช้ at และวันต้องใช้ on'
-      : isJa
-      ? '間違い！時刻はat、曜日はonが正しい前置詞です。'
-      : 'Terkecoh! Jam spesifik memakai "at" dan hari kalender memakai "on".';
-
-    return {
-      prompt,
-      optionA: { text: correctSent, isCorrect: true, feedback: rightFeedback },
-      optionB: { text: trickyDistractor, isCorrect: false, feedback: wrongFeedback },
-    };
-  }
-
-  // 6. Kasus Did + Verb 1 / Pertanyaan Lampau
-  if (/did|past tense|lampau/i.test(lowerQ)) {
-    const prompt = isThai
-      ? 'ทดสอบความเข้าใจ: เลือกประโยคคำถามอดีตที่ถูกต้อง:'
-      : isJa
-      ? '理解度テスト: 正しい過去形の疑問文を選択してください:'
-      : 'Tes Kepahaman: Pilih kalimat tanya masa lampau yang BENAR:';
-    const correctSent = 'Did your supervisor review the quarterly report yesterday?';
-    const trickyDistractor = 'Did your supervisor reviewed the quarterly report yesterday?';
-    const rightFeedback = isThai
-      ? 'ถูกต้อง! เมื่อมี Did แล้ว กริยาหลักต้องกลับเป็นรูปเดิม (review)'
-      : isJa
-      ? '正解！Didの後は動詞の原形（review）になります。'
-      : 'Tepat sekali! Karena sudah ada "Did", kata kerja utama wajib bentuk dasar (review).';
-    const wrongFeedback = isThai
-      ? 'ระวัง! ห้ามใช้ Did คู่กับกริยาช่อง 2 (reviewed)'
-      : isJa
-      ? '注意！Didの後ろに過去形（reviewed）は使えません。'
-      : 'Terkecoh! Sudah ada "Did", tidak boleh memakai bentuk lampau (reviewed) lagi!';
-
-    return {
-      prompt,
-      optionA: { text: correctSent, isCorrect: true, feedback: rightFeedback },
-      optionB: { text: trickyDistractor, isCorrect: false, feedback: wrongFeedback },
-    };
-  }
-
-  // 7. Kasus Make versus Do
-  if (/make.*do|do.*make/i.test(lowerQ)) {
-    const prompt = isThai
-      ? 'ทดสอบความเข้าใจ: เลือกประโยคที่ถูกต้องเกี่ยวกับการตัดสินใจ:'
-      : isJa
-      ? '理解度テスト: 「決定を下す」の正しい表現はどれ？'
-      : 'Tes Kepahaman: Pilih kalimat yang BENAR untuk pembuatan keputusan penting:';
-    const correctSent = 'The executive board made a crucial decision this morning.';
-    const trickyDistractor = 'The executive board did a crucial decision this morning.';
-    const rightFeedback = isThai
-      ? 'ยอดเยี่ยม! สำนวนการตัดสินใจใช้ make a decision เสมอ'
-      : isJa
-      ? '正解！「決定する」は make a decision です。'
-      : 'Tepat sekali! Frasa untuk keputusan adalah "make a decision", bukan "do".';
-    const wrongFeedback = isThai
-      ? 'ระวัง! ห้ามใช้ did a decision'
-      : isJa
-      ? '注意！did a decisionという表現はありません。'
-      : 'Terkecoh! Bahasa Inggris menggunakan "made a decision", bukan "did a decision".';
-
-    return {
-      prompt,
-      optionA: { text: correctSent, isCorrect: true, feedback: rightFeedback },
-      optionB: { text: trickyDistractor, isCorrect: false, feedback: wrongFeedback },
-    };
-  }
-
-  // 8. Topik Khusus dari Payload Server / Worker (Prioritas Sentences Terpisah)
-  if (action?.drillTargetSentence && action?.drillTrapSentence) {
-    const prompt =
-      action.drillMeaningPrompt ||
-      (isThai
-        ? `ทดสอบความเข้าใจ: เลือกประโยคที่ถูกต้องสำหรับ "${topicTitle}":`
-        : isJa
-        ? `理解度テスト: 「${topicTitle}」について正しい文を選択してください:`
-        : `Tes Kepahaman: Pilih kalimat yang BENAR untuk "${topicTitle}":`);
-    return {
-      prompt,
-      optionA: {
-        text: action.drillTargetSentence,
-        isCorrect: true,
-        feedback: isThai
-          ? 'ถูกต้องที่สุด! โครงสร้างประโยคถูกต้องและเป็นธรรมชาติ'
-          : isJa
-          ? '完璧です！自然な文法構造です。'
-          : 'Tepat sekali! Susunan kalimat ini sudah benar dan alami.',
+      contextMode: 'confusing_pair',
+      topicTitle: 'Borrow versus Lend',
+      patternFormula: 'Borrow from (Meminjam dari orang) vs Lend to (Meminjamkan ke orang)',
+      coachExplanation:
+        '"Borrow" artinya meminjam (kita yang menerima barang dari teman). "Lend" artinya meminjamkan (kita yang memberikan barang ke orang lain). Perhatikan arah barangnya!',
+      pairData: {
+        termA: 'Borrow (← Menerima)',
+        descA: 'Kita meminjam dari orang lain',
+        colorA: '#E6F4EA',
+        termB: 'Lend (→ Memberi)',
+        descB: 'Kita meminjamkan ke orang lain',
+        colorB: '#FEF3C7',
+        keyAnalogy: 'Barang masuk ke kita = Borrow. Barang keluar dari kita = Lend.',
       },
-      optionB: {
-        text: action.drillTrapSentence,
-        isCorrect: false,
-        feedback:
-          action.trapWrongReason ||
-          (isThai
-            ? 'ระวัง! ประโยคนี้มีจุดที่ผิดหลักไวยากรณ์'
-            : isJa
-            ? '注意！この文には文法の誤りがあります。'
-            : 'Terkecoh! Kalimat ini masih mengandung jebakan tata bahasa.'),
+      quiz: {
+        prompt: 'Pilih kalimat yang sopan saat kamu ingin meminjam payung temanmu:',
+        options: [
+          { id: 'opt_1', text: 'Could I please borrow your umbrella for an hour?', isCorrect: true, feedback: 'Tepat! Kita yang meminjam, jadi gunakan "borrow".' },
+          { id: 'opt_2', text: 'Could I please lend your umbrella for an hour?', isCorrect: false, feedback: 'Salah arah! "Lend" artinya kamu meminjamkan payung temanmu ke orang lain.' },
+          { id: 'opt_3', text: 'Could you please borrow me your umbrella?', isCorrect: false, feedback: 'Jika subjeknya "you", gunakan "lend me", bukan "borrow me".' },
+        ],
+        cloze: {
+          prefix: 'My brother agreed to',
+          blankWord: 'lend',
+          suffix: 'me his gaming laptop tonight.',
+          chips: ['lend', 'borrow', 'lending'],
+          feedback: 'Benar! Kakak memberikan pinjaman ke saya, jadi gunakan "lend me".',
+        },
+        blocks: {
+          correctOrder: ['May', 'I', 'borrow', 'your', 'dictionary', 'please?'],
+          pool: ['borrow', 'May', 'I', 'lend', 'your', 'please?', 'dictionary'],
+          meaningId: 'Bolehkah saya meminjam kamusmu?',
+          feedback: 'Luar biasa! Kalimat tersusun dengan sangat sopan.',
+        },
       },
     };
   }
 
-  // 9. Topik Dinamis Berdasarkan Kalimat Coach (Dijamin Tidak Mengulang Contoh Penjelasan)
-  let baseCorrect = sampleRightSent.trim() || 'I study diligently every single day.';
-  let baseWrong = sampleWrongSent.trim() || 'I study hardly every single day.';
-  if (baseCorrect === baseWrong) {
-    baseWrong = baseCorrect.replace(/\b(\w+)\b/, '$1 to');
+  // -------------------------------------------------------------
+  // 4. KASUS TATA BAHASA SINTAKSIS: VERB ING / PRESENT CONTINUOUS
+  // -------------------------------------------------------------
+  if (/verb.*ing|continuous|sedang|right now|studying/i.test(lowerQ)) {
+    return {
+      contextMode: 'syntax_ribbon',
+      topicTitle: 'Pola Waktu Sedang Berlangsung (Verb-ing)',
+      patternFormula: 'Subjek + [am / is / are] + Kata Kerja (Verb-ing)',
+      coachExplanation:
+        'Gunakan kata bantu to be (am/is/are) diikuti kata kerja berakhiran -ing saat menyatakan kegiatan yang sedang berlangsung detik ini juga. Jangan pernah meninggalkan to be!',
+      ribbonSegments: [
+        { role: 'Subjek', word: 'The engineers', tagColor: '#FEF3C7' },
+        { role: 'Kata Bantu', word: 'are', tagColor: '#E6F4EA' },
+        { role: 'Kata Kerja (-ing)', word: 'testing', tagColor: '#FDE8E4' },
+        { role: 'Keterangan', word: 'the new system', tagColor: '#F1F0F7' },
+      ],
+      quiz: {
+        prompt: 'Pilih kalimat yang BENAR saat para siswa sedang membaca buku di perpustakaan saat ini:',
+        options: [
+          { id: 'opt_1', text: 'The students are reading books in the library right now.', isCorrect: true, feedback: 'Tepat sekali! "Are reading" menyatakan kegiatan yang sedang berlangsung.' },
+          { id: 'opt_2', text: 'The students are read books in the library right now.', isCorrect: false, feedback: 'Setelah "are", kata kerja wajib memakai bentuk -ing (reading).' },
+          { id: 'opt_3', text: 'The students reading books in the library right now.', isCorrect: false, feedback: 'Jangan hilangkan kata bantu to be "are"!' },
+        ],
+        cloze: {
+          prefix: 'Listen! The choir is',
+          blankWord: 'singing',
+          suffix: 'a beautiful song on stage.',
+          chips: ['singing', 'sing', 'sang'],
+          feedback: 'Sempurna! Setelah "is", kata kerja bernyanyi menjadi "singing".',
+        },
+        blocks: {
+          correctOrder: ['We', 'are', 'learning', 'English', 'together', 'today.'],
+          pool: ['learning', 'are', 'We', 'learn', 'English', 'together', 'today.'],
+          meaningId: 'Kita sedang belajar bahasa Inggris bersama hari ini.',
+          feedback: 'Rangkaian kalimat sangat alami dan tepat!',
+        },
+      },
+    };
+  }
+
+  // -------------------------------------------------------------
+  // 5. KASUS JEPANG: PARTIKEL に (NI) VS で (DE)
+  // -------------------------------------------------------------
+  if (/ni\s*(?:vs|sama|dan)\s*de|partikel\s*ni|partikel\s*de|に.*で/i.test(lowerQ)) {
+    return {
+      contextMode: 'confusing_pair',
+      topicTitle: 'Partikel に (Ni) vs で (De)',
+      patternFormula: 'Tempat + に (Tujuan Gerakan / Keberadaan) vs Tempat + で (Lokasi Aktivitas)',
+      coachExplanation:
+        'Partikel に (ni) dipakai untuk titik tujuan gerakan (pergi ke...) atau tempat diamnya sesuatu (ada di...). Sedangkan partikel で (de) dipakai untuk tempat berlangsungnya suatu kegiatan aktif (belajar di..., makan di...).',
+      pairData: {
+        termA: 'Tempat + に (Ni)',
+        descA: 'Titik tujuan (pergi ke) / Posisi diam',
+        colorA: '#FAF2E6',
+        termB: 'Tempat + で (De)',
+        descB: 'Tempat melakukan aktivitas / aksi',
+        colorB: '#E6F4EA',
+        keyAnalogy: 'Tujuan pergi = に (Ni). Tempat beraksi = で (De).',
+      },
+      quiz: {
+        prompt: 'Lengkapi kalimat: "Saya makan ramen di restoran."',
+        options: [
+          { id: 'opt_1', text: 'レストランで ラーメンを 食べます。', isCorrect: true, feedback: 'Tepat sekali! Makan ramen adalah aktivitas, jadi gunakan partikel で (de).' },
+          { id: 'opt_2', text: 'レストランに ラーメンを 食べます。', isCorrect: false, feedback: 'Kurang pas. Partikel に untuk tujuan arah, bukan tempat beraktivitas.' },
+          { id: 'opt_3', text: 'レストランを ラーメンに 食べます。', isCorrect: false, feedback: 'Partikel terbalik.' },
+        ],
+        cloze: {
+          prefix: 'あした ともだちと としょかん',
+          blankWord: 'で',
+          suffix: 'べんきょうします。',
+          chips: ['で', 'に', 'を'],
+          feedback: 'Benar! Belajar (べんきょうします) adalah aktivitas, jadi gunakan で.',
+        },
+        blocks: {
+          correctOrder: ['わたしは', 'にちようびに', 'とうきょうに', 'いきます。'],
+          pool: ['いきます。', 'わたしは', 'とうきょうに', 'とうきょうで', 'にちようびに'],
+          meaningId: 'Saya pergi ke Tokyo pada hari Minggu.',
+          feedback: 'Susunan kalimat bahasa Jepang sudah sangat tepat!',
+        },
+      },
+    };
+  }
+
+  // -------------------------------------------------------------
+  // 6. DEFAULT ADAPTIVE FALLBACK (BEBAS KAKU)
+  // -------------------------------------------------------------
+  const cleanTitle = (action?.topicTitle || query || 'Pemahaman Materi').trim();
+  const cleanFormula = (action?.patternFormula || `Pola Inti: ${cleanTitle}`).trim();
+  const cleanExplanation = (
+    action?.coachSpokenScript ||
+    action?.explanationText ||
+    'Perhatikan pola dan penggunaannya dalam kalimat agar tuturanmu terdengar alami dan percaya diri.'
+  ).trim();
+
+  const targetSent = (action?.drillTargetSentence || action?.sampleTarget || 'I practice speaking English every day.').trim();
+  const trapSent = (action?.drillTrapSentence || action?.trapWrongSentence || 'I practice speak English every day.').trim();
+
+  // Pisahkan kata menjadi balok kata dinamis
+  const words = targetSent.replace(/[.?!,]/g, '').split(/\s+/).filter(Boolean);
+  const blockPool = [...words];
+  if (words.length > 2) {
+    blockPool.push('is');
   }
 
   return {
-    prompt: isThai
-      ? `ทดสอบความเข้าใจ: เลือกประโยคที่ถูกต้องสำหรับ "${topicTitle}":`
-      : isJa
-      ? `理解度テスト: 「${topicTitle}」について正しい文を選択してください:`
-      : `Tes Kepahaman: Pilih kalimat yang BENAR untuk "${topicTitle}":`,
-    optionA: {
-      text: baseCorrect,
-      isCorrect: true,
-      feedback: isThai
-        ? 'ถูกต้องที่สุด! โครงสร้างประโยคถูกต้อง'
-        : isJa
-        ? '完璧です！自然な文法構造です。'
-        : 'Tepat sekali! Susunan kalimat ini sudah benar dan alami.',
-    },
-    optionB: {
-      text: baseWrong,
-      isCorrect: false,
-      feedback: isThai
-        ? 'ระวัง! ประโยคนี้มีจุดที่ผิดหลักไวยากรณ์'
-        : isJa
-        ? '注意！この文には文法の誤りがあります。'
-        : 'Terkecoh! Kalimat ini masih mengandung kesalahan tata bahasa.',
+    contextMode: 'standard_clarity',
+    topicTitle: cleanTitle,
+    patternFormula: cleanFormula,
+    coachExplanation: cleanExplanation,
+    quiz: {
+      prompt: action?.drillMeaningPrompt || `Manakah kalimat yang BENAR untuk "${cleanTitle}"?`,
+      options: [
+        { id: 'opt_1', text: targetSent, isCorrect: true, feedback: 'Tepat sekali! Susunan kalimat ini sudah benar dan alami.' },
+        { id: 'opt_2', text: trapSent, isCorrect: false, feedback: action?.trapWrongReason || 'Terkecoh! Pilihan ini memiliki susunan kata yang kurang tepat.' },
+      ],
+      cloze: {
+        prefix: words.slice(0, Math.max(1, Math.floor(words.length / 2))).join(' '),
+        blankWord: words[Math.max(1, Math.floor(words.length / 2))] || 'practice',
+        suffix: words.slice(Math.max(1, Math.floor(words.length / 2)) + 1).join(' '),
+        chips: [words[Math.max(1, Math.floor(words.length / 2))] || 'practice', 'practicing', 'practiced'],
+        feedback: 'Mantap! Kata yang kamu pilih tepat melengkapi kalimat.',
+      },
+      blocks: {
+        correctOrder: words,
+        pool: blockPool.sort(() => Math.random() - 0.5),
+        meaningId: 'Susun kata-kata berikut agar membentuk kalimat yang padu.',
+        feedback: 'Susunan kalimat selesai dengan rapi!',
+      },
     },
   };
 }
 
 /**
- * Intelligent Pedagogical Deriver:
- * Merangkum 1 baris rumus inti, papan sorot 2 kalimat (Salah vs Benar),
- * dan kuis uji pemahaman tanpa embel-embel paragraf panjang di layar.
+ * KOMPONEN UTAMA KANVAS ADAPTIF KAWAN BICARA
+ * Desain Minimalis, Elegan, Anti-AI-Slop, Palet Pastel Lembut FIEZEL.
  */
-export function derivePedagogicalBoard(
-  action: VoiceUiAction | undefined,
-  rawQuery: string,
-  targetLang: TargetLang,
-  locale: LearnerLocale
-): DynamicBoardState {
-  const query = (action?.topicTitle || rawQuery || '').trim();
-  const lowerQ = query.toLowerCase();
-  const isThai = locale === 'th';
-  const isJa = locale === 'ja';
-  const isEn = locale === 'en';
-
-  // JIKA ACTION MEMILIKI DATA DARI FIEZEL (PRIORITAS MUTLAK)
-  const cleanTitle = (action?.topicTitle || query || (isThai ? 'ไวยากรณ์' : isJa ? '文法' : 'Tata Bahasa'))
-    .replace(/[—–]/g, ' ')
-    .replace(/verb-ing/gi, 'Verb ing')
-    .trim();
-  const cleanFormula = (
-    action?.patternFormula ||
-    (/borrow|lend/i.test(cleanTitle)
-      ? (isThai
-          ? 'Borrow from (ยืมจาก) vs Lend to (ให้ยืมแก่)'
-          : isJa
-          ? 'Borrow from (〜から借りる) vs Lend to (〜に貸す)'
-          : 'Borrow from (meminjam dari) vs Lend to (meminjamkan ke)')
-      : /hard/i.test(cleanTitle)
-      ? (isThai
-          ? 'Work hard (ทำงานหนัก/ขยัน) vs Hardly work (แทบไม่ทำ)'
-          : isJa
-          ? 'Work hard (熱心に働く) vs Hardly work (ほとんど働かない)'
-          : 'Work hard (giat/keras) vs Hardly work (hampir tidak)')
-      : /verb.*ing/i.test(cleanTitle)
-      ? 'Subject + [is/am/are] + Verb ing'
-      : (isThai ? `โครงสร้าง: ${cleanTitle}` : isJa ? `文法形式: ${cleanTitle}` : `Pola: ${cleanTitle}`))
-  )
-    .replace(/[—–]/g, ' ')
-    .replace(/verb-ing/gi, 'Verb ing')
-    .trim();
-
-  const cleanExplanation = (
-    action?.coachSpokenScript ||
-    action?.explanationText ||
-    (/borrow|lend/i.test(cleanTitle)
-      ? (isThai
-          ? 'Borrow หมายถึงขอยืม (รับมา) ส่วน Lend หมายถึงให้ยืม (มอบให้ผู้อื่น)'
-          : isJa
-          ? 'Borrowは「借りる（受け取る）」、Lendは「貸す（相手に渡す）」という意味です。'
-          : 'Borrow artinya meminjam (menerima), sedangkan lend artinya meminjamkan (memberi ke orang lain).')
-      : /hard/i.test(cleanTitle)
-      ? (isThai
-          ? 'คำว่า hard แปลว่าขยันหรือเต็มที่ ส่วน hardly แปลว่าแทบจะไม่เลย'
-          : isJa
-          ? 'hardは「一生懸命に」、hardlyは「ほとんど〜ない」という意味になります。'
-          : 'Kata "hard" berarti giat atau keras, sedangkan "hardly" berarti hampir tidak sama sekali.')
-      : /verb.*ing/i.test(cleanTitle)
-      ? (isThai
-          ? 'ใช้ to be ตามด้วย Verb ing สำหรับการกระทำที่กำลังดำเนินอยู่ในขณะนี้'
-          : isJa
-          ? '今まさに行われている動作を表すには「be動詞 ＋ Verb ing」を使います。'
-          : 'Gunakan to be ditambah verb ing untuk kegiatan yang sedang berlangsung sekarang.')
-      : (isThai
-          ? 'สังเกตความแตกต่างของสองคำนี้ เพื่อให้ประโยคดูเป็นธรรมชาติ'
-          : isJa
-          ? '自然な表現になるよう、単語の使い分けに注意しましょう。'
-          : 'Perhatikan perbedaan kedua kata ini agar kalimatmu terdengar alami.'))
-  )
-    .replace(/[—–]/g, ' ')
-    .replace(/verb-ing/gi, 'Verb ing')
-    .trim();
-
-  let rightSent = (action?.sampleTarget || action?.drillTargetSentence || '').trim();
-  let wrongSent = (action?.trapWrongSentence || '').trim();
-
-  if (!rightSent || rightSent.includes('Bentuk alami')) {
-    if (targetLang === 'zh') {
-      if (/听|看|一下/i.test(lowerQ)) {
-        rightSent = '我想听听看。';
-        wrongSent = '我想听一下吧。';
-      } else if (/的/i.test(lowerQ)) {
-        rightSent = '这是我的书。';
-        wrongSent = '这是我书。';
-      } else {
-        rightSent = '我想听听看。';
-        wrongSent = '我想听一下吧。';
-      }
-    } else if (targetLang === 'ja') {
-      if (/で|に|図書館/i.test(lowerQ)) {
-        rightSent = '図書館で勉強します。';
-        wrongSent = '図書館に勉強します。';
-      } else if (/たら/i.test(lowerQ)) {
-        rightSent = '勉強したら分かります。';
-        wrongSent = '勉強するたら分かります。';
-      } else {
-        rightSent = '図書館で勉強します。';
-        wrongSent = '図書館に勉強します。';
-      }
-    } else {
-      if (/borrow|lend/i.test(lowerQ)) {
-        rightSent = 'Can I borrow your pen?';
-        wrongSent = 'Can I lend your pen?';
-      } else if (/hard/i.test(lowerQ)) {
-        rightSent = 'I study hard every day for the exam.';
-        wrongSent = 'I study hardly every day for the exam.';
-      } else if (/verb.*ing|sedang/i.test(lowerQ)) {
-        rightSent = 'I am studying English right now.';
-        wrongSent = 'I am study English right now.';
-      } else if (/since|for/i.test(lowerQ)) {
-        rightSent = 'I have lived here since 2020.';
-        wrongSent = 'I have lived here for 2020.';
-      } else {
-        rightSent = 'I study hard every day for the exam.';
-        wrongSent = 'I study hardly every day for the exam.';
-      }
-    }
-  }
-
-  if (!wrongSent || wrongSent === rightSent || wrongSent.includes('Bentuk kaku')) {
-    if (targetLang === 'zh') {
-      wrongSent = rightSent.includes('听听看')
-        ? '我想听一下吧。'
-        : rightSent.includes('的')
-          ? rightSent.replace(/的/g, '')
-          : '我想听一下吧。';
-    } else if (targetLang === 'ja') {
-      wrongSent = rightSent.includes('で')
-        ? rightSent.replace(/で/, 'に')
-        : rightSent.includes('たら')
-          ? rightSent.replace(/したら/, 'するたら')
-          : '図書館に勉強します。';
-    } else {
-      if (/\bborrow\b/i.test(rightSent)) {
-        wrongSent = rightSent.replace(/\bborrow\b/i, 'lend');
-      } else if (/\bhard\b/i.test(rightSent)) {
-        wrongSent = rightSent.replace(/\bhard\b/i, 'hardly');
-      } else if (/\b(am|is|are)\s+(\w+ing)\b/i.test(rightSent)) {
-        wrongSent = rightSent.replace(/\b(am|is|are)\s+(\w+)ing\b/i, '$1 $2');
-      } else {
-        wrongSent = rightSent.replace(/\b(\w+)\b/, '$1 to');
-      }
-    }
-  }
-
-  const quiz = buildComprehensionChallengeQuiz(
-    cleanTitle,
-    rightSent,
-    wrongSent,
-    locale,
-    lowerQ,
-    action
-  );
-
-  return {
-    topicTitle: cleanTitle,
-    patternFormula: cleanFormula,
-    coachExplanation: cleanExplanation,
-    wrongSentence: wrongSent,
-    rightSentence: rightSent,
-    wrongReason:
-      action?.trapWrongReason ||
-      (isThai
-        ? 'โครงสร้างนี้ยังไม่ถูกต้อง'
-        : isJa
-        ? 'この構造は文法的に誤りです。'
-        : 'Bentuk ini kurang tepat dalam kaidah tata bahasa.'),
-    quiz,
-  };
-}
-
 export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps> = ({
   isOpen,
   onClose,
@@ -609,81 +438,92 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   onSpeakPreview,
   onResumeConversation,
   onEvaluatePractice,
+  onRequestCustomTopic,
+  forcedExerciseMode,
+  externalQuizSeed,
 }) => {
   const [boardState, setBoardState] = useState<DynamicBoardState | null>(null);
-  const [selectedOption, setSelectedOption] = useState<'A' | 'B' | null>(null);
+  const [quizMode, setQuizMode] = useState<WorkbenchQuizMode>(forcedExerciseMode || 'multiple_choice');
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [clozeAnswer, setClozeAnswer] = useState<string | null>(null);
+  const [placedBlocks, setPlacedBlocks] = useState<string[]>([]);
   const [isQuizCompleted, setIsQuizCompleted] = useState<boolean>(false);
   const [isReady, setIsReady] = useState<boolean>(false);
+  const [quizSeed, setQuizSeed] = useState<number>(externalQuizSeed ?? 0);
 
-  const onSpeakPreviewRef = React.useRef(onSpeakPreview);
+  useEffect(() => {
+    if (externalQuizSeed !== undefined && externalQuizSeed !== quizSeed) {
+      setQuizSeed(externalQuizSeed);
+      setSelectedOptionId(null);
+      setClozeAnswer(null);
+      setPlacedBlocks([]);
+      setIsQuizCompleted(false);
+    }
+  }, [externalQuizSeed]);
+
+  useEffect(() => {
+    if (forcedExerciseMode && forcedExerciseMode !== quizMode) {
+      setQuizMode(forcedExerciseMode);
+      setSelectedOptionId(null);
+      setClozeAnswer(null);
+      setPlacedBlocks([]);
+      setIsQuizCompleted(false);
+    }
+  }, [forcedExerciseMode]);
+
+  const onSpeakPreviewRef = useRef(onSpeakPreview);
   onSpeakPreviewRef.current = onSpeakPreview;
-  const lastSpokenKeyRef = React.useRef<string>('');
+  const lastSpokenKeyRef = useRef<string>('');
 
+  // Identifikasi kunci soal saat ini
+  const currentKey = `${uiAction?.bankTopicId || ''}::${uiAction?.topicTitle || topicTitle || ''}::${quizSeed}`;
+  const lastKeyRef = useRef<string>('');
+
+  // SIKLUS HIDUP STATE BERSIH (PEMBERANTAS MUTLAK GHOST ANSWER BUG)
   useEffect(() => {
     if (!isOpen) {
       setBoardState(null);
-      setSelectedOption(null);
+      setSelectedOptionId(null);
+      setClozeAnswer(null);
+      setPlacedBlocks([]);
       setIsQuizCompleted(false);
       setIsReady(false);
+      lastKeyRef.current = '';
       lastSpokenKeyRef.current = '';
       return;
     }
 
-    const hasRich = hasRichDynamicAction(uiAction);
+    // JIKA TOPIK BERGANTI SELAGI MODAL TERBUKA: BERSIHKAN JAWABAN LAMA SEKETIKA!
+    if (lastKeyRef.current && lastKeyRef.current !== currentKey) {
+      setSelectedOptionId(null);
+      setClozeAnswer(null);
+      setPlacedBlocks([]);
+      setIsQuizCompleted(false);
+    }
+    lastKeyRef.current = currentKey;
+
     const query = (uiAction?.topicTitle || topicTitle || '').trim();
+    const hasRich = hasRichDynamicAction(uiAction);
+
     if (hasRich) {
-      const board = derivePedagogicalBoard(uiAction, query, targetLang, locale);
-      setBoardState(board);
+      const derived = deriveContextualPedagogicalBoard(uiAction, query, targetLang, locale, quizSeed);
+      setBoardState(derived);
       setIsReady(true);
       return;
     }
 
-    // Sedang meracik data materi dinamis dari server:
-    // Jangan pernah memunculkan template statis selagi AI sedang menyusun jawaban spesifik murid!
     setIsReady(false);
-    const fallbackDelayMs = isGeneratingTopic ? 6500 : 2100;
+    const delayMs = isGeneratingTopic ? 5500 : 1800;
     const timer = setTimeout(() => {
-      const board = derivePedagogicalBoard(uiAction, query, targetLang, locale);
-      setBoardState(board);
+      const derived = deriveContextualPedagogicalBoard(uiAction, query, targetLang, locale, quizSeed);
+      setBoardState(derived);
       setIsReady(true);
-    }, fallbackDelayMs);
+    }, delayMs);
 
     return () => clearTimeout(timer);
-  }, [isOpen, topicTitle, uiAction, targetLang, locale, isGeneratingTopic]);
+  }, [isOpen, currentKey, topicTitle, uiAction, targetLang, locale, isGeneratingTopic, quizSeed]);
 
-  if (!isOpen) return null;
-
-  const handleSelectOption = (opt: 'A' | 'B') => {
-    if (!boardState) return;
-    setSelectedOption(opt);
-    const isCorrect =
-      opt === 'A' ? boardState.quiz.optionA.isCorrect : boardState.quiz.optionB.isCorrect;
-    const correctSent = boardState.quiz.optionA.isCorrect
-      ? boardState.quiz.optionA.text
-      : boardState.quiz.optionB.text;
-    if (isCorrect) {
-      playFiezelSfx('answer_correct');
-      setIsQuizCompleted(true);
-      if (onEvaluatePractice) {
-        onEvaluatePractice(
-          opt === 'A' ? boardState.quiz.optionA.text : boardState.quiz.optionB.text,
-          correctSent,
-          boardState.patternFormula,
-          { isQuizSuccess: true }
-        );
-      }
-    } else {
-      playFiezelSfx('answer_wrong');
-    }
-  };
-
-  const handleReplayVoice = () => {
-    if (boardState?.coachExplanation && onSpeakPreview) {
-      const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
-      onSpeakPreview(boardState.coachExplanation, locCode);
-    }
-  };
-
+  // Handler Suara Guru
   useEffect(() => {
     if (isReady && boardState?.coachExplanation && onSpeakPreviewRef.current) {
       const key = `${boardState.topicTitle}::${boardState.coachExplanation}`;
@@ -697,14 +537,93 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     }
   }, [isReady, boardState, isLiveConnected, locale]);
 
+  if (!isOpen) return null;
+
+  // Interaksi 1: Pilihan Ganda 3 Opsi
+  const handleSelectOption = (optId: string) => {
+    if (!boardState) return;
+    setSelectedOptionId(optId);
+    const opt = boardState.quiz.options.find((o) => o.id === optId);
+    if (opt?.isCorrect) {
+      playFiezelSfx('answer_correct');
+      setIsQuizCompleted(true);
+      if (onEvaluatePractice) {
+        onEvaluatePractice(opt.text, opt.text, boardState.patternFormula, { isQuizSuccess: true });
+      }
+    } else {
+      playFiezelSfx('answer_wrong');
+    }
+  };
+
+  // Interaksi 2: Isian Rumpang (Cloze)
+  const handleSelectClozeChip = (word: string) => {
+    if (!boardState || isQuizCompleted) return;
+    setClozeAnswer(word);
+    const isCorrect = word.toLowerCase().trim() === boardState.quiz.cloze.blankWord.toLowerCase().trim();
+    if (isCorrect) {
+      playFiezelSfx('answer_correct');
+      setIsQuizCompleted(true);
+      if (onEvaluatePractice) {
+        const full = `${boardState.quiz.cloze.prefix} ${word} ${boardState.quiz.cloze.suffix}`;
+        onEvaluatePractice(full, full, boardState.patternFormula, { isQuizSuccess: true });
+      }
+    } else {
+      playFiezelSfx('answer_wrong');
+    }
+  };
+
+  // Interaksi 3: Susun Balok Kata (Sentence Blocks)
+  const handleAddBlock = (word: string) => {
+    if (isQuizCompleted) return;
+    playFiezelSfx('tap');
+    const nextBlocks = [...placedBlocks, word];
+    setPlacedBlocks(nextBlocks);
+
+    if (nextBlocks.length === boardState?.quiz.blocks.correctOrder.length) {
+      const joinedPlaced = nextBlocks.join(' ').toLowerCase();
+      const joinedTarget = boardState.quiz.blocks.correctOrder.join(' ').toLowerCase();
+      if (joinedPlaced === joinedTarget) {
+        playFiezelSfx('answer_correct');
+        setIsQuizCompleted(true);
+        if (onEvaluatePractice) {
+          onEvaluatePractice(joinedPlaced, joinedTarget, boardState.patternFormula, { isQuizSuccess: true });
+        }
+      } else {
+        playFiezelSfx('answer_wrong');
+      }
+    }
+  };
+
+  const handleRemoveBlock = (index: number) => {
+    if (isQuizCompleted) return;
+    playFiezelSfx('tap');
+    setPlacedBlocks(placedBlocks.filter((_, i) => i !== index));
+  };
+
+  // Handler Ganti Soal Bersih (Clean State Regeneration)
+  const handleReRollQuestion = () => {
+    playFiezelSfx('tap');
+    setSelectedOptionId(null);
+    setClozeAnswer(null);
+    setPlacedBlocks([]);
+    setIsQuizCompleted(false);
+    setQuizSeed((prev) => prev + 1);
+
+    if (onRequestCustomTopic) {
+      onRequestCustomTopic(`Soal latihan baru tentang ${topicTitle}`, 'custom_dynamic');
+    }
+  };
+
+  const handleReplayVoice = () => {
+    if (boardState?.coachExplanation && onSpeakPreview) {
+      const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
+      onSpeakPreview(boardState.coachExplanation, locCode);
+    }
+  };
+
   const handleResumeTalk = () => {
-    const correctSent = boardState
-      ? boardState.quiz.optionA.isCorrect
-        ? boardState.quiz.optionA.text
-        : boardState.quiz.optionB.text
-      : undefined;
     if (onResumeConversation) {
-      onResumeConversation(isQuizCompleted ? correctSent : undefined, boardState?.topicTitle || topicTitle);
+      onResumeConversation(undefined, boardState?.topicTitle || topicTitle);
     } else {
       onClose();
     }
@@ -712,290 +631,337 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1C1611]/70 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1C1611]/60 backdrop-blur-sm animate-in fade-in duration-200"
       data-testid="in-call-learning-workbench"
     >
-      <div className="w-full max-w-md rounded-[24px] bg-[#FAF4E8] border-2 border-[#D8CBB5] shadow-2xl overflow-hidden flex flex-col">
-        {/* HEADER MINIMALIS: JUDUL & TOMBOL TUTUP */}
-        <div className="px-4 py-3 bg-[#FFFDF8] border-b border-[#E5DAC6] flex items-center justify-between gap-2">
+      <div className="w-full max-w-md rounded-[28px] bg-[#FDFAF4] border border-[#EADBCE] shadow-[0_20px_50px_rgba(28,22,17,0.18)] overflow-hidden flex flex-col max-h-[90vh]">
+        {/* HEADER MINIMALIS PASTEL FIEZEL */}
+        <div className="px-5 py-3.5 bg-[#FBF8F1] border-b border-[#F0E6D9] flex items-center justify-between gap-2 shrink-0">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-full bg-[#10B981]/15 text-[#065F46] text-[10px] font-black tracking-wide uppercase">
-                Papan Belajar
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#FDE8E4] text-[#B85D43] text-[10px] font-bold tracking-wide uppercase w-fit">
+                ✦ Papan Belajar
               </span>
-              <h3
-                className="text-xs sm:text-sm font-black text-[#1C1611] truncate"
-                data-testid="workbench-topic-title"
-              >
+              <h3 className="text-xs sm:text-sm font-extrabold text-[#231A12] leading-tight line-clamp-1" data-testid="workbench-topic-title">
                 {boardState?.topicTitle || topicTitle || 'Papan Belajar'}
               </h3>
             </div>
-            {isReady && boardState?.patternFormula && (
-              <p
-                className="text-[11px] font-bold text-[#854D0E] bg-[#FEF3C7] border border-[#F59E0B]/30 rounded-md px-2 py-0.5 mt-1 truncate"
-                data-testid="workbench-formula-pill"
-              >
-                {boardState.patternFormula}
-              </p>
-            )}
           </div>
           <button
             type="button"
             onClick={onClose}
             data-testid="workbench-close-btn"
-            className="px-2.5 py-1 rounded-full bg-[#EFE6D5] hover:bg-[#E2D5BE] text-[#4A3E30] font-black text-xs flex items-center gap-1 cursor-pointer shrink-0 transition-colors"
+            className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-xs flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
             title="Tutup & Lanjut Ngobrol"
           >
-            <span>Tutup</span>
-            <span>✕</span>
+            ✕
           </button>
         </div>
 
-        {/* JIKA SEDANG MERACIK: ANIMASI BUFFERING FIEZEL (ZERO CLUTTER) */}
+        {/* JIKA SEDANG MERACIK MATERI: ANIMASI ORGANIK MINIMALIS */}
         {!isReady && (
-          <div
-            data-testid="workbench-buffering-state"
-            className="p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[260px]"
-          >
+          <div data-testid="workbench-buffering-state" className="p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[280px]">
             <div className="relative w-16 h-16 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full bg-[#10B981]/20 animate-ping" />
-              <div className="relative w-14 h-14 rounded-2xl bg-[#ECFDF5] border-2 border-[#A7F3D0] flex items-center justify-center shadow-md animate-pulse">
-                <span className="text-2xl select-none">🌱</span>
+              <div className="absolute inset-0 rounded-full bg-[#FDE8E4] animate-ping opacity-75" />
+              <div className="relative w-14 h-14 rounded-2xl bg-[#FFF9F5] border border-[#F5D5CE] flex items-center justify-center shadow-xs">
+                <span className="text-2xl select-none">✨</span>
               </div>
             </div>
-
-            <div className="space-y-1.5">
-              <h3 className="text-base font-black text-[#1C1611] tracking-tight">
-                {locale === 'th'
-                  ? 'Fiezel กำลังเตรียมบทเรียน...'
-                  : locale === 'ja'
-                  ? 'Fiezelが教材を準備しています...'
-                  : 'Fiezel sedang meracik materi...'}
+            <div className="space-y-1">
+              <h3 className="text-sm font-extrabold text-[#231A12] tracking-tight">
+                {locale === 'th' ? 'Fiezel กำลังเตรียมบทเรียน...' : locale === 'ja' ? 'Fiezelが教材を準備中...' : 'Menyiapkan papan belajar...'}
               </h3>
-              <p className="text-xs font-semibold text-[#5C4E3C] max-w-[240px] leading-relaxed">
-                {locale === 'th'
-                  ? 'กำลังสรุปสูตรและกระดานเน้นประโยคให้คุณ'
-                  : locale === 'ja'
-                  ? '要点公式と例文ボードを作成中'
-                  : 'Menyiapkan rumus dan papan sorot untukmu'}
+              <p className="text-xs text-[#8C7760] max-w-[220px] leading-relaxed">
+                Meracik penjelasan visual dan latihan khusus untukmu
               </p>
-            </div>
-
-            <div className="flex items-center gap-1.5 pt-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-bounce [animation-delay:-0.3s]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-bounce [animation-delay:-0.15s]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-bounce" />
             </div>
           </div>
         )}
 
-        {/* JIKA SIAP: 3 ELEMEN MINIMALIS MURNI */}
+        {/* JIKA MATERI SIAP: KANVAS ADAPTIF & LATIHAN MULTI-MODE */}
         {isReady && boardState && (
-          <div className="p-3.5 sm:p-4 space-y-3.5 overflow-y-auto max-h-[80vh]">
-            {/* ELEMEN 1: PAPAN SOROT KALIMAT (SALAH VS BENAR) */}
-            <div
-              className="rounded-2xl bg-[#FFFDF8] border-2 border-[#E2D5C1] p-3.5 sm:p-4 shadow-xs space-y-3"
-              data-testid="whiteboard-spotlight-card"
-            >
-              <div className="space-y-2">
-                {/* Baris 1: SALAH */}
-                <div
-                  className="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA]"
-                  data-testid="wb-row-wrong"
-                >
-                  <span className="px-2 py-0.5 rounded-md bg-[#EF4444] text-white text-[10px] font-black shrink-0 tracking-wide">
-                    ✕ SALAH
-                  </span>
-                  <p className="text-xs sm:text-sm font-bold text-[#991B1B] line-through leading-snug">
-                    {boardState.wrongSentence}
-                  </p>
+          <div className="p-4 sm:p-5 space-y-4 overflow-y-auto">
+            {/* -------------------------------------------------------------
+                KANVAS 1: DUAL-STREAM CONTRAST (UNTUK CONFUSING PAIR)
+            ------------------------------------------------------------- */}
+            {boardState.contextMode === 'confusing_pair' && boardState.pairData && (
+              <div className="space-y-2.5">
+                <div className="grid grid-cols-2 gap-2.5">
+                  {/* Sisi A */}
+                  <div className="p-3 rounded-2xl bg-[#FFF9F2] border border-[#F0E4D3] space-y-1">
+                    <span className="text-xs font-black text-[#B45309] block">{boardState.pairData.termA}</span>
+                    <p className="text-[11px] font-medium text-[#5C4A38] leading-tight">{boardState.pairData.descA}</p>
+                  </div>
+                  {/* Sisi B */}
+                  <div className="p-3 rounded-2xl bg-[#F7F9F5] border border-[#E3EBDC] space-y-1">
+                    <span className="text-xs font-black text-[#2D7A4D] block">{boardState.pairData.termB}</span>
+                    <p className="text-[11px] font-medium text-[#5C4A38] leading-tight">{boardState.pairData.descB}</p>
+                  </div>
                 </div>
-
-                {/* Baris 2: BENAR */}
-                <div
-                  className="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0]"
-                  data-testid="wb-row-right"
-                >
-                  <span className="px-2 py-0.5 rounded-md bg-[#10B981] text-white text-[10px] font-black shrink-0 tracking-wide">
-                    ✓ BENAR
-                  </span>
-                  <p className="text-xs sm:text-sm font-bold text-[#065F46] leading-snug">
-                    {boardState.rightSentence}
-                  </p>
+                {/* Analogi Inti */}
+                <div className="px-3.5 py-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] text-[11.5px] font-semibold text-[#5C4A38] flex items-center gap-2">
+                  <span className="text-amber-600 font-bold">💡 Intinya:</span>
+                  <span>{boardState.pairData.keyAnalogy}</span>
                 </div>
               </div>
+            )}
 
-              {/* Baris 3: Penjelasan Inti Guru (Dalam Bahasa Interface Murid) */}
-              {boardState.coachExplanation && (
-                <div
-                  className="p-3 rounded-xl bg-[#FDF8EE] border border-[#E8DFC8] text-xs leading-relaxed text-[#4A3E30] font-medium"
-                  data-testid="wb-coach-explanation-box"
-                >
-                  <span className="font-bold text-[#8C2233] block mb-1">
-                    {locale === 'th'
-                      ? 'คำอธิบาย:'
-                      : locale === 'ja'
-                        ? '解説:'
-                        : locale === 'zh'
-                          ? '讲解说明:'
-                          : locale === 'vi'
-                            ? 'Giải thích:'
-                            : locale === 'ru'
-                              ? 'Объяснение:'
-                              : 'Penjelasan:'}
-                  </span>
-                  <p>{boardState.coachExplanation}</p>
+            {/* -------------------------------------------------------------
+                KANVAS 2: PITA KALIMAT SINTAKSIS (UNTUK GRAMMAR / FORMULA)
+            ------------------------------------------------------------- */}
+            {boardState.contextMode === 'syntax_ribbon' && boardState.ribbonSegments && (
+              <div className="space-y-2 p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE]">
+                <span className="text-[10px] font-bold text-[#8C7760] tracking-wider uppercase block">
+                  Pola Susunan Kalimat
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                  {boardState.ribbonSegments.map((seg, idx) => (
+                    <React.Fragment key={idx}>
+                      <div className="px-2.5 py-1.5 rounded-xl border border-black/5 flex flex-col items-center" style={{ backgroundColor: seg.tagColor }}>
+                        <span className="text-[9px] font-bold text-black/60 uppercase">{seg.role}</span>
+                        <span className="text-xs font-black text-[#231A12]">{seg.word}</span>
+                      </div>
+                      {idx < boardState.ribbonSegments!.length - 1 && (
+                        <span className="text-[#8C7760] font-bold text-xs">→</span>
+                      )}
+                    </React.Fragment>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Baris 4: Suara Coach */}
-              <div className="flex items-center justify-between pt-1 text-xs">
-                <span className="font-bold text-[#4A3E30] truncate">
-                  {persona.name}{' '}
-                  {locale === 'th'
-                    ? 'กำลังอธิบาย'
-                    : locale === 'ja'
-                      ? 'が説明中'
-                      : locale === 'zh'
-                        ? '正在讲解'
-                        : locale === 'vi'
-                          ? 'đang giải thích'
-                          : locale === 'ru'
-                            ? 'объясняет'
-                            : 'sedang menjelaskan'}
+            {/* PENJELASAN SINGKAT GURU DENGAN TOMBOL AUDIO */}
+            <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
+              <p className="text-xs text-[#3D2E20] leading-relaxed font-medium">
+                {boardState.coachExplanation}
+              </p>
+              <div className="flex items-center justify-between pt-1 border-t border-[#F0E6D9]">
+                <span className="text-[11px] font-semibold text-[#8C7760]">
+                  {persona.name} {persona.voiceName ? `(${persona.voiceName})` : ''}
                 </span>
                 <button
                   type="button"
                   onClick={handleReplayVoice}
                   data-testid="wb-replay-voice-btn"
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#EAE2D2] hover:bg-[#DDD3C0] text-[#3D3225] text-[11px] font-bold cursor-pointer transition-colors active:scale-95"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer transition-colors active:scale-95"
                 >
                   <span>🔊</span>
-                  <span>
-                    {locale === 'th'
-                      ? 'ฟังซ้ำ'
-                      : locale === 'ja'
-                        ? '音声再生'
-                        : locale === 'zh'
-                          ? '重播语音'
-                          : locale === 'vi'
-                            ? 'Nghe lại'
-                            : locale === 'ru'
-                              ? 'Повторить'
-                              : 'Ulangi Suara'}
-                  </span>
+                  <span>Dengarkan</span>
                 </button>
               </div>
             </div>
 
-            {/* ELEMEN 2: KUIS TES KEPAHAMAN (2 OPSI CEPAT) */}
-            <div className="rounded-2xl bg-[#FFFDF8] border-2 border-[#E2D5C1] p-3.5 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="px-2 py-0.5 rounded-full bg-[#3B82F6]/15 text-[#1D4ED8] text-[9px] font-black uppercase tracking-wider">
-                    Uji Pemahaman
-                  </span>
-                  <span className="text-xs font-black text-[#1C1611]" data-testid="wb-quiz-prompt">
-                    {boardState.quiz.prompt}
-                  </span>
+            {/* -------------------------------------------------------------
+                AREA LATIHAN INTERAKTIF MULTI-MODE (ANTI-SPOILING)
+            ------------------------------------------------------------- */}
+            <div className="p-4 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-3">
+              {/* Top Bar Kuis & Switcher Mode */}
+              <div className="flex items-center justify-between gap-2 border-b border-[#F0E6D9] pb-2.5">
+                <div className="flex items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => { playFiezelSfx('tap'); setQuizMode('multiple_choice'); }}
+                    data-testid="mode-tab-multiple_choice"
+                    className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all ${
+                      quizMode === 'multiple_choice' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
+                    }`}
+                  >
+                    Pilihan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { playFiezelSfx('tap'); setQuizMode('cloze_gap'); }}
+                    data-testid="mode-tab-cloze_gap"
+                    className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all ${
+                      quizMode === 'cloze_gap' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
+                    }`}
+                  >
+                    Isian Kata
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { playFiezelSfx('tap'); setQuizMode('sentence_blocks'); }}
+                    data-testid="mode-tab-sentence_blocks"
+                    className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all ${
+                      quizMode === 'sentence_blocks' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
+                    }`}
+                  >
+                    Susun Balok
+                  </button>
                 </div>
-                {isQuizCompleted && (
-                  <span className="text-[11px] font-black text-[#065F46] bg-[#D1FAE5] px-2 py-0.5 rounded-full shrink-0">
-                    ✓ Benar
-                  </span>
-                )}
-              </div>
 
-              <div className="grid grid-cols-1 gap-2 pt-1">
-                {/* Opsi A */}
+                {/* Tombol Ganti Soal Bersih */}
                 <button
                   type="button"
-                  data-testid="quiz-option-a"
-                  onClick={() => handleSelectOption('A')}
-                  className={`w-full p-3 rounded-xl border-2 text-left text-xs font-bold cursor-pointer transition-all ${
-                    selectedOption === 'A'
-                      ? boardState.quiz.optionA.isCorrect
-                        ? 'bg-[#D1FAE5] border-[#10B981] text-[#065F46]'
-                        : 'bg-[#FEE2E2] border-[#EF4444] text-[#991B1B]'
-                      : 'bg-[#FAF4E8] border-[#E5DAC6] text-[#29221B] hover:border-[#D8CBB5]'
-                  }`}
+                  onClick={handleReRollQuestion}
+                  data-testid="wb-reroll-btn"
+                  className="px-2.5 py-1 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-bold inline-flex items-center gap-1 cursor-pointer transition-transform active:scale-95"
+                  title="Ganti Soal Baru Tanpa Terjawab Duluan"
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="leading-snug">{boardState.quiz.optionA.text}</span>
-                    {selectedOption === 'A' && (
-                      <span className="shrink-0">{boardState.quiz.optionA.isCorrect ? '✓' : '✕'}</span>
-                    )}
-                  </div>
-                  {selectedOption === 'A' && (
-                    <p className="text-[11px] mt-1.5 font-semibold opacity-95">
-                      {boardState.quiz.optionA.feedback}
-                    </p>
-                  )}
-                </button>
-
-                {/* Opsi B */}
-                <button
-                  type="button"
-                  data-testid="quiz-option-b"
-                  onClick={() => handleSelectOption('B')}
-                  className={`w-full p-3 rounded-xl border-2 text-left text-xs font-bold cursor-pointer transition-all ${
-                    selectedOption === 'B'
-                      ? boardState.quiz.optionB.isCorrect
-                        ? 'bg-[#D1FAE5] border-[#10B981] text-[#065F46]'
-                        : 'bg-[#FEE2E2] border-[#EF4444] text-[#991B1B]'
-                      : 'bg-[#FAF4E8] border-[#E5DAC6] text-[#29221B] hover:border-[#D8CBB5]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="leading-snug">{boardState.quiz.optionB.text}</span>
-                    {selectedOption === 'B' && (
-                      <span className="shrink-0">{boardState.quiz.optionB.isCorrect ? '✓' : '✕'}</span>
-                    )}
-                  </div>
-                  {selectedOption === 'B' && (
-                    <p className="text-[11px] mt-1.5 font-semibold opacity-95">
-                      {boardState.quiz.optionB.feedback}
-                    </p>
-                  )}
+                  <span>↻</span>
+                  <span>Ganti Soal</span>
                 </button>
               </div>
+
+              {/* MODE 1: PILIHAN GANDA (3 OPSI TRANSFER) */}
+              {quizMode === 'multiple_choice' && (
+                <div className="space-y-2 pt-1">
+                  <p className="text-xs font-bold text-[#231A12]">{boardState.quiz.prompt}</p>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    {boardState.quiz.options.map((opt) => {
+                      const isSelected = selectedOptionId === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => handleSelectOption(opt.id)}
+                          data-testid={`quiz-option-${opt.id}`}
+                          className={`w-full p-2.5 rounded-xl border text-left text-xs font-semibold cursor-pointer transition-all active:scale-98 ${
+                            isSelected
+                              ? opt.isCorrect
+                                ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
+                                : 'bg-[#FDE8E4] border-[#F87171] text-[#991B1B]'
+                              : 'bg-[#FDFAF4] border-[#EADBCE] text-[#3D2E20] hover:border-[#D8CBB5]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span>{opt.text}</span>
+                            {isSelected && <span>{opt.isCorrect ? '✓' : '✕'}</span>}
+                          </div>
+                          {isSelected && (
+                            <p className="text-[10.5px] mt-1 font-medium opacity-90">{opt.feedback}</p>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* MODE 2: ISIAN RUMPANG (CLOZE GAP) */}
+              {quizMode === 'cloze_gap' && (
+                <div className="space-y-2.5 pt-1">
+                  <p className="text-xs font-bold text-[#231A12]">Ketuk kata yang tepat untuk melengkapi kalimat:</p>
+                  <div className="p-3 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] text-xs font-medium text-[#231A12] leading-relaxed">
+                    {boardState.quiz.cloze.prefix}{' '}
+                    <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#FFFFFF] border-2 border-dashed border-[#B45309] font-bold text-[#B45309] min-w-[50px] text-center">
+                      {clozeAnswer || '______'}
+                    </span>{' '}
+                    {boardState.quiz.cloze.suffix}
+                  </div>
+                  {/* Pilihan Kata Chip */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    {boardState.quiz.cloze.chips.map((chip, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSelectClozeChip(chip)}
+                        data-testid={`cloze-chip-${idx}`}
+                        className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+                          clozeAnswer === chip
+                            ? chip.toLowerCase() === boardState.quiz.cloze.blankWord.toLowerCase()
+                              ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
+                              : 'bg-[#FDE8E4] border-[#F87171] text-[#991B1B]'
+                            : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#D8CBB5]'
+                        }`}
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                  {clozeAnswer && (
+                    <p className={`text-[11px] font-semibold ${
+                      clozeAnswer.toLowerCase() === boardState.quiz.cloze.blankWord.toLowerCase()
+                        ? 'text-[#1B5E34]'
+                        : 'text-[#991B1B]'
+                    }`}>
+                      {clozeAnswer.toLowerCase() === boardState.quiz.cloze.blankWord.toLowerCase()
+                        ? boardState.quiz.cloze.feedback
+                        : 'Kata tersebut belum pas. Coba kata yang lain!'}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* MODE 3: SUSUN BALOK KATA (SENTENCE BLOCKS) */}
+              {quizMode === 'sentence_blocks' && (
+                <div className="space-y-2.5 pt-1">
+                  <p className="text-xs font-bold text-[#231A12]">{boardState.quiz.blocks.meaningId}</p>
+                  {/* Slot Kalimat yang Sedang Disusun */}
+                  <div className="min-h-[44px] p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-wrap gap-1.5 items-center">
+                    {placedBlocks.length === 0 ? (
+                      <span className="text-[11px] text-[#8C7760] italic">Ketuk balok di bawah untuk menyusun kalimat...</span>
+                    ) : (
+                      placedBlocks.map((blk, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleRemoveBlock(idx)}
+                          className="px-2.5 py-1 rounded-lg bg-[#FFFFFF] border border-[#D8CBB5] text-xs font-bold text-[#231A12] shadow-2xs hover:bg-[#FEE2E2] cursor-pointer"
+                        >
+                          {blk} ✕
+                        </button>
+                      ))
+                    )}
+                  </div>
+                  {/* Pool Balok Kata Tersedia */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    {boardState.quiz.blocks.pool.map((blk, idx) => {
+                      const countInPool = boardState.quiz.blocks.pool.filter(w => w === blk).length;
+                      const countPlaced = placedBlocks.filter(w => w === blk).length;
+                      const isExhausted = countPlaced >= countInPool;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          disabled={isExhausted}
+                          onClick={() => handleAddBlock(blk)}
+                          data-testid={`available-block-${idx}`}
+                          className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                            isExhausted
+                              ? 'opacity-35 bg-[#EADBCE] border-transparent text-[#8C7760] cursor-not-allowed'
+                              : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#B45309] active:scale-95'
+                          }`}
+                        >
+                          {blk}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {isQuizCompleted && (
+                    <p className="text-[11px] font-bold text-[#1B5E34]">
+                      ✓ {boardState.quiz.blocks.feedback}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* ELEMEN 3: INDIKATOR MIKROFON & TOMBOL AKSI */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F0E5D3] border border-[#DFCDB3] text-[11px] text-[#423628]">
-              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping shrink-0"></span>
+            {/* STATUS SUARA MIKROFON & TOMBOL SELESAI */}
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FBF8F1] border border-[#F0E6D9] text-[11px] text-[#5C4A38]">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping shrink-0" />
               <span className="font-semibold truncate">
-                {locale === 'th'
-                  ? `${persona.name} กำลังฟังคุณอยู่... (พูดคุยได้ทันที)`
-                  : locale === 'ja'
-                  ? `${persona.name}が聞いています…（話しかけてください）`
-                  : `${persona.name} sedang mendengarkan... (Kamu bisa langsung bicara)`}
+                {persona.name} sedang mendengarkan (bisa bicara langsung via mic)
               </span>
             </div>
 
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2 pt-1 pb-1">
               <button
                 type="button"
                 onClick={handleResumeTalk}
                 data-testid="wb-talk-coach-btn"
-                className="flex-1 py-2.5 px-3 rounded-xl bg-[#1C1611] hover:bg-[#2F261E] text-white text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-98 transition-all"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-[#231A12] hover:bg-[#3D2E20] text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-98 transition-all"
               >
                 <span>🎙️</span>
-                <span>
-                  {locale === 'th'
-                    ? `คุยต่อกับ ${persona.name}`
-                    : locale === 'ja'
-                    ? `${persona.name}と会話を続ける`
-                    : `Lanjut Ngobrol dengan ${persona.name}`}
-                </span>
+                <span>Lanjut Bicara dengan {persona.name}</span>
               </button>
               <button
                 type="button"
                 onClick={onClose}
                 data-testid="wb-dismiss-footer-btn"
-                className="py-2.5 px-3 rounded-xl bg-[#EFE6D5] hover:bg-[#E2D5BE] text-[#4A3E30] text-xs font-bold cursor-pointer transition-colors"
+                className="py-2.5 px-3.5 rounded-xl bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] text-xs font-bold cursor-pointer transition-colors"
               >
-                {locale === 'th' ? 'ปิด ✕' : locale === 'ja' ? '閉じる ✕' : 'Tutup ✕'}
+                Tutup ✕
               </button>
             </div>
           </div>
