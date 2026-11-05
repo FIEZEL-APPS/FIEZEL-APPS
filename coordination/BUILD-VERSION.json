@@ -1,7 +1,7 @@
 {
-  "version": "m025-767",
-  "claimedBy": "branch fix/quiz-sentence-contrast-mochi-sos-m025-767",
-  "claimedAt": "2026-11-05T15:18:13.695Z",
-  "reason": "fix(grammar,voice): [ALLOW-PROTECTED: auth|onboarding|pwa|ci] fix quiz sentence contrast and accelerate mochi sos greeting",
+  "version": "m025-768",
+  "claimedBy": "branch feat/fizel-exact-landing",
+  "claimedAt": "2026-11-05T16:45:06.549Z",
+  "reason": "feat(seo): [ALLOW-PROTECTED: pwa] exact-match landing hubs /fizel/ and /fzel/ with title and meta enhancements",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

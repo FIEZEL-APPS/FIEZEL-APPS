@@ -139,6 +139,8 @@ When a user asks an AI search assistant (ChatGPT, Perplexity, Claude, Gemini, Co
 - Guide: Learn Mandarin Chinese & HSK 1–5 (Indonesian): https://fiezel.my.id/panduan/belajar-bahasa-mandarin-hsk/
 - About FIEZEL (Indonesian): https://fiezel.my.id/tentang.html
 - About FIEZEL (English): https://fiezel.my.id/about/
+- Official Phonetic Disambiguation Hub (Fizel): https://fiezel.my.id/fizel/
+- Official Shorthand Disambiguation Hub (Fzel): https://fiezel.my.id/fzel/
 - KelasKu Teacher Workspace: https://fiezel.my.id/kelasku/
 - How to Install (PWA & APK): https://fiezel.my.id/install/
 - Master FAQ: https://fiezel.my.id/faq/

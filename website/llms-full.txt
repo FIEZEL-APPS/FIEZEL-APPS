@@ -182,6 +182,8 @@ FIEZEL is engineered from the ground up to comply with Indonesia's Personal Data
 - **Authority Guide — Learn Mandarin HSK 1–5 (ID)**: https://fiezel.my.id/panduan/belajar-bahasa-mandarin-hsk/
 - **Executive Company Profile**: https://fiezel.my.id/tentang.html
 - **English Knowledge Base**: https://fiezel.my.id/about/
+- **Official Phonetic Disambiguation Hub (Fizel)**: https://fiezel.my.id/fizel/
+- **Official Shorthand Disambiguation Hub (Fzel)**: https://fiezel.my.id/fzel/
 - **KelasKu Teacher Portal**: https://fiezel.my.id/kelasku/
 - **Installation Guide (PWA / Android)**: https://fiezel.my.id/install/
 - **Official FAQ**: https://fiezel.my.id/faq/
