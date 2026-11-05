@@ -18,7 +18,13 @@
     'settings.locale-toast': 'บันทึกภาษาที่แสดงแล้ว',
     // AUTONYM — byte-identik dengan copy-id-settings-locale.js, jangan diterjemahkan
     'settings.locale-opsi-id': 'Bahasa Indonesia',
+    'settings.locale-opsi-en': 'English',
     'settings.locale-opsi-th': 'ภาษาไทย',
-    'settings.locale-opsi-ja': '日本語'
+    'settings.locale-opsi-ja': '日本語',
+    'settings.locale-opsi-ms': 'Bahasa Melayu',
+    'settings.locale-opsi-vi': 'Tiếng Việt',
+    'settings.locale-opsi-fil': 'Filipino',
+    'settings.locale-opsi-km': 'ភាសាខ្មែរ',
+    'settings.locale-opsi-ru': 'Русский'
   });
 }());

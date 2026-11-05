@@ -229,8 +229,8 @@ test('KUNCI: pemilih bahasa tidak lagi membawa tombol masuk — masuk adalah lay
   assert.strictEqual(run.stepIndex(), onboarding.LANGUAGE_STEP, 'masih di pra-langkah bahasa');
   assert.ok(!/data-ob-google|Sudah punya akun/.test(run.element.innerHTML), 'pintu kedua ke hal yang sama tidak kembali');
   assert.strictEqual(G._calls.length, 0, 'perkenalan tidak menggambar tombol Google');
-  assert.deepStrictEqual(run.element.querySelectorAll('[data-ob-locale]').map(b => b.getAttribute('data-ob-locale')), ['id', 'th'],
-    'kedua pilihan bahasa tetap utuh');
+  assert.deepStrictEqual(run.element.querySelectorAll('[data-ob-locale]').map(b => b.getAttribute('data-ob-locale')), ['id', 'th', 'en', 'ja', 'ms', 'vi', 'fil', 'km', 'ru'],
+    'kesembilan pilihan bahasa tetap utuh');
 });
 
 test('KUNCI: langkah nama tidak lagi menanyakan peran atau kode KelasKu', () => {
@@ -280,7 +280,7 @@ test('popup pertama onboarding memilih Bahasa Indonesia atau Thai sebelum Step 1
   assert.ok(/Bahasa Indonesia/.test(run.element.innerHTML));
   assert.ok(/ภาษาไทย/.test(run.element.innerHTML));
   const choices = run.element.querySelectorAll('[data-ob-locale]');
-  assert.deepStrictEqual(choices.map(b => b.getAttribute('data-ob-locale')), ['id', 'th']);
+  assert.deepStrictEqual(choices.map(b => b.getAttribute('data-ob-locale')), ['id', 'th', 'en', 'ja', 'ms', 'vi', 'fil', 'km', 'ru']);
   choices[0].listeners.click[0]();
   assert.deepStrictEqual(selected, ['id']);
   assert.strictEqual(onboarding.storedLocale(env), 'id');

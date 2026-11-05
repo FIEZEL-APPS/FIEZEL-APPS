@@ -172,6 +172,39 @@
     + '<circle cx="18" cy="12" r="7.2" fill="#BC002D"/>'
     + '</svg>';
 
+  var FLAG_MS = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#FFFFFF"/>'
+    + '<path d="M0 0h36v2H0zm0 4h36v2H0zm0 4h36v2H0zm0 4h36v2H0zm0 4h36v2H0zm0 4h36v2H0z" fill="#CC0001"/>'
+    + '<rect width="18" height="14" fill="#010066"/>'
+    + '<circle cx="7.6" cy="7" r="4.2" fill="#FFCC00"/>'
+    + '<circle cx="8.8" cy="7" r="3.4" fill="#010066"/>'
+    + '<circle cx="12.2" cy="7" r="1.9" fill="#FFCC00"/>'
+    + '</svg>';
+
+  var FLAG_VI = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#DA251D"/>'
+    + '<polygon points="18,5 19.8,10.5 25.6,10.5 20.9,13.9 22.7,19.4 18,16 13.3,19.4 15.1,13.9 10.4,10.5 16.2,10.5" fill="#FFFF00"/>'
+    + '</svg>';
+
+  var FLAG_FIL = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="12" fill="#0038A8"/>'
+    + '<rect y="12" width="36" height="12" fill="#CE1126"/>'
+    + '<polygon points="0,0 16,12 0,24" fill="#FFFFFF"/>'
+    + '<circle cx="5.6" cy="12" r="2.2" fill="#FCD116"/>'
+    + '</svg>';
+
+  var FLAG_KM = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#032EA1"/>'
+    + '<rect y="6" width="36" height="12" fill="#E00025"/>'
+    + '<path d="M12 15h12v-2.5h-2V10.5h-2V8.8h-4v1.7h-2v2h-2z" fill="#FFFFFF"/>'
+    + '</svg>';
+
+  var FLAG_RU = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="8" fill="#FFFFFF"/>'
+    + '<rect y="8" width="36" height="8" fill="#0039A6"/>'
+    + '<rect y="16" width="36" height="8" fill="#D52B1E"/>'
+    + '</svg>';
+
   var FLAG_ZH = '<svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="36" height="24" aria-hidden="true" focusable="false">'
     + '<rect width="60" height="40" fill="#DE2910"/>'
     + '<path d="M10 6l2.35 7.23-6.15-4.47h7.6L7.65 13.23z" fill="#FFDE00"/>'
@@ -319,7 +352,7 @@
 
   function normalizeLocale(value) {
     var locale = String(value || '');
-    var supported = I18N && Array.isArray(I18N.SUPPORTED) ? I18N.SUPPORTED : ['id', 'th', 'ja'];
+    var supported = I18N && Array.isArray(I18N.SUPPORTED) ? I18N.SUPPORTED : ['id', 'th', 'en', 'vi', 'ms', 'fil', 'ja', 'km', 'ru'];
     return supported.indexOf(locale) >= 0 ? locale : '';
   }
 
@@ -807,19 +840,34 @@
         + '<span class="fiezel-language-copy"><b>' + title + '</b><small>' + subtitle + '</small></span>'
         + '</button>';
     }
+    var busyNotes = {
+      th: 'Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span>',
+      en: '<span lang="en">Preparing English…</span>',
+      ja: '<span lang="ja">日本語データを準備中…</span>',
+      ms: '<span lang="ms">Menyediakan Bahasa Melayu…</span>',
+      vi: '<span lang="vi">Đang chuẩn bị Tiếng Việt…</span>',
+      fil: '<span lang="fil">Inihahanda ang Filipino…</span>',
+      km: '<span lang="km">កំពុងរៀបចំភាសាខ្មែរ…</span>',
+      ru: '<span lang="ru">Подготовка русского языка…</span>'
+    };
     return reveal(env)
       + topbar(false, false)
       + '<div class="fiezel-sheet fiezel-language-sheet" data-ob-step="language">'
       + '<span class="fiezel-language-kicker">LANGUAGE · BAHASA · ภาษา · 言語</span>'
       + '<h2 class="fiezel-title">Choose your language</h2>'
-      + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span><br><span lang="ja">言語を選択して続行してください</span></p>'
+      + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span> · <span lang="ja">言語を選択してください</span></p>'
       + '<div class="fiezel-goal-grid fiezel-language-grid" role="group" aria-label="Language / Bahasa / ภาษา / 言語">'
       + choice('id', FLAG_ID, 'Bahasa Indonesia', 'Indonesia')
       + choice('th', FLAG_TH, 'ภาษาไทย', 'ไทย')
+      + choice('en', FLAG_EN, 'English', 'Global')
       + choice('ja', FLAG_JA, '日本語', '日本')
+      + choice('ms', FLAG_MS, 'Bahasa Melayu', 'Malaysia')
+      + choice('vi', FLAG_VI, 'Tiếng Việt', 'Việt Nam')
+      + choice('fil', FLAG_FIL, 'Filipino', 'Pilipinas')
+      + choice('km', FLAG_KM, 'ភាសាខ្មែរ', 'កម្ពុជា')
+      + choice('ru', FLAG_RU, 'Русский', 'Русский')
       + '</div>'
-      + (busy === 'th' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span></p>' : '')
-      + (busy === 'ja' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Jepang · <span lang="ja">日本語データを準備中…</span></p>' : '')
+      + (busy && busyNotes[busy] ? '<p class="fiezel-note" role="status">' + busyNotes[busy] + '</p>' : '')
       + '</div>';
   }
 
@@ -1704,11 +1752,9 @@
       try { opts.onLocale({ locale: locale, restored: false }); } catch (_) {}
       markLocaleSelected(target, locale);
 
-      // Bundle Indonesia sudah ada sejak boot. Copy Thai & Japanese sengaja dinamis; jangan munculkan
-      // Step 1 dengan fallback Indonesia sambil unduhannya berjalan. Menunggu SATU kunci
-      // onboarding cukup untuk membuktikan domain feat-b sudah siap. Tenggat tetap ada agar
-      // kegagalan jaringan tidak mengurung pengguna pada layar penuh.
-      if ((locale === 'th' || locale === 'ja') && I18N && typeof I18N.hasCopy === 'function'
+      // Bundle Indonesia sudah ada sejak boot. Seluruh locale non-Indonesia dimuat dinamis;
+      // jangan munculkan Step 1 dengan fallback Indonesia/Inggris sambil unduhannya berjalan.
+      if (locale !== 'id' && I18N && typeof I18N.hasCopy === 'function'
           && typeof I18N.whenAvailable === 'function'
           && !I18N.hasCopy(locale, 'onboarding.dialog-aria')) {
         localeBusy = locale;

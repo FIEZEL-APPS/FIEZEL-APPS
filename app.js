@@ -1285,7 +1285,7 @@ try{
 // idempoten; render ulang hanya bila layar pernah dicat (jangan mencat sebelum openApp).
 // Murid id: FiezelThData tidak pernah ada, listener ini praktis no-op yang murah.
 try{
-  self.FiezelI18n?.onChange?.(()=>{try{searchIndexCache=null;applyContentLocale()}catch(_){}});
+  self.FiezelI18n?.onChange?.(()=>{try{__fzRefreshI18nTables();searchIndexCache=null;applyContentLocale();if(typeof window!=='undefined'&&window.__fiezelLastRenderMs!==undefined)render()}catch(_){}});
   self.FiezelOnThDataReady=()=>{try{__fzRefreshI18nTables();/* v49-F1: copy-map th baru mendarat \u2014 tabel eager dibangun ulang */searchIndexCache=null;applyContentLocale();if(window.__fiezelLastRenderMs!==undefined)render()}catch(_){}};
 }catch(_){/* harness tanpa i18n */}
 // ============================== W4-MERGE: OVERLAY DATA LOCALE TH ==============================
@@ -20013,8 +20013,17 @@ function settingsFold(title,body,open,extraClass){return `<details class="home-f
    salah tetap bisa mengenali nama bahasanya sendiri di daftar. */
 function learnerLocaleRowMarkup(){
   const active=(self.FiezelI18n?.getLocale?.())||'id';
-  const options=[['id',FiezelI18n.t('settings.locale-opsi-id')],['th',FiezelI18n.t('settings.locale-opsi-th')],['ja',FiezelI18n.t('settings.locale-opsi-ja')||'日本語']]
-    .map(([value,label])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)}</option>`).join('');
+  const options=[
+    ['id',FiezelI18n.t('settings.locale-opsi-id')||'Bahasa Indonesia'],
+    ['en',FiezelI18n.t('settings.locale-opsi-en')||'English'],
+    ['th',FiezelI18n.t('settings.locale-opsi-th')||'ภาษาไทย'],
+    ['ja',FiezelI18n.t('settings.locale-opsi-ja')||'日本語'],
+    ['ms',FiezelI18n.t('settings.locale-opsi-ms')||'Bahasa Melayu'],
+    ['vi',FiezelI18n.t('settings.locale-opsi-vi')||'Tiếng Việt'],
+    ['fil',FiezelI18n.t('settings.locale-opsi-fil')||'Filipino'],
+    ['km',FiezelI18n.t('settings.locale-opsi-km')||'ភាសាខ្មែរ'],
+    ['ru',FiezelI18n.t('settings.locale-opsi-ru')||'Русский']
+  ].map(([value,label])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)}</option>`).join('');
   return `<label class="setting-row"><span class="setting-icon"><i data-lucide="languages"></i></span><span><b>${FiezelI18n.t('settings.locale-judul')}</b><small>${FiezelI18n.t('settings.locale-catatan')}</small></span><select id="settingLearnerLocale" aria-label="${FiezelI18n.t('settings.locale-judul')}">${options}</select></label>`;
 }
 /* m025-182 (W2-STATE): ganti bahasa DITERAPKAN saat itu juga (pola toggle settingReminders),
@@ -20025,14 +20034,20 @@ function learnerLocaleRowMarkup(){
    saat back) → closeModal + render() penuh → toast konfirmasi yang sudah berbahasa BARU.
    Nilai ini TIDAK PERNAH diteruskan ke opsi audio/voice (AI-17 F02, audio-locale-guard). */
 function setLearnerLocalePreference(next){
-  const supported=(self.FiezelI18n?.SUPPORTED)||['id','th','ja'];
+  const supported=(self.FiezelI18n?.SUPPORTED)||['id','th','en','vi','ms','fil','ja','km','ru'];
   const value=supported.includes(next)?next:'id';
   if((state.preferences?.learnerLocale||'id')===value)return true;
   state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();
   try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
   try{leaveAllStages()}catch(_){}
   closeModal();render();haptic('confirm');
-  showToast(FiezelI18n.t('settings.locale-toast'),'success');
+  if(value!=='id'&&self.FiezelI18n?.hasCopy&&self.FiezelI18n?.whenAvailable&&!self.FiezelI18n.hasCopy(value,'settings.locale-toast')){
+    self.FiezelI18n.whenAvailable(value,'settings.locale-toast').then(()=>{
+      try{showToast(FiezelI18n.t('settings.locale-toast'),'success')}catch(_){}
+    });
+  }else{
+    showToast(FiezelI18n.t('settings.locale-toast'),'success');
+  }
   return true;
 }
 window.setLearnerLocalePreference=setLearnerLocalePreference;

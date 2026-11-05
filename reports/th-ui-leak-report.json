@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-11-05T05:58:33.006Z",
+  "generatedAt": "2026-11-05T06:42:29.955Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -337,7 +337,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 815,
+          "line": 858,
           "text": "Pilih bahasa untuk melanjutkan"
         }
       ]

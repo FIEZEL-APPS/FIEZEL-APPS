@@ -41,6 +41,17 @@
     if (loadingPromise) return loadingPromise;
     var d = root.FiezelJaData;
 
+    if (root.FiezelI18n && typeof root.FiezelI18n.loadLocale === 'function') {
+      loadingPromise = Promise.resolve(root.FiezelI18n.loadLocale('ja')).then(function () {
+        d.ready = true;
+        fireReady();
+      }, function () {
+        d.ready = true;
+        fireReady();
+      });
+      return loadingPromise;
+    }
+
     var jobs = NAMESPACES.map(function (ns) {
       var url = JA_BASE + ns + '.json';
       return fetch(url, { credentials: 'same-origin' })
