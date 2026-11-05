@@ -92,7 +92,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             data-testid="copilot-toggle-collapse-btn"
             onClick={() => setIsCollapsed(false)}
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611] text-[11px] font-semibold cursor-pointer transition-colors shrink-0"
-            title="Tampilkan kembali bantuan jawaban AI"
+            title="Tampilkan kembali bantuan jawaban Fiezel"
             aria-label={locale === 'th' ? 'เปิดตัวช่วย' : 'Tampilkan Bantuan'}
           >
             <Eye className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
@@ -116,30 +116,18 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
 
   const resolvePronunciationGuide = (card: BeginnerReplyCard): string => {
     const raw = (card.pronunciation || '').trim();
+    const hasCjkRaw = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(raw);
     if (targetLang === 'ja') {
+      // Deterministic word-spaced Hepburn engine (FIEZEL Master Lexicon) is ALWAYS preferred:
+      // AI-provided romaji is often syllable-split ("to sho ka n de") and hard to read aloud.
       const deterministic = toPhoneticRomaji(card.text);
-      const hasCjk = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(raw);
-      if (!hasCjk && raw && /[A-Za-z]/.test(raw) && raw.length >= Math.max(3, Math.floor(deterministic.length * 0.6))) {
-        return raw;
-      }
-      return deterministic;
+      if (deterministic) return deterministic;
+      return hasCjkRaw ? '' : raw;
     }
     if (targetLang === 'zh') {
       const deterministic = toPhoneticPinyin(card.text);
-      const hasCjk = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(raw);
-      const hasCorruptZhToken = raw
-        .split(/\s+/)
-        .some((tok) => tok.toLowerCase().replace(/[^a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]/g, '') === 'zh');
-      if (
-        !hasCjk &&
-        !hasCorruptZhToken &&
-        raw &&
-        /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(raw) &&
-        raw.length >= Math.max(3, Math.floor(deterministic.length * 0.6))
-      ) {
-        return raw;
-      }
-      return deterministic;
+      if (deterministic) return deterministic;
+      return hasCjkRaw ? '' : raw;
     }
     // For English, avoid echoing the exact same Latin sentence twice if pronunciation === text
     if (
@@ -223,12 +211,12 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               }`}
             />
             {showLoadingState ? (
-              <span>{locale === 'th' ? 'กำลังสร้าง...' : 'Meracik AI...'}</span>
+              <span>{locale === 'th' ? 'กำลังสร้าง...' : 'Meracik Jawaban...'}</span>
             ) : (
               <>
-                <span className="sm:hidden">{locale === 'th' ? 'AI สด' : 'AI Realtime'}</span>
+                <span className="sm:hidden">{locale === 'th' ? 'สด' : 'Spontan'}</span>
                 <span className="hidden sm:inline">
-                  {locale === 'th' ? 'AI สด · สดใหม่' : 'AI Realtime · Spontan'}
+                  {locale === 'th' ? 'ตอบโต้สด' : 'Jawaban Spontan'}
                 </span>
               </>
             )}
@@ -243,7 +231,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               disabled={showLoadingState || isAnalyzingTurn}
               onClick={onRefreshAssist}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-[#FAF5EB] border border-[#E6DEC8] text-[#5C4E3C] hover:text-[#1C1611] text-[11px] font-semibold shadow-2xs cursor-pointer transition-all shrink-0 disabled:opacity-50"
-              title="Minta 3 variasi jawaban AI baru"
+              title="Minta 3 variasi jawaban baru"
             >
               <RefreshCw className={`w-3 h-3 ${isRefreshingAssist ? 'animate-spin' : ''}`} />
               <span className="hidden xs:inline">{locale === 'th' ? 'สร้างใหม่' : 'Opsi Baru'}</span>
@@ -297,8 +285,8 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             <div className="flex items-center justify-between pt-1">
               <span className="text-[11px] font-medium text-[#857560]">
                 {locale === 'th'
-                  ? 'กำลังวิเคราะห์คำพูดล่าสุดของ AI และสร้างแนวทางตอบโต้สด...'
-                  : 'Menyesuaikan bantuan jawaban dengan kalimat yang baru diucapkan AI...'}
+                  ? 'กำลังวิเคราะห์คำพูดล่าสุดและสร้างแนวทางตอบโต้สด...'
+                  : 'Menyesuaikan bantuan jawaban dengan kalimat yang baru diucapkan partner...'}
               </span>
               <div className="h-7 w-20 rounded-full bg-[#EFE9DC]" />
             </div>

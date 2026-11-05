@@ -342,6 +342,24 @@
     'kurikulum.antre-isi': '{n} jawaban antre untuk dihitung server — belum masuk bukti penguasaan.',
     'kurikulum.antre-kirim': 'Kirim antrean',
     'kurikulum.antre-terkirim': 'Antrean terkirim.',
-    'kurikulum.antre-sisa': '{n} masih antre — coba lagi saat sinyal lebih baik.'
+    'kurikulum.antre-sisa': '{n} masih antre — coba lagi saat sinyal lebih baik.',
+    'kurikulum.nav-kembali-fiezel': '← Kembali ke Fiezel',
+    'kurikulum.nav-badge-guru': 'KelasKu · Ruang Guru',
+    'kurikulum.nav-badge-misi': 'Fiezel · Misi Belajar',
+    'kurikulum.jaringan-gagal': 'Belum dapat terhubung ke server KelasKu. Pastikan koneksi internet aktif, atau masuk lewat aplikasi FIEZEL terlebih dahulu.',
+    'kurikulum.guru-pilar-1-judul': 'Peta Kompetensi BSKAP',
+    'kurikulum.guru-pilar-1-isi': 'Capaian & Tujuan Pembelajaran Fase A–F terstruktur siap pakai.',
+    'kurikulum.guru-pilar-2-judul': 'Diagnostik Miskonsepsi',
+    'kurikulum.guru-pilar-2-isi': 'Pantau titik salah paham murid secara presisi, bukan sekadar skor akhir.',
+    'kurikulum.guru-pilar-3-judul': 'Draf Narasi e-Rapor',
+    'kurikulum.guru-pilar-3-isi': 'Ringkasan capaian otomatis yang menghormati penuh otonomi pendidik.',
+    'kurikulum.guru-panel-kicker': 'Akses Terpadu Satu Pintu',
+    'kurikulum.misi-pilar-1-judul': 'Jalur Adaptif Personal',
+    'kurikulum.misi-pilar-1-isi': 'Urutan pemanasan, contoh, hingga tantangan mengikuti kesiapanmu.',
+    'kurikulum.misi-pilar-2-judul': 'Umpan Balik Bermakna',
+    'kurikulum.misi-pilar-2-isi': 'Pahami alasan di balik tiap jawaban agar konsep benar-benar melekat.',
+    'kurikulum.misi-pilar-3-judul': 'Siap Daring & Luring',
+    'kurikulum.misi-pilar-3-isi': 'Tetap bisa berlatih dari bank perangkat meski sinyal sedang terbatas.',
+    'kurikulum.misi-panel-kicker': 'Mulai Sesi Belajar'
   });
 })();

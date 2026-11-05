@@ -11850,7 +11850,7 @@ function todayHomeMarkup(){
     + `</div>`
     + `<div class="fz-vissol-mascot-wrap" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{window.FiezelMochiCompanion?.interact?.();}catch(_){}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();try{window.FiezelMochiCompanion?.interact?.();}catch(_){}}">`
     + `<div class="fz-vissol-mascot-cloud-bg" aria-hidden="true"></div>`
-    + `<img src="./assets/brand/mochi-mascot-headset.png" alt="Mochi Mascot" class="fz-vissol-mascot-img" />`
+    + `<img src="./assets/brand/paw-mochi-idle.svg" alt="Mochi Mascot" class="fz-vissol-mascot-img" />`
     + `</div>`
     + (currentStreak > 0 ? `<div class="tactile-streak-badge" style="display:none;" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
     + flameSvg
@@ -12822,6 +12822,7 @@ window.startFromRitual=startFromRitual;
 function maybeShowDailyRitual(now=Date.now()){
   if(state.view!=='home')return false;
   if(document.getElementById('fzRitual'))return false;
+  if(document.querySelector('.fz-tour, .fiezel-splash, .fiezel-ob, #fzPrasasti'))return false;
   /* Audit UI/UX 2026-08-30: ritual TIDAK boleh terbit di belakang gerbang yang sedang
      terbuka. Penting: keluar SEBELUM state.ritualMeta ditandai - kalau ditandai lebih
      dulu, kartu yang tak pernah terlihat tetap menghabiskan jatah "sekali sehari" dan

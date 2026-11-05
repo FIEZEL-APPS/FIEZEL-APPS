@@ -278,8 +278,8 @@ body {
 
 .fz-ja-ruby-text,
 .fz-zh-ruby-text {
-  line-height: 2.6 !important;
-  padding-top: 0.35em;
+  line-height: 2.85 !important;
+  padding-top: 0.45em;
   display: block;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -290,17 +290,18 @@ ruby.zh-ruby {
   ruby-position: over;
   display: inline-ruby;
   vertical-align: baseline;
-  margin-inline: 0.08em;
-  padding-inline: 0.03em;
-  line-height: 2.6 !important;
+  margin-inline: 0.14em;
+  margin-block: 0.16em;
+  padding-inline: 0.04em;
+  line-height: 2.85 !important;
 }
 
 rt.fz-ja-rt {
-  font-size: 0.58em;
+  font-size: 0.56em;
   font-weight: 600;
   color: #8C6D1F;
-  line-height: 1.05;
-  padding-inline: 2px;
+  line-height: 1.15;
+  padding-inline: 4px;
   white-space: nowrap;
   user-select: none;
   text-align: center;
@@ -308,11 +309,11 @@ rt.fz-ja-rt {
 }
 
 rt.zh-rt {
-  font-size: 0.58em;
+  font-size: 0.56em;
   font-weight: 700;
   color: #BE123C;
-  line-height: 1.05;
-  padding-inline: 2px;
+  line-height: 1.15;
+  padding-inline: 4px;
   white-space: nowrap;
   user-select: none;
   text-align: center;
@@ -326,4 +327,187 @@ rt.zh-rt {
   margin-top: 6px;
   line-height: 1.5 !important;
   display: block;
+}
+
+/* ============================================================================
+   IN-CALL INTERACTIVE LEARNING WORKBENCH (Warm Paper & Tactile Flashcard)
+   GPU-only animations (transform & opacity) — Emil Kowalski Motion Standard
+   ============================================================================ */
+@keyframes fzWbBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fzWbSheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fzWbSectionStagger {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fzWbMicroShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  45% { transform: translateX(5px); }
+  70% { transform: translateX(-3px); }
+  88% { transform: translateX(2px); }
+}
+
+@keyframes fzWbCheckDraw {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes fzWbEqBar {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.72; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes fzWbStepSlide {
+  from {
+    opacity: 0;
+    transform: translateX(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes fzWbTokenPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.82) translateY(6px);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.05) translateY(-1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fzWbPopCelebration {
+  0% { transform: scale(0.86); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.fz-wb-step-panel {
+  animation: fzWbStepSlide 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+.fz-wb-token-pop {
+  animation: fzWbTokenPop 210ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fz-wb-celebrate {
+  animation: fzWbPopCelebration 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fz-wb-tactile-cta {
+  box-shadow: 0 3px 0 0 rgba(36, 26, 17, 0.18);
+  transition: transform 110ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 110ms cubic-bezier(0.22, 1, 0.36, 1), background-color 140ms ease;
+}
+.fz-wb-tactile-cta:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 rgba(36, 26, 17, 0.18);
+}
+
+.fz-wb-backdrop {
+  animation: fzWbBackdropIn 180ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.fz-wb-sheet {
+  background: #FDFAF3;
+  border: 1px solid #EAE4D7;
+  box-shadow:
+    0 22px 48px -12px rgba(36, 26, 17, 0.2),
+    0 4px 14px -2px rgba(36, 26, 17, 0.08),
+    0 1px 0 0 rgba(255, 255, 255, 0.85) inset;
+  animation: fzWbSheetIn 240ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  will-change: transform, opacity;
+}
+
+.fz-wb-stagger-1 {
+  animation: fzWbSectionStagger 220ms cubic-bezier(0.23, 1, 0.32, 1) 25ms both;
+}
+.fz-wb-stagger-2 {
+  animation: fzWbSectionStagger 220ms cubic-bezier(0.23, 1, 0.32, 1) 65ms both;
+}
+.fz-wb-stagger-3 {
+  animation: fzWbSectionStagger 220ms cubic-bezier(0.23, 1, 0.32, 1) 105ms both;
+}
+
+.fz-wb-press {
+  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1), opacity 120ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+.fz-wb-press:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.fz-wb-tab-glider {
+  transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+
+.fz-wb-shake {
+  animation: fzWbMicroShake 180ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.fz-wb-check-path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: fzWbCheckDraw 280ms cubic-bezier(0.23, 1, 0.32, 1) 40ms forwards;
+}
+
+.fz-wb-mastery-fill {
+  transform-origin: left center;
+  transition: transform 380ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+
+.fz-wb-eq-1 { transform-origin: bottom center; animation: fzWbEqBar 520ms ease-in-out infinite; }
+.fz-wb-eq-2 { transform-origin: bottom center; animation: fzWbEqBar 440ms ease-in-out 90ms infinite; }
+.fz-wb-eq-3 { transform-origin: bottom center; animation: fzWbEqBar 600ms ease-in-out 180ms infinite; }
+.fz-wb-eq-4 { transform-origin: bottom center; animation: fzWbEqBar 480ms ease-in-out 60ms infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fz-wb-backdrop,
+  .fz-wb-sheet,
+  .fz-wb-stagger-1,
+  .fz-wb-stagger-2,
+  .fz-wb-stagger-3,
+  .fz-wb-shake,
+  .fz-wb-eq-1,
+  .fz-wb-eq-2,
+  .fz-wb-eq-3,
+  .fz-wb-eq-4 {
+    animation: none !important;
+  }
+  .fz-wb-check-path {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .fz-wb-press:active:not(:disabled) {
+    transform: none !important;
+  }
 }

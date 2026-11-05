@@ -49,7 +49,7 @@ function sourceBlock(name, source = app) {
 const COPY = {
   menu: [
     ['Mulai dari Hari ini', // audit F12 2026-09-23: satu nama per tujuan (tab = "Hari ini")
-      'Ini halaman Hari ini: progres harian, runtun belajar, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'],
+      'Ini halaman Hari ini: progres harian, runtun belajar, dan saran latihan dari Mochi. Semua perjalananmu berangkat dari sini.'],
     /* m025-246: dua langkah ini menunjuk tab yang berbeda sekarang - Vocab dan Reading
        tidak lagi punya tab sendiri; keduanya hidup di dalam Latihan, dan Peta berganti
        nama jadi Progres. Naskahnya diperbarui bersama reports/copy-tour-gems.md, sesuai
@@ -81,7 +81,7 @@ const COPY = {
     ['Dengar dulu, baru jawab',
       'Putar audionya dan pasang telinga baik-baik. Kalau belum nangkep, ulang \u2014 ada jatah replay di tiap soal.'],
     ['Meleset? Nggak apa-apa',
-      'Salah itu bagian dari latihan, bukan masalah. PAW nemenin kamu di tiap soalnya.'],
+      'Salah itu bagian dari latihan, bukan masalah. Mochi nemenin kamu di tiap soalnya.'],
     ['Terjemahan Indonesia',
       'Toggle ini nampilin terjemahan tiap soal, seharga 1 Gem Terjemahan per sesi. Gem-nya kamu dapat gratis dari streak jawaban benar.'],
     ['Atur kecepatan suara',

@@ -138,8 +138,8 @@
   // ---------------- boot ----------------
   function boot() {
     function viaKelasKu() {
-      return E.login.kelasku().then(start).catch(function (e) {
-        renderAuth(e && e.message);
+      return E.login.kelasku().then(start).catch(function () {
+        renderAuth();
       });
     }
     if (E.token && E.token()) {
@@ -158,17 +158,36 @@
      di sana, tidak ada yang perlu diketik sama sekali. */
   function renderAuth(err) {
     app.innerHTML =
-      '<div class="auth-wrap"><div class="card ink rise">' +
+      '<div class="auth-wrap">' +
+      '<div class="auth-nav-bar">' +
+      '<a href="./index.html" class="auth-nav-back">' + esc(t('kurikulum.nav-kembali-fiezel', '← Kembali ke Fiezel')) + '</a>' +
+      '<span class="auth-brand-badge">' + esc(t('kurikulum.nav-badge-guru', 'KelasKu · Ruang Guru')) + '</span>' +
+      '</div>' +
+      '<div class="card ink rise auth-portal-card">' +
+      '<div class="auth-grid">' +
+      '<div class="auth-col-hero">' +
       '<p class="kicker">FIEZEL · Ruang Guru</p>' +
       '<h1>Kurikulum yang benar-benar dipelajari.</h1>' +
       '<p class="muted">Masuk dengan akun KelasKu-mu. Tidak ada token terpisah: akses guru mengikuti peranmu di KelasKu, dan owner mengaturnya dari satu tempat.</p>' +
+      '<div class="auth-pillars">' +
+      '<div class="auth-pillar"><span class="auth-pillar-dot"></span><div><b>' + esc(t('kurikulum.guru-pilar-1-judul', 'Peta Kompetensi BSKAP')) + '</b><small>' + esc(t('kurikulum.guru-pilar-1-isi', 'Capaian & Tujuan Pembelajaran Fase A–F terstruktur siap pakai.')) + '</small></div></div>' +
+      '<div class="auth-pillar"><span class="auth-pillar-dot"></span><div><b>' + esc(t('kurikulum.guru-pilar-2-judul', 'Diagnostik Miskonsepsi')) + '</b><small>' + esc(t('kurikulum.guru-pilar-2-isi', 'Pantau titik salah paham murid secara presisi, bukan sekadar skor akhir.')) + '</small></div></div>' +
+      '<div class="auth-pillar"><span class="auth-pillar-dot"></span><div><b>' + esc(t('kurikulum.guru-pilar-3-judul', 'Draf Narasi e-Rapor')) + '</b><small>' + esc(t('kurikulum.guru-pilar-3-isi', 'Ringkasan capaian otomatis yang menghormati penuh otonomi pendidik.')) + '</small></div></div>' +
+      '</div>' +
+      '</div>' +
+      '<div class="auth-col-action">' +
+      '<div class="auth-action-panel">' +
+      '<p class="kicker">' + esc(t('kurikulum.guru-panel-kicker', 'Akses Terpadu Satu Pintu')) + '</p>' +
       (err ? '<div class="issue error">' + esc(err) + '</div>' : '') +
-      '<button class="btn primary" data-a="login" data-testid="teacher-login-btn">Masuk dengan akun KelasKu</button>' +
-      '<p class="muted" style="margin-top:16px;font-size:13px">Belum masuk? Buka <a href="./index.html" data-testid="link-app">aplikasi FIEZEL</a> dulu, lalu kembali ke halaman ini.</p>' +
-      '<p class="muted" style="font-size:13px">Murid masuk di halaman <a href="./misi.html" data-testid="link-student">Misi Belajar</a>.</p>' +
-      '<p class="muted" style="margin-top:20px;font-size:11px;line-height:1.5;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">' +
+      '<button class="btn primary auth-cta-btn" data-a="login" data-testid="teacher-login-btn">Masuk dengan akun KelasKu</button>' +
+      '<p class="muted auth-sub-link" style="margin-top:16px;font-size:13px">Belum masuk? Buka <a href="./index.html" data-testid="link-app">aplikasi FIEZEL</a> dulu, lalu kembali ke halaman ini.</p>' +
+      '<p class="muted auth-sub-link" style="font-size:13px">Murid masuk di halaman <a href="./misi.html" data-testid="link-student">Misi Belajar</a>.</p>' +
+      '<p class="muted auth-disclaimer" style="margin-top:18px;font-size:11px;line-height:1.5;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">' +
       esc(t('kurikulum.disclaimer-auth', 'Mengadopsi Standar Capaian Pembelajaran Kurikulum Merdeka (BSKAP No. 032/H/KR/2024). Menghormati penuh otonomi KOSP sekolah dan pendidik.')) +
       '</p>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
       '</div></div>';
   }
 

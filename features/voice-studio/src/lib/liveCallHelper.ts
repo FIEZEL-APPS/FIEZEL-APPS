@@ -22,6 +22,8 @@ export interface LiveTranslationResult {
   pronunciation: string;
   translationId: string;
   translationTh: string;
+  translationJa?: string;
+  translationZh?: string;
   furiganaHtml?: string;
 }
 
@@ -49,10 +51,90 @@ const KNOWN_UTTERANCE_TRANSLATIONS: Array<{
   translationTh: string;
 }> = [
   {
-    match: "hey! glad you're on the line. no stiff textbook voice today—if your grammar slips, i'm stopping you on the spot. what's on your mind today?",
+    match: "yo what's good fam! leave that stiff textbook robot voice at the door, if your grammar slips, i'm calling it out on the spot. talk to me for real, what part of english been tripping you up lately?",
+    pronunciation: "Yo wots gud fem! Liv det stif tekstbuk robot vois et de dor.",
+    translationId:
+      'Yo apa kabar bro! Tinggalin suara buku teks kaku itu di luar, kalau grammar-mu kepleset, langsung kutegur di tempat. Ngomong jujur sama gua, bagian bahasa Inggris mana yang paling bikin lu pusing belakangan ini?',
+    translationTh:
+      'โย่ ว่าไงพวก! ทิ้งเสียงพูดแข็งๆ แบบหุ่นยนต์ตำราเรียนไว้ข้างนอกเลย ถ้าไวยากรณ์พลาดฉันทักเดี๋ยวนั้นเลยนะ บอกมาตรงๆ ช่วงนี้ภาษาอังกฤษเรื่องไหนทำปวดหัวที่สุด?',
+  },
+  {
+    match: "oh brilliant, you actually picked up. don't even think about giving me stiff textbook answers today, i'll catch every slip. tell me honestly, which english grammar rule has been giving you the biggest headache?",
+    pronunciation: "Ou brilyent, yu ekcueli pikd ap. Dount iven tingk ebaut giving mi stif tekstbuk ensers tudei.",
+    translationId:
+      'Oh baguslah, akhirnya kamu angkat juga. Jangan coba-coba kasih jawaban buku teks yang kaku hari ini, setiap selip bakal langsung kutangkap. Jujur padaku, aturan grammar Inggris mana yang paling bikin kepalamu pusing?',
+    translationTh:
+      'โอ้ ยอดเยี่ยม รับสายสักทีนะ วันนี้อย่าคิดตอบแบบท่องตำราแข็งๆ เชียวล่ะ ฉันจับได้ทุกจุดแน่ บอกมาตามตรง กฎไวยากรณ์ภาษาอังกฤษข้อไหนทำปวดหัวที่สุดคะ?',
+  },
+  {
+    match: 'あんたやっと来たわね！教科書ロボットみたいな堅苦しい日本語で話したら、その場でツッコミ入れるからね。ねえ正直に言いなさい、最近日本語の文法や助詞でどこが一番モヤモヤしてるの？',
+    pronunciation: 'Anta yatto kita wa ne! Kyoukasho robotto mitaina katakurushii nihongo de hanashitara, sonoba de tsukkomi ireru kara ne. Nee shoujiki ni iinasai, saikin nihongo no bunpou ya joshi de doko ga ichiban moyamoya shiteru no?',
+    translationId:
+      'Akhirnya nongol juga kamu! Awas ya kalau ngomong bahasa Jepang kaku kayak robot buku teks, langsung kusindir di tempat! Ayo jujur dulu sama aku, belakangan ini bagian grammar atau partikel Jepang mana yang paling bikin kamu pusing?',
+    translationTh:
+      'กว่าจะโผล่มาได้นะเธอ! ถ้าขืนพูดภาษาญี่ปุ่นแข็งทื่อเป็นหุ่นยนต์ท่องตำราล่ะก็ โดนฉันสวนเดี๋ยวนั้นแน่ บอกมาตรงๆ เลย ช่วงนี้ไวยากรณ์หรือคำช่วยภาษาญี่ปุ่นตรงไหนที่ทำให้งงที่สุด?',
+  },
+  {
+    match: 'おう、やっと来たやん！教科書丸暗記のカチカチ日本語で喋ったら、その場で『なんでやねん！』ってツッコミ入れるで。で、ぶっちゃけ最近日本語の文法とか助詞でどこが一番ムズいん？',
+    pronunciation: 'Ou, yatto kita yan! Kyoukasho maruanki no kachikachi nihongo de shabettara, sonoba de "nandeyanen!" tte tsukkomi ireru de. De, butchake saikin nihongo no bunpou toka joshi de doko ga ichiban muzuin?',
+    translationId:
+      'Woi, akhirnya nongol juga lu! Kalau lu ngomong bahasa Jepang kaku hasil hafalan buku teks, langsung gua celetukin "Nandeyanen!" di tempat ya. Ngomong-ngomong jujur nih, belakangan ini bagian grammar atau partikel Jepang mana yang paling susah buat lu?',
+    translationTh:
+      'โอ้ว มาสักทีนะพวก! ถ้าขืนพูดภาษาญี่ปุ่นแข็งโป๊กแบบท่องจำตำราล่ะก็ โดนตบมุก "นันเดะยะเน็น!" เดี๋ยวนั้นเลยนะ ว่าแต่พูดตรงๆ ช่วงนี้ไวยากรณ์หรือคำช่วยญี่ปุ่นตัวไหนยากสุดสำหรับเอ็ง?',
+  },
+  {
+    match: '哎哟喂，总算上线啦！我是小糯米。今天可别拿课本里那种死板的话糊弄我啊，声调一歪我当场就给你揪出来！跟姐说实话，最近学中文哪块儿最让你头疼？',
+    pronunciation: 'Āiyōwèi, zǒngsuàn shàngxiàn la! Wǒ shì Xiǎo Nuòmǐ.',
+    translationId:
+      'Aduh, akhirnya online juga kamu! Aku Xiao Mochi. Hari ini jangan coba-coba ngomong kaku kayak buku teks ya, begitu nadamu miring sedikit langsung kutangkap di tempat! Jujur sama kakak, bagian bahasa Mandarin mana yang belakangan ini paling bikin kamu pusing?',
+    translationTh:
+      'ไอ้หยา ออนไลน์สักทีนะ! พี่เสี่ยวโนโมจิเองจ้า วันนี้อย่าเอาประโยคแข็งๆ ในตำรามาพูดเชียวล่ะ ถ้าเสียงวรรณยุกต์เพี้ยนนิดเดียวพี่จับแก้ทันทีเลย! บอกความจริงมา ช่วงนี้เรียนภาษาจีนเรื่องไหนปวดหัวที่สุด?',
+  },
+  {
+    match: "yo, what's good fam! coach alex on the line. ain't no stiff robot talk in here, if your grammar's trippin', i'ma check it real quick. tell me straight up: what english rule been messin' with your head lately, or what we talkin' 'bout today?",
+    pronunciation: "Yo, wots gud fem! Kouch Aleks on de lain. Eint nou stif robot tok in hir.",
+    translationId:
+      'Yo, apa kabar bro! Coach Alex di sini. Nggak ada obrolan robot kaku di sini, kalau grammar-mu ngaco, langsung gua koreksi cepat di tempat. Jujur aja sama gua: aturan bahasa Inggris apa yang paling bikin pusing akhir-akhir ini, atau mau bahas apa kita hari ini?',
+    translationTh:
+      'โย่ ว่าไงพวก! โค้ชอเล็กซ์อยู่ในสายแล้ว ที่นี่ไม่มีคุยแข็งทื่อแบบหุ่นยนต์นะ ถ้าไวยากรณ์หลุดเมื่อไหร่ฉันเบรกแก้ให้ทันที บอกมาตรงๆ เลย ช่วงนี้เรื่องไหนในภาษาอังกฤษทำปวดหัวที่สุด หรือวันนี้เราจะคุยเรื่องอะไรกันดี?',
+  },
+  {
+    match: "right then, glad you've finally dialed in. i've got your braincore dossier right in front of me, so don't even try hiding behind safe one-word answers. tell me honestly, which grammar point has been giving you the biggest headache lately, or shall we dive straight into your week?",
+    pronunciation: "Rait den, gled yuv faineli daield in. Aiv got yor Breinkor dosier rait in frant ov mi.",
+    translationId:
+      'Nah begitu dong, akhirnya nyambung juga. Catatan Braincore-mu ada persis di depanku, jadi jangan coba-coba sembunyi pakai jawaban satu kata yang aman ya. Jujur padaku, materi grammar mana yang paling bikin kamu pusing belakangan ini, atau kita langsung bahas minggumu?',
+    translationTh:
+      'เอาล่ะ ดีใจที่โทรเข้ามาสักที แฟ้มข้อมูล Braincore ของคุณอยู่ตรงหน้าฉันแล้ว เพราะงั้นอย่าคิดหลบหลังคำตอบสั้นๆ คำเดียวเชียวนะ บอกมาตามตรงเลย ช่วงนี้ไวยากรณ์เรื่องไหนทำปวดหัวที่สุด หรือจะเล่าเรื่องสัปดาห์นี้เลยดีคะ?',
+  },
+  {
+    match: 'ちょっと、やっと来たわね！あなたのBraincoreの記録、全部見てあるんだから。変な日本語でごまかしたらその場でビシッと止めるわよ。正直に言いなさい、最近一番モヤモヤしてる文法や助詞は何？それとも今日の出来事から話す？',
+    pronunciation: 'Chotto, yatto kita wa ne! Anata no Braincore no kiroku, zenbu mite aru n dakara.',
+    translationId:
+      'Heh, akhirnya nongol juga kamu! Catatan Braincore-mu sudah kubaca semuanya lho. Kalau coba ngeles pakai bahasa Jepang yang aneh, langsung kustop tegas di tempat! Ayo ngaku jujur, grammar atau partikel apa yang paling bikin kamu bingung belakangan ini? Atau mau cerita kejadian hari ini dulu?',
+    translationTh:
+      'นี่ กว่าจะมาได้นะ! บันทึก Braincore ของเธอฉันอ่านดูหมดแล้วนะ ถ้าพูดภาษาญี่ปุ่นแปลกๆ กลบเกลื่อนฉันเบรกทันทีเลย บอกมาตรงๆ ช่วงนี้ไวยากรณ์หรือคำช่วยตัวไหนที่ยังงงที่สุด? หรือจะเล่าเรื่องวันนี้ก่อนดี?',
+  },
+  {
+    match: 'おっ、来たやん後輩！お前のBraincoreのデータ、バッチリ見といたで。変な直訳したら秒でツッコミ入れるから覚悟しときや！で、ぶっちゃけ最近どの文法や言葉が一番ムズいん？何でも言うてみ！',
+    pronunciation: 'O, kita yan kouhai! Omae no Braincore no deeta, batchiri mitoita de.',
+    translationId:
+      'Woi, nongol juga lu! Data Braincore lu udah gua cek tuntas nih. Kalau lu ngomong terjemahan mentah yang ngaco, dalam hitungan detik langsung gua skakmat ya, siap-siap aja! Jujur deh, belakangan ini grammar atau kosakata bagian mana yang paling bikin lu puyeng? Cerita aja semuanya!',
+    translationTh:
+      'โอ้ มาแล้วเหรอน้อง! ข้อมูล Braincore ของเอ็ง รุ่นพี่เช็กมาเรียบร้อยแล้วนะ ถ้าเผลอแปลตรงตัวเพี้ยนๆ มา โดนเบรกในเสี้ยววินาทีแน่ เตรียมใจไว้เลย! ว่าแต่พูดตรงๆ ช่วงนี้ไวยากรณ์หรือศัพท์เรื่องไหนยากสุด? เล่ามาได้เลย!',
+  },
+  {
+    match: '哎哟，总算上线啦！我是小糯米。你的Braincore学习档案我都瞄过一眼了，今天要是声调跑偏或者乱造词儿，我可当场就给你揪出来啊！跟姐说实话，最近学中文哪块儿最让你头疼？咱们今天聊点儿啥？',
+    pronunciation: 'Āiyō, zǒngsuàn shàngxiàn la! Wǒ shì Xiǎo Nuòmǐ.',
+    translationId:
+      'Aduh, akhirnya online juga kamu! Aku Xiao Mochi. Catatan belajar Braincore-mu sudah kucek lho-hari ini kalau nadamu melenceng atau ngarang kata sendiri, langsung kutangkap di tempat ya! Jujur sama kakak, bagian bahasa Mandarin mana yang paling bikin kepalamu pusing akhir-akhir ini? Kita mau ngobrolin apa hari ini?',
+    translationTh:
+      'ไอ้หยา ออนไลน์สักทีนะ! พี่เสี่ยวโนโมจิเองจ้า แฟ้มเรียน Braincore ของเธอพี่แอบส่องมาหมดแล้ว วันนี้ถ้าเสียงวรรณยุกต์เพี้ยนหรือแต่งคำมั่วๆ พี่จับแก้คาหนังคาเขาเลยนะ! บอกความจริงมา ช่วงนี้ภาษาจีนเรื่องไหนทำปวดหัวสุด? วันนี้เราจะคุยเรื่องอะไรกันดี?',
+  },
+  {
+    match: "hey! glad you're on the line. no stiff textbook voice today-if your grammar slips, i'm stopping you on the spot. what's on your mind today?",
     pronunciation: "Hei! Gled yur on de lain. Nou stif tekstbuk vois tudei.",
     translationId:
-      'Hei! Bagus kamu sudah nyambung. Hari ini dilarang pakai suara buku teks kaku—kalau grammar-mu meleset, langsung kutegur di tempat ya. Lagi mikirin apa hari ini?',
+      'Hei! Bagus kamu sudah nyambung. Hari ini dilarang pakai suara buku teks kaku-kalau grammar-mu meleset, langsung kutegur di tempat ya. Lagi mikirin apa hari ini?',
     translationTh:
       'เฮ้! ดีใจที่โทรมา วันนี้ห้ามพูดเกร็งแบบตำราเรียนนะ ถ้าไวยากรณ์หลุดเมื่อไหร่ ฉันเบรกทันที วันนี้มีเรื่องอะไรในหัวเล่ามาได้เลย?',
   },
@@ -823,31 +905,56 @@ function approximateEnglishToThai(text: string): string {
 
 const liveTranslationCache = new Map<string, string>();
 
-function resolveTranslationApiBase(): string {
+function resolveTranslationCandidateBases(): string[] {
+  const bases: string[] = [];
   try {
+    if (
+      typeof window !== 'undefined' &&
+      /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(window.location?.hostname || '')
+    ) {
+      bases.push('');
+    }
     const win = typeof window !== 'undefined' ? (window as any) : null;
-    const cfg = win?.FIEZEL_CONFIG?.apiBaseUrl;
+    const cfg = win?.FIEZEL_CONFIG?.apiBaseUrl || win?.FIEZEL_CF_CONFIG?.base;
     if (typeof cfg === 'string' && cfg.trim()) {
-      return cfg.trim().replace(/\/+$/, '');
+      bases.push(cfg.trim().replace(/\/+$/, ''));
     }
   } catch {
     // Ignore
   }
-  return 'https://api.fiezel.my.id';
+  bases.push('https://api.fiezel.my.id');
+  return Array.from(new Set(bases));
+}
+
+const inFlightTranslations = new Map<string, Promise<string>>();
+
+function looksAlreadyIndonesian(text: string): boolean {
+  return (
+    /\b(adalah|sedangkan|gunakan|perhatikan|bagaimana|kenapa|kapan|jelaskan|bedanya|kalau|dipakai|kalimat|artinya|contoh|jangan|ketika|tolong|aku|bingung)\b/i.test(
+      text
+    ) && !/\b(what|where|when|would|should|could|have|been|going)\b/i.test(text)
+  );
 }
 
 /**
  * Fetches high-fidelity, natural translations in real-time via FIEZEL Worker `/api/voice/translate`
  * (Gemini multi-key pool, zero CJK leak, zero unofficial translate.googleapis.com HTTP 500 errors)
- * with in-memory Map & localStorage caching. Safe for continuous live duplex calls.
+ * with in-flight deduplication, in-memory Map & localStorage caching. Safe for continuous live duplex calls.
  */
 export async function fetchLiveTranslation(
   text: string,
-  targetLocale: 'id' | 'th'
+  targetLocale: LearnerLocale | string
 ): Promise<string> {
   const clean = (text || '').trim();
   if (!clean) return '';
-  const cacheKey = `${targetLocale}:${clean}`;
+  const loc = String(targetLocale || 'id').toLowerCase();
+  if (loc === 'id' && looksAlreadyIndonesian(clean)) {
+    return clean;
+  }
+  if (loc === 'th' && /[\u0E00-\u0E7F]{3,}/.test(clean)) {
+    return clean;
+  }
+  const cacheKey = `${loc}:${clean}`;
   if (liveTranslationCache.has(cacheKey)) {
     return liveTranslationCache.get(cacheKey)!;
   }
@@ -855,7 +962,7 @@ export async function fetchLiveTranslation(
     if (typeof localStorage !== 'undefined') {
       const stored = localStorage.getItem(`fz_trans_${cacheKey}`);
       if (stored) {
-        const cleanStored = sanitizeTranslationOutput(stored);
+        const cleanStored = sanitizeTranslationOutput(stored, loc);
         if (cleanStored) {
           liveTranslationCache.set(cacheKey, cleanStored);
           return cleanStored;
@@ -866,49 +973,100 @@ export async function fetchLiveTranslation(
     // Ignore
   }
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5500);
-  try {
-    const apiBase = resolveTranslationApiBase();
-    const res = await fetch(`${apiBase}/api/voice/translate`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        text: clean,
-        targetLocale,
-      }),
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-    if (res.ok) {
-      const data = await res.json().catch(() => null);
-      const rawTranslated =
-        typeof data?.translatedText === 'string'
-          ? data.translatedText.trim()
-          : typeof data?.translation === 'string'
-            ? data.translation.trim()
-            : '';
-      const translated = sanitizeTranslationOutput(rawTranslated);
-      if (translated) {
-        liveTranslationCache.set(cacheKey, translated);
-        try {
-          if (typeof localStorage !== 'undefined') {
-            localStorage.setItem(`fz_trans_${cacheKey}`, translated);
+  const existingPromise = inFlightTranslations.get(cacheKey);
+  if (existingPromise) {
+    return existingPromise;
+  }
+
+  const task = (async (): Promise<string> => {
+    for (const apiBase of resolveTranslationCandidateBases()) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5500);
+      try {
+        const res = await fetch(`${apiBase}/api/voice/translate`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            text: clean,
+            targetLocale: loc,
+          }),
+          mode: 'cors',
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+        if (res.ok) {
+          const data = await res.json().catch(() => null);
+          const rawTranslated =
+            typeof data?.translatedText === 'string'
+              ? data.translatedText.trim()
+              : typeof data?.translation === 'string'
+                ? data.translation.trim()
+                : '';
+          const translated = sanitizeTranslationOutput(rawTranslated, loc);
+          if (translated) {
+            liveTranslationCache.set(cacheKey, translated);
+            try {
+              if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(`fz_trans_${cacheKey}`, translated);
+              }
+            } catch {
+              // Ignore
+            }
+            return translated;
           }
-        } catch {
-          // Ignore
         }
-        return translated;
+      } catch {
+        clearTimeout(timer);
       }
     }
-  } catch {
-    clearTimeout(timer);
+
+    // Direct client fallback to ensure student subtitles are NEVER blank:
+    try {
+      const directUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(loc)}&dt=t&q=${encodeURIComponent(clean)}`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 3500);
+      const res = await fetch(directUrl, { signal: ctrl.signal });
+      clearTimeout(tid);
+      if (res.ok) {
+        const gtxData = await res.json();
+        if (Array.isArray(gtxData) && Array.isArray(gtxData[0])) {
+          const directTrans = gtxData[0].map((item: any) => (item && item[0] ? item[0] : '')).join('').trim();
+          const cleaned = sanitizeTranslationOutput(directTrans, loc);
+          if (cleaned) {
+            liveTranslationCache.set(cacheKey, cleaned);
+            try {
+              if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(`fz_trans_${cacheKey}`, cleaned);
+              }
+            } catch {
+              // Ignore
+            }
+            return cleaned;
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+
+    return '';
+  })();
+
+  inFlightTranslations.set(cacheKey, task);
+  try {
+    return await task;
+  } finally {
+    inFlightTranslations.delete(cacheKey);
   }
-  return '';
 }
 
-function sanitizeTranslationOutput(text: string): string {
+function sanitizeTranslationOutput(text: string, targetLocale?: string): string {
   if (!text) return '';
+  const loc = String(targetLocale || '').toLowerCase();
+  // NEVER strip CJK if the learner is studying or viewing Japanese/Chinese!
+  if (loc === 'ja' || loc === 'zh' || loc === 'ko') {
+    return text.trim();
+  }
   // If translation contains raw Hanzi or Kanji embedded inside quotes or parens, convert or strip them
   return text
     .replace(/["'「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'」』]/g, (_match, inner) => {
@@ -973,7 +1131,8 @@ export function translateAndPhoneticizeLiveText(
   targetLang: 'en' | 'ja' | 'zh',
   explicitTranslationId?: string,
   explicitTranslationTh?: string,
-  explicitPronunciation?: string
+  explicitPronunciation?: string,
+  options?: { syncOnly?: boolean }
 ): LiveTranslationResult {
   const clean = stripEmojisAndEmotWords(rawText || '').trim();
   if (!clean) {
@@ -1002,19 +1161,37 @@ export function translateAndPhoneticizeLiveText(
     }
   }
 
-  // Trigger non-blocking background translation hydration if not cached yet
+  const isAlreadyId = looksAlreadyIndonesian(clean);
+  const isCompleteSentence =
+    !options?.syncOnly &&
+    clean.length >= 10 &&
+    clean.length <= 220 &&
+    /[.?!。？！]$/.test(clean);
+
+  // Trigger non-blocking background translation hydration ONLY on completed sentences (never on syllable-by-syllable streaming drafts!)
   const cachedId = liveTranslationCache.get(`id:${clean}`);
   const cachedTh = liveTranslationCache.get(`th:${clean}`);
-  if (!cachedId && !explicitTranslationId && typeof window !== 'undefined') {
-    void fetchLiveTranslation(clean, 'id').catch(() => {});
-  }
-  if (!cachedTh && !explicitTranslationTh && typeof window !== 'undefined') {
-    void fetchLiveTranslation(clean, 'th').catch(() => {});
+  if (typeof window !== 'undefined' && isCompleteSentence) {
+    let activeLocale = 'id';
+    try {
+      const qs = new URLSearchParams(window.location.search || '');
+      const urlLang = (qs.get('lang') || localStorage.getItem('fz_ui_lang') || 'id').toLowerCase();
+      if (urlLang === 'th') activeLocale = 'th';
+    } catch {
+      // Ignore
+    }
+    if (activeLocale === 'th') {
+      if (!cachedTh && !explicitTranslationTh && !/[\u0E00-\u0E7F]{3,}/.test(clean)) {
+        void fetchLiveTranslation(clean, 'th').catch(() => {});
+      }
+    } else if (!cachedId && !explicitTranslationId && !isAlreadyId) {
+      void fetchLiveTranslation(clean, 'id').catch(() => {});
+    }
   }
 
   if (targetLang === 'zh') {
     const pinyin = explicitPronunciation || toPhoneticPinyin(clean);
-    const idTrans = explicitTranslationId || cachedId || approximateMandarinToIndonesian(clean);
+    const idTrans = explicitTranslationId || cachedId || (isAlreadyId ? clean : approximateMandarinToIndonesian(clean));
     const thTrans = explicitTranslationTh || cachedTh || approximateMandarinToThai(clean);
     const furiganaHtml = renderMandarinRubyHtml(clean);
     return {
@@ -1028,7 +1205,7 @@ export function translateAndPhoneticizeLiveText(
 
   if (targetLang === 'ja') {
     const romaji = explicitPronunciation || toPhoneticRomaji(clean);
-    const idTrans = explicitTranslationId || cachedId || approximateJapaneseToIndonesian(clean);
+    const idTrans = explicitTranslationId || cachedId || (isAlreadyId ? clean : approximateJapaneseToIndonesian(clean));
     const thTrans = explicitTranslationTh || cachedTh || approximateJapaneseToThai(clean);
     const furiganaHtml = renderFuriganaHtml(clean);
     return {
@@ -1041,7 +1218,7 @@ export function translateAndPhoneticizeLiveText(
   }
 
   const phoneticEn = explicitPronunciation || approximateEnglishPhoneticId(clean);
-  const idTrans = explicitTranslationId || cachedId || approximateEnglishToIndonesian(clean);
+  const idTrans = explicitTranslationId || cachedId || (isAlreadyId ? clean : approximateEnglishToIndonesian(clean));
   const thTrans = explicitTranslationTh || cachedTh || approximateEnglishToThai(clean);
 
   return {
@@ -1661,7 +1838,7 @@ function synthesizeContextualThreeCards(
           pronunciation: 'Miruku dake onegaishimasu. Arigatou gozaimasu.',
           hintId: 'Tolong tambahkan susu saja. Terima kasih banyak.',
           hintTh: 'ขอนมอย่างเดียวครับ/ค่ะ ขอบคุณมากครับ/ค่ะ',
-          contextAnchorId: 'Menjawab pertanyaan Partner AI tentang tambahan gula & susu',
+          contextAnchorId: 'Menjawab pertanyaan Partner tentang tambahan gula & susu',
           wordBreakdown: [
             { word: 'ミルクだけ', reading: 'miruku dake', meaningId: 'susu saja' },
             { word: 'お願いします', reading: 'onegaishimasu', meaningId: 'tolong ya' },
@@ -1677,7 +1854,7 @@ function synthesizeContextualThreeCards(
           pronunciation: 'Hai, o-satou to miruku o hitotsu zutsu onegaishimasu.',
           hintId: 'Ya, tolong berikan gula dan susu masing-masing satu.',
           hintTh: 'รับครับ/ค่ะ ขอน้ำตาลและนมอย่างละ 1 ที่ครับ/ค่ะ',
-          contextAnchorId: 'Menjawab pertanyaan Partner AI tentang gula & susu secara lengkap',
+          contextAnchorId: 'Menjawab pertanyaan Partner tentang gula & susu secara lengkap',
           wordBreakdown: [
             { word: 'お砂糖とミルク', reading: 'o-satou to miruku', meaningId: 'gula dan susu' },
             { word: '一つずつ', reading: 'hitotsu zutsu', meaningId: 'masing-masing satu' },
@@ -1715,7 +1892,7 @@ function synthesizeContextualThreeCards(
           pronunciation: 'Hai, tennai de onegaishimasu. Arigatou gozaimasu.',
           hintId: 'Ya, saya makan/minum di dalam kafe, tolong. Terima kasih banyak.',
           hintTh: 'ใช่ครับ/ค่ะ ขอทานที่ร้านนะครับ/คะ ขอบคุณมากครับ/ค่ะ',
-          contextAnchorId: 'Menjawab pertanyaan Partner AI apakah makan di tempat atau dibawa pulang',
+          contextAnchorId: 'Menjawab pertanyaan Partner apakah makan di tempat atau dibawa pulang',
           wordBreakdown: [
             { word: '店内で', reading: 'tennai de', meaningId: 'di dalam kafe' },
             { word: 'お願いします', reading: 'onegaishimasu', meaningId: 'tolong (sopan)' },
@@ -1769,7 +1946,7 @@ function synthesizeContextualThreeCards(
           pronunciation: 'Hai, kore kara toshokan e benkyou shi ni ikimasu.',
           hintId: 'Ya, setelah ini saya akan pergi ke perpustakaan untuk belajar.',
           hintTh: 'ใช่ครับ/ค่ะ หลังจากนี้จะไปอ่านหนังสือที่ห้องสมุดครับ/ค่ะ',
-          contextAnchorId: 'Menjawab pertanyaan Partner AI tentang rencana setelah dari kafe',
+          contextAnchorId: 'Menjawab pertanyaan Partner tentang rencana setelah dari kafe',
         }),
         buildCard({
           id: 'ja_plan_2',
@@ -1948,7 +2125,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: `Tempat favorit di dekat rumah saya di ${ctx.city} adalah taman hijau. Saya sering jalan sore di sana.`,
         hintTh: `สถานที่โปรดใกล้บ้านฉันใน ${ctx.city} คือสวนสาธารณะสีเขียว ฉันมักไปเดินเล่นตอนบ่าย`,
-        contextAnchorId: `Menjawab pertanyaan Partner AI tentang tempat favorit di dekat rumahmu (${ctx.city})`,
+        contextAnchorId: `Menjawab pertanyaan Partner tentang tempat favorit di dekat rumahmu (${ctx.city})`,
       }),
       buildCard({
         id: 'en_favplace_2',
@@ -2029,7 +2206,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: `Saya sudah tinggal di ${ctx.city} selama lima tahun bersama ${ctx.companionId}.`,
         hintTh: `ฉันอาศัยอยู่ใน ${ctx.city} มาห้าปีแล้ว`,
-        contextAnchorId: `Menjawab pertanyaan Partner AI tentang berapa lama tinggal di ${ctx.city}`,
+        contextAnchorId: `Menjawab pertanyaan Partner tentang berapa lama tinggal di ${ctx.city}`,
       }),
       buildCard({
         id: 'en_howlong_2',
@@ -2068,7 +2245,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: 'Saya tinggal di Jakarta bersama keluarga saya. Rumah saya tenang dan nyaman.',
         hintTh: 'ฉันอาศัยอยู่ที่จาการ์ตากับครอบครัว บ้านของฉันเงียบสงบและอบอุ่น',
-        contextAnchorId: 'Menjawab langsung pertanyaan Partner AI tentang tempat tinggal & keluarga',
+        contextAnchorId: 'Menjawab langsung pertanyaan Partner tentang tempat tinggal & keluarga',
         wordBreakdown: [
           { word: 'I live in...', reading: 'Ai liv in', meaningId: 'Saya tinggal di...' },
           { word: 'with my family', reading: 'wit mai fe-mi-li', meaningId: 'bersama keluargaku' },
@@ -2131,8 +2308,8 @@ function synthesizeContextualThreeCards(
           : 'Topik presentasi kami adalah tentang pemasaran digital dan media sosial.',
         hintTh: 'พวกเรากำลังศึกษาเรื่องการตลาดดิจิทัลและโซเชียลมีเดีย',
         contextAnchorId: isLibraryContext
-          ? `Menjawab pertanyaan Partner AI tentang materi yang dipelajari bersama ${ctx.companionId} di perpustakaan`
-          : `Menjawab pertanyaan Partner AI tentang topik presentasi bersama ${ctx.companionId}`,
+          ? `Menjawab pertanyaan Partner tentang materi yang dipelajari bersama ${ctx.companionId} di perpustakaan`
+          : `Menjawab pertanyaan Partner tentang topik presentasi bersama ${ctx.companionId}`,
       }),
       buildCard({
         id: 'cafe_topic_2',
@@ -2264,7 +2441,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: `Hidangan favorit saya di ${ctx.tripPlace} adalah sate ayam dan nasi goreng hangat. Rasanya sangat lezat!`,
         hintTh: `เมนูโปรดของฉันที่ ${ctx.tripPlace} คือสะเต๊ะไก่และข้าวผัดร้อนๆ อร่อยมากเลย!`,
-        contextAnchorId: `Menjawab pertanyaan Partner AI tentang kuliner favorit saat di ${ctx.tripPlace}`,
+        contextAnchorId: `Menjawab pertanyaan Partner tentang kuliner favorit saat di ${ctx.tripPlace}`,
       }),
       buildCard({
         id: 'trip_food_2',
@@ -2303,7 +2480,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: `Ya, saya sangat ingin berkunjung ke ${ctx.tripPlace} lagi bersama ${ctx.companionId} pada liburan berikutnya!`,
         hintTh: `ใช่ ฉันอยากกลับไปเที่ยวที่ ${ctx.tripPlace} อีกครั้งในวันหยุดหน้าแน่นอน!`,
-        contextAnchorId: `Menjawab pertanyaan Partner AI tentang rencana berkunjung kembali ke ${ctx.tripPlace}`,
+        contextAnchorId: `Menjawab pertanyaan Partner tentang rencana berkunjung kembali ke ${ctx.tripPlace}`,
       }),
       buildCard({
         id: 'trip_again_2',
@@ -2403,7 +2580,7 @@ function synthesizeContextualThreeCards(
             'Saya percaya perusahaan sebaiknya menerapkan jadwal hibrida karena dapat menyeimbangkan fleksibilitas dan kerja sama tim.',
           hintTh:
             'ฉันเชื่อว่าบริษัทควรใช้ตารางงานแบบไฮบริด เพราะช่วยสร้างสมดุลระหว่างความยืดหยุ่นและการทำงานเป็นทีม',
-          contextAnchorId: 'Menjawab pertanyaan tindak lanjut PAW tentang kebijakan kerja masa depan',
+          contextAnchorId: 'Menjawab pertanyaan tindak lanjut Mentor tentang kebijakan kerja masa depan',
         }),
         buildCard({
           id: 'ielts_f2',
@@ -2446,7 +2623,7 @@ function synthesizeContextualThreeCards(
           'Menurut saya kerja jarak jauh meningkatkan produktivitas karena karyawan dapat menghemat waktu perjalanan setiap hari.',
         hintTh:
           'ฉันคิดว่าการทำงานทางไกลช่วยเพิ่มประสิทธิภาพ เพราะพนักงานประหยัดเวลาเดินทางในทุกๆ วัน',
-        contextAnchorId: 'Menjawab pertanyaan Partner AI tentang dampak kerja jarak jauh terhadap produktivitas',
+        contextAnchorId: 'Menjawab pertanyaan Partner tentang dampak kerja jarak jauh terhadap produktivitas',
       }),
       buildCard({
         id: 'ielts_open_2',
@@ -2489,7 +2666,7 @@ function synthesizeContextualThreeCards(
       targetLang: 'en',
       hintId: `Ya, saya sangat senang melakukan hal itu di ${ctx.city} bersama ${ctx.companionId}.`,
       hintTh: `ใช่ ฉันชอบทำสิ่งนั้นใน ${ctx.city} มากเลย`,
-      contextAnchorId: `Menjawab langsung pertanyaan live PAW: "${cleanQuestion.slice(0, 60)}"`,
+      contextAnchorId: `Menjawab langsung pertanyaan live Mentor: "${cleanQuestion.slice(0, 60)}"`,
     }),
     buildCard({
       id: 'univ_live_2',

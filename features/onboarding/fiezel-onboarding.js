@@ -491,51 +491,11 @@
   var TOPO = 'M121 120C122 123 118 128 115 131C112 133 106 134 102 134C98 135 94 136 90 135C85 135 76 135 74 132C72 130 77 124 77 120C78 116 77 113 79 110C81 107 84 103 88 102C92 101 100 101 103 103C107 104 107 109 110 112C113 115 121 117 121 120Z|M146 120C147 126 140 137 134 141C127 146 116 144 107 147C98 149 90 155 82 155C73 154 59 149 55 143C52 137 57 127 58 120C59 113 59 107 63 101C66 95 72 83 80 81C88 79 101 86 109 89C117 93 120 98 127 103C133 108 145 114 146 120Z|M171 120C172 131 164 146 154 153C144 159 126 154 112 159C98 163 83 180 71 179C59 178 45 162 39 152C33 142 35 130 35 120C36 110 38 101 44 91C50 80 59 60 70 58C82 56 100 73 113 78C126 84 139 83 149 90C159 97 171 109 171 120Z|M197 120C197 135 188 156 175 165C161 173 137 166 118 173C99 180 75 210 60 208C44 205 33 175 25 161C16 146 10 134 9 120C9 106 14 93 22 78C31 64 44 35 60 34C76 32 98 61 118 68C137 75 163 66 177 74C190 83 198 105 197 120Z|M225 120C223 140 209 163 193 175C177 187 151 183 126 193C102 203 67 240 48 236C28 232 21 188 10 169C-1 150 -16 138 -19 120C-21 102 -16 81 -4 63C7 45 30 13 51 12C72 11 97 47 123 55C149 62 190 46 207 57C224 68 228 100 225 120Z|M257 120C252 144 228 167 208 183C188 200 167 209 138 221C110 234 62 268 37 261C13 254 6 203 -8 179C-22 156 -42 142 -47 120C-52 98 -53 65 -38 44C-23 23 16 -3 44 -4C73 -6 99 28 131 35C163 43 217 26 238 40C259 54 262 96 257 120Z|M292 120C284 148 243 167 220 190C197 214 186 244 154 259C122 274 60 291 29 280C-1 269 -14 219 -31 192C-49 166 -69 148 -76 120C-84 92 -97 44 -77 22C-58 -1 4 -11 40 -14C77 -16 105 1 143 7C181 13 242 5 266 23C291 42 299 92 292 120Z|M328 120C318 152 259 167 233 197C207 228 208 289 173 305C138 320 63 309 24 293C-15 277 -38 237 -60 208C-82 180 -98 155 -108 120C-118 85 -144 21 -120 -2C-96 -26 -8 -14 38 -19C85 -24 116 -35 159 -30C201 -26 265 -17 293 8C321 34 338 88 328 120Z|M349 70C349 73 346 76 344 78C341 80 338 79 334 81C331 82 325 88 323 88C320 87 319 80 318 77C316 74 314 73 313 70C313 67 313 64 315 61C316 59 320 54 323 54C326 54 330 60 334 61C338 62 344 59 347 60C350 62 350 67 349 70Z|M371 70C369 76 361 80 356 85C351 89 348 93 341 96C334 100 321 108 315 106C309 104 308 90 305 84C302 78 296 76 295 70C293 64 291 55 295 50C298 45 310 40 318 40C325 40 330 48 339 49C347 51 361 46 366 49C372 53 372 64 371 70Z|M395 70C392 79 374 82 367 91C359 99 360 114 351 119C341 124 319 125 309 121C299 116 295 102 289 93C283 85 278 80 275 70C272 60 263 42 269 36C276 29 301 31 314 30C326 30 334 30 346 32C358 33 378 32 386 38C394 45 398 61 395 70Z|M422 70C417 82 389 84 379 98C369 111 376 144 363 150C351 156 319 141 304 134C288 126 277 116 268 105C259 94 255 84 250 70C245 56 230 27 240 19C250 11 291 25 310 23C330 21 340 5 357 6C373 7 397 15 408 26C418 37 427 58 422 70Z|M446 70C440 86 408 89 397 108C386 127 393 177 377 183C361 189 321 156 299 145C277 134 259 130 245 118C232 106 223 89 218 70C212 51 198 13 213 3C227 -6 280 18 307 14C333 9 349 -24 369 -24C390 -24 417 -2 430 13C442 29 451 54 446 70Z|M315 300C315 302 312 303 311 306C309 309 309 315 306 315C304 316 299 312 296 310C293 309 290 309 288 307C286 305 284 303 283 300C283 297 282 293 285 291C287 290 293 293 297 292C300 291 303 286 306 286C309 286 312 290 314 292C315 294 316 298 315 300Z|M328 300C328 305 330 310 327 316C325 321 319 329 313 330C307 331 297 324 291 321C285 319 280 318 275 314C269 311 261 305 260 300C260 295 267 288 272 284C278 281 285 282 292 280C298 278 306 270 312 271C318 271 327 278 330 283C332 288 329 295 328 300Z|M341 300C342 310 358 323 354 330C350 338 330 343 318 344C307 345 295 340 285 337C275 333 267 330 258 324C249 318 228 307 229 300C230 293 254 286 263 279C272 273 274 265 284 261C293 256 308 252 319 254C330 256 345 265 349 272C352 280 340 290 341 300Z'.split('|');
 
   function topo(pawState) {
-    var star = function (x, y, s, op) {
-      return '<path d="M0,-10 Q0,0 10,0 Q0,0 0,10 Q0,0 -10,0 Q0,0 0,-10 Z" fill="url(#fzGoldGrad)" opacity="' + op + '" transform="translate(' + x + ',' + y + ') scale(' + s + ')"/>';
-    };
-    var dot = function (x, y, r, op) {
-      return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="url(#fzGoldGrad)" opacity="' + op + '"/>';
-    };
-    var note = function (x, y, s, op) {
-      return '<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h5V3h-7z" fill="url(#fzGoldGrad)" opacity="' + op + '" transform="translate(' + x + ',' + y + ') scale(' + s + ')"/>';
-    };
-    var radiance = '<g class="fz-radiance-burst" stroke="#FFD54F" stroke-width="2.8" stroke-linecap="round" opacity="0.95">'
-      + '<line x1="284" y1="112" x2="300" y2="98"/>'
-      + '<line x1="294" y1="128" x2="314" y2="124"/>'
-      + '<line x1="284" y1="144" x2="302" y2="152"/>'
-      + '</g>';
-    var isListening = (pawState === 'listening' || pawState === 'observing');
-    var sparkles = '<g class="fz-topo-sparkles">'
-      + star(46, 54, 1.05, 0.95)
-      + star(364, 58, 1.3, 0.95)
-      + star(76, 102, 0.7, 0.8)
-      + star(380, 108, 0.85, 0.85)
-      + star(334, 126, 0.65, 0.75)
-      + star(28, 124, 0.55, 0.7)
-      + dot(32, 90, 2.5, 0.8)
-      + dot(90, 48, 2, 0.75)
-      + dot(336, 44, 2.5, 0.85)
-      + dot(388, 80, 2, 0.75)
-      + (isListening ? (note(326, 46, 1.2, 0.95) + note(62, 60, 0.9, 0.9)) : radiance)
-      + '</g>';
-
     return '<svg class="fz-auth-topo" viewBox="-20 -40 430 385" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
-      + '<defs>'
-      + '<linearGradient id="fzGoldGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFE082"/><stop offset="100%" stop-color="#FFB300"/></linearGradient>'
-      + '<radialGradient id="fzMochiHaloSpot" cx="50%" cy="58%" r="48%">'
-      + '<stop offset="0%" stop-color="#FFD54F" stop-opacity="0.45"/>'
-      + '<stop offset="40%" stop-color="#FFB300" stop-opacity="0.22"/>'
-      + '<stop offset="70%" stop-color="#FF8F00" stop-opacity="0.06"/>'
-      + '<stop offset="100%" stop-color="#1C1417" stop-opacity="0"/>'
-      + '</radialGradient>'
-      + '</defs>'
-      + '<circle cx="206" cy="165" r="145" fill="url(#fzMochiHaloSpot)" pointer-events="none"/>'
       + TOPO.map(function (d, i) {
           var isAccent = (i % 3 === 0);
           return '<path class="' + (isAccent ? 'is-accent' : '') + '" d="' + d + '"/>';
         }).join('')
-      + sparkles
       + '</svg>';
   }
 
@@ -558,10 +518,7 @@
       + '</div>'
       + '</div>';
 
-    var wave = '<div class="fz-ob-cloud-cushion" aria-hidden="true">'
-      + '<svg class="fz-cloud-back" viewBox="0 0 412 160" preserveAspectRatio="none"><path d="M0,50 C50,38 95,55 145,68 C185,78 225,78 265,70 C310,60 355,38 390,36 C400,35 408,38 412,40 L412,160 L0,160 Z" fill="rgba(235, 222, 206, 0.82)"></path></svg>'
-      + '<svg class="fz-cloud-front fz-auth-wave" viewBox="0 0 412 160" preserveAspectRatio="none"><path d="M0,65 C45,55 85,75 130,85 C165,92 206,94 245,90 C290,84 340,55 380,50 C395,48 405,52 412,55 L412,160 L0,160 Z" fill="#FAF5ED"></path></svg>'
-      + '</div>';
+    var wave = '';
 
     var stepIndicator = (typeof stepNumber !== 'undefined') ? stepper(stepNumber, visualOverride) : '';
 
@@ -638,12 +595,9 @@
   // HANYA maskotnya (di mascot()); kalimatnya tetap dibacakan karena ia informasi.
   function greet(env, pawState, text) {
     return '<div class="fiezel-stage">'
-      + '<div class="fz-mochi-halo" aria-hidden="true"></div>'
       + '<div class="fiezel-stage-art">'
-      + '<div class="fz-mochi-rays" aria-hidden="true"><span></span><span></span><span></span><span></span></div>'
       + mascot(env, pawState)
       + '</div>'
-      + '<div class="fz-mochi-cloud-shadow" aria-hidden="true"></div>'
       + (text ? '<p class="fiezel-greet-bubble" style="display:none;">' + escapeHtml(text) + '</p>' : '')
       + '</div>';
   }
@@ -1158,7 +1112,9 @@
       + '<div class="fz-path-card-content">'
       + '<span class="fz-path-icon" aria-hidden="true">' + ICON_BOOK_SVG + '</span>'
       + '<div class="fz-path-texts">'
+      + '<div class="fz-path-header-row">'
       + '<b class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-beginner-title')) + '</b>'
+      + '</div>'
       + '<p class="fiezel-path-desc">' + escapeHtml(T('onboarding.path-beginner-desc-v2')) + '</p>'
       + '</div>'
       + '</div>'
@@ -1169,8 +1125,10 @@
       + '<div class="fz-path-card-content">'
       + '<span class="fz-path-icon" aria-hidden="true">' + ICON_CLIPBOARD_SVG + '</span>'
       + '<div class="fz-path-texts">'
-      + '<span class="fz-path-soal-pill">' + facts.soal + ' soal</span>'
+      + '<div class="fz-path-header-row">'
       + '<b class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-test-title')) + '</b>'
+      + '<span class="fz-path-soal-pill">' + facts.soal + ' ' + escapeHtml(T('guru.soal-count', 'soal')) + '</span>'
+      + '</div>'
       + '<p class="fiezel-path-desc"><span class="fiezel-path-count" style="display:none;">' + facts.soal + ' soal</span> ' + escapeHtml(T('onboarding.path-test-desc-v2')) + '</p>'
       + '</div>'
       + '</div>'

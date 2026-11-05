@@ -238,7 +238,7 @@
   "quiz.burst-ok": "ถูกต้อง!",
   "quiz.burst-ok-sub": "เยี่ยม คุณเข้าใจรูปแบบแล้ว",
   "quiz.class-muted-progres-sudah-masuk": "<p class=\"muted\">ความคืบหน้าเข้าโปรไฟล์ทักษะและแบบฝึกหัดปรับตามตัวคุณครั้งถัดไปแล้ว</p>",
-  "quiz.class-tutor-report-data-lucide": "<p class=\"tutor-report\"><i data-lucide=\"graduation-cap\"></i>  {headline}  </p>",
+  "quiz.class-tutor-report-data-lucide": "<p class=\"tutor-report\"><i data-lucide=\"graduation-cap\"></i> {headline} </p>",
   "quiz.clean-correct-takeaway": "คำตอบที่ถูกต้องคือ \"{correct}\" โปรดสังเกตรูปแบบประโยคและความหมายโดยรวม",
   "quiz.cloze-avoid": "เขียนรูปเต็มของคำ ไม่ใช่แค่รูปพื้นฐาน",
   "quiz.cloze-correct": "รูปแบบของคุณถูกต้อง: {answer}",
