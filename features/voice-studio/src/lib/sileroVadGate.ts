@@ -204,17 +204,18 @@ export class SileroNeuralVadGate {
           if (cb.isAiPlaying()) {
             // While AI partner speaks:
             // 1. If visual learning workbench is open, student is looking at the card - NEVER barge-in interrupt!
-            // 2. High threshold (>= 14 frames = 448ms with neural speech prob >= 0.90 & rms >= 0.075).
-            // Prevents laptop/phone speaker acoustic bleed from falsely cutting off AI playback.
+            // 2. High threshold (>= 18 frames = 576ms with neural speech prob >= 0.94 & rms >= 0.14).
+            // Prevents laptop/phone speaker acoustic bleed from falsely cutting off AI playback or echoing back into Gemini Live.
             if (cb.isWorkbenchOpen?.()) {
               speechStreak = 0;
+              preRollBase64.length = 0;
               return;
             }
-            if (pSpeech >= 0.90 && rms >= 0.075) {
+            if (pSpeech >= 0.94 && rms >= 0.14) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
-              if (speechStreak >= 14) {
+              if (speechStreak >= 18) {
                 burstOpen = true;
                 this.confirmedSpeaking = true;
                 cb.onHumanBargeIn();
@@ -227,11 +228,9 @@ export class SileroNeuralVadGate {
                 return;
               }
             } else {
-              if (pSpeech < 0.60) speechStreak = 0;
-              if (pcmBase64) {
-                preRollBase64.push(pcmBase64);
-                if (preRollBase64.length > MAX_PREROLL_FRAMES) preRollBase64.shift();
-              }
+              if (pSpeech < 0.70) speechStreak = 0;
+              // Never buffer AI speaker echo into preRollBase64 while AI is playing
+              preRollBase64.length = 0;
               return;
             }
           } else {

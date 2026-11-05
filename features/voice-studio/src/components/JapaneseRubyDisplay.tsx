@@ -33,14 +33,24 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
 
   const Component = as;
 
+  // Count CJK characters vs Latin words so a predominantly Indonesian/English sentence quoting 1-2 CJK characters
+  // NEVER duplicates the entire Latin sentence as a fake Pinyin/Romaji line underneath!
+  const hanziMatches = clean.match(/[\u3400-\u4DBF\u4E00-\u9FFF]/g) || [];
+  const kanaMatches = clean.match(/[\u3040-\u30FF]/g) || [];
+  const cjkCount = hanziMatches.length + kanaMatches.length;
+  const latinWords = clean.match(/[A-Za-z]{3,}/g) || [];
+  const isPredominantlyLatinSentence =
+    latinWords.length >= 4 && latinWords.length > cjkCount * 2;
+
   // 1. MANDARIN CHINESE (targetLang === 'zh' OR explicitly contains Hanzi without Japanese Kana)
   const isMandarin =
-    targetLang === 'zh' ||
+    (targetLang === 'zh' && containsHanzi(clean)) ||
     (containsHanzi(clean) && !/[\u3040-\u30FF]/.test(clean) && targetLang !== 'ja');
 
   if (isMandarin) {
     const rubyHtml = renderMandarinRubyHtml(clean, { hideRuby: !allowFurigana });
-    const pinyin = allowRomaji ? toPhoneticPinyin(clean) : '';
+    const pinyin =
+      allowRomaji && !isPredominantlyLatinSentence ? toPhoneticPinyin(clean) : '';
 
     return (
       <Component
@@ -72,11 +82,13 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
 
   // 2. JAPANESE (targetLang === 'ja' OR contains Kana/Kanji)
   const isJapanese =
-    targetLang === 'ja' || /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF]/.test(clean);
+    (targetLang === 'ja' && cjkCount > 0) ||
+    /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF]/.test(clean);
 
   if (isJapanese) {
     const furiganaHtml = renderFuriganaHtml(clean, { hideFurigana: !allowFurigana });
-    const romaji = allowRomaji ? toPhoneticRomaji(clean) : '';
+    const romaji =
+      allowRomaji && !isPredominantlyLatinSentence ? toPhoneticRomaji(clean) : '';
 
     return (
       <Component

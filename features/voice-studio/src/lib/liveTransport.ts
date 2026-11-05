@@ -1112,6 +1112,168 @@ export function buildContextualFallbackCards(params: {
     ];
   }
 
+  // Special handler when AI opens the interactive learning popup / explains a grammar rule or particle
+  if (
+    /\b(popped up|on your screen|writing drill|latihan.*layar|papan tulis|partikel)\b/i.test(rawAi) ||
+    /(?:画面に.*カード|練習.*画面|書いてみて)/u.test(rawAi) ||
+    /(?:屏幕上|练习卡片|试着写|的用法)/u.test(rawAi)
+  ) {
+    if (params.targetLang === 'zh') {
+      return [
+        {
+          id: 'ctx_wb_zh_1',
+          tier: 'easy',
+          badgeId: 'Singkat & Mudah',
+          badgeTh: 'สั้นและง่าย',
+          tierLabelId: '1 · Singkat',
+          tierLabelTh: '1 · สั้นและง่าย',
+          text: '好的，我现在就试着造一个句子！',
+          pronunciation: 'Hǎo de, wǒ xiànzài jiù shìzhe zào yī gè jùzi!',
+          hintId: 'Baik, aku coba buat satu kalimat sekarang juga!',
+          hintTh: 'โอเค ฉันจะลองแต่งประโยคดูเดี๋ยวนี้เลย!',
+          meaningId: 'Baik, aku coba buat satu kalimat sekarang juga!',
+          meaningTh: 'โอเค ฉันจะลองแต่งประโยคดูเดี๋ยวนี้เลย!',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_wb_zh_2',
+          tier: 'mission',
+          badgeId: 'Alami & Kontekstual',
+          badgeTh: 'เป็นธรรมชาติ',
+          tierLabelId: '2 · Alami',
+          tierLabelTh: '2 · เป็นธรรมชาติ',
+          text: '我看懂屏幕上的规则了，比如：这是我的中文书。',
+          pronunciation: 'Wǒ kàn dǒng píngmù shàng de guīzé le, bǐrú: zhè shì wǒ de Zhōngwén shū.',
+          hintId: 'Aku sudah paham aturan di layar, misalnya: ini adalah buku bahasa Mandarinku.',
+          hintTh: 'ฉันเข้าใจกฎบนหน้าจอแล้ว เช่น นี่คือหนังสือภาษาจีนของฉัน',
+          meaningId: 'Aku sudah paham aturan di layar, misalnya: ini adalah buku bahasa Mandarinku.',
+          meaningTh: 'ฉันเข้าใจกฎบนหน้าจอแล้ว เช่น นี่คือหนังสือภาษาจีนของฉัน',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_wb_zh_3',
+          tier: 'rescue',
+          badgeId: 'Jawab + Tanya Balik',
+          badgeTh: 'ตอบและถามกลับ',
+          tierLabelId: '3 · + Tanya Balik',
+          tierLabelTh: '3 · + ถามกลับ',
+          text: '原来是这样用的！你觉得我刚才的发音标准吗？',
+          pronunciation: 'Yuánlái shì zhèyàng yòng de! Nǐ juéde wǒ gāngcái de fāyīn biāozhǔn ma?',
+          hintId: 'Ternyata begini cara pakainya! Menurutmu pelafalanku barusan sudah tepat?',
+          hintTh: 'ใช้แบบนี้เองเหรอ! คุณคิดว่าการออกเสียงของฉันเมื่อกี้ชัดเจนไหม?',
+          meaningId: 'Ternyata begini cara pakainya! Menurutmu pelafalanku barusan sudah tepat?',
+          meaningTh: 'ใช้แบบนี้เองเหรอ! คุณคิดว่าการออกเสียงของฉันเมื่อกี้ชัดเจนไหม?',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+      ];
+    }
+    if (params.targetLang === 'ja') {
+      return [
+        {
+          id: 'ctx_wb_ja_1',
+          tier: 'easy',
+          badgeId: 'Singkat & Mudah',
+          badgeTh: 'สั้นและง่าย',
+          tierLabelId: '1 · Singkat',
+          tierLabelTh: '1 · สั้นและง่าย',
+          text: 'わかりました、今すぐ文を作ってみます！',
+          pronunciation: 'Wakarimashita, ima sugu bun o tsukutte mimasu!',
+          hintId: 'Mengerti, aku coba buat kalimatnya sekarang juga!',
+          hintTh: 'เข้าใจแล้ว ฉันจะลองแต่งประโยคดูเดี๋ยวนี้เลย!',
+          meaningId: 'Mengerti, aku coba buat kalimatnya sekarang juga!',
+          meaningTh: 'เข้าใจแล้ว ฉันจะลองแต่งประโยคดูเดี๋ยวนี้เลย!',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_wb_ja_2',
+          tier: 'mission',
+          badgeId: 'Alami & Kontekstual',
+          badgeTh: 'เป็นธรรมชาติ',
+          tierLabelId: '2 · Alami',
+          tierLabelTh: '2 · เป็นธรรมชาติ',
+          text: '画面の解説でスッキリ分かりました、練習してみますね。',
+          pronunciation: 'Gamen no kaisetsu de sukkiri wakarimashita, renshuu shite mimasu ne.',
+          hintId: 'Penjelasan di layar bikin langsung paham, aku coba latihannya ya.',
+          hintTh: 'คำอธิบายบนหน้าจอทำให้เข้าใจชัดเจนเลย เดี๋ยวลองฝึกดูนะ',
+          meaningId: 'Penjelasan di layar bikin langsung paham, aku coba latihannya ya.',
+          meaningTh: 'คำอธิบายบนหน้าจอทำให้เข้าใจชัดเจนเลย เดี๋ยวลองฝึกดูนะ',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_wb_ja_3',
+          tier: 'rescue',
+          badgeId: 'Jawab + Tanya Balik',
+          badgeTh: 'ตอบและถามกลับ',
+          tierLabelId: '3 · + Tanya Balik',
+          tierLabelTh: '3 · + ถามกลับ',
+          text: 'なるほど、そういう使い分けなんですね！もう一つ例文を教えてくれますか？',
+          pronunciation: 'Naruhodo, sou iu tsukaiwake nan desu ne! Mou hitotsu reibun o oshiete kuremasu ka?',
+          hintId: 'Begitu toh perbedaannya! Bisa kasih satu contoh kalimat lagi?',
+          hintTh: 'อ๋อ แยกใช้อย่างนี้นี่เอง! ช่วยยกตัวอย่างประโยคอีกสักอันได้ไหม?',
+          meaningId: 'Begitu toh perbedaannya! Bisa kasih satu contoh kalimat lagi?',
+          meaningTh: 'อ๋อ แยกใช้อย่างนี้นี่เอง! ช่วยยกตัวอย่างประโยคอีกสักอันได้ไหม?',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+      ];
+    }
+    return [
+      {
+        id: 'ctx_wb_en_1',
+        tier: 'easy',
+        badgeId: 'Singkat & Mudah',
+        badgeTh: 'สั้นและง่าย',
+        tierLabelId: '1 · Singkat',
+        tierLabelTh: '1 · สั้นและง่าย',
+        text: 'Got it, let me try writing a sentence right now!',
+        pronunciation: 'got it, let mi trai raiting e sentens rait nau!',
+        hintId: 'Mengerti, coba aku tulis kalimatnya sekarang!',
+        hintTh: 'เข้าใจแล้ว ขอฉันลองเขียนประโยคดูเดี๋ยวนี้เลย!',
+        meaningId: 'Mengerti, coba aku tulis kalimatnya sekarang!',
+        meaningTh: 'เข้าใจแล้ว ขอฉันลองเขียนประโยคดูเดี๋ยวนี้เลย!',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+      {
+        id: 'ctx_wb_en_2',
+        tier: 'mission',
+        badgeId: 'Alami & Kontekstual',
+        badgeTh: 'เป็นธรรมชาติ',
+        tierLabelId: '2 · Alami',
+        tierLabelTh: '2 · เป็นธรรมชาติ',
+        text: 'The formula on screen makes total sense, I see the difference now.',
+        pronunciation: 'de formula on skrin meiks toutal sens, ai si de diferens nau',
+        hintId: 'Rumus di layar masuk akal banget, sekarang aku paham bedanya.',
+        hintTh: 'สูตรบนหน้าจอเข้าใจง่ายมาก ตอนนี้ฉันเห็นความแตกต่างแล้ว',
+        meaningId: 'Rumus di layar masuk akal banget, sekarang aku paham bedanya.',
+        meaningTh: 'สูตรบนหน้าจอเข้าใจง่ายมาก ตอนนี้ฉันเห็นความแตกต่างแล้ว',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+      {
+        id: 'ctx_wb_en_3',
+        tier: 'rescue',
+        badgeId: 'Jawab + Tanya Balik',
+        badgeTh: 'ตอบและถามกลับ',
+        tierLabelId: '3 · + Tanya Balik',
+        tierLabelTh: '3 · + ถามกลับ',
+        text: 'That clears it up! Can you give me one more situation to test it?',
+        pronunciation: 'det klirs it ap! ken yu giv mi wan mor sicuesyen tu test it?',
+        hintId: 'Itu bikin jelas! Bisa kasih satu situasi lagi buat mengujinya?',
+        hintTh: 'ชัดเจนเลย! ช่วยยกอีกสักสถานการณ์ให้ฉันลองทดสอบหน่อยได้ไหม?',
+        meaningId: 'Itu bikin jelas! Bisa kasih satu situasi lagi buat mengujinya?',
+        meaningTh: 'ชัดเจนเลย! ช่วยยกอีกสักสถานการณ์ให้ฉันลองทดสอบหน่อยได้ไหม?',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+    ];
+  }
+
   const focal = extractFocalClause(params.aiText || '', params.targetLang);
   const act = detectAiIntent(params.aiText || '', params.targetLang);
   const topic = focal.extractedTopic || '';
@@ -3732,6 +3894,16 @@ export async function synthesizeViaGeminiLiveWav(params: {
 
     ws.onopen = () => {
       try {
+        const speechLangCode =
+          effectiveLang === 'ja'
+            ? 'ja-JP'
+            : effectiveLang === 'zh'
+              ? 'cmn-CN'
+              : effectiveLang === 'th'
+                ? 'th-TH'
+                : effectiveLang === 'id'
+                  ? 'id-ID'
+                  : 'en-US';
         ws?.send(
           JSON.stringify({
             setup: {
@@ -3739,6 +3911,7 @@ export async function synthesizeViaGeminiLiveWav(params: {
               generationConfig: {
                 responseModalities: ['AUDIO'],
                 speechConfig: {
+                  languageCode: speechLangCode,
                   voiceConfig: {
                     prebuiltVoiceConfig: {
                       voiceName,
@@ -3749,7 +3922,7 @@ export async function synthesizeViaGeminiLiveWav(params: {
               systemInstruction: {
                 parts: [
                   {
-                    text: `You are ${params.persona?.name || 'a charismatic native mentor'}, performing spoken dialogue in ${langLabel}. Vocal profile: ${personaStyle}. Perform ONLY the exact line inside quotes with vivid human prosody, natural breath, and authentic emotional inflection. Never spell out literal laugh words like "h-a-h-a", if a chuckle is present, render it acoustically as a subtle, genuine human sound. Never add extra words outside the quotes.`,
+                    text: `You are ${params.persona?.name || 'a charismatic native mentor'}, a 100% native speaker performing spoken dialogue in ${langLabel} (${speechLangCode}) with authentic native phonology and zero foreign/Indonesian accent. Vocal profile: ${personaStyle}. Perform ONLY the exact line inside quotes with vivid human prosody, natural breath, and authentic emotional inflection. Never spell out literal laugh words like "h-a-h-a", if a chuckle is present, render it acoustically as a subtle, genuine human sound. Never add extra words outside the quotes.`,
                   },
                 ],
               },

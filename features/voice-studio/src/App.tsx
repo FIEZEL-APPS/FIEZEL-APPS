@@ -378,6 +378,11 @@ export default function App() {
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
   const [speechRate, setSpeechRate] = useState<number>(0.88);
 
+  const isLiveConnectingRef = useRef<boolean>(false);
+  const connectSeqRef = useRef<number>(0);
+  const isAiServerTurnOpenRef = useRef<boolean>(false);
+  const lastAiPlayoutEndedAtRef = useRef<number>(0);
+
   const setAiAudioPlaying = (playing: boolean, tailDelayMs = 0) => {
     if (aiPlayoutTailTimerRef.current) {
       window.clearTimeout(aiPlayoutTailTimerRef.current);
@@ -390,10 +395,14 @@ export default function App() {
       aiPlayoutTailTimerRef.current = window.setTimeout(() => {
         aiPlayoutTailTimerRef.current = null;
         isPlayingAiAudioRef.current = false;
+        lastAiPlayoutEndedAtRef.current = Date.now();
+        handyVadRef.current.reset();
         setIsPlayingAiAudio(false);
       }, tailDelayMs);
     } else {
       isPlayingAiAudioRef.current = false;
+      lastAiPlayoutEndedAtRef.current = Date.now();
+      handyVadRef.current.reset();
       setIsPlayingAiAudio(false);
     }
   };
@@ -701,11 +710,17 @@ export default function App() {
         }
         if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
           liveAudioCtxRef.current = new AudioCtx();
+          nextStartTimeRef.current = liveAudioCtxRef.current.currentTime;
         }
         const liveCtx = liveAudioCtxRef.current;
         outputAudioCtxRef.current = liveCtx;
         inputAudioCtxRef.current = liveCtx;
-        nextStartTimeRef.current = liveCtx.currentTime;
+        // CRITICAL: Never reset nextStartTimeRef.current to liveCtx.currentTime on pointerdown/keydown
+        // while activeSourcesRef chunks are already queued in the future! Resetting nextStartTimeRef
+        // during a click causes incoming WebSocket audio chunks to play on top of ongoing chunks!
+        if (activeSourcesRef.current.length === 0 && nextStartTimeRef.current < liveCtx.currentTime) {
+          nextStartTimeRef.current = liveCtx.currentTime;
+        }
         if (liveCtx.state === 'suspended') {
           void liveCtx.resume().catch(() => {});
         }
@@ -878,18 +893,6 @@ export default function App() {
 
     const currentSeq = ++copilotSeqRef.current;
 
-    // Do NOT abort an in-flight request if the AI text is a streaming debounce of the same utterance
-    if (!opts?.isDebouncedStreaming && copilotAbortRef.current) {
-      try {
-        copilotAbortRef.current.abort();
-      } catch {
-        // Ignore
-      }
-    }
-    const controller = new AbortController();
-    copilotAbortRef.current = controller;
-    inFlightCopilotKeyRef.current = dedupKey;
-
     // 1. INSTANT 0ms ZERO-DELAY OPTIMISTIC COPILOT HYDRATION:
     // Compute focal-clause contextual replies immediately and mount them synchronously
     // so learner never waits 3-7s on network before seeing 1·Singkat, 2·Alami, 3·+Tanya Balik.
@@ -912,6 +915,24 @@ export default function App() {
       setIsGeneratingCopilot(true);
       setCopilotSource('loading');
     }
+
+    // While AI speech is still streaming mid-turn, only update the instant 0ms optimistic cards above;
+    // do NOT fire 6-8 parallel network /api/voice/copilot-assist calls on partial sentences!
+    // The final turnComplete call will fire a single network upgrade once the full sentence is known.
+    if (opts?.isDebouncedStreaming) {
+      return;
+    }
+
+    if (copilotAbortRef.current) {
+      try {
+        copilotAbortRef.current.abort();
+      } catch {
+        // Ignore
+      }
+    }
+    const controller = new AbortController();
+    copilotAbortRef.current = controller;
+    inFlightCopilotKeyRef.current = dedupKey;
 
     try {
       const res = await requestRealtimeCopilotAssist({
@@ -1293,11 +1314,17 @@ export default function App() {
       timestamp: Date.now(),
     };
     setTurns([newOpeningTurn]);
-    void triggerRealtimeCopilotForAi(lineToSay, '', [
-      { speaker: 'ai', text: lineToSay },
-    ]);
+    void triggerRealtimeCopilotForAi(
+      lineToSay,
+      '',
+      [{ speaker: 'ai', text: lineToSay }],
+      { scenarioOverride: matchingScen, personaOverride: p }
+    );
     if (lineToSay) {
-      void speakAiText(lineToSay);
+      void speakAiText(lineToSay, null, undefined, {
+        spokenLang: p.targetLang,
+        personaOverride: p,
+      });
     }
     setShowPersonaModal(false);
   };
@@ -1314,7 +1341,7 @@ export default function App() {
       } catch {}
     }
     playFiezelSfx('button_tap');
-    if (isLiveConnectedRef.current) {
+    if (isLiveConnectedRef.current || isLiveConnectingRef.current) {
       stopLiveCall();
     }
     const lineToSay = p.openingGreeting || scen.openingLine;
@@ -1329,11 +1356,17 @@ export default function App() {
       timestamp: Date.now(),
     };
     setTurns([newOpeningTurn]);
-    void triggerRealtimeCopilotForAi(lineToSay, '', [
-      { speaker: 'ai', text: lineToSay },
-    ]);
+    void triggerRealtimeCopilotForAi(
+      lineToSay,
+      '',
+      [{ speaker: 'ai', text: lineToSay }],
+      { scenarioOverride: scen, personaOverride: p }
+    );
     if (lineToSay) {
-      void speakAiText(lineToSay);
+      void speakAiText(lineToSay, null, undefined, {
+        spokenLang: scen.targetLang,
+        personaOverride: p,
+      });
     }
     setShowPersonaModal(false);
   };
@@ -1365,13 +1398,18 @@ export default function App() {
    * is intentionally never used. If the neural server cannot answer, the reply text stays on
    * screen and the learner can replay it with "Putar Suara", never a robot voice.
    */
-  const fetchNeuralVoice = async (text: string, spokenLang?: string) => {
-    const langToUse = (spokenLang as TargetLang) || activeScenario.targetLang;
+  const fetchNeuralVoice = async (
+    text: string,
+    spokenLang?: string,
+    personaOverride?: typeof activePersona
+  ) => {
+    const persToUse = personaOverride || activePersona;
+    const langToUse = (spokenLang as TargetLang) || persToUse?.targetLang || activeScenario.targetLang;
     for (let attempt = 0; attempt < 2; attempt++) {
       const res = await synthesizeFlexibleTts({
         text,
         targetLang: langToUse,
-        persona: activePersona,
+        persona: persToUse,
         force: attempt > 0,
       });
       if (res?.audioBase64) return res;
@@ -1535,24 +1573,30 @@ export default function App() {
     text: string,
     preloadedBase64?: string | null,
     overrideRate?: number,
-    opts?: { isManualReplay?: boolean; spokenLang?: string }
+    opts?: {
+      isManualReplay?: boolean;
+      spokenLang?: string;
+      personaOverride?: typeof activePersona;
+    }
   ) => {
     const cleanSpoken = stripEmojisAndEmotWords(text).trim();
     if (!cleanSpoken) return;
 
-    // Never allow automatic background HTTP TTS to interrupt an active Gemini 3.8 Live WebSocket stream!
-    if (
-      isLiveConnectedRef.current &&
-      wsRef.current &&
-      wsRef.current.readyState === WebSocket.OPEN &&
-      !opts?.isManualReplay
-    ) {
+    // Never allow automatic background HTTP TTS to interrupt or overlap with an active/connecting Gemini 3.8 Live WebSocket call!
+    if ((isLiveConnectedRef.current || isLiveConnectingRef.current) && !opts?.isManualReplay) {
       return;
     }
 
-    // ZERO AUDIO COLLISION: Silence any previous playback or live WebSocket stream
+    // ZERO AUDIO COLLISION: Silence any previous playback, OS speechSynthesis, or buffer sources
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // Ignore
+      }
+    }
     stopNeuralBufferSource();
-    if (activeSourcesRef.current.length > 0) {
+    if (activeSourcesRef.current.length > 0 && !isLiveConnectedRef.current) {
       activeSourcesRef.current.forEach((src) => {
         try {
           src.stop();
@@ -1573,7 +1617,7 @@ export default function App() {
     const fetchChunk = (idx: number) =>
       idx === 0 && preloadedBase64
         ? Promise.resolve({ audioBase64: preloadedBase64, audioMimeType: 'audio/mpeg', engine: 'preloaded' })
-        : fetchNeuralVoice(chunks[idx], opts?.spokenLang);
+        : fetchNeuralVoice(chunks[idx], opts?.spokenLang, opts?.personaOverride);
     let nextAudioJob: Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> | null =
       fetchChunk(0);
 
@@ -1595,6 +1639,9 @@ export default function App() {
         const currentJob = nextAudioJob || fetchChunk(i);
         const res = await currentJob;
         if (token !== speakTokenRef.current) return;
+        if ((isLiveConnectedRef.current || isLiveConnectingRef.current) && !opts?.isManualReplay) {
+          return;
+        }
         nextAudioJob = i + 1 < chunks.length ? fetchChunk(i + 1) : null;
         if (!res?.audioBase64) continue;
         anyAudio = true;
@@ -1617,38 +1664,12 @@ export default function App() {
         }
       }
       if (!anyAudio) {
-        // Guaranteed Voice Fallback: Student must NEVER experience total silence when Coach explains or speaks!
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-          try {
-            const u = new SpeechSynthesisUtterance(cleanSpoken);
-            if (locale === 'th') {
-              u.lang = 'th-TH';
-            } else if (activeScenario.targetLang === 'ja') {
-              u.lang = 'ja-JP';
-            } else if (activeScenario.targetLang === 'zh') {
-              u.lang = 'zh-CN';
-            } else if (/[a-zA-Z]/.test(cleanSpoken) && !/(adalah|bahwa|dengan|untuk|yang|kamu|kita|saya|tidak|bukan)/i.test(cleanSpoken)) {
-              u.lang = 'en-US';
-            } else {
-              u.lang = 'id-ID';
-            }
-            u.rate = targetRate || 1.0;
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(u);
-            anyPlayed = true;
-            anyAudio = true;
-            setStatusBanner(null);
-          } catch {
-            // Ignore
-          }
-        }
-        if (!anyAudio) {
-          setStatusBanner(
-            locale === 'th'
-              ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
-              : 'Suara Fiezel sedang menyambung ulang. Teks balasan tetap tampil, ketuk "Putar Suara" untuk mencoba lagi.'
-          );
-        }
+        // NEURAL-ONLY VOICE INVARIANT: Never fall back to robotic OS window.speechSynthesis!
+        setStatusBanner(
+          locale === 'th'
+            ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
+            : 'Suara Fiezel sedang menyambung ulang. Teks balasan tetap tampil, ketuk "Putar Suara" untuk mencoba lagi.'
+        );
       }
     } catch {
       // Ignore, the reply text stays on screen and can be replayed.
@@ -1689,6 +1710,13 @@ export default function App() {
   const interruptAiAndStartListening = () => {
     speakTokenRef.current += 1;
     clearSpeechWatchdog();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // Ignore
+      }
+    }
     if (livePlaybackSafetyTimerRef.current) {
       window.clearTimeout(livePlaybackSafetyTimerRef.current);
       livePlaybackSafetyTimerRef.current = null;
@@ -3019,6 +3047,7 @@ export default function App() {
       wsRef.current = null;
     }
     setLiveTransportMode('turn-by-turn-fallback');
+    isLiveConnectingRef.current = false;
     setIsLiveConnecting(false);
     setIsLiveConnected(true);
     playFiezelSfx('lesson_start');
@@ -3027,7 +3056,16 @@ export default function App() {
   };
 
   const startLiveCall = async (preAcquiredStream?: MediaStream) => {
-    if (isLiveConnected || isLiveConnecting) return;
+    if (
+      isLiveConnected ||
+      isLiveConnecting ||
+      isLiveConnectedRef.current ||
+      isLiveConnectingRef.current
+    ) {
+      return;
+    }
+    isLiveConnectingRef.current = true;
+    setIsLiveConnecting(true);
     if (!callBillingRef.current.active) {
       const autoFree = getDailyFreeCallAvailable();
       callBillingRef.current = {
@@ -3229,13 +3267,19 @@ export default function App() {
           const sampleRate = liveCtx.sampleRate || 48000;
 
           // ACOUSTIC ECHO SUPPRESSION + INSTANT BARGE-IN:
-          // Saat AI sedang berbicara, cegah echo speaker masuk ke Gemini Live.
-          // Jangan pernah memicu barge-in jika workbench sedang terbuka atau hanya getaran speaker!
-          if (isPlayingAiAudioRef.current) {
-            if (isWorkbenchOpenRef.current) return;
+          // Saat AI sedang berbicara atau gema speaker masih memantul (<480ms setelah selesai bicara),
+          // cegah echo speaker masuk ke Gemini Live agar AI tidak menjawab suaranya sendiri!
+          if (
+            isPlayingAiAudioRef.current ||
+            isAiServerTurnOpenRef.current ||
+            Date.now() - lastAiPlayoutEndedAtRef.current < 480
+          ) {
+            if (isWorkbenchOpenRef.current || Date.now() - lastAiPlayoutEndedAtRef.current < 480) {
+              return;
+            }
             const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
             const rms = bargeVad.lastMetrics?.rms ?? 0;
-            if (bargeVad.speechStarted && rms >= 0.075) {
+            if (bargeVad.speechStarted && rms >= 0.16) {
               interruptAiAndStartListening();
               if (!isUserSpeakingLiveRef.current) {
                 isUserSpeakingLiveRef.current = true;
@@ -3260,6 +3304,9 @@ export default function App() {
                   })
                 );
               }
+            } else if (!bargeVad.inSpeech) {
+              // Never retain speaker bleed in handyVad pre-roll buffer while AI is playing
+              handyVadRef.current.reset();
             }
             return;
           }
@@ -3392,11 +3439,26 @@ export default function App() {
     setCallDurationSec(0);
 
     const connectDuplex = async (isReconnect = false) => {
+      const mySeq = ++connectSeqRef.current;
+      if (wsRef.current) {
+        try {
+          wsRef.current.onopen = null;
+          wsRef.current.onmessage = null;
+          wsRef.current.onerror = null;
+          wsRef.current.onclose = null;
+          wsRef.current.close();
+        } catch {
+          // Ignore
+        }
+        wsRef.current = null;
+      }
+
       let targetWsUrl = '';
       let isGoogleLive = true;
 
       // 1. Dapatkan ephemeral session token dari Worker 16-key pool
       const session = await requestGeminiLiveSessionToken();
+      if (mySeq !== connectSeqRef.current || userHungUpRef.current) return;
       if (session.ok && session.token) {
         currentLiveSessionRef.current = session;
         const baseEndpoint =
@@ -3421,6 +3483,7 @@ export default function App() {
       let ws: WebSocket;
 
       const connectTimer = window.setTimeout(() => {
+        if (mySeq !== connectSeqRef.current || userHungUpRef.current) return;
         if (!settled) {
           settled = true;
           try {
@@ -3439,6 +3502,7 @@ export default function App() {
 
       try {
         ws = new WebSocket(targetWsUrl);
+        ws.binaryType = 'arraybuffer';
         wsRef.current = ws;
       } catch {
         window.clearTimeout(connectTimer);
@@ -3447,6 +3511,7 @@ export default function App() {
       }
 
       ws.onopen = () => {
+        if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) return;
         if (isGoogleLive) {
           try {
             const priorTurns = turnsRef.current.filter((t) => t.text && t.text.trim());
@@ -3496,6 +3561,15 @@ export default function App() {
                 ? 'Mandarin Chinese'
                 : 'English';
 
+            const speechLangCode =
+              activeScenario.targetLang === 'ja'
+                ? 'ja-JP'
+                : activeScenario.targetLang === 'zh'
+                ? 'cmn-CN'
+                : activePersona.id === 'coach_sarah' || activePersona.id === 'cambridge_examiner'
+                ? 'en-GB'
+                : 'en-US';
+
             ws.send(
               JSON.stringify({
                 setup: {
@@ -3503,6 +3577,7 @@ export default function App() {
                   generationConfig: {
                     responseModalities: ['AUDIO'],
                     speechConfig: {
+                      languageCode: speechLangCode,
                       voiceConfig: {
                         prebuiltVoiceConfig: {
                           voiceName:
@@ -3607,7 +3682,7 @@ export default function App() {
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n\n[Scenario]: ${activeScenario.titleId} (${targetLangLabel}). ${activeScenario.descriptionId || activeScenario.situationId || ''}. Opening situation: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal mentor ("Guru Sarkas Tapi Peduli Banget"). NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they confess confusion or ask for written practice, call \`open_interactive_learning_popup\` FIRST at the very start of your turn AND tell them aloud to try the card that just popped up! When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[MANDATORY EXPLANATION LANGUAGE DIRECTIVE]: Conversational practice stays in ${targetLangLabel}. HOWEVER, whenever the learner asks for an explanation or the difference between words/grammar points (e.g. "bedanya X dan Y", "kapan pakai X", "aku bingung", "tolong jelasin"), YOU MUST CALL \`open_interactive_learning_popup\` IMMEDIATELY AT THE START OF YOUR TURN AND SWITCH 100% TO THE LEARNER'S LANGUAGE (${locale === 'th' ? 'Thai' : 'Bahasa Indonesia'}) FROM YOUR VERY FIRST SPOKEN WORD! Explain the rule clearly and sharply in 1-2 short spoken sentences in their native language while quoting the target words, and tell them to look at the card on screen!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- You are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak with an Indonesian or foreign accent!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they confess confusion or ask for written practice, call \`open_interactive_learning_popup\` FIRST at the very start of your turn (putting the written explanation in ${locale === 'th' ? 'Thai' : 'Bahasa Indonesia'} inside the tool arguments) AND tell them aloud in 100% ${targetLangLabel} to try the card that just popped up on screen! When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT NATIVE SPOKEN OUTPUT LOCK]: The learner may speak to you in ${targetLangLabel}, Bahasa Indonesia, or Thai, and you understand every word. HOWEVER, YOUR SPOKEN VOICE MUST ALWAYS STAY 100% IN ${targetLangLabel.toUpperCase()} (${speechLangCode})—EVEN WHEN EXPLAINING GRAMMAR OR OPENING THE LEARNING POPUP! NEVER speak full sentences in Bahasa Indonesia or Thai aloud, because the FIEZEL UI automatically displays the bold Indonesian/Thai translation at the top of the screen and inside the learning popup!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
                       },
                     ],
                   },
@@ -3621,14 +3696,16 @@ export default function App() {
       };
 
       ws.onmessage = async (event: MessageEvent) => {
+        if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) return;
         try {
           let rawData = '';
           if (typeof event.data === 'string') {
             rawData = event.data;
-          } else if (event.data instanceof Blob) {
-            rawData = await event.data.text();
           } else if (event.data instanceof ArrayBuffer) {
             rawData = new TextDecoder().decode(event.data);
+          } else if (event.data instanceof Blob) {
+            rawData = await event.data.text();
+            if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) return;
           } else {
             return;
           }
@@ -3641,6 +3718,7 @@ export default function App() {
               window.clearTimeout(connectTimer);
             }
             setLiveTransportMode('ws-duplex');
+            isLiveConnectingRef.current = false;
             setIsLiveConnecting(false);
             setIsLiveConnected(true);
             isLiveConnectedRef.current = true;
@@ -3673,11 +3751,17 @@ export default function App() {
               const dualMem = brainStateRef.current.dualBrainMemory;
               const priorSessionsCount = dualMem?.mentorBrain?.sessionSummaries?.length || 0;
               const nextFocusNote = dualMem?.mentorBrain?.activeFocusAssignment || '';
+              const targetLangLabel =
+                activeScenario.targetLang === 'ja'
+                  ? 'Japanese'
+                  : activeScenario.targetLang === 'zh'
+                  ? 'Mandarin Chinese (Putonghua)'
+                  : 'English';
               const greetingDirective = hasUserSpoken
-                ? `[Instruction: The learner just called you back! Greet them naturally in 1-2 short, composed sentences as ${activePersona.name} in "${activeScenario.titleId}", briefly acknowledging your ongoing conversation above and asking a sharp follow-up question so they can reply immediately. Do NOT start with forced "Haha!" laughter.]`
+                ? `[Instruction: The learner just called you back! Greet them naturally in 1-2 short, composed sentences 100% in ${targetLangLabel} with authentic native ${targetLangLabel} pronunciation as ${activePersona.name}, briefly acknowledging your ongoing conversation above and asking a sharp follow-up question so they can reply immediately. NEVER speak Indonesian or Thai aloud, and do NOT start with forced laughter.]`
                 : priorSessionsCount > 0 && nextFocusNote
-                ? `[Instruction: Begin our call now as ${activePersona.name} in scenario "${activeScenario.titleId}". Deliver your opening greeting ("${activePersona.openingGreeting || activeScenario.openingLine}") with composed mentor authority (no forced "Haha!"), and briefly remind the learner of today's Braincore focus: ${nextFocusNote}]`
-                : `[Instruction: Begin our conversation now with composed, sharp, caring mentor energy as ${activePersona.name} in scenario "${activeScenario.titleId}" (do NOT start with forced "Haha!"). Say your opening line: "${activePersona.openingGreeting || activeScenario.openingLine}"]`;
+                ? `[Instruction: Begin our call now as ${activePersona.name} speaking 100% in ${targetLangLabel} with authentic native ${targetLangLabel} pronunciation. Deliver your opening greeting ("${activePersona.openingGreeting || activeScenario.openingLine}") with composed mentor authority (no forced laughter), and briefly ask a natural follow-up question in ${targetLangLabel}.]`
+                : `[Instruction: Begin our conversation now with composed, sharp, caring mentor energy as ${activePersona.name} speaking 100% in ${targetLangLabel} with authentic native ${targetLangLabel} pronunciation (do NOT start with forced laughter). Say your exact opening line in ${targetLangLabel}: "${activePersona.openingGreeting || activeScenario.openingLine}"]`;
               try {
                 ws.send(
                   JSON.stringify({
@@ -3817,17 +3901,36 @@ export default function App() {
           }
 
           if (incomingAudioChunks.length > 0 && outputAudioCtxRef.current) {
+            isAiServerTurnOpenRef.current = true;
             if (liveOpeningAudioWatchdogRef.current) {
               window.clearTimeout(liveOpeningAudioWatchdogRef.current);
               liveOpeningAudioWatchdogRef.current = null;
             }
-            const ctx = outputAudioCtxRef.current;
-            if (ctx.state === 'suspended') {
+            // Silence any stray HTTP TTS / HTMLAudioElement / speechSynthesis so two voices NEVER play simultaneously!
+            speakTokenRef.current += 1;
+            stopNeuralBufferSource();
+            if (currentAudioElRef.current) {
               try {
-                await ctx.resume();
+                currentAudioElRef.current.onended = null;
+                currentAudioElRef.current.onerror = null;
+                currentAudioElRef.current.onpause = null;
+                currentAudioElRef.current.pause();
+                currentAudioElRef.current.src = '';
               } catch {
                 // Ignore
               }
+              currentAudioElRef.current = null;
+            }
+            if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+              try {
+                window.speechSynthesis.cancel();
+              } catch {
+                // Ignore
+              }
+            }
+            const ctx = outputAudioCtxRef.current;
+            if (ctx.state === 'suspended') {
+              void ctx.resume().catch(() => {});
             }
             meterCallAiVoiceTurn();
 
@@ -3859,12 +3962,12 @@ export default function App() {
               activeSourcesRef.current.push(source);
               source.onended = () => {
                 activeSourcesRef.current = activeSourcesRef.current.filter((s) => s !== source);
-                if (activeSourcesRef.current.length === 0) {
+                if (activeSourcesRef.current.length === 0 && !isAiServerTurnOpenRef.current) {
                   if (livePlaybackSafetyTimerRef.current) {
                     window.clearTimeout(livePlaybackSafetyTimerRef.current);
                     livePlaybackSafetyTimerRef.current = null;
                   }
-                  setAiAudioPlaying(false, 250);
+                  setAiAudioPlaying(false, 350);
                 }
               };
             }
@@ -3873,11 +3976,12 @@ export default function App() {
               window.clearTimeout(livePlaybackSafetyTimerRef.current);
             }
             const remainingPlaybackMs = Math.max(
-              350,
-              Math.ceil((nextStartTimeRef.current - ctx.currentTime) * 1000) + 350
+              500,
+              Math.ceil((nextStartTimeRef.current - ctx.currentTime) * 1000) + 450
             );
             livePlaybackSafetyTimerRef.current = window.setTimeout(() => {
               livePlaybackSafetyTimerRef.current = null;
+              isAiServerTurnOpenRef.current = false;
               activeSourcesRef.current = [];
               setAiAudioPlaying(false, 0);
             }, remainingPlaybackMs);
@@ -3885,6 +3989,7 @@ export default function App() {
 
           // Barge-in interruption from server
           if (msg.serverContent?.interrupted || msg.type === 'interrupted') {
+            isAiServerTurnOpenRef.current = false;
             callBillingRef.current.turnMetered = false;
             if (livePlaybackSafetyTimerRef.current) {
               window.clearTimeout(livePlaybackSafetyTimerRef.current);
@@ -4004,6 +4109,10 @@ export default function App() {
           // Turn Complete, evaluate learner utterance and record Braincore mastery
           const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
           if (isGoogleTurnComplete || msg.type === 'turn_complete') {
+            isAiServerTurnOpenRef.current = false;
+            if (activeSourcesRef.current.length === 0) {
+              setAiAudioPlaying(false, 350);
+            }
             callBillingRef.current.turnMetered = false;
             if (callBillingRef.current.outOfGemsAfterTurn && callBillingRef.current.active) {
               callBillingRef.current.outOfGemsAfterTurn = false;
@@ -4183,20 +4292,18 @@ export default function App() {
                 },
               ]);
 
-              if (!isAiIndonesianExplanation) {
-                const lastUserForCopilot =
-                  uText ||
-                  [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
-                  '';
-                const updatedHist: Array<{ speaker: 'ai' | 'user'; text: string }> = [
-                  ...turnsRef.current
-                    .slice(-6)
-                    .map((tr) => ({ speaker: tr.speaker, text: tr.text })),
-                  ...(uText ? [{ speaker: 'user' as const, text: uText }] : []),
-                  { speaker: 'ai', text: aText },
-                ];
-                void triggerRealtimeCopilotRef.current(aText, lastUserForCopilot, updatedHist);
-              }
+              const lastUserForCopilot =
+                uText ||
+                [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
+                '';
+              const updatedHist: Array<{ speaker: 'ai' | 'user'; text: string }> = [
+                ...turnsRef.current
+                  .slice(-6)
+                  .map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+                ...(uText ? [{ speaker: 'user' as const, text: uText }] : []),
+                { speaker: 'ai', text: aText },
+              ];
+              void triggerRealtimeCopilotRef.current(aText, lastUserForCopilot, updatedHist);
 
               // Always fetch full-utterance contextual translation whenever active locale translation was incomplete
               const activeLoc = String(locale || 'id').toLowerCase();
@@ -4237,6 +4344,7 @@ export default function App() {
       };
 
       ws.onerror = () => {
+        if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) return;
         if (!settled) {
           settled = true;
           window.clearTimeout(connectTimer);
@@ -4250,6 +4358,7 @@ export default function App() {
       };
 
       ws.onclose = (event) => {
+        if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) return;
         if (!settled) {
           settled = true;
           window.clearTimeout(connectTimer);
@@ -4278,7 +4387,7 @@ export default function App() {
                 : 'Mengalihkan ke jalur suara baru tanpa hambatan...'
             );
             setTimeout(() => {
-              if (!userHungUpRef.current) {
+              if (!userHungUpRef.current && mySeq === connectSeqRef.current) {
                 void connectDuplex(true);
               }
             }, 300);
@@ -4295,6 +4404,16 @@ export default function App() {
   const stopLiveCall = () => {
     userHungUpRef.current = true;
     isLiveConnectedRef.current = false;
+    isLiveConnectingRef.current = false;
+    isAiServerTurnOpenRef.current = false;
+    connectSeqRef.current += 1;
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // Ignore
+      }
+    }
     if (liveOpeningAudioWatchdogRef.current) {
       window.clearTimeout(liveOpeningAudioWatchdogRef.current);
       liveOpeningAudioWatchdogRef.current = null;
@@ -4792,29 +4911,60 @@ export default function App() {
     translationId:
       rawSubtitleSourceId ||
       computedAiSubtitle.translationId ||
-      defaultOpeningTransId ||
+      (!isStreamingAiLive && !lastAiTurn ? defaultOpeningTransId : '') ||
       '',
     translationTh:
       rawSubtitleSourceTh ||
       computedAiSubtitle.translationTh ||
-      defaultOpeningTransTh ||
+      (!isStreamingAiLive && !lastAiTurn ? defaultOpeningTransTh : '') ||
       '',
   };
 
   const resolvedActiveAiMeaning = (() => {
+    let rawMeaning = '';
     if (isStreamingAiLive && liveAiTranslationDraft) {
-      return liveAiTranslationDraft;
+      rawMeaning = liveAiTranslationDraft;
+    } else if (locale === 'th') {
+      rawMeaning = activeAiSubtitle.translationTh || activeAiSubtitle.translationId || '';
+    } else if (locale === 'ja') {
+      rawMeaning =
+        activeAiSubtitle.translationJa ||
+        (activeScenario.targetLang === 'ja' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
+    } else if (locale === 'zh') {
+      rawMeaning =
+        activeAiSubtitle.translationZh ||
+        (activeScenario.targetLang === 'zh' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
+    } else {
+      rawMeaning = activeAiSubtitle.translationId || activeAiSubtitle.translationTh || '';
     }
-    if (locale === 'th') {
-      return activeAiSubtitle.translationTh || activeAiSubtitle.translationId || '';
+    if (rawMeaning && locale !== 'zh' && locale !== 'ja' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(rawMeaning)) {
+      rawMeaning = rawMeaning.replace(/[\u4E00-\u9FFF\u3040-\u30FF]+/g, (cjkMatch) => {
+        const phonetic =
+          activeScenario.targetLang === 'zh'
+            ? toPhoneticPinyin(cjkMatch)
+            : toPhoneticRomaji(cjkMatch);
+        return phonetic && phonetic !== cjkMatch ? phonetic : cjkMatch;
+      });
     }
-    if (locale === 'ja') {
-      return activeAiSubtitle.translationJa || (activeScenario.targetLang === 'ja' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
+    return rawMeaning.trim();
+  })();
+
+  const isAiHudDuplicateMeaning = (() => {
+    const normMeaning = (resolvedActiveAiMeaning || '').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
+    const normSpeech = (activeAiLiveText || '').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
+    if (!normMeaning) return true;
+    if (normMeaning === normSpeech) return true;
+    // Also guard if AI accidentally spoke in Indonesian while target course is zh/ja/en
+    const cjkChars = (activeAiLiveText.match(/[\u4E00-\u9FFF\u3040-\u30FF]/g) || []).length;
+    const latinWords = (activeAiLiveText.match(/[A-Za-zÀ-ÖØ-öø-ÿ]{2,}/g) || []).length;
+    if (
+      (activeScenario.targetLang === 'zh' || activeScenario.targetLang === 'ja') &&
+      latinWords >= 4 &&
+      latinWords > cjkChars * 2
+    ) {
+      return true;
     }
-    if (locale === 'zh') {
-      return activeAiSubtitle.translationZh || (activeScenario.targetLang === 'zh' ? '' : liveAiTranslationDraft || activeAiSubtitle.translationId || '');
-    }
-    return activeAiSubtitle.translationId || activeAiSubtitle.translationTh || '';
+    return false;
   })();
 
   const activeUserLiveText = liveUserDraft.trim() || lastUserTurn?.text || '';
@@ -5534,35 +5684,41 @@ export default function App() {
                             data-testid="live-hud-ai-translation"
                             className="text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
                           >
-                            {resolvedActiveAiMeaning || (
-                              <span className="font-bold text-[#1C1611]">{activeAiLiveText}</span>
-                            )}
+                            {resolvedActiveAiMeaning || activeAiLiveText}
                           </p>
                         )}
 
-                        {/* BAWAH: Subtitle bahasa kursus (English, Japanese, dsb.) - font-normal, secondary color */}
+                        {/* BAWAH: Subtitle bahasa kursus (English, Japanese, Mandarin, dsb.) - font-normal, secondary color */}
                         <div
                           data-testid="live-hud-ai-text"
                           data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
-                          className={!isMeasureMode && showTranslations && resolvedActiveAiMeaning ? 'pt-0.5' : ''}
+                          className={
+                            !isMeasureMode && showTranslations
+                              ? isAiHudDuplicateMeaning
+                                ? 'hidden'
+                                : 'pt-0.5'
+                              : ''
+                          }
                         >
-                          <JapaneseRubyDisplay
-                            text={activeAiLiveText}
-                            targetLang={activeScenario.targetLang}
-                            showFurigana={!isMeasureMode}
-                            showRomaji={!isMeasureMode}
-                            className={
-                              !isMeasureMode && showTranslations && resolvedActiveAiMeaning
-                                ? 'text-xs sm:text-[13px] text-[#6E5E47] leading-relaxed break-words font-normal'
-                                : 'text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] break-words'
-                            }
-                            rubyClassName={
-                              !isMeasureMode && showTranslations && resolvedActiveAiMeaning
-                                ? 'text-xs sm:text-[13px]'
-                                : 'text-[15px] sm:text-[17px]'
-                            }
-                            romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
-                          />
+                          {(isMeasureMode || !showTranslations || !isAiHudDuplicateMeaning) && (
+                            <JapaneseRubyDisplay
+                              text={activeAiLiveText}
+                              targetLang={activeScenario.targetLang}
+                              showFurigana={!isMeasureMode}
+                              showRomaji={!isMeasureMode}
+                              className={
+                                !isMeasureMode && showTranslations && resolvedActiveAiMeaning
+                                  ? 'text-xs sm:text-[13px] text-[#6E5E47] leading-relaxed break-words font-normal'
+                                  : 'text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] break-words'
+                              }
+                              rubyClassName={
+                                !isMeasureMode && showTranslations && resolvedActiveAiMeaning
+                                  ? 'text-xs sm:text-[13px]'
+                                  : 'text-[15px] sm:text-[17px]'
+                              }
+                              romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
+                            />
+                          )}
                         </div>
                       </>
                     )}

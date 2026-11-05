@@ -1576,13 +1576,13 @@ export async function routeVoicePartnerTurn(ctx) {
   2) Give the exact natural phrase and DEMAND ECHO REDEMPTION (make them repeat it aloud right now), setting Option 1 ("easy") in "replies" to that exact phrase!
 - PROACTIVE STRUGGLE DIAGNOSIS: Actively diagnose what has been hardest for the learner in FIEZEL and offer to pop up the interactive whiteboard or navigate to a FIEZEL module.`;
 
-  const prompt = isExplanationTurn
+  const prompt = boardOnly
     ? [
         `[SILENT JSON COMPILER TASK: Call emit_json_response immediately. Do NOT generate spoken audio.]`,
         `Target course: ${targetLang.toUpperCase()}. Learner UI language: ${targetLocaleName}. Mentor name: ${personaName}.`,
         `Learner question: "${userText}"`,
         `Build a JSON object with a visual teaching board answering "${userText}".`,
-        `Field rules: "aiReply" and "coachSpokenScript" must be 100% in ${targetLocaleName} (1 short sentence, max 14 words, no emojis, no em-dash, write "Verb ing" with a space, never say AI/bot), quoting the ${targetLang.toUpperCase()} target words.`,
+        `Field rules: "aiReply" must be 100% in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'} (1 short sentence). "aiReplyTranslation" and "coachSpokenScript" must be 100% in ${targetLocaleName} (1 short sentence, max 14 words, no emojis, no em-dash, write "Verb ing" with a space, never say AI/bot), quoting the ${targetLang.toUpperCase()} target words.`,
         `"sampleTarget": natural ${targetLang.toUpperCase()} sentence showing the rule. "trapWrongSentence": realistic mistake version of sampleTarget. "trapWrongReason": short reason in ${targetLocaleName}.`,
         `"drillMeaningPrompt": quiz prompt in ${targetLocaleName} for a DIFFERENT real-life situation. "drillTargetSentence": correct ${targetLang.toUpperCase()} sentence for that new situation (different from sampleTarget). "drillTrapSentence": wrong trap version of drillTargetSentence.`,
         `JSON schema: {"aiReply":"...","aiReplyTranslation":"...","uiAction":{"actionType":"open_learning_popup","topicTitle":"...","patternFormula":"...","coachSpokenScript":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"..."}}`,
@@ -1593,9 +1593,9 @@ export async function routeVoicePartnerTurn(ctx) {
         `[FIEZEL ECOSYSTEM & IDENTITY]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku companion.`,
         learnerDossier,
         `[4 IRONCLAD MANDATES: ZERO EXCEPTIONS]:`,
-        `1) MULTILINGUAL INPUT ACCEPTED, SPOKEN OUTPUT 100% LOCKED IN TARGET LANGUAGE (${targetLang.toUpperCase()}):
+        `1) MULTILINGUAL INPUT ACCEPTED, SPOKEN OUTPUT ("aiReply") 100% LOCKED IN TARGET LANGUAGE (${targetLang.toUpperCase()}):
    - The learner is 100% free to speak or type in Indonesian, English, Japanese, Mandarin, Thai, or mixed languages. Understand their exact meaning without complaining.
-   - HOWEVER, your "aiReply" MUST BE 100% in ${targetLang === 'ja' ? 'Japanese (Kanji+Kana)' : targetLang === 'zh' ? 'Simplified Chinese (Hanzi)' : 'English'}. NEVER speak Indonesian or Thai inside "aiReply"! Put the ${targetLocaleName} translation strictly in "aiReplyTranslation".`,
+   - HOWEVER, your "aiReply" MUST ALWAYS BE 100% in ${targetLang === 'ja' ? 'Japanese (Kanji+Kana)' : targetLang === 'zh' ? 'Simplified Chinese (Hanzi)' : 'English'} with 100% authentic native phrasing—even when explaining grammar or opening the whiteboard popup! NEVER write Indonesian or Thai sentences inside "aiReply"! Put the ${targetLocaleName} translation strictly in "aiReplyTranslation" and the written board explanation in "uiAction.explanationText" / "uiAction.coachSpokenScript".`,
         `2) ZERO APOLOGIES & REFUSE TO SWITCH LANGUAGE:`,
         `   - NEVER apologize ("I apologize", "I'm sorry", "Maaf", "すみません、AIなので"). You are a bold human-like mentor.`,
         `   - If the learner tells you to speak another language, firmly refuse in ${targetLang.toUpperCase()} because we are in the ${targetLang.toUpperCase()} course right now, while telling them they can speak their own language freely and you understand every word.`,
@@ -1607,7 +1607,7 @@ export async function routeVoicePartnerTurn(ctx) {
         `   - PURE DYNAMIC WHITEBOARD POPUP (when learner asks a grammar/vocab/particle/tone question OR needs visual correction in tutor_coach mode):`,
         `     * Whenever the learner asks what a grammar point or word difference means, you MUST return actionType="open_learning_popup" with a board generated dynamically to match THAT exact question!`,
         `     * Fill ALL of: topicTitle, coachSpokenScript, patternFormula, leadText, triggerWord, triggerTag, wrongWord, wrongTag, rightWord, rightTag, tailText, sampleTarget, trapWrongSentence, trapWrongToken, trapWrongReason, drillMeaningPrompt, drillTargetSentence, drillTrapSentence.`,
-        `   - EXPLANATION LANGUAGE RULE: casual conversation stays 100% in ${targetLang.toUpperCase()}, BUT when the learner is confused/asks for an explanation or you open a whiteboard popup, write BOTH aiReply and uiAction.coachSpokenScript, plus explanationText and trapWrongReason, in the LEARNER'S language (${targetLocaleName}) with the same lively mentor tone, quoting the target-language example words inside.`,
+        `   - EXPLANATION LANGUAGE RULE: "aiReply" MUST ALWAYS stay 100% in ${targetLang.toUpperCase()} so the spoken voice and subtitle HUD stay in the target language, while "aiReplyTranslation", "uiAction.coachSpokenScript", "uiAction.explanationText", and "uiAction.trapWrongReason" are written in the LEARNER'S language (${targetLocaleName}).`,
         modeDirective,
         `[FIEZEL COPY RULES]: NEVER write an em-dash or en-dash character in any field (use a comma, colon, or a new sentence instead). NEVER write hyphenated "Verb-ing" (write "Verb ing" with a space). NEVER call yourself or the app "AI", "bot", "chatbot", "assistant" or "model" in any language; you are ${personaName}, a FIEZEL mentor, and the app is simply "Fiezel".`,
         historyLines.length
@@ -2405,18 +2405,31 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
 
     ws.onopen = () => {
       try {
+        const speechLangCode =
+          effectiveLang === 'ja'
+            ? 'ja-JP'
+            : effectiveLang === 'zh'
+              ? 'cmn-CN'
+              : effectiveLang === 'th'
+                ? 'th-TH'
+                : effectiveLang === 'id'
+                  ? 'id-ID'
+                  : 'en-US';
         ws.send(
           JSON.stringify({
             setup: {
               model: 'models/gemini-3.8-live',
               generationConfig: {
                 responseModalities: ['AUDIO'],
-                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice || 'Puck' } } },
+                speechConfig: {
+                  languageCode: speechLangCode,
+                  voiceConfig: { prebuiltVoiceConfig: { voiceName: voice || 'Puck' } },
+                },
               },
               systemInstruction: {
                 parts: [
                   {
-                    text: `PURE VOICEOVER READER MODE. Vocal style: ${style}. Speak strictly in ${langLabel}. Read ONLY the exact text given after READ_EXACTLY:, word for word, with zero added words before or after.`,
+                    text: `PURE VOICEOVER READER MODE. Vocal style: ${style}. Speak strictly in ${langLabel} (${speechLangCode}) with 100% authentic native phonology and zero foreign/Indonesian accent. Read ONLY the exact text given after READ_EXACTLY:, word for word, with zero added words before or after.`,
                   },
                 ],
               },
