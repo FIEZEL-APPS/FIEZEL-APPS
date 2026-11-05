@@ -431,15 +431,27 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
   }
 
   // 1. Check for Echo Redemption correction request
-  const echoMatchEn = clean.match(
-    /(?:repeat|say (?:it|this)?(?:\s+back)?(?:\s+to me)?(?:\s+cleanly|\s+out loud)?|say after me|repeat after me)[:\s]+["'“‘『「]([^"'”’』」]+)["'”’』」]/i
-  );
+  const echoMatchEn =
+    clean.match(
+      /(?:repeat|say (?:it|this)?(?:\s+back)?(?:\s+to me)?(?:\s+cleanly|\s+out loud|\s+like this)?|say after me|repeat after me|should say|gotta say|try saying)[:\s,]+["'“‘『「]([^"'”’』」]+)["'”’』」]/i
+    ) ||
+    clean.match(
+      /["'“‘『「]([^"'”’』」]{4,120})["'”’』」][.!,?\s]*(?:come on[,!\s]*|now[,!\s]*)?(?:repeat|say it(?:\s+again|\s+back|\s+with me|\s+after me)?|try saying it)/i
+    );
   const echoMatchJa =
-    clean.match(/(?:[「『"“])([^」』"”]+)[」』"”](?:と(?:言って(?:みて|ごらん)?|リピートして|読ん(?:でみて)?))/u) ||
-    clean.match(/(?:(?:もう一度|もう一回|リピートして|言ってみて|言ってごらん)[:：\s]*(?:[「『"“])([^」』"”]+)[」』"”])/u);
+    clean.match(
+      /(?:[「『"“])([^」』"”]+)[」』"”](?:と|って)?[、。！!\s]*(?:ほら[、\s]*|さあ[、\s]*)?(?:もう一度|もう一回)?(?:言って(?:みて|ごらん|み)?|リピートして|読ん(?:でみて)?|言い直して)/u
+    ) ||
+    clean.match(
+      /(?:(?:もう一度|もう一回|リピートして|言ってみて|言ってごらん|こう言う(?:んだ|のよ|ねん)|正しくは)[:：、\s]*(?:[「『"“])([^」』"”]+)[」』"”])/u
+    );
   const echoMatchZh =
-    clean.match(/(?:[“"「『])([^”"」』]+)[”"」』](?:跟我读|重复一遍|读一遍)/u) ||
-    clean.match(/(?:(?:跟我读|再说一遍|重复一遍|读一遍)[:：\s]*(?:[“"「『])([^”"」』]+)[”"」』])/u);
+    clean.match(
+      /(?:[“"「『])([^”"」』]+)[”"」』][，。！!\s]*(?:来[，\s]*|快[，\s]*)?(?:跟我(?:重新)?(?:读|说|念)|(?:重新|再)(?:说|读|念)一遍|重复一遍|读一遍|说一遍)/u
+    ) ||
+    clean.match(
+      /(?:(?:跟我(?:重新)?(?:读|说)|(?:再|重新)说一遍|重复一遍|读一遍|(?:得|要|应该|该)这么说|正确(?:的)?说法是)[:：，\s]*(?:[“"「『])([^”"」』]+)[”"」』])/u
+    );
   const echoTarget = (echoMatchEn?.[1] || echoMatchJa?.[1] || echoMatchZh?.[1])?.trim();
   if (echoTarget) {
     return {

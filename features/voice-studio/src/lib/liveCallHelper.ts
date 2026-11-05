@@ -956,7 +956,9 @@ export async function fetchLiveTranslation(
   }
   const cacheKey = `${loc}:${clean}`;
   if (liveTranslationCache.has(cacheKey)) {
-    return liveTranslationCache.get(cacheKey)!;
+    const cachedMem = sanitizeTranslationOutput(liveTranslationCache.get(cacheKey)!, loc);
+    if (cachedMem) return cachedMem;
+    liveTranslationCache.delete(cacheKey);
   }
   try {
     if (typeof localStorage !== 'undefined') {
@@ -966,6 +968,8 @@ export async function fetchLiveTranslation(
         if (cleanStored) {
           liveTranslationCache.set(cacheKey, cleanStored);
           return cleanStored;
+        } else {
+          localStorage.removeItem(`fz_trans_${cacheKey}`);
         }
       }
     }
@@ -978,6 +982,12 @@ export async function fetchLiveTranslation(
     return existingPromise;
   }
 
+  const detectedSourceLang = /[\u3040-\u30ff]/.test(clean)
+    ? 'ja'
+    : /[\u3400-\u4dbf\u4e00-\u9fff]/.test(clean)
+      ? 'zh-CN'
+      : 'en';
+
   const task = (async (): Promise<string> => {
     for (const apiBase of resolveTranslationCandidateBases()) {
       const controller = new AbortController();
@@ -989,6 +999,7 @@ export async function fetchLiveTranslation(
           body: JSON.stringify({
             text: clean,
             targetLocale: loc,
+            sourceLang: detectedSourceLang,
           }),
           mode: 'cors',
           signal: controller.signal,
@@ -1022,7 +1033,7 @@ export async function fetchLiveTranslation(
 
     // Direct client fallback to ensure student subtitles are NEVER blank:
     try {
-      const directUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(loc)}&dt=t&q=${encodeURIComponent(clean)}`;
+      const directUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${encodeURIComponent(detectedSourceLang)}&tl=${encodeURIComponent(loc)}&dt=t&q=${encodeURIComponent(clean)}`;
       const ctrl = new AbortController();
       const tid = setTimeout(() => ctrl.abort(), 3500);
       const res = await fetch(directUrl, { signal: ctrl.signal });
@@ -1067,9 +1078,14 @@ function sanitizeTranslationOutput(text: string, targetLocale?: string): string 
   if (loc === 'ja' || loc === 'zh' || loc === 'ko') {
     return text.trim();
   }
+  // Reject immediately if the input is purely untranslated CJK with fewer than 2 non-CJK letters
+  const nonCjkLettersBefore = (text.match(/[A-Za-zÀ-ÖØ-öø-ÿ\u0E00-\u0E7F]/g) || []).length;
+  if (nonCjkLettersBefore < 2) {
+    return '';
+  }
   // If translation contains raw Hanzi or Kanji embedded inside quotes or parens, convert or strip them
-  return text
-    .replace(/["'「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'」』]/g, (_match, inner) => {
+  const cleaned = text
+    .replace(/["'“”‘’「『]([^"'“”‘’」』]*[\u4e00-\u9fff\u3040-\u30ff][^"'“”‘’」』]*)["'“”‘’」』]/g, (_match, inner) => {
       if (/[\u4e00-\u9fff]/.test(inner)) {
         const py = toPhoneticPinyin(inner);
         return py ? `"${py}"` : '';
@@ -1077,12 +1093,33 @@ function sanitizeTranslationOutput(text: string, targetLocale?: string): string 
       const ro = toPhoneticRomaji(inner);
       return ro ? `"${ro}"` : '';
     })
-    .replace(/[\u4e00-\u9fff\u3040-\u30ff]/g, '')
+    .replace(/[\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff]+/g, '')
     .replace(/\s{2,}/g, ' ')
     .trim();
+
+  // Final guard: never return punctuation-only "morse code" strings like ", ! , : "! ", !"
+  const nonCjkLettersAfter = (cleaned.match(/[A-Za-zÀ-ÖØ-öø-ÿ\u0E00-\u0E7F]/g) || []).length;
+  if (nonCjkLettersAfter < 3) {
+    return '';
+  }
+  return cleaned;
 }
 
 function approximateMandarinToIndonesian(text: string): string {
+  const quoteMatch = text.match(/[“"「『]([^”"」』]+)[”"」』]/u);
+  if (
+    quoteMatch &&
+    (text.includes('这么说') ||
+      text.includes('应该说') ||
+      text.includes('跟我') ||
+      text.includes('重新说') ||
+      text.includes('再说一遍') ||
+      text.includes('读一遍') ||
+      text.includes('死板'))
+  ) {
+    const pyQuote = toPhoneticPinyin(quoteMatch[1]);
+    return `Jangan bicara terlalu kaku! Kalau mau terdengar alami, ucapkan begini: "${pyQuote}". Ayo ikuti dan ulangi sekali lagi bersamaku!`;
+  }
   if (text.includes('你好') && (text.includes('小糯米') || text.includes('练习中文') || text.includes('聊点儿什么'))) {
     return 'Halo! Aku Xiao Mochi. Senang sekali bisa berlatih bahasa Mandarin bersamamu! Hari ini kamu ingin mengobrol apa?';
   }

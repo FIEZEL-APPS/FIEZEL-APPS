@@ -4891,16 +4891,22 @@ export default function App() {
     activePersona.openingGreetingTranslationTh || activeScenario.openingTranslationTh;
   const isStreamingAiLive = Boolean(liveAiDraft.trim());
   const activeAiLiveText = liveAiDraft.trim() || lastAiTurn?.text || defaultOpeningText;
-  const rawSubtitleSourceId = isStreamingAiLive
+  const hasRealLettersForMeaning = (str?: string): boolean => {
+    if (!str) return false;
+    return (str.match(/[A-Za-zÀ-ÖØ-öø-ÿ\u0E00-\u0E7F]/g) || []).length >= 3;
+  };
+  const rawCandidateId = isStreamingAiLive
     ? liveAiTranslationDraft
     : lastAiTurn
     ? lastAiTurn.translationId || ''
     : defaultOpeningTransId;
-  const rawSubtitleSourceTh = isStreamingAiLive
+  const rawSubtitleSourceId = hasRealLettersForMeaning(rawCandidateId) ? rawCandidateId : '';
+  const rawCandidateTh = isStreamingAiLive
     ? (locale === 'th' ? liveAiTranslationDraft : '')
     : lastAiTurn
     ? lastAiTurn.translationTh || ''
     : defaultOpeningTransTh;
+  const rawSubtitleSourceTh = hasRealLettersForMeaning(rawCandidateTh) ? rawCandidateTh : '';
   const computedAiSubtitle = translateAndPhoneticizeLiveText(
     activeAiLiveText,
     activeScenario.targetLang,
@@ -4924,7 +4930,7 @@ export default function App() {
   const resolvedActiveAiMeaning = (() => {
     try {
       let rawMeaning = '';
-      if (isStreamingAiLive && liveAiTranslationDraft) {
+      if (isStreamingAiLive && hasRealLettersForMeaning(liveAiTranslationDraft)) {
         rawMeaning = liveAiTranslationDraft;
       } else if (locale === 'th') {
         rawMeaning = activeAiSubtitle.translationTh || activeAiSubtitle.translationId || '';
@@ -4953,6 +4959,11 @@ export default function App() {
               : toPhoneticRomaji(cjkMatch);
           return phonetic && phonetic !== cjkMatch ? phonetic : cjkMatch;
         });
+      }
+      if (locale !== 'zh' && locale !== 'ja' && !hasRealLettersForMeaning(rawMeaning)) {
+        return hasRealLettersForMeaning(computedAiSubtitle.translationId)
+          ? computedAiSubtitle.translationId.trim()
+          : '';
       }
       return rawMeaning.trim();
     } catch {

@@ -2002,34 +2002,61 @@ export async function routeVoiceTranslate(ctx) {
 
   const cacheKey = `${targetLocale}::${rawText}`;
   if (_serverTranslationCache.has(cacheKey)) {
-    return jsonResponse({
-      ok: true,
-      translatedText: _serverTranslationCache.get(cacheKey),
-      locale: targetLocale,
-      model: 'server-cache',
-    });
+    const cachedVal = _serverTranslationCache.get(cacheKey) || '';
+    if (/\p{L}{2,}/u.test(cachedVal)) {
+      return jsonResponse({
+        ok: true,
+        translatedText: cachedVal,
+        locale: targetLocale,
+        model: 'server-cache',
+      });
+    }
+    _serverTranslationCache.delete(cacheKey);
   }
+
+  const isNonCjkTarget = targetLocale !== 'ja' && targetLocale !== 'zh' && targetLocale !== 'ko';
+  const isValidTranslatedCandidate = (cand) => {
+    const s = String(cand || '').trim();
+    if (!s) return false;
+    if (isNonCjkTarget) {
+      const nonCjkLetters = (s.match(/[A-Za-zÀ-ÖØ-öø-ÿ\u0E00-\u0E7F]/g) || []).length;
+      const cjkChars = (s.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g) || []).length;
+      if (nonCjkLetters < 2) return false;
+      if (cjkChars > nonCjkLetters) return false;
+      return true;
+    }
+    return /\p{L}{2,}/u.test(s);
+  };
+
+  const detectedSourceLoc = /[\u3040-\u30ff]/.test(rawText)
+    ? 'ja'
+    : /[\u3400-\u4dbf\u4e00-\u9fff]/.test(rawText)
+      ? 'zh-CN'
+      : /[\u0E00-\u0E7F]/.test(rawText)
+        ? 'th'
+        : String(body.sourceLang || body.sourceLocale || 'en').toLowerCase().trim();
 
   const keys = await resolvePoolKeys(ctx);
   let translatedText = '';
   let modelUsed = 'gemini-pool';
 
   // Always prefer fast gtx/mymemory translation first so subtitle translation never opens a competing Gemini WebSocket or burns RPD quota
-  translatedText = await fallbackGoogleTranslate(rawText, targetLocale);
-  if (translatedText) {
+  const gtxCand = await fallbackGoogleTranslate(rawText, targetLocale);
+  if (isValidTranslatedCandidate(gtxCand)) {
+    translatedText = gtxCand;
     modelUsed = 'gtx-fast';
   }
 
   if (!translatedText) {
-    const sourceLoc = String(body.sourceLang || body.sourceLocale || 'en').toLowerCase().trim();
-    translatedText = await fallbackMyMemoryTranslate(rawText, targetLocale, sourceLoc);
-    if (translatedText) {
+    const mmCand = await fallbackMyMemoryTranslate(rawText, targetLocale, detectedSourceLoc);
+    if (isValidTranslatedCandidate(mmCand)) {
+      translatedText = mmCand;
       modelUsed = 'mymemory-fast';
     }
   }
 
-  if (!translatedText && keys.length > 1) {
-    const cjkRule = (targetLocale === 'ja' || targetLocale === 'zh' || targetLocale === 'ko')
+  if (!translatedText && keys.length >= 1) {
+    const cjkRule = !isNonCjkTarget
       ? 'Use appropriate native Kanji/Kana/Hanzi characters for natural readability in this language.'
       : 'ZERO raw Chinese Hanzi or Japanese Kanji characters in the output! If referencing a specific term, write its Romanized form.';
 
@@ -2044,22 +2071,25 @@ export async function routeVoiceTranslate(ctx) {
 
     const gen = await runGeminiJsonWithPool(keys, prompt, 0.2, 450);
     if (gen.ok && gen.parsed) {
-      translatedText = cleanSpokenText(
+      const gemCand = cleanSpokenText(
         gen.parsed.translatedText || gen.parsed.translation || gen.parsed.aiMeaning || ''
       );
-      modelUsed = gen.model || 'gemini';
+      if (isValidTranslatedCandidate(gemCand)) {
+        translatedText = gemCand;
+        modelUsed = gen.model || 'gemini';
+      }
     }
   }
 
   // Only strip CJK characters if the target language is NOT Japanese, Chinese, or Korean!
-  if (targetLocale !== 'ja' && targetLocale !== 'zh' && targetLocale !== 'ko') {
+  if (isNonCjkTarget && translatedText) {
     translatedText = translatedText
       .replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '')
       .replace(/\s{2,}/g, ' ')
       .trim();
   }
 
-  if (!translatedText) {
+  if (!isValidTranslatedCandidate(translatedText)) {
     return jsonResponse({ ok: false, reason: 'empty_translation' }, { status: 503 });
   }
 
