@@ -6245,18 +6245,20 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth-hero::before{display:none !important;content:none !important}
 .fz-auth-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:64px;z-index:2;pointer-events:none}
 .fz-auth-wave-h{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:64px;z-index:2;pointer-events:none;display:block}
-.fz-wave-back{fill:#EBDDC8 !important;opacity:0.45 !important}
+.fz-wave-mist{fill:#D8C7B2 !important;opacity:0.28 !important}
+.fz-wave-back{fill:#EBDDC8 !important;opacity:0.52 !important}
 .fz-wave-front{fill:#F8F3E9 !important}
-.fz-wave-back-v{fill:#EBDDC8 !important;opacity:0.45 !important}
-.fz-wave-front-v{fill:#F8F3E9 !important}
+.fz-wave-cushion-outer{fill:#D8C7B2 !important;opacity:0.46 !important}
+.fz-wave-back-v{fill:#6E6055 !important;opacity:0.88 !important}
+.fz-wave-front-v{fill:#1B1515 !important}
 .fz-auth-wave-v{display:none}
-.fz-auth-hero-center{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;width:100%}
+.fz-auth-hero-center{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;width:100%}
 .fz-auth-brand{position:relative;z-index:1}
 .fz-auth-brand .fiezel-wordmark{width:min(48vw,190px);display:block;margin:0 auto}
 .fz-auth-hero.is-daftar .fiezel-wordmark{width:min(36vw,144px)}
 .fz-auth-word{margin:0;font-family:var(--fz-heading);font-weight:800;font-size:2rem;letter-spacing:.04em}
 .fz-auth-slogan-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;margin-top:2px}
-.fz-auth-tagline{margin:0;font-family:var(--fz-heading,'Plus Jakarta Sans',sans-serif);font-weight:700;font-size:1.15rem;color:#FFFDF8;letter-spacing:-0.01em;display:flex;flex-direction:column;align-items:center}
+.fz-auth-tagline{margin:0;font-family:var(--fz-heading,'Plus Jakarta Sans',sans-serif);font-weight:600;font-size:0.86rem;color:rgba(255,253,248,0.92);letter-spacing:0.01em;display:flex;flex-direction:column;align-items:center}
 .fz-auth-tagline-curve{width:140px;height:7px;display:block;margin-top:3px}
 .fz-auth .fz-auth-lang-wrap{position:absolute;z-index:10;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:14px}
 .fz-auth .fz-auth-lang{display:flex;align-items:center;gap:2px;padding:3px 6px;border-radius:9999px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(215,182,109,.35)}
@@ -6330,13 +6332,15 @@ body.fz-auth-open{overflow:hidden}
 
 /* DESKTOP & TABLET SPLIT-SCREEN AUTHENTIC REDESIGN (min-width: 768px) */
 @media (min-width: 768px) {
-  .fz-auth{display:grid !important;grid-template-columns:1fr 1fr !important;min-height:100vh !important;height:100vh !important;overflow:hidden !important;position:fixed !important;inset:0 !important}
-  .fz-auth-hero{min-height:100vh !important;height:100% !important;padding:48px 48px !important;justify-content:center !important;align-items:center !important;position:relative !important;background:#1B1515 !important}
-  .fz-auth-hero.is-welcome,.fz-auth-hero.is-masuk,.fz-auth-hero.is-daftar{min-height:100vh !important}
+  .fz-auth{display:grid !important;grid-template-columns:1fr 1fr !important;min-height:100vh !important;height:100vh !important;overflow:hidden !important;position:fixed !important;inset:0 !important;background:radial-gradient(85% 75% at 88% 12%, #FFFDF8 0%, #F8F3E9 55%, #F8F3E9 100%) !important}
+  .fz-auth-hero{min-height:100vh !important;height:100% !important;padding:48px 140px 48px 48px !important;justify-content:center !important;align-items:center !important;position:relative !important;background:transparent !important;background-color:transparent !important;z-index:5 !important}
+  .fz-auth-hero.is-welcome,.fz-auth-hero.is-masuk,.fz-auth-hero.is-daftar{min-height:100vh !important;background:transparent !important;background-color:transparent !important;padding:48px 140px 48px 48px !important}
+  .fz-auth-hero .fz-auth-topo{clip-path:url(#fzAuthHeroClipV) !important;z-index:2 !important}
   .fz-auth-wave-h{display:none !important}
-  .fz-auth-wave-v{display:block !important;position:absolute !important;right:-1px !important;top:0 !important;bottom:0 !important;height:100% !important;width:160px !important;z-index:5 !important;pointer-events:none !important}
+  .fz-auth-wave-v{display:block !important;position:absolute !important;inset:0 !important;left:0 !important;right:0 !important;top:0 !important;bottom:0 !important;height:100% !important;width:100% !important;z-index:1 !important;pointer-events:none !important}
+  .fz-auth-brand{position:relative !important;z-index:5 !important}
   .fz-auth-brand .fiezel-wordmark{width:220px !important}
-  .fz-auth-tagline{font-size:1.35rem !important}
+  .fz-auth-tagline{font-size:1.02rem !important;font-weight:600 !important}
 
   /* Desktop Language Selector: Pojok Kanan Atas, Solid, Jelas, Tanpa Fading */
   .fz-auth .fz-auth-lang-wrap{position:absolute !important;top:24px !important;right:36px !important;z-index:50 !important}
@@ -6348,7 +6352,8 @@ body.fz-auth-open{overflow:hidden}
   .fz-lang-item{padding:10px 14px !important;font-size:0.92rem !important}
 
   /* Desktop Content & Form Expansion: Lebar Mewah, Eksklusif, Tanpa Lahan Kosong */
-  .fz-auth-body{min-height:100vh !important;height:100% !important;display:flex !important;flex-direction:column !important;justify-content:center !important;align-items:center !important;max-width:none !important;margin:0 !important;padding:48px 80px !important;position:relative !important}
+  .fz-auth-body{min-height:100vh !important;height:100% !important;display:flex !important;flex-direction:column !important;justify-content:center !important;align-items:center !important;max-width:none !important;margin:0 !important;padding:48px 80px !important;position:relative !important;background:transparent !important;background-color:transparent !important;z-index:6 !important}
+  .fz-cream-contours{position:absolute !important;left:0 !important;right:0 !important;bottom:0 !important;width:100% !important;height:185px !important;z-index:1 !important;pointer-events:none !important}
   .fz-auth-welcome-container{height:auto !important;flex:0 0 auto !important;max-width:680px !important;width:100% !important;display:flex !important;flex-direction:column !important;justify-content:center !important;padding:24px 0 !important}
   .fz-auth-title{font-size:4.5rem !important;font-weight:800 !important;line-height:1.06 !important;margin-bottom:26px !important;letter-spacing:-0.04em !important}
   .fz-auth-lead{font-size:1.45rem !important;margin-bottom:38px !important;max-width:44ch !important;line-height:1.65 !important;color:#5C4E4B !important}
@@ -6493,7 +6498,7 @@ body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected .fz-kana-bt
     box-sizing: border-box !important;
     padding: 14px 28px 10px !important;
     border: none !important;
-    border-bottom: 1.5px solid #E2E8F0 !important;
+    border-bottom: none !important;
     background: linear-gradient(180deg, #181824 0%, #0F0F17 100%) !important;
   }
   body .fiezel-ob .fiezel-topbar {
@@ -10206,20 +10211,22 @@ header.topbar {
     height: 100vh !important;
     max-height: 100vh !important;
     overflow: hidden !important;
-    background: #FDFAF3 !important;
+    background: radial-gradient(85% 75% at 88% 12%, #FFFDF8 0%, #F8F3E9 55%, #F8F3E9 100%) !important;
   }
   html body .fz-auth-hero {
     min-height: 100vh !important;
     height: 100% !important;
     max-height: 100vh !important;
     overflow: hidden !important;
-    background: #161114 !important;
+    background: transparent !important;
+    background-color: transparent !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    padding: 48px 48px !important;
+    padding: 48px 140px 48px 48px !important;
     position: relative !important;
+    z-index: 5 !important;
   }
   html body .fz-auth-hero.is-welcome,
   html body .fz-auth-hero.is-masuk,
@@ -10227,7 +10234,17 @@ header.topbar {
     min-height: 100vh !important;
     height: 100% !important;
     max-height: 100vh !important;
-    padding: 48px 48px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 48px 140px 48px 48px !important;
+  }
+  html body .fz-auth-hero .fz-auth-topo {
+    clip-path: url(#fzAuthHeroClipV) !important;
+    z-index: 2 !important;
+  }
+  html body .fz-auth-hero .fz-auth-brand {
+    position: relative !important;
+    z-index: 5 !important;
   }
   html body .fz-auth-hero .fz-auth-brand .fiezel-wordmark {
     width: 220px !important;
@@ -10238,12 +10255,14 @@ header.topbar {
   html body .fz-auth-wave-v {
     display: block !important;
     position: absolute !important;
-    right: -1px !important;
+    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     top: 0 !important;
     bottom: 0 !important;
     height: 100% !important;
-    width: 160px !important;
-    z-index: 5 !important;
+    width: 100% !important;
+    z-index: 1 !important;
     pointer-events: none !important;
   }
   html body .fz-auth-body {
@@ -10255,11 +10274,23 @@ header.topbar {
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    background: radial-gradient(120% 80% at 85% 10%, #FFFDF8 0%, rgba(248, 243, 233, 0.75) 45%, rgba(243, 232, 217, 0.40) 100%), radial-gradient(90% 60% at 15% 90%, rgba(243, 232, 217, 0.75) 0%, rgba(248, 243, 233, 0.45) 50%, transparent 100%), #F8F3E9 !important;
+    background: transparent !important;
+    background-color: transparent !important;
     padding: 48px 48px !important;
     max-width: none !important;
     margin: 0 !important;
     position: relative !important;
+    z-index: 6 !important;
+  }
+  html body .fz-cream-contours {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 185px !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
   }
   html body .fz-auth-welcome-container {
     max-width: 680px !important;
@@ -10306,18 +10337,39 @@ header.topbar {
 @media (max-width: 767px) {
   .fz-auth-hero.is-masuk {
     flex: 0 0 auto !important;
-    min-height: 24vh !important;
-    max-height: 28vh !important;
-    padding: max(48px, calc(env(safe-area-inset-top, 0px) + 36px)) 20px 38px !important;
+    min-height: 23vh !important;
+    max-height: 26vh !important;
+    padding: max(36px, calc(env(safe-area-inset-top, 0px) + 22px)) 24px 62px !important;
   }
 
   .fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
-    width: min(36vw, 140px) !important;
+    width: min(36vw, 136px) !important;
+  }
+
+  .fz-auth-hero.is-masuk .fz-auth-tagline,
+  .fz-auth-hero.is-daftar .fz-auth-tagline {
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    margin-top: 1px !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  .fz-auth-hero.is-masuk .fz-auth-wave-h,
+  .fz-auth-hero.is-daftar .fz-auth-wave-h {
+    height: 50px !important;
   }
 
   .fz-auth-hero.is-welcome {
-    min-height: 48vh !important;
-    max-height: 52vh !important;
+    min-height: 46vh !important;
+    max-height: 50vh !important;
+    padding: max(42px, calc(env(safe-area-inset-top, 0px) + 28px)) 24px 72px !important;
+  }
+
+  .fz-auth-hero.is-welcome .fz-auth-tagline {
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    margin-top: 2px !important;
+    letter-spacing: 0.01em !important;
   }
 
   .fz-auth-body {
