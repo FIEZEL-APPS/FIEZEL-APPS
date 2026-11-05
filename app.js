@@ -17743,9 +17743,9 @@ function quizLoop(cfg){
    },{measure:MEASURE||!!cfg.noHints});
    host.appendChild(tokenWidget);
   }
-  /* Fase 3 (C5 butir 4): kalimat ajakan prediksi SRL tampil di bawah soal - jawabannya
-     dikumpulkan lewat popup keyakinan existing, bukan popup kedua. */
-  if(q.__srlPredict)try{const ses=srlSessionSync();if(ses.ask){const p=document.createElement('p');p.className='muted srl-predict';p.textContent=ses.ask;$('options').before(p)}}catch{}
+  /* Fase 3 (C5 butir 4): prompt teks prediksi SRL dimatikan dari DOM kuis
+     karena popup keyakinan telah dihapus permanen oleh mandat owner (2026-08-31)
+     agar pertanyaan metakognisi tidak melayang tanpa pilihan di atas opsi jawaban kuis. */
   // Soal listening: naskahnya tidak pernah dirender sebagai teks - kalau dirender, soalnya
   // berubah menjadi soal membaca, dan tes ini justru dibuat tanpa reading. Pilihan dikunci
   // sampai audio benar-benar berbunyi, supaya jawaban benar tidak bisa didapat tanpa
