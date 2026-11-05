@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-11-05T09:24:18.807Z",
+  "generatedAt": "2026-11-05T10:04:15.612Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -582,8 +582,8 @@
     }
   },
   "copyKeys": {
-    "id": 4722,
-    "th": 4546,
+    "id": 4751,
+    "th": 4575,
     "idTanpaTh": 0
   },
   "pass": true

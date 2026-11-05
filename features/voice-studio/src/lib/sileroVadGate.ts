@@ -201,14 +201,14 @@ export class SileroNeuralVadGate {
           const pcmBase64 = n > 0 ? float32At16kToPcm16Base64(frame) : '';
 
           if (cb.isAiPlaying()) {
-            // While AI partner speaks: Echo-tolerant human voice barge-in
-            // (>= 6 frames = 192ms with neural speech probability >= 0.72 & rms >= 0.010).
-            // Passing motorcycles, horns, knocks, fans, and speaker echo are rejected 100%.
-            if (pSpeech >= 0.72 && rms >= 0.010) {
+            // While AI partner speaks: Robust echo-immune human voice barge-in
+            // (>= 8 frames = 256ms with neural speech probability >= 0.85 & rms >= 0.038).
+            // Prevents laptop/phone speaker acoustic bleed from falsely cutting off AI playback.
+            if (pSpeech >= 0.85 && rms >= 0.038) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
-              if (speechStreak >= 6) {
+              if (speechStreak >= 8) {
                 burstOpen = true;
                 this.confirmedSpeaking = true;
                 cb.onHumanBargeIn();

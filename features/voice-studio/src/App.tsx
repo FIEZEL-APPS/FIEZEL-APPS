@@ -434,6 +434,7 @@ export default function App() {
   const [callDurationSec, setCallDurationSec] = useState<number>(0);
   const [syncingNow, setSyncingNow] = useState<boolean>(false);
   const [isUserSpeakingLive, setIsUserSpeakingLive] = useState<boolean>(false);
+  const isUserSpeakingLiveRef = useRef<boolean>(false);
   const userSpeakingTimerRef = useRef<number | null>(null);
   const handyVadRef = useRef<HandyHumanVad>(new HandyHumanVad());
   const sileroVadGateRef = useRef<SileroNeuralVadGate | null>(null);
@@ -1376,15 +1377,16 @@ export default function App() {
   ): AudioNode => {
     try {
       if (typeof ctx.createAnalyser !== 'function') return ctx.destination;
-      if (!holderRef.current || (holderRef.current as any).context !== ctx) {
+      const isNew = !holderRef.current || (holderRef.current as any).context !== ctx;
+      if (isNew) {
         const an = ctx.createAnalyser();
         an.fftSize = 2048;
         an.smoothingTimeConstant = 0.5;
         an.connect(ctx.destination);
         holderRef.current = an;
-      }
-      if (mochiInstanceRef.current?.attachAudioAnalyser) {
-        mochiInstanceRef.current.attachAudioAnalyser(holderRef.current, ctx.sampleRate || 24000);
+        if (mochiInstanceRef.current?.attachAudioAnalyser) {
+          mochiInstanceRef.current.attachAudioAnalyser(an, ctx.sampleRate || 24000);
+        }
       }
       return holderRef.current;
     } catch {
@@ -3173,7 +3175,10 @@ export default function App() {
           isMicMuted: () => isMicMutedRef.current,
           isAiPlaying: () => isPlayingAiAudioRef.current,
           onHumanSpeechState: (speaking) => {
-            setIsUserSpeakingLive(speaking);
+            if (isUserSpeakingLiveRef.current !== speaking) {
+              isUserSpeakingLiveRef.current = speaking;
+              setIsUserSpeakingLive(speaking);
+            }
           },
           onHumanBargeIn: () => {
             interruptAiAndStartListening();
@@ -3218,9 +3223,12 @@ export default function App() {
           if (isPlayingAiAudioRef.current) {
             const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
             const rms = bargeVad.lastMetrics?.rms ?? 0;
-            if (bargeVad.speechStarted || (bargeVad.inSpeech && rms >= 0.016)) {
+            if (bargeVad.speechStarted && rms >= 0.038) {
               interruptAiAndStartListening();
-              setIsUserSpeakingLive(true);
+              if (!isUserSpeakingLiveRef.current) {
+                isUserSpeakingLiveRef.current = true;
+                setIsUserSpeakingLive(true);
+              }
               if (
                 wsRef.current &&
                 wsRef.current.readyState === WebSocket.OPEN &&
@@ -3248,9 +3256,13 @@ export default function App() {
 
           if (vadRes.inSpeech) {
             lastHandySpeechAtRef.current = Date.now();
-            setIsUserSpeakingLive(true);
+            if (!isUserSpeakingLiveRef.current) {
+              isUserSpeakingLiveRef.current = true;
+              setIsUserSpeakingLive(true);
+            }
             if (userSpeakingTimerRef.current) window.clearTimeout(userSpeakingTimerRef.current);
             userSpeakingTimerRef.current = window.setTimeout(() => {
+              isUserSpeakingLiveRef.current = false;
               setIsUserSpeakingLive(false);
             }, 450);
           }
@@ -4706,7 +4718,7 @@ export default function App() {
         mochiSpeechCadenceTimerRef.current = null;
       }
     };
-  }, [callStateKey, is3dMochiReady, isAiThinking, liveAiDraft, lastAiTurn?.text]);
+  }, [callStateKey, is3dMochiReady, isAiThinking, lastAiTurn?.text]);
 
   const defaultOpeningText = activePersona.openingGreeting || activeScenario.openingLine;
   const defaultOpeningTransId =
@@ -5472,29 +5484,42 @@ export default function App() {
                       </div>
                     ) : (
                       <>
+                        {/* ATAS: Terjemahan bahasa user (Bahasa Indonesia / Jepang / Thai / dsb.) - BOLD & Kontras Tinggi */}
+                        {!isMeasureMode && showTranslations && (
+                          <p
+                            data-testid="live-hud-ai-translation"
+                            className="text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
+                          >
+                            {resolvedActiveAiMeaning || (
+                              <span className="font-bold text-[#1C1611]">{activeAiLiveText}</span>
+                            )}
+                          </p>
+                        )}
+
+                        {/* BAWAH: Subtitle bahasa kursus (English, Japanese, dsb.) - font-normal, secondary color */}
                         <div
                           data-testid="live-hud-ai-text"
                           data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
+                          className={!isMeasureMode && showTranslations && resolvedActiveAiMeaning ? 'pt-0.5' : ''}
                         >
                           <JapaneseRubyDisplay
                             text={activeAiLiveText}
                             targetLang={activeScenario.targetLang}
                             showFurigana={!isMeasureMode}
                             showRomaji={!isMeasureMode}
-                            className="text-[15px] sm:text-[17px] font-semibold text-[#1C1611] tracking-[-0.01em] break-words"
-                            rubyClassName="text-[15px] sm:text-[17px]"
-                            romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-1"
+                            className={
+                              !isMeasureMode && showTranslations && resolvedActiveAiMeaning
+                                ? 'text-xs sm:text-[13px] text-[#6E5E47] leading-relaxed break-words font-normal'
+                                : 'text-[15px] sm:text-[17px] font-bold text-[#1C1611] tracking-[-0.01em] break-words'
+                            }
+                            rubyClassName={
+                              !isMeasureMode && showTranslations && resolvedActiveAiMeaning
+                                ? 'text-xs sm:text-[13px]'
+                                : 'text-[15px] sm:text-[17px]'
+                            }
+                            romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
                           />
                         </div>
-
-                        {!isMeasureMode && showTranslations && (
-                          <p
-                            data-testid="live-hud-ai-translation"
-                            className="text-xs sm:text-[13px] text-[#6E5E47] leading-relaxed break-words pt-0.5"
-                          >
-                            {resolvedActiveAiMeaning}
-                          </p>
-                        )}
                       </>
                     )}
 
@@ -5638,18 +5663,34 @@ export default function App() {
                         return (
                           <div
                             key={turn.id}
-                            className="bg-white/85 rounded-2xl rounded-tl-xs px-4 py-2.5 max-w-[90%] sm:max-w-[82%] shadow-[0_1px_3px_rgba(28,22,17,0.04)] break-words space-y-1"
+                            className="bg-white/85 rounded-2xl rounded-tl-xs px-4 py-2.5 max-w-[90%] sm:max-w-[82%] shadow-[0_1px_3px_rgba(28,22,17,0.04)] break-words space-y-1.5"
                           >
-                            <div className="flex items-start justify-between gap-2">
+                            {/* ATAS: Terjemahan bahasa user (Bahasa Indonesia / Jepang / Thai / dsb.) - BOLD */}
+                            {!isMeasureMode &&
+                              showTranslations &&
+                              (turn.translationId || turn.translationTh || turn.translationJa || turn.translationZh) && (
+                                <p className="text-sm font-bold text-[#1C1611] leading-snug break-words">
+                                  {locale === 'th'
+                                    ? (turn.translationTh || turn.translationId)
+                                    : locale === 'ja'
+                                    ? (turn.translationJa || turn.translationId)
+                                    : locale === 'zh'
+                                    ? (turn.translationZh || turn.translationId)
+                                    : (turn.translationId || turn.translationTh)}
+                                </p>
+                              )}
+
+                            {/* BAWAH: Bahasa kursus (subtitle sekunder) */}
+                            <div className="flex items-start justify-between gap-2 pt-0.5">
                               <div className="min-w-0 flex-1">
                                 <JapaneseRubyDisplay
                                   text={turn.text}
                                   targetLang={activeScenario.targetLang}
                                   showFurigana={!isMeasureMode}
                                   showRomaji={!isMeasureMode}
-                                  className="text-sm font-medium text-[#1C1611] break-words"
-                                  rubyClassName="text-sm font-medium"
-                                  romajiClassName="text-xs text-[#8C6D1F] font-medium mt-0.5"
+                                  className="text-xs text-[#6E5E47] font-normal leading-relaxed break-words"
+                                  rubyClassName="text-xs font-normal"
+                                  romajiClassName="text-[11px] text-[#8C6D1F] font-medium mt-0.5"
                                 />
                               </div>
                               <button
@@ -5661,19 +5702,6 @@ export default function App() {
                                 <Volume2 className="w-3 h-3" />
                               </button>
                             </div>
-                            {!isMeasureMode &&
-                              showTranslations &&
-                              (turn.translationId || turn.translationTh || turn.translationJa || turn.translationZh) && (
-                                <p className="text-xs text-[#6E5E47] break-words">
-                                  {locale === 'th'
-                                    ? (turn.translationTh || turn.translationId)
-                                    : locale === 'ja'
-                                    ? (turn.translationJa || turn.translationId)
-                                    : locale === 'zh'
-                                    ? (turn.translationZh || turn.translationId)
-                                    : (turn.translationId || turn.translationTh)}
-                                </p>
-                              )}
                           </div>
                         );
                       }

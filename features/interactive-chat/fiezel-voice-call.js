@@ -2143,9 +2143,9 @@
 
         // Live Subtitle Card
         '<div class="fzc-call-subtitle-card" id="fzcCallSubtitleCard">' +
-        '<div class="fzc-call-sub-text fzc-call-transcript-text" id="fzcCallSubText">' + t('call_sub_connecting', 'Mempersiapkan audio...') + '</div>' +
+        '<div class="fzc-call-sub-trans" id="fzcCallSubTrans" style="font-weight:700;font-size:1.05rem;color:#1C1611;margin-bottom:4px;line-height:1.4;"></div>' +
+        '<div class="fzc-call-sub-text fzc-call-transcript-text" id="fzcCallSubText" style="font-size:0.85rem;color:#5C4E3C;line-height:1.4;">' + t('call_sub_connecting', 'Mempersiapkan audio...') + '</div>' +
         '<div class="fzc-call-sub-romaji fzc-romaji" id="fzcCallSubRomaji" style="display:none;"></div>' +
-        '<div class="fzc-call-sub-trans" id="fzcCallSubTrans"></div>' +
         '<div class="fzc-call-diag-container" id="fzcCallDiagContainer"></div>' +
         '<div class="fzc-call-sample-container" id="fzcCallSampleContainer"></div>' +
         '</div>' +
