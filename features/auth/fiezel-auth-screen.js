@@ -156,7 +156,9 @@
     { id: 'ja', label: 'JA', flag: '🇯🇵', name: '日本語' },
     { id: 'ms', label: 'MS', flag: '🇲🇾', name: 'Bahasa Melayu' },
     { id: 'vi', label: 'VI', flag: '🇻🇳', name: 'Tiếng Việt' },
-    { id: 'fil', label: 'FIL', flag: '🇵🇭', name: 'Filipino' }
+    { id: 'fil', label: 'FIL', flag: '🇵🇭', name: 'Filipino' },
+    { id: 'km', label: 'KM', flag: '🇰🇭', name: 'ភាសាខ្មែរ' },
+    { id: 'ru', label: 'RU', flag: '🇷🇺', name: 'Русский' }
   ];
   function langSwitch() {
     var cur = locale();

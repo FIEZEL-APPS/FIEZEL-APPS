@@ -1,6 +1,6 @@
 {
-  "vocab.buka-flashcards": "Buka flashcards",
-  "vocab.ganti-level": "Ganti level dari tombol di atas.",
+  "vocab.buka-flashcards": "Belajar dengan kartu",
+  "vocab.ganti-level": "Ganti level lewat tombol di atas.",
   "vocab.jenis-kata-adjective": "kata sifat",
   "vocab.jenis-kata-adverb": "kata keterangan",
   "vocab.jenis-kata-article": "kata sandang",
@@ -14,11 +14,11 @@
   "vocab.jenis-kata-preposition": "kata depan",
   "vocab.jenis-kata-pronoun": "kata ganti",
   "vocab.jenis-kata-verb": "kata kerja",
-  "vocab.ket-mastered": "{jumlah} mastered · bank level lain tetap tersimpan, tetapi tidak ditampilkan.",
-  "vocab.kosong": "Belum tersedia untuk level ini.",
+  "vocab.ket-mastered": "{jumlah} kata sudah kamu kuasai.",
+  "vocab.kosong": "Belum ada kata untuk level ini.",
   "vocab.n-kata": "{jumlah} kata",
-  "vocab.quiz-kosong": "Vocabulary {level} belum tersedia.",
-  "vocab.review-due": " Review Due ({jumlah})</button>",
-  "vocab.subjudul": "{jumlah} kata level {level}. Semua latihan mengikuti level belajar aktif.",
-  "vocab.uji": " Uji Vocabulary {level}</button>"
+  "vocab.quiz-kosong": "Kosakata {level} belum tersedia.",
+  "vocab.review-due": " Ulang ({jumlah})</button>",
+  "vocab.subjudul": "{jumlah} kata untuk level {level}.",
+  "vocab.uji": " Kuis kosakata {level}</button>"
 }

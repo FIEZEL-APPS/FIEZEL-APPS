@@ -51,11 +51,22 @@
   var current = DEFAULT_LOCALE;
   var listeners = [];
   var availabilityWaiters = [];
+  var loadingPromises = Object.create(null);
   var misses = Object.create(null);
   var course = null;
 
   function normalize(loc) {
     return SUPPORTED.indexOf(loc) >= 0 ? loc : DEFAULT_LOCALE;
+  }
+
+  function resolveWaiters(normalizedLocale) {
+    var box = registry[normalizedLocale];
+    for (var i = availabilityWaiters.length - 1; i >= 0; i--) {
+      var waiter = availabilityWaiters[i];
+      if (waiter.locale !== normalizedLocale || !hasCopy(waiter.locale, waiter.key)) continue;
+      availabilityWaiters.splice(i, 1);
+      try { waiter.resolve(box[waiter.key]); } catch (_) {}
+    }
   }
 
   function registerCopy(locale, map) {
@@ -70,12 +81,7 @@
       box[k] = map[k];
     });
 
-    for (var i = availabilityWaiters.length - 1; i >= 0; i--) {
-      var waiter = availabilityWaiters[i];
-      if (waiter.locale !== normalizedLocale || !hasCopy(waiter.locale, waiter.key)) continue;
-      availabilityWaiters.splice(i, 1);
-      try { waiter.resolve(box[waiter.key]); } catch (_) {}
-    }
+    resolveWaiters(normalizedLocale);
     if (normalizedLocale === current) {
       listeners.forEach(function (fn) {
         try { fn(current); } catch (e) {}
@@ -87,6 +93,7 @@
     var normalized = normalize(locale);
     var box = registry[normalized];
     Object.keys(map).forEach(function (k) { box[k] = map[k]; });
+    resolveWaiters(normalized);
   }
 
   function hasCopy(locale, key) {
@@ -213,27 +220,59 @@
   }
 
   /**
-   * Pemuatan katalog dinamis via fetch di browser
+   * Pemuatan katalog dinamis via fetch di browser + CacheStorage offline per-locale
    */
   function loadLocale(loc) {
     var target = normalize(loc);
     if (typeof fetch !== 'function') return Promise.resolve();
+    if (target !== 'id' && target !== GOLDEN_PIVOT && !loadingPromises[GOLDEN_PIVOT] && typeof document !== 'undefined') {
+      try { loadLocale(GOLDEN_PIVOT); } catch (_) {}
+    }
+    if (loadingPromises[target]) return loadingPromises[target];
+
     var namespaces = ['ui', 'quiz', 'grammar', 'vocab'];
-    return Promise.all(namespaces.map(function (ns) {
+    var loadedKeys = 0;
+    var urls = namespaces.map(function (ns) {
+      return './features/i18n/locales/' + target + '/' + ns + '.json';
+    });
+
+    if (typeof caches !== 'undefined' && target !== 'id') {
+      caches.open('fiezel-locale-' + target + '-v1').then(function (c) {
+        return Promise.allSettled(urls.map(function (u) { return c.add(u).catch(function () {}); }));
+      }).catch(function () {});
+    }
+
+    loadingPromises[target] = Promise.all(namespaces.map(function (ns) {
       var url = './features/i18n/locales/' + target + '/' + ns + '.json';
-      return fetch(url).then(function (r) {
-        if (!r.ok) return {};
+      return fetch(url, { credentials: 'same-origin' }).then(function (r) {
+        if (!r.ok) return null;
         return r.json();
       }).then(function (map) {
-        overrideCopy(target, map);
+        if (map && typeof map === 'object') {
+          loadedKeys += Object.keys(map).length;
+          overrideCopy(target, map);
+        }
       }).catch(function () {});
     })).then(function () {
+      if (loadedKeys === 0) {
+        delete loadingPromises[target];
+        return;
+      }
+      if (root) {
+        root.FiezelLocaleReady = root.FiezelLocaleReady || Object.create(null);
+        root.FiezelLocaleReady[target] = true;
+        if (typeof root.FiezelOnLocaleDataReady === 'function') {
+          try { root.FiezelOnLocaleDataReady(target); } catch (_) {}
+        }
+      }
       if (target === current) {
         listeners.forEach(function (fn) {
           try { fn(current); } catch (_) {}
         });
       }
     });
+
+    return loadingPromises[target];
   }
 
   /**
