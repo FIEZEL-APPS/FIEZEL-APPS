@@ -89,6 +89,11 @@
       });
     }).catch(function (err) {
       hideWakeNotice();
+      if (err && /failed to fetch|networkerror|load failed/i.test(String(err.message || ''))) {
+        var netErr = new Error(t('kurikulum.jaringan-gagal', 'Belum dapat terhubung ke server KelasKu. Pastikan koneksi internet aktif, atau masuk lewat aplikasi FIEZEL terlebih dahulu.'));
+        netErr.isNetwork = true;
+        throw netErr;
+      }
       throw err;
     });
   }
@@ -172,6 +177,13 @@
         }
         return { ticket: data.ticket, subjectId: data.subjectId || null, gradeId: data.gradeId || null };
       });
+    }).catch(function (err) {
+      if (err && /failed to fetch|networkerror|load failed/i.test(String(err.message || ''))) {
+        var netErr = new Error(t('kurikulum.jaringan-gagal', 'Belum dapat terhubung ke server KelasKu. Pastikan koneksi internet aktif, atau masuk lewat aplikasi FIEZEL terlebih dahulu.'));
+        netErr.isNetwork = true;
+        throw netErr;
+      }
+      throw err;
     });
   }
 

@@ -13,6 +13,7 @@ import { float32At16kToPcm16Base64 } from './handyVad';
 export interface SileroVadGateCallbacks {
   isMicMuted: () => boolean;
   isAiPlaying: () => boolean;
+  isWorkbenchOpen?: () => boolean;
   onHumanSpeechState: (speaking: boolean) => void;
   onHumanBargeIn: () => void;
   onSpeechPcm16kBase64: (pcmBase64: string) => void;
@@ -201,9 +202,15 @@ export class SileroNeuralVadGate {
           const pcmBase64 = n > 0 ? float32At16kToPcm16Base64(frame) : '';
 
           if (cb.isAiPlaying()) {
-            // While AI partner speaks: Echo-tolerant human voice barge-in
-            // (>= 6 frames = 192ms with neural speech probability >= 0.72 & rms >= 0.010).
-            // Passing motorcycles, horns, knocks, fans, and speaker echo are rejected 100%.
+            // While AI partner speaks:
+            // 1. If visual learning workbench is open, student is looking at the card - NEVER barge-in interrupt!
+            // 2. High threshold (>= 18 frames = 576ms with neural speech prob >= 0.94 & rms >= 0.14).
+            // Prevents laptop/phone speaker acoustic bleed from falsely cutting off AI playback or echoing back into Gemini Live.
+            if (cb.isWorkbenchOpen?.()) {
+              speechStreak = 0;
+              preRollBase64.length = 0;
+              return;
+            }
             if (pSpeech >= 0.72 && rms >= 0.010) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
@@ -221,11 +228,9 @@ export class SileroNeuralVadGate {
                 return;
               }
             } else {
-              if (pSpeech < 0.55) speechStreak = 0;
-              if (pcmBase64) {
-                preRollBase64.push(pcmBase64);
-                if (preRollBase64.length > MAX_PREROLL_FRAMES) preRollBase64.shift();
-              }
+              if (pSpeech < 0.70) speechStreak = 0;
+              // Never buffer AI speaker echo into preRollBase64 while AI is playing
+              preRollBase64.length = 0;
               return;
             }
           } else {
@@ -234,7 +239,8 @@ export class SileroNeuralVadGate {
             const isMobile =
               typeof navigator !== 'undefined' &&
               (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
-            const endSilenceFrames = isMobile ? 11 : 13; // ~352ms mobile, ~416ms desktop
+            // Natural pedagogical pause: 800-900ms allows foreign language learners to think/breathe without premature cutoff!
+            const endSilenceFrames = isMobile ? 26 : 28; // ~832ms mobile, ~896ms desktop
             if (pSpeech >= 0.45 && rms >= 0.002) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;

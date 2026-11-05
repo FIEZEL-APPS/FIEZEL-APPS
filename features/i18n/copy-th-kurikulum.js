@@ -338,6 +338,24 @@
     'kurikulum.antre-isi': '{n} คำตอบรอให้เซิร์ฟเวอร์นับ — ยังไม่เข้าหลักฐานความชำนาญ',
     'kurikulum.antre-kirim': 'ส่งคิว',
     'kurikulum.antre-terkirim': 'ส่งคิวแล้ว',
-    'kurikulum.antre-sisa': 'เหลือ {n} — ลองอีกครั้งเมื่อสัญญาณดีกว่า'
+    'kurikulum.antre-sisa': 'เหลือ {n} — ลองอีกครั้งเมื่อสัญญาณดีกว่า',
+    'kurikulum.nav-kembali-fiezel': '← กลับไปที่ Fiezel',
+    'kurikulum.nav-badge-guru': 'KelasKu · ห้องพักครู',
+    'kurikulum.nav-badge-misi': 'Fiezel · ภารกิจการเรียนรู้',
+    'kurikulum.jaringan-gagal': 'ยังไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ KelasKu ได้ โปรดตรวจสอบอินเทอร์เน็ต หรือเข้าสู่ระบบผ่านแอป FIEZEL ก่อน',
+    'kurikulum.guru-pilar-1-judul': 'แผนผังสมรรถนะหลักสูตร',
+    'kurikulum.guru-pilar-1-isi': 'เป้าหมายและผลลัพธ์การเรียนรู้จัดเรียงอย่างเป็นระบบพร้อมใช้งาน',
+    'kurikulum.guru-pilar-2-judul': 'วิเคราะห์ความเข้าใจคลาดเคลื่อน',
+    'kurikulum.guru-pilar-2-isi': 'ติดตามจุดที่นักเรียนยังสับสนอย่างแม่นยำ ไม่ใช่แค่คะแนนรวม',
+    'kurikulum.guru-pilar-3-judul': 'ร่างคำบรรยายผลการเรียนอัตโนมัติ',
+    'kurikulum.guru-pilar-3-isi': 'สรุปความก้าวหน้ารายบุคคลโดยเคารพดุลยพินิจของครูผู้สอนอย่างเต็มที่',
+    'kurikulum.guru-panel-kicker': 'เข้าสู่ระบบด้วยบัญชีเดียว',
+    'kurikulum.misi-pilar-1-judul': 'เส้นทางปรับตามผู้เรียน',
+    'kurikulum.misi-pilar-1-isi': 'ลำดับตั้งแต่เตรียมความพร้อม ตัวอย่าง ไปจนถึงโจทย์ท้าทายตามความถนัดของคุณ',
+    'kurikulum.misi-pilar-2-judul': 'คำอธิบายที่เข้าใจจริง',
+    'kurikulum.misi-pilar-2-isi': 'เข้าใจเหตุผลเบื้องหลังทุกคำตอบเพื่อให้แนวคิดติดตัวไปใช้งานได้จริง',
+    'kurikulum.misi-pilar-3-judul': 'พร้อมทั้งออนไลน์และออฟไลน์',
+    'kurikulum.misi-pilar-3-isi': 'ฝึกต่อจากคลังในเครื่องได้แม้ในเวลาที่สัญญาณอินเทอร์เน็ตจำกัด',
+    'kurikulum.misi-panel-kicker': 'เริ่มเซสชันการเรียนรู้'
   });
 })();

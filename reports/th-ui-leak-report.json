@@ -1,21 +1,21 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-11-04T12:47:58.524Z",
+  "generatedAt": "2026-11-05T13:54:25.501Z",
   "files": {
     "app.js": {
       "leaks": 3,
       "budget": 3,
       "sample": [
         {
-          "line": 12740,
+          "line": 12737,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 13646,
+          "line": 13644,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 14669,
+          "line": 14667,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         }
       ]
@@ -25,15 +25,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 93,
+          "line": 13,
           "text": "Akurasi di bawah target dan replay sudah penuh, jadi klip dipendekkan satu tingkat."
         },
         {
-          "line": 94,
+          "line": 14,
           "text": "Akurasi di bawah target meski replay penuh dan klip pendek, jadi kecepatan diperlambat satu pita."
         },
         {
-          "line": 95,
+          "line": 15,
           "text": "Akurasi berada di dalam pita target (±0.1), jadi kesulitan dipertahankan — di sinilah belajar paling efisien."
         }
       ]
@@ -43,7 +43,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 219,
+          "line": 43,
           "text": "%. Jawaban-jawabanmu lebih akurat daripada taksiranmu \\u2014 saat polanya sudah dikenali,"
         }
       ]
@@ -53,7 +53,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 86,
+          "line": 20,
           "text": "Sekarang gabungkan langkah-langkah tadi"
         }
       ]
@@ -63,15 +63,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 564,
+          "line": 30,
           "text": "Belum tepat nih, tapi wajar kok, bagian ini memang sering bikin terkecoh."
         },
         {
-          "line": 567,
+          "line": 37,
           "text": ". Sekarang coba lagi yuk."
         },
         {
-          "line": 579,
+          "line": 62,
           "text": "Belum ada jawaban di sesi ini."
         }
       ]
@@ -113,23 +113,23 @@
       "budget": 19,
       "sample": [
         {
-          "line": 94,
+          "line": 101,
           "text": "FIEZEL · Misi Belajar"
         },
         {
-          "line": 99,
+          "line": 115,
           "text": "Masuk dengan akun KelasKu"
         },
         {
-          "line": 113,
+          "line": 129,
           "text": "Guru masuk di"
         },
         {
-          "line": 113,
+          "line": 129,
           "text": "Ruang Guru"
         },
         {
-          "line": 145,
+          "line": 164,
           "text": "Murid"
         }
       ]
@@ -139,23 +139,23 @@
       "budget": 35,
       "sample": [
         {
-          "line": 162,
+          "line": 169,
           "text": "FIEZEL · Ruang Guru"
         },
         {
-          "line": 163,
+          "line": 170,
           "text": "Kurikulum yang benar-benar dipelajari."
         },
         {
-          "line": 166,
+          "line": 182,
           "text": "Masuk dengan akun KelasKu"
         },
         {
-          "line": 167,
+          "line": 183,
           "text": "Belum masuk? Buka"
         },
         {
-          "line": 168,
+          "line": 184,
           "text": "Murid masuk di halaman"
         }
       ]
@@ -337,7 +337,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 815,
+          "line": 854,
           "text": "Pilih bahasa untuk melanjutkan"
         }
       ]
@@ -582,8 +582,8 @@
     }
   },
   "copyKeys": {
-    "id": 4704,
-    "th": 4528,
+    "id": 4751,
+    "th": 4575,
     "idTanpaTh": 0
   },
   "pass": true

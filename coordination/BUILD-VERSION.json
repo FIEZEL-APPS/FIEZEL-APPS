@@ -1,7 +1,7 @@
 {
-  "version": "m025-765",
-  "claimedBy": "branch perf/brain-runtime-seal",
-  "claimedAt": "2026-11-05T08:25:27.200Z",
-  "reason": "refactor(brain-cleanup): add frozen export guard for runtime modules",
+  "version": "m025-766",
+  "claimedBy": "branch feat/unified-release-m025-766",
+  "claimedAt": "2026-11-05T08:46:49.656Z",
+  "reason": "feat(unified): [ALLOW-PROTECTED: auth|onboarding|pwa|ci] [ALLOW-MASS-DELETE] integrate 9-locales engine, voice studio desktop, and pedagogical whiteboard",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

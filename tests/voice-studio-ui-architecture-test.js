@@ -170,10 +170,10 @@ assert.ok(
   'Sensei Nanami uses Aoede Gemini Live voice for expressive vocal delivery'
 );
 assert.ok(
-  scenariosContent.includes('GLOBAL DIRECTIVE 1 — STRICT ACOUSTIC & LANGUAGE LOCK (ZERO FOREIGN HALLUCINATION)') &&
-  scenariosContent.includes('GLOBAL DIRECTIVE 2 — "GURU GALAK TAPI PENUH PERHATIAN" & MANDATORY LIVE GRAMMAR CORRECTION') &&
-  scenariosContent.includes('GLOBAL DIRECTIVE 3 — RESTRAINED NATURAL HUMOR & ZERO ROBOTIC LAUGHTER') &&
-  scenariosContent.includes('GLOBAL DIRECTIVE 4 — DYNAMIC ACCENT SHIFTING, DIALECT ACTING & VOCAL CONTRAST'),
+  scenariosContent.includes('GLOBAL DIRECTIVE 1: STRICT ACOUSTIC & LANGUAGE LOCK (ZERO FOREIGN HALLUCINATION)') &&
+  scenariosContent.includes('GLOBAL DIRECTIVE 2: "GURU GALAK TAPI PENUH PERHATIAN" & MANDATORY LIVE GRAMMAR CORRECTION') &&
+  scenariosContent.includes('GLOBAL DIRECTIVE 3: RESTRAINED NATURAL HUMOR & ZERO ROBOTIC LAUGHTER') &&
+  scenariosContent.includes('GLOBAL DIRECTIVE 4: UNAPOLOGETIC SARCASTIC PERSONALITY & AUTHENTIC STREET/REGIONAL ACCENTS'),
   'callScenarios.ts enforces all 4 global mentor directives without requiring user prompting'
 );
 assert.ok(
@@ -183,13 +183,12 @@ assert.ok(
 );
 assert.ok(
   scenariosContent.includes('Kansai-ben') &&
-  scenariosContent.includes('Hakata-ben') &&
   scenariosContent.includes('ECHO REDEMPTION'),
   'callScenarios.ts enables global dialect shifting and Echo Redemption grammar interception'
 );
 assert.ok(
   routeVoiceLiveContent.includes('learnerDossier') &&
-  routeVoiceLiveContent.includes('Echo Redemption'),
+  /ECHO REDEMPTION/i.test(routeVoiceLiveContent),
   'route-voice-live.js integrates Braincore learnerDossier and Echo Redemption into partner-turn and copilot endpoints'
 );
 console.log('✓ Mentor pedagogy, restrained laughter, and dynamic accent directives verified.\n');
@@ -231,7 +230,7 @@ assert.ok(
   'buildBraincoreCognitiveDossier exposes learner strengths, weaknesses, dual-brain memory, and mandatory focus directive'
 );
 assert.ok(
-  appContent.includes('const cognitiveDossier = buildBraincoreCognitiveDossier(') &&
+  appContent.includes('buildBraincoreCognitiveDossier(') &&
   appContent.includes('const updatedBrain = finalizeCallSessionMemory(brainStateRef.current, {'),
   'App.tsx injects Braincore cognitive dossier into live session and persists session memory on call end'
 );

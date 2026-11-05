@@ -1285,7 +1285,7 @@ try{
 // idempoten; render ulang hanya bila layar pernah dicat (jangan mencat sebelum openApp).
 // Murid id: FiezelThData tidak pernah ada, listener ini praktis no-op yang murah.
 try{
-  self.FiezelI18n?.onChange?.(()=>{try{searchIndexCache=null;applyContentLocale()}catch(_){}});
+  self.FiezelI18n?.onChange?.(()=>{try{__fzRefreshI18nTables();searchIndexCache=null;applyContentLocale();if(typeof window!=='undefined'&&window.__fiezelLastRenderMs!==undefined)render()}catch(_){}});
   self.FiezelOnThDataReady=()=>{try{__fzRefreshI18nTables();/* v49-F1: copy-map th baru mendarat \u2014 tabel eager dibangun ulang */searchIndexCache=null;applyContentLocale();if(window.__fiezelLastRenderMs!==undefined)render()}catch(_){}};
 }catch(_){/* harness tanpa i18n */}
 // ============================== W4-MERGE: OVERLAY DATA LOCALE TH ==============================
@@ -11778,17 +11778,14 @@ function todayHomeMarkup(){
     + `<circle cx="12" cy="16.5" r="1.5" fill="#FFFFFF" opacity="0.85"/>`
     + `</svg>`;
 
-  let timeGreeting = 'Selamat pagi';
+  let timeGreeting = FiezelI18n.t('home.greet-pagi');
   try {
     const curHour = new Date().getHours();
-    if (curHour >= 11 && curHour < 15) timeGreeting = 'Selamat siang';
-    else if (curHour >= 15 && curHour < 18) timeGreeting = 'Selamat sore';
-    else if (curHour >= 18 || curHour < 4) timeGreeting = 'Selamat malam';
-    if (isTh) {
-      if (curHour >= 5 && curHour < 12) timeGreeting = 'สวัสดีตอนเช้า';
-      else if (curHour >= 12 && curHour < 17) timeGreeting = 'สวัสดีตอนบ่าย';
-      else timeGreeting = 'สวัสดีตอนเย็น';
-    }
+    let timeKey = 'home.greet-pagi';
+    if (curHour >= 11 && curHour < 15) timeKey = 'home.greet-siang';
+    else if (curHour >= 15 && curHour < 18) timeKey = 'home.greet-sore';
+    else if (curHour >= 18 || curHour < 4) timeKey = 'home.greet-malam';
+    timeGreeting = FiezelI18n.t(timeKey);
   } catch(_) {}
 
   const homeTop = `<div class="fz-vissol-bg-motion" aria-hidden="true">`
@@ -11839,23 +11836,23 @@ function todayHomeMarkup(){
     + `<div class="tactile-welcome-left fz-vissol-welcome-left">`
     + `<div class="tactile-kicker-row fz-vissol-kicker-row">`
     + `<span class="tactile-kicker-dot" aria-hidden="true" style="display:none;"></span>`
-    + `<span class="tactile-kicker-text" style="display:none;">${isTh ? 'เป้าหมายวันนี้' : 'SESI HARI INI'}</span>`
+    + `<span class="tactile-kicker-text" style="display:none;">${esc(FiezelI18n.t('home.kicker-sesi', 'SESI HARI INI'))}</span>`
     + `<span class="fz-vissol-greeting-time">${timeGreeting},</span>`
     + `</div>`
     + `<h1 class="fz-greet-title fz-vissol-title">${esc(currentLearner || 'Haiza')}!<span class="sr-only" style="display:none;">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</span></h1>`
     + `<div class="fz-vissol-sub">`
-    + `<span>${isTh ? 'ตั้งใจเรียนวันนี้ต่อไปนะ' : 'Semangat terus belajar hari ini.'}</span>`
-    + `<span>${isTh ? 'คุณทำได้แน่นอน!' : 'Kamu pasti bisa!'}</span>`
+    + `<span>${esc(FiezelI18n.t('home.semangat-sub-1', 'Semangat terus belajar hari ini.'))}</span>`
+    + `<span>${esc(FiezelI18n.t('home.semangat-sub-2', 'Kamu pasti bisa!'))}</span>`
     + `</div>`
     + `</div>`
-    + `<div class="fz-vissol-mascot-wrap" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{window.FiezelMochiCompanion?.interact?.();}catch(_){}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();try{window.FiezelMochiCompanion?.interact?.();}catch(_){}}">`
+    + `<div class="fz-vissol-mascot-wrap${(typeof window !== 'undefined' && (window.FiezelMochiCompanion || window.FiezelMochi)) ? ' has-3d-mochi' : ''}" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{window.FiezelMochiCompanion?.interact?.();}catch(_){}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();try{window.FiezelMochiCompanion?.interact?.();}catch(_){}}">`
     + `<div class="fz-vissol-mascot-cloud-bg" aria-hidden="true"></div>`
-    + `<img src="./assets/brand/mochi-mascot-headset.png" alt="Mochi Mascot" class="fz-vissol-mascot-img" />`
+    + `<img src="./assets/brand/paw-mochi-idle.svg" alt="Mochi Mascot" class="fz-vissol-mascot-img"${(typeof window !== 'undefined' && (window.FiezelMochiCompanion || window.FiezelMochi)) ? ' style="display:none;"' : ''} />`
     + `</div>`
     + (currentStreak > 0 ? `<div class="tactile-streak-badge" style="display:none;" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
     + flameSvg
     + `<span class="tactile-streak-val">${currentStreak}</span>`
-    + `<span class="tactile-streak-lbl">${isTh ? 'วัน' : 'HARI'}</span>`
+    + `<span class="tactile-streak-lbl">${esc(FiezelI18n.t('home.streak-hari', 'HARI'))}</span>`
     + `</div>` : '')
     + `</div>`
     + `</div>`;
@@ -11871,8 +11868,8 @@ function todayHomeMarkup(){
             <span class="fz-vissol-tile-chevron is-vocab-chevron">›</span>
           </div>
           <div class="fz-vissol-tile-bottom">
-            <h3 class="fz-vissol-tile-title">Vocabulary</h3>
-            <p class="fz-vissol-tile-sub">Kosakata</p>
+            <h3 class="fz-vissol-tile-title">${esc(FiezelI18n.t('skill.vocab', 'Vocabulary'))}</h3>
+            <p class="fz-vissol-tile-sub">${esc(FiezelI18n.t('home.tile-vocab-sub', 'Kosakata'))}</p>
           </div>
         </div>
 
@@ -11886,8 +11883,8 @@ function todayHomeMarkup(){
             <span class="fz-vissol-tile-chevron is-grammar-chevron">›</span>
           </div>
           <div class="fz-vissol-tile-bottom">
-            <h3 class="fz-vissol-tile-title">Grammar</h3>
-            <p class="fz-vissol-tile-sub">Tata bahasa</p>
+            <h3 class="fz-vissol-tile-title">${esc(FiezelI18n.t('skill.grammar', 'Grammar'))}</h3>
+            <p class="fz-vissol-tile-sub">${esc(FiezelI18n.t('home.tile-grammar-sub', 'Tata bahasa'))}</p>
           </div>
         </div>
 
@@ -11901,8 +11898,8 @@ function todayHomeMarkup(){
             <span class="fz-vissol-tile-chevron is-reading-chevron">›</span>
           </div>
           <div class="fz-vissol-tile-bottom">
-            <h3 class="fz-vissol-tile-title">Reading</h3>
-            <p class="fz-vissol-tile-sub">Pemahaman teks</p>
+            <h3 class="fz-vissol-tile-title">${esc(FiezelI18n.t('skill.reading', 'Reading'))}</h3>
+            <p class="fz-vissol-tile-sub">${esc(FiezelI18n.t('home.tile-reading-sub', 'Pemahaman teks'))}</p>
           </div>
         </div>
 
@@ -11916,7 +11913,7 @@ function todayHomeMarkup(){
             <span class="fz-vissol-tile-chevron is-listening-chevron">›</span>
           </div>
           <div class="fz-vissol-tile-bottom">
-            <h3 class="fz-vissol-tile-title">Listening-Writing</h3>
+            <h3 class="fz-vissol-tile-title">${esc(FiezelI18n.t('home.tile-listening-title', 'Listening & Writing'))}</h3>
             <p class="fz-vissol-tile-sub">${esc(FiezelI18n.t('home.chip-dengar-sub'))}</p>
           </div>
         </div>
@@ -12017,10 +12014,10 @@ function todayHomeMarkup(){
         <div class="fz-aurora-zone-header">
           <div class="fz-aurora-kicker">
             <span class="fz-aurora-dot"></span>
-            <span>${esc(isTh ? 'คำศัพท์ประจำวัน' : 'KOSAKATA HARIAN')}</span>
+            <span>${esc(FiezelI18n.t('home.kosakata-harian', 'KOSAKATA HARIAN'))}</span>
           </div>
-          <div class="fz-aurora-stepper" onclick="event.stopPropagation();if(window.nextTodayVocabWord)window.nextTodayVocabWord();" title="${isTh ? 'เปลี่ยนคำถัดไป' : 'Klik untuk ganti kata berikutnya'}" style="cursor:pointer">
-            <span class="fz-aurora-step-text">${isTh ? `คำที่ ${vocabOrderNum} จาก 5` : `KATA ${vocabOrderNum} DARI 5`}</span>
+          <div class="fz-aurora-stepper" onclick="event.stopPropagation();if(window.nextTodayVocabWord)window.nextTodayVocabWord();" title="${esc(FiezelI18n.t('home.ganti-kata-tip', 'Klik untuk ganti kata berikutnya'))}" style="cursor:pointer">
+            <span class="fz-aurora-step-text">${esc(FiezelI18n.t('home.kata-n-dari-5', { n: vocabOrderNum }, `KATA ${vocabOrderNum} DARI 5`))}</span>
             <div class="fz-aurora-dots">
               ${[1,2,3,4,5].map(n => `<span class="fz-aurora-dot-item${n === vocabOrderNum ? ' is-active' : ''}"></span>`).join('')}
             </div>
@@ -12035,7 +12032,7 @@ function todayHomeMarkup(){
             ${dailyWord.phonetic && dailyWord.phonetic.includes('/') ? `<div class="fz-aurora-phonetic">${esc(dailyWord.phonetic.split('•')[0].trim())}</div>` : (dailyWord.phonetic && !dailyWord.phonetic.includes('•') ? `<div class="fz-aurora-phonetic">${esc(dailyWord.phonetic)}</div>` : '')}
             <div class="fz-aurora-meaning">${esc(dailyWord.meaning)}</div>
           </div>
-          <button type="button" class="fz-aurora-audio-btn" onclick="event.stopPropagation();if(window.playTodayVocabAudio)window.playTodayVocabAudio();" title="${isTh ? 'ฟังการออกเสียง' : 'Putar audio pengucapan'}">
+          <button type="button" class="fz-aurora-audio-btn" onclick="event.stopPropagation();if(window.playTodayVocabAudio)window.playTodayVocabAudio();" title="${esc(FiezelI18n.t('home.putar-audio-tip', 'Putar audio pengucapan'))}">
             <svg class="fz-svg" viewBox="0 0 24 24" style="width:20px;height:20px;display:inline-block;vertical-align:middle" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
           </button>
         </div>
@@ -12044,7 +12041,7 @@ function todayHomeMarkup(){
         <div class="fz-aurora-session-header">
           <div class="fz-aurora-session-badge">
             <i class="fz-i" data-fz-icon="practice" style="width:13px;height:13px"></i>
-            <span>${isTh ? 'เซสชันรายวันแบบปรับตัว' : 'SESI ADAPTIF HARIAN'}</span>
+            <span>${esc(FiezelI18n.t('home.sesi-adaptif-harian', 'SESI ADAPTIF HARIAN'))}</span>
           </div>
           <div class="fz-aurora-session-time">${esc(FiezelI18n.t('home.kartu1-soal', { n: shape.soal || 10 }))} • ${esc(FiezelI18n.t('home.kartu1-menit', { n: shape.menit || 5 }))}</div>
         </div>
@@ -12062,7 +12059,7 @@ function todayHomeMarkup(){
           </div>
         </div>
         <button type="button" class="fz-aurora-cta-btn" onclick="event.stopPropagation();${primaryBtnAction}">
-          <span>${hasTestedLevel ? (isTh ? 'เริ่มเซสชันเต็มรูปแบบทันที' : 'MULAI SESI LENGKAP SEKARANG') : esc(primaryBtnText)}</span>
+          <span>${hasTestedLevel ? esc(FiezelI18n.t('home.mulai-sesi-lengkap', 'MULAI SESI LENGKAP SEKARANG')) : esc(primaryBtnText)}</span>
           <span aria-hidden="true">➔</span>
         </button>
       </div>
@@ -12241,24 +12238,24 @@ function todayHomeMarkup(){
                 <circle cx="12" cy="12" r="2" fill="#9A3412"/>
               </svg>
             </span>
-            <span class="fz-vissol-badge-text">${isTh ? 'เริ่มเซสชันวันนี้' : 'Mulai Sesi Hari Ini'}</span>
+            <span class="fz-vissol-badge-text">${esc(FiezelI18n.t('home.mulai-sesi-badge', 'Mulai Sesi Hari Ini'))}</span>
           </div>
 
           <h2 class="fz-vissol-hero-title">${esc(selesai ? FiezelI18n.t('today.selesai-judul') : (hasTestedLevel ? FiezelI18n.t('today.cta-lanjut') : FiezelI18n.t('home.cari-level')))}</h2>
-          <p class="fz-vissol-hero-desc">${isTh ? 'ทดสอบความเข้าใจของคุณวันนี้ และดูพัฒนาการการเรียนรู้' : 'Uji pemahamanmu hari ini dan lihat perkembangan belajarmu.'}</p>
+          <p class="fz-vissol-hero-desc">${esc(FiezelI18n.t('home.hero-desc', 'Uji pemahamanmu hari ini dan lihat perkembangan belajarmu.'))}</p>
 
           <div class="fz-vissol-chips-row">
             <span class="fz-vissol-meta-chip">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
               </svg>
-              <span>± ${shape.menit || 8} menit</span>
+              <span>${esc(FiezelI18n.t('home.meta-menit', { menit: shape.menit || 8 }, `± ${shape.menit || 8} menit`))}</span>
             </span>
             <span class="fz-vissol-meta-chip">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
               </svg>
-              <span>Level ${displayLevel(todayLevel)} • ${shape.soal || 6}</span>
+              <span>${esc(FiezelI18n.t('home.meta-soal', { level: displayLevel(todayLevel), soal: shape.soal || 6 }, `Level ${displayLevel(todayLevel)} • ${shape.soal || 6}`))}</span>
             </span>
           </div>
         </div>
@@ -12353,7 +12350,7 @@ function todayHomeMarkup(){
           <span>${esc(FiezelI18n.t('nav.peta'))}</span>
         </div>
         <div class="fz-vissol-see-all" role="button" tabindex="0" onclick="go('progress')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('progress')}">
-          <span>${isTh ? 'ดูทั้งหมด' : 'Lihat semua'}</span>
+          <span>${esc(FiezelI18n.t('home.lihat-semua', 'Lihat semua'))}</span>
           <span aria-hidden="true">›</span>
         </div>
       </div>
@@ -12373,7 +12370,7 @@ function todayHomeMarkup(){
           <div class="fz-vissol-plan-kicker">${esc(FiezelI18n.t('home.ritual-mark'))}</div>
           <div class="fz-vissol-plan-count">
             <b>${Number(rhythmShown) || 0} / ${rhythmTarget || 6}</b>
-            <span>${isTh ? 'เส้นทาง' : 'Rute'}</span>
+            <span>${esc(FiezelI18n.t('home.rute-label', 'Rute'))}</span>
           </div>
           <div class="fz-vissol-progress-track">
             <div class="fz-vissol-progress-fill" style="width: ${Math.max(0, Number(rhythmPct) || 0)}%;"></div>
@@ -12382,7 +12379,7 @@ function todayHomeMarkup(){
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
-            <span>± ${Math.max(5, Math.round(((rhythmTarget || 6) - (Number(rhythmShown) || 0)) * 8.5))} menit lagi</span>
+            <span>${esc(FiezelI18n.t('home.menit-lagi', { menit: Math.max(5, Math.round(((rhythmTarget || 6) - (Number(rhythmShown) || 0)) * 8.5)) }, `± ${Math.max(5, Math.round(((rhythmTarget || 6) - (Number(rhythmShown) || 0)) * 8.5))} menit lagi`))}</span>
           </div>
         </div>
       </div>
@@ -12822,6 +12819,7 @@ window.startFromRitual=startFromRitual;
 function maybeShowDailyRitual(now=Date.now()){
   if(state.view!=='home')return false;
   if(document.getElementById('fzRitual'))return false;
+  if(document.querySelector('.fz-tour, .fiezel-splash, .fiezel-ob, #fzPrasasti'))return false;
   /* Audit UI/UX 2026-08-30: ritual TIDAK boleh terbit di belakang gerbang yang sedang
      terbuka. Penting: keluar SEBELUM state.ritualMeta ditandai - kalau ditandai lebih
      dulu, kartu yang tak pernah terlihat tetap menghabiskan jatah "sekali sehari" dan
@@ -13344,7 +13342,7 @@ function showOnboarding(now=Date.now()){
       // fiezel-th-loader. Onboarding sendiri menunggu copy feat-b Thai sebelum mengecat
       // langkah nama, sehingga tidak ada kilatan/fallback Bahasa Indonesia.
       onLocale:({locale})=>{
-        const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
+        const supported=(self.FiezelI18n?.SUPPORTED)||['id','th','ja'];
         const value=supported.includes(locale)?locale:'id';
         state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();
         try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
@@ -14945,7 +14943,7 @@ async function startAdaptive(){if(!state.adaptiveReady){if(!state.placementDone)
     Satu kalimat ajakan via toast - bukan layar baru. Guarded: tanpa modul, tidak ada apa-apa. */
  // D5 T5: dulu toast 2,6 dtk yang bertanya tanpa bisa dijawab; kini popup pilihan tujuan.
  try{const plan=srlSessionPlan(policy,count);srlSessionSync();const gp=plan?.goalPrompt;if(gp?.ask)setTimeout(()=>{try{srlGoalPopShow(gp)}catch{}},1200)}catch{}}
-function vocab(){try{self.FiezelLazy?.load?.('voice')}catch(_){}const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab||{}).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab?.[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length,pct=active.length?Math.round((mastered/active.length)*100):0;setApp(`<section class="fade vocab-hub-page"><div class="vocab-hero-card"><div class="vocab-hero-top"><span class="vocab-level-chip">${esc(displayLevel(level))} · ${esc(levelDescriptor(level))}</span><span class="vocab-count-badge">${FiezelI18n.t('vocab.n-kata',{jumlah:active.length})}</span></div><div class="vocab-progress-track" aria-hidden="true"><div class="vocab-progress-fill" style="width:${pct}%"></div></div><p class="vocab-hero-desc"><b>${mastered}</b> / <b>${active.length}</b> (${pct}%).</p>${active.length?`<button type="button" class="vocab-main-flashcard-btn" onclick="flashcards('${esc(level)}')"><span class="vmf-left"><span class="vmf-icon">🃏</span><span class="vmf-text"><strong>${t('vocab.buka-flashcards','Buka flashcards')}</strong><small>Hafal mandiri dengan kartu interaktif</small></span></span><span class="vmf-arrow">→</span></button>`:`<p class="muted">${t('vocab.kosong','Belum tersedia untuk level ini.')}</p>`}</div><div class="vocab-quick-grid"><button type="button" class="vocab-quick-btn" onclick="startVocabQuiz()"><span class="vq-icon">⚡</span><span class="vq-text"><strong>${t('student.vocab-title','Kosakata')} Test</strong><small>Kuis interaktif</small></span></button><button type="button" class="vocab-quick-btn" onclick="reviewVocab()"><span class="vq-icon">🔄</span><span class="vq-text"><strong>Review Due (${due})</strong><small>Segarkan ingatan SRS</small></span></button></div></section>`);enhanceUI()}
+function vocab(){try{self.FiezelLazy?.load?.('voice')}catch(_){}const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab||{}).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab?.[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length,pct=active.length?Math.round((mastered/active.length)*100):0;setApp(`<section class="fade vocab-hub-page"><div class="vocab-hero-card"><div class="vocab-hero-top"><span class="vocab-level-chip">${esc(displayLevel(level))} · ${esc(levelDescriptor(level))}</span><span class="vocab-count-badge">${FiezelI18n.t('vocab.n-kata',{jumlah:active.length})}</span></div><div class="vocab-progress-track" aria-hidden="true"><div class="vocab-progress-fill" style="width:${pct}%"></div></div><p class="vocab-hero-desc"><b>${mastered}</b> / <b>${active.length}</b> (${pct}%).</p>${active.length?`<button type="button" class="vocab-main-flashcard-btn" onclick="flashcards('${esc(level)}')"><span class="vmf-left"><span class="vmf-icon">🃏</span><span class="vmf-text"><strong>${FiezelI18n.t('vocab.buka-flashcards','Buka flashcards')}</strong><small>${esc(FiezelI18n.t('vocab.hafal-mandiri-sub','Hafal mandiri dengan kartu interaktif'))}</small></span></span><span class="vmf-arrow">→</span></button>`:`<p class="muted">${FiezelI18n.t('vocab.kosong','Belum tersedia untuk level ini.')}</p>`}</div><div class="vocab-quick-grid"><button type="button" class="vocab-quick-btn" onclick="startVocabQuiz()"><span class="vq-icon">⚡</span><span class="vq-text"><strong>${esc(FiezelI18n.t('vocab.kuis-test-title', 'Tes Kosakata'))}</strong><small>${esc(FiezelI18n.t('vocab.kuis-interaktif-sub','Kuis interaktif'))}</small></span></button><button type="button" class="vocab-quick-btn" onclick="reviewVocab()"><span class="vq-icon">🔄</span><span class="vq-text"><strong>Review Due (${due})</strong><small>${esc(FiezelI18n.t('vocab.segarkan-ingatan-sub','Segarkan ingatan SRS'))}</small></span></button></div></section>`);enhanceUI()}
 // m025-96 jalur suara materi pelajaran: Reading, Vocabulary, Grammar.
 //
 // Semuanya lewat pintu bersama, jadi tiap kalimat Inggris otomatis membawa subtitle
@@ -20013,8 +20011,17 @@ function settingsFold(title,body,open,extraClass){return `<details class="home-f
    salah tetap bisa mengenali nama bahasanya sendiri di daftar. */
 function learnerLocaleRowMarkup(){
   const active=(self.FiezelI18n?.getLocale?.())||'id';
-  const options=[['id',FiezelI18n.t('settings.locale-opsi-id')],['th',FiezelI18n.t('settings.locale-opsi-th')]]
-    .map(([value,label])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)}</option>`).join('');
+  const options=[
+    ['id',FiezelI18n.t('settings.locale-opsi-id')||'Bahasa Indonesia'],
+    ['en',FiezelI18n.t('settings.locale-opsi-en')||'English'],
+    ['th',FiezelI18n.t('settings.locale-opsi-th')||'ภาษาไทย'],
+    ['ja',FiezelI18n.t('settings.locale-opsi-ja')||'日本語'],
+    ['ms',FiezelI18n.t('settings.locale-opsi-ms')||'Bahasa Melayu'],
+    ['vi',FiezelI18n.t('settings.locale-opsi-vi')||'Tiếng Việt'],
+    ['fil',FiezelI18n.t('settings.locale-opsi-fil')||'Filipino'],
+    ['km',FiezelI18n.t('settings.locale-opsi-km')||'ភាសាខ្មែរ'],
+    ['ru',FiezelI18n.t('settings.locale-opsi-ru')||'Русский']
+  ].map(([value,label])=>`<option value="${value}"${value===active?' selected':''}>${esc(label)}</option>`).join('');
   return `<label class="setting-row"><span class="setting-icon"><i data-lucide="languages"></i></span><span><b>${FiezelI18n.t('settings.locale-judul')}</b><small>${FiezelI18n.t('settings.locale-catatan')}</small></span><select id="settingLearnerLocale" aria-label="${FiezelI18n.t('settings.locale-judul')}">${options}</select></label>`;
 }
 /* m025-182 (W2-STATE): ganti bahasa DITERAPKAN saat itu juga (pola toggle settingReminders),
@@ -20025,14 +20032,20 @@ function learnerLocaleRowMarkup(){
    saat back) → closeModal + render() penuh → toast konfirmasi yang sudah berbahasa BARU.
    Nilai ini TIDAK PERNAH diteruskan ke opsi audio/voice (AI-17 F02, audio-locale-guard). */
 function setLearnerLocalePreference(next){
-  const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
+  const supported=(self.FiezelI18n?.SUPPORTED)||['id','th','en','vi','ms','fil','ja','km','ru'];
   const value=supported.includes(next)?next:'id';
   if((state.preferences?.learnerLocale||'id')===value)return true;
   state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();
   try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
   try{leaveAllStages()}catch(_){}
   closeModal();render();haptic('confirm');
-  showToast(FiezelI18n.t('settings.locale-toast'),'success');
+  if(value!=='id'&&self.FiezelI18n?.hasCopy&&self.FiezelI18n?.whenAvailable&&!self.FiezelI18n.hasCopy(value,'settings.locale-toast')){
+    self.FiezelI18n.whenAvailable(value,'settings.locale-toast').then(()=>{
+      try{showToast(FiezelI18n.t('settings.locale-toast'),'success')}catch(_){}
+    });
+  }else{
+    showToast(FiezelI18n.t('settings.locale-toast'),'success');
+  }
   return true;
 }
 window.setLearnerLocalePreference=setLearnerLocalePreference;

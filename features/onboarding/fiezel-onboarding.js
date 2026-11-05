@@ -172,6 +172,39 @@
     + '<circle cx="18" cy="12" r="7.2" fill="#BC002D"/>'
     + '</svg>';
 
+  var FLAG_MS = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#FFFFFF"/>'
+    + '<path d="M0 0h36v2H0zm0 4h36v2H0zm0 4h36v2H0zm0 4h36v2H0zm0 4h36v2H0zm0 4h36v2H0z" fill="#CC0001"/>'
+    + '<rect width="18" height="14" fill="#010066"/>'
+    + '<circle cx="7.6" cy="7" r="4.2" fill="#FFCC00"/>'
+    + '<circle cx="8.8" cy="7" r="3.4" fill="#010066"/>'
+    + '<circle cx="12.2" cy="7" r="1.9" fill="#FFCC00"/>'
+    + '</svg>';
+
+  var FLAG_VI = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#DA251D"/>'
+    + '<polygon points="18,5 19.8,10.5 25.6,10.5 20.9,13.9 22.7,19.4 18,16 13.3,19.4 15.1,13.9 10.4,10.5 16.2,10.5" fill="#FFFF00"/>'
+    + '</svg>';
+
+  var FLAG_FIL = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="12" fill="#0038A8"/>'
+    + '<rect y="12" width="36" height="12" fill="#CE1126"/>'
+    + '<polygon points="0,0 16,12 0,24" fill="#FFFFFF"/>'
+    + '<circle cx="5.6" cy="12" r="2.2" fill="#FCD116"/>'
+    + '</svg>';
+
+  var FLAG_KM = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#032EA1"/>'
+    + '<rect y="6" width="36" height="12" fill="#E00025"/>'
+    + '<path d="M12 15h12v-2.5h-2V10.5h-2V8.8h-4v1.7h-2v2h-2z" fill="#FFFFFF"/>'
+    + '</svg>';
+
+  var FLAG_RU = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="8" fill="#FFFFFF"/>'
+    + '<rect y="8" width="36" height="8" fill="#0039A6"/>'
+    + '<rect y="16" width="36" height="8" fill="#D52B1E"/>'
+    + '</svg>';
+
   var FLAG_ZH = '<svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="36" height="24" aria-hidden="true" focusable="false">'
     + '<rect width="60" height="40" fill="#DE2910"/>'
     + '<path d="M10 6l2.35 7.23-6.15-4.47h7.6L7.65 13.23z" fill="#FFDE00"/>'
@@ -319,7 +352,7 @@
 
   function normalizeLocale(value) {
     var locale = String(value || '');
-    var supported = I18N && Array.isArray(I18N.SUPPORTED) ? I18N.SUPPORTED : ['id', 'th'];
+    var supported = I18N && Array.isArray(I18N.SUPPORTED) ? I18N.SUPPORTED : ['id', 'th', 'en', 'vi', 'ms', 'fil', 'ja', 'km', 'ru'];
     return supported.indexOf(locale) >= 0 ? locale : '';
   }
 
@@ -458,33 +491,28 @@
   var TOPO = 'M121 120C122 123 118 128 115 131C112 133 106 134 102 134C98 135 94 136 90 135C85 135 76 135 74 132C72 130 77 124 77 120C78 116 77 113 79 110C81 107 84 103 88 102C92 101 100 101 103 103C107 104 107 109 110 112C113 115 121 117 121 120Z|M146 120C147 126 140 137 134 141C127 146 116 144 107 147C98 149 90 155 82 155C73 154 59 149 55 143C52 137 57 127 58 120C59 113 59 107 63 101C66 95 72 83 80 81C88 79 101 86 109 89C117 93 120 98 127 103C133 108 145 114 146 120Z|M171 120C172 131 164 146 154 153C144 159 126 154 112 159C98 163 83 180 71 179C59 178 45 162 39 152C33 142 35 130 35 120C36 110 38 101 44 91C50 80 59 60 70 58C82 56 100 73 113 78C126 84 139 83 149 90C159 97 171 109 171 120Z|M197 120C197 135 188 156 175 165C161 173 137 166 118 173C99 180 75 210 60 208C44 205 33 175 25 161C16 146 10 134 9 120C9 106 14 93 22 78C31 64 44 35 60 34C76 32 98 61 118 68C137 75 163 66 177 74C190 83 198 105 197 120Z|M225 120C223 140 209 163 193 175C177 187 151 183 126 193C102 203 67 240 48 236C28 232 21 188 10 169C-1 150 -16 138 -19 120C-21 102 -16 81 -4 63C7 45 30 13 51 12C72 11 97 47 123 55C149 62 190 46 207 57C224 68 228 100 225 120Z|M257 120C252 144 228 167 208 183C188 200 167 209 138 221C110 234 62 268 37 261C13 254 6 203 -8 179C-22 156 -42 142 -47 120C-52 98 -53 65 -38 44C-23 23 16 -3 44 -4C73 -6 99 28 131 35C163 43 217 26 238 40C259 54 262 96 257 120Z|M292 120C284 148 243 167 220 190C197 214 186 244 154 259C122 274 60 291 29 280C-1 269 -14 219 -31 192C-49 166 -69 148 -76 120C-84 92 -97 44 -77 22C-58 -1 4 -11 40 -14C77 -16 105 1 143 7C181 13 242 5 266 23C291 42 299 92 292 120Z|M328 120C318 152 259 167 233 197C207 228 208 289 173 305C138 320 63 309 24 293C-15 277 -38 237 -60 208C-82 180 -98 155 -108 120C-118 85 -144 21 -120 -2C-96 -26 -8 -14 38 -19C85 -24 116 -35 159 -30C201 -26 265 -17 293 8C321 34 338 88 328 120Z|M349 70C349 73 346 76 344 78C341 80 338 79 334 81C331 82 325 88 323 88C320 87 319 80 318 77C316 74 314 73 313 70C313 67 313 64 315 61C316 59 320 54 323 54C326 54 330 60 334 61C338 62 344 59 347 60C350 62 350 67 349 70Z|M371 70C369 76 361 80 356 85C351 89 348 93 341 96C334 100 321 108 315 106C309 104 308 90 305 84C302 78 296 76 295 70C293 64 291 55 295 50C298 45 310 40 318 40C325 40 330 48 339 49C347 51 361 46 366 49C372 53 372 64 371 70Z|M395 70C392 79 374 82 367 91C359 99 360 114 351 119C341 124 319 125 309 121C299 116 295 102 289 93C283 85 278 80 275 70C272 60 263 42 269 36C276 29 301 31 314 30C326 30 334 30 346 32C358 33 378 32 386 38C394 45 398 61 395 70Z|M422 70C417 82 389 84 379 98C369 111 376 144 363 150C351 156 319 141 304 134C288 126 277 116 268 105C259 94 255 84 250 70C245 56 230 27 240 19C250 11 291 25 310 23C330 21 340 5 357 6C373 7 397 15 408 26C418 37 427 58 422 70Z|M446 70C440 86 408 89 397 108C386 127 393 177 377 183C361 189 321 156 299 145C277 134 259 130 245 118C232 106 223 89 218 70C212 51 198 13 213 3C227 -6 280 18 307 14C333 9 349 -24 369 -24C390 -24 417 -2 430 13C442 29 451 54 446 70Z|M315 300C315 302 312 303 311 306C309 309 309 315 306 315C304 316 299 312 296 310C293 309 290 309 288 307C286 305 284 303 283 300C283 297 282 293 285 291C287 290 293 293 297 292C300 291 303 286 306 286C309 286 312 290 314 292C315 294 316 298 315 300Z|M328 300C328 305 330 310 327 316C325 321 319 329 313 330C307 331 297 324 291 321C285 319 280 318 275 314C269 311 261 305 260 300C260 295 267 288 272 284C278 281 285 282 292 280C298 278 306 270 312 271C318 271 327 278 330 283C332 288 329 295 328 300Z|M341 300C342 310 358 323 354 330C350 338 330 343 318 344C307 345 295 340 285 337C275 333 267 330 258 324C249 318 228 307 229 300C230 293 254 286 263 279C272 273 274 265 284 261C293 256 308 252 319 254C330 256 345 265 349 272C352 280 340 290 341 300Z'.split('|');
 
   function topo(pawState) {
-    var star = function (x, y, s, op) {
-      return '<path d="M0,-10 Q0,0 10,0 Q0,0 0,10 Q0,0 -10,0 Q0,0 0,-10 Z" fill="url(#fzGoldGrad)" opacity="' + op + '" transform="translate(' + x + ',' + y + ') scale(' + s + ')"/>';
+    var star = function (x, y, s, op, idx) {
+      return '<g transform="translate(' + x + ',' + y + ') scale(' + s + ')"><g class="fz-ob-star-anim fz-ob-star-' + (idx || 1) + '"><path class="fz-ob-star" d="M0,-10 Q0,0 10,0 Q0,0 0,10 Q0,0 -10,0 Q0,0 0,-10 Z" fill="url(#fzGoldGrad)" opacity="' + op + '"/></g></g>';
     };
-    var dot = function (x, y, r, op) {
-      return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="url(#fzGoldGrad)" opacity="' + op + '"/>';
+    var dot = function (x, y, r, op, idx) {
+      return '<g class="fz-ob-dot-anim fz-ob-dot-' + (idx || 1) + '"><circle class="fz-ob-dot" cx="' + x + '" cy="' + y + '" r="' + r + '" fill="url(#fzGoldGrad)" opacity="' + op + '"/></g>';
     };
     var note = function (x, y, s, op) {
       return '<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h5V3h-7z" fill="url(#fzGoldGrad)" opacity="' + op + '" transform="translate(' + x + ',' + y + ') scale(' + s + ')"/>';
     };
-    var radiance = '<g class="fz-radiance-burst" stroke="#FFD54F" stroke-width="2.8" stroke-linecap="round" opacity="0.95">'
-      + '<line x1="284" y1="112" x2="300" y2="98"/>'
-      + '<line x1="294" y1="128" x2="314" y2="124"/>'
-      + '<line x1="284" y1="144" x2="302" y2="152"/>'
-      + '</g>';
     var isListening = (pawState === 'listening' || pawState === 'observing');
     var sparkles = '<g class="fz-topo-sparkles">'
-      + star(46, 54, 1.05, 0.95)
-      + star(364, 58, 1.3, 0.95)
-      + star(76, 102, 0.7, 0.8)
-      + star(380, 108, 0.85, 0.85)
-      + star(334, 126, 0.65, 0.75)
-      + star(28, 124, 0.55, 0.7)
-      + dot(32, 90, 2.5, 0.8)
-      + dot(90, 48, 2, 0.75)
-      + dot(336, 44, 2.5, 0.85)
-      + dot(388, 80, 2, 0.75)
-      + (isListening ? (note(326, 46, 1.2, 0.95) + note(62, 60, 0.9, 0.9)) : radiance)
+      + star(46, 54, 1.05, 0.95, 1)
+      + star(364, 58, 1.3, 0.95, 2)
+      + star(76, 102, 0.7, 0.85, 3)
+      + star(380, 108, 0.85, 0.85, 4)
+      + star(334, 126, 0.65, 0.8, 5)
+      + star(28, 124, 0.55, 0.75, 6)
+      + dot(32, 90, 2.5, 0.8, 1)
+      + dot(90, 48, 2, 0.75, 2)
+      + dot(336, 44, 2.5, 0.85, 3)
+      + dot(388, 80, 2, 0.75, 4)
+      + (isListening ? (note(326, 46, 1.2, 0.95) + note(62, 60, 0.9, 0.9)) : '')
       + '</g>';
 
     return '<svg class="fz-auth-topo" viewBox="-20 -40 430 385" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
@@ -526,8 +554,9 @@
       + '</div>';
 
     var wave = '<div class="fz-ob-cloud-cushion" aria-hidden="true">'
-      + '<svg class="fz-cloud-back" viewBox="0 0 412 160" preserveAspectRatio="none"><path d="M0,50 C50,38 95,55 145,68 C185,78 225,78 265,70 C310,60 355,38 390,36 C400,35 408,38 412,40 L412,160 L0,160 Z" fill="rgba(235, 222, 206, 0.82)"></path></svg>'
-      + '<svg class="fz-cloud-front fz-auth-wave" viewBox="0 0 412 160" preserveAspectRatio="none"><path d="M0,65 C45,55 85,75 130,85 C165,92 206,94 245,90 C290,84 340,55 380,50 C395,48 405,52 412,55 L412,160 L0,160 Z" fill="#FAF5ED"></path></svg>'
+      + '<svg class="fz-cloud-mist" viewBox="0 0 412 160" preserveAspectRatio="none"><path d="M-12,52 C32,14 84,22 128,48 C172,22 224,20 268,48 C314,14 368,12 424,42 L424,160 L-12,160 Z" fill="rgba(218, 198, 174, 0.34)"></path></svg>'
+      + '<svg class="fz-cloud-back" viewBox="0 0 412 160" preserveAspectRatio="none"><path d="M-12,68 C38,32 94,46 144,70 C190,90 238,86 284,60 C332,34 378,28 424,52 L424,160 L-12,160 Z" fill="rgba(235, 222, 206, 0.85)"></path></svg>'
+      + '<svg class="fz-cloud-front fz-auth-wave" viewBox="0 0 412 160" preserveAspectRatio="none"><path d="M-12,84 C40,52 92,70 142,88 C186,104 234,102 280,80 C328,58 374,48 424,66 L424,160 L-12,160 Z" fill="#FAF5ED"></path></svg>'
       + '</div>';
 
     var stepIndicator = (typeof stepNumber !== 'undefined') ? stepper(stepNumber, visualOverride) : '';
@@ -646,7 +675,7 @@
 
   // Ukuran bawaan (px). CSS yang menjepitnya (clamp) supaya 390px tetap rapi; angka ini
   // hanya nilai awal --fz-ob-paw, bukan ukuran final.
-  var MASCOT_SIZE = 148;
+  var MASCOT_SIZE = 188;
 
   /**
    * Pose yang DIMAKSUDKAN per langkah, dan rantai penggantinya.
@@ -807,17 +836,34 @@
         + '<span class="fiezel-language-copy"><b>' + title + '</b><small>' + subtitle + '</small></span>'
         + '</button>';
     }
+    var busyNotes = {
+      th: 'Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span>',
+      en: '<span lang="en">Preparing English…</span>',
+      ja: '<span lang="ja">日本語データを準備中…</span>',
+      ms: '<span lang="ms">Menyediakan Bahasa Melayu…</span>',
+      vi: '<span lang="vi">Đang chuẩn bị Tiếng Việt…</span>',
+      fil: '<span lang="fil">Inihahanda ang Filipino…</span>',
+      km: '<span lang="km">កំពុងរៀបចំភាសាខ្មែរ…</span>',
+      ru: '<span lang="ru">Подготовка русского языка…</span>'
+    };
     return reveal(env)
       + topbar(false, false)
       + '<div class="fiezel-sheet fiezel-language-sheet" data-ob-step="language">'
-      + '<span class="fiezel-language-kicker">LANGUAGE · BAHASA · ภาษา</span>'
+      + '<span class="fiezel-language-kicker">LANGUAGE · BAHASA · ภาษา · 言語</span>'
       + '<h2 class="fiezel-title">Choose your language</h2>'
-      + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span></p>'
-      + '<div class="fiezel-goal-grid fiezel-language-grid" role="group" aria-label="Language / Bahasa / ภาษา">'
+      + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span> · <span lang="ja">言語を選択してください</span></p>'
+      + '<div class="fiezel-goal-grid fiezel-language-grid" role="group" aria-label="Language / Bahasa / ภาษา / 言語">'
       + choice('id', FLAG_ID, 'Bahasa Indonesia', 'Indonesia')
       + choice('th', FLAG_TH, 'ภาษาไทย', 'ไทย')
+      + choice('en', FLAG_EN, 'English', 'Global')
+      + choice('ja', FLAG_JA, '日本語', '日本')
+      + choice('ms', FLAG_MS, 'Bahasa Melayu', 'Malaysia')
+      + choice('vi', FLAG_VI, 'Tiếng Việt', 'Việt Nam')
+      + choice('fil', FLAG_FIL, 'Filipino', 'Pilipinas')
+      + choice('km', FLAG_KM, 'ភាសាខ្មែរ', 'កម្ពុជា')
+      + choice('ru', FLAG_RU, 'Русский', 'Русский')
       + '</div>'
-      + (busy === 'th' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span></p>' : '')
+      + (busy && busyNotes[busy] ? '<p class="fiezel-note" role="status">' + busyNotes[busy] + '</p>' : '')
       + '</div>';
   }
 
@@ -1108,7 +1154,9 @@
       + '<div class="fz-path-card-content">'
       + '<span class="fz-path-icon" aria-hidden="true">' + ICON_BOOK_SVG + '</span>'
       + '<div class="fz-path-texts">'
+      + '<div class="fz-path-header-row">'
       + '<b class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-beginner-title')) + '</b>'
+      + '</div>'
       + '<p class="fiezel-path-desc">' + escapeHtml(T('onboarding.path-beginner-desc-v2')) + '</p>'
       + '</div>'
       + '</div>'
@@ -1119,8 +1167,10 @@
       + '<div class="fz-path-card-content">'
       + '<span class="fz-path-icon" aria-hidden="true">' + ICON_CLIPBOARD_SVG + '</span>'
       + '<div class="fz-path-texts">'
-      + '<span class="fz-path-soal-pill">' + facts.soal + ' soal</span>'
+      + '<div class="fz-path-header-row">'
       + '<b class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-test-title')) + '</b>'
+      + '<span class="fz-path-soal-pill">' + facts.soal + ' ' + escapeHtml(T('guru.soal-count', 'soal')) + '</span>'
+      + '</div>'
       + '<p class="fiezel-path-desc"><span class="fiezel-path-count" style="display:none;">' + facts.soal + ' soal</span> ' + escapeHtml(T('onboarding.path-test-desc-v2')) + '</p>'
       + '</div>'
       + '</div>'
@@ -1702,17 +1752,15 @@
       try { opts.onLocale({ locale: locale, restored: false }); } catch (_) {}
       markLocaleSelected(target, locale);
 
-      // Bundle Indonesia sudah ada sejak boot. Copy Thai sengaja dinamis; jangan munculkan
-      // Step 1 dengan fallback Indonesia sambil unduhannya berjalan. Menunggu SATU kunci
-      // onboarding cukup untuk membuktikan domain feat-b sudah siap. Tenggat tetap ada agar
-      // kegagalan jaringan tidak mengurung pengguna pada layar penuh.
-      if (locale === 'th' && I18N && typeof I18N.hasCopy === 'function'
+      // Bundle Indonesia sudah ada sejak boot. Seluruh locale non-Indonesia dimuat dinamis;
+      // jangan munculkan Step 1 dengan fallback Indonesia/Inggris sambil unduhannya berjalan.
+      if (locale !== 'id' && I18N && typeof I18N.hasCopy === 'function'
           && typeof I18N.whenAvailable === 'function'
-          && !I18N.hasCopy('th', 'onboarding.dialog-aria')) {
-        localeBusy = 'th';
+          && !I18N.hasCopy(locale, 'onboarding.dialog-aria')) {
+        localeBusy = locale;
         paint();
         try {
-          I18N.whenAvailable('th', 'onboarding.dialog-aria').then(function () {
+          I18N.whenAvailable(locale, 'onboarding.dialog-aria').then(function () {
             localeReady(locale, token);
           }, function () { localeReady(locale, token); });
         } catch (_) { localeReady(locale, token); return; }

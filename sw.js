@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-765-unified-grammar-20261002';
+const SW_REV='m025-766-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
@@ -131,6 +131,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
   // offline yang beralih ke th kehilangan satu-satunya pemuat aset th-nya.
   './features/i18n/fiezel-th-loader.js',
+  './features/i18n/fiezel-ja-loader.js',
   './features/i18n/locales/en/ui.json',
   './features/i18n/locales/en/quiz.json',
   './features/i18n/locales/en/grammar.json',

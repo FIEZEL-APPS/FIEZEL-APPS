@@ -413,7 +413,7 @@
     if (this.transcriptTextEl) {
       var main = this._escapeHtml(text || '');
       if (translation) {
-        this.transcriptTextEl.innerHTML = main + '<span class="fzc-call-transcript-trans" style="display:block;font-size:0.82rem;opacity:0.85;margin-top:6px;font-weight:500;">' + this._escapeHtml(translation) + '</span>';
+        this.transcriptTextEl.innerHTML = '<span class="fzc-call-transcript-trans" style="display:block;font-size:1.05rem;font-weight:700;color:#1C1611;margin-bottom:4px;line-height:1.4;">' + this._escapeHtml(translation) + '</span><span class="fzc-call-transcript-main" style="display:block;font-size:0.84rem;opacity:0.82;font-weight:400;color:#5C4E3C;line-height:1.4;">' + main + '</span>';
       } else {
         this.transcriptTextEl.textContent = (text || '');
       }

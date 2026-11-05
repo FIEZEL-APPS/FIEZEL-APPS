@@ -882,6 +882,36 @@
     // app.js:1302 — openConfidencePop() vonis benar
     'quiz.vonis-benar': 'Benar, mantap!',
     // app.js:1302 — openConfidencePop() vonis salah
-    'quiz.vonis-salah': 'Belum tepat, nggak apa-apa.'
+    'quiz.vonis-salah': 'Belum tepat, nggak apa-apa.',
+    // app.js — todayHomeMarkup & vocab universal i18n
+    'home.kicker-sesi': 'SESI HARI INI',
+    'home.semangat-sub-1': 'Sedikit demi sedikit, nanti juga fasih.',
+    'home.semangat-sub-2': 'Lanjutin ritme belajarmu hari ini.',
+    'home.streak-hari': 'hari berturut-turut',
+    'home.mulai-sesi-badge': 'Sesi Adaptif',
+    'home.hero-desc': 'Target cerdas hari ini disusun berdasarkan ingatan dan materi terlemahmu.',
+    'home.meta-menit': '± {menit} menit',
+    'home.meta-soal': 'Level {level} • {soal}',
+    'home.lihat-semua': 'Lihat semua',
+    'home.rute-label': 'target materi',
+    'home.menit-lagi': '± {menit} menit lagi',
+    'home.kosakata-harian': 'Kosakata Hari Ini',
+    'home.ganti-kata-tip': 'Ganti kata',
+    'home.kata-n-dari-5': 'KATA {n} DARI 5',
+    'home.putar-audio-tip': 'Dengar audio',
+    'home.sesi-adaptif-harian': 'Sesi Adaptif Harian',
+    'home.mulai-sesi-lengkap': 'Mulai Sesi Lengkap',
+    'home.tile-vocab-sub': 'Flashcard pintar & SRS',
+    'home.tile-grammar-sub': 'Pola kalimat & rumus',
+    'home.tile-reading-sub': 'Bacaan bergradasi',
+    'home.tile-listening-title': 'Chōkai / Menyimak',
+    'home.greet-pagi': 'Selamat pagi',
+    'home.greet-siang': 'Selamat siang',
+    'home.greet-sore': 'Selamat sore',
+    'home.greet-malam': 'Selamat malam',
+    'vocab.hafal-mandiri-sub': 'Hafal mandiri dengan SRS cerdas',
+    'vocab.kuis-test-title': 'Uji Pemahaman',
+    'vocab.kuis-interaktif-sub': 'Tebak arti & pilihan ganda',
+    'vocab.segarkan-ingatan-sub': 'Segarkan kata yang rawan lupa'
   });
 }());

@@ -70,8 +70,8 @@
         var ob = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}');
         storedCode = ob.classCode || '';
       } catch (_) {}
-      return E.login.kelasku(storedCode || undefined).then(start).catch(function (e) {
-        renderAuth(e.message);
+      return E.login.kelasku(storedCode || undefined).then(start).catch(function () {
+        renderAuth();
       });
     }
 
@@ -90,27 +90,46 @@
      KELAS dari gurunya — itu pun hanya sekali, saat pertama bergabung. */
   function renderAuth(err) {
     app.innerHTML =
-      '<div class="auth-wrap"><div class="card ink rise">' +
+      '<div class="auth-wrap">' +
+      '<div class="auth-nav-bar">' +
+      '<a href="./index.html" class="auth-nav-back">' + esc(t('kurikulum.nav-kembali-fiezel', '← Kembali ke Fiezel')) + '</a>' +
+      '<span class="auth-brand-badge">' + esc(t('kurikulum.nav-badge-misi', 'Fiezel · Misi Belajar')) + '</span>' +
+      '</div>' +
+      '<div class="card ink rise auth-portal-card">' +
+      '<div class="auth-grid">' +
+      '<div class="auth-col-hero">' +
       '<p class="kicker">FIEZEL · Misi Belajar</p>' +
       '<h1>Bukan sekadar mengerjakan soal.</h1>' +
       '<p class="muted">Kamu belajar satu kompetensi sampai benar-benar bisa dipakai — dengan jalur yang disesuaikan untukmu.</p>' +
+      '<div class="auth-pillars">' +
+      '<div class="auth-pillar"><span class="auth-pillar-dot"></span><div><b>' + esc(t('kurikulum.misi-pilar-1-judul', 'Jalur Adaptif Personal')) + '</b><small>' + esc(t('kurikulum.misi-pilar-1-isi', 'Urutan pemanasan, contoh, hingga tantangan mengikuti kesiapanmu.')) + '</small></div></div>' +
+      '<div class="auth-pillar"><span class="auth-pillar-dot"></span><div><b>' + esc(t('kurikulum.misi-pilar-2-judul', 'Umpan Balik Bermakna')) + '</b><small>' + esc(t('kurikulum.misi-pilar-2-isi', 'Pahami alasan di balik tiap jawaban agar konsep benar-benar melekat.')) + '</small></div></div>' +
+      '<div class="auth-pillar"><span class="auth-pillar-dot"></span><div><b>' + esc(t('kurikulum.misi-pilar-3-judul', 'Siap Daring & Luring')) + '</b><small>' + esc(t('kurikulum.misi-pilar-3-isi', 'Tetap bisa berlatih dari bank perangkat meski sinyal sedang terbatas.')) + '</small></div></div>' +
+      '</div>' +
+      '</div>' +
+      '<div class="auth-col-action">' +
+      '<div class="auth-action-panel">' +
+      '<p class="kicker">' + esc(t('kurikulum.misi-panel-kicker', 'Mulai Sesi Belajar')) + '</p>' +
       (err ? '<div class="issue error">' + esc(err) + '</div>' : '') +
       '<label class="f">Kode kelas dari guru (isi kalau ini pertama kalinya)<input id="joinCode" placeholder="FZ-XXXXXX" data-testid="join-code" autocomplete="off"></label>' +
-      '<button class="btn primary" data-a="login" data-testid="login-btn">Masuk dengan akun KelasKu</button>' +
+      '<button class="btn primary auth-cta-btn" data-a="login" data-testid="login-btn">Masuk dengan akun KelasKu</button>' +
       /* F9: pintu luring hanya muncul bila ada sesi terakhir yang bisa dikonfirmasi —
          tanpa itu tidak ada identitas untuk mengikat bukti antre. */
       (function () {
         var snap = muatJSON(SES_KEY);
         var nm = snap && snap.u && (snap.u.name || snap.u.handle);
         if (!nm) return '';
-        return '<div class="card" style="margin-top:12px" data-testid="offline-door"><p class="kicker">' +
-          esc(t('kurikulum.luring-kicker', 'Mode luring')) + '</p><p class="muted">' +
+        return '<div class="card" style="margin-top:12px;margin-bottom:0" data-testid="offline-door"><p class="kicker">' +
+          esc(t('kurikulum.luring-kicker', 'Mode luring')) + '</p><p class="muted" style="font-size:13px">' +
           esc(t('kurikulum.luring-masuk-sub', 'Tanpa sinyal — latihan dari bank perangkat, dinilai di perangkat.')) + '</p>' +
           '<button class="btn ghost sm" data-a="offline" data-testid="offline-btn">' +
           esc(t('kurikulum.luring-masuk', 'Lanjut luring sebagai {nama}').replace('{nama}', nm)) + '</button></div>';
       })() +
-      '<p class="muted" style="margin-top:16px;font-size:13px"><a href="./index.html#classroom" data-testid="link-app">' + t('kelas.kembali-kelasku-app', '‹ Kembali ke KelasKu di aplikasi FIEZEL') + '</a></p>' +
-      '<p class="muted" style="font-size:13px">Guru masuk di <a href="./kurikulum.html">Ruang Guru</a>.</p>' +
+      '<p class="muted auth-sub-link" style="margin-top:16px;font-size:13px"><a href="./index.html#classroom" data-testid="link-app">' + t('kelas.kembali-kelasku-app', '‹ Kembali ke KelasKu di aplikasi FIEZEL') + '</a></p>' +
+      '<p class="muted auth-sub-link" style="font-size:13px;margin-bottom:0">Guru masuk di <a href="./kurikulum.html">Ruang Guru</a>.</p>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
       '</div></div>';
   }
 

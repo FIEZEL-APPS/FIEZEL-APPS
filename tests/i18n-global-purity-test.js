@@ -149,9 +149,139 @@ test('Katalog Malaysia (ms) bebas kata Indonesia spesifik yang salah dalam konte
   assert.deepStrictEqual(msSpecificLeaks, [], 'Katalog Malaysia memuat kata Indonesia spesifik:\n  ' + msSpecificLeaks.join('\n  '));
 });
 
+test('Katalog Japanese (ja) minimal 95% karakter Kanji/Kana autentik dan ZERO dummy text', () => {
+  const jaRegex = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/;
+  NAMESPACES.forEach(ns => {
+    const p = path.join(LOCALES_DIR, 'ja', `${ns}.json`);
+    assert(fs.existsSync(p), `Berkas hilang: ja/${ns}.json`);
+    const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+    const totalKeys = Object.keys(data).length;
+    let jaCount = 0;
+    const nonJa = [];
+
+    for (const [k, v] of Object.entries(data)) {
+      const valStr = String(v).trim();
+      if (jaRegex.test(valStr) || valStr.length <= 4 || /^[0-9\s.,!?:;/\\-_+*#@%$()]+$/.test(valStr)) {
+        jaCount++;
+      } else {
+        nonJa.push(`ja/${ns}.${k}: "${v}"`);
+      }
+    }
+
+    const pct = (jaCount / totalKeys) * 100;
+    assert(pct >= 95, `Katalog ja/${ns}.json hanya ${pct.toFixed(1)}% Jepang (< 95%):\n  Contoh non-JA: ` + nonJa.slice(0, 10).join('\n  '));
+  });
+});
+
+test('Paritas Kunci Kanonik Penuh: Seluruh kunci runtime copy-id-*.js terdaftar 1:1 di seluruh 9 bahasa', () => {
+  const vm = require('vm');
+  const i18nDir = path.join(ROOT, 'features', 'i18n');
+  const copyIdKeys = new Set();
+  const sandbox = {
+    FiezelI18n: {
+      registerCopy: (_loc, map) => {
+        if (map && typeof map === 'object') {
+          for (const k of Object.keys(map)) copyIdKeys.add(k);
+        }
+      },
+      overrideCopy: (_loc, map) => {
+        if (map && typeof map === 'object') {
+          for (const k of Object.keys(map)) copyIdKeys.add(k);
+        }
+      }
+    }
+  };
+  sandbox.self = sandbox;
+  sandbox.window = sandbox;
+  vm.createContext(sandbox);
+  for (const f of fs.readdirSync(i18nDir).filter(x => /^copy-id-.*\.js$/.test(x)).sort()) {
+    vm.runInContext(fs.readFileSync(path.join(i18nDir, f), 'utf8'), sandbox, { filename: f });
+  }
+  assert(copyIdKeys.size >= 6000, `Ekspektasi >= 6000 kunci copy-id runtime, terbaca: ${copyIdKeys.size}`);
+
+  const mergedByLoc = {};
+  for (const loc of ['id', ...ALL_NON_ID_LOCALES]) {
+    mergedByLoc[loc] = {};
+    for (const ns of NAMESPACES) {
+      Object.assign(mergedByLoc[loc], JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, loc, `${ns}.json`), 'utf8')));
+    }
+  }
+  const idCatalogKeys = Object.keys(mergedByLoc.id).sort();
+  const missingRuntime = [...copyIdKeys].filter(k => !(k in mergedByLoc.id));
+  assert.deepStrictEqual(missingRuntime, [], `Kunci copy-id-*.js belum masuk katalog locales/: ${missingRuntime.slice(0, 15).join(', ')}`);
+
+  for (const loc of ALL_NON_ID_LOCALES) {
+    const locKeys = Object.keys(mergedByLoc[loc]).sort();
+    assert.strictEqual(locKeys.length, idCatalogKeys.length, `Jumlah kunci ${loc} (${locKeys.length}) != id (${idCatalogKeys.length})`);
+    const diff = idCatalogKeys.filter(k => !(k in mergedByLoc[loc]));
+    assert.deepStrictEqual(diff, [], `Kunci hilang di ${loc}: ${diff.slice(0, 15).join(', ')}`);
+  }
+});
+
+test('Paritas Placeholder 100%: Seluruh {param} di 9 bahasa identik 1:1 tanpa korupsi kurung kurawal', () => {
+  const phOf = (s) => (String(s || '').match(/\{[a-zA-Z0-9_]+\}/g) || []).sort().join(',');
+  const mismatches = [];
+  for (const ns of NAMESPACES) {
+    const idData = JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, 'id', `${ns}.json`), 'utf8'));
+    for (const loc of ALL_NON_ID_LOCALES) {
+      const locData = JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, loc, `${ns}.json`), 'utf8'));
+      for (const [k, idVal] of Object.entries(idData)) {
+        const pId = phOf(idVal);
+        const pLoc = phOf(locData[k]);
+        if (pId !== pLoc) {
+          mismatches.push(`${loc}/${ns}.${k}: expected [${pId}] got [${pLoc}]`);
+        }
+      }
+    }
+  }
+  assert.deepStrictEqual(mismatches, [], `Ketidakcocokan {placeholder}:\n  ` + mismatches.slice(0, 15).join('\n  '));
+});
+
+test('Aksara Asli Non-Latin (th, ru, km) minimal 95% autentik dan bebas stub Inggris', () => {
+  const scriptMap = {
+    th: /[\u0E00-\u0E7F]/,
+    ru: /[\u0400-\u04FF]/,
+    km: /[\u1780-\u17FF]/
+  };
+  for (const [loc, re] of Object.entries(scriptMap)) {
+    let total = 0, native = 0;
+    for (const ns of NAMESPACES) {
+      const data = JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, loc, `${ns}.json`), 'utf8'));
+      for (const v of Object.values(data)) {
+        const s = String(v).trim();
+        total++;
+        if (re.test(s) || s.length <= 4 || /^settings\.locale-opsi-/.test(s) || /^[0-9\s.,!?:;/\\-_+*#@%$()]+$/.test(s)) {
+          native++;
+        }
+      }
+    }
+    const pct = (native / total) * 100;
+    assert(pct >= 95, `Katalog ${loc} hanya ${pct.toFixed(1)}% beraksara asli (< 95%)`);
+  }
+});
+
+test('Katalog Bahasa Rumpun Latin (ms, fil, vi) minimal 92% diterjemahkan asli (bukan copy-paste Inggris)', () => {
+  const enMerged = {};
+  for (const ns of NAMESPACES) {
+    Object.assign(enMerged, JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, 'en', `${ns}.json`), 'utf8')));
+  }
+  const total = Object.keys(enMerged).length;
+  for (const loc of ['ms', 'fil', 'vi']) {
+    let translated = 0;
+    for (const ns of NAMESPACES) {
+      const data = JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, loc, `${ns}.json`), 'utf8'));
+      for (const [k, v] of Object.entries(data)) {
+        if (v !== enMerged[k] || String(v).trim().length <= 4) translated++;
+      }
+    }
+    const pct = (translated / total) * 100;
+    assert(pct >= 92, `Katalog ${loc} hanya ${pct.toFixed(1)}% berbeda dari Inggris (< 92% — indikasi stub belum diterjemahkan!)`);
+  }
+});
+
 console.log('\n--- HASIL GERBANG I18N GLOBAL PURITY ---');
 if (failures === 0) {
-  console.log('SEMUA 6 GERBANG PURITAS I18N GLOBAL: 100% HIJAU (PASS)!');
+  console.log('SEMUA 11 GERBANG PURITAS I18N GLOBAL: 100% HIJAU (PASS)!');
   process.exit(0);
 } else {
   console.error(`TERDAPAT ${failures} KEGAGALAN PADA GERBANG PURITAS I18N GLOBAL!`);

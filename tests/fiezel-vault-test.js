@@ -60,8 +60,9 @@ async function runTests() {
   // TEST 5: Deteksi manipulasi data (Anti-Tamper GCM Auth Tag)
   console.log('Test 5: Integritas manipulasi data (Tamper detection)...');
   const tampered = JSON.parse(JSON.stringify(encrypted));
-  // Rusak satu karakter di data biner
-  tampered.data = tampered.data.substring(0, 10) + 'X' + tampered.data.substring(11);
+  // Rusak satu karakter di data biner (selalu ubah karakter, jangan ganti dengan karakter yang sama)
+  const flipChar = tampered.data[10] === 'X' ? 'Y' : 'X';
+  tampered.data = tampered.data.substring(0, 10) + flipChar + tampered.data.substring(11);
   let failed = false;
   try {
     await runtime.unpack(tampered);
