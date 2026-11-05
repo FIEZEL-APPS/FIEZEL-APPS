@@ -1,7 +1,7 @@
 {
-  "version": "m025-765",
-  "claimedBy": "branch perf/brain-runtime-seal",
-  "claimedAt": "2026-11-05T08:25:27.200Z",
-  "reason": "refactor(brain-cleanup): add frozen export guard for runtime modules",
+  "version": "m025-766",
+  "claimedBy": "branch perf/brain-deep-hardening",
+  "claimedAt": "2026-11-05T09:35:49.275Z",
+  "reason": "refactor(brain-cleanup): add per-invocation runtime seal and anti-tamper property locks",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
