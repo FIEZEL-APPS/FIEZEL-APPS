@@ -1,7 +1,7 @@
 {
-  "version": "m025-766",
-  "claimedBy": "branch feat/unified-release-m025-766",
-  "claimedAt": "2026-11-05T08:46:49.656Z",
-  "reason": "feat(unified): [ALLOW-PROTECTED: auth|onboarding|pwa|ci] [ALLOW-MASS-DELETE] integrate 9-locales engine, voice studio desktop, and pedagogical whiteboard",
+  "version": "m025-767",
+  "claimedBy": "branch fix/quiz-sentence-contrast-mochi-sos-m025-767",
+  "claimedAt": "2026-11-05T15:18:13.695Z",
+  "reason": "fix(grammar,voice): [ALLOW-PROTECTED: auth|onboarding|pwa|ci] fix quiz sentence contrast and accelerate mochi sos greeting",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
