@@ -669,7 +669,10 @@
     host.__mochiInstance = null;
     host.__mochiAttached = false;
     host.__mochiHoldUntil = 0;
-    try { host.classList.remove('mochi-active'); } catch (_) {}
+    try {
+      host.classList.remove('mochi-active');
+      host.classList.remove('has-3d-mochi');
+    } catch (_) {}
     var svg = host.querySelector ? host.querySelector('.fz-svg') : null;
     if (svg) {
       svg.style.opacity = '';
@@ -721,18 +724,21 @@
     host.__mochiInstance = m;
     host.__mochiHoldUntil = 0;
     host.classList.add('mochi-active');
+    host.classList.add('has-3d-mochi');
     hookHost(host);
 
     // Hide the 2D SVG or fallback image visually while preserving it in the DOM for a11y & tests
     var svg = host.querySelector('.fz-svg');
     if (svg) {
-      svg.style.opacity = '0';
-      svg.style.display = 'none';
+      svg.style.setProperty('opacity', '0', 'important');
+      svg.style.setProperty('display', 'none', 'important');
+      svg.style.setProperty('visibility', 'hidden', 'important');
     }
     var fallbackImg = host.querySelector('.fz-vissol-mascot-img');
     if (fallbackImg) {
-      fallbackImg.style.opacity = '0';
-      fallbackImg.style.display = 'none';
+      fallbackImg.style.setProperty('opacity', '0', 'important');
+      fallbackImg.style.setProperty('display', 'none', 'important');
+      fallbackImg.style.setProperty('visibility', 'hidden', 'important');
     }
 
     host.appendChild(pool.viewport);

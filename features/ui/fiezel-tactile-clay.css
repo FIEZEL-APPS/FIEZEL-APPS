@@ -7743,6 +7743,21 @@ body:has(.home-today),
   pointer-events: auto !important;
 }
 
+/* Eliminasi total maskot 2D statis saat 3D Mochi terpasang atau aktif */
+.fz-vissol-mascot-wrap:has(.fz-mochi-viewport) .fz-vissol-mascot-img,
+.fz-vissol-mascot-wrap.mochi-active .fz-vissol-mascot-img,
+.fz-vissol-mascot-wrap.has-3d-mochi .fz-vissol-mascot-img,
+.fz-mochi-viewport ~ .fz-vissol-mascot-img,
+.fz-vissol-mascot-img:has(~ .fz-mochi-viewport) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .fz-vissol-mascot-cloud-bg {
   position: absolute !important;
   top: -8px !important;
