@@ -211,11 +211,11 @@ export class SileroNeuralVadGate {
               preRollBase64.length = 0;
               return;
             }
-            if (pSpeech >= 0.94 && rms >= 0.14) {
+            if (pSpeech >= 0.72 && rms >= 0.010) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
-              if (speechStreak >= 18) {
+              if (speechStreak >= 6) {
                 burstOpen = true;
                 this.confirmedSpeaking = true;
                 cb.onHumanBargeIn();
