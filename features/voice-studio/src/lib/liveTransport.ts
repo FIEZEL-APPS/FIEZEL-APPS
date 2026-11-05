@@ -390,6 +390,8 @@ let _copilotServerCooldownUntil = 0;
 
 export type CopilotSpeechAct =
   | 'echo_redemption'
+  | 'clarification_repeat'
+  | 'wh_what_action'
   | 'invitation'
   | 'choice'
   | 'wh_how_long'
@@ -436,7 +438,7 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
       /(?:repeat|say (?:it|this)?(?:\s+back)?(?:\s+to me)?(?:\s+cleanly|\s+out loud|\s+like this)?|say after me|repeat after me|should say|gotta say|try saying)[:\s,]+["'“‘『「]([^"'”’』」]+)["'”’』」]/i
     ) ||
     clean.match(
-      /["'“‘『「]([^"'”’』」]{4,120})["'”’』」][.!,?\s]*(?:come on[,!\s]*|now[,!\s]*)?(?:repeat|say it(?:\s+again|\s+back|\s+with me|\s+after me)?|try saying it)/i
+      /["'“‘『「]([^"'”’』」]{2,120})["'”’』」][.!,?\s]*(?:come on[,!\s]*|now[,!\s]*)?(?:repeat|say it(?:\s+again|\s+back|\s+with me|\s+after me)?|try saying it)/i
     );
   const echoMatchJa =
     clean.match(
@@ -447,10 +449,10 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
     );
   const echoMatchZh =
     clean.match(
-      /(?:[“"「『])([^”"」』]+)[”"」』][，。！!\s]*(?:来[，\s]*|快[，\s]*)?(?:跟我(?:重新)?(?:读|说|念)|(?:重新|再)(?:说|读|念)一遍|重复一遍|读一遍|说一遍)/u
+      /(?:[“"「『])([^”"」』]+)[”"」』][，。！!\s]*(?:来[，\s]*|快[，\s]*)?(?:跟我(?:重新)?(?:读|说|念|重复)(?:一遍)?|(?:重新|再)(?:说|读|念|重复)一遍|重复一遍|读一遍|说一遍)/u
     ) ||
     clean.match(
-      /(?:(?:跟我(?:重新)?(?:读|说)|(?:再|重新)说一遍|重复一遍|读一遍|(?:得|要|应该|该)这么说|正确(?:的)?说法是)[:：，\s]*(?:[“"「『])([^”"」』]+)[”"」』])/u
+      /(?:(?:跟我(?:重新)?(?:读|说|念|重复)(?:一遍)?|(?:再|重新)?(?:说|读|念|重复)一遍|重复一遍|读一遍|(?:得|要|应该|该)这么说|正确(?:的)?说法是)[:：，\s]*(?:[“"「『])([^”"」』]+)[”"」』])/u
     );
   const echoTarget = (echoMatchEn?.[1] || echoMatchJa?.[1] || echoMatchZh?.[1])?.trim();
   if (echoTarget) {
@@ -571,6 +573,42 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
   if (focal.isEchoRedemption) return 'echo_redemption';
 
   const s = focal.focalText.toLowerCase();
+
+  // 0. Clarification / Repeat request (e.g. "could you say that again?", "repeat that?")
+  if (targetLang === 'ja') {
+    if (/(?:もう一度|もう一回|聞き取れ|電波が.*途切れ|言って(?:いただけますか|ください|みて))/u.test(focal.focalText)) {
+      return 'clarification_repeat';
+    }
+  } else if (targetLang === 'zh') {
+    if (/(?:再说一遍|信号.*断|刚才没听清|能重复一遍吗|再说一次|重新说一遍)/u.test(focal.focalText)) {
+      return 'clarification_repeat';
+    }
+  } else {
+    if (
+      /\b(?:could you|can you|would you|please)?\s*(?:say that again|repeat that|say again|speak again|one more time)\b/i.test(s) ||
+      /\b(?:pardon|what did you say|line glitched)\b/i.test(s)
+    ) {
+      return 'clarification_repeat';
+    }
+  }
+
+  // 0.5. What Action / Activity (e.g. "what are you doing?", "what are you watching?", "what did you do today?")
+  if (targetLang === 'ja') {
+    if (/(?:何をしている|何をしてる|今何してる|何してた|何を食べた|何を見てる|何やってる|何をしていらっしゃ)/u.test(focal.focalText)) {
+      return 'wh_what_action';
+    }
+  } else if (targetLang === 'zh') {
+    if (/(?:在干嘛|在做什么|在干什么|做了什么|吃了什么|看什么|在忙什么)/u.test(focal.focalText)) {
+      return 'wh_what_action';
+    }
+  } else {
+    if (
+      /\bwhat (?:are you doing|are you up to|is going on|did you do|were you doing|do you do now)\b/i.test(s) ||
+      /\bwhat (?:did you eat|are you watching|are you eating|are you working on)\b/i.test(s)
+    ) {
+      return 'wh_what_action';
+    }
+  }
 
   // 1. Invitations & Proposals
   if (targetLang === 'ja') {
@@ -1296,12 +1334,53 @@ export function buildContextualFallbackCards(params: {
 
   type CardRow = [string, string, string, string]; // [text, pronunciation, hintId, hintTh]
   type Tpl = { easy: CardRow; mission: CardRow; rescue: CardRow };
+  const userEcho = (params.lastUserText || '').trim();
 
   const EN: Record<CopilotSpeechAct, Tpl> = {
     echo_redemption: {
       easy: [echo, echo.toLowerCase(), `Ulangi: "${echo}"`, `พูดตาม: "${echo}"`],
       mission: [`${echo}, got it.`, `${echo.toLowerCase()}, got it`, `Mengerti: "${echo}"`, `เข้าใจแล้ว: "${echo}"`],
       rescue: [`${echo}. Did I say that right?`, `${echo.toLowerCase()}. did ai sei det rait?`, `"${echo}". Apakah pengucapanku sudah tepat?`, `"${echo}". ฉันออกเสียงถูกต้องไหม?`],
+    },
+    clarification_repeat: {
+      easy: [
+        userEcho || "I said I'm practicing my English with you!",
+        userEcho ? userEcho.toLowerCase() : "ai sed aim praktising mai ingglis wid yu",
+        userEcho ? `Ulangi: "${userEcho}"` : "Kukatakan aku lagi latihan bahasa Inggris!",
+        userEcho ? `พูดซ้ำ: "${userEcho}"` : "ฉันบอกว่ากำลังฝึกภาษาอังกฤษอยู่!",
+      ],
+      mission: [
+        userEcho ? `Sorry about that, I said: "${userEcho}".` : "Sorry about that! My connection glitched for a moment.",
+        userEcho ? `sori abaut det, ai sed: "${userEcho.toLowerCase()}".` : "sori abaut det! mai koneksyen glichd for e moument.",
+        userEcho ? `Maaf ya, tadi kukatakan: "${userEcho}".` : "Maaf ya! Koneksiku tadi sempat terputus sebentar.",
+        userEcho ? `ขอโทษทีนะ ฉันบอกว่า: "${userEcho}"` : "ขอโทษทีนะ สัญญาณของฉันสะดุดไปนิดหน่อย",
+      ],
+      rescue: [
+        "Can you hear me clearly now? Let's keep going!",
+        "ken yu hir mi klirli nau? lets kip gouing!",
+        "Apakah sekarang sudah terdengar jelas? Ayo kita lanjut!",
+        "ตอนนี้คุณได้ยินฉันชัดเจนไหม? มาคุยกันต่อนะ!",
+      ],
+    },
+    wh_what_action: {
+      easy: [
+        "I'm just relaxing at home right now.",
+        "aim jast rileksing et houm rait nau",
+        "Aku lagi santai di rumah sekarang.",
+        "ตอนนี้ฉันแค่พักผ่อนอยู่ที่บ้านครับ/ค่ะ",
+      ],
+      mission: [
+        "I'm watching a good show and chilling out today.",
+        "aim wocing e gud syou end ciling aut tudei",
+        "Hari ini aku lagi nonton acara seru dan bersantai.",
+        "วันนี้ฉันกำลังดูรายการสนุกๆ และพักผ่อนอยู่",
+      ],
+      rescue: [
+        "Just resting at home. What about you, what are you doing?",
+        "jast resting et houm. wat abaut yu, wat ar yu duing?",
+        "Lagi santai di rumah. Kalau kamu lagi ngapain?",
+        "แค่พักผ่อนอยู่บ้าน แล้วคุณล่ะครับ/ค่ะ กำลังทำอะไรอยู่?",
+      ],
     },
     invitation: {
       easy: ['Sure, I would love to!', 'syur, ai wud lav tu!', 'Tentu, aku mau banget!', 'ได้เลย ฉันอยากไปมาก!'],
@@ -1426,6 +1505,46 @@ export function buildContextualFallbackCards(params: {
       mission: [`${echo}、ですね。`, `${toPhoneticRomaji(echo)}, desu ne`, `Mengerti: 「${echo}」`, `เข้าใจแล้ว: 「${echo}」`],
       rescue: [`${echo}。これで合っていますか？`, `${toPhoneticRomaji(echo)}. kore de atte imasu ka?`, `「${echo}」. Apakah ini sudah benar?`, `「${echo}」 ถูกต้องไหมครับ/ค่ะ?`],
     },
+    clarification_repeat: {
+      easy: [
+        userEcho || "もう一度言いますね！",
+        userEcho ? toPhoneticRomaji(userEcho) : "Mou ichido iimasu ne!",
+        userEcho ? `Ulangi: 「${userEcho}」` : "Kukatakan sekali lagi ya!",
+        userEcho ? `พูดซ้ำ: 「${userEcho}」` : "ฉันจะพูดอีกรอบนะ!",
+      ],
+      mission: [
+        userEcho ? `すみません、さっき「${userEcho}」と言っていました。` : "すみません、電波が少し途切れてしまいました。",
+        userEcho ? `Sumimasen, sakki "${toPhoneticRomaji(userEcho)}" to itte imashita.` : "Sumimasen, denpa ga sukoshi togirete shimaimashita.",
+        userEcho ? `Maaf, tadi aku bilang: 「${userEcho}」.` : "Maaf, tadi sinyalku agak terputus sebentar.",
+        userEcho ? `ขอโทษที เมื่อกี้ฉันพูดว่า: 「${userEcho}」` : "ขอโทษที สัญญาณขัดข้องนิดหน่อยครับ/ค่ะ",
+      ],
+      rescue: [
+        "今はっきり聞こえますか？続けましょう！",
+        "Ima hakkiri kikoemasu ka? Tsuzukemashou!",
+        "Sekarang sudah terdengar jelas? Ayo kita lanjut!",
+        "ตอนนี้ได้ยินชัดเจนไหมครับ/ค่ะ? มาคุยกันต่อเถอะ!",
+      ],
+    },
+    wh_what_action: {
+      easy: [
+        "今は家でのんびり休んでいます。",
+        "Ima wa ie de nonbiri yasunde imasu.",
+        "Sekarang aku lagi santai istirahat di rumah.",
+        "ตอนนี้ฉันกำลังพักผ่อนสบายๆ อยู่ที่บ้านครับ/ค่ะ",
+      ],
+      mission: [
+        "アニメを見ながら、少しリラックスしています。",
+        "Anime o minagara, sukoshi rirakkusu shite imasu.",
+        "Aku lagi santai sambil nonton anime.",
+        "กำลังดูอนิเมะและผ่อนคลายอยู่นิดหน่อย",
+      ],
+      rescue: [
+        "家でくつろいでいます。先生は何をしているんですか？",
+        "Ie de kutsuroide imasu. Sensei wa nani o shite iru n desu ka?",
+        "Aku lagi santai di rumah. Kalau Sensei lagi ngapain?",
+        "พักผ่อนอยู่บ้าน แล้วคุณครูกำลังทำอะไรอยู่เหรอครับ/ค่ะ?",
+      ],
+    },
     invitation: {
       easy: ['はい、ぜひ一緒にお願いします！', 'hai, zehi issho ni onegai shimasu!', 'Ya, mari kita lakukan bersama!', 'ได้เลย ไปด้วยกันนะ!'],
       mission: ['いいですね！ちょうど時間が空いていますよ。', 'ii desu ne! choudo jikan ga aite imasu yo.', 'Bagus sekali! Pas banget aku ada waktu luang.', 'ดีเลย! ฉันกำลังว่างอยู่พอดีเลย'],
@@ -1548,6 +1667,46 @@ export function buildContextualFallbackCards(params: {
       easy: [echo, toPhoneticPinyin(echo), `Ulangi: “${toPhoneticPinyin(echo)}”`, `พูดตาม: “${toPhoneticPinyin(echo)}”`],
       mission: [`${echo}，对吧？`, `${toPhoneticPinyin(echo)}, duì ba?`, `Mengerti: “${toPhoneticPinyin(echo)}”`, `เข้าใจแล้ว: “${toPhoneticPinyin(echo)}”`],
       rescue: [`${echo}。我读得对吗？`, `${toPhoneticPinyin(echo)}. Wǒ dú de duì ma?`, `“${toPhoneticPinyin(echo)}”. Apakah pengucapanku sudah benar?`, `“${toPhoneticPinyin(echo)}” ฉันอ่านถูกต้องไหม?`],
+    },
+    clarification_repeat: {
+      easy: [
+        userEcho || "那我再说一遍吧！",
+        userEcho ? toPhoneticPinyin(userEcho) : "Nà wǒ zài shuō yí biàn ba!",
+        userEcho ? `Ulangi: "${userEcho}"` : "Kalau begitu aku ulangi lagi ya!",
+        userEcho ? `พูดซ้ำ: "${userEcho}"` : "งั้นฉันพูดอีกรอบนะ!",
+      ],
+      mission: [
+        userEcho ? `不好意思，我刚才说的是：“${userEcho}”。` : "不好意思，刚才我这边的网络卡了一下。",
+        userEcho ? `Bù hǎoyìsi, wǒ gāngcái shuō de shì: "${toPhoneticPinyin(userEcho)}".` : "Bù hǎoyìsi, gāngcái wǒ zhè biān de wǎngluò kǎ le yíxià.",
+        userEcho ? `Maaf ya, tadi maksudku: "${userEcho}".` : "Maaf ya, tadi jaringanku sempat macet sebentar.",
+        userEcho ? `ขอโทษที เมื่อกี้ฉันบอกว่า: "${userEcho}"` : "ขอโทษที เมื่อกี้เน็ตฉันกระตุกนิดหน่อย",
+      ],
+      rescue: [
+        "现在能听清楚了吗？我们继续聊吧！",
+        "Xiànzài néng tīng qīngchu le ma? Wǒmen jìxù liáo ba!",
+        "Sekarang sudah terdengar jelas? Ayo kita lanjut ngobrol!",
+        "ตอนนี้ได้ยินชัดเจนไหม? มาคุยกันต่อนะ!",
+      ],
+    },
+    wh_what_action: {
+      easy: [
+        "我现在在家里休息呢。",
+        "Wǒ xiànzài zài jiālǐ xiūxi ne.",
+        "Sekarang aku lagi istirahat di rumah.",
+        "ตอนนี้ฉันพักผ่อนอยู่ที่บ้านครับ/ค่ะ",
+      ],
+      mission: [
+        "我正在看一部电影，顺便放松一下。",
+        "Wǒ zhèngzài kàn yí bù diànyǐng, shùnbiàn fàngsōng yíxià.",
+        "Aku lagi nonton film sambil santai.",
+        "ฉันกำลังดูหนังและพักผ่อนอยู่",
+      ],
+      rescue: [
+        "在家里休息。老师您在忙些什么呢？",
+        "Zài jiālǐ xiūxi. Lǎoshī nín zài máng xiē shénme ne?",
+        "Lagi santai di rumah. Kalau Laoshi lagi sibuk apa?",
+        "พักผ่อนอยู่บ้าน แล้วคุณครูกำลังทำอะไรอยู่เหรอครับ/ค่ะ?",
+      ],
     },
     invitation: {
       easy: ['好啊，我们一起去吧！', 'Hǎo a, wǒmen yīqǐ qù ba!', 'Boleh, ayo kita pergi sama-sama!', 'ดีเลย ไปด้วยกันเถอะ!'],

@@ -290,34 +290,34 @@ ruby.zh-ruby {
   ruby-position: over;
   display: inline-ruby;
   vertical-align: baseline;
-  margin-inline: 0.14em;
-  margin-block: 0.16em;
-  padding-inline: 0.04em;
+  margin-inline: 0;
+  margin-block: 0.12em;
+  padding-inline: 0.02em;
   line-height: 2.85 !important;
 }
 
 rt.fz-ja-rt {
-  font-size: 0.56em;
-  font-weight: 600;
+  font-size: 0.65em;
+  font-weight: 700;
   color: #8C6D1F;
   line-height: 1.15;
-  padding-inline: 4px;
+  padding-inline: 2px;
   white-space: nowrap;
   user-select: none;
   text-align: center;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 rt.zh-rt {
-  font-size: 0.56em;
+  font-size: 0.65em;
   font-weight: 700;
   color: #BE123C;
   line-height: 1.15;
-  padding-inline: 4px;
+  padding-inline: 2px;
   white-space: nowrap;
   user-select: none;
   text-align: center;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .fz-ja-romaji-text,
