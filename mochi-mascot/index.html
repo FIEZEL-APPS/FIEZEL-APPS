@@ -198,15 +198,57 @@
     </div>
     <div class="parts-container">
 
-      <!-- Mata / Mood -->
+      <!-- Mata / Mood (Master Storyboard) -->
       <div class="part-group">
-        <div class="part-label">1. Ekspresi Wajah (Mata)</div>
+        <div class="part-label">1. Ekspresi Wajah Master Storyboard (13 Emosi)</div>
         <div class="part-chips" id="moodChips">
-          <button class="chip" data-mood="dots" onclick="selectMood('dots')">Dots (Netral)</button>
-          <button class="chip active" data-mood="wink" onclick="selectMood('wink')">Wink (Kedip)</button>
-          <button class="chip" data-mood="happy" onclick="selectMood('happy')">Happy (^ ^)</button>
-          <button class="chip" data-mood="hearts" onclick="selectMood('hearts')">Hearts (Hati)</button>
-          <button class="chip" data-mood="sleepy" onclick="selectMood('sleepy')">Sleepy (Tidur)</button>
+          <button class="chip active" data-mood="neutral" onclick="selectMood('neutral')">1. Netral (Calm)</button>
+          <button class="chip" data-mood="tegas" onclick="selectMood('tegas')">2. Tegas (Firm)</button>
+          <button class="chip" data-mood="sinis" onclick="selectMood('sinis')">3. Sinis (Skeptical)</button>
+          <button class="chip" data-mood="gembira" onclick="selectMood('gembira')">4. Gembira (Happy)</button>
+          <button class="chip" data-mood="empati" onclick="selectMood('empati')">5. Empati (Paws & Arcs)</button>
+          <button class="chip" data-mood="kesal" onclick="selectMood('kesal')">6. Kesal (Pout)</button>
+          <button class="chip" data-mood="marah" onclick="selectMood('marah')">7. Marah (Flushed)</button>
+          <button class="chip" data-mood="sangat_marah" onclick="selectMood('sangat_marah')">8. Sangat Marah (Demon)</button>
+          <button class="chip" data-mood="kaget" onclick="selectMood('kaget')">9. Kaget (Surprised)</button>
+          <button class="chip" data-mood="sedih" onclick="selectMood('sedih')">10. Sedih (Tears)</button>
+          <button class="chip" data-mood="penasaran" onclick="selectMood('penasaran')">11. Penasaran (?)</button>
+          <button class="chip" data-mood="lelah" onclick="selectMood('lelah')">12. Lelah (Zzz)</button>
+          <button class="chip" data-mood="takut" onclick="selectMood('takut')">13. Takut (Tremble)</button>
+        </div>
+      </div>
+
+      <!-- AIUEO Visemes -->
+      <div class="part-group">
+        <div class="part-label">2. Bentuk Mulut Bicara Live (AIUEO Visemes)</div>
+        <div class="part-chips" id="visemeChips">
+          <button class="chip" onclick="testViseme('A')">Mulut A</button>
+          <button class="chip" onclick="testViseme('I')">Mulut I</button>
+          <button class="chip" onclick="testViseme('U')">Mulut U</button>
+          <button class="chip" onclick="testViseme('E')">Mulut E</button>
+          <button class="chip" onclick="testViseme('O')">Mulut O</button>
+          <button class="chip active" onclick="testViseme(null)">Tutup Mulut</button>
+        </div>
+      </div>
+
+      <!-- Latar Belakang Panggung -->
+      <div class="part-group">
+        <div class="part-label">3. Warna Panggung Latar (Travertine / Putih / Gelap)</div>
+        <div class="part-chips" id="bgChips">
+          <button class="chip active" onclick="setBg('#0F1115')">Dark Slate (#0F1115)</button>
+          <button class="chip" onclick="setBg('#FDFAF3')">Travertine Daylight (#FDFAF3)</button>
+          <button class="chip" onclick="setBg('#FFFFFF')">Pure White (#FFFFFF - Uji Outline)</button>
+        </div>
+      </div>
+
+      <!-- Aksi Gerakan -->
+      <div class="part-group">
+        <div class="part-label">4. Aksi Fisika & Animasi (Acting)</div>
+        <div class="part-chips">
+          <button class="chip" onclick="mochi.triggerJiggle(0.35)">Kenyal Squish</button>
+          <button class="chip" onclick="mochi.triggerEarWiggle(1.2)">Goyang Telinga</button>
+          <button class="chip" onclick="mochi.triggerHandGesture('cheer', 3.0)">Sorak (Cheer)</button>
+          <button class="chip" onclick="mochi.triggerHandGesture('wave', 3.0)">Lambaian Tangan (Wave)</button>
         </div>
       </div>
 
@@ -344,6 +386,35 @@
       mochi.setTail(show);
       syncChips();
       updateCodeSnippet();
+    };
+
+    window.testViseme = (vowel) => {
+      mochi.setVowel(vowel, vowel ? 0.95 : 0);
+      document.querySelectorAll('#visemeChips .chip').forEach(c => {
+        if ((vowel && c.innerText.includes(vowel)) || (!vowel && c.innerText.includes('Tutup'))) {
+          c.classList.add('active');
+        } else {
+          c.classList.remove('active');
+        }
+      });
+    };
+
+    window.setBg = (color) => {
+      document.body.style.backgroundColor = color;
+      if (color === '#FDFAF3' || color === '#FFFFFF') {
+        document.querySelector('.hero-title').style.color = '#1E293B';
+        document.querySelector('.hero-subtitle').style.color = '#64748B';
+      } else {
+        document.querySelector('.hero-title').style.color = '#FFFFFF';
+        document.querySelector('.hero-subtitle').style.color = '#8C92A4';
+      }
+      document.querySelectorAll('#bgChips .chip').forEach(c => {
+        if (c.getAttribute('onclick').includes(color)) {
+          c.classList.add('active');
+        } else {
+          c.classList.remove('active');
+        }
+      });
     };
 
     function syncChips() {
