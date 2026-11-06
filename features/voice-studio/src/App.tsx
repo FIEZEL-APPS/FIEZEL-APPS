@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Phone,
   PhoneOff,
@@ -19,6 +19,7 @@ import {
   X,
   MessageSquare,
   BookOpen,
+  Video,
 } from 'lucide-react';
 import {
   BraincoreStoreState,
@@ -422,6 +423,8 @@ export default function App() {
   const livePlaybackSafetyTimerRef = useRef<number | null>(null);
 
   const [isRecordingPtt, setIsRecordingPtt] = useState<boolean>(false);
+  const userAggressionLevelRef = useRef<number>(0);
+  const userPraiseCountRef = useRef<number>(0);
   const [isListeningLiveSpeech, setIsListeningLiveSpeech] = useState<boolean>(false);
   const [isWaitingAfterSpeech, setIsWaitingAfterSpeech] = useState<boolean>(false);
   const pttStartedAtRef = useRef<number | null>(null);
@@ -539,6 +542,100 @@ export default function App() {
 
   const [callMode, setCallMode] = useState<CallMode>('tutor_coach');
   const callModeRef = useRef<CallMode>('tutor_coach');
+
+  // GoPrep FaceTime Sentiment Reflex & AI Mood Parser
+  const cleanMoodTags = (text: string): string => {
+    if (!text) return '';
+    return text.replace(/\[MOOD:\s*[a-z_]+\]\s*/gi, '').trim();
+  };
+
+  const applyAiMoodFromText = useCallback((text: string) => {
+    if (!text) return;
+    const match = text.match(/\[MOOD:\s*([a-z_]+)\]/i);
+    if (match && match[1]) {
+      const rawMood = match[1].toLowerCase().trim();
+      const inst = mochiInstanceRef.current;
+      if (inst) {
+        let targetMood = rawMood;
+        if (targetMood === 'marah_besar' || targetMood === 'demon' || targetMood === 'sangat-marah') targetMood = 'sangat_marah';
+        if (typeof inst.setMood === 'function') {
+          inst.setMood(targetMood);
+          if (targetMood === 'sangat_marah' && typeof inst.playIronmanTransformSound === 'function') {
+            inst.playIronmanTransformSound();
+          }
+        }
+      }
+    }
+  }, []);
+
+  const evaluateAndTriggerUserSpeechSentiment = useCallback((text: string) => {
+    if (!text || !text.trim()) return;
+    const clean = text.toLowerCase().trim();
+    const inst = mochiInstanceRef.current;
+    if (!inst || typeof inst.setMood !== 'function') return;
+
+    // 1. INSULT / DEMEANING / PUT-DOWN (Mochi gets sad / hurt / cries):
+    const isInsult = /\b(jelek|buruk|bodoh|bego|tolol|goblok|sampah|payah|gak guna|tidak guna|tidak berguna|anjing|babi|bangsat|tai|cacat|stupid|idiot|dumb|useless|ugly|suck|worst|hate you|shut up|diem lu|bacot|笨蛋|바보)\b/i.test(clean);
+
+    // 2. ANGER / SCOLDING / AGGRESSION (Mochi challenges back boldly!):
+    const isAggression = /\b(berisik|diem|diam|jangan sok|sok tau|sok pintar|gua pukul|gua banting|nyebelin|lu yang salah|jangan ngatur|f\w*k|damn|piss off|annoying)\b/i.test(clean) || (clean.length >= 6 && clean === clean.toUpperCase() && /!{2,}/.test(clean));
+
+    // 3. PRAISE / COMPLIMENT / AFFECTION (Mochi blushes cute / joyful):
+    const isPraise = /\b(lucu|imut|gemoy|gemas|pintar|hebat|keren|cantik|ganteng|makasih|terima kasih|sayang|love you|cute|adorable|smart|genius|amazing|cool|kawaii|かわいい|可爱的)\b/i.test(clean);
+
+    // 4. CONFUSION / VULNERABLE / STRUGGLING (Mochi provides empathetic comfort):
+    const isConfusion = /\b(gak paham|tidak paham|pusing|bingung|susah|gak ngerti|tidak mengerti|aku nyerah|menyerah|buntu|tolong|help|confused|hard|give up)\b/i.test(clean);
+
+    // 5. LAUGHTER / HUMOR (Mochi laughs along):
+    const isLaughter = /\b(haha|wkwk|hehe|ngakak|lucu|humor|canda|lol|lmao|rofl)\b/i.test(clean);
+
+    if (isInsult) {
+      userAggressionLevelRef.current = Math.max(0, userAggressionLevelRef.current - 1);
+      inst.setMood('sedih');
+      inst.setAura?.('pink');
+    } else if (isAggression) {
+      userAggressionLevelRef.current += 1;
+      const level = userAggressionLevelRef.current;
+      if (level >= 3) {
+        // Extreme aggression: Sangat Marah / Demon Transformation with Ironman sound!
+        inst.setMood('sangat_marah');
+        inst.setAura?.('amber');
+        if (typeof inst.playIronmanTransformSound === 'function') {
+          inst.playIronmanTransformSound();
+        }
+      } else if (level === 2) {
+        // High aggression: Marah (Flushed red face)
+        inst.setMood('marah');
+        inst.setAura?.('pink');
+      } else {
+        // Initial challenge: Sinis (Skeptical Smirk)
+        inst.setMood('sinis');
+        inst.setAura?.('purple');
+      }
+    } else if (isPraise) {
+      userAggressionLevelRef.current = 0;
+      userPraiseCountRef.current += 1;
+      if (userPraiseCountRef.current % 2 === 1) {
+        // Blushing Empati paws
+        inst.setMood('empati');
+        inst.setAura?.('pink');
+      } else {
+        // Joyful Gembira stars
+        inst.setMood('gembira');
+        inst.setAura?.('green');
+        inst.setFx?.('stars');
+        inst.triggerHop?.(0.35);
+      }
+    } else if (isConfusion) {
+      userAggressionLevelRef.current = 0;
+      inst.setMood('empati');
+      inst.setAura?.('blue');
+    } else if (isLaughter) {
+      inst.setMood('gembira');
+      inst.setAura?.('green');
+      inst.triggerEarWiggle?.(1.4);
+    }
+  }, []);
 
   const [learningWorkbench, setLearningWorkbench] = useState<{
     isOpen: boolean;
@@ -1882,6 +1979,8 @@ export default function App() {
   const submitLiveUserUtterance = (textToSend: string) => {
     const trimmed = textToSend.trim();
     if (!trimmed) return;
+
+    evaluateAndTriggerUserSpeechSentiment(trimmed);
 
     if (
       wsRef.current &&
@@ -3831,7 +3930,7 @@ export default function App() {
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
                       },
                     ],
                   },
@@ -4173,6 +4272,7 @@ export default function App() {
                 locale
               );
               setLiveUserDraft(liveUserDraftRef.current);
+              evaluateAndTriggerUserSpeechSentiment(liveUserDraftRef.current);
             }
           } else if (msg.type === 'input_transcription' || msg.type === 'user_transcript') {
             const cleanFull = sanitizeHallucinatedTranscript(
@@ -4182,14 +4282,17 @@ export default function App() {
             );
             liveUserDraftRef.current = cleanFull;
             setLiveUserDraft(liveUserDraftRef.current);
+            evaluateAndTriggerUserSpeechSentiment(cleanFull);
           }
 
           if (msg.serverContent?.outputTranscription?.text) {
             liveAiDraftRef.current += msg.serverContent.outputTranscription.text;
-            setLiveAiDraft(liveAiDraftRef.current);
+            applyAiMoodFromText(liveAiDraftRef.current);
+            setLiveAiDraft(cleanMoodTags(liveAiDraftRef.current));
           } else if (msg.type === 'output_transcription' || msg.type === 'ai_transcript') {
             liveAiDraftRef.current = msg.fullText || msg.text || '';
-            setLiveAiDraft(liveAiDraftRef.current);
+            applyAiMoodFromText(liveAiDraftRef.current);
+            setLiveAiDraft(cleanMoodTags(liveAiDraftRef.current));
           }
 
           // Spekulatif pre-fetch: jika ucapan AI yang sedang streaming telah menyelesaikan klausul/pertanyaan
@@ -4252,7 +4355,12 @@ export default function App() {
               activeScenario.targetLang,
               locale
             ).trim();
-            const aText = (liveAiDraftRef.current || msg.aiTranscript || '').trim();
+            const rawAText = (liveAiDraftRef.current || msg.aiTranscript || '').trim();
+            applyAiMoodFromText(rawAText);
+            const aText = cleanMoodTags(rawAText);
+            if (uText) {
+              evaluateAndTriggerUserSpeechSentiment(uText);
+            }
             liveUserDraftRef.current = '';
             liveAiDraftRef.current = '';
             setLiveUserDraft('');
@@ -4875,11 +4983,11 @@ export default function App() {
           showEars: true,
           showTail: false,
           autoExpressions: false,
-          voiceCompanionStrictMode: true,
+          voiceCompanionStrictMode: false,
           width: mochiWidth,
           height: mochiHeight,
         });
-        inst.setVoiceCompanionStrictMode?.(true);
+        inst.setVoiceCompanionStrictMode?.(false);
         if (liveAnalyserRef.current && liveAudioCtxRef.current) {
           inst.attachAudioAnalyser?.(liveAnalyserRef.current, liveAudioCtxRef.current.sampleRate || 24000);
         } else if (ttsAnalyserRef.current && ttsAudioCtxRef.current) {
@@ -4910,18 +5018,13 @@ export default function App() {
     };
   }, [activeTab, prereqStatus.isReady]);
 
-  // Strict 2-Motion Open-Eyes Rule for Kawan Bicara 3D Mochi:
-  // Motion #1: Idle (open eyes 'dots' + hands retracted)
-  // Motion #2: Greeting / Speaking (open eyes 'dots' + gentle hand wave + real-time wawa-lipsync mouth)
+  // GoPrep FaceTime Interactive Companion Dynamic Speaking Layer:
+  // Updates talking and speech wave without suppressing or resetting Mochi's active emotional state
   useEffect(() => {
     const m = mochiInstanceRef.current;
     if (!m) return;
     try {
-      m.setVoiceCompanionStrictMode?.(true);
-      m.setMood?.('dots');
-      m.setBadge?.(null);
-      m.setFx?.(null);
-      m.setAura?.('purple');
+      m.setVoiceCompanionStrictMode?.(false);
 
       if (callStateKey === 'speaking') {
         m.setTalking?.(true);
@@ -4934,8 +5037,6 @@ export default function App() {
           const inst = mochiInstanceRef.current;
           if (!inst) return;
           try {
-            inst.setVoiceCompanionStrictMode?.(true);
-            inst.setMood?.('dots');
             inst.setTalking?.(true);
             inst.triggerHandGesture?.('wave', 1.8);
           } catch {
@@ -4948,7 +5049,6 @@ export default function App() {
           mochiSpeechCadenceTimerRef.current = null;
         }
         m.setTalking?.(false);
-        m.retractHands?.();
       }
     } catch {
       // Ignore
@@ -5105,109 +5205,172 @@ export default function App() {
 
   return (
     <div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-[#F6F3EC] text-[#1C1611] flex flex-col">
-      {/* TOP BAR BERSIH SATU BARIS (Tanpa Kotak Berlapis) */}
-      <header className="shrink-0 sticky top-0 z-20 bg-[#F6F3EC]/95 backdrop-blur-md border-b border-[#E8DFC8]/60 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <div className="max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
+      {/* TOP BAR RINGKAS & BERSIH (h-11 / 44px - FaceTime & Duolingo Max Style) */}
+      <header className="shrink-0 sticky top-0 z-20 bg-[#F6F3EC]/95 backdrop-blur-md border-b border-[#E8DFC8]/60 pt-[env(safe-area-inset-top,0.25rem)]">
+        <div className="max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-3 sm:px-6 h-11 flex items-center justify-between gap-2">
+          {/* SISI KIRI: Tombol Kembali & Persona Active */}
           <div className="flex items-center gap-2 min-w-0">
             <a
               href="./index.html"
               onClick={handleBackToPwa}
               data-testid="mitra-kaiwa-back-btn"
-              className="px-3 py-1.5 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] font-semibold text-[#1C1611] cursor-pointer flex items-center gap-1.5 transition-all text-xs shrink-0"
+              className="px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] font-semibold text-[#1C1611] cursor-pointer flex items-center gap-1 transition-all text-xs shrink-0"
               title="Kembali"
             >
               <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
               <span className="hidden sm:inline">{locale === 'th' ? 'กลับ' : 'Kembali'}</span>
             </a>
 
-            {/* Room Title & Persona Name - No dropdown/topic picker */}
-            <div className="flex items-center gap-2 min-w-0">
-              <span
-                data-testid="mitra-kaiwa-header-title"
-                className="font-bold text-sm text-[#1C1611] whitespace-nowrap"
-              >
-                {targetLang === 'ja' ? (
-                  locale === 'th' ? (
-                    <>
-                      <span>คู่สนทนาไควะ</span>
-                      <span className="hidden sm:inline"> · สนทนาอิสระ</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Mitra Kaiwa</span>
-                      <span className="hidden sm:inline"> · Free Talk</span>
-                    </>
-                  )
-                ) : locale === 'th' ? (
-                  <>
-                    <span>คู่สนทนา Fiezel</span>
-                    <span className="hidden sm:inline"> · สนทนาอิสระ</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Kawan Bicara</span>
-                    <span className="hidden sm:inline"> · Free Talk</span>
-                  </>
-                )}
-              </span>
-              <button
-                type="button"
-                data-testid="persona-picker-trigger"
-                onClick={() => {
-                  playFiezelSfx('button_tap');
-                  setShowPersonaModal(true);
-                }}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-[#5C4E3C] text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
-                title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์เสียง' : 'Ganti Karakter & Gaya Bicara Partner'}
-              >
-                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-                <span className="max-w-[70px] xs:max-w-[100px] sm:max-w-[160px] truncate">
-                  {formatPersonaShortName(activePersona.name)}
-                </span>
-                <svg className="w-3 h-3 text-[#8C7A65]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
+            <span
+              data-testid="mitra-kaiwa-header-title"
+              className="sr-only"
+            >
+              {targetLang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara'}
+            </span>
 
-            {/* Navigasi Segmented (Nonaktif pada mode tunggal Mitra Kaiwa) */}
-            <nav
-              aria-hidden="true"
-              style={{ display: 'none' }}
-              className="hidden items-center gap-1 bg-[#FFF3DC] border border-[#F0E4CF] p-1 rounded-2xl"
+            <button
+              type="button"
+              data-testid="persona-picker-trigger"
+              onClick={() => {
+                playFiezelSfx('button_tap');
+                setShowPersonaModal(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-[#5C4E3C] text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+              title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์เสียง' : 'Ganti Karakter & Gaya Bicara Partner'}
+            >
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+              <span className="max-w-[85px] xs:max-w-[120px] sm:max-w-[160px] truncate">
+                {formatPersonaShortName(activePersona.name)}
+              </span>
+              <svg className="w-3 h-3 text-[#8C7A65]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* TENGAH: Segmented Switcher FaceTime (Panggung) vs Riwayat Chat */}
+          {activeTab === 'call' && (
+            <div
+              data-testid="call-view-mode-toggle"
+              className="inline-flex items-center p-0.5 rounded-full bg-[#EFE8DA] text-[11px] font-semibold shadow-2xs shrink-0"
             >
               <button
                 type="button"
-                onClick={() => handleTabChange('home')}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold"
+                onClick={() => {
+                  playFiezelSfx('button_tap');
+                  setCallViewMode('stage');
+                }}
+                className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+                  callViewMode === 'stage'
+                    ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                    : 'text-[#6E5E47] hover:text-[#1C1611]'
+                }`}
               >
-                {locale === 'th' ? 'หน้าแรก' : 'Beranda'}
+                <Video className="w-3 h-3 text-[#8C2233]" />
+                <span>FaceTime</span>
               </button>
               <button
                 type="button"
-                onClick={() => handleTabChange('call')}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold"
+                onClick={() => {
+                  playFiezelSfx('button_tap');
+                  setCallViewMode('history');
+                }}
+                className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+                  callViewMode === 'history'
+                    ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                    : 'text-[#6E5E47] hover:text-[#1C1611]'
+                }`}
               >
-                <span>{locale === 'th' ? 'โทรกับติวเตอร์' : 'Panggilan Suara'}</span>
+                <MessageSquare className="w-3 h-3 text-[#5C4E3C]" />
+                <span>{locale === 'th' ? 'แชท' : 'Riwayat'}</span>
+                {turns.filter((tr) => tr.speaker === 'user').length > 0 && (
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#8C2233] text-white text-[9px] flex items-center justify-center font-bold">
+                    {turns.filter((tr) => tr.speaker === 'user').length}
+                  </span>
+                )}
               </button>
-              <button
-                type="button"
-                onClick={() => handleTabChange('braincore')}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold"
-              >
-                Braincore ({Math.round(currentMasteryP * 100)}%)
-              </button>
-            </nav>
-          </div>
+            </div>
+          )}
 
-          {/* Kontrol Kanan Ringkas: EN/JA Pill, BKT %, API Key */}
+          {/* SISI KANAN: Papan Belajar Quick Action, EN/JA/ZH Pill, BKT % */}
           <div className="flex items-center gap-1.5 text-xs shrink-0">
+            {!isMeasureMode && activeTab === 'call' && (
+              <button
+                type="button"
+                data-testid="open-workbench-pill-btn"
+                onClick={() => {
+                  playFiezelSfx('button_tap');
+                  const focusQuery =
+                    lastUserTurn?.text?.trim() ||
+                    activeScenario.targetPatterns?.[0] ||
+                    activeScenario.competencyNameId ||
+                    'Perbedaan kata kerja dan pola kalimat percakapan';
+                  const reqSeq = ++workbenchSessionRef.current.turnSeq;
+                  workbenchSessionRef.current.dismissedByUser = false;
+                  setIsAnalyzingTurn(true);
+                  openLearningWorkbenchWithAction(
+                    {
+                      actionType: 'open_learning_popup',
+                      topicTitle: focusQuery,
+                    },
+                    focusQuery
+                  );
+                  void (async () => {
+                    try {
+                      for (const base of resolveVoiceApiCandidateBases()) {
+                        const res = await fetch(`${base}/api/voice/partner-turn`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            text: `[WHITEBOARD_REQUEST] Jelaskan aturan tata bahasa dan contoh untuk: ${focusQuery}`,
+                            forcePopup: true,
+                            personaId: activePersona.id,
+                            personaName: activePersona.name,
+                            scenarioId: activeScenario.id,
+                            scenarioTitle: activeScenario.titleId,
+                            targetLang: activeScenario.targetLang,
+                            locale,
+                            callMode: 'tutor_coach',
+                            history: turnsRef.current
+                              .slice(-4)
+                              .map((t) => ({ speaker: t.speaker, text: t.text })),
+                          }),
+                        });
+                        if (res.ok) {
+                          const data = await res.json();
+                          if (
+                            reqSeq === workbenchSessionRef.current.turnSeq &&
+                            !workbenchSessionRef.current.dismissedByUser &&
+                            data?.uiAction?.actionType === 'open_learning_popup'
+                          ) {
+                            openLearningWorkbenchWithAction(data.uiAction, focusQuery);
+                          }
+                          break;
+                        }
+                      }
+                    } catch {
+                      // Fallback gracefully
+                    } finally {
+                      if (reqSeq === workbenchSessionRef.current.turnSeq) {
+                        setIsAnalyzingTurn(false);
+                      }
+                    }
+                  })();
+                }}
+                className="fz-wb-press px-2.5 py-1 rounded-full bg-[#FFF3C4] hover:bg-[#FFE896] border border-[#E6CE7A] text-[#241A11] text-[11px] font-bold shadow-2xs flex items-center gap-1 cursor-pointer transition-all"
+                title="Buka Papan Tulis Interaktif (Bank Materi Braincore + Bedah Kilat Fiezel)"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-[#8C6D1F] shrink-0" />
+                <span className="hidden sm:inline">{locale === 'th' ? 'กระดานติวเตอร์' : 'Papan Tulis'}</span>
+              </button>
+            )}
+
             <div className="flex items-center bg-white/90 rounded-full p-0.5 shadow-[0_1px_2px_rgba(28,22,17,0.05)]">
               <button
                 type="button"
                 data-testid="target-lang-en"
                 onClick={() => handleSelectTargetLang('en')}
-                className={`px-2.5 py-1 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
+                className={`px-2 py-0.5 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
                   targetLang === 'en'
                     ? 'bg-[#1C1611] text-white'
                     : 'text-[#6E5E47] hover:text-[#1C1611]'
@@ -5219,7 +5382,7 @@ export default function App() {
                 type="button"
                 data-testid="target-lang-ja"
                 onClick={() => handleSelectTargetLang('ja')}
-                className={`px-2.5 py-1 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
+                className={`px-2 py-0.5 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
                   targetLang === 'ja'
                     ? 'bg-[#1C1611] text-white'
                     : 'text-[#6E5E47] hover:text-[#1C1611]'
@@ -5231,7 +5394,7 @@ export default function App() {
                 type="button"
                 data-testid="target-lang-zh"
                 onClick={() => handleSelectTargetLang('zh')}
-                className={`px-2.5 py-1 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
+                className={`px-2 py-0.5 rounded-full font-bold text-[11px] cursor-pointer transition-all ${
                   targetLang === 'zh'
                     ? 'bg-[#BE123C] text-white'
                     : 'text-[#6E5E47] hover:text-[#1C1611]'
@@ -5246,21 +5409,10 @@ export default function App() {
               data-testid="btn-open-braincore"
               onClick={() => handleTabChange('braincore')}
               title="Analitik Braincore"
-              className="hidden xs:inline-flex px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#5C4E3C] font-mono text-[11px] font-semibold tabular-nums cursor-pointer transition-all"
+              className="hidden xs:inline-flex px-2 py-0.5 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#5C4E3C] font-mono text-[11px] font-semibold tabular-nums cursor-pointer transition-all"
             >
               {Math.round(currentMasteryP * 100)}%
             </button>
-
-            <a
-              href="/api/download-patch"
-              download="fiezel-ai-voice-call.patch"
-              data-testid="download-patch-btn"
-              aria-hidden="true"
-              style={{ display: 'none' }}
-              className="hidden"
-            >
-              Patch
-            </a>
           </div>
         </div>
       </header>
@@ -5347,125 +5499,77 @@ export default function App() {
                 </button>
               </section>
             ) : (
-              <div className="w-full flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:gap-6 lg:items-start space-y-3 lg:space-y-0">
-                {/* KOLOM KIRI (5 col desktop): Panggung Mochi 3D & Status Partner */}
-                <div className="w-full lg:col-span-5 flex flex-col gap-3 lg:sticky lg:top-2">
-                  {/* 1. ZONA PARTNER AI (Ringkas, Fokus Kontak Mata, Komunikasi Dua Arah) */}
+              <div className="w-full flex-1 flex flex-col space-y-3">
+                {/* KOLOM FACETIME (40-60 Split: 40% Video Stage Mochi | 60% Interactive Learning Surface) */}
+                <div className={`w-full max-w-xl lg:max-w-4xl mx-auto flex flex-col lg:grid lg:grid-cols-12 lg:items-stretch gap-3.5 ${callViewMode === 'stage' ? 'flex' : 'hidden'}`}>
+                  {/* 1. ZONA 40%: FaceTime Video Stage Mochi */}
                   <section
                     data-testid="ai-call-card"
                     data-call-state={callStateKey}
                     data-transport-mode={liveTransportMode}
-                    className={`bg-gradient-to-b from-[#FAF5EB] to-white rounded-3xl px-4 py-3 sm:px-6 sm:py-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-black/[0.04] space-y-2.5 w-full ${
-                      callViewMode === 'history' ? 'hidden lg:flex lg:flex-col' : 'flex flex-col'
-                    }`}
+                    className="lg:col-span-5 bg-gradient-to-b from-[#FAF5EB]/95 to-white/95 rounded-3xl p-3.5 sm:p-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-[#EADBCE]/80 flex flex-col justify-between items-center w-full min-h-[260px] sm:min-h-[290px]"
                   >
-                  {/* Baris Meta Atas: Identitas Partner Bersih & Pill Mode Switcher */}
-                  <div className="w-full flex items-center justify-between gap-1.5 text-xs">
-                    <div className="flex items-center gap-1.5 text-[#6E5E47] min-w-0">
-                      <button
-                        type="button"
-                        data-testid="persona-card-trigger"
-                        onClick={() => {
-                          playFiezelSfx('button_tap');
-                          setShowPersonaModal(true);
-                        }}
-                        className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95"
-                        title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์เสียง' : 'Ganti Karakter & Gaya Bicara Partner'}
-                      >
-                        <span className="sm:hidden">
-                          {formatPersonaShortName(activePersona.name).replace(/^(Sensei|Coach)\s+/i, '')}
-                        </span>
-                        <span className="hidden sm:inline">
-                          {formatPersonaShortName(activePersona.name)}
-                        </span>
-                        <span className="text-[10px] text-[#8C7A65]">▾</span>
-                      </button>
-                      <span className="shrink-0">·</span>
-                      <span className="shrink-0 text-[11px] font-medium whitespace-nowrap">
-                        <span className="sm:hidden">
-                          {String(activeScenario.level || '').replace(/\b(CEFR|JLPT)\s*/gi, '').trim() || 'Dasar'}
-                        </span>
-                        <span className="hidden sm:inline">
+                    {/* Meta Bar Atas: Coach & Scenario Level & Mode Badges */}
+                    <div className="w-full flex items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-1.5 text-[#6E5E47] min-w-0">
+                        <button
+                          type="button"
+                          data-testid="persona-card-trigger"
+                          onClick={() => {
+                            playFiezelSfx('button_tap');
+                            setShowPersonaModal(true);
+                          }}
+                          className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95 text-[11px]"
+                          title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์เสียง' : 'Ganti Karakter & Gaya Bicara Partner'}
+                        >
+                          <span>{formatPersonaShortName(activePersona.name)}</span>
+                          <span className="text-[10px] text-[#8C7A65]">▾</span>
+                        </button>
+                        <span className="shrink-0">·</span>
+                        <span className="shrink-0 text-[11px] font-medium text-[#5C4E3C]">
                           {formatCleanLevel(activeScenario.level)}
                         </span>
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {/* Segmented Switcher: Live (Panggung) vs Riwayat Chat */}
-                      <div
-                        data-testid="call-view-mode-toggle"
-                        className="inline-flex items-center p-0.5 rounded-full bg-[#EFE8DA] text-[11px] font-semibold shadow-2xs"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => {
-                            playFiezelSfx('button_tap');
-                            setCallViewMode('stage');
-                          }}
-                          className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${
-                            callViewMode === 'stage'
-                              ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
-                              : 'text-[#6E5E47] hover:text-[#1C1611]'
-                          }`}
-                        >
-                          {locale === 'th' ? 'โหมดสด' : 'Live'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            playFiezelSfx('button_tap');
-                            setCallViewMode('history');
-                          }}
-                          className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-1 ${
-                            callViewMode === 'history'
-                              ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
-                              : 'text-[#6E5E47] hover:text-[#1C1611]'
-                          }`}
-                        >
-                          <span>{locale === 'th' ? 'แชท' : 'Riwayat'}</span>
-                          {turns.filter((tr) => tr.speaker === 'user').length > 0 && (
-                            <span className="w-3.5 h-3.5 rounded-full bg-[#8C2233] text-white text-[9px] flex items-center justify-center font-bold">
-                              {turns.filter((tr) => tr.speaker === 'user').length}
-                            </span>
-                          )}
-                        </button>
                       </div>
 
-                      <button
-                        type="button"
-                        data-testid="exam-mode-toggle-btn"
-                        onClick={() => setCustomMeasureOverride(!isMeasureMode)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
-                          isMeasureMode
-                            ? 'bg-[#FDF2F4] text-[#8C2233]'
-                            : 'bg-[#F5F1E8] text-[#5C4E3C] hover:text-[#1C1611]'
-                        }`}
-                      >
-                        {isMeasureMode ? (
-                          locale === 'th' ? (
-                            'โหมดสอบ'
-                          ) : (
-                            <>
-                              <span className="hidden sm:inline">Mode </span>
-                              <span>Ujian</span>
-                            </>
-                          )
-                        ) : locale === 'th' ? (
-                          'โหมดฝึกซ้อม'
-                        ) : (
-                          <>
-                            <span className="hidden sm:inline">Mode </span>
-                            <span>Latihan</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          data-testid="exam-mode-toggle-btn"
+                          onClick={() => setCustomMeasureOverride(!isMeasureMode)}
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-semibold transition-colors cursor-pointer shrink-0 ${
+                            isMeasureMode
+                              ? 'bg-[#FDF2F4] text-[#8C2233]'
+                              : 'bg-[#F5F1E8] text-[#5C4E3C] hover:text-[#1C1611]'
+                          }`}
+                        >
+                          {isMeasureMode ? 'Mode Ujian' : 'Latihan'}
+                        </button>
 
-                  {/* Baris Kehadiran Partner + Kontrol Suara Ringkas */}
-                  <div className="w-full flex flex-wrap lg:flex-col items-center justify-between lg:justify-center gap-2 lg:gap-3">
-                    <div className="flex lg:flex-col items-center gap-2.5 lg:gap-1.5 min-w-0">
+                        {!isMeasureMode && (
+                          <button
+                            type="button"
+                            data-testid="call-mode-toggle-btn"
+                            onClick={() => {
+                              const nextMode: CallMode =
+                                callMode === 'tutor_coach' ? 'casual_chat' : 'tutor_coach';
+                              callModeRef.current = nextMode;
+                              setCallMode(nextMode);
+                              playFiezelSfx('button_tap');
+                            }}
+                            className={`px-2 py-0.5 rounded-full text-[11px] font-semibold transition-colors cursor-pointer border ${
+                              callMode === 'casual_chat'
+                                ? 'bg-[#E8F8F0] border-[#96D8B6] text-[#14472D]'
+                                : 'bg-[#F5EFE4] border-[#DFD4BF] text-[#3B2F23]'
+                            }`}
+                          >
+                            <span>{callMode === 'casual_chat' ? '☕ Kasual' : '🎓 Mentor'}</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* HERO CENTER STAGE: 3D Volumetric Mochi Mascot */}
+                    <div className="flex flex-col items-center justify-center w-full py-0.5">
                       <div
                         onClick={() => {
                           if (isPlayingAiAudio) {
@@ -5482,12 +5586,12 @@ export default function App() {
                           }
                         }}
                         title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi (Mitra Kaiwa 3D)'}
-                        className="relative w-[140px] sm:w-[200px] lg:w-[220px] h-[130px] sm:h-[180px] lg:h-[195px] flex items-center justify-center cursor-pointer select-none shrink-0"
+                        className="relative w-[150px] sm:w-[200px] h-[130px] sm:h-[175px] flex items-center justify-center cursor-pointer select-none"
                       >
                         <div
                           ref={mochiContainerRef}
                           data-testid="mochi-3d-stage"
-                          className="w-[140px] sm:w-[200px] lg:w-[220px] h-[130px] sm:h-[180px] lg:h-[195px] flex items-center justify-center relative"
+                          className="w-[150px] sm:w-[200px] h-[130px] sm:h-[175px] flex items-center justify-center relative"
                         />
                         {!is3dMochiReady && !mochi3dFailed && (
                           <div
@@ -5516,403 +5620,322 @@ export default function App() {
                         )}
                       </div>
 
-                      <div
-                        key={callStateKey}
-                        data-testid="ai-call-status-pill"
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F5F1E8] text-[11px] font-medium text-[#5C4E3C]"
-                      >
-                        <span
-                          aria-hidden="true"
-                          className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                            callStateKey === 'recording'
-                              ? 'bg-[#8C2233] animate-ping'
-                              : callStateKey === 'speaking'
-                                ? 'bg-[#E6A800] animate-pulse'
-                                : callStateKey === 'waiting'
-                                  ? 'bg-[#2979FF] animate-pulse'
-                                  : callStateKey === 'live'
-                                    ? 'bg-[#2E8B69] animate-pulse'
-                                    : 'bg-[#2E8B69]'
-                          }`}
-                        />
-                        <span data-testid="ai-call-status-text">
-                          {isAiThinking && !isPlayingAiAudio
-                            ? locale === 'th'
-                              ? 'Mochi กำลังคิด…'
-                              : 'Mochi sedang berpikir…'
-                            : isPlayingAiAudio
-                            ? isLiveConnected
-                              ? `Mochi berbicara... (${formatTimer(callDurationSec)})`
-                              : 'Sedang berbicara...'
-                            : isWaitingAfterSpeech
-                            ? locale === 'th'
-                              ? `Mochi กำลังฟัง… (ช่วงคิด) (${formatTimer(callDurationSec)})`
-                              : `Mochi mendengarkan... (jeda berpikir) (${formatTimer(callDurationSec)})`
-                            : isRecordingPtt
-                              ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
-                              : isLiveConnected
-                                ? isMicMuted
-                                  ? `Mic dibisukan · ${formatTimer(callDurationSec)}`
-                                  : `LIVE · ${formatTimer(callDurationSec)}`
-                                : 'Siap bicara'}
-                        </span>
-                      </div>
-                      {isLiveConnected && (
-                        <div
-                          data-testid="ai-call-gem-meter-pill"
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FEFCE8] border border-[#FDE68A] text-[11px] font-bold text-[#78350F] shadow-2xs"
-                          title={
-                            isLocalTestEnvironment()
-                              ? 'Mode Uji Lokal (Bebas Gem / Unlimited)'
-                              : locale === 'th'
-                              ? 'ระบบคิด Gem ตามจำนวนเสียง Fiezel ที่ตอบกลับจริง (เชื่อมต่อ 0 Gem)'
-                              : 'Meteran kuota suara Fiezel real-time (Menyambung = 0 Gem)'
-                          }
-                        >
-                          {isLocalTestEnvironment() ? (
-                            <span>🧪 Uji Lokal · Bebas Gem</span>
-                          ) : liveBillingUi.isDailyFree && liveBillingUi.gemsSpent === 0 ? (
-                            <span>
-                              {locale === 'th'
-                                ? `🎁 ฟรี · ${liveBillingUi.turns}/${DAILY_FREE_CALL_MAX_TURNS} ตอบ`
-                                : `🎁 Gratis · ${liveBillingUi.turns}/${DAILY_FREE_CALL_MAX_TURNS} respon`}
-                            </span>
-                          ) : (
-                            <span>
-                              {locale === 'th'
-                                ? `💎 ${liveBillingUi.gemsSpent} Gem · ${liveBillingUi.turns} ตอบ`
-                                : `💎 ${liveBillingUi.gemsSpent} Gem · ${liveBillingUi.turns} respon`}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Kontrol Panggilan Pill Ringkas */}
-                    <div className="flex flex-wrap items-center lg:justify-center gap-1.5 ml-auto lg:ml-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSpeechRate((prev) => (prev <= 0.86 ? 0.92 : prev <= 0.93 ? 1.0 : 0.85));
-                        }}
-                        className="px-2.5 py-1.5 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#5C4E3C] text-xs font-mono font-semibold cursor-pointer transition-colors"
-                        title="Kecepatan bicara Coach (0.85x Santai / 0.92x Sedang / 1.0x Normal)"
-                      >
-                        {speechRate <= 0.86 ? '0.85x' : speechRate <= 0.93 ? '0.92x' : '1.0x'}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const lastAi = [...turns].reverse().find((tr) => tr.speaker === 'ai');
-                          if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64, undefined, { isManualReplay: true });
-                        }}
-                        className="px-3 py-1.5 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
-                      >
-                        <Volume2 className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
-                        <span>{callStateKey === 'speaking' ? 'Diputar...' : 'Putar Suara'}</span>
-                      </button>
-
-                      {!isMeasureMode && (
-                        <>
-                          <button
-                            type="button"
-                            data-testid="call-mode-toggle-btn"
-                            onClick={() => {
-                              const nextMode: CallMode =
-                                callMode === 'tutor_coach' ? 'casual_chat' : 'tutor_coach';
-                              callModeRef.current = nextMode;
-                              setCallMode(nextMode);
-                              playFiezelSfx('button_tap');
-                            }}
-                            className={`fz-wb-press px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 cursor-pointer border ${
-                              callMode === 'casual_chat'
-                                ? 'bg-[#E8F8F0] hover:bg-[#D5F2E3] border-[#96D8B6] text-[#14472D]'
-                                : 'bg-[#F5EFE4] hover:bg-[#EAE1D0] border-[#DFD4BF] text-[#3B2F23]'
-                            }`}
-                            title={
-                              callMode === 'casual_chat'
-                                ? 'Mode Chat Kasual Santai aktif: ngobrol santai seperti teman tanpa menyela dengan papan tulis (ucapkan "mode mentor" untuk kembali)'
-                                : 'Mode Mentor & Guru Pribadi aktif: Coach siap mengajar dan membuka papan tulis interaktif (ucapkan "chat seperti biasa" untuk santai)'
-                            }
+                      {/* STATUS & SAKLAR TELEPON FACETIME (Call Switch & Mic Activator) */}
+                      <div className="w-full flex flex-col items-center justify-center gap-2 mt-1">
+                        {/* Status Kehadiran Partner */}
+                        <div className="flex flex-wrap items-center justify-center gap-1.5">
+                          <div
+                            key={callStateKey}
+                            data-testid="ai-call-status-pill"
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F5F1E8] text-[11px] font-medium text-[#5C4E3C] shadow-2xs"
                           >
-                            <span>{callMode === 'casual_chat' ? '☕ Mode Kasual' : '🎓 Mode Mentor'}</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            data-testid="open-workbench-pill-btn"
-                            onClick={() => {
-                              playFiezelSfx('button_tap');
-                              const focusQuery =
-                                lastUserTurn?.text?.trim() ||
-                                activeScenario.targetPatterns?.[0] ||
-                                activeScenario.competencyNameId ||
-                                'Perbedaan kata kerja dan pola kalimat percakapan';
-                              const reqSeq = ++workbenchSessionRef.current.turnSeq;
-                              workbenchSessionRef.current.dismissedByUser = false;
-                              setIsAnalyzingTurn(true);
-                              openLearningWorkbenchWithAction(
-                                {
-                                  actionType: 'open_learning_popup',
-                                  topicTitle: focusQuery,
-                                },
-                                focusQuery
-                              );
-                              void (async () => {
-                                try {
-                                  for (const base of resolveVoiceApiCandidateBases()) {
-                                    const res = await fetch(`${base}/api/voice/partner-turn`, {
-                                      method: 'POST',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({
-                                        text: `[WHITEBOARD_REQUEST] Jelaskan aturan tata bahasa dan contoh untuk: ${focusQuery}`,
-                                        forcePopup: true,
-                                        personaId: activePersona.id,
-                                        personaName: activePersona.name,
-                                        scenarioId: activeScenario.id,
-                                        scenarioTitle: activeScenario.titleId,
-                                        targetLang: activeScenario.targetLang,
-                                        locale,
-                                        callMode: 'tutor_coach',
-                                        history: turnsRef.current
-                                          .slice(-4)
-                                          .map((t) => ({ speaker: t.speaker, text: t.text })),
-                                      }),
-                                    });
-                                    if (res.ok) {
-                                      const data = await res.json();
-                                      if (
-                                        reqSeq === workbenchSessionRef.current.turnSeq &&
-                                        !workbenchSessionRef.current.dismissedByUser &&
-                                        data?.uiAction?.actionType === 'open_learning_popup'
-                                      ) {
-                                        openLearningWorkbenchWithAction(data.uiAction, focusQuery);
-                                        if (
-                                          isLiveConnectedRef.current &&
-                                          wsRef.current &&
-                                          wsRef.current.readyState === WebSocket.OPEN &&
-                                          !isAiServerTurnOpenRef.current
-                                        ) {
-                                          const spokenExplain =
-                                            data.uiAction.coachSpokenScript ||
-                                            data.uiAction.explanationText ||
-                                            data.aiReplyTranslation ||
-                                            data.aiReplyTranslationId ||
-                                            '';
-                                          const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
-                                          const uiLangName =
-                                            locCode === 'th'
-                                              ? 'Thai'
-                                              : locCode === 'vi'
-                                                ? 'Vietnamese'
-                                                : locCode === 'ru'
-                                                  ? 'Russian'
-                                                  : locCode === 'ja'
-                                                    ? 'Japanese'
-                                                    : locCode === 'zh'
-                                                      ? 'Mandarin Chinese'
-                                                      : locCode === 'en'
-                                                        ? 'English'
-                                                        : 'Bahasa Indonesia';
-                                          try {
-                                            wsRef.current.send(
-                                              JSON.stringify({
-                                                clientContent: {
-                                                  turns: [
-                                                    {
-                                                      role: 'user',
-                                                      parts: [
-                                                        {
-                                                          text: `[System Note: Learner opened the Papan Belajar popup for "${data.uiAction.topicTitle || focusQuery}". For this turn ONLY, explain this rule aloud in 1-2 short, natural sentences 100% in ${uiLangName}: "${spokenExplain}". Once they close the popup, switch 100% back to the course language!]`,
-                                                        },
-                                                      ],
-                                                    },
-                                                  ],
-                                                  turnComplete: true,
-                                                },
-                                              })
-                                            );
-                                          } catch {
-                                            // Ignore
-                                          }
-                                        }
-                                      }
-                                      break;
-                                    }
-                                  }
-                                } catch {
-                                  // Ignore network fallback
-                                } finally {
-                                  if (reqSeq === workbenchSessionRef.current.turnSeq) {
-                                    setIsAnalyzingTurn(false);
-                                  }
-                                }
-                              })();
-                            }}
-                            className="fz-wb-press px-3 py-1.5 rounded-full bg-[#FFF3C4] hover:bg-[#FFE896] border border-[#E6CE7A] text-[#241A11] text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-                            title="Buka Papan Tulis Interaktif (Bank Materi Braincore + Bedah Kilat Fiezel)"
-                          >
-                            <BookOpen className="w-3.5 h-3.5 text-[#8C6D1F] shrink-0" />
-                            <span>{locale === 'th' ? 'กระดานติวเตอร์' : 'Papan Tulis'}</span>
-                          </button>
-                        </>
-                      )}
-
-                      {!isLiveConnected ? (
-                        <button
-                          type="button"
-                          disabled={isLiveConnecting}
-                          onClick={() => requestStartLiveCall()}
-                          className="px-4 py-1.5 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-60"
-                          title="Mulai panggilan suara dua arah hands-free (bebas bicara langsung)"
-                        >
-                          <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                          <span>{isLiveConnecting ? 'Menyambungkan...' : 'Telepon Live'}</span>
-                        </button>
-                      ) : (
-                        <>
-                          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FDFAF3] border border-[#EAE3D5] text-xs shadow-2xs">
-                            {isUserSpeakingLive ? (
-                              <>
-                                <span className="w-2 h-2 rounded-full bg-[#2E7D32] animate-ping" />
-                                <span className="font-bold text-[#2E7D32]">Mendengarkan...</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="w-2 h-2 rounded-full bg-[#E06738] animate-pulse" />
-                                <span className="text-[#6E5E47]">Mic Aktif</span>
-                              </>
-                            )}
+                            <span
+                              aria-hidden="true"
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                callStateKey === 'recording'
+                                  ? 'bg-[#8C2233] animate-ping'
+                                  : callStateKey === 'speaking'
+                                    ? 'bg-[#E6A800] animate-pulse'
+                                    : callStateKey === 'waiting'
+                                      ? 'bg-[#2979FF] animate-pulse'
+                                      : callStateKey === 'live'
+                                        ? 'bg-[#2E8B69] animate-pulse'
+                                        : 'bg-[#2E8B69]'
+                              }`}
+                            />
+                            <span data-testid="ai-call-status-text">
+                              {isAiThinking && !isPlayingAiAudio
+                                ? locale === 'th'
+                                  ? 'Mochi กำลังคิด…'
+                                  : 'Mochi sedang berpikir…'
+                                : isPlayingAiAudio
+                                ? isLiveConnected
+                                  ? `Mochi berbicara... (${formatTimer(callDurationSec)})`
+                                  : 'Sedang berbicara...'
+                                : isWaitingAfterSpeech
+                                ? locale === 'th'
+                                  ? `Mochi กำลังฟัง… (ช่วงคิด) (${formatTimer(callDurationSec)})`
+                                  : `Mochi mendengarkan... (jeda berpikir) (${formatTimer(callDurationSec)})`
+                                : isRecordingPtt
+                                  ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
+                                  : isLiveConnected
+                                    ? isMicMuted
+                                      ? `Mic dibisukan · ${formatTimer(callDurationSec)}`
+                                      : `LIVE · ${formatTimer(callDurationSec)}`
+                                    : 'Siap bicara'}
+                            </span>
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={toggleMuteMic}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-colors ${
-                              isMicMuted
-                                ? 'bg-[#B8432D] text-white'
-                                : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
-                            }`}
-                            aria-label="Mute Mic"
-                          >
-                            {isMicMuted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
+                          {isLiveConnected && (
+                            <div
+                              data-testid="ai-call-gem-meter-pill"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FEFCE8] border border-[#FDE68A] text-[11px] font-bold text-[#78350F] shadow-2xs"
+                            >
+                              {isLocalTestEnvironment() ? (
+                                <span>🧪 Bebas Gem</span>
+                              ) : liveBillingUi.isDailyFree && liveBillingUi.gemsSpent === 0 ? (
+                                <span>🎁 Gratis ({liveBillingUi.turns}/{DAILY_FREE_CALL_MAX_TURNS})</span>
+                              ) : (
+                                <span>💎 {liveBillingUi.gemsSpent} Gem ({liveBillingUi.turns})</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* SAKLAR UTAMA TELEPON FACETIME (Call Switch: Mulai Obrolan & Aktifkan Mic Hands-Free) */}
+                        {!isLiveConnected ? (
+                          <div className="w-full flex flex-col items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              data-testid="facetime-call-switch-btn"
+                              disabled={isLiveConnecting}
+                              onClick={() => requestStartLiveCall()}
+                              className="w-full xs:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(16,185,129,0.35)] transition-all cursor-pointer active:scale-95 disabled:opacity-60 group"
+                              title="Nyalakan panggilan suara FaceTime (Hands-free, mic aktif otomatis)"
+                            >
+                              <span className="relative flex h-2.5 w-2.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                              </span>
+                              <Phone className="w-4 h-4 text-white group-hover:rotate-12 transition-transform shrink-0" />
+                              <span>{isLiveConnecting ? 'Menyambungkan FaceTime...' : 'Mulai Telepon FaceTime'}</span>
+                            </button>
+                            <span className="text-[11px] text-[#8C7A65] font-medium flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                              <span>Hands-Free · Mikrofon aktif dua arah untuk ngobrol langsung</span>
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 shadow-xs">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+                              </span>
+                              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-900 truncate">
+                                <Mic className={`w-3.5 h-3.5 shrink-0 ${isMicMuted ? 'text-[#8C2233]' : 'text-emerald-700 animate-pulse'}`} />
+                                <span className="truncate">
+                                  {isMicMuted
+                                    ? 'Mic Mati'
+                                    : isUserSpeakingLive
+                                    ? 'Kamu Bicara...'
+                                    : isPlayingAiAudio
+                                    ? 'Mochi Berbicara...'
+                                    : 'Mic Aktif (Bicara Langsung)'}
+                                </span>
+                                <span className="font-mono text-emerald-700 text-[11px] font-semibold shrink-0">
+                                  ({formatTimer(callDurationSec)})
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <button
+                                type="button"
+                                onClick={toggleMuteMic}
+                                className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+                                  isMicMuted ? 'bg-[#8C2233] text-white' : 'bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                }`}
+                                title={isMicMuted ? 'Aktifkan Mic' : 'Bisukan Mic'}
+                              >
+                                {isMicMuted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
                               playFiezelSfx('button_tap');
                               stopLiveCall();
                               setLiveUserDraft('');
                               setLiveAiDraft('');
                             }}
-                            className="px-3.5 py-1.5 rounded-full bg-[#B8432D] hover:bg-[#9E3622] text-white font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#B8432D] hover:bg-[#9E3622] text-white text-xs font-bold shadow-xs cursor-pointer transition-all active:scale-95"
+                                title="Akhiri Telepon FaceTime"
+                              >
+                                <PhoneOff className="w-3.5 h-3.5" />
+                                <span>Tutup</span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* 2. ZONA 60%: Interactive Learning Surface (Subtitles & Learning Controls) */}
+                  <div className="lg:col-span-7 flex flex-col justify-between gap-3 w-full h-full">
+                    {/* SUBTITLE MELAYANG HALUS (Floating Subtitles Glass HUD) */}
+                    <div
+                      data-testid="live-translation-hud"
+                      className="w-full text-left rounded-3xl bg-white/95 backdrop-blur-md border border-[#EDE5D4] p-4 sm:p-5 shadow-sm space-y-3 flex flex-col justify-between h-full"
+                    >
+                      {isAiThinking ? (
+                        <div
+                          data-testid="live-hud-ai-thinking"
+                          aria-live="polite"
+                          className="flex items-center gap-2 py-1"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse [animation-delay:-0.3s]" />
+                          <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse [animation-delay:-0.15s]" />
+                          <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse" />
+                          <span className="text-xs font-medium text-[#6E5E47]">
+                            {locale === 'th' ? 'กำลังตอบกลับ...' : 'Menyiapkan balasan...'}
+                          </span>
+                        </div>
+                      ) : (
+                        <>
+                          {/* ATAS: Subtitle Bahasa Kursus (Bold & Furigana/Pinyin) */}
+                          <div
+                            data-testid="live-hud-ai-text"
+                            data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
                           >
-                            <PhoneOff className="w-3.5 h-3.5" />
-                            <span>Akhiri</span>
-                          </button>
+                            <JapaneseRubyDisplay
+                              text={activeAiLiveText}
+                              targetLang={activeScenario.targetLang}
+                              showFurigana={!isMeasureMode}
+                              showRomaji={!isMeasureMode}
+                              className="text-[17px] sm:text-[19px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
+                              rubyClassName="text-[17px] sm:text-[19px]"
+                              romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
+                            />
+                          </div>
+
+                          {/* BAWAH: Terjemahan Bahasa Indonesia / Thai */}
+                          {!isMeasureMode && showTranslations && resolvedActiveAiMeaning && !isAiHudDuplicateMeaning && (
+                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#EDE5D4]/60">
+                              <p
+                                data-testid="live-hud-ai-translation"
+                                className="text-xs sm:text-[13.5px] font-normal text-[#5C4E3C] leading-relaxed break-words"
+                              >
+                                {resolvedActiveAiMeaning}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => setShowTranslations(false)}
+                                className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] shrink-0 font-medium cursor-pointer"
+                                title="Sembunyikan terjemahan"
+                              >
+                                👁️ Sembunyikan
+                              </button>
+                            </div>
+                          )}
+                          {!isMeasureMode && !showTranslations && (
+                            <div className="pt-0.5">
+                              <button
+                                type="button"
+                                onClick={() => setShowTranslations(true)}
+                                className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] font-medium cursor-pointer"
+                                title="Tampilkan terjemahan"
+                              >
+                                👁️ Tampilkan Arti
+                              </button>
+                            </div>
+                          )}
                         </>
+                      )}
+
+                      {/* IN-CARD DYNAMIC CONTROLS: Replay Suara & Dynamic Speed Skalar */}
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#EDE5D4]/60 mt-auto">
+                        <button
+                          type="button"
+                          data-testid="btn-replay-ai-audio"
+                          onClick={() => {
+                            const lastAi = [...turns].reverse().find((tr) => tr.speaker === 'ai');
+                            if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64, speechRate, { isManualReplay: true });
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-xs font-semibold text-[#1C1611] transition-all cursor-pointer active:scale-95"
+                          title="Putar suara dengan kecepatan saat ini"
+                        >
+                          <Volume2 className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
+                          <span>{callStateKey === 'speaking' ? 'Diputar...' : 'Putar Suara'}</span>
+                        </button>
+
+                        {/* SKALAR DINAMIS: 0.85x | 0.92x | 1.0x */}
+                        <div
+                          data-testid="speech-rate-skalar"
+                          className="inline-flex items-center p-0.5 rounded-full bg-[#F5F1E8] border border-[#E8DEC8] text-[11px] font-semibold"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              playFiezelSfx('button_tap');
+                              setSpeechRate(0.85);
+                            }}
+                            className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${
+                              speechRate <= 0.86
+                                ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                                : 'text-[#8C7A65] hover:text-[#1C1611]'
+                            }`}
+                            title="0.85x - Santai & Jelas"
+                          >
+                            🐢 0.85x
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              playFiezelSfx('button_tap');
+                              setSpeechRate(0.92);
+                            }}
+                            className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${
+                              speechRate > 0.86 && speechRate <= 0.95
+                                ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                                : 'text-[#8C7A65] hover:text-[#1C1611]'
+                            }`}
+                            title="0.92x - Alami & Pas"
+                          >
+                            ✨ 0.92x
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              playFiezelSfx('button_tap');
+                              setSpeechRate(1.0);
+                            }}
+                            className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${
+                              speechRate > 0.95
+                                ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                                : 'text-[#8C7A65] hover:text-[#1C1611]'
+                            }`}
+                            title="1.0x - Normal Native"
+                          >
+                            ⚡ 1.0x
+                          </button>
+                        </div>
+                      </div>
+
+                      {activeUserSubtitle && (
+                        <div className="pt-0.5">
+                          <span className="inline-flex items-center gap-1 max-w-full px-2.5 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] text-[#5C4E3C] truncate">
+                            <strong className="font-semibold text-[#1C1611] shrink-0">Kamu:</strong>
+                            <span className="truncate">{activeUserSubtitle.text}</span>
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
-
-                  {/* Ucapan Partner AI Fokus Kontak Mata */}
-                  <div
-                    data-testid="live-translation-hud"
-                    className="w-full text-left pt-2 border-t border-[#EDE5D4]/80 space-y-2"
-                  >
-                    {isAiThinking ? (
-                      <div
-                        data-testid="live-hud-ai-thinking"
-                        aria-live="polite"
-                        className="flex items-center gap-2 py-1"
-                      >
-                        <span className="sr-only">
-                          {locale === 'th' ? 'Mochi กำลังคิดคำตอบ' : 'Mochi sedang menyiapkan jawaban'}
-                        </span>
-                        <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse [animation-delay:-0.3s]" />
-                        <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse [animation-delay:-0.15s]" />
-                        <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse" />
-                        <span className="text-xs font-medium text-[#6E5E47]">
-                          {locale === 'th' ? 'กำลังตอบกลับ...' : 'Menyiapkan balasan...'}
-                        </span>
-                      </div>
-                    ) : (
-                      <>
-                        {/* ATAS: Subtitle bahasa kursus (English, Japanese, Mandarin, dsb.) - UTAMA, BOLD & Jelas */}
-                        <div
-                          data-testid="live-hud-ai-text"
-                          data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
-                          className="pt-0.5"
-                        >
-                          <JapaneseRubyDisplay
-                            text={activeAiLiveText}
-                            targetLang={activeScenario.targetLang}
-                            showFurigana={!isMeasureMode}
-                            showRomaji={!isMeasureMode}
-                            className="text-[17px] sm:text-[19px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
-                            rubyClassName="text-[17px] sm:text-[19px]"
-                            romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
-                          />
-                        </div>
-
-                        {/* BAWAH: Terjemahan bahasa user (Bahasa Indonesia / Thai / dsb.) - Sekunder, sopan & ada tombol toggle */}
-                        {!isMeasureMode && showTranslations && resolvedActiveAiMeaning && !isAiHudDuplicateMeaning && (
-                          <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#EDE5D4]/60">
-                            <p
-                              data-testid="live-hud-ai-translation"
-                              className="text-xs sm:text-[13.5px] font-normal text-[#5C4E3C] leading-relaxed break-words"
-                            >
-                              {resolvedActiveAiMeaning}
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() => setShowTranslations(false)}
-                              className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] shrink-0 font-medium cursor-pointer"
-                              title="Sembunyikan terjemahan"
-                            >
-                              👁️ Sembunyikan
-                            </button>
-                          </div>
-                        )}
-                        {!isMeasureMode && !showTranslations && (
-                          <div className="pt-0.5">
-                            <button
-                              type="button"
-                              onClick={() => setShowTranslations(true)}
-                              className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] font-medium cursor-pointer"
-                              title="Tampilkan terjemahan"
-                            >
-                              👁️ Tampilkan Arti
-                            </button>
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    {activeUserSubtitle && (
-                      <div className="pt-0.5">
-                        <span className="inline-flex items-center gap-1 max-w-full px-2.5 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] text-[#5C4E3C] truncate">
-                          <strong className="font-semibold text-[#1C1611] shrink-0">Kamu:</strong>
-                          <span className="truncate">{activeUserSubtitle.text}</span>
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </section>
                 </div>
 
-                {/* KOLOM KANAN (7 col desktop): Transkrip Percakapan Mengalir Lancar */}
-                <div className="w-full lg:col-span-7 flex flex-col gap-3">
-                  {/* 2. ALUR PERCAKAPAN RINGKAS (Mengalir Terpadu, WhatsApp-style) */}
-                  <section className="space-y-2.5 w-full pt-1 lg:max-h-[560px] lg:overflow-y-auto lg:pr-1">
+                {/* KOLOM RIWAYAT: Khusus Chat History & Feedback Transkrip */}
+                <div className={`w-full max-w-2xl mx-auto flex flex-col gap-3 ${callViewMode === 'history' ? 'flex' : 'hidden'}`}>
+                  <section className="space-y-2.5 w-full pt-1">
                     <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47] pb-1">
                       <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1C1611] uppercase tracking-wider">
                         <MessageSquare className="w-3.5 h-3.5 text-[#8C2233]" />
                         <span>{locale === 'th' ? 'บันทึกการสนทนา' : 'Transkrip Percakapan'}</span>
                       </span>
 
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            playFiezelSfx('button_tap');
+                            setCallViewMode('stage');
+                          }}
+                          className="px-2.5 py-1 rounded-full bg-[#1C1611] text-white text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                        >
+                          <Video className="w-3 h-3" />
+                          <span>Kembali ke FaceTime</span>
+                        </button>
                         {!isMeasureMode && (
                           <button
                             type="button"
