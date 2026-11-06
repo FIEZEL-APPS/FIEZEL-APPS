@@ -1,7 +1,7 @@
 {
-  "version": "m025-773",
-  "claimedBy": "branch feat/ultra-fast-copilot-m025-773",
-  "claimedAt": "2026-11-06T00:06:16.323Z",
-  "reason": "fix(voice): [ALLOW-PROTECTED: pwa] sub-second streaming copilot assist and zero-cooldown pool routing (m025-773)",
+  "version": "m025-774",
+  "claimedBy": "branch feat/mochi-master-expressions-m025-774",
+  "claimedAt": "2026-11-06T04:52:19.806Z",
+  "reason": "feat(mochi): 1:1 master expressions anime cel outline kawaii paws demon overhaul",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
