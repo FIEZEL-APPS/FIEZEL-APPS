@@ -2019,7 +2019,7 @@ export async function requestRealtimeCopilotAssist(params: {
     const meaning = translateAndPhoneticizeLiveText(cleanAiText, params.targetLang);
     return {
       ok: false,
-      source: 'loading',
+      source: 'ai-realtime',
       aiMeaningId: meaning.translationId || '',
       aiMeaningTh: meaning.translationTh || '',
       replies: cards,

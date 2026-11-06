@@ -61,9 +61,7 @@ const COPILOT_MODELS = [
   'gemini-3.1-flash-lite',
   'gemini-3.5-flash-lite',
   'gemini-3-flash-preview',
-  'gemini-3.5-flash',
-  'gemini-3.6-flash',
-  'gemini-3.8-flash',
+  'gemini-2.5-flash',
 ];
 const GEMINI_TTS_MODELS = [
   'gemini-3.8-flash-lite-tts',
@@ -77,8 +75,9 @@ const DEFAULT_CONSTRAINED_ENDPOINT =
 const _cooldownMap = new Map(); // key -> timestamp ms
 let _poolIndex = Math.floor(Math.random() * 16);
 
-// Terisolasi: status cooldown per (key::model) dan rotasi pool khusus Copilot
+// Terisolasi: status cooldown per (key::model) dan rotasi pool khusus Copilot & TTS
 const _copilotCooldownMap = new Map(); // `${key}::${model}` -> timestamp ms
+const _ttsCooldownMap = new Map(); // `${key}::${model}` -> timestamp ms
 let _copilotPoolIndex = Math.floor(Math.random() * 16);
 
 // Rate limit in-memory per IP untuk mencegah pengurasan kuota Gemini Live & Copilot
@@ -535,7 +534,7 @@ async function invokeSingleGeminiJson({
       thinking_level: 'minimal',
     };
 
-    const res = await fetch(GOOGLE_INTERACTIONS_API, {
+    let res = await fetch(GOOGLE_INTERACTIONS_API, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -558,20 +557,44 @@ async function invokeSingleGeminiJson({
         generation_config: genCfg,
       }),
       signal: controller.signal,
-    });
+    }).catch(() => null);
+
+    // If interactions API returns 404/400 or fails, try standard Google generateContent API
+    if (!res || (!res.ok && (res.status === 404 || res.status === 400))) {
+      res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: promptText }] }],
+            generationConfig: {
+              response_mime_type: 'application/json',
+              temperature: genCfg.temperature,
+              max_output_tokens: genCfg.max_output_tokens,
+            },
+          }),
+          signal: controller.signal,
+        }
+      ).catch(() => null);
+    }
+
     clearTimeout(timer);
     parentSignal?.removeEventListener('abort', onParentAbort);
 
+    if (!res) {
+      return { ok: false, reason: 'fetch_failed' };
+    }
+
     const cooldownKey = `${key}::${model}`;
     if (res.status === 429) {
-      const until = Date.now() + 300000;
+      const until = Date.now() + 45000;
       _copilotCooldownMap.set(cooldownKey, until);
-      _copilotCooldownMap.set(`${key}::ALL_REST`, until);
       return { ok: false, reason: `HTTP 429 (${model})` };
     }
     if (!res.ok) {
       if (res.status !== 404 && res.status !== 503) {
-        _copilotCooldownMap.set(cooldownKey, Date.now() + 12000);
+        _copilotCooldownMap.set(cooldownKey, Date.now() + 15000);
       }
       return { ok: false, reason: `HTTP ${res.status} (${model})` };
     }
@@ -585,6 +608,9 @@ async function invokeSingleGeminiJson({
         .filter((c) => c && c.type === 'text' && typeof c.text === 'string')
         .map((c) => c.text)
         .join('');
+    }
+    if (!rawText && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+      rawText = data.candidates[0].content.parts[0].text;
     }
     if (!rawText) {
       return { ok: false, reason: 'empty_candidate' };
@@ -813,42 +839,58 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
   const totalKeys = keys.length;
   if (!totalKeys) return { ok: false, reason: 'no_keys_configured' };
 
-  // Build candidate (key, model) pairs ordered so healthy pairs come first and
-  // consecutive requests rotate BOTH keys and models (so even a 1-key local dev setup
-  // spreads consecutive calls across separate Gemini 3.x model RPM buckets immediately).
-  const stride = Math.max(totalKeys, COPILOT_MODELS.length);
-  const startIdx = _copilotPoolIndex % stride;
-  _copilotPoolIndex = (_copilotPoolIndex + 1) % stride;
+  // STRICT LITE-FIRST STRATEGY:
+  // gemini-3.1-flash-lite is the fastest (~600-900ms) with highest RPM.
+  // We rotate KEYS on each request so consecutive requests hit different keys,
+  // but candidate 0 is ALWAYS gemini-3.1-flash-lite!
+  const startKeyIdx = _copilotPoolIndex % totalKeys;
+  _copilotPoolIndex = (_copilotPoolIndex + 1) % totalKeys;
 
   const candidates = [];
-  for (let m = 0; m < COPILOT_MODELS.length; m++) {
-    const model = COPILOT_MODELS[(startIdx + m) % COPILOT_MODELS.length];
-    const key = keys[(startIdx + m) % totalKeys];
-    const isCooledDown =
-      now < (_copilotCooldownMap.get(`${key}::${model}`) || 0) ||
-      now < (_copilotCooldownMap.get(`${key}::ALL_REST`) || 0);
-    candidates.push({ key, model, isCooledDown });
+  // Tier 1: gemini-3.1-flash-lite across rotating keys
+  for (let k = 0; k < totalKeys; k++) {
+    const key = keys[(startKeyIdx + k) % totalKeys];
+    const model = 'gemini-3.1-flash-lite';
+    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
+    candidates.push({ key, model, isCooledDown, tier: 1 });
   }
-  candidates.sort((a, b) => Number(a.isCooledDown) - Number(b.isCooledDown));
+  // Tier 2: gemini-3.5-flash-lite across rotating keys
+  for (let k = 0; k < totalKeys; k++) {
+    const key = keys[(startKeyIdx + k) % totalKeys];
+    const model = 'gemini-3.5-flash-lite';
+    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
+    candidates.push({ key, model, isCooledDown, tier: 2 });
+  }
+  // Tier 3: gemini-3-flash-preview across rotating keys
+  for (let k = 0; k < totalKeys; k++) {
+    const key = keys[(startKeyIdx + k) % totalKeys];
+    const model = 'gemini-3-flash-preview';
+    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
+    candidates.push({ key, model, isCooledDown, tier: 3 });
+  }
+  // Tier 4: gemini-2.5-flash across rotating keys
+  for (let k = 0; k < totalKeys; k++) {
+    const key = keys[(startKeyIdx + k) % totalKeys];
+    const model = 'gemini-2.5-flash';
+    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
+    candidates.push({ key, model, isCooledDown, tier: 4 });
+  }
+
+  // Sort so uncooled candidates come first, while preserving strict tier priority!
+  candidates.sort((a, b) => {
+    if (a.isCooledDown !== b.isCooledDown) {
+      return Number(a.isCooledDown) - Number(b.isCooledDown);
+    }
+    return a.tier - b.tier;
+  });
 
   const healthyRestCandidates = candidates.filter((c) => !c.isCooledDown);
   let lastReason = 'unknown';
 
-  // Fast-path: If all REST models on the active key(s) are currently in 429 cooldown,
-  // jump straight to Gemini 3.8 Live structured JSON bridge (~2.3s, separate Live quota)!
-  if (healthyRestCandidates.length === 0) {
-    for (let kIdx = 0; kIdx < Math.min(2, totalKeys); kIdx++) {
-      const liveKey = keys[(startIdx + kIdx) % totalKeys];
-      const liveRes = await invokeGeminiLiveStructuredJson({ key: liveKey, promptText });
-      if (liveRes && liveRes.ok) return liveRes;
-      lastReason = liveRes?.reason || lastReason;
-    }
-  }
-
-  const HEDGE_DELAY_MS = 2500;
-  const OVERALL_DEADLINE_MS = 10000;
+  const HEDGE_DELAY_MS = 1200;
+  const OVERALL_DEADLINE_MS = 8000;
   const activeCandidates = healthyRestCandidates.length > 0 ? healthyRestCandidates : candidates;
-  const maxAttempts = Math.min(totalKeys === 1 ? 2 : 3, activeCandidates.length);
+  const maxAttempts = Math.min(totalKeys === 1 ? 2 : 4, activeCandidates.length);
   const overallController = new AbortController();
   const overallTimer = setTimeout(() => overallController.abort(), OVERALL_DEADLINE_MS);
 
@@ -919,7 +961,7 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
 
     // Failover to Gemini 3.8 Live Structured JSON Bridge so learners NEVER receive static fallback templates!
     for (let kIdx = 0; kIdx < Math.min(2, totalKeys); kIdx++) {
-      const liveKey = keys[(startIdx + kIdx) % totalKeys];
+      const liveKey = keys[(startKeyIdx + kIdx) % totalKeys];
       const liveRes = await invokeGeminiLiveStructuredJson({ key: liveKey, promptText });
       if (liveRes && liveRes.ok) return liveRes;
       lastReason = liveRes?.reason || lastReason;
@@ -2206,10 +2248,7 @@ export async function routeVoiceGeminiTts(ctx) {
       const idx = (_copilotPoolIndex + i) % keys.length;
       const key = keys[idx];
       const cooldownKey = `${key}::${model}`;
-      if (
-        now >= (_copilotCooldownMap.get(cooldownKey) || 0) &&
-        now >= (_copilotCooldownMap.get(`${key}::ALL_REST`) || 0)
-      ) {
+      if (now >= (_ttsCooldownMap.get(cooldownKey) || 0)) {
         ttsCandidates.push({ key, model, cooldownKey });
       }
     }
@@ -2262,9 +2301,8 @@ export async function routeVoiceGeminiTts(ctx) {
       clearTimeout(timer);
 
       if (res.status === 429) {
-        const until = Date.now() + 300000;
-        _copilotCooldownMap.set(cooldownKey, until);
-        _copilotCooldownMap.set(`${key}::ALL_REST`, until);
+        const until = Date.now() + 45000;
+        _ttsCooldownMap.set(cooldownKey, until);
         lastReason = `HTTP 429 (${model})`;
         continue;
       }
@@ -2288,7 +2326,7 @@ export async function routeVoiceGeminiTts(ctx) {
       }
 
       if (audioBase64 && audioBase64.length > 100) {
-        _copilotCooldownMap.delete(cooldownKey);
+        _ttsCooldownMap.delete(cooldownKey);
         return jsonResponse(
           {
             ok: true,

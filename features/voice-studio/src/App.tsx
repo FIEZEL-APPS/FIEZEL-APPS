@@ -898,10 +898,13 @@ export default function App() {
 
     // MANDAT USER: HAPUS TOTAL TEMPLATES!
     // Tidak ada fallback template statis atau tebakan regex. 100% respon harus murni hasil generatif AI.
-    // Tampilkan loading shimmer/skeleton ("Meracik Jawaban...") saat panggilan AI sedang berlangsung.
+    // Tampilkan loading shimmer/skeleton ("Meracik Jawaban...") HANYA jika belum ada kartu sama sekali di layar
+    // agar layar tidak berkedip kosong saat regenerasi antar giliran!
     setIsGeneratingCopilot(true);
-    setCopilotSource('loading');
-    setCopilotCards([]);
+    if (copilotCardsRef.current.length === 0 && !opts?.isDebouncedStreaming) {
+      setCopilotSource('loading');
+      setCopilotCards([]);
+    }
 
     if (copilotAbortRef.current) {
       try {
@@ -933,6 +936,10 @@ export default function App() {
       if (validCards.length > 0) {
         lastCopilotAiKeyRef.current = dedupKey;
         setCopilotCards(validCards);
+        setCopilotSource('ai-realtime');
+      } else if (copilotCardsRef.current.length === 0 && rawList.length > 0) {
+        lastCopilotAiKeyRef.current = dedupKey;
+        setCopilotCards(rawList);
         setCopilotSource('ai-realtime');
       }
       if (res.aiMeaningId || res.aiMeaningTh) {
@@ -4185,13 +4192,36 @@ export default function App() {
             setLiveAiDraft(liveAiDraftRef.current);
           }
 
-          // MANDAT USER: Selama AI sedang berbicara, JANGAN jalankan terjemahan parsial yang berubah-ubah
-          // dan JANGAN buat bantuan jawaban dari kalimat terpotong/setengah matang!
-          // Biarkan layar menampilkan status "Sedang memuat terjemahan..." hingga AI selesai bicara.
-          if (copilotEarlyTimerRef.current) {
-            window.clearTimeout(copilotEarlyTimerRef.current);
-            copilotEarlyTimerRef.current = null;
+          // Spekulatif pre-fetch: jika ucapan AI yang sedang streaming telah menyelesaikan klausul/pertanyaan
+          // (diakhiri tanda tanya atau titik) dan memiliki panjang memadai, mulai racik copilot di latar belakang
+          // sehingga kartu bantuan sudah SIAP SEKETIKA (0ms) saat audio bicara AI tuntas!
+          const draftSoFar = (liveAiDraftRef.current || '').trim();
+          const hasClosingPunct = /[?？.!。！]$/.test(draftSoFar);
+          const hasSubstantialText = draftSoFar.split(/\s+/).length >= 3 || draftSoFar.length >= 8;
+
+          if (hasSubstantialText && hasClosingPunct && draftSoFar !== lastStreamedCopilotTextRef.current) {
+            if (copilotEarlyTimerRef.current) {
+              window.clearTimeout(copilotEarlyTimerRef.current);
+            }
+            copilotEarlyTimerRef.current = window.setTimeout(() => {
+              const curDraft = (liveAiDraftRef.current || '').trim();
+              if (curDraft && curDraft !== lastStreamedCopilotTextRef.current) {
+                lastStreamedCopilotTextRef.current = curDraft;
+                const lastUserForCopilot =
+                  liveUserDraftRef.current ||
+                  [...turnsRef.current].reverse().find((tr) => tr.speaker === 'user')?.text ||
+                  '';
+                const hist = [
+                  ...turnsRef.current.slice(-6).map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+                  ...(lastUserForCopilot ? [{ speaker: 'user' as const, text: lastUserForCopilot }] : []),
+                ];
+                void triggerRealtimeCopilotRef.current(curDraft, lastUserForCopilot, hist, {
+                  isDebouncedStreaming: true,
+                });
+              }
+            }, 250);
           }
+
           setLiveAiTranslationDraft('');
 
           // Turn Complete, evaluate learner utterance and record Braincore mastery
@@ -4217,7 +4247,6 @@ export default function App() {
               window.clearTimeout(copilotEarlyTimerRef.current);
               copilotEarlyTimerRef.current = null;
             }
-            lastStreamedCopilotTextRef.current = '';
             const uText = sanitizeHallucinatedTranscript(
               liveUserDraftRef.current || msg.userTranscript || '',
               activeScenario.targetLang,
