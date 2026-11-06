@@ -1,5 +1,7 @@
 # FIEZEL RELEASE HANDOFF: M025-774 — PEMULIHAN 100% 3D MOCHI VOLUMETRIK ASLI, ARSITEKTUR 40:60 FACETIME, & FLUID SPREI BOTTOM SHEET
 
+[ALLOW-PROTECTED: pwa] [ALLOW-MASS-DELETE]
+
 ## 1. Ringkasan Eksekutif & Nomor Build
 - **Nomor Build**: `m025-774`
 - **Active Branch**: `feat/mochi-master-expressions-m025-774`
