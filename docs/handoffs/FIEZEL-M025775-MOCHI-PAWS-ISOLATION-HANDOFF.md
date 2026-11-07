@@ -1,9 +1,9 @@
 # FIEZEL-M025775 Handoff: Mochi 3D Paws Isolation & Mood Purity
 
-**Tanggal**: 8 November 2026  
-**Build Target**: `m025-775`  
-**Cakupan**: `mochi-mascot/fiezel-mochi.js`, `mochi-mascot/index.html`, `mochi-mascot/preview.html`  
-**Token Proteksi**: `[ALLOW-PROTECTED: pwa]`  
+**Tanggal**: 8 November 2026
+**Build Target**: `m025-775`
+**Cakupan**: `mochi-mascot/fiezel-mochi.js`, `mochi-mascot/index.html`, `mochi-mascot/preview.html`
+**Token Proteksi**: `[ALLOW-PROTECTED: pwa]`
 
 ---
 
