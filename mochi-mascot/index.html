@@ -715,17 +715,21 @@
     function captureSpeakingMochiDataUrl(visemeCode) {
       snapMochi.setAccessory(null);
       snapMochi.setMoodInstant('dots');
-      snapMochi.setViseme(visemeCode, 0.92);
-      snapMochi.updateMouthMotion(0.25);
+      snapMochi.setViseme(visemeCode, 0.92, true);
       snapMochi.time = 1.15;
       snapMochi.blinkTimer = 0;
       snapMochi.blinkFactor = 0;
-      snapMochi.mochiGroup.rotation.set(0, 0, 0);
-      snapMochi.mochiGroup.position.set(0, 0, 0);
-      snapMochi.mochiMesh.scale.set(1, 1, 1);
-      snapMochi.faceGroup.scale.set(1, 1, 1);
-      if (snapMochi.earsGroup) snapMochi.earsGroup.scale.set(1, 1, 1);
-      if (snapMochi.tailGroup) snapMochi.tailGroup.scale.set(1, 1, 1);
+      const rig = snapMochi.mouthRig || {};
+      const jawStretch = (rig.open || 0) * 0.045 - (rig.pucker || 0) * 0.014 - (rig.bilabial || 0) * 0.014;
+      const sx = 1.0 - jawStretch * 0.52 + ((rig.smile || 0.28) - 0.30) * 0.022 - (rig.roundness || 0) * 0.020;
+      const sy = 1.0 + jawStretch;
+      const sz = 1.0 - jawStretch * 0.42 + (rig.pucker || 0) * 0.028 + (rig.roundness || 0) * 0.018;
+      snapMochi.mochiGroup.rotation.set(-(rig.open || 0) * 0.025, 0, 0);
+      snapMochi.mochiGroup.position.set(0, (rig.open || 0) * 0.022, 0);
+      snapMochi.mochiMesh.scale.set(sx, sy, sz);
+      snapMochi.faceGroup.scale.set(sx, sy, sz);
+      if (snapMochi.earsGroup) snapMochi.earsGroup.scale.set(sx, sy, sz);
+      if (snapMochi.tailGroup) snapMochi.tailGroup.scale.set(sx, sy, sz);
       snapMochi.applyMorphRigMeshes();
       if (snapMochi.updatePaws) snapMochi.updatePaws(0.016, true);
       if (snapMochi.auraBackUniforms) {
