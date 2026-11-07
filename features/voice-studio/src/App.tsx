@@ -862,11 +862,25 @@ export default function App() {
 
   useEffect(() => {
     warmUpVoiceServices();
-    const onGesture = () => primeAudioPlayback();
+    const onGesture = () => {
+      primeAudioPlayback();
+      try {
+        if (liveAudioCtxRef.current && liveAudioCtxRef.current.state === 'suspended') {
+          void liveAudioCtxRef.current.resume().catch(() => {});
+        }
+        if (ttsAudioCtxRef.current && ttsAudioCtxRef.current.state === 'suspended') {
+          void ttsAudioCtxRef.current.resume().catch(() => {});
+        }
+      } catch {}
+    };
+    window.addEventListener('touchstart', onGesture, { passive: true, capture: true });
     window.addEventListener('pointerdown', onGesture, { passive: true, capture: true });
+    window.addEventListener('click', onGesture, { passive: true, capture: true });
     window.addEventListener('keydown', onGesture, { passive: true, capture: true });
     return () => {
+      window.removeEventListener('touchstart', onGesture, true);
       window.removeEventListener('pointerdown', onGesture, true);
+      window.removeEventListener('click', onGesture, true);
       window.removeEventListener('keydown', onGesture, true);
     };
   }, []);
@@ -4973,8 +4987,8 @@ export default function App() {
 
         mochiContainerRef.current.innerHTML = '';
         const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 640;
-        const mochiWidth = isMobileScreen ? 140 : 200;
-        const mochiHeight = isMobileScreen ? 130 : 180;
+        const mochiWidth = isMobileScreen ? 115 : 200;
+        const mochiHeight = isMobileScreen ? 95 : 180;
         const inst = new MochiCtor(mochiContainerRef.current, {
           mood: 'dots',
           badge: null,
@@ -5116,11 +5130,6 @@ export default function App() {
           ? '正在翻译...'
           : 'Sedang memuat terjemahan...';
 
-      // Mandat User: Selama AI sedang bicara atau memuat, jangan tampilkan
-      // tebakan terjemahan berubah-ubah atau titik/koma Morse (, ! , :). Tampilkan "Sedang memuat terjemahan...".
-      if (isStreamingAiLive || isPlayingAiAudio || isAiThinking) {
-        return loadingTranslationText;
-      }
       let rawMeaning = '';
       if (locale === 'th') {
         rawMeaning = activeAiSubtitle.translationTh || activeAiSubtitle.translationId || '';
@@ -5135,28 +5144,32 @@ export default function App() {
       } else {
         rawMeaning = activeAiSubtitle.translationId || activeAiSubtitle.translationTh || '';
       }
-      if (/^[\s,.:;!?"'“”‘’()（）\-—]+$/.test(rawMeaning)) {
-        return loadingTranslationText;
-      }
-      if (rawMeaning && locale !== 'zh' && locale !== 'ja' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(rawMeaning)) {
-        const cjkCount = (rawMeaning.match(/[\u4E00-\u9FFF\u3040-\u30FF]/g) || []).length;
-        const latinWords = (rawMeaning.match(/[A-Za-zÀ-ÖØ-öø-ÿ]{2,}/g) || []).length;
-        if (latinWords === 0 && cjkCount > 0) {
-          // Untranslated CJK string: do not masquerade as Indonesian/Thai translation
-          return loadingTranslationText;
+
+      // 1. Jika terjemahan valid sudah tersedia (dari skenario/turn/memori terjemahan),
+      // TAMPILKAN LANGSUNG agar murid bisa membaca arti saat Mochi sedang berbicara!
+      if (rawMeaning && hasRealLettersForMeaning(rawMeaning) && !isGenericPlaceholderTranslation(rawMeaning) && !/^[\s,.:;!?"'“”‘’()（）\-—]+$/.test(rawMeaning)) {
+        if (locale !== 'zh' && locale !== 'ja' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(rawMeaning)) {
+          const cjkCount = (rawMeaning.match(/[\u4E00-\u9FFF\u3040-\u30FF]/g) || []).length;
+          const latinWords = (rawMeaning.match(/[A-Za-zÀ-ÖØ-öø-ÿ]{2,}/g) || []).length;
+          if (latinWords === 0 && cjkCount > 0) {
+            return isStreamingAiLive || isAiThinking ? loadingTranslationText : '';
+          }
+          rawMeaning = rawMeaning.replace(/[\u4E00-\u9FFF\u3040-\u30FF]+/g, (cjkMatch) => {
+            const phonetic =
+              activeScenario.targetLang === 'zh'
+                ? toPhoneticPinyin(cjkMatch)
+                : toPhoneticRomaji(cjkMatch);
+            return phonetic && phonetic !== cjkMatch ? phonetic : cjkMatch;
+          });
         }
-        rawMeaning = rawMeaning.replace(/[\u4E00-\u9FFF\u3040-\u30FF]+/g, (cjkMatch) => {
-          const phonetic =
-            activeScenario.targetLang === 'zh'
-              ? toPhoneticPinyin(cjkMatch)
-              : toPhoneticRomaji(cjkMatch);
-          return phonetic && phonetic !== cjkMatch ? phonetic : cjkMatch;
-        });
+        return rawMeaning.trim();
       }
-      if (!rawMeaning || !hasRealLettersForMeaning(rawMeaning) || isGenericPlaceholderTranslation(rawMeaning)) {
+
+      // 2. Jika terjemahan belum tiba dan AI sedang berpikir atau streaming ucapan baru, tampilkan status memuat
+      if (isStreamingAiLive || isPlayingAiAudio || isAiThinking) {
         return loadingTranslationText;
       }
-      return rawMeaning.trim();
+      return '';
     } catch {
       return '';
     }
@@ -5586,12 +5599,12 @@ export default function App() {
                           }
                         }}
                         title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi (Mitra Kaiwa 3D)'}
-                        className="relative w-[150px] sm:w-[200px] h-[130px] sm:h-[175px] flex items-center justify-center cursor-pointer select-none"
+                        className="relative w-[95px] sm:w-[200px] h-[80px] sm:h-[175px] flex items-center justify-center cursor-pointer select-none"
                       >
                         <div
                           ref={mochiContainerRef}
                           data-testid="mochi-3d-stage"
-                          className="w-[150px] sm:w-[200px] h-[130px] sm:h-[175px] flex items-center justify-center relative"
+                          className="w-[95px] sm:w-[200px] h-[80px] sm:h-[175px] flex items-center justify-center relative"
                         />
                         {!is3dMochiReady && !mochi3dFailed && (
                           <div
@@ -5800,19 +5813,24 @@ export default function App() {
                             />
                           </div>
 
-                          {/* BAWAH: Terjemahan Bahasa Indonesia / Thai */}
+                          {/* BAWAH: Terjemahan Bahasa Indonesia / Thai - DIBUAT SANGAT JELAS & PROMINEN */}
                           {!isMeasureMode && showTranslations && resolvedActiveAiMeaning && !isAiHudDuplicateMeaning && (
-                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#EDE5D4]/60">
-                              <p
-                                data-testid="live-hud-ai-translation"
-                                className="text-xs sm:text-[13.5px] font-normal text-[#5C4E3C] leading-relaxed break-words"
-                              >
-                                {resolvedActiveAiMeaning}
-                              </p>
+                            <div className="flex items-start justify-between gap-2 p-2.5 sm:p-3 rounded-2xl bg-[#FFF8EE] border border-[#F0DFCA] shadow-2xs mt-1.5">
+                              <div className="min-w-0 flex-1 space-y-0.5">
+                                <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-[#9C6119] tracking-wider uppercase">
+                                  <span>{locale === 'th' ? '🇹🇭 คำแปล:' : '🇮🇩 Arti / Terjemahan:'}</span>
+                                </div>
+                                <p
+                                  data-testid="live-hud-ai-translation"
+                                  className="text-[13.5px] sm:text-[15px] font-semibold text-[#1C1611] leading-relaxed break-words"
+                                >
+                                  {resolvedActiveAiMeaning}
+                                </p>
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => setShowTranslations(false)}
-                                className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] shrink-0 font-medium cursor-pointer"
+                                className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] shrink-0 font-medium cursor-pointer pt-0.5"
                                 title="Sembunyikan terjemahan"
                               >
                                 👁️ Sembunyikan
