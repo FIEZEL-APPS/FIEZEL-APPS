@@ -342,12 +342,24 @@ export class FiezelMochi {
       steamScale: 0, steamVel: 0,
       empatiPawScale: 0, empatiPawVel: 0
     };
-    // Continuous 3D Parametric Mouth Morph Rig (Viscoelastic Damped Spring Physics, Zero Frame Swapping)
+    // Continuous 3D Parametric Mouth & Prosody Rig (Viscoelastic Flesh Physics, Zero Frame Swapping)
     this.mouthRig = {
       open: 0.0, openVel: 0.0,
       width: 1.0, widthVel: 0.0,
+      smile: 0.28, smileVel: 0.0,
       roundness: 0.0, roundnessVel: 0.0,
-      tongueY: 0.0, tongueYVel: 0.0
+      pucker: 0.0, puckerVel: 0.0,
+      bilabial: 0.0, bilabialVel: 0.0,
+      tongueLift: 0.0, tongueLiftVel: 0.0,
+      tongueCurl: 0.0, tongueCurlVel: 0.0,
+      lipTuck: 0.0, lipTuckVel: 0.0,
+      presence: 0.0, presenceVel: 0.0,
+      headPitch: 0.0, headPitchVel: 0.0,
+      headRoll: 0.0, headRollVel: 0.0,
+      headYaw: 0.0, headYawVel: 0.0,
+      audioEnv: 0.0,
+      holdViseme: null,
+      holdTimer: 0.0
     };
     // Active Phonetic / Vowel Viseme State (Supports 12 Phonetic + 5 AIUEO x 3 Intensities, 100% Toothless)
     this.activeViseme = options.viseme || null;
@@ -2496,19 +2508,27 @@ export class FiezelMochi {
     ctx.clearRect(0, 0, w, h);
 
     const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
+    const rig = this.mouthRig || { open: 0, width: 1.0, smile: 0.28, roundness: 0, pucker: 0, presence: 0, headPitch: 0, headRoll: 0, headYaw: 0 };
+    const sp = (!this._isStaticChartRenderer && rig.presence) ? Math.max(0, Math.min(1, rig.presence)) : 0;
+    const cheekPush = sp * Math.max(0, (rig.open || 0) * 0.52 + (rig.smile || 0) * 0.56 - (rig.roundness || 0) * 0.20);
+    const roundWonder = sp * (rig.roundness || 0) * Math.min(1, (rig.open || 0) * 1.4);
     const blinkScaleY = Math.max(0.08, 1.0 - Math.sin((this.blinkFactor || 0) * Math.PI));
 
-    // Subtle gaze tracking from head rotation + mood gaze bias
-    const gazeX = (this.currentRot ? this.currentRot.y * 28 : 0) + (desc.gazeBiasX || 0);
-    const gazeY = (this.currentRot ? this.currentRot.x * 20 : 0) + (desc.gazeBiasY || 0);
+    // Subtle 2.5D spherical face parallax coupled to conversational head yaw/pitch so mouth, eyes & cheeks move as ONE 3D head!
+    const faceParallaxX = sp * (rig.headYaw || 0) * 185;
+    const faceParallaxY = sp * (rig.headPitch || 0) * 145;
+
+    // Subtle gaze tracking from head rotation + conversational speech engagement + mood gaze bias
+    const gazeX = (this.currentRot ? this.currentRot.y * 28 : 0) + (rig.headYaw || 0) * 160 * sp + (desc.gazeBiasX || 0);
+    const gazeY = (this.currentRot ? this.currentRot.x * 20 : 0) + (rig.headPitch || 0) * 120 * sp + (desc.gazeBiasY || 0);
 
     // High-frequency micro-tremble for 'Takut' (Scared)
-    const trembleX = desc.id === 'takut' ? Math.sin(this.time * 48) * 3.2 : 0;
-    const trembleY = desc.id === 'takut' ? Math.cos(this.time * 54) * 2.2 : 0;
+    const trembleX = (desc.id === 'takut' ? Math.sin(this.time * 48) * 3.2 : 0) + faceParallaxX;
+    const trembleY = (desc.id === 'takut' ? Math.cos(this.time * 54) * 2.2 : 0) + faceParallaxY;
 
     const leftEyeX = 282 + trembleX;
     const rightEyeX = 742 + trembleX;
-    const eyeY = 412 + trembleY;
+    const eyeY = 412 + trembleY - cheekPush * 7.5;
 
     // -------------------------------------------------------------------------
     // 0a. CONTAINED ELLIPTICAL BROW SHADOW FOR 'SANGAT MARAH'
@@ -2530,10 +2550,13 @@ export class FiezelMochi {
     }
 
     // -------------------------------------------------------------------------
-    // 0. LOCKED KAWAII CHEEK BLUSH OVALS (Anchored directly under outer half of each eye)
+    // 0. KAWAII CHEEK BLUSH OVALS (Lifts & warms organically with Mochi's speech!)
     // -------------------------------------------------------------------------
-    const blushA = desc.blushAlpha !== undefined ? desc.blushAlpha : 0.72;
+    const baseBlush = desc.blushAlpha !== undefined ? desc.blushAlpha : 0.72;
+    const blushA = Math.min(0.95, baseBlush + cheekPush * 0.14);
     if (blushA > 0.02) {
+      const blushLiftY = cheekPush * 16 - sp * (rig.roundness || 0) * 5;
+      const blushShiftX = cheekPush * 6 - sp * (rig.pucker || 0) * 8;
       const drawCheekBlush = (bx, by) => {
         ctx.save();
         ctx.translate(bx, by);
@@ -2551,15 +2574,15 @@ export class FiezelMochi {
           bGrad.addColorStop(0.55, `rgba(255, 148, 180, ${blushA * 0.38})`);
           bGrad.addColorStop(1.00, 'rgba(255, 168, 195, 0.0)');
         }
-        ctx.scale(1.0, 0.56);
+        ctx.scale(1.0 + cheekPush * 0.06, 0.56 + cheekPush * 0.04);
         ctx.fillStyle = bGrad;
         ctx.beginPath();
         ctx.arc(0, 0, 118, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
       };
-      drawCheekBlush(192 + trembleX * 0.5, 514 + trembleY * 0.5);
-      drawCheekBlush(832 + trembleX * 0.5, 514 + trembleY * 0.5);
+      drawCheekBlush(192 - blushShiftX + trembleX * 0.5, 514 - blushLiftY + trembleY * 0.5);
+      drawCheekBlush(832 + blushShiftX + trembleX * 0.5, 514 - blushLiftY + trembleY * 0.5);
     }
 
     // -------------------------------------------------------------------------
@@ -2667,8 +2690,8 @@ export class FiezelMochi {
         return;
       }
 
-      const rx = 122 * (desc.eyeScaleX || 1.0);
-      const ry = 130 * (desc.eyeScaleY || 1.0) * blinkScaleY;
+      const rx = 122 * (desc.eyeScaleX || 1.0) * (1.0 + cheekPush * 0.022 + roundWonder * 0.022);
+      const ry = 130 * (desc.eyeScaleY || 1.0) * (1.0 - cheekPush * 0.056 + roundWonder * 0.032) * blinkScaleY;
       const upperLid = isLeft ? (desc.upperLidL || 0) : (desc.upperLidR || 0);
       const lidAngle = isLeft ? (desc.lidAngleL || 0) : (desc.lidAngleR || 0);
 
@@ -2829,8 +2852,9 @@ export class FiezelMochi {
         ctx.restore();
       };
 
-      const byL = 256 + (desc.browYL !== undefined ? desc.browYL : (desc.browY || 0)) + trembleY;
-      const byR = 256 + (desc.browYR !== undefined ? desc.browYR : (desc.browY || 0)) + trembleY;
+      const browSpeechLift = sp * ((rig.open || 0) * 11 + (rig.roundness || 0) * 5);
+      const byL = 256 + (desc.browYL !== undefined ? desc.browYL : (desc.browY || 0)) - browSpeechLift + trembleY;
+      const byR = 256 + (desc.browYR !== undefined ? desc.browYR : (desc.browY || 0)) - browSpeechLift + trembleY;
       drawBrow(leftEyeX + 8, byL, desc.browAngleL || 0, true);
       drawBrow(rightEyeX - 8, byR, desc.browAngleR || 0, false);
     }
@@ -2855,7 +2879,7 @@ export class FiezelMochi {
     }
 
     // -------------------------------------------------------------------------
-    // 4. MOUTH RENDERER: CONTINUOUS ORGANIC 3D MOCHI MOUTH MORPH RIG
+    // 4. MOUTH RENDERER: UNIFIED 3D SCULPTED DAIFUKU VISCOELASTIC MOUTH RIG
     // -------------------------------------------------------------------------
     const mouthX = 512 + trembleX * 0.8;
     const mouthY = 482 + trembleY * 0.8;
@@ -2868,9 +2892,8 @@ export class FiezelMochi {
       this.drawMochiVisemeMouth3D(ctx, 0, 0, this.activeViseme, this.visemeIntensity);
       ctx.restore();
     } else {
-      // For live speaking and dynamic expressions: continuous viscoelastic parametric deformation (Zero Frame-Swapping!)
-      const rig = this.mouthRig || { open: 0, width: 1.0, roundness: 0, tongueY: 0 };
-      this.drawOrganicMochiMouth3D(ctx, mouthX, mouthY, rig.open, rig.width, rig.roundness, desc.mouthType);
+      // Unified 3D Daifuku viscoelastic parametric mouth deformation (Zero Threshold Pops, 100% Toothless!)
+      this.drawOrganicMochiMouth3D(ctx, mouthX, mouthY, rig, desc);
     }
 
     if (this.faceTexture) {
@@ -2884,118 +2907,402 @@ export class FiezelMochi {
   }
 
   /**
-   * Draws the continuous, viscoelastic 3D Daifuku Mochi mouth for live speaking.
-   * Smoothly morphs from closed cat-smile to wide open oral cavity with pink tongue and zero teeth!
+   * Unified 3D Sculpted Daifuku Viscoelastic Mouth Renderer (`drawOrganicMochiMouth3D`).
+   * - 100% Branchless C² Parametric Bezier Topology from `open = 0.000` to `open = 1.000`:
+   *   Zero `if (kOpen < 0.02)` snap and zero `if (kRound > 0.4)` frame pop!
+   * - Lush 3D Marshmallow Subsurface Lip Cushion, Chin Bounce Shadow, Velvet Maroon Oral Cavity,
+   *   and Living Articulated 3D Glossy Pink Tongue matching `Storyboard Mulut A,I,U,E,O` (100% Toothless!).
    */
-  drawOrganicMochiMouth3D(ctx, cx, cy, open, widthScale = 1.0, roundness = 0.0, baseMoodType = 'w') {
-    ctx.save();
-    ctx.translate(cx, cy);
+  drawOrganicMochiMouth3D(ctx, cx, cy, rigOrOpen, widthScale = 1.0, roundness = 0.0, baseMoodType = 'w') {
+    const isRigObj = rigOrOpen && typeof rigOrOpen === 'object';
+    const rig = isRigObj ? rigOrOpen : {
+      open: Number(rigOrOpen) || 0,
+      width: widthScale,
+      smile: widthScale > 1.1 ? Math.min(1, (widthScale - 1.0) * 3.0) : 0.28,
+      roundness: roundness,
+      pucker: roundness > 0.7 ? (roundness - 0.7) * 2.5 : 0,
+      bilabial: 0,
+      tongueLift: 0,
+      tongueCurl: 0,
+      lipTuck: 0,
+      presence: (Number(rigOrOpen) || 0) > 0.005 ? 1 : 0
+    };
+    const desc = (isRigObj && widthScale && typeof widthScale === 'object') ? widthScale : null;
+    const moodType = desc ? (desc.mouthType || 'w') : (baseMoodType || 'w');
 
-    const kOpen = Math.max(0.0, Math.min(1.0, open));
-    const kW = Math.max(0.65, Math.min(1.45, widthScale));
-    const kRound = Math.max(0.0, Math.min(1.0, roundness));
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const smoothstep = (e0, e1, x) => {
+      const t = clamp((x - e0) / Math.max(1e-5, e1 - e0), 0, 1);
+      return t * t * (3 - 2 * t);
+    };
 
-    // When fully closed (or nearly closed), draw the canonical resting expression mouth
-    if (kOpen < 0.02) {
-      this.drawStoryboardExpressionMouth3D(ctx, 0, 0, baseMoodType);
-      ctx.restore();
+    const presence = clamp(rig.presence ?? 0, 0, 1);
+    const kOpen = clamp(rig.open ?? 0, 0, 1);
+
+    // When completely idle (not speaking and no active viseme), preserve all 15 static storyboard mouths 1:1
+    if (!this.isTalking && !this.activeViseme && presence < 0.006 && kOpen < 0.006) {
+      this.drawStoryboardExpressionMouth3D(ctx, cx, cy, moodType);
       return;
     }
 
-    // Geometry of the opening mouth:
-    // Half-width at corners: expands from resting 52px to (52 * kW)
-    const rx = (46 + kOpen * 14) * kW;
-    // Upper lip arch: lifts slightly when open (-2 to -10px)
-    const upperY = -2 - kOpen * 8;
-    // Lower lip drop: descends smoothly with kOpen (reaches up to +54px)
-    const lowerY = 10 + kOpen * 42;
-    // Center dip for cat-lip philtrum: flattens as mouth opens or rounds
-    const philtrumDip = (1.0 - kOpen * 0.7) * (1.0 - kRound * 0.9) * 12;
+    const kW = clamp(rig.width ?? 1.0, 0.66, 1.40);
+    const kSmile = clamp(rig.smile ?? 0.28, 0, 1);
+    const kRound = clamp(rig.roundness ?? 0, 0, 1);
+    const kPucker = clamp(rig.pucker ?? 0, 0, 1);
+    const kBilabial = clamp(rig.bilabial ?? 0, 0, 1);
+    const kTongueLift = clamp(rig.tongueLift ?? 0, -0.45, 1.0);
+    const kTongueCurl = clamp(rig.tongueCurl ?? 0, 0, 1);
+    const kLipTuck = clamp(rig.lipTuck ?? 0, 0, 1);
 
-    // 1. Oral Cavity Interior
+    // Generous, plush Daifuku aperture response so vowels read warmly & clearly at every screen scale
+    const lipPart = Math.pow(kOpen, 0.74);
+    const sForm = smoothstep(0.0, 0.20, lipPart);
+    const sTop = smoothstep(0.0, 0.22, lipPart);
+    const cavAlpha = smoothstep(0.012, 0.11, lipPart);
+    const bPress = kBilabial * (1.0 - smoothstep(0.0, 0.22, lipPart));
+
     ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(-rx, 0);
-    if (kRound > 0.4) {
-      // Rounded O/U top
-      ctx.bezierCurveTo(-rx * 0.55, upperY - 4, rx * 0.55, upperY - 4, rx, 0);
-    } else {
-      // Cat-lip philtrum top
-      ctx.bezierCurveTo(-rx * 0.55, upperY + philtrumDip * 0.5, -rx * 0.15, upperY + philtrumDip, 0, upperY + philtrumDip * 0.7);
-      ctx.bezierCurveTo(rx * 0.15, upperY + philtrumDip, rx * 0.55, upperY + philtrumDip * 0.5, rx, 0);
+    // Natural vertical jaw drop anchor shift on the face canvas
+    const yShift = lipPart * 10 - kSmile * 4 + kRound * 2;
+    ctx.translate(cx, cy + yShift);
+
+    // 1. Resting Closed Seam Anchor (coincides 100% with ω smile or ^ caret when lipPart === 0!)
+    const isCaretMood = (moodType === 'caret' || moodType === 'caret_small');
+    const baseRestRx = isCaretMood ? (moodType === 'caret_small' ? 34 : 44) : 52;
+    const baseRestCornerY = isCaretMood ? 22 : -4;
+    const baseRestLobeY = isCaretMood ? -6 : 24;
+    const baseRestCenterY = isCaretMood ? -10 : -2;
+
+    const restRx = lerp(baseRestRx, 62, bPress);
+    const restCornerY = lerp(baseRestCornerY, 2, bPress);
+    const restLobeY = lerp(baseRestLobeY, 2, bPress);
+    const restCenterY = lerp(baseRestCenterY, 3, bPress);
+
+    // 2. Open Speaking Parametric Coordinates (100% branchless C² math across A, I, U, E, O!)
+    // - Wide/Open family (A, E, I): warm dome-cup 'A' <-> upturned D-smile 'I'/'E'
+    // - Rounded family (O, U, Q/W): 100% G²-symmetrical vertical oval 'O' (0) <-> round pucker circle 'U' (o)!
+    const wRound = kRound;
+    const wSmile = kSmile * (1.0 - wRound * 0.90);
+
+    const nonRoundRx = (72 + lipPart * 15) * kW;
+    const roundRx = lerp(47, 28, kPucker) * (0.86 + lipPart * 0.20);
+    const openRx = Math.max(24, lerp(nonRoundRx, roundRx, wRound));
+    const rx = lerp(restRx, openRx, sForm);
+
+    // Non-round vertical geometry ('A' dome-cup <-> 'I'/'E' happy D-smile)
+    const aTopY = -14 - lipPart * 14;
+    const smTopY = -5 - lipPart * 5;
+    const nonRoundTopY = lerp(aTopY, smTopY, wSmile);
+    const nonRoundDrop = lipPart * lerp(114, 86, wSmile) * (1.0 - kLipTuck * 0.34);
+    const nonRoundBotY = nonRoundTopY + nonRoundDrop;
+    const nonRoundCornerY = lerp(nonRoundTopY + lipPart * 38, -15 - lipPart * 4, wSmile);
+
+    // Symmetrical Rounded vertical geometry ('O' tall vertical oval <-> 'U' cute circle — ZERO upside-down frown!)
+    const roundMidY = lerp(30, 22, kPucker);
+    const roundRy = lipPart * lerp(62, 37, kPucker);
+    const roundTopY = roundMidY - roundRy;
+    const roundBotY = roundMidY + roundRy;
+    const roundCornerY = roundMidY;
+
+    const openCornerY = lerp(nonRoundCornerY, roundCornerY, wRound);
+    const cornerY = lerp(restCornerY, openCornerY, sForm);
+
+    const philtrumSoft = (1.0 - lipPart * 0.58) * (1.0 - wRound * 0.96) * (1.0 - wSmile * 0.55) * 7.5;
+    const openTopCenterBase = lerp(nonRoundTopY, roundTopY, wRound);
+    const openTopCenterY = openTopCenterBase + philtrumSoft * 0.70;
+
+    // Upper Bezier control Y: smooth dome/smile for A/E/I, exact G² vertical tangent (midY - 0.58*ry) for O/U!
+    const nonRoundTopLobe1Y = lerp(nonRoundTopY - 2, lerp(nonRoundCornerY, smTopY, 0.72), wSmile);
+    const nonRoundTopLobe2Y = nonRoundTopY - 2 + philtrumSoft;
+    const roundTopLobe1Y = roundMidY - roundRy * 0.58;
+    const roundTopLobe2Y = roundTopY;
+
+    const topLobe1Y = lerp(restLobeY, lerp(nonRoundTopLobe1Y, roundTopLobe1Y, wRound), sTop);
+    const topLobe2Y = lerp(restLobeY, lerp(nonRoundTopLobe2Y, roundTopLobe2Y, wRound), sTop);
+    const topCenterY = lerp(restCenterY, openTopCenterY, sTop);
+
+    // Lower Bezier control Y: peels smoothly downward from exact upper seam at lipPart === 0!
+    const openBotY = lerp(nonRoundBotY, roundBotY, wRound);
+    const sBot = smoothstep(0.0, 0.14, lipPart);
+    const botCenterY = lerp(topCenterY, openBotY, sBot);
+
+    const tuckLeft = kLipTuck * lipPart * 24 * (1.0 - wRound);
+    const tuckRight = -kLipTuck * lipPart * 6 * (1.0 - wRound);
+
+    const nonRoundBotLobe1Y = nonRoundCornerY + (nonRoundBotY - nonRoundCornerY) * 0.76;
+    const nonRoundBotLobe2Y = nonRoundBotY + nonRoundDrop * 0.03;
+    const roundBotLobe1Y = roundMidY + roundRy * 0.58;
+    const roundBotLobe2Y = roundBotY;
+
+    const openBotLobe1Base = lerp(nonRoundBotLobe1Y, roundBotLobe1Y, wRound);
+    const openBotLobe2Base = lerp(nonRoundBotLobe2Y, roundBotLobe2Y, wRound);
+
+    const botLobe1RY = lerp(topLobe1Y, openBotLobe1Base - tuckRight, sBot);
+    const botLobe2RY = lerp(topLobe2Y, openBotLobe2Base - tuckRight * 0.5, sBot);
+    const botLobe1LY = lerp(topLobe1Y, openBotLobe1Base - tuckLeft, sBot);
+    const botLobe2LY = lerp(topLobe2Y, openBotLobe2Base - tuckLeft * 0.7, sBot);
+
+    // Horizontal Bezier tangents: at wRound -> 1, u1x = b1x = rx so left/right sides of 'O' and 'U' are 100% smooth curves!
+    const u1x = rx * lerp(0.80, lerp(0.78, 1.00, wRound), sTop);
+    const u2x = rx * lerp(0.16, lerp(0.34, 0.58, wRound), sTop);
+    const b1x = rx * lerp(0.80, lerp(0.88, 1.00, wRound), sForm);
+    const b2x = rx * lerp(0.16, lerp(0.42, 0.58, wRound), sForm);
+
+    const traceMouthAperture = () => {
+      ctx.beginPath();
+      ctx.moveTo(-rx, cornerY);
+      ctx.bezierCurveTo(-u1x, topLobe1Y, -u2x, topLobe2Y, 0, topCenterY);
+      ctx.bezierCurveTo(u2x, topLobe2Y, u1x, topLobe1Y, rx, cornerY);
+      ctx.bezierCurveTo(b1x, botLobe1RY, b2x, botLobe2RY, 0, botCenterY);
+      ctx.bezierCurveTo(-b2x, botLobe2LY, -b1x, botLobe1LY, -rx, cornerY);
+      ctx.closePath();
+    };
+
+    // -------------------------------------------------------------------------
+    // LAYER A: 3D DAIFUKU SUBSURFACE LIP FLUSH & PUCKER TORUS CUSHION
+    // Blends mouth organically into Mochi's creamy marshmallow face!
+    // -------------------------------------------------------------------------
+    const flushStrength = clamp(cavAlpha * 0.46 + kPucker * 0.38 + bPress * 0.36 + kRound * cavAlpha * 0.18, 0, 0.82);
+    if (flushStrength > 0.01) {
+      const midY = (topCenterY + botCenterY) * 0.5;
+      const flushRx = rx * (1.42 + kPucker * 0.45);
+      const flushRy = Math.max(36, (botCenterY - topCenterY) * 0.88 + 30);
+      ctx.save();
+      ctx.translate(0, midY);
+      ctx.scale(1.0, flushRy / Math.max(1, flushRx));
+      const fGrad = ctx.createRadialGradient(0, 0, 6, 0, 0, flushRx);
+      fGrad.addColorStop(0.00, `rgba(244, 136, 170, ${flushStrength})`);
+      fGrad.addColorStop(0.55, `rgba(250, 172, 198, ${flushStrength * 0.46})`);
+      fGrad.addColorStop(1.00, 'rgba(255, 245, 248, 0)');
+      ctx.fillStyle = fGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, flushRx, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Protruding 3D marshmallow pucker torus highlight when rounding/puckering (U / O / QW)
+      const torusA = clamp((kPucker * 0.85 + kRound * 0.25) * cavAlpha, 0, 0.88);
+      if (torusA > 0.03) {
+        ctx.save();
+        ctx.translate(0, midY);
+        const trRx = rx * 1.32;
+        const trRy = Math.max(32, (botCenterY - topCenterY) * 0.74 + 18);
+        ctx.scale(1.0, trRy / Math.max(1, trRx));
+        const rGrad = ctx.createRadialGradient(-4, -5, 6, 0, 2, trRx);
+        rGrad.addColorStop(0.00, `rgba(255, 246, 250, ${torusA * 0.90})`);
+        rGrad.addColorStop(0.52, `rgba(248, 196, 214, ${torusA * 0.72})`);
+        rGrad.addColorStop(0.82, `rgba(232, 154, 182, ${torusA * 0.36})`);
+        rGrad.addColorStop(1.00, 'rgba(232, 154, 182, 0)');
+        ctx.fillStyle = rGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, trRx, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
     }
-    const bowlDepth = lowerY + (kRound > 0.4 ? 6 : 0);
-    ctx.bezierCurveTo(rx * 0.75, bowlDepth, -rx * 0.75, bowlDepth, -rx, 0);
-    ctx.closePath();
 
-    // Deep oral cavity shadow gradient (dark velvet maroon, rich 3D depth)
-    const cavGrad = ctx.createLinearGradient(0, upperY, 0, bowlDepth);
-    cavGrad.addColorStop(0.00, '#360E18'); // Deep shadow beneath upper lip
-    cavGrad.addColorStop(0.55, '#4E1624'); // Rich dark velvet maroon
-    cavGrad.addColorStop(1.00, '#661C2E'); // Warm bottom bounce
-    ctx.fillStyle = cavGrad;
-    ctx.fill();
+    // -------------------------------------------------------------------------
+    // LAYER B: 3D OUTER LIP CUSHION BEVEL, CHIN BOUNCE SHADOW & ORAL CAVITY
+    // -------------------------------------------------------------------------
+    if (cavAlpha > 0.01) {
+      // 1. Soft 3D chin drop-shadow beneath parting lower lip
+      ctx.save();
+      ctx.globalAlpha = cavAlpha;
+      ctx.shadowColor = 'rgba(202, 110, 140, 0.56)';
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 8;
+      traceMouthAperture();
+      ctx.fillStyle = '#3B0312';
+      ctx.fill();
+      ctx.restore();
 
-    // Clip to oral cavity so tongue stays inside
-    ctx.clip();
+      // 2. Plump rosy-pink 3D outer lip cushion bevel (sculpted marshmallow lip rim, zero white teeth!)
+      ctx.save();
+      ctx.globalAlpha = cavAlpha;
+      traceMouthAperture();
+      ctx.strokeStyle = 'rgba(238, 146, 176, 0.74)';
+      ctx.lineWidth = 12;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      ctx.restore();
 
-    // 2. Soft, Plump Rosy Daifuku Tongue (nestled inside the bottom bowl)
-    const tongueY = bowlDepth - (kOpen * 20) + (this.mouthRig ? this.mouthRig.tongueY * 6 : 0);
-    const tongueRadiusX = rx * (0.68 + kRound * 0.12);
-    const tongueRadiusY = (15 + kOpen * 14);
+      // 3. Clipped Deep Velvet Oral Cavity + Living 3D Glossy Pink Daifuku Tongue (100% Toothless!)
+      ctx.save();
+      traceMouthAperture();
+      ctx.clip();
 
-    const tongueGrad = ctx.createRadialGradient(
-      0, tongueY + 2, tongueRadiusX * 0.2,
-      0, tongueY, tongueRadiusX * 1.1
-    );
-    tongueGrad.addColorStop(0.00, '#FFA4BD'); // Soft highlight
-    tongueGrad.addColorStop(0.40, '#FF7597'); // Rosy daifuku pink
-    tongueGrad.addColorStop(0.85, '#E64D73');
-    tongueGrad.addColorStop(1.00, '#C7385D');
-    ctx.fillStyle = tongueGrad;
-    ctx.beginPath();
-    ctx.ellipse(0, tongueY, tongueRadiusX, tongueRadiusY, 0, 0, Math.PI * 2);
-    ctx.fill();
+      const cavTop = Math.min(topCenterY, cornerY) - 10;
+      const cavBot = botCenterY + 14;
+      const cavGrad = ctx.createLinearGradient(0, cavTop, 0, cavBot);
+      cavGrad.addColorStop(0.00, '#2C020D');
+      cavGrad.addColorStop(0.52, '#5E0820');
+      cavGrad.addColorStop(1.00, '#8E1234');
+      ctx.fillStyle = cavGrad;
+      ctx.fillRect(-rx * 1.5, cavTop - 16, rx * 3.0, (cavBot - cavTop) + 36);
 
-    // Subtle tongue center crease
-    ctx.strokeStyle = 'rgba(180, 40, 70, 0.35)';
-    ctx.lineWidth = 3.5;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(0, tongueY - tongueRadiusY * 0.5);
-    ctx.lineTo(0, tongueY + tongueRadiusY * 0.4);
-    ctx.stroke();
+      // Soft deep throat arch for spatial 3D oral depth
+      const apH = Math.max(8, botCenterY - topCenterY);
+      ctx.fillStyle = 'rgba(28, 1, 8, 0.52)';
+      ctx.beginPath();
+      ctx.ellipse(0, topCenterY + apH * 0.42, rx * 0.54, apH * 0.36, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-    ctx.restore(); // Exit clip
+      // Living Articulated 3D Pink Tongue (smoothly curls for 'L', peeks for 'TH', or cushions lower bowl!)
+      const tRx = rx * (0.76 - kRound * 0.06);
+      const tRy = Math.max(14, apH * (0.46 + Math.max(0, kTongueLift) * 0.14));
+      const baseTongueY = botCenterY - apH * (0.24 + kTongueLift * 0.28);
 
-    // 3. Velvety Lip Contour Outline
+      if (kTongueCurl > 0.25) {
+        // Smooth blendable curled 'L' tongue sweeping upward toward palate
+        ctx.save();
+        ctx.globalAlpha = clamp(kTongueCurl, 0, 1);
+        const lGrad = ctx.createLinearGradient(-rx * 0.6, botCenterY, rx * 0.5, topCenterY);
+        lGrad.addColorStop(0.00, '#D92B5E');
+        lGrad.addColorStop(0.55, '#FF5C8D');
+        lGrad.addColorStop(1.00, '#FFA8C5');
+        ctx.fillStyle = lGrad;
+        ctx.beginPath();
+        ctx.moveTo(-rx * 0.84, botCenterY + 8);
+        ctx.bezierCurveTo(-rx * 0.52, topCenterY + apH * 0.45, -8, topCenterY + apH * 0.22, rx * 0.24, topCenterY + apH * 0.08);
+        ctx.bezierCurveTo(rx * 0.68, topCenterY + apH * 0.06, rx * 0.80, topCenterY + apH * 0.55, rx * 0.54, botCenterY + 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (kTongueCurl < 0.85) {
+        ctx.save();
+        ctx.globalAlpha = 1.0 - clamp((kTongueCurl - 0.25) / 0.60, 0, 1);
+        const tGrad = ctx.createRadialGradient(0, baseTongueY - tRy * 0.28, 4, 0, baseTongueY + tRy * 0.25, Math.max(tRx, tRy) * 1.18);
+        tGrad.addColorStop(0.00, '#FFB0CB');
+        tGrad.addColorStop(0.54, '#FF5E8E');
+        tGrad.addColorStop(1.00, '#C91E50');
+        ctx.fillStyle = tGrad;
+
+        // Soft wavy-top 3D Mochi tongue cushion (zero dark vertical split line!)
+        const waveDepth = (1.0 - kRound * 0.65) * 0.14;
+        ctx.beginPath();
+        ctx.moveTo(-tRx, baseTongueY + tRy * 0.48);
+        ctx.bezierCurveTo(
+          -tRx * 0.85, baseTongueY - tRy * (0.82 + waveDepth),
+          -tRx * 0.22, baseTongueY - tRy * (0.50 - waveDepth * 0.5),
+          0, baseTongueY - tRy * (0.38 - waveDepth)
+        );
+        ctx.bezierCurveTo(
+          tRx * 0.22, baseTongueY - tRy * (0.50 - waveDepth * 0.5),
+          tRx * 0.85, baseTongueY - tRy * (0.82 + waveDepth),
+          tRx, baseTongueY + tRy * 0.48
+        );
+        ctx.bezierCurveTo(tRx, baseTongueY + tRy * 1.25, -tRx, baseTongueY + tRy * 1.25, -tRx, baseTongueY + tRy * 0.48);
+        ctx.closePath();
+        ctx.fill();
+
+        // Glossy specular moisture highlight on upper-right tongue dome
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.46)';
+        ctx.beginPath();
+        ctx.ellipse(tRx * 0.25, baseTongueY - tRy * 0.26, Math.max(5, tRx * 0.18), Math.max(3.5, tRy * 0.12), 0.18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Inner lip ambient-occlusion rim shadow for sculpted 3D cavity depth
+      ctx.strokeStyle = 'rgba(38, 2, 11, 0.78)';
+      ctx.lineWidth = 10;
+      ctx.lineJoin = 'round';
+      traceMouthAperture();
+      ctx.stroke();
+
+      ctx.restore(); // End oral cavity clip
+    }
+
+    // -------------------------------------------------------------------------
+    // LAYER C: SEAMLESS LIP SEAM & OUTER RIM CONTOUR + ALPHA-BLENDED DIMPLES
+    // Morphs smoothly from crisp closed ω line to soft sculpted warm-plum rim!
+    // -------------------------------------------------------------------------
+    const openRimBlend = smoothstep(0.02, 0.22, lipPart);
+    const closedLineWidth = lerp(14.5, 8.5, bPress);
+    const rimLineWidth = lerp(closedLineWidth, 6.2, openRimBlend);
+
+    // Upper lip soft specular ridge on bilabial press ('B,M,P')
+    if (bPress > 0.08) {
+      ctx.save();
+      ctx.strokeStyle = `rgba(255, 255, 255, ${bPress * 0.72})`;
+      ctx.lineWidth = 6.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-rx + 8, restCornerY - 6);
+      ctx.bezierCurveTo(-u1x * 0.6, restCenterY - 9, u1x * 0.6, restCenterY - 9, rx - 8, restCornerY - 6);
+      ctx.stroke();
+      ctx.restore();
+    }
+
     ctx.save();
-    ctx.strokeStyle = '#231216';
-    ctx.lineWidth = 14;
+    // Smooth color transition: '#261016' (rest) -> '#6E1F38' (bilabial press) / '#4D0B20' (sculpted 3D open rim)
+    const rCol = Math.round(lerp(lerp(38, 110, bPress), 77, openRimBlend));
+    const gCol = Math.round(lerp(lerp(16, 31, bPress), 11, openRimBlend));
+    const bCol = Math.round(lerp(lerp(22, 56, bPress), 32, openRimBlend));
+    const rimAlpha = lerp(1.0, 0.78, openRimBlend);
+    ctx.strokeStyle = `rgba(${rCol}, ${gCol}, ${bCol}, ${rimAlpha})`;
+    ctx.lineWidth = rimLineWidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(-rx, 0);
-    if (kRound > 0.4) {
-      ctx.bezierCurveTo(-rx * 0.55, upperY - 4, rx * 0.55, upperY - 4, rx, 0);
-    } else {
-      ctx.bezierCurveTo(-rx * 0.55, upperY + philtrumDip * 0.5, -rx * 0.15, upperY + philtrumDip, 0, upperY + philtrumDip * 0.7);
-      ctx.bezierCurveTo(rx * 0.15, upperY + philtrumDip, rx * 0.55, upperY + philtrumDip * 0.5, rx, 0);
-    }
-    ctx.bezierCurveTo(rx * 0.75, bowlDepth, -rx * 0.75, bowlDepth, -rx, 0);
-    ctx.closePath();
-    ctx.stroke();
 
-    // Subtle corner laugh dimples
-    if (kW > 1.08 && kOpen > 0.22) {
-      ctx.strokeStyle = 'rgba(210, 120, 145, 0.45)';
-      ctx.lineWidth = 6;
+    if (lipPart < 0.008) {
+      // Exact single-stroke seam at zero aperture so line weight never doubles
       ctx.beginPath();
-      ctx.arc(-rx - 4, upperY * 0.5, 9, Math.PI * 0.6, Math.PI * 1.4);
+      ctx.moveTo(-rx, cornerY);
+      ctx.bezierCurveTo(-u1x, topLobe1Y, -u2x, topLobe2Y, 0, topCenterY);
+      ctx.bezierCurveTo(u2x, topLobe2Y, u1x, topLobe1Y, rx, cornerY);
+      ctx.stroke();
+    } else {
+      traceMouthAperture();
+      ctx.stroke();
+    }
+
+    // Cute sunken corner dimple dots on bilabial 'B,M,P' closure
+    if (bPress > 0.15) {
+      ctx.fillStyle = `rgba(107, 29, 52, ${bPress * 0.85})`;
+      ctx.beginPath();
+      ctx.arc(-rx - 3, cornerY, 6.0, 0, Math.PI * 2);
+      ctx.arc(rx + 3, cornerY, 6.0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Smooth alpha-blended corner smile dimples `(   )` on wide vowels (I, E, A) — ZERO boolean pop!
+    const dimpleAlpha = smoothstep(0.38, 0.76, kSmile) * smoothstep(0.10, 0.28, lipPart) * (1.0 - kRound * 0.85) * 0.62;
+    if (dimpleAlpha > 0.015) {
+      const dimpleSpan = Math.max(13, (botCenterY - topCenterY) * 0.28);
+      const dimpleY = cornerY + 5;
+      ctx.strokeStyle = `rgba(202, 115, 142, ${dimpleAlpha})`;
+      ctx.lineWidth = 7.0;
+      ctx.beginPath();
+      ctx.arc(-rx + dimpleSpan * 0.35, dimpleY, dimpleSpan, Math.PI * 0.72, Math.PI * 1.28);
       ctx.stroke();
       ctx.beginPath();
-      ctx.arc(rx + 4, upperY * 0.5, 9, -Math.PI * 0.4, Math.PI * 0.4);
+      ctx.arc(rx - dimpleSpan * 0.35, dimpleY, dimpleSpan, -Math.PI * 0.28, Math.PI * 0.28);
       ctx.stroke();
+    }
+
+    // Delicate pucker corner creases on tight 'U' pucker — smoothly alpha-blended!
+    const puckerCreaseA = smoothstep(0.45, 0.85, kPucker) * cavAlpha * 0.42;
+    if (puckerCreaseA > 0.015) {
+      ctx.strokeStyle = `rgba(208, 124, 152, ${puckerCreaseA})`;
+      ctx.lineWidth = 4.2;
+      const pyTop = topCenterY + 6;
+      const pyBot = botCenterY - 6;
+      [
+        [-rx + 2, pyTop, -rx - 8, pyTop - 7],
+        [rx - 2, pyTop, rx + 8, pyTop - 7],
+        [-rx + 2, pyBot, -rx - 8, pyBot + 7],
+        [rx - 2, pyBot, rx + 8, pyBot + 7]
+      ].forEach(([x1, y1, x2, y2]) => {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      });
     }
 
     ctx.restore();
@@ -5431,25 +5738,120 @@ export class FiezelMochi {
   }
 
   setTalking(isTalking, durationSeconds = 0) {
-    this.isTalking = !!isTalking;
+    const nextTalking = !!isTalking;
+    const wasTalking = !!this.isTalking;
+    this.isTalking = nextTalking;
     this.talkDuration = durationSeconds > 0 ? durationSeconds : 0;
+
+    if (nextTalking && !wasTalking) {
+      // Seed mouthRig smoothly from the active mood's natural resting aperture so start-of-speech NEVER snaps!
+      const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
+      if (this.mouthRig && this.mouthRig.presence < 0.05) {
+        if (desc && (desc.mouthType === 'happy_open_tall' || desc.mouthType === 'happy_open_wide')) {
+          this.mouthRig.open = 0.62;
+          this.mouthRig.smile = 0.82;
+          this.mouthRig.width = 1.16;
+        } else if (desc && desc.mouthType === 'surprised_o') {
+          this.mouthRig.open = 0.68;
+          this.mouthRig.roundness = 0.78;
+          this.mouthRig.width = 0.84;
+        }
+      }
+      this._analyserSilentTime = 0;
+    }
+
     if (!this.isTalking && !this._manualVisemeLock) {
       this.activeViseme = null;
-      this.renderCurvedFaceAndFx();
+      // Do NOT snap renderCurvedFaceAndFx to closed here; let mouthRig.presence & open glide softly to rest!
     }
   }
 
   /**
-   * Explicitly set a phonetic or vowel viseme on the 3D Curved Face Shell (100% Toothless).
-   * Supports:
-   *  - 5 Vowels: 'A', 'I', 'U', 'E', 'O' (with intensity 0.0..1.0 or 'A1','A2','A3'..'O3')
-   *  - 12 Phonetic Visemes: 'AEI' ('A,E,I'), 'O', 'CDNSTXYZ' ('C,D,N,S,T,X,Y,Z'), 'GK' ('G,K'),
-   *    'L', 'BMP' ('B,M,P'), 'FV' ('F,V'), 'EE' ('Ee'), 'TH', 'CHJSH' ('CH,J,SH'), 'U', 'QW' ('Q,W')
-   *  - Pass `null` to return to the current expression's resting mouth.
+   * Maps any phonetic or AIUEO viseme code into continuous 3D viscoelastic `mouthRig` targets.
    */
-  setViseme(code, intensity = 1.0) {
+  resolveVisemeTargets(rawCode, rawIntensity = 1.0) {
+    let code = String(rawCode || 'A').trim().toUpperCase();
+    let k = Math.max(0.15, Math.min(1.0, Number(rawIntensity) || 1.0));
+    const mMatch = /^([AIUEO])([123])$/.exec(code);
+    const rawUpper = code;
+    if (mMatch) {
+      code = mMatch[1];
+      const tier = Number(mMatch[2]);
+      k = tier === 1 ? 0.42 : (tier === 2 ? 0.72 : 1.0);
+    }
+
+    const T = {
+      open: 0.55, width: 1.04, smile: 0.30, roundness: 0.08,
+      pucker: 0.0, bilabial: 0.0, tongueLift: 0.12, tongueCurl: 0.0, lipTuck: 0.0
+    };
+
+    if (code === 'BMP' || code === 'B,M,P' || code === 'PP' || code === 'VISEME_PP') {
+      T.open = 0.0; T.width = 0.98; T.smile = 0.18; T.roundness = 0.0; T.bilabial = 1.0; T.tongueLift = 0.0;
+    } else if (code === 'FV' || code === 'F,V' || code === 'FF' || code === 'VISEME_FF') {
+      T.open = 0.28 + k * 0.14; T.width = 1.04; T.smile = 0.34; T.lipTuck = 0.95; T.tongueLift = 0.15;
+    } else if (rawUpper === 'U' || rawUpper === 'U1' || rawUpper === 'VISEME_U') {
+      T.open = 0.48 + k * 0.14; T.width = 0.72; T.smile = 0.0; T.roundness = 0.98; T.pucker = 0.94; T.tongueLift = -0.14;
+    } else if (code === 'U' || code === 'QW' || code === 'Q,W') {
+      T.open = 0.50 + k * 0.24; T.width = 0.80; T.smile = 0.02; T.roundness = 0.96; T.pucker = 0.62; T.tongueLift = -0.10;
+    } else if (code === 'O' || code === 'VISEME_O') {
+      T.open = 0.46 + k * 0.46; T.width = 0.76; T.smile = 0.02; T.roundness = 0.98; T.pucker = 0.22; T.tongueLift = -0.10;
+    } else if (code === 'I' || code === 'VISEME_I') {
+      T.open = 0.26 + k * 0.36; T.width = 1.24 + k * 0.08; T.smile = 0.94; T.roundness = 0.0; T.tongueLift = 0.38;
+    } else if (code === 'CDNSTXYZ' || code.includes('C,D') || code === 'VISEME_DD' || code === 'VISEME_SS') {
+      T.open = 0.32 + k * 0.22; T.width = 1.22; T.smile = 0.86; T.roundness = 0.0; T.tongueLift = 0.42;
+    } else if (code === 'E' || code === 'EE' || code === 'VISEME_E') {
+      const ek = rawUpper === 'EE' ? 0.82 : k;
+      T.open = 0.38 + ek * 0.42; T.width = 1.18 + ek * 0.08; T.smile = 0.84; T.roundness = 0.0; T.tongueLift = 0.28;
+    } else if (code === 'AEI' || code.includes('A,E,I')) {
+      T.open = 0.64 + k * 0.18; T.width = 1.18; T.smile = 0.72; T.roundness = 0.04; T.tongueLift = 0.22;
+    } else if (code === 'TH' || code === 'VISEME_TH') {
+      T.open = 0.44 + k * 0.18; T.width = 1.18; T.smile = 0.76; T.roundness = 0.0; T.tongueLift = 0.72;
+    } else if (code === 'L' || code === 'VISEME_RR') {
+      T.open = 0.54 + k * 0.20; T.width = 1.06; T.smile = 0.32; T.roundness = 0.10; T.tongueLift = 0.65; T.tongueCurl = 0.95;
+    } else if (code === 'GK' || code.includes('G,K') || code === 'VISEME_KK') {
+      T.open = 0.52 + k * 0.22; T.width = 1.04; T.smile = 0.22; T.roundness = 0.18; T.tongueLift = 0.32;
+    } else if (code === 'CHJSH' || code.includes('CH,J') || code === 'VISEME_CH') {
+      T.open = 0.44 + k * 0.18; T.width = 0.94; T.smile = 0.24; T.roundness = 0.62; T.pucker = 0.42; T.tongueLift = 0.22;
+    } else {
+      // 'A' / 'AA' / general open vowel
+      T.open = 0.40 + k * 0.50; T.width = 1.04 + k * 0.06; T.smile = 0.34; T.roundness = 0.08; T.tongueLift = 0.14;
+    }
+    return T;
+  }
+
+  /**
+   * Explicitly set a phonetic or vowel viseme on the 3D Curved Face Shell (100% Toothless).
+   * Pass `immediate = true` when capturing static 3D Mochi showcase cards so springs converge immediately.
+   */
+  setViseme(code, intensity = 1.0, immediate = false) {
     this.activeViseme = code || null;
     this.visemeIntensity = intensity ?? 1.0;
+    if (immediate && this.mouthRig) {
+      if (this.activeViseme) {
+        const T = this.resolveVisemeTargets(this.activeViseme, this.visemeIntensity);
+        Object.assign(this.mouthRig, {
+          open: T.open, openVel: 0,
+          width: T.width, widthVel: 0,
+          smile: T.smile, smileVel: 0,
+          roundness: T.roundness, roundnessVel: 0,
+          pucker: T.pucker, puckerVel: 0,
+          bilabial: T.bilabial, bilabialVel: 0,
+          tongueLift: T.tongueLift, tongueLiftVel: 0,
+          tongueCurl: T.tongueCurl, tongueCurlVel: 0,
+          lipTuck: T.lipTuck, lipTuckVel: 0,
+          presence: 1.0, presenceVel: 0
+        });
+      } else {
+        Object.assign(this.mouthRig, {
+          open: 0, openVel: 0, width: 1.0, widthVel: 0, smile: 0.28, smileVel: 0,
+          roundness: 0, roundnessVel: 0, pucker: 0, puckerVel: 0, bilabial: 0, bilabialVel: 0,
+          tongueLift: 0, tongueLiftVel: 0, tongueCurl: 0, tongueCurlVel: 0, lipTuck: 0, lipTuckVel: 0,
+          presence: 0, presenceVel: 0
+        });
+      }
+      this.renderCurvedFaceAndFx();
+      return;
+    }
     if (this._isStaticChartRenderer) {
       this.renderCurvedFaceAndFx();
     }
@@ -5461,134 +5863,281 @@ export class FiezelMochi {
       if (this.talkDuration <= 0) {
         this.isTalking = false;
         this.talkDuration = 0;
-        this.activeViseme = null;
+        if (!this._manualVisemeLock) this.activeViseme = null;
       }
     }
 
-    if (!this.mouthRig) {
+    if (!this.mouthRig || this.mouthRig.smile === undefined) {
       this.mouthRig = {
         open: 0.0, openVel: 0.0,
         width: 1.0, widthVel: 0.0,
+        smile: 0.28, smileVel: 0.0,
         roundness: 0.0, roundnessVel: 0.0,
-        tongueY: 0.0, tongueYVel: 0.0
+        pucker: 0.0, puckerVel: 0.0,
+        bilabial: 0.0, bilabialVel: 0.0,
+        tongueLift: 0.0, tongueLiftVel: 0.0,
+        tongueCurl: 0.0, tongueCurlVel: 0.0,
+        lipTuck: 0.0, lipTuckVel: 0.0,
+        presence: 0.0, presenceVel: 0.0,
+        headPitch: 0.0, headPitchVel: 0.0,
+        headRoll: 0.0, headRollVel: 0.0,
+        headYaw: 0.0, headYawVel: 0.0,
+        audioEnv: 0.0,
+        holdViseme: null,
+        holdTimer: 0.0
       };
     }
 
-    // GoPrep Damped Harmonic Spring Stepper for smooth continuous 60fps morphing (zero frame-swapping / zero flicker)
-    const stepSpring = (val, vel, target, omega = 16.0, zeta = 0.72) => {
+    const rig = this.mouthRig;
+
+    // Sub-stepped Critically Damped Viscoelastic Flesh Oscillator (zeta ~ 0.94 => zero robotic bounce, zero blink!)
+    const stepFlesh = (val, vel, target, omega = 13.0, zeta = 0.94) => {
       val = Number.isFinite(val) ? val : target;
       vel = Number.isFinite(vel) ? vel : 0;
-      const sDt = Math.min(dt, 1 / 30);
-      const accel = -omega * omega * (val - target) - 2 * zeta * omega * vel;
-      vel += accel * sDt;
-      val += vel * sDt;
-      if (Math.abs(val - target) < 0.001 && Math.abs(vel) < 0.002) {
+      const clampedDt = Math.max(0, Math.min(dt, 0.08));
+      const subSteps = Math.max(1, Math.ceil(clampedDt / 0.016));
+      const sDt = clampedDt / subSteps;
+      for (let i = 0; i < subSteps; i++) {
+        const accel = -omega * omega * (val - target) - 2 * zeta * omega * vel;
+        vel += accel * sDt;
+        val += vel * sDt;
+      }
+      if (Math.abs(val - target) < 0.0008 && Math.abs(vel) < 0.0015) {
         val = target;
         vel = 0;
       }
       return [val, vel];
     };
 
+    const quinticEase = (x) => {
+      const t = Math.max(0, Math.min(1, x));
+      return t * t * t * (t * (t * 6 - 15) + 10);
+    };
+
     let targetOpen = 0.0;
     let targetWidth = 1.0;
+    let targetSmile = 0.28;
     let targetRound = 0.0;
-    let targetTongue = 0.0;
+    let targetPucker = 0.0;
+    let targetBilabial = 0.0;
+    let targetTongueLift = 0.0;
+    let targetTongueCurl = 0.0;
+    let targetLipTuck = 0.0;
+    let targetPresence = 0.0;
+    let targetPitch = 0.0;
+    let targetRoll = 0.0;
+    let targetYaw = 0.0;
 
     const hasLiveAnalyser = !!(this.wawaLipsync && this.wawaLipsync.analyser);
+    let handledByLiveAudio = false;
 
-    if (this.isTalking && hasLiveAnalyser && this.mood !== 'pout' && this.mood !== 'sleepy') {
-      const viseme = this.wawaLipsync.processAudio();
+    // -------------------------------------------------------------------------
+    // 1. LIVE WEBAUDIO STREAMING MODE (Coarticulated Asymmetric Envelope + Formant Glide)
+    // -------------------------------------------------------------------------
+    if (this.isTalking && hasLiveAnalyser) {
+      const rawViseme = this.wawaLipsync.processAudio();
       const feat = this.wawaLipsync.features;
-      const vol = feat ? Math.max(0, Math.min(1, feat.volume * 1.8)) : 0;
+      const rawVol = feat ? Math.max(0, Math.min(1, feat.volume * 2.1)) : 0;
 
-      if (vol > 0.03 && viseme !== VISEMES.sil) {
-        targetOpen = Math.min(1.0, vol * 1.35 + 0.15);
-        if (viseme === VISEMES.I || viseme === VISEMES.E) {
-          targetWidth = 1.25 + vol * 0.15;
-          targetRound = 0.0;
-          targetTongue = 0.4;
-        } else if (viseme === VISEMES.O || viseme === VISEMES.U || viseme === VISEMES.CH) {
-          targetWidth = 0.78;
-          targetRound = 0.88;
-          targetTongue = -0.2;
-        } else if (viseme === VISEMES.PP || viseme === VISEMES.nn) {
-          targetOpen = 0.0; // Bilabial closure!
-          targetWidth = 0.95;
-          targetRound = 0.0;
-        } else {
-          // Open A / general vowel
-          targetWidth = 1.02;
-          targetRound = 0.12;
-          targetTongue = 0.1;
+      if (rawVol > 0.020) {
+        this._analyserSilentTime = 0;
+      } else {
+        this._analyserSilentTime = (this._analyserSilentTime || 0) + dt;
+      }
+
+      // Only let live analyser control mouth if audio is genuinely flowing through this analyser node;
+      // if an alternate TTS path is playing (analyser silent > 0.28s while isTalking === true), fall back seamlessly!
+      if ((this._analyserSilentTime || 0) <= 0.28) {
+        handledByLiveAudio = true;
+        targetPresence = 1.0;
+
+        // Asymmetric Speech Envelope: crisp 42ms vowel onset, warm 190ms coarticulated vowel sustain!
+        // Prevents 30-70ms inter-consonant FFT dips from slamming the mouth shut like an eye blink.
+        const envRate = rawVol > rig.audioEnv ? 23.0 : 5.2;
+        rig.audioEnv += (rawVol - rig.audioEnv) * Math.min(1.0, dt * envRate);
+        const env = rig.audioEnv;
+
+        // Minimum 135ms viseme hysteresis so formants glide smoothly instead of flickering at 60Hz
+        rig.holdTimer = Math.max(0, (rig.holdTimer || 0) - dt);
+        if (rawVol > 0.035 && rawViseme !== VISEMES.sil && (rig.holdTimer <= 0 || !rig.holdViseme)) {
+          rig.holdViseme = rawViseme;
+          rig.holdTimer = (rawViseme === VISEMES.PP) ? 0.095 : 0.140;
         }
-      } else {
-        targetOpen = 0.0;
-      }
-    } else if (this.isTalking) {
-      // Natural Autonomous Speech Cadence (Calibrated to natural human/anime speech: ~3.4 syllables/sec)
-      this.talkTimer = (this.talkTimer || 0) + dt;
-      const t = this.talkTimer;
+        const vis = rig.holdViseme || rawViseme;
 
-      // Phrasing cycle: 1.6s sentence stream followed by 0.35s breathing micro-pause
-      const sentenceCycle = t % 1.95;
-      const isBreathingPause = sentenceCycle > 1.60;
+        if (env > 0.028) {
+          if (vis === VISEMES.PP && rawVol < 0.24) {
+            // Brief natural bilabial consonant touch ('B, M, P')
+            targetOpen = 0.02;
+            targetBilabial = 0.88;
+            targetWidth = 0.96;
+            targetSmile = 0.22;
+            targetPitch = 0.018;
+          } else {
+            // Coarticulated open vowel carrier modulated by acoustic energy
+            const baseVowelOpen = Math.min(0.92, 0.30 + env * 0.88);
+            targetOpen = baseVowelOpen;
 
-      if (!isBreathingPause) {
-        // Multi-frequency smooth syllable rhythm (3.4 Hz fundamental + 1.7 Hz emphasis)
-        const syl = Math.sin(t * 21.4) * 0.5 + 0.5; // ~3.4 Hz
-        const emphasis = 0.70 + 0.30 * Math.sin(t * 10.7);
-        targetOpen = Math.max(0.08, Math.min(0.88, syl * emphasis));
+            if (vis === VISEMES.I || vis === VISEMES.E || vis === VISEMES.SS || vis === VISEMES.DD) {
+              targetOpen = Math.min(0.74, 0.28 + env * 0.64);
+              targetWidth = 1.20 + env * 0.10;
+              targetSmile = 0.86;
+              targetRound = 0.0;
+              targetTongueLift = 0.36;
+            } else if (vis === VISEMES.O) {
+              targetOpen = Math.min(0.90, 0.38 + env * 0.78);
+              targetWidth = 0.78;
+              targetSmile = 0.06;
+              targetRound = 0.90;
+              targetPucker = 0.42;
+              targetTongueLift = -0.12;
+            } else if (vis === VISEMES.U || vis === VISEMES.CH) {
+              targetOpen = Math.min(0.62, 0.28 + env * 0.48);
+              targetWidth = 0.74;
+              targetSmile = 0.04;
+              targetRound = 0.88;
+              targetPucker = vis === VISEMES.U ? 0.80 : 0.48;
+              targetTongueLift = -0.14;
+            } else if (vis === VISEMES.RR || vis === VISEMES.TH) {
+              targetOpen = Math.min(0.72, 0.32 + env * 0.56);
+              targetWidth = 1.08;
+              targetSmile = 0.52;
+              targetTongueLift = 0.62;
+              targetTongueCurl = vis === VISEMES.RR ? 0.72 : 0.0;
+            } else if (vis === VISEMES.FF) {
+              targetOpen = Math.min(0.46, 0.22 + env * 0.34);
+              targetWidth = 1.04;
+              targetSmile = 0.34;
+              targetLipTuck = 0.75;
+            } else {
+              // Warm open 'A' vowel
+              targetWidth = 1.06 + env * 0.06;
+              targetSmile = 0.42;
+              targetRound = 0.08;
+              targetTongueLift = 0.16;
+            }
 
-        // Organic vowel modulation during speech (cycles between wide A/I and round O/U)
-        const vowelFlow = Math.sin(t * 4.2);
-        targetWidth = 1.0 + vowelFlow * 0.22; // 0.78 to 1.22
-        targetRound = Math.max(0.0, -vowelFlow * 0.75);
-        targetTongue = Math.sin(t * 5.5) * 0.40;
-      } else {
-        targetOpen = 0.0;
-        targetWidth = 1.0;
-        targetRound = 0.0;
-        targetTongue = 0.0;
-      }
-    } else if (this.activeViseme) {
-      // Smooth continuous morph target for explicit viseme selection (Zero Frame-Swapping!)
-      const k = this.visemeIntensity || 1.0;
-      const code = String(this.activeViseme).toUpperCase();
-      if (code === 'A' || code === 'AA' || code === 'A1' || code === 'A2' || code === 'A3' || code.includes('A,E,I') || code === 'AEI') {
-        targetOpen = Math.min(1.0, 0.45 + k * 0.45); targetWidth = 1.05; targetRound = 0.10; targetTongue = 0.15;
-      } else if (code === 'I' || code === 'I1' || code === 'I2' || code === 'I3' || code === 'EE') {
-        targetOpen = 0.25 + k * 0.35; targetWidth = 1.34; targetRound = 0.0; targetTongue = 0.45;
-      } else if (code === 'U' || code === 'U1' || code === 'U2' || code === 'U3' || code === 'QW') {
-        targetOpen = 0.35 + k * 0.35; targetWidth = 0.72; targetRound = 0.92; targetTongue = -0.25;
-      } else if (code === 'E' || code === 'E1' || code === 'E2' || code === 'E3') {
-        targetOpen = 0.32 + k * 0.36; targetWidth = 1.24; targetRound = 0.0; targetTongue = 0.35;
-      } else if (code === 'O' || code === 'O1' || code === 'O2' || code === 'O3') {
-        targetOpen = 0.50 + k * 0.42; targetWidth = 0.82; targetRound = 0.96; targetTongue = -0.10;
-      } else if (code === 'BMP' || code === 'B,M,P') {
-        targetOpen = 0.0; targetWidth = 0.95; targetRound = 0.0; targetTongue = 0.0;
-      } else if (code.includes('C,D') || code === 'CDNSTXYZ') {
-        targetOpen = 0.28 + k * 0.25; targetWidth = 1.15; targetRound = 0.0; targetTongue = 0.40;
-      } else if (code.includes('G,K') || code === 'GK') {
-        targetOpen = 0.35 + k * 0.30; targetWidth = 1.05; targetRound = 0.15; targetTongue = -0.20;
-      } else if (code === 'L') {
-        targetOpen = 0.38 + k * 0.30; targetWidth = 1.12; targetRound = 0.10; targetTongue = 0.60;
-      } else if (code.includes('F,V') || code === 'FV') {
-        targetOpen = 0.22 + k * 0.22; targetWidth = 1.08; targetRound = 0.05; targetTongue = 0.10;
-      } else if (code === 'TH') {
-        targetOpen = 0.25 + k * 0.25; targetWidth = 1.18; targetRound = 0.0; targetTongue = 0.45;
-      } else if (code.includes('CH,J') || code === 'CHJSH') {
-        targetOpen = 0.32 + k * 0.30; targetWidth = 0.92; targetRound = 0.70; targetTongue = 0.20;
-      } else {
-        targetOpen = 0.35 + k * 0.30; targetWidth = 1.05; targetRound = 0.20; targetTongue = 0.10;
+            // Prosodic head pitch, roll & yaw coupled directly to real voice energy!
+            this.talkTimer = (this.talkTimer || 0) + dt;
+            const pt = this.talkTimer;
+            targetPitch = -(env - 0.22) * 0.105 + Math.sin(pt * 2.4) * 0.018;
+            targetRoll = Math.sin(pt * 1.55) * 0.056;
+            targetYaw = Math.sin(pt * 1.12 + 0.6) * 0.058;
+          }
+        } else {
+          // Quiet pause in live audio stream
+          targetOpen = 0.0;
+          targetSmile = 0.32;
+          targetPitch = 0.010;
+        }
       }
     }
 
-    // Smoothly step all mouth deformation variables at 60 FPS
-    const rig = this.mouthRig;
-    [rig.open, rig.openVel] = stepSpring(rig.open, rig.openVel, targetOpen, 18.0, 0.68);
-    [rig.width, rig.widthVel] = stepSpring(rig.width, rig.widthVel, targetWidth, 16.0, 0.72);
-    [rig.roundness, rig.roundnessVel] = stepSpring(rig.roundness, rig.roundnessVel, targetRound, 16.0, 0.72);
-    [rig.tongueY, rig.tongueYVel] = stepSpring(rig.tongueY, rig.tongueYVel, targetTongue, 15.0, 0.70);
+    // -------------------------------------------------------------------------
+    // 2. COARTICULATED PROCEDURAL PHONEME SEQUENCER (Natural Human/Anime Prosody!)
+    // Connected vowels STAY OPEN and glide smoothly (A -> I -> O -> M -> A -> E -> U)
+    // instead of slamming shut every syllable like a sine-wave eye blink!
+    // -------------------------------------------------------------------------
+    if (this.isTalking && !handledByLiveAudio) {
+      targetPresence = 1.0;
+      this.talkTimer = (this.talkTimer || 0) + dt;
+
+      // Two melodic, unhurried conversational phrases (~5.35s loop) with lush connected vowel glides,
+      // gentle breath micro-resonance, rare soft bilabials, and rich 3D head/body prosody!
+      const SCRIPT = [
+        // Phrase 1: Warm, joyful greeting ("Ha-looo te-man, yuk be-la-jar!")
+        { dur: 0.30, open: 0.78, w: 1.08, sm: 0.44, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.16, tc: 0.00, p: -0.058, r:  0.048, y: -0.045 }, // Ha- (plush open A + upward lift)
+        { dur: 0.32, open: 0.74, w: 0.78, sm: 0.04, rd: 0.94, pk: 0.28, bi: 0.00, tl: -0.10, tc: 0.25, p:  0.024, r:  0.062, y: -0.024 }, // -looo (glides smoothly into tall round O!)
+        { dur: 0.26, open: 0.54, w: 1.22, sm: 0.84, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.34, tc: 0.00, p: -0.026, r:  0.036, y:  0.018 }, // te- (glides wide into happy D-smile E!)
+        { dur: 0.16, open: 0.02, w: 0.96, sm: 0.26, rd: 0.00, pk: 0.00, bi: 0.92, tl: 0.00, tc: 0.00, p:  0.042, r:  0.010, y:  0.032 }, // -m- (soft marshmallow bilabial kiss + gentle nod)
+        { dur: 0.34, open: 0.88, w: 1.12, sm: 0.48, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.18, tc: 0.00, p: -0.068, r: -0.038, y:  0.056 }, // -aaan (expressive open A bloom + buoyant lift!)
+        { dur: 0.28, open: 0.50, w: 0.70, sm: 0.02, rd: 0.96, pk: 0.86, bi: 0.00, tl: -0.12, tc: 0.00, p:  0.022, r: -0.058, y:  0.042 }, // yuuk (cute round U pucker cushion!)
+        { dur: 0.26, open: 0.62, w: 1.20, sm: 0.78, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.32, tc: 0.52, p: -0.034, r: -0.044, y:  0.012 }, // be-la- (open E + curled L tongue glide)
+        { dur: 0.30, open: 0.68, w: 1.10, sm: 0.60, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.18, tc: 0.00, p: -0.024, r: -0.018, y: -0.016 }, // -jaar (warm trailing A)
+        { dur: 0.52, open: 0.00, w: 1.02, sm: 0.40, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.00, tc: 0.00, p:  0.020, r:  0.000, y:  0.000 }, // [Calm smiling conversational breath]
+
+        // Phrase 2: Curious & encouraging ("A-yooo la-giii, pas-ti bi-sa!")
+        { dur: 0.28, open: 0.80, w: 1.08, sm: 0.46, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.16, tc: 0.00, p: -0.052, r: -0.056, y:  0.058 }, // A-
+        { dur: 0.32, open: 0.76, w: 0.76, sm: 0.04, rd: 0.95, pk: 0.32, bi: 0.00, tl: -0.10, tc: 0.00, p:  0.028, r: -0.038, y:  0.042 }, // -yooo (tall symmetrical O!)
+        { dur: 0.26, open: 0.50, w: 1.26, sm: 0.90, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.40, tc: 0.00, p: -0.024, r:  0.020, y:  0.008 }, // la-giii (wide joyful I smile!)
+        { dur: 0.16, open: 0.02, w: 0.96, sm: 0.24, rd: 0.00, pk: 0.00, bi: 0.92, tl: 0.00, tc: 0.00, p:  0.044, r:  0.038, y: -0.026 }, // p- (soft bilabial P cushion)
+        { dur: 0.32, open: 0.88, w: 1.12, sm: 0.54, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.18, tc: 0.00, p: -0.066, r:  0.060, y: -0.054 }, // -aas- (joyful emphasis A!)
+        { dur: 0.26, open: 0.48, w: 1.28, sm: 0.92, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.42, tc: 0.00, p: -0.028, r:  0.046, y: -0.038 }, // -ti bi- (stays open in bright I smile!)
+        { dur: 0.30, open: 0.66, w: 1.10, sm: 0.58, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.16, tc: 0.00, p: -0.018, r:  0.022, y: -0.014 }, // -saa!
+        { dur: 0.54, open: 0.00, w: 1.02, sm: 0.42, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.00, tc: 0.00, p:  0.018, r:  0.000, y:  0.000 }  // [Warm phrase settle & gentle nod]
+      ];
+
+      let totalDur = 0;
+      for (let i = 0; i < SCRIPT.length; i++) totalDur += SCRIPT[i].dur;
+      let localT = this.talkTimer % totalDur;
+      let idx = 0;
+      while (idx < SCRIPT.length - 1 && localT >= SCRIPT[idx].dur) {
+        localT -= SCRIPT[idx].dur;
+        idx++;
+      }
+
+      const curr = SCRIPT[idx];
+      const prev = SCRIPT[(idx - 1 + SCRIPT.length) % SCRIPT.length];
+      // Fluid coarticulation glide across 68% of syllable, with warm vocal micro-resonance on held nuclei!
+      const blend = quinticEase(Math.min(1.0, localT / Math.max(0.05, curr.dur * 0.68)));
+      const mix = (a, b) => a + (b - a) * blend;
+
+      const baseOpen = mix(prev.open, curr.open);
+      const vocalResonance = baseOpen > 0.25 ? Math.sin(this.talkTimer * 9.2) * 0.026 : 0;
+      const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
+      const moodSmileBoost = (desc && (desc.id === 'gembira' || desc.id === 'senang')) ? 0.16 : 0;
+
+      targetOpen = Math.max(0, Math.min(1, baseOpen + vocalResonance));
+      targetWidth = mix(prev.w, curr.w);
+      targetSmile = Math.min(1, mix(prev.sm, curr.sm) + moodSmileBoost * (1.0 - mix(prev.rd, curr.rd)));
+      targetRound = mix(prev.rd, curr.rd);
+      targetPucker = mix(prev.pk, curr.pk);
+      targetBilabial = mix(prev.bi, curr.bi);
+      targetTongueLift = mix(prev.tl, curr.tl);
+      targetTongueCurl = mix(prev.tc, curr.tc);
+      targetPitch = mix(prev.p, curr.p);
+      targetRoll = mix(prev.r, curr.r);
+      targetYaw = mix(prev.y, curr.y);
+    } else if (!this.isTalking && this.activeViseme) {
+      // 3. EXPLICIT VISEME PREVIEW MODE (Interactive Studio Chips)
+      const T = this.resolveVisemeTargets(this.activeViseme, this.visemeIntensity || 1.0);
+      targetPresence = 1.0;
+      targetOpen = T.open;
+      targetWidth = T.width;
+      targetSmile = T.smile;
+      targetRound = T.roundness;
+      targetPucker = T.pucker;
+      targetBilabial = T.bilabial;
+      targetTongueLift = T.tongueLift;
+      targetTongueCurl = T.tongueCurl;
+      targetLipTuck = T.lipTuck;
+      targetPitch = -(T.open - 0.3) * 0.035;
+    } else if (!this.isTalking) {
+      // Idle settle: smoothly release presence and return toward resting mood seam
+      const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
+      if (rig.presence > 0.02 && desc && (desc.mouthType === 'happy_open_tall' || desc.mouthType === 'happy_open_wide')) {
+        targetOpen = 0.64;
+        targetSmile = 0.84;
+        targetWidth = 1.18;
+      }
+      rig.audioEnv = (rig.audioEnv || 0) * Math.max(0, 1 - dt * 10);
+    }
+
+    // Asymmetric plush marshmallow stepping: silky vowel glide (omega=11.6), unhurried soft closing (omega=8.6)
+    const openOmega = targetOpen >= rig.open ? 11.6 : 8.6;
+    [rig.open, rig.openVel] = stepFlesh(rig.open, rig.openVel, targetOpen, openOmega, 0.96);
+    [rig.width, rig.widthVel] = stepFlesh(rig.width, rig.widthVel, targetWidth, 10.2, 0.96);
+    [rig.smile, rig.smileVel] = stepFlesh(rig.smile, rig.smileVel, targetSmile, 10.0, 0.96);
+    [rig.roundness, rig.roundnessVel] = stepFlesh(rig.roundness, rig.roundnessVel, targetRound, 10.4, 0.96);
+    [rig.pucker, rig.puckerVel] = stepFlesh(rig.pucker, rig.puckerVel, targetPucker, 10.6, 0.96);
+    [rig.bilabial, rig.bilabialVel] = stepFlesh(rig.bilabial, rig.bilabialVel, targetBilabial, 13.5, 0.94);
+    [rig.tongueLift, rig.tongueLiftVel] = stepFlesh(rig.tongueLift, rig.tongueLiftVel, targetTongueLift, 11.8, 0.94);
+    [rig.tongueCurl, rig.tongueCurlVel] = stepFlesh(rig.tongueCurl, rig.tongueCurlVel, targetTongueCurl, 11.8, 0.94);
+    [rig.lipTuck, rig.lipTuckVel] = stepFlesh(rig.lipTuck, rig.lipTuckVel, targetLipTuck, 11.8, 0.94);
+    [rig.presence, rig.presenceVel] = stepFlesh(rig.presence, rig.presenceVel, targetPresence, targetPresence > 0.5 ? 12.5 : 8.2, 0.96);
+    [rig.headPitch, rig.headPitchVel] = stepFlesh(rig.headPitch, rig.headPitchVel, targetPitch, 8.4, 0.88);
+    [rig.headRoll, rig.headRollVel] = stepFlesh(rig.headRoll, rig.headRollVel, targetRoll, 7.2, 0.88);
+    [rig.headYaw, rig.headYawVel] = stepFlesh(rig.headYaw, rig.headYawVel, targetYaw, 6.8, 0.88);
 
     // Completely hide legacy 3D meshes so they NEVER flicker or conflict with faceCanvas!
     if (this.mouthHappy) this.mouthHappy.visible = false;
@@ -5776,7 +6325,9 @@ export class FiezelMochi {
     }
     this.mood = m;
     this.syncMoodTargets(Boolean(this._instantMood));
-    this.triggerJiggle(0.18);
+    if (!this._instantMood) {
+      this.triggerJiggle(0.18);
+    }
 
     // Dynamic hand emergence matching mood!
     if (m === 'happy' || m === 'gembira') {
@@ -6112,16 +6663,22 @@ export class FiezelMochi {
   update(dt) {
     this.time += dt;
 
-    // 1. Organic Multi-Frequency Floating & Velocity Calculation
+    // 0. Advance Coarticulated Mouth & Speech Prosody FIRST so 3D body, head, cheeks & ears move in 100% unity!
+    this.updateMouthMotion(dt);
+    const rig = this.mouthRig || { open: 0, smile: 0.28, roundness: 0, pucker: 0, bilabial: 0, presence: 0, headPitch: 0, headRoll: 0, headYaw: 0 };
+    const sp = rig.presence || 0;
+
+    // 1. Organic Multi-Frequency Floating + Conversational Speech Buoyancy
     this.floatPos.prevY = this.floatPos.y;
     const baseFloat = Math.sin(this.time * 2.2) * 0.12 + Math.sin(this.time * 4.4) * 0.02 + Math.sin(this.time * 0.8) * 0.01;
+    const speechBuoyancy = sp * ((rig.open || 0) * 0.056 - (rig.bilabial || 0) * 0.022);
     let hopOffset = 0;
     if (this.hopTimer > 0) {
       this.hopTimer -= dt;
       const progress = 1 - Math.max(0, this.hopTimer / 0.65);
       hopOffset = Math.sin(progress * Math.PI) * Math.min(this.hopHeight || 0.30, 0.28);
     }
-    this.floatPos.y = baseFloat + hopOffset;
+    this.floatPos.y = baseFloat * (1.0 - sp * 0.28) + speechBuoyancy + hopOffset;
     this.floatPos.velY = (this.floatPos.y - this.floatPos.prevY) / Math.max(dt, 0.001);
     this.mochiGroup.position.y = this.floatPos.y;
 
@@ -6130,26 +6687,30 @@ export class FiezelMochi {
     this.shadowMesh.scale.set(shadowScale * this.squish.x, shadowScale, 1);
     this.shadowMesh.material.opacity = Math.max(0.35, 0.85 - this.floatPos.y * 1.5);
 
-    // 2. Buttery 3D Rotational Damping
+    // 2. Buttery 3D Rotational Damping + Expressive Conversational Head Pitch / Tilt / Yaw
     this.currentRot.x += (this.targetRot.x - this.currentRot.x) * 0.12;
     this.currentRot.y += (this.targetRot.y - this.currentRot.y) * 0.12;
 
     this.updateAccessoriesMotion(dt);
 
     const hasAccessoryMotion = (this.currentAccessory === 'headset' || this.currentAccessory === 'pencil');
-    const ambientSway = hasAccessoryMotion ? 0 : Math.sin(this.time * 1.8) * 0.035;
+    const ambientSway = hasAccessoryMotion ? 0 : Math.sin(this.time * 1.8) * 0.035 * (1.0 - sp * 0.45);
     const accRotX = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotX) || 0;
     const accRotY = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotY) || 0;
     const accRotZ = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotZ) || 0;
     const accPosY = (this.accessoryMotionOffset && this.accessoryMotionOffset.posY) || 0;
 
-    this.mochiGroup.rotation.x = this.currentRot.x + accRotX;
-    this.mochiGroup.rotation.y = this.currentRot.y + ambientSway + accRotY;
+    const speechPitch = sp * (rig.headPitch || 0);
+    const speechRoll = sp * (rig.headRoll || 0);
+    const speechYaw = sp * (rig.headYaw || 0);
+
+    this.mochiGroup.rotation.x = this.currentRot.x + accRotX + speechPitch;
+    this.mochiGroup.rotation.y = this.currentRot.y + ambientSway + accRotY + speechYaw;
     const desc = this.resolveMoodDescriptor(this.mood);
     this._currentMoodDesc = desc;
     const headTiltTarget = (desc && desc.headTilt) ? desc.headTilt : 0;
     this._currentHeadTilt = (this._currentHeadTilt || 0) + (headTiltTarget - (this._currentHeadTilt || 0)) * Math.min(1, dt * 10);
-    this.mochiGroup.rotation.z = -this.currentRot.y * 0.15 + accRotZ + this._currentHeadTilt;
+    this.mochiGroup.rotation.z = -this.currentRot.y * 0.15 + accRotZ + this._currentHeadTilt + speechRoll;
     this.mochiGroup.position.y = this.floatPos.y + accPosY;
 
     // 2b. Damped Spring Stepping for 3D Skin States & 3D Morph Rig (Horns / Ears / Steam / Empati Paws)
@@ -6194,8 +6755,8 @@ export class FiezelMochi {
       this.applyMorphRigMeshes();
     }
 
-    // 3. Disney 90° Phase Inertia + Damped Harmonic Jiggle
-    const inertialPhase = Math.sin(this.time * 2.2 + Math.PI * 0.5) * 0.045;
+    // 3. Disney 90° Phase Inertia + Damped Harmonic Jiggle + 3D Viscoelastic Speech Jaw Stretch
+    const idleInertial = Math.sin(this.time * 2.2 + Math.PI * 0.5) * 0.045 * (1.0 - sp * 0.48);
 
     // Viscoelastic Jiggle Decay
     let jiggleOffset = 0;
@@ -6211,9 +6772,15 @@ export class FiezelMochi {
     const baseTargetY = isPout ? 0.95 : 1.0;
     const baseTargetZ = isPout ? 1.06 : 1.0;
 
-    this.squish.targetY = baseTargetY + inertialPhase + jiggleOffset;
-    this.squish.targetX = baseTargetX - (inertialPhase + jiggleOffset) * 0.75;
-    this.squish.targetZ = baseTargetZ - (inertialPhase + jiggleOffset) * 0.75;
+    // 3D Daifuku Jaw-Body Coupling: open vowels gently elongate Y while preserving marshmallow volume;
+    // round/pucker vowels ('U', 'O') puff Z-depth forward and narrow X cheeks organically!
+    const jawStretch = sp * ((rig.open || 0) * 0.070 - (rig.pucker || 0) * 0.020 - (rig.bilabial || 0) * 0.028);
+    const cheekWidthMod = sp * (((rig.smile || 0.28) - 0.30) * 0.032 - (rig.roundness || 0) * 0.028);
+    const puckerDepthMod = sp * ((rig.pucker || 0) * 0.038 + (rig.roundness || 0) * 0.024);
+
+    this.squish.targetY = baseTargetY + idleInertial + jiggleOffset + jawStretch;
+    this.squish.targetX = baseTargetX - (idleInertial + jiggleOffset) * 0.75 - jawStretch * 0.52 + cheekWidthMod;
+    this.squish.targetZ = baseTargetZ - (idleInertial + jiggleOffset) * 0.75 - jawStretch * 0.42 + puckerDepthMod;
 
     const k = 0.28;
     const damp = 0.76;
@@ -6240,9 +6807,6 @@ export class FiezelMochi {
 
     // Fox Ears & Cat Tail kinematics and expressive reaction
     this.updateEarsAndTail(dt);
-
-    // Dynamic Mouth Motion (Talking articulation & subtle micro-breathing)
-    this.updateMouthMotion(dt);
 
     // 4. Heart eyes gentle pulse (Frame 11)
     if (this.mood === 'hearts') {
@@ -6765,11 +7329,16 @@ export class FiezelMochi {
       const inertialLagX = Math.max(-0.06, Math.min(0.06, -velY * 0.06));
       const inertialTip = Math.max(-0.10, Math.min(0.10, -velY * 0.08 + squashVel * 0.06));
 
-      targetZ_L += inertialLagZ;
-      targetZ_R -= inertialLagZ;
-      targetX = Math.max(-0.12, Math.min(0.04, targetX + inertialLagX));
-      tipFlexTargetL += inertialTip;
-      tipFlexTargetR += inertialTip;
+      // Subtle conversational fox-ear perk coupled to vowel emphasis!
+      const earSpeechPerk = (this.mouthRig && this.mouthRig.presence)
+        ? this.mouthRig.presence * Math.max(0, (this.mouthRig.open || 0) - 0.15) * 0.052
+        : 0;
+
+      targetZ_L += inertialLagZ - earSpeechPerk * 0.65;
+      targetZ_R -= inertialLagZ - earSpeechPerk * 0.65;
+      targetX = Math.max(-0.12, Math.min(0.04, targetX + inertialLagX + earSpeechPerk * 0.25));
+      tipFlexTargetL += inertialTip + earSpeechPerk * 0.85;
+      tipFlexTargetR += inertialTip + earSpeechPerk * 0.85;
 
       // 2-Stage Damped Harmonic Oscillator (Semi-implicit Symplectic with sub-steps for unconditionally stable physics)
       const springStep = (val, vel, target, k, zeta, minVal, maxVal) => {

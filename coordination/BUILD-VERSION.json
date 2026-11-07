@@ -1,7 +1,7 @@
 {
-  "version": "m025-777",
-  "claimedBy": "branch feat/voice-mobile-mic-translation-m025-777",
-  "claimedAt": "2026-11-07T20:52:14.116Z",
-  "reason": "fix(voice): [ALLOW-PROTECTED: pwa] unblock mobile mic, elevate translation clarity, and dock copilot in-flow (m025-777)",
+  "version": "m025-778",
+  "claimedBy": "branch fix/mochi-natural-speech-motion-m025-778",
+  "claimedAt": "2026-11-07T23:09:46.842Z",
+  "reason": "fix(mascot): unify 3d daifuku viscoelastic speech rig, coarticulated prosody, and whole-body motion",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
