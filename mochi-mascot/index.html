@@ -292,6 +292,13 @@
           <div class="ctrl-label">9 Aksesori 3D Studio & Karakter (Headset, Kacamata, Mahkota, Sensei, dll.)</div>
           <div class="chip-row" id="liveAccessoryChips"></div>
         </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label">Uji Bicara Langsung (Continuous Viscoelastic Speech)</div>
+          <div class="chip-row">
+            <button class="chip-btn" id="btnToggleTalk" style="background:#FFE4E6;border-color:#F43F5E;color:#9F1239;font-weight:800;font-size:13px;padding:8px 18px;">🎙️ Mulai Bicara Alami (Fluid Speech)</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -462,6 +469,24 @@
       });
     }
 
+    const talkBtn = document.getElementById('btnToggleTalk');
+    if (talkBtn) {
+      talkBtn.onclick = () => {
+        liveMochi.setTalking(!liveMochi.isTalking);
+        if (liveMochi.isTalking) {
+          talkBtn.classList.add('active');
+          talkBtn.style.background = '#F43F5E';
+          talkBtn.style.color = '#FFFFFF';
+          talkBtn.textContent = '⏹️ Hentikan Bicara (Sedang Berbicara)';
+        } else {
+          talkBtn.classList.remove('active');
+          talkBtn.style.background = '#FFE4E6';
+          talkBtn.style.color = '#9F1239';
+          talkBtn.textContent = '🎙️ Mulai Bicara Alami (Fluid Speech)';
+        }
+      };
+    }
+
     // 2. Render 3D Snapshots for Board 1 (All 15 Expressions) using an offscreen 3D Mochi renderer
     const snapContainer = document.createElement('div');
     snapContainer.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:300px;height:300px;pointer-events:none;';
@@ -497,6 +522,11 @@
       if (snapMochi.tailGroup) snapMochi.tailGroup.scale.set(1, 1, 1);
       snapMochi.applyMorphRigMeshes();
       if (snapMochi.updatePaws) snapMochi.updatePaws(0.016, true);
+      if (snapMochi.auraBackUniforms) {
+        snapMochi.auraBackUniforms.uTime.value = snapMochi.time;
+        snapMochi.auraBackUniforms.uMarah.value = desc ? (desc.marah || 0) : 0;
+        snapMochi.auraBackUniforms.uFurious.value = desc ? (desc.furious || 0) : 0;
+      }
       snapMochi.renderCurvedFaceAndFx();
       snapMochi.renderer.render(snapMochi.scene, snapMochi.camera);
       return snapMochi.renderer.domElement.toDataURL('image/png');
@@ -686,6 +716,7 @@
       snapMochi.setAccessory(null);
       snapMochi.setMoodInstant('dots');
       snapMochi.setViseme(visemeCode, 0.92);
+      snapMochi.updateMouthMotion(0.25);
       snapMochi.time = 1.15;
       snapMochi.blinkTimer = 0;
       snapMochi.blinkFactor = 0;
@@ -697,6 +728,11 @@
       if (snapMochi.tailGroup) snapMochi.tailGroup.scale.set(1, 1, 1);
       snapMochi.applyMorphRigMeshes();
       if (snapMochi.updatePaws) snapMochi.updatePaws(0.016, true);
+      if (snapMochi.auraBackUniforms) {
+        snapMochi.auraBackUniforms.uTime.value = snapMochi.time;
+        snapMochi.auraBackUniforms.uMarah.value = 0;
+        snapMochi.auraBackUniforms.uFurious.value = 0;
+      }
       snapMochi.renderCurvedFaceAndFx();
       snapMochi.renderer.render(snapMochi.scene, snapMochi.camera);
       return snapMochi.renderer.domElement.toDataURL('image/png');

@@ -342,6 +342,13 @@ export class FiezelMochi {
       steamScale: 0, steamVel: 0,
       empatiPawScale: 0, empatiPawVel: 0
     };
+    // Continuous 3D Parametric Mouth Morph Rig (Viscoelastic Damped Spring Physics, Zero Frame Swapping)
+    this.mouthRig = {
+      open: 0.0, openVel: 0.0,
+      width: 1.0, widthVel: 0.0,
+      roundness: 0.0, roundnessVel: 0.0,
+      tongueY: 0.0, tongueYVel: 0.0
+    };
     // Active Phonetic / Vowel Viseme State (Supports 12 Phonetic + 5 AIUEO x 3 Intensities, 100% Toothless)
     this.activeViseme = options.viseme || null;
     this.visemeIntensity = options.visemeIntensity ?? 1.0;
@@ -1438,73 +1445,14 @@ export class FiezelMochi {
   }
 
   /**
-   * 3D Volumetric Steam Puffs realistically venting out of the ears for Stage 2 'Marah' (Angry).
+   * 3D Ear Steam Group for Stage 2 'Marah' (Angry).
+   * Note: The inner ear canals are kept 100% clean, cute, and unblocked (zero white cauliflower balls inside the ears!).
+   * The signature stylized anime steam puffs float elegantly in the air above each ear via renderFloatingStoryboardFx.
    */
   createEarSteam() {
     this.steamGroup = new THREE.Group();
     this.steamGroup.visible = false;
     this.mochiGroup.add(this.steamGroup);
-
-    const steamMat = new THREE.MeshPhysicalMaterial({
-      color: 0xFFFFFF,
-      roughness: 0.32,
-      metalness: 0.0,
-      clearcoat: 0.15,
-      sheen: 0.85,
-      sheenColor: new THREE.Color(0xF0F4FC),
-      transparent: true,
-      opacity: 0.95
-    });
-
-    const buildSteamSide = (side) => {
-      const g = new THREE.Group();
-      // Positioned emerging directly from the ear canal opening (X = ±0.64, Y = 1.08, Z = 0.38)
-      g.position.set(side * 0.68, 1.18, 0.38);
-      g.rotation.z = -side * 0.35;
-      g.rotation.x = -0.08;
-
-      // 1. Narrow pressurized vapor jet nozzle emerging from ear opening
-      const nozzleGeo = new THREE.ConeGeometry(0.065, 0.24, 18);
-      nozzleGeo.rotateX(Math.PI);
-      const nozzle = new THREE.Mesh(nozzleGeo, steamMat);
-      nozzle.position.set(0, -0.06, 0);
-      g.add(nozzle);
-
-      // 2. Main billowy expanding cloud head
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 24, 20), steamMat);
-      head.position.set(0, 0.16, 0);
-      head.scale.set(1.18, 1.12, 0.90);
-      g.add(head);
-
-      // Flanking cumulus lobes
-      const lobe1 = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 16), steamMat);
-      lobe1.position.set(-side * 0.11, 0.22, 0.04);
-      g.add(lobe1);
-
-      const lobe2 = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 16), steamMat);
-      lobe2.position.set(side * 0.12, 0.20, 0.04);
-      g.add(lobe2);
-
-      const lobe3 = new THREE.Mesh(new THREE.SphereGeometry(0.12, 20, 16), steamMat);
-      lobe3.position.set(0, 0.32, 0.02);
-      g.add(lobe3);
-
-      // Trailing pop wisp droplets
-      const wisp1 = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 12), steamMat);
-      wisp1.position.set(side * 0.16, 0.44, 0.02);
-      g.add(wisp1);
-
-      const wisp2 = new THREE.Mesh(new THREE.SphereGeometry(0.045, 14, 10), steamMat);
-      wisp2.position.set(-side * 0.10, 0.48, 0.02);
-      g.add(wisp2);
-
-      return g;
-    };
-
-    this.steamL = buildSteamSide(-1);
-    this.steamR = buildSteamSide(1);
-    this.steamGroup.add(this.steamL);
-    this.steamGroup.add(this.steamR);
   }
 
   /**
@@ -2907,19 +2855,22 @@ export class FiezelMochi {
     }
 
     // -------------------------------------------------------------------------
-    // 4. MOUTH RENDERER: 100% TOOTHLESS 3D MOCHI MOUTHS & PHONETIC VISEMES
+    // 4. MOUTH RENDERER: CONTINUOUS ORGANIC 3D MOCHI MOUTH MORPH RIG
     // -------------------------------------------------------------------------
     const mouthX = 512 + trembleX * 0.8;
     const mouthY = 482 + trembleY * 0.8;
 
-    if (this.activeViseme) {
+    if (this._isStaticChartRenderer && this.activeViseme) {
+      // For static showcase cards (Board 2 & 3), draw the exact static viseme chart reference
       ctx.save();
       ctx.translate(mouthX, mouthY + 34);
       ctx.scale(1.42, 1.42);
       this.drawMochiVisemeMouth3D(ctx, 0, 0, this.activeViseme, this.visemeIntensity);
       ctx.restore();
     } else {
-      this.drawStoryboardExpressionMouth3D(ctx, mouthX, mouthY, desc.mouthType);
+      // For live speaking and dynamic expressions: continuous viscoelastic parametric deformation (Zero Frame-Swapping!)
+      const rig = this.mouthRig || { open: 0, width: 1.0, roundness: 0, tongueY: 0 };
+      this.drawOrganicMochiMouth3D(ctx, mouthX, mouthY, rig.open, rig.width, rig.roundness, desc.mouthType);
     }
 
     if (this.faceTexture) {
@@ -2930,6 +2881,125 @@ export class FiezelMochi {
     // 5. FLOATING 3D STORYBOARD SYMBOLS OVERLAY (fxCanvas)
     // -------------------------------------------------------------------------
     this.renderFloatingStoryboardFx(desc.fxType);
+  }
+
+  /**
+   * Draws the continuous, viscoelastic 3D Daifuku Mochi mouth for live speaking.
+   * Smoothly morphs from closed cat-smile to wide open oral cavity with pink tongue and zero teeth!
+   */
+  drawOrganicMochiMouth3D(ctx, cx, cy, open, widthScale = 1.0, roundness = 0.0, baseMoodType = 'w') {
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    const kOpen = Math.max(0.0, Math.min(1.0, open));
+    const kW = Math.max(0.65, Math.min(1.45, widthScale));
+    const kRound = Math.max(0.0, Math.min(1.0, roundness));
+
+    // When fully closed (or nearly closed), draw the canonical resting expression mouth
+    if (kOpen < 0.02) {
+      this.drawStoryboardExpressionMouth3D(ctx, 0, 0, baseMoodType);
+      ctx.restore();
+      return;
+    }
+
+    // Geometry of the opening mouth:
+    // Half-width at corners: expands from resting 52px to (52 * kW)
+    const rx = (46 + kOpen * 14) * kW;
+    // Upper lip arch: lifts slightly when open (-2 to -10px)
+    const upperY = -2 - kOpen * 8;
+    // Lower lip drop: descends smoothly with kOpen (reaches up to +54px)
+    const lowerY = 10 + kOpen * 42;
+    // Center dip for cat-lip philtrum: flattens as mouth opens or rounds
+    const philtrumDip = (1.0 - kOpen * 0.7) * (1.0 - kRound * 0.9) * 12;
+
+    // 1. Oral Cavity Interior
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(-rx, 0);
+    if (kRound > 0.4) {
+      // Rounded O/U top
+      ctx.bezierCurveTo(-rx * 0.55, upperY - 4, rx * 0.55, upperY - 4, rx, 0);
+    } else {
+      // Cat-lip philtrum top
+      ctx.bezierCurveTo(-rx * 0.55, upperY + philtrumDip * 0.5, -rx * 0.15, upperY + philtrumDip, 0, upperY + philtrumDip * 0.7);
+      ctx.bezierCurveTo(rx * 0.15, upperY + philtrumDip, rx * 0.55, upperY + philtrumDip * 0.5, rx, 0);
+    }
+    const bowlDepth = lowerY + (kRound > 0.4 ? 6 : 0);
+    ctx.bezierCurveTo(rx * 0.75, bowlDepth, -rx * 0.75, bowlDepth, -rx, 0);
+    ctx.closePath();
+
+    // Deep oral cavity shadow gradient (dark velvet maroon, rich 3D depth)
+    const cavGrad = ctx.createLinearGradient(0, upperY, 0, bowlDepth);
+    cavGrad.addColorStop(0.00, '#360E18'); // Deep shadow beneath upper lip
+    cavGrad.addColorStop(0.55, '#4E1624'); // Rich dark velvet maroon
+    cavGrad.addColorStop(1.00, '#661C2E'); // Warm bottom bounce
+    ctx.fillStyle = cavGrad;
+    ctx.fill();
+
+    // Clip to oral cavity so tongue stays inside
+    ctx.clip();
+
+    // 2. Soft, Plump Rosy Daifuku Tongue (nestled inside the bottom bowl)
+    const tongueY = bowlDepth - (kOpen * 20) + (this.mouthRig ? this.mouthRig.tongueY * 6 : 0);
+    const tongueRadiusX = rx * (0.68 + kRound * 0.12);
+    const tongueRadiusY = (15 + kOpen * 14);
+
+    const tongueGrad = ctx.createRadialGradient(
+      0, tongueY + 2, tongueRadiusX * 0.2,
+      0, tongueY, tongueRadiusX * 1.1
+    );
+    tongueGrad.addColorStop(0.00, '#FFA4BD'); // Soft highlight
+    tongueGrad.addColorStop(0.40, '#FF7597'); // Rosy daifuku pink
+    tongueGrad.addColorStop(0.85, '#E64D73');
+    tongueGrad.addColorStop(1.00, '#C7385D');
+    ctx.fillStyle = tongueGrad;
+    ctx.beginPath();
+    ctx.ellipse(0, tongueY, tongueRadiusX, tongueRadiusY, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Subtle tongue center crease
+    ctx.strokeStyle = 'rgba(180, 40, 70, 0.35)';
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, tongueY - tongueRadiusY * 0.5);
+    ctx.lineTo(0, tongueY + tongueRadiusY * 0.4);
+    ctx.stroke();
+
+    ctx.restore(); // Exit clip
+
+    // 3. Velvety Lip Contour Outline
+    ctx.save();
+    ctx.strokeStyle = '#231216';
+    ctx.lineWidth = 14;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-rx, 0);
+    if (kRound > 0.4) {
+      ctx.bezierCurveTo(-rx * 0.55, upperY - 4, rx * 0.55, upperY - 4, rx, 0);
+    } else {
+      ctx.bezierCurveTo(-rx * 0.55, upperY + philtrumDip * 0.5, -rx * 0.15, upperY + philtrumDip, 0, upperY + philtrumDip * 0.7);
+      ctx.bezierCurveTo(rx * 0.15, upperY + philtrumDip, rx * 0.55, upperY + philtrumDip * 0.5, rx, 0);
+    }
+    ctx.bezierCurveTo(rx * 0.75, bowlDepth, -rx * 0.75, bowlDepth, -rx, 0);
+    ctx.closePath();
+    ctx.stroke();
+
+    // Subtle corner laugh dimples
+    if (kW > 1.08 && kOpen > 0.22) {
+      ctx.strokeStyle = 'rgba(210, 120, 145, 0.45)';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(-rx - 4, upperY * 0.5, 9, Math.PI * 0.6, Math.PI * 1.4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(rx + 4, upperY * 0.5, 9, -Math.PI * 0.4, Math.PI * 0.4);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+    ctx.restore();
   }
 
   /**
@@ -3917,10 +3987,259 @@ export class FiezelMochi {
     const H = 1024;
     ctx.clearRect(0, 0, W, H);
 
-    // User Mandate: "hilangkan api di belakang ini" — eliminate background fire aura completely
-    if (this.auraBackMesh) this.auraBackMesh.visible = false;
-    if (this.auraBackTexture) this.auraBackTexture.needsUpdate = true;
-    return;
+    const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
+    const isFurious = (desc && desc.id === 'sangat_marah') || (this.skinBlend && this.skinBlend.furious > 0.08) || fxType === 'anger_vein_demon';
+    const isMarah = (desc && desc.id === 'marah') || (this.skinBlend && this.skinBlend.marah > 0.08) || fxType === 'anger_marah_fire';
+
+    if (!isFurious && !isMarah) {
+      if (this.auraBackMesh) this.auraBackMesh.visible = false;
+      if (this.auraBackTexture) this.auraBackTexture.needsUpdate = true;
+      return;
+    }
+
+    if (this.auraBackMesh) this.auraBackMesh.visible = true;
+
+    const t = this.time || 1.15;
+
+    // Helper: draw single layered anime flame tongue with fluid organic S-curve
+    const drawAnimeFlameTongue = (cx, baseY, width, height, curl, phase) => {
+      const flickerW = Math.sin(t * 7.2 + phase) * (width * 0.12);
+      const flickerH = Math.cos(t * 6.5 + phase * 1.3) * (height * 0.08);
+      const w = width + flickerW;
+      const h = height + flickerH;
+      const curlOffset = curl * (w * 1.5) + Math.sin(t * 5.8 + phase * 2.1) * (w * 0.35);
+      const tipX = cx + curlOffset;
+      const tipY = baseY - h;
+
+      // 3 Layers: Outer Ruby Red -> Mid Fiery Orange -> Core Yellow-White
+      const layers = [
+        {
+          sw: 1.00, sh: 1.00,
+          grad: () => {
+            const g = ctx.createLinearGradient(cx, baseY, tipX, tipY);
+            g.addColorStop(0.00, 'rgba(239, 68, 68, 0.95)');
+            g.addColorStop(0.45, 'rgba(220, 38, 38, 0.90)');
+            g.addColorStop(0.85, 'rgba(185, 28, 28, 0.75)');
+            g.addColorStop(1.00, 'rgba(153, 27, 27, 0.0)');
+            return g;
+          }
+        },
+        {
+          sw: 0.70, sh: 0.82,
+          grad: () => {
+            const g = ctx.createLinearGradient(cx, baseY, tipX, tipY);
+            g.addColorStop(0.00, 'rgba(255, 140, 0, 0.98)');
+            g.addColorStop(0.50, 'rgba(255, 106, 0, 0.92)');
+            g.addColorStop(0.85, 'rgba(234, 88, 12, 0.70)');
+            g.addColorStop(1.00, 'rgba(194, 65, 12, 0.0)');
+            return g;
+          }
+        },
+        {
+          sw: 0.40, sh: 0.58,
+          grad: () => {
+            const g = ctx.createLinearGradient(cx, baseY, tipX, tipY);
+            g.addColorStop(0.00, 'rgba(255, 255, 255, 1.0)');
+            g.addColorStop(0.35, 'rgba(254, 240, 138, 0.96)');
+            g.addColorStop(0.70, 'rgba(250, 204, 21, 0.85)');
+            g.addColorStop(1.00, 'rgba(245, 158, 11, 0.0)');
+            return g;
+          }
+        }
+      ];
+
+      for (const L of layers) {
+        const lw = w * L.sw;
+        const lh = h * L.sh;
+        const ltX = cx + curlOffset * L.sh;
+        const ltY = baseY - lh;
+        const lmY = baseY - lh * 0.52;
+
+        ctx.fillStyle = L.grad();
+        ctx.beginPath();
+        ctx.moveTo(cx - lw, baseY);
+        ctx.bezierCurveTo(
+          cx - lw * 1.15 + Math.sin(phase + t * 4) * 5, lmY + lh * 0.12,
+          ltX - lw * 0.60, lmY - lh * 0.15,
+          ltX, ltY
+        );
+        ctx.bezierCurveTo(
+          ltX + lw * 0.60, lmY - lh * 0.15,
+          cx + lw * 1.15 + Math.cos(phase + t * 4) * 5, lmY + lh * 0.12,
+          cx + lw, baseY
+        );
+        ctx.closePath();
+        ctx.fill();
+      }
+    };
+
+    if (isFurious) {
+      // Stage 3 Sangat Marah: Towering Demon Inferno behind horns and head!
+      // 1. Massive radiant heat glow bloom
+      const aura = ctx.createRadialGradient(512, 450, 80, 512, 430, 480);
+      aura.addColorStop(0.00, 'rgba(255, 240, 150, 0.72)');
+      aura.addColorStop(0.25, 'rgba(255, 115, 20, 0.58)');
+      aura.addColorStop(0.60, 'rgba(220, 38, 38, 0.38)');
+      aura.addColorStop(0.85, 'rgba(185, 28, 28, 0.18)');
+      aura.addColorStop(1.00, 'rgba(127, 29, 29, 0.0)');
+      ctx.fillStyle = aura;
+      ctx.beginPath();
+      ctx.arc(512, 430, 480, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Left Horn Inferno Column (plumes rising up behind left demon horn)
+      drawAnimeFlameTongue(300, 460, 110, 430, -0.26, 0.0);
+      drawAnimeFlameTongue(230, 510, 95, 360, -0.42, 1.2);
+      drawAnimeFlameTongue(370, 440, 85, 330, -0.10, 2.4);
+
+      // 3. Right Horn Inferno Column (plumes rising up behind right demon horn)
+      drawAnimeFlameTongue(724, 460, 110, 430, 0.26, 0.5);
+      drawAnimeFlameTongue(794, 510, 95, 360, 0.42, 1.7);
+      drawAnimeFlameTongue(654, 440, 85, 330, 0.10, 2.9);
+
+      // 4. Crown Center Inferno (towering flame between horns)
+      drawAnimeFlameTongue(512, 400, 90, 370, 0.04, 3.1);
+      drawAnimeFlameTongue(455, 420, 75, 320, -0.12, 4.2);
+      drawAnimeFlameTongue(569, 420, 75, 320, 0.12, 5.0);
+
+      // 5. Flank Inferno (licking up from lower sides)
+      drawAnimeFlameTongue(150, 640, 95, 280, -0.48, 1.8);
+      drawAnimeFlameTongue(95, 710, 80, 230, -0.58, 2.6);
+      drawAnimeFlameTongue(874, 640, 95, 280, 0.48, 2.1);
+      drawAnimeFlameTongue(929, 710, 80, 230, 0.58, 2.9);
+
+      // 6. Base Ground Scorching Flames
+      for (let bx = 220; bx <= 804; bx += 80) {
+        const h = 130 + Math.sin(bx * 0.1 + t * 5) * 40;
+        drawAnimeFlameTongue(bx, 760, 45, h, (bx - 512) * 0.001, bx * 0.05);
+      }
+
+      // 7. Rising Embers & Sparks (20 sparks floating upwards)
+      for (let i = 0; i < 20; i++) {
+        const seed = i * 47.13;
+        const sx = 120 + ((seed * 19.3) % 784);
+        const rise = ((t * 85 + seed * 31) % 450);
+        const sy = 680 - rise;
+        const sr = 3.5 + (i % 3) * 1.5;
+        const alpha = Math.sin((rise / 450) * Math.PI) * 0.85;
+        ctx.fillStyle = `rgba(255, 235, 120, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (isMarah) {
+      // Stage 2 Marah: Vibrant glowing anime fire aura rising up past shoulders and ears (matching crop_ref_marah_stage2.png)
+      // 1. Radiant luminous heat bloom halo
+      const halo = ctx.createRadialGradient(512, 450, 70, 512, 430, 460);
+      halo.addColorStop(0.00, 'rgba(255, 180, 80, 0.75)');
+      halo.addColorStop(0.28, 'rgba(244, 63, 94, 0.55)');
+      halo.addColorStop(0.60, 'rgba(225, 29, 72, 0.32)');
+      halo.addColorStop(0.85, 'rgba(190, 18, 60, 0.12)');
+      halo.addColorStop(1.00, 'rgba(150, 10, 40, 0.0)');
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(512, 430, 460, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Left Flank & Shoulder Flame Columns (licking up past left ear)
+      drawAnimeFlameTongue(260, 530, 105, 390, -0.30, 0.0);
+      drawAnimeFlameTongue(180, 580, 95, 340, -0.42, 1.2);
+      drawAnimeFlameTongue(340, 480, 85, 330, -0.15, 2.4);
+
+      // 3. Right Flank & Shoulder Flame Columns (licking up past right ear)
+      drawAnimeFlameTongue(764, 530, 105, 390, 0.30, 0.5);
+      drawAnimeFlameTongue(844, 580, 95, 340, 0.42, 1.7);
+      drawAnimeFlameTongue(684, 480, 85, 330, 0.15, 2.9);
+
+      // 4. Center Head Crown Tongues (heat licks rising between the ears)
+      drawAnimeFlameTongue(460, 440, 70, 270, -0.08, 3.8);
+      drawAnimeFlameTongue(564, 440, 70, 270, 0.08, 4.5);
+
+      // 5. Base Ground Scorching Flames
+      for (let bx = 240; bx <= 784; bx += 75) {
+        const h = 110 + Math.sin(bx * 0.1 + t * 4) * 30;
+        drawAnimeFlameTongue(bx, 740, 40, h, (bx - 512) * 0.001, bx * 0.08);
+      }
+
+      // 6. Rising Fiery Sparks & Embers (12 floating sparks)
+      for (let i = 0; i < 12; i++) {
+        const seed = i * 39.41;
+        const sx = 160 + ((seed * 23.7) % 704);
+        const rise = ((t * 70 + seed * 27) % 400);
+        const sy = 640 - rise;
+        const sr = 3.0 + (i % 3) * 1.2;
+        const alpha = Math.sin((rise / 400) * Math.PI) * 0.85;
+        ctx.fillStyle = `rgba(255, 220, 100, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 7. Authentic Anime Smoke Puffs floating in the air ABOVE & BEHIND each ear (matching crop_ref_marah_stage2.png 1:1)
+      const drawAnimeSteamPuff = (cx, cy, dir, sPhase) => {
+        const bobY = Math.sin(t * 4.8 + sPhase) * 6;
+        const px = cx;
+        const py = cy + bobY;
+
+        ctx.save();
+        const grad = ctx.createLinearGradient(px - dir * 28, py - 28, px + dir * 28, py + 28);
+        grad.addColorStop(0.00, '#A0AEC0'); // Soft light slate grey
+        grad.addColorStop(0.50, '#718096'); // Medium slate grey
+        grad.addColorStop(1.00, '#4A5568'); // Deep slate shadow
+        ctx.fillStyle = grad;
+
+        // Draw multi-lobed anime cumulus puff head
+        ctx.beginPath();
+        ctx.arc(px, py, 34, 0, Math.PI * 2);
+        ctx.arc(px - dir * 16, py - 12, 25, 0, Math.PI * 2);
+        ctx.arc(px + dir * 16, py + 10, 23, 0, Math.PI * 2);
+        ctx.arc(px - dir * 8, py + 16, 21, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tapered tail wisp pointing towards ear tip
+        ctx.beginPath();
+        const tailStartX = px + dir * 16;
+        const tailStartY = py + 16;
+        const earTargetX = dir < 0 ? px + 85 : px - 85;
+        const earTargetY = py + 75;
+        ctx.moveTo(px, py + 24);
+        ctx.quadraticCurveTo(tailStartX, tailStartY + 28, earTargetX, earTargetY);
+        ctx.quadraticCurveTo(tailStartX - dir * 14, tailStartY + 18, px - dir * 12, py + 22);
+        ctx.closePath();
+        ctx.fill();
+
+        // Detached trailing wisp droplet (midway between puff and ear)
+        const dropX = dir < 0 ? px + 48 : px - 48;
+        const dropY = py + 46 + Math.sin(t * 5.2 + sPhase) * 3;
+        ctx.beginPath();
+        ctx.ellipse(dropX, dropY, 7, 11, dir * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Crisp White Specular Crescent Glint on top crest (signature anime style)
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 4.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        if (dir < 0) {
+          ctx.arc(px - 16, py - 12, 15, Math.PI * 0.85, Math.PI * 1.55);
+        } else {
+          ctx.arc(px + 16, py - 12, 15, -Math.PI * 0.55, -Math.PI * 0.10);
+        }
+        ctx.stroke();
+
+        ctx.restore();
+      };
+
+      // Left ear floating steam puff (positioned in space behind/above left ear)
+      drawAnimeSteamPuff(230, 215, -1, 0.0);
+
+      // Right ear floating steam puff (positioned in space behind/above right ear)
+      drawAnimeSteamPuff(794, 215, 1, 1.4);
+    }
+
+    if (this.auraBackTexture) {
+      this.auraBackTexture.needsUpdate = true;
+    }
   }
 
   /**
@@ -4033,7 +4352,7 @@ export class FiezelMochi {
       // Tegas / Kesal: Red 💢 on upper-right temple
       drawAngerVein(742, 265, 0.94, false);
     } else if (fxType === 'anger_marah_fire') {
-      // Stage 2 Marah: Red 💢 on upper-right temple (Volumetric steam puffs realistically vent from ear canals via this.steamGroup)
+      // Stage 2 Marah: Red 💢 on upper-right temple (steam puffs & flame aura are rendered BEHIND mascot on auraBackMesh!)
       drawAngerVein(748, 258, 0.96, false);
     } else if (fxType === 'anger_vein_demon') {
       // Stage 3 Sangat Marah: 2 glowing red-orange 💢 symbols on right & left temples (inferno is BEHIND mascot on auraBackMesh!)
@@ -5129,10 +5448,11 @@ export class FiezelMochi {
    *  - Pass `null` to return to the current expression's resting mouth.
    */
   setViseme(code, intensity = 1.0) {
-    this._manualVisemeLock = !!code;
     this.activeViseme = code || null;
     this.visemeIntensity = intensity ?? 1.0;
-    this.renderCurvedFaceAndFx();
+    if (this._isStaticChartRenderer) {
+      this.renderCurvedFaceAndFx();
+    }
   }
 
   updateMouthMotion(dt) {
@@ -5141,128 +5461,140 @@ export class FiezelMochi {
       if (this.talkDuration <= 0) {
         this.isTalking = false;
         this.talkDuration = 0;
-        if (!this._manualVisemeLock) this.activeViseme = null;
+        this.activeViseme = null;
       }
     }
+
+    if (!this.mouthRig) {
+      this.mouthRig = {
+        open: 0.0, openVel: 0.0,
+        width: 1.0, widthVel: 0.0,
+        roundness: 0.0, roundnessVel: 0.0,
+        tongueY: 0.0, tongueYVel: 0.0
+      };
+    }
+
+    // GoPrep Damped Harmonic Spring Stepper for smooth continuous 60fps morphing (zero frame-swapping / zero flicker)
+    const stepSpring = (val, vel, target, omega = 16.0, zeta = 0.72) => {
+      val = Number.isFinite(val) ? val : target;
+      vel = Number.isFinite(vel) ? vel : 0;
+      const sDt = Math.min(dt, 1 / 30);
+      const accel = -omega * omega * (val - target) - 2 * zeta * omega * vel;
+      vel += accel * sDt;
+      val += vel * sDt;
+      if (Math.abs(val - target) < 0.001 && Math.abs(vel) < 0.002) {
+        val = target;
+        vel = 0;
+      }
+      return [val, vel];
+    };
+
+    let targetOpen = 0.0;
+    let targetWidth = 1.0;
+    let targetRound = 0.0;
+    let targetTongue = 0.0;
 
     const hasLiveAnalyser = !!(this.wawaLipsync && this.wawaLipsync.analyser);
 
     if (this.isTalking && hasLiveAnalyser && this.mood !== 'pout' && this.mood !== 'sleepy') {
-      this.talkTimer = (this.talkTimer || 0) + dt;
       const viseme = this.wawaLipsync.processAudio();
       const feat = this.wawaLipsync.features;
-      const vol = feat ? Math.max(0, Math.min(1, feat.volume * 1.9)) : 0;
-      const lerp = Math.min(1, Math.max(0.18, dt * 22));
+      const vol = feat ? Math.max(0, Math.min(1, feat.volume * 1.8)) : 0;
 
-      if (viseme === VISEMES.sil || vol < 0.04) {
-        this.activeViseme = null;
+      if (vol > 0.03 && viseme !== VISEMES.sil) {
+        targetOpen = Math.min(1.0, vol * 1.35 + 0.15);
+        if (viseme === VISEMES.I || viseme === VISEMES.E) {
+          targetWidth = 1.25 + vol * 0.15;
+          targetRound = 0.0;
+          targetTongue = 0.4;
+        } else if (viseme === VISEMES.O || viseme === VISEMES.U || viseme === VISEMES.CH) {
+          targetWidth = 0.78;
+          targetRound = 0.88;
+          targetTongue = -0.2;
+        } else if (viseme === VISEMES.PP || viseme === VISEMES.nn) {
+          targetOpen = 0.0; // Bilabial closure!
+          targetWidth = 0.95;
+          targetRound = 0.0;
+        } else {
+          // Open A / general vowel
+          targetWidth = 1.02;
+          targetRound = 0.12;
+          targetTongue = 0.1;
+        }
       } else {
-        this.activeViseme = viseme;
-        this.visemeIntensity = Math.max(0.28, Math.min(1.0, vol * 1.15));
+        targetOpen = 0.0;
       }
-
-      if (!this._mouthLerp) {
-        this._mouthLerp = { hx: 1, hy: 1, ox: 0.9, oy: 1.15, wx: 1, wy: 1 };
-      }
-      const L = this._mouthLerp;
-
-      if (viseme === VISEMES.aa || viseme === VISEMES.E || viseme === VISEMES.I) {
-        // Open / Mid / Wide Vowel -> mouthHappy
-        const targetHx = viseme === VISEMES.I ? (1.10 + vol * 0.16) : (viseme === VISEMES.E ? (1.02 + vol * 0.14) : (0.94 + vol * 0.18));
-        const targetHy = viseme === VISEMES.aa ? (1.02 + vol * 0.30) : (viseme === VISEMES.E ? (0.86 + vol * 0.22) : (0.68 + vol * 0.16));
-        L.hx += (targetHx - L.hx) * lerp;
-        L.hy += (targetHy - L.hy) * lerp;
-        if (this.mouthHappy) {
-          this.mouthHappy.visible = true;
-          this.mouthHappy.position.y = -0.10 - vol * 0.016;
-          this.mouthHappy.scale.set(L.hx, L.hy, 1.0);
-        }
-        if (this.mouthO) this.mouthO.visible = false;
-        if (this.mouthW) this.mouthW.visible = false;
-      } else if (viseme === VISEMES.O || viseme === VISEMES.U || viseme === VISEMES.CH || viseme === VISEMES.RR) {
-        // Rounded Vowel / Affricate -> mouthO
-        const tight = (viseme === VISEMES.U);
-        const targetOx = tight ? (0.72 + vol * 0.18) : (0.94 + vol * 0.28);
-        const targetOy = tight ? (0.88 + vol * 0.22) : (1.12 + vol * 0.34);
-        L.ox += (targetOx - L.ox) * lerp;
-        L.oy += (targetOy - L.oy) * lerp;
-        if (this.mouthO) {
-          this.mouthO.visible = true;
-          this.mouthO.position.y = -0.10 - vol * 0.010;
-          this.mouthO.scale.set(L.ox, L.oy, 1.0);
-        }
-        if (this.mouthHappy) this.mouthHappy.visible = false;
-        if (this.mouthW) this.mouthW.visible = false;
-      } else {
-        // Bilabial closure (PP), Frics/Stops (FF, SS, TH, DD, kk), Nasal (nn), or micro-pause (sil) -> mouthW
-        const compressed = (viseme === VISEMES.PP || viseme === VISEMES.nn);
-        const targetWx = compressed ? 0.90 : (1.02 + vol * 0.08);
-        const targetWy = compressed ? 0.72 : (0.94 + vol * 0.10);
-        L.wx += (targetWx - L.wx) * lerp;
-        L.wy += (targetWy - L.wy) * lerp;
-        if (this.mouthW) {
-          this.mouthW.visible = true;
-          this.mouthW.position.y = -0.10 - vol * 0.008;
-          this.mouthW.scale.set(L.wx, L.wy, 1.0);
-        }
-        if (this.mouthHappy) this.mouthHappy.visible = false;
-        if (this.mouthO) this.mouthO.visible = false;
-      }
-      return;
-    }
-
-    if (this.isTalking) {
+    } else if (this.isTalking) {
+      // Natural Autonomous Speech Cadence (Calibrated to natural human/anime speech: ~3.4 syllables/sec)
       this.talkTimer = (this.talkTimer || 0) + dt;
-      const syllableWave = Math.sin(this.talkTimer * 14.0) * 0.55 + Math.sin(this.talkTimer * 22.0) * 0.25 + 0.20;
-      const mouthOpen = Math.max(0, Math.min(1.0, syllableWave));
+      const t = this.talkTimer;
 
-      if (!this._manualVisemeLock) {
-        const cycle = ['A', 'I', 'U', 'E', 'O', 'L', 'BMP'];
-        const vIdx = Math.floor(this.talkTimer * 5.2) % cycle.length;
-        this.activeViseme = mouthOpen > 0.18 ? cycle[vIdx] : 'BMP';
-        this.visemeIntensity = Math.max(0.32, mouthOpen);
-      }
+      // Phrasing cycle: 1.6s sentence stream followed by 0.35s breathing micro-pause
+      const sentenceCycle = t % 1.95;
+      const isBreathingPause = sentenceCycle > 1.60;
 
-      if (this.mood !== 'pout' && this.mood !== 'sleepy') {
-        const isOpen = (mouthOpen > 0.35);
-        if (this.mouthHappy) {
-          this.mouthHappy.visible = isOpen;
-          this.mouthHappy.position.y = -0.10 - mouthOpen * 0.015;
-          const hScale = 0.85 + mouthOpen * 0.25;
-          this.mouthHappy.scale.set(hScale, hScale, 1.0);
-        }
-        if (this.mouthW) {
-          this.mouthW.visible = !isOpen;
-          this.mouthW.position.y = -0.10 - mouthOpen * 0.02;
-          this.mouthW.scale.set(1.0, 1.0, 1.0);
-        }
-        if (this.mouthO) {
-          this.mouthO.visible = false;
-        }
+      if (!isBreathingPause) {
+        // Multi-frequency smooth syllable rhythm (3.4 Hz fundamental + 1.7 Hz emphasis)
+        const syl = Math.sin(t * 21.4) * 0.5 + 0.5; // ~3.4 Hz
+        const emphasis = 0.70 + 0.30 * Math.sin(t * 10.7);
+        targetOpen = Math.max(0.08, Math.min(0.88, syl * emphasis));
+
+        // Organic vowel modulation during speech (cycles between wide A/I and round O/U)
+        const vowelFlow = Math.sin(t * 4.2);
+        targetWidth = 1.0 + vowelFlow * 0.22; // 0.78 to 1.22
+        targetRound = Math.max(0.0, -vowelFlow * 0.75);
+        targetTongue = Math.sin(t * 5.5) * 0.40;
       } else {
-        if (this.mouthPout) {
-          this.mouthPout.position.y = -0.11 + Math.sin(this.talkTimer * 12.0) * 0.015;
-        }
+        targetOpen = 0.0;
+        targetWidth = 1.0;
+        targetRound = 0.0;
+        targetTongue = 0.0;
       }
-    } else {
-      if (!this._manualVisemeLock) {
-        this.activeViseme = null;
-      }
-      const breath = Math.sin(this.time * 2.2) * 0.005;
-      if (this.mouthW && (this.mood === 'dots' || this.mood === 'wink')) {
-        this.mouthW.visible = true;
-        this.mouthW.position.y = -0.10 + breath;
-        this.mouthW.scale.set(1.0, 1.0, 1.0);
-      }
-      if (this.mouthHappy) {
-        this.mouthHappy.visible = (this.mood === 'happy');
-        if (this.mood === 'happy') this.mouthHappy.scale.set(1.0, 1.0, 1.0);
-      }
-      if (this.mouthO) {
-        this.mouthO.visible = false;
-        this.mouthO.scale.set(0.9, 1.15, 1.0);
+    } else if (this.activeViseme) {
+      // Smooth continuous morph target for explicit viseme selection (Zero Frame-Swapping!)
+      const k = this.visemeIntensity || 1.0;
+      const code = String(this.activeViseme).toUpperCase();
+      if (code === 'A' || code === 'AA' || code === 'A1' || code === 'A2' || code === 'A3' || code.includes('A,E,I') || code === 'AEI') {
+        targetOpen = Math.min(1.0, 0.45 + k * 0.45); targetWidth = 1.05; targetRound = 0.10; targetTongue = 0.15;
+      } else if (code === 'I' || code === 'I1' || code === 'I2' || code === 'I3' || code === 'EE') {
+        targetOpen = 0.25 + k * 0.35; targetWidth = 1.34; targetRound = 0.0; targetTongue = 0.45;
+      } else if (code === 'U' || code === 'U1' || code === 'U2' || code === 'U3' || code === 'QW') {
+        targetOpen = 0.35 + k * 0.35; targetWidth = 0.72; targetRound = 0.92; targetTongue = -0.25;
+      } else if (code === 'E' || code === 'E1' || code === 'E2' || code === 'E3') {
+        targetOpen = 0.32 + k * 0.36; targetWidth = 1.24; targetRound = 0.0; targetTongue = 0.35;
+      } else if (code === 'O' || code === 'O1' || code === 'O2' || code === 'O3') {
+        targetOpen = 0.50 + k * 0.42; targetWidth = 0.82; targetRound = 0.96; targetTongue = -0.10;
+      } else if (code === 'BMP' || code === 'B,M,P') {
+        targetOpen = 0.0; targetWidth = 0.95; targetRound = 0.0; targetTongue = 0.0;
+      } else if (code.includes('C,D') || code === 'CDNSTXYZ') {
+        targetOpen = 0.28 + k * 0.25; targetWidth = 1.15; targetRound = 0.0; targetTongue = 0.40;
+      } else if (code.includes('G,K') || code === 'GK') {
+        targetOpen = 0.35 + k * 0.30; targetWidth = 1.05; targetRound = 0.15; targetTongue = -0.20;
+      } else if (code === 'L') {
+        targetOpen = 0.38 + k * 0.30; targetWidth = 1.12; targetRound = 0.10; targetTongue = 0.60;
+      } else if (code.includes('F,V') || code === 'FV') {
+        targetOpen = 0.22 + k * 0.22; targetWidth = 1.08; targetRound = 0.05; targetTongue = 0.10;
+      } else if (code === 'TH') {
+        targetOpen = 0.25 + k * 0.25; targetWidth = 1.18; targetRound = 0.0; targetTongue = 0.45;
+      } else if (code.includes('CH,J') || code === 'CHJSH') {
+        targetOpen = 0.32 + k * 0.30; targetWidth = 0.92; targetRound = 0.70; targetTongue = 0.20;
+      } else {
+        targetOpen = 0.35 + k * 0.30; targetWidth = 1.05; targetRound = 0.20; targetTongue = 0.10;
       }
     }
+
+    // Smoothly step all mouth deformation variables at 60 FPS
+    const rig = this.mouthRig;
+    [rig.open, rig.openVel] = stepSpring(rig.open, rig.openVel, targetOpen, 18.0, 0.68);
+    [rig.width, rig.widthVel] = stepSpring(rig.width, rig.widthVel, targetWidth, 16.0, 0.72);
+    [rig.roundness, rig.roundnessVel] = stepSpring(rig.roundness, rig.roundnessVel, targetRound, 16.0, 0.72);
+    [rig.tongueY, rig.tongueYVel] = stepSpring(rig.tongueY, rig.tongueYVel, targetTongue, 15.0, 0.70);
+
+    // Completely hide legacy 3D meshes so they NEVER flicker or conflict with faceCanvas!
+    if (this.mouthHappy) this.mouthHappy.visible = false;
+    if (this.mouthW) this.mouthW.visible = false;
+    if (this.mouthO) this.mouthO.visible = false;
+    if (this.mouthPout) this.mouthPout.visible = false;
   }
 
   updateAccessoriesMotion(dt) {
@@ -5994,6 +6326,13 @@ export class FiezelMochi {
 
     // 9. Particles Update
     this.updateParticles(dt);
+
+    // 9b. Update Living Inferno & Aura Shader Uniforms
+    if (this.auraBackUniforms) {
+      this.auraBackUniforms.uTime.value = this.time;
+      this.auraBackUniforms.uMarah.value = this.skinBlend ? this.skinBlend.marah : (desc ? (desc.marah || 0) : 0);
+      this.auraBackUniforms.uFurious.value = this.skinBlend ? this.skinBlend.furious : (desc ? (desc.furious || 0) : 0);
+    }
 
     // 10. Curved 3D Face Shell & Storyboard FX Redraw
     this.renderCurvedFaceAndFx();
