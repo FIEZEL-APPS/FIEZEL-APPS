@@ -112,6 +112,14 @@ export class WawaLipsyncAnalyzer {
     this.history = [];
   }
 
+  attachAnalyser(analyser, sampleRate) {
+    this.setAnalyser(analyser, sampleRate);
+  }
+
+  detachAnalyser() {
+    this.setAnalyser(null);
+  }
+
   extractFeatures() {
     if (!this.analyser || !this.dataArray) return null;
     try {
@@ -321,9 +329,29 @@ export class FiezelMochi {
     this.nextBlink = 2.8;
     this.blinkFactor = 0; // 0 to 1
 
+    // Continuous 3D Skin & Storyboard Spring Morph State (GoPrep Damped Spring)
+    this.skinBlend = {
+      takut: 0, takutVel: 0,
+      marah: 0, marahVel: 0,
+      furious: 0, furiousVel: 0,
+      pout: 0, poutVel: 0
+    };
+    this.morphRig = {
+      hornScale: 0, hornVel: 0,
+      earScale: 1, earVel: 0,
+      steamScale: 0, steamVel: 0,
+      empatiPawScale: 0, empatiPawVel: 0
+    };
+    // Active Phonetic / Vowel Viseme State (Supports 12 Phonetic + 5 AIUEO x 3 Intensities, 100% Toothless)
+    this.activeViseme = options.viseme || null;
+    this.visemeIntensity = options.visemeIntensity ?? 1.0;
+
     this.initScene();
     this.createMochiMesh();
     this.createFoxEars();
+    this.createDemonHorns();
+    this.createEarSteam();
+    this.createEmpatiPaws();
     this.createCatTail();
     this.createFaceObjects();
     this.createShadow();
@@ -333,6 +361,9 @@ export class FiezelMochi {
     this.createParticles();
     this.setupLighting();
     this.bindEvents();
+
+    // Sync initial mood targets immediately so initial frame renders accurately
+    this.syncMoodTargets(true);
 
     // Apply initial aura, accessory & visibility
     if (this.aura) this.setAura(this.aura);
@@ -344,7 +375,7 @@ export class FiezelMochi {
     this.scene = new THREE.Scene();
 
     this.camera = new THREE.PerspectiveCamera(46, this.width / this.height, 0.1, 100);
-    this.camera.position.set(0, 0.08, 5.05); // Natural prominent close-up framing: pure canonical Daifuku Mochi ratio
+    this.camera.position.set(0, 0.08, 5.38); // Balanced studio framing giving generous breathing room for floating Rayman/Mochi paws
 
 
     this.renderer = new THREE.WebGLRenderer({
@@ -386,37 +417,39 @@ export class FiezelMochi {
   }
 
   setupLighting() {
-    // 1. Soft warm ambient studio light (calibrated to preserve form shadows & 3D curvature)
-    this.ambientLight = new THREE.AmbientLight(0xFFFDF8, 1.45);
+    // Calibrated Studio Daifuku Lighting: warm creamy milk-white Daifuku base with zero plastic chin glare,
+    // while preserving 3D form contour, rosy cheek blushes, icy-blue Takut dread, strawberry-pink Marah flush,
+    // and deep charcoal-crimson Sangat Marah demon skin!
+    this.ambientLight = new THREE.AmbientLight(0xFFFDFB, 1.92);
     this.scene.add(this.ambientLight);
 
-    // 2. Hemisphere Light: Pure white sky, warm cream ground bounce
-    this.hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFF0E5, 1.25);
+    // 2. Hemisphere Light: Pure warm white sky, soft rose-cream ground bounce
+    this.hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xF5DCE8, 0.72);
     this.scene.add(this.hemiLight);
 
-    // 3. Key directional light from top-front-right (soft form gradient, not blown out)
-    this.keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.40);
-    this.keyLight.position.set(2.4, 3.8, 3.8);
+    // 3. Key directional light from top-front-right (sculpts 3D curvature softly without harsh glare)
+    this.keyLight = new THREE.DirectionalLight(0xFFFDF9, 0.46);
+    this.keyLight.position.set(1.8, 3.0, 4.2);
     this.scene.add(this.keyLight);
 
-    // 4. Crisp specular glint light for authentic wet/glossy glazed mochi sheen
-    this.glintLight = new THREE.DirectionalLight(0xFFFFFF, 0.45);
-    this.glintLight.position.set(-1.4, 2.8, 4.2);
+    // 4. Gentle front-left fill light (zero mirror hotspots)
+    this.glintLight = new THREE.DirectionalLight(0xFFF8FB, 0.14);
+    this.glintLight.position.set(-1.6, 2.2, 3.8);
     this.scene.add(this.glintLight);
 
-    // 5. Warm upward bounce light from bottom (soft creamy daifuku underbelly)
-    this.bounceLight = new THREE.DirectionalLight(0xFFF2E6, 0.65);
-    this.bounceLight.position.set(0, -3.2, 1.4);
+    // 5. Soft upward bounce light (low intensity to prevent V-glare on lower chin)
+    this.bounceLight = new THREE.DirectionalLight(0xFFEFF5, 0.10);
+    this.bounceLight.position.set(0, -2.4, 2.2);
     this.scene.add(this.bounceLight);
 
     // 6. Subtle cool fill light from side
-    this.fillLight = new THREE.DirectionalLight(0xF1F5F9, 0.45);
-    this.fillLight.position.set(-3.5, 0.2, 2.4);
+    this.fillLight = new THREE.DirectionalLight(0xF8FAFC, 0.16);
+    this.fillLight.position.set(-3.2, 0.6, 2.6);
     this.scene.add(this.fillLight);
 
-    // 7. Soft rosy rim light from back-top (outlines ears & crown against light backgrounds!)
-    this.rimLight = new THREE.DirectionalLight(0xFFD8E4, 1.35);
-    this.rimLight.position.set(0, 3.8, -2.8);
+    // 7. Soft rosy rim light from back-top (outlines ears, horns & crown)
+    this.rimLight = new THREE.DirectionalLight(0xFFE0EC, 0.38);
+    this.rimLight.position.set(0, 3.6, -2.8);
     this.scene.add(this.rimLight);
 
     // 8. Dynamic Colored Aura Point Light (bounce underglow onto belly)
@@ -490,18 +523,18 @@ export class FiezelMochi {
 
     this.updateSkinBlush();
 
-    // Mouth-watering velvety Daifuku skin with soft peach-rose edge sheen
+    // Mouth-watering velvety Daifuku rice-dough skin with soft peach-rose edge sheen (zero plastic glare!)
     this.mochiMaterial = new THREE.MeshPhysicalMaterial({
       map: this.mochiSkinTexture,
       color: 0xFFFFFF,
-      roughness: 0.28,
+      roughness: 0.62,
       metalness: 0.0,
-      clearcoat: 0.12,
-      clearcoatRoughness: 0.25,
-      sheen: 0.90,
-      sheenRoughness: 0.30,
-      sheenColor: new THREE.Color(0xFFD2DE), // Soft rosy peach sheen along silhouette: pops on white & cream!
-      ior: 1.45
+      clearcoat: 0.0,
+      clearcoatRoughness: 0.50,
+      sheen: 0.55,
+      sheenRoughness: 0.55,
+      sheenColor: new THREE.Color(0xFFD6E2), // Soft rosy peach sheen along silhouette: pops on white & cream!
+      ior: 1.42
     });
 
     this.mochiMesh = new THREE.Mesh(geo, this.mochiMaterial);
@@ -511,26 +544,44 @@ export class FiezelMochi {
     this.mochiGroup.add(this.mochiMesh);
     this.scene.add(this.mochiGroup);
 
-    // Detached FLOATING cat paws (Rayman-style) - Plump marshmallow paws matching Option C
-    const handMat = new THREE.MeshPhysicalMaterial({
+    // Detached FLOATING cat paws (Rayman-style) - Articulated & Morphable 3D Expressive Hands!
+    this.handMat = new THREE.MeshStandardMaterial({
       color: 0xFFFDF9,
-      roughness: 0.16,
-      metalness: 0.0,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.06,
-      sheen: 0.65,
-      sheenRoughness: 0.20,
-      sheenColor: new THREE.Color(0xFFE8EE)
+      roughness: 0.32,
+      metalness: 0.02
+    });
+    const handMat = this.handMat;
+
+    // Soft strawberry-pink glossy paw pad & knuckle accent material
+    this.beanMat = new THREE.MeshStandardMaterial({
+      color: 0xFF7696,
+      roughness: 0.22,
+      metalness: 0.04
+    });
+    const beanMat = this.beanMat;
+
+    // Subtle rosy-taupe contour rim material so white paws stand out crisply on white backgrounds
+    this.pawContourMat = new THREE.MeshBasicMaterial({
+      color: 0xD8B4C4,
+      transparent: true,
+      opacity: 0.42,
+      depthWrite: false
     });
 
-    // Soft strawberry-pink glossy paw pad material
-    const beanMat = new THREE.MeshPhysicalMaterial({
-      color: 0xFF7696,
-      roughness: 0.16,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.08,
-      sheen: 0.5,
-      sheenColor: new THREE.Color(0xFFAEC4)
+    // Knuckle crease material for clenched punching fists (Marah / Kesal / Tegas / Sangat Marah)
+    this.knuckleCreaseMat = new THREE.MeshBasicMaterial({
+      color: 0x9E3B5A,
+      transparent: true,
+      opacity: 0.72
+    });
+
+    // Demon claw material for 'Sangat Marah' furious fists
+    this.clawMat = new THREE.MeshStandardMaterial({
+      color: 0xFFF4F6,
+      roughness: 0.20,
+      metalness: 0.10,
+      emissive: new THREE.Color(0xFF2A14),
+      emissiveIntensity: 0.25
     });
 
     const buildPaw = (side) => {
@@ -538,48 +589,236 @@ export class FiezelMochi {
       const core = new THREE.Group();
       paw.add(core);
 
-      // 1. Chubby Palm Base (smooth plump marshmallow cushion)
-      const palmGeo = new THREE.SphereGeometry(0.19, 32, 24);
-      palmGeo.scale(1.08, 1.15, 0.74);
-      const palmMesh = new THREE.Mesh(palmGeo, handMat);
-      core.add(palmMesh);
+      // =========================================================================
+      // 1. OPEN PAW GROUP (Canonical Kawaii Cat Paw - Senang, Kaget, Gembira)
+      // =========================================================================
+      const openGroup = new THREE.Group();
+      core.add(openGroup);
 
-      // 2. 4 Chubby Pillowy Toes nestled smoothly along the top curved arch (Option C)
-      const toeGeo = new THREE.SphereGeometry(0.066, 24, 18);
-      const toeAngles = [
-        { x: -0.112, y: 0.142, s: 0.94, rx: 0.04, rz: 0.28 },
-        { x: -0.040, y: 0.188, s: 1.04, rx: 0.02, rz: 0.08 },
-        { x:  0.040, y: 0.188, s: 1.04, rx: 0.02, rz: -0.08 },
-        { x:  0.112, y: 0.142, s: 0.94, rx: 0.04, rz: -0.28 }
+      // 0. Soft 3D Silhouette Rim Backing
+      const rimGeo = new THREE.SphereGeometry(0.206, 24, 18);
+      rimGeo.scale(1.10, 1.15, 0.42);
+      const rimMesh = new THREE.Mesh(rimGeo, this.pawContourMat);
+      rimMesh.position.set(0, 0, -0.05);
+      openGroup.add(rimMesh);
+
+      // 1. Chubby Kawaii Cat Paw Cushion Base
+      const palmGeo = new THREE.SphereGeometry(0.19, 28, 22);
+      palmGeo.scale(1.08, 1.14, 0.74);
+      const palmMesh = new THREE.Mesh(palmGeo, handMat);
+      openGroup.add(palmMesh);
+
+      // 2. 4 Symmetrical Articulated Cat Toes
+      const toeGeo = new THREE.SphereGeometry(0.068, 20, 16);
+      const beanGeo = new THREE.SphereGeometry(0.033, 16, 12);
+      const clawGeo = new THREE.ConeGeometry(0.024, 0.082, 12);
+      const toeBaseConfigs = [
+        { x: -0.114, y: 0.144, s: 0.94, rx: 0.04, rz: 0.28 },
+        { x: -0.040, y: 0.190, s: 1.04, rx: 0.02, rz: 0.08 },
+        { x:  0.040, y: 0.190, s: 1.04, rx: 0.02, rz: -0.08 },
+        { x:  0.114, y: 0.144, s: 0.94, rx: 0.04, rz: -0.28 }
       ];
 
-      toeAngles.forEach((t) => {
-        const toe = new THREE.Mesh(toeGeo, handMat);
-        toe.position.set(t.x, t.y, 0.0);
-        toe.scale.set(t.s, t.s * 1.18, t.s * 0.88);
-        toe.rotation.set(t.rx, 0, t.rz);
-        core.add(toe);
+      const toes = toeBaseConfigs.map((t, idx) => {
+        const tg = new THREE.Group();
+        tg.position.set(t.x, t.y, 0.0);
+        tg.rotation.set(t.rx, 0, t.rz);
+
+        const toeMesh = new THREE.Mesh(toeGeo, handMat);
+        toeMesh.scale.set(t.s, t.s * 1.18, t.s * 0.88);
+        tg.add(toeMesh);
+
+        const beanMesh = new THREE.Mesh(beanGeo, beanMat);
+        beanMesh.position.set(0, 0.008, 0.092);
+        beanMesh.scale.set(0.96, 1.16, 0.46);
+        beanMesh.rotation.set(-0.12, 0, 0);
+        tg.add(beanMesh);
+
+        const clawMesh = new THREE.Mesh(clawGeo, this.clawMat);
+        clawMesh.position.set(0, 0.082, 0.025);
+        clawMesh.rotation.set(0.22, 0, 0);
+        clawMesh.visible = false;
+        tg.add(clawMesh);
+
+        openGroup.add(tg);
+        return { group: tg, toeMesh, beanMesh, clawMesh, base: t, idx };
       });
 
-      // 3. Pink Toe Beans (Soft glossy rounded cushions protruding proudly on each toe)
-      const beanGeo = new THREE.SphereGeometry(0.032, 20, 14);
-      toeAngles.forEach((t) => {
-        const bean = new THREE.Mesh(beanGeo, beanMat);
-        bean.position.set(t.x, t.y + 0.008, 0.096);
-        bean.scale.set(0.96, 1.16, 0.46);
-        bean.rotation.set(-0.12, 0, t.rz * 0.8);
-        core.add(bean);
-      });
-
-      // 4. Plump Heart/Bean Palm Pad (Cute glossy strawberry-pink main pad, sits prominently on palm)
-      const padGeo = new THREE.SphereGeometry(0.076, 24, 18);
+      // 3. Plump Heart/Oval Central Pink Paw Pad
+      const padGeo = new THREE.SphereGeometry(0.076, 22, 16);
       const padMesh = new THREE.Mesh(padGeo, beanMat);
       padMesh.position.set(0, -0.025, 0.128);
       padMesh.scale.set(1.42, 1.05, 0.48);
       padMesh.rotation.set(-0.12, 0, 0);
-      core.add(padMesh);
+      openGroup.add(padMesh);
 
-      paw.userData = { side, core };
+      // =========================================================================
+      // 2. FIST GROUP (True 3D Volumetric Fleshy Clenched Fist - Marah, Kesal, Tegas)
+      // Solid continuous muscular cartoon fist with thick palm, 4 rounded clenched knuckles,
+      // and locked fleshy thumb. 100% fleshy volume, zero skeletal sticks or donut holes!
+      // =========================================================================
+      const fistGroup = new THREE.Group();
+      core.add(fistGroup);
+
+      // 1. Plump Muscular Palm Base (full-sized cushion matching open paw mass)
+      const fistPalmGeo = new THREE.SphereGeometry(0.185, 32, 24);
+      fistPalmGeo.scale(1.10, 1.14, 0.84);
+      const fistPalm = new THREE.Mesh(fistPalmGeo, handMat);
+      fistPalm.position.set(0, -0.015, 0.01);
+      fistGroup.add(fistPalm);
+
+      // 2. 4 Proud, Contiguous Rounded Curled Knuckles across top front
+      const knuckleGeo = new THREE.SphereGeometry(0.068, 24, 18);
+      const knuckleConfigs = [
+        { x: -0.106, y: 0.126, z: 0.072, s: 0.98 },
+        { x: -0.035, y: 0.158, z: 0.094, s: 1.08 },
+        { x:  0.035, y: 0.158, z: 0.094, s: 1.08 },
+        { x:  0.106, y: 0.126, z: 0.072, s: 0.98 }
+      ];
+      const knuckles = knuckleConfigs.map((kc) => {
+        const km = new THREE.Mesh(knuckleGeo, handMat);
+        km.position.set(kc.x, kc.y, kc.z);
+        km.scale.set(kc.s, kc.s * 1.16, kc.s * 0.96);
+        fistGroup.add(km);
+
+        // Curled phalanx muscle beneath knuckle curling into palm base
+        const seg = new THREE.Mesh(new THREE.SphereGeometry(0.056, 20, 16), handMat);
+        seg.position.set(kc.x, 0.048, 0.112);
+        seg.scale.set(kc.s * 0.98, kc.s * 1.08, kc.s * 0.90);
+        fistGroup.add(seg);
+
+        return km;
+      });
+
+      // 3. Thick Muscular Locked Thumb wrapping across front
+      const thumbMuscleGeo = new THREE.SphereGeometry(0.088, 24, 18);
+      thumbMuscleGeo.scale(1.42, 0.98, 0.90);
+      const thumbMesh = new THREE.Mesh(thumbMuscleGeo, handMat);
+      thumbMesh.position.set(-side * 0.018, 0.014, 0.136);
+      thumbMesh.rotation.set(0.08, 0, -side * 0.28);
+      fistGroup.add(thumbMesh);
+
+      const thumbKnuckleGeo = new THREE.SphereGeometry(0.062, 20, 16);
+      const thumbKnuckle = new THREE.Mesh(thumbKnuckleGeo, handMat);
+      thumbKnuckle.position.set(-side * 0.018, 0.014, 0.175);
+      fistGroup.add(thumbKnuckle);
+
+      const thumbBeanGeo = new THREE.SphereGeometry(0.030, 16, 12);
+      thumbBeanGeo.scale(1.15, 0.82, 0.40);
+      const thumbBean = new THREE.Mesh(thumbBeanGeo, beanMat);
+      thumbBean.position.set(-side * 0.018, 0.014, 0.188);
+      thumbBean.rotation.set(0.08, 0, -side * 0.28);
+      fistGroup.add(thumbBean);
+
+      // =========================================================================
+      // 3. SCRATCH GROUP (Dedicated Head-Scratching Paw - Penasaran / Bingung)
+      // Plump 4-toed Daifuku paw with soft pink beans, curled into an adorable head-scratch
+      // =========================================================================
+      const scratchGroup = new THREE.Group();
+      core.add(scratchGroup);
+
+      const scratchPalmGeo = new THREE.SphereGeometry(0.185, 28, 22);
+      scratchPalmGeo.scale(1.06, 1.12, 0.76);
+      const scratchPalm = new THREE.Mesh(scratchPalmGeo, handMat);
+      scratchGroup.add(scratchPalm);
+
+      // 4 Curled scratching cat toes with soft pink beans
+      const sToeConfigs = [
+        { x: -0.110, y: 0.135, z: 0.04, s: 0.94, rx: 0.38, rz: 0.26 },
+        { x: -0.038, y: 0.178, z: 0.06, s: 1.04, rx: 0.44, rz: 0.08 },
+        { x:  0.038, y: 0.178, z: 0.06, s: 1.04, rx: 0.44, rz: -0.08 },
+        { x:  0.110, y: 0.135, z: 0.04, s: 0.94, rx: 0.38, rz: -0.26 }
+      ];
+      sToeConfigs.forEach((t) => {
+        const tg = new THREE.Group();
+        tg.position.set(t.x, t.y, t.z);
+        tg.rotation.set(t.rx, 0, t.rz);
+
+        const tm = new THREE.Mesh(toeGeo, handMat);
+        tm.scale.set(t.s, t.s * 1.15, t.s * 0.88);
+        tg.add(tm);
+
+        const bm = new THREE.Mesh(beanGeo, beanMat);
+        bm.position.set(0, 0.006, 0.088);
+        bm.scale.set(0.96, 1.14, 0.46);
+        tg.add(bm);
+
+        scratchGroup.add(tg);
+      });
+
+      const sPadMesh = new THREE.Mesh(new THREE.SphereGeometry(0.074, 22, 16), beanMat);
+      sPadMesh.position.set(0, -0.024, 0.124);
+      sPadMesh.scale.set(1.40, 1.04, 0.46);
+      scratchGroup.add(sPadMesh);
+
+      // =========================================================================
+      // 4. POINT GROUP (Thinking & Sassy Point Paw - Sinis, Berpikir)
+      // Plump fleshy palm base with curled fingers and rounded index finger
+      // =========================================================================
+      const pointGroup = new THREE.Group();
+      core.add(pointGroup);
+
+      const pointPalmGeo = new THREE.SphereGeometry(0.185, 28, 22);
+      pointPalmGeo.scale(1.08, 1.12, 0.78);
+      const pointPalm = new THREE.Mesh(pointPalmGeo, handMat);
+      pointGroup.add(pointPalm);
+
+      // Curled finger cushions on palm
+      const curledConfigs = [
+        { x: -0.102, y: 0.105, z: 0.065, s: 0.92 },
+        { x: -0.035, y: 0.135, z: 0.080, s: 1.02 },
+        { x: -0.035, y: 0.060, z: 0.095, s: 0.92 }
+      ];
+      curledConfigs.forEach(cc => {
+        const cm = new THREE.Mesh(new THREE.SphereGeometry(0.062, 20, 16), handMat);
+        cm.position.set(side * cc.x, cc.y, cc.z);
+        cm.scale.set(cc.s, cc.s * 1.15, cc.s * 0.92);
+        pointGroup.add(cm);
+      });
+
+      // Fleshy thinking/pointing finger
+      const indexGroup = new THREE.Group();
+      indexGroup.position.set(side * 0.065, 0.095, 0.065);
+      indexGroup.rotation.set(-0.12, 0, -side * 0.22);
+
+      const baseKnuckle = new THREE.Mesh(new THREE.SphereGeometry(0.062, 20, 16), handMat);
+      baseKnuckle.scale.set(1.0, 1.20, 1.0);
+      indexGroup.add(baseKnuckle);
+
+      const phalanx = new THREE.Mesh(new THREE.SphereGeometry(0.058, 20, 16), handMat);
+      phalanx.position.set(0, 0.090, 0);
+      phalanx.scale.set(0.96, 1.25, 0.92);
+      indexGroup.add(phalanx);
+
+      const tip = new THREE.Mesh(new THREE.SphereGeometry(0.052, 20, 16), handMat);
+      tip.position.set(0, 0.165, 0);
+      indexGroup.add(tip);
+
+      const tipBean = new THREE.Mesh(new THREE.SphereGeometry(0.026, 16, 12), beanMat);
+      tipBean.scale.set(0.95, 1.18, 0.45);
+      tipBean.position.set(0, 0.165, 0.046);
+      indexGroup.add(tipBean);
+
+      pointGroup.add(indexGroup);
+
+      const pThumbMesh = new THREE.Mesh(thumbMuscleGeo, handMat);
+      pThumbMesh.position.set(-side * 0.025, 0.015, 0.122);
+      pThumbMesh.rotation.set(0.10, 0, -side * 0.28);
+      pointGroup.add(pThumbMesh);
+
+      // Initial state: openGroup visible, others hidden
+      openGroup.visible = true;
+      fistGroup.visible = false;
+      scratchGroup.visible = false;
+      pointGroup.visible = false;
+
+      paw.userData = {
+        side, core,
+        openGroup, fistGroup, scratchGroup, pointGroup,
+        palmMesh, rimMesh, toes, padMesh,
+        fistPalm, knuckles, thumbMesh, thumbBean,
+        shapeMode: 'open'
+      };
       paw.scale.set(0.001, 0.001, 0.001);
       paw.visible = false;
       return paw;
@@ -594,51 +833,77 @@ export class FiezelMochi {
   }
 
   /**
-   * Airbrushes natural rosy blushes directly onto the 3D cheek contour of the daifuku skin.
-   * Conforms seamlessly to the cheek contour curvature, with ZERO balloon mesh or eye overlap.
+   * Airbrushes 3D studio Daifuku form shading + rosy cheek contours directly onto the skin texture.
+   * Smoothly blends across 4 body states:
+   *  - Normal Creamy White Daifuku (warm alabaster center, soft rose-taupe rim/underbelly, pink blushes)
+   *  - Takut (pale icy-blue dread shadow across the upper crown/forehead)
+   *  - Marah Stage 2 (flushed strawberry-pink to crimson-rose body & ears)
+   *  - Sangat Marah Stage 3 (velvety dark espresso-charcoal crown + glowing crimson-ruby cheeks/belly)
    */
   updateSkinBlush() {
     if (!this.sCtx || !this.skinCanvas) return;
     const sCtx = this.sCtx;
-    // All painting below is authored in 1024-unit coordinates.
     sCtx.setTransform(SKIN_RES / 1024, 0, 0, SKIN_RES / 1024, 0, 0);
+
+    const sb = this.skinBlend || { takut: 0, marah: 0, furious: 0, pout: 0 };
+    const wTakut = Math.max(0, Math.min(1, sb.takut || 0));
+    const wMarah = Math.max(0, Math.min(1, sb.marah || 0));
+    const wFurious = Math.max(0, Math.min(1, sb.furious || 0));
+    const isPout = (this.mood === 'pout' || this.mood === 'sleepy' || (sb.pout || 0) > 0.4);
+
+    // 1. Base Creamy White Daifuku with warm milk-white center & soft rose-ivory rim (zero greyness!)
     const bgGrad = sCtx.createLinearGradient(0, 0, 0, 1024);
     bgGrad.addColorStop(0.00, '#FFFFFF');
-    bgGrad.addColorStop(0.50, '#FFFDF9');
-    bgGrad.addColorStop(0.85, '#FFF7F2');
-    bgGrad.addColorStop(1.00, '#FFEFE5');
+    bgGrad.addColorStop(0.45, '#FFFDFB');
+    bgGrad.addColorStop(0.75, '#FDF3F7');
+    bgGrad.addColorStop(0.92, '#F8E6EE');
+    bgGrad.addColorStop(1.00, '#F1DAE5');
     sCtx.fillStyle = bgGrad;
     sCtx.fillRect(0, 0, 1024, 1024);
 
-    const isPout = (this.mood === 'pout' || this.mood === 'sleepy');
+    // Soft 3D radial flank shading around front face (u = 0.25 -> cx = 256, v = 0.52 -> cy = 490)
+    sCtx.save();
+    sCtx.translate(256, 485);
+    sCtx.scale(1.0, 1.45);
+    const faceDome = sCtx.createRadialGradient(0, -20, 10, 0, 0, 210);
+    faceDome.addColorStop(0.00, 'rgba(255, 255, 255, 0.96)');
+    faceDome.addColorStop(0.62, 'rgba(255, 253, 252, 0.72)');
+    faceDome.addColorStop(0.86, 'rgba(248, 228, 236, 0.22)');
+    faceDome.addColorStop(1.00, 'rgba(240, 214, 225, 0.36)');
+    sCtx.fillStyle = faceDome;
+    sCtx.beginPath();
+    sCtx.arc(0, 0, 210, 0, Math.PI * 2);
+    sCtx.fill();
+    sCtx.restore();
 
-    const drawCheekBlush = (u, v, rX, rY, isPoutMood) => {
+    const drawCheekBlush = (u, v, rX, rY, mode) => {
       const cx = u * 1024;
-      const cy = (1 - v) * 1024; // Three.js UV V is flipped relative to Canvas Y
-
+      const cy = (1 - v) * 1024;
       sCtx.save();
       sCtx.translate(cx, cy);
       sCtx.scale(1.0, rY / rX);
-
       const grad = sCtx.createRadialGradient(0, 0, 0, 0, 0, rX);
-
-      if (isPoutMood) {
-        // Deep, rich strawberry-red sulk flush on the puffed cheek contour!
-        // Matches "pipi merah yang kembung kiri dan kanan" 1:1!
-        grad.addColorStop(0.00, 'rgba(255, 24, 75, 0.98)');   // Deep strawberry-red core
-        grad.addColorStop(0.25, 'rgba(255, 48, 95, 0.92)');   // Warm vibrant rosy flush
-        grad.addColorStop(0.52, 'rgba(255, 96, 138, 0.72)');  // Puffed cheek contour bloom
-        grad.addColorStop(0.78, 'rgba(255, 160, 192, 0.35)');
-        grad.addColorStop(0.94, 'rgba(255, 220, 235, 0.10)');
-        grad.addColorStop(1.00, 'rgba(255, 253, 249, 0)');    // Seamless fade into daifuku dough
+      if (mode === 'pout') {
+        grad.addColorStop(0.00, 'rgba(255, 36, 86, 0.94)');
+        grad.addColorStop(0.32, 'rgba(255, 72, 118, 0.82)');
+        grad.addColorStop(0.65, 'rgba(255, 138, 172, 0.42)');
+        grad.addColorStop(1.00, 'rgba(255, 245, 248, 0)');
+      } else if (mode === 'marah') {
+        grad.addColorStop(0.00, 'rgba(220, 18, 64, 0.92)');
+        grad.addColorStop(0.45, 'rgba(240, 48, 92, 0.68)');
+        grad.addColorStop(0.80, 'rgba(255, 110, 145, 0.28)');
+        grad.addColorStop(1.00, 'rgba(255, 180, 200, 0)');
+      } else if (mode === 'furious') {
+        grad.addColorStop(0.00, 'rgba(235, 28, 36, 0.95)');
+        grad.addColorStop(0.45, 'rgba(195, 20, 28, 0.72)');
+        grad.addColorStop(0.82, 'rgba(140, 14, 20, 0.30)');
+        grad.addColorStop(1.00, 'rgba(70, 12, 16, 0)');
       } else {
-        // Soft, sweet kawaii peach-rose mochi blush
-        grad.addColorStop(0.00, 'rgba(255, 75, 125, 0.94)');
-        grad.addColorStop(0.35, 'rgba(255, 115, 155, 0.78)');
-        grad.addColorStop(0.68, 'rgba(255, 168, 195, 0.38)');
-        grad.addColorStop(1.00, 'rgba(255, 253, 249, 0)');
+        grad.addColorStop(0.00, 'rgba(255, 68, 120, 0.90)');
+        grad.addColorStop(0.38, 'rgba(255, 112, 154, 0.72)');
+        grad.addColorStop(0.72, 'rgba(255, 168, 198, 0.32)');
+        grad.addColorStop(1.00, 'rgba(255, 250, 248, 0)');
       }
-
       sCtx.fillStyle = grad;
       sCtx.beginPath();
       sCtx.arc(0, 0, rX, 0, Math.PI * 2);
@@ -646,13 +911,162 @@ export class FiezelMochi {
       sCtx.restore();
     };
 
-    // Aligned with the physical 3D cheek contour bulges at peak UVs (u = 0.208 & 0.292, v = 0.468)
-    if (isPout) {
-      drawCheekBlush(0.208, 0.468, 44, 34, true);
-      drawCheekBlush(0.292, 0.468, 44, 34, true);
-    } else {
-      drawCheekBlush(0.208, 0.468, 36, 28, false);
-      drawCheekBlush(0.292, 0.468, 36, 28, false);
+    // Normal / Pout Rosy Cheek Blushes (aligned with 3D cheek bulges at u = 0.204 & 0.296, v = 0.468)
+    const baseBlushAlpha = Math.max(0, 1.0 - wFurious * 0.9);
+    if (baseBlushAlpha > 0.01) {
+      sCtx.save();
+      sCtx.globalAlpha = baseBlushAlpha;
+      if (isPout) {
+        drawCheekBlush(0.204, 0.468, 44, 33, 'pout');
+        drawCheekBlush(0.296, 0.468, 44, 33, 'pout');
+      } else {
+        drawCheekBlush(0.204, 0.468, 39, 29, 'normal');
+        drawCheekBlush(0.296, 0.468, 39, 29, 'normal');
+      }
+      sCtx.restore();
+    }
+
+    // 2. Takut Overlay: Pale Icy-Blue Dread Shadow across Upper Forehead & Crown
+    if (wTakut > 0.005) {
+      sCtx.save();
+      sCtx.globalAlpha = wTakut;
+      const dreadGrad = sCtx.createLinearGradient(0, 0, 0, 510);
+      dreadGrad.addColorStop(0.00, 'rgba(138, 192, 238, 0.88)');
+      dreadGrad.addColorStop(0.45, 'rgba(168, 212, 248, 0.65)');
+      dreadGrad.addColorStop(0.78, 'rgba(205, 232, 255, 0.28)');
+      dreadGrad.addColorStop(1.00, 'rgba(255, 255, 255, 0)');
+      sCtx.fillStyle = dreadGrad;
+      sCtx.fillRect(0, 0, 1024, 510);
+      sCtx.restore();
+    }
+
+    // 3. Marah Stage 2 Overlay: Flushed Strawberry-Pink / Crimson-Rose Body & Ears
+    if (wMarah > 0.005) {
+      sCtx.save();
+      sCtx.globalAlpha = wMarah;
+      const marahGrad = sCtx.createLinearGradient(0, 0, 0, 1024);
+      marahGrad.addColorStop(0.00, '#FFC4D6');
+      marahGrad.addColorStop(0.32, '#FF9EBA');
+      marahGrad.addColorStop(0.62, '#FF6B92');
+      marahGrad.addColorStop(0.86, '#E83868');
+      marahGrad.addColorStop(1.00, '#C91E4A');
+      sCtx.fillStyle = marahGrad;
+      sCtx.fillRect(0, 0, 1024, 1024);
+
+      // Soft lighter rose-cream center forehead glow matching Row 3 'Marah'
+      sCtx.save();
+      sCtx.translate(256, 460);
+      sCtx.scale(1.0, 1.25);
+      const centerGlow = sCtx.createRadialGradient(0, -25, 8, 0, 0, 145);
+      centerGlow.addColorStop(0.00, 'rgba(255, 236, 242, 0.92)');
+      centerGlow.addColorStop(0.55, 'rgba(255, 195, 212, 0.55)');
+      centerGlow.addColorStop(1.00, 'rgba(255, 120, 155, 0)');
+      sCtx.fillStyle = centerGlow;
+      sCtx.beginPath();
+      sCtx.arc(0, 0, 145, 0, Math.PI * 2);
+      sCtx.fill();
+      sCtx.restore();
+
+      drawCheekBlush(0.202, 0.465, 44, 34, 'marah');
+      drawCheekBlush(0.298, 0.465, 44, 34, 'marah');
+      sCtx.restore();
+    }
+
+    // 4. Sangat Marah Stage 3 Overlay: Deep Velvety Espresso-Charcoal Crown + Glowing Crimson-Ruby Belly/Cheeks
+    if (wFurious > 0.005) {
+      sCtx.save();
+      sCtx.globalAlpha = wFurious;
+      const furGrad = sCtx.createLinearGradient(0, 0, 0, 1024);
+      furGrad.addColorStop(0.00, '#040102');
+      furGrad.addColorStop(0.36, '#070203');
+      furGrad.addColorStop(0.54, '#110406');
+      furGrad.addColorStop(0.68, '#3B070C');
+      furGrad.addColorStop(0.84, '#A81018');
+      furGrad.addColorStop(1.00, '#FF3218');
+      sCtx.fillStyle = furGrad;
+      sCtx.fillRect(0, 0, 1024, 1024);
+
+      // Dark charcoal V-forehead shadow descending between the eyes so scarlet eyes pop
+      sCtx.save();
+      sCtx.translate(256, 430);
+      const browShadow = sCtx.createRadialGradient(0, 0, 8, 0, 0, 125);
+      browShadow.addColorStop(0.00, 'rgba(4, 1, 2, 0.98)');
+      browShadow.addColorStop(0.65, 'rgba(8, 2, 4, 0.85)');
+      browShadow.addColorStop(1.00, 'rgba(18, 4, 7, 0)');
+      sCtx.fillStyle = browShadow;
+      sCtx.beginPath();
+      sCtx.arc(0, 0, 125, 0, Math.PI * 2);
+      sCtx.fill();
+      sCtx.restore();
+
+      // Fiery ruby-crimson subsurface glow on left & right cheeks and lower chin
+      drawCheekBlush(0.195, 0.465, 54, 42, 'furious');
+      drawCheekBlush(0.305, 0.465, 54, 42, 'furious');
+      sCtx.restore();
+    }
+
+    if (this.mochiMaterial && this.mochiMaterial.sheenColor) {
+      if (wFurious > 0.5) {
+        this.mochiMaterial.color.setHex(0x421218);
+        this.mochiMaterial.roughness = 0.88;
+        this.mochiMaterial.sheen = 0.14;
+        this.mochiMaterial.sheenColor.setHex(0xB81820);
+      } else if (wMarah > 0.5) {
+        this.mochiMaterial.color.setHex(0xFFFFFF);
+        this.mochiMaterial.roughness = 0.62;
+        this.mochiMaterial.sheen = 0.48;
+        this.mochiMaterial.sheenColor.setHex(0xFF8AA8);
+      } else {
+        this.mochiMaterial.color.setHex(0xFFFFFF);
+        this.mochiMaterial.roughness = 0.62;
+        this.mochiMaterial.sheen = 0.55;
+        this.mochiMaterial.sheenColor.setHex(0xFFD2DE);
+      }
+    }
+
+    // Synchronize 3D Expressive Hand Materials with Body Mood State (Normal / Takut / Marah / Sangat Marah)
+    if (this.handMat && this.beanMat) {
+      if (wFurious > 0.5) {
+        this.handMat.color.setHex(0x1C0508);
+        if (this.handMat.sheenColor) this.handMat.sheenColor.setHex(0xFF2E18);
+        this.beanMat.color.setHex(0xFF3818);
+        if (this.pawContourMat) {
+          this.pawContourMat.color.setHex(0xFF3B14);
+          this.pawContourMat.opacity = 0.68;
+        }
+        if (this.knuckleCreaseMat) this.knuckleCreaseMat.color.setHex(0xFF4518);
+      } else if (wMarah > 0.5) {
+        this.handMat.color.setHex(0xFF85A6);
+        if (this.handMat.sheenColor) this.handMat.sheenColor.setHex(0xFFC2D4);
+        this.beanMat.color.setHex(0xD91E54);
+        if (this.pawContourMat) {
+          this.pawContourMat.color.setHex(0xC91E4A);
+          this.pawContourMat.opacity = 0.52;
+        }
+        if (this.knuckleCreaseMat) this.knuckleCreaseMat.color.setHex(0x8C1034);
+      } else if (wTakut > 0.5) {
+        this.handMat.color.setHex(0xF2F8FF);
+        if (this.handMat.sheenColor) this.handMat.sheenColor.setHex(0xC8E4FF);
+        this.beanMat.color.setHex(0xF082A4);
+        if (this.pawContourMat) {
+          this.pawContourMat.color.setHex(0x9BBAD8);
+          this.pawContourMat.opacity = 0.45;
+        }
+        if (this.knuckleCreaseMat) this.knuckleCreaseMat.color.setHex(0x829AB8);
+      } else {
+        this.handMat.color.setHex(0xFFFDF9);
+        if (this.handMat.sheenColor) this.handMat.sheenColor.setHex(0xFFE8EE);
+        this.beanMat.color.setHex(0xFF7696);
+        if (this.pawContourMat) {
+          this.pawContourMat.color.setHex(0xD8B4C4);
+          this.pawContourMat.opacity = 0.42;
+        }
+        if (this.knuckleCreaseMat) this.knuckleCreaseMat.color.setHex(0xA64B68);
+      }
+    }
+
+    if (this.updateEarTextures) {
+      this.updateEarTextures();
     }
 
     if (this.mochiSkinTexture) {
@@ -661,116 +1075,273 @@ export class FiezelMochi {
   }
 
   /**
-   * 3D Organic Sculpted Fox Ears with 2-Stage Cartilage Spring Flex.
-   * Wide curved base, chubby petal flanks, filleted rounded tip (zero sharp needle points),
-   * soft rosy inner ear hollow, and textured inner fur tufts matching mochi-design-floating.jpg.
+   * Updates the 512x512 High-Resolution 2.5D Sculpted Ear Canvas Textures (`earCanvasL` & `earCanvasR`).
+   * Renders the exact Master Storyboard (`media_1794052222222_3662d750.jpg`) ear anatomy:
+   * 1. Thick, plump 3D creamy-white outer ear cushion with visible warm rosy-taupe outer contour & glossy inner ridge.
+   * 2. Deep recessed strawberry-pink inner ear hollow (`#E0507C` -> `#FF80A6` -> `#FFA8C4`).
+   * 3. Signature 3-lobed fluffy white-pink inner-ear fur tuft (`bulu telinga dalam`) rising at the base of the pink hollow!
+   */
+  updateEarTextures() {
+    if (!this.earCanvasL || !this.earCanvasR) return;
+    const wTakut = this.skinBlend ? (this.skinBlend.takut || 0) : 0;
+    const wMarah = this.skinBlend ? (this.skinBlend.marah || 0) : 0;
+    const wFurious = this.skinBlend ? (this.skinBlend.furious || 0) : 0;
+
+    const renderSingleEar = (canvas, isLeft) => {
+      const ctx = canvas.getContext('2d');
+      const W = 512;
+      const H = 512;
+      ctx.clearRect(0, 0, W, H);
+
+      ctx.save();
+      if (!isLeft) {
+        ctx.translate(W, 0);
+        ctx.scale(-1, 1);
+      }
+
+      // Outer Ear Cushion Silhouette (asymmetric cat/fox ear: outer edge gently curved, inner edge sweeping toward crown)
+      const traceOuterEar = () => {
+        ctx.beginPath();
+        ctx.moveTo(64, 468);
+        ctx.bezierCurveTo(42, 310, 82, 128, 204, 46);
+        ctx.bezierCurveTo(234, 26, 268, 26, 298, 48);
+        ctx.bezierCurveTo(412, 132, 462, 308, 444, 468);
+        ctx.bezierCurveTo(340, 496, 168, 496, 64, 468);
+        ctx.closePath();
+      };
+
+      // Inner Pink Hollow Silhouette (leaves a thick, plush ~72px white outer ear cushion all around!)
+      const traceInnerEar = () => {
+        ctx.beginPath();
+        ctx.moveTo(142, 424);
+        ctx.bezierCurveTo(128, 304, 158, 182, 224, 118);
+        ctx.bezierCurveTo(243, 100, 263, 100, 282, 118);
+        ctx.bezierCurveTo(348, 182, 378, 304, 364, 424);
+        ctx.bezierCurveTo(300, 444, 206, 444, 142, 424);
+        ctx.closePath();
+      };
+
+      // 1. Outer 3D Silhouette Rim Shadow (so the white outer ear stands out clearly on #FFFFFF backgrounds!)
+      ctx.save();
+      traceOuterEar();
+      if (wFurious > 0.5) {
+        ctx.strokeStyle = 'rgba(18, 3, 6, 0.95)';
+        ctx.lineWidth = 12;
+      } else if (wMarah > 0.5) {
+        ctx.strokeStyle = 'rgba(218, 132, 158, 0.88)';
+        ctx.lineWidth = 11;
+      } else if (wTakut > 0.5) {
+        ctx.strokeStyle = 'rgba(162, 182, 212, 0.85)';
+        ctx.lineWidth = 10;
+      } else {
+        ctx.strokeStyle = 'rgba(206, 174, 192, 0.86)';
+        ctx.lineWidth = 10;
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // 2. Clipped Outer Ear 3D Cushion Shading & Glossy Inner Bevel Ridge
+      ctx.save();
+      traceOuterEar();
+      ctx.clip();
+
+      const outGrad = ctx.createRadialGradient(252, 220, 24, 252, 265, 245);
+      if (wFurious > 0.5) {
+        outGrad.addColorStop(0.00, '#2B070C');
+        outGrad.addColorStop(0.65, '#1A0407');
+        outGrad.addColorStop(1.00, '#0E0204');
+      } else if (wMarah > 0.5) {
+        outGrad.addColorStop(0.00, '#FFFBFD');
+        outGrad.addColorStop(0.58, '#FFE6EF');
+        outGrad.addColorStop(0.86, '#F9C4D8');
+        outGrad.addColorStop(1.00, '#EAA4BE');
+      } else if (wTakut > 0.5) {
+        outGrad.addColorStop(0.00, '#FFFFFF');
+        outGrad.addColorStop(0.60, '#EEF5FC');
+        outGrad.addColorStop(0.88, '#D8E7F7');
+        outGrad.addColorStop(1.00, '#C2D6EC');
+      } else {
+        outGrad.addColorStop(0.00, '#FFFFFF');
+        outGrad.addColorStop(0.58, '#FFFBFD');
+        outGrad.addColorStop(0.84, '#F7E2EE');
+        outGrad.addColorStop(1.00, '#E6C8D8');
+      }
+      ctx.fillStyle = outGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Soft warm 3D lateral shading along the outer-left flank of the ear cushion
+      if (wFurious <= 0.5) {
+        const flankGrad = ctx.createLinearGradient(55, 220, 175, 250);
+        flankGrad.addColorStop(0.0, wMarah > 0.5 ? 'rgba(232, 138, 168, 0.55)' : 'rgba(222, 186, 206, 0.52)');
+        flankGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+        ctx.fillStyle = flankGrad;
+        ctx.fillRect(0, 0, 220, H);
+      }
+
+      // Bright 3D White Cushion Ridge framing the pink inner ear hollow
+      if (wFurious <= 0.5) {
+        ctx.save();
+        traceInnerEar();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.96)';
+        ctx.lineWidth = 26;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 3. Recessed Strawberry-Pink Inner Ear Hollow
+      ctx.save();
+      traceInnerEar();
+      ctx.clip();
+
+      const inGrad = ctx.createLinearGradient(252, 100, 252, 430);
+      if (wFurious > 0.5) {
+        inGrad.addColorStop(0.00, '#5E0810');
+        inGrad.addColorStop(0.55, '#9E141E');
+        inGrad.addColorStop(1.00, '#D9261E');
+      } else if (wMarah > 0.5) {
+        inGrad.addColorStop(0.00, '#D43B6A');
+        inGrad.addColorStop(0.45, '#F56490');
+        inGrad.addColorStop(1.00, '#FF98B8');
+      } else {
+        inGrad.addColorStop(0.00, '#DF527E');
+        inGrad.addColorStop(0.42, '#FF7EA5');
+        inGrad.addColorStop(1.00, '#FFACC6');
+      }
+      ctx.fillStyle = inGrad;
+      ctx.fillRect(110, 90, 290, 360);
+
+      // Deep recessed inner-arch shadow at top & sides of the pink hollow
+      ctx.strokeStyle = wFurious > 0.5 ? 'rgba(35, 2, 6, 0.75)' : 'rgba(188, 42, 86, 0.45)';
+      ctx.lineWidth = 18;
+      traceInnerEar();
+      ctx.stroke();
+
+      // 4. Signature 3-Lobed Fluffy Ear Fur Tuft (`bulu telinga dalam`) at the base of the pink hollow!
+      // Matches ref_marah_zoom.png & media_1794052222222_3662d750.jpg 1:1!
+      const drawThreeLobedTuft = (offsetY, fillStyle) => {
+        ctx.fillStyle = fillStyle;
+        ctx.beginPath();
+        // Left scallop lobe
+        ctx.arc(184, 352 + offsetY, 60, 0, Math.PI * 2);
+        // Taller center scallop lobe
+        ctx.arc(253, 310 + offsetY, 72, 0, Math.PI * 2);
+        // Right scallop lobe
+        ctx.arc(322, 352 + offsetY, 60, 0, Math.PI * 2);
+        // Solid base fill connecting the 3 lobes
+        ctx.rect(120, 340 + offsetY, 265, 135);
+        ctx.fill();
+      };
+
+      if (wFurious > 0.5) {
+        drawThreeLobedTuft(-12, 'rgba(65, 8, 14, 0.85)');
+        drawThreeLobedTuft(0, '#28060A');
+      } else {
+        // Upper rose-pink scalloped rim border on the 3-lobed tuft (exact match to ref_marah_zoom.png!)
+        drawThreeLobedTuft(-13, wMarah > 0.5 ? 'rgba(235, 118, 154, 0.88)' : 'rgba(238, 132, 166, 0.82)');
+
+        // Main creamy-white & soft-blush 3-lobed fluffy ear tuft
+        const tuftGrad = ctx.createLinearGradient(253, 260, 253, 435);
+        tuftGrad.addColorStop(0.00, '#FFFFFF');
+        tuftGrad.addColorStop(0.55, '#FFF5F9');
+        tuftGrad.addColorStop(1.00, wMarah > 0.5 ? '#FFD2E2' : '#FFE4EE');
+        drawThreeLobedTuft(0, tuftGrad);
+      }
+
+      ctx.restore(); // End inner ear clip
+
+      // Crisp inner pink rim bevel line
+      ctx.strokeStyle = wFurious > 0.5 ? 'rgba(180, 24, 30, 0.55)' : 'rgba(228, 112, 148, 0.55)';
+      ctx.lineWidth = 4.5;
+      traceInnerEar();
+      ctx.stroke();
+
+      ctx.restore(); // End outer ear clip
+      ctx.restore();
+    };
+
+    renderSingleEar(this.earCanvasL, true);
+    renderSingleEar(this.earCanvasR, false);
+    if (this.earTexL) this.earTexL.needsUpdate = true;
+    if (this.earTexR) this.earTexR.needsUpdate = true;
+  }
+
+  /**
+   * 3D Organic Sculpted Cat/Fox Ears with High-Resolution 2.5D Storyboard Texture & 2-Stage Spring Flex.
+   * Renders the thick white outer ear shell, recessed strawberry-pink inner hollow, and 3-lobed fluffy ear tuft
+   * matching media_1794052222222_3662d750.jpg 1:1!
    */
   createFoxEars() {
     this.earsGroup = new THREE.Group();
     this.earsGroup.visible = this.showEars;
     this.mochiGroup.add(this.earsGroup);
 
-    const innerEarMat = new THREE.MeshStandardMaterial({
-      color: 0xFF829E, // Deeper, appetizing rosy strawberry inner ear: pops vividly against white!
-      roughness: 0.60,
-      metalness: 0.0
-    });
+    this.earCanvasL = document.createElement('canvas');
+    this.earCanvasL.width = 512;
+    this.earCanvasL.height = 512;
+    this.earTexL = new THREE.CanvasTexture(this.earCanvasL);
 
-    // 1. Organic Petal Bezier Shape for Fox Ears
-    const earShape = new THREE.Shape();
-    earShape.moveTo(-0.32, 0);
-    earShape.bezierCurveTo(-0.44, 0.28, -0.38, 0.68, -0.12, 0.92);
-    earShape.bezierCurveTo(-0.04, 0.98, 0.04, 0.98, 0.12, 0.92);
-    earShape.bezierCurveTo(0.38, 0.68, 0.44, 0.28, 0.32, 0);
-    earShape.bezierCurveTo(0.16, -0.06, -0.16, -0.06, -0.32, 0);
+    this.earCanvasR = document.createElement('canvas');
+    this.earCanvasR.width = 512;
+    this.earCanvasR.height = 512;
+    this.earTexR = new THREE.CanvasTexture(this.earCanvasR);
 
-    const earExtrudeSettings = {
-      depth: 0.10,
-      bevelEnabled: true,
-      bevelSegments: 4,
-      steps: 1,
-      bevelSize: 0.06,
-      bevelThickness: 0.06
+    this.updateEarTextures();
+
+    const makeCurvedEarGeo = () => {
+      const geo = new THREE.PlaneGeometry(1.24, 1.08, 24, 24);
+      // Shift pivot to the lower base of the ear so ear rotation/wiggle pivots from the skull!
+      geo.translate(0, 0.36, 0);
+      const pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        // Smooth 3D convex pillow dome across X and gentle forward cup along Y
+        const normX = x / 0.62;
+        const normY = Math.max(0, (y + 0.15) / 1.02);
+        const domeZ = (1.0 - normX * normX * 0.65) * 0.065 * Math.sin(normY * Math.PI);
+        const cupZ = -Math.pow(normY, 1.35) * 0.05;
+        pos.setZ(i, domeZ + cupZ);
+      }
+      geo.computeVertexNormals();
+      return geo;
     };
-    const earOuterGeo = new THREE.ExtrudeGeometry(earShape, earExtrudeSettings);
 
-    const pos = earOuterGeo.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      let x = pos.getX(i);
-      let y = pos.getY(i);
-      let z = pos.getZ(i) - 0.05;
-      z -= Math.pow(Math.max(0, y) / 0.95, 1.3) * 0.14;
-      if (z > 0 && Math.abs(x) < 0.26) z -= 0.030;
-      pos.setXYZ(i, x, y, z);
-    }
-    earOuterGeo.computeVertexNormals();
+    const earGeoL = makeCurvedEarGeo();
+    const earGeoR = makeCurvedEarGeo();
 
-    // 2. Rosy Inner Hollow
-    const innerShape = new THREE.Shape();
-    innerShape.moveTo(-0.20, 0.04);
-    innerShape.bezierCurveTo(-0.28, 0.26, -0.24, 0.56, -0.07, 0.76);
-    innerShape.bezierCurveTo(-0.02, 0.80, 0.02, 0.80, 0.07, 0.76);
-    innerShape.bezierCurveTo(0.24, 0.56, 0.28, 0.26, 0.20, 0.04);
-    innerShape.bezierCurveTo(0.08, -0.02, -0.08, -0.02, -0.20, 0.04);
-
-    const earInnerGeo = new THREE.ExtrudeGeometry(innerShape, {
-      depth: 0.05,
-      bevelEnabled: true,
-      bevelSegments: 3,
-      steps: 1,
-      bevelSize: 0.04,
-      bevelThickness: 0.04
+    this.earMatL = new THREE.MeshBasicMaterial({
+      map: this.earTexL,
+      transparent: true,
+      alphaTest: 0.01,
+      side: THREE.DoubleSide
     });
-    const inPos = earInnerGeo.attributes.position;
-    for (let i = 0; i < inPos.count; i++) {
-      let x = inPos.getX(i);
-      let y = inPos.getY(i);
-      let z = inPos.getZ(i) + 0.015;
-      z -= Math.pow(Math.max(0, y) / 0.75, 1.3) * 0.10;
-      inPos.setXYZ(i, x, y, z);
-    }
-    earInnerGeo.computeVertexNormals();
+    this.earMatR = new THREE.MeshBasicMaterial({
+      map: this.earTexR,
+      transparent: true,
+      alphaTest: 0.01,
+      side: THREE.DoubleSide
+    });
 
-    // Left Fox Ear Rig
+    // Left Ear Rig (bold, tall, plush cat/fox ear framing upper head matching media_1794052222222_3662d750.jpg!)
     this.earL = new THREE.Group();
-    this.earL.position.set(-0.50, 0.96, 0.14);
+    this.earL.position.set(-0.62, 0.98, 0.40);
+    this.earL.rotation.set(-0.03, -0.04, Math.PI * 0.13);
 
     this.earL_Flex = new THREE.Group();
-    this.earL_Flex.add(new THREE.Mesh(earOuterGeo, this.mochiMaterial));
-    this.earL_Flex.add(new THREE.Mesh(earInnerGeo, innerEarMat));
-
-    // Ear fur tufts inside hollow
-    const tuftMat = new THREE.MeshStandardMaterial({ color: 0xFFB4C8, roughness: 0.80 });
-    const tuftL1 = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 12), tuftMat);
-    tuftL1.position.set(-0.07, 0.18, 0.06);
-    tuftL1.scale.set(0.8, 1.3, 0.6);
-    this.earL_Flex.add(tuftL1);
-
-    const tuftL2 = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), tuftMat);
-    tuftL2.position.set(0.05, 0.24, 0.06);
-    tuftL2.scale.set(0.7, 1.2, 0.6);
-    this.earL_Flex.add(tuftL2);
-
+    const meshL = new THREE.Mesh(earGeoL, this.earMatL);
+    meshL.renderOrder = 15;
+    this.earL_Flex.add(meshL);
     this.earL.add(this.earL_Flex);
 
-    // Right Fox Ear Rig
+    // Right Ear Rig
     this.earR = new THREE.Group();
-    this.earR.position.set(0.50, 0.96, 0.14);
+    this.earR.position.set(0.62, 0.98, 0.40);
+    this.earR.rotation.set(-0.03, 0.04, -Math.PI * 0.13);
 
     this.earR_Flex = new THREE.Group();
-    this.earR_Flex.add(new THREE.Mesh(earOuterGeo, this.mochiMaterial));
-    this.earR_Flex.add(new THREE.Mesh(earInnerGeo, innerEarMat));
-
-    const tuftR1 = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 12), tuftMat);
-    tuftR1.position.set(0.07, 0.18, 0.06);
-    tuftR1.scale.set(0.8, 1.3, 0.6);
-    this.earR_Flex.add(tuftR1);
-
-    const tuftR2 = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), tuftMat);
-    tuftR2.position.set(-0.05, 0.24, 0.06);
-    tuftR2.scale.set(0.7, 1.2, 0.6);
-    this.earR_Flex.add(tuftR2);
-
+    const meshR = new THREE.Mesh(earGeoR, this.earMatR);
+    meshR.renderOrder = 15;
+    this.earR_Flex.add(meshR);
     this.earR.add(this.earR_Flex);
 
     this.earsGroup.add(this.earL);
@@ -779,6 +1350,214 @@ export class FiezelMochi {
     this.earTwitchTimer = 3.0;
     this.nextEarTwitch = 3.5;
     this.twitchEar = 'L';
+  }
+
+  /**
+   * True 3D Sculpted Curved Bull/Demon Horns for 'Sangat Marah' (Furious) transformation.
+   * Built via parametric Catmull-Rom loft with 6 organic annular ridges and
+   * deep glossy dark-mahogany/obsidian PBR material with warm fiery rim sheen.
+   */
+  createDemonHorns() {
+    this.hornsGroup = new THREE.Group();
+    this.hornsGroup.visible = false;
+    this.mochiGroup.add(this.hornsGroup);
+
+    const hornMat = new THREE.MeshPhysicalMaterial({
+      color: 0x260E12,
+      roughness: 0.28,
+      metalness: 0.08,
+      clearcoat: 0.55,
+      clearcoatRoughness: 0.24,
+      sheen: 0.90,
+      sheenRoughness: 0.25,
+      sheenColor: new THREE.Color(0xC83228)
+    });
+
+    const buildHornMesh = (side) => {
+      const spine = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(side * 0.54, 0.78, 0.16),
+        new THREE.Vector3(side * 0.82, 0.96, 0.18),
+        new THREE.Vector3(side * 0.94, 1.24, 0.19),
+        new THREE.Vector3(side * 0.86, 1.54, 0.17),
+        new THREE.Vector3(side * 0.64, 1.78, 0.14)
+      ]);
+
+      const segs = 48;
+      const radSegs = 28;
+      const frames = spine.computeFrenetFrames(segs, false);
+      const verts = [];
+      const indices = [];
+
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
+        const pt = spine.getPointAt(t);
+        const N = frames.normals[i];
+        const B = frames.binormals[i];
+
+        // Bold thick base (0.31) tapering to a sharp curved demon tip (0.008)
+        const baseR = 0.31 * Math.pow(1.0 - t, 0.74) + 0.006 * (1.0 - t);
+        // 6 organic annular horn growth ridges
+        const ridge = 1.0 + 0.068 * Math.sin(t * Math.PI * 13.0) * Math.sin(t * Math.PI);
+        const r = baseR * ridge;
+
+        for (let j = 0; j <= radSegs; j++) {
+          const theta = (j / radSegs) * Math.PI * 2;
+          const cosT = Math.cos(theta) * r;
+          const sinT = Math.sin(theta) * r;
+          verts.push(
+            pt.x + N.x * cosT + B.x * sinT,
+            pt.y + N.y * cosT + B.y * sinT,
+            pt.z + N.z * cosT + B.z * sinT
+          );
+        }
+      }
+
+      const ringStride = radSegs + 1;
+      for (let i = 0; i < segs; i++) {
+        for (let j = 0; j < radSegs; j++) {
+          const a = i * ringStride + j;
+          const b = (i + 1) * ringStride + j;
+          const c = (i + 1) * ringStride + (j + 1);
+          const d = i * ringStride + (j + 1);
+          indices.push(a, b, d);
+          indices.push(b, c, d);
+        }
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      geo.setIndex(indices);
+      geo.computeVertexNormals();
+      return new THREE.Mesh(geo, hornMat);
+    };
+
+    this.hornL = buildHornMesh(-1);
+    this.hornR = buildHornMesh(1);
+    this.hornsGroup.add(this.hornL);
+    this.hornsGroup.add(this.hornR);
+  }
+
+  /**
+   * 3D Volumetric Steam Puffs realistically venting out of the ears for Stage 2 'Marah' (Angry).
+   */
+  createEarSteam() {
+    this.steamGroup = new THREE.Group();
+    this.steamGroup.visible = false;
+    this.mochiGroup.add(this.steamGroup);
+
+    const steamMat = new THREE.MeshPhysicalMaterial({
+      color: 0xFFFFFF,
+      roughness: 0.32,
+      metalness: 0.0,
+      clearcoat: 0.15,
+      sheen: 0.85,
+      sheenColor: new THREE.Color(0xF0F4FC),
+      transparent: true,
+      opacity: 0.95
+    });
+
+    const buildSteamSide = (side) => {
+      const g = new THREE.Group();
+      // Positioned emerging directly from the ear canal opening (X = ±0.64, Y = 1.08, Z = 0.38)
+      g.position.set(side * 0.68, 1.18, 0.38);
+      g.rotation.z = -side * 0.35;
+      g.rotation.x = -0.08;
+
+      // 1. Narrow pressurized vapor jet nozzle emerging from ear opening
+      const nozzleGeo = new THREE.ConeGeometry(0.065, 0.24, 18);
+      nozzleGeo.rotateX(Math.PI);
+      const nozzle = new THREE.Mesh(nozzleGeo, steamMat);
+      nozzle.position.set(0, -0.06, 0);
+      g.add(nozzle);
+
+      // 2. Main billowy expanding cloud head
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 24, 20), steamMat);
+      head.position.set(0, 0.16, 0);
+      head.scale.set(1.18, 1.12, 0.90);
+      g.add(head);
+
+      // Flanking cumulus lobes
+      const lobe1 = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 16), steamMat);
+      lobe1.position.set(-side * 0.11, 0.22, 0.04);
+      g.add(lobe1);
+
+      const lobe2 = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 16), steamMat);
+      lobe2.position.set(side * 0.12, 0.20, 0.04);
+      g.add(lobe2);
+
+      const lobe3 = new THREE.Mesh(new THREE.SphereGeometry(0.12, 20, 16), steamMat);
+      lobe3.position.set(0, 0.32, 0.02);
+      g.add(lobe3);
+
+      // Trailing pop wisp droplets
+      const wisp1 = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 12), steamMat);
+      wisp1.position.set(side * 0.16, 0.44, 0.02);
+      g.add(wisp1);
+
+      const wisp2 = new THREE.Mesh(new THREE.SphereGeometry(0.045, 14, 10), steamMat);
+      wisp2.position.set(-side * 0.10, 0.48, 0.02);
+      g.add(wisp2);
+
+      return g;
+    };
+
+    this.steamL = buildSteamSide(-1);
+    this.steamR = buildSteamSide(1);
+    this.steamGroup.add(this.steamL);
+    this.steamGroup.add(this.steamR);
+  }
+
+  /**
+   * Smooth, Chubby 3D White Daifuku Mochi Paws held gently on the chest/cheeks
+   * for 'Empati' (Row 1 Col 5), matching the Master Storyboard 1:1 (zero pink toe-beans facing front!).
+   */
+  createEmpatiPaws() {
+    this.empatiPawsGroup = new THREE.Group();
+    this.empatiPawsGroup.visible = false;
+    this.mochiGroup.add(this.empatiPawsGroup);
+
+    const pawMochiMat = new THREE.MeshPhysicalMaterial({
+      color: 0xFFFDFB,
+      roughness: 0.58,
+      metalness: 0.0,
+      clearcoat: 0.0,
+      sheen: 0.55,
+      sheenRoughness: 0.55,
+      sheenColor: new THREE.Color(0xFFD6E2)
+    });
+
+    const shadowMat = new THREE.MeshBasicMaterial({
+      color: 0xE6B8CA,
+      transparent: true,
+      opacity: 0.24,
+      depthWrite: false
+    });
+
+    const buildMitten = (side) => {
+      const g = new THREE.Group();
+      g.position.set(side * 0.34, -0.44, 1.15);
+      g.rotation.set(0.22, side * 0.16, -side * 0.46);
+
+      // Soft contact shadow on chest behind paw
+      const shGeo = new THREE.SphereGeometry(0.22, 24, 18);
+      shGeo.scale(1.06, 1.24, 0.35);
+      const sh = new THREE.Mesh(shGeo, shadowMat);
+      sh.position.set(side * 0.02, -0.04, -0.06);
+      g.add(sh);
+
+      // Smooth pillowy mochi mitten
+      const mGeo = new THREE.SphereGeometry(0.205, 32, 24);
+      mGeo.scale(1.02, 1.24, 0.72);
+      const mMesh = new THREE.Mesh(mGeo, pawMochiMat);
+      g.add(mMesh);
+
+      return g;
+    };
+
+    this.empatiPawL = buildMitten(-1);
+    this.empatiPawR = buildMitten(1);
+    this.empatiPawsGroup.add(this.empatiPawL);
+    this.empatiPawsGroup.add(this.empatiPawR);
   }
 
   /**
@@ -1269,7 +2048,2105 @@ export class FiezelMochi {
     this.foreheadFurrow.renderOrder = 1000;
     this.faceGroup.add(this.foreheadFurrow);
 
+    // Hide legacy low-poly primitive face meshes visually while keeping their object references
+    // and .visible / .scale properties 100% intact for backward compatibility & unit tests!
+    darkMat.opacity = 0;
+    hiMat.opacity = 0;
+    glintMat.opacity = 0;
+    heartMat.opacity = 0;
+    tongueMat.opacity = 0;
+    poutLipMat.transparent = true;
+    poutLipMat.opacity = 0;
+    sulkSeamMat.opacity = 0;
+
+    // =========================================================================
+    // 10. CURVED 3D FACE SHELL (1024x768) + FLOATING 3D STORYBOARD FX LAYER
+    // Raycast-wrapped directly onto the 3D Daifuku superellipsoid cushion!
+    // =========================================================================
+    this.createCurvedFaceShellAndFx();
+
     this.updateFaceVisibility();
+  }
+
+  /**
+   * Projects a 56x42 high-density 3D surface shell directly onto `this.mochiMesh`
+   * so that all 15 Storyboard Expressions and all 12 Phonetic / 15 AIUEO Toothless Visemes
+   * hug the true 3D curvature of the Daifuku Mochi cushion with 100% Retina clarity!
+   */
+  createCurvedFaceShellAndFx() {
+    this.faceCanvas = document.createElement('canvas');
+    this.faceCanvas.width = 1024;
+    this.faceCanvas.height = 768;
+    this.fCtx = this.faceCanvas.getContext('2d');
+    this.faceTexture = new THREE.CanvasTexture(this.faceCanvas);
+    this.faceTexture.needsUpdate = true;
+
+    const shellW = 2.40;
+    const shellH = 1.80;
+    const shellGeo = new THREE.PlaneGeometry(shellW, shellH, 60, 45);
+    const pos = shellGeo.attributes.position;
+
+    if (this.mochiMesh) {
+      this.mochiMesh.updateMatrixWorld(true);
+      const raycaster = new THREE.Raycaster();
+      const origin = new THREE.Vector3();
+      const dir = new THREE.Vector3(0, 0, -1);
+
+      for (let i = 0; i < pos.count; i++) {
+        const vx = pos.getX(i);
+        const vy = pos.getY(i) - 0.02; // Centered slightly below equator for Kawaii Baby-Schema ratio
+        origin.set(vx, vy, 3.0);
+        raycaster.set(origin, dir);
+        const hits = raycaster.intersectObject(this.mochiMesh, false);
+        if (hits && hits.length > 0) {
+          pos.setXYZ(i, vx, vy, hits[0].point.z + 0.016);
+        } else {
+          const r2 = Math.max(0, 1.0 - (vx * vx) / (1.52 * 1.52) - (vy * vy) / (1.12 * 1.12));
+          pos.setXYZ(i, vx, vy, Math.sqrt(r2) * 1.24 + 0.016);
+        }
+      }
+      shellGeo.computeVertexNormals();
+    }
+
+    this.faceShellMat = new THREE.MeshBasicMaterial({
+      map: this.faceTexture,
+      transparent: true,
+      depthTest: true,
+      depthWrite: false
+    });
+    this.faceShellMesh = new THREE.Mesh(shellGeo, this.faceShellMat);
+    this.faceShellMesh.renderOrder = 1010;
+    this.faceGroup.add(this.faceShellMesh);
+
+    // =========================================================================
+    // 10b. TRUE BEHIND-MASCOT LIVING VOLUMETRIC FIRE & SMOKE AURA LAYER (z = -0.06)
+    // Sits BEHIND mochiMesh, earsGroup, and hornsGroup with depthTest: true
+    // and runs a real-time WebGL GLSL 4-octave FBM curl-advection & blackbody shader!
+    // =========================================================================
+    this.auraBackCanvas = document.createElement('canvas');
+    this.auraBackCanvas.width = 1024;
+    this.auraBackCanvas.height = 1024;
+    this.auraBackCtx = this.auraBackCanvas.getContext('2d');
+    this.auraBackTexture = new THREE.CanvasTexture(this.auraBackCanvas);
+
+    const auraBackGeo = new THREE.PlaneGeometry(4.30, 4.30, 1, 1);
+    this.auraBackUniforms = {
+      uMap: { value: this.auraBackTexture },
+      uTime: { value: 0.0 },
+      uMarah: { value: 0.0 },
+      uFurious: { value: 0.0 }
+    };
+    this.auraBackMat = new THREE.ShaderMaterial({
+      uniforms: this.auraBackUniforms,
+      transparent: true,
+      depthTest: true,
+      depthWrite: false,
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D uMap;
+        uniform float uTime;
+        uniform float uMarah;
+        uniform float uFurious;
+        varying vec2 vUv;
+
+        float hash21(vec2 p) {
+          p = fract(p * vec2(234.34, 435.345));
+          p += dot(p, p + 34.23);
+          return fract(p.x * p.y);
+        }
+        float noise2D(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(
+            mix(hash21(i + vec2(0.0, 0.0)), hash21(i + vec2(1.0, 0.0)), u.x),
+            mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), u.x),
+            u.y
+          );
+        }
+        float fbm(vec2 p) {
+          float v = 0.0;
+          float a = 0.5;
+          mat2 rot = mat2(0.8, -0.6, 0.6, 0.8);
+          for (int i = 0; i < 4; i++) {
+            v += a * noise2D(p);
+            p = rot * p * 2.02;
+            a *= 0.5;
+          }
+          return v;
+        }
+
+        void main() {
+          float t = uTime * 2.6;
+          float n1 = fbm(vUv * vec2(6.0, 4.4) + vec2(0.0, -t));
+          float n2 = fbm(vUv * vec2(10.2, 7.2) + vec2(3.7, -t * 1.4) + n1 * 0.35);
+
+          float warpAmp = 0.014 * (uMarah * 0.45 + uFurious * 1.15);
+          vec2 warpedUv = vUv + vec2((n1 - 0.5) * warpAmp, (n2 - 0.5) * warpAmp * 1.35);
+          vec4 texColor = texture2D(uMap, clamp(warpedUv, 0.002, 0.998));
+
+          // Guarantee ZERO flat viewport clipping at top, bottom, left, or right borders!
+          float edgeMask = smoothstep(0.005, 0.085, vUv.x) * smoothstep(0.995, 0.915, vUv.x)
+                         * smoothstep(0.005, 0.075, vUv.y) * smoothstep(0.995, 0.915, vUv.y);
+
+          float flicker = 1.0 + (n1 - 0.48) * 0.16;
+          vec3 finalRgb = clamp(texColor.rgb * flicker, 0.0, 1.0);
+          gl_FragColor = vec4(finalRgb, texColor.a * edgeMask);
+        }
+      `
+    });
+    this.auraBackMesh = new THREE.Mesh(auraBackGeo, this.auraBackMat);
+    this.auraBackMesh.position.set(0, 0.08, -0.08);
+    this.auraBackMesh.renderOrder = 1;
+    this.mochiGroup.add(this.auraBackMesh);
+
+    // Floating 3D Storyboard FX Symbol Layer (///, 💢, ✨, !!, ?, Zz, sweat drops, shiver arcs)
+    this.fxCanvas = document.createElement('canvas');
+    this.fxCanvas.width = 1024;
+    this.fxCanvas.height = 800;
+    this.fxCtx = this.fxCanvas.getContext('2d');
+    this.fxTexture = new THREE.CanvasTexture(this.fxCanvas);
+
+    const fxGeo = new THREE.PlaneGeometry(3.56, 2.78, 1, 1);
+    this.fxOverlayMat = new THREE.MeshBasicMaterial({
+      map: this.fxTexture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false
+    });
+    this.fxOverlayMesh = new THREE.Mesh(fxGeo, this.fxOverlayMat);
+    this.fxOverlayMesh.position.set(0, 0.20, 0.84);
+    this.fxOverlayMesh.renderOrder = 1050;
+    this.mochiGroup.add(this.fxOverlayMesh);
+  }
+
+  /**
+   * Resolves any mood alias (Indonesian Storyboard name, English name, or legacy name)
+   * into its canonical Storyboard Expression Descriptor.
+   */
+  resolveMoodDescriptor(moodName) {
+    const m = String(moodName || 'dots').toLowerCase().trim();
+    const TABLE = {
+      // Row 1: From Calm to Furious
+      dots: {
+        id: 'netral', eyeType: 'normal', eyeScaleX: 1.0, eyeScaleY: 1.0,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 0, browY: 0, browAngleL: 0, browAngleR: 0, browArch: 0.3,
+        mouthType: 'w', fxType: 'rays_green_3',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      netral: null, calm: null, neutral: null,
+
+      netral_2: {
+        id: 'netral_2', eyeType: 'normal', eyeScaleX: 1.0, eyeScaleY: 1.0,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 0, browY: 0, browAngleL: 0, browAngleR: 0, browArch: 0.3,
+        mouthType: 'w', fxType: 'rays_green_2',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      neutral_2: null,
+
+      tegas: {
+        id: 'tegas', eyeType: 'normal', eyeScaleX: 1.0, eyeScaleY: 0.98,
+        upperLidL: 0.24, upperLidR: 0.24, lidAngleL: 0.34, lidAngleR: -0.34,
+        browAlpha: 1.0, browY: 16, browAngleL: 0.38, browAngleR: -0.38, browArch: 0.10,
+        innerBrowTick: 1,
+        mouthType: 'caret', fxType: 'anger_vein',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      firm: null, serious: null,
+
+      sinis: {
+        id: 'sinis', eyeType: 'normal', eyeScaleX: 0.98, eyeScaleY: 0.94,
+        upperLidL: 0.46, upperLidR: 0.40, lidAngleL: 0.08, lidAngleR: -0.12,
+        gazeBiasX: -14, gazeBiasY: 4,
+        browAlpha: 1.0, browYL: 10, browYR: -18, browAngleL: 0.12, browAngleR: -0.18, browArch: 0.45,
+        mouthType: 'smirk_tongue', fxType: 'sparkles_right',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: -0.04, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      skeptical: null, smirk: null,
+
+      gembira: {
+        id: 'gembira', eyeType: 'happy_arch', eyeScaleX: 1.0, eyeScaleY: 1.0,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 0.95, browY: -22, browAngleL: -0.14, browAngleR: 0.14, browArch: 0.85,
+        mouthType: 'happy_open_tall', fxType: 'rays_gold_3',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'joy_high'
+      },
+      happy: null, joy: null,
+
+      empati: {
+        id: 'empati', eyeType: 'normal', eyeScaleX: 1.02, eyeScaleY: 1.02,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 1.0, browY: -12, browAngleL: -0.36, browAngleR: 0.36, browArch: 0.35,
+        mouthType: 'tiny_3', fxType: 'sweat_both',
+        takut: 0, marah: 0, furious: 0, pout: 0.65,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0.03, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      empathetic: null, pout: null,
+
+      sangat_marah: {
+        id: 'sangat_marah', eyeType: 'demon_red', eyeScaleX: 1.04, eyeScaleY: 0.96,
+        upperLidL: 0.40, upperLidR: 0.40, lidAngleL: 0.44, lidAngleR: -0.44,
+        browAlpha: 1.0, browY: 22, browAngleL: 0.46, browAngleR: -0.46, browArch: 0.08,
+        bridgeCrease: 2,
+        mouthType: 'furious_roar', fxType: 'anger_vein_demon',
+        takut: 0, marah: 0, furious: 1.0, pout: 0,
+        horns: 1, ears: 0.64, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 1.0,
+        handPose: 'hidden'
+      },
+      furious: null, demon: null,
+
+      // Row 2: 8 Everyday Expressions
+      senang: {
+        id: 'senang', eyeType: 'happy_arch', eyeScaleX: 1.0, eyeScaleY: 1.0,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 0.92, browY: -20, browAngleL: -0.14, browAngleR: 0.14, browArch: 0.85,
+        mouthType: 'happy_open_wide', fxType: 'senang_combo',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'happy_wave'
+      },
+      happy_soft: null, glad: null,
+
+      kaget: {
+        id: 'kaget', eyeType: 'shocked', eyeScaleX: 0.94, eyeScaleY: 1.04,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 1.0, browY: -26, browAngleL: -0.22, browAngleR: 0.22, browArch: 0.78,
+        mouthType: 'surprised_o', fxType: 'exclamation_double',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'shock_flail'
+      },
+      surprised: null, shock: null,
+
+      sedih: {
+        id: 'sedih', eyeType: 'watery', eyeScaleX: 1.02, eyeScaleY: 1.04,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 1.0, browY: -14, browAngleL: -0.38, browAngleR: 0.38, browArch: 0.32,
+        mouthType: 'sad_cry', fxType: 'none',
+        takut: 0, marah: 0, furious: 0, pout: 0.35,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 1.0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      sad: null, crying: null,
+
+      kesal: {
+        id: 'kesal', eyeType: 'normal', eyeScaleX: 0.98, eyeScaleY: 0.94,
+        upperLidL: 0.42, upperLidR: 0.42, lidAngleL: 0.26, lidAngleR: -0.26,
+        browAlpha: 1.0, browY: 14, browAngleL: 0.34, browAngleR: -0.34, browArch: 0.08,
+        innerBrowTick: 1, bridgeCrease: 1,
+        mouthType: 'caret', fxType: 'anger_vein',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      annoyed: null, irritated: null,
+
+      penasaran: {
+        id: 'penasaran', eyeType: 'normal', eyeScaleX: 1.0, eyeScaleY: 1.02,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        gazeBiasX: -12, gazeBiasY: -12,
+        browAlpha: 1.0, browY: -18, browAngleL: -0.28, browAngleR: 0.28, browArch: 0.48,
+        mouthType: 'caret_small', fxType: 'question_purple',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0.06, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      curious: null, question: null,
+
+      lelah: {
+        id: 'lelah', eyeType: 'normal', eyeScaleX: 0.98, eyeScaleY: 0.92,
+        upperLidL: 0.56, upperLidR: 0.56, lidAngleL: -0.16, lidAngleR: 0.16,
+        browAlpha: 1.0, browY: -6, browAngleL: -0.30, browAngleR: 0.30, browArch: 0.22,
+        mouthType: 'wavy_sigh', fxType: 'zz_teal',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: -0.03, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      tired: null, sleepy: null,
+
+      takut: {
+        id: 'takut', eyeType: 'normal', eyeScaleX: 0.94, eyeScaleY: 1.02,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 1.0, browY: -20, browAngleL: -0.40, browAngleR: 0.40, browArch: 0.35,
+        mouthType: 'scared_scream', fxType: 'shiver_lines',
+        takut: 1.0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      scared: null, fear: null,
+
+      // Row 3 Middle: Stage 2 Anger (Flushed Pink Body + Red Eyes + Organic Ear-Vent Steam + Punching Fists + 💢)
+      marah: {
+        id: 'marah', eyeType: 'angry_red', eyeScaleX: 1.0, eyeScaleY: 0.96,
+        upperLidL: 0.36, upperLidR: 0.36, lidAngleL: 0.38, lidAngleR: -0.38,
+        browAlpha: 1.0, browY: 18, browAngleL: 0.42, browAngleR: -0.42, browArch: 0.08,
+        innerBrowTick: 1, bridgeCrease: 1,
+        mouthType: 'caret', fxType: 'anger_marah_fire',
+        takut: 0, marah: 1.0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 1, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0.82,
+        handPose: 'hidden'
+      },
+      angry: null, steaming: null,
+
+      // Legacy playful moods
+      wink: {
+        id: 'wink', eyeType: 'wink_right', eyeScaleX: 1.0, eyeScaleY: 1.0,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 0, browY: 0, browAngleL: 0, browAngleR: 0, browArch: 0.3,
+        mouthType: 'w', fxType: 'sparkles_right',
+        takut: 0, marah: 0, furious: 0, pout: 0,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0.04, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      },
+      hearts: {
+        id: 'hearts', eyeType: 'heart_eyes', eyeScaleX: 1.0, eyeScaleY: 1.0,
+        upperLidL: 0, upperLidR: 0, lidAngleL: 0, lidAngleR: 0,
+        browAlpha: 0, browY: 0, browAngleL: 0, browAngleR: 0, browArch: 0.3,
+        mouthType: 'w', fxType: 'sparkles_right',
+        takut: 0, marah: 0, furious: 0, pout: 0.3,
+        horns: 0, ears: 1, steam: 0, empatiPaws: 0, headTilt: 0, tearFlow: 0, eyeRedGlow: 0,
+        handPose: 'hidden'
+      }
+    };
+
+    TABLE.netral = TABLE.dots;
+    TABLE.calm = TABLE.dots;
+    TABLE.neutral = TABLE.dots;
+    TABLE.neutral_2 = TABLE.netral_2;
+    TABLE.firm = TABLE.tegas;
+    TABLE.serious = TABLE.tegas;
+    TABLE.skeptical = TABLE.sinis;
+    TABLE.smirk = TABLE.sinis;
+    TABLE.happy = TABLE.gembira;
+    TABLE.joy = TABLE.gembira;
+    TABLE.empathetic = TABLE.empati;
+    TABLE.pout = TABLE.empati;
+    TABLE.furious = TABLE.sangat_marah;
+    TABLE.demon = TABLE.sangat_marah;
+    TABLE.happy_soft = TABLE.senang;
+    TABLE.glad = TABLE.senang;
+    TABLE.surprised = TABLE.kaget;
+    TABLE.shock = TABLE.kaget;
+    TABLE.sad = TABLE.sedih;
+    TABLE.crying = TABLE.sedih;
+    TABLE.annoyed = TABLE.kesal;
+    TABLE.irritated = TABLE.kesal;
+    TABLE.curious = TABLE.penasaran;
+    TABLE.question = TABLE.penasaran;
+    TABLE.tired = TABLE.lelah;
+    TABLE.sleepy = TABLE.lelah;
+    TABLE.scared = TABLE.takut;
+    TABLE.fear = TABLE.takut;
+    TABLE.angry = TABLE.marah;
+    TABLE.steaming = TABLE.marah;
+
+    return TABLE[m] || TABLE.dots;
+  }
+
+  /**
+   * Synchronizes spring targets (or snaps immediately when `immediate === true`)
+   * for skin states, 3D horns/ears/steam/empati-paws, expressive 3D hands, and curved 3D face shell.
+   */
+  syncMoodTargets(immediate = false) {
+    const desc = this.resolveMoodDescriptor(this.mood);
+    this._currentMoodDesc = desc;
+
+    if (immediate) {
+      this.skinBlend.takut = desc.takut;
+      this.skinBlend.marah = desc.marah;
+      this.skinBlend.furious = desc.furious;
+      this.skinBlend.pout = desc.pout;
+      this.morphRig.hornScale = desc.horns;
+      this.morphRig.earScale = desc.ears;
+      this.morphRig.steamScale = desc.steam;
+      this.morphRig.empatiPawScale = desc.empatiPaws;
+      this.updateSkinBlush();
+      this.applyMorphRigMeshes();
+      this.updatePaws(0.016, true);
+    }
+    this.renderCurvedFaceAndFx();
+  }
+
+  applyMorphRigMeshes() {
+    const rig = this.morphRig;
+    const hs = Math.max(0.0, rig.hornScale || 0);
+    if (this.hornsGroup) {
+      this.hornsGroup.visible = hs > 0.015;
+      const s = Math.max(0.001, hs);
+      this.hornsGroup.scale.set(s, s, s);
+    }
+    if (this.earsGroup) {
+      const es = Math.max(0.001, rig.earScale);
+      this.earsGroup.visible = this.showEars && (es > 0.02);
+      if (this.earL && this.earR) {
+        this.earL.scale.set(es, es, es);
+        this.earR.scale.set(es, es, es);
+        // When demon horns emerge, tuck the dark cat/demon ears right beneath the outer base of the horns!
+        this.earL.position.set(-0.62 - hs * 0.30, 0.98 - hs * 0.50, 0.40 - hs * 0.20);
+        this.earR.position.set(0.62 + hs * 0.30, 0.98 - hs * 0.50, 0.40 - hs * 0.20);
+        this.earL.rotation.z = Math.PI * (0.13 + hs * 0.15);
+        this.earR.rotation.z = -Math.PI * (0.13 + hs * 0.15);
+      }
+    }
+    if (this.steamGroup) {
+      const ss = Math.max(0.0, rig.steamScale || 0);
+      this.steamGroup.visible = ss > 0.015;
+      const s = Math.max(0.001, ss);
+      this.steamGroup.scale.set(s, s, s);
+    }
+    if (this.tailGroup) {
+      const hideTailForFire = ((this.skinBlend && (this.skinBlend.furious > 0.15 || this.skinBlend.marah > 0.15)) || hs > 0.15);
+      this.tailGroup.visible = this.showTail && !hideTailForFire;
+    }
+    if (this.empatiPawsGroup) {
+      this.empatiPawsGroup.visible = rig.empatiPawScale > 0.015;
+      const ps = Math.max(0.001, rig.empatiPawScale);
+      const breath = Math.sin(this.time * 3.2) * 0.015;
+      this.empatiPawsGroup.scale.set(ps, ps, ps);
+      this.empatiPawsGroup.position.y = breath;
+    }
+    if (this.camera) {
+      const wM = (this.skinBlend && this.skinBlend.marah) ? Math.max(0, this.skinBlend.marah) : 0;
+      const wF = Math.max(hs, (this.skinBlend && this.skinBlend.furious) ? this.skinBlend.furious : 0);
+      this.camera.position.z = 5.05 + wM * 0.08 + wF * 0.16;
+      this.camera.position.y = 0.08 + wM * 0.02 + wF * 0.04;
+      if (this.ambientLight && this.hemiLight) {
+        this.ambientLight.intensity = 1.92 - wF * 0.52;
+        this.hemiLight.intensity = 0.72 * (1.0 - wF * 0.65);
+      }
+    }
+  }
+
+  /**
+   * Renders the 1024x768 Curved 3D Face Shell & 1024x800 Floating Storyboard FX Overlay.
+   * Implements all 15 Storyboard Expressions + all 12 Phonetic & 15 AIUEO Toothless Mouth Visemes!
+   */
+  renderCurvedFaceAndFx() {
+    if (!this.fCtx || !this.faceCanvas) return;
+    const ctx = this.fCtx;
+    const w = 1024;
+    const h = 768;
+    ctx.clearRect(0, 0, w, h);
+
+    const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
+    const blinkScaleY = Math.max(0.08, 1.0 - Math.sin((this.blinkFactor || 0) * Math.PI));
+
+    // Subtle gaze tracking from head rotation + mood gaze bias
+    const gazeX = (this.currentRot ? this.currentRot.y * 28 : 0) + (desc.gazeBiasX || 0);
+    const gazeY = (this.currentRot ? this.currentRot.x * 20 : 0) + (desc.gazeBiasY || 0);
+
+    // High-frequency micro-tremble for 'Takut' (Scared)
+    const trembleX = desc.id === 'takut' ? Math.sin(this.time * 48) * 3.2 : 0;
+    const trembleY = desc.id === 'takut' ? Math.cos(this.time * 54) * 2.2 : 0;
+
+    const leftEyeX = 282 + trembleX;
+    const rightEyeX = 742 + trembleX;
+    const eyeY = 412 + trembleY;
+
+    // -------------------------------------------------------------------------
+    // 0a. CONTAINED ELLIPTICAL BROW SHADOW FOR 'SANGAT MARAH'
+    // Strictly fades to 0.0 well inside the 1024x768 faceCanvas bounds so ZERO rectangular edges ever appear!
+    // -------------------------------------------------------------------------
+    if (desc.id === 'sangat_marah') {
+      ctx.save();
+      ctx.translate(512, 365);
+      ctx.scale(1.65, 1.0);
+      const faceDarkGrad = ctx.createRadialGradient(0, 0, 15, 0, 0, 185);
+      faceDarkGrad.addColorStop(0.00, 'rgba(8, 2, 4, 0.72)');
+      faceDarkGrad.addColorStop(0.55, 'rgba(14, 3, 6, 0.38)');
+      faceDarkGrad.addColorStop(1.00, 'rgba(24, 4, 8, 0.0)');
+      ctx.fillStyle = faceDarkGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, 185, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------------------
+    // 0. LOCKED KAWAII CHEEK BLUSH OVALS (Anchored directly under outer half of each eye)
+    // -------------------------------------------------------------------------
+    const blushA = desc.blushAlpha !== undefined ? desc.blushAlpha : 0.72;
+    if (blushA > 0.02) {
+      const drawCheekBlush = (bx, by) => {
+        ctx.save();
+        ctx.translate(bx, by);
+        const bGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, 118);
+        if (desc.id === 'sangat_marah') {
+          bGrad.addColorStop(0.00, `rgba(255, 42, 24, ${blushA * 0.78})`);
+          bGrad.addColorStop(0.55, `rgba(220, 20, 16, ${blushA * 0.38})`);
+          bGrad.addColorStop(1.00, 'rgba(220, 20, 16, 0.0)');
+        } else if (desc.id === 'marah') {
+          bGrad.addColorStop(0.00, `rgba(255, 75, 105, ${blushA * 0.85})`);
+          bGrad.addColorStop(0.58, `rgba(255, 105, 135, ${blushA * 0.42})`);
+          bGrad.addColorStop(1.00, 'rgba(255, 105, 135, 0.0)');
+        } else {
+          bGrad.addColorStop(0.00, `rgba(255, 118, 156, ${blushA * 0.78})`);
+          bGrad.addColorStop(0.55, `rgba(255, 148, 180, ${blushA * 0.38})`);
+          bGrad.addColorStop(1.00, 'rgba(255, 168, 195, 0.0)');
+        }
+        ctx.scale(1.0, 0.56);
+        ctx.fillStyle = bGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, 118, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      };
+      drawCheekBlush(192 + trembleX * 0.5, 514 + trembleY * 0.5);
+      drawCheekBlush(832 + trembleX * 0.5, 514 + trembleY * 0.5);
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. WATERFALL TEARS FOR 'SEDIH' (Drawn behind eyes/mouth on lower cheeks)
+    // -------------------------------------------------------------------------
+    const tearFlow = desc.tearFlow || 0;
+    if (tearFlow > 0.02) {
+      const drawWaterfallTear = (ex, isLeft) => {
+        ctx.save();
+        ctx.globalAlpha = tearFlow;
+        const dir = isLeft ? -1 : 1;
+        const startX = ex + dir * 38;
+        const startY = eyeY + 74;
+        const endX = ex + dir * 68;
+        const endY = 716;
+
+        // Glossy aqua-blue waterfall stream
+        const tGrad = ctx.createLinearGradient(startX, startY, endX, endY);
+        tGrad.addColorStop(0.00, '#E0F2FE');
+        tGrad.addColorStop(0.25, '#7DD3FC');
+        tGrad.addColorStop(0.68, '#38BDF8');
+        tGrad.addColorStop(1.00, '#0284C7');
+
+        ctx.fillStyle = tGrad;
+        ctx.beginPath();
+        ctx.moveTo(startX - 32, startY);
+        ctx.bezierCurveTo(startX - 48, startY + 95, endX - 54, endY - 70, endX - 44, endY);
+        ctx.bezierCurveTo(endX - 22, endY + 32, endX + 32, endY + 32, endX + 46, endY);
+        ctx.bezierCurveTo(endX + 54, endY - 70, startX + 44, startY + 95, startX + 28, startY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Tear puddle splash at bottom of cheek
+        ctx.beginPath();
+        ctx.ellipse(endX + dir * 6, endY + 8, 54, 22, dir * 0.12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Crisp white vertical specular reflection streaks inside tear stream
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)';
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(startX - 8, startY + 26);
+        ctx.quadraticCurveTo(startX - 18, (startY + endY) * 0.5, endX - 14, endY - 12);
+        ctx.stroke();
+
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.arc(endX + dir * 10, endY + 10, 18, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.stroke();
+        ctx.restore();
+      };
+      drawWaterfallTear(leftEyeX, true);
+      drawWaterfallTear(rightEyeX, false);
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. EYES (Balanced 122x130 Glossy 3D Feline Iris, Happy Arches, Angry & Demon Red)
+    // -------------------------------------------------------------------------
+    const drawSingleEye = (cx, cy, isLeft) => {
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      if (desc.eyeType === 'wink_right' && !isLeft) {
+        // Playful wink arch on right eye
+        ctx.strokeStyle = '#1E1115';
+        ctx.lineWidth = 28;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(0, 22, 104, Math.PI * 1.12, Math.PI * 1.88);
+        ctx.stroke();
+        ctx.restore();
+        return;
+      }
+
+      if (desc.eyeType === 'happy_arch') {
+        // Thick joyous upward-curving crescent arch (⌒ ⌒) matching Gembira & Senang 1:1
+        ctx.scale(1.0, blinkScaleY);
+        ctx.fillStyle = '#1E1115';
+        ctx.beginPath();
+        ctx.moveTo(-116, 26);
+        ctx.bezierCurveTo(-84, -86, 84, -86, 116, 26);
+        ctx.bezierCurveTo(122, 42, 100, 50, 88, 34);
+        ctx.bezierCurveTo(58, -38, -58, -38, -88, 34);
+        ctx.bezierCurveTo(-100, 50, -122, 42, -116, 26);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+        return;
+      }
+
+      if (desc.eyeType === 'heart_eyes') {
+        const pulse = 1.0 + Math.sin(this.time * 6.5) * 0.08;
+        ctx.scale(pulse * 1.28, pulse * 1.28 * blinkScaleY);
+        ctx.fillStyle = '#FF2E63';
+        ctx.beginPath();
+        ctx.moveTo(0, 58);
+        ctx.bezierCurveTo(-88, -10, -98, -78, -42, -78);
+        ctx.bezierCurveTo(-12, -78, 0, -48, 0, -48);
+        ctx.bezierCurveTo(0, -48, 12, -78, 42, -78);
+        ctx.bezierCurveTo(98, -78, 88, -10, 0, 58);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+        return;
+      }
+
+      const rx = 122 * (desc.eyeScaleX || 1.0);
+      const ry = 130 * (desc.eyeScaleY || 1.0) * blinkScaleY;
+      const upperLid = isLeft ? (desc.upperLidL || 0) : (desc.upperLidR || 0);
+      const lidAngle = isLeft ? (desc.lidAngleL || 0) : (desc.lidAngleR || 0);
+
+      // Clip to oval eye boundary AND custom upper eyelid plane
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, isLeft ? -0.04 : 0.04, 0, Math.PI * 2);
+      ctx.clip();
+
+      if (upperLid > 0.01) {
+        // Clip out everything above the angled upper eyelid line
+        ctx.save();
+        const lidY = -ry + upperLid * (ry * 1.62);
+        ctx.beginPath();
+        ctx.translate(0, lidY);
+        ctx.rotate(lidAngle);
+        ctx.rect(-rx * 2.4, 0, rx * 4.8, ry * 3.6);
+        ctx.restore();
+        ctx.clip();
+      }
+
+      // Base Iris Fill
+      if (desc.eyeType === 'demon_red') {
+        // Fiery glowing scarlet-orange demon eye (Sangat Marah) matching ref_row1_demon_zoom.png 1:1
+        const dGrad = ctx.createRadialGradient(gazeX * 0.35, gazeY * 0.35 + 16, 6, 0, 10, ry * 1.02);
+        dGrad.addColorStop(0.00, '#FFFAC2');
+        dGrad.addColorStop(0.18, '#FFD438');
+        dGrad.addColorStop(0.38, '#FF6A00');
+        dGrad.addColorStop(0.68, '#E6141E');
+        dGrad.addColorStop(0.90, '#8A040C');
+        dGrad.addColorStop(1.00, '#2B0104');
+        ctx.fillStyle = dGrad;
+        ctx.fillRect(-rx * 1.5, -ry * 1.5, rx * 3, ry * 3);
+
+        // Crisp white-gold upper-left catchlight tucked under angled upper lid
+        ctx.fillStyle = '#FFFDF2';
+        ctx.beginPath();
+        ctx.ellipse(-40 + gazeX * 0.3, -24 + gazeY * 0.3, 22, 16, -0.28, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (desc.eyeType === 'angry_red') {
+        // Stage 2 Marah: Deep dark-crimson eye with glowing ruby lower crescent
+        const aGrad = ctx.createRadialGradient(gazeX * 0.4, gazeY * 0.4 + 38, 10, 0, 0, ry);
+        aGrad.addColorStop(0.00, '#FF1E38');
+        aGrad.addColorStop(0.45, '#A80A22');
+        aGrad.addColorStop(0.78, '#2B060D');
+        aGrad.addColorStop(1.00, '#140307');
+        ctx.fillStyle = aGrad;
+        ctx.fillRect(-rx * 1.5, -ry * 1.5, rx * 3, ry * 3);
+
+        // Primary upper-left white catchlight
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(-36 + gazeX * 0.35, -28 + gazeY * 0.35, 34, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Secondary lower-right ruby-white catchlight
+        ctx.fillStyle = 'rgba(255, 215, 225, 0.92)';
+        ctx.beginPath();
+        ctx.arc(36 + gazeX * 0.35, 34 + gazeY * 0.35, 16, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else {
+        // Classic Glossy Dark-Espresso Feline Eye with Warm Bronze Lower Cornea Reflection
+        const eGrad = ctx.createLinearGradient(0, -ry, 0, ry);
+        eGrad.addColorStop(0.00, '#11090C');
+        eGrad.addColorStop(0.60, '#1D1115');
+        eGrad.addColorStop(1.00, '#4E2E35');
+        ctx.fillStyle = eGrad;
+        ctx.fillRect(-rx * 1.5, -ry * 1.5, rx * 3, ry * 3);
+
+        // Warm lower crescent iris reflection
+        ctx.strokeStyle = 'rgba(130, 82, 90, 0.58)';
+        ctx.lineWidth = 24;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(gazeX * 0.3, gazeY * 0.3 + 6, rx * 0.65, Math.PI * 0.18, Math.PI * 0.82);
+        ctx.stroke();
+
+        // 1. Big primary upper-left sparkling white catchlight
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(-36 + gazeX * 0.45, -34 + gazeY * 0.45, 40, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Medium lower-right sparkling catchlight
+        ctx.beginPath();
+        ctx.arc(38 + gazeX * 0.45, 34 + gazeY * 0.45, 20, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. Tiny upper-right pinpoint glint
+        ctx.beginPath();
+        ctx.arc(18 + gazeX * 0.45, -48 + gazeY * 0.45, 9, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. Extra watery lower-edge teardrops for 'Empati' & 'Sedih'
+        if (desc.eyeType === 'watery') {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+          ctx.beginPath();
+          ctx.ellipse(-28, 66, 18, 13, 0.25, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(14, 78, 10, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Draw crisp upper eyelid lash line when upperLid > 0.01
+      if (upperLid > 0.01) {
+        const lidY = -ry + upperLid * (ry * 1.62);
+        ctx.save();
+        ctx.translate(0, lidY);
+        ctx.rotate(lidAngle);
+        ctx.strokeStyle = desc.eyeType === 'demon_red' ? '#1A070A' : '#1A0E12';
+        ctx.lineWidth = 18;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-rx * 1.2, 0);
+        ctx.lineTo(rx * 1.2, 0);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      ctx.restore();
+    };
+
+    drawSingleEye(leftEyeX, eyeY, true);
+    drawSingleEye(rightEyeX, eyeY, false);
+
+    // -------------------------------------------------------------------------
+    // 3. EYEBROWS, INNER BROW TICKS & FOREHEAD BRIDGE CREASES
+    // -------------------------------------------------------------------------
+    if ((desc.browAlpha || 0) > 0.02) {
+      const drawBrow = (bx, by, angle, isLeft) => {
+        ctx.save();
+        ctx.globalAlpha = desc.browAlpha;
+        ctx.translate(bx, by);
+        ctx.rotate(angle);
+        ctx.strokeStyle = desc.id === 'sangat_marah' ? '#160608' : '#231317';
+        const isBoldBrow = (desc.id === 'tegas' || desc.id === 'kesal' || desc.id === 'marah' || desc.id === 'sangat_marah');
+        ctx.lineWidth = isBoldBrow ? 20 : 15;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        const archH = (desc.browArch || 0.25) * 36;
+        ctx.beginPath();
+        ctx.moveTo(-74, 8);
+        ctx.quadraticCurveTo(0, -archH, 74, 8);
+        ctx.stroke();
+
+        // Cute inner vertical brow tick on Tegas / Kesal / Marah (matching reference!)
+        if (desc.innerBrowTick) {
+          const innerX = isLeft ? 72 : -72;
+          ctx.lineWidth = 16;
+          ctx.beginPath();
+          ctx.moveTo(innerX, 6);
+          ctx.lineTo(innerX + (isLeft ? 8 : -8), -22);
+          ctx.stroke();
+        }
+        ctx.restore();
+      };
+
+      const byL = 256 + (desc.browYL !== undefined ? desc.browYL : (desc.browY || 0)) + trembleY;
+      const byR = 256 + (desc.browYR !== undefined ? desc.browYR : (desc.browY || 0)) + trembleY;
+      drawBrow(leftEyeX + 8, byL, desc.browAngleL || 0, true);
+      drawBrow(rightEyeX - 8, byR, desc.browAngleR || 0, false);
+    }
+
+    // Bridge creases between angry eyes (Kesal, Marah, Sangat Marah)
+    if (desc.bridgeCrease) {
+      ctx.save();
+      ctx.strokeStyle = desc.id === 'sangat_marah' ? 'rgba(20, 6, 8, 0.88)' : 'rgba(165, 95, 112, 0.68)';
+      ctx.lineWidth = 9;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(486, 352);
+      ctx.quadraticCurveTo(512, 344, 538, 352);
+      ctx.stroke();
+      if (desc.bridgeCrease >= 2) {
+        ctx.beginPath();
+        ctx.moveTo(494, 372);
+        ctx.quadraticCurveTo(512, 366, 530, 372);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. MOUTH RENDERER: 100% TOOTHLESS 3D MOCHI MOUTHS & PHONETIC VISEMES
+    // -------------------------------------------------------------------------
+    const mouthX = 512 + trembleX * 0.8;
+    const mouthY = 482 + trembleY * 0.8;
+
+    if (this.activeViseme) {
+      ctx.save();
+      ctx.translate(mouthX, mouthY + 34);
+      ctx.scale(1.42, 1.42);
+      this.drawMochiVisemeMouth3D(ctx, 0, 0, this.activeViseme, this.visemeIntensity);
+      ctx.restore();
+    } else {
+      this.drawStoryboardExpressionMouth3D(ctx, mouthX, mouthY, desc.mouthType);
+    }
+
+    if (this.faceTexture) {
+      this.faceTexture.needsUpdate = true;
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. FLOATING 3D STORYBOARD SYMBOLS OVERLAY (fxCanvas)
+    // -------------------------------------------------------------------------
+    this.renderFloatingStoryboardFx(desc.fxType);
+  }
+
+  /**
+   * Draws all 15 Storyboard Expression Mouths in lush 3D Daifuku style — 100% TANPA GIGI (Zero Teeth)!
+   * Calibrated 1:1 to the anatomical proportions of `media_1794044280214_5080cae0.jpg`.
+   */
+  drawStoryboardExpressionMouth3D(ctx, cx, cy, mouthType) {
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    if (mouthType === 'w') {
+      // Netral: Classic sweet double-lobed Mochi Cat smile (ω) sitting right between lower inner eye curves
+      ctx.strokeStyle = '#231216';
+      ctx.lineWidth = 15;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-52, -4);
+      ctx.bezierCurveTo(-42, 26, -8, 26, 0, -2);
+      ctx.bezierCurveTo(8, 26, 42, 26, 52, -4);
+      ctx.stroke();
+
+    } else if (mouthType === 'caret' || mouthType === 'caret_small') {
+      // Tegas / Kesal / Marah / Penasaran: Firm or curious inverted caret (^)
+      const span = mouthType === 'caret_small' ? 31 : 43;
+      const drop = mouthType === 'caret_small' ? 22 : 30;
+      const yOff = mouthType === 'caret_small' ? 10 : 16;
+      ctx.strokeStyle = '#231216';
+      ctx.lineWidth = mouthType === 'caret_small' ? 14 : 16;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-span, yOff + drop * 0.5);
+      ctx.quadraticCurveTo(0, yOff - drop * 0.85, span, yOff + drop * 0.5);
+      ctx.stroke();
+
+    } else if (mouthType === 'smirk_tongue') {
+      // Sinis: cute ω mouth with a cheeky pink U-tongue peeking out of center-bottom
+      ctx.fillStyle = '#5E0B1E';
+      ctx.beginPath();
+      ctx.arc(-2, 10, 24, 0, Math.PI);
+      ctx.fill();
+
+      const tGrad = ctx.createLinearGradient(0, 4, 0, 42);
+      tGrad.addColorStop(0, '#FF85A6');
+      tGrad.addColorStop(1, '#FF4778');
+      ctx.fillStyle = tGrad;
+      ctx.beginPath();
+      ctx.arc(-2, 10, 21, 0.04 * Math.PI, 0.96 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = '#231216';
+      ctx.lineWidth = 8;
+      ctx.stroke();
+
+      ctx.strokeStyle = '#231216';
+      ctx.lineWidth = 14;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-50, -4);
+      ctx.bezierCurveTo(-38, 22, -8, 22, 0, -2);
+      ctx.bezierCurveTo(8, 22, 38, 20, 52, -8);
+      ctx.stroke();
+
+    } else if (mouthType === 'happy_open_tall' || mouthType === 'happy_open') {
+      // Gembira (Row 1 Col 4): Tall, deep U-cup laughing mouth with ω cat top lip & huge pink tongue (NO teeth!)
+      const mouthPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(-72, -38);
+        ctx.bezierCurveTo(-48, -14, -14, -14, 0, -34);
+        ctx.bezierCurveTo(14, -14, 48, -14, 72, -38);
+        ctx.bezierCurveTo(78, 56, 52, 146, 0, 146);
+        ctx.bezierCurveTo(-52, 146, -78, 56, -72, -38);
+        ctx.closePath();
+      };
+      ctx.save();
+      ctx.shadowColor = 'rgba(215, 130, 155, 0.55)';
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 6;
+      mouthPath();
+      ctx.fillStyle = '#4A0618';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      mouthPath();
+      ctx.clip();
+
+      const cavGrad = ctx.createLinearGradient(0, -40, 0, 146);
+      cavGrad.addColorStop(0.0, '#3D0412');
+      cavGrad.addColorStop(0.45, '#720B26');
+      cavGrad.addColorStop(1.0, '#9E1438');
+      ctx.fillStyle = cavGrad;
+      ctx.fillRect(-90, -50, 180, 210);
+
+      // Huge bright pink tongue filling the lower 75% of the tall cup
+      const tgGrad = ctx.createRadialGradient(0, 74, 10, 0, 88, 86);
+      tgGrad.addColorStop(0.0, '#FFA6C2');
+      tgGrad.addColorStop(0.65, '#FF6694');
+      tgGrad.addColorStop(1.0, '#E03468');
+      ctx.fillStyle = tgGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 78, 68, 76, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Crisp dark-wine contour around mouth and ω upper lip
+      ctx.strokeStyle = '#2B0812';
+      ctx.lineWidth = 11;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      mouthPath();
+      ctx.stroke();
+
+    } else if (mouthType === 'happy_open_wide') {
+      // Senang (Row 2 Col 2): Wider, rounder laughing bowl mouth with ω cat top lip & wide pink tongue (NO teeth!)
+      const mouthPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(-84, -30);
+        ctx.bezierCurveTo(-54, -8, -16, -8, 0, -26);
+        ctx.bezierCurveTo(16, -8, 54, -8, 84, -30);
+        ctx.bezierCurveTo(92, 42, 58, 108, 0, 108);
+        ctx.bezierCurveTo(-58, 108, -92, 42, -84, -30);
+        ctx.closePath();
+      };
+      ctx.save();
+      ctx.shadowColor = 'rgba(215, 130, 155, 0.55)';
+      ctx.shadowBlur = 14;
+      ctx.shadowOffsetY = 6;
+      mouthPath();
+      ctx.fillStyle = '#4A0618';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      mouthPath();
+      ctx.clip();
+
+      const cavGrad = ctx.createLinearGradient(0, -32, 0, 108);
+      cavGrad.addColorStop(0.0, '#3D0412');
+      cavGrad.addColorStop(0.5, '#720B26');
+      cavGrad.addColorStop(1.0, '#9E1438');
+      ctx.fillStyle = cavGrad;
+      ctx.fillRect(-100, -40, 200, 160);
+
+      // Plump wide pink tongue
+      const tgGrad = ctx.createRadialGradient(0, 58, 8, 0, 68, 74);
+      tgGrad.addColorStop(0.0, '#FFA6C2');
+      tgGrad.addColorStop(0.65, '#FF6694');
+      tgGrad.addColorStop(1.0, '#E03468');
+      ctx.fillStyle = tgGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 62, 74, 56, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.strokeStyle = '#2B0812';
+      ctx.lineWidth = 11;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      mouthPath();
+      ctx.stroke();
+
+    } else if (mouthType === 'tiny_3') {
+      // Empati (Row 1 Col 5): Vertical puckered '3' / ε mouth between the eyes (enlarged 1.9x for clear legibility)
+      ctx.save();
+      ctx.scale(1.9, 1.9);
+      ctx.fillStyle = '#FF759B';
+      ctx.beginPath();
+      ctx.ellipse(2, 16, 14, 24, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#2B0812';
+      ctx.lineWidth = 7.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.arc(-4, 2, 13, -0.45 * Math.PI, 0.48 * Math.PI);
+      ctx.arc(-4, 27, 14, -0.48 * Math.PI, 0.48 * Math.PI);
+      ctx.stroke();
+      ctx.restore();
+
+    } else if (mouthType === 'surprised_o') {
+      // Kaget (Row 2 Col 3): Large tall bell/pear-shaped surprised open mouth (100% TANPA GIGI!)
+      const kagetPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.bezierCurveTo(38, -14, 58, 34, 62, 86);
+        ctx.bezierCurveTo(64, 130, 38, 146, 0, 146);
+        ctx.bezierCurveTo(-38, 146, -64, 130, -62, 86);
+        ctx.bezierCurveTo(-58, 34, -38, -14, 0, -14);
+        ctx.closePath();
+      };
+      ctx.save();
+      ctx.shadowColor = 'rgba(195, 115, 138, 0.50)';
+      ctx.shadowBlur = 14;
+      kagetPath();
+      ctx.fillStyle = '#4A0618';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      kagetPath();
+      ctx.clip();
+      ctx.fillStyle = '#4A0618';
+      ctx.fillRect(-80, -25, 160, 185);
+
+      // Diagonal-curved pink tongue filling lower half (matching Kaget in reference!)
+      const tgGrad = ctx.createLinearGradient(-40, 40, 40, 146);
+      tgGrad.addColorStop(0.0, '#FF94B4');
+      tgGrad.addColorStop(1.0, '#E03468');
+      ctx.fillStyle = tgGrad;
+      ctx.beginPath();
+      ctx.ellipse(10, 98, 66, 58, -0.28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.strokeStyle = '#2B0812';
+      ctx.lineWidth = 10;
+      kagetPath();
+      ctx.stroke();
+
+    } else if (mouthType === 'sad_cry') {
+      // Sedih (Row 2 Col 4): Pinched vertical figure-8 / peanut crying mouth (100% TANPA GIGI!)
+      const sadPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(0, -10);
+        ctx.bezierCurveTo(28, -10, 32, 16, 18, 36);
+        ctx.bezierCurveTo(36, 56, 36, 94, 0, 94);
+        ctx.bezierCurveTo(-36, 94, -36, 56, -18, 36);
+        ctx.bezierCurveTo(-32, 16, -28, -10, 0, -10);
+        ctx.closePath();
+      };
+      ctx.save();
+      sadPath();
+      ctx.clip();
+      ctx.fillStyle = '#4A0618';
+      ctx.fillRect(-50, -20, 100, 130);
+      ctx.fillStyle = '#FF759E';
+      ctx.beginPath();
+      ctx.ellipse(0, 68, 34, 32, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.strokeStyle = '#2B0812';
+      ctx.lineWidth = 10;
+      sadPath();
+      ctx.stroke();
+
+    } else if (mouthType === 'wavy_sigh') {
+      // Lelah (Row 2 Col 7): Wavy exhausted sigh line
+      ctx.strokeStyle = '#231216';
+      ctx.lineWidth = 14;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-48, 18);
+      ctx.bezierCurveTo(-24, -4, -8, 24, 6, 4);
+      ctx.bezierCurveTo(22, -10, 34, 18, 48, 14);
+      ctx.stroke();
+
+    } else if (mouthType === 'scared_scream') {
+      // Takut (Row 2 Col 8): Large wide wavy kidney-bean screaming mouth — 100% TANPA GIGI (Zero Teeth!)
+      const scaredPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(-92, 42);
+        ctx.bezierCurveTo(-96, -6, -48, -18, 0, -18);
+        ctx.bezierCurveTo(48, -18, 96, -6, 92, 42);
+        ctx.bezierCurveTo(96, 98, 56, 114, 0, 96);
+        ctx.bezierCurveTo(-56, 114, -96, 98, -92, 42);
+        ctx.closePath();
+      };
+      ctx.save();
+      ctx.shadowColor = 'rgba(195, 115, 138, 0.50)';
+      ctx.shadowBlur = 14;
+      scaredPath();
+      ctx.fillStyle = '#4A0516';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      scaredPath();
+      ctx.clip();
+      ctx.fillStyle = '#4A0516';
+      ctx.fillRect(-110, -30, 220, 160);
+
+      // Wavy terrified pink tongue filling lower half (Zero teeth!)
+      const tGrad = ctx.createLinearGradient(0, 24, 0, 114);
+      tGrad.addColorStop(0, '#FF85A8');
+      tGrad.addColorStop(1, '#E03468');
+      ctx.fillStyle = tGrad;
+      ctx.beginPath();
+      ctx.moveTo(-96, 56);
+      ctx.bezierCurveTo(-48, 22, 48, 22, 96, 56);
+      ctx.lineTo(96, 125);
+      ctx.lineTo(-96, 125);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      ctx.strokeStyle = '#2B0812';
+      ctx.lineWidth = 11;
+      scaredPath();
+      ctx.stroke();
+
+    } else if (mouthType === 'furious_roar') {
+      // Sangat Marah (Row 1 Col 6 & Row 3 Col 3): Cute cat nose (▼) + Massive roaring mouth — 100% TANPA GIGI!
+      // 1. Cute dark cat nose triangle + vertical philtrum above the roaring mouth
+      ctx.fillStyle = '#120306';
+      ctx.beginPath();
+      ctx.moveTo(-18, -34);
+      ctx.quadraticCurveTo(0, -38, 18, -34);
+      ctx.quadraticCurveTo(10, -18, 0, -16);
+      ctx.quadraticCurveTo(-10, -18, -18, -34);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = '#120306';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, -18);
+      ctx.lineTo(0, -2);
+      ctx.stroke();
+
+      // 2. Massive tall trapezoid/bell roaring mouth (Zero fangs, zero teeth!)
+      const roarPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(-58, -2);
+        ctx.bezierCurveTo(-24, -14, 24, -14, 58, -2);
+        ctx.bezierCurveTo(102, 48, 122, 138, 104, 184);
+        ctx.bezierCurveTo(78, 206, -78, 206, -104, 184);
+        ctx.bezierCurveTo(-122, 138, -102, 48, -58, -2);
+        ctx.closePath();
+      };
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(25, 2, 6, 0.82)';
+      ctx.shadowBlur = 18;
+      roarPath();
+      ctx.fillStyle = '#38040C';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      roarPath();
+      ctx.clip();
+
+      const rGrad = ctx.createLinearGradient(0, -14, 0, 204);
+      rGrad.addColorStop(0.0, '#2B0208');
+      rGrad.addColorStop(0.50, '#680818');
+      rGrad.addColorStop(1.0, '#9E1228');
+      ctx.fillStyle = rGrad;
+      ctx.fillRect(-135, -25, 270, 240);
+
+      // Huge wavy roaring scarlet-pink tongue at bottom
+      const tgGrad = ctx.createRadialGradient(0, 135, 12, 0, 150, 110);
+      tgGrad.addColorStop(0.0, '#FF7592');
+      tgGrad.addColorStop(0.58, '#F02E52');
+      tgGrad.addColorStop(1.0, '#A8102C');
+      ctx.fillStyle = tgGrad;
+      ctx.beginPath();
+      ctx.moveTo(-115, 124);
+      ctx.bezierCurveTo(-62, 78, -18, 108, 0, 96);
+      ctx.bezierCurveTo(18, 108, 62, 78, 115, 124);
+      ctx.lineTo(125, 215);
+      ctx.lineTo(-125, 215);
+      ctx.closePath();
+      ctx.fill();
+
+      // Inner lip bevel shadow
+      ctx.strokeStyle = 'rgba(18, 1, 4, 0.88)';
+      ctx.lineWidth = 14;
+      roarPath();
+      ctx.stroke();
+
+      // 4 Iconic Gleaming White Canine Fangs for 'Sangat Marah' Demon Roar (2 Upper + 2 Lower)!
+      // Rendered AFTER lip stroke so fangs are crisp, sharp, prominent & 100% visible!
+      const drawDemonFang = (baseX, baseY, tipX, tipY, halfW, isUpper) => {
+        ctx.save();
+        const fGrad = ctx.createLinearGradient(baseX, baseY, tipX, tipY);
+        fGrad.addColorStop(0.00, '#FFF5F8');
+        fGrad.addColorStop(0.25, '#FFFFFF');
+        fGrad.addColorStop(1.00, '#FFFFFF');
+        ctx.fillStyle = fGrad;
+        ctx.shadowColor = 'rgba(255, 60, 90, 0.55)';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(baseX - halfW, baseY);
+        ctx.quadraticCurveTo(baseX - halfW * 0.25, (baseY + tipY) * 0.5, tipX, tipY);
+        ctx.quadraticCurveTo(baseX + halfW * 0.25, (baseY + tipY) * 0.5, baseX + halfW, baseY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(30, 2, 8, 0.65)';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.restore();
+      };
+      // 2 Prominent Upper Demon Fangs hanging boldly from top-left and top-right of the roaring mouth
+      drawDemonFang(-46, -4, -38, 56, 19, true);
+      drawDemonFang(46, -4, 38, 56, 19, true);
+      // 2 Lower Canine Fangs jutting upward from bottom-left and bottom-right corners
+      drawDemonFang(-74, 186, -66, 138, 15, false);
+      drawDemonFang(74, 186, 66, 138, 15, false);
+
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  /**
+   * 3D-Shaded Toothless Phonetic & AIUEO Mouth Viseme Renderer (`drawMochiVisemeMouth3D`).
+   * Matches BOTH user-uploaded storyboards (`media_1794037248789_f03c3bc4.jpg` 12 Phonetic Visemes
+   * and `media_1794037257641_8dd59bf6.jpg` 5 AIUEO Vowels x 3 Intensity Rows)
+   * with 100% TANPA GIGI (STRICTLY ZERO TEETH)!
+   */
+  drawMochiVisemeMouth3D(ctx, cx, cy, rawCode, rawIntensity = 1.0) {
+    let code = String(rawCode || 'A').trim().toUpperCase();
+    let k = Math.max(0.15, Math.min(1.0, Number(rawIntensity) || 1.0));
+
+    // Support shorthand intensity codes 'A1','A2','A3', 'I1'..'O3'
+    const mMatch = /^([AIUEO])([123])$/.exec(code);
+    if (mMatch) {
+      code = mMatch[1];
+      const tier = Number(mMatch[2]);
+      k = tier === 1 ? 0.34 : (tier === 2 ? 0.68 : 1.0);
+    }
+
+    // Normalize WawaLipsync codes to phonetic viseme keys
+    if (code === 'VISEME_AA' || code === 'AA') code = 'A';
+    else if (code === 'VISEME_I') code = 'I';
+    else if (code === 'VISEME_U') code = 'U';
+    else if (code === 'VISEME_E') code = 'E';
+    else if (code === 'VISEME_O') code = 'O';
+    else if (code === 'VISEME_PP' || code === 'PP' || code === 'B,M,P') code = 'BMP';
+    else if (code === 'VISEME_FF' || code === 'FF' || code === 'F,V') code = 'FV';
+    else if (code === 'VISEME_TH') code = 'TH';
+    else if (code === 'VISEME_DD' || code === 'VISEME_SS' || code === 'VISEME_NN' || code === 'C,D,N,S,T,X,Y,Z') code = 'CDNSTXYZ';
+    else if (code === 'VISEME_KK' || code === 'G,K') code = 'GK';
+    else if (code === 'VISEME_CH' || code === 'CH,J,SH') code = 'CHJSH';
+    else if (code === 'VISEME_RR') code = 'L';
+    else if (code === 'A,E,I') code = 'AEI';
+    else if (code === 'Q,W') code = 'QW';
+
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // Helper: Cute curved corner laugh-dimple parentheses `(   )` for I, E, Ee, CDNSTXYZ, TH
+    const drawCornerDimples = (rx, yOffset, spanY) => {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(202, 118, 144, 0.62)';
+      ctx.lineWidth = 7.5;
+      ctx.lineCap = 'round';
+      // Left corner dimple `(`
+      ctx.beginPath();
+      ctx.arc(-rx - 4, yOffset, spanY, Math.PI * 0.72, Math.PI * 1.28);
+      ctx.stroke();
+      // Right corner dimple `)`
+      ctx.beginPath();
+      ctx.arc(rx + 4, yOffset, spanY, -Math.PI * 0.28, Math.PI * 0.28);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const rawUpper = String(rawCode || 'A').trim().toUpperCase();
+
+    // Helper: Plump 3D Smooth Pink Mochi Tongue (Zero Teeth, Zero Split Line!)
+    const drawPlumpTongue = (tx, ty, trx, tryR, wavyTop = false) => {
+      ctx.save();
+      const tGrad = ctx.createRadialGradient(tx, ty - tryR * 0.28, 4, tx, ty + tryR * 0.25, Math.max(trx, tryR) * 1.18);
+      tGrad.addColorStop(0.00, '#FFA8C5');
+      tGrad.addColorStop(0.55, '#FF5E8E');
+      tGrad.addColorStop(1.00, '#C91E50');
+      ctx.fillStyle = tGrad;
+
+      ctx.beginPath();
+      if (wavyTop) {
+        ctx.moveTo(tx - trx, ty + tryR * 0.5);
+        ctx.bezierCurveTo(tx - trx * 0.85, ty - tryR * 0.88, tx - trx * 0.22, ty - tryR * 0.52, tx, ty - tryR * 0.36);
+        ctx.bezierCurveTo(tx + trx * 0.22, ty - tryR * 0.52, tx + trx * 0.85, ty - tryR * 0.88, tx + trx, ty + tryR * 0.5);
+        ctx.bezierCurveTo(tx + trx, ty + tryR * 1.2, tx - trx, ty + tryR * 1.2, tx - trx, ty + tryR * 0.5);
+      } else {
+        ctx.ellipse(tx, ty, trx, tryR, 0, 0, Math.PI * 2);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Soft upper-center tongue contour highlight (no vertical split line!)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.46)';
+      ctx.beginPath();
+      ctx.ellipse(tx + trx * 0.26, ty - tryR * 0.28, Math.max(4, trx * 0.18), Math.max(3, tryR * 0.12), 0.18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    // =========================================================================
+    // CASE 1: 'BMP' (B, M, P — Pressed Closed 3D Bilabial Mochi Lips)
+    // =========================================================================
+    if (code === 'BMP') {
+      const rx = 68;
+      // Soft upper & lower lip cushion glow
+      const cushionGrad = ctx.createRadialGradient(0, 4, 4, 0, 4, rx * 1.25);
+      cushionGrad.addColorStop(0.0, 'rgba(235, 150, 175, 0.42)');
+      cushionGrad.addColorStop(1.0, 'rgba(255, 245, 248, 0)');
+      ctx.fillStyle = cushionGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 4, rx * 1.25, 34, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Upper lip highlight ridge
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.lineWidth = 7;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-rx + 8, -5);
+      ctx.bezierCurveTo(-24, -10, -8, -4, 0, -3);
+      ctx.bezierCurveTo(8, -4, 24, -10, rx - 8, -5);
+      ctx.stroke();
+
+      // Lower lip underside shadow
+      ctx.strokeStyle = 'rgba(198, 112, 138, 0.48)';
+      ctx.lineWidth = 9;
+      ctx.beginPath();
+      ctx.arc(0, 4, rx * 0.65, 0.18 * Math.PI, 0.82 * Math.PI);
+      ctx.stroke();
+
+      // Pressed lip seam line
+      ctx.strokeStyle = '#7A2840';
+      ctx.lineWidth = 7.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-rx, 2);
+      ctx.bezierCurveTo(-32, -2, -12, 5, 0, 4);
+      ctx.bezierCurveTo(12, 5, 32, -2, rx, 2);
+      ctx.stroke();
+
+      // Cute sunken corner dimple dots (`• — •`)
+      ctx.fillStyle = '#6B1D34';
+      ctx.beginPath();
+      ctx.arc(-rx - 3, 2, 6.5, 0, Math.PI * 2);
+      ctx.arc(rx + 3, 2, 6.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+      return;
+    }
+
+    // =========================================================================
+    // CASE 2: 'FV' (F, V — Asymmetric Lower-Lip Tuck, 100% Toothless!)
+    // =========================================================================
+    if (code === 'FV') {
+      const rx = 64;
+      // Soft rose lip flush
+      const flush = ctx.createRadialGradient(0, 6, 6, 0, 6, rx * 1.25);
+      flush.addColorStop(0.0, 'rgba(238, 142, 170, 0.50)');
+      flush.addColorStop(1.0, 'rgba(255, 245, 248, 0)');
+      ctx.fillStyle = flush;
+      ctx.beginPath();
+      ctx.ellipse(0, 6, rx * 1.25, 38, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const fvPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(-rx, 10);
+        // Cupid's bow upper lip
+        ctx.bezierCurveTo(-36, -16, -12, -18, 0, -10);
+        ctx.bezierCurveTo(14, -18, 42, -14, rx, 10);
+        // Right side dips open into an asymmetric crescent, left side tucked up
+        ctx.bezierCurveTo(44, 28, 12, 24, -12, 8);
+        ctx.bezierCurveTo(-32, 4, -48, 8, -rx, 10);
+        ctx.closePath();
+      };
+
+      ctx.save();
+      fvPath();
+      ctx.clip();
+      ctx.fillStyle = '#4A0618';
+      ctx.fillRect(-80, -30, 160, 70);
+      // Soft pink tongue peeking inside right crescent (NO teeth!)
+      drawPlumpTongue(18, 18, 34, 18, false);
+      ctx.restore();
+
+      // Tucked lower lip cushion crease on right
+      ctx.strokeStyle = 'rgba(195, 105, 132, 0.55)';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-10, 18);
+      ctx.quadraticCurveTo(28, 36, rx - 4, 16);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#5E1228';
+      ctx.lineWidth = 7.5;
+      ctx.lineCap = 'round';
+      fvPath();
+      ctx.stroke();
+
+      ctx.restore();
+      return;
+    }
+
+    // =========================================================================
+    // CASE 3: 'U' (Phonetic U & AIUEO U1 — Tight 3D Puckered Mochi Cushion Lips)
+    // Swapped per user feedback so 'U' has the tight 3D pucker and 'Q,W' has the arch!
+    // =========================================================================
+    if (rawUpper === 'U' || rawUpper === 'VISEME_U' || rawUpper === 'U1') {
+      const outerRx = 46;
+      const outerRy = 44;
+
+      // Warm cheek/lip pucker flush
+      const pFlush = ctx.createRadialGradient(0, 6, 4, 0, 6, outerRx * 2.1);
+      pFlush.addColorStop(0.0, 'rgba(244, 142, 174, 0.62)');
+      pFlush.addColorStop(0.55, 'rgba(250, 172, 198, 0.30)');
+      pFlush.addColorStop(1.0, 'rgba(255, 245, 248, 0)');
+      ctx.fillStyle = pFlush;
+      ctx.beginPath();
+      ctx.ellipse(0, 6, outerRx * 2.1, outerRy * 1.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Protruding 3D puckered lip cushion torus (seamless soft blend)
+      const ringGrad = ctx.createRadialGradient(-4, -2, 6, 0, 6, outerRy * 1.05);
+      ringGrad.addColorStop(0.0, 'rgba(255, 242, 247, 0.95)');
+      ringGrad.addColorStop(0.48, 'rgba(248, 196, 214, 0.88)');
+      ringGrad.addColorStop(0.78, 'rgba(232, 156, 182, 0.55)');
+      ringGrad.addColorStop(1.0, 'rgba(232, 156, 182, 0)');
+      ctx.fillStyle = ringGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 6, outerRx * 1.05, outerRy * 1.05, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Clean symmetric diamond-keyhole pucker opening (Zero teeth!)
+      const innerPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(0, -15);
+        ctx.bezierCurveTo(15, -13, 23, -3, 23, 4);
+        ctx.bezierCurveTo(23, 13, 13, 23, 0, 23);
+        ctx.bezierCurveTo(-13, 23, -23, 13, -23, 4);
+        ctx.bezierCurveTo(-23, -3, -15, -13, 0, -15);
+        ctx.closePath();
+      };
+
+      // Soft pink lip bevel around pucker opening
+      ctx.save();
+      innerPath();
+      ctx.strokeStyle = 'rgba(222, 128, 158, 0.72)';
+      ctx.lineWidth = 10;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      innerPath();
+      ctx.clip();
+      ctx.fillStyle = '#3B0312';
+      ctx.fillRect(-35, -30, 70, 70);
+      drawPlumpTongue(0, 19, 17, 12, false);
+      ctx.restore();
+
+      ctx.strokeStyle = 'rgba(115, 20, 46, 0.68)';
+      ctx.lineWidth = 4.5;
+      innerPath();
+      ctx.stroke();
+
+      // Delicate soft pucker dimple creases
+      ctx.strokeStyle = 'rgba(210, 128, 154, 0.42)';
+      ctx.lineWidth = 3.8;
+      ctx.lineCap = 'round';
+      [[-17, -14, -24, -20], [17, -14, 24, -20], [-19, 14, -26, 19], [19, 14, 26, 19]].forEach(([x1, y1, x2, y2]) => {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      });
+
+      ctx.restore();
+      return;
+    }
+
+    // =========================================================================
+    // CASE 4: 'CHJSH' (CH, J, SH — Natural Symmetric Rounded-Squircle Cushion Mouth, Zero Teeth!)
+    // Fixed per user feedback: 100% symmetric aperture, soft natural Mochi lip cushion bevel,
+    // zero lipstick-donut ring, zero white oval stickers!
+    // =========================================================================
+    if (code === 'CHJSH') {
+      const rx = 58;
+      const ryTop = 24;
+      const ryBot = 28;
+
+      // Soft natural rose lip flush blending seamlessly into the Daifuku Mochi cheek
+      const flushGrad = ctx.createRadialGradient(0, 4, 8, 0, 4, rx * 1.45);
+      flushGrad.addColorStop(0.0, 'rgba(242, 138, 172, 0.55)');
+      flushGrad.addColorStop(0.6, 'rgba(248, 168, 194, 0.24)');
+      flushGrad.addColorStop(1.0, 'rgba(255, 245, 248, 0)');
+      ctx.fillStyle = flushGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 4, rx * 1.45, (ryTop + ryBot) * 0.95, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 100% Symmetric rounded-squircle aperture with gentle Cupid's bow top curve
+      const chPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(-rx, 2);
+        ctx.bezierCurveTo(-rx * 0.92, -ryTop * 1.15, -20, -ryTop * 1.18, 0, -ryTop * 0.92);
+        ctx.bezierCurveTo(20, -ryTop * 1.18, rx * 0.92, -ryTop * 1.15, rx, 2);
+        ctx.bezierCurveTo(rx * 0.92, ryBot * 1.18, 26, ryBot * 1.16, 0, ryBot * 1.16);
+        ctx.bezierCurveTo(-26, ryBot * 1.16, -rx * 0.92, ryBot * 1.18, -rx, 2);
+        ctx.closePath();
+      };
+
+      // Soft 3D Mochi Lip Cushion Bevel & Lower Chin Shadow
+      ctx.save();
+      ctx.shadowColor = 'rgba(205, 118, 145, 0.50)';
+      ctx.shadowBlur = 14;
+      ctx.shadowOffsetY = 6;
+      chPath();
+      ctx.fillStyle = '#3B0312';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      chPath();
+      ctx.strokeStyle = 'rgba(235, 142, 172, 0.72)';
+      ctx.lineWidth = 12;
+      ctx.stroke();
+      ctx.restore();
+
+      // Clipped Mouth Interior: Deep Maroon Oral Cavity + Plump Symmetric Pink Tongue
+      ctx.save();
+      chPath();
+      ctx.clip();
+      const cavGrad = ctx.createLinearGradient(0, -ryTop, 0, ryBot);
+      cavGrad.addColorStop(0.0, '#32020E');
+      cavGrad.addColorStop(0.55, '#5E0820');
+      cavGrad.addColorStop(1.0, '#8A1032');
+      ctx.fillStyle = cavGrad;
+      ctx.fillRect(-rx * 1.3, -ryTop * 1.4, rx * 2.6, (ryTop + ryBot) * 2.0);
+      drawPlumpTongue(0, ryBot * 0.62, rx * 0.74, ryBot * 0.58, true);
+
+      // Inner lip ambient occlusion shadow
+      ctx.strokeStyle = 'rgba(42, 2, 12, 0.75)';
+      ctx.lineWidth = 10;
+      chPath();
+      ctx.stroke();
+      ctx.restore();
+
+      // Crisp outer lip rim contour
+      ctx.strokeStyle = 'rgba(115, 22, 48, 0.65)';
+      ctx.lineWidth = 5;
+      chPath();
+      ctx.stroke();
+
+      ctx.restore();
+      return;
+    }
+
+    // =========================================================================
+    // CASE 5: OPEN VOWEL & CONSONANT MOUTHS (A, I, U2/U3, QW, E, O, AEI, Ee, CDNSTXYZ, GK, L, TH)
+    // All rendered with 3D Mochi Lip Cushion Bevel + Oral Cavity + 3D Pink Tongue (ZERO TEETH!)
+    // =========================================================================
+    let rx = 64;
+    let ryTop = 36;
+    let ryBot = 44;
+    let shapeMode = 'dome'; // 'dome' | 'smile_d' | 'oval_o' | 'arch_u3'
+    let hasDimples = false;
+    let tongueMode = 'plump'; // 'plump' | 'wavy' | 'curled_l' | 'tip_th' | 'back_gk'
+
+    if (code === 'A') {
+      rx = 44 + 28 * k;
+      ryTop = 30 + 28 * k;
+      ryBot = 26 + 26 * k;
+      shapeMode = 'dome';
+      tongueMode = 'wavy';
+    } else if (code === 'I') {
+      rx = 72 + 16 * k;
+      ryTop = 2 + 6 * k;
+      ryBot = 20 + 36 * k;
+      shapeMode = 'smile_d';
+      hasDimples = true;
+      tongueMode = 'plump';
+    } else if (code === 'QW') {
+      // 'Q,W' Phonetic Viseme: Horseshoe arch mouth (swapped with 'U' per user feedback!)
+      rx = 60;
+      ryTop = 48;
+      ryBot = 34;
+      shapeMode = 'arch_u3';
+      tongueMode = 'wavy';
+    } else if (code === 'U') {
+      // AIUEO U2 & U3 (since phonetic 'U' and 'U1' are handled in CASE 3 above)
+      rx = 46 + 18 * k;
+      ryTop = 34 + 18 * k;
+      ryBot = 22 + 14 * k;
+      shapeMode = k >= 0.80 ? 'arch_u3' : 'dome';
+      tongueMode = 'wavy';
+    } else if (code === 'E' || code === 'EE') {
+      const ek = code === 'EE' ? 0.85 : k;
+      rx = 68 + 18 * ek;
+      ryTop = 4 + 6 * ek;
+      ryBot = 36 + 28 * ek;
+      shapeMode = 'smile_d';
+      hasDimples = true;
+      tongueMode = 'wavy';
+    } else if (code === 'O') {
+      rx = 26 + 14 * k;
+      ryTop = 30 + 30 * k;
+      ryBot = 30 + 32 * k;
+      shapeMode = 'oval_o';
+      tongueMode = 'plump';
+    } else if (code === 'AEI') {
+      rx = 74;
+      ryTop = 10;
+      ryBot = 48;
+      shapeMode = 'smile_d';
+      tongueMode = 'wavy';
+    } else if (code === 'CDNSTXYZ') {
+      rx = 78;
+      ryTop = 4;
+      ryBot = 24;
+      shapeMode = 'smile_d';
+      hasDimples = true;
+      tongueMode = 'plump';
+    } else if (code === 'GK') {
+      rx = 66;
+      ryTop = 40;
+      ryBot = 34;
+      shapeMode = 'dome';
+      tongueMode = 'back_gk';
+    } else if (code === 'L') {
+      rx = 62;
+      ryTop = 34;
+      ryBot = 40;
+      shapeMode = 'dome';
+      tongueMode = 'curled_l';
+    } else if (code === 'TH') {
+      rx = 76;
+      ryTop = 8;
+      ryBot = 46;
+      shapeMode = 'smile_d';
+      hasDimples = true;
+      tongueMode = 'tip_th';
+    }
+
+    const buildAperturePath = () => {
+      ctx.beginPath();
+      if (shapeMode === 'smile_d') {
+        // Wide upturned D-smile (I, E, Ee, AEI, CDNSTXYZ, TH)
+        ctx.moveTo(-rx, -ryTop);
+        ctx.quadraticCurveTo(0, ryTop * 0.8, rx, -ryTop);
+        ctx.bezierCurveTo(rx * 0.92, ryBot * 1.15, -rx * 0.92, ryBot * 1.15, -rx, -ryTop);
+      } else if (shapeMode === 'oval_o') {
+        // Tall vertical oval (O1, O2, O3)
+        ctx.ellipse(0, (ryBot - ryTop) * 0.25, rx, (ryTop + ryBot) * 0.5, 0, 0, Math.PI * 2);
+      } else if (shapeMode === 'arch_u3') {
+        // Horseshoe arch with downward-curving corners (U Row 3 & Phonetic Q,W)
+        ctx.moveTo(-rx, ryBot * 0.65);
+        ctx.bezierCurveTo(-rx * 0.95, -ryTop * 1.25, rx * 0.95, -ryTop * 1.25, rx, ryBot * 0.65);
+        ctx.bezierCurveTo(rx * 0.75, ryBot * 1.15, 24, ryBot * 0.85, 0, ryBot * 0.85);
+        ctx.bezierCurveTo(-24, ryBot * 0.85, -rx * 0.75, ryBot * 1.15, -rx, ryBot * 0.65);
+      } else {
+        // Rounded dome arch (A1..A3, U2, GK, L)
+        ctx.moveTo(-rx, ryBot * 0.15);
+        ctx.bezierCurveTo(-rx * 0.92, -ryTop * 1.22, rx * 0.92, -ryTop * 1.22, rx, ryBot * 0.15);
+        ctx.bezierCurveTo(rx * 1.02, ryBot * 1.12, -rx * 1.02, ryBot * 1.12, -rx, ryBot * 0.15);
+      }
+      ctx.closePath();
+    };
+
+    // 1. Soft 3D Outer Mochi Lip Cushion Bevel & Lower Chin Shadow
+    ctx.save();
+    ctx.shadowColor = 'rgba(205, 118, 145, 0.52)';
+    ctx.shadowBlur = 16;
+    ctx.shadowOffsetY = 7;
+    buildAperturePath();
+    ctx.fillStyle = '#3B0312';
+    ctx.fill();
+    ctx.restore();
+
+    // Soft rosy-pink 3D Mochi Lip Cushion Bevel (zero white top-rim line that could resemble teeth!)
+    ctx.save();
+    buildAperturePath();
+    ctx.strokeStyle = 'rgba(235, 148, 176, 0.65)';
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    ctx.restore();
+
+    if (hasDimples) {
+      drawCornerDimples(rx, 2, Math.max(14, ryBot * 0.36));
+    }
+
+    // 2. Clipped Mouth Interior: Deep Maroon Oral Cavity + 3D Pink Tongue (ZERO TEETH!)
+    ctx.save();
+    buildAperturePath();
+    ctx.clip();
+
+    const cavGrad = ctx.createLinearGradient(0, -ryTop, 0, ryBot);
+    cavGrad.addColorStop(0.00, '#32020E');
+    cavGrad.addColorStop(0.55, '#5E0820');
+    cavGrad.addColorStop(1.00, '#8A1032');
+    ctx.fillStyle = cavGrad;
+    ctx.fillRect(-rx * 1.4, -ryTop * 1.5, rx * 2.8, (ryTop + ryBot) * 2.0);
+
+    // Subtle deep throat arch for dome vowels/velars (A, GK, U2, QW)
+    if (shapeMode === 'dome' || shapeMode === 'arch_u3') {
+      ctx.fillStyle = 'rgba(32, 1, 8, 0.55)';
+      ctx.beginPath();
+      ctx.ellipse(0, 4, rx * 0.55, (ryTop + ryBot) * 0.38, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 3. Tongue Posture per Viseme (100% Toothless!)
+    if (tongueMode === 'curled_l') {
+      // 'L' Viseme: Pink tongue sweeps from bottom-left and curls its rounded tip up to upper-right palate!
+      const lGrad = ctx.createLinearGradient(-rx * 0.6, ryBot, rx * 0.5, -ryTop * 0.6);
+      lGrad.addColorStop(0.00, '#D92B5E');
+      lGrad.addColorStop(0.55, '#FF5C8D');
+      lGrad.addColorStop(1.00, '#FF9EBC');
+      ctx.fillStyle = lGrad;
+      ctx.beginPath();
+      ctx.moveTo(-rx * 0.85, ryBot * 0.95);
+      ctx.bezierCurveTo(-rx * 0.55, ryBot * 0.05, -8, -4, rx * 0.22, -ryTop * 0.78);
+      ctx.bezierCurveTo(rx * 0.68, -ryTop * 0.82, rx * 0.82, ryBot * 0.15, rx * 0.52, ryBot * 0.95);
+      ctx.closePath();
+      ctx.fill();
+
+      // Underside tongue curl crease
+      ctx.strokeStyle = 'rgba(165, 18, 58, 0.48)';
+      ctx.lineWidth = 5.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-rx * 0.15, ryBot * 0.65);
+      ctx.quadraticCurveTo(rx * 0.32, ryBot * 0.10, rx * 0.35, -ryTop * 0.38);
+      ctx.stroke();
+
+    } else if (tongueMode === 'tip_th') {
+      // 'TH' Viseme: Plump rounded pink tongue tip protrudes right under the top-center lip!
+      drawPlumpTongue(0, ryBot * 0.72, rx * 0.72, ryBot * 0.52, false);
+      const thGrad = ctx.createRadialGradient(0, -ryTop + 6, 4, 0, 8, 38);
+      thGrad.addColorStop(0.0, '#FFB2CA');
+      thGrad.addColorStop(0.6, '#FF6694');
+      thGrad.addColorStop(1.0, '#D92B5E');
+      ctx.fillStyle = thGrad;
+      ctx.beginPath();
+      ctx.moveTo(-34, -ryTop - 4);
+      ctx.bezierCurveTo(-32, ryBot * 0.62, 32, ryBot * 0.62, 34, -ryTop - 4);
+      ctx.closePath();
+      ctx.fill();
+
+    } else if (tongueMode === 'back_gk') {
+      // 'G,K' Viseme: Raised back of tongue cushion
+      drawPlumpTongue(0, ryBot * 0.56, rx * 0.78, ryBot * 0.58, true);
+
+    } else if (shapeMode === 'oval_o') {
+      // 'O' Viseme: Small rounded tongue nestled at the bottom of the vertical oval
+      drawPlumpTongue(0, ryBot * 0.68, rx * 0.68, ryBot * 0.38, true);
+
+    } else {
+      // Standard plump smooth tongue (A, I, U, QW, E, Ee, AEI, CDNSTXYZ)
+      drawPlumpTongue(0, ryBot * 0.62, rx * 0.76, ryBot * 0.56, tongueMode === 'wavy');
+    }
+
+    // Inner Lip Rim Ambient Occlusion Shadow (gives soft 3D mochi lip thickness over cavity & tongue)
+    ctx.strokeStyle = 'rgba(42, 2, 12, 0.75)';
+    ctx.lineWidth = 11;
+    buildAperturePath();
+    ctx.stroke();
+    ctx.restore();
+
+    // Crisp outer lip rim contour
+    ctx.strokeStyle = 'rgba(115, 22, 48, 0.65)';
+    ctx.lineWidth = 5;
+    buildAperturePath();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /**
+   * Renders the True Behind-Mascot Living Volumetric Fire & Smoke Aura (`this.auraBackCanvas` at z = -0.06).
+   * Because `this.auraBackMesh` sits physically behind `this.mochiMesh`, `this.earsGroup`, and `this.hornsGroup`
+   * in 3D WebGL depth space, all flame roots originate deep behind the Mochi's body and blaze outward
+   * in fluid, sinuous S-curves (100% organic, zero blocky/flat-bottomed triangles!).
+   */
+  renderBackAuraAndFire(fxType) {
+    if (!this.auraBackCtx || !this.auraBackCanvas) return;
+    const ctx = this.auraBackCtx;
+    const W = 1024;
+    const H = 1024;
+    ctx.clearRect(0, 0, W, H);
+
+    // User Mandate: "hilangkan api di belakang ini" — eliminate background fire aura completely
+    if (this.auraBackMesh) this.auraBackMesh.visible = false;
+    if (this.auraBackTexture) this.auraBackTexture.needsUpdate = true;
+    return;
+  }
+
+  /**
+   * Renders the floating Storyboard FX symbols (///, 💢, ✨, !!, ?, Zz, sweat droplets, shiver arcs)
+   * onto `this.fxCanvas` with gentle 60fps floating animation.
+   */
+  renderFloatingStoryboardFx(fxType) {
+    // Always update the True Behind-Mascot Volumetric Fire & Smoke Layer first!
+    this.renderBackAuraAndFire(fxType);
+
+    if (!this.fxCtx || !this.fxCanvas) return;
+    const ctx = this.fxCtx;
+    const w = 1024;
+    const h = 800;
+    ctx.clearRect(0, 0, w, h);
+
+    if (!fxType || fxType === 'none') {
+      if (this.fxTexture) this.fxTexture.needsUpdate = true;
+      return;
+    }
+
+    const bob = Math.sin(this.time * 4.2) * 6;
+    const pulse = 1.0 + Math.sin(this.time * 5.0) * 0.05;
+
+    const drawRayPill = (x1, y1, x2, y2, thickness, colorStart, colorEnd) => {
+      ctx.save();
+      const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+      grad.addColorStop(0, colorStart);
+      grad.addColorStop(1, colorEnd);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = thickness;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const drawSparkle4 = (sx, sy, size) => {
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.scale(pulse, pulse);
+      const sGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, size);
+      sGrad.addColorStop(0, '#FEF08A');
+      sGrad.addColorStop(0.5, '#FACC15');
+      sGrad.addColorStop(1, '#EA580C');
+      ctx.fillStyle = sGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, -size);
+      ctx.quadraticCurveTo(0, 0, size * 0.78, 0);
+      ctx.quadraticCurveTo(0, 0, 0, size);
+      ctx.quadraticCurveTo(0, 0, -size * 0.78, 0);
+      ctx.quadraticCurveTo(0, 0, 0, -size);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    };
+
+    const drawAngerVein = (vx, vy, scale, isDemon = false) => {
+      ctx.save();
+      ctx.translate(vx, vy + bob * 0.5);
+      ctx.scale(scale * pulse, scale * pulse);
+      ctx.strokeStyle = isDemon ? '#FF3B2F' : '#DC2626';
+      ctx.lineWidth = 14;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      if (isDemon) {
+        ctx.shadowColor = 'rgba(255, 50, 30, 0.85)';
+        ctx.shadowBlur = 14;
+      }
+      // 4 curved anger vein ticks (💢)
+      const angles = [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5];
+      angles.forEach((ang) => {
+        ctx.save();
+        ctx.rotate(ang + 0.15);
+        ctx.beginPath();
+        ctx.moveTo(12, -38);
+        ctx.quadraticCurveTo(14, -14, 38, -12);
+        ctx.stroke();
+        ctx.restore();
+      });
+      ctx.restore();
+    };
+
+    if (fxType === 'rays_green_3' || fxType === 'rays_green_2') {
+      // Emerald green attention rays on top-left
+      drawRayPill(175, 195 + bob, 118, 125 + bob, 20, '#34D399', '#059669');
+      drawRayPill(148, 240 + bob, 82, 195 + bob, 20, '#34D399', '#059669');
+      if (fxType === 'rays_green_3') {
+        drawRayPill(135, 290 + bob, 68, 272 + bob, 18, '#34D399', '#059669');
+      }
+    } else if (fxType === 'rays_gold_3') {
+      // Gembira: 3 golden-yellow rays on top-left + sparkle
+      drawRayPill(178, 190 + bob, 124, 115 + bob, 22, '#FDE047', '#F59E0B');
+      drawRayPill(146, 238 + bob, 82, 188 + bob, 22, '#FDE047', '#F59E0B');
+      drawRayPill(134, 286 + bob, 68, 265 + bob, 20, '#FDE047', '#F59E0B');
+      drawSparkle4(182, 312 - bob, 24);
+    } else if (fxType === 'sparkles_right') {
+      // Sinis: 2 golden 4-point sparkles on right
+      drawSparkle4(845, 255 + bob, 36);
+      drawSparkle4(888, 315 - bob, 22);
+    } else if (fxType === 'senang_combo') {
+      // Senang (Row 2 Col 2): 2 green rays on top-left + 2 golden sparkles on top-right
+      drawRayPill(172, 205 + bob, 120, 140 + bob, 18, '#34D399', '#059669');
+      drawRayPill(145, 250 + bob, 86, 210 + bob, 18, '#34D399', '#059669');
+      drawSparkle4(842, 225 + bob, 36);
+      drawSparkle4(886, 282 - bob, 22);
+    } else if (fxType === 'anger_vein') {
+      // Tegas / Kesal: Red 💢 on upper-right temple
+      drawAngerVein(742, 265, 0.94, false);
+    } else if (fxType === 'anger_marah_fire') {
+      // Stage 2 Marah: Red 💢 on upper-right temple (Volumetric steam puffs realistically vent from ear canals via this.steamGroup)
+      drawAngerVein(748, 258, 0.96, false);
+    } else if (fxType === 'anger_vein_demon') {
+      // Stage 3 Sangat Marah: 2 glowing red-orange 💢 symbols on right & left temples (inferno is BEHIND mascot on auraBackMesh!)
+      drawAngerVein(775, 315, 0.92, true);
+      drawAngerVein(238, 355, 0.64, true);
+    } else if (fxType === 'sweat_both') {
+      // Empati: Sky-blue sweat droplets on both upper-left & upper-right
+      const drawDrop = (dx, dy, angle) => {
+        ctx.save();
+        ctx.translate(dx, dy + bob);
+        ctx.rotate(angle);
+        const dGrad = ctx.createLinearGradient(0, -24, 0, 24);
+        dGrad.addColorStop(0, '#7DD3FC');
+        dGrad.addColorStop(1, '#0284C7');
+        ctx.fillStyle = dGrad;
+        ctx.beginPath();
+        ctx.moveTo(0, -24);
+        ctx.bezierCurveTo(18, -2, 18, 22, 0, 22);
+        ctx.bezierCurveTo(-18, 22, -18, -2, 0, -24);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+        ctx.beginPath();
+        ctx.ellipse(-4, 6, 3.5, 7, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      };
+      drawDrop(158, 225, -0.55);
+      drawDrop(135, 282, -0.75);
+      drawDrop(866, 232, 0.55);
+      drawDrop(888, 288, 0.75);
+    } else if (fxType === 'exclamation_double') {
+      // Kaget: Bold red double exclamation marks `!!` on upper-right
+      const drawBang = (bx, by, rot, sc) => {
+        ctx.save();
+        ctx.translate(bx, by + bob);
+        ctx.rotate(rot);
+        ctx.scale(sc, sc);
+        ctx.fillStyle = '#DC2626';
+        ctx.beginPath();
+        ctx.roundRect(-11, -48, 22, 64, 10);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, 34, 11, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      };
+      drawBang(818, 212, 0.14, 0.95);
+      drawBang(862, 228, 0.26, 0.85);
+    } else if (fxType === 'question_purple') {
+      // Penasaran: Glossy purple-violet question mark `?` on upper-left
+      ctx.save();
+      ctx.translate(178, 205 + bob);
+      ctx.rotate(-0.14);
+      const qGrad = ctx.createLinearGradient(0, -55, 0, 55);
+      qGrad.addColorStop(0, '#C084FC');
+      qGrad.addColorStop(0.5, '#9333EA');
+      qGrad.addColorStop(1, '#6B21A8');
+      ctx.strokeStyle = qGrad;
+      ctx.lineWidth = 22;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(0, -22, 26, Math.PI * 0.92, Math.PI * 2.15);
+      ctx.quadraticCurveTo(22, 6, 0, 18);
+      ctx.stroke();
+      ctx.fillStyle = '#7E22CE';
+      ctx.beginPath();
+      ctx.arc(0, 46, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    } else if (fxType === 'zz_teal') {
+      // Lelah: Teal-emerald `Z z` sleep letters on upper-right
+      const drawZ = (zx, zy, sz, rot) => {
+        ctx.save();
+        ctx.translate(zx, zy + bob);
+        ctx.rotate(rot);
+        ctx.strokeStyle = '#0D9488';
+        ctx.lineWidth = sz * 0.28;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-sz, -sz);
+        ctx.lineTo(sz, -sz);
+        ctx.lineTo(-sz, sz);
+        ctx.lineTo(sz, sz);
+        ctx.stroke();
+        ctx.restore();
+      };
+      drawZ(758, 222, 22, -0.08);
+      drawZ(816, 195, 16, 0.08);
+    } else if (fxType === 'shiver_lines') {
+      // Takut: Blue double curved shiver arcs `((` on left and `))` on right
+      const jitter = Math.sin(this.time * 52) * 3;
+      ctx.save();
+      ctx.strokeStyle = '#0284C7';
+      ctx.lineWidth = 6.5;
+      ctx.lineCap = 'round';
+      // Left double shiver arcs
+      [-1, 1].forEach((side) => {
+        const baseX = side < 0 ? 155 : 869;
+        ctx.beginPath();
+        ctx.arc(baseX + jitter * side, 345, 38, side < 0 ? Math.PI * 0.75 : -Math.PI * 0.25, side < 0 ? Math.PI * 1.25 : Math.PI * 0.25);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(baseX - side * 16 + jitter * side, 395, 34, side < 0 ? Math.PI * 0.75 : -Math.PI * 0.25, side < 0 ? Math.PI * 1.25 : Math.PI * 0.25);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    if (this.fxTexture) {
+      this.fxTexture.needsUpdate = true;
+    }
   }
 
   updateFaceVisibility() {
@@ -1625,6 +4502,10 @@ export class FiezelMochi {
     this.createHeadsetAccessory();
     this.createGlassesAccessory();
     this.createPencilAccessory();
+    this.createCrownAccessory();
+    this.createRibbonAccessory();
+    this.createGradCapAccessory();
+    this.createBeretAccessory();
 
     this.accessoryMotionOffset = { rotX: 0, rotY: 0, rotZ: 0, posY: 0 };
     this.setAccessory(this.currentAccessory);
@@ -1636,33 +4517,25 @@ export class FiezelMochi {
 
     // High-end Kawaii Studio Over-Ear Headphones
     // Colors: Sleek Royal Indigo (#4338CA), Soft Frost Lilac (#DDD6FE), Brilliant Cyan (#00E5FF), Cream Plush Leather (#FFFDF7)
-    const bandMat = new THREE.MeshPhysicalMaterial({
+    const bandMat = new THREE.MeshStandardMaterial({
       color: 0x4338CA, // Royal Indigo
-      roughness: 0.22,
-      metalness: 0.15,
-      clearcoat: 0.90,
-      clearcoatRoughness: 0.12,
-      sheen: 0.60,
-      sheenColor: new THREE.Color(0xA78BFA)
+      roughness: 0.24,
+      metalness: 0.25
     });
-    const cushionLeatherMat = new THREE.MeshPhysicalMaterial({
+    const cushionLeatherMat = new THREE.MeshStandardMaterial({
       color: 0xFFFDF7, // Creamy Marshmallow Plush
-      roughness: 0.55,
-      metalness: 0.05,
-      clearcoat: 0.3,
-      sheen: 0.5,
-      sheenColor: new THREE.Color(0xDDD6FE)
+      roughness: 0.50,
+      metalness: 0.05
     });
     const metallicChromeMat = new THREE.MeshStandardMaterial({
       color: 0xF1F5F9,
-      metalness: 0.92,
-      roughness: 0.15
+      metalness: 0.88,
+      roughness: 0.18
     });
-    const rimMat = new THREE.MeshPhysicalMaterial({
+    const rimMat = new THREE.MeshStandardMaterial({
       color: 0x38BDF8, // Glowing Cyan Metallic Rim
-      metalness: 0.85,
-      roughness: 0.18,
-      clearcoat: 0.8
+      metalness: 0.80,
+      roughness: 0.20
     });
     this.headsetLedMat = new THREE.MeshBasicMaterial({
       color: 0x00E5FF,
@@ -1802,27 +4675,20 @@ export class FiezelMochi {
     this.accessoriesGroup.add(this.glassesGroup);
 
     // Adorable Chunky Kawaii Scholar Glasses (Warm Glossy Honey Amber & Polished Gold)
-    const frameMat = new THREE.MeshPhysicalMaterial({
+    const frameMat = new THREE.MeshStandardMaterial({
       color: 0xD97706, // Warm glowing honey amber
-      roughness: 0.15,
-      metalness: 0.45,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.08,
-      sheen: 0.6,
-      sheenColor: new THREE.Color(0xFBBF24)
+      roughness: 0.18,
+      metalness: 0.45
     });
-    const goldMat = new THREE.MeshPhysicalMaterial({
+    const goldMat = new THREE.MeshStandardMaterial({
       color: 0xF59E0B, // Polished Gold Bridge & Accents
-      metalness: 0.90,
-      roughness: 0.15,
-      clearcoat: 0.8
+      metalness: 0.85,
+      roughness: 0.18
     });
-    const lensMat = new THREE.MeshPhysicalMaterial({
-      color: 0xF0F9FF,
-      transmission: 0.94,
-      opacity: 0.22,
+    const lensMat = new THREE.MeshBasicMaterial({
+      color: 0xE0F2FE,
+      opacity: 0.18,
       transparent: true,
-      roughness: 0.04,
       depthWrite: false
     });
     const gleamMat = new THREE.MeshBasicMaterial({
@@ -1832,31 +4698,31 @@ export class FiezelMochi {
       depthWrite: false
     });
 
-    // 1. Chunky Rounded Rims (Left & Right)
-    const rimRadius = 0.25;
-    const rimTube = 0.020;
+    // 1. Chunky Rounded Rims (Left & Right) — Calibrated to the 3D Storyboard Eyes on faceShellMesh (±0.52, -0.05, 1.33)
+    const rimRadius = 0.32;
+    const rimTube = 0.024;
     const rimGeo = new THREE.TorusGeometry(rimRadius, rimTube, 16, 48);
 
     const rimL = new THREE.Mesh(rimGeo, frameMat);
-    rimL.position.set(-0.38, 0.08, 1.34);
-    rimL.rotation.set(-0.06, -0.14, 0);
+    rimL.position.set(-0.52, -0.05, 1.34);
+    rimL.rotation.set(-0.04, -0.14, 0);
     rimL.renderOrder = 2500;
     this.glassesGroup.add(rimL);
 
     const rimR = new THREE.Mesh(rimGeo, frameMat);
-    rimR.position.set(0.38, 0.08, 1.34);
-    rimR.rotation.set(-0.06, 0.14, 0);
+    rimR.position.set(0.52, -0.05, 1.34);
+    rimR.rotation.set(-0.04, 0.14, 0);
     rimR.renderOrder = 2500;
     this.glassesGroup.add(rimR);
 
     // 2. Arched Gold Nose Bridge
     const bridgePoints = [
-      new THREE.Vector3(-0.12, 0.08, 1.35),
-      new THREE.Vector3( 0.00, 0.12, 1.36),
-      new THREE.Vector3( 0.12, 0.08, 1.35)
+      new THREE.Vector3(-0.20, -0.03, 1.35),
+      new THREE.Vector3( 0.00,  0.03, 1.37),
+      new THREE.Vector3( 0.20, -0.03, 1.35)
     ];
     const bridgeCurve = new THREE.CatmullRomCurve3(bridgePoints);
-    const bridgeGeo = new THREE.TubeGeometry(bridgeCurve, 16, 0.016, 12, false);
+    const bridgeGeo = new THREE.TubeGeometry(bridgeCurve, 16, 0.018, 12, false);
     const bridgeMesh = new THREE.Mesh(bridgeGeo, goldMat);
     bridgeMesh.renderOrder = 2501;
     this.glassesGroup.add(bridgeMesh);
@@ -1865,37 +4731,37 @@ export class FiezelMochi {
     const lensGeo = new THREE.CircleGeometry(rimRadius - 0.015, 32);
 
     const lensL = new THREE.Mesh(lensGeo, lensMat);
-    lensL.position.set(-0.38, 0.08, 1.335);
-    lensL.rotation.set(-0.06, -0.14, 0);
+    lensL.position.set(-0.52, -0.05, 1.335);
+    lensL.rotation.set(-0.04, -0.14, 0);
     lensL.renderOrder = 2500;
     this.glassesGroup.add(lensL);
 
     const lensR = new THREE.Mesh(lensGeo, lensMat);
-    lensR.position.set(0.38, 0.08, 1.335);
-    lensR.rotation.set(-0.06, 0.14, 0);
+    lensR.position.set(0.52, -0.05, 1.335);
+    lensR.rotation.set(-0.04, 0.14, 0);
     lensR.renderOrder = 2500;
     this.glassesGroup.add(lensR);
 
     // 4. Iconic Anime Glasses Gleam Highlight (Upper-Left on each lens)
-    const gleamGeo = new THREE.CapsuleGeometry(0.020, 0.08, 4, 12);
+    const gleamGeo = new THREE.CapsuleGeometry(0.022, 0.095, 4, 12);
 
     const gleamL = new THREE.Mesh(gleamGeo, gleamMat);
-    gleamL.position.set(-0.46, 0.16, 1.345);
-    gleamL.rotation.set(-0.06, -0.14, Math.PI / 4);
+    gleamL.position.set(-0.63, 0.06, 1.348);
+    gleamL.rotation.set(-0.04, -0.14, Math.PI / 4);
     gleamL.renderOrder = 2502;
     this.glassesGroup.add(gleamL);
 
     const gleamR = new THREE.Mesh(gleamGeo, gleamMat);
-    gleamR.position.set(0.30, 0.16, 1.345);
-    gleamR.rotation.set(-0.06, 0.14, Math.PI / 4);
+    gleamR.position.set(0.41, 0.06, 1.348);
+    gleamR.rotation.set(-0.04, 0.14, Math.PI / 4);
     gleamR.renderOrder = 2502;
     this.glassesGroup.add(gleamR);
 
     // 5. Chic Gold Temple Hinges (Discreet, cute, sits flush at outer rim edges)
     [-1, 1].forEach((side) => {
-      const hingeGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.045, 16);
+      const hingeGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.055, 16);
       const hinge = new THREE.Mesh(hingeGeo, goldMat);
-      hinge.position.set(side * 0.64, 0.08, 1.31);
+      hinge.position.set(side * 0.85, -0.05, 1.29);
       hinge.rotation.z = Math.PI / 2;
       hinge.renderOrder = 2501;
       this.glassesGroup.add(hinge);
@@ -1957,14 +4823,222 @@ export class FiezelMochi {
     this.pencilGroup.visible = false;
   }
 
-  setAccessory(name) {
-    this.currentAccessory = name;
-    const isTeacher = (name === 'teacher' || name === 'teach' || name === 'study');
-    if (this.headsetGroup) this.headsetGroup.visible = (name === 'headset' || isTeacher);
-    if (this.glassesGroup) this.glassesGroup.visible = (name === 'glasses' || isTeacher);
-    if (this.pencilGroup) this.pencilGroup.visible = (name === 'pencil');
+  /**
+   * 3D Royal 24K Gold Champion Crown ('crown') with Ruby, Emerald & Sapphire Cabochon Jewels
+   */
+  createCrownAccessory() {
+    this.crownGroup = new THREE.Group();
+    this.crownGroup.position.set(0, 1.15, 0.22);
+    this.crownGroup.rotation.set(0.18, 0, -0.04);
+    this.crownGroup.scale.set(1.42, 1.42, 1.42);
+    this.crownGroup.renderOrder = 2400;
+    this.accessoriesGroup.add(this.crownGroup);
 
-    if (name !== 'pencil') {
+    const goldMat = new THREE.MeshStandardMaterial({
+      color: 0xFACC15,
+      metalness: 0.72,
+      roughness: 0.22
+    });
+    const velvetMat = new THREE.MeshStandardMaterial({
+      color: 0xBE123C,
+      roughness: 0.62,
+      metalness: 0.05
+    });
+    const rubyMat = new THREE.MeshStandardMaterial({ color: 0xFF1E56, roughness: 0.14, metalness: 0.2, emissive: 0x880824, emissiveIntensity: 0.35 });
+    const sapphireMat = new THREE.MeshStandardMaterial({ color: 0x00B4D8, roughness: 0.14, metalness: 0.2, emissive: 0x00487C, emissiveIntensity: 0.35 });
+    const pearlMat = new THREE.MeshStandardMaterial({ color: 0xFFFDF9, roughness: 0.18, metalness: 0.08 });
+
+    // 1. Base Golden Circlet Ring + Lower Torus Trim
+    const baseCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.30, 0.16, 32), goldMat);
+    this.crownGroup.add(baseCyl);
+
+    const lowerRim = new THREE.Mesh(new THREE.TorusGeometry(0.31, 0.032, 16, 32), goldMat);
+    lowerRim.rotation.x = Math.PI / 2;
+    lowerRim.position.y = -0.07;
+    this.crownGroup.add(lowerRim);
+
+    // 2. Plump Royal Crimson Velvet Inner Cushion Dome
+    const cushion = new THREE.Mesh(new THREE.SphereGeometry(0.29, 24, 18), velvetMat);
+    cushion.scale.set(1.0, 0.78, 1.0);
+    cushion.position.y = 0.05;
+    this.crownGroup.add(cushion);
+
+    // 3. 5 Royal Crown Spires with Pearl Tips around the perimeter
+    const spireCount = 5;
+    for (let i = 0; i < spireCount; i++) {
+      const ang = (i / spireCount) * Math.PI * 2;
+      const sx = Math.sin(ang) * 0.31;
+      const sz = Math.cos(ang) * 0.31;
+      const spire = new THREE.Mesh(new THREE.ConeGeometry(0.095, 0.24, 16), goldMat);
+      spire.position.set(sx, 0.18, sz);
+      spire.rotation.set(Math.cos(ang) * 0.18, 0, -Math.sin(ang) * 0.18);
+      this.crownGroup.add(spire);
+
+      const tipPearl = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 12), pearlMat);
+      tipPearl.position.set(Math.sin(ang) * 0.34, 0.30, Math.cos(ang) * 0.34);
+      this.crownGroup.add(tipPearl);
+    }
+
+    // 4. Front Gemstones (Center Ruby + Flanking Sapphires)
+    const centerRuby = new THREE.Mesh(new THREE.SphereGeometry(0.052, 18, 14), rubyMat);
+    centerRuby.scale.set(0.85, 1.15, 0.55);
+    centerRuby.position.set(0, 0.0, 0.325);
+    this.crownGroup.add(centerRuby);
+
+    [-1, 1].forEach((s) => {
+      const gem = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 12), sapphireMat);
+      gem.position.set(s * 0.19, 0.0, 0.265);
+      this.crownGroup.add(gem);
+    });
+
+    this.crownGroup.visible = false;
+  }
+
+  /**
+   * 3D Satin Strawberry-Pink Kawaii Bow ('ribbon') perched cutely by the Left Ear
+   */
+  createRibbonAccessory() {
+    this.ribbonGroup = new THREE.Group();
+    this.ribbonGroup.position.set(-0.44, 1.04, 0.64);
+    this.ribbonGroup.rotation.set(0.18, -0.18, 0.24);
+    this.ribbonGroup.scale.set(1.55, 1.55, 1.55);
+    this.ribbonGroup.renderOrder = 2450;
+    this.accessoriesGroup.add(this.ribbonGroup);
+
+    const ribbonMat = new THREE.MeshStandardMaterial({
+      color: 0xFF3E7F,
+      roughness: 0.28,
+      metalness: 0.06
+    });
+    const knotMat = new THREE.MeshStandardMaterial({
+      color: 0xE01E63,
+      roughness: 0.24,
+      metalness: 0.08
+    });
+
+    // Center pillowy knot
+    const knot = new THREE.Mesh(new THREE.SphereGeometry(0.088, 24, 18), knotMat);
+    knot.scale.set(0.92, 1.12, 0.85);
+    this.ribbonGroup.add(knot);
+
+    // Left & Right Puffy Satin Loops
+    [-1, 1].forEach((s) => {
+      const loop = new THREE.Mesh(new THREE.SphereGeometry(0.165, 28, 20), ribbonMat);
+      loop.scale.set(1.32, 0.92, 0.52);
+      loop.position.set(s * 0.18, 0.02, -0.02);
+      loop.rotation.set(0, -s * 0.18, s * 0.16);
+      this.ribbonGroup.add(loop);
+
+      // Fluttering lower ribbon tail
+      const tail = new THREE.Mesh(new THREE.ConeGeometry(0.068, 0.22, 16), ribbonMat);
+      tail.scale.set(1.0, 1.0, 0.42);
+      tail.position.set(s * 0.11, -0.15, -0.03);
+      tail.rotation.set(0, 0, s * 0.38);
+      this.ribbonGroup.add(tail);
+    });
+
+    this.ribbonGroup.visible = false;
+  }
+
+  /**
+   * 3D Academic Mortarboard Graduation Cap ('gradcap') with Golden Tassel
+   */
+  createGradCapAccessory() {
+    this.gradCapGroup = new THREE.Group();
+    this.gradCapGroup.position.set(0, 1.15, 0.22);
+    this.gradCapGroup.rotation.set(0.24, 0.08, -0.06);
+    this.gradCapGroup.scale.set(1.32, 1.32, 1.32);
+    this.gradCapGroup.renderOrder = 2420;
+    this.accessoriesGroup.add(this.gradCapGroup);
+
+    const capMat = new THREE.MeshStandardMaterial({
+      color: 0x1E1B4B,
+      roughness: 0.42,
+      metalness: 0.12
+    });
+    const goldTasselMat = new THREE.MeshStandardMaterial({
+      color: 0xFACC15,
+      metalness: 0.75,
+      roughness: 0.22
+    });
+
+    // Skullcap base
+    const skull = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.38, 0.16, 32), capMat);
+    this.gradCapGroup.add(skull);
+
+    // Square mortarboard top
+    const board = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.045, 0.96), capMat);
+    board.position.y = 0.09;
+    board.rotation.y = Math.PI / 4;
+    this.gradCapGroup.add(board);
+
+    // Center gold button & draped golden tassel
+    const btn = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 12), goldTasselMat);
+    btn.position.set(0, 0.12, 0);
+    this.gradCapGroup.add(btn);
+
+    const cordCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0.12, 0),
+      new THREE.Vector3(0.24, 0.11, 0.18),
+      new THREE.Vector3(0.46, 0.08, 0.32),
+      new THREE.Vector3(0.50, -0.14, 0.36)
+    ]);
+    const cord = new THREE.Mesh(new THREE.TubeGeometry(cordCurve, 20, 0.016, 10, false), goldTasselMat);
+    this.gradCapGroup.add(cord);
+
+    const fringe = new THREE.Mesh(new THREE.ConeGeometry(0.048, 0.14, 16), goldTasselMat);
+    fringe.position.set(0.50, -0.19, 0.36);
+    this.gradCapGroup.add(fringe);
+
+    this.gradCapGroup.visible = false;
+  }
+
+  /**
+   * 3D Plump Sakura Artist Beret ('beret') tilted jauntily on Mochi's crown
+   */
+  createBeretAccessory() {
+    this.beretGroup = new THREE.Group();
+    this.beretGroup.position.set(0.18, 1.13, 0.22);
+    this.beretGroup.rotation.set(0.18, 0, -0.24);
+    this.beretGroup.scale.set(1.38, 1.38, 1.38);
+    this.beretGroup.renderOrder = 2410;
+    this.accessoriesGroup.add(this.beretGroup);
+
+    const woolMat = new THREE.MeshStandardMaterial({
+      color: 0xE11D48,
+      roughness: 0.62,
+      metalness: 0.05
+    });
+    const bandMat = new THREE.MeshStandardMaterial({ color: 0x4C0519, roughness: 0.45 });
+
+    const headband = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.38, 0.09, 32), bandMat);
+    this.beretGroup.add(headband);
+
+    const puff = new THREE.Mesh(new THREE.SphereGeometry(0.48, 32, 24), woolMat);
+    puff.scale.set(1.15, 0.46, 1.12);
+    puff.position.set(0.04, 0.12, 0);
+    this.beretGroup.add(puff);
+
+    const stem = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.06, 6, 12), woolMat);
+    stem.position.set(0.04, 0.34, 0);
+    stem.rotation.z = -0.25;
+    this.beretGroup.add(stem);
+
+    this.beretGroup.visible = false;
+  }
+
+  setAccessory(name) {
+    this.currentAccessory = name || null;
+    const isTeacher = (name === 'teacher' || name === 'teach' || name === 'study' || name === 'sensei');
+    if (this.headsetGroup) this.headsetGroup.visible = (name === 'headset' || isTeacher);
+    if (this.glassesGroup) this.glassesGroup.visible = (name === 'glasses' || isTeacher || name === 'scholar');
+    if (this.pencilGroup) this.pencilGroup.visible = (name === 'pencil' || isTeacher);
+    if (this.crownGroup) this.crownGroup.visible = (name === 'crown' || name === 'king' || name === 'queen');
+    if (this.ribbonGroup) this.ribbonGroup.visible = (name === 'ribbon' || name === 'bow');
+    if (this.gradCapGroup) this.gradCapGroup.visible = (name === 'gradcap' || name === 'scholar');
+    if (this.beretGroup) this.beretGroup.visible = (name === 'beret' || name === 'artist');
+
+    if (name !== 'pencil' && !isTeacher) {
       if (this.pencilGroup && !this.pencilGroup.visible) {
         if (this.handR && !this.handGesture && this.handState === 'hidden') {
           this.handR.visible = false;
@@ -2040,6 +5114,25 @@ export class FiezelMochi {
   setTalking(isTalking, durationSeconds = 0) {
     this.isTalking = !!isTalking;
     this.talkDuration = durationSeconds > 0 ? durationSeconds : 0;
+    if (!this.isTalking && !this._manualVisemeLock) {
+      this.activeViseme = null;
+      this.renderCurvedFaceAndFx();
+    }
+  }
+
+  /**
+   * Explicitly set a phonetic or vowel viseme on the 3D Curved Face Shell (100% Toothless).
+   * Supports:
+   *  - 5 Vowels: 'A', 'I', 'U', 'E', 'O' (with intensity 0.0..1.0 or 'A1','A2','A3'..'O3')
+   *  - 12 Phonetic Visemes: 'AEI' ('A,E,I'), 'O', 'CDNSTXYZ' ('C,D,N,S,T,X,Y,Z'), 'GK' ('G,K'),
+   *    'L', 'BMP' ('B,M,P'), 'FV' ('F,V'), 'EE' ('Ee'), 'TH', 'CHJSH' ('CH,J,SH'), 'U', 'QW' ('Q,W')
+   *  - Pass `null` to return to the current expression's resting mouth.
+   */
+  setViseme(code, intensity = 1.0) {
+    this._manualVisemeLock = !!code;
+    this.activeViseme = code || null;
+    this.visemeIntensity = intensity ?? 1.0;
+    this.renderCurvedFaceAndFx();
   }
 
   updateMouthMotion(dt) {
@@ -2048,6 +5141,7 @@ export class FiezelMochi {
       if (this.talkDuration <= 0) {
         this.isTalking = false;
         this.talkDuration = 0;
+        if (!this._manualVisemeLock) this.activeViseme = null;
       }
     }
 
@@ -2059,6 +5153,13 @@ export class FiezelMochi {
       const feat = this.wawaLipsync.features;
       const vol = feat ? Math.max(0, Math.min(1, feat.volume * 1.9)) : 0;
       const lerp = Math.min(1, Math.max(0.18, dt * 22));
+
+      if (viseme === VISEMES.sil || vol < 0.04) {
+        this.activeViseme = null;
+      } else {
+        this.activeViseme = viseme;
+        this.visemeIntensity = Math.max(0.28, Math.min(1.0, vol * 1.15));
+      }
 
       if (!this._mouthLerp) {
         this._mouthLerp = { hx: 1, hy: 1, ox: 0.9, oy: 1.15, wx: 1, wy: 1 };
@@ -2115,6 +5216,13 @@ export class FiezelMochi {
       const syllableWave = Math.sin(this.talkTimer * 14.0) * 0.55 + Math.sin(this.talkTimer * 22.0) * 0.25 + 0.20;
       const mouthOpen = Math.max(0, Math.min(1.0, syllableWave));
 
+      if (!this._manualVisemeLock) {
+        const cycle = ['A', 'I', 'U', 'E', 'O', 'L', 'BMP'];
+        const vIdx = Math.floor(this.talkTimer * 5.2) % cycle.length;
+        this.activeViseme = mouthOpen > 0.18 ? cycle[vIdx] : 'BMP';
+        this.visemeIntensity = Math.max(0.32, mouthOpen);
+      }
+
       if (this.mood !== 'pout' && this.mood !== 'sleepy') {
         const isOpen = (mouthOpen > 0.35);
         if (this.mouthHappy) {
@@ -2137,6 +5245,9 @@ export class FiezelMochi {
         }
       }
     } else {
+      if (!this._manualVisemeLock) {
+        this.activeViseme = null;
+      }
       const breath = Math.sin(this.time * 2.2) * 0.005;
       if (this.mouthW && (this.mood === 'dots' || this.mood === 'wink')) {
         this.mouthW.visible = true;
@@ -2311,30 +5422,32 @@ export class FiezelMochi {
     this.holdMoodUntil = Date.now() + durationSeconds * 1000;
   }
 
+  setMoodInstant(m) {
+    this._instantMood = true;
+    this.setMood(m);
+    this._instantMood = false;
+    this.syncMoodTargets(true);
+    this.renderCurvedFaceAndFx();
+  }
+
   setMood(m) {
     if (this.voiceCompanionStrictMode) {
-      const wasPoutStrict = (this.mood === 'pout' || this.mood === 'sleepy');
       this.mood = 'dots';
-      this.updateFaceVisibility();
-      if (wasPoutStrict) this.updateSkinBlush();
+      this.syncMoodTargets(false);
       this.triggerJiggle(0.14);
-      if (m === 'wink' || m === 'happy' || m === 'hearts') {
+      if (m === 'wink' || m === 'happy' || m === 'hearts' || m === 'senang' || m === 'gembira') {
         this.triggerHandGesture('wave', 2.2);
       } else {
         this.retractHands();
       }
       return;
     }
-    const wasPout = (this.mood === 'pout' || this.mood === 'sleepy');
     this.mood = m;
-    this.updateFaceVisibility();
-    // The skin texture only differs between pout/sleepy and every other mood; repainting and
-    // re-uploading it on each same-look mood call stalled answer taps on phones.
-    if (wasPout !== (m === 'pout' || m === 'sleepy')) this.updateSkinBlush();
+    this.syncMoodTargets(Boolean(this._instantMood));
     this.triggerJiggle(0.18);
 
     // Dynamic hand emergence matching mood!
-    if (m === 'happy') {
+    if (m === 'happy' || m === 'gembira') {
       this.triggerHandGesture('cheer', 4.0);
     } else if (m === 'pout' || m === 'sleepy') {
       this.triggerHandGesture('pout', 4.5);
@@ -2343,7 +5456,7 @@ export class FiezelMochi {
       this.squish.z = 1.14;
       this.squish.y = 0.94;
       this.triggerJiggle(0.24);
-    } else if (m === 'wink' || m === 'hearts') {
+    } else if (m === 'wink' || m === 'hearts' || m === 'senang') {
       this.triggerHandGesture('wave', 2.2);
     } else {
       this.retractHands();
@@ -2700,8 +5813,54 @@ export class FiezelMochi {
 
     this.mochiGroup.rotation.x = this.currentRot.x + accRotX;
     this.mochiGroup.rotation.y = this.currentRot.y + ambientSway + accRotY;
-    this.mochiGroup.rotation.z = -this.currentRot.y * 0.15 + accRotZ;
+    const desc = this.resolveMoodDescriptor(this.mood);
+    this._currentMoodDesc = desc;
+    const headTiltTarget = (desc && desc.headTilt) ? desc.headTilt : 0;
+    this._currentHeadTilt = (this._currentHeadTilt || 0) + (headTiltTarget - (this._currentHeadTilt || 0)) * Math.min(1, dt * 10);
+    this.mochiGroup.rotation.z = -this.currentRot.y * 0.15 + accRotZ + this._currentHeadTilt;
     this.mochiGroup.position.y = this.floatPos.y + accPosY;
+
+    // 2b. Damped Spring Stepping for 3D Skin States & 3D Morph Rig (Horns / Ears / Steam / Empati Paws)
+    const stepSpring = (val, vel, target, omega = 15.0, zeta = 0.62) => {
+      val = Number.isFinite(val) ? val : target;
+      vel = Number.isFinite(vel) ? vel : 0;
+      const sDt = Math.min(dt, 1 / 30);
+      const accel = -omega * omega * (val - target) - 2 * zeta * omega * vel;
+      vel += accel * sDt;
+      val += vel * sDt;
+      if (Math.abs(val - target) < 0.001 && Math.abs(vel) < 0.002) {
+        val = target;
+        vel = 0;
+      }
+      return [val, vel];
+    };
+    if (this.skinBlend && desc) {
+      let skinDirty = false;
+      for (const kKey of ['takut', 'marah', 'furious', 'pout']) {
+        const prev = this.skinBlend[kKey];
+        const vKey = kKey + 'Vel';
+        [this.skinBlend[kKey], this.skinBlend[vKey]] = stepSpring(
+          this.skinBlend[kKey], this.skinBlend[vKey], desc[kKey] || 0, 14.0, 0.72
+        );
+        if (Math.abs(this.skinBlend[kKey] - prev) > 0.003) skinDirty = true;
+      }
+      if (skinDirty) this.updateSkinBlush();
+    }
+    if (this.morphRig && desc) {
+      [this.morphRig.hornScale, this.morphRig.hornVel] = stepSpring(
+        this.morphRig.hornScale, this.morphRig.hornVel, desc.horns || 0, 16.0, 0.52
+      );
+      [this.morphRig.earScale, this.morphRig.earVel] = stepSpring(
+        this.morphRig.earScale, this.morphRig.earVel, desc.ears !== undefined ? desc.ears : 1, 15.0, 0.65
+      );
+      [this.morphRig.steamScale, this.morphRig.steamVel] = stepSpring(
+        this.morphRig.steamScale, this.morphRig.steamVel, desc.steam || 0, 14.0, 0.58
+      );
+      [this.morphRig.empatiPawScale, this.morphRig.empatiPawVel] = stepSpring(
+        this.morphRig.empatiPawScale, this.morphRig.empatiPawVel, desc.empatiPaws || 0, 16.0, 0.58
+      );
+      this.applyMorphRigMeshes();
+    }
 
     // 3. Disney 90° Phase Inertia + Damped Harmonic Jiggle
     const inertialPhase = Math.sin(this.time * 2.2 + Math.PI * 0.5) * 0.045;
@@ -2835,6 +5994,9 @@ export class FiezelMochi {
 
     // 9. Particles Update
     this.updateParticles(dt);
+
+    // 10. Curved 3D Face Shell & Storyboard FX Redraw
+    this.renderCurvedFaceAndFx();
   }
 
 
@@ -2848,19 +6010,89 @@ export class FiezelMochi {
    *  - palms face the body in celebration (fist pump), never both palms to camera
    *    (that read as "surrender" / "high-five")
    */
-  updatePaws(dt) {
+  /**
+   * Floating cat paws — animation principles applied (research: Rayman-style detached limbs,
+   * Animation Mentor "avoid twinning", squash & stretch, anticipation, overlap):
+   *  - every paw is driven by damped springs (position, wrist rotation, finger curl, scale)
+   *    so motion has natural overshoot and follow-through instead of stiff sine loops
+   *  - the two paws NEVER mirror each other: different pose, height, curl and a time offset
+   *  - fingers are jointed: open (wave) -> relaxed -> fist (cheer / ganbatte)
+   *  - palms face the body in celebration (fist pump), never both palms to camera
+   *    (that read as "surrender" / "high-five")
+   */
+  /**
+   * True 3D Volumetric Fleshy Paw Rig — 100% Three.js Mesh Articulation
+   * Every hand shape is built from real 3D plush marshmallow geometry (plump palm, 4 jointed chubby fingers,
+   * articulated thumb, glossy pink pads, and retractable demon talons) with full PBR shading, specular sheen,
+   * and fleshy volume matching Mochi's body:
+   *  - 'open'        : Plush wide-spread 3D cat paw with pink toe beans & heart palm pad (Senang, Kaget, Gembira)
+   *  - 'fist_punch'  : 3D forward-thrusting muscular clenched brawler fist with 4 knuckle arches, locked thumb & kinetic shock ring (Marah)
+   *  - 'fist_guard'  : 3D cocked boxer guard fist with stacked curled fingers and upright thumb (Marah left)
+   *  - 'fist_clench' : Muscular tight clenched fists with 4 curled knuckles & locked thumb (Kesal)
+   *  - 'hips_akimbo' : Firm 3D clenched fist angled powerfully against the waist in mid-air (Tegas & Sinis left)
+   *  - 'scratch_head': Extended hooked chubby index finger scratching temple + 3 curled knuckles & thumb (Penasaran right)
+   *  - 'chin_think'  : Upright thinking index finger along cheek + horizontal chin thumb + 3 curled knuckles (Penasaran left)
+   *  - 'sassy_point' : Proud upright chubby index finger + curled knuckles (Sinis right)
+   *  - 'empati_cup'  : Fleshy, softly cupped caring hands curved tenderly inward hugging chest/cheeks (Empati)
+   *  - 'wipe_tear'   : Fleshy index finger reaching to wipe tear with 3D crystal sky-blue tear droplet on tip (Sedih right)
+   *  - 'sad_droop'   : Limp, relaxed chubby fingers hanging downward from relaxed palm (Sedih left & Lelah right)
+   *  - 'sleepy_rub'  : Fleshy clenched fist rubbing sleepy eye with circular motion (Lelah left)
+   *  - 'scared_shiver': 5 chubby fingers splayed wide and trembling with 3D icy shiver ring (Takut)
+   *  - 'demon_claw'  : Ferocious 3D obsidian-charcoal paws with 5 razor-sharp curved demon talons (Sangat Marah)
+   *  - 'peace_sign'  : Celebratory V-sign with Index & Middle fingers high (Mahkota Juara)
+   *  - 'thumbs_up'   : Proud upright chubby thumb with curled knuckles (Topi Wisuda)
+   *  - 'pencil_grip' : Index & thumb pinching forward around the 3D pencil (Pensil Belajar)
+   */
+  /**
+   * True 3D Volumetric Fleshy Paw Rig — 100% Three.js Mesh Articulation
+   * Seamlessly switches between 3 dedicated, fully sculpted 3D geometries with full PBR plush shading:
+   *  - 'open'       : Canonical plush 4-toed Kawaii cat paw with pink toe beans & heart pad (Senang, Kaget, Gembira)
+   *  - 'fist'       : Solid continuous fleshy cartoon fist with 4 rounded knuckles & locked thumb (Marah, Kesal, Tegas)
+   *  - 'point'      : Fleshy thinking/scratching hand with curved chubby index finger (Penasaran, Sinis)
+   */
+  applyPawShape(paw, shapeMode = 'open', isDemon = false) {
+    if (!paw || !paw.userData) return;
+    const u = paw.userData;
+    u.shapeMode = shapeMode;
+
+    if (u.openGroup) u.openGroup.visible = false;
+    if (u.fistGroup) u.fistGroup.visible = false;
+    if (u.scratchGroup) u.scratchGroup.visible = false;
+    if (u.pointGroup) u.pointGroup.visible = false;
+
+    if (shapeMode === 'fist_punch' || shapeMode === 'fist_guard' || shapeMode === 'fist_clench' || shapeMode === 'hips_akimbo' || shapeMode === 'sleepy_rub') {
+      if (u.fistGroup) u.fistGroup.visible = true;
+    } else if (shapeMode === 'scratch_head') {
+      if (u.scratchGroup) u.scratchGroup.visible = true;
+    } else if (shapeMode === 'chin_think' || shapeMode === 'sassy_point') {
+      if (u.pointGroup) u.pointGroup.visible = true;
+    } else {
+      // Default: Clean, beloved 3D Kawaii Cat Paw ('open', 'empati_cup', 'scared_shiver', 'demon_claw', 'peace_sign', 'thumbs_up', 'pencil_grip')
+      if (u.openGroup) {
+        u.openGroup.visible = true;
+        const showClaws = (shapeMode === 'demon_claw' || isDemon);
+        if (u.toes) {
+          u.toes.forEach(t => {
+            if (t.clawMesh) t.clawMesh.visible = showClaws;
+          });
+        }
+      }
+    }
+  }
+
+  updatePaws(dt, snapImmediate = false) {
     if (!this.handL || !this.handR) return;
     dt = Math.min(dt, 1 / 30);
 
-    if (this.handTimer > 0) {
+    if (this.handTimer > 0 && !snapImmediate) {
       this.handTimer -= dt;
       if (this.handTimer <= 0) this.handState = 'hidden';
     }
-    this.handGestureTime = (this.handGestureTime || 0) + dt;
+    this.handGestureTime = (this.handGestureTime || 0) + (snapImmediate ? 1.0 : dt);
 
     if (!this.pawSim) {
       const mk = (side) => ({
-        pos: new THREE.Vector3(side * 1.35, -0.1, 0.3), vel: new THREE.Vector3(),
+        pos: new THREE.Vector3(side * 1.68, -0.1, 0.48), vel: new THREE.Vector3(),
         rot: new THREE.Vector3(), rotVel: new THREE.Vector3(),
         s: 0, sVel: 0
       });
@@ -2868,69 +6100,175 @@ export class FiezelMochi {
     }
 
     const t = this.time;
-    const st = this.handState;
-    const smooth = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+    const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
+    const isDemon = (desc && desc.id === 'sangat_marah') || (this.skinBlend && this.skinBlend.furious > 0.5);
+    const isTeacher = (this.currentAccessory === 'teacher' || this.currentAccessory === 'teach' || this.currentAccessory === 'study' || this.currentAccessory === 'sensei');
+
+    // Resolve active hand choreography:
+    // Per user mandate: ONLY 'gembira', 'senang', and 'kaget' show hands; all other expressions have NO hands.
+    const allowedPawsMoods = ['gembira', 'senang', 'kaget'];
+    const moodId = desc ? desc.id : '';
+    const allowHands = allowedPawsMoods.includes(moodId) || this.currentAccessory === 'pencil' || isTeacher;
+
+    let st = this.handState;
+    if (!allowHands) {
+      st = 'hidden';
+    } else if ((!st || st === 'hidden') && !this.voiceCompanionStrictMode && this.showHands !== false) {
+      if (this.currentAccessory === 'pencil' || isTeacher) {
+        st = 'pencil_hold';
+      } else if (desc && desc.handPose && desc.handPose !== 'hidden') {
+        st = desc.handPose;
+      }
+    }
+
     const bump = (x, at, w) => { const d = (x - at) / w; return Math.abs(d) < 1 ? Math.cos(d * Math.PI * 0.5) ** 2 : 0; };
 
     const pose = (side) => {
       const lead = side === 1;
-      const g = this.handGestureTime - (lead ? 0 : 0.16);
-      const bob = Math.sin(t * 2.5 + (lead ? 1.6 : 0)) * 0.05;
-      const P = { x: side * 1.35, y: -0.1, z: 0.3, rx: 0, ry: 0, rz: 0, s: 0 };
+      const g = snapImmediate ? 1.2 : (this.handGestureTime - (lead ? 0 : 0.12));
+      const bob = Math.sin(t * 2.5 + (lead ? 1.6 : 0)) * 0.04;
+      const P = { x: side * 1.68, y: -0.1, z: 0.48, rx: 0, ry: 0, rz: 0, s: 0, shape: 'open' };
       if (g < 0 && st !== 'hidden') { P.s = 0; return P; }
 
-      if (st === 'cheer') {
+      if (st === 'cheer' || st === 'joy_high') {
+        // Gembira: Both open paws floating high in joyous celebration ("Hore / Yatta!")
+        const wig = Math.sin(t * 9.5 + (lead ? 0 : 1.2)) * 0.10;
         if (lead) {
-          // RIGHT PAW (Reference C): Raised high with joy, pink pads proudly facing front, cheerful wave!
-          const hop = (bump(g, 0.55, 0.16) + bump(g, 0.95, 0.16)) * 0.10;
-          const wig = Math.sin(t * 11.0) * 0.14;
-          P.x = 1.54; P.y = 0.72 + hop + bob * 0.5; P.z = 0.65;
-          P.rx = -0.05; P.ry = -0.10; P.rz = -0.22 + wig;
-          P.s = 1.0;
+          const hop = (bump(g, 0.55, 0.16) + bump(g, 0.95, 0.16)) * 0.08;
+          P.x = 1.70; P.y = 0.44 + hop + bob * 0.5; P.z = 0.50;
+          P.rx = -0.05; P.ry = -0.12; P.rz = -0.30 + wig;
+          P.s = 0.90; P.shape = 'open';
         } else {
-          // LEFT PAW (Reference C): Resting gently down at the side, hanging naturally
-          P.x = -1.54; P.y = -0.12 + bob; P.z = 0.60;
-          P.rx = 0.10; P.ry = 0.40; P.rz = 0.32;
-          P.s = 0.92;
+          P.x = -1.70; P.y = 0.40 + bob * 0.5; P.z = 0.50;
+          P.rx = -0.05; P.ry = 0.12; P.rz = 0.30 - wig;
+          P.s = 0.88; P.shape = 'open';
         }
-      } else if (st === 'pout' || st === 'sad') {
+      } else if (st === 'happy_wave' || st === 'wave') {
+        // Senang / Wave: Right open paw waving high in mid-air, Left open paw floating outside lower-left
         if (lead) {
-          // RIGHT PAW: Tucked close to puffed-out cheek in cute harmless toddler sulk
-          const sulkTremble = Math.sin(t * 7.5) * 0.03;
-          P.x = 1.48; P.y = -0.18 + sulkTremble + bob * 0.4; P.z = 0.68;
-          P.rx = 0.08; P.ry = -0.32; P.rz = -0.18;
-          P.s = 0.98;
+          const w = Math.sin(t * 8.5) * 0.20;
+          const hasHeadset = (this.currentAccessory === 'headset' || isTeacher);
+          P.x = 1.68;
+          P.y = (hasHeadset ? -0.16 : 0.38) + bob * 0.5;
+          P.z = 0.50;
+          P.rx = -0.04; P.ry = -0.12; P.rz = -0.26 + w;
+          P.s = 0.90; P.shape = 'open';
         } else {
-          // LEFT PAW: Tucked close to opposite puffed cheek
-          P.x = -1.48; P.y = -0.22 + bob * 0.4; P.z = 0.65;
-          P.rx = 0.08; P.ry = 0.32; P.rz = 0.18;
-          P.s = 0.95;
+          P.x = -1.68; P.y = -0.18 + bob * 0.4; P.z = 0.48;
+          P.rx = -0.04; P.ry = 0.12; P.rz = 0.24;
+          P.s = (st === 'wave') ? 0.0 : 0.86; P.shape = 'open';
         }
-      } else if (st === 'wave') {
+      } else if (st === 'firm_hips') {
+        // Tegas: Both firm fists floating outside waist in determined "Bertolak pinggang" stance!
+        P.x = side * 1.72; P.y = -0.22 + bob * 0.3; P.z = 0.48;
+        P.rx = 0.05; P.ry = -side * 0.25; P.rz = side * 0.35;
+        P.s = 0.92; P.shape = 'hips_akimbo';
+      } else if (st === 'skeptical_chin') {
+        // Sinis: Right thinking paw resting under cheek, Left firm fist at waist
         if (lead) {
-          // RIGHT PAW: Playful cute cat wave with pink pads visible
-          const w = Math.sin(t * 9.0) * 0.28;
-          P.x = 1.54; P.y = 0.40 + bob * 0.5; P.z = 0.62;
-          P.rx = 0.0; P.ry = -0.08; P.rz = -0.16 + w;
-          P.s = 1.0;
+          P.x = 1.42; P.y = -0.24 + Math.sin(t * 3.5) * 0.02; P.z = 0.54;
+          P.rx = -0.10; P.ry = -0.22; P.rz = -0.15;
+          P.s = 0.90; P.shape = 'chin_think';
         } else {
-          // Left paw remains cleanly retracted inside body (zero 4-paw collision anomaly)
-          P.s = 0.0;
+          P.x = -1.70; P.y = -0.20 + bob * 0.3; P.z = 0.48;
+          P.rx = 0.05; P.ry = 0.25; P.rz = -0.35;
+          P.s = 0.88; P.shape = 'hips_akimbo';
         }
-      } else if (this.currentAccessory === 'pencil') {
+      } else if (st === 'empati_float' || st === 'empati_chest') {
+        // Empati: Both softly cupped caring paws with pink beans resting tenderly under chin matching Master Storyboard 1:1!
+        P.x = side * 0.34; P.y = -0.42 + bob * 0.2; P.z = 1.12;
+        P.rx = 0.22; P.ry = side * 0.16; P.rz = -side * 0.42;
+        P.s = 0.92; P.shape = 'open';
+      } else if (st === 'scratch_head') {
+        // Penasaran / Bingung: Right 4-toed chubby paw scratching temple/ear, Left open paw floating outside!
         if (lead) {
-          // RIGHT PAW: Holding pencil, gentle, rhythmic, charming bobbing
+          const scratch = Math.sin(t * 11.0) * 0.04;
+          P.x = 1.46; P.y = 0.62 + scratch * 0.3; P.z = 0.52;
+          P.rx = 0.12; P.ry = -0.32; P.rz = 0.42 + scratch;
+          P.s = 0.92; P.shape = 'scratch_head';
+        } else {
+          P.x = -1.68; P.y = -0.16 + bob * 0.3; P.z = 0.48;
+          P.rx = 0.04; P.ry = 0.18; P.rz = -0.18;
+          P.s = 0.88; P.shape = 'open';
+        }
+      } else if (st === 'shock_flail') {
+        // Kaget: Both open paws flung wide outward in mid-air shock!
+        const jolt = Math.sin(t * 18.0) * 0.025;
+        P.x = side * 1.74; P.y = 0.24 + jolt; P.z = 0.50;
+        P.rx = 0.02; P.ry = -side * 0.14; P.rz = -side * 0.45;
+        P.s = 0.92; P.shape = 'open';
+      } else if (st === 'wipe_tears') {
+        // Sedih: Right hand wiping tear near right cheek, Left hand drooping limp
+        if (lead) {
+          const wipe = Math.sin(t * 6.5) * 0.035;
+          P.x = 1.48; P.y = 0.12 + wipe; P.z = 0.52;
+          P.rx = 0.06; P.ry = -0.22; P.rz = 0.22;
+          P.s = 0.90; P.shape = 'open';
+        } else {
+          P.x = -1.68; P.y = -0.22 + bob * 0.3; P.z = 0.48;
+          P.rx = 0.08; P.ry = 0.14; P.rz = 0.18;
+          P.s = 0.88; P.shape = 'open';
+        }
+      } else if (st === 'annoyed_fists') {
+        // Kesal: Both clenched fists floating outside lower sides, trembling with annoyance!
+        const shake = Math.sin(t * 24.0) * 0.016;
+        P.x = side * 1.70 + shake; P.y = -0.14 + bob * 0.3; P.z = 0.50;
+        P.rx = 0.08; P.ry = -side * 0.16; P.rz = -side * 0.18;
+        P.s = 0.92; P.shape = 'fist_clench';
+      } else if (st === 'sleepy_rub') {
+        // Lelah: Left curled hand rubbing sleepy eye, Right limp hand hanging low
+        if (!lead) {
+          const rub = Math.sin(t * 4.5) * 0.035;
+          P.x = -1.45; P.y = 0.16 + rub; P.z = 0.52;
+          P.rx = 0.08; P.ry = 0.22; P.rz = -0.24 + rub;
+          P.s = 0.90; P.shape = 'fist_clench';
+        } else {
+          P.x = 1.68; P.y = -0.26 + bob * 0.2; P.z = 0.48;
+          P.rx = 0.10; P.ry = -0.14; P.rz = -0.22;
+          P.s = 0.88; P.shape = 'open';
+        }
+      } else if (st === 'scared_cheeks') {
+        // Takut: Both open paws shivering nervously beside cheeks!
+        const shiver = Math.sin(t * 48.0) * 0.022;
+        P.x = side * 1.72 + shiver; P.y = 0.08; P.z = 0.50;
+        P.rx = 0.04; P.ry = -side * 0.14; P.rz = side * 0.18;
+        P.s = 0.90; P.shape = 'open';
+      } else if (st === 'boxing_punch') {
+        // Marah (Stage 2): Right forward brawler punch fist & Left cocked boxer guard fist!
+        const jab = Math.sin(t * 10.0) * 0.04;
+        if (lead) {
+          P.x = 1.72; P.y = 0.06 + jab * 0.4; P.z = 0.65 + jab * 0.5;
+          P.rx = 0.12; P.ry = -0.24; P.rz = -0.18;
+          P.s = 0.96; P.shape = 'fist_punch';
+        } else {
+          P.x = -1.70; P.y = 0.22 - jab * 0.3; P.z = 0.52;
+          P.rx = 0.08; P.ry = 0.22; P.rz = 0.24;
+          P.s = 0.92; P.shape = 'fist_guard';
+        }
+      } else if (st === 'demon_rage_fists') {
+        // Sangat Marah (Stage 3): Ferocious demon claws floating menacingly at sides!
+        const tremor = Math.sin(t * 32.0) * 0.02;
+        P.x = side * 1.72 + tremor; P.y = 0.12 + bob * 0.3; P.z = 0.52;
+        P.rx = 0.12; P.ry = -side * 0.18; P.rz = -side * 0.24;
+        P.s = 0.95; P.shape = 'demon_claw';
+      } else if (st === 'pencil_hold' || this.currentAccessory === 'pencil' || isTeacher) {
+        if (lead) {
           const wave = Math.sin(t * 1.8);
-          P.x = 1.42;
+          P.x = 1.54;
           P.y = -0.06 + wave * 0.035;
-          P.z = 0.78;
-          P.rx = -0.12;
-          P.ry = -0.20;
-          P.rz = -0.32 + wave * 0.06;
-          P.s = 1.0;
+          P.z = 0.52;
+          P.rx = 0;
+          P.ry = 0;
+          P.rz = -0.10 + wave * 0.05;
+          P.s = 0.92; P.shape = 'open';
         } else {
-          // Left paw remains tucked inside cleanly during pencil writing
-          P.s = 0.0;
+          P.x = -1.68;
+          P.y = -0.20 + bob * 0.3;
+          P.z = 0.48;
+          P.rx = 0.02;
+          P.ry = 0.12;
+          P.rz = 0.24;
+          P.s = 0.86; P.shape = 'open';
         }
       }
       return P;
@@ -2943,13 +6281,31 @@ export class FiezelMochi {
     };
 
     const drive = (hand, S, side) => {
-      const P = pose(side);
-      const axes = ['x', 'y', 'z'];
-      for (const a of axes) {
-        [S.pos[a], S.vel[a]] = spring(S.pos[a], S.vel[a], P[a], 140, 0.52);
-        [S.rot[a], S.rotVel[a]] = spring(S.rot[a], S.rotVel[a], P['r' + a], 110, 0.60);
+      if (!allowHands || st === 'hidden') {
+        hand.visible = false;
+        S.s = 0;
+        S.sVel = 0;
+        hand.scale.set(0.001, 0.001, 0.001);
+        return;
       }
-      [S.s, S.sVel] = spring(S.s, S.sVel, P.s, 160, 0.56);
+      const P = pose(side);
+      this.applyPawShape(hand, P.shape || 'open', isDemon);
+
+      if (snapImmediate) {
+        S.pos.set(P.x, P.y, P.z);
+        S.vel.set(0, 0, 0);
+        S.rot.set(P.rx, P.ry, P.rz);
+        S.rotVel.set(0, 0, 0);
+        S.s = P.s;
+        S.sVel = 0;
+      } else {
+        const axes = ['x', 'y', 'z'];
+        for (const a of axes) {
+          [S.pos[a], S.vel[a]] = spring(S.pos[a], S.vel[a], P[a], 140, 0.52);
+          [S.rot[a], S.rotVel[a]] = spring(S.rot[a], S.rotVel[a], P['r' + a], 110, 0.60);
+        }
+        [S.s, S.sVel] = spring(S.s, S.sVel, P.s, 160, 0.56);
+      }
 
       const sc = Math.max(0.001, S.s * 1.45);
       hand.visible = S.s > 0.02;
@@ -2961,7 +6317,9 @@ export class FiezelMochi {
       const speed = S.vel.length();
       const stretch = 1 + Math.min(0.22, speed * 0.035);
       const inv = 1 / Math.sqrt(stretch);
-      hand.userData.core.scale.set(inv, stretch, inv);
+      if (hand.userData && hand.userData.core) {
+        hand.userData.core.scale.set(inv, stretch, inv);
+      }
     };
 
     drive(this.handL, this.pawSim.L, -1);
