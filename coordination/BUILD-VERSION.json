@@ -1,7 +1,7 @@
 {
-  "version": "m025-775",
-  "claimedBy": "branch feat/mochi-paws-isolation-m025-775",
-  "claimedAt": "2026-11-07T18:19:20.876Z",
-  "reason": "feat(mascot): [ALLOW-PROTECTED: pwa] isolate paws to joy senang kaget and hide for other moods (m025-775)",
+  "version": "m025-776",
+  "claimedBy": "branch feat/mochi-organic-mouth-fire-steam-m025-776",
+  "claimedAt": "2026-11-07T20:13:12.856Z",
+  "reason": "fix(mascot): [ALLOW-PROTECTED: pwa] continuous organic viscoelastic mouth morphing, demon inferno, and anime steam puffs (m025-776)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
