@@ -1,7 +1,7 @@
 {
-  "version": "m025-776",
-  "claimedBy": "branch feat/mochi-organic-mouth-fire-steam-m025-776",
-  "claimedAt": "2026-11-07T20:13:12.856Z",
-  "reason": "fix(mascot): [ALLOW-PROTECTED: pwa] continuous organic viscoelastic mouth morphing, demon inferno, and anime steam puffs (m025-776)",
+  "version": "m025-777",
+  "claimedBy": "branch feat/voice-mobile-mic-translation-m025-777",
+  "claimedAt": "2026-11-07T20:52:14.116Z",
+  "reason": "fix(voice): [ALLOW-PROTECTED: pwa] unblock mobile mic, elevate translation clarity, and dock copilot in-flow (m025-777)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
