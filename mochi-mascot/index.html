@@ -1,379 +1,744 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mochi Mascot - Modular Component Playground</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mochi 3D Volumetric Storyboard & Toothless Viseme Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       user-select: none;
-      -webkit-user-select: none;
     }
     body {
-      background: #0F1115;
-      color: #E2E4E9;
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: linear-gradient(180deg, #FDF7FA 0%, #F7EFF6 50%, #FDF8FB 100%);
+      color: #3B1832;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      padding: 28px 24px 64px;
       min-height: 100vh;
+    }
+    .container {
+      max-width: 1420px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
+      gap: 36px;
+    }
+    /* Interactive Live 3D Stage */
+    .live-hero {
+      background: #FFFFFF;
+      border: 2.5px solid #F3DCEB;
+      border-radius: 28px;
+      padding: 24px 28px;
+      box-shadow: 0 18px 44px rgba(98, 36, 76, 0.08);
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 28px;
       align-items: center;
-      justify-content: flex-start;
-      padding: 24px 16px 48px;
-      overflow-x: hidden;
     }
-    .hero-title {
-      font-size: 24px;
-      font-weight: 800;
-      color: #FFFFFF;
-      letter-spacing: -0.5px;
-      margin-top: 12px;
-      text-align: center;
-    }
-    .hero-subtitle {
-      font-size: 13px;
-      color: #8C92A4;
-      margin-top: 4px;
-      text-align: center;
-      letter-spacing: 0.3px;
-    }
-    .stage {
-      position: relative;
+    .live-stage-wrap {
+      background: radial-gradient(circle at 50% 42%, #FFFDFB 0%, #F9EDF4 100%);
+      border: 2px solid #F2D8E9;
+      border-radius: 24px;
       width: 360px;
       height: 340px;
-      margin: 12px auto 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: grab;
+      position: relative;
+      box-shadow: inset 0 4px 16px rgba(176, 84, 136, 0.08);
     }
-    .stage:active {
-      cursor: grabbing;
+    .live-controls h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #461539;
+      margin-bottom: 6px;
     }
-    canvas {
-      display: block;
-      width: 360px;
-      height: 340px;
+    .live-controls p {
+      font-size: 13.5px;
+      color: #7D5270;
+      margin-bottom: 16px;
     }
-    .panel {
-      width: 100%;
-      max-width: 540px;
-      background: #171920;
-      border: 1px solid #232732;
-      border-radius: 20px;
-      padding: 20px;
-      margin-top: 16px;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    .ctrl-group {
+      margin-bottom: 14px;
     }
-    .section-title {
-      font-size: 11px;
+    .ctrl-label {
+      font-size: 11.5px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: #72798E;
-      margin-bottom: 10px;
+      letter-spacing: 0.9px;
+      color: #9A5B86;
+      margin-bottom: 8px;
+    }
+    .chip-row {
       display: flex;
-      align-items: center;
-      gap: 6px;
+      flex-wrap: wrap;
+      gap: 7px;
     }
-    .preset-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-    .btn-preset {
-      background: #202430;
-      border: 1px solid #2D3344;
-      color: #D2D6E2;
-      padding: 10px 8px;
-      border-radius: 12px;
+    .chip-btn {
+      background: #FDF4FA;
+      border: 1.5px solid #ECC6DF;
+      color: #561D46;
+      padding: 7px 13px;
+      border-radius: 999px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      transition: all 0.15s ease;
-      text-align: center;
+      transition: all 0.16s ease;
     }
-    .btn-preset:hover {
-      background: #2A3042;
-      border-color: #3F4760;
-      color: #FFFFFF;
-      transform: translateY(-2px);
+    .chip-btn:hover {
+      background: #FCE3F3;
+      transform: translateY(-1px);
     }
-    .btn-preset.active {
-      background: #3B82F6;
-      border-color: #60A5FA;
+    .chip-btn.active {
+      background: linear-gradient(180deg, #FF7EB8 0%, #E0488D 100%);
+      border-color: #C93176;
       color: #FFFFFF;
-      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 4px 12px rgba(224, 72, 141, 0.32);
     }
 
-    .parts-container {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .part-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .part-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #A6ADBF;
-    }
-    .part-chips {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .chip {
-      background: #1F222B;
-      border: 1px solid #2C303E;
-      color: #9BA3B8;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .chip:hover {
-      background: #282C38;
-      color: #E2E4E9;
-    }
-    .chip.active {
-      background: #E2E8F0;
-      border-color: #FFFFFF;
-      color: #0F172A;
-      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
-    }
-    .code-box {
-      margin-top: 16px;
-      background: #0B0D11;
-      border: 1px solid #1E222D;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-family: ui-monospace, monospace;
-      font-size: 11px;
-      color: #7DD3FC;
-      overflow-x: auto;
-      line-height: 1.5;
-    }
-    .hint-text {
-      margin-top: 12px;
-      font-size: 12px;
-      color: #6E7589;
+    /* Storyboard Sheet Cards */
+    .storyboard-sheet {
+      background: radial-gradient(circle at 50% 20%, #FFFFFF 0%, #FBF3F9 100%);
+      border: 3px solid #F2D5E8;
+      border-radius: 32px;
+      padding: 32px 28px 38px;
+      box-shadow: 0 22px 54px rgba(88, 28, 68, 0.08);
       text-align: center;
+    }
+    .sheet-pill-header {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #FFDDF0 0%, #FFC2E2 100%);
+      border: 2.5px solid #F497C8;
+      border-radius: 999px;
+      padding: 10px 38px;
+      font-size: 23px;
+      font-weight: 800;
+      color: #4D153D;
+      box-shadow: 0 6px 18px rgba(235, 115, 178, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.85);
+      margin-bottom: 26px;
+    }
+    .row-divider-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #5C1C49;
+      margin: 22px 0 14px;
+      letter-spacing: -0.2px;
+    }
+
+    /* Board 1 Grids */
+    .expr-row-6 {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .expr-row-8 {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .expr-row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 240px);
+      justify-content: center;
+      gap: 28px;
+      margin-top: 10px;
+    }
+    .expr-row-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .expr-subpill {
+      margin-top: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #844872;
+    }
+    .expr-card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 2px solid #F3DCEB;
+      border-radius: 22px;
+      padding: 10px 8px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(120, 45, 92, 0.05);
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+    .expr-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 26px rgba(180, 55, 128, 0.13);
+    }
+    .expr-card img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      display: block;
+    }
+    .expr-pill {
+      margin-top: 6px;
+      background: linear-gradient(180deg, #FFE5F3 0%, #FFCCE7 100%);
+      border: 1.8px solid #F3A1CC;
+      border-radius: 999px;
+      padding: 4px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #4D153D;
+      box-shadow: 0 3px 8px rgba(225, 110, 170, 0.18);
+    }
+
+    /* Board 2: 12 Phonetic Visemes Grid (4x3) */
+    .viseme-12-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px 24px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .viseme-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .viseme-tag {
+      background: linear-gradient(180deg, #FFE4F3 0%, #FFC9E7 100%);
+      border: 2px solid #F29ECB;
+      border-radius: 999px;
+      padding: 5px 22px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #49143A;
+      box-shadow: 0 4px 12px rgba(230, 115, 175, 0.22), inset 0 2px 3px rgba(255, 255, 255, 0.85);
+    }
+    .viseme-card canvas.cushion-canvas {
+      width: 240px;
+      height: 156px;
+      display: block;
+      filter: drop-shadow(0 10px 18px rgba(125, 45, 90, 0.12));
+    }
+
+    /* Board 3: 5x3 AIUEO Grid */
+    .aiueo-5x3-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px 20px;
+      max-width: 1220px;
+      margin: 0 auto;
+    }
+    .aiueo-col-header {
+      background: linear-gradient(180deg, #FFE4F3 0%, #FFC9E7 100%);
+      border: 2.2px solid #F29ECB;
+      border-radius: 999px;
+      padding: 6px 0;
+      width: 150px;
+      margin: 0 auto 4px;
+      font-size: 28px;
+      font-weight: 800;
+      color: #49143A;
+      box-shadow: 0 5px 14px rgba(230, 115, 175, 0.24), inset 0 2px 3px rgba(255, 255, 255, 0.9);
+    }
+    .aiueo-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .aiueo-cell canvas.cushion-canvas {
+      width: 215px;
+      height: 155px;
+      display: block;
+      filter: drop-shadow(0 10px 18px rgba(125, 45, 90, 0.12));
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <!-- Interactive 3D Live Stage -->
+    <section class="live-hero" id="liveHeroSection">
+      <div class="live-stage-wrap" id="liveStage"></div>
+      <div class="live-controls">
+        <h1>Mochi 3D Volumetric Studio (Tanpa Gigi / 100% Toothless)</h1>
+        <p>Klik ekspresi atau viseme mulut di bawah untuk menguji langsung pada Mochi 3D Daifuku dengan transisi pegas halus.</p>
 
-  <div class="hero-title">Mochi Mascot System</div>
-  <div class="hero-subtitle">Bongkar-Pasang Modular Asset untuk PWA Fiezel</div>
+        <div class="ctrl-group">
+          <div class="ctrl-label">15 Ekspresi Storyboard Karakter</div>
+          <div class="chip-row" id="liveMoodChips"></div>
+        </div>
 
-  <div class="stage" id="stage"></div>
+        <div class="ctrl-group">
+          <div class="ctrl-label">12 Bentuk Mulut Fonetik (Tanpa Gigi)</div>
+          <div class="chip-row" id="livePhoneticChips"></div>
+        </div>
 
-  <div class="panel">
-    <div class="section-title">
-      <span>⚡ Skenario Preset PWA</span>
-    </div>
-    <div class="preset-grid">
-      <button class="btn-preset active" onclick="applyPreset('welcome', this)">1. Welcome (Wink)</button>
-      <button class="btn-preset" onclick="applyPreset('thinking_purple', this)">2. AI Thinking (...)</button>
-      <button class="btn-preset" onclick="applyPreset('universe', this)">3. Orbit Kurikulum</button>
-      <button class="btn-preset" onclick="applyPreset('alert', this)">4. Alert Review (!)</button>
-      <button class="btn-preset" onclick="applyPreset('celebrate', this)">5. Streak Juara (★)</button>
-      <button class="btn-preset" onclick="applyPreset('love', this)">6. Selesai Misi (♥)</button>
-    </div>
+        <div class="ctrl-group">
+          <div class="ctrl-label">15 Vokal A, I, U, E, O × 3 Tingkat Intensitas (Tanpa Gigi)</div>
+          <div class="chip-row" id="liveAiueoChips"></div>
+        </div>
 
-    <div class="section-title">
-      <span>🧩 Bongkar-Pasang Komponen (Parts Library)</span>
-    </div>
-    <div class="parts-container">
-
-      <!-- Mata / Mood -->
-      <div class="part-group">
-        <div class="part-label">1. Ekspresi Wajah (Mata)</div>
-        <div class="part-chips" id="moodChips">
-          <button class="chip" data-mood="dots" onclick="selectMood('dots')">Dots (Netral)</button>
-          <button class="chip active" data-mood="wink" onclick="selectMood('wink')">Wink (Kedip)</button>
-          <button class="chip" data-mood="happy" onclick="selectMood('happy')">Happy (^ ^)</button>
-          <button class="chip" data-mood="hearts" onclick="selectMood('hearts')">Hearts (Hati)</button>
-          <button class="chip" data-mood="sleepy" onclick="selectMood('sleepy')">Sleepy (Tidur)</button>
+        <div class="ctrl-group">
+          <div class="ctrl-label">9 Aksesori 3D Studio & Karakter (Headset, Kacamata, Mahkota, Sensei, dll.)</div>
+          <div class="chip-row" id="liveAccessoryChips"></div>
         </div>
       </div>
+    </section>
 
-      <!-- Badge -->
-      <div class="part-group">
-        <div class="part-label">2. Badge Kepala (Status)</div>
-        <div class="part-chips" id="badgeChips">
-          <button class="chip active" data-badge="null" onclick="selectBadge(null)">Tanpa Badge</button>
-          <button class="chip" data-badge="chat_purple" onclick="selectBadge('chat_purple')">Chat Ungu (...)</button>
-          <button class="chip" data-badge="chat_blue" onclick="selectBadge('chat_blue')">Chat Biru (...)</button>
-          <button class="chip" data-badge="alert" onclick="selectBadge('alert')">Alert Oranye (!)</button>
-          <button class="chip" data-badge="online" onclick="selectBadge('online')">Online Hijau (●)</button>
-        </div>
-      </div>
+    <!-- BOARD 1: 15 Character Expression Storyboard -->
+    <section class="storyboard-sheet" id="boardExpressions">
+      <div class="sheet-pill-header">✦ Karakter Ekspresi Storyboard ✦</div>
+      <div class="expr-row-6" id="exprRow1"></div>
+      <div class="expr-row-8" id="exprRow2"></div>
+      <div class="row-divider-title">Transformasi Kemarahan (Kesal &rarr; Marah &rarr; Sangat Marah)</div>
+      <div class="expr-row-3" id="exprRow3"></div>
+    </section>
 
-      <!-- Efek Partikel -->
-      <div class="part-group">
-        <div class="part-label">3. Efek Partikel / Latar</div>
-        <div class="part-chips" id="fxChips">
-          <button class="chip active" data-fx="null" onclick="selectFx(null)">Tanpa Partikel</button>
-          <button class="chip" data-fx="orbit" onclick="selectFx('orbit')">Stardust Orbit Ring</button>
-          <button class="chip" data-fx="stars" onclick="selectFx('stars')">Sparkle Stars (★)</button>
-          <button class="chip" data-fx="hearts" onclick="selectFx('hearts')">Floating Hearts (♥)</button>
-        </div>
-      </div>
+    <!-- BOARD 5: 3D Accessories & Expressive Hand Poses Showcase -->
+    <section class="storyboard-sheet" id="boardAccessories">
+      <div class="sheet-pill-header">✦ Storyboard Aksesori 3D & Persona Karakter ✦</div>
+      <div class="expr-row-4" id="accessoryRow1"></div>
+      <div class="expr-row-4" id="accessoryRow2"></div>
+    </section>
 
-      <!-- Tangan Mochi -->
-      <div class="part-group">
-        <div class="part-label">5. Tangan Bulat Mochi (Hands)</div>
-        <div class="part-chips" id="handsChips">
-          <button class="chip active" data-hands="false" onclick="toggleHands(false)">Sembunyikan Tangan</button>
-          <button class="chip" data-hands="true" onclick="toggleHands(true)">Tampilkan Tangan Bulat (o_o)</button>
-        </div>
-      </div>
-      <div class="part-group">
-        <div class="part-label">4. Ambient Aura Glow</div>
-        <div class="part-chips" id="auraChips">
-          <button class="chip active" data-aura="null" onclick="selectAura(null)">Off</button>
-          <button class="chip" data-aura="purple" onclick="selectAura('purple')">Ungu</button>
-          <button class="chip" data-aura="blue" onclick="selectAura('blue')">Biru</button>
-          <button class="chip" data-aura="amber" onclick="selectAura('amber')">Amber/Emas</button>
-          <button class="chip" data-aura="green" onclick="selectAura('green')">Hijau</button>
-          <button class="chip" data-aura="pink" onclick="selectAura('pink')">Pink</button>
-        </div>
-      </div>
+    <!-- BOARD 2: 12 Phonetic Mouth Visemes (Toothless) -->
+    <section class="storyboard-sheet" id="boardPhonetics">
+      <div class="sheet-pill-header">✦ Storyboard Mulut Pengucapan (Tanpa Gigi) ✦</div>
+      <div class="viseme-12-grid" id="phoneticGrid"></div>
+    </section>
 
-      <!-- Telinga Rubah -->
-      <div class="part-group">
-        <div class="part-label">5. Telinga Rubah (Fox Ears)</div>
-        <div class="part-chips" id="earsChips">
-          <button class="chip active" data-ears="true" onclick="toggleEars(true)">Pasang Telinga Rubah</button>
-          <button class="chip" data-ears="false" onclick="toggleEars(false)">Lepas Telinga</button>
-        </div>
-      </div>
+    <!-- BOARD 3: 5x3 AIUEO Mouth Visemes (Toothless) -->
+    <section class="storyboard-sheet" id="boardAiueo">
+      <div class="sheet-pill-header">✦ Storyboard Mulut Pengucapan A, I, U, E, O (Tanpa Gigi) ✦</div>
+      <div class="aiueo-5x3-grid" id="aiueoHeaders"></div>
+      <div class="aiueo-5x3-grid" id="aiueoGrid"></div>
+    </section>
 
-      <!-- Ekor Kucing Fluffy -->
-      <div class="part-group">
-        <div class="part-label">6. Ekor Kucing Fluffy (Cat Tail)</div>
-        <div class="part-chips" id="tailChips">
-          <button class="chip active" data-tail="true" onclick="toggleTail(true)">Pasang Ekor Kucing</button>
-          <button class="chip" data-tail="false" onclick="toggleTail(false)">Lepas Ekor</button>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="code-box" id="codeSnippet">
-      // Cara pasang di layar PWA Fiezel:<br>
-      const mochi = new FiezelMochi('#canvas');<br>
-      mochi.preset('welcome');
-    </div>
-
-    <div class="hint-text">
-      Sentuh atau klik Mochi untuk melihat reaksi getaran kenyal dan pelacakan mata interaktif!
-    </div>
+    <!-- BOARD 4: Full 3D Mochi Speaking Visemes Showcase -->
+    <section class="storyboard-sheet" id="boardMochiSpeaking">
+      <div class="sheet-pill-header">✦ Demo Mochi 3D Mengucapkan Viseme (100% Tanpa Gigi) ✦</div>
+      <div class="expr-row-6" id="mochiSpeakingRow1"></div>
+      <div class="expr-row-6" id="mochiSpeakingRow2"></div>
+    </section>
   </div>
 
   <script type="module">
     import { FiezelMochi } from './fiezel-mochi.js';
 
-    const mochi = new FiezelMochi('#stage', {
-      width: 360,
-      height: 340,
-      mood: 'wink'
+    // 1. Mount Live Interactive 3D Mochi
+    const liveMochi = new FiezelMochi('#liveStage', {
+      width: 340,
+      height: 320,
+      mood: 'dots',
+      ears: true,
+      tail: true,
+      autoExpressions: false
+    });
+    window.liveMochi = liveMochi;
+
+    const ROW1_MOODS = [
+      { code: 'dots', label: 'Netral' },
+      { code: 'tegas', label: 'Tegas' },
+      { code: 'sinis', label: 'Sinis' },
+      { code: 'gembira', label: 'Gembira' },
+      { code: 'empati', label: 'Empati' },
+      { code: 'sangat_marah', label: 'Marah' }
+    ];
+
+    const ROW2_MOODS = [
+      { code: 'netral_2', label: 'Netral' },
+      { code: 'senang', label: 'Senang' },
+      { code: 'kaget', label: 'Kaget' },
+      { code: 'sedih', label: 'Sedih' },
+      { code: 'kesal', label: 'Kesal' },
+      { code: 'penasaran', label: 'Penasaran' },
+      { code: 'lelah', label: 'Lelah' },
+      { code: 'takut', label: 'Takut' }
+    ];
+
+    const ROW3_MOODS = [
+      { code: 'kesal', label: 'Kesal' },
+      { code: 'marah', label: 'Marah' },
+      { code: 'sangat_marah', label: 'Sangat Marah' }
+    ];
+
+    const PHONETIC_12 = [
+      'A,E,I', 'O', 'C,D,N,S,T,X,Y,Z', 'G,K',
+      'L', 'B,M,P', 'F,V', 'Ee',
+      'TH', 'CH,J,SH', 'U', 'Q,W'
+    ];
+
+    const AIUEO_COLS = ['A', 'I', 'U', 'E', 'O'];
+
+    // Populate Live Control Chips
+    const moodChipsEl = document.getElementById('liveMoodChips');
+    const allUniqueMoods = [
+      ...ROW1_MOODS.slice(0, 5),
+      ...ROW2_MOODS.slice(1),
+      ...ROW3_MOODS.slice(1)
+    ];
+    allUniqueMoods.forEach((item, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'chip-btn' + (idx === 0 ? ' active' : '');
+      btn.textContent = item.label + ' (' + item.code + ')';
+      btn.onclick = () => {
+        document.querySelectorAll('#liveMoodChips .chip-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        liveMochi.setViseme(null);
+        liveMochi.setMood(item.code);
+      };
+      moodChipsEl.appendChild(btn);
     });
 
-    // Expose helpers to window for button clicks
-    window.mochi = mochi;
+    const phoneticChipsEl = document.getElementById('livePhoneticChips');
+    PHONETIC_12.forEach((code) => {
+      const btn = document.createElement('button');
+      btn.className = 'chip-btn';
+      btn.textContent = code;
+      btn.onclick = () => {
+        document.querySelectorAll('#livePhoneticChips .chip-btn, #liveAiueoChips .chip-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        liveMochi.setMood('dots');
+        liveMochi.setViseme(code, 0.92);
+      };
+      phoneticChipsEl.appendChild(btn);
+    });
 
-    window.applyPreset = (name, btn) => {
-      document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      mochi.preset(name);
-      syncChips();
-      updateCodeSnippet();
-    };
-
-    window.selectMood = (m) => {
-      mochi.setMood(m);
-      syncChips();
-      updateCodeSnippet();
-    };
-
-    window.selectBadge = (b) => {
-      mochi.setBadge(b);
-      syncChips();
-      updateCodeSnippet();
-    };
-
-    window.selectFx = (f) => {
-      mochi.setFx(f);
-      syncChips();
-      updateCodeSnippet();
-    };
-
-    window.selectAura = (a) => {
-      mochi.setAura(a);
-      syncChips();
-      updateCodeSnippet();
-    };
-
-    window.toggleHands = (show) => {
-      mochi.setHands(show);
-      syncChips();
-      updateCodeSnippet();
-    };
-
-    window.toggleEars = (show) => {
-      mochi.setEars(show);
-      syncChips();
-      updateCodeSnippet();
-    };
-
-    window.toggleTail = (show) => {
-      mochi.setTail(show);
-      syncChips();
-      updateCodeSnippet();
-    };
-
-    function syncChips() {
-      // Clear all active presets if custom chips clicked
-      updateActiveChip('#moodChips', mochi.mood);
-      updateActiveChip('#badgeChips', String(mochi.badge));
-      updateActiveChip('#fxChips', String(mochi.fx));
-      updateActiveChip('#auraChips', String(mochi.aura));
-      updateActiveChip('#handsChips', String(mochi.showHands));
-      updateActiveChip('#earsChips', String(mochi.showEars));
-      updateActiveChip('#tailChips', String(mochi.showTail));
+    const aiueoChipsEl = document.getElementById('liveAiueoChips');
+    for (let r = 1; r <= 3; r++) {
+      for (const col of AIUEO_COLS) {
+        const code = col + r;
+        const btn = document.createElement('button');
+        btn.className = 'chip-btn';
+        btn.textContent = code;
+        btn.onclick = () => {
+          document.querySelectorAll('#livePhoneticChips .chip-btn, #liveAiueoChips .chip-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          liveMochi.setMood('dots');
+          liveMochi.setViseme(code, r === 1 ? 0.45 : (r === 2 ? 0.75 : 1.0));
+        };
+        aiueoChipsEl.appendChild(btn);
+      }
     }
 
-    function updateActiveChip(containerSelector, value) {
-      const container = document.querySelector(containerSelector);
-      if (!container) return;
-      container.querySelectorAll('.chip').forEach(chip => {
-        const key = chip.dataset.mood || chip.dataset.badge || chip.dataset.fx || chip.dataset.aura || chip.dataset.hands || chip.dataset.ears || chip.dataset.tail;
-        if (key === value) {
-          chip.classList.add('active');
-        } else {
-          chip.classList.remove('active');
-        }
+    const ACCESSORY_ITEMS = [
+      { code: null, label: 'Tanpa Aksesori', mood: 'dots', sub: 'Wajah Polos' },
+      { code: 'headset', label: '🎧 Headset Studio', mood: 'senang', sub: 'Lambaian Tangan Ceria' },
+      { code: 'glasses', label: '👓 Kacamata Cendekia', mood: 'penasaran', sub: 'Fokus Belajar Cermat' },
+      { code: 'pencil', label: '✏️ Pensil Belajar', mood: 'sinis', sub: 'Mencatat Materi Cermat' },
+      { code: 'teacher', label: '🎓 Sensei (Lengkap)', mood: 'tegas', sub: 'Sensei Mengajar Serius' },
+      { code: 'crown', label: '👑 Mahkota Juara', mood: 'gembira', sub: 'Sorak Dua Tangan Floating' },
+      { code: 'ribbon', label: '🎀 Pita Kawaii', mood: 'empati', sub: 'Sentuhan Lembut Manis' },
+      { code: 'gradcap', label: '🎓 Topi Wisuda', mood: 'senang', sub: 'Lambaian Lulus Ceria' },
+      { code: 'beret', label: '🎨 Topi Baret', mood: 'marah', sub: 'Seniman Ekspresif Berapi' }
+    ];
+
+    const accessoryChipsEl = document.getElementById('liveAccessoryChips');
+    if (accessoryChipsEl) {
+      ACCESSORY_ITEMS.forEach((item, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'chip-btn' + (idx === 0 ? ' active' : '');
+        btn.textContent = item.label;
+        btn.onclick = () => {
+          document.querySelectorAll('#liveAccessoryChips .chip-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          liveMochi.setAccessory(item.code);
+          if (item.code && item.mood) {
+            liveMochi.setViseme(null);
+            liveMochi.setMood(item.mood);
+          }
+        };
+        accessoryChipsEl.appendChild(btn);
       });
     }
 
-    function updateCodeSnippet() {
-      const snippet = `// Kode Pasang di PWA Fiezel:\nconst mochi = new FiezelMochi('#canvas');\nmochi.setMood('${mochi.mood}');\nmochi.setBadge(${mochi.badge ? `'${mochi.badge}'` : 'null'});\nmochi.setFx(${mochi.fx ? `'${mochi.fx}'` : 'null'});\nmochi.setAura(${mochi.aura ? `'${mochi.aura}'` : 'null'});`;
-      document.getElementById('codeSnippet').innerText = snippet;
+    // 2. Render 3D Snapshots for Board 1 (All 15 Expressions) using an offscreen 3D Mochi renderer
+    const snapContainer = document.createElement('div');
+    snapContainer.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:300px;height:300px;pointer-events:none;';
+    document.body.appendChild(snapContainer);
+
+    const snapMochi = new FiezelMochi(snapContainer, {
+      width: 300,
+      height: 300,
+      mood: 'dots',
+      ears: true,
+      tail: false,
+      autoExpressions: false
+    });
+    // Set deterministic time so sine-based FX (sparkles, Zz, tears, steam) look crisp
+    snapMochi.time = 1.15;
+    snapMochi.blinkTimer = 0;
+    snapMochi.blinkFactor = 0;
+
+    function captureMoodDataUrl(moodCode, accessoryType = null) {
+      snapMochi.setViseme(null);
+      snapMochi.setAccessory(accessoryType);
+      snapMochi.setMoodInstant(moodCode);
+      snapMochi.time = 1.15;
+      snapMochi.blinkTimer = 0;
+      snapMochi.blinkFactor = 0;
+      const desc = snapMochi.resolveMoodDescriptor(moodCode);
+      const tilt = (desc && desc.headTilt) ? desc.headTilt : 0;
+      snapMochi.mochiGroup.rotation.set(0, 0, tilt);
+      snapMochi.mochiGroup.position.set(0, 0, 0);
+      snapMochi.mochiMesh.scale.set(1, 1, 1);
+      snapMochi.faceGroup.scale.set(1, 1, 1);
+      if (snapMochi.earsGroup) snapMochi.earsGroup.scale.set(1, 1, 1);
+      if (snapMochi.tailGroup) snapMochi.tailGroup.scale.set(1, 1, 1);
+      snapMochi.applyMorphRigMeshes();
+      if (snapMochi.updatePaws) snapMochi.updatePaws(0.016, true);
+      snapMochi.renderCurvedFaceAndFx();
+      snapMochi.renderer.render(snapMochi.scene, snapMochi.camera);
+      return snapMochi.renderer.domElement.toDataURL('image/png');
     }
+
+    function populateExpressionRow(rowItems, containerId) {
+      const container = document.getElementById(containerId);
+      rowItems.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'expr-card';
+        card.dataset.mood = item.code;
+        const img = document.createElement('img');
+        img.src = captureMoodDataUrl(item.code, null);
+        img.alt = item.label;
+        const pill = document.createElement('div');
+        pill.className = 'expr-pill';
+        pill.textContent = item.label;
+        card.appendChild(img);
+        card.appendChild(pill);
+        card.onclick = () => {
+          liveMochi.setViseme(null);
+          liveMochi.setMood(item.code);
+        };
+        container.appendChild(card);
+      });
+    }
+
+    function populateAccessoryRow(items, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      items.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'expr-card';
+        card.dataset.accessory = item.code || '';
+        const img = document.createElement('img');
+        img.src = captureMoodDataUrl(item.mood || 'dots', item.code);
+        img.alt = item.label;
+        const pill = document.createElement('div');
+        pill.className = 'expr-pill';
+        pill.textContent = item.label;
+        const sub = document.createElement('div');
+        sub.className = 'expr-subpill';
+        sub.textContent = item.sub || '';
+        card.appendChild(img);
+        card.appendChild(pill);
+        card.appendChild(sub);
+        card.onclick = () => {
+          liveMochi.setViseme(null);
+          liveMochi.setAccessory(item.code);
+          liveMochi.setMood(item.mood || 'dots');
+        };
+        container.appendChild(card);
+      });
+    }
+
+    // 3. Helper to render a Plush 3D Mochi Cheek Cushion + Toothless 3D Mouth Viseme
+    function renderToothlessMochiCushion(canvas, visemeCode, intensity = 0.9, isSquare = false) {
+      const W = isSquare ? 430 : 480;
+      const H = 310;
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, W, H);
+
+      const padX = 28;
+      const padY = 18;
+      const cw = W - padX * 2;
+      const ch = H - padY * 2;
+      const rad = isSquare ? 78 : 88;
+
+      const drawRoundedBlock = () => {
+        ctx.beginPath();
+        ctx.roundRect(padX, padY, cw, ch, rad);
+      };
+
+      // Soft ambient drop shadow
+      ctx.save();
+      ctx.shadowColor = 'rgba(138, 48, 96, 0.18)';
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetY = 10;
+      drawRoundedBlock();
+      ctx.fillStyle = '#FFF7FA';
+      ctx.fill();
+      ctx.restore();
+
+      // Clip to 3D Mochi Cheek Cushion
+      ctx.save();
+      drawRoundedBlock();
+      ctx.clip();
+
+      // Base creamy-pink 3D Daifuku Mochi gradient
+      const baseGrad = ctx.createRadialGradient(W * 0.46, H * 0.32, 18, W * 0.5, H * 0.55, cw * 0.68);
+      baseGrad.addColorStop(0.0, '#FFFDFC');
+      baseGrad.addColorStop(0.48, '#FFF2F7');
+      baseGrad.addColorStop(0.82, '#FAD8E6');
+      baseGrad.addColorStop(1.0, '#EABCCF');
+      ctx.fillStyle = baseGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Left & Right warm strawberry mochi cheek blush
+      for (const side of [-1, 1]) {
+        const bx = W * 0.5 + side * (cw * 0.34);
+        const by = H * 0.50;
+        const bGrad = ctx.createRadialGradient(bx, by, 4, bx, by, cw * 0.26);
+        bGrad.addColorStop(0.0, 'rgba(255, 138, 178, 0.34)');
+        bGrad.addColorStop(0.6, 'rgba(255, 160, 195, 0.14)');
+        bGrad.addColorStop(1.0, 'rgba(255, 180, 210, 0)');
+        ctx.fillStyle = bGrad;
+        ctx.beginPath();
+        ctx.arc(bx, by, cw * 0.26, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Top glossy rim highlight
+      const topHi = ctx.createLinearGradient(0, padY, 0, padY + 55);
+      topHi.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+      topHi.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = topHi;
+      ctx.fillRect(padX, padY, cw, 55);
+
+      // Render the 100% TOOTHLESS 3D Mochi Mouth using FiezelMochi's exact mouth engine!
+      ctx.save();
+      ctx.translate(W * 0.5, H * 0.52);
+      ctx.scale(1.68, 1.68);
+      liveMochi.drawMochiVisemeMouth3D(ctx, 0, 0, visemeCode, intensity);
+      ctx.restore();
+
+      ctx.restore();
+
+      // Subtle rim stroke
+      ctx.strokeStyle = 'rgba(232, 175, 202, 0.65)';
+      ctx.lineWidth = 2.5;
+      drawRoundedBlock();
+      ctx.stroke();
+    }
+
+    // Populate Board 2: 12 Phonetic Visemes
+    const phoneticGridEl = document.getElementById('phoneticGrid');
+    PHONETIC_12.forEach((code) => {
+      const card = document.createElement('div');
+      card.className = 'viseme-card';
+      const tag = document.createElement('div');
+      tag.className = 'viseme-tag';
+      tag.textContent = code;
+      const cvs = document.createElement('canvas');
+      cvs.className = 'cushion-canvas';
+      renderToothlessMochiCushion(cvs, code, 0.92, false);
+      card.appendChild(tag);
+      card.appendChild(cvs);
+      card.onclick = () => {
+        liveMochi.setMood('dots');
+        liveMochi.setViseme(code, 0.92);
+      };
+      phoneticGridEl.appendChild(card);
+    });
+
+    // Populate Board 3: 5x3 AIUEO Grid
+    const aiueoHeadersEl = document.getElementById('aiueoHeaders');
+    AIUEO_COLS.forEach((col) => {
+      const h = document.createElement('div');
+      h.className = 'aiueo-col-header';
+      h.textContent = col;
+      aiueoHeadersEl.appendChild(h);
+    });
+
+    const aiueoGridEl = document.getElementById('aiueoGrid');
+    for (let row = 1; row <= 3; row++) {
+      for (const col of AIUEO_COLS) {
+        const code = col + row;
+        const cell = document.createElement('div');
+        cell.className = 'aiueo-cell';
+        const cvs = document.createElement('canvas');
+        cvs.className = 'cushion-canvas';
+        const inten = row === 1 ? 0.45 : (row === 2 ? 0.75 : 1.0);
+        renderToothlessMochiCushion(cvs, code, inten, true);
+        cell.appendChild(cvs);
+        cell.onclick = () => {
+          liveMochi.setMood('dots');
+          liveMochi.setViseme(code, inten);
+        };
+        aiueoGridEl.appendChild(cell);
+      }
+    }
+
+    // Populate Board 4: Full 3D Mochi Speaking all 12 Phonetic Visemes
+    function captureSpeakingMochiDataUrl(visemeCode) {
+      snapMochi.setAccessory(null);
+      snapMochi.setMoodInstant('dots');
+      snapMochi.setViseme(visemeCode, 0.92);
+      snapMochi.time = 1.15;
+      snapMochi.blinkTimer = 0;
+      snapMochi.blinkFactor = 0;
+      snapMochi.mochiGroup.rotation.set(0, 0, 0);
+      snapMochi.mochiGroup.position.set(0, 0, 0);
+      snapMochi.mochiMesh.scale.set(1, 1, 1);
+      snapMochi.faceGroup.scale.set(1, 1, 1);
+      if (snapMochi.earsGroup) snapMochi.earsGroup.scale.set(1, 1, 1);
+      if (snapMochi.tailGroup) snapMochi.tailGroup.scale.set(1, 1, 1);
+      snapMochi.applyMorphRigMeshes();
+      if (snapMochi.updatePaws) snapMochi.updatePaws(0.016, true);
+      snapMochi.renderCurvedFaceAndFx();
+      snapMochi.renderer.render(snapMochi.scene, snapMochi.camera);
+      return snapMochi.renderer.domElement.toDataURL('image/png');
+    }
+
+    function populateSpeakingRow(codes, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      codes.forEach((code) => {
+        const card = document.createElement('div');
+        card.className = 'expr-card';
+        const img = document.createElement('img');
+        img.src = captureSpeakingMochiDataUrl(code);
+        img.alt = code;
+        const pill = document.createElement('div');
+        pill.className = 'expr-pill';
+        pill.textContent = code;
+        card.appendChild(img);
+        card.appendChild(pill);
+        card.onclick = () => {
+          liveMochi.setMood('dots');
+          liveMochi.setViseme(code, 0.92);
+        };
+        container.appendChild(card);
+      });
+    }
+
+    setTimeout(() => {
+      populateExpressionRow(ROW1_MOODS, 'exprRow1');
+      populateExpressionRow(ROW2_MOODS, 'exprRow2');
+      populateExpressionRow(ROW3_MOODS, 'exprRow3');
+
+      const showcaseAccessories = ACCESSORY_ITEMS.slice(1);
+      populateAccessoryRow(showcaseAccessories.slice(0, 4), 'accessoryRow1');
+      populateAccessoryRow(showcaseAccessories.slice(4, 8), 'accessoryRow2');
+      snapMochi.setAccessory(null);
+
+      populateSpeakingRow(PHONETIC_12.slice(0, 6), 'mochiSpeakingRow1');
+      populateSpeakingRow(PHONETIC_12.slice(6, 12), 'mochiSpeakingRow2');
+
+      window.__STORYBOARD_READY = true;
+    }, 10);
   </script>
 </body>
 </html>
