@@ -400,6 +400,7 @@ jobs:
           node tests/ai-legacy-spend-gate-test.js
           node tests/boot-order-test.js
           node tests/splash-first-paint-test.js
+          node tests/pwa-cold-boot-seamless-test.js
           node tests/teacher-instant-boot-test.js
           node tests/kurikulum-integritas-test.js
           node tests/teacher-demo-preview-test.js

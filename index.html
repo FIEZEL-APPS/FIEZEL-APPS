@@ -177,7 +177,16 @@ html.fz-booting body:not(.fz-app-open) .bottomnav {
   opacity:0 !important;
   pointer-events:none !important;
 }
-#fiezelBootSplash{contain:layout style paint;position:fixed !important;inset:0 !important;top:calc(-1 * env(safe-area-inset-top,0px)) !important;bottom:calc(-1 * env(safe-area-inset-bottom,0px)) !important;padding-top:0 !important;padding-bottom:0 !important;background-color:#1B1418 !important}
+html.fz-booting main.app,
+html.fz-booting #app,
+html.fz-booting header.topbar,
+html.fz-booting .nav-scrim,
+html.fz-booting #globalSky {
+  visibility:hidden !important;
+  opacity:0 !important;
+  background:transparent !important;
+}
+#fiezelBootSplash{position:fixed !important;inset:0 !important;top:-120px !important;bottom:-120px !important;left:0 !important;right:0 !important;padding-top:120px !important;padding-bottom:120px !important;box-sizing:border-box !important;background:#1B1418 !important;background-color:#1B1418 !important;--fz-bg:#1B1418 !important}
 #fiezelBootSplash:not(.is-leaving){animation:none}
 #fiezelBootSplash .fiezel-splash-brand{background:linear-gradient(180deg,#1B1418 0%,#1B1418 72px,rgba(27,20,24,0) 168px),radial-gradient(circle at 50% 48%,#251D22 0%,#1B1418 55%,#120C0F 100%);background-color:#1B1418}
 #fiezelBootSplash .fz-splash-canvas{-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px);mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px)}
@@ -266,35 +275,60 @@ html.fz-booting body:not(.fz-app-open) .bottomnav {
         onload="this.onload=null;this.rel='stylesheet';window.__fzShellCss='ready'"
         onerror="window.__fzShellCss='error'">
   <noscript><link rel="stylesheet" href="./style.css"></noscript>
-  <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
-  <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
-  <link rel="stylesheet" href="./features/learner-flow/learner-flow.css">
-  <link rel="stylesheet" href="./features/learner-flow/home-polish.css">
+  <link rel="preload" as="style" href="./features/ui/mobile-edge-fit.css">
+  <link rel="preload" as="style" href="./features/ui/fiezel-tactile-clay.css">
+  <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/learner-flow/learner-flow.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/learner-flow/home-polish.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
   <!-- Ruang Guru: tema cangkang guru (features/teacher/teacher-shell.css, 72 KB) TIDAK lagi
        dimuat untuk murid (audit F28). FiezelTeacherShell.ensureCss() memasangnya begitu mode
        guru/demo menyala. -->
-  <link rel="stylesheet" href="./features/class-hub/class-hub.css">
-  <link rel="stylesheet" href="./features/grammar/grammar-upgrade.css">
-  <link rel="stylesheet" href="./features/grammar/grammar-vocab-bridge.css">
+  <link rel="stylesheet" href="./features/class-hub/class-hub.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/grammar/grammar-upgrade.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/grammar/grammar-vocab-bridge.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
   <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
        berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
        --fz-ink, --fz-line), jadi di sana token dipasang pada kelas .fz-mascot/.fz-motion
        dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
        atas ukuran wajah pembimbing lama tanpa perlu !important. -->
-  <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
-  <link rel="stylesheet" href="./features/mascot/mochi-voice-sos.css">
-  <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
-  <link rel="stylesheet" href="./fiezel-2.css">
-  <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
-  <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css">
-  <link rel="stylesheet" href="./features/ui/fiezel-vivid.css">
-  <link rel="stylesheet" href="./features/nujum/fiezel-nujum.css">
-  <link rel="stylesheet" href="./features/bug/fiezel-bug.css">
-  <link rel="stylesheet" href="./features/ui/fiezel-tactile-clay.css">
-  <link rel="stylesheet" href="./features/speaking-listening/panggung-suara.css">
-  <link rel="stylesheet" href="./features/interactive-chat/interactive-chat.css">
-  <link rel="stylesheet" href="./features/japanese/fiezel-kakijun-studio.css">
-  <link rel="stylesheet" href="./features/mandarin/mandarin.css">
+  <link rel="stylesheet" href="./features/mascot/fiezel-motion.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/mascot/mochi-voice-sos.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/ui/fiezel-lux.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./fiezel-2.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/ui/fiezel-vivid.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/nujum/fiezel-nujum.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/bug/fiezel-bug.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/ui/fiezel-tactile-clay.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/speaking-listening/panggung-suara.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/interactive-chat/interactive-chat.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/japanese/fiezel-kakijun-studio.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/mandarin/mandarin.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <noscript>
+    <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
+    <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
+    <link rel="stylesheet" href="./features/learner-flow/learner-flow.css">
+    <link rel="stylesheet" href="./features/learner-flow/home-polish.css">
+    <link rel="stylesheet" href="./features/class-hub/class-hub.css">
+    <link rel="stylesheet" href="./features/grammar/grammar-upgrade.css">
+    <link rel="stylesheet" href="./features/grammar/grammar-vocab-bridge.css">
+    <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
+    <link rel="stylesheet" href="./features/mascot/mochi-voice-sos.css">
+    <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
+    <link rel="stylesheet" href="./fiezel-2.css">
+    <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
+    <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css">
+    <link rel="stylesheet" href="./features/ui/fiezel-vivid.css">
+    <link rel="stylesheet" href="./features/nujum/fiezel-nujum.css">
+    <link rel="stylesheet" href="./features/bug/fiezel-bug.css">
+    <link rel="stylesheet" href="./features/ui/fiezel-tactile-clay.css">
+    <link rel="stylesheet" href="./features/speaking-listening/panggung-suara.css">
+    <link rel="stylesheet" href="./features/interactive-chat/interactive-chat.css">
+    <link rel="stylesheet" href="./features/japanese/fiezel-kakijun-studio.css">
+    <link rel="stylesheet" href="./features/mandarin/mandarin.css">
+  </noscript>
   <style id="fz-contrast-guard">
     /* High contrast guard: prevent yellow-on-yellow or white-on-yellow illegible text */
     .fz2-lvls span.is-now,
@@ -832,9 +866,16 @@ html.fz-booting body:not(.fz-app-open) .bottomnav {
     }
     html:not(.fz-booting):not(:has(.fz-auth)):not(:has(.fiezel-ob)),
     html:not(.fz-booting):not(:has(.fz-auth)):not(:has(.fiezel-ob)) body:not(.fz-auth-open) {
-      background: #FBF7F3 !important;
+      background: var(--bg-canvas, #FAF8F5) !important;
+      background-color: var(--bg-canvas, #FAF8F5) !important;
       overscroll-behavior-x: none !important;
       overscroll-behavior-y: auto !important;
+    }
+    #app:empty {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: 0 !important;
+      outline: 0 !important;
     }
     body:not(.fz-auth-open):not(.voice-bundle-locked):not(.fz-coach-open) {
       overflow-x: clip !important;
