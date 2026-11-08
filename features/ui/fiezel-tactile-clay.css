@@ -179,8 +179,8 @@ button.primary:disabled {
 }
 
 /* 6. TACTILE 3D SECONDARY BUTTONS */
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):not(.modal-close-icon):not(.modal-close):not(.modal-close-corner):not([aria-label="Tutup"]):not(.fz-rhythm-close):not(#quizExit):not(.quiz-exit):not(.feedback-sheet-close-btn):not(#topContextBackBtn):not(#topSettingsBtn):not(#topProfileFriendBtn):not(#fzNotifBtn),
-.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):not(.modal-close-icon):not(.modal-close):not(.modal-close-corner):not([aria-label="Tutup"]):not(.fz-rhythm-close):not(#quizExit):not(.quiz-exit):not(.feedback-sheet-close-btn):not(#topContextBackBtn):not(#topSettingsBtn):not(#topProfileFriendBtn):not(#fzNotifBtn) {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):not(.modal-close-icon):not(.modal-close):not(.modal-close-corner):not([aria-label="Tutup"]):not(.fz-rhythm-close):not(#quizExit):not(.quiz-exit):not(.feedback-sheet-close-btn):not(#topContextBackBtn):not(#topSettingsBtn):not(#topProfileFriendBtn):not(#fzNotifBtn):not(.fz-kawan-modal-phone):not(.fz-kawan-modal-later):not(.fz-kawan-modal-close),
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):not(.modal-close-icon):not(.modal-close):not(.modal-close-corner):not([aria-label="Tutup"]):not(.fz-rhythm-close):not(#quizExit):not(.quiz-exit):not(.feedback-sheet-close-btn):not(#topContextBackBtn):not(#topSettingsBtn):not(#topProfileFriendBtn):not(#fzNotifBtn):not(.fz-kawan-modal-phone):not(.fz-kawan-modal-later):not(.fz-kawan-modal-close) {
   background: #FFFFFF !important;
   border: 2px solid var(--card-border) !important;
   border-radius: 14px !important;
@@ -192,8 +192,8 @@ button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.o
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
 }
 
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):not(.modal-close-icon):not(.modal-close):not(.modal-close-corner):not([aria-label="Tutup"]):not(.fz-rhythm-close):not(#quizExit):not(.quiz-exit):not(.feedback-sheet-close-btn):not(#topContextBackBtn):not(#topSettingsBtn):not(#topProfileFriendBtn):not(#fzNotifBtn):active,
-.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):not(.modal-close-icon):not(.modal-close):not(.modal-close-corner):not([aria-label="Tutup"]):not(.fz-rhythm-close):not(#quizExit):not(.quiz-exit):not(.feedback-sheet-close-btn):not(#topContextBackBtn):not(#topSettingsBtn):not(#topProfileFriendBtn):not(#fzNotifBtn):active {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):not(.modal-close-icon):not(.modal-close):not(.modal-close-corner):not([aria-label="Tutup"]):not(.fz-rhythm-close):not(#quizExit):not(.quiz-exit):not(.feedback-sheet-close-btn):not(#topContextBackBtn):not(#topSettingsBtn):not(#topProfileFriendBtn):not(#fzNotifBtn):not(.fz-kawan-modal-phone):not(.fz-kawan-modal-later):not(.fz-kawan-modal-close):active,
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):not(.fiezel-back):not(.fiezel-skip):not(.jlpt-mode-btn):not(.jlpt-exam-mode-btn):not(.listening-filter-btn):not(.jlpt-filter-btn):not(.jlpt-sheet-tab-btn):not(.fz-mochi-card-toggle):not(#fzMochiCardToggle):not(.fz-plain):not(.fz-btn-google-native):not(.modal-close-icon):not(.modal-close):not(.modal-close-corner):not([aria-label="Tutup"]):not(.fz-rhythm-close):not(#quizExit):not(.quiz-exit):not(.feedback-sheet-close-btn):not(#topContextBackBtn):not(#topSettingsBtn):not(#topProfileFriendBtn):not(#fzNotifBtn):not(.fz-kawan-modal-phone):not(.fz-kawan-modal-later):not(.fz-kawan-modal-close):active {
   transform: translateY(2px) !important;
   box-shadow: 0 2px 0 var(--card-bevel) !important;
 }
@@ -8190,56 +8190,155 @@ html body #app .fz-kawan-card.fz-vissol-kawan-card::after {
 .fz-kawan-modal-scrim {
   position: fixed !important; inset: 0 !important; z-index: 12000 !important;
   display: flex !important; align-items: center !important; justify-content: center !important; padding: 20px !important;
-  background: rgba(46, 26, 71, 0.46) !important;
-  backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(15, 23, 42, 0.6) !important;
+  backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
   animation: fzKawanScrimIn 0.22s ease-out !important;
   box-sizing: border-box !important;
 }
 .fz-kawan-modal-scrim.is-leaving { animation: fzKawanScrimOut 0.2s ease-in forwards !important; }
 .fz-kawan-modal-card {
-  position: relative !important; width: 100% !important; max-width: 340px !important;
-  background: linear-gradient(180deg, #FFFFFF 0%, #FAF7FF 100%) !important;
-  border: 1.5px solid #EDE9FE !important; border-radius: 28px !important;
-  padding: 28px 22px 22px !important; text-align: center !important;
-  box-shadow: 0 24px 60px rgba(76, 29, 149, 0.28) !important;
+  position: relative !important; width: 100% !important; max-width: 360px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #F1F5F9 !important; border-radius: 32px !important;
+  padding: 24px 20px 20px !important; text-align: center !important;
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.24), 0 4px 16px rgba(15, 23, 42, 0.06) !important;
   animation: fzKawanCardIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) !important;
   box-sizing: border-box !important;
 }
 .fz-kawan-modal-close {
-  position: absolute !important; top: 12px !important; right: 12px !important; width: 34px !important; height: 34px !important; border-radius: 50% !important;
-  border: none !important; background: #F5F3FF !important; color: #6D28D9 !important; cursor: pointer !important;
+  position: absolute !important; top: 14px !important; right: 14px !important; width: 34px !important; height: 34px !important; border-radius: 50% !important;
+  border: 1px solid #E2E8F0 !important; background: #F8FAFC !important; color: #64748B !important; cursor: pointer !important;
   display: flex !important; align-items: center !important; justify-content: center !important;
+  z-index: 20 !important;
+  transition: background 0.15s ease, color 0.15s ease !important;
 }
-.fz-kawan-modal-mochi { display: flex !important; justify-content: center !important; animation: fzKawanMochiBob 2.4s ease-in-out infinite !important; }
-.fz-kawan-modal-title { margin: 6px 0 6px !important; font-size: 22px !important; font-weight: 800 !important; color: #0F172A !important; letter-spacing: -0.01em !important; }
-.fz-kawan-modal-sub { margin: 0 0 22px !important; font-size: 13.5px !important; color: #64748B !important; line-height: 1.45 !important; }
+.fz-kawan-modal-close:hover { background: #F1F5F9 !important; color: #0F172A !important; }
+
+/* Authentic 3D Mochi Mascot Podium */
+.fz-kawan-modal-mascot-podium {
+  position: relative !important; display: flex !important; flex-direction: column !important;
+  align-items: center !important; justify-content: center !important;
+  margin: 2px auto 10px !important; width: 100% !important;
+}
+.fz-kawan-modal-mascot-halo {
+  position: absolute !important; top: 50% !important; left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 180px !important; height: 180px !important; border-radius: 50% !important;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.22) 0%, rgba(59, 130, 246, 0.10) 50%, transparent 72%) !important;
+  filter: blur(8px) !important; pointer-events: none !important; z-index: 0 !important;
+}
+.fz-kawan-modal-mochi-img {
+  position: relative !important; z-index: 1 !important;
+  width: 180px !important; height: 180px !important; object-fit: contain !important;
+  filter: drop-shadow(0 14px 22px rgba(76, 29, 149, 0.18)) !important;
+  animation: fzKawanMochiFloat 3s ease-in-out infinite !important;
+  pointer-events: none !important; user-select: none !important;
+}
+.fz-kawan-modal-3d-stage {
+  position: relative !important; z-index: 1 !important;
+  width: 340px !important; height: 260px !important;
+  max-width: 100% !important;
+  margin: -16px auto 0 !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  pointer-events: none !important; user-select: none !important;
+  overflow: visible !important;
+  border: none !important; outline: none !important; background: transparent !important;
+}
+.fz-kawan-modal-3d-stage canvas {
+  width: 340px !important; height: 260px !important;
+  max-width: 100% !important;
+  filter: drop-shadow(0 14px 22px rgba(76, 29, 149, 0.18)) !important;
+  border: none !important; outline: none !important;
+}
+.fz-kawan-modal-status-pill {
+  position: relative !important; z-index: 2 !important;
+  margin-top: -10px !important; display: inline-flex !important; align-items: center !important; gap: 6px !important;
+  padding: 4px 12px !important; background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important; border-radius: 9999px !important;
+  font-size: 11.5px !important; font-weight: 750 !important; color: #0F172A !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06) !important;
+}
+.fz-kawan-status-dot {
+  width: 7px !important; height: 7px !important; border-radius: 50% !important;
+  background: #10B981 !important; box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.25) !important;
+  animation: fzKawanPulseDot 2s ease-in-out infinite !important;
+}
+
+.fz-kawan-modal-title { margin: 4px 0 6px !important; font-size: 21px !important; font-weight: 850 !important; color: #0F172A !important; letter-spacing: -0.02em !important; }
+.fz-kawan-modal-sub { margin: 0 auto 14px !important; font-size: 13.5px !important; color: #64748B !important; line-height: 1.48 !important; max-width: 275px !important; }
+
+/* Tactile Micro-Pills */
+.fz-kawan-modal-chips {
+  display: flex !important; justify-content: center !important; gap: 8px !important;
+  margin: 0 auto 18px !important;
+}
+.fz-kawan-chip {
+  display: inline-flex !important; align-items: center !important; gap: 5px !important;
+  background: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 9999px !important;
+  padding: 4px 11px !important; font-size: 11.5px !important; font-weight: 650 !important; color: #475569 !important;
+}
+
+/* Call Trigger Section */
+.fz-kawan-phone-container {
+  display: flex !important; flex-direction: column !important; align-items: center !important;
+  position: relative !important; margin: 4px 0 6px !important;
+}
 .fz-kawan-modal-phone {
-  position: relative !important; width: 84px !important; height: 84px !important; border-radius: 50% !important; border: none !important; cursor: pointer !important;
-  background: radial-gradient(circle at 30% 30%, #34D399 0%, #10B981 55%, #059669 100%) !important;
-  box-shadow: 0 10px 26px rgba(16, 185, 129, 0.45), 0 0 0 6px rgba(252, 211, 77, 0.35) !important;
-  display: inline-flex !important; align-items: center !important; justify-content: center !important;
-  animation: fzKawanPhoneShake 1.6s ease-in-out infinite !important;
-  transition: transform 0.15s ease !important;
+  position: relative !important;
+  width: 76px !important; height: 76px !important; min-width: 76px !important; min-height: 76px !important;
+  border-radius: 50% !important; border: none !important; outline: none !important; cursor: pointer !important;
+  background: linear-gradient(145deg, #10B981 0%, #059669 100%) !important;
+  box-shadow: 0 12px 28px -4px rgba(16, 185, 129, 0.45), 0 0 0 4px rgba(16, 185, 129, 0.16) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  animation: fzKawanPhonePulse 2.4s ease-in-out infinite !important;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease !important;
+  padding: 0 !important;
+}
+.fz-kawan-phone-core {
+  width: 76px !important; height: 76px !important; display: flex !important;
+  align-items: center !important; justify-content: center !important; border-radius: 50% !important;
+}
+.fz-kawan-modal-phone:hover {
+  transform: scale(1.06) !important;
+  box-shadow: 0 16px 34px -4px rgba(16, 185, 129, 0.55), 0 0 0 6px rgba(16, 185, 129, 0.22) !important;
 }
 .fz-kawan-modal-phone:active { transform: scale(0.94) !important; }
 .fz-kawan-modal-phone.is-dialing { animation: none !important; filter: saturate(1.2) !important; }
+
+/* Emerald Live Ripples (No Yellow!) */
 .fz-kawan-ring {
-  position: absolute !important; inset: -6px !important; border-radius: 50% !important;
-  border: 2px solid rgba(250, 204, 21, 0.75) !important;
-  animation: fzKawanRingWave 1.8s ease-out infinite !important;
+  position: absolute !important; inset: -8px !important; border-radius: 50% !important;
+  border: 2px solid rgba(16, 185, 129, 0.38) !important;
+  animation: fzKawanRingWave 2s cubic-bezier(0.16, 1, 0.3, 1) infinite !important;
   pointer-events: none !important;
 }
-.fz-kawan-ring.r2 { animation-delay: 0.6s !important; } .fz-kawan-ring.r3 { animation-delay: 1.2s !important; }
-.fz-kawan-modal-cta { margin-top: 12px !important; font-size: 14px !important; font-weight: 700 !important; color: #065F46 !important; }
-.fz-kawan-modal-later { margin-top: 14px !important; background: none !important; border: none !important; color: #94A3B8 !important; font-size: 13px !important; cursor: pointer !important; text-decoration: underline !important; }
+.fz-kawan-ring.r2 { animation-delay: 0.7s !important; }
+
+.fz-kawan-modal-cta {
+  margin-top: 10px !important; font-size: 14.5px !important; font-weight: 800 !important;
+  color: #065F46 !important; letter-spacing: -0.01em !important;
+}
+.fz-kawan-modal-later {
+  display: inline-block !important; margin-top: 12px !important; padding: 7px 18px !important;
+  background: transparent !important; border: none !important; box-shadow: none !important;
+  outline: none !important; color: #94A3B8 !important; font-size: 13.5px !important;
+  font-weight: 650 !important; cursor: pointer !important; border-radius: 9999px !important;
+  text-decoration: none !important; transition: color 0.15s ease, background 0.15s ease !important;
+}
+.fz-kawan-modal-later:hover {
+  color: #475569 !important; background: rgba(148, 163, 184, 0.12) !important;
+  text-decoration: none !important;
+}
+
 @keyframes fzKawanScrimIn { from { opacity: 0 } to { opacity: 1 } }
 @keyframes fzKawanScrimOut { from { opacity: 1 } to { opacity: 0 } }
-@keyframes fzKawanCardIn { from { opacity: 0; transform: translateY(18px) scale(0.92) } to { opacity: 1; transform: none } }
-@keyframes fzKawanMochiBob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
-@keyframes fzKawanPhoneShake { 0%,100% { transform: rotate(0) } 10% { transform: rotate(-10deg) } 20% { transform: rotate(10deg) } 30% { transform: rotate(-8deg) } 40% { transform: rotate(8deg) } 50% { transform: rotate(0) } }
-@keyframes fzKawanRingWave { 0% { transform: scale(1); opacity: 0.9 } 100% { transform: scale(1.9); opacity: 0 } }
+@keyframes fzKawanCardIn { from { opacity: 0; transform: translateY(18px) scale(0.94) } to { opacity: 1; transform: none } }
+@keyframes fzKawanMochiFloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+@keyframes fzKawanPulseDot { 0%,100% { opacity: 1; transform: scale(1) } 50% { opacity: 0.65; transform: scale(0.85) } }
+@keyframes fzKawanPhonePulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.03) } }
+@keyframes fzKawanRingWave { 0% { transform: scale(1); opacity: 0.85 } 100% { transform: scale(1.85); opacity: 0 } }
 @media (prefers-reduced-motion: reduce) {
-  .fz-kawan-modal-phone, .fz-kawan-ring, .fz-kawan-modal-mochi { animation: none !important; }
+  .fz-kawan-modal-phone, .fz-kawan-ring, .fz-kawan-modal-mochi-img, .fz-kawan-status-dot { animation: none !important; }
 }
 
 /* 4. Progres Belajar Section */

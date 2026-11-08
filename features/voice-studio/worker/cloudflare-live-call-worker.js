@@ -137,8 +137,13 @@ export default {
 
       server.addEventListener('message', (event) => {
         try {
-          const msg = JSON.parse(event.data);
-          if (msg.audio) {
+          const raw = typeof event.data === 'string' ? event.data : new TextDecoder().decode(event.data);
+          const msg = JSON.parse(raw);
+          if (msg.realtimeInput || msg.clientContent || msg.toolResponse || msg.setup) {
+            if (upstreamWs.readyState === WebSocket.OPEN) {
+              upstreamWs.send(raw);
+            }
+          } else if (msg.audio) {
             upstreamWs.send(
               JSON.stringify({
                 realtimeInput: {
