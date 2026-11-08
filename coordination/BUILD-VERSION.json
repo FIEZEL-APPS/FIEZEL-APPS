@@ -1,7 +1,7 @@
 {
-  "version": "m025-781",
-  "claimedBy": "branch fix/pwa-atomic-delta-cache-m025-781",
-  "claimedAt": "2026-11-08T09:47:19.799Z",
-  "reason": "fix(pwa): atomic delta precache, zero-stale auto cutover, and anti-poisoning cache coherence (m025-781)",
+  "version": "m025-782",
+  "claimedBy": "branch fix/mochi-lipsync-live-voice-m025-782",
+  "claimedAt": "2026-11-08T19:43:08.673Z",
+  "reason": "fix(voice): natural 3d mochi lipsync, kawan bicara live audio continuity, and mochi voice sos",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

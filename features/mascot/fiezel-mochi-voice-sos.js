@@ -456,11 +456,30 @@
     return null;
   }
 
-  var _sessionMochiEnabled = false;
+  var _sessionMochiEnabled = null;
   var _chargedQuestionSigs = {};
 
   function isMochiEnabledFromStorage() {
-    return !!_sessionMochiEnabled;
+    if (typeof _sessionMochiEnabled === 'boolean') {
+      return _sessionMochiEnabled;
+    }
+    try {
+      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+      if (ls && typeof ls.getItem === 'function') {
+        var v = ls.getItem(MOCHI_ENABLED_STORAGE_KEY);
+        if (v === '1' || v === 'true') {
+          _sessionMochiEnabled = true;
+          return true;
+        }
+        if (v === '0' || v === 'false') {
+          _sessionMochiEnabled = false;
+          return false;
+        }
+      }
+    } catch (_) {}
+    // Sesi latihan interaktif: Mochi SOS aktif mendampingi murid jika tidak dimatikan manual
+    _sessionMochiEnabled = true;
+    return true;
   }
 
   function writeMochiEnabledToStorage(enabled) {
@@ -2752,17 +2771,8 @@
         return false;
       }
       if (!isMochiEnabledFromStorage()) {
-        var doc = getDoc();
-        var toggleBtn = doc ? doc.getElementById('fzMochiCardToggle') : null;
-        if (toggleBtn) {
-          try {
-            toggleBtn.classList.remove('is-nudge');
-            void toggleBtn.offsetWidth;
-            toggleBtn.classList.add('is-nudge');
-            setTimeout(function () { try { toggleBtn.classList.remove('is-nudge'); } catch (_) {} }, 650);
-          } catch (_) {}
-        }
-        return false;
+        writeMochiEnabledToStorage(true);
+        this.setMochiEnabled(true, { userConfirmed: true });
       }
       // Umpan balik instan (<30ms) sebelum apa pun yang async.
       warmAudioContext();
@@ -3263,7 +3273,11 @@
 
           rec.onresult = function (event) {
             if (!_speechRecActive || !_activeCall || !_activeCall.active) return;
-            var mochiBusy = (_activeAudioSources.length > 0) || _modelTurnInProgress || _awaitingOpeningModelTurn || ((Date.now() - _lastMochiAudioEndedAt) < 450);
+            if (_activeAudioSources.length === 0 && _awaitingOpeningModelTurn) {
+              _awaitingOpeningModelTurn = false;
+              if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
+            }
+            var mochiBusy = (_activeAudioSources.length > 0) || _modelTurnInProgress || ((Date.now() - _lastMochiAudioEndedAt) < 350);
             if (mochiBusy) return;
             // Wajib lolos verifikasi Silero Neural VAD bila model aktif (tolak halusinasi bising jalanan)
             if (_sileroVadActive && (Date.now() - _sileroLastSpeechProbAt) > 2800) {
@@ -3288,7 +3302,9 @@
               accumulated = '';
               if (!toSend || !_activeCall || !_activeCall.active) return;
               if (_modelTurnInProgress || _awaitingOpeningModelTurn || _activeAudioSources.length > 0) return;
-              if (_sileroVadActive && (Date.now() - _sileroLastSpeechProbAt) > 3600) return;
+              // Jika aliran audio PCM mikrofon sudah aktif mengirimkan suara langsung (realtimeInput.audio),
+              // jangan menimpa dengan clientContent ganda agar respons Gemini Live tidak terputus!
+              if (_userAudioBurstActive || (Date.now() - _lastUserSpeechAt) < 2800) return;
               if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete) {
                 _userAskedConceptOnCurrent = true;
                 _pendingFollowupBillable = true;
@@ -3401,7 +3417,6 @@
                     _ws.send(
                       JSON.stringify({
                         realtimeInput: { audioStreamEnd: true },
-                        clientContent: { turns: [{ role: 'user', parts: [] }], turnComplete: true },
                       })
                     );
                   } catch (_) {}
@@ -3503,9 +3518,9 @@
                 }
               } catch (_) {}
             },
-            positiveSpeechThreshold: 0.62,
-            negativeSpeechThreshold: 0.42,
-            minSpeechMs: 192,
+            positiveSpeechThreshold: 0.48,
+            negativeSpeechThreshold: 0.32,
+            minSpeechMs: 128,
             redemptionMs: 480,
             preSpeechPadMs: 384,
             submitUserSpeechOnPause: false,
@@ -3552,25 +3567,28 @@
                     return;
                   }
                 } else {
-                  if (pSpeech < 0.55) sileroSpeechStreak = 0;
+                  if (pSpeech < 0.48) sileroSpeechStreak = 0;
                   return;
                 }
               } else {
-                // Saat mendengarkan: wajib >= 4 frame (128ms, p >= 0.58) suara bicara manusia; bising kendaraan diabaikan total!
-                // Setiap frame di bawah ambang tersebut langsung menambah sileroSilenceStreak tanpa zona mati [0.42, 0.62)
-                // agar AGC mikrofon HP tidak menahan jeda berpikir pasca-bicara!
+                // Saat mendengarkan: responsif >= 2 frame (64ms, p >= 0.46, rms >= 0.0015) suara bicara manusia;
+                // bising statis di bawah ambang diabaikan.
                 var isMobVad = typeof navigator !== 'undefined' &&
                   (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
-                var silenceEndFrames = isMobVad ? 11 : 13;
-                if (pSpeech >= 0.58 && rms >= 0.004) {
+                var silenceEndFrames = isMobVad ? 10 : 12;
+                var frameBand = (rms >= 0.004 && frame && frame.length > 0) ? analyzeHumanVoiceBandFrame(frame, 16000) : null;
+                var isSpeechDetected = (pSpeech >= 0.34 || (frameBand && frameBand.isHumanSpeech && rms >= 0.006)) && rms >= 0.0015;
+                if (isSpeechDetected) {
                   _sileroLastSpeechProbAt = Date.now();
                   sileroSpeechStreak++;
                   sileroSilenceStreak = 0;
-                  if (sileroSpeechStreak >= 4) {
+                  if (sileroSpeechStreak >= 2) {
                     _userAskedConceptOnCurrent = true;
                     _userAudioBurstActive = true;
                     _lastUserSpeechAt = Date.now();
                     _silencePromptFired = false;
+                    _awaitingOpeningModelTurn = false;
+                    if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
                     if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
                     self._setVoiceVisualizerUserSpeaking(true);
                   }
@@ -3588,7 +3606,6 @@
                           _ws.send(
                             JSON.stringify({
                               realtimeInput: { audioStreamEnd: true },
-                              clientContent: { turns: [{ role: 'user', parts: [] }], turnComplete: true },
                             })
                           );
                         } catch (_) {}
@@ -3726,7 +3743,7 @@
           _awaitingOpeningModelTurn = false;
           _openingTurnCompletedForQ = true;
           _openingModelTurnTimer = null;
-        }, 7500);
+        }, 3200);
         var activeQ = getActiveQuestion(q);
         var bcOpen = evaluateBraincoreStruggleState(activeQ);
         if (bcOpen.isStruggling) {
@@ -4187,7 +4204,11 @@
                 try {
                   var c = root && root.FiezelMochiCompanion;
                   var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
-                  if (m && typeof m.setTalking === 'function') m.setTalking(true);
+                  if (m) {
+                    var d = (audioEl.duration && Number.isFinite(audioEl.duration)) ? audioEl.duration : Math.max(1.0, guidance.length * 0.12);
+                    if (typeof m.speakPhrase === 'function') m.speakPhrase(guidance, loc === 'th' ? 'th' : 'id', d);
+                    else if (typeof m.setTalking === 'function') m.setTalking(true);
+                  }
                 } catch (_) {}
                 self.meterDeliveredAiTurn(activeQ, 'opening');
               }).catch(function (e) {
@@ -4222,7 +4243,11 @@
                 try {
                   var c = root && root.FiezelMochiCompanion;
                   var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
-                  if (m && typeof m.setTalking === 'function') m.setTalking(true);
+                  if (m) {
+                    var d = (audioEl.duration && Number.isFinite(audioEl.duration)) ? audioEl.duration : Math.max(1.0, guidance.length * 0.12);
+                    if (typeof m.speakPhrase === 'function') m.speakPhrase(guidance, loc === 'th' ? 'th' : 'id', d);
+                    else if (typeof m.setTalking === 'function') m.setTalking(true);
+                  }
                 } catch (_) {}
                 self.meterDeliveredAiTurn(activeQ, 'opening');
                 source.onended = function () {
@@ -4592,6 +4617,11 @@
         }
       };
       card.appendChild(btn);
+      try {
+        if (!this.isCallActive()) {
+          prewarmLiveSession(false);
+        }
+      } catch (_) {}
       return btn;
     },
 

@@ -99,18 +99,28 @@ export class WawaLipsyncAnalyzer {
   }
 
   setAnalyser(analyser, sampleRate) {
-    this.analyser = analyser || null;
-    if (!this.analyser) {
+    if (!analyser) {
+      this.analyser = null;
       this.dataArray = null;
+      this.timeDataArray = null;
       this.viseme = VISEMES.sil;
       this.state = 'silence';
       this.history = [];
       return;
     }
+    const nextRate = sampleRate || (analyser.context && analyser.context.sampleRate) || 24000;
+    if (this.analyser === analyser && this.sampleRate === nextRate && this.dataArray) {
+      return;
+    }
+    this.analyser = analyser;
+    try {
+      this.analyser.smoothingTimeConstant = 0.5;
+    } catch (_) {}
     this.fftSize = this.analyser.fftSize || 2048;
-    this.sampleRate = sampleRate || (this.analyser.context && this.analyser.context.sampleRate) || 24000;
+    this.sampleRate = nextRate;
     this.binWidth = this.sampleRate / this.fftSize;
     this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.timeDataArray = new Uint8Array(this.fftSize);
     this.history = [];
   }
 
@@ -126,8 +136,22 @@ export class WawaLipsyncAnalyzer {
     if (!this.analyser || !this.dataArray) return null;
     try {
       this.analyser.getByteFrequencyData(this.dataArray);
+      if (this.timeDataArray && typeof this.analyser.getByteTimeDomainData === 'function') {
+        this.analyser.getByteTimeDomainData(this.timeDataArray);
+      }
     } catch (_) {
       return null;
+    }
+
+    let rms = 0;
+    if (this.timeDataArray && this.timeDataArray.length > 0) {
+      let sumSq = 0;
+      const tLen = this.timeDataArray.length;
+      for (let i = 0; i < tLen; i++) {
+        const sample = (this.timeDataArray[i] - 128) / 128;
+        sumSq += sample * sample;
+      }
+      rms = Math.sqrt(sumSq / tLen);
     }
 
     const bandEnergies = this.bands.map(({ start, end }) => {
@@ -154,8 +178,8 @@ export class WawaLipsyncAnalyzer {
       return energy - this.history[this.history.length - 2].bands[idx];
     });
 
-    const features = { bands: bandEnergies, deltaBands, volume, centroid };
-    if (sumAmplitude > 0) {
+    const features = { bands: bandEnergies, deltaBands, volume, rms, centroid };
+    if (sumAmplitude > 0 || rms > 0.002) {
       this.history.push(features);
       if (this.history.length > this.historySize) this.history.shift();
     }
@@ -164,14 +188,15 @@ export class WawaLipsyncAnalyzer {
 
   getAveragedFeatures() {
     const len = this.history.length || 1;
-    const sum = { volume: 0, centroid: 0, bands: Array(this.bands.length).fill(0) };
+    const sum = { volume: 0, rms: 0, centroid: 0, bands: Array(this.bands.length).fill(0) };
     for (const f of this.history) {
       sum.volume += f.volume;
+      sum.rms += (f.rms || 0);
       sum.centroid += f.centroid;
       f.bands.forEach((b, i) => { sum.bands[i] += b; });
     }
     const bands = sum.bands.map((b) => b / len);
-    return { volume: sum.volume / len, centroid: sum.centroid / len, bands, deltaBands: bands };
+    return { volume: sum.volume / len, rms: sum.rms / len, centroid: sum.centroid / len, bands, deltaBands: bands };
   }
 
   computeVisemeScores(current, avg, dVolume, dCentroid) {
@@ -180,55 +205,75 @@ export class WawaLipsyncAnalyzer {
       viseme_kk: 0, viseme_CH: 0, viseme_SS: 0, viseme_nn: 0, viseme_RR: 0,
       viseme_aa: 0, viseme_E: 0, viseme_I: 0, viseme_O: 0, viseme_U: 0
     };
-    const b7 = current.bands[6];
+    const b1 = avg.bands[0] || 0; // 50-200Hz: pitch harmonics / pre-voicing
+    const b2 = avg.bands[1] || 0; // 200-400Hz: lower F1 (close vowels: i, u)
+    const b3 = avg.bands[2] || 0; // 400-800Hz: mid/high F1 (open vowels: a, o, e)
+    const b4 = avg.bands[3] || 0; // 800-1500Hz: low F2 (back/round vowels: u, o)
+    const b5 = avg.bands[4] || 0; // 1500-2500Hz: high F2 (front vowels: i, e)
+    const b6 = avg.bands[5] || 0; // 2500-4000Hz: F3 / dental / alveolar
+    const b7 = current.bands[6] || 0; // 4000-8000Hz: high fricatives (s, sh, f)
 
-    if (avg.volume < 0.06 && current.volume < 0.06) {
+    // 1. Breath Pause / Silence Detection
+    if (avg.volume < 0.032 && current.volume < 0.032) {
       scores.viseme_sil = 1.0;
+      return scores;
     }
 
-    Object.entries(VISEMES_STATES).forEach(([v, st]) => {
-      if (st === 'plosive') {
-        if (dVolume < 0.01) scores[v] -= 0.5;
-        if (avg.volume < 0.2) scores[v] += 0.2;
-        if (dCentroid > 1000) scores[v] += 0.2;
+    // 2. High-Frequency Fricatives & Sibilants (S, SH, CH, F) — NEVER trigger bilabial PP!
+    if (current.centroid > 3800 || b7 > 0.22) {
+      if (current.centroid > 5200 || b7 > 0.35) {
+        scores.viseme_SS = 1.2;
+      } else if (current.centroid > 4200) {
+        scores.viseme_CH = 1.1;
+      } else if (b6 > 0.28) {
+        scores.viseme_DD = 0.9;
+      } else {
+        scores.viseme_FF = 0.85;
       }
-    });
-
-    if (current.centroid > 1000 && current.centroid < 8000) {
-      if (current.centroid > 7000) scores.viseme_DD += 0.6;
-      else if (current.centroid > 5000) scores.viseme_kk += 0.6;
-      else if (current.centroid > 4000) {
-        scores.viseme_PP += 1.0;
-        if (b7 > 0.25 && current.centroid < 6000) scores.viseme_DD += 1.4;
-      } else scores.viseme_nn += 0.6;
+      return scores;
     }
 
-    if (dCentroid > 1000 && current.centroid > 6000 && avg.centroid > 5000) {
-      if (current.bands[6] > 0.4 && avg.bands[6] > 0.3) scores.viseme_FF = 0.7;
+    // 3. Bilabial Plosives & Nasals (B, M, P) — Low-frequency dominance during burst or occlusion dip
+    if ((dVolume > 0.025 || dVolume < -0.020) && current.centroid < 950 && (b1 + b2) > (b4 + b5 + 0.05)) {
+      scores.viseme_PP = 1.3;
+      return scores;
     }
 
-    if (avg.volume > 0.05 && avg.centroid < 6000 && current.centroid < 6000) {
-      const [b1, b2, b3, b4, b5] = avg.bands;
-      const gapB1B2 = Math.abs(b1 - b2);
-      const maxGapB2B3B4 = Math.max(Math.abs(b2 - b3), Math.abs(b2 - b4), Math.abs(b3 - b4));
-      if (b3 > 0.07 || b4 > 0.07) {
-        if (b4 > b3) scores.viseme_aa = 0.8 + (b3 > b2 ? 0.2 : 0);
-        if (b3 > b2 && b3 > b4) scores.viseme_I = 0.7;
-        if (gapB1B2 < 0.25) scores.viseme_U = 0.7;
-        if (maxGapB2B3B4 < 0.25) scores.viseme_O = 0.9;
-        if (b2 > b3 && b3 > b4) scores.viseme_E = 1.0;
-        if (b3 < 0.2 && b4 > 0.3) scores.viseme_I = 0.7;
-        if (b3 > 0.25 && b5 > 0.25) scores.viseme_O = 0.7;
-        if (b3 < 0.15 && b5 < 0.15) scores.viseme_U = 0.7;
+    // 4. Acoustic Vowel Formant Discrimination (F1 vs F2)
+    const f1Open = b3 - b2; // positive -> open jaw (A, O); negative -> close jaw (I, U)
+    const f2Front = b5 - b4; // positive -> front tongue / smile (I, E); negative -> back tongue / round (U, O)
+
+    if (f1Open > 0.04) {
+      // Open jaw group: 'A' vs 'O'
+      if (b3 > b4 && b3 > 0.20) {
+        scores.viseme_aa = 1.2 + f1Open * 2.5;
+      } else if (f2Front < -0.04 || b4 > b5) {
+        scores.viseme_O = 1.1 + Math.abs(f2Front) * 2.0;
+      } else {
+        scores.viseme_aa = 1.0 + f1Open * 2.0;
+      }
+    } else {
+      // Close/Mid jaw group: 'I', 'E', 'U'
+      if (f2Front > 0.03) {
+        if (b3 > b2) {
+          scores.viseme_E = 1.0 + f2Front * 2.0;
+        } else {
+          scores.viseme_I = 1.1 + f2Front * 2.5;
+        }
+      } else if (f2Front < -0.02 || b4 > b5) {
+        scores.viseme_U = 1.1 + Math.abs(f2Front) * 2.0;
+      } else {
+        scores.viseme_aa = 0.7;
       }
     }
+
     return scores;
   }
 
   processAudio() {
     const feat = this.extractFeatures();
     this.features = feat;
-    if (!feat || feat.volume < 0.025) {
+    if (!feat || (feat.volume < 0.025 && (feat.rms || 0) < 0.005)) {
       this.state = 'silence';
       this.viseme = VISEMES.sil;
       return this.viseme;
@@ -240,8 +285,8 @@ export class WawaLipsyncAnalyzer {
     const dur = now - this.visemeStartTime;
     if (this.viseme && scores[this.viseme] != null) {
       let boost = 1.0;
-      if (dur <= 100) boost = 1.3;
-      else boost = Math.max(0.5, 1.0 - (dur - this.maxVisemeDuration) / 1000);
+      if (dur <= 75) boost = 1.18;
+      else boost = Math.max(0.45, 1.0 - (dur - 75) / 450);
       scores[this.viseme] *= boost;
     }
     let maxScore = -Infinity;
@@ -255,6 +300,38 @@ export class WawaLipsyncAnalyzer {
     return this.viseme;
   }
 }
+
+/**
+ * Canonical speech mouth shapes (Preston-Blair style), expressed as Mochi mouthRig targets.
+ * Only VISIBLE articulations get a shape: vowels, lip closures (M/B/P), lip-teeth (F/V),
+ * rounded glides (W/SH) and tongue-tip (L/TH). Invisible consonants share one narrow "C" shape.
+ */
+export const MOCHI_SPEECH_SHAPES = {
+  REST: { open: 0.00, w: 1.00, sm: 0.32, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.00, tc: 0.00, lipTuck: 0.00 },
+  GAP:  { open: 0.00, w: 1.00, sm: 0.30, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.00, tc: 0.00, lipTuck: 0.00 },
+  A:    { open: 0.88, w: 1.08, sm: 0.36, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.16, tc: 0.00, lipTuck: 0.00 },
+  AH:   { open: 0.68, w: 1.05, sm: 0.35, rd: 0.06, pk: 0.00, bi: 0.00, tl: 0.14, tc: 0.00, lipTuck: 0.00 },
+  I:    { open: 0.34, w: 1.35, sm: 1.00, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.42, tc: 0.00, lipTuck: 0.00 },
+  E:    { open: 0.56, w: 1.22, sm: 0.84, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.30, tc: 0.00, lipTuck: 0.00 },
+  O:    { open: 0.82, w: 0.74, sm: 0.02, rd: 0.98, pk: 0.35, bi: 0.00, tl: -0.10, tc: 0.00, lipTuck: 0.00 },
+  U:    { open: 0.42, w: 0.64, sm: 0.00, rd: 0.98, pk: 0.96, bi: 0.00, tl: -0.14, tc: 0.00, lipTuck: 0.00 },
+  K:    { open: 0.48, w: 1.08, sm: 0.48, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.20, tc: 0.00, lipTuck: 0.00 },
+  MBP:  { open: 0.00, w: 0.98, sm: 0.22, rd: 0.00, pk: 0.00, bi: 1.00, tl: 0.00, tc: 0.00, lipTuck: 0.00 },
+  FV:   { open: 0.16, w: 1.02, sm: 0.32, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.10, tc: 0.00, lipTuck: 0.95 },
+  SH:   { open: 0.22, w: 0.84, sm: 0.18, rd: 0.65, pk: 0.60, bi: 0.00, tl: 0.42, tc: 0.00, lipTuck: 0.00 },
+  C:    { open: 0.20, w: 1.05, sm: 0.36, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.45, tc: 0.00, lipTuck: 0.00 },
+  L:    { open: 0.28, w: 1.06, sm: 0.44, rd: 0.02, pk: 0.00, bi: 0.00, tl: 0.78, tc: 0.65, lipTuck: 0.00 },
+  TH:   { open: 0.18, w: 1.05, sm: 0.38, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.65, tc: 0.00, lipTuck: 0.00 },
+  R:    { open: 0.24, w: 0.92, sm: 0.22, rd: 0.42, pk: 0.32, bi: 0.00, tl: 0.55, tc: 0.75, lipTuck: 0.00 },
+  N:    { open: 0.16, w: 1.02, sm: 0.30, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.45, tc: 0.00, lipTuck: 0.00 },
+  HOLD: { open: 0.00, w: 1.00, sm: 0.28, rd: 0.00, pk: 0.00, bi: 0.35, tl: 0.00, tc: 0.00, lipTuck: 0.00 }
+};
+
+const WAWA_TO_SPEECH_SHAPE = {
+  viseme_aa: 'A', viseme_E: 'E', viseme_I: 'I', viseme_O: 'O', viseme_U: 'U',
+  viseme_PP: 'MBP', viseme_FF: 'FV', viseme_CH: 'SH', viseme_RR: 'R', viseme_TH: 'TH',
+  viseme_SS: 'C', viseme_DD: 'C', viseme_kk: 'C', viseme_nn: 'N'
+};
 
 export class FiezelMochi {
   constructor(container, options = {}) {
@@ -290,6 +367,8 @@ export class FiezelMochi {
 
     this.width = options.width || 380;
     this.height = options.height || 360;
+    this.baseCameraZ = options.cameraZ || 5.05;
+    this.baseCameraY = options.cameraY !== undefined ? options.cameraY : 0.08;
 
     // Physics & Motion State
     this.time = 0;
@@ -396,7 +475,7 @@ export class FiezelMochi {
     this.scene = new THREE.Scene();
 
     this.camera = new THREE.PerspectiveCamera(46, this.width / this.height, 0.1, 100);
-    this.camera.position.set(0, 0.08, 5.38); // Balanced studio framing giving generous breathing room for floating Rayman/Mochi paws
+    this.camera.position.set(0, this.baseCameraY, this.baseCameraZ || 5.05); // Configurable camera framing (e.g. 4.70 for full stage presence in FaceTime)
 
 
     this.renderer = new THREE.WebGLRenderer({
@@ -438,39 +517,38 @@ export class FiezelMochi {
   }
 
   setupLighting() {
-    // Calibrated Studio Daifuku Lighting: warm creamy milk-white Daifuku base with zero plastic chin glare,
-    // while preserving 3D form contour, rosy cheek blushes, icy-blue Takut dread, strawberry-pink Marah flush,
-    // and deep charcoal-crimson Sangat Marah demon skin!
-    this.ambientLight = new THREE.AmbientLight(0xFFFDFB, 1.92);
+    // Authentic 3D Studio Daifuku Lighting: rich volumetric form gradient with soft peach-rose sheen,
+    // glint highlights, warm creamy bounce underbelly, and sculpted rim light!
+    this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.45);
     this.scene.add(this.ambientLight);
 
-    // 2. Hemisphere Light: Pure warm white sky, soft rose-cream ground bounce
-    this.hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xF5DCE8, 0.72);
+    // 2. Hemisphere fill (sky white, ground warm creamy beige)
+    this.hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFF0E5, 1.25);
     this.scene.add(this.hemiLight);
 
-    // 3. Key directional light from top-front-right (sculpts 3D curvature softly without harsh glare)
-    this.keyLight = new THREE.DirectionalLight(0xFFFDF9, 0.46);
-    this.keyLight.position.set(1.8, 3.0, 4.2);
+    // 3. Key directional light from top-front-right (soft form gradient, not blown out)
+    this.keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.40);
+    this.keyLight.position.set(2.4, 3.8, 3.8);
     this.scene.add(this.keyLight);
 
-    // 4. Gentle front-left fill light (zero mirror hotspots)
-    this.glintLight = new THREE.DirectionalLight(0xFFF8FB, 0.14);
-    this.glintLight.position.set(-1.6, 2.2, 3.8);
+    // 4. Crisp specular glint light for authentic wet/glossy glazed mochi sheen
+    this.glintLight = new THREE.DirectionalLight(0xFFFFFF, 0.45);
+    this.glintLight.position.set(-1.4, 2.8, 4.2);
     this.scene.add(this.glintLight);
 
-    // 5. Soft upward bounce light (low intensity to prevent V-glare on lower chin)
-    this.bounceLight = new THREE.DirectionalLight(0xFFEFF5, 0.10);
-    this.bounceLight.position.set(0, -2.4, 2.2);
+    // 5. Warm upward bounce light from bottom (soft creamy daifuku underbelly)
+    this.bounceLight = new THREE.DirectionalLight(0xFFF2E6, 0.65);
+    this.bounceLight.position.set(0, -3.2, 1.4);
     this.scene.add(this.bounceLight);
 
     // 6. Subtle cool fill light from side
-    this.fillLight = new THREE.DirectionalLight(0xF8FAFC, 0.16);
-    this.fillLight.position.set(-3.2, 0.6, 2.6);
+    this.fillLight = new THREE.DirectionalLight(0xF1F5F9, 0.45);
+    this.fillLight.position.set(-3.5, 0.2, 2.4);
     this.scene.add(this.fillLight);
 
-    // 7. Soft rosy rim light from back-top (outlines ears, horns & crown)
-    this.rimLight = new THREE.DirectionalLight(0xFFE0EC, 0.38);
-    this.rimLight.position.set(0, 3.6, -2.8);
+    // 7. Soft rosy rim light from back-top (outlines ears, horns & crown against light backgrounds!)
+    this.rimLight = new THREE.DirectionalLight(0xFFD8E4, 1.35);
+    this.rimLight.position.set(0, 3.8, -2.8);
     this.scene.add(this.rimLight);
 
     // 8. Dynamic Colored Aura Point Light (bounce underglow onto belly)
@@ -544,18 +622,18 @@ export class FiezelMochi {
 
     this.updateSkinBlush();
 
-    // Mouth-watering velvety Daifuku rice-dough skin with soft peach-rose edge sheen (zero plastic glare!)
+    // Mouth-watering velvety Daifuku rice-dough skin with soft peach-rose edge sheen (HD 3D studio quality)
     this.mochiMaterial = new THREE.MeshPhysicalMaterial({
       map: this.mochiSkinTexture,
       color: 0xFFFFFF,
-      roughness: 0.62,
+      roughness: 0.28,
       metalness: 0.0,
-      clearcoat: 0.0,
-      clearcoatRoughness: 0.50,
-      sheen: 0.55,
-      sheenRoughness: 0.55,
-      sheenColor: new THREE.Color(0xFFD6E2), // Soft rosy peach sheen along silhouette: pops on white & cream!
-      ior: 1.42
+      clearcoat: 0.12,
+      clearcoatRoughness: 0.25,
+      sheen: 0.90,
+      sheenRoughness: 0.30,
+      sheenColor: new THREE.Color(0xFFD2DE), // Soft rosy peach sheen along silhouette: pops on white & cream!
+      ior: 1.45
     });
 
     this.mochiMesh = new THREE.Mesh(geo, this.mochiMaterial);
@@ -1039,9 +1117,9 @@ export class FiezelMochi {
         this.mochiMaterial.sheenColor.setHex(0xFF8AA8);
       } else {
         this.mochiMaterial.color.setHex(0xFFFFFF);
-        this.mochiMaterial.roughness = 0.62;
-        this.mochiMaterial.sheen = 0.55;
-        this.mochiMaterial.sheenColor.setHex(0xFFD2DE);
+        this.mochiMaterial.roughness = 0.28;
+        this.mochiMaterial.sheen = 0.90;
+        this.mochiMaterial.sheenColor.setHex(0xFFC4D6);
       }
     }
 
@@ -1287,82 +1365,116 @@ export class FiezelMochi {
   }
 
   /**
-   * 3D Organic Sculpted Cat/Fox Ears with High-Resolution 2.5D Storyboard Texture & 2-Stage Spring Flex.
-   * Renders the thick white outer ear shell, recessed strawberry-pink inner hollow, and 3-lobed fluffy ear tuft
-   * matching media_1794052222222_3662d750.jpg 1:1!
+   * True 3D Volumetric Extruded Fox/Cat Ears with Physical Plush Daifuku Outer Shell,
+   * Rosy Strawberry Inner Hollow, and 3D Marshmallow Fur Tufts.
+   * 100% Volumetric Three.js Geometry with authentic studio lighting interaction!
    */
   createFoxEars() {
     this.earsGroup = new THREE.Group();
     this.earsGroup.visible = this.showEars;
     this.mochiGroup.add(this.earsGroup);
 
-    this.earCanvasL = document.createElement('canvas');
-    this.earCanvasL.width = 512;
-    this.earCanvasL.height = 512;
-    this.earTexL = new THREE.CanvasTexture(this.earCanvasL);
+    const innerEarMat = new THREE.MeshStandardMaterial({
+      color: 0xFF829E, // Deeper, appetizing rosy strawberry inner ear: pops vividly against white!
+      roughness: 0.60,
+      metalness: 0.0
+    });
 
-    this.earCanvasR = document.createElement('canvas');
-    this.earCanvasR.width = 512;
-    this.earCanvasR.height = 512;
-    this.earTexR = new THREE.CanvasTexture(this.earCanvasR);
+    // 1. Organic Petal Bezier Shape for Fox Ears
+    const earShape = new THREE.Shape();
+    earShape.moveTo(-0.32, 0);
+    earShape.bezierCurveTo(-0.44, 0.28, -0.38, 0.68, -0.12, 0.92);
+    earShape.bezierCurveTo(-0.04, 0.98, 0.04, 0.98, 0.12, 0.92);
+    earShape.bezierCurveTo(0.38, 0.68, 0.44, 0.28, 0.32, 0);
+    earShape.bezierCurveTo(0.16, -0.06, -0.16, -0.06, -0.32, 0);
 
-    this.updateEarTextures();
-
-    const makeCurvedEarGeo = () => {
-      const geo = new THREE.PlaneGeometry(1.24, 1.08, 24, 24);
-      // Shift pivot to the lower base of the ear so ear rotation/wiggle pivots from the skull!
-      geo.translate(0, 0.36, 0);
-      const pos = geo.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i);
-        const y = pos.getY(i);
-        // Smooth 3D convex pillow dome across X and gentle forward cup along Y
-        const normX = x / 0.62;
-        const normY = Math.max(0, (y + 0.15) / 1.02);
-        const domeZ = (1.0 - normX * normX * 0.65) * 0.065 * Math.sin(normY * Math.PI);
-        const cupZ = -Math.pow(normY, 1.35) * 0.05;
-        pos.setZ(i, domeZ + cupZ);
-      }
-      geo.computeVertexNormals();
-      return geo;
+    const earExtrudeSettings = {
+      depth: 0.10,
+      bevelEnabled: true,
+      bevelSegments: 4,
+      steps: 1,
+      bevelSize: 0.06,
+      bevelThickness: 0.06
     };
+    const earOuterGeo = new THREE.ExtrudeGeometry(earShape, earExtrudeSettings);
 
-    const earGeoL = makeCurvedEarGeo();
-    const earGeoR = makeCurvedEarGeo();
+    const pos = earOuterGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      let x = pos.getX(i);
+      let y = pos.getY(i);
+      let z = pos.getZ(i) - 0.05;
+      z -= Math.pow(Math.max(0, y) / 0.95, 1.3) * 0.14;
+      if (z > 0 && Math.abs(x) < 0.26) z -= 0.030;
+      pos.setXYZ(i, x, y, z);
+    }
+    earOuterGeo.computeVertexNormals();
 
-    this.earMatL = new THREE.MeshBasicMaterial({
-      map: this.earTexL,
-      transparent: true,
-      alphaTest: 0.01,
-      side: THREE.DoubleSide
+    // 2. Rosy Inner Hollow
+    const innerShape = new THREE.Shape();
+    innerShape.moveTo(-0.20, 0.04);
+    innerShape.bezierCurveTo(-0.28, 0.26, -0.24, 0.56, -0.07, 0.76);
+    innerShape.bezierCurveTo(-0.02, 0.80, 0.02, 0.80, 0.07, 0.76);
+    innerShape.bezierCurveTo(0.24, 0.56, 0.28, 0.26, 0.20, 0.04);
+    innerShape.bezierCurveTo(0.08, -0.02, -0.08, -0.02, -0.20, 0.04);
+
+    const earInnerGeo = new THREE.ExtrudeGeometry(innerShape, {
+      depth: 0.05,
+      bevelEnabled: true,
+      bevelSegments: 3,
+      steps: 1,
+      bevelSize: 0.04,
+      bevelThickness: 0.04
     });
-    this.earMatR = new THREE.MeshBasicMaterial({
-      map: this.earTexR,
-      transparent: true,
-      alphaTest: 0.01,
-      side: THREE.DoubleSide
-    });
+    const inPos = earInnerGeo.attributes.position;
+    for (let i = 0; i < inPos.count; i++) {
+      let x = inPos.getX(i);
+      let y = inPos.getY(i);
+      let z = inPos.getZ(i) + 0.015;
+      z -= Math.pow(Math.max(0, y) / 0.75, 1.3) * 0.10;
+      inPos.setXYZ(i, x, y, z);
+    }
+    earInnerGeo.computeVertexNormals();
 
-    // Left Ear Rig (bold, tall, plush cat/fox ear framing upper head matching media_1794052222222_3662d750.jpg!)
+    // Left Fox Ear Rig
     this.earL = new THREE.Group();
-    this.earL.position.set(-0.62, 0.98, 0.40);
-    this.earL.rotation.set(-0.03, -0.04, Math.PI * 0.13);
+    this.earL.position.set(-0.50, 0.96, 0.14);
 
     this.earL_Flex = new THREE.Group();
-    const meshL = new THREE.Mesh(earGeoL, this.earMatL);
-    meshL.renderOrder = 15;
-    this.earL_Flex.add(meshL);
+    this.earL_Flex.add(new THREE.Mesh(earOuterGeo, this.mochiMaterial));
+    this.earL_Flex.add(new THREE.Mesh(earInnerGeo, innerEarMat));
+
+    // Ear fur tufts inside hollow
+    const tuftMat = new THREE.MeshStandardMaterial({ color: 0xFFB4C8, roughness: 0.80 });
+    const tuftL1 = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 12), tuftMat);
+    tuftL1.position.set(-0.07, 0.18, 0.06);
+    tuftL1.scale.set(0.8, 1.3, 0.6);
+    this.earL_Flex.add(tuftL1);
+
+    const tuftL2 = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), tuftMat);
+    tuftL2.position.set(0.05, 0.24, 0.06);
+    tuftL2.scale.set(0.7, 1.2, 0.6);
+    this.earL_Flex.add(tuftL2);
+
     this.earL.add(this.earL_Flex);
 
-    // Right Ear Rig
+    // Right Fox Ear Rig
     this.earR = new THREE.Group();
-    this.earR.position.set(0.62, 0.98, 0.40);
-    this.earR.rotation.set(-0.03, 0.04, -Math.PI * 0.13);
+    this.earR.position.set(0.50, 0.96, 0.14);
 
     this.earR_Flex = new THREE.Group();
-    const meshR = new THREE.Mesh(earGeoR, this.earMatR);
-    meshR.renderOrder = 15;
-    this.earR_Flex.add(meshR);
+    this.earR_Flex.add(new THREE.Mesh(earOuterGeo, this.mochiMaterial));
+    this.earR_Flex.add(new THREE.Mesh(earInnerGeo, innerEarMat));
+
+    const tuftR1 = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 12), tuftMat);
+    tuftR1.position.set(0.07, 0.18, 0.06);
+    tuftR1.scale.set(0.8, 1.3, 0.6);
+    this.earR_Flex.add(tuftR1);
+
+    const tuftR2 = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), tuftMat);
+    tuftR2.position.set(-0.05, 0.24, 0.06);
+    tuftR2.scale.set(0.7, 1.2, 0.6);
+    this.earR_Flex.add(tuftR2);
+
     this.earR.add(this.earR_Flex);
 
     this.earsGroup.add(this.earL);
@@ -2549,11 +2661,11 @@ export class FiezelMochi {
     if (this.camera) {
       const wM = (this.skinBlend && this.skinBlend.marah) ? Math.max(0, this.skinBlend.marah) : 0;
       const wF = Math.max(hs, (this.skinBlend && this.skinBlend.furious) ? this.skinBlend.furious : 0);
-      this.camera.position.z = 5.05 + wM * 0.08 + wF * 0.16;
-      this.camera.position.y = 0.08 + wM * 0.02 + wF * 0.04;
+      this.camera.position.z = (this.baseCameraZ || 5.05) + wM * 0.08 + wF * 0.16;
+      this.camera.position.y = (this.baseCameraY !== undefined ? this.baseCameraY : 0.08) + wM * 0.02 + wF * 0.04;
       if (this.ambientLight && this.hemiLight) {
-        this.ambientLight.intensity = 1.92 - wF * 0.52;
-        this.hemiLight.intensity = 0.72 * (1.0 - wF * 0.65);
+        this.ambientLight.intensity = 1.35 - wF * 0.40;
+        this.hemiLight.intensity = 1.10 * (1.0 - wF * 0.55);
       }
     }
   }
@@ -5799,22 +5911,41 @@ export class FiezelMochi {
     }
   }
 
-  setTalking(isTalking, durationSeconds = 0) {
+  setTalking(isTalking, durationSeconds = 0, phraseText = null, phraseLang = 'ja') {
     const nextTalking = !!isTalking;
     const wasTalking = !!this.isTalking;
     this.isTalking = nextTalking;
     this.talkDuration = durationSeconds > 0 ? durationSeconds : 0;
 
-    if (nextTalking && !wasTalking) {
+    if (phraseText && typeof phraseText === 'string') {
+      const script = this.parseTextToPhoneticVisemes(phraseText, phraseLang, durationSeconds);
+      if (script && script.length > 0) {
+        this._customTalkScript = script;
+        const totalScriptDur = script.reduce((acc, s) => acc + s.dur, 0);
+        this._customTalkDuration = durationSeconds > 0 ? durationSeconds : totalScriptDur;
+        if (!this.talkDuration) this.talkDuration = this._customTalkDuration;
+        // A NEW phrase always restarts the speech clock at its first syllable, even if Mochi
+        // was already flagged as talking (e.g. while the audio was still downloading).
+        this.talkTimer = 0;
+        this._speechClockRunning = false;
+        this._speechWaitTime = 0;
+        this._speechSignalSeen = false;
+        this._analyserSilentTime = 0;
+        if (this.mouthRig) this.mouthRig.envPeak = 0;
+      }
+    }
+
+    if (nextTalking && !wasTalking && !phraseText) {
+      this.talkTimer = 0;
       // Seed mouthRig smoothly from the active mood's natural resting aperture so start-of-speech NEVER snaps!
       const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
       if (this.mouthRig && this.mouthRig.presence < 0.05) {
         if (desc && (desc.mouthType === 'happy_open_tall' || desc.mouthType === 'happy_open_wide')) {
-          this.mouthRig.open = 0.62;
+          this.mouthRig.open = 0.50;
           this.mouthRig.smile = 0.82;
           this.mouthRig.width = 1.16;
         } else if (desc && desc.mouthType === 'surprised_o') {
-          this.mouthRig.open = 0.68;
+          this.mouthRig.open = 0.56;
           this.mouthRig.roundness = 0.78;
           this.mouthRig.width = 0.84;
         }
@@ -5824,8 +5955,279 @@ export class FiezelMochi {
 
     if (!this.isTalking && !this._manualVisemeLock) {
       this.activeViseme = null;
+      this._customTalkScript = null;
+      this.talkDuration = 0;
+      this.talkTimer = 0;
       // Do NOT snap renderCurvedFaceAndFx to closed here; let mouthRig.presence & open glide softly to rest!
     }
+  }
+
+  speakPhrase(text, lang = 'ja', totalDurationSec = 0) {
+    this.setTalking(true, totalDurationSec, text, lang);
+  }
+
+  /**
+   * Syllable-based Speech Viseme Planner (Kawan Bicara, Voice SOS, Neural TTS).
+   * Plans VISIBLE articulation per syllable (not per letter): vowel nuclei, lip closures (M/B/P/ん),
+   * lip-teeth (F/V), rounded glides (W/SH), tongue-tip (L/TH). Fluent speech does NOT close between
+   * words; only M/B/P and punctuation pauses close the lips fully.
+   * Returns timed segments [{ dur, shape, open, w, sm, rd, pk, bi, tl, tc, lipTuck, p, r, y }].
+   */
+  parseTextToPhoneticVisemes(rawText, lang = 'ja', totalDurationSec = 0) {
+    if (!rawText || typeof rawText !== 'string') return [];
+    const text = rawText
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\[[^\]]*\]/g, ' ')
+      .replace(/\([^)]*\)/g, ' ')
+      .replace(/[「」『』"“”‘’*_#~]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!text) return [];
+
+    const units = [];
+    const last = () => units[units.length - 1];
+    const push = (shape, weight) => {
+      const l = last();
+      // Collapse identical consecutive consonant shapes (e.g. "nd", "st") into one pulse
+      if (l && l.shape === shape && (shape === 'C' || shape === 'MBP' || shape === 'FV')) {
+        l.weight += weight * 0.35;
+        return;
+      }
+      units.push({ shape, weight });
+    };
+    const pause = (weight) => {
+      const l = last();
+      if (!l) return;
+      if (l.shape === 'REST') { l.weight = Math.max(l.weight, weight); return; }
+      if (l.shape === 'GAP') { l.shape = 'REST'; l.weight = weight; return; }
+      units.push({ shape: 'REST', weight });
+    };
+    const gap = () => {
+      const l = last();
+      if (l && l.shape !== 'REST' && l.shape !== 'GAP') units.push({ shape: 'GAP', weight: 0.16 });
+    };
+    const isVowelShape = (s) => s === 'A' || s === 'AH' || s === 'I' || s === 'E' || s === 'O' || s === 'U' || s === 'K';
+
+    // ---------------------------------------------------------------------
+    // Alphabetic planner (English / Indonesian / Romaji)
+    // ---------------------------------------------------------------------
+    const planAlphaWord = (rawWord, mode) => {
+      let w = rawWord.toLowerCase().replace(/[^a-z0-9']/g, '').replace(/'/g, '');
+      if (!w) return;
+      if (/^[0-9]+$/.test(w)) {
+        for (let d = 0; d < Math.min(6, w.length); d++) { push('C', 0.3); push('K', 1.0); }
+        return;
+      }
+      const EN_U_OU = /^(you|your|youre|yours|soup|group|through|could|would|should|route|tour)$/;
+      const EN_O_OW = /^(know|known|show|shown|low|slow|grow|grown|below|follow|window|tomorrow|yellow|own|owner|throw|bowl|snow|blow)$/;
+      let magicE = false;
+      if (mode === 'en') {
+        w = w.replace(/tion/g, 'shun').replace(/sion/g, 'zhun').replace(/ture/g, 'chur');
+        if (w.length > 2 && /[^aeiouy][e]$/.test(w) && !/[^aeiou]le$/.test(w)) {
+          const stripped = w.slice(0, -1);
+          if (/[aeiouy]/.test(stripped)) { w = stripped; magicE = true; }
+        }
+      }
+      const V = 'aeiou';
+      const isV = (ch, idx) => V.includes(ch) || (ch === 'y' && idx > 0 && !V.includes(w[idx + 1] || ''));
+      // Locate last vowel group start for magic-e diphthongs
+      let lastGroupStart = -1;
+      for (let k = 0; k < w.length; k++) if (isV(w[k], k) && (k === 0 || !isV(w[k - 1], k - 1))) lastGroupStart = k;
+
+      let i = 0;
+      while (i < w.length) {
+        const ch = w[i];
+        const nx = w[i + 1] || '';
+        const two = ch + nx;
+        if (isV(ch, i)) {
+          let j = i;
+          while (j < w.length && isV(w[j], j)) j++;
+          // trailing w/y glide closes a diphthong (aw, ow, ew, ay, oy)
+          if (j < w.length && (w[j] === 'w') && (j + 1 >= w.length || !V.includes(w[j + 1]))) j++;
+          const g = w.slice(i, j);
+          const isLastGroup = i === lastGroupStart;
+          const single = (s, wt = 1.0) => push(s, wt);
+          const diph = (a, b) => { push(a, 0.72); push(b, 0.48); };
+          if (mode === 'en') {
+            if (magicE && isLastGroup && g.length === 1) {
+              if (g === 'a') diph('E', 'I');
+              else if (g === 'i' || g === 'y') diph('A', 'I');
+              else if (g === 'o') diph('O', 'U');
+              else if (g === 'u') diph('I', 'U');
+              else single('I');
+            } else if (g === 'i' && w.length === 1) diph('A', 'I');
+            else if (g === 'y' && j === w.length && !/[aeiou]/.test(w.slice(0, i))) diph('A', 'I'); // my, by, why, try
+            else if (g === 'y') single('I', 0.8);
+            else if (g === 'a') single('A');
+            else if (g === 'e') single(j === w.length && w.length <= 3 ? 'I' : 'E'); // me, he, be, we, the
+            else if (g === 'i') single('I');
+            else if (g === 'o') single(/^(to|do|who|two|into|onto)$/.test(w) ? 'U' : 'O', 1.0); // to, do, who -> U; hello, go, no -> O
+            else if (g === 'u') single(/^(u|put|push|pull|full)$/.test(w) ? 'U' : 'AH');
+            else if (g === 'ee' || g === 'ea' || g === 'ie' || g === 'ey' || g === 'ei' && j === w.length) single('I', 1.15);
+            else if (g === 'oo' || g === 'ue' || g === 'ew' || g === 'eu' || g === 'ui') single('U', 1.1);
+            else if (g === 'ou') { if (EN_U_OU.test(w)) single('U', 1.05); else diph('A', 'U'); }
+            else if (g === 'ow') { if (EN_O_OW.test(w)) diph('O', 'U'); else diph('A', 'U'); }
+            else if (g === 'ai' || g === 'ay' || g === 'ei') diph('E', 'I');
+            else if (g === 'oa' || g === 'oe') diph('O', 'U');
+            else if (g === 'au' || g === 'aw') single('O', 1.1);
+            else if (g === 'oi' || g === 'oy') diph('O', 'I');
+            else {
+              for (let q = 0; q < g.length; q++) {
+                const c = g[q];
+                single(c === 'a' ? 'A' : c === 'e' ? 'E' : c === 'o' ? 'O' : c === 'u' ? 'U' : 'I', 0.7);
+              }
+            }
+          } else {
+            // Indonesian / Romaji: transparent orthography, one letter = one sound
+            if (g === 'ai') diph('A', 'I');
+            else if (g === 'au') diph('A', 'U');
+            else if (g === 'oi') diph('O', 'I');
+            else if (g === 'ei') diph('E', 'I');
+            else {
+              for (let q = 0; q < g.length; q++) {
+                const c = g[q];
+                single(c === 'a' ? 'A' : c === 'e' ? 'E' : c === 'o' ? 'O' : c === 'u' ? 'U' : 'I', g.length > 1 ? 0.85 : 1.0);
+              }
+            }
+          }
+          i = j;
+          continue;
+        }
+        // Consonants (only visible articulations get their own shape)
+        if (two === 'th') { push('TH', 0.42); i += 2; continue; }
+        if (two === 'sh' || two === 'ch' || two === 'zh' || two === 'sy') { push('SH', 0.48); i += 2; continue; }
+        if (two === 'ph') { push('FV', 0.42); i += 2; continue; }
+        if (two === 'wh') { push('U', 0.34); i += 2; continue; }
+        if (two === 'qu') { push('C', 0.2); push('U', 0.32); i += 2; continue; }
+        if (two === 'ng' || two === 'ny' || two === 'kh' || two === 'gh' || two === 'ck') { push('C', 0.34); i += 2; continue; }
+        if (ch === nx) { i++; continue; } // doubled consonant = one articulation
+        if (ch === 'm' || ch === 'b' || ch === 'p') { push('MBP', 0.5); i++; continue; }
+        if (ch === 'f' || ch === 'v') { push('FV', 0.44); i++; continue; }
+        if (ch === 'w') { push('U', 0.34); i++; continue; }
+        if (ch === 'y') { push('I', 0.26); i++; continue; }
+        if (ch === 'j') { push('SH', 0.44); i++; continue; }
+        if (ch === 'l') { push('L', 0.38); i++; continue; }
+        if (ch === 'r') { push(mode === 'en' ? 'R' : 'C', 0.34); i++; continue; }
+        if (ch === 'h') { i++; continue; } // invisible
+        push('C', 0.32);
+        i++;
+      }
+    };
+
+    const planAlphaText = (chunk, mode) => {
+      const tokens = chunk.split(/(\s+|[,;:]|[.!?…]+|—|–)/);
+      for (const tok of tokens) {
+        if (!tok) continue;
+        if (/^\s+$/.test(tok)) { gap(); continue; }
+        if (/^[,;:—–]$/.test(tok)) { pause(1.1); continue; }
+        if (/^[.!?…]+$/.test(tok)) { pause(2.0); continue; }
+        const parts = tok.split(/-/);
+        parts.forEach((p, pi) => { if (pi > 0) gap(); planAlphaWord(p, mode); });
+      }
+    };
+
+    // ---------------------------------------------------------------------
+    // Japanese (kana mora) / Chinese (hanzi syllable) planner
+    // ---------------------------------------------------------------------
+    const hasCJK = /[\u3040-\u30FF\u4E00-\u9FAF]/.test(text);
+    const alphaMode = lang === 'en' ? 'en' : 'id'; // Indonesian & romaji share transparent spelling
+    if (hasCJK) {
+      const isZh = lang === 'zh';
+      const toHira = (ch) => {
+        const c = ch.charCodeAt(0);
+        return (c >= 0x30A1 && c <= 0x30F6) ? String.fromCharCode(c - 0x60) : ch;
+      };
+      const VOW = {
+        A: 'あかさたなはまやらわがざだばぱ',
+        I: 'いきしちにひみりぎじぢびぴ',
+        U: 'うくすつぬふむゆるぐずづぶぷゔ',
+        E: 'えけせてねへめれげぜでべぺ',
+        O: 'おこそとのほもよろをごぞどぼぽ'
+      };
+      const SMALL = { 'ゃ': 'A', 'ゅ': 'U', 'ょ': 'O', 'ぁ': 'A', 'ぃ': 'I', 'ぅ': 'U', 'ぇ': 'E', 'ぉ': 'O', 'ゎ': 'A' };
+      const vowelOf = (h) => { for (const k in VOW) if (VOW[k].includes(h)) return k; return null; };
+      const BIL = 'まみむめもばびぶべぼぱぴぷぺぽ';
+      const chars = Array.from(text);
+      let alphaBuf = '';
+      const flushAlpha = () => { if (alphaBuf.trim()) planAlphaText(alphaBuf, 'id'); alphaBuf = ''; };
+      for (let i = 0; i < chars.length; i++) {
+        const raw = chars[i];
+        if (/[A-Za-z0-9']/.test(raw)) { alphaBuf += raw; continue; }
+        if (alphaBuf && raw === ' ') { alphaBuf += raw; continue; }
+        flushAlpha();
+        const h = toHira(raw);
+        const nextH = toHira(chars[i + 1] || '');
+        if ('。！？!?.…'.includes(h)) { pause(2.0); continue; }
+        if ('、，,；;：:'.includes(h)) { pause(1.1); continue; }
+        if (h === ' ' || h === '　') { gap(); continue; }
+        if (h === 'ー' || h === '〜') { const l = last(); if (l && isVowelShape(l.shape)) l.weight += 0.85; continue; }
+        if (h === 'っ') { push(BIL.includes(nextH) ? 'MBP' : 'HOLD', 0.7); continue; }
+        if (h === 'ん') { push('MBP', 0.72); continue; }
+        if (SMALL[h]) { const l = last(); if (l && isVowelShape(l.shape)) { l.shape = SMALL[h]; } else push(SMALL[h], 0.6); continue; }
+        if (/[\u4E00-\u9FAF]/.test(h)) {
+          // Hanzi = 1 syllable, Kanji ≈ 2 morae (reading unknown → neutral open with a consonant pulse)
+          push('C', 0.28); push('K', isZh ? 1.0 : 0.95);
+          if (!isZh) { push('C', 0.24); push('K', 0.8); }
+          continue;
+        }
+        const v = vowelOf(h);
+        if (!v) continue;
+        const l = last();
+        // Long vowels: おう / こう -> long O, えい / せい -> long E
+        if (h === 'う' && l && l.shape === 'O') { l.weight += 0.85; continue; }
+        if (h === 'い' && l && l.shape === 'E') { l.weight += 0.8; continue; }
+        // Devoiced final す (です / ます) -> barely moving lips
+        if (h === 'す' && (!nextH || '。、！？!?.,… '.includes(nextH))) { push('C', 0.55); continue; }
+        if (BIL.includes(h)) push('MBP', 0.42);
+        else if (h === 'わ' || h === 'を') push('U', 0.28);
+        else if (h === 'ふ') push('U', 0.18);
+        else if (!'あいうえお'.includes(h)) push('C', 0.24);
+        push(v, 1.0);
+      }
+      flushAlpha();
+    } else {
+      planAlphaText(text, alphaMode);
+    }
+
+    // Trim leading pauses and guarantee at least one articulation
+    while (units.length && (units[0].shape === 'REST' || units[0].shape === 'GAP')) units.shift();
+    while (units.length && units[units.length - 1].shape === 'GAP') units.pop();
+    if (!units.length) return [];
+
+    // Timing: distribute measured audio time across articulation weights
+    const totalW = units.reduce((a, u) => a + u.weight, 0);
+    const BASE_SYLLABLE = 0.17;
+    let speechTime = totalW * BASE_SYLLABLE;
+    if (totalDurationSec > 0.2) {
+      // Neural TTS buffers carry ~60-120 ms of leading/trailing silence; the clock itself is onset-gated.
+      speechTime = Math.max(0.3, totalDurationSec * 0.95 - 0.06);
+    }
+    const perW = speechTime / Math.max(0.001, totalW);
+
+    const seq = [];
+    let vowelIdx = 0;
+    for (const u of units) {
+      const s = MOCHI_SPEECH_SHAPES[u.shape] || MOCHI_SPEECH_SHAPES.C;
+      let dur = u.weight * perW;
+      if (u.shape === 'MBP') dur = Math.max(0.065, dur);
+      else if (u.shape === 'GAP') dur = Math.max(0.082, Math.min(0.11, dur));
+      else if (isVowelShape(u.shape)) dur = Math.max(0.055, dur);
+      else dur = Math.max(0.035, dur);
+      const vowel = isVowelShape(u.shape);
+      if (vowel) vowelIdx++;
+      seq.push({
+        dur,
+        shape: u.shape,
+        open: s.open, w: s.w, sm: s.sm, rd: s.rd, pk: s.pk, bi: s.bi, tl: s.tl, tc: s.tc, lipTuck: s.lipTuck,
+        p: vowel ? (-0.018 - s.open * 0.03 + (vowelIdx % 2 === 0 ? 0.012 : -0.006)) : 0.008,
+        r: vowel ? Math.sin(vowelIdx * 1.3) * 0.032 : 0,
+        y: vowel ? Math.cos(vowelIdx * 0.9) * 0.034 : 0
+      });
+    }
+    // Final settle into the resting smile
+    const rest = MOCHI_SPEECH_SHAPES.REST;
+    seq.push({ dur: 0.14, shape: 'REST', open: rest.open, w: rest.w, sm: rest.sm, rd: 0, pk: 0, bi: 0, tl: 0, tc: 0, lipTuck: 0, p: 0.01, r: 0, y: 0 });
+    return seq;
   }
 
   /**
@@ -5991,175 +6393,245 @@ export class FiezelMochi {
     let targetYaw = 0.0;
 
     const hasLiveAnalyser = !!(this.wawaLipsync && this.wawaLipsync.analyser);
-    let handledByLiveAudio = false;
+    const hasCustomScript = !!(this._customTalkScript && this._customTalkScript.length > 0);
 
     // -------------------------------------------------------------------------
-    // 1. LIVE WEBAUDIO STREAMING MODE (Coarticulated Asymmetric Envelope + Formant Glide)
+    // 1. DYNAMIC VOCABULARY-ALIGNED PHONETIC SEQUENCER (With Real-Time Audio Modulation)
+    // Runs whenever text was synthesized (HTTP TTS, Kawan Bicara replies, Voice SOS, scenarios).
+    // Exact phonetic viseme shapes matched to vocabulary, modulated by real audio envelope!
     // -------------------------------------------------------------------------
-    if (this.isTalking && hasLiveAnalyser) {
+    if (this.isTalking && (hasCustomScript || !hasLiveAnalyser)) {
+      targetPresence = 1.0;
+      this.talkTimer = (this.talkTimer || 0) + dt;
+
+      const script = hasCustomScript
+        ? this._customTalkScript
+        : [
+            // Natural Japanese greeting fallback ("Konnichiwa, Fiezel!")
+            { dur: 0.22, open: 0.76, w: 0.78, sm: 0.04, rd: 0.94, pk: 0.32, bi: 0.00, tl: -0.10, tc: 0.00, p: -0.04, r: -0.02, y:  0.02 }, // Ko-
+            { dur: 0.14, open: 0.00, w: 0.98, sm: 0.24, rd: 0.00, pk: 0.00, bi: 0.95, tl:  0.00, tc: 0.00, p:  0.02, r:  0.01, y:  0.01 }, // -n- (lips press shut!)
+            { dur: 0.18, open: 0.36, w: 1.25, sm: 0.94, rd: 0.00, pk: 0.00, bi: 0.00, tl:  0.38, tc: 0.00, p: -0.02, r:  0.03, y: -0.02 }, // -ni-
+            { dur: 0.18, open: 0.38, w: 1.20, sm: 0.86, rd: 0.00, pk: 0.00, bi: 0.00, tl:  0.34, tc: 0.00, p: -0.02, r:  0.02, y: -0.01 }, // -chi-
+            { dur: 0.22, open: 0.72, w: 1.08, sm: 0.44, rd: 0.04, pk: 0.00, bi: 0.00, tl:  0.16, tc: 0.00, p:  0.02, r: -0.02, y:  0.01 }, // -wa
+            { dur: 0.18, open: 0.00, w: 1.02, sm: 0.34, rd: 0.00, pk: 0.00, bi: 0.00, tl:  0.00, tc: 0.00, p:  0.01, r:  0.00, y:  0.00 }, // [Word boundary pause: MOUTH CLOSES]
+            { dur: 0.18, open: 0.24, w: 1.04, sm: 0.34, rd: 0.00, pk: 0.00, bi: 0.00, tl:  0.15, tc: 0.00, p:  0.01, r: -0.01, y:  0.02 }, // F-
+            { dur: 0.20, open: 0.50, w: 1.18, sm: 0.82, rd: 0.00, pk: 0.00, bi: 0.00, tl:  0.28, tc: 0.00, p: -0.03, r:  0.03, y: -0.02 }, // -ie-
+            { dur: 0.18, open: 0.48, w: 1.16, sm: 0.84, rd: 0.00, pk: 0.00, bi: 0.00, tl:  0.36, tc: 0.00, p: -0.02, r:  0.02, y: -0.01 }, // -ze-
+            { dur: 0.22, open: 0.52, w: 1.08, sm: 0.36, rd: 0.06, pk: 0.00, bi: 0.00, tl:  0.65, tc: 0.75, p:  0.02, r: -0.02, y:  0.01 }, // -l!
+            { dur: 0.42, open: 0.00, w: 1.02, sm: 0.38, rd: 0.00, pk: 0.00, bi: 0.00, tl:  0.00, tc: 0.00, p:  0.015, r: 0.00, y:  0.00 }  // [Phrase rest: MOUTH CLOSES IN WARM SMILE]
+          ];
+
+      let totalDur = 0;
+      for (let i = 0; i < script.length; i++) totalDur += script[i].dur;
+
+      let localT = this.talkTimer;
+      if (hasCustomScript) {
+        if (localT >= totalDur) {
+          // Finished phrase sequence! Settle closed to rest
+          targetOpen = 0.00;
+          targetBilabial = 0.00;
+          targetPresence = 0.00;
+          targetSmile = 0.32;
+          this.isTalking = false;
+          this._customTalkScript = null;
+          this.talkDuration = 0;
+          this.talkTimer = 0;
+          return;
+        }
+      } else {
+        localT = localT % Math.max(0.1, totalDur);
+      }
+
+      let idx = 0;
+      while (idx < script.length - 1 && localT >= script[idx].dur) {
+        localT -= script[idx].dur;
+        idx++;
+      }
+
+      const curr = script[idx];
+      const prev = idx > 0 ? script[idx - 1] : { open: 0.0, w: 1.0, sm: 0.28, rd: 0.0, pk: 0.0, bi: 0.0, tl: 0.0, tc: 0.0, p: 0.0, r: 0.0, y: 0.0 };
+      const isClosure = curr.open <= 0.01 || (curr.bi || 0) > 0.4 || curr.shape === 'MBP' || curr.shape === 'GAP' || curr.shape === 'REST' || curr.shape === 'HOLD';
+
+      // Attack-Hold-Decay Syllable Viseme Envelope (Preston-Blair & TalkingHead animation standards):
+      // - Attack (first 18% of syllable duration, max 30ms): snappy transition into the true viseme
+      // - Hold (next 67% of syllable duration): hold the true viseme plateau so the vowel/consonant is clearly readable!
+      // - Release (last 15% of syllable duration): glide towards next syllable
+      const sylDur = Math.max(0.035, curr.dur);
+      const prog = localT / sylDur;
+      let blend = 1.0;
+      if (prog < 0.18) {
+        const t = prog / 0.18;
+        blend = t * t * (3 - 2 * t);
+      } else {
+        blend = 1.0; // HOLD TRUE VISEME APERTURE & SHAPE!
+      }
+      const mix = (a, b) => a + (b - a) * blend;
+
+      if (isClosure) {
+        targetOpen = 0.00;
+        const targetBi = typeof curr.bi === 'number' ? curr.bi : (curr.shape === 'MBP' ? 1.0 : 0.0);
+        targetBilabial = mix(prev.bi || 0, targetBi);
+        targetWidth = mix(prev.w || 1.0, curr.w || 0.98);
+        targetSmile = mix(prev.sm || 0.3, curr.sm || 0.24);
+        targetRound = 0.00;
+        targetPucker = 0.00;
+      } else {
+        targetOpen = mix(prev.open, curr.open);
+        targetWidth = mix(prev.w, curr.w);
+        // Mutual exclusion between smile and roundness:
+        // Round vowels (O, U) must NEVER smile; wide vowels (I, E) must NEVER round!
+        targetSmile = curr.rd > 0.2 ? 0.0 : mix(prev.sm, curr.sm);
+        targetRound = curr.sm > 0.3 ? 0.0 : mix(prev.rd, curr.rd);
+        targetPucker = curr.sm > 0.3 ? 0.0 : mix(prev.pk, curr.pk);
+        targetBilabial = 0.00;
+      }
+      targetTongueLift = mix(prev.tl || 0, curr.tl || 0);
+      targetTongueCurl = mix(prev.tc || 0, curr.tc || 0);
+      targetLipTuck = mix(prev.lipTuck || 0, curr.lipTuck || 0);
+      targetPitch = mix(prev.p || 0, curr.p || 0);
+      targetRoll = mix(prev.r || 0, curr.r || 0);
+      targetYaw = mix(prev.y || 0, curr.y || 0);
+
+      // Synergistic Real-Time Audio Modulation:
+      // If an audio analyser is active, linear RMS envelope dynamically modulates jaw aperture!
+      if (hasLiveAnalyser) {
+        const feat = this.wawaLipsync.extractFeatures();
+        const rawRms = feat ? (typeof feat.rms === 'number' && feat.rms > 0 ? feat.rms : Math.pow(Math.max(0, (feat.volume - 0.06) / 0.55), 2.0) * 0.25) : 0;
+        rig.peakRms = Math.max(0.06, Math.max(rawRms, (rig.peakRms || 0.12) * Math.max(0.85, 1.0 - dt * 1.2)));
+        const envRate = rawRms > (rig.audioEnv || 0) ? 45.0 : 20.0;
+        rig.audioEnv = (rig.audioEnv || 0) + (rawRms - (rig.audioEnv || 0)) * Math.min(1.0, dt * envRate);
+        const energyNorm = Math.min(1.0, Math.max(0, (rig.audioEnv - 0.006) / (rig.peakRms * 0.72)));
+
+        if (!isClosure && curr.open > 0.04) {
+          // Maintain vivid, expressive vowel aperture, dynamically boosted by real audio energy
+          targetOpen = Math.min(1.0, targetOpen * (0.78 + 0.32 * energyNorm));
+        } else {
+          // Consonant closure / word space in phonetic script stays 100% closed
+          targetOpen = 0.00;
+        }
+      }
+    } else if (this.isTalking && hasLiveAnalyser) {
+      // -------------------------------------------------------------------------
+      // 2. LIVE BIDIRECTIONAL WEBAUDIO STREAMING MODE (Gemini Live WebSocket Calls)
+      // True linear time-domain RMS syllable envelope + formant vowel/bilabial articulation!
+      // -------------------------------------------------------------------------
       const rawViseme = this.wawaLipsync.processAudio();
       const feat = this.wawaLipsync.features;
-      const rawVol = feat ? Math.max(0, Math.min(1, feat.volume * 2.1)) : 0;
+      const rawRms = feat
+        ? (typeof feat.rms === 'number' && feat.rms > 0
+            ? feat.rms
+            : Math.pow(Math.max(0, ((feat.volume || 0) - 0.06) / 0.55), 2.0) * 0.25)
+        : 0;
+      const rawVol = feat ? Math.max(0, Math.min(1, (feat.volume || 0) * 1.8)) : 0;
 
-      if (rawVol > 0.020) {
+      if (rawRms > 0.006 || rawVol > 0.045) {
         this._analyserSilentTime = 0;
       } else {
         this._analyserSilentTime = (this._analyserSilentTime || 0) + dt;
       }
 
-      // Only let live analyser control mouth if audio is genuinely flowing through this analyser node;
-      // if an alternate TTS path is playing (analyser silent > 0.28s while isTalking === true), fall back seamlessly!
       if ((this._analyserSilentTime || 0) <= 0.28) {
-        handledByLiveAudio = true;
         targetPresence = 1.0;
+        rig.peakRms = Math.max(0.055, Math.max(rawRms, (rig.peakRms || 0.12) * Math.max(0.85, 1.0 - dt * 1.2)));
+        const fastRate = rawRms > (rig.fastRms || 0) ? 55.0 : 34.0;
+        rig.fastRms = (rig.fastRms || 0) + (rawRms - (rig.fastRms || 0)) * Math.min(1.0, dt * fastRate);
+        rig.slowRms = (rig.slowRms || 0) + (rawRms - (rig.slowRms || 0)) * Math.min(1.0, dt * 5.8);
+        rig.audioEnv = rig.fastRms;
 
-        // Asymmetric Speech Envelope: crisp 42ms vowel onset, warm 190ms coarticulated vowel sustain!
-        // Prevents 30-70ms inter-consonant FFT dips from slamming the mouth shut like an eye blink.
-        const envRate = rawVol > rig.audioEnv ? 23.0 : 5.2;
-        rig.audioEnv += (rawVol - rig.audioEnv) * Math.min(1.0, dt * envRate);
-        const env = rig.audioEnv;
+        const normRms = Math.min(1.0, Math.max(0, (rig.fastRms - 0.007) / (rig.peakRms * 0.68)));
+        const isValley = rig.fastRms < (rig.slowRms || 0.01) * 0.68 || normRms < 0.14;
 
-        // Minimum 135ms viseme hysteresis so formants glide smoothly instead of flickering at 60Hz
+        // Track continuous open syllable time so multi-syllable vowel glides articulate natural consonant dips (~4.6 Hz)
+        rig.syllableDipTimer = Math.max(0, (rig.syllableDipTimer || 0) - dt);
+        if (isValley || rawViseme === VISEMES.PP || rawViseme === VISEMES.sil) {
+          rig.openSyllableTime = 0;
+        } else {
+          rig.openSyllableTime = (rig.openSyllableTime || 0) + dt;
+          if (rig.openSyllableTime > 0.20 && rig.syllableDipTimer <= 0) {
+            rig.syllableDipTimer = 0.068;
+            rig.openSyllableTime = 0;
+            rig.dipCount = (rig.dipCount || 0) + 1;
+          }
+        }
+
         rig.holdTimer = Math.max(0, (rig.holdTimer || 0) - dt);
-        if (rawVol > 0.035 && rawViseme !== VISEMES.sil && (rig.holdTimer <= 0 || !rig.holdViseme)) {
+        if (normRms > 0.14 && rawViseme !== VISEMES.sil && (rig.holdTimer <= 0 || !rig.holdViseme)) {
           rig.holdViseme = rawViseme;
-          rig.holdTimer = (rawViseme === VISEMES.PP) ? 0.095 : 0.140;
+          rig.holdTimer = (rawViseme === VISEMES.PP) ? 0.075 : 0.110;
         }
         const vis = rig.holdViseme || rawViseme;
+        const b1 = feat && feat.bands ? (feat.bands[0] || 0) : 0;
+        const b2 = feat && feat.bands ? (feat.bands[1] || 0) : 0;
+        const b4 = feat && feat.bands ? (feat.bands[3] || 0) : 0;
+        const b5 = feat && feat.bands ? (feat.bands[4] || 0) : 0;
+        const lowDom = (b1 + b2) >= (b4 + b5) * 0.92;
 
-        if (env > 0.028) {
-          if (vis === VISEMES.PP && rawVol < 0.24) {
-            // Brief natural bilabial consonant touch ('B, M, P')
-            targetOpen = 0.02;
-            targetBilabial = 0.88;
-            targetWidth = 0.96;
-            targetSmile = 0.22;
-            targetPitch = 0.018;
+        if (rig.syllableDipTimer > 0 || vis === VISEMES.PP || (isValley && normRms > 0.03)) {
+          // Inter-syllable consonant closure ('B, M, P, N' or alveolar stop)
+          const isBilabialStop = vis === VISEMES.PP || lowDom || ((rig.dipCount || 0) % 2 === 0);
+          targetOpen = 0.00;
+          targetBilabial = isBilabialStop ? 0.95 : 0.00;
+          targetWidth = isBilabialStop ? 0.96 : 1.02;
+          targetSmile = isBilabialStop ? 0.22 : 0.30;
+          targetPitch = 0.016;
+        } else if (normRms > 0.12 && vis !== VISEMES.sil) {
+          const energyNorm = Math.min(1.0, Math.max(0.28, normRms));
+          const baseVowelOpen = Math.min(0.92, 0.22 + energyNorm * 0.68);
+          targetOpen = baseVowelOpen;
+          targetBilabial = 0.00;
+
+          if (vis === VISEMES.I || vis === VISEMES.E || vis === VISEMES.SS || vis === VISEMES.DD) {
+            targetOpen = Math.min(0.72, 0.18 + energyNorm * 0.50);
+            targetWidth = 1.22 + energyNorm * 0.10;
+            targetSmile = 0.90;
+            targetRound = 0.0;
+            targetTongueLift = 0.36;
+          } else if (vis === VISEMES.O) {
+            targetOpen = Math.min(0.90, 0.30 + energyNorm * 0.58);
+            targetWidth = 0.76;
+            targetSmile = 0.02;
+            targetRound = 0.94;
+            targetPucker = 0.38;
+            targetTongueLift = -0.12;
+          } else if (vis === VISEMES.U || vis === VISEMES.CH) {
+            targetOpen = Math.min(0.58, 0.20 + energyNorm * 0.36);
+            targetWidth = 0.72;
+            targetSmile = 0.00;
+            targetRound = 0.94;
+            targetPucker = vis === VISEMES.U ? 0.86 : 0.50;
+            targetTongueLift = -0.14;
+          } else if (vis === VISEMES.RR || vis === VISEMES.TH) {
+            targetOpen = Math.min(0.66, 0.20 + energyNorm * 0.44);
+            targetWidth = 1.08;
+            targetSmile = 0.52;
+            targetTongueLift = 0.62;
+            targetTongueCurl = vis === VISEMES.RR ? 0.72 : 0.0;
+          } else if (vis === VISEMES.FF) {
+            targetOpen = Math.min(0.42, 0.14 + energyNorm * 0.28);
+            targetWidth = 1.04;
+            targetSmile = 0.34;
+            targetLipTuck = 0.78;
           } else {
-            // Coarticulated open vowel carrier modulated by acoustic energy
-            const baseVowelOpen = Math.min(0.92, 0.30 + env * 0.88);
-            targetOpen = baseVowelOpen;
-
-            if (vis === VISEMES.I || vis === VISEMES.E || vis === VISEMES.SS || vis === VISEMES.DD) {
-              targetOpen = Math.min(0.74, 0.28 + env * 0.64);
-              targetWidth = 1.20 + env * 0.10;
-              targetSmile = 0.86;
-              targetRound = 0.0;
-              targetTongueLift = 0.36;
-            } else if (vis === VISEMES.O) {
-              targetOpen = Math.min(0.90, 0.38 + env * 0.78);
-              targetWidth = 0.78;
-              targetSmile = 0.06;
-              targetRound = 0.90;
-              targetPucker = 0.42;
-              targetTongueLift = -0.12;
-            } else if (vis === VISEMES.U || vis === VISEMES.CH) {
-              targetOpen = Math.min(0.62, 0.28 + env * 0.48);
-              targetWidth = 0.74;
-              targetSmile = 0.04;
-              targetRound = 0.88;
-              targetPucker = vis === VISEMES.U ? 0.80 : 0.48;
-              targetTongueLift = -0.14;
-            } else if (vis === VISEMES.RR || vis === VISEMES.TH) {
-              targetOpen = Math.min(0.72, 0.32 + env * 0.56);
-              targetWidth = 1.08;
-              targetSmile = 0.52;
-              targetTongueLift = 0.62;
-              targetTongueCurl = vis === VISEMES.RR ? 0.72 : 0.0;
-            } else if (vis === VISEMES.FF) {
-              targetOpen = Math.min(0.46, 0.22 + env * 0.34);
-              targetWidth = 1.04;
-              targetSmile = 0.34;
-              targetLipTuck = 0.75;
-            } else {
-              // Warm open 'A' vowel
-              targetWidth = 1.06 + env * 0.06;
-              targetSmile = 0.42;
-              targetRound = 0.08;
-              targetTongueLift = 0.16;
-            }
-
-            // Prosodic head pitch, roll & yaw coupled directly to real voice energy!
-            this.talkTimer = (this.talkTimer || 0) + dt;
-            const pt = this.talkTimer;
-            targetPitch = -(env - 0.22) * 0.105 + Math.sin(pt * 2.4) * 0.018;
-            targetRoll = Math.sin(pt * 1.55) * 0.056;
-            targetYaw = Math.sin(pt * 1.12 + 0.6) * 0.058;
+            // Warm open 'A' vowel
+            targetWidth = 1.06 + energyNorm * 0.06;
+            targetSmile = 0.40;
+            targetRound = 0.06;
+            targetTongueLift = 0.16;
           }
+
+          this.talkTimer = (this.talkTimer || 0) + dt;
+          const pt = this.talkTimer;
+          targetPitch = -(energyNorm - 0.28) * 0.08 + Math.sin(pt * 2.2) * 0.015;
+          targetRoll = Math.sin(pt * 1.4) * 0.045;
+          targetYaw = Math.sin(pt * 1.0 + 0.5) * 0.048;
         } else {
-          // Quiet pause in live audio stream
-          targetOpen = 0.0;
-          targetSmile = 0.32;
+          // Quiet pause in live audio stream: MOUTH CLOSES COMPLETELY!
+          targetOpen = 0.00;
+          targetBilabial = 0.00;
+          targetSmile = 0.30;
           targetPitch = 0.010;
         }
       }
-    }
-
-    // -------------------------------------------------------------------------
-    // 2. COARTICULATED PROCEDURAL PHONEME SEQUENCER (Natural Human/Anime Prosody!)
-    // Connected vowels STAY OPEN and glide smoothly (A -> I -> O -> M -> A -> E -> U)
-    // instead of slamming shut every syllable like a sine-wave eye blink!
-    // -------------------------------------------------------------------------
-    if (this.isTalking && !handledByLiveAudio) {
-      targetPresence = 1.0;
-      this.talkTimer = (this.talkTimer || 0) + dt;
-
-      // Two melodic, unhurried conversational phrases (~5.35s loop) with lush connected vowel glides,
-      // gentle breath micro-resonance, rare soft bilabials, and rich 3D head/body prosody!
-      const SCRIPT = [
-        // Phrase 1: Warm, joyful greeting ("Ha-looo te-man, yuk be-la-jar!")
-        { dur: 0.30, open: 0.78, w: 1.08, sm: 0.44, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.16, tc: 0.00, p: -0.058, r:  0.048, y: -0.045 }, // Ha- (plush open A + upward lift)
-        { dur: 0.32, open: 0.74, w: 0.78, sm: 0.04, rd: 0.94, pk: 0.28, bi: 0.00, tl: -0.10, tc: 0.25, p:  0.024, r:  0.062, y: -0.024 }, // -looo (glides smoothly into tall round O!)
-        { dur: 0.26, open: 0.54, w: 1.22, sm: 0.84, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.34, tc: 0.00, p: -0.026, r:  0.036, y:  0.018 }, // te- (glides wide into happy D-smile E!)
-        { dur: 0.16, open: 0.02, w: 0.96, sm: 0.26, rd: 0.00, pk: 0.00, bi: 0.92, tl: 0.00, tc: 0.00, p:  0.042, r:  0.010, y:  0.032 }, // -m- (soft marshmallow bilabial kiss + gentle nod)
-        { dur: 0.34, open: 0.88, w: 1.12, sm: 0.48, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.18, tc: 0.00, p: -0.068, r: -0.038, y:  0.056 }, // -aaan (expressive open A bloom + buoyant lift!)
-        { dur: 0.28, open: 0.50, w: 0.70, sm: 0.02, rd: 0.96, pk: 0.86, bi: 0.00, tl: -0.12, tc: 0.00, p:  0.022, r: -0.058, y:  0.042 }, // yuuk (cute round U pucker cushion!)
-        { dur: 0.26, open: 0.62, w: 1.20, sm: 0.78, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.32, tc: 0.52, p: -0.034, r: -0.044, y:  0.012 }, // be-la- (open E + curled L tongue glide)
-        { dur: 0.30, open: 0.68, w: 1.10, sm: 0.60, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.18, tc: 0.00, p: -0.024, r: -0.018, y: -0.016 }, // -jaar (warm trailing A)
-        { dur: 0.52, open: 0.00, w: 1.02, sm: 0.40, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.00, tc: 0.00, p:  0.020, r:  0.000, y:  0.000 }, // [Calm smiling conversational breath]
-
-        // Phrase 2: Curious & encouraging ("A-yooo la-giii, pas-ti bi-sa!")
-        { dur: 0.28, open: 0.80, w: 1.08, sm: 0.46, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.16, tc: 0.00, p: -0.052, r: -0.056, y:  0.058 }, // A-
-        { dur: 0.32, open: 0.76, w: 0.76, sm: 0.04, rd: 0.95, pk: 0.32, bi: 0.00, tl: -0.10, tc: 0.00, p:  0.028, r: -0.038, y:  0.042 }, // -yooo (tall symmetrical O!)
-        { dur: 0.26, open: 0.50, w: 1.26, sm: 0.90, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.40, tc: 0.00, p: -0.024, r:  0.020, y:  0.008 }, // la-giii (wide joyful I smile!)
-        { dur: 0.16, open: 0.02, w: 0.96, sm: 0.24, rd: 0.00, pk: 0.00, bi: 0.92, tl: 0.00, tc: 0.00, p:  0.044, r:  0.038, y: -0.026 }, // p- (soft bilabial P cushion)
-        { dur: 0.32, open: 0.88, w: 1.12, sm: 0.54, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.18, tc: 0.00, p: -0.066, r:  0.060, y: -0.054 }, // -aas- (joyful emphasis A!)
-        { dur: 0.26, open: 0.48, w: 1.28, sm: 0.92, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.42, tc: 0.00, p: -0.028, r:  0.046, y: -0.038 }, // -ti bi- (stays open in bright I smile!)
-        { dur: 0.30, open: 0.66, w: 1.10, sm: 0.58, rd: 0.04, pk: 0.00, bi: 0.00, tl: 0.16, tc: 0.00, p: -0.018, r:  0.022, y: -0.014 }, // -saa!
-        { dur: 0.54, open: 0.00, w: 1.02, sm: 0.42, rd: 0.00, pk: 0.00, bi: 0.00, tl: 0.00, tc: 0.00, p:  0.018, r:  0.000, y:  0.000 }  // [Warm phrase settle & gentle nod]
-      ];
-
-      let totalDur = 0;
-      for (let i = 0; i < SCRIPT.length; i++) totalDur += SCRIPT[i].dur;
-      let localT = this.talkTimer % totalDur;
-      let idx = 0;
-      while (idx < SCRIPT.length - 1 && localT >= SCRIPT[idx].dur) {
-        localT -= SCRIPT[idx].dur;
-        idx++;
-      }
-
-      const curr = SCRIPT[idx];
-      const prev = SCRIPT[(idx - 1 + SCRIPT.length) % SCRIPT.length];
-      // Fluid coarticulation glide across 68% of syllable, with warm vocal micro-resonance on held nuclei!
-      const blend = quinticEase(Math.min(1.0, localT / Math.max(0.05, curr.dur * 0.68)));
-      const mix = (a, b) => a + (b - a) * blend;
-
-      const baseOpen = mix(prev.open, curr.open);
-      const vocalResonance = baseOpen > 0.25 ? Math.sin(this.talkTimer * 9.2) * 0.026 : 0;
-      const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
-      const moodSmileBoost = (desc && (desc.id === 'gembira' || desc.id === 'senang')) ? 0.16 : 0;
-
-      targetOpen = Math.max(0, Math.min(1, baseOpen + vocalResonance));
-      targetWidth = mix(prev.w, curr.w);
-      targetSmile = Math.min(1, mix(prev.sm, curr.sm) + moodSmileBoost * (1.0 - mix(prev.rd, curr.rd)));
-      targetRound = mix(prev.rd, curr.rd);
-      targetPucker = mix(prev.pk, curr.pk);
-      targetBilabial = mix(prev.bi, curr.bi);
-      targetTongueLift = mix(prev.tl, curr.tl);
-      targetTongueCurl = mix(prev.tc, curr.tc);
-      targetPitch = mix(prev.p, curr.p);
-      targetRoll = mix(prev.r, curr.r);
-      targetYaw = mix(prev.y, curr.y);
     } else if (!this.isTalking && this.activeViseme) {
       // 3. EXPLICIT VISEME PREVIEW MODE (Interactive Studio Chips)
       const T = this.resolveVisemeTargets(this.activeViseme, this.visemeIntensity || 1.0);
@@ -6185,17 +6657,28 @@ export class FiezelMochi {
       rig.audioEnv = (rig.audioEnv || 0) * Math.max(0, 1 - dt * 10);
     }
 
-    // Asymmetric plush marshmallow stepping: silky vowel glide (omega=11.6), unhurried soft closing (omega=8.6)
-    const openOmega = targetOpen >= rig.open ? 11.6 : 8.6;
-    [rig.open, rig.openVel] = stepFlesh(rig.open, rig.openVel, targetOpen, openOmega, 0.96);
-    [rig.width, rig.widthVel] = stepFlesh(rig.width, rig.widthVel, targetWidth, 10.2, 0.96);
-    [rig.smile, rig.smileVel] = stepFlesh(rig.smile, rig.smileVel, targetSmile, 10.0, 0.96);
-    [rig.roundness, rig.roundnessVel] = stepFlesh(rig.roundness, rig.roundnessVel, targetRound, 10.4, 0.96);
-    [rig.pucker, rig.puckerVel] = stepFlesh(rig.pucker, rig.puckerVel, targetPucker, 10.6, 0.96);
-    [rig.bilabial, rig.bilabialVel] = stepFlesh(rig.bilabial, rig.bilabialVel, targetBilabial, 13.5, 0.94);
-    [rig.tongueLift, rig.tongueLiftVel] = stepFlesh(rig.tongueLift, rig.tongueLiftVel, targetTongueLift, 11.8, 0.94);
-    [rig.tongueCurl, rig.tongueCurlVel] = stepFlesh(rig.tongueCurl, rig.tongueCurlVel, targetTongueCurl, 11.8, 0.94);
-    [rig.lipTuck, rig.lipTuckVel] = stepFlesh(rig.lipTuck, rig.lipTuckVel, targetLipTuck, 11.8, 0.94);
+    // Snappy closure on consonants/pauses (omega=48.0) and lively responsive vowel articulation (omega=32.0)
+    const isClosing = targetOpen < rig.open;
+    const openOmega = isClosing ? (targetOpen <= 0.05 ? 48.0 : 28.0) : 32.0;
+    [rig.open, rig.openVel] = stepFlesh(rig.open, rig.openVel, targetOpen, openOmega, 0.94);
+    if (targetOpen <= 0.001 && rig.open < 0.038) {
+      rig.open = 0.00;
+      rig.openVel = 0;
+    }
+    const shapeOmega = 28.0;
+    [rig.width, rig.widthVel] = stepFlesh(rig.width, rig.widthVel, targetWidth, shapeOmega, 0.94);
+    [rig.smile, rig.smileVel] = stepFlesh(rig.smile, rig.smileVel, targetSmile, shapeOmega, 0.94);
+    [rig.roundness, rig.roundnessVel] = stepFlesh(rig.roundness, rig.roundnessVel, targetRound, shapeOmega, 0.94);
+    [rig.pucker, rig.puckerVel] = stepFlesh(rig.pucker, rig.puckerVel, targetPucker, shapeOmega, 0.94);
+    const bilabialOmega = targetBilabial > 0.1 ? 48.0 : 24.0;
+    [rig.bilabial, rig.bilabialVel] = stepFlesh(rig.bilabial, rig.bilabialVel, targetBilabial, bilabialOmega, 0.94);
+    if (targetBilabial <= 0.001 && rig.bilabial < 0.035) {
+      rig.bilabial = 0.00;
+      rig.bilabialVel = 0;
+    }
+    [rig.tongueLift, rig.tongueLiftVel] = stepFlesh(rig.tongueLift, rig.tongueLiftVel, targetTongueLift, 14.0, 0.94);
+    [rig.tongueCurl, rig.tongueCurlVel] = stepFlesh(rig.tongueCurl, rig.tongueCurlVel, targetTongueCurl, 14.0, 0.94);
+    [rig.lipTuck, rig.lipTuckVel] = stepFlesh(rig.lipTuck, rig.lipTuckVel, targetLipTuck, 14.0, 0.94);
     [rig.presence, rig.presenceVel] = stepFlesh(rig.presence, rig.presenceVel, targetPresence, targetPresence > 0.5 ? 12.5 : 8.2, 0.96);
     [rig.headPitch, rig.headPitchVel] = stepFlesh(rig.headPitch, rig.headPitchVel, targetPitch, 8.4, 0.88);
     [rig.headRoll, rig.headRollVel] = stepFlesh(rig.headRoll, rig.headRollVel, targetRoll, 7.2, 0.88);
@@ -7092,50 +7575,50 @@ export class FiezelMochi {
       const lead = side === 1;
       const g = snapImmediate ? 1.2 : (this.handGestureTime - (lead ? 0 : 0.12));
       const bob = Math.sin(t * 2.5 + (lead ? 1.6 : 0)) * 0.04;
-      const P = { x: side * 1.68, y: -0.1, z: 0.48, rx: 0, ry: 0, rz: 0, s: 0, shape: 'open' };
+      const P = { x: side * 1.15, y: -0.1, z: 0.60, rx: 0, ry: 0, rz: 0, s: 0, shape: 'open' };
       if (g < 0 && st !== 'hidden') { P.s = 0; return P; }
 
       if (st === 'cheer' || st === 'joy_high') {
-        // Gembira: Both open paws floating high in joyous celebration ("Hore / Yatta!")
-        const wig = Math.sin(t * 9.5 + (lead ? 0 : 1.2)) * 0.10;
+        // Gembira: Both open paws floating in joyous celebration hugging chubby cheeks ("Hore / Yatta!")
+        const wig = Math.sin(t * 9.5 + (lead ? 0 : 1.2)) * 0.08;
         if (lead) {
           const hop = (bump(g, 0.55, 0.16) + bump(g, 0.95, 0.16)) * 0.08;
-          P.x = 1.70; P.y = 0.44 + hop + bob * 0.5; P.z = 0.50;
-          P.rx = -0.05; P.ry = -0.12; P.rz = -0.30 + wig;
-          P.s = 0.90; P.shape = 'open';
-        } else {
-          P.x = -1.70; P.y = 0.40 + bob * 0.5; P.z = 0.50;
-          P.rx = -0.05; P.ry = 0.12; P.rz = 0.30 - wig;
+          P.x = 1.15; P.y = 0.28 + hop + bob * 0.5; P.z = 0.76;
+          P.rx = -0.05; P.ry = -0.10; P.rz = -0.25 + wig;
           P.s = 0.88; P.shape = 'open';
+        } else {
+          P.x = -1.15; P.y = 0.25 + bob * 0.5; P.z = 0.76;
+          P.rx = -0.05; P.ry = 0.10; P.rz = 0.25 - wig;
+          P.s = 0.86; P.shape = 'open';
         }
       } else if (st === 'happy_wave' || st === 'wave') {
-        // Senang / Wave: Right open paw waving high in mid-air, Left open paw floating outside lower-left
+        // Senang / Wave: Right open paw waving warmly, Left open paw floating at lower-left
         if (lead) {
-          const w = Math.sin(t * 8.5) * 0.20;
+          const w = Math.sin(t * 8.5) * 0.18;
           const hasHeadset = (this.currentAccessory === 'headset' || isTeacher);
-          P.x = 1.68;
-          P.y = (hasHeadset ? -0.16 : 0.38) + bob * 0.5;
-          P.z = 0.50;
-          P.rx = -0.04; P.ry = -0.12; P.rz = -0.26 + w;
-          P.s = 0.90; P.shape = 'open';
+          P.x = 1.18;
+          P.y = (hasHeadset ? -0.12 : 0.28) + bob * 0.5;
+          P.z = 0.76;
+          P.rx = -0.04; P.ry = -0.10; P.rz = -0.24 + w;
+          P.s = 0.88; P.shape = 'open';
         } else {
-          P.x = -1.68; P.y = -0.18 + bob * 0.4; P.z = 0.48;
-          P.rx = -0.04; P.ry = 0.12; P.rz = 0.24;
-          P.s = (st === 'wave') ? 0.0 : 0.86; P.shape = 'open';
+          P.x = -1.15; P.y = -0.18 + bob * 0.4; P.z = 0.65;
+          P.rx = -0.04; P.ry = 0.10; P.rz = 0.22;
+          P.s = (st === 'wave') ? 0.0 : 0.84; P.shape = 'open';
         }
       } else if (st === 'firm_hips') {
         // Tegas: Both firm fists floating outside waist in determined "Bertolak pinggang" stance!
-        P.x = side * 1.72; P.y = -0.22 + bob * 0.3; P.z = 0.48;
+        P.x = side * 1.30; P.y = -0.22 + bob * 0.3; P.z = 0.60;
         P.rx = 0.05; P.ry = -side * 0.25; P.rz = side * 0.35;
         P.s = 0.92; P.shape = 'hips_akimbo';
       } else if (st === 'skeptical_chin') {
         // Sinis: Right thinking paw resting under cheek, Left firm fist at waist
         if (lead) {
-          P.x = 1.42; P.y = -0.24 + Math.sin(t * 3.5) * 0.02; P.z = 0.54;
+          P.x = 1.15; P.y = -0.24 + Math.sin(t * 3.5) * 0.02; P.z = 0.68;
           P.rx = -0.10; P.ry = -0.22; P.rz = -0.15;
           P.s = 0.90; P.shape = 'chin_think';
         } else {
-          P.x = -1.70; P.y = -0.20 + bob * 0.3; P.z = 0.48;
+          P.x = -1.30; P.y = -0.20 + bob * 0.3; P.z = 0.60;
           P.rx = 0.05; P.ry = 0.25; P.rz = -0.35;
           P.s = 0.88; P.shape = 'hips_akimbo';
         }
@@ -7148,36 +7631,36 @@ export class FiezelMochi {
         // Penasaran / Bingung: Right 4-toed chubby paw scratching temple/ear, Left open paw floating outside!
         if (lead) {
           const scratch = Math.sin(t * 11.0) * 0.04;
-          P.x = 1.46; P.y = 0.62 + scratch * 0.3; P.z = 0.52;
+          P.x = 1.20; P.y = 0.58 + scratch * 0.3; P.z = 0.68;
           P.rx = 0.12; P.ry = -0.32; P.rz = 0.42 + scratch;
           P.s = 0.92; P.shape = 'scratch_head';
         } else {
-          P.x = -1.68; P.y = -0.16 + bob * 0.3; P.z = 0.48;
+          P.x = -1.30; P.y = -0.16 + bob * 0.3; P.z = 0.60;
           P.rx = 0.04; P.ry = 0.18; P.rz = -0.18;
           P.s = 0.88; P.shape = 'open';
         }
       } else if (st === 'shock_flail') {
-        // Kaget: Both open paws flung wide outward in mid-air shock!
+        // Kaget: Both open paws flung outward in mid-air shock!
         const jolt = Math.sin(t * 18.0) * 0.025;
-        P.x = side * 1.74; P.y = 0.24 + jolt; P.z = 0.50;
+        P.x = side * 1.32; P.y = 0.22 + jolt; P.z = 0.65;
         P.rx = 0.02; P.ry = -side * 0.14; P.rz = -side * 0.45;
         P.s = 0.92; P.shape = 'open';
       } else if (st === 'wipe_tears') {
         // Sedih: Right hand wiping tear near right cheek, Left hand drooping limp
         if (lead) {
           const wipe = Math.sin(t * 6.5) * 0.035;
-          P.x = 1.48; P.y = 0.12 + wipe; P.z = 0.52;
+          P.x = 1.18; P.y = 0.12 + wipe; P.z = 0.68;
           P.rx = 0.06; P.ry = -0.22; P.rz = 0.22;
           P.s = 0.90; P.shape = 'open';
         } else {
-          P.x = -1.68; P.y = -0.22 + bob * 0.3; P.z = 0.48;
+          P.x = -1.30; P.y = -0.22 + bob * 0.3; P.z = 0.60;
           P.rx = 0.08; P.ry = 0.14; P.rz = 0.18;
           P.s = 0.88; P.shape = 'open';
         }
       } else if (st === 'annoyed_fists') {
         // Kesal: Both clenched fists floating outside lower sides, trembling with annoyance!
         const shake = Math.sin(t * 24.0) * 0.016;
-        P.x = side * 1.70 + shake; P.y = -0.14 + bob * 0.3; P.z = 0.50;
+        P.x = side * 1.28 + shake; P.y = -0.14 + bob * 0.3; P.z = 0.60;
         P.rx = 0.08; P.ry = -side * 0.16; P.rz = -side * 0.18;
         P.s = 0.92; P.shape = 'fist_clench';
       } else if (st === 'sleepy_rub') {
@@ -7470,8 +7953,11 @@ export class FiezelMochi {
     if (this.container && typeof IntersectionObserver !== 'undefined' && !this._visibilityObserver) {
       try {
         this._visibilityObserver = new IntersectionObserver((entries) => {
-          this.isVisible = !!(entries[0] && entries[0].isIntersecting);
-        }, { threshold: 0.02 });
+          const visible = !!(entries[0] && (entries[0].isIntersecting || entries[0].intersectionRatio > 0));
+          if (!this.isTalking) {
+            this.isVisible = visible;
+          }
+        }, { threshold: [0, 0.02] });
         this._visibilityObserver.observe(this.container);
       } catch (_) {}
     }
@@ -7481,7 +7967,9 @@ export class FiezelMochi {
       if (!this._running) return;
       // Offscreen or parked by the companion pool: poll at 4 Hz instead of rendering at 60 fps.
       // The sleep timer is kept apart from rafId so destroy() can cancel each with its own API.
-      if (this.isVisible === false || this._paused) {
+      // CRITICAL: NEVER throttle if Mochi is actively speaking, has audio attached, or has speech presence!
+      const mustStayAwake = this.isTalking || this.talkDuration > 0 || !!(this.wawaLipsync && this.wawaLipsync.analyser) || (this.mouthRig && this.mouthRig.presence > 0.05);
+      if (!mustStayAwake && (this.isVisible === false || this._paused)) {
         this._sleepTimer = setTimeout(() => {
           this._sleepTimer = null;
           if (this._running) this.rafId = requestAnimationFrame(loop);

@@ -281,30 +281,25 @@ export interface GeminiLiveSessionInfo {
  * static cPanel hosts return 404 HTML pages for `/api/*` endpoints.
  */
 export function resolveVoiceApiCandidateBases(): string[] {
-  const bases: string[] = [];
   const isLocalHost =
     typeof window !== 'undefined' &&
     /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(window.location?.hostname || '');
+  if (isLocalHost) {
+    return [''];
+  }
   const cfBase =
     resolveCfApiBase() ||
     (typeof window !== 'undefined' && window.FIEZEL_CF_CONFIG?.base
       ? window.FIEZEL_CF_CONFIG.base
       : 'https://api.fiezel.my.id');
 
-  if (isLocalHost) {
-    bases.push('');
-  }
-  if (cfBase) {
-    bases.push(cfBase.replace(/\/$/, ''));
-  }
-  return Array.from(new Set(bases));
+  return cfBase ? [cfBase.replace(/\/$/, '')] : ['https://api.fiezel.my.id'];
 }
 
-/**
- * Requests an ephemeral session token from the Cloudflare Worker / Local 16-key pool.
- * Automatically round-robins and fails over if a key encounters quota limits.
- */
-export async function requestGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
+let _prewarmedLiveSession: { info: GeminiLiveSessionInfo; ts: number } | null = null;
+let _prewarmInflight: Promise<GeminiLiveSessionInfo> | null = null;
+
+async function fetchFreshGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
   for (const base of resolveVoiceApiCandidateBases()) {
     const url = `${base}/api/voice/live-session`;
     try {
@@ -339,6 +334,50 @@ export async function requestGeminiLiveSessionToken(): Promise<GeminiLiveSession
     }
   }
   return { ok: false, fallback: true };
+}
+
+export function prewarmGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
+  if (_prewarmedLiveSession && Date.now() - _prewarmedLiveSession.ts < 90000) {
+    return Promise.resolve(_prewarmedLiveSession.info);
+  }
+  if (_prewarmInflight) return _prewarmInflight;
+  _prewarmInflight = fetchFreshGeminiLiveSessionToken()
+    .then((info) => {
+      _prewarmInflight = null;
+      if (info.ok && info.token) {
+        _prewarmedLiveSession = { info, ts: Date.now() };
+      }
+      return info;
+    })
+    .catch(() => {
+      _prewarmInflight = null;
+      return { ok: false, fallback: true };
+    });
+  return _prewarmInflight;
+}
+
+/**
+ * Requests an ephemeral session token from the Cloudflare Worker / Local 16-key pool.
+ * Uses prewarmed token if fresh (<90s) for 0ms latency, and refills in background.
+ */
+export async function requestGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
+  if (_prewarmedLiveSession && Date.now() - _prewarmedLiveSession.ts < 90000) {
+    const ready = _prewarmedLiveSession.info;
+    _prewarmedLiveSession = null;
+    void prewarmGeminiLiveSessionToken();
+    return ready;
+  }
+  if (_prewarmInflight) {
+    const inflightRes = await _prewarmInflight;
+    if (inflightRes.ok && inflightRes.token) {
+      _prewarmedLiveSession = null;
+      void prewarmGeminiLiveSessionToken();
+      return inflightRes;
+    }
+  }
+  const fresh = await fetchFreshGeminiLiveSessionToken();
+  void prewarmGeminiLiveSessionToken();
+  return fresh;
 }
 
 /**
@@ -3342,6 +3381,7 @@ export function warmUpVoiceServices(): void {
     }
   };
   ping();
+  void prewarmGeminiLiveSessionToken();
   // Retry once shortly after mount in case defer `core-config.js` finished just after module init.
   window.setTimeout(() => {
     if (!_ttsWarm) ping();
@@ -4224,11 +4264,14 @@ export async function synthesizeViaGeminiLiveWav(params: {
  * Delivers genuine human prosody, authentic Hood American / Tokyo-Osaka Tsundere / Beijing Putonghua
  * accents, and expressive sarcastic inflection, NEVER flat robotic Edge TTS!
  */
+let _workerGeminiTtsCooldownUntil = 0;
+
 export async function synthesizeViaWorkerGeminiTts(params: {
   text: string;
   targetLang: TargetLang | LearnerLocale | string;
   persona?: VoicePersona;
 }): Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> {
+  if (Date.now() < _workerGeminiTtsCooldownUntil) return null;
   const cleanText = stripEmojisAndEmotWords(params.text || '').trim();
   if (!cleanText) return null;
 
@@ -4260,12 +4303,15 @@ export async function synthesizeViaWorkerGeminiTts(params: {
         const json = await res.json().catch(() => null);
         const b64 = String(json?.audioBase64 || '').replace(/^data:audio\/[^;]+;base64,/, '');
         if (b64.length > 64) {
+          _workerGeminiTtsCooldownUntil = 0;
           return {
             audioBase64: b64,
             audioMimeType: String(json?.audioMimeType || 'audio/wav'),
             engine: String(json?.model || json?.engine || 'gemini-3.8-flash-lite-tts'),
           };
         }
+      } else if (res.status >= 500) {
+        _workerGeminiTtsCooldownUntil = Date.now() + 60000;
       }
     } catch {
       clearTimeout(timer);

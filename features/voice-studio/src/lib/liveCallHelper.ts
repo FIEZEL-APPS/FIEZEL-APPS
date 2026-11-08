@@ -906,24 +906,22 @@ function approximateEnglishToThai(text: string): string {
 const liveTranslationCache = new Map<string, string>();
 
 function resolveTranslationCandidateBases(): string[] {
-  const bases: string[] = [];
   try {
     if (
       typeof window !== 'undefined' &&
       /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(window.location?.hostname || '')
     ) {
-      bases.push('');
+      return [''];
     }
     const win = typeof window !== 'undefined' ? (window as any) : null;
     const cfg = win?.FIEZEL_CONFIG?.apiBaseUrl || win?.FIEZEL_CF_CONFIG?.base;
     if (typeof cfg === 'string' && cfg.trim()) {
-      bases.push(cfg.trim().replace(/\/+$/, ''));
+      return [cfg.trim().replace(/\/+$/, '')];
     }
   } catch {
     // Ignore
   }
-  bases.push('https://api.fiezel.my.id');
-  return Array.from(new Set(bases));
+  return ['https://api.fiezel.my.id'];
 }
 
 const inFlightTranslations = new Map<string, Promise<string>>();

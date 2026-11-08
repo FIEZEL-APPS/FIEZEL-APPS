@@ -8541,12 +8541,12 @@ function startRoleResolution(){
   return roleResolutionPromise;
 }
 function openApp(){
+  const cl=x=>x?.classList;cl(document.documentElement)?.remove('fz-booting');cl(document.body)?.remove('fz-booting','fz-auth-open','auth-locked','notification-locked');cl(document.documentElement)?.add('fz-app-open');cl(document.body)?.add('fz-app-open');
   if(appOpened)return true;appOpened=true;
   if(isVerifiedTeacher()){
     state.view='tutor';
     try{self.FiezelTeacherShell?.ensureCss?.()}catch(_){}document.body?.classList?.add?.('fz-teacher-mode');
   }
-  const cl=x=>x?.classList;cl(document.documentElement)?.remove('fz-booting');cl(document.body)?.remove('fz-booting','notification-locked');cl(document.documentElement)?.add('fz-app-open');cl(document.body)?.add('fz-app-open');
   notifyAppUpdateIfNew();render();try{dismissBootSplash()}catch(_){}try{updateTopbarCourseButton()}catch(_){}
   // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka KelasKu untuk Guru
   try{checkUrlTeacherToken()}catch(_){}
@@ -8869,8 +8869,13 @@ function startNotificationInvitation(){
 let pendingAfterGate=null;let pendingAfterGateFn=null;/* v06 2026-08-29: penundaan generik \u2014 kuis apa pun yang diminta saat gerbang akun menutup layar dijalankan ulang setelah gerbang selesai/dilewati. */
 function afterOnboardingExit(action){
   try{prefetchPlacementListening()}catch(_){}
-  try{document.body?.classList?.remove?.('fz-auth-open');}catch(_){}
-  try{document.body?.classList?.remove?.('auth-locked');}catch(_){}
+  try{
+    const cl=x=>x?.classList;
+    cl(document.documentElement)?.remove('fz-booting');
+    cl(document.body)?.remove('fz-booting','fz-auth-open','auth-locked','notification-locked');
+    cl(document.documentElement)?.add('fz-app-open');
+    cl(document.body)?.add('fz-app-open');
+  }catch(_){}
   if(isVerifiedTeacher()){
     if(state.view!=='tutor')go('tutor');
     return;
@@ -12535,6 +12540,10 @@ function playKawanRingtone(){
 function closeKawanBicaraCallModal(){
   const el=$('fzKawanCallModal');if(!el)return false;
   el.classList.add('is-leaving');
+  if(el.__kawanMochi){
+    try{el.__kawanMochi.destroy()}catch(_){}
+    el.__kawanMochi=null;
+  }
   setTimeout(()=>{try{el.remove()}catch(_){}},220);
   document.removeEventListener('keydown',kawanModalEsc,true);
   return true;
@@ -12555,36 +12564,79 @@ function openKawanBicaraCallModal(){
   wrap.setAttribute('data-testid','kawan-call-modal');
   wrap.innerHTML=`<div class="fz-kawan-modal-card" role="dialog" aria-modal="true" aria-labelledby="fzKawanModalTitle">
       <button type="button" class="fz-kawan-modal-close" data-testid="kawan-call-modal-close" aria-label="${esc(FiezelI18n.t('modal.tutup'))}" onclick="closeKawanBicaraCallModal()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      <div class="fz-kawan-modal-mochi" aria-hidden="true">
-        <svg viewBox="0 0 120 120" width="112" height="112" fill="none">
-          <ellipse cx="60" cy="104" rx="34" ry="7" fill="rgba(124,58,237,0.12)"/>
-          <path d="M60 22C36 22 22 42 22 70c0 24 17 30 38 30s38-6 38-30c0-28-14-48-38-48z" fill="#FFFDF8" stroke="#DDD6FE" stroke-width="3"/>
-          <ellipse cx="40" cy="72" rx="7" ry="4.5" fill="#FDA4AF"/><ellipse cx="80" cy="72" rx="7" ry="4.5" fill="#FDA4AF"/>
-          <circle cx="46" cy="60" r="5" fill="#0F172A"/><circle cx="74" cy="60" r="5" fill="#0F172A"/>
-          <path d="M53 70c3 4 11 4 14 0" stroke="#0F172A" stroke-width="2.6" stroke-linecap="round"/>
-          <path d="M28 52C28 34 40 22 60 22s32 12 32 30" stroke="#3B82F6" stroke-width="4" stroke-linecap="round"/>
-          <rect x="22" y="48" width="9" height="16" rx="4.5" fill="#2563EB"/><rect x="89" y="48" width="9" height="16" rx="4.5" fill="#2563EB"/>
-        </svg>
+      <div class="fz-kawan-modal-mascot-podium" aria-hidden="true">
+        <div class="fz-kawan-modal-mascot-halo"></div>
+        <img src="./assets/brand/mochi-mascot-headset.png" alt="Mochi" class="fz-kawan-modal-mochi-img" width="156" height="156" loading="eager" />
+        <div class="fz-kawan-modal-status-pill">
+          <span class="fz-kawan-status-dot"></span>
+          <span>${esc(persona)} • ${esc(FiezelI18n.t('home.kawan.badge-online','Online'))}</span>
+        </div>
       </div>
       <h3 id="fzKawanModalTitle" class="fz-kawan-modal-title">${esc(title)}</h3>
       <p class="fz-kawan-modal-sub">${esc(sub)}</p>
-      <button type="button" class="fz-kawan-modal-phone" id="fzKawanModalPhone" data-testid="kawan-call-modal-phone" aria-label="${esc(cta)}" style="position:relative;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #34D399 0%, #10B981 55%, #059669 100%) !important;box-shadow:0 10px 26px rgba(16,185,129,0.45),0 0 0 6px rgba(252,211,77,0.35);display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;outline:none;">
-        <span class="fz-kawan-ring r1" aria-hidden="true"></span><span class="fz-kawan-ring r2" aria-hidden="true"></span><span class="fz-kawan-ring r3" aria-hidden="true"></span>
-        <svg viewBox="0 0 24 24" width="34" height="34" fill="#ffffff" style="display:block;margin:auto;" aria-hidden="true"><path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="#ffffff"/></svg>
-      </button>
-      <div class="fz-kawan-modal-cta">${esc(cta)}</div>
-      <button type="button" class="fz-kawan-modal-later" style="margin-top:14px;background:none;border:none;color:#94A3B8;font-size:13px;cursor:pointer;text-decoration:underline;" onclick="closeKawanBicaraCallModal()">${esc(later)}</button>
+      <div class="fz-kawan-phone-container">
+        <button type="button" class="fz-kawan-modal-phone" id="fzKawanModalPhone" data-testid="kawan-call-modal-phone" aria-label="${esc(cta)}">
+          <span class="fz-kawan-ring r1" aria-hidden="true"></span>
+          <span class="fz-kawan-ring r2" aria-hidden="true"></span>
+          <span class="fz-kawan-phone-core" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="#FFFFFF"><path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          </span>
+        </button>
+        <div class="fz-kawan-modal-cta">${esc(cta)}</div>
+      </div>
+      <button type="button" class="fz-kawan-modal-later" data-testid="kawan-call-modal-later" onclick="closeKawanBicaraCallModal()">${esc(later)}</button>
     </div>`;
   wrap.addEventListener('click',e=>{if(e.target===wrap)closeKawanBicaraCallModal()});
   document.body.appendChild(wrap);
   document.addEventListener('keydown',kawanModalEsc,true);
+
+  // Mount Authentic Living 3D Volumetric Mochi Mascot with Headset into Modal Podium
+  const podium=wrap.querySelector('.fz-kawan-modal-mascot-podium');
+  if(podium){
+    const mount3dMochi=()=>{
+      try{
+        const FM=window.FiezelMochi;
+        if(!FM||wrap.__kawanMochi)return;
+        const stage=document.createElement('div');
+        stage.className='fz-kawan-modal-3d-stage';
+        podium.insertBefore(stage,podium.firstChild);
+        const mInst=new FM(stage,{
+          width:340,
+          height:260,
+          accessory:'headset',
+          cameraZ:6.40,
+          cameraY:0.42,
+          autoExpressions:true,
+          mood:'gembira'
+        });
+        wrap.__kawanMochi=mInst;
+        const img=podium.querySelector('.fz-kawan-modal-mochi-img');
+        if(img)img.style.display='none';
+      }catch(_){}
+    };
+    if(window.FiezelMochi){
+      mount3dMochi();
+    }else{
+      import('./mochi-mascot/fiezel-mochi.js').then(m=>{
+        if(m&&m.FiezelMochi){
+          window.FiezelMochi=m.FiezelMochi;
+          mount3dMochi();
+        }
+      }).catch(()=>{});
+    }
+  }
+
   const phone=wrap.querySelector('#fzKawanModalPhone');
   phone.onclick=()=>{
     phone.disabled=true;phone.classList.add('is-dialing');
     haptic('confirm');playKawanRingtone();
     try{sessionStorage.setItem('fz_kawan_autocall','1')}catch(_){}
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(AC){const dCtx=new AC();dCtx.resume().catch(()=>{})}
+    }catch(_){}
     try{self.FiezelInteractiveChat?.StudioBridge?.send?.('fz.shell.autocall',{at:Date.now()})}catch(_){}
-    setTimeout(()=>{closeKawanBicaraCallModal();go('chat')},520);
+    setTimeout(()=>{closeKawanBicaraCallModal();go('chat')},160);
   };
   requestAnimationFrame(()=>{try{phone.focus({preventScroll:true})}catch(_){}});
   return true;
@@ -13216,6 +13268,7 @@ function dismissBootSplash(){
   }catch(_){}
   try{
     self.document?.documentElement?.classList?.remove?.('fz-booting');
+    self.document?.body?.classList?.remove?.('fz-booting');
   }catch(_){}
   try{
     self.__fiezelBootSplashDismissed=true;

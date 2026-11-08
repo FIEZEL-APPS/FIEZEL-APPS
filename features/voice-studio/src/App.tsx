@@ -484,6 +484,8 @@ export default function App() {
   const [is3dMochiReady, setIs3dMochiReady] = useState<boolean>(false);
   const [mochi3dFailed, setMochi3dFailed] = useState<boolean>(false);
   const isWorkbenchExplanationActiveRef = useRef<boolean>(false);
+  const lastSpokenAiTextRef = useRef<string>('');
+  const lastSpokenAiLangRef = useRef<string>('ja');
 
   // Gemini Live multi-key pool & mid-call auto-failover bookkeeping
   const liveUserDraftRef = useRef<string>('');
@@ -731,10 +733,11 @@ export default function App() {
     });
   };
 
-  const requestStartLiveCall = () => {
+  const requestStartLiveCall = (isAutoCallTrigger = false) => {
     if (isLiveConnected || isLiveConnecting) return;
-    if (isLocalTestEnvironment()) {
-      // Localhost test bypass: Start live call directly with 0 Gem cost & zero modal blocker
+    const shouldBypassModal = isLocalTestEnvironment() || isAutoCallTrigger || autoCallProcessedRef.current;
+    if (shouldBypassModal) {
+      // Localhost test & Auto-Call bypass: Start live call directly with 0 Gem cost & zero modal blocker
       callBillingRef.current = {
         active: true,
         isDailyFree: true,
@@ -1498,10 +1501,23 @@ export default function App() {
   };
 
   const stopNeuralBufferSource = () => {
+    const hadActiveTts = Boolean(playbackSettleRef.current || ttsSourceNodeRef.current);
     if (playbackSettleRef.current) {
       const settle = playbackSettleRef.current;
       playbackSettleRef.current = null;
       settle();
+    }
+    if (
+      hadActiveTts &&
+      !isLiveConnectedRef.current &&
+      activeSourcesRef.current.length === 0 &&
+      mochiInstanceRef.current?.setTalking
+    ) {
+      try {
+        mochiInstanceRef.current.setTalking(false);
+      } catch {
+        // Ignore
+      }
     }
     if (ttsSourceNodeRef.current) {
       try {
@@ -1575,8 +1591,30 @@ export default function App() {
       src.playbackRate.value = targetRate;
       src.connect(getOrAttachAnalyser(ctx, ttsAnalyserRef));
       ttsSourceNodeRef.current = src;
+
+      // Feed exact audio duration to Mochi's text-to-viseme phonetic sequencer
+      const exactDuration = decoded.duration / Math.max(0.1, targetRate);
+      if (lastSpokenAiTextRef.current && mochiInstanceRef.current?.speakPhrase) {
+        try {
+          mochiInstanceRef.current.speakPhrase(
+            lastSpokenAiTextRef.current,
+            lastSpokenAiLangRef.current || 'ja',
+            exactDuration
+          );
+        } catch {
+          // Ignore
+        }
+      }
+
       src.onended = () => {
         if (ttsSourceNodeRef.current === src) ttsSourceNodeRef.current = null;
+        if (!isLiveConnectedRef.current && activeSourcesRef.current.length === 0 && mochiInstanceRef.current?.setTalking) {
+          try {
+            mochiInstanceRef.current.setTalking(false);
+          } catch {
+            // Ignore
+          }
+        }
         onDone();
       };
       src.start(0);
@@ -1588,8 +1626,8 @@ export default function App() {
 
   /**
    * Plays ONE neural MP3 chunk and resolves when it has finished, failed, or been halted.
-   * HTMLAudio first (element unlocked during the user's tap), then the gesture-unlocked
-   * Web Audio context, never browser `speechSynthesis`.
+   * Unlocked Web Audio first (connects to ttsAnalyserRef for live 3D Mochi visemes),
+   * then HTMLAudio element, never browser `speechSynthesis`.
    * Resolves `true` when audio actually started.
    */
   const playNeuralChunk = (
@@ -1597,18 +1635,37 @@ export default function App() {
     audioMime: string,
     targetRate: number
   ): Promise<boolean> =>
-    new Promise<boolean>((resolve) => {
+    new Promise<boolean>(async (resolve) => {
       let settled = false;
       let started = false;
       const settle = () => {
         if (settled) return;
         settled = true;
         clearSpeechWatchdog();
+        if (!isLiveConnectedRef.current && activeSourcesRef.current.length === 0 && mochiInstanceRef.current?.setTalking) {
+          try {
+            mochiInstanceRef.current.setTalking(false);
+          } catch {
+            // Ignore
+          }
+        }
         if (playbackSettleRef.current === settle) playbackSettleRef.current = null;
         resolve(started);
       };
       playbackSettleRef.current = settle;
 
+      // 1. Primary: Unlocked Web Audio context connects directly to ttsAnalyserRef for real 60 FPS Mochi visemes!
+      try {
+        const okWeb = await playNeuralBase64ViaWebAudio(audioBase64, targetRate, () => settle());
+        if (okWeb) {
+          started = true;
+          return;
+        }
+      } catch (_) {
+        // Fall back to HTMLAudioElement
+      }
+
+      // 2. Fallback: HTMLAudioElement
       const audio = sharedAudioElRef.current || new Audio();
       const detach = () => {
         audio.onended = null;
@@ -1634,17 +1691,23 @@ export default function App() {
         .play()
         .then(() => {
           started = true;
-          // Halted from outside (hang-up / newer reply) also ends this chunk.
           audio.onpause = done;
+          if (lastSpokenAiTextRef.current && mochiInstanceRef.current?.speakPhrase) {
+            try {
+              const exactDur = (audio.duration && Number.isFinite(audio.duration) ? audio.duration : Math.max(1.0, lastSpokenAiTextRef.current.length * 0.12)) / Math.max(0.1, targetRate);
+              mochiInstanceRef.current.speakPhrase(
+                lastSpokenAiTextRef.current,
+                lastSpokenAiLangRef.current || 'en',
+                exactDur
+              );
+            } catch {
+              // Ignore
+            }
+          }
         })
         .catch(async () => {
-          // HTMLAudio blocked outside a tap (hands-free turn on Safari/mobile): play the
-          // EXACT SAME neural MP3 via the unlocked Web Audio context, zero robot voice.
           detach();
-          if (settled) return;
-          const ok = await playNeuralBase64ViaWebAudio(audioBase64, targetRate, () => settle());
-          if (ok) started = true;
-          else settle();
+          settle();
         });
     });
 
@@ -1690,6 +1753,10 @@ export default function App() {
     const targetRate = overrideRate ?? speechRate;
     const token = ++speakTokenRef.current;
 
+    const resolvedLang = opts?.spokenLang || (activeScenario?.targetLang as string) || (typeof window !== 'undefined' && (window as any).jaCourseOn?.() ? 'ja' : 'en');
+    lastSpokenAiTextRef.current = cleanSpoken;
+    lastSpokenAiLangRef.current = resolvedLang;
+
     // Single continuous WAV synthesis: never split a spoken reply into multiple sequential WebSocket TTS requests,
     // which causes mid-sentence pauses, prosody resets, and single-key WebSocket contention.
     const chunks = [cleanSpoken];
@@ -1709,8 +1776,6 @@ export default function App() {
       currentAudioElRef.current.pause();
       currentAudioElRef.current = null;
     }
-    setAiAudioPlaying(true);
-
     let anyAudio = false;
     let anyPlayed = false;
     try {
@@ -1724,6 +1789,7 @@ export default function App() {
         nextAudioJob = i + 1 < chunks.length ? fetchChunk(i + 1) : null;
         if (!res?.audioBase64) continue;
         anyAudio = true;
+        setAiAudioPlaying(true);
         const ok = await playNeuralChunk(res.audioBase64, res.audioMimeType || 'audio/mpeg', targetRate);
         if (token !== speakTokenRef.current) return;
         if (ok) {
@@ -1755,7 +1821,16 @@ export default function App() {
     } finally {
       if (token === speakTokenRef.current) {
         clearSpeechWatchdog();
-        setAiAudioPlaying(false, 250);
+        if (!isLiveConnectedRef.current && activeSourcesRef.current.length === 0) {
+          setAiAudioPlaying(false, 250);
+          if (mochiInstanceRef.current?.setTalking) {
+            try {
+              mochiInstanceRef.current.setTalking(false);
+            } catch {
+              // Ignore
+            }
+          }
+        }
         isWorkbenchExplanationActiveRef.current = false;
       }
     }
@@ -2955,15 +3030,18 @@ export default function App() {
           }
           if (code === 'not-allowed' || code === 'service-not-allowed') {
             isDisposed = true;
-            isMicMutedRef.current = true;
-            setIsMicMuted(true);
-            setIsListeningLiveSpeech(false);
-            setIsUserSpeakingLive(false);
-            setStatusBanner(
-              locale === 'th'
-                ? 'ไมโครโฟนถูกบล็อก อนุญาตไมโครโฟนในแถบที่อยู่ หรือพิมพ์ประโยคด้านล่าง'
-                : 'Mikrofon tidak aktif atau diblokir peramban. Ketuk tombol Bicara untuk mengizinkan mic, atau ketik kalimatmu.'
-            );
+            const hasLiveStream = micStreamRef.current && micStreamRef.current.getAudioTracks().some((t) => t.readyState === 'live');
+            if (!hasLiveStream) {
+              isMicMutedRef.current = true;
+              setIsMicMuted(true);
+              setIsListeningLiveSpeech(false);
+              setIsUserSpeakingLive(false);
+              setStatusBanner(
+                locale === 'th'
+                  ? 'ไมโครโฟนถูกบล็อก อนุญาตไมโครโฟนในแถบที่อยู่ หรือพิมพ์ประโยคด้านล่าง'
+                  : 'Mikrofon tidak aktif atau diblokir peramban. Ketuk tombol Bicara untuk mengizinkan mic, atau ketik kalimatmu.'
+              );
+            }
           } else if (code === 'network') {
             setStatusBanner(
               locale === 'th'
@@ -4170,7 +4248,9 @@ export default function App() {
             }
             // Silence any stray HTTP TTS / HTMLAudioElement / speechSynthesis so two voices NEVER play simultaneously!
             speakTokenRef.current += 1;
-            stopNeuralBufferSource();
+            if (ttsSourceNodeRef.current || playbackSettleRef.current) {
+              stopNeuralBufferSource();
+            }
             if (currentAudioElRef.current) {
               try {
                 currentAudioElRef.current.onended = null;
@@ -4232,6 +4312,20 @@ export default function App() {
                   setAiAudioPlaying(false, 350);
                 }
               };
+            }
+
+            if (mochiInstanceRef.current) {
+              try {
+                if (liveAnalyserRef.current) {
+                  mochiInstanceRef.current.attachAudioAnalyser?.(liveAnalyserRef.current, ctx.sampleRate || 24000);
+                }
+                if (!mochiInstanceRef.current.isTalking) {
+                  mochiInstanceRef.current.setTalking?.(true);
+                  mochiInstanceRef.current.triggerHandGesture?.('wave', 2.2);
+                }
+              } catch {
+                // Ignore
+              }
             }
             // Wall-clock safety unlock: ensures mic streaming resumes promptly even if WebAudio onended is throttled
             if (livePlaybackSafetyTimerRef.current) {
@@ -4887,7 +4981,7 @@ export default function App() {
       }
       if (shouldAuto && !isLiveConnected && !isLiveConnecting) {
         autoCallProcessedRef.current = true;
-        requestStartLiveCall();
+        requestStartLiveCall(true);
       }
     };
 
@@ -4895,7 +4989,7 @@ export default function App() {
       if (!e.data) return;
       if (e.data.type === 'fz.shell.autocall') {
         if (!isLiveConnected && !isLiveConnecting) {
-          requestStartLiveCall();
+          requestStartLiveCall(true);
         }
       }
     };
@@ -4987,8 +5081,8 @@ export default function App() {
 
         mochiContainerRef.current.innerHTML = '';
         const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 640;
-        const mochiWidth = isMobileScreen ? 115 : 200;
-        const mochiHeight = isMobileScreen ? 95 : 180;
+        const mochiWidth = isMobileScreen ? 260 : 300;
+        const mochiHeight = isMobileScreen ? 200 : 225;
         const inst = new MochiCtor(mochiContainerRef.current, {
           mood: 'dots',
           badge: null,
@@ -5000,14 +5094,18 @@ export default function App() {
           voiceCompanionStrictMode: false,
           width: mochiWidth,
           height: mochiHeight,
+          cameraZ: isMobileScreen ? 4.80 : 4.95,
+          cameraY: 0.16,
         });
         inst.setVoiceCompanionStrictMode?.(false);
-        if (liveAnalyserRef.current && liveAudioCtxRef.current) {
-          inst.attachAudioAnalyser?.(liveAnalyserRef.current, liveAudioCtxRef.current.sampleRate || 24000);
+        const liveCtx = outputAudioCtxRef.current || liveAudioCtxRef.current;
+        if (liveAnalyserRef.current && liveCtx) {
+          inst.attachAudioAnalyser?.(liveAnalyserRef.current, liveCtx.sampleRate || 24000);
         } else if (ttsAnalyserRef.current && ttsAudioCtxRef.current) {
           inst.attachAudioAnalyser?.(ttsAnalyserRef.current, ttsAudioCtxRef.current.sampleRate || 24000);
         }
         mochiInstanceRef.current = inst;
+        try { (window as any).__fzVoiceMochiInstance = inst; } catch {}
         setIs3dMochiReady(true);
       } catch {
         setIs3dMochiReady(false);
@@ -5041,22 +5139,19 @@ export default function App() {
       m.setVoiceCompanionStrictMode?.(false);
 
       if (callStateKey === 'speaking') {
-        m.setTalking?.(true);
-        m.triggerHandGesture?.('wave', 2.2);
-
-        if (mochiSpeechCadenceTimerRef.current) {
-          window.clearInterval(mochiSpeechCadenceTimerRef.current);
+        const liveCtx = outputAudioCtxRef.current || liveAudioCtxRef.current;
+        if (liveAnalyserRef.current && liveCtx) {
+          m.attachAudioAnalyser?.(liveAnalyserRef.current, liveCtx.sampleRate || 24000);
+        } else if (ttsAnalyserRef.current && ttsAudioCtxRef.current) {
+          m.attachAudioAnalyser?.(ttsAnalyserRef.current, ttsAudioCtxRef.current.sampleRate || 24000);
         }
-        mochiSpeechCadenceTimerRef.current = window.setInterval(() => {
-          const inst = mochiInstanceRef.current;
-          if (!inst) return;
-          try {
-            inst.setTalking?.(true);
-            inst.triggerHandGesture?.('wave', 1.8);
-          } catch {
-            // Ignore
-          }
-        }, 2200);
+        // Whenever AI audio is audibly playing (Gemini Live duplex OR HTTP neural TTS),
+        // Mochi MUST be in talking mode so the WebAudio formant analyser drives the mouth.
+        // (Previously gated on isLiveConnectedRef, which left the mouth frozen in Turn-by-Turn.)
+        if (!m.isTalking) {
+          m.setTalking?.(true);
+          m.triggerHandGesture?.('wave', 2.2);
+        }
       } else {
         if (mochiSpeechCadenceTimerRef.current) {
           window.clearInterval(mochiSpeechCadenceTimerRef.current);
@@ -5520,7 +5615,7 @@ export default function App() {
                     data-testid="ai-call-card"
                     data-call-state={callStateKey}
                     data-transport-mode={liveTransportMode}
-                    className="lg:col-span-5 lg:self-start bg-gradient-to-b from-[#FAF5EB]/95 to-white/95 rounded-3xl p-3.5 sm:p-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-[#EADBCE]/80 flex flex-col justify-between items-center w-full h-[260px] sm:h-[300px] shrink-0"
+                    className="lg:col-span-5 lg:self-start bg-gradient-to-b from-[#FAF5EB]/95 to-white/95 rounded-3xl p-3.5 sm:p-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-[#EADBCE]/80 flex flex-col justify-between items-center w-full h-auto min-h-[310px] sm:min-h-[345px] relative z-10 shrink-0"
                   >
                     {/* Meta Bar Atas: Coach & Scenario Level & Mode Badges */}
                     <div className="w-full flex items-center justify-between gap-2 text-xs">
@@ -5599,17 +5694,17 @@ export default function App() {
                           }
                         }}
                         title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi (Mitra Kaiwa 3D)'}
-                        className="relative w-[95px] sm:w-[200px] h-[80px] sm:h-[175px] flex items-center justify-center cursor-pointer select-none"
+                        className="relative w-[260px] sm:w-[300px] h-[200px] sm:h-[225px] flex items-center justify-center cursor-pointer select-none"
                       >
                         <div
                           ref={mochiContainerRef}
                           data-testid="mochi-3d-stage"
-                          className="w-[95px] sm:w-[200px] h-[80px] sm:h-[175px] flex items-center justify-center relative"
+                          className="w-[260px] sm:w-[300px] h-[200px] sm:h-[225px] flex items-center justify-center relative"
                         />
                         {!is3dMochiReady && !mochi3dFailed && (
                           <div
                             aria-hidden="true"
-                            className="absolute pointer-events-none w-20 sm:w-28 h-20 sm:h-28 rounded-full bg-gradient-to-br from-[#EEDFCC]/60 to-[#DFCEB7]/50 animate-pulse shadow-inner flex items-center justify-center"
+                            className="absolute pointer-events-none w-28 sm:w-36 h-28 sm:h-36 rounded-full bg-gradient-to-br from-[#EEDFCC]/60 to-[#DFCEB7]/50 animate-pulse shadow-inner flex items-center justify-center"
                           />
                         )}
                         {mochi3dFailed && (
@@ -5628,7 +5723,7 @@ export default function App() {
                               }
                             }}
                             alt="Mochi Fallback"
-                            className="absolute pointer-events-none w-20 sm:w-28 h-20 sm:h-28 rounded-full object-contain p-1"
+                            className="absolute pointer-events-none w-28 sm:w-36 h-28 sm:h-36 rounded-full object-contain p-1"
                           />
                         )}
                       </div>

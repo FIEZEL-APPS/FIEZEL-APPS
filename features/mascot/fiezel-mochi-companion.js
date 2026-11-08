@@ -160,9 +160,10 @@
     var strict = syncStrictModeOnMochi(m);
     var session = detectSession(host);
 
-    // Mochi Voice SOS Teaching Mode: Wajib kacamata + headset ('teacher') saat saklar aktif
+    // Mochi Voice SOS Teaching Mode: Wajib kacamata + headset ('teacher') saat saklar aktif di sesi quiz/SOS
     var sos = (typeof root !== 'undefined' ? root.FiezelMochiVoiceSos : (typeof globalThis !== 'undefined' ? globalThis.FiezelMochiVoiceSos : (typeof window !== 'undefined' ? window.FiezelMochiVoiceSos : null)));
-    if (sos && typeof sos.isMochiEnabled === 'function' && sos.isMochiEnabled()) {
+    var sosCallActive = !!(sos && typeof sos.isCallActive === 'function' && sos.isCallActive());
+    if (sos && typeof sos.isMochiEnabled === 'function' && sos.isMochiEnabled() && (session === 'quiz' || sosCallActive)) {
       m.setAccessory('teacher');
       m.setAura(null);
       return;
@@ -260,6 +261,22 @@
     if (!mochi) return null;
 
     if (syncStrictModeOnMochi(mochi)) {
+      try {
+        var sos = (typeof root !== 'undefined' ? root.FiezelMochiVoiceSos : (typeof globalThis !== 'undefined' ? globalThis.FiezelMochiVoiceSos : (typeof window !== 'undefined' ? window.FiezelMochiVoiceSos : null)));
+        if (sos && typeof sos.handleMascotTap === 'function') {
+          var handled = sos.handleMascotTap('companion-tap');
+          if (handled) {
+            return {
+              sfx: null,
+              mood: 'happy',
+              gesture: 'wave',
+              aura: null,
+              fx: null,
+              title: 'Mochi SOS Activated'
+            };
+          }
+        }
+      } catch (_) {}
       try {
         clearTimeout(_touchFxTimer);
         if (typeof mochi.setMood === 'function') mochi.setMood('dots');
