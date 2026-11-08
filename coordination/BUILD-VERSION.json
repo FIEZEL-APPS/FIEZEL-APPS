@@ -1,7 +1,7 @@
 {
-  "version": "m025-778",
-  "claimedBy": "branch fix/mochi-natural-speech-motion-m025-778",
-  "claimedAt": "2026-11-07T23:09:46.842Z",
-  "reason": "fix(mascot): unify 3d daifuku viscoelastic speech rig, coarticulated prosody, and whole-body motion",
+  "version": "m025-779",
+  "claimedBy": "branch fix/pwa-boot-splash-seamless-m025-779",
+  "claimedAt": "2026-11-08T00:40:49.557Z",
+  "reason": "fix(pwa-boot): [ALLOW-PROTECTED: pwa, auth] eliminate cold-boot css blocking, bottom-bar flash, and 6s post-splash white screen",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

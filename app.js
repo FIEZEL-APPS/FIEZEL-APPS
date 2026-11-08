@@ -6787,6 +6787,7 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
   }
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;const kana=v.kana||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[0].trim():'');const kanji=v.kanji||v.word||'';const romaji=v.romaji||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[1].trim():'');return{id:v.id,word:v.word,kana,kanji,romaji,jlpt:v.jlpt||'',phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
+  try{if(self.__fzLocaleBootPromise){await Promise.race([self.__fzLocaleBootPromise,new Promise(r=>setTimeout(r,600))]);self.__fzLocaleBootPromise=null}}catch(_){}
   CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
   try{window.CONTENT_BASE=CONTENT_BASE;window.V=V;window.G=G;window.R=R;window.GRAMMAR_ITEMS=GRAMMAR_ITEMS;}catch(_){}
   reconcileStateAfterBankLoad();
@@ -13167,9 +13168,18 @@ window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstal
  * tidak pernah terangkat lebih buruk daripada satu frame yang belum bergaya. */
 function shellCssSettled(){
   try{
-    if(self.__fzShellCss==='ready'||self.__fzShellCss==='error')return true;
+    if(self.__fzShellCss==='error')return true;
+    var extraOk=true;
+    if(typeof self.document?.querySelectorAll==='function'){
+      var extras=self.document.querySelectorAll('link[data-fz-shell-css]');
+      for(var i=0;extras&&i<extras.length;i++){
+        var el=extras[i];
+        if(el&&el.media==='print'&&el.dataset?.fzShellReady!=='1'&&el.dataset?.fzShellReady!=='error'){extraOk=false;break}
+      }
+    }
+    if(self.__fzShellCss==='ready')return extraOk;
     var lembar=self.document?.querySelector?.('link[href="./style.css"]');
-    return !lembar||lembar.rel==='stylesheet';
+    return (!lembar||lembar.rel==='stylesheet')&&extraOk;
   }catch(_){return true}
 }
 function dismissBootSplash(){
@@ -24145,7 +24155,10 @@ function maybeAutoDetectLocale(){
     if(cc==='TH')next.learnerLocale='th';
     state.preferences=next;state.coachCache=null;
     try{save()}catch(_){}
-    if(cc==='TH'){try{self.FiezelI18n?.setLocale?.('th')}catch(_){}}
+    if(cc==='TH'){
+      try{self.FiezelI18n?.setLocale?.('th')}catch(_){}
+      try{if(CONTENT_BASE)applyContentLocale();if(appOpened)render()}catch(_){}
+    }
   }).catch(function(){});
 }
 function installScrollRubberBand(){
@@ -24245,7 +24258,8 @@ function bootFiezel(){
   try{installScrollRubberBand()}catch(_){}
   try{syncLearnerAccountOnBoot()}catch(_){}
   try{primeBootAuthVerdict()}catch(_){}
-  return maybeAutoDetectLocale().then(function(){return load()}).catch(e=>{dismissBootSplash();
+  try{self.__fzLocaleBootPromise=maybeAutoDetectLocale()}catch(_){}
+  return load().catch(e=>{dismissBootSplash();
   try{console.debug('FIEZEL boot error:',e)}catch(_){}
   const offline=typeof navigator!=='undefined'&&navigator.onLine===false,fileProto=typeof location!=='undefined'&&location.protocol==='file:';
   const msg=offline?FiezelI18n.t('boot.offline-msg')

@@ -28,6 +28,8 @@ const IS_MOBILE = typeof window !== 'undefined' && (
 );
 const SKIN_RES = 1024;
 const BADGE_SCALE = 1;
+let _cachedFaceShellPos = null;
+let _cachedFaceShellNorm = null;
 
 // Real-time Formant & Viseme Analyzer (adapted from wass08/wawa-lipsync MIT)
 export const VISEMES = {
@@ -2046,26 +2048,86 @@ export class FiezelMochi {
     const shellGeo = new THREE.PlaneGeometry(shellW, shellH, 60, 45);
     const pos = shellGeo.attributes.position;
 
-    if (this.mochiMesh) {
-      this.mochiMesh.updateMatrixWorld(true);
-      const raycaster = new THREE.Raycaster();
-      const origin = new THREE.Vector3();
-      const dir = new THREE.Vector3(0, 0, -1);
+    if (_cachedFaceShellPos && _cachedFaceShellNorm && _cachedFaceShellPos.length === pos.array.length) {
+      pos.array.set(_cachedFaceShellPos);
+      pos.needsUpdate = true;
+      shellGeo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(_cachedFaceShellNorm), 3));
+    } else if (this.mochiMesh && this.mochiMesh.geometry) {
+      const bGeo = this.mochiMesh.geometry;
+      const bPos = bGeo.attributes.position;
+      const bIdx = bGeo.index;
+      const GX = 32, GY = 24;
+      const minX = -1.25, maxX = 1.25, invW = GX / (maxX - minX);
+      const minY = -0.95, maxY = 0.95, invH = GY / (maxY - minY);
+      const buckets = new Array(GX * GY);
+      const triCount = bIdx ? (bIdx.count / 3) : (bPos.count / 3);
+      const frontTris = [];
+
+      for (let t = 0; t < triCount; t++) {
+        const i0 = bIdx ? bIdx.getX(t * 3) : (t * 3);
+        const i1 = bIdx ? bIdx.getX(t * 3 + 1) : (t * 3 + 1);
+        const i2 = bIdx ? bIdx.getX(t * 3 + 2) : (t * 3 + 2);
+        const z0 = bPos.getZ(i0), z1 = bPos.getZ(i1), z2 = bPos.getZ(i2);
+        if (z0 <= 0 && z1 <= 0 && z2 <= 0) continue;
+        const x0 = bPos.getX(i0), y0 = bPos.getY(i0);
+        const x1 = bPos.getX(i1), y1 = bPos.getY(i1);
+        const x2 = bPos.getX(i2), y2 = bPos.getY(i2);
+        const det = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+        if (det <= 1e-10) continue;
+        const tMinX = Math.min(x0, x1, x2), tMaxX = Math.max(x0, x1, x2);
+        const tMinY = Math.min(y0, y1, y2), tMaxY = Math.max(y0, y1, y2);
+        if (tMaxX < minX || tMinX > maxX || tMaxY < minY || tMinY > maxY) continue;
+        const base = frontTris.length;
+        frontTris.push(x0, y0, z0, x1, y1, z1, x2, y2, z2, 1.0 / det);
+        const bx0 = Math.max(0, Math.min(GX - 1, ((tMinX - minX) * invW) | 0));
+        const bx1 = Math.max(0, Math.min(GX - 1, ((tMaxX - minX) * invW) | 0));
+        const by0 = Math.max(0, Math.min(GY - 1, ((tMinY - minY) * invH) | 0));
+        const by1 = Math.max(0, Math.min(GY - 1, ((tMaxY - minY) * invH) | 0));
+        for (let by = by0; by <= by1; by++) {
+          const rowOff = by * GX;
+          for (let bx = bx0; bx <= bx1; bx++) {
+            const cell = rowOff + bx;
+            if (!buckets[cell]) buckets[cell] = [base];
+            else buckets[cell].push(base);
+          }
+        }
+      }
 
       for (let i = 0; i < pos.count; i++) {
         const vx = pos.getX(i);
         const vy = pos.getY(i) - 0.02; // Centered slightly below equator for Kawaii Baby-Schema ratio
-        origin.set(vx, vy, 3.0);
-        raycaster.set(origin, dir);
-        const hits = raycaster.intersectObject(this.mochiMesh, false);
-        if (hits && hits.length > 0) {
-          pos.setXYZ(i, vx, vy, hits[0].point.z + 0.016);
+        let bestZ = -Infinity;
+        const bx = ((vx - minX) * invW) | 0;
+        const by = ((vy - minY) * invH) | 0;
+        if (bx >= 0 && bx < GX && by >= 0 && by < GY) {
+          const list = buckets[by * GX + bx];
+          if (list) {
+            for (let k = 0; k < list.length; k++) {
+              const o = list[k];
+              const x0 = frontTris[o], y0 = frontTris[o + 1], z0 = frontTris[o + 2];
+              const x1 = frontTris[o + 3], y1 = frontTris[o + 4], z1 = frontTris[o + 5];
+              const x2 = frontTris[o + 6], y2 = frontTris[o + 7], z2 = frontTris[o + 8];
+              const invDet = frontTris[o + 9];
+              const u = ((vx - x0) * (y2 - y0) - (x2 - x0) * (vy - y0)) * invDet;
+              if (u < -1e-6) continue;
+              const v = ((x1 - x0) * (vy - y0) - (vx - x0) * (y1 - y0)) * invDet;
+              if (v < -1e-6 || u + v > 1.000001) continue;
+              const w = 1.0 - u - v;
+              const hz = w * z0 + u * z1 + v * z2;
+              if (hz > bestZ) bestZ = hz;
+            }
+          }
+        }
+        if (bestZ > -Infinity) {
+          pos.setXYZ(i, vx, vy, bestZ + 0.016);
         } else {
           const r2 = Math.max(0, 1.0 - (vx * vx) / (1.52 * 1.52) - (vy * vy) / (1.12 * 1.12));
           pos.setXYZ(i, vx, vy, Math.sqrt(r2) * 1.24 + 0.016);
         }
       }
       shellGeo.computeVertexNormals();
+      _cachedFaceShellPos = new Float32Array(pos.array);
+      _cachedFaceShellNorm = new Float32Array(shellGeo.attributes.normal.array);
     }
 
     this.faceShellMat = new THREE.MeshBasicMaterial({

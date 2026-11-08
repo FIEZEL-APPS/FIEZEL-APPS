@@ -166,6 +166,15 @@
   function disposeBootSplash(env) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
     var node = bootSplashElement(target);
+    if (!node) {
+      try {
+        var doc = target && target.document;
+        var cand = doc && typeof doc.querySelector === 'function' ? doc.querySelector(BOOT_SELECTOR) : null;
+        if (cand && (!cand.getAttribute || cand.getAttribute(BOOT_CLAIMED_ATTR) !== 'disposed')) {
+          node = cand;
+        }
+      } catch (_) {}
+    }
     endBootBackground(target);
     try {
       if (target.__fiezelBootSplash && typeof target.__fiezelBootSplash.clearWatchdog === 'function') {
@@ -796,13 +805,20 @@
 
     var closed = false;
     var timer = null;
+    function finishDismissal() {
+      try { target.__fiezelSplashActive = false; } catch (_) {}
+      try { target.__fiezelBootSplashDismissed = true; } catch (_) {}
+      endBootBackground(target);
+      try { host.classList.add('is-leaving'); } catch (_) {}
+      if (typeof target.setTimeout === 'function') target.setTimeout(remove, 320);
+      else remove();
+    }
     function close() {
       if (closed) return;
       closed = true;
       ctl.closed = true;
       try { target.__fiezelSplashActive = false; } catch (_) {}
       try {
-        target.__fiezelBootSplashDismissed = true;
         if (typeof target.dispatchEvent === 'function' && typeof target.CustomEvent === 'function') {
           target.dispatchEvent(new target.CustomEvent('fiezel:splash-dismissed'));
         }
@@ -817,12 +833,29 @@
       // pewaktu kedua. Dipanggil SEBELUM latar boot dilepas dan animasi keluar
       // mulai, supaya beranda/gerbang sudah ter-render di balik splash.
       if (typeof opts.onClose === 'function') { try { opts.onClose({ via: 'close' }); } catch (_) {} }
+      // Jika pemanggil meminta deferDispose (jalur boot handoff) dan belum ada
+      // antarmuka yang selesai dirender (mis. proceed() masih menunggu auth verdict),
+      // TAHAN tirai splash agar murid tidak pernah melihat kanvas kosong berkotak.
+      if (opts && opts.deferDispose === true) {
+        var handoffSettled = false;
+        try {
+          handoffSettled = !!(
+            target.__fiezelBootSplashDismissed ||
+            !host.parentNode ||
+            (doc.documentElement && doc.documentElement.classList && doc.documentElement.classList.contains('fz-app-open')) ||
+            (doc.querySelector && doc.querySelector('.fz-auth, .fiezel-ob'))
+          );
+        } catch (_) { handoffSettled = true; }
+        if (!handoffSettled && typeof target.setTimeout === 'function') {
+          target.setTimeout(function () {
+            if (host.parentNode) finishDismissal();
+          }, 3500);
+          return;
+        }
+      }
       // Latar gelap boot dilepas di AWAL penutupan, bukan setelah animasi
       // keluar: yang tersingkap harus sudah berwarna aplikasi.
-      endBootBackground(target);
-      try { host.classList.add('is-leaving'); } catch (_) {}
-      if (typeof target.setTimeout === 'function') target.setTimeout(remove, 320);
-      else remove();
+      finishDismissal();
     }
     function remove() {
       try { target.__fiezelSplashActive = false; } catch (_) {}
