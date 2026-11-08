@@ -125,11 +125,22 @@
           nonce = api.StudioBridge.begin();
         }
       } catch (_) {}
+      try {
+        var AC = root.AudioContext || root.webkitAudioContext;
+        if (AC) {
+          if (!root.__fzSharedLiveAudioCtx || root.__fzSharedLiveAudioCtx.state === 'closed') {
+            root.__fzSharedLiveAudioCtx = new AC();
+          }
+          if (root.__fzSharedLiveAudioCtx.state === 'suspended') {
+            root.__fzSharedLiveAudioCtx.resume().catch(function () {});
+          }
+        }
+      } catch (_) {}
       var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (autoCall ? '&autoCall=1' : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
       var titleText = lang === 'ja' ? 'Mitra Kaiwa' : (lang === 'zh' ? 'Xiao Mochi (小麻薯)' : 'Kawan Bicara');
       mountPoint.innerHTML =
         '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
-        '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone *; camera *; autoplay *; clipboard-write *; display-capture *" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
+        '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone; camera; autoplay; display-capture; clipboard-write; microphone *; autoplay *; camera *" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
         '</div>';
       try {
         var mountedFrame = root.document && root.document.getElementById('fzMitraKaiwaStudioFrame');

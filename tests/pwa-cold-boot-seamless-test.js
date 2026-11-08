@@ -74,8 +74,8 @@ const mochiJs = fs.readFileSync(path.join(ROOT, 'mochi-mascot', 'fiezel-mochi.js
     '[G2] #fiezelBootSplash dilarang memakai contain:paint karena memotong safe-area shift di iOS WebKit'
   );
   assert(
-    /top\s*:\s*-120px\s*!important/.test(bootStyle) && /bottom\s*:\s*-120px\s*!important/.test(bootStyle),
-    '[G2] #fiezelBootSplash wajib memakai overscan vertikal -120px !important agar kebal lonjakan bottom inset'
+    /inset\s*:\s*0\s*!important/.test(bootStyle) && /top\s*:\s*0\s*!important/.test(bootStyle) && /bottom\s*:\s*0\s*!important/.test(bootStyle),
+    '[G2] #fiezelBootSplash wajib memakai geometri layar penuh inset:0 !important; top:0 !important; bottom:0 !important agar bebas lompatan 120px'
   );
   assert(
     /--fz-bg\s*:\s*#1B1418\s*!important/i.test(bootStyle),

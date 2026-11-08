@@ -33,7 +33,7 @@
   <meta name="theme-color" content="#1B1418">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
-  <meta name="fz-build" content="m025-782">
+  <meta name="fz-build" content="m025-783">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa adaptif: kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4), dengan vocabulary, grammar, reading, dan AI Tutor. Gratis dan bisa dipakai offline.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -169,6 +169,7 @@
 html.fz-booting,html.fz-booting body{background:#1B1418}
 html.fz-booting,html.fz-booting body{overscroll-behavior:none;overscroll-behavior-x:none}
 html.fz-booting body{overflow:hidden}
+html.fz-booting:has(.fiezel-ob) body,html.fz-booting body:has(.fiezel-ob){overflow-y:auto !important;overscroll-behavior-y:contain !important}
 html.fz-booting nav.bottomnav,
 html.fz-booting .bottomnav,
 html.fz-booting body:not(.fz-app-open) nav.bottomnav,
@@ -187,9 +188,9 @@ html.fz-booting #globalSky {
   opacity:0 !important;
   background:transparent !important;
 }
-#fiezelBootSplash{position:fixed !important;inset:0 !important;top:-120px !important;bottom:-120px !important;left:0 !important;right:0 !important;padding-top:120px !important;padding-bottom:120px !important;box-sizing:border-box !important;background:#1B1418 !important;background-color:#1B1418 !important;--fz-bg:#1B1418 !important}
+#fiezelBootSplash{position:fixed !important;inset:0 !important;top:0 !important;bottom:0 !important;left:0 !important;right:0 !important;width:100% !important;height:100% !important;height:100dvh !important;padding:0 !important;margin:0 !important;box-sizing:border-box !important;background:#1B1418 !important;background-color:#1B1418 !important;--fz-bg:#1B1418 !important}
 #fiezelBootSplash:not(.is-leaving){animation:none}
-#fiezelBootSplash .fiezel-splash-brand{background:linear-gradient(180deg,#1B1418 0%,#1B1418 72px,rgba(27,20,24,0) 168px),radial-gradient(circle at 50% 48%,#251D22 0%,#1B1418 55%,#120C0F 100%);background-color:#1B1418}
+#fiezelBootSplash .fiezel-splash-brand{position:relative;width:100%;height:100%;background:linear-gradient(180deg,#1B1418 0%,#1B1418 72px,rgba(27,20,24,0) 168px),radial-gradient(circle at 50% 48%,#251D22 0%,#1B1418 55%,#120C0F 100%);background-color:#1B1418}
 #fiezelBootSplash .fz-splash-canvas{-webkit-mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px);mask-image:linear-gradient(180deg,transparent 0px,transparent 28px,rgba(0,0,0,.35) 84px,#000 156px)}
 #fiezelBootSplash .fz-auth-topo{-webkit-mask-image:none !important;mask-image:none !important}
 #fiezelBootSplash .fiezel-logo{position:absolute;left:calc(50% - 31vmin);top:calc(50% - 31vmin);width:62vmin;height:62vmin}

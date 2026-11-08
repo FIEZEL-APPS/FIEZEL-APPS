@@ -9773,9 +9773,21 @@ html body .fiezel-splash-brand .fz-auth-topo {
   html body div.fiezel-ob[role="dialog"],
   html body .fiezel-ob {
     display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-height: 100vh !important;
     background: #FAF5ED !important;
     overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-y: contain !important;
     padding: 0 !important;
+    z-index: 2147482000 !important;
   }
 
   html body div.fiezel-ob[role="dialog"] .fiezel-ob-card,
@@ -9794,6 +9806,69 @@ html body .fiezel-splash-brand .fz-auth-topo {
     position: relative !important;
     margin: 0 !important;
     padding: 0 !important;
+    touch-action: pan-y !important;
+  }
+
+  :root html body .fiezel-ob .fiezel-ob-reveal,
+  :root .fiezel-ob .fiezel-ob-reveal {
+    height: 190px !important;
+    min-height: 190px !important;
+    max-height: 190px !important;
+    padding: 10px 16px 0 !important;
+  }
+
+  :root html body .fiezel-ob .fiezel-ob-reveal .fiezel-ob-mascot,
+  :root .fiezel-ob .fiezel-ob-reveal .fiezel-ob-mascot {
+    --fz-ob-paw: 96px !important;
+    height: 96px !important;
+  }
+
+  :root html body .fiezel-ob .fiezel-ob-reveal .fz-auth-topo,
+  :root .fiezel-ob .fiezel-ob-reveal .fz-auth-topo {
+    pointer-events: none !important;
+  }
+
+  html body .fiezel-language-grid,
+  html body div.fiezel-language-grid {
+    gap: 10px !important;
+    padding: 0 4px !important;
+  }
+
+  html body .fiezel-language-choice,
+  html body button.fiezel-language-choice {
+    min-height: 64px !important;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+    gap: 10px !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+  }
+
+  html body .fiezel-language-flag .fiezel-flag-svg,
+  html body .fiezel-language-choice .fiezel-flag-svg {
+    width: 44px !important;
+    height: 30px !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  html body .fiezel-language-copy,
+  html body .fiezel-language-choice .fiezel-language-copy {
+    text-align: left !important;
+    align-items: flex-start !important;
+  }
+
+  html body .fiezel-language-copy b,
+  html body .fiezel-language-choice .fiezel-language-copy b {
+    font-size: 14.5px !important;
+    text-align: left !important;
+    margin: 0 !important;
+  }
+
+  html body .fiezel-language-copy small,
+  html body .fiezel-language-choice .fiezel-language-copy small {
+    font-size: 11.5px !important;
+    text-align: left !important;
   }
 }
 

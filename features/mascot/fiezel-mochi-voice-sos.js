@@ -93,8 +93,12 @@
   var _micSource = null;
   var _sileroVad = null;
   var _sileroVadActive = false;
+  var _lastSileroFrameAt = 0;
   var _sileroBundlePromise = null;
   var _sileroLastSpeechProbAt = 0;
+  var _lastPcmSpeechSentAt = 0;
+  var _sessionPrepaidByModal = false;
+  var _prewarmedMicStream = null;
   var _directKeyCooldownUntil = 0;
   var _openingWatchdogTimer = null;
   var _connStatus = { state: 'idle', message: '', updatedAt: 0 };
@@ -1303,9 +1307,90 @@
     });
   }
 
-  // Membuka WS + kirim setup di latar belakang dinonaktifkan demi perlindungan kuota Gemini API.
-  function openHotSocket() {
-    return;
+  // Hanya dibuka pada intent eksplisit user (mis. saat modal konfirmasi terbuka atau pointerdown pada Mochi)
+  // sehingga handshake WebSocket + setupComplete selesai tepat saat user klik Mulai (<100ms latensi suara).
+  function openHotSocket(q) {
+    var targetQ = getActiveQuestion(q || _currentQ);
+    if (!targetQ || !isMochiSosEligible(targetQ, _currentCtx) || isExamLocked()) return;
+    var wantSig = getQuestionSig(targetQ);
+    if (_hotWs && _hotWs.readyState <= 1) {
+      if (_hotWs.__fzBoundQSig === wantSig) return;
+      discardHotSocket();
+    }
+    var WS = root.WebSocket || (typeof window !== 'undefined' ? window.WebSocket : null);
+    if (!WS) return;
+    var connectHot = function (endpoint, keyIndex, isDirectKey) {
+      if (!endpoint || (_activeCall && _activeCall.active)) return;
+      if (_hotWs && _hotWs.readyState <= 1 && _hotWs.__fzBoundQSig === wantSig) return;
+      discardHotSocket();
+      try {
+        var ws = new WS(endpoint);
+        ws.binaryType = 'arraybuffer';
+        ws.__fzKeyIndex = keyIndex || 0;
+        ws.__fzDirectKey = !!isDirectKey;
+        ws.__fzBoundQSig = wantSig;
+        _hotWs = ws;
+        _hotWsSetupComplete = false;
+        if (_hotWsIdleTimer) clearTimeout(_hotWsIdleTimer);
+        _hotWsIdleTimer = setTimeout(function () {
+          discardHotSocket();
+        }, 25000);
+        ws.onopen = function () {
+          if (_hotWs !== ws) return;
+          ws.__fzSetupSent = true;
+          try { ws.send(buildSetupFrame(targetQ, _currentCtx)); } catch (_) {}
+        };
+        ws.onmessage = function (ev) {
+          if (_hotWs !== ws) return;
+          var handleRaw = function (txt) {
+            try {
+              var m = JSON.parse(txt);
+              if (m && m.setupComplete) {
+                _hotWsSetupComplete = true;
+                ws.__fzSetupComplete = true;
+              }
+            } catch (_) {}
+          };
+          if (typeof ev.data === 'string') handleRaw(ev.data);
+          else if (typeof Blob !== 'undefined' && ev.data instanceof Blob && typeof ev.data.text === 'function') {
+            ev.data.text().then(handleRaw).catch(function () {});
+          } else if (typeof ArrayBuffer !== 'undefined' && ev.data instanceof ArrayBuffer && typeof TextDecoder !== 'undefined') {
+            try { handleRaw(new TextDecoder().decode(ev.data)); } catch (_) {}
+          }
+        };
+        ws.onerror = function () {
+          if (_hotWs === ws) discardHotSocket();
+        };
+        ws.onclose = function () {
+          if (_hotWs === ws) {
+            _hotWs = null;
+            _hotWsSetupComplete = false;
+          }
+        };
+      } catch (_) {}
+    };
+    if (isDirectKeyAvailable()) {
+      var directKey = getUserGeminiApiKey();
+      if (directKey) {
+        connectHot(
+          'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=' + encodeURIComponent(directKey),
+          0,
+          true
+        );
+        return;
+      }
+    }
+    var pre = takePrewarmedSession();
+    if (pre && pre.endpoint) {
+      connectHot(pre.endpoint, pre.keyIndex, !!pre.isDirectKey);
+      return;
+    }
+    prewarmLiveSession(false).then(function (session) {
+      if (session && session.ok && session.endpoint) {
+        var taken = takePrewarmedSession() || session;
+        connectHot(taken.endpoint, taken.keyIndex, !!taken.isDirectKey);
+      }
+    }).catch(function () {});
   }
 
   function discardHotSocket() {
@@ -2017,7 +2102,7 @@
     analyzeHumanVoiceBandFrame: analyzeHumanVoiceBandFrame,
     clearQuizClueHighlights: clearQuizClueHighlights,
     markDirectKeyQuotaCooldown: markDirectKeyQuotaCooldown,
-    isSileroVadActive: function () { return !!_sileroVadActive; },
+    isSileroVadActive: function () { return !!(_sileroVadActive && (Date.now() - _lastSileroFrameAt) < 600); },
     isCallActive: function () {
       return !!(_activeCall && _activeCall.active);
     },
@@ -2257,6 +2342,10 @@
         return { ok: true, spent: 0, isWelcomePass: true };
       }
 
+      if (_sessionPrepaidByModal) {
+        return { ok: true, spent: 0, prepaidByModal: true };
+      }
+
       // Daily Free SOS Pass covers all voice turns on that free question (only consumed once real audio plays!)
       if (_freeQuestionSigs[qSig]) {
         this._refreshLiveToggleBadge();
@@ -2493,6 +2582,7 @@
       _sessionGemsSpent = 0;
       _sessionVoiceTurns = 0;
       _sessionFreeQuestions = 0;
+      _sessionPrepaidByModal = false;
       _pendingBillingMode = 'auto';
       _currentTurnMetered = false;
       _isSilenceNudgeTurn = false;
@@ -2539,6 +2629,7 @@
       _sessionGemsSpent = 0;
       _sessionVoiceTurns = 0;
       _sessionFreeQuestions = 0;
+      _sessionPrepaidByModal = false;
       _currentTurnMetered = false;
       _isSilenceNudgeTurn = false;
       _pendingFollowupBillable = false;
@@ -2843,10 +2934,35 @@
         return;
       }
 
-      // Pre-warm live session token in memory while user reviews modal so Gemini Live connects INSTANTLY on confirm!
+      // Unlock AudioContext, pre-warm mic stream, and open hot WebSocket on user gesture so Gemini Live speaks INSTANTLY on confirm!
       try {
+        warmAudioContext();
         if (!self.isCallActive()) {
           prewarmLiveSession(true);
+          openHotSocket(activeQ);
+        }
+        if (
+          !_prewarmedMicStream &&
+          !_micStream &&
+          typeof navigator !== 'undefined' &&
+          navigator.mediaDevices &&
+          typeof navigator.mediaDevices.getUserMedia === 'function'
+        ) {
+          navigator.mediaDevices
+            .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+            .catch(function () { return navigator.mediaDevices.getUserMedia({ audio: true }); })
+            .then(function (s) {
+              if (!s) return;
+              if (self.isCallActive() && !_micStream) {
+                _micStream = s;
+                self._wireMicrophoneStream(s);
+              } else if (!self.isCallActive()) {
+                _prewarmedMicStream = s;
+              } else {
+                try { s.getTracks().forEach(function (tr) { tr.stop(); }); } catch (_) {}
+              }
+            })
+            .catch(function () {});
         }
       } catch (_) {}
 
@@ -2894,6 +3010,11 @@
         btnCancel.onclick = function (e) {
           if (e) { e.preventDefault(); e.stopPropagation(); }
           scrim.remove();
+          discardHotSocket();
+          if (_prewarmedMicStream) {
+            try { _prewarmedMicStream.getTracks().forEach(function (tr) { tr.stop(); }); } catch (_) {}
+            _prewarmedMicStream = null;
+          }
         };
       }
 
@@ -2904,6 +3025,7 @@
           var bal = getGemBalance();
           if (bal < 10) {
             scrim.remove();
+            discardHotSocket();
             self.showInsufficientGemModal(bal);
             return;
           }
@@ -2935,6 +3057,7 @@
             try { if (typeof root.save === 'function') root.save(); } catch (_) {}
           }
           _sessionGemsSpent = 10;
+          _sessionPrepaidByModal = true;
 
           // 3. Update tampilan Gem di topbar secara langsung seketika
           self.updateTopbarGem();
@@ -3123,9 +3246,13 @@
       }
 
       // 1. Mikrofon — aliran audio PCM 16kHz langsung ke Gemini Live melalui Silero Neural VAD v5 / DSP.
-      //    Parallel Web Speech Recognition hanya dipakai sebagai cadangan bila getUserMedia gagal/tidak tersedia,
-      //    sehingga tidak pernah mengirim 2 giliran ganda atau berebut mikrofon di HP/PWA.
-      if (typeof navigator !== 'undefined' && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+      var preStream = _prewarmedMicStream;
+      _prewarmedMicStream = null;
+      if (preStream && typeof preStream.getAudioTracks === 'function' && preStream.getAudioTracks().some(function (tr) { return tr && tr.readyState === 'live'; })) {
+        _micStream = preStream;
+        this._wireMicrophoneStream(preStream);
+        this._startParallelSpeechRecognition();
+      } else if (typeof navigator !== 'undefined' && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
         navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         }).catch(function () {
@@ -3136,9 +3263,9 @@
             return;
           }
           if (!self.isCallActive()) { stream.getTracks().forEach(function (tr) { tr.stop(); }); return; }
-          self._stopParallelSpeechRecognition();
           _micStream = stream;
           self._wireMicrophoneStream(stream);
+          self._startParallelSpeechRecognition();
         }).catch(function (err) {
           console.warn('[Mochi Voice SOS] Mic permission unavailable (listen-only mode):', err);
           self._startParallelSpeechRecognition();
@@ -3279,8 +3406,8 @@
             }
             var mochiBusy = (_activeAudioSources.length > 0) || _modelTurnInProgress || ((Date.now() - _lastMochiAudioEndedAt) < 350);
             if (mochiBusy) return;
-            // Wajib lolos verifikasi Silero Neural VAD bila model aktif (tolak halusinasi bising jalanan)
-            if (_sileroVadActive && (Date.now() - _sileroLastSpeechProbAt) > 2800) {
+            // Wajib lolos verifikasi Silero Neural VAD bila model aktif menghasilkan frame (tolak halusinasi bising jalanan)
+            if (_sileroVadActive && (Date.now() - _lastSileroFrameAt) < 600 && (Date.now() - _sileroLastSpeechProbAt) > 2800) {
               return;
             }
             var tx = '';
@@ -3301,39 +3428,48 @@
               var toSend = String(accumulated || '').trim();
               accumulated = '';
               if (!toSend || !_activeCall || !_activeCall.active) return;
-              if (_modelTurnInProgress || _awaitingOpeningModelTurn || _activeAudioSources.length > 0) return;
-              // Jika aliran audio PCM mikrofon sudah aktif mengirimkan suara langsung (realtimeInput.audio),
-              // jangan menimpa dengan clientContent ganda agar respons Gemini Live tidak terputus!
-              if (_userAudioBurstActive || (Date.now() - _lastUserSpeechAt) < 2800) return;
-              if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete) {
-                _userAskedConceptOnCurrent = true;
-                _pendingFollowupBillable = true;
-                _currentTurnMetered = false;
-                _isSilenceNudgeTurn = false;
-                var activeSpokenQ = getActiveQuestion(null);
-                var bcSpoken = evaluateBraincoreStruggleState(activeSpokenQ);
-                if (bcSpoken.isStruggling) {
-                  autoHighlightQuestionClue(activeSpokenQ);
+              if (_modelTurnInProgress || _activeAudioSources.length > 0) return;
+              // Jika aliran audio PCM mikrofon baru saja mengirim suara langsung (<1200ms),
+              // tunggu 1200ms apakah Gemini Live sudah merespons dari audio PCM; jika belum merespons, kirim transkripnya!
+              var sendTranscriptTurn = function () {
+                if (!toSend || !_activeCall || !_activeCall.active) return;
+                if (_modelTurnInProgress || _activeAudioSources.length > 0) return;
+                if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete) {
+                  _userAskedConceptOnCurrent = true;
+                  _pendingFollowupBillable = true;
+                  _currentTurnMetered = false;
+                  _isSilenceNudgeTurn = false;
+                  _awaitingOpeningModelTurn = false;
+                  var activeSpokenQ = getActiveQuestion(null);
+                  var bcSpoken = evaluateBraincoreStruggleState(activeSpokenQ);
+                  if (bcSpoken.isStruggling) {
+                    autoHighlightQuestionClue(activeSpokenQ);
+                  }
+                  var learnerName = getRegisteredLearnerName();
+                  var snap = buildQuizContextSnapshot(activeSpokenQ, _currentCtx);
+                  try {
+                    _ws.send(JSON.stringify({
+                      clientContent: {
+                        turns: [{
+                          role: 'user',
+                          parts: [{
+                            text: '[Peserta "' + learnerName + '" berkata: "' + toSend + '" terkait butir "' + snap.stem + '".]\n' +
+                              bcSpoken.diagnosticPacket + '\n' +
+                              'Jawab langsung dengan suara manusia asli yang hangat menggunakan bahasa anak SMP yang sederhana dan perumpamaan sehari-hari berdasarkan konsep (' + (snap.rule || snap.why || 'konteks kalimat') + ') tanpa membocorkan kunci!'
+                          }]
+                        }],
+                        turnComplete: true
+                      }
+                    }));
+                  } catch (_) {}
                 }
-                var learnerName = getRegisteredLearnerName();
-                var snap = buildQuizContextSnapshot(activeSpokenQ, _currentCtx);
-                try {
-                  _ws.send(JSON.stringify({
-                    clientContent: {
-                      turns: [{
-                        role: 'user',
-                        parts: [{
-                          text: '[Peserta "' + learnerName + '" berkata: "' + toSend + '" terkait butir "' + snap.stem + '".]\n' +
-                            bcSpoken.diagnosticPacket + '\n' +
-                            'Jawab langsung dengan suara manusia asli yang hangat menggunakan bahasa anak SMP yang sederhana dan perumpamaan sehari-hari berdasarkan konsep (' + (snap.rule || snap.why || 'konteks kalimat') + ') tanpa membocorkan kunci!'
-                        }]
-                      }],
-                      turnComplete: true
-                    }
-                  }));
-                } catch (_) {}
+              };
+              if (_userAudioBurstActive || (Date.now() - _lastPcmSpeechSentAt) < 1200) {
+                setTimeout(sendTranscriptTurn, 1300);
+                return;
               }
-            }, 520);
+              sendTranscriptTurn();
+            }, 600);
           };
 
           rec.onerror = function (evErr) {
@@ -3390,10 +3526,10 @@
           var preRollFrames = [];
           _consecutiveSpeechFrames = 0;
 
-          // Fallback Vocal-Formant Gate (hanya aktif selama ~120ms sebelum Silero ONNX WASM siap atau di lingkungan uji non-WASM)
+          // Fallback Vocal-Formant Gate (aktif setiap saat jika Silero ONNX WASM belum mengirim frame <600ms)
           proc.onaudioprocess = function (e) {
             if (!_activeCall || !_activeCall.active) return;
-            if (_sileroVadActive) return;
+            if (_sileroVadActive && (Date.now() - _lastSileroFrameAt) < 600) return;
             if (ctx.state === 'suspended') {
               try { ctx.resume().catch(function () {}); } catch (_) {}
             }
@@ -3411,8 +3547,9 @@
                 _audioStreamEndTimer = null;
                 _userAudioBurstActive = false;
                 self._setVoiceVisualizerUserSpeaking(false);
-                if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && !_awaitingOpeningModelTurn && _activeAudioSources.length === 0) {
+                if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && _activeAudioSources.length === 0) {
                   _pendingFollowupBillable = true;
+                  _awaitingOpeningModelTurn = false;
                   try {
                     _ws.send(
                       JSON.stringify({
@@ -3421,7 +3558,7 @@
                     );
                   } catch (_) {}
                 }
-              }, isMob ? 360 : 440);
+              }, isMob ? 720 : 800);
             };
 
             if (mochiPlayingAudio) {
@@ -3441,6 +3578,7 @@
                   stopAllActiveAudioSources();
                   self._setVoiceVisualizerUserSpeaking(true);
                   _lastUserSpeechAt = Date.now();
+                  _lastPcmSpeechSentAt = Date.now();
                   _silencePromptFired = false;
                   if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
                   _userAudioBurstActive = true;
@@ -3453,13 +3591,16 @@
                 return;
               }
             } else {
-              var minRms = _modelTurnInProgress ? 0.012 : 0.003;
-              if (v.isHumanSpeech && v.rms >= minRms) {
+              var minRms = _modelTurnInProgress ? 0.010 : 0.002;
+              if ((v.isHumanSpeech || v.rms >= 0.005) && v.rms >= minRms) {
                 _consecutiveSpeechFrames++;
                 if (_consecutiveSpeechFrames >= 2) {
                   _userAskedConceptOnCurrent = true;
+                  _awaitingOpeningModelTurn = false;
+                  if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
                   self._setVoiceVisualizerUserSpeaking(true);
                   _lastUserSpeechAt = Date.now();
+                  _lastPcmSpeechSentAt = Date.now();
                   _silencePromptFired = false;
                   if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
                   _userAudioBurstActive = true;
@@ -3474,7 +3615,8 @@
             var pcmBase64 = resampleAndConvertToPcm16Base64(float32, inRate, 16000);
             if (!pcmBase64) return;
 
-            if (_userAudioBurstActive) {
+            if (_userAudioBurstActive || !mochiPlayingAudio) {
+              if (_userAudioBurstActive) _lastPcmSpeechSentAt = Date.now();
               while (preRollFrames.length > 0) {
                 var pre = preRollFrames.shift();
                 try {
@@ -3529,6 +3671,7 @@
             resumeStream: function () { return Promise.resolve(stream); },
             audioContext: ctx,
             onFrameProcessed: function (probs, frame) {
+              _lastSileroFrameAt = Date.now();
               if (!_activeCall || !_activeCall.active) return;
               var pSpeech = (probs && typeof probs.isSpeech === 'number') ? probs.isSpeech : 0;
               var n = frame ? frame.length : 0;
@@ -3560,6 +3703,7 @@
                     stopAllActiveAudioSources();
                     self._setVoiceVisualizerUserSpeaking(true);
                     _lastUserSpeechAt = Date.now();
+                    _lastPcmSpeechSentAt = Date.now();
                     _silencePromptFired = false;
                     if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
                     _userAudioBurstActive = true;
@@ -3571,13 +3715,13 @@
                   return;
                 }
               } else {
-                // Saat mendengarkan: responsif >= 2 frame (64ms, p >= 0.46, rms >= 0.0015) suara bicara manusia;
-                // bising statis di bawah ambang diabaikan.
+                // Saat mendengarkan: responsif >= 2 frame (64ms, p >= 0.30, rms >= 0.0012) suara bicara manusia;
+                // jeda tenang ~768ms-832ms (24-26 frame) agar murid tidak dipotong di tengah kalimat.
                 var isMobVad = typeof navigator !== 'undefined' &&
                   (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
-                var silenceEndFrames = isMobVad ? 10 : 12;
-                var frameBand = (rms >= 0.004 && frame && frame.length > 0) ? analyzeHumanVoiceBandFrame(frame, 16000) : null;
-                var isSpeechDetected = (pSpeech >= 0.34 || (frameBand && frameBand.isHumanSpeech && rms >= 0.006)) && rms >= 0.0015;
+                var silenceEndFrames = isMobVad ? 24 : 26;
+                var frameBand = (rms >= 0.003 && frame && frame.length > 0) ? analyzeHumanVoiceBandFrame(frame, 16000) : null;
+                var isSpeechDetected = (pSpeech >= 0.30 || (frameBand && frameBand.isHumanSpeech && rms >= 0.004)) && rms >= 0.0012;
                 if (isSpeechDetected) {
                   _sileroLastSpeechProbAt = Date.now();
                   sileroSpeechStreak++;
@@ -3586,6 +3730,7 @@
                     _userAskedConceptOnCurrent = true;
                     _userAudioBurstActive = true;
                     _lastUserSpeechAt = Date.now();
+                    _lastPcmSpeechSentAt = Date.now();
                     _silencePromptFired = false;
                     _awaitingOpeningModelTurn = false;
                     if (_openingModelTurnTimer) { clearTimeout(_openingModelTurnTimer); _openingModelTurnTimer = null; }
@@ -3600,8 +3745,9 @@
                       _userAudioBurstActive = false;
                       sileroSilenceStreak = 0;
                       self._setVoiceVisualizerUserSpeaking(false);
-                      if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && !_awaitingOpeningModelTurn && _activeAudioSources.length === 0) {
+                      if (_ws && _ws.readyState === 1 && _ws.__fzSetupComplete && !_modelTurnInProgress && _activeAudioSources.length === 0) {
                         _pendingFollowupBillable = true;
+                        _awaitingOpeningModelTurn = false;
                         try {
                           _ws.send(
                             JSON.stringify({
@@ -3623,7 +3769,8 @@
                 return;
               }
 
-              if (_userAudioBurstActive) {
+              if (_userAudioBurstActive || !mochiPlayingAudio) {
+                if (_userAudioBurstActive) _lastPcmSpeechSentAt = Date.now();
                 while (sileroPreRoll.length > 0) {
                   var preChunk = sileroPreRoll.shift();
                   try {
@@ -4056,7 +4203,8 @@
       _openingTurnCompletedForQ = true;
       _lastMochiAudioEndedAt = Date.now();
       _lastUserSpeechAt = Date.now();
-      this._scheduleSilenceCheck(SILENCE_PROMPT_MS);
+      // Berikan waktu berpikir alami 10 detik bagi murid untuk membaca kalimat dan menjawab pertanyaan Mochi
+      this._scheduleSilenceCheck(10000);
     },
 
     _scheduleSilenceCheck: function (delayMs) {
@@ -4222,7 +4370,7 @@
           var ctx = getAudioContext();
           if (ctx) {
             var resumePromise = (ctx.state === 'suspended' && typeof ctx.resume === 'function')
-              ? ctx.resume().catch(function () {})
+              ? Promise.race([ctx.resume().catch(function () {}), new Promise(function (r) { setTimeout(r, 150); })])
               : Promise.resolve();
 
             return resumePromise.then(function () {
