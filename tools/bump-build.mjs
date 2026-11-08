@@ -161,6 +161,12 @@ if (argv[0] === '--adopt') {
     console.error('Selaraskan dulu, atau jalankan `bump` kalau memang versinya harus naik.');
     process.exit(1);
   }
+  const pIndex = path.join(ROOT, 'index.html');
+  if (fs.existsSync(pIndex)) {
+    let isiIndex = fs.readFileSync(pIndex, 'utf8');
+    isiIndex = isiIndex.replace(/<meta name="fz-build" content="m025-\d+">/, '<meta name="fz-build" content="' + v[0] + '">');
+    fs.writeFileSync(pIndex, isiIndex);
+  }
   const sumberLama = versiSumber();
   const j = JSON.parse(fs.readFileSync(SUMBER, 'utf8'));
   j.version = v[0];
@@ -289,6 +295,14 @@ for (const berkas of HALAMAN_BERVERSI) {
   }
   fs.writeFileSync(p, isi.replace(POLA_VERSI, '?v=' + versiBaru));
   console.log(berkas + ': ' + cocok.length + ' rujukan -> ' + versiBaru);
+}
+
+const pIndex = path.join(ROOT, 'index.html');
+if (fs.existsSync(pIndex)) {
+  let isiIndex = fs.readFileSync(pIndex, 'utf8');
+  isiIndex = isiIndex.replace(/<meta name="fz-build" content="m025-\d+">/, '<meta name="fz-build" content="' + versiBaru + '">');
+  fs.writeFileSync(pIndex, isiIndex);
+  console.log('index.html: fz-build -> ' + versiBaru);
 }
 
 const sumber = JSON.parse(fs.readFileSync(SUMBER, 'utf8'));

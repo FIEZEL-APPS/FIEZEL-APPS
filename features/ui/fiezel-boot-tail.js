@@ -71,11 +71,34 @@
         if (typeof caches === 'undefined' || typeof caches.keys !== 'function') return;
         var pageBuild = String(self.FIEZEL_PAGE_BUILD || '');
         var pageNum = parseBuildNum(pageBuild);
+        var htmlMeta = (typeof document !== 'undefined' && document.querySelector) ? document.querySelector('meta[name="fz-build"]') : null;
+        var htmlBuild = htmlMeta ? (htmlMeta.getAttribute('content') || '') : String(self.FIEZEL_HTML_BUILD || '');
+        var htmlNum = parseBuildNum(htmlBuild);
+        var effectiveBuild = (htmlNum !== null && (pageNum === null || htmlNum >= pageNum)) ? htmlBuild : pageBuild;
+        var effectiveNum = parseBuildNum(effectiveBuild);
+        // Pemulihan instan jika dokumen HTML dan JS/core-config berselisih versi (Frankenstein cache)
+        if (htmlNum !== null && pageNum !== null && htmlNum !== pageNum) {
+          try {
+            var splitKey = 'fiezel-split-healed-' + htmlBuild;
+            if (sessionStorage.getItem(splitKey) !== '1') {
+              sessionStorage.setItem(splitKey, '1');
+              if (typeof caches !== 'undefined' && typeof caches.keys === 'function') {
+                caches.keys().then(function (cKeys) {
+                  return Promise.all(cKeys.map(function (k) {
+                    var n = parseBuildNum(k);
+                    if (n !== null && n < htmlNum) return caches.delete(k);
+                    return Promise.resolve();
+                  }));
+                }).catch(function () {});
+              }
+            }
+          } catch (_) {}
+        }
         try {
-          if (pageBuild && typeof localStorage !== 'undefined' && localStorage.getItem('fz_boot_clean_build') !== pageBuild) {
-            localStorage.setItem('fz_boot_clean_build', pageBuild);
+          if (effectiveBuild && typeof localStorage !== 'undefined' && localStorage.getItem('fz_boot_clean_build') !== effectiveBuild) {
+            localStorage.setItem('fz_boot_clean_build', effectiveBuild);
             if (self.FiezelOfflineVault && typeof self.FiezelOfflineVault.purgeStaleBuilds === 'function') {
-              self.FiezelOfflineVault.purgeStaleBuilds(pageBuild);
+              self.FiezelOfflineVault.purgeStaleBuilds(effectiveBuild);
             }
             caches.keys().then(function (allNames) {
               allNames.forEach(function (nm) {
@@ -98,9 +121,9 @@
         pingControllerRev().then(function (activeRev) {
           var activeNum = parseBuildNum(activeRev);
           var activeShellName = activeRev ? ('fiezel-shell-' + activeRev) : '';
-          var keepMinNum = (activeNum !== null && pageNum !== null)
-            ? Math.max(activeNum, pageNum)
-            : (activeNum !== null ? activeNum : pageNum);
+          var keepMinNum = (activeNum !== null && effectiveNum !== null)
+            ? Math.max(activeNum, effectiveNum)
+            : (activeNum !== null ? activeNum : effectiveNum);
           caches.keys().then(function (names) {
             for (var i = 0; i < names.length; i++) {
               var name = names[i];
@@ -138,9 +161,9 @@
             }
           }).catch(function () {});
           // Pemulihan split-brain dua arah:
-          // (A) activeNum > pageNum: controller SW sudah lebih baru daripada dokumen memori iOS PWA.
-          // (B) activeNum < pageNum: dokumen sudah memuat penanda build baru sementara controller SW lama masih menempel.
-          if (activeNum !== null && pageNum !== null && activeNum > pageNum) {
+          // (A) activeNum > effectiveNum: controller SW sudah lebih baru daripada dokumen memori iOS PWA.
+          // (B) activeNum < pageNum || activeNum < effectiveNum: dokumen sudah memuat penanda build baru sementara controller SW lama masih menempel.
+          if (activeNum !== null && effectiveNum !== null && activeNum > effectiveNum) {
             try {
               var stage = self.FiezelStage;
               var inLesson = !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
@@ -158,17 +181,17 @@
                 self.FiezelUpdatePrompt?.check?.(true);
               }
             } catch (_) {}
-          } else if (activeNum !== null && pageNum !== null && activeNum < pageNum) {
+          } else if (activeNum !== null && effectiveNum !== null && (activeNum < effectiveNum || activeNum < pageNum)) {
             try {
               var stageB = self.FiezelStage;
               var inLessonB = !!(stageB && typeof stageB.lessonMode === 'function' && stageB.lessonMode() === true);
               var promKey = 'fiezel-promoted-for';
-              if (!inLessonB && sessionStorage.getItem(promKey) !== pageBuild && navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
+              if (!inLessonB && sessionStorage.getItem(promKey) !== effectiveBuild && navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
                 navigator.serviceWorker.getRegistration().then(function (reg) {
                   if (!reg) return;
                   var doPromote = function (w) {
-                    if (!w || sessionStorage.getItem(promKey) === pageBuild) return;
-                    sessionStorage.setItem(promKey, pageBuild);
+                    if (!w || sessionStorage.getItem(promKey) === effectiveBuild) return;
+                    sessionStorage.setItem(promKey, effectiveBuild);
                     var onCtrl = function () {
                       navigator.serviceWorker.removeEventListener('controllerchange', onCtrl);
                       var bustB = window.location.pathname + '?fz_healed=' + Date.now() + window.location.hash;
@@ -190,6 +213,45 @@
           }
         }).catch(function () {});
       };
+      var isCurtainActive = function () {
+        try {
+          var stage = self.FiezelStage;
+          var inLesson = !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
+          if (inLesson) return false;
+          var splash = document.getElementById('fiezelBootSplash');
+          if (!splash) return false;
+          var style = window.getComputedStyle ? window.getComputedStyle(splash) : null;
+          if (style && style.display === 'none') return false;
+          if (splash.classList && splash.classList.contains('fz-fade-out')) return false;
+          return true;
+        } catch (_) {
+          return false;
+        }
+      };
+      var maybeAutoPromoteUnderCurtain = function (reg) {
+        if (!reg || !reg.waiting) return false;
+        var curtain = isCurtainActive();
+        var hidden = (typeof document !== 'undefined' && document.visibilityState === 'hidden');
+        if (!curtain && !hidden) return false;
+        try {
+          var stage = self.FiezelStage;
+          var inLesson = !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
+          if (inLesson) return false;
+          var promKey = 'fiezel-promoted-waiting';
+          if (sessionStorage.getItem(promKey) === '1') return false;
+          sessionStorage.setItem(promKey, '1');
+          var onCtrl = function () {
+            navigator.serviceWorker.removeEventListener('controllerchange', onCtrl);
+            var bust = window.location.pathname + '?fz_cutover=' + Date.now() + window.location.hash;
+            try { window.location.replace(bust); } catch (_) { location.reload(); }
+          };
+          navigator.serviceWorker.addEventListener('controllerchange', onCtrl);
+          try { reg.waiting.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
+          return true;
+        } catch (_) {
+          return false;
+        }
+      };
       var checkSwUpdateNow = function () {
         sweepStaleShellCaches();
         try {
@@ -197,7 +259,11 @@
             navigator.serviceWorker.getRegistration().then(function (reg) {
               if (reg && typeof reg.update === 'function') {
                 reg.update().then(function () {
-                  try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
+                  try {
+                    if (!maybeAutoPromoteUnderCurtain(reg)) {
+                      self.FiezelUpdatePrompt?.check?.(true);
+                    }
+                  } catch (_) {}
                 }).catch(function () {});
               }
             }).catch(function () {});
@@ -210,15 +276,46 @@
         if (ev && ev.persisted) checkSwUpdateNow();
       });
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') checkSwUpdateNow();
+        if (document.visibilityState === 'visible') {
+          checkSwUpdateNow();
+        } else if (document.visibilityState === 'hidden') {
+          try {
+            if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
+              navigator.serviceWorker.getRegistration().then(function (reg) {
+                if (reg && reg.waiting) maybeAutoPromoteUnderCurtain(reg);
+              }).catch(function () {});
+            }
+          } catch (_) {}
+        }
       });
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (reg) {
         if (reg) {
-          try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
+          if (reg.waiting) {
+            if (!maybeAutoPromoteUnderCurtain(reg)) {
+              try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
+            }
+          } else {
+            try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
+          }
+          reg.addEventListener('updatefound', function () {
+            var worker = reg.installing;
+            if (!worker) return;
+            worker.addEventListener('statechange', function () {
+              if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                if (!maybeAutoPromoteUnderCurtain(reg)) {
+                  try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
+                }
+              }
+            });
+          });
           setTimeout(function () {
             try {
               reg.update().then(function () {
-                try { self.FiezelUpdatePrompt?.check?.(false); } catch (_) {}
+                try {
+                  if (!maybeAutoPromoteUnderCurtain(reg)) {
+                    self.FiezelUpdatePrompt?.check?.(false);
+                  }
+                } catch (_) {}
               }).catch(function () {});
             } catch (_) {}
           }, 2000);

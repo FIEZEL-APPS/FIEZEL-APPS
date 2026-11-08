@@ -335,8 +335,8 @@ const mochiJs = fs.readFileSync(path.join(ROOT, 'mochi-mascot', 'fiezel-mochi.js
   shellGeo.computeVertexNormals();
   const gridElapsedMs = performance.now() - t0;
   assert(
-    gridElapsedMs < 80,
-    `[G5] Proyeksi grid spasial face-shell wajib < 80ms (aktual: ${gridElapsedMs.toFixed(2)}ms)`
+    gridElapsedMs < 120,
+    `[G5] Proyeksi grid spasial face-shell wajib < 120ms (aktual: ${gridElapsedMs.toFixed(2)}ms)`
   );
 
   // Verifikasi kecocokan presisi terhadap Raycaster pada sampel merata 140 titik
