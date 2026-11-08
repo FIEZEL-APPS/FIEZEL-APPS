@@ -1578,8 +1578,8 @@ export default function App() {
       const ctx = ttsAudioCtxRef.current;
       if (ctx.state === 'suspended') {
         await Promise.race([
-          ctx.resume().catch(() => {}),
           new Promise<void>((r) => setTimeout(r, 150)),
+          (async () => { await ctx.resume().catch(() => {}); })(),
         ]);
       }
       const bin = atob(audioBase64);
