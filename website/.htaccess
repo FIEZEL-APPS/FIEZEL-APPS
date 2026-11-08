@@ -131,7 +131,7 @@ AddDefaultCharset UTF-8
   # secara diam-diam. Service Worker Cache Storage sudah menjadi penyimpan offline tunggal;
   # membiarkan HTTP disk cache menahan .js/.css lama menyebabkan cache.addAll() atau fallback
   # fetch() di iOS tersedot bita generasi lama.
-  <FilesMatch "\.(js|mjs|css|html|htm)$">
+  <FilesMatch "\.(js|mjs|css|html|htm|json)$">
     Header set Cache-Control "no-cache, must-revalidate"
   </FilesMatch>
   <FilesMatch "^(sw\.js|core-config\.js|version\.js|VERSION\.json|BUILD-VERSION\.json|manifest\.json|index\.html)$">
@@ -154,6 +154,7 @@ AddDefaultCharset UTF-8
   RewriteCond %{HTTP_REFERER} !^https?://(localhost|127\.0\.0\.1) [NC]
   RewriteCond %{HTTP_REFERER} !^android-app:// [NC]
   RewriteCond %{HTTP_USER_AGENT} !(FiezelApp|FiezelPWA) [NC]
-  RewriteCond %{HTTP:Sec-Fetch-Site} !^same-origin$ [NC]
+  RewriteCond %{HTTP:Sec-Fetch-Site} !^(same-origin|same-site)$ [NC]
+  RewriteCond %{HTTP:Sec-Fetch-Mode} !^(cors|same-origin)$ [NC]
   RewriteRule ^.*$ - [F,L]
 </IfModule>

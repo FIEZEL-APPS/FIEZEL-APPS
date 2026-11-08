@@ -53,16 +53,24 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-780-unified-grammar-20261002';
+const SW_REV='m025-781-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
     const keys=await caches.keys();
-    await Promise.all(keys.map(k=>(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE)?caches.delete(k):Promise.resolve()));
+    const curNum=Number((SW_REV.match(/m025-(\d+)/)||[])[1]||0);
+    await Promise.all(keys.map(k=>{
+      if(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE){
+        const m=k.match(/m025-(\d+)/);
+        const kNum=m?Number(m[1]):0;
+        if(kNum<curNum)return caches.delete(k);
+      }
+      return Promise.resolve();
+    }));
     const c=await caches.open(SHELL_CACHE);
     const hasIndex=await c.match('./index.html',{ignoreSearch:true});
     const hasApp=await c.match('./app.js',{ignoreSearch:true});
-    if(!hasIndex||!hasApp)await c.addAll(shellRequests());
+    if(!hasIndex||!hasApp)await installShell(c);
   }catch{}
 }
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
@@ -260,11 +268,39 @@ function withCoopCoep(response,request){
   return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
 }
 
+function isStaticAsset(url){
+  return /\.(ogg|mp3|webp|png|ico|woff2)$/i.test(url)||url.includes('/stories/')||url.includes('/assets/audio/');
+}
 const shellRequests=()=>ASSETS.map(asset=>new Request(asset,{cache:'reload'}));
+async function installShell(c){
+  const keys=await caches.keys();
+  const oldShellName=keys.filter(k=>k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE).sort().pop();
+  let oldCache=null;
+  if(oldShellName){
+    try{oldCache=await caches.open(oldShellName);}catch(_){}
+  }
+  const toFetch=[];
+  for(const asset of ASSETS){
+    const req=new Request(asset,{cache:'reload'});
+    if(oldCache&&isStaticAsset(asset)){
+      try{
+        const hit=await oldCache.match(asset);
+        if(hit&&hit.ok){
+          await c.put(req,hit.clone());
+          continue;
+        }
+      }catch(_){}
+    }
+    toFetch.push(req);
+  }
+  if(toFetch.length>0){
+    await c.addAll(toFetch);
+  }
+}
 // Do not skipWaiting here. A new release is allowed to activate only after clients
 // using the previous worker are gone, preventing a controller-generation swap in
 // the middle of a live installed-PWA document.
-self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>c.addAll(shellRequests())).catch(async err=>{try{await caches.delete(SHELL_CACHE)}catch{}throw err})));
+self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>installShell(c)).catch(async err=>{try{await caches.delete(SHELL_CACHE)}catch{}throw err})));
 // Because activation is no longer forced over live old clients, stale dedicated
 // shell caches can be removed here. The stable neural/runtime CACHE is preserved.
 // D16 (D7 T-5): activate membersihkan cache fiezel-v* basi yang bukan revisi aktif,
@@ -417,9 +453,20 @@ self.addEventListener('fetch',e=>{
     const cangkang=()=>caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true})
       .then(c=>c||(requestUrl.search?caches.match(cleanNavUrl,{cacheName:SHELL_CACHE}):null))
       .then(c=>c||(isSubHtml?null:caches.match('./index.html',{cacheName:SHELL_CACHE})));
-    const segarkan=fetch(new Request(e.request,{cache:'reload'})).then(r=>{
+    const segarkan=fetch(new Request(e.request,{cache:'reload'})).then(async r=>{
       if(r&&r.ok){
         const copy=r.clone();
+        // Cegah peracunan cangkang lintas-generasi: jangan timpa cangkang jika HTML jaringan dari build baru
+        try{
+          const text=await r.clone().text();
+          const m=text.match(/name=["']fz-build["']\s+content=["'](m025-\d+)/i)||text.match(/FIEZEL_HTML_BUILD\s*=\s*['"](m025-\d+)/i);
+          const htmlBuild=m?m[1]:null;
+          const curBuild=(SW_REV.match(/m025-\d+/)||[])[0];
+          if(htmlBuild&&curBuild&&htmlBuild!==curBuild){
+            if(self.registration&&typeof self.registration.update==='function')self.registration.update().catch(()=>{});
+            return r;
+          }
+        }catch(_){}
         const copyIdx=(!isSubHtml&&isUpdateNav)?r.clone():null;
         const putKey=(requestUrl.search&&(isSubHtml||isUpdateNav))?new Request(cleanNavUrl):e.request;
         caches.open(SHELL_CACHE).then(cache=>{
