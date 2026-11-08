@@ -512,7 +512,7 @@
        tinggi 62% sisi terpendek) supaya SVG tajam menumpuk piksel-persis di
        atas target partikel. JS menimpa posisi CSS dengan px persis. */
     function layout() {
-      var w = host.clientWidth || 0, h = host.clientHeight || 0;
+      var w = host.clientWidth || (env.innerWidth || 0), h = host.clientHeight || (env.innerHeight || 0);
       if (!w || !h) return;
       var box = Math.min(w, h) * 0.62;
       var scale = box / 512;

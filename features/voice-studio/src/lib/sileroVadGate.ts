@@ -125,10 +125,11 @@ export class SileroNeuralVadGate {
   private disposed = false;
   private confirmedSpeaking = false;
   private lastHumanSpeechAt = 0;
+  private lastFrameAt = 0;
   private lastProb = 0;
 
   public isActive(): boolean {
-    return this.active && !this.disposed;
+    return this.active && !this.disposed && Date.now() - this.lastFrameAt < 600;
   }
 
   public isConfirmedSpeaking(): boolean {
@@ -191,6 +192,7 @@ export class SileroNeuralVadGate {
         resumeStream: async () => stream,
         audioContext,
         onFrameProcessed: (probs: { isSpeech?: number }, frame: Float32Array) => {
+          this.lastFrameAt = Date.now();
           if (this.disposed || cb.isMicMuted()) return;
           const pSpeech = typeof probs?.isSpeech === 'number' ? probs.isSpeech : 0;
           this.lastProb = pSpeech;
@@ -234,14 +236,14 @@ export class SileroNeuralVadGate {
               return;
             }
           } else {
-            // Listening state: sensitive human vocal onset (>= 2 frames / 64ms with pSpeech >= 0.45 & rms >= 0.002).
-            // Guarantees quiet speech and laptop/headset built-in mics immediately open audio burst without clipping.
+            // Listening state: sensitive human vocal onset (>= 2 frames / 64ms with pSpeech >= 0.35 & rms >= 0.0015).
+            // Guarantees quiet speech and mobile/laptop built-in mics immediately open audio burst without clipping.
             const isMobile =
               typeof navigator !== 'undefined' &&
               (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
             // Natural pedagogical pause: 800-900ms allows foreign language learners to think/breathe without premature cutoff!
             const endSilenceFrames = isMobile ? 26 : 28; // ~832ms mobile, ~896ms desktop
-            if (pSpeech >= 0.45 && rms >= 0.002) {
+            if (pSpeech >= 0.35 && rms >= 0.0015) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
@@ -269,7 +271,7 @@ export class SileroNeuralVadGate {
 
           if (!pcmBase64) return;
 
-          if (burstOpen) {
+          if (burstOpen || !cb.isAiPlaying()) {
             while (preRollBase64.length > 0) {
               const pre = preRollBase64.shift();
               if (pre) cb.onSpeechPcm16kBase64(pre);

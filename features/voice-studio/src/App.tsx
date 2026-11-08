@@ -804,15 +804,24 @@ export default function App() {
   const primeAudioPlayback = () => {
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioCtx) {
+      const parentSharedCtx = (() => {
+        try {
+          const p = window.parent && window.parent !== window ? (window.parent as any) : null;
+          const c = p?.__fzSharedLiveAudioCtx;
+          return c && c.state !== 'closed' ? (c as AudioContext) : null;
+        } catch {
+          return null;
+        }
+      })();
+      if (AudioCtx || parentSharedCtx) {
         if (!ttsAudioCtxRef.current || ttsAudioCtxRef.current.state === 'closed') {
-          ttsAudioCtxRef.current = new AudioCtx();
+          ttsAudioCtxRef.current = parentSharedCtx || new AudioCtx();
         }
         if (ttsAudioCtxRef.current.state === 'suspended') {
           void ttsAudioCtxRef.current.resume().catch(() => {});
         }
         if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
-          liveAudioCtxRef.current = new AudioCtx();
+          liveAudioCtxRef.current = parentSharedCtx || new AudioCtx();
           nextStartTimeRef.current = liveAudioCtxRef.current.currentTime;
         }
         const liveCtx = liveAudioCtxRef.current;
@@ -1568,7 +1577,10 @@ export default function App() {
       }
       const ctx = ttsAudioCtxRef.current;
       if (ctx.state === 'suspended') {
-        await ctx.resume().catch(() => {});
+        await Promise.race([
+          ctx.resume().catch(() => {}),
+          new Promise<void>((r) => setTimeout(r, 150)),
+        ]);
       }
       const bin = atob(audioBase64);
       const bytes = new Uint8Array(bin.length);
@@ -3441,7 +3453,10 @@ export default function App() {
     });
 
     if (liveCtx.state === 'suspended') {
-      await liveCtx.resume().catch(() => {});
+      await Promise.race([
+        liveCtx.resume().catch(() => {}),
+        new Promise<void>((r) => setTimeout(r, 150)),
+      ]);
     }
 
     if (micSourceNodeRef.current) {
@@ -3527,10 +3542,10 @@ export default function App() {
         },
       });
 
-      // iOS WebKit check: iOS Safari / Chrome on iOS / PWA standalone iOS
-      const isIOSWebKit =
+      // Mobile & iOS WebKit check: iOS Safari / Android Chrome / Mobile PWA standalone
+      const isMobileOrIOSWebKit =
         typeof navigator !== 'undefined' &&
-        (/iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+        (/iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || '') ||
           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
           ((navigator as any).userAgentData?.platform === 'iOS') ||
           (navigator.vendor &&
@@ -3539,10 +3554,32 @@ export default function App() {
             !navigator.userAgent.includes('Chrome')));
 
       let workletInitialized = false;
+      let workletReceivedFrames = false;
 
-      // On Android / Chromium / Desktop: Try AudioWorklet first
+      const attachScriptProcessorFallback = () => {
+        if (scriptProcessorRef.current) return;
+        const processor = liveCtx.createScriptProcessor(4096, 1, 1);
+        scriptProcessorRef.current = processor;
+        (window as any).__fzLiveProcessor = processor;
+
+        processor.onaudioprocess = (e) => {
+          if (liveCtx.state === 'suspended') {
+            void liveCtx.resume().catch(() => {});
+          }
+          handleMicPcmData(e.inputBuffer.getChannelData(0));
+        };
+
+        const muteGain = liveCtx.createGain();
+        // Positive tiny non-zero gain prevents Chrome & WebKit power-saving from throttling onaudioprocess
+        muteGain.gain.value = 0.00001;
+        source.connect(processor);
+        processor.connect(muteGain);
+        muteGain.connect(liveCtx.destination);
+      };
+
+      // On Desktop Chromium: Try AudioWorklet first with a 500ms frame watchdog
       if (
-        !isIOSWebKit &&
+        !isMobileOrIOSWebKit &&
         liveCtx.audioWorklet &&
         typeof liveCtx.audioWorklet.addModule === 'function' &&
         typeof window !== 'undefined' &&
@@ -3587,39 +3624,37 @@ export default function App() {
           audioWorkletNodeRef.current = workletNode;
 
           workletNode.port.onmessage = (e: MessageEvent<Float32Array>) => {
+            workletReceivedFrames = true;
             handleMicPcmData(e.data);
           };
 
           source.connect(workletNode);
           const dummyGain = liveCtx.createGain();
-          dummyGain.gain.value = 0;
+          dummyGain.gain.value = 0.00001;
           workletNode.connect(dummyGain);
           dummyGain.connect(liveCtx.destination);
           workletInitialized = true;
+
+          window.setTimeout(() => {
+            if (!workletReceivedFrames && micStreamRef.current === stream) {
+              try {
+                workletNode.port.onmessage = null;
+                workletNode.disconnect();
+              } catch {}
+              if (audioWorkletNodeRef.current === workletNode) {
+                audioWorkletNodeRef.current = null;
+              }
+              attachScriptProcessorFallback();
+            }
+          }, 500);
         } catch (workletErr) {
           console.warn('AudioWorklet init fallback to ScriptProcessor:', workletErr);
         }
       }
 
-      // Fallback for Chromium or Direct for iOS WebKit: ScriptProcessorNode
+      // Direct for Mobile (iOS/Android PWA) or Fallback for Desktop: ScriptProcessorNode
       if (!workletInitialized) {
-        const processor = liveCtx.createScriptProcessor(4096, 1, 1);
-        scriptProcessorRef.current = processor;
-        (window as any).__fzLiveProcessor = processor;
-
-        processor.onaudioprocess = (e) => {
-          if (liveCtx.state === 'suspended') {
-            void liveCtx.resume().catch(() => {});
-          }
-          handleMicPcmData(e.inputBuffer.getChannelData(0));
-        };
-
-        const muteGain = liveCtx.createGain();
-        // Positive tiny non-zero gain prevents Chrome & WebKit power-saving from throttling onaudioprocess
-        muteGain.gain.value = 0.00001;
-        source.connect(processor);
-        processor.connect(muteGain);
-        muteGain.connect(liveCtx.destination);
+        attachScriptProcessorFallback();
       }
     } catch (err: any) {
       console.warn('Microphone node wiring error (SpeechRecognition handles voice):', err);
@@ -3674,8 +3709,16 @@ export default function App() {
 
     // 1. Prime Unified Live AudioContext (native hardware rate for iOS & Desktop)
     const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
+    const parentWin = (() => {
+      try {
+        return window.parent && window.parent !== window ? (window.parent as any) : null;
+      } catch {
+        return null;
+      }
+    })();
     if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
-      liveAudioCtxRef.current = new CtxClass();
+      const sharedCtx = parentWin?.__fzSharedLiveAudioCtx;
+      liveAudioCtxRef.current = sharedCtx && sharedCtx.state !== 'closed' ? sharedCtx : new CtxClass();
     }
     const liveCtx = liveAudioCtxRef.current;
     inputAudioCtxRef.current = liveCtx;
@@ -3687,6 +3730,24 @@ export default function App() {
 
     // 2. Dapatkan mikrofon secara non-blocking jika peramban mengizinkan langsung
     let stream: MediaStream | null = preAcquiredStream || micStreamRef.current;
+    if (!stream && parentWin) {
+      try {
+        if (parentWin.__fzSharedMicStream && parentWin.__fzSharedMicStream.getAudioTracks?.().some((t: MediaStreamTrack) => t.readyState === 'live')) {
+          stream = parentWin.__fzSharedMicStream;
+          parentWin.__fzSharedMicStream = null;
+        } else if (parentWin.__fzSharedMicStreamPromise) {
+          const sharedRes = await Promise.race([
+            parentWin.__fzSharedMicStreamPromise,
+            new Promise<null>((r) => setTimeout(() => r(null), 1500)),
+          ]);
+          parentWin.__fzSharedMicStreamPromise = null;
+          parentWin.__fzSharedMicStream = null;
+          if (sharedRes && sharedRes.getAudioTracks?.().length > 0) {
+            stream = sharedRes;
+          }
+        }
+      } catch {}
+    }
     if (!stream && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
       try {
         const getStreamPromise = navigator.mediaDevices

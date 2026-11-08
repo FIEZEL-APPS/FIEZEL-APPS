@@ -90,8 +90,12 @@ http.createServer((req, res) => {
 
     proxyReq.on('error', (err) => {
       console.warn('[preview-server proxy error]:', err?.message);
-      res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      res.end(JSON.stringify({ ok: false, error: 'proxy_failed', message: err?.message }));
+      if (!res.headersSent) {
+        res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      }
+      try {
+        res.end(JSON.stringify({ ok: false, error: 'proxy_failed', message: err?.message }));
+      } catch (_) {}
     });
 
     req.pipe(proxyReq);

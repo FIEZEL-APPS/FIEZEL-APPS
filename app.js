@@ -12633,7 +12633,21 @@ function openKawanBicaraCallModal(){
     try{sessionStorage.setItem('fz_kawan_autocall','1')}catch(_){}
     try{
       const AC=window.AudioContext||window.webkitAudioContext;
-      if(AC){const dCtx=new AC();dCtx.resume().catch(()=>{})}
+      if(AC){
+        if(!window.__fzSharedLiveAudioCtx||window.__fzSharedLiveAudioCtx.state==='closed'){
+          window.__fzSharedLiveAudioCtx=new AC();
+        }
+        if(window.__fzSharedLiveAudioCtx.state==='suspended'){
+          window.__fzSharedLiveAudioCtx.resume().catch(()=>{});
+        }
+      }
+      if(navigator.mediaDevices&&typeof navigator.mediaDevices.getUserMedia==='function'&&!window.__fzSharedMicStreamPromise){
+        window.__fzSharedMicStreamPromise=navigator.mediaDevices
+          .getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})
+          .catch(()=>navigator.mediaDevices.getUserMedia({audio:true}))
+          .then(s=>{window.__fzSharedMicStream=s;return s})
+          .catch(()=>{window.__fzSharedMicStreamPromise=null;return null});
+      }
     }catch(_){}
     try{self.FiezelInteractiveChat?.StudioBridge?.send?.('fz.shell.autocall',{at:Date.now()})}catch(_){}
     setTimeout(()=>{closeKawanBicaraCallModal();go('chat')},160);
