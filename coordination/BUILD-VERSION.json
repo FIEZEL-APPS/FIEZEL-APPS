@@ -1,7 +1,7 @@
 {
-  "version": "m025-779",
-  "claimedBy": "branch fix/pwa-boot-splash-seamless-m025-779",
-  "claimedAt": "2026-11-08T00:40:49.557Z",
-  "reason": "fix(pwa-boot): [ALLOW-PROTECTED: pwa, auth] eliminate cold-boot css blocking, bottom-bar flash, and 6s post-splash white screen",
+  "version": "m025-780",
+  "claimedBy": "branch fix/voice-studio-mochi-card-fixed-m025-780",
+  "claimedAt": "2026-11-08T09:15:20.155Z",
+  "reason": "fix(voice): [ALLOW-PROTECTED: pwa] fix mochi stage and facetime card height to prevent downward expansion on long subtitles (m025-780)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -5514,13 +5514,13 @@ export default function App() {
             ) : (
               <div className="w-full flex-1 flex flex-col space-y-3">
                 {/* KOLOM FACETIME (40-60 Split: 40% Video Stage Mochi | 60% Interactive Learning Surface) */}
-                <div className={`w-full max-w-xl lg:max-w-4xl mx-auto flex flex-col lg:grid lg:grid-cols-12 lg:items-stretch gap-3.5 ${callViewMode === 'stage' ? 'flex' : 'hidden'}`}>
+                <div className={`w-full max-w-xl lg:max-w-4xl mx-auto flex flex-col lg:grid lg:grid-cols-12 lg:items-start gap-3.5 ${callViewMode === 'stage' ? 'flex' : 'hidden'}`}>
                   {/* 1. ZONA 40%: FaceTime Video Stage Mochi */}
                   <section
                     data-testid="ai-call-card"
                     data-call-state={callStateKey}
                     data-transport-mode={liveTransportMode}
-                    className="lg:col-span-5 bg-gradient-to-b from-[#FAF5EB]/95 to-white/95 rounded-3xl p-3.5 sm:p-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-[#EADBCE]/80 flex flex-col justify-between items-center w-full min-h-[260px] sm:min-h-[290px]"
+                    className="lg:col-span-5 lg:self-start bg-gradient-to-b from-[#FAF5EB]/95 to-white/95 rounded-3xl p-3.5 sm:p-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-[#EADBCE]/80 flex flex-col justify-between items-center w-full h-[260px] sm:h-[300px] shrink-0"
                   >
                     {/* Meta Bar Atas: Coach & Scenario Level & Mode Badges */}
                     <div className="w-full flex items-center justify-between gap-2 text-xs">
@@ -5776,11 +5776,11 @@ export default function App() {
                   </section>
 
                   {/* 2. ZONA 60%: Interactive Learning Surface (Subtitles & Learning Controls) */}
-                  <div className="lg:col-span-7 flex flex-col justify-between gap-3 w-full h-full">
+                  <div className="lg:col-span-7 flex flex-col justify-between gap-3 w-full">
                     {/* SUBTITLE MELAYANG HALUS (Floating Subtitles Glass HUD) */}
                     <div
                       data-testid="live-translation-hud"
-                      className="w-full text-left rounded-3xl bg-white/95 backdrop-blur-md border border-[#EDE5D4] p-4 sm:p-5 shadow-sm space-y-3 flex flex-col justify-between h-full"
+                      className="w-full text-left rounded-3xl bg-white/95 backdrop-blur-md border border-[#EDE5D4] p-4 sm:p-5 shadow-sm space-y-3 flex flex-col justify-between min-h-[260px] sm:min-h-[300px]"
                     >
                       {isAiThinking ? (
                         <div
