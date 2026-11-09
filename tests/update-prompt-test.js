@@ -27,6 +27,7 @@ const html = fs.readFileSync('./index.html', 'utf8');
 const sw = fs.readFileSync('./sw.js', 'utf8');
 const app = fs.readFileSync('./app.js', 'utf8');
 const prompt = fs.readFileSync('./features/ui/fiezel-update-prompt.js', 'utf8');
+const bootTail = fs.readFileSync('./features/ui/fiezel-boot-tail.js', 'utf8');
 const swAssets = (sw.match(/const ASSETS=\[[\s\S]*?\];/) || [''])[0];
 const css = fs.readFileSync('./style.css', 'utf8');
 
@@ -133,6 +134,15 @@ test('pembersihan cache peramban ikut dipicu saat murid menekan tombol pembaruan
   assert.ok(/purgeStaleCaches/.test(applyBody), 'purgeStaleCaches wajib dipanggil di dalam apply()');
   assert.ok(/fiezel-shell-/.test(prompt), 'pembersihan wajib menyentuh cangkang fiezel-shell-');
   assert.ok(/caches\.delete/.test(prompt), 'pembersihan wajib memanggil caches.delete');
+  assert.ok(/maxNewerShellName/.test(prompt), 'purgeStaleCaches wajib membatasi maksimal 1 cangkang baru agar tidak menumpuk');
+});
+
+test('fiezel-boot-tail.js DILARANG melakukan auto-update diam-diam & wajib membersihkan cangkang lama', () => {
+  assert.ok(!/maybeAutoPromoteUnderCurtain/.test(bootTail), 'maybeAutoPromoteUnderCurtain dilarang ada di fiezel-boot-tail.js');
+  assert.ok(!/isCurtainActive/.test(bootTail), 'isCurtainActive auto-promote dilarang ada di fiezel-boot-tail.js');
+  assert.ok(!/FIEZEL_SKIP_WAITING/.test(bootTail), 'fiezel-boot-tail.js dilarang mengirim FIEZEL_SKIP_WAITING tanpa klik murid di #updateBanner');
+  assert.ok(/maxPendingName/.test(bootTail) && /hasPendingWorker/.test(bootTail),
+    'sweepStaleShellCaches wajib menghapus seluruh cangkang fiezel-shell-* lama kecuali cangkang aktif dan maksimal 1 cangkang worker waiting');
 });
 
 for (const [name, fn] of tests) {

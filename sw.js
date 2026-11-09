@@ -53,17 +53,28 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-785-unified-grammar-20261002';
+const SW_REV='m025-786-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
     const keys=await caches.keys();
     const curNum=Number((SW_REV.match(/m025-(\d+)/)||[])[1]||0);
+    const hasPendingNewer=Boolean(self.registration&&(self.registration.waiting||self.registration.installing));
+    let maxNewerKey='';
+    let maxNewerNum=curNum;
+    if(hasPendingNewer){
+      for(const k of keys){
+        if(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE){
+          const m=k.match(/m025-(\d+)/);
+          const kNum=m?Number(m[1]):0;
+          if(kNum>maxNewerNum){maxNewerNum=kNum;maxNewerKey=k;}
+        }
+      }
+    }
     await Promise.all(keys.map(k=>{
       if(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE){
-        const m=k.match(/m025-(\d+)/);
-        const kNum=m?Number(m[1]):0;
-        if(kNum<curNum)return caches.delete(k);
+        if(hasPendingNewer&&maxNewerKey&&k===maxNewerKey)return Promise.resolve();
+        return caches.delete(k);
       }
       return Promise.resolve();
     }));
@@ -274,7 +285,12 @@ function isStaticAsset(url){
 const shellRequests=()=>ASSETS.map(asset=>new Request(asset,{cache:'reload'}));
 async function installShell(c){
   const keys=await caches.keys();
-  const oldShellName=keys.filter(k=>k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE).sort().pop();
+  const otherShells=keys.filter(k=>k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE).sort((a,b)=>{
+    const na=Number((a.match(/m025-(\d+)/)||[])[1]||0);
+    const nb=Number((b.match(/m025-(\d+)/)||[])[1]||0);
+    return na-nb;
+  });
+  const oldShellName=otherShells.pop();
   let oldCache=null;
   if(oldShellName){
     try{oldCache=await caches.open(oldShellName);}catch(_){}
@@ -295,6 +311,9 @@ async function installShell(c){
   }
   if(toFetch.length>0){
     await c.addAll(toFetch);
+  }
+  if(otherShells.length>0){
+    await Promise.all(otherShells.map(k=>caches.delete(k).catch(()=>{})));
   }
 }
 // Do not skipWaiting here. A new release is allowed to activate only after clients
@@ -449,7 +468,7 @@ self.addEventListener('fetch',e=>{
   if(e.request.mode==='navigate'){
     const cleanNavUrl=requestUrl.origin+requestUrl.pathname;
     const isSubHtml=/\/(call|misi|kurikulum|undercover|creator-report-dashboard|creator-report-setup)\.html$/i.test(requestUrl.pathname);
-    const isUpdateNav=requestUrl.searchParams.has('fz_upd')||requestUrl.searchParams.has('__fz_fresh')||requestUrl.searchParams.has('fz_healed');
+    const isUpdateNav=requestUrl.searchParams.has('fz_upd')||requestUrl.searchParams.has('__fz_fresh')||requestUrl.searchParams.has('fz_healed')||requestUrl.searchParams.has('fz_cutover');
     const cangkang=()=>caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true})
       .then(c=>c||(requestUrl.search?caches.match(cleanNavUrl,{cacheName:SHELL_CACHE}):null))
       .then(c=>c||(isSubHtml?null:caches.match('./index.html',{cacheName:SHELL_CACHE})));

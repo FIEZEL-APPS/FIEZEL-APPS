@@ -13,7 +13,7 @@
 (function () {
   'use strict';
 
-  var isLocal = typeof location !== 'undefined' && (
+  var isLocal = typeof location !== 'undefined' && !(typeof self !== 'undefined' && self.__FZ_FORCE_PROD_SW) && (
     location.hostname === 'localhost' ||
     location.hostname === '127.0.0.1' ||
     location.hostname === '0.0.0.0' ||
@@ -118,23 +118,46 @@
             }).catch(function () {});
           }
         } catch (_) {}
-        pingControllerRev().then(function (activeRev) {
+        Promise.all([
+          pingControllerRev(),
+          (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function')
+            ? navigator.serviceWorker.getRegistration().catch(function () { return null; })
+            : Promise.resolve(null)
+        ]).then(function (pair) {
+          var activeRev = (pair && pair[0]) || '';
+          var reg = (pair && pair[1]) || null;
+          var hasPendingWorker = !!(reg && (reg.waiting || reg.installing));
           var activeNum = parseBuildNum(activeRev);
           var activeShellName = activeRev ? ('fiezel-shell-' + activeRev) : '';
           var keepMinNum = (activeNum !== null && effectiveNum !== null)
             ? Math.max(activeNum, effectiveNum)
             : (activeNum !== null ? activeNum : effectiveNum);
           caches.keys().then(function (names) {
+            var maxPendingName = '';
+            var maxPendingNum = -1;
+            var fallbackKeepName = '';
+            var fallbackKeepNum = -1;
+            for (var j = 0; j < names.length; j++) {
+              var cand = names[j];
+              if (cand.indexOf('fiezel-shell-') !== 0) continue;
+              var cNum = parseBuildNum(cand);
+              if (cNum !== null && cNum > fallbackKeepNum) {
+                fallbackKeepNum = cNum;
+                fallbackKeepName = cand;
+              }
+              if (hasPendingWorker && cNum !== null && keepMinNum !== null && cNum > (activeNum !== null ? activeNum : keepMinNum) && cNum > maxPendingNum) {
+                maxPendingNum = cNum;
+                maxPendingName = cand;
+              }
+            }
             for (var i = 0; i < names.length; i++) {
               var name = names[i];
               if (name.indexOf('fiezel-shell-') === 0) {
                 if (activeShellName && name === activeShellName) continue;
-                var nNum = parseBuildNum(name);
-                // Jangan pernah menghapus cangkang rilis baru (> keepMinNum) yang sedang di-precache worker waiting/installing
-                if (nNum !== null && keepMinNum !== null && nNum >= keepMinNum && (!activeShellName || nNum > activeNum)) continue;
-                if (nNum !== null && keepMinNum !== null && nNum < keepMinNum) {
-                  try { caches.delete(name); } catch (_) {}
-                }
+                if (!activeShellName && fallbackKeepName && name === fallbackKeepName) continue;
+                // Hanya simpan maksimal SATU cangkang rilis baru apabila ada worker waiting/installing
+                if (hasPendingWorker && maxPendingName && name === maxPendingName) continue;
+                try { caches.delete(name); } catch (_) {}
               }
             }
             // Deteksi cangkang aktif yang tercemar aset HTTP disk cache lama di iOS WebKit:
@@ -160,9 +183,10 @@
               }).catch(function () {});
             }
           }).catch(function () {});
-          // Pemulihan split-brain dua arah:
+          // Pemulihan split-brain:
           // (A) activeNum > effectiveNum: controller SW sudah lebih baru daripada dokumen memori iOS PWA.
-          // (B) activeNum < pageNum || activeNum < effectiveNum: dokumen sudah memuat penanda build baru sementara controller SW lama masih menempel.
+          // (B) activeNum < pageNum || activeNum < effectiveNum: tampilkan popup pembaruan (#updateBanner)
+          //     secara eksplisit (DILARANG auto-update diam-diam tanpa persetujuan murid).
           if (activeNum !== null && effectiveNum !== null && activeNum > effectiveNum) {
             try {
               var stage = self.FiezelStage;
@@ -183,74 +207,10 @@
             } catch (_) {}
           } else if (activeNum !== null && effectiveNum !== null && (activeNum < effectiveNum || activeNum < pageNum)) {
             try {
-              var stageB = self.FiezelStage;
-              var inLessonB = !!(stageB && typeof stageB.lessonMode === 'function' && stageB.lessonMode() === true);
-              var promKey = 'fiezel-promoted-for';
-              if (!inLessonB && sessionStorage.getItem(promKey) !== effectiveBuild && navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
-                navigator.serviceWorker.getRegistration().then(function (reg) {
-                  if (!reg) return;
-                  var doPromote = function (w) {
-                    if (!w || sessionStorage.getItem(promKey) === effectiveBuild) return;
-                    sessionStorage.setItem(promKey, effectiveBuild);
-                    var onCtrl = function () {
-                      navigator.serviceWorker.removeEventListener('controllerchange', onCtrl);
-                      var bustB = window.location.pathname + '?fz_healed=' + Date.now() + window.location.hash;
-                      try { window.location.replace(bustB); } catch (_) { location.reload(); }
-                    };
-                    navigator.serviceWorker.addEventListener('controllerchange', onCtrl);
-                    try { w.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-                  };
-                  if (reg.waiting) {
-                    doPromote(reg.waiting);
-                  } else if (typeof reg.update === 'function') {
-                    reg.update().then(function () {
-                      if (reg.waiting) doPromote(reg.waiting);
-                    }).catch(function () {});
-                  }
-                }).catch(function () {});
-              }
+              self.FiezelUpdatePrompt?.check?.(true);
             } catch (_) {}
           }
         }).catch(function () {});
-      };
-      var isCurtainActive = function () {
-        try {
-          var stage = self.FiezelStage;
-          var inLesson = !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
-          if (inLesson) return false;
-          var splash = document.getElementById('fiezelBootSplash');
-          if (!splash) return false;
-          var style = window.getComputedStyle ? window.getComputedStyle(splash) : null;
-          if (style && style.display === 'none') return false;
-          if (splash.classList && splash.classList.contains('fz-fade-out')) return false;
-          return true;
-        } catch (_) {
-          return false;
-        }
-      };
-      var maybeAutoPromoteUnderCurtain = function (reg) {
-        if (!reg || !reg.waiting) return false;
-        var curtain = isCurtainActive();
-        var hidden = (typeof document !== 'undefined' && document.visibilityState === 'hidden');
-        if (!curtain && !hidden) return false;
-        try {
-          var stage = self.FiezelStage;
-          var inLesson = !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
-          if (inLesson) return false;
-          var promKey = 'fiezel-promoted-waiting';
-          if (sessionStorage.getItem(promKey) === '1') return false;
-          sessionStorage.setItem(promKey, '1');
-          var onCtrl = function () {
-            navigator.serviceWorker.removeEventListener('controllerchange', onCtrl);
-            var bust = window.location.pathname + '?fz_cutover=' + Date.now() + window.location.hash;
-            try { window.location.replace(bust); } catch (_) { location.reload(); }
-          };
-          navigator.serviceWorker.addEventListener('controllerchange', onCtrl);
-          try { reg.waiting.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-          return true;
-        } catch (_) {
-          return false;
-        }
       };
       var checkSwUpdateNow = function () {
         sweepStaleShellCaches();
@@ -260,9 +220,7 @@
               if (reg && typeof reg.update === 'function') {
                 reg.update().then(function () {
                   try {
-                    if (!maybeAutoPromoteUnderCurtain(reg)) {
-                      self.FiezelUpdatePrompt?.check?.(true);
-                    }
+                    self.FiezelUpdatePrompt?.check?.(true);
                   } catch (_) {}
                 }).catch(function () {});
               }
@@ -278,33 +236,17 @@
       document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
           checkSwUpdateNow();
-        } else if (document.visibilityState === 'hidden') {
-          try {
-            if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
-              navigator.serviceWorker.getRegistration().then(function (reg) {
-                if (reg && reg.waiting) maybeAutoPromoteUnderCurtain(reg);
-              }).catch(function () {});
-            }
-          } catch (_) {}
         }
       });
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (reg) {
         if (reg) {
-          if (reg.waiting) {
-            if (!maybeAutoPromoteUnderCurtain(reg)) {
-              try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
-            }
-          } else {
-            try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
-          }
+          try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
           reg.addEventListener('updatefound', function () {
             var worker = reg.installing;
             if (!worker) return;
             worker.addEventListener('statechange', function () {
               if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-                if (!maybeAutoPromoteUnderCurtain(reg)) {
-                  try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
-                }
+                try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
               }
             });
           });
@@ -312,9 +254,7 @@
             try {
               reg.update().then(function () {
                 try {
-                  if (!maybeAutoPromoteUnderCurtain(reg)) {
-                    self.FiezelUpdatePrompt?.check?.(false);
-                  }
+                  self.FiezelUpdatePrompt?.check?.(false);
                 } catch (_) {}
               }).catch(function () {});
             } catch (_) {}
