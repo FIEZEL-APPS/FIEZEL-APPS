@@ -86,7 +86,7 @@
     // dan meminta dokumen baru ke Service Worker yang baru aktif.
     var bustParam = 'fz_upd=' + Date.now();
     var cleanPairs = String(location.search || '').replace(/^\?/, '').split('&').filter(function (part) {
-      return part && !/^(?:fz_upd|fz_healed|__fz_fresh)=/i.test(part);
+      return part && !/^(?:fz_upd|fz_healed|fz_cutover|__fz_fresh)=/i.test(part);
     });
     cleanPairs.push(bustParam);
     var curSearch = '?' + cleanPairs.join('&');
@@ -171,13 +171,24 @@
     if (typeof caches === 'undefined' || !caches.keys) return Promise.resolve();
     return caches.keys().then(function (names) {
       var target = bestBuild || '';
+      var appBuildNum = parseBuild(APP_BUILD);
+      var maxNewerShellName = '';
+      var maxNewerShellNum = -1;
+      for (var i = 0; i < names.length; i++) {
+        var cand = names[i];
+        if (cand.indexOf('fiezel-shell-') !== 0) continue;
+        var cNum = parseBuild(cand);
+        if (cNum !== null && (appBuildNum === null || cNum > appBuildNum) && cNum > maxNewerShellNum) {
+          maxNewerShellNum = cNum;
+          maxNewerShellName = cand;
+        }
+      }
       return Promise.all(names.map(function (name) {
         // Cangkang shell versi lama yang bukan target rilis baru
         if (name.indexOf('fiezel-shell-') === 0) {
           var cacheBuildNum = parseBuild(name);
-          var appBuildNum = parseBuild(APP_BUILD);
-          // Jangan pernah menghapus cangkang rilis yang lebih baru dari build halaman aktif!
-          if (cacheBuildNum !== null && appBuildNum !== null && cacheBuildNum > appBuildNum) {
+          // Pertahankan HANYA satu cangkang rilis paling baru (tidak boleh menumpuk cangkang antara!)
+          if (maxNewerShellName && name === maxNewerShellName) {
             return Promise.resolve();
           }
           // Jangan menghapus cangkang halaman aktif sebelum worker baru activated agar
@@ -185,11 +196,11 @@
           if (!includeCurrentShell && cacheBuildNum !== null && appBuildNum !== null && cacheBuildNum === appBuildNum) {
             return Promise.resolve();
           }
-          // Bila target rilis baru sudah diketahui, pertahankan cangkang target rilis baru
+          // Bila target rilis baru sudah diketahui dan cocok persis, pertahankan cangkang target rilis baru
           if (target && name.indexOf(target) !== -1) {
             return Promise.resolve();
           }
-          // Selain cangkang rilis baru, SEMUA cangkang shell lama WAJIB dihapus bersih!
+          // Selain cangkang rilis terbaru itu, SEMUA cangkang shell lama WAJIB dihapus bersih!
           return caches.delete(name);
         }
         // Cache runtime data (fiezel-v*): hapus berkas non-neural basi

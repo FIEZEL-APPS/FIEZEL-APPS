@@ -1,7 +1,7 @@
 {
-  "version": "m025-785",
-  "claimedBy": "branch fix/kawan-mic-parity-m025-785",
-  "claimedAt": "2026-11-09T19:02:31.227Z",
-  "reason": "fix(voice): enforce kawan bicara mobile pwa mic parity with mochi sos and 13-point ci contract gate",
+  "version": "m025-786",
+  "claimedBy": "branch fix/kawan-mic-update-popup-m025-786",
+  "claimedAt": "2026-11-09T20:47:53.193Z",
+  "reason": "fix(voice,pwa): [ALLOW-PROTECTED: pwa] instant mochi opening voice, 2-stage same-realm mic activation, visible update popup, and shell cache purge (m025-786)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

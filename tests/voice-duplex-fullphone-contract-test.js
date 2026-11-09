@@ -29,14 +29,14 @@ const appTsxPath = path.join(ROOT, 'features/voice-studio/src/App.tsx');
 assert.ok(fs.existsSync(appTsxPath), 'features/voice-studio/src/App.tsx wajib ada');
 const appTsxContent = fs.readFileSync(appTsxPath, 'utf8');
 
-console.log('[Test 1] Kawan Bicara: Peniadaan Browser SpeechRecognition di Mode ws-duplex');
+console.log('[Test 1] Kawan Bicara: Peniadaan Browser SpeechRecognition di Mode ws-duplex Saat Mic Hardware Aktif');
 assert.ok(
-  appTsxContent.includes("if (isLiveConnected && liveTransportMode === 'ws-duplex')"),
-  'Wajib memiliki bypass guard eksplisit ws-duplex di awal useEffect pengenal ucapan'
+  appTsxContent.includes("if (isLiveConnected && liveTransportMode === 'ws-duplex' && hasLiveHardwareMic)"),
+  'Wajib memiliki bypass guard eksplisit ws-duplex saat hasLiveHardwareMic aktif di awal useEffect pengenal ucapan'
 );
 assert.ok(
-  appTsxContent.includes('We MUST NEVER initialize or run browser SpeechRecognition in ws-duplex mode!'),
-  'Wajib memiliki dokumentasi penegakan zero-SpeechRecognition di mode duplex'
+  appTsxContent.includes('Do NOT run browser SpeechRecognition simultaneously when hardware mic PCM is active'),
+  'Wajib memiliki dokumentasi penegakan zero-SpeechRecognition saat mic PCM aktif di mode duplex'
 );
 console.log('  ✓ Browser SpeechRecognition flapping di mode ws-duplex tereliminasi 100%');
 
@@ -144,28 +144,34 @@ const distVoiceStudioContent = fs.readFileSync(
   'utf8'
 );
 
-console.log('[Test 8] Kawan Bicara: Larangan Mutlak Pembajakan getUserMedia & Cross-Realm AudioContext oleh Jendela Induk');
-assert.strictEqual(
-  appJsContent.includes('__fzSharedLiveAudioCtx') ||
-    appJsContent.includes('__fzSharedMicStream') ||
-    appJsContent.includes('__fzSharedMicStreamPromise'),
-  false,
-  'app.js DILARANG KERAS membuat __fzSharedLiveAudioCtx atau memanggil getUserMedia untuk iframe call.html'
+console.log('[Test 8] Kawan Bicara: 2-Stage Same-Realm AudioContext & Mic Bridge (100% Mochi SOS Parity)');
+assert.ok(
+  appJsContent.includes('function ensureSharedKawanAudioCtx()') &&
+    appJsContent.includes('function wireSharedKawanMicBridge(stream)') &&
+    appJsContent.includes('function warmKawanAudioAndMic()') &&
+    appJsContent.includes('self.__fzEnsureSharedLiveAudioCtx=ensureSharedKawanAudioCtx;') &&
+    appJsContent.includes('self.__fzWireSharedMicBridge=wireSharedKawanMicBridge;'),
+  'app.js wajib menyediakan jembatan same-realm __fzEnsureSharedLiveAudioCtx, __fzWireSharedMicBridge, dan __fzWarmKawanAudioAndMic di jendela utama'
 );
-assert.strictEqual(
-  interactiveChatContent.includes('__fzSharedLiveAudioCtx') ||
-    interactiveChatContent.includes('__fzSharedMicStream'),
-  false,
-  'fiezel-interactive-chat.js DILARANG KERAS membuat __fzSharedLiveAudioCtx lintas-iframe'
+const modalOpenIdx = appJsContent.indexOf('function openKawanBicaraCallModal()');
+const modalEndIdx = appJsContent.indexOf('window.openKawanBicaraCallModal=openKawanBicaraCallModal;', modalOpenIdx);
+const modalSlice = modalOpenIdx >= 0 && modalEndIdx > modalOpenIdx ? appJsContent.slice(modalOpenIdx, modalEndIdx) : '';
+const warmCallsInModal = (modalSlice.match(/warmKawanAudioAndMic\(\)/g) || []).length;
+assert.ok(
+  warmCallsInModal >= 2,
+  'openKawanBicaraCallModal() wajib memanggil warmKawanAudioAndMic() di Stage 1 (saat modal dibuka) DAN Stage 2 (saat tombol telepon diketuk)'
 );
-assert.strictEqual(
-  appTsxContent.includes('__fzSharedLiveAudioCtx') ||
-    appTsxContent.includes('__fzSharedMicStream') ||
-    appTsxContent.includes('parentSharedCtx'),
-  false,
-  'App.tsx DILARANG KERAS mengadopsi AudioContext atau MediaStream lintas-realm dari window.parent'
+assert.ok(
+  modalSlice.includes('closeKawanBicaraCallModal(true);go(\'chat\')'),
+  'Saat tombol telepon diketuk, closeKawanBicaraCallModal(true) wajib mempertahankan shared AudioContext & mic stream menuju call.html'
 );
-console.log('  ✓ Isolasi same-realm AudioContext & getUserMedia di dalam call.html terjamin 100%');
+assert.ok(
+  appTsxContent.includes('parentWin.__fzEnsureSharedLiveAudioCtx') &&
+    appTsxContent.includes('parentWin.__fzWireSharedMicBridge(stream)') &&
+    appTsxContent.includes('parentWin.__fzSharedMicPcmCallback = (samples: Float32Array) => {'),
+  'App.tsx wajib mengadopsi __fzEnsureSharedLiveAudioCtx untuk suara pembuka instan Mochi dan __fzWireSharedMicBridge untuk pemrosesan PCM 2048 sampel same-realm'
+);
+console.log('  ✓ 2-Stage Same-Realm AudioContext & Mic Bridge (Mochi langsung bicara + mic langsung aktif) terjamin 100%');
 
 console.log('[Test 9] Kawan Bicara: Same-Realm AudioContext Unlock (1-Frame Silent Buffer) & Direct Gesture Call Start');
 assert.ok(
@@ -191,8 +197,9 @@ assert.ok(
   'App.tsx wajib memiliki detektor pita vokal manusia analyzeHumanVoiceBandFrame (300Hz-3300Hz)'
 );
 assert.ok(
-  appTsxContent.includes('const processor = liveCtx.createScriptProcessor(2048, 1, 1);'),
-  'attachScriptProcessorFallback wajib menggunakan ukuran buffer rendah-latensi 2048 sampel (42.6ms)'
+  appTsxContent.includes('createScriptProcessor(2048, 1, 1)') &&
+    appJsContent.includes('ctx.createScriptProcessor(2048,1,1)'),
+  'ScriptProcessor wajib menggunakan ukuran buffer rendah-latensi 2048 sampel (42.6ms) di kedua jembatan'
 );
 assert.ok(
   appTsxContent.includes('(v.isHumanSpeech || vadRes.inSpeech || v.rms >= 0.005) && v.rms >= 0.0022'),
@@ -205,11 +212,12 @@ assert.ok(
 );
 console.log('  ✓ Formant-Band VAD, 2048-sample ScriptProcessor, dan HandyVad -65dB terverifikasi');
 
-console.log('[Test 11] Kawan Bicara: Proteksi Sapaan Pembuka (awaitingOpeningTurnRef) & Anti-Drop Balasan Suara AI');
+console.log('[Test 11] Kawan Bicara: Proteksi Sapaan Pembuka (awaitingOpeningTurnRef 2200ms) & Anti-Drop Balasan Suara AI');
 assert.ok(
   appTsxContent.includes('if (awaitingOpeningTurnRef.current) {\n      clearUserBurstEndTimer();\n      return;\n    }') &&
-    appTsxContent.includes('awaitingOpeningTurnRef.current = true;\n                isAiServerTurnOpenRef.current = true;'),
-  'Sapaan pembuka wajib dilindungi oleh awaitingOpeningTurnRef dan isAiServerTurnOpenRef dari tabrakan mic awal'
+    appTsxContent.includes('awaitingOpeningTurnRef.current = true;') &&
+    appTsxContent.includes('}, 2200);'),
+  'Sapaan pembuka wajib dilindungi oleh awaitingOpeningTurnRef (2200ms) dan membebaskan mic seketika sesudahnya'
 );
 assert.strictEqual(
   /if\s*\(\s*userAudioBurstActiveRef\.current\s*\|\|/.test(appTsxContent),
@@ -236,11 +244,10 @@ assert.strictEqual(
 console.log('  ✓ Aliran kontinu 16kHz PCM & kebersihan customVocabTerms terverifikasi');
 
 console.log('[Test 13] Kawan Bicara: Integritas Bundle Produksi dist/voice-studio.js');
-assert.strictEqual(
-  distVoiceStudioContent.includes('__fzSharedLiveAudioCtx') ||
-    distVoiceStudioContent.includes('__fzSharedMicStream'),
-  false,
-  'Bundle produksi dist/voice-studio.js wajib bersih dari referensi __fzSharedLiveAudioCtx / __fzSharedMicStream'
+assert.ok(
+  distVoiceStudioContent.includes('__fzWireSharedMicBridge') &&
+    distVoiceStudioContent.includes('__fzEnsureSharedLiveAudioCtx'),
+  'Bundle produksi dist/voice-studio.js wajib memuat jembatan same-realm __fzWireSharedMicBridge & __fzEnsureSharedLiveAudioCtx'
 );
 assert.ok(
   distVoiceStudioContent.includes('Ketuk untuk Aktifkan Mic'),

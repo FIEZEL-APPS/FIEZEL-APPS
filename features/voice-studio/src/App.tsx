@@ -750,11 +750,36 @@ export default function App() {
     });
   };
 
+  const getParentWin = (): any => {
+    try {
+      if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+        return window.parent as any;
+      }
+    } catch {}
+    return null;
+  };
+
   const syncMicHardwareReadyState = () => {
+    const parentWin = getParentWin();
+    const activeStream =
+      micStreamRef.current &&
+      micStreamRef.current.getAudioTracks?.().some((t) => t.readyState === 'live')
+        ? micStreamRef.current
+        : parentWin?.__fzSharedMicStream &&
+            parentWin.__fzSharedMicStream.getAudioTracks?.().some((t: any) => t.readyState === 'live')
+          ? (parentWin.__fzSharedMicStream as MediaStream)
+          : null;
+    if (activeStream && micStreamRef.current !== activeStream) {
+      micStreamRef.current = activeStream;
+    }
     const hasLiveTrack = Boolean(
-      micStreamRef.current?.getAudioTracks?.().some((t) => t.readyState === 'live')
+      activeStream?.getAudioTracks?.().some((t) => t.readyState === 'live')
     );
-    const ctxRunning = liveAudioCtxRef.current?.state === 'running';
+    const activeCtx =
+      liveAudioCtxRef.current ||
+      inputAudioCtxRef.current ||
+      (parentWin?.__fzSharedLiveAudioCtx as AudioContext | undefined);
+    const ctxRunning = activeCtx?.state === 'running';
     const ready = Boolean(hasLiveTrack && ctxRunning);
     if (isMicHardwareReadyRef.current !== ready) {
       isMicHardwareReadyRef.current = ready;
@@ -821,50 +846,65 @@ export default function App() {
   /** Unlocks Web Audio + one persistent HTMLAudioElement inside a user gesture (100% same-realm Mochi SOS parity). */
   const primeAudioPlayback = () => {
     try {
+      const parentWin = getParentWin();
+      const sharedParentCtx: AudioContext | null =
+        (parentWin && typeof parentWin.__fzEnsureSharedLiveAudioCtx === 'function'
+          ? parentWin.__fzEnsureSharedLiveAudioCtx()
+          : null) ||
+        (parentWin?.__fzSharedLiveAudioCtx && parentWin.__fzSharedLiveAudioCtx.state !== 'closed'
+          ? (parentWin.__fzSharedLiveAudioCtx as AudioContext)
+          : null);
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioCtx) {
-        if (!ttsAudioCtxRef.current || ttsAudioCtxRef.current.state === 'closed') {
-          try {
-            ttsAudioCtxRef.current = new AudioCtx({ latencyHint: 'interactive' });
-          } catch {
-            ttsAudioCtxRef.current = new AudioCtx();
+      if (sharedParentCtx || AudioCtx) {
+        if (sharedParentCtx && sharedParentCtx.state !== 'closed') {
+          liveAudioCtxRef.current = sharedParentCtx;
+          ttsAudioCtxRef.current = sharedParentCtx;
+        } else if (AudioCtx) {
+          if (!ttsAudioCtxRef.current || ttsAudioCtxRef.current.state === 'closed') {
+            try {
+              ttsAudioCtxRef.current = new AudioCtx({ latencyHint: 'interactive' });
+            } catch {
+              ttsAudioCtxRef.current = new AudioCtx();
+            }
+          }
+          if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
+            try {
+              liveAudioCtxRef.current = new AudioCtx({ latencyHint: 'interactive' });
+            } catch {
+              liveAudioCtxRef.current = new AudioCtx();
+            }
+            nextStartTimeRef.current = liveAudioCtxRef.current.currentTime;
           }
         }
-        if (ttsAudioCtxRef.current.state === 'suspended') {
+        if (ttsAudioCtxRef.current && ttsAudioCtxRef.current.state === 'suspended') {
           void ttsAudioCtxRef.current.resume().catch(() => {});
         }
-        if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
-          try {
-            liveAudioCtxRef.current = new AudioCtx({ latencyHint: 'interactive' });
-          } catch {
-            liveAudioCtxRef.current = new AudioCtx();
-          }
-          nextStartTimeRef.current = liveAudioCtxRef.current.currentTime;
-        }
         const liveCtx = liveAudioCtxRef.current;
-        liveCtx.onstatechange = () => {
-          syncMicHardwareReadyState();
-        };
-        outputAudioCtxRef.current = liveCtx;
-        inputAudioCtxRef.current = liveCtx;
-        // CRITICAL: Never reset nextStartTimeRef.current to liveCtx.currentTime on pointerdown/keydown
-        // while activeSourcesRef chunks are already queued in the future!
-        if (activeSourcesRef.current.length === 0 && nextStartTimeRef.current < liveCtx.currentTime) {
-          nextStartTimeRef.current = liveCtx.currentTime;
-        }
-        if (liveCtx.state === 'suspended') {
-          void liveCtx.resume().then(() => {
+        if (liveCtx) {
+          liveCtx.onstatechange = () => {
             syncMicHardwareReadyState();
-          }).catch(() => {});
-        }
-        try {
-          const silentBuf = liveCtx.createBuffer(1, 1, liveCtx.sampleRate || 24000);
-          const silentSrc = liveCtx.createBufferSource();
-          silentSrc.buffer = silentBuf;
-          silentSrc.connect(liveCtx.destination);
-          silentSrc.start(0);
-        } catch {
-          // Ignore
+          };
+          outputAudioCtxRef.current = liveCtx;
+          inputAudioCtxRef.current = liveCtx;
+          // CRITICAL: Never reset nextStartTimeRef.current to liveCtx.currentTime on pointerdown/keydown
+          // while activeSourcesRef chunks are already queued in the future!
+          if (activeSourcesRef.current.length === 0 && nextStartTimeRef.current < liveCtx.currentTime) {
+            nextStartTimeRef.current = liveCtx.currentTime;
+          }
+          if (liveCtx.state === 'suspended') {
+            void liveCtx.resume().then(() => {
+              syncMicHardwareReadyState();
+            }).catch(() => {});
+          }
+          try {
+            const silentBuf = liveCtx.createBuffer(1, 1, liveCtx.sampleRate || 24000);
+            const silentSrc = liveCtx.createBufferSource();
+            silentSrc.buffer = silentBuf;
+            silentSrc.connect(liveCtx.destination);
+            silentSrc.start(0);
+          } catch {
+            // Ignore
+          }
         }
         syncMicHardwareReadyState();
       }
@@ -2887,11 +2927,19 @@ export default function App() {
 
   // Hands-free Continuous Voice Recognition for "Telepon Live"
   useEffect(() => {
-    // 1. In WebSocket Full-Duplex mode ("Telepon Live"), audio input is 100% handled
-    // by continuous hardware microphone PCM streaming via Silero/Handy VAD directly to Gemini Live WS.
-    // We MUST NEVER initialize or run browser SpeechRecognition in ws-duplex mode!
-    // Running SpeechRecognition causes OS audio focus renegotiation, mic cutoffs, and beeping on Android/iOS!
-    if (isLiveConnected && liveTransportMode === 'ws-duplex') {
+    const parentWin = getParentWin();
+    const hasLiveHardwareMic = Boolean(
+      (micStreamRef.current &&
+        micStreamRef.current.getAudioTracks?.().some((tr) => tr.readyState === 'live' && tr.enabled)) ||
+        (parentWin?.__fzSharedMicStream &&
+          parentWin.__fzSharedMicStream.getAudioTracks?.().some((tr: any) => tr.readyState === 'live' && tr.enabled))
+    );
+
+    // 1. In WebSocket Full-Duplex mode ("Telepon Live") WITH an active hardware microphone stream,
+    // audio input is 100% handled by continuous 16kHz PCM streaming directly to Gemini Live WS.
+    // Do NOT run browser SpeechRecognition simultaneously when hardware mic PCM is active, as
+    // parallel SpeechRecognition causes OS audio focus renegotiation on Android/iOS (Mochi SOS parity).
+    if (isLiveConnected && liveTransportMode === 'ws-duplex' && hasLiveHardwareMic) {
       if (liveSpeechRecRef.current) {
         try {
           liveSpeechRecRef.current.onresult = null;
@@ -2943,22 +2991,6 @@ export default function App() {
     const isMobileDevice =
       typeof navigator !== 'undefined' &&
       (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
-    const hasLiveHardwareMic = Boolean(
-      micStreamRef.current &&
-        micStreamRef.current.getAudioTracks().some((tr) => tr.readyState === 'live' && tr.enabled)
-    );
-
-    // On mobile PWA devices (iPhone/Android), when Gemini Live ws-duplex is active with a live
-    // hardware microphone stream, native 16kHz PCM audio is already streamed directly to Gemini Live
-    // via Silero/Handy VAD (~352ms end-of-speech turn completion). Running webkitSpeechRecognition
-    // in parallel on mobile causes OS audio-session contention and 3.2s-4.5s "jeda berpikir" delay!
-    if (isMobileDevice && liveTransportMode === 'ws-duplex' && hasLiveHardwareMic) {
-      setIsWaitingAfterSpeech(false);
-      setIsListeningLiveSpeech(true);
-      return () => {
-        setIsWaitingAfterSpeech(false);
-      };
-    }
 
     const SpeechRec =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -3185,6 +3217,7 @@ export default function App() {
   }, [
     isLiveConnected,
     liveTransportMode,
+    isMicHardwareReady,
     isPlayingAiAudio,
     isAnalyzingTurn,
     isMicMuted,
@@ -3644,7 +3677,40 @@ export default function App() {
         new Promise<void>((r) => setTimeout(r, 150)),
       ]);
     }
-    syncMicHardwareReadyState();
+
+    handyVadRef.current.reset();
+    preRollFramesRef.current = [];
+    consecutiveSpeechFramesRef.current = 0;
+    bargeSpeechStreakRef.current = 0;
+    userAudioBurstActiveRef.current = false;
+    lastHandySpeechAtRef.current = 0;
+    try {
+      (window as any).__fzVoiceStudioHandyVad = handyVadRef.current;
+    } catch {}
+
+    // 1. Same-Realm Top-Level Bridge (100% Mochi SOS parity when mounted inside index.html):
+    // When stream was pre-warmed in index.html (`window.parent`), wire MediaStreamAudioSourceNode
+    // + ScriptProcessorNode(2048, 1, 1) directly inside `window.parent` on `__fzSharedLiveAudioCtx`
+    // so `AudioContext`, `MediaStream`, and `ScriptProcessorNode` are 100% in the exact same realm!
+    const parentWin = getParentWin();
+    const isParentStream = Boolean(
+      parentWin &&
+        (stream === parentWin.__fzSharedMicStream ||
+          (typeof window.MediaStream !== 'undefined' && !(stream instanceof window.MediaStream)))
+    );
+    if (parentWin && typeof parentWin.__fzWireSharedMicBridge === 'function' && isParentStream) {
+      parentWin.__fzSharedMicPcmCallback = (samples: Float32Array) => {
+        handleMicPcmData(samples);
+      };
+      const wiredInParent = Boolean(parentWin.__fzWireSharedMicBridge(stream));
+      if (wiredInParent) {
+        try {
+          (window as any).__fzLiveProcessor = parentWin.__fzSharedMicProcessor;
+        } catch {}
+        syncMicHardwareReadyState();
+        return;
+      }
+    }
 
     if (micSourceNodeRef.current) {
       try {
@@ -3667,24 +3733,45 @@ export default function App() {
       scriptProcessorRef.current = null;
     }
 
+    // Ensure same-realm AudioContext when wiring a stream created inside call.html's own window
+    const LocalAudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    let micCtx: AudioContext = liveCtx;
+    if (
+      LocalAudioCtx &&
+      typeof window.MediaStream !== 'undefined' &&
+      stream instanceof window.MediaStream &&
+      !(liveCtx instanceof LocalAudioCtx)
+    ) {
+      if (
+        !inputAudioCtxRef.current ||
+        inputAudioCtxRef.current.state === 'closed' ||
+        !(inputAudioCtxRef.current instanceof LocalAudioCtx)
+      ) {
+        try {
+          inputAudioCtxRef.current = new LocalAudioCtx({ latencyHint: 'interactive' });
+        } catch {
+          inputAudioCtxRef.current = new LocalAudioCtx();
+        }
+      }
+      micCtx = inputAudioCtxRef.current;
+      if (micCtx.state === 'suspended') {
+        await Promise.race([
+          micCtx.resume().catch(() => {}),
+          new Promise<void>((r) => setTimeout(r, 150)),
+        ]);
+      }
+    }
+    syncMicHardwareReadyState();
+
     try {
-      const source = liveCtx.createMediaStreamSource(stream);
+      const source = micCtx.createMediaStreamSource(stream);
       micSourceNodeRef.current = source;
-      handyVadRef.current.reset();
-      preRollFramesRef.current = [];
-      consecutiveSpeechFramesRef.current = 0;
-      bargeSpeechStreakRef.current = 0;
-      userAudioBurstActiveRef.current = false;
-      lastHandySpeechAtRef.current = 0;
-      try {
-        (window as any).__fzVoiceStudioHandyVad = handyVadRef.current;
-      } catch {}
 
       // Start Self-Hosted Silero Neural VAD v5 if available
       sileroVadGateRef.current?.destroy();
       const sileroGate = new SileroNeuralVadGate();
       sileroVadGateRef.current = sileroGate;
-      void sileroGate.start(stream, liveCtx, {
+      void sileroGate.start(stream, micCtx, {
         isMicMuted: () => isMicMutedRef.current,
         isAiPlaying: () => isPlayingAiAudioRef.current,
         isWorkbenchOpen: () => isWorkbenchOpenRef.current,
@@ -3741,30 +3828,30 @@ export default function App() {
 
       const attachScriptProcessorFallback = () => {
         if (scriptProcessorRef.current) return;
-        const processor = liveCtx.createScriptProcessor(2048, 1, 1);
+        const processor = micCtx.createScriptProcessor(2048, 1, 1);
         scriptProcessorRef.current = processor;
         (window as any).__fzLiveProcessor = processor;
 
         processor.onaudioprocess = (e) => {
-          if (liveCtx.state === 'suspended') {
-            void liveCtx.resume().catch(() => {});
+          if (micCtx.state === 'suspended') {
+            void micCtx.resume().catch(() => {});
           }
           handleMicPcmData(e.inputBuffer.getChannelData(0));
         };
 
-        const muteGain = liveCtx.createGain();
+        const muteGain = micCtx.createGain();
         // Positive tiny non-zero gain prevents Chrome & WebKit power-saving from throttling onaudioprocess
         muteGain.gain.value = 0.00001;
         source.connect(processor);
         processor.connect(muteGain);
-        muteGain.connect(liveCtx.destination);
+        muteGain.connect(micCtx.destination);
       };
 
       // On Desktop Chromium: Try AudioWorklet first with a 500ms frame watchdog
       if (
         !isMobileOrIOSWebKit &&
-        liveCtx.audioWorklet &&
-        typeof liveCtx.audioWorklet.addModule === 'function' &&
+        micCtx.audioWorklet &&
+        typeof micCtx.audioWorklet.addModule === 'function' &&
         typeof window !== 'undefined' &&
         window.isSecureContext
       ) {
@@ -3800,10 +3887,10 @@ export default function App() {
           `;
           const blob = new Blob([workletCode], { type: 'application/javascript' });
           const url = URL.createObjectURL(blob);
-          await liveCtx.audioWorklet.addModule(url);
+          await micCtx.audioWorklet.addModule(url);
           URL.revokeObjectURL(url);
 
-          const workletNode = new AudioWorkletNode(liveCtx, 'live-mic-capture-processor');
+          const workletNode = new AudioWorkletNode(micCtx, 'live-mic-capture-processor');
           audioWorkletNodeRef.current = workletNode;
 
           workletNode.port.onmessage = (e: MessageEvent<Float32Array>) => {
@@ -3812,10 +3899,10 @@ export default function App() {
           };
 
           source.connect(workletNode);
-          const dummyGain = liveCtx.createGain();
+          const dummyGain = micCtx.createGain();
           dummyGain.gain.value = 0.00001;
           workletNode.connect(dummyGain);
-          dummyGain.connect(liveCtx.destination);
+          dummyGain.connect(micCtx.destination);
           workletInitialized = true;
 
           window.setTimeout(() => {
@@ -3890,16 +3977,27 @@ export default function App() {
     setIsMicMuted(false);
     isMicMutedRef.current = false;
 
-    // 1. Prime Unified Live AudioContext (100% same-realm Mochi SOS parity)
+    // 1. Prime Unified Live AudioContext (adopt gesture-unlocked parent AudioContext first, Mochi SOS parity)
+    const parentWin = getParentWin();
+    const sharedParentCtx: AudioContext | null =
+      (parentWin && typeof parentWin.__fzEnsureSharedLiveAudioCtx === 'function'
+        ? parentWin.__fzEnsureSharedLiveAudioCtx()
+        : null) ||
+      (parentWin?.__fzSharedLiveAudioCtx && parentWin.__fzSharedLiveAudioCtx.state !== 'closed'
+        ? (parentWin.__fzSharedLiveAudioCtx as AudioContext)
+        : null);
     const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
+    if (sharedParentCtx && sharedParentCtx.state !== 'closed') {
+      liveAudioCtxRef.current = sharedParentCtx;
+      ttsAudioCtxRef.current = sharedParentCtx;
+    } else if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
       try {
         liveAudioCtxRef.current = new CtxClass({ latencyHint: 'interactive' });
       } catch {
         liveAudioCtxRef.current = new CtxClass();
       }
     }
-    const liveCtx = liveAudioCtxRef.current;
+    const liveCtx = liveAudioCtxRef.current!;
     liveCtx.onstatechange = () => {
       syncMicHardwareReadyState();
     };
@@ -3912,27 +4010,46 @@ export default function App() {
       }).catch(() => {});
     }
 
-    // 2. Dapatkan mikrofon langsung di realm call.html (seperti Mochi SOS)
+    // 2. Adopt pre-warmed mic stream from index.html (`__fzSharedMicStream` / `__fzSharedMicStreamPromise`)
+    // or acquire directly in call.html (100% Mochi SOS parity)
     let stream: MediaStream | null =
       preAcquiredStream && preAcquiredStream.getAudioTracks?.().some((t) => t.readyState === 'live')
         ? preAcquiredStream
         : micStreamRef.current && micStreamRef.current.getAudioTracks?.().some((t) => t.readyState === 'live')
           ? micStreamRef.current
-          : null;
+          : parentWin?.__fzSharedMicStream &&
+              parentWin.__fzSharedMicStream.getAudioTracks?.().some((t: any) => t.readyState === 'live')
+            ? (parentWin.__fzSharedMicStream as MediaStream)
+            : null;
+    if (!stream && parentWin?.__fzSharedMicStreamPromise) {
+      try {
+        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
+        const sharedRes = await Promise.race([
+          parentWin.__fzSharedMicStreamPromise as Promise<MediaStream | null>,
+          timeoutPromise,
+        ]);
+        if (sharedRes && sharedRes.getAudioTracks?.().some((t) => t.readyState === 'live')) {
+          stream = sharedRes;
+        }
+      } catch {}
+    }
     if (!stream && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
       try {
-        const getStreamPromise = navigator.mediaDevices
-          .getUserMedia({
-            audio: {
-              channelCount: 1,
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true,
-            },
-          })
-          .catch(() => {
-            return navigator.mediaDevices.getUserMedia({ audio: true });
-          });
+        const getStreamPromise =
+          parentWin && typeof parentWin.__fzWarmKawanAudioAndMic === 'function'
+            ? (parentWin.__fzWarmKawanAudioAndMic() as Promise<MediaStream | null>)
+            : navigator.mediaDevices
+                .getUserMedia({
+                  audio: {
+                    channelCount: 1,
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true,
+                  },
+                })
+                .catch(() => {
+                  return navigator.mediaDevices.getUserMedia({ audio: true });
+                });
         // Beri waktu 4000ms untuk dialog izin mic di Android/iOS
         const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
         const res = await Promise.race([getStreamPromise, timeoutPromise]);
@@ -4332,14 +4449,17 @@ export default function App() {
               try {
                 openingGreetingCompletedRef.current = false;
                 awaitingOpeningTurnRef.current = true;
-                isAiServerTurnOpenRef.current = true;
                 if (awaitingOpeningTimerRef.current) {
                   window.clearTimeout(awaitingOpeningTimerRef.current);
                 }
                 awaitingOpeningTimerRef.current = window.setTimeout(() => {
                   awaitingOpeningTurnRef.current = false;
                   awaitingOpeningTimerRef.current = null;
-                }, 4000);
+                  if (!isPlayingAiAudioRef.current && activeSourcesRef.current.length === 0) {
+                    isAiServerTurnOpenRef.current = false;
+                    openingGreetingCompletedRef.current = true;
+                  }
+                }, 2200);
                 ws.send(
                   JSON.stringify({
                     clientContent: {
@@ -4698,6 +4818,8 @@ export default function App() {
           // Turn Complete, evaluate learner utterance and record Braincore mastery
           const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
           if (isGoogleTurnComplete || msg.type === 'turn_complete') {
+            awaitingOpeningTurnRef.current = false;
+            openingGreetingCompletedRef.current = true;
             isAiServerTurnOpenRef.current = false;
             if (
               activeSourcesRef.current.length === 0 ||
@@ -5092,6 +5214,17 @@ export default function App() {
     } catch {
       // Ignore
     }
+    try {
+      const parentWin = getParentWin();
+      if (parentWin) {
+        parentWin.__fzSharedMicPcmCallback = null;
+        if (typeof parentWin.__fzStopSharedMicBridge === 'function') {
+          parentWin.__fzStopSharedMicBridge();
+        }
+      }
+    } catch {
+      // Ignore
+    }
     if (micStreamRef.current) {
       try {
         micStreamRef.current.getTracks().forEach((tr) => tr.stop());
@@ -5176,30 +5309,48 @@ export default function App() {
 
   const toggleMuteMic = async () => {
     playFiezelSfx('button_tap');
+    const parentWin = getParentWin();
     const hasLiveTrack = Boolean(
-      micStreamRef.current?.getAudioTracks?.().some((t) => t.readyState === 'live')
+      micStreamRef.current?.getAudioTracks?.().some((t) => t.readyState === 'live') ||
+        parentWin?.__fzSharedMicStream?.getAudioTracks?.().some((t: any) => t.readyState === 'live')
     );
     if (!hasLiveTrack && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
       setIsMicMuted(false);
       isMicMutedRef.current = false;
       try {
+        const sharedParentCtx: AudioContext | null =
+          (parentWin && typeof parentWin.__fzEnsureSharedLiveAudioCtx === 'function'
+            ? parentWin.__fzEnsureSharedLiveAudioCtx()
+            : null) ||
+          (parentWin?.__fzSharedLiveAudioCtx && parentWin.__fzSharedLiveAudioCtx.state !== 'closed'
+            ? (parentWin.__fzSharedLiveAudioCtx as AudioContext)
+            : null);
         const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
-        if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
+        if (sharedParentCtx && sharedParentCtx.state !== 'closed') {
+          liveAudioCtxRef.current = sharedParentCtx;
+          inputAudioCtxRef.current = sharedParentCtx;
+          outputAudioCtxRef.current = sharedParentCtx;
+        } else if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
           liveAudioCtxRef.current = new CtxClass();
           inputAudioCtxRef.current = liveAudioCtxRef.current;
           outputAudioCtxRef.current = liveAudioCtxRef.current;
         }
-        const liveCtx = liveAudioCtxRef.current;
+        const liveCtx = liveAudioCtxRef.current!;
         if (liveCtx.state === 'suspended') {
           await liveCtx.resume().catch(() => {});
         }
-        const stream = await navigator.mediaDevices
-          .getUserMedia({
-            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-          })
-          .catch(() => navigator.mediaDevices.getUserMedia({ audio: true }));
-        await connectMicStreamToLiveProcessing(stream, liveCtx);
-        setStatusBanner(null);
+        const stream =
+          parentWin && typeof parentWin.__fzWarmKawanAudioAndMic === 'function'
+            ? ((await parentWin.__fzWarmKawanAudioAndMic()) as MediaStream)
+            : await navigator.mediaDevices
+                .getUserMedia({
+                  audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                })
+                .catch(() => navigator.mediaDevices.getUserMedia({ audio: true }));
+        if (stream) {
+          await connectMicStreamToLiveProcessing(stream, liveCtx);
+          setStatusBanner(null);
+        }
       } catch (err) {
         console.warn('Re-acquire mic failed:', err);
       }
@@ -5208,8 +5359,10 @@ export default function App() {
     const next = !isMicMuted;
     setIsMicMuted(next);
     isMicMutedRef.current = next;
-    if (micStreamRef.current) {
-      micStreamRef.current.getAudioTracks().forEach((track) => {
+    const targetStream =
+      micStreamRef.current || (parentWin?.__fzSharedMicStream as MediaStream | undefined) || null;
+    if (targetStream) {
+      targetStream.getAudioTracks().forEach((track) => {
         track.enabled = !next;
       });
       if (!next && liveAudioCtxRef.current?.state === 'suspended') {
@@ -5223,6 +5376,7 @@ export default function App() {
     let acquiring = false;
     const healLiveAudioAndMicOnGesture = () => {
       try {
+        const parentWin = getParentWin();
         if (liveAudioCtxRef.current?.state === 'suspended') {
           void liveAudioCtxRef.current.resume().then(() => {
             syncMicHardwareReadyState();
@@ -5237,8 +5391,12 @@ export default function App() {
         ) {
           void outputAudioCtxRef.current.resume().catch(() => {});
         }
+        if (parentWin?.__fzSharedLiveAudioCtx?.state === 'suspended') {
+          void parentWin.__fzSharedLiveAudioCtx.resume().catch(() => {});
+        }
         const hasLiveMic = Boolean(
-          micStreamRef.current?.getAudioTracks?.().some((t) => t.readyState === 'live')
+          micStreamRef.current?.getAudioTracks?.().some((t) => t.readyState === 'live') ||
+            parentWin?.__fzSharedMicStream?.getAudioTracks?.().some((t: any) => t.readyState === 'live')
         );
         if (
           !hasLiveMic &&
@@ -5248,17 +5406,22 @@ export default function App() {
           navigator.mediaDevices?.getUserMedia
         ) {
           acquiring = true;
-          void navigator.mediaDevices
-            .getUserMedia({
-              audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-            })
-            .catch(() => navigator.mediaDevices.getUserMedia({ audio: true }))
+          const acquirePromise =
+            parentWin && typeof parentWin.__fzWarmKawanAudioAndMic === 'function'
+              ? (parentWin.__fzWarmKawanAudioAndMic() as Promise<MediaStream | null>)
+              : navigator.mediaDevices
+                  .getUserMedia({
+                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                  })
+                  .catch(() => navigator.mediaDevices.getUserMedia({ audio: true }));
+          void acquirePromise
             .then(async (freshStream) => {
               acquiring = false;
               if (!freshStream || userHungUpRef.current) return;
               const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
               if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
-                liveAudioCtxRef.current = new CtxClass();
+                liveAudioCtxRef.current =
+                  (parentWin?.__fzSharedLiveAudioCtx as AudioContext | undefined) || new CtxClass();
                 inputAudioCtxRef.current = liveAudioCtxRef.current;
                 outputAudioCtxRef.current = liveAudioCtxRef.current;
               }
@@ -5366,7 +5529,7 @@ export default function App() {
     };
 
     window.addEventListener('message', handleWindowMsg);
-    const timer = window.setTimeout(checkAutoCall, 350);
+    const timer = window.setTimeout(checkAutoCall, 40);
     return () => {
       window.removeEventListener('message', handleWindowMsg);
       window.clearTimeout(timer);

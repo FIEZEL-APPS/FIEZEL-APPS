@@ -12524,12 +12524,119 @@ function conversationPartnerHomeCardMarkup(){
 }
 
 /* ── Pop-up "Telepon aku sekarang" + auto-start Telepon Live ─────────────── */
+function ensureSharedKawanAudioCtx(){
+  try{
+    const AC=self.AudioContext||self.webkitAudioContext;if(!AC)return null;
+    let ctx=self.__fzSharedLiveAudioCtx;
+    if(!ctx||ctx.state==='closed'){
+      try{ctx=new AC({latencyHint:'interactive'})}catch(_){ctx=new AC()}
+      self.__fzSharedLiveAudioCtx=ctx;
+    }
+    self.__fzKawanRingCtx=ctx;
+    if(ctx.state==='suspended'){try{ctx.resume().catch(()=>{})}catch(_){}}
+    try{
+      const b=ctx.createBuffer(1,1,ctx.sampleRate||24000);
+      const s=ctx.createBufferSource();
+      s.buffer=b;s.connect(ctx.destination);s.start(0);
+    }catch(_){}
+    return ctx;
+  }catch(_){return null}
+}
+function wireSharedKawanMicBridge(stream){
+  try{
+    if(!stream||typeof stream.getAudioTracks!=='function')return false;
+    const tracks=stream.getAudioTracks();
+    if(!tracks||!tracks.some(t=>t&&t.readyState==='live'))return false;
+    self.__fzSharedMicStream=stream;
+    const ctx=ensureSharedKawanAudioCtx();
+    if(!ctx)return false;
+    if(self.__fzSharedMicProcessor&&self.__fzSharedMicSource&&self.__fzSharedMicBoundStream===stream){
+      if(ctx.state==='suspended'){try{ctx.resume().catch(()=>{})}catch(_){}}
+      return true;
+    }
+    try{if(self.__fzSharedMicSource)self.__fzSharedMicSource.disconnect()}catch(_){}
+    try{if(self.__fzSharedMicProcessor){self.__fzSharedMicProcessor.onaudioprocess=null;self.__fzSharedMicProcessor.disconnect()}}catch(_){}
+    try{if(self.__fzSharedMicGain)self.__fzSharedMicGain.disconnect()}catch(_){}
+    const src=ctx.createMediaStreamSource(stream);
+    const proc=ctx.createScriptProcessor(2048,1,1);
+    const gain=ctx.createGain();
+    gain.gain.value=0.00001;
+    proc.onaudioprocess=function(ev){
+      if(ctx.state==='suspended'){try{ctx.resume().catch(()=>{})}catch(_){}}
+      const cb=self.__fzSharedMicPcmCallback;
+      if(typeof cb==='function'){
+        try{
+          const ch=ev.inputBuffer.getChannelData(0);
+          const copy=new Float32Array(ch.length);
+          copy.set(ch);
+          cb(copy,ctx.sampleRate||48000);
+        }catch(_){}
+      }
+    };
+    src.connect(proc);
+    proc.connect(gain);
+    gain.connect(ctx.destination);
+    self.__fzSharedMicSource=src;
+    self.__fzSharedMicProcessor=proc;
+    self.__fzSharedMicGain=gain;
+    self.__fzSharedMicBoundStream=stream;
+    return true;
+  }catch(_){return false}
+}
+function stopSharedKawanMicBridge(){
+  try{if(self.__fzSharedMicSource)self.__fzSharedMicSource.disconnect()}catch(_){}
+  try{if(self.__fzSharedMicProcessor){self.__fzSharedMicProcessor.onaudioprocess=null;self.__fzSharedMicProcessor.disconnect()}}catch(_){}
+  try{if(self.__fzSharedMicGain)self.__fzSharedMicGain.disconnect()}catch(_){}
+  self.__fzSharedMicSource=null;
+  self.__fzSharedMicProcessor=null;
+  self.__fzSharedMicGain=null;
+  self.__fzSharedMicBoundStream=null;
+  self.__fzSharedMicPcmCallback=null;
+  if(self.__fzSharedMicStream){
+    try{self.__fzSharedMicStream.getTracks().forEach(t=>t.stop())}catch(_){}
+    self.__fzSharedMicStream=null;
+  }
+  self.__fzSharedMicStreamPromise=null;
+}
+function warmKawanAudioAndMic(){
+  const ctx=ensureSharedKawanAudioCtx();
+  try{
+    const cur=self.__fzSharedMicStream;
+    if(cur&&typeof cur.getAudioTracks==='function'&&cur.getAudioTracks().some(t=>t&&t.readyState==='live')){
+      wireSharedKawanMicBridge(cur);
+      return Promise.resolve(cur);
+    }
+    if(self.__fzSharedMicStreamPromise)return self.__fzSharedMicStreamPromise;
+    if(typeof navigator!=='undefined'&&navigator.mediaDevices&&typeof navigator.mediaDevices.getUserMedia==='function'){
+      const p=navigator.mediaDevices.getUserMedia({
+        audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}
+      }).catch(()=>navigator.mediaDevices.getUserMedia({audio:true})).then(stream=>{
+        self.__fzSharedMicStreamPromise=null;
+        if(stream&&typeof stream.getAudioTracks==='function'&&stream.getAudioTracks().length>0){
+          self.__fzSharedMicStream=stream;
+          if(ctx&&ctx.state==='suspended'){try{ctx.resume().catch(()=>{})}catch(_){}}
+          wireSharedKawanMicBridge(stream);
+          return stream;
+        }
+        return null;
+      }).catch(()=>{
+        self.__fzSharedMicStreamPromise=null;
+        return null;
+      });
+      self.__fzSharedMicStreamPromise=p;
+      return p;
+    }
+  }catch(_){}
+  return Promise.resolve(null);
+}
+self.__fzEnsureSharedLiveAudioCtx=ensureSharedKawanAudioCtx;
+self.__fzWireSharedMicBridge=wireSharedKawanMicBridge;
+self.__fzStopSharedMicBridge=stopSharedKawanMicBridge;
+self.__fzWarmKawanAudioAndMic=warmKawanAudioAndMic;
 function playKawanRingtone(){
   try{
+    const ctx=ensureSharedKawanAudioCtx();if(!ctx)return;
     if(state.preferences?.feedbackSounds===false)return;
-    const AC=self.AudioContext||self.webkitAudioContext;if(!AC)return;
-    const ctx=self.__fzKawanRingCtx||(self.__fzKawanRingCtx=new AC());
-    if(ctx.state==='suspended')ctx.resume().catch(()=>{});
     const t0=ctx.currentTime;
     const beep=(f,at,dur,g)=>{const o=ctx.createOscillator(),v=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(f,at);v.gain.setValueAtTime(0.0001,at);v.gain.exponentialRampToValueAtTime(g,at+0.012);v.gain.exponentialRampToValueAtTime(0.0001,at+dur);o.connect(v);v.connect(ctx.destination);o.start(at);o.stop(at+dur+0.02)};
     beep(880,t0,0.16,0.07);beep(1174.66,t0+0.02,0.16,0.05);
@@ -12537,8 +12644,11 @@ function playKawanRingtone(){
     beep(1318.51,t0+0.56,0.22,0.06);
   }catch(_){}
 }
-function closeKawanBicaraCallModal(){
+function closeKawanBicaraCallModal(keepSharedMedia){
   const el=$('fzKawanCallModal');if(!el)return false;
+  if(!keepSharedMedia){
+    stopSharedKawanMicBridge();
+  }
   el.classList.add('is-leaving');
   if(el.__kawanMochi){
     try{el.__kawanMochi.destroy()}catch(_){}
@@ -12548,9 +12658,12 @@ function closeKawanBicaraCallModal(){
   document.removeEventListener('keydown',kawanModalEsc,true);
   return true;
 }
-function kawanModalEsc(e){if(e.key==='Escape'){closeKawanBicaraCallModal()}}
+function kawanModalEsc(e){if(e.key==='Escape'){closeKawanBicaraCallModal(false)}}
 function openKawanBicaraCallModal(){
   if($('fzKawanCallModal'))return false;
+  // Stage 1 (Mochi SOS showConfirmModal parity): Pre-warm shared WebAudio + hardware microphone on Tap #1
+  // so OS PlayAndRecord switch & mic permission complete BEFORE Tap #2!
+  try{warmKawanAudioAndMic()}catch(_){}
   haptic('tap');uiSfx('open');
   const course=jaCourseOn()?'ja':'en';
   const persona=course==='ja'?'Sensei Nanami':'Coach Alex';
@@ -12563,7 +12676,7 @@ function openKawanBicaraCallModal(){
   wrap.className='fz-kawan-modal-scrim';
   wrap.setAttribute('data-testid','kawan-call-modal');
   wrap.innerHTML=`<div class="fz-kawan-modal-card" role="dialog" aria-modal="true" aria-labelledby="fzKawanModalTitle">
-      <button type="button" class="fz-kawan-modal-close" data-testid="kawan-call-modal-close" aria-label="${esc(FiezelI18n.t('modal.tutup'))}" onclick="closeKawanBicaraCallModal()"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <button type="button" class="fz-kawan-modal-close" data-testid="kawan-call-modal-close" aria-label="${esc(FiezelI18n.t('modal.tutup'))}" onclick="closeKawanBicaraCallModal(false)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       <div class="fz-kawan-modal-mascot-podium" aria-hidden="true">
         <div class="fz-kawan-modal-mascot-halo"></div>
         <img src="./assets/brand/mochi-mascot-headset.png" alt="Mochi" class="fz-kawan-modal-mochi-img" width="156" height="156" loading="eager" />
@@ -12584,9 +12697,9 @@ function openKawanBicaraCallModal(){
         </button>
         <div class="fz-kawan-modal-cta">${esc(cta)}</div>
       </div>
-      <button type="button" class="fz-kawan-modal-later" data-testid="kawan-call-modal-later" onclick="closeKawanBicaraCallModal()">${esc(later)}</button>
+      <button type="button" class="fz-kawan-modal-later" data-testid="kawan-call-modal-later" onclick="closeKawanBicaraCallModal(false)">${esc(later)}</button>
     </div>`;
-  wrap.addEventListener('click',e=>{if(e.target===wrap)closeKawanBicaraCallModal()});
+  wrap.addEventListener('click',e=>{if(e.target===wrap)closeKawanBicaraCallModal(false)});
   document.body.appendChild(wrap);
   document.addEventListener('keydown',kawanModalEsc,true);
 
@@ -12629,10 +12742,12 @@ function openKawanBicaraCallModal(){
   const phone=wrap.querySelector('#fzKawanModalPhone');
   phone.onclick=()=>{
     phone.disabled=true;phone.classList.add('is-dialing');
+    // Stage 2 (Mochi SOS btnOk parity): Resume shared AudioContext & verify mic bridge AFTER PlayAndRecord switch!
+    try{warmKawanAudioAndMic()}catch(_){}
     haptic('confirm');playKawanRingtone();
     try{sessionStorage.setItem('fz_kawan_autocall','1')}catch(_){}
     try{self.FiezelInteractiveChat?.StudioBridge?.send?.('fz.shell.autocall',{at:Date.now()})}catch(_){}
-    setTimeout(()=>{closeKawanBicaraCallModal();go('chat')},160);
+    setTimeout(()=>{closeKawanBicaraCallModal(true);go('chat')},160);
   };
   requestAnimationFrame(()=>{try{phone.focus({preventScroll:true})}catch(_){}});
   return true;
