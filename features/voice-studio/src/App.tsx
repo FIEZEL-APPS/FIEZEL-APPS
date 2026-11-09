@@ -5359,15 +5359,20 @@ export default function App() {
     const next = !isMicMuted;
     setIsMicMuted(next);
     isMicMutedRef.current = next;
-    const targetStream =
-      micStreamRef.current || (parentWin?.__fzSharedMicStream as MediaStream | undefined) || null;
-    if (targetStream) {
-      targetStream.getAudioTracks().forEach((track) => {
+    if (micStreamRef.current) {
+      micStreamRef.current.getAudioTracks().forEach((track) => {
         track.enabled = !next;
       });
-      if (!next && liveAudioCtxRef.current?.state === 'suspended') {
-        void liveAudioCtxRef.current.resume().catch(() => {});
-      }
+    }
+    if (parentWin?.__fzSharedMicStream) {
+      try {
+        (parentWin.__fzSharedMicStream as MediaStream).getAudioTracks().forEach((track) => {
+          track.enabled = !next;
+        });
+      } catch (_) {}
+    }
+    if (!next && liveAudioCtxRef.current?.state === 'suspended') {
+      void liveAudioCtxRef.current.resume().catch(() => {});
     }
   };
 
