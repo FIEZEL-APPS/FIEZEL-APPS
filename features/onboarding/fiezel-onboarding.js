@@ -1566,8 +1566,18 @@
       companion();
     }
 
+    var lastPaintedStepKey = null;
+
     function paint() {
       var html;
+      var currentStepKey = String(step) + ':' + String(courseStage) + ':' + String(slide);
+      var prevHostScroll = 0;
+      var prevCardScroll = 0;
+      try {
+        prevHostScroll = host.scrollTop || 0;
+        var prevCard = host.querySelector('.fiezel-ob-card');
+        if (prevCard) prevCardScroll = prevCard.scrollTop || 0;
+      } catch (_) {}
       if (step === LANGUAGE_STEP) html = languageMarkup(target, selectedLocale, localeBusy);
       else if (step === 1) html = nameMarkup(target, typedName);
       else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse, selectedKanaPref, selectedFurigana, courseStage);
@@ -1587,9 +1597,15 @@
         ? 'FIEZEL · Language / Bahasa / ภาษา'
         : T('onboarding.dialog-aria'));
       try {
-        host.scrollTop = 0;
         var card = host.querySelector('.fiezel-ob-card');
-        if (card) card.scrollTop = 0;
+        if (currentStepKey !== lastPaintedStepKey) {
+          host.scrollTop = 0;
+          if (card) card.scrollTop = 0;
+          lastPaintedStepKey = currentStepKey;
+        } else {
+          host.scrollTop = prevHostScroll;
+          if (card) card.scrollTop = prevCardScroll;
+        }
       } catch (_) {}
       applyMascot();
       bind();
@@ -2158,6 +2174,18 @@
             button.addEventListener('click', function () {
               selectedGoal = button.getAttribute('data-ob-goal') || '';
               paint();
+              try {
+                var advBtn = host.querySelector('[data-ob-advance]');
+                var cardEl = host.querySelector('.fiezel-ob-card');
+                var scroller = (cardEl && cardEl.scrollHeight > cardEl.clientHeight + 4) ? cardEl : host;
+                if (advBtn && scroller && typeof advBtn.getBoundingClientRect === 'function') {
+                  var advRect = advBtn.getBoundingClientRect();
+                  var scrollerRect = scroller.getBoundingClientRect();
+                  if (advRect.bottom > scrollerRect.bottom - 8) {
+                    scroller.scrollTop += (advRect.bottom - scrollerRect.bottom + 20);
+                  }
+                }
+              } catch (_) {}
             });
           })(goalButtons[i]);
         }

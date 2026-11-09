@@ -9732,15 +9732,19 @@ html body .fiezel-splash-brand .fz-auth-topo {
   box-sizing: border-box !important;
   margin: 0 !important;
   padding: 0 !important;
-  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+  overscroll-behavior-y: contain !important;
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
 }
 
 @media (min-width: 768px) {
-  html body div.fiezel-ob[role="dialog"],
-  html body .fiezel-ob {
+  html:root body div.fiezel-ob[role="dialog"],
+  html:root body .fiezel-ob {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9748,8 +9752,8 @@ html body .fiezel-splash-brand .fz-auth-topo {
     padding: 24px !important;
   }
 
-  html body div.fiezel-ob[role="dialog"] .fiezel-ob-card,
-  html body .fiezel-ob .fiezel-ob-card {
+  html:root body div.fiezel-ob[role="dialog"] .fiezel-ob-card,
+  html:root body .fiezel-ob .fiezel-ob-card {
     width: 412px !important;
     max-width: calc(100vw - 32px) !important;
     height: min(820px, calc(100vh - 48px)) !important;
@@ -10042,10 +10046,13 @@ html body .fiezel-ob .fiezel-topbar {
   min-height: 36px !important;
 }
 
-html body .fiezel-ob .fiezel-topbar:empty {
+html body .fiezel-ob .fiezel-topbar:empty,
+html body .fiezel-ob .fiezel-topbar.is-bare {
+  display: none !important;
   min-height: 0 !important;
   height: 0 !important;
   margin: 0 !important;
+  padding: 0 !important;
 }
 
 html body .fiezel-ob .fiezel-topbar button.fiezel-back {
@@ -10122,22 +10129,37 @@ html body .fiezel-ob .fz-auth-tagline {
 /* Multi-layered Billowy Cloud Cushion Divider ("Bantalan Awan") */
 .fiezel-ob .fz-ob-cloud-cushion {
   position: absolute !important;
-  bottom: -1px !important;
+  bottom: -2px !important;
   left: 0 !important;
   right: 0 !important;
   width: 100% !important;
-  height: 158px !important;
+  height: 162px !important;
   pointer-events: none !important;
   z-index: 6 !important;
   display: block !important;
   overflow: hidden !important;
 }
 
+.fiezel-ob .fz-ob-cloud-cushion::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  height: 28px !important;
+  background: #FAF5ED !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
 html body .fiezel-ob .fz-cloud-mist {
   position: absolute !important;
-  inset: 0 !important;
+  top: auto !important;
+  bottom: -2px !important;
+  left: 0 !important;
+  right: 0 !important;
   width: 100% !important;
-  height: auto !important;
+  height: 162px !important;
   display: block !important;
   z-index: 1 !important;
   filter: drop-shadow(0 -6px 14px rgba(215, 182, 109, 0.14)) !important;
@@ -10145,9 +10167,12 @@ html body .fiezel-ob .fz-cloud-mist {
 
 html body .fiezel-ob .fz-cloud-back {
   position: absolute !important;
-  inset: 0 !important;
+  top: auto !important;
+  bottom: -2px !important;
+  left: 0 !important;
+  right: 0 !important;
   width: 100% !important;
-  height: auto !important;
+  height: 162px !important;
   display: block !important;
   z-index: 2 !important;
   filter: drop-shadow(0 -4px 10px rgba(27, 20, 24, 0.16)) !important;
@@ -10156,9 +10181,12 @@ html body .fiezel-ob .fz-cloud-back {
 html body .fiezel-ob .fz-cloud-front,
 html body .fiezel-ob .fz-auth-wave {
   position: absolute !important;
-  inset: 0 !important;
+  top: auto !important;
+  bottom: -2px !important;
+  left: 0 !important;
+  right: 0 !important;
   width: 100% !important;
-  height: auto !important;
+  height: 162px !important;
   display: block !important;
   z-index: 3 !important;
   fill: #FAF5ED !important;
@@ -10428,12 +10456,16 @@ html body .fiezel-ob .fiezel-name-box input.fiezel-input::placeholder {
 }
 
 /* Step 2: Course Selection Cards (Japanese & English) */
-html body .fiezel-ob .fiezel-course-grid {
+html body .fiezel-ob .fiezel-course-grid:not(.is-hidden) {
   width: 100% !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 10px !important;
-  margin-bottom: 8px !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+}
+
+html body .fiezel-ob .fiezel-course-grid.is-hidden {
+  display: none !important;
 }
 
 html body .fiezel-ob .fiezel-course-card {
@@ -10443,12 +10475,27 @@ html body .fiezel-ob .fiezel-course-card {
   justify-content: space-between !important;
   background: #FFFFFF !important;
   border: 1.5px solid #E2D9CE !important;
-  border-radius: 18px !important;
-  padding: 13px 18px !important;
-  box-shadow: 0 4px 12px rgba(27, 20, 24, 0.04) !important;
+  border-radius: 16px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 3px 10px rgba(27, 20, 24, 0.04) !important;
   box-sizing: border-box !important;
   cursor: pointer !important;
   transition: all 0.18s ease !important;
+}
+
+html body .fiezel-ob .fiezel-course-card .fiezel-course-flag {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+html body .fiezel-ob .fiezel-course-card .fiezel-course-flag svg {
+  width: 38px !important;
+  height: 26px !important;
+  border-radius: 5px !important;
+  display: block !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important;
 }
 
 html body .fiezel-ob .fiezel-course-card.is-selected {
@@ -10493,55 +10540,521 @@ html body .fiezel-ob .fz-card-check.is-checked {
   place-items: center !important;
 }
 
-/* Step 4: Goal Cards */
+/* Step 0 & Step 3: Language & Goal Grids */
 html body .fiezel-ob .fiezel-goal-grid {
   width: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 8px !important;
   margin-bottom: 8px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
 }
 
-html body .fiezel-ob .fiezel-goal-card {
+html body .fiezel-ob .fiezel-goal-card,
+html body .fiezel-ob button.fiezel-goal-card {
   width: 100% !important;
+  min-height: 52px !important;
+  height: auto !important;
   display: flex !important;
+  flex-direction: row !important;
   align-items: center !important;
-  gap: 14px !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
   background: #FFFFFF !important;
   border: 1.5px solid #E2D9CE !important;
-  border-radius: 16px !important;
-  padding: 11px 16px !important;
+  border-radius: 15px !important;
+  padding: 9px 11px !important;
   box-shadow: 0 3px 10px rgba(27, 20, 24, 0.04) !important;
   box-sizing: border-box !important;
   cursor: pointer !important;
   transition: all 0.18s ease !important;
   position: relative !important;
+  text-align: left !important;
 }
 
-html body .fiezel-ob .fiezel-goal-card.is-selected {
+html body .fiezel-ob .fiezel-goal-card::after,
+html body .fiezel-ob .fiezel-goal-card.is-selected::after,
+html body .fiezel-ob .fiezel-level-chip::after,
+html body .fiezel-ob .fiezel-level-chip.is-selected::after {
+  content: none !important;
+  display: none !important;
+}
+
+html body .fiezel-ob .fiezel-goal-card.is-selected,
+html body .fiezel-ob button.fiezel-goal-card.is-selected {
   border: 2px solid #7C1D3A !important;
   background: #FFFFFF !important;
   box-shadow: 0 6px 18px rgba(124, 29, 58, 0.12) !important;
 }
 
+html body .fiezel-ob .fiezel-goal-icon {
+  font-size: 1.15rem !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 html body .fiezel-ob .fz-goal-card-title {
-  flex: 1 !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
   text-align: left !important;
-  font-size: 0.94rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  color: #1B1418 !important;
+  line-height: 1.2 !important;
+}
+
+html body .fiezel-ob .fz-goal-check {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  background: #7C1D3A !important;
+  color: #FFFDF8 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  display: grid !important;
+  place-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+/* Step 0: Language Choice Specifics */
+html body .fiezel-ob .fiezel-language-choice,
+html body .fiezel-ob button.fiezel-language-choice {
+  min-height: 58px !important;
+  padding: 9px 10px !important;
+  gap: 9px !important;
+}
+
+html body .fiezel-ob .fiezel-language-flag {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+html body .fiezel-ob .fiezel-language-flag .fiezel-flag-svg {
+  width: 36px !important;
+  height: 25px !important;
+  border-radius: 5px !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important;
+}
+
+html body .fiezel-ob .fiezel-language-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  text-align: left !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+html body .fiezel-ob .fiezel-language-copy b {
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  color: #1B1418 !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+html body .fiezel-ob .fiezel-language-copy small {
+  font-size: 0.7rem !important;
+  color: #6E635C !important;
+  line-height: 1.2 !important;
+  margin: 2px 0 0 0 !important;
+  text-align: left !important;
+}
+
+/* Step 2b/2c: Course Sub-Settings (JA & EN) */
+html body .fiezel-ob .fz-active-lang-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2D9CE !important;
+  border-radius: 9999px !important;
+  padding: 6px 14px !important;
+  margin: 0 auto 10px auto !important;
+  box-shadow: 0 2px 8px rgba(27, 20, 24, 0.04) !important;
+}
+
+html body .fiezel-ob .fz-active-lang-pill .fiezel-course-flag svg {
+  width: 28px !important;
+  height: 20px !important;
+  border-radius: 4px !important;
+  display: block !important;
+}
+
+html body .fiezel-ob .fz-active-lang-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+}
+
+html body .fiezel-ob .fz-active-lang-text b {
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  color: #1B1418 !important;
+  line-height: 1.15 !important;
+}
+
+html body .fiezel-ob .fz-active-lang-text small {
+  font-size: 0.68rem !important;
+  color: #6E635C !important;
+  line-height: 1.15 !important;
+}
+
+html body .fiezel-ob .fiezel-ja-onboarding-panel:not([style*="display:none"]):not([style*="display: none"]),
+html body .fiezel-ob .fiezel-en-onboarding-panel:not([style*="display:none"]):not([style*="display: none"]) {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  padding: 10px 12px !important;
+  margin-bottom: 4px !important;
+  border-radius: 18px !important;
+  box-sizing: border-box !important;
+}
+
+html body .fiezel-ob .fiezel-ja-onboarding-panel[style*="display:none"],
+html body .fiezel-ob .fiezel-ja-onboarding-panel[style*="display: none"],
+html body .fiezel-ob .fiezel-en-onboarding-panel[style*="display:none"],
+html body .fiezel-ob .fiezel-en-onboarding-panel[style*="display: none"] {
+  display: none !important;
+}
+
+html body .fiezel-ob .fiezel-ob-subblock {
+  width: 100% !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2D9CE !important;
+  border-radius: 16px !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+}
+
+html body .fiezel-ob .fiezel-ob-subhead {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  color: #1B1418 !important;
+  margin: 0 0 7px 0 !important;
+  text-align: left !important;
+}
+
+html body .fiezel-ob .fiezel-ob-furigana-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+html body .fiezel-ob button.fiezel-ob-furigana-pill {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 5px 12px !important;
+  border-radius: 9999px !important;
+  background: #EDE5DA !important;
+  color: #4A3E38 !important;
+  -webkit-text-fill-color: #4A3E38 !important;
+  border: 1.5px solid #D8CCBE !important;
+  cursor: pointer !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+html body .fiezel-ob button.fiezel-ob-furigana-pill.is-active,
+html body .fiezel-ob button.fiezel-ob-furigana-pill.is-selected {
+  border: 1.5px solid #7C1D3A !important;
+  background: #7C1D3A !important;
+  color: #FFFDF8 !important;
+  -webkit-text-fill-color: #FFFDF8 !important;
+  box-shadow: 0 3px 10px rgba(124, 29, 58, 0.2) !important;
+}
+
+html body .fiezel-ob button.fiezel-ob-furigana-pill .fz-sr-furi,
+html body .fiezel-ob button.fiezel-ob-furigana-pill .fz-pill-text,
+html body .fiezel-ob button.fiezel-ob-furigana-pill strong {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+  font-size: 0.75rem !important;
+}
+
+html body .fiezel-ob .fiezel-ob-sentence-card {
+  padding: 8px 10px !important;
+  border-radius: 14px !important;
+}
+
+html body .fiezel-ob .fz-helper-note {
+  margin: 2px 0 0 0 !important;
+  font-size: 0.72rem !important;
+  line-height: 1.25 !important;
+  color: #6E635C !important;
+}
+
+html body .fiezel-ob .fiezel-sheet .fiezel-note {
+  color: #6E635C !important;
+  -webkit-text-fill-color: #6E635C !important;
+  font-size: 0.75rem !important;
+  line-height: 1.25 !important;
+  margin: 2px 0 !important;
+}
+
+html body .fiezel-ob button.fiezel-btn-ghost,
+html body .fiezel-ob [data-ob-step-skip] {
+  color: #6E635C !important;
+  -webkit-text-fill-color: #6E635C !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  padding: 4px 12px !important;
+  margin-top: 4px !important;
+  min-height: 28px !important;
+  height: auto !important;
+  cursor: pointer !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+}
+
+html body .fiezel-ob .fz-furigana-pill-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 6px !important;
+  margin-bottom: 2px !important;
+}
+
+html body .fiezel-ob .fz-furigana-pill-head b {
+  font-size: 0.78rem !important;
   font-weight: 700 !important;
   color: #1B1418 !important;
 }
 
-html body .fiezel-ob .fz-goal-check {
-  width: 22px !important;
-  height: 22px !important;
-  border-radius: 50% !important;
-  background: #7C1D3A !important;
-  color: #FFFDF8 !important;
-  font-size: 13px !important;
-  font-weight: 800 !important;
+html body .fiezel-ob button.fiezel-ob-furigana-pill small {
+  font-size: 0.68rem !important;
+  color: #6E635C !important;
+  line-height: 1.25 !important;
+}
+
+html body .fiezel-ob .fz-ob-ruby-row {
   display: grid !important;
-  place-items: center !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  width: 100% !important;
+}
+
+html body .fiezel-ob button.fz-ob-ruby {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 7px 4px !important;
+  border-radius: 12px !important;
+  background: #FAF5ED !important;
+  border: 1.5px solid #E2D9CE !important;
+  cursor: pointer !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+}
+
+html body .fiezel-ob button.fz-ob-ruby.is-selected {
+  border: 2px solid #7C1D3A !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(124, 29, 58, 0.1) !important;
+}
+
+html body .fiezel-ob .fz-ob-ruby-sample {
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  color: #1B1418 !important;
+  line-height: 1.25 !important;
+}
+
+html body .fiezel-ob .fz-ob-ruby-label {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  color: #1B1418 !important;
+  margin-top: 2px !important;
+}
+
+html body .fiezel-ob .fz-ob-ruby-hint {
+  font-size: 0.62rem !important;
+  color: #6E635C !important;
+}
+
+html body .fiezel-ob .fz-toggle-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+html body .fiezel-ob .fz-toggle-info {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  flex: 1 1 auto !important;
+}
+
+html body .fiezel-ob .fz-toggle-title {
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  color: #1B1418 !important;
+}
+
+html body .fiezel-ob .fz-toggle-desc {
+  font-size: 0.72rem !important;
+  color: #6E635C !important;
+  margin-top: 2px !important;
+}
+
+html body .fiezel-ob .fz-switch {
+  position: relative !important;
+  display: inline-block !important;
+  width: 46px !important;
+  height: 26px !important;
+  flex-shrink: 0 !important;
+}
+
+html body .fiezel-ob .fz-switch input {
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+html body .fiezel-ob .fz-slider {
+  position: absolute !important;
+  cursor: pointer !important;
+  inset: 0 !important;
+  background-color: #D5C8B8 !important;
+  border-radius: 9999px !important;
+  transition: 0.2s !important;
+}
+
+html body .fiezel-ob .fz-slider::before {
+  position: absolute !important;
+  content: "" !important;
+  height: 20px !important;
+  width: 20px !important;
+  left: 3px !important;
+  bottom: 3px !important;
+  background-color: #FFFFFF !important;
+  border-radius: 50% !important;
+  transition: 0.2s !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+html body .fiezel-ob .fz-switch input:checked + .fz-slider {
+  background-color: #7C1D3A !important;
+}
+
+html body .fiezel-ob .fz-switch input:checked + .fz-slider::before {
+  transform: translateX(20px) !important;
+}
+
+html body .fiezel-ob .fz-pronounce-preview-box {
+  margin-top: 8px !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  background: #FAF5ED !important;
+  border: 1px solid #E2D9CE !important;
+  text-align: left !important;
+}
+
+html body .fiezel-ob .fz-preview-label {
+  display: block !important;
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  color: #7C1D3A !important;
+  margin-bottom: 2px !important;
+}
+
+html body .fiezel-ob .fz-preview-word b {
+  font-size: 0.9rem !important;
+  color: #1B1418 !important;
+}
+
+html body .fiezel-ob .fz-preview-phonetic {
+  font-size: 0.78rem !important;
+  color: #6E635C !important;
+}
+
+/* Step 3b: Level Selection Block */
+html body .fiezel-ob .fiezel-level-block {
+  width: 100% !important;
+  margin: 4px 0 4px 0 !important;
+  padding: 10px 12px !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  border: 1.5px solid #E2D9CE !important;
+  border-radius: 16px !important;
+  box-sizing: border-box !important;
+}
+
+html body .fiezel-ob .fiezel-level-label {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  color: #4A3E38 !important;
+  margin: 0 0 8px 0 !important;
+  text-align: center !important;
+}
+
+html body .fiezel-ob .fiezel-level-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  width: 100% !important;
+}
+
+html body .fiezel-ob button.fiezel-level-chip {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 7px 6px !important;
+  min-height: 46px !important;
+  border-radius: 12px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2D9CE !important;
+  cursor: pointer !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  transition: all 0.16s ease !important;
+}
+
+html body .fiezel-ob button.fiezel-level-chip.is-selected {
+  border: 2px solid #7C1D3A !important;
+  background: rgba(124, 29, 58, 0.06) !important;
+  box-shadow: 0 3px 10px rgba(124, 29, 58, 0.12) !important;
+}
+
+html body .fiezel-ob button.fiezel-level-chip b {
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  color: #1B1418 !important;
+  line-height: 1.15 !important;
+}
+
+html body .fiezel-ob button.fiezel-level-chip small {
+  font-size: 0.64rem !important;
+  color: #6E635C !important;
+  line-height: 1.15 !important;
+  margin-top: 2px !important;
 }
 
 /* Step 5: Placement Path Cards */
@@ -10719,4 +11232,186 @@ html body .fiezel-ob [data-ob-dots] span.dot.is-active {
   border-radius: 9999px !important;
   background: #7C1D3A !important;
   box-shadow: 0 2px 6px rgba(124, 29, 58, 0.28) !important;
+}
+
+/* Step 0 (No Mascot Stage): Compact Header & Cushion */
+html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) {
+  height: 176px !important;
+  min-height: 176px !important;
+  max-height: 176px !important;
+  padding-top: 18px !important;
+}
+
+html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-ob-cloud-cushion,
+html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-cloud-mist,
+html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-cloud-back,
+html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-cloud-front,
+html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-auth-wave {
+  height: 112px !important;
+  bottom: -2px !important;
+  top: auto !important;
+}
+
+/* Mobile Responsive Overrides (<= 767px) - Placed at end of cascade */
+@media (max-width: 767px) {
+  html:root body div.fiezel-ob[role="dialog"],
+  html:root body .fiezel-ob {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    background: #FAF5ED !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-y: contain !important;
+    padding: 0 !important;
+  }
+
+  html:root body div.fiezel-ob[role="dialog"] .fiezel-ob-card,
+  html:root body .fiezel-ob .fiezel-ob-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #FAF5ED !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    padding-bottom: 24px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-ob-reveal {
+    height: 204px !important;
+    min-height: 204px !important;
+    max-height: 204px !important;
+    padding: 10px 16px 0 !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) {
+    height: 142px !important;
+    min-height: 142px !important;
+    max-height: 142px !important;
+    padding-top: 14px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-ob-reveal .fz-ob-cloud-cushion,
+  html:root body .fiezel-ob .fiezel-ob-reveal .fz-cloud-mist,
+  html:root body .fiezel-ob .fiezel-ob-reveal .fz-cloud-back,
+  html:root body .fiezel-ob .fiezel-ob-reveal .fz-cloud-front,
+  html:root body .fiezel-ob .fiezel-ob-reveal .fz-auth-wave {
+    height: 120px !important;
+    bottom: -2px !important;
+    top: auto !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-ob-cloud-cushion,
+  html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-cloud-mist,
+  html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-cloud-back,
+  html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-cloud-front,
+  html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-auth-wave {
+    height: 92px !important;
+    bottom: -2px !important;
+    top: auto !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-stage {
+    top: 38px !important;
+    width: 148px !important;
+    max-width: 148px !important;
+    height: 138px !important;
+    max-height: 138px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-stage-art,
+  html:root body .fiezel-ob .fiezel-ob-mascot,
+  html:root body .fiezel-ob .fiezel-ob-mascot fiezel-mascot,
+  html:root body .fiezel-ob .fiezel-ob-mascot .fiezel-ob-paw {
+    width: 136px !important;
+    height: 126px !important;
+    max-width: 144px !important;
+    max-height: 132px !important;
+  }
+
+  html:root body .fiezel-ob .fz-mochi-halo {
+    width: 184px !important;
+    height: 184px !important;
+  }
+
+  html:root body .fiezel-ob .fz-mochi-cloud-shadow {
+    width: 98px !important;
+    height: 12px !important;
+    margin-top: -10px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-sheet {
+    padding: 4px 18px 20px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-sheet .fiezel-title,
+  html:root body .fiezel-ob .fiezel-sheet h2 {
+    font-size: 1.32rem !important;
+    margin: 0 0 4px 0 !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-sheet .fiezel-body,
+  html:root body .fiezel-ob .fiezel-sheet p:not(.fiezel-note):not(.fiezel-path-desc) {
+    font-size: 0.84rem !important;
+    margin: 0 0 10px 0 !important;
+    line-height: 1.35 !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-goal-grid {
+    gap: 7px !important;
+    margin-bottom: 6px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-goal-card,
+  html:root body .fiezel-ob button.fiezel-goal-card {
+    min-height: 46px !important;
+    padding: 8px 10px !important;
+    border-radius: 13px !important;
+    gap: 8px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-language-choice,
+  html:root body .fiezel-ob button.fiezel-language-choice {
+    min-height: 54px !important;
+    padding: 8px 10px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-level-block {
+    padding: 8px 10px !important;
+    margin: 2px 0 4px 0 !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-level-label {
+    font-size: 0.76rem !important;
+    margin: 0 0 6px 0 !important;
+  }
+
+  html:root body .fiezel-ob button.fiezel-level-chip {
+    min-height: 42px !important;
+    padding: 5px 4px !important;
+  }
+
+  html:root body .fiezel-ob button.fiezel-btn-primary,
+  html:root body .fiezel-ob [data-ob-advance],
+  html:root body .fiezel-ob [data-ob-main-start] {
+    min-height: 48px !important;
+    height: 48px !important;
+    font-size: 0.98rem !important;
+    margin-top: 10px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-dots,
+  html:root body .fiezel-ob .fiezel-stepper-dots,
+  html:root body .fiezel-ob [data-ob-dots] {
+    margin-top: 10px !important;
+  }
 }
