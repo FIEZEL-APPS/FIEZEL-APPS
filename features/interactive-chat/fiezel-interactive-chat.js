@@ -125,17 +125,6 @@
           nonce = api.StudioBridge.begin();
         }
       } catch (_) {}
-      try {
-        var AC = root.AudioContext || root.webkitAudioContext;
-        if (AC) {
-          if (!root.__fzSharedLiveAudioCtx || root.__fzSharedLiveAudioCtx.state === 'closed') {
-            root.__fzSharedLiveAudioCtx = new AC();
-          }
-          if (root.__fzSharedLiveAudioCtx.state === 'suspended') {
-            root.__fzSharedLiveAudioCtx.resume().catch(function () {});
-          }
-        }
-      } catch (_) {}
       var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (autoCall ? '&autoCall=1' : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
       var titleText = lang === 'ja' ? 'Mitra Kaiwa' : (lang === 'zh' ? 'Xiao Mochi (小麻薯)' : 'Kawan Bicara');
       mountPoint.innerHTML =

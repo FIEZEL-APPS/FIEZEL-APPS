@@ -391,19 +391,25 @@ export default function App() {
     }
     if (playing) {
       isPlayingAiAudioRef.current = true;
+      bargeSpeechStreakRef.current = 0;
+      consecutiveSpeechFramesRef.current = 0;
       setIsPlayingAiAudio(true);
     } else if (tailDelayMs > 0) {
       aiPlayoutTailTimerRef.current = window.setTimeout(() => {
         aiPlayoutTailTimerRef.current = null;
         isPlayingAiAudioRef.current = false;
+        openingGreetingCompletedRef.current = true;
         lastAiPlayoutEndedAtRef.current = Date.now();
-        handyVadRef.current.reset();
+        bargeSpeechStreakRef.current = 0;
+        handyVadRef.current.clearPreRoll();
         setIsPlayingAiAudio(false);
       }, tailDelayMs);
     } else {
       isPlayingAiAudioRef.current = false;
+      openingGreetingCompletedRef.current = true;
       lastAiPlayoutEndedAtRef.current = Date.now();
-      handyVadRef.current.reset();
+      bargeSpeechStreakRef.current = 0;
+      handyVadRef.current.clearPreRoll();
       setIsPlayingAiAudio(false);
     }
   };
@@ -449,6 +455,17 @@ export default function App() {
   const [isUserSpeakingLive, setIsUserSpeakingLive] = useState<boolean>(false);
   const isUserSpeakingLiveRef = useRef<boolean>(false);
   const userSpeakingTimerRef = useRef<number | null>(null);
+  const [isMicHardwareReady, setIsMicHardwareReady] = useState<boolean>(false);
+  const isMicHardwareReadyRef = useRef<boolean>(false);
+  const awaitingOpeningTurnRef = useRef<boolean>(false);
+  const awaitingOpeningTimerRef = useRef<number | null>(null);
+  const openingGreetingCompletedRef = useRef<boolean>(false);
+  const userAudioBurstActiveRef = useRef<boolean>(false);
+  const userBurstEndTimerRef = useRef<number | null>(null);
+  const preRollFramesRef = useRef<string[]>([]);
+  const consecutiveSpeechFramesRef = useRef<number>(0);
+  const bargeSpeechStreakRef = useRef<number>(0);
+  const lastBargeInAtRef = useRef<number>(0);
   const handyVadRef = useRef<HandyHumanVad>(new HandyHumanVad());
   const sileroVadGateRef = useRef<SileroNeuralVadGate | null>(null);
   const lastHandySpeechAtRef = useRef<number>(0);
@@ -733,46 +750,46 @@ export default function App() {
     });
   };
 
+  const syncMicHardwareReadyState = () => {
+    const hasLiveTrack = Boolean(
+      micStreamRef.current?.getAudioTracks?.().some((t) => t.readyState === 'live')
+    );
+    const ctxRunning = liveAudioCtxRef.current?.state === 'running';
+    const ready = Boolean(hasLiveTrack && ctxRunning);
+    if (isMicHardwareReadyRef.current !== ready) {
+      isMicHardwareReadyRef.current = ready;
+      setIsMicHardwareReady(ready);
+    }
+    return ready;
+  };
+
   const requestStartLiveCall = (isAutoCallTrigger = false) => {
+    primeAudioPlayback();
     if (isLiveConnected || isLiveConnecting) return;
-    const shouldBypassModal = isLocalTestEnvironment() || isAutoCallTrigger || autoCallProcessedRef.current;
-    if (shouldBypassModal) {
-      // Localhost test & Auto-Call bypass: Start live call directly with 0 Gem cost & zero modal blocker
+    const balance = getHostGemBalance();
+    const hasDailyFree = getDailyFreeCallAvailable();
+    const shouldStartImmediately =
+      isLocalTestEnvironment() ||
+      isAutoCallTrigger ||
+      autoCallProcessedRef.current ||
+      hasDailyFree ||
+      balance >= KAWAN_BICARA_MIN_START_GEMS;
+    if (shouldStartImmediately) {
+      // Preserve synchronous user gesture for WebAudio + getUserMedia (Mochi SOS parity, 0 Gem deducted on start)
+      const isFree = isLocalTestEnvironment() || hasDailyFree;
       callBillingRef.current = {
         active: true,
-        isDailyFree: true,
+        isDailyFree: isFree,
         dailyFreeMarked: false,
         aiVoiceTurnsDelivered: 0,
         gemsSpentThisCall: 0,
         turnMetered: false,
         outOfGemsAfterTurn: false,
       };
-      setLiveBillingUi({ isDailyFree: true, turns: 0, gemsSpent: 0 });
+      setLiveBillingUi({ isDailyFree: isFree, turns: 0, gemsSpent: 0 });
       setCallConfirmModal(null);
       setInsufficientGemModal(null);
       void startLiveCall();
-      return;
-    }
-    const balance = getHostGemBalance();
-    const hasDailyFree = getDailyFreeCallAvailable();
-    if (hasDailyFree) {
-      setCallConfirmModal({
-        isOpen: true,
-        isDailyFree: true,
-        balance,
-        cost: 0,
-        remainingFree: 1,
-      });
-      return;
-    }
-    if (balance >= KAWAN_BICARA_MIN_START_GEMS) {
-      setCallConfirmModal({
-        isOpen: true,
-        isDailyFree: false,
-        balance,
-        cost: KAWAN_BICARA_OPENING_GEM_COST,
-        remainingFree: 0,
-      });
       return;
     }
     setInsufficientGemModal({
@@ -783,6 +800,7 @@ export default function App() {
   };
 
   const handleConfirmStartCall = () => {
+    primeAudioPlayback();
     if (!callConfirmModal) return;
     // 0 Gem dipotong saat klik tombol mulai! Kuota gratis / Gem baru terhitung saat audio AI benar-benar diputar.
     const isFree = callConfirmModal.isDailyFree;
@@ -800,42 +818,55 @@ export default function App() {
     void startLiveCall();
   };
 
-  /** Unlocks Web Audio + one persistent HTMLAudioElement inside a user gesture. */
+  /** Unlocks Web Audio + one persistent HTMLAudioElement inside a user gesture (100% same-realm Mochi SOS parity). */
   const primeAudioPlayback = () => {
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const parentSharedCtx = (() => {
-        try {
-          const p = window.parent && window.parent !== window ? (window.parent as any) : null;
-          const c = p?.__fzSharedLiveAudioCtx;
-          return c && c.state !== 'closed' ? (c as AudioContext) : null;
-        } catch {
-          return null;
-        }
-      })();
-      if (AudioCtx || parentSharedCtx) {
+      if (AudioCtx) {
         if (!ttsAudioCtxRef.current || ttsAudioCtxRef.current.state === 'closed') {
-          ttsAudioCtxRef.current = parentSharedCtx || new AudioCtx();
+          try {
+            ttsAudioCtxRef.current = new AudioCtx({ latencyHint: 'interactive' });
+          } catch {
+            ttsAudioCtxRef.current = new AudioCtx();
+          }
         }
         if (ttsAudioCtxRef.current.state === 'suspended') {
           void ttsAudioCtxRef.current.resume().catch(() => {});
         }
         if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
-          liveAudioCtxRef.current = parentSharedCtx || new AudioCtx();
+          try {
+            liveAudioCtxRef.current = new AudioCtx({ latencyHint: 'interactive' });
+          } catch {
+            liveAudioCtxRef.current = new AudioCtx();
+          }
           nextStartTimeRef.current = liveAudioCtxRef.current.currentTime;
         }
         const liveCtx = liveAudioCtxRef.current;
+        liveCtx.onstatechange = () => {
+          syncMicHardwareReadyState();
+        };
         outputAudioCtxRef.current = liveCtx;
         inputAudioCtxRef.current = liveCtx;
         // CRITICAL: Never reset nextStartTimeRef.current to liveCtx.currentTime on pointerdown/keydown
-        // while activeSourcesRef chunks are already queued in the future! Resetting nextStartTimeRef
-        // during a click causes incoming WebSocket audio chunks to play on top of ongoing chunks!
+        // while activeSourcesRef chunks are already queued in the future!
         if (activeSourcesRef.current.length === 0 && nextStartTimeRef.current < liveCtx.currentTime) {
           nextStartTimeRef.current = liveCtx.currentTime;
         }
         if (liveCtx.state === 'suspended') {
-          void liveCtx.resume().catch(() => {});
+          void liveCtx.resume().then(() => {
+            syncMicHardwareReadyState();
+          }).catch(() => {});
         }
+        try {
+          const silentBuf = liveCtx.createBuffer(1, 1, liveCtx.sampleRate || 24000);
+          const silentSrc = liveCtx.createBufferSource();
+          silentSrc.buffer = silentBuf;
+          silentSrc.connect(liveCtx.destination);
+          silentSrc.start(0);
+        } catch {
+          // Ignore
+        }
+        syncMicHardwareReadyState();
       }
     } catch {
       // Ignore
@@ -1875,6 +1906,12 @@ export default function App() {
    */
   const interruptAiAndStartListening = () => {
     speakTokenRef.current += 1;
+    isAiServerTurnOpenRef.current = false;
+    awaitingOpeningTurnRef.current = false;
+    if (awaitingOpeningTimerRef.current) {
+      window.clearTimeout(awaitingOpeningTimerRef.current);
+      awaitingOpeningTimerRef.current = null;
+    }
     clearSpeechWatchdog();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
@@ -3361,14 +3398,112 @@ export default function App() {
 
   const lastMicFrameAtRef = useRef<number>(0);
 
+  /**
+   * Mochi SOS parity (`fiezel-mochi-voice-sos.js:1014-1054`):
+   * First-order 300-3300 Hz human vocal band-pass + zero-crossing rate analyzer.
+   */
+  const analyzeHumanVoiceBandFrame = (float32: Float32Array, inRate: number) => {
+    const len = float32 ? float32.length : 0;
+    if (len < 64) return { rms: 0, voiceBandRms: 0, isHumanSpeech: false };
+    const sr = inRate > 0 ? inRate : 16000;
+    const rcHp = 1 / (2 * Math.PI * 300);
+    const dt = 1 / sr;
+    const alphaHp = rcHp / (rcHp + dt);
+    const rcLp = 1 / (2 * Math.PI * 3300);
+    const alphaLp = dt / (rcLp + dt);
+    let prevX = float32[0] || 0;
+    let hpY = 0;
+    let bpY = 0;
+    let prevBpY = 0;
+    let sumAllSq = 0;
+    let sumVoiceSq = 0;
+    let zeroCrossings = 0;
+    let count = 0;
+    for (let i = 0; i < len; i += 2) {
+      const x = float32[i];
+      sumAllSq += x * x;
+      hpY = alphaHp * (hpY + x - prevX);
+      prevX = x;
+      bpY = bpY + alphaLp * (hpY - bpY);
+      sumVoiceSq += bpY * bpY;
+      if ((bpY >= 0 && prevBpY < 0) || (bpY < 0 && prevBpY >= 0)) {
+        zeroCrossings++;
+      }
+      prevBpY = bpY;
+      count++;
+    }
+    const rms = Math.sqrt(sumAllSq / Math.max(1, count));
+    const voiceBandRms = Math.sqrt(sumVoiceSq / Math.max(1, count));
+    const voiceRatio = rms > 0.0001 ? voiceBandRms / rms : 0;
+    const durationSec = len / sr;
+    const zcrHz = durationSec > 0 ? zeroCrossings / (2 * durationSec) : 0;
+    const isHumanSpeech =
+      voiceBandRms >= 0.0038 &&
+      voiceRatio >= 0.42 &&
+      zcrHz >= 140 &&
+      zcrHz <= 2900;
+    return { rms, voiceBandRms, isHumanSpeech };
+  };
+
+  /**
+   * Mochi SOS parity (`fiezel-mochi-voice-sos.js:3566-3586`):
+   * Sends `{"realtimeInput":{"audioStreamEnd":true}}` after the user's speech burst finishes
+   * so mobile AGC ambient noise never prevents Gemini Live from ending the user's turn!
+   */
+  const clearUserBurstEndTimer = () => {
+    if (userBurstEndTimerRef.current) {
+      window.clearTimeout(userBurstEndTimerRef.current);
+      userBurstEndTimerRef.current = null;
+    }
+  };
+
+  const scheduleUserBurstEnd = () => {
+    clearUserBurstEndTimer();
+    const silenceHoldMs = 1050;
+    userBurstEndTimerRef.current = window.setTimeout(() => {
+      userBurstEndTimerRef.current = null;
+      if (userAudioBurstActiveRef.current) {
+        userAudioBurstActiveRef.current = false;
+        consecutiveSpeechFramesRef.current = 0;
+        preRollFramesRef.current = [];
+        if (isUserSpeakingLiveRef.current) {
+          isUserSpeakingLiveRef.current = false;
+          setIsUserSpeakingLive(false);
+        }
+        if (
+          wsRef.current &&
+          wsRef.current.readyState === WebSocket.OPEN &&
+          isLiveConnectedRef.current &&
+          !isPlayingAiAudioRef.current &&
+          !isAiServerTurnOpenRef.current
+        ) {
+          try {
+            wsRef.current.send(
+              JSON.stringify({
+                realtimeInput: {
+                  audioStreamEnd: true,
+                },
+              })
+            );
+          } catch {
+            // Ignore
+          }
+        }
+      }
+    }, silenceHoldMs);
+  };
+
   const handleMicPcmData = (float32: Float32Array) => {
     let peak = 0;
     for (let i = 0; i < float32.length; i += 4) {
-      const v = Math.abs(float32[i]);
-      if (v > peak) peak = v;
+      const val = Math.abs(float32[i]);
+      if (val > peak) peak = val;
     }
     if (peak > 0.00001) {
       lastMicFrameAtRef.current = Date.now();
+      if (!isMicHardwareReadyRef.current) {
+        syncMicHardwareReadyState();
+      }
     }
     if (isMicMutedRef.current) return;
     // Once Silero Neural VAD v5 WASM is active, it exclusively owns 16kHz human-speech streaming & barge-in.
@@ -3376,69 +3511,105 @@ export default function App() {
 
     const liveCtx = liveAudioCtxRef.current;
     const sampleRate = liveCtx?.sampleRate || 48000;
+    const v = analyzeHumanVoiceBandFrame(float32, sampleRate);
+
+    // Protect the opening greeting request from immediate background mic collision (Mochi SOS _awaitingOpeningModelTurn parity)
+    if (awaitingOpeningTurnRef.current) {
+      clearUserBurstEndTimer();
+      return;
+    }
 
     // ACOUSTIC ECHO SUPPRESSION + INSTANT BARGE-IN:
-    // Saat AI sedang berbicara atau gema speaker masih memantul (<480ms setelah selesai bicara),
-    // cegah echo speaker masuk ke Gemini Live agar AI tidak menjawab suaranya sendiri!
-    if (
-      isPlayingAiAudioRef.current ||
-      isAiServerTurnOpenRef.current ||
-      Date.now() - lastAiPlayoutEndedAtRef.current < 480
-    ) {
-      if (isWorkbenchOpenRef.current || Date.now() - lastAiPlayoutEndedAtRef.current < 480) {
+    // Only treat AI as playing when outputAudioCtx is actively running so a suspended context never deadlocks the mic!
+    const outCtxRunning = outputAudioCtxRef.current?.state === 'running';
+    const aiActuallyPlaying =
+      outCtxRunning &&
+      (isPlayingAiAudioRef.current ||
+        isAiServerTurnOpenRef.current ||
+        activeSourcesRef.current.length > 0 ||
+        Date.now() - lastAiPlayoutEndedAtRef.current < 420);
+
+    if (aiActuallyPlaying) {
+      clearUserBurstEndTimer();
+      userAudioBurstActiveRef.current = false;
+      consecutiveSpeechFramesRef.current = 0;
+      if (
+        !openingGreetingCompletedRef.current ||
+        isWorkbenchOpenRef.current ||
+        Date.now() - lastAiPlayoutEndedAtRef.current < 420
+      ) {
+        bargeSpeechStreakRef.current = 0;
         return;
       }
       const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
-      const rms = bargeVad.lastMetrics?.rms ?? 0;
-      if (bargeVad.speechStarted && rms >= 0.016) {
-        interruptAiAndStartListening();
-        if (!isUserSpeakingLiveRef.current) {
-          isUserSpeakingLiveRef.current = true;
-          setIsUserSpeakingLive(true);
-        }
-        if (
-          wsRef.current &&
-          wsRef.current.readyState === WebSocket.OPEN &&
-          isLiveConnectedRef.current &&
-          bargeVad.speechPcm16k &&
-          bargeVad.speechPcm16k.length > 0
-        ) {
-          const pcmBase64 = float32At16kToPcm16Base64(bargeVad.speechPcm16k);
-          wsRef.current.send(
-            JSON.stringify({
-              realtimeInput: {
-                audio: {
-                  mimeType: 'audio/pcm;rate=16000',
-                  data: pcmBase64,
+      const isBargeVoice =
+        v.isHumanSpeech &&
+        (bargeVad.inSpeech || bargeVad.speechStarted) &&
+        v.rms >= 0.026;
+      if (isBargeVoice) {
+        bargeSpeechStreakRef.current += 1;
+        if (bargeSpeechStreakRef.current >= 5) {
+          bargeSpeechStreakRef.current = 0;
+          lastBargeInAtRef.current = Date.now();
+          interruptAiAndStartListening();
+          userAudioBurstActiveRef.current = true;
+          if (!isUserSpeakingLiveRef.current) {
+            isUserSpeakingLiveRef.current = true;
+            setIsUserSpeakingLive(true);
+          }
+          const pcmBase64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
+          if (
+            pcmBase64 &&
+            wsRef.current &&
+            wsRef.current.readyState === WebSocket.OPEN &&
+            isLiveConnectedRef.current
+          ) {
+            wsRef.current.send(
+              JSON.stringify({
+                realtimeInput: {
+                  audio: {
+                    mimeType: 'audio/pcm;rate=16000',
+                    data: pcmBase64,
+                  },
                 },
-              },
-            })
-          );
+              })
+            );
+          }
+          scheduleUserBurstEnd();
         }
-      } else if (!bargeVad.inSpeech) {
-        // Never retain speaker bleed in handyVad pre-roll buffer while AI is playing
-        handyVadRef.current.reset();
+      } else {
+        bargeSpeechStreakRef.current = Math.max(0, bargeSpeechStreakRef.current - 1);
+        handyVadRef.current.clearPreRoll();
       }
       return;
     }
 
     const vadRes = handyVadRef.current.processSamples(float32, sampleRate, false);
+    const isListeningSpeech =
+      (v.isHumanSpeech || vadRes.inSpeech || v.rms >= 0.005) && v.rms >= 0.0022;
 
-    if (vadRes.inSpeech) {
-      lastHandySpeechAtRef.current = Date.now();
-      if (!isUserSpeakingLiveRef.current) {
-        isUserSpeakingLiveRef.current = true;
-        setIsUserSpeakingLive(true);
+    if (isListeningSpeech) {
+      consecutiveSpeechFramesRef.current += 1;
+      if (consecutiveSpeechFramesRef.current >= 2) {
+        lastHandySpeechAtRef.current = Date.now();
+        userAudioBurstActiveRef.current = true;
+        if (!isUserSpeakingLiveRef.current) {
+          isUserSpeakingLiveRef.current = true;
+          setIsUserSpeakingLive(true);
+        }
+        if (userSpeakingTimerRef.current) window.clearTimeout(userSpeakingTimerRef.current);
+        userSpeakingTimerRef.current = window.setTimeout(() => {
+          isUserSpeakingLiveRef.current = false;
+          setIsUserSpeakingLive(false);
+        }, 650);
+        scheduleUserBurstEnd();
       }
-      if (userSpeakingTimerRef.current) window.clearTimeout(userSpeakingTimerRef.current);
-      userSpeakingTimerRef.current = window.setTimeout(() => {
-        isUserSpeakingLiveRef.current = false;
-        setIsUserSpeakingLive(false);
-      }, 450);
+    } else {
+      consecutiveSpeechFramesRef.current = Math.max(0, consecutiveSpeechFramesRef.current - 1);
     }
 
-    // Stream continuous 16kHz PCM directly to Gemini 3.8 Live's native server-side Automatic VAD
-    // so speech onset, natural pauses, and end-of-turn silence are detected without clipping!
+    // Stream continuous real-time 16kHz PCM directly to Gemini 3.8 Live's native server-side Automatic VAD
+    // (matching Mochi SOS `!mochiPlayingAudio` continuous streaming so the server VAD clock never stalls).
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
       const pcmBase64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
       if (pcmBase64) {
@@ -3462,6 +3633,9 @@ export default function App() {
 
     stream.getAudioTracks().forEach((track) => {
       track.enabled = !isMicMutedRef.current;
+      track.onended = () => {
+        syncMicHardwareReadyState();
+      };
     });
 
     if (liveCtx.state === 'suspended') {
@@ -3470,20 +3644,12 @@ export default function App() {
         new Promise<void>((r) => setTimeout(r, 150)),
       ]);
     }
+    syncMicHardwareReadyState();
 
     if (micSourceNodeRef.current) {
       try {
         micSourceNodeRef.current.disconnect();
       } catch {}
-      micSourceNodeRef.current = null;
-    }
-
-    if (micSourceNodeRef.current) {
-      try {
-        micSourceNodeRef.current.disconnect();
-      } catch {
-        // Ignore
-      }
       micSourceNodeRef.current = null;
     }
     if (audioWorkletNodeRef.current) {
@@ -3505,6 +3671,10 @@ export default function App() {
       const source = liveCtx.createMediaStreamSource(stream);
       micSourceNodeRef.current = source;
       handyVadRef.current.reset();
+      preRollFramesRef.current = [];
+      consecutiveSpeechFramesRef.current = 0;
+      bargeSpeechStreakRef.current = 0;
+      userAudioBurstActiveRef.current = false;
       lastHandySpeechAtRef.current = 0;
       try {
         (window as any).__fzVoiceStudioHandyVad = handyVadRef.current;
@@ -3525,6 +3695,7 @@ export default function App() {
           }
         },
         onHumanBargeIn: () => {
+          lastBargeInAtRef.current = Date.now();
           interruptAiAndStartListening();
         },
         onSpeechPcm16kBase64: (pcmBase64) => {
@@ -3570,7 +3741,7 @@ export default function App() {
 
       const attachScriptProcessorFallback = () => {
         if (scriptProcessorRef.current) return;
-        const processor = liveCtx.createScriptProcessor(4096, 1, 1);
+        const processor = liveCtx.createScriptProcessor(2048, 1, 1);
         scriptProcessorRef.current = processor;
         (window as any).__fzLiveProcessor = processor;
 
@@ -3668,37 +3839,6 @@ export default function App() {
       if (!workletInitialized) {
         attachScriptProcessorFallback();
       }
-
-      // Cross-realm / zero-sample self-healing watchdog:
-      // If `stream` originated from parent window (`__fzSharedMicStream`) and WebAudio produces all-zero samples
-      // in this iframe realm, automatically acquire a native same-realm MediaStream.
-      const isCrossRealmStream =
-        typeof window !== 'undefined' &&
-        typeof window.MediaStream === 'function' &&
-        !(stream instanceof window.MediaStream);
-      if (isCrossRealmStream && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
-        const connectedAt = Date.now();
-        window.setTimeout(() => {
-          if (
-            micStreamRef.current === stream &&
-            !userHungUpRef.current &&
-            !isMicMutedRef.current &&
-            lastMicFrameAtRef.current < connectedAt
-          ) {
-            void navigator.mediaDevices
-              .getUserMedia({
-                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-              })
-              .catch(() => navigator.mediaDevices.getUserMedia({ audio: true }))
-              .then(async (nativeStream) => {
-                if (nativeStream && !userHungUpRef.current && micStreamRef.current === stream) {
-                  await connectMicStreamToLiveProcessing(nativeStream, liveCtx);
-                }
-              })
-              .catch(() => {});
-          }
-        }, 800);
-      }
     } catch (err: any) {
       console.warn('Microphone node wiring error (SpeechRecognition handles voice):', err);
     }
@@ -3750,72 +3890,41 @@ export default function App() {
     setIsMicMuted(false);
     isMicMutedRef.current = false;
 
-    // 1. Prime Unified Live AudioContext (native hardware rate for iOS & Desktop)
+    // 1. Prime Unified Live AudioContext (100% same-realm Mochi SOS parity)
     const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
-    const parentWin = (() => {
-      try {
-        return window.parent && window.parent !== window ? (window.parent as any) : null;
-      } catch {
-        return null;
-      }
-    })();
-    if (parentWin?.__fzSharedLiveAudioCtx?.state === 'suspended') {
-      void parentWin.__fzSharedLiveAudioCtx.resume().catch(() => {});
-    }
     if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
-      liveAudioCtxRef.current = new CtxClass();
+      try {
+        liveAudioCtxRef.current = new CtxClass({ latencyHint: 'interactive' });
+      } catch {
+        liveAudioCtxRef.current = new CtxClass();
+      }
     }
     const liveCtx = liveAudioCtxRef.current;
+    liveCtx.onstatechange = () => {
+      syncMicHardwareReadyState();
+    };
     inputAudioCtxRef.current = liveCtx;
     outputAudioCtxRef.current = liveCtx;
     nextStartTimeRef.current = liveCtx.currentTime;
     if (liveCtx.state === 'suspended') {
-      void liveCtx.resume().catch(() => {});
+      void liveCtx.resume().then(() => {
+        syncMicHardwareReadyState();
+      }).catch(() => {});
     }
 
-    // 2. Dapatkan mikrofon secara non-blocking jika peramban mengizinkan langsung
+    // 2. Dapatkan mikrofon langsung di realm call.html (seperti Mochi SOS)
     let stream: MediaStream | null =
       preAcquiredStream && preAcquiredStream.getAudioTracks?.().some((t) => t.readyState === 'live')
         ? preAcquiredStream
         : micStreamRef.current && micStreamRef.current.getAudioTracks?.().some((t) => t.readyState === 'live')
           ? micStreamRef.current
           : null;
-    if (!stream && parentWin) {
-      try {
-        if (parentWin.__fzSharedMicStream && parentWin.__fzSharedMicStream.getAudioTracks?.().some((t: MediaStreamTrack) => t.readyState === 'live')) {
-          stream = parentWin.__fzSharedMicStream;
-          parentWin.__fzSharedMicStream = null;
-        } else if (parentWin.__fzSharedMicStreamPromise) {
-          const pendingParentPromise = parentWin.__fzSharedMicStreamPromise;
-          const sharedRes = await Promise.race([
-            pendingParentPromise,
-            new Promise<null>((r) => setTimeout(() => r(null), 6000)),
-          ]);
-          if (sharedRes && sharedRes.getAudioTracks?.().some((t: MediaStreamTrack) => t.readyState === 'live')) {
-            stream = sharedRes;
-            parentWin.__fzSharedMicStreamPromise = null;
-            parentWin.__fzSharedMicStream = null;
-          } else {
-            void pendingParentPromise
-              .then(async (lateSharedStream: MediaStream | null) => {
-                if (
-                  lateSharedStream &&
-                  !userHungUpRef.current &&
-                  (!micStreamRef.current || !micStreamRef.current.getAudioTracks?.().some((t) => t.readyState === 'live'))
-                ) {
-                  await connectMicStreamToLiveProcessing(lateSharedStream, liveCtx);
-                }
-              })
-              .catch(() => {});
-          }
-        }
-      } catch {}
-    }
     if (!stream && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
       try {
         const getStreamPromise = navigator.mediaDevices
           .getUserMedia({
             audio: {
+              channelCount: 1,
               echoCancellation: true,
               noiseSuppression: true,
               autoGainControl: true,
@@ -4001,18 +4110,12 @@ export default function App() {
               )
             );
             const customVocabTerms = Array.from(
-              new Set([
-                'Fiezel',
-                'Mochi',
-                'Sensei Nanami',
-                'Keita Senpai',
-                'Coach Alex',
-                'Coach Sarah',
-                'Xiao Mochi',
-                'Braincore',
-                ...activeScenario.vocabPrereqs.map((v) => v.term),
-              ])
-            ).slice(0, 32);
+              new Set(
+                activeScenario.vocabPrereqs
+                  .map((v) => String(v.term || '').trim())
+                  .filter((t) => t.length >= 3)
+              )
+            ).slice(0, 16);
 
             const pacingDirective =
               speechRate <= 0.95
@@ -4227,6 +4330,16 @@ export default function App() {
                 ? `[Instruction: Begin our call now as ${activePersona.name} speaking 100% in ${targetLangLabel} with authentic native ${targetLangLabel} pronunciation. Deliver your opening greeting ("${activePersona.openingGreeting || activeScenario.openingLine}") with composed mentor authority (no forced laughter), and briefly ask a natural follow-up question in ${targetLangLabel}.]`
                 : `[Instruction: Begin our conversation now with composed, sharp, caring mentor energy as ${activePersona.name} speaking 100% in ${targetLangLabel} with authentic native ${targetLangLabel} pronunciation (do NOT start with forced laughter). Say your exact opening line in ${targetLangLabel}: "${activePersona.openingGreeting || activeScenario.openingLine}"]`;
               try {
+                openingGreetingCompletedRef.current = false;
+                awaitingOpeningTurnRef.current = true;
+                isAiServerTurnOpenRef.current = true;
+                if (awaitingOpeningTimerRef.current) {
+                  window.clearTimeout(awaitingOpeningTimerRef.current);
+                }
+                awaitingOpeningTimerRef.current = window.setTimeout(() => {
+                  awaitingOpeningTurnRef.current = false;
+                  awaitingOpeningTimerRef.current = null;
+                }, 4000);
                 ws.send(
                   JSON.stringify({
                     clientContent: {
@@ -4365,6 +4478,28 @@ export default function App() {
           }
 
           if (incomingAudioChunks.length > 0 && outputAudioCtxRef.current) {
+            awaitingOpeningTurnRef.current = false;
+            if (awaitingOpeningTimerRef.current) {
+              window.clearTimeout(awaitingOpeningTimerRef.current);
+              awaitingOpeningTimerRef.current = null;
+            }
+            if (lastBargeInAtRef.current > 0 && Date.now() - lastBargeInAtRef.current < 450) {
+              incomingAudioChunks.length = 0;
+            }
+          }
+
+          if (incomingAudioChunks.length > 0 && outputAudioCtxRef.current) {
+            clearUserBurstEndTimer();
+            userAudioBurstActiveRef.current = false;
+            consecutiveSpeechFramesRef.current = 0;
+            if (userSpeakingTimerRef.current) {
+              window.clearTimeout(userSpeakingTimerRef.current);
+              userSpeakingTimerRef.current = null;
+            }
+            if (isUserSpeakingLiveRef.current) {
+              isUserSpeakingLiveRef.current = false;
+              setIsUserSpeakingLive(false);
+            }
             isAiServerTurnOpenRef.current = true;
             if (liveOpeningAudioWatchdogRef.current) {
               window.clearTimeout(liveOpeningAudioWatchdogRef.current);
@@ -4451,13 +4586,14 @@ export default function App() {
                 // Ignore
               }
             }
-            // Wall-clock safety unlock: ensures mic streaming resumes promptly even if WebAudio onended is throttled
+            // Wall-clock safety unlock: while server turn is still open, allow 2400ms for inter-sentence pauses
+            // so the mic never opens mid-turn and interrupts the AI's second sentence!
             if (livePlaybackSafetyTimerRef.current) {
               window.clearTimeout(livePlaybackSafetyTimerRef.current);
             }
             const remainingPlaybackMs = Math.max(
-              500,
-              Math.ceil((nextStartTimeRef.current - ctx.currentTime) * 1000) + 450
+              1200,
+              Math.ceil((nextStartTimeRef.current - ctx.currentTime) * 1000) + 2400
             );
             livePlaybackSafetyTimerRef.current = window.setTimeout(() => {
               livePlaybackSafetyTimerRef.current = null;
@@ -4567,8 +4703,25 @@ export default function App() {
               activeSourcesRef.current.length === 0 ||
               outputAudioCtxRef.current?.state === 'suspended'
             ) {
+              if (livePlaybackSafetyTimerRef.current) {
+                window.clearTimeout(livePlaybackSafetyTimerRef.current);
+                livePlaybackSafetyTimerRef.current = null;
+              }
               activeSourcesRef.current = [];
               setAiAudioPlaying(false, 350);
+            } else if (outputAudioCtxRef.current) {
+              if (livePlaybackSafetyTimerRef.current) {
+                window.clearTimeout(livePlaybackSafetyTimerRef.current);
+              }
+              const exactLeftMs = Math.max(
+                200,
+                Math.ceil((nextStartTimeRef.current - outputAudioCtxRef.current.currentTime) * 1000) + 400
+              );
+              livePlaybackSafetyTimerRef.current = window.setTimeout(() => {
+                livePlaybackSafetyTimerRef.current = null;
+                activeSourcesRef.current = [];
+                setAiAudioPlaying(false, 0);
+              }, exactLeftMs);
             }
             callBillingRef.current.turnMetered = false;
             if (callBillingRef.current.outOfGemsAfterTurn && callBillingRef.current.active) {
@@ -4883,7 +5036,23 @@ export default function App() {
     lastHandySpeechAtRef.current = 0;
     liveAnalyserRef.current = null;
     handyVadRef.current.reset();
+    awaitingOpeningTurnRef.current = false;
+    if (awaitingOpeningTimerRef.current) {
+      window.clearTimeout(awaitingOpeningTimerRef.current);
+      awaitingOpeningTimerRef.current = null;
+    }
+    userAudioBurstActiveRef.current = false;
+    if (userBurstEndTimerRef.current) {
+      window.clearTimeout(userBurstEndTimerRef.current);
+      userBurstEndTimerRef.current = null;
+    }
+    preRollFramesRef.current = [];
+    consecutiveSpeechFramesRef.current = 0;
+    bargeSpeechStreakRef.current = 0;
+    isMicHardwareReadyRef.current = false;
+    setIsMicHardwareReady(false);
     setIsUserSpeakingLive(false);
+    isUserSpeakingLiveRef.current = false;
     if (userSpeakingTimerRef.current) {
       window.clearTimeout(userSpeakingTimerRef.current);
       userSpeakingTimerRef.current = null;
@@ -4931,16 +5100,8 @@ export default function App() {
       }
       micStreamRef.current = null;
     }
-    if (liveAudioCtxRef.current) {
-      try {
-        void liveAudioCtxRef.current.close().catch(() => {});
-      } catch {
-        // Ignore
-      }
-      liveAudioCtxRef.current = null;
-    }
-    inputAudioCtxRef.current = null;
-    outputAudioCtxRef.current = null;
+    // Keep liveAudioCtxRef.current alive across calls in the same session (Mochi SOS parity)
+    // so gesture-unlocked WebAudio is never destroyed when hanging up and calling again!
     if (wsRef.current) {
       wsRef.current.onclose = null;
       wsRef.current.onerror = null;
@@ -5063,7 +5224,11 @@ export default function App() {
     const healLiveAudioAndMicOnGesture = () => {
       try {
         if (liveAudioCtxRef.current?.state === 'suspended') {
-          void liveAudioCtxRef.current.resume().catch(() => {});
+          void liveAudioCtxRef.current.resume().then(() => {
+            syncMicHardwareReadyState();
+          }).catch(() => {});
+        } else {
+          syncMicHardwareReadyState();
         }
         if (
           outputAudioCtxRef.current &&
@@ -6026,7 +6191,14 @@ export default function App() {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
                               </span>
-                              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-900 truncate">
+                              <div
+                                onClick={() => {
+                                  if (!isMicHardwareReady && !isMicMuted) {
+                                    void toggleMuteMic();
+                                  }
+                                }}
+                                className={`flex items-center gap-1.5 text-xs font-bold text-emerald-900 truncate ${!isMicHardwareReady && !isMicMuted ? 'cursor-pointer underline decoration-dotted' : ''}`}
+                              >
                                 <Mic className={`w-3.5 h-3.5 shrink-0 ${isMicMuted ? 'text-[#8C2233]' : 'text-emerald-700 animate-pulse'}`} />
                                 <span className="truncate">
                                   {isMicMuted
@@ -6035,6 +6207,8 @@ export default function App() {
                                     ? 'Kamu Bicara...'
                                     : isPlayingAiAudio
                                     ? 'Mochi Berbicara...'
+                                    : !isMicHardwareReady
+                                    ? 'Ketuk untuk Aktifkan Mic'
                                     : 'Mic Aktif (Bicara Langsung)'}
                                 </span>
                                 <span className="font-mono text-emerald-700 text-[11px] font-semibold shrink-0">

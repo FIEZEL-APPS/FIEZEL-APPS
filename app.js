@@ -12631,29 +12631,6 @@ function openKawanBicaraCallModal(){
     phone.disabled=true;phone.classList.add('is-dialing');
     haptic('confirm');playKawanRingtone();
     try{sessionStorage.setItem('fz_kawan_autocall','1')}catch(_){}
-    try{
-      const AC=window.AudioContext||window.webkitAudioContext;
-      if(AC){
-        if(!window.__fzSharedLiveAudioCtx||window.__fzSharedLiveAudioCtx.state==='closed'){
-          window.__fzSharedLiveAudioCtx=new AC();
-        }
-        if(window.__fzSharedLiveAudioCtx.state==='suspended'){
-          window.__fzSharedLiveAudioCtx.resume().catch(()=>{});
-        }
-      }
-      const hasLiveSharedMic=Boolean(window.__fzSharedMicStream&&typeof window.__fzSharedMicStream.getAudioTracks==='function'&&window.__fzSharedMicStream.getAudioTracks().some(t=>t.readyState==='live'));
-      if(!hasLiveSharedMic){
-        window.__fzSharedMicStream=null;
-        window.__fzSharedMicStreamPromise=null;
-      }
-      if(navigator.mediaDevices&&typeof navigator.mediaDevices.getUserMedia==='function'&&!window.__fzSharedMicStreamPromise){
-        window.__fzSharedMicStreamPromise=navigator.mediaDevices
-          .getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})
-          .catch(()=>navigator.mediaDevices.getUserMedia({audio:true}))
-          .then(s=>{window.__fzSharedMicStream=s;return s})
-          .catch(()=>{window.__fzSharedMicStreamPromise=null;return null});
-      }
-    }catch(_){}
     try{self.FiezelInteractiveChat?.StudioBridge?.send?.('fz.shell.autocall',{at:Date.now()})}catch(_){}
     setTimeout(()=>{closeKawanBicaraCallModal();go('chat')},160);
   };

@@ -16,7 +16,7 @@ const VOCAL_BUCKETS = 16;
 const VOCAL_FREQ_MIN = 400.0;
 const VOCAL_FREQ_MAX = 4000.0;
 const NOISE_ALPHA = 0.002;
-const INITIAL_NOISE_FLOOR_DB = -62.0;
+const INITIAL_NOISE_FLOOR_DB = -65.0;
 
 export interface HandyFrameScore {
   score: number;
@@ -166,11 +166,11 @@ export class HandyHumanVad {
   private inSpeech: boolean;
 
   constructor(opts: HandyVadOptions = {}) {
-    this.threshold = typeof opts.threshold === 'number' ? opts.threshold : 0.50;
-    this.bargeInThreshold = typeof opts.bargeInThreshold === 'number' ? opts.bargeInThreshold : 0.62;
+    this.threshold = typeof opts.threshold === 'number' ? opts.threshold : 0.45;
+    this.bargeInThreshold = typeof opts.bargeInThreshold === 'number' ? opts.bargeInThreshold : 0.60;
     this.prefillFrames = typeof opts.prefillFrames === 'number' ? opts.prefillFrames : 15;
     this.hangoverFrames = typeof opts.hangoverFrames === 'number' ? opts.hangoverFrames : 11;
-    this.onsetFrames = typeof opts.onsetFrames === 'number' ? opts.onsetFrames : 3;
+    this.onsetFrames = typeof opts.onsetFrames === 'number' ? opts.onsetFrames : 2;
     this.bargeInOnsetFrames = typeof opts.bargeInOnsetFrames === 'number' ? opts.bargeInOnsetFrames : 4;
 
     this.noiseFloor = new Float32Array(VOCAL_BUCKETS);
@@ -202,6 +202,12 @@ export class HandyHumanVad {
     this.hangoverCounter = 0;
     this.onsetCounter = 0;
     this.inSpeech = false;
+  }
+
+  public clearPreRoll(): void {
+    if (!this.inSpeech && this.onsetCounter === 0) {
+      this.frameBuffer = [];
+    }
   }
 
   /**
@@ -265,7 +271,7 @@ export class HandyHumanVad {
 
     const rms = Math.sqrt(sumSq / N);
     const zcr = zc / N;
-    const minRms = aiPlaying ? 0.012 : 0.0042;
+    const minRms = aiPlaying ? 0.012 : 0.0028;
     if (rms < minRms) {
       return {
         score: 0,

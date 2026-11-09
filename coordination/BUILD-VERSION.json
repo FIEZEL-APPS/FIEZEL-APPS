@@ -1,7 +1,7 @@
 {
-  "version": "m025-784",
-  "claimedBy": "branch fix/onboarding-cloud-scroll-pwa-mic-m025-784",
-  "claimedAt": "2026-11-09T11:29:57.116Z",
-  "reason": "fix(onboarding,voice): [ALLOW-PROTECTED: onboarding|pwa] fix onboarding cloud seam, mobile scroll/goal grid, and pwa microphone activation",
+  "version": "m025-785",
+  "claimedBy": "branch fix/kawan-mic-parity-m025-785",
+  "claimedAt": "2026-11-09T19:02:31.227Z",
+  "reason": "fix(voice): enforce kawan bicara mobile pwa mic parity with mochi sos and 13-point ci contract gate",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

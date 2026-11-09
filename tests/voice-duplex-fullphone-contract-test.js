@@ -129,6 +129,125 @@ assert.ok(
 );
 console.log('  ✓ Voice Studio SileroVadGate selaras dengan Mochi SOS');
 
+// 4. Audit Invarian Mutlak Mikrofon Mobile PWA Kawan Bicara (Zero Cross-Realm Hijack & Mochi SOS Parity)
+const appJsContent = fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8');
+const interactiveChatContent = fs.readFileSync(
+  path.join(ROOT, 'features/interactive-chat/fiezel-interactive-chat.js'),
+  'utf8'
+);
+const handyVadContent = fs.readFileSync(
+  path.join(ROOT, 'features/voice-studio/src/lib/handyVad.ts'),
+  'utf8'
+);
+const distVoiceStudioContent = fs.readFileSync(
+  path.join(ROOT, 'features/voice-studio/dist/voice-studio.js'),
+  'utf8'
+);
+
+console.log('[Test 8] Kawan Bicara: Larangan Mutlak Pembajakan getUserMedia & Cross-Realm AudioContext oleh Jendela Induk');
+assert.strictEqual(
+  appJsContent.includes('__fzSharedLiveAudioCtx') ||
+    appJsContent.includes('__fzSharedMicStream') ||
+    appJsContent.includes('__fzSharedMicStreamPromise'),
+  false,
+  'app.js DILARANG KERAS membuat __fzSharedLiveAudioCtx atau memanggil getUserMedia untuk iframe call.html'
+);
+assert.strictEqual(
+  interactiveChatContent.includes('__fzSharedLiveAudioCtx') ||
+    interactiveChatContent.includes('__fzSharedMicStream'),
+  false,
+  'fiezel-interactive-chat.js DILARANG KERAS membuat __fzSharedLiveAudioCtx lintas-iframe'
+);
+assert.strictEqual(
+  appTsxContent.includes('__fzSharedLiveAudioCtx') ||
+    appTsxContent.includes('__fzSharedMicStream') ||
+    appTsxContent.includes('parentSharedCtx'),
+  false,
+  'App.tsx DILARANG KERAS mengadopsi AudioContext atau MediaStream lintas-realm dari window.parent'
+);
+console.log('  ✓ Isolasi same-realm AudioContext & getUserMedia di dalam call.html terjamin 100%');
+
+console.log('[Test 9] Kawan Bicara: Same-Realm AudioContext Unlock (1-Frame Silent Buffer) & Direct Gesture Call Start');
+assert.ok(
+  appTsxContent.includes('const silentBuf = liveCtx.createBuffer(1, 1, liveCtx.sampleRate || 24000);') &&
+    appTsxContent.includes('silentSrc.connect(liveCtx.destination);'),
+  'primeAudioPlayback() wajib membuka kunci AudioContext melalui 1-frame silent AudioBuffer di dalam user gesture'
+);
+assert.ok(
+  appTsxContent.includes('// Keep liveAudioCtxRef.current alive across calls in the same session (Mochi SOS parity)'),
+  'stopLiveCall() wajib menjaga liveAudioCtxRef tetap hidup lintas panggilan agar tidak kehilangan unlock gesture'
+);
+assert.ok(
+  appTsxContent.includes('hasDailyFree ||\n      balance >= KAWAN_BICARA_MIN_START_GEMS;') &&
+    appTsxContent.includes('if (shouldStartImmediately) {') &&
+    appTsxContent.includes('void startLiveCall();\n      return;'),
+  'requestStartLiveCall() wajib langsung menjalankan startLiveCall() secara sinkron di dalam user gesture tanpa terhalang modal konfirmasi saat kuota gratis / Gem cukup'
+);
+console.log('  ✓ Same-realm AudioContext warmup & direct gesture start terverifikasi');
+
+console.log('[Test 10] Kawan Bicara: Paritas Formant-Band VAD (300Hz-3300Hz), 2048-Sample Processor, & HandyVad -65dB Noise Floor');
+assert.ok(
+  appTsxContent.includes('const analyzeHumanVoiceBandFrame = (float32: Float32Array, inRate: number) => {'),
+  'App.tsx wajib memiliki detektor pita vokal manusia analyzeHumanVoiceBandFrame (300Hz-3300Hz)'
+);
+assert.ok(
+  appTsxContent.includes('const processor = liveCtx.createScriptProcessor(2048, 1, 1);'),
+  'attachScriptProcessorFallback wajib menggunakan ukuran buffer rendah-latensi 2048 sampel (42.6ms)'
+);
+assert.ok(
+  appTsxContent.includes('(v.isHumanSpeech || vadRes.inSpeech || v.rms >= 0.005) && v.rms >= 0.0022'),
+  'Sensitivitas deteksi bicara isListeningSpeech wajib selaras dengan Mochi SOS untuk mikrofon HP'
+);
+assert.ok(
+  handyVadContent.includes('const INITIAL_NOISE_FLOOR_DB = -65.0;') &&
+    handyVadContent.includes('public clearPreRoll(): void'),
+  'handyVad.ts wajib menggunakan INITIAL_NOISE_FLOOR_DB = -65.0 dan menyediakan clearPreRoll()'
+);
+console.log('  ✓ Formant-Band VAD, 2048-sample ScriptProcessor, dan HandyVad -65dB terverifikasi');
+
+console.log('[Test 11] Kawan Bicara: Proteksi Sapaan Pembuka (awaitingOpeningTurnRef) & Anti-Drop Balasan Suara AI');
+assert.ok(
+  appTsxContent.includes('if (awaitingOpeningTurnRef.current) {\n      clearUserBurstEndTimer();\n      return;\n    }') &&
+    appTsxContent.includes('awaitingOpeningTurnRef.current = true;\n                isAiServerTurnOpenRef.current = true;'),
+  'Sapaan pembuka wajib dilindungi oleh awaitingOpeningTurnRef dan isAiServerTurnOpenRef dari tabrakan mic awal'
+);
+assert.strictEqual(
+  /if\s*\(\s*userAudioBurstActiveRef\.current\s*\|\|/.test(appTsxContent),
+  false,
+  'ws.onmessage DILARANG KERAS membuang incomingAudioChunks balasan AI hanya karena userAudioBurstActiveRef masih true'
+);
+assert.ok(
+  appTsxContent.includes('if (incomingAudioChunks.length > 0 && outputAudioCtxRef.current) {\n            clearUserBurstEndTimer();\n            userAudioBurstActiveRef.current = false;'),
+  'Kedatangan incomingAudioChunks balasan AI wajib langsung menutup burst mic murid dan memutar suara AI'
+);
+console.log('  ✓ Proteksi sapaan pembuka & anti-drop balasan suara AI terverifikasi');
+
+console.log('[Test 12] Kawan Bicara: Aliran Kontinu 16kHz PCM + scheduleUserBurstEnd (1050ms) & Anti-Halusinasi Vocab');
+assert.ok(
+  appTsxContent.includes('const silenceHoldMs = 1050;') &&
+    appTsxContent.includes('scheduleUserBurstEnd();'),
+  'handleMicPcmData wajib menjadwalkan scheduleUserBurstEnd (1050ms) dan mengalirkan 16kHz PCM kontinu'
+);
+assert.strictEqual(
+  appTsxContent.includes("'Fiezel',") || appTsxContent.includes("'Xiao Mochi',"),
+  false,
+  'customVocabTerms DILARANG menyuntikkan token nama aplikasi yang memicu halusinasi ASR pada ucapan pendek'
+);
+console.log('  ✓ Aliran kontinu 16kHz PCM & kebersihan customVocabTerms terverifikasi');
+
+console.log('[Test 13] Kawan Bicara: Integritas Bundle Produksi dist/voice-studio.js');
+assert.strictEqual(
+  distVoiceStudioContent.includes('__fzSharedLiveAudioCtx') ||
+    distVoiceStudioContent.includes('__fzSharedMicStream'),
+  false,
+  'Bundle produksi dist/voice-studio.js wajib bersih dari referensi __fzSharedLiveAudioCtx / __fzSharedMicStream'
+);
+assert.ok(
+  distVoiceStudioContent.includes('Ketuk untuk Aktifkan Mic'),
+  'Bundle produksi dist/voice-studio.js wajib memuat hasil build terbaru dari App.tsx'
+);
+console.log('  ✓ Integritas bundle produksi dist/voice-studio.js terverifikasi');
+
 console.log('\n================================================================');
-console.log('ALL 7/7 VOICE DUPLEX FULL-PHONE & BARGE-IN CONTRACT CHECKS PASSED!');
+console.log('ALL 13/13 VOICE DUPLEX FULL-PHONE & BARGE-IN CONTRACT CHECKS PASSED!');
 console.log('================================================================');
