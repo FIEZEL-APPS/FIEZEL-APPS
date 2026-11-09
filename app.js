@@ -12641,6 +12641,11 @@ function openKawanBicaraCallModal(){
           window.__fzSharedLiveAudioCtx.resume().catch(()=>{});
         }
       }
+      const hasLiveSharedMic=Boolean(window.__fzSharedMicStream&&typeof window.__fzSharedMicStream.getAudioTracks==='function'&&window.__fzSharedMicStream.getAudioTracks().some(t=>t.readyState==='live'));
+      if(!hasLiveSharedMic){
+        window.__fzSharedMicStream=null;
+        window.__fzSharedMicStreamPromise=null;
+      }
       if(navigator.mediaDevices&&typeof navigator.mediaDevices.getUserMedia==='function'&&!window.__fzSharedMicStreamPromise){
         window.__fzSharedMicStreamPromise=navigator.mediaDevices
           .getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})

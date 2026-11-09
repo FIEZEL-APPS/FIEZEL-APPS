@@ -878,20 +878,41 @@
     var onGesture = function () {
       var ctx = warmAudioContext();
       try {
+        if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+          ctx.resume().catch(function () {});
+        }
         if (isMochiEnabledFromStorage() && isSosSurfaceActiveInternal()) {
           prewarmLiveSession(false);
           if (hasSessionStorage() && !_hotWs && !(_activeCall && _activeCall.active)) {
             openHotSocket();
           }
         }
+        if (
+          _activeCall &&
+          _activeCall.active &&
+          !_micMuted &&
+          (!_micStream ||
+            typeof _micStream.getAudioTracks !== 'function' ||
+            !_micStream.getAudioTracks().some(function (t) { return t.readyState === 'live'; })) &&
+          root &&
+          root.navigator &&
+          root.navigator.mediaDevices &&
+          typeof root.navigator.mediaDevices.getUserMedia === 'function'
+        ) {
+          root.navigator.mediaDevices
+            .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+            .catch(function () { return root.navigator.mediaDevices.getUserMedia({ audio: true }); })
+            .then(function (s) {
+              if (s && _activeCall && _activeCall.active) {
+                _micStream = s;
+                if (typeof _wireMicrophoneStream === 'function') {
+                  _wireMicrophoneStream(_activeCall, s);
+                }
+              }
+            })
+            .catch(function () {});
+        }
       } catch (_) {}
-      if (ctx && ctx.state === 'running') {
-        doc.removeEventListener('pointerdown', onGesture, true);
-        doc.removeEventListener('touchstart', onGesture, true);
-        doc.removeEventListener('click', onGesture, true);
-        doc.removeEventListener('keydown', onGesture, true);
-        _audioWarmBound = false;
-      }
     };
     doc.addEventListener('pointerdown', onGesture, true);
     doc.addEventListener('touchstart', onGesture, true);
@@ -945,6 +966,9 @@
   }
 
   function ensureSileroVadBundle() {
+    if (!root || !root.ort) {
+      return Promise.resolve(null);
+    }
     if (root && root.vad && typeof root.vad.MicVAD === 'object' || (root && root.vad && root.vad.MicVAD && typeof root.vad.MicVAD.new === 'function')) {
       return Promise.resolve(root.vad);
     }
