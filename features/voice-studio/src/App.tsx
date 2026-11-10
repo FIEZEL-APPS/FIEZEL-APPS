@@ -39,6 +39,8 @@ import {
   dispatchVoiceAppNavigation,
   finalizeCallSessionMemory,
   loadBraincoreState,
+  loadPteMasterState,
+  recordPteMasterAttempt,
   recordSpeakingAttempt,
   recordVocabPrereqMastery,
   saveBraincoreState,
@@ -659,7 +661,16 @@ export default function App() {
   const [learningWorkbench, setLearningWorkbench] = useState<{
     isOpen: boolean;
     topicTitle: string;
-    focusType: 'grammar' | 'vocab' | 'kanji' | 'kana' | 'sentence_drill';
+    focusType:
+      | 'grammar'
+      | 'vocab'
+      | 'kanji'
+      | 'kana'
+      | 'sentence_drill'
+      | 'pte_describe_image'
+      | 'pte_read_aloud'
+      | 'pte_scorecard'
+      | string;
     explanationText: string;
     patternFormula: string;
     drillInstruction: string;
@@ -2183,15 +2194,30 @@ export default function App() {
     const rawTitle = (override?.topicTitle || hintText || '').trim();
     const title = rawTitle || 'Papan Belajar';
 
-    let focusType: 'grammar' | 'vocab' | 'kanji' | 'kana' | 'sentence_drill' =
+    let focusType:
+      | 'grammar'
+      | 'vocab'
+      | 'kanji'
+      | 'kana'
+      | 'sentence_drill'
+      | 'pte_describe_image'
+      | 'pte_read_aloud'
+      | 'pte_scorecard'
+      | string =
       override?.focusType ||
-      (/kanji|hanzi|huruf china|aksara/i.test(title)
-        ? 'kanji'
-        : /kana|hiragana|katakana/i.test(title)
-          ? 'kana'
-          : /kosakata|vocab|kata baru|arti kata/i.test(title)
-            ? 'vocab'
-            : 'grammar');
+      (/describe.*image|pte.*di|pte.*chart|grafik/i.test(title)
+        ? 'pte_describe_image'
+        : /read.*aloud|pte.*ra|chunking|baca.*teks/i.test(title)
+          ? 'pte_read_aloud'
+          : /scorecard|rapor.*pte|evaluasi.*pte/i.test(title)
+            ? 'pte_scorecard'
+            : /kanji|hanzi|huruf china|aksara/i.test(title)
+              ? 'kanji'
+              : /kana|hiragana|katakana/i.test(title)
+                ? 'kana'
+                : /kosakata|vocab|kata baru|arti kata/i.test(title)
+                  ? 'vocab'
+                  : 'grammar');
 
     return {
       isOpen: true,
@@ -2602,6 +2628,24 @@ export default function App() {
       brainStateRef.current = nextState;
       setBrainState(nextState);
     });
+
+    // Record to PTE Master Ledger if in Dr. Julian PTE mode
+    if (activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian') {
+      const stageNum = /level(\d)/i.exec(activeScenario.id)?.[1]
+        ? parseInt(/level(\d)/i.exec(activeScenario.id)![1], 10)
+        : 1;
+      const fluencyMark = finalOk ? 4.5 : Math.max(1.5, ((ev.fluencyScore || 60) / 100) * 5);
+      const pronMark = finalOk ? 4.2 : Math.max(1.5, ((ev.accuracyScore || 60) / 100) * 5);
+      const contentMark = finalOk ? 2.8 : 1.2;
+      recordPteMasterAttempt({
+        stage: stageNum,
+        taskName: activeScenario.titleId,
+        fluency: fluencyMark,
+        pronunciation: pronMark,
+        content: contentMark,
+        feedback: extraFailReason || (finalOk ? 'Passing candidate standard' : 'Needs practice on fluency and key tokens'),
+      });
+    }
 
     if (finalOk) {
       workbenchSessionRef.current.completedQuizSentence = clean;
@@ -4179,6 +4223,14 @@ export default function App() {
               locale
             );
 
+            const pteMasterDirective =
+              activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian'
+                ? (() => {
+                    const pteState = loadPteMasterState();
+                    return `\n\n[PTE MASTER ACTIVE CANDIDATE DOSSIER]:\nCandidate Active Stage: Stage ${pteState.activeStage} of 4.\nCurrent Target: PTE ${pteState.targetScore} (Overall Estimate: ${pteState.overallEstimate}/90).\nCompleted Stages: [${pteState.completedStages.join(', ')}].\nChronic Misconceptions: ${pteState.chronicMisconceptions.map((m) => m.word).join(', ') || 'None yet'}.\nGreet the candidate directly at their current stage. If they are in Stage 1, conduct Describe Image with the Universal Template. Do NOT indulge in casual banter.`;
+                  })()
+                : '';
+
             const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
             const learnerAsrBcp47 =
               locCode === 'th'
@@ -4366,7 +4418,7 @@ export default function App() {
                   systemInstruction: {
                     parts: [
                       {
-                        text: `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}`,
                       },
                     ],
                   },

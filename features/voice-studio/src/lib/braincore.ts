@@ -10,6 +10,8 @@ import type {
   MasteryStateName,
   MentorSessionMemoryEntry,
   MisconceptionLedgerEntry,
+  PteMasterScorecard,
+  PteMasterState,
   SpeakingSessionMetric,
   TargetLang,
 } from '../types/voiceCall.ts';
@@ -2245,6 +2247,146 @@ export function dispatchVoiceAppNavigation(
   } catch {
     return false;
   }
+}
+
+// =========================================================================
+// PTE Academic Master Tutor Persistent Memory Ledger (fz_pte_master_state_v1)
+// =========================================================================
+
+export const PTE_MASTER_STORAGE_KEY = 'fz_pte_master_state_v1';
+
+export function getDefaultPteMasterState(): PteMasterState {
+  return {
+    version: 1,
+    activeStage: 1, // Default Stage 1: Describe Image
+    targetScore: 42,
+    overallEstimate: 30,
+    completedStages: [],
+    scorecards: [],
+    chronicMisconceptions: [],
+    lastUpdated: Date.now(),
+  };
+}
+
+export function loadPteMasterState(): PteMasterState {
+  if (typeof localStorage === 'undefined') return getDefaultPteMasterState();
+  try {
+    const raw = localStorage.getItem(PTE_MASTER_STORAGE_KEY);
+    if (!raw) return getDefaultPteMasterState();
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && parsed.version === 1) {
+      return parsed as PteMasterState;
+    }
+  } catch {
+    // ignore parse error
+  }
+  return getDefaultPteMasterState();
+}
+
+export function savePteMasterState(state: PteMasterState): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem(
+      PTE_MASTER_STORAGE_KEY,
+      JSON.stringify({
+        ...state,
+        lastUpdated: Date.now(),
+      })
+    );
+  } catch {
+    // quota exceeded fallback
+  }
+}
+
+export function recordPteMasterAttempt(attempt: {
+  stage: number;
+  taskName: string;
+  fluency: number;
+  pronunciation: number;
+  content: number;
+  missedWords?: string[];
+  feedback?: string;
+}): { nextState: PteMasterState; scoreCard: PteMasterScorecard } {
+  const current = loadPteMasterState();
+  const f = Math.max(1, Math.min(5, attempt.fluency));
+  const p = Math.max(1, Math.min(5, attempt.pronunciation));
+  const c = Math.max(0, Math.min(3, attempt.content));
+
+  // Pearson Concordance estimation: 10 to 90 scale
+  // Composite weighting: Fluency (40%), Pronunciation (35%), Content (25%)
+  const rawFraction = (f / 5) * 0.40 + (p / 5) * 0.35 + (c / 3) * 0.25;
+  const pearsonScore = Math.round(10 + rawFraction * 80);
+  const passed = pearsonScore >= current.targetScore;
+
+  const scoreCard: PteMasterScorecard = {
+    stage: attempt.stage,
+    taskName: attempt.taskName,
+    fluency: f,
+    pronunciation: p,
+    content: c,
+    pearsonScore,
+    passed,
+    missedWords: Array.isArray(attempt.missedWords) ? attempt.missedWords : [],
+    feedback:
+      attempt.feedback ||
+      (passed
+        ? 'Meets Australian Visa Benchmark (PTE 42+)'
+        : 'Below Target 42 Benchmark. Remedial drill required.'),
+    timestamp: Date.now(),
+  };
+
+  const nextCompleted = [...current.completedStages];
+  let nextStage = current.activeStage;
+  if (passed && !nextCompleted.includes(attempt.stage)) {
+    nextCompleted.push(attempt.stage);
+    if (attempt.stage < 4) {
+      nextStage = Math.max(nextStage, attempt.stage + 1);
+    }
+  }
+
+  // Update chronic misconceptions
+  const nextMisconceptions = [...current.chronicMisconceptions];
+  if (Array.isArray(attempt.missedWords)) {
+    attempt.missedWords.forEach((w) => {
+      const clean = w.trim().toLowerCase();
+      if (!clean) return;
+      const existing = nextMisconceptions.find((m) => m.word.toLowerCase() === clean);
+      if (existing) {
+        existing.missCount += 1;
+        existing.lastSeen = Date.now();
+      } else {
+        nextMisconceptions.push({
+          word: clean,
+          expected: clean,
+          stage: attempt.stage,
+          missCount: 1,
+          lastSeen: Date.now(),
+        });
+      }
+    });
+  }
+
+  // Rolling overall estimate (alpha = 0.3)
+  const nextEstimate = Math.round(current.overallEstimate * 0.7 + pearsonScore * 0.3);
+
+  const nextState: PteMasterState = {
+    ...current,
+    activeStage: nextStage,
+    overallEstimate: nextEstimate,
+    completedStages: nextCompleted,
+    scorecards: [scoreCard, ...current.scorecards].slice(0, 50),
+    chronicMisconceptions: nextMisconceptions.slice(-100),
+    lastUpdated: Date.now(),
+  };
+
+  savePteMasterState(nextState);
+  return { nextState, scoreCard };
+}
+
+export function resetPteMasterState(): PteMasterState {
+  const fresh = getDefaultPteMasterState();
+  savePteMasterState(fresh);
+  return fresh;
 }
 
 export { STORAGE_KEY };
