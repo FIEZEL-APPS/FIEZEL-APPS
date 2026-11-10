@@ -1,10 +1,10 @@
 # FIEZEL · Handoff: PTE Academic Preparation Hub & Big 4 Engine
 
-**Build Milestone**: `m025-787`  
-**Authoring Worktree**: `feat/pte-academic-prep-hub` (`fiezel-pte-prep-8979c`)  
-**Target Level**: Vocational & Higher Ed Entry (Australian Subclass 500 Student Visa Target 42–58+)  
-**Authoring Session**: `8979cd84-d320-4043-80cf-c591935cf8b2`  
-**Mandate Source**: `a91b3a79-13cf-443d-8f8f-d3a0860668c8`  
+**Build Milestone**: `m025-787`<br/>
+**Authoring Worktree**: `feat/pte-academic-prep-hub` (`fiezel-pte-prep-8979c`)<br/>
+**Target Level**: Vocational & Higher Ed Entry (Australian Subclass 500 Student Visa Target 42–58+)<br/>
+**Authoring Session**: `8979cd84-d320-4043-80cf-c591935cf8b2`<br/>
+**Mandate Source**: `a91b3a79-13cf-443d-8f8f-d3a0860668c8`<br/>
 **Compliance**: `AGENTS.md` (Ironclad Scope Isolation, Live SSOT, Braincore Engine Authority, Multi-Agent Concurrency Protocol)
 
 ---
