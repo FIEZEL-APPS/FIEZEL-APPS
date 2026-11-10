@@ -84,30 +84,32 @@ export const PTE_CALL_SCENARIOS: CallScenario[] = [
     personaId: 'dr_julian',
     isMeasureExam: false,
     situationId:
-      'Latihan resmi Describe Image. Dr. Julian akan memproyeksikan visual grafik (Bar Chart / Line Graph). Gunakan Formula Universal FIEZEL: Judul -> Kategori Utama -> Angka Maksimum -> Angka Minimum -> Kesimpulan.',
+      'Latihan resmi Describe Image. Dr. Julian memproyeksikan bank 50 soal ujian asli Pearson & APEUni (Bar, Line, Pie, Process, Map, Table). Gunakan Formula Universal FIEZEL 5-Tahap: Judul -> Elemen Kunci -> Angka Maksimum -> Angka Minimum -> Kesimpulan.',
     situationTh:
-      'การฝึกอย่างเป็นทางการ Describe Image โดย Dr. Julian จะเปิดกราฟบนหน้าจอ ใช้สูตรสำเร็จสากล: ชื่อกราฟ -> หมวดหมู่หลัก -> ค่าสูงสุด -> ค่าต่ำสุด -> บทสรุป',
+      'การฝึกอย่างเป็นทางการ Describe Image โดย Dr. Julian จะเปิดคลังข้อสอบจริง 50 ข้อจาก Pearson & APEUni (Bar, Line, Pie, Process, Map, Table) ใช้สูตรสำเร็จสากล 5 ขั้นตอนอย่างคล่องแคล่ว',
     openingLine:
-      'Candidate, this is Describe Image Level 1. I am projecting the visual chart onto your learning workbench now. You have 25 seconds to study the categories and peak numbers. When you speak, follow the Universal Formula without stopping. Begin your preparation.',
+      'Candidate, this is Describe Image Level 1. I have projected our comprehensive master bank of 50 authentic Pearson and APEUni questions onto your workbench. You can switch across Bar, Line, Pie, Process, Map, and Table formats. You have 25 seconds of preparation. When speaking, maintain continuous fluency for 30 to 35 seconds following the Universal Formula. Begin your preparation now.',
     openingTranslationId:
-      'Kandidat, ini adalah Describe Image Tingkat 1. Saya membuka grafik visual pada papan belajarmu sekarang. Anda punya waktu 25 detik mempelajari kategori dan angka puncaknya. Saat berbicara, ikuti Formula Universal tanpa berhenti. Mulai persiapan.',
+      'Kandidat, ini adalah Describe Image Tingkat 1. Saya membuka bank master 50 soal resmi Pearson dan APEUni pada papan belajarmu. Kamu bisa berpindah antara format Bar, Line, Pie, Process, Map, dan Table. Kamu memiliki 25 detik persiapan. Saat berbicara, pertahankan kelancaran tanpa henti selama 30 hingga 35 detik menggunakan Formula Universal. Mulai persiapan sekarang.',
     openingTranslationTh:
-      'ผู้เข้าสอบ นี่คือ Describe Image ระดับ 1 ผมกำลังแสดงกราฟบนกระดานการเรียนรู้ของคุณ คุณมีเวลา 25 วินาทีในการศึกษาข้อมูล เมื่อพูด ให้ใช้สูตรสำเร็จสากลอย่างต่อเนื่อง เริ่มเตรียมตัวได้',
+      'ผู้เข้าสอบ นี่คือ Describe Image ระดับ 1 ผมได้แสดงคลังข้อสอบจริง 50 ข้อจาก Pearson และ APEUni บนกระดานการเรียนรู้ของคุณ ซึ่งครอบคลุมทั้ง Bar, Line, Pie, Process, Map และ Table คุณมีเวลาเตรียมตัว 25 วินาที เมื่อพูด จงรักษาความคล่องแคล่วต่อเนื่อง 30-35 วินาทีตามสูตรสำเร็จ เริ่มเตรียมตัวได้ทันที',
     missionGoalsId: [
-      'Bicaralah selama 30 hingga 38 detik penuh menggunakan Formula Universal FIEZEL.',
-      'Hindari jeda lebih dari 3 detik (Aturan Hening Pearson) dan pertahankan kelancaran 5/5.',
-      'Sebutkan judul grafik, minimal 2 kategori, nilai puncak maksimum, dan nilai minimum.'
+      'Bicaralah selama 30 hingga 35 detik penuh (sweet spot Pearson) menggunakan Formula Universal FIEZEL.',
+      'Hindari jeda lebih dari 3 detik (Aturan Hening Pearson) dan amankan skor Oral Fluency 5/5.',
+      'Jelajahi berbagai variasi grafik dari 50 bank soal autentik (Bar, Line, Pie, Process, Map, Table).',
+      'Sebutkan judul grafik, kategori data, nilai puncak maksimum, nilai minimum, dan kalimat kesimpulan.'
     ],
     missionGoalsTh: [
-      'พูดต่อเนื่อง 30-38 วินาทีโดยใช้สูตรสำเร็จสากล',
+      'พูดต่อเนื่อง 30-35 วินาทีตามจังหวะที่เหมาะสมที่สุดของ Pearson โดยใช้สูตรสำเร็จสากล',
       'หลีกเลี่ยงการหยุดพูดเกิน 3 วินาทีเพื่อรักษาคะแนนความคล่องแคล่ว 5/5',
-      'ระบุชื่อกราฟ หมวดหมู่หลัก ค่าสูงสุด และค่าต่ำสุดให้ครบถ้วน'
+      'ฝึกฝนกับกราฟหลากหลายรูปแบบจากคลังข้อสอบ 50 ข้อ (Bar, Line, Pie, Process, Map, Table)',
+      'ระบุชื่อกราฟ หมวดหมู่ข้อมูล ค่าสูงสุด ค่าต่ำสุด และสรุปแนวโน้มให้ครบถ้วน'
     ],
     targetPatterns: [
-      'The given image represents an informative chart regarding...',
-      'According to the picture, we can see several key elements, including...',
-      'Looking closely, the maximum figure is observed in..., while the minimum figure is found in...',
-      'In conclusion, the picture provides significant data and is very beneficial for further understanding.'
+      'The given image provides key information about...',
+      'Looking closely, there are various figures such as...',
+      'The highest figure is represented by..., while the lowest value is seen in...',
+      'In conclusion, it is evident that...'
     ],
     vocabPrereqs: [
       {
@@ -115,21 +117,28 @@ export const PTE_CALL_SCENARIOS: CallScenario[] = [
         term: 'maximum figure',
         meaningId: 'angka atau titik tertinggi pada grafik',
         meaningTh: 'ตัวเลขหรือจุดสูงสุดในกราฟ',
-        exampleSentence: 'The maximum figure is observed in the first quarter.'
+        exampleSentence: 'The maximum figure is observed in the first category.'
       },
       {
         id: 'v_pte_di_2',
-        term: 'significant data',
-        meaningId: 'data penting yang memberikan gambaran jelas',
-        meaningTh: 'ข้อมูลที่มีนัยสำคัญ',
-        exampleSentence: 'In conclusion, the picture provides significant data.'
+        term: 'lowest value',
+        meaningId: 'angka atau proporsi terendah pada visual',
+        meaningTh: 'ค่าต่ำสุดในกราฟ',
+        exampleSentence: 'Conversely, the lowest value is recorded at only ten percent.'
+      },
+      {
+        id: 'v_pte_di_3',
+        term: 'continuous fluency',
+        meaningId: 'kelancaran berucap terus-menerus tanpa jeda terbata',
+        meaningTh: 'ความคล่องแคล่วในการพูดต่อเนื่องโดยไม่หยุดชะงัก',
+        exampleSentence: 'Maintain continuous fluency without unnatural pauses.'
       }
     ],
     sampleUtterances: [
       {
-        labelId: 'Contoh Deskripsi Sempurna (Formula Universal)',
-        labelTh: 'ตัวอย่างการตอบตามสูตรสำเร็จสากล',
-        text: 'The given image represents an informative chart regarding global renewable energy production. According to the picture, we can see several key elements, including solar, wind, and hydro power. Looking closely, the maximum figure is observed in solar energy, while the minimum figure is found in geothermal power. In conclusion, the picture provides significant data and is very beneficial for further understanding.',
+        labelId: 'Contoh Deskripsi Sempurna (Formula Universal 5-Tahap)',
+        labelTh: 'ตัวอย่างการตอบตามสูตรสำเร็จสากล 5 ขั้นตอน',
+        text: 'The given image provides key information about Global Renewable Energy Share. Looking closely, there are various figures such as solar power at forty-five percent and wind energy at thirty percent. The highest figure is represented by solar power at forty-five percent. Conversely, the lowest value is seen in biomass at only ten percent. In conclusion, it is evident that clean energy adoption has shown a steady upward trend.',
         intent: 'accurate'
       }
     ]

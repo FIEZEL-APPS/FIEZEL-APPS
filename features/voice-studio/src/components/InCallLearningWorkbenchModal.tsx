@@ -7,6 +7,14 @@ import {
   VoiceUiAction,
 } from '../types/voiceCall';
 import { playFiezelSfx } from '../lib/sfx';
+import {
+  PTE_DESCRIBE_IMAGE_BANK,
+  PteDescribeImageQuestion,
+  PteChartCategory,
+  getPteQuestionById,
+  getPteQuestionsByCategory,
+  getRandomPteQuestion,
+} from '../data/pteDescribeImageBank';
 
 export type WorkbenchContextMode =
   | 'confusing_pair'   // Timbangan Konseptual / Dual Contrast Stream
@@ -47,11 +55,11 @@ export interface DynamicQuizData {
 }
 
 export interface PteChartData {
-  chartType: 'bar' | 'line' | 'pie' | 'process';
+  chartType: PteChartCategory;
   title: string;
   sourceText?: string;
-  labels: string[];
-  values: number[];
+  labels?: string[];
+  values?: number[];
   seriesName?: string;
   pieData?: Array<{ label: string; pct: number; color: string }>;
   processSteps?: Array<{ step: number; title: string; desc: string }>;
@@ -63,6 +71,11 @@ export interface PteChartData {
     minimum: string;
     conclusion: string;
   };
+  questionId?: string;
+  examFrequency?: string;
+  sourceOrigin?: string;
+  renderData?: any;
+  examinerTips?: string;
 }
 
 export interface PteReadAloudData {
@@ -430,50 +443,46 @@ export function deriveContextualPedagogicalBoard(
   // -------------------------------------------------------------
   if (
     action?.focusType === 'pte_describe_image' ||
-    /describe.*image|pte.*di|pte.*chart|pte.*grafik|bar chart|line graph|pie chart|process flow/i.test(lowerQ)
+    /describe.*image|pte.*di|pte.*chart|pte.*grafik|bar chart|line graph|pie chart|process flow|map|table/i.test(lowerQ)
   ) {
-    const isLine = /line|garis|tren|growth/i.test(lowerQ);
-    const isPie = /pie|lingkaran|persen|share/i.test(lowerQ);
-    const isProcess = /process|alur|tahap|flow|cycle/i.test(lowerQ);
-    const initialChartType: 'bar' | 'line' | 'pie' | 'process' = isLine
+    const isLine = /line|garis|tren|growth|inflation|co2/i.test(lowerQ);
+    const isPie = /pie|lingkaran|persen|share|smartphone|waste/i.test(lowerQ);
+    const isProcess = /process|alur|tahap|flow|cycle|salmon|water|glass/i.test(lowerQ);
+    const isMap = /map|peta|geografi|rainfall|deforestation/i.test(lowerQ);
+    const isTable = /table|tabel|enrolment|hospital/i.test(lowerQ);
+    const preferredCat: PteChartCategory = isLine
       ? 'line'
       : isPie
       ? 'pie'
       : isProcess
       ? 'process'
+      : isMap
+      ? 'map'
+      : isTable
+      ? 'table'
       : 'bar';
 
+    // Cari soal spesifik jika judulnya cocok, atau ambil soal representatif dari kategori
+    const targetQ =
+      PTE_DESCRIBE_IMAGE_BANK.find(
+        (q) => lowerQ.includes(q.title.toLowerCase()) || q.id === action?.topicTitle
+      ) || getRandomPteQuestion(preferredCat);
+
     const pteChart: PteChartData = {
-      chartType: initialChartType,
-      title: action?.topicTitle || 'Global Renewable Energy Share (2020-2025)',
-      labels: ['Solar', 'Wind', 'Hydro', 'Biomass'],
-      values: [45, 30, 15, 10],
-      seriesName: 'Energy Share (%)',
-      pieData: [
-        { label: 'Android', pct: 71, color: '#10B981' },
-        { label: 'iOS', pct: 28, color: '#3B82F6' },
-        { label: 'Others', pct: 1, color: '#F59E0B' },
-      ],
-      processSteps: [
-        { step: 1, title: 'Raw Intake', desc: 'River & reservoir extraction' },
-        { step: 2, title: 'Coagulation', desc: 'Chemical flocculation & filtration' },
-        { step: 3, title: 'Disinfection', desc: 'Chlorination & UV sterilization' },
-        { step: 4, title: 'Distribution', desc: 'Pressurized residential supply' },
-      ],
-      keywords: [
-        'Renewable energy',
-        'Solar power (45%)',
-        'Wind energy (30%)',
-        'Highest figure',
-        'In conclusion',
-      ],
-      universalTemplate: {
-        intro: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-        keyElements: 'Looking closely, there are various figures such as solar power at 45% and wind energy at 30%.',
-        maximum: 'The highest figure is represented by solar power at 45%.',
-        minimum: 'Conversely, the lowest value is seen in biomass at only 10%.',
-        conclusion: 'In conclusion, it is evident that clean energy adoption has shown a steady upward trend.',
-      },
+      chartType: targetQ.category,
+      title: targetQ.title,
+      labels: targetQ.renderData.labels || [],
+      values: targetQ.renderData.values || [],
+      seriesName: targetQ.renderData.unit || 'Units',
+      pieData: targetQ.renderData.segments?.map((s) => ({ label: s.label, pct: s.pct, color: s.color })),
+      processSteps: targetQ.renderData.steps?.map((st) => ({ step: st.stepNumber, title: st.title, desc: st.detail })),
+      keywords: targetQ.keywords,
+      universalTemplate: targetQ.universalTemplate,
+      questionId: targetQ.id,
+      examFrequency: targetQ.examFrequency,
+      sourceOrigin: targetQ.sourceOrigin,
+      renderData: targetQ.renderData,
+      examinerTips: targetQ.examinerTips,
     };
 
     return {
@@ -484,11 +493,11 @@ export function deriveContextualPedagogicalBoard(
         'Kunci Describe Image adalah KELANCARAN MUTLAK. Jangan berhenti lebih dari 3 detik! Gunakan 5 kalimat sakti Fiezel tanpa ragu, biarkan intonasi terus mengalir santai tapi tegas.',
       pteChartData: pteChart,
       quiz: {
-        prompt: 'Pilih kalimat pembuka (Introduction) yang BENAR untuk grafik ini:',
+        prompt: `Pilih kalimat pembuka (Introduction) yang BENAR untuk ${targetQ.title}:`,
         options: [
           {
             id: 'opt_1',
-            text: 'The given image provides key information about global renewable energy share.',
+            text: targetQ.universalTemplate.intro,
             isCorrect: true,
             feedback: 'Sempurna! Formula pembuka standar Pearson yang menjamin poin Fluency & Content.',
           },
@@ -506,15 +515,15 @@ export function deriveContextualPedagogicalBoard(
           },
         ],
         cloze: {
-          prefix: 'The highest figure is',
-          blankWord: 'represented',
-          suffix: 'by solar power at forty-five percent.',
-          chips: ['represented', 'represent', 'representing'],
-          feedback: 'Tepat! "is represented by" adalah kolokasi pasif akademik yang sangat disukai Pearson AI scorer.',
+          prefix: 'Looking closely, the',
+          blankWord: 'maximum',
+          suffix: 'figure can be clearly observed in this informative visual.',
+          chips: ['maximum', 'huge', 'big', 'taller'],
+          feedback: 'Tepat! "maximum figure" adalah kolokasi akademik baku yang sangat disukai Pearson AI scorer.',
         },
         blocks: {
-          correctOrder: ['The', 'given', 'image', 'provides', 'key', 'information', 'about', 'energy.'],
-          pool: ['about', 'given', 'The', 'energy.', 'information', 'provides', 'key', 'image'],
+          correctOrder: ['The', 'given', 'image', 'provides', 'key', 'information', 'about', 'the', 'visual.'],
+          pool: ['about', 'given', 'The', 'visual.', 'information', 'provides', 'key', 'image', 'the'],
           meaningId: 'Susun kalimat pengantar standar Pearson Describe Image:',
           feedback: 'Susunan kalimat pembuka tepat sempurna!',
         },
@@ -722,22 +731,73 @@ export function deriveContextualPedagogicalBoard(
 /**
  * -------------------------------------------------------------
  * KANVAS KHUSUS 1: PTE ACADEMIC - DESCRIBE IMAGE
- * Dynamic SVG Charts (Bar, Line, Pie, Process) + Prep/Speaking Timers + Rumus Universal
+ * 50 Authentic Questions from Pearson Real Exam & APEUni Bank
+ * Categories: Bar, Line, Pie, Process, Map, Table
+ * Interactive Timers (25s Prep & 40s Speak), Keywords, & Universal Formula
  * -------------------------------------------------------------
  */
 export const PteDescribeImageCanvas: React.FC<{
   data: PteChartData;
   onSpeakPreview?: (text: string) => void;
 }> = ({ data, onSpeakPreview }) => {
-  const [activeChart, setActiveChart] = useState<'bar' | 'line' | 'pie' | 'process'>(
-    data.chartType || 'bar'
-  );
+  const [selectedCategory, setSelectedCategory] = useState<'all' | PteChartCategory>('all');
+  const [currentQuestionId, setCurrentQuestionId] = useState<string>(data.questionId || 'di_bar_01');
   const [prepSeconds, setPrepSeconds] = useState<number>(25);
   const [isPrepRunning, setIsPrepRunning] = useState<boolean>(false);
   const [speakSeconds, setSpeakSeconds] = useState<number>(40);
   const [isSpeakRunning, setIsSpeakRunning] = useState<boolean>(false);
   const [checkedKeywords, setCheckedKeywords] = useState<Record<string, boolean>>({});
   const [isTemplateOpen, setIsTemplateOpen] = useState<boolean>(false);
+
+  // Active question resolution
+  const activeQuestion: PteDescribeImageQuestion =
+    getPteQuestionById(currentQuestionId) || PTE_DESCRIBE_IMAGE_BANK[0];
+
+  // Filtered pool based on selectedCategory
+  const filteredQuestions =
+    selectedCategory === 'all'
+      ? PTE_DESCRIBE_IMAGE_BANK
+      : getPteQuestionsByCategory(selectedCategory);
+
+  const currentIndex = Math.max(
+    0,
+    filteredQuestions.findIndex((q) => q.id === activeQuestion.id)
+  );
+
+  // Sync external questionId change
+  useEffect(() => {
+    if (data.questionId && data.questionId !== currentQuestionId) {
+      setCurrentQuestionId(data.questionId);
+    }
+  }, [data.questionId]);
+
+  // Reset timers & state when switching question
+  const handleSelectQuestion = (q: PteDescribeImageQuestion) => {
+    playFiezelSfx('tap');
+    setCurrentQuestionId(q.id);
+    setPrepSeconds(25);
+    setIsPrepRunning(false);
+    setSpeakSeconds(40);
+    setIsSpeakRunning(false);
+    setCheckedKeywords({});
+  };
+
+  const handlePrevQuestion = () => {
+    const prevIdx = (currentIndex - 1 + filteredQuestions.length) % filteredQuestions.length;
+    handleSelectQuestion(filteredQuestions[prevIdx]);
+  };
+
+  const handleNextQuestion = () => {
+    const nextIdx = (currentIndex + 1) % filteredQuestions.length;
+    handleSelectQuestion(filteredQuestions[nextIdx]);
+  };
+
+  const handleRandomQuestion = () => {
+    playFiezelSfx('tap');
+    const pool = selectedCategory === 'all' ? PTE_DESCRIBE_IMAGE_BANK : filteredQuestions;
+    const randomIdx = Math.floor(Math.random() * pool.length);
+    handleSelectQuestion(pool[randomIdx] || pool[0]);
+  };
 
   // Timer 25s Prep
   useEffect(() => {
@@ -784,188 +844,388 @@ export const PteDescribeImageCanvas: React.FC<{
     setCheckedKeywords((prev) => ({ ...prev, [kw]: !prev[kw] }));
   };
 
-  const fullSampleSpoken = `${data.universalTemplate.intro} ${data.universalTemplate.keyElements} ${data.universalTemplate.maximum} ${data.universalTemplate.minimum} ${data.universalTemplate.conclusion}`;
+  const fullSampleSpoken = `${activeQuestion.universalTemplate.intro} ${activeQuestion.universalTemplate.keyElements} ${activeQuestion.universalTemplate.maximum} ${activeQuestion.universalTemplate.minimum} ${activeQuestion.universalTemplate.conclusion}`;
+
+  const CATEGORY_TABS: Array<{ key: 'all' | PteChartCategory; label: string; icon: string; count: number }> = [
+    { key: 'all', label: 'Semua', icon: '📚', count: PTE_DESCRIBE_IMAGE_BANK.length },
+    { key: 'bar', label: 'Bar', icon: '📊', count: getPteQuestionsByCategory('bar').length },
+    { key: 'line', label: 'Line', icon: '📈', count: getPteQuestionsByCategory('line').length },
+    { key: 'pie', label: 'Pie', icon: '🥧', count: getPteQuestionsByCategory('pie').length },
+    { key: 'process', label: 'Process', icon: '🔄', count: getPteQuestionsByCategory('process').length },
+    { key: 'map', label: 'Map', icon: '🗺️', count: getPteQuestionsByCategory('map').length },
+    { key: 'table', label: 'Table', icon: '📋', count: getPteQuestionsByCategory('table').length },
+  ];
 
   return (
     <div className="space-y-3.5" data-testid="pte-describe-image-canvas">
-      {/* Top Banner & Switcher Chart */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between gap-1 flex-wrap">
-          <span className="px-2.5 py-0.5 rounded-full bg-[#E6F4EA] text-[#1B5E34] text-[10.5px] font-extrabold uppercase tracking-wide">
-            PTE Academic • Describe Image
+      {/* Top Banner, Category Pills & Question Navigator */}
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-center justify-between gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#E6F4EA] text-[#1B5E34] text-[10.5px] font-extrabold uppercase tracking-wide">
+              PTE Academic • Describe Image
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
+              🔥 {activeQuestion.examFrequency}
+            </span>
+          </div>
+          <span className="text-[10px] text-[#8C7760] font-semibold">
+            {activeQuestion.sourceOrigin}
           </span>
-          <div className="flex items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl">
-            {(['bar', 'line', 'pie', 'process'] as const).map((t) => (
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 bg-[#FAF4E8] p-1.5 rounded-2xl scrollbar-none">
+          {CATEGORY_TABS.map((tab) => {
+            const isSelected = selectedCategory === tab.key;
+            return (
               <button
-                key={t}
+                key={tab.key}
                 type="button"
                 onClick={() => {
                   playFiezelSfx('tap');
-                  setActiveChart(t);
+                  setSelectedCategory(tab.key);
+                  const newPool = tab.key === 'all' ? PTE_DESCRIBE_IMAGE_BANK : getPteQuestionsByCategory(tab.key);
+                  if (newPool.length > 0 && !newPool.some((q) => q.id === activeQuestion.id)) {
+                    handleSelectQuestion(newPool[0]);
+                  }
                 }}
-                className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                  activeChart === t
+                className={`px-2.5 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+                  isSelected
                     ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs'
                     : 'text-[#8C7760] hover:text-[#5C4A38]'
                 }`}
               >
-                {t === 'bar' ? '📊 Bar' : t === 'line' ? '📈 Line' : t === 'pie' ? '🥧 Pie' : '🔄 Process'}
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+                <span className={`text-[9px] px-1 py-0.2 rounded-full ${isSelected ? 'bg-[#FAF4E8] text-[#B45309]' : 'text-[#A89480]'}`}>
+                  {tab.count}
+                </span>
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
-        <h4 className="text-xs font-black text-[#231A12] leading-tight">
-          {activeChart === 'bar'
-            ? 'Global Renewable Energy Share (2020-2025)'
-            : activeChart === 'line'
-            ? 'E-Commerce Market Growth in Southeast Asia ($ Billion)'
-            : activeChart === 'pie'
-            ? 'Global Smartphone OS Market Share'
-            : 'Water Treatment & Purification Cycle'}
-        </h4>
+        {/* Question Navigator Toolbar */}
+        <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl bg-[#FFFDF8] border border-[#EADBCE]">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={handlePrevQuestion}
+              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-black cursor-pointer active:scale-95 transition-all"
+              title="Soal Sebelumnya"
+            >
+              ◀ Prev
+            </button>
+            <span className="text-[11px] font-bold text-[#231A12] px-2 py-0.5">
+              Soal {currentIndex + 1} / {filteredQuestions.length}
+            </span>
+            <button
+              type="button"
+              onClick={handleNextQuestion}
+              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-black cursor-pointer active:scale-95 transition-all"
+              title="Soal Berikutnya"
+            >
+              Next ▶
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleRandomQuestion}
+            className="px-2.5 py-1 rounded-lg bg-[#B45309] hover:bg-[#92400E] text-white text-[10.5px] font-bold cursor-pointer active:scale-95 transition-all flex items-center gap-1"
+          >
+            <span>🎲</span>
+            <span>Acak Soal Ujian Asli</span>
+          </button>
+        </div>
+
+        {/* Active Question Title & Exam ID */}
+        <div className="flex items-start justify-between gap-2 pt-0.5">
+          <h4 className="text-xs font-black text-[#231A12] leading-tight">
+            {activeQuestion.title}
+          </h4>
+          <span className="text-[9.5px] font-bold text-[#8C7760] bg-[#FAF6EE] px-1.5 py-0.5 rounded-md shrink-0">
+            ID: {activeQuestion.id}
+          </span>
+        </div>
       </div>
 
-      {/* SVG CHART CONTAINER */}
-      <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs flex flex-col items-center justify-center">
-        {activeChart === 'bar' && (
-          <svg viewBox="0 0 360 170" className="w-full h-auto max-h-[170px] select-none">
+      {/* SVG / DATA VISUALIZER CONTAINER (6 CATEGORIES) */}
+      <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs flex flex-col items-center justify-center min-h-[175px]">
+        {/* 1. BAR CHARTS */}
+        {activeQuestion.category === 'bar' && (
+          <svg viewBox="0 0 360 175" className="w-full h-auto max-h-[175px] select-none">
             <defs>
-              <linearGradient id="barSolar" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#F59E0B" />
-                <stop offset="100%" stopColor="#D97706" />
-              </linearGradient>
-              <linearGradient id="barWind" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10B981" />
-                <stop offset="100%" stopColor="#059669" />
-              </linearGradient>
-              <linearGradient id="barHydro" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3B82F6" />
-                <stop offset="100%" stopColor="#2563EB" />
-              </linearGradient>
-              <linearGradient id="barBio" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#8B5CF6" />
-                <stop offset="100%" stopColor="#7C3AED" />
-              </linearGradient>
+              <linearGradient id="barGrad0" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F59E0B" /><stop offset="100%" stopColor="#D97706" /></linearGradient>
+              <linearGradient id="barGrad1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#10B981" /><stop offset="100%" stopColor="#059669" /></linearGradient>
+              <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#3B82F6" /><stop offset="100%" stopColor="#2563EB" /></linearGradient>
+              <linearGradient id="barGrad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#8B5CF6" /><stop offset="100%" stopColor="#7C3AED" /></linearGradient>
+              <linearGradient id="barGrad4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#EC4899" /><stop offset="100%" stopColor="#DB2777" /></linearGradient>
+              <linearGradient id="barGrad5" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#06B6D4" /><stop offset="100%" stopColor="#0891B2" /></linearGradient>
             </defs>
-            {/* Grid Lines */}
-            <line x1="45" y1="25" x2="340" y2="25" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="35" y="28" fontSize="9" fill="#8C7760" textAnchor="end">50%</text>
-            <line x1="45" y1="65" x2="340" y2="65" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="35" y="68" fontSize="9" fill="#8C7760" textAnchor="end">35%</text>
-            <line x1="45" y1="105" x2="340" y2="105" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="35" y="108" fontSize="9" fill="#8C7760" textAnchor="end">20%</text>
-            <line x1="45" y1="145" x2="340" y2="145" stroke="#D8CBB5" strokeWidth="1.5" />
-            <text x="35" y="148" fontSize="9" fill="#8C7760" textAnchor="end">0%</text>
+            {/* Grid lines */}
+            <line x1="45" y1="25" x2="345" y2="25" stroke="#F0E6D9" strokeDasharray="3 3" />
+            <text x="38" y="28" fontSize="8.5" fill="#8C7760" textAnchor="end">100%</text>
+            <line x1="45" y1="65" x2="345" y2="65" stroke="#F0E6D9" strokeDasharray="3 3" />
+            <text x="38" y="68" fontSize="8.5" fill="#8C7760" textAnchor="end">65%</text>
+            <line x1="45" y1="105" x2="345" y2="105" stroke="#F0E6D9" strokeDasharray="3 3" />
+            <text x="38" y="108" fontSize="8.5" fill="#8C7760" textAnchor="end">30%</text>
+            <line x1="45" y1="145" x2="345" y2="145" stroke="#D8CBB5" strokeWidth="1.5" />
+            <text x="38" y="148" fontSize="8.5" fill="#8C7760" textAnchor="end">0</text>
 
-            {/* Bars */}
-            <rect x="65" y="37" width="50" height="108" rx="4" fill="url(#barSolar)" />
-            <text x="90" y="30" fontSize="10" fontWeight="bold" fill="#B45309" textAnchor="middle">45%</text>
-            <text x="90" y="159" fontSize="9.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">Solar</text>
+            {/* Dynamic Bars */}
+            {(() => {
+              const labels = activeQuestion.renderData.labels || ['Cat A', 'Cat B', 'Cat C', 'Cat D'];
+              const values = activeQuestion.renderData.values || [45, 30, 15, 10];
+              const maxVal = Math.max(...values, 1);
+              const barCount = labels.length;
+              const totalWidth = 285;
+              const barWidth = Math.min(48, Math.floor((totalWidth - (barCount - 1) * 12) / barCount));
+              const startX = 55 + Math.floor((totalWidth - (barCount * barWidth + (barCount - 1) * 12)) / 2);
 
-            <rect x="135" y="73" width="50" height="72" rx="4" fill="url(#barWind)" />
-            <text x="160" y="66" fontSize="10" fontWeight="bold" fill="#047857" textAnchor="middle">30%</text>
-            <text x="160" y="159" fontSize="9.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">Wind</text>
+              return labels.map((lbl, idx) => {
+                const val = values[idx] || 0;
+                const barHeight = Math.max(8, Math.round((val / maxVal) * 115));
+                const x = startX + idx * (barWidth + 12);
+                const y = 145 - barHeight;
+                const gradId = `url(#barGrad${idx % 6})`;
+                const unit = activeQuestion.renderData.unit ? ` ${activeQuestion.renderData.unit}` : '';
 
-            <rect x="205" y="109" width="50" height="36" rx="4" fill="url(#barHydro)" />
-            <text x="230" y="102" fontSize="10" fontWeight="bold" fill="#1D4ED8" textAnchor="middle">15%</text>
-            <text x="230" y="159" fontSize="9.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">Hydro</text>
-
-            <rect x="275" y="121" width="50" height="24" rx="4" fill="url(#barBio)" />
-            <text x="300" y="114" fontSize="10" fontWeight="bold" fill="#6D28D9" textAnchor="middle">10%</text>
-            <text x="300" y="159" fontSize="9.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">Biomass</text>
+                return (
+                  <g key={idx}>
+                    <rect x={x} y={y} width={barWidth} height={barHeight} rx="4" fill={gradId} />
+                    <text x={x + barWidth / 2} y={Math.max(18, y - 5)} fontSize="9" fontWeight="bold" fill="#231A12" textAnchor="middle">
+                      {val}{unit.length <= 3 ? unit : ''}
+                    </text>
+                    <text x={x + barWidth / 2} y="159" fontSize="8.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">
+                      {lbl.length > 9 ? lbl.slice(0, 8) + '…' : lbl}
+                    </text>
+                  </g>
+                );
+              });
+            })()}
           </svg>
         )}
 
-        {activeChart === 'line' && (
-          <svg viewBox="0 0 360 170" className="w-full h-auto max-h-[170px] select-none">
+        {/* 2. LINE GRAPHS */}
+        {activeQuestion.category === 'line' && (
+          <svg viewBox="0 0 360 175" className="w-full h-auto max-h-[175px] select-none">
             <defs>
-              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#2563EB" stopOpacity="0.35" />
+              <linearGradient id="areaLineGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#2563EB" stopOpacity="0.32" />
                 <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
               </linearGradient>
             </defs>
             {/* Grid */}
-            <line x1="45" y1="25" x2="340" y2="25" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="35" y="28" fontSize="9" fill="#8C7760" textAnchor="end">$140B</text>
-            <line x1="45" y1="65" x2="340" y2="65" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="35" y="68" fontSize="9" fill="#8C7760" textAnchor="end">$90B</text>
-            <line x1="45" y1="105" x2="340" y2="105" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="35" y="108" fontSize="9" fill="#8C7760" textAnchor="end">$40B</text>
-            <line x1="45" y1="145" x2="340" y2="145" stroke="#D8CBB5" strokeWidth="1.5" />
-            <text x="35" y="148" fontSize="9" fill="#8C7760" textAnchor="end">$0B</text>
+            <line x1="45" y1="25" x2="345" y2="25" stroke="#F0E6D9" strokeDasharray="3 3" />
+            <text x="38" y="28" fontSize="8.5" fill="#8C7760" textAnchor="end">
+              {activeQuestion.renderData.yAxis?.[3] || 'High'}
+            </text>
+            <line x1="45" y1="65" x2="345" y2="65" stroke="#F0E6D9" strokeDasharray="3 3" />
+            <text x="38" y="68" fontSize="8.5" fill="#8C7760" textAnchor="end">
+              {activeQuestion.renderData.yAxis?.[2] || 'Med'}
+            </text>
+            <line x1="45" y1="105" x2="345" y2="105" stroke="#F0E6D9" strokeDasharray="3 3" />
+            <text x="38" y="108" fontSize="8.5" fill="#8C7760" textAnchor="end">
+              {activeQuestion.renderData.yAxis?.[1] || 'Low'}
+            </text>
+            <line x1="45" y1="145" x2="345" y2="145" stroke="#D8CBB5" strokeWidth="1.5" />
+            <text x="38" y="148" fontSize="8.5" fill="#8C7760" textAnchor="end">
+              {activeQuestion.renderData.yAxis?.[0] || '0'}
+            </text>
 
-            {/* Trend Area & Curve */}
-            <polygon points="70,113 145,95 220,72 295,35 295,145 70,145" fill="url(#areaGrad)" />
-            <polyline points="70,113 145,95 220,72 295,35" fill="none" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Points & Curve */}
+            {(() => {
+              const rawPoints = activeQuestion.renderData.points || [
+                { x: 65, y: 120, label: '30', year: '2015' },
+                { x: 145, y: 95, label: '50', year: '2018' },
+                { x: 225, y: 65, label: '75', year: '2021' },
+                { x: 305, y: 35, label: '110', year: '2024' },
+              ];
+              const polylineStr = rawPoints.map((p) => `${p.x},${p.y}`).join(' ');
+              const polygonStr = `${polylineStr} ${rawPoints[rawPoints.length - 1].x},145 ${rawPoints[0].x},145`;
 
-            {/* Points */}
-            <circle cx="70" cy="113" r="4.5" fill="#FFFFFF" stroke="#2563EB" strokeWidth="2.5" />
-            <text x="70" y="105" fontSize="9" fontWeight="bold" fill="#1E40AF" textAnchor="middle">$32B</text>
-            <text x="70" y="159" fontSize="9.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">2018</text>
-
-            <circle cx="145" cy="95" r="4.5" fill="#FFFFFF" stroke="#2563EB" strokeWidth="2.5" />
-            <text x="145" y="87" fontSize="9" fontWeight="bold" fill="#1E40AF" textAnchor="middle">$54B</text>
-            <text x="145" y="159" fontSize="9.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">2020</text>
-
-            <circle cx="220" cy="72" r="4.5" fill="#FFFFFF" stroke="#2563EB" strokeWidth="2.5" />
-            <text x="220" y="64" fontSize="9" fontWeight="bold" fill="#1E40AF" textAnchor="middle">$82B</text>
-            <text x="220" y="159" fontSize="9.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">2022</text>
-
-            <circle cx="295" cy="35" r="5" fill="#2563EB" stroke="#FFFFFF" strokeWidth="2" />
-            <text x="295" y="26" fontSize="9.5" fontWeight="black" fill="#1E40AF" textAnchor="middle">$120B</text>
-            <text x="295" y="159" fontSize="9.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">2024</text>
+              return (
+                <g>
+                  <polygon points={polygonStr} fill="url(#areaLineGrad)" />
+                  <polyline points={polylineStr} fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  {rawPoints.map((pt, pIdx) => (
+                    <g key={pIdx}>
+                      <circle cx={pt.x} cy={pt.y} r={pIdx === rawPoints.length - 1 ? 5 : 4} fill={pIdx === rawPoints.length - 1 ? '#2563EB' : '#FFFFFF'} stroke="#2563EB" strokeWidth="2" />
+                      <text x={pt.x} y={Math.max(18, pt.y - 7)} fontSize="8.5" fontWeight="bold" fill="#1E40AF" textAnchor="middle">
+                        {pt.label}
+                      </text>
+                      <text x={pt.x} y="159" fontSize="8.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">
+                        {pt.year}
+                      </text>
+                    </g>
+                  ))}
+                </g>
+              );
+            })()}
           </svg>
         )}
 
-        {activeChart === 'pie' && (
-          <svg viewBox="0 0 360 170" className="w-full h-auto max-h-[170px] select-none">
-            <g transform="translate(100, 85)">
-              <path d="M 0 0 L 0 -65 A 65 65 0 1 1 -62.9 16.4 Z" fill="#10B981" />
-              <path d="M 0 0 L -62.9 16.4 A 65 65 0 0 1 -4.1 -64.9 Z" fill="#3B82F6" />
-              <path d="M 0 0 L -4.1 -64.9 A 65 65 0 0 1 0 -65 Z" fill="#F59E0B" />
-              <circle cx="0" cy="0" r="28" fill="#FFFFFF" />
-              <text x="0" y="3" fontSize="8" fontWeight="bold" fill="#5C4A38" textAnchor="middle">OS Share</text>
-            </g>
-            <g transform="translate(195, 35)">
-              <rect x="0" y="0" width="12" height="12" rx="3" fill="#10B981" />
-              <text x="18" y="10" fontSize="10.5" fontWeight="bold" fill="#231A12">Android: 71%</text>
-              <text x="18" y="22" fontSize="9" fill="#8C7760">Dominant global market</text>
+        {/* 3. PIE CHARTS */}
+        {activeQuestion.category === 'pie' && (
+          <div className="w-full flex items-center justify-between gap-3 py-1">
+            <div className="shrink-0 flex items-center justify-center pl-2">
+              <svg viewBox="0 0 160 160" className="w-[145px] h-[145px] select-none">
+                {(() => {
+                  const segments = activeQuestion.renderData.segments || [
+                    { label: 'Segment A', pct: 60, color: '#10B981' },
+                    { label: 'Segment B', pct: 30, color: '#3B82F6' },
+                    { label: 'Segment C', pct: 10, color: '#F59E0B' },
+                  ];
+                  let currentAngle = 0;
+                  return (
+                    <g transform="translate(80, 80)">
+                      {segments.map((seg, sIdx) => {
+                        const angle = (seg.pct / 100) * 360;
+                        const startAngle = currentAngle;
+                        const endAngle = currentAngle + angle;
+                        currentAngle += angle;
 
-              <rect x="0" y="38" width="12" height="12" rx="3" fill="#3B82F6" />
-              <text x="18" y="48" fontSize="10.5" fontWeight="bold" fill="#231A12">iOS: 28%</text>
-              <text x="18" y="60" fontSize="9" fill="#8C7760">Premium tier share</text>
+                        const rad = Math.PI / 180;
+                        const safeEnd = angle >= 360 ? startAngle + 359.99 : endAngle;
+                        const r = 62;
+                        const innerR = 26;
+                        const x1 = r * Math.sin(startAngle * rad);
+                        const y1 = -r * Math.cos(startAngle * rad);
+                        const x2 = r * Math.sin(safeEnd * rad);
+                        const y2 = -r * Math.cos(safeEnd * rad);
+                        const x3 = innerR * Math.sin(safeEnd * rad);
+                        const y3 = -innerR * Math.cos(safeEnd * rad);
+                        const x4 = innerR * Math.sin(startAngle * rad);
+                        const y4 = -innerR * Math.cos(startAngle * rad);
+                        const largeArc = angle > 180 ? 1 : 0;
+                        const d = `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerR} ${innerR} 0 ${largeArc} 0 ${x4} ${y4} Z`;
 
-              <rect x="0" y="76" width="12" height="12" rx="3" fill="#F59E0B" />
-              <text x="18" y="86" fontSize="10.5" fontWeight="bold" fill="#231A12">Others: 1%</text>
-              <text x="18" y="98" fontSize="9" fill="#8C7760">Alternative systems</text>
-            </g>
-          </svg>
+                        return <path key={sIdx} d={d} fill={seg.color} stroke="#FFFFFF" strokeWidth="1.5" />;
+                      })}
+                      <circle cx="0" cy="0" r="24" fill="#FFFFFF" />
+                      <text x="0" y="3" fontSize="8" fontWeight="bold" fill="#5C4A38" textAnchor="middle">
+                        Share %
+                      </text>
+                    </g>
+                  );
+                })()}
+              </svg>
+            </div>
+            <div className="flex-1 space-y-1.5 pr-2">
+              {(activeQuestion.renderData.segments || []).map((seg, sIdx) => (
+                <div key={sIdx} className="flex items-start gap-2 p-1.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
+                  <span className="w-3 h-3 rounded-md shrink-0 mt-0.5" style={{ backgroundColor: seg.color }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-[#231A12]">
+                      <span className="truncate">{seg.label}</span>
+                      <span className="shrink-0 font-extrabold text-[#B45309]">{seg.pct}%</span>
+                    </div>
+                    {seg.desc && <p className="text-[9.5px] text-[#8C7760] truncate">{seg.desc}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
-        {activeChart === 'process' && (
-          <div className="w-full grid grid-cols-2 gap-2 p-1">
-            {[
-              { num: '1', title: 'Raw Intake', desc: 'River & reservoir collection', color: '#E0F2FE', border: '#7DD3FC' },
-              { num: '2', title: 'Coagulation', desc: 'Chemical filtration process', color: '#FEF3C7', border: '#FDE68A' },
-              { num: '3', title: 'Chlorination', desc: 'Disinfection & bacteria testing', color: '#DCFCE7', border: '#86EFAC' },
-              { num: '4', title: 'Distribution', desc: 'Clean municipal network pipe', color: '#F3E8FF', border: '#D8B4FE' },
-            ].map((step, idx) => (
-              <div
-                key={idx}
-                className="p-2 rounded-xl border flex flex-col justify-between"
-                style={{ backgroundColor: step.color, borderColor: step.border }}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase text-black/60">Step {step.num}</span>
-                  <span className="text-xs font-bold text-black/40">➔</span>
+        {/* 4. PROCESS DIAGRAMS */}
+        {activeQuestion.category === 'process' && (
+          <div className="w-full space-y-1.5 py-1">
+            <div className="grid grid-cols-2 gap-2">
+              {(activeQuestion.renderData.steps || []).map((st, sIdx) => {
+                const bgColors = ['#E0F2FE', '#FEF3C7', '#DCFCE7', '#F3E8FF', '#FFE4E6'];
+                const borderColors = ['#7DD3FC', '#FDE68A', '#86EFAC', '#D8B4FE', '#FDA4AF'];
+                const currentBg = bgColors[sIdx % bgColors.length];
+                const currentBorder = borderColors[sIdx % borderColors.length];
+
+                return (
+                  <div
+                    key={sIdx}
+                    className="p-2.5 rounded-xl border flex flex-col justify-between"
+                    style={{ backgroundColor: currentBg, borderColor: currentBorder }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="px-1.5 py-0.5 rounded-md bg-white/70 text-[9.5px] font-black uppercase text-[#231A12]">
+                        Tahap {st.stepNumber}
+                      </span>
+                      <span className="text-xs font-bold text-black/40">➔</span>
+                    </div>
+                    <div className="pt-1.5">
+                      <span className="text-xs font-bold text-[#231A12] block leading-tight">{st.title}</span>
+                      <span className="text-[10px] text-[#5C4A38] leading-tight block pt-0.5">{st.detail}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 5. MAPS & GEOGRAPHY */}
+        {activeQuestion.category === 'map' && (
+          <div className="w-full space-y-2 py-1">
+            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
+              <span className="text-[10.5px] font-bold text-[#8C7760] flex items-center gap-1.5">
+                <span>🧭</span>
+                <span>Arah Mata Angin: N (Utara) • S (Selatan) • E (Timur) • W (Barat)</span>
+              </span>
+              <span className="text-[9.5px] font-black px-2 py-0.5 rounded-md bg-[#E6F4EA] text-[#1B5E34]">
+                Peta Geografis Resmi
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {(activeQuestion.renderData.mapRegions || []).map((reg, rIdx) => (
+                <div key={rIdx} className="p-2.5 rounded-xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs space-y-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-xs font-bold text-[#231A12] truncate">{reg.name}</span>
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: reg.color }} />
+                  </div>
+                  <div className="text-[11.5px] font-black" style={{ color: reg.color }}>
+                    {reg.value}
+                  </div>
+                  <p className="text-[9.5px] text-[#5C4A38] leading-tight line-clamp-2">{reg.note}</p>
                 </div>
-                <div className="pt-1">
-                  <span className="text-xs font-bold text-[#231A12] block leading-tight">{step.title}</span>
-                  <span className="text-[10px] text-[#5C4A38] leading-tight block">{step.desc}</span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 6. ACADEMIC TABLES */}
+        {activeQuestion.category === 'table' && (
+          <div className="w-full overflow-x-auto rounded-xl border border-[#EADBCE] bg-[#FFFFFF] shadow-2xs">
+            <table className="w-full text-left border-collapse text-[11px]">
+              <thead>
+                <tr className="bg-[#FAF4E8] border-b border-[#EADBCE]">
+                  {(activeQuestion.renderData.headers || []).map((head, hIdx) => (
+                    <th key={hIdx} className="px-2.5 py-1.5 font-black text-[#231A12] text-[10px] uppercase tracking-wider">
+                      {head}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(activeQuestion.renderData.rows || []).map((row, rIdx) => {
+                  const isHighlighted = rIdx === activeQuestion.renderData.highlightRowIdx;
+                  return (
+                    <tr
+                      key={rIdx}
+                      className={`border-b border-[#F0E6D9] last:border-b-0 transition-colors ${
+                        isHighlighted ? 'bg-[#FEF3C7]/40 font-bold' : 'hover:bg-[#FAF6EE]'
+                      }`}
+                    >
+                      {row.map((cell, cIdx) => (
+                        <td key={cIdx} className="px-2.5 py-1.5 text-[#3D2E20]">
+                          {cIdx === 0 && isHighlighted && <span className="inline-block mr-1 text-[#B45309]">★</span>}
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
@@ -1023,11 +1283,16 @@ export const PteDescribeImageCanvas: React.FC<{
 
       {/* CHECKLIST KATA KUNCI TARGET */}
       <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
-        <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block">
-          Checklist Kata Kunci (Ketuk untuk menandai yang sudah diucapkan):
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block">
+            Checklist Kata Kunci (Ketuk saat diucapkan):
+          </span>
+          <span className="text-[10px] font-bold text-[#B45309]">
+            {Object.values(checkedKeywords).filter(Boolean).length} / {activeQuestion.keywords.length} terucap
+          </span>
+        </div>
         <div className="flex flex-wrap gap-1.5">
-          {data.keywords.map((kw, idx) => {
+          {activeQuestion.keywords.map((kw, idx) => {
             const isChecked = Boolean(checkedKeywords[kw]);
             return (
               <button
@@ -1047,6 +1312,21 @@ export const PteDescribeImageCanvas: React.FC<{
           })}
         </div>
       </div>
+
+      {/* DR. JULIAN'S EXAMINER SECRET TIP */}
+      {activeQuestion.examinerTips && (
+        <div className="p-2.5 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] flex items-start gap-2">
+          <span className="text-base select-none shrink-0 leading-none mt-0.5">💡</span>
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-black text-[#1E40AF] uppercase tracking-wider block">
+              Rahasia Penguji (Dr. Julian):
+            </span>
+            <p className="text-[11px] text-[#1E3A8A] font-medium leading-relaxed">
+              {activeQuestion.examinerTips}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* COLLAPSIBLE ACCORDION: RUMUS UNIVERSAL FIEZEL 5-TAHAP */}
       <div className="rounded-2xl border border-[#EADBCE] overflow-hidden bg-[#FFFDF8]">
@@ -1072,23 +1352,23 @@ export const PteDescribeImageCanvas: React.FC<{
             <div className="space-y-1.5 text-[11px] leading-relaxed">
               <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="font-extrabold text-[#B45309] block">1. Introduction (Pembuka):</span>
-                <span className="text-[#3D2E20] font-medium">{data.universalTemplate.intro}</span>
+                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.intro}</span>
               </div>
               <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="font-extrabold text-[#B45309] block">2. Key Elements (Angka Utama):</span>
-                <span className="text-[#3D2E20] font-medium">{data.universalTemplate.keyElements}</span>
+                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.keyElements}</span>
               </div>
               <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="font-extrabold text-[#B45309] block">3. Maximum Figure (Tertinggi):</span>
-                <span className="text-[#3D2E20] font-medium">{data.universalTemplate.maximum}</span>
+                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.maximum}</span>
               </div>
               <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="font-extrabold text-[#B45309] block">4. Minimum Figure (Terendah):</span>
-                <span className="text-[#3D2E20] font-medium">{data.universalTemplate.minimum}</span>
+                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.minimum}</span>
               </div>
               <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="font-extrabold text-[#B45309] block">5. Conclusion (Kesimpulan):</span>
-                <span className="text-[#3D2E20] font-medium">{data.universalTemplate.conclusion}</span>
+                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.conclusion}</span>
               </div>
             </div>
 
