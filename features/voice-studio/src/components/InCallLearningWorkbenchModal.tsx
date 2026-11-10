@@ -190,6 +190,7 @@ export interface InCallLearningWorkbenchProps {
  */
 export function hasRichDynamicAction(action?: VoiceUiAction): boolean {
   if (!action) return false;
+  if (action.focusType && action.focusType.startsWith('pte_')) return true;
   const hasSample = Boolean(action.sampleTarget && action.sampleTarget.trim().length > 3);
   const hasFormula = Boolean(
     action.patternFormula &&
@@ -443,6 +444,8 @@ export function deriveContextualPedagogicalBoard(
   // -------------------------------------------------------------
   if (
     action?.focusType === 'pte_describe_image' ||
+    lowerQ.includes('renewable') ||
+    lowerQ.includes('describe image') ||
     /describe.*image|pte.*di|pte.*chart|pte.*grafik|bar chart|line graph|pie chart|process flow|map|table/i.test(lowerQ)
   ) {
     const isLine = /line|garis|tren|growth|inflation|co2/i.test(lowerQ);
@@ -465,7 +468,10 @@ export function deriveContextualPedagogicalBoard(
     // Cari soal spesifik jika judulnya cocok, atau ambil soal representatif dari kategori
     const targetQ =
       PTE_DESCRIBE_IMAGE_BANK.find(
-        (q) => lowerQ.includes(q.title.toLowerCase()) || q.id === action?.topicTitle
+        (q) =>
+          lowerQ.includes(q.title.toLowerCase()) ||
+          q.title.toLowerCase().includes(lowerQ) ||
+          q.id === action?.topicTitle
       ) || getRandomPteQuestion(preferredCat);
 
     const pteChart: PteChartData = {
@@ -1615,6 +1621,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   persona,
   isLiveConnected,
   topicTitle,
+  focusType,
+  patternFormula,
+  sampleTarget,
   uiAction,
   isGeneratingTopic,
   onSpeakPreview,
@@ -1684,11 +1693,22 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     }
     lastKeyRef.current = currentKey;
 
-    const query = (uiAction?.topicTitle || topicTitle || '').trim();
-    const hasRich = hasRichDynamicAction(uiAction);
+    const effectiveAction: VoiceUiAction | undefined =
+      uiAction ||
+      (focusType
+        ? {
+            actionType: 'open_learning_popup',
+            focusType: focusType as any,
+            topicTitle: topicTitle || '',
+            patternFormula: patternFormula || '',
+            sampleTarget: sampleTarget || '',
+          }
+        : undefined);
+    const query = (effectiveAction?.topicTitle || topicTitle || '').trim();
+    const hasRich = hasRichDynamicAction(effectiveAction) || Boolean(focusType?.startsWith('pte_'));
 
     if (hasRich) {
-      const derived = deriveContextualPedagogicalBoard(uiAction, query, targetLang, locale, quizSeed);
+      const derived = deriveContextualPedagogicalBoard(effectiveAction, query, targetLang, locale, quizSeed);
       setBoardState(derived);
       setIsReady(true);
       return;
@@ -1697,13 +1717,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     setIsReady(false);
     const delayMs = isGeneratingTopic ? 5500 : 1800;
     const timer = setTimeout(() => {
-      const derived = deriveContextualPedagogicalBoard(uiAction, query, targetLang, locale, quizSeed);
+      const derived = deriveContextualPedagogicalBoard(effectiveAction, query, targetLang, locale, quizSeed);
       setBoardState(derived);
       setIsReady(true);
     }, delayMs);
 
     return () => clearTimeout(timer);
-  }, [isOpen, currentKey, topicTitle, uiAction, targetLang, locale, isGeneratingTopic, quizSeed]);
+  }, [isOpen, currentKey, topicTitle, focusType, patternFormula, sampleTarget, uiAction, targetLang, locale, isGeneratingTopic, quizSeed]);
 
   // Handler Suara Guru
   useEffect(() => {

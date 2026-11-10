@@ -679,7 +679,27 @@ export default function App() {
     uiAction?: VoiceUiAction;
     preferredExerciseMode?: 'multiple_choice' | 'cloze_gap' | 'sentence_blocks';
     quizSeed?: number;
-  } | null>(null);
+  } | null>(() => {
+    if (selectedPersonaId === 'dr_julian' || activeScenarioId.startsWith('scen_pte')) {
+      return {
+        isOpen: true,
+        topicTitle: 'Global Renewable Energy Share (2020-2025)',
+        focusType: 'pte_describe_image',
+        explanationText: 'Analyze key trends, highest and lowest values, and conclude within 40 seconds.',
+        patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
+        drillInstruction: 'Speak continuously for 40 seconds following the Universal 5-Part Formula.',
+        sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
+        uiAction: {
+          actionType: 'open_learning_popup',
+          focusType: 'pte_describe_image',
+          topicTitle: 'Global Renewable Energy Share (2020-2025)',
+          patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
+          sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
+        },
+      };
+    }
+    return null;
+  });
   const isWorkbenchOpenRef = useRef<boolean>(false);
   isWorkbenchOpenRef.current = Boolean(learningWorkbench?.isOpen);
   const lastSystemIntentAtRef = useRef<{ key: string; at: number }>({ key: '', at: 0 });
@@ -1480,6 +1500,13 @@ export default function App() {
         focusType: 'pte_describe_image',
         sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
         patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
+        uiAction: {
+          actionType: 'open_learning_popup',
+          focusType: 'pte_describe_image',
+          topicTitle: 'Global Renewable Energy Share (2020-2025)',
+          patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
+          sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
+        },
       });
     }
     if (isLiveConnectedRef.current) {
@@ -1531,6 +1558,13 @@ export default function App() {
         focusType: 'pte_describe_image',
         sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
         patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
+        uiAction: {
+          actionType: 'open_learning_popup',
+          focusType: 'pte_describe_image',
+          topicTitle: 'Global Renewable Energy Share (2020-2025)',
+          patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
+          sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
+        },
       });
     }
     if (isLiveConnectedRef.current || isLiveConnectingRef.current) {
