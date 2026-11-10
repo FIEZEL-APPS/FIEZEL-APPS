@@ -1,7 +1,7 @@
 {
-  "version": "m025-786",
-  "claimedBy": "branch fix/kawan-mic-update-popup-m025-786",
-  "claimedAt": "2026-11-09T20:47:53.193Z",
-  "reason": "fix(voice,pwa): [ALLOW-PROTECTED: pwa] instant mochi opening voice, 2-stage same-realm mic activation, visible update popup, and shell cache purge (m025-786)",
+  "version": "m025-787",
+  "claimedBy": "branch feat/pte-academic-prep-hub",
+  "claimedAt": "2026-11-10T13:26:51.203Z",
+  "reason": "feat(pte): implement PTE Academic Big 4 prep hub engine",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

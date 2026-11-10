@@ -1,0 +1,120 @@
+{
+  "version": "1.1.0",
+  "task": "Read Aloud",
+  "crossSkills": ["Speaking", "Reading"],
+  "pool": "Pearson PTE Academic Recurring Real Exam Prediction Bank",
+  "items": [
+    {
+      "id": "ra-001",
+      "title": "Market Research",
+      "domain": "Business & Commerce (Pearson Recurring Exam Classic)",
+      "text": "Market research is a vital part of the planning process of any business. It involves collecting information which provides an insight into the customers' thinking, buying patterns and location. In addition, market research can also help you discover whether there is a market for your products or services.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 40,
+      "wordCount": 49,
+      "chunking": "Market research is a vital part // of the planning process of any business. // It involves collecting information // which provides an insight // into the customers' thinking, // buying patterns and location. // In addition, // market research can also help you discover // whether there is a market // for your products or services.",
+      "phoneticChallenges": [
+        { "word": "vital", "ipa": "/ˈvaɪtəl/", "tip": "Tekan depan: VYE-tul." },
+        { "word": "insight", "ipa": "/ˈɪnsaɪt/", "tip": "IN-syte." },
+        { "word": "patterns", "ipa": "/ˈpætənz/", "tip": "PAT-urnz." }
+      ],
+      "keywords": ["market", "research", "vital", "planning", "business", "collecting", "information", "insight", "customers", "patterns", "products", "services"]
+    },
+    {
+      "id": "ra-002",
+      "title": "Domestication of Animals",
+      "domain": "Anthropology & Biology (Pearson Real Exam Classic)",
+      "text": "Domestication is a sustained multi-generational relationship in which one group of organisms assumes a significant degree of influence over the reproduction and care of another group to secure a more predictable supply of resources.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 40,
+      "wordCount": 35,
+      "chunking": "Domestication is a sustained multi-generational relationship // in which one group of organisms // assumes a significant degree of influence // over the reproduction and care of another group // to secure a more predictable supply of resources.",
+      "phoneticChallenges": [
+        { "word": "domestication", "ipa": "/dəˌmestɪˈkeɪʃən/", "tip": "duh-mes-tih-KAY-shun." },
+        { "word": "multi-generational", "ipa": "/ˌmʌltiˌdʒenəˈreɪʃənəl/", "tip": "mul-tee-jen-er-AY-shun-ul." },
+        { "word": "organisms", "ipa": "/ˈɔːɡənɪzəmz/", "tip": "OR-guh-niz-umz." }
+      ],
+      "keywords": ["domestication", "sustained", "multi-generational", "organisms", "reproduction", "predictable", "resources"]
+    },
+    {
+      "id": "ra-003",
+      "title": "Lincoln's Gettysburg Address",
+      "domain": "History & Rhetoric (Pearson Real Exam Classic)",
+      "text": "Lincoln's legendary address was delivered on the battlefield of Gettysburg. He spoke for just two minutes, yet his speech remains one of the most powerful and memorable statements on human freedom and equality in American history.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 40,
+      "wordCount": 36,
+      "chunking": "Lincoln's legendary address // was delivered on the battlefield of Gettysburg. // He spoke for just two minutes, // yet his speech remains // one of the most powerful and memorable statements // on human freedom and equality // in American history.",
+      "phoneticChallenges": [
+        { "word": "legendary", "ipa": "/ˈledʒəndəri/", "tip": "LEJ-un-dare-ee." },
+        { "word": "battlefield", "ipa": "/ˈbætlfiːld/", "tip": "BAT-ul-feeld." },
+        { "word": "equality", "ipa": "/ɪˈkwɒləti/", "tip": "ih-KWOL-ih-tee." }
+      ],
+      "keywords": ["Lincoln", "legendary", "address", "battlefield", "Gettysburg", "memorable", "freedom", "equality"]
+    },
+    {
+      "id": "ra-004",
+      "title": "Carbon Accounting & Emissions",
+      "domain": "Environmental Science (Pearson Real Exam Classic)",
+      "text": "When countries assess their carbon emissions, they commonly calculate only the gases produced within their national borders. This standard accounting method excludes the emissions generated to produce imported consumer goods.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 40,
+      "wordCount": 30,
+      "chunking": "When countries assess their carbon emissions, // they commonly calculate only the gases produced // within their national borders. // This standard accounting method // excludes the emissions generated // to produce imported consumer goods.",
+      "phoneticChallenges": [
+        { "word": "emissions", "ipa": "/iˈmɪʃənz/", "tip": "ih-MISH-unz." },
+        { "word": "accounting", "ipa": "/əˈkaʊntɪŋ/", "tip": "uh-KOWN-ting." },
+        { "word": "imported", "ipa": "/ɪmˈpɔːtɪd/", "tip": "im-POR-ted." }
+      ],
+      "keywords": ["countries", "assess", "carbon", "emissions", "calculate", "national", "borders", "imported", "consumer", "goods"]
+    },
+    {
+      "id": "ra-005",
+      "title": "Culinary Science & Temperature Control",
+      "domain": "Commercial Cookery & Food Science (AILFE Entry Pathway)",
+      "text": "Cooking is both an art and an exacting science. When professional chefs understand how food ingredients react to precise temperatures, they can consistently create nutritious and flavorful dishes for their guests.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 40,
+      "wordCount": 31,
+      "chunking": "Cooking is both an art // and an exacting science. // When professional chefs understand // how food ingredients react to precise temperatures, // they can consistently create // nutritious and flavorful dishes // for their guests.",
+      "phoneticChallenges": [
+        { "word": "ingredients", "ipa": "/ɪnˈɡriːdiənts/", "tip": "in-GREE-dee-unts." },
+        { "word": "temperatures", "ipa": "/ˈtemprətʃərz/", "tip": "TEM-pruh-churz." },
+        { "word": "nutritious", "ipa": "/njuːˈtrɪʃəs/", "tip": "nyoo-TRISH-us." }
+      ],
+      "keywords": ["cooking", "exacting", "science", "professional", "chefs", "ingredients", "temperatures", "nutritious", "flavorful"]
+    },
+    {
+      "id": "ra-006",
+      "title": "Hospitality Management Standards",
+      "domain": "Hospitality & Tourism (Australian Vocational Standard)",
+      "text": "Effective hospitality management relies upon comprehensive communication between kitchen staff and front-of-house teams. Maintaining immaculate hygiene standards ensures guest satisfaction and complies with national food safety regulations.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 40,
+      "wordCount": 28,
+      "chunking": "Effective hospitality management // relies upon comprehensive communication // between kitchen staff and front-of-house teams. // Maintaining immaculate hygiene standards // ensures guest satisfaction // and complies with national food safety regulations.",
+      "phoneticChallenges": [
+        { "word": "hospitality", "ipa": "/ˌhɒspɪˈtæləti/", "tip": "hosp-ih-TAL-ih-tee." },
+        { "word": "hygiene", "ipa": "/ˈhaɪdʒiːn/", "tip": "HIGH-jeen." },
+        { "word": "regulations", "ipa": "/ˌreɡjuˈleɪʃənz/", "tip": "reg-yoo-LAY-shunz." }
+      ],
+      "keywords": ["hospitality", "management", "communication", "kitchen", "hygiene", "satisfaction", "regulations"]
+    },
+    {
+      "id": "ra-007",
+      "title": "Vocational Training in Western Australia",
+      "domain": "Education & Career (Perth Visa Pathway)",
+      "text": "Vocational education institutions in Western Australia provide practical, hands-on training that aligns directly with industry workforce requirements. Students gain valuable practical competencies, opening dependable pathways to professional employment and career advancement.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 40,
+      "wordCount": 31,
+      "chunking": "Vocational education institutions in Western Australia // provide practical, hands-on training // that aligns directly with industry workforce requirements. // Students gain valuable practical competencies, // opening dependable pathways // to professional employment // and career advancement.",
+      "phoneticChallenges": [
+        { "word": "vocational", "ipa": "/vəʊˈkeɪʃənəl/", "tip": "voh-KAY-shun-ul." },
+        { "word": "competencies", "ipa": "/ˈkɒmpɪtənsiz/", "tip": "KOM-pih-tun-seez." },
+        { "word": "advancement", "ipa": "/ədˈvɑːnsmənt/", "tip": "ud-VAHN-smunt." }
+      ],
+      "keywords": ["vocational", "institutions", "workforce", "requirements", "competencies", "dependable", "advancement"]
+    }
+  ]
+}
