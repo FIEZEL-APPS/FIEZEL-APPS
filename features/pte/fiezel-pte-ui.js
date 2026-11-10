@@ -23,13 +23,6 @@
     });
   }
 
-  function t(k, fallback) {
-    if (typeof globalThis !== 'undefined' && globalThis.FiezelI18n && typeof globalThis.FiezelI18n.t === 'function') {
-      return globalThis.FiezelI18n.t(k, fallback);
-    }
-    return fallback;
-  }
-
   // Preloaded Content Bank Caches
   var BANKS = {
     ra: [],
@@ -215,7 +208,7 @@
     } else if (item) {
       out.push(renderPracticeCard(item));
     } else {
-      out.push('  <div class="card" style="padding:20px; text-align:center;"><p>' + esc(t('pte.loading', 'Memuat bank data PTE...')) + '</p></div>');
+      out.push('  <div class="card" style="padding:20px; text-align:center;"><p>Loading PTE Academic data banks...</p></div>');
     }
 
     out.push('</section>');
@@ -243,7 +236,7 @@
 
     // Official Pearson Status Box
     out.push('    <div class="fz-pte-pearson-status-box">');
-    var statusTitle = t('pte.status_title', 'Current Status:');
+    var statusTitle = 'Current State:';
     var statusVal = 'Ready to begin';
     var barClass = 'ready-bar';
     var progressPct = 0;
@@ -271,7 +264,7 @@
     out.push('      <div class="fz-pte-pearson-bar-track">');
     out.push('        <div class="fz-pte-pearson-bar-fill ' + barClass + '" style="width:' + progressPct + '%;"></div>');
     out.push('      </div>');
-    out.push('      <div class="fz-pte-status-timer-sub">Time: <b>' + formatClock(state.timerRemainingSec) + '</b>' + (state.silenceTriggered ? ' · <span style="color:#ef4444; font-weight:800;">(Aturan 3 Detik Hening Pearson Aktif)</span>' : '') + '</div>');
+    out.push('      <div class="fz-pte-status-timer-sub">Time: <b>' + formatClock(state.timerRemainingSec) + '</b>' + (state.silenceTriggered ? ' · <span style="color:#ef4444; font-weight:800;">(Pearson 3-Second Silence Rule Activated)</span>' : '') + '</div>');
     out.push('    </div>');
 
     // Mode-specific Body
@@ -287,7 +280,7 @@
 
       if (Array.isArray(item.phoneticChallenges) && item.phoneticChallenges.length > 0) {
         out.push('    <div style="background:#f8fafc; border-radius:10px; padding:10px 14px; font-size:0.82rem; color:#475569;">');
-        out.push('      <b style="color:#0284c7;">Tips Pelafalan Kunci:</b> ' +
+        out.push('      <b style="color:#0284c7;">Key Pronunciation Focus:</b> ' +
           item.phoneticChallenges.map(function (p) { return '<b>' + esc(p.word) + '</b> (' + esc(p.ipa) + ' - ' + esc(p.tip) + ')'; }).join(' · ')
         );
         out.push('    </div>');
@@ -302,17 +295,17 @@
       }
       out.push('      </div>');
       out.push('    </div>');
-      out.push('    <p style="font-size:0.84rem; color:#64748b; margin:0;">Tekan tombol putar untuk mendengarkan kalimat, lalu tirukan dengan suara keras dan lancar.</p>');
+      out.push('    <p style="font-size:0.84rem; color:#64748b; margin:0;">Press the play button to listen, then repeat aloud clearly and fluently.</p>');
     } else if (state.mode === 'di') {
       out.push('    <div class="fz-pte-chart-wrap">');
-      out.push(item.svg || '<div style="padding:40px;">Diagram SVG</div>');
+      out.push(item.svg || '<div style="padding:40px;">SVG Diagram</div>');
       out.push('    </div>');
 
       // Collapsible Universal Template
       out.push('    <div class="fz-pte-template-box">');
       out.push('      <div class="fz-pte-template-header" onclick="FiezelPteUi.toggleTemplate()">');
-      out.push('        <span>⚡ Template Hafalan Universal (Buka Contekan)</span>');
-      out.push('        <span>' + (state.templateOpen ? '▲ Tutup' : '▼ Lihat Pola') + '</span>');
+      out.push('        <span>⚡ Universal Template (Memorization Scaffold)</span>');
+      out.push('        <span>' + (state.templateOpen ? '▲ Hide Template' : '▼ View Template') + '</span>');
       out.push('      </div>');
       if (state.templateOpen) {
         out.push('      <div class="fz-pte-template-body">');
@@ -331,10 +324,10 @@
       out.push('      </div>');
       out.push('    </div>');
       out.push('    <div>');
-      out.push('      <textarea id="fzPteDictationInput" class="fz-pte-dictation-editor" placeholder="Ketik kalimat yang kamu dengar di sini (perhatikan ejaan kata kunci)..." oninput="FiezelPteUi.updateWfdCount()"></textarea>');
+      out.push('      <textarea id="fzPteDictationInput" class="fz-pte-dictation-editor" placeholder="Type the sentence you hear here (check keyword spelling)..." oninput="FiezelPteUi.updateWfdCount()"></textarea>');
       out.push('      <div class="fz-pte-dictation-stats">');
-      out.push('        <span id="fzPteWordCountLabel">0 kata</span>');
-      out.push('        <span>1 poin untuk setiap kata yang benar</span>');
+      out.push('        <span id="fzPteWordCountLabel">0 words</span>');
+      out.push('        <span>1 point for each correct word</span>');
       out.push('      </div>');
       out.push('    </div>');
     }
@@ -342,14 +335,14 @@
     // Action Dock
     out.push('    <div class="fz-pte-action-dock">');
     if (state.mode === 'wfd') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.submitWfd()">' + esc(t('pte.check_wfd', 'Periksa Ejaan & Skor')) + '</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.submitWfd()">Check Spelling &amp; Score</button>');
     } else {
       var isRec = state.timerState === 'recording';
       var recBtnClass = isRec ? ' recording' : '';
-      var recBtnLabel = isRec ? t('pte.finish_speak', '■ Selesai Bicara (Kirim)') : (state.timerState === 'preparing' ? t('pte.record_now', '▶ Mulai Rekam Sekarang') : t('pte.start_prep', '● Mulai Latihan (Persiapan)'));
+      var recBtnLabel = isRec ? '■ Finish Speaking (Submit)' : (state.timerState === 'preparing' ? '▶ Record Now' : '● Start Preparation');
       out.push('      <button type="button" class="fz-pte-btn-primary' + recBtnClass + '" onclick="FiezelPteUi.handleMicAction()">' + esc(recBtnLabel) + '</button>');
     }
-    out.push('      <button type="button" class="fz-pte-btn-secondary" onclick="FiezelPteUi.nextItem()">' + esc(t('pte.next_item', 'Soal Berikutnya ➔')) + '</button>');
+    out.push('      <button type="button" class="fz-pte-btn-secondary" onclick="FiezelPteUi.nextItem()">Next Question ➔</button>');
     out.push('    </div>');
 
     out.push('  </div>');
@@ -362,7 +355,7 @@
   function renderResultScorecard(res) {
     var out = ['  <div class="fz-pte-result-card">'];
     out.push('    <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">');
-    out.push('      <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#0f172a;">Hasil Evaluasi ' + esc(res.task) + '</h3>');
+    out.push('      <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#0f172a;">Evaluation Results: ' + esc(res.task) + '</h3>');
     out.push('      <span class="fz-pte-target-badge" style="background:#0284c7; color:#fff;">TARGET 42</span>');
     out.push('    </div>');
 
@@ -375,9 +368,9 @@
     out.push('        <span class="fz-pte-score-scale">Pearson / 90</span>');
     out.push('      </div>');
     out.push('      <div>');
-    var verdictLabel = pass ? t('pte.passed', '✓ Memenuhi Syarat Visa (PTE 42+)') : t('pte.not_passed', '▲ Belum Mencapai Target 42');
+    var verdictLabel = pass ? '✓ Meets Australian Visa Benchmark (PTE 42+)' : '▲ Below Target 42 Benchmark';
     out.push('        <div style="font-weight:800; font-size:1.05rem; color:' + (pass ? '#10b981' : '#f59e0b') + ';">' + esc(verdictLabel) + '</div>');
-    out.push('        <div style="font-size:0.84rem; color:#64748b; margin-top:4px;">Poin berkontribusi ke sub-skor Speaking, Listening, atau Writing.</div>');
+    out.push('        <div style="font-size:0.84rem; color:#64748b; margin-top:4px;">Points contribute to PTE Speaking, Listening, and Writing subscores.</div>');
     out.push('      </div>');
     out.push('    </div>');
 
@@ -406,17 +399,17 @@
     // Spelling Misconceptions (WFD)
     if (Array.isArray(res.spellingMisconceptions) && res.spellingMisconceptions.length > 0) {
       out.push('    <div class="fz-pte-diagnosis-banner">');
-      out.push('      <b>⚠ Peringatan Ejaan Kata Kunci (Misconception Ledger):</b><br/>');
+      out.push('      <b>⚠ Keyword Spelling Feedback (Misconception Ledger):</b><br/>');
       res.spellingMisconceptions.forEach(function (m) {
-        out.push('      • Kamu mengetik <i>"' + esc(m.typedWord) + '"</i>, yang benar adalah <b>"' + esc(m.targetWord) + '"</b>. ' + esc(m.rule) + '<br/>');
+        out.push('      • You typed <i>"' + esc(m.typedWord) + '"</i>; correct spelling is <b>"' + esc(m.targetWord) + '"</b>. ' + esc(m.rule) + '<br/>');
       });
       out.push('    </div>');
     }
 
     // Action buttons
     out.push('    <div class="fz-pte-action-dock" style="margin-top:8px;">');
-    out.push('      <button type="button" class="fz-pte-btn-secondary" onclick="FiezelPteUi.retryItem()">' + esc(t('pte.retry', 'Coba Ulang')) + '</button>');
-    out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.nextItem()">' + esc(t('pte.continue_next', 'Lanjut ke Soal Berikutnya ➔')) + '</button>');
+    out.push('      <button type="button" class="fz-pte-btn-secondary" onclick="FiezelPteUi.retryItem()">Try Again</button>');
+    out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.nextItem()">Continue to Next Question ➔</button>');
     out.push('    </div>');
 
     out.push('  </div>');
@@ -474,7 +467,7 @@
     if (!ta || !label) return;
     var engine = getEngine();
     var words = engine ? engine.tokenize(ta.value) : ta.value.trim().split(/\s+/).filter(Boolean);
-    label.textContent = words.length + ' kata';
+    label.textContent = words.length + ' words';
   }
 
   function clearTimer() {

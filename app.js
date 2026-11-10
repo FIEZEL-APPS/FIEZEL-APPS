@@ -11135,8 +11135,8 @@ function pteAcademicView(){
   if(self.FiezelPteUi && typeof self.FiezelPteUi.mount==='function'){
     self.FiezelPteUi.mount($('app'));
   } else {
-    shell('PTE Academic Hub','Persiapan Ujian Target 42–58+',
-      '<div class="card"><p>' + t('pte.loading', 'Menyiapkan modul PTE Academic Hub...') + '</p></div>');
+    shell('PTE Academic Hub','Official Pearson Exam Preparation (Target 42–58+)',
+      '<div class="card"><p>Loading PTE Academic Hub...</p></div>');
   }
 }
 window.pteAcademicView=pteAcademicView;
