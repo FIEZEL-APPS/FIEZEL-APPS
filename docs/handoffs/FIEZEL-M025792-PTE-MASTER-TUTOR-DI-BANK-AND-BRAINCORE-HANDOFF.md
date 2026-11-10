@@ -1,7 +1,7 @@
-# FIEZEL Handoff Dossier: m025-790
+# FIEZEL Handoff Dossier: m025-792
 ## PTE Academic Master Tutor & Strict Examiner Engine (Dr. Julian) + 50 Describe Image Questions + Real-time Braincore Diagnostic Suite
 
-- **Build Version**: `m025-790`
+- **Build Version**: `m025-792`
 - **Branch**: `feat/voice-pte-master-tutor`
 - **PR**: #865 (`https://github.com/FIEZEL-APPS/FIEZEL-APPS/pull/865`)
 - **Status**: UNMERGED / LOCAL PREVIEW ONLY (`http://127.0.0.1:4173/`)

@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-791-unified-grammar-20261002';
+const SW_REV='m025-792-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
