@@ -2389,4 +2389,380 @@ export function resetPteMasterState(): PteMasterState {
   return fresh;
 }
 
+// =========================================================================
+// Real-Time Braincore Diagnostic Engine for PTE Academic Speech Evaluation
+// =========================================================================
+
+export interface PteDiagnosticSpeechInput {
+  spokenTranscript: string;
+  durationSec?: number;
+  questionId?: string;
+  questionTitle?: string;
+  expectedKeywords?: string[];
+  expectedIntro?: string;
+  expectedMax?: string;
+  expectedMin?: string;
+  expectedConclusion?: string;
+  learnerName?: string;
+}
+
+export interface PteDiagnosticSpeechResult {
+  wpm: number;
+  durationSec: number;
+  wordCount: number;
+  pacingQuality: 'optimal' | 'rushed' | 'slow';
+  hesitationCount: number;
+  hesitationTokens: string[];
+  droppedPluralS: Array<{ heard: string; expected: string; reason: string }>;
+  droppedPastEd: Array<{ heard: string; expected: string; reason: string }>;
+  misconceptionsFound: Array<{ id: string; label: string; detail: string }>;
+  templateAdherence: {
+    hasIntro: boolean;
+    hasKeyElements: boolean;
+    hasMax: boolean;
+    hasMin: boolean;
+    hasConclusion: boolean;
+    contentScore: number;
+    missingStages: string[];
+  };
+  scores: {
+    fluency: number;
+    pronunciation: number;
+    content: number;
+    pearsonEstimate: number;
+    passedTarget: boolean;
+  };
+  bkt: {
+    fluencyP: number;
+    fluencyTheta: number;
+    pronunciationP: number;
+    pronunciationTheta: number;
+  };
+  clinicalDossierText: string;
+}
+
+export function diagnosePteCandidateSpeech(
+  input: PteDiagnosticSpeechInput
+): PteDiagnosticSpeechResult {
+  const learner = input.learnerName || 'Fitra';
+  const transcript = (input.spokenTranscript || '').trim();
+  const cleanTokens = transcript
+    .toLowerCase()
+    .replace(/[^a-z0-9'\s-]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const duration = Math.max(5, Math.min(60, Number(input.durationSec || 30)));
+  const wordCount = cleanTokens.length;
+  const wpm = Math.round((wordCount / duration) * 60);
+
+  const pacingQuality: 'optimal' | 'rushed' | 'slow' =
+    wpm >= 115 && wpm <= 148 ? 'optimal' : wpm > 148 ? 'rushed' : 'slow';
+
+  // 1. Deteksi Keraguan / Hesitasi / False Starts
+  const hesitationMatches = transcript.match(/\b(umm+|uhh+|ehh+|aaa+|err+|wait|sorry|ano)\b/gi) || [];
+  const stutterMatches = transcript.match(/\b([a-z]+)\s+\1\b/gi) || [];
+  const hesitationTokens = [...hesitationMatches, ...stutterMatches];
+  const hesitationCount = hesitationTokens.length;
+
+  // 2. Deteksi Fonetik: Dropped Plural 's'
+  const COMMON_PLURALS: Record<string, string> = {
+    supermarket: 'supermarkets',
+    percentage: 'percentages',
+    category: 'categories',
+    million: 'millions',
+    billion: 'billions',
+    export: 'exports',
+    import: 'imports',
+    dollar: 'dollars',
+    figure: 'figures',
+    corridor: 'corridors',
+    resident: 'residents',
+    region: 'regions',
+    faculty: 'faculties',
+    student: 'students',
+    stage: 'stages',
+    proportion: 'proportions',
+    element: 'elements',
+    degree: 'degrees',
+    emission: 'emissions',
+    country: 'countries',
+    resource: 'resources',
+    regulation: 'regulations',
+    chart: 'charts',
+    graph: 'graphs',
+  };
+
+  const droppedPluralS: Array<{ heard: string; expected: string; reason: string }> = [];
+  const lowerTranscript = transcript.toLowerCase();
+
+  // Periksa frasa pemicu bentuk jamak (various, several, multiple, numbers > 1)
+  for (const [singular, plural] of Object.entries(COMMON_PLURALS)) {
+    const pluralTriggerRegex = new RegExp(
+      `\\b(?:various|several|multiple|different|many|all|two|three|four|five|six|seven|eight|nine|ten|hundred|thousand|million|billion)\\s+${singular}\\b`,
+      'i'
+    );
+    if (pluralTriggerRegex.test(lowerTranscript)) {
+      droppedPluralS.push({
+        heard: singular,
+        expected: plural,
+        reason: `Kata "${singular}" diucapkan tunggal setelah pembilang jamak. Seharusnya "${plural}".`,
+      });
+    }
+  }
+
+  // 3. Deteksi Fonetik: Dropped Past Tense '-ed'
+  const COMMON_ED_VERBS: Record<string, string> = {
+    represent: 'represented',
+    record: 'recorded',
+    observe: 'observed',
+    increase: 'increased',
+    decrease: 'decreased',
+    fluctuate: 'fluctuated',
+    measure: 'measured',
+    generate: 'generated',
+    collect: 'collected',
+  };
+
+  const droppedPastEd: Array<{ heard: string; expected: string; reason: string }> = [];
+  for (const [stem, edForm] of Object.entries(COMMON_ED_VERBS)) {
+    const passiveTriggerRegex = new RegExp(
+      `\\b(?:is|are|was|were|has been|have been|can be)\\s+${stem}\\b`,
+      'i'
+    );
+    if (passiveTriggerRegex.test(lowerTranscript)) {
+      droppedPastEd.push({
+        heard: stem,
+        expected: edForm,
+        reason: `Pola pasif/lampau membutuhkan akhiran -ed ("${edForm}"), terdengar "${stem}".`,
+      });
+    }
+  }
+
+  // 4. Analisis Adhesi Formula Universal (5-Tahap)
+  const hasIntro = /(given|provided|represents|shows|illustrates|informative|information about)/i.test(
+    transcript
+  );
+  const hasKeyElements = /(looking closely|we can see|key elements|various|figures|categories|such as)/i.test(
+    transcript
+  );
+  const hasMax = /(highest|maximum|peak|largest|dominant|greatest)/i.test(transcript);
+  const hasMin = /(lowest|minimum|smallest|least|conversely|in contrast)/i.test(transcript);
+  const hasConclusion = /(in conclusion|overall|it is evident|to conclude|in summary)/i.test(transcript);
+
+  const missingStages: string[] = [];
+  if (!hasIntro) missingStages.push('Introduction (Pembuka)');
+  if (!hasKeyElements) missingStages.push('Key Elements (Angka Utama)');
+  if (!hasMax) missingStages.push('Maximum Figure (Angka Tertinggi)');
+  if (!hasMin) missingStages.push('Minimum Figure (Angka Terendah)');
+  if (!hasConclusion) missingStages.push('Conclusion (Kesimpulan)');
+
+  const stagesMetCount = [hasIntro, hasKeyElements, hasMax, hasMin, hasConclusion].filter(Boolean).length;
+  const contentScore = stagesMetCount >= 4 ? 3 : stagesMetCount >= 2 ? 2 : 1;
+
+  // 5. Kalkulasi Skor Enabling Skills (Fluency & Pronunciation)
+  let baseFluency = 5.0;
+  if (pacingQuality === 'slow') baseFluency -= 1.0;
+  if (pacingQuality === 'rushed') baseFluency -= 0.5;
+  if (hesitationCount > 0) baseFluency -= Math.min(2.0, hesitationCount * 0.5);
+  if (duration > 38) baseFluency -= 0.5;
+  const fluencyScore = Number(Math.max(1.0, Math.min(5.0, baseFluency)).toFixed(1));
+
+  let basePron = 5.0;
+  if (droppedPluralS.length > 0) basePron -= Math.min(1.5, droppedPluralS.length * 0.75);
+  if (droppedPastEd.length > 0) basePron -= Math.min(1.5, droppedPastEd.length * 0.75);
+  const pronunciationScore = Number(Math.max(1.0, Math.min(5.0, basePron)).toFixed(1));
+
+  // Pearson Concordance Formula
+  const rawFrac = (fluencyScore / 5) * 0.4 + (pronunciationScore / 5) * 0.35 + (contentScore / 3) * 0.25;
+  const pearsonEstimate = Math.round(10 + rawFrac * 80);
+  const passedTarget = pearsonEstimate >= 42;
+
+  // 6. Misconception Ledger Integration
+  const misconceptionsFound: Array<{ id: string; label: string; detail: string }> = [];
+  if (droppedPluralS.length > 0) {
+    droppedPluralS.forEach((d) => {
+      misconceptionsFound.push({
+        id: 'pte_dropped_plural_s',
+        label: `Dropped Plural 's': ${d.heard} -> ${d.expected}`,
+        detail: d.reason,
+      });
+    });
+  }
+  if (droppedPastEd.length > 0) {
+    droppedPastEd.forEach((d) => {
+      misconceptionsFound.push({
+        id: 'pte_dropped_past_ed',
+        label: `Dropped Past -ed: ${d.heard} -> ${d.expected}`,
+        detail: d.reason,
+      });
+    });
+  }
+  if (hesitationCount >= 2) {
+    misconceptionsFound.push({
+      id: 'pte_hesitation_over_2s',
+      label: `Excessive Hesitation (${hesitationCount} fillers/stutters)`,
+      detail: `Terdeteksi ${hesitationCount} keraguan ("${hesitationTokens.join(', ')}"). Memotong skor Oral Fluency.`,
+    });
+  }
+  if (!hasConclusion) {
+    misconceptionsFound.push({
+      id: 'pte_missing_conclusion',
+      label: 'Missing Conclusion Sentence',
+      detail: 'Tidak ada penutup "In conclusion / Overall" sebelum waktu bicara habis.',
+    });
+  }
+
+  // 7. Update Bayesian Knowledge Tracing (BKT) di Local Storage
+  let fluencyP = 0.55;
+  let fluencyTheta = 3.2;
+  let pronP = 0.55;
+  let pronTheta = 3.2;
+
+  try {
+    const brainState = loadBraincoreState();
+    const updateBktSkill = (skillId: string, isSuccess: boolean) => {
+      const rec = brainState.competencies[skillId] || {
+        competencyId: skillId,
+        masteryProb: BRAINCORE_PARAMS.P_INIT,
+        attemptsCount: 0,
+        correctCount: 0,
+        streak: 0,
+        lastAttemptTs: Date.now(),
+        retentionDecayTs: Date.now(),
+        halfLifeDays: BRAINCORE_PARAMS.HALF_LIFE_DAYS,
+        status: 'learning',
+      };
+      const p = rec.masteryProb;
+      const pObs = isSuccess
+        ? (p * (1 - BRAINCORE_PARAMS.P_SLIP)) /
+          (p * (1 - BRAINCORE_PARAMS.P_SLIP) + (1 - p) * BRAINCORE_PARAMS.P_GUESS)
+        : (p * BRAINCORE_PARAMS.P_SLIP) /
+          (p * BRAINCORE_PARAMS.P_SLIP + (1 - p) * (1 - BRAINCORE_PARAMS.P_GUESS));
+      const nextP = Math.max(0.05, Math.min(0.99, pObs + (1 - pObs) * BRAINCORE_PARAMS.P_LEARN));
+      rec.masteryProb = Number(nextP.toFixed(3));
+      rec.attemptsCount += 1;
+      if (isSuccess) {
+        rec.correctCount += 1;
+        rec.streak += 1;
+      } else {
+        rec.streak = 0;
+      }
+      rec.lastAttemptTs = Date.now();
+      rec.status = nextP >= BRAINCORE_PARAMS.MASTERY_T ? 'mastered' : 'learning';
+      brainState.competencies[skillId] = rec;
+      return { p: rec.masteryProb, theta: abilityThetaFromMastery(rec.masteryProb) };
+    };
+
+    const fRes = updateBktSkill('pte_oral_fluency', fluencyScore >= 3.5);
+    const pRes = updateBktSkill('pte_pronunciation', pronunciationScore >= 3.5);
+    updateBktSkill('pte_template_adherence', contentScore >= 2);
+
+    fluencyP = fRes.p;
+    fluencyTheta = fRes.theta;
+    pronP = pRes.p;
+    pronTheta = pRes.theta;
+
+    // Catat ke Misconception Ledger
+    misconceptionsFound.forEach((m) => {
+      brainState.misconceptionLedger.push({
+        id: `pte_misc_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        ruleId: m.id,
+        ruleTitle: m.label,
+        misconceptionId: m.id,
+        whyFailsId: m.detail,
+        userAttempt: transcript.slice(0, 80),
+        correctTarget: input.questionTitle || 'PTE Exam Question',
+        timestamp: Date.now(),
+        status: 'active',
+        streakCorrection: 0,
+      });
+    });
+
+    if (brainState.misconceptionLedger.length > 80) {
+      brainState.misconceptionLedger = brainState.misconceptionLedger.slice(-80);
+    }
+
+    saveBraincoreState(brainState);
+
+    // Update PteMasterState
+    const missedWordsList = [
+      ...droppedPluralS.map((d) => d.expected),
+      ...droppedPastEd.map((d) => d.expected),
+    ];
+    recordPteMasterAttempt({
+      stage: 1,
+      taskName: 'Describe Image',
+      fluency: Math.round(fluencyScore),
+      pronunciation: Math.round(pronunciationScore),
+      content: contentScore,
+      missedWords: missedWordsList,
+      feedback: passedTarget
+        ? `Meets PTE 42+ Benchmark (${pearsonEstimate}/90)`
+        : `Below Target Benchmark (${pearsonEstimate}/90). Remedial drill required.`,
+    });
+  } catch {
+    // Non-fatal fallback
+  }
+
+  // 8. Rumuskan Clinical Dossier Text untuk Diucapkan Dr. Julian
+  const miscListText =
+    misconceptionsFound.length > 0
+      ? misconceptionsFound.map((m) => `- [${m.id}] ${m.label}: ${m.detail}`).join('\n')
+      : 'Nihil (Bersih dari miskonsepsi kronis).';
+
+  const droppedPluralSummary = droppedPluralS.map((d) => `"${d.heard}" -> "${d.expected}"`).join(', ');
+
+  const clinicalDossierText = `[BRAINCORE REAL-TIME CLINICAL DIAGNOSTIC DOSSIER]:
+Candidate: ${learner}
+Evaluated Task: Describe Image (${input.questionTitle || 'Exam Visual'})
+- Real Speech Pacing: ${wpm} WPM (${pacingQuality === 'optimal' ? 'OPTIMAL 120-140 WPM' : pacingQuality === 'slow' ? 'TERLALU LAMBAT < 115 WPM' : 'TERBURU-BURU > 148 WPM'})
+- Oral Fluency Score: ${fluencyScore} / 5.0 (BKT P(L): ${fluencyP.toFixed(2)}, Latent Ability Theta: ${fluencyTheta.toFixed(2)})
+- Pronunciation Score: ${pronunciationScore} / 5.0 (BKT P(L): ${pronP.toFixed(2)}, Latent Ability Theta: ${pronTheta.toFixed(2)})
+- Content Coverage: ${contentScore} / 3.0 (Intro: ${hasIntro ? '✓' : '✗'}, Key Elements: ${hasKeyElements ? '✓' : '✗'}, Max: ${hasMax ? '✓' : '✗'}, Min: ${hasMin ? '✓' : '✗'}, Conclusion: ${hasConclusion ? '✓' : '✗'})
+- Estimated Pearson Concordance: ${pearsonEstimate} / 90 (${passedTarget ? 'MEMENUHI TARGET 42+' : 'BELUM MEMENUHI TARGET 42 - WAJIB REMEDIAL'})
+- Misconception Ledger Active Entries:
+${miscListText}
+
+[EXAMINER VERBAL MANDATE FOR DR. JULIAN]:
+Anda WAJIB mengutip diagnosa Braincore ini secara eksplisit dan klinis di awal respon Anda kepada ${learner}:
+Contoh pembuka wajib: "${learner}, berdasarkan diagnosa Braincore barusan: Kelancaranmu ${wpm} WPM (${pacingQuality === 'optimal' ? 'sudah stabil di zona optimal Pearson' : 'belum konsisten'}). ${droppedPluralS.length > 0 ? `Namun di Misconception Ledger tercatat kamu menghilangkan akhiran 's' pada kata: ${droppedPluralSummary}. ` : ''}${hesitationCount > 0 ? `Terdeteksi juga ${hesitationCount} keraguan yang memotong nilai Fluency. ` : ''}Nilai simulasi resmimu: Fluency ${fluencyScore}/5, Pronunciation ${pronunciationScore}/5, Content ${contentScore}/3 (Estimasi Pearson: ${pearsonEstimate}/90). ${passedTarget ? 'Pertahankan ritme ini!' : 'Kamu butuh remedial!'}"
+${droppedPluralS.length > 0 || droppedPastEd.length > 0 ? 'Tuntut murid melafalkan ulang kata yang salah sekarang juga sebelum lanjut!' : ''}`;
+
+  return {
+    wpm,
+    durationSec: duration,
+    wordCount,
+    pacingQuality,
+    hesitationCount,
+    hesitationTokens,
+    droppedPluralS,
+    droppedPastEd,
+    misconceptionsFound,
+    templateAdherence: {
+      hasIntro,
+      hasKeyElements,
+      hasMax,
+      hasMin,
+      hasConclusion,
+      contentScore,
+      missingStages,
+    },
+    scores: {
+      fluency: fluencyScore,
+      pronunciation: pronunciationScore,
+      content: contentScore,
+      pearsonEstimate,
+      passedTarget,
+    },
+    bkt: {
+      fluencyP,
+      fluencyTheta,
+      pronunciationP,
+      pronunciationTheta,
+    },
+    clinicalDossierText,
+  };
+}
+
 export { STORAGE_KEY };

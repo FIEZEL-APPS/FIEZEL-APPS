@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-11-10T19:52:52.268Z",
+  "generatedAt": "2026-11-10T20:37:52.485Z",
   "files": {
     "app.js": {
       "leaks": 3,
