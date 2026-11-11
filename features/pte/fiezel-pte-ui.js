@@ -249,12 +249,13 @@
    * Render Guided Daily Coach Card (30-Day Curriculum & Nakul Protocol).
    */
   function renderGuidedCoachCard(roadmap) {
-    if (!roadmap) return '';
+    var rm = roadmap || BANKS.roadmap;
+    if (!rm) return '';
     var engine = getEngine();
     var currentDay = state.selectedDay || 1;
     var dayData = engine && typeof engine.getDailyRoadmapDay === 'function'
-      ? engine.getDailyRoadmapDay(currentDay, roadmap)
-      : (roadmap.days ? roadmap.days.find(function (d) { return d.day === currentDay; }) || roadmap.days[0] : null);
+      ? engine.getDailyRoadmapDay(currentDay, rm)
+      : (rm.days ? rm.days.find(function (d) { return d.day === currentDay; }) || rm.days[0] : null);
 
     if (!dayData) return '';
 
@@ -281,7 +282,7 @@
     out.push('    <div class="fz-pte-days-carousel">');
     for (var d = 1; d <= 30; d++) {
       var isActive = d === currentDay ? ' active' : '';
-      var dayItem = roadmap.days ? roadmap.days.find(function (x) { return x.day === d; }) : null;
+      var dayItem = rm.days ? rm.days.find(function (x) { return x.day === d; }) : null;
       var dayDone = false;
       if (dayItem && dayItem.tasks && engine && typeof engine.calculateDailyProgress === 'function') {
         dayDone = engine.calculateDailyProgress(dayItem.tasks, state.completedTaskIds).isDayCompleted;
