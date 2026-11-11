@@ -1089,7 +1089,11 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
           ? `Exam dialogue context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
           : '',
         `Generate EXACTLY ONE single best Model Answer that 100% SPECIFICALLY AND DIRECTLY ANSWERS the examiner's statement/question above.`,
-        cefrLevel === 'B1'
+        cefrLevel === 'A1'
+          ? `CRITICAL CEFR A1 MANDATE: Candidate is an absolute beginner. Use VERY SHORT and simple sentences (max 4-7 words). Use only fundamental A1 vocabulary. Keep it extremely easy to pronounce and understand!`
+          : cefrLevel === 'A2'
+          ? `CRITICAL CEFR A2 MANDATE: Candidate is at elementary level. Use simple, direct sentences (max 7-10 words) with basic everyday vocabulary (A2 level). Avoid any advanced idioms or complex syntax!`
+          : cefrLevel === 'B1'
           ? `CRITICAL CEFR B1 MANDATE: Use clear, natural compound sentences with everyday professional vocabulary suitable for PTE 42 / CEFR B1. NEVER use obscure C2 academic jargon (like 'cogent', 'unilateral', 'invariably yields'). The candidate must be able to speak it comfortably and fluently!`
           : cefrLevel === 'B2'
           ? `Use clear, articulate B2 sentences with good academic vocabulary and clear discourse markers. Avoid overly obscure C2 jargon.`

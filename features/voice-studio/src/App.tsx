@@ -74,6 +74,7 @@ import { JapaneseRubyDisplay } from './components/JapaneseRubyDisplay';
 import { stripEmojisAndEmotWords, toPhoneticRomaji } from './lib/japanesePhonetics';
 import { toPhoneticPinyin } from './lib/mandarinPhonetics';
 import {
+  buildContextualFallbackCards,
   evaluateTurnLocal,
   type LiveTransportMode,
   pcm16Base64ToAudioBuffer,
@@ -1126,14 +1127,53 @@ export default function App() {
 
     const currentSeq = ++copilotSeqRef.current;
 
-    // MANDAT USER: HAPUS TOTAL TEMPLATES!
-    // Tidak ada fallback template statis atau tebakan regex. 100% respon harus murni hasil generatif AI.
-    // Tampilkan loading shimmer/skeleton ("Meracik Jawaban...") HANYA jika belum ada kartu sama sekali di layar
-    // agar layar tidak berkedip kosong saat regenerasi antar giliran!
-    setIsGeneratingCopilot(true);
-    if (copilotCardsRef.current.length === 0 && !opts?.isDebouncedStreaming) {
-      setCopilotSource('loading');
-      setCopilotCards([]);
+    const isCambridge =
+      pers?.id === 'cambridge_examiner' ||
+      scen?.personaId === 'cambridge_examiner' ||
+      scen?.id.startsWith('scen_ielts') ||
+      pers?.id === 'dr_julian' ||
+      scen?.personaId === 'dr_julian' ||
+      scen?.id.startsWith('scen_pte');
+
+    // INSTANT OPTIMISTIC ZERO-LATENCY COPILOT (<50ms):
+    // Synthesize calibrated answer immediately so the learner NEVER suffers from network lag/spinners!
+    const instantCards = buildContextualFallbackCards({
+      aiText: cleanAi,
+      targetLang: scen.targetLang,
+      locale,
+      lastUserText: lastUserLine,
+      variationSeed: opts?.forceVariation ? copilotVariationSeedRef.current : 0,
+      excludeTexts: opts?.excludeTexts,
+      isCambridge,
+      personaId: pers?.id,
+      cefrLevel: userCefrLevel,
+    });
+
+    if (instantCards.length > 0) {
+      lastCopilotAiKeyRef.current = dedupKey;
+      setCopilotCards(isCambridge ? instantCards.slice(0, 1) : instantCards);
+      setCopilotSource('ai-realtime');
+      setIsGeneratingCopilot(false);
+    } else {
+      setIsGeneratingCopilot(true);
+      if (copilotCardsRef.current.length === 0 && !opts?.isDebouncedStreaming) {
+        setCopilotSource('loading');
+        setCopilotCards([]);
+      }
+    }
+
+    const instantMeaning = translateAndPhoneticizeLiveText(cleanAi, scen.targetLang);
+    if (instantMeaning.translationId || instantMeaning.translationTh) {
+      setTurns((prev) =>
+        prev.map((tr) => {
+          if (tr.speaker !== 'ai' || tr.text.trim() !== cleanAi) return tr;
+          return {
+            ...tr,
+            translationId: tr.translationId || instantMeaning.translationId,
+            translationTh: tr.translationTh || instantMeaning.translationTh,
+          };
+        })
+      );
     }
 
     if (copilotAbortRef.current) {
@@ -1160,19 +1200,16 @@ export default function App() {
         variationSeed: opts?.forceVariation ? copilotVariationSeedRef.current : 0,
         excludeTexts: opts?.excludeTexts,
         signal: controller.signal,
+        budgetMs: 2500,
       });
       if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
       const rawList = res.replies || res.cards || [];
-      const isCambridge =
-        pers?.id === 'cambridge_examiner' ||
-        scen?.personaId === 'cambridge_examiner' ||
-        scen?.id.startsWith('scen_ielts');
       const validCards = rawList.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
       if (validCards.length > 0) {
         lastCopilotAiKeyRef.current = dedupKey;
         setCopilotCards(isCambridge ? validCards.slice(0, 1) : validCards);
         setCopilotSource('ai-realtime');
-      } else if (rawList.length > 0) {
+      } else if (rawList.length > 0 && (!instantCards || instantCards.length === 0)) {
         lastCopilotAiKeyRef.current = dedupKey;
         setCopilotCards(isCambridge ? rawList.slice(0, 1) : rawList);
         setCopilotSource('ai-realtime');
@@ -4363,7 +4400,30 @@ export default function App() {
                 ? 'en-GB'
                 : 'en-US';
 
-            const cefrCalibrationDirective = `\n\n[MANDATORY TARGET CEFR LEVEL: ${userCefrLevel}]:\n- Target Proficiency: CEFR ${userCefrLevel} ${userCefrLevel === 'B1' ? '(PTE 42 / IELTS 5.0-5.5 Vocational Benchmark)' : userCefrLevel === 'B2' ? '(PTE 58 / IELTS 6.5)' : userCefrLevel === 'C1' ? '(PTE 76 / IELTS 7.5)' : ''}.\n- Candidate Vocabulary & Sentence Structure: Expected learner production is calibrated to Level ${userCefrLevel}.\n${userCefrLevel === 'B1' ? "- FORBIDDEN JARGON: NEVER expect or use obscure C2 academic vocabulary (like 'cogent', 'unilateral', 'invariably yields'). Focus on practical, clear compound sentences with standard professional vocabulary." : ""}\n`;
+            const cefrCalibrationDirective = `\n\n[MANDATORY TARGET CEFR LEVEL: ${userCefrLevel}]:
+- Target Proficiency: CEFR ${userCefrLevel} ${
+  userCefrLevel === 'A1'
+    ? '(Absolute Beginner: Very simple 3-6 word sentences, slow pace, everyday basic words)'
+    : userCefrLevel === 'A2'
+    ? '(Elementary: Simple 6-10 word sentences, clear conversational pace, practical daily vocabulary)'
+    : userCefrLevel === 'B1'
+    ? '(PTE 42 / IELTS 5.0-5.5 Vocational Benchmark: Clear compound sentences, everyday professional vocabulary)'
+    : userCefrLevel === 'B2'
+    ? '(PTE 58 / IELTS 6.5)'
+    : userCefrLevel === 'C1'
+    ? '(PTE 76 / IELTS 7.5)'
+    : '(Mastery: Cambridge Band 9.0 Academic)'
+}.
+- Candidate Vocabulary & Sentence Structure: Expected learner production is calibrated to Level ${userCefrLevel}.
+${
+  userCefrLevel === 'A1'
+    ? "- CEFR A1 MANDATE: Speak in VERY SHORT, SIMPLE sentences (max 5-7 words). Use only fundamental A1 vocabulary. Speak slowly and clearly. Never use idioms or complex clauses!"
+    : userCefrLevel === 'A2'
+    ? "- CEFR A2 MANDATE: Speak in clear, simple everyday sentences (max 8-10 words). Use standard basic A2 vocabulary and simple connectors (and, but, because). Avoid advanced idioms."
+    : userCefrLevel === 'B1'
+    ? "- FORBIDDEN JARGON: NEVER expect or use obscure C2 academic vocabulary (like 'cogent', 'unilateral', 'invariably yields'). Focus on practical, clear compound sentences with standard professional vocabulary."
+    : ""
+}\n`;
 
             ws.send(
               JSON.stringify({

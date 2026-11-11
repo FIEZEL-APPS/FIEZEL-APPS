@@ -860,6 +860,8 @@ export function buildCambridgeModelAnswerFallback(
   cefrLevel: string = 'B1'
 ): BeginnerReplyCard[] {
   const q = rawAi.toLowerCase();
+  const isA1 = cefrLevel === 'A1';
+  const isA2 = cefrLevel === 'A2';
   const isHigherLevel = cefrLevel === 'C1' || cefrLevel === 'C2';
   const isB2 = cefrLevel === 'B2';
 
@@ -870,10 +872,22 @@ export function buildCambridgeModelAnswerFallback(
 
   // 1. Candidate Details / Name / ID
   if (/\b(name|call you|identification|id|passport)\b/i.test(q)) {
-    text = "My full name is Fitra Rusdiawan, though you may simply address me as Fitra. Here is my identification document for your verification.";
-    hintId = "Nama lengkap saya adalah Fitra Rusdiawan, namun Anda cukup memanggil saya Fitra. Ini dokumen identitas saya untuk verifikasi Anda.";
-    hintTh = "ชื่อเต็มของฉันคือ Fitra Rusdiawan แต่คุณสามารถเรียกฉันว่า Fitra ได้ นี่คือเอกสารระบุตัวตนของฉันสำหรับการตรวจสอบ";
-    pronunciation = "mai ful neim iz Fitra Rusdiawan, dou yu mei simp-li ed-res mi ez Fitra.";
+    if (isA1) {
+      text = "My name is Fitra Rusdiawan. You can call me Fitra.";
+      hintId = "Nama saya Fitra Rusdiawan. Anda bisa memanggil saya Fitra.";
+      hintTh = "ชื่อของฉันคือ Fitra Rusdiawan คุณสามารถเรียกฉันว่า Fitra ได้";
+      pronunciation = "mai neim iz Fitra Rusdiawan. yu ken kol mi Fitra.";
+    } else if (isA2) {
+      text = "My full name is Fitra Rusdiawan, but please call me Fitra.";
+      hintId = "Nama lengkap saya adalah Fitra Rusdiawan, tapi silakan panggil saya Fitra.";
+      hintTh = "ชื่อเต็มของฉันคือ Fitra Rusdiawan แต่โปรดเรียกฉันว่า Fitra";
+      pronunciation = "mai ful neim iz Fitra Rusdiawan, bat pliz kol mi Fitra.";
+    } else {
+      text = "My full name is Fitra Rusdiawan, though you may simply address me as Fitra. Here is my identification document for your verification.";
+      hintId = "Nama lengkap saya adalah Fitra Rusdiawan, namun Anda cukup memanggil saya Fitra. Ini dokumen identitas saya untuk verifikasi Anda.";
+      hintTh = "ชื่อเต็มของฉันคือ Fitra Rusdiawan แต่คุณสามารถเรียกฉันว่า Fitra ได้ นี่คือเอกสารระบุตัวตนของฉันสำหรับการตรวจสอบ";
+      pronunciation = "mai ful neim iz Fitra Rusdiawan, dou yu mei simp-li ed-res mi ez Fitra.";
+    }
   }
   // 2. FOCUS, PRIORITIES, ADAPTABILITY, TIME MANAGEMENT (Kasus Pengujian Nyata)
   else if (/\b(focus|priorit|adapt|task|pressure|time management|deadline|multitask)\b/i.test(q)) {
@@ -887,6 +901,16 @@ export function buildCambridgeModelAnswerFallback(
       hintId = "Saya menjaga fokus dengan menyusun ulang alur kerja harian dan menetapkan batasan yang jelas untuk tugas-tugas penting saat situasi berubah.";
       hintTh = "ฉันรักษาโฟกัสโดยจัดลำดับความสำคัญของงานใหม่และกำหนดกรอบที่ชัดเจนสำหรับงานสำคัญเมื่อสถานการณ์เปลี่ยน";
       pronunciation = "ai mein-TEIN FO-kes bai ri-prai-OR-i-tai-zing mai dei-li werk-flou end se-ting klir baun-der-iz.";
+    } else if (isA1) {
+      text = "I make a short to-do list.";
+      hintId = "Saya membuat daftar tugas yang pendek.";
+      hintTh = "ฉันทำรายการสิ่งที่ต้องทำสั้นๆ";
+      pronunciation = "ai meik e syort tu-du list.";
+    } else if (isA2) {
+      text = "When tasks change, I do the most urgent work first.";
+      hintId = "Ketika tugas berubah, saya fokus pada pekerjaan mendesak lebih dulu.";
+      hintTh = "เมื่องานเปลี่ยนไป ฉันจะทำงานด่วนที่สุดก่อน";
+      pronunciation = "wen tesks tyeindz, ai du de most ER-dzend werk ferst.";
     } else {
       // Level B1 (Target PTE 42 / IELTS 5.0-5.5) - Alami, Nyambung, Mudah Dipahami & Diucapkan!
       text = "To maintain focus when priorities change, I quickly list my urgent tasks and tackle the most important items first.";
@@ -897,90 +921,230 @@ export function buildCambridgeModelAnswerFallback(
   }
   // 3. Managing Stress, Burnout & Relaxation
   else if (/\b(stress|relax|balance|unwind|burnout|mental|pressure)\b/i.test(q)) {
-    text = "When feeling under pressure, I take a short brisk walk and organize my schedule to stay calm and productive.";
-    hintId = "Saat merasa tertekan, saya berjalan santai sejenak dan menata jadwal saya agar tetap tenang dan produktif.";
-    hintTh = "เมื่อรู้สึกกดดัน ฉันจะออกไปเดินเล่นสั้นๆ และจัดตารางเวลาใหม่เพื่อรักษาความสงบและทำงานได้ดีขึ้น";
-    pronunciation = "wen fi-ling an-der PRE-syer, ai teik e syort brisk wok end OR-gen-aiz mai SKE-dzul tu stei kam end pro-DAK-tiv.";
+    if (isA1) {
+      text = "I take a short walk to relax.";
+      hintId = "Saya jalan-jalan sebentar untuk bersantai.";
+      hintTh = "ฉันออกไปเดินเล่นสั้นๆ เพื่อผ่อนคลาย";
+      pronunciation = "ai teik e syort wok tu ri-leks.";
+    } else if (isA2) {
+      text = "When I feel stressed, I take a rest and organize my day.";
+      hintId = "Ketika saya merasa stres, saya beristirahat dan menata hari saya.";
+      hintTh = "เมื่อรู้สึกเครียด ฉันจะพักผ่อนและจัดระเบียบวันใหม่";
+      pronunciation = "wen ai fil strest, ai teik e rest end or-gen-aiz mai dei.";
+    } else {
+      text = "When feeling under pressure, I take a short brisk walk and organize my schedule to stay calm and productive.";
+      hintId = "Saat merasa tertekan, saya berjalan santai sejenak dan menata jadwal saya agar tetap tenang dan produktif.";
+      hintTh = "เมื่อรู้สึกกดดัน ฉันจะออกไปเดินเล่นสั้นๆ และจัดตารางเวลาใหม่เพื่อรักษาความสงบและทำงานได้ดีขึ้น";
+      pronunciation = "wen fi-ling an-der PRE-syer, ai teik e syort brisk wok end OR-gen-aiz mai SKE-dzul tu stei kam end pro-DAK-tiv.";
+    }
   }
   // 4. Opinions, Agreement, Disagreement
   else if (/\b(agree|disagree|opinion|think|believe|perspective|viewpoint)\b/i.test(q)) {
-    text = "In my view, having a clear and practical plan is the best way to make steady progress without unnecessary confusion.";
-    hintId = "Menurut pandangan saya, memiliki rencana yang jelas dan praktis adalah cara terbaik untuk mencapai kemajuan stabil tanpa kebingungan yang tak perlu.";
-    hintTh = "ในมุมมองของฉัน การมีแผนงานที่ชัดเจนและปฏิบัติได้จริงเป็นวิธีที่ดีที่สุดในการก้าวหน้าอย่างมั่นคงโดยไม่สับสน";
-    pronunciation = "in mai vyu, he-ving e klir end PREK-ti-kel plen iz de best wei tu meik STE-di PRO-gres.";
+    if (isA1) {
+      text = "I agree. A clear plan is very helpful.";
+      hintId = "Saya setuju. Rencana yang jelas sangat membantu.";
+      hintTh = "ฉันเห็นด้วย แผนงานที่ชัดเจนช่วยได้มาก";
+      pronunciation = "ai e-gri. e klir plen iz ve-ri help-ful.";
+    } else if (isA2) {
+      text = "In my opinion, having a simple plan helps us make progress.";
+      hintId = "Menurut pendapat saya, memiliki rencana sederhana membantu kita maju.";
+      hintTh = "ในมุมมองของฉัน การมีแผนง่ายๆ ช่วยให้เราก้าวหน้าได้";
+      pronunciation = "in mai o-pin-yen, he-ving e sim-pel plen helps as meik pro-gres.";
+    } else {
+      text = "In my view, having a clear and practical plan is the best way to make steady progress without unnecessary confusion.";
+      hintId = "Menurut pandangan saya, memiliki rencana yang jelas dan praktis adalah cara terbaik untuk mencapai kemajuan stabil tanpa kebingungan yang tak perlu.";
+      hintTh = "ในมุมมองของฉัน การมีแผนงานที่ชัดเจนและปฏิบัติได้จริงเป็นวิธีที่ดีที่สุดในการก้าวหน้าอย่างมั่นคงโดยไม่สับสน";
+      pronunciation = "in mai vyu, he-ving e klir end PREK-ti-kel plen iz de best wei tu meik STE-di PRO-gres.";
+    }
   }
   // 5. Advantages & Disadvantages
   else if (/\b(advantage|disadvantage|benefit|drawback|better|prefer|pros|cons)\b/i.test(q)) {
-    text = "One major advantage is that it saves valuable time, although it does require a bit more patience and practice at the start.";
-    hintId = "Salah satu keuntungan utamanya adalah menghemat waktu berharga, kendati memang butuh sedikit kesabaran dan latihan di awal.";
-    hintTh = "ข้อดีที่สำคัญอย่างหนึ่งคือช่วยประหยัดเวลาอันมีค่า แม้ว่าจะต้องใช้ความอดทนและการฝึกฝนมากขึ้นเล็กน้อยในช่วงเริ่มต้น";
-    pronunciation = "wan MEI-dzor ed-VEN-tidz iz det it seivz VEL-yu-bel taim, ol-dou it daz ri-KWAIR e bit mor pei-syens.";
+    if (isA1) {
+      text = "It helps us save a lot of time.";
+      hintId = "Itu membantu kita menghemat banyak waktu.";
+      hintTh = "มันช่วยให้เราประหยัดเวลาได้มาก";
+      pronunciation = "it helps as seiv e lot ov taim.";
+    } else if (isA2) {
+      text = "The main benefit is saving time, but we need practice.";
+      hintId = "Manfaat utamanya adalah menghemat waktu, tapi kita perlu latihan.";
+      hintTh = "ประโยชน์หลักคือช่วยประหยัดเวลา แต่เราต้องฝึกฝน";
+      pronunciation = "de mein be-ne-fit iz sei-ving taim, bat wi nid prek-tis.";
+    } else {
+      text = "One major advantage is that it saves valuable time, although it does require a bit more patience and practice at the start.";
+      hintId = "Salah satu keuntungan utamanya adalah menghemat waktu berharga, kendati memang butuh sedikit kesabaran dan latihan di awal.";
+      hintTh = "ข้อดีที่สำคัญอย่างหนึ่งคือช่วยประหยัดเวลาอันมีค่า แม้ว่าจะต้องใช้ความอดทนและการฝึกฝนมากขึ้นเล็กน้อยในช่วงเริ่มต้น";
+      pronunciation = "wan MEI-dzor ed-VEN-tidz iz det it seivz VEL-yu-bel taim, ol-dou it daz ri-KWAIR e bit mor pei-syens.";
+    }
   }
   // 6. Problems, Difficulties & Solutions
   else if (/\b(problem|difficult|challenge|issue|solv|solution|trouble|overcome)\b/i.test(q)) {
-    text = "The most effective way to solve this difficulty is by breaking the problem down into smaller, manageable steps.";
-    hintId = "Cara paling efektif untuk mengatasi kesulitan ini adalah dengan memecah masalah menjadi langkah-langkah yang lebih kecil dan mudah dikelola.";
-    hintTh = "วิธีที่มีประสิทธิภาพที่สุดในการแก้ปัญหานี้คือการแบ่งปัญหาออกเป็นขั้นตอนย่อยๆ ที่จัดการได้ง่าย";
-    pronunciation = "de most if-FEK-tiv wei tu solv dis DIF-i-kel-ti iz bai brei-king de PRO-blem daun in-tu smol-er steps.";
+    if (isA1) {
+      text = "We can solve it step by step.";
+      hintId = "Kita bisa menyelesaikannya langkah demi langkah.";
+      hintTh = "เราแก้ปัญหาได้ทีละขั้นตอน";
+      pronunciation = "wi ken solv it step bai step.";
+    } else if (isA2) {
+      text = "Breaking the problem into small steps is the best way.";
+      hintId = "Memecah masalah menjadi langkah kecil adalah cara terbaik.";
+      hintTh = "การแบ่งปัญหาออกเป็นขั้นตอนเล็กๆ เป็นวิธีที่ดีที่สุด";
+      pronunciation = "brei-king de prob-lem in-tu smol steps iz de best wei.";
+    } else {
+      text = "The most effective way to solve this difficulty is by breaking the problem down into smaller, manageable steps.";
+      hintId = "Cara paling efektif untuk mengatasi kesulitan ini adalah dengan memecah masalah menjadi langkah-langkah yang lebih kecil dan mudah dikelola.";
+      hintTh = "วิธีที่มีประสิทธิภาพที่สุดในการแก้ปัญหานี้คือการแบ่งปัญหาออกเป็นขั้นตอนย่อยๆ ที่จัดการได้ง่าย";
+      pronunciation = "de most if-FEK-tiv wei tu solv dis DIF-i-kel-ti iz bai brei-king de PRO-blem daun in-tu smol-er steps.";
+    }
   }
   // 7. Work, Study, Career, Major
   else if (/\b(work or study|job|occupation|major|career|profession|field of study)\b/i.test(q)) {
-    text = "Presently, I work in software engineering, where I enjoy solving practical problems and collaborating closely with my teammates.";
-    hintId = "Saat ini, saya bekerja di bidang rekayasa perangkat lunak, di mana saya menikmati menyelesaikan masalah praktis dan berkolaborasi erat dengan rekan tim saya.";
-    hintTh = "ปัจจุบัน ฉันทำงานด้านวิศวกรรมซอฟต์แวร์ ซึ่งฉันชอบแก้ปัญหาเชิงปฏิบัติและร่วมงานอย่างใกล้ชิดกับเพื่อนร่วมทีม";
-    pronunciation = "PRE-zent-li, ai werk in SOFT-wer en-dzi-NI-ring, wer ai en-DZOI sol-ving PREK-ti-kel PRO-blemz.";
+    if (isA1) {
+      text = "I study English every day for my future.";
+      hintId = "Saya belajar bahasa Inggris setiap hari untuk masa depan saya.";
+      hintTh = "ฉันเรียนภาษาอังกฤษทุกวันเพื่ออนาคต";
+      pronunciation = "ai sta-di ing-glisy ev-ri dei for mai fyu-tsyer.";
+    } else if (isA2) {
+      text = "I work hard every day and practice English with my team.";
+      hintId = "Saya bekerja keras setiap hari dan berlatih bahasa Inggris dengan tim saya.";
+      hintTh = "ฉันทำงานหนักทุกวันและฝึกภาษาอังกฤษกับทีม";
+      pronunciation = "ai werk hard ev-ri dei end prek-tis ing-glisy wid mai tim.";
+    } else {
+      text = "Presently, I work in software engineering, where I enjoy solving practical problems and collaborating closely with my teammates.";
+      hintId = "Saat ini, saya bekerja di bidang rekayasa perangkat lunak, di mana saya menikmati menyelesaikan masalah praktis dan berkolaborasi erat dengan rekan tim saya.";
+      hintTh = "ปัจจุบัน ฉันทำงานด้านวิศวกรรมซอฟต์แวร์ ซึ่งฉันชอบแก้ปัญหาเชิงปฏิบัติและร่วมงานอย่างใกล้ชิดกับเพื่อนร่วมทีม";
+      pronunciation = "PRE-zent-li, ai werk in SOFT-wer en-dzi-NI-ring, wer ai en-DZOI sol-ving PREK-ti-kel PRO-blemz.";
+    }
   }
   // 8. Hometown & Countryside
   else if (/\b(hometown|where (?:do )?you (?:live|come from)|city|neighbourhood|countryside)\b/i.test(q)) {
-    text = "I originally come from Jakarta, Indonesia, but I currently live in a quieter suburban neighborhood with great green spaces.";
-    hintId = "Saya aslinya berasal dari Jakarta, Indonesia, namun saat ini saya tinggal di lingkungan pinggiran kota yang lebih tenang dengan banyak ruang hijau.";
-    hintTh = "เดิมทีฉันมาจากจาการ์ตา ประเทศอินโดนีเซีย แต่ปัจจุบันฉันอาศัยอยู่ในย่านชานเมืองที่เงียบสงบและมีพื้นที่สีเขียวที่ยอดเยี่ยม";
-    pronunciation = "ai o-RIDZ-i-nel-li kam from Dze-KAR-ta, in-do-NI-sya, bat ai KA-rent-li liv in e KWAI-et-er sa-BER-ben nei-bor-hud.";
+    if (isA1) {
+      text = "I live in Jakarta, Indonesia. It is very lively.";
+      hintId = "Saya tinggal di Jakarta, Indonesia. Kotanya sangat hidup.";
+      hintTh = "ฉันอาศัยอยู่ที่จาการ์ตา ประเทศอินโดนีเซีย มันมีชีวิตชีวามาก";
+      pronunciation = "ai liv in Dze-kar-ta, in-do-ni-sya. it iz ve-ri laiv-li.";
+    } else if (isA2) {
+      text = "I come from Jakarta, Indonesia, but now I live in a quiet area.";
+      hintId = "Saya berasal dari Jakarta, Indonesia, tapi sekarang tinggal di area yang tenang.";
+      hintTh = "ฉันมาจากจาการ์ตา ประเทศอินโดนีเซีย แต่ตอนนี้อาศัยอยู่ในย่านที่เงียบสงบ";
+      pronunciation = "ai kam from Dze-kar-ta, in-do-ni-sya, bat nau ai liv in e kwai-et e-ri-a.";
+    } else {
+      text = "I originally come from Jakarta, Indonesia, but I currently live in a quieter suburban neighborhood with great green spaces.";
+      hintId = "Saya aslinya berasal dari Jakarta, Indonesia, namun saat ini saya tinggal di lingkungan pinggiran kota yang lebih tenang dengan banyak ruang hijau.";
+      hintTh = "เดิมทีฉันมาจากจาการ์ตา ประเทศอินโดนีเซีย แต่ปัจจุบันฉันอาศัยอยู่ในย่านชานเมืองที่เงียบสงบและมีพื้นที่สีเขียวที่ยอดเยี่ยม";
+      pronunciation = "ai o-RIDZ-i-nel-li kam from Dze-KAR-ta, in-do-NI-sya, bat ai KA-rent-li liv in e KWAI-et-er sa-BER-ben nei-bor-hud.";
+    }
   }
   // 9. Hobbies & Leisure Time
   else if (/\b(leisure|free time|spare time|hobb(?:y|ies)|relax|weekends|unwind)\b/i.test(q)) {
-    text = "In my free time, I really enjoy distance running and reading practical books because they help me relax and refresh my mind.";
-    hintId = "Di waktu luang, saya sangat menikmati lari jarak jauh dan membaca buku-buku praktis karena itu membantu saya relaks dan menyegarkan pikiran.";
-    hintTh = "ในเวลาว่าง ฉันชอบวิ่งระยะไกลและอ่านหนังสือเชิงปฏิบัติมาก เพราะช่วยให้ฉันผ่อนคลายและเติมความสดชื่นให้จิตใจ";
-    pronunciation = "in mai fri taim, ai RI-li en-DZOI DIS-tens RA-ning end RI-ding PREK-ti-kel buks bi-KOS dei help mi ri-LEKS.";
+    if (isA1) {
+      text = "In my free time, I like reading books.";
+      hintId = "Di waktu luang, saya suka membaca buku.";
+      hintTh = "ในเวลาว่าง ฉันชอบอ่านหนังสือ";
+      pronunciation = "in mai fri taim, ai laik ri-ding buks.";
+    } else if (isA2) {
+      text = "In my free time, I like running and cooking simple food.";
+      hintId = "Di waktu luang, saya suka berlari dan memasak makanan sederhana.";
+      hintTh = "ในเวลาว่าง ฉันชอบวิ่งและทำอาหารง่ายๆ";
+      pronunciation = "in mai fri taim, ai laik ra-ning end ku-king sim-pel fud.";
+    } else {
+      text = "In my free time, I really enjoy distance running and reading practical books because they help me relax and refresh my mind.";
+      hintId = "Di waktu luang, saya sangat menikmati lari jarak jauh dan membaca buku-buku praktis karena itu membantu saya relaks dan menyegarkan pikiran.";
+      hintTh = "ในเวลาว่าง ฉันชอบวิ่งระยะไกลและอ่านหนังสือเชิงปฏิบัติมาก เพราะช่วยให้ฉันผ่อนคลายและเติมความสดชื่นให้จิตใจ";
+      pronunciation = "in mai fri taim, ai RI-li en-DZOI DIS-tens RA-ning end RI-ding PREK-ti-kel buks bi-KOS dei help mi ri-LEKS.";
+    }
   }
   // 10. Technology, AI & Tools
   else if (/\b(technolog|artificial intelligence|\bai\b|digital|comput|automat|smartphone)\b/i.test(q)) {
-    text = "Digital tools have made our communication much faster, but we still need to balance screen time with real-life activities.";
-    hintId = "Alat-alat digital telah membuat komunikasi kita jauh lebih cepat, namun kita tetap perlu menyeimbangkan waktu layar dengan aktivitas di dunia nyata.";
-    hintTh = "เครื่องมือดิจิทัลทำให้การสื่อสารของพวกเราเร็วขึ้นมาก แต่เรายังต้องสร้างสมดุลระหว่างเวลาหน้าจอกับกิจกรรมในชีวิตจริง";
-    pronunciation = "DI-dzi-tel tulz hev meid aur kom-yu-ni-KEI-syen maty FAS-ter, bat wi stil nid tu BE-lens skrin taim.";
+    if (isA1) {
+      text = "Smartphones help us learn new words easily.";
+      hintId = "Ponsel pintar membantu kita belajar kata baru dengan mudah.";
+      hintTh = "สมาร์ทโฟนช่วยให้เราเรียนรู้คำศัพท์ใหม่ๆ ได้ง่าย";
+      pronunciation = "smart-founz help as lern nyu werds i-zi-li.";
+    } else if (isA2) {
+      text = "Technology makes communication faster and helps us study anywhere.";
+      hintId = "Teknologi membuat komunikasi lebih cepat dan membantu kita belajar di mana saja.";
+      hintTh = "เทคโนโลยีทำให้การสื่อสารเร็วขึ้นและช่วยให้เราเรียนรู้ได้ทุกที่";
+      pronunciation = "tek-no-lo-dzi meiks kom-yu-ni-kei-syen fas-ter end helps as sta-di e-ni-wer.";
+    } else {
+      text = "Digital tools have made our communication much faster, but we still need to balance screen time with real-life activities.";
+      hintId = "Alat-alat digital telah membuat komunikasi kita jauh lebih cepat, namun kita tetap perlu menyeimbangkan waktu layar dengan aktivitas di dunia nyata.";
+      hintTh = "เครื่องมือดิจิทัลทำให้การสื่อสารของพวกเราเร็วขึ้นมาก แต่เรายังต้องสร้างสมดุลระหว่างเวลาหน้าจอกับกิจกรรมในชีวิตจริง";
+      pronunciation = "DI-dzi-tel tulz hev meid aur kom-yu-ni-KEI-syen maty FAS-ter, bat wi stil nid tu BE-lens skrin taim.";
+    }
   }
   // 11. Environment & Global Issues
   else if (/\b(environment|climate|sustainab|pollut|global warming|green|planet)\b/i.test(q)) {
-    text = "Protecting the environment requires simple everyday habits, like reducing plastic waste and saving electricity at home.";
-    hintId = "Melindungi lingkungan memerlukan kebiasaan sederhana sehari-hari, seperti mengurangi sampah plastik dan menghemat listrik di rumah.";
-    hintTh = "การปกป้องสิ่งแวดล้อมเริ่มต้นจากนิสัยง่ายๆ ในชีวิตประจำวัน เช่น การลดขยะพลาสติกและการประหยัดไฟที่บ้าน";
-    pronunciation = "pro-TEK-ting di en-VAI-ren-ment ri-KWAIRZ SIM-pel EV-ri-dei HE-bits, laik ri-DYU-sing PLES-tik weist.";
+    if (isA1) {
+      text = "We must save water and reduce plastic.";
+      hintId = "Kita harus menghemat air dan mengurangi plastik.";
+      hintTh = "เราต้องประหยัดน้ำและลดการใช้พลาสติก";
+      pronunciation = "wi mast seiv wo-ter end ri-dyus ples-tik.";
+    } else if (isA2) {
+      text = "We should protect nature by saving electricity and planting trees.";
+      hintId = "Kita sebaiknya menjaga alam dengan menghemat listrik dan menanam pohon.";
+      hintTh = "เราควรปกป้องธรรมชาติด้วยการประหยัดไฟและปลูกต้นไม้";
+      pronunciation = "wi syud pro-tekt nei-tsyer bai sei-ving i-lek-tri-si-ti end plen-ting triz.";
+    } else {
+      text = "Protecting the environment requires simple everyday habits, like reducing plastic waste and saving electricity at home.";
+      hintId = "Melindungi lingkungan memerlukan kebiasaan sederhana sehari-hari, seperti mengurangi sampah plastik dan menghemat listrik di rumah.";
+      hintTh = "การปกป้องสิ่งแวดล้อมเริ่มต้นจากนิสัยง่ายๆ ในชีวิตประจำวัน เช่น การลดขยะพลาสติกและการประหยัดไฟที่บ้าน";
+      pronunciation = "pro-TEK-ting di en-VAI-ren-ment ri-KWAIRZ SIM-pel EV-ri-dei HE-bits, laik ri-DYU-sing PLES-tik weist.";
+    }
   }
   // 12. Education & Practical Learning
   else if (/\b(educat|school|curriculum|critical thinking|child(?:ren)?|teach|academic|learn)\b/i.test(q)) {
-    text = "Learning practical skills through real practice is far more effective than just memorizing theory from textbooks.";
-    hintId = "Mempelajari keterampilan praktis melalui latihan nyata jauh lebih efektif daripada sekadar menghafal teori dari buku pelajaran.";
-    hintTh = "การเรียนรู้ทักษะเชิงปฏิบัติผ่านการลงมือทำจริงมีประสิทธิภาพมากกว่าการท่องจำทฤษฎีจากตำราเรียนเพียงอย่างเดียว";
-    pronunciation = "LER-ning PREK-ti-kel skilz tru ri-el PREK-tis iz far mor if-FEK-tiv den dzast ME-mo-rai-zing ti-o-ri.";
+    if (isA1) {
+      text = "Daily practice helps us learn English quickly.";
+      hintId = "Latihan setiap hari membantu kita belajar bahasa Inggris dengan cepat.";
+      hintTh = "การฝึกฝนทุกวันช่วยให้เราเรียนภาษาอังกฤษได้เร็ว";
+      pronunciation = "dei-li prek-tis helps as lern ing-glisy kwik-li.";
+    } else if (isA2) {
+      text = "Real speaking practice is better than only reading books.";
+      hintId = "Latihan bicara langsung lebih baik daripada sekadar membaca buku.";
+      hintTh = "การฝึกพูดจริงดีกว่าแค่อ่านหนังสือ";
+      pronunciation = "ri-el spi-king prek-tis iz bet-ter den oun-li ri-ding buks.";
+    } else {
+      text = "Learning practical skills through real practice is far more effective than just memorizing theory from textbooks.";
+      hintId = "Mempelajari keterampilan praktis melalui latihan nyata jauh lebih efektif daripada sekadar menghafal teori dari buku pelajaran.";
+      hintTh = "การเรียนรู้ทักษะเชิงปฏิบัติผ่านการลงมือทำจริงมีประสิทธิภาพมากกว่าการท่องจำทฤษฎีจากตำราเรียนเพียงอย่างเดียว";
+      pronunciation = "LER-ning PREK-ti-kel skilz tru ri-el PREK-tis iz far mor if-FEK-tiv den dzast ME-mo-rai-zing ti-o-ri.";
+    }
   }
   // 13. General Contextual Fallback (Clean, Direct, B1, Menjawab Penuh Topik Pembicaraan!)
   else {
-    if (variationSeed % 2 === 1) {
-      text = "That is an important question. In my personal experience, taking consistent small steps every day always produces the most reliable result.";
-      hintId = "Itu pertanyaan yang penting. Dalam pengalaman pribadi saya, mengambil langkah-langkah kecil yang konsisten setiap hari selalu membuahkan hasil yang paling dapat diandalkan.";
-      hintTh = "นั่นเป็นคำถามที่สำคัญ จากประสบการณ์ส่วนตัวของฉัน การทำสิ่งเล็กๆ อย่างสม่ำเสมอทุกวันมักให้ผลลัพธ์ที่เชื่อถือได้มากที่สุด";
-      pronunciation = "det iz en im-POR-tent KWES-tyen. in mai PER-sen-el ik-SPI-ri-ens, tei-king ken-SIS-tent smol steps ev-ri dei ol-weiz pro-DYU-sez de best ri-ZALT.";
+    if (isA1) {
+      text = "I understand. That is a good point.";
+      hintId = "Saya paham. Itu poin yang bagus.";
+      hintTh = "ฉันเข้าใจ นั่นเป็นประเด็นที่ดี";
+      pronunciation = "ai an-der-stend. det iz e gud point.";
+    } else if (isA2) {
+      text = "I agree with you, and practice helps us improve.";
+      hintId = "Saya setuju dengan Anda, dan latihan membantu kita berkembang.";
+      hintTh = "ฉันเห็นด้วยกับคุณ และการฝึกฝนช่วยให้เราพัฒนาขึ้น";
+      pronunciation = "ai e-gri wid yu, end prek-tis helps as im-pruv.";
     } else {
-      text = "From what I have observed, keeping our daily communication simple and open is the most practical way to resolve misunderstandings.";
-      hintId = "Dari apa yang saya amati, menjaga komunikasi harian kita tetap sederhana dan terbuka adalah cara paling praktis untuk menyelesaikan kesalahpahaman.";
-      hintTh = "จากสิ่งที่ฉันได้สังเกต การสื่อสารในชีวิตประจำวันอย่างตรงไปตรงมาและเปิดกว้างเป็นวิธีที่ได้ผลที่สุดในการแก้ไขความเข้าใจผิด";
-      pronunciation = "from wat ai hev ob-ZERVD, KI-ping aur dei-li kom-yu-ni-KEI-syen SIM-pel end OU-pen iz de most PREK-ti-kel wei tu ri-ZOLV mis-an-der-STEN-dingz.";
+      if (variationSeed % 2 === 1) {
+        text = "That is an important question. In my personal experience, taking consistent small steps every day always produces the most reliable result.";
+        hintId = "Itu pertanyaan yang penting. Dalam pengalaman pribadi saya, mengambil langkah-langkah kecil yang konsisten setiap hari selalu membuahkan hasil yang paling dapat diandalkan.";
+        hintTh = "นั่นเป็นคำถามที่สำคัญ จากประสบการณ์ส่วนตัวของฉัน การทำสิ่งเล็กๆ อย่างสม่ำเสมอทุกวันมักให้ผลลัพธ์ที่เชื่อถือได้มากที่สุด";
+        pronunciation = "det iz en im-POR-tent KWES-tyen. in mai PER-sen-el ik-SPI-ri-ens, tei-king ken-SIS-tent smol steps ev-ri dei ol-weiz pro-DYU-sez de best ri-ZALT.";
+      } else {
+        text = "From what I have observed, keeping our daily communication simple and open is the most practical way to resolve misunderstandings.";
+        hintId = "Dari apa yang saya amati, menjaga komunikasi harian kita tetap sederhana dan terbuka adalah cara paling praktis untuk menyelesaikan kesalahpahaman.";
+        hintTh = "จากสิ่งที่ฉันได้สังเกต การสื่อสารในชีวิตประจำวันอย่างตรงไปตรงมาและเปิดกว้างเป็นวิธีที่ได้ผลที่สุดในการแก้ไขความเข้าใจผิด";
+        pronunciation = "from wat ai hev ob-ZERVD, KI-ping aur dei-li kom-yu-ni-KEI-syen SIM-pel end OU-pen iz de most PREK-ti-kel wei tu ri-ZOLV mis-an-der-STEN-dingz.";
+      }
     }
   }
 
-  const badgeLevel = isHigherLevel ? 'Band 9.0 · Advanced' : isB2 ? 'Level B2 · PTE 58' : 'Level B1 · Target PTE 42';
+  const badgeLevel = isHigherLevel
+    ? 'Band 9.0 · Advanced'
+    : isB2
+    ? 'Level B2 · PTE 58'
+    : isA1
+    ? 'Level A1 · Pemula Dasar'
+    : isA2
+    ? 'Level A2 · Percakapan Simpel'
+    : 'Level B1 · Target PTE 42';
 
   const card: BeginnerReplyCard = {
     id: `cambridge_model_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
@@ -2256,7 +2420,7 @@ export async function requestRealtimeCopilotAssist(params: {
     };
   };
 
-  const budgetMs = Math.max(1000, Math.min(params.budgetMs ?? 10000, 15000));
+  const budgetMs = Math.max(1000, Math.min(params.budgetMs ?? 3000, 15000));
   const deadline = Date.now() + budgetMs;
 
   // 1) Fast-Path: kunci Gemini pribadi murid (gemini-3-flash-preview)
