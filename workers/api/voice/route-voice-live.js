@@ -382,10 +382,26 @@ function normalizeHistory(rawHistory) {
     }));
 }
 
-function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallbackTarget = '', isCambridge = false) {
+function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallbackTarget = '', isCambridge = false, cefrLevel = 'B1') {
   const list = Array.isArray(rawReplies) ? rawReplies : [];
 
   if (isCambridge) {
+    const lvl = String(cefrLevel || 'B1').toUpperCase();
+    const badgeId = lvl === 'B1'
+      ? '🎯 Jawaban B1 (PTE 42 / Band 5.5)'
+      : lvl === 'B2'
+      ? '🎯 Jawaban B2 (Band 6.5)'
+      : lvl === 'A2'
+      ? '🎯 Jawaban A2'
+      : lvl === 'A1'
+      ? '🎯 Jawaban A1'
+      : `🎯 Jawaban Terbaik (${lvl})`;
+    const badgeTh = lvl === 'B1'
+      ? '🎯 คำตอบระดับ B1 (PTE 42)'
+      : `🎯 คำตอบระดับ ${lvl}`;
+    const tierLabelId = `Model Answer (${lvl})`;
+    const tierLabelTh = `Model Answer (${lvl})`;
+
     for (let i = 0; i < list.length; i++) {
       const item = list[i];
       if (!item || typeof item !== 'object') continue;
@@ -397,10 +413,10 @@ function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallback
         {
           id: `cambridge_rt_${Date.now()}`,
           tier: 'cambridge_model',
-          badgeId: '🎯 Jawaban Terbaik (Band 9.0)',
-          badgeTh: '🎯 คำตอบระดับ Band 9.0',
-          tierLabelId: 'Band 9.0 Model Answer',
-          tierLabelTh: 'Band 9.0 Model Answer',
+          badgeId,
+          badgeTh,
+          tierLabelId,
+          tierLabelTh,
           text,
           pronunciation,
           hintId: locale === 'th' ? cleanSpokenText(item.hintId || hint).slice(0, 320) : hint,
@@ -410,6 +426,7 @@ function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallback
         },
       ];
     }
+    return [];
   }
 
   const defaultBadges = [
@@ -1032,17 +1049,20 @@ export async function routeVoiceCopilotAssist(ctx) {
 
   const focal = extractFocalClause(aiText, targetLang);
 
+  const cefrLevel = String(body.cefrLevel || 'B1').toUpperCase().trim();
   const isCambridge =
     Boolean(body.isCambridge) ||
     body.personaId === 'cambridge_examiner' ||
-    String(body.scenarioId || '').startsWith('scen_ielts');
+    String(body.scenarioId || '').startsWith('scen_ielts') ||
+    body.personaId === 'dr_julian' ||
+    String(body.scenarioId || '').startsWith('scen_pte');
 
   const langSpec =
     targetLang === 'ja'
       ? 'Japanese (natural spoken N5-N3, Kanji+Hiragana, NO emojis; "pronunciation" = word-spaced Hepburn Romaji)'
       : targetLang === 'zh'
       ? 'Mandarin Chinese (natural spoken HSK1-HSK3, Simplified Chinese characters, NO emojis; "pronunciation" = tone-marked Pinyin)'
-      : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy Indonesian phonetic guide)';
+      : `English (natural spoken ${cefrLevel === 'B1' ? 'A2-B1' : cefrLevel}, NO emojis; "pronunciation" = easy phonetic guide)`;
 
   const focalRule = focal.isEchoRedemption
     ? `CRITICAL MANDATORY ECHO REDEMPTION: Partner AI demanded repeating the exact corrected phrase: "${focal.focalText}". Option 1 (tier="easy") MUST be that exact phrase: "${focal.focalText}"!`
@@ -1055,20 +1075,29 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
 - If asked what food/drink/place, name a concrete item!
 - Option 1 must be concise (1 short sentence), direct, and completely conversational.`;
 
+  const levelBadge = isCambridge
+    ? (cefrLevel === 'B1' ? '🎯 Jawaban B1 (PTE 42 / Band 5.5)' : cefrLevel === 'B2' ? '🎯 Jawaban B2 (Band 6.5)' : cefrLevel === 'A2' ? '🎯 Jawaban A2' : cefrLevel === 'A1' ? '🎯 Jawaban A1' : `🎯 Jawaban Terbaik (${cefrLevel})`)
+    : '';
+
   const prompt = isCambridge
     ? [
-        `You are the Cambridge Senior Examiner Copilot for IELTS Speaking.`,
+        `You are the Senior English Speaking Exam Copilot (PTE Academic / IELTS). Target Level: CEFR ${cefrLevel} (Target Score: ${cefrLevel === 'B1' ? 'PTE 42 / IELTS 5.0-5.5' : cefrLevel === 'B2' ? 'PTE 58 / IELTS 6.5' : cefrLevel === 'C1' ? 'PTE 76 / IELTS 7.5' : 'PTE 84+ / IELTS 8.5-9.0'}).`,
         `Examiner statement/question: "${aiText}".`,
         focal.focalText ? `Examiner focal focus: "${focal.focalText}".` : '',
         lastUserText ? `Candidate just said: "${lastUserText}".` : '',
         historyLines.length
           ? `Exam dialogue context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
           : '',
-        `Generate EXACTLY ONE single best Band 8.5-9.0 IELTS Model Answer that fully answers the examiner with elevated academic vocabulary, complex grammar, clear discourse markers, and natural British RP cadence.`,
+        `Generate EXACTLY ONE single best Model Answer that 100% SPECIFICALLY AND DIRECTLY ANSWERS the examiner's statement/question above.`,
+        cefrLevel === 'B1'
+          ? `CRITICAL CEFR B1 MANDATE: Use clear, natural compound sentences with everyday professional vocabulary suitable for PTE 42 / CEFR B1. NEVER use obscure C2 academic jargon (like 'cogent', 'unilateral', 'invariably yields'). The candidate must be able to speak it comfortably and fluently!`
+          : cefrLevel === 'B2'
+          ? `Use clear, articulate B2 sentences with good academic vocabulary and clear discourse markers. Avoid overly obscure C2 jargon.`
+          : `Use elevated C1/C2 academic vocabulary, complex grammar, and sophisticated discourse markers.`,
         `Translate "${aiText}" into aiMeaning (${targetLocaleName}).`,
-        `In "hint", write an accurate, elegant first-person translation of the model answer into ${targetLocaleName}.`,
-        `In "pronunciation", provide natural RP cadence and stress guidance.`,
-        `JSON only: {"aiMeaning":"...","replies":[{"tier":"cambridge_model","badgeId":"🎯 Jawaban Terbaik (Band 9.0)","text":"...","pronunciation":"...","hint":"..."}]}`,
+        `In "hint", write an accurate, helpful first-person translation of the model answer into ${targetLocaleName}.`,
+        `In "pronunciation", provide an easy, human-readable phonetic pronunciation guide (NO raw IPA symbols like æ, ʌ, ɪ, ð, ŋ).`,
+        `JSON only: {"aiMeaning":"...","replies":[{"tier":"cambridge_model","badgeId":"${levelBadge}","text":"...","pronunciation":"...","hint":"..."}]}`,
       ]
         .filter(Boolean)
         .join('\n')
@@ -1096,7 +1125,7 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
 
-  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang, locale, '', isCambridge);
+  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang, locale, '', isCambridge, cefrLevel);
   if (!replies.length) {
     return jsonResponse({ ok: false, fallback: true, reason: 'invalid_replies' }, { status: 503 });
   }

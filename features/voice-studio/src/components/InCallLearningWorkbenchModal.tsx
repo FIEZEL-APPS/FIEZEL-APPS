@@ -183,6 +183,8 @@ export interface InCallLearningWorkbenchProps {
   onNavigateModule?: (destination: string) => void;
   forcedExerciseMode?: 'multiple_choice' | 'cloze_gap' | 'sentence_blocks' | null;
   externalQuizSeed?: number;
+  initialMinimized?: boolean;
+  cefrLevel?: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2' | string;
 }
 
 /**
@@ -928,11 +930,13 @@ export const PteDescribeImageCanvas: React.FC<{
             </span>
             <button
               type="button"
+              data-testid="pte-di-next-question-btn"
               onClick={handleNextQuestion}
-              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-black cursor-pointer active:scale-95 transition-all"
-              title="Soal Berikutnya"
+              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-black cursor-pointer active:scale-95 transition-all flex items-center gap-1"
+              title="Soal Grafik Berikutnya"
             >
-              Next ▶
+              <span>Soal Grafik Berikutnya</span>
+              <span>▶</span>
             </button>
           </div>
 
@@ -1632,6 +1636,8 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   onRequestCustomTopic,
   forcedExerciseMode,
   externalQuizSeed,
+  initialMinimized,
+  cefrLevel = 'B1',
 }) => {
   const [boardState, setBoardState] = useState<DynamicBoardState | null>(null);
   const [quizMode, setQuizMode] = useState<WorkbenchQuizMode>(forcedExerciseMode || 'multiple_choice');
@@ -1641,6 +1647,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   const [isQuizCompleted, setIsQuizCompleted] = useState<boolean>(false);
   const [isReady, setIsReady] = useState<boolean>(false);
   const [quizSeed, setQuizSeed] = useState<number>(externalQuizSeed ?? 0);
+  const [isMinimized, setIsMinimized] = useState<boolean>(initialMinimized ?? false);
+
+  useEffect(() => {
+    if (initialMinimized !== undefined) {
+      setIsMinimized(initialMinimized);
+    }
+  }, [initialMinimized]);
 
   useEffect(() => {
     if (externalQuizSeed !== undefined && externalQuizSeed !== quizSeed) {
@@ -1679,6 +1692,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       setPlacedBlocks([]);
       setIsQuizCompleted(false);
       setIsReady(false);
+      setIsMinimized(false);
       lastKeyRef.current = '';
       lastSpokenKeyRef.current = '';
       return;
@@ -1831,6 +1845,55 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     }
   };
 
+  if (isMinimized) {
+    return (
+      <aside
+        className="fixed top-20 right-4 z-50 max-w-xs sm:max-w-sm w-full rounded-2xl bg-[#FFFDF8]/95 border-2 border-[#EADBCE] shadow-2xl backdrop-blur-md p-3 flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200"
+        data-testid="in-call-workbench-minimized"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
+            <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B85D43] bg-[#FDE8E4] px-1.5 py-0.2 rounded-full shrink-0">
+              Papan Aktif
+            </span>
+            <span className="text-xs font-bold text-[#231A12] truncate">
+              {boardState?.topicTitle || topicTitle || 'Papan Belajar'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              data-testid="workbench-restore-btn"
+              onClick={() => {
+                playFiezelSfx('tap');
+                setIsMinimized(false);
+              }}
+              className="px-2 py-0.5 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer border border-[#EADBCE]"
+              title="Perbesar Papan Belajar"
+            >
+              ⤢ Buka
+            </button>
+            <button
+              type="button"
+              data-testid="workbench-minimized-close-btn"
+              onClick={onClose}
+              className="w-6 h-6 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] text-[11px] font-bold flex items-center justify-center cursor-pointer"
+              title="Tutup Papan"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+        {boardState?.patternFormula && (
+          <div className="text-[10.5px] font-medium text-[#5C4A38] bg-[#FAF4E8] px-2.5 py-1.5 rounded-xl border border-[#F0E6D9] line-clamp-2">
+            💡 <span className="font-semibold">{boardState.patternFormula}</span>
+          </div>
+        )}
+      </aside>
+    );
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1C1611]/60 backdrop-blur-sm animate-in fade-in duration-200"
@@ -1849,15 +1912,29 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               </h3>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            data-testid="workbench-close-btn"
-            className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-xs flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
-            title="Tutup & Lanjut Ngobrol"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                playFiezelSfx('tap');
+                setIsMinimized(true);
+              }}
+              data-testid="workbench-minimize-btn"
+              className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-sm flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
+              title="Kecilkan Papan (Lihat Mochi & Tetap Bicara)"
+            >
+              —
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              data-testid="workbench-close-btn"
+              className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-xs flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
+              title="Tutup & Lanjut Ngobrol"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* JIKA SEDANG MERACIK MATERI: ANIMASI ORGANIK MINIMALIS */}

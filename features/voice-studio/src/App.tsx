@@ -679,27 +679,31 @@ export default function App() {
     uiAction?: VoiceUiAction;
     preferredExerciseMode?: 'multiple_choice' | 'cloze_gap' | 'sentence_blocks';
     quizSeed?: number;
-  } | null>(() => {
-    if (selectedPersonaId === 'dr_julian' || activeScenarioId.startsWith('scen_pte')) {
-      return {
-        isOpen: true,
-        topicTitle: 'Global Renewable Energy Share (2020-2025)',
-        focusType: 'pte_describe_image',
-        explanationText: 'Analyze key trends, highest and lowest values, and conclude within 40 seconds.',
-        patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-        drillInstruction: 'Speak continuously for 40 seconds following the Universal 5-Part Formula.',
-        sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-        uiAction: {
-          actionType: 'open_learning_popup',
-          focusType: 'pte_describe_image',
-          topicTitle: 'Global Renewable Energy Share (2020-2025)',
-          patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-          sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-        },
-      };
-    }
-    return null;
+  } | null>(null);
+
+  type CefrLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+  const [userCefrLevel, setUserCefrLevel] = useState<CefrLevel>(() => {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const saved = (localStorage.getItem('fz_user_cefr_level') || '').toUpperCase().trim();
+        if (['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].includes(saved)) {
+          return saved as CefrLevel;
+        }
+      }
+    } catch {}
+    return 'B1';
   });
+  const [showCefrPicker, setShowCefrPicker] = useState<boolean>(false);
+
+  const handleSelectCefrLevel = (lvl: CefrLevel) => {
+    playFiezelSfx('button_tap');
+    setUserCefrLevel(lvl);
+    setShowCefrPicker(false);
+    try {
+      localStorage.setItem('fz_user_cefr_level', lvl);
+    } catch {}
+  };
+
   const isWorkbenchOpenRef = useRef<boolean>(false);
   isWorkbenchOpenRef.current = Boolean(learningWorkbench?.isOpen);
   const lastSystemIntentAtRef = useRef<{ key: string; at: number }>({ key: '', at: 0 });
@@ -1151,6 +1155,7 @@ export default function App() {
         persona: pers,
         targetLang: scen.targetLang,
         locale,
+        cefrLevel: userCefrLevel,
         history: historyList.slice(-8),
         variationSeed: opts?.forceVariation ? copilotVariationSeedRef.current : 0,
         excludeTexts: opts?.excludeTexts,
@@ -1497,22 +1502,6 @@ export default function App() {
       setActiveScenarioId(matchingScen.id);
     }
     playFiezelSfx('button_tap');
-    if (pId === 'dr_julian') {
-      setLearningWorkbench({
-        isOpen: true,
-        topicTitle: 'Global Renewable Energy Share (2020-2025)',
-        focusType: 'pte_describe_image',
-        sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-        patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-        uiAction: {
-          actionType: 'open_learning_popup',
-          focusType: 'pte_describe_image',
-          topicTitle: 'Global Renewable Energy Share (2020-2025)',
-          patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-          sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-        },
-      });
-    }
     if (isLiveConnectedRef.current) {
       stopLiveCall();
     }
@@ -1555,22 +1544,6 @@ export default function App() {
       } catch {}
     }
     playFiezelSfx('button_tap');
-    if (scen.id.startsWith('scen_pte_di') || scen.personaId === 'dr_julian') {
-      setLearningWorkbench({
-        isOpen: true,
-        topicTitle: 'Global Renewable Energy Share (2020-2025)',
-        focusType: 'pte_describe_image',
-        sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-        patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-        uiAction: {
-          actionType: 'open_learning_popup',
-          focusType: 'pte_describe_image',
-          topicTitle: 'Global Renewable Energy Share (2020-2025)',
-          patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-          sampleTarget: 'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-        },
-      });
-    }
     if (isLiveConnectedRef.current || isLiveConnectingRef.current) {
       stopLiveCall();
     }
@@ -4390,6 +4363,8 @@ export default function App() {
                 ? 'en-GB'
                 : 'en-US';
 
+            const cefrCalibrationDirective = `\n\n[MANDATORY TARGET CEFR LEVEL: ${userCefrLevel}]:\n- Target Proficiency: CEFR ${userCefrLevel} ${userCefrLevel === 'B1' ? '(PTE 42 / IELTS 5.0-5.5 Vocational Benchmark)' : userCefrLevel === 'B2' ? '(PTE 58 / IELTS 6.5)' : userCefrLevel === 'C1' ? '(PTE 76 / IELTS 7.5)' : ''}.\n- Candidate Vocabulary & Sentence Structure: Expected learner production is calibrated to Level ${userCefrLevel}.\n${userCefrLevel === 'B1' ? "- FORBIDDEN JARGON: NEVER expect or use obscure C2 academic vocabulary (like 'cogent', 'unilateral', 'invariably yields'). Focus on practical, clear compound sentences with standard professional vocabulary." : ""}\n`;
+
             ws.send(
               JSON.stringify({
                 setup: {
@@ -4502,10 +4477,10 @@ export default function App() {
                     parts: [
                       {
                         text: isDrJulian
-                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: Fitra (address him respectfully as "Fitra" or "Candidate").\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen Fitra finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "Fitra, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing him to move on to the next question!\n\n${pteMasterDirective}`
+                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: Fitra (address him respectfully as "Fitra" or "Candidate").\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen Fitra finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "Fitra, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing him to move on to the next question!\n\n${pteMasterDirective}${cefrCalibrationDirective}`
                           : isCambridgeExaminer
-                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "Fitra".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate Fitra makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5–9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`
-                          : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}`,
+                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "Fitra".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate Fitra makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5–9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${cefrCalibrationDirective}`
+                          : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}${cefrCalibrationDirective}`,
                       },
                     ],
                   },
@@ -4546,22 +4521,6 @@ export default function App() {
             setIsLiveConnected(true);
             isLiveConnectedRef.current = true;
             playFiezelSfx('lesson_start');
-
-            // Auto-launch Describe Image Workbench if in PTE DI Scenario or Dr. Julian Stage 1!
-            if (
-              activePersona.id === 'dr_julian' ||
-              activeScenario.personaId === 'dr_julian' ||
-              activeScenario.id.startsWith('scen_pte')
-            ) {
-              setLearningWorkbench({
-                isOpen: true,
-                topicTitle: 'Global Renewable Energy Share (2020-2025)',
-                focusType: 'pte_describe_image',
-                sampleTarget:
-                  'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-                patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-              });
-            }
 
             // Resume Audio Context if suspended & start keep-alive watchdog for iOS Safari
             if (liveAudioCtxRef.current && liveAudioCtxRef.current.state === 'suspended') {
@@ -6268,22 +6227,6 @@ export default function App() {
               const nextState = recordVocabPrereqMastery(brainState, scen.prereqCompetencyId);
               setBrainState(nextState);
               playFiezelSfx('lesson_start');
-
-            // Auto-launch Describe Image Workbench if in PTE DI Scenario or Dr. Julian Stage 1!
-            if (
-              activePersona.id === 'dr_julian' ||
-              activeScenario.personaId === 'dr_julian' ||
-              activeScenario.id.startsWith('scen_pte')
-            ) {
-              setLearningWorkbench({
-                isOpen: true,
-                topicTitle: 'Global Renewable Energy Share (2020-2025)',
-                focusType: 'pte_describe_image',
-                sampleTarget:
-                  'The given image provides key information about Global Renewable Energy Share between 2020 and 2025.',
-                patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-              });
-            }
               setStatusBanner(
                 locale === 'th'
                   ? 'ปลดล็อกคำศัพท์พื้นฐานเรียบร้อยแล้ว!'
@@ -6357,9 +6300,74 @@ export default function App() {
                           <span className="text-[10px] text-[#8C7A65]">▾</span>
                         </button>
                         <span className="shrink-0">·</span>
-                        <span className="shrink-0 text-[11px] font-medium text-[#5C4E3C]">
-                          {formatCleanLevel(activeScenario.level)}
-                        </span>
+                        <div className="relative inline-flex items-center">
+                          <button
+                            type="button"
+                            data-testid="cefr-level-selector-btn"
+                            onClick={() => {
+                              playFiezelSfx('button_tap');
+                              setShowCefrPicker((v) => !v);
+                            }}
+                            className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95 text-[11px]"
+                            title="Pilih Target Level CEFR (A1 - C2)"
+                          >
+                            <span className="text-[#B45309]">🎯</span>
+                            <span>Level {userCefrLevel}</span>
+                            <span className="text-[10px] text-[#8C7A65]">▾</span>
+                          </button>
+
+                          {showCefrPicker && (
+                            <div
+                              className="absolute top-full left-0 mt-1 z-50 bg-[#FFFDF8] border border-[#EADBCE] rounded-2xl shadow-xl p-1.5 min-w-[170px] flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
+                              data-testid="cefr-level-dropdown"
+                            >
+                              <div className="px-2 py-1 text-[10px] font-extrabold text-[#8C7A65] uppercase tracking-wider border-b border-[#F0E6D9]">
+                                Target Level CEFR
+                              </div>
+                              {(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const).map((lvl) => {
+                                const isSel = userCefrLevel === lvl;
+                                const desc =
+                                  lvl === 'A1'
+                                    ? 'Pemula Dasar'
+                                    : lvl === 'A2'
+                                    ? 'Percakapan Simpel'
+                                    : lvl === 'B1'
+                                    ? 'PTE 42 / IELTS 5.0 (Default)'
+                                    : lvl === 'B2'
+                                    ? 'PTE 58 / IELTS 6.5'
+                                    : lvl === 'C1'
+                                    ? 'PTE 76 / IELTS 7.5'
+                                    : 'Akademik Mahir (C2)';
+                                return (
+                                  <button
+                                    key={lvl}
+                                    type="button"
+                                    data-testid={`cefr-option-${lvl.toLowerCase()}`}
+                                    onClick={() => handleSelectCefrLevel(lvl)}
+                                    className={`w-full text-left px-2 py-1.5 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                                      isSel
+                                        ? 'bg-[#FDF4E7] text-[#B45309] font-extrabold shadow-2xs'
+                                        : 'text-[#4A3B2C] hover:bg-[#F5EFE6] font-medium'
+                                    }`}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="font-bold flex items-center gap-1">
+                                        Level {lvl}
+                                        {lvl === 'B1' && (
+                                          <span className="text-[9px] px-1 py-0.2 rounded-full bg-[#E6F4EA] text-[#1B5E34] font-bold">
+                                            PTE 42
+                                          </span>
+                                        )}
+                                      </span>
+                                      <span className="text-[9.5px] text-[#8C7A65]">{desc}</span>
+                                    </div>
+                                    {isSel && <span className="text-[#B45309] font-bold">✓</span>}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
