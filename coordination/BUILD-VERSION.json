@@ -1,7 +1,7 @@
 {
-  "version": "m025-797",
+  "version": "m025-798",
   "claimedBy": "branch feat/voice-pte-master-tutor",
-  "claimedAt": "2026-11-11T07:53:00.000Z",
+  "claimedAt": "2026-11-11T07:53:05.638Z",
   "reason": "feat(voice): instant zero-latency copilot & CEFR A1-C2 cross-persona calibration",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
