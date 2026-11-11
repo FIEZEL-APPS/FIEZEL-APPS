@@ -1158,14 +1158,18 @@ export default function App() {
       });
       if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
       const rawList = res.replies || res.cards || [];
+      const isCambridge =
+        pers?.id === 'cambridge_examiner' ||
+        scen?.personaId === 'cambridge_examiner' ||
+        scen?.id.startsWith('scen_ielts');
       const validCards = rawList.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
       if (validCards.length > 0) {
         lastCopilotAiKeyRef.current = dedupKey;
-        setCopilotCards(validCards);
+        setCopilotCards(isCambridge ? validCards.slice(0, 1) : validCards);
         setCopilotSource('ai-realtime');
-      } else if (copilotCardsRef.current.length === 0 && rawList.length > 0) {
+      } else if (rawList.length > 0) {
         lastCopilotAiKeyRef.current = dedupKey;
-        setCopilotCards(rawList);
+        setCopilotCards(isCambridge ? rawList.slice(0, 1) : rawList);
         setCopilotSource('ai-realtime');
       }
       if (res.aiMeaningId || res.aiMeaningTh) {
@@ -2909,10 +2913,14 @@ export default function App() {
           }
           const isPopupAction = serverUiAction?.actionType === 'open_learning_popup';
           if (Array.isArray(suggestions) && suggestions.length > 0) {
+            const isCambridge =
+              activePersona?.id === 'cambridge_examiner' ||
+              activeScenario.personaId === 'cambridge_examiner' ||
+              activeScenario.id.startsWith('scen_ielts');
             const aiOnly = suggestions.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
             if (aiOnly.length > 0) {
               lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${aiText.trim()}::${exactTranscript}`;
-              setCopilotCards(aiOnly);
+              setCopilotCards(isCambridge ? aiOnly.slice(0, 1) : aiOnly);
               setCopilotSource('ai-realtime');
               setIsGeneratingCopilot(false);
             } else if (!isPopupAction) {
@@ -2989,10 +2997,14 @@ export default function App() {
 
       const isOpeningPopup = replyEv.uiAction?.actionType === 'open_learning_popup';
       if (Array.isArray(replyEv.nextSuggestedReplies) && replyEv.nextSuggestedReplies.length > 0) {
+        const isCambridge =
+          activePersona?.id === 'cambridge_examiner' ||
+          activeScenario.personaId === 'cambridge_examiner' ||
+          activeScenario.id.startsWith('scen_ielts');
         const aiOnly = replyEv.nextSuggestedReplies.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
         if (aiOnly.length > 0) {
           lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${replyEv.aiReply.trim()}::${exactTranscript}`;
-          setCopilotCards(aiOnly);
+          setCopilotCards(isCambridge ? aiOnly.slice(0, 1) : aiOnly);
           setCopilotSource('ai-realtime');
           setIsGeneratingCopilot(false);
         } else if (!textAlreadyShown && replyEv.aiReply && !isOpeningPopup) {
@@ -4288,6 +4300,7 @@ export default function App() {
             );
 
             const isDrJulian = activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian';
+            const isCambridgeExaminer = activePersona.id === 'cambridge_examiner' || activeScenario.personaId === 'cambridge_examiner';
             const pteMasterDirective = isDrJulian
               ? (() => {
                   const pteState = loadPteMasterState();
@@ -4490,6 +4503,8 @@ export default function App() {
                       {
                         text: isDrJulian
                           ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: Fitra (address him respectfully as "Fitra" or "Candidate").\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen Fitra finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "Fitra, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing him to move on to the next question!\n\n${pteMasterDirective}`
+                          : isCambridgeExaminer
+                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "Fitra".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate Fitra makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5–9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}`
                           : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}`,
                       },
                     ],
@@ -7090,6 +7105,7 @@ export default function App() {
                   locale={locale}
                   targetLang={activeScenario.targetLang}
                   scenario={activeScenario}
+                  persona={activePersona}
                   aiQuestionText={activeAiLiveText}
                   aiQuestionTranslation={resolvedActiveAiMeaning}
                   lastUserText={lastUserTurn?.text || ''}

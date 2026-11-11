@@ -2413,6 +2413,9 @@ export interface PteDiagnosticSpeechResult {
   pacingQuality: 'optimal' | 'rushed' | 'slow';
   hesitationCount: number;
   hesitationTokens: string[];
+  selfCorrectionCount?: number;
+  selfCorrectionTokens?: string[];
+  pauseCount?: number;
   droppedPluralS: Array<{ heard: string; expected: string; reason: string }>;
   droppedPastEd: Array<{ heard: string; expected: string; reason: string }>;
   misconceptionsFound: Array<{ id: string; label: string; detail: string }>;
@@ -2460,10 +2463,18 @@ export function diagnosePteCandidateSpeech(
     wpm >= 115 && wpm <= 148 ? 'optimal' : wpm > 148 ? 'rushed' : 'slow';
 
   // 1. Deteksi Keraguan / Hesitasi / False Starts
-  const hesitationMatches = transcript.match(/\b(umm+|uhh+|ehh+|aaa+|err+|wait|sorry|ano)\b/gi) || [];
+  const hesitationMatches = transcript.match(/\b(umm+|uhh+|ehh+|aaa+|err+|wait|ano)\b/gi) || [];
   const stutterMatches = transcript.match(/\b([a-z]+)\s+\1\b/gi) || [];
   const hesitationTokens = [...hesitationMatches, ...stutterMatches];
   const hesitationCount = hesitationTokens.length;
+
+  // 1-B. Pearson Self-Correction Penalty (Reverse-Engineered from Pearson & APEUni Scorer)
+  const selfCorrectionMatches = transcript.match(/\b(sorry|i mean|no wait|excuse me|or rather|actually no)\b/gi) || [];
+  const selfCorrectionCount = selfCorrectionMatches.length;
+
+  // 1-C. Deteksi Jeda Panjang (> 2 detik)
+  const pauseMatches = transcript.match(/(\.{3,}|…|\[pause\]|\(\s*pause\s*\))/gi) || [];
+  const pauseCount = pauseMatches.length;
 
   // 2. Deteksi Fonetik: Dropped Plural 's'
   const COMMON_PLURALS: Record<string, string> = {
@@ -2565,6 +2576,8 @@ export function diagnosePteCandidateSpeech(
   if (pacingQuality === 'slow') baseFluency -= 1.0;
   if (pacingQuality === 'rushed') baseFluency -= 0.5;
   if (hesitationCount > 0) baseFluency -= Math.min(2.0, hesitationCount * 0.5);
+  if (selfCorrectionCount > 0) baseFluency -= Math.min(2.5, selfCorrectionCount * 1.0);
+  if (pauseCount > 0) baseFluency -= Math.min(2.0, pauseCount * 1.0);
   if (duration > 38) baseFluency -= 0.5;
   const fluencyScore = Number(Math.max(1.0, Math.min(5.0, baseFluency)).toFixed(1));
 
@@ -2580,6 +2593,20 @@ export function diagnosePteCandidateSpeech(
 
   // 6. Misconception Ledger Integration
   const misconceptionsFound: Array<{ id: string; label: string; detail: string }> = [];
+  if (selfCorrectionCount > 0) {
+    misconceptionsFound.push({
+      id: 'pte_self_correction_penalty',
+      label: `Self-Correction Detected (${selfCorrectionCount}x)`,
+      detail: `Terdeteksi perbaikan diri ("${selfCorrectionMatches.join(', ')}"). Standar Pearson AI memotong skor Oral Fluency drastis jika kandidat meralat diri sendiri alih-alih terus berbicara lancar.`,
+    });
+  }
+  if (pauseCount > 0) {
+    misconceptionsFound.push({
+      id: 'pte_pause_over_2s',
+      label: `Unnatural Pause > 2s (${pauseCount}x)`,
+      detail: 'Terdeteksi jeda hening lebih dari 2 detik. Memotong poin Oral Fluency.',
+    });
+  }
   if (droppedPluralS.length > 0) {
     droppedPluralS.forEach((d) => {
       misconceptionsFound.push({
@@ -2736,6 +2763,9 @@ ${droppedPluralS.length > 0 || droppedPastEd.length > 0 ? 'Tuntut murid melafalk
     pacingQuality,
     hesitationCount,
     hesitationTokens,
+    selfCorrectionCount,
+    selfCorrectionTokens: selfCorrectionMatches,
+    pauseCount,
     droppedPluralS,
     droppedPastEd,
     misconceptionsFound,

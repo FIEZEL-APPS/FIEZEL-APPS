@@ -843,6 +843,111 @@ function capitalizeWord(w: string): string {
 }
 
 /**
+ * Fallback khusus Cambridge Senior Examiner (Dr. Alistair Vance):
+ * Menghasilkan TEPAT 1 JAWABAN TERBAIK (Single Best Model Answer) berstandar Band 8.5–9.0 IELTS
+ * dengan struktur gramatika tingkat tinggi, leksikon akademik, dan terjemahan Indonesia/Thai yang elegan.
+ */
+export function buildCambridgeModelAnswerFallback(
+  rawAi: string,
+  locale: LearnerLocale,
+  variationSeed: number = 0
+): BeginnerReplyCard[] {
+  const q = rawAi.toLowerCase();
+
+  let text = '';
+  let hintId = '';
+  let hintTh = '';
+  let pronunciation = '';
+
+  if (/\b(name|call you|identification|id|passport)\b/i.test(q)) {
+    text = "My full name is Fitra Rusdiawan, though you may simply address me as Fitra. Here is my identification document for your verification.";
+    hintId = "Nama lengkap saya adalah Fitra Rusdiawan, namun Anda cukup memanggil saya Fitra. Ini dokumen identitas saya untuk verifikasi Anda.";
+    hintTh = "ชื่อเต็มของฉันคือ Fitra Rusdiawan แต่คุณสามารถเรียกฉันว่า Fitra ได้ นี่คือเอกสารระบุตัวตนของฉันสำหรับการตรวจสอบ";
+    pronunciation = "maɪ fʊl neɪm ɪz fɪtrə rʊsdiːɑːwɑːn, ðəʊ juː meɪ ˈsɪmpli əˈdrɛs miː æz fɪtrə.";
+  } else if (/\b(hometown|where (?:do )?you (?:live|come from)|city|neighbourhood|countryside)\b/i.test(q)) {
+    if (variationSeed % 2 === 1) {
+      text = "I was raised in Banda Aceh, a coastal city with profound historical resilience, though I subsequently relocated to a more vibrant metropolitan district for tertiary education.";
+      hintId = "Saya dibesarkan di Banda Aceh, sebuah kota pesisir dengan ketangguhan sejarah yang mendalam, meskipun saya kemudian pindah ke distrik metropolitan yang lebih dinamis untuk pendidikan tinggi.";
+      hintTh = "ฉันเติบโตในบันดาอาเจะห์ เมืองชายฝั่งที่มีประวัติศาสตร์อันเข้มแข็ง แม้ว่าต่อมาฉันจะย้ายไปอยู่ในย่านเมืองใหญ่เพื่อการศึกษาระดับอุดมศึกษา";
+      pronunciation = "aɪ wɒz reɪzd ɪn ˈbændə ɑːˈtʃeɪ, ə ˈkəʊstl ˈsɪti wɪð prəˈfaʊnd hɪˈstɒrɪkl rɪˈzɪliəns...";
+    } else {
+      text = "I originally hail from Jakarta, the bustling capital of Indonesia, though I currently reside in a considerably quieter suburban area that offers a tranquil contrast to the urban core.";
+      hintId = "Saya aslinya berasal dari Jakarta, ibu kota Indonesia yang sangat dinamis, meskipun saat ini saya tinggal di area pinggiran kota yang jauh lebih tenang dan menawarkan kontras damai dari pusat kota.";
+      hintTh = "เดิมทีฉันมาจากจาการ์ตา เมืองหลวงที่พลุกพล่านของอินโดนีเซีย แต่ปัจจุบันฉันอาศัยอยู่ในย่านชานเมืองที่เงียบสงบกว่ามาก";
+      pronunciation = "aɪ əˈrɪdʒɪnəli heɪl frɒm dʒəˈkɑːtə, ðə ˈbʌslɪŋ ˈkæpɪtl ɒv ˌɪndəˈniːziə...";
+    }
+  } else if (/\b(work or study|job|occupation|major|career|profession|field of study)\b/i.test(q)) {
+    text = "Presently, I am engaged in software engineering with a particular emphasis on intelligent conversational systems—a discipline that demands both analytical precision and creative problem-solving.";
+    hintId = "Saat ini, saya berkecimpung di bidang rekayasa perangkat lunak dengan penekanan khusus pada sistem percakapan cerdas—sebuah disiplin yang menuntut ketelitian analitis sekaligus pemecahan masalah kreatif.";
+    hintTh = "ปัจจุบัน ฉันทำงานด้านวิศวกรรมซอฟต์แวร์โดยเน้นเป็นพิเศษที่ระบบสนทนาอัจฉริยะ ซึ่งเป็นสาขาที่ต้องใช้ทั้งความแม่นยำในการวิเคราะห์และการแก้ปัญหาอย่างสร้างสรรค์";
+    pronunciation = "ˈprɛzntli, aɪ æm ɪnˈɡeɪdʒd ɪn ˈsɒftweər ˌɛndʒɪˈnɪərɪŋ wɪð ə pəˈtɪkjələr ˈɛmfəsɪs ɒn ɪnˈtɛlɪdʒənt kɒnvəˈseɪʃənl ˈsɪstəmz...";
+  } else if (/\b(leisure|free time|spare time|hobb(?:y|ies)|relax|weekends|unwind)\b/i.test(q)) {
+    text = "During my leisure hours, I gravitate towards distance running and immersing myself in analytical essays, both of which serve as an indispensable mental decompression from cognitively demanding work.";
+    hintId = "Di waktu luang, saya cenderung memilih lari jarak jauh dan mendalami esai-esai analitis, keduanya berfungsi sebagai pelepasan pikiran yang tak tergantikan dari tuntutan kognitif pekerjaan.";
+    hintTh = "ในเวลาว่าง ฉันมักจะวิ่งระยะไกลและอ่านบทความเชิงวิเคราะห์ ซึ่งทั้งสองอย่างนี้ช่วยผ่อนคลายสมองจากการทำงานที่ต้องใช้ความคิดอย่างหนัก";
+    pronunciation = "ˈdjʊərɪŋ maɪ ˈlɛʒər ˈaʊəz, aɪ ˈɡrævɪteɪt təˈwɔːdz ˈdɪstəns ˈrʌnɪŋ ænd ɪˈmɜːsɪŋ maɪˈsɛlf ɪn ˌænəˈlɪtɪkl ˈɛseɪz...";
+  } else if (/\b(describe|talk about|mentor|teacher|leader|role model|achievement|memorable|journey)\b/i.test(q)) {
+    text = "I would like to speak about a senior university mentor whose rigorous academic standards and unfailing intellectual generosity fundamentally altered my approach to empirical inquiry and disciplined scholarship.";
+    hintId = "Saya ingin menceritakan tentang seorang dosen senior universitas yang standar akademisnya yang ketat serta kemurahan hati intelektualnya secara mendasar mengubah pendekatan saya terhadap penyelidikan empiris dan keilmuan yang disiplin.";
+    hintTh = "ฉันอยากจะพูดถึงอาจารย์ที่ปรึกษาระดับมหาวิทยาลัยท่านหนึ่ง ซึ่งมาตรฐานทางวิชาการที่เข้มงวดและความเอื้อเฟื้อทางปัญญาได้เปลี่ยนวิธีคิดของฉันต่อการค้นคว้าเชิงประจักษ์อย่างสิ้นเชิง";
+    pronunciation = "aɪ wʊd laɪk tuː spiːk əˈbaʊt ə ˈsiːniər ˌjuːnɪˈvɜːsɪti ˈmɛntɔː huːz ˈrɪɡərəs ˌækəˈdɛmɪk ˈstændədz...";
+  } else if (/\b(technolog|artificial intelligence|\bai\b|digital|comput|automat|algorithm|social media|smartphone)\b/i.test(q)) {
+    text = "From an objective standpoint, artificial intelligence undoubtedly serves as an unprecedented catalyst for productivity; nevertheless, it simultaneously necessitates stringent ethical frameworks to prevent systemic biases and retain human oversight.";
+    hintId = "Dari sudut pandang objektif, kecerdasan buatan tak diragukan lagi berfungsi sebagai katalis produktivitas yang belum pernah ada sebelumnya; kendati demikian, hal itu secara bersamaan menuntut kerangka etika yang ketat untuk mencegah bias sistemik dan mempertahankan pengawasan manusia.";
+    hintTh = "จากมุมมองที่เป็นกลาง ปัญญาประดิษฐ์เป็นตัวเร่งการผลิตที่ไม่เคยมีมาก่อนอย่างไม่ต้องสงสัย อย่างไรก็ตาม มันจำเป็นต้องมีกรอบจริยธรรมที่เข้มงวดควบคู่กันไปเพื่อป้องกันอคติเชิงระบบ";
+    pronunciation = "frɒm ən əbˈdʒɛktɪv ˈstændpɔɪnt, ˌɑːtɪˈfɪʃl ɪnˈtɛlɪdʒəns ʌnˈdaʊtɪdli sɜːvz æz ən ʌnˈprɛsɪdɛntɪd ˈkætəlɪst fɔː ˌprɒdʌkˈtɪvɪti...";
+  } else if (/\b(environment|climate|sustainab|pollut|global warming|green|planet|renewable)\b/i.test(q)) {
+    text = "I am firmly convinced that mitigating global environmental degradation requires a dual-pronged paradigm: comprehensive governmental regulatory policy harmonized with grassroots individual accountability across daily consumption patterns.";
+    hintId = "Saya sangat yakin bahwa memitigasi degradasi lingkungan global memerlukan paradigma dua cabang: kebijakan regulasi pemerintah yang komprehensif yang diselaraskan dengan akuntabilitas individu akar rumput di seluruh pola konsumsi sehari-hari.";
+    hintTh = "ฉันเชื่อมั่นอย่างยิ่งว่าการบรรเทาความเสื่อมโทรมของสิ่งแวดล้อมโลกจำเป็นต้องใช้แนวทางสองด้าน: นโยบายการกำกับดูแลของรัฐบาลที่ครอบคลุมควบคู่ไปกับความรับผิดชอบของแต่ละบุคคล";
+    pronunciation = "aɪ æm ˈfɜːmli kənˈvɪnst ðæt ˈmɪtɪɡeɪtɪŋ ˈɡləʊbl ɪnˌvaɪrənˈmɛntl ˌdɛɡrəˈdeɪʃn rɪˈkwaɪəz ə ˈdjuːəl prɒŋd ˈpærədaɪm...";
+  } else if (/\b(educat|school|curriculum|critical thinking|child(?:ren)?|teach|academic|learn)\b/i.test(q)) {
+    text = "Educational institutions ought to pivot away from mechanical rote memorization and instead prioritize the cultivation of critical discernment, cognitive adaptability, and multidisciplinary problem-solving capacities.";
+    hintId = "Lembaga pendidikan seyogianya beralih dari hafalan mekanis dan beralih memprioritaskan penanaman ketajaman berpikir kritis, kemampuan adaptasi kognitif, serta kapasitas pemecahan masalah multidisipliner.";
+    hintTh = "สถาบันการศึกษาควรเปลี่ยนผ่านจากการท่องจำแบบเดิมๆ ไปสู่การให้ความสำคัญกับการปลูกฝังการคิดเชิงวิพากษ์ ความยืดหยุ่นทางความคิด และความสามารถในการแก้ปัญหาแบบสหวิทยาการ";
+    pronunciation = "ˌɛdʒuˈkeɪʃənl ˌɪnstɪˈtjuːʃnz ɔːt tuː ˈpɪvət əˈweɪ frɒm mɪˈkænɪkl rəʊt ˌmɛməraɪˈzeɪʃn...";
+  } else if (/\b(cultur|tradition|globali[sz]|societ|art|heritage)\b/i.test(q)) {
+    text = "While globalization facilitates unprecedented intercultural dialogue, preservation of localized cultural heritage remains crucial to safeguarding societal identity and historical continuity.";
+    hintId = "Meskipun globalisasi memfasilitasi dialog antarbudaya yang belum pernah terjadi sebelumnya, pelestarian warisan budaya lokal tetap sangat penting untuk menjaga identitas masyarakat dan kesinambungan sejarah.";
+    hintTh = "แม้ว่าโลกาภิวัตน์จะช่วยให้เกิดการแลกเปลี่ยนทางวัฒนธรรมอย่างที่ไม่เคยมีมาก่อน แต่การอนุรักษ์มรดกทางวัฒนธรรมท้องถิ่นยังคงมีความสำคัญยิ่งต่อการปกป้องอัตลักษณ์ของสังคม";
+    pronunciation = "waɪl ˌɡləʊbəlaɪˈzeɪʃn fəˈsɪlɪteɪts ʌnˈprɛsɪdɛntɪd ˌɪntəˈkʌltʃərəl ˈdaɪəlɒɡ, ˌprɛzəˈveɪʃn ɒv ˈləʊkəlaɪzd ˈkʌltʃərəl ˈhɛrɪtɪdʒ...";
+  } else {
+    // General IELTS Part 3 reflective academic response
+    if (variationSeed % 2 === 1) {
+      text = "That is an intriguing proposition. In my assessment, while short-term practical measures provide immediate relief, sustainable progress is fundamentally contingent upon structural reforms executed at an institutional tier.";
+      hintId = "Itu adalah proposisi yang sangat menarik. Menurut penilaian saya, kendati langkah-langkah praktis jangka pendek memberikan kelegaan segera, kemajuan yang berkelanjutan secara mendasar bergantung pada reformasi struktural yang dijalankan pada tingkat kelembagaan.";
+      hintTh = "นั่นเป็นข้อเสนอที่น่าสนใจมาก ในมุมมองของฉัน แม้ว่ามาตรการระยะสั้นจะช่วยบรรเทาปัญหาได้ทันที แต่ความก้าวหน้าที่ยั่งยืนนั้นขึ้นอยู่กับการปฏิรูปเชิงโครงสร้างในระดับสถาบัน";
+      pronunciation = "ðæt ɪz ən ɪnˈtriːɡɪŋ ˌprɒpəˈzɪʃn. ɪn maɪ əˈsɛsmənt, waɪl ʃɔːt-tɜːm ˈpræktɪkl ˈmɛʒəz prəˈvaɪd ɪˈmiːdiət rɪˈliːf...";
+    } else {
+      text = "While there are cogent arguments on both sides of the spectrum, I would contend that systemic collaboration invariably yields far more resilient societal outcomes than isolated unilateral efforts.";
+      hintId = "Meskipun ada argumen-argumen yang meyakinkan di kedua sisi spektrum, saya berpendapat bahwa kolaborasi sistemik selalu membuahkan hasil sosial yang jauh lebih tangguh daripada upaya sepihak yang terisolasi.";
+      hintTh = "แม้ว่าจะมีข้อโต้แย้งที่มีน้ำหนักจากทั้งสองมุมมอง แต่ฉันมองว่าความร่วมมือเชิงระบบมักจะให้ผลลัพธ์ทางสังคมที่มั่นคงและยั่งยืนกว่าความพยายามเพียงลำพังอย่างมีนัยสำคัญ";
+      pronunciation = "waɪl ðeər ɑː ˈkəʊdʒənt ˈɑːɡjumənts ɒn bəʊθ saɪdz ɒv ðə ˈspɛktrəm, aɪ wʊd kənˈtɛnd ðæt sɪˈstɛmɪk kəˌlæbəˈreɪʃn...";
+    }
+  }
+
+  const card: BeginnerReplyCard = {
+    id: `cambridge_model_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    tier: 'cambridge_model',
+    badgeId: '🎯 Jawaban Terbaik (Band 9.0)',
+    badgeTh: '🎯 คำตอบระดับ Band 9.0',
+    tierLabelId: 'Band 9.0 Model Answer',
+    tierLabelTh: 'Band 9.0 Model Answer',
+    text,
+    pronunciation,
+    hintId,
+    hintTh,
+    meaningId: hintId,
+    meaningTh: hintTh,
+    isRealtimeAi: false,
+    isOfflineFallback: true,
+    wordBreakdown: [],
+  };
+
+  return [card];
+}
+
+/**
  * Fallback kontekstual lokal presisi: dipilih dari speech act kalimat AI penutup
  * + topik/pilihan yang diekstrak secara spesifik.
  * Menjamin kartu 1 · Singkat selalu menjawab pertanyaan/ajakan secara 100% nyambung.
@@ -854,10 +959,21 @@ export function buildContextualFallbackCards(params: {
   lastUserText?: string;
   variationSeed?: number;
   excludeTexts?: string[];
+  isCambridge?: boolean;
+  personaId?: string;
 }): BeginnerReplyCard[] {
   const rawAi = String(params.aiText || '');
   const th = params.locale === 'th';
   const variationSeed = Number(params.variationSeed || 0);
+
+  // If Cambridge Senior Examiner mode, ALWAYS return EXACTLY ONE single best Band 8.5-9.0 model answer!
+  const isCambridge =
+    Boolean(params.isCambridge) ||
+    params.personaId === 'cambridge_examiner' ||
+    (params.targetLang === 'en' && /\b(cambridge|ielts|band\s*9|examiner)\b/i.test(rawAi));
+  if (isCambridge) {
+    return buildCambridgeModelAnswerFallback(rawAi, params.locale, variationSeed);
+  }
 
   // Special handler for proactive struggle diagnosis questions ("what part been tripping you up", "モヤモヤ", "头疼")
   if (
@@ -2036,7 +2152,11 @@ export async function requestRealtimeCopilotAssist(params: {
   if (!cleanAiText || params.signal?.aborted) return empty;
 
   const variationSeed = params.variationSeed || 0;
-  const cacheKey = `${params.targetLang}::${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
+  const isCambridge =
+    params.persona?.id === 'cambridge_examiner' ||
+    params.scenario.personaId === 'cambridge_examiner' ||
+    params.scenario.id.startsWith('scen_ielts');
+  const cacheKey = `${params.targetLang}::${isCambridge ? 'cambridge::' : ''}${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
   if (variationSeed === 0 && (!params.excludeTexts || params.excludeTexts.length === 0)) {
     const cached = _copilotTurnCache.get(cacheKey);
     if (cached && cached.replies.length > 0) return cached;
@@ -2050,6 +2170,8 @@ export async function requestRealtimeCopilotAssist(params: {
       lastUserText: params.lastUserText,
       variationSeed,
       excludeTexts: params.excludeTexts,
+      isCambridge,
+      personaId: params.persona?.id,
     }).map((c) => ({
       ...c,
       isRealtimeAi: false,
@@ -2089,15 +2211,25 @@ export async function requestRealtimeCopilotAssist(params: {
           : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
       const learnerLangName = params.locale === 'th' ? 'Thai' : 'Indonesian';
       const hist = (params.history || []).slice(-6).map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner'}: "${h.text}"`).join('\n');
-      const prompt = [
-        `Speech Copilot (${params.scenario.titleId}). Target: ${langSpec}.`,
-        hist ? `Context:\n${hist}` : '',
-        params.lastUserText ? `Learner said: "${params.lastUserText}"` : '',
-        `Partner said: "${cleanAiText}"`,
-        params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
-        `Generate 3 spontaneous spoken replies directly answering it (easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back). Translate it into aiMeaning (${learnerLangName}); each reply's first-person translation in hint (${learnerLangName}).`,
-        `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"..."}]}`,
-      ].filter(Boolean).join('\n');
+      const prompt = isCambridge
+        ? [
+            `You are the Cambridge Senior Examiner AI Copilot for IELTS Speaking.`,
+            `The examiner just asked: "${cleanAiText}".`,
+            params.lastUserText ? `Candidate just said: "${params.lastUserText}".` : '',
+            hist ? `Exam Context:\n${hist}` : '',
+            `Produce EXACTLY ONE single best Band 8.5-9.0 IELTS Model Answer that fully answers the examiner with elevated academic lexical resource, nuanced discourse markers, complex sentence structures, and natural British RP cadence.`,
+            `Provide the first-person translation in ${learnerLangName} in the "hint" field, and phonetic/stress guidance in "pronunciation".`,
+            `JSON only: {"aiMeaning":"${learnerLangName} translation of examiner question","replies":[{"tier":"cambridge_model","badgeId":"🎯 Jawaban Terbaik (Band 9.0)","text":"...","pronunciation":"...","hint":"..."}]}`,
+          ].filter(Boolean).join('\n')
+        : [
+            `Speech Copilot (${params.scenario.titleId}). Target: ${langSpec}.`,
+            hist ? `Context:\n${hist}` : '',
+            params.lastUserText ? `Learner said: "${params.lastUserText}"` : '',
+            `Partner said: "${cleanAiText}"`,
+            params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
+            `Generate 3 spontaneous spoken replies directly answering it (easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back). Translate it into aiMeaning (${learnerLangName}); each reply's first-person translation in hint (${learnerLangName}).`,
+            `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"..."}]}`,
+          ].filter(Boolean).join('\n');
       const res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
         method: 'POST',
         headers: {
@@ -2106,7 +2238,7 @@ export async function requestRealtimeCopilotAssist(params: {
           'x-goog-api-key': userGeminiKey,
         },
         body: JSON.stringify({
-          model: 'gemini-3.1-flash-lite',
+          model: 'gemini-2.5-flash',
           input: prompt,
           response_mime_type: 'application/json',
           generation_config: {
@@ -2128,13 +2260,23 @@ export async function requestRealtimeCopilotAssist(params: {
           .trim();
         const parsed = raw ? JSON.parse(raw) : null;
         const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
-        if (cards.length > 0) {
+        const finalCards = isCambridge && cards.length > 0
+          ? cards.slice(0, 1).map((c) => ({
+              ...c,
+              tier: 'cambridge_model' as any,
+              badgeId: '🎯 Jawaban Terbaik (Band 9.0)',
+              badgeTh: '🎯 คำตอบระดับ Band 9.0',
+              tierLabelId: 'Band 9.0 Model Answer',
+              tierLabelTh: 'Band 9.0 Model Answer',
+            }))
+          : cards;
+        if (finalCards.length > 0) {
           const meaning = stripEmojisAndEmotWords(String(parsed?.aiMeaning || '')).trim();
           const result: RealtimeCopilotAssistResult = {
             ok: true, source: 'ai-realtime',
             aiMeaningId: params.locale === 'id' ? meaning : '',
             aiMeaningTh: params.locale === 'th' ? meaning : '',
-            replies: cards, cards,
+            replies: finalCards, cards: finalCards,
           };
           if (variationSeed === 0) copilotCacheSet(cacheKey, result);
           return result;
@@ -2152,6 +2294,8 @@ export async function requestRealtimeCopilotAssist(params: {
     scenarioTitle: params.scenario.titleId,
     scenarioId: params.scenario.id,
     personaName: params.persona?.name || '',
+    personaId: params.persona?.id || params.scenario.personaId || '',
+    isCambridge,
     targetLang: params.targetLang,
     locale: params.locale,
     history: (params.history || []).slice(-6),
@@ -2191,12 +2335,22 @@ export async function requestRealtimeCopilotAssist(params: {
       if (res.ok) {
         const data = await res.json();
         const cards = normalizeServerCopilotCards(data?.replies || data?.suggestions, params.targetLang);
-        if (cards.length > 0) {
+        const finalCards = isCambridge && cards.length > 0
+          ? cards.slice(0, 1).map((c) => ({
+              ...c,
+              tier: 'cambridge_model' as any,
+              badgeId: '🎯 Jawaban Terbaik (Band 9.0)',
+              badgeTh: '🎯 คำตอบระดับ Band 9.0',
+              tierLabelId: 'Band 9.0 Model Answer',
+              tierLabelTh: 'Band 9.0 Model Answer',
+            }))
+          : cards;
+        if (finalCards.length > 0) {
           const result: RealtimeCopilotAssistResult = {
             ok: true, source: 'ai-realtime',
             aiMeaningId: stripEmojisAndEmotWords(String(data?.aiMeaningId || '')).trim(),
             aiMeaningTh: stripEmojisAndEmotWords(String(data?.aiMeaningTh || '')).trim(),
-            replies: cards, cards,
+            replies: finalCards, cards: finalCards,
           };
           if (variationSeed === 0) copilotCacheSet(cacheKey, result);
           return result;
