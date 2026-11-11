@@ -696,15 +696,6 @@ export default function App() {
   });
   const [showCefrPicker, setShowCefrPicker] = useState<boolean>(false);
 
-  const handleSelectCefrLevel = (lvl: CefrLevel) => {
-    playFiezelSfx('button_tap');
-    setUserCefrLevel(lvl);
-    setShowCefrPicker(false);
-    try {
-      localStorage.setItem('fz_user_cefr_level', lvl);
-    } catch {}
-  };
-
   const isWorkbenchOpenRef = useRef<boolean>(false);
   isWorkbenchOpenRef.current = Boolean(learningWorkbench?.isOpen);
   const lastSystemIntentAtRef = useRef<{ key: string; at: number }>({ key: '', at: 0 });
@@ -1109,13 +1100,15 @@ export default function App() {
       forceVariation?: boolean;
       excludeTexts?: string[];
       isDebouncedStreaming?: boolean;
+      cefrLevelOverride?: CefrLevel;
     }
   ) => {
     const cleanAi = String(aiLine || '').trim();
     if (!cleanAi) return;
     const scen = opts?.scenarioOverride || activeScenario;
     const pers = opts?.personaOverride || activePersona;
-    const dedupKey = `${scen.id}::${scen.targetLang}::${cleanAi}::${lastUserLine}`;
+    const effectiveCefrLevel = opts?.cefrLevelOverride || userCefrLevel;
+    const dedupKey = `${scen.id}::${scen.targetLang}::${cleanAi}::${lastUserLine}::${effectiveCefrLevel}`;
     if (!opts?.forceVariation) {
       if (lastCopilotAiKeyRef.current === dedupKey && copilotCardsRef.current.length > 0) {
         return;
@@ -1146,7 +1139,7 @@ export default function App() {
       excludeTexts: opts?.excludeTexts,
       isCambridge,
       personaId: pers?.id,
-      cefrLevel: userCefrLevel,
+      cefrLevel: effectiveCefrLevel,
     });
 
     if (instantCards.length > 0) {
@@ -1195,7 +1188,7 @@ export default function App() {
         persona: pers,
         targetLang: scen.targetLang,
         locale,
-        cefrLevel: userCefrLevel,
+        cefrLevel: effectiveCefrLevel,
         history: historyList.slice(-8),
         variationSeed: opts?.forceVariation ? copilotVariationSeedRef.current : 0,
         excludeTexts: opts?.excludeTexts,
@@ -1253,6 +1246,25 @@ export default function App() {
 
   const triggerRealtimeCopilotRef = useRef(triggerRealtimeCopilotForAi);
   triggerRealtimeCopilotRef.current = triggerRealtimeCopilotForAi;
+
+  const handleSelectCefrLevel = (lvl: CefrLevel) => {
+    playFiezelSfx('button_tap');
+    setUserCefrLevel(lvl);
+    setShowCefrPicker(false);
+    try {
+      localStorage.setItem('fz_user_cefr_level', lvl);
+    } catch {}
+
+    const activeText = activeAiLiveText || (turns.slice().reverse().find((t) => t.speaker === 'ai')?.text) || '';
+    if (activeText) {
+      void triggerRealtimeCopilotForAi(
+        activeText,
+        lastUserTurn?.text || '',
+        turns.map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+        { forceVariation: true, cefrLevelOverride: lvl }
+      );
+    }
+  };
 
   const prereqStatus = checkPrerequisiteStatus(brainState, activeScenario.prereqCompetencyId);
   const activeCompRecord = brainState.competencies[activeScenario.competencyId];

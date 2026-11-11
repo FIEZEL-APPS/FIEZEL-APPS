@@ -188,10 +188,14 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <span className="px-2.5 py-1 rounded-xl bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-2xs truncate">
                 <span className="text-xs">🎯</span>
-                <span>{locale === 'th' ? 'คำตอบระดับ Band 9.0' : 'Jawaban Terbaik (Band 9.0)'}</span>
+                <span>
+                  {locale === 'th'
+                    ? (activeCard?.badgeTh || 'คำตอบแนะนำ')
+                    : (activeCard?.badgeId || 'Jawaban Terbaik')}
+                </span>
               </span>
               <span className="hidden sm:inline-block text-[10.5px] font-semibold text-[#8C7760] truncate">
-                Cambridge IELTS Academic
+                {activeCard?.tierLabelId || (scenario.id.startsWith('scen_pte') ? 'Pearson PTE Academic' : 'Cambridge IELTS Academic')}
               </span>
             </div>
           ) : (
