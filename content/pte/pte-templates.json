@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "name": "FIEZEL PTE Academic Universal Templates",
+  "description": "Standardized pedagogical templates designed for guaranteed scoring in Pearson AI automated grading algorithms.",
+  "templates": {
+    "describe_image": {
+      "id": "di_universal_v1",
+      "title": "FIEZEL Universal Describe Image Template",
+      "target_task": "Describe Image",
+      "structure": [
+        "Introduction / Overview",
+        "Key Element 1",
+        "Key Element 2",
+        "Maximum Trend / High Point",
+        "Minimum Trend / Low Point",
+        "Logical Conclusion"
+      ],
+      "text": "The given image represents an informative chart regarding [Topic]. According to the picture, we can see several key elements, including [Element 1], [Element 2], and [Element 3]. Looking closely, the maximum figure is observed in [Key Trend / High Point], while the minimum figure is found in [Low Point]. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
+      "fill_guide": {
+        "Topic": "Title or main subject of the chart/diagram",
+        "Element 1": "First category or axis label",
+        "Element 2": "Second category or axis label",
+        "Element 3": "Third category or legend item",
+        "Key Trend / High Point": "The highest bar, peak year, or dominant section",
+        "Low Point": "The lowest bar, valley, or smallest portion"
+      },
+      "tips": [
+        "Do not stop speaking before 25 seconds; Pearson rewards oral fluency and continuous acoustic flow over complex logic.",
+        "Pronounce the template with natural sentence stress and steady rhythm (120-140 words per minute).",
+        "If you stumble on a number, do not correct yourself—keep moving smoothly to the next sentence."
+      ]
+    },
+    "retell_lecture": {
+      "id": "rl_universal_v1",
+      "title": "FIEZEL Retell Lecture Standard Scaffold",
+      "target_task": "Retell Lecture",
+      "text": "The speaker was discussing the primary aspects of [Main Topic]. Firstly, the speaker highlighted that [Key Note 1]. In addition, significant emphasis was placed on [Key Note 2]. Furthermore, the presentation provided crucial evidence about [Key Note 3]. Overall, the lecture provided highly comprehensive insights into the subject matter.",
+      "tips": [
+        "Take 4-6 noun chunks during the audio playback.",
+        "Insert the noun chunks directly into the template slots without worrying about complex grammar transformation."
+      ]
+    },
+    "summarize_written_text": {
+      "id": "swt_universal_v1",
+      "title": "FIEZEL Strict One-Sentence Summarizer Scaffold",
+      "target_task": "Summarize Written Text",
+      "rules": "Strict single sentence (5-75 words), one capital letter at beginning, exactly one period at end.",
+      "formula": "[Key Sentence 1], and [Key Sentence 2], which demonstrates that [Author Conclusion].",
+      "tips": [
+        "Never use more than one period in the entire response.",
+        "Keep word count strictly between 35 and 65 words for maximum content and grammar safety."
+      ]
+    },
+    "write_essay": {
+      "id": "we_4par_v1",
+      "title": "FIEZEL 4-Paragraph Balanced Argument Template",
+      "target_task": "Write Essay",
+      "target_word_count": "200-300 words",
+      "paragraphs": [
+        {
+          "role": "Introduction",
+          "scaffold": "In the contemporary era, whether [Topic] remains a subject of considerable controversy. While some individuals argue that [View A], others firmly maintain that [View B]. In my perspective, I concur with the former viewpoint for several compelling reasons."
+        },
+        {
+          "role": "Body Paragraph 1",
+          "scaffold": "To begin with, the foremost justification is that [Argument 1]. Specifically, [Supporting Evidence 1]. For example, empirical studies conducted in recent years have demonstrated that [Concrete Example 1]. Consequently, it is evident that [Concluding thought 1]."
+        },
+        {
+          "role": "Body Paragraph 2",
+          "scaffold": "Furthermore, another pivotal factor that should be considered is that [Argument 2]. In other words, [Supporting Evidence 2]. To illustrate, modern organizations and academic institutions frequently observe that [Concrete Example 2]. Hence, this clearly reinforces the significance of the issue."
+        },
+        {
+          "role": "Conclusion",
+          "scaffold": "In conclusion, after evaluating the aforementioned perspectives, I reiterate that although alternative viewpoints exist, [Rephrased Thesis]. Therefore, taking proactive measures regarding this matter will undoubtedly yield long-term advantages."
+        }
+      ]
+    }
+  }
+}

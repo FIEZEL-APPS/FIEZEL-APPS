@@ -1,7 +1,7 @@
 {
   "version": "m025-801",
   "claimedBy": "branch feat/voice-pte-master-tutor",
-  "claimedAt": "2026-11-11T08:10:21.514Z",
-  "reason": "feat(voice): [ALLOW-PROTECTED: pwa] instant zero-latency copilot & CEFR dynamic level switch",
+  "claimedAt": "2026-11-11T08:35:00.000Z",
+  "reason": "feat(pte,voice): [ALLOW-PROTECTED: pwa] unify PTE Big 4 Prep Hub and Voice Studio PTE Master Tutor",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

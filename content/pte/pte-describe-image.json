@@ -1,0 +1,57 @@
+{
+  "version": "1.0.0",
+  "task": "Describe Image",
+  "crossSkills": ["Speaking"],
+  "prepTimeSec": 25,
+  "recordTimeSec": 40,
+  "items": [
+    {
+      "id": "di-001",
+      "title": "International Tourist Arrivals in Western Australia",
+      "chartType": "bar_chart",
+      "topic": "International Tourist Arrivals in Western Australia from 2018 to 2024",
+      "categories": ["2018", "2020", "2022", "2024"],
+      "highPoint": "the year 2024 with over 1.2 million overseas visitors",
+      "lowPoint": "the year 2020 with approximately 300 thousand visitors due to global travel restrictions",
+      "keywords": ["tourist", "arrivals", "Western Australia", "Perth", "visitors", "million", "increase", "recovery", "maximum", "minimum", "2024", "2020"],
+      "sampleResponse": "The given image represents an informative chart regarding International Tourist Arrivals in Western Australia. According to the picture, we can see several key elements, including 2018, 2020, 2022, and 2024. Looking closely, the maximum figure is observed in the year 2024 with over 1.2 million visitors, while the minimum figure is found in 2020 with around 300 thousand visitors. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Tourist Arrivals in Western Australia (Thousands)</text><line x1='50' y1='190' x2='360' y2='190' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='190' stroke='#94A3B8' stroke-width='2'/><rect x='80' y='80' width='45' height='110' fill='#0284C7' rx='4'/><text x='102' y='72' text-anchor='middle' font-size='11' font-weight='bold' fill='#0284C7'>950k</text><text x='102' y='208' text-anchor='middle' font-size='11' fill='#475569'>2018</text><rect x='150' y='145' width='45' height='45' fill='#EF4444' rx='4'/><text x='172' y='137' text-anchor='middle' font-size='11' font-weight='bold' fill='#EF4444'>300k</text><text x='172' y='208' text-anchor='middle' font-size='11' fill='#475569'>2020</text><rect x='220' y='95' width='45' height='95' fill='#0EA5E9' rx='4'/><text x='242' y='87' text-anchor='middle' font-size='11' font-weight='bold' fill='#0EA5E9'>820k</text><text x='242' y='208' text-anchor='middle' font-size='11' fill='#475569'>2022</text><rect x='290' y='55' width='45' height='135' fill='#10B981' rx='4'/><text x='312' y='47' text-anchor='middle' font-size='11' font-weight='bold' fill='#10B981'>1,200k</text><text x='312' y='208' text-anchor='middle' font-size='11' fill='#475569'>2024</text></svg>"
+    },
+    {
+      "id": "di-002",
+      "title": "Hospitality Operational Expenditure Breakdown",
+      "chartType": "pie_chart",
+      "topic": "Annual Operational Expenditure in a Commercial Restaurant",
+      "categories": ["Labor & Staff", "Food Ingredients", "Rent & Utilities", "Marketing"],
+      "highPoint": "Labor and staff wages accounting for 42 percent of total expenses",
+      "lowPoint": "Marketing and advertising representing only 8 percent",
+      "keywords": ["operational", "expenditure", "commercial", "restaurant", "labor", "ingredients", "rent", "marketing", "percentage", "maximum", "minimum"],
+      "sampleResponse": "The given image represents an informative chart regarding Annual Operational Expenditure in a Commercial Restaurant. According to the picture, we can see several key elements, including labor and staff, food ingredients, rent and utilities, and marketing. Looking closely, the maximum figure is observed in labor and staff at 42 percent, while the minimum figure is found in marketing at only 8 percent. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Restaurant Expenditure Breakdown (%)</text><circle cx='140' cy='130' r='75' fill='none' stroke='#0284C7' stroke-width='40' stroke-dasharray='198 471' transform='rotate(-90 140 130)'/><circle cx='140' cy='130' r='75' fill='none' stroke='#10B981' stroke-width='40' stroke-dasharray='141 471' stroke-dashoffset='-198' transform='rotate(-90 140 130)'/><circle cx='140' cy='130' r='75' fill='none' stroke='#F59E0B' stroke-width='40' stroke-dasharray='94 471' stroke-dashoffset='-339' transform='rotate(-90 140 130)'/><circle cx='140' cy='130' r='75' fill='none' stroke='#EC4899' stroke-width='40' stroke-dasharray='38 471' stroke-dashoffset='-433' transform='rotate(-90 140 130)'/><rect x='250' y='70' width='14' height='14' fill='#0284C7' rx='3'/><text x='272' y='82' font-size='11' font-weight='bold' fill='#1E293B'>Labor (42%)</text><rect x='250' y='100' width='14' height='14' fill='#10B981' rx='3'/><text x='272' y='112' font-size='11' font-weight='bold' fill='#1E293B'>Food (30%)</text><rect x='250' y='130' width='14' height='14' fill='#F59E0B' rx='3'/><text x='272' y='142' font-size='11' font-weight='bold' fill='#1E293B'>Rent (20%)</text><rect x='250' y='160' width='14' height='14' fill='#EC4899' rx='3'/><text x='272' y='172' font-size='11' font-weight='bold' fill='#1E293B'>Marketing (8%)</text></svg>"
+    },
+    {
+      "id": "di-003",
+      "title": "Global Renewable Power Generation Trend",
+      "chartType": "line_graph",
+      "topic": "Global Renewable Power Generation from 2015 to 2025",
+      "categories": ["2015", "2018", "2021", "2025"],
+      "highPoint": "the projected capacity in 2025 exceeding 3800 Gigawatts",
+      "lowPoint": "the starting figure in 2015 at approximately 1800 Gigawatts",
+      "keywords": ["renewable", "power", "generation", "global", "energy", "gigawatts", "solar", "wind", "increase", "maximum", "2025", "minimum", "2015"],
+      "sampleResponse": "The given image represents an informative chart regarding Global Renewable Power Generation. According to the picture, we can see several key elements, including 2015, 2018, 2021, and 2025. Looking closely, the maximum figure is observed in the year 2025 at over 3800 Gigawatts, while the minimum figure is found in 2015 at approximately 1800 Gigawatts. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Renewable Capacity (Gigawatts)</text><line x1='50' y1='190' x2='360' y2='190' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='190' stroke='#94A3B8' stroke-width='2'/><path d='M80,165 Q150,150 220,110 T340,55' fill='none' stroke='#059669' stroke-width='4'/><circle cx='80' cy='165' r='5' fill='#059669'/><text x='80' y='152' text-anchor='middle' font-size='11' font-weight='bold' fill='#059669'>1.8k</text><text x='80' y='208' text-anchor='middle' font-size='11' fill='#475569'>2015</text><circle cx='160' cy='140' r='5' fill='#059669'/><text x='160' y='128' text-anchor='middle' font-size='11' font-weight='bold' fill='#059669'>2.3k</text><text x='160' y='208' text-anchor='middle' font-size='11' fill='#475569'>2018</text><circle cx='240' cy='105' r='5' fill='#059669'/><text x='240' y='92' text-anchor='middle' font-size='11' font-weight='bold' fill='#059669'>3.0k</text><text x='240' y='208' text-anchor='middle' font-size='11' fill='#475569'>2021</text><circle cx='340' cy='55' r='5' fill='#059669'/><text x='340' y='42' text-anchor='middle' font-size='11' font-weight='bold' fill='#059669'>3.8k</text><text x='340' y='208' text-anchor='middle' font-size='11' fill='#475569'>2025</text></svg>"
+    },
+    {
+      "id": "di-004",
+      "title": "Commercial Kitchen Food Safety Flowchart",
+      "chartType": "process_diagram",
+      "topic": "HACCP Food Safety Process in Commercial Kitchens",
+      "categories": ["Receiving Raw Goods", "Cold Storage", "Thermal Cooking", "Plate Service"],
+      "highPoint": "the critical thermal cooking stage reaching over 75 degrees Celsius",
+      "lowPoint": "the cold storage stage strictly maintained below 5 degrees Celsius",
+      "keywords": ["food", "safety", "HACCP", "receiving", "storage", "cooking", "service", "temperature", "critical", "process", "commercial", "kitchen"],
+      "sampleResponse": "The given image represents an informative chart regarding the HACCP Food Safety Process in Commercial Kitchens. According to the picture, we can see several key elements, including receiving raw goods, cold storage, thermal cooking, and plate service. Looking closely, the maximum figure is observed in thermal cooking exceeding 75 degrees, while the minimum figure is found in cold storage below 5 degrees. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>HACCP Kitchen Safety Workflow</text><rect x='30' y='70' width='70' height='60' fill='#E0F2FE' stroke='#0284C7' stroke-width='2' rx='8'/><text x='65' y='96' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='114' text-anchor='middle' font-size='9' fill='#0369A1'>Receiving</text><text x='115' y='105' font-size='16' fill='#0284C7'>➔</text><rect x='130' y='70' width='70' height='60' fill='#FEF3C7' stroke='#D97706' stroke-width='2' rx='8'/><text x='165' y='96' text-anchor='middle' font-size='10' font-weight='bold' fill='#B45309'>Step 2</text><text x='165' y='114' text-anchor='middle' font-size='9' fill='#B45309'>Storage &lt;5°C</text><text x='215' y='105' font-size='16' fill='#D97706'>➔</text><rect x='230' y='70' width='70' height='60' fill='#FEE2E2' stroke='#DC2626' stroke-width='2' rx='8'/><text x='265' y='96' text-anchor='middle' font-size='10' font-weight='bold' fill='#B91C1C'>Step 3</text><text x='265' y='114' text-anchor='middle' font-size='9' fill='#B91C1C'>Cooking &gt;75°C</text><text x='315' y='105' font-size='16' fill='#DC2626'>➔</text><rect x='330' y='70' width='60' height='60' fill='#DCFCE7' stroke='#16A34A' stroke-width='2' rx='8'/><text x='360' y='96' text-anchor='middle' font-size='10' font-weight='bold' fill='#15803D'>Step 4</text><text x='360' y='114' text-anchor='middle' font-size='9' fill='#15803D'>Service</text><rect x='40' y='160' width='320' height='48' fill='#F1F5F9' rx='6'/><text x='200' y='182' text-anchor='middle' font-size='10' font-weight='bold' fill='#334155'>Standard Operating Quality Checklist</text><text x='200' y='198' text-anchor='middle' font-size='9' fill='#64748B'>Critical Temperature Monitoring at Every Step</text></svg>"
+    }
+  ]
+}

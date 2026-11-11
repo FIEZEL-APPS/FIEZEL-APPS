@@ -1509,6 +1509,10 @@ jobs:
           node tests/mandarin-blueprint-integrity-test.js
           node tests/mandarin-pinyin-ruby-test.js
           node tests/mandarin-tutor-braincore-feedback-test.js
+      - name: 'PTE Academic Big 4 Prep Hub Engine & Content Bank Integrity'
+        run: |
+          node tests/pte-academic-engine-test.js
+          node tests/pte-bank-integrity-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +
