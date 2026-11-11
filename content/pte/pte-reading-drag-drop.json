@@ -1,0 +1,237 @@
+{
+  "version": "1.0.0",
+  "task": "Reading: Fill in the Blanks (Drag and Drop)",
+  "crossSkills": [
+    "Reading"
+  ],
+  "pool": "Pearson PTE Academic Official Guide & Real Exam Prediction Bank",
+  "items": [
+    {
+      "id": "r-dd-001",
+      "title": "Ocean Acidification and Marine Ecosystems",
+      "domain": "Marine Biology & Environmental Science",
+      "text": "The absorption of atmospheric carbon dioxide by the world's oceans has triggered a chemical process known as ocean acidification. As marine waters become increasingly acidic, the availability of carbonate ions decreases, which poses a severe challenge for shell-forming organisms such as oysters, clams, and coral reefs. Without adequate minerals, these organisms struggle to [blank_1] their protective outer structures. Over time, the degradation of coral reefs can cause irreversible [blank_2] to biodiversity, leaving fish species without breeding habitats. Marine scientists are actively developing conservation models to [blank_3] vulnerable ecosystems from catastrophic collapse.",
+      "wordPool": [
+        "build",
+        "damage",
+        "protect",
+        "destructive",
+        "destroy",
+        "carefully"
+      ],
+      "correctAnswers": {
+        "blank_1": "build",
+        "blank_2": "damage",
+        "blank_3": "protect"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "build",
+          "grammarFormula": "Rumus Infinitive: 'struggle to' + Verb 1 murni (base form). Pilihan kata kerja dasar untuk membuat cangkang pelindung adalah 'build'.",
+          "collocation": "build protective structures (= membangun/membentuk struktur pelindung)",
+          "distractorTip": "'Destructive' adalah adjective, 'carefully' adalah adverb, dan 'destroy' berlawanan secara logika."
+        },
+        "blank_2": {
+          "correct": "damage",
+          "grammarFormula": "Rumus Frasa Benda: Setelah adjective 'irreversible', kita membutuhkan Noun (kata benda).",
+          "collocation": "cause irreversible damage to (= menyebabkan kerusakan yang tak terpulihkan pada)",
+          "distractorTip": "'Damage' berstatus uncountable noun dalam konteks ini. 'Destructive' salah karena bentuk kata sifat."
+        },
+        "blank_3": {
+          "correct": "protect",
+          "grammarFormula": "Rumus Infinitive of Purpose: 'models to' + Verb 1 murni. Pola preposisi: 'protect [something] from [danger]'.",
+          "collocation": "protect ecosystems from collapse (= melindungi ekosistem dari keruntuhan)",
+          "distractorTip": "'Destroy' berarti merusak (salah logika tujuan konservasi)."
+        }
+      }
+    },
+    {
+      "id": "r-dd-002",
+      "title": "Culinary Tourism and Regional Economics",
+      "domain": "Hospitality & Tourism Economics",
+      "text": "Culinary tourism has emerged as a major catalyst for regional economic revitalization in regional Western Australia. Travelers increasingly seek authentic dining experiences that showcase local produce, artisanal cheeses, and boutique wines. Local hospitality operators must therefore [blank_1] compelling narratives around their culinary heritage. By establishing direct partnerships with agricultural producers, restaurateurs can guarantee ingredient freshness while stimulating the rural economy. In addition, culinary festivals have proven highly [blank_2] in attracting interstate and international visitors during off-peak seasonal travel periods.",
+      "wordPool": [
+        "create",
+        "effective",
+        "effectively",
+        "creation",
+        "failure",
+        "ignore"
+      ],
+      "correctAnswers": {
+        "blank_1": "create",
+        "blank_2": "effective"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "create",
+          "grammarFormula": "Rumus Modal: Setelah modal verb 'must' (dan adverb 'therefore'), kata kerja WAJIB berbentuk Verb 1 murni.",
+          "collocation": "create compelling narratives (= menciptakan narasi yang memikat)",
+          "distractorTip": "'Creation' adalah kata benda (noun), 'effectively' adalah adverb, dan 'ignore' bertentangan dengan konteks."
+        },
+        "blank_2": {
+          "correct": "effective",
+          "grammarFormula": "Rumus Linking Verb: 'prove / have proven' + Adverb of Degree ('highly') + Kata Sifat (Adjective).",
+          "collocation": "prove highly effective in (+ V-ing) (= terbukti sangat efektif dalam)",
+          "distractorTip": "'Effectively' adalah adverb (tidak bisa berpasangan dengan linking verb 'have proven' untuk mendeskripsikan subjek). 'Failure' adalah kata benda."
+        }
+      }
+    },
+    {
+      "id": "r-dd-003",
+      "title": "Fermentation Techniques in Food Production",
+      "domain": "Commercial Cookery & Science",
+      "text": "Fermentation is an ancient biochemical process that transforms raw food ingredients into flavorful culinary delicacies. Microorganisms such as yeast and bacteria {blank_1} sugars into acids or alcohol under controlled conditions. This biochemical transformation not only extends the shelf life of perishable products, but also {blank_2} the nutritional bioavailability of key vitamins. Modern chefs increasingly employ artisanal fermentation to {blank_3} distinctive flavor profiles in gourmet dishes.",
+      "wordPool": [
+        "convert",
+        "enhances",
+        "create",
+        "destroy",
+        "carelessly",
+        "harmful"
+      ],
+      "correctAnswers": {
+        "blank_1": "convert",
+        "blank_2": "enhances",
+        "blank_3": "create"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "convert",
+          "grammarFormula": "Rumus Present Plural: Subjek 'Microorganisms' adalah jamak, memerlukan Verb 1 murni 'convert' yang berpasangan dengan preposisi 'into'.",
+          "collocation": "convert sugars into acids (= mengubah gula menjadi asam)",
+          "distractorTip": "'Destroy' salah makna biokimia; 'harmful' adalah adjective."
+        },
+        "blank_2": {
+          "correct": "enhances",
+          "grammarFormula": "Rumus Parallel Verb: Subjek 'This biochemical transformation' adalah tunggal, sejajar dengan 'extends', sehingga membutuhkan verb tunggal berakhiran -s ('enhances').",
+          "collocation": "enhances nutritional bioavailability (= meningkatkan ketersediaan hayati nutrisi)",
+          "distractorTip": "'Enhances' berbentuk singular; 'convert' dan 'create' bentuk dasar."
+        },
+        "blank_3": {
+          "correct": "create",
+          "grammarFormula": "Rumus Infinitive of Purpose: 'to' + Verb 1 murni untuk menyatakan tujuan pembuatan cita rasa baru.",
+          "collocation": "create distinctive flavor profiles (= menciptakan profil rasa yang khas)",
+          "distractorTip": "'Carelessly' adalah adverb yang merusak makna kuliner profesional."
+        }
+      }
+    },
+    {
+      "id": "r-dd-004",
+      "title": "Deforestation and Climate Feedback Loops",
+      "domain": "Environmental Science",
+      "text": "Tropical rainforests play a critical role in stabilizing global atmospheric systems by capturing enormous volumes of carbon. When vast areas of canopy are {blank_1} for agricultural expansion, this stored carbon is released directly into the atmosphere. The loss of foliage also disrupts localized precipitation patterns, leaving remaining woodlands increasingly {blank_2} to wildfires. Climatologists warn that these compounding pressures could {blank_3} irreversible ecological degradation across the Amazon basin.",
+      "wordPool": [
+        "cleared",
+        "vulnerable",
+        "trigger",
+        "protect",
+        "heavily",
+        "safe"
+      ],
+      "correctAnswers": {
+        "blank_1": "cleared",
+        "blank_2": "vulnerable",
+        "blank_3": "trigger"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "cleared",
+          "grammarFormula": "Rumus Passive Voice: 'are' + Verb 3 (Past Participle) yang menjelaskan penebangan/pembersihan hutan.",
+          "collocation": "cleared for agricultural expansion (= ditebang/dibersihkan demi perluasan pertanian)",
+          "distractorTip": "'Safe' adalah adjective; 'protect' berlawanan konteks deforestasi."
+        },
+        "blank_2": {
+          "correct": "vulnerable",
+          "grammarFormula": "Rumus Predicative Adjective: 'leaving remaining woodlands increasingly' + Adjective yang berpasangan dengan preposisi 'to'.",
+          "collocation": "vulnerable to wildfires (= rentan terhadap kebakaran hutan)",
+          "distractorTip": "'Heavily' adalah adverb; 'vulnerable' berpasangan resmi dengan 'to'."
+        },
+        "blank_3": {
+          "correct": "trigger",
+          "grammarFormula": "Rumus Modal Auxiliary: 'could' + Verb 1 murni (base form) bermakna memicu/mengakibatkan.",
+          "collocation": "trigger irreversible degradation (= memicu degradasi yang tak terpulihkan)",
+          "distractorTip": "'Trigger' adalah kata kerja penyebab (causative verb)."
+        }
+      }
+    },
+    {
+      "id": "r-dd-005",
+      "title": "The Evolution of Commercial Aviation",
+      "domain": "Aviation & Engineering",
+      "text": "The development of jet propulsion revolutionized passenger travel by dramatically reducing journey durations between continents. Modern aeronautical engineers prioritize fuel efficiency and noise reduction to {blank_1} international environmental standards. Advanced composite materials have enabled manufacturers to construct lighter airframes that withstand extreme atmospheric {blank_2}. Consequently, airline operators can maintain reliable schedules while significantly minimizing operating {blank_3}.",
+      "wordPool": [
+        "meet",
+        "pressures",
+        "costs",
+        "ignore",
+        "violently",
+        "heavy"
+      ],
+      "correctAnswers": {
+        "blank_1": "meet",
+        "blank_2": "pressures",
+        "blank_3": "costs"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "meet",
+          "grammarFormula": "Rumus Kolokasi Standar: 'to meet standards' = memenuhi standar regulasi resmi.",
+          "collocation": "meet environmental standards (= memenuhi standar lingkungan hidup)",
+          "distractorTip": "'Ignore' (mengabaikan) melanggar komitmen kepatuhan penerbangan."
+        },
+        "blank_2": {
+          "correct": "pressures",
+          "grammarFormula": "Rumus Frasa Benda: Setelah adjective 'atmospheric', dibutuhkan Noun yang cocok dengan kondisi fisika penerbangan tinggi.",
+          "collocation": "withstand extreme atmospheric pressures (= menahan tekanan atmosfer ekstrem)",
+          "distractorTip": "'Violently' adalah adverb; 'pressures' adalah kata benda fisik."
+        },
+        "blank_3": {
+          "correct": "costs",
+          "grammarFormula": "Rumus Kolokasi Finansial: 'minimizing operating costs' adalah frasa bisnis baku dalam manajemen maskapai.",
+          "collocation": "minimizing operating costs (= meminimalkan biaya operasional)",
+          "distractorTip": "'Costs' melengkapi frasa 'operating costs'."
+        }
+      }
+    },
+    {
+      "id": "r-dd-006",
+      "title": "Cognitive Benefits of Bilingualism",
+      "domain": "Psycholinguistics",
+      "text": "Research in cognitive neuroscience suggests that speaking multiple languages enhances mental flexibility and executive control. Bilingual individuals frequently demonstrate superior abilities to {blank_1} between conflicting tasks without confusion. Furthermore, active bilingualism appears to {blank_2} the onset of age-related cognitive decline by reinforcing neural connectivity. These intellectual advantages highlight the profound lifelong value of early language {blank_3}.",
+      "wordPool": [
+        "switch",
+        "delay",
+        "acquisition",
+        "forget",
+        "slowly",
+        "weak"
+      ],
+      "correctAnswers": {
+        "blank_1": "switch",
+        "blank_2": "delay",
+        "blank_3": "acquisition"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "switch",
+          "grammarFormula": "Rumus Infinitive: 'abilities to' + Verb 1 murni yang berpasangan dengan preposisi 'between'.",
+          "collocation": "switch between tasks (= berpindah antar tugas)",
+          "distractorTip": "'Forget' berlawanan makna kognitif unggul; 'slowly' adalah adverb."
+        },
+        "blank_2": {
+          "correct": "delay",
+          "grammarFormula": "Rumus Infinitive: 'appears to' + Verb 1 murni yang bermakna menunda/menghambat terjadinya penuaan kognitif.",
+          "collocation": "delay the onset of cognitive decline (= menunda awitan penurunan kognitif)",
+          "distractorTip": "'Weak' adalah adjective; 'delay' adalah verb aktif pelindung."
+        },
+        "blank_3": {
+          "correct": "acquisition",
+          "grammarFormula": "Rumus Frasa Nama: 'early language acquisition' adalah istilah linguistik baku untuk pemerolehan bahasa sejak dini.",
+          "collocation": "early language acquisition (= pemerolehan bahasa usia dini)",
+          "distractorTip": "'Acquisition' berposisi sebagai noun penutup frasa kata benda."
+        }
+      }
+    }
+  ]
+}

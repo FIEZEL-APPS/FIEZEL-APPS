@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "task": "Re-tell Lecture",
+  "crossSkills": [
+    "Speaking",
+    "Listening"
+  ],
+  "pool": "Pearson Real Exam Prediction Bank",
+  "items": [
+    {
+      "id": "rl-001",
+      "title": "The Barnum Effect in Psychology",
+      "domain": "Cognitive Psychology",
+      "audioTranscript": "Today we are going to explore a psychological phenomenon known as the Barnum effect. Individuals have a strong tendency to believe that generic personality descriptions apply specifically to them, even when the descriptions are vague enough to describe almost anyone. This cognitive bias explains why astrology, fortune cookies, and generalized personality tests enjoy immense public popularity. When statements sound positive and universally relatable, the human brain readily embraces them as profound personal insights.",
+      "keyNounChunks": [
+        "the Barnum effect",
+        "generic personality descriptions",
+        "cognitive bias",
+        "immense public popularity",
+        "profound personal insights"
+      ],
+      "nakulTemplateSpeech": "The lecture discusses the Barnum effect. In the beginning, the speaker explained generic personality descriptions. Later, the speaker said that cognitive bias influences decision making. Here, the speaker also mentioned immense public popularity. In conclusion, the lecture effectively summarized profound personal insights.",
+      "timingTargetSec": 25
+    },
+    {
+      "id": "rl-002",
+      "title": "Dark Matter in Modern Astrophysics",
+      "domain": "Astrophysics & Cosmology",
+      "audioTranscript": "When astronomers observe the rotation curves of spiral galaxies, they encounter a startling discrepancy between Newtonian gravitational predictions and empirical reality. The visible stars and luminous gas clouds at the outer edges of galaxies are moving far too quickly to be held together by visible baryonic matter alone. To explain this astronomical anomaly, astrophysicists postulate the existence of dark matter—a non-luminous, non-baryonic substance that interacts almost exclusively through gravitational pull rather than electromagnetic radiation. Current cosmological calculations suggest that dark matter constitutes approximately twenty-seven percent of the entire universe's mass-energy budget. While particle physicists continue to search for candidate particles such as WIMPs and axions using ultra-deep underground detectors, dark matter remains one of the greatest unsolved mysteries in fundamental physics.",
+      "keyNounChunks": [
+        "spiral galaxies",
+        "visible baryonic matter",
+        "dark matter",
+        "astronomical anomaly",
+        "electromagnetic radiation",
+        "cosmological calculations",
+        "underground detectors"
+      ],
+      "nakulTemplateSpeech": "The lecture primarily discussed dark matter in modern astrophysics. He highlighted visible baryonic matter and gravitational predictions. Furthermore, he explained cosmological calculations and non-luminous substances. He also mentioned underground detectors and particle candidates. Finally, the speaker concluded that dark matter remains a fundamental mystery.",
+      "timingTargetSec": 28
+    },
+    {
+      "id": "rl-003",
+      "title": "Food Preservation in Ancient Civilizations",
+      "domain": "Vocational Hospitality & Food History",
+      "audioTranscript": "Long before the invention of mechanical refrigeration, human civilizations developed ingenious biochemical methods to preserve perishable foodstuffs across harsh winters and long oceanic voyages. In ancient Mesopotamia and Egypt, people harnessed solar dehydration and salt curing to preserve beef, fish, and fowl. High concentrations of sodium chloride draw moisture out of microbial cells through osmotic pressure, effectively inhibiting bacterial proliferation. In cooler alpine and northern climates, early societies developed cold-smoking and lactic acid fermentation techniques, producing fermented cheeses, sausages, and preserved vegetables like sauerkraut. These traditional food preservation crafts not only safeguarded ancient populations against seasonal famines, but also laid the technological groundwork for contemporary commercial food safety protocols.",
+      "keyNounChunks": [
+        "perishable foodstuffs",
+        "mechanical refrigeration",
+        "solar dehydration",
+        "salt curing",
+        "osmotic pressure",
+        "bacterial proliferation",
+        "food safety protocols"
+      ],
+      "nakulTemplateSpeech": "The lecture primarily discussed food preservation in ancient civilizations. He highlighted mechanical refrigeration and perishable foodstuffs. Furthermore, he explained solar dehydration and salt curing. He also mentioned osmotic pressure and bacterial proliferation. Finally, the speaker concluded that ancient techniques founded modern food safety protocols.",
+      "timingTargetSec": 28
+    },
+    {
+      "id": "rl-004",
+      "title": "Behavioral Economics and Heuristic Biases",
+      "domain": "Economics & Psychology",
+      "audioTranscript": "Classical economic models historically assumed that human market participants are rational agents who systematically calculate optimal utilities before making financial decisions. However, the rise of behavioral economics in the late twentieth century dismantled this pristine assumption. Pioneering researchers demonstrated that human decision-makers rely heavily on mental shortcuts known as heuristics when navigating complex choices. For instance, the availability heuristic leads individuals to assess probability based on how easily vivid instances come to mind, such as fearing airplane crashes over far more statistically dangerous automobile journeys. Similarly, loss aversion reveals that the psychological pain of losing one hundred dollars is twice as intense as the joy of gaining the same sum. Recognizing these cognitive biases allows policymakers and economists to design ethical 'nudges' that guide citizens toward healthier financial and nutritional choices.",
+      "keyNounChunks": [
+        "behavioral economics",
+        "rational agents",
+        "mental shortcuts",
+        "availability heuristic",
+        "loss aversion",
+        "cognitive biases",
+        "ethical nudges"
+      ],
+      "nakulTemplateSpeech": "The lecture primarily discussed behavioral economics and heuristic biases. He highlighted rational agents and financial decisions. Furthermore, he explained availability heuristics and mental shortcuts. He also mentioned loss aversion and cognitive biases. Finally, the speaker concluded that ethical nudges guide better financial decisions.",
+      "timingTargetSec": 28
+    },
+    {
+      "id": "rl-005",
+      "title": "Renewable Energy and Battery Chemistry",
+      "domain": "Clean Energy Engineering",
+      "audioTranscript": "The worldwide transition toward solar and wind power faces a fundamental engineering challenge known as intermittency. Solar panels generate maximum electricity during midday hours when the sun shines brightest, while wind turbines fluctuate with shifting atmospheric currents. To store this variable green energy for nighttime and calm weather, advanced battery storage systems are absolutely indispensable. While lithium-ion batteries currently dominate grid storage and electric vehicles due to their high energy density, material scientists are rapidly developing alternative chemistries. Sodium-ion batteries, for instance, utilize abundant sea salt and do not require scarce cobalt or nickel, making them significantly cheaper for large-scale utility installations. In addition, flow batteries utilize liquid electrolytes in external tanks, offering long-duration energy discharge without thermal degradation. Developing these next-generation battery architectures is critical to achieving a fully decarbonized global electrical grid.",
+      "keyNounChunks": [
+        "renewable energy",
+        "intermittency challenge",
+        "battery storage systems",
+        "lithium-ion batteries",
+        "sodium-ion batteries",
+        "flow batteries",
+        "decarbonized electrical grid"
+      ],
+      "nakulTemplateSpeech": "The lecture primarily discussed renewable energy and battery chemistry. He highlighted the intermittency challenge in solar and wind power. Furthermore, he explained lithium-ion batteries and sodium-ion alternatives. He also mentioned flow batteries and liquid electrolytes. Finally, the speaker concluded that next-generation batteries enable a decarbonized grid.",
+      "timingTargetSec": 28
+    }
+  ]
+}

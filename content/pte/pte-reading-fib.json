@@ -1,0 +1,483 @@
+{
+  "version": "1.0.0",
+  "task": "Reading & Writing: Fill in the Blanks (Dropdown)",
+  "crossSkills": [
+    "Reading",
+    "Writing"
+  ],
+  "pool": "Pearson PTE Academic & E2Language Recurring Real Exam Prediction Bank",
+  "items": [
+    {
+      "id": "rw-fib-001",
+      "title": "Dietary Habits and Longevity",
+      "domain": "Health & Nutrition Sciences",
+      "text": "Recent longitudinal epidemiological studies have demonstrated that dietary patterns play a vital [blank_1] in determining life expectancy. Researchers who examined populations adhering to Mediterranean diets observed a marked reduction in cardiovascular risks. In addition, individuals must rely [blank_2] nutrient-dense whole foods rather than ultra-processed alternatives to maintain metabolic health. [blank_3], public health organizations continue to advocate for comprehensive lifestyle interventions that encourage regular physical activity alongside balanced caloric intake.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "role",
+          "options": [
+            "role",
+            "part",
+            "work",
+            "function"
+          ],
+          "deepFeedback": {
+            "formula": "Pasangan Kolokasi Paten (Collocation): 'play a vital/crucial/important role in' adalah frasa akademik standar bahasa Inggris.",
+            "grammarRule": "Setelah kata sifat 'vital', kita membutuhkan kata benda (noun) yang secara idiomatik berkolokasi dengan kata kerja 'play'.",
+            "collocation": "play a vital role in (= memainkan peran penting dalam)",
+            "distractorAnalysis": "'Part' biasanya memakai 'play a part in' tetapi 'play a vital role' adalah kolokasi akademik resmi berbobot tinggi di kamus Oxford Collocations. 'Work' dan 'function' tidak digunakan bersama kata kerja 'play' dalam konteks ini.",
+            "translation": "Pola makan memainkan peran penting dalam menentukan harapan hidup."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "on",
+          "options": [
+            "on",
+            "in",
+            "with",
+            "at"
+          ],
+          "deepFeedback": {
+            "formula": "Pasangan Kata Kerja + Preposisi Paten: Kata kerja 'rely' dan 'depend' SELALU berpasangan dengan preposisi 'on' (atau 'upon').",
+            "grammarRule": "Dependent preposition: rely + on + noun/pronoun.",
+            "collocation": "rely on (= bergantung pada / mengandalkan)",
+            "distractorAnalysis": "'In', 'with', dan 'at' tidak dapat mengikuti kata kerja 'rely'. Menggunakan preposisi lain dianggap kesalahan tata bahasa dasar di Pearson.",
+            "translation": "Individu harus mengandalkan makanan utuh padat nutrisi daripada makanan olahan."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "Consequently",
+          "options": [
+            "Consequently",
+            "However",
+            "Although",
+            "Despite"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Sebab-Akibat / Hasil): Kalimat sebelumnya menjelaskan bukti ilmiah, maka kalimat ini menyampaikan akibat/tindakan lanjutan logis.",
+            "grammarRule": "Linking adverb diikuti tanda koma di awal kalimat mandiri ('Consequently, ...').",
+            "linkingWordType": "Cause and Effect / Logical Result (= Oleh karena itu / Akibatnya)",
+            "distractorAnalysis": "'However' salah karena kalimat ini tidak bertentangan dengan kalimat sebelumnya. 'Although' dan 'Despite' adalah konjungsi subordinatif yang membutuhkan klausa anak, tidak bisa berdiri sendiri di depan tanda koma.",
+            "translation": "Oleh karena itu, organisasi kesehatan masyarakat terus mengadvokasi intervensi gaya hidup komprehensif."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-002",
+      "title": "Renewable Energy Transition",
+      "domain": "Environmental Science & Economics",
+      "text": "The international transition toward sustainable energy sources has accelerated significantly over the past decade. Governments around the world have implemented stringent regulations to [blank_1] greenhouse gas emissions from heavy industries. While solar and wind infrastructure has become substantially more cost-effective, energy grids must still be modernized to [blank_2] intermittent power generation. [blank_3], fossil fuels remain a primary component of global base-load electricity in developing nations.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "curtail",
+          "options": [
+            "curtail",
+            "curtailed",
+            "curtailing",
+            "curtailment"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Modal / Infinitive: Setelah partikel 'to' (infinitive of purpose), kata kerja WAJIB berbentuk VERB 1 (base form).",
+            "grammarRule": "to + Verb 1 murni (tanpa akhiran -ed, -ing, atau akhiran benda -ment).",
+            "collocation": "curtail emissions (= mengurangi/memangkas emisi gas buang)",
+            "distractorAnalysis": "'Curtailed' adalah bentuk lampau (V2/V3), 'curtailing' adalah gerund/participle, dan 'curtailment' adalah kata benda (noun). Ketiganya melanggar aturan infinitive 'to + V1'.",
+            "translation": "Pemerintah telah menerapkan regulasi ketat untuk memangkas emisi gas rumah kaca."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "accommodate",
+          "options": [
+            "accommodate",
+            "accommodates",
+            "accommodation",
+            "accommodated"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Infinitive: Setelah 'to', kata kerja wajib berbentuk dasar (Verb 1).",
+            "grammarRule": "to + Verb 1 murni.",
+            "collocation": "accommodate power generation (= memfasilitasi/menampung pasokan pembangkit listrik)",
+            "distractorAnalysis": "'Accommodates' memiliki akhiran -s (hanya untuk present singular subject), 'accommodation' adalah noun, 'accommodated' adalah past tense. Hanya 'accommodate' yang berbentuk V1.",
+            "translation": "Jaringan listrik harus dimodernisasi untuk menampung pembangkitan daya yang berselang-seling."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "Nevertheless",
+          "options": [
+            "Nevertheless",
+            "Furthermore",
+            "Therefore",
+            "Because"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Kontras / Berlawanan): Kalimat sebelumnya memuji kemajuan energi surya/angin (+), tetapi kalimat ini menunjukkan bahwa bahan bakar fosil masih dominan (-).",
+            "grammarRule": "Conjunctive adverb diikuti tanda koma: 'Nevertheless, ...'",
+            "linkingWordType": "Contrast / Concession (= Meskipun demikian / Namun demikian)",
+            "distractorAnalysis": "'Furthermore' (penambahan ide searah) dan 'Therefore' (sebab-akibat) salah arah logika. 'Because' tidak dapat berdiri sendiri di depan koma sebelum klausa lengkap.",
+            "translation": "Meskipun demikian, bahan bakar fosil masih tetap menjadi komponen utama listrik beban dasar global."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-003",
+      "title": "Hospitality Management and Customer Loyalty",
+      "domain": "Hospitality & Commercial Cookery",
+      "text": "In the modern hospitality sector, culinary excellence alone is no longer sufficient to guarantee commercial viability. Establishments must place tremendous emphasis [blank_1] customer service and ambiance to cultivate sustained patronage. Front-of-house staff are routinely trained to [blank_2] exceptional attention to guest preferences. [blank_3], hotels and premier restaurants that invest in bespoke guest experiences consistently outperform competitors in occupancy and customer satisfaction metrics.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "on",
+          "options": [
+            "on",
+            "in",
+            "for",
+            "with"
+          ],
+          "deepFeedback": {
+            "formula": "Pasangan Kolokasi Paten: 'place emphasis on' adalah kolokasi akademik tetap.",
+            "grammarRule": "place / put emphasis + on + noun/gerund.",
+            "collocation": "place tremendous emphasis on (= menaruh penekanan luar biasa pada)",
+            "distractorAnalysis": "'In', 'for', dan 'with' tidak pernah digunakan bersama 'place emphasis'. Mengabaikan preposisi paten 'on' adalah kesalahan fatal di PTE Reading.",
+            "translation": "Tempat usaha harus menaruh penekanan luar biasa pada pelayanan pelanggan dan suasana."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "deliver",
+          "options": [
+            "deliver",
+            "delivering",
+            "delivered",
+            "delivery"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Infinitive: Setelah 'trained to', kata kerja wajib berbentuk Verb 1 dasar.",
+            "grammarRule": "be trained to + Verb 1.",
+            "collocation": "deliver exceptional attention / service (= memberikan perhatian/pelayanan luar biasa)",
+            "distractorAnalysis": "'Delivering' (-ing), 'delivered' (-ed), dan 'delivery' (noun) melanggar aturan infinitive.",
+            "translation": "Staf bagian depan secara rutin dilatih untuk memberikan perhatian luar biasa terhadap preferensi tamu."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "As a result",
+          "options": [
+            "As a result",
+            "On the other hand",
+            "Conversely",
+            "Despite"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Hasil Logis): Latihan pelayanan prima (sebab) menghasilkan keunggulan persaingan dan kepuasan tamu (hasil).",
+            "grammarRule": "Transitional phrase diikuti tanda koma di awal kalimat: 'As a result, ...'",
+            "linkingWordType": "Cause and Effect (= Hasilnya / Sebagai hasilnya)",
+            "distractorAnalysis": "'On the other hand' dan 'Conversely' digunakan untuk pertentangan/kontras (salah logika). 'Despite' adalah preposisi yang membutuhkan frasa kata benda, bukan kalimat utuh.",
+            "translation": "Sebagai hasilnya, hotel dan restoran terkemuka yang berinvestasi dalam pengalaman tamu secara konsisten mengungguli pesaing."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-004",
+      "title": "Artificial Intelligence in Academic Research",
+      "domain": "Computer Science & Academic Methodology",
+      "text": "The advent of automated neural networks has dramatically transformed how scholars conduct academic literature reviews. Advanced natural language processing models are now capable [blank_1] analyzing thousands of peer-reviewed articles in seconds. Many researchers have [blank_2] that machine learning tools expedite data synthesis. [blank_3], ethical concerns regarding citation hallucinations and intellectual property continue to stimulate rigorous institutional debates.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "of",
+          "options": [
+            "of",
+            "to",
+            "for",
+            "with"
+          ],
+          "deepFeedback": {
+            "formula": "Pasangan Kata Sifat + Preposisi Paten: 'capable' SELALU berpasangan dengan 'of' + gerund (-ing).",
+            "grammarRule": "capable + of + V-ing.",
+            "collocation": "capable of analyzing (= mampu menganalisis)",
+            "distractorAnalysis": "'Capable to' adalah kesalahan umum penutur non-asli. Kata yang memakai 'to' adalah 'able' (able to analyze), sedangkan 'capable' wajib memakai 'of' (capable of analyzing).",
+            "translation": "Model pemrosesan bahasa alami canggih kini mampu menganalisis ribuan artikel ilmiah dalam hitungan detik."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "acknowledged",
+          "options": [
+            "acknowledged",
+            "acknowledge",
+            "acknowledging",
+            "acknowledgment"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Present Perfect: Setelah auxiliary 'have' / 'has' / 'had', kata kerja WAJIB VERB 3 (past participle).",
+            "grammarRule": "have + Verb 3 (acknowledged).",
+            "collocation": "researchers have acknowledged that (= peneliti telah mengakui bahwa)",
+            "distractorAnalysis": "'Acknowledge' adalah V1, 'acknowledging' adalah V-ing, dan 'acknowledgment' adalah kata benda. Hanya 'acknowledged' (V3) yang dapat berpasangan dengan 'have'.",
+            "translation": "Banyak peneliti telah mengakui bahwa alat pembelajaran mesin mempercepat sintesis data."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "However",
+          "options": [
+            "However",
+            "Furthermore",
+            "In addition",
+            "Therefore"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Kontras Nyata): Kalimat sebelumnya memuji kecepatan AI (+), sedangkan kalimat ini menyoroti kekhawatiran etika dan halusinasi kutipan (-).",
+            "grammarRule": "Adverbia kontras dengan koma: 'However, ...'",
+            "linkingWordType": "Contrast / Opposition (= Namun / Akan tetapi)",
+            "distractorAnalysis": "'Furthermore' dan 'In addition' salah karena arah makna berbalik dari positif ke negatif. 'Therefore' salah karena kekhawatiran etis bukan akibat dari kecepatan analisis.",
+            "translation": "Namun demikian, kekhawatiran etis seputar halusinasi kutipan dan kekayaan intelektual terus memicu perdebatan kelembagaan yang ketat."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-005",
+      "title": "Urban Architecture and Sustainable Living",
+      "domain": "Civil Engineering & Architecture",
+      "text": "Urban planning in the twenty-first century has increasingly shifted toward compact, transit-oriented designs. Metropolitan authorities now recognize that sprawling suburbs pose a serious [blank_1] to municipal infrastructure budgets and environmental equilibrium. To counter this unsustainable trend, municipal councils are taking decisive [blank_2] to promote high-density housing within walking distance of public rail networks. When residential districts are thoughtfully integrated with civic amenities, carbon footprints [blank_3] substantially.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "threat",
+          "options": [
+            "threat",
+            "threaten",
+            "threatening",
+            "threatened"
+          ],
+          "deepFeedback": {
+            "formula": "Struktur Frasa Benda: Setelah artikel 'a' dan kata sifat 'serious', kita WAJIB mengisi KATA BENDA (Noun).",
+            "grammarRule": "a + adjective + singular noun.",
+            "collocation": "pose a serious threat to (= menimbulkan ancaman serius bagi)",
+            "distractorAnalysis": "'Threaten' adalah kata kerja (Verb 1), 'threatening' adalah participle/adjective, dan 'threatened' adalah past verb/adjective. Hanya 'threat' yang berstatus kata benda tunggal.",
+            "translation": "Pemerintah metropolitan menyadari bahwa pinggiran kota yang meluas menimbulkan ancaman serius terhadap anggaran kota."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "measures",
+          "options": [
+            "measures",
+            "measure",
+            "measuring",
+            "measurement"
+          ],
+          "deepFeedback": {
+            "formula": "Pasangan Kolokasi Paten E2Language & Nakul: 'take measures / take steps / take action' adalah idiom akademik baku.",
+            "grammarRule": "take decisive measures (= mengambil tindakan/langkah tegas).",
+            "collocation": "take decisive measures to (+ V1)",
+            "distractorAnalysis": "'Measuring' (-ing) dan 'measurement' (pengukuran fisik alat ukur) salah arti. 'Measure' bentuk jamak 'measures' diartikan sebagai tindakan/kebijakan resmi.",
+            "translation": "Dewan kota mengambil langkah-langkah tegas untuk mempromosikan perumahan berkepadatan tinggi."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "decrease",
+          "options": [
+            "decrease",
+            "decreases",
+            "decreased",
+            "decreasing"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Subject-Verb Agreement: Subjek 'carbon footprints' berbentuk JAMAK (plural, berakhiran -s).",
+            "grammarRule": "Plural subject + Verb 1 tanpa akhiran -s di present tense.",
+            "collocation": "carbon footprints decrease substantially (= jejak karbon menurun secara substansial)",
+            "distractorAnalysis": "'Decreases' berakhiran -s hanya untuk subjek tunggal. 'Decreased' adalah past tense (padahal kalimat memakai conditional 'when ... are ...' present tense). 'Decreasing' membutuhkan to be.",
+            "translation": "Ketika kawasan pemukiman diintegrasikan secara cermat, jejak karbon menurun secara substansial."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-006",
+      "title": "Culinary Arts and Global Spice Trade",
+      "domain": "Vocational Hospitality & History",
+      "text": "The historical trade in spices not only transformed culinary traditions across continents but also {1} the trajectory of global commerce. Medieval European merchants {2} unprecedented perils to procure black pepper and cinnamon from Asian ports. In contemporary gastronomy, international spices continue to {3} an indispensable component of gourmet food preparation.",
+      "blanks": [
+        {
+          "id": 1,
+          "correct": "reshaped",
+          "options": [
+            "reshaped",
+            "confused",
+            "abandoned",
+            "repaired"
+          ],
+          "deepFeedback": {
+            "formula": "Pola Akibat Historis: Subjek 'trade in spices' membutuhkan kata kerja masa lampau (Verb 2) bermakna mengubah bentuk sejarah ('reshaped').",
+            "grammarRule": "Bentuk lampau (past tense) sejajar dengan klausa 'transformed'.",
+            "collocation": "reshape the trajectory of (= membentuk kembali jalannya)",
+            "distractorAnalysis": "'Confused' salah makna (membingungkan), 'abandoned' (meninggalkan) berlawanan, 'repaired' (memperbaiki) tidak lazim untuk trajektori sejarah.",
+            "translation": "Perdagangan rempah bersejarah membentuk kembali jalannya perdagangan global."
+          }
+        },
+        {
+          "id": 2,
+          "correct": "braved",
+          "options": [
+            "braved",
+            "feared",
+            "invented",
+            "avoided"
+          ],
+          "deepFeedback": {
+            "formula": "Kolokasi Keberanian: 'brave perils/dangers' adalah kolokasi tingkat tinggi yang berarti menantang marabahaya demi suatu tujuan.",
+            "grammarRule": "Verb transitif lampau yang menerima objek langsung 'unprecedented perils'.",
+            "collocation": "brave perils (= menantang/menghadapi bahaya)",
+            "distractorAnalysis": "'Avoided' (menghindari) berlawanan dengan konteks pedagang yang rela berlayar jauh.",
+            "translation": "Para pedagang Eropa abad pertengahan menantang marabahaya yang belum pernah ada sebelumnya."
+          }
+        },
+        {
+          "id": 3,
+          "correct": "constitute",
+          "options": [
+            "constitute",
+            "demolish",
+            "distort",
+            "expire"
+          ],
+          "deepFeedback": {
+            "formula": "Pola Infinitive: 'continue to' + Verb 1 dasar (base form) yang bermakna 'merupakan/menjadi bagian penting'.",
+            "grammarRule": "Setelah 'to' memerlukan bentuk dasar kata kerja untuk menyatakan kontinuitas peran.",
+            "collocation": "constitute an indispensable component (= merupakan komponen yang tak terpisahkan)",
+            "distractorAnalysis": "'Demolish' (meruntuhkan) dan 'distort' (mendistorsi) bermakna destruktif.",
+            "translation": "Dalam gastronomi kontemporer, rempah internasional terus menjadi komponen tak terpisahkan."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-007",
+      "title": "Ocean Acidification and Marine Life",
+      "domain": "Environmental Science",
+      "text": "As atmospheric carbon dioxide levels escalate, substantial portions are {1} by the world oceans. This biochemical reaction results in ocean acidification, which {2} a grave danger to calcifying organisms. Marine biologists warn that without mitigation, coral reefs could suffer {3} damage within decades.",
+      "blanks": [
+        {
+          "id": 1,
+          "correct": "absorbed",
+          "options": [
+            "absorbed",
+            "radiated",
+            "scattered",
+            "wasted"
+          ],
+          "deepFeedback": {
+            "formula": "Passive Voice Ilmiah: 'are' + Verb 3 (Past Participle) yang menjelaskan penyerapan gas oleh air laut.",
+            "grammarRule": "Bentuk pasif present: 'are absorbed by'.",
+            "collocation": "absorbed by the oceans (= diserap oleh lautan)",
+            "distractorAnalysis": "'Radiated' (dipancarkan) keliru karena laut menyerap CO2, bukan memancarkannya.",
+            "translation": "Porsi signifikan karbon dioksida diserap oleh lautan dunia."
+          }
+        },
+        {
+          "id": 2,
+          "correct": "poses",
+          "options": [
+            "poses",
+            "cures",
+            "invents",
+            "relieves"
+          ],
+          "deepFeedback": {
+            "formula": "Kolokasi Risiko Paten: 'pose a threat / pose a danger' adalah rumus paten kolokasi Pearson.",
+            "grammarRule": "Subject relative clause 'which' mengacu pada 'ocean acidification' (singular) sehingga verb berakhiran -s ('poses').",
+            "collocation": "pose a grave danger to (= menghadirkan/menimbulkan bahaya besar bagi)",
+            "distractorAnalysis": "'Cures' dan 'relieves' justru bermakna menyembuhkan/meredakan.",
+            "translation": "Reaksi biokimia ini menimbulkan bahaya besar bagi organisme bercangkang."
+          }
+        },
+        {
+          "id": 3,
+          "correct": "irreversible",
+          "options": [
+            "irreversible",
+            "tentative",
+            "beneficial",
+            "fictional"
+          ],
+          "deepFeedback": {
+            "formula": "Adjective Modifier: Sebelum noun 'damage', dibutuhkan adjective yang menerangkan kerusakan permanen yang tak dapat diperbaiki.",
+            "grammarRule": "Adjective menerangkan kata benda 'damage'.",
+            "collocation": "suffer irreversible damage (= mengalami kerusakan permanen/tak terpulihkan)",
+            "distractorAnalysis": "'Beneficial' (bermanfaat) berlawanan total dengan nada peringatan ilmiah.",
+            "translation": "Terumbu karang dapat mengalami kerusakan permanen dalam kurun beberapa dekade."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-008",
+      "title": "Psychology of Motivation in Higher Education",
+      "domain": "Educational Psychology",
+      "text": "Academic perseverance often {1} on intrinsic motivation rather than external incentives. When students discover genuine intellectual curiosity, they are more inclined to {2} rigorous study habits. Conversely, individuals motivated solely by grades frequently experience burnout when {3} with unexpected academic difficulties.",
+      "blanks": [
+        {
+          "id": 1,
+          "correct": "hinges",
+          "options": [
+            "hinges",
+            "blames",
+            "resigns",
+            "collides"
+          ],
+          "deepFeedback": {
+            "formula": "Kolokasi Preposisi Paten: 'hinge on' = 'depend on' (sangat bergantung pada).",
+            "grammarRule": "Subjek singular 'Academic perseverance' membutuhkan verb singular present 'hinges'.",
+            "collocation": "hinges on intrinsic motivation (= sangat bergantung pada motivasi intrinsik)",
+            "distractorAnalysis": "'Blame' biasanya berpasangan dengan 'for', bukan 'on' dalam konteks akademis ketergantungan.",
+            "translation": "Ketekunan akademik sering kali bergantung pada motivasi intrinsik."
+          }
+        },
+        {
+          "id": 2,
+          "correct": "cultivate",
+          "options": [
+            "cultivate",
+            "deteriorate",
+            "demolish",
+            "evade"
+          ],
+          "deepFeedback": {
+            "formula": "Pola Infinitive: 'inclined to' + Verb 1 murni yang bermakna menumbuhkan/mengembangkan kebiasaan positif.",
+            "grammarRule": "Bentuk dasar verb untuk kebiasaan.",
+            "collocation": "cultivate study habits (= menumbuhkan/membiasakan pola belajar)",
+            "distractorAnalysis": "'Deteriorate' (memburuk) dan 'evade' (menghindar) bertolak belakang dengan dorongan positif.",
+            "translation": "Mereka lebih terdorong untuk menumbuhkan kebiasaan belajar yang disiplin."
+          }
+        },
+        {
+          "id": 3,
+          "correct": "confronted",
+          "options": [
+            "confronted",
+            "delighted",
+            "rewarded",
+            "praised"
+          ],
+          "deepFeedback": {
+            "formula": "Pola Reduksi Participle: 'when confronted with' (= saat dihadapkan pada/bertemu dengan kesulitan).",
+            "grammarRule": "Bentuk passive participle berpasangan dengan preposisi 'with'.",
+            "collocation": "confronted with unexpected difficulties (= dihadapkan pada kesulitan yang tak terduga)",
+            "distractorAnalysis": "'Delighted' (gembira) tidak masuk akal dipasangkan dengan kesulitan akademik.",
+            "translation": "Saat dihadapkan pada kesulitan akademik yang tak terduga."
+          }
+        }
+      ]
+    }
+  ]
+}

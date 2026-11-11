@@ -1,0 +1,126 @@
+{
+  "version": "1.0.0",
+  "task": "Listening: Fill in the Blanks",
+  "crossSkills": [
+    "Listening",
+    "Writing"
+  ],
+  "pool": "Pearson Real Exam Recurring Classics",
+  "items": [
+    {
+      "id": "lfib-001",
+      "title": "Urban Biodiversity Corridors",
+      "audioTranscript": "City planners are incorporating ecological corridors to allow wildlife species to migrate safely across modern highways. These green bridges reduce vehicle collisions and promote genetic diversity among isolated populations.",
+      "displayedText": "City planners are incorporating ecological [blank_1] to allow wildlife species to [blank_2] safely across modern highways. These green bridges reduce vehicle [blank_3] and promote genetic diversity among isolated populations.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "corridors",
+          "spellingTip": "C-O-R-R-I-D-O-R-S (Dua huruf R, bukan dua huruf L)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "migrate",
+          "spellingTip": "M-I-G-R-A-T-E (Verb 1 setelah 'to allow wildlife to...')."
+        },
+        {
+          "id": "blank_3",
+          "correct": "collisions",
+          "spellingTip": "C-O-L-L-I-S-I-O-N-S (Dua huruf L, akhiran -ions)."
+        }
+      ]
+    },
+    {
+      "id": "lf-002",
+      "title": "Hotel Kitchen Sanitation and HACCP Protocols",
+      "audioTranscript": "In commercial culinary environments, strict adherence to sanitation standards is essential to maintain food safety and prevent bacterial contamination. Kitchen staff must monitor critical control points and record temperatures consistently throughout food preparation.",
+      "displayedText": "In commercial culinary environments, strict {1} to sanitation standards is {2} to maintain food safety and prevent bacterial {3}. Kitchen staff must monitor critical control points and record temperatures consistently throughout food preparation.",
+      "blanks": [
+        {
+          "id": 1,
+          "correct": "adherence",
+          "spellingTip": "Perhatikan akhiran -ence (bukan -ance): a-d-h-e-r-e-n-c-e."
+        },
+        {
+          "id": 2,
+          "correct": "essential",
+          "spellingTip": "Huruf 'ss' ganda: e-s-s-e-n-t-i-a-l."
+        },
+        {
+          "id": 3,
+          "correct": "contamination",
+          "spellingTip": "Kata benda dengan akhiran -tion: c-o-n-t-a-m-i-n-a-t-i-o-n."
+        }
+      ]
+    },
+    {
+      "id": "lf-003",
+      "title": "Geothermal Energy Extraction",
+      "audioTranscript": "Geothermal power plants extract superheated steam from deep subterranean reservoirs to drive turbines and produce clean electricity. This constant renewable resource remains unaffected by surface weather conditions.",
+      "displayedText": "Geothermal power plants extract superheated steam from deep subterranean {1} to drive turbines and produce clean electricity. This {2} renewable resource remains {3} by surface weather conditions.",
+      "blanks": [
+        {
+          "id": 1,
+          "correct": "reservoirs",
+          "spellingTip": "Ejaan serapan Perancis: r-e-s-e-r-v-o-i-r-s."
+        },
+        {
+          "id": 2,
+          "correct": "constant",
+          "spellingTip": "Kata sifat dasar: c-o-n-s-t-a-n-t."
+        },
+        {
+          "id": 3,
+          "correct": "unaffected",
+          "spellingTip": "Awalan un- dengan 'ff' ganda: u-n-a-f-f-e-c-t-e-d (bukan uninfected/ineffective)."
+        }
+      ]
+    },
+    {
+      "id": "lf-004",
+      "title": "Marine Biology and Coral Bleaching",
+      "audioTranscript": "Elevated sea temperatures disrupt the delicate symbiosis between corals and their photosynthetic microalgae. Without these symbiotic organisms, coral reefs lose their vibrant pigmentation and struggle to survive.",
+      "displayedText": "Elevated sea temperatures disrupt the delicate {1} between corals and their photosynthetic microalgae. Without these {2} organisms, coral reefs lose their vibrant {3} and struggle to survive.",
+      "blanks": [
+        {
+          "id": 1,
+          "correct": "symbiosis",
+          "spellingTip": "Huruf 'y': s-y-m-b-i-o-s-i-s."
+        },
+        {
+          "id": 2,
+          "correct": "symbiotic",
+          "spellingTip": "Bentuk kata sifat dari symbiosis: s-y-m-b-i-o-t-i-c."
+        },
+        {
+          "id": 3,
+          "correct": "pigmentation",
+          "spellingTip": "Perhatikan g-m: p-i-g-m-e-n-t-a-t-i-o-n."
+        }
+      ]
+    },
+    {
+      "id": "lf-005",
+      "title": "Cognitive Psychology of Memory Retrieval",
+      "audioTranscript": "Cognitive psychologists distinguish between short-term storage and long-term consolidation. Retrieval cues facilitate the conscious recall of previously encoded episodic memories during examination periods.",
+      "displayedText": "Cognitive psychologists distinguish between short-term storage and long-term {1}. Retrieval cues {2} the conscious recall of previously encoded episodic memories during examination {3}.",
+      "blanks": [
+        {
+          "id": 1,
+          "correct": "consolidation",
+          "spellingTip": "c-o-n-s-o-l-i-d-a-t-i-o-n."
+        },
+        {
+          "id": 2,
+          "correct": "facilitate",
+          "spellingTip": "f-a-c-i-l-i-t-a-t-e (perhatikan satu 'l' dan satu 'c')."
+        },
+        {
+          "id": 3,
+          "correct": "periods",
+          "spellingTip": "Bentuk jamak: p-e-r-i-o-d-s."
+        }
+      ]
+    }
+  ]
+}

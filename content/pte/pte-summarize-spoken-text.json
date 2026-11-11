@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "task": "Summarize Spoken Text",
+  "crossSkills": [
+    "Listening",
+    "Writing"
+  ],
+  "pool": "Pearson Real Exam High-Frequency Audio",
+  "items": [
+    {
+      "id": "sst-001",
+      "title": "Global Water Scarcity and Desalination",
+      "audioTranscript": "Freshwater availability is rapidly emerging as a critical geopolitical and environmental crisis. Expanding global populations, agricultural irrigation, and climate-induced droughts are depleting underground aquifers at an unsustainable pace. In response, arid nations are heavily investing in seawater desalination facilities. While modern reverse-osmosis plants are significantly more energy-efficient than older thermal designs, they still require substantial electrical power and generate concentrated brine that poses environmental challenges for coastal ecosystems.",
+      "wordLimit": "50-70 words",
+      "modelSummary": "The lecture discusses global freshwater scarcity and industrial desalination solutions. Firstly, expanding populations and climate-induced droughts are depleting underground aquifers at an alarming rate. Secondly, arid nations are investing heavily in modern reverse-osmosis facilities to generate potable water. In conclusion, although desalination provides essential freshwater security, managing high electrical consumption and brine disposal remains an ongoing environmental priority.",
+      "modelWordCount": 63
+    },
+    {
+      "id": "sst-002",
+      "title": "Agricultural Robotics and Precision Farming",
+      "audioTranscript": "Modern agriculture is undergoing a quiet technological revolution driven by autonomous robotics and precision sensor networks. Farm laborers are increasingly difficult to recruit in industrialized countries, while unpredictable climatic patterns demand faster planting and harvesting cycles. In response, agricultural engineers have developed autonomous tractors equipped with GPS guidance and laser weeders that eradicate invasive plants without spraying chemical pesticides. Furthermore, multispectral aerial drones scan agricultural fields to detect localized nitrogen deficiencies and soil moisture stress before crop damage occurs. By applying water, fertilizers, and pest treatments strictly where required, precision farming drastically lowers operating expenses and mitigates groundwater contamination. Agronomists emphasize that robotic farming systems will be crucial to feeding an anticipated global population of nearly ten billion people by mid-century.",
+      "wordLimit": "50-70 words strictly",
+      "modelSummary": "The lecture highlighted agricultural robotics and precision farming, explaining that autonomous machines and aerial drones address labor shortages. Furthermore, sensor technologies apply localized fertilizers and water treatments efficiently. Consequently, precision agricultural automation significantly reduces chemical runoff and operating expenses while bolstering global food security.",
+      "modelWordCount": 46
+    },
+    {
+      "id": "sst-003",
+      "title": "Microplastics in Freshwater Ecosystems",
+      "audioTranscript": "While public awareness of plastic pollution predominantly focuses on oceanic garbage patches, recent limnological investigations reveal alarming concentrations of microplastics in continental lakes and river systems. These microscopic synthetic fragments, originating from degraded synthetic textiles, cosmetic microbeads, and industrial pellets, are readily ingested by plankton, macroinvertebrates, and commercial fish species. Because microplastics possess high surface-area-to-volume ratios, they actively adsorb toxic organic pollutants and heavy metals from ambient water columns. When aquatic organisms consume these contaminated particles, the synthetic toxins accumulate within muscle tissues and travel upwards along the food chain, ultimately reaching human dining tables. Environmental toxicologists stress that standard municipal wastewater treatment plants lack filtration membranes fine enough to capture microscopic fibers, necessitating urgent regulatory interventions and bio-based packaging innovations.",
+      "wordLimit": "50-70 words strictly",
+      "modelSummary": "The speaker discussed microplastic contamination in freshwater ecosystems, asserting that synthetic fragments adsorb dangerous toxic pollutants and heavy metals. Furthermore, aquatic organisms ingest these particles, causing toxins to accumulate along biological food chains. In conclusion, conventional water filtration facilities remain insufficient, necessitating stricter industrial regulations and biodegradable packaging solutions.",
+      "modelWordCount": 48
+    },
+    {
+      "id": "sst-004",
+      "title": "The Historical Legacy of the Ancient Silk Road",
+      "audioTranscript": "The Silk Road was not a single paved highway, but rather an intricate network of desert caravan tracks and maritime routes connecting Chang'an in China with the Mediterranean basin. While luxury commodities like raw Chinese silk, porcelain, and Indian spices dominated merchant shipping manifests, the most enduring historical legacy of these transcontinental arteries was the exchange of intangible ideas and technological innovations. Paper-making technology traveled westwards from China into the Islamic world and Renaissance Europe, fundamentally accelerating mass literacy and scientific scholarship. Similarly, religious doctrines including Buddhism, Christianity, and Islam traversed geographical boundaries along oasis trading posts. Economic historians emphasize that the Silk Road fostered early globalization by demonstrating that reciprocal commercial exchange inevitably catalyzes transformative cultural cross-pollination across diverse civilizations.",
+      "wordLimit": "50-70 words strictly",
+      "modelSummary": "The lecture explored the historical Silk Road, highlighting that interconnected transcontinental routes facilitated commerce between China and the Mediterranean. Furthermore, while merchants traded luxury silk and spices, intangible technological innovations like paper-making and religious ideas spread widely. In conclusion, the ancient network founded early global interconnectedness through reciprocal economic and cultural exchange.",
+      "modelWordCount": 48
+    },
+    {
+      "id": "sst-005",
+      "title": "Sleep Deprivation and Cognitive Performance",
+      "audioTranscript": "In fast-paced modern societies, chronic sleep deprivation has become an endemic public health epidemic that severely degrades neurological function. Neuroscientists utilizing functional magnetic resonance imaging have demonstrated that during slow-wave non-REM sleep, the brain activates its glymphatic system, which flushes out metabolic waste products including amyloid-beta plaques associated with Alzheimer's disease. When individuals curtail their nightly rest to fewer than six hours, the prefrontal cortex suffers acute impairment, diminishing working memory capacity, impulse regulation, and analytical problem-solving abilities. Furthermore, sleep-deprived individuals exhibit heightened amygdala reactivity, leading to irrational emotional responses and elevated workplace error rates. Medical researchers conclude that adequate restorative sleep is not a passive luxury, but a biological prerequisite for sustained cognitive health and professional competence.",
+      "wordLimit": "50-70 words strictly",
+      "modelSummary": "The speaker highlighted the severe dangers of chronic sleep deprivation on neurological function, explaining that slow-wave sleep flushes out dangerous metabolic waste. Furthermore, insufficient rest impairs prefrontal cortex capacity and elevates emotional reactivity. In conclusion, neurological research confirms that restorative sleep is an essential biological prerequisite for cognitive health and occupational performance.",
+      "modelWordCount": 49
+    }
+  ]
+}

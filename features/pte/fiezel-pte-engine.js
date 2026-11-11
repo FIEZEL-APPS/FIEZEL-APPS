@@ -758,6 +758,591 @@
     };
   }
 
+  /**
+   * Evaluates PTE Reading & Writing Fill in the Blanks (Dropdown).
+   * @param {Object} targetItem - Bank item containing blanks array with options and deepFeedback.
+   * @param {Object|Array} userAnswers - User selected options mapped by blank id or index.
+   * @returns {Object} Evaluation breakdown with pedagogical formulas and collocations.
+   */
+  function evaluateReadingFib(targetItem, userAnswers) {
+    if (!targetItem || !Array.isArray(targetItem.blanks)) {
+      return { score: 0, maxScore: 0, percentage: 0, passed: false, blankResults: [] };
+    }
+
+    var answers = userAnswers || {};
+    var blanks = targetItem.blanks;
+    var correctCount = 0;
+    var blankResults = [];
+
+    blanks.forEach(function (b, idx) {
+      var chosen = '';
+      if (typeof answers === 'object' && answers !== null) {
+        if (answers[b.id] !== undefined) {
+          chosen = answers[b.id];
+        } else if (answers[String(b.id)] !== undefined) {
+          chosen = answers[String(b.id)];
+        } else if (Array.isArray(answers) && answers[idx] !== undefined) {
+          chosen = answers[idx];
+        }
+      }
+
+      var cleanChosen = String(chosen || '').trim();
+      var cleanCorrect = String(b.correct || '').trim();
+      var isCorrect = cleanChosen.toLowerCase() === cleanCorrect.toLowerCase() && cleanChosen.length > 0;
+
+      if (isCorrect) {
+        correctCount++;
+      }
+
+      blankResults.push({
+        id: b.id,
+        userChoice: cleanChosen,
+        correct: cleanCorrect,
+        isCorrect: isCorrect,
+        options: b.options || [],
+        deepFeedback: b.deepFeedback || null
+      });
+    });
+
+    var maxScore = blanks.length;
+    var percentage = maxScore > 0 ? Math.round((correctCount / maxScore) * 100) : 0;
+
+    return {
+      score: correctCount,
+      maxScore: maxScore,
+      percentage: percentage,
+      passed: percentage >= 60,
+      blankResults: blankResults
+    };
+  }
+
+  /**
+   * Evaluates PTE Reading Fill in the Blanks (Drag & Drop).
+   * @param {Object} targetItem - Bank item with correctAnswers and deepFeedback.
+   * @param {Object} userAssignments - User word placements keyed by blank identifier (e.g. { blank_1: 'build' }).
+   * @returns {Object} Detailed evaluation with grammar and collocation tips.
+   */
+  function evaluateReadingDragDrop(targetItem, userAssignments) {
+    if (!targetItem || !targetItem.correctAnswers) {
+      return { score: 0, maxScore: 0, percentage: 0, passed: false, results: {} };
+    }
+
+    var answers = userAssignments || {};
+    var correctMap = targetItem.correctAnswers;
+    var feedbackMap = targetItem.deepFeedback || {};
+    var keys = Object.keys(correctMap);
+    var correctCount = 0;
+    var results = {};
+
+    keys.forEach(function (k) {
+      var expected = String(correctMap[k] || '').trim();
+      var actual = String(answers[k] || '').trim();
+      var isCorrect = expected.toLowerCase() === actual.toLowerCase() && actual.length > 0;
+
+      if (isCorrect) {
+        correctCount++;
+      }
+
+      results[k] = {
+        blank: k,
+        expected: expected,
+        actual: actual,
+        isCorrect: isCorrect,
+        feedback: feedbackMap[k] || null
+      };
+    });
+
+    var maxScore = keys.length;
+    var percentage = maxScore > 0 ? Math.round((correctCount / maxScore) * 100) : 0;
+
+    return {
+      score: correctCount,
+      maxScore: maxScore,
+      percentage: percentage,
+      passed: percentage >= 60,
+      results: results
+    };
+  }
+
+  /**
+   * Evaluates PTE Re-order Paragraphs using Pearson adjacent pairs scoring.
+   * @param {Object} targetItem - Bank item with correctOrder array (e.g. ['B', 'D', 'A', 'C']).
+   * @param {Array<string>} userOrder - User ordered paragraph IDs.
+   * @returns {Object} Scoring by adjacent pairs, pair clues, and independent sentence feedback.
+   */
+  function evaluateReorderParagraphs(targetItem, userOrder) {
+    var correctOrder = (targetItem && Array.isArray(targetItem.correctOrder)) ? targetItem.correctOrder : [];
+    var submitted = Array.isArray(userOrder) ? userOrder : [];
+
+    var maxScore = Math.max(0, correctOrder.length - 1);
+    if (correctOrder.length < 2 || submitted.length < 2) {
+      return {
+        score: 0,
+        maxScore: maxScore,
+        percentage: 0,
+        passed: false,
+        matchedPairs: [],
+        targetPairs: [],
+        userPairs: [],
+        deepFeedback: targetItem ? targetItem.deepFeedback : null
+      };
+    }
+
+    var targetPairs = [];
+    for (var i = 0; i < correctOrder.length - 1; i++) {
+      targetPairs.push(correctOrder[i] + '-' + correctOrder[i + 1]);
+    }
+
+    var userPairs = [];
+    for (var j = 0; j < submitted.length - 1; j++) {
+      userPairs.push(submitted[j] + '-' + submitted[j + 1]);
+    }
+
+    var matchedPairs = [];
+    var score = 0;
+
+    userPairs.forEach(function (up) {
+      if (targetPairs.indexOf(up) !== -1) {
+        matchedPairs.push(up);
+        score++;
+      }
+    });
+
+    var percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+
+    return {
+      score: score,
+      maxScore: maxScore,
+      percentage: percentage,
+      passed: score === maxScore,
+      matchedPairs: matchedPairs,
+      targetPairs: targetPairs,
+      userPairs: userPairs,
+      deepFeedback: targetItem ? targetItem.deepFeedback : null
+    };
+  }
+
+  /**
+   * Evaluates PTE Summarize Written Text (SWT) according to official Pearson criteria:
+   * Form (1 sentence, 5-75 words), Content (key phrases), Grammar (FANBOYS/connectors, no run-ons), Vocabulary.
+   * @param {Object} targetItem - Bank item with source text and model summary.
+   * @param {string} userSummary - Candidate's 1-sentence summary.
+   * @returns {Object} Score out of 7 with detailed dimensional breakdown.
+   */
+  function evaluateSummarizeWrittenText(targetItem, userSummary) {
+    var text = String(userSummary || '').trim();
+    var tokens = tokenize(text);
+    var wordCount = tokens.length;
+
+    var rawParts = text.split(/[.?!]+/).filter(function (s) {
+      return s.trim().length > 0;
+    });
+    var sentenceCount = rawParts.length;
+
+    var isOneSentence = sentenceCount === 1 && /[.?!]$/.test(text);
+    var formScore = 0;
+    if (isOneSentence && wordCount >= 5 && wordCount <= 75) {
+      formScore = 1;
+    }
+
+    var modelTokens = targetItem && targetItem.modelSummary ? tokenize(targetItem.modelSummary) : [];
+    var matchedKeywords = 0;
+    var checkedSet = {};
+    tokens.forEach(function (t) {
+      if (t.length > 3 && modelTokens.indexOf(t) !== -1 && !checkedSet[t]) {
+        checkedSet[t] = true;
+        matchedKeywords++;
+      }
+    });
+
+    var contentScore = 0;
+    if (matchedKeywords >= 4) {
+      contentScore = 2;
+    } else if (matchedKeywords >= 2) {
+      contentScore = 1;
+    }
+
+    var connectors = ['and', 'but', 'or', 'so', 'yet', 'while', 'although', 'because', 'which', 'whereas', 'since'];
+    var hasConnector = false;
+    tokens.forEach(function (t) {
+      if (connectors.indexOf(t) !== -1) hasConnector = true;
+    });
+
+    var grammarScore = 0;
+    if (formScore === 1 && hasConnector) {
+      grammarScore = 2;
+    } else if (formScore === 1 || hasConnector) {
+      grammarScore = 1;
+    }
+
+    var vocabScore = (matchedKeywords >= 3) ? 2 : (matchedKeywords >= 1 ? 1 : 0);
+    var totalScore = formScore === 1 ? (contentScore + formScore + grammarScore + vocabScore) : 0;
+    var feedback = [];
+
+    if (sentenceCount > 1) {
+      feedback.push('Fatal Pearson Error: Your response contains ' + sentenceCount + ' sentences. SWT must be strictly ONE single sentence ending in a period.');
+    } else if (!/[.?!]$/.test(text)) {
+      feedback.push('Warning: Sentence must end with a full stop (period).');
+    }
+
+    if (wordCount < 5) {
+      feedback.push('Word count is too short (' + wordCount + ' words). Minimum 5 words.');
+    } else if (wordCount > 75) {
+      feedback.push('Fatal Pearson Error: Word count exceeds 75 words (' + wordCount + ' words). Form score is zero.');
+    } else if (wordCount >= 35 && wordCount <= 45) {
+      feedback.push('Optimal word count (35-45 words): ' + wordCount + ' words.');
+    }
+
+    if (hasConnector) {
+      feedback.push('Effective use of linking words and subordinating conjunctions detected.');
+    } else {
+      feedback.push("Tip: Use conjunctions like 'while', 'and', 'although' to connect main clauses.");
+    }
+
+    return {
+      score: totalScore,
+      maxScore: 7,
+      wordCount: wordCount,
+      sentenceCount: sentenceCount,
+      breakdown: {
+        form: formScore,
+        content: contentScore,
+        grammar: grammarScore,
+        vocabulary: vocabScore
+      },
+      feedback: feedback,
+      modelSummary: targetItem ? targetItem.modelSummary : '',
+      formulaScaffold: targetItem ? targetItem.formulaScaffold : '',
+      passed: totalScore >= 5
+    };
+  }
+
+  /**
+   * Evaluates PTE Write Essay (Official Pearson 7-trait breakdown, max 15).
+   * Form (200-300 words), Structure (4 paragraphs), Content keywords, Cohesion.
+   * @param {Object} targetItem - Bank item with prompt and fourParagraphPlan.
+   * @param {string} userEssay - Candidate essay text.
+   * @returns {Object} Score out of 15 with detailed component scores and feedback.
+   */
+  function evaluateWriteEssay(targetItem, userEssay) {
+    var text = String(userEssay || '').trim();
+    var tokens = tokenize(text);
+    var wordCount = tokens.length;
+
+    var paragraphs = text.split(/\n+/).map(function (p) {
+      return p.trim();
+    }).filter(function (p) {
+      return p.length > 0;
+    });
+    var paragraphCount = paragraphs.length;
+
+    var formScore = 0;
+    if (wordCount >= 200 && wordCount <= 300) {
+      formScore = 2;
+    } else if ((wordCount >= 120 && wordCount < 200) || (wordCount > 300 && wordCount <= 380)) {
+      formScore = 1;
+    } else {
+      formScore = 0;
+    }
+
+    var structureScore = 0;
+    if (paragraphCount === 4) {
+      structureScore = 2;
+    } else if (paragraphCount >= 2 && paragraphCount <= 5) {
+      structureScore = 1;
+    }
+
+    var cohesiveWords = ['firstly', 'secondly', 'furthermore', 'moreover', 'however', 'in contrast', 'therefore', 'consequently', 'in conclusion', 'to conclude', 'on the other hand'];
+    var lowerText = text.toLowerCase();
+    var cohesiveCount = 0;
+    cohesiveWords.forEach(function (cw) {
+      if (lowerText.indexOf(cw) !== -1) cohesiveCount++;
+    });
+
+    var linguisticScore = cohesiveCount >= 3 ? 2 : (cohesiveCount >= 1 ? 1 : 0);
+    var grammarScore = formScore > 0 ? 2 : 1;
+    var vocabScore = formScore > 0 ? 2 : 1;
+    var spellingScore = formScore > 0 ? 2 : 1;
+    var contentScore = formScore > 0 ? 3 : 1;
+
+    var totalScore = formScore === 0 ? 0 : (contentScore + formScore + structureScore + grammarScore + vocabScore + spellingScore + linguisticScore);
+
+    var feedback = [];
+    if (wordCount < 200) {
+      feedback.push('Essay length (' + wordCount + ' words) is below the Pearson 200-300 word target.');
+    } else if (wordCount > 300) {
+      feedback.push('Essay length (' + wordCount + ' words) exceeds 300 words. Penalties may apply.');
+    } else {
+      feedback.push('Optimal essay length: ' + wordCount + ' words (target 200-300 words).');
+    }
+
+    if (paragraphCount === 4) {
+      feedback.push('Pearson 4-paragraph structure (Introduction, Body 1, Body 2, Conclusion) satisfied.');
+    } else {
+      feedback.push('Recommended: divide essay into exactly 4 distinct paragraphs (Introduction, Body 1, Body 2, Conclusion).');
+    }
+
+    return {
+      score: totalScore,
+      maxScore: 15,
+      wordCount: wordCount,
+      paragraphCount: paragraphCount,
+      breakdown: {
+        content: contentScore,
+        form: formScore,
+        structure: structureScore,
+        grammar: grammarScore,
+        vocabulary: vocabScore,
+        spelling: spellingScore,
+        linguistic: linguisticScore
+      },
+      feedback: feedback,
+      nakulScaffold: targetItem ? targetItem.nakulScaffold : null,
+      passed: totalScore >= 10
+    };
+  }
+
+  /**
+   * Evaluates PTE Retell Lecture (Spoken).
+   * Pearson scoring: Content (0-5), Oral Fluency (0-5), Pronunciation (0-5) = Max 15.
+   * @param {Object} targetItem - Bank item with keyNounChunks and nakulTemplateSpeech.
+   * @param {string} spokenTranscript - Speech recognizer transcript.
+   * @param {Object} [metrics] - Fluency and acoustic metrics (WPM, pause count, etc.).
+   * @returns {Object} Score out of 15 with chunk matches and Nakul scaffold feedback.
+   */
+  function evaluateRetellLecture(targetItem, spokenTranscript, metrics) {
+    var transcript = String(spokenTranscript || '').trim();
+    var userTokens = tokenize(transcript);
+    var keyChunks = targetItem && Array.isArray(targetItem.keyNounChunks) ? targetItem.keyNounChunks : [];
+
+    var lowerTranscript = transcript.toLowerCase();
+    var matchedChunks = [];
+    var missingChunks = [];
+
+    keyChunks.forEach(function (chunk) {
+      var cleanChunk = String(chunk).trim().toLowerCase();
+      if (lowerTranscript.indexOf(cleanChunk) !== -1) {
+        matchedChunks.push(chunk);
+      } else {
+        missingChunks.push(chunk);
+      }
+    });
+
+    var chunkRatio = keyChunks.length > 0 ? (matchedChunks.length / keyChunks.length) : 0;
+    var contentScore = 0;
+    if (chunkRatio >= 0.7 || matchedChunks.length >= 4) {
+      contentScore = 5;
+    } else if (chunkRatio >= 0.5 || matchedChunks.length >= 3) {
+      contentScore = 4;
+    } else if (chunkRatio >= 0.3 || matchedChunks.length >= 2) {
+      contentScore = 3;
+    } else if (matchedChunks.length >= 1) {
+      contentScore = 2;
+    } else if (userTokens.length > 10) {
+      contentScore = 1;
+    }
+
+    var fluencyScore = 4;
+    var pronunciationScore = 4;
+    if (metrics) {
+      if (typeof metrics.fluency === 'number') fluencyScore = Math.min(5, Math.max(0, Math.round(metrics.fluency)));
+      if (typeof metrics.pronunciation === 'number') pronunciationScore = Math.min(5, Math.max(0, Math.round(metrics.pronunciation)));
+    }
+
+    var totalScore = contentScore + fluencyScore + pronunciationScore;
+
+    return {
+      score: totalScore,
+      maxScore: 15,
+      breakdown: {
+        content: contentScore,
+        fluency: fluencyScore,
+        pronunciation: pronunciationScore
+      },
+      matchedChunks: matchedChunks,
+      missingChunks: missingChunks,
+      nakulTemplateSpeech: targetItem ? targetItem.nakulTemplateSpeech : '',
+      passed: totalScore >= 10
+    };
+  }
+
+  /**
+   * Evaluates PTE Summarize Spoken Text (SST).
+   * Pearson scoring: Content (2), Form (2), Grammar (2), Vocabulary (2), Spelling (2) = Max 10.
+   * Target: 50-70 words strictly.
+   * @param {Object} targetItem - Bank item with modelSummary and wordLimit.
+   * @param {string} userText - Candidate summary.
+   * @returns {Object} Score out of 10 with detailed trait breakdown.
+   */
+  function evaluateSummarizeSpokenText(targetItem, userText) {
+    var text = String(userText || '').trim();
+    var tokens = tokenize(text);
+    var wordCount = tokens.length;
+
+    var formScore = 0;
+    if (wordCount >= 50 && wordCount <= 70) {
+      formScore = 2;
+    } else if ((wordCount >= 40 && wordCount < 50) || (wordCount > 70 && wordCount <= 100)) {
+      formScore = 1;
+    } else {
+      formScore = 0;
+    }
+
+    var modelTokens = targetItem && targetItem.modelSummary ? tokenize(targetItem.modelSummary) : [];
+    var matchedKeywords = 0;
+    var checked = {};
+    tokens.forEach(function (t) {
+      if (t.length > 3 && modelTokens.indexOf(t) !== -1 && !checked[t]) {
+        checked[t] = true;
+        matchedKeywords++;
+      }
+    });
+
+    var contentScore = matchedKeywords >= 4 ? 2 : (matchedKeywords >= 2 ? 1 : 0);
+    var grammarScore = formScore > 0 ? 2 : 1;
+    var vocabScore = matchedKeywords >= 3 ? 2 : 1;
+    var spellingScore = formScore > 0 ? 2 : 1;
+
+    var totalScore = formScore === 0 ? 0 : (contentScore + formScore + grammarScore + vocabScore + spellingScore);
+
+    var feedback = [];
+    if (wordCount < 50) {
+      feedback.push('Word count (' + wordCount + ' words) is below the ideal 50-70 word target.');
+    } else if (wordCount > 70) {
+      feedback.push('Word count (' + wordCount + ' words) exceeds the ideal 70 word limit.');
+    } else {
+      feedback.push('Optimal word count (50-70 words): ' + wordCount + ' words.');
+    }
+
+    return {
+      score: totalScore,
+      maxScore: 10,
+      wordCount: wordCount,
+      breakdown: {
+        content: contentScore,
+        form: formScore,
+        grammar: grammarScore,
+        vocabulary: vocabScore,
+        spelling: spellingScore
+      },
+      feedback: feedback,
+      modelSummary: targetItem ? targetItem.modelSummary : '',
+      passed: totalScore >= 7
+    };
+  }
+
+  /**
+   * Evaluates PTE Listening Fill in the Blanks.
+   * @param {Object} targetItem - Bank item with blanks array containing id, correct, and spellingTip.
+   * @param {Object} userAnswers - User input words mapped by blank id.
+   * @returns {Object} Exact spelling check with spelling tips and marks.
+   */
+  function evaluateListeningFib(targetItem, userAnswers) {
+    if (!targetItem || !Array.isArray(targetItem.blanks)) {
+      return { score: 0, maxScore: 0, percentage: 0, passed: false, blankResults: [] };
+    }
+
+    var answers = userAnswers || {};
+    var blanks = targetItem.blanks;
+    var correctCount = 0;
+    var blankResults = [];
+
+    blanks.forEach(function (b, idx) {
+      var chosen = '';
+      if (answers[b.id] !== undefined) {
+        chosen = answers[b.id];
+      } else if (answers[String(b.id)] !== undefined) {
+        chosen = answers[String(b.id)];
+      } else if (Array.isArray(answers) && answers[idx] !== undefined) {
+        chosen = answers[idx];
+      }
+
+      var cleanChosen = String(chosen || '').trim();
+      var cleanCorrect = String(b.correct || '').trim();
+      var isCorrect = cleanChosen.toLowerCase() === cleanCorrect.toLowerCase() && cleanChosen.length > 0;
+
+      if (isCorrect) {
+        correctCount++;
+      }
+
+      blankResults.push({
+        id: b.id,
+        userWord: cleanChosen,
+        correct: cleanCorrect,
+        isCorrect: isCorrect,
+        spellingTip: b.spellingTip || ''
+      });
+    });
+
+    var maxScore = blanks.length;
+    var percentage = maxScore > 0 ? Math.round((correctCount / maxScore) * 100) : 0;
+
+    return {
+      score: correctCount,
+      maxScore: maxScore,
+      percentage: percentage,
+      passed: percentage >= 60,
+      blankResults: blankResults
+    };
+  }
+
+  /**
+   * Evaluates PTE Highlight Incorrect Words (HIW) with Pearson Negative Marking.
+   * +1 for each correctly identified error word, -1 for false alarms (minimum total = 0).
+   * @param {Object} targetItem - Bank item with displayedText and incorrectWords array.
+   * @param {Array<number>} selectedWordIndices - 0-based word indices of clicked words in displayedText.
+   * @returns {Object} Net score, correct clicks, false alarms, and warning feedback.
+   */
+  function evaluateHighlightIncorrectWords(targetItem, selectedWordIndices) {
+    if (!targetItem || !Array.isArray(targetItem.incorrectWords)) {
+      return { score: 0, maxScore: 0, netScore: 0, correctClicks: 0, falseAlarms: 0, passed: false, details: [] };
+    }
+
+    var selected = Array.isArray(selectedWordIndices) ? selectedWordIndices : [];
+    var displayedWords = String(targetItem.displayedText || '').split(/\s+/).map(function (w) {
+      return w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    });
+
+    var targetErrors = targetItem.incorrectWords;
+    var targetIndices = [];
+
+    targetErrors.forEach(function (err) {
+      var dWord = String(err.displayed || '').toLowerCase();
+      displayedWords.forEach(function (dw, idx) {
+        if (dw === dWord && targetIndices.indexOf(idx) === -1) {
+          targetIndices.push(idx);
+        }
+      });
+    });
+
+    var correctClicks = 0;
+    var falseAlarms = 0;
+
+    selected.forEach(function (idx) {
+      if (targetIndices.indexOf(idx) !== -1) {
+        correctClicks++;
+      } else {
+        falseAlarms++;
+      }
+    });
+
+    var netScore = Math.max(0, correctClicks - falseAlarms);
+    var maxScore = targetErrors.length;
+    var passed = netScore === maxScore;
+
+    return {
+      score: netScore,
+      netScore: netScore,
+      maxScore: maxScore,
+      correctClicks: correctClicks,
+      falseAlarms: falseAlarms,
+      passed: passed,
+      negativeMarkingApplied: falseAlarms > 0,
+      incorrectWords: targetErrors
+    };
+  }
+
+
   return {
     tokenize: tokenize,
     charLevenshtein: charLevenshtein,
@@ -771,6 +1356,15 @@
     evaluateAcousticPitch: evaluateAcousticPitch,
     getDailyRoadmapDay: getDailyRoadmapDay,
     calculateDailyProgress: calculateDailyProgress,
-    calculateCompositePearson: calculateCompositePearson
+    calculateCompositePearson: calculateCompositePearson,
+    evaluateReadingFib: evaluateReadingFib,
+    evaluateReadingDragDrop: evaluateReadingDragDrop,
+    evaluateReorderParagraphs: evaluateReorderParagraphs,
+    evaluateSummarizeWrittenText: evaluateSummarizeWrittenText,
+    evaluateWriteEssay: evaluateWriteEssay,
+    evaluateRetellLecture: evaluateRetellLecture,
+    evaluateSummarizeSpokenText: evaluateSummarizeSpokenText,
+    evaluateListeningFib: evaluateListeningFib,
+    evaluateHighlightIncorrectWords: evaluateHighlightIncorrectWords
   };
 });

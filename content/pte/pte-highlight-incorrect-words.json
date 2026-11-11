@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "task": "Highlight Incorrect Words",
+  "crossSkills": [
+    "Listening",
+    "Reading"
+  ],
+  "warning": "Negative marking (-1) for incorrect clicks! Do not guess.",
+  "items": [
+    {
+      "id": "hiw-001",
+      "title": "Nutrition and Cognitive Performance",
+      "audioTranscript": "Maintaining balanced blood glucose levels is essential for sustained intellectual concentration throughout the working day. Skipping breakfast frequently leads to fatigue and diminished executive function.",
+      "displayedText": "Maintaining balanced blood glucose levels is necessary for sustained intellectual performance throughout the working day. Skipping breakfast frequently leads to hunger and diminished executive function.",
+      "incorrectWords": [
+        {
+          "spoken": "essential",
+          "displayed": "necessary"
+        },
+        {
+          "spoken": "concentration",
+          "displayed": "performance"
+        },
+        {
+          "spoken": "fatigue",
+          "displayed": "hunger"
+        }
+      ]
+    },
+    {
+      "id": "hiw-002",
+      "title": "Culinary Nutrition and Balanced Diets",
+      "audioTranscript": "Professional chefs increasingly design restaurant menus that balance exquisite gastronomic flavor with rigorous nutritional standards. Substituting saturated fats with polyunsaturated vegetable oils significantly improves cardiovascular longevity without sacrificing mouthfeel or taste profile.",
+      "displayedText": "Professional chefs increasingly design restaurant menus that balance exquisite gastronomic flavor with rigorous nutritional standards. Substituting saturated fats with polyunsaturated vegetable oils significantly improves cardiovascular longevity without sacrificing texture or price profile.",
+      "incorrectWords": [
+        {
+          "displayed": "texture",
+          "spoken": "mouthfeel"
+        },
+        {
+          "displayed": "price",
+          "spoken": "taste"
+        }
+      ]
+    },
+    {
+      "id": "hiw-003",
+      "title": "Satellite Communication and Space Orbits",
+      "audioTranscript": "Modern communication satellites operate primarily in geostationary orbits approximately thirty-six thousand kilometers above the planetary equator. These sophisticated orbital relays transmit telecommunication signals across continents, connecting remote rural hamlets with international fiber networks.",
+      "displayedText": "Modern communication satellites operate primarily in geostationary orbits approximately thirty-six thousand kilometers above the planetary equator. These sophisticated orbital arrays transmit telecommunication signals across continents, connecting remote rural villages with international fiber networks.",
+      "incorrectWords": [
+        {
+          "displayed": "arrays",
+          "spoken": "relays"
+        },
+        {
+          "displayed": "villages",
+          "spoken": "hamlets"
+        }
+      ]
+    },
+    {
+      "id": "hiw-004",
+      "title": "Economic Globalization and International Trade",
+      "audioTranscript": "Over recent decades, international supply chains have enabled manufacturing enterprises to source raw materials from diverse global territories. This commercial interdependence drives down production expenses, providing consumers with affordable electronic appliances and consumer commodities.",
+      "displayedText": "Over recent decades, international supply chains have enabled manufacturing companies to source raw materials from diverse global territories. This commercial interdependence drives down production expenses, providing citizens with affordable electronic appliances and consumer commodities.",
+      "incorrectWords": [
+        {
+          "displayed": "companies",
+          "spoken": "enterprises"
+        },
+        {
+          "displayed": "citizens",
+          "spoken": "consumers"
+        }
+      ]
+    },
+    {
+      "id": "hiw-005",
+      "title": "Renewable Wind Turbine Engineering",
+      "audioTranscript": "Offshore wind installations benefit from stronger and more consistent oceanic breezes than terrestrial facilities. Heavy aerodynamic blades convert kinetic wind energy into rotational mechanical momentum, driving high-efficiency electrical generators housed inside the nacelle.",
+      "displayedText": "Offshore wind installations benefit from stronger and more consistent oceanic breezes than inland facilities. Heavy aerodynamic blades convert kinetic wind energy into rotational mechanical power, driving high-efficiency electrical generators housed inside the nacelle.",
+      "incorrectWords": [
+        {
+          "displayed": "inland",
+          "spoken": "terrestrial"
+        },
+        {
+          "displayed": "power",
+          "spoken": "momentum"
+        }
+      ]
+    }
+  ]
+}

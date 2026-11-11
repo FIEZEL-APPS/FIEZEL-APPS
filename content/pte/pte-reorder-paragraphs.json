@@ -1,0 +1,195 @@
+{
+  "version": "1.0.0",
+  "task": "Re-order Paragraphs",
+  "crossSkills": [
+    "Reading"
+  ],
+  "pool": "Pearson PTE Academic & E2Language Real Exam Classics",
+  "items": [
+    {
+      "id": "ro-001",
+      "title": "Alexander Fleming and Penicillin",
+      "domain": "History of Medicine",
+      "correctOrder": [
+        "B",
+        "D",
+        "A",
+        "C"
+      ],
+      "paragraphs": [
+        {
+          "id": "A",
+          "text": "Upon closer examination, he noticed that a common green mold had contaminated a petri dish of Staphylococcus bacteria."
+        },
+        {
+          "id": "B",
+          "text": "In 1928, Scottish bacteriologist Alexander Fleming made an accidental discovery that would revolutionize modern medicine."
+        },
+        {
+          "id": "C",
+          "text": "This life-saving substance was later named penicillin, opening the antibiotic era."
+        },
+        {
+          "id": "D",
+          "text": "Returning from a two-week family vacation, he inspected his cluttered laboratory benches at St. Mary's Hospital in London."
+        }
+      ],
+      "deepFeedback": {
+        "independentSentence": "Kalimat B adalah 'Independent Sentence' (Kalimat Mandiri). Kalimat ini memperkenalkan waktu ('In 1928'), nama lengkap tokoh ('Alexander Fleming'), dan topik umum ('accidental discovery'). Tidak ada kata ganti (he, it, this).",
+        "pairingClues": [
+          "Pasangan 1 (B ➔ D): Kalimat B memperkenalkan kepulangan/penelitian Fleming, dilanjutkan D yang menjelaskan tindakan spesifiknya ('Returning from a vacation, he inspected his lab benches').",
+          "Pasangan 2 (D ➔ A): Setelah memeriksa meja lab (D), Fleming melihat ada jamur yang mengkontaminasi cawan petri ('Upon closer examination, he noticed a green mold' di A).",
+          "Pasangan 3 (A ➔ C): Jamur penghambat bakteri di kalimat A dirujuk oleh frasa demonstratif 'This life-saving substance' di kalimat C sebagai kesimpulan penamaan penisilin."
+        ]
+      }
+    },
+    {
+      "id": "ro-002",
+      "title": "The Evolution of E-Commerce Logistics",
+      "domain": "Business & Supply Chain Management",
+      "correctOrder": [
+        "C",
+        "A",
+        "D",
+        "B"
+      ],
+      "paragraphs": [
+        {
+          "id": "A",
+          "text": "Initially, traditional postal networks struggled to cope with the unprecedented influx of individual parcels."
+        },
+        {
+          "id": "B",
+          "text": "As a result, modern consumers now routinely receive online orders within twenty-four hours of payment."
+        },
+        {
+          "id": "C",
+          "text": "Over the past two decades, global retail commerce has experienced a profound shift from brick-and-mortar storefronts to digital shopping platforms."
+        },
+        {
+          "id": "D",
+          "text": "To address these logistical bottlenecks, logistics corporations invested billions of dollars in automated fulfillment warehouses."
+        }
+      ],
+      "deepFeedback": {
+        "independentSentence": "Kalimat C adalah kalimat pembuka mandiri yang memperkenalkan topik besar pergeseran toko fisik ke e-commerce.",
+        "pairingClues": [
+          "Pasangan 1 (C ➔ A): Pergeseran belanja online (C) menimbulkan masalah awal pada jaringan pos (A: 'Initially, traditional postal networks struggled...').",
+          "Pasangan 2 (A ➔ D): Masalah kemacetan pengiriman di A dirujuk secara langsung oleh kalimat D ('To address these logistical bottlenecks, corporations invested...').",
+          "Pasangan 3 (D ➔ B): Investasi gudang otomatis di D menghasilkan pengiriman kilat 24 jam di kalimat B ('As a result, modern consumers now receive orders within 24 hours')."
+        ]
+      }
+    },
+    {
+      "id": "ro-003",
+      "title": "The Discovery of Australia's Great Barrier Reef",
+      "domain": "Australian History & Geography",
+      "correctOrder": [
+        "C",
+        "A",
+        "D",
+        "B"
+      ],
+      "paragraphs": [
+        {
+          "id": "C",
+          "text": "In June 1770, Captain James Cook sailed the HMS Endeavour along the uncharted eastern coastline of Australia, unaware of the immense coral labyrinth beneath the surface."
+        },
+        {
+          "id": "A",
+          "text": "Without warning, the vessel struck a sharp underwater reef, tearing open the wooden hull and leaving the crew stranded in dangerous tropical waters."
+        },
+        {
+          "id": "D",
+          "text": "To lighten the damaged ship and prevent it from sinking, Cook ordered his men to heave heavy iron cannons and ballast overboard onto the seabed."
+        },
+        {
+          "id": "B",
+          "text": "This desperate salvage operation allowed the Endeavour to refloat with the rising tide, leading to the first documented European survey of the Great Barrier Reef."
+        }
+      ],
+      "deepFeedback": {
+        "independentSentence": "Kalimat C adalah Kalimat Mandiri (Independent Sentence): Menyebutkan waktu spesifik ('In June 1770'), nama kapal dan kapten lengkap ('Captain James Cook', 'HMS Endeavour'), serta wilayah geografis tanpa kata ganti ambigu.",
+        "pairingClues": [
+          "Pasangan 1 (C ➔ A): Kalimat C menjelaskan pelayaran Cook di sepanjang pesisir karang, dilanjutkan A yang menjelaskan kecelakaan tiba-tiba ('the vessel struck a sharp underwater reef').",
+          "Pasangan 2 (A ➔ D): Kerusakan lambung kapal di kalimat A memicu tindakan darurat Cook di kalimat D ('To lighten the damaged ship... Cook ordered his men to heave cannons overboard').",
+          "Pasangan 3 (D ➔ B): Pembuangan beban di D dirujuk secara anaforis oleh frasa 'This desperate salvage operation' di kalimat B sebagai hasil keberhasilan pengapungan kembali kapal."
+        ]
+      }
+    },
+    {
+      "id": "ro-004",
+      "title": "The Commercial Evolution of Electric Vehicles",
+      "domain": "Technology & Automotive History",
+      "correctOrder": [
+        "B",
+        "D",
+        "A",
+        "C"
+      ],
+      "paragraphs": [
+        {
+          "id": "B",
+          "text": "At the beginning of the twentieth century, electric automobiles competed fiercely with steam and gasoline carriages for supremacy on city streets."
+        },
+        {
+          "id": "D",
+          "text": "However, the discovery of massive petroleum reserves in Texas rapidly drove down fuel prices and made gasoline vehicles far more economical."
+        },
+        {
+          "id": "A",
+          "text": "Coupled with the invention of the electric self-starter, internal combustion engines soon dominated personal transportation for nearly a century."
+        },
+        {
+          "id": "C",
+          "text": "Today, mounting concerns over carbon emissions and breakthrough lithium battery chemistries have reignited global demand for these zero-emission alternatives."
+        }
+      ],
+      "deepFeedback": {
+        "independentSentence": "Kalimat B adalah Kalimat Mandiri: Membuka kronologi historis ('At the beginning of the twentieth century') dan topik umum tentang mobil listrik awal tanpa transition markers.",
+        "pairingClues": [
+          "Pasangan 1 (B ➔ D): Kalimat B memperkenalkan persaingan awal, dikontraskan oleh transisi 'However' di D yang menjelaskan jatuhnya harga minyak bumi.",
+          "Pasangan 2 (D ➔ A): Keunggulan ekonomi di D digabungkan ('Coupled with...') dengan penemuan self-starter di A yang mengunci dominasi mesin bensin.",
+          "Pasangan 3 (A ➔ C): Dominasi seabad di A dikontraskan dengan kebangkitan modern di C ('Today... zero-emission alternatives')."
+        ]
+      }
+    },
+    {
+      "id": "ro-005",
+      "title": "Coffee Cultivation and the Global Economy",
+      "domain": "Vocational Agriculture & Economics",
+      "correctOrder": [
+        "D",
+        "B",
+        "C",
+        "A"
+      ],
+      "paragraphs": [
+        {
+          "id": "D",
+          "text": "Wild coffee plants originated in the forested highlands of southwestern Ethiopia, where nomadic pastoralists first consumed the energizing red berries."
+        },
+        {
+          "id": "B",
+          "text": "By the fifteenth century, cultivation had crossed the Red Sea into Yemen, where Sufi monasteries pioneered the brewing of boiled beverage infusions."
+        },
+        {
+          "id": "C",
+          "text": "From these Arabian ports, bustling trading networks swiftly carried the exotic roasted beans into the merchant capitals of Renaissance Europe."
+        },
+        {
+          "id": "A",
+          "text": "The establishment of dedicated coffeehouses across London and Paris subsequently stimulated intellectual discourse and paved the way for modern financial exchanges."
+        }
+      ],
+      "deepFeedback": {
+        "independentSentence": "Kalimat D adalah Kalimat Mandiri: Memulai dari asal-usul geografis awal tanaman kopi ('Wild coffee plants originated in... Ethiopia') dengan subjek utuh tanpa pronomina.",
+        "pairingClues": [
+          "Pasangan 1 (D ➔ B): Dari Ethiopia di D, jalur waktu bergerak ke abad ke-15 di B ('By the fifteenth century, cultivation had crossed the Red Sea into Yemen').",
+          "Pasangan 2 (B ➔ C): Wilayah Yaman di B dirujuk secara geografis oleh 'From these Arabian ports' di kalimat C.",
+          "Pasangan 3 (C ➔ A): Kedatangan biji kopi ke Eropa di C memicu berdirinya kedai kopi di A ('The establishment of dedicated coffeehouses across London and Paris...')."
+        ]
+      }
+    }
+  ]
+}

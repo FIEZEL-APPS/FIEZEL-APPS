@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "task": "Write Essay",
+  "crossSkills": [
+    "Writing"
+  ],
+  "pool": "Pearson Real Exam High-Frequency Topics",
+  "items": [
+    {
+      "id": "we-001",
+      "title": "Artificial Intelligence in the Workplace",
+      "prompt": "Some people believe that artificial intelligence and automation will lead to widespread unemployment, while others argue that technological advancement creates new career opportunities. Discuss both views and give your own opinion.",
+      "wordCountTarget": "200-250 words",
+      "timeLimitMin": 20,
+      "fourParagraphPlan": {
+        "par1_intro": "Paraphrase topic + statement of thesis (agreeing that automation creates specialized roles).",
+        "par2_body1": "Argument for job displacement (repetitive manual labor is automated) with concrete example.",
+        "par3_body2": "Counterargument for job creation (data analysis, AI oversight, creative strategy) with example.",
+        "par4_conclusion": "Summary of points + final forward-looking outlook."
+      },
+      "nakulScaffold": {
+        "intro": "In the contemporary era, whether artificial intelligence and automation will cause pervasive unemployment remains a subject of ongoing debate. While some individuals contend that machines replace manual labor, others maintain that technological progress generates novel employment opportunities. In my perspective, I concur with the latter viewpoint for several reasons.",
+        "body1": "To begin with, the primary concern is that repetitive manual roles are increasingly displaced by robotics and automated algorithms. For example, manufacturing assembly plants and administrative filing positions have observed substantial workforce reductions in recent decades. Consequently, employees lacking digital competencies face immediate career vulnerabilities.",
+        "body2": "Furthermore, another pivotal factor is that technological transformation consistently fosters new specialized industries and service occupations. Specifically, emerging sectors require professionals skilled in machine learning engineering, ethical governance, and data infrastructure maintenance. To illustrate, global enterprise reports demonstrate that technology adoption creates millions of high-value professional roles annually.",
+        "conclusion": "In conclusion, after evaluating both perspectives, I reiterate that although automation inevitably disrupts legacy occupations, it fundamentally expands long-term economic prosperity and innovative career opportunities."
+      },
+      "wordCountTotal": 206
+    },
+    {
+      "id": "essay-002",
+      "title": "Government Funding for Higher Education",
+      "prompt": "Some people believe that university education should be completely free for all citizens, funded entirely by government taxation. Others argue that students should pay their own tuition fees because higher education primarily benefits the individual. Discuss both views and give your own opinion.",
+      "wordCountTarget": "200-300 words (Strict Pearson Window: 220-260 words ideal)",
+      "timeLimitMin": 20,
+      "fourParagraphPlan": {
+        "introduction": "Restate the university tuition debate with a balanced thesis statement declaring that while individuals gain higher earnings, tertiary education fuels national economic innovation.",
+        "bodyParagraph1": "Arguments for taxpayer-funded university: Promotes social mobility, eliminates crippling student debt, and ensures that talented students from low-income backgrounds can contribute to high-skill sectors like medicine and engineering.",
+        "bodyParagraph2": "Arguments for personal tuition fees: Fosters student accountability, prevents over-qualification in non-vocational degrees, and alleviates excessive tax burdens on working-class citizens who do not attend university.",
+        "conclusion": "Balanced conclusion: Reiterate that a hybrid system—such as income-contingent loans or targeted government subsidies for high-demand vocational and technical fields—offers the optimal societal balance."
+      },
+      "nakulScaffold": "The debate over whether higher education should be publicly funded remains contentious. On the one hand, universal funding democratizes opportunity. On the other hand, individual contribution ensures institutional sustainability. In conclusion, a targeted subsidy model represents the most prudent compromise."
+    },
+    {
+      "id": "essay-003",
+      "title": "Impact of Mass Tourism on Local Communities",
+      "prompt": "International tourism has expanded exponentially over recent decades, bringing economic growth to remote regions. However, critics argue that mass tourism damages local cultures and natural environments. Discuss both sides and present your own perspective.",
+      "wordCountTarget": "200-300 words",
+      "timeLimitMin": 20,
+      "fourParagraphPlan": {
+        "introduction": "Introduce the expansion of global leisure travel and state that while tourism revitalizes regional economies, unregulated tourism risks cultural degradation and ecological harm.",
+        "bodyParagraph1": "Economic benefits: Job creation in hospitality, restaurant services, and transportation; infrastructural development such as improved airports and roads; foreign exchange influx.",
+        "bodyParagraph2": "Cultural and ecological drawbacks: Overtourism, inflation of local housing prices, commodification of sacred cultural traditions, and environmental pollution.",
+        "conclusion": "Synthesize that sustainable tourism policies, including visitor quotas and eco-certification, allow communities to harvest economic dividends without destroying their identity."
+      },
+      "nakulScaffold": "Tourism represents a double-edged sword for host communities worldwide. While tourism generates essential employment in hospitality and gastronomy, unconstrained traveler influxes strain delicate heritage ecosystems. Therefore, sustainable management frameworks must guide future tourism operations."
+    },
+    {
+      "id": "essay-004",
+      "title": "Remote Telecommuting vs Traditional Office Work",
+      "prompt": "Advances in digital communication technology have made remote working feasible for millions of employees worldwide. Do the advantages of telecommuting outweigh its disadvantages for workers and organizations? Give reasons and examples.",
+      "wordCountTarget": "200-300 words",
+      "timeLimitMin": 20,
+      "fourParagraphPlan": {
+        "introduction": "Set the context of post-pandemic digital workplaces and assert that the flexibility and productivity benefits of remote work outweigh its social isolation disadvantages.",
+        "bodyParagraph1": "Advantages: Elimination of exhausting commutes, improved work-life balance, access to global talent pools, and reduced commercial real estate overhead for businesses.",
+        "bodyParagraph2": "Disadvantages: Potential deterioration of collaborative team culture, blurred boundaries between domestic life and occupational duties, and cybersecurity risks.",
+        "conclusion": "Conclude that hybrid working structures combine the concentrated autonomy of remote work with the spontaneous camaraderie of face-to-face office collaboration."
+      },
+      "nakulScaffold": "The modern paradigm shift toward digital telecommuting has transformed corporate operations. Without question, eliminating daily transit routines boosts productivity and domestic harmony. Although professional isolation presents challenges, hybrid operating models successfully balance flexibility with organizational cohesion."
+    },
+    {
+      "id": "essay-005",
+      "title": "Artificial Intelligence and Future Employment",
+      "prompt": "The rapid automation of cognitive and manual tasks by artificial intelligence systems has sparked fears of widespread unemployment. Will AI eliminate more jobs than it creates, or will it generate new vocational horizons? Present your argument.",
+      "wordCountTarget": "200-300 words",
+      "timeLimitMin": 20,
+      "fourParagraphPlan": {
+        "introduction": "Highlight the exponential adoption of artificial intelligence across industries and argue that while disruption is inevitable, technological evolution historically creates higher-tier professions.",
+        "bodyParagraph1": "Job displacement reality: Routine administrative, data entry, and repetitive manufacturing roles face rapid obsolescence as algorithmic systems achieve superior speed and accuracy.",
+        "bodyParagraph2": "Creation of new industries: Growth in AI maintenance, ethical auditing, cybersecurity, specialized robotics engineering, and human-centric service professions like culinary hospitality and healthcare.",
+        "conclusion": "Summarize that proactive vocational reskilling and educational modernization will determine whether society harnesses AI as an empowering productivity amplifier."
+      },
+      "nakulScaffold": "Technological disruption driven by artificial intelligence evokes both optimism and apprehension. While algorithmic automation eliminates repetitive clerical duties, historical industrial transitions demonstrate that technological progress continuously inaugurates novel occupational sectors. Consequently, comprehensive workforce reskilling remains imperative."
+    }
+  ]
+}
