@@ -1,14 +1,24 @@
 {
   "version": "1.0.0",
   "task": "Repeat Sentence",
-  "crossSkills": ["Speaking", "Listening"],
+  "crossSkills": [
+    "Speaking",
+    "Listening"
+  ],
   "items": [
     {
       "id": "rs-001",
       "sentence": "Please submit your completed assignment to the student office before Friday afternoon.",
       "wordCount": 12,
       "audioDurationSec": 4.2,
-      "keyContentWords": ["submit", "assignment", "student", "office", "Friday", "afternoon"],
+      "keyContentWords": [
+        "submit",
+        "assignment",
+        "student",
+        "office",
+        "Friday",
+        "afternoon"
+      ],
       "category": "Campus Administration"
     },
     {
@@ -16,15 +26,29 @@
       "sentence": "The library will remain open twenty-four hours during the final examination period.",
       "wordCount": 12,
       "audioDurationSec": 4.5,
-      "keyContentWords": ["library", "open", "twenty-four", "hours", "examination", "period"],
+      "keyContentWords": [
+        "library",
+        "open",
+        "twenty-four",
+        "hours",
+        "examination",
+        "period"
+      ],
       "category": "Campus Life"
     },
     {
       "id": "rs-003",
       "sentence": "Proper food safety guidelines must be strictly followed in all commercial kitchens.",
       "wordCount": 12,
-      "audioDurationSec": 4.0,
-      "keyContentWords": ["food", "safety", "guidelines", "strictly", "commercial", "kitchens"],
+      "audioDurationSec": 4,
+      "keyContentWords": [
+        "food",
+        "safety",
+        "guidelines",
+        "strictly",
+        "commercial",
+        "kitchens"
+      ],
       "category": "Hospitality & Cookery"
     },
     {
@@ -32,7 +56,14 @@
       "sentence": "You must wear protective gear before entering the chemistry laboratory.",
       "wordCount": 10,
       "audioDurationSec": 3.8,
-      "keyContentWords": ["wear", "protective", "gear", "entering", "chemistry", "laboratory"],
+      "keyContentWords": [
+        "wear",
+        "protective",
+        "gear",
+        "entering",
+        "chemistry",
+        "laboratory"
+      ],
       "category": "Academic Science"
     },
     {
@@ -40,7 +71,14 @@
       "sentence": "Students are required to attend all scheduled orientation sessions this week.",
       "wordCount": 11,
       "audioDurationSec": 3.9,
-      "keyContentWords": ["students", "required", "attend", "orientation", "sessions", "week"],
+      "keyContentWords": [
+        "students",
+        "required",
+        "attend",
+        "orientation",
+        "sessions",
+        "week"
+      ],
       "category": "Orientation"
     },
     {
@@ -48,7 +86,14 @@
       "sentence": "All international applicants need to provide verified proof of English language proficiency.",
       "wordCount": 12,
       "audioDurationSec": 4.8,
-      "keyContentWords": ["international", "applicants", "verified", "proof", "English", "proficiency"],
+      "keyContentWords": [
+        "international",
+        "applicants",
+        "verified",
+        "proof",
+        "English",
+        "proficiency"
+      ],
       "category": "Admissions & Visa"
     },
     {
@@ -56,7 +101,14 @@
       "sentence": "The lecture slides will be uploaded to the campus portal by tomorrow morning.",
       "wordCount": 13,
       "audioDurationSec": 4.3,
-      "keyContentWords": ["lecture", "slides", "uploaded", "campus", "portal", "tomorrow"],
+      "keyContentWords": [
+        "lecture",
+        "slides",
+        "uploaded",
+        "campus",
+        "portal",
+        "tomorrow"
+      ],
       "category": "Academic Studies"
     },
     {
@@ -64,7 +116,14 @@
       "sentence": "Chefs should always inspect raw ingredients prior to food preparation.",
       "wordCount": 10,
       "audioDurationSec": 3.6,
-      "keyContentWords": ["chefs", "inspect", "ingredients", "prior", "food", "preparation"],
+      "keyContentWords": [
+        "chefs",
+        "inspect",
+        "ingredients",
+        "prior",
+        "food",
+        "preparation"
+      ],
       "category": "Hospitality & Cookery"
     },
     {
@@ -72,7 +131,13 @@
       "sentence": "The results of the scientific study will be published next semester.",
       "wordCount": 11,
       "audioDurationSec": 3.9,
-      "keyContentWords": ["results", "scientific", "study", "published", "semester"],
+      "keyContentWords": [
+        "results",
+        "scientific",
+        "study",
+        "published",
+        "semester"
+      ],
       "category": "Research"
     },
     {
@@ -80,7 +145,14 @@
       "sentence": "Customer service representatives must respond promptly to all guest inquiries.",
       "wordCount": 10,
       "audioDurationSec": 4.1,
-      "keyContentWords": ["customer", "service", "respond", "promptly", "guest", "inquiries"],
+      "keyContentWords": [
+        "customer",
+        "service",
+        "respond",
+        "promptly",
+        "guest",
+        "inquiries"
+      ],
       "category": "Hospitality & Service"
     },
     {
@@ -88,7 +160,14 @@
       "sentence": "Fresh fruit and vegetables provide essential vitamins for human health.",
       "wordCount": 10,
       "audioDurationSec": 3.7,
-      "keyContentWords": ["fresh", "fruit", "vegetables", "essential", "vitamins", "health"],
+      "keyContentWords": [
+        "fresh",
+        "fruit",
+        "vegetables",
+        "essential",
+        "vitamins",
+        "health"
+      ],
       "category": "Nutrition"
     },
     {
@@ -96,8 +175,393 @@
       "sentence": "Please ensure your mobile phones are switched off during the formal presentation.",
       "wordCount": 12,
       "audioDurationSec": 4.2,
-      "keyContentWords": ["ensure", "mobile", "phones", "switched", "off", "presentation"],
+      "keyContentWords": [
+        "ensure",
+        "mobile",
+        "phones",
+        "switched",
+        "off",
+        "presentation"
+      ],
       "category": "Campus Etiquette"
+    },
+    {
+      "id": "rs-013",
+      "title": "Commercial Kitchen Safety Briefing",
+      "sentence": "All kitchen staff must wash their hands thoroughly before handling raw food ingredients.",
+      "audioTranscript": "All kitchen staff must wash their hands thoroughly before handling raw food ingredients.",
+      "persona": "aria",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "kitchen staff",
+        "hands",
+        "raw food ingredients"
+      ],
+      "target50Chunk": "All kitchen staff must wash their hands thoroughly",
+      "wordCount": 13,
+      "audioDurationSec": 4.7,
+      "keyContentWords": [
+        "All",
+        "kitchen",
+        "staff",
+        "their",
+        "hands",
+        "thoroughly"
+      ],
+      "category": "Commercial Kitchen Safety Briefing"
+    },
+    {
+      "id": "rs-014",
+      "title": "University Library Digital Archives",
+      "sentence": "Students can access peer-reviewed academic journals through the online university repository.",
+      "audioTranscript": "Students can access peer-reviewed academic journals through the online university repository.",
+      "persona": "guy",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "students",
+        "academic journals",
+        "online repository"
+      ],
+      "target50Chunk": "Students can access peer-reviewed academic journals",
+      "wordCount": 11,
+      "audioDurationSec": 4,
+      "keyContentWords": [
+        "Students",
+        "access",
+        "peer-reviewed",
+        "academic",
+        "journals",
+        "through"
+      ],
+      "category": "University Library Digital Archives"
+    },
+    {
+      "id": "rs-015",
+      "title": "Hospitality Customer Reservation Confirmation",
+      "sentence": "Please confirm your dining reservation with the front desk before six o'clock this evening.",
+      "audioTranscript": "Please confirm your dining reservation with the front desk before six o'clock this evening.",
+      "persona": "aria",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "dining reservation",
+        "front desk",
+        "six o'clock"
+      ],
+      "target50Chunk": "Please confirm your dining reservation with the front desk",
+      "wordCount": 14,
+      "audioDurationSec": 5,
+      "keyContentWords": [
+        "Please",
+        "confirm",
+        "dining",
+        "reservation",
+        "front",
+        "before"
+      ],
+      "category": "Hospitality Customer Reservation Confirmation"
+    },
+    {
+      "id": "rs-016",
+      "title": "Food Temperature Regulation Compliance",
+      "sentence": "Perishable items must be stored below five degrees Celsius to inhibit bacterial growth.",
+      "audioTranscript": "Perishable items must be stored below five degrees Celsius to inhibit bacterial growth.",
+      "persona": "guy",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "perishable items",
+        "five degrees Celsius",
+        "bacterial growth"
+      ],
+      "target50Chunk": "Perishable items must be stored below five degrees Celsius",
+      "wordCount": 13,
+      "audioDurationSec": 4.7,
+      "keyContentWords": [
+        "Perishable",
+        "items",
+        "stored",
+        "below",
+        "degrees",
+        "Celsius"
+      ],
+      "category": "Food Temperature Regulation Compliance"
+    },
+    {
+      "id": "rs-017",
+      "title": "Vocational Apprenticeship Workshop Orientation",
+      "sentence": "Protective footwear and safety goggles are strictly mandatory inside the commercial workshop.",
+      "audioTranscript": "Protective footwear and safety goggles are strictly mandatory inside the commercial workshop.",
+      "persona": "aria",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "protective footwear",
+        "safety goggles",
+        "commercial workshop"
+      ],
+      "target50Chunk": "Protective footwear and safety goggles are strictly mandatory",
+      "wordCount": 12,
+      "audioDurationSec": 4.3,
+      "keyContentWords": [
+        "Protective",
+        "footwear",
+        "safety",
+        "goggles",
+        "strictly",
+        "mandatory"
+      ],
+      "category": "Vocational Apprenticeship Workshop Orientation"
+    },
+    {
+      "id": "rs-018",
+      "title": "Environmental Science Lecture Overview",
+      "sentence": "Rising ocean temperatures pose a catastrophic threat to delicate coral reef ecosystems.",
+      "audioTranscript": "Rising ocean temperatures pose a catastrophic threat to delicate coral reef ecosystems.",
+      "persona": "guy",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "ocean temperatures",
+        "catastrophic threat",
+        "coral reef ecosystems"
+      ],
+      "target50Chunk": "Rising ocean temperatures pose a catastrophic threat",
+      "wordCount": 12,
+      "audioDurationSec": 4.3,
+      "keyContentWords": [
+        "Rising",
+        "ocean",
+        "temperatures",
+        "catastrophic",
+        "threat",
+        "delicate"
+      ],
+      "category": "Environmental Science Lecture Overview"
+    },
+    {
+      "id": "rs-019",
+      "title": "Culinary Technique Demonstration",
+      "sentence": "Slow roasting at moderate temperatures tenderizes tough cuts of meat while preserving moisture.",
+      "audioTranscript": "Slow roasting at moderate temperatures tenderizes tough cuts of meat while preserving moisture.",
+      "persona": "aria",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "slow roasting",
+        "moderate temperatures",
+        "meat",
+        "moisture"
+      ],
+      "target50Chunk": "Slow roasting at moderate temperatures tenderizes tough cuts",
+      "wordCount": 13,
+      "audioDurationSec": 4.7,
+      "keyContentWords": [
+        "Slow",
+        "roasting",
+        "moderate",
+        "temperatures",
+        "tenderizes",
+        "tough"
+      ],
+      "category": "Culinary Technique Demonstration"
+    },
+    {
+      "id": "rs-020",
+      "title": "Hotel Revenue Operations Meeting",
+      "sentence": "The marketing team implemented dynamic pricing strategies to maximize room occupancy during the conference.",
+      "audioTranscript": "The marketing team implemented dynamic pricing strategies to maximize room occupancy during the conference.",
+      "persona": "guy",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "marketing team",
+        "dynamic pricing",
+        "room occupancy",
+        "conference"
+      ],
+      "target50Chunk": "The marketing team implemented dynamic pricing strategies",
+      "wordCount": 14,
+      "audioDurationSec": 5,
+      "keyContentWords": [
+        "The",
+        "marketing",
+        "implemented",
+        "dynamic",
+        "pricing",
+        "strategies"
+      ],
+      "category": "Hotel Revenue Operations Meeting"
+    },
+    {
+      "id": "rs-021",
+      "title": "Public Health and Dietary Guidelines",
+      "sentence": "Consuming a balanced diet rich in leafy vegetables significantly lowers cardiovascular risk factors.",
+      "audioTranscript": "Consuming a balanced diet rich in leafy vegetables significantly lowers cardiovascular risk factors.",
+      "persona": "aria",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "balanced diet",
+        "leafy vegetables",
+        "cardiovascular risk"
+      ],
+      "target50Chunk": "Consuming a balanced diet rich in leafy vegetables",
+      "wordCount": 13,
+      "audioDurationSec": 4.7,
+      "keyContentWords": [
+        "Consuming",
+        "balanced",
+        "leafy",
+        "vegetables",
+        "significantly",
+        "lowers"
+      ],
+      "category": "Public Health and Dietary Guidelines"
+    },
+    {
+      "id": "rs-022",
+      "title": "Academic Research Methodology",
+      "sentence": "Participants were randomly divided into two experimental groups to evaluate treatment efficacy.",
+      "audioTranscript": "Participants were randomly divided into two experimental groups to evaluate treatment efficacy.",
+      "persona": "guy",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "participants",
+        "experimental groups",
+        "treatment efficacy"
+      ],
+      "target50Chunk": "Participants were randomly divided into two experimental groups",
+      "wordCount": 12,
+      "audioDurationSec": 4.3,
+      "keyContentWords": [
+        "Participants",
+        "randomly",
+        "divided",
+        "experimental",
+        "groups",
+        "evaluate"
+      ],
+      "category": "Academic Research Methodology"
+    },
+    {
+      "id": "rs-023",
+      "title": "Renewable Energy Seminar Discussion",
+      "sentence": "Solar and wind energy installations have expanded rapidly across regional Western Australia.",
+      "audioTranscript": "Solar and wind energy installations have expanded rapidly across regional Western Australia.",
+      "persona": "aria",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "solar and wind energy",
+        "installations",
+        "Western Australia"
+      ],
+      "target50Chunk": "Solar and wind energy installations have expanded rapidly",
+      "wordCount": 12,
+      "audioDurationSec": 4.3,
+      "keyContentWords": [
+        "Solar",
+        "energy",
+        "installations",
+        "expanded",
+        "rapidly",
+        "across"
+      ],
+      "category": "Renewable Energy Seminar Discussion"
+    },
+    {
+      "id": "rs-024",
+      "title": "Sustainable Fisheries Enforcement",
+      "sentence": "Strict quota regulations prevent overfishing and guarantee the long-term survival of marine species.",
+      "audioTranscript": "Strict quota regulations prevent overfishing and guarantee the long-term survival of marine species.",
+      "persona": "guy",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "quota regulations",
+        "overfishing",
+        "marine species"
+      ],
+      "target50Chunk": "Strict quota regulations prevent overfishing and guarantee",
+      "wordCount": 13,
+      "audioDurationSec": 4.7,
+      "keyContentWords": [
+        "Strict",
+        "quota",
+        "regulations",
+        "prevent",
+        "overfishing",
+        "guarantee"
+      ],
+      "category": "Sustainable Fisheries Enforcement"
+    },
+    {
+      "id": "rs-025",
+      "title": "Student Visa and Enrollment Guidelines",
+      "sentence": "International applicants must present certified documentation before their official enrollment can be finalized.",
+      "audioTranscript": "International applicants must present certified documentation before their official enrollment can be finalized.",
+      "persona": "aria",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "international applicants",
+        "certified documentation",
+        "enrollment"
+      ],
+      "target50Chunk": "International applicants must present certified documentation",
+      "wordCount": 13,
+      "audioDurationSec": 4.7,
+      "keyContentWords": [
+        "International",
+        "applicants",
+        "present",
+        "certified",
+        "documentation",
+        "before"
+      ],
+      "category": "Student Visa and Enrollment Guidelines"
+    },
+    {
+      "id": "rs-026",
+      "title": "Baking Science Sourdough Fermentation",
+      "sentence": "Beneficial microorganisms produce organic acids that impart distinct tart flavors to artisan bread.",
+      "audioTranscript": "Beneficial microorganisms produce organic acids that impart distinct tart flavors to artisan bread.",
+      "persona": "guy",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "microorganisms",
+        "organic acids",
+        "tart flavors",
+        "artisan bread"
+      ],
+      "target50Chunk": "Beneficial microorganisms produce organic acids that impart",
+      "wordCount": 13,
+      "audioDurationSec": 4.7,
+      "keyContentWords": [
+        "Beneficial",
+        "microorganisms",
+        "produce",
+        "organic",
+        "acids",
+        "impart"
+      ],
+      "category": "Baking Science Sourdough Fermentation"
+    },
+    {
+      "id": "rs-027",
+      "title": "Campus Security and Emergency Protocols",
+      "sentence": "In case of emergency, please evacuate the lecture hall immediately through the nearest marked exits.",
+      "audioTranscript": "In case of emergency, please evacuate the lecture hall immediately through the nearest marked exits.",
+      "persona": "aria",
+      "recordTimeSec": 15,
+      "keyNounChunks": [
+        "emergency",
+        "lecture hall",
+        "marked exits"
+      ],
+      "target50Chunk": "In case of emergency please evacuate the lecture hall",
+      "wordCount": 15,
+      "audioDurationSec": 5.4,
+      "keyContentWords": [
+        "In",
+        "emergency",
+        "please",
+        "evacuate",
+        "lecture",
+        "immediately"
+      ],
+      "category": "Campus Security and Emergency Protocols"
     }
   ]
 }

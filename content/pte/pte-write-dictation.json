@@ -1,16 +1,37 @@
 {
   "version": "1.0.0",
   "task": "Write from Dictation",
-  "crossSkills": ["Listening", "Writing"],
+  "crossSkills": [
+    "Listening",
+    "Writing"
+  ],
   "items": [
     {
       "id": "wfd-001",
       "sentence": "The university provides free accommodation for international exchange students.",
       "wordCount": 9,
       "audioDurationSec": 4.1,
-      "tokens": ["The", "university", "provides", "free", "accommodation", "for", "international", "exchange", "students"],
+      "tokens": [
+        "The",
+        "university",
+        "provides",
+        "free",
+        "accommodation",
+        "for",
+        "international",
+        "exchange",
+        "students"
+      ],
       "spellingChallenges": [
-        { "word": "accommodation", "commonErrors": ["acommodation", "accomodation", "acomodation"], "rule": "Double 'c' and double 'm'." }
+        {
+          "word": "accommodation",
+          "commonErrors": [
+            "acommodation",
+            "accomodation",
+            "acomodation"
+          ],
+          "rule": "Double 'c' and double 'm'."
+        }
       ]
     },
     {
@@ -18,10 +39,37 @@
       "sentence": "Strict kitchen hygiene standards are essential for all commercial restaurants.",
       "wordCount": 10,
       "audioDurationSec": 4.3,
-      "tokens": ["Strict", "kitchen", "hygiene", "standards", "are", "essential", "for", "all", "commercial", "restaurants"],
+      "tokens": [
+        "Strict",
+        "kitchen",
+        "hygiene",
+        "standards",
+        "are",
+        "essential",
+        "for",
+        "all",
+        "commercial",
+        "restaurants"
+      ],
       "spellingChallenges": [
-        { "word": "hygiene", "commonErrors": ["hygene", "hygeine", "higene"], "rule": "H-Y-G-I-E-N-E (i before e)." },
-        { "word": "restaurants", "commonErrors": ["resturants", "restaraunts", "resteraunts"], "rule": "R-E-S-T-A-U-R-A-N-T-S ('au' in the middle)." }
+        {
+          "word": "hygiene",
+          "commonErrors": [
+            "hygene",
+            "hygeine",
+            "higene"
+          ],
+          "rule": "H-Y-G-I-E-N-E (i before e)."
+        },
+        {
+          "word": "restaurants",
+          "commonErrors": [
+            "resturants",
+            "restaraunts",
+            "resteraunts"
+          ],
+          "rule": "R-E-S-T-A-U-R-A-N-T-S ('au' in the middle)."
+        }
       ]
     },
     {
@@ -29,9 +77,30 @@
       "sentence": "It is necessary to submit all academic documents before the official deadline.",
       "wordCount": 12,
       "audioDurationSec": 4.5,
-      "tokens": ["It", "is", "necessary", "to", "submit", "all", "academic", "documents", "before", "the", "official", "deadline"],
+      "tokens": [
+        "It",
+        "is",
+        "necessary",
+        "to",
+        "submit",
+        "all",
+        "academic",
+        "documents",
+        "before",
+        "the",
+        "official",
+        "deadline"
+      ],
       "spellingChallenges": [
-        { "word": "necessary", "commonErrors": ["neccessary", "necesary", "necessery"], "rule": "One 'c', double 's' (Never Eat Cake, Eat Salad Sandwiches And Remain Young)." }
+        {
+          "word": "necessary",
+          "commonErrors": [
+            "neccessary",
+            "necesary",
+            "necessery"
+          ],
+          "rule": "One 'c', double 's' (Never Eat Cake, Eat Salad Sandwiches And Remain Young)."
+        }
       ]
     },
     {
@@ -39,10 +108,34 @@
       "sentence": "Environmental scientists are monitoring temperature changes across coastal Australia.",
       "wordCount": 9,
       "audioDurationSec": 4.6,
-      "tokens": ["Environmental", "scientists", "are", "monitoring", "temperature", "changes", "across", "coastal", "Australia"],
+      "tokens": [
+        "Environmental",
+        "scientists",
+        "are",
+        "monitoring",
+        "temperature",
+        "changes",
+        "across",
+        "coastal",
+        "Australia"
+      ],
       "spellingChallenges": [
-        { "word": "environmental", "commonErrors": ["enviromental", "environmantal"], "rule": "Remember the 'n' after 'viro': E-N-V-I-R-O-N-mental." },
-        { "word": "temperature", "commonErrors": ["temprature", "temperture"], "rule": "T-E-M-P-E-R-A-T-U-R-E." }
+        {
+          "word": "environmental",
+          "commonErrors": [
+            "enviromental",
+            "environmantal"
+          ],
+          "rule": "Remember the 'n' after 'viro': E-N-V-I-R-O-N-mental."
+        },
+        {
+          "word": "temperature",
+          "commonErrors": [
+            "temprature",
+            "temperture"
+          ],
+          "rule": "T-E-M-P-E-R-A-T-U-R-E."
+        }
       ]
     },
     {
@@ -50,10 +143,35 @@
       "sentence": "Successful applicants will receive their confirmation letters by next Wednesday.",
       "wordCount": 10,
       "audioDurationSec": 4.2,
-      "tokens": ["Successful", "applicants", "will", "receive", "their", "confirmation", "letters", "by", "next", "Wednesday"],
+      "tokens": [
+        "Successful",
+        "applicants",
+        "will",
+        "receive",
+        "their",
+        "confirmation",
+        "letters",
+        "by",
+        "next",
+        "Wednesday"
+      ],
       "spellingChallenges": [
-        { "word": "successful", "commonErrors": ["succesful", "successfull", "sucessful"], "rule": "Double 'c', double 's', single 'l'." },
-        { "word": "receive", "commonErrors": ["recieve"], "rule": "I before E except after C." }
+        {
+          "word": "successful",
+          "commonErrors": [
+            "succesful",
+            "successfull",
+            "sucessful"
+          ],
+          "rule": "Double 'c', double 's', single 'l'."
+        },
+        {
+          "word": "receive",
+          "commonErrors": [
+            "recieve"
+          ],
+          "rule": "I before E except after C."
+        }
       ]
     },
     {
@@ -61,19 +179,55 @@
       "sentence": "The library catalog contains thousands of digital journals and reference materials.",
       "wordCount": 11,
       "audioDurationSec": 4.7,
-      "tokens": ["The", "library", "catalog", "contains", "thousands", "of", "digital", "journals", "and", "reference", "materials"],
+      "tokens": [
+        "The",
+        "library",
+        "catalog",
+        "contains",
+        "thousands",
+        "of",
+        "digital",
+        "journals",
+        "and",
+        "reference",
+        "materials"
+      ],
       "spellingChallenges": [
-        { "word": "reference", "commonErrors": ["referance", "reffurence"], "rule": "R-E-F-E-R-E-N-C-E." }
+        {
+          "word": "reference",
+          "commonErrors": [
+            "referance",
+            "reffurence"
+          ],
+          "rule": "R-E-F-E-R-E-N-C-E."
+        }
       ]
     },
     {
       "id": "wfd-007",
       "sentence": "Modern hospitality training prepares students for international leadership roles.",
       "wordCount": 9,
-      "audioDurationSec": 4.0,
-      "tokens": ["Modern", "hospitality", "training", "prepares", "students", "for", "international", "leadership", "roles"],
+      "audioDurationSec": 4,
+      "tokens": [
+        "Modern",
+        "hospitality",
+        "training",
+        "prepares",
+        "students",
+        "for",
+        "international",
+        "leadership",
+        "roles"
+      ],
       "spellingChallenges": [
-        { "word": "hospitality", "commonErrors": ["hospitalaty", "hospitallity"], "rule": "H-O-S-P-I-T-A-L-I-T-Y." }
+        {
+          "word": "hospitality",
+          "commonErrors": [
+            "hospitalaty",
+            "hospitallity"
+          ],
+          "rule": "H-O-S-P-I-T-A-L-I-T-Y."
+        }
       ]
     },
     {
@@ -81,10 +235,33 @@
       "sentence": "Financial assistance is available for qualifying postgraduate researchers.",
       "wordCount": 8,
       "audioDurationSec": 4.2,
-      "tokens": ["Financial", "assistance", "is", "available", "for", "qualifying", "postgraduate", "researchers"],
+      "tokens": [
+        "Financial",
+        "assistance",
+        "is",
+        "available",
+        "for",
+        "qualifying",
+        "postgraduate",
+        "researchers"
+      ],
       "spellingChallenges": [
-        { "word": "assistance", "commonErrors": ["assistence", "asistance"], "rule": "Double 's', ends in '-ance'." },
-        { "word": "available", "commonErrors": ["availible", "avaliable"], "rule": "A-V-A-I-L-A-B-L-E." }
+        {
+          "word": "assistance",
+          "commonErrors": [
+            "assistence",
+            "asistance"
+          ],
+          "rule": "Double 's', ends in '-ance'."
+        },
+        {
+          "word": "available",
+          "commonErrors": [
+            "availible",
+            "avaliable"
+          ],
+          "rule": "A-V-A-I-L-A-B-L-E."
+        }
       ]
     },
     {
@@ -92,9 +269,28 @@
       "sentence": "A balanced diet and regular physical exercise significantly reduce health risks.",
       "wordCount": 11,
       "audioDurationSec": 4.8,
-      "tokens": ["A", "balanced", "diet", "and", "regular", "physical", "exercise", "significantly", "reduce", "health", "risks"],
+      "tokens": [
+        "A",
+        "balanced",
+        "diet",
+        "and",
+        "regular",
+        "physical",
+        "exercise",
+        "significantly",
+        "reduce",
+        "health",
+        "risks"
+      ],
       "spellingChallenges": [
-        { "word": "exercise", "commonErrors": ["excercise", "exercize"], "rule": "E-X-E-R-C-I-S-E (no 'c' after 'x')." }
+        {
+          "word": "exercise",
+          "commonErrors": [
+            "excercise",
+            "exercize"
+          ],
+          "rule": "E-X-E-R-C-I-S-E (no 'c' after 'x')."
+        }
       ]
     },
     {
@@ -102,10 +298,693 @@
       "sentence": "Our vocational campus offers specialized culinary certificates and hospitality diplomas.",
       "wordCount": 10,
       "audioDurationSec": 4.7,
-      "tokens": ["Our", "vocational", "campus", "offers", "specialized", "culinary", "certificates", "and", "hospitality", "diplomas"],
+      "tokens": [
+        "Our",
+        "vocational",
+        "campus",
+        "offers",
+        "specialized",
+        "culinary",
+        "certificates",
+        "and",
+        "hospitality",
+        "diplomas"
+      ],
       "spellingChallenges": [
-        { "word": "culinary", "commonErrors": ["cullinary", "culunary"], "rule": "Single 'l': C-U-L-I-N-A-R-Y." },
-        { "word": "certificates", "commonErrors": ["certifikates", "certifecates"], "rule": "C-E-R-T-I-F-I-C-A-T-E-S." }
+        {
+          "word": "culinary",
+          "commonErrors": [
+            "cullinary",
+            "culunary"
+          ],
+          "rule": "Single 'l': C-U-L-I-N-A-R-Y."
+        },
+        {
+          "word": "certificates",
+          "commonErrors": [
+            "certifikates",
+            "certifecates"
+          ],
+          "rule": "C-E-R-T-I-F-I-C-A-T-E-S."
+        }
+      ]
+    },
+    {
+      "id": "wfd-011",
+      "title": "Commercial Cookery Kitchen Sanitation",
+      "sentence": "All food handlers must maintain strict personal hygiene inside the commercial kitchen.",
+      "audioTranscript": "All food handlers must maintain strict personal hygiene inside the commercial kitchen.",
+      "persona": "guy",
+      "spellingChallenges": [
+        {
+          "word": "hygiene",
+          "commonErrors": [
+            "hygene",
+            "heigiene",
+            "hygeine"
+          ],
+          "rule": "H-Y-G-I-E-N-E (I before E, letter Y in first syllable)."
+        },
+        {
+          "word": "commercial",
+          "commonErrors": [
+            "comercial",
+            "commerical"
+          ],
+          "rule": "C-O-M-M-E-R-C-I-A-L (Double M, ends in -cial)."
+        }
+      ],
+      "nakulExtraWords": [
+        "handler",
+        "handlers",
+        "kitchen",
+        "kitchens"
+      ],
+      "tokens": [
+        "All",
+        "food",
+        "handlers",
+        "must",
+        "maintain",
+        "strict",
+        "personal",
+        "hygiene",
+        "inside",
+        "the",
+        "commercial",
+        "kitchen"
+      ]
+    },
+    {
+      "id": "wfd-012",
+      "title": "Hospitality Front Office Accommodation",
+      "sentence": "The hotel accommodates corporate clients with modern conference facilities.",
+      "audioTranscript": "The hotel accommodates corporate clients with modern conference facilities.",
+      "persona": "aria",
+      "spellingChallenges": [
+        {
+          "word": "accommodates",
+          "commonErrors": [
+            "acommodates",
+            "accomodates",
+            "accommodate"
+          ],
+          "rule": "A-C-C-O-M-M-O-D-A-T-E-S (Double C and double M)."
+        },
+        {
+          "word": "conference",
+          "commonErrors": [
+            "conferance",
+            "conferense"
+          ],
+          "rule": "C-O-N-F-E-R-E-N-C-E (Ends in -ence, not -ance)."
+        }
+      ],
+      "nakulExtraWords": [
+        "client",
+        "clients",
+        "facility",
+        "facilities"
+      ],
+      "tokens": [
+        "The",
+        "hotel",
+        "accommodates",
+        "corporate",
+        "clients",
+        "with",
+        "modern",
+        "conference",
+        "facilities"
+      ]
+    },
+    {
+      "id": "wfd-013",
+      "title": "University Laboratory Safety Procedures",
+      "sentence": "Protective equipment must be worn at all times inside chemical laboratories.",
+      "audioTranscript": "Protective equipment must be worn at all times inside chemical laboratories.",
+      "persona": "guy",
+      "spellingChallenges": [
+        {
+          "word": "equipment",
+          "commonErrors": [
+            "equipments",
+            "equiptment"
+          ],
+          "rule": "E-Q-U-I-P-M-E-N-T (Uncountable noun, never add -s)."
+        },
+        {
+          "word": "laboratories",
+          "commonErrors": [
+            "laboratorys",
+            "labratories"
+          ],
+          "rule": "L-A-B-O-R-A-T-O-R-I-E-S (Plural of laboratory: -ies)."
+        }
+      ],
+      "nakulExtraWords": [
+        "laboratory",
+        "laboratories",
+        "chemical",
+        "chemicals"
+      ],
+      "tokens": [
+        "Protective",
+        "equipment",
+        "must",
+        "be",
+        "worn",
+        "at",
+        "all",
+        "times",
+        "inside",
+        "chemical",
+        "laboratories"
+      ]
+    },
+    {
+      "id": "wfd-014",
+      "title": "Environmental Climate Research Findings",
+      "sentence": "Scientists collected valuable empirical data regarding extreme weather fluctuations.",
+      "audioTranscript": "Scientists collected valuable empirical data regarding extreme weather fluctuations.",
+      "persona": "aria",
+      "spellingChallenges": [
+        {
+          "word": "empirical",
+          "commonErrors": [
+            "empiracle",
+            "emperical"
+          ],
+          "rule": "E-M-P-I-R-I-C-A-L (E-m-p-i-r-i-c-a-l)."
+        },
+        {
+          "word": "fluctuations",
+          "commonErrors": [
+            "fluctuasions",
+            "fluctuations"
+          ],
+          "rule": "F-L-U-C-T-U-A-T-I-O-N-S (Ends in -tions)."
+        }
+      ],
+      "nakulExtraWords": [
+        "scientist",
+        "scientists",
+        "fluctuation",
+        "fluctuations"
+      ],
+      "tokens": [
+        "Scientists",
+        "collected",
+        "valuable",
+        "empirical",
+        "data",
+        "regarding",
+        "extreme",
+        "weather",
+        "fluctuations"
+      ]
+    },
+    {
+      "id": "wfd-015",
+      "title": "Library Borrowing Privileges and Regulations",
+      "sentence": "Students must present their valid identity cards to borrow reference books.",
+      "audioTranscript": "Students must present their valid identity cards to borrow reference books.",
+      "persona": "guy",
+      "spellingChallenges": [
+        {
+          "word": "privilege",
+          "commonErrors": [
+            "privelege",
+            "priviledge"
+          ],
+          "rule": "P-R-I-V-I-L-E-G-E (Two I's, no D)."
+        },
+        {
+          "word": "reference",
+          "commonErrors": [
+            "referance",
+            "referense"
+          ],
+          "rule": "R-E-F-E-R-E-N-C-E (Ends in -ence)."
+        }
+      ],
+      "nakulExtraWords": [
+        "student",
+        "students",
+        "card",
+        "cards",
+        "book",
+        "books"
+      ],
+      "tokens": [
+        "Students",
+        "must",
+        "present",
+        "their",
+        "valid",
+        "identity",
+        "cards",
+        "to",
+        "borrow",
+        "reference",
+        "books"
+      ]
+    },
+    {
+      "id": "wfd-016",
+      "title": "Vocational Hospitality Assessment Criteria",
+      "sentence": "Practical competency assessments require candidates to demonstrate professional customer service.",
+      "audioTranscript": "Practical competency assessments require candidates to demonstrate professional customer service.",
+      "persona": "aria",
+      "spellingChallenges": [
+        {
+          "word": "assessments",
+          "commonErrors": [
+            "assesments",
+            "assesment"
+          ],
+          "rule": "A-S-S-E-S-S-M-E-N-T-S (Four S's in total)."
+        },
+        {
+          "word": "professional",
+          "commonErrors": [
+            "profesional",
+            "proffessional"
+          ],
+          "rule": "P-R-O-F-E-S-S-I-O-N-A-L (One F, double S)."
+        }
+      ],
+      "nakulExtraWords": [
+        "candidate",
+        "candidates",
+        "assessment",
+        "assessments"
+      ],
+      "tokens": [
+        "Practical",
+        "competency",
+        "assessments",
+        "require",
+        "candidates",
+        "to",
+        "demonstrate",
+        "professional",
+        "customer",
+        "service"
+      ]
+    },
+    {
+      "id": "wfd-017",
+      "title": "Culinary Nutrition and Dietary Balance",
+      "sentence": "Balanced nutrition supports sustained physical energy and cognitive performance throughout the day.",
+      "audioTranscript": "Balanced nutrition supports sustained physical energy and cognitive performance throughout the day.",
+      "persona": "guy",
+      "spellingChallenges": [
+        {
+          "word": "sustained",
+          "commonErrors": [
+            "susteined",
+            "sustanied"
+          ],
+          "rule": "S-U-S-T-A-I-N-E-D (S-u-s-t-a-i-n-e-d)."
+        },
+        {
+          "word": "cognitive",
+          "commonErrors": [
+            "cognative",
+            "cognetive"
+          ],
+          "rule": "C-O-G-N-I-T-I-V-E (C-o-g-n-i-t-i-v-e)."
+        }
+      ],
+      "nakulExtraWords": [
+        "nutrition",
+        "nutritions",
+        "performance",
+        "performances"
+      ],
+      "tokens": [
+        "Balanced",
+        "nutrition",
+        "supports",
+        "sustained",
+        "physical",
+        "energy",
+        "and",
+        "cognitive",
+        "performance",
+        "throughout",
+        "the",
+        "day"
+      ]
+    },
+    {
+      "id": "wfd-018",
+      "title": "Renewable Energy Transition Policies",
+      "sentence": "Government subsidies encourage corporate investment in sustainable solar infrastructure.",
+      "audioTranscript": "Government subsidies encourage corporate investment in sustainable solar infrastructure.",
+      "persona": "aria",
+      "spellingChallenges": [
+        {
+          "word": "government",
+          "commonErrors": [
+            "goverment",
+            "govornment"
+          ],
+          "rule": "G-O-V-E-R-N-M-E-N-T (Keep the N: govern + ment)."
+        },
+        {
+          "word": "infrastructure",
+          "commonErrors": [
+            "infrastructur",
+            "infrastruture"
+          ],
+          "rule": "I-N-F-R-A-S-T-R-U-C-T-U-R-E (Contains -cture)."
+        }
+      ],
+      "nakulExtraWords": [
+        "subsidy",
+        "subsidies",
+        "investment",
+        "investments"
+      ],
+      "tokens": [
+        "Government",
+        "subsidies",
+        "encourage",
+        "corporate",
+        "investment",
+        "in",
+        "sustainable",
+        "solar",
+        "infrastructure"
+      ]
+    },
+    {
+      "id": "wfd-019",
+      "title": "Marine Ecology Great Barrier Reef",
+      "sentence": "Marine sanctuaries protect endangered aquatic species from commercial exploitation.",
+      "audioTranscript": "Marine sanctuaries protect endangered aquatic species from commercial exploitation.",
+      "persona": "guy",
+      "spellingChallenges": [
+        {
+          "word": "sanctuaries",
+          "commonErrors": [
+            "sanctuarys",
+            "sancturies"
+          ],
+          "rule": "S-A-N-C-T-U-A-R-I-E-S (Plural: y becomes -ies)."
+        },
+        {
+          "word": "endangered",
+          "commonErrors": [
+            "indangered",
+            "endangred"
+          ],
+          "rule": "E-N-D-A-N-G-E-R-E-D (Prefix en-, not in-)."
+        }
+      ],
+      "nakulExtraWords": [
+        "sanctuary",
+        "sanctuaries",
+        "species"
+      ],
+      "tokens": [
+        "Marine",
+        "sanctuaries",
+        "protect",
+        "endangered",
+        "aquatic",
+        "species",
+        "from",
+        "commercial",
+        "exploitation"
+      ]
+    },
+    {
+      "id": "wfd-020",
+      "title": "Hotel Reservation Management Procedures",
+      "sentence": "Guests should notify reception immediately if their travel arrangements change unexpectedly.",
+      "audioTranscript": "Guests should notify reception immediately if their travel arrangements change unexpectedly.",
+      "persona": "aria",
+      "spellingChallenges": [
+        {
+          "word": "immediately",
+          "commonErrors": [
+            "immediatly",
+            "imediatly"
+          ],
+          "rule": "I-M-M-E-D-I-A-T-E-L-Y (Double M, keep the E before -ly)."
+        },
+        {
+          "word": "arrangements",
+          "commonErrors": [
+            "arangements",
+            "arrangments"
+          ],
+          "rule": "A-R-R-A-N-G-E-M-E-N-T-S (Double R, keep E: arrange + ments)."
+        }
+      ],
+      "nakulExtraWords": [
+        "guest",
+        "guests",
+        "arrangement",
+        "arrangements"
+      ],
+      "tokens": [
+        "Guests",
+        "should",
+        "notify",
+        "reception",
+        "immediately",
+        "if",
+        "their",
+        "travel",
+        "arrangements",
+        "change",
+        "unexpectedly"
+      ]
+    },
+    {
+      "id": "wfd-021",
+      "title": "Food Chemistry and Emulsification",
+      "sentence": "Egg yolks contain natural emulsifiers that stabilize delicate culinary sauces.",
+      "audioTranscript": "Egg yolks contain natural emulsifiers that stabilize delicate culinary sauces.",
+      "persona": "guy",
+      "spellingChallenges": [
+        {
+          "word": "emulsifiers",
+          "commonErrors": [
+            "emulsyfiers",
+            "emulcifiers"
+          ],
+          "rule": "E-M-U-L-S-I-F-I-E-R-S (S, not C; ends in -fiers)."
+        },
+        {
+          "word": "stabilize",
+          "commonErrors": [
+            "stabilise",
+            "stabelize"
+          ],
+          "rule": "S-T-A-B-I-L-I-Z-E (Pearson accepts both -ize and -ise)."
+        }
+      ],
+      "nakulExtraWords": [
+        "sauce",
+        "sauces",
+        "emulsifier",
+        "emulsifiers"
+      ],
+      "tokens": [
+        "Egg",
+        "yolks",
+        "contain",
+        "natural",
+        "emulsifiers",
+        "that",
+        "stabilize",
+        "delicate",
+        "culinary",
+        "sauces"
+      ]
+    },
+    {
+      "id": "wfd-022",
+      "title": "Academic Research Thesis Submission",
+      "sentence": "Postgraduate candidates must submit their finalized dissertations before the commencement ceremony.",
+      "audioTranscript": "Postgraduate candidates must submit their finalized dissertations before the commencement ceremony.",
+      "persona": "aria",
+      "spellingChallenges": [
+        {
+          "word": "dissertations",
+          "commonErrors": [
+            "disertations",
+            "dissertacions"
+          ],
+          "rule": "D-I-S-S-E-R-T-A-T-I-O-N-S (Double S, ends in -tions)."
+        },
+        {
+          "word": "commencement",
+          "commonErrors": [
+            "comencement",
+            "commencment"
+          ],
+          "rule": "C-O-M-M-E-N-C-E-M-E-N-T (Double M, keep E before -ment)."
+        }
+      ],
+      "nakulExtraWords": [
+        "candidate",
+        "candidates",
+        "dissertation",
+        "dissertations"
+      ],
+      "tokens": [
+        "Postgraduate",
+        "candidates",
+        "must",
+        "submit",
+        "their",
+        "finalized",
+        "dissertations",
+        "before",
+        "the",
+        "commencement",
+        "ceremony"
+      ]
+    },
+    {
+      "id": "wfd-023",
+      "title": "Hospitality Food Allergens Safety Notice",
+      "sentence": "Restaurant staff are legally required to disclose potential food allergens upon request.",
+      "audioTranscript": "Restaurant staff are legally required to disclose potential food allergens upon request.",
+      "persona": "guy",
+      "spellingChallenges": [
+        {
+          "word": "allergens",
+          "commonErrors": [
+            "alergenes",
+            "allergenes"
+          ],
+          "rule": "A-L-L-E-R-G-E-N-S (Double L, single G, ends in -ens)."
+        },
+        {
+          "word": "potential",
+          "commonErrors": [
+            "potensial",
+            "potentual"
+          ],
+          "rule": "P-O-T-E-N-T-I-A-L (T-I-A-L, not S-I-A-L)."
+        }
+      ],
+      "nakulExtraWords": [
+        "allergen",
+        "allergens",
+        "staff",
+        "request",
+        "requests"
+      ],
+      "tokens": [
+        "Restaurant",
+        "staff",
+        "are",
+        "legally",
+        "required",
+        "to",
+        "disclose",
+        "potential",
+        "food",
+        "allergens",
+        "upon",
+        "request"
+      ]
+    },
+    {
+      "id": "wfd-024",
+      "title": "Agricultural Irrigation Water Conservation",
+      "sentence": "Modern agricultural techniques utilize automated drip irrigation to conserve precious groundwater.",
+      "audioTranscript": "Modern agricultural techniques utilize automated drip irrigation to conserve precious groundwater.",
+      "persona": "aria",
+      "spellingChallenges": [
+        {
+          "word": "irrigation",
+          "commonErrors": [
+            "irigation",
+            "irrigasion"
+          ],
+          "rule": "I-R-R-I-G-A-T-I-O-N (Double R, single G, -tion)."
+        },
+        {
+          "word": "precious",
+          "commonErrors": [
+            "presious",
+            "preceous"
+          ],
+          "rule": "P-R-E-C-I-O-U-S (C-I-O-U-S)."
+        }
+      ],
+      "nakulExtraWords": [
+        "technique",
+        "techniques",
+        "groundwater"
+      ],
+      "tokens": [
+        "Modern",
+        "agricultural",
+        "techniques",
+        "utilize",
+        "automated",
+        "drip",
+        "irrigation",
+        "to",
+        "conserve",
+        "precious",
+        "groundwater"
+      ]
+    },
+    {
+      "id": "wfd-025",
+      "title": "Perth Student Campus Transportation",
+      "sentence": "Public transportation discounts are available for all full-time vocational college students.",
+      "audioTranscript": "Public transportation discounts are available for all full-time vocational college students.",
+      "persona": "guy",
+      "spellingChallenges": [
+        {
+          "word": "transportation",
+          "commonErrors": [
+            "transportasion",
+            "transporation"
+          ],
+          "rule": "T-R-A-N-S-P-O-R-T-A-T-I-O-N (T-a-t-i-o-n)."
+        },
+        {
+          "word": "vocational",
+          "commonErrors": [
+            "vocasionale",
+            "vacational"
+          ],
+          "rule": "V-O-C-A-T-I-O-N-A-L (V-o-, not V-a-)."
+        }
+      ],
+      "nakulExtraWords": [
+        "student",
+        "students",
+        "discount",
+        "discounts",
+        "college",
+        "colleges"
+      ],
+      "tokens": [
+        "Public",
+        "transportation",
+        "discounts",
+        "are",
+        "available",
+        "for",
+        "all",
+        "full-time",
+        "vocational",
+        "college",
+        "students"
       ]
     }
   ]

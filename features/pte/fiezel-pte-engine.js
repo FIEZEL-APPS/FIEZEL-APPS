@@ -266,9 +266,23 @@
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
     // Pearson item scale translation (0 to 90)
-    // Content contributes equally to Reading and Speaking in Pearson model
-    var totalRaw = contentScore + fluency.score + pronunciation.score; // 0 to 13
-    var pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 80);
+    // Official Pearson Scoring Rule: If content is 0 (mismatched/silent), fluency and pronunciation receive 0.
+    var totalRaw = 0;
+    var pearsonEquivalent = 10;
+    if (contentScore === 0 || hypTokens.length === 0) {
+      fluency = { score: 0, wpm: 0, label: 'No speech detected / Mismatched' };
+      pronunciation = { score: 0, confidence: 0, label: 'Unintelligible' };
+      totalRaw = 0;
+      pearsonEquivalent = 10;
+    } else if (contentScore === 1) {
+      fluency.score = Math.min(fluency.score, 3);
+      pronunciation.score = Math.min(pronunciation.score, 3);
+      totalRaw = contentScore + fluency.score + pronunciation.score;
+      pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 50); // Capped below Target 42
+    } else {
+      totalRaw = contentScore + fluency.score + pronunciation.score; // 0 to 13
+      pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 80);
+    }
 
     return {
       task: 'Read Aloud',
@@ -329,8 +343,29 @@
     var fluency = evaluateOralFluency(m.durationSec || (hypTokens.length * 0.4), hypTokens.length, m.pausesCount || 0);
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
-    var totalRaw = contentScore + fluency.score + pronunciation.score; // 0 to 13
-    var pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 80);
+    // Official Pearson Scoring Rule: If content is 0 (mismatched/silent), fluency and pronunciation receive 0.
+    var totalRaw = 0;
+    var pearsonEquivalent = 10;
+    if (contentScore === 0 || hypTokens.length === 0) {
+      fluency = { score: 0, wpm: 0, label: 'No speech detected / Mismatched' };
+      pronunciation = { score: 0, confidence: 0, label: 'Unintelligible' };
+      totalRaw = 0;
+      pearsonEquivalent = 10;
+    } else if (contentScore === 1) {
+      // Partial content (<50%): cap fluency and pronunciation to max 3
+      fluency.score = Math.min(fluency.score, 3);
+      pronunciation.score = Math.min(pronunciation.score, 3);
+      totalRaw = contentScore + fluency.score + pronunciation.score;
+      pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 50); // Capped around 25-37 (below Target 42 benchmark)
+    } else if (contentScore === 2) {
+      // Nakul 50% Rule satisfied (Target 42 benchmark)
+      totalRaw = contentScore + fluency.score + pronunciation.score;
+      pearsonEquivalent = Math.round(35 + (totalRaw / 13) * 45); // Maps to 42 - 68 based on rhythm
+    } else {
+      // Full replication (>=90%)
+      totalRaw = contentScore + fluency.score + pronunciation.score; // 0 to 13
+      pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 80);
+    }
 
     var meets50Percent = alignment.matchRatio >= 0.50;
     var nakulFeedback = meets50Percent
@@ -470,8 +505,22 @@
     var fluency = evaluateOralFluency(duration, hypTokens.length, m.pausesCount || 0);
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
-    var totalRaw = contentScore + fluency.score + pronunciation.score; // 0 to 15
-    var pearsonEquivalent = Math.round(10 + (totalRaw / 15) * 80);
+    var totalRaw = 0;
+    var pearsonEquivalent = 10;
+    if (contentScore === 0 || hypTokens.length === 0) {
+      fluency = { score: 0, wpm: 0, label: 'No speech detected / Mismatched' };
+      pronunciation = { score: 0, confidence: 0, label: 'Unintelligible' };
+      totalRaw = 0;
+      pearsonEquivalent = 10;
+    } else if (hypTokens.length < 5 || duration < 10) {
+      fluency.score = 1;
+      pronunciation.score = 1;
+      totalRaw = contentScore + fluency.score + pronunciation.score;
+      pearsonEquivalent = Math.round(10 + (totalRaw / 15) * 30); // ~16-20 (insufficient speech)
+    } else {
+      totalRaw = contentScore + fluency.score + pronunciation.score; // 0 to 15
+      pearsonEquivalent = Math.round(10 + (totalRaw / 15) * 80);
+    }
 
     return {
       task: 'Describe Image',

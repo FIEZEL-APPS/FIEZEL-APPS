@@ -121,6 +121,259 @@
           "spellingTip": "Bentuk jamak: p-e-r-i-o-d-s."
         }
       ]
+    },
+    {
+      "id": "lfib-006",
+      "title": "Commercial Kitchen Temperature Standards",
+      "audioTranscript": "To prevent foodborne bacterial proliferation, commercial refrigeration units must maintain temperatures strictly between one and four degrees Celsius. Food inspectors routinely inspect digital calibration logs to ensure complete regulatory compliance.",
+      "displayedText": "To prevent foodborne bacterial [blank_1], commercial refrigeration units must maintain temperatures strictly between one and four degrees Celsius. Food inspectors routinely inspect digital [blank_2] logs to ensure complete regulatory [blank_3].",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "proliferation",
+          "spellingTip": "P-R-O-L-I-F-E-R-A-T-I-O-N (Akhiran -tion, satu huruf F, bukan double F)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "calibration",
+          "spellingTip": "C-A-L-I-B-R-A-T-I-O-N (Satu huruf L, diawali C)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "compliance",
+          "spellingTip": "C-O-M-P-L-I-A-N-C-E (Perhatikan akhiran -ance, bukan -ence)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-007",
+      "title": "Hospitality Customer Relationship Management",
+      "audioTranscript": "Modern hotel management systems gather real-time analytical data on guest preferences during their stay. Front desk personnel utilize these records to anticipate individual requests and provide superior customer hospitality.",
+      "displayedText": "Modern hotel management systems gather real-time [blank_1] data on guest preferences during their stay. Front desk personnel utilize these records to [blank_2] individual requests and provide superior customer [blank_3].",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "analytical",
+          "spellingTip": "A-N-A-L-Y-T-I-C-A-L (Huruf Y setelah L, akhiran -ical)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "anticipate",
+          "spellingTip": "A-N-T-I-C-I-P-A-T-E (Verb 1 setelah 'to anticipate')."
+        },
+        {
+          "id": "blank_3",
+          "correct": "hospitality",
+          "spellingTip": "H-O-S-P-I-T-A-L-I-T-Y (H-O-S-P-I-T-A-L-I-T-Y)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-008",
+      "title": "Nutritional Value of Dietary Fiber",
+      "audioTranscript": "Clinical nutritionists emphasize that soluble fiber plays an indispensable role in stabilizing blood glucose levels and reducing serum cholesterol. Whole grains and legumes also provide vital micronutrients essential for digestive health.",
+      "displayedText": "Clinical nutritionists emphasize that soluble fiber plays an [blank_1] role in stabilizing blood glucose levels and reducing serum [blank_2]. Whole grains and legumes also provide vital [blank_3] essential for digestive health.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "indispensable",
+          "spellingTip": "I-N-D-I-S-P-E-N-S-A-B-L-E (Perhatikan akhiran -able, bukan -ible)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "cholesterol",
+          "spellingTip": "C-H-O-L-E-S-T-E-R-O-L (Diawali Ch-, akhiran -ol)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "micronutrients",
+          "spellingTip": "M-I-C-R-O-N-U-T-R-I-E-N-T-S (Bentuk jamak berakhiran -s)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-009",
+      "title": "Culinary Emulsification Techniques",
+      "audioTranscript": "When preparing classic warm emulsion sauces, chefs must introduce melted butter gradually while whisking vigorously to avoid thermal curdling. The precise temperature of the egg yolks determines the ultimate stability of the sauce.",
+      "displayedText": "When preparing classic warm [blank_1] sauces, chefs must introduce melted butter gradually while whisking [blank_2] to avoid thermal curdling. The precise temperature of the egg yolks determines the ultimate [blank_3] of the sauce.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "emulsion",
+          "spellingTip": "E-M-U-L-S-I-O-N (Satu huruf M, akhiran -sion)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "vigorously",
+          "spellingTip": "V-I-G-O-R-O-U-S-L-Y (Adverb berakhiran -ously)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "stability",
+          "spellingTip": "S-T-A-B-I-L-I-T-Y (Kata benda dari stable)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-010",
+      "title": "Renewable Energy and Solar Microgrids",
+      "audioTranscript": "Remote mining operations in the Australian outback are adopting hybrid solar microgrids to minimize diesel consumption. High-capacity lithium batteries store surplus electrical power generated during midday sunshine.",
+      "displayedText": "Remote mining operations in the Australian outback are adopting hybrid solar [blank_1] to minimize diesel consumption. High-capacity lithium batteries store [blank_2] electrical power generated during midday [blank_3].",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "microgrids",
+          "spellingTip": "M-I-C-R-O-G-R-I-D-S (Satu kata majemuk, jamak -s)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "surplus",
+          "spellingTip": "S-U-R-P-L-U-S (Surplus = kelebihan daya)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "sunshine",
+          "spellingTip": "S-U-N-S-H-I-N-E (S-U-N-S-H-I-N-E)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-011",
+      "title": "Great Barrier Reef Coral Conservation",
+      "audioTranscript": "Marine biologists have discovered that certain thermal-tolerant coral colonies can survive elevated oceanic temperatures. Genetic sequencing reveals protective adaptations that offer hope for extensive ecological restoration.",
+      "displayedText": "Marine biologists have discovered that certain thermal-tolerant coral [blank_1] can survive elevated oceanic temperatures. Genetic [blank_2] reveals protective adaptations that offer hope for extensive ecological [blank_3].",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "colonies",
+          "spellingTip": "C-O-L-O-N-I-E-S (Bentuk jamak dari colony: y berubah menjadi -ies)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "sequencing",
+          "spellingTip": "S-E-Q-U-E-N-C-I-N-G (Perhatikan huruf Q-U, akhiran -cing)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "restoration",
+          "spellingTip": "R-E-S-T-O-R-A-T-I-O-N (Akhiran -tion)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-012",
+      "title": "Vocational Hospitality Apprenticeships in Perth",
+      "audioTranscript": "Vocational apprentices receive structured on-the-job mentorship within accredited hotel dining establishments. Practical competency evaluations verify that candidates can execute high-volume food service under rigorous commercial deadlines.",
+      "displayedText": "Vocational apprentices receive structured on-the-job [blank_1] within accredited hotel dining establishments. Practical [blank_2] evaluations verify that candidates can execute high-volume food service under rigorous commercial [blank_3].",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "mentorship",
+          "spellingTip": "M-E-N-T-O-R-S-H-I-P (Akhiran -ship)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "competency",
+          "spellingTip": "C-O-M-P-E-T-E-N-C-Y (Perhatikan huruf E di tengah: c-o-m-p-e-t-e-n-c-y)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "deadlines",
+          "spellingTip": "D-E-A-D-L-I-N-E-S (Jamak berakhiran -s)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-013",
+      "title": "Sustainable Agriculture and Soil Microbiomes",
+      "audioTranscript": "Regenerative agricultural practices focus on replenishing organic matter in depleted topsoils. Cover crops foster symbiotic relationships with mycorrhizal fungi, which significantly enhances moisture retention during summer droughts.",
+      "displayedText": "Regenerative agricultural practices focus on replenishing organic matter in [blank_1] topsoils. Cover crops foster [blank_2] relationships with mycorrhizal fungi, which significantly enhances moisture [blank_3] during summer droughts.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "depleted",
+          "spellingTip": "D-E-P-L-E-T-E-D (Past participle sebagai adjective)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "symbiotic",
+          "spellingTip": "S-Y-M-B-I-O-T-I-C (Huruf Y setelah S, akhiran -tic)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "retention",
+          "spellingTip": "R-E-T-E-N-T-I-O-N (Akhiran -tion, bukan -sion)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-014",
+      "title": "Culinary Maillard Reaction and Meat Searing",
+      "audioTranscript": "High-heat surface searing triggers non-enzymatic browning between amino acids and reducing carbohydrates. This reaction produces complex heterocyclic volatile aromatics that define the savory profile of roasted steaks.",
+      "displayedText": "High-heat surface searing triggers non-enzymatic [blank_1] between amino acids and reducing carbohydrates. This reaction produces complex heterocyclic [blank_2] aromatics that define the savory [blank_3] of roasted steaks.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "browning",
+          "spellingTip": "B-R-O-W-N-I-N-G (Gerund/noun proses pencokelatan)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "volatile",
+          "spellingTip": "V-O-L-A-T-I-L-E (V-o-l-a-t-i-l-e = mudah menguap)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "profile",
+          "spellingTip": "P-R-O-F-I-L-E (P-r-o-f-i-l-e)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-015",
+      "title": "Regional Tourism and Western Australian Vineyards",
+      "audioTranscript": "Boutique wineries in the Margaret River district combine premium viticulture with luxury culinary hospitality. Tour operators organize guided tastings that highlight sustainable vineyard practices and regional biodiversity.",
+      "displayedText": "Boutique wineries in the Margaret River district combine premium [blank_1] with luxury culinary hospitality. Tour operators organize guided [blank_2] that highlight sustainable vineyard practices and regional [blank_3].",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "viticulture",
+          "spellingTip": "V-I-T-I-C-U-L-T-U-R-E (Viticulture = budidaya anggur)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "tastings",
+          "spellingTip": "T-A-S-T-I-N-G-S (Jamak berakhiran -s)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "biodiversity",
+          "spellingTip": "B-I-O-D-I-V-E-R-S-I-T-Y (Bio + diversity)."
+        }
+      ]
+    },
+    {
+      "id": "lfib-016",
+      "title": "Hotel Energy Efficiency and Automated HVAC Systems",
+      "audioTranscript": "Eco-friendly hotels are retrofitting computerized environmental sensors to regulate room climate automatically. These intelligent thermostats adjust output according to occupancy, cutting electrical expenditure without compromising patron comfort.",
+      "displayedText": "Eco-friendly hotels are retrofitting computerized environmental sensors to regulate room [blank_1] automatically. These intelligent thermostats adjust output according to [blank_2], cutting electrical expenditure without compromising patron [blank_3].",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "climate",
+          "spellingTip": "C-L-I-M-A-T-E (C-L-I-M-A-T-E)."
+        },
+        {
+          "id": "blank_2",
+          "correct": "occupancy",
+          "spellingTip": "O-C-C-U-P-A-N-C-Y (Dua huruf C, satu huruf P, akhiran -ancy)."
+        },
+        {
+          "id": "blank_3",
+          "correct": "comfort",
+          "spellingTip": "C-O-M-F-O-R-T (C-o-m-f-o-r-t)."
+        }
+      ]
     }
   ]
 }

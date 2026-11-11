@@ -478,6 +478,629 @@
           }
         }
       ]
+    },
+    {
+      "id": "rw-fib-009",
+      "title": "HACCP Food Safety and Commercial Kitchen Hygiene",
+      "domain": "Hospitality Management & Culinary Science",
+      "text": "The Hazard Analysis Critical Control Point (HACCP) system is an internationally recognized framework designed to [blank_1] biological, chemical, and physical food safety hazards. In commercial kitchens, head chefs and food handlers are legally obligated to monitor critical temperatures to prevent harmful bacteria from proliferating. For instance, high-risk foods must be refrigerated below five degrees Celsius to [blank_2] microbial growth. [blank_3], failure to adhere to statutory hygiene protocols can result in severe legal penalties, public health sanctions, and immediate business closure.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "mitigate",
+          "options": [
+            "mitigate",
+            "mitigation",
+            "mitigated",
+            "mitigating"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus 3 Detik: Setelah partikel infinitive 'to', gunakan kata kerja dasar VERB 1 (base form).",
+            "grammarRule": "to + Verb 1 murni tanpa imbuhan.",
+            "collocation": "mitigate hazards (= mengurangi/memitigasi bahaya)",
+            "distractorAnalysis": "'Mitigation' adalah kata benda (noun), 'mitigated' adalah past tense (V2/V3), dan 'mitigating' adalah participle (-ing). Hanya 'mitigate' yang memenuhi kaidah infinitive 'to + V1'.",
+            "translation": "Sistem HACCP dirancang untuk memitigasi bahaya keamanan pangan biologis, kimia, dan fisik."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "inhibit",
+          "options": [
+            "inhibit",
+            "inhabits",
+            "inhabitant",
+            "inhibiting"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus 3 Detik: Frasa tujuan 'to + V1' membutuhkan kata kerja dasar yang memiliki arti 'menghambat'.",
+            "grammarRule": "Infinitive of purpose: to + V1.",
+            "collocation": "inhibit microbial growth (= menghambat pertumbuhan mikroba)",
+            "distractorAnalysis": "'Inhabits' dan 'inhabitant' berasal dari kata 'inhabit' (menempati/menghuni) yang salah total secara arti. 'Inhibiting' memiliki akhiran -ing yang melanggar aturan to + V1.",
+            "translation": "Makanan berisiko tinggi harus didinginkan di bawah lima derajat Celsius untuk menghambat pertumbuhan mikroba."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "Furthermore",
+          "options": [
+            "Furthermore",
+            "However",
+            "Although",
+            "Despite"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Penambahan / Penguatan): Kalimat ini menambahkan konsekuensi hukum yang memperkuat peringatan bahaya di kalimat sebelumnya.",
+            "grammarRule": "Conjunctive adverb diikuti tanda koma di awal klausa independen.",
+            "linkingWordType": "Addition & Reinforcement (= Lebih jauh lagi / Selain itu)",
+            "distractorAnalysis": "'However' salah karena tidak ada kontradiksi/pertentangan ide. 'Although' dan 'Despite' membutuhkan klausa dependen dan tidak dapat berdiri sendiri di depan koma.",
+            "translation": "Selain itu, kegagalan mematuhi protokol kebersihan resmi dapat mengakibatkan sanksi hukum berat."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-010",
+      "title": "The Biochemistry of Culinary Fermentation",
+      "domain": "Food Science & Molecular Gastronomy",
+      "text": "Culinary fermentation represents a biochemical transformation driven by beneficial microorganisms such as yeasts, molds, and lactic acid bacteria. During the process, enzymes break down complex carbohydrates into organic acids or alcohols, which [blank_1] a distinctive tangy flavor profile and natural preservation qualities. Fermented food items, ranging from sourdough bread to artisan cheeses, must be incubated within tightly controlled temperature [blank_2]. [blank_3], improper handling can introduce pathogenic microbes that spoil the entire batch.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "impart",
+          "options": [
+            "impart",
+            "imparts",
+            "imparting",
+            "impartation"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus 3 Detik: Relative pronoun 'which' merujuk pada kata benda jamak 'organic acids or alcohols', sehingga kata kerjanya adalah VERB 1 PLURAL (tanpa akhiran -s).",
+            "grammarRule": "Subject-Verb Agreement: Plural antecedent -> Plural verb (impart).",
+            "collocation": "impart a distinctive flavor (= memberi/menghasilkan cita rasa khas)",
+            "distractorAnalysis": "'Imparts' berbentuk singular (untuk he/she/it). 'Imparting' adalah bentuk -ing tanpa auxiliary verb, dan 'impartation' adalah noun.",
+            "translation": "Enzim memecah karbohidrat kompleks menjadi asam organik atau alkohol, yang memberikan profil rasa asam yang khas."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "ranges",
+          "options": [
+            "ranges",
+            "distances",
+            "intervals",
+            "durations"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Kolokasi Paten: Dalam sains termal, rentang derajat suhu dinyatakan dengan frasa 'temperature ranges'.",
+            "grammarRule": "Noun phrase collocation: temperature + ranges.",
+            "collocation": "temperature ranges (= rentang/kisaran suhu)",
+            "distractorAnalysis": "'Distances' merujuk pada jarak spasial (meter/km). 'Intervals' merujuk pada jeda waktu atau titik berkala. 'Durations' merujuk pada durasi waktu, bukan derajat suhu.",
+            "translation": "Makanan fermentasi harus diinkubasi dalam rentang suhu yang dikontrol secara ketat."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "Nevertheless",
+          "options": [
+            "Nevertheless",
+            "Consequently",
+            "Because",
+            "Therefore"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Kontras / Konsesi): Kalimat sebelumnya membahas manfaat fermentasi yang terkontrol, sedangkan kalimat ini memperingatkan risiko kontaminasi patogen bila salah penanganan.",
+            "grammarRule": "Adversative conjunctive adverb: Menyatakan kontras/peringatan berlawanan.",
+            "linkingWordType": "Concession / Contrast (= Meskipun demikian / Namun)",
+            "distractorAnalysis": "'Consequently' dan 'Therefore' menandakan sebab-akibat searah, bukan kontras. 'Because' adalah subordinate conjunction yang tidak bisa berdiri sendiri sebelum tanda koma.",
+            "translation": "Meskipun demikian, penanganan yang salah dapat memasukkan mikroba patogen yang merusak seluruh adonan."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-011",
+      "title": "Ecotourism Management in Western Australia",
+      "domain": "Tourism Economics & Environmental Protection",
+      "text": "Ecotourism has emerged as a cornerstone of sustainable regional economic growth across Western Australia, drawing international visitors to pristine natural reserves such as Rottnest Island and Ningaloo Reef. Conservation authorities strive to [blank_1] an optimal balance between welcoming tourism revenues and preserving fragile marine ecosystems. Tour operators are required to undergo rigorous accreditation to ensure their activities do not [blank_2] native wildlife. [blank_3], environmental levies paid by tourists are directly allocated toward habitat restoration and ecological monitoring programs.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "strike",
+          "options": [
+            "strike",
+            "strikes",
+            "striking",
+            "stricken"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Kolokasi Paten Bahasa Inggris Akademik (ACL): Pasangan frasa 'mencapai keseimbangan' adalah 'strike a balance'.",
+            "grammarRule": "Infinitive structure: strive to + Verb 1 (strike).",
+            "collocation": "strike an optimal balance (= mencapai/menemukan keseimbangan optimal)",
+            "distractorAnalysis": "'Strikes' (singular), 'striking' (-ing), dan 'stricken' (past participle) melanggar kaidah 'strive to + V1'.",
+            "translation": "Otoritas konservasi berusaha untuk mencapai keseimbangan optimal antara menyambut pendapatan pariwisata dan melestarikan ekosistem laut yang rapuh."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "disturb",
+          "options": [
+            "disturb",
+            "disturbed",
+            "disturbance",
+            "disturbingly"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Auxiliary Modal: Setelah auxiliary verb negatif 'do not', kata kerja SELALU berupa VERB 1 BASE FORM.",
+            "grammarRule": "do not + Verb 1 murni.",
+            "collocation": "disturb native wildlife (= mengganggu satwa liar asli)",
+            "distractorAnalysis": "'Disturbed' adalah bentuk lampau, 'disturbance' adalah kata benda, dan 'disturbingly' adalah adverb. Hanya 'disturb' yang merupakan Verb 1.",
+            "translation": "Operator tur diwajibkan menjalani akreditasi ketat untuk memastikan aktivitas mereka tidak mengganggu satwa liar asli."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "Moreover",
+          "options": [
+            "Moreover",
+            "Whereas",
+            "Despite",
+            "Unless"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Penambahan Positif): Menambahkan fakta positif pendukung tentang bagaimana retribusi turis langsung mendanai konservasi.",
+            "grammarRule": "Conjunctive adverb diikuti tanda koma di awal kalimat baru.",
+            "linkingWordType": "Addition & Elaboration (= Selain itu / Terlebih lagi)",
+            "distractorAnalysis": "'Whereas' dan 'Unless' adalah subordinating conjunctions yang membutuhkan klausa terikat. 'Despite' membutuhkan noun phrase, bukan kalimat lengkap dengan koma.",
+            "translation": "Terlebih lagi, pungutan lingkungan yang dibayarkan oleh wisatawan dialokasikan langsung untuk pemulihan habitat."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-012",
+      "title": "Hotel Revenue Management and Dynamic Pricing",
+      "domain": "Hospitality Operations & Business Analytics",
+      "text": "Modern hospitality establishments rely heavily on algorithmic revenue management systems to maximize RevPAR (Revenue Per Available Room). By continuously analyzing historical reservation data and market demand fluctuations, hotels can [blank_1] room rates in real time. During peak festival seasons, high occupancy allows properties to charge premium tariffs, whereas promotional discounts are introduced during off-peak periods to stimulate [blank_2]. [blank_3], excessive price volatility can alienate loyal corporate clients and harm long-term brand equity.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "adjust",
+          "options": [
+            "adjust",
+            "adjustment",
+            "adjusted",
+            "adjusting"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Modal Verb: Setelah modal auxiliary 'can', kata kerja WAJIB berbentuk VERB 1 DASAR.",
+            "grammarRule": "Modal (can/could/may/must/should) + Verb 1.",
+            "collocation": "adjust room rates (= menyesuaikan tarif kamar)",
+            "distractorAnalysis": "'Adjustment' adalah noun, 'adjusted' adalah past form, 'adjusting' adalah present participle. Hanya 'adjust' yang merupakan bentuk dasar.",
+            "translation": "Dengan terus menganalisis data reservasi historis, hotel dapat menyesuaikan tarif kamar secara real time."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "demand",
+          "options": [
+            "demand",
+            "demanding",
+            "demanded",
+            "demands"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Frasa Kerja-Benda: Kata kerja transitif 'stimulate' membutuhkan objek berupa kata benda (noun).",
+            "grammarRule": "Transitive verb + Noun object: stimulate demand.",
+            "collocation": "stimulate demand (= merangsang/mendorong permintaan pasar)",
+            "distractorAnalysis": "'Demanding' adalah kata sifat (menuntut/sulit), 'demanded' adalah verb lampau. 'Demand' (uncountable noun) adalah pilihan tepat untuk konsep ekonomi permintaan pasar.",
+            "translation": "Diskon promosi diperkenalkan selama periode sepi untuk merangsang permintaan."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "However",
+          "options": [
+            "However",
+            "Therefore",
+            "Because",
+            "In addition"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Peringatan / Kontras): Kalimat sebelumnya menguraikan keuntungan penetapan harga dinamis, sedangkan kalimat ini memperingatkan dampak negatif volatilitas harga berlebih.",
+            "grammarRule": "Adversative transition followed by comma.",
+            "linkingWordType": "Contrast / Limitation (= Namun / Akan tetapi)",
+            "distractorAnalysis": "'Therefore' menandakan akibat logis positif, 'In addition' menambahkan poin searah, sedangkan kalimat ini menyajikan risiko berlawanan.",
+            "translation": "Namun, volatilitas harga yang berlebihan dapat mengasingkan klien korporat yang setia dan merusak reputasi merek jangka panjang."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-013",
+      "title": "Sensory Perception and Food Texture Chemistry",
+      "domain": "Food Science & Sensory Evaluation",
+      "text": "The perceived palatability of culinary dishes is determined not only by taste and olfactory signals, but also by oral tactile sensations known as mouthfeel. Food rheology studies how substances deform and flow under mechanical mastication. For example, hydrocolloids such as xanthan gum are widely utilized in modern gastronomy to [blank_1] aqueous solutions without altering their aromatic qualities. When food exhibits an agreeable consistency, consumer acceptance increases [blank_2]. [blank_3], an overly viscous or slimy texture can instantly evoke sensory aversion.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "thicken",
+          "options": [
+            "thicken",
+            "thickness",
+            "thickened",
+            "thickly"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus 3 Detik: Setelah 'to' (infinitive of purpose), gunakan kata kerja dasar VERB 1. Perhatikan bentukan kata kerja dari 'thick' adalah 'thicken'.",
+            "grammarRule": "to + Verb 1 murni (thicken).",
+            "collocation": "thicken aqueous solutions (= mengentalkan larutan berbasis air)",
+            "distractorAnalysis": "'Thickness' adalah kata benda (noun), 'thickened' adalah past participle/adjective, dan 'thickly' adalah adverb. Kata kerja dasarnya adalah 'thicken'.",
+            "translation": "Hidrokoloid seperti permen xanthan banyak digunakan dalam gastronomi modern untuk mengentalkan larutan tanpa mengubah kualitas aromanya."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "substantially",
+          "options": [
+            "substantially",
+            "substantial",
+            "substance",
+            "substantiate"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Modifikasi Kata Kerja: Kata kerja intransitif 'increases' dimodifikasi oleh KATA KETERANGAN (adverb of degree) berakhiran -ly.",
+            "grammarRule": "Verb + Adverb of manner/degree: increases substantially.",
+            "collocation": "increase substantially (= meningkat secara substansial / sangat nyata)",
+            "distractorAnalysis": "'Substantial' adalah kata sifat (adjective), 'substance' adalah noun, dan 'substantiate' adalah kata kerja (membuktikan). Hanya 'substantially' yang merupakan adverb.",
+            "translation": "Ketika makanan menunjukkan konsistensi yang menyenangkan, penerimaan konsumen meningkat secara substansial."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "Conversely",
+          "options": [
+            "Conversely",
+            "Consequently",
+            "Furthermore",
+            "Namely"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Kebalikan Langsung): Membandingkan dua kondisi yang bertolak belakang (tekstur enak vs tekstur terlalu kental/berlendir).",
+            "grammarRule": "Contrastive sentence linker: Conversely (= Sebaliknya).",
+            "linkingWordType": "Direct Contrast / Opposite Case (= Sebaliknya)",
+            "distractorAnalysis": "'Consequently' menandakan sebab-akibat, 'Furthermore' menandakan penambahan, dan 'Namely' digunakan untuk menyebutkan contoh spesifik.",
+            "translation": "Sebaliknya, tekstur yang terlalu kental atau berlendir dapat langsung memicu keengganan sensorik."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-014",
+      "title": "Sustainable Fisheries Management in Australia",
+      "domain": "Marine Ecology & Commercial Cookery Supply Chain",
+      "text": "The Western Rock Lobster fishery off the coast of Perth is widely celebrated as one of the world's most sustainably managed commercial fisheries. To prevent depletion of crustacean stocks, authorities set stringent annual total allowable catch limits that are [blank_1] enforced. Vessels must install satellite tracking devices and utilize escape gaps in potting traps to permit juvenile lobsters to [blank_2] safely. [blank_3], these rigorous ecological measures ensure steady export revenues while safeguarding marine biodiversity for future generations.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "rigorously",
+          "options": [
+            "rigorously",
+            "rigorous",
+            "rigor",
+            "rigorousness"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Passive Voice Adverbial: Di antara passive auxiliary 'are' dan participle 'enforced', sisipkan KATA KETERANGAN (adverb -ly) untuk menerangkan cara penegakan.",
+            "grammarRule": "be + Adverb (-ly) + Past Participle: are rigorously enforced.",
+            "collocation": "rigorously enforced (= ditegakkan secara ketat/disiplin)",
+            "distractorAnalysis": "'Rigorous' adalah adjective, sedangkan 'rigor' dan 'rigorousness' adalah noun. Posisi sebelum past participle membutuhkan adverb.",
+            "translation": "Otoritas menetapkan batas tangkapan tahunan yang ditegakkan secara ketat."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "escape",
+          "options": [
+            "escape",
+            "escaped",
+            "escaping",
+            "escapes"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Verb of Causation/Permission: Pola 'permit + object + to + Verb 1'.",
+            "grammarRule": "permit [someone/something] to + Verb 1 base form.",
+            "collocation": "permit juvenile lobsters to escape (= memungkinkan lobster muda meloloskan diri)",
+            "distractorAnalysis": "'Escaped' adalah V2/V3, 'escaping' adalah gerund, 'escapes' adalah singular present. Setelah 'to' wajib Verb 1 'escape'.",
+            "translation": "Kapal harus menggunakan celah keluar pada perangkap agar lobster muda dapat meloloskan diri dengan aman."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "Ultimately",
+          "options": [
+            "Ultimately",
+            "Instead",
+            "Although",
+            "Whereas"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Kesimpulan / Hasil Akhir): Merangkum hasil akhir dari seluruh regulasi ekologis yang dibahas sebelumnya.",
+            "grammarRule": "Concluding sentence adverb followed by comma.",
+            "linkingWordType": "Conclusion & Culmination (= Pada akhirnya / Secara mendasar)",
+            "distractorAnalysis": "'Instead' digunakan bila ada penggantian alternatif yang dibatalkan. 'Although' dan 'Whereas' adalah konjungsi perbandingan yang membutuhkan dua klausa terhubung.",
+            "translation": "Pada akhirnya, langkah-langkah ekologis yang ketat ini memastikan pendapatan ekspor yang stabil sekaligus melindungi keanekaragaman hayati laut."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-015",
+      "title": "Food Allergens and Commercial Menu Engineering",
+      "domain": "Hospitality Compliance & Public Health",
+      "text": "Food allergies represent an escalating public health concern, with severe reactions such as anaphylaxis posing immediate life-threatening risks to dining patrons. Under Australian hospitality regulations, commercial dining establishments possess a legal duty of care to accurately [blank_1] all major allergens present in their culinary offerings. Kitchens must implement dedicated preparation stations and color-coded utensils to eradicate the hazard of cross-contact. [blank_2], front-of-house service staff must be thoroughly trained to communicate ingredient specifications transparently with guests.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "disclose",
+          "options": [
+            "disclose",
+            "disclosure",
+            "disclosed",
+            "disclosing"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Infinitive: Setelah frasa 'legal duty of care to', kata kerja wajib berbentuk VERB 1 DASAR.",
+            "grammarRule": "duty of care to + Verb 1 base form.",
+            "collocation": "disclose allergens (= mengungkapkan/mencantumkan bahan alergen)",
+            "distractorAnalysis": "'Disclosure' adalah kata benda (noun), 'disclosed' adalah past form, 'disclosing' adalah present participle. Hanya 'disclose' yang merupakan Verb 1 dasar.",
+            "translation": "Tempat makan komersial memiliki kewajiban hukum untuk mengungkapkan secara akurat semua alergen utama yang ada dalam hidangan mereka."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "Simultaneously",
+          "options": [
+            "Simultaneously",
+            "Otherwise",
+            "Despite",
+            "Unless"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Aksi Bersamaan / Paralel): Menghubungkan persiapan di dapur dengan pelatihan staf pelayan yang harus berjalan beriringan.",
+            "grammarRule": "Sentence-level temporal adverb followed by comma.",
+            "linkingWordType": "Simultaneous Action / Parallel Effort (= Secara bersamaan)",
+            "distractorAnalysis": "'Otherwise' menandakan kondisi pengandaian negatif ('jika tidak'). 'Despite' membutuhkan noun phrase, 'Unless' adalah konjungsi bersyarat.",
+            "translation": "Secara bersamaan, staf layanan depan harus dilatih secara menyeluruh untuk mengomunikasikan spesifikasi bahan secara transparan kepada para tamu."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-016",
+      "title": "Nutritional Science and Plant-Based Protein Quality",
+      "domain": "Clinical Nutrition & Dietetics",
+      "text": "The global surge in plant-based diets has prompted food scientists to evaluate the biological value and amino acid profiles of novel non-animal proteins. While traditional animal proteins contain all essential amino acids in optimal ratios, individual plant sources are often [blank_1] in specific amino acids such as methionine or lysine. To overcome this limitation, food manufacturers [blank_2] complementary proteins, such as combining legumes with cereal grains, to achieve a complete protein profile. [blank_3], modern processing techniques have enhanced the bioavailability of plant-derived minerals.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "deficient",
+          "options": [
+            "deficient",
+            "deficiency",
+            "deficiently",
+            "deficit"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Predicative Adjective: Pola 'are often [adjective] in [nutrient]'. Pasangan kata sifat untuk kekurangan zat adalah 'deficient in'.",
+            "grammarRule": "be + Adjective + in + noun: deficient in.",
+            "collocation": "deficient in amino acids (= kekurangan asam amino)",
+            "distractorAnalysis": "'Deficiency' dan 'deficit' adalah kata benda (noun). 'Deficiently' adalah adverb. Setelah to be 'are' dibutuhkan kata sifat 'deficient'.",
+            "translation": "Sumber nabati individual sering kali kekurangan asam amino spesifik seperti metionin atau lisin."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "blend",
+          "options": [
+            "blend",
+            "blends",
+            "blended",
+            "blending"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Subject-Verb Agreement: Subjek 'food manufacturers' adalah jamak (plural), maka kata kerja Simple Present harus jamak VERB 1 TANPA -S.",
+            "grammarRule": "Plural subject (manufacturers) -> Plural verb (blend).",
+            "collocation": "blend complementary proteins (= mencampur/mengombinasikan protein pelengkap)",
+            "distractorAnalysis": "'Blends' adalah bentuk singular. 'Blended' adalah past tense. 'Blending' membutuhkan auxiliary to be.",
+            "translation": "Produsen makanan mencampurkan protein pelengkap untuk mencapai profil protein yang lengkap."
+          }
+        },
+        {
+          "id": "blank_3",
+          "correct": "Additionally",
+          "options": [
+            "Additionally",
+            "Conversely",
+            "Although",
+            "In contrast"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Penambahan Manfaat): Menambahkan kemajuan teknologi lain yang melengkapi keberhasilan kombinasi protein.",
+            "grammarRule": "Additive linking adverb followed by comma.",
+            "linkingWordType": "Addition & Progress (= Selain itu / Di samping itu)",
+            "distractorAnalysis": "'Conversely' dan 'In contrast' salah karena menandakan perlawanan/kebalikan ide. 'Although' membutuhkan anak kalimat terikat.",
+            "translation": "Selain itu, teknik pengolahan modern telah meningkatkan ketersediaan hayati mineral yang berasal dari tumbuhan."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-017",
+      "title": "Vocational Education and Australian Apprenticeships",
+      "domain": "Vocational Education & Workforce Economics",
+      "text": "Vocational Education and Training (VET) plays a pivotal role in maintaining Australia's skilled labor force, particularly in high-demand trades such as commercial cookery, electrical engineering, and hospitality management. Unlike purely theoretical university degrees, vocational programs emphasize competency-based assessments that [blank_1] direct workplace application. Apprentices spend a significant portion of their training under the mentorship of licensed industry professionals. [blank_2], graduates enter the workforce with proven technical competencies that substantially enhance their employability.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "prioritize",
+          "options": [
+            "prioritize",
+            "prioritizes",
+            "priority",
+            "prioritizing"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Subject-Verb Agreement Klausa Relatif: Antecedent 'competency-based assessments' berbentuk jamak (plural), maka kata kerja 'that ...' adalah VERB 1 PLURAL.",
+            "grammarRule": "Plural antecedent -> Verb 1 base form (prioritize).",
+            "collocation": "prioritize direct application (= memprioritaskan penerapan langsung)",
+            "distractorAnalysis": "'Prioritizes' adalah bentuk tunggal (-s). 'Priority' adalah kata benda. 'Prioritizing' adalah gerund/participle.",
+            "translation": "Program kejuruan menekankan penilaian berbasis kompetensi yang memprioritaskan penerapan langsung di tempat kerja."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "As a result",
+          "options": [
+            "As a result",
+            "On the contrary",
+            "Nevertheless",
+            "Despite"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Hasil / Dampak Logis): Kalimat sebelumnya menjelaskan bimbingan profesional langsung, maka kalimat ini menyimpulkan hasil positif berupa peningkatan daya kerja lulusan.",
+            "grammarRule": "Transitional phrase denoting logical consequence followed by comma.",
+            "linkingWordType": "Cause and Effect / Positive Consequence (= Akibatnya / Oleh karena itu)",
+            "distractorAnalysis": "'On the contrary' dan 'Nevertheless' mengindikasikan pertentangan ide, bukan kelanjutan logis.",
+            "translation": "Akibatnya, lulusan memasuki dunia kerja dengan kompetensi teknis terbukti yang secara substansial meningkatkan daya serap kerja mereka."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-018",
+      "title": "Specialty Coffee Agronomy and Roasting Chemistry",
+      "domain": "Agricultural Science & Culinary Chemistry",
+      "text": "The cultivation of specialty Arabica coffee requires precise microclimatic conditions, typically found at high altitudes with well-drained volcanic soils. During the roasting process, green coffee beans undergo the complex Maillard reaction, in which reducing sugars and amino acids interact to [blank_1] hundreds of volatile aromatic compounds. Master roasters carefully modulate the rate of temperature rise to prevent surface charring while ensuring uniform heat penetration. [blank_2], improper heat application can destroy delicate fruity notes and leave an unpleasant astringent aftertaste.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "generate",
+          "options": [
+            "generate",
+            "generation",
+            "generated",
+            "generating"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Infinitive of Result: Pola 'interact to + Verb 1'.",
+            "grammarRule": "to + Verb 1 murni (generate).",
+            "collocation": "generate aromatic compounds (= menghasilkan senyawa aromatik)",
+            "distractorAnalysis": "'Generation' adalah kata benda, 'generated' adalah past tense, 'generating' adalah bentuk -ing. Hanya 'generate' yang merupakan Verb 1.",
+            "translation": "Gula pereduksi dan asam amino berinteraksi untuk menghasilkan ratusan senyawa aromatik yang mudah menguap."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "Conversely",
+          "options": [
+            "Conversely",
+            "Furthermore",
+            "Therefore",
+            "Because"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Kontras Risiko): Membandingkan pemanggangan sempurna dengan risiko kegagalan bila panas tidak diatur dengan benar.",
+            "grammarRule": "Adversative discourse marker: Conversely (= Sebaliknya).",
+            "linkingWordType": "Contrast & Consequence (= Sebaliknya / Namun bila salah)",
+            "distractorAnalysis": "'Furthermore' dan 'Therefore' menandakan kesinambungan searah, bukan perbandingan kondisi yang salah penanganan.",
+            "translation": "Sebaliknya, penerapan panas yang tidak tepat dapat merusak aroma buah yang lembut dan meninggalkan rasa sepat yang tidak menyenangkan."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-019",
+      "title": "Cold Chain Logistics in Modern Food Supply Chains",
+      "domain": "Supply Chain Management & Food Preservation",
+      "text": "Maintaining an unbroken cold chain is indispensable for safeguarding the freshness and microbiological safety of perishable agricultural commodities. From the moment produce is harvested, temperature-controlled transport units must prevent thermal abuse that can accelerate enzymatic [blank_1]. IoT sensors equipped with real-time telemetry allow logistics coordinators to monitor temperature deviations instantly across vast geographic distances. [blank_2], any breakdown in refrigeration during transit can compromise consumer safety and result in substantial financial losses.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "breakdown",
+          "options": [
+            "breakdown",
+            "break",
+            "breaking",
+            "broken"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Frasa Kata Benda: Setelah kata sifat 'enzymatic', kita membutuhkan KATA BENDA (noun).",
+            "grammarRule": "Adjective + Noun: enzymatic breakdown.",
+            "collocation": "enzymatic breakdown (= penguraian enzimatik)",
+            "distractorAnalysis": "'Break' adalah verb dasar, 'breaking' adalah present participle, 'broken' adalah past participle. 'Breakdown' adalah noun baku untuk proses penguraian biokimia.",
+            "translation": "Unit transportasi dengan pengatur suhu harus mencegah kenaikan suhu yang dapat mempercepat penguraian enzimatik."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "Indeed",
+          "options": [
+            "Indeed",
+            "Although",
+            "Despite",
+            "Unless"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Penegasan / Kenyataan): Menegaskan fakta pentingnya rantai dingin dengan memaparkan bahaya fatal bila terjadi kerusakan pendingin.",
+            "grammarRule": "Emphatic adverbial connector followed by comma: Indeed (= Memang / Faktanya).",
+            "linkingWordType": "Emphasis & Confirmation (= Memang benar / Kenyataannya)",
+            "distractorAnalysis": "'Although' dan 'Unless' adalah subordinating conjunctions. 'Despite' adalah preposition.",
+            "translation": "Memang benar, setiap kerusakan pada sistem pendingin selama transit dapat membahayakan keselamatan konsumen dan mengakibatkan kerugian finansial yang besar."
+          }
+        }
+      ]
+    },
+    {
+      "id": "rw-fib-020",
+      "title": "The Gut-Brain Axis and Dietary Neurobiology",
+      "domain": "Neuroscience & Clinical Nutrition",
+      "text": "Emerging scientific research indicates that the gastrointestinal microbiome communicates bidirectionally with the central nervous system through the gut-brain axis. Commensal bacterial colonies produce neurotransmitters such as serotonin and gamma-aminobutyric acid (GABA), which [blank_1] mood regulation and cognitive function. Clinical trials have shown that diets enriched with dietary prebiotic fiber can cultivate beneficial microbial diversity. [blank_2], the therapeutic modulation of gut flora represents an innovative frontier in preventative mental healthcare.",
+      "blanks": [
+        {
+          "id": "blank_1",
+          "correct": "influence",
+          "options": [
+            "influence",
+            "influences",
+            "influential",
+            "influencing"
+          ],
+          "deepFeedback": {
+            "formula": "Rumus Subject-Verb Agreement Relatif: Antecedent 'neurotransmitters' berbentuk jamak (plural), maka verb yang mengikuti adalah VERB 1 PLURAL (tanpa -s).",
+            "grammarRule": "Plural noun + which + Verb 1: influence.",
+            "collocation": "influence mood regulation (= memengaruhi pengaturan suasana hati)",
+            "distractorAnalysis": "'Influences' adalah bentuk tunggal singular. 'Influential' adalah kata sifat (adjective). 'Influencing' adalah participle.",
+            "translation": "Bakteri usus menghasilkan neurotransmiter seperti serotonin yang memengaruhi pengaturan suasana hati dan fungsi kognitif."
+          }
+        },
+        {
+          "id": "blank_2",
+          "correct": "Consequently",
+          "options": [
+            "Consequently",
+            "However",
+            "Although",
+            "In contrast"
+          ],
+          "deepFeedback": {
+            "formula": "Peta Linking Words (Kesimpulan Logis): Menyimpulkan bahwa berdasarkan bukti ilmiah tersebut, modulasi flora usus merupakan terobosan baru dalam kesehatan mental.",
+            "grammarRule": "Sentence adverb of result followed by comma.",
+            "linkingWordType": "Cause and Effect / Scientific Conclusion (= Oleh karena itu / Akibatnya)",
+            "distractorAnalysis": "'However' dan 'In contrast' salah karena menyatakan perlawanan ide, padahal kalimat ini adalah rangkuman kesimpulan yang selaras.",
+            "translation": "Oleh karena itu, modulasi terapeutik flora usus mewakili garis depan yang inovatif dalam perawatan kesehatan mental preventif."
+          }
+        }
+      ]
     }
   ]
 }
