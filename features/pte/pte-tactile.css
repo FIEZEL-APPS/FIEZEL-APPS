@@ -9,7 +9,7 @@
   gap: 16px;
   max-width: 760px;
   margin: 0 auto;
-  padding: 12px 16px 80px 16px;
+  padding: 12px 16px 120px 16px;
   box-sizing: border-box;
 }
 
@@ -927,15 +927,27 @@
   to { opacity: 1; transform: scale(1.01); }
 }
 
+.fz-pte-progress-rail {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: visible;
+  margin: 14px 0 6px 0;
+}
+
 .fz-pte-green-zone-marker {
   position: absolute;
   top: 0;
   bottom: 0;
+  height: 100%;
   left: 62.5%; /* 25s / 40s */
   width: 7.5%; /* 3s / 40s (25-28s) */
   background: rgba(16, 185, 129, 0.45);
   border-left: 2px solid #10b981;
   border-right: 2px solid #10b981;
+  border-radius: 2px;
   pointer-events: none;
   z-index: 2;
 }
@@ -948,6 +960,223 @@
   font-weight: 800;
   color: #059669;
   white-space: nowrap;
+}
+
+/* Exam Mode Minimal Header & Live Speech Bubble */
+.fz-pte-exam-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.fz-pte-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fz-pte-back-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.fz-pte-exam-badge {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0369a1;
+  background: #e0f2fe;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.fz-pte-exam-count {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.fz-pte-live-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: #166534;
+  line-height: 1.45;
+  margin-top: 10px;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.08);
+}
+
+.fz-pte-live-mic-pulse {
+  display: inline-block;
+  animation: fzPteMicPulse 1s infinite alternate;
+  font-size: 1.1rem;
+}
+
+@keyframes fzPteMicPulse {
+  from { transform: scale(0.9); opacity: 0.7; }
+  to { transform: scale(1.15); opacity: 1; }
+}
+
+.fz-pte-hack-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.fz-pte-rs-rule-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+.fz-pte-rs-rule-badge.pass {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.fz-pte-rs-rule-badge.fail {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+/* Grammar 3-Second Guide Card */
+.fz-pte-grammar-guide-card {
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 12px 0;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+}
+
+.fz-pte-guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #fef3c7;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.fz-pte-guide-header h4 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #92400e;
+}
+
+.fz-pte-close-guide {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.fz-pte-rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.fz-pte-rule-item {
+  background: #ffffff;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.fz-pte-rule-item b {
+  display: block;
+  font-size: 0.82rem;
+  color: #b45309;
+  margin-bottom: 4px;
+}
+
+.fz-pte-rule-item p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.fz-pte-rule-item code {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.fz-pte-collocation-summary {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.fz-pte-collocation-summary b {
+  color: #0369a1;
+}
+
+.fz-pte-guide-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef3c7;
+  border: 1.5px solid #fde68a;
+  color: #92400e;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.fz-pte-guide-toggle-btn:hover {
+  background: #fde68a;
 }
 
 /* =========================================================================

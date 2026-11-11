@@ -111,9 +111,11 @@
     essayText: '',
     rlTranscript: '',
     sstText: '',
+    wfdText: '',
     lfAnswers: {},
     hiwSelectedIndices: [],
-    activeDeepFeedback: null
+    activeDeepFeedback: null,
+    showGrammarGuide: false
   };
 
   function playPearsonBeep() {
@@ -143,11 +145,11 @@
     if (state.silenceWatchdogTimer) clearTimeout(state.silenceWatchdogTimer);
     state.silenceWatchdogTimer = setTimeout(function () {
       if (state.timerState === 'recording' && (!state.speechTranscript || !state.speechTranscript.trim())) {
-        console.log('[PTE Official 3-Second Silence Rule Triggered: Recording Completed]');
+        console.log('[PTE Official Silence Watchdog Triggered: No Speech Detected]');
         state.silenceTriggered = true;
         stopRecordingAndEvaluate();
       }
-    }, 3200);
+    }, 6000);
   }
 
   function disarmSilenceWatchdog() {
@@ -216,6 +218,13 @@
     var item = getActiveItem();
     state.lastResult = null;
     state.activeDeepFeedback = null;
+    state.speechTranscript = '';
+    state.wfdText = '';
+    state.showGrammarGuide = false;
+    state.timerState = 'idle';
+    state.isAudioPlaying = false;
+    clearTimer();
+    disarmSilenceWatchdog();
 
     if (state.mode === 'rwFib') {
       state.rwFibSelections = {};
@@ -255,6 +264,29 @@
     });
   }
 
+  function renderExamTopBar() {
+    var secTitles = {
+      speaking: '🗣️ Speaking',
+      writing: '✍️ Writing',
+      reading: '📖 Reading',
+      listening: '🎧 Listening'
+    };
+    var secName = secTitles[state.section] || 'PTE Exam';
+    var bank = BANKS[state.mode] || [];
+    var totalCount = bank.length || 1;
+    var currentNum = Math.min(totalCount, state.itemIndex + 1);
+
+    var out = ['  <div class="fz-pte-exam-header">'];
+    out.push('    <button type="button" class="fz-pte-back-btn" onclick="FiezelPteUi.switchSection(\'plan\')">‹ Hub</button>');
+    out.push('    <div style="display:flex; align-items:center; gap:8px;">');
+    out.push('      <span class="fz-pte-exam-badge">' + secName + '</span>');
+    out.push('      <span class="fz-pte-exam-count">No. ' + currentNum + ' / ' + totalCount + '</span>');
+    out.push('    </div>');
+    out.push('    <span style="font-size:0.75rem; font-weight:800; color:#059669; background:#dcfce7; padding:3px 8px; border-radius:6px;">Target 42 🎯</span>');
+    out.push('  </div>');
+    return out.join('\n');
+  }
+
   /**
    * Render the complete Hub DOM.
    */
@@ -264,26 +296,31 @@
 
     var out = ['<section class="fz-pte-hub fade">'];
 
-    // 1. Hero Card with Target 42 Benchmark
-    out.push('  <div class="fz-pte-hero-card">');
-    out.push('    <div class="fz-pte-badge-row">');
-    out.push('      <span class="fz-pte-target-badge">★ PEARSON TARGET 42 · AUSTRALIA VISA</span>');
-    out.push('      <span style="font-size:0.8rem; font-weight:800; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:6px;">VOCATIONAL BENCHMARK</span>');
-    out.push('    </div>');
-    out.push('    <h2 class="fz-pte-title">PTE Academic Comprehensive Hub</h2>');
-    out.push('    <p class="fz-pte-lead">Official preparation for all 4 Pearson sections (Speaking, Writing, Reading, Listening) with authentic test banks and deep pedagogical feedback.</p>');
+    if (state.section === 'plan') {
+      // 1. Hero Card with Target 42 Benchmark
+      out.push('  <div class="fz-pte-hero-card">');
+      out.push('    <div class="fz-pte-badge-row">');
+      out.push('      <span class="fz-pte-target-badge">★ PEARSON TARGET 42 · AUSTRALIA VISA</span>');
+      out.push('      <span style="font-size:0.8rem; font-weight:800; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:6px;">VOCATIONAL BENCHMARK</span>');
+      out.push('    </div>');
+      out.push('    <h2 class="fz-pte-title">PTE Academic Comprehensive Hub</h2>');
+      out.push('    <p class="fz-pte-lead">Official preparation for all 4 Pearson sections (Speaking, Writing, Reading, Listening) with authentic test banks and deep pedagogical feedback.</p>');
 
-    out.push('    <div class="fz-pte-benchmark-meter">');
-    out.push('      <div class="fz-pte-meter-bar-wrap">');
-    var progressPercent = Math.min(100, Math.round((state.overallEstimate / 90) * 100));
-    out.push('        <div class="fz-pte-meter-bar" style="width:' + progressPercent + '%;"></div>');
-    out.push('        <div class="fz-pte-meter-target-marker" title="Target Visa: PTE 42"></div>');
-    out.push('      </div>');
-    out.push('      <div class="fz-pte-meter-label">Estimasi: <b style="color:#fcd34d;">' + state.overallEstimate + '</b> / 90</div>');
-    out.push('    </div>');
-    out.push('  </div>');
+      out.push('    <div class="fz-pte-benchmark-meter">');
+      out.push('      <div class="fz-pte-meter-bar-wrap">');
+      var progressPercent = Math.min(100, Math.round((state.overallEstimate / 90) * 100));
+      out.push('        <div class="fz-pte-meter-bar" style="width:' + progressPercent + '%;"></div>');
+      out.push('        <div class="fz-pte-meter-target-marker" title="Target Visa: PTE 42"></div>');
+      out.push('      </div>');
+      out.push('      <div class="fz-pte-meter-label">Estimasi: <b style="color:#fcd34d;">' + state.overallEstimate + '</b> / 90</div>');
+      out.push('    </div>');
+      out.push('  </div>');
+    } else {
+      // EXAM PRACTICE MODE: ZERO GIANT BANNER, COMPACT EXAM HEADER
+      out.push(renderExamTopBar());
+    }
 
-    // 2. Section Selector Tabs (Level 1)
+    // 2. Section Selector Tabs (Level 1 Navigation - Always Present)
     out.push('  <div class="fz-pte-section-bar">');
     var sections = [
       { id: 'plan', label: '🎯 30-Day Plan' },
@@ -294,19 +331,19 @@
     ];
     sections.forEach(function (s) {
       var act = state.section === s.id ? ' active' : '';
-      out.push('    <button type="button" class="fz-pte-section-tab' + act + '" onclick="FiezelPteUi.switchSection(\' + s.id + \')">' + s.label + '</button>');
+      out.push('    <button type="button" class="fz-pte-section-tab' + act + '" onclick="FiezelPteUi.switchSection(\'' + s.id + '\')">' + s.label + '</button>');
     });
     out.push('  </div>');
 
     // 3. Section Content
     if (state.section === 'plan') {
+      // 30-Day Guided Plan
       if (BANKS.roadmap) {
         out.push(renderGuidedCoachCard(BANKS.roadmap));
       } else {
         out.push('  <div class="card" style="padding:20px; text-align:center;"><p>Loading 30-Day Guided Plan...</p></div>');
       }
     } else {
-      // Level 2: Task Selector Pills
       out.push(renderModePills());
 
       var item = getActiveItem();
@@ -386,7 +423,8 @@
     out.push('    <div class="fz-pte-daily-header">');
     out.push('      <div>');
     out.push('        <div class="fz-pte-daily-pill">30-DAY TARGET 42 ROADMAP</div>');
-    out.push('        <h3 class="fz-pte-daily-title">Day ' + dayData.day + ': ' + esc(dayData.title) + '</h3>');
+    var cleanDayTitle = dayData.title ? dayData.title.replace(/^Day\s+\d+:\s*/i, '') : '';
+    out.push('        <h3 class="fz-pte-daily-title">Day ' + dayData.day + ': ' + esc(cleanDayTitle) + '</h3>');
     out.push('        <div class="fz-pte-daily-focus">Focus: <b>' + esc(dayData.focus) + '</b> (' + dayData.targetMinutes + ' min target)</div>');
     out.push('      </div>');
 
@@ -454,6 +492,71 @@
   }
 
   /**
+   * Render 6 Rumus Grammar 3 Detik & Collocations Quick Guide Drawer.
+   */
+  function renderGrammarQuickGuide() {
+    var out = ['  <div class="fz-pte-grammar-guide-card fade">'];
+    out.push('    <div class="fz-pte-guide-header">');
+    out.push('      <h4>💡 6 Rumus Grammar 3 Detik (PTE FIB Cheat-Sheet)</h4>');
+    out.push('      <button type="button" class="fz-pte-close-guide" onclick="FiezelPteUi.toggleGrammarGuide()">✕ Close</button>');
+    out.push('    </div>');
+
+    out.push('    <div class="fz-pte-rules-grid">');
+
+    // Rule 1
+    out.push('      <div class="fz-pte-rule-item">');
+    out.push('        <b>Rumus 1: Modal Auxiliary + V1</b>');
+    out.push('        <p>Setelah modal (<code>can</code>, <code>could</code>, <code>will</code>, <code>would</code>, <code>must</code>, <code>should</code>, <code>may</code>), kata kerja wajib berbentuk dasar (V1 tanpa -s/-ed/-ing).<br>Contoh: <i>will <b>provide</b></i>, <i>must <b>ensure</b></i>.</p>');
+    out.push('      </div>');
+
+    // Rule 2
+    out.push('      <div class="fz-pte-rule-item">');
+    out.push('        <b>Rumus 2: Passive Voice (to be + V3)</b>');
+    out.push('        <p>Setelah <code>is / are / was / were / been / being</code> jika subjek menerima aksi (di-/ter-), wajib gunakan Verb 3 (Past Participle).<br>Contoh: <i>was <b>conducted</b></i>, <i>is widely <b>regarded</b></i>.</p>');
+    out.push('      </div>');
+
+    // Rule 3
+    out.push('      <div class="fz-pte-rule-item">');
+    out.push('        <b>Rumus 3: Perfect Aspect (have/has/had + V3)</b>');
+    out.push('        <p>Setelah <code>has / have / had</code>, kata kerja wajib Verb 3 (Past Participle).<br>Contoh: <i>has <b>developed</b></i>, <i>have <b>demonstrated</b></i>.</p>');
+    out.push('      </div>');
+
+    // Rule 4
+    out.push('      <div class="fz-pte-rule-item">');
+    out.push('        <b>Rumus 4: Adjective before Noun</b>');
+    out.push('        <p>Jika titik-titik berada di antara Determiner (<code>a / an / the / their</code>) dan Noun (kata benda), wajib diisi Adjective (kata sifat).<br>Contoh: <i>a <b>vital</b> role</i>, <i><b>significant</b> impact</i>.</p>');
+    out.push('      </div>');
+
+    // Rule 5
+    out.push('      <div class="fz-pte-rule-item">');
+    out.push('        <b>Rumus 5: Adverb modifies Verb or Adjective</b>');
+    out.push('        <p>Adverb berakhiran <code>-ly</code> menjelaskan cara kerja (Verb) atau kadar (Adjective).<br>Contoh: <i>increased <b>dramatically</b></i>, <i><b>substantially</b> more cost-effective</i>.</p>');
+    out.push('      </div>');
+
+    // Rule 6
+    out.push('      <div class="fz-pte-rule-item">');
+    out.push('        <b>Rumus 6: Preposition + Gerund (V-ing) / Noun</b>');
+    out.push('        <p>Setelah preposisi (<code>by</code>, <code>in</code>, <code>of</code>, <code>for</code>, <code>through</code>, <code>without</code>), kata kerja wajib berbentuk <code>V-ing</code> (Gerund) atau Noun.<br>Contoh: <i>by <b>analyzing</b></i>, <i>in <b>determining</b></i>.</p>');
+    out.push('      </div>');
+
+    out.push('    </div>');
+
+    // Collocation and Linking Words Quick Summary
+    out.push('    <div class="fz-pte-collocation-summary">');
+    out.push('      <b>🤝 Top Academic Collocation Pairs (ACL):</b><br>');
+    out.push('      <code>play a key/vital role in</code> · <code>conduct research</code> · <code>take into account</code> · <code>wide range of</code> · <code>pose a serious threat to</code> · <code>meet the criteria</code> · <code>pave the way for</code>');
+    out.push('    </div>');
+
+    out.push('    <div class="fz-pte-collocation-summary" style="margin-top:8px;">');
+    out.push('      <b>🧭 Linking Words &amp; Logic Connectors:</b><br>');
+    out.push('      <b>Contrast:</b> <code>However,</code>, <code>Although</code>, <code>In contrast,</code>, <code>Conversely,</code> | <b>Addition:</b> <code>Furthermore,</code>, <code>Moreover,</code>, <code>In addition,</code> | <b>Cause &amp; Effect:</b> <code>Therefore,</code>, <code>Consequently,</code>, <code>As a result,</code>');
+    out.push('    </div>');
+
+    out.push('  </div>');
+    return out.join('\n');
+  }
+
+  /**
    * Render individual practice card tailored to active mode.
    */
   function renderPracticeCard(item) {
@@ -514,6 +617,16 @@
       }
       out.push('      </div>');
       out.push('    </div>');
+
+      if (state.timerState === 'recording') {
+        out.push('    <div class="fz-pte-live-bubble">');
+        out.push('      <span class="fz-pte-live-mic-pulse">🎙️</span>');
+        out.push('      <div style="flex:1;">');
+        out.push('        <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:#15803d; letter-spacing:0.04em;">Live Speech Recognition</div>');
+        out.push('        <div id="fzPteLiveSpeechText" style="font-size:0.92rem; font-weight:600; color:#166534; min-height:22px;">' + esc(state.speechTranscript || 'Listening to your voice... Speak now!') + '</div>');
+        out.push('      </div>');
+        out.push('    </div>');
+      }
     }
 
     // BODY CANVAS PER MODE
@@ -526,13 +639,22 @@
       out.push('    </div>');
     } else if (state.mode === 'rs') {
       out.push('    <div class="fz-pte-audio-player-box">');
-      out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
+      out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playRsAudioAndListen()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
+      out.push('      <div style="flex:1; margin-left:12px;">');
+      out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Repeat Sentence (Pearson Audio Prompt)</div>');
+      out.push('        <div style="font-size:0.78rem; color:#64748b;">' + (state.isAudioPlaying ? '🔊 Playing prompt sentence...' : 'Click Play (or Start Task) to hear audio prompt') + '</div>');
+      out.push('      </div>');
       out.push('      <div class="fz-pte-audio-waveform">');
       for (var w = 0; w < 16; w++) {
         var hClass = state.isAudioPlaying ? ' active' : '';
         out.push('        <div class="fz-pte-wave-bar' + hClass + '" style="animation-delay:' + (w * 0.05) + 's;"></div>');
       }
       out.push('      </div>');
+      out.push('    </div>');
+      out.push('    <div class="fz-pte-prompt-box" style="background:#f8fafc; border-style:dashed; text-align:center; padding:18px;">');
+      out.push('      <span style="font-size:1.4rem;">🎧</span>');
+      out.push('      <div style="font-weight:700; color:#334155; margin-top:6px;">Listen to the spoken sentence carefully.</div>');
+      out.push('      <div style="font-size:0.8rem; color:#64748b;">In the real Pearson PTE Academic exam, sentence text is <b>never displayed</b>. Speak immediately after the tone.</div>');
       out.push('    </div>');
       out.push('    <div class="fz-pte-secret-tip">');
       out.push('      <b>💡 Nakul 50% Rule:</b> Tangkap 50-60% kata awal dengan lancar tanpa jeda. Jangan mengoreksi diri sendiri!');
@@ -575,6 +697,10 @@
     } else if (state.mode === 'wfd') {
       out.push('    <div class="fz-pte-audio-player-box">');
       out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
+      out.push('      <div style="flex:1; margin-left:12px;">');
+      out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Listen to Sentence (Dictation Prompt)</div>');
+      out.push('        <div style="font-size:0.78rem; color:#64748b;">Click Play to listen. Type exactly what you hear.</div>');
+      out.push('      </div>');
       out.push('      <div class="fz-pte-audio-waveform">');
       for (var w2 = 0; w2 < 16; w2++) {
         var hClass2 = state.isAudioPlaying ? ' active' : '';
@@ -582,19 +708,36 @@
       }
       out.push('      </div>');
       out.push('    </div>');
-      out.push('    <div>');
-      out.push('      <textarea id="fzPteDictationInput" class="fz-pte-dictation-editor" placeholder="Type the sentence you hear here (check keyword spelling)..." oninput="FiezelPteUi.updateWfdCount()"></textarea>');
+      out.push('    <div style="margin-top:12px;">');
+      out.push('      <textarea id="fzPteDictationInput" class="fz-pte-dictation-editor" placeholder="Type the sentence you hear here (check keyword spelling)..." oninput="FiezelPteUi.updateWfdCount()">' + esc(state.wfdText || '') + '</textarea>');
       out.push('      <div class="fz-pte-dictation-stats">');
-      out.push('        <span id="fzPteWordCountLabel">0 words</span>');
-      out.push('        <span>1 point for each correct word</span>');
+      var wfdWordCount = state.wfdText ? state.wfdText.trim().split(/\s+/).filter(Boolean).length : 0;
+      out.push('        <span id="fzPteWordCountLabel">' + wfdWordCount + ' words</span>');
+      out.push('        <span>1 point for each correct word (Listening + Writing)</span>');
       out.push('      </div>');
-      out.push('      <div style="font-size:0.78rem; color:#64748b; margin-top:4px; line-height:1.4;">💡 <b>Nakul Extra Words Hack:</b> Unsure of singular or plural? Write both (e.g. <code>student students</code>). Pearson AI does not penalize extra words!</div>');
+      out.push('      <div class="fz-pte-hack-badge">💡 <b>Nakul Extra Words Hack:</b> Unsure of singular or plural? Write both (e.g. <code>student students</code>). Pearson AI does not penalize extra words!</div>');
       out.push('    </div>');
     } else if (state.mode === 'rwFib') {
+      out.push('    <div style="display:flex; justify-content:flex-end;">');
+      out.push('      <button type="button" class="fz-pte-guide-toggle-btn" onclick="FiezelPteUi.toggleGrammarGuide()">');
+      out.push('        <span>' + (state.showGrammarGuide ? '▲ Close Guide' : '💡 6 Rumus Grammar 3 Detik & Collocations') + '</span>');
+      out.push('      </button>');
+      out.push('    </div>');
+      if (state.showGrammarGuide) {
+        out.push(renderGrammarQuickGuide());
+      }
       out.push('    <div class="fz-pte-prompt-box">');
       out.push('      <div class="fz-pte-reading-passage">' + renderRwFibPassage(item) + '</div>');
       out.push('    </div>');
     } else if (state.mode === 'rDd') {
+      out.push('    <div style="display:flex; justify-content:flex-end;">');
+      out.push('      <button type="button" class="fz-pte-guide-toggle-btn" onclick="FiezelPteUi.toggleGrammarGuide()">');
+      out.push('        <span>' + (state.showGrammarGuide ? '▲ Close Guide' : '💡 6 Rumus Grammar 3 Detik & Collocations') + '</span>');
+      out.push('      </button>');
+      out.push('    </div>');
+      if (state.showGrammarGuide) {
+        out.push(renderGrammarQuickGuide());
+      }
       out.push('    <div class="fz-pte-prompt-box">');
       out.push('      <div class="fz-pte-reading-passage">' + renderReadingDdPassage(item) + '</div>');
       out.push('    </div>');
@@ -738,7 +881,7 @@
     var blanks = item.blanks || [];
     blanks.forEach(function (b) {
       var chosen = state.rwFibSelections[b.id] || '';
-      var selHtml = '<select class="fz-pte-fib-select" onchange="FiezelPteUi.selectRwFibOption(' + b.id + ', this.value)">';
+      var selHtml = '<select class="fz-pte-fib-select" onchange="FiezelPteUi.selectRwFibOption(\'' + esc(b.id) + '\', this.value)">';
       selHtml += '<option value="">-- select --</option>';
       (b.options || []).forEach(function (opt) {
         var isSel = chosen === opt ? ' selected' : '';
@@ -746,6 +889,7 @@
       });
       selHtml += '</select>';
       text = text.replace('{' + b.id + '}', selHtml);
+      text = text.replace('[' + b.id + ']', selHtml);
     });
     return text;
   }
@@ -755,8 +899,9 @@
     var keys = Object.keys(item.correctAnswers || {});
     keys.forEach(function (k, idx) {
       var assigned = state.rDdAssignments[k] || '';
-      var slotHtml = '<span class="fz-pte-drop-slot' + (assigned ? ' filled' : '') + '" onclick="FiezelPteUi.clearDdBlank(\' + esc(k) + \')">' + (assigned ? esc(assigned) : '[' + (idx + 1) + ']') + '</span>';
+      var slotHtml = '<span class="fz-pte-drop-slot' + (assigned ? ' filled' : '') + '" onclick="FiezelPteUi.clearDdBlank(\'' + esc(k) + '\')">' + (assigned ? esc(assigned) : '[' + (idx + 1) + ']') + '</span>';
       text = text.replace('{' + k + '}', slotHtml);
+      text = text.replace('[' + k + ']', slotHtml);
     });
     return text;
   }
@@ -788,8 +933,9 @@
     var text = item.displayedText || '';
     (item.blanks || []).forEach(function (b) {
       var typed = state.lfAnswers[b.id] || '';
-      var inputHtml = '<input type="text" class="fz-pte-lf-input" value="' + esc(typed) + '" oninput="FiezelPteUi.setLfAnswer(' + b.id + ', this.value)" placeholder="(' + b.id + ')">';
+      var inputHtml = '<input type="text" class="fz-pte-lf-input" value="' + esc(typed) + '" oninput="FiezelPteUi.setLfAnswer(\'' + esc(b.id) + '\', this.value)" placeholder="(' + esc(b.id) + ')">';
       text = text.replace('{' + b.id + '}', inputHtml);
+      text = text.replace('[' + b.id + ']', inputHtml);
     });
     return text;
   }
@@ -866,10 +1012,18 @@
 
   function renderResultScorecard(res) {
     var out = ['  <div class="fz-pte-result-card">'];
+    var item = getActiveItem();
+
     out.push('    <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">');
     out.push('      <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#0f172a;">Evaluation Results: ' + esc(res.task || state.mode.toUpperCase()) + '</h3>');
     out.push('      <span class="fz-pte-target-badge" style="background:#0284c7; color:#fff;">TARGET 42</span>');
     out.push('    </div>');
+
+    if (res.noSpeechDetected) {
+      out.push('    <div style="background:#fee2e2; border:1.5px solid #fca5a5; color:#991b1b; padding:12px 14px; border-radius:12px; margin-top:12px; font-weight:700; font-size:0.88rem; line-height:1.45;">');
+      out.push('      ⚠️ <b>No speech detected.</b> Please check your microphone, click "Retry Question", and speak clearly.');
+      out.push('    </div>');
+    }
 
     var pScore = typeof res.pearsonScore === 'number' ? res.pearsonScore : Math.round((res.score / (res.maxScore || 1)) * 90);
     var pass = pScore >= 42;
@@ -882,9 +1036,102 @@
     out.push('      <div>');
     var verdictLabel = pass ? '✓ Meets Australian Visa Benchmark (PTE 42+)' : '▲ Below Target 42 Benchmark';
     out.push('        <div style="font-weight:800; font-size:1.05rem; color:' + (pass ? '#10b981' : '#f59e0b') + ';">' + esc(verdictLabel) + '</div>');
-    out.push('        <div style="font-size:0.84rem; color:#64748b; margin-top:4px;">Score: ' + res.score + ' / ' + res.maxScore + ' points (' + (res.percentage || Math.round((res.score / res.maxScore) * 100)) + '%)</div>');
+    if (res.content && typeof res.content.score === 'number') {
+      out.push('        <div style="font-size:0.84rem; color:#64748b; margin-top:4px;">Content: ' + res.content.score + ' / ' + res.content.max + ' points</div>');
+    } else if (typeof res.score === 'number' && typeof res.maxScore === 'number') {
+      out.push('        <div style="font-size:0.84rem; color:#64748b; margin-top:4px;">Score: ' + res.score + ' / ' + res.maxScore + ' points (' + (res.percentage || Math.round((res.score / res.maxScore) * 100)) + '%)</div>');
+    }
     out.push('      </div>');
     out.push('    </div>');
+
+    // Enabling Skills Breakdown
+    if (res.fluency || res.pronunciation || (res.content && typeof res.content.score === 'number')) {
+      out.push('    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-top:14px;">');
+      out.push('      <div style="font-size:0.82rem; font-weight:800; color:#475569; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Enabling Skills Breakdown</div>');
+
+      if (res.content && typeof res.content.score === 'number') {
+        var cPct = Math.min(100, Math.round((res.content.score / (res.content.max || 3)) * 100));
+        out.push('      <div style="margin-bottom:8px;">');
+        out.push('        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:#334155;"><span>Content:</span> <span>' + res.content.score + ' / ' + res.content.max + ' (' + cPct + '%)</span></div>');
+        out.push('        <div style="width:100%; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-top:3px;"><div style="width:' + cPct + '%; height:100%; background:#0284c7;"></div></div>');
+        out.push('      </div>');
+      }
+
+      if (res.fluency) {
+        var fPct = Math.min(100, Math.round((res.fluency.score / 5) * 100));
+        out.push('      <div style="margin-bottom:8px;">');
+        out.push('        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:#334155;"><span>Oral Fluency:</span> <span>' + res.fluency.score + ' / 5 (' + esc(res.fluency.label || '') + ')</span></div>');
+        out.push('        <div style="width:100%; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-top:3px;"><div style="width:' + fPct + '%; height:100%; background:#10b981;"></div></div>');
+        out.push('      </div>');
+      }
+
+      if (res.pronunciation) {
+        var pPct = Math.min(100, Math.round((res.pronunciation.score / 5) * 100));
+        out.push('      <div>');
+        out.push('        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:#334155;"><span>Pronunciation:</span> <span>' + res.pronunciation.score + ' / 5 (' + esc(res.pronunciation.label || '') + ')</span></div>');
+        out.push('        <div style="width:100%; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-top:3px;"><div style="width:' + pPct + '%; height:100%; background:#8b5cf6;"></div></div>');
+        out.push('      </div>');
+      }
+      out.push('    </div>');
+    }
+
+    // Repeat Sentence (RS) Insight
+    if (state.mode === 'rs') {
+      var meets50 = res.content && res.content.meets50PercentRule;
+      out.push('    <div class="fz-pte-rs-rule-badge ' + (meets50 ? 'pass' : 'fail') + '">');
+      out.push('      <span>' + (meets50 ? '✅ Nakul 50% Rule Satisfied:' : '⚠️ Below 50% Rule Target:') + '</span>');
+      out.push('      <span>' + (meets50 ? 'Repeated ≥50% words with smooth delivery. 2/3 Content + Fluency marks secured!' : 'Aim to capture at least first 5-6 words fluently without pausing!') + '</span>');
+      out.push('    </div>');
+
+      out.push('    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-top:10px; font-size:0.84rem; line-height:1.5;">');
+      out.push('      <div style="margin-bottom:4px;"><b>Original Sentence:</b> <span style="color:#0369a1;">' + esc((item && item.sentence) || '') + '</span></div>');
+      out.push('      <div><b>You Spoke:</b> <span style="color:' + (res.studentTranscript ? '#0f172a' : '#ef4444') + ';">' + esc(res.studentTranscript || '(no speech detected)') + '</span></div>');
+      out.push('    </div>');
+    }
+
+    // Write from Dictation (WFD) Insight
+    if (state.mode === 'wfd') {
+      if (res.extraWordsHackDetected) {
+        out.push('    <div class="fz-pte-hack-badge">💡 <b>Nakul Extra Words Hack Active:</b> Detected pairs: ' + esc((res.variantPairs || []).join(', ')) + '. Pearson awards matching words without penalizing extras!</div>');
+      }
+      out.push('    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-top:10px; font-size:0.84rem; line-height:1.5;">');
+      out.push('      <div style="margin-bottom:4px;"><b>Target Sentence:</b> <span style="color:#0369a1;">' + esc((item && item.sentence) || '') + '</span></div>');
+      out.push('      <div style="margin-bottom:6px;"><b>Your Submission:</b> <span style="color:#0f172a;">' + esc(res.studentAnswer || '') + '</span></div>');
+      if (res.content && Array.isArray(res.content.matchedWords) && res.content.matchedWords.length > 0) {
+        out.push('      <div style="color:#15803d; font-size:0.8rem;"><b>Matched Words (' + res.content.matchedWords.length + '):</b> ' + esc(res.content.matchedWords.join(', ')) + '</div>');
+      }
+      if (res.content && Array.isArray(res.content.missedWords) && res.content.missedWords.length > 0) {
+        out.push('      <div style="color:#b91c1c; font-size:0.8rem; margin-top:2px;"><b>Missed Words (' + res.content.missedWords.length + '):</b> ' + esc(res.content.missedWords.join(', ')) + '</div>');
+      }
+      out.push('    </div>');
+    }
+
+    // Describe Image (DI) Insight
+    if (state.mode === 'di') {
+      var dSec = res.durationSec || 0;
+      var inZone = dSec >= 25 && dSec <= 28;
+      out.push('    <div class="fz-pte-rs-rule-badge ' + (inZone ? 'pass' : 'fail') + '">');
+      out.push('      <span>' + (inZone ? '✅ Optimal Duration Zone Hit:' : '⏱ Duration Report:') + '</span>');
+      out.push('      <span>Spoke for ' + dSec + 's. (Nakul Optimal Zone: 25–28 seconds).</span>');
+      out.push('    </div>');
+      if (Array.isArray(res.matchedKeywords) && res.matchedKeywords.length > 0) {
+        out.push('    <div style="font-size:0.8rem; color:#0369a1; margin-top:8px;"><b>Keywords Captured:</b> ' + esc(res.matchedKeywords.join(', ')) + '</div>');
+      }
+      if (Array.isArray(res.templateMarkersDetected) && res.templateMarkersDetected.length > 0) {
+        out.push('    <div style="font-size:0.8rem; color:#15803d; margin-top:4px;"><b>Template Lines Detected:</b> ' + esc(res.templateMarkersDetected.join(', ')) + '</div>');
+      }
+    }
+
+    // Read Aloud (RA) Insight
+    if (state.mode === 'ra') {
+      out.push('    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-top:10px; font-size:0.84rem; line-height:1.5;">');
+      out.push('      <div><b>Word Error Rate (WER):</b> ' + (typeof res.wer === 'number' ? Math.round(res.wer * 100) + '%' : '0%') + '</div>');
+      out.push('      <div><b>Pace:</b> ' + (res.durationSec || 0) + 's (Target: 12–14s steady rhythm)</div>');
+      if (res.studentTranscript) {
+        out.push('      <div style="margin-top:6px;"><b>Transcribed Speech:</b> <span style="color:#334155;">' + esc(res.studentTranscript) + '</span></div>');
+      }
+      out.push('    </div>');
+    }
 
     out.push('    <div class="fz-pte-action-dock" style="margin-top:16px;">');
     out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.retryItem()">Retry Question ↺</button>');
@@ -997,6 +1244,11 @@
     renderHub();
   }
 
+  function toggleGrammarGuide() {
+    state.showGrammarGuide = !state.showGrammarGuide;
+    renderHub();
+  }
+
   function updateWfdCount() {
     var ta = document.getElementById('fzPteDictationInput');
     var lbl = document.getElementById('fzPteWordCountLabel');
@@ -1069,7 +1321,53 @@
     }
   }
 
+  function playRsAudioAndListen() {
+    var item = getActiveItem();
+    if (!item) return;
+    var speechText = item.sentence || '';
+    if (!speechText) return;
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+      state.isAudioPlaying = true;
+      state.timerState = 'preparing';
+      state.timerRemainingSec = 3;
+      state.timerTotalSec = 3;
+      renderHub();
+
+      var utter = new SpeechSynthesisUtterance(speechText);
+      utter.lang = 'en-US';
+      utter.rate = 0.95;
+      utter.onstart = function () {
+        state.isAudioPlaying = true;
+        renderHub();
+      };
+      utter.onend = function () {
+        state.isAudioPlaying = false;
+        playPearsonBeep();
+        setTimeout(function () {
+          startRecordingPhase();
+        }, 300);
+      };
+      utter.onerror = function () {
+        state.isAudioPlaying = false;
+        playPearsonBeep();
+        startRecordingPhase();
+      };
+      window.speechSynthesis.speak(utter);
+    } else {
+      playPearsonBeep();
+      startRecordingPhase();
+    }
+  }
+
   function handleMicAction() {
+    if (state.mode === 'rs' && state.timerState === 'idle') {
+      playRsAudioAndListen();
+      return;
+    }
     if (state.timerState === 'idle') {
       var item = getActiveItem();
       var prepSec = (item && item.prepTimeSec) || (state.mode === 'di' ? 25 : 35);
@@ -1108,7 +1406,7 @@
 
   function startRecordingPhase() {
     var item = getActiveItem();
-    var recSec = (item && item.recordTimeSec) || 40;
+    var recSec = (item && item.recordTimeSec) || (state.mode === 'rs' ? 15 : 40);
     state.timerState = 'recording';
     state.timerRemainingSec = recSec;
     state.timerTotalSec = recSec;
@@ -1128,11 +1426,24 @@
 
         state.speechRecognizer.onresult = function (event) {
           disarmSilenceWatchdog();
-          var transcript = '';
-          for (var i = event.resultIndex; i < event.results.length; ++i) {
-            transcript += event.results[i][0].transcript;
+          var final = '';
+          var interim = '';
+          for (var i = 0; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              final += event.results[i][0].transcript + ' ';
+            } else {
+              interim += event.results[i][0].transcript;
+            }
           }
-          state.speechTranscript = transcript;
+          state.speechTranscript = (final + interim).trim();
+          var liveEl = document.getElementById('fzPteLiveSpeechText');
+          if (liveEl) {
+            liveEl.textContent = state.speechTranscript || 'Listening...';
+          }
+        };
+
+        state.speechRecognizer.onerror = function (event) {
+          console.warn('[PTE Speech recognition error]', event.error);
         };
 
         state.speechRecognizer.start();
@@ -1166,11 +1477,7 @@
     }
 
     var dur = (Date.now() - state.speechStartTime) / 1000;
-    var transcript = state.speechTranscript || '';
-    var item = getActiveItem();
-    if (!transcript.trim() && item) {
-      transcript = item.sampleResponse || item.text || item.sentence || item.nakulTemplateSpeech || '';
-    }
+    var transcript = (state.speechTranscript || '').trim();
 
     evaluateSpeechResult(transcript, dur);
   }
@@ -1181,9 +1488,10 @@
     var item = getActiveItem();
     if (!item) return;
 
+    var isEmpty = !transcript || !transcript.trim();
     var metrics = {
-      durationSec: Math.max(2, durationSec || 25),
-      confidenceAvg: state.speechConfidence,
+      durationSec: Math.max(1, durationSec || 1),
+      confidenceAvg: isEmpty ? 0 : state.speechConfidence,
       pausesCount: 0
     };
 
@@ -1199,6 +1507,16 @@
     }
 
     if (res) {
+      res.studentTranscript = transcript;
+      res.durationSec = Math.round(durationSec * 10) / 10;
+      if (isEmpty) {
+        res.noSpeechDetected = true;
+        res.pearsonScore = 10;
+        res.passed = false;
+        if (res.content) res.content.score = 0;
+        if (res.fluency) res.fluency.score = 0;
+        if (res.pronunciation) res.pronunciation.score = 0;
+      }
       state.lastResult = res;
       state.timerState = 'result';
       reportBraincoreTelemetry(item.id, res.pearsonScore ? res.pearsonScore >= 42 : res.passed, Math.round(durationSec * 1000));
@@ -1416,8 +1734,10 @@
 
     var ta = document.getElementById('fzPteDictationInput');
     var typed = ta ? ta.value : '';
+    state.wfdText = typed;
 
     var res = engine.evaluateWriteFromDictation(item.sentence, typed, item.spellingChallenges);
+    res.studentAnswer = typed;
     state.lastResult = res;
     state.timerState = 'result';
     reportBraincoreTelemetry(item.id, res.isTarget42Qualified, 8000, res.spellingMisconceptions);
@@ -1486,7 +1806,9 @@
     updateEssayCount: updateEssayCount,
     updateSstCount: updateSstCount,
     playAudioPrompt: playAudioPrompt,
+    playRsAudioAndListen: playRsAudioAndListen,
     handleMicAction: handleMicAction,
+    toggleGrammarGuide: toggleGrammarGuide,
     submitWfd: submitWfd,
     selectRwFibOption: selectRwFibOption,
     checkRwFib: checkRwFib,
