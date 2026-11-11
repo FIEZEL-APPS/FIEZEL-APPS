@@ -1,7 +1,7 @@
 {
-  "version": "m025-806",
+  "version": "m025-807",
   "claimedBy": "branch feat/pte-academic-prep-hub",
-  "claimedAt": "2026-11-11T20:37:20.396Z",
-  "reason": "feat(pte): launch comprehensive 4-section pte academic prep hub with deep pedagogical feedback and official pearson banks",
+  "claimedAt": "2026-11-11T20:49:07.432Z",
+  "reason": "feat(pte): launch comprehensive 4-section pte academic prep hub with deep pedagogical feedback (m025-807)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
