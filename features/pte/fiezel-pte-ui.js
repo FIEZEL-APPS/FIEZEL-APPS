@@ -273,7 +273,7 @@
     out.push('      </div>');
     var badgeStyle = progress.isDayCompleted ? 'background:#dcfce7; color:#15803d; border-color:#86efac;' : '';
     out.push('      <div class="fz-pte-coach-progress-badge" style="' + badgeStyle + '">');
-    out.push(progress.isDayCompleted ? '✓ Hari ' + currentDay + ' Tuntas (100%)' : progress.completedCount + ' / ' + progress.totalCount + ' Selesai (' + progress.percent + '%)');
+    out.push(progress.isDayCompleted ? '✓ Day ' + currentDay + ' Completed (100%)' : progress.completedCount + ' / ' + progress.totalCount + ' Done (' + progress.percent + '%)');
     out.push('      </div>');
     out.push('    </div>');
 
@@ -318,11 +318,11 @@
       out.push('        </div>');
 
       if (t.type === 'kawan_bicara') {
-        out.push('        <button type="button" class="fz-pte-task-action-btn" onclick="FiezelPteUi.openVoiceStudio(' + currentDay + ')">Panggil Coach 🎙</button>');
+        out.push('        <button type="button" class="fz-pte-task-action-btn" onclick="FiezelPteUi.openVoiceStudio(' + currentDay + ')">Call Coach 🎙</button>');
       } else {
         var modeMap = { read_aloud: 'ra', repeat_sentence: 'rs', describe_image: 'di', write_from_dictation: 'wfd' };
         var targetMode = modeMap[t.type] || 'ra';
-        out.push('        <button type="button" class="fz-pte-task-action-btn" onclick="FiezelPteUi.launchTask(\'' + targetMode + '\', ' + JSON.stringify(t.itemIds || []).replace(/"/g, '&quot;') + ')">Latihan ➔</button>');
+        out.push('        <button type="button" class="fz-pte-task-action-btn" onclick="FiezelPteUi.launchTask(\'' + targetMode + '\', ' + JSON.stringify(t.itemIds || []).replace(/"/g, '&quot;') + ')">Practice ➔</button>');
       }
 
       out.push('      </div>');
