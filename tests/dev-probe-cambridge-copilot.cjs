@@ -76,7 +76,7 @@ async function run() {
   const copilotTestResult = await page.evaluate(async () => {
     // Exact question from examiner in user screenshot:
     const testAiQuestion = "You can express that you maintain focus by adapting quickly to new priorities.";
-    
+
     // Test the live client fallback function imported or via fetch
     try {
       const resp = await fetch('/api/voice/copilot-assist', {
