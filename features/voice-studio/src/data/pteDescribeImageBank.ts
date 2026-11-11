@@ -1,7 +1,7 @@
 /**
  * PTE Academic Describe Image Master Prediction Bank
  * 50 Authentic Questions from Pearson Real Exam & APEUni High-Frequency Database
- * 
+ *
  * Categories:
  * 1. Bar Charts (10 items)
  * 2. Line Graphs (10 items)

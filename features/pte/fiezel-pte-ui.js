@@ -972,9 +972,18 @@
     renderHub();
   }
 
-  function openVoiceStudio(day) {
-    if (typeof window !== 'undefined' && typeof window.go === 'function') {
-      window.go('chat');
+  function openVoiceStudio(day, taskMode, itemId) {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('fz_persona_id', 'dr_julian');
+        localStorage.setItem('fz_target_course', 'en');
+        if (taskMode) localStorage.setItem('fz_pte_active_task', taskMode);
+      } catch (_) {}
+      if (typeof window.go === 'function') {
+        window.go('chat');
+      } else {
+        window.location.href = './call.html?persona=dr_julian&course=en' + (taskMode ? '&task=' + encodeURIComponent(taskMode) : '');
+      }
     }
   }
 

@@ -1,11 +1,11 @@
 # FIEZEL Handoff Dossier: PTE Master Tutor & Strict Examiner Engine (Dr. Julian)
 
-**Build Version**: `m025-788`  
-**Branch**: `feat/voice-pte-master-tutor`  
-**Target Component**: `features/voice-studio/` (`call.html` / Kawan Bicara)  
-**Coordinator Session**: `a91b3a79-13cf-443d-8f8f-d3a0860668c8`  
-**Executor Agent**: `8979cd84-d320-4043-80cf-c591935cf8b2`  
-**Compliance Protocol**: AGENTS.md (Scope Isolation #0, Live SSOT #0-B, CSS Integrity #0-C, Voice Studio Purity #11, Multi-Agent Concurrency #12)  
+**Build Version**: `m025-788`
+**Branch**: `feat/voice-pte-master-tutor`
+**Target Component**: `features/voice-studio/` (`call.html` / Kawan Bicara)
+**Coordinator Session**: `a91b3a79-13cf-443d-8f8f-d3a0860668c8`
+**Executor Agent**: `8979cd84-d320-4043-80cf-c591935cf8b2`
+**Compliance Protocol**: AGENTS.md (Scope Isolation #0, Live SSOT #0-B, CSS Integrity #0-C, Voice Studio Purity #11, Multi-Agent Concurrency #12)
 **Deployment Policy**: **LOCAL TEST ONLY (UNMERGED / NO LIVE DEPLOY)** per explicit user directive.
 
 ---
