@@ -1,7 +1,7 @@
 /**
  * FIEZEL · features/voice-studio/src/data/pteReadAloudBank.ts
  * Master Bank of 15+ Authentic Pearson PTE Academic & APEUni Read Aloud Items.
- * Specialized for Fitra Rusdiawan:
+ * Tailored for PTE Academic Candidates (Perth/Australia VET & Academic Pathways):
  * - AILFE Perth Commercial Cookery & Hospitality Management
  * - Western Australia / Perth Coastal Ecology & Solar Transition
  * - Academic Science & Research Integrity

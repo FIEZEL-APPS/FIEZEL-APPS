@@ -842,11 +842,64 @@ function capitalizeWord(w: string): string {
   return w.charAt(0).toUpperCase() + w.slice(1);
 }
 
-/**
- * Fallback khusus Cambridge Senior Examiner (Dr. Alistair Vance):
- * Menghasilkan TEPAT 1 JAWABAN TERBAIK (Single Best Model Answer) berstandar Band 8.5–9.0 IELTS
- * dengan struktur gramatika tingkat tinggi, leksikon akademik, dan terjemahan Indonesia/Thai yang elegan.
- */
+function resolveCandidateName(): { fullName: string; shortName: string } {
+  try {
+    if (typeof window !== 'undefined') {
+      const parentWin = window.parent as any;
+      if (parentWin && parentWin !== window && parentWin.state) {
+        const pName = String(parentWin.state.userName || parentWin.state.name || parentWin.state.learnerName || '').trim();
+        if (pName && pName.length <= 40) {
+          const parts = pName.split(/\s+/).filter(Boolean);
+          return { fullName: pName, shortName: parts[0] || pName };
+        }
+      }
+    }
+    if (typeof localStorage !== 'undefined') {
+      const rawLname = localStorage.getItem('fiezel-lname-sync-v1');
+      if (rawLname) {
+        try {
+          const parsed = JSON.parse(rawLname);
+          const nameStr = typeof parsed === 'string' ? parsed : String(parsed?.name || parsed?.userName || '');
+          if (nameStr.trim() && nameStr.trim().length <= 40) {
+            const trimmed = nameStr.trim();
+            const parts = trimmed.split(/\s+/).filter(Boolean);
+            return { fullName: trimmed, shortName: parts[0] || trimmed };
+          }
+        } catch {
+          if (rawLname.trim().length <= 40 && !rawLname.trim().startsWith('{')) {
+            const trimmed = rawLname.trim();
+            const parts = trimmed.split(/\s+/).filter(Boolean);
+            return { fullName: trimmed, shortName: parts[0] || trimmed };
+          }
+        }
+      }
+      const rawAuth = localStorage.getItem('fiezel-auth-v1');
+      if (rawAuth) {
+        try {
+          const auth = JSON.parse(rawAuth);
+          const nameStr = String(auth?.user?.displayName || auth?.user?.name || auth?.displayName || auth?.name || '').trim();
+          if (nameStr && !nameStr.includes('@') && nameStr.length <= 40) {
+            const parts = nameStr.split(/\s+/).filter(Boolean);
+            return { fullName: nameStr, shortName: parts[0] || nameStr };
+          }
+        } catch {}
+      }
+      const rawOb = localStorage.getItem('fiezel-onboarding-v1');
+      if (rawOb) {
+        try {
+          const ob = JSON.parse(rawOb);
+          const nameStr = String(ob?.name || ob?.userName || '').trim();
+          if (nameStr && !nameStr.includes('@') && nameStr.length <= 40) {
+            const parts = nameStr.split(/\s+/).filter(Boolean);
+            return { fullName: nameStr, shortName: parts[0] || nameStr };
+          }
+        } catch {}
+      }
+    }
+  } catch {}
+  return { fullName: 'Candidate', shortName: 'Candidate' };
+}
+
 /**
  * Fallback khusus Cambridge & PTE Senior Examiner (Dr. Alistair Vance / Dr. Julian):
  * Menghasilkan TEPAT 1 JAWABAN TERBAIK (Single Best Model Answer) yang 100% RELEVAN
@@ -872,21 +925,47 @@ export function buildCambridgeModelAnswerFallback(
 
   // 1. Candidate Details / Name / ID
   if (/\b(name|call you|identification|id|passport)\b/i.test(q)) {
+    const { fullName, shortName } = resolveCandidateName();
+    const hasSpecificName = shortName !== 'Candidate';
     if (isA1) {
-      text = "My name is Fitra Rusdiawan. You can call me Fitra.";
-      hintId = "Nama saya Fitra Rusdiawan. Anda bisa memanggil saya Fitra.";
-      hintTh = "ชื่อของฉันคือ Fitra Rusdiawan คุณสามารถเรียกฉันว่า Fitra ได้";
-      pronunciation = "mai neim iz Fitra Rusdiawan. yu ken kol mi Fitra.";
+      text = hasSpecificName
+        ? `My name is ${fullName}. You can call me ${shortName}.`
+        : 'My name is on my official candidate identification card.';
+      hintId = hasSpecificName
+        ? `Nama saya ${fullName}. Anda bisa memanggil saya ${shortName}.`
+        : 'Nama saya tercantum di kartu identitas resmi ujian saya.';
+      hintTh = hasSpecificName
+        ? `ชื่อของฉันคือ ${fullName} คุณสามารถเรียกฉันว่า ${shortName} ได้`
+        : 'ชื่อของฉันอยู่บนบัตรประจำตัวผู้เข้าสอบอย่างเป็นทางการ';
+      pronunciation = hasSpecificName
+        ? `mai neim iz ${fullName}. yu ken kol mi ${shortName}.`
+        : 'mai neim iz on mai o-fi-syel ken-di-deit ai-den-ti-fi-kei-syen kard.';
     } else if (isA2) {
-      text = "My full name is Fitra Rusdiawan, but please call me Fitra.";
-      hintId = "Nama lengkap saya adalah Fitra Rusdiawan, tapi silakan panggil saya Fitra.";
-      hintTh = "ชื่อเต็มของฉันคือ Fitra Rusdiawan แต่โปรดเรียกฉันว่า Fitra";
-      pronunciation = "mai ful neim iz Fitra Rusdiawan, bat pliz kol mi Fitra.";
+      text = hasSpecificName
+        ? `My full name is ${fullName}, but please call me ${shortName}.`
+        : 'My full name is stated on my registration document, and you may address me directly.';
+      hintId = hasSpecificName
+        ? `Nama lengkap saya adalah ${fullName}, tapi silakan panggil saya ${shortName}.`
+        : 'Nama lengkap saya tercantum di dokumen pendaftaran saya, dan Anda bisa langsung memanggil saya.';
+      hintTh = hasSpecificName
+        ? `ชื่อเต็มของฉันคือ ${fullName} แต่โปรดเรียกฉันว่า ${shortName}`
+        : 'ชื่อเต็มของฉันระบุไว้ในเอกสารลงทะเบียน และคุณสามารถเรียกฉันได้โดยตรง';
+      pronunciation = hasSpecificName
+        ? `mai ful neim iz ${fullName}, bat pliz kol mi ${shortName}.`
+        : 'mai ful neim iz stei-tid on mai re-jis-trei-syen do-kyu-ment.';
     } else {
-      text = "My full name is Fitra Rusdiawan, though you may simply address me as Fitra. Here is my identification document for your verification.";
-      hintId = "Nama lengkap saya adalah Fitra Rusdiawan, namun Anda cukup memanggil saya Fitra. Ini dokumen identitas saya untuk verifikasi Anda.";
-      hintTh = "ชื่อเต็มของฉันคือ Fitra Rusdiawan แต่คุณสามารถเรียกฉันว่า Fitra ได้ นี่คือเอกสารระบุตัวตนของฉันสำหรับการตรวจสอบ";
-      pronunciation = "mai ful neim iz Fitra Rusdiawan, dou yu mei simp-li ed-res mi ez Fitra.";
+      text = hasSpecificName
+        ? `My full name is ${fullName}, though you may simply address me as ${shortName}. Here is my identification document for your verification.`
+        : 'My full name is stated on my official registration passport. Here is my identification document for your verification.';
+      hintId = hasSpecificName
+        ? `Nama lengkap saya adalah ${fullName}, namun Anda cukup memanggil saya ${shortName}. Ini dokumen identitas saya untuk verifikasi Anda.`
+        : 'Nama lengkap saya tertera pada paspor pendaftaran resmi saya. Ini dokumen identitas saya untuk verifikasi Anda.';
+      hintTh = hasSpecificName
+        ? `ชื่อเต็มของฉันคือ ${fullName} แต่คุณสามารถเรียกฉันว่า ${shortName} ได้ นี่คือเอกสารระบุตัวตนของฉันสำหรับการตรวจสอบ`
+        : 'ชื่อเต็มของฉันระบุไว้ในหนังสือเดินทางลงทะเบียนอย่างเป็นทางการ นี่คือเอกสารระบุตัวตนของฉันสำหรับการตรวจสอบ';
+      pronunciation = hasSpecificName
+        ? `mai ful neim iz ${fullName}, dou yu mei simp-li ed-res mi ez ${shortName}.`
+        : 'mai ful neim iz stei-tid on mai o-fi-syel re-jis-trei-syen pas-port. hir iz mai ai-den-ti-fi-kei-syen do-kyu-ment for yor ve-ri-fi-kei-syen.';
     }
   }
   // 2. FOCUS, PRIORITIES, ADAPTABILITY, TIME MANAGEMENT (Kasus Pengujian Nyata)

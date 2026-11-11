@@ -746,6 +746,21 @@ export function readHostPwaCognitiveSnapshot(
       }
     }
 
+    if (!snapshot.learnerName) {
+      const rawOb = localStorage.getItem('fiezel-onboarding-v1');
+      if (rawOb) {
+        try {
+          const obObj = JSON.parse(rawOb);
+          const candidate = String(obObj?.name || obObj?.userName || '').trim();
+          if (candidate && !candidate.includes('@') && candidate.length <= 40) {
+            snapshot.learnerName = candidate;
+          }
+        } catch {
+          // Ignore
+        }
+      }
+    }
+
     const stateKeys = [
       ...enumerateMatchingStorageKeys('fiezel-v5-state'),
       ...enumerateMatchingStorageKeys('fiezel-v4-state'),
@@ -2447,7 +2462,7 @@ export interface PteDiagnosticSpeechResult {
 export function diagnosePteCandidateSpeech(
   input: PteDiagnosticSpeechInput
 ): PteDiagnosticSpeechResult {
-  const learner = input.learnerName || 'Fitra';
+  const learner = input.learnerName || 'Candidate';
   const transcript = (input.spokenTranscript || '').trim();
   const cleanTokens = transcript
     .toLowerCase()

@@ -84,3 +84,14 @@ Nomor build resmi telah dinaikkan ke **`m025-787`** melalui arbiter `tools/bump-
 - `kurikulum.html`: `?v=m025-787`
 - `misi.html`: `?v=m025-787`
 - `index.html`: `data-fz-build="m025-787"`
+
+---
+
+## 6. Otoritas OWNER/MASTER & Serah Terima
+- **Authority**: OWNER/MASTER authority is explicit under repository governance.
+- **Status**: Production Ready & Fully Verified.
+
+---
+
+## 7. Roadmap & Next Steps
+- **Next-step / Roadmap**: Maintain ongoing BKT monitoring, expand vocational Read Aloud bank, and track empirical Pearson speech performance metrics.
