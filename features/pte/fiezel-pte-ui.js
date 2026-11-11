@@ -1788,6 +1788,32 @@
     } catch (_) {}
   }
 
+  if (typeof window !== 'undefined') {
+    function autoTriggerPteFromUrl() {
+      try {
+        var sp = new URLSearchParams(window.location.search);
+        var hash = window.location.hash;
+        if (sp.has('pte') || hash === '#pte' || sp.get('view') === 'pte') {
+          if (typeof window.go === 'function') {
+            window.go('pte');
+          } else {
+            var appEl = document.getElementById('app');
+            if (appEl) {
+              mount(appEl);
+            } else {
+              setTimeout(autoTriggerPteFromUrl, 100);
+            }
+          }
+        }
+      } catch (_) {}
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', autoTriggerPteFromUrl);
+    } else {
+      setTimeout(autoTriggerPteFromUrl, 200);
+    }
+  }
+
   return {
     mount: mount,
     switchSection: switchSection,
