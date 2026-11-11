@@ -1,6 +1,6 @@
 # FIEZEL Handoff Dossier: PTE Master Tutor & Strict Examiner Engine (Dr. Julian)
 
-**Build Version**: `m025-806`<br/>
+**Build Version**: `m025-787`<br/>
 **Branch**: `feat/voice-pte-master-tutor`<br/>
 **Target Component**: `features/voice-studio/` (`call.html` / Kawan Bicara)<br/>
 **Coordinator Session**: `a91b3a79-13cf-443d-8f8f-d3a0860668c8`<br/>
@@ -51,7 +51,7 @@
    - `pte-describe-image-landscape-split.png`: Tangkapan layar empiris Describe Image split screen.
    - `pte-read-aloud-landscape-split.png`: Tangkapan layar empiris Read Aloud dengan penanda jeda nafas.
 7. `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `index.html`:
-   - Sinkronisasi build resmi `m025-806`.
+   - Sinkronisasi build resmi `m025-787`.
 
 ---
 
@@ -66,9 +66,9 @@
 | PTE Academic Engine Unit Tests | `node tests/pte-academic-engine-test.js` | **PASS (18/18)** |
 | Indonesian Golden Snapshot | `node tests/id-golden-snapshot-test.js` | **PASS (HIJAU baseline emas utuh)** |
 | Thai UI Leak Guard | `node tests/th-ui-leak-test.js` | **PASS (4751 kunci utuh)** |
-| Curriculum Cache Version | `node tests/curriculum-cache-version-test.js` | **PASS (33 penegasan, m025-806)** |
+| Curriculum Cache Version | `node tests/curriculum-cache-version-test.js` | **PASS (33 penegasan, m025-787)** |
 | Gate Registry Audit | `node tests/gate-registry-test.js` | **PASS (10 pass, 0 fail)** |
-| Hexa-Sync Version Check | `node tools/bump-build.mjs --check` | **PASS (Selaras: true, m025-806)** |
+| Hexa-Sync Version Check | `node tools/bump-build.mjs --check` | **PASS (Selaras: true, m025-787)** |
 | Git Whitespace Audit | `git diff --check origin/main` | **PASS (0 warnings)** |
 
 ---
