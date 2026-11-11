@@ -1,0 +1,2771 @@
+{
+  "version": "1.0.0",
+  "title": "FIEZEL 30-Day Guided Roadmap to PTE Academic 42",
+  "description": "Structured 30-day preparation program engineered for Fitra Rusdiawan targeting PTE Academic 42 (Vocational Benchmark / Australian Student Visa Subclass 500 for AILFE Perth). Based on the official 7-hour Nakul masterclass blueprint.",
+  "targetLearner": "Fitra Rusdiawan",
+  "targetScore": 42,
+  "visaBenchmark": "Australian Student Visa Subclass 500 (AILFE Perth)",
+  "totalDays": 30,
+  "weeks": [
+    {
+      "week": 1,
+      "name": "Week 1: Acoustic Foundations & Describe Image Mastery",
+      "focus": "Read Aloud steady pitch (135–145 Hz), 5-line Describe Image template, and 25–28s stopping zone.",
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "week": 2,
+      "name": "Week 2: Listening & Writing Dual-Scoring Core",
+      "focus": "Repeat Sentence 50% rule, Write From Dictation prediction bank, and Extra Words hack.",
+      "days": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "week": 3,
+      "name": "Week 3: Reading Collocations & Single-Sentence SWT",
+      "focus": "SWT 1-sentence compound rule, SST 50–70 word short connectors, and collocations.",
+      "days": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ]
+    },
+    {
+      "week": 4,
+      "name": "Week 4: Timed Mini-Mocks & Exam Simulation",
+      "focus": "Rapid-fire Big 4 speed runs, background acoustic tolerance, and readiness verification.",
+      "days": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": 1,
+      "week": 1,
+      "title": "Day 1: Acoustic Foundation & Describe Image Template",
+      "focus": "Read Aloud natural pitch and Describe Image 5-line template drill",
+      "targetMinutes": 45,
+      "nakulSecret": "Men voice pitch must stay above 130 Hz (ideally 135–145 Hz). Speak naturally to a friend, do not force deep chest bass.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d1_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d1_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d1_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-001",
+            "di-002",
+            "di-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d1_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d1_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-1"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "week": 1,
+      "title": "Day 2: Breath Marking & Cadence Locking",
+      "focus": "Pausing 0.3-0.5s only at commas/periods; steady 120-140 WPM rhythm",
+      "targetMinutes": 45,
+      "nakulSecret": "Never stop speaking mid-sentence. If you misread a word, keep moving. Zero self-correction.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d2_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d2_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d2_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-002",
+            "di-003",
+            "di-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d2_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d2_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-2"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "week": 1,
+      "title": "Day 3: Describe Image 25–28s Optimal Zone",
+      "focus": "Master stopping Describe Image at 26-28 seconds before the 30s mark",
+      "targetMinutes": 45,
+      "nakulSecret": "Stopping between 25-28s guarantees maximum Pearson oral fluency and content points without risking timeout.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d3_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006",
+            "ra-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d3_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d3_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-003",
+            "di-004",
+            "di-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d3_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d3_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-3"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "week": 1,
+      "title": "Day 4: Repeat Sentence 50% Rule Introduction",
+      "focus": "Reproduce >=50% of words with smooth oral flow; ignore complex recall",
+      "targetMinutes": 45,
+      "nakulSecret": "Getting 50% of the words right with 100% fluency awards 2/3 content + 5/5 fluency. That is more than enough for PTE 42.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d4_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-004",
+            "ra-005",
+            "ra-006",
+            "ra-007",
+            "ra-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d4_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d4_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-004",
+            "di-001",
+            "di-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d4_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d4_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-4"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "week": 1,
+      "title": "Day 5: Write From Dictation Extra Words Hack",
+      "focus": "Write singular + plural and tense variations without negative marking penalty",
+      "targetMinutes": 45,
+      "nakulSecret": "Pearson does NOT penalize extra words in WFD. If unsure about student vs students, write both: student students.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d5_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-005",
+            "ra-006",
+            "ra-007",
+            "ra-001",
+            "ra-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d5_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d5_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-001",
+            "di-002",
+            "di-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d5_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d5_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-5"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "week": 1,
+      "title": "Day 6: Speed Runs & Microphone Cutoff Discipline",
+      "focus": "Click Next immediately after the last spoken syllable",
+      "targetMinutes": 45,
+      "nakulSecret": "Click Next within 1 second after finishing your sentence to block nearby exam room noises.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d6_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-006",
+            "ra-007",
+            "ra-001",
+            "ra-002",
+            "ra-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d6_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d6_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-002",
+            "di-003",
+            "di-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d6_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d6_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-6"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "week": 1,
+      "title": "Day 7: Week 1 Diagnostic & Progress Review",
+      "focus": "Consolidate Big 4 skills and evaluate predicted Pearson score towards 42",
+      "targetMinutes": 45,
+      "nakulSecret": "Consistency beats intensity. 45 minutes of targeted Big 4 practice daily guarantees score 42.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d7_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-007",
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d7_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d7_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-003",
+            "di-004",
+            "di-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d7_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d7_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-7"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "week": 2,
+      "title": "Day 8: Repeat Sentence Intonation Mimicry",
+      "focus": "Copy speaker rise-and-fall pitch and deliver in a single breath",
+      "targetMinutes": 45,
+      "nakulSecret": "Mimic the audio melody like singing a short tune; acoustic contour helps brain retain phrases.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d8_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d8_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d8_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-004",
+            "di-001",
+            "di-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d8_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d8_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-8"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "week": 2,
+      "title": "Day 9: Write From Dictation High-Frequency Bank",
+      "focus": "Master top prediction sentences with spelling challenges",
+      "targetMinutes": 45,
+      "nakulSecret": "WFD is the kingmaker of PTE. It carries ~35-40 points for Listening AND ~35-40 for Writing.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d9_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d9_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d9_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-001",
+            "di-002",
+            "di-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d9_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d9_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-9"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 10,
+      "week": 2,
+      "title": "Day 10: Describe Image Process & Diagrams",
+      "focus": "Apply universal template to non-chart images (diagrams, cycles, maps)",
+      "targetMinutes": 45,
+      "nakulSecret": "For diagrams without X/Y axes, replace line 2 with: According to the image, we can see several key stages.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d10_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006",
+            "ra-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d10_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d10_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-002",
+            "di-003",
+            "di-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d10_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d10_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-10"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "week": 2,
+      "title": "Day 11: Chunking & Memory Scaffolds",
+      "focus": "Divide 10-word sentences into 2 chunks of 5 words",
+      "targetMinutes": 45,
+      "nakulSecret": "Do not memorize individual words. Group words into meaningful blocks (Subject-Verb-Object).",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d11_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-004",
+            "ra-005",
+            "ra-006",
+            "ra-007",
+            "ra-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d11_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d11_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-003",
+            "di-004",
+            "di-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d11_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d11_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-11"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 12,
+      "week": 2,
+      "title": "Day 12: WFD Tricky Spellings (Commercial & Hospitality)",
+      "focus": "Lock down accommodation, restaurant, maintenance, schedule",
+      "targetMinutes": 45,
+      "nakulSecret": "A misspelled word gives 0 points for that word. Use extra word variations if doubtful.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d12_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-005",
+            "ra-006",
+            "ra-007",
+            "ra-001",
+            "ra-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d12_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d12_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-004",
+            "di-001",
+            "di-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d12_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d12_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-12"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "week": 2,
+      "title": "Day 13: Retell Lecture 5-Sentence Structure",
+      "focus": "Note down 4-5 noun chunks and insert into Nakul Retell Lecture template",
+      "targetMinutes": 45,
+      "nakulSecret": "Do not try to understand the entire lecture. Write down 5 clear noun phrases and slot them into the template.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d13_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-006",
+            "ra-007",
+            "ra-001",
+            "ra-002",
+            "ra-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d13_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d13_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-001",
+            "di-002",
+            "di-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d13_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d13_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-13"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 14,
+      "week": 2,
+      "title": "Day 14: Week 2 Midpoint Diagnostic Check",
+      "focus": "Verify Listening and Speaking dual-contribution marks",
+      "targetMinutes": 45,
+      "nakulSecret": "At Day 14, your speaking fluency should naturally clock at 120-140 WPM without conscious effort.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d14_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-007",
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d14_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d14_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-002",
+            "di-003",
+            "di-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d14_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d14_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-14"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 15,
+      "week": 3,
+      "title": "Day 15: Read Aloud Complex Academic Vocabulary",
+      "focus": "Flow smoothly past difficult culinary & academic terminology",
+      "targetMinutes": 45,
+      "nakulSecret": "If you see an unfamiliar word, pronounce it phonetically with confidence and do not hesitate.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d15_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d15_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d15_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-003",
+            "di-004",
+            "di-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d15_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d15_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-15"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "week": 3,
+      "title": "Day 16: Summarize Written Text Single-Sentence Rule",
+      "focus": "Master the 1-sentence compound formula: [Clause 1], and [Clause 2], although [Clause 3].",
+      "targetMinutes": 45,
+      "nakulSecret": "Never place more than one period in SWT. Word count must be strictly between 35 and 45 words.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d16_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d16_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d16_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-004",
+            "di-001",
+            "di-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d16_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d16_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-16"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 17,
+      "week": 3,
+      "title": "Day 17: Essential Academic Collocations",
+      "focus": "Identify natural word pairings for Reading & Writing FIB",
+      "targetMinutes": 45,
+      "nakulSecret": "Read phrases as collocations: conduct research, significant impact, primary concern.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d17_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006",
+            "ra-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d17_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d17_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-001",
+            "di-002",
+            "di-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d17_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d17_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-17"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "week": 3,
+      "title": "Day 18: Summarize Spoken Text Short Connectors",
+      "focus": "Use short connectors (Firstly, Secondly, Furthermore, In conclusion) within 50-70 words",
+      "targetMinutes": 45,
+      "nakulSecret": "Do not use heavy 40-word templates in SST. Keep connectors simple so content points shine.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d18_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-004",
+            "ra-005",
+            "ra-006",
+            "ra-007",
+            "ra-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d18_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d18_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-002",
+            "di-003",
+            "di-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d18_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d18_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-18"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 19,
+      "week": 3,
+      "title": "Day 19: Repeat Sentence Long Sentence Resilience",
+      "focus": "Stay calm when audio has 12-14 words; speak the first 6-7 words fluently",
+      "targetMinutes": 45,
+      "nakulSecret": "Never panic if the sentence is long. Secure the first half with 100% fluency and stop cleanly.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d19_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-005",
+            "ra-006",
+            "ra-007",
+            "ra-001",
+            "ra-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d19_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d19_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-003",
+            "di-004",
+            "di-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d19_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d19_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-19"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "week": 3,
+      "title": "Day 20: WFD Fast Typing & Proofreading",
+      "focus": "Type initial letters first on scratchpad, then type and proofread",
+      "targetMinutes": 45,
+      "nakulSecret": "Always check that the first letter is capitalized and there is a single period at the end.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d20_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-006",
+            "ra-007",
+            "ra-001",
+            "ra-002",
+            "ra-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d20_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d20_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-004",
+            "di-001",
+            "di-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d20_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d20_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-20"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 21,
+      "week": 3,
+      "title": "Day 21: Week 3 Full Skills Integration Diagnostic",
+      "focus": "Simulate Speaking + Reading + Listening interconnected scoring",
+      "targetMinutes": 45,
+      "nakulSecret": "Dual scoring means good speaking pushes your reading score past the 42 threshold automatically.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d21_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-007",
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d21_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d21_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-001",
+            "di-002",
+            "di-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d21_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d21_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-21"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 22,
+      "week": 4,
+      "title": "Day 22: Timed Read Aloud Rapid Fire",
+      "focus": "Complete 5 Read Aloud items back-to-back under strict 40s timers",
+      "targetMinutes": 45,
+      "nakulSecret": "Finish speaking at 12-14 seconds and click Next immediately.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d22_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d22_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d22_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-002",
+            "di-003",
+            "di-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d22_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d22_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-22"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 23,
+      "week": 4,
+      "title": "Day 23: Timed Describe Image Speed Run",
+      "focus": "Execute 4 Describe Image tasks stopping exactly at 25-28s",
+      "targetMinutes": 45,
+      "nakulSecret": "Internalize the 26-second rhythm: intro (5s), axes (6s), high (5s), low (5s), conclusion (5s).",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d23_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d23_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d23_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-003",
+            "di-004",
+            "di-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d23_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d23_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-23"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 24,
+      "week": 4,
+      "title": "Day 24: Timed Repeat Sentence Rapid Fire",
+      "focus": "12 Repeat Sentences in 6 minutes with instant vocal response",
+      "targetMinutes": 45,
+      "nakulSecret": "Start speaking within 1 second of hearing the beep to ensure the mic captures your first word.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d24_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006",
+            "ra-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d24_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d24_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-004",
+            "di-001",
+            "di-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d24_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d24_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-24"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 25,
+      "week": 4,
+      "title": "Day 25: Timed Write From Dictation Sprint",
+      "focus": "10 WFD items with 1 minute typing and verification per item",
+      "targetMinutes": 45,
+      "nakulSecret": "WFD is where the easiest points for Target 42 are won. 8 correct words out of 10 gives 80% mark.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d25_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-004",
+            "ra-005",
+            "ra-006",
+            "ra-007",
+            "ra-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d25_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-001",
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d25_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-001",
+            "di-002",
+            "di-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d25_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d25_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-25"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 26,
+      "week": 4,
+      "title": "Day 26: Full Mini-Mock Exam 1 (The Big 4)",
+      "focus": "Comprehensive timed simulation of RA, RS, DI, and WFD",
+      "targetMinutes": 45,
+      "nakulSecret": "Treat the mini-mock as the real test. Maintain voice projection throughout.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d26_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-005",
+            "ra-006",
+            "ra-007",
+            "ra-001",
+            "ra-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d26_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-002",
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d26_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-002",
+            "di-003",
+            "di-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d26_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d26_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-26"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 27,
+      "week": 4,
+      "title": "Day 27: Misconception Ledger & Weakness Patch",
+      "focus": "Review mispronounced words and misspelled tokens from previous days",
+      "targetMinutes": 45,
+      "nakulSecret": "Review your personal Misconception Ledger. Fixing 3 common spelling errors can boost your score by 5 points.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d27_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-006",
+            "ra-007",
+            "ra-001",
+            "ra-002",
+            "ra-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d27_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-003",
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d27_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-003",
+            "di-004",
+            "di-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d27_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-007",
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d27_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-27"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 28,
+      "week": 4,
+      "title": "Day 28: Full Mini-Mock Exam 2 (Acoustic Stress Test)",
+      "focus": "Simulate background murmur and noise while maintaining clear pitch",
+      "targetMinutes": 45,
+      "nakulSecret": "In the test center, others will speak simultaneously. Focus entirely on your own microphone.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d28_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-007",
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d28_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-004",
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d28_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-004",
+            "di-001",
+            "di-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d28_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-008",
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d28_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-28"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 29,
+      "week": 4,
+      "title": "Day 29: Final Big 4 Accuracy Lockdown",
+      "focus": "Final drill of templates, extra words hack, and pacing confidence",
+      "targetMinutes": 45,
+      "nakulSecret": "You only need 42 out of 90 (approx 45% raw accuracy). You are well-prepared and ready.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d29_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-001",
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d29_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-005",
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d29_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-001",
+            "di-002",
+            "di-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d29_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-009",
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d29_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-29"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    },
+    {
+      "day": 30,
+      "week": 4,
+      "title": "Day 30: Official Readiness Certification",
+      "focus": "Final evaluation and graduation to PTE Academic 42 benchmark",
+      "targetMinutes": 45,
+      "nakulSecret": "Sleep well before exam day, hydrate, speak with a warm conversational pitch, and claim your visa benchmark.",
+      "successMilestone": "Complete all 5 daily tasks with >= 40 estimated Pearson score",
+      "tasks": [
+        {
+          "id": "task_d30_ra",
+          "type": "read_aloud",
+          "title": "5 Read Aloud Passages",
+          "targetCount": 5,
+          "itemIds": [
+            "ra-002",
+            "ra-003",
+            "ra-004",
+            "ra-005",
+            "ra-006"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Read smoothly in 12–14s. Maintain pitch at 135–145 Hz. Zero self-correction."
+        },
+        {
+          "id": "task_d30_rs",
+          "type": "repeat_sentence",
+          "title": "10 Repeat Sentence Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "rs-006",
+            "rs-007",
+            "rs-008",
+            "rs-009",
+            "rs-010",
+            "rs-011",
+            "rs-012",
+            "rs-001",
+            "rs-002",
+            "rs-003"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Aim for >=50% of words with smooth oral flow. Do not hesitate or say uh/um."
+        },
+        {
+          "id": "task_d30_di",
+          "type": "describe_image",
+          "title": "3 Describe Image Template Drills",
+          "targetCount": 3,
+          "itemIds": [
+            "di-002",
+            "di-003",
+            "di-004"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Follow Nakul 5-line template. Stop speaking inside the 25–28s green zone."
+        },
+        {
+          "id": "task_d30_wfd",
+          "type": "write_from_dictation",
+          "title": "10 Write From Dictation Drills",
+          "targetCount": 10,
+          "itemIds": [
+            "wfd-010",
+            "wfd-001",
+            "wfd-002",
+            "wfd-003",
+            "wfd-004",
+            "wfd-005",
+            "wfd-006",
+            "wfd-007",
+            "wfd-008",
+            "wfd-009"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Apply Extra Words Hack for doubtful plurals or tenses. Ensure initial capital and final period."
+        },
+        {
+          "id": "task_d30_kawan_bicara",
+          "type": "kawan_bicara",
+          "title": "10-Min Kawan Bicara AI Coach Call",
+          "targetCount": 1,
+          "itemIds": [
+            "call-studio-day-30"
+          ],
+          "estimatedMinutes": 10,
+          "instructions": "Voice simulation with AI Coach in Voice Studio. Practice conversational fluency and acoustic confidence."
+        }
+      ]
+    }
+  ]
+}

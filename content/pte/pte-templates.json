@@ -1,54 +1,79 @@
 {
-  "version": "1.0.0",
-  "name": "FIEZEL PTE Academic Universal Templates",
-  "description": "Standardized pedagogical templates designed for guaranteed scoring in Pearson AI automated grading algorithms.",
+  "version": "1.1.0",
+  "name": "FIEZEL PTE Academic Official Templates & Nakul Master Scaffolds",
+  "description": "Standardized pedagogical templates designed for guaranteed scoring in Pearson AI automated grading algorithms (Target PTE 42–58+).",
   "templates": {
     "describe_image": {
-      "id": "di_universal_v1",
-      "title": "FIEZEL Universal Describe Image Template",
+      "id": "di_nakul_v1",
+      "title": "Nakul 5-Line Universal Describe Image Template",
       "target_task": "Describe Image",
+      "target_duration_sec": 26,
+      "duration_range": "25–28 seconds (Optimal Pearson Oral Fluency Zone)",
       "structure": [
-        "Introduction / Overview",
-        "Key Element 1",
-        "Key Element 2",
-        "Maximum Trend / High Point",
-        "Minimum Trend / Low Point",
-        "Logical Conclusion"
+        "Line 1 (Type & Topic): The image provided is a [type] that gives information about [topic].",
+        "Line 2 (Axes / Breakdown): While the x-axis represents [categories], the y-axis shows [values].",
+        "Line 3 (Maximum Trend): It is evident that [highest feature] has the highest value.",
+        "Line 4 (Minimum Trend): Conversely, [lowest feature] has the lowest value.",
+        "Line 5 (Conclusion): Overall, this image clearly illustrates [restate topic]."
       ],
-      "text": "The given image represents an informative chart regarding [Topic]. According to the picture, we can see several key elements, including [Element 1], [Element 2], and [Element 3]. Looking closely, the maximum figure is observed in [Key Trend / High Point], while the minimum figure is found in [Low Point]. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
+      "text": "The given image represents an informative [type] regarding [topic]. While the x-axis represents [categories], the y-axis shows [values]. It is evident that [highest feature] has the highest value. Conversely, [lowest feature] has the lowest value. Overall, this image clearly illustrates [restate topic].",
       "fill_guide": {
-        "Topic": "Title or main subject of the chart/diagram",
-        "Element 1": "First category or axis label",
-        "Element 2": "Second category or axis label",
-        "Element 3": "Third category or legend item",
-        "Key Trend / High Point": "The highest bar, peak year, or dominant section",
-        "Low Point": "The lowest bar, valley, or smallest portion"
+        "type": "bar chart / line graph / pie chart / diagram / table",
+        "topic": "Title or main subject of the chart/diagram",
+        "categories": "Categories shown along horizontal axis or legend",
+        "values": "Numerical values or percentages along vertical axis",
+        "highest feature": "The peak bar, year, or segment with largest number",
+        "lowest feature": "The lowest bar, year, or segment with smallest number"
       },
       "tips": [
-        "Do not stop speaking before 25 seconds; Pearson rewards oral fluency and continuous acoustic flow over complex logic.",
-        "Pronounce the template with natural sentence stress and steady rhythm (120-140 words per minute).",
-        "If you stumble on a number, do not correct yourself—keep moving smoothly to the next sentence."
+        "Speak steadily for 25–28 seconds; stop before 30s to avoid rushing or getting cut off.",
+        "No pauses longer than 2 seconds (Pearson's 3-second silence rule will automatically shut off the mic).",
+        "Do not self-correct if you misread a number; maintain continuous vocal acoustic flow."
       ]
     },
     "retell_lecture": {
-      "id": "rl_universal_v1",
-      "title": "FIEZEL Retell Lecture Standard Scaffold",
+      "id": "rl_nakul_v1",
+      "title": "Nakul 5-Sentence Retell Lecture Template",
       "target_task": "Retell Lecture",
-      "text": "The speaker was discussing the primary aspects of [Main Topic]. Firstly, the speaker highlighted that [Key Note 1]. In addition, significant emphasis was placed on [Key Note 2]. Furthermore, the presentation provided crucial evidence about [Key Note 3]. Overall, the lecture provided highly comprehensive insights into the subject matter.",
+      "target_duration_sec": 28,
+      "text": "The lecture discusses [topic]. In the beginning, the speaker explained [phrase 1]. Later, the speaker said that [phrase 2]. Here, the speaker also mentioned [phrase 3]. In conclusion, the lecture effectively summarized [phrase 4].",
       "tips": [
-        "Take 4-6 noun chunks during the audio playback.",
-        "Insert the noun chunks directly into the template slots without worrying about complex grammar transformation."
+        "Capture 4 to 6 noun phrases during audio playback without worrying about grammar.",
+        "Insert the captured keywords directly into the slots with calm, rhythmic pacing."
       ]
     },
     "summarize_written_text": {
-      "id": "swt_universal_v1",
-      "title": "FIEZEL Strict One-Sentence Summarizer Scaffold",
+      "id": "swt_nakul_v1",
+      "title": "Nakul Strict 1-Sentence Summarizer Scaffold",
       "target_task": "Summarize Written Text",
-      "rules": "Strict single sentence (5-75 words), one capital letter at beginning, exactly one period at end.",
-      "formula": "[Key Sentence 1], and [Key Sentence 2], which demonstrates that [Author Conclusion].",
+      "rules": "Strictly ONE single sentence (35-45 words), one capital letter at beginning, exactly one full stop at end.",
+      "formula": "[Clause 1], and [Clause 2], although [Clause 3].",
       "tips": [
-        "Never use more than one period in the entire response.",
-        "Keep word count strictly between 35 and 65 words for maximum content and grammar safety."
+        "Never place more than one period in the entire response.",
+        "Pick 2-3 key independent clauses from the text and join them with 'and' and 'although'."
+      ]
+    },
+    "summarize_spoken_text": {
+      "id": "sst_nakul_v1",
+      "title": "Nakul Short Connectors Spoken Summarizer",
+      "target_task": "Summarize Spoken Text",
+      "target_word_count": "50–70 words",
+      "formula": "The audio discusses [topic]. Firstly, [point 1]. Secondly, [point 2]. Furthermore, [point 3]. In conclusion, [point 4].",
+      "tips": [
+        "Avoid bulky 40-word filler templates that waste cognitive load.",
+        "Write 3-4 short sentences using simple connectors: Firstly, Secondly, Furthermore, In conclusion."
+      ]
+    },
+    "write_from_dictation": {
+      "id": "wfd_extra_words_v1",
+      "title": "Nakul Extra Words Hack & Zero Negative Marking Protocol",
+      "target_task": "Write From Dictation",
+      "rules": "1 point per correct word. Zero negative marking. Order does not invalidate points.",
+      "hack_guide": "If you are unsure whether a word is singular or plural (e.g. student or students), or unsure of tense (develop, develops, developed), or article (the, a), write BOTH variations: 'student students', 'the a'. Pearson AI matches tokens without deducting marks for extraneous guesses.",
+      "tips": [
+        "Always write down the initial letter of each word while listening to capture the entire sentence.",
+        "Ensure capitalization of the first word and proper nouns.",
+        "Add a full stop at the end."
       ]
     },
     "write_essay": {

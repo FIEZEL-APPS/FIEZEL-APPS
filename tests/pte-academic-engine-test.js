@@ -154,4 +154,88 @@ test('calculateCompositePearson correctly computes overall and evaluates Target 
   assert.strictEqual(beginner.distanceToTarget42 > 0, true);
 });
 
+// 7. Nakul 2025/2026 Masterclass Algorithmic Enhancements
+test('evaluateRepeatSentence flags Nakul 50% rule compliance', () => {
+  const sentence = 'Please submit your completed assignment to the student office before Friday afternoon.';
+  const spoken = 'Please submit your completed assignment before Friday.';
+  const res = engine.evaluateRepeatSentence(sentence, spoken, { durationSec: 4 });
+  assert.strictEqual(res.meets50PercentRule, true);
+  assert.ok(res.content.nakulFeedback.includes('50% Rule Satisfied'));
+});
+
+test('evaluateDescribeImage detects Nakul 5-line template and 25-28s optimal duration zone', () => {
+  const chartData = {
+    keywords: ['coffee', 'consumption', 'Europe', 'Finland', 'Italy'],
+    categories: ['Finland', 'Norway', 'Italy'],
+    highPoint: 'Finland',
+    lowPoint: 'Italy'
+  };
+  const nakulResponse = 'The image provided is a bar chart that gives information about coffee consumption in Europe. While the x-axis represents European countries, the y-axis shows kilograms per person. It is evident that Finland has the highest value with over twelve kilograms. Conversely, Italy has the lowest value among the selected countries. Overall, this image clearly illustrates significant variations in beverage consumption.';
+
+  const res = engine.evaluateDescribeImage(chartData, nakulResponse, { durationSec: 26.5 });
+  assert.strictEqual(res.isOptimalDuration, true);
+  assert.strictEqual(res.durationZone, 'optimal_25_28');
+  assert.strictEqual(res.nakulTemplate.isDetected, true);
+  assert.strictEqual(res.nakulTemplate.linesCount >= 4, true);
+  assert.strictEqual(res.content.score, 5);
+  assert.ok(res.durationAdvice.includes('Optimal Nakul Fluency Zone'));
+});
+
+test('evaluateWriteFromDictation verifies Nakul Extra Words Hack without penalty', () => {
+  const sentence = 'The student completed the challenging assignment.';
+  // Student uses extra word hack: writing both singular & plural (student students) and extra article
+  const studentWithHack = 'The student students completed the challenging assignment assignments on time.';
+  const res = engine.evaluateWriteFromDictation(sentence, studentWithHack);
+
+  // Target sentence has 6 words: the, student, completed, the, challenging, assignment.
+  // Student matched all 6 words.
+  assert.strictEqual(res.content.score, 6);
+  assert.strictEqual(res.content.matchRatio, 1);
+  assert.strictEqual(res.extraWordsCount >= 3, true);
+  assert.strictEqual(res.extraWordsHackDetected, true);
+  assert.ok(res.nakulHackAdvice.includes('Extra Words Hack Applied'));
+});
+
+test('evaluateAcousticPitch checks pitch frequency for male speaker', () => {
+  const bass = engine.evaluateAcousticPitch(105, 'male');
+  assert.strictEqual(bass.isOptimal, false);
+  assert.strictEqual(bass.zone, 'deep_bass');
+  assert.ok(bass.feedback.includes('too low/bass'));
+
+  const optimal = engine.evaluateAcousticPitch(140, 'male');
+  assert.strictEqual(optimal.isOptimal, true);
+  assert.strictEqual(optimal.zone, 'optimal');
+  assert.ok(optimal.feedback.includes('Optimal Pearson Male Pitch'));
+});
+
+test('getDailyRoadmapDay and calculateDailyProgress handle 30-day curriculum', () => {
+  const mockRoadmap = {
+    days: [
+      {
+        day: 1,
+        title: 'Day 1: Acoustic Foundation',
+        tasks: [{ id: 't1' }, { id: 't2' }, { id: 't3' }, { id: 't4' }, { id: 't5' }]
+      },
+      {
+        day: 2,
+        title: 'Day 2: Breath Marking',
+        tasks: [{ id: 't6' }, { id: 't7' }]
+      }
+    ]
+  };
+
+  const day1 = engine.getDailyRoadmapDay(1, mockRoadmap);
+  assert.strictEqual(day1.title, 'Day 1: Acoustic Foundation');
+
+  const progress = engine.calculateDailyProgress(day1.tasks, ['t1', 't2', 't3']);
+  assert.strictEqual(progress.completedCount, 3);
+  assert.strictEqual(progress.totalCount, 5);
+  assert.strictEqual(progress.percent, 60);
+  assert.strictEqual(progress.isDayCompleted, false);
+
+  const fullProgress = engine.calculateDailyProgress(day1.tasks, ['t1', 't2', 't3', 't4', 't5']);
+  assert.strictEqual(fullProgress.isDayCompleted, true);
+  assert.strictEqual(fullProgress.percent, 100);
+});
+
 console.log(`\nAll ${passedTests} PTE Academic Engine unit tests PASSED successfully!`);

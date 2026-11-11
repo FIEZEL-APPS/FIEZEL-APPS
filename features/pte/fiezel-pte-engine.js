@@ -332,16 +332,24 @@
     var totalRaw = contentScore + fluency.score + pronunciation.score; // 0 to 13
     var pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 80);
 
+    var meets50Percent = alignment.matchRatio >= 0.50;
+    var nakulFeedback = meets50Percent
+      ? 'Nakul 50% Rule Satisfied: You repeated ' + Math.round(alignment.matchRatio * 100) + '% of words with smooth oral rhythm, securing key Pearson fluency marks.'
+      : 'Below 50% threshold (' + Math.round(alignment.matchRatio * 100) + '%). Focus on reproducing at least the first 5–6 words smoothly without pausing.';
+
     return {
       task: 'Repeat Sentence',
       content: {
         score: contentScore,
         max: 3,
         matchRatio: alignment.matchRatio,
-        wer: alignment.wer
+        wer: alignment.wer,
+        meets50PercentRule: meets50Percent,
+        nakulFeedback: nakulFeedback
       },
       fluency: fluency,
       pronunciation: pronunciation,
+      meets50PercentRule: meets50Percent,
       totalRaw: totalRaw,
       maxRaw: 13,
       pearsonScore: Math.min(90, Math.max(10, pearsonEquivalent)),
@@ -395,12 +403,52 @@
       return rawText.indexOf(marker) !== -1;
     });
 
+    // Nakul 5-Line Universal Template analysis
+    var nakulLines = [];
+    if (/image provided is|given image represents|informative (chart|graph|diagram)|gives information/i.test(rawText)) {
+      nakulLines.push('Line 1 (Type & Topic)');
+    }
+    if (/x-axis|y-axis|horizontal axis|vertical axis|according to|we can see/i.test(rawText)) {
+      nakulLines.push('Line 2 (Axes / Breakdown)');
+    }
+    if (/highest value|maximum figure|maximum trend|highest bar|maximum value|highest/i.test(rawText)) {
+      nakulLines.push('Line 3 (Maximum Trend)');
+    }
+    if (/lowest value|minimum figure|minimum trend|lowest bar|minimum value|conversely/i.test(rawText)) {
+      nakulLines.push('Line 4 (Minimum Trend)');
+    }
+    if (/in conclusion|overall|clearly illustrates|significant data/i.test(rawText)) {
+      nakulLines.push('Line 5 (Conclusion)');
+    }
+
+    var isNakulTemplate = nakulLines.length >= 4;
+    var isOptimalDuration = duration >= 25 && duration <= 28;
+    var durationZone = 'under_20';
+    var durationAdvice = '';
+
+    if (duration < 20) {
+      durationZone = 'under_20';
+      durationAdvice = 'Speech too short (<20s). Speaking less than 20 seconds heavily penalizes oral fluency in Pearson algorithms.';
+    } else if (duration < 25) {
+      durationZone = 'short_20_24';
+      durationAdvice = 'Acceptable (20–24s), but aim to speak between 25–28 seconds for maximum oral fluency points.';
+    } else if (duration <= 28) {
+      durationZone = 'optimal_25_28';
+      durationAdvice = 'Optimal Nakul Fluency Zone (25–28s)! Perfect duration—stopping here avoids rushing and microphone cut-off.';
+    } else if (duration <= 34) {
+      durationZone = 'good_29_34';
+      durationAdvice = 'Good length (29–34s). Make sure you stop before the 40-second buzzer.';
+    } else {
+      durationZone = 'danger_over_35';
+      durationAdvice = 'Danger zone (>35s)! Click Next immediately to avoid cut-off mid-sentence.';
+    }
+
     // Content Score (0 to 5 for DI)
     // Pearson evaluates topic coverage, key trends, and comparison points
     var contentScore = 0;
-    if (matchedKeywords.length >= 4 || (detectedMarkers.length >= 4 && matchedKeywords.length >= 2)) {
+    if (matchedKeywords.length >= 4 || (detectedMarkers.length >= 4 && matchedKeywords.length >= 2) || (isNakulTemplate && matchedKeywords.length >= 1)) {
       contentScore = 5;
-    } else if (matchedKeywords.length >= 3 || (detectedMarkers.length >= 3 && matchedKeywords.length >= 1)) {
+    } else if (matchedKeywords.length >= 3 || (detectedMarkers.length >= 3 && matchedKeywords.length >= 1) || isNakulTemplate) {
       contentScore = 4;
     } else if (matchedKeywords.length >= 2 || detectedMarkers.length >= 2) {
       contentScore = 3; // Target 42 benchmark
@@ -433,10 +481,21 @@
         matchedKeywords: matchedKeywords,
         totalKeywords: keywords.length,
         keywordRatio: keywordRatio,
-        detectedTemplateMarkers: detectedMarkers
+        detectedTemplateMarkers: detectedMarkers,
+        nakulLinesDetected: nakulLines,
+        nakulLinesCount: nakulLines.length,
+        isNakulTemplate: isNakulTemplate
       },
       durationSec: duration,
       durationSufficient: duration >= 25,
+      isOptimalDuration: isOptimalDuration,
+      durationZone: durationZone,
+      durationAdvice: durationAdvice,
+      nakulTemplate: {
+        isDetected: isNakulTemplate,
+        linesCount: nakulLines.length,
+        linesDetected: nakulLines
+      },
       fluency: fluency,
       pronunciation: pronunciation,
       totalRaw: totalRaw,
@@ -479,6 +538,31 @@
     var totalCount = refTokens.length;
     var matchRatio = totalCount > 0 ? (correctCount / totalCount) : 0;
 
+    // Nakul Extra Words Hack evaluation
+    // Pearson automated scoring awards points for matched words and does NOT deduct points for extra words.
+    var extraWords = [];
+    var refSet = {};
+    refTokens.forEach(function (w) { refSet[w] = true; });
+    hypTokens.forEach(function (w) {
+      if (!refSet[w]) {
+        extraWords.push(w);
+      }
+    });
+
+    // Detect if student paired singular/plural or tense variants (e.g. student students)
+    var extraWordsHackDetected = false;
+    var variantPairs = [];
+    for (var i = 0; i < hypTokens.length; i++) {
+      for (var j = i + 1; j < hypTokens.length; j++) {
+        var w1 = hypTokens[i];
+        var w2 = hypTokens[j];
+        if (w1 + 's' === w2 || w2 + 's' === w1 || w1 + 'es' === w2 || w2 + 'es' === w1 || w1 + 'ed' === w2 || w2 + 'ed' === w1) {
+          extraWordsHackDetected = true;
+          variantPairs.push(w1 + ' / ' + w2);
+        }
+      }
+    }
+
     // Detect spelling misconceptions
     var detectedMisconceptions = [];
     var studentRaw = tokenize(studentAnswer);
@@ -508,6 +592,13 @@
         matchedWords: matchedWords,
         missedWords: missedWords
       },
+      extraWords: extraWords,
+      extraWordsCount: extraWords.length,
+      extraWordsHackDetected: extraWordsHackDetected,
+      extraWordsPairs: variantPairs,
+      nakulHackAdvice: extraWords.length > 0
+        ? 'Extra Words Hack Applied: ' + extraWords.length + ' additional words were included. Pearson AI awarded full credit for your matched words without any score deductions!'
+        : 'Tip: If unsure of singular vs plural (e.g., student vs students), write both. Pearson does not penalize extra words in WFD.',
       spellingMisconceptions: detectedMisconceptions,
       pearsonScore: Math.min(90, Math.max(10, pearsonEquivalent)),
       crossCredits: {
@@ -568,6 +659,105 @@
     };
   }
 
+  /**
+   * Acoustic Pitch & Frequency Evaluator (Nakul Speech Rule).
+   * @param {number} pitchHz
+   * @param {string} [gender='male']
+   * @returns {{ pitchHz: number, zone: string, isOptimal: boolean, feedback: string }}
+   */
+  function evaluateAcousticPitch(pitchHz, gender) {
+    var hz = Number(pitchHz) || 140;
+    var g = String(gender || 'male').toLowerCase();
+    var isMale = g === 'male';
+
+    if (isMale) {
+      if (hz < 115) {
+        return {
+          pitchHz: hz,
+          zone: 'deep_bass',
+          isOptimal: false,
+          feedback: 'Vocal pitch is too low/bass (' + Math.round(hz) + ' Hz). Pearson speech recognition may fail to register low frequencies. Speak higher, with a conversational, friendly lift (target 135–145 Hz).'
+        };
+      } else if (hz >= 130 && hz <= 155) {
+        return {
+          pitchHz: hz,
+          zone: 'optimal',
+          isOptimal: true,
+          feedback: 'Optimal Pearson Male Pitch (' + Math.round(hz) + ' Hz). Clear acoustic projection with high speech recognition accuracy.'
+        };
+      } else if (hz > 185) {
+        return {
+          pitchHz: hz,
+          zone: 'high_pitch',
+          isOptimal: false,
+          feedback: 'Vocal pitch is somewhat elevated (' + Math.round(hz) + ' Hz). Lower slightly to maintain calm, authoritative cadence.'
+        };
+      } else {
+        return {
+          pitchHz: hz,
+          zone: 'acceptable',
+          isOptimal: true,
+          feedback: 'Acceptable pitch (' + Math.round(hz) + ' Hz). Aim for 135–145 Hz for maximum acoustic clarity.'
+        };
+      }
+    } else {
+      if (hz >= 190 && hz <= 250) {
+        return {
+          pitchHz: hz,
+          zone: 'optimal',
+          isOptimal: true,
+          feedback: 'Optimal Pearson Female Pitch (' + Math.round(hz) + ' Hz). Clear acoustic harmonics.'
+        };
+      } else {
+        return {
+          pitchHz: hz,
+          zone: 'acceptable',
+          isOptimal: true,
+          feedback: 'Acceptable female pitch (' + Math.round(hz) + ' Hz).'
+        };
+      }
+    }
+  }
+
+  /**
+   * Retrieve a specific day from the 30-Day Daily Roadmap.
+   * @param {number} dayNumber (1-30)
+   * @param {object} roadmapData - parsed pte-daily-roadmap.json
+   * @returns {object|null}
+   */
+  function getDailyRoadmapDay(dayNumber, roadmapData) {
+    if (!roadmapData || !Array.isArray(roadmapData.days)) return null;
+    var d = Math.max(1, Math.min(30, parseInt(dayNumber, 10) || 1));
+    return roadmapData.days.find(function (item) { return item.day === d; }) || roadmapData.days[0] || null;
+  }
+
+  /**
+   * Calculate completion status for a specific day's tasks.
+   * @param {Array<object>} dayTasks
+   * @param {Array<string>} completedTaskIds
+   * @returns {{ completedCount: number, totalCount: number, percent: number, isDayCompleted: boolean }}
+   */
+  function calculateDailyProgress(dayTasks, completedTaskIds) {
+    var tasks = Array.isArray(dayTasks) ? dayTasks : [];
+    var completed = Array.isArray(completedTaskIds) ? completedTaskIds : [];
+    if (tasks.length === 0) return { completedCount: 0, totalCount: 0, percent: 0, isDayCompleted: false };
+
+    var count = 0;
+    tasks.forEach(function (t) {
+      if (completed.indexOf(t.id) !== -1) {
+        count++;
+      }
+    });
+
+    var percent = Math.round((count / tasks.length) * 100);
+    return {
+      completedCount: count,
+      totalCount: tasks.length,
+      percent: percent,
+      isDayCompleted: count === tasks.length
+    };
+  }
+
   return {
     tokenize: tokenize,
     charLevenshtein: charLevenshtein,
@@ -578,6 +768,9 @@
     evaluateRepeatSentence: evaluateRepeatSentence,
     evaluateDescribeImage: evaluateDescribeImage,
     evaluateWriteFromDictation: evaluateWriteFromDictation,
+    evaluateAcousticPitch: evaluateAcousticPitch,
+    getDailyRoadmapDay: getDailyRoadmapDay,
+    calculateDailyProgress: calculateDailyProgress,
     calculateCompositePearson: calculateCompositePearson
   };
 });

@@ -29,7 +29,8 @@ const expectedFiles = [
   'pte-repeat-sentence.json',
   'pte-describe-image.json',
   'pte-write-dictation.json',
-  'pte-templates.json'
+  'pte-templates.json',
+  'pte-daily-roadmap.json'
 ];
 
 expectedFiles.forEach(file => {
@@ -117,7 +118,7 @@ test('Validate pte-write-dictation.json items schema', () => {
   });
 });
 
-// 6. Validate Universal Templates
+// 6. Validate Universal & Nakul Templates
 test('Validate pte-templates.json schema', () => {
   const data = JSON.parse(fs.readFileSync(path.join(contentDir, 'pte-templates.json'), 'utf8'));
   assert.ok(data.templates);
@@ -125,7 +126,40 @@ test('Validate pte-templates.json schema', () => {
   assert.ok(data.templates.retell_lecture);
   assert.ok(data.templates.summarize_written_text);
   assert.ok(data.templates.write_essay);
+  assert.ok(data.templates.summarize_spoken_text);
+  assert.ok(data.templates.write_from_dictation);
+  assert.strictEqual(data.templates.describe_image.id, 'di_nakul_v1');
+  assert.strictEqual(data.templates.describe_image.target_duration_sec, 26);
   assert.ok(data.templates.describe_image.text.includes('The given image represents'));
+  assert.strictEqual(data.templates.write_from_dictation.id, 'wfd_extra_words_v1');
+});
+
+// 7. Validate 30-Day Guided Daily Roadmap
+test('Validate pte-daily-roadmap.json 30-day curriculum schema', () => {
+  const data = JSON.parse(fs.readFileSync(path.join(contentDir, 'pte-daily-roadmap.json'), 'utf8'));
+  assert.strictEqual(data.targetScore, 42);
+  assert.strictEqual(data.totalDays, 30);
+  assert.strictEqual(Array.isArray(data.weeks), true);
+  assert.strictEqual(data.weeks.length, 4);
+  assert.strictEqual(Array.isArray(data.days), true);
+  assert.strictEqual(data.days.length, 30);
+
+  data.days.forEach((dayItem, idx) => {
+    assert.strictEqual(dayItem.day, idx + 1);
+    assert.ok(dayItem.title, `Day ${idx + 1} missing title`);
+    assert.ok(dayItem.focus, `Day ${idx + 1} missing focus`);
+    assert.ok(dayItem.nakulSecret, `Day ${idx + 1} missing nakulSecret`);
+    assert.strictEqual(typeof dayItem.targetMinutes, 'number');
+    assert.strictEqual(Array.isArray(dayItem.tasks), true);
+    assert.strictEqual(dayItem.tasks.length, 5, `Day ${idx + 1} must have 5 Big 4 + Kawan Bicara tasks`);
+
+    const taskTypes = dayItem.tasks.map(t => t.type);
+    assert.ok(taskTypes.includes('read_aloud'));
+    assert.ok(taskTypes.includes('repeat_sentence'));
+    assert.ok(taskTypes.includes('describe_image'));
+    assert.ok(taskTypes.includes('write_from_dictation'));
+    assert.ok(taskTypes.includes('kawan_bicara'));
+  });
 });
 
 console.log(`\nAll ${passedTests} PTE Bank Integrity tests PASSED successfully!`);

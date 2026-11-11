@@ -667,3 +667,285 @@
   border-radius: 3px;
   margin: 0 2px;
 }
+
+/* ==========================================================================
+   Guided Daily Coach & 30-Day Roadmap Widgets (Nakul Master Protocol)
+   ========================================================================== */
+
+.fz-pte-guided-coach-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fz-pte-coach-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fz-pte-coach-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fz-pte-coach-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #0284c7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fz-pte-coach-heading {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.fz-pte-coach-progress-badge {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Day Selector Scrollbar */
+.fz-pte-days-carousel {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+
+.fz-pte-days-carousel::-webkit-scrollbar {
+  height: 5px;
+}
+
+.fz-pte-days-carousel::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.fz-pte-day-pill {
+  flex-shrink: 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fz-pte-day-pill:hover {
+  background: #f1f5f9;
+}
+
+.fz-pte-day-pill.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+.fz-pte-day-pill.completed {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.fz-pte-day-pill.active.completed {
+  background: #15803d;
+  color: #ffffff;
+}
+
+/* Nakul Secret Advice Banner */
+.fz-pte-nakul-callout {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fz-pte-nakul-callout-header {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #b45309;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fz-pte-nakul-callout-body {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #78350f;
+  margin: 0;
+}
+
+/* Daily Tasks Checklist */
+.fz-pte-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fz-pte-task-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.fz-pte-task-row.done {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+}
+
+.fz-pte-task-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.fz-pte-checkbox-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #cbd5e1;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.fz-pte-checkbox-btn.checked {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.fz-pte-task-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fz-pte-task-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.fz-pte-task-row.done .fz-pte-task-name {
+  text-decoration: line-through;
+  color: #64748b;
+}
+
+.fz-pte-task-instruction {
+  font-size: 0.77rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.fz-pte-task-action-btn {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.fz-pte-task-action-btn:hover {
+  opacity: 0.9;
+}
+
+.fz-pte-task-row.done .fz-pte-task-action-btn {
+  background: #94a3b8;
+}
+
+/* Describe Image Green Zone (25–28s) Indicator */
+.fz-pte-green-zone-banner {
+  background: #10b981;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+  animation: fzPtePulseGlow 1.2s infinite alternate;
+  margin-top: 8px;
+}
+
+@keyframes fzPtePulseGlow {
+  from { opacity: 0.88; transform: scale(0.99); }
+  to { opacity: 1; transform: scale(1.01); }
+}
+
+.fz-pte-green-zone-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 62.5%; /* 25s / 40s */
+  width: 7.5%; /* 3s / 40s (25-28s) */
+  background: rgba(16, 185, 129, 0.45);
+  border-left: 2px solid #10b981;
+  border-right: 2px solid #10b981;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.fz-pte-green-zone-label {
+  position: absolute;
+  top: -18px;
+  left: 62.5%;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #059669;
+  white-space: nowrap;
+}
