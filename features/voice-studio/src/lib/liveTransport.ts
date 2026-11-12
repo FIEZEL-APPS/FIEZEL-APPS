@@ -842,6 +842,410 @@ function capitalizeWord(w: string): string {
   return w.charAt(0).toUpperCase() + w.slice(1);
 }
 
+function resolveCandidateName(): { fullName: string; shortName: string } {
+  try {
+    if (typeof window !== 'undefined') {
+      const parentWin = window.parent as any;
+      if (parentWin && parentWin !== window && parentWin.state) {
+        const pName = String(parentWin.state.userName || parentWin.state.name || parentWin.state.learnerName || '').trim();
+        if (pName && pName.length <= 40) {
+          const parts = pName.split(/\s+/).filter(Boolean);
+          return { fullName: pName, shortName: parts[0] || pName };
+        }
+      }
+    }
+    if (typeof localStorage !== 'undefined') {
+      const rawLname = localStorage.getItem('fiezel-lname-sync-v1');
+      if (rawLname) {
+        try {
+          const parsed = JSON.parse(rawLname);
+          const nameStr = typeof parsed === 'string' ? parsed : String(parsed?.name || parsed?.userName || '');
+          if (nameStr.trim() && nameStr.trim().length <= 40) {
+            const trimmed = nameStr.trim();
+            const parts = trimmed.split(/\s+/).filter(Boolean);
+            return { fullName: trimmed, shortName: parts[0] || trimmed };
+          }
+        } catch {
+          if (rawLname.trim().length <= 40 && !rawLname.trim().startsWith('{')) {
+            const trimmed = rawLname.trim();
+            const parts = trimmed.split(/\s+/).filter(Boolean);
+            return { fullName: trimmed, shortName: parts[0] || trimmed };
+          }
+        }
+      }
+      const rawAuth = localStorage.getItem('fiezel-auth-v1');
+      if (rawAuth) {
+        try {
+          const auth = JSON.parse(rawAuth);
+          const nameStr = String(auth?.user?.displayName || auth?.user?.name || auth?.displayName || auth?.name || '').trim();
+          if (nameStr && !nameStr.includes('@') && nameStr.length <= 40) {
+            const parts = nameStr.split(/\s+/).filter(Boolean);
+            return { fullName: nameStr, shortName: parts[0] || nameStr };
+          }
+        } catch {}
+      }
+      const rawOb = localStorage.getItem('fiezel-onboarding-v1');
+      if (rawOb) {
+        try {
+          const ob = JSON.parse(rawOb);
+          const nameStr = String(ob?.name || ob?.userName || '').trim();
+          if (nameStr && !nameStr.includes('@') && nameStr.length <= 40) {
+            const parts = nameStr.split(/\s+/).filter(Boolean);
+            return { fullName: nameStr, shortName: parts[0] || nameStr };
+          }
+        } catch {}
+      }
+    }
+  } catch {}
+  return { fullName: 'Candidate', shortName: 'Candidate' };
+}
+
+/**
+ * Fallback khusus Cambridge & PTE Senior Examiner (Dr. Alistair Vance / Dr. Julian):
+ * Menghasilkan TEPAT 1 JAWABAN TERBAIK (Single Best Model Answer) yang 100% RELEVAN
+ * dengan topik pertanyaan examiner, dikalibrasi sesuai level target CEFR murid (default: B1 / PTE 42),
+ * bebas dari jargon esai C2 yang rumit, dan menggunakan ejaan fonetis manusiawi.
+ */
+export function buildCambridgeModelAnswerFallback(
+  rawAi: string,
+  locale: LearnerLocale,
+  variationSeed: number = 0,
+  cefrLevel: string = 'B1'
+): BeginnerReplyCard[] {
+  const q = rawAi.toLowerCase();
+  const isA1 = cefrLevel === 'A1';
+  const isA2 = cefrLevel === 'A2';
+  const isHigherLevel = cefrLevel === 'C1' || cefrLevel === 'C2';
+  const isB2 = cefrLevel === 'B2';
+
+  let text = '';
+  let hintId = '';
+  let hintTh = '';
+  let pronunciation = '';
+
+  // 1. Candidate Details / Name / ID
+  if (/\b(name|call you|identification|id|passport)\b/i.test(q)) {
+    const { fullName, shortName } = resolveCandidateName();
+    const hasSpecificName = shortName !== 'Candidate';
+    if (isA1) {
+      text = hasSpecificName
+        ? `My name is ${fullName}. You can call me ${shortName}.`
+        : 'My name is on my official candidate identification card.';
+      hintId = hasSpecificName
+        ? `Nama saya ${fullName}. Anda bisa memanggil saya ${shortName}.`
+        : 'Nama saya tercantum di kartu identitas resmi ujian saya.';
+      hintTh = hasSpecificName
+        ? `ชื่อของฉันคือ ${fullName} คุณสามารถเรียกฉันว่า ${shortName} ได้`
+        : 'ชื่อของฉันอยู่บนบัตรประจำตัวผู้เข้าสอบอย่างเป็นทางการ';
+      pronunciation = hasSpecificName
+        ? `mai neim iz ${fullName}. yu ken kol mi ${shortName}.`
+        : 'mai neim iz on mai o-fi-syel ken-di-deit ai-den-ti-fi-kei-syen kard.';
+    } else if (isA2) {
+      text = hasSpecificName
+        ? `My full name is ${fullName}, but please call me ${shortName}.`
+        : 'My full name is stated on my registration document, and you may address me directly.';
+      hintId = hasSpecificName
+        ? `Nama lengkap saya adalah ${fullName}, tapi silakan panggil saya ${shortName}.`
+        : 'Nama lengkap saya tercantum di dokumen pendaftaran saya, dan Anda bisa langsung memanggil saya.';
+      hintTh = hasSpecificName
+        ? `ชื่อเต็มของฉันคือ ${fullName} แต่โปรดเรียกฉันว่า ${shortName}`
+        : 'ชื่อเต็มของฉันระบุไว้ในเอกสารลงทะเบียน และคุณสามารถเรียกฉันได้โดยตรง';
+      pronunciation = hasSpecificName
+        ? `mai ful neim iz ${fullName}, bat pliz kol mi ${shortName}.`
+        : 'mai ful neim iz stei-tid on mai re-jis-trei-syen do-kyu-ment.';
+    } else {
+      text = hasSpecificName
+        ? `My full name is ${fullName}, though you may simply address me as ${shortName}. Here is my identification document for your verification.`
+        : 'My full name is stated on my official registration passport. Here is my identification document for your verification.';
+      hintId = hasSpecificName
+        ? `Nama lengkap saya adalah ${fullName}, namun Anda cukup memanggil saya ${shortName}. Ini dokumen identitas saya untuk verifikasi Anda.`
+        : 'Nama lengkap saya tertera pada paspor pendaftaran resmi saya. Ini dokumen identitas saya untuk verifikasi Anda.';
+      hintTh = hasSpecificName
+        ? `ชื่อเต็มของฉันคือ ${fullName} แต่คุณสามารถเรียกฉันว่า ${shortName} ได้ นี่คือเอกสารระบุตัวตนของฉันสำหรับการตรวจสอบ`
+        : 'ชื่อเต็มของฉันระบุไว้ในหนังสือเดินทางลงทะเบียนอย่างเป็นทางการ นี่คือเอกสารระบุตัวตนของฉันสำหรับการตรวจสอบ';
+      pronunciation = hasSpecificName
+        ? `mai ful neim iz ${fullName}, dou yu mei simp-li ed-res mi ez ${shortName}.`
+        : 'mai ful neim iz stei-tid on mai o-fi-syel re-jis-trei-syen pas-port. hir iz mai ai-den-ti-fi-kei-syen do-kyu-ment for yor ve-ri-fi-kei-syen.';
+    }
+  }
+  // 2. FOCUS, PRIORITIES, ADAPTABILITY, TIME MANAGEMENT (Kasus Pengujian Nyata)
+  else if (/\b(focus|priorit|adapt|task|pressure|time management|deadline|multitask)\b/i.test(q)) {
+    if (isHigherLevel) {
+      text = "When priorities shift abruptly, I maintain operational focus through structured time-blocking and systematic triage of urgent deliverables.";
+      hintId = "Saat prioritas bergeser tiba-tiba, saya menjaga fokus kerja melalui alokasi waktu terstruktur dan pemilahan sistematis terhadap tugas-tugas mendesak.";
+      hintTh = "เมื่อลำดับความสำคัญเปลี่ยนไปอย่างกะทันหัน ฉันจะรักษาโฟกัสผ่านการจัดสรรเวลาอย่างเป็นระบบและจัดการงานเร่งด่วนก่อน";
+      pronunciation = "wen prai-OR-i-tiz shift eb-RAPT-li, ai mein-TEIN op-er-EI-syen-el FO-kes tru strak-tserd taim-blo-king.";
+    } else if (isB2) {
+      text = "I maintain focus by reprioritizing my daily workflow and setting clear boundaries for critical tasks when circumstances change.";
+      hintId = "Saya menjaga fokus dengan menyusun ulang alur kerja harian dan menetapkan batasan yang jelas untuk tugas-tugas penting saat situasi berubah.";
+      hintTh = "ฉันรักษาโฟกัสโดยจัดลำดับความสำคัญของงานใหม่และกำหนดกรอบที่ชัดเจนสำหรับงานสำคัญเมื่อสถานการณ์เปลี่ยน";
+      pronunciation = "ai mein-TEIN FO-kes bai ri-prai-OR-i-tai-zing mai dei-li werk-flou end se-ting klir baun-der-iz.";
+    } else if (isA1) {
+      text = "I make a short to-do list.";
+      hintId = "Saya membuat daftar tugas yang pendek.";
+      hintTh = "ฉันทำรายการสิ่งที่ต้องทำสั้นๆ";
+      pronunciation = "ai meik e syort tu-du list.";
+    } else if (isA2) {
+      text = "When tasks change, I do the most urgent work first.";
+      hintId = "Ketika tugas berubah, saya fokus pada pekerjaan mendesak lebih dulu.";
+      hintTh = "เมื่องานเปลี่ยนไป ฉันจะทำงานด่วนที่สุดก่อน";
+      pronunciation = "wen tesks tyeindz, ai du de most ER-dzend werk ferst.";
+    } else {
+      // Level B1 (Target PTE 42 / IELTS 5.0-5.5) - Alami, Nyambung, Mudah Dipahami & Diucapkan!
+      text = "To maintain focus when priorities change, I quickly list my urgent tasks and tackle the most important items first.";
+      hintId = "Untuk menjaga fokus saat prioritas berubah, saya segera mencatat tugas-tugas mendesak dan menyelesaikan hal yang paling penting terlebih dahulu.";
+      hintTh = "เพื่อรักษาโฟกัสเมื่อความสำคัญเปลี่ยนไป ฉันจะจดรายการงานด่วนอย่างรวดเร็วและลงมือทำงานที่สำคัญที่สุดก่อน";
+      pronunciation = "tu mein-TEIN FO-kes wen prai-OR-i-tiz tyeindz, ai KWIK-li list mai er-dzend tesks end tek-el de most im-POR-tent ai-temz ferst.";
+    }
+  }
+  // 3. Managing Stress, Burnout & Relaxation
+  else if (/\b(stress|relax|balance|unwind|burnout|mental|pressure)\b/i.test(q)) {
+    if (isA1) {
+      text = "I take a short walk to relax.";
+      hintId = "Saya jalan-jalan sebentar untuk bersantai.";
+      hintTh = "ฉันออกไปเดินเล่นสั้นๆ เพื่อผ่อนคลาย";
+      pronunciation = "ai teik e syort wok tu ri-leks.";
+    } else if (isA2) {
+      text = "When I feel stressed, I take a rest and organize my day.";
+      hintId = "Ketika saya merasa stres, saya beristirahat dan menata hari saya.";
+      hintTh = "เมื่อรู้สึกเครียด ฉันจะพักผ่อนและจัดระเบียบวันใหม่";
+      pronunciation = "wen ai fil strest, ai teik e rest end or-gen-aiz mai dei.";
+    } else {
+      text = "When feeling under pressure, I take a short brisk walk and organize my schedule to stay calm and productive.";
+      hintId = "Saat merasa tertekan, saya berjalan santai sejenak dan menata jadwal saya agar tetap tenang dan produktif.";
+      hintTh = "เมื่อรู้สึกกดดัน ฉันจะออกไปเดินเล่นสั้นๆ และจัดตารางเวลาใหม่เพื่อรักษาความสงบและทำงานได้ดีขึ้น";
+      pronunciation = "wen fi-ling an-der PRE-syer, ai teik e syort brisk wok end OR-gen-aiz mai SKE-dzul tu stei kam end pro-DAK-tiv.";
+    }
+  }
+  // 4. Opinions, Agreement, Disagreement
+  else if (/\b(agree|disagree|opinion|think|believe|perspective|viewpoint)\b/i.test(q)) {
+    if (isA1) {
+      text = "I agree. A clear plan is very helpful.";
+      hintId = "Saya setuju. Rencana yang jelas sangat membantu.";
+      hintTh = "ฉันเห็นด้วย แผนงานที่ชัดเจนช่วยได้มาก";
+      pronunciation = "ai e-gri. e klir plen iz ve-ri help-ful.";
+    } else if (isA2) {
+      text = "In my opinion, having a simple plan helps us make progress.";
+      hintId = "Menurut pendapat saya, memiliki rencana sederhana membantu kita maju.";
+      hintTh = "ในมุมมองของฉัน การมีแผนง่ายๆ ช่วยให้เราก้าวหน้าได้";
+      pronunciation = "in mai o-pin-yen, he-ving e sim-pel plen helps as meik pro-gres.";
+    } else {
+      text = "In my view, having a clear and practical plan is the best way to make steady progress without unnecessary confusion.";
+      hintId = "Menurut pandangan saya, memiliki rencana yang jelas dan praktis adalah cara terbaik untuk mencapai kemajuan stabil tanpa kebingungan yang tak perlu.";
+      hintTh = "ในมุมมองของฉัน การมีแผนงานที่ชัดเจนและปฏิบัติได้จริงเป็นวิธีที่ดีที่สุดในการก้าวหน้าอย่างมั่นคงโดยไม่สับสน";
+      pronunciation = "in mai vyu, he-ving e klir end PREK-ti-kel plen iz de best wei tu meik STE-di PRO-gres.";
+    }
+  }
+  // 5. Advantages & Disadvantages
+  else if (/\b(advantage|disadvantage|benefit|drawback|better|prefer|pros|cons)\b/i.test(q)) {
+    if (isA1) {
+      text = "It helps us save a lot of time.";
+      hintId = "Itu membantu kita menghemat banyak waktu.";
+      hintTh = "มันช่วยให้เราประหยัดเวลาได้มาก";
+      pronunciation = "it helps as seiv e lot ov taim.";
+    } else if (isA2) {
+      text = "The main benefit is saving time, but we need practice.";
+      hintId = "Manfaat utamanya adalah menghemat waktu, tapi kita perlu latihan.";
+      hintTh = "ประโยชน์หลักคือช่วยประหยัดเวลา แต่เราต้องฝึกฝน";
+      pronunciation = "de mein be-ne-fit iz sei-ving taim, bat wi nid prek-tis.";
+    } else {
+      text = "One major advantage is that it saves valuable time, although it does require a bit more patience and practice at the start.";
+      hintId = "Salah satu keuntungan utamanya adalah menghemat waktu berharga, kendati memang butuh sedikit kesabaran dan latihan di awal.";
+      hintTh = "ข้อดีที่สำคัญอย่างหนึ่งคือช่วยประหยัดเวลาอันมีค่า แม้ว่าจะต้องใช้ความอดทนและการฝึกฝนมากขึ้นเล็กน้อยในช่วงเริ่มต้น";
+      pronunciation = "wan MEI-dzor ed-VEN-tidz iz det it seivz VEL-yu-bel taim, ol-dou it daz ri-KWAIR e bit mor pei-syens.";
+    }
+  }
+  // 6. Problems, Difficulties & Solutions
+  else if (/\b(problem|difficult|challenge|issue|solv|solution|trouble|overcome)\b/i.test(q)) {
+    if (isA1) {
+      text = "We can solve it step by step.";
+      hintId = "Kita bisa menyelesaikannya langkah demi langkah.";
+      hintTh = "เราแก้ปัญหาได้ทีละขั้นตอน";
+      pronunciation = "wi ken solv it step bai step.";
+    } else if (isA2) {
+      text = "Breaking the problem into small steps is the best way.";
+      hintId = "Memecah masalah menjadi langkah kecil adalah cara terbaik.";
+      hintTh = "การแบ่งปัญหาออกเป็นขั้นตอนเล็กๆ เป็นวิธีที่ดีที่สุด";
+      pronunciation = "brei-king de prob-lem in-tu smol steps iz de best wei.";
+    } else {
+      text = "The most effective way to solve this difficulty is by breaking the problem down into smaller, manageable steps.";
+      hintId = "Cara paling efektif untuk mengatasi kesulitan ini adalah dengan memecah masalah menjadi langkah-langkah yang lebih kecil dan mudah dikelola.";
+      hintTh = "วิธีที่มีประสิทธิภาพที่สุดในการแก้ปัญหานี้คือการแบ่งปัญหาออกเป็นขั้นตอนย่อยๆ ที่จัดการได้ง่าย";
+      pronunciation = "de most if-FEK-tiv wei tu solv dis DIF-i-kel-ti iz bai brei-king de PRO-blem daun in-tu smol-er steps.";
+    }
+  }
+  // 7. Work, Study, Career, Major
+  else if (/\b(work or study|job|occupation|major|career|profession|field of study)\b/i.test(q)) {
+    if (isA1) {
+      text = "I study English every day for my future.";
+      hintId = "Saya belajar bahasa Inggris setiap hari untuk masa depan saya.";
+      hintTh = "ฉันเรียนภาษาอังกฤษทุกวันเพื่ออนาคต";
+      pronunciation = "ai sta-di ing-glisy ev-ri dei for mai fyu-tsyer.";
+    } else if (isA2) {
+      text = "I work hard every day and practice English with my team.";
+      hintId = "Saya bekerja keras setiap hari dan berlatih bahasa Inggris dengan tim saya.";
+      hintTh = "ฉันทำงานหนักทุกวันและฝึกภาษาอังกฤษกับทีม";
+      pronunciation = "ai werk hard ev-ri dei end prek-tis ing-glisy wid mai tim.";
+    } else {
+      text = "Presently, I work in software engineering, where I enjoy solving practical problems and collaborating closely with my teammates.";
+      hintId = "Saat ini, saya bekerja di bidang rekayasa perangkat lunak, di mana saya menikmati menyelesaikan masalah praktis dan berkolaborasi erat dengan rekan tim saya.";
+      hintTh = "ปัจจุบัน ฉันทำงานด้านวิศวกรรมซอฟต์แวร์ ซึ่งฉันชอบแก้ปัญหาเชิงปฏิบัติและร่วมงานอย่างใกล้ชิดกับเพื่อนร่วมทีม";
+      pronunciation = "PRE-zent-li, ai werk in SOFT-wer en-dzi-NI-ring, wer ai en-DZOI sol-ving PREK-ti-kel PRO-blemz.";
+    }
+  }
+  // 8. Hometown & Countryside
+  else if (/\b(hometown|where (?:do )?you (?:live|come from)|city|neighbourhood|countryside)\b/i.test(q)) {
+    if (isA1) {
+      text = "I live in Jakarta, Indonesia. It is very lively.";
+      hintId = "Saya tinggal di Jakarta, Indonesia. Kotanya sangat hidup.";
+      hintTh = "ฉันอาศัยอยู่ที่จาการ์ตา ประเทศอินโดนีเซีย มันมีชีวิตชีวามาก";
+      pronunciation = "ai liv in Dze-kar-ta, in-do-ni-sya. it iz ve-ri laiv-li.";
+    } else if (isA2) {
+      text = "I come from Jakarta, Indonesia, but now I live in a quiet area.";
+      hintId = "Saya berasal dari Jakarta, Indonesia, tapi sekarang tinggal di area yang tenang.";
+      hintTh = "ฉันมาจากจาการ์ตา ประเทศอินโดนีเซีย แต่ตอนนี้อาศัยอยู่ในย่านที่เงียบสงบ";
+      pronunciation = "ai kam from Dze-kar-ta, in-do-ni-sya, bat nau ai liv in e kwai-et e-ri-a.";
+    } else {
+      text = "I originally come from Jakarta, Indonesia, but I currently live in a quieter suburban neighborhood with great green spaces.";
+      hintId = "Saya aslinya berasal dari Jakarta, Indonesia, namun saat ini saya tinggal di lingkungan pinggiran kota yang lebih tenang dengan banyak ruang hijau.";
+      hintTh = "เดิมทีฉันมาจากจาการ์ตา ประเทศอินโดนีเซีย แต่ปัจจุบันฉันอาศัยอยู่ในย่านชานเมืองที่เงียบสงบและมีพื้นที่สีเขียวที่ยอดเยี่ยม";
+      pronunciation = "ai o-RIDZ-i-nel-li kam from Dze-KAR-ta, in-do-NI-sya, bat ai KA-rent-li liv in e KWAI-et-er sa-BER-ben nei-bor-hud.";
+    }
+  }
+  // 9. Hobbies & Leisure Time
+  else if (/\b(leisure|free time|spare time|hobb(?:y|ies)|relax|weekends|unwind)\b/i.test(q)) {
+    if (isA1) {
+      text = "In my free time, I like reading books.";
+      hintId = "Di waktu luang, saya suka membaca buku.";
+      hintTh = "ในเวลาว่าง ฉันชอบอ่านหนังสือ";
+      pronunciation = "in mai fri taim, ai laik ri-ding buks.";
+    } else if (isA2) {
+      text = "In my free time, I like running and cooking simple food.";
+      hintId = "Di waktu luang, saya suka berlari dan memasak makanan sederhana.";
+      hintTh = "ในเวลาว่าง ฉันชอบวิ่งและทำอาหารง่ายๆ";
+      pronunciation = "in mai fri taim, ai laik ra-ning end ku-king sim-pel fud.";
+    } else {
+      text = "In my free time, I really enjoy distance running and reading practical books because they help me relax and refresh my mind.";
+      hintId = "Di waktu luang, saya sangat menikmati lari jarak jauh dan membaca buku-buku praktis karena itu membantu saya relaks dan menyegarkan pikiran.";
+      hintTh = "ในเวลาว่าง ฉันชอบวิ่งระยะไกลและอ่านหนังสือเชิงปฏิบัติมาก เพราะช่วยให้ฉันผ่อนคลายและเติมความสดชื่นให้จิตใจ";
+      pronunciation = "in mai fri taim, ai RI-li en-DZOI DIS-tens RA-ning end RI-ding PREK-ti-kel buks bi-KOS dei help mi ri-LEKS.";
+    }
+  }
+  // 10. Technology, AI & Tools
+  else if (/\b(technolog|artificial intelligence|\bai\b|digital|comput|automat|smartphone)\b/i.test(q)) {
+    if (isA1) {
+      text = "Smartphones help us learn new words easily.";
+      hintId = "Ponsel pintar membantu kita belajar kata baru dengan mudah.";
+      hintTh = "สมาร์ทโฟนช่วยให้เราเรียนรู้คำศัพท์ใหม่ๆ ได้ง่าย";
+      pronunciation = "smart-founz help as lern nyu werds i-zi-li.";
+    } else if (isA2) {
+      text = "Technology makes communication faster and helps us study anywhere.";
+      hintId = "Teknologi membuat komunikasi lebih cepat dan membantu kita belajar di mana saja.";
+      hintTh = "เทคโนโลยีทำให้การสื่อสารเร็วขึ้นและช่วยให้เราเรียนรู้ได้ทุกที่";
+      pronunciation = "tek-no-lo-dzi meiks kom-yu-ni-kei-syen fas-ter end helps as sta-di e-ni-wer.";
+    } else {
+      text = "Digital tools have made our communication much faster, but we still need to balance screen time with real-life activities.";
+      hintId = "Alat-alat digital telah membuat komunikasi kita jauh lebih cepat, namun kita tetap perlu menyeimbangkan waktu layar dengan aktivitas di dunia nyata.";
+      hintTh = "เครื่องมือดิจิทัลทำให้การสื่อสารของพวกเราเร็วขึ้นมาก แต่เรายังต้องสร้างสมดุลระหว่างเวลาหน้าจอกับกิจกรรมในชีวิตจริง";
+      pronunciation = "DI-dzi-tel tulz hev meid aur kom-yu-ni-KEI-syen maty FAS-ter, bat wi stil nid tu BE-lens skrin taim.";
+    }
+  }
+  // 11. Environment & Global Issues
+  else if (/\b(environment|climate|sustainab|pollut|global warming|green|planet)\b/i.test(q)) {
+    if (isA1) {
+      text = "We must save water and reduce plastic.";
+      hintId = "Kita harus menghemat air dan mengurangi plastik.";
+      hintTh = "เราต้องประหยัดน้ำและลดการใช้พลาสติก";
+      pronunciation = "wi mast seiv wo-ter end ri-dyus ples-tik.";
+    } else if (isA2) {
+      text = "We should protect nature by saving electricity and planting trees.";
+      hintId = "Kita sebaiknya menjaga alam dengan menghemat listrik dan menanam pohon.";
+      hintTh = "เราควรปกป้องธรรมชาติด้วยการประหยัดไฟและปลูกต้นไม้";
+      pronunciation = "wi syud pro-tekt nei-tsyer bai sei-ving i-lek-tri-si-ti end plen-ting triz.";
+    } else {
+      text = "Protecting the environment requires simple everyday habits, like reducing plastic waste and saving electricity at home.";
+      hintId = "Melindungi lingkungan memerlukan kebiasaan sederhana sehari-hari, seperti mengurangi sampah plastik dan menghemat listrik di rumah.";
+      hintTh = "การปกป้องสิ่งแวดล้อมเริ่มต้นจากนิสัยง่ายๆ ในชีวิตประจำวัน เช่น การลดขยะพลาสติกและการประหยัดไฟที่บ้าน";
+      pronunciation = "pro-TEK-ting di en-VAI-ren-ment ri-KWAIRZ SIM-pel EV-ri-dei HE-bits, laik ri-DYU-sing PLES-tik weist.";
+    }
+  }
+  // 12. Education & Practical Learning
+  else if (/\b(educat|school|curriculum|critical thinking|child(?:ren)?|teach|academic|learn)\b/i.test(q)) {
+    if (isA1) {
+      text = "Daily practice helps us learn English quickly.";
+      hintId = "Latihan setiap hari membantu kita belajar bahasa Inggris dengan cepat.";
+      hintTh = "การฝึกฝนทุกวันช่วยให้เราเรียนภาษาอังกฤษได้เร็ว";
+      pronunciation = "dei-li prek-tis helps as lern ing-glisy kwik-li.";
+    } else if (isA2) {
+      text = "Real speaking practice is better than only reading books.";
+      hintId = "Latihan bicara langsung lebih baik daripada sekadar membaca buku.";
+      hintTh = "การฝึกพูดจริงดีกว่าแค่อ่านหนังสือ";
+      pronunciation = "ri-el spi-king prek-tis iz bet-ter den oun-li ri-ding buks.";
+    } else {
+      text = "Learning practical skills through real practice is far more effective than just memorizing theory from textbooks.";
+      hintId = "Mempelajari keterampilan praktis melalui latihan nyata jauh lebih efektif daripada sekadar menghafal teori dari buku pelajaran.";
+      hintTh = "การเรียนรู้ทักษะเชิงปฏิบัติผ่านการลงมือทำจริงมีประสิทธิภาพมากกว่าการท่องจำทฤษฎีจากตำราเรียนเพียงอย่างเดียว";
+      pronunciation = "LER-ning PREK-ti-kel skilz tru ri-el PREK-tis iz far mor if-FEK-tiv den dzast ME-mo-rai-zing ti-o-ri.";
+    }
+  }
+  // 13. General Contextual Fallback (Clean, Direct, B1, Menjawab Penuh Topik Pembicaraan!)
+  else {
+    if (isA1) {
+      text = "I understand. That is a good point.";
+      hintId = "Saya paham. Itu poin yang bagus.";
+      hintTh = "ฉันเข้าใจ นั่นเป็นประเด็นที่ดี";
+      pronunciation = "ai an-der-stend. det iz e gud point.";
+    } else if (isA2) {
+      text = "I agree with you, and practice helps us improve.";
+      hintId = "Saya setuju dengan Anda, dan latihan membantu kita berkembang.";
+      hintTh = "ฉันเห็นด้วยกับคุณ และการฝึกฝนช่วยให้เราพัฒนาขึ้น";
+      pronunciation = "ai e-gri wid yu, end prek-tis helps as im-pruv.";
+    } else {
+      if (variationSeed % 2 === 1) {
+        text = "That is an important question. In my personal experience, taking consistent small steps every day always produces the most reliable result.";
+        hintId = "Itu pertanyaan yang penting. Dalam pengalaman pribadi saya, mengambil langkah-langkah kecil yang konsisten setiap hari selalu membuahkan hasil yang paling dapat diandalkan.";
+        hintTh = "นั่นเป็นคำถามที่สำคัญ จากประสบการณ์ส่วนตัวของฉัน การทำสิ่งเล็กๆ อย่างสม่ำเสมอทุกวันมักให้ผลลัพธ์ที่เชื่อถือได้มากที่สุด";
+        pronunciation = "det iz en im-POR-tent KWES-tyen. in mai PER-sen-el ik-SPI-ri-ens, tei-king ken-SIS-tent smol steps ev-ri dei ol-weiz pro-DYU-sez de best ri-ZALT.";
+      } else {
+        text = "From what I have observed, keeping our daily communication simple and open is the most practical way to resolve misunderstandings.";
+        hintId = "Dari apa yang saya amati, menjaga komunikasi harian kita tetap sederhana dan terbuka adalah cara paling praktis untuk menyelesaikan kesalahpahaman.";
+        hintTh = "จากสิ่งที่ฉันได้สังเกต การสื่อสารในชีวิตประจำวันอย่างตรงไปตรงมาและเปิดกว้างเป็นวิธีที่ได้ผลที่สุดในการแก้ไขความเข้าใจผิด";
+        pronunciation = "from wat ai hev ob-ZERVD, KI-ping aur dei-li kom-yu-ni-KEI-syen SIM-pel end OU-pen iz de most PREK-ti-kel wei tu ri-ZOLV mis-an-der-STEN-dingz.";
+      }
+    }
+  }
+
+  const badgeLevel = isHigherLevel
+    ? 'Band 9.0 · Advanced'
+    : isB2
+    ? 'Level B2 · PTE 58'
+    : isA1
+    ? 'Level A1 · Pemula Dasar'
+    : isA2
+    ? 'Level A2 · Percakapan Simpel'
+    : 'Level B1 · Target PTE 42';
+
+  const card: BeginnerReplyCard = {
+    id: `cambridge_model_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    tier: 'cambridge_model',
+    badgeId: `🎯 Jawaban Terbaik (${badgeLevel})`,
+    badgeTh: `🎯 คำตอบแนะนำ (${badgeLevel})`,
+    tierLabelId: `${badgeLevel} Model Answer`,
+    tierLabelTh: `${badgeLevel} Model Answer`,
+    text,
+    pronunciation,
+    hintId,
+    hintTh,
+    meaningId: hintId,
+    meaningTh: hintTh,
+    isRealtimeAi: false,
+    isOfflineFallback: true,
+    wordBreakdown: [],
+  };
+
+  return [card];
+}
+
 /**
  * Fallback kontekstual lokal presisi: dipilih dari speech act kalimat AI penutup
  * + topik/pilihan yang diekstrak secara spesifik.
@@ -854,10 +1258,23 @@ export function buildContextualFallbackCards(params: {
   lastUserText?: string;
   variationSeed?: number;
   excludeTexts?: string[];
+  isCambridge?: boolean;
+  personaId?: string;
+  cefrLevel?: string;
 }): BeginnerReplyCard[] {
   const rawAi = String(params.aiText || '');
   const th = params.locale === 'th';
   const variationSeed = Number(params.variationSeed || 0);
+
+  // If Cambridge Senior Examiner or PTE Academic mode, ALWAYS return EXACTLY ONE single best model answer!
+  const isCambridge =
+    Boolean(params.isCambridge) ||
+    params.personaId === 'cambridge_examiner' ||
+    params.personaId === 'dr_julian' ||
+    (params.targetLang === 'en' && /\b(cambridge|ielts|pte|band\s*9|examiner|academic)\b/i.test(rawAi));
+  if (isCambridge) {
+    return buildCambridgeModelAnswerFallback(rawAi, params.locale, variationSeed, params.cefrLevel || 'B1');
+  }
 
   // Special handler for proactive struggle diagnosis questions ("what part been tripping you up", "モヤモヤ", "头疼")
   if (
@@ -2025,6 +2442,7 @@ export async function requestRealtimeCopilotAssist(params: {
   persona?: VoicePersona;
   targetLang: TargetLang;
   locale: LearnerLocale;
+  cefrLevel?: string;
   history?: Array<{ speaker: 'ai' | 'user'; text: string }>;
   variationSeed?: number;
   excludeTexts?: string[];
@@ -2036,7 +2454,19 @@ export async function requestRealtimeCopilotAssist(params: {
   if (!cleanAiText || params.signal?.aborted) return empty;
 
   const variationSeed = params.variationSeed || 0;
-  const cacheKey = `${params.targetLang}::${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
+  const isCambridge =
+    params.persona?.id === 'cambridge_examiner' ||
+    params.scenario.personaId === 'cambridge_examiner' ||
+    params.scenario.id.startsWith('scen_ielts') ||
+    params.persona?.id === 'dr_julian' ||
+    params.scenario.personaId === 'dr_julian' ||
+    params.scenario.id.startsWith('scen_pte');
+
+  const cefrLevel =
+    params.cefrLevel ||
+    (typeof localStorage !== 'undefined' ? localStorage.getItem('fz_user_cefr_level') || 'B1' : 'B1');
+
+  const cacheKey = `${params.targetLang}::${isCambridge ? `cambridge_${cefrLevel}::` : ''}${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
   if (variationSeed === 0 && (!params.excludeTexts || params.excludeTexts.length === 0)) {
     const cached = _copilotTurnCache.get(cacheKey);
     if (cached && cached.replies.length > 0) return cached;
@@ -2050,6 +2480,9 @@ export async function requestRealtimeCopilotAssist(params: {
       lastUserText: params.lastUserText,
       variationSeed,
       excludeTexts: params.excludeTexts,
+      isCambridge,
+      personaId: params.persona?.id,
+      cefrLevel,
     }).map((c) => ({
       ...c,
       isRealtimeAi: false,
@@ -2066,7 +2499,7 @@ export async function requestRealtimeCopilotAssist(params: {
     };
   };
 
-  const budgetMs = Math.max(1000, Math.min(params.budgetMs ?? 10000, 15000));
+  const budgetMs = Math.max(1000, Math.min(params.budgetMs ?? 3000, 15000));
   const deadline = Date.now() + budgetMs;
 
   // 1) Fast-Path: kunci Gemini pribadi murid (gemini-3-flash-preview)
@@ -2086,18 +2519,30 @@ export async function requestRealtimeCopilotAssist(params: {
         ? 'Japanese (N5-N3, Kanji+Hiragana, NO emojis; word-spaced Hepburn Romaji in pronunciation)'
         : params.targetLang === 'zh'
           ? 'Mandarin Chinese (HSK1-HSK3, Simplified Chinese characters, NO emojis; tone-marked Pinyin in pronunciation)'
-          : 'English (A2-B1, NO emojis; easy phonetic guide in pronunciation)';
+          : `English (Level ${cefrLevel}, accessible natural spoken English, NO emojis; readable phonetic guide in pronunciation)`;
       const learnerLangName = params.locale === 'th' ? 'Thai' : 'Indonesian';
       const hist = (params.history || []).slice(-6).map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner'}: "${h.text}"`).join('\n');
-      const prompt = [
-        `Speech Copilot (${params.scenario.titleId}). Target: ${langSpec}.`,
-        hist ? `Context:\n${hist}` : '',
-        params.lastUserText ? `Learner said: "${params.lastUserText}"` : '',
-        `Partner said: "${cleanAiText}"`,
-        params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
-        `Generate 3 spontaneous spoken replies directly answering it (easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back). Translate it into aiMeaning (${learnerLangName}); each reply's first-person translation in hint (${learnerLangName}).`,
-        `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"..."}]}`,
-      ].filter(Boolean).join('\n');
+      const prompt = isCambridge
+        ? [
+            `You are the Senior Examiner AI Speech Copilot for English speaking practice.`,
+            `The examiner just said: "${cleanAiText}".`,
+            params.lastUserText ? `Candidate just said: "${params.lastUserText}".` : '',
+            hist ? `Exam Context:\n${hist}` : '',
+            `Candidate's Target Proficiency: Level ${cefrLevel} (Target PTE 42 / IELTS 5.0–5.5).`,
+            `CRITICAL MANDATE: Produce EXACTLY ONE single best Model Answer that 100% DIRECTLY answers the examiner's actual statement/question.`,
+            `Use natural, accessible Level ${cefrLevel} vocabulary and clear compound syntax. STRICTLY FORBIDDEN: Do NOT use obscure C2 academic jargon (such as "cogent", "unilateral", "invariably yields").`,
+            `Provide an accurate first-person translation in ${learnerLangName} in the "hint" field, and a readable phonetic pronunciation guide in "pronunciation".`,
+            `JSON only: {"aiMeaning":"${learnerLangName} translation of examiner statement","replies":[{"tier":"cambridge_model","badgeId":"🎯 Jawaban Terbaik (Level ${cefrLevel})","text":"...","pronunciation":"...","hint":"..."}]}`,
+          ].filter(Boolean).join('\n')
+        : [
+            `Speech Copilot (${params.scenario.titleId}). Target: ${langSpec}.`,
+            hist ? `Context:\n${hist}` : '',
+            params.lastUserText ? `Learner said: "${params.lastUserText}"` : '',
+            `Partner said: "${cleanAiText}"`,
+            params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
+            `Generate 3 spontaneous spoken replies directly answering it (easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back). Translate it into aiMeaning (${learnerLangName}); each reply's first-person translation in hint (${learnerLangName}).`,
+            `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"..."}]}`,
+          ].filter(Boolean).join('\n');
       const res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
         method: 'POST',
         headers: {
@@ -2106,7 +2551,7 @@ export async function requestRealtimeCopilotAssist(params: {
           'x-goog-api-key': userGeminiKey,
         },
         body: JSON.stringify({
-          model: 'gemini-3.1-flash-lite',
+          model: 'gemini-2.5-flash',
           input: prompt,
           response_mime_type: 'application/json',
           generation_config: {
@@ -2128,13 +2573,23 @@ export async function requestRealtimeCopilotAssist(params: {
           .trim();
         const parsed = raw ? JSON.parse(raw) : null;
         const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
-        if (cards.length > 0) {
+        const finalCards = isCambridge && cards.length > 0
+          ? cards.slice(0, 1).map((c) => ({
+              ...c,
+              tier: 'cambridge_model' as any,
+              badgeId: c.badgeId || `🎯 Jawaban Terbaik (Level ${cefrLevel})`,
+              badgeTh: c.badgeTh || `🎯 คำตอบแนะนำ (Level ${cefrLevel})`,
+              tierLabelId: `Level ${cefrLevel} Model Answer`,
+              tierLabelTh: `Level ${cefrLevel} Model Answer`,
+            }))
+          : cards;
+        if (finalCards.length > 0) {
           const meaning = stripEmojisAndEmotWords(String(parsed?.aiMeaning || '')).trim();
           const result: RealtimeCopilotAssistResult = {
             ok: true, source: 'ai-realtime',
             aiMeaningId: params.locale === 'id' ? meaning : '',
             aiMeaningTh: params.locale === 'th' ? meaning : '',
-            replies: cards, cards,
+            replies: finalCards, cards: finalCards,
           };
           if (variationSeed === 0) copilotCacheSet(cacheKey, result);
           return result;
@@ -2152,6 +2607,9 @@ export async function requestRealtimeCopilotAssist(params: {
     scenarioTitle: params.scenario.titleId,
     scenarioId: params.scenario.id,
     personaName: params.persona?.name || '',
+    personaId: params.persona?.id || params.scenario.personaId || '',
+    isCambridge,
+    cefrLevel,
     targetLang: params.targetLang,
     locale: params.locale,
     history: (params.history || []).slice(-6),
@@ -2191,12 +2649,22 @@ export async function requestRealtimeCopilotAssist(params: {
       if (res.ok) {
         const data = await res.json();
         const cards = normalizeServerCopilotCards(data?.replies || data?.suggestions, params.targetLang);
-        if (cards.length > 0) {
+        const finalCards = isCambridge && cards.length > 0
+          ? cards.slice(0, 1).map((c) => ({
+              ...c,
+              tier: 'cambridge_model' as any,
+              badgeId: c.badgeId || `🎯 Jawaban Terbaik (Level ${cefrLevel})`,
+              badgeTh: c.badgeTh || `🎯 คำตอบแนะนำ (Level ${cefrLevel})`,
+              tierLabelId: `Level ${cefrLevel} Model Answer`,
+              tierLabelTh: `Level ${cefrLevel} Model Answer`,
+            }))
+          : cards;
+        if (finalCards.length > 0) {
           const result: RealtimeCopilotAssistResult = {
             ok: true, source: 'ai-realtime',
             aiMeaningId: stripEmojisAndEmotWords(String(data?.aiMeaningId || '')).trim(),
             aiMeaningTh: stripEmojisAndEmotWords(String(data?.aiMeaningTh || '')).trim(),
-            replies: cards, cards,
+            replies: finalCards, cards: finalCards,
           };
           if (variationSeed === 0) copilotCacheSet(cacheKey, result);
           return result;

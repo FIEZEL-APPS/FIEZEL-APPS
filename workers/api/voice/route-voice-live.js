@@ -382,8 +382,53 @@ function normalizeHistory(rawHistory) {
     }));
 }
 
-function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallbackTarget = '') {
+function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallbackTarget = '', isCambridge = false, cefrLevel = 'B1') {
   const list = Array.isArray(rawReplies) ? rawReplies : [];
+
+  if (isCambridge) {
+    const lvl = String(cefrLevel || 'B1').toUpperCase();
+    const badgeId = lvl === 'B1'
+      ? '🎯 Jawaban B1 (PTE 42 / Band 5.5)'
+      : lvl === 'B2'
+      ? '🎯 Jawaban B2 (Band 6.5)'
+      : lvl === 'A2'
+      ? '🎯 Jawaban A2'
+      : lvl === 'A1'
+      ? '🎯 Jawaban A1'
+      : `🎯 Jawaban Terbaik (${lvl})`;
+    const badgeTh = lvl === 'B1'
+      ? '🎯 คำตอบระดับ B1 (PTE 42)'
+      : `🎯 คำตอบระดับ ${lvl}`;
+    const tierLabelId = `Model Answer (${lvl})`;
+    const tierLabelTh = `Model Answer (${lvl})`;
+
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      if (!item || typeof item !== 'object') continue;
+      const text = cleanSpokenText(item.text || '');
+      if (!looksLikeTargetLang(text, targetLang)) continue;
+      let hint = cleanSpokenText(item.hint || (locale === 'th' ? item.hintTh : item.hintId) || item.translation || '').slice(0, 320);
+      let pronunciation = cleanSpokenText(item.pronunciation || item.phonetic || '').slice(0, 320);
+      return [
+        {
+          id: `cambridge_rt_${Date.now()}`,
+          tier: 'cambridge_model',
+          badgeId,
+          badgeTh,
+          tierLabelId,
+          tierLabelTh,
+          text,
+          pronunciation,
+          hintId: locale === 'th' ? cleanSpokenText(item.hintId || hint).slice(0, 320) : hint,
+          hintTh: locale === 'th' ? hint : cleanSpokenText(item.hintTh || hint).slice(0, 320),
+          hint,
+          isRealtimeAi: true,
+        },
+      ];
+    }
+    return [];
+  }
+
   const defaultBadges = [
     { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
     { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ' },
@@ -839,41 +884,34 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
   const totalKeys = keys.length;
   if (!totalKeys) return { ok: false, reason: 'no_keys_configured' };
 
-  // STRICT LITE-FIRST STRATEGY:
-  // gemini-3.1-flash-lite is the fastest (~600-900ms) with highest RPM.
-  // We rotate KEYS on each request so consecutive requests hit different keys,
-  // but candidate 0 is ALWAYS gemini-3.1-flash-lite!
+  // ULTRA-FAST PRODUCTION CANDIDATE STRATEGY:
+  // Tier 1: gemini-2.5-flash (Ultra cepat ~350-500ms, high stability, supported natively on REST)
+  // Tier 2: gemini-2.0-flash (Fallback super cepat)
+  // Tier 3: gemini-1.5-flash (Resilient fallback)
   const startKeyIdx = _copilotPoolIndex % totalKeys;
   _copilotPoolIndex = (_copilotPoolIndex + 1) % totalKeys;
 
   const candidates = [];
-  // Tier 1: gemini-3.1-flash-lite across rotating keys
-  for (let k = 0; k < totalKeys; k++) {
-    const key = keys[(startKeyIdx + k) % totalKeys];
-    const model = 'gemini-3.1-flash-lite';
-    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
-    candidates.push({ key, model, isCooledDown, tier: 1 });
-  }
-  // Tier 2: gemini-3.5-flash-lite across rotating keys
-  for (let k = 0; k < totalKeys; k++) {
-    const key = keys[(startKeyIdx + k) % totalKeys];
-    const model = 'gemini-3.5-flash-lite';
-    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
-    candidates.push({ key, model, isCooledDown, tier: 2 });
-  }
-  // Tier 3: gemini-3-flash-preview across rotating keys
-  for (let k = 0; k < totalKeys; k++) {
-    const key = keys[(startKeyIdx + k) % totalKeys];
-    const model = 'gemini-3-flash-preview';
-    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
-    candidates.push({ key, model, isCooledDown, tier: 3 });
-  }
-  // Tier 4: gemini-2.5-flash across rotating keys
+  // Tier 1: gemini-2.5-flash across rotating keys
   for (let k = 0; k < totalKeys; k++) {
     const key = keys[(startKeyIdx + k) % totalKeys];
     const model = 'gemini-2.5-flash';
     const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
-    candidates.push({ key, model, isCooledDown, tier: 4 });
+    candidates.push({ key, model, isCooledDown, tier: 1 });
+  }
+  // Tier 2: gemini-2.0-flash across rotating keys
+  for (let k = 0; k < totalKeys; k++) {
+    const key = keys[(startKeyIdx + k) % totalKeys];
+    const model = 'gemini-2.0-flash';
+    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
+    candidates.push({ key, model, isCooledDown, tier: 2 });
+  }
+  // Tier 3: gemini-1.5-flash across rotating keys
+  for (let k = 0; k < totalKeys; k++) {
+    const key = keys[(startKeyIdx + k) % totalKeys];
+    const model = 'gemini-1.5-flash';
+    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
+    candidates.push({ key, model, isCooledDown, tier: 3 });
   }
 
   // Sort so uncooled candidates come first, while preserving strict tier priority!
@@ -1011,12 +1049,20 @@ export async function routeVoiceCopilotAssist(ctx) {
 
   const focal = extractFocalClause(aiText, targetLang);
 
+  const cefrLevel = String(body.cefrLevel || 'B1').toUpperCase().trim();
+  const isCambridge =
+    Boolean(body.isCambridge) ||
+    body.personaId === 'cambridge_examiner' ||
+    String(body.scenarioId || '').startsWith('scen_ielts') ||
+    body.personaId === 'dr_julian' ||
+    String(body.scenarioId || '').startsWith('scen_pte');
+
   const langSpec =
     targetLang === 'ja'
       ? 'Japanese (natural spoken N5-N3, Kanji+Hiragana, NO emojis; "pronunciation" = word-spaced Hepburn Romaji)'
       : targetLang === 'zh'
       ? 'Mandarin Chinese (natural spoken HSK1-HSK3, Simplified Chinese characters, NO emojis; "pronunciation" = tone-marked Pinyin)'
-      : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy Indonesian phonetic guide)';
+      : `English (natural spoken ${cefrLevel === 'B1' ? 'A2-B1' : cefrLevel}, NO emojis; "pronunciation" = easy phonetic guide)`;
 
   const focalRule = focal.isEchoRedemption
     ? `CRITICAL MANDATORY ECHO REDEMPTION: Partner AI demanded repeating the exact corrected phrase: "${focal.focalText}". Option 1 (tier="easy") MUST be that exact phrase: "${focal.focalText}"!`
@@ -1029,23 +1075,53 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
 - If asked what food/drink/place, name a concrete item!
 - Option 1 must be concise (1 short sentence), direct, and completely conversational.`;
 
-  const prompt = [
-    `Speech Copilot (${scenarioTitle}). Target: ${langSpec}.`,
-    `Persona & Pedagogy: Sharp, observant, caring mentor ("guru galak tapi penuh perhatian") in FIEZEL (ecosystem created by Fitra Rustqi from Banda Aceh; powered by Braincore).`,
-    historyLines.length
-      ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
-      : '',
-    lastUserText ? `Learner said: "${lastUserText}"` : '',
-    `Partner AI said: "${aiText}"`,
-    focalRule,
-    excludeList.length
-      ? `Do NOT repeat: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
-      : '',
-    `Generate 3 spontaneous spoken replies directly answering "${focal.focalText}" (natural, conversational, punchy; NEVER generic textbook templates): easy=1 short direct sentence (or exact Echo repeat if demanded), mission=natural reply with concrete detail, rescue=reply + follow-up question back. Translate "${aiText}" into aiMeaning (${targetLocaleName}), and write natural first-person translation of each reply in hint (${targetLocaleName}).`,
-    `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
-  ]
-    .filter(Boolean)
-    .join('\n');
+  const levelBadge = isCambridge
+    ? (cefrLevel === 'B1' ? '🎯 Jawaban B1 (PTE 42 / Band 5.5)' : cefrLevel === 'B2' ? '🎯 Jawaban B2 (Band 6.5)' : cefrLevel === 'A2' ? '🎯 Jawaban A2' : cefrLevel === 'A1' ? '🎯 Jawaban A1' : `🎯 Jawaban Terbaik (${cefrLevel})`)
+    : '';
+
+  const prompt = isCambridge
+    ? [
+        `You are the Senior English Speaking Exam Copilot (PTE Academic / IELTS). Target Level: CEFR ${cefrLevel} (Target Score: ${cefrLevel === 'B1' ? 'PTE 42 / IELTS 5.0-5.5' : cefrLevel === 'B2' ? 'PTE 58 / IELTS 6.5' : cefrLevel === 'C1' ? 'PTE 76 / IELTS 7.5' : 'PTE 84+ / IELTS 8.5-9.0'}).`,
+        `Examiner statement/question: "${aiText}".`,
+        focal.focalText ? `Examiner focal focus: "${focal.focalText}".` : '',
+        lastUserText ? `Candidate just said: "${lastUserText}".` : '',
+        historyLines.length
+          ? `Exam dialogue context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
+          : '',
+        `Generate EXACTLY ONE single best Model Answer that 100% SPECIFICALLY AND DIRECTLY ANSWERS the examiner's statement/question above.`,
+        cefrLevel === 'A1'
+          ? `CRITICAL CEFR A1 MANDATE: Candidate is an absolute beginner. Use VERY SHORT and simple sentences (max 4-7 words). Use only fundamental A1 vocabulary. Keep it extremely easy to pronounce and understand!`
+          : cefrLevel === 'A2'
+          ? `CRITICAL CEFR A2 MANDATE: Candidate is at elementary level. Use simple, direct sentences (max 7-10 words) with basic everyday vocabulary (A2 level). Avoid any advanced idioms or complex syntax!`
+          : cefrLevel === 'B1'
+          ? `CRITICAL CEFR B1 MANDATE: Use clear, natural compound sentences with everyday professional vocabulary suitable for PTE 42 / CEFR B1. NEVER use obscure C2 academic jargon (like 'cogent', 'unilateral', 'invariably yields'). The candidate must be able to speak it comfortably and fluently!`
+          : cefrLevel === 'B2'
+          ? `Use clear, articulate B2 sentences with good academic vocabulary and clear discourse markers. Avoid overly obscure C2 jargon.`
+          : `Use elevated C1/C2 academic vocabulary, complex grammar, and sophisticated discourse markers.`,
+        `Translate "${aiText}" into aiMeaning (${targetLocaleName}).`,
+        `In "hint", write an accurate, helpful first-person translation of the model answer into ${targetLocaleName}.`,
+        `In "pronunciation", provide an easy, human-readable phonetic pronunciation guide (NO raw IPA symbols like æ, ʌ, ɪ, ð, ŋ).`,
+        `JSON only: {"aiMeaning":"...","replies":[{"tier":"cambridge_model","badgeId":"${levelBadge}","text":"...","pronunciation":"...","hint":"..."}]}`,
+      ]
+        .filter(Boolean)
+        .join('\n')
+    : [
+        `Speech Copilot (${scenarioTitle}). Target: ${langSpec}.`,
+        `Persona & Pedagogy: Sharp, observant, caring mentor ("guru galak tapi penuh perhatian") in FIEZEL (ecosystem created by Fitra Rustqi from Banda Aceh; powered by Braincore).`,
+        historyLines.length
+          ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
+          : '',
+        lastUserText ? `Learner said: "${lastUserText}"` : '',
+        `Partner AI said: "${aiText}"`,
+        focalRule,
+        excludeList.length
+          ? `Do NOT repeat: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
+          : '',
+        `Generate 3 spontaneous spoken replies directly answering "${focal.focalText}" (natural, conversational, punchy; NEVER generic textbook templates): easy=1 short direct sentence (or exact Echo repeat if demanded), mission=natural reply with concrete detail, rescue=reply + follow-up question back. Translate "${aiText}" into aiMeaning (${targetLocaleName}), and write natural first-person translation of each reply in hint (${targetLocaleName}).`,
+        `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
 
   const temp = variationSeed > 0 || excludeList.length > 0 ? 0.75 : 0.45;
   const gen = await runGeminiJsonWithPool(keys, prompt, temp, 850);
@@ -1053,7 +1129,7 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
 
-  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang, locale);
+  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang, locale, '', isCambridge, cefrLevel);
   if (!replies.length) {
     return jsonResponse({ ok: false, fallback: true, reason: 'invalid_replies' }, { status: 503 });
   }

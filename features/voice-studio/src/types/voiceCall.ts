@@ -297,3 +297,33 @@ export interface BraincoreStoreState {
   completedCallSessions: number;
   dualBrainMemory?: DualBrainMemoryState;
 }
+
+export interface PteMasterScorecard {
+  stage: number; // 1: DI, 2: RA, 3: RS, 4: WFD
+  taskName: string;
+  fluency: number; // 1 to 5
+  pronunciation: number; // 1 to 5
+  content: number; // 0 to 3
+  pearsonScore: number; // 10 to 90
+  passed: boolean;
+  missedWords: string[];
+  feedback: string;
+  timestamp: number;
+}
+
+export interface PteMasterState {
+  version: number;
+  activeStage: number; // 1 to 4
+  targetScore: number; // 42 or 58
+  overallEstimate: number; // Pearson 10-90
+  completedStages: number[];
+  scorecards: PteMasterScorecard[];
+  chronicMisconceptions: Array<{
+    word: string;
+    expected: string;
+    stage: number;
+    missCount: number;
+    lastSeen: number;
+  }>;
+  lastUpdated: number;
+}

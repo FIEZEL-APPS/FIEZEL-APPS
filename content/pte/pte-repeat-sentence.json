@@ -1,0 +1,103 @@
+{
+  "version": "1.0.0",
+  "task": "Repeat Sentence",
+  "crossSkills": ["Speaking", "Listening"],
+  "items": [
+    {
+      "id": "rs-001",
+      "sentence": "Please submit your completed assignment to the student office before Friday afternoon.",
+      "wordCount": 12,
+      "audioDurationSec": 4.2,
+      "keyContentWords": ["submit", "assignment", "student", "office", "Friday", "afternoon"],
+      "category": "Campus Administration"
+    },
+    {
+      "id": "rs-002",
+      "sentence": "The library will remain open twenty-four hours during the final examination period.",
+      "wordCount": 12,
+      "audioDurationSec": 4.5,
+      "keyContentWords": ["library", "open", "twenty-four", "hours", "examination", "period"],
+      "category": "Campus Life"
+    },
+    {
+      "id": "rs-003",
+      "sentence": "Proper food safety guidelines must be strictly followed in all commercial kitchens.",
+      "wordCount": 12,
+      "audioDurationSec": 4.0,
+      "keyContentWords": ["food", "safety", "guidelines", "strictly", "commercial", "kitchens"],
+      "category": "Hospitality & Cookery"
+    },
+    {
+      "id": "rs-004",
+      "sentence": "You must wear protective gear before entering the chemistry laboratory.",
+      "wordCount": 10,
+      "audioDurationSec": 3.8,
+      "keyContentWords": ["wear", "protective", "gear", "entering", "chemistry", "laboratory"],
+      "category": "Academic Science"
+    },
+    {
+      "id": "rs-005",
+      "sentence": "Students are required to attend all scheduled orientation sessions this week.",
+      "wordCount": 11,
+      "audioDurationSec": 3.9,
+      "keyContentWords": ["students", "required", "attend", "orientation", "sessions", "week"],
+      "category": "Orientation"
+    },
+    {
+      "id": "rs-006",
+      "sentence": "All international applicants need to provide verified proof of English language proficiency.",
+      "wordCount": 12,
+      "audioDurationSec": 4.8,
+      "keyContentWords": ["international", "applicants", "verified", "proof", "English", "proficiency"],
+      "category": "Admissions & Visa"
+    },
+    {
+      "id": "rs-007",
+      "sentence": "The lecture slides will be uploaded to the campus portal by tomorrow morning.",
+      "wordCount": 13,
+      "audioDurationSec": 4.3,
+      "keyContentWords": ["lecture", "slides", "uploaded", "campus", "portal", "tomorrow"],
+      "category": "Academic Studies"
+    },
+    {
+      "id": "rs-008",
+      "sentence": "Chefs should always inspect raw ingredients prior to food preparation.",
+      "wordCount": 10,
+      "audioDurationSec": 3.6,
+      "keyContentWords": ["chefs", "inspect", "ingredients", "prior", "food", "preparation"],
+      "category": "Hospitality & Cookery"
+    },
+    {
+      "id": "rs-009",
+      "sentence": "The results of the scientific study will be published next semester.",
+      "wordCount": 11,
+      "audioDurationSec": 3.9,
+      "keyContentWords": ["results", "scientific", "study", "published", "semester"],
+      "category": "Research"
+    },
+    {
+      "id": "rs-010",
+      "sentence": "Customer service representatives must respond promptly to all guest inquiries.",
+      "wordCount": 10,
+      "audioDurationSec": 4.1,
+      "keyContentWords": ["customer", "service", "respond", "promptly", "guest", "inquiries"],
+      "category": "Hospitality & Service"
+    },
+    {
+      "id": "rs-011",
+      "sentence": "Fresh fruit and vegetables provide essential vitamins for human health.",
+      "wordCount": 10,
+      "audioDurationSec": 3.7,
+      "keyContentWords": ["fresh", "fruit", "vegetables", "essential", "vitamins", "health"],
+      "category": "Nutrition"
+    },
+    {
+      "id": "rs-012",
+      "sentence": "Please ensure your mobile phones are switched off during the formal presentation.",
+      "wordCount": 12,
+      "audioDurationSec": 4.2,
+      "keyContentWords": ["ensure", "mobile", "phones", "switched", "off", "presentation"],
+      "category": "Campus Etiquette"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Volume2, Send, Mic, RefreshCw, Sparkles, ChevronUp, ChevronDown, Check } from 'lucide-react';
 import type { BeginnerReplyCard } from '../lib/liveCallHelper';
-import type { CallScenario, LearnerLocale } from '../types/voiceCall';
+import type { CallScenario, LearnerLocale, VoicePersona } from '../types/voiceCall';
 import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
 import { toPhoneticRomaji } from '../lib/japanesePhonetics';
 import { toPhoneticPinyin, containsHanzi } from '../lib/mandarinPhonetics';
@@ -10,6 +10,7 @@ export interface BeginnerAnswerAssistantProps {
   locale: LearnerLocale;
   targetLang: 'en' | 'ja' | 'zh';
   scenario: CallScenario;
+  persona?: VoicePersona;
   aiQuestionText: string;
   aiQuestionTranslation: string;
   lastUserText?: string;
@@ -32,6 +33,8 @@ export interface BeginnerAnswerAssistantProps {
 export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = ({
   locale,
   targetLang,
+  scenario,
+  persona,
   aiQuestionText,
   aiQuestionTranslation,
   lastUserText,
@@ -60,6 +63,17 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
   const visibleCards = (cards || []).slice(0, 3);
   const safeIndex = selectedIndex < visibleCards.length ? selectedIndex : 0;
   const activeCard = visibleCards[safeIndex] || null;
+
+  const isCambridgeMode =
+    persona?.id === 'cambridge_examiner' ||
+    scenario.personaId === 'cambridge_examiner' ||
+    scenario.id.startsWith('scen_ielts') ||
+    visibleCards.some(
+      (c) =>
+        c.tier === ('cambridge_model' as any) ||
+        c.badgeId?.includes('Band 9') ||
+        c.tierLabelId?.includes('Band 9')
+    );
 
   const showLoadingState =
     !isRecordingPtt &&
@@ -164,42 +178,58 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
           >
             <Sparkles className="w-3.5 h-3.5 text-[#B85D43] shrink-0" />
             <span className="truncate">
-              {locale === 'th' ? 'ตัวช่วยตอบ' : 'Ide Bicara'}
+              {isCambridgeMode ? (locale === 'th' ? 'คำตอบ Band 9.0' : 'Model Answer') : (locale === 'th' ? 'ตัวช่วยตอบ' : 'Ide Bicara')}
             </span>
             {isExpanded ? <ChevronDown className="w-3.5 h-3.5 shrink-0" /> : <ChevronUp className="w-3.5 h-3.5 shrink-0" />}
           </button>
 
-          {/* Quick Tabs: Singkat · Alami · Tanya Balik */}
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar min-w-0 flex-1">
-            {showLoadingState ? (
-              <div className="flex items-center gap-1 animate-pulse">
-                <span className="w-16 h-6 rounded-lg bg-[#EADBCE]/60 inline-block" />
-                <span className="w-16 h-6 rounded-lg bg-[#EADBCE]/60 inline-block" />
-              </div>
-            ) : (
-              visibleCards.map((card, idx) => {
-                const isSelected = idx === safeIndex;
-                return (
-                  <button
-                    key={`${card.id}_tab_${idx}`}
-                    type="button"
-                    data-testid={`copilot-tier-tab-${idx}`}
-                    onClick={() => {
-                      setSelectedIndex(idx);
-                      onSelectForInput(card.text);
-                    }}
-                    className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
-                      isSelected
-                        ? 'bg-[#1C1611] text-white shadow-2xs'
-                        : 'bg-white/80 hover:bg-white text-[#5C4A38] border border-[#EADBCE]'
-                    }`}
-                  >
-                    {getShortTabLabel(card, idx)}
-                  </button>
-                );
-              })
-            )}
-          </div>
+          {/* Quick Tabs: Singkat · Alami · Tanya Balik OR Single Best Model Answer Badge */}
+          {isCambridgeMode ? (
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+              <span className="px-2.5 py-1 rounded-xl bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-2xs truncate">
+                <span className="text-xs">🎯</span>
+                <span>
+                  {locale === 'th'
+                    ? (activeCard?.badgeTh || 'คำตอบแนะนำ')
+                    : (activeCard?.badgeId || 'Jawaban Terbaik')}
+                </span>
+              </span>
+              <span className="hidden sm:inline-block text-[10.5px] font-semibold text-[#8C7760] truncate">
+                {activeCard?.tierLabelId || (scenario.id.startsWith('scen_pte') ? 'Pearson PTE Academic' : 'Cambridge IELTS Academic')}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar min-w-0 flex-1">
+              {showLoadingState ? (
+                <div className="flex items-center gap-1 animate-pulse">
+                  <span className="w-16 h-6 rounded-lg bg-[#EADBCE]/60 inline-block" />
+                  <span className="w-16 h-6 rounded-lg bg-[#EADBCE]/60 inline-block" />
+                </div>
+              ) : (
+                visibleCards.map((card, idx) => {
+                  const isSelected = idx === safeIndex;
+                  return (
+                    <button
+                      key={`${card.id}_tab_${idx}`}
+                      type="button"
+                      data-testid={`copilot-tier-tab-${idx}`}
+                      onClick={() => {
+                        setSelectedIndex(idx);
+                        onSelectForInput(card.text);
+                      }}
+                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                        isSelected
+                          ? 'bg-[#1C1611] text-white shadow-2xs'
+                          : 'bg-white/80 hover:bg-white text-[#5C4A38] border border-[#EADBCE]'
+                      }`}
+                    >
+                      {getShortTabLabel(card, idx)}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
 
           {/* Tombol Regenerasi Ide Baru */}
           {onRefreshAssist && (
@@ -257,7 +287,8 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               data-testid="teleprompter-meaning"
               className="text-xs sm:text-[12.5px] text-[#4A3B2C] font-medium leading-relaxed pt-1 border-t border-[#F2ECE0] break-words"
             >
-              💡 {sanitizeMotherTongueHint(locale === 'th' ? activeCard.hintTh || activeCard.hintId : activeCard.hintId)}
+              💡 {isCambridgeMode && <span className="font-bold text-[#92400E] mr-1">[{locale === 'th' ? 'แปลคำตอบ Band 9.0' : 'Terjemahan Model Answer'}]:</span>}
+              {sanitizeMotherTongueHint(locale === 'th' ? activeCard.hintTh || activeCard.hintId : activeCard.hintId)}
             </p>
 
             {/* Action Bar: Dengar, Ucapkan, Pakai */}

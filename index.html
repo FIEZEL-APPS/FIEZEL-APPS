@@ -33,7 +33,7 @@
   <meta name="theme-color" content="#1B1418">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
-  <meta name="fz-build" content="m025-786">
+  <meta name="fz-build" content="m025-787">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa adaptif: kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4), dengan vocabulary, grammar, reading, dan AI Tutor. Gratis dan bisa dipakai offline.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -308,6 +308,7 @@ html.fz-booting #globalSky {
   <link rel="stylesheet" href="./features/interactive-chat/interactive-chat.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
   <link rel="stylesheet" href="./features/japanese/fiezel-kakijun-studio.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
   <link rel="stylesheet" href="./features/mandarin/mandarin.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
+  <link rel="stylesheet" href="./features/pte/pte-tactile.css" media="print" data-fz-shell-css onload="this.onload=null;this.media='all';this.dataset.fzShellReady='1'" onerror="this.dataset.fzShellReady='error'">
   <noscript>
     <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
     <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
@@ -330,6 +331,7 @@ html.fz-booting #globalSky {
     <link rel="stylesheet" href="./features/interactive-chat/interactive-chat.css">
     <link rel="stylesheet" href="./features/japanese/fiezel-kakijun-studio.css">
     <link rel="stylesheet" href="./features/mandarin/mandarin.css">
+    <link rel="stylesheet" href="./features/pte/pte-tactile.css">
   </noscript>
   <style id="fz-contrast-guard">
     /* High contrast guard: prevent yellow-on-yellow or white-on-yellow illegible text */
@@ -1889,6 +1891,9 @@ html.fz-booting #globalSky {
        previewAllowed() seketika dan mengambil modul penuh hanya untuk guru/demo guru. -->
   <script defer src="./features/teacher/fiezel-teacher-loader.js"></script>
   <script defer src="./features/security/fiezel-offline-vault.js"></script>
+  <!-- PTE Academic Big 4 Prep Hub Engine & UI -->
+  <script defer src="./features/pte/fiezel-pte-engine.js"></script>
+  <script defer src="./features/pte/fiezel-pte-ui.js"></script>
   <script defer src="./app.js"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
   <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>

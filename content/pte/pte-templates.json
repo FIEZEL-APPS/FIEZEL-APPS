@@ -1,0 +1,104 @@
+{
+  "version": "1.1.0",
+  "name": "FIEZEL PTE Academic Official Templates & Nakul Master Scaffolds",
+  "description": "Standardized pedagogical templates designed for guaranteed scoring in Pearson AI automated grading algorithms (Target PTE 42–58+).",
+  "templates": {
+    "describe_image": {
+      "id": "di_nakul_v1",
+      "title": "Nakul 5-Line Universal Describe Image Template",
+      "target_task": "Describe Image",
+      "target_duration_sec": 26,
+      "duration_range": "25–28 seconds (Optimal Pearson Oral Fluency Zone)",
+      "structure": [
+        "Line 1 (Type & Topic): The image provided is a [type] that gives information about [topic].",
+        "Line 2 (Axes / Breakdown): While the x-axis represents [categories], the y-axis shows [values].",
+        "Line 3 (Maximum Trend): It is evident that [highest feature] has the highest value.",
+        "Line 4 (Minimum Trend): Conversely, [lowest feature] has the lowest value.",
+        "Line 5 (Conclusion): Overall, this image clearly illustrates [restate topic]."
+      ],
+      "text": "The given image represents an informative [type] regarding [topic]. While the x-axis represents [categories], the y-axis shows [values]. It is evident that [highest feature] has the highest value. Conversely, [lowest feature] has the lowest value. Overall, this image clearly illustrates [restate topic].",
+      "fill_guide": {
+        "type": "bar chart / line graph / pie chart / diagram / table",
+        "topic": "Title or main subject of the chart/diagram",
+        "categories": "Categories shown along horizontal axis or legend",
+        "values": "Numerical values or percentages along vertical axis",
+        "highest feature": "The peak bar, year, or segment with largest number",
+        "lowest feature": "The lowest bar, year, or segment with smallest number"
+      },
+      "tips": [
+        "Speak steadily for 25–28 seconds; stop before 30s to avoid rushing or getting cut off.",
+        "No pauses longer than 2 seconds (Pearson's 3-second silence rule will automatically shut off the mic).",
+        "Do not self-correct if you misread a number; maintain continuous vocal acoustic flow."
+      ]
+    },
+    "retell_lecture": {
+      "id": "rl_nakul_v1",
+      "title": "Nakul 5-Sentence Retell Lecture Template",
+      "target_task": "Retell Lecture",
+      "target_duration_sec": 28,
+      "text": "The lecture discusses [topic]. In the beginning, the speaker explained [phrase 1]. Later, the speaker said that [phrase 2]. Here, the speaker also mentioned [phrase 3]. In conclusion, the lecture effectively summarized [phrase 4].",
+      "tips": [
+        "Capture 4 to 6 noun phrases during audio playback without worrying about grammar.",
+        "Insert the captured keywords directly into the slots with calm, rhythmic pacing."
+      ]
+    },
+    "summarize_written_text": {
+      "id": "swt_nakul_v1",
+      "title": "Nakul Strict 1-Sentence Summarizer Scaffold",
+      "target_task": "Summarize Written Text",
+      "rules": "Strictly ONE single sentence (35-45 words), one capital letter at beginning, exactly one full stop at end.",
+      "formula": "[Clause 1], and [Clause 2], although [Clause 3].",
+      "tips": [
+        "Never place more than one period in the entire response.",
+        "Pick 2-3 key independent clauses from the text and join them with 'and' and 'although'."
+      ]
+    },
+    "summarize_spoken_text": {
+      "id": "sst_nakul_v1",
+      "title": "Nakul Short Connectors Spoken Summarizer",
+      "target_task": "Summarize Spoken Text",
+      "target_word_count": "50–70 words",
+      "formula": "The audio discusses [topic]. Firstly, [point 1]. Secondly, [point 2]. Furthermore, [point 3]. In conclusion, [point 4].",
+      "tips": [
+        "Avoid bulky 40-word filler templates that waste cognitive load.",
+        "Write 3-4 short sentences using simple connectors: Firstly, Secondly, Furthermore, In conclusion."
+      ]
+    },
+    "write_from_dictation": {
+      "id": "wfd_extra_words_v1",
+      "title": "Nakul Extra Words Hack & Zero Negative Marking Protocol",
+      "target_task": "Write From Dictation",
+      "rules": "1 point per correct word. Zero negative marking. Order does not invalidate points.",
+      "hack_guide": "If you are unsure whether a word is singular or plural (e.g. student or students), or unsure of tense (develop, develops, developed), or article (the, a), write BOTH variations: 'student students', 'the a'. Pearson AI matches tokens without deducting marks for extraneous guesses.",
+      "tips": [
+        "Always write down the initial letter of each word while listening to capture the entire sentence.",
+        "Ensure capitalization of the first word and proper nouns.",
+        "Add a full stop at the end."
+      ]
+    },
+    "write_essay": {
+      "id": "we_4par_v1",
+      "title": "FIEZEL 4-Paragraph Balanced Argument Template",
+      "target_task": "Write Essay",
+      "target_word_count": "200-300 words",
+      "paragraphs": [
+        {
+          "role": "Introduction",
+          "scaffold": "In the contemporary era, whether [Topic] remains a subject of considerable controversy. While some individuals argue that [View A], others firmly maintain that [View B]. In my perspective, I concur with the former viewpoint for several compelling reasons."
+        },
+        {
+          "role": "Body Paragraph 1",
+          "scaffold": "To begin with, the foremost justification is that [Argument 1]. Specifically, [Supporting Evidence 1]. For example, empirical studies conducted in recent years have demonstrated that [Concrete Example 1]. Consequently, it is evident that [Concluding thought 1]."
+        },
+        {
+          "role": "Body Paragraph 2",
+          "scaffold": "Furthermore, another pivotal factor that should be considered is that [Argument 2]. In other words, [Supporting Evidence 2]. To illustrate, modern organizations and academic institutions frequently observe that [Concrete Example 2]. Hence, this clearly reinforces the significance of the issue."
+        },
+        {
+          "role": "Conclusion",
+          "scaffold": "In conclusion, after evaluating the aforementioned perspectives, I reiterate that although alternative viewpoints exist, [Rephrased Thesis]. Therefore, taking proactive measures regarding this matter will undoubtedly yield long-term advantages."
+        }
+      ]
+    }
+  }
+}

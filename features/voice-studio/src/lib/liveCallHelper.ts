@@ -5,11 +5,15 @@ export interface BeginnerReplyCard {
   id: string;
   badgeId: string;
   badgeTh: string;
-  tier: 'easy' | 'mission' | 'rescue';
+  tier: 'easy' | 'mission' | 'rescue' | 'cambridge_model';
   text: string;
   pronunciation: string;
   hintId: string;
   hintTh: string;
+  meaningId?: string;
+  meaningTh?: string;
+  tierLabelId?: string;
+  tierLabelTh?: string;
   contextAnchorId?: string;
   contextAnchorTh?: string;
   wordBreakdown?: Array<{ word: string; reading: string; meaningId: string }>;

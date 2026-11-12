@@ -1,0 +1,112 @@
+{
+  "version": "1.0.0",
+  "task": "Write from Dictation",
+  "crossSkills": ["Listening", "Writing"],
+  "items": [
+    {
+      "id": "wfd-001",
+      "sentence": "The university provides free accommodation for international exchange students.",
+      "wordCount": 9,
+      "audioDurationSec": 4.1,
+      "tokens": ["The", "university", "provides", "free", "accommodation", "for", "international", "exchange", "students"],
+      "spellingChallenges": [
+        { "word": "accommodation", "commonErrors": ["acommodation", "accomodation", "acomodation"], "rule": "Double 'c' and double 'm'." }
+      ]
+    },
+    {
+      "id": "wfd-002",
+      "sentence": "Strict kitchen hygiene standards are essential for all commercial restaurants.",
+      "wordCount": 10,
+      "audioDurationSec": 4.3,
+      "tokens": ["Strict", "kitchen", "hygiene", "standards", "are", "essential", "for", "all", "commercial", "restaurants"],
+      "spellingChallenges": [
+        { "word": "hygiene", "commonErrors": ["hygene", "hygeine", "higene"], "rule": "H-Y-G-I-E-N-E (i before e)." },
+        { "word": "restaurants", "commonErrors": ["resturants", "restaraunts", "resteraunts"], "rule": "R-E-S-T-A-U-R-A-N-T-S ('au' in the middle)." }
+      ]
+    },
+    {
+      "id": "wfd-003",
+      "sentence": "It is necessary to submit all academic documents before the official deadline.",
+      "wordCount": 12,
+      "audioDurationSec": 4.5,
+      "tokens": ["It", "is", "necessary", "to", "submit", "all", "academic", "documents", "before", "the", "official", "deadline"],
+      "spellingChallenges": [
+        { "word": "necessary", "commonErrors": ["neccessary", "necesary", "necessery"], "rule": "One 'c', double 's' (Never Eat Cake, Eat Salad Sandwiches And Remain Young)." }
+      ]
+    },
+    {
+      "id": "wfd-004",
+      "sentence": "Environmental scientists are monitoring temperature changes across coastal Australia.",
+      "wordCount": 9,
+      "audioDurationSec": 4.6,
+      "tokens": ["Environmental", "scientists", "are", "monitoring", "temperature", "changes", "across", "coastal", "Australia"],
+      "spellingChallenges": [
+        { "word": "environmental", "commonErrors": ["enviromental", "environmantal"], "rule": "Remember the 'n' after 'viro': E-N-V-I-R-O-N-mental." },
+        { "word": "temperature", "commonErrors": ["temprature", "temperture"], "rule": "T-E-M-P-E-R-A-T-U-R-E." }
+      ]
+    },
+    {
+      "id": "wfd-005",
+      "sentence": "Successful applicants will receive their confirmation letters by next Wednesday.",
+      "wordCount": 10,
+      "audioDurationSec": 4.2,
+      "tokens": ["Successful", "applicants", "will", "receive", "their", "confirmation", "letters", "by", "next", "Wednesday"],
+      "spellingChallenges": [
+        { "word": "successful", "commonErrors": ["succesful", "successfull", "sucessful"], "rule": "Double 'c', double 's', single 'l'." },
+        { "word": "receive", "commonErrors": ["recieve"], "rule": "I before E except after C." }
+      ]
+    },
+    {
+      "id": "wfd-006",
+      "sentence": "The library catalog contains thousands of digital journals and reference materials.",
+      "wordCount": 11,
+      "audioDurationSec": 4.7,
+      "tokens": ["The", "library", "catalog", "contains", "thousands", "of", "digital", "journals", "and", "reference", "materials"],
+      "spellingChallenges": [
+        { "word": "reference", "commonErrors": ["referance", "reffurence"], "rule": "R-E-F-E-R-E-N-C-E." }
+      ]
+    },
+    {
+      "id": "wfd-007",
+      "sentence": "Modern hospitality training prepares students for international leadership roles.",
+      "wordCount": 9,
+      "audioDurationSec": 4.0,
+      "tokens": ["Modern", "hospitality", "training", "prepares", "students", "for", "international", "leadership", "roles"],
+      "spellingChallenges": [
+        { "word": "hospitality", "commonErrors": ["hospitalaty", "hospitallity"], "rule": "H-O-S-P-I-T-A-L-I-T-Y." }
+      ]
+    },
+    {
+      "id": "wfd-008",
+      "sentence": "Financial assistance is available for qualifying postgraduate researchers.",
+      "wordCount": 8,
+      "audioDurationSec": 4.2,
+      "tokens": ["Financial", "assistance", "is", "available", "for", "qualifying", "postgraduate", "researchers"],
+      "spellingChallenges": [
+        { "word": "assistance", "commonErrors": ["assistence", "asistance"], "rule": "Double 's', ends in '-ance'." },
+        { "word": "available", "commonErrors": ["availible", "avaliable"], "rule": "A-V-A-I-L-A-B-L-E." }
+      ]
+    },
+    {
+      "id": "wfd-009",
+      "sentence": "A balanced diet and regular physical exercise significantly reduce health risks.",
+      "wordCount": 11,
+      "audioDurationSec": 4.8,
+      "tokens": ["A", "balanced", "diet", "and", "regular", "physical", "exercise", "significantly", "reduce", "health", "risks"],
+      "spellingChallenges": [
+        { "word": "exercise", "commonErrors": ["excercise", "exercize"], "rule": "E-X-E-R-C-I-S-E (no 'c' after 'x')." }
+      ]
+    },
+    {
+      "id": "wfd-010",
+      "sentence": "Our vocational campus offers specialized culinary certificates and hospitality diplomas.",
+      "wordCount": 10,
+      "audioDurationSec": 4.7,
+      "tokens": ["Our", "vocational", "campus", "offers", "specialized", "culinary", "certificates", "and", "hospitality", "diplomas"],
+      "spellingChallenges": [
+        { "word": "culinary", "commonErrors": ["cullinary", "culunary"], "rule": "Single 'l': C-U-L-I-N-A-R-Y." },
+        { "word": "certificates", "commonErrors": ["certifikates", "certifecates"], "rule": "C-E-R-T-I-F-I-C-A-T-E-S." }
+      ]
+    }
+  ]
+}
