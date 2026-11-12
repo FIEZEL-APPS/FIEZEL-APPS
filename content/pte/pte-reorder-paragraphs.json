@@ -190,6 +190,78 @@
           "Pasangan 3 (C ➔ A): Kedatangan biji kopi ke Eropa di C memicu berdirinya kedai kopi di A ('The establishment of dedicated coffeehouses across London and Paris...')."
         ]
       }
+    },
+    {
+      "id": "ro-006",
+      "title": "Desalination Development in Coastal Perth",
+      "correctOrder": [
+        "In the early 2000s, prolonged southwestern droughts significantly reduced streamflow into Western Australia's surface dams.",
+        "To mitigate this impending water deficit, the state government initiated ambitious seawater desalination infrastructure.",
+        "The Kwinana Desalination Plant was consequently commissioned in 2006, utilizing advanced reverse osmosis filtration.",
+        "Today, this facility alongside the Southern Seawater plant supplies nearly half of Perth's potable tap water."
+      ],
+      "paragraphs": [
+        "The Kwinana Desalination Plant was consequently commissioned in 2006, utilizing advanced reverse osmosis filtration.",
+        "In the early 2000s, prolonged southwestern droughts significantly reduced streamflow into Western Australia's surface dams.",
+        "Today, this facility alongside the Southern Seawater plant supplies nearly half of Perth's potable tap water.",
+        "To mitigate this impending water deficit, the state government initiated ambitious seawater desalination infrastructure."
+      ],
+      "deepFeedback": {
+        "independentSentence": "Kalimat pertama adalah kalimat yang menyebutkan latar belakang waktu dan masalah ('In the early 2000s, prolonged southwestern droughts...') tanpa kata ganti penunjuk atau konjungsi akibat.",
+        "pairingClues": [
+          "Pasangan 1: Masalah kekeringan ('droughts') memicu respons pemerintah ('To mitigate this impending water deficit...').",
+          "Pasangan 2: Inisiatif tersebut diwujudkan dengan pembangunan pabrik ('The Kwinana Desalination Plant was consequently commissioned...').",
+          "Pasangan 3: Kalimat penutup merangkum status saat ini ('Today, this facility alongside...')."
+        ]
+      }
+    },
+    {
+      "id": "ro-007",
+      "title": "The Sourdough Fermentation Cycle",
+      "correctOrder": [
+        "Traditional sourdough bread relies on a living starter culture composed of wild yeasts and beneficial bacteria.",
+        "When flour and water are replenished, these microorganisms break down cereal starches into sugars.",
+        "The yeasts convert these sugars into carbon dioxide gas, which causes the gluten dough matrix to expand.",
+        "Simultaneously, lactic acid bacteria produce tangy acids that give sourdough its distinctive flavor and shelf stability."
+      ],
+      "paragraphs": [
+        "The yeasts convert these sugars into carbon dioxide gas, which causes the gluten dough matrix to expand.",
+        "Traditional sourdough bread relies on a living starter culture composed of wild yeasts and beneficial bacteria.",
+        "Simultaneously, lactic acid bacteria produce tangy acids that give sourdough its distinctive flavor and shelf stability.",
+        "When flour and water are replenished, these microorganisms break down cereal starches into sugars."
+      ],
+      "deepFeedback": {
+        "independentSentence": "Kalimat pembuka mengenalkan subjek umum: starter sourdough ('Traditional sourdough bread relies on...').",
+        "pairingClues": [
+          "Pasangan 1: 'living starter culture' dirujuk sebagai 'these microorganisms' pada kalimat kedua.",
+          "Pasangan 2: 'break down cereal starches into sugars' dilanjutkan oleh 'The yeasts convert these sugars...'.",
+          "Pasangan 3: 'Simultaneously' menjelaskan aksi paralel bakteri asam laktat yang melengkapi kerja ragi."
+        ]
+      }
+    },
+    {
+      "id": "ro-008",
+      "title": "Autonomous Mining Locomotives in the Pilbara",
+      "correctOrder": [
+        "Extracting iron ore from remote Australian deposits requires transporting vast tonnages across arid desert expanses.",
+        "Heavy-haul diesel trains have traditionally transported these mineral stockpiles to Indian Ocean export ports.",
+        "However, operating trains over thousands of kilometers exposed train crews to severe isolation and fatigue.",
+        "To eliminate these operational hazards, mining corporations transitioned to fully autonomous robotic train networks."
+      ],
+      "paragraphs": [
+        "However, operating trains over thousands of kilometers exposed train crews to severe isolation and fatigue.",
+        "To eliminate these operational hazards, mining corporations transitioned to fully autonomous robotic train networks.",
+        "Extracting iron ore from remote Australian deposits requires transporting vast tonnages across arid desert expanses.",
+        "Heavy-haul diesel trains have traditionally transported these mineral stockpiles to Indian Ocean export ports."
+      ],
+      "deepFeedback": {
+        "independentSentence": "Kalimat pembuka mendefinisikan kebutuhan logistik umum ('Extracting iron ore... requires transporting vast tonnages...').",
+        "pairingClues": [
+          "Pasangan 1: Kebutuhan transportasi ditautkan ke kereta diesel konvensional ('Heavy-haul diesel trains have traditionally transported...').",
+          "Pasangan 2: Kata hubung kontras 'However' memperkenalkan masalah kelelahan masinis.",
+          "Pasangan 3: 'To eliminate these operational hazards' merujuk langsung ke masalah kelelahan dan isolasi pada kalimat sebelumnya."
+        ]
+      }
     }
   ]
 }

@@ -562,6 +562,306 @@
         "immediately"
       ],
       "category": "Campus Security and Emergency Protocols"
+    },
+    {
+      "id": "rs-028",
+      "sentence": "Undergraduate students must submit their chemistry lab reports before Friday afternoon.",
+      "wordCount": 11,
+      "audioDurationSec": 3.5,
+      "keyContentWords": [
+        "undergraduate",
+        "chemistry",
+        "reports",
+        "Friday",
+        "afternoon"
+      ]
+    },
+    {
+      "id": "rs-029",
+      "sentence": "The university cafeteria offers nutritious dietary alternatives for international scholars.",
+      "wordCount": 9,
+      "audioDurationSec": 3.2,
+      "keyContentWords": [
+        "cafeteria",
+        "nutritious",
+        "dietary",
+        "alternatives",
+        "scholars"
+      ]
+    },
+    {
+      "id": "rs-030",
+      "sentence": "Statistical data demonstrates significant correlation between physical exercise and cognitive health.",
+      "wordCount": 10,
+      "audioDurationSec": 3.6,
+      "keyContentWords": [
+        "statistical",
+        "correlation",
+        "exercise",
+        "cognitive",
+        "health"
+      ]
+    },
+    {
+      "id": "rs-031",
+      "sentence": "All library research cubicles must be reserved through the campus digital portal.",
+      "wordCount": 12,
+      "audioDurationSec": 3.8,
+      "keyContentWords": [
+        "library",
+        "research",
+        "cubicles",
+        "reserved",
+        "digital",
+        "portal"
+      ]
+    },
+    {
+      "id": "rs-032",
+      "sentence": "Modern culinary apprentices are required to demonstrate strict temperature hygiene compliance.",
+      "wordCount": 10,
+      "audioDurationSec": 3.4,
+      "keyContentWords": [
+        "culinary",
+        "apprentices",
+        "temperature",
+        "hygiene",
+        "compliance"
+      ]
+    },
+    {
+      "id": "rs-033",
+      "sentence": "Renewable solar installations have expanded dramatically across Western Australian rural properties.",
+      "wordCount": 10,
+      "audioDurationSec": 3.7,
+      "keyContentWords": [
+        "renewable",
+        "solar",
+        "installations",
+        "expanded",
+        "Western Australia"
+      ]
+    },
+    {
+      "id": "rs-034",
+      "sentence": "The faculty dean delivered an inspiring keynote regarding global economic transformation.",
+      "wordCount": 10,
+      "audioDurationSec": 3.5,
+      "keyContentWords": [
+        "faculty",
+        "dean",
+        "keynote",
+        "economic",
+        "transformation"
+      ]
+    },
+    {
+      "id": "rs-035",
+      "sentence": "Peer-reviewed scientific publications require rigorous methodological replication before formal acceptance.",
+      "wordCount": 9,
+      "audioDurationSec": 3.9,
+      "keyContentWords": [
+        "peer-reviewed",
+        "scientific",
+        "rigorous",
+        "replication",
+        "acceptance"
+      ]
+    },
+    {
+      "id": "rs-036",
+      "sentence": "Students experiencing academic stress are encouraged to consult campus counseling counselors.",
+      "wordCount": 10,
+      "audioDurationSec": 3.6,
+      "keyContentWords": [
+        "academic",
+        "stress",
+        "encouraged",
+        "consult",
+        "counseling"
+      ]
+    },
+    {
+      "id": "rs-037",
+      "sentence": "The biology tutorial will convene in the central science laboratory tomorrow morning.",
+      "wordCount": 12,
+      "audioDurationSec": 3.8,
+      "keyContentWords": [
+        "biology",
+        "tutorial",
+        "science",
+        "laboratory",
+        "tomorrow"
+      ]
+    },
+    {
+      "id": "rs-038",
+      "sentence": "Microbial fermentation produces vital organic acids that preserve artisan culinary products.",
+      "wordCount": 10,
+      "audioDurationSec": 3.5,
+      "keyContentWords": [
+        "microbial",
+        "fermentation",
+        "organic",
+        "acids",
+        "artisan"
+      ]
+    },
+    {
+      "id": "rs-039",
+      "sentence": "International applicants must present authentic certified copies of their educational diplomas.",
+      "wordCount": 10,
+      "audioDurationSec": 3.6,
+      "keyContentWords": [
+        "international",
+        "applicants",
+        "authentic",
+        "certified",
+        "diplomas"
+      ]
+    },
+    {
+      "id": "rs-040",
+      "sentence": "The historical museum exhibition will remain open to the public throughout November.",
+      "wordCount": 12,
+      "audioDurationSec": 3.7,
+      "keyContentWords": [
+        "historical",
+        "museum",
+        "exhibition",
+        "public",
+        "November"
+      ]
+    },
+    {
+      "id": "rs-041",
+      "sentence": "Environmental regulations mandate immediate reporting of hazardous chemical discharge incidents.",
+      "wordCount": 9,
+      "audioDurationSec": 3.5,
+      "keyContentWords": [
+        "environmental",
+        "regulations",
+        "hazardous",
+        "chemical",
+        "discharge"
+      ]
+    },
+    {
+      "id": "rs-042",
+      "sentence": "Hospitality supervisors must conduct thorough inventory audits at the close of every shift.",
+      "wordCount": 13,
+      "audioDurationSec": 4.1,
+      "keyContentWords": [
+        "hospitality",
+        "supervisors",
+        "inventory",
+        "audits",
+        "shift"
+      ]
+    },
+    {
+      "id": "rs-043",
+      "sentence": "Contemporary architecture blends utilitarian concrete structures with energy-efficient glazed glass.",
+      "wordCount": 9,
+      "audioDurationSec": 3.6,
+      "keyContentWords": [
+        "architecture",
+        "utilitarian",
+        "concrete",
+        "energy-efficient",
+        "glass"
+      ]
+    },
+    {
+      "id": "rs-044",
+      "sentence": "Marine sanctuaries provide critical breeding habitats for migratory whale and dolphin pods.",
+      "wordCount": 11,
+      "audioDurationSec": 3.8,
+      "keyContentWords": [
+        "marine",
+        "sanctuaries",
+        "breeding",
+        "habitats",
+        "migratory"
+      ]
+    },
+    {
+      "id": "rs-045",
+      "sentence": "Artificial intelligence systems analyze clinical symptoms to assist diagnostic medical practitioners.",
+      "wordCount": 10,
+      "audioDurationSec": 3.6,
+      "keyContentWords": [
+        "artificial",
+        "intelligence",
+        "clinical",
+        "symptoms",
+        "practitioners"
+      ]
+    },
+    {
+      "id": "rs-046",
+      "sentence": "The university auditorium cannot accommodate more than four hundred seated conference delegates.",
+      "wordCount": 12,
+      "audioDurationSec": 3.9,
+      "keyContentWords": [
+        "auditorium",
+        "accommodate",
+        "hundred",
+        "conference",
+        "delegates"
+      ]
+    },
+    {
+      "id": "rs-047",
+      "sentence": "Professional chefs emphasize consistent seasoning and delicate knife precision during prep work.",
+      "wordCount": 11,
+      "audioDurationSec": 3.7,
+      "keyContentWords": [
+        "professional",
+        "seasoning",
+        "knife",
+        "precision",
+        "prep"
+      ]
+    },
+    {
+      "id": "rs-048",
+      "sentence": "Atmospheric ocean currents distribute thermal equilibrium across equatorial and polar regions.",
+      "wordCount": 10,
+      "audioDurationSec": 3.6,
+      "keyContentWords": [
+        "atmospheric",
+        "currents",
+        "equilibrium",
+        "equatorial",
+        "polar"
+      ]
+    },
+    {
+      "id": "rs-049",
+      "sentence": "Course enrollment amendments must be approved by the department advisor within two weeks.",
+      "wordCount": 12,
+      "audioDurationSec": 3.8,
+      "keyContentWords": [
+        "enrollment",
+        "amendments",
+        "approved",
+        "advisor",
+        "weeks"
+      ]
+    },
+    {
+      "id": "rs-050",
+      "sentence": "Economic models illustrate how fluctuating commodity prices affect domestic grocery inflation.",
+      "wordCount": 10,
+      "audioDurationSec": 3.5,
+      "keyContentWords": [
+        "economic",
+        "commodity",
+        "prices",
+        "domestic",
+        "inflation"
+      ]
     }
   ]
 }
