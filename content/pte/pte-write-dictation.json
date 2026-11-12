@@ -986,6 +986,864 @@
         "college",
         "students"
       ]
+    },
+    {
+      "id": "wfd-026",
+      "sentence": "Undergraduate students must submit their chemistry lab reports before Friday afternoon.",
+      "tokens": [
+        "undergraduate",
+        "students",
+        "must",
+        "submit",
+        "their",
+        "chemistry",
+        "lab",
+        "reports",
+        "before",
+        "friday",
+        "afternoon"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "undergraduate",
+          "commonErrors": [
+            "undergradute",
+            "undergraduat"
+          ]
+        },
+        {
+          "word": "chemistry",
+          "commonErrors": [
+            "chemisty",
+            "kemistry"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-027",
+      "sentence": "The university cafeteria offers nutritious dietary alternatives for international scholars.",
+      "tokens": [
+        "the",
+        "university",
+        "cafeteria",
+        "offers",
+        "nutritious",
+        "dietary",
+        "alternatives",
+        "for",
+        "international",
+        "scholars"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "cafeteria",
+          "commonErrors": [
+            "cafetaria",
+            "cafeteriya"
+          ]
+        },
+        {
+          "word": "nutritious",
+          "commonErrors": [
+            "nutritous",
+            "nutritiouss"
+          ]
+        },
+        {
+          "word": "alternatives",
+          "commonErrors": [
+            "alternetives",
+            "alternativs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-028",
+      "sentence": "Statistical data demonstrates significant correlation between physical exercise and cognitive health.",
+      "tokens": [
+        "statistical",
+        "data",
+        "demonstrates",
+        "significant",
+        "correlation",
+        "between",
+        "physical",
+        "exercise",
+        "and",
+        "cognitive",
+        "health"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "correlation",
+          "commonErrors": [
+            "corelation",
+            "correlasion"
+          ]
+        },
+        {
+          "word": "cognitive",
+          "commonErrors": [
+            "cognative",
+            "cognitiv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-029",
+      "sentence": "Modern culinary apprentices are required to demonstrate strict temperature hygiene compliance.",
+      "tokens": [
+        "modern",
+        "culinary",
+        "apprentices",
+        "are",
+        "required",
+        "to",
+        "demonstrate",
+        "strict",
+        "temperature",
+        "hygiene",
+        "compliance"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "apprentices",
+          "commonErrors": [
+            "aprentices",
+            "apprentises"
+          ]
+        },
+        {
+          "word": "hygiene",
+          "commonErrors": [
+            "hygene",
+            "hygeine"
+          ]
+        },
+        {
+          "word": "compliance",
+          "commonErrors": [
+            "complience",
+            "complianse"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-030",
+      "sentence": "Renewable solar installations have expanded dramatically across Western Australian rural properties.",
+      "tokens": [
+        "renewable",
+        "solar",
+        "installations",
+        "have",
+        "expanded",
+        "dramatically",
+        "across",
+        "western",
+        "australian",
+        "rural",
+        "properties"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "installations",
+          "commonErrors": [
+            "instalations",
+            "instalation"
+          ]
+        },
+        {
+          "word": "dramatically",
+          "commonErrors": [
+            "dramaticly",
+            "dramaticaly"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-031",
+      "sentence": "Peer-reviewed scientific publications require rigorous methodological replication before formal acceptance.",
+      "tokens": [
+        "peer-reviewed",
+        "scientific",
+        "publications",
+        "require",
+        "rigorous",
+        "methodological",
+        "replication",
+        "before",
+        "formal",
+        "acceptance"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "rigorous",
+          "commonErrors": [
+            "rigourous",
+            "rigorus"
+          ]
+        },
+        {
+          "word": "methodological",
+          "commonErrors": [
+            "methodologcal",
+            "methodlogical"
+          ]
+        },
+        {
+          "word": "acceptance",
+          "commonErrors": [
+            "acceptence",
+            "acceptans"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-032",
+      "sentence": "Students experiencing academic stress are encouraged to consult campus counseling counselors.",
+      "tokens": [
+        "students",
+        "experiencing",
+        "academic",
+        "stress",
+        "are",
+        "encouraged",
+        "to",
+        "consult",
+        "campus",
+        "counseling",
+        "counselors"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "experiencing",
+          "commonErrors": [
+            "experiencing",
+            "experiancing"
+          ]
+        },
+        {
+          "word": "counseling",
+          "commonErrors": [
+            "counselling",
+            "counceling"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-033",
+      "sentence": "Microbial fermentation produces vital organic acids that preserve artisan culinary products.",
+      "tokens": [
+        "microbial",
+        "fermentation",
+        "produces",
+        "vital",
+        "organic",
+        "acids",
+        "that",
+        "preserve",
+        "artisan",
+        "culinary",
+        "products"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "fermentation",
+          "commonErrors": [
+            "fermentasion",
+            "fermentaton"
+          ]
+        },
+        {
+          "word": "preserve",
+          "commonErrors": [
+            "perserve",
+            "presurve"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-034",
+      "sentence": "Environmental regulations mandate immediate reporting of hazardous chemical discharge incidents.",
+      "tokens": [
+        "environmental",
+        "regulations",
+        "mandate",
+        "immediate",
+        "reporting",
+        "of",
+        "hazardous",
+        "chemical",
+        "discharge",
+        "incidents"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "hazardous",
+          "commonErrors": [
+            "hasardous",
+            "hazardus"
+          ]
+        },
+        {
+          "word": "immediate",
+          "commonErrors": [
+            "imediate",
+            "immediat"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-035",
+      "sentence": "Hospitality supervisors must conduct thorough inventory audits at the close of every shift.",
+      "tokens": [
+        "hospitality",
+        "supervisors",
+        "must",
+        "conduct",
+        "thorough",
+        "inventory",
+        "audits",
+        "at",
+        "the",
+        "close",
+        "of",
+        "every",
+        "shift"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "supervisors",
+          "commonErrors": [
+            "supervisers",
+            "supervisorss"
+          ]
+        },
+        {
+          "word": "thorough",
+          "commonErrors": [
+            "through",
+            "thourogh"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-036",
+      "sentence": "Contemporary architecture blends utilitarian concrete structures with energy-efficient glazed glass.",
+      "tokens": [
+        "contemporary",
+        "architecture",
+        "blends",
+        "utilitarian",
+        "concrete",
+        "structures",
+        "with",
+        "energy-efficient",
+        "glazed",
+        "glass"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "contemporary",
+          "commonErrors": [
+            "contempary",
+            "contemporery"
+          ]
+        },
+        {
+          "word": "utilitarian",
+          "commonErrors": [
+            "utilaterian",
+            "utilatarian"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-037",
+      "sentence": "Marine sanctuaries provide critical breeding habitats for migratory whale and dolphin pods.",
+      "tokens": [
+        "marine",
+        "sanctuaries",
+        "provide",
+        "critical",
+        "breeding",
+        "habitats",
+        "for",
+        "migratory",
+        "whale",
+        "and",
+        "dolphin",
+        "pods"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "sanctuaries",
+          "commonErrors": [
+            "sancturies",
+            "sanctuarys"
+          ]
+        },
+        {
+          "word": "migratory",
+          "commonErrors": [
+            "migratary",
+            "migratery"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-038",
+      "sentence": "Artificial intelligence systems analyze clinical symptoms to assist diagnostic medical practitioners.",
+      "tokens": [
+        "artificial",
+        "intelligence",
+        "systems",
+        "analyze",
+        "clinical",
+        "symptoms",
+        "to",
+        "assist",
+        "diagnostic",
+        "medical",
+        "practitioners"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "practitioners",
+          "commonErrors": [
+            "practicioners",
+            "practishioners"
+          ]
+        },
+        {
+          "word": "symptoms",
+          "commonErrors": [
+            "symtoms",
+            "simptoms"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-039",
+      "sentence": "The university auditorium cannot accommodate more than four hundred seated conference delegates.",
+      "tokens": [
+        "the",
+        "university",
+        "auditorium",
+        "cannot",
+        "accommodate",
+        "more",
+        "than",
+        "four",
+        "hundred",
+        "seated",
+        "conference",
+        "delegates"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "accommodate",
+          "commonErrors": [
+            "acommodate",
+            "accomodate"
+          ]
+        },
+        {
+          "word": "auditorium",
+          "commonErrors": [
+            "auditerium",
+            "audotorium"
+          ]
+        },
+        {
+          "word": "delegates",
+          "commonErrors": [
+            "delegats",
+            "delegats"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-040",
+      "sentence": "Professional chefs emphasize consistent seasoning and delicate knife precision during prep work.",
+      "tokens": [
+        "professional",
+        "chefs",
+        "emphasize",
+        "consistent",
+        "seasoning",
+        "and",
+        "delicate",
+        "knife",
+        "precision",
+        "during",
+        "prep",
+        "work"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "precision",
+          "commonErrors": [
+            "presision",
+            "precission"
+          ]
+        },
+        {
+          "word": "consistent",
+          "commonErrors": [
+            "consistant",
+            "consistente"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-041",
+      "sentence": "Atmospheric ocean currents distribute thermal equilibrium across equatorial and polar regions.",
+      "tokens": [
+        "atmospheric",
+        "ocean",
+        "currents",
+        "distribute",
+        "thermal",
+        "equilibrium",
+        "across",
+        "equatorial",
+        "and",
+        "polar",
+        "regions"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "equilibrium",
+          "commonErrors": [
+            "equilibirum",
+            "equillibrium"
+          ]
+        },
+        {
+          "word": "equatorial",
+          "commonErrors": [
+            "equitorial",
+            "equateriel"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-042",
+      "sentence": "Course enrollment amendments must be approved by the department advisor within two weeks.",
+      "tokens": [
+        "course",
+        "enrollment",
+        "amendments",
+        "must",
+        "be",
+        "approved",
+        "by",
+        "the",
+        "department",
+        "advisor",
+        "within",
+        "two",
+        "weeks"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "enrollment",
+          "commonErrors": [
+            "enrolment",
+            "enrollement"
+          ]
+        },
+        {
+          "word": "amendments",
+          "commonErrors": [
+            "ammendments",
+            "amendmentes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-043",
+      "sentence": "Economic models illustrate how fluctuating commodity prices affect domestic grocery inflation.",
+      "tokens": [
+        "economic",
+        "models",
+        "illustrate",
+        "how",
+        "fluctuating",
+        "commodity",
+        "prices",
+        "affect",
+        "domestic",
+        "grocery",
+        "inflation"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "fluctuating",
+          "commonErrors": [
+            "fluctating",
+            "fluctueting"
+          ]
+        },
+        {
+          "word": "commodity",
+          "commonErrors": [
+            "comodity",
+            "commoditty"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-044",
+      "sentence": "Desalination facilities convert ocean saltwater into high quality drinking water for metropolitan residents.",
+      "tokens": [
+        "desalination",
+        "facilities",
+        "convert",
+        "ocean",
+        "saltwater",
+        "into",
+        "high",
+        "quality",
+        "drinking",
+        "water",
+        "for",
+        "metropolitan",
+        "residents"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "desalination",
+          "commonErrors": [
+            "desalanation",
+            "desalinasion"
+          ]
+        },
+        {
+          "word": "facilities",
+          "commonErrors": [
+            "facilties",
+            "facillities"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-045",
+      "sentence": "Culinary apprentices must memorize internal meat cooking temperatures to ensure hygiene safety.",
+      "tokens": [
+        "culinary",
+        "apprentices",
+        "must",
+        "memorize",
+        "internal",
+        "meat",
+        "cooking",
+        "temperatures",
+        "to",
+        "ensure",
+        "hygiene",
+        "safety"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "apprentices",
+          "commonErrors": [
+            "aprentices",
+            "apprentises"
+          ]
+        },
+        {
+          "word": "hygiene",
+          "commonErrors": [
+            "hygene",
+            "hygeine"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-046",
+      "sentence": "The university botanical garden preserves rare indigenous flora for academic research.",
+      "tokens": [
+        "the",
+        "university",
+        "botanical",
+        "garden",
+        "preserves",
+        "rare",
+        "indigenous",
+        "flora",
+        "for",
+        "academic",
+        "research"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "indigenous",
+          "commonErrors": [
+            "indigenus",
+            "indigenious"
+          ]
+        },
+        {
+          "word": "botanical",
+          "commonErrors": [
+            "botanicle",
+            "botannical"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-047",
+      "sentence": "Renewable energy microgrids deliver uninterrupted electricity to isolated outback mining communities.",
+      "tokens": [
+        "renewable",
+        "energy",
+        "microgrids",
+        "deliver",
+        "uninterrupted",
+        "electricity",
+        "to",
+        "isolated",
+        "outback",
+        "mining",
+        "communities"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "uninterrupted",
+          "commonErrors": [
+            "uninterupted",
+            "uninterruptedd"
+          ]
+        },
+        {
+          "word": "microgrids",
+          "commonErrors": [
+            "micro-grids",
+            "microgrides"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-048",
+      "sentence": "Laboratory technicians wear protective safety goggles during chemical titration experiments.",
+      "tokens": [
+        "laboratory",
+        "technicians",
+        "wear",
+        "protective",
+        "safety",
+        "goggles",
+        "during",
+        "chemical",
+        "titration",
+        "experiments"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "technicians",
+          "commonErrors": [
+            "technitians",
+            "tecnicians"
+          ]
+        },
+        {
+          "word": "titration",
+          "commonErrors": [
+            "titrasion",
+            "titraton"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-049",
+      "sentence": "Hospitality supervisors emphasize customer satisfaction and swift order turnaround times.",
+      "tokens": [
+        "hospitality",
+        "supervisors",
+        "emphasize",
+        "customer",
+        "satisfaction",
+        "and",
+        "swift",
+        "order",
+        "turnaround",
+        "times"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "satisfaction",
+          "commonErrors": [
+            "satisfaksion",
+            "satisfation"
+          ]
+        },
+        {
+          "word": "supervisors",
+          "commonErrors": [
+            "supervisers",
+            "supervisorss"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wfd-050",
+      "sentence": "The doctoral dissertation examines macroeconomic policies during periods of severe financial inflation.",
+      "tokens": [
+        "the",
+        "doctoral",
+        "dissertation",
+        "examines",
+        "macroeconomic",
+        "policies",
+        "during",
+        "periods",
+        "of",
+        "severe",
+        "financial",
+        "inflation"
+      ],
+      "spellingChallenges": [
+        {
+          "word": "dissertation",
+          "commonErrors": [
+            "dissertasion",
+            "disertation"
+          ]
+        },
+        {
+          "word": "macroeconomic",
+          "commonErrors": [
+            "macro-economic",
+            "macroeconomik"
+          ]
+        }
+      ]
     }
   ]
 }

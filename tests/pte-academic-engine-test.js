@@ -503,4 +503,51 @@ test('FiezelPteUi transitions sections and evaluates reading/listening tasks', (
   assert.ok(mockContainer.innerHTML.includes('Listening'));
 });
 
+// 30. Handy Human-VAD & Speech Recognition Integration in UI
+test('FiezelPteUi HandyHumanVad accurately discriminates human vocal formants and isolates speech', () => {
+  const ui = require('../features/pte/fiezel-pte-ui.js');
+  assert.ok(ui.HandyHumanVad, 'HandyHumanVad must be accessible on FiezelPteUi');
+  const vad = new ui.HandyHumanVad({ threshold: 0.45, prefillFrames: 15, hangoverFrames: 12 });
+
+  // Pure silence rejection
+  const silence = new Float32Array(512);
+  const silenceScore = vad.scoreFrame512(silence);
+  assert.strictEqual(silenceScore.isVoice, false);
+
+  // Impulse click rejection
+  const click = new Float32Array(512);
+  click[15] = 0.95;
+  const clickScore = vad.scoreFrame512(click);
+  assert.strictEqual(clickScore.isVoice, false);
+
+  // Vocal formant synthesis (F0 chest voice + F1 vowel + F2 vocal tract formant)
+  const voice = new Float32Array(512);
+  for (let i = 0; i < 512; i++) {
+    const t = i / 16000;
+    voice[i] = 0.35 * Math.sin(2 * Math.PI * 150 * t) +
+               0.25 * Math.sin(2 * Math.PI * 600 * t) +
+               0.15 * Math.sin(2 * Math.PI * 1200 * t);
+  }
+  const voiceScore = vad.scoreFrame512(voice);
+  assert.ok(voiceScore.vocalSnrDb > 5);
+  assert.ok(voiceScore.pitchCorr > 0.5);
+  assert.strictEqual(voiceScore.isVoice, true);
+
+  const activeVad = ui.getHandyVad();
+  assert.ok(activeVad, 'Active Handy VAD singleton must be initialized');
+});
+
+// 31. True Speech Duration prevents hesitation penalty in Oral Fluency
+test('evaluateOralFluency scores 5 (Native-like) using true vocal duration rather than full timer countdown', () => {
+  // If student speaks 25 words in 11 seconds of actual voice, WPM = 136 WPM (Score 5: Native-like).
+  // If raw timer duration of 40s was used, WPM = 37 WPM (Score 1: Disfluent penalty).
+  const engine = require('../features/pte/fiezel-pte-engine.js');
+  const rawTimerRes = engine.evaluateOralFluency(40, 25, 0);
+  assert.strictEqual(rawTimerRes.score, 1, 'Flawed raw countdown duration causes unfair disfluent score');
+
+  const handyVadTrueRes = engine.evaluateOralFluency(11, 25, 0);
+  assert.strictEqual(handyVadTrueRes.score, 5, 'Handy VAD true vocal duration accurately awards Native-like fluency');
+  assert.strictEqual(handyVadTrueRes.wpm, 136);
+});
+
 console.log(`\nAll ${passedTests} PTE Academic Engine unit tests PASSED successfully!`);

@@ -46,6 +46,76 @@
       "wordLimit": "50-70 words strictly",
       "modelSummary": "The speaker highlighted the severe dangers of chronic sleep deprivation on neurological function, explaining that slow-wave sleep flushes out dangerous metabolic waste. Furthermore, insufficient rest impairs prefrontal cortex capacity and elevates emotional reactivity. In conclusion, neurological research confirms that restorative sleep is an essential biological prerequisite for cognitive health and occupational performance.",
       "modelWordCount": 49
+    },
+    {
+      "id": "sst-006",
+      "title": "Cold Chain Logistics and Microbial Growth",
+      "audioTranscript": "In commercial foodservice and international food trade, cold chain logistics forms the primary barrier against foodborne pathogens. Microbial organisms like Salmonella and Listeria proliferate exponentially when high-risk foods dwell between five and sixty degrees Celsius, known as the danger zone. Modern refrigerated transport utilizes continuous IoT temperature loggers to verify that meat and dairy remain below statutory thresholds throughout distribution, ensuring public health safety and product shelf life.",
+      "modelSummary": "The lecture discusses cold chain logistics in commercial foodservice, highlighting how foodborne pathogens proliferate exponentially within temperature danger zones. It emphasizes the importance of IoT temperature loggers during distribution to ensure public health safety and prevent spoilage.",
+      "modelWordCount": 39
+    },
+    {
+      "id": "sst-007",
+      "title": "Urban Green Corridors and Biodiversity",
+      "audioTranscript": "Urban expansion traditionally fragments natural animal habitats, isolating species in small ecological pockets. City planners are now designing continuous green corridors—linear strips of native trees, pollinator gardens, and vegetated riverbanks. These ecological bridges enable birds, insects, and small mammals to migrate between parks, promoting genetic diversity and mitigating urban heat island temperatures in densely populated metropolitan areas.",
+      "modelSummary": "The speaker examines urban green corridors, explaining how continuous ecological bridges reconnect fragmented habitats in cities. These vegetated pathways facilitate wildlife migration, enhance genetic diversity, and significantly reduce urban temperatures in metropolitan environments.",
+      "modelWordCount": 34
+    },
+    {
+      "id": "sst-008",
+      "title": "Renewable Microgrids in Remote Communities",
+      "audioTranscript": "Remote Australian outback towns historically relied exclusively on expensive diesel fuel generators shipped over thousand-kilometer gravel tracks. Recent advancements in battery energy storage and bifacial solar arrays have enabled the deployment of isolated renewable microgrids. Smart inverters balance intermittent solar generation with battery discharge, slashing diesel consumption by eighty percent and providing reliable, emission-free electricity to Indigenous and mining settlements.",
+      "modelSummary": "The lecture explores renewable microgrids in remote communities, explaining how solar arrays and battery energy storage replace costly diesel generators. Smart inverters ensure grid stability, dramatically reducing fuel consumption and delivering reliable, clean electricity to isolated settlements.",
+      "modelWordCount": 36
+    },
+    {
+      "id": "sst-009",
+      "title": "Neurogastronomy and Multisensory Dining",
+      "audioTranscript": "Scientific investigation into flavor perception demonstrates that taste buds detect only fundamental chemical compounds on the tongue. In contrast, complex dining enjoyment is formulated in the brain through multisensory synthesis. Researchers found that background acoustic music, plate coloration, and utensil weight dramatically influence perceived food sweetness and acidity, allowing culinary artists to craft healthier dishes with lower sugar and salt content.",
+      "modelSummary": "The talk discusses neurogastronomy and multisensory dining, explaining that flavor perception is synthesized in the brain rather than solely on the tongue. It highlights how sound, color, and texture influence taste, enabling chefs to reduce sugar and salt.",
+      "modelWordCount": 39
+    },
+    {
+      "id": "sst-010",
+      "title": "Autonomous Maritime Cargo Vessels",
+      "audioTranscript": "Maritime shipping corporations are developing unmanned autonomous container vessels to increase oceanic freight efficiency. Controlled through satellite communication and onboard machine learning vision systems, these computer-piloted cargo ships eliminate crew quarters and life-support systems, maximizing cargo capacity while eliminating human navigational errors that cause costly commercial harbor collisions.",
+      "modelSummary": "The speaker analyzes autonomous maritime cargo vessels, explaining how artificial intelligence and satellite navigation enable unmanned commercial shipping. This innovation maximizes freight capacity, lowers operational costs, and minimizes human errors that lead to harbor accidents.",
+      "modelWordCount": 35
+    },
+    {
+      "id": "sst-011",
+      "title": "Reverse Osmosis Desalination Energy Efficiency",
+      "audioTranscript": "Reverse osmosis desalination facilities separate fresh potable water from ocean saltwater by forcing seawater across semipermeable polyamide membranes under immense pressure. Historically, these high-pressure pumps consumed tremendous amounts of grid electricity. Modern energy recovery devices now capture kinetic pressure from escaping brine streams, recycling up to ninety-eight percent of the mechanical energy back into the incoming feed stream, drastically reducing operational carbon footprints.",
+      "modelSummary": "The lecture discusses reverse osmosis desalination, explaining how seawater is filtered across semipermeable membranes under pressure. It emphasizes how modern energy recovery devices recycle kinetic energy from escaping brine, substantially lowering electricity consumption and carbon emissions.",
+      "modelWordCount": 36
+    },
+    {
+      "id": "sst-012",
+      "title": "HACCP Temperature Monitoring in Kitchens",
+      "audioTranscript": "Hospitality venues must manage food storage temperatures rigorously to safeguard public health. Raw poultry, minced meats, and seafood spoil rapidly if kept between five and sixty degrees Celsius. Head chefs enforce daily digital thermometer logs, verifying that refrigeration stays under five degrees and cooked proteins reach seventy-five degrees. Failure to maintain these statutory temperature logs can result in immediate legal closures.",
+      "modelSummary": "The speaker examines HACCP temperature controls in commercial kitchens, highlighting the dangers of bacterial growth between five and sixty degrees. It emphasizes that maintaining strict temperature logs for cooking and chilling prevents foodborne illnesses and regulatory business closures.",
+      "modelWordCount": 37
+    },
+    {
+      "id": "sst-013",
+      "title": "Autonomous Agricultural Robotics",
+      "audioTranscript": "Modern agriculture is experiencing rapid automation with the introduction of autonomous field robotics. Solar-powered robotic rovers utilize computer vision algorithms to distinguish between emerging crop seedlings and invasive weeds. Instead of blanket chemical herbicide spraying, these precision machines apply targeted micro-doses or mechanically slice weed roots, slashing chemical input costs by eighty percent while protecting local soil microbiomes.",
+      "modelSummary": "The lecture explores autonomous agricultural robotics, describing how solar-powered rovers use computer vision to identify and remove weeds. By targeting individual weeds rather than spraying broad fields, these machines reduce chemical herbicide use and protect soil ecology.",
+      "modelWordCount": 36
+    },
+    {
+      "id": "sst-014",
+      "title": "Urban Architecture and Acoustical Engineering",
+      "audioTranscript": "Rapid urban densification often places residential apartment buildings adjacent to busy freeways and elevated railways. Acoustic engineers incorporate architectural decoupling, including floating concrete floors, resilient sound-isolation clips, and double-laminated glazing. These structural acoustic dampening techniques prevent low-frequency rumble and airborne traffic noise from disturbing residential sleeping quarters.",
+      "modelSummary": "The talk examines acoustical engineering in urban apartment design, explaining how floating floors and laminated glazing mitigate freeway and transit noise. These structural sound-isolation methods ensure domestic quietness and improve resident well-being in dense cities.",
+      "modelWordCount": 35
+    },
+    {
+      "id": "sst-015",
+      "title": "Biodiversity Conservation on Remote Australian Islands",
+      "audioTranscript": "Isolated Australian islands serve as crucial arks for endangered native species threatened on the mainland by feral cats and foxes. On Rottnest Island and Barrow Island, strict quarantine protocols prevent the introduction of invasive rodents and plant seeds. Biologists monitor endemic marsupials and reptiles, using genetic testing to ensure isolated island populations maintain sufficient gene diversity for long-term survival.",
+      "modelSummary": "The speaker discusses biodiversity conservation on remote Australian islands, explaining how strict quarantine protects native marsupials from feral predators. Continuous biological monitoring and genetic testing ensure these isolated endangered populations maintain sufficient genetic health for long-term survival.",
+      "modelWordCount": 35
     }
   ]
 }

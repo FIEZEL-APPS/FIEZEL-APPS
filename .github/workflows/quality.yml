@@ -1513,6 +1513,7 @@ jobs:
         run: |
           node tests/pte-academic-engine-test.js
           node tests/pte-bank-integrity-test.js
+          node tests/pte-handy-vad-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +

@@ -1,7 +1,10 @@
 {
   "version": "1.1.0",
   "task": "Read Aloud",
-  "crossSkills": ["Speaking", "Reading"],
+  "crossSkills": [
+    "Speaking",
+    "Reading"
+  ],
   "pool": "Pearson PTE Academic Recurring Real Exam Prediction Bank",
   "items": [
     {
@@ -14,11 +17,36 @@
       "wordCount": 49,
       "chunking": "Market research is a vital part // of the planning process of any business. // It involves collecting information // which provides an insight // into the customers' thinking, // buying patterns and location. // In addition, // market research can also help you discover // whether there is a market // for your products or services.",
       "phoneticChallenges": [
-        { "word": "vital", "ipa": "/ˈvaɪtəl/", "tip": "Tekan depan: VYE-tul." },
-        { "word": "insight", "ipa": "/ˈɪnsaɪt/", "tip": "IN-syte." },
-        { "word": "patterns", "ipa": "/ˈpætənz/", "tip": "PAT-urnz." }
+        {
+          "word": "vital",
+          "ipa": "/ˈvaɪtəl/",
+          "tip": "Tekan depan: VYE-tul."
+        },
+        {
+          "word": "insight",
+          "ipa": "/ˈɪnsaɪt/",
+          "tip": "IN-syte."
+        },
+        {
+          "word": "patterns",
+          "ipa": "/ˈpætənz/",
+          "tip": "PAT-urnz."
+        }
       ],
-      "keywords": ["market", "research", "vital", "planning", "business", "collecting", "information", "insight", "customers", "patterns", "products", "services"]
+      "keywords": [
+        "market",
+        "research",
+        "vital",
+        "planning",
+        "business",
+        "collecting",
+        "information",
+        "insight",
+        "customers",
+        "patterns",
+        "products",
+        "services"
+      ]
     },
     {
       "id": "ra-002",
@@ -30,11 +58,31 @@
       "wordCount": 35,
       "chunking": "Domestication is a sustained multi-generational relationship // in which one group of organisms // assumes a significant degree of influence // over the reproduction and care of another group // to secure a more predictable supply of resources.",
       "phoneticChallenges": [
-        { "word": "domestication", "ipa": "/dəˌmestɪˈkeɪʃən/", "tip": "duh-mes-tih-KAY-shun." },
-        { "word": "multi-generational", "ipa": "/ˌmʌltiˌdʒenəˈreɪʃənəl/", "tip": "mul-tee-jen-er-AY-shun-ul." },
-        { "word": "organisms", "ipa": "/ˈɔːɡənɪzəmz/", "tip": "OR-guh-niz-umz." }
+        {
+          "word": "domestication",
+          "ipa": "/dəˌmestɪˈkeɪʃən/",
+          "tip": "duh-mes-tih-KAY-shun."
+        },
+        {
+          "word": "multi-generational",
+          "ipa": "/ˌmʌltiˌdʒenəˈreɪʃənəl/",
+          "tip": "mul-tee-jen-er-AY-shun-ul."
+        },
+        {
+          "word": "organisms",
+          "ipa": "/ˈɔːɡənɪzəmz/",
+          "tip": "OR-guh-niz-umz."
+        }
       ],
-      "keywords": ["domestication", "sustained", "multi-generational", "organisms", "reproduction", "predictable", "resources"]
+      "keywords": [
+        "domestication",
+        "sustained",
+        "multi-generational",
+        "organisms",
+        "reproduction",
+        "predictable",
+        "resources"
+      ]
     },
     {
       "id": "ra-003",
@@ -46,11 +94,32 @@
       "wordCount": 36,
       "chunking": "Lincoln's legendary address // was delivered on the battlefield of Gettysburg. // He spoke for just two minutes, // yet his speech remains // one of the most powerful and memorable statements // on human freedom and equality // in American history.",
       "phoneticChallenges": [
-        { "word": "legendary", "ipa": "/ˈledʒəndəri/", "tip": "LEJ-un-dare-ee." },
-        { "word": "battlefield", "ipa": "/ˈbætlfiːld/", "tip": "BAT-ul-feeld." },
-        { "word": "equality", "ipa": "/ɪˈkwɒləti/", "tip": "ih-KWOL-ih-tee." }
+        {
+          "word": "legendary",
+          "ipa": "/ˈledʒəndəri/",
+          "tip": "LEJ-un-dare-ee."
+        },
+        {
+          "word": "battlefield",
+          "ipa": "/ˈbætlfiːld/",
+          "tip": "BAT-ul-feeld."
+        },
+        {
+          "word": "equality",
+          "ipa": "/ɪˈkwɒləti/",
+          "tip": "ih-KWOL-ih-tee."
+        }
       ],
-      "keywords": ["Lincoln", "legendary", "address", "battlefield", "Gettysburg", "memorable", "freedom", "equality"]
+      "keywords": [
+        "Lincoln",
+        "legendary",
+        "address",
+        "battlefield",
+        "Gettysburg",
+        "memorable",
+        "freedom",
+        "equality"
+      ]
     },
     {
       "id": "ra-004",
@@ -62,11 +131,34 @@
       "wordCount": 30,
       "chunking": "When countries assess their carbon emissions, // they commonly calculate only the gases produced // within their national borders. // This standard accounting method // excludes the emissions generated // to produce imported consumer goods.",
       "phoneticChallenges": [
-        { "word": "emissions", "ipa": "/iˈmɪʃənz/", "tip": "ih-MISH-unz." },
-        { "word": "accounting", "ipa": "/əˈkaʊntɪŋ/", "tip": "uh-KOWN-ting." },
-        { "word": "imported", "ipa": "/ɪmˈpɔːtɪd/", "tip": "im-POR-ted." }
+        {
+          "word": "emissions",
+          "ipa": "/iˈmɪʃənz/",
+          "tip": "ih-MISH-unz."
+        },
+        {
+          "word": "accounting",
+          "ipa": "/əˈkaʊntɪŋ/",
+          "tip": "uh-KOWN-ting."
+        },
+        {
+          "word": "imported",
+          "ipa": "/ɪmˈpɔːtɪd/",
+          "tip": "im-POR-ted."
+        }
       ],
-      "keywords": ["countries", "assess", "carbon", "emissions", "calculate", "national", "borders", "imported", "consumer", "goods"]
+      "keywords": [
+        "countries",
+        "assess",
+        "carbon",
+        "emissions",
+        "calculate",
+        "national",
+        "borders",
+        "imported",
+        "consumer",
+        "goods"
+      ]
     },
     {
       "id": "ra-005",
@@ -78,11 +170,33 @@
       "wordCount": 31,
       "chunking": "Cooking is both an art // and an exacting science. // When professional chefs understand // how food ingredients react to precise temperatures, // they can consistently create // nutritious and flavorful dishes // for their guests.",
       "phoneticChallenges": [
-        { "word": "ingredients", "ipa": "/ɪnˈɡriːdiənts/", "tip": "in-GREE-dee-unts." },
-        { "word": "temperatures", "ipa": "/ˈtemprətʃərz/", "tip": "TEM-pruh-churz." },
-        { "word": "nutritious", "ipa": "/njuːˈtrɪʃəs/", "tip": "nyoo-TRISH-us." }
+        {
+          "word": "ingredients",
+          "ipa": "/ɪnˈɡriːdiənts/",
+          "tip": "in-GREE-dee-unts."
+        },
+        {
+          "word": "temperatures",
+          "ipa": "/ˈtemprətʃərz/",
+          "tip": "TEM-pruh-churz."
+        },
+        {
+          "word": "nutritious",
+          "ipa": "/njuːˈtrɪʃəs/",
+          "tip": "nyoo-TRISH-us."
+        }
       ],
-      "keywords": ["cooking", "exacting", "science", "professional", "chefs", "ingredients", "temperatures", "nutritious", "flavorful"]
+      "keywords": [
+        "cooking",
+        "exacting",
+        "science",
+        "professional",
+        "chefs",
+        "ingredients",
+        "temperatures",
+        "nutritious",
+        "flavorful"
+      ]
     },
     {
       "id": "ra-006",
@@ -94,11 +208,31 @@
       "wordCount": 28,
       "chunking": "Effective hospitality management // relies upon comprehensive communication // between kitchen staff and front-of-house teams. // Maintaining immaculate hygiene standards // ensures guest satisfaction // and complies with national food safety regulations.",
       "phoneticChallenges": [
-        { "word": "hospitality", "ipa": "/ˌhɒspɪˈtæləti/", "tip": "hosp-ih-TAL-ih-tee." },
-        { "word": "hygiene", "ipa": "/ˈhaɪdʒiːn/", "tip": "HIGH-jeen." },
-        { "word": "regulations", "ipa": "/ˌreɡjuˈleɪʃənz/", "tip": "reg-yoo-LAY-shunz." }
+        {
+          "word": "hospitality",
+          "ipa": "/ˌhɒspɪˈtæləti/",
+          "tip": "hosp-ih-TAL-ih-tee."
+        },
+        {
+          "word": "hygiene",
+          "ipa": "/ˈhaɪdʒiːn/",
+          "tip": "HIGH-jeen."
+        },
+        {
+          "word": "regulations",
+          "ipa": "/ˌreɡjuˈleɪʃənz/",
+          "tip": "reg-yoo-LAY-shunz."
+        }
       ],
-      "keywords": ["hospitality", "management", "communication", "kitchen", "hygiene", "satisfaction", "regulations"]
+      "keywords": [
+        "hospitality",
+        "management",
+        "communication",
+        "kitchen",
+        "hygiene",
+        "satisfaction",
+        "regulations"
+      ]
     },
     {
       "id": "ra-007",
@@ -110,11 +244,703 @@
       "wordCount": 31,
       "chunking": "Vocational education institutions in Western Australia // provide practical, hands-on training // that aligns directly with industry workforce requirements. // Students gain valuable practical competencies, // opening dependable pathways // to professional employment // and career advancement.",
       "phoneticChallenges": [
-        { "word": "vocational", "ipa": "/vəʊˈkeɪʃənəl/", "tip": "voh-KAY-shun-ul." },
-        { "word": "competencies", "ipa": "/ˈkɒmpɪtənsiz/", "tip": "KOM-pih-tun-seez." },
-        { "word": "advancement", "ipa": "/ədˈvɑːnsmənt/", "tip": "ud-VAHN-smunt." }
+        {
+          "word": "vocational",
+          "ipa": "/vəʊˈkeɪʃənəl/",
+          "tip": "voh-KAY-shun-ul."
+        },
+        {
+          "word": "competencies",
+          "ipa": "/ˈkɒmpɪtənsiz/",
+          "tip": "KOM-pih-tun-seez."
+        },
+        {
+          "word": "advancement",
+          "ipa": "/ədˈvɑːnsmənt/",
+          "tip": "ud-VAHN-smunt."
+        }
       ],
-      "keywords": ["vocational", "institutions", "workforce", "requirements", "competencies", "dependable", "advancement"]
+      "keywords": [
+        "vocational",
+        "institutions",
+        "workforce",
+        "requirements",
+        "competencies",
+        "dependable",
+        "advancement"
+      ]
+    },
+    {
+      "id": "ra-008",
+      "title": "Cold Chain Logistics in Food Preservation",
+      "category": "Culinary & Food Science",
+      "text": "Maintaining uninterrupted cold chain logistics is indispensable for modern culinary establishments. Chilled seafood, poultry, and dairy perishables must remain strictly within refrigeration thresholds from delivery docks to commercial prep counters, preventing exponential bacterial proliferation.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Maintaining uninterrupted cold chain logistics // is indispensable for modern culinary establishments. // Chilled seafood, poultry, and dairy perishables // must remain strictly within refrigeration thresholds // from delivery docks to commercial prep counters, // preventing exponential bacterial proliferation.",
+      "keywords": [
+        "uninterrupted",
+        "cold chain",
+        "logistics",
+        "perishables",
+        "refrigeration",
+        "proliferation"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "indispensable",
+          "ipa": "/ˌɪn.dɪˈspen.sə.bəl/",
+          "tip": "Stress on pen"
+        }
+      ]
+    },
+    {
+      "id": "ra-009",
+      "title": "Knife Skills and Kitchen Ergonomics",
+      "category": "Commercial Cookery & Safety",
+      "text": "Precision knife execution defines culinary mastery and professional kitchen efficiency. Chefs utilize specialized grips to stabilize vegetable cuts, maintaining rhythmic cadence while minimizing repetitive wrist strain and acute laceration hazards during high-volume banquet preparation.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Precision knife execution // defines culinary mastery and professional kitchen efficiency. // Chefs utilize specialized grips // to stabilize vegetable cuts, // maintaining rhythmic cadence // while minimizing repetitive wrist strain // and acute laceration hazards during high-volume banquet preparation.",
+      "keywords": [
+        "precision",
+        "execution",
+        "culinary",
+        "cadence",
+        "laceration",
+        "banquet"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "cadence",
+          "ipa": "/ˈkeɪ.dəns/",
+          "tip": "Stress on first syllable"
+        }
+      ]
+    },
+    {
+      "id": "ra-010",
+      "title": "Desalination and Perth Drinking Water",
+      "category": "Western Australia Ecology",
+      "text": "Western Australia has pioneered reverse osmosis seawater desalination to secure Perth's metropolitan drinking water supply. With drying regional winter climates reducing surface dam inflows, renewable-powered coastal plants now satisfy nearly half of the capital city's daily potable water requirements.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Western Australia has pioneered // reverse osmosis seawater desalination // to secure Perth's metropolitan drinking water supply. // With drying regional winter climates // reducing surface dam inflows, // renewable-powered coastal plants // now satisfy nearly half // of the capital city's daily potable water requirements.",
+      "keywords": [
+        "pioneered",
+        "desalination",
+        "potable",
+        "metropolitan",
+        "osmosis",
+        "renewable"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "desalination",
+          "ipa": "/ˌdiːˌsæl.ɪˈneɪ.ʃən/",
+          "tip": "Stress on nay"
+        }
+      ]
+    },
+    {
+      "id": "ra-011",
+      "title": "Pilbara Iron Ore Autonomous Rail Transport",
+      "category": "Australian Mining Economics",
+      "text": "In the remote Pilbara region of Western Australia, resource mining giants operate fully autonomous heavy-haul freight locomotives. Spanning hundreds of kilometers across arid outback corridors, automated trains deliver vast iron ore shipments to coastal ports with millimeter satellite precision.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "In the remote Pilbara region // of Western Australia, // resource mining giants operate // fully autonomous heavy-haul freight locomotives. // Spanning hundreds of kilometers // across arid outback corridors, // automated trains deliver vast iron ore shipments // to coastal ports with millimeter satellite precision.",
+      "keywords": [
+        "autonomous",
+        "locomotives",
+        "freight",
+        "corridors",
+        "shipments",
+        "satellite"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "autonomous",
+          "ipa": "/ɔːˈtɒn.ə.məs/",
+          "tip": "Stress on ton"
+        }
+      ]
+    },
+    {
+      "id": "ra-012",
+      "title": "Neuroplasticity and Adult Language Acquisition",
+      "category": "Cognitive Neuroscience",
+      "text": "Neuroplasticity demonstrates that adult human brains retain dynamic structural adaptability throughout lifetime learning. Consistent verbal immersion stimulates dendritic arborization across auditory and motor cortices, establishing robust synaptic pathways essential for fluent second-language articulation.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Neuroplasticity demonstrates // that adult human brains retain dynamic structural adaptability // throughout lifetime learning. // Consistent verbal immersion // stimulates dendritic arborization // across auditory and motor cortices, // establishing robust synaptic pathways // essential for fluent second-language articulation.",
+      "keywords": [
+        "neuroplasticity",
+        "adaptability",
+        "dendritic",
+        "synaptic",
+        "articulation",
+        "cortices"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "neuroplasticity",
+          "ipa": "/ˌnjʊə.rəʊ.plæsˈtɪs.ə.ti/",
+          "tip": "Stress on tis"
+        }
+      ]
+    },
+    {
+      "id": "ra-013",
+      "title": "Quantum Computing and Cryptographic Integrity",
+      "category": "Computer Science & Cryptography",
+      "text": "Quantum computing leverages the principles of superposition and quantum entanglement to execute parallel calculations exponentially faster than classical supercomputers. This processing breakthrough threatens traditional public-key encryption, compelling mathematicians to engineer post-quantum cryptographic defenses.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Quantum computing leverages // the principles of superposition // and quantum entanglement // to execute parallel calculations // exponentially faster than classical supercomputers. // This processing breakthrough threatens traditional public-key encryption, // compelling mathematicians to engineer // post-quantum cryptographic defenses.",
+      "keywords": [
+        "superposition",
+        "entanglement",
+        "exponentially",
+        "cryptographic",
+        "encryption",
+        "defenses"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "entanglement",
+          "ipa": "/ɪnˈtæŋ.ɡəl.mənt/",
+          "tip": "Nasal ng sound"
+        }
+      ]
+    },
+    {
+      "id": "ra-014",
+      "title": "Allergen Management in Commercial Dining",
+      "category": "Hospitality Management",
+      "text": "Hospitality venues must implement rigorous allergen control programs to protect vulnerable patrons from anaphylactic shock. Designated cookware, separate sanitizing sinks, and exhaustive staff allergen briefings guarantee that trace peanut or gluten proteins never cross-contaminate dietary dining orders.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Hospitality venues must implement // rigorous allergen control programs // to protect vulnerable patrons from anaphylactic shock. // Designated cookware, // separate sanitizing sinks, // and exhaustive staff allergen briefings // guarantee that trace peanut or gluten proteins // never cross-contaminate dietary dining orders.",
+      "keywords": [
+        "anaphylactic",
+        "allergen",
+        "cookware",
+        "sanitizing",
+        "cross-contaminate",
+        "patrons"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "anaphylactic",
+          "ipa": "/ˌæn.ə.fɪˈlæk.tɪk/",
+          "tip": "Stress on lak"
+        }
+      ]
+    },
+    {
+      "id": "ra-015",
+      "title": "Rottnest Island Quokka Conservation",
+      "category": "Australian Wildlife Biology",
+      "text": "Rottnest Island, situated nineteen kilometers offshore from Fremantle, accommodates the world's primary sanctuary for the quokka. Isolated from introduced feral predators, these vulnerable marsupials thrive among coastal scrublands, offering researchers unique opportunities to examine native island ecology.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Rottnest Island, // situated nineteen kilometers offshore from Fremantle, // accommodates the world's primary sanctuary for the quokka. // Isolated from introduced feral predators, // these vulnerable marsupials thrive among coastal scrublands, // offering researchers unique opportunities // to examine native island ecology.",
+      "keywords": [
+        "sanctuary",
+        "marsupials",
+        "predators",
+        "quokka",
+        "offshore",
+        "scrublands"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "marsupials",
+          "ipa": "/mɑːˈsuː.pi.əlz/",
+          "tip": "Stress on soo"
+        }
+      ]
+    },
+    {
+      "id": "ra-016",
+      "title": "Atmospheric Microplastics in Oceanic Ecosystems",
+      "category": "Environmental Science",
+      "text": "Recent oceanographic research reveals that microscopic synthetic polymer fibers are carried across continents by atmospheric wind currents. When deposited into marine pelagic zones, these microscopic pollutants are ingested by zooplankton, inadvertently introducing hazardous chemical plasticizers into global marine food chains.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Recent oceanographic research reveals // that microscopic synthetic polymer fibers // are carried across continents by atmospheric wind currents. // When deposited into marine pelagic zones, // these microscopic pollutants are ingested by zooplankton, // inadvertently introducing hazardous chemical plasticizers // into global marine food chains.",
+      "keywords": [
+        "oceanographic",
+        "synthetic",
+        "pollutants",
+        "zooplankton",
+        "plasticizers",
+        "inadvertently"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "plasticizers",
+          "ipa": "/ˈplæs.tɪ.saɪ.zəz/",
+          "tip": "Stress on plas"
+        }
+      ]
+    },
+    {
+      "id": "ra-017",
+      "title": "Algorithmic Bias and Ethical Artificial Intelligence",
+      "category": "Artificial Intelligence Ethics",
+      "text": "Automated decision models trained on historic institutional datasets often inherit and amplify societal prejudices. Computer scientists emphasize algorithmic auditing, representative sampling, and transparent explainability frameworks to verify that credit evaluations, hiring screeners, and judicial diagnostics operate equitably.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Automated decision models // trained on historic institutional datasets // often inherit and amplify societal prejudices. // Computer scientists emphasize algorithmic auditing, // representative sampling, // and transparent explainability frameworks // to verify that credit evaluations, // hiring screeners, and judicial diagnostics // operate equitably.",
+      "keywords": [
+        "algorithmic",
+        "prejudices",
+        "sampling",
+        "explainability",
+        "equitably",
+        "diagnostics"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "equitably",
+          "ipa": "/ˈek.wɪ.tə.bli/",
+          "tip": "Stress on first syllable"
+        }
+      ]
+    },
+    {
+      "id": "ra-018",
+      "title": "Thermal Sous-Vide Cooking and Texture Optimization",
+      "category": "Culinary Science & Gastronomy",
+      "text": "Sous-vide culinary processing utilizes precision immersion circulators to cook vacuum-sealed proteins at low, uniform temperatures for prolonged durations. This method dissolves tough collagen connective tissues without denaturing delicate myofibrillar proteins, yielding exceptionally tender meats with minimal moisture loss.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Sous-vide culinary processing // utilizes precision immersion circulators // to cook vacuum-sealed proteins // at low, uniform temperatures // for prolonged durations. // This method dissolves tough collagen connective tissues // without denaturing delicate myofibrillar proteins, // yielding exceptionally tender meats // with minimal moisture loss.",
+      "keywords": [
+        "sous-vide",
+        "immersion",
+        "circulators",
+        "collagen",
+        "myofibrillar",
+        "prolonged"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "myofibrillar",
+          "ipa": "/ˌmaɪ.oʊ.faɪˈbrɪl.ər/",
+          "tip": "Stress on bril"
+        }
+      ]
+    },
+    {
+      "id": "ra-019",
+      "title": "Western Australia Renewable Hydrogen Export Corridors",
+      "category": "Energy Economics",
+      "text": "Vast expanses of coastal desert in northern Western Australia combine world-leading solar irradiance with intense nocturnal wind resources. Energy consortia are deploying multi-gigawatt electrolyzer hubs to manufacture zero-emission green ammonia, positioning the state as an indispensable clean energy exporter to East Asia.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Vast expanses of coastal desert // in northern Western Australia // combine world-leading solar irradiance // with intense nocturnal wind resources. // Energy consortia are deploying multi-gigawatt electrolyzer hubs // to manufacture zero-emission green ammonia, // positioning the state as an indispensable clean energy exporter // to East Asia.",
+      "keywords": [
+        "irradiance",
+        "nocturnal",
+        "consortia",
+        "electrolyzer",
+        "ammonia",
+        "indispensable"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "irradiance",
+          "ipa": "/ɪˈreɪ.di.əns/",
+          "tip": "Stress on ray"
+        }
+      ]
+    },
+    {
+      "id": "ra-020",
+      "title": "Behavioral Economics and Choice Architecture",
+      "category": "Behavioral Economics",
+      "text": "Classical financial theory assumes consumers make strictly rational decisions by optimizing utility. Conversely, behavioral economics demonstrates that cognitive heuristics, loss aversion, and subtle choice architecture significantly dictate spending decisions, demonstrating how defaulted options systematically guide consumer welfare.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Classical financial theory assumes // consumers make strictly rational decisions // by optimizing utility. // Conversely, behavioral economics demonstrates // that cognitive heuristics, loss aversion, // and subtle choice architecture // significantly dictate spending decisions, // demonstrating how defaulted options // systematically guide consumer welfare.",
+      "keywords": [
+        "heuristics",
+        "aversion",
+        "architecture",
+        "systematically",
+        "optimizing",
+        "welfare"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "heuristics",
+          "ipa": "/hjʊˈrɪs.tɪks/",
+          "tip": "Stress on ris"
+        }
+      ]
+    },
+    {
+      "id": "ra-021",
+      "title": "Fermentation Microbiology and Sourdough Ecology",
+      "category": "Food Science",
+      "text": "Artisan sourdough starters sustain a symbiotic micro-ecosystem comprising wild Saccharomyces yeasts and hetero-fermentative lactic acid bacteria. These microorganisms metabolize cereal starches, synthesizing carbon dioxide for dough leavening alongside acetic and lactic acids that produce signature sour complexities.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Artisan sourdough starters // sustain a symbiotic micro-ecosystem // comprising wild Saccharomyces yeasts // and hetero-fermentative lactic acid bacteria. // These microorganisms metabolize cereal starches, // synthesizing carbon dioxide for dough leavening // alongside acetic and lactic acids // that produce signature sour complexities.",
+      "keywords": [
+        "symbiotic",
+        "microorganisms",
+        "metabolize",
+        "fermentative",
+        "leavening",
+        "complexities"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "symbiotic",
+          "ipa": "/ˌsɪm.baɪˈɒt.ɪk/",
+          "tip": "Stress on ot"
+        }
+      ]
+    },
+    {
+      "id": "ra-022",
+      "title": "Urban Heat Island Mitigation through Green Roofs",
+      "category": "Urban Architecture & Ecology",
+      "text": "Dense metropolitan centers absorb and re-radiate intense solar radiation due to dark asphalt paving and concrete massing. Incorporating vegetated living roofs mitigates this thermal burden through plant evapotranspiration, reducing air conditioning electricity demand while filtering particulate stormwater runoff.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Dense metropolitan centers absorb and re-radiate // intense solar radiation // due to dark asphalt paving and concrete massing. // Incorporating vegetated living roofs // mitigates this thermal burden through plant evapotranspiration, // reducing air conditioning electricity demand // while filtering particulate stormwater runoff.",
+      "keywords": [
+        "metropolitan",
+        "evapotranspiration",
+        "asphalt",
+        "particulate",
+        "mitigates",
+        "stormwater"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "evapotranspiration",
+          "ipa": "/ɪˌvæp.oʊˌtræn.spɪˈreɪ.ʃən/",
+          "tip": "Stress on ray"
+        }
+      ]
+    },
+    {
+      "id": "ra-023",
+      "title": "Ancient Epigraphy and Inscription Decipherment",
+      "category": "Archaeology & Linguistics",
+      "text": "Epigraphers analyze weathered lapidary inscriptions engraved on stone monuments to reconstruct socio-political chronicles of antiquity. Advanced multispectral imaging reveals faint chisel incisions eroded by centuries of exposure, recovering fragmented historical records obscured to naked observation.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Epigraphers analyze weathered lapidary inscriptions // engraved on stone monuments // to reconstruct socio-political chronicles of antiquity. // Advanced multispectral imaging // reveals faint chisel incisions // eroded by centuries of exposure, // recovering fragmented historical records // obscured to naked observation.",
+      "keywords": [
+        "epigraphers",
+        "lapidary",
+        "inscriptions",
+        "multispectral",
+        "incisions",
+        "antiquity"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "epigraphers",
+          "ipa": "/ɪˈpɪɡ.rə.fəz/",
+          "tip": "Stress on pig"
+        }
+      ]
+    },
+    {
+      "id": "ra-024",
+      "title": "Volcanic Ash and Soil Fertility in Agriculture",
+      "category": "Geology & Soil Science",
+      "text": "Volcanic eruptions periodically deposit mineral-rich tephra across adjacent agrarian valleys. Over weathering cycles, these basaltic ejecta enrich agricultural soils with vital potassium, magnesium, and phosphorus, sustaining extraordinarily fertile farmlands capable of supporting dense rural communities across generations.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Volcanic eruptions periodically deposit // mineral-rich tephra across adjacent agrarian valleys. // Over weathering cycles, // these basaltic ejecta enrich agricultural soils // with vital potassium, magnesium, and phosphorus, // sustaining extraordinarily fertile farmlands // capable of supporting dense rural communities // across generations.",
+      "keywords": [
+        "tephra",
+        "basaltic",
+        "ejecta",
+        "phosphorus",
+        "agrarian",
+        "extraordinarily"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "basaltic",
+          "ipa": "/bəˈsɔːl.tɪk/",
+          "tip": "Stress on sawl"
+        }
+      ]
+    },
+    {
+      "id": "ra-025",
+      "title": "Hospitality Revenue Management and Dynamic Pricing",
+      "category": "Hospitality Economics",
+      "text": "Modern hotel and airline enterprises employ predictive algorithms to adjust reservation tariffs dynamically based on fluctuating demand. Yield managers analyze booking curves, seasonal flight patterns, and regional festival calendars to optimize inventory occupancy without compromising brand prestige.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Modern hotel and airline enterprises // employ predictive algorithms // to adjust reservation tariffs dynamically // based on fluctuating demand. // Yield managers analyze booking curves, // seasonal flight patterns, // and regional festival calendars // to optimize inventory occupancy // without compromising brand prestige.",
+      "keywords": [
+        "algorithms",
+        "tariffs",
+        "fluctuating",
+        "occupancy",
+        "compromising",
+        "prestige"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "tariffs",
+          "ipa": "/ˈtær.ɪfs/",
+          "tip": "Short a sound"
+        }
+      ]
+    },
+    {
+      "id": "ra-026",
+      "title": "Enzyme Kinetics in Fermentation Chemistry",
+      "category": "Culinary Science",
+      "text": "Enzymatic catalysis regulates biochemical conversions throughout commercial food preparation. Proteolytic enzymes tenderize tough muscular protein fibers, while amylases accelerate the breakdown of complex starches into fermentable sugars, establishing optimal consistency and textural appeal in modern gastronomy.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Enzymatic catalysis regulates // biochemical conversions // throughout commercial food preparation. // Proteolytic enzymes tenderize // tough muscular protein fibers, // while amylases accelerate the breakdown // of complex starches into fermentable sugars, // establishing optimal consistency and textural appeal in modern gastronomy.",
+      "keywords": [
+        "enzymatic",
+        "catalysis",
+        "proteolytic",
+        "amylases",
+        "gastronomy",
+        "consistency"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "proteolytic",
+          "ipa": "/ˌproʊ.ti.əˈlɪt.ɪk/",
+          "tip": "Stress on lit"
+        }
+      ]
+    },
+    {
+      "id": "ra-027",
+      "title": "Swan River Estuarine Ecology",
+      "category": "Western Australia Ecology",
+      "text": "Perth's iconic Swan River estuary represents a delicate hydrological intersection between inland seasonal freshwater streams and marine tidal ocean waters. Monitoring dissolved oxygen levels and nutrient runoff from surrounding urban catchments is imperative to prevent hazardous microalgal blooms.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Perth's iconic Swan River estuary // represents a delicate hydrological intersection // between inland seasonal freshwater streams // and marine tidal ocean waters. // Monitoring dissolved oxygen levels // and nutrient runoff from surrounding urban catchments // is imperative // to prevent hazardous microalgal blooms.",
+      "keywords": [
+        "estuary",
+        "hydrological",
+        "intersection",
+        "catchments",
+        "microalgal",
+        "imperative"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "estuary",
+          "ipa": "/ˈes.tʃu.ə.ri/",
+          "tip": "Stress on es"
+        }
+      ]
+    },
+    {
+      "id": "ra-028",
+      "title": "Stock Control and FIFO Inventory Rotation",
+      "category": "Hospitality Management",
+      "text": "Commercial kitchens adhere strictly to first-in, first-out inventory rotation principles. Kitchen staff systematically inspect delivery date labels, positioning older compliant stocks forward while placing freshly received stock behind, thereby minimizing organic spoilage and preventing consumer health risks.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Commercial kitchens adhere strictly // to first-in, first-out inventory rotation principles. // Kitchen staff systematically inspect // delivery date labels, // positioning older compliant stocks forward // while placing freshly received stock behind, // thereby minimizing organic spoilage // and preventing consumer health risks.",
+      "keywords": [
+        "rotation",
+        "systematically",
+        "compliant",
+        "spoilage",
+        "inventory",
+        "adhere"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "systematically",
+          "ipa": "/ˌsɪs.təˈmæt.ɪ.kəl.i/",
+          "tip": "Stress on mat"
+        }
+      ]
+    },
+    {
+      "id": "ra-029",
+      "title": "Pilbara Solar Microgrids and Battery Storage",
+      "category": "Energy Economics",
+      "text": "Isolated mining operations in the northern Pilbara basin are actively transitioning from fossil fuel diesel reliance toward industrial battery microgrids. High-capacity lithium iron phosphate batteries store excess midday solar generation, discharging energy seamlessly through nocturnal processing cycles.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Isolated mining operations // in the northern Pilbara basin // are actively transitioning // from fossil fuel diesel reliance // toward industrial battery microgrids. // High-capacity lithium iron phosphate batteries // store excess midday solar generation, // discharging energy seamlessly // through nocturnal processing cycles.",
+      "keywords": [
+        "microgrids",
+        "reliance",
+        "phosphate",
+        "nocturnal",
+        "transitioning",
+        "seamlessly"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "phosphate",
+          "ipa": "/ˈfɒs.feɪt/",
+          "tip": "F sound at start"
+        }
+      ]
+    },
+    {
+      "id": "ra-030",
+      "title": "Cognitive Biases in Medical Diagnostics",
+      "category": "Psychology & Medicine",
+      "text": "Diagnostic clinicians occasionally fall prey to anchoring biases when evaluating initial clinical emergency presentations. Relying disproportionately on early symptom reports can obscure subsequent contradictory pathological data, underscoring the critical necessity of structured differential diagnostic checklists.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Diagnostic clinicians occasionally fall prey // to anchoring biases // when evaluating initial clinical emergency presentations. // Relying disproportionately on early symptom reports // can obscure subsequent contradictory pathological data, // underscoring the critical necessity // of structured differential diagnostic checklists.",
+      "keywords": [
+        "clinicians",
+        "anchoring",
+        "disproportionately",
+        "pathological",
+        "differential",
+        "diagnostic"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "disproportionately",
+          "ipa": "/ˌdɪs.prəˈpɔː.ʃən.ət.li/",
+          "tip": "Stress on paw"
+        }
+      ]
+    },
+    {
+      "id": "ra-031",
+      "title": "Marine Coral Reef Bleaching Mechanisms",
+      "category": "Marine Biology",
+      "text": "Sustained ocean thermal anomalies induce severe physiological stress across hermatypic coral colonies. When seawater temperatures exceed local biological thresholds for several weeks, corals expel their photosynthetic zooxanthellae endosymbionts, turning bone-white and facing severe starvation.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Sustained ocean thermal anomalies // induce severe physiological stress // across hermatypic coral colonies. // When seawater temperatures exceed local biological thresholds // for several weeks, // corals expel their photosynthetic zooxanthellae endosymbionts, // turning bone-white // and facing severe starvation.",
+      "keywords": [
+        "physiological",
+        "hermatypic",
+        "zooxanthellae",
+        "endosymbionts",
+        "anomalies",
+        "starvation"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "zooxanthellae",
+          "ipa": "/ˌzoʊ.ə.zænˈθel.iː/",
+          "tip": "Stress on thel"
+        }
+      ]
+    },
+    {
+      "id": "ra-032",
+      "title": "Urban Architecture and Acoustical Insulation",
+      "category": "Architecture & Engineering",
+      "text": "Designing high-density residential towers adjacent to busy transport interchanges requires advanced acoustical decoupling. Architects specify double-glazed laminated window assemblies and acoustic damping composite wall assemblies to prevent external transit reverberations from penetrating domestic living zones.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Designing high-density residential towers // adjacent to busy transport interchanges // requires advanced acoustical decoupling. // Architects specify double-glazed laminated window assemblies // and acoustic damping composite wall assemblies // to prevent external transit reverberations // from penetrating domestic living zones.",
+      "keywords": [
+        "interchanges",
+        "acoustical",
+        "decoupling",
+        "laminated",
+        "reverberations",
+        "penetrating"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "reverberations",
+          "ipa": "/rɪˌvɜː.bərˈeɪ.ʃənz/",
+          "tip": "Stress on ray"
+        }
+      ]
+    },
+    {
+      "id": "ra-033",
+      "title": "Sustainable Aquaculture and Fish Farming",
+      "category": "Marine Agriculture",
+      "text": "Global demand for seafood protein has outstripped wild oceanic fishery capacities, driving rapid growth in recirculating aquaculture facilities. Land-based tank systems filter water continuously, recycling ninety-nine percent of system volume while eliminating antibiotic runoff into natural coastal estuaries.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Global demand for seafood protein // has outstripped wild oceanic fishery capacities, // driving rapid growth // in recirculating aquaculture facilities. // Land-based tank systems filter water continuously, // recycling ninety-nine percent of system volume // while eliminating antibiotic runoff // into natural coastal estuaries.",
+      "keywords": [
+        "aquaculture",
+        "recirculating",
+        "facilities",
+        "antibiotic",
+        "estuaries",
+        "capacities"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "aquaculture",
+          "ipa": "/ˈæk.wə.kʌl.tʃər/",
+          "tip": "Stress on ak"
+        }
+      ]
+    },
+    {
+      "id": "ra-034",
+      "title": "Gluten Development in Bread Making",
+      "category": "Culinary Science",
+      "text": "Wheat flour dough derives its viscoelastic structural matrix from two key storage proteins: gliadin and glutenin. When hydrated and subjected to mechanical kneading shear, these molecules form a continuous three-dimensional network capable of trapping expanding carbon dioxide fermentation bubbles.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Wheat flour dough derives // its viscoelastic structural matrix // from two key storage proteins: // gliadin and glutenin. // When hydrated and subjected to mechanical kneading shear, // these molecules form a continuous three-dimensional network // capable of trapping expanding carbon dioxide fermentation bubbles.",
+      "keywords": [
+        "viscoelastic",
+        "gliadin",
+        "glutenin",
+        "kneading",
+        "fermentation",
+        "hydrated"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "viscoelastic",
+          "ipa": "/ˌvɪs.koʊ.ɪˈlæs.tɪk/",
+          "tip": "Stress on las"
+        }
+      ]
+    },
+    {
+      "id": "ra-035",
+      "title": "Desalination Brine Disposal and Marine Protection",
+      "category": "Western Australia Ecology",
+      "text": "Discharging hyper-saline brine effluent from coastal desalination facilities requires hydrodynamic diffusers installed kilometers offshore. Engineered discharge nozzles spray pressurized brine into deep ocean currents, facilitating instantaneous dilution and preventing dense saline plumes from settling over benthic marine seabed habitats.",
+      "prepTimeSec": 35,
+      "recordTimeSec": 35,
+      "chunking": "Discharging hyper-saline brine effluent // from coastal desalination facilities // requires hydrodynamic diffusers installed kilometers offshore. // Engineered discharge nozzles spray pressurized brine // into deep ocean currents, // facilitating instantaneous dilution // and preventing dense saline plumes // from settling over benthic marine seabed habitats.",
+      "keywords": [
+        "effluent",
+        "diffusers",
+        "hydrodynamic",
+        "instantaneous",
+        "benthic",
+        "plumes"
+      ],
+      "phoneticFocus": [
+        {
+          "word": "effluent",
+          "ipa": "/ˈef.lu.ənt/",
+          "tip": "Stress on ef"
+        }
+      ]
     }
   ]
 }

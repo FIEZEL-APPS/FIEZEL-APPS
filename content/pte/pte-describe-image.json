@@ -1,7 +1,9 @@
 {
   "version": "1.0.0",
   "task": "Describe Image",
-  "crossSkills": ["Speaking"],
+  "crossSkills": [
+    "Speaking"
+  ],
   "prepTimeSec": 25,
   "recordTimeSec": 40,
   "items": [
@@ -10,10 +12,28 @@
       "title": "International Tourist Arrivals in Western Australia",
       "chartType": "bar_chart",
       "topic": "International Tourist Arrivals in Western Australia from 2018 to 2024",
-      "categories": ["2018", "2020", "2022", "2024"],
+      "categories": [
+        "2018",
+        "2020",
+        "2022",
+        "2024"
+      ],
       "highPoint": "the year 2024 with over 1.2 million overseas visitors",
       "lowPoint": "the year 2020 with approximately 300 thousand visitors due to global travel restrictions",
-      "keywords": ["tourist", "arrivals", "Western Australia", "Perth", "visitors", "million", "increase", "recovery", "maximum", "minimum", "2024", "2020"],
+      "keywords": [
+        "tourist",
+        "arrivals",
+        "Western Australia",
+        "Perth",
+        "visitors",
+        "million",
+        "increase",
+        "recovery",
+        "maximum",
+        "minimum",
+        "2024",
+        "2020"
+      ],
       "sampleResponse": "The given image represents an informative chart regarding International Tourist Arrivals in Western Australia. According to the picture, we can see several key elements, including 2018, 2020, 2022, and 2024. Looking closely, the maximum figure is observed in the year 2024 with over 1.2 million visitors, while the minimum figure is found in 2020 with around 300 thousand visitors. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
       "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Tourist Arrivals in Western Australia (Thousands)</text><line x1='50' y1='190' x2='360' y2='190' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='190' stroke='#94A3B8' stroke-width='2'/><rect x='80' y='80' width='45' height='110' fill='#0284C7' rx='4'/><text x='102' y='72' text-anchor='middle' font-size='11' font-weight='bold' fill='#0284C7'>950k</text><text x='102' y='208' text-anchor='middle' font-size='11' fill='#475569'>2018</text><rect x='150' y='145' width='45' height='45' fill='#EF4444' rx='4'/><text x='172' y='137' text-anchor='middle' font-size='11' font-weight='bold' fill='#EF4444'>300k</text><text x='172' y='208' text-anchor='middle' font-size='11' fill='#475569'>2020</text><rect x='220' y='95' width='45' height='95' fill='#0EA5E9' rx='4'/><text x='242' y='87' text-anchor='middle' font-size='11' font-weight='bold' fill='#0EA5E9'>820k</text><text x='242' y='208' text-anchor='middle' font-size='11' fill='#475569'>2022</text><rect x='290' y='55' width='45' height='135' fill='#10B981' rx='4'/><text x='312' y='47' text-anchor='middle' font-size='11' font-weight='bold' fill='#10B981'>1,200k</text><text x='312' y='208' text-anchor='middle' font-size='11' fill='#475569'>2024</text></svg>"
     },
@@ -22,10 +42,27 @@
       "title": "Hospitality Operational Expenditure Breakdown",
       "chartType": "pie_chart",
       "topic": "Annual Operational Expenditure in a Commercial Restaurant",
-      "categories": ["Labor & Staff", "Food Ingredients", "Rent & Utilities", "Marketing"],
+      "categories": [
+        "Labor & Staff",
+        "Food Ingredients",
+        "Rent & Utilities",
+        "Marketing"
+      ],
       "highPoint": "Labor and staff wages accounting for 42 percent of total expenses",
       "lowPoint": "Marketing and advertising representing only 8 percent",
-      "keywords": ["operational", "expenditure", "commercial", "restaurant", "labor", "ingredients", "rent", "marketing", "percentage", "maximum", "minimum"],
+      "keywords": [
+        "operational",
+        "expenditure",
+        "commercial",
+        "restaurant",
+        "labor",
+        "ingredients",
+        "rent",
+        "marketing",
+        "percentage",
+        "maximum",
+        "minimum"
+      ],
       "sampleResponse": "The given image represents an informative chart regarding Annual Operational Expenditure in a Commercial Restaurant. According to the picture, we can see several key elements, including labor and staff, food ingredients, rent and utilities, and marketing. Looking closely, the maximum figure is observed in labor and staff at 42 percent, while the minimum figure is found in marketing at only 8 percent. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
       "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Restaurant Expenditure Breakdown (%)</text><circle cx='140' cy='130' r='75' fill='none' stroke='#0284C7' stroke-width='40' stroke-dasharray='198 471' transform='rotate(-90 140 130)'/><circle cx='140' cy='130' r='75' fill='none' stroke='#10B981' stroke-width='40' stroke-dasharray='141 471' stroke-dashoffset='-198' transform='rotate(-90 140 130)'/><circle cx='140' cy='130' r='75' fill='none' stroke='#F59E0B' stroke-width='40' stroke-dasharray='94 471' stroke-dashoffset='-339' transform='rotate(-90 140 130)'/><circle cx='140' cy='130' r='75' fill='none' stroke='#EC4899' stroke-width='40' stroke-dasharray='38 471' stroke-dashoffset='-433' transform='rotate(-90 140 130)'/><rect x='250' y='70' width='14' height='14' fill='#0284C7' rx='3'/><text x='272' y='82' font-size='11' font-weight='bold' fill='#1E293B'>Labor (42%)</text><rect x='250' y='100' width='14' height='14' fill='#10B981' rx='3'/><text x='272' y='112' font-size='11' font-weight='bold' fill='#1E293B'>Food (30%)</text><rect x='250' y='130' width='14' height='14' fill='#F59E0B' rx='3'/><text x='272' y='142' font-size='11' font-weight='bold' fill='#1E293B'>Rent (20%)</text><rect x='250' y='160' width='14' height='14' fill='#EC4899' rx='3'/><text x='272' y='172' font-size='11' font-weight='bold' fill='#1E293B'>Marketing (8%)</text></svg>"
     },
@@ -34,10 +71,29 @@
       "title": "Global Renewable Power Generation Trend",
       "chartType": "line_graph",
       "topic": "Global Renewable Power Generation from 2015 to 2025",
-      "categories": ["2015", "2018", "2021", "2025"],
+      "categories": [
+        "2015",
+        "2018",
+        "2021",
+        "2025"
+      ],
       "highPoint": "the projected capacity in 2025 exceeding 3800 Gigawatts",
       "lowPoint": "the starting figure in 2015 at approximately 1800 Gigawatts",
-      "keywords": ["renewable", "power", "generation", "global", "energy", "gigawatts", "solar", "wind", "increase", "maximum", "2025", "minimum", "2015"],
+      "keywords": [
+        "renewable",
+        "power",
+        "generation",
+        "global",
+        "energy",
+        "gigawatts",
+        "solar",
+        "wind",
+        "increase",
+        "maximum",
+        "2025",
+        "minimum",
+        "2015"
+      ],
       "sampleResponse": "The given image represents an informative chart regarding Global Renewable Power Generation. According to the picture, we can see several key elements, including 2015, 2018, 2021, and 2025. Looking closely, the maximum figure is observed in the year 2025 at over 3800 Gigawatts, while the minimum figure is found in 2015 at approximately 1800 Gigawatts. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
       "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Renewable Capacity (Gigawatts)</text><line x1='50' y1='190' x2='360' y2='190' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='190' stroke='#94A3B8' stroke-width='2'/><path d='M80,165 Q150,150 220,110 T340,55' fill='none' stroke='#059669' stroke-width='4'/><circle cx='80' cy='165' r='5' fill='#059669'/><text x='80' y='152' text-anchor='middle' font-size='11' font-weight='bold' fill='#059669'>1.8k</text><text x='80' y='208' text-anchor='middle' font-size='11' fill='#475569'>2015</text><circle cx='160' cy='140' r='5' fill='#059669'/><text x='160' y='128' text-anchor='middle' font-size='11' font-weight='bold' fill='#059669'>2.3k</text><text x='160' y='208' text-anchor='middle' font-size='11' fill='#475569'>2018</text><circle cx='240' cy='105' r='5' fill='#059669'/><text x='240' y='92' text-anchor='middle' font-size='11' font-weight='bold' fill='#059669'>3.0k</text><text x='240' y='208' text-anchor='middle' font-size='11' fill='#475569'>2021</text><circle cx='340' cy='55' r='5' fill='#059669'/><text x='340' y='42' text-anchor='middle' font-size='11' font-weight='bold' fill='#059669'>3.8k</text><text x='340' y='208' text-anchor='middle' font-size='11' fill='#475569'>2025</text></svg>"
     },
@@ -46,12 +102,1494 @@
       "title": "Commercial Kitchen Food Safety Flowchart",
       "chartType": "process_diagram",
       "topic": "HACCP Food Safety Process in Commercial Kitchens",
-      "categories": ["Receiving Raw Goods", "Cold Storage", "Thermal Cooking", "Plate Service"],
+      "categories": [
+        "Receiving Raw Goods",
+        "Cold Storage",
+        "Thermal Cooking",
+        "Plate Service"
+      ],
       "highPoint": "the critical thermal cooking stage reaching over 75 degrees Celsius",
       "lowPoint": "the cold storage stage strictly maintained below 5 degrees Celsius",
-      "keywords": ["food", "safety", "HACCP", "receiving", "storage", "cooking", "service", "temperature", "critical", "process", "commercial", "kitchen"],
+      "keywords": [
+        "food",
+        "safety",
+        "HACCP",
+        "receiving",
+        "storage",
+        "cooking",
+        "service",
+        "temperature",
+        "critical",
+        "process",
+        "commercial",
+        "kitchen"
+      ],
       "sampleResponse": "The given image represents an informative chart regarding the HACCP Food Safety Process in Commercial Kitchens. According to the picture, we can see several key elements, including receiving raw goods, cold storage, thermal cooking, and plate service. Looking closely, the maximum figure is observed in thermal cooking exceeding 75 degrees, while the minimum figure is found in cold storage below 5 degrees. In conclusion, the picture provides significant data and is very beneficial for further understanding.",
       "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>HACCP Kitchen Safety Workflow</text><rect x='30' y='70' width='70' height='60' fill='#E0F2FE' stroke='#0284C7' stroke-width='2' rx='8'/><text x='65' y='96' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='114' text-anchor='middle' font-size='9' fill='#0369A1'>Receiving</text><text x='115' y='105' font-size='16' fill='#0284C7'>➔</text><rect x='130' y='70' width='70' height='60' fill='#FEF3C7' stroke='#D97706' stroke-width='2' rx='8'/><text x='165' y='96' text-anchor='middle' font-size='10' font-weight='bold' fill='#B45309'>Step 2</text><text x='165' y='114' text-anchor='middle' font-size='9' fill='#B45309'>Storage &lt;5°C</text><text x='215' y='105' font-size='16' fill='#D97706'>➔</text><rect x='230' y='70' width='70' height='60' fill='#FEE2E2' stroke='#DC2626' stroke-width='2' rx='8'/><text x='265' y='96' text-anchor='middle' font-size='10' font-weight='bold' fill='#B91C1C'>Step 3</text><text x='265' y='114' text-anchor='middle' font-size='9' fill='#B91C1C'>Cooking &gt;75°C</text><text x='315' y='105' font-size='16' fill='#DC2626'>➔</text><rect x='330' y='70' width='60' height='60' fill='#DCFCE7' stroke='#16A34A' stroke-width='2' rx='8'/><text x='360' y='96' text-anchor='middle' font-size='10' font-weight='bold' fill='#15803D'>Step 4</text><text x='360' y='114' text-anchor='middle' font-size='9' fill='#15803D'>Service</text><rect x='40' y='160' width='320' height='48' fill='#F1F5F9' rx='6'/><text x='200' y='182' text-anchor='middle' font-size='10' font-weight='bold' fill='#334155'>Standard Operating Quality Checklist</text><text x='200' y='198' text-anchor='middle' font-size='9' fill='#64748B'>Critical Temperature Monitoring at Every Step</text></svg>"
+    },
+    {
+      "id": "di_bar_01",
+      "title": "World Population Projections by Continent (2050)",
+      "chartType": "bar_chart",
+      "topic": "World Population Projections by Continent (2050)",
+      "categories": [
+        "Asia",
+        "Africa",
+        "Americas",
+        "Europe",
+        "Oceania"
+      ],
+      "highPoint": "Asia with 53%",
+      "lowPoint": "Oceania with only 2%",
+      "keywords": [
+        "population projection",
+        "demographic distribution",
+        "highest percentage",
+        "Asia and Africa",
+        "in conclusion",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given bar chart provides key information about world population projections by continent for the year 2050. Looking closely, there are various major regions including Asia, Africa, the Americas, Europe, and Oceania. The highest figure is represented by Asia, accounting for a massive 53 percent of the global total. Conversely, the lowest demographic share is seen in Oceania at merely two percent. In conclusion, it is evident that developing continents will dominate the vast majority of world population growth.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>World Population Projections by Continent (2050) (% of World Total)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='67' y='70' width='45' height='110' fill='#F59E0B' rx='4'/><text x='89.5' y='64' font-size='10' font-weight='bold' fill='#F59E0B' text-anchor='middle'>53</text><text x='89.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Asia</text><rect x='122' y='126' width='45' height='54' fill='#10B981' rx='4'/><text x='144.5' y='120' font-size='10' font-weight='bold' fill='#10B981' text-anchor='middle'>26</text><text x='144.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Africa</text><rect x='177' y='155' width='45' height='25' fill='#3B82F6' rx='4'/><text x='199.5' y='149' font-size='10' font-weight='bold' fill='#3B82F6' text-anchor='middle'>12</text><text x='199.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Americas</text><rect x='232' y='165' width='45' height='15' fill='#8B5CF6' rx='4'/><text x='254.5' y='159' font-size='10' font-weight='bold' fill='#8B5CF6' text-anchor='middle'>7</text><text x='254.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Europe</text><rect x='287' y='170' width='45' height='10' fill='#EC4899' rx='4'/><text x='309.5' y='164' font-size='10' font-weight='bold' fill='#EC4899' text-anchor='middle'>2</text><text x='309.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Oceania</text></svg>"
+    },
+    {
+      "id": "di_bar_02",
+      "title": "Australian Wine Exports by Key Destination (Billion AUD)",
+      "chartType": "bar_chart",
+      "topic": "Australian Wine Exports by Key Destination (Billion AUD)",
+      "categories": [
+        "China",
+        "United Kingdom",
+        "United States",
+        "Canada",
+        "Germany"
+      ],
+      "highPoint": "China at 1.2 Billion AUD",
+      "lowPoint": "Germany at 0.06 Billion AUD",
+      "keywords": [
+        "wine export value",
+        "destination markets",
+        "highest buyer",
+        "China and UK",
+        "economic significance",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided bar chart illustrates significant data regarding Australian wine exports across various destination countries. Looking into the details, key markets include China, the United Kingdom, the United States, Canada, and Germany. The highest monetary value is represented by exports to China, standing at approximately 1.2 billion Australian dollars. In sharp contrast, the lowest export figure is registered by Germany at only 0.06 billion dollars. In conclusion, it is apparent that East Asian demand represents the vital economic backbone for Australian viticulture.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Australian Wine Exports by Key Destination (Bi… (Billion AUD)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='67' y='70' width='45' height='110' fill='#DC2626' rx='4'/><text x='89.5' y='64' font-size='10' font-weight='bold' fill='#DC2626' text-anchor='middle'>1.2</text><text x='89.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>China</text><rect x='122' y='139' width='45' height='41' fill='#2563EB' rx='4'/><text x='144.5' y='133' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>0.45</text><text x='144.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>United K…</text><rect x='177' y='141' width='45' height='39' fill='#D97706' rx='4'/><text x='199.5' y='135' font-size='10' font-weight='bold' fill='#D97706' text-anchor='middle'>0.42</text><text x='199.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>United S…</text><rect x='232' y='163' width='45' height='17' fill='#059669' rx='4'/><text x='254.5' y='157' font-size='10' font-weight='bold' fill='#059669' text-anchor='middle'>0.18</text><text x='254.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Canada</text><rect x='287' y='170' width='45' height='10' fill='#7C3AED' rx='4'/><text x='309.5' y='164' font-size='10' font-weight='bold' fill='#7C3AED' text-anchor='middle'>0.06</text><text x='309.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Germany</text></svg>"
+    },
+    {
+      "id": "di_bar_03",
+      "title": "Global Renewable Energy Share (2020-2025)",
+      "chartType": "bar_chart",
+      "topic": "Global Renewable Energy Share (2020-2025)",
+      "categories": [
+        "Solar",
+        "Wind",
+        "Hydro",
+        "Biomass"
+      ],
+      "highPoint": "Solar power at 45%",
+      "lowPoint": "Biomass energy at 10%",
+      "keywords": [
+        "renewable energy",
+        "solar photovoltaic",
+        "wind turbine",
+        "capacity share",
+        "clean transition",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given bar chart provides key information about global renewable energy share between 2020 and 2025. Looking closely, there are various energy sources including solar power, wind energy, hydroelectricity, and biomass. The highest figure is represented by solar power, which captures forty-five percent of overall clean capacity. Conversely, the lowest proportion is observed in biomass energy at only ten percent. In conclusion, it is evident that modern solar and wind technologies are leading the worldwide clean energy transition.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Renewable Energy Share (2020-2025) (% of Clean Capacity)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='95' y='70' width='45' height='110' fill='#F59E0B' rx='4'/><text x='117.5' y='64' font-size='10' font-weight='bold' fill='#F59E0B' text-anchor='middle'>45</text><text x='117.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Solar</text><rect x='150' y='107' width='45' height='73' fill='#10B981' rx='4'/><text x='172.5' y='101' font-size='10' font-weight='bold' fill='#10B981' text-anchor='middle'>30</text><text x='172.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Wind</text><rect x='205' y='143' width='45' height='37' fill='#3B82F6' rx='4'/><text x='227.5' y='137' font-size='10' font-weight='bold' fill='#3B82F6' text-anchor='middle'>15</text><text x='227.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Hydro</text><rect x='260' y='156' width='45' height='24' fill='#8B5CF6' rx='4'/><text x='282.5' y='150' font-size='10' font-weight='bold' fill='#8B5CF6' text-anchor='middle'>10</text><text x='282.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Biomass</text></svg>"
+    },
+    {
+      "id": "di_bar_04",
+      "title": "Global Smartphone Shipments by Brand (Million Units)",
+      "chartType": "bar_chart",
+      "topic": "Global Smartphone Shipments by Brand (Million Units)",
+      "categories": [
+        "Samsung",
+        "Apple",
+        "Xiaomi",
+        "OPPO",
+        "Others"
+      ],
+      "highPoint": "Samsung at 260 million units",
+      "lowPoint": "OPPO at 105 million units",
+      "keywords": [
+        "smartphone shipments",
+        "global market leader",
+        "Samsung and Apple",
+        "million units",
+        "consumer electronics",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given bar chart outlines comprehensive data regarding worldwide smartphone shipments categorized by leading manufacturers. Examining the categories, notable brands include Samsung, Apple, Xiaomi, OPPO, alongside several aggregate competitors. The highest individual shipment volume is dominated by Samsung at roughly 260 million units. In contrast, the lowest categorized brand is OPPO registering approximately 105 million units. In conclusion, it is evident that top multinational corporations command substantial market leverage in consumer electronics.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Smartphone Shipments by Brand (Million … (Million Units)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='67' y='105' width='45' height='75' fill='#2563EB' rx='4'/><text x='89.5' y='99' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>260</text><text x='89.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Samsung</text><rect x='122' y='113' width='45' height='67' fill='#64748B' rx='4'/><text x='144.5' y='107' font-size='10' font-weight='bold' fill='#64748B' text-anchor='middle'>230</text><text x='144.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Apple</text><rect x='177' y='137' width='45' height='43' fill='#F97316' rx='4'/><text x='199.5' y='131' font-size='10' font-weight='bold' fill='#F97316' text-anchor='middle'>150</text><text x='199.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Xiaomi</text><rect x='232' y='150' width='45' height='30' fill='#10B981' rx='4'/><text x='254.5' y='144' font-size='10' font-weight='bold' fill='#10B981' text-anchor='middle'>105</text><text x='254.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>OPPO</text><rect x='287' y='70' width='45' height='110' fill='#94A3B8' rx='4'/><text x='309.5' y='64' font-size='10' font-weight='bold' fill='#94A3B8' text-anchor='middle'>380</text><text x='309.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Others</text></svg>"
+    },
+    {
+      "id": "di_bar_05",
+      "title": "Primary Energy Consumption by Economic Sector",
+      "chartType": "bar_chart",
+      "topic": "Primary Energy Consumption by Economic Sector",
+      "categories": [
+        "Industrial",
+        "Transportation",
+        "Residential",
+        "Commercial"
+      ],
+      "highPoint": "Industrial sector at 35 Quads",
+      "lowPoint": "Commercial buildings at 15 Quads",
+      "keywords": [
+        "energy consumption",
+        "industrial sector",
+        "transportation",
+        "quadrillion BTU",
+        "macroeconomics",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented bar chart gives detailed insights into primary energy consumption distributed across key economic sectors. Looking closely, there are four designated sectors: industrial, transportation, residential, and commercial operations. The highest energy consumption is recorded in the industrial sector, reaching thirty-five quadrillion BTU. Conversely, the lowest utilization is observed in commercial facilities at only fifteen quadrillion BTU. In conclusion, heavy manufacturing operations remain the primary driver of national energy demand.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Primary Energy Consumption by Economic Sector (Quadrillion BTU)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='95' y='70' width='45' height='110' fill='#DC2626' rx='4'/><text x='117.5' y='64' font-size='10' font-weight='bold' fill='#DC2626' text-anchor='middle'>35</text><text x='117.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Industri…</text><rect x='150' y='92' width='45' height='88' fill='#D97706' rx='4'/><text x='172.5' y='86' font-size='10' font-weight='bold' fill='#D97706' text-anchor='middle'>28</text><text x='172.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Transpor…</text><rect x='205' y='111' width='45' height='69' fill='#2563EB' rx='4'/><text x='227.5' y='105' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>22</text><text x='227.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Resident…</text><rect x='260' y='133' width='45' height='47' fill='#10B981' rx='4'/><text x='282.5' y='127' font-size='10' font-weight='bold' fill='#10B981' text-anchor='middle'>15</text><text x='282.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Commerci…</text></svg>"
+    },
+    {
+      "id": "di_bar_06",
+      "title": "Tertiary Education Attainment Rate in OECD Nations (%)",
+      "chartType": "bar_chart",
+      "topic": "Tertiary Education Attainment Rate in OECD Nations (%)",
+      "categories": [
+        "South Korea",
+        "Canada",
+        "Japan",
+        "United Kingdom",
+        "Germany"
+      ],
+      "highPoint": "South Korea at 69%",
+      "lowPoint": "Germany at 36%",
+      "keywords": [
+        "tertiary education",
+        "university attainment",
+        "South Korea and Canada",
+        "percentage of graduates",
+        "higher learning",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The supplied bar chart provides key information about tertiary education attainment rates among young adults in selected OECD nations. Looking closely, there are five prominent countries including South Korea, Canada, Japan, the United Kingdom, and Germany. The highest academic attainment rate is achieved by South Korea, standing at an impressive 69 percent. In comparison, the lowest rate is documented in Germany at approximately 36 percent. In conclusion, it is evident that East Asian economies place immense educational priority on formal university credentials.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Tertiary Education Attainment Rate in OECD Nat… (% of Young Adults (25-34))</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='67' y='70' width='45' height='110' fill='#2563EB' rx='4'/><text x='89.5' y='64' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>69</text><text x='89.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>South Ko…</text><rect x='122' y='81' width='45' height='99' fill='#DC2626' rx='4'/><text x='144.5' y='75' font-size='10' font-weight='bold' fill='#DC2626' text-anchor='middle'>62</text><text x='144.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Canada</text><rect x='177' y='92' width='45' height='88' fill='#EA580C' rx='4'/><text x='199.5' y='86' font-size='10' font-weight='bold' fill='#EA580C' text-anchor='middle'>55</text><text x='199.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Japan</text><rect x='232' y='102' width='45' height='78' fill='#7C3AED' rx='4'/><text x='254.5' y='96' font-size='10' font-weight='bold' fill='#7C3AED' text-anchor='middle'>49</text><text x='254.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>United K…</text><rect x='287' y='123' width='45' height='57' fill='#059669' rx='4'/><text x='309.5' y='117' font-size='10' font-weight='bold' fill='#059669' text-anchor='middle'>36</text><text x='309.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Germany</text></svg>"
+    },
+    {
+      "id": "di_bar_07",
+      "title": "Carbon Footprint by Passenger Transport Mode",
+      "chartType": "bar_chart",
+      "topic": "Carbon Footprint by Passenger Transport Mode",
+      "categories": [
+        "Domestic Flight",
+        "Petrol Car",
+        "Diesel Bus",
+        "Electric Train"
+      ],
+      "highPoint": "Domestic Aviation at 255g CO2/km",
+      "lowPoint": "Electric Train at only 28g CO2/km",
+      "keywords": [
+        "carbon footprint",
+        "passenger transport",
+        "domestic aviation",
+        "electric rail",
+        "greenhouse emissions",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given bar graph illustrates meaningful metrics regarding carbon emissions produced by various passenger transport modes. Looking into the details, the graph contrasts domestic flights, private petrol cars, diesel buses, and electric trains. The highest carbon footprint is generated by domestic flights, emitting 255 grams of carbon dioxide per passenger kilometer. Conversely, the lowest emission profile belongs to electric trains at a modest twenty-eight grams. In conclusion, expanding electrified railway networks provides the most sustainable path for decarbonizing public mobility.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Carbon Footprint by Passenger Transport Mode (Grams CO2 per Passenger-km)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='95' y='70' width='45' height='110' fill='#DC2626' rx='4'/><text x='117.5' y='64' font-size='10' font-weight='bold' fill='#DC2626' text-anchor='middle'>255</text><text x='117.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Domestic…</text><rect x='150' y='107' width='45' height='73' fill='#EA580C' rx='4'/><text x='172.5' y='101' font-size='10' font-weight='bold' fill='#EA580C' text-anchor='middle'>170</text><text x='172.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Petrol C…</text><rect x='205' y='145' width='45' height='35' fill='#F59E0B' rx='4'/><text x='227.5' y='139' font-size='10' font-weight='bold' fill='#F59E0B' text-anchor='middle'>80</text><text x='227.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Diesel B…</text><rect x='260' y='168' width='45' height='12' fill='#10B981' rx='4'/><text x='282.5' y='162' font-size='10' font-weight='bold' fill='#10B981' text-anchor='middle'>28</text><text x='282.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Electric…</text></svg>"
+    },
+    {
+      "id": "di_bar_08",
+      "title": "Average Weekly Working Hours in Selected Economies",
+      "chartType": "bar_chart",
+      "topic": "Average Weekly Working Hours in Selected Economies",
+      "categories": [
+        "Mexico",
+        "Costa Rica",
+        "South Korea",
+        "United States",
+        "Germany"
+      ],
+      "highPoint": "Mexico at 42.5 hours",
+      "lowPoint": "Germany at 26.2 hours",
+      "keywords": [
+        "working hours",
+        "labor productivity",
+        "Mexico and Germany",
+        "hours per week",
+        "employment conditions",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented bar chart presents detailed data concerning average weekly working hours across different global economies. Looking closely, there are multiple nations analyzed, including Mexico, Costa Rica, South Korea, the United States, and Germany. The highest weekly workload is registered in Mexico, averaging approximately 42.5 hours per worker. In contrast, the lowest hours are observed in Germany, standing at only 26.2 hours per week. In conclusion, high-income European nations demonstrate a strong societal transition toward shorter working schedules.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Average Weekly Working Hours in Selected Econo… (Hours per Week)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='67' y='70' width='45' height='110' fill='#B45309' rx='4'/><text x='89.5' y='64' font-size='10' font-weight='bold' fill='#B45309' text-anchor='middle'>42.5</text><text x='89.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Mexico</text><rect x='122' y='74' width='45' height='106' fill='#D97706' rx='4'/><text x='144.5' y='68' font-size='10' font-weight='bold' fill='#D97706' text-anchor='middle'>41</text><text x='144.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Costa Ri…</text><rect x='177' y='82' width='45' height='98' fill='#2563EB' rx='4'/><text x='199.5' y='76' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>37.8</text><text x='199.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>South Ko…</text><rect x='232' y='91' width='45' height='89' fill='#64748B' rx='4'/><text x='254.5' y='85' font-size='10' font-weight='bold' fill='#64748B' text-anchor='middle'>34.5</text><text x='254.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>United S…</text><rect x='287' y='112' width='45' height='68' fill='#059669' rx='4'/><text x='309.5' y='106' font-size='10' font-weight='bold' fill='#059669' text-anchor='middle'>26.2</text><text x='309.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Germany</text></svg>"
+    },
+    {
+      "id": "di_bar_09",
+      "title": "Annual Coffee Consumption per Capita (Kilograms)",
+      "chartType": "bar_chart",
+      "topic": "Annual Coffee Consumption per Capita (Kilograms)",
+      "categories": [
+        "Finland",
+        "Norway",
+        "Iceland",
+        "United States",
+        "Italy"
+      ],
+      "highPoint": "Finland at 12.0 kg",
+      "lowPoint": "Italy at 3.8 kg",
+      "keywords": [
+        "coffee consumption",
+        "per capita",
+        "Nordic countries",
+        "Finland and Norway",
+        "beverage intake",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given bar chart provides key information regarding annual per capita coffee consumption across selected countries. Looking closely, the chart depicts consumption figures for Finland, Norway, Iceland, the United States, and Italy. The highest coffee intake is overwhelmingly led by Finland, with citizens consuming twelve kilograms annually. Conversely, the lowest documented consumption in this group belongs to Italy at approximately 3.8 kilograms. In conclusion, northern European cold climates correlate with remarkably elevated hot beverage intake.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Annual Coffee Consumption per Capita (Kilograms) (kg per person per year)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='67' y='70' width='45' height='110' fill='#0284C7' rx='4'/><text x='89.5' y='64' font-size='10' font-weight='bold' fill='#0284C7' text-anchor='middle'>12</text><text x='89.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Finland</text><rect x='122' y='89' width='45' height='91' fill='#0369A1' rx='4'/><text x='144.5' y='83' font-size='10' font-weight='bold' fill='#0369A1' text-anchor='middle'>9.9</text><text x='144.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Norway</text><rect x='177' y='97' width='45' height='83' fill='#075985' rx='4'/><text x='199.5' y='91' font-size='10' font-weight='bold' fill='#075985' text-anchor='middle'>9</text><text x='199.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Iceland</text><rect x='232' y='140' width='45' height='40' fill='#D97706' rx='4'/><text x='254.5' y='134' font-size='10' font-weight='bold' fill='#D97706' text-anchor='middle'>4.4</text><text x='254.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>United S…</text><rect x='287' y='145' width='45' height='35' fill='#15803D' rx='4'/><text x='309.5' y='139' font-size='10' font-weight='bold' fill='#15803D' text-anchor='middle'>3.8</text><text x='309.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Italy</text></svg>"
+    },
+    {
+      "id": "di_bar_10",
+      "title": "Gross Domestic R&D Expenditure as Percentage of GDP",
+      "chartType": "bar_chart",
+      "topic": "Gross Domestic R&D Expenditure as Percentage of GDP",
+      "categories": [
+        "Israel",
+        "South Korea",
+        "United States",
+        "Japan",
+        "Germany"
+      ],
+      "highPoint": "Israel at 5.4% of GDP",
+      "lowPoint": "Germany at 3.1% of GDP",
+      "keywords": [
+        "research and development",
+        "expenditure percentage",
+        "gross domestic product",
+        "Israel and South Korea",
+        "technological innovation",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given bar chart provides key information about gross research and development spending as a percentage of gross domestic product. Examining the categories, the graph features technological economies including Israel, South Korea, the United States, Japan, and Germany. The highest research allocation is commanded by Israel, contributing an exceptional 5.4 percent of national GDP. In contrast, the lowest expenditure among this cohort is seen in Germany at approximately 3.1 percent. In conclusion, it is evident that sustained scientific investment forms the strategic foundation for advanced global competitiveness.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Gross Domestic R&D Expenditure as Percentage o… (% of National GDP)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><rect x='67' y='70' width='45' height='110' fill='#2563EB' rx='4'/><text x='89.5' y='64' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>5.4</text><text x='89.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Israel</text><rect x='122' y='82' width='45' height='98' fill='#1D4ED8' rx='4'/><text x='144.5' y='76' font-size='10' font-weight='bold' fill='#1D4ED8' text-anchor='middle'>4.8</text><text x='144.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>South Ko…</text><rect x='177' y='111' width='45' height='69' fill='#64748B' rx='4'/><text x='199.5' y='105' font-size='10' font-weight='bold' fill='#64748B' text-anchor='middle'>3.4</text><text x='199.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>United S…</text><rect x='232' y='115' width='45' height='65' fill='#EA580C' rx='4'/><text x='254.5' y='109' font-size='10' font-weight='bold' fill='#EA580C' text-anchor='middle'>3.2</text><text x='254.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Japan</text><rect x='287' y='117' width='45' height='63' fill='#059669' rx='4'/><text x='309.5' y='111' font-size='10' font-weight='bold' fill='#059669' text-anchor='middle'>3.1</text><text x='309.5' y='198' font-size='9' fill='#475569' text-anchor='middle'>Germany</text></svg>"
+    },
+    {
+      "id": "di_line_01",
+      "title": "Atmospheric Carbon Dioxide Concentration (1960-2024)",
+      "chartType": "line_graph",
+      "topic": "Atmospheric Carbon Dioxide Concentration (1960-2024)",
+      "categories": [
+        "1960",
+        "1980",
+        "2000",
+        "2024"
+      ],
+      "highPoint": "424 ppm in 2024",
+      "lowPoint": "316 ppm in 1960",
+      "keywords": [
+        "carbon dioxide concentration",
+        "parts per million",
+        "continuous increase",
+        "atmospheric change",
+        "global warming",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided line graph illustrates the trajectory of atmospheric carbon dioxide concentration recorded between 1960 and 2024. Looking closely at the time horizon, metrics are tracked across intervals from 1960, 1980, 2000, up to the year 2024. The highest concentration peak is reached in 2024, climbing to a historic summit of 424 parts per million. Conversely, the lowest baseline figure was registered at the beginning of the timeline in 1960 at only 316 parts per million. In conclusion, it is clear that greenhouse gas concentrations have experienced uninterrupted exponential acceleration.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Atmospheric Carbon Dioxide Concentration (1960-2024)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,135 140,110 220,75 300,30' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='135' r='5' fill='#2563EB'/><text x='60' y='127' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>316 ppm</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>1960</text><circle cx='140' cy='110' r='5' fill='#2563EB'/><text x='140' y='102' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>338 ppm</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>1980</text><circle cx='220' cy='75' r='5' fill='#2563EB'/><text x='220' y='67' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>369 ppm</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>2000</text><circle cx='300' cy='30' r='5' fill='#2563EB'/><text x='300' y='22' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>424 ppm</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2024</text></svg>"
+    },
+    {
+      "id": "di_line_02",
+      "title": "Global Inflation Rate Fluctuations (2018-2025)",
+      "chartType": "line_graph",
+      "topic": "Global Inflation Rate Fluctuations (2018-2025)",
+      "categories": [
+        "2018",
+        "2020",
+        "2022",
+        "2025"
+      ],
+      "highPoint": "8.8% in 2022",
+      "lowPoint": "2.4% in 2018",
+      "keywords": [
+        "inflation rate",
+        "economic fluctuations",
+        "peak figure",
+        "monetary stabilization",
+        "macroeconomic trend",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given line chart provides key information about global inflation rate fluctuations over the period from 2018 to 2025. Looking closely, the chart details annual movements through critical years such as 2018, 2020, 2022, and projected 2025. The highest inflationary surge is documented in 2022, reaching an acute peak of 8.8 percent. On the other hand, the lowest inflation benchmark occurred in 2018, situated at merely 2.4 percent. In conclusion, while global markets underwent sharp price volatility, recent central bank policies show signs of gradual cooling.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Inflation Rate Fluctuations (2018-2025)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,125 140,115 220,35 300,95' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='125' r='5' fill='#2563EB'/><text x='60' y='117' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>2.4%</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>2018</text><circle cx='140' cy='115' r='5' fill='#2563EB'/><text x='140' y='107' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>3.1%</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>2020</text><circle cx='220' cy='35' r='5' fill='#2563EB'/><text x='220' y='27' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>8.8%</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>2022</text><circle cx='300' cy='95' r='5' fill='#2563EB'/><text x='300' y='87' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>4.2%</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2025</text></svg>"
+    },
+    {
+      "id": "di_line_03",
+      "title": "Southeast Asia Digital Economy Gross Merchandise Value",
+      "chartType": "line_graph",
+      "topic": "Southeast Asia Digital Economy Gross Merchandise Value",
+      "categories": [
+        "2018",
+        "2020",
+        "2022",
+        "2024"
+      ],
+      "highPoint": "$120 Billion in 2024",
+      "lowPoint": "$32 Billion in 2018",
+      "keywords": [
+        "digital economy",
+        "gross merchandise value",
+        "steady expansion",
+        "Southeast Asia",
+        "billion dollars",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given line graph delineates the expansion of Southeast Asia’s digital economy measured in gross merchandise value from 2018 to 2024. Examining the horizontal axis, the graph tracks rapid growth through key milestones in 2018, 2020, 2022, and 2024. The highest economic valuation is achieved in 2024, standing at an impressive 120 billion US dollars. In contrast, the lowest starting valuation was recorded in 2018 at only 32 billion dollars. In conclusion, it is evident that internet commerce and financial technologies have stimulated monumental regional growth.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Southeast Asia Digital Economy Gross Merchandise Value</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,128 140,104 220,72 300,35' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='128' r='5' fill='#2563EB'/><text x='60' y='120' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>$32B</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>2018</text><circle cx='140' cy='104' r='5' fill='#2563EB'/><text x='140' y='96' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>$54B</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>2020</text><circle cx='220' cy='72' r='5' fill='#2563EB'/><text x='220' y='64' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>$82B</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>2022</text><circle cx='300' cy='35' r='5' fill='#2563EB'/><text x='300' y='27' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>$120B</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2024</text></svg>"
+    },
+    {
+      "id": "di_line_04",
+      "title": "International Tourist Arrivals in Western Australia",
+      "chartType": "line_graph",
+      "topic": "International Tourist Arrivals in Western Australia",
+      "categories": [
+        "2017",
+        "2019",
+        "2021",
+        "2024"
+      ],
+      "highPoint": "1,080,000 visitors in 2024",
+      "lowPoint": "180,000 visitors in 2021",
+      "keywords": [
+        "tourist arrivals",
+        "Western Australia",
+        "sharp decline",
+        "rebound trend",
+        "visitor volume",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given line graph outlines international tourist arrivals visiting Western Australia between the years 2017 and 2024. Looking closely, traveler volumes are plotted across four distinct chronological stages: 2017, 2019, 2021, and 2024. The highest volume of overseas travelers occurred in 2024, topping out at roughly 1.08 million visitors. Conversely, the lowest trough is visible in 2021, dropping steeply to merely 180,000 arrivals due to border closures. In conclusion, the hospitality sector demonstrated a robust V-shaped recovery exceeding previous historical records.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>International Tourist Arrivals in Western Australia</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,65 140,55 220,135 300,48' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='65' r='5' fill='#2563EB'/><text x='60' y='57' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>920K</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>2017</text><circle cx='140' cy='55' r='5' fill='#2563EB'/><text x='140' y='47' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>1010K</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>2019</text><circle cx='220' cy='135' r='5' fill='#2563EB'/><text x='220' y='127' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>180K</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>2021</text><circle cx='300' cy='48' r='5' fill='#2563EB'/><text x='300' y='40' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>1080K</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2024</text></svg>"
+    },
+    {
+      "id": "di_line_05",
+      "title": "Worldwide Electric Vehicle Sales Volume (2015-2024)",
+      "chartType": "line_graph",
+      "topic": "Worldwide Electric Vehicle Sales Volume (2015-2024)",
+      "categories": [
+        "2015",
+        "2018",
+        "2021",
+        "2024"
+      ],
+      "highPoint": "14.2 Million in 2024",
+      "lowPoint": "0.5 Million in 2015",
+      "keywords": [
+        "electric vehicles",
+        "sales volume",
+        "exponential growth",
+        "million units",
+        "automotive industry",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided line chart demonstrates the rapid trajectory of worldwide electric vehicle sales between 2015 and 2024. Looking closely, sales statistics are measured across key intervals including 2015, 2018, 2021, and 2024. The highest sales volume is documented in 2024, culminating in an extraordinary 14.2 million units sold. In contrast, the lowest market baseline was observed in 2015 at only half a million vehicles. In conclusion, global automotive markets are transitioning rapidly away from internal combustion engines toward electric mobility.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Worldwide Electric Vehicle Sales Volume (2015-2024)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,140 140,125 220,85 300,25' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='140' r='5' fill='#2563EB'/><text x='60' y='132' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>0.5M</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>2015</text><circle cx='140' cy='125' r='5' fill='#2563EB'/><text x='140' y='117' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>2.1M</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>2018</text><circle cx='220' cy='85' r='5' fill='#2563EB'/><text x='220' y='77' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>6.6M</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>2021</text><circle cx='300' cy='25' r='5' fill='#2563EB'/><text x='300' y='17' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>14.2M</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2024</text></svg>"
+    },
+    {
+      "id": "di_line_06",
+      "title": "Average Life Expectancy at Birth in Developing Regions",
+      "chartType": "line_graph",
+      "topic": "Average Life Expectancy at Birth in Developing Regions",
+      "categories": [
+        "1950",
+        "1970",
+        "1995",
+        "2020"
+      ],
+      "highPoint": "73 years in 2020",
+      "lowPoint": "42 years in 1950",
+      "keywords": [
+        "life expectancy",
+        "public health",
+        "steady increase",
+        "developing regions",
+        "longevity gain",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given line graph provides essential data regarding average life expectancy at birth across developing regions from 1950 to 2020. Looking into the progression, milestones are highlighted across four generations: 1950, 1970, 1995, and 2020. The highest life expectancy is achieved in the modern era in 2020, reaching seventy-three years of age. In comparison, the lowest historical figure was recorded in 1950, when the average lifespan stood at only forty-two years. In conclusion, modern medical advances and sanitation infrastructure have fostered extraordinary global longevity gains.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Average Life Expectancy at Birth in Developing Regions</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,130 140,98 220,68 300,40' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='130' r='5' fill='#2563EB'/><text x='60' y='122' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>42 yrs</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>1950</text><circle cx='140' cy='98' r='5' fill='#2563EB'/><text x='140' y='90' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>55 yrs</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>1970</text><circle cx='220' cy='68' r='5' fill='#2563EB'/><text x='220' y='60' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>64 yrs</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>1995</text><circle cx='300' cy='40' r='5' fill='#2563EB'/><text x='300' y='32' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>73 yrs</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2020</text></svg>"
+    },
+    {
+      "id": "di_line_07",
+      "title": "Global Crude Oil Price Volatility (Brent USD per Barrel)",
+      "chartType": "line_graph",
+      "topic": "Global Crude Oil Price Volatility (Brent USD per Barrel)",
+      "categories": [
+        "2014",
+        "2016",
+        "2020",
+        "2022"
+      ],
+      "highPoint": "$104 in 2022",
+      "lowPoint": "$39 in 2020",
+      "keywords": [
+        "crude oil price",
+        "Brent benchmark",
+        "price volatility",
+        "dollars per barrel",
+        "energy commodity",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given line chart details the significant price fluctuations of Brent crude oil measured in US dollars per barrel from 2014 to 2022. Looking closely, the chart captures volatile swings across four pivotal years: 2014, 2016, 2020, and 2022. The highest commodity price peak occurred in 2022, surging to an elevated benchmark of 104 dollars per barrel. Conversely, the lowest price level was experienced in 2020, bottoming out at merely thirty-nine dollars per barrel. In conclusion, international hydrocarbon markets remain exceptionally sensitive to macroeconomic cycles and geopolitical instability.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Crude Oil Price Volatility (Brent USD per Barrel)</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,42 140,120 220,135 300,35' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='42' r='5' fill='#2563EB'/><text x='60' y='34' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>$98</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>2014</text><circle cx='140' cy='120' r='5' fill='#2563EB'/><text x='140' y='112' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>$43</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>2016</text><circle cx='220' cy='135' r='5' fill='#2563EB'/><text x='220' y='127' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>$39</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>2020</text><circle cx='300' cy='35' r='5' fill='#2563EB'/><text x='300' y='27' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>$104</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2022</text></svg>"
+    },
+    {
+      "id": "di_line_08",
+      "title": "Percentage of Global Population Using the Internet",
+      "chartType": "line_graph",
+      "topic": "Percentage of Global Population Using the Internet",
+      "categories": [
+        "2005",
+        "2010",
+        "2017",
+        "2024"
+      ],
+      "highPoint": "68% in 2024",
+      "lowPoint": "16% in 2005",
+      "keywords": [
+        "internet penetration",
+        "global connectivity",
+        "steady rise",
+        "percentage of population",
+        "telecommunication",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented line graph exhibits the growth rate of worldwide internet penetration between 2005 and 2024. Examining the horizontal axis, the chart tracks four milestone years: 2005, 2010, 2017, and 2024. The highest connectivity rate is recorded in 2024, reaching sixty-eight percent of the human population. In contrast, the lowest user percentage was seen in 2005, standing at merely sixteen percent. In conclusion, the proliferation of mobile telecommunications has successfully connected over two-thirds of the world population.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Percentage of Global Population Using the Internet</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,130 140,105 220,70 300,35' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='130' r='5' fill='#2563EB'/><text x='60' y='122' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>16%</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>2005</text><circle cx='140' cy='105' r='5' fill='#2563EB'/><text x='140' y='97' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>30%</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>2010</text><circle cx='220' cy='70' r='5' fill='#2563EB'/><text x='220' y='62' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>49%</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>2017</text><circle cx='300' cy='35' r='5' fill='#2563EB'/><text x='300' y='27' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>68%</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2024</text></svg>"
+    },
+    {
+      "id": "di_line_09",
+      "title": "Average Monthly Temperature Comparison: London vs Sydney",
+      "chartType": "line_graph",
+      "topic": "Average Monthly Temperature Comparison: London vs Sydney",
+      "categories": [
+        "Jan",
+        "Apr",
+        "Jul",
+        "Oct"
+      ],
+      "highPoint": "Sydney in January at 23°C",
+      "lowPoint": "London in January at 6°C",
+      "keywords": [
+        "monthly temperature",
+        "London and Sydney",
+        "hemisphere contrast",
+        "celsius degrees",
+        "seasonal pattern",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given line graph provides a comparative temperature analysis between London and Sydney across different calendar months. Looking closely, monthly averages are tracked during key seasons: January, April, July, and October. The highest warmth figure is represented by Sydney in January, reaching an average of twenty-three degrees Celsius. Conversely, the lowest temperature is observed in London in January, dropping down to only six degrees Celsius. In conclusion, the mirrored temperature curves clearly demonstrate the opposing seasonal patterns of the two hemispheres.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Average Monthly Temperature Comparison: London vs Sydney</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,55 140,88 220,72 300,120' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='55' r='5' fill='#2563EB'/><text x='60' y='47' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>Sydney 23°C</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>Jan</text><circle cx='140' cy='88' r='5' fill='#2563EB'/><text x='140' y='80' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>Sydney 18°C</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>Apr</text><circle cx='220' cy='72' r='5' fill='#2563EB'/><text x='220' y='64' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>London 19°C</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>Jul</text><circle cx='300' cy='120' r='5' fill='#2563EB'/><text x='300' y='112' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>London 6°C</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>Jan</text></svg>"
+    },
+    {
+      "id": "di_line_10",
+      "title": "Youth Unemployment Rate Trends Across Major Economies",
+      "chartType": "line_graph",
+      "topic": "Youth Unemployment Rate Trends Across Major Economies",
+      "categories": [
+        "2012",
+        "2016",
+        "2020",
+        "2024"
+      ],
+      "highPoint": "24% in 2012",
+      "lowPoint": "13% in 2024",
+      "keywords": [
+        "youth unemployment",
+        "labor market",
+        "downward trend",
+        "gradual decline",
+        "economic participation",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given line graph demonstrates youth unemployment rate trends documented between 2012 and 2024. Examining the timeline, key data points are recorded in 2012, 2016, 2020, and 2024. The highest rate of youth unemployment was observed in 2012, standing at an elevated peak of twenty-four percent. In contrast, the lowest rate is registered in 2024, decreasing favorably to approximately thirteen percent. In conclusion, economic restructuring and active training initiatives have contributed to a sustained reduction in youth joblessness.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Youth Unemployment Rate Trends Across Major Economies</text><line x1='50' y1='180' x2='360' y2='180' stroke='#94A3B8' stroke-width='2'/><line x1='50' y1='40' x2='50' y2='180' stroke='#94A3B8' stroke-width='2'/><polyline points='60,40 140,65 220,55 300,85' fill='none' stroke='#2563EB' stroke-width='3' stroke-linecap='round'/><circle cx='60' cy='40' r='5' fill='#2563EB'/><text x='60' y='32' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>24%</text><text x='60' y='198' font-size='9' fill='#475569' text-anchor='middle'>2012</text><circle cx='140' cy='65' r='5' fill='#2563EB'/><text x='140' y='57' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>18%</text><text x='140' y='198' font-size='9' fill='#475569' text-anchor='middle'>2016</text><circle cx='220' cy='55' r='5' fill='#2563EB'/><text x='220' y='47' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>21%</text><text x='220' y='198' font-size='9' fill='#475569' text-anchor='middle'>2020</text><circle cx='300' cy='85' r='5' fill='#2563EB'/><text x='300' y='77' font-size='10' font-weight='bold' fill='#2563EB' text-anchor='middle'>13%</text><text x='300' y='198' font-size='9' fill='#475569' text-anchor='middle'>2024</text></svg>"
+    },
+    {
+      "id": "di_pie_01",
+      "title": "Global Smartphone Operating System Market Share",
+      "chartType": "pie_chart",
+      "topic": "Global Smartphone Operating System Market Share",
+      "categories": [
+        "Android",
+        "iOS",
+        "Others"
+      ],
+      "highPoint": "Android at 71%",
+      "lowPoint": "Others at 1%",
+      "keywords": [
+        "operating system",
+        "market share",
+        "Android and iOS",
+        "duopoly structure",
+        "mobile software",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given pie chart illustrates the worldwide market share distribution of smartphone operating systems. Looking closely, the chart categorizes software platforms into Android, iOS, and other minor operating systems. The highest proportion is overwhelmingly captured by Android, securing seventy-one percent of all mobile devices. In sharp contrast, the lowest segment belongs to other competing systems at a negligible one percent. In conclusion, the global mobile operating ecosystem is overwhelmingly characterized by a powerful two-platform duopoly.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Smartphone Operating System Market Share</text><circle cx='140' cy='125' r='75' fill='none' stroke='#10B981' stroke-width='40' stroke-dasharray='334 471' stroke-dashoffset='-0' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#3B82F6' stroke-width='40' stroke-dasharray='132 471' stroke-dashoffset='-334' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#F59E0B' stroke-width='40' stroke-dasharray='5 471' stroke-dashoffset='-466' transform='rotate(-90 140 125)'/><rect x='250' y='65' width='12' height='12' fill='#10B981' rx='2'/><text x='268' y='75' font-size='10' font-weight='bold' fill='#1E293B'>Android (71%)</text><rect x='250' y='90' width='12' height='12' fill='#3B82F6' rx='2'/><text x='268' y='100' font-size='10' font-weight='bold' fill='#1E293B'>iOS (28%)</text><rect x='250' y='115' width='12' height='12' fill='#F59E0B' rx='2'/><text x='268' y='125' font-size='10' font-weight='bold' fill='#1E293B'>Others (1%)</text></svg>"
+    },
+    {
+      "id": "di_pie_02",
+      "title": "Municipal Solid Waste Composition by Material",
+      "chartType": "pie_chart",
+      "topic": "Municipal Solid Waste Composition by Material",
+      "categories": [
+        "Food & Organic",
+        "Paper & Cardboard",
+        "Plastics",
+        "Glass & Metals",
+        "Others"
+      ],
+      "highPoint": "Food & Organic waste at 44%",
+      "lowPoint": "Glass & Metals at 10%",
+      "keywords": [
+        "solid waste",
+        "organic material",
+        "paper and plastics",
+        "recycling categories",
+        "municipal management",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided pie chart depicts the proportional breakdown of municipal solid waste categorized by material type. Looking into the segments, major components include food and organic scraps, paper, plastics, glass, and metals. The highest waste share is represented by food and organic refuse, accounting for forty-four percent of the aggregate total. Conversely, the lowest categorized grouping belongs to glass and metals at only ten percent. In conclusion, prioritizing municipal composting programs represents the most impactful step toward reducing overall landfill burden.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Municipal Solid Waste Composition by Material</text><circle cx='140' cy='125' r='75' fill='none' stroke='#10B981' stroke-width='40' stroke-dasharray='207 471' stroke-dashoffset='-0' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#F59E0B' stroke-width='40' stroke-dasharray='80 471' stroke-dashoffset='-207' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#EF4444' stroke-width='40' stroke-dasharray='57 471' stroke-dashoffset='-287' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#6366F1' stroke-width='40' stroke-dasharray='47 471' stroke-dashoffset='-344' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#94A3B8' stroke-width='40' stroke-dasharray='80 471' stroke-dashoffset='-391' transform='rotate(-90 140 125)'/><rect x='250' y='65' width='12' height='12' fill='#10B981' rx='2'/><text x='268' y='75' font-size='10' font-weight='bold' fill='#1E293B'>Food & Organic (44%)</text><rect x='250' y='90' width='12' height='12' fill='#F59E0B' rx='2'/><text x='268' y='100' font-size='10' font-weight='bold' fill='#1E293B'>Paper & Cardboard (17%)</text><rect x='250' y='115' width='12' height='12' fill='#EF4444' rx='2'/><text x='268' y='125' font-size='10' font-weight='bold' fill='#1E293B'>Plastics (12%)</text><rect x='250' y='140' width='12' height='12' fill='#6366F1' rx='2'/><text x='268' y='150' font-size='10' font-weight='bold' fill='#1E293B'>Glass & Metals (10%)</text><rect x='250' y='165' width='12' height='12' fill='#94A3B8' rx='2'/><text x='268' y='175' font-size='10' font-weight='bold' fill='#1E293B'>Others (17%)</text></svg>"
+    },
+    {
+      "id": "di_pie_03",
+      "title": "Global Freshwater Withdrawal by Economic Sector",
+      "chartType": "pie_chart",
+      "topic": "Global Freshwater Withdrawal by Economic Sector",
+      "categories": [
+        "Agriculture",
+        "Industrial",
+        "Municipal / Domestic"
+      ],
+      "highPoint": "Agriculture at 70%",
+      "lowPoint": "Municipal / Domestic usage at 11%",
+      "keywords": [
+        "freshwater withdrawal",
+        "agricultural irrigation",
+        "industrial usage",
+        "municipal consumption",
+        "water resource",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given pie chart details the distribution of global freshwater withdrawals allocated across primary economic sectors. Examining the divisions, the chart measures agricultural irrigation, industrial operations, and domestic municipal usage. The highest water consumption is heavily concentrated in agriculture, demanding seventy percent of all extracted freshwater. In comparison, the lowest extraction portion is assigned to domestic municipal taps at only eleven percent. In conclusion, developing efficient micro-irrigation technologies is paramount for ensuring sustainable future water security.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Freshwater Withdrawal by Economic Sector</text><circle cx='140' cy='125' r='75' fill='none' stroke='#059669' stroke-width='40' stroke-dasharray='330 471' stroke-dashoffset='-0' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#2563EB' stroke-width='40' stroke-dasharray='89 471' stroke-dashoffset='-330' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#0284C7' stroke-width='40' stroke-dasharray='52 471' stroke-dashoffset='-419' transform='rotate(-90 140 125)'/><rect x='250' y='65' width='12' height='12' fill='#059669' rx='2'/><text x='268' y='75' font-size='10' font-weight='bold' fill='#1E293B'>Agriculture (70%)</text><rect x='250' y='90' width='12' height='12' fill='#2563EB' rx='2'/><text x='268' y='100' font-size='10' font-weight='bold' fill='#1E293B'>Industrial (19%)</text><rect x='250' y='115' width='12' height='12' fill='#0284C7' rx='2'/><text x='268' y='125' font-size='10' font-weight='bold' fill='#1E293B'>Municipal / Domestic (11%)</text></svg>"
+    },
+    {
+      "id": "di_pie_04",
+      "title": "Electricity Generation Fuel Mix in Australia",
+      "chartType": "pie_chart",
+      "topic": "Electricity Generation Fuel Mix in Australia",
+      "categories": [
+        "Coal",
+        "Renewables",
+        "Natural Gas",
+        "Oil"
+      ],
+      "highPoint": "Coal at 47%",
+      "lowPoint": "Oil at 1%",
+      "keywords": [
+        "electricity generation",
+        "fuel mix",
+        "coal power",
+        "renewable transition",
+        "energy distribution",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given pie chart presents valuable data on the electricity generation fuel mix across Australia. Looking into the segments, generation is split between coal, renewable resources, natural gas, and oil. The highest individual generation source is coal, producing forty-seven percent of national electric power. Conversely, the lowest contribution is seen in petroleum oil at merely one percent. In conclusion, while coal historically anchors base load supply, renewable energy has rapidly expanded to over one-third of the total grid.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Electricity Generation Fuel Mix in Australia</text><circle cx='140' cy='125' r='75' fill='none' stroke='#475569' stroke-width='40' stroke-dasharray='221 471' stroke-dashoffset='-0' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#10B981' stroke-width='40' stroke-dasharray='165 471' stroke-dashoffset='-221' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#F59E0B' stroke-width='40' stroke-dasharray='80 471' stroke-dashoffset='-386' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#DC2626' stroke-width='40' stroke-dasharray='5 471' stroke-dashoffset='-466' transform='rotate(-90 140 125)'/><rect x='250' y='65' width='12' height='12' fill='#475569' rx='2'/><text x='268' y='75' font-size='10' font-weight='bold' fill='#1E293B'>Coal (47%)</text><rect x='250' y='90' width='12' height='12' fill='#10B981' rx='2'/><text x='268' y='100' font-size='10' font-weight='bold' fill='#1E293B'>Renewables (35%)</text><rect x='250' y='115' width='12' height='12' fill='#F59E0B' rx='2'/><text x='268' y='125' font-size='10' font-weight='bold' fill='#1E293B'>Natural Gas (17%)</text><rect x='250' y='140' width='12' height='12' fill='#DC2626' rx='2'/><text x='268' y='150' font-size='10' font-weight='bold' fill='#1E293B'>Oil (1%)</text></svg>"
+    },
+    {
+      "id": "di_pie_05",
+      "title": "Global Wealth Distribution by Population Decile",
+      "chartType": "pie_chart",
+      "topic": "Global Wealth Distribution by Population Decile",
+      "categories": [
+        "Top 1% Richest",
+        "Next 9% Wealthy",
+        "Middle 40%",
+        "Bottom 50%"
+      ],
+      "highPoint": "Top 1% richest holding 45% of total wealth",
+      "lowPoint": "Bottom 50% holding only 2%",
+      "keywords": [
+        "wealth distribution",
+        "economic inequality",
+        "top one percent",
+        "asset concentration",
+        "net worth",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided pie chart demonstrates the worldwide distribution of aggregate wealth among different population strata. Looking closely, the chart segments the global population into the top one percent, the next nine percent, the middle class, and the bottom half. The highest share of capital is hoarded by the richest one percent, controlling forty-five percent of all personal assets. In severe contrast, the lowest asset share is owned by the bottom fifty percent of humanity at only two percent. In conclusion, the data highlights acute structural wealth inequality present throughout contemporary global financial systems.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Wealth Distribution by Population Decile</text><circle cx='140' cy='125' r='75' fill='none' stroke='#D97706' stroke-width='40' stroke-dasharray='212 471' stroke-dashoffset='-0' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#2563EB' stroke-width='40' stroke-dasharray='179 471' stroke-dashoffset='-212' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#10B981' stroke-width='40' stroke-dasharray='71 471' stroke-dashoffset='-391' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#94A3B8' stroke-width='40' stroke-dasharray='9 471' stroke-dashoffset='-462' transform='rotate(-90 140 125)'/><rect x='250' y='65' width='12' height='12' fill='#D97706' rx='2'/><text x='268' y='75' font-size='10' font-weight='bold' fill='#1E293B'>Top 1% Richest (45%)</text><rect x='250' y='90' width='12' height='12' fill='#2563EB' rx='2'/><text x='268' y='100' font-size='10' font-weight='bold' fill='#1E293B'>Next 9% Wealthy (38%)</text><rect x='250' y='115' width='12' height='12' fill='#10B981' rx='2'/><text x='268' y='125' font-size='10' font-weight='bold' fill='#1E293B'>Middle 40% (15%)</text><rect x='250' y='140' width='12' height='12' fill='#94A3B8' rx='2'/><text x='268' y='150' font-size='10' font-weight='bold' fill='#1E293B'>Bottom 50% (2%)</text></svg>"
+    },
+    {
+      "id": "di_pie_06",
+      "title": "Recommended Daily Caloric Intake by Macronutrient",
+      "chartType": "pie_chart",
+      "topic": "Recommended Daily Caloric Intake by Macronutrient",
+      "categories": [
+        "Carbohydrates",
+        "Healthy Fats",
+        "Proteins"
+      ],
+      "highPoint": "Carbohydrates at 55%",
+      "lowPoint": "Proteins at 15%",
+      "keywords": [
+        "caloric intake",
+        "macronutrient balance",
+        "carbohydrates",
+        "fats and proteins",
+        "dietary guideline",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given pie chart details the recommended proportion of daily caloric intake distributed across key macronutrients. Looking closely, the dietary distribution divides nutrition into carbohydrates, healthy fats, and dietary proteins. The highest caloric proportion is allocated to carbohydrates, representing fifty-five percent of overall daily intake. Conversely, the lowest percentage is assigned to proteins at approximately fifteen percent. In conclusion, standard dietary consensus emphasizes carbohydrates as the fundamental fuel source for human metabolic health.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Recommended Daily Caloric Intake by Macronutrient</text><circle cx='140' cy='125' r='75' fill='none' stroke='#F59E0B' stroke-width='40' stroke-dasharray='259 471' stroke-dashoffset='-0' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#3B82F6' stroke-width='40' stroke-dasharray='141 471' stroke-dashoffset='-259' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#10B981' stroke-width='40' stroke-dasharray='71 471' stroke-dashoffset='-400' transform='rotate(-90 140 125)'/><rect x='250' y='65' width='12' height='12' fill='#F59E0B' rx='2'/><text x='268' y='75' font-size='10' font-weight='bold' fill='#1E293B'>Carbohydrates (55%)</text><rect x='250' y='90' width='12' height='12' fill='#3B82F6' rx='2'/><text x='268' y='100' font-size='10' font-weight='bold' fill='#1E293B'>Healthy Fats (30%)</text><rect x='250' y='115' width='12' height='12' fill='#10B981' rx='2'/><text x='268' y='125' font-size='10' font-weight='bold' fill='#1E293B'>Proteins (15%)</text></svg>"
+    },
+    {
+      "id": "di_pie_07",
+      "title": "Ocean Plastic Pollution Sources by Economic Origin",
+      "chartType": "pie_chart",
+      "topic": "Ocean Plastic Pollution Sources by Economic Origin",
+      "categories": [
+        "Single-Use Packaging",
+        "Synthetic Textiles",
+        "Consumer Goods",
+        "Maritime & Fishing",
+        "Others"
+      ],
+      "highPoint": "Single-use packaging at 36%",
+      "lowPoint": "Maritime & fishing gear at 10%",
+      "keywords": [
+        "plastic pollution",
+        "marine debris",
+        "single-use packaging",
+        "synthetic textiles",
+        "ocean conservation",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided pie chart outlines the primary sources contributing to global ocean plastic pollution by economic origin. Looking closely, major categories include single-use packaging, synthetic textiles, consumer goods, and maritime fishing gear. The highest contributing segment is single-use packaging, responsible for thirty-six percent of all ocean plastic deposits. In contrast, the lowest categorized sector is maritime and fishing equipment at ten percent. In conclusion, curtailing land-based consumer packaging is vital for halting the ecological degradation of marine habitats.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Ocean Plastic Pollution Sources by Economic Origin</text><circle cx='140' cy='125' r='75' fill='none' stroke='#DC2626' stroke-width='40' stroke-dasharray='170 471' stroke-dashoffset='-0' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#EA580C' stroke-width='40' stroke-dasharray='75 471' stroke-dashoffset='-170' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#F59E0B' stroke-width='40' stroke-dasharray='57 471' stroke-dashoffset='-245' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#2563EB' stroke-width='40' stroke-dasharray='47 471' stroke-dashoffset='-302' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#64748B' stroke-width='40' stroke-dasharray='122 471' stroke-dashoffset='-349' transform='rotate(-90 140 125)'/><rect x='250' y='65' width='12' height='12' fill='#DC2626' rx='2'/><text x='268' y='75' font-size='10' font-weight='bold' fill='#1E293B'>Single-Use Packaging (36%)</text><rect x='250' y='90' width='12' height='12' fill='#EA580C' rx='2'/><text x='268' y='100' font-size='10' font-weight='bold' fill='#1E293B'>Synthetic Textiles (16%)</text><rect x='250' y='115' width='12' height='12' fill='#F59E0B' rx='2'/><text x='268' y='125' font-size='10' font-weight='bold' fill='#1E293B'>Consumer Goods (12%)</text><rect x='250' y='140' width='12' height='12' fill='#2563EB' rx='2'/><text x='268' y='150' font-size='10' font-weight='bold' fill='#1E293B'>Maritime & Fishing (10%)</text><rect x='250' y='165' width='12' height='12' fill='#64748B' rx='2'/><text x='268' y='175' font-size='10' font-weight='bold' fill='#1E293B'>Others (26%)</text></svg>"
+    },
+    {
+      "id": "di_pie_08",
+      "title": "Global Venture Capital Deal Funding by Industry Sector",
+      "chartType": "pie_chart",
+      "topic": "Global Venture Capital Deal Funding by Industry Sector",
+      "categories": [
+        "Artificial Intelligence & Cloud",
+        "Biotechnology & Healthcare",
+        "FinTech",
+        "Climate & Cleantech"
+      ],
+      "highPoint": "AI & Cloud Computing at 42%",
+      "lowPoint": "Climate & Cleantech at 16%",
+      "keywords": [
+        "venture capital",
+        "funding allocation",
+        "artificial intelligence",
+        "biotechnology",
+        "fintech investment",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given pie chart illustrates the allocation of global venture capital funding distributed across emerging technology sectors. Looking into the details, key target industries include artificial intelligence, biotechnology, financial technology, and cleantech. The highest investment volume is secured by artificial intelligence and cloud computing, commanding forty-two percent of total venture funds. Conversely, the lowest proportion is allocated to climate and clean technologies at sixteen percent. In conclusion, investor capital remains aggressively focused on software automation and cutting-edge machine learning.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='26' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Venture Capital Deal Funding by Industry Sector</text><circle cx='140' cy='125' r='75' fill='none' stroke='#6366F1' stroke-width='40' stroke-dasharray='198 471' stroke-dashoffset='-0' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#10B981' stroke-width='40' stroke-dasharray='113 471' stroke-dashoffset='-198' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#3B82F6' stroke-width='40' stroke-dasharray='85 471' stroke-dashoffset='-311' transform='rotate(-90 140 125)'/><circle cx='140' cy='125' r='75' fill='none' stroke='#F59E0B' stroke-width='40' stroke-dasharray='75 471' stroke-dashoffset='-396' transform='rotate(-90 140 125)'/><rect x='250' y='65' width='12' height='12' fill='#6366F1' rx='2'/><text x='268' y='75' font-size='10' font-weight='bold' fill='#1E293B'>Artificial Intelligence & Cloud (42%)</text><rect x='250' y='90' width='12' height='12' fill='#10B981' rx='2'/><text x='268' y='100' font-size='10' font-weight='bold' fill='#1E293B'>Biotechnology & Healthcare (24%)</text><rect x='250' y='115' width='12' height='12' fill='#3B82F6' rx='2'/><text x='268' y='125' font-size='10' font-weight='bold' fill='#1E293B'>FinTech (18%)</text><rect x='250' y='140' width='12' height='12' fill='#F59E0B' rx='2'/><text x='268' y='150' font-size='10' font-weight='bold' fill='#1E293B'>Climate & Cleantech (16%)</text></svg>"
+    },
+    {
+      "id": "di_proc_01",
+      "title": "The Biological Life Cycle of an Atlantic Salmon",
+      "chartType": "process_diagram",
+      "topic": "The Biological Life Cycle of an Atlantic Salmon",
+      "categories": [
+        "Freshwater Eggs",
+        "Alevin & Fry Stage",
+        "Parr to Smolt",
+        "Adult Ocean Migration",
+        "Upriver Spawning"
+      ],
+      "highPoint": "Adult ocean phase (maximum size and weight)",
+      "lowPoint": "Egg stage (most fragile vulnerability)",
+      "keywords": [
+        "salmon life cycle",
+        "freshwater eggs",
+        "smoltification",
+        "ocean migration",
+        "spawning cycle",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided process diagram delineates the complete biological life cycle of the Atlantic salmon from birth to reproduction. Looking into the stages, the cycle progresses from riverbed eggs, alevin, parr, smolt, adult oceanic phase, to upriver spawning. The most physically demanding phase occurs during adult upriver migration, where fish swim against strong river currents to spawn. In contrast, the initial vulnerable baseline begins at the freshwater egg stage concealed beneath gravel beds. In conclusion, the diagram clearly illustrates an intricate anadromous life cycle bridging both river and marine ecosystems.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>The Biological Life Cycle of an Atlantic Salmon</text><rect x='30' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='65' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Freshwater…</text><text x='110' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='120' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='155' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 2</text><text x='155' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Alevin & F…</text><text x='200' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='210' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='245' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 3</text><text x='245' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Parr to Sm…</text><text x='290' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='300' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='335' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 4</text><text x='335' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Adult Ocea…</text><text x='380' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='390' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='425' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 5</text><text x='425' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Upriver Sp…</text><rect x='40' y='160' width='320' height='40' fill='#F1F5F9' rx='6'/><text x='200' y='184' text-anchor='middle' font-size='9.5' font-weight='bold' fill='#475569'>Systematic Sequential Progression</text></svg>"
+    },
+    {
+      "id": "di_proc_02",
+      "title": "Industrial Glass Bottle Recycling and Remanufacturing Process",
+      "chartType": "process_diagram",
+      "topic": "Industrial Glass Bottle Recycling and Remanufacturing Process",
+      "categories": [
+        "Curbside Collection",
+        "Crushing to Cullet",
+        "High-Heat Furnace",
+        "Blow Molding",
+        "Quality Inspection"
+      ],
+      "highPoint": "Furnace temperature at 1500°C",
+      "lowPoint": "Initial manual sorting stage",
+      "keywords": [
+        "glass recycling",
+        "collection and sorting",
+        "crushed cullet",
+        "furnace melting",
+        "circular economy",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given flow diagram illustrates the industrial process of recycling and remanufacturing consumer glass bottles. Examining the sequence, there are five systematic stages: collection, crushing, furnace melting, mold blowing, and quality inspection. The most energy-intensive operation takes place inside the high-heat furnace, where materials are melted at 1500 degrees Celsius. Conversely, the simplest starting point is the collection and mechanical sorting of used bottles. In conclusion, the continuous recycling loop demonstrates an effective circular manufacturing process that conserves natural silica.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Industrial Glass Bottle Recycling and Remanufacturing Process</text><rect x='30' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='65' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Curbside C…</text><text x='110' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='120' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='155' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 2</text><text x='155' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Crushing t…</text><text x='200' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='210' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='245' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 3</text><text x='245' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>High-Heat …</text><text x='290' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='300' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='335' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 4</text><text x='335' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Blow Moldi…</text><text x='380' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='390' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='425' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 5</text><text x='425' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Quality In…</text><rect x='40' y='160' width='320' height='40' fill='#F1F5F9' rx='6'/><text x='200' y='184' text-anchor='middle' font-size='9.5' font-weight='bold' fill='#475569'>Systematic Sequential Progression</text></svg>"
+    },
+    {
+      "id": "di_proc_03",
+      "title": "Municipal Water Purification and Distribution System",
+      "chartType": "process_diagram",
+      "topic": "Municipal Water Purification and Distribution System",
+      "categories": [
+        "Raw Intake",
+        "Coagulation & Flocculation",
+        "Sedimentation Basin",
+        "Sand & Carbon Filtration",
+        "Chlorination & Disinfection",
+        "Pressurized Network"
+      ],
+      "highPoint": "Clean water distribution to residential taps",
+      "lowPoint": "Raw water intake containing turbidity",
+      "keywords": [
+        "water purification",
+        "coagulation and flocculation",
+        "sedimentation basin",
+        "disinfection",
+        "potable water",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented diagram outlines the multi-stage municipal process of purifying raw water for domestic distribution. Looking into the stages, the sequence encompasses raw intake, chemical coagulation, sedimentation, sand filtration, and chlorination. The most critical biochemical safeguard occurs during chlorination, ensuring the complete eradication of waterborne pathogens. In contrast, the initial mechanical stage starts with raw water extraction from lakes or rivers. In conclusion, the structured treatment pipeline effectively transforms turbid natural water into safe potable drinking supply.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Municipal Water Purification and Distribution System</text><rect x='30' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='65' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Raw Intake</text><text x='110' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='120' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='155' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 2</text><text x='155' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Coagulatio…</text><text x='200' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='210' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='245' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 3</text><text x='245' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Sedimentat…</text><text x='290' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='300' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='335' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 4</text><text x='335' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Sand & Car…</text><text x='380' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='390' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='425' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 5</text><text x='425' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Chlorinati…</text><text x='470' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='480' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='515' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 6</text><text x='515' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Pressurize…</text><rect x='40' y='160' width='320' height='40' fill='#F1F5F9' rx='6'/><text x='200' y='184' text-anchor='middle' font-size='9.5' font-weight='bold' fill='#475569'>Systematic Sequential Progression</text></svg>"
+    },
+    {
+      "id": "di_proc_04",
+      "title": "From Coffee Bean Harvesting to Espresso Extraction",
+      "chartType": "process_diagram",
+      "topic": "From Coffee Bean Harvesting to Espresso Extraction",
+      "categories": [
+        "Cherry Picking",
+        "Depulping & Washing",
+        "Sun Drying",
+        "Roasting at 220°C",
+        "Grinding & Brewing"
+      ],
+      "highPoint": "Thermal roasting at 220°C producing aromatic flavor",
+      "lowPoint": "Initial hand-picking of raw cherries",
+      "keywords": [
+        "coffee production",
+        "cherry harvesting",
+        "sun drying",
+        "thermal roasting",
+        "espresso extraction",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided process flowchart traces the comprehensive journey of coffee production from cherry harvesting to final brewing. Looking closely, the process comprises five core milestones: cherry picking, wet depulping, sun drying, thermal roasting, and brewing. The most transformative thermal operation occurs during roasting at 220 degrees Celsius, which develops rich aromatic coffee oils. Conversely, the simplest initial step begins with hand-picking ripe cherries on farm plantations. In conclusion, the flowchart clearly highlights how meticulous agricultural and thermal processing yields commercial espresso coffee.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>From Coffee Bean Harvesting to Espresso Extraction</text><rect x='30' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='65' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Cherry Pic…</text><text x='110' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='120' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='155' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 2</text><text x='155' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Depulping …</text><text x='200' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='210' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='245' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 3</text><text x='245' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Sun Drying</text><text x='290' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='300' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='335' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 4</text><text x='335' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Roasting a…</text><text x='380' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='390' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='425' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 5</text><text x='425' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Grinding &…</text><rect x='40' y='160' width='320' height='40' fill='#F1F5F9' rx='6'/><text x='200' y='184' text-anchor='middle' font-size='9.5' font-weight='bold' fill='#475569'>Systematic Sequential Progression</text></svg>"
+    },
+    {
+      "id": "di_proc_05",
+      "title": "Photosynthesis Biochemical Cycle and Energy Conversion",
+      "chartType": "process_diagram",
+      "topic": "Photosynthesis Biochemical Cycle and Energy Conversion",
+      "categories": [
+        "Light Absorption",
+        "Water Splitting",
+        "Calvin Cycle",
+        "Glucose Synthesis"
+      ],
+      "highPoint": "Glucose synthesis storing chemical energy",
+      "lowPoint": "Light absorption trigger",
+      "keywords": [
+        "photosynthesis cycle",
+        "chlorophyll absorption",
+        "water photolysis",
+        "Calvin cycle",
+        "glucose synthesis",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given scientific diagram illustrates the biochemical process of photosynthesis and solar energy conversion within plant cells. Looking closely at the stages, the mechanism involves solar absorption, water photolysis, the Calvin cycle, and glucose synthesis. The most vital chemical outcome is glucose synthesis, which converts captured solar energy into stable plant biomass. Conversely, the initial operational trigger is solar photon absorption by chlorophyll pigments in the thylakoid membranes. In conclusion, photosynthesis serves as the fundamental biological engine sustaining both terrestrial oxygen and food webs.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Photosynthesis Biochemical Cycle and Energy Conversion</text><rect x='30' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='65' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Light Abso…</text><text x='110' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='120' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='155' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 2</text><text x='155' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Water Spli…</text><text x='200' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='210' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='245' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 3</text><text x='245' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Calvin Cyc…</text><text x='290' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='300' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='335' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 4</text><text x='335' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Glucose Sy…</text><rect x='40' y='160' width='320' height='40' fill='#F1F5F9' rx='6'/><text x='200' y='184' text-anchor='middle' font-size='9.5' font-weight='bold' fill='#475569'>Systematic Sequential Progression</text></svg>"
+    },
+    {
+      "id": "di_proc_06",
+      "title": "Crystalline Silicon Photovoltaic Solar Cell Manufacturing",
+      "chartType": "process_diagram",
+      "topic": "Crystalline Silicon Photovoltaic Solar Cell Manufacturing",
+      "categories": [
+        "Quartz Mining",
+        "Ingot Smelting",
+        "Wafer Slicing",
+        "Phosphorus Doping",
+        "Panel Assembly"
+      ],
+      "highPoint": "Precision doping creating electrical semiconductor properties",
+      "lowPoint": "Raw quartz extraction from open quarries",
+      "keywords": [
+        "photovoltaic manufacturing",
+        "silicon ingots",
+        "wafer slicing",
+        "semiconductor doping",
+        "solar module",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented diagram outlines the technological stages involved in manufacturing crystalline silicon photovoltaic solar cells. Examining the flow, the fabrication covers quartz mining, ingot smelting, wafer slicing, semiconductor doping, and panel assembly. The most technically sensitive procedure is phosphorus doping, which creates the P-N junction necessary for electric currents. In contrast, the foundational baseline begins with quartz sand extraction from raw quarries. In conclusion, sophisticated semiconductor processing allows common silica minerals to become advanced clean energy generators.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Crystalline Silicon Photovoltaic Solar Cell Manufacturing</text><rect x='30' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='65' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Quartz Min…</text><text x='110' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='120' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='155' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 2</text><text x='155' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Ingot Smel…</text><text x='200' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='210' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='245' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 3</text><text x='245' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Wafer Slic…</text><text x='290' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='300' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='335' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 4</text><text x='335' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Phosphorus…</text><text x='380' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='390' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='425' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 5</text><text x='425' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Panel Asse…</text><rect x='40' y='160' width='320' height='40' fill='#F1F5F9' rx='6'/><text x='200' y='184' text-anchor='middle' font-size='9.5' font-weight='bold' fill='#475569'>Systematic Sequential Progression</text></svg>"
+    },
+    {
+      "id": "di_proc_07",
+      "title": "Hydroelectric Dam Gravity Power Generation Flow",
+      "chartType": "process_diagram",
+      "topic": "Hydroelectric Dam Gravity Power Generation Flow",
+      "categories": [
+        "Reservoir Storage",
+        "Penstock Sluice Gate",
+        "Turbine Runner",
+        "Generator Induction",
+        "Grid Transmission"
+      ],
+      "highPoint": "Power generation via electromagnetic induction",
+      "lowPoint": "Passive water storage in reservoir",
+      "keywords": [
+        "hydroelectric dam",
+        "penstock pipe",
+        "turbine rotation",
+        "electromagnetic generator",
+        "grid transmission",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given engineering diagram demonstrates how a hydroelectric dam converts gravitational water potential into electrical power. Looking closely, the infrastructure contains five principal elements: water reservoir, penstock gate, turbine, generator, and transformers. The highest kinetic energy conversion occurs inside the turbine housing, where high-pressure water drives rapid rotor rotation. Conversely, the static starting condition consists of calm water storage in the elevated reservoir. In conclusion, the system harnesses natural gravitational hydraulics to deliver continuous, renewable electricity to the power grid.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Hydroelectric Dam Gravity Power Generation Flow</text><rect x='30' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='65' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Reservoir …</text><text x='110' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='120' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='155' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 2</text><text x='155' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Penstock S…</text><text x='200' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='210' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='245' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 3</text><text x='245' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Turbine Ru…</text><text x='290' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='300' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='335' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 4</text><text x='335' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Generator …</text><text x='380' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='390' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='425' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 5</text><text x='425' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Grid Trans…</text><rect x='40' y='160' width='320' height='40' fill='#F1F5F9' rx='6'/><text x='200' y='184' text-anchor='middle' font-size='9.5' font-weight='bold' fill='#475569'>Systematic Sequential Progression</text></svg>"
+    },
+    {
+      "id": "di_proc_08",
+      "title": "Recycled Paperboard and Pulp Processing Cycle",
+      "chartType": "process_diagram",
+      "topic": "Recycled Paperboard and Pulp Processing Cycle",
+      "categories": [
+        "Waste Paper Intake",
+        "De-inking & Screening",
+        "Slurry Refining",
+        "Heated Roller Press",
+        "Finished Paper Reels"
+      ],
+      "highPoint": "Heated roller drying under high steam pressure",
+      "lowPoint": "Raw waste paper shredding",
+      "keywords": [
+        "paperboard recycling",
+        "de-inking process",
+        "slurry refining",
+        "steam rollers",
+        "finished reels",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided process diagram illustrates the industrial remanufacturing of discarded waste paper into commercial packaging reels. Examining the sequence, operations proceed through hydrapulper mixing, de-inking screening, slurry refining, roller drying, and reel winding. The most mechanically intense phase occurs across the heated roller press, which flattens and evaporates moisture from wet paper sheets. In contrast, the initial preparation stage merely involves shredding discarded consumer cardboard. In conclusion, closed-loop paper reprocessing substantially curtails virgin timber consumption and reduces municipal waste volumes.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Recycled Paperboard and Pulp Processing Cycle</text><rect x='30' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='65' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 1</text><text x='65' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Waste Pape…</text><text x='110' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='120' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='155' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 2</text><text x='155' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>De-inking …</text><text x='200' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='210' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='245' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 3</text><text x='245' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Slurry Ref…</text><text x='290' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='300' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='335' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 4</text><text x='335' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Heated Rol…</text><text x='380' y='112' font-size='14' fill='#0284C7'>➔</text><rect x='390' y='80' width='70' height='55' fill='#F0F9FF' stroke='#0284C7' stroke-width='1.5' rx='6'/><text x='425' y='102' text-anchor='middle' font-size='10' font-weight='bold' fill='#0369A1'>Step 5</text><text x='425' y='120' text-anchor='middle' font-size='8.5' fill='#334155'>Finished P…</text><rect x='40' y='160' width='320' height='40' fill='#F1F5F9' rx='6'/><text x='200' y='184' text-anchor='middle' font-size='9.5' font-weight='bold' fill='#475569'>Systematic Sequential Progression</text></svg>"
+    },
+    {
+      "id": "di_map_01",
+      "title": "Annual Rainfall and Climate Zones Across Australia",
+      "chartType": "geographic_map",
+      "topic": "Annual Rainfall and Climate Zones Across Australia",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Tropical North with over 1200 mm precipitation",
+      "lowPoint": "Arid Outback Center with under 200 mm",
+      "keywords": [
+        "rainfall distribution",
+        "climate zones",
+        "tropical north",
+        "arid interior",
+        "precipitation contrast",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given geographic map delineates the distribution of annual rainfall and climate zones across the Australian continent. Looking closely, the map contrasts the tropical northern territory, coastal eastern rim, southern agricultural belt, and the central outback. The highest annual precipitation is concentrated along the northern tropical coast, exceeding 1200 millimeters per year. In severe contrast, the lowest rainfall is observed across the vast arid interior, dipping below 200 millimeters annually. In conclusion, the map clearly demonstrates that Australian demographic and farming activities are strictly constrained to coastal fringes.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Annual Rainfall and Climate Zones Across Australia</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Tropical North with over 1200 mm precipitation</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Arid Outback Center with under 200 mm</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Coastal wet fringes surrounding a dry, desert-dominated continent</text></svg>"
+    },
+    {
+      "id": "di_map_02",
+      "title": "Global Tropical Deforestation Hotspots and Forest Loss",
+      "chartType": "geographic_map",
+      "topic": "Global Tropical Deforestation Hotspots and Forest Loss",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Amazon Basin with 3.2 million hectares lost annually",
+      "lowPoint": "Boreal northern forests with stable canopy cover",
+      "keywords": [
+        "tropical deforestation",
+        "forest canopy loss",
+        "Amazon Basin",
+        "Southeast Asia",
+        "environmental conservation",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented thematic world map highlights critical geographic hotspots of tropical deforestation and forest loss. Looking closely, critical areas identified include the Amazon Basin in South America, Southeast Asia, Central Africa, and northern boreal zones. The highest rate of forest destruction is located in the Amazon Basin, suffering over 3.2 million hectares of annual canopy loss. In contrast, the most stable forest areas are preserved across northern boreal regions in Canada and Scandinavia. In conclusion, equatorial rainforest ecosystems remain under extreme deforestation pressure driven by commercial agriculture.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Tropical Deforestation Hotspots and Forest Loss</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Amazon Basin with 3.2 million hectares lost annually</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Boreal northern forests with stable canopy cover</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Equatorial rainforests face acute agricultural clearing while northern temperate zones remain stable</text></svg>"
+    },
+    {
+      "id": "di_map_03",
+      "title": "Population Density Clusters Across the Japanese Archipelago",
+      "chartType": "geographic_map",
+      "topic": "Population Density Clusters Across the Japanese Archipelago",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Tokyo metropolitan area with over 6,000 people per square km",
+      "lowPoint": "Hokkaido mountain regions under 70 people per square km",
+      "keywords": [
+        "population density",
+        "Japanese archipelago",
+        "Tokyo megalopolis",
+        "coastal concentration",
+        "demographic cluster",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given demographic map displays the concentration of population density across the islands of the Japanese archipelago. Looking closely, the map contrasts the Tokyo megalopolis, the Osaka-Kobe industrial basin, rural Honshu, and mountainous Hokkaido. The highest population density is overwhelmingly centered in the Greater Tokyo area, exceeding 6,000 individuals per square kilometer. Conversely, the lowest density is recorded in northern Hokkaido and alpine areas, with fewer than seventy people per square kilometer. In conclusion, rugged mountainous terrain has forced the vast majority of Japan’s population into highly congested coastal plains.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Population Density Clusters Across the Japanese Archipelago</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Tokyo metropolitan area with over 6,000 people per square km</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Hokkaido mountain regions under 70 people per square km</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Intense demographic clustering along the southern Pacific belt vs empty mountainous interior</text></svg>"
+    },
+    {
+      "id": "di_map_04",
+      "title": "Pacific Rim Seismic and Volcanic Activity (Ring of Fire)",
+      "chartType": "geographic_map",
+      "topic": "Pacific Rim Seismic and Volcanic Activity (Ring of Fire)",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Western Pacific Arc with over 85% of major earthquakes",
+      "lowPoint": "Central ocean plate interior with minimal tremors",
+      "keywords": [
+        "Ring of Fire",
+        "tectonic plate boundary",
+        "seismic activity",
+        "volcanic eruptions",
+        "subduction zones",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given geological map depicts the distribution of major earthquake epicenters and active volcanoes along the Pacific Ring of Fire. Looking into the geography, the horseshoe-shaped zone spans East Asia, the Pacific islands, North America’s coast, and the South American Andes. The highest seismic hazard is concentrated along the Western Pacific subduction trenches, accounting for over eighty-five percent of major tremors. In contrast, the lowest tectonic instability is observed within the interior central Pacific plate basin. In conclusion, tectonic subduction boundaries around the ocean perimeter delineate the planet’s most volatile geological fault lines.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Pacific Rim Seismic and Volcanic Activity (Ring of Fire)</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Western Pacific Arc with over 85% of major earthquakes</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Central ocean plate interior with minimal tremors</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Horseshoe-shaped tectonic boundary concentrates the vast majority of global eruptions</text></svg>"
+    },
+    {
+      "id": "di_map_05",
+      "title": "Metropolitan Urban Heat Island Temperature Anomalies",
+      "chartType": "geographic_map",
+      "topic": "Metropolitan Urban Heat Island Temperature Anomalies",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Downtown Core with +4.5°C thermal anomaly",
+      "lowPoint": "Outer green belts at baseline 0°C",
+      "keywords": [
+        "urban heat island",
+        "temperature anomaly",
+        "concrete core",
+        "vegetation cooling",
+        "thermal gradient",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented thermal map illustrates the urban heat island effect across a metropolitan area, depicting temperature anomalies. Looking closely, the map displays concentric zones from the commercial downtown core, midtown districts, suburbs, to rural parkland. The highest thermal elevation is detected in the dense downtown commercial core, soaring 4.5 degrees Celsius above rural baselines. In contrast, the lowest ambient temperature is maintained across outer green parklands, registering standard regional baselines. In conclusion, extensive concrete infrastructure severely traps solar radiation, proving the necessity of urban tree canopies.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Metropolitan Urban Heat Island Temperature Anomalies</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Downtown Core with +4.5°C thermal anomaly</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Outer green belts at baseline 0°C</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Concentric temperature gradients radiating outward from dense concrete cores</text></svg>"
+    },
+    {
+      "id": "di_map_06",
+      "title": "Offshore and Onshore Wind Energy Potential Across the UK",
+      "chartType": "geographic_map",
+      "topic": "Offshore and Onshore Wind Energy Potential Across the UK",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Scottish North Sea at over 9.5 meters per second",
+      "lowPoint": "Southern English Midlands under 5.0 m/s",
+      "keywords": [
+        "wind energy potential",
+        "offshore wind speed",
+        "North Sea coast",
+        "meters per second",
+        "renewable resource",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided geographic map delineates the distribution of onshore and offshore wind velocity potential across the United Kingdom. Looking closely, the map compares maritime speeds off Scotland’s coast, the Irish Sea, the English seaboard, and southern inland valleys. The highest kinetic wind speeds are concentrated offshore along the Scottish coast, consistently exceeding 9.5 meters per second. Conversely, the lowest wind velocities are situated in the southern inland Midlands, registering below 5 meters per second. In conclusion, the United Kingdom’s northern maritime geography offers exceptional natural advantages for offshore wind generation.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Offshore and Onshore Wind Energy Potential Across the UK</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Scottish North Sea at over 9.5 meters per second</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Southern English Midlands under 5.0 m/s</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Coastal and northern marine territories possess double the kinetic potential of southern inland valleys</text></svg>"
+    },
+    {
+      "id": "di_map_07",
+      "title": "Major Global Maritime Container Shipping Corridors",
+      "chartType": "geographic_map",
+      "topic": "Major Global Maritime Container Shipping Corridors",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Trans-Pacific route carrying 28 million TEU annually",
+      "lowPoint": "Trans-Indian Ocean carrying 6 million TEU",
+      "keywords": [
+        "container shipping",
+        "maritime corridors",
+        "Trans-Pacific route",
+        "twenty-foot equivalent units",
+        "global logistics",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given nautical trade map displays the major global maritime container shipping corridors and annual freight volumes. Looking into the corridors, principal trade lanes connect East Asia to North America, Europe via the Suez Canal, and Trans-Atlantic links. The highest shipping volume is transported across the Trans-Pacific route between China and the US, carrying twenty-eight million TEU. In comparison, the lowest volume corridor depicted is the Trans-Indian route, handling approximately six million containers. In conclusion, modern international merchandise trade is heavily anchored by manufacturing exports originating from East Asian ports.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Major Global Maritime Container Shipping Corridors</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Trans-Pacific route carrying 28 million TEU annually</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Trans-Indian Ocean carrying 6 million TEU</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>East Asian export lanes to North America and Europe dominate over 65% of all maritime freight</text></svg>"
+    },
+    {
+      "id": "di_tab_01",
+      "title": "University International Student Enrolment by Faculty",
+      "chartType": "academic_table",
+      "topic": "University International Student Enrolment by Faculty",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Business & Economics with 4,850 students (42%)",
+      "lowPoint": "Law & Justice with 580 students (5%)",
+      "keywords": [
+        "university enrolment",
+        "international students",
+        "business and engineering",
+        "highest percentage",
+        "academic faculty",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided data table gives structured details regarding international student enrolment figures across university faculties. Examining the rows, the table lists disciplines including Business, Engineering, Health Sciences, Humanities, and Law. The highest enrolment is commanded by the Faculty of Business and Economics, registering 4,850 students or forty-two percent. In contrast, the lowest international headcount is recorded in the Faculty of Law with only 580 enrolled students. In conclusion, international scholars exhibit strong career preferences toward commercial and technical STEM faculties.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>University International Student Enrolment by Faculty</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Business & Economics with 4,850 students (42%)</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Law & Justice with 580 students (5%)</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>STEM and Commerce disciplines account for 70% of all overseas admissions</text></svg>"
+    },
+    {
+      "id": "di_tab_02",
+      "title": "Hospital Bed-to-Population Ratios Across OECD Nations",
+      "chartType": "academic_table",
+      "topic": "Hospital Bed-to-Population Ratios Across OECD Nations",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Japan with 12.8 beds per 1,000 residents",
+      "lowPoint": "United Kingdom with 2.4 beds per 1,000 residents",
+      "keywords": [
+        "hospital beds",
+        "healthcare capacity",
+        "beds per thousand",
+        "Japan and UK",
+        "medical infrastructure",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given academic table presents key comparative statistics regarding hospital bed-to-population ratios in OECD nations. Looking closely, the table surveys medical capacities across Japan, South Korea, Germany, Australia, the US, and the UK. The highest overall hospital bed density is maintained by Japan, providing 12.8 beds for every one thousand citizens. Conversely, the lowest inpatient bed ratio belongs to the United Kingdom, offering only 2.4 beds per thousand residents. In conclusion, the data demonstrates marked divergence in national healthcare planning between inpatient and ambulatory models.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Hospital Bed-to-Population Ratios Across OECD Nations</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Japan with 12.8 beds per 1,000 residents</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: United Kingdom with 2.4 beds per 1,000 residents</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>East Asian healthcare systems maintain substantially higher inpatient capacity than Western nations</text></svg>"
+    },
+    {
+      "id": "di_tab_03",
+      "title": "Public Transit Commuter Modal Share Across Global Metropolises",
+      "chartType": "academic_table",
+      "topic": "Public Transit Commuter Modal Share Across Global Metropolises",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Tokyo with 51% public transit share",
+      "lowPoint": "Sydney with only 23% public transit (64% car usage)",
+      "keywords": [
+        "public transit",
+        "modal share",
+        "commuter transport",
+        "Tokyo and Sydney",
+        "urban mobility",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented data table outlines commuter modal transportation shares across major international metropolitan centers. Examining the cities, the table evaluates transport habits in Tokyo, Paris, London, New York City, and Sydney. The highest public transit utilization is led by Tokyo, where fifty-one percent of daily commuters travel by train or bus. In contrast, the lowest public transit adoption is registered in Sydney at only twenty-three percent, with sixty-four percent relying on private cars. In conclusion, high-density transit rail investments drastically reduce private automobile dependency in major urban centers.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Public Transit Commuter Modal Share Across Global Metropolises</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Tokyo with 51% public transit share</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Sydney with only 23% public transit (64% car usage)</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Asian and European capitals rely heavily on trains while car dependency dominates suburban cities</text></svg>"
+    },
+    {
+      "id": "di_tab_04",
+      "title": "Nutritional Density Comparison: Dairy vs Plant-Based Milks",
+      "chartType": "academic_table",
+      "topic": "Nutritional Density Comparison: Dairy vs Plant-Based Milks",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Whole Dairy Milk in protein (8.0g) and calories (150kcal)",
+      "lowPoint": "Almond milk in protein (only 1.0g) and calories (40kcal)",
+      "keywords": [
+        "nutritional comparison",
+        "protein and calcium",
+        "dairy milk",
+        "plant-based alternatives",
+        "caloric value",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given nutritional table illustrates a comparative dietary breakdown between whole dairy milk and plant-based alternatives. Looking into the rows, the comparison examines whole cow’s milk, soy milk, oat milk, and almond milk per glass. The highest protein content is delivered by whole dairy milk, providing eight grams alongside 150 calories. Conversely, the lowest protein value is observed in almond milk, containing only one gram of protein and forty calories. In conclusion, while dairy and soy provide superior protein density, almond milk offers a significantly lower caloric alternative.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Nutritional Density Comparison: Dairy vs Plant-Based Milks</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Whole Dairy Milk in protein (8.0g) and calories (150kcal)</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Almond milk in protein (only 1.0g) and calories (40kcal)</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Soy milk closely matches cow's milk protein while almond milk is lowest in caloric density</text></svg>"
+    },
+    {
+      "id": "di_tab_05",
+      "title": "National Government Budget Allocation Across Major Portfolios",
+      "chartType": "academic_table",
+      "topic": "National Government Budget Allocation Across Major Portfolios",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "Social Security at $190 Billion (32%)",
+      "lowPoint": "Transport Infrastructure at $36 Billion (6%)",
+      "keywords": [
+        "budget allocation",
+        "social security",
+        "healthcare spending",
+        "defence and infrastructure",
+        "fiscal policy",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The presented table provides an overview of national government budgetary allocations distributed across primary public portfolios. Looking closely, the table outlines spending on social security, healthcare, education, national defence, and infrastructure. The highest budget expenditure is allocated to social security and welfare, commanding 190 billion dollars or thirty-two percent. In contrast, the lowest documented allocation is dedicated to transport and infrastructure at thirty-six billion dollars. In conclusion, public welfare and universal healthcare services constitute the overwhelming majority of national fiscal spending.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>National Government Budget Allocation Across Major Portfolios</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: Social Security at $190 Billion (32%)</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Transport Infrastructure at $36 Billion (6%)</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Welfare and healthcare absorb over half of all government fiscal expenditures</text></svg>"
+    },
+    {
+      "id": "di_tab_06",
+      "title": "Global Airline Passenger Volumes and On-Time Flight Performance",
+      "chartType": "academic_table",
+      "topic": "Global Airline Passenger Volumes and On-Time Flight Performance",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "American Airlines in passengers (215M) and Ryanair in OTP (88.6%)",
+      "lowPoint": "Qantas in passenger volume (52M) and OTP (74.1%)",
+      "keywords": [
+        "airline performance",
+        "passenger volume",
+        "on-time arrival rate",
+        "fleet size",
+        "aviation statistics",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The given data table displays key operating metrics for major international airline carriers, detailing passenger volumes and punctuality. Looking into the details, the carriers analyzed include Delta Air Lines, American Airlines, Ryanair, and the Qantas Group. The highest annual passenger volume is achieved by American Airlines, transporting an enormous 215 million passengers. On the other hand, the lowest passenger headcount among this selection belongs to Qantas at fifty-two million travelers. In conclusion, punctuality records highlight that streamlined low-cost carriers frequently outperform legacy network competitors in on-time reliability.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Global Airline Passenger Volumes and On-Time Flight Performance</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: American Airlines in passengers (215M) and Ryanair in OTP (88.6%)</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: Qantas in passenger volume (52M) and OTP (74.1%)</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Low-cost carriers like Ryanair achieve higher punctuality than legacy network operators</text></svg>"
+    },
+    {
+      "id": "di_tab_07",
+      "title": "Commercial Solar PV Hardware Cost Reduction (USD per Watt)",
+      "chartType": "academic_table",
+      "topic": "Commercial Solar PV Hardware Cost Reduction (USD per Watt)",
+      "categories": [
+        "Category A",
+        "Category B",
+        "Category C",
+        "Category D"
+      ],
+      "highPoint": "2010 total system cost at $3.40 per Watt",
+      "lowPoint": "2024 total system cost at $0.16 per Watt",
+      "keywords": [
+        "solar hardware cost",
+        "cost per watt",
+        "dramatic decline",
+        "photovoltaic modules",
+        "manufacturing scale",
+        "chart",
+        "maximum",
+        "minimum",
+        "conclusion",
+        "significant",
+        "data"
+      ],
+      "sampleResponse": "The provided data table traces the dramatic cost deflation of commercial solar photovoltaic hardware from 2010 to 2024. Looking closely, the table breaks down hardware costs across polysilicon, solar cells, finished modules, and total systems. The highest total system cost occurred in 2010, when solar hardware stood at an expensive 3.40 US dollars per Watt. In extraordinary contrast, the lowest system cost is achieved in 2024, plunging down to only sixteen cents per Watt. In conclusion, massive industrial scaling has driven an astonishing ninety-five percent cost reduction, making solar energy globally affordable.",
+      "svg": "<svg viewBox='0 0 400 240' class='fz-pte-chart-svg' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='#F8FAFC' rx='12'/><text x='200' y='28' text-anchor='middle' font-size='13' font-weight='bold' fill='#0F172A'>Commercial Solar PV Hardware Cost Reduction (USD per Watt)</text><rect x='40' y='55' width='320' height='140' fill='#FFFFFF' stroke='#CBD5E1' stroke-width='1.5' rx='8'/><text x='200' y='105' text-anchor='middle' font-size='12' font-weight='bold' fill='#0284C7'>High Point: 2010 total system cost at $3.40 per Watt</text><text x='200' y='135' text-anchor='middle' font-size='12' font-weight='bold' fill='#EF4444'>Low Point: 2024 total system cost at $0.16 per Watt</text><text x='200' y='165' text-anchor='middle' font-size='10' fill='#64748B'>Spectacular 95% cost collapse driven by manufacturing scaling in China</text></svg>"
     }
   ]
 }

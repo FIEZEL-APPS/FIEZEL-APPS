@@ -90,6 +90,62 @@
           "spoken": "momentum"
         }
       ]
+    },
+    {
+      "id": "hiw-006",
+      "title": "Cold Chain Food Logistics",
+      "audioTranscript": "Maintaining an uninterrupted refrigeration network is essential for preserving perishable food items during international shipment. Fresh seafood and poultry must be stored below critical temperature boundaries to prevent bacterial contamination.",
+      "displayedText": "Maintaining an uninterrupted refrigeration circuit is essential for preserving perishable food items during international shipment. Fresh seafood and poultry must be stored below severe temperature boundaries to prevent chemical contamination.",
+      "incorrectWords": [
+        {
+          "displayed": "circuit",
+          "spoken": "network"
+        },
+        {
+          "displayed": "severe",
+          "spoken": "critical"
+        },
+        {
+          "displayed": "chemical",
+          "spoken": "bacterial"
+        }
+      ]
+    },
+    {
+      "id": "hiw-007",
+      "title": "Perth Solar Energy Transition",
+      "audioTranscript": "Western Australia enjoys abundant annual sunshine, making solar panels an ideal investment for regional homeowners. Rooftop photovoltaic arrays generate clean electricity during daylight hours, reducing reliance on fossil fuel power stations.",
+      "displayedText": "Western Australia enjoys abundant annual sunshine, making solar panels an ideal investment for municipal homeowners. Rooftop photovoltaic arrays generate clean electricity during daylight hours, reducing dependence on fossil fuel power stations.",
+      "incorrectWords": [
+        {
+          "displayed": "municipal",
+          "spoken": "regional"
+        },
+        {
+          "displayed": "dependence",
+          "spoken": "reliance"
+        }
+      ]
+    },
+    {
+      "id": "hiw-008",
+      "title": "Neuroplasticity and Memory",
+      "audioTranscript": "Neuroscientists have demonstrated that human brains adapt continuously throughout adulthood in response to novel cognitive challenges. Practicing complex mental tasks stimulates the formation of neural connections, improving memory retention.",
+      "displayedText": "Neuroscientists have demonstrated that human brains evolve continuously throughout adulthood in response to novel cognitive challenges. Practicing complex physical tasks stimulates the formation of neural connections, accelerating memory retention.",
+      "incorrectWords": [
+        {
+          "displayed": "evolve",
+          "spoken": "adapt"
+        },
+        {
+          "displayed": "physical",
+          "spoken": "mental"
+        },
+        {
+          "displayed": "accelerating",
+          "spoken": "improving"
+        }
+      ]
     }
   ]
 }

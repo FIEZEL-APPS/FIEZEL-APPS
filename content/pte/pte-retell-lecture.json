@@ -89,6 +89,146 @@
       ],
       "nakulTemplateSpeech": "The lecture primarily discussed renewable energy and battery chemistry. He highlighted the intermittency challenge in solar and wind power. Furthermore, he explained lithium-ion batteries and sodium-ion alternatives. He also mentioned flow batteries and liquid electrolytes. Finally, the speaker concluded that next-generation batteries enable a decarbonized grid.",
       "timingTargetSec": 28
+    },
+    {
+      "id": "rl-006",
+      "title": "Desalination Technology and Urban Water Security",
+      "audioTranscript": "Good morning class. Today we investigate coastal urban water resilience. Traditional rainfall catchment is no longer sufficient for cities experiencing prolonged meteorological drought. In Western Australia, desalination facilities harness reverse osmosis membranes. Saltwater is pressurized against semi-permeable membranes, extracting ultra-pure potable water while returning concentrated brine to ocean currents. The primary challenge remains thermodynamic energy consumption, which engineers are now mitigating by coupling desalination plants directly with utility-scale wind and solar farms.",
+      "keyNounChunks": [
+        "coastal urban water resilience",
+        "prolonged meteorological drought",
+        "reverse osmosis membranes",
+        "potable water",
+        "concentrated brine",
+        "renewable energy integration"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding coastal urban water resilience. Firstly, the speaker highlighted prolonged meteorological drought and reverse osmosis membranes. Furthermore, the speaker emphasized potable water and thermodynamic energy consumption. In conclusion, the lecture demonstrates the vital role of renewable energy integration."
+    },
+    {
+      "id": "rl-007",
+      "title": "The Biochemistry of Sensory Taste Perception",
+      "audioTranscript": "Human gustatory perception is far more complex than simple tongue papillae. While classical gastronomy recognized sweet, sour, salty, and bitter, Japanese biochemist Kikunae Ikeda identified umami, triggered by monosodium glutamate. Today, neurogastronomy reveals that true culinary flavor is synthesized within the orbitofrontal cortex, integrating olfactory aromas, tactile mouthfeel, and auditory crunch. Chefs manipulate these multi-sensory interactions to heighten dining experiences without relying on excess sodium.",
+      "keyNounChunks": [
+        "gustatory perception",
+        "tongue papillae",
+        "umami flavor",
+        "orbitofrontal cortex",
+        "olfactory aromas",
+        "tactile mouthfeel"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding human gustatory perception. Firstly, the speaker highlighted tongue papillae and umami flavor. Furthermore, the speaker emphasized the orbitofrontal cortex and olfactory aromas. In conclusion, the lecture demonstrates the importance of tactile mouthfeel in modern culinary science."
+    },
+    {
+      "id": "rl-008",
+      "title": "Autonomous Fleet Logistics in Western Australian Mining",
+      "audioTranscript": "In the mineral-rich Pilbara basin, open-cut mining has undergone a digital revolution. Traditional diesel haul trucks are rapidly being superseded by autonomous haulage systems guided by GPS telemetry and LiDAR sensors. These five-hundred-ton vehicles operate non-stop without human fatigue, navigating pit roads and dumping ore with millimeter precision. Central control operations in Perth, fifteen hundred kilometers away, monitor truck telemetry in real time, drastically improving workplace safety while reducing fuel consumption.",
+      "keyNounChunks": [
+        "open-cut mining",
+        "autonomous haulage systems",
+        "GPS telemetry",
+        "LiDAR sensors",
+        "remote operations center",
+        "workplace safety"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding open-cut mining technology. Firstly, the speaker highlighted autonomous haulage systems and GPS telemetry. Furthermore, the speaker emphasized LiDAR sensors and remote operations centers. In conclusion, the lecture demonstrates significant improvements in workplace safety."
+    },
+    {
+      "id": "rl-009",
+      "title": "Ocean Acidification and Coral Calcification",
+      "audioTranscript": "Marine biogeochemistry faces an unprecedented crisis with rising atmospheric carbon dioxide. Approximately thirty percent of human anthropogenic CO2 emissions are absorbed by oceanic waters, creating carbonic acid. This alters ocean pH and depletes bioavailable carbonate ions. Consequently, calcifying organisms like aragonite corals and pteropods struggle to precipitate protective calcium carbonate shells, threatening the fundamental base of the marine trophic web.",
+      "keyNounChunks": [
+        "marine biogeochemistry",
+        "anthropogenic carbon emissions",
+        "carbonic acid",
+        "carbonate ions",
+        "aragonite corals",
+        "marine trophic web"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding marine biogeochemistry. Firstly, the speaker highlighted anthropogenic carbon emissions and carbonic acid. Furthermore, the speaker emphasized carbonate ions and aragonite corals. In conclusion, the lecture demonstrates severe threats to the marine trophic web."
+    },
+    {
+      "id": "rl-010",
+      "title": "Cognitive Load Theory and Instructional Design",
+      "audioTranscript": "Educational psychologist John Sweller formulated Cognitive Load Theory based on the biological architecture of human memory. Our working memory has strictly limited processing capacity, handling only four to seven cognitive elements simultaneously, whereas long-term memory is virtually limitless. Effective instructional design minimizes extraneous cognitive load caused by confusing layouts, manages intrinsic complexity through progressive chunking, and fosters germane load for schema construction.",
+      "keyNounChunks": [
+        "Cognitive Load Theory",
+        "working memory capacity",
+        "long-term memory",
+        "extraneous cognitive load",
+        "progressive chunking",
+        "schema construction"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding Cognitive Load Theory. Firstly, the speaker highlighted working memory capacity and long-term memory. Furthermore, the speaker emphasized extraneous cognitive load and progressive chunking. In conclusion, the lecture demonstrates essential strategies for schema construction."
+    },
+    {
+      "id": "rl-011",
+      "title": "Urban Heat Island Mitigation and Cool Roofs",
+      "audioTranscript": "Urban asphalt and concrete trap substantial daytime heat, causing city temperatures to exceed surrounding rural areas by several degrees. Scientists advocate for high-albedo cool roofs and urban tree canopies. Highly reflective white membranes reflect eighty percent of sunlight, while deciduous trees provide shading and evapotranspiration, substantially reducing cooling electricity loads and heat-related illnesses.",
+      "keyNounChunks": [
+        "urban heat island effect",
+        "high-albedo cool roofs",
+        "urban tree canopies",
+        "reflective white membranes",
+        "evapotranspiration",
+        "cooling electricity demand"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding the urban heat island effect. Firstly, the speaker highlighted high-albedo cool roofs and urban tree canopies. Furthermore, the speaker emphasized evapotranspiration and reflective white membranes. In conclusion, the lecture demonstrates effective ways to reduce cooling electricity demand."
+    },
+    {
+      "id": "rl-012",
+      "title": "HACCP Principles and Foodborne Pathogen Control",
+      "audioTranscript": "In professional food processing, prevention of bacterial contamination is governed by Hazard Analysis Critical Control Points. Rather than inspecting finished meals, chefs and operators identify critical stages where hazards can be controlled. Critical limits such as cooking internal meat to seventy-five degrees Celsius or chilling soups within two hours ensure pathogenic bacteria cannot multiply to dangerous levels.",
+      "keyNounChunks": [
+        "Hazard Analysis Critical Control Points",
+        "bacterial contamination",
+        "critical control points",
+        "internal meat temperatures",
+        "pathogenic bacteria",
+        "food safety protocols"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding Hazard Analysis Critical Control Points. Firstly, the speaker highlighted bacterial contamination and critical control points. Furthermore, the speaker emphasized internal meat temperatures and pathogenic bacteria. In conclusion, the lecture demonstrates the importance of food safety protocols."
+    },
+    {
+      "id": "rl-013",
+      "title": "Neuroplasticity and Skill Acquisition",
+      "audioTranscript": "For decades, neuroscientists believed the human brain became structurally fixed after childhood. Modern neuroimaging demonstrates profound neuroplasticity in adults learning musical instruments or foreign languages. Repetitive deliberate practice strengthens myelin sheaths around active axon pathways, accelerating electrical impulse transmission and stabilizing complex motor and linguistic cognitive skills.",
+      "keyNounChunks": [
+        "adult neuroplasticity",
+        "structural brain changes",
+        "deliberate practice",
+        "myelin sheaths",
+        "axon pathways",
+        "linguistic skills"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding adult neuroplasticity. Firstly, the speaker highlighted structural brain changes and deliberate practice. Furthermore, the speaker emphasized myelin sheaths and axon pathways. In conclusion, the lecture demonstrates significant benefits for acquiring linguistic skills."
+    },
+    {
+      "id": "rl-014",
+      "title": "Western Australian Iron Ore Supply Chains",
+      "audioTranscript": "The mining economy of Western Australia relies on highly automated infrastructure to extract and transport hundreds of millions of tons of iron ore annually. Remote operations centers in Perth coordinate autonomous drill rigs, driverless trucks, and automated freight trains in the Pilbara. This digital coordination ensures port shiploading proceeds without bottleneck delays, maintaining global market competitiveness.",
+      "keyNounChunks": [
+        "mining infrastructure",
+        "autonomous drill rigs",
+        "driverless trucks",
+        "automated freight trains",
+        "shiploading logistics",
+        "global competitiveness"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding mining infrastructure. Firstly, the speaker highlighted autonomous drill rigs and driverless trucks. Furthermore, the speaker emphasized automated freight trains and shiploading logistics. In conclusion, the lecture demonstrates essential strategies for global competitiveness."
+    },
+    {
+      "id": "rl-015",
+      "title": "Sourdough Microbiology and Lactic Fermentation",
+      "audioTranscript": "Traditional sourdough fermentation involves a resilient ecosystem of yeasts and lactic acid bacteria coexisting in flour and water. While yeasts generate carbon dioxide gas for volume rise, lactobacilli produce lactic and acetic acids. These organic acids lower dough pH, breaking down gluten proteins slightly for easier human digestion while giving sourdough bread its long shelf life.",
+      "keyNounChunks": [
+        "sourdough fermentation",
+        "microbial ecosystem",
+        "lactic acid bacteria",
+        "organic acids",
+        "gluten breakdown",
+        "improved shelf life"
+      ],
+      "nakulTemplateSpeech": "The lecture provided significant information regarding sourdough fermentation. Firstly, the speaker highlighted the microbial ecosystem and lactic acid bacteria. Furthermore, the speaker emphasized organic acids and gluten breakdown. In conclusion, the lecture demonstrates key factors in achieving improved shelf life."
     }
   ]
 }

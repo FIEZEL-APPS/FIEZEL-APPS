@@ -95,6 +95,126 @@
         "linkingWords": "'Although' memastikan kalimat tetap satu kesatuan gramatika tanpa terpecah menjadi dua kalimat terpisah.",
         "translation": "Meskipun desalinasi osmosis terbalik menyediakan jaminan air minum penting bagi negara pesisir gersang, para peneliti harus mengatasi kebutuhan energi yang tinggi dan pembuangan air garam pekat beracun melalui integrasi energi terbarukan dan teknologi pemulihan mineral."
       }
+    },
+    {
+      "id": "swt-006",
+      "title": "HACCP Food Safety Protocols in Commercial Kitchens",
+      "text": "The Hazard Analysis Critical Control Point (HACCP) system serves as the international gold standard for preventing foodborne contamination in hospitality and food manufacturing. Developed initially during early aerospace missions to ensure astronaut food safety, the methodology identifies biological, chemical, and physical risk factors across every stage of culinary preparation. Kitchen managers establish critical limits, continuous temperature monitoring, and mandatory corrective actions. By shifting food safety management from post-production batch inspection to real-time process control, HACCP guarantees consumer protection while reducing commercial food wastage.",
+      "formulaScaffold": "Rumus 1 Kalimat SWT: [Klausa Pembuka / Subjek Utama] + [Verb Utama] + [Konjungsi Koordinatif / Subordinatif] + [Kesimpulan / Dampak Utama].",
+      "modelSummary": "Although the Hazard Analysis Critical Control Point system originated in aerospace missions to eliminate contamination, modern commercial kitchens utilize its real-time process monitoring to prevent foodborne illness and reduce unnecessary culinary wastage.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 34,
+        "ruleCheck": "Memenuhi batasan 5-75 kata Pearson (34 kata) dan berformat persis 1 kalimat dengan 1 titik di akhir."
+      }
+    },
+    {
+      "id": "swt-007",
+      "title": "Agricultural Desalination and Solar Irrigation",
+      "text": "Groundwater salinity presents an escalating challenge for agricultural regions facing acute climate vulnerability. In arid zones, high mineral concentrations degrade crop yields and poison fragile soil structures. Environmental engineers are deploying off-grid solar-powered reverse osmosis units that treat brackish bore water directly on farms. Because these modular systems operate during peak sunlight hours matching crop transpiration demand, farmers can cultivate high-value horticultural produce without draining precious freshwater aquifers or incurring prohibitive fossil-fuel electricity bills.",
+      "formulaScaffold": "Rumus 1 Kalimat SWT: While [kondisi krisis air tanah], [solusi desalinasi surya] + [manfaat ekonomi dan ekologi].",
+      "modelSummary": "While rising groundwater salinity severely threatens agricultural production in arid zones, modular solar-powered desalination systems enable farmers to irrigate high-value crops effectively without depleting freshwater aquifers or incurring excessive energy costs.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 32,
+        "ruleCheck": "1 kalimat utuh, 32 kata, struktur compound-complex yang elegan."
+      }
+    },
+    {
+      "id": "swt-008",
+      "title": "Urban Architecture and Passive Solar Cooling",
+      "text": "Contemporary architectural design is increasingly incorporating passive solar principles to minimize the ecological footprint of high-density metropolitan residential towers. By orienting building facades along prevailing seasonal wind corridors, engineers foster natural cross-ventilation that dissipates internal thermal buildup without mechanical refrigeration. Furthermore, exterior deep overhangs and automated ceramic louvers shade glazing during high summer sun angles while permitting low-angle winter sunlight to penetrate interiors. These integrated passive strategies reduce HVAC electricity consumption by over forty percent while enhancing indoor air quality for urban residents.",
+      "formulaScaffold": "Rumus 1 Kalimat SWT: By [metode arsitektur pasif], [subjek perancang] + [hasil efisiensi energi].",
+      "modelSummary": "By integrating seasonal wind orientation with exterior architectural shading louvers, contemporary residential towers achieve effective passive climate regulation, thereby substantially lowering mechanical air-conditioning electricity demand while optimizing indoor living comfort.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 31,
+        "ruleCheck": "1 kalimat utuh, 31 kata, memenuhi syarat Pearson SWT."
+      }
+    },
+    {
+      "id": "swt-009",
+      "title": "Circular Economy in Hospitality Food Waste",
+      "text": "Commercial dining establishments generate substantial quantities of organic food scraps that traditionally decompose in municipal landfills, emitting significant volumes of methane greenhouse gases. In response, sustainable hospitality enterprises are embracing circular economy frameworks by partnering with local composting cooperatives and urban bio-digesters. Organic vegetable trimmings and coffee grounds are processed into nutrient-dense fertilizer, which is returned directly to regional agricultural suppliers. This closed-loop procurement cycle lowers disposal fees for restaurants while bolstering soil biodiversity across local farming networks.",
+      "formulaScaffold": "Rumus 1 Kalimat SWT: In order to [tujuan kurangi limbah], [pelaku industri] + [proses daur ulang] + [manfaat].",
+      "modelSummary": "In order to mitigate hazardous landfill methane emissions, forward-thinking hospitality enterprises are adopting circular waste systems that convert commercial food scraps into rich agricultural compost, effectively reducing operational disposal costs while rejuvenating regional soils.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 34,
+        "ruleCheck": "1 kalimat utuh, 34 kata, lulus validasi Pearson."
+      }
+    },
+    {
+      "id": "swt-010",
+      "title": "Autonomous Drone Surveying in Mineral Exploration",
+      "text": "Traditional geological mineral exploration across remote desert terrains requires arduous ground expeditions and expensive crewed helicopter reconnaissance. Over the past decade, autonomous aerial drones equipped with high-resolution magnetometers and hyperspectral cameras have transformed resource mapping. These uncrewed aircraft operate over vast desert expanses at low altitudes, capturing sub-surface magnetic anomalies that indicate buried ore deposits with unprecedented spatial clarity. The technology accelerates discovery timelines while eliminating hazardous field travel for exploration personnel.",
+      "formulaScaffold": "Rumus 1 Kalimat SWT: By replacing [metode konvensional], [drone otonom] + [manfaat kecepatan dan keselamatan].",
+      "modelSummary": "By replacing hazardous and expensive ground expeditions with autonomous drone magnetometry, mining corporations can map remote subterranean mineral deposits with unprecedented spatial precision, significantly accelerating exploration timelines while safeguarding geological field personnel.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 33,
+        "ruleCheck": "1 kalimat utuh, 33 kata, 100% valid."
+      }
+    },
+    {
+      "id": "swt-011",
+      "title": "Precision Agriculture and Satellite Soil Mapping",
+      "text": "Traditional farming practices often treat vast agricultural fields as uniform zones, applying identical quantities of synthetic fertilizers and irrigation water throughout. However, soil moisture and organic nutrient concentrations vary significantly across undulating topography. Modern precision agriculture deploys multispectral satellite imaging and GPS-guided equipment to map sub-field variations in real time. Variable-rate applicators deliver precise micro-doses of nitrogen and phosphorus only where required, reducing fertilizer runoff into waterways while enhancing crop yields.",
+      "formulaScaffold": "Rumus 1 Kalimat: Although [metode tradisional seragam], [pertanian presisi satelit] + [hasil efisiensi dan kelestarian].",
+      "modelSummary": "Although traditional farming treated agricultural fields uniformly, modern precision farming utilizes satellite soil mapping and GPS-guided applicators to deliver targeted fertilizer micro-doses, thereby minimizing environmental runoff while substantially boosting crop productivity.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 32,
+        "ruleCheck": "1 kalimat, 32 kata, struktur compound-complex."
+      }
+    },
+    {
+      "id": "swt-012",
+      "title": "Urban Heat Island Mitigation and Reflective Pavements",
+      "text": "Metropolitan centers frequently experience the urban heat island effect, wherein dark asphalt roads and tar roofs absorb solar thermal radiation, raising city temperatures significantly above surrounding countryside. Urban planners are introducing cool pavements coated with high-albedo reflective sealants that deflect sunlight away from ground surfaces. Combined with expansive public parkland and mature tree canopy shade, these reflective surfaces lower ambient air temperatures, decreasing residential air conditioning power demand and mitigating heat-stress mortality during summer heatwaves.",
+      "formulaScaffold": "Rumus 1 Kalimat: By replacing [aspal gelap penyerap panas], [permukaan reflektif dan taman] + [penurunan suhu dan hemat energi].",
+      "modelSummary": "By replacing heat-absorbing dark asphalt with high-albedo reflective coatings and expanding shaded urban parklands, metropolitan authorities can substantially reduce ambient summer temperatures, thereby lowering air-conditioning electricity demand and preventing heat-related illnesses.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 33,
+        "ruleCheck": "1 kalimat, 33 kata, memenuhi aturan Pearson SWT."
+      }
+    },
+    {
+      "id": "swt-013",
+      "title": "Commercial Cookery Food Hygiene and Sanitization",
+      "text": "In high-volume commercial restaurant kitchens, food contact surfaces and culinary utensils can quickly harbor dangerous bacterial colonies such as Salmonella, Staphylococcus, and E. coli if hygiene standards lapse. Food safety legislation requires commercial kitchens to implement two-stage sanitization, beginning with detergent cleaning to remove organic grease, followed by thermal or chemical disinfection exceeding eighty-two degrees Celsius. Furthermore, color-coded cutting boards for poultry, raw meat, and ready-to-eat salads prevent cross-contamination, ensuring patron safety across banquet dining operations.",
+      "formulaScaffold": "Rumus 1 Kalimat: To prevent [bakteri berbahaya], [protokol dapur komersial] + [metode sanitasi dan pemisahan alat].",
+      "modelSummary": "To eliminate dangerous foodborne bacterial pathogens in high-volume dining operations, commercial kitchens must strictly enforce two-stage thermal sanitization and color-coded chopping boards, effectively preventing cross-contamination and safeguarding consumer health.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 31,
+        "ruleCheck": "1 kalimat, 31 kata, 1 titik di akhir."
+      }
+    },
+    {
+      "id": "swt-014",
+      "title": "Western Australian Renewable Hydrogen Corridors",
+      "text": "The vast landmass and abundant sunshine of Western Australia provide exceptional conditions for utility-scale green hydrogen and ammonia production. Export consortia are installing multi-gigawatt solar photovoltaic and wind energy farms in coastal desert areas to power electrolyzer facilities that split purified water into hydrogen gas without greenhouse emissions. The resulting green hydrogen can be synthesized into liquid ammonia for cryogenic maritime transport, enabling clean energy exports to industrial hubs across Japan and South Korea seeking decarbonization.",
+      "formulaScaffold": "Rumus 1 Kalimat: Leveraging [kondisi surya dan angin WA], [fasilitas elektrolisis] + [ekspor energi bersih ke Asia].",
+      "modelSummary": "Leveraging abundant coastal sunshine and wind resources, Western Australian energy developers are constructing multi-gigawatt electrolyzer hubs to produce clean green ammonia, thereby facilitating zero-emission maritime energy exports to industrial Asian markets.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 32,
+        "ruleCheck": "1 kalimat, 32 kata, lolos audit SWT."
+      }
+    },
+    {
+      "id": "swt-015",
+      "title": "Artificial Intelligence in Medical Diagnostic Imaging",
+      "text": "Radiological analysis of medical imagery has historically relied entirely on trained physicians meticulously scanning computerized tomography and magnetic resonance imaging slices for pathological abnormalities. However, mounting patient volumes and clinical radiologist shortages have led to diagnostic delays and fatigue-induced misdiagnoses. Deep learning convolutional neural networks trained on millions of annotated scans can now identify micro-calcifications and subtle tumors within seconds. While artificial intelligence cannot replace comprehensive physician consultations, it acts as an indispensable first-line triage co-pilot.",
+      "formulaScaffold": "Rumus 1 Kalimat: Although [keterbatasan jumlah radiolog], [AI deep learning] + [manfaat deteksi cepat sebagai asisten klinis].",
+      "modelSummary": "Although diagnostic radiology traditionally faced backlogs and human fatigue, deep learning algorithms can rapidly screen medical scans for subtle pathological tumors, serving as an indispensable clinical assistant that accelerates diagnosis and improves patient outcomes.",
+      "deepFeedback": {
+        "sentenceCount": 1,
+        "wordCount": 35,
+        "ruleCheck": "1 kalimat, 35 kata, sempurna."
+      }
     }
   ]
 }

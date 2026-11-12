@@ -81,6 +81,126 @@
         "conclusion": "Summarize that proactive vocational reskilling and educational modernization will determine whether society harnesses AI as an empowering productivity amplifier."
       },
       "nakulScaffold": "Technological disruption driven by artificial intelligence evokes both optimism and apprehension. While algorithmic automation eliminates repetitive clerical duties, historical industrial transitions demonstrate that technological progress continuously inaugurates novel occupational sectors. Consequently, comprehensive workforce reskilling remains imperative."
+    },
+    {
+      "id": "essay-006",
+      "title": "Automation and Future Employment in Hospitality",
+      "prompt": "Some believe that automated service kiosks and robotic cooking systems will completely replace human hospitality workers, while others argue that human service remains indispensable. Discuss both views and give your opinion.",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Paraphrase topic regarding automation in hospitality and state thesis that while technology aids efficiency, human warmth is irreplaceable.",
+        "p2": "Body 1 (Advantages of Automation): High consistency, speed, reduced labor costs, and precision in repetitive cooking tasks.",
+        "p3": "Body 2 (Value of Human Touch): Personalized empathy, problem solving in guest complaints, authentic cultural hospitality.",
+        "p4": "Conclusion: Restate thesis that a hybrid model integrating tech efficiency with human service will prevail."
+      },
+      "nakulScaffold": "These days, the issue of whether automated systems will replace human hospitality staff has sparked considerable debate. While some argue that machines guarantee speed and precision, I firmly believe that genuine human empathy remains essential for guest satisfaction."
+    },
+    {
+      "id": "essay-007",
+      "title": "Mandatory Renewable Energy Transition for Commercial Businesses",
+      "prompt": "Governments should legally mandate all commercial corporations to generate or source one hundred percent of their electricity from renewable energy. To what extent do you agree or disagree?",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Introduce the debate on statutory renewable energy mandates for corporate enterprises and state agreement.",
+        "p2": "Body 1 (Environmental Imperative): Accelerated reduction in industrial carbon footprints and encouragement of renewable grid infrastructure.",
+        "p3": "Body 2 (Economic Feasibility): Falling costs of solar and wind energy paired with potential government tax subsidies.",
+        "p4": "Conclusion: Conclude that enforceable mandates are vital to meet global climate targets."
+      },
+      "nakulScaffold": "In contemporary society, climate change necessitates bold governmental action. I completely agree that governments should mandate commercial enterprises to transition toward renewable energy to ensure a sustainable future."
+    },
+    {
+      "id": "essay-008",
+      "title": "Remote Higher Education versus Campus Experience",
+      "prompt": "Online university education is becoming increasingly popular. Do the advantages of studying remotely outweigh the disadvantages of missing campus life?",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Paraphrase growth of distance learning and state stance that advantages outweigh disadvantages for non-traditional students.",
+        "p2": "Body 1 (Benefits of Online Study): Flexibility, reduced commuting expenses, ability to balance employment with academic progression.",
+        "p3": "Body 2 (Drawbacks): Reduced face-to-face networking and collaborative campus socialization.",
+        "p4": "Conclusion: Affirm that the accessibility and economic benefits of online education outweigh the drawbacks."
+      },
+      "nakulScaffold": "With the rapid advancement of digital technology, virtual university degree programs have gained widespread popularity. In my opinion, the flexibility and affordability of online education significantly outweigh the lack of traditional campus life."
+    },
+    {
+      "id": "essay-009",
+      "title": "Consumerism and Fast Fashion Environmental Impact",
+      "prompt": "The rise of fast fashion has led to massive textile waste and environmental pollution. Should consumers take personal responsibility, or should governments regulate clothing manufacturers?",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Frame the problem of textile waste and argue that while consumer awareness matters, government manufacturer regulation is decisive.",
+        "p2": "Body 1 (Manufacturer Regulation): Imposing recycling quotas, banning toxic dyes, and enforcing extended producer responsibility.",
+        "p3": "Body 2 (Consumer Habits): Encouraging sustainable purchasing, secondhand garment exchange, and mindful consumption.",
+        "p4": "Conclusion: Emphasize that strict state regulation provides the necessary structural solution to curb industry pollution."
+      },
+      "nakulScaffold": "Over recent decades, fast fashion has imposed severe ecological consequences across global ecosystems. Although conscious consumer choices are beneficial, I firmly maintain that stringent government regulation of clothing manufacturers is the most effective remedy."
+    },
+    {
+      "id": "essay-010",
+      "title": "Artificial Intelligence in Medical Healthcare Diagnostics",
+      "prompt": "Artificial intelligence algorithms are increasingly used to analyze medical scans and diagnose illnesses. Discuss the benefits and potential ethical risks of this development.",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Introduce AI integration in clinical diagnostics and state that benefits in speed and accuracy outweigh ethical risks if properly supervised.",
+        "p2": "Body 1 (Diagnostic Benefits): Rapid tumor detection, reduced medical practitioner fatigue, and high precision in radiological image interpretation.",
+        "p3": "Body 2 (Ethical Concerns): Algorithmic bias, patient data privacy, and the danger of replacing human clinical judgment.",
+        "p4": "Conclusion: Conclude that AI must remain a supportive diagnostic co-pilot rather than an autonomous decision maker."
+      },
+      "nakulScaffold": "The application of artificial intelligence in modern healthcare diagnostics has generated widespread academic and ethical discourse. In my view, while data privacy risks must be regulated, AI's ability to save lives through early diagnosis is overwhelmingly positive."
+    },
+    {
+      "id": "essay-011",
+      "title": "Public Funding for Space Exploration versus Domestic Social Welfare",
+      "prompt": "Vast sums of national public funding are dedicated to space exploration missions. Some argue that this expenditure is unjustified when poverty and healthcare issues remain unresolved on Earth. Discuss both sides and give your opinion.",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Introduce the debate on space spending versus domestic social problems. State stance that space research produces indispensable technological spin-offs benefiting society.",
+        "p2": "Body 1 (Arguments against Space Spending): Urgent immediate crises on Earth such as homelessness, underfunded hospitals, and famine requiring direct funding.",
+        "p3": "Body 2 (Arguments for Space Spending): Technological innovations including satellite communication, weather tracking, solar cells, and advanced materials originating from space research.",
+        "p4": "Conclusion: Restate thesis that space investment fosters essential long-term human progress alongside social welfare."
+      },
+      "nakulScaffold": "In recent years, the substantial government investment in space exploration programs has ignited intense public debate. While some argue that funds should be redirected toward urgent poverty relief on Earth, I firmly believe that space research yields indispensable technological innovations that benefit all humanity."
+    },
+    {
+      "id": "essay-012",
+      "title": "Universal Basic Income and Workplace Productivity",
+      "prompt": "Some economic theorists propose introducing a Universal Basic Income (UBI) for all adult citizens to address technological unemployment. Others argue it will reduce motivation to work. Discuss both views and provide your stance.",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Define UBI and state view that it offers vital economic security during automation without eliminating ambition.",
+        "p2": "Body 1 (Benefits of UBI): Eradication of extreme poverty, empowerment of workers to pursue education or caregiving, stability against robotic automation.",
+        "p3": "Body 2 (Concerns): Potential fiscal strain on national budgets and fear of decreased labor force participation in low-wage sectors.",
+        "p4": "Conclusion: Emphasize that properly calibrated UBI acts as a springboard for entrepreneurship and social resilience."
+      },
+      "nakulScaffold": "With the rise of robotic automation, Universal Basic Income has emerged as a prominent economic proposal. Although critics claim it could disincentivize work, I believe that providing a baseline financial safety net fosters educational advancement and entrepreneurial growth."
+    },
+    {
+      "id": "essay-013",
+      "title": "Banning Single-Use Plastics by Law",
+      "prompt": "Should governments enact complete legal bans on single-use plastics such as bags, cutlery, and packaging, or should recycling incentives remain voluntary? Discuss your perspective.",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Highlight marine plastic pollution crisis and state strong agreement with enforceable legal bans over voluntary recycling.",
+        "p2": "Body 1 (Inefficacy of Voluntary Systems): Only a small fraction of plastic is recycled; consumer convenience frequently overrides environmental mindfulness.",
+        "p3": "Body 2 (Impact of Statutory Bans): Forcing manufacturers to adopt biodegradable alternatives, drastic reduction in coastal litter and landfill waste.",
+        "p4": "Conclusion: Conclude that enforceable legislation is the only realistic method to curb global environmental degradation."
+      },
+      "nakulScaffold": "The proliferation of non-biodegradable plastic waste poses a critical threat to global marine and terrestrial ecosystems. In my opinion, voluntary recycling schemes have proven inadequate, and governments must enforce mandatory legal bans on single-use plastic products."
+    },
+    {
+      "id": "essay-014",
+      "title": "Compulsory Physical Education in High School Curricula",
+      "prompt": "Physical fitness levels among adolescents have declined globally due to sedentary screen time. Should daily physical education be made strictly mandatory for all secondary students? Give your opinion.",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Address adolescent obesity and sedentary lifestyle trends. Agree that mandatory daily PE is vital for mental and physical well-being.",
+        "p2": "Body 1 (Physical Health Benefits): Prevention of juvenile diabetes, cardiovascular strength, development of lifelong motor habits.",
+        "p3": "Body 2 (Cognitive and Mental Health): Reduction in academic anxiety, improved concentration, dopamine and endorphin release supporting cognitive retention.",
+        "p4": "Conclusion: Affirm that mandatory physical training should be prioritized alongside STEM academics."
+      },
+      "nakulScaffold": "In the modern digital era, sedentary lifestyle habits have led to concerning declines in adolescent fitness. I strongly support the perspective that mandatory daily physical education in high schools is essential for safeguarding students' long-term physical and cognitive health."
+    },
+    {
+      "id": "essay-015",
+      "title": "Tourism and Cultural Preservation in Heritage Destinations",
+      "prompt": "Mass tourism provides substantial economic revenue for historical cities, but it can also erode local cultural heritage and displace residents. Discuss how cities can balance tourism with preservation.",
+      "fourParagraphPlan": {
+        "p1": "Introduction: Frame the paradox of tourism revenue versus heritage erosion. State that sustainable quotas and cultural preservation taxes strike the right balance.",
+        "p2": "Body 1 (Economic Opportunities): Job creation in hospitality, funding for historical monument restoration, international cultural exchange.",
+        "p3": "Body 2 (Negative Repercussions): Overcrowding, inflation in residential rents, commodification of local sacred rituals.",
+        "p4": "Conclusion: Recommend visitor quota management and reinvestment of tourism taxes into heritage conservation."
+      },
+      "nakulScaffold": "International tourism serves as a major economic lifeline for historical destinations worldwide, yet unchecked mass travel threatens cultural preservation. I believe municipal authorities must balance economic gains with heritage protection through visitor limits and targeted conservation levies."
     }
   ]
 }
