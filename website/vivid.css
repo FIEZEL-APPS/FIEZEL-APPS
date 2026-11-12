@@ -1,248 +1,2592 @@
 /* FIEZEL landing — lapisan "VIVID SOLAR" (audit UI/UX 2026).
    Dimuat SETELAH style.css. Identitas tetap: krem · solar · maroon, tanpa latar gelap.
-   Aksen baru diambil dari palet maskot PAW (rose #D9536A, pink #F0A0AC, sky #9CC7E8)
+   Aksen baru diambil dari palet maskot Mochi & pastel Kidmima / Velin / Wo-Fi:
+   Butter (#FFF8DB), Mint (#E8F8EE), Lavender (#EEF2FC), Blush (#FFF0F4), Peach (#FFF2EC)
    + hijau KelasKu #1F7A63, supaya tiap skill punya warna dan halaman tidak lagi datar. */
-:root{
-  --vv-sun:#FFC700;
-  --vv-sun-2:#FFD94F;
-  --vv-sun-soft:#FFF1B8;
-  --vv-rose:#D9536A;
-  --vv-rose-ink:#A3263B;
-  --vv-pink-soft:#FDE4E8;
-  --vv-teal:#1F7A63;
-  --vv-teal-soft:#DDF3EA;
-  --vv-sky:#9CC7E8;
-  --vv-sky-ink:#1F5C87;
-  --vv-sky-soft:#E4F1FB;
-  --vv-ink:#5E1420;
-  --vv-line:#6D1926;
-  --vv-hard:4px 5px 0 var(--vv-line);
-  --vv-hard-lg:7px 9px 0 var(--vv-line);
+:root {
+  --vv-sun: #FFC700;
+  --vv-sun-2: #FFD94F;
+  --vv-sun-soft: #FFF1B8;
+  --vv-rose: #D9536A;
+  --vv-rose-ink: #A3263B;
+  --vv-pink-soft: #FDE4E8;
+  --vv-teal: #1F7A63;
+  --vv-teal-soft: #DDF3EA;
+  --vv-sky: #9CC7E8;
+  --vv-sky-ink: #1F5C87;
+  --vv-sky-soft: #E4F1FB;
+  --vv-ink: #5E1420;
+  --vv-line: #6D1926;
+  --vv-hard: 4px 5px 0 var(--vv-line);
+  --vv-hard-lg: 7px 9px 0 var(--vv-line);
+
+  /* CANDY PASTEL DESIGN SYSTEM (Kidmima & Dribbble Benchmark) */
+  --pastel-butter: #FFF8DB;
+  --pastel-butter-border: #FCD34D;
+  --pastel-mint: #E8F8EE;
+  --pastel-mint-border: #6EE7B7;
+  --pastel-lavender: #EEF2FC;
+  --pastel-lavender-border: #93C5FD;
+  --pastel-blush: #FFF0F4;
+  --pastel-blush-border: #FDA4AF;
+  --pastel-peach: #FFF2EC;
+  --pastel-peach-border: #FDBA74;
+  --pastel-slate: #F5FAF7;
+  --pastel-slate-border: #A7F3D0;
+
+  --ink-primary: #3B0E17;
+  --ink-secondary: #6B2332;
+  --ink-muted: #8E3B4C;
+  --line-tactile: #5E1420;
 }
-body{color:#6A2230}
 
-/* ---------- ritme: jeda antarseksi dipadatkan (dulu 104px + reveal = lubang kosong) ---------- */
-.sec{padding:56px 0}
-@media (min-width:900px){.sec{padding:84px 0}.sec-final{padding:72px 0 96px}}
+body { color: #6A2230; }
 
-/* reveal lebih cepat & pendek: konten tidak lagi terlihat pudar saat di-scroll */
-.anim .reveal{transform:translate3d(0,12px,0);transition-duration:.42s,.42s;transition-delay:calc(var(--i,0) * 45ms)}
+/* ---------- ritme: jeda antarseksi dipadatkan ---------- */
+.sec { padding: 60px 0; }
+@media (min-width: 900px) {
+  .sec { padding: 88px 0; }
+  .sec-final { padding: 72px 0 96px; }
+}
 
-/* ---------- kepala seksi: nomor jadi pil, judul lebih besar, garis jadi bar solar ---------- */
-.sec-num{display:inline-flex;align-items:center;gap:8px;width:auto;padding:6px 14px 6px 10px;margin-bottom:16px;
-  background:#fff;border:1.5px solid var(--vv-line);border-radius:999px;color:var(--vv-ink);
-  letter-spacing:.14em;box-shadow:0 2px 0 var(--vv-line)}
-.sec-num::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--vv-rose);box-shadow:0 0 0 3px var(--vv-pink-soft)}
-.sec-title{font-size:clamp(2rem,6.6vw,3.1rem);color:var(--vv-ink);letter-spacing:-.035em}
-.sec-head .rule{width:72px;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--vv-sun),var(--vv-rose))}
-.sec-dek{font-size:1.02rem;color:#6A2230;max-width:58ch}
+/* reveal lebih responsif */
+.anim .reveal {
+  transform: translate3d(0, 12px, 0);
+  transition-duration: .42s, .42s;
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
 
-/* ---------- tombol: lebih "timbul" dan kontras ---------- */
-.btn{border-color:var(--vv-line)}
-.btn-primary{background:linear-gradient(180deg,#FFE066 0%,var(--vv-sun) 55%,#FFB300 100%);color:var(--vv-ink);
-  box-shadow:0 4px 0 var(--vv-line),0 10px 24px -8px rgba(255,170,0,.65)}
-.anim .btn-primary:hover{box-shadow:0 7px 0 var(--vv-line),0 16px 30px -10px rgba(255,170,0,.75)}
-.btn-ghost{background:#fff;box-shadow:0 4px 0 var(--vv-line)}
-.anim .btn-ghost:hover{box-shadow:0 7px 0 var(--vv-line)}
+/* ---------- kepala seksi: nomor jadi pil, judul ekspresif, bar solar ---------- */
+.sec-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 6px 16px 6px 12px;
+  margin-bottom: 16px;
+  background: #fff;
+  border: 1.5px solid var(--line-tactile);
+  border-radius: 999px;
+  color: var(--ink-primary);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  box-shadow: 0 2px 0 var(--line-tactile);
+}
+.sec-num::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--vv-rose);
+  box-shadow: 0 0 0 3px var(--vv-pink-soft);
+}
+.sec-title {
+  font-size: clamp(2.1rem, 6.6vw, 3.2rem);
+  color: var(--ink-primary);
+  letter-spacing: -.035em;
+  line-height: 1.18;
+}
+.sec-head .rule {
+  width: 76px;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--vv-sun), var(--vv-rose));
+  margin: 18px 0 0;
+}
+.sec-dek {
+  font-size: 1.05rem;
+  color: var(--ink-secondary);
+  max-width: 58ch;
+  line-height: 1.6;
+}
+
+/* ---------- tombol: timbul, tactil, dan bervolume ---------- */
+.btn { border-color: var(--line-tactile); }
+.btn-primary {
+  background: linear-gradient(180deg, #FFE066 0%, var(--vv-sun) 55%, #FFB300 100%);
+  color: var(--ink-primary);
+  box-shadow: 0 4px 0 var(--line-tactile), 0 10px 24px -8px rgba(255,170,0,.65);
+}
+.anim .btn-primary:hover {
+  box-shadow: 0 7px 0 var(--line-tactile), 0 16px 30px -10px rgba(255,170,0,.75);
+}
+.btn-ghost {
+  background: #fff;
+  box-shadow: 0 4px 0 var(--line-tactile);
+}
+.anim .btn-ghost:hover {
+  box-shadow: 0 7px 0 var(--line-tactile);
+}
 
 /* ---------- topbar ---------- */
-.topbar{background:rgba(255,249,238,.9);border-bottom:1.5px solid rgba(109,25,38,.14)}
-.topbar .btn-primary{background:linear-gradient(180deg,#28967B 0%,var(--vv-teal) 60%,#166052 100%);color:#fff;border-color:#124B3D;
-  box-shadow:0 3px 0 #124B3D,0 6px 16px -4px rgba(31,122,99,.35)}
-.anim .topbar .btn-primary:hover{background:linear-gradient(180deg,#32A78A 0%,#238970 60%,#186E59 100%);
-  box-shadow:0 5px 0 #124B3D,0 10px 20px -4px rgba(31,122,99,.45);color:#fff}
-.topnav-links a:not(.lang-switch){position:relative}
-.topnav-links a:not(.lang-switch)::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:3px;border-radius:3px;
-  background:var(--vv-teal);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--fz-out)}
-.topnav-links a:not(.lang-switch):hover{text-decoration:none}
-.topnav-links a:not(.lang-switch):hover::after{transform:scaleX(1)}
+.topbar {
+  background: rgba(255, 249, 238, .92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1.5px solid rgba(109, 25, 38, .14);
+}
+.topbar .btn-primary {
+  background: linear-gradient(180deg, #28967B 0%, var(--vv-teal) 60%, #166052 100%);
+  color: #fff;
+  border-color: #124B3D;
+  box-shadow: 0 3px 0 #124B3D, 0 6px 16px -4px rgba(31, 122, 99, .35);
+}
+.anim .topbar .btn-primary:hover {
+  background: linear-gradient(180deg, #32A78A 0%, #238970 60%, #186E59 100%);
+  box-shadow: 0 5px 0 #124B3D, 0 10px 20px -4px rgba(31, 122, 99, .45);
+  color: #fff;
+}
+.topnav-links a:not(.lang-switch) { position: relative; }
+.topnav-links a:not(.lang-switch)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--vv-teal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .25s var(--fz-out);
+}
+.topnav-links a:not(.lang-switch):hover { text-decoration: none; }
+.topnav-links a:not(.lang-switch):hover::after { transform: scaleX(1); }
 
-/* ============ HERO: Palet Hijau Emerald KelasKu (#1F7A63) + Krem Travertine ============ */
-.hero{background:
-  radial-gradient(100% 65% at 50% -5%,rgba(31,122,99,.18) 0%,rgba(58,163,133,.09) 36%,rgba(255,249,238,0) 72%),
-  radial-gradient(60% 45% at 85% 15%,rgba(255,217,79,.10) 0%,transparent 60%),
-  radial-gradient(50% 40% at 15% 20%,rgba(31,122,99,.08) 0%,transparent 55%),
-  linear-gradient(180deg,#F2F8F5 0%,#FAF8F2 42%,var(--cream) 100%)}
-.hero::before{content:"";position:absolute;left:50%;top:-30vmax;width:100vmax;height:100vmax;transform:translateX(-50%);
-  pointer-events:none;z-index:0;opacity:.35;
-  background:radial-gradient(circle at 50% 50%,rgba(31,122,99,.20) 0%,rgba(46,157,129,.08) 38%,transparent 68%)}
-.anim .hero::before{animation:vvPulseGlow 18s ease-in-out infinite alternate}
-@keyframes vvPulseGlow{0%{transform:translateX(-50%) scale(0.96);opacity:.28}100%{transform:translateX(-50%) scale(1.04);opacity:.42}}
-.hero>.wrap{position:relative;z-index:1}
+/* ---------- HERO: Travertine Daylight + Hijau Emerald KelasKu ---------- */
+.hero {
+  background:
+    radial-gradient(100% 65% at 50% -5%, rgba(31, 122, 99, .18) 0%, rgba(58, 163, 133, .09) 36%, rgba(255, 249, 238, 0) 72%),
+    radial-gradient(60% 45% at 85% 15%, rgba(255, 217, 79, .10) 0%, transparent 60%),
+    radial-gradient(50% 40% at 15% 20%, rgba(31, 122, 99, .08) 0%, transparent 55%),
+    linear-gradient(180deg, #F2F8F5 0%, #FAF8F2 42%, var(--cream) 100%);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -30vmax;
+  width: 100vmax;
+  height: 100vmax;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: .35;
+  background: radial-gradient(circle at 50% 50%, rgba(31, 122, 99, .20) 0%, rgba(46, 157, 129, .08) 38%, transparent 68%);
+}
+.anim .hero::before { animation: vvPulseGlow 18s ease-in-out infinite alternate; }
+@keyframes vvPulseGlow {
+  0% { transform: translateX(-50%) scale(0.96); opacity: .28; }
+  100% { transform: translateX(-50%) scale(1.04); opacity: .42; }
+}
+.hero > .wrap { position: relative; z-index: 1; }
 
-.mast-h1{max-width:24ch;font-size:clamp(1.85rem,4.6vw,3.05rem);line-height:1.16;letter-spacing:-.035em;color:var(--vv-ink);margin:0 auto;text-wrap:balance}
-.mast-lang{color:var(--vv-teal);display:inline-block;background:linear-gradient(135deg,#238970 0%,#166052 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.mast-sub{white-space:normal;text-transform:none!important;letter-spacing:0!important;
-  font-size:clamp(.98rem,2.3vw,1.1rem);font-weight:500;line-height:1.6;color:#7A323F;
-  max-width:52ch;margin:14px auto 0;text-wrap:balance}
-
-.mast-cta{gap:12px}
-.mast-cta .btn-primary{min-height:54px;padding:14px 32px;font-size:1.08rem;font-weight:800;
-  background:linear-gradient(180deg,#28967B 0%,var(--vv-teal) 60%,#166052 100%);color:#fff;border-color:#124B3D;
-  box-shadow:0 4px 0 #124B3D,0 12px 24px -6px rgba(31,122,99,.42)}
-.anim .mast-cta .btn-primary:hover{background:linear-gradient(180deg,#32A78A 0%,#238970 60%,#186E59 100%);
-  box-shadow:0 6px 0 #124B3D,0 16px 28px -6px rgba(31,122,99,.52);color:#fff}
-.vv-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 10px;margin:20px auto 0;padding:0;list-style:none}
-.vv-trust li{display:inline-flex;align-items:center;gap:7px;padding:6px 13px 6px 8px;border-radius:999px;
-  background:rgba(255,255,255,.82);border:1.5px solid rgba(109,25,38,.22);
-  font-size:var(--fs-label);font-weight:700;color:var(--vv-ink)}
-.vv-trust li::before{content:"";width:18px;height:18px;border-radius:50%;flex:none;
-  background:var(--vv-teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat}
-
-@media (max-width:559px){
-  .masthead{padding-left:18px!important;padding-right:18px!important}
-  .mast-h1{font-size:clamp(1.55rem,5.4vw,1.95rem);line-height:1.2;max-width:100%}
-  .mast-lang{display:inline}
-  .mast-sub{font-size:0.95rem;line-height:1.5;max-width:34ch;margin-top:10px}
-  .mast-cta{display:grid;grid-template-columns:1fr;gap:10px}
-  .mast-cta .btn{width:100%;min-width:0;padding-left:12px;padding-right:12px}
-  .mast-cta .btn-ghost{min-height:46px}
-  .btn-primary-hero{width:100%;max-width:320px}
-  .vv-trust li{font-size:var(--fs-micro)}
+.mast-h1 {
+  max-width: 24ch;
+  font-size: clamp(1.85rem, 4.6vw, 3.05rem);
+  line-height: 1.16;
+  letter-spacing: -.035em;
+  color: var(--ink-primary);
+  margin: 0 auto;
+  text-wrap: balance;
+}
+.mast-lang {
+  color: var(--vv-teal);
+  display: inline-block;
+  background: linear-gradient(135deg, #238970 0%, #166052 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.mast-sub {
+  white-space: normal;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: clamp(.98rem, 2.3vw, 1.1rem);
+  font-weight: 500;
+  line-height: 1.6;
+  color: #7A323F;
+  max-width: 52ch;
+  margin: 14px auto 0;
+  text-wrap: balance;
+}
+.mast-cta { gap: 12px; }
+.mast-cta .btn-primary {
+  min-height: 54px;
+  padding: 14px 32px;
+  font-size: 1.08rem;
+  font-weight: 800;
+  background: linear-gradient(180deg, #28967B 0%, var(--vv-teal) 60%, #166052 100%);
+  color: #fff;
+  border-color: #124B3D;
+  box-shadow: 0 4px 0 #124B3D, 0 12px 24px -6px rgba(31, 122, 99, .42);
+}
+.anim .mast-cta .btn-primary:hover {
+  background: linear-gradient(180deg, #32A78A 0%, #238970 60%, #186E59 100%);
+  box-shadow: 0 6px 0 #124B3D, 0 16px 28px -6px rgba(31, 122, 99, .52);
+  color: #fff;
+}
+.vv-trust {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 10px;
+  margin: 20px auto 0;
+  padding: 0;
+  list-style: none;
+}
+.vv-trust li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px 6px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .82);
+  border: 1.5px solid rgba(109, 25, 38, .22);
+  font-size: var(--fs-label);
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+.vv-trust li::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--vv-teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat;
 }
 
-/* ============ LOOP ADAPTIF: tiap langkah punya warna sendiri ============ */
-.loop-step{border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard);background:#fff;position:relative;overflow:hidden}
-.loop-step::before{content:"";position:absolute;left:0;right:0;top:0;height:6px}
-.loop-step:nth-child(1)::before{background:var(--vv-rose)}
-.loop-step:nth-child(2){background:var(--vv-sun-soft);border-color:var(--vv-line)}
-.loop-step:nth-child(2)::before{background:var(--vv-sun)}
-.loop-step:nth-child(3){background:var(--vv-teal-soft)}
-.loop-step:nth-child(3)::before{background:var(--vv-teal)}
-.loop-n{color:var(--vv-ink);padding-top:4px}
-.loop-step:nth-child(1) .loop-n span{background:var(--vv-rose-ink)}
-.loop-step:nth-child(2) .loop-n span{background:var(--vv-ink)}
-.loop-step:nth-child(3) .loop-n span{background:var(--vv-teal)}
-.loop-step:nth-child(3) .loop-plan-k{color:var(--vv-teal)}
-.loop-q{background:#FFF9EE;border:1.5px dashed rgba(109,25,38,.3)}
-.loop-q b{background:var(--vv-sun-2)}
-.loop-verdict-bad{background:var(--vv-pink-soft);border-color:var(--vv-rose);color:var(--vv-rose-ink)}
-.loop-rule{border-left-color:var(--vv-rose)}
-.anim .loop-step:hover{transform:translate(-2px,-4px);box-shadow:var(--vv-hard-lg)}
-
-/* ============ RINGKASAN + STATISTIK ============ */
-.sec-intro{overflow:hidden}
-.intro-copy .eyebrow{background:var(--vv-teal-soft);border-color:rgba(31,122,99,.45);color:#145A48}
-.intro-note{background:var(--vv-sky-soft);border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard)}
-.intro-note .tagline .t-2{color:var(--vv-rose-ink)}
-.stats li{border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard);padding:20px 18px}
-.stats li::after{display:none}
-.stats li:nth-child(1){background:var(--vv-sun-2)}
-.stats li:nth-child(2){background:var(--vv-pink-soft)}
-.stats li:nth-child(3){background:var(--vv-teal-soft)}
-.stats li:nth-child(4){background:var(--vv-sky-soft)}
-.stats b{font-size:clamp(2.2rem,9vw,3.2rem);color:var(--vv-ink)}
-.stats span{color:var(--vv-ink);font-weight:600}
-.anim .stats li:hover{transform:translate(-2px,-4px);box-shadow:var(--vv-hard-lg)}
-
-/* ticker: pita solar miring — dulu garis tipis yang nyaris tak terlihat */
-.ticker{margin-top:44px;padding:14px 0;background:var(--vv-sun);border-top:2px solid var(--vv-line);border-bottom:2px solid var(--vv-line);
-  transform:rotate(-1.4deg) scale(1.03)}
-.ticker li{color:var(--vv-ink);font-weight:800}
-.ticker li::after{background:var(--vv-rose);width:7px;height:7px}
-
-/* ============ TENTANG ============ */
-.disambiguation-note{background:var(--vv-pink-soft)!important;border:1.5px solid rgba(163,38,59,.35)!important;border-radius:16px!important}
-.sec-about .body-lg a{color:var(--vv-rose-ink);font-weight:700;border-bottom:2px solid rgba(217,83,106,.35)}
-.sec-about .body-lg a:hover{text-decoration:none;border-color:var(--vv-rose)}
-.phone{border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard)}
-.shot-pair{position:relative}
-.shot-pair::before{content:"";position:absolute;inset:8% 4% 0;border-radius:40% 60% 55% 45%;z-index:0;
-  background:radial-gradient(circle at 40% 40%,var(--vv-sun-2),rgba(255,217,79,.35) 60%,transparent 72%)}
-.shot-pair>*{position:relative;z-index:1}
-
-/* ============ FITUR: kartu stiker + ubin ikon berwarna per skill ============ */
-.feat{background:#fff!important;border:1.5px solid var(--vv-line)!important;box-shadow:var(--vv-hard);--vv-tile:var(--vv-sun-2);--vv-tile-ink:var(--vv-ink)}
-.anim .feat:hover{transform:translate(-2px,-5px);box-shadow:var(--vv-hard-lg)}
-.feat .ico,.feat .ico-img{box-sizing:content-box;width:26px;height:26px;padding:11px;border-radius:14px;
-  background:var(--vv-tile);color:var(--vv-tile-ink);border:1.5px solid var(--vv-line)}
-.feat .ico-img{width:30px;height:30px;padding:9px}
-.feat h3{font-size:1.16rem;color:var(--vv-ink);margin-top:16px}
-.feat p{color:#6A2230}
-.feat-grid>.feat:nth-child(1){background:var(--vv-sun-2)!important;--vv-tile:#fff}
-.feat-grid>.feat:nth-child(2){--vv-tile:var(--vv-sky);--vv-tile-ink:#0F3552}
-.feat-grid>.feat:nth-child(3){--vv-tile:var(--vv-pink-soft);--vv-tile-ink:var(--vv-rose-ink)}
-.feat-grid>.feat:nth-child(4){--vv-tile:var(--vv-teal-soft);--vv-tile-ink:var(--vv-teal)}
-.feat-grid>.feat:nth-child(5){--vv-tile:var(--vv-sun-soft)}
-.feat-grid>.feat:nth-child(6){--vv-tile:var(--vv-rose);--vv-tile-ink:#fff}
-.feat-grid>.feat:nth-child(7){--vv-tile:var(--vv-sky-soft);--vv-tile-ink:var(--vv-sky-ink)}
-.feat-grid>.feat:nth-child(8){background:var(--vv-pink-soft)!important;--vv-tile:#fff;--vv-tile-ink:var(--vv-rose-ink)}
-.feat-grid>.feat:nth-child(9){--vv-tile:var(--vv-teal);--vv-tile-ink:#fff}
-.feat-grid>.feat:nth-child(10){--vv-tile:var(--vv-sun);--vv-tile-ink:var(--vv-ink)}
-.feat-grid>.feat:nth-child(9) a{color:var(--vv-teal);font-weight:700}
-.chiplist li{background:#fff;border:1.5px solid var(--vv-line);box-shadow:0 2px 0 var(--vv-line)}
-/* perbaikan grid: kartu terakhir dulu dipaku ke kolom 1 sehingga KelasKu tertinggal sendirian */
-@media (min-width:900px){.feat-grid>.feat:last-child{grid-column:span 2}}
-
-/* ============ CARA PAKAI: nomor besar + garis penghubung ============ */
-.steps{position:relative;counter-reset:none}
-.step{border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard);background:#fff}
-.step-n{width:46px;height:46px;font-size:1.2rem;background:var(--vv-sun);color:var(--vv-ink);border:1.5px solid var(--vv-line);box-shadow:0 3px 0 var(--vv-line)}
-.steps>li:nth-child(2) .step-n{background:var(--vv-pink-soft)}
-.steps>li:nth-child(3) .step-n{background:var(--vv-teal-soft)}
-.steps>li:nth-child(4) .step-n{background:var(--vv-sky-soft)}
-.step p{color:#6A2230;padding-top:10px}
-.anim .step:hover{transform:translate(-2px,-4px);box-shadow:var(--vv-hard-lg)}
-@media (min-width:900px){
-  .steps::before{content:"";position:absolute;left:6%;right:6%;top:45px;height:0;border-top:2.5px dashed rgba(109,25,38,.35);z-index:0}
-  .steps>li{position:relative;z-index:1}
-  .step{grid-template-columns:1fr;gap:6px;padding:22px 20px 24px}
+@media (max-width: 559px) {
+  .masthead { padding-left: 18px !important; padding-right: 18px !important; }
+  .mast-h1 { font-size: clamp(1.55rem, 5.4vw, 1.95rem); line-height: 1.2; max-width: 100%; }
+  .mast-lang { display: inline; }
+  .mast-sub { font-size: 0.95rem; line-height: 1.5; max-width: 34ch; margin-top: 10px; }
+  .mast-cta { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .mast-cta .btn { width: 100%; min-width: 0; padding-left: 12px; padding-right: 12px; }
+  .mast-cta .btn-ghost { min-height: 46px; }
+  .btn-primary-hero { width: 100%; max-width: 320px; }
 }
 
-/* ============ INSTALL ============ */
-.install-card{background:var(--vv-sky-soft)!important;border:1.5px solid var(--vv-line)!important;box-shadow:var(--vv-hard-lg)}
-.howlist li{background:#fff;border:1.5px solid rgba(109,25,38,.22);padding-left:44px;position:relative}
-.howlist li::before{content:"";position:absolute;left:14px;top:50%;width:18px;height:18px;transform:translateY(-50%);border-radius:50%;
-  background:var(--vv-teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat}
-.install-card .link-arrow{color:var(--vv-sky-ink);border-color:rgba(31,92,135,.4)}
+/* ============================================================================
+   TILTED GRAPHIC STICKERS & SKEUOMORPHIC SHINE (Kidmima + Wo-Fi Style)
+   ============================================================================ */
+.skeuo-shine {
+  position: relative;
+  overflow: hidden;
+}
+.skeuo-shine::after {
+  content: "";
+  position: absolute;
+  inset: -60% -60% -60% -60%;
+  background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.55) 50%, transparent 65%);
+  transform: translateX(-100%) rotate(25deg);
+  pointer-events: none;
+  z-index: 3;
+  transition: transform .8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.skeuo-shine:hover::after {
+  transform: translateX(100%) rotate(25deg);
+}
 
-/* ============ FAQ ============ */
-.sec-faq{background:var(--vv-sun-soft);
-  background-image:radial-gradient(rgba(109,25,38,.10) 1.2px,transparent 1.4px);background-size:22px 22px}
-.faq details{border:1.5px solid var(--vv-line);box-shadow:0 4px 0 var(--vv-line)}
-.faq details[open]{box-shadow:var(--vv-hard)}
-.faq details[open] summary{background:var(--vv-sun-2)}
-.anim .faq summary{transition:background-color .2s var(--fz-out)}
-.faq summary:hover{background:#FFF7D6}
-.faq-body{padding-top:16px}
+.sticker-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 16px;
+  margin: 24px auto 32px;
+}
 
-/* ============ CTA AKHIR: bidang solar penuh ============ */
-.final{background:var(--vv-sun)!important;border:2px solid var(--vv-line)!important;box-shadow:var(--vv-hard-lg)!important}
-.final::before{inset:-60% -30% auto -30%;height:220%;opacity:.5;
-  background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.55) 0deg 6deg,transparent 6deg 18deg)!important;
-  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 0%,transparent 55%);mask-image:radial-gradient(circle at 50% 50%,#000 0%,transparent 55%)}
-.final::after{display:none}
-.final h2{font-size:clamp(2rem,6.8vw,3.2rem);color:var(--vv-ink)}
-.final p{color:var(--vv-ink);font-weight:600}
-.final .tagline .t-1{color:var(--vv-ink);opacity:.75}
-.final .tagline .t-2{color:var(--vv-ink)}
-.final .btn-primary{background:var(--vv-ink);color:#FFF9EE;box-shadow:0 4px 0 #3A0B14}
-.anim .final .btn-primary:hover{box-shadow:0 7px 0 #3A0B14}
-.final-paw{width:92px}
-.final .rule{display:none}
+.sticker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  border: 2px solid var(--line-tactile);
+  box-shadow: 0 3px 0 var(--line-tactile);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: default;
+}
+.sticker-badge:hover {
+  transform: scale(1.08) rotate(0deg) !important;
+}
+.sticker-yellow {
+  background: var(--pastel-butter);
+  color: #713F12;
+  border-color: #B45309;
+  box-shadow: 0 3px 0 #B45309;
+  transform: rotate(-2.5deg);
+}
+.sticker-mint {
+  background: var(--pastel-mint);
+  color: #064E3B;
+  border-color: #047857;
+  box-shadow: 0 3px 0 #047857;
+  transform: rotate(2deg);
+}
+.sticker-rose {
+  background: var(--pastel-blush);
+  color: #881337;
+  border-color: #BE123C;
+  box-shadow: 0 3px 0 #BE123C;
+  transform: rotate(-1.5deg);
+}
+.sticker-blue {
+  background: var(--pastel-lavender);
+  color: #1E3A8A;
+  border-color: #2563EB;
+  box-shadow: 0 3px 0 #2563EB;
+  transform: rotate(2.5deg);
+}
 
-/* ============ FOOTER ============ */
-.foot{border-top:2px solid var(--vv-line)}
+/* ============================================================================
+   1. REAL KAWAN BICARA AI STUDIO STAGE (#kawan-bicara)
+   Menggunakan UI Resmi FaceTime + Real 3D Mochi Mascot
+   ============================================================================ */
+.velin-call-section {
+  padding: 80px 0;
+  background: radial-gradient(ellipse at 50% 10%, #FFF5E6 0%, #FFFDF8 80%);
+  position: relative;
+  overflow: hidden;
+}
 
-/* ============ DOK CTA MOBILE: muncul setelah hero lewat, hilang di CTA akhir ============ */
-.vv-dock{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:45;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 10px 10px 16px;
-  background:#fff;border:1.5px solid var(--vv-line);border-radius:20px;box-shadow:var(--vv-hard);
-  transform:translateY(160%);opacity:0;pointer-events:none;
-  transition:transform .36s var(--fz-out),opacity .36s var(--fz-out)}
-.vv-dock.is-on{transform:none;opacity:1;pointer-events:auto}
-.vv-dock-copy{display:grid;line-height:1.25;min-width:0}
-.vv-dock-copy b{font-size:.95rem;color:var(--vv-ink)}
-.vv-dock-copy span{font-size:var(--fs-micro);color:#6A2230;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vv-dock .btn{min-height:46px;padding:10px 20px;font-size:.95rem;flex:none}
-@media (min-width:760px){.vv-dock{display:none}}
-@media (prefers-reduced-motion:reduce){.hero::before{animation:none}.vv-dock{transition:none}}
+.real-studio-box {
+  max-width: 960px;
+  margin: 0 auto;
+  border: 3px solid var(--line-tactile);
+  border-radius: 36px;
+  background: #FFFDF8;
+  box-shadow: 0 10px 0 var(--line-tactile), 0 28px 60px -15px rgba(94, 20, 32, 0.22);
+  overflow: hidden;
+  position: relative;
+}
 
-/* penyesuaian pasca-tinjau */
-@media (min-width:900px){.mast-h1{max-width:21ch}}
-.step{align-content:start;align-items:start}
-#pasang{padding-top:0}
-.sec-head .rule{margin-top:18px}
-.final .tagline{max-width:none}
-@media (min-width:900px){.sec-about{padding-top:56px}}
-:lang(th) .mast-h1{line-height:1.28}
+/* Inner 2-column on wide screens, stacked on mobile */
+.real-studio-inner-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 920px) {
+  .real-studio-inner-grid {
+    grid-template-columns: 1.05fr 1fr;
+  }
+}
+
+/* Column 1: Top/Left Calling Card (FaceTime with Sensei Nanami & Real Mochi) */
+.real-studio-call-card {
+  background: #FBF7EE;
+  padding: 36px 36px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--line-tactile);
+}
+@media (min-width: 920px) {
+  .real-studio-call-card {
+    border-bottom: none;
+    border-right: 3px solid var(--line-tactile);
+    padding: 40px 38px;
+  }
+}
+
+/* Floating Persona Badge Bar */
+.real-studio-meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+.real-persona-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #fff;
+  border: 1.5px solid var(--line-tactile);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--ink-primary);
+  box-shadow: 0 2px 0 var(--line-tactile);
+}
+.real-mentor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #FDF2F4;
+  border: 1.5px solid var(--line-tactile);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: #9F1239;
+}
+
+/* REAL 3D MOCHI MASCOT HERO */
+.real-mochi-stage {
+  position: relative;
+  display: inline-block;
+  margin: 10px auto 16px;
+}
+.real-mochi-img {
+  width: 160px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+
+  animation: realMochiFloat 3.8s ease-in-out infinite alternate;
+}
+@keyframes realMochiFloat {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1.2deg); }
+  100% { transform: translateY(3px) rotate(-1.2deg); }
+}
+
+/* Telemetry Sound Rays (Green Waves around Mochi) */
+.real-mochi-sound-rays {
+  position: absolute;
+  top: 15%;
+  left: -20px;
+  width: 22px;
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.real-sound-ray {
+  height: 4px;
+  border-radius: 2px;
+  background: #10B981;
+  transform-origin: right center;
+  animation: rayPulse 1.2s ease-in-out infinite alternate;
+}
+.real-sound-ray:nth-child(1) { width: 14px; animation-delay: 0.1s; }
+.real-sound-ray:nth-child(2) { width: 22px; animation-delay: 0.3s; }
+.real-sound-ray:nth-child(3) { width: 16px; animation-delay: 0.2s; }
+@keyframes rayPulse {
+  0% { transform: scaleX(0.5); opacity: 0.4; }
+  100% { transform: scaleX(1.2); opacity: 1; }
+}
+
+/* Status Pill "Siap Bicara" */
+.real-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  background: #E8F8EE;
+  border: 1.5px solid #10B981;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #065F46;
+  margin-bottom: 20px;
+}
+.real-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  animation: realDotPulse 1.4s infinite alternate;
+}
+@keyframes realDotPulse {
+  0% { opacity: 0.4; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.25); }
+}
+
+/* Real FaceTime Call Button */
+.real-facetime-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 420px;
+  padding: 16px 28px;
+  background: linear-gradient(180deg, #059669 0%, #047857 100%);
+  border: 2.5px solid #064E3B;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 1.08rem;
+  font-weight: 800;
+  box-shadow: 0 5px 0 #064E3B, 0 14px 28px -6px rgba(5,150,105,0.45);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.real-facetime-btn:hover {
+  background: linear-gradient(180deg, #10B981 0%, #059669 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 #064E3B, 0 18px 32px -6px rgba(5,150,105,0.55);
+  color: #fff;
+}
+.real-facetime-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #064E3B;
+}
+
+.real-call-subnote {
+  margin-top: 14px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #065F46;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Column 2: Authentic Beginner Assistant (Ide Bicara) */
+.real-studio-assistant {
+  background: #FFFDF8;
+  padding: 34px 34px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+@media (min-width: 920px) {
+  .real-studio-assistant {
+    padding: 38px 36px;
+  }
+}
+
+.real-assistant-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.real-assistant-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #9F1239;
+  background: #FFE4E6;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1.5px solid #FDA4AF;
+}
+.real-mode-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.real-mode-pill {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1.5px solid var(--line-tactile);
+  background: #fff;
+  color: var(--ink-primary);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.real-mode-pill.active {
+  background: var(--ink-primary);
+  color: #FFF9EE;
+}
+
+/* Real Japanese Dialogue Box */
+.real-dialogue-card {
+  background: #fff;
+  border: 2px solid var(--line-tactile);
+  border-radius: 22px;
+  padding: 22px 24px;
+  box-shadow: 0 4px 0 var(--line-tactile);
+  margin-bottom: 20px;
+}
+.real-kanji-line {
+  font-size: clamp(1.22rem, 2.8vw, 1.48rem);
+  font-weight: 800;
+  color: var(--ink-primary);
+  line-height: 1.6;
+}
+.real-kanji-line ruby {
+  ruby-position: over;
+  font-weight: 800;
+}
+.real-kanji-line rt {
+  font-size: 0.6em;
+  font-weight: 700;
+  color: #BE123C;
+}
+.real-romaji-line {
+  margin-top: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #9F1239;
+  font-family: inherit;
+}
+.real-trans-line {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #6B2332;
+  font-style: italic;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Action Buttons: Dengar, Ucapkan, Pakai Jawaban */
+.real-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.real-left-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.real-act-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1.5px solid var(--line-tactile);
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  box-shadow: 0 2px 0 var(--line-tactile);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+.real-act-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 var(--line-tactile);
+}
+.real-act-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--line-tactile);
+}
+.real-send-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  background: var(--ink-primary);
+  border: 2px solid var(--line-tactile);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #FFF9EE;
+  box-shadow: 0 3px 0 #1A050A;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.real-send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 #1A050A;
+  color: #fff;
+}
+
+/* Beginner Prompts Quick Row */
+.real-quick-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1.5px dashed rgba(94, 20, 32, 0.2);
+  padding-top: 16px;
+}
+.real-quick-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #7A2837;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.real-quick-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.real-quick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: #F1F5F9;
+  border: 1px solid rgba(94, 20, 32, 0.15);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.real-quick-chip:hover {
+  background: #E2E8F0;
+  border-color: var(--line-tactile);
+}
+.real-quick-chip span {
+  font-size: 0.72rem;
+  color: #64748B;
+}
+
+/* ============================================================================
+   2. PINNED ROADMAP BANNER & LEBAR STEP ADAPTIF (#adaptif)
+   ============================================================================ */
+.sec-loop {
+  background: radial-gradient(ellipse at 50% 0%, #FFF8E7 0%, var(--cream) 80%);
+}
+.velin-pinned-banner {
+  background: #FFFDF8;
+  border: 2.5px solid var(--line-tactile);
+  border-radius: 28px;
+  padding: 34px 34px 30px;
+  box-shadow: 0 6px 0 var(--line-tactile);
+  position: relative;
+  margin-bottom: 36px;
+}
+.velin-pinned-banner .velin-pin {
+  position: absolute;
+  top: -14px;
+  right: 32px;
+  width: 36px;
+  height: 36px;
+  filter: drop-shadow(2px 4px 6px rgba(94, 20, 32, 0.3));
+  transform: rotate(-15deg);
+}
+.velin-milestones-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+@media (min-width: 880px) {
+  .velin-milestones-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+.velin-milestones-grid .velin-milestone-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1.5px solid var(--line-tactile);
+  background: #fff;
+  box-shadow: 0 2px 0 var(--line-tactile);
+  transition: transform 0.2s ease;
+}
+.velin-milestones-grid .velin-milestone-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 var(--line-tactile);
+}
+.velin-milestones-grid .velin-milestone-item.done {
+  background: #F0FDF4;
+  border-color: #10B981;
+  box-shadow: 0 2px 0 #10B981;
+}
+.velin-milestones-grid .velin-milestone-item.active {
+  background: #FEF9C3;
+  border-color: #EAB308;
+  border-width: 2px;
+  box-shadow: 0 3px 0 var(--line-tactile);
+}
+.velin-item-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: #fff;
+  border: 1.5px solid currentColor;
+}
+.velin-milestone-item.done .velin-item-icon {
+  background: #10B981;
+  color: #fff;
+  border: none;
+}
+.velin-milestone-item.active .velin-item-icon {
+  background: #EAB308;
+  color: #713F12;
+  border: none;
+}
+.velin-item-content b {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--ink-primary);
+  margin-bottom: 4px;
+}
+.velin-item-content span {
+  font-size: 0.82rem;
+  color: #6A2230;
+  line-height: 1.4;
+}
+
+/* ============================================================================
+   3. REFINED BENTO GRID WITH PASTEL SURFACES (#fitur)
+   ============================================================================ */
+.velin-bento-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+@media (min-width: 880px) {
+  .velin-bento-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .bento-col-12 { grid-column: span 12; }
+  .bento-col-7 { grid-column: span 7; }
+  .bento-col-5 { grid-column: span 5; }
+}
+
+.bento-card {
+  border: 2.5px solid var(--line-tactile);
+  border-radius: 32px;
+  box-shadow: 0 4px 6px -1px rgba(94, 20, 32, 0.04), 0 20px 40px -15px rgba(94, 20, 32, 0.08), 0 6px 0 var(--line-tactile);
+  padding: 34px 32px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+.anim .bento-card:hover {
+  transform: translateY(-6px) scale(1.008);
+  box-shadow: 0 8px 14px -2px rgba(94, 20, 32, 0.07), 0 28px 50px -15px rgba(94, 20, 32, 0.16), 0 10px 0 var(--line-tactile);
+}
+
+/* True Pastel Flavors with Subtle Depth Gradients */
+.bento-amber {
+  background: linear-gradient(175deg, #FFFDF5 0%, #FEF9C3 60%, #FEF08A 100%);
+  border-color: #F59E0B;
+  box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.05), 0 20px 35px -10px rgba(217, 119, 6, 0.08), 0 6px 0 #D97706;
+}
+.anim .bento-amber:hover {
+  box-shadow: 0 8px 14px -2px rgba(217, 119, 6, 0.08), 0 28px 50px -15px rgba(217, 119, 6, 0.18), 0 10px 0 #D97706;
+}
+
+.bento-mint {
+  background: linear-gradient(175deg, #F0FDF4 0%, #DCFCE7 60%, #BBF7D0 100%);
+  border-color: #10B981;
+  box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.05), 0 20px 35px -10px rgba(5, 150, 105, 0.08), 0 6px 0 #059669;
+}
+.anim .bento-mint:hover {
+  box-shadow: 0 8px 14px -2px rgba(5, 150, 105, 0.08), 0 28px 50px -15px rgba(5, 150, 105, 0.18), 0 10px 0 #059669;
+}
+
+.bento-lavender {
+  background: linear-gradient(175deg, #F8FAFC 0%, #EEF2FF 60%, #E0E7FF 100%);
+  border-color: #6366F1;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.05), 0 20px 35px -10px rgba(99, 102, 241, 0.08), 0 6px 0 #4F46E5;
+}
+.anim .bento-lavender:hover {
+  box-shadow: 0 8px 14px -2px rgba(99, 102, 241, 0.08), 0 28px 50px -15px rgba(99, 102, 241, 0.18), 0 10px 0 #4F46E5;
+}
+
+.bento-coral {
+  background: linear-gradient(175deg, #FFF8F8 0%, #FFE4E6 60%, #FECDD3 100%);
+  border-color: #F43F5E;
+  box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.05), 0 20px 35px -10px rgba(225, 29, 72, 0.08), 0 6px 0 #E11D48;
+}
+.anim .bento-coral:hover {
+  box-shadow: 0 8px 14px -2px rgba(225, 29, 72, 0.08), 0 28px 50px -15px rgba(225, 29, 72, 0.18), 0 10px 0 #E11D48;
+}
+
+.bento-slate {
+  background: linear-gradient(175deg, #F0FDFA 0%, #CCFBF1 60%, #99F6E4 100%);
+  border-color: #0D9488;
+  box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.05), 0 20px 35px -10px rgba(13, 148, 136, 0.08), 0 6px 0 #0F766E;
+}
+.anim .bento-slate:hover {
+  box-shadow: 0 8px 14px -2px rgba(13, 148, 136, 0.08), 0 28px 50px -15px rgba(13, 148, 136, 0.18), 0 10px 0 #0F766E;
+}
+
+.bento-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--line-tactile);
+  background: #fff;
+  box-shadow: 0 2px 0 var(--line-tactile);
+  color: var(--ink-primary);
+  margin-bottom: 14px;
+}
+.bento-card h3 {
+  font-size: clamp(1.28rem, 2.4vw, 1.55rem);
+  color: var(--ink-primary);
+  margin: 0 0 10px;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+.bento-card p {
+  font-size: 0.95rem;
+  color: var(--ink-secondary);
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
+
+/* Micro-Widget: Interactive Grammar Token Puzzle */
+.widget-grammar-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid var(--line-tactile);
+  border-radius: 18px;
+  box-shadow: 0 2px 0 var(--line-tactile);
+}
+.token-chip {
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line-tactile);
+  background: #fff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--ink-primary);
+  box-shadow: 0 2px 0 var(--line-tactile);
+}
+.token-chip.target {
+  background: #FFC700;
+  border-color: var(--line-tactile);
+}
+.token-feedback {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #065F46;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Micro-Widget: Braincore Circular Gauge */
+.widget-mastery-dial {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid var(--line-tactile);
+  border-radius: 18px;
+  box-shadow: 0 2px 0 var(--line-tactile);
+}
+.mastery-circle {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex: none;
+}
+.mastery-svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+.mastery-bg {
+  fill: none;
+  stroke: #E2E8F0;
+  stroke-width: 6;
+}
+.mastery-prog {
+  fill: none;
+  stroke: #10B981;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 163;
+  stroke-dashoffset: 13;
+}
+.mastery-val {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--ink-primary);
+}
+.mastery-meta b {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--ink-primary);
+}
+.mastery-meta span {
+  font-size: 0.8rem;
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Micro-Widget: Audio Chokai 3 Personas */
+.widget-personas {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid var(--line-tactile);
+  border-radius: 18px;
+  box-shadow: 0 2px 0 var(--line-tactile);
+}
+.persona-pill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 6px;
+  border-radius: 12px;
+  background: #F1F5F9;
+  border: 1px solid rgba(94, 20, 32, 0.15);
+}
+.persona-role {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  text-transform: uppercase;
+}
+.persona-freq {
+  font-size: 0.68rem;
+  color: #64748B;
+  font-family: monospace;
+}
+
+/* Micro-Widget: Kanji Pitch Accent Karaoke */
+.widget-kanji-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #fff;
+  border: 1.5px solid var(--line-tactile);
+  border-radius: 18px;
+  box-shadow: 0 2px 0 var(--line-tactile);
+}
+.kanji-text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+}
+.kanji-pitch-tag {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: #FFE4E6;
+  border: 1px solid #FDA4AF;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #BE123C;
+}
+
+/* ============================================================================
+   4. TACTILE POLISH FOR ALAT & PANDUAN (#alat-dan-panduan)
+   ============================================================================ */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 32px;
+}
+.tool-card {
+  background: #fff;
+  border: 2px solid var(--line-tactile);
+  border-radius: 22px;
+  padding: 24px 22px;
+  box-shadow: 0 4px 0 var(--line-tactile);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+.tool-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 0 var(--line-tactile);
+}
+.tool-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.tool-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1.5px solid var(--line-tactile);
+  box-shadow: 0 2px 0 var(--line-tactile);
+}
+.badge-gold { background: #FEF08A; color: #713F12; }
+.badge-mint { background: #D1FAE5; color: #065F46; border-color: #065F46; }
+.badge-rose { background: #FFE4E6; color: #9F1239; border-color: #9F1239; }
+.badge-sky  { background: #E0F2FE; color: #075985; border-color: #075985; }
+.tool-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+.tool-desc {
+  font-size: 0.86rem;
+  color: var(--ink-secondary);
+  line-height: 1.45;
+  margin: 0 0 16px;
+}
+.tool-cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #059669;
+}
+.tool-card:hover .tool-cta-link {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .real-studio-call-card, .real-studio-assistant {
+    padding: 24px 20px;
+  }
+  .real-mochi-img {
+    width: 130px;
+  }
+  .real-facetime-btn {
+    font-size: 1rem;
+    padding: 14px 20px;
+  }
+  .real-action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .real-left-btns {
+    justify-content: space-between;
+  }
+  .real-send-btn {
+    justify-content: center;
+  }
+}
+
+/* ============================================================================
+   KIDMIMA + VELIN + DUOLINGO VISUAL EXCELLENCE (2026 UI/UX)
+   - Wavy Scalloped Cloud Dividers
+   - Winding Duolingo-Style Learning Path with Interactive Node Popups
+   - Interactive FaceTime Live Call Modal Pop-up with Live Audio Waves
+   - Phone Mockup Frames with Pinned 3D Star Badges
+   - Tinted Pastel Multi-Layered Shadows & Spring Physics
+   ============================================================================ */
+
+/* ---------- Wavy Scalloped Cloud Dividers (Kidmima Style) ---------- */
+.cloud-divider {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.cloud-divider svg {
+  display: block;
+  width: 100%;
+  height: 42px;
+}
+.cloud-to-cream { color: var(--cream, #FFFDF8); }
+.cloud-to-butter { color: var(--pastel-butter, #FFF8DB); }
+.cloud-to-mint { color: var(--pastel-mint, #E8F8EE); }
+.cloud-to-white { color: #ffffff; }
+
+/* ---------- Duolingo-Style Winding Learning Road (#adaptif) ---------- */
+.duo-roadmap-box {
+  background: linear-gradient(180deg, #FFFDF8 0%, #FFF9EC 50%, #FFF4DE 100%);
+  border: 3px solid var(--line-tactile);
+  border-radius: 36px;
+  padding: 48px 36px 44px;
+  box-shadow: 0 8px 0 var(--line-tactile), 0 24px 50px rgba(94, 20, 32, 0.10);
+  position: relative;
+  overflow: visible;
+  margin-bottom: 40px;
+}
+.duo-roadmap-head {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 56px;
+}
+.duo-path-wrapper {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  padding: 20px 0;
+}
+@media (min-width: 860px) {
+  .duo-path-wrapper {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    padding-bottom: 30px;
+  }
+}
+
+/* Undulating Curved SVG Road Spline with Moving Light Flow */
+.duo-curved-road-svg {
+  display: none;
+}
+@media (min-width: 860px) {
+  .duo-curved-road-svg {
+    display: block;
+    position: absolute;
+    top: 36px;
+    left: 4%;
+    right: 4%;
+    width: 92%;
+    height: 160px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .duo-road-pulse {
+    stroke-dasharray: 80 420;
+    animation: roadPulseMove 4s linear infinite;
+  }
+  @keyframes roadPulseMove {
+    from { stroke-dashoffset: 500; }
+    to { stroke-dashoffset: 0; }
+  }
+  .duo-node-pos1 { transform: translateY(0px); }
+  .duo-node-pos2 { transform: translateY(48px); }
+  .duo-node-pos3 { transform: translateY(-8px); }
+  .duo-node-pos4 { transform: translateY(32px); }
+}
+
+.duo-node-meta-pill {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.duo-node-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 2;
+  cursor: pointer;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.duo-node-circle {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 3px solid var(--line-tactile);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  font-weight: 800;
+  box-shadow: 0 6px 0 var(--line-tactile);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  position: relative;
+  user-select: none;
+}
+.duo-node-item:hover .duo-node-circle {
+  transform: translateY(-5px) scale(1.08);
+  box-shadow: 0 11px 0 var(--line-tactile);
+}
+.duo-node-circle.done {
+  background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+  color: #fff;
+  border-color: #064E3B;
+  box-shadow: 0 6px 0 #064E3B, 0 0 20px rgba(16, 185, 129, 0.35);
+}
+.duo-node-circle.active {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+  color: #fff;
+  border-color: #78350F;
+  box-shadow: 0 6px 0 #78350F, 0 0 26px rgba(245, 158, 11, 0.45);
+  animation: duoPulseNode 2s infinite ease-in-out;
+}
+@keyframes duoPulseNode {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.duo-node-circle.locked {
+  background: #E2E8F0;
+  color: #94A3B8;
+  border-color: #64748B;
+  box-shadow: 0 6px 0 #64748B;
+}
+
+/* 3D Mochi Standing on Active Node (100% Transparent PNG, Zero Box) */
+.duo-mochi-standing-wrap {
+  position: absolute;
+  top: -124px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  z-index: 5;
+}
+.duo-mochi-standing-img {
+  width: 84px;
+  height: auto;
+  filter: drop-shadow(0 8px 14px rgba(94, 20, 32, 0.22));
+  animation: duoMochiBob 1.8s ease-in-out infinite alternate;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.duo-node-item:hover .duo-mochi-standing-img {
+  transform: scale(1.15) rotate(3deg);
+}
+@keyframes duoMochiBob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-7px); }
+}
+.duo-mochi-bubble {
+  background: #fff;
+  border: 2px solid var(--line-tactile);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  box-shadow: 0 3px 0 var(--line-tactile);
+  margin-bottom: 2px;
+}
+
+.duo-node-label {
+  margin-top: 14px;
+}
+.duo-node-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  margin: 0 0 4px;
+}
+.duo-node-sub {
+  font-size: 0.8rem;
+  color: var(--ink-secondary);
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* Kidmima Scalloped Cloud Divider */
+.kidmima-cloud-divider {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  pointer-events: none;
+}
+.kidmima-cloud-divider svg {
+  display: block;
+  width: 100%;
+  height: 48px;
+}
+.kidmima-cloud-divider.cloud-top {
+  margin-top: -1px;
+  transform: rotate(180deg);
+}
+.kidmima-cloud-divider.cloud-bottom {
+  margin-bottom: -1px;
+}
+
+/* Interactive Stepping Stone Tooltip Pop-up */
+.duo-node-popup {
+  position: absolute;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.9) translateY(8px);
+  width: 250px;
+  background: #fff;
+  border: 2.5px solid var(--line-tactile);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 6px 0 var(--line-tactile), 0 20px 35px rgba(94, 20, 32, 0.16);
+  z-index: 20;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.duo-node-popup::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 8px 8px 8px;
+  border-style: solid;
+  border-color: transparent transparent var(--line-tactile) transparent;
+}
+.duo-node-item:hover .duo-node-popup,
+.duo-node-item:focus-within .duo-node-popup {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) scale(1) translateY(0);
+}
+.duo-popup-unit {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #9F1239;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.duo-popup-h {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  margin: 0 0 6px;
+}
+.duo-popup-desc {
+  font-size: 0.78rem;
+  color: #6B2332;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+.duo-popup-btn {
+  display: block;
+  text-align: center;
+  padding: 6px 12px;
+  background: #10B981;
+  color: #fff;
+  border: 1.5px solid #064E3B;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 2px 0 #064E3B;
+  transition: transform 0.15s ease;
+}
+.duo-popup-btn:hover {
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+/* ---------- Phone Mockups for Bento Grid (#fitur) ---------- */
+.phone-mockup-frame {
+  width: 100%;
+  max-width: 280px;
+  margin: 16px auto 0;
+  background: #2D0F16;
+  border-radius: 36px;
+  padding: 8px;
+  box-shadow: 0 8px 0 var(--line-tactile), 0 20px 32px rgba(94, 20, 32, 0.22);
+  border: 2.5px solid var(--line-tactile);
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.bento-card:hover .phone-mockup-frame {
+  transform: translateY(-8px) scale(1.02);
+}
+.phone-mockup-notch {
+  width: 72px;
+  height: 12px;
+  background: #2D0F16;
+  border-radius: 0 0 10px 10px;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+.phone-mockup-screen {
+  border-radius: 28px;
+  overflow: hidden;
+  background: #FFF9EE;
+  line-height: 0;
+  position: relative;
+}
+.phone-mockup-screen img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.phone-pin-star {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 42px;
+  height: 42px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+  z-index: 12;
+  animation: starWiggle 3.5s ease-in-out infinite alternate;
+}
+@keyframes starWiggle {
+  0% { transform: rotate(-8deg) scale(0.95); }
+  100% { transform: rotate(12deg) scale(1.06); }
+}
+
+/* ---------- Interactive FaceTime Live Call Modal Pop-up ---------- */
+.facetime-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 12, 18, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.facetime-modal-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.facetime-modal-card {
+  width: 100%;
+  max-width: 580px;
+  background: #FFFDF8;
+  border: 3px solid var(--line-tactile);
+  border-radius: 36px;
+  box-shadow: 0 18px 0 var(--line-tactile), 0 35px 80px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  transform: scale(0.85) translateY(30px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+}
+.facetime-modal-backdrop.is-open .facetime-modal-card {
+  transform: scale(1) translateY(0);
+}
+
+.facetime-modal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  background: #FFF4E3;
+  border-bottom: 2px solid var(--line-tactile);
+}
+.facetime-modal-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+}
+.facetime-modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--line-tactile);
+  background: #fff;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 0 var(--line-tactile);
+  transition: transform 0.15s ease;
+}
+.facetime-modal-close:hover {
+  transform: scale(1.1);
+  background: #FEE2E2;
+}
+
+.facetime-modal-video-stage {
+  background: radial-gradient(circle at 50% 40%, #FFFDF8 0%, #FFF2DF 100%);
+  padding: 30px 24px;
+  text-align: center;
+  position: relative;
+  border-bottom: 2px solid var(--line-tactile);
+}
+.facetime-modal-mochi-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.facetime-modal-mochi-img {
+  width: 150px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  animation: realMochiFloat 3s ease-in-out infinite alternate;
+}
+
+/* Subtitle & Audio Bubble inside Modal */
+.facetime-modal-speech {
+  background: #fff;
+  border: 2px solid var(--line-tactile);
+  border-radius: 20px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 0 var(--line-tactile);
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: left;
+}
+.facetime-speech-jp {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  line-height: 1.5;
+}
+.facetime-speech-id {
+  font-size: 0.88rem;
+  color: #6B2332;
+  font-style: italic;
+  margin-top: 6px;
+}
+
+.facetime-modal-interactive-row {
+  padding: 22px 24px;
+  background: #FFFDF8;
+}
+.facetime-interactive-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #7A2837;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+.facetime-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.facetime-option-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-radius: 16px;
+  border: 2px solid var(--line-tactile);
+  background: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  box-shadow: 0 3px 0 var(--line-tactile);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: left;
+}
+.facetime-option-btn:hover {
+  transform: translateY(-2px);
+  background: #F0FDF4;
+  border-color: #059669;
+  box-shadow: 0 5px 0 #059669;
+}
+.facetime-option-btn.selected {
+  background: #D1FAE5;
+  border-color: #059669;
+  color: #064E3B;
+  box-shadow: 0 2px 0 #059669;
+}
+
+.facetime-modal-footer {
+  padding: 16px 24px;
+  background: #FFF4E3;
+  border-top: 2px solid var(--line-tactile);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.facetime-end-call-btn {
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: #EF4444;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border: 2px solid #991B1B;
+  box-shadow: 0 3px 0 #991B1B;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.facetime-end-call-btn:hover {
+  transform: translateY(-2px);
+}
+.facetime-full-app-btn {
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: #059669;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border: 2px solid #064E3B;
+  box-shadow: 0 3px 0 #064E3B;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+}
+.facetime-full-app-btn:hover {
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+/* ============ DUAL-LANGUAGE LISTENING TABS & CF WORKER BAR (BENTO 3) ============ */
+.listening-lang-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(224, 231, 255, 0.65);
+  border: 1.5px solid #C7D2FE;
+  border-radius: 16px;
+  padding: 5px;
+  margin-top: 10px;
+}
+
+.listening-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.listening-tab-btn:hover {
+  color: #1E3A8A;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.listening-tab-btn.active {
+  background: #FFFFFF;
+  color: #1E3A8A;
+  box-shadow: 0 3px 8px rgba(30, 58, 138, 0.15), 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.listening-tab-flag {
+  font-size: 1rem;
+}
+
+.listening-tab-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #EEF2FF;
+  color: #2563EB;
+}
+
+.listening-tab-btn.active .listening-tab-badge {
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
+/* Cloudflare D1 Worker Audio Socket Telemetry Bar */
+.cf-worker-socket-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+}
+
+.cf-worker-socket-bar.is-connected {
+  background: #F0FDF4;
+  border-color: #86EFAC;
+  color: #166534;
+}
+
+.cf-socket-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cf-socket-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+  animation: cfSocketPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes cfSocketPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.cf-socket-ping {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #64748B;
+}
+
+.cf-worker-socket-bar.is-connected .cf-socket-ping {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+/* Listening Session Panel */
+.listening-panel {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  animation: panelFadeIn 0.25s ease-out;
+}
+
+@keyframes panelFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ CHOKAI INTERACTIVE PLAYER (BENTO 3) ============ */
+.chokai-player-widget {
+  background: #FFFFFF;
+  border: 2px solid #C7D2FE;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.12), inset 0 1px 0 #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chokai-player-widget.english-theme {
+  border-color: #93C5FD;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12), inset 0 1px 0 #FFFFFF;
+}
+
+.chokai-play-btn.english-btn {
+  background: linear-gradient(135deg, #2563EB, #1E40AF);
+}
+
+.chokai-wave-container.english-waves.is-active .chokai-wave-bar {
+  background: linear-gradient(180deg, #2563EB, #1E40AF);
+}
+
+.chokai-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chokai-track-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1E3A8A;
+}
+
+.chokai-status-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #EEF2FF;
+  border: 1px solid #C7D2FE;
+  color: #3730A3;
+  transition: all 0.25s ease;
+}
+
+.chokai-status-badge.playing {
+  background: #ECFDF5;
+  border-color: #6EE7B7;
+  color: #065F46;
+}
+
+.chokai-player-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 10px 14px;
+}
+
+.chokai-play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  color: #FFFFFF;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35), 0 2px 0 #1E40AF;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.chokai-play-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.45), 0 3px 0 #1E40AF;
+}
+
+.chokai-play-btn:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.3), 0 0 0 #1E40AF;
+}
+
+.chokai-play-btn .icon-pause {
+  display: none;
+}
+
+.chokai-play-btn.is-playing .icon-play {
+  display: none;
+}
+
+.chokai-play-btn.is-playing .icon-pause {
+  display: block;
+}
+
+.chokai-wave-container {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 36px;
+  flex: 1;
+}
+
+.chokai-wave-bar {
+  flex: 1;
+  width: 3px;
+  height: 6px;
+  background: #93C5FD;
+  border-radius: 999px;
+  transition: height 0.2s ease, background 0.2s ease;
+}
+
+.chokai-wave-container.is-active .chokai-wave-bar {
+  background: linear-gradient(180deg, #3B82F6, #1D4ED8);
+  animation: chokaiWavePulse 0.5s ease-in-out infinite alternate;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes chokaiWavePulse {
+  0% { height: 6px; }
+  100% { height: var(--h, 24px); }
+}
+
+.chokai-meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.chokai-speed-btn {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #E0E7FF;
+  border: 1px solid #A5B4FC;
+  color: #3730A3;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.chokai-speed-btn:hover {
+  background: #C7D2FE;
+}
+
+.chokai-time {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748B;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Synced Persona Highlight */
+.persona-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1.5px solid #BFDBFE;
+  background: #FFFFFF;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.persona-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94A3B8;
+  transition: background 0.2s ease;
+}
+
+.persona-pill.is-speaking {
+  background: #EFF6FF;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18), 0 4px 10px rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
+}
+
+.persona-pill.is-speaking .persona-dot {
+  background: #2563EB;
+  box-shadow: 0 0 6px #2563EB;
+  animation: personaDotPing 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes personaDotPing {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============ DRIBBBLE & VELIN PINNED STICKY CARDS ============ */
+.velin-pinned-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  list-style: none;
+  padding: 24px 0 0;
+  margin: 36px 0 0;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .velin-pinned-cards {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+.loop-step {
+  border-radius: 28px;
+  padding: 30px 24px 22px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 2.5px solid var(--line-tactile);
+  box-shadow: 0 4px 6px -1px rgba(94, 20, 32, 0.04), 0 20px 35px -10px rgba(94, 20, 32, 0.08), 0 6px 0 var(--line-tactile);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.anim .loop-step:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 8px 12px -2px rgba(94, 20, 32, 0.06), 0 28px 50px -15px rgba(94, 20, 32, 0.16), 0 10px 0 var(--line-tactile);
+}
+
+.loop-step-coral {
+  background: linear-gradient(175deg, #FFF8F8 0%, #FFE4E6 100%);
+  border-color: #FDA4AF;
+  box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.04), 0 20px 35px -10px rgba(225, 29, 72, 0.08), 0 6px 0 #E11D48;
+}
+.anim .loop-step-coral:hover {
+  box-shadow: 0 8px 12px -2px rgba(225, 29, 72, 0.08), 0 28px 50px -15px rgba(225, 29, 72, 0.18), 0 10px 0 #E11D48;
+}
+
+.loop-step-amber {
+  background: linear-gradient(175deg, #FFFDF7 0%, #FEF3C7 100%);
+  border-color: #FCD34D;
+  box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.04), 0 20px 35px -10px rgba(217, 119, 6, 0.08), 0 6px 0 #D97706;
+}
+.anim .loop-step-amber:hover {
+  box-shadow: 0 8px 12px -2px rgba(217, 119, 6, 0.08), 0 28px 50px -15px rgba(217, 119, 6, 0.18), 0 10px 0 #D97706;
+}
+
+.loop-step-mint {
+  background: linear-gradient(175deg, #F0FDF4 0%, #DCFCE7 100%);
+  border-color: #86EFAC;
+  box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.04), 0 20px 35px -10px rgba(5, 150, 105, 0.08), 0 6px 0 #059669;
+}
+.anim .loop-step-mint:hover {
+  box-shadow: 0 8px 12px -2px rgba(5, 150, 105, 0.08), 0 28px 50px -15px rgba(5, 150, 105, 0.18), 0 10px 0 #059669;
+}
+
+/* 3D Push-Pin Badges */
+.pin-badge {
+  position: absolute;
+  top: -14px;
+  right: 24px;
+  z-index: 5;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.16));
+  animation: pinFloat 3s ease-in-out infinite alternate;
+}
+.pin-amber {
+  animation-delay: 0.5s;
+}
+.pin-mint {
+  animation-delay: 1s;
+}
+
+@keyframes pinFloat {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-3px) rotate(4deg); }
+}
+
+.loop-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.loop-badge-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1.5px solid;
+}
+.pill-coral {
+  background: #FFF1F2;
+  border-color: #FDA4AF;
+  color: #9F1239;
+}
+.pill-amber {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+  color: #92400E;
+}
+.pill-mint {
+  background: #ECFDF5;
+  border-color: #86EFAC;
+  color: #065F46;
+}
+
+.loop-sub-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-secondary);
+}
+
+.loop-card-title {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  margin: 6px 0 16px;
+  letter-spacing: -0.02em;
+}
+
+/* Sculpted Inset Tiles */
+.loop-inner-tile {
+  background: #FFFFFF;
+  border: 2px solid;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(94, 20, 32, 0.04), inset 0 1px 0 #FFFFFF;
+  margin-bottom: 16px;
+}
+.tile-coral { border-color: #FECDD3; }
+.tile-amber { border-color: #FDE68A; }
+.tile-mint { border-color: #BBF7D0; }
+
+.loop-sentence-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  margin-bottom: 12px;
+}
+.loop-word.wrong-strike {
+  background: #FEE2E2;
+  border: 1px solid #FCA5A5;
+  color: #991B1B;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-decoration: line-through;
+}
+.loop-word.time-key {
+  background: #FEF3C7;
+  border: 1px solid #FCD34D;
+  color: #92400E;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.loop-comparison-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.comp-tag {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+.comp-wrong {
+  background: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #FECDD3;
+}
+.comp-right {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.loop-reason-p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--ink-primary);
+  margin: 0 0 10px;
+}
+.loop-rule-callout {
+  background: #FFFBEB;
+  border-left: 3px solid #D97706;
+  border-radius: 0 10px 10px 0;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #78350F;
+  margin-bottom: 8px;
+}
+.loop-mnemonic-pill {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #92400E;
+  background: #FEF3C7;
+  border: 1px dashed #D97706;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.loop-checklist-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.loop-checklist-items li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.check-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #10B981;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.loop-checklist-items b {
+  display: block;
+  font-size: 0.82rem;
+  color: #064E3B;
+}
+.loop-checklist-items p {
+  font-size: 0.78rem;
+  color: #065F46;
+  margin: 2px 0 0;
+  line-height: 1.35;
+}
+
+.loop-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--ink-secondary);
+  border-top: 1.5px dashed rgba(94, 20, 32, 0.15);
+  padding-top: 12px;
+  margin-top: auto;
+}
+.loop-note-icon {
+  font-size: 1rem;
+}
+
+/* ============ BENTO 2 COGNITIVE RETENTION CHART ============ */
+.widget-cognitive-chart {
+  background: #FFFFFF;
+  border: 2px solid #86EFAC;
+  border-radius: 20px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.08), inset 0 1px 0 #FFFFFF;
+  margin: 16px 0;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.chart-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-dot-live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 6px #10B981;
+  animation: personaDotPing 1.2s infinite;
+}
+
+.chart-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #065F46;
+}
+
+.chart-status-pill {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.chart-graph-wrap {
+  position: relative;
+  margin: 6px 0 10px;
+}
+
+.bkt-curve-svg {
+  width: 100%;
+  height: 75px;
+  overflow: visible;
+}
+
+.chart-peak-badge {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: #ECFDF5;
+  border: 1.5px solid #10B981;
+  color: #064E3B;
+  padding: 3px 9px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+}
+
+.pulse-emerald {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #059669;
+}
+
+.chart-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #A7F3D0;
+}
+
+.chart-stat-chip {
+  font-size: 0.72rem;
+}
+.chart-stat-chip small {
+  display: block;
+  font-weight: 700;
+  color: #047857;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+.chart-stat-chip b {
+  color: #064E3B;
+  font-weight: 800;
+}
+
+/* ============ BENTO 4 KANJI & MANDARIN GRID ============ */
+.kanji-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.kanji-col-box {
+  background: #FFFFFF;
+  border: 2px solid #FDA4AF;
+  border-radius: 18px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.05), inset 0 1px 0 #FFFFFF;
+}
+
+.script-badge-tiny {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9F1239;
+  background: #FFE4E6;
+  border: 1px solid #FECDD3;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.kanji-main-ruby {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.kanji-main-ruby ruby rt {
+  font-size: 0.5em;
+  color: #BE123C;
+}
+
+.pitch-tag-mini, .tone-tag-mini {
+  font-size: 0.68rem;
+  font-weight: 800;
+  background: #FFF1F2;
+  border: 1px solid #FDA4AF;
+  color: #E11D48;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.kanji-audio-cue {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9F1239;
+}
+
+.mandarin-karaoke-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.m-tone-chip {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+.m-tone-4 {
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  color: #991B1B;
+}
+.m-tone-3 {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1D4ED8;
+}
+
+/* Persona Avatars in Bento 3 */
+.persona-avatar {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.persona-info-col {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.persona-info-col .persona-role {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #1E3A8A;
+  line-height: 1.2;
+  text-transform: none;
+  white-space: nowrap;
+}
+.persona-info-col .persona-freq {
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748B;
+  line-height: 1.2;
+  white-space: nowrap;
+}

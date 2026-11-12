@@ -1154,51 +1154,248 @@ if(window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(d
 
   </section>
 
-  <!-- ============ ADAPTIF DALAM TIGA LANGKAH ============
-       m029 FOCUS: "adaptif" adalah klaim pembeda FIEZEL, tetapi sampai commit ini ia hanya
-       DIKATAKAN ("menyesuaikan soal dengan jawabanmu") dan tidak pernah DITUNJUKKAN — dari
-       luar tidak ada bedanya dengan aplikasi kuis biasa. Strip ini memperlihatkan satu putaran
-       nyata: jawaban salah -> pola dibaca -> sesi berikutnya berubah.
-
-       Naskah langkah 2 BUKAN karangan halaman ini: ia disalin apa adanya dari entri TA-002 di
-       grammar-explanations-id.json (field `misconception` dan `rule`) — yaitu penjelasan yang
-       benar-benar dibaca murid di dalam aplikasi. Kalau bank soal berubah, perbarui di sini. -->
+  <!-- ============ ADAPTIF DALAM TIGA LANGKAH ============ -->
   <section class="sec sec-loop" id="adaptif">
+    <!-- Kidmima-style Scalloped Cloud Divider (Top) -->
+    <div class="kidmima-cloud-divider cloud-top" aria-hidden="true">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+        <path fill="#FFFDF8" d="M0,60 L0,20 Q60,0 120,20 Q180,0 240,20 Q300,0 360,20 Q420,0 480,20 Q540,0 600,20 Q660,0 720,20 Q780,0 840,20 Q900,0 960,20 Q1020,0 1080,20 Q1140,0 1200,20 Q1260,0 1320,20 Q1380,0 1440,20 L1440,60 Z"></path>
+      </svg>
+    </div>
+
     <div class="wrap">
       <div class="sec-head reveal">
         <span class="sec-num" aria-hidden="true">01 — Adaptif</span>
-        <h2 class="sec-title">Apa yang terjadi saat kamu salah</h2>
-        <p class="sec-dek">Kebanyakan orang berhenti belajar bukan karena kurang materi, tapi karena tidak tahu harus mulai dari mana. Ini satu putaran nyata di dalam FIEZEL — bukan ilustrasi.</p>
+        <h2 class="sec-title">Belajar Materi Hanyalah Permulaan</h2>
+        <p class="sec-dek">Menghafal kosakata dan rumus di buku catatan itu langkah awal. Tapi percakapan nyata menuntutmu merespons seketika dengan percaya diri. Ini cara FIEZEL mengubah kesalahan menjadi lompatan pemahaman.</p>
         <hr class="rule" aria-hidden="true">
       </div>
 
-      <ol class="loop">
-        <li class="card loop-step reveal">
-          <p class="loop-n"><span aria-hidden="true">1</span>Kamu menjawab</p>
-          <p class="loop-q">I <s>have finished</s> it <b>yesterday</b>.</p>
-          <p class="loop-verdict loop-verdict-bad">Belum tepat</p>
-          <dl class="loop-ans">
-            <dt>Pilihanmu</dt><dd>have finished</dd>
-            <dt>Seharusnya</dt><dd>finished</dd>
-          </dl>
-          <p class="loop-note">FIEZEL berhenti di sini kalau ia aplikasi kuis biasa.</p>
+      <!-- FIEZEL Cognitive Constellation Highway (Benchmark: Duolingo + Velin + Kidmima) -->
+      <div class="duo-roadmap-box reveal">
+        <div class="duo-roadmap-head">
+          <span class="sticker-badge sticker-mint">🗺️ Peta Perjalanan Belajar Adaptif</span>
+          <h3 style="font-size:clamp(1.5rem, 3.2vw, 1.95rem); color:var(--ink-primary); margin:12px 0 8px; letter-spacing:-0.03em;">
+            Rute Penguasaan Bahasa dari Nol sampai Refleks Bicara
+          </h3>
+          <p style="font-size:0.95rem; color:#7A2837; margin:0; line-height:1.5;">
+            Bukan sekadar rentetan kuis acak. Setiap pos merefleksikan daya ingatmu melalui Braincore BKT &amp; FSRS. Arahkan kursor atau klik tiap pos untuk memeriksa detail unit!
+          </p>
+        </div>
+
+        <div class="duo-path-wrapper">
+          <!-- Undulating Curved SVG Road Spline with Moving Light Flow -->
+          <svg class="duo-curved-road-svg" viewBox="0 0 1000 180" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="duoRoadPulseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#059669" stop-opacity="0.3"/>
+                <stop offset="50%" stop-color="#F59E0B" stop-opacity="1"/>
+                <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.3"/>
+              </linearGradient>
+            </defs>
+            <!-- Wide soft roadbed -->
+            <path class="duo-road-bed" d="M 60,60 C 180,60 220,135 340,135 C 460,135 520,45 660,45 C 780,45 840,110 940,110" fill="none" stroke="rgba(217, 119, 6, 0.16)" stroke-width="32" stroke-linecap="round"/>
+            <!-- Crisp dashed center line -->
+            <path class="duo-road-dash" d="M 60,60 C 180,60 220,135 340,135 C 460,135 520,45 660,45 C 780,45 840,110 940,110" fill="none" stroke="var(--line-tactile)" stroke-width="6" stroke-dasharray="14 16" stroke-linecap="round"/>
+            <!-- Glowing energy beam traveling continuously -->
+            <path class="duo-road-pulse" d="M 60,60 C 180,60 220,135 340,135 C 460,135 520,45 660,45 C 780,45 840,110 940,110" fill="none" stroke="url(#duoRoadPulseGrad)" stroke-width="5" stroke-linecap="round"/>
+          </svg>
+
+          <!-- Node 1: Kosakata & Pola FSRS (Elevated Pos 1) -->
+          <div class="duo-node-item duo-node-pos1" tabindex="0">
+            <span class="duo-node-meta-pill" style="background:#E8F8EE; color:#065F46; border-color:#059669;">Pos 01 · Retensi 98%</span>
+            <div class="duo-node-circle done">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="m9 9.5 2 2 4-4"/></svg>
+            </div>
+            <div class="duo-node-label">
+              <div class="duo-node-title">1. Kosakata &amp; FSRS</div>
+              <div class="duo-node-sub">2.440 kata CEFR &amp; 1.884 kata Jepang</div>
+            </div>
+            <!-- Tooltip Pop-up -->
+            <div class="duo-node-popup">
+              <div class="duo-popup-unit">Unit 1 · Kuasai Dasar</div>
+              <div class="duo-popup-h">Fondasi Kosakata FSRS</div>
+              <div class="duo-popup-desc">Retensi memori 98%. Pola pengulangan otomatis mencegah lupa tanpa drilling membosankan.</div>
+              <a class="duo-popup-btn" href="app/?fz_view=vocab">Buka Unit 1 →</a>
+            </div>
+          </div>
+
+          <!-- Node 2: Tata Bahasa AST (Elevated Pos 2) -->
+          <div class="duo-node-item duo-node-pos2" tabindex="0">
+            <span class="duo-node-meta-pill" style="background:#EFF6FF; color:#1E40AF; border-color:#2563EB;">Pos 02 · 0 Miskonsepsi</span>
+            <div class="duo-node-circle done" style="background:linear-gradient(135deg, #60A5FA 0%, #2563EB 100%); border-color:#1E3A8A; box-shadow:0 6px 0 #1E3A8A, 0 0 20px rgba(37,99,235,0.35);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M12 7.5v3.5"/><path d="m8 16 4-5 4 5"/></svg>
+            </div>
+            <div class="duo-node-label">
+              <div class="duo-node-title">2. Tata Bahasa AST</div>
+              <div class="duo-node-sub">180 Lesson sintaksis terurai</div>
+            </div>
+            <!-- Tooltip Pop-up -->
+            <div class="duo-node-popup">
+              <div class="duo-popup-unit">Unit 2 · Pahami Pola</div>
+              <div class="duo-popup-h">Pohon Sintaksis AST</div>
+              <div class="duo-popup-desc">Mengurai penyebab salah susun kata secara instan. Menghubungkan 180 tenses &amp; partikel.</div>
+              <a class="duo-popup-btn" href="app/?fz_view=grammar">Buka Unit 2 →</a>
+            </div>
+          </div>
+
+          <!-- Node 3: Mitra Kaiwa Studio (Active with 100% Transparent Mochi) -->
+          <div class="duo-node-item duo-node-pos3 is-active-node" tabindex="0">
+            <!-- Standing 3D Mochi Mascot (100% Transparent PNG, Zero Box) -->
+            <div class="duo-mochi-standing-wrap">
+              <div class="duo-mochi-bubble">Ayo ngobrol bareng Mochi! ✨</div>
+              <img class="duo-mochi-standing-img" src="assets/brand/mochi/mochi-real-talk.png" alt="Mochi Daifuku Mascot Standing">
+            </div>
+
+            <span class="duo-node-meta-pill" style="background:#FEF3C7; color:#92400E; border-color:#D97706; font-weight:800;">Pos 03 · Aktif Hari Ini</span>
+            <div class="duo-node-circle active">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/><path d="M12 11v4"/><path d="M9 13v2"/><path d="M15 13v2"/></svg>
+            </div>
+            <div class="duo-node-label">
+              <div class="duo-node-title" style="color:#B45309;">3. Mitra Kaiwa Studio</div>
+              <div class="duo-node-sub">Percakapan suara real-time duplex</div>
+            </div>
+            <!-- Tooltip Pop-up -->
+            <div class="duo-node-popup" style="border-color:#F59E0B; box-shadow:0 6px 0 #B45309, 0 20px 35px rgba(245,158,11,0.25);">
+              <div class="duo-popup-unit" style="color:#B45309;">Unit 3 · Pos Aktif Hari Ini</div>
+              <div class="duo-popup-h">Latihan Bicara Bebas Canggung</div>
+              <div class="duo-popup-desc">Kawan Bicara AI latensi sub-500ms via WebSocket duplex 48 kHz. Dilengkapi Furigana otomatis.</div>
+              <button class="duo-popup-btn" type="button" style="background:#F59E0B; border-color:#B45309;" data-open-facetime="true">Uji Suara Sekarang →</button>
+            </div>
+          </div>
+
+          <!-- Node 4: Refleks Nyata (Target Akhir) -->
+          <div class="duo-node-item duo-node-pos4" tabindex="0">
+            <span class="duo-node-meta-pill" style="background:#F1F5F9; color:#475569; border-color:#94A3B8;">Pos 04 · Target Refleks</span>
+            <div class="duo-node-circle locked">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="none"/></svg>
+            </div>
+            <div class="duo-node-label">
+              <div class="duo-node-title">4. Refleks Dunia Nyata</div>
+              <div class="duo-node-sub">Wawancara beasiswa &amp; kerja global</div>
+            </div>
+            <!-- Tooltip Pop-up -->
+            <div class="duo-node-popup">
+              <div class="duo-popup-unit" style="color:#64748B;">Unit 4 · Target Penguasaan</div>
+              <div class="duo-popup-h">Kelancaran Spontan Tanpa Ragu</div>
+              <div class="duo-popup-desc">Terbuka otomatis setelah menyelesaikan simulasi percakapan. Siap untuk tes TOEFL/IELTS &amp; JLPT.</div>
+              <span class="duo-popup-btn" style="background:#94A3B8; border-color:#64748B;">Target Akhir</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Adaptive Loop Step Cards (Dribbble & Velin Pinned Sticky Cards) -->
+      <ol class="loop velin-pinned-cards">
+        <!-- Step 1: Coral / Rose Card with Red Pin -->
+        <li class="card loop-step loop-step-coral reveal">
+          <div class="pin-badge pin-coral" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#EF4444" stroke="#991B1B" stroke-width="1.5">
+              <circle cx="12" cy="7" r="5"/>
+              <path d="M12 12v9l-2-2m2 2l2-2" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="loop-head-row">
+            <span class="loop-badge-pill pill-coral">Langkah 01</span>
+            <span class="loop-sub-tag">Tangkap Refleks</span>
+          </div>
+          <h4 class="loop-card-title">Kamu Menjawab</h4>
+
+          <div class="loop-inner-tile tile-coral">
+            <div class="loop-sentence-box">
+              <span class="loop-word">I</span>
+              <span class="loop-word wrong-strike">have finished</span>
+              <span class="loop-word">it</span>
+              <span class="loop-word time-key">yesterday.</span>
+            </div>
+            <div class="loop-comparison-tags">
+              <span class="comp-tag comp-wrong">❌ Pilihanmu: have finished</span>
+              <span class="comp-tag comp-right">✅ Target: finished</span>
+            </div>
+          </div>
+
+          <p class="loop-note">
+            <span class="loop-note-icon">⚠️</span>
+            Aplikasi kuis biasa cuma bilang <em>"Jawabanmu Salah"</em> lalu lanjut.
+          </p>
         </li>
 
-        <li class="card loop-step reveal">
-          <p class="loop-n"><span aria-hidden="true">2</span>FIEZEL menjelaskan polanya</p>
-          <p class="loop-exp">Kamu ngira present perfect selalu berarti masih jalan sekarang. Padahal maknanya lampau tanpa waktu pasti yang masih nyambung ke sekarang.</p>
-          <p class="loop-rule"><b>Aturannya:</b> present perfect nggak bisa jalan bareng keterangan waktu lampau yang pasti — “yesterday”, “in 2019”, “last week”.</p>
-          <p class="loop-note">Bukan cuma “salah”, tapi <b>kenapa</b> salah.</p>
+        <!-- Step 2: Butter Solar Card with Amber Pin -->
+        <li class="card loop-step loop-step-amber reveal">
+          <div class="pin-badge pin-amber" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#F59E0B" stroke="#78350F" stroke-width="1.5">
+              <circle cx="12" cy="7" r="5"/>
+              <path d="M12 12v9l-2-2m2 2l2-2" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="loop-head-row">
+            <span class="loop-badge-pill pill-amber">Langkah 02</span>
+            <span class="loop-sub-tag">Diagnosis Sintaksis AST</span>
+          </div>
+          <h4 class="loop-card-title">FIEZEL Menjelaskan Polanya</h4>
+
+          <div class="loop-inner-tile tile-amber">
+            <p class="loop-reason-p">
+              <strong>Miskonsepsi:</strong> Kamu mengira <em>Present Perfect</em> selalu berarti masih berlangsung sekarang.
+            </p>
+            <div class="loop-rule-callout">
+              <strong>Aturannya:</strong> Present Perfect tidak dapat berpasangan dengan titik waktu lampau pasti (<em>yesterday, last year, in 2021</em>). Gunakan <strong>Past Simple (V2)</strong>.
+            </div>
+            <div class="loop-mnemonic-pill">
+              💡 <strong>Trik Cepat:</strong> Ada <em>yesterday</em>? Langsung kunci V2!
+            </div>
+          </div>
+
+          <p class="loop-note">
+            <span class="loop-note-icon">✨</span>
+            Bukan sekadar vonis salah, tapi paham <b>kenapa</b> salah.
+          </p>
         </li>
 
-        <li class="card loop-step reveal">
-          <p class="loop-n"><span aria-hidden="true">3</span>Sesi berikutnya berubah</p>
-          <ul class="loop-plan">
-            <li><span class="loop-plan-k">Ditambahkan</span> Review past simple vs present perfect</li>
-            <li><span class="loop-plan-k">Alasan</span> Pola ini tertukar di latihan terakhirmu</li>
-            <li><span class="loop-plan-k">Muncul lagi</span> Di target harianmu besok</li>
-          </ul>
-          <p class="loop-note">Rencana besok disusun dari kesalahan hari ini.</p>
+        <!-- Step 3: Mint Dew Card with Emerald Pin -->
+        <li class="card loop-step loop-step-mint reveal">
+          <div class="pin-badge pin-mint" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#10B981" stroke="#064E3B" stroke-width="1.5">
+              <circle cx="12" cy="7" r="5"/>
+              <path d="M12 12v9l-2-2m2 2l2-2" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="loop-head-row">
+            <span class="loop-badge-pill pill-mint">Langkah 03</span>
+            <span class="loop-sub-tag">Kurikulum Beradaptasi</span>
+          </div>
+          <h4 class="loop-card-title">Sesi Berikutnya Beradaptasi</h4>
+
+          <div class="loop-inner-tile tile-mint">
+            <ul class="loop-checklist-items">
+              <li>
+                <span class="check-dot">✓</span>
+                <div>
+                  <b>Soal Terarah Otomatis:</b>
+                  <p>Variasi Past Simple vs Present Perfect disisipkan besok.</p>
+                </div>
+              </li>
+              <li>
+                <span class="check-dot">✓</span>
+                <div>
+                  <b>Kalibrasi BKT &amp; IRT 3PL:</b>
+                  <p>Probabilitas memori P(Lt) 0.88, materi tetap menantang.</p>
+                </div>
+              </li>
+              <li>
+                <span class="check-dot">✓</span>
+                <div>
+                  <b>Tanpa Buang Waktu:</b>
+                  <p>Tidak perlu mengulang satu bab dari awal.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <p class="loop-note">
+            <span class="loop-note-icon">🎯</span>
+            Rencana latihan besok dirancang otomatis dari kesalahan hari ini.
+          </p>
         </li>
       </ol>
     </div>
@@ -1242,6 +1439,150 @@ if(window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(d
     </div>
   </section>
 
+    <!-- ============ KAWAN BICARA AI — LIVE CALL STUDIO (BENCHMARK: VELIN BY ABRON STUDIO) ============ -->
+  <section class="sec velin-call-section" id="kawan-bicara">
+    <div class="wrap">
+      <div class="sec-head reveal" style="text-align:center; max-width:760px; margin:0 auto 24px;">
+        <span class="sec-num" aria-hidden="true">02 — Mitra Kaiwa Studio</span>
+        <h2 class="sec-title">Kamu Tahu Materinya.<br>Sekarang Waktunya Bicara.</h2>
+        <p class="sec-dek" style="margin:12px auto 0;">Bukan obrolan teks kaku. Latihan percakapan suara real-time dua arah bertenaga WebSocket duplex &lt;500ms bersama Mochi, terjemahan instan di layar, Furigana otomatis, dan asisten ide bicara.</p>
+        <hr class="rule" aria-hidden="true" style="margin:20px auto 0;">
+      </div>
+
+      <!-- Playful Tilted Graphic Stickers (Kidmima + Wo-Fi Benchmark) -->
+      <div class="sticker-cloud reveal">
+        <span class="sticker-badge sticker-mint">✨ 100% Real-Time Duplex</span>
+        <span class="sticker-badge sticker-yellow">🎙️ Sub-500ms Latensi WebSocket</span>
+        <span class="sticker-badge sticker-rose">🌸 Furigana &amp; Romaji Otomatis</span>
+        <span class="sticker-badge sticker-blue">🎧 Hands-Free 48 kHz Audio</span>
+      </div>
+
+      <!-- The Real Kawan Bicara Studio Stage (Faithful to call.html & ja-chat-mobile.png) -->
+      <div class="real-studio-box reveal">
+        <div class="real-studio-inner-grid">
+          <!-- Column 1: FaceTime Call Card with Sensei Nanami & Authentic 3D Mochi -->
+          <div class="real-studio-call-card">
+            <div class="real-studio-meta-bar">
+              <span class="real-persona-pill">
+                Sensei Nanami
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+              <span style="font-size:0.86rem; font-weight:700; color:var(--ink-secondary);">· Level N5–N3</span>
+              <span style="font-size:0.82rem; font-weight:700; color:#059669; background:#E8F8EE; padding:4px 10px; border-radius:999px;">Latihan</span>
+              <span class="real-mentor-pill">🎓 Mentor</span>
+            </div>
+
+            <!-- Authentic 3D Mochi Mascot with Audio Telemetry Rays -->
+            <div class="real-mochi-stage">
+              <div class="real-mochi-sound-rays" aria-hidden="true">
+                <span class="real-sound-ray"></span>
+                <span class="real-sound-ray"></span>
+                <span class="real-sound-ray"></span>
+              </div>
+              <img class="real-mochi-img" src="assets/brand/mochi/mochi-real-headset.png" alt="Mochi AI Companion 3D" width="180" height="170" loading="lazy">
+            </div>
+
+            <!-- Status Pill -->
+            <div>
+              <span class="real-status-pill">
+                <span class="real-status-dot"></span>
+                Siap bicara
+              </span>
+            </div>
+
+            <!-- Big Green FaceTime Button -->
+            <a class="real-facetime-btn skeuo-shine" href="#facetime" data-open-facetime="true">
+              <span class="real-status-dot" style="background:#fff;"></span>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Mulai Telepon FaceTime
+            </a>
+
+            <div class="real-call-subnote">
+              <span class="real-status-dot" style="width:6px; height:6px;"></span>
+              Hands-Free · Mikrofon aktif dua arah untuk ngobrol langsung
+            </div>
+          </div>
+
+          <!-- Column 2: Authentic Beginner Assistant (Ide Bicara) -->
+          <div class="real-studio-assistant">
+            <div>
+              <div class="real-assistant-header">
+                <span class="real-assistant-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                  Ide Bicara
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+                <div class="real-mode-pills">
+                  <span class="real-mode-pill active">1·Singkat</span>
+                  <span class="real-mode-pill">2·Alami</span>
+                  <span class="real-mode-pill">3·+Target</span>
+                  <span class="real-mode-pill" style="padding:5px 8px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Real Dialogue Card with Furigana Ruby -->
+              <div class="real-dialogue-card">
+                <div class="real-kanji-line">
+                  <ruby>助詞<rt>じょし</rt></ruby>の「は」と「が」の<ruby>使<rt>つか</rt></ruby>い<ruby>分<rt>わ</rt></ruby>けが<ruby>一番<rt>いちばん</rt></ruby>モヤモヤしています。
+                </div>
+                <div class="real-romaji-line">
+                  Joshi no " ha " to " ga " no tsukai wake ga ichiban moyamoya shiteimasu.
+                </div>
+                <div class="real-trans-line">
+                  <span>💡</span>
+                  <span>Perbedaan partikel "wa" dan "ga" yang paling bikin aku bingung.</span>
+                </div>
+              </div>
+
+              <!-- Action Row: Dengar, Ucapkan, Pakai Jawaban -->
+              <div class="real-action-row">
+                <div class="real-left-btns">
+                  <button class="real-act-btn" type="button" aria-label="Dengarkan pengucapan">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    Dengar
+                  </button>
+                  <button class="real-act-btn" type="button" aria-label="Latihan ucapkan kalimat">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                    Ucapkan
+                  </button>
+                </div>
+                <a class="real-send-btn skeuo-shine" href="app/?fz_view=chat">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Pakai Jawaban
+                </a>
+              </div>
+            </div>
+
+            <!-- Beginner Quick Prompts Row -->
+            <div class="real-quick-prompts">
+              <span class="real-quick-label">Pilih Situasi Latihan:</span>
+              <div class="real-quick-list">
+                <a class="real-quick-chip" href="app/?fz_view=chat">
+                  「カフェで注文する練習」 <span>(Pesan kopi di Shibuya)</span>
+                </a>
+                <a class="real-quick-chip" href="app/?fz_view=chat">
+                  「I'd like to practice IELTS Speaking」 <span>(Wawancara formal)</span>
+                </a>
+                <a class="real-quick-chip" href="app/?fz_view=chat">
+                  「道を聞く練習」 <span>(Tanya arah stasiun)</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direct CTA Button below Stage -->
+      <div style="text-align:center; margin-top:36px;" class="reveal">
+        <a class="btn btn-primary skeuo-shine" href="app/?fz_view=chat" style="padding:16px 36px; font-size:1.1rem; font-weight:800;">
+          Mulai Bicara dengan Mochi Sekarang →
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ TENTANG ============ -->
   <section class="sec sec-about" id="tentang">
     <div class="wrap about-grid">
@@ -1261,93 +1602,392 @@ if(window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(d
       <div class="shot-pair reveal">
         <figure class="phone phone-sm">
           <div class="phone-screen">
-            <img src="assets/shots/grammar-mobile.png" alt="Grammar Hub dengan 17 lesson terurut untuk level A1" width="780" height="1688" loading="lazy" decoding="async">
+            <img src="assets/shots/home-mobile.png" alt="Layar Beranda FIEZEL dengan Mochi 3D, Sesi Adaptif, &amp; Mitra Kaiwa" width="780" height="1688" loading="lazy" decoding="async">
           </div>
         </figure>
         <figure class="phone phone-sm phone-lift">
           <div class="phone-screen">
-            <img src="assets/shots/reading-mobile.png" alt="Layar Reading FIEZEL dengan daftar bacaan berjenjang" width="780" height="1688" loading="lazy" decoding="async">
+            <img src="assets/shots/kawan-bicara-real.png" alt="Studio Panggilan Suara AI Kawan Bicara dengan Sensei Nanami &amp; Mochi 3D" width="780" height="1688" loading="lazy" decoding="async">
           </div>
         </figure>
       </div>
     </div>
   </section>
 
-  <!-- ============ FITUR ============ -->
+  <!-- ============ FITUR: BENTO GRID (BENCHMARK: WO-FI & VELIN) ============ -->
+    <!-- ============ FITUR: BENTO GRID (BENCHMARK: KIDMIMA & WO-FI) ============ -->
   <section class="sec" id="fitur">
     <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="sec-num" aria-hidden="true">03 — Isi aplikasi</span>
-        <h2 class="sec-title">Yang kamu dapat di dalam</h2>
-        <hr class="rule" aria-hidden="true">
+      <div class="sec-head reveal" style="text-align:center; max-width:760px; margin:0 auto 36px;">
+        <span class="sec-num" aria-hidden="true">03 — Isi Aplikasi</span>
+        <h2 class="sec-title">Alat Canggih untuk Penguasaan Bahasa</h2>
+        <p class="sec-dek" style="margin:12px auto 0;">Setiap fitur dirancang dengan antarmuka taktil yang menyenangkan, ditenagai pemetaan kognitif Braincore, audio berstandar siar, dan kurikulum internasional terstruktur.</p>
+        <hr class="rule" aria-hidden="true" style="margin:20px auto 0;">
       </div>
-      <div class="feat-grid">
-        <article class="card feat feat-wide tint-sun reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/><path d="M8 13h7M8 16.5h4"/></svg>
-          <h3>Grammar Hub berjenjang</h3>
-          <p>180 lesson dari A1 sampai C2, tiap lesson 25 soal latihan terfokus, terbuka bertahap lewat prasyarat.</p>
-          <ul class="chiplist">
-            <li>A1 17</li><li>A2 29</li><li>B1 52</li><li>B2 39</li><li>C1 24</li><li>C2 19</li>
-          </ul>
+
+      <div class="velin-bento-grid">
+        <!-- Bento 1: Grammar Hub & Reading (Solar Butter Yellow, Span 7) -->
+        <article class="bento-card bento-col-7 bento-amber reveal">
+          <div>
+            <span class="bento-badge-pill" style="color:#713F12; border-color:#D97706; background:#FEF08A;">CEFR A1–C2 · 180 Lesson</span>
+            <h3>Grammar Hub &amp; Diagnosis Braincore</h3>
+            <p>Pelajari pola sintaksis bahasa Inggris tanpa rumus yang bikin pusing. Dilengkapi analisis pohon kalimat (AST), telemetri BKT real-time, dan trik cepat ingat.</p>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr; gap:16px;">
+            <div class="widget-grammar-tokens">
+              <span class="token-chip">Ms. Rina</span>
+              <span class="token-chip">is our teacher. We like</span>
+              <span class="token-chip target">her</span>
+              <span class="token-chip">very much.</span>
+              <div class="token-feedback">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                Diagnosis AST: Kata ganti objek (her) selaras dengan subjek perempuan tunggal (Ms. Rina).
+              </div>
+            </div>
+
+            <!-- Phone Mockup with Braincore Feedback Screen -->
+            <div class="phone-mockup-frame" style="max-width:240px; margin:10px auto 0;">
+              <svg class="phone-pin-star" viewBox="0 0 24 24" fill="#FBBF24" stroke="#78350F" stroke-width="1.5">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <div class="phone-mockup-notch"></div>
+              <div class="phone-mockup-screen">
+                <img src="assets/shots/grammar-mobile.png" alt="Layar Diagnosis Braincore Grammar FIEZEL dengan Analisis Sintaksis &amp; Mnemonic" width="780" height="1688" loading="lazy">
+              </div>
+            </div>
+          </div>
         </article>
 
-        <article class="card feat tint-paper reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H11v18H5.5A2.5 2.5 0 0 1 3 18.5Z"/><path d="M21 5.5A2.5 2.5 0 0 0 18.5 3H13v18h5.5A2.5 2.5 0 0 0 21 18.5Z"/></svg>
-          <h3>Reading A1–C2</h3>
-          <p>312 bacaan berjenjang dengan 1.560 soal membaca, dari teks pendek pemula sampai bacaan panjang tingkat lanjut.</p>
+        <!-- Bento 2: Braincore Adaptive Engine (Mint Sage, Span 5) -->
+        <article class="bento-card bento-col-5 bento-mint reveal">
+          <div>
+            <span class="bento-badge-pill" style="color:#065F46; border-color:#059669; background:#D1FAE5;">Mesin Kognitif</span>
+            <h3>Braincore BKT &amp; IRT 3PL</h3>
+            <p>Mengukur probabilitas retensi memori secara real-time. Soal menyesuaikan kemampuanmu agar belajar tetap menantang tanpa bikin frustrasi.</p>
+          </div>
+
+          <!-- Cognitive Retention Curve & Telemetry Chart -->
+          <div class="widget-cognitive-chart">
+            <div class="chart-header">
+              <div class="chart-title-group">
+                <span class="chart-dot-live"></span>
+                <span class="chart-title">Probabilitas Retensi BKT</span>
+              </div>
+              <span class="chart-status-pill">P(Lt) Aktif</span>
+            </div>
+
+            <div class="chart-graph-wrap">
+              <svg class="bkt-curve-svg" viewBox="0 0 280 80" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="bktGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10B981" stop-opacity="0.32"/>
+                    <stop offset="100%" stop-color="#10B981" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="0" y1="20" x2="280" y2="20" stroke="rgba(5, 150, 105, 0.15)" stroke-width="1" stroke-dasharray="4 4"/>
+                <line x1="0" y1="50" x2="280" y2="50" stroke="rgba(5, 150, 105, 0.15)" stroke-width="1" stroke-dasharray="4 4"/>
+                <path d="M 10,72 C 70,68 110,50 160,32 C 210,16 240,12 270,10 L 270,80 L 10,80 Z" fill="url(#bktGrad)"/>
+                <path d="M 10,72 C 70,68 110,50 160,32 C 210,16 240,12 270,10" fill="none" stroke="#059669" stroke-width="3.5" stroke-linecap="round"/>
+                <circle cx="10" cy="72" r="4" fill="#059669"/>
+                <circle cx="95" cy="56" r="4" fill="#059669"/>
+                <circle cx="175" cy="27" r="4" fill="#059669"/>
+                <circle cx="270" cy="10" r="5.5" fill="#10B981" stroke="#fff" stroke-width="2"/>
+              </svg>
+
+              <div class="chart-peak-badge">
+                <span class="pulse-emerald"></span>
+                <span>P(Lt) 0.92 · Siap Materi Baru</span>
+              </div>
+            </div>
+
+            <div class="chart-stats-row">
+              <div class="chart-stat-chip">
+                <small>Parameter IRT</small>
+                <b>a=1.42, b=0.21, c=0.20</b>
+              </div>
+              <div class="chart-stat-chip">
+                <small>Misconception Ledger</small>
+                <b>0 Miskonsepsi Tersisa</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="widget-mastery-dial" style="margin-top:auto;">
+            <div class="mastery-circle">
+              <svg class="mastery-svg" viewBox="0 0 64 64">
+                <circle class="mastery-bg" cx="32" cy="32" r="26"></circle>
+                <circle class="mastery-prog" cx="32" cy="32" r="26"></circle>
+              </svg>
+              <div class="mastery-val" style="color:#065F46;">92%</div>
+            </div>
+            <div class="mastery-meta">
+              <b style="color:#064E3B;">Kesiapan Materi: Tinggi</b>
+              <span style="color:#059669;">P(Lt) ≥ 0.92 · Target Tercapai</span>
+            </div>
+          </div>
         </article>
 
-        <article class="card feat tint-sun reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3Z"/><path d="M5 17h14"/><path d="M9 8h6M9 11.5h4"/></svg>
-          <h3>2.440 kosakata</h3>
-          <p>Bank kosakata bertingkat untuk dilatih berulang, tersusun mengikuti tingkat CEFR yang sedang kamu kerjakan.</p>
+        <!-- Bento 3: Audio Listening Dual-Session (Sky Lavender, Span 5) -->
+        <article class="bento-card bento-col-5 bento-lavender reveal">
+          <div>
+            <span class="bento-badge-pill" style="color:#1E3A8A; border-color:#2563EB; background:#E0E7FF;">EBU R128 (-14 LUFS) · CLOUDFLARE D1 STREAM</span>
+            <h3>1.400+ Audio Listening Multi-Karakter</h3>
+            <p>Bukan suara robot datar. Percakapan hidup berstandar siar dengan 3 karakter kontras untuk Bahasa Inggris (CEFR / IELTS) dan Bahasa Jepang (JLPT Chokai).</p>
+          </div>
+
+          <!-- Session Switcher Segmented Tabs (English Listening & Japanese Chokai) -->
+          <div class="listening-lang-tabs" role="tablist" aria-label="Pilih Bahasa Sesi Listening">
+            <button class="listening-tab-btn active" id="tabListeningEnglish" type="button" role="tab" aria-selected="true" data-session="english">
+              <svg class="flag-icon" viewBox="0 0 32 32" width="18" height="18" aria-hidden="true">
+                <clipPath id="flagRoundUk"><circle cx="16" cy="16" r="16"/></clipPath>
+                <g clip-path="url(#flagRoundUk)">
+                  <rect width="32" height="32" fill="#012169"/>
+                  <path d="M0,0 L32,32 M32,0 L0,32" stroke="#fff" stroke-width="5.5"/>
+                  <path d="M0,0 L32,32 M32,0 L0,32" stroke="#C8102E" stroke-width="3"/>
+                  <path d="M16,0 V32 M0,16 H32" stroke="#fff" stroke-width="9"/>
+                  <path d="M16,0 V32 M0,16 H32" stroke="#C8102E" stroke-width="5.5"/>
+                </g>
+              </svg>
+              <span class="listening-tab-title">English Listening</span>
+              <span class="listening-tab-badge">CEFR B1</span>
+            </button>
+            <button class="listening-tab-btn" id="tabListeningJapanese" type="button" role="tab" aria-selected="false" data-session="japanese">
+              <svg class="flag-icon" viewBox="0 0 32 32" width="18" height="18" aria-hidden="true">
+                <circle cx="16" cy="16" r="15" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+                <circle cx="16" cy="16" r="7.5" fill="#BC002D"/>
+              </svg>
+              <span class="listening-tab-title">Japanese Chokai</span>
+              <span class="listening-tab-badge">JLPT N5</span>
+            </button>
+          </div>
+
+          <!-- Cloudflare D1 Worker Audio Socket Telemetry Bar -->
+          <div class="cf-worker-socket-bar" id="cfSocketBar">
+            <div class="cf-socket-left">
+              <span class="cf-socket-dot"></span>
+              <span class="cf-socket-text" id="cfSocketStatus">Cloudflare D1 Worker Audio: Socket Terhubung (48 kHz Stream)</span>
+            </div>
+            <span class="cf-socket-ping" id="cfSocketPing">24ms</span>
+          </div>
+
+          <!-- PANEL 1: English Listening Session Card (Active by Default) -->
+          <div class="listening-panel active" id="sessionEnglishPanel">
+            <div class="chokai-player-widget english-theme">
+              <audio id="fzEnglishAudio" src="https://fiezel.my.id/api/audio/english-listening-preview.mp3" data-fallback="assets/audio/english-listening-preview.mp3" preload="metadata"></audio>
+
+              <div class="chokai-player-header">
+                <div class="chokai-track-info">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  <span>Simulasi CEFR B1 · Campus Discussion</span>
+                </div>
+                <span id="englishStatusBadge" class="chokai-status-badge">Klik Putar</span>
+              </div>
+
+              <div class="chokai-player-controls">
+                <!-- Play / Pause button -->
+                <button id="fzEnglishPlayBtn" class="chokai-play-btn english-btn" type="button" aria-label="Putar audio latihan English Listening">
+                  <svg class="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <svg class="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" rx="1"/>
+                    <rect x="14" y="4" width="4" height="16" rx="1"/>
+                  </svg>
+                </button>
+
+                <!-- Animated Equalizer Waveform -->
+                <div id="englishWaveform" class="chokai-wave-container english-waves" aria-hidden="true">
+                  <span class="chokai-wave-bar" style="--h:14px; --d:0.05s;"></span>
+                  <span class="chokai-wave-bar" style="--h:24px; --d:0.18s;"></span>
+                  <span class="chokai-wave-bar" style="--h:18px; --d:0.12s;"></span>
+                  <span class="chokai-wave-bar" style="--h:32px; --d:0.25s;"></span>
+                  <span class="chokai-wave-bar" style="--h:12px; --d:0.08s;"></span>
+                  <span class="chokai-wave-bar" style="--h:28px; --d:0.20s;"></span>
+                  <span class="chokai-wave-bar" style="--h:20px; --d:0.15s;"></span>
+                  <span class="chokai-wave-bar" style="--h:34px; --d:0.28s;"></span>
+                  <span class="chokai-wave-bar" style="--h:16px; --d:0.10s;"></span>
+                  <span class="chokai-wave-bar" style="--h:26px; --d:0.22s;"></span>
+                  <span class="chokai-wave-bar" style="--h:30px; --d:0.26s;"></span>
+                  <span class="chokai-wave-bar" style="--h:15px; --d:0.09s;"></span>
+                </div>
+
+                <!-- Speed & Time -->
+                <div class="chokai-meta-right">
+                  <button id="englishSpeedBtn" class="chokai-speed-btn" type="button" title="Ubah kecepatan audio">1.0x</button>
+                  <span id="englishTime" class="chokai-time">00:00 / 00:37</span>
+                </div>
+              </div>
+
+              <!-- 3 English Persona Pills (Synced to Audio) -->
+              <div class="widget-personas">
+                <div class="persona-pill" data-role="prof">
+                  <span class="persona-avatar">👨‍🏫</span>
+                  <div class="persona-info-col">
+                    <span class="persona-role">Prof. Arthur</span>
+                    <span class="persona-freq">Lecturer · -14Hz</span>
+                  </div>
+                  <span class="persona-dot"></span>
+                </div>
+                <div class="persona-pill" data-role="liam">
+                  <span class="persona-avatar">🧑‍🎓</span>
+                  <div class="persona-info-col">
+                    <span class="persona-role">Liam</span>
+                    <span class="persona-freq">Student · +2Hz</span>
+                  </div>
+                  <span class="persona-dot"></span>
+                </div>
+                <div class="persona-pill" data-role="emma">
+                  <span class="persona-avatar">👩‍🎓</span>
+                  <div class="persona-info-col">
+                    <span class="persona-role">Emma</span>
+                    <span class="persona-freq">Exchange · +5Hz</span>
+                  </div>
+                  <span class="persona-dot"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL 2: Japanese Chokai Session Card -->
+          <div class="listening-panel" id="sessionJapanesePanel" style="display:none;">
+            <div class="chokai-player-widget">
+              <audio id="fzChokaiAudio" src="https://fiezel.my.id/api/audio/chokai-preview.mp3" data-fallback="assets/audio/chokai-preview.mp3" preload="metadata"></audio>
+
+              <div class="chokai-player-header">
+                <div class="chokai-track-info">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  <span>Simulasi JLPT N5 · Dialog Kafe Shibuya</span>
+                </div>
+                <span id="chokaiStatusBadge" class="chokai-status-badge">Klik Putar</span>
+              </div>
+
+              <div class="chokai-player-controls">
+                <!-- Play / Pause button -->
+                <button id="fzChokaiPlayBtn" class="chokai-play-btn" type="button" aria-label="Putar audio latihan Chokai">
+                  <svg class="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <svg class="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" rx="1"/>
+                    <rect x="14" y="4" width="4" height="16" rx="1"/>
+                  </svg>
+                </button>
+
+                <!-- Animated Equalizer Waveform -->
+                <div id="chokaiWaveform" class="chokai-wave-container" aria-hidden="true">
+                  <span class="chokai-wave-bar" style="--h:14px; --d:0.05s;"></span>
+                  <span class="chokai-wave-bar" style="--h:24px; --d:0.18s;"></span>
+                  <span class="chokai-wave-bar" style="--h:18px; --d:0.12s;"></span>
+                  <span class="chokai-wave-bar" style="--h:32px; --d:0.25s;"></span>
+                  <span class="chokai-wave-bar" style="--h:12px; --d:0.08s;"></span>
+                  <span class="chokai-wave-bar" style="--h:28px; --d:0.20s;"></span>
+                  <span class="chokai-wave-bar" style="--h:20px; --d:0.15s;"></span>
+                  <span class="chokai-wave-bar" style="--h:34px; --d:0.28s;"></span>
+                  <span class="chokai-wave-bar" style="--h:16px; --d:0.10s;"></span>
+                  <span class="chokai-wave-bar" style="--h:26px; --d:0.22s;"></span>
+                  <span class="chokai-wave-bar" style="--h:30px; --d:0.26s;"></span>
+                  <span class="chokai-wave-bar" style="--h:15px; --d:0.09s;"></span>
+                </div>
+
+                <!-- Speed & Time -->
+                <div class="chokai-meta-right">
+                  <button id="chokaiSpeedBtn" class="chokai-speed-btn" type="button" title="Ubah kecepatan audio">1.0x</button>
+                  <span id="chokaiTime" class="chokai-time">00:00 / 00:34</span>
+                </div>
+              </div>
+
+              <!-- 3 Persona Pills (Synced to Audio) -->
+              <div class="widget-personas">
+                <div class="persona-pill" data-role="instruktur">
+                  <span class="persona-avatar">👨‍🏫</span>
+                  <div class="persona-info-col">
+                    <span class="persona-role">Sensei Keita</span>
+                    <span class="persona-freq">Instruktur · -18Hz</span>
+                  </div>
+                  <span class="persona-dot"></span>
+                </div>
+                <div class="persona-pill" data-role="mahasiswa">
+                  <span class="persona-avatar">🧑‍🎓</span>
+                  <div class="persona-info-col">
+                    <span class="persona-role">Kenji</span>
+                    <span class="persona-freq">Mahasiswa · +4Hz</span>
+                  </div>
+                  <span class="persona-dot"></span>
+                </div>
+                <div class="persona-pill" data-role="mahasiswi">
+                  <span class="persona-avatar">👩‍🎓</span>
+                  <div class="persona-info-col">
+                    <span class="persona-role">Aoi</span>
+                    <span class="persona-freq">Mahasiswi · +3Hz</span>
+                  </div>
+                  <span class="persona-dot"></span>
+                </div>
+              </div>
+            </div>
+          </div>
         </article>
 
-        <article class="card feat tint-paper reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/></svg>
-          <h3>Speaking dan Listening</h3>
-          <p>36 sesi speaking plus 1.400+ latihan listening dengan bank soal dan enam format ujian bergaya IELTS dan TOEFL. Audionya TTS dari skrip orisinal, bukan rekaman ujian asli.</p>
+        <!-- Bento 4: Kursus Jepang & Mandarin (Warm Sakura Blush, Span 7) -->
+        <article class="bento-card bento-col-7 bento-coral reveal">
+          <div>
+            <span class="bento-badge-pill" style="color:#881337; border-color:#E11D48; background:#FFE4E6;">JLPT N5–N4 &amp; HSK 1–5</span>
+            <h3>Bahasa Jepang Praktis &amp; Mandarin Karaoke</h3>
+            <p>422 poin tata bahasa Jepang dengan penanda Pitch Accent Tokyo, serta 168 lesson Mandarin dengan sinkronisasi lirik 4-nada 60 FPS.</p>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr; gap:16px;">
+            <div class="widget-kanji-card">
+              <div class="kanji-split-grid">
+                <div class="kanji-col-box">
+                  <span class="script-badge-tiny">🇯🇵 Japanese · Tokyo Pitch</span>
+                  <div class="kanji-main-ruby">
+                    <ruby>日本語<rt>にほんご</rt></ruby><span class="pitch-tag-mini">[0] Heiban</span>
+                  </div>
+                  <div class="kanji-audio-cue">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <span>Tokyo Flat Accent</span>
+                  </div>
+                </div>
+
+                <div class="kanji-col-box">
+                  <span class="script-badge-tiny">🇨🇳 Mandarin · 4-Tone 60 FPS</span>
+                  <div class="kanji-main-ruby">
+                    <ruby>汉语<rt>hànyǔ</rt></ruby><span class="tone-tag-mini">4-Tone Sync</span>
+                  </div>
+                  <div class="mandarin-karaoke-pills">
+                    <span class="m-tone-chip m-tone-4">hàn (Nada 4 ↘)</span>
+                    <span class="m-tone-chip m-tone-3">yǔ (Nada 3 ∨)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phone Mockup with Reading Screen -->
+            <div class="phone-mockup-frame" style="max-width:240px; margin:10px auto 0;">
+              <svg class="phone-pin-star" viewBox="0 0 24 24" fill="#F43F5E" stroke="#881337" stroke-width="1.5">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <div class="phone-mockup-notch"></div>
+              <div class="phone-mockup-screen">
+                <img src="assets/shots/reading-mobile.png" alt="Layar Kakijun Studio Karakter Kana FIEZEL dengan 46 huruf Gojūon" width="780" height="1688" loading="lazy">
+              </div>
+            </div>
+          </div>
         </article>
 
-        <article class="card feat tint-blush reveal">
-          <!-- maskot PAW inline (geometri asli assets/brand/paw-mascot-head.svg) + idle breathing -->
-          <svg class="ico-img paw-idle" viewBox="56 -10 208 216" role="img" aria-label="PAW — ikon kepala maskot FIEZEL"><g><path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/><path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/><circle cx="160" cy="106" r="88" fill="#FFD94F"/><ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/><path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/><circle cx="102" cy="126" r="11" fill="#F0A0AC"/><circle cx="218" cy="126" r="11" fill="#F0A0AC"/><g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g><g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g><path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/></g></svg>
-          <h3>Maskot PAW</h3>
-          <p>PAW punya 14 ekspresi yang bereaksi ke jawabanmu: penasaran, memberi petunjuk, ikut senang, ikut bingung.</p>
-        </article>
-
-        <article class="card feat tint-blush reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17c3.5 0 4.5-10 8-10s4.5 10 8 10"/><path d="M3 12.5h4M17 12.5h4"/></svg>
-          <h3>Belajar adaptif</h3>
-          <p>Aplikasi membaca pola jawabanmu, lalu menyesuaikan soal dan pengulangan berikutnya supaya latihan tidak terlalu mudah.</p>
-        </article>
-
-        <article class="card feat tint-sun reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3"/><path d="M12 6v6M9.5 9.5 12 12l2.5-2.5"/></svg>
-          <h3>Bisa dipasang (PWA)</h3>
-          <p>Pasang ke Home Screen seperti aplikasi biasa. Setelah terpasang, materi dan latihan bisa dibuka tanpa internet.</p>
-        </article>
-
-        <article class="card feat feat-wide tint-blush reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16"/><path d="M12 3v4"/><path d="M9.5 7c0 5-2.5 8.5-5.5 10"/><path d="M13 9.5c.5 4 2.5 6.5 6 7.5"/><path d="M13 20.5l3.5-8 3.5 8"/><path d="M14.4 17.8h4.2"/></svg>
-          <h3>Kursus Bahasa Jepang (JLPT N5–N4)</h3>
-          <p>422 poin grammar dari 27 keluarga, 1.884 kosakata, dan 150 bacaan berjenjang. Penjelasannya berbahasa Indonesia dan Thai, bukan Inggris.</p>
-          <ul class="chiplist">
-            <li>422 grammar</li><li>1.884 kosakata</li><li>150 bacaan</li><li>N5–N4</li>
-          </ul>
-          <p class="fineprint">Jujur: listening dan speaking belum ada untuk kursus Jepang, dan kartunya disembunyikan — bukan ditampilkan kosong.</p>
-        </article>
-
-        <article class="card feat tint-paper reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 12 5l9 4.5-9 4.5Z"/><path d="M7 12v4.2c0 1.3 2.2 2.3 5 2.3s5-1 5-2.3V12"/><path d="M21 9.5V15"/></svg>
-          <h3>KelasKu untuk Guru</h3>
-          <p>Ruang kelas, tugas yang menempel bab Kurikulum Nasional, analitik per kompetensi, dan rapor orang tua. <a href="untuk-sekolah.html">Selengkapnya untuk sekolah →</a></p>
-        </article>
-
-        <article class="card feat tint-paper reveal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4M8 7v10M12 4.5v15M16 8v8M20 11v2"/></svg>
-          <h3>Suara neural opsional</h3>
-          <p>Suara perangkat aktif sejak awal. Suara neural diunduh sekali dan butuh jaringan saat mengunduh dan memakainya pertama kali.</p>
+        <!-- Bento 5: KelasKu untuk Guru (Soft Slate, Span 12) -->
+        <article class="bento-card bento-col-12 bento-slate reveal">
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:20px;">
+            <div style="max-width:620px;">
+              <span class="bento-badge-pill" style="color:#0F766E; border-color:#0D9488; background:#CCFBF1;">Untuk Pendidik &amp; Sekolah</span>
+              <h3 style="font-size:1.65rem; color:#115E59;">KelasKu untuk Guru — Mode Kelas Tanpa HP</h3>
+              <p style="margin-bottom:0; color:#134E4A;">Kuis proyektor 5 menit untuk pembuka kelas, lembar kerja siswa LKS A4 cetak ber-QR, analitik otomatis tanpa koreksi lembar jawaban, dan draf e-Rapor KKTP.</p>
+            </div>
+            <div style="flex:none;">
+              <a class="btn btn-primary skeuo-shine" href="untuk-sekolah.html" style="background:#0D9488; border-color:#115E59; color:#fff;">Pelajari Solusi Sekolah →</a>
+            </div>
+          </div>
         </article>
       </div>
     </div>
@@ -1424,15 +2064,102 @@ if(window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(d
         <p class="body-lg">Gunakan alat kalkulasi psikometrik dan panduan kurikulum terbuka FIEZEL langsung dari browser Anda sebelum memulai latihan penuh di aplikasi.</p>
         <hr class="rule" aria-hidden="true">
       </div>
-      <div class="steps reveal" style="list-style:none; padding:0;">
-        <div class="card step"><span class="step-n">A1–C2</span><p><strong><a href="alat/cek-level-bahasa-inggris/">Tes Level Bahasa Inggris CEFR Gratis</a></strong> — Kuis diagnostik 5 soal (IRT 3PL) dalam 90 detik untuk estimasi level CEFR, kesetaraan Band IELTS, dan deteksi titik buta grammar.</p></div>
-        <div class="card step"><span class="step-n">IELTS</span><p><strong><a href="alat/kalkulator-skor-ielts/">Kalkulator Skor Band IELTS &amp; Raw Score (0–40)</a></strong> — Hitung pembulatan resmi desimal <code>.25</code>/<code>.75</code> serta konversi nilai benar Reading &amp; Listening.</p></div>
-        <div class="card step"><span class="step-n">LPDP</span><p><strong><a href="alat/syarat-skor-ielts-beasiswa-kampus/">Database Syarat Skor IELTS Beasiswa &amp; Kampus Dunia</a></strong> — Cari ambang skor minimum LPDP, AAS, Chevening, Fulbright, MEXT, CGS, dan 50+ universitas luar negeri.</p></div>
-        <div class="card step"><span class="step-n">12×</span><p><strong><a href="alat/cek-grammar-12-tenses/">Rumus 12 Tenses &amp; Diagnostik Grammar Sokratik</a></strong> — Matriks 12 tenses bahasa Inggris lengkap dengan simulasi petunjuk Sokratik 2-tingkat.</p></div>
-        <div class="card step"><span class="step-n">180</span><p><strong><a href="panduan/aplikasi-belajar-grammar-terbaik/">Panduan Aplikasi Belajar Grammar Terbaik</a></strong> — Bedah 6 kriteria ilmiah evaluasi aplikasi grammar &amp; peta 180 pelajaran CEFR A1–C2.</p></div>
-        <div class="card step"><span class="step-n">8.0</span><p><strong><a href="panduan/persiapan-ielts-otodidak/">Panduan Persiapan IELTS Otodidak 4-Skill</a></strong> — Rubrik penilaian Listening, Reading, Writing, Speaking &amp; jadwal mandiri 8 minggu.</p></div>
-        <div class="card step"><span class="step-n">JLPT</span><p><strong><a href="panduan/belajar-bahasa-jepang-pemula/">Panduan Belajar Bahasa Jepang Pemula (N5–N4)</a></strong> — Hiragana, Katakana, 422 poin grammar, Pitch Accent Tokyo, dan 54 skenario Can-Do.</p></div>
-        <div class="card step"><span class="step-n">HSK</span><p><strong><a href="panduan/belajar-bahasa-mandarin-hsk/">Panduan Belajar Bahasa Mandarin &amp; HSK 1–5</a></strong> — Sistem 4 nada Pinyin, sinkronisasi Karaoke 60 FPS, dan 168 pelajaran HSK berjenjang.</p></div>
+      <div class="tool-grid reveal">
+        <a class="tool-card skeuo-shine" href="alat/cek-level-bahasa-inggris/">
+          <div>
+            <div class="tool-header">
+              <span class="tool-pill-badge badge-gold">CEFR A1–C2</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3 class="tool-title">Tes Level Bahasa Inggris CEFR Gratis</h3>
+            <p class="tool-desc">Kuis diagnostik 5 soal (IRT 3PL) dalam 90 detik untuk estimasi level CEFR, kesetaraan Band IELTS, dan deteksi titik buta grammar.</p>
+          </div>
+          <span class="tool-cta-link">Mulai Tes 90 Detik →</span>
+        </a>
+
+        <a class="tool-card skeuo-shine" href="alat/kalkulator-skor-ielts/">
+          <div>
+            <div class="tool-header">
+              <span class="tool-pill-badge badge-mint">IELTS 9.0</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/></svg>
+            </div>
+            <h3 class="tool-title">Kalkulator Skor Band IELTS &amp; Raw Score</h3>
+            <p class="tool-desc">Hitung pembulatan resmi desimal .25 / .75 serta konversi nilai benar Reading &amp; Listening Academic dan General Training.</p>
+          </div>
+          <span class="tool-cta-link">Hitung Skor Band →</span>
+        </a>
+
+        <a class="tool-card skeuo-shine" href="alat/syarat-skor-ielts-beasiswa-kampus/">
+          <div>
+            <div class="tool-header">
+              <span class="tool-pill-badge badge-rose">BEASISWA</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 3 6 3 6 3s6 0 6-3v-5"/></svg>
+            </div>
+            <h3 class="tool-title">Database Syarat Skor IELTS Kampus Dunia</h3>
+            <p class="tool-desc">Cari ambang skor minimum LPDP, AAS, Chevening, Fulbright, MEXT, CGS, dan 50+ universitas top luar negeri.</p>
+          </div>
+          <span class="tool-cta-link">Jelajahi Database →</span>
+        </a>
+
+        <a class="tool-card skeuo-shine" href="alat/cek-grammar-12-tenses/">
+          <div>
+            <div class="tool-header">
+              <span class="tool-pill-badge badge-sky">12 TENSES</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <h3 class="tool-title">Rumus 12 Tenses &amp; Diagnostik Sokratik</h3>
+            <p class="tool-desc">Matriks 12 tenses bahasa Inggris lengkap dengan simulasi petunjuk diagnostik Sokratik 2-tingkat.</p>
+          </div>
+          <span class="tool-cta-link">Buka Matriks Tenses →</span>
+        </a>
+
+        <a class="tool-card skeuo-shine" href="panduan/aplikasi-belajar-grammar-terbaik/">
+          <div>
+            <div class="tool-header">
+              <span class="tool-pill-badge badge-gold">PANDUAN 180</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+            </div>
+            <h3 class="tool-title">Panduan Aplikasi Belajar Grammar Terbaik</h3>
+            <p class="tool-desc">Bedah 6 kriteria ilmiah evaluasi aplikasi grammar &amp; peta 180 pelajaran kurikulum CEFR A1–C2.</p>
+          </div>
+          <span class="tool-cta-link">Baca Panduan →</span>
+        </a>
+
+        <a class="tool-card skeuo-shine" href="panduan/persiapan-ielts-otodidak/">
+          <div>
+            <div class="tool-header">
+              <span class="tool-pill-badge badge-mint">IELTS 8.0</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h3 class="tool-title">Panduan Persiapan IELTS Otodidak 4-Skill</h3>
+            <p class="tool-desc">Rubrik penilaian Listening, Reading, Writing, Speaking &amp; jadwal belajar mandiri 8 minggu teruji.</p>
+          </div>
+          <span class="tool-cta-link">Lihat Jadwal 8 Minggu →</span>
+        </a>
+
+        <a class="tool-card skeuo-shine" href="panduan/belajar-bahasa-jepang-pemula/">
+          <div>
+            <div class="tool-header">
+              <span class="tool-pill-badge badge-rose">JLPT N5–N4</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <h3 class="tool-title">Panduan Belajar Bahasa Jepang Pemula</h3>
+            <p class="tool-desc">Hiragana, Katakana, 422 poin grammar, Pitch Accent Tokyo, dan 54 skenario praktis Can-Do.</p>
+          </div>
+          <span class="tool-cta-link">Mulai Belajar Jepang →</span>
+        </a>
+
+        <a class="tool-card skeuo-shine" href="panduan/belajar-bahasa-mandarin-hsk/">
+          <div>
+            <div class="tool-header">
+              <span class="tool-pill-badge badge-sky">HSK 1–5</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
+            <h3 class="tool-title">Panduan Belajar Bahasa Mandarin &amp; HSK</h3>
+            <p class="tool-desc">Sistem 4 nada Pinyin, sinkronisasi Karaoke 60 FPS, dan 168 pelajaran HSK berjenjang.</p>
+          </div>
+          <span class="tool-cta-link">Pelajari Nada &amp; Pinyin →</span>
+        </a>
       </div>
     </div>
   </section>
@@ -1560,7 +2287,9 @@ if(window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(d
   <section class="sec sec-final">
     <div class="wrap">
       <div class="stage final reveal">
-        <svg class="final-paw paw-idle" viewBox="56 -10 208 216" role="img" aria-label="PAW, maskot kucing geometris FIEZEL"><g><path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/><path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/><circle cx="160" cy="106" r="88" fill="#FFD94F"/><ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/><path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/><circle cx="102" cy="126" r="11" fill="#F0A0AC"/><circle cx="218" cy="126" r="11" fill="#F0A0AC"/><g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g><g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g><path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/></g></svg>
+        <div class="final-mochi-wrap" style="text-align:center; margin-bottom:16px;">
+          <img src="assets/brand/mochi/mochi-real-talk.png" alt="Mochi Maskot FIEZEL 3D" width="130" height="130" style="display:inline-block; filter:drop-shadow(0 8px 18px rgba(94,20,32,0.20)); animation:realMochiFloat 3.2s ease-in-out infinite alternate;">
+        </div>
         <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
         <h2>Mulai dari level yang tepat hari ini</h2>
         <p>Buka FIEZEL, pilih tingkatmu, dan kerjakan satu lesson — gratis, tanpa langganan, tanpa akun.</p>
@@ -1653,5 +2382,68 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+
+  <!-- ============================================================================
+       INTERACTIVE FACETIME CALL POP-UP MODAL (Test-Drive Kawan Bicara AI)
+       ============================================================================ -->
+  <div class="facetime-modal-backdrop" id="fzFaceTimeModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="facetime-modal-card">
+      <div class="facetime-modal-topbar">
+        <div class="facetime-modal-status">
+          <span class="real-status-dot" style="width:10px; height:10px;"></span>
+          <span>Sensei Nanami · Terhubung (48 kHz Duplex)</span>
+        </div>
+        <button class="facetime-modal-close" id="fzCloseModalBtn" type="button" aria-label="Tutup jendela panggilan">✕</button>
+      </div>
+
+      <!-- Mascot Video Stage -->
+      <div class="facetime-modal-video-stage">
+        <div class="facetime-modal-mochi-wrap">
+          <div class="real-mochi-sound-rays" aria-hidden="true" style="left:-16px; top:12%;">
+            <span class="real-sound-ray"></span>
+            <span class="real-sound-ray"></span>
+            <span class="real-sound-ray"></span>
+          </div>
+          <img class="facetime-modal-mochi-img" src="assets/brand/mochi/mochi-real-talk.png" alt="Mochi Speaking" width="150" height="145">
+        </div>
+
+        <!-- Mochi Dynamic Speech Dialogue -->
+        <div class="facetime-modal-speech">
+          <div class="facetime-speech-jp" id="fzModalJpText">
+            「こんにちは！今日はどんなシチュエーションで会話の練習をしようか？」
+          </div>
+          <div class="facetime-speech-id" id="fzModalIdText">
+            “Halo! Hari ini mau latihan percakapan dengan situasi apa? Pilih topik di bawah ya!”
+          </div>
+        </div>
+      </div>
+
+      <!-- User Interactive Options -->
+      <div class="facetime-modal-interactive-row">
+        <div class="facetime-interactive-label">Pilih atau ucapkan jawabanmu:</div>
+        <div class="facetime-options-grid" id="fzModalOptions">
+          <button class="facetime-option-btn" type="button" data-resp-jp="「いいですね！カフェの注文ですね。いらっしゃいませ、何になさいますか？」" data-resp-id="“Bagus sekali! Mau pesan kopi ya. Selamat datang, mau pesan apa?”">
+            <span>☕ 「カフェで注文する練習をしたいです」</span>
+            <span style="font-size:0.75rem; color:#6B2332;">(Pesan kopi di Shibuya)</span>
+          </button>
+          <button class="facetime-option-btn" type="button" data-resp-jp="「分かりました！道案内の練習ですね。すみません、渋谷駅はどちらですか？」" data-resp-id="“Baik! Simulasi tanya arah ya. Permisi, stasiun Shibuya ke arah mana ya?”">
+            <span>🗺️ 「駅への道を聞く練習をしたいです」</span>
+            <span style="font-size:0.75rem; color:#6B2332;">(Tanya arah jalan)</span>
+          </button>
+          <button class="facetime-option-btn" type="button" data-resp-jp="「Sure! Let's simulate IELTS Speaking Part 2. Describe a place you love.」" data-resp-id="“Tentu! Mari simulasi wawancara formal IELTS Part 2.”">
+            <span>🎓 「I'd like to practice IELTS Speaking Part 2」</span>
+            <span style="font-size:0.75rem; color:#6B2332;">(Simulasi IELTS)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Footer Controls -->
+      <div class="facetime-modal-footer">
+        <button class="facetime-end-call-btn" id="fzModalEndBtn" type="button">📞 Tutup Panggilan</button>
+        <a class="facetime-full-app-btn" href="app/?fz_view=chat">Mulai Sesi Penuh di Aplikasi →</a>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
