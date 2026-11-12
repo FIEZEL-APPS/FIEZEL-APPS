@@ -238,4 +238,269 @@ test('getDailyRoadmapDay and calculateDailyProgress handle 30-day curriculum', (
   assert.strictEqual(fullProgress.percent, 100);
 });
 
+// 6. Reading Evaluators (FIB Dropdown, Drag & Drop, Reorder Paragraphs)
+test('evaluateReadingFib scores dropdown blanks and attaches deepFeedback', () => {
+  const item = {
+    blanks: [
+      { id: 1, correct: 'role', options: ['part', 'role', 'function'], deepFeedback: { formula: 'play a vital role in' } },
+      { id: 2, correct: 'factors', options: ['factors', 'items'], deepFeedback: { formula: 'lifestyle factors' } },
+      { id: 3, correct: 'essential', options: ['essential', 'optional'], deepFeedback: { formula: 'essential for health' } }
+    ]
+  };
+
+  const perfect = engine.evaluateReadingFib(item, { 1: 'role', 2: 'factors', 3: 'essential' });
+  assert.strictEqual(perfect.score, 3);
+  assert.strictEqual(perfect.maxScore, 3);
+  assert.strictEqual(perfect.percentage, 100);
+  assert.strictEqual(perfect.passed, true);
+  assert.strictEqual(perfect.blankResults[0].deepFeedback.formula, 'play a vital role in');
+
+  const partial = engine.evaluateReadingFib(item, { 1: 'part', 2: 'factors', 3: 'essential' });
+  assert.strictEqual(partial.score, 2);
+  assert.strictEqual(partial.blankResults[0].isCorrect, false);
+  assert.strictEqual(partial.percentage, 67);
+});
+
+test('evaluateReadingDragDrop validates word pool assignments', () => {
+  const item = {
+    correctAnswers: { blank_1: 'build', blank_2: 'damage' },
+    deepFeedback: { blank_1: { correct: 'build' }, blank_2: { correct: 'damage' } }
+  };
+
+  const perfect = engine.evaluateReadingDragDrop(item, { blank_1: 'build', blank_2: 'damage' });
+  assert.strictEqual(perfect.score, 2);
+  assert.strictEqual(perfect.maxScore, 2);
+  assert.strictEqual(perfect.percentage, 100);
+  assert.strictEqual(perfect.passed, true);
+
+  const wrong = engine.evaluateReadingDragDrop(item, { blank_1: 'destroy', blank_2: 'damage' });
+  assert.strictEqual(wrong.score, 1);
+  assert.strictEqual(wrong.results.blank_1.isCorrect, false);
+  assert.strictEqual(wrong.results.blank_2.isCorrect, true);
+});
+
+test('evaluateReorderParagraphs implements Pearson adjacent pairs scoring', () => {
+  const item = {
+    correctOrder: ['B', 'D', 'A', 'C'],
+    deepFeedback: { independentSentence: 'Kalimat B' }
+  };
+
+  // Target pairs: B-D, D-A, A-C (3 pairs)
+  const perfect = engine.evaluateReorderParagraphs(item, ['B', 'D', 'A', 'C']);
+  assert.strictEqual(perfect.score, 3);
+  assert.strictEqual(perfect.maxScore, 3);
+  assert.strictEqual(perfect.passed, true);
+  assert.deepStrictEqual(perfect.matchedPairs, ['B-D', 'D-A', 'A-C']);
+
+  // User order: B, D, C, A -> user pairs: B-D (match), D-C (no), C-A (no) -> score: 1
+  const partial = engine.evaluateReorderParagraphs(item, ['B', 'D', 'C', 'A']);
+  assert.strictEqual(partial.score, 1);
+  assert.strictEqual(partial.maxScore, 3);
+  assert.strictEqual(partial.passed, false);
+  assert.deepStrictEqual(partial.matchedPairs, ['B-D']);
+});
+
+// 7. Writing Evaluators (SWT & Essay)
+test('evaluateSummarizeWrittenText enforces single sentence and word limits', () => {
+  const item = {
+    modelSummary: 'While commercial agriculture produces food, unsustainable practices cause environmental degradation.',
+    formulaScaffold: '[Lead clause], while [Main clause].'
+  };
+
+  const validText = 'While modern agriculture provides essential sustenance for humanity, unsustainable farming practices cause significant environmental degradation and accelerate biodiversity loss worldwide.';
+  const evalValid = engine.evaluateSummarizeWrittenText(item, validText);
+  assert.strictEqual(evalValid.sentenceCount, 1);
+  assert.strictEqual(evalValid.breakdown.form, 1);
+  assert.strictEqual(evalValid.passed, true);
+  assert.ok(evalValid.score >= 5);
+
+  // Two sentences (Pearson Fatal Error)
+  const twoSentences = 'Modern agriculture provides food. However it damages nature.';
+  const evalTwo = engine.evaluateSummarizeWrittenText(item, twoSentences);
+  assert.strictEqual(evalTwo.breakdown.form, 0);
+  assert.strictEqual(evalTwo.score, 0);
+  assert.ok(evalTwo.feedback.some(f => f.includes('Fatal Pearson Error')));
+
+  // Word count > 75 words
+  const longText = 'Modern agriculture ' + 'word '.repeat(76) + '.';
+  const evalLong = engine.evaluateSummarizeWrittenText(item, longText);
+  assert.strictEqual(evalLong.breakdown.form, 0);
+  assert.strictEqual(evalLong.score, 0);
+});
+
+test('evaluateWriteEssay scores 4 paragraphs, word limit and cohesion', () => {
+  const item = {
+    nakulScaffold: 'Scaffold structure'
+  };
+
+  const p1 = 'In contemporary society, education plays an indispensable role in shaping human destiny. Historically, civilizations have advanced through the systematic transmission of knowledge, ethical values, and technical expertise across generations. Consequently, educational institutions form the bedrock of societal development and cultural preservation. Without structured schooling, modern civilization would struggle to maintain scientific and technological progress in competitive global environments.';
+  const p2 = 'Firstly, formal education equips individuals with analytical reasoning, quantitative literacy, and technical proficiency. In modern economies, specialized technological competence and adaptability are paramount for professional advancement. Therefore, learners with robust academic foundations secure prosperous employment prospects in highly competitive vocational marketplaces. Furthermore, structured academic instruction fosters critical problem-solving skills that allow graduates to navigate complex socioeconomic dilemmas effectively.';
+  const p3 = 'On the other hand, experiential learning outside academic institutions provides pragmatic wisdom and emotional maturity. Practical immersion in workplace settings teaches resilience, teamwork, and tactical problem-solving that theoretical lectures cannot replicate. Thus, hands-on apprenticeships complement abstract scholarly knowledge by grounding theories in real-world application. Combining vocational practice with theoretical understanding ensures well-rounded competence and rapid occupational adaptability.';
+  const p4 = 'In conclusion, both academic curricula and vocational apprenticeships remain undeniably vital for holistic development. While formal schooling provides theoretical principles, practical exposure guarantees real-world readiness. Ultimately, a balanced pedagogical approach combining scholarly instruction and practical immersion empowers learners to attain long-term vocational excellence and personal fulfillment throughout their careers.';
+
+  const fullEssay = [p1, p2, p3, p4].join('\n\n');
+  const result = engine.evaluateWriteEssay(item, fullEssay);
+  assert.strictEqual(result.paragraphCount, 4);
+  assert.strictEqual(result.breakdown.form, 2);
+  assert.strictEqual(result.breakdown.structure, 2);
+  assert.ok(result.score >= 12);
+  assert.strictEqual(result.passed, true);
+
+  // Under 120 words gives form = 0, score = 0
+  const shortEssay = 'This is a short essay that fails Pearson minimum limit.';
+  const shortResult = engine.evaluateWriteEssay(item, shortEssay);
+  assert.strictEqual(shortResult.breakdown.form, 0);
+  assert.strictEqual(shortResult.score, 0);
+});
+
+// 8. Listening Evaluators (Retell Lecture, SST, Listening FIB, HIW)
+test('evaluateRetellLecture checks key noun chunks and fluency', () => {
+  const item = {
+    keyNounChunks: ['deep learning', 'neural networks', 'image recognition', 'future developments'],
+    nakulTemplateSpeech: 'The lecture primarily discussed...'
+  };
+
+  const transcript = 'The speaker discussed deep learning and neural networks in modern computer science, highlighting image recognition and future developments.';
+  const result = engine.evaluateRetellLecture(item, transcript, { fluency: 4.5, pronunciation: 4.0 });
+  assert.strictEqual(result.matchedChunks.length, 4);
+  assert.strictEqual(result.breakdown.content, 5);
+  assert.strictEqual(result.passed, true);
+  assert.ok(result.score >= 13);
+});
+
+test('evaluateSummarizeSpokenText enforces 50-70 word target', () => {
+  const item = {
+    modelSummary: 'The lecture highlighted marine ecosystem protection, asserting that sustainable fisheries prevent coral reef degradation.'
+  };
+
+  const goodSummary = 'The speaker highlighted the critical necessity of global marine conservation, asserting that sustainable fisheries actively protect fragile oceanic ecosystems. Furthermore, empirical research clearly demonstrates that reducing industrial chemical pollution prevents catastrophic biodiversity collapse across vulnerable coastal reefs. In conclusion, collective environmental action and stricter regulatory governance remain absolutely imperative for long-term ecological balance.';
+  const result = engine.evaluateSummarizeSpokenText(item, goodSummary);
+  assert.strictEqual(result.breakdown.form, 2);
+  assert.ok(result.score >= 7);
+  assert.strictEqual(result.passed, true);
+
+  // Under 40 words gives form = 0, score = 0
+  const under40 = 'The lecture was about marine conservation and fish.';
+  const shortRes = engine.evaluateSummarizeSpokenText(item, under40);
+  assert.strictEqual(shortRes.breakdown.form, 0);
+  assert.strictEqual(shortRes.score, 0);
+});
+
+test('evaluateListeningFib checks exact spelling and returns spellingTips', () => {
+  const item = {
+    blanks: [
+      { id: 1, correct: 'accommodate', spellingTip: 'Double c and double m' },
+      { id: 2, correct: 'phenomenon', spellingTip: 'Singular ending in -on' }
+    ]
+  };
+
+  const perfect = engine.evaluateListeningFib(item, { 1: 'accommodate', 2: 'phenomenon' });
+  assert.strictEqual(perfect.score, 2);
+  assert.strictEqual(perfect.percentage, 100);
+  assert.strictEqual(perfect.passed, true);
+
+  const typo = engine.evaluateListeningFib(item, { 1: 'acomodate', 2: 'phenomenon' });
+  assert.strictEqual(typo.score, 1);
+  assert.strictEqual(typo.blankResults[0].isCorrect, false);
+  assert.strictEqual(typo.blankResults[0].spellingTip, 'Double c and double m');
+});
+
+test('evaluateHighlightIncorrectWords applies Pearson negative marking', () => {
+  const item = {
+    displayedText: 'Regular physical activity is necessary for improving concentration and decreasing hunger after meals.',
+    incorrectWords: [
+      { displayed: 'necessary', spoken: 'essential' },
+      { displayed: 'hunger', spoken: 'fatigue' }
+    ]
+  };
+
+  // Words: ['regular'(0), 'physical'(1), 'activity'(2), 'is'(3), 'necessary'(4), 'for'(5), 'improving'(6), 'concentration'(7), 'and'(8), 'decreasing'(9), 'hunger'(10), 'after'(11), 'meals'(12)]
+  // Incorrect words are at index 4 ('necessary') and index 10 ('hunger')
+
+  // Case 1: Candidate clicks both errors accurately (indices 4 and 10)
+  const perfect = engine.evaluateHighlightIncorrectWords(item, [4, 10]);
+  assert.strictEqual(perfect.correctClicks, 2);
+  assert.strictEqual(perfect.falseAlarms, 0);
+  assert.strictEqual(perfect.netScore, 2);
+  assert.strictEqual(perfect.passed, true);
+
+  // Case 2: Candidate clicks 1 correct error (4) and 1 innocent word (0: 'regular')
+  // Net score: 1 - 1 = 0 (Negative marking applied!)
+  const penalised = engine.evaluateHighlightIncorrectWords(item, [4, 0]);
+  assert.strictEqual(penalised.correctClicks, 1);
+  assert.strictEqual(penalised.falseAlarms, 1);
+  assert.strictEqual(penalised.netScore, 0);
+  assert.strictEqual(penalised.negativeMarkingApplied, true);
+
+  // Case 3: More false alarms than correct clicks: score cannot drop below 0
+  const floorZero = engine.evaluateHighlightIncorrectWords(item, [0, 1, 2]);
+  assert.strictEqual(floorZero.netScore, 0);
+  assert.strictEqual(floorZero.falseAlarms, 3);
+});
+
+// 9. FiezelPteUi 4-Section Integration
+const ui = require('../features/pte/fiezel-pte-ui.js');
+
+test('FiezelPteUi exports all required methods and caches banks', () => {
+  const expectedMethods = [
+    'mount', 'switchSection', 'switchMode', 'nextItem', 'prevItem', 'retryItem',
+    'selectDay', 'toggleTaskComplete', 'launchTask', 'openVoiceStudio',
+    'selectRwFibOption', 'checkRwFib', 'assignDdWord', 'clearDdBlank', 'checkReadingDd',
+    'moveRoParagraph', 'checkReorder', 'checkSwt', 'checkEssay', 'checkSst',
+    'setLfAnswer', 'checkListeningFib', 'toggleHiwWord', 'checkHiw',
+    'getState', 'getBanks'
+  ];
+  expectedMethods.forEach(m => {
+    assert.strictEqual(typeof ui[m], 'function', `Missing method: ${m}`);
+  });
+
+  const banks = ui.getBanks();
+  assert.ok(banks.ra.length >= 5);
+  assert.ok(banks.rwFib.length >= 6);
+  assert.ok(banks.rDd.length >= 5);
+  assert.ok(banks.ro.length >= 5);
+  assert.ok(banks.swt.length >= 5);
+  assert.ok(banks.essay.length >= 5);
+  assert.ok(banks.rl.length >= 5);
+  assert.ok(banks.sst.length >= 5);
+  assert.ok(banks.lf.length >= 5);
+  assert.ok(banks.hiw.length >= 5);
+});
+
+test('FiezelPteUi transitions sections and evaluates reading/listening tasks', () => {
+  ui.switchSection('reading');
+  let st = ui.getState();
+  assert.strictEqual(st.section, 'reading');
+  assert.strictEqual(st.mode, 'rwFib');
+
+  ui.selectRwFibOption(1, 'reshaped');
+  ui.checkRwFib();
+  st = ui.getState();
+  assert.ok(st.activeDeepFeedback);
+  assert.ok(st.activeDeepFeedback.items.length >= 2);
+
+  ui.switchMode('rDd');
+  st = ui.getState();
+  const firstWord = st.rDdWordPool[0];
+  ui.assignDdWord(firstWord);
+  st = ui.getState();
+  assert.ok(Object.keys(st.rDdAssignments).length >= 1);
+
+  ui.switchSection('listening');
+  ui.switchMode('hiw');
+  ui.toggleHiwWord(2);
+  ui.checkHiw();
+  st = ui.getState();
+  assert.ok(st.activeDeepFeedback.generalFeedback.length >= 3);
+
+  const mockContainer = { innerHTML: '' };
+  ui.mount(mockContainer);
+  assert.ok(mockContainer.innerHTML.includes('fz-pte-hub'));
+  assert.ok(mockContainer.innerHTML.includes('30-Day Plan'));
+  assert.ok(mockContainer.innerHTML.includes('Speaking'));
+  assert.ok(mockContainer.innerHTML.includes('Writing'));
+  assert.ok(mockContainer.innerHTML.includes('Reading'));
+  assert.ok(mockContainer.innerHTML.includes('Listening'));
+});
+
 console.log(`\nAll ${passedTests} PTE Academic Engine unit tests PASSED successfully!`);

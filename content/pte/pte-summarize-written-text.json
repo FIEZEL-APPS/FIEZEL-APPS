@@ -1,0 +1,100 @@
+{
+  "version": "1.0.0",
+  "task": "Summarize Written Text",
+  "crossSkills": [
+    "Reading",
+    "Writing"
+  ],
+  "pool": "Pearson Recurring Real Exam Prediction Bank",
+  "items": [
+    {
+      "id": "swt-001",
+      "title": "The Environmental Impact of Food Waste",
+      "wordCount": 185,
+      "text": "Food waste is increasingly recognized as one of the most critical environmental and economic challenges of the twenty-first century. According to the United Nations Food and Agriculture Organization, approximately one-third of all food produced for human consumption is lost or wasted globally each year, amounting to nearly 1.3 billion tons. This massive inefficiency squanders vast quantities of agricultural land, fresh water, and energy used in cultivation and distribution. Furthermore, decomposing organic waste in municipal landfills generates significant amounts of methane gas, a potent greenhouse gas that exacerbates global warming. While industrialized nations tend to waste food predominantly at the consumer and retail levels due to cosmetic standards and over-purchasing, developing nations suffer agricultural losses primarily during post-harvest storage and transportation due to inadequate refrigeration infrastructure. Addressing this systemic challenge requires targeted investments in cold-chain logistics, stricter commercial food waste regulations, and broad educational campaigns that encourage responsible household consumption.",
+      "idealWordCount": "35-45 words",
+      "rules": "Exactly ONE sentence, ending with ONE period.",
+      "formulaScaffold": "[Independent Clause 1: Food waste squanders natural resources], and [Independent Clause 2: decomposing organic matter accelerates global warming], although [Dependent Clause 3: targeted investments and public education can mitigate this challenge].",
+      "modelSummary": "Food waste squanders immense natural resources and accelerates global climate change through landfill methane emissions, although targeted infrastructural investments and consumer education can effectively resolve this critical challenge.",
+      "modelWordCount": 33,
+      "deepFeedback": {
+        "grammarPurity": "Memakai rumus compound-complex: 1 klausa independen dihubungkan kata sambung 'and', lalu ditutup subordinasi 'although'. Hanya ada 1 huruf kapital di depan dan 1 tanda titik di akhir.",
+        "collocationsUsed": [
+          "natural resources",
+          "climate change",
+          "methane emissions",
+          "infrastructural investments",
+          "consumer education"
+        ]
+      }
+    },
+    {
+      "id": "swt-002",
+      "title": "Food Waste in the Global Hospitality Industry",
+      "wordCount": 198,
+      "text": "The hospitality and food service industry is currently confronting substantial economic and moral scrutiny regarding the volume of edible food discarded each day. Commercial kitchens routinely prepare surplus quantities to guarantee that buffet displays remain abundantly stocked, leading to tons of perfectly nutritious meals entering municipal landfills. Furthermore, improper inventory rotation, inaccurate guest forecasting, and rigid aesthetic presentation guidelines exacerbate kitchen waste. Environmental scientists emphasize that decomposing organic waste in landfills generates potent methane gas, accelerating planetary warming. In response, forward-thinking restaurants and hotel chains are implementing digital inventory tracking systems, automated portion control, and partnership networks with local food redistribution charities. These technological innovations not only curtail greenhouse emissions but also enhance operating profit margins by significantly lowering raw ingredient procurement costs.",
+      "idealWordCount": "35-45 kata",
+      "rules": "Tepat 1 kalimat, 5-75 kata, akhiri satu titik (.), gunakan konjungsi subordinatif.",
+      "formulaScaffold": "While commercial kitchens generate substantial organic waste due to overproduction and rigid presentation standards, innovative hospitality operators are adopting digital inventory tracking and charitable redistribution to mitigate greenhouse emissions and reduce procurement costs.",
+      "modelSummary": "While commercial hospitality kitchens generate extensive food waste due to overproduction and aesthetic standards, modern enterprises are deploying digital inventory tracking and charitable donation partnerships to curb greenhouse emissions and reduce procurement costs.",
+      "modelWordCount": 36,
+      "deepFeedback": {
+        "grammarFormula": "Rumus 1 Kalimat Majemuk: [Klausa Kontras: While + Subjek Masalah + Verb Masalah], [Klausa Utama: Subjek Solusi + Verb Solusi + Tujuan Manfaat].",
+        "collocationPaten": "curb greenhouse emissions (= menekan emisi gas rumah kaca), digital inventory tracking (= pelacakan inventaris digital)",
+        "linkingWords": "'While' di awal kalimat menghubungkan realitas limbah makanan dengan inisiatif teknologi hotel modern tanpa menciptakan comma splice.",
+        "translation": "Meskipun dapur perhotelan komersial menghasilkan limbah makanan dalam jumlah besar akibat kelebihan produksi dan standar estetika, perusahaan modern menerapkan sistem inventaris digital dan kemitraan amal untuk menekan emisi gas rumah kaca dan mengurangi biaya pengadaan."
+      }
+    },
+    {
+      "id": "swt-003",
+      "title": "Artificial Intelligence in Medical Diagnostic Imaging",
+      "wordCount": 205,
+      "text": "The integration of machine learning algorithms into clinical radiology has marked a transformative milestone in modern healthcare diagnostics. Deep learning networks trained on hundreds of thousands of labeled CT scans and MRI images can now identify microscopic pathological anomalies, such as malignant oncological tumors, with accuracy rates rivaling seasoned specialists. Moreover, automated scanning protocols enable overburdened hospital departments to triage critical trauma cases within minutes, substantially shortening the interval between patient arrival and surgical intervention. However, bioethicists and regulatory agencies caution against total diagnostic delegation, emphasizing that algorithmic bias, training dataset limitations, and the absence of clinician accountability present formidable risks. Consequently, leading medical researchers advocate for a collaborative paradigm wherein artificial intelligence serves as an augmented decision-support tool rather than an autonomous replacement for licensed human physicians.",
+      "idealWordCount": "35-45 kata",
+      "rules": "Tepat 1 kalimat, 5-75 kata, akhiri satu titik (.).",
+      "formulaScaffold": "Although machine learning algorithms significantly enhance diagnostic accuracy and emergency triage in radiology, medical experts insist that algorithmic decision-support must complement rather than replace licensed human clinicians due to ethical and accountability concerns.",
+      "modelSummary": "Although artificial intelligence algorithms greatly enhance diagnostic precision and emergency patient triage in clinical radiology, medical authorities insist that diagnostic software must augment rather than replace licensed physicians due to ethical and accountability considerations.",
+      "modelWordCount": 36,
+      "deepFeedback": {
+        "grammarFormula": "Rumus Subordinatif: [Although + Keunggulan AI], [Klausa Utama: Otoritas medis menegaskan komplementasi manusia].",
+        "collocationPaten": "clinical radiology (= radiologi klinis), decision-support tool (= alat bantu pendukung keputusan)",
+        "linkingWords": "'Although' menjembatani kemajuan teknologi imaging dengan batasan etika medis.",
+        "translation": "Meskipun algoritma kecerdasan buatan sangat meningkatkan akurasi diagnostik dan triage pasien darurat dalam radiologi klinis, otoritas medis menegaskan bahwa perangkat lunak harus mendampingi dan bukan menggantikan dokter berlisensi karena pertimbangan etika dan akuntabilitas."
+      }
+    },
+    {
+      "id": "swt-004",
+      "title": "Urban Green Infrastructure and Public Well-being",
+      "wordCount": 192,
+      "text": "As urban populations swell across industrialized metropolitan centers, municipal planners are encountering unprecedented challenges concerning public health and environmental resilience. Dense concrete architecture and asphalt roadways absorb solar radiation, creating oppressive urban heat island effects that elevate respiratory ailments and cardiovascular stress among residents. To counteract these escalating physiological vulnerabilities, progressive cities are investing heavily in urban green infrastructure, including living rooftop gardens, interconnected botanical corridors, and community canopy networks. Extensive sociological research confirms that regular immersion in natural vegetative environments reduces cortisol stress levels, enhances cognitive restoration, and fosters localized community cohesion. Furthermore, permeable parklands capture stormwater runoff, preventing metropolitan flooding while filtering atmospheric particulates, thereby demonstrating that accessible green sanctuaries are indispensable infrastructure rather than decorative civic amenities.",
+      "idealWordCount": "35-45 kata",
+      "rules": "Tepat 1 kalimat, 5-75 kata, akhiri satu titik (.).",
+      "formulaScaffold": "While dense metropolitan developments generate oppressive heat islands that endanger public health, investments in urban green infrastructure provide psychological restoration for citizens and mitigate urban flooding through permeable vegetation.",
+      "modelSummary": "While expanding urban concrete landscapes generate oppressive heat island effects that elevate health risks, municipal investments in green infrastructure actively reduce resident stress levels and enhance ecological resilience against catastrophic metropolitan flooding.",
+      "modelWordCount": 34,
+      "deepFeedback": {
+        "grammarFormula": "Pola Sintaksis Pearson: While [Kondisi Kota Menantang], [Infrastruktur Hijau + Manfaat Ganda].",
+        "collocationPaten": "urban heat island effects (= efek pulau panas perkotaan), ecological resilience (= ketahanan ekologis)",
+        "linkingWords": "'While' memberikan kontras tajam antara bahaya beton panas dan restorasi taman kota.",
+        "translation": "Sementara lanskap beton perkotaan menghasilkan efek pulau panas yang meningkatkan risiko kesehatan, investasi tata kota pada infrastruktur hijau secara aktif menurunkan tingkat stres warga dan meningkatkan ketahanan ekologis terhadap banjir kota."
+      }
+    },
+    {
+      "id": "swt-005",
+      "title": "Global Freshwater Scarcity and Desalination Technology",
+      "wordCount": 188,
+      "text": "Accelerating climate disruption, agricultural depletion, and exponential industrial consumption have precipitated acute freshwater deficits across arid global territories. In response to depleted subterranean aquifers, drought-stricken coastal nations have increasingly turned to seawater reverse osmosis desalination as an essential guarantee of urban water security. Modern reverse osmosis facilities utilize specialized semipermeable membranes to filter dissolved salts, delivering billions of liters of potable drinking water to dense populations daily. Nevertheless, conventional thermal and membrane desalination facilities consume colossal amounts of electrical energy, and the subsequent discharge of concentrated hypersaline brine into shallow littoral zones threatens sensitive coastal marine biodiversity. Consequently, ongoing technological research focuses on powering desalination plants with offshore renewable energy and developing closed-loop mineral extraction methods to neutralize the environmental hazards of brine disposal.",
+      "idealWordCount": "35-45 kata",
+      "rules": "Tepat 1 kalimat, 5-75 kata, akhiri satu titik (.).",
+      "formulaScaffold": "Although reverse osmosis desalination provides critical potable water security for arid coastal nations, engineers must resolve substantial energy consumption and marine brine discharge through renewable power and advanced mineral extraction.",
+      "modelSummary": "Although seawater reverse osmosis desalination provides vital potable water security for arid coastal nations, researchers must address intense energy demands and toxic hypersaline brine discharges through renewable power integration and mineral recovery technologies.",
+      "modelWordCount": 36,
+      "deepFeedback": {
+        "grammarFormula": "Struktur Kalimat Majemuk Pearson: Although [Solusi Desalinasi], [Tantangan Lingkungan + Solusi Terbarukan].",
+        "collocationPaten": "reverse osmosis desalination (= desalinasi osmosis terbalik), hypersaline brine discharges (= pembuangan air garam hipersalin)",
+        "linkingWords": "'Although' memastikan kalimat tetap satu kesatuan gramatika tanpa terpecah menjadi dua kalimat terpisah.",
+        "translation": "Meskipun desalinasi osmosis terbalik menyediakan jaminan air minum penting bagi negara pesisir gersang, para peneliti harus mengatasi kebutuhan energi yang tinggi dan pembuangan air garam pekat beracun melalui integrasi energi terbarukan dan teknologi pemulihan mineral."
+      }
+    }
+  ]
+}

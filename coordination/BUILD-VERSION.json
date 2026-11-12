@@ -1,7 +1,7 @@
 {
-  "version": "m025-787",
-  "claimedBy": "branch feat/voice-pte-master-tutor",
-  "claimedAt": "2026-11-11T17:19:21.207Z",
-  "reason": "feat(voice): implement landscape split workbench, proactive grammar tutor, and read aloud bank (m025-787)",
+  "version": "m025-788",
+  "claimedBy": "branch feat/pte-academic-prep-hub",
+  "claimedAt": "2026-11-12T12:19:06.248Z",
+  "reason": "feat(pte): [ALLOW-PROTECTED: ci|pwa] finalize 4-section PTE Academic prep hub and unified Dr. Julian voice workbench",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

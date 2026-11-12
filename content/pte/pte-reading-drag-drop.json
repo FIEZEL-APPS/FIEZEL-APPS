@@ -1,0 +1,627 @@
+{
+  "version": "1.0.0",
+  "task": "Reading: Fill in the Blanks (Drag and Drop)",
+  "crossSkills": [
+    "Reading"
+  ],
+  "pool": "Pearson PTE Academic Official Guide & Real Exam Prediction Bank",
+  "items": [
+    {
+      "id": "r-dd-001",
+      "title": "Ocean Acidification and Marine Ecosystems",
+      "domain": "Marine Biology & Environmental Science",
+      "text": "The absorption of atmospheric carbon dioxide by the world's oceans has triggered a chemical process known as ocean acidification. As marine waters become increasingly acidic, the availability of carbonate ions decreases, which poses a severe challenge for shell-forming organisms such as oysters, clams, and coral reefs. Without adequate minerals, these organisms struggle to [blank_1] their protective outer structures. Over time, the degradation of coral reefs can cause irreversible [blank_2] to biodiversity, leaving fish species without breeding habitats. Marine scientists are actively developing conservation models to [blank_3] vulnerable ecosystems from catastrophic collapse.",
+      "wordPool": [
+        "build",
+        "damage",
+        "protect",
+        "destructive",
+        "destroy",
+        "carefully"
+      ],
+      "correctAnswers": {
+        "blank_1": "build",
+        "blank_2": "damage",
+        "blank_3": "protect"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "build",
+          "grammarFormula": "Rumus Infinitive: 'struggle to' + Verb 1 murni (base form). Pilihan kata kerja dasar untuk membuat cangkang pelindung adalah 'build'.",
+          "collocation": "build protective structures (= membangun/membentuk struktur pelindung)",
+          "distractorTip": "'Destructive' adalah adjective, 'carefully' adalah adverb, dan 'destroy' berlawanan secara logika."
+        },
+        "blank_2": {
+          "correct": "damage",
+          "grammarFormula": "Rumus Frasa Benda: Setelah adjective 'irreversible', kita membutuhkan Noun (kata benda).",
+          "collocation": "cause irreversible damage to (= menyebabkan kerusakan yang tak terpulihkan pada)",
+          "distractorTip": "'Damage' berstatus uncountable noun dalam konteks ini. 'Destructive' salah karena bentuk kata sifat."
+        },
+        "blank_3": {
+          "correct": "protect",
+          "grammarFormula": "Rumus Infinitive of Purpose: 'models to' + Verb 1 murni. Pola preposisi: 'protect [something] from [danger]'.",
+          "collocation": "protect ecosystems from collapse (= melindungi ekosistem dari keruntuhan)",
+          "distractorTip": "'Destroy' berarti merusak (salah logika tujuan konservasi)."
+        }
+      }
+    },
+    {
+      "id": "r-dd-002",
+      "title": "Culinary Tourism and Regional Economics",
+      "domain": "Hospitality & Tourism Economics",
+      "text": "Culinary tourism has emerged as a major catalyst for regional economic revitalization in regional Western Australia. Travelers increasingly seek authentic dining experiences that showcase local produce, artisanal cheeses, and boutique wines. Local hospitality operators must therefore [blank_1] compelling narratives around their culinary heritage. By establishing direct partnerships with agricultural producers, restaurateurs can guarantee ingredient freshness while stimulating the rural economy. In addition, culinary festivals have proven highly [blank_2] in attracting interstate and international visitors during off-peak seasonal travel periods.",
+      "wordPool": [
+        "create",
+        "effective",
+        "effectively",
+        "creation",
+        "failure",
+        "ignore"
+      ],
+      "correctAnswers": {
+        "blank_1": "create",
+        "blank_2": "effective"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "create",
+          "grammarFormula": "Rumus Modal: Setelah modal verb 'must' (dan adverb 'therefore'), kata kerja WAJIB berbentuk Verb 1 murni.",
+          "collocation": "create compelling narratives (= menciptakan narasi yang memikat)",
+          "distractorTip": "'Creation' adalah kata benda (noun), 'effectively' adalah adverb, dan 'ignore' bertentangan dengan konteks."
+        },
+        "blank_2": {
+          "correct": "effective",
+          "grammarFormula": "Rumus Linking Verb: 'prove / have proven' + Adverb of Degree ('highly') + Kata Sifat (Adjective).",
+          "collocation": "prove highly effective in (+ V-ing) (= terbukti sangat efektif dalam)",
+          "distractorTip": "'Effectively' adalah adverb (tidak bisa berpasangan dengan linking verb 'have proven' untuk mendeskripsikan subjek). 'Failure' adalah kata benda."
+        }
+      }
+    },
+    {
+      "id": "r-dd-003",
+      "title": "Fermentation Techniques in Food Production",
+      "domain": "Commercial Cookery & Science",
+      "text": "Fermentation is an ancient biochemical process that transforms raw food ingredients into flavorful culinary delicacies. Microorganisms such as yeast and bacteria {blank_1} sugars into acids or alcohol under controlled conditions. This biochemical transformation not only extends the shelf life of perishable products, but also {blank_2} the nutritional bioavailability of key vitamins. Modern chefs increasingly employ artisanal fermentation to {blank_3} distinctive flavor profiles in gourmet dishes.",
+      "wordPool": [
+        "convert",
+        "enhances",
+        "create",
+        "destroy",
+        "carelessly",
+        "harmful"
+      ],
+      "correctAnswers": {
+        "blank_1": "convert",
+        "blank_2": "enhances",
+        "blank_3": "create"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "convert",
+          "grammarFormula": "Rumus Present Plural: Subjek 'Microorganisms' adalah jamak, memerlukan Verb 1 murni 'convert' yang berpasangan dengan preposisi 'into'.",
+          "collocation": "convert sugars into acids (= mengubah gula menjadi asam)",
+          "distractorTip": "'Destroy' salah makna biokimia; 'harmful' adalah adjective."
+        },
+        "blank_2": {
+          "correct": "enhances",
+          "grammarFormula": "Rumus Parallel Verb: Subjek 'This biochemical transformation' adalah tunggal, sejajar dengan 'extends', sehingga membutuhkan verb tunggal berakhiran -s ('enhances').",
+          "collocation": "enhances nutritional bioavailability (= meningkatkan ketersediaan hayati nutrisi)",
+          "distractorTip": "'Enhances' berbentuk singular; 'convert' dan 'create' bentuk dasar."
+        },
+        "blank_3": {
+          "correct": "create",
+          "grammarFormula": "Rumus Infinitive of Purpose: 'to' + Verb 1 murni untuk menyatakan tujuan pembuatan cita rasa baru.",
+          "collocation": "create distinctive flavor profiles (= menciptakan profil rasa yang khas)",
+          "distractorTip": "'Carelessly' adalah adverb yang merusak makna kuliner profesional."
+        }
+      }
+    },
+    {
+      "id": "r-dd-004",
+      "title": "Deforestation and Climate Feedback Loops",
+      "domain": "Environmental Science",
+      "text": "Tropical rainforests play a critical role in stabilizing global atmospheric systems by capturing enormous volumes of carbon. When vast areas of canopy are {blank_1} for agricultural expansion, this stored carbon is released directly into the atmosphere. The loss of foliage also disrupts localized precipitation patterns, leaving remaining woodlands increasingly {blank_2} to wildfires. Climatologists warn that these compounding pressures could {blank_3} irreversible ecological degradation across the Amazon basin.",
+      "wordPool": [
+        "cleared",
+        "vulnerable",
+        "trigger",
+        "protect",
+        "heavily",
+        "safe"
+      ],
+      "correctAnswers": {
+        "blank_1": "cleared",
+        "blank_2": "vulnerable",
+        "blank_3": "trigger"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "cleared",
+          "grammarFormula": "Rumus Passive Voice: 'are' + Verb 3 (Past Participle) yang menjelaskan penebangan/pembersihan hutan.",
+          "collocation": "cleared for agricultural expansion (= ditebang/dibersihkan demi perluasan pertanian)",
+          "distractorTip": "'Safe' adalah adjective; 'protect' berlawanan konteks deforestasi."
+        },
+        "blank_2": {
+          "correct": "vulnerable",
+          "grammarFormula": "Rumus Predicative Adjective: 'leaving remaining woodlands increasingly' + Adjective yang berpasangan dengan preposisi 'to'.",
+          "collocation": "vulnerable to wildfires (= rentan terhadap kebakaran hutan)",
+          "distractorTip": "'Heavily' adalah adverb; 'vulnerable' berpasangan resmi dengan 'to'."
+        },
+        "blank_3": {
+          "correct": "trigger",
+          "grammarFormula": "Rumus Modal Auxiliary: 'could' + Verb 1 murni (base form) bermakna memicu/mengakibatkan.",
+          "collocation": "trigger irreversible degradation (= memicu degradasi yang tak terpulihkan)",
+          "distractorTip": "'Trigger' adalah kata kerja penyebab (causative verb)."
+        }
+      }
+    },
+    {
+      "id": "r-dd-005",
+      "title": "The Evolution of Commercial Aviation",
+      "domain": "Aviation & Engineering",
+      "text": "The development of jet propulsion revolutionized passenger travel by dramatically reducing journey durations between continents. Modern aeronautical engineers prioritize fuel efficiency and noise reduction to {blank_1} international environmental standards. Advanced composite materials have enabled manufacturers to construct lighter airframes that withstand extreme atmospheric {blank_2}. Consequently, airline operators can maintain reliable schedules while significantly minimizing operating {blank_3}.",
+      "wordPool": [
+        "meet",
+        "pressures",
+        "costs",
+        "ignore",
+        "violently",
+        "heavy"
+      ],
+      "correctAnswers": {
+        "blank_1": "meet",
+        "blank_2": "pressures",
+        "blank_3": "costs"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "meet",
+          "grammarFormula": "Rumus Kolokasi Standar: 'to meet standards' = memenuhi standar regulasi resmi.",
+          "collocation": "meet environmental standards (= memenuhi standar lingkungan hidup)",
+          "distractorTip": "'Ignore' (mengabaikan) melanggar komitmen kepatuhan penerbangan."
+        },
+        "blank_2": {
+          "correct": "pressures",
+          "grammarFormula": "Rumus Frasa Benda: Setelah adjective 'atmospheric', dibutuhkan Noun yang cocok dengan kondisi fisika penerbangan tinggi.",
+          "collocation": "withstand extreme atmospheric pressures (= menahan tekanan atmosfer ekstrem)",
+          "distractorTip": "'Violently' adalah adverb; 'pressures' adalah kata benda fisik."
+        },
+        "blank_3": {
+          "correct": "costs",
+          "grammarFormula": "Rumus Kolokasi Finansial: 'minimizing operating costs' adalah frasa bisnis baku dalam manajemen maskapai.",
+          "collocation": "minimizing operating costs (= meminimalkan biaya operasional)",
+          "distractorTip": "'Costs' melengkapi frasa 'operating costs'."
+        }
+      }
+    },
+    {
+      "id": "r-dd-006",
+      "title": "Cognitive Benefits of Bilingualism",
+      "domain": "Psycholinguistics",
+      "text": "Research in cognitive neuroscience suggests that speaking multiple languages enhances mental flexibility and executive control. Bilingual individuals frequently demonstrate superior abilities to {blank_1} between conflicting tasks without confusion. Furthermore, active bilingualism appears to {blank_2} the onset of age-related cognitive decline by reinforcing neural connectivity. These intellectual advantages highlight the profound lifelong value of early language {blank_3}.",
+      "wordPool": [
+        "switch",
+        "delay",
+        "acquisition",
+        "forget",
+        "slowly",
+        "weak"
+      ],
+      "correctAnswers": {
+        "blank_1": "switch",
+        "blank_2": "delay",
+        "blank_3": "acquisition"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "switch",
+          "grammarFormula": "Rumus Infinitive: 'abilities to' + Verb 1 murni yang berpasangan dengan preposisi 'between'.",
+          "collocation": "switch between tasks (= berpindah antar tugas)",
+          "distractorTip": "'Forget' berlawanan makna kognitif unggul; 'slowly' adalah adverb."
+        },
+        "blank_2": {
+          "correct": "delay",
+          "grammarFormula": "Rumus Infinitive: 'appears to' + Verb 1 murni yang bermakna menunda/menghambat terjadinya penuaan kognitif.",
+          "collocation": "delay the onset of cognitive decline (= menunda awitan penurunan kognitif)",
+          "distractorTip": "'Weak' adalah adjective; 'delay' adalah verb aktif pelindung."
+        },
+        "blank_3": {
+          "correct": "acquisition",
+          "grammarFormula": "Rumus Frasa Nama: 'early language acquisition' adalah istilah linguistik baku untuk pemerolehan bahasa sejak dini.",
+          "collocation": "early language acquisition (= pemerolehan bahasa usia dini)",
+          "distractorTip": "'Acquisition' berposisi sebagai noun penutup frasa kata benda."
+        }
+      }
+    },
+    {
+      "id": "r-dd-007",
+      "title": "Kitchen Sanitation and Foodborne Illness Prevention",
+      "domain": "Commercial Cookery & Food Safety",
+      "text": "Commercial kitchens are dynamic environments where rigorous hygiene standards are strictly enforced to prevent outbreaks of foodborne illnesses. Chefs must maintain high levels of personal cleanliness and sanitize all food-contact surfaces [blank_1] throughout each shift. Raw poultry and seafood must be kept completely [blank_2] from ready-to-eat ingredients to eliminate the danger of cross-contamination. Furthermore, cooling warm dishes rapidly within two hours is vital to [blank_3] bacterial spores from germinating into active pathogens.",
+      "wordPool": [
+        "regularly",
+        "separate",
+        "prevent",
+        "prevention",
+        "separation",
+        "carelessly"
+      ],
+      "correctAnswers": {
+        "blank_1": "regularly",
+        "blank_2": "separate",
+        "blank_3": "prevent"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "regularly",
+          "grammarFormula": "Rumus Adverb of Frequency: Kata kerja 'sanitize surfaces' dimodifikasi oleh kata keterangan (adverb -ly) yang menunjukkan keteraturan waktu.",
+          "collocation": "sanitize regularly (= membersihkan secara teratur)",
+          "distractorTip": "'Carelessly' berlawanan makna (sembrono), 'regular' adalah kata sifat (adjective)."
+        },
+        "blank_2": {
+          "correct": "separate",
+          "grammarFormula": "Rumus Adjective Complement: Pola 'kept completely [adjective] from'. Kata sifat pemisah adalah 'separate'.",
+          "collocation": "kept separate from (= dijaga terpisah dari)",
+          "distractorTip": "'Separation' adalah kata benda (noun), sedangkan posisi setelah 'kept + adverb' membutuhkan adjective."
+        },
+        "blank_3": {
+          "correct": "prevent",
+          "grammarFormula": "Rumus Infinitive: 'vital to' + Verb 1 murni (base form). Kata kerja pencegahan adalah 'prevent'.",
+          "collocation": "prevent bacterial spores from germinating (= mencegah spora bakteri berkecambah)",
+          "distractorTip": "'Prevention' adalah noun, bukan verb dasar."
+        }
+      }
+    },
+    {
+      "id": "r-dd-008",
+      "title": "Hospitality Guest Services and Front Office Excellence",
+      "domain": "Hospitality Management",
+      "text": "In the contemporary luxury hotel industry, providing personalized guest experiences is the primary catalyst for fostering customer [blank_1]. Front desk associates serve as the initial point of contact, requiring active listening skills to anticipate traveler needs [blank_2]. When service disruptions or scheduling errors occur, managers must respond promptly with empathetic communication and restitution to [blank_3] customer satisfaction.",
+      "wordPool": [
+        "loyalty",
+        "effectively",
+        "restore",
+        "restoration",
+        "effective",
+        "disloyalty"
+      ],
+      "correctAnswers": {
+        "blank_1": "loyalty",
+        "blank_2": "effectively",
+        "blank_3": "restore"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "loyalty",
+          "grammarFormula": "Rumus Noun Phrase: Setelah kata benda atribut 'customer', kita membutuhkan kata benda utama (head noun) 'loyalty'.",
+          "collocation": "foster customer loyalty (= menumbuhkan loyalitas pelanggan)",
+          "distractorTip": "'Disloyalty' berlawanan arti, 'loyal' adalah adjective."
+        },
+        "blank_2": {
+          "correct": "effectively",
+          "grammarFormula": "Rumus Adverb of Manner: Kata kerja 'anticipate needs' dimodifikasi oleh keterangan cara (adverb -ly).",
+          "collocation": "anticipate needs effectively (= mengantisipasi kebutuhan secara efektif)",
+          "distractorTip": "'Effective' adalah kata sifat, tidak bisa memodifikasi kata kerja transitif."
+        },
+        "blank_3": {
+          "correct": "restore",
+          "grammarFormula": "Rumus Infinitive of Purpose: 'to' + Verb 1 murni. Kata kerja pemulihan kepuasan adalah 'restore'.",
+          "collocation": "restore customer satisfaction (= memulihkan kepuasan pelanggan)",
+          "distractorTip": "'Restoration' adalah noun."
+        }
+      }
+    },
+    {
+      "id": "r-dd-009",
+      "title": "Culinary Emulsification and Sauce Chemistry",
+      "domain": "Culinary Science & Classic Cookery",
+      "text": "Sauce making in classical culinary arts relies extensively on physical chemistry, specifically the science of emulsification. In oil-in-water emulsions such as mayonnaise or hollandaise, two immiscible liquids are forced into a stable [blank_1] through continuous mechanical shearing. Egg yolks contain lecithin, a natural phospholipid that acts as an emulsifying agent to [blank_2] the surface tension between fat droplets and vinegar. If oil is incorporated too rapidly, the delicate emulsion will [blank_3] and separate into greasy layers.",
+      "wordPool": [
+        "mixture",
+        "reduce",
+        "split",
+        "reduction",
+        "mixed",
+        "splitting"
+      ],
+      "correctAnswers": {
+        "blank_1": "mixture",
+        "blank_2": "reduce",
+        "blank_3": "split"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "mixture",
+          "grammarFormula": "Rumus Noun Phrase: Setelah adjective 'stable', dibutuhkan kata benda (noun) 'mixture'.",
+          "collocation": "stable mixture (= campuran yang stabil)",
+          "distractorTip": "'Mixed' adalah adjective/verb, bukan noun."
+        },
+        "blank_2": {
+          "correct": "reduce",
+          "grammarFormula": "Rumus Infinitive of Purpose: 'to' + Verb 1 murni (reduce).",
+          "collocation": "reduce surface tension (= mengurangi tegangan permukaan)",
+          "distractorTip": "'Reduction' adalah kata benda."
+        },
+        "blank_3": {
+          "correct": "split",
+          "grammarFormula": "Rumus Modal Future: Setelah modal auxiliary 'will', kata kerja WAJIB berbentuk VERB 1 DASAR.",
+          "collocation": "emulsion will split (= emulsi akan pecah/rusak)",
+          "distractorTip": "'Splitting' adalah participle, membutuhkan to be."
+        }
+      }
+    },
+    {
+      "id": "r-dd-010",
+      "title": "Solar Photovoltaic Efficiency and Grid Modernization",
+      "domain": "Renewable Energy & Engineering",
+      "text": "Advances in photovoltaic cell engineering have led to substantial improvements in the conversion [blank_1] of sunlight into electrical energy. Perovskite-silicon tandem cells demonstrate record performance by absorbing broader wavelengths of the solar spectrum. However, national electricity networks must incorporate large-scale battery storage to [blank_2] consistent supply during overcast days. Engineers are currently designing intelligent transmission systems to [blank_3] clean energy across rural and metropolitan regions.",
+      "wordPool": [
+        "efficiency",
+        "maintain",
+        "distribute",
+        "efficient",
+        "maintenance",
+        "distribution"
+      ],
+      "correctAnswers": {
+        "blank_1": "efficiency",
+        "blank_2": "maintain",
+        "blank_3": "distribute"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "efficiency",
+          "grammarFormula": "Rumus Compound Noun: Pasangan istilah teknik untuk daya guna pengubahan energi adalah 'conversion efficiency'.",
+          "collocation": "conversion efficiency (= efisiensi konversi)",
+          "distractorTip": "'Efficient' adalah adjective, membutuhkan noun sebagai objek preposisi 'in'."
+        },
+        "blank_2": {
+          "correct": "maintain",
+          "grammarFormula": "Rumus Infinitive: 'to' + Verb 1 (maintain).",
+          "collocation": "maintain consistent supply (= menjaga pasokan yang konsisten)",
+          "distractorTip": "'Maintenance' adalah noun."
+        },
+        "blank_3": {
+          "correct": "distribute",
+          "grammarFormula": "Rumus Infinitive: 'to' + Verb 1 (distribute).",
+          "collocation": "distribute clean energy (= mendistribusikan energi bersih)",
+          "distractorTip": "'Distribution' adalah noun."
+        }
+      }
+    },
+    {
+      "id": "r-dd-011",
+      "title": "Agricultural Water Management in Arid Australia",
+      "domain": "Environmental Agriculture & Irrigation",
+      "text": "In the arid interior of Western Australia, agricultural producers must manage limited freshwater resources with extreme [blank_1]. Traditional overhead sprayers have been largely supplanted by automated subsurface drip irrigation systems that deliver water directly to crop roots. This technique minimizes evaporative [blank_2] and reduces soil salinization. By utilizing soil moisture sensors, growers can calculate exact daily irrigation quotas to [blank_3] crop yields while conserving groundwater reserves.",
+      "wordPool": [
+        "precision",
+        "losses",
+        "maximize",
+        "precise",
+        "losing",
+        "maximum"
+      ],
+      "correctAnswers": {
+        "blank_1": "precision",
+        "blank_2": "losses",
+        "blank_3": "maximize"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "precision",
+          "grammarFormula": "Rumus Prepositional Object: Setelah preposisi 'with', kita membutuhkan KATA BENDA (noun) 'precision'.",
+          "collocation": "with extreme precision (= dengan ketepatan/presisi ekstrem)",
+          "distractorTip": "'Precise' adalah kata sifat (adjective)."
+        },
+        "blank_2": {
+          "correct": "losses",
+          "grammarFormula": "Rumus Noun Phrase: Setelah kata sifat 'evaporative', kita membutuhkan kata benda jamak (losses).",
+          "collocation": "evaporative losses (= kehilangan air akibat penguapan)",
+          "distractorTip": "'Losing' adalah participle/gerund."
+        },
+        "blank_3": {
+          "correct": "maximize",
+          "grammarFormula": "Rumus Infinitive: 'to' + Verb 1 (maximize).",
+          "collocation": "maximize crop yields (= memaksimalkan hasil panen)",
+          "distractorTip": "'Maximum' adalah adjective/noun."
+        }
+      }
+    },
+    {
+      "id": "r-dd-012",
+      "title": "Meat Tenderness and Post-Mortem Muscle Proteolysis",
+      "domain": "Meat Science & Culinary Preparation",
+      "text": "The mechanical tenderness of meat is governed by the structural integrity of myofibrillar proteins and connective collagen tissues. Following slaughter, muscle tissues enter rigor mortis as cellular ATP stores become depleted. During subsequent aging, endogenous proteolytic enzymes, primarily calpains and cathepsins, gradually [blank_1] muscle fibers. Chefs utilize wet-aging vacuum packaging to allow this enzymatic tenderization to proceed [blank_2] without surface dehydration. Cooking meat at low, gentle temperatures further prevents muscle fibers from tightening [blank_3].",
+      "wordPool": [
+        "degrade",
+        "safely",
+        "excessively",
+        "degradation",
+        "safe",
+        "excessive"
+      ],
+      "correctAnswers": {
+        "blank_1": "degrade",
+        "blank_2": "safely",
+        "blank_3": "excessively"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "degrade",
+          "grammarFormula": "Rumus Subject-Verb Agreement: Subjek jamak 'proteolytic enzymes' membutuhkan VERB 1 PLURAL 'degrade'.",
+          "collocation": "degrade muscle fibers (= mengurai/melunakkan serat otot)",
+          "distractorTip": "'Degradation' adalah kata benda."
+        },
+        "blank_2": {
+          "correct": "safely",
+          "grammarFormula": "Rumus Adverb of Manner: Kata kerja 'proceed' diterangkan oleh kata keterangan berakhiran -ly 'safely'.",
+          "collocation": "proceed safely (= berlangsung dengan aman)",
+          "distractorTip": "'Safe' adalah kata sifat."
+        },
+        "blank_3": {
+          "correct": "excessively",
+          "grammarFormula": "Rumus Adverb of Degree: Menerangkan kata kerja 'tightening' dengan adverb 'excessively'.",
+          "collocation": "tighten excessively (= mengencang/mengeras secara berlebihan)",
+          "distractorTip": "'Excessive' adalah kata sifat."
+        }
+      }
+    },
+    {
+      "id": "r-dd-013",
+      "title": "Food Waste Reduction in Commercial Hospitality",
+      "domain": "Hospitality Sustainability & Operations",
+      "text": "Food waste in the hospitality sector carries immense ecological and fiscal implications. Buffets and high-volume catering kitchens frequently generate excess prepared food due to inaccurate patron [blank_1]. To mitigate this systemic waste, forward-thinking restaurants perform comprehensive culinary audits and repurpose trimmings into stocks and sauces. Furthermore, establishing partnerships with community food rescue charities enables hotels to [blank_2] unserved edible meals to populations in need, thereby reinforcing their corporate social [blank_3].",
+      "wordPool": [
+        "forecasting",
+        "donate",
+        "responsibility",
+        "forecast",
+        "donation",
+        "responsible"
+      ],
+      "correctAnswers": {
+        "blank_1": "forecasting",
+        "blank_2": "donate",
+        "blank_3": "responsibility"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "forecasting",
+          "grammarFormula": "Rumus Noun Phrase: Setelah kata sifat 'inaccurate patron', kita membutuhkan noun/gerund 'forecasting'.",
+          "collocation": "patron forecasting (= peramalan/prediksi jumlah tamu)",
+          "distractorTip": "'Forecast' adalah bentuk kerja dasar/singular present."
+        },
+        "blank_2": {
+          "correct": "donate",
+          "grammarFormula": "Rumus Infinitive: 'enables hotels to' + Verb 1 murni (donate).",
+          "collocation": "donate unserved meals (= menyumbangkan makanan yang belum disajikan)",
+          "distractorTip": "'Donation' adalah kata benda."
+        },
+        "blank_3": {
+          "correct": "responsibility",
+          "grammarFormula": "Rumus Collocation Paten: 'corporate social responsibility' (CSR) adalah istilah bisnis paten dunia.",
+          "collocation": "corporate social responsibility (= tanggung jawab sosial perusahaan)",
+          "distractorTip": "'Responsible' adalah kata sifat."
+        }
+      }
+    },
+    {
+      "id": "r-dd-014",
+      "title": "The Physics of Sourdough Bread Aeration",
+      "domain": "Baking Science & Pastry Arts",
+      "text": "The open crumb structure of artisan sourdough bread is a direct manifestation of gas retention within a viscoelastic gluten matrix. As yeasts ferment sugars, carbon dioxide gas bubbles expand during the initial stages of baking in a phenomenon called oven [blank_1]. Bakers must develop gluten strength through controlled hydration and folding techniques to ensure the dough walls are [blank_2] enough to entrap expanding gas without rupturing prematurely. A well-aerated loaf exhibits a light interior crumb and an exceptionally crisp outer [blank_3].",
+      "wordPool": [
+        "spring",
+        "elastic",
+        "crust",
+        "springing",
+        "elasticity",
+        "crusty"
+      ],
+      "correctAnswers": {
+        "blank_1": "spring",
+        "blank_2": "elastic",
+        "blank_3": "crust"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "spring",
+          "grammarFormula": "Rumus Baking Terminology: Istilah baku lonjakan mengembangnya roti saat pertama masuk oven adalah 'oven spring'.",
+          "collocation": "oven spring (= lonjakan pemuaian adonan di oven)",
+          "distractorTip": "'Springing' adalah bentuk participle."
+        },
+        "blank_2": {
+          "correct": "elastic",
+          "grammarFormula": "Rumus Adjective + Enough: Pola '[adjective] + enough'. Kata sifat elastis adalah 'elastic'.",
+          "collocation": "elastic enough to entrap gas (= cukup elastis untuk memerangkap gas)",
+          "distractorTip": "'Elasticity' adalah kata benda (noun)."
+        },
+        "blank_3": {
+          "correct": "crust",
+          "grammarFormula": "Rumus Noun Phrase: Setelah kata sifat 'crisp outer', kita membutuhkan kata benda 'crust'.",
+          "collocation": "crisp outer crust (= kerak luar yang renyah)",
+          "distractorTip": "'Crusty' adalah kata sifat."
+        }
+      }
+    },
+    {
+      "id": "r-dd-015",
+      "title": "Sous-Vide Cooking and Precision Temperature Control",
+      "domain": "Modern Culinary Techniques & Thermal Physics",
+      "text": "Sous-vide cooking involves vacuum-sealing raw ingredients in food-grade pouches and submerging them into an agitated water bath maintained at a constant [blank_1]. By eliminating moisture loss through evaporation, this technique preserves delicate cellular moisture and volatile aromatics. Furthermore, uniform thermal conduction ensures that proteins reach pasteurization temperatures [blank_2] without overcooking outer layers. Once cooked, chefs often give meats a brief sear in a smoking hot pan to develop savory caramelized crusts via the Maillard [blank_3].",
+      "wordPool": [
+        "temperature",
+        "evenly",
+        "reaction",
+        "hot",
+        "eventual",
+        "react"
+      ],
+      "correctAnswers": {
+        "blank_1": "temperature",
+        "blank_2": "evenly",
+        "blank_3": "reaction"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "temperature",
+          "grammarFormula": "Rumus Noun Phrase: Setelah adjective 'constant', kita membutuhkan kata benda 'temperature'.",
+          "collocation": "constant temperature (= suhu konstan)",
+          "distractorTip": "'Hot' adalah kata sifat."
+        },
+        "blank_2": {
+          "correct": "evenly",
+          "grammarFormula": "Rumus Adverb of Manner: Menerangkan proses pemanasan 'reach temperatures' dengan keterangan rata/merata 'evenly'.",
+          "collocation": "heat evenly (= memanas secara merata)",
+          "distractorTip": "'Eventual' adalah kata sifat."
+        },
+        "blank_3": {
+          "correct": "reaction",
+          "grammarFormula": "Rumus Kimia Kuliner Paten: Reaksi pencokelatan aroma pada masakan bernama 'Maillard reaction'.",
+          "collocation": "Maillard reaction (= reaksi Maillard)",
+          "distractorTip": "'React' adalah kata kerja."
+        }
+      }
+    },
+    {
+      "id": "r-dd-016",
+      "title": "Australian Tourism Economics and Regional Infrastructure",
+      "domain": "Regional Development & Tourism Economics",
+      "text": "Regional tourism outside metropolitan capitals serves as a crucial economic lifeline for rural Australian towns. To attract international travelers, local governments must invest in transportation [blank_1] such as modern regional airports and scenic highway corridors. Enhanced accessibility encourages visitors to disperse throughout rural wine regions and national parks, generating direct revenues for family-owned restaurants and boutique hotels. Effective marketing campaigns highlight unique cultural heritage to [blank_2] visitor interest throughout all seasons. As a consequence, regional communities enjoy sustainable employment [blank_3].",
+      "wordPool": [
+        "infrastructure",
+        "stimulate",
+        "opportunities",
+        "structural",
+        "stimulation",
+        "opportunistic"
+      ],
+      "correctAnswers": {
+        "blank_1": "infrastructure",
+        "blank_2": "stimulate",
+        "blank_3": "opportunities"
+      },
+      "deepFeedback": {
+        "blank_1": {
+          "correct": "infrastructure",
+          "grammarFormula": "Rumus Compound Noun: 'transportation infrastructure' adalah frasa benda ekonomi standar.",
+          "collocation": "transportation infrastructure (= infrastruktur transportasi)",
+          "distractorTip": "'Structural' adalah kata sifat."
+        },
+        "blank_2": {
+          "correct": "stimulate",
+          "grammarFormula": "Rumus Infinitive: 'to' + Verb 1 murni (stimulate).",
+          "collocation": "stimulate visitor interest (= merangsang/meningkatkan minat pengunjung)",
+          "distractorTip": "'Stimulation' adalah kata benda."
+        },
+        "blank_3": {
+          "correct": "opportunities",
+          "grammarFormula": "Rumus Noun Phrase: Setelah 'employment', kita membutuhkan kata benda jamak 'opportunities'.",
+          "collocation": "employment opportunities (= peluang/lapangan pekerjaan)",
+          "distractorTip": "'Opportunistic' adalah kata sifat."
+        }
+      }
+    }
+  ]
+}
