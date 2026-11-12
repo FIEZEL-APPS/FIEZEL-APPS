@@ -15,6 +15,14 @@ import {
   getPteQuestionsByCategory,
   getRandomPteQuestion,
 } from '../data/pteDescribeImageBank';
+import {
+  PTE_READ_ALOUD_BANK,
+  PteReadAloudQuestion,
+  PteRaCategory,
+  getPteRaQuestionById,
+  getPteRaQuestionsByCategory,
+  getRandomPteRaQuestion,
+} from '../data/pteReadAloudBank';
 
 export type WorkbenchContextMode =
   | 'confusing_pair'   // Timbangan Konseptual / Dual Contrast Stream
@@ -84,6 +92,12 @@ export interface PteReadAloudData {
   chunkedSegments: Array<{ text: string; isChunkBreak?: boolean }>;
   targetWpm: number;
   phoneticFocus: Array<{ word: string; ipa: string; tip: string }>;
+  questionId?: string;
+  category?: string;
+  examFrequency?: string;
+  sourceOrigin?: string;
+  examinerTips?: string;
+  oneSentenceHack?: string;
 }
 
 export interface PteScorecardData {
@@ -546,41 +560,34 @@ export function deriveContextualPedagogicalBoard(
     action?.focusType === 'pte_read_aloud' ||
     /read.*aloud|pte.*ra|chunking|baca.*teks|baca.*nyaring|pacing/i.test(lowerQ)
   ) {
+    const isCookery = /cook|culinary|kitchen|food|hygiene|sauce|haccp|hospit/i.test(lowerQ);
+    const isPerth = /perth|wa|australia|swan|rottnest|quokka|solar|beach/i.test(lowerQ);
+    const prefCat: PteRaCategory | undefined = isCookery
+      ? 'cookery_hospitality'
+      : isPerth
+      ? 'australia_perth'
+      : undefined;
+
+    const targetRa =
+      PTE_READ_ALOUD_BANK.find(
+        (q) =>
+          lowerQ.includes(q.title.toLowerCase()) ||
+          q.title.toLowerCase().includes(lowerQ) ||
+          q.id === action?.topicTitle
+      ) || getRandomPteRaQuestion(prefCat);
+
     const readAloudData: PteReadAloudData = {
-      title: action?.topicTitle || 'Academic Passage: Grid Energy Stabilization',
-      passageText:
-        'The proliferation of renewable energy technologies has fundamentally transformed modern power grids. Recent empirical studies demonstrate that solar and wind fluctuations can be effectively stabilized through distributed battery storage systems.',
-      chunkedSegments: [
-        { text: 'The proliferation of renewable energy technologies' },
-        { text: 'has fundamentally transformed modern power grids.' },
-        { text: 'Recent empirical studies demonstrate' },
-        { text: 'that solar and wind fluctuations' },
-        { text: 'can be effectively stabilized' },
-        { text: 'through distributed battery storage systems.' },
-      ],
-      targetWpm: 130,
-      phoneticFocus: [
-        {
-          word: 'proliferation',
-          ipa: '/prəˌlɪf.əˈreɪ.ʃən/',
-          tip: 'Tekan suku kata ke-3 (RAY). Jangan tergesa di suku kata awal.',
-        },
-        {
-          word: 'fluctuations',
-          ipa: '/ˌflʌk.tʃuˈeɪ.ʃənz/',
-          tip: 'Artikulasi bunyi /ʃ/ di akhir harus bulat dan jelas.',
-        },
-        {
-          word: 'empirical',
-          ipa: '/ɪmˈpɪr.ɪ.kəl/',
-          tip: 'Tekan suku kata ke-2 (PEER). Huruf E dibaca /ɪ/.',
-        },
-        {
-          word: 'stabilized',
-          ipa: '/ˈsteɪ.bə.laɪzd/',
-          tip: 'Diftong /eɪ/ panjang, akhiran -ed dibaca /zd/.',
-        },
-      ],
+      title: targetRa.title,
+      passageText: targetRa.passageText,
+      chunkedSegments: targetRa.chunkedSegments,
+      targetWpm: targetRa.targetWpm,
+      phoneticFocus: targetRa.phoneticFocus,
+      questionId: targetRa.id,
+      category: targetRa.category,
+      examFrequency: targetRa.examFrequency,
+      sourceOrigin: targetRa.sourceOrigin,
+      examinerTips: targetRa.examinerTips,
+      oneSentenceHack: targetRa.oneSentenceHack,
     };
 
     return {
@@ -588,6 +595,7 @@ export function deriveContextualPedagogicalBoard(
       topicTitle: readAloudData.title,
       patternFormula: 'Read Aloud Technique: Syntax Chunking (//) + 130 WPM Balanced Pacing',
       coachExplanation:
+        targetRa.examinerTips ||
         'Pearson tidak menilai kecepatan balap, melainkan KONSISTENSI IRAMA. Tarik nafas hanya pada tanda jeda //, jangan berhenti di tengah kata frasa!',
       pteReadAloudData: readAloudData,
       quiz: {
@@ -961,7 +969,13 @@ export const PteDescribeImageCanvas: React.FC<{
         </div>
       </div>
 
-      {/* SVG / DATA VISUALIZER CONTAINER (6 CATEGORIES) */}
+      {/* 2-COLUMN LANDSCAPE SPLIT SCREEN WORKBENCH (DIAGRAM ON LEFT, FORMULA & HACKS ON RIGHT) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+        {/* ==========================================
+            KOLOM KIRI: GRAFIK VISUAL, TIMERS, & CHECKLIST KATA KUNCI
+           ========================================== */}
+        <div className="flex flex-col gap-3">
+          {/* SVG / DATA VISUALIZER CONTAINER (6 CATEGORIES) */}
       <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs flex flex-col items-center justify-center min-h-[175px]">
         {/* 1. BAR CHARTS */}
         {activeQuestion.category === 'bar' && (
@@ -1240,145 +1254,151 @@ export const PteDescribeImageCanvas: React.FC<{
         )}
       </div>
 
-      {/* TIMERS: 25s PREP & 40s SPEAK + PEARSON 3-SECOND RULE */}
-      <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2.5">
-        <div className="grid grid-cols-2 gap-2">
-          {/* Prep Timer (25s) */}
-          <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
-            <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Persiapan</span>
-            <div className="text-lg font-black text-[#231A12] my-0.5">
-              {prepSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+          {/* TIMERS: 25s PREP & 40s SPEAK + GREEN ZONE SWEET SPOT BANNER */}
+          <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2.5">
+            <div className="grid grid-cols-2 gap-2">
+              {/* Prep Timer (25s) */}
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
+                <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Persiapan</span>
+                <div className="text-lg font-black text-[#231A12] my-0.5">
+                  {prepSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playFiezelSfx('tap');
+                    if (prepSeconds === 0) setPrepSeconds(25);
+                    setIsPrepRunning(!isPrepRunning);
+                  }}
+                  className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#231A12] text-white text-[10px] font-bold cursor-pointer active:scale-95"
+                >
+                  {isPrepRunning ? 'Pause' : prepSeconds === 0 ? 'Reset' : 'Mulai (25d)'}
+                </button>
+              </div>
+
+              {/* Speaking Timer (40s) */}
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
+                <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Rekam Bicara</span>
+                <div className={`text-lg font-black my-0.5 ${speakSeconds <= 10 ? 'text-[#DC2626]' : 'text-[#231A12]'}`}>
+                  {speakSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playFiezelSfx('tap');
+                    if (speakSeconds === 0) setSpeakSeconds(40);
+                    setIsSpeakRunning(!isSpeakRunning);
+                  }}
+                  className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#B45309] text-white text-[10px] font-bold cursor-pointer active:scale-95"
+                >
+                  {isSpeakRunning ? 'Stop' : speakSeconds === 0 ? 'Reset' : 'Mulai Bicara (40d)'}
+                </button>
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                playFiezelSfx('tap');
-                if (prepSeconds === 0) setPrepSeconds(25);
-                setIsPrepRunning(!isPrepRunning);
-              }}
-              className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#231A12] text-white text-[10px] font-bold cursor-pointer active:scale-95"
-            >
-              {isPrepRunning ? 'Pause' : prepSeconds === 0 ? 'Reset' : 'Mulai (25d)'}
-            </button>
-          </div>
 
-          {/* Speaking Timer (40s) */}
-          <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
-            <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Rekam Bicara</span>
-            <div className={`text-lg font-black my-0.5 ${speakSeconds <= 10 ? 'text-[#DC2626]' : 'text-[#231A12]'}`}>
-              {speakSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+            {/* Optimal Green Zone Indicator (Nakul Masterclass 25-28s Rule) */}
+            <div className="p-2 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm">⚡</span>
+                <span className="text-[10.5px] font-bold text-[#065F46]">
+                  Zona Berhenti Ideal: <strong className="font-black text-[#047857]">25–28 Detik!</strong>
+                </span>
+              </div>
+              <span className="px-2 py-0.5 rounded-md bg-[#059669] text-white text-[9px] font-black uppercase">
+                Oral Fluency 90
+              </span>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                playFiezelSfx('tap');
-                if (speakSeconds === 0) setSpeakSeconds(40);
-                setIsSpeakRunning(!isSpeakRunning);
-              }}
-              className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#B45309] text-white text-[10px] font-bold cursor-pointer active:scale-95"
-            >
-              {isSpeakRunning ? 'Stop' : speakSeconds === 0 ? 'Reset' : 'Mulai Bicara (40d)'}
-            </button>
+
+            {/* Pearson 3-Second Rule Warning Banner */}
+            <div className="p-2 rounded-xl bg-[#FEF2F2] border border-[#FCA5A5] flex items-start gap-1.5">
+              <span className="text-base select-none shrink-0 leading-none mt-0.5">⚠️</span>
+              <p className="text-[10px] text-[#991B1B] font-semibold leading-snug">
+                <span className="font-bold">Aturan 3 Detik Pearson:</span> Jangan hening &gt;3 detik! Mikrofon akan otomatis tertutup dan skor Fluency dinilai 0.
+              </p>
+            </div>
+          </div>
+
+          {/* CHECKLIST KATA KUNCI TARGET */}
+          <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block">
+                Checklist Kata Kunci (Ketuk saat diucapkan):
+              </span>
+              <span className="text-[10px] font-bold text-[#B45309]">
+                {Object.values(checkedKeywords).filter(Boolean).length} / {activeQuestion.keywords.length} terucap
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {activeQuestion.keywords.map((kw, idx) => {
+                const isChecked = Boolean(checkedKeywords[kw]);
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleToggleKeyword(kw)}
+                    className={`px-2.5 py-1 rounded-xl border text-[11px] font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+                      isChecked
+                        ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
+                        : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#B45309]'
+                    }`}
+                  >
+                    <span>{isChecked ? '✓' : '○'}</span>
+                    <span>{kw}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Pearson 3-Second Rule Warning Banner */}
-        <div className="p-2 rounded-xl bg-[#FEF2F2] border border-[#FCA5A5] flex items-start gap-2">
-          <span className="text-base select-none shrink-0 leading-none mt-0.5">⚠️</span>
-          <p className="text-[10.5px] text-[#991B1B] font-semibold leading-snug">
-            <span className="font-bold">Aturan 3 Detik Pearson:</span> Jangan hening lebih dari 3 detik setelah nada beep! Mikrofon akan otomatis tertutup dan skor Fluency dinilai 0.
-          </p>
-        </div>
-      </div>
-
-      {/* CHECKLIST KATA KUNCI TARGET */}
-      <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block">
-            Checklist Kata Kunci (Ketuk saat diucapkan):
-          </span>
-          <span className="text-[10px] font-bold text-[#B45309]">
-            {Object.values(checkedKeywords).filter(Boolean).length} / {activeQuestion.keywords.length} terucap
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {activeQuestion.keywords.map((kw, idx) => {
-            const isChecked = Boolean(checkedKeywords[kw]);
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleToggleKeyword(kw)}
-                className={`px-2.5 py-1 rounded-xl border text-[11px] font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
-                  isChecked
-                    ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
-                    : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#B45309]'
-                }`}
-              >
-                <span>{isChecked ? '✓' : '○'}</span>
-                <span>{kw}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* DR. JULIAN'S EXAMINER SECRET TIP */}
-      {activeQuestion.examinerTips && (
-        <div className="p-2.5 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] flex items-start gap-2">
-          <span className="text-base select-none shrink-0 leading-none mt-0.5">💡</span>
-          <div className="space-y-0.5">
-            <span className="text-[10px] font-black text-[#1E40AF] uppercase tracking-wider block">
-              Rahasia Penguji (Dr. Julian):
-            </span>
-            <p className="text-[11px] text-[#1E3A8A] font-medium leading-relaxed">
-              {activeQuestion.examinerTips}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* COLLAPSIBLE ACCORDION: RUMUS UNIVERSAL FIEZEL 5-TAHAP */}
-      <div className="rounded-2xl border border-[#EADBCE] overflow-hidden bg-[#FFFDF8]">
-        <button
-          type="button"
-          onClick={() => {
-            playFiezelSfx('tap');
-            setIsTemplateOpen(!isTemplateOpen);
-          }}
-          className="w-full px-3.5 py-2.5 bg-[#FAF6EE] flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-[#F3EBE0]"
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-xs">📐</span>
-            <span className="text-xs font-black text-[#231A12]">
-              Rumus Universal FIEZEL (5-Tahap Anti-Pause)
-            </span>
-          </div>
-          <span className="text-xs font-bold text-[#8C7760]">{isTemplateOpen ? '▲ Tutup' : '▼ Intip Rumus'}</span>
-        </button>
-
-        {isTemplateOpen && (
-          <div className="p-3.5 space-y-2 border-t border-[#EADBCE] bg-[#FFFFFF]">
-            <div className="space-y-1.5 text-[11px] leading-relaxed">
-              <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
-                <span className="font-extrabold text-[#B45309] block">1. Introduction (Pembuka):</span>
-                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.intro}</span>
+        {/* ==========================================
+            KOLOM KANAN: TEMPLATE 5-BARIS NAKUL & TRIK HACKS DR. JULIAN
+           ========================================== */}
+        <div className="flex flex-col gap-3">
+          {/* RUMUS UNIVERSAL NAKUL 5-BARIS (SELALU TERBUKA & SIAP BACA TANPA SCROLL!) */}
+          <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] shadow-2xs space-y-2.5">
+            <div className="flex items-center justify-between pb-1 border-b border-[#F0E6D9]">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm">📐</span>
+                <span className="text-xs font-black text-[#231A12]">
+                  Rumus Universal Nakul (5-Baris Anti-Pause)
+                </span>
               </div>
-              <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
-                <span className="font-extrabold text-[#B45309] block">2. Key Elements (Angka Utama):</span>
-                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.keyElements}</span>
+              <span className="px-2 py-0.5 rounded-full bg-[#E6F4EA] text-[#1B5E34] text-[9.5px] font-bold">
+                100% Fluency Guard
+              </span>
+            </div>
+
+            <div className="space-y-2 text-[11px] leading-relaxed">
+              <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
+                <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
+                  1. Introduction (Pembuka):
+                </span>
+                <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.intro}</span>
               </div>
-              <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
-                <span className="font-extrabold text-[#B45309] block">3. Maximum Figure (Tertinggi):</span>
-                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.maximum}</span>
+              <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
+                <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
+                  2. Key Elements (Fitur Utama):
+                </span>
+                <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.keyElements}</span>
               </div>
-              <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
-                <span className="font-extrabold text-[#B45309] block">4. Minimum Figure (Terendah):</span>
-                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.minimum}</span>
+              <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
+                <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
+                  3. Maximum Figure (Tertinggi):
+                </span>
+                <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.maximum}</span>
               </div>
-              <div className="p-2 rounded-lg bg-[#FAF6EE] border border-[#EADBCE]">
-                <span className="font-extrabold text-[#B45309] block">5. Conclusion (Kesimpulan):</span>
-                <span className="text-[#3D2E20] font-medium">{activeQuestion.universalTemplate.conclusion}</span>
+              <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
+                <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
+                  4. Minimum Figure (Terendah):
+                </span>
+                <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.minimum}</span>
+              </div>
+              <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
+                <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
+                  5. Conclusion (Kesimpulan):
+                </span>
+                <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.conclusion}</span>
               </div>
             </div>
 
@@ -1386,14 +1406,45 @@ export const PteDescribeImageCanvas: React.FC<{
               <button
                 type="button"
                 onClick={() => onSpeakPreview(fullSampleSpoken)}
-                className="w-full mt-2 py-2 px-3 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                className="w-full mt-1 py-2 px-3 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors active:scale-95"
               >
                 <span>🔊</span>
-                <span>Dengarkan Contoh Lengkap 5-Tahap (Native Model)</span>
+                <span>Dengarkan Contoh Lengkap 5-Baris (Native Model - 26d)</span>
               </button>
             )}
           </div>
-        )}
+
+          {/* TRIK & TIPS RAHASIA LULUS PTE 42 (EXAMINER HACKS) */}
+          <div className="p-3.5 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] shadow-2xs space-y-2">
+            <div className="flex items-center gap-1.5 pb-1 border-b border-[#DBEAFE]">
+              <span className="text-sm">💡</span>
+              <span className="text-xs font-black text-[#1E40AF]">
+                Trik & Tips Rahasia Lulus PTE 42 (Dr. Julian Insider Hacks)
+              </span>
+            </div>
+
+            <div className="space-y-1.5 text-[10.5px] text-[#1E3A8A] leading-snug">
+              <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
+                <span className="font-bold text-blue-700 shrink-0">⚡ Hack 25–28 Detik:</span>
+                <span>Jangan bicara sampai 40 detik! Selesaikan baris ke-5 pada detik 25–28 lalu langsung klik Next. Skor Oral Fluency akan di-cap maksimal (90)!</span>
+              </div>
+              <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
+                <span className="font-bold text-blue-700 shrink-0">🎯 Nada Monoton:</span>
+                <span>Gunakan pitch suara datar stabil (135–145 Hz). Pearson AI menyukai irama konsisten tanpa lonjakan nada dramatis.</span>
+              </div>
+              <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
+                <span className="font-bold text-blue-700 shrink-0">🚫 Pantangan Koreksi Diri:</span>
+                <span>Salah sebut kata atau angka? JANGAN BERHENTI atau minta maaf! Teruskan membaca tanpa ragu untuk menjaga skor kelancaran.</span>
+              </div>
+              {activeQuestion.examinerTips && (
+                <div className="p-2 rounded-xl bg-white/70 border border-[#BFDBFE] flex items-start gap-1.5 text-[#1E3A8A]">
+                  <span className="font-bold text-amber-700 shrink-0">📌 Tips Khusus Grafik Ini:</span>
+                  <span>{activeQuestion.examinerTips}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1401,97 +1452,379 @@ export const PteDescribeImageCanvas: React.FC<{
 
 /**
  * -------------------------------------------------------------
- * KANVAS KHUSUS 2: PTE ACADEMIC - READ ALOUD
- * Academic Passage + Syntax Chunking (//) + Pacing Speedometer + Phonetic Pills
+ * KANVAS KHUSUS 2: PTE ACADEMIC - READ ALOUD (BANK MULTI-TOPIK)
+ * 15+ Soal Otentik Pearson & APEUni (Cookery, Perth Ecology, Academic Science)
+ * Academic Passage + Syntax Chunking (//) + Pacing Speedometer + Phonetics + Hacks
  * -------------------------------------------------------------
  */
 export const PteReadAloudCanvas: React.FC<{
   data: PteReadAloudData;
   onSpeakPreview?: (text: string) => void;
 }> = ({ data, onSpeakPreview }) => {
+  const [selectedCategory, setSelectedCategory] = useState<'all' | PteRaCategory>('all');
+  const [currentQuestionId, setCurrentQuestionId] = useState<string>(data.questionId || 'ra_cook_01');
+  const [prepSeconds, setPrepSeconds] = useState<number>(35);
+  const [isPrepRunning, setIsPrepRunning] = useState<boolean>(false);
+  const [speakSeconds, setSpeakSeconds] = useState<number>(40);
+  const [isSpeakRunning, setIsSpeakRunning] = useState<boolean>(false);
+
+  // Active question resolution
+  const activeQuestion: PteReadAloudQuestion =
+    getPteRaQuestionById(currentQuestionId) || PTE_READ_ALOUD_BANK[0];
+
+  // Filtered pool based on selectedCategory
+  const filteredQuestions =
+    selectedCategory === 'all'
+      ? PTE_READ_ALOUD_BANK
+      : getPteRaQuestionsByCategory(selectedCategory);
+
+  const currentIndex = Math.max(
+    0,
+    filteredQuestions.findIndex((q) => q.id === activeQuestion.id)
+  );
+
+  // Sync external questionId change
+  useEffect(() => {
+    if (data.questionId && data.questionId !== currentQuestionId) {
+      setCurrentQuestionId(data.questionId);
+    }
+  }, [data.questionId]);
+
+  // Reset timers when changing question
+  const handleSelectQuestion = (q: PteReadAloudQuestion) => {
+    playFiezelSfx('tap');
+    setCurrentQuestionId(q.id);
+    setPrepSeconds(35);
+    setIsPrepRunning(false);
+    setSpeakSeconds(40);
+    setIsSpeakRunning(false);
+  };
+
+  const handlePrevQuestion = () => {
+    const prevIdx = (currentIndex - 1 + filteredQuestions.length) % filteredQuestions.length;
+    handleSelectQuestion(filteredQuestions[prevIdx]);
+  };
+
+  const handleNextQuestion = () => {
+    const nextIdx = (currentIndex + 1) % filteredQuestions.length;
+    handleSelectQuestion(filteredQuestions[nextIdx]);
+  };
+
+  const handleRandomQuestion = () => {
+    playFiezelSfx('tap');
+    const pool = selectedCategory === 'all' ? PTE_READ_ALOUD_BANK : filteredQuestions;
+    const randomIdx = Math.floor(Math.random() * pool.length);
+    handleSelectQuestion(pool[randomIdx] || pool[0]);
+  };
+
+  // Timer 35s Prep
+  useEffect(() => {
+    let timer: any = null;
+    if (isPrepRunning && prepSeconds > 0) {
+      timer = setInterval(() => {
+        setPrepSeconds((prev) => {
+          if (prev <= 1) {
+            playFiezelSfx('bell_ring');
+            setIsPrepRunning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isPrepRunning, prepSeconds]);
+
+  // Timer 40s Speak
+  useEffect(() => {
+    let timer: any = null;
+    if (isSpeakRunning && speakSeconds > 0) {
+      timer = setInterval(() => {
+        setSpeakSeconds((prev) => {
+          if (prev <= 1) {
+            playFiezelSfx('bell_ring');
+            setIsSpeakRunning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isSpeakRunning, speakSeconds]);
+
+  const CATEGORY_TABS: Array<{ key: 'all' | PteRaCategory; label: string; icon: string; count: number }> = [
+    { key: 'all', label: 'Semua Soal', icon: '📚', count: PTE_READ_ALOUD_BANK.length },
+    { key: 'cookery_hospitality', label: 'Cookery & Hospitality', icon: '🍳', count: getPteRaQuestionsByCategory('cookery_hospitality').length },
+    { key: 'australia_perth', label: 'Perth & WA Ecology', icon: '☀️', count: getPteRaQuestionsByCategory('australia_perth').length },
+    { key: 'academic_science', label: 'Academic & Science', icon: '🔬', count: getPteRaQuestionsByCategory('academic_science').length },
+  ];
+
   return (
     <div className="space-y-3.5" data-testid="pte-read-aloud-canvas">
-      {/* Header Badge */}
-      <div className="flex items-center justify-between gap-2">
-        <span className="px-2.5 py-0.5 rounded-full bg-[#E6F4EA] text-[#1B5E34] text-[10.5px] font-extrabold uppercase tracking-wide">
-          PTE Academic • Read Aloud
-        </span>
-        <span className="px-2.5 py-0.5 rounded-full bg-[#FAF4E8] border border-[#EADBCE] text-[#5C4A38] text-[10.5px] font-bold">
-          Target: {data.targetWpm} WPM
-        </span>
-      </div>
-
-      {/* Pacing Speedometer Alert */}
-      <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">⏱️</span>
-          <div>
-            <span className="text-xs font-bold text-[#231A12] block">Pacing Konsisten (120 - 140 WPM)</span>
-            <span className="text-[10px] text-[#8C7760]">Tarik nafas HANYA pada tanda jeda // di bawah</span>
+      {/* Top Banner, Category Pills & Question Navigator */}
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-center justify-between gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#E6F4EA] text-[#1B5E34] text-[10.5px] font-extrabold uppercase tracking-wide">
+              PTE Academic • Read Aloud
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
+              🔥 {activeQuestion.examFrequency}
+            </span>
           </div>
+          <span className="text-[10px] text-[#8C7760] font-semibold">
+            {activeQuestion.sourceOrigin}
+          </span>
         </div>
-        <div className="px-2 py-1 rounded-lg bg-[#E6F4EA] text-[#1B5E34] text-[10.5px] font-black shrink-0">
-          Ideal
-        </div>
-      </div>
 
-      {/* Academic Passage with Chunking Breaks */}
-      <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs space-y-2">
-        <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block">
-          Teks Akademik & Pemenggalan Nafas (Chunking)
-        </span>
-        <div className="text-xs sm:text-[13px] leading-relaxed font-semibold text-[#231A12]">
-          {data.chunkedSegments.map((seg, idx) => (
-            <React.Fragment key={idx}>
-              <span>{seg.text}</span>
-              {idx < data.chunkedSegments.length - 1 && (
-                <span className="inline-flex items-center mx-1 px-1.5 py-0.5 rounded-md bg-[#FDE8E4] text-[#B85D43] font-black text-[10px] select-none">
-                  // jeda
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 bg-[#FAF4E8] p-1.5 rounded-2xl scrollbar-none">
+          {CATEGORY_TABS.map((tab) => {
+            const isSelected = selectedCategory === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => {
+                  playFiezelSfx('tap');
+                  setSelectedCategory(tab.key);
+                  const newPool = tab.key === 'all' ? PTE_READ_ALOUD_BANK : getPteRaQuestionsByCategory(tab.key);
+                  if (newPool.length > 0 && !newPool.some((q) => q.id === activeQuestion.id)) {
+                    handleSelectQuestion(newPool[0]);
+                  }
+                }}
+                className={`px-2.5 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+                  isSelected
+                    ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs'
+                    : 'text-[#8C7760] hover:text-[#5C4A38]'
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+                <span className={`text-[9px] px-1 py-0.2 rounded-full ${isSelected ? 'bg-[#FAF4E8] text-[#B45309]' : 'text-[#A89480]'}`}>
+                  {tab.count}
                 </span>
-              )}
-            </React.Fragment>
-          ))}
+              </button>
+            );
+          })}
         </div>
 
-        {onSpeakPreview && (
+        {/* Question Navigator Toolbar */}
+        <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl bg-[#FFFDF8] border border-[#EADBCE]">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={handlePrevQuestion}
+              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-black cursor-pointer active:scale-95 transition-all"
+              title="Soal Sebelumnya"
+            >
+              ◀ Prev
+            </button>
+            <span className="text-[11px] font-bold text-[#231A12] px-2 py-0.5">
+              Soal {currentIndex + 1} / {filteredQuestions.length}
+            </span>
+            <button
+              type="button"
+              data-testid="pte-ra-next-question-btn"
+              onClick={handleNextQuestion}
+              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-black cursor-pointer active:scale-95 transition-all flex items-center gap-1"
+              title="Soal Bacaan Berikutnya"
+            >
+              <span>Soal Berikutnya</span>
+              <span>▶</span>
+            </button>
+          </div>
+
           <button
             type="button"
-            onClick={() => onSpeakPreview(data.passageText)}
-            className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer transition-colors"
+            onClick={handleRandomQuestion}
+            className="px-2.5 py-1 rounded-lg bg-[#B45309] hover:bg-[#92400E] text-white text-[10.5px] font-bold cursor-pointer active:scale-95 transition-all flex items-center gap-1"
           >
-            <span>🔊</span>
-            <span>Dengarkan Contoh Bacaan Pacing Ideal</span>
+            <span>🎲</span>
+            <span>Acak Soal Ujian Asli</span>
           </button>
-        )}
+        </div>
+
+        {/* Active Question Title & Exam ID */}
+        <div className="flex items-start justify-between gap-2 pt-0.5">
+          <h4 className="text-xs font-black text-[#231A12] leading-tight">
+            {activeQuestion.title}
+          </h4>
+          <span className="text-[9.5px] font-bold text-[#8C7760] bg-[#FAF6EE] px-1.5 py-0.5 rounded-md shrink-0">
+            ID: {activeQuestion.id} • {activeQuestion.wordCount} Kata
+          </span>
+        </div>
       </div>
 
-      {/* Articulation & Phonetic Chips */}
-      <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
-        <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block">
-          Titik Kritis Artikulasi & Pelafalan (Tekan untuk mendengar lafal):
-        </span>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {data.phoneticFocus.map((p, idx) => (
-            <div
-              key={idx}
-              className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col justify-between"
-            >
-              <div className="flex items-center justify-between gap-1">
-                <span className="text-xs font-black text-[#231A12]">{p.word}</span>
-                <span className="text-[10px] font-mono font-bold text-[#B45309]">{p.ipa}</span>
-              </div>
-              <p className="text-[10px] text-[#5C4A38] mt-1 leading-snug">{p.tip}</p>
-              {onSpeakPreview && (
+      {/* 2-COLUMN LANDSCAPE SPLIT SCREEN WORKBENCH */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+        {/* ==========================================
+            KOLOM KIRI: TEKS AKADEMIK CHUNKING & TIMERS
+           ========================================== */}
+        <div className="md:col-span-7 flex flex-col gap-3">
+          {/* Academic Passage with Chunking Breaks */}
+          <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs space-y-2.5">
+            <div className="flex items-center justify-between pb-1 border-b border-[#F0E6D9]">
+              <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block">
+                Teks Akademik Resmi & Pemenggalan Nafas (Chunking)
+              </span>
+              <span className="text-[10px] font-black text-[#B45309]">
+                Target: {activeQuestion.targetWpm} WPM
+              </span>
+            </div>
+
+            <div className="text-xs sm:text-[13px] leading-relaxed font-semibold text-[#231A12]">
+              {activeQuestion.chunkedSegments.map((seg, idx) => (
+                <React.Fragment key={idx}>
+                  <span>{seg.text}</span>
+                  {idx < activeQuestion.chunkedSegments.length - 1 && (
+                    <span className="inline-flex items-center mx-1 px-1.5 py-0.5 rounded-md bg-[#FDE8E4] text-[#B85D43] font-black text-[10px] select-none">
+                      // jeda
+                    </span>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {onSpeakPreview && (
+              <button
+                type="button"
+                onClick={() => onSpeakPreview(activeQuestion.passageText)}
+                className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer transition-colors active:scale-95"
+              >
+                <span>🔊</span>
+                <span>Dengarkan Contoh Bacaan Pacing Ideal ({activeQuestion.targetWpm} WPM)</span>
+              </button>
+            )}
+          </div>
+
+          {/* TIMERS: 35s PREP & 40s SPEAK */}
+          <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2.5">
+            <div className="grid grid-cols-2 gap-2">
+              {/* Prep Timer (35s) */}
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
+                <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Persiapan</span>
+                <div className="text-lg font-black text-[#231A12] my-0.5">
+                  {prepSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+                </div>
                 <button
                   type="button"
-                  onClick={() => onSpeakPreview(p.word)}
-                  className="mt-1.5 text-left text-[10px] font-bold text-[#B85D43] hover:underline cursor-pointer"
+                  onClick={() => {
+                    playFiezelSfx('tap');
+                    if (prepSeconds === 0) setPrepSeconds(35);
+                    setIsPrepRunning(!isPrepRunning);
+                  }}
+                  className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#231A12] text-white text-[10px] font-bold cursor-pointer active:scale-95"
                 >
-                  🔊 Tes dengar suku kata
+                  {isPrepRunning ? 'Pause' : prepSeconds === 0 ? 'Reset' : 'Mulai (35d)'}
                 </button>
+              </div>
+
+              {/* Speaking Timer (40s) */}
+              <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
+                <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Rekam Bicara</span>
+                <div className={`text-lg font-black my-0.5 ${speakSeconds <= 10 ? 'text-[#DC2626]' : 'text-[#231A12]'}`}>
+                  {speakSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playFiezelSfx('tap');
+                    if (speakSeconds === 0) setSpeakSeconds(40);
+                    setIsSpeakRunning(!isSpeakRunning);
+                  }}
+                  className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#B45309] text-white text-[10px] font-bold cursor-pointer active:scale-95"
+                >
+                  {isSpeakRunning ? 'Stop' : speakSeconds === 0 ? 'Reset' : 'Mulai Bicara (40d)'}
+                </button>
+              </div>
+            </div>
+
+            {/* Pacing Speedometer Alert */}
+            <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">⏱️</span>
+                <div>
+                  <span className="text-xs font-bold text-[#231A12] block">Pacing Konsisten (120 - 140 WPM)</span>
+                  <span className="text-[9.5px] text-[#8C7760]">Tarik nafas pendek hanya pada tanda jeda //</span>
+                </div>
+              </div>
+              <div className="px-2 py-1 rounded-lg bg-[#E6F4EA] text-[#1B5E34] text-[10px] font-black shrink-0">
+                Ideal Range
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ==========================================
+            KOLOM KANAN: TITIK KRITIS FONETIK & HACKS
+           ========================================== */}
+        <div className="md:col-span-5 flex flex-col gap-3">
+          {/* Articulation & Phonetic Chips */}
+          <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] shadow-2xs space-y-2">
+            <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block pb-1 border-b border-[#F0E6D9]">
+              Titik Kritis Artikulasi & Pelafalan:
+            </span>
+            <div className="grid grid-cols-1 gap-2">
+              {activeQuestion.phoneticFocus.map((p, idx) => (
+                <div
+                  key={idx}
+                  className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-xs font-black text-[#231A12]">{p.word}</span>
+                    <span className="text-[10px] font-mono font-bold text-[#B45309]">{p.ipa}</span>
+                  </div>
+                  <p className="text-[9.5px] text-[#5C4A38] mt-1 leading-snug">{p.tip}</p>
+                  {onSpeakPreview && (
+                    <button
+                      type="button"
+                      onClick={() => onSpeakPreview(p.word)}
+                      className="mt-1 text-left text-[9.5px] font-bold text-[#B85D43] hover:underline cursor-pointer"
+                    >
+                      🔊 Tes dengar suku kata
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* TRIK & TIPS RAHASIA LULUS PTE 42 READ ALOUD (HACKS) */}
+          <div className="p-3.5 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] shadow-2xs space-y-2">
+            <div className="flex items-center gap-1.5 pb-1 border-b border-[#DBEAFE]">
+              <span className="text-sm">💡</span>
+              <span className="text-xs font-black text-[#1E40AF]">
+                Trik & Tips Rahasia Lulus PTE 42 Read Aloud
+              </span>
+            </div>
+
+            <div className="space-y-1.5 text-[10.5px] text-[#1E3A8A] leading-snug">
+              <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex flex-col gap-1">
+                <span className="font-bold text-blue-700">⚡ Trik 1-Kalimat APEUni (One-Sentence Hack):</span>
+                <span>{activeQuestion.oneSentenceHack}</span>
+              </div>
+              <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
+                <span className="font-bold text-blue-700 shrink-0">🎯 Monotone Pitch:</span>
+                <span>Pertahankan nada datar 135–145 Hz. Pearson acoustic engine mendeteksi kelancaran konstan dengan skor kelancaran tertinggi.</span>
+              </div>
+              <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
+                <span className="font-bold text-blue-700 shrink-0">💨 Jeda 0.3 Detik:</span>
+                <span>Ambil nafas pendek di tanda // tanpa menghela nafas keras di mikrofon.</span>
+              </div>
+              {activeQuestion.examinerTips && (
+                <div className="p-2 rounded-xl bg-white/70 border border-[#BFDBFE] flex items-start gap-1.5 text-[#1E3A8A]">
+                  <span className="font-bold text-amber-700 shrink-0">📌 Tips Penguji:</span>
+                  <span>{activeQuestion.examinerTips}</span>
+                </div>
               )}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
@@ -1622,6 +1955,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   onClose,
   locale,
   targetLang,
+  scenario,
   persona,
   isLiveConnected,
   topicTitle,
@@ -1894,12 +2228,24 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     );
   }
 
+  const isWidePteCanvas =
+    boardState?.contextMode === 'pte_describe_image' ||
+    boardState?.contextMode === 'pte_read_aloud' ||
+    focusType === 'pte_describe_image' ||
+    focusType === 'pte_read_aloud' ||
+    uiAction?.focusType === 'pte_describe_image' ||
+    uiAction?.focusType === 'pte_read_aloud' ||
+    scenario?.competencyId === 'speak_pte_describe_image' ||
+    scenario?.competencyId === 'speak_pte_read_aloud' ||
+    Boolean(scenario?.id?.startsWith('scen_pte_di')) ||
+    Boolean(scenario?.id?.startsWith('scen_pte_ra'));
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1C1611]/60 backdrop-blur-sm animate-in fade-in duration-200"
       data-testid="in-call-learning-workbench"
     >
-      <div className="w-full max-w-lg rounded-[28px] bg-[#FDFAF4] border border-[#EADBCE] shadow-[0_20px_50px_rgba(28,22,17,0.18)] overflow-hidden flex flex-col max-h-[90vh]">
+      <div className={`w-full ${isWidePteCanvas ? 'max-w-5xl xl:max-w-6xl' : 'max-w-lg'} rounded-[28px] bg-[#FDFAF4] border border-[#EADBCE] shadow-[0_20px_50px_rgba(28,22,17,0.18)] overflow-hidden flex flex-col max-h-[92vh]`}>
         {/* HEADER MINIMALIS PASTEL FIEZEL */}
         <div className="px-5 py-3.5 bg-[#FBF8F1] border-b border-[#F0E6D9] flex items-center justify-between gap-2 shrink-0">
           <div className="min-w-0 flex-1">
@@ -2039,31 +2385,34 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               />
             )}
 
-            {/* PENJELASAN SINGKAT GURU DENGAN TOMBOL AUDIO */}
-            <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
-              <p className="text-xs text-[#3D2E20] leading-relaxed font-medium">
-                {boardState.coachExplanation}
-              </p>
-              <div className="flex items-center justify-between pt-1 border-t border-[#F0E6D9]">
-                <span className="text-[11px] font-semibold text-[#8C7760]">
-                  {persona.name} {persona.voiceName ? `(${persona.voiceName})` : ''}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleReplayVoice}
-                  data-testid="wb-replay-voice-btn"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer transition-colors active:scale-95"
-                >
-                  <span>🔊</span>
-                  <span>Dengarkan</span>
-                </button>
+            {/* PENJELASAN SINGKAT GURU DENGAN TOMBOL AUDIO - hanya jika bukan mode PTE canvas lebar */}
+            {!isWidePteCanvas && boardState.coachExplanation && (
+              <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
+                <p className="text-xs text-[#3D2E20] leading-relaxed font-medium">
+                  {boardState.coachExplanation}
+                </p>
+                <div className="flex items-center justify-between pt-1 border-t border-[#F0E6D9]">
+                  <span className="text-[11px] font-semibold text-[#8C7760]">
+                    {persona.name} {persona.voiceName ? `(${persona.voiceName})` : ''}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleReplayVoice}
+                    data-testid="wb-replay-voice-btn"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer transition-colors active:scale-95"
+                  >
+                    <span>🔊</span>
+                    <span>Dengarkan</span>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* -------------------------------------------------------------
                 AREA LATIHAN INTERAKTIF MULTI-MODE (ANTI-SPOILING)
             ------------------------------------------------------------- */}
-            <div className="p-4 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-3">
+            {!isWidePteCanvas && (
+              <div className="p-4 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-3">
               {/* Top Bar Kuis & Switcher Mode */}
               <div className="flex items-center justify-between gap-2 border-b border-[#F0E6D9] pb-2.5">
                 <div className="flex items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl">
@@ -2245,6 +2594,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 </div>
               )}
             </div>
+            )}
 
             {/* STATUS SUARA MIKROFON & TOMBOL SELESAI */}
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FBF8F1] border border-[#F0E6D9] text-[11px] text-[#5C4A38]">

@@ -42,6 +42,7 @@ import {
   loadPteMasterState,
   recordPteMasterAttempt,
   diagnosePteCandidateSpeech,
+  readHostPwaCognitiveSnapshot,
   recordSpeakingAttempt,
   recordVocabPrereqMastery,
   saveBraincoreState,
@@ -362,6 +363,17 @@ export default function App() {
   const [showPersonaModal, setShowPersonaModal] = useState<boolean>(false);
   const [activeScenarioId, setActiveScenarioId] = useState<string>(() => {
     const initialLang = loadBraincoreState().targetLang || 'en';
+    try {
+      const savedScen = localStorage.getItem('fiezel_voice_scenario_pref');
+      if (savedScen && CALL_SCENARIOS.some((s) => s.id === savedScen && s.targetLang === initialLang)) {
+        return savedScen;
+      }
+      const savedPersona = localStorage.getItem('fiezel_voice_persona_pref');
+      if (savedPersona === 'dr_julian') {
+        const pteScen = CALL_SCENARIOS.find((s) => s.personaId === 'dr_julian' && s.targetLang === initialLang);
+        if (pteScen) return pteScen.id;
+      }
+    } catch {}
     const freeScenario = CALL_SCENARIOS.find((s) => s.targetLang === initialLang && s.id.includes('free'));
     if (freeScenario) return freeScenario.id;
     const firstForLang = CALL_SCENARIOS.find((s) => s.targetLang === initialLang);
@@ -1549,6 +1561,9 @@ export default function App() {
       activeScenario;
     if (matchingScen && matchingScen.id !== activeScenarioId) {
       setActiveScenarioId(matchingScen.id);
+      try {
+        localStorage.setItem('fiezel_voice_scenario_pref', matchingScen.id);
+      } catch {}
     }
     playFiezelSfx('button_tap');
     if (isLiveConnectedRef.current) {
@@ -1585,6 +1600,9 @@ export default function App() {
     const scen = CALL_SCENARIOS.find((s) => s.id === scenId);
     if (!scen) return;
     setActiveScenarioId(scen.id);
+    try {
+      localStorage.setItem('fiezel_voice_scenario_pref', scen.id);
+    } catch {}
     const p = (scen.personaId && VOICE_PERSONAS[scen.personaId]) ? VOICE_PERSONAS[scen.personaId] : activePersona;
     if (scen.personaId && VOICE_PERSONAS[scen.personaId]) {
       setSelectedPersonaId(scen.personaId);
@@ -2284,9 +2302,9 @@ export default function App() {
       | 'pte_scorecard'
       | string =
       override?.focusType ||
-      (/describe.*image|pte.*di|pte.*chart|grafik/i.test(title)
+      (activeScenario.id === 'scen_pte_di_level1' || activeScenario.competencyId === 'speak_pte_describe_image' || /describe.*image|pte.*di|pte.*chart|grafik/i.test(title)
         ? 'pte_describe_image'
-        : /read.*aloud|pte.*ra|chunking|baca.*teks/i.test(title)
+        : activeScenario.id === 'scen_pte_ra_level2' || activeScenario.competencyId === 'speak_pte_read_aloud' || /read.*aloud|pte.*ra|chunking|baca.*teks/i.test(title)
           ? 'pte_read_aloud'
           : /scorecard|rapor.*pte|evaluasi.*pte/i.test(title)
             ? 'pte_scorecard'
@@ -2298,6 +2316,13 @@ export default function App() {
                   ? 'vocab'
                   : 'grammar');
 
+    const effectiveUiAction: VoiceUiAction = {
+      actionType: 'open_learning_popup',
+      focusType: focusType as any,
+      topicTitle: title,
+      ...(override || {}),
+    } as VoiceUiAction;
+
     return {
       isOpen: true,
       focusType,
@@ -2306,7 +2331,7 @@ export default function App() {
       patternFormula: override?.patternFormula || '',
       drillInstruction: override?.drillInstruction || '',
       sampleTarget: override?.sampleTarget || '',
-      uiAction: override as VoiceUiAction,
+      uiAction: effectiveUiAction,
     };
   };
 
@@ -2825,11 +2850,14 @@ export default function App() {
       const isDrJulianTurn = activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian';
       let pteDiagResult: ReturnType<typeof diagnosePteCandidateSpeech> | null = null;
       if (isDrJulianTurn && trimmed) {
+        const regLearnerName =
+          readHostPwaCognitiveSnapshot(activeScenario.targetLang, locale).learnerName?.trim() ||
+          (locale === 'th' ? 'นักเรียน' : 'Candidate');
         pteDiagResult = diagnosePteCandidateSpeech({
           spokenTranscript: trimmed,
           durationSec: params.speakingDurationSec || 30,
           questionTitle: learningWorkbench?.topicTitle || activeScenario.titleId,
-          learnerName: 'Fitra',
+          learnerName: regLearnerName,
         });
         evalParams.learnerDossier += `\n\n${pteDiagResult.clinicalDossierText}`;
       }
@@ -4323,6 +4351,8 @@ export default function App() {
 
             const isDrJulian = activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian';
             const isCambridgeExaminer = activePersona.id === 'cambridge_examiner' || activeScenario.personaId === 'cambridge_examiner';
+            const cognitiveSnapshot = readHostPwaCognitiveSnapshot(activeScenario.targetLang, locale);
+            const candidateName = cognitiveSnapshot.learnerName?.trim() || (locale === 'th' ? 'นักเรียน' : 'Candidate');
             const pteMasterDirective = isDrJulian
               ? (() => {
                   const pteState = loadPteMasterState();
@@ -4332,7 +4362,7 @@ export default function App() {
                   const templateRec = bState.competencies['pte_template_adherence'];
                   const miscList = pteState.chronicMisconceptions.map((m) => `${m.word} (${m.missCount}x)`).join(', ');
 
-                  return `\n\n[BRAINCORE OFFICIAL CANDIDATE DOSSIER]:\nCandidate Name: Fitra (address him respectfully as "Fitra" or "Candidate")\nTarget Score Benchmark: PTE Academic ${pteState.targetScore}+ (Australian Visa & University Admissions)\nActive Curriculum Stage: Stage ${pteState.activeStage} of 4 (Stage 1: Describe Image, Stage 2: Read Aloud, Stage 3: Repeat Sentence, Stage 4: Write from Dictation)\nRolling Overall Estimate: ${pteState.overallEstimate}/90\nCompleted Stages: [${pteState.completedStages.join(', ') || 'None'}]\nRecent Scorecards: ${pteState.scorecards.slice(0, 3).map((s) => `${s.taskName}: ${s.pearsonScore}/90 (Fluency ${s.fluency}, Pron ${s.pronunciation})`).join(' | ') || 'None'}\nBayesian Knowledge Tracing (BKT) Telemetry:\n- Oral Fluency: P(L) = ${Number(fluencyRec?.masteryProb || 0.45).toFixed(2)}, Attempts: ${fluencyRec?.attemptsCount || 0}, Status: ${fluencyRec?.status || 'learning'}\n- Pronunciation: P(L) = ${Number(pronRec?.masteryProb || 0.45).toFixed(2)}, Attempts: ${pronRec?.attemptsCount || 0}, Status: ${pronRec?.status || 'learning'}\n- Template Adherence: P(L) = ${Number(templateRec?.masteryProb || 0.45).toFixed(2)}, Status: ${templateRec?.status || 'learning'}\nChronic Misconceptions: ${miscList || 'None recorded yet'}\n\n[EXAMINER VERBAL MANDATE]:\n- When greeting Fitra, address him as Fitra and state his current stage and target score (e.g. "Candidate Fitra, we are at Stage 1: Describe Image. Target benchmark is PTE 42+").\n- When Fitra speaks or describes an image, evaluate him strictly according to the Braincore rubrics:\n  1. Speech Pacing (WPM): Optimal is 120-140 WPM.\n  2. Hesitations & Aturan 3 Detik Pearson.\n  3. Dropped plural 's' or dropped past tense '-ed'.\n  4. Template 5-part structure adherence.\n- Always cite the Braincore diagnosis aloud: "Fitra, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM...".\n- Provide the official Pearson scorecard (Oral Fluency 1-5, Pronunciation 1-5, Content 0-3, Overall /90) and require immediate remedial practice on any missed words!`;
+                  return `\n\n[BRAINCORE OFFICIAL CANDIDATE DOSSIER]:\nCandidate Name: ${candidateName} (address the candidate respectfully as "${candidateName}" or "Candidate")\nTarget Score Benchmark: PTE Academic ${pteState.targetScore}+ (Australian Visa & University Admissions)\nActive Curriculum Stage: Stage ${pteState.activeStage} of 4 (Stage 1: Describe Image, Stage 2: Read Aloud, Stage 3: Repeat Sentence, Stage 4: Write from Dictation)\nRolling Overall Estimate: ${pteState.overallEstimate}/90\nCompleted Stages: [${pteState.completedStages.join(', ') || 'None'}]\nRecent Scorecards: ${pteState.scorecards.slice(0, 3).map((s) => `${s.taskName}: ${s.pearsonScore}/90 (Fluency ${s.fluency}, Pron ${s.pronunciation})`).join(' | ') || 'None'}\nBayesian Knowledge Tracing (BKT) Telemetry:\n- Oral Fluency: P(L) = ${Number(fluencyRec?.masteryProb || 0.45).toFixed(2)}, Attempts: ${fluencyRec?.attemptsCount || 0}, Status: ${fluencyRec?.status || 'learning'}\n- Pronunciation: P(L) = ${Number(pronRec?.masteryProb || 0.45).toFixed(2)}, Attempts: ${pronRec?.attemptsCount || 0}, Status: ${pronRec?.status || 'learning'}\n- Template Adherence: P(L) = ${Number(templateRec?.masteryProb || 0.45).toFixed(2)}, Status: ${templateRec?.status || 'learning'}\nChronic Misconceptions: ${miscList || 'None recorded yet'}\n\n[EXAMINER VERBAL MANDATE]:\n- When greeting the candidate, address them respectfully as "${candidateName}" and state their current stage and target score (e.g. "Candidate ${candidateName}, we are at Stage 1: Describe Image. Target benchmark is PTE 42+").\n- DYNAMIC SYLLABUS ALIGNMENT: If ${candidateName} asks to practice a specific skill (e.g. Describe Image marathon, Repeat Sentence, or Read Aloud), immediately agree and align the roadmap: "Siap ${candidateName}, kita selaraskan target harian PTE 42 kita dengan fokus ke [permintaan ${candidateName}] hari ini! Mari kita mulai!" Never refuse or force an unwanted mode.\n- ACTIVE SPOKEN GRAMMAR CORRECTION: If ${candidateName} makes ANY grammatical mistake (subject-verb agreement 'he go', wrong tense 'yesterday I am', missing articles, wrong prepositions, dropped plural 's'), DO NOT LET IT PASS. Intercept immediately: "Tunggu sebentar, ${candidateName}. Ada kesalahan grammar barusan: kamu bilang [salah], yang benar adalah [benar] karena [alasan 1 kalimat]. Coba ulangi kalimat yang benar sekarang!"\n- PROACTIVE DRILLING (ZERO DEAD AIR): Never wait passively or ask "Mau lanjut?". In Repeat Sentence or Read Aloud, immediately read the sentence and say "Giliranmu, ulangi dalam 5 detik!", then evaluate, and immediately fire question #2 in the very same turn!\n- DESCRIBE IMAGE SPLIT-SCREEN WORKBENCH: Describe Image modal is now a wide side-by-side screen (SVG diagram on left, 5-line Nakul formula & 25-28s stopping hacks on right). Direct them: "Perhatikan layar lebarmu ${candidateName}: sebelah kiri adalah grafik, sebelah kanan adalah 5 baris template Nakul. Gunakan waktu persiapan 25 detik, lalu bicara 25 hingga 28 detik tanpa berhenti!"\n- When ${candidateName} speaks or describes an image, evaluate them strictly according to the Braincore rubrics:\n  1. Speech Pacing (WPM): Optimal is 120-140 WPM.\n  2. Hesitations & Aturan 3 Detik Pearson.\n  3. Dropped plural 's' or dropped past tense '-ed'.\n  4. Template 5-part structure adherence.\n- Always cite the Braincore diagnosis aloud: "${candidateName}, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM...".\n- Provide the official Pearson scorecard (Oral Fluency 1-5, Pronunciation 1-5, Content 0-3, Overall /90) and require immediate remedial practice on any missed words!`;
                 })()
               : '';
 
@@ -4549,9 +4579,9 @@ ${
                     parts: [
                       {
                         text: isDrJulian
-                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: Fitra (address him respectfully as "Fitra" or "Candidate").\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen Fitra finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "Fitra, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing him to move on to the next question!\n\n${pteMasterDirective}${cefrCalibrationDirective}`
+                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: ${candidateName} (address the candidate respectfully as "${candidateName}" or "Candidate").\n\n[ZERO-TOLERANCE REAL-TIME GRAMMAR INTERCEPTION MANDATE]:\n- Whenever ${candidateName} speaks in conversation or answers an exercise, if they make ANY grammatical flaw (subject-verb agreement 'he go', wrong tense 'yesterday I am', missing articles, wrong prepositions, dropped plural 's'), YOU MUST NOT LET IT PASS!\n- Stop them immediately with authoritative tough-love examiner demeanor:\n  "Tunggu sebentar, ${candidateName}. Ada kesalahan grammar barusan: kamu bilang '[kesalahan]', yang benar adalah '[perbaikan]' karena [penjelasan singkat 1 kalimat]. Coba ulangi kalimat yang benar sekarang!"\n- Require Echo Redemption (they repeat the corrected phrase aloud) before proceeding!\n\n[PROACTIVE AUTOMATED DRILLING PROTOCOL (ZERO DEAD AIR)]:\n- NEVER wait for the candidate to prompt you or say 'coba lanjut' or 'lanjutkan'!\n- In Repeat Sentence or Read Aloud or Describe Image: Act like an elite Australian private tutor in an intensive 1-on-1 session.\n- When introducing or transitioning, immediately read the sentence/question in the SAME breath:\n  E.g.: "Baik ${candidateName}, kita mulai Repeat Sentence nomor 1. Dengarkan kalimat ini baik-baik: '[academic sentence]'. ... Sekarang giliranmu, ulangi dalam 5 detik!"\n- When candidate repeats: Immediately grade it (evaluating the 50% rule: did they capture >=50% words without hesitation?), deliver punchy feedback, and IMMEDIATELY fire question number 2 in the very same turn:\n  "Bagus, kelancaranmu terjaga dan lebih dari 50% kata tertangkap. Sekarang nomor 2, dengarkan: '[academic sentence 2]'. ... Giliranmu!"\n- ZERO AWKWARD PAUSES! ZERO ASKING 'Mau lanjut ke nomor berikutnya?'! Automatically drive the test session forward with momentum!\n\n[DYNAMIC SYLLABUS ALIGNMENT MANDATE]:\n- When ${candidateName} says what they want to practice (e.g. 'aku mau latihan Describe Image dulu' or 'aku mau drill Repeat Sentence' or 'aku mau bahas tips rahasia'):\n- Immediately align with their wish while keeping the PTE 42 roadmap standards intact:\n  "Siap ${candidateName}, kita selaraskan roadmap target PTE 42 kita dengan fokus latihan [permintaan ${candidateName}] hari ini! Mari kita mulai!"\n- Never rigidly refuse or force an unwanted mode. Dynamically adapt the session to what they ask while maintaining examiner rigor!\n\n[DESCRIBE IMAGE SPLIT-SCREEN WORKBENCH INSTRUCTIONS]:\n- The Describe Image workbench is now a wide side-by-side landscape screen (diagram on left, Nakul 5-line formula & 25-28s stopping hacks on right).\n- Instruct ${candidateName}: "Perhatikan layar lebarmu ${candidateName}: di sebelah kiri adalah diagram ujian asli, dan di sebelah kanan adalah 5 baris template Nakul dan trik berhenti di detik 25-28. Gunakan waktu persiapan 25 detik untuk mengunci angka tertinggi dan terendah, lalu bicara selama 25 hingga 28 detik tanpa berhenti!"\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen ${candidateName} finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "${candidateName}, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing them to move on to the next question!\n\n${pteMasterDirective}${cefrCalibrationDirective}`
                           : isCambridgeExaminer
-                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "Fitra".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate Fitra makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5–9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${cefrCalibrationDirective}`
+                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "${candidateName}".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate ${candidateName} makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5–9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${cefrCalibrationDirective}`
                           : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}${cefrCalibrationDirective}`,
                       },
                     ],
@@ -5110,11 +5140,14 @@ ${
                 activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian';
               let pteDiagResult: ReturnType<typeof diagnosePteCandidateSpeech> | null = null;
               if (isDrJulianTurn && uText) {
+                const regLearnerName =
+                  readHostPwaCognitiveSnapshot(activeScenario.targetLang, locale).learnerName?.trim() ||
+                  (locale === 'th' ? 'นักเรียน' : 'Candidate');
                 pteDiagResult = diagnosePteCandidateSpeech({
                   spokenTranscript: uText,
                   durationSec: 30,
                   questionTitle: learningWorkbench?.topicTitle || activeScenario.titleId,
-                  learnerName: 'Fitra',
+                  learnerName: regLearnerName,
                 });
                 evalParams.learnerDossier += `\n\n${pteDiagResult.clinicalDossierText}`;
                 brainStateRef.current = loadBraincoreState();
@@ -5740,6 +5773,50 @@ ${
     };
   }, [isLiveConnected, isLiveConnecting]);
 
+  // Test Bridge & Custom Event Handler for Probe Testing
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__FIEZEL_VOICE_STUDIO_TEST_BRIDGE__ = {
+        openWorkbench: (opts?: any) => {
+          openLearningWorkbenchWithAction(
+            opts
+              ? {
+                  actionType: 'open_learning_popup',
+                  focusType: opts.contextMode || opts.focusType,
+                  topicTitle: opts.topicTitle,
+                  ...opts,
+                }
+              : undefined
+          );
+        },
+        closeWorkbench: () => {
+          setLearningWorkbench(null);
+        },
+        setScenario: (scenId: string) => {
+          handleSelectScenario(scenId);
+        },
+        getState: () => ({
+          activeScenario,
+          activePersona,
+          learningWorkbench,
+          isMeasureMode,
+        }),
+      };
+
+      const handleWorkbenchEvt = (e: Event) => {
+        const ce = e as CustomEvent;
+        if (ce.detail) {
+          openLearningWorkbenchWithAction(ce.detail, ce.detail.topicTitle || '');
+        }
+      };
+      window.addEventListener('fiezel:open-learning-workbench', handleWorkbenchEvt);
+
+      return () => {
+        window.removeEventListener('fiezel:open-learning-workbench', handleWorkbenchEvt);
+      };
+    }
+  }, [activeScenario, activePersona, learningWorkbench, isMeasureMode]);
+
   const handleManualSync = async () => {
     setSyncingNow(true);
     const { nextState } = await brainSyncFlush(brainState);
@@ -6154,9 +6231,12 @@ ${
                   const reqSeq = ++workbenchSessionRef.current.turnSeq;
                   workbenchSessionRef.current.dismissedByUser = false;
                   setIsAnalyzingTurn(true);
+                  const isPte = activeScenario.id.startsWith('scen_pte_') || activeScenario.personaId === 'dr_julian';
+                  const pteFocus = activeScenario.id === 'scen_pte_ra_level2' ? 'pte_read_aloud' : (isPte ? 'pte_describe_image' : undefined);
                   openLearningWorkbenchWithAction(
                     {
                       actionType: 'open_learning_popup',
+                      focusType: pteFocus,
                       topicTitle: focusQuery,
                     },
                     focusQuery

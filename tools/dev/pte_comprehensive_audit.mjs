@@ -20,7 +20,7 @@ const PORT = 4173;
 async function runAudit() {
   console.log('--- Starting PTE Academic Hub Visual & Functional Audit ---');
   const browser = await chromium.launch({ headless: true });
-  
+
   // Mobile context (iPhone 13 / modern phone: 390x844)
   const mobileCtx = await browser.newContext({
     viewport: { width: 390, height: 844 },

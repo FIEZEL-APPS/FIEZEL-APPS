@@ -1,78 +1,57 @@
 # FIEZEL Handoff Dossier: PTE Master Tutor & Strict Examiner Engine (Dr. Julian)
 
-**Build Version**: `m025-788`
-**Branch**: `feat/voice-pte-master-tutor`
-**Target Component**: `features/voice-studio/` (`call.html` / Kawan Bicara)
-**Coordinator Session**: `a91b3a79-13cf-443d-8f8f-d3a0860668c8`
-**Executor Agent**: `8979cd84-d320-4043-80cf-c591935cf8b2`
-**Compliance Protocol**: AGENTS.md (Scope Isolation #0, Live SSOT #0-B, CSS Integrity #0-C, Voice Studio Purity #11, Multi-Agent Concurrency #12)
+**Build Version**: `m025-787`<br/>
+**Branch**: `feat/voice-pte-master-tutor`<br/>
+**Target Component**: `features/voice-studio/` (`call.html` / Kawan Bicara)<br/>
+**Coordinator Session**: `a91b3a79-13cf-443d-8f8f-d3a0860668c8`<br/>
+**Executor Agent**: `8979cd84-d320-4043-80cf-c591935cf8b2`<br/>
+**Compliance Protocol**: AGENTS.md (Scope Isolation #0, Live SSOT #0-B, CSS Integrity #0-C, Voice Studio Purity #11, Multi-Agent Concurrency #12)<br/>
 **Deployment Policy**: **LOCAL TEST ONLY (UNMERGED / NO LIVE DEPLOY)** per explicit user directive.
 
 ---
 
 ## 1. Executive Summary & Problem Resolution
 
-### Core Problem Solved & User Feedback Addressed:
-1. "Untuk soal popup grafik Describe Image-nya masih sangat sedikit dan sangat template, tidak banyak."
-2. "Seharusnya bank soal untuk Describe Image-nya dimuatkan lebih banyak lagi, diambil dari bank soal APEUni dan internet, karena saat ini terlihat tidak resmi dan terbatas."
-3. "Kecerdasan / logika AI-nya belum pintar, ilmunya belum banyak untuk mengajari secara mendalam."
-
-### Arsitektur Solusi & Peningkatan Signifikan:
-1. **Bank Soal Master 50 Soal Asli Pearson & Prediksi APEUni (`pteDescribeImageBank.ts`)**:
-   - Berisi **50 soal asli** terbagi ke dalam 6 kategori lengkap standar Pearson Academic:
-     * **10 Bar Charts**: World Population 2050, Australian Wine Exports, Renewable Energy Share, Government Spending, Household Waste, Electric Vehicle Adoption, OECD Higher Education, Air Freight Volumes, Agricultural Water Use, Urbanization Rates.
-     * **10 Line Graphs**: Atmospheric CO2 (1960-2024), Global Inflation, Southeast Asia E-Commerce ($32B-$120B), Average Global Temperature Anomaly, Crude Oil Price Volatility, Teleworking Rates, Solar PV Hardware Cost Deflation, Youth Unemployment, Clean Tech Patents, Life Expectancy.
-     * **8 Pie Charts**: Global Smartphone OS Market Share (Android 71%, iOS 28%), Municipal Solid Waste Breakdown, Global Freshwater Withdrawal, Global Energy Generation Mix, Online vs Brick-and-Mortar Retail, Electric Vehicle Battery Chemistry, Cloud Infrastructure Market Share, World Land Usage.
-     * **8 Process Diagrams**: Atlantic Salmon Biological Life Cycle, Industrial Glass Bottle Recycling, Potable Water Treatment Cycle, Coffee Processing from Cherry to Roasted Bean, Hydroelectric Dam Power Generation, Recycled Paperboard Cycle, Aluminium Can Closed-Loop Recycling, Solar Thermal Desalination.
-     * **7 Maps & Geography**: Annual Rainfall and Climate Zones Across Australia, Global Tropical Deforestation Hotspots, Population Density Distribution Across Japan, Major Maritime Container Shipping Corridors, Seismic Hazards and Pacific Ring of Fire, Global Solar Irradiation Potentials, African Urbanization Corridors.
-     * **7 Academic Tables**: University International Student Enrolment by Faculty, Hospital Bed Capacity per 1,000 Inhabitants, Public Transit vs Private Vehicle Modal Share, Global Renewable Energy Installed Capacity, R&D Expenditure as % of GDP, Average Annual Working Hours, Commercial Solar PV Hardware Cost Deflation.
-2. **Kanvas Interaktif Describe Image Multi-Kategori (`InCallLearningWorkbenchModal.tsx`)**:
-   - **Filter Kategori Cepat**: `[Semua (50)]`, `[📊 Bar (10)]`, `[📈 Line (10)]`, `[🥧 Pie (8)]`, `[🔄 Process (8)]`, `[🗺️ Map (7)]`, `[📋 Table (7)]`.
-   - **Bilah Navigasi Soal**: `[◀ Prev]`, `[Soal X dari Y]`, `[Next ▶]`, serta tombol `[🎲 Acak Soal Ujian Asli]`.
-   - **Render Visual Dinamis untuk 6 Kategori**:
-     * Visualizer Bar & Line SVG dinamis dengan grid garis putus-putus, persentase nilai, dan sumbu waktu.
-     * Visualizer Pie Donut SVG dinamis dengan potongan warna-warni dan legenda keterangan lengkap.
-     * Visualizer Process Flow dengan kartu langkah terstruktur, nomor badge tahapan, dan panah aliran.
-     * Visualizer Map & Geography dengan kompas mata angin `🧭 N • S • E • W`, kode status wilayah, dan catatan iklim/bahaya.
-     * Visualizer Academic Table dengan tampilan layar komputer pusat ujian resmi Pearson, baris kepala tabel berlatar kontras, dan penyorotan baris kunci.
-   - **Timers Resmi**: Timer 25 detik persiapan dan timer 40 detik rekam bicara (peringatan merah saat $\le 10$ detik) + peringatan Aturan 3 Detik Pearson.
-   - **Checklist Kata Kunci**: Mengambil kata kunci dinamis sesuai soal aktif dengan interaksi centang bersuara tap.
-   - **Rahasia Penguji (Dr. Julian)**: Kartu tips rahasia penguji (`examinerTips`) yang membedah trik pelafalan angka, perangkap konsonan jamak (-s), dan fokus frasa kunci pada setiap soal.
-   - **Accordion Rumus Universal 5-Tahap FIEZEL**: Intro, Key Elements, Maximum Figure, Minimum Figure, Conclusion, dan tombol putar audio model native.
-3. **Peningkatan Kecerdasan Pedagogis Dr. Julian (`callScenarios.ts` & `pteCallScenarios.ts`)**:
-   - Penanaman rubrik mendalam algoritma Pearson AI: Oral Fluency 1-5 (anti jeda > 2 detik, larangan meralat diri sendiri / self-correction), Pronunciation 1-5 (penalti pelafalan jamak dropped 's' dan -ed, intonasi kata akademik multi-suku kata), dan Content 0-3 (pola lexical anchors).
-   - Protokol waktu optimal bicara: Sweet spot 30-35 detik (tempo konstan 120-140 WPM).
-   - Panduan spesifik penguraian untuk ke-6 jenis visual (Bar, Line, Pie, Process, Map, Table).
-   - Perintah remedial wajib jika skor Fluency atau Pronunciation di bawah 3.
+### Core Problem Solved & User Directives Addressed:
+1. **Landscape Side-by-Side (Split Screen) Describe Image**:
+   - *Masalah Sebelumnya*: Gambar diagram berada di atas, template jawaban berada di bawah di dalam accordion tertutup. Murid harus scroll bolak-balik antara gambar dan template, mengorbankan Oral Fluency dan konsentrasi.
+   - *Solusi Sempurna*: Melebarkan modal ke wadah lanskap `max-w-5xl xl:max-w-6xl` dengan tata letak 2-kolom berdampingan (*side-by-side*). Sisi kiri memuat diagram visual SVG interaktif, timer persiapan 25d & rekam 40d, indikator *Zona Berhenti Ideal 25–28 Detik*, peringatan Aturan 3 Detik Pearson, dan checklist kata kunci. Sisi kanan menampilkan **Rumus Universal Nakul (5-Baris Anti-Pause)** yang SELALU terbuka (tanpa accordion) berdampingan langsung dengan diagram, preview audio native, dan trik rahasia penguji (*examiner secret hacks*). NOL SCROLLING diperlukan!
+2. **Koreksi Tata Bahasa Lisan Real-Time Ketat (Zero-Tolerance Grammar Interception)**:
+   - *Masalah Sebelumnya*: Dr. Julian terlalu pasif dan tidak pernah mengoreksi kesalahan grammar murid saat berbicara.
+   - *Solusi Sempurna*: Penegakan aturan *Zero-Tolerance Grammar Interception*. Ketika murid melakukan kesalahan tata bahasa (subject-verb agreement, salah tenses, konsonan jamak -s/-ed yang hilang, atau salah preposisi), Dr. Julian secara sopan namun otoriter langsung memotong, menjelaskan letak kesalahan dalam 1 kalimat presisi, dan mewajibkan *Echo Redemption* (murid mengulangi kalimat yang sudah dibenarkan).
+3. **Proactive Automated Drilling (Tanpa Perlu Diperintah / Pengalaman Guru Private Asli)**:
+   - *Masalah Sebelumnya*: Pada sesi Repeat Sentence atau drilling, AI berhenti dan pasif menunggu murid mengetik "coba lanjut" baru memberikan soal berikutnya.
+   - *Solusi Sempurna*: Dr. Julian memandu sesi secara proaktif dan otonom layaknya tutor privat senior Australia. Dr. Julian langsung membacakan kalimat target dan memerintahkan: *"Giliranmu, ulangi dalam 5 detik!"*, mengevaluasi kepatuhan Aturan 50% Nakul, dan segera melontarkan soal berikutnya dalam putaran yang sama tanpa bertanya *"Mau lanjut?"*.
+4. **Penyelarasan Silabus Dinamis (Dynamic Syllabus Alignment)**:
+   - *Masalah Sebelumnya*: AI kaku ketika murid meminta materi atau mode latihan tertentu di luar urutan kaku.
+   - *Solusi Sempurna*: Menyelaraskan roadmap latihan dengan keinginan murid (misalnya maraton Describe Image atau Repeat Sentence) sambil tetap mempertahankan tolok ukur standar kelulusan PTE Academic 42 untuk Visa Pelajar Australia (Subclass 500) di AILFE Perth.
+5. **Bank Soal Read Aloud Multi-Topik & Chunking Nafas (`pteReadAloudBank.ts`)**:
+   - *Masalah Sebelumnya*: Hanya ada 1 teks statis yang berulang tanpa variasi, trik, atau tips pemenggalan nafas.
+   - *Solusi Sempurna*: Disediakan bank soal multi-topik otentik (11+ teks) lintas kategori *Cookery & Hospitality* (persiapan AILFE Perth), *Western Australia / Perth Ecology*, dan *Academic Science*. Setiap teks dilengkapi penanda jeda nafas sintaksis (`// jeda`), spidometer target tempo 120–140 WPM, kartu bor fonetik dengan IPA, dan spanduk *Trik 1-Kalimat APEUni*.
 
 ---
 
 ## 2. Berkas yang Dimodifikasi & Dibuat
 
-1. `features/voice-studio/src/types/voiceCall.ts`:
-   - Penambahan interface `PteMasterScorecard` dan `PteMasterState`.
-   - Perluasan `focusType` untuk `'pte_describe_image' | 'pte_read_aloud' | 'pte_scorecard'`.
-2. `features/voice-studio/src/lib/braincore.ts`:
-   - Implementasi kunci penyimpanan `PTE_MASTER_STORAGE_KEY` (`fz_pte_master_state_v1`).
-   - Fungsi `getDefaultPteMasterState()`, `loadPteMasterState()`, `savePteMasterState()`, `recordPteMasterAttempt()`, dan `resetPteMasterState()`.
-3. `features/voice-studio/src/data/pteCallScenarios.ts`:
-   - Pembuatan data skenario kurikulum PTE 5-level lengkap dengan tujuan, kosakata prasyarat, target pola, dan ujaran model.
-4. `features/voice-studio/src/data/callScenarios.ts`:
-   - Pendaftaran persona Dr. Julian (`dr_julian`) dengan prompt sistem penguji ketat.
-   - Penggabungan skenario `PTE_CALL_SCENARIOS` ke dalam daftar `CALL_SCENARIOS`.
-5. `features/voice-studio/src/components/InCallLearningWorkbenchModal.tsx`:
-   - Implementasi `PteDescribeImageCanvas` (SVG Bar, Line, Pie, Process, Timer 25s & 40s, Aturan 3 Detik, Checklist, Accordion Formula).
-   - Implementasi `PteReadAloudCanvas` (Chunking Marks, 120-140 WPM, Articulation Pills).
-   - Implementasi `PteScorecardCanvas` (Circle Score /90, Enabling Skills, Remedial Words).
-   - Integrasi ke `deriveContextualPedagogicalBoard`.
-6. `features/voice-studio/src/App.tsx`:
-   - Pengambilan stage aktif murid dari `loadPteMasterState()` ke dalam instruksi sistem Dr. Julian (`pteMasterDirective`).
-   - Pencatatan telemetri evaluasi ke `recordPteMasterAttempt` saat latihan dinilai.
-   - Dukungan `focusType` PTE pada `buildDefaultWorkbenchPayload`.
-7. `features/voice-studio/dist/` (`voice-studio.js` & `voice-studio.css`):
-   - Kompilasi produksi Vite sukses tanpa eror.
-8. `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `index.html`:
-   - Sinkronisasi nomor build resmi `m025-788`.
+1. `features/voice-studio/src/data/pteReadAloudBank.ts` *(Baru)*:
+   - Bank soal 11+ teks otentik Pearson Academic lengkap dengan pemenggalan sintaksis (`chunkedSegments`), target WPM, kartu fonetik IPA, tips penguji, dan Trik 1-Kalimat APEUni.
+2. `features/voice-studio/src/components/InCallLearningWorkbenchModal.tsx` *(Dimodifikasi)*:
+   - Pembongkaran kanvas Describe Image menjadi tata letak 2-kolom lanskap berdampingan.
+   - Rumus Universal Nakul 5-baris terbuka permanen di sisi kanan berdampingan dengan grafik di sisi kiri.
+   - Penghilangan kuis ganda generik yang mengacaukan bagian bawah kanvas PTE.
+   - Pembuatan `PteReadAloudCanvas` interaktif lengkap dengan navigasi soal, kategori, dan visualisasi pemenggalan nafas.
+3. `features/voice-studio/src/App.tsx` *(Dimodifikasi)*:
+   - Penyempurnaan `pteMasterDirective` dan instruksi sistem Dr. Julian untuk penegakan koreksi tata bahasa lisan seketika, pemanduan latihan otomatis tanpa jeda kosong (*zero dead air*), dan sinkronisasi preferensi skenario `fiezel_voice_scenario_pref`.
+   - Penyediaan jembatan tes `window.__FIEZEL_VOICE_STUDIO_TEST_BRIDGE__` dan pendengar event kustom `fiezel:open-learning-workbench`.
+4. `features/voice-studio/src/data/callScenarios.ts` *(Dimodifikasi)*:
+   - Pembaruan persona Dr. Julian dengan mandat penguji ketat dan rubrik penilaian Pearson AI.
+5. `tests/dev-probe-pte-landscape-workbench.cjs` *(Baru)*:
+   - Skrip pengujian Playwright Chromium headless beresolusi 1280x800 yang memverifikasi wadah modal lanskap (`max-w-5xl`), tampilan berdampingan diagram dan 5 baris template Nakul, perputaran soal Describe Image & Read Aloud, dan penyimpanan tangkapan layar visual.
+6. `coordination/screenshots/` *(Aset Pembuktian Visual)*:
+   - `pte-describe-image-landscape-split.png`: Tangkapan layar empiris Describe Image split screen.
+   - `pte-read-aloud-landscape-split.png`: Tangkapan layar empiris Read Aloud dengan penanda jeda nafas.
+7. `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `index.html`:
+   - Sinkronisasi build resmi `m025-787`.
 
 ---
 
@@ -80,34 +59,34 @@
 
 | Gerbang Pengujian | Perintah | Status |
 |---|---|---|
-| Gate Registry Audit | `node tests/gate-registry-test.js` | **PASS (10 pass, 0 fail)** |
+| Empirical Playwright Landscape Probe | `node tests/dev-probe-pte-landscape-workbench.cjs` | **PASS 100% (Screenshots Saved)** |
+| Voice Studio UI Architecture | `node tests/voice-studio-ui-architecture-test.js` | **PASS (8/8)** |
+| Voice Call Studio Integration | `node tests/voice-call-studio-integration-test.js` | **PASS (8/8)** |
+| PTE Bank Integrity | `node tests/pte-bank-integrity-test.js` | **PASS (12/12)** |
+| PTE Academic Engine Unit Tests | `node tests/pte-academic-engine-test.js` | **PASS (18/18)** |
 | Indonesian Golden Snapshot | `node tests/id-golden-snapshot-test.js` | **PASS (HIJAU baseline emas utuh)** |
 | Thai UI Leak Guard | `node tests/th-ui-leak-test.js` | **PASS (4751 kunci utuh)** |
-| Hexa-Sync Version Check | `node tools/bump-build.mjs --check` | **PASS (Selaras: true, m025-788)** |
-| Curriculum Cache Version | `node tests/curriculum-cache-version-test.js` | **PASS (33 penegasan, m025-788)** |
-| Vite Production Bundle | `npm run build` | **PASS (2,985.45 kB, 0 errors)** |
+| Curriculum Cache Version | `node tests/curriculum-cache-version-test.js` | **PASS (33 penegasan, m025-787)** |
+| Gate Registry Audit | `node tests/gate-registry-test.js` | **PASS (10 pass, 0 fail)** |
+| Hexa-Sync Version Check | `node tools/bump-build.mjs --check` | **PASS (Selaras: true, m025-787)** |
+| Git Whitespace Audit | `git diff --check origin/main` | **PASS (0 warnings)** |
 
 ---
 
 ## 4. Panduan Pengujian Lokal Pengguna (Localhost Test Walkthrough)
 
-Sesuai instruksi mutlak pengguna, build ini **TIDAK DI-DEPLOY KE SERVER LIVE**.
-Untuk menguji di mesin lokal:
+Build aktif disajikan pada port lokal 4173:
 
-1. Jalankan web server statis di root workspace (atau buka worktree `C:\Users\hp\fiezel-voice-pte-tutor`):
-   ```bash
-   npx serve -p 4173 C:\Users\hp\fiezel-voice-pte-tutor
+1. Buka URL Studio Kawan Bicara di peramban:
    ```
-2. Buka peramban di URL:
+   http://127.0.0.1:4173/call.html
    ```
-   http://127.0.0.1:4173/call.html?v=m025-788
-   ```
-   (Atau buka `http://127.0.0.1:4173/` lalu pilih menu Kawan Bicara / Mitra Kaiwa).
-3. Pilih Persona: **Dr. Julian (Pearson Certified Master Coach & Strict Examiner)**.
-4. Pilih Skenario: **Level 1: Describe Image Master** atau **Level 2: Read Aloud**.
-5. Buka Papan Belajar untuk menguji Kanvas Visual:
-   - Ketuk tab **Bar / Line / Pie / Process** untuk melihat 4 grafik SVG.
-   - Ketuk **Mulai (25d)** untuk menguji timer persiapan 25 detik dan Aturan 3 Detik Pearson.
-   - Buka accordion **Rumus Universal FIEZEL (5-Tahap)** dan ketuk tombol dengar audio.
-   - Selesaikan kuis formula di bagian bawah untuk melihat umpan balik Braincore.
-6. Periksa `localStorage.getItem('fz_pte_master_state_v1')` di DevTools Console untuk membuktikan persistensi stage, target skor, dan riwayat rapor Pearson.
+2. Pastikan Persona **Dr. Julian** aktif di header atas.
+3. Ketuk tombol **Papan Tulis / Papan Belajar** di kanan atas:
+   - Amati jendela modal yang kini **jauh lebih lebar (Landscape Split Screen)**.
+   - Perhatikan **Sisi Kiri**: Grafik diagram SVG interaktif dengan timer 25d/40d, indikator hijau 25–28 detik, dan checklist kata kunci.
+   - Perhatikan **Sisi Kanan**: **Rumus Universal Nakul (5-Baris Anti-Pause)** yang langsung terbuka penuh (Intro, Key Elements, Maximum, Minimum, Conclusion) tanpa perlu di-scroll ke bawah!
+   - Uji tombol **Next ▶** untuk mengganti soal grafik secara instan.
+4. Uji pergantian ke Skenario **Level 2: Read Aloud**:
+   - Amati penanda jeda nafas sintaksis (`// jeda`), spidometer 120–140 WPM, kartu fonetik IPA, dan spanduk Trik 1-Kalimat APEUni.
+5. Bicara dengan sengaja membuat kesalahan grammar (misal: *"Yesterday I go to market"*) saat mikrofon terhubung, dan saksikan Dr. Julian langsung memotong dengan koreksi tata bahasa lisan presisi.
