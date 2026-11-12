@@ -81,10 +81,11 @@ http.createServer((req, res) => {
       method: req.method,
       headers: proxyHeaders,
     }, (proxyRes) => {
-      res.writeHead(proxyRes.statusCode || 200, {
-        ...proxyRes.headers,
-        'Access-Control-Allow-Origin': '*',
-      });
+      const respHeaders = { ...proxyRes.headers };
+      delete respHeaders['access-control-allow-origin'];
+      delete respHeaders['Access-Control-Allow-Origin'];
+      respHeaders['Access-Control-Allow-Origin'] = '*';
+      res.writeHead(proxyRes.statusCode || 200, respHeaders);
       proxyRes.pipe(res);
     });
 

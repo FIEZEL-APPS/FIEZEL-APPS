@@ -116,7 +116,9 @@
     lfAnswers: {},
     hiwSelectedIndices: [],
     activeDeepFeedback: null,
-    showGrammarGuide: false
+    showGrammarGuide: false,
+    speechErrorNotice: '',
+    showManualSpeechInput: false
   };
 
   function playPearsonBeep() {
@@ -144,14 +146,15 @@
 
   function armSilenceWatchdog() {
     if (state.silenceWatchdogTimer) clearTimeout(state.silenceWatchdogTimer);
-    // Pearson Official Standard: If student doesn't speak within 3 seconds of the tone, recording halts
+    // Relaxed silence timeout to accommodate Web Speech API initialization and network delay:
+    // If student has not spoken and VAD detected no audio within 8.5 seconds, recording halts
     state.silenceWatchdogTimer = setTimeout(function () {
-      if (state.timerState === 'recording' && (!state.speechTranscript || !state.speechTranscript.trim())) {
-        console.log('[PTE Official 3-Second Silence Rule Triggered: No Speech Detected]');
+      if (state.timerState === 'recording' && !pteHasUserSpoken && (!state.speechTranscript || !state.speechTranscript.trim())) {
+        console.log('[PTE Silence Watchdog: No Speech Detected]');
         state.silenceTriggered = true;
         stopRecordingAndEvaluate();
       }
-    }, 3200);
+    }, 8500);
   }
 
   function disarmSilenceWatchdog() {
@@ -170,6 +173,8 @@
     }
     return null;
   }
+
+  var isPteInitialized = false;
 
   /**
    * Ensure all 15 content banks are populated in browser via fetch if empty.
@@ -204,7 +209,10 @@
     ];
 
     Promise.all(promises).then(function () {
-      initCurrentItemState();
+      if (!isPteInitialized) {
+        isPteInitialized = true;
+        initCurrentItemState();
+      }
       if (typeof callback === 'function') callback();
     });
   }
@@ -221,6 +229,8 @@
     state.lastResult = null;
     state.activeDeepFeedback = null;
     state.speechTranscript = '';
+    state.speechErrorNotice = '';
+    state.showManualSpeechInput = false;
     state.wfdText = '';
     state.showGrammarGuide = false;
     state.timerState = 'idle';
@@ -262,8 +272,14 @@
    */
   function mount(containerEl) {
     if (!containerEl) return;
+    if (typeof window !== 'undefined' && window.FiezelLazyLoader && typeof window.FiezelLazyLoader.load === 'function') {
+      window.FiezelLazyLoader.load('voice').catch(function () {});
+    }
     ensureBanksLoaded(function () {
-      initCurrentItemState();
+      if (!isPteInitialized) {
+        isPteInitialized = true;
+        initCurrentItemState();
+      }
       renderHub(containerEl);
     });
   }
@@ -354,6 +370,13 @@
       out.push('    <button type="button" class="fz-pte-section-tab' + act + '" onclick="FiezelPteUi.switchSection(\'' + s.id + '\')">' + s.label + '</button>');
     });
     out.push('  </div>');
+
+    if (state.speechErrorNotice) {
+      out.push('  <div style="background:#fef3c7; border:1.5px solid #fcd34d; color:#92400e; padding:8px 12px; border-radius:8px; margin:8px 0; font-size:0.82rem; font-weight:600; display:flex; justify-content:space-between; align-items:center;">');
+      out.push('    <span>⚠️ ' + esc(state.speechErrorNotice) + '</span>');
+      out.push('    <button type="button" style="background:none; border:none; color:#92400e; font-weight:bold; cursor:pointer;" onclick="FiezelPteUi.clearSpeechError()">✕</button>');
+      out.push('  </div>');
+    }
 
     // 3. Section Content
     if (state.section === 'plan') {
@@ -675,6 +698,9 @@
       out.push('    <div class="fz-pte-prompt-box">');
       out.push('      <div class="fz-pte-chunked-text">' + formatChunkedText(item.chunking || item.text) + '</div>');
       out.push('    </div>');
+      out.push('    <div style="display:flex; justify-content:flex-end; margin-top:8px;">');
+      out.push('      <button type="button" class="fz-pte-play-btn" style="width:auto; padding:6px 14px; border-radius:20px; font-size:0.8rem; gap:6px; display:inline-flex; align-items:center;" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■ Stop Audio' : '🔊 Listen Model Pronunciation') + '</button>');
+      out.push('    </div>');
       out.push('    <div class="fz-pte-secret-tip">');
       out.push('      <b>💡 Nakul 7-Hour Secret:</b> Baca dengan tempo stabil 12-14 detik. Jangan terburu-buru, jangan ubah nada saat tanda titik! Bernafas hanya di tanda jeda ganda (//).');
       out.push('    </div>');
@@ -719,7 +745,13 @@
       out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
       out.push('      <div style="flex:1; margin-left:12px;">');
       out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Listen to Academic Lecture</div>');
-      out.push('        <div style="font-size:0.78rem; color:#64748b;">Domain: ' + esc(item.domain || 'Academic') + '</div>');
+      out.push('        <div style="font-size:0.78rem; color:#64748b;">' + (state.isAudioPlaying ? '🔊 Playing academic lecture...' : 'Domain: ' + esc(item.domain || 'Academic')) + '</div>');
+      out.push('      </div>');
+      out.push('      <div class="fz-pte-audio-waveform">');
+      for (var wRl = 0; wRl < 16; wRl++) {
+        var hClassRl = state.isAudioPlaying ? ' active' : '';
+        out.push('        <div class="fz-pte-wave-bar' + hClassRl + '" style="animation-delay:' + (wRl * 0.05) + 's;"></div>');
+      }
       out.push('      </div>');
       out.push('    </div>');
       out.push('    <div class="fz-pte-prompt-box" style="margin-top:12px;">');
@@ -837,7 +869,13 @@
       out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
       out.push('      <div style="flex:1; margin-left:12px;">');
       out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Listen to Spoken Lecture</div>');
-      out.push('        <div style="font-size:0.78rem; color:#64748b;">Target: 50-70 words summary strictly</div>');
+      out.push('        <div style="font-size:0.78rem; color:#64748b;">' + (state.isAudioPlaying ? '🔊 Playing lecture audio...' : 'Target: 50-70 words summary strictly') + '</div>');
+      out.push('      </div>');
+      out.push('      <div class="fz-pte-audio-waveform">');
+      for (var wSst = 0; wSst < 16; wSst++) {
+        var hClassSst = state.isAudioPlaying ? ' active' : '';
+        out.push('        <div class="fz-pte-wave-bar' + hClassSst + '" style="animation-delay:' + (wSst * 0.05) + 's;"></div>');
+      }
       out.push('      </div>');
       out.push('    </div>');
       out.push('    <div style="margin-top:12px;">');
@@ -852,7 +890,13 @@
       out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
       out.push('      <div style="flex:1; margin-left:12px;">');
       out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Listening Fill in the Blanks</div>');
-      out.push('        <div style="font-size:0.78rem; color:#64748b;">Type the exact missing words as spoken.</div>');
+      out.push('        <div style="font-size:0.78rem; color:#64748b;">' + (state.isAudioPlaying ? '🔊 Playing audio passage...' : 'Type the exact missing words as spoken.') + '</div>');
+      out.push('      </div>');
+      out.push('      <div class="fz-pte-audio-waveform">');
+      for (var wLf = 0; wLf < 16; wLf++) {
+        var hClassLf = state.isAudioPlaying ? ' active' : '';
+        out.push('        <div class="fz-pte-wave-bar' + hClassLf + '" style="animation-delay:' + (wLf * 0.05) + 's;"></div>');
+      }
       out.push('      </div>');
       out.push('    </div>');
       out.push('    <div class="fz-pte-prompt-box" style="margin-top:12px;">');
@@ -863,7 +907,13 @@
       out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
       out.push('      <div style="flex:1; margin-left:12px;">');
       out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Highlight Incorrect Words</div>');
-      out.push('        <div style="font-size:0.78rem; color:#b91c1c; font-weight:700;">⚠ Negative Marking Active: +1 correct error, -1 false alarm!</div>');
+      out.push('        <div style="font-size:0.78rem; color:' + (state.isAudioPlaying ? '#0284c7' : '#b91c1c') + '; font-weight:700;">' + (state.isAudioPlaying ? '🔊 Audio is playing — tap words that differ from speech!' : '⚠ Negative Marking Active: +1 correct error, -1 false alarm!') + '</div>');
+      out.push('      </div>');
+      out.push('      <div class="fz-pte-audio-waveform">');
+      for (var wHiw = 0; wHiw < 16; wHiw++) {
+        var hClassHiw = state.isAudioPlaying ? ' active' : '';
+        out.push('        <div class="fz-pte-wave-bar' + hClassHiw + '" style="animation-delay:' + (wHiw * 0.05) + 's;"></div>');
+      }
       out.push('      </div>');
       out.push('    </div>');
       out.push('    <div class="fz-pte-prompt-box" style="margin-top:12px;">');
@@ -1134,6 +1184,7 @@
     if (res.noSpeechDetected) {
       out.push('    <div style="background:#fee2e2; border:1.5px solid #fca5a5; color:#991b1b; padding:10px 12px; border-radius:10px; margin-top:10px; font-weight:700; font-size:0.84rem; line-height:1.45;">');
       out.push('      ⚠️ <b>No speech detected.</b> Please check your microphone, click "Retry Question", and speak clearly.');
+      out.push('      <div style="margin-top:8px; font-weight:500; font-size:0.8rem; color:#7f1d1d;">Did your browser mic fail to record? <button type="button" class="fz-pte-text-link-btn" style="text-decoration:underline; font-weight:700; color:#b91c1c; cursor:pointer;" onclick="FiezelPteUi.toggleManualSpeechInput()">Click here to type/paste your transcript and score</button></div>');
       out.push('    </div>');
     }
 
@@ -1381,7 +1432,7 @@
     lbl.innerHTML = '<b style="color:' + color + ';">' + words.length + ' words</b> (Target: 50-70 words)';
   }
 
-  // --- Neural Voice Pipeline (Wired from Kawan Bicara) ---
+  // --- Neural Voice Pipeline & Robust Native Speech Synthesis Fallback ---
   function getChatVoice() {
     if (typeof window !== 'undefined' && window.FiezelChatVoice) return window.FiezelChatVoice;
     if (typeof require === 'function') {
@@ -1390,10 +1441,99 @@
     return null;
   }
 
+  var pteSpeechKeepAliveTimer = null;
+
+  function fallbackBrowserTts(text, options, callback) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      state.isAudioPlaying = false;
+      renderHub();
+      if (typeof callback === 'function') callback(true);
+      return;
+    }
+    try {
+      window.speechSynthesis.cancel();
+      var cleanText = String(text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!cleanText) {
+        state.isAudioPlaying = false;
+        renderHub();
+        if (typeof callback === 'function') callback(false);
+        return;
+      }
+      var utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'en-US';
+      utterance.rate = (options && options.rate) || 0.95;
+      utterance.pitch = (options && (options.persona === 'guy' || options.persona === 'keita')) ? 0.95 : 1.0;
+
+      var voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      if (voices && voices.length > 0) {
+        var preferredVoice = null;
+        var isMale = options && (options.persona === 'guy' || options.persona === 'keita');
+        for (var i = 0; i < voices.length; i++) {
+          var v = voices[i];
+          var vLang = (v.lang || '').toLowerCase();
+          var vName = (v.name || '').toLowerCase();
+          if (vLang.startsWith('en')) {
+            if (isMale && (vName.includes('guy') || vName.includes('male') || vName.includes('david') || vName.includes('george') || vName.includes('natural'))) {
+              preferredVoice = v;
+              break;
+            } else if (!isMale && (vName.includes('aria') || vName.includes('jenny') || vName.includes('female') || vName.includes('samantha') || vName.includes('zira'))) {
+              preferredVoice = v;
+              break;
+            } else if (!preferredVoice) {
+              preferredVoice = v;
+            }
+          }
+        }
+        if (preferredVoice) utterance.voice = preferredVoice;
+      }
+
+      var ended = false;
+      function done(ok) {
+        if (ended) return;
+        ended = true;
+        if (pteSpeechKeepAliveTimer) {
+          clearInterval(pteSpeechKeepAliveTimer);
+          pteSpeechKeepAliveTimer = null;
+        }
+        state.isAudioPlaying = false;
+        renderHub();
+        if (typeof callback === 'function') callback(ok);
+      }
+
+      utterance.onend = function () { done(true); };
+      utterance.onerror = function (e) {
+        if (e && (e.error === 'interrupted' || e.error === 'canceled')) {
+          done(true);
+          return;
+        }
+        console.warn('[PTE Browser TTS Error]', e?.error || e);
+        done(false);
+      };
+
+      if (pteSpeechKeepAliveTimer) clearInterval(pteSpeechKeepAliveTimer);
+      pteSpeechKeepAliveTimer = setInterval(function () {
+        if (!state.isAudioPlaying) {
+          clearInterval(pteSpeechKeepAliveTimer);
+          pteSpeechKeepAliveTimer = null;
+          return;
+        }
+        if (window.speechSynthesis && window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      }, 4000);
+
+      state.isAudioPlaying = true;
+      renderHub();
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.warn('[PTE fallbackBrowserTts exception]', err);
+      state.isAudioPlaying = false;
+      renderHub();
+      if (typeof callback === 'function') callback(false);
+    }
+  }
+
   function playPteAudio(text, options, callback) {
-    var cv = getChatVoice();
-    var opts = options || {};
-    var persona = opts.persona || 'aria';
     stopPteAudio();
 
     if (!text || !String(text).trim()) {
@@ -1401,38 +1541,68 @@
       return;
     }
 
+    var cleanText = String(text).trim();
+    var opts = options || {};
+    var persona = opts.persona || 'aria';
+
     state.isAudioPlaying = true;
     renderHub();
 
+    var cv = getChatVoice();
+    var fallbackInvoked = false;
+
+    function invokeFallback() {
+      if (fallbackInvoked) return;
+      fallbackInvoked = true;
+      fallbackBrowserTts(cleanText, opts, callback);
+    }
+
     if (cv && typeof cv.speak === 'function') {
-      cv.speak(String(text).trim(), 'en', {
-        persona: persona,
-        onSentenceStart: function () {},
-        onEnd: function (ok) {
-          state.isAudioPlaying = false;
-          renderHub();
-          if (typeof callback === 'function') callback(ok);
+      try {
+        var speakPromise = cv.speak(cleanText, 'en', {
+          persona: persona,
+          onSentenceStart: function () {},
+          onEnd: function (ok) {
+            if (ok) {
+              state.isAudioPlaying = false;
+              renderHub();
+              if (typeof callback === 'function') callback(true);
+            } else {
+              invokeFallback();
+            }
+          }
+        });
+
+        if (speakPromise && typeof speakPromise.then === 'function') {
+          speakPromise.then(function (result) {
+            if (result === false) {
+              invokeFallback();
+            }
+          }).catch(function (err) {
+            console.warn('[PTE Audio Prompt cv.speak catch]', err);
+            invokeFallback();
+          });
         }
-      }).catch(function (err) {
-        console.warn('[PTE Audio Prompt Error]', err);
-        state.isAudioPlaying = false;
-        renderHub();
-        if (typeof callback === 'function') callback(false);
-      });
+      } catch (err) {
+        console.warn('[PTE Audio Prompt cv.speak sync error]', err);
+        invokeFallback();
+      }
     } else {
-      // Offline / Test fallback
-      setTimeout(function () {
-        state.isAudioPlaying = false;
-        renderHub();
-        if (typeof callback === 'function') callback(true);
-      }, 300);
+      invokeFallback();
     }
   }
 
   function stopPteAudio() {
+    if (pteSpeechKeepAliveTimer) {
+      clearInterval(pteSpeechKeepAliveTimer);
+      pteSpeechKeepAliveTimer = null;
+    }
     var cv = getChatVoice();
     if (cv && typeof cv.stop === 'function') {
       try { cv.stop(); } catch (_) {}
+    }
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      try { window.speechSynthesis.cancel(); } catch (_) {}
     }
     state.isAudioPlaying = false;
   }
@@ -1448,7 +1618,7 @@
     var speechText = item.sentence || item.audioTranscript || item.text || '';
     if (!speechText) return;
 
-    var persona = (state.mode === 'wfd' || state.mode === 'sst') ? 'guy' : 'aria';
+    var persona = (state.mode === 'wfd' || state.mode === 'sst' || state.mode === 'rl') ? 'guy' : 'aria';
     playPteAudio(speechText, { persona: persona });
   }
 
@@ -1568,7 +1738,7 @@
         }
       }
 
-      if (rms > 0.035) {
+      if (rms > 0.015) {
         pteHasUserSpoken = true;
         disarmSilenceWatchdog();
         if (pteVadSilenceTimer) {
@@ -1582,7 +1752,7 @@
             if (state.timerState === 'recording') {
               stopRecordingAndEvaluate();
             }
-          }, 2400);
+          }, 3500);
         }
       }
 
@@ -1727,12 +1897,31 @@
 
         state.speechRecognizer.onerror = function (event) {
           console.warn('[PTE Speech recognition error]', event.error);
+          disarmSilenceWatchdog();
+          if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            state.speechErrorNotice = 'Microphone permission blocked. Please check browser permissions or use the keyboard input below.';
+            state.showManualSpeechInput = true;
+            renderHub();
+          } else if (event.error === 'network') {
+            state.speechErrorNotice = 'Speech recognition network timeout. You can use the keyboard input below to submit.';
+            state.showManualSpeechInput = true;
+            renderHub();
+          }
         };
 
         state.speechRecognizer.start();
       } catch (err) {
         console.warn('[PTE Speech init error]', err);
+        state.speechErrorNotice = 'Speech recognition not supported in this browser. Use keyboard input below.';
+        state.showManualSpeechInput = true;
+        disarmSilenceWatchdog();
+        renderHub();
       }
+    } else {
+      state.speechErrorNotice = 'Web Speech Recognition not available in this browser. You can type or paste your spoken words below.';
+      state.showManualSpeechInput = true;
+      disarmSilenceWatchdog();
+      renderHub();
     }
 
     renderHub();
@@ -1800,6 +1989,7 @@
         if (res.content) res.content.score = 0;
         if (res.fluency) res.fluency.score = 0;
         if (res.pronunciation) res.pronunciation.score = 0;
+        state.showManualSpeechInput = true;
       }
       state.lastResult = res;
       state.timerState = 'result';
@@ -1827,6 +2017,11 @@
     var estimatedDuration = Math.max(3, Math.round(wordCount / 2.5));
     state.speechConfidence = 0.92;
     evaluateSpeechResult(text, estimatedDuration);
+  }
+
+  function clearSpeechError() {
+    state.speechErrorNotice = '';
+    renderHub();
   }
 
   // Reading & Writing Handlers
@@ -2166,6 +2361,8 @@
     toggleManualSpeechInput: toggleManualSpeechInput,
     setManualSpeech: setManualSpeech,
     evaluateManualSpeech: evaluateManualSpeech,
+    clearSpeechError: clearSpeechError,
+    fallbackBrowserTts: fallbackBrowserTts,
     renderGuidedCoachCard: renderGuidedCoachCard,
     getState: function () { return state; },
     getBanks: function () { return BANKS; }
