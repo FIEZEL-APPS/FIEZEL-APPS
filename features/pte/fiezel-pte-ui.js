@@ -1432,7 +1432,9 @@
     lbl.innerHTML = '<b style="color:' + color + ';">' + words.length + ' words</b> (Target: 50-70 words)';
   }
 
-  // --- Neural Voice Pipeline & Robust Native Speech Synthesis Fallback ---
+  // --- Gemini Multimodal Live API Voice Pipeline (Kawan Bicara Socket Cycle) ---
+  // Kanon FIEZEL m025-232/m025-246: TTS bawaan peramban (speechSynthesis) MATI TOTAL.
+  // Suara prompt PTE terhubung langsung ke siklus WebSocket Gemini API key (`gemini-3.8-live` audio duplex).
   function getChatVoice() {
     if (typeof window !== 'undefined' && window.FiezelChatVoice) return window.FiezelChatVoice;
     if (typeof require === 'function') {
@@ -1441,96 +1443,350 @@
     return null;
   }
 
-  var pteSpeechKeepAliveTimer = null;
+  var pteAudioCtx = null;
+  var pteActiveSources = [];
+  var pteActiveWs = null;
+  var pteNextAudioPlayTime = 0;
+  var pteWsTurnInProgress = false;
 
-  function fallbackBrowserTts(text, options, callback) {
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      state.isAudioPlaying = false;
-      renderHub();
-      if (typeof callback === 'function') callback(true);
-      return;
+  function getPteAudioContext() {
+    if (!pteAudioCtx || pteAudioCtx.state === 'closed') {
+      var AudioCtx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) || null;
+      if (!AudioCtx) return null;
+      pteAudioCtx = new AudioCtx({ sampleRate: 24000 });
+      pteNextAudioPlayTime = pteAudioCtx.currentTime;
     }
+    if (pteAudioCtx.state === 'suspended') {
+      pteAudioCtx.resume().catch(function () {});
+    }
+    return pteAudioCtx;
+  }
+
+  function pcm16Base64ToAudioBuffer(ctx, base64, sampleRate) {
+    sampleRate = sampleRate || 24000;
+    var decodeFn = typeof atob === 'function' ? atob : (typeof window !== 'undefined' && window.atob ? window.atob : null);
+    if (!decodeFn) {
+      if (typeof Buffer !== 'undefined') {
+        decodeFn = function (b64) { return Buffer.from(b64, 'base64').toString('binary'); };
+      } else {
+        return null;
+      }
+    }
+    var binary = decodeFn(base64);
+    if (!binary) return null;
+
+    var len = binary.length;
+    var samples = Math.floor(len / 2);
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    var view = new DataView(bytes.buffer, bytes.byteOffset, samples * 2);
+    var float32 = new Float32Array(samples);
+    for (var j = 0; j < samples; j++) {
+      float32[j] = view.getInt16(j * 2, true) / 32768.0;
+    }
+    var buffer = ctx.createBuffer(1, samples, sampleRate);
+    buffer.getChannelData(0).set(float32);
+    return buffer;
+  }
+
+  function schedulePtePcmChunk(base64Pcm, onComplete) {
+    var ctx = getPteAudioContext();
+    if (!ctx) return;
+    var buffer = pcm16Base64ToAudioBuffer(ctx, base64Pcm, 24000);
+    if (!buffer) return;
+
+    var source = ctx.createBufferSource();
+    source.buffer = buffer;
+    var now = ctx.currentTime;
+    if (pteNextAudioPlayTime < now + 0.01) {
+      pteNextAudioPlayTime = now + 0.03;
+    }
+    var startAt = pteNextAudioPlayTime;
+    pteNextAudioPlayTime = startAt + buffer.duration;
+
+    source.connect(ctx.destination);
+    source.start(startAt);
+    pteActiveSources.push(source);
+
+    source.onended = function () {
+      pteActiveSources = pteActiveSources.filter(function (s) { return s !== source; });
+      if (pteActiveSources.length === 0 && !pteWsTurnInProgress) {
+        stopPteAudio();
+        if (typeof onComplete === 'function') onComplete(true);
+      }
+    };
+  }
+
+  function getUserGeminiApiKey() {
     try {
-      window.speechSynthesis.cancel();
-      var cleanText = String(text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      if (!cleanText) {
-        state.isAudioPlaying = false;
-        renderHub();
-        if (typeof callback === 'function') callback(false);
-        return;
+      var ls = (typeof window !== 'undefined' && window.localStorage) || null;
+      if (ls && typeof ls.getItem === 'function') {
+        var k = ls.getItem('fz_gemini_api_key') ||
+                ls.getItem('gemini_api_key') ||
+                ls.getItem('GEMINI_API_KEY');
+        if (k && k.trim().length > 10) return k.trim();
       }
-      var utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = 'en-US';
-      utterance.rate = (options && options.rate) || 0.95;
-      utterance.pitch = (options && (options.persona === 'guy' || options.persona === 'keita')) ? 0.95 : 1.0;
+    } catch (_) {}
+    return '';
+  }
 
-      var voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
-      if (voices && voices.length > 0) {
-        var preferredVoice = null;
-        var isMale = options && (options.persona === 'guy' || options.persona === 'keita');
-        for (var i = 0; i < voices.length; i++) {
-          var v = voices[i];
-          var vLang = (v.lang || '').toLowerCase();
-          var vName = (v.name || '').toLowerCase();
-          if (vLang.startsWith('en')) {
-            if (isMale && (vName.includes('guy') || vName.includes('male') || vName.includes('david') || vName.includes('george') || vName.includes('natural'))) {
-              preferredVoice = v;
-              break;
-            } else if (!isMale && (vName.includes('aria') || vName.includes('jenny') || vName.includes('female') || vName.includes('samantha') || vName.includes('zira'))) {
-              preferredVoice = v;
-              break;
-            } else if (!preferredVoice) {
-              preferredVoice = v;
-            }
+  function resolveVoiceApiBases() {
+    var bases = [];
+    if (typeof window !== 'undefined') {
+      var isLocal = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(window.location?.hostname || '');
+      if (isLocal) bases.push('');
+      if (window.FIEZEL_CF_CONFIG && window.FIEZEL_CF_CONFIG.base) {
+        bases.push(window.FIEZEL_CF_CONFIG.base.replace(/\/$/, ''));
+      }
+    }
+    bases.push('https://api.fiezel.my.id');
+    return Array.from(new Set(bases));
+  }
+
+  function fetchGeminiLiveWsEndpoint() {
+    var directKey = getUserGeminiApiKey();
+    if (directKey) {
+      return Promise.resolve({
+        endpoint: 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=' + encodeURIComponent(directKey),
+        directKey: true
+      });
+    }
+    var bases = resolveVoiceApiBases();
+    var tryBase = function (idx) {
+      if (idx >= bases.length) return Promise.resolve(null);
+      var base = bases[idx];
+      var url = (base ? base : '') + '/api/voice/live-session';
+      var fetchFn = typeof fetch === 'function' ? fetch : null;
+      if (!fetchFn) return Promise.resolve(null);
+      return fetchFn(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}'
+      }).then(function (res) {
+        if (!res || !res.ok) return tryBase(idx + 1);
+        return res.json().then(function (data) {
+          if (data && data.ok && data.token) {
+            var ep = data.endpoint || 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained';
+            return {
+              endpoint: ep + '?access_token=' + encodeURIComponent(data.token),
+              directKey: false
+            };
           }
-        }
-        if (preferredVoice) utterance.voice = preferredVoice;
-      }
+          return tryBase(idx + 1);
+        });
+      }).catch(function () {
+        return tryBase(idx + 1);
+      });
+    };
+    return tryBase(0);
+  }
 
-      var ended = false;
-      function done(ok) {
-        if (ended) return;
-        ended = true;
-        if (pteSpeechKeepAliveTimer) {
-          clearInterval(pteSpeechKeepAliveTimer);
-          pteSpeechKeepAliveTimer = null;
+  function fallbackChatVoice(cleanText, opts, callback) {
+    var cv = getChatVoice();
+    if (cv && typeof cv.speak === 'function') {
+      try {
+        var speakPromise = cv.speak(cleanText, 'en', {
+          persona: opts.persona || 'aria',
+          onSentenceStart: function () {},
+          onEnd: function (ok) {
+            state.isAudioPlaying = false;
+            renderHub();
+            if (typeof callback === 'function') callback(ok);
+          }
+        });
+        if (speakPromise && typeof speakPromise.then === 'function') {
+          speakPromise.catch(function () {
+            state.isAudioPlaying = false;
+            renderHub();
+            if (typeof callback === 'function') callback(false);
+          });
         }
-        state.isAudioPlaying = false;
-        renderHub();
-        if (typeof callback === 'function') callback(ok);
-      }
+        return;
+      } catch (_) {}
+    }
+    state.isAudioPlaying = false;
+    renderHub();
+    if (typeof callback === 'function') callback(false);
+  }
 
-      utterance.onend = function () { done(true); };
-      utterance.onerror = function (e) {
-        if (e && (e.error === 'interrupted' || e.error === 'canceled')) {
-          done(true);
-          return;
-        }
-        console.warn('[PTE Browser TTS Error]', e?.error || e);
-        done(false);
-      };
-
-      if (pteSpeechKeepAliveTimer) clearInterval(pteSpeechKeepAliveTimer);
-      pteSpeechKeepAliveTimer = setInterval(function () {
-        if (!state.isAudioPlaying) {
-          clearInterval(pteSpeechKeepAliveTimer);
-          pteSpeechKeepAliveTimer = null;
-          return;
-        }
-        if (window.speechSynthesis && window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-        }
-      }, 4000);
-
-      state.isAudioPlaying = true;
-      renderHub();
-      window.speechSynthesis.speak(utterance);
-    } catch (err) {
-      console.warn('[PTE fallbackBrowserTts exception]', err);
+  function synthesizeGeminiLiveVoice(text, options, callback) {
+    var cleanText = String(text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!cleanText) {
       state.isAudioPlaying = false;
       renderHub();
       if (typeof callback === 'function') callback(false);
+      return;
     }
+
+    var opts = options || {};
+    var persona = opts.persona || 'aria';
+    var isMale = persona === 'guy' || persona === 'keita';
+    // Persona muda dan elegan (Aoede: young, elegant, articulate British/American speaker; Fenrir: confident academic lecturer)
+    var voiceName = isMale ? 'Fenrir' : 'Aoede';
+    var personaStyle = isMale
+      ? 'Articulate, confident, young academic lecturer speaking clear standard British/American English'
+      : 'Young, elegant, articulate academic speaker with vivid prosody, natural breath, and clear pronunciation';
+
+    fetchGeminiLiveWsEndpoint().then(function (sessionInfo) {
+      if (!sessionInfo || !sessionInfo.endpoint) {
+        console.warn('[PTE Gemini Live] No live endpoint available, trying chat voice fallback...');
+        fallbackChatVoice(cleanText, opts, callback);
+        return;
+      }
+
+      var ws = null;
+      var receivedAudio = false;
+      var fallbackTimer = null;
+
+      function triggerFallback() {
+        if (receivedAudio || !state.isAudioPlaying) return;
+        if (fallbackTimer) {
+          clearTimeout(fallbackTimer);
+          fallbackTimer = null;
+        }
+        if (ws) {
+          try {
+            ws.onopen = null;
+            ws.onmessage = null;
+            ws.onerror = null;
+            ws.onclose = null;
+            ws.close(1000, 'fallback');
+          } catch (_) {}
+        }
+        pteActiveWs = null;
+        pteWsTurnInProgress = false;
+        fallbackChatVoice(cleanText, opts, callback);
+      }
+
+      fallbackTimer = setTimeout(triggerFallback, 7500);
+
+      try {
+        var WsConstructor = (typeof window !== 'undefined' && window.WebSocket) || null;
+        if (!WsConstructor) {
+          triggerFallback();
+          return;
+        }
+        ws = new WsConstructor(sessionInfo.endpoint);
+        pteActiveWs = ws;
+        pteWsTurnInProgress = true;
+
+        ws.onopen = function () {
+          try {
+            ws.send(JSON.stringify({
+              setup: {
+                model: 'models/gemini-3.8-live',
+                generationConfig: {
+                  responseModalities: ['AUDIO'],
+                  speechConfig: {
+                    voiceConfig: {
+                      prebuiltVoiceConfig: {
+                        voiceName: voiceName
+                      }
+                    }
+                  }
+                },
+                systemInstruction: {
+                  parts: [{
+                    text: 'You are an authentic academic speaker in English. Voice profile: ' + personaStyle + '. Speak ONLY the exact line in quotes with vivid human prosody, natural breathing, and clear articulation. Never add extra words outside the quotes.'
+                  }]
+                }
+              }
+            }));
+          } catch (err) {
+            console.warn('[PTE Gemini Live ws.onopen error]', err);
+            triggerFallback();
+          }
+        };
+
+        ws.onmessage = function (ev) {
+          var raw = typeof ev.data === 'string' ? ev.data : '';
+          if (!raw && ev.data instanceof Blob) {
+            ev.data.text().then(handleParsedMsg).catch(function () {});
+            return;
+          }
+          if (raw) handleParsedMsg(raw);
+        };
+
+        function handleParsedMsg(str) {
+          var msg = null;
+          try { msg = JSON.parse(str); } catch (_) { return; }
+          if (!msg) return;
+
+          if (msg.setupComplete) {
+            try {
+              ws.send(JSON.stringify({
+                clientContent: {
+                  turns: [{
+                    role: 'user',
+                    parts: [{
+                      text: 'Perform clearly in natural academic English: "' + cleanText + '"'
+                    }]
+                  }],
+                  turnComplete: true
+                }
+              }));
+            } catch (err) {
+              console.warn('[PTE Gemini Live send speech line error]', err);
+            }
+            return;
+          }
+
+          var parts = msg.serverContent && msg.serverContent.modelTurn && msg.serverContent.modelTurn.parts;
+          if (Array.isArray(parts)) {
+            for (var i = 0; i < parts.length; i++) {
+              var p = parts[i];
+              if (p && p.inlineData && p.inlineData.data) {
+                if (!receivedAudio) {
+                  receivedAudio = true;
+                  if (fallbackTimer) {
+                    clearTimeout(fallbackTimer);
+                    fallbackTimer = null;
+                  }
+                  state.isAudioPlaying = true;
+                  renderHub();
+                }
+                schedulePtePcmChunk(p.inlineData.data, callback);
+              }
+            }
+          }
+
+          if (msg.serverContent && msg.serverContent.turnComplete) {
+            pteWsTurnInProgress = false;
+            try {
+              ws.onopen = null;
+              ws.onmessage = null;
+              ws.onerror = null;
+              ws.onclose = null;
+              ws.close(1000, 'turn_complete');
+            } catch (_) {}
+            pteActiveWs = null;
+            if (!receivedAudio) {
+              triggerFallback();
+            }
+          }
+        }
+
+        ws.onerror = function (err) {
+          if (!receivedAudio && state.isAudioPlaying) {
+            console.warn('[PTE Gemini Live ws.onerror]', err);
+            triggerFallback();
+          }
+        };
+
+        ws.onclose = function () {
+          pteActiveWs = null;
+          if (!receivedAudio && state.isAudioPlaying) triggerFallback();
+        };
+      } catch (err) {
+        console.warn('[PTE Gemini Live WebSocket creation exception]', err);
+        triggerFallback();
+      }
+    }).catch(function (err) {
+      console.warn('[PTE fetchGeminiLiveWsEndpoint error]', err);
+      fallbackChatVoice(cleanText, opts, callback);
+    });
   }
 
   function playPteAudio(text, options, callback) {
@@ -1543,66 +1799,41 @@
 
     var cleanText = String(text).trim();
     var opts = options || {};
-    var persona = opts.persona || 'aria';
 
     state.isAudioPlaying = true;
     renderHub();
 
-    var cv = getChatVoice();
-    var fallbackInvoked = false;
-
-    function invokeFallback() {
-      if (fallbackInvoked) return;
-      fallbackInvoked = true;
-      fallbackBrowserTts(cleanText, opts, callback);
-    }
-
-    if (cv && typeof cv.speak === 'function') {
-      try {
-        var speakPromise = cv.speak(cleanText, 'en', {
-          persona: persona,
-          onSentenceStart: function () {},
-          onEnd: function (ok) {
-            if (ok) {
-              state.isAudioPlaying = false;
-              renderHub();
-              if (typeof callback === 'function') callback(true);
-            } else {
-              invokeFallback();
-            }
-          }
-        });
-
-        if (speakPromise && typeof speakPromise.then === 'function') {
-          speakPromise.then(function (result) {
-            if (result === false) {
-              invokeFallback();
-            }
-          }).catch(function (err) {
-            console.warn('[PTE Audio Prompt cv.speak catch]', err);
-            invokeFallback();
-          });
-        }
-      } catch (err) {
-        console.warn('[PTE Audio Prompt cv.speak sync error]', err);
-        invokeFallback();
-      }
-    } else {
-      invokeFallback();
-    }
+    // Kanon FIEZEL: Langsung terhubung ke siklus socket Gemini API key fitur Kawan Bicara!
+    // Zero browser TTS (speechSynthesis mati total).
+    synthesizeGeminiLiveVoice(cleanText, opts, callback);
   }
 
   function stopPteAudio() {
-    if (pteSpeechKeepAliveTimer) {
-      clearInterval(pteSpeechKeepAliveTimer);
-      pteSpeechKeepAliveTimer = null;
+    if (pteActiveWs) {
+      try {
+        pteActiveWs.onopen = null;
+        pteActiveWs.onmessage = null;
+        pteActiveWs.onerror = null;
+        pteActiveWs.onclose = null;
+        pteActiveWs.close(1000, 'stopped');
+      } catch (_) {}
+      pteActiveWs = null;
+    }
+    pteWsTurnInProgress = false;
+    for (var i = 0; i < pteActiveSources.length; i++) {
+      try {
+        pteActiveSources[i].onended = null;
+        pteActiveSources[i].stop();
+        pteActiveSources[i].disconnect();
+      } catch (_) {}
+    }
+    pteActiveSources = [];
+    if (pteAudioCtx && pteAudioCtx.currentTime != null) {
+      pteNextAudioPlayTime = pteAudioCtx.currentTime;
     }
     var cv = getChatVoice();
     if (cv && typeof cv.stop === 'function') {
       try { cv.stop(); } catch (_) {}
-    }
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      try { window.speechSynthesis.cancel(); } catch (_) {}
     }
     state.isAudioPlaying = false;
   }
@@ -2362,7 +2593,7 @@
     setManualSpeech: setManualSpeech,
     evaluateManualSpeech: evaluateManualSpeech,
     clearSpeechError: clearSpeechError,
-    fallbackBrowserTts: fallbackBrowserTts,
+    synthesizeGeminiLiveVoice: synthesizeGeminiLiveVoice,
     renderGuidedCoachCard: renderGuidedCoachCard,
     getState: function () { return state; },
     getBanks: function () { return BANKS; }
