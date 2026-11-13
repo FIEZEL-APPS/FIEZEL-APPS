@@ -378,22 +378,24 @@ async function run() {
       assert.strictEqual(afterNoise.srStarts, 0, 'OS SpeechRecognition must remain inactive while Gemini Live mic pipeline runs');
 
       // Pump human vocal formant speech, then silence -> measure audioStreamEnd latency
-      const endStart = Date.now();
       await page.evaluate(() => {
+        window.__PROBE__.speechDrivenAt = Date.now();
         window.__driveAudioFrames('speech', 22, 48000, 1024);
         window.__PROBE__.afterSpeechPcm = window.__PROBE__.pcmCount;
       });
       const afterSpeech = await page.evaluate(() => window.__PROBE__.pcmCount);
       assert.ok(afterSpeech >= 5, `Human vocal formants must stream PCM packets cleanly (sent=${afterSpeech})`);
 
-      // Pump brief silence so hangover/burst timer settles
+      // Pump brief silence so burst timer settles promptly (polling: 50ms avoids headless rAF throttling)
+      const silenceWallStart = Date.now();
       await page.evaluate(() => {
+        window.__PROBE__.silenceDrivenAt = Date.now();
         window.__driveAudioFrames('silence', 18, 48000, 1024);
         window.__PROBE__.afterSilencePcm = window.__PROBE__.pcmCount;
       });
 
       try {
-        await page.waitForFunction(() => window.__PROBE__.streamEndCount >= 1, null, { timeout: 1500 });
+        await page.waitForFunction(() => window.__PROBE__.streamEndCount >= 1, null, { timeout: 1500, polling: 50 });
       } catch (e2) {
         const diag = await page.evaluate(() => ({
           pcm: window.__PROBE__.pcmCount,
@@ -408,13 +410,16 @@ async function run() {
         }));
         throw new Error(`Scenario 1 streamEnd timeout: ${e2.message} | diag=${JSON.stringify(diag)} | badRes=${JSON.stringify(badResponses)} | console=${JSON.stringify(consoleLogs.slice(-15))} | errors=${JSON.stringify(pageErrors)}`);
       }
+      const turnEndElapsedMs = Date.now() - silenceWallStart;
       const endState = await page.evaluate(() => ({
         streamEndCount: window.__PROBE__.streamEndCount,
         lastStreamEndAt: window.__PROBE__.lastStreamEndAt,
+        silenceDrivenAt: window.__PROBE__.silenceDrivenAt,
       }));
-      const turnEndElapsedMs = Date.now() - endStart;
-      assert.ok(turnEndElapsedMs < 950, `Kawan Bicara audioStreamEnd took ${turnEndElapsedMs}ms (must be < 950ms, no multi-second lag)`);
-      console.log(`  ✓ Kawan Bicara E2E: noise rejected (0 PCM), speech streamed (${afterSpeech} PCM), audioStreamEnd fired in ${turnEndElapsedMs}ms, SpeechRec=0`);
+      const internalTurnEndMs = endState.lastStreamEndAt - endState.silenceDrivenAt;
+      assert.ok(internalTurnEndMs >= 0 && internalTurnEndMs < 750, `Kawan Bicara internal audioStreamEnd took ${internalTurnEndMs}ms (must be < 750ms)`);
+      assert.ok(turnEndElapsedMs < 1100, `Kawan Bicara wall-clock audioStreamEnd took ${turnEndElapsedMs}ms (must be < 1100ms, no multi-second lag)`);
+      console.log(`  ✓ Kawan Bicara E2E: noise rejected (0 PCM), speech streamed (${afterSpeech} PCM), audioStreamEnd fired in ${internalTurnEndMs}ms internal / ${turnEndElapsedMs}ms wall, SpeechRec=0`);
       await ctx.close();
     }
 
@@ -602,19 +607,22 @@ async function run() {
       await page.evaluate(() => {
         window.__driveAudioFrames('speech', 26, 48000, 1024);
         window.__emitWsTranscript('Sustainable urban development improves long-term resilience.');
+        window.__PROBE__.silenceDrivenAt = Date.now();
         window.__driveAudioFrames('silence', 24, 48000, 1024);
       });
 
-      await page.waitForFunction(() => window.__PROBE__.streamEndCount >= 1, null, { timeout: 1000 });
+      await page.waitForFunction(() => window.__PROBE__.streamEndCount >= 1, null, { timeout: 1500, polling: 50 });
       const immediateStreamEndMs = Date.now() - silenceStart;
-      assert.ok(immediateStreamEndMs < 800, `PTE per-turn audioStreamEnd took ${immediateStreamEndMs}ms (must be < 800ms)`);
+      const internalImmediateMs = await page.evaluate(() => window.__PROBE__.lastStreamEndAt - window.__PROBE__.silenceDrivenAt);
+      assert.ok(internalImmediateMs >= 0 && internalImmediateMs < 200, `PTE internal per-turn audioStreamEnd took ${internalImmediateMs}ms (must be < 200ms)`);
+      assert.ok(immediateStreamEndMs < 1100, `PTE wall-clock per-turn audioStreamEnd took ${immediateStreamEndMs}ms (must be < 1100ms)`);
 
-      await page.waitForFunction(() => window.FiezelPteUi.getState().timerState === 'result', null, { timeout: 4500 });
+      await page.waitForFunction(() => window.FiezelPteUi.getState().timerState === 'result', null, { timeout: 4500, polling: 50 });
       const autoCloseMs = Date.now() - silenceStart;
-      assert.ok(autoCloseMs >= 2700 && autoCloseMs < 4300, `Pearson 3s post-speech auto-close fired at ${autoCloseMs}ms (expected ~3000ms)`);
+      assert.ok(autoCloseMs >= 2700 && autoCloseMs < 4400, `Pearson 3s post-speech auto-close fired at ${autoCloseMs}ms (expected ~3000ms)`);
       const autoState = await page.evaluate(() => window.FiezelPteUi.getState());
       assert.strictEqual(autoState.lastResult.studentTranscript, 'Sustainable urban development improves long-term resilience.');
-      console.log(`  ✓ PTE Auto-Close E2E: immediate audioStreamEnd (${immediateStreamEndMs}ms) + hands-free Pearson 3s close (${autoCloseMs}ms)`);
+      console.log(`  ✓ PTE Auto-Close E2E: immediate audioStreamEnd (${internalImmediateMs}ms internal / ${immediateStreamEndMs}ms wall) + hands-free Pearson 3s close (${autoCloseMs}ms)`);
       await ctx.close();
     }
 

@@ -2291,7 +2291,7 @@
     return pteCachedSilent16kPcmB64;
   }
 
-  function resamplePteFloat32To16kPcmBase64(samples, sampleRate) {
+  function encodePte16kPcmB64(samples, sampleRate) {
     if (!samples || samples.length === 0) return '';
     var sr = sampleRate > 0 ? sampleRate : HANDY_SAMPLE_RATE;
     if (sr === HANDY_SAMPLE_RATE) {
@@ -2667,7 +2667,7 @@
       ptePreRollFrames = [];
       sendOrQueuePteAsrPcm(float32At16kToPcm16Base64(vadRes.speechPcm16k));
     } else if (bandInfo.isHumanSpeech) {
-      var b64Band = resamplePteFloat32To16kPcmBase64(inputData, sr);
+      var b64Band = encodePte16kPcmB64(inputData, sr);
       if (b64Band) {
         ptePreRollFrames.push(b64Band);
         if (ptePreRollFrames.length >= 2) {
