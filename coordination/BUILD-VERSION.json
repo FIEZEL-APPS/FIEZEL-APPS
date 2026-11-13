@@ -1,7 +1,7 @@
 {
-  "version": "m025-791",
-  "claimedBy": "branch feat/pte-handy-vad-asr-m025-791",
-  "claimedAt": "2026-11-12T18:22:36.389Z",
-  "reason": "fix(pte): integrate Handy VAD, Gemini Live real-time ASR, and expand master banks to 300+ items (m025-791)",
+  "version": "m025-792",
+  "claimedBy": "branch feat/pte-asr-fix-m025-792",
+  "claimedAt": "2026-11-13T10:17:18.689Z",
+  "reason": "fix(pte): zero-loss hybrid speech recognition, Blob-tolerant Gemini Live decoding, and mic lifecycle fix (m025-792)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

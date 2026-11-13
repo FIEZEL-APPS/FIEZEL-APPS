@@ -2418,15 +2418,28 @@
       };
 
       ws.onmessage = function (event) {
-        try {
-          var msg = JSON.parse(event.data);
-          if (msg.serverContent && msg.serverContent.inputTranscription && msg.serverContent.inputTranscription.text) {
-            var chunk = msg.serverContent.inputTranscription.text;
-            if (typeof onTranscriptChunk === 'function') {
-              onTranscriptChunk(chunk);
+        var handleMsgText = function (rawText) {
+          try {
+            if (!rawText) return;
+            var msg = JSON.parse(rawText);
+            if (msg.serverContent && msg.serverContent.inputTranscription && msg.serverContent.inputTranscription.text) {
+              var chunk = msg.serverContent.inputTranscription.text;
+              if (typeof onTranscriptChunk === 'function') {
+                onTranscriptChunk(chunk);
+              }
             }
-          }
-        } catch (_) {}
+          } catch (_) {}
+        };
+
+        if (typeof event.data === 'string') {
+          handleMsgText(event.data);
+        } else if (typeof Blob !== 'undefined' && event.data instanceof Blob) {
+          event.data.text().then(handleMsgText).catch(function () {});
+        } else if (event.data instanceof ArrayBuffer) {
+          try {
+            handleMsgText(new TextDecoder().decode(event.data));
+          } catch (_) {}
+        }
       };
 
       ws.onerror = function (err) {
@@ -2511,6 +2524,63 @@
     }
   }
 
+  function initPteSpeechRecognition() {
+    if (typeof window === 'undefined') return;
+    var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) return;
+    try {
+      if (state.speechRecognizer) {
+        try {
+          state.speechRecognizer.onresult = null;
+          state.speechRecognizer.onerror = null;
+          state.speechRecognizer.onend = null;
+          state.speechRecognizer.stop();
+        } catch (_) {}
+        state.speechRecognizer = null;
+      }
+      var recognizer = new SpeechRec();
+      recognizer.lang = 'en-US';
+      recognizer.interimResults = true;
+      var isAndroid = /Android/i.test(navigator.userAgent || '');
+      recognizer.continuous = !isAndroid;
+
+      recognizer.onresult = function (event) {
+        var final = '';
+        var interim = '';
+        for (var i = 0; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript + ' ';
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        var text = (final + interim).trim();
+        if (text) {
+          disarmSilenceWatchdog();
+          pteHasUserSpoken = true;
+          state.speechTranscript = text;
+          var liveEl = typeof document !== 'undefined' ? document.getElementById('fzPteLiveSpeechText') : null;
+          if (liveEl) liveEl.textContent = text;
+        }
+      };
+
+      recognizer.onerror = function (err) {
+        console.warn('[PTE SpeechRecognition err]', err && err.error);
+      };
+
+      recognizer.onend = function () {
+        if (state.timerState === 'recording' && state.speechRecognizer === recognizer) {
+          try { recognizer.start(); } catch (_) {}
+        }
+      };
+
+      state.speechRecognizer = recognizer;
+      recognizer.start();
+    } catch (e) {
+      console.warn('[PTE initSpeechRecognition]', e);
+    }
+  }
+
   function startRecordingPhase() {
     var item = getActiveItem();
     var recSec = (item && item.recordTimeSec) || (state.mode === 'rs' ? 15 : 40);
@@ -2533,46 +2603,29 @@
 
     armSilenceWatchdog();
 
-    // 1. Initialize hardware microphone bridge with Handy VAD
+    // 1. Initialize hardware microphone bridge with Handy VAD (volume meter + formants + SNR)
     initPteMicBridge();
 
-    // 2. Connect directly to Gemini 3.8 Live WebSocket for Pearson ASR
-    var liveAsrConnected = false;
+    // 2. Start high-fidelity browser SpeechRecognition directly (identik dengan Kawan Bicara PTT)
+    initPteSpeechRecognition();
+
+    // 3. Connect directly to Gemini 3.8 Live WebSocket for Pearson ASR
     connectGeminiLiveAsr(function (chunk) {
-      liveAsrConnected = true;
       disarmSilenceWatchdog();
-      state.speechTranscript = (state.speechTranscript + chunk).trim();
-      var liveEl = document.getElementById('fzPteLiveSpeechText');
+      pteHasUserSpoken = true;
+      if (!state.speechTranscript) {
+        state.speechTranscript = chunk.trim();
+      } else if (chunk && chunk.trim().length > state.speechTranscript.length && chunk.toLowerCase().indexOf(state.speechTranscript.toLowerCase().slice(0, 10)) !== -1) {
+        state.speechTranscript = chunk.trim();
+      }
+      var liveEl = typeof document !== 'undefined' ? document.getElementById('fzPteLiveSpeechText') : null;
       if (liveEl) {
         liveEl.textContent = state.speechTranscript || 'Listening...';
       }
     }, function () {
       console.log('[PTE Gemini Live ASR Connected and Ready]');
-    }, function () {
-      // Fallback: If Gemini Live WebSocket is unreachable (e.g. offline), engage Web Speech API fallback
-      if (!liveAsrConnected && typeof window !== 'undefined' && (window.webkitSpeechRecognition || window.SpeechRecognition)) {
-        try {
-          var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-          state.speechRecognizer = new SpeechRec();
-          state.speechRecognizer.continuous = true;
-          state.speechRecognizer.interimResults = true;
-          state.speechRecognizer.lang = 'en-US';
-
-          state.speechRecognizer.onresult = function (event) {
-            disarmSilenceWatchdog();
-            var final = '';
-            var interim = '';
-            for (var i = 0; i < event.results.length; ++i) {
-              if (event.results[i].isFinal) final += event.results[i][0].transcript + ' ';
-              else interim += event.results[i][0].transcript;
-            }
-            state.speechTranscript = (final + interim).trim();
-            var liveEl = document.getElementById('fzPteLiveSpeechText');
-            if (liveEl) liveEl.textContent = state.speechTranscript || 'Listening...';
-          };
-          state.speechRecognizer.start();
-        } catch (_) {}
-      }
+    }, function (err) {
+      console.warn('[PTE Gemini Live ASR]', err);
     });
 
     renderHub();
@@ -2594,6 +2647,7 @@
     stopPteVadLoop();
     clearTimer();
     state.timerState = 'completed';
+    stopPteMicBridge();
 
     // Disconnect Gemini Live ASR socket cleanly
     if (pteAsrWs) {
@@ -2608,7 +2662,12 @@
     }
 
     if (state.speechRecognizer) {
-      try { state.speechRecognizer.stop(); } catch (_) {}
+      try {
+        state.speechRecognizer.onresult = null;
+        state.speechRecognizer.onerror = null;
+        state.speechRecognizer.onend = null;
+        state.speechRecognizer.stop();
+      } catch (_) {}
       state.speechRecognizer = null;
     }
 
@@ -2625,6 +2684,13 @@
     }
 
     var transcript = (state.speechTranscript || '').trim();
+    if (!transcript && typeof document !== 'undefined') {
+      var manualEl = document.getElementById('fzPteManualSpeechInput');
+      if (manualEl && manualEl.value && manualEl.value.trim()) {
+        transcript = manualEl.value.trim();
+        state.speechTranscript = transcript;
+      }
+    }
     evaluateSpeechResult(transcript, trueSpeechDurationSec);
   }
 
@@ -3039,6 +3105,7 @@
     renderGuidedCoachCard: renderGuidedCoachCard,
     getHandyVad: function () { return pteHandyVad; },
     HandyHumanVad: HandyHumanVad,
+    initPteSpeechRecognition: initPteSpeechRecognition,
     getState: function () { return state; },
     getBanks: function () { return BANKS; }
   };
