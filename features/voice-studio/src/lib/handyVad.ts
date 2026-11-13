@@ -41,6 +41,14 @@ export interface HandyVadProcessResult {
   maxScore: number;
   /** Last frame diagnostic metrics */
   lastMetrics: HandyFrameScore | null;
+  /** Count of 32ms frames where raw acoustic score passed voice check (BEFORE hangover padding) */
+  voicedFrames: number;
+  /** Total 32ms 512-sample frames decoded from this chunk */
+  totalFrames: number;
+  /** True voiced milliseconds in this chunk (voicedFrames * 32) */
+  voicedMs: number;
+  /** Total processed audio milliseconds in this chunk (totalFrames * 32) */
+  totalMs: number;
 }
 
 export interface HandyVadOptions {
@@ -464,6 +472,10 @@ export class HandyHumanVad {
         speechEnded: false,
         maxScore: 0,
         lastMetrics: null,
+        voicedFrames: 0,
+        totalFrames: 0,
+        voicedMs: 0,
+        totalMs: 0,
       };
     }
 
@@ -501,6 +513,8 @@ export class HandyHumanVad {
     let speechEnded = false;
     let maxScore = 0;
     let lastMetrics: HandyFrameScore | null = null;
+    let totalFrames = 0;
+    let voicedFrames = 0;
     const requiredOnset = aiPlaying ? this.bargeInOnsetFrames : this.onsetFrames;
 
     let offset = 0;
@@ -520,6 +534,8 @@ export class HandyHumanVad {
       lastMetrics = metrics;
       if (metrics.score > maxScore) maxScore = metrics.score;
       slot.voiced = metrics.isVoice;
+      totalFrames += 1;
+      if (metrics.isVoice) voicedFrames += 1;
 
       // 3. SmoothedVad state machine
       if (!this.inSpeech && metrics.isVoice) {
@@ -584,6 +600,10 @@ export class HandyHumanVad {
       speechEnded,
       maxScore,
       lastMetrics,
+      voicedFrames,
+      totalFrames,
+      voicedMs: voicedFrames * 32,
+      totalMs: totalFrames * 32,
     };
   }
 }

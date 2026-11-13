@@ -1,7 +1,7 @@
 {
-  "version": "m025-793",
-  "claimedBy": "branch fix/voice-pte-vad-realtime",
-  "claimedAt": "2026-11-13T11:55:49.969Z",
-  "reason": "fix(voice,pte): real-time VAD endpointing, zero-contention Gemini Live ASR, and empirical PTE scoring",
+  "version": "m025-794",
+  "claimedBy": "branch fix/oral-fluency-acoustic-engine",
+  "claimedAt": "2026-11-13T14:38:23.240Z",
+  "reason": "fix(voice,pte,grammar): acoustic-temporal oral fluency engine and voice-to-tile grammar builder",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

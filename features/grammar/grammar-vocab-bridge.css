@@ -1288,6 +1288,15 @@ body:has(.modal-intensity-sheet) nav.bottomnav {
   margin-top: 10px;
 }
 
+.puzzle-bank-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .bank-label {
   font-size: 0.72rem;
   font-weight: 800;
@@ -1295,7 +1304,83 @@ body:has(.modal-intensity-sheet) nav.bottomnav {
   color: #64748B;
   letter-spacing: 0.05em;
   display: block;
+  margin-bottom: 0;
+}
+
+.puzzle-voice-btn {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #0369A1;
+  background: #FFFFFF;
+  border: 1.5px solid #7DD3FC;
+  border-bottom: 3px solid #38BDF8;
+  border-radius: 9999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.puzzle-voice-btn:hover {
+  background: #F0F9FF;
+}
+
+.puzzle-voice-btn:active {
+  transform: translateY(1px);
+}
+
+.puzzle-voice-btn .puzzle-voice-lang {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 9999px;
+  background: #E0F2FE;
+  color: #0369A1;
+}
+
+.puzzle-voice-btn.is-listening {
+  color: #BE123C;
+  background: #FFF1F2;
+  border-color: #FB7185;
+  border-bottom-color: #E11D48;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.16);
+}
+
+.puzzle-voice-btn.is-listening .puzzle-voice-lang {
+  background: #FFE4E6;
+  color: #BE123C;
+}
+
+.puzzle-voice-status {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 11px;
+  border-radius: 10px;
   margin-bottom: 8px;
+  color: #0369A1;
+  background: #F0F9FF;
+  border: 1px solid #BAE6FD;
+}
+
+.puzzle-voice-status.is-listening {
+  color: #9F1239;
+  background: #FFF1F2;
+  border-color: #FECDD3;
+}
+
+.puzzle-voice-status.is-matched {
+  color: #166534;
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+}
+
+.puzzle-voice-status.is-error {
+  color: #991B1B;
+  background: #FEF2F2;
+  border-color: #FECACA;
 }
 
 .puzzle-bank-tiles {

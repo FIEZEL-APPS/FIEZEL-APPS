@@ -85,14 +85,600 @@
     return '';
   };
 
+  // =========================================================================
+  // 1A. Voice-to-Tile Cross-Lingual Alignment Engine (EN / JA / ZH)
+  // Zero-Ghost-Answer Invariant: pencocokan HANYA melihat daftar kata pada
+  // bankTokens (termasuk distraktor), tidak pernah mengintip kunci jawaban.
+  // =========================================================================
+  const VOICE_LANG_MAP = { en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' };
+  const VOICE_BADGE_MAP = { en: 'EN', ja: 'JA', zh: 'ZH' };
+  const HAS_KANA_RE = /[\u3040-\u30ff]/;
+  const HAS_HANZI_RE = /[\u4e00-\u9fff]/;
+
+  function t(key, fallback, params) {
+    let out;
+    try {
+      const i18n = typeof FiezelI18n !== 'undefined' ? FiezelI18n : self.FiezelI18n;
+      if (i18n && typeof i18n.t === 'function') {
+        const res = i18n.t(key, params);
+        if (res && res !== key) out = res;
+      }
+    } catch (_) {}
+    if (!out) out = fallback;
+    if (params && typeof out === 'string') {
+      out = out.replace(/\{(\w+)\}/g, (m, k) => (Object.prototype.hasOwnProperty.call(params, k) ? String(params[k]) : m));
+    }
+    return out;
+  }
+
+  function normalizeLangKey(raw) {
+    const v = String(raw || '').trim().toLowerCase();
+    if (!v) return '';
+    if (v === 'ja' || v.startsWith('ja-') || v === 'jp') return 'ja';
+    if (v === 'zh' || v.startsWith('zh-') || v === 'cn' || v === 'mandarin') return 'zh';
+    if (v === 'en' || v.startsWith('en-')) return 'en';
+    return '';
+  }
+
+  function readActiveCourseLang() {
+    const fromState = normalizeLangKey(self.state?.preferences?.targetLang || self.state?.targetLang);
+    if (fromState) return fromState;
+    try {
+      if (typeof self.jaCourseOn === 'function' && self.jaCourseOn()) return 'ja';
+    } catch (_) {}
+    try {
+      if (typeof localStorage !== 'undefined' && localStorage) {
+        const stored = normalizeLangKey(localStorage.getItem('fz_target_course'));
+        if (stored) return stored;
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  function resolveTokenOrderSpeechLang(q, bankTokens, opts) {
+    const explicit = normalizeLangKey((opts && opts.lang) || (q && q.targetLang));
+    if (explicit) return explicit;
+    const sample = []
+      .concat(Array.isArray(bankTokens) ? bankTokens : [])
+      .concat(Array.isArray(q && q.tokens) ? q.tokens : [])
+      .map((item) => (typeof item === 'object' && item ? (item.text || item.option || item.word || '') : String(item ?? '')))
+      .join('');
+    if (HAS_KANA_RE.test(sample)) return 'ja';
+    const courseLang = readActiveCourseLang();
+    if (HAS_HANZI_RE.test(sample)) return courseLang === 'ja' ? 'ja' : 'zh';
+    if (courseLang) return courseLang;
+    return 'en';
+  }
+
+  const VOICE_CLEAR_EXACT = new Set([
+    'hapus semua', 'ulangi susunan', 'reset susunan', 'kosongkan susunan', 'clear all', 'reset sentence',
+    '全部消して', 'ぜんぶけして', 'やりなおして', 'やり直して', 'リセットして',
+    '全部清除', '清空句子', '重新开始', '重新排列'
+  ]);
+
+  function isVoiceClearCommand(transcript) {
+    const cleaned = String(transcript || '')
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!cleaned) return false;
+    if (VOICE_CLEAR_EXACT.has(cleaned)) return true;
+    const compact = cleaned.replace(/\s+/g, '');
+    return VOICE_CLEAR_EXACT.has(compact);
+  }
+
+  // English contractions & numbers (bidirectional lookup)
+  const EN_CONTRACTIONS_EXPANDED_TO_SHORT = {
+    'cannot': "can't", 'can not': "can't",
+    'do not': "don't", 'does not': "doesn't", 'did not': "didn't",
+    'will not': "won't", 'would not': "wouldn't", 'should not': "shouldn't", 'could not': "couldn't",
+    'is not': "isn't", 'are not': "aren't", 'was not': "wasn't", 'were not': "weren't",
+    'have not': "haven't", 'has not': "hasn't", 'had not': "hadn't", 'must not': "mustn't", 'need not': "needn't",
+    'i am': "i'm", 'you are': "you're", 'we are': "we're", 'they are': "they're",
+    'he is': "he's", 'she is': "she's", 'it is': "it's",
+    'where is': "where's", 'what is': "what's", 'who is': "who's", 'that is': "that's", 'there is': "there's", 'here is': "here's",
+    'let us': "let's",
+    'i will': "i'll", 'you will': "you'll", 'we will': "we'll", 'they will': "they'll", 'he will': "he'll", 'she will': "she'll",
+    'i have': "i've", 'you have': "you've", 'we have': "we've", 'they have': "they've",
+    'i would': "i'd", 'you would': "you'd", 'he would': "he'd", 'she would': "she'd", 'we would': "we'd", 'they would': "they'd"
+  };
+  const EN_SHORT_TO_SPLIT = {
+    "can't": ['can', 'not'], "don't": ['do', 'not'], "doesn't": ['does', 'not'], "didn't": ['did', 'not'],
+    "won't": ['will', 'not'], "wouldn't": ['would', 'not'], "shouldn't": ['should', 'not'], "couldn't": ['could', 'not'],
+    "isn't": ['is', 'not'], "aren't": ['are', 'not'], "wasn't": ['was', 'not'], "weren't": ['were', 'not'],
+    "haven't": ['have', 'not'], "hasn't": ['has', 'not'], "hadn't": ['had', 'not'], "mustn't": ['must', 'not'], "needn't": ['need', 'not'],
+    "i'm": ['i', 'am'], "you're": ['you', 'are'], "we're": ['we', 'are'], "they're": ['they', 'are'],
+    "he's": ['he', 'is'], "she's": ['she', 'is'], "it's": ['it', 'is'],
+    "where's": ['where', 'is'], "what's": ['what', 'is'], "who's": ['who', 'is'], "that's": ['that', 'is'], "there's": ['there', 'is'], "here's": ['here', 'is'],
+    "let's": ['let', 'us'],
+    "i'll": ['i', 'will'], "you'll": ['you', 'will'], "we'll": ['we', 'will'], "they'll": ['they', 'will'], "he'll": ['he', 'will'], "she'll": ['she', 'will'],
+    "i've": ['i', 'have'], "you've": ['you', 'have'], "we've": ['we', 'have'], "they've": ['they', 'have'],
+    "i'd": ['i', 'would'], "you'd": ['you', 'would'], "he'd": ['he', 'would'], "she'd": ['she', 'would'], "we'd": ['we', 'would'], "they'd": ['they', 'would'],
+    'cannot': ['can', 'not']
+  };
+  const EN_NUM_TO_WORD = {
+    '0': 'zero', '1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five',
+    '6': 'six', '7': 'seven', '8': 'eight', '9': 'nine', '10': 'ten',
+    '11': 'eleven', '12': 'twelve', '13': 'thirteen', '14': 'fourteen', '15': 'fifteen',
+    '16': 'sixteen', '17': 'seventeen', '18': 'eighteen', '19': 'nineteen', '20': 'twenty',
+    '30': 'thirty', '40': 'forty', '50': 'fifty', '100': 'hundred'
+  };
+  const EN_WORD_TO_NUM = Object.keys(EN_NUM_TO_WORD).reduce((acc, digit) => {
+    acc[EN_NUM_TO_WORD[digit]] = digit;
+    return acc;
+  }, {});
+  const EN_FILLERS = new Set(['um', 'uh', 'umm', 'uhh', 'er', 'erm', 'ah', 'eh']);
+
+  function normEn(s) {
+    return String(s || '')
+      .replace(/[’‘\x60]/g, "'")
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\x27\s]/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .split(' ')
+      .map((w) => w.replace(/^\x27+|\x27+$/g, ''))
+      .filter(Boolean);
+  }
+
+  function matchEnglishTranscript(transcript, tiles) {
+    const words = normEn(transcript);
+    const entries = tiles.map((tile) => {
+      const parts = normEn(tile.text);
+      return { tile, parts, key: parts.join(' '), used: false };
+    }).filter((e) => e.parts.length > 0);
+
+    const findUnusedExact = (key) => entries.find((e) => !e.used && e.key === key);
+    const findUnusedNumericAlt = (w) => {
+      const alt = EN_NUM_TO_WORD[w] || EN_WORD_TO_NUM[w];
+      return alt ? entries.find((e) => !e.used && e.key === alt) : null;
+    };
+
+    const matchedIds = [];
+    const matchedTokens = [];
+    const unmatched = [];
+    let i = 0;
+    let safety = 0;
+
+    while (i < words.length && safety++ < 256) {
+      let bestExact = null;
+      let bestSpan = 0;
+      for (const e of entries) {
+        if (e.used) continue;
+        const n = e.parts.length;
+        if (n <= words.length - i && n > bestSpan) {
+          let allEq = true;
+          for (let k = 0; k < n; k++) {
+            if (words[i + k] !== e.parts[k]) { allEq = false; break; }
+          }
+          if (allEq) {
+            bestExact = e;
+            bestSpan = n;
+          }
+        }
+      }
+      if (bestExact) {
+        bestExact.used = true;
+        matchedIds.push(bestExact.tile.id);
+        matchedTokens.push(bestExact.tile.text);
+        i += bestSpan;
+        continue;
+      }
+
+      // 2 spoken words -> contracted 1-word tile (when exact 1-word match did not win)
+      if (i + 1 < words.length) {
+        const pairKey = words[i] + ' ' + words[i + 1];
+        const shortForm = EN_CONTRACTIONS_EXPANDED_TO_SHORT[pairKey];
+        if (shortForm) {
+          const shortEntry = findUnusedExact(shortForm);
+          if (shortEntry) {
+            shortEntry.used = true;
+            matchedIds.push(shortEntry.tile.id);
+            matchedTokens.push(shortEntry.tile.text);
+            i += 2;
+            continue;
+          }
+        }
+      }
+
+      const w = words[i];
+      // 1-word contracted/compound -> equivalent short/split tile(s)
+      const equivShort = EN_CONTRACTIONS_EXPANDED_TO_SHORT[w];
+      if (equivShort) {
+        const shortEntry = findUnusedExact(equivShort);
+        if (shortEntry) {
+          shortEntry.used = true;
+          matchedIds.push(shortEntry.tile.id);
+          matchedTokens.push(shortEntry.tile.text);
+          i += 1;
+          continue;
+        }
+      }
+
+      const splitParts = EN_SHORT_TO_SPLIT[w];
+      if (splitParts && splitParts.length === 2) {
+        const firstPart = findUnusedExact(splitParts[0]);
+        if (firstPart) {
+          words.splice(i, 1, splitParts[0], splitParts[1]);
+          continue;
+        }
+      }
+
+      const numMatch = findUnusedNumericAlt(w);
+      if (numMatch) {
+        numMatch.used = true;
+        matchedIds.push(numMatch.tile.id);
+        matchedTokens.push(numMatch.tile.text);
+        i += 1;
+        continue;
+      }
+
+      if (!EN_FILLERS.has(w)) unmatched.push(w);
+      i += 1;
+    }
+
+    return { matchedIds, matchedTokens, unmatchedText: unmatched.join(' ') };
+  }
+
+  // Japanese Kanji <-> Hiragana/Katakana Equivalence
+  const JA_BUILTIN_KANJI_MAP = {
+    '私': 'わたし', '僕': 'ぼく', '彼': 'かれ', '彼女': 'かのじょ', 'あなた': 'あなた',
+    '今日': 'きょう', '明日': 'あした', '昨日': 'きのう', '毎日': 'まいにち', '毎週': 'まいしゅう',
+    '今': 'いま', '時間': 'じかん', '時': 'とき', '分': 'ふん', '半': 'はん', '年': 'ねん', '月': 'つき', '日': 'ひ',
+    '人': 'ひと', '方': 'かた', '男': 'おとこ', '女': 'おんな', '子供': 'こども', '子ども': 'こども',
+    '学生': 'がくせい', '先生': 'せんせい', '友達': 'ともだち', '家族': 'かぞく', '母': 'はは', '父': 'ちち',
+    '日本': 'にほん', '日本語': 'にほんご', '英語': 'えいご', '中国語': 'ちゅうごくご',
+    '静か': 'しずか', '綺麗': 'きれい', '元気': 'げんき', '便利': 'べんり', '有名': 'ゆうめい', '好き': 'すき', '嫌い': 'きらい', '上手': 'じょうず', '下手': 'へた',
+    '公園': 'こうえん', '学校': 'がっこう', '図書館': 'としょかん', '大学': 'だいがく', '教室': 'きょうしつ',
+    '部屋': 'へや', '家': 'いえ', '駅': 'えき', '電車': 'でんしゃ', '車': 'くるま', 'バス': 'ばす',
+    '会社': 'かいしゃ', '仕事': 'しごと', '店': 'みせ', '病院': 'びょういん', 'レストラン': 'れすとらん',
+    '食べ物': 'たべもの', '飲み物': 'のみもの', '朝ご飯': 'あさごはん', '昼ご飯': 'ひるごはん', '晩ご飯': 'ばんごはん',
+    '水': 'みず', 'お茶': 'おちゃ', 'コーヒー': 'こーひー', 'パン': 'ぱん', '肉': 'にく', '魚': 'さかな', '野菜': 'やさい', '果物': 'くだもの', 'リンゴ': 'りんご',
+    '本': 'ほん', '映画': 'えいが', '音楽': 'おんがく', '写真': 'しゃしん', '手紙': 'てがみ', '新聞': 'しんぶん', '電話': 'でんわ',
+    '行き': 'いき', '行く': 'いく', '行っ': 'いっ', '来': 'き', '来る': 'くる', '帰り': 'かえり', '帰る': 'かえる',
+    '食べ': 'たべ', '食べる': 'たべる', '飲み': 'のみ', '飲む': 'のむ', '見': 'み', '見る': 'みる',
+    '読み': 'よみ', '読む': 'よむ', '書き': 'かき', '書く': 'かく', '話し': 'はなし', '話す': 'はなす', '話': 'はなし',
+    '聞き': 'きき', '聞く': 'きく', '買い': 'かい', '買う': 'かう', '作り': 'つくり', '作る': 'つくる',
+    'でき': 'でき', '出来': 'でき', '分かる': 'わかる', '分かり': 'わかり', '思': 'おも', '言': 'い',
+    '使い': 'つかい', '使う': 'つかう', '待ち': 'まち', '待つ': 'まつ', '持ち': 'もち', '持つ': 'もつ',
+    '知り': 'しり', '知る': 'しる', '住み': 'すみ', '住む': 'すむ', '働き': 'はたらき', '働く': 'はたらく',
+    '起き': 'おき', '起きる': 'おきる', '寝': 'ね', '寝る': 'ねる', '勉強': 'べんきょう', '運動': 'うんどう', '料理': 'りょうり',
+    '大きい': 'おおきい', '大き': 'おおき', '小さい': 'ちいさい', '小さ': 'ちいさ',
+    '新しい': 'あたらしい', '新し': 'あたらし', '古い': 'ふるい', '高い': 'たかい', '安い': 'やすい',
+    '多い': 'おおい', '少ない': 'すくない', '早い': 'はやい', '遅い': 'おそい',
+    '暑い': 'あつい', '寒い': 'さむい', '忙しい': 'いそがしい', '楽しい': 'たのしい', '難しい': 'むずかしい', '易しい': 'やさしい', '面白い': 'おもしろい',
+    '一': 'いち', '二': 'に', '三': 'さん', '四': 'よん', '五': 'ご', '六': 'ろく', '七': 'なな', '八': 'はち', '九': 'きゅう', '十': 'じゅう',
+    '一つ': 'ひとつ', '二つ': 'ふたつ', '三つ': 'みっつ', '四つ': 'よっつ', '五つ': 'いつつ',
+    '何': 'なに', '誰': 'だれ', 'どこ': 'どこ', 'いつ': 'いつ', 'どう': 'どう',
+    '1つ': 'ひとつ', '2つ': 'ふたつ', '3つ': 'みっつ', '4つ': 'よっつ', '5つ': 'いつつ',
+    '0': 'ぜろ', '1': 'いち', '2': 'に', '3': 'さん', '4': 'よん', '5': 'ご',
+    '6': 'ろく', '7': 'なな', '8': 'はち', '9': 'きゅう', '10': 'じゅう'
+  };
+
+  let _jaVocabLexiconCache = null;
+  let _jaVocabLexiconLen = -1;
+
+  function toHiragana(str) {
+    return String(str || '').replace(/[\u30a1-\u30f6]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+  }
+
+  function stripJaPunct(str) {
+    return String(str || '')
+      .toLowerCase()
+      .replace(/[\s\u3000\p{P}\p{S}]+/gu, '');
+  }
+
+  function getJaKanjiLexicon() {
+    const vocabList = Array.isArray(self.V) ? self.V : null;
+    const vLen = vocabList ? vocabList.length : 0;
+    if (_jaVocabLexiconCache && _jaVocabLexiconLen === vLen) return _jaVocabLexiconCache;
+
+    const map = new Map(Object.entries(JA_BUILTIN_KANJI_MAP));
+    if (vocabList) {
+      for (let i = 0; i < vocabList.length; i++) {
+        const entry = vocabList[i];
+        if (!entry || (entry.lang && entry.lang !== 'ja')) continue;
+        const w = stripJaPunct(entry.word);
+        const r = toHiragana(stripJaPunct(entry.reading || entry.kana || ''));
+        if (w && r && HAS_HANZI_RE.test(w) && !HAS_HANZI_RE.test(r) && !map.has(w)) {
+          map.set(w, r);
+        }
+      }
+    }
+    const keys = Array.from(map.keys()).sort((a, b) => b.length - a.length);
+    _jaVocabLexiconCache = { map, keys };
+    _jaVocabLexiconLen = vLen;
+    return _jaVocabLexiconCache;
+  }
+
+  function projectJaToKana(rawText) {
+    const cleanRaw = stripJaPunct(rawText);
+    const { map } = getJaKanjiLexicon();
+    const maxKeyLen = 8;
+    let kana = '';
+    const kanaToRawPos = [];
+    let i = 0;
+    while (i < cleanRaw.length) {
+      let matchedKey = '';
+      let matchedVal = '';
+      const maxSpan = Math.min(maxKeyLen, cleanRaw.length - i);
+      for (let span = maxSpan; span >= 1; span--) {
+        const sub = cleanRaw.slice(i, i + span);
+        if (map.has(sub)) {
+          matchedKey = sub;
+          matchedVal = toHiragana(map.get(sub));
+          break;
+        }
+      }
+      if (matchedKey) {
+        for (let k = 0; k < matchedVal.length; k++) kanaToRawPos.push(i);
+        kana += matchedVal;
+        i += matchedKey.length;
+      } else {
+        const h = toHiragana(cleanRaw[i]);
+        kanaToRawPos.push(i);
+        kana += h;
+        i += 1;
+      }
+    }
+    kanaToRawPos.push(cleanRaw.length);
+    return { raw: cleanRaw, kana, kanaToRawPos };
+  }
+
+  function matchJapaneseTranscript(transcript, tiles) {
+    const spoken = projectJaToKana(transcript);
+    const entries = tiles.map((tile) => {
+      const proj = projectJaToKana(tile.text);
+      return { tile, raw: proj.raw, kana: proj.kana, used: false };
+    }).filter((e) => e.kana.length > 0);
+
+    const matchedIds = [];
+    const matchedTokens = [];
+    const unmatchedChars = [];
+    let cursor = 0;
+
+    while (cursor < spoken.kana.length) {
+      let best = null;
+      let bestScore = -1;
+      const rawStart = spoken.kanaToRawPos[cursor] ?? 0;
+
+      for (const e of entries) {
+        if (e.used) continue;
+        if (spoken.kana.startsWith(e.kana, cursor)) {
+          const exactRawBonus = (e.raw && spoken.raw.startsWith(e.raw, rawStart)) ? 100 : 0;
+          const score = exactRawBonus + e.kana.length;
+          if (score > bestScore) {
+            bestScore = score;
+            best = e;
+          }
+        }
+      }
+
+      if (best) {
+        best.used = true;
+        matchedIds.push(best.tile.id);
+        matchedTokens.push(best.tile.text);
+        cursor += best.kana.length;
+      } else {
+        unmatchedChars.push(spoken.kana[cursor]);
+        cursor += 1;
+      }
+    }
+
+    return { matchedIds, matchedTokens, unmatchedText: unmatchedChars.join('') };
+  }
+
+  // Mandarin Hanzi + Digit + Pinyin Homophone Fallback
+  const ZH_DIGIT_TO_HANZI = {
+    '0': ['零'], '1': ['一'], '2': ['两', '二'], '3': ['三'], '4': ['四'],
+    '5': ['五'], '6': ['六'], '7': ['七'], '8': ['八'], '9': ['九'], '10': ['十']
+  };
+  const ZH_CHAR_PY_FALLBACK = {
+    '他': 'ta', '她': 'ta', '它': 'ta', '的': 'de', '地': 'de', '得': 'de',
+    '在': 'zai', '再': 'zai', '做': 'zuo', '作': 'zuo', '坐': 'zuo', '座': 'zuo',
+    '那': 'na', '哪': 'na', '和': 'he', '合': 'he', '河': 'he', '喝': 'he',
+    '会': 'hui', '回': 'hui', '有': 'you', '友': 'you', '是': 'shi', '事': 'shi', '时': 'shi', '视': 'shi',
+    '名': 'ming', '明': 'ming', '快': 'kuai', '块': 'kuai', '几': 'ji', '己': 'ji', '机': 'ji',
+    '一': 'yi', '医': 'yi', '衣': 'yi', '两': 'liang', '二': 'er', '你': 'ni', '您': 'nin', '我': 'wo',
+    '们': 'men', '好': 'hao', '号': 'hao', '叫': 'jiao', '什': 'shen', '么': 'me',
+    '这': 'zhe', '谁': 'shei', '多': 'duo', '都': 'dou', '大': 'da', '小': 'xiao', '少': 'shao',
+    '不': 'bu', '很': 'hen', '太': 'tai', '也': 'ye', '个': 'ge', '岁': 'sui',
+    '年': 'nian', '月': 'yue', '日': 'ri', '天': 'tian', '星': 'xing', '期': 'qi',
+    '点': 'dian', '分': 'fen', '现': 'xian', '去': 'qu', '来': 'lai', '家': 'jia',
+    '吃': 'chi', '看': 'kan', '见': 'jian', '听': 'ting', '说': 'shuo', '读': 'du', '写': 'xie',
+    '想': 'xiang', '要': 'yao', '能': 'neng', '买': 'mai', '卖': 'mai', '学': 'xue', '习': 'xi',
+    '生': 'sheng', '老': 'lao', '师': 'shi', '朋': 'peng', '人': 'ren', '水': 'shui', '茶': 'cha',
+    '喜': 'xi', '欢': 'huan', '爱': 'ai', '请': 'qing', '问': 'wen', '谢': 'xie',
+    '吗': 'ma', '妈': 'ma', '呢': 'ne', '吧': 'ba', '爸': 'ba', '了': 'le', '过': 'guo', '着': 'zhe',
+    '上': 'shang', '下': 'xia', '里': 'li', '中': 'zhong', '国': 'guo', '今': 'jin', '明': 'ming'
+  };
+
+  function stripPinyinTone(py) {
+    return String(py || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/ü/gi, 'v')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  function getZhCharSyllable(ch) {
+    try {
+      const pyEngine = self.FiezelMandarinPinyinEngine;
+      if (pyEngine && typeof pyEngine.getPinyinForChar === 'function') {
+        const p = stripPinyinTone(pyEngine.getPinyinForChar(ch));
+        if (p && p !== ch.toLowerCase()) return p;
+      }
+    } catch (_) {}
+    if (ZH_CHAR_PY_FALLBACK[ch]) return ZH_CHAR_PY_FALLBACK[ch];
+    if (ZH_DIGIT_TO_HANZI[ch]) return ZH_CHAR_PY_FALLBACK[ZH_DIGIT_TO_HANZI[ch][0]] || '';
+    return '';
+  }
+
+  function getZhSyllables(str) {
+    const out = [];
+    for (let i = 0; i < str.length; i++) {
+      const py = getZhCharSyllable(str[i]);
+      if (!py) return null;
+      out.push(py);
+    }
+    return out;
+  }
+
+  function stripZhPunct(str) {
+    return String(str || '').replace(/[\s\u3000\p{P}\p{S}]+/gu, '');
+  }
+
+  function expandZhDigitVariants(spoken) {
+    return String(spoken || '').replace(/10|[0-9]/g, (m) => {
+      const list = ZH_DIGIT_TO_HANZI[m];
+      return list ? list[0] : m;
+    });
+  }
+
+  function matchMandarinTranscript(transcript, tiles) {
+    const cleanSpoken = stripZhPunct(transcript);
+    const entries = tiles.map((tile) => {
+      const raw = stripZhPunct(tile.text);
+      const normDigit = expandZhDigitVariants(raw);
+      return {
+        tile,
+        raw,
+        normDigit,
+        syllables: raw.length > 0 ? getZhSyllables(raw) : null,
+        used: false
+      };
+    }).filter((e) => e.raw.length > 0);
+
+    const matchedIds = [];
+    const matchedTokens = [];
+    const unmatched = [];
+    let cursor = 0;
+
+    while (cursor < cleanSpoken.length) {
+      let exactBest = null;
+      let exactBestLen = 0;
+
+      for (const e of entries) {
+        if (e.used) continue;
+        if (cleanSpoken.startsWith(e.raw, cursor) && e.raw.length > exactBestLen) {
+          exactBest = e;
+          exactBestLen = e.raw.length;
+        }
+      }
+
+      // Digit spoken form (e.g. ASR outputs "2点" when bank tile is "两" / "点")
+      if (!exactBest) {
+        const slice2 = cleanSpoken.slice(cursor, cursor + 2);
+        const digitKey = slice2 === '10' ? '10' : (ZH_DIGIT_TO_HANZI[cleanSpoken[cursor]] ? cleanSpoken[cursor] : '');
+        if (digitKey) {
+          const candidates = ZH_DIGIT_TO_HANZI[digitKey];
+          for (const ch of candidates) {
+            const found = entries.find((e) => !e.used && e.raw === ch);
+            if (found) {
+              exactBest = found;
+              exactBestLen = digitKey.length;
+              break;
+            }
+          }
+        }
+      }
+
+      if (exactBest) {
+        exactBest.used = true;
+        matchedIds.push(exactBest.tile.id);
+        matchedTokens.push(exactBest.tile.text);
+        cursor += exactBestLen;
+        continue;
+      }
+
+      // Pinyin homophone fallback ONLY when no exact Hanzi tile matches at cursor
+      let pyBest = null;
+      let pyBestLen = 0;
+      for (const e of entries) {
+        if (e.used || !e.syllables) continue;
+        const cLen = e.raw.length;
+        if (cursor + cLen > cleanSpoken.length || cLen <= pyBestLen) continue;
+        const sub = cleanSpoken.slice(cursor, cursor + cLen);
+        const subSyl = getZhSyllables(sub);
+        if (subSyl && subSyl.length === e.syllables.length && subSyl.every((s, idx) => s === e.syllables[idx])) {
+          pyBest = e;
+          pyBestLen = cLen;
+        }
+      }
+
+      if (pyBest) {
+        pyBest.used = true;
+        matchedIds.push(pyBest.tile.id);
+        matchedTokens.push(pyBest.tile.text);
+        cursor += pyBestLen;
+        continue;
+      }
+
+      unmatched.push(cleanSpoken[cursor]);
+      cursor += 1;
+    }
+
+    return { matchedIds, matchedTokens, unmatchedText: unmatched.join('') };
+  }
+
+  FiezelGrammarUpgrade.matchSpokenTranscriptToTokens = function(transcript, bankTokens, lang) {
+    const resolvedLang = normalizeLangKey(lang) || resolveTokenOrderSpeechLang({ tokens: bankTokens }, bankTokens);
+    const list = Array.isArray(bankTokens) ? bankTokens : [];
+    const normalizedTiles = list.map((item, idx) => {
+      if (item && typeof item === 'object') {
+        return {
+          id: item.id !== undefined ? item.id : idx,
+          text: String(item.text || item.option || item.word || ''),
+          placed: Boolean(item.placed)
+        };
+      }
+      return { id: idx, text: String(item ?? ''), placed: false };
+    }).filter((t) => !t.placed && t.text.trim().length > 0);
+
+    if (isVoiceClearCommand(transcript)) {
+      return { matchedIds: [], matchedTokens: [], unmatchedText: '', commandAction: 'clear', lang: resolvedLang };
+    }
+
+    let res;
+    if (resolvedLang === 'ja') {
+      res = matchJapaneseTranscript(transcript, normalizedTiles);
+    } else if (resolvedLang === 'zh') {
+      res = matchMandarinTranscript(transcript, normalizedTiles);
+    } else {
+      res = matchEnglishTranscript(transcript, normalizedTiles);
+    }
+
+    return {
+      matchedIds: res.matchedIds,
+      matchedTokens: res.matchedTokens,
+      unmatchedText: res.unmatchedText,
+      commandAction: null,
+      lang: resolvedLang
+    };
+  };
+
+  FiezelGrammarUpgrade.resolveTokenOrderSpeechLang = resolveTokenOrderSpeechLang;
+
+  let _activeVoiceController = null;
+  FiezelGrammarUpgrade.stopActiveVoice = function() {
+    if (_activeVoiceController && typeof _activeVoiceController.stop === 'function') {
+      const prev = _activeVoiceController;
+      _activeVoiceController = null;
+      try { prev.stop(true); } catch (_) {}
+    }
+  };
+
   /**
-   * 1. Token-Order Exercise Renderer (Tap-to-Order Token Rail)
+   * 1. Token-Order Exercise Renderer (Tap-to-Order Token Rail + Voice-to-Tile)
    * Merender latihan susun kata untuk grammar dengan token rail interaktif.
    * @param {Object} q Objek pertanyaan (q.tokens, q.distractors, q.correctOrder)
    * @param {Function} onComplete Callback saat pengguna selesai/submit, dipanggil dengan boolean (isCorrect)
    * @returns {HTMLElement} Elemen DOM siap dimasukkan ke dalam kuis
    */
   FiezelGrammarUpgrade.renderTokenOrder = function(q, onComplete, opts) {
+    FiezelGrammarUpgrade.stopActiveVoice();
     // Mode ukur (tes penempatan, ujian lompat level, gerbang lewati materi): tanpa bantuan
     // apa pun - arti kata yang bisa diintip adalah bantuan, dan bantuan di alat ukur membuat
     // levelnya mengukur bantuan itu, bukan muridnya (audit P-A 2026-10-04).
@@ -107,7 +693,7 @@
     const distractors = [...(q.distractors || [])];
     const allTokens = [...tokens, ...distractors];
 
-    // Fisher-Yates shuffle
+    // Fisher-Yates shuffle (skip when explicit presetBankOrder requested)
     const shuffle = (array) => {
       let currentIndex = array.length, randomIndex;
       while (currentIndex !== 0) {
@@ -141,43 +727,57 @@
       return '';
     };
 
-    const bankTokens = shuffle(allTokens.map((item, id) => {
+    const rawBankList = allTokens.map((item, id) => {
       const rawText = typeof item === 'object' && item ? (item.text || item.option || item.word || '') : String(item ?? '');
       const text = rawText.replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+|[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+$/g, '');
       const explicitSyntax = typeof item === 'object' && item.syntax ? item.syntax : '';
       const syntax = explicitSyntax || FiezelGrammarUpgrade.classifyWord(text);
       const gloss = glossFor(text);
       return { text, id, syntax, gloss, placed: false };
-    }));
+    });
+    const bankTokens = (opts && opts.preserveBankOrder) ? rawBankList : shuffle(rawBankList);
     // Tombol "intip arti" hanya muncul kalau memang ada arti yang bisa diintip: tombol yang
     // ditekan lalu tidak mengubah apa pun justru membuat murid mengira aplikasinya rusak.
     const anyGloss = !measure && bankTokens.some(t => t.gloss);
     const placedTokens = [];
     let vacantSlotIndex = null;
     let showGloss = false;
-    const vacantSlotHtml = () => `<span aria-hidden="true">↳</span> ${esc(FiezelI18n.t('grammar.token-isi-di-sini'))}`;
+    const vacantSlotHtml = () => `<span aria-hidden="true">↳</span> ${esc(t('grammar.token-isi-di-sini', 'isi di sini'))}`;
+    const courseLangKey = resolveTokenOrderSpeechLang(q, bankTokens, opts);
+    const speechBcp47 = VOICE_LANG_MAP[courseLangKey] || 'en-US';
+    const speechBadge = VOICE_BADGE_MAP[courseLangKey] || 'EN';
 
     container.innerHTML = `
-      <div class="token-rail" id="tokenRail" aria-label="${FiezelI18n.t('grammar.token-rail-aria', 'Area penyusunan kalimat')}"></div>
+      <div class="token-rail" id="tokenRail" aria-label="${esc(t('grammar.token-rail-aria', 'Area penyusunan kalimat'))}"></div>
       <div class="gx-gloss-bar">
-        <span class="token-bank-label">${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}</span>
-        ${anyGloss ? `<button type="button" class="gx-btn-gloss" id="tokenGlossToggle" aria-pressed="false">
-          <span aria-hidden="true">📖</span> ${esc(FiezelI18n.t('grammar.token-intip-arti'))}
-        </button>` : ''}
+        <span class="token-bank-label">${esc(t('grammar.token-bank-aria', 'Daftar kata tersedia'))}</span>
+        <div class="gx-bar-actions">
+          <button type="button" class="gx-btn-voice" id="tokenVoiceBtn" aria-pressed="false" aria-label="${esc(t('grammar.token-voice-aria', 'Susun kalimat dengan suara'))}">
+            <span class="gx-voice-mic-icon" aria-hidden="true">🎙️</span>
+            <span class="gx-voice-label">${esc(t('grammar.token-voice-btn', 'Susun Suara'))}</span>
+            <span class="gx-voice-lang">${esc(speechBadge)}</span>
+          </button>
+          ${anyGloss ? `<button type="button" class="gx-btn-gloss" id="tokenGlossToggle" aria-pressed="false">
+            <span aria-hidden="true">📖</span> ${esc(t('grammar.token-intip-arti', 'Intip arti kata'))}
+          </button>` : ''}
+        </div>
       </div>
-      <div class="token-bank" id="tokenBank" aria-label="${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}"></div>
+      <div class="gx-voice-status" id="tokenVoiceStatus" hidden role="status" aria-live="polite"></div>
+      <div class="token-bank" id="tokenBank" aria-label="${esc(t('grammar.token-bank-aria', 'Daftar kata tersedia'))}"></div>
       <div class="token-actions">
         <button type="button" id="tokenResetBtn" class="token-reset-btn" disabled>
           <i data-lucide="rotate-ccw"></i>
-          <span>${FiezelI18n.t('umum.hapus', 'Hapus')}</span>
+          <span>${esc(t('umum.hapus', 'Hapus'))}</span>
         </button>
-        <button type="button" id="tokenSubmitBtn" class="primary token-submit-btn" disabled>${FiezelI18n.t('quiz.periksa', 'Periksa')}</button>
+        <button type="button" id="tokenSubmitBtn" class="primary token-submit-btn" disabled>${esc(t('quiz.periksa', 'Periksa'))}</button>
       </div>
     `;
 
     const railEl = container.querySelector('#tokenRail');
     const bankEl = container.querySelector('#tokenBank');
     const glossToggleBtn = container.querySelector('#tokenGlossToggle');
+    const voiceBtn = container.querySelector('#tokenVoiceBtn');
+    const voiceStatusEl = container.querySelector('#tokenVoiceStatus');
     const submitBtn = container.querySelector('#tokenSubmitBtn');
     const resetBtn = container.querySelector('#tokenResetBtn');
 
@@ -212,6 +812,7 @@
             btn.textContent = token.text;
           }
           btn.onclick = () => {
+            FiezelGrammarUpgrade.stopActiveVoice();
             if (typeof self.haptic === 'function') self.haptic('tap');
             if (typeof self.uiSfx === 'function') self.uiSfx('pop');
             token.placed = true;
@@ -250,6 +851,7 @@
         }
         btn.setAttribute('title', FiezelI18n.t('grammar.token-lepas', 'Ketuk untuk melepas'));
         btn.onclick = () => {
+          FiezelGrammarUpgrade.stopActiveVoice();
           if (typeof self.haptic === 'function') self.haptic('tap');
           token.placed = false;
           placedTokens.splice(index, 1);
@@ -280,17 +882,253 @@
       if (resetBtn) resetBtn.disabled = placedTokens.length === 0;
     };
 
+    let activeRec = null;
+    let isListening = false;
+    let silenceTimer = null;
+    let preVoiceIds = [];
+    let hadSpeechResult = false;
+    let wasConnected = !!container.isConnected;
+    const clearSilenceTimer = () => {
+      if (silenceTimer !== null) {
+        clearTimeout(silenceTimer);
+        silenceTimer = null;
+      }
+    };
+    const updateVoiceBtnUi = () => {
+      if (!voiceBtn) return;
+      voiceBtn.classList.toggle('is-listening', isListening);
+      voiceBtn.setAttribute('aria-pressed', String(isListening));
+      const lbl = voiceBtn.querySelector('.gx-voice-label');
+      if (lbl) {
+        lbl.textContent = isListening
+          ? t('grammar.token-voice-listening', 'Mendengarkan...')
+          : t('grammar.token-voice-btn', 'Susun Suara');
+      }
+    };
+    const setVoiceStatus = (mode, text) => {
+      if (!voiceStatusEl) return;
+      voiceStatusEl.className = 'gx-voice-status' + (mode ? ' is-' + mode : '');
+      if (!text) {
+        voiceStatusEl.hidden = true;
+        voiceStatusEl.textContent = '';
+        return;
+      }
+      voiceStatusEl.hidden = false;
+      voiceStatusEl.innerHTML = '';
+      if (mode === 'listening') {
+        const dot = document.createElement('span');
+        dot.className = 'gx-voice-dot';
+        dot.setAttribute('aria-hidden', 'true');
+        voiceStatusEl.appendChild(dot);
+      }
+      const span = document.createElement('span');
+      span.textContent = text;
+      voiceStatusEl.appendChild(span);
+    };
+    const stopListening = (preserveStatus) => {
+      clearSilenceTimer();
+      const rec = activeRec;
+      activeRec = null;
+      isListening = false;
+      if (rec) {
+        try {
+          rec.onresult = null;
+          rec.onerror = null;
+          rec.onend = null;
+          if (typeof rec.stop === 'function') rec.stop();
+          else if (typeof rec.abort === 'function') rec.abort();
+        } catch (_) {
+          try { if (typeof rec.abort === 'function') rec.abort(); } catch (__) {}
+        }
+      }
+      if (_activeVoiceController && _activeVoiceController.stop === stopListening) {
+        _activeVoiceController = null;
+      }
+      updateVoiceBtnUi();
+      if (!preserveStatus && !hadSpeechResult) {
+        setVoiceStatus('', '');
+      }
+    };
+    const armSilenceTimer = (ms) => {
+      clearSilenceTimer();
+      silenceTimer = setTimeout(() => {
+        if (isListening) stopListening(true);
+      }, ms);
+    };
+
+    const applySpeechEvent = (event) => {
+      if (container.isConnected) wasConnected = true;
+      if (wasConnected && container.isConnected === false) {
+        stopListening(true);
+        return;
+      }
+
+      const results = event && event.results ? Array.from(event.results) : [];
+      const candidates = [];
+      let allFinal = false;
+
+      if (results.length > 0) {
+        allFinal = results.every((r) => Boolean(r && r.isFinal));
+        const lastIdx = results.length - 1;
+        const prefix = results
+          .slice(0, lastIdx)
+          .map((r) => (r && r[0] && r[0].transcript) || '')
+          .filter(Boolean)
+          .join(' ');
+        const lastRes = results[lastIdx];
+        const altLen = lastRes && typeof lastRes.length === 'number' ? Math.min(3, lastRes.length) : 0;
+        for (let a = 0; a < altLen; a++) {
+          const altText = (lastRes[a] && lastRes[a].transcript) || '';
+          const combined = [prefix, altText].filter(Boolean).join(' ').trim();
+          if (combined) candidates.push(combined);
+        }
+      } else if (event && typeof event.transcript === 'string' && event.transcript.trim()) {
+        candidates.push(event.transcript.trim());
+        allFinal = true;
+      }
+
+      if (candidates.length === 0) return;
+
+      const preVoiceSet = new Set(preVoiceIds);
+      const preTokens = preVoiceIds
+        .map((id) => bankTokens.find((t) => t.id === id))
+        .filter(Boolean);
+      const availableForVoice = bankTokens
+        .filter((t) => !preVoiceSet.has(t.id))
+        .map((t) => ({ id: t.id, text: t.text, placed: false }));
+
+      let chosen = null;
+      let chosenCand = candidates[0];
+      for (let i = 0; i < candidates.length; i++) {
+        const res = FiezelGrammarUpgrade.matchSpokenTranscriptToTokens(candidates[i], availableForVoice, courseLangKey);
+        if (res.commandAction === 'clear') {
+          chosen = res;
+          chosenCand = candidates[i];
+          break;
+        }
+        if (!chosen || res.matchedIds.length > chosen.matchedIds.length) {
+          chosen = res;
+          chosenCand = candidates[i];
+        }
+      }
+
+      if (!chosen) return;
+      if (chosen.commandAction === 'clear') {
+        bankTokens.forEach((t) => { t.placed = false; });
+        placedTokens.length = 0;
+        preVoiceIds = [];
+        vacantSlotIndex = null;
+        hadSpeechResult = true;
+        render();
+        setVoiceStatus('matched', t('grammar.token-voice-matched', '{cocok} kata tersusun', { cocok: 0 }));
+        stopListening(true);
+        return;
+      }
+
+      if (chosen.matchedIds.length > 0) {
+        hadSpeechResult = true;
+        const nextTokens = [...preTokens];
+        const chosenSet = new Set(preTokens.map((t) => t.id));
+        chosen.matchedIds.forEach((id) => {
+          if (chosenSet.has(id)) return;
+          const tok = bankTokens.find((t) => t.id === id);
+          if (tok) {
+            chosenSet.add(id);
+            nextTokens.push(tok);
+          }
+        });
+        bankTokens.forEach((t) => { t.placed = chosenSet.has(t.id); });
+        placedTokens.length = 0;
+        placedTokens.push(...nextTokens);
+        vacantSlotIndex = null;
+        render();
+        setVoiceStatus('matched', t('grammar.token-voice-matched', '{cocok} kata tersusun', { cocok: placedTokens.length }));
+      } else if (allFinal) {
+        setVoiceStatus('error', t('grammar.token-voice-nomatch', 'Belum ada kata yang cocok dari {teks}.', { teks: chosenCand.slice(0, 48) }));
+      }
+
+      if (isListening) armSilenceTimer(2600);
+    };
+
+    if (voiceBtn) {
+      voiceBtn.onclick = () => {
+        if (typeof self.haptic === 'function') self.haptic('tap');
+        if (isListening) {
+          stopListening(true);
+          return;
+        }
+        FiezelGrammarUpgrade.stopActiveVoice();
+        const SpeechRec = (typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition))
+          || (typeof self !== 'undefined' && (self.SpeechRecognition || self.webkitSpeechRecognition));
+        if (!SpeechRec) {
+          setVoiceStatus('error', t('grammar.token-voice-unsupported', 'Peramban ini belum mendukung pengenalan suara otomatis.'));
+          return;
+        }
+
+        preVoiceIds = placedTokens.map((t) => t.id);
+        hadSpeechResult = false;
+        let rec;
+        try {
+          rec = new SpeechRec();
+        } catch (_) {
+          setVoiceStatus('error', t('grammar.token-voice-unsupported', 'Peramban ini belum mendukung pengenalan suara otomatis.'));
+          return;
+        }
+
+        rec.lang = speechBcp47;
+        rec.interimResults = true;
+        rec.continuous = true;
+        rec.maxAlternatives = 3;
+
+        activeRec = rec;
+        isListening = true;
+        _activeVoiceController = { stop: stopListening };
+        updateVoiceBtnUi();
+        setVoiceStatus('listening', t('grammar.token-voice-ready', 'Ucapkan kalimat sesuai kata yang tersedia...'));
+        armSilenceTimer(7500);
+
+        rec.onresult = (ev) => applySpeechEvent(ev);
+        rec.onerror = (ev) => {
+          const err = String(ev && ev.error ? ev.error : '');
+          if (err === 'not-allowed' || err === 'service-not-allowed') {
+            hadSpeechResult = true;
+            setVoiceStatus('error', t('grammar.token-voice-denied', 'Izin mikrofon ditolak. Aktifkan izin mikrofon di peramban.'));
+          } else if (err && err !== 'no-speech' && err !== 'aborted') {
+            hadSpeechResult = true;
+            setVoiceStatus('error', t('grammar.token-voice-unsupported', 'Peramban ini belum mendukung pengenalan suara otomatis.'));
+          }
+          stopListening(true);
+        };
+        rec.onend = () => {
+          if (activeRec === rec) {
+            stopListening(true);
+          }
+        };
+
+        try {
+          rec.start();
+        } catch (_) {
+          stopListening(false);
+          setVoiceStatus('error', t('grammar.token-voice-unsupported', 'Peramban ini belum mendukung pengenalan suara otomatis.'));
+        }
+      };
+    }
+
     if (resetBtn) {
       resetBtn.onclick = () => {
+        stopListening(false);
         if (typeof self.haptic === 'function') self.haptic('tap');
         bankTokens.forEach((token) => { token.placed = false; });
         placedTokens.length = 0;
+        preVoiceIds = [];
         vacantSlotIndex = null;
+        setVoiceStatus('', '');
         render();
       };
     }
 
     submitBtn.onclick = () => {
+      stopListening(true);
       const HAS_CJK_RE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/;
       const norm = (s) => {
         const cleaned = String(s || '')

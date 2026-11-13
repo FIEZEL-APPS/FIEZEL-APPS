@@ -36,17 +36,20 @@ import {
   brainSyncFlush,
   buildBraincoreCognitiveDossier,
   checkPrerequisiteStatus,
+  createTurnAcousticTracker,
   dispatchVoiceAppNavigation,
   finalizeCallSessionMemory,
   loadBraincoreState,
   loadPteMasterState,
   recordPteMasterAttempt,
   diagnosePteCandidateSpeech,
+  type PteDiagnosticSpeechResult,
   readHostPwaCognitiveSnapshot,
   recordSpeakingAttempt,
   recordVocabPrereqMastery,
   saveBraincoreState,
   STORAGE_KEY,
+  type TurnAcousticTelemetry,
 } from './lib/braincore';
 import {
   InCallLearningWorkbenchModal,
@@ -111,6 +114,15 @@ const KAWAN_BICARA_GEM_COST = KAWAN_BICARA_MAX_SESSION_GEMS;
 const DAILY_FREE_CALL_MAX_TURNS = 5;
 const MAX_CALL_DURATION_SEC = Infinity; // Bebas batas waktu percakapan (unlimited)
 const DAILY_FREE_CALL_LIMIT = 1;
+
+function countUtteranceUnits(text: string, targetLang: TargetLang): number {
+  const clean = String(text || '').trim();
+  if (!clean) return 0;
+  if (targetLang === 'ja' || targetLang === 'zh') {
+    return clean.replace(/[\s.,!?。、！？…「」『』（）()]+/g, '').length;
+  }
+  return clean.split(/\s+/).filter(Boolean).length;
+}
 
 function resolveHostFiezelState(win: any): any {
   if (!win) return null;
@@ -453,6 +465,8 @@ export default function App() {
   const [isListeningLiveSpeech, setIsListeningLiveSpeech] = useState<boolean>(false);
   const [isWaitingAfterSpeech, setIsWaitingAfterSpeech] = useState<boolean>(false);
   const pttStartedAtRef = useRef<number | null>(null);
+  const turnAcousticTrackerRef = useRef(createTurnAcousticTracker());
+  const [latestPteDiagnostic, setLatestPteDiagnostic] = useState<PteDiagnosticSpeechResult | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const speechRecRef = useRef<any>(null);
@@ -2121,13 +2135,23 @@ export default function App() {
     void brainSyncFlush(updated).then(({ nextState }) => setBrainState(nextState));
   };
 
-  const commitLiveUserTurn = (textToCommit: string) => {
+  const commitLiveUserTurn = (
+    textToCommit: string,
+    opts?: { inputMode?: 'voice' | 'typed' | 'quick_chip' }
+  ) => {
     const uText = sanitizeHallucinatedTranscript(
       textToCommit,
       activeScenario.targetLang,
       locale
     ).trim();
     if (!uText) return;
+
+    const effectiveInputMode = opts?.inputMode || 'voice';
+    const liveTelemetry =
+      effectiveInputMode === 'voice' ? turnAcousticTrackerRef.current.finalize() : null;
+    if (effectiveInputMode === 'voice') {
+      turnAcousticTrackerRef.current.reset();
+    }
 
     liveUserDraftRef.current = '';
     setLiveUserDraft('');
@@ -2202,6 +2226,9 @@ export default function App() {
       targetLang: activeScenario.targetLang,
       locale,
       measureMode: isMeasureMode,
+      speakingDurationSec: liveTelemetry?.spanDurationSec || undefined,
+      inputMode: effectiveInputMode,
+      fluencyTelemetry: liveTelemetry || undefined,
       learnerDossier: safeBuildDossier(
         brainStateRef.current,
         activeScenario,
@@ -2212,6 +2239,32 @@ export default function App() {
         text: tItem.text,
       })),
     };
+    const isDrJulianTurn =
+      activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian';
+    let pteDiagResult: ReturnType<typeof diagnosePteCandidateSpeech> | null = null;
+    if (isDrJulianTurn && uText && effectiveInputMode === 'voice') {
+      const regLearnerName =
+        readHostPwaCognitiveSnapshot(activeScenario.targetLang, locale).learnerName?.trim() ||
+        (locale === 'th' ? 'นักเรียน' : 'Candidate');
+      pteDiagResult = diagnosePteCandidateSpeech({
+        spokenTranscript: uText,
+        durationSec: liveTelemetry?.spanDurationSec || undefined,
+        activeSpeechSec: liveTelemetry?.activeSpeechSec,
+        phonationRatio: liveTelemetry?.phonationRatio,
+        shortPausesCount: liveTelemetry?.shortPausesCount,
+        hesitationPausesCount: liveTelemetry?.hesitationPausesCount,
+        longPausesCount: liveTelemetry?.longPausesCount,
+        maxPauseMs: liveTelemetry?.maxPauseMs,
+        pauseDurationsMs: liveTelemetry?.pauseDurationsMs,
+        burstDurationsMs: liveTelemetry?.burstDurationsMs,
+        isAcousticTiming: liveTelemetry?.isAcousticTiming,
+        measurementSource: liveTelemetry?.measurementSource,
+        questionTitle: learningWorkbench?.topicTitle || activeScenario.titleId,
+        learnerName: regLearnerName,
+      });
+      setLatestPteDiagnostic(pteDiagResult);
+      evalParams.learnerDossier += `\n\n${pteDiagResult.clinicalDossierText}`;
+    }
     const ev = evaluateTurnLocal(evalParams);
     const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
     const outcome = recordSpeakingAttempt(brainStateRef.current, {
@@ -2219,12 +2272,13 @@ export default function App() {
       scenarioId: activeScenario.id,
       targetLang: activeScenario.targetLang,
       userExactTranscript: uText,
-      ok: Boolean(ev.ok),
-      grammarScore: ev.grammarScore,
-      fluencyScore: ev.fluencyScore,
-      vocabUsageScore: ev.vocabUsageScore,
-      accuracyScore: ev.accuracyScore,
-      misconceptionId: ev.misconceptionId || null,
+      ok: pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok),
+      grammarScore: pteDiagResult ? Math.round(pteDiagResult.scores.pronunciation * 20) : ev.grammarScore,
+      fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
+      vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
+      accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
+      speakingDurationSec: liveTelemetry?.spanDurationSec || undefined,
+      misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
       correctionPattern: ev.syntacticCorrection || ev.naturalReformulation || null,
       hintsUsed: effectiveHints,
       confidence: 0.85,
@@ -2236,19 +2290,19 @@ export default function App() {
       playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
     }
     const turnDiag: TurnDiagnosis = {
-      ok: Boolean(ev.ok),
-      accuracyScore: ev.accuracyScore,
-      grammarScore: ev.grammarScore,
-      fluencyScore: ev.fluencyScore,
-      vocabUsageScore: ev.vocabUsageScore,
+      ok: pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok),
+      accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
+      grammarScore: pteDiagResult ? Math.round(pteDiagResult.scores.pronunciation * 20) : ev.grammarScore,
+      fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
+      vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
       userExactTranscript: uText,
-      misconceptionId: ev.misconceptionId || null,
-      whyFailsId: ev.whyFailsId || null,
+      misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
+      whyFailsId: pteDiagResult?.misconceptionsFound[0]?.detail || ev.whyFailsId || null,
       whyFailsTh: ev.whyFailsTh || null,
       missingTokens: ev.missingTokens || [],
       syntacticCorrection: ev.syntacticCorrection || null,
       naturalReformulation: ev.naturalReformulation || uText,
-      pedagogicalFeedbackId: ev.pedagogicalFeedbackId,
+      pedagogicalFeedbackId: pteDiagResult?.clinicalDossierText || ev.pedagogicalFeedbackId,
       pedagogicalFeedbackTh: ev.pedagogicalFeedbackTh,
       bktBefore: outcome.bktBefore,
       bktAfter: outcome.bktAfter,
@@ -2268,7 +2322,10 @@ export default function App() {
     ]);
   };
 
-  const submitLiveUserUtterance = (textToSend: string) => {
+  const submitLiveUserUtterance = (
+    textToSend: string,
+    opts?: { inputMode?: 'voice' | 'typed' | 'quick_chip' }
+  ) => {
     const trimmed = textToSend.trim();
     if (!trimmed) return;
 
@@ -2287,7 +2344,7 @@ export default function App() {
         })
       );
     }
-    commitLiveUserTurn(trimmed);
+    commitLiveUserTurn(trimmed, opts);
   };
 
   const buildDefaultWorkbenchPayload = (
@@ -2625,6 +2682,7 @@ export default function App() {
       locale,
       measureMode: false,
       callMode: callModeRef.current,
+      inputMode: 'typed' as const,
       learnerDossier: safeBuildDossier(brainStateRef.current, activeScenario, locale),
       history: turnsRef.current.slice(-4).map((tr) => ({ speaker: tr.speaker, text: tr.text })),
     };
@@ -2793,6 +2851,8 @@ export default function App() {
     audioBase64?: string;
     audioMimeType?: string;
     speakingDurationSec?: number;
+    inputMode?: 'voice' | 'typed' | 'quick_chip';
+    fluencyTelemetry?: Partial<TurnAcousticTelemetry> | null;
   }) => {
     const trimmed = (params.text || '').trim();
     if (!trimmed && !params.audioBase64) return;
@@ -2833,6 +2893,17 @@ export default function App() {
     setStatusBanner(null);
 
     try {
+      const effectiveInputMode: 'voice' | 'typed' | 'quick_chip' =
+        params.inputMode ||
+        (params.fluencyTelemetry || (params.speakingDurationSec && params.speakingDurationSec > 0)
+          ? 'voice'
+          : 'typed');
+      const measuredDurationSec =
+        params.fluencyTelemetry?.spanDurationSec && params.fluencyTelemetry.spanDurationSec > 0
+          ? params.fluencyTelemetry.spanDurationSec
+          : params.speakingDurationSec && params.speakingDurationSec > 0
+            ? params.speakingDurationSec
+            : undefined;
       const evalParams = {
         text: trimmed || activeScenario.sampleUtterances[0]?.text || 'Hello',
         scenario: activeScenario,
@@ -2841,6 +2912,9 @@ export default function App() {
         locale,
         measureMode: isMeasureMode,
         callMode: callModeRef.current,
+        speakingDurationSec: measuredDurationSec,
+        inputMode: effectiveInputMode,
+        fluencyTelemetry: params.fluencyTelemetry || undefined,
         learnerDossier: safeBuildDossier(
           brainStateRef.current,
           activeScenario,
@@ -2861,10 +2935,21 @@ export default function App() {
           (locale === 'th' ? 'นักเรียน' : 'Candidate');
         pteDiagResult = diagnosePteCandidateSpeech({
           spokenTranscript: trimmed,
-          durationSec: params.speakingDurationSec || 30,
+          durationSec: measuredDurationSec,
+          activeSpeechSec: params.fluencyTelemetry?.activeSpeechSec,
+          phonationRatio: params.fluencyTelemetry?.phonationRatio,
+          shortPausesCount: params.fluencyTelemetry?.shortPausesCount,
+          hesitationPausesCount: params.fluencyTelemetry?.hesitationPausesCount,
+          longPausesCount: params.fluencyTelemetry?.longPausesCount,
+          maxPauseMs: params.fluencyTelemetry?.maxPauseMs,
+          pauseDurationsMs: params.fluencyTelemetry?.pauseDurationsMs,
+          burstDurationsMs: params.fluencyTelemetry?.burstDurationsMs,
+          isAcousticTiming: params.fluencyTelemetry?.isAcousticTiming,
+          measurementSource: params.fluencyTelemetry?.measurementSource,
           questionTitle: learningWorkbench?.topicTitle || activeScenario.titleId,
           learnerName: regLearnerName,
         });
+        setLatestPteDiagnostic(pteDiagResult);
         evalParams.learnerDossier += `\n\n${pteDiagResult.clinicalDossierText}`;
       }
       const localEv = evaluateTurnLocal(evalParams);
@@ -2882,7 +2967,7 @@ export default function App() {
         fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
         vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
         accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
-        speakingDurationSec: params.speakingDurationSec,
+        speakingDurationSec: measuredDurationSec,
         misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
         correctionPattern: ev.syntacticCorrection || ev.naturalReformulation || null,
         hintsUsed: effectiveHints,
@@ -2921,7 +3006,7 @@ export default function App() {
         speaker: 'user',
         text: exactTranscript,
         timestamp: Date.now(),
-        speakingDurationSec: params.speakingDurationSec,
+        speakingDurationSec: measuredDurationSec,
         diagnosis,
       };
 
@@ -3236,6 +3321,10 @@ export default function App() {
           setLiveUserDraft(clean);
           setInputText(clean);
           setIsUserSpeakingLive(true);
+          turnAcousticTrackerRef.current.recordTranscriptEvent(
+            Date.now(),
+            countUtteranceUnits(clean, activeScenario.targetLang)
+          );
 
           if (liveSilenceTimerRef.current) {
             window.clearTimeout(liveSilenceTimerRef.current);
@@ -3264,11 +3353,15 @@ export default function App() {
                 wsRef.current.readyState === WebSocket.OPEN &&
                 liveTransportMode === 'ws-duplex'
               ) {
-                submitLiveUserUtterance(toSend);
+                submitLiveUserUtterance(toSend, { inputMode: 'voice' });
               } else {
+                const liveTel = turnAcousticTrackerRef.current.finalize();
+                turnAcousticTrackerRef.current.reset();
                 void submitStudentTurnRef.current({
                   text: toSend,
-                  speakingDurationSec: 3,
+                  speakingDurationSec: liveTel.spanDurationSec > 0 ? liveTel.spanDurationSec : undefined,
+                  inputMode: 'voice',
+                  fluencyTelemetry: liveTel,
                 });
               }
             }
@@ -3331,11 +3424,15 @@ export default function App() {
                     wsRef.current.readyState === WebSocket.OPEN &&
                     liveTransportMode === 'ws-duplex'
                   ) {
-                    submitLiveUserUtterance(toSend);
+                    submitLiveUserUtterance(toSend, { inputMode: 'voice' });
                   } else {
+                    const liveTel = turnAcousticTrackerRef.current.finalize();
+                    turnAcousticTrackerRef.current.reset();
                     void submitStudentTurnRef.current({
                       text: toSend,
-                      speakingDurationSec: 3,
+                      speakingDurationSec: liveTel.spanDurationSec > 0 ? liveTel.spanDurationSec : undefined,
+                      inputMode: 'voice',
+                      fluencyTelemetry: liveTel,
                     });
                   }
                 }
@@ -3422,6 +3519,7 @@ export default function App() {
       liveDictatedTextRef.current = '';
       setLiveUserDraft('');
       pttStartedAtRef.current = Date.now();
+      turnAcousticTrackerRef.current.reset();
 
       const SpeechRec =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -3452,6 +3550,10 @@ export default function App() {
             liveDictatedTextRef.current = clean;
             setLiveUserDraft(clean);
             setInputText(clean);
+            turnAcousticTrackerRef.current.recordTranscriptEvent(
+              Date.now(),
+              countUtteranceUnits(clean, activeScenario.targetLang)
+            );
 
             // Auto-submit right after brief breathing pause, ZERO manual "Kirim" click required!
             if (pttSilenceTimerRef.current) {
@@ -3515,17 +3617,23 @@ export default function App() {
       recorder.onstop = async () => {
         stream.getTracks().forEach((tr) => tr.stop());
         const elapsedSec = pttStartedAtRef.current
-          ? Math.max(2, Math.round((Date.now() - pttStartedAtRef.current) / 1000))
-          : 4;
+          ? Math.max(0.8, (Date.now() - pttStartedAtRef.current) / 1000)
+          : undefined;
         pttStartedAtRef.current = null;
         const dictated = liveDictatedTextRef.current.trim();
         if (dictated) {
           liveDictatedTextRef.current = '';
+          const pttTelemetry = turnAcousticTrackerRef.current.finalize(elapsedSec);
+          turnAcousticTrackerRef.current.reset();
           void submitStudentTurnRef.current({
             text: dictated,
-            speakingDurationSec: elapsedSec,
+            speakingDurationSec:
+              pttTelemetry.spanDurationSec > 0 ? pttTelemetry.spanDurationSec : elapsedSec,
+            inputMode: 'voice',
+            fluencyTelemetry: pttTelemetry,
           });
         } else {
+          turnAcousticTrackerRef.current.reset();
           setStatusBanner(
             'Peramban ini belum mendukung pengenalan suara otomatis. Ketik kalimatmu di kolom bawah atau pilih dari Bantuan Cara Jawab.'
           );
@@ -3547,9 +3655,9 @@ export default function App() {
       window.clearTimeout(pttSilenceTimerRef.current);
       pttSilenceTimerRef.current = null;
     }
-    const elapsedSec = pttStartedAtRef.current
-      ? Math.max(2, Math.round((Date.now() - pttStartedAtRef.current) / 1000))
-      : 4;
+    const rawElapsedSec = pttStartedAtRef.current
+      ? Math.max(0.8, (Date.now() - pttStartedAtRef.current) / 1000)
+      : undefined;
     pttStartedAtRef.current = null;
 
     if (speechRecRef.current) {
@@ -3566,11 +3674,17 @@ export default function App() {
         if (dictated) {
           liveDictatedTextRef.current = '';
           setLiveUserDraft('');
+          const pttTelemetry = turnAcousticTrackerRef.current.finalize(rawElapsedSec);
+          turnAcousticTrackerRef.current.reset();
           void submitStudentTurnRef.current({
             text: dictated,
-            speakingDurationSec: elapsedSec,
+            speakingDurationSec:
+              pttTelemetry.spanDurationSec > 0 ? pttTelemetry.spanDurationSec : rawElapsedSec,
+            inputMode: 'voice',
+            fluencyTelemetry: pttTelemetry,
           });
         } else {
+          turnAcousticTrackerRef.current.reset();
           setStatusBanner(
             'Belum ada suara yang terdengar. Pastikan mikrofon aktif dan ucapkan kalimat dengan jelas, atau ketik di kolom bawah.'
           );
@@ -3789,6 +3903,13 @@ export default function App() {
           bargeSpeechStreakRef.current = 0;
           lastBargeInAtRef.current = Date.now();
           interruptAiAndStartListening();
+          const bargeChunkMs = Math.max(10, Math.round((float32.length / sampleRate) * 1000));
+          turnAcousticTrackerRef.current.recordAudioFrame({
+            chunkMs: bargeChunkMs,
+            voicedMs: bargeVad.voicedMs || bargeChunkMs,
+            isActiveVoice: true,
+            confirmedSpeech: true,
+          });
           userAudioBurstActiveRef.current = true;
           if (!isUserSpeakingLiveRef.current) {
             isUserSpeakingLiveRef.current = true;
@@ -3823,7 +3944,14 @@ export default function App() {
     }
 
     const vadRes = handyVadRef.current.processSamples(float32, sampleRate, false);
+    const frameChunkMs = Math.max(10, Math.round((float32.length / sampleRate) * 1000));
     const isListeningSpeech = (v.isHumanSpeech || vadRes.inSpeech) && v.rms >= 0.002;
+    turnAcousticTrackerRef.current.recordAudioFrame({
+      chunkMs: frameChunkMs,
+      voicedMs: vadRes.voicedMs || (v.isHumanSpeech ? frameChunkMs : 0),
+      isActiveVoice: (vadRes.voicedFrames || 0) > 0 || v.isHumanSpeech,
+      confirmedSpeech: Boolean(vadRes.inSpeech || isListeningSpeech),
+    });
     const wsOpen = Boolean(wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current);
 
     if (isListeningSpeech) {
@@ -3937,6 +4065,7 @@ export default function App() {
     }
 
     handyVadRef.current.reset();
+    turnAcousticTrackerRef.current.reset();
     preRollFramesRef.current = [];
     consecutiveSpeechFramesRef.current = 0;
     bargeSpeechStreakRef.current = 0;
@@ -4074,6 +4203,14 @@ export default function App() {
               })
             );
           }
+        },
+        onFrameTelemetry: (ft) => {
+          turnAcousticTrackerRef.current.recordAudioFrame({
+            chunkMs: ft.frameMs,
+            voicedMs: ft.isActiveVoice ? ft.frameMs : 0,
+            isActiveVoice: ft.isActiveVoice,
+            confirmedSpeech: ft.confirmedSpeech,
+          });
         },
       });
 
@@ -5085,6 +5222,10 @@ ${
               );
               setLiveUserDraft(liveUserDraftRef.current);
               evaluateAndTriggerUserSpeechSentiment(liveUserDraftRef.current);
+              turnAcousticTrackerRef.current.recordTranscriptEvent(
+                Date.now(),
+                countUtteranceUnits(liveUserDraftRef.current, activeScenario.targetLang)
+              );
             }
           } else if (msg.type === 'input_transcription' || msg.type === 'user_transcript') {
             const cleanFull = sanitizeHallucinatedTranscript(
@@ -5095,6 +5236,10 @@ ${
             liveUserDraftRef.current = cleanFull;
             setLiveUserDraft(liveUserDraftRef.current);
             evaluateAndTriggerUserSpeechSentiment(cleanFull);
+            turnAcousticTrackerRef.current.recordTranscriptEvent(
+              Date.now(),
+              countUtteranceUnits(cleanFull, activeScenario.targetLang)
+            );
           }
 
           if (msg.serverContent?.outputTranscription?.text) {
@@ -5227,6 +5372,11 @@ ${
                 });
               }
 
+              const liveTelemetry = turnAcousticTrackerRef.current.finalize();
+              turnAcousticTrackerRef.current.reset();
+              const measuredTurnSec =
+                liveTelemetry.spanDurationSec > 0 ? liveTelemetry.spanDurationSec : undefined;
+
               const evalParams = {
                 text: uText,
                 scenario: activeScenario,
@@ -5234,6 +5384,9 @@ ${
                 targetLang: activeScenario.targetLang,
                 locale,
                 measureMode: isMeasureMode,
+                speakingDurationSec: measuredTurnSec,
+                inputMode: 'voice' as const,
+                fluencyTelemetry: liveTelemetry,
                 learnerDossier: safeBuildDossier(
                   brainStateRef.current,
                   activeScenario,
@@ -5253,10 +5406,21 @@ ${
                   (locale === 'th' ? 'นักเรียน' : 'Candidate');
                 pteDiagResult = diagnosePteCandidateSpeech({
                   spokenTranscript: uText,
-                  durationSec: 30,
+                  durationSec: measuredTurnSec,
+                  activeSpeechSec: liveTelemetry.activeSpeechSec,
+                  phonationRatio: liveTelemetry.phonationRatio,
+                  shortPausesCount: liveTelemetry.shortPausesCount,
+                  hesitationPausesCount: liveTelemetry.hesitationPausesCount,
+                  longPausesCount: liveTelemetry.longPausesCount,
+                  maxPauseMs: liveTelemetry.maxPauseMs,
+                  pauseDurationsMs: liveTelemetry.pauseDurationsMs,
+                  burstDurationsMs: liveTelemetry.burstDurationsMs,
+                  isAcousticTiming: liveTelemetry.isAcousticTiming,
+                  measurementSource: liveTelemetry.measurementSource,
                   questionTitle: learningWorkbench?.topicTitle || activeScenario.titleId,
                   learnerName: regLearnerName,
                 });
+                setLatestPteDiagnostic(pteDiagResult);
                 evalParams.learnerDossier += `\n\n${pteDiagResult.clinicalDossierText}`;
                 brainStateRef.current = loadBraincoreState();
               }
@@ -5272,6 +5436,7 @@ ${
                 fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
                 vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
                 accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
+                speakingDurationSec: measuredTurnSec,
                 misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
                 correctionPattern: ev.syntacticCorrection || ev.naturalReformulation || null,
                 hintsUsed: effectiveHints,
@@ -7406,9 +7571,9 @@ ${
                       wsRef.current &&
                       wsRef.current.readyState === WebSocket.OPEN
                     ) {
-                      submitLiveUserUtterance(clean);
+                      submitLiveUserUtterance(clean, { inputMode: 'quick_chip' });
                     } else {
-                      void submitStudentTurn({ text: clean, speakingDurationSec: 3 });
+                      void submitStudentTurn({ text: clean, inputMode: 'quick_chip' });
                     }
                   }}
                   onStartPttWithPrompt={(promptText) => {
@@ -7469,9 +7634,17 @@ ${
                       else if (textToSend) {
                         setLiveUserDraft('');
                         if (isLiveConnected) {
-                          submitLiveUserUtterance(textToSend);
+                          submitLiveUserUtterance(textToSend, { inputMode: 'voice' });
                         } else {
-                          void submitStudentTurn({ text: textToSend, speakingDurationSec: 3 });
+                          const draftTel = turnAcousticTrackerRef.current.finalize();
+                          turnAcousticTrackerRef.current.reset();
+                          void submitStudentTurn({
+                            text: textToSend,
+                            speakingDurationSec:
+                              draftTel.spanDurationSec > 0 ? draftTel.spanDurationSec : undefined,
+                            inputMode: 'voice',
+                            fluencyTelemetry: draftTel,
+                          });
                         }
                       }
                     }}
@@ -7580,10 +7753,10 @@ ${
                       wsRef.current &&
                       wsRef.current.readyState === WebSocket.OPEN
                     ) {
-                      submitLiveUserUtterance(textToSend);
+                      submitLiveUserUtterance(textToSend, { inputMode: 'typed' });
                       setInputText('');
                     } else {
-                      void submitStudentTurn({ text: textToSend });
+                      void submitStudentTurn({ text: textToSend, inputMode: 'typed' });
                     }
                   }
                 }}
@@ -7604,10 +7777,10 @@ ${
                     wsRef.current &&
                     wsRef.current.readyState === WebSocket.OPEN
                   ) {
-                    submitLiveUserUtterance(textToSend);
+                    submitLiveUserUtterance(textToSend, { inputMode: 'typed' });
                     setInputText('');
                   } else {
-                    void submitStudentTurn({ text: textToSend });
+                    void submitStudentTurn({ text: textToSend, inputMode: 'typed' });
                   }
                 }}
                 className="px-4 py-2 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all disabled:opacity-30"
@@ -7919,6 +8092,7 @@ ${
           sampleTarget={learningWorkbench.sampleTarget}
           forcedExerciseMode={learningWorkbench.preferredExerciseMode}
           externalQuizSeed={learningWorkbench.quizSeed}
+          latestPteDiagnostic={latestPteDiagnostic}
           currentMasteryPct={Math.round(
             ((brainState.competencies[activeScenario.competencyId]?.pMasteryDecayed ??
               brainState.competencies[activeScenario.competencyId]?.pMastery ??
@@ -7996,7 +8170,7 @@ ${
                 } catch {
                   // Fallback
                 }
-                void submitStudentTurn({ text: customQuestion, speakingDurationSec: 2 });
+                void submitStudentTurn({ text: customQuestion, inputMode: 'typed' });
               })();
             }
           }}
@@ -8009,9 +8183,9 @@ ${
               wsRef.current &&
               wsRef.current.readyState === WebSocket.OPEN
             ) {
-              submitLiveUserUtterance(writtenSentence);
+              submitLiveUserUtterance(writtenSentence, { inputMode: 'typed' });
             } else {
-              void submitStudentTurn({ text: writtenSentence, speakingDurationSec: 3 });
+              void submitStudentTurn({ text: writtenSentence, inputMode: 'typed' });
             }
           }}
           onNavigateModule={(dest) => {

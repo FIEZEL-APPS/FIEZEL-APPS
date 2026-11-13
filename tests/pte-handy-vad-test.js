@@ -179,4 +179,57 @@ const hesitantConf = FiezelPteUi.computePteEmpiricalConfidence({
 assert.ok(fluentConf > hesitantConf + 0.15, `Fluent confidence (${fluentConf}) must significantly exceed hesitant (${hesitantConf})`);
 console.log(`  ✓ Empirical confidence scoring verified (fluent=${fluentConf}, hesitant=${hesitantConf})`);
 
+// 12. Verify HandyHumanVad.processSamples reports hangover-free active voicedMs/voicedFrames
+const activeVad = new FiezelPteUi.HandyHumanVad({ threshold: 0.45, prefillFrames: 5, hangoverFrames: 12 });
+const chunk2Voice = new Float32Array(1024);
+for (let i = 0; i < 1024; i++) {
+  const t = i / 16000;
+  chunk2Voice[i] = 0.35 * Math.sin(2 * Math.PI * 150 * t) + 0.25 * Math.sin(2 * Math.PI * 600 * t) + 0.15 * Math.sin(2 * Math.PI * 1200 * t);
+}
+const chunk2Silence = new Float32Array(1024);
+// Warm up onset, then measure voiced burst vs pure hangover silence
+let voicedSumMs = 0;
+for (let r = 0; r < 6; r++) {
+  const out = activeVad.processSamples(chunk2Voice, 16000);
+  voicedSumMs += out.voicedMs;
+}
+assert.ok(voicedSumMs > 100, `Active speech must report positive voicedMs (got ${voicedSumMs})`);
+// Next chunk is silent: VAD remains in hangover (`inSpeech === true` briefly), yet `voicedFrames` & `voicedMs` MUST be 0!
+const hangoverOut = activeVad.processSamples(chunk2Silence, 16000);
+assert.strictEqual(hangoverOut.voicedFrames, 0, 'Silence during hangover must report voicedFrames === 0');
+assert.strictEqual(hangoverOut.voicedMs, 0, 'Silence during hangover must report voicedMs === 0');
+assert.strictEqual(hangoverOut.activeVoiceDetected, false, 'activeVoiceDetected must be false on silence frame');
+console.log('  ✓ Hangover-free HandyHumanVad frame telemetry (voicedFrames/voicedMs) verified');
+
+// 13. Verify createPteFluencyTracker excludes trailing silence & accurately measures intra-utterance pauses
+const tracker = FiezelPteUi.createPteFluencyTracker();
+// Pre-speech wait (2s silence)
+for (let i = 0; i < 100; i++) {
+  tracker.recordAudioFrame({ chunkMs: 20, voicedMs: 0, isActiveVoice: false, confirmedSpeech: false });
+}
+// First speech burst: 2.0s active voice (100 * 20ms)
+for (let i = 0; i < 100; i++) {
+  tracker.recordAudioFrame({ chunkMs: 20, voicedMs: 20, isActiveVoice: true, confirmedSpeech: true });
+}
+// Intra-utterance hesitation pause: 1.1s silence (55 * 20ms)
+for (let i = 0; i < 55; i++) {
+  tracker.recordAudioFrame({ chunkMs: 20, voicedMs: 0, isActiveVoice: false, confirmedSpeech: true });
+}
+// Second speech burst: 2.0s active voice
+for (let i = 0; i < 100; i++) {
+  tracker.recordAudioFrame({ chunkMs: 20, voicedMs: 20, isActiveVoice: true, confirmedSpeech: true });
+}
+// Long trailing silence: 4.5s (e.g., waiting for Pearson auto-close) — MUST NOT inflate span or longPausesCount!
+for (let i = 0; i < 225; i++) {
+  tracker.recordAudioFrame({ chunkMs: 20, voicedMs: 0, isActiveVoice: false, confirmedSpeech: false });
+}
+const metrics = tracker.finalize(12000);
+assert.strictEqual(metrics.measurementSource, 'acoustic_vad');
+assert.ok(metrics.spanDurationSec >= 4.9 && metrics.spanDurationSec <= 5.3, `Span expected ~5.1s excluding pre/post silence, got ${metrics.spanDurationSec}s`);
+assert.ok(metrics.activeSpeechSec >= 3.8 && metrics.activeSpeechSec <= 4.1, `Active speech expected ~4.0s, got ${metrics.activeSpeechSec}s`);
+assert.strictEqual(metrics.hesitationPausesCount, 1, '1.1s intra-utterance pause must count as 1 hesitation pause');
+assert.strictEqual(metrics.longPausesCount, 0, '4.5s trailing silence MUST NOT become a breakdown pause');
+assert.ok(metrics.burstDurationsMs.length === 2, 'Two distinct vocal bursts recorded');
+console.log(`  ✓ createPteFluencyTracker telemetry verified (span=${metrics.spanDurationSec}s, active=${metrics.activeSpeechSec}s, hes=${metrics.hesitationPausesCount}, long=${metrics.longPausesCount})`);
+
 console.log('\nAll Handy VAD unit tests PASSED successfully!\n');

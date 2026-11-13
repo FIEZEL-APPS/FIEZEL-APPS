@@ -588,4 +588,99 @@ test('evaluateRetellLecture computes dynamic acoustic fluency/pronunciation inst
   assert.ok(strongRes.pearsonScore > weakRes.pearsonScore + 20);
 });
 
+// 34. Multi-factor acoustic-temporal Oral Fluency telemetry & pause tiers
+test('evaluateOralFluency differentiates smooth vs hesitated vs self-corrected speech with telemetry reasons', () => {
+  const e = require('../features/pte/fiezel-pte-engine.js');
+  assert.strictEqual(e.countSelfCorrections('I mean yes, wait no actually I think solar works'), 2);
+
+  const smooth = e.evaluateOralFluency(12.0, 28, 0, {
+    isAcousticTiming: true,
+    measurementSource: 'acoustic_vad',
+    activeSpeechSec: 10.2,
+    phonationRatio: 0.85,
+    shortPausesCount: 1,
+    hesitationPausesCount: 0,
+    longPausesCount: 0,
+    maxPauseMs: 420,
+    burstDurationsMs: [3200, 3400, 3600],
+    disfluencyCount: 0,
+    selfCorrectionCount: 0
+  });
+  assert.strictEqual(smooth.score, 5);
+  assert.ok(smooth.exactScore >= 4.7, `Smooth exactScore expected >=4.7, got ${smooth.exactScore}`);
+  assert.strictEqual(smooth.measurementSource, 'acoustic_vad');
+  assert.strictEqual(smooth.phonationRatio, 0.85);
+  assert.ok(Array.isArray(smooth.reasons) && smooth.reasons.some(r => /Tempo optimal/i.test(r)));
+
+  const hesitant = e.evaluateOralFluency(12.0, 22, 2, {
+    isAcousticTiming: true,
+    measurementSource: 'acoustic_vad',
+    activeSpeechSec: 5.2,
+    phonationRatio: 0.43,
+    shortPausesCount: 1,
+    hesitationPausesCount: 1,
+    longPausesCount: 1,
+    maxPauseMs: 2450,
+    burstDurationsMs: [1200, 3800, 900],
+    disfluencyCount: 2,
+    selfCorrectionCount: 1
+  });
+  assert.ok(hesitant.exactScore <= 2.3, `Hesitated/self-corrected exactScore expected <=2.3, got ${hesitant.exactScore}`);
+  assert.ok(hesitant.score <= 2);
+  assert.ok(hesitant.fluency90 < smooth.fluency90 - 40);
+  assert.ok(hesitant.reasons.some(r => /jeda panjang/i.test(r)));
+  assert.ok(hesitant.reasons.some(r => /Rasio suara aktif rendah/i.test(r)));
+
+  // Overly rushed delivery (>195 WPM) should lose points cleanly
+  const rushed = e.evaluateOralFluency(5.0, 20, 0, {
+    isAcousticTiming: true,
+    activeSpeechSec: 4.8,
+    phonationRatio: 0.96,
+    shortPausesCount: 0,
+    hesitationPausesCount: 0,
+    longPausesCount: 0
+  });
+  assert.ok(rushed.wpm >= 230 && rushed.exactScore < smooth.exactScore, 'Rushed 240 WPM speech must score below optimal cadence');
+});
+
+// 35. Big-4 tasks pass acoustic telemetry & manual text inputs mark estimated timing honestly
+test('evaluateReadAloud & evaluateDescribeImage propagate acoustic pause/rhythm telemetry without dummy fluency', () => {
+  const e = require('../features/pte/fiezel-pte-engine.js');
+  const raRef = 'Global supply chains depend on resilient ports and digitized customs workflows.';
+  const cleanRa = e.evaluateReadAloud(raRef, raRef, {
+    durationSec: 4.6,
+    activeSpeechSec: 4.1,
+    phonationRatio: 0.89,
+    shortPausesCount: 1,
+    hesitationPausesCount: 0,
+    longPausesCount: 0,
+    maxPauseMs: 360,
+    isAcousticTiming: true,
+    measurementSource: 'acoustic_vad',
+    confidenceAvg: 0.93
+  });
+  const bumpyRa = e.evaluateReadAloud(raRef, raRef, {
+    durationSec: 11.2,
+    activeSpeechSec: 4.5,
+    phonationRatio: 0.40,
+    shortPausesCount: 2,
+    hesitationPausesCount: 2,
+    longPausesCount: 1,
+    maxPauseMs: 2300,
+    isAcousticTiming: true,
+    measurementSource: 'acoustic_vad',
+    confidenceAvg: 0.93
+  });
+  assert.ok(cleanRa.fluency.score >= 4 && bumpyRa.fluency.score <= 2, `Expected clean>=4 & bumpy<=2, got clean=${cleanRa.fluency.score}, bumpy=${bumpyRa.fluency.score}`);
+
+  const diItem = { title: 'Chart', keyPoints: ['energy', 'solar', 'growth', 'peak'] };
+  const manualDi = e.evaluateDescribeImage(diItem, 'The chart illustrates energy growth and a solar peak in demand.', {
+    durationSec: 2,
+    confidenceAvg: 0.8,
+    isManual: true
+  });
+  assert.strictEqual(manualDi.fluency.isEstimatedTiming, true);
+  assert.strictEqual(manualDi.fluency.measurementSource, 'manual_text');
+});
+
 console.log(`\nAll ${passedTests} PTE Academic Engine unit tests PASSED successfully!`);
