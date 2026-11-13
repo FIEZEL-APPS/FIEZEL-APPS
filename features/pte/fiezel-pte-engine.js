@@ -166,27 +166,50 @@
   }
 
   /**
+   * Counts filler hesitations ("um", "uh", "er", "emm") and immediate word stutters ("the the")
+   * that Pearson Oral Fluency penalizes.
+   * @param {string} text
+   * @returns {number}
+   */
+  function countSpeechDisfluencies(text) {
+    var raw = String(text || '').toLowerCase();
+    if (!raw) return 0;
+    var fillerMatches = raw.match(/\b(um+|uh+|er+|ah+|emm+|hmm+|you know)\b/g);
+    var count = fillerMatches ? fillerMatches.length : 0;
+    var rawTokens = raw.replace(/[^a-z0-9'\s]/g, ' ').split(/\s+/).filter(Boolean);
+    for (var i = 1; i < rawTokens.length; i++) {
+      if (rawTokens[i] === rawTokens[i - 1] && rawTokens[i].length >= 2) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /**
    * Oral Fluency Heuristic (Pearson 0–5 scale).
    * @param {number} durationSec - Actual duration of student speech
    * @param {number} wordCount - Number of recognized speech tokens
    * @param {number} pausesCount - Number of detected pauses > 2.0s
-   * @returns {{ score: number, wpm: number, label: string }}
+   * @param {object} [extra] - Optional { disfluencyCount }
+   * @returns {{ score: number, wpm: number, label: string, disfluencyCount: number }}
    */
-  function evaluateOralFluency(durationSec, wordCount, pausesCount) {
+  function evaluateOralFluency(durationSec, wordCount, pausesCount, extra) {
     var dur = Math.max(1, Number(durationSec) || 0);
     var count = Math.max(0, Number(wordCount) || 0);
     var pauses = Math.max(0, Number(pausesCount) || 0);
+    var disfluencies = (extra && typeof extra.disfluencyCount === 'number') ? Math.max(0, extra.disfluencyCount) : 0;
+    var effectivePauses = pauses + Math.floor(disfluencies / 2);
     var wpm = Math.round((count / dur) * 60);
 
     // Target Pearson Cadence: 110 - 150 WPM
     var score = 5;
-    if (wpm >= 115 && wpm <= 155 && pauses === 0) {
+    if (wpm >= 115 && wpm <= 155 && effectivePauses === 0 && disfluencies === 0) {
       score = 5; // Native-like / Smooth
-    } else if ((wpm >= 95 && wpm <= 170) && pauses <= 1) {
+    } else if ((wpm >= 95 && wpm <= 170) && effectivePauses <= 1 && disfluencies <= 1) {
       score = 4; // Advanced fluency
-    } else if ((wpm >= 80 && wpm <= 185) && pauses <= 2) {
+    } else if ((wpm >= 80 && wpm <= 185) && effectivePauses <= 2) {
       score = 3; // Intermediate / Target 42 benchmark
-    } else if (wpm >= 60 && pauses <= 3) {
+    } else if (wpm >= 60 && effectivePauses <= 3) {
       score = 2; // Limited fluency / hesitant
     } else if (count > 0) {
       score = 1; // Disfluent
@@ -201,7 +224,7 @@
     if (score === 1) label = 'Disfluent';
     if (score === 0) label = 'No speech detected';
 
-    return { score: score, wpm: wpm, label: label };
+    return { score: score, wpm: wpm, label: label, disfluencyCount: disfluencies };
   }
 
   /**
@@ -211,7 +234,10 @@
    * @returns {{ score: number, confidence: number, label: string }}
    */
   function evaluatePronunciation(confidenceAvg) {
-    var conf = Math.max(0, Math.min(1.0, Number(confidenceAvg) || 0.85));
+    var rawConf = (confidenceAvg === undefined || confidenceAvg === null || confidenceAvg === '' || Number.isNaN(Number(confidenceAvg)))
+      ? 0.85
+      : Number(confidenceAvg);
+    var conf = Math.max(0, Math.min(1.0, rawConf));
     var score = 5;
     if (conf >= 0.92) {
       score = 5;
@@ -262,7 +288,12 @@
       contentScore = 0;
     }
 
-    var fluency = evaluateOralFluency(m.durationSec || (hypTokens.length * 0.45), hypTokens.length, m.pausesCount || 0);
+    var fluency = evaluateOralFluency(
+      m.durationSec || (hypTokens.length * 0.45),
+      hypTokens.length,
+      m.pausesCount || 0,
+      { disfluencyCount: countSpeechDisfluencies(studentTranscript) }
+    );
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
     // Pearson item scale translation (0 to 90)
@@ -340,7 +371,12 @@
       contentScore = 0;
     }
 
-    var fluency = evaluateOralFluency(m.durationSec || (hypTokens.length * 0.4), hypTokens.length, m.pausesCount || 0);
+    var fluency = evaluateOralFluency(
+      m.durationSec || (hypTokens.length * 0.4),
+      hypTokens.length,
+      m.pausesCount || 0,
+      { disfluencyCount: countSpeechDisfluencies(studentTranscript) }
+    );
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
     // Official Pearson Scoring Rule: If content is 0 (mismatched/silent), fluency and pronunciation receive 0.
@@ -502,7 +538,12 @@
       contentScore = 1;
     }
 
-    var fluency = evaluateOralFluency(duration, hypTokens.length, m.pausesCount || 0);
+    var fluency = evaluateOralFluency(
+      duration,
+      hypTokens.length,
+      m.pausesCount || 0,
+      { disfluencyCount: countSpeechDisfluencies(studentTranscript) }
+    );
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
     var totalRaw = 0;
@@ -1191,18 +1232,40 @@
       contentScore = 1;
     }
 
-    var fluencyScore = 4;
-    var pronunciationScore = 4;
-    if (metrics) {
-      if (typeof metrics.fluency === 'number') fluencyScore = Math.min(5, Math.max(0, Math.round(metrics.fluency)));
-      if (typeof metrics.pronunciation === 'number') pronunciationScore = Math.min(5, Math.max(0, Math.round(metrics.pronunciation)));
+    var m = metrics || {};
+    var durationSec = Math.max(1, Number(m.durationSec) || (userTokens.length * 0.45));
+    var pausesCount = Number(m.pausesCount) || 0;
+    var disfluencies = countSpeechDisfluencies(transcript);
+    var fluencyObj = evaluateOralFluency(durationSec, userTokens.length, pausesCount, { disfluencyCount: disfluencies });
+    var pronObj = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
+
+    var fluencyScore = typeof m.fluency === 'number'
+      ? Math.min(5, Math.max(0, Math.round(m.fluency)))
+      : fluencyObj.score;
+    var pronunciationScore = typeof m.pronunciation === 'number'
+      ? Math.min(5, Math.max(0, Math.round(m.pronunciation)))
+      : pronObj.score;
+
+    if (userTokens.length === 0 || contentScore === 0) {
+      fluencyScore = 0;
+      pronunciationScore = 0;
+      fluencyObj = { score: 0, wpm: 0, label: 'No speech detected / Mismatched', disfluencyCount: 0 };
+      pronObj = { score: 0, confidence: 0, label: 'Unintelligible' };
+    } else {
+      fluencyObj.score = fluencyScore;
+      pronObj.score = pronunciationScore;
     }
 
     var totalScore = contentScore + fluencyScore + pronunciationScore;
+    var pearsonScore = totalScore === 0 ? 10 : Math.min(90, Math.max(10, Math.round(10 + (totalScore / 15) * 80)));
 
     return {
+      task: 'Retell Lecture',
       score: totalScore,
       maxScore: 15,
+      pearsonScore: pearsonScore,
+      fluency: fluencyObj,
+      pronunciation: pronObj,
       breakdown: {
         content: contentScore,
         fluency: fluencyScore,
@@ -1396,6 +1459,7 @@
     tokenize: tokenize,
     charLevenshtein: charLevenshtein,
     tokenAlignment: tokenAlignment,
+    countSpeechDisfluencies: countSpeechDisfluencies,
     evaluateOralFluency: evaluateOralFluency,
     evaluatePronunciation: evaluatePronunciation,
     evaluateReadAloud: evaluateReadAloud,

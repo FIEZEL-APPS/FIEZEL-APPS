@@ -550,4 +550,42 @@ test('evaluateOralFluency scores 5 (Native-like) using true vocal duration rathe
   assert.strictEqual(handyVadTrueRes.wpm, 136);
 });
 
+// 32. Zero-coercion pronunciation & disfluency penalties
+test('evaluatePronunciation preserves zero confidence and evaluateOralFluency penalizes disfluencies', () => {
+  const zeroPron = engine.evaluatePronunciation(0);
+  assert.strictEqual(zeroPron.score, 0, 'confidenceAvg=0 must NOT be coerced to 0.85');
+  assert.strictEqual(zeroPron.label, 'Unintelligible');
+
+  assert.strictEqual(engine.countSpeechDisfluencies('Um, I uh think the the system er works'), 4);
+  const smooth = engine.evaluateOralFluency(10, 22, 0, { disfluencyCount: 0 });
+  const bumpy = engine.evaluateOralFluency(10, 22, 1, { disfluencyCount: 4 });
+  assert.ok(smooth.score > bumpy.score, `Smooth fluency (${smooth.score}) must outscore disfluent speech (${bumpy.score})`);
+});
+
+// 33. Retell Lecture computes dynamic fluency, pronunciation, and zero-content gate
+test('evaluateRetellLecture computes dynamic acoustic fluency/pronunciation instead of hardcoded 4/5', () => {
+  const item = {
+    id: 'rl-dyn-test',
+    keyPoints: ['solar energy', 'battery storage', 'grid reliability', 'carbon reduction']
+  };
+  const emptyRes = engine.evaluateRetellLecture(item, '', { durationSec: 2, confidenceAvg: 0 });
+  assert.strictEqual(emptyRes.pearsonScore, 10, 'Empty Retell Lecture must score Pearson 10');
+  assert.strictEqual(emptyRes.fluency.score, 0);
+  assert.strictEqual(emptyRes.pronunciation.score, 0);
+
+  const weakRes = engine.evaluateRetellLecture(
+    item,
+    'Um uh solar energy is er good and battery storage helps.',
+    { durationSec: 28, confidenceAvg: 0.56, pausesCount: 4 }
+  );
+  const strongRes = engine.evaluateRetellLecture(
+    item,
+    'The speaker emphasized solar energy expansion paired with advanced battery storage to improve grid reliability and achieve major carbon reduction.',
+    { durationSec: 10, confidenceAvg: 0.92, pausesCount: 0 }
+  );
+  assert.ok(strongRes.fluency.score >= 4 && weakRes.fluency.score < strongRes.fluency.score, 'Retell Lecture fluency must vary with real cadence & disfluencies');
+  assert.ok(strongRes.pronunciation.score > weakRes.pronunciation.score, 'Retell Lecture pronunciation must reflect empirical confidence');
+  assert.ok(strongRes.pearsonScore > weakRes.pearsonScore + 20);
+});
+
 console.log(`\nAll ${passedTests} PTE Academic Engine unit tests PASSED successfully!`);

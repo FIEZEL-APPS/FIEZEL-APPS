@@ -202,8 +202,9 @@ assert.ok(
   'ScriptProcessor wajib menggunakan ukuran buffer rendah-latensi 2048 sampel (42.6ms) di kedua jembatan'
 );
 assert.ok(
-  appTsxContent.includes('(v.isHumanSpeech || vadRes.inSpeech || v.rms >= 0.005) && v.rms >= 0.0022'),
-  'Sensitivitas deteksi bicara isListeningSpeech wajib selaras dengan Mochi SOS untuk mikrofon HP'
+  appTsxContent.includes('(v.isHumanSpeech || vadRes.inSpeech) && v.rms >= 0.002') &&
+    !appTsxContent.includes('v.rms >= 0.005'),
+  'Sensitivitas deteksi bicara isListeningSpeech wajib bebas bypass RMS noise (>0.005) agar kebisingan ruangan tidak menunda akhir giliran'
 );
 assert.ok(
   handyVadContent.includes('const INITIAL_NOISE_FLOOR_DB = -65.0;') &&
@@ -230,11 +231,14 @@ assert.ok(
 );
 console.log('  ✓ Proteksi sapaan pembuka & anti-drop balasan suara AI terverifikasi');
 
-console.log('[Test 12] Kawan Bicara: Aliran Kontinu 16kHz PCM + scheduleUserBurstEnd (1050ms) & Anti-Halusinasi Vocab');
+console.log('[Test 12] Kawan Bicara: End-of-Speech Real-Time (520ms), realtimeInputConfig VAD, Pre-Roll, & Anti-Halusinasi Vocab');
 assert.ok(
-  appTsxContent.includes('const silenceHoldMs = 1050;') &&
-    appTsxContent.includes('scheduleUserBurstEnd();'),
-  'handleMicPcmData wajib menjadwalkan scheduleUserBurstEnd (1050ms) dan mengalirkan 16kHz PCM kontinu'
+  appTsxContent.includes('const silenceHoldMs = 520;') &&
+    appTsxContent.includes('flushUserAudioStreamEnd()') &&
+    appTsxContent.includes('scheduleUserBurstEnd();') &&
+    appTsxContent.includes('automaticActivityDetection:') &&
+    appTsxContent.includes('END_SENSITIVITY_HIGH'),
+  'handleMicPcmData wajib mengaktifkan scheduleUserBurstEnd (520ms), flush audioStreamEnd real-time, serta realtimeInputConfig.automaticActivityDetection'
 );
 assert.strictEqual(
   appTsxContent.includes("'Fiezel',") || appTsxContent.includes("'Xiao Mochi',"),

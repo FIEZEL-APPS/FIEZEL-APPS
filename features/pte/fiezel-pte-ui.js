@@ -94,7 +94,8 @@
     silenceWatchdogTimer: null,
     speechRecognizer: null,
     speechTranscript: '',
-    speechConfidence: 0.88,
+    speechConfidence: 0,
+    speechConfidences: [],
     speechStartTime: 0,
     isAudioPlaying: false,
     lastResult: null,
@@ -229,6 +230,8 @@
     state.lastResult = null;
     state.activeDeepFeedback = null;
     state.speechTranscript = '';
+    state.speechConfidence = 0;
+    state.speechConfidences = [];
     state.speechErrorNotice = '';
     state.showManualSpeechInput = false;
     state.wfdText = '';
@@ -238,6 +241,7 @@
     clearTimer();
     disarmSilenceWatchdog();
     stopPteAudio();
+    closePteAsrWsImmediate();
     stopPteMicBridge();
 
     if (state.mode === 'rwFib') {
@@ -1871,10 +1875,12 @@
     playPteAudio(speechText, { persona: item.persona || 'aria' }, function () {
       if (state.mode !== 'rs') return;
       state.isAudioPlaying = false;
-      // Audio playback completed: 1-second preparation buffer before Pearson tone
+      // Audio playback completed: 1-second preparation buffer before Pearson tone.
+      // Pre-warm mic bridge + Gemini Live WS immediately so 0ms of RS response is missed.
       state.timerState = 'preparing';
       state.timerRemainingSec = 1;
       state.timerTotalSec = 1;
+      prewarmPteCapturePipeline();
       renderHub();
 
       setTimeout(function () {
@@ -1998,13 +2004,19 @@
     this.inSpeech = false;
   }
 
-  HandyHumanVad.prototype.reset = function () {
-    this.noiseFloor.fill(INITIAL_NOISE_FLOOR_DB);
+  HandyHumanVad.prototype.reset = function (opts) {
+    if (!opts || !opts.preserveNoiseFloor) {
+      this.noiseFloor.fill(INITIAL_NOISE_FLOOR_DB);
+    }
     this.resampleCarryLen = 0;
     this.frameBuffer = [];
     this.hangoverCounter = 0;
     this.onsetCounter = 0;
     this.inSpeech = false;
+  };
+
+  HandyHumanVad.prototype.isInSpeech = function () {
+    return Boolean(this.inSpeech);
   };
 
   HandyHumanVad.prototype.scoreFrame512 = function (frame) {
@@ -2271,32 +2283,451 @@
     return (typeof btoa === 'function') ? btoa(binary) : Buffer.from(binary, 'binary').toString('base64');
   }
 
+  var pteCachedSilent16kPcmB64 = '';
+  function getPteSilent16kPcmBase64() {
+    if (!pteCachedSilent16kPcmB64) {
+      pteCachedSilent16kPcmB64 = float32At16kToPcm16Base64(new Float32Array(HANDY_FRAME_SAMPLES));
+    }
+    return pteCachedSilent16kPcmB64;
+  }
+
+  function encodePte16kPcmB64(samples, sampleRate) {
+    if (!samples || samples.length === 0) return '';
+    var sr = sampleRate > 0 ? sampleRate : HANDY_SAMPLE_RATE;
+    if (sr === HANDY_SAMPLE_RATE) {
+      return float32At16kToPcm16Base64(samples);
+    }
+    var ratio = sr / HANDY_SAMPLE_RATE;
+    var outLen = Math.max(1, Math.floor(samples.length / ratio));
+    var out = new Float32Array(outLen);
+    for (var i = 0; i < outLen; i++) {
+      var start = Math.floor(i * ratio);
+      var end = Math.min(samples.length, Math.floor((i + 1) * ratio));
+      if (end <= start) end = Math.min(samples.length, start + 1);
+      var sum = 0;
+      for (var k = start; k < end; k++) sum += samples[k];
+      out[i] = sum / (end - start);
+    }
+    return float32At16kToPcm16Base64(out);
+  }
+
+  /**
+   * 300-3300 Hz band-pass formant energy validator synced with Kawan Bicara.
+   * Rejects low-frequency rumble/fan (<300 Hz) and ultrasonic hiss/clicks (>3300 Hz)
+   * while remaining invariant across hardware sample rates (16k / 44.1k / 48k).
+   */
+  function analyzePteHumanVoiceBand(samples, sampleRate) {
+    if (!samples || samples.length === 0) {
+      return { rms: 0, voiceBandRms: 0, bandRatio: 0, approxFreqHz: 0, isHumanSpeech: false };
+    }
+    var sr = sampleRate > 0 ? sampleRate : HANDY_SAMPLE_RATE;
+    var dt = 1.0 / sr;
+    var rcHp = 1.0 / (2.0 * Math.PI * 300.0);
+    var hpAlpha = rcHp / (rcHp + dt);
+    var rcLp = 1.0 / (2.0 * Math.PI * 3300.0);
+    var lpAlpha = dt / (rcLp + dt);
+
+    var len = samples.length;
+    var sumRawSq = 0;
+    var sumBandSq = 0;
+    var prevX = 0;
+    var prevHp = 0;
+    var prevLp = 0;
+    var zc = 0;
+
+    for (var i = 0; i < len; i++) {
+      var x = samples[i];
+      if (!Number.isFinite(x)) {
+        return { rms: 0, voiceBandRms: 0, bandRatio: 0, approxFreqHz: 0, isHumanSpeech: false };
+      }
+      sumRawSq += x * x;
+      var hp = hpAlpha * (prevHp + x - prevX);
+      var lp = prevLp + lpAlpha * (hp - prevLp);
+      sumBandSq += lp * lp;
+      if (i > 0 && ((lp >= 0 && prevLp < 0) || (lp < 0 && prevLp >= 0))) {
+        zc += 1;
+      }
+      prevX = x;
+      prevHp = hp;
+      prevLp = lp;
+    }
+
+    var rms = Math.sqrt(sumRawSq / len);
+    var voiceBandRms = Math.sqrt(sumBandSq / len);
+    var bandRatio = voiceBandRms / Math.max(rms, 1e-6);
+    var approxFreqHz = ((zc / len) * sr) / 2.0;
+    var isHumanSpeech = voiceBandRms >= 0.0022 && bandRatio >= 0.36 && approxFreqHz >= 180 && approxFreqHz <= 3800;
+
+    return {
+      rms: rms,
+      voiceBandRms: voiceBandRms,
+      bandRatio: bandRatio,
+      approxFreqHz: approxFreqHz,
+      isHumanSpeech: isHumanSpeech
+    };
+  }
+
+  /**
+   * Accumulates streaming Gemini Live `inputTranscription.text` deltas cleanly:
+   * preserves subword joins ("educa" + "tion"), natural spaces ("Hello " + "world"),
+   * cumulative prefix snapshots, and boundary overlap dedup without dropping words.
+   */
+  function appendIncrementalTranscript(existing, chunk) {
+    var prev = String(existing || '');
+    var nextRaw = String(chunk || '');
+    if (!nextRaw || !nextRaw.trim()) return prev;
+
+    var prevNorm = prev.replace(/[ \t]+/g, ' ').trim();
+    var nextTrim = nextRaw.trim();
+    if (!prevNorm) {
+      return nextRaw.replace(/^\s+/, '').replace(/[ \t]{2,}/g, ' ');
+    }
+
+    var prevLower = prevNorm.toLowerCase();
+    var nextLower = nextTrim.toLowerCase();
+
+    // Cumulative full-utterance revision starting with previous text
+    if (nextLower.indexOf(prevLower) === 0) {
+      return nextRaw.replace(/^\s+/, '').replace(/[ \t]{2,}/g, ' ');
+    }
+
+    // Stale shorter echo of what is already transcribed
+    if ((prevLower === nextLower && prevLower.length >= 6) ||
+        (prevLower.indexOf(nextLower) === 0 && nextLower.length >= 12)) {
+      return prev;
+    }
+
+    // Whole-word suffix-prefix boundary overlap (min length 3 chars so short particles aren't swallowed)
+    var prevTokens = prevNorm.split(' ');
+    var nextTokens = nextTrim.split(/\s+/);
+    var maxOverlap = Math.min(prevTokens.length, nextTokens.length, 4);
+    for (var ov = maxOverlap; ov >= 1; ov--) {
+      var slicePrev = prevTokens.slice(prevTokens.length - ov).join(' ');
+      var sliceNext = nextTokens.slice(0, ov).join(' ');
+      if (slicePrev.length >= 3 && slicePrev.toLowerCase() === sliceNext.toLowerCase()) {
+        var tail = nextTokens.slice(ov).join(' ');
+        if (!tail) return prev;
+        return (prevNorm + ' ' + tail).replace(/[ \t]{2,}/g, ' ');
+      }
+    }
+
+    var joined = prev + nextRaw;
+    return joined.replace(/^\s+/, '').replace(/[ \t]{2,}/g, ' ');
+  }
+
   // --- PTE Hardware Mic Bridge & Gemini Multimodal Live ASR ---
-  var pteHandyVad = new HandyHumanVad({ threshold: 0.45, prefillFrames: 15, hangoverFrames: 12, onsetFrames: 2 });
+  var pteHandyVad = new HandyHumanVad({ threshold: 0.45, prefillFrames: 15, hangoverFrames: 10, onsetFrames: 2 });
   var pteMicStream = null;
   var pteAudioCtx = null;
+  var pteMediaSrcNode = null;
   var pteScriptProcessor = null;
+  var pteWorkletNode = null;
+  var pteSilentGainNode = null;
+  var pteWorkletModuleReady = false;
+  var pteMicBridgeSessionId = 0;
+  var pteMicBridgeInitPromise = null;
+  var pteNoiseCalibratedDuringPrep = false;
+
   var pteAsrWs = null;
+  var pteAsrWsConnectingPromise = null;
+  var pteAsrSetupComplete = false;
+  var pteAsrPendingQueue = [];
+  var pteSentAudioSinceEnd = false;
+  var ptePreRollFrames = [];
+  var pteGeminiRawTranscript = '';
+  var pteAsrFlushTimer = null;
+  var pteAsrFlushResolver = null;
+  var pteAsrFallbackTimer = null;
+  var ptePostSpeechAutoCloseTimer = null;
+  var pteSpeechRecFallbackStarted = false;
+
   var pteSpeechOnsetTimestamp = 0;
   var pteSpeechOffsetTimestamp = 0;
   var pteVoicedDurationMs = 0;
   var ptePauseCount = 0;
   var pteHasUserSpoken = false;
+  var pteLastSpeechActivityMs = 0;
+  var pteVadMaxScoreObserved = 0;
+
+  var PTE_WORKLET_CODE =
+    'class PteVadCaptureProcessor extends AudioWorkletProcessor {\n' +
+    '  constructor() {\n' +
+    '    super();\n' +
+    '    this._buf = new Float32Array(1024);\n' +
+    '    this._pos = 0;\n' +
+    '  }\n' +
+    '  process(inputs) {\n' +
+    '    var ch = inputs && inputs[0] && inputs[0][0];\n' +
+    '    if (ch && ch.length) {\n' +
+    '      var i = 0;\n' +
+    '      while (i < ch.length) {\n' +
+    '        var take = Math.min(ch.length - i, this._buf.length - this._pos);\n' +
+    '        this._buf.set(ch.subarray(i, i + take), this._pos);\n' +
+    '        this._pos += take;\n' +
+    '        i += take;\n' +
+    '        if (this._pos >= this._buf.length) {\n' +
+    '          var copy = this._buf;\n' +
+    '          this.port.postMessage(copy, [copy.buffer]);\n' +
+    '          this._buf = new Float32Array(1024);\n' +
+    '          this._pos = 0;\n' +
+    '        }\n' +
+    '      }\n' +
+    '    }\n' +
+    '    return true;\n' +
+    '  }\n' +
+    '}\n' +
+    'try { registerProcessor("pte-vad-capture-worklet", PteVadCaptureProcessor); } catch (_) {}\n';
+
+  function clearPteAsrTimers() {
+    if (pteAsrFlushTimer) {
+      clearTimeout(pteAsrFlushTimer);
+      pteAsrFlushTimer = null;
+    }
+    if (pteAsrFallbackTimer) {
+      clearTimeout(pteAsrFallbackTimer);
+      pteAsrFallbackTimer = null;
+    }
+    if (ptePostSpeechAutoCloseTimer) {
+      clearTimeout(ptePostSpeechAutoCloseTimer);
+      ptePostSpeechAutoCloseTimer = null;
+    }
+    if (pteAsrFlushResolver) {
+      var resFn = pteAsrFlushResolver;
+      pteAsrFlushResolver = null;
+      try { resFn(); } catch (_) {}
+    }
+  }
+
+  function closePteAsrWsImmediate() {
+    clearPteAsrTimers();
+    pteAsrSetupComplete = false;
+    pteAsrPendingQueue = [];
+    pteSentAudioSinceEnd = false;
+    pteAsrWsConnectingPromise = null;
+    if (pteAsrWs) {
+      try {
+        pteAsrWs.onopen = null;
+        pteAsrWs.onmessage = null;
+        pteAsrWs.onerror = null;
+        pteAsrWs.onclose = null;
+        if (pteAsrWs.readyState < 2) {
+          pteAsrWs.close(1000, 'pte_asr_reset');
+        }
+      } catch (_) {}
+      pteAsrWs = null;
+    }
+  }
+
+  function flushPendingPteAsrQueue() {
+    if (!pteAsrWs || pteAsrWs.readyState !== 1 || !pteAsrSetupComplete) return;
+    while (pteAsrPendingQueue.length > 0) {
+      var item = pteAsrPendingQueue.shift();
+      try {
+        pteAsrWs.send(item);
+      } catch (_) {}
+    }
+  }
+
+  function enqueueOrSendPteAsrPayload(payloadStr) {
+    if (!payloadStr) return false;
+    if (pteAsrWs && pteAsrWs.readyState === 1 && pteAsrSetupComplete) {
+      try {
+        pteAsrWs.send(payloadStr);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    if ((pteAsrWs && pteAsrWs.readyState <= 1) || pteAsrWsConnectingPromise) {
+      if (pteAsrPendingQueue.length >= 64) {
+        pteAsrPendingQueue.shift();
+      }
+      pteAsrPendingQueue.push(payloadStr);
+      return true;
+    }
+    return false;
+  }
+
+  function sendOrQueuePteAsrPcm(b64pcm) {
+    if (!b64pcm) return false;
+    var ok = enqueueOrSendPteAsrPayload(JSON.stringify({
+      realtimeInput: {
+        audio: {
+          mimeType: 'audio/pcm;rate=16000',
+          data: b64pcm
+        }
+      }
+    }));
+    if (ok) pteSentAudioSinceEnd = true;
+    return ok;
+  }
+
+  function sendOrQueuePteAsrStreamEnd(withTrailingSilence) {
+    if (!pteSentAudioSinceEnd) return false;
+    if (withTrailingSilence) {
+      enqueueOrSendPteAsrPayload(JSON.stringify({
+        realtimeInput: {
+          audio: {
+            mimeType: 'audio/pcm;rate=16000',
+            data: getPteSilent16kPcmBase64()
+          }
+        }
+      }));
+    }
+    var ok = enqueueOrSendPteAsrPayload(JSON.stringify({
+      realtimeInput: {
+        audioStreamEnd: true
+      }
+    }));
+    pteSentAudioSinceEnd = false;
+    return ok;
+  }
+
+  function schedulePtePostSpeechAutoClose() {
+    if (ptePostSpeechAutoCloseTimer) return;
+    if (state.timerState !== 'recording' || !pteHasUserSpoken || pteVoicedDurationMs < 450) return;
+    // Pearson PTE 3-second post-speech auto-close (2.2s crisp turn close for Repeat Sentence)
+    var silenceThresholdMs = state.mode === 'rs' ? 2200 : 3000;
+    ptePostSpeechAutoCloseTimer = setTimeout(function () {
+      ptePostSpeechAutoCloseTimer = null;
+      if (state.timerState !== 'recording') return;
+      if (pteHandyVad.isInSpeech()) return;
+      var elapsedSilence = Date.now() - (pteLastSpeechActivityMs || Date.now());
+      if (elapsedSilence >= silenceThresholdMs - 100) {
+        stopRecordingAndEvaluate();
+      } else {
+        schedulePtePostSpeechAutoClose();
+      }
+    }, silenceThresholdMs);
+  }
+
+  function processPteMicAudioFrame(inputData, sampleRate) {
+    if (!inputData || inputData.length === 0) return;
+    if (state.timerState !== 'recording' && state.timerState !== 'preparing') return;
+
+    var sr = sampleRate > 0 ? sampleRate : HANDY_SAMPLE_RATE;
+    var vadRes = pteHandyVad.processSamples(inputData, sr);
+    var bandInfo = analyzePteHumanVoiceBand(inputData, sr);
+
+    // During prep, calibrate HandyHumanVad room noiseFloor silently without emitting audio
+    if (state.timerState === 'preparing') {
+      pteNoiseCalibratedDuringPrep = true;
+      return;
+    }
+
+    if (vadRes.maxScore > pteVadMaxScoreObserved) {
+      pteVadMaxScoreObserved = vadRes.maxScore;
+    }
+
+    var isVoiceNow = Boolean(vadRes.inSpeech || bandInfo.isHumanSpeech);
+
+    // Update tactile mic meter UI
+    if (typeof document !== 'undefined') {
+      var fillEl = document.getElementById('fzPteMicMeterFill');
+      if (fillEl) {
+        var snr = (vadRes.lastMetrics && vadRes.lastMetrics.vocalSnrDb) || (bandInfo.isHumanSpeech ? 12 : 0);
+        var pct = Math.min(100, Math.max(0, Math.round(snr * 6.5)));
+        fillEl.style.width = pct + '%';
+        fillEl.style.backgroundColor = isVoiceNow ? '#10b981' : '#94a3b8';
+      }
+    }
+
+    // Accurate Human Speech Cadence & Timing Tracking (sample-rate exact ms)
+    var frameDurationMs = Math.max(10, Math.round((inputData.length / sr) * 1000));
+    if (vadRes.speechStarted || (bandInfo.isHumanSpeech && !pteHasUserSpoken)) {
+      if (!pteSpeechOnsetTimestamp) pteSpeechOnsetTimestamp = Date.now();
+      pteHasUserSpoken = true;
+      pteLastSpeechActivityMs = Date.now();
+      disarmSilenceWatchdog();
+      if (ptePostSpeechAutoCloseTimer) {
+        clearTimeout(ptePostSpeechAutoCloseTimer);
+        ptePostSpeechAutoCloseTimer = null;
+      }
+    }
+    if (isVoiceNow) {
+      pteSpeechOffsetTimestamp = Date.now();
+      pteLastSpeechActivityMs = Date.now();
+      if (vadRes.inSpeech || bandInfo.isHumanSpeech) {
+        pteVoicedDurationMs += frameDurationMs;
+      }
+      if (ptePostSpeechAutoCloseTimer) {
+        clearTimeout(ptePostSpeechAutoCloseTimer);
+        ptePostSpeechAutoCloseTimer = null;
+      }
+    }
+    if (vadRes.speechEnded) {
+      pteSpeechOffsetTimestamp = Date.now();
+      ptePauseCount = (ptePauseCount || 0) + 1;
+      sendOrQueuePteAsrStreamEnd(true);
+      schedulePtePostSpeechAutoClose();
+    }
+
+    // Zero-idle-noise 16kHz PCM streaming to Gemini Live
+    if (vadRes.speechPcm16k && vadRes.speechPcm16k.length > 0) {
+      ptePreRollFrames = [];
+      sendOrQueuePteAsrPcm(float32At16kToPcm16Base64(vadRes.speechPcm16k));
+    } else if (bandInfo.isHumanSpeech) {
+      var b64Band = encodePte16kPcmB64(inputData, sr);
+      if (b64Band) {
+        ptePreRollFrames.push(b64Band);
+        if (ptePreRollFrames.length >= 2) {
+          for (var pf = 0; pf < ptePreRollFrames.length; pf++) {
+            sendOrQueuePteAsrPcm(ptePreRollFrames[pf]);
+          }
+          ptePreRollFrames = [];
+        }
+      }
+    } else {
+      ptePreRollFrames = [];
+      if (!vadRes.inSpeech && pteHasUserSpoken && !ptePostSpeechAutoCloseTimer && pteVoicedDurationMs >= 450) {
+        if (pteSentAudioSinceEnd && Date.now() - (pteLastSpeechActivityMs || 0) >= 420) {
+          sendOrQueuePteAsrStreamEnd(true);
+        }
+        schedulePtePostSpeechAutoClose();
+      }
+    }
+  }
+
+  function attachPteScriptProcessorFallback(srcNode, silentGain, sessionId) {
+    if (sessionId !== pteMicBridgeSessionId || !pteAudioCtx || !srcNode) return;
+    var procNode = pteAudioCtx.createScriptProcessor ? pteAudioCtx.createScriptProcessor(2048, 1, 1) : null;
+    if (!procNode) return;
+    procNode.onaudioprocess = function (evt) {
+      if (sessionId !== pteMicBridgeSessionId) return;
+      var inputData = evt.inputBuffer.getChannelData(0);
+      processPteMicAudioFrame(inputData, pteAudioCtx ? pteAudioCtx.sampleRate : HANDY_SAMPLE_RATE);
+    };
+    srcNode.connect(procNode);
+    procNode.connect(silentGain || pteAudioCtx.destination);
+    pteScriptProcessor = procNode;
+  }
 
   function initPteMicBridge() {
     if (typeof window === 'undefined' || !navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
       return Promise.resolve(null);
     }
-    if (pteMicStream && pteMicStream.active) {
+    if (pteMicStream && pteMicStream.active && (pteWorkletNode || pteScriptProcessor)) {
       return Promise.resolve(pteMicStream);
     }
-    return navigator.mediaDevices.getUserMedia({
+    if (pteMicBridgeInitPromise) {
+      return pteMicBridgeInitPromise;
+    }
+
+    var sessionId = ++pteMicBridgeSessionId;
+    pteMicBridgeInitPromise = navigator.mediaDevices.getUserMedia({
       audio: {
         echoCancellation: true,
         noiseSuppression: true,
         autoGainControl: true
       }
     }).then(function (stream) {
+      if (sessionId !== pteMicBridgeSessionId) {
+        try {
+          var staleTracks = stream.getTracks();
+          for (var st = 0; st < staleTracks.length; st++) staleTracks[st].stop();
+        } catch (_) {}
+        return null;
+      }
       pteMicStream = stream;
       try {
         var AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -2304,89 +2735,134 @@
           if (!pteAudioCtx || pteAudioCtx.state === 'closed') {
             pteAudioCtx = window.__fiezelSharedAudioContext || new AudioCtx();
             window.__fiezelSharedAudioContext = pteAudioCtx;
+            pteWorkletModuleReady = false;
           }
           if (pteAudioCtx.state === 'suspended') {
             pteAudioCtx.resume().catch(function () {});
           }
 
           var srcNode = pteAudioCtx.createMediaStreamSource(stream);
+          pteMediaSrcNode = srcNode;
 
-          // AudioWorklet / ScriptProcessor Node for Handy VAD & Gemini Live PCM Streaming
-          var procNode = pteAudioCtx.createScriptProcessor ? pteAudioCtx.createScriptProcessor(2048, 1, 1) : null;
-          if (procNode) {
-            procNode.onaudioprocess = function (evt) {
-              if (state.timerState !== 'recording') return;
-              var inputData = evt.inputBuffer.getChannelData(0);
-              var vadRes = pteHandyVad.processSamples(inputData, pteAudioCtx.sampleRate);
+          var silentGain = pteAudioCtx.createGain ? pteAudioCtx.createGain() : null;
+          if (silentGain) {
+            silentGain.gain.value = 0.00001;
+            silentGain.connect(pteAudioCtx.destination);
+            pteSilentGainNode = silentGain;
+          }
 
-              // Update tactile mic meter UI
-              if (typeof document !== 'undefined') {
-                var fillEl = document.getElementById('fzPteMicMeterFill');
-                if (fillEl) {
-                  var snr = (vadRes.lastMetrics && vadRes.lastMetrics.vocalSnrDb) || 0;
-                  var pct = Math.min(100, Math.max(0, Math.round(snr * 6.5)));
-                  fillEl.style.width = pct + '%';
-                  if (vadRes.inSpeech || (vadRes.lastMetrics && vadRes.lastMetrics.isVoice)) {
-                    fillEl.style.backgroundColor = '#10b981'; // Emerald human voice active
-                  } else {
-                    fillEl.style.backgroundColor = '#94a3b8'; // Grey ambient baseline
+          var canWorklet = Boolean(
+            pteAudioCtx.audioWorklet &&
+            typeof pteAudioCtx.audioWorklet.addModule === 'function' &&
+            typeof AudioWorkletNode === 'function' &&
+            typeof Blob === 'function' &&
+            typeof URL !== 'undefined' &&
+            typeof URL.createObjectURL === 'function'
+          );
+
+          if (canWorklet) {
+            var loadWorklet = pteWorkletModuleReady
+              ? Promise.resolve()
+              : (function () {
+                  var blob = new Blob([PTE_WORKLET_CODE], { type: 'application/javascript' });
+                  var url = URL.createObjectURL(blob);
+                  return pteAudioCtx.audioWorklet.addModule(url).then(function () {
+                    pteWorkletModuleReady = true;
+                    try { URL.revokeObjectURL(url); } catch (_) {}
+                  }, function (err) {
+                    try { URL.revokeObjectURL(url); } catch (_) {}
+                    throw err;
+                  });
+                })();
+
+            loadWorklet.then(function () {
+              if (sessionId !== pteMicBridgeSessionId || !pteAudioCtx || !srcNode) return;
+              try {
+                var wNode = new AudioWorkletNode(pteAudioCtx, 'pte-vad-capture-worklet');
+                wNode.port.onmessage = function (ev) {
+                  if (sessionId !== pteMicBridgeSessionId) return;
+                  var samples = ev && ev.data ? (ev.data instanceof Float32Array ? ev.data : new Float32Array(ev.data)) : null;
+                  if (samples) {
+                    processPteMicAudioFrame(samples, pteAudioCtx ? pteAudioCtx.sampleRate : HANDY_SAMPLE_RATE);
                   }
-                }
+                };
+                srcNode.connect(wNode);
+                wNode.connect(silentGain || pteAudioCtx.destination);
+                pteWorkletNode = wNode;
+              } catch (_) {
+                attachPteScriptProcessorFallback(srcNode, silentGain, sessionId);
               }
-
-              // Accurate Human Speech Cadence & Timing Tracking
-              if (vadRes.speechStarted) {
-                if (!pteSpeechOnsetTimestamp) pteSpeechOnsetTimestamp = Date.now();
-                pteHasUserSpoken = true;
-                disarmSilenceWatchdog();
-              }
-              if (vadRes.inSpeech) {
-                pteSpeechOffsetTimestamp = Date.now();
-                pteVoicedDurationMs += 32;
-              }
-              if (vadRes.speechEnded) {
-                pteSpeechOffsetTimestamp = Date.now();
-                ptePauseCount = (ptePauseCount || 0) + 1;
-              }
-
-              // Stream 16kHz PCM chunks live to Gemini Live WebSocket for real-time Pearson ASR
-              if (pteAsrWs && pteAsrWs.readyState === WebSocket.OPEN && vadRes.speechPcm16k) {
-                var b64pcm = float32At16kToPcm16Base64(vadRes.speechPcm16k);
-                try {
-                  pteAsrWs.send(JSON.stringify({
-                    realtimeInput: {
-                      mediaChunks: [{
-                        mimeType: 'audio/pcm;rate=16000',
-                        data: b64pcm
-                      }]
-                    }
-                  }));
-                } catch (_) {}
-              }
-            };
-            srcNode.connect(procNode);
-            procNode.connect(pteAudioCtx.destination);
-            pteScriptProcessor = procNode;
+            }).catch(function () {
+              attachPteScriptProcessorFallback(srcNode, silentGain, sessionId);
+            });
+          } else {
+            attachPteScriptProcessorFallback(srcNode, silentGain, sessionId);
           }
         }
       } catch (e) {
         console.warn('[PTE MicBridge AudioCtx]', e);
       }
+      pteMicBridgeInitPromise = null;
       return stream;
     }).catch(function (err) {
+      pteMicBridgeInitPromise = null;
       console.warn('[PTE MicBridge getUserMedia]', err);
       return null;
     });
+
+    return pteMicBridgeInitPromise;
+  }
+
+  function handlePteGeminiTranscriptChunk(chunk) {
+    if (!chunk || !String(chunk).trim()) return;
+    if (state.timerState !== 'recording' && state.timerState !== 'completed') return;
+    disarmSilenceWatchdog();
+    pteHasUserSpoken = true;
+    if (pteAsrFallbackTimer) {
+      clearTimeout(pteAsrFallbackTimer);
+      pteAsrFallbackTimer = null;
+    }
+    pteGeminiRawTranscript = appendIncrementalTranscript(pteGeminiRawTranscript, chunk);
+    var clean = pteGeminiRawTranscript.replace(/[ \t]+/g, ' ').trim();
+    if (clean) {
+      state.speechTranscript = clean;
+      var liveEl = typeof document !== 'undefined' ? document.getElementById('fzPteLiveSpeechText') : null;
+      if (liveEl) {
+        liveEl.textContent = state.speechTranscript;
+      }
+    }
+  }
+
+  function maybeStartSpeechRecFallback() {
+    if (state.timerState !== 'recording' || pteSpeechRecFallbackStarted) return;
+    if (pteAsrWs && pteAsrWs.readyState === 1 && pteAsrSetupComplete) return;
+    pteSpeechRecFallbackStarted = true;
+    initPteSpeechRecognition();
   }
 
   function connectGeminiLiveAsr(onTranscriptChunk, onReady, onError) {
-    return fetchGeminiLiveWsEndpoint().then(function (sessionInfo) {
+    if (pteAsrWs && pteAsrWs.readyState === 1 && pteAsrSetupComplete) {
+      if (typeof onReady === 'function') {
+        try { onReady(pteAsrWs); } catch (_) {}
+      }
+      return Promise.resolve(pteAsrWs);
+    }
+    if (pteAsrWsConnectingPromise) {
+      return pteAsrWsConnectingPromise;
+    }
+
+    pteAsrSetupComplete = false;
+    pteAsrPendingQueue = [];
+
+    pteAsrWsConnectingPromise = fetchGeminiLiveWsEndpoint().then(function (sessionInfo) {
       if (!sessionInfo || !sessionInfo.endpoint) {
+        pteAsrWsConnectingPromise = null;
         if (typeof onError === 'function') onError(new Error('No Gemini Live endpoint available'));
         return null;
       }
       var WsConstructor = (typeof window !== 'undefined' && window.WebSocket) || null;
       if (!WsConstructor) {
+        pteAsrWsConnectingPromise = null;
         if (typeof onError === 'function') onError(new Error('WebSocket unsupported'));
         return null;
       }
@@ -2401,18 +2877,28 @@
               generationConfig: {
                 responseModalities: ['AUDIO']
               },
+              realtimeInputConfig: {
+                automaticActivityDetection: {
+                  disabled: false,
+                  startOfSpeechSensitivity: 'START_SENSITIVITY_HIGH',
+                  endOfSpeechSensitivity: 'END_SENSITIVITY_HIGH',
+                  prefixPaddingMs: 200,
+                  silenceDurationMs: 400
+                },
+                turnCoverage: 'TURN_INCLUDES_ONLY_ACTIVITY'
+              },
               inputAudioTranscription: {
                 languageCodes: ['en-US']
               },
               systemInstruction: {
                 parts: [{
-                  text: 'You are Pearson PTE Academic automated speech evaluator. Accurately transcribe user speech verbatim in real time with high lexical precision. Do not interrupt or speak.'
+                  text: 'You are Pearson PTE Academic automated speech evaluator. Accurately transcribe user speech verbatim in real time with high lexical precision. Remain silent and do not speak.'
                 }]
               }
             }
           }));
-          if (typeof onReady === 'function') onReady(ws);
         } catch (err) {
+          pteAsrWsConnectingPromise = null;
           if (typeof onError === 'function') onError(err);
         }
       };
@@ -2422,11 +2908,36 @@
           try {
             if (!rawText) return;
             var msg = JSON.parse(rawText);
+            if (!msg) return;
+
+            if (msg.setupComplete && !pteAsrSetupComplete) {
+              pteAsrSetupComplete = true;
+              pteAsrWsConnectingPromise = null;
+              if (pteAsrFallbackTimer) {
+                clearTimeout(pteAsrFallbackTimer);
+                pteAsrFallbackTimer = null;
+              }
+              flushPendingPteAsrQueue();
+              if (typeof onReady === 'function') onReady(ws);
+            }
+
             if (msg.serverContent && msg.serverContent.inputTranscription && msg.serverContent.inputTranscription.text) {
               var chunk = msg.serverContent.inputTranscription.text;
               if (typeof onTranscriptChunk === 'function') {
                 onTranscriptChunk(chunk);
+              } else {
+                handlePteGeminiTranscriptChunk(chunk);
               }
+            }
+
+            if (msg.serverContent && msg.serverContent.turnComplete && pteAsrFlushResolver) {
+              var doneFn = pteAsrFlushResolver;
+              pteAsrFlushResolver = null;
+              if (pteAsrFlushTimer) {
+                clearTimeout(pteAsrFlushTimer);
+                pteAsrFlushTimer = null;
+              }
+              try { doneFn(); } catch (_) {}
             }
           } catch (_) {}
         };
@@ -2444,18 +2955,47 @@
 
       ws.onerror = function (err) {
         console.warn('[PTE Gemini Live ASR ws.onerror]', err);
+        pteAsrSetupComplete = false;
+        pteAsrWsConnectingPromise = null;
         if (typeof onError === 'function') onError(err);
+        maybeStartSpeechRecFallback();
       };
 
       ws.onclose = function () {
-        if (pteAsrWs === ws) pteAsrWs = null;
+        if (pteAsrWs === ws) {
+          pteAsrWs = null;
+          pteAsrSetupComplete = false;
+          pteAsrWsConnectingPromise = null;
+        }
+        if (pteAsrFlushResolver) {
+          var closeDone = pteAsrFlushResolver;
+          pteAsrFlushResolver = null;
+          try { closeDone(); } catch (_) {}
+        }
+        if (state.timerState === 'recording' && (!state.speechTranscript || !state.speechTranscript.trim())) {
+          maybeStartSpeechRecFallback();
+        }
       };
 
       return ws;
     }).catch(function (err) {
+      pteAsrWsConnectingPromise = null;
       if (typeof onError === 'function') onError(err);
+      maybeStartSpeechRecFallback();
       return null;
     });
+
+    return pteAsrWsConnectingPromise;
+  }
+
+  function prewarmPteCapturePipeline() {
+    if (typeof window === 'undefined') return;
+    pteNoiseCalibratedDuringPrep = false;
+    pteHandyVad.reset();
+    initPteMicBridge();
+    if (!pteAsrWs || pteAsrWs.readyState >= 2) {
+      connectGeminiLiveAsr(handlePteGeminiTranscriptChunk, null, function () {});
+    }
   }
 
   function stopPteVadLoop() {
@@ -2466,13 +3006,30 @@
   }
 
   function stopPteMicBridge() {
+    pteMicBridgeSessionId += 1;
+    pteMicBridgeInitPromise = null;
     stopPteVadLoop();
+    if (pteWorkletNode) {
+      try {
+        pteWorkletNode.port.onmessage = null;
+        pteWorkletNode.disconnect();
+      } catch (_) {}
+      pteWorkletNode = null;
+    }
     if (pteScriptProcessor) {
       try {
         pteScriptProcessor.disconnect();
         pteScriptProcessor.onaudioprocess = null;
       } catch (_) {}
       pteScriptProcessor = null;
+    }
+    if (pteMediaSrcNode) {
+      try { pteMediaSrcNode.disconnect(); } catch (_) {}
+      pteMediaSrcNode = null;
+    }
+    if (pteSilentGainNode) {
+      try { pteSilentGainNode.disconnect(); } catch (_) {}
+      pteSilentGainNode = null;
     }
     if (pteMicStream) {
       try {
@@ -2495,6 +3052,7 @@
       state.timerRemainingSec = prepSec;
       state.timerTotalSec = prepSec;
       state.silenceTriggered = false;
+      prewarmPteCapturePipeline();
       renderHub();
 
       clearTimer();
@@ -2545,22 +3103,36 @@
       recognizer.continuous = !isAndroid;
 
       recognizer.onresult = function (event) {
-        var final = '';
-        var interim = '';
+        var finalText = '';
+        var interimText = '';
         for (var i = 0; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            final += event.results[i][0].transcript + ' ';
+          var resItem = event.results[i];
+          var alt = resItem && resItem[0];
+          if (!alt) continue;
+          if (resItem.isFinal) {
+            finalText += (alt.transcript || '') + ' ';
+            if (typeof alt.confidence === 'number' && isFinite(alt.confidence) && alt.confidence > 0) {
+              if (!Array.isArray(state.speechConfidences)) state.speechConfidences = [];
+              if (state.speechConfidences.length <= i) {
+                state.speechConfidences.push(Math.min(0.99, Math.max(0.2, alt.confidence)));
+              } else {
+                state.speechConfidences[i] = Math.min(0.99, Math.max(0.2, alt.confidence));
+              }
+            }
           } else {
-            interim += event.results[i][0].transcript;
+            interimText += (alt.transcript || '');
           }
         }
-        var text = (final + interim).trim();
+        var text = (finalText + interimText).replace(/\s+/g, ' ').trim();
         if (text) {
           disarmSilenceWatchdog();
           pteHasUserSpoken = true;
-          state.speechTranscript = text;
-          var liveEl = typeof document !== 'undefined' ? document.getElementById('fzPteLiveSpeechText') : null;
-          if (liveEl) liveEl.textContent = text;
+          var geminiActiveAndHasText = Boolean(pteAsrWs && pteAsrWs.readyState === 1 && pteAsrSetupComplete && pteGeminiRawTranscript);
+          if (!geminiActiveAndHasText) {
+            state.speechTranscript = text;
+            var liveEl = typeof document !== 'undefined' ? document.getElementById('fzPteLiveSpeechText') : null;
+            if (liveEl) liveEl.textContent = text;
+          }
         }
       };
 
@@ -2584,6 +3156,7 @@
   function startRecordingPhase() {
     var item = getActiveItem();
     var recSec = (item && item.recordTimeSec) || (state.mode === 'rs' ? 15 : 40);
+    clearPteAsrTimers();
     state.timerState = 'recording';
     state.timerRemainingSec = recSec;
     state.timerTotalSec = recSec;
@@ -2591,42 +3164,50 @@
     state.speechTranscript = '';
     state.silenceTriggered = false;
     state.pausesCount = 0;
-    state.speechConfidence = 0.94;
+    state.speechConfidence = 0;
+    state.speechConfidences = [];
 
-    // Reset Handy VAD & Timing Accumulators
-    pteHandyVad.reset();
+    // Reset Handy VAD while preserving ambient noiseFloor calibrated during prep
+    pteHandyVad.reset({ preserveNoiseFloor: pteNoiseCalibratedDuringPrep });
+    pteNoiseCalibratedDuringPrep = false;
+    ptePreRollFrames = [];
+    pteGeminiRawTranscript = '';
+    pteSpeechRecFallbackStarted = false;
+    pteSentAudioSinceEnd = false;
     pteSpeechOnsetTimestamp = 0;
     pteSpeechOffsetTimestamp = 0;
     pteVoicedDurationMs = 0;
     ptePauseCount = 0;
     pteHasUserSpoken = false;
+    pteLastSpeechActivityMs = 0;
+    pteVadMaxScoreObserved = 0;
 
     armSilenceWatchdog();
 
-    // 1. Initialize hardware microphone bridge with Handy VAD (volume meter + formants + SNR)
+    // 1. Hardware microphone bridge with HandyHumanVad + AudioWorklet/ScriptProcessor
     initPteMicBridge();
 
-    // 2. Start high-fidelity browser SpeechRecognition directly (identik dengan Kawan Bicara PTT)
-    initPteSpeechRecognition();
-
-    // 3. Connect directly to Gemini 3.8 Live WebSocket for Pearson ASR
-    connectGeminiLiveAsr(function (chunk) {
-      disarmSilenceWatchdog();
-      pteHasUserSpoken = true;
-      if (!state.speechTranscript) {
-        state.speechTranscript = chunk.trim();
-      } else if (chunk && chunk.trim().length > state.speechTranscript.length && chunk.toLowerCase().indexOf(state.speechTranscript.toLowerCase().slice(0, 10)) !== -1) {
-        state.speechTranscript = chunk.trim();
+    // 2. Gemini 3.8 Live WebSocket as primary Pearson ASR (no concurrent OS SpeechRecognition contention)
+    var wsPromise = connectGeminiLiveAsr(handlePteGeminiTranscriptChunk, function () {
+      if (pteAsrFallbackTimer) {
+        clearTimeout(pteAsrFallbackTimer);
+        pteAsrFallbackTimer = null;
       }
-      var liveEl = typeof document !== 'undefined' ? document.getElementById('fzPteLiveSpeechText') : null;
-      if (liveEl) {
-        liveEl.textContent = state.speechTranscript || 'Listening...';
-      }
-    }, function () {
       console.log('[PTE Gemini Live ASR Connected and Ready]');
     }, function (err) {
       console.warn('[PTE Gemini Live ASR]', err);
+      maybeStartSpeechRecFallback();
     });
+
+    // 3. Automatic SpeechRecognition fallback ONLY if Gemini Live WS fails or does not complete setup within 1200ms
+    if (!pteAsrWs || pteAsrWs.readyState !== 1 || !pteAsrSetupComplete) {
+      pteAsrFallbackTimer = setTimeout(function () {
+        pteAsrFallbackTimer = null;
+        if (state.timerState === 'recording' && (!pteAsrWs || pteAsrWs.readyState !== 1 || !pteAsrSetupComplete)) {
+          maybeStartSpeechRecFallback();
+        }
+      }, wsPromise ? 1200 : 100);
+    }
 
     renderHub();
 
@@ -2642,24 +3223,47 @@
     }, 1000);
   }
 
+  function finalizeRecordingEvaluation(trueSpeechDurationSec) {
+    closePteAsrWsImmediate();
+    var transcript = (state.speechTranscript || '').trim();
+    if (!transcript && typeof document !== 'undefined') {
+      var manualEl = document.getElementById('fzPteManualSpeechInput');
+      if (manualEl && manualEl.value && manualEl.value.trim()) {
+        transcript = manualEl.value.trim();
+        state.speechTranscript = transcript;
+      }
+    }
+    evaluateSpeechResult(transcript, trueSpeechDurationSec, { isManual: false });
+  }
+
   function stopRecordingAndEvaluate() {
+    if (state.timerState === 'completed' || state.timerState === 'result') return;
     disarmSilenceWatchdog();
     stopPteVadLoop();
     clearTimer();
     state.timerState = 'completed';
-    stopPteMicBridge();
 
-    // Disconnect Gemini Live ASR socket cleanly
-    if (pteAsrWs) {
-      try {
-        pteAsrWs.onopen = null;
-        pteAsrWs.onmessage = null;
-        pteAsrWs.onerror = null;
-        pteAsrWs.onclose = null;
-        pteAsrWs.close(1000, 'recording_completed');
-      } catch (_) {}
-      pteAsrWs = null;
+    if (pteAsrFallbackTimer) {
+      clearTimeout(pteAsrFallbackTimer);
+      pteAsrFallbackTimer = null;
     }
+    if (ptePostSpeechAutoCloseTimer) {
+      clearTimeout(ptePostSpeechAutoCloseTimer);
+      ptePostSpeechAutoCloseTimer = null;
+    }
+
+    // Precise Pearson Speech Duration captured BEFORE tearing down bridge:
+    var rawDurationSec = (Date.now() - state.speechStartTime) / 1000;
+    var trueSpeechDurationSec;
+    if (pteSpeechOnsetTimestamp > 0 && pteSpeechOffsetTimestamp >= pteSpeechOnsetTimestamp) {
+      trueSpeechDurationSec = Math.max(1, (pteSpeechOffsetTimestamp - pteSpeechOnsetTimestamp) / 1000);
+    } else if (pteVoicedDurationMs > 0) {
+      trueSpeechDurationSec = Math.max(1, pteVoicedDurationMs / 1000);
+    } else {
+      trueSpeechDurationSec = Math.max(1, rawDurationSec);
+    }
+
+    stopPteMicBridge();
 
     if (state.speechRecognizer) {
       try {
@@ -2671,40 +3275,109 @@
       state.speechRecognizer = null;
     }
 
-    // Precise Pearson Speech Duration:
-    // Uses true vocal onset to offset from Handy VAD (excluding initial hesitation and trailing countdown wait!)
-    var rawDurationSec = (Date.now() - state.speechStartTime) / 1000;
-    var trueSpeechDurationSec;
-    if (pteSpeechOnsetTimestamp > 0 && pteSpeechOffsetTimestamp >= pteSpeechOnsetTimestamp) {
-      trueSpeechDurationSec = Math.max(1, (pteSpeechOffsetTimestamp - pteSpeechOnsetTimestamp) / 1000);
-    } else if (pteVoicedDurationMs > 0) {
-      trueSpeechDurationSec = Math.max(1, pteVoicedDurationMs / 1000);
-    } else {
-      trueSpeechDurationSec = Math.max(1, rawDurationSec);
+    var shouldFlushGeminiWs = Boolean(pteAsrWs && pteAsrWs.readyState === 1 && pteSentAudioSinceEnd);
+    if (shouldFlushGeminiWs) {
+      sendOrQueuePteAsrStreamEnd(true);
+      renderHub();
+      var finalized = false;
+      var completeStop = function () {
+        if (finalized) return;
+        finalized = true;
+        finalizeRecordingEvaluation(trueSpeechDurationSec);
+      };
+      pteAsrFlushResolver = completeStop;
+      pteAsrFlushTimer = setTimeout(completeStop, 380);
+      return;
     }
 
-    var transcript = (state.speechTranscript || '').trim();
-    if (!transcript && typeof document !== 'undefined') {
-      var manualEl = document.getElementById('fzPteManualSpeechInput');
-      if (manualEl && manualEl.value && manualEl.value.trim()) {
-        transcript = manualEl.value.trim();
-        state.speechTranscript = transcript;
-      }
-    }
-    evaluateSpeechResult(transcript, trueSpeechDurationSec);
+    finalizeRecordingEvaluation(trueSpeechDurationSec);
   }
 
-  function evaluateSpeechResult(transcript, durationSec) {
+  /**
+   * Computes empirical ASR + acoustic-lexical confidence in [0, 0.99] from real telemetry.
+   * Uses genuine SpeechRecognition alt.confidence scores when present, or acoustic/fluency
+   * signals (speaking rate, lexical complexity, disfluencies, pauses, Handy VAD score).
+   */
+  function computePteEmpiricalConfidence(opts) {
+    var o = opts || {};
+    var text = String(o.transcript || '').trim();
+    if (o.isEmpty || !text) return 0;
+
+    var confList = Array.isArray(o.speechConfidences)
+      ? o.speechConfidences.filter(function (c) { return typeof c === 'number' && isFinite(c) && c > 0 && c <= 1; })
+      : [];
+    if (confList.length > 0) {
+      var sumConf = 0;
+      for (var ci = 0; ci < confList.length; ci++) sumConf += confList[ci];
+      var avgNative = sumConf / confList.length;
+      return Math.round(Math.min(0.99, Math.max(0.35, avgNative)) * 1000) / 1000;
+    }
+
+    var tokens = text.split(/\s+/).filter(Boolean);
+    var wordCount = tokens.length;
+    if (wordCount === 0) return 0;
+
+    var durationSec = Math.max(1, Number(o.durationSec) || 1);
+    var wpm = (wordCount / durationSec) * 60;
+    var rateScore;
+    if (wpm >= 100 && wpm <= 168) {
+      rateScore = 0.94;
+    } else if (wpm >= 75 && wpm <= 195) {
+      rateScore = 0.84;
+    } else if (wpm >= 45 && wpm <= 230) {
+      rateScore = 0.70;
+    } else {
+      rateScore = 0.52;
+    }
+
+    var totalCharLen = 0;
+    for (var wi = 0; wi < wordCount; wi++) {
+      totalCharLen += tokens[wi].replace(/[^a-zA-Z0-9']/g, '').length;
+    }
+    var avgWordLen = totalCharLen / wordCount;
+    var lengthCoverage = Math.min(1, Math.max(0.35, (avgWordLen - 1.5) / 4.2));
+    var completenessBoost = Math.min(1, wordCount / 14);
+    var lexicalScore = 0.55 * lengthCoverage + 0.45 * (0.45 + 0.55 * completenessBoost);
+
+    var disfluencyMatches = text.match(/\b(um+|uh+|er+|ah+|hmm+)\b/gi) || [];
+    var pauseCount = Math.max(0, Number(o.pausesCount) || 0);
+    var pauseRatio = pauseCount / Math.max(1, wordCount / 6);
+    var fluencyStability = Math.max(0.35, 1.0 - (pauseRatio * 0.14 + disfluencyMatches.length * 0.09));
+
+    var rawConfidence;
+    if (!o.isManual && typeof o.vadMaxScore === 'number' && o.vadMaxScore > 0) {
+      var acousticScore = Math.min(0.98, Math.max(0.45, 0.45 + o.vadMaxScore * 0.55));
+      rawConfidence = 0.30 * acousticScore + 0.30 * rateScore + 0.22 * lexicalScore + 0.18 * fluencyStability;
+    } else {
+      rawConfidence = 0.38 * rateScore + 0.36 * lexicalScore + 0.26 * fluencyStability;
+    }
+
+    return Math.round(Math.min(0.98, Math.max(0.42, rawConfidence)) * 1000) / 1000;
+  }
+
+  function evaluateSpeechResult(transcript, durationSec, evalOpts) {
     var engine = getEngine();
     if (!engine) return;
     var item = getActiveItem();
     if (!item) return;
 
     var isEmpty = !transcript || !transcript.trim();
+    var pauseCount = ptePauseCount || state.pausesCount || 0;
+    var empConfidence = computePteEmpiricalConfidence({
+      transcript: transcript,
+      durationSec: durationSec,
+      pausesCount: pauseCount,
+      speechConfidences: state.speechConfidences,
+      vadMaxScore: pteVadMaxScoreObserved,
+      isEmpty: isEmpty,
+      isManual: Boolean(evalOpts && evalOpts.isManual)
+    });
+    state.speechConfidence = empConfidence;
+
     var metrics = {
       durationSec: Math.max(1, durationSec || 1),
-      confidenceAvg: isEmpty ? 0 : 0.94,
-      pausesCount: ptePauseCount || state.pausesCount || 0
+      confidenceAvg: empConfidence,
+      pausesCount: pauseCount
     };
 
     var res = null;
@@ -2752,10 +3425,10 @@
     var text = (ta ? ta.value : (state.speechTranscript || '')).trim();
     if (!text) return;
     state.speechTranscript = text;
+    state.speechConfidences = [];
     var wordCount = text.split(/\s+/).filter(Boolean).length;
     var estimatedDuration = Math.max(3, Math.round(wordCount / 2.5));
-    state.speechConfidence = 0.92;
-    evaluateSpeechResult(text, estimatedDuration);
+    evaluateSpeechResult(text, estimatedDuration, { isManual: true });
   }
 
   function clearSpeechError() {
@@ -3105,6 +3778,9 @@
     renderGuidedCoachCard: renderGuidedCoachCard,
     getHandyVad: function () { return pteHandyVad; },
     HandyHumanVad: HandyHumanVad,
+    analyzePteHumanVoiceBand: analyzePteHumanVoiceBand,
+    appendIncrementalTranscript: appendIncrementalTranscript,
+    computePteEmpiricalConfidence: computePteEmpiricalConfidence,
     initPteSpeechRecognition: initPteSpeechRecognition,
     getState: function () { return state; },
     getBanks: function () { return BANKS; }
