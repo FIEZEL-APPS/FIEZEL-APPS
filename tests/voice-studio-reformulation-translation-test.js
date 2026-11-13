@@ -3,6 +3,9 @@
  * and Persistent Conversation Memory Invariants.
  */
 import assert from 'node:assert';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import vm from 'node:vm';
 import {
   evaluateTurnLocal,
   sanitizeHallucinatedTranscript,
@@ -15,6 +18,9 @@ import {
 } from '../features/voice-studio/src/lib/liveCallHelper.ts';
 import {
   buildBraincoreCognitiveDossier,
+  createTurnAcousticTracker,
+  diagnosePteCandidateSpeech,
+  evaluateConversationalOralFluency,
   finalizeCallSessionMemory,
   loadBraincoreState,
   recordSpeakingAttempt,
@@ -374,8 +380,197 @@ async function run() {
   );
   console.log('✓ PASS\n');
 
+  // 8. Voice Studio Multi-Factor Acoustic-Temporal Oral Fluency & PTEDiagnostic
+  console.log('--- TEST 8: Acoustic-Temporal Oral Fluency (Voice Studio + PTE) ---');
+  const tracker = createTurnAcousticTracker();
+  for (let i = 0; i < 12; i++) tracker.recordAudioFrame({ chunkMs: 25, voicedMs: 0, isActiveVoice: false, confirmedSpeech: false });
+  for (let i = 0; i < 80; i++) tracker.recordAudioFrame({ chunkMs: 25, voicedMs: 25, isActiveVoice: true, confirmedSpeech: true });
+  for (let i = 0; i < 45; i++) tracker.recordAudioFrame({ chunkMs: 25, voicedMs: 0, isActiveVoice: false, confirmedSpeech: true }); // 1125ms pause
+  for (let i = 0; i < 80; i++) tracker.recordAudioFrame({ chunkMs: 25, voicedMs: 25, isActiveVoice: true, confirmedSpeech: true });
+  for (let i = 0; i < 160; i++) tracker.recordAudioFrame({ chunkMs: 25, voicedMs: 0, isActiveVoice: false, confirmedSpeech: false }); // 4s trailing silence
+  const tel = tracker.finalize();
+  assert.strictEqual(tel.isAcousticTiming, true);
+  assert.strictEqual(tel.measurementSource, 'acoustic_vad');
+  assert.ok(tel.spanDurationSec >= 5.0 && tel.spanDurationSec <= 5.25, `Span expected ~5.13s without trailing silence, got ${tel.spanDurationSec}`);
+  assert.strictEqual(tel.hesitationPausesCount, 1);
+  assert.strictEqual(tel.longPausesCount, 0);
+
+  const enFluent = evaluateConversationalOralFluency({
+    text: 'Today I practiced ordering coffee and explaining my project clearly.',
+    targetLang: 'en',
+    inputMode: 'voice',
+    durationSec: 4.5,
+    telemetry: {
+      spanDurationSec: 4.5,
+      activeSpeechSec: 4.0,
+      phonationRatio: 0.89,
+      shortPausesCount: 0,
+      hesitationPausesCount: 0,
+      longPausesCount: 0,
+      pausesCount: 0,
+      maxPauseMs: 0,
+      pauseDurationsMs: [],
+      burstDurationsMs: [2100, 1900],
+      isAcousticTiming: true,
+      measurementSource: 'acoustic_vad',
+    },
+  });
+  const enDisfluent = evaluateConversationalOralFluency({
+    text: 'Um I uh practiced, no wait, ordering coffee...',
+    targetLang: 'en',
+    inputMode: 'voice',
+    durationSec: 9.0,
+    telemetry: {
+      spanDurationSec: 9.0,
+      activeSpeechSec: 3.1,
+      phonationRatio: 0.34,
+      shortPausesCount: 1,
+      hesitationPausesCount: 2,
+      longPausesCount: 1,
+      pausesCount: 3,
+      maxPauseMs: 2300,
+      pauseDurationsMs: [900, 1100, 2300],
+      burstDurationsMs: [800, 2100],
+      isAcousticTiming: true,
+      measurementSource: 'acoustic_vad',
+    },
+  });
+  assert.ok(enFluent.fluencyScore >= 85 && enDisfluent.fluencyScore <= 55, `Expected fluent>=85 vs disfluent<=55, got ${enFluent.fluencyScore} vs ${enDisfluent.fluencyScore}`);
+
+  const jaCpm = evaluateConversationalOralFluency({ text: 'きのう静かな図書館で日本語を勉強しました。', targetLang: 'ja', inputMode: 'voice', durationSec: 4.2 });
+  assert.strictEqual(jaCpm.rateUnit, 'CPM');
+  assert.ok(jaCpm.rateValue > 200);
+
+  const zhCpm = evaluateConversationalOralFluency({ text: '我们今天在学校一起学习汉语。', targetLang: 'zh', inputMode: 'voice', durationSec: 3.6 });
+  assert.strictEqual(zhCpm.rateUnit, 'CPM');
+
+  const typedEval = evaluateConversationalOralFluency({ text: 'Yes', targetLang: 'en', inputMode: 'typed', durationSec: 2 });
+  assert.strictEqual(typedEval.measurementSource, 'typed_text');
+  assert.strictEqual(typedEval.rateValue, 0);
+
+  const pteSmooth = diagnosePteCandidateSpeech({
+    spokenTranscript: 'Global energy transitions require reliable storage systems and modern transmission lines.',
+    durationSec: 5.0,
+    activeSpeechSec: 4.4,
+    phonationRatio: 0.88,
+    shortPausesCount: 0,
+    hesitationPausesCount: 0,
+    longPausesCount: 0,
+    isAcousticTiming: true,
+    measurementSource: 'acoustic_vad',
+  });
+  const pteBroken = diagnosePteCandidateSpeech({
+    spokenTranscript: 'Um uh global energy, I mean transitions require...',
+    durationSec: 12.5,
+    activeSpeechSec: 4.2,
+    phonationRatio: 0.34,
+    shortPausesCount: 2,
+    hesitationPausesCount: 2,
+    longPausesCount: 1,
+    maxPauseMs: 2600,
+    isAcousticTiming: true,
+    measurementSource: 'acoustic_vad',
+  });
+  assert.ok(
+    pteSmooth.scores.fluency >= 4.2 && pteBroken.scores.fluency <= 2.2,
+    `PTE diagnostic smooth (${pteSmooth.scores.fluency}/5) must cleanly outperform paused/broken (${pteBroken.scores.fluency}/5)`
+  );
+  assert.ok(
+    pteSmooth.scores.pearsonEstimate > pteBroken.scores.pearsonEstimate + 20,
+    `PTE Pearson estimate smooth (${pteSmooth.scores.pearsonEstimate}) must beat broken (${pteBroken.scores.pearsonEstimate})`
+  );
+  console.log('✓ PASS\n');
+
+  // 9. Cross-Lingual Grammar Susun Kata (EN / JA / ZH) + Voice-to-Tile Matcher
+  console.log('--- TEST 9: Cross-Lingual Grammar Token-Order & Voice-to-Tile Matcher ---');
+  const requireCjs = createRequire(import.meta.url);
+  if (typeof globalThis.self === 'undefined') globalThis.self = globalThis;
+  globalThis.self.FiezelI18n = globalThis.FiezelI18n || { t: (k) => k };
+  globalThis.self.V = [
+    { lang: 'ja', word: '図書館', reading: 'としょかん' },
+    { lang: 'ja', word: '公園', reading: 'こうえん' },
+  ];
+  const FiezelGrammarUpgrade = requireCjs('../features/grammar/fiezel-grammar-upgrade.js');
+
+  const enBank = ['can\'t', 'I', 'Where', 'his', 'see', 'he', 'him', 'is', 'Tom'].map((text, id) => ({ id, text, placed: false }));
+  const enMatched = FiezelGrammarUpgrade.matchSpokenTranscriptToTokens('Where is Tom I cannot see him', enBank, 'en');
+  assert.deepStrictEqual(enMatched.matchedTokens, ['Where', 'is', 'Tom', 'I', "can't", 'see', 'him']);
+
+  const enSplitBank = ['Where', 'is', 'Tom', 'I', 'can', 'not', 'see', 'him'].map((text, id) => ({ id, text, placed: false }));
+  const enSplitMatched = FiezelGrammarUpgrade.matchSpokenTranscriptToTokens("Where's Tom I can't see him", enSplitBank, 'en');
+  assert.ok(
+    enSplitMatched.matchedTokens.includes('can') && enSplitMatched.matchedTokens.includes('not'),
+    'Contracted spoken speech must also split into [can, not] when uncontracted tiles are in bank'
+  );
+
+  // Zero-Ghost-Answer rule: if speaker speaks a distractor word ("his"), matcher obeys the bank honestly!
+  const enDistMatched = FiezelGrammarUpgrade.matchSpokenTranscriptToTokens('Where is Tom I can\'t see his', enBank, 'en');
+  assert.strictEqual(enDistMatched.matchedTokens[enDistMatched.matchedTokens.length - 1], 'his');
+
+  // Japanese Kanji <-> Hiragana equivalence (via builtin map + self.V)
+  const jaBank = ['へ', 'わたし', 'いきます', 'しずかな', 'は', 'で', 'こうえん'].map((text, id) => ({ id, text, placed: false }));
+  const jaMatched = FiezelGrammarUpgrade.matchSpokenTranscriptToTokens('私は静かな公園へ行きます', jaBank, 'ja');
+  assert.deepStrictEqual(jaMatched.matchedTokens, ['わたし', 'は', 'しずかな', 'こうえん', 'へ', 'いきます']);
+
+  // Mandarin Hanzi + Digit + Pinyin homophone fallback
+  const zhBank = ['点', '现在', '两', '吃'].map((text, id) => ({ id, text, placed: false }));
+  const zhDigitMatched = FiezelGrammarUpgrade.matchSpokenTranscriptToTokens('现在2点', zhBank, 'zh');
+  assert.deepStrictEqual(zhDigitMatched.matchedTokens, ['现在', '两', '点']);
+
+  const zhHomoBank = ['喜欢', '她', '喝茶', '咖啡'].map((text, id) => ({ id, text, placed: false }));
+  const zhHomoMatched = FiezelGrammarUpgrade.matchSpokenTranscriptToTokens('他喜欢喝茶', zhHomoBank, 'zh');
+  assert.deepStrictEqual(zhHomoMatched.matchedTokens, ['她', '喜欢', '喝茶']);
+
+  // Explicit multi-word clear command only
+  assert.strictEqual(FiezelGrammarUpgrade.matchSpokenTranscriptToTokens('hapus semua', enBank, 'en').commandAction, 'clear');
+  assert.strictEqual(FiezelGrammarUpgrade.matchSpokenTranscriptToTokens('全部清除', zhBank, 'zh').commandAction, 'clear');
+  assert.strictEqual(FiezelGrammarUpgrade.matchSpokenTranscriptToTokens('全部消して', jaBank, 'ja').commandAction, 'clear');
+
+  // Verify app.js makeGrammarTokenOrderQuestion produces real JA and ZH token arrays (zero CJK wipeout!)
+  const appSrc = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const fnStart = appSrc.indexOf('function makeGrammarTokenOrderQuestion(');
+  const fnEnd = appSrc.indexOf('\nfunction weaveGrammarSessionVariety(');
+  assert.ok(fnStart > 0 && fnEnd > fnStart, 'Must extract makeGrammarTokenOrderQuestion cleanly from app.js');
+  const fnCode = appSrc.slice(fnStart, fnEnd);
+  let activeMockLang = 'ja';
+  const appSandbox = {
+    GRAMMAR_ITEMS: [],
+    V: [{ word: '図書館' }, { word: '学校' }, { word: '我们' }, { word: '喜欢' }],
+    getActiveLevel: () => 'A1',
+    activeTargetLang: () => activeMockLang,
+    grammarLessonRule: () => 'Rule',
+    grammarMeta: () => ({ whyCorrect: '', memory: '', avoid: '' }),
+    grammarSanitizeContext: (x) => x,
+    grammarOptionReason: () => '',
+    tokenGlossMap: () => ({}),
+    tokenOrderMovableAlternates: () => [],
+    FiezelI18n: { t: (_k, fb) => fb || _k, getLocale: () => 'id' },
+    self: {},
+  };
+  vm.createContext(appSandbox);
+  vm.runInContext(fnCode, appSandbox);
+
+  activeMockLang = 'ja';
+  const jaTemplates = JSON.parse(fs.readFileSync(new URL('../content/ja/grammar-templates-ja.json', import.meta.url), 'utf8'));
+  const jaRawTpl = (jaTemplates.templates || []).find((tpl) => tpl && typeof tpl.stem === 'string' && /_{2,}/.test(tpl.stem) && Array.isArray(tpl.options) && typeof tpl.correctIndex === 'number');
+  assert.ok(jaRawTpl, 'Expected Japanese grammar template');
+  const firstJaTpl = [jaRawTpl.stem, jaRawTpl.options, jaRawTpl.correctIndex, '', jaRawTpl.distractors || []];
+  const jaQuestion = appSandbox.makeGrammarTokenOrderQuestion('ja-test-skill', firstJaTpl, 0, 'A1');
+  assert.ok(jaQuestion && jaQuestion.tokens.length >= 3, 'Japanese makeGrammarTokenOrderQuestion must produce >=3 non-empty tokens');
+  assert.strictEqual(jaQuestion.targetLang, 'ja');
+
+  activeMockLang = 'zh';
+  const zhTemplates = JSON.parse(fs.readFileSync(new URL('../content/zh/grammar-templates-zh.json', import.meta.url), 'utf8'));
+  const zhRawTpl = (zhTemplates.templates || []).find((tpl) => tpl && typeof tpl.stem === 'string' && /_{2,}/.test(tpl.stem) && Array.isArray(tpl.options) && typeof tpl.correctIndex === 'number');
+  assert.ok(zhRawTpl, 'Expected Mandarin grammar template');
+  const firstZhTpl = [zhRawTpl.stem, zhRawTpl.options, zhRawTpl.correctIndex, '', zhRawTpl.distractors || []];
+  const zhQuestion = appSandbox.makeGrammarTokenOrderQuestion('zh-test-skill', firstZhTpl, 0, 'A1');
+  assert.ok(zhQuestion && zhQuestion.tokens.length >= 3, 'Mandarin makeGrammarTokenOrderQuestion must produce >=3 non-empty tokens');
+  assert.strictEqual(zhQuestion.targetLang, 'zh');
+  console.log(`✓ PASS (JA tokens=${jaQuestion.tokens.length}, ZH tokens=${zhQuestion.tokens.length})\n`);
+
   console.log('================================================================');
-  console.log('ALL REFORMULATION, GRAMMAR, & BRAINCORE DOSSIER TESTS PASSED!');
+  console.log('ALL REFORMULATION, ORAL FLUENCY, & CROSS-LINGUAL VOICE TESTS PASSED!');
   console.log('================================================================');
 }
 

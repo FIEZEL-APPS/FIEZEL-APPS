@@ -1206,10 +1206,29 @@
       }
 
       if (res.fluency) {
-        var fPct = Math.min(100, Math.round((res.fluency.score / 5) * 100));
+        var fDisplay = typeof res.fluency.exactScore === 'number' ? res.fluency.exactScore.toFixed(1) : String(res.fluency.score);
+        var fPct = Math.min(100, Math.round(((typeof res.fluency.exactScore === 'number' ? res.fluency.exactScore : res.fluency.score) / 5) * 100));
+        var fBarColor = res.fluency.score >= 4 ? '#10b981' : (res.fluency.score >= 3 ? '#f59e0b' : '#ef4444');
+        var fMetaParts = [];
+        if (res.fluency.wpm > 0) fMetaParts.push(res.fluency.wpm + ' WPM');
+        if (typeof res.fluency.activeSpeechSec === 'number' && typeof res.fluency.spanDurationSec === 'number' && res.fluency.activeSpeechSec > 0 && !res.fluency.isEstimatedTiming) {
+          fMetaParts.push('Aktif ' + res.fluency.activeSpeechSec + 'd / ' + res.fluency.spanDurationSec + 'd (' + Math.round((res.fluency.phonationRatio || 0) * 100) + '%)');
+        }
+        var fNoticeablePauses = (res.fluency.hesitationPausesCount || 0) + (res.fluency.longPausesCount || 0);
+        if (!res.fluency.isEstimatedTiming && typeof res.fluency.pausesCount === 'number') {
+          fMetaParts.push((fNoticeablePauses > 0 ? fNoticeablePauses : res.fluency.pausesCount) + ' jeda >=0.7d');
+        }
+        if (res.fluency.disfluencyCount > 0) fMetaParts.push(res.fluency.disfluencyCount + ' filler');
+        if (res.fluency.selfCorrectionCount > 0) fMetaParts.push(res.fluency.selfCorrectionCount + ' koreksi');
+        var fReasonText = Array.isArray(res.fluency.reasons) && res.fluency.reasons.length > 0
+          ? res.fluency.reasons.slice(0, 2).join(' · ')
+          : '';
         out.push('      <div style="margin-bottom:8px;">');
-        out.push('        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:#334155;"><span>Oral Fluency:</span> <span>' + res.fluency.score + ' / 5 (' + esc(res.fluency.label || '') + ')</span></div>');
-        out.push('        <div style="width:100%; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-top:3px;"><div style="width:' + fPct + '%; height:100%; background:#10b981;"></div></div>');
+        out.push('        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:#334155;"><span>Oral Fluency:</span> <span>' + fDisplay + ' / 5 (' + esc(res.fluency.label || '') + ')</span></div>');
+        out.push('        <div style="width:100%; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-top:3px;"><div style="width:' + fPct + '%; height:100%; background:' + fBarColor + ';"></div></div>');
+        if (fMetaParts.length > 0 || fReasonText) {
+          out.push('        <div style="font-size:0.72rem; color:#64748b; margin-top:3px;">' + esc(fMetaParts.join(' · ')) + (fReasonText ? ' — ' + esc(fReasonText) : '') + '</div>');
+        }
         out.push('      </div>');
       }
 
@@ -2150,7 +2169,19 @@
 
   HandyHumanVad.prototype.processSamples = function (inputSamples, inputSampleRate) {
     if (!inputSamples || inputSamples.length === 0) {
-      return { speechPcm16k: null, inSpeech: this.inSpeech, speechStarted: false, speechEnded: false, maxScore: 0, lastMetrics: null };
+      return {
+        speechPcm16k: null,
+        inSpeech: this.inSpeech,
+        speechStarted: false,
+        speechEnded: false,
+        maxScore: 0,
+        lastMetrics: null,
+        voicedFrames: 0,
+        totalFrames: 0,
+        voicedMs: 0,
+        totalMs: 0,
+        activeVoiceDetected: false
+      };
     }
 
     var fromRate = inputSampleRate > 0 ? inputSampleRate : HANDY_SAMPLE_RATE;
@@ -2186,6 +2217,8 @@
     var speechEnded = false;
     var maxScore = 0;
     var lastMetrics = null;
+    var totalFrames = 0;
+    var voicedFrames = 0;
 
     var offset = 0;
     while (this.resampleCarryLen - offset >= HANDY_FRAME_SAMPLES) {
@@ -2202,6 +2235,8 @@
       lastMetrics = metrics;
       if (metrics.score > maxScore) maxScore = metrics.score;
       slot.voiced = metrics.isVoice;
+      totalFrames += 1;
+      if (metrics.isVoice) voicedFrames += 1;
 
       if (!this.inSpeech && metrics.isVoice) {
         this.onsetCounter += 1;
@@ -2263,7 +2298,12 @@
       speechStarted: speechStarted,
       speechEnded: speechEnded,
       maxScore: maxScore,
-      lastMetrics: lastMetrics
+      lastMetrics: lastMetrics,
+      voicedFrames: voicedFrames,
+      totalFrames: totalFrames,
+      voicedMs: voicedFrames * 32,
+      totalMs: totalFrames * 32,
+      activeVoiceDetected: voicedFrames > 0
     };
   };
 
@@ -2448,6 +2488,211 @@
   var pteHasUserSpoken = false;
   var pteLastSpeechActivityMs = 0;
   var pteVadMaxScoreObserved = 0;
+  var pteTurnTelemetry = null;
+
+  /**
+   * Hangover-free acoustic-temporal Oral Fluency tracker.
+   * Strips trailing hangover/silence from utterance span, distinguishes true active vocal frames
+   * from plosive gaps (<250ms), natural breaths (250-699ms), hesitations (700-1999ms),
+   * and breakdown pauses (>=2000ms), and NEVER counts post-speech trailing silence as a pause.
+   */
+  function createPteFluencyTracker() {
+    var st = {
+      elapsedAudioMs: 0,
+      hasOnset: false,
+      onsetAudioMs: 0,
+      lastVocalAudioMs: 0,
+      activeVoicedMs: 0,
+      preOnsetVoicedMs: 0,
+      pendingGapMs: 0,
+      currentBurstMs: 0,
+      burstDurationsMs: [],
+      pauseDurationsMs: [],
+      shortPausesCount: 0,
+      hesitationPausesCount: 0,
+      longPausesCount: 0,
+      maxPauseMs: 0,
+      audioFramesCount: 0,
+      firstGrowthWallMs: 0,
+      lastGrowthWallMs: 0,
+      lastWordCount: 0,
+      speechRecPausesMs: []
+    };
+
+    function reset() {
+      st.elapsedAudioMs = 0;
+      st.hasOnset = false;
+      st.onsetAudioMs = 0;
+      st.lastVocalAudioMs = 0;
+      st.activeVoicedMs = 0;
+      st.preOnsetVoicedMs = 0;
+      st.pendingGapMs = 0;
+      st.currentBurstMs = 0;
+      st.burstDurationsMs = [];
+      st.pauseDurationsMs = [];
+      st.shortPausesCount = 0;
+      st.hesitationPausesCount = 0;
+      st.longPausesCount = 0;
+      st.maxPauseMs = 0;
+      st.audioFramesCount = 0;
+      st.firstGrowthWallMs = 0;
+      st.lastGrowthWallMs = 0;
+      st.lastWordCount = 0;
+      st.speechRecPausesMs = [];
+    }
+
+    function recordAudioFrame(opts) {
+      if (!opts) return;
+      var dt = Math.max(0, Number(opts.chunkMs) || 0);
+      if (dt <= 0) return;
+      st.audioFramesCount += 1;
+      st.elapsedAudioMs += dt;
+      var vMs = Math.min(dt, Math.max(0, Number(opts.voicedMs) || 0));
+      var activeNow = Boolean(opts.isActiveVoice);
+      var confirmed = Boolean(opts.confirmedSpeech);
+
+      if (!st.hasOnset) {
+        if (activeNow) {
+          st.preOnsetVoicedMs += (vMs > 0 ? vMs : dt);
+        } else if (!confirmed) {
+          st.preOnsetVoicedMs = 0;
+        }
+        if (confirmed && (activeNow || st.preOnsetVoicedMs > 0)) {
+          st.hasOnset = true;
+          var preDur = Math.min(st.elapsedAudioMs, st.preOnsetVoicedMs > 0 ? st.preOnsetVoicedMs : dt);
+          st.onsetAudioMs = Math.max(0, st.elapsedAudioMs - preDur);
+          st.activeVoicedMs = preDur;
+          st.currentBurstMs = preDur;
+          st.lastVocalAudioMs = st.elapsedAudioMs;
+          st.pendingGapMs = 0;
+          st.preOnsetVoicedMs = 0;
+        }
+        return;
+      }
+
+      if (activeNow) {
+        if (st.pendingGapMs >= 250) {
+          var gapDur = Math.round(st.pendingGapMs);
+          st.pauseDurationsMs.push(gapDur);
+          if (gapDur > st.maxPauseMs) st.maxPauseMs = gapDur;
+          if (gapDur >= 2000) st.longPausesCount += 1;
+          else if (gapDur >= 700) st.hesitationPausesCount += 1;
+          else st.shortPausesCount += 1;
+          if (st.currentBurstMs > 0) st.burstDurationsMs.push(Math.round(st.currentBurstMs));
+          st.currentBurstMs = 0;
+        } else if (st.pendingGapMs > 0) {
+          st.currentBurstMs += st.pendingGapMs;
+        }
+        st.pendingGapMs = 0;
+        st.activeVoicedMs += (vMs > 0 ? vMs : dt);
+        st.currentBurstMs += dt;
+        st.lastVocalAudioMs = st.elapsedAudioMs;
+      } else {
+        st.pendingGapMs += dt;
+      }
+    }
+
+    function recordTranscriptEvent(nowMs, wordCount) {
+      var ts = Number(nowMs) || Date.now();
+      var wc = Math.max(0, Number(wordCount) || 0);
+      if (wc <= 0) return;
+      if (!st.firstGrowthWallMs) {
+        st.firstGrowthWallMs = ts;
+        st.lastGrowthWallMs = ts;
+        st.lastWordCount = wc;
+      } else if (wc > st.lastWordCount) {
+        var gap = ts - st.lastGrowthWallMs;
+        if (gap >= 900) {
+          st.speechRecPausesMs.push(Math.round(gap));
+        }
+        st.lastGrowthWallMs = ts;
+        st.lastWordCount = wc;
+      }
+    }
+
+    function getNoticeablePauseCount() {
+      if (st.hasOnset) {
+        return st.hesitationPausesCount + st.longPausesCount;
+      }
+      return st.speechRecPausesMs.length;
+    }
+
+    function finalize(fallbackWallSpanMs) {
+      if (st.hasOnset && st.lastVocalAudioMs > st.onsetAudioMs) {
+        var bursts = st.burstDurationsMs.slice();
+        if (st.currentBurstMs > 0) bursts.push(Math.round(st.currentBurstMs));
+        var spanMs = Math.max(250, st.lastVocalAudioMs - st.onsetAudioMs);
+        var spanSec = Math.round((spanMs / 1000) * 100) / 100;
+        var activeSec = Math.round((st.activeVoicedMs / 1000) * 100) / 100;
+        var phonRatio = Math.min(1, Math.round((st.activeVoicedMs / spanMs) * 100) / 100);
+        return {
+          spanDurationSec: spanSec,
+          activeSpeechSec: activeSec,
+          phonationRatio: phonRatio,
+          shortPausesCount: st.shortPausesCount,
+          hesitationPausesCount: st.hesitationPausesCount,
+          longPausesCount: st.longPausesCount,
+          pausesCount: st.hesitationPausesCount + st.longPausesCount,
+          maxPauseMs: st.maxPauseMs,
+          pauseDurationsMs: st.pauseDurationsMs.slice(),
+          burstDurationsMs: bursts,
+          isAcousticTiming: true,
+          measurementSource: 'acoustic_vad'
+        };
+      }
+      if (st.firstGrowthWallMs > 0 && st.lastGrowthWallMs > st.firstGrowthWallMs) {
+        var srSpanMs = Math.max(800, st.lastGrowthWallMs - st.firstGrowthWallMs);
+        var srHes = 0;
+        var srLong = 0;
+        var srMax = 0;
+        for (var si = 0; si < st.speechRecPausesMs.length; si++) {
+          var sg = st.speechRecPausesMs[si];
+          if (sg > srMax) srMax = sg;
+          if (sg >= 2000) srLong += 1;
+          else srHes += 1;
+        }
+        return {
+          spanDurationSec: Math.round((srSpanMs / 1000) * 100) / 100,
+          activeSpeechSec: undefined,
+          phonationRatio: undefined,
+          shortPausesCount: 0,
+          hesitationPausesCount: srHes,
+          longPausesCount: srLong,
+          pausesCount: srHes + srLong,
+          maxPauseMs: srMax,
+          pauseDurationsMs: st.speechRecPausesMs.slice(),
+          burstDurationsMs: [],
+          isAcousticTiming: false,
+          measurementSource: 'speech_rec_events'
+        };
+      }
+      var rawSec = Math.max(1, (Number(fallbackWallSpanMs) || 1000) / 1000);
+      return {
+        spanDurationSec: Math.round(rawSec * 100) / 100,
+        activeSpeechSec: undefined,
+        phonationRatio: undefined,
+        shortPausesCount: 0,
+        hesitationPausesCount: 0,
+        longPausesCount: 0,
+        pausesCount: 0,
+        maxPauseMs: 0,
+        pauseDurationsMs: [],
+        burstDurationsMs: [],
+        isAcousticTiming: false,
+        measurementSource: 'timer_fallback'
+      };
+    }
+
+    return {
+      reset: reset,
+      recordAudioFrame: recordAudioFrame,
+      recordTranscriptEvent: recordTranscriptEvent,
+      getNoticeablePauseCount: getNoticeablePauseCount,
+      finalize: finalize
+    };
+  }
+
+  var pteFluencyTracker = createPteFluencyTracker();
 
   var PTE_WORKLET_CODE =
     'class PteVadCaptureProcessor extends AudioWorkletProcessor {\n' +
@@ -2619,7 +2864,11 @@
       pteVadMaxScoreObserved = vadRes.maxScore;
     }
 
-    var isVoiceNow = Boolean(vadRes.inSpeech || bandInfo.isHumanSpeech);
+    var isGateOpen = Boolean(vadRes.inSpeech || bandInfo.isHumanSpeech);
+    var isActiveVoiceFrame = Boolean(
+      (typeof vadRes.voicedFrames === 'number' && vadRes.voicedFrames > 0) ||
+      bandInfo.isHumanSpeech
+    );
 
     // Update tactile mic meter UI
     if (typeof document !== 'undefined') {
@@ -2628,12 +2877,22 @@
         var snr = (vadRes.lastMetrics && vadRes.lastMetrics.vocalSnrDb) || (bandInfo.isHumanSpeech ? 12 : 0);
         var pct = Math.min(100, Math.max(0, Math.round(snr * 6.5)));
         fillEl.style.width = pct + '%';
-        fillEl.style.backgroundColor = isVoiceNow ? '#10b981' : '#94a3b8';
+        fillEl.style.backgroundColor = isGateOpen ? '#10b981' : '#94a3b8';
       }
     }
 
-    // Accurate Human Speech Cadence & Timing Tracking (sample-rate exact ms)
-    var frameDurationMs = Math.max(10, Math.round((inputData.length / sr) * 1000));
+    // Hangover-free acoustic-temporal cadence tracking (sample-rate exact ms)
+    var exactChunkMs = (inputData.length / sr) * 1000;
+    var chunkVoicedMs = (typeof vadRes.voicedMs === 'number' && vadRes.voicedMs > 0)
+      ? Math.min(exactChunkMs, vadRes.voicedMs)
+      : (bandInfo.isHumanSpeech ? exactChunkMs : 0);
+    pteFluencyTracker.recordAudioFrame({
+      chunkMs: exactChunkMs,
+      voicedMs: chunkVoicedMs,
+      isActiveVoice: isActiveVoiceFrame,
+      confirmedSpeech: isGateOpen
+    });
+
     if (vadRes.speechStarted || (bandInfo.isHumanSpeech && !pteHasUserSpoken)) {
       if (!pteSpeechOnsetTimestamp) pteSpeechOnsetTimestamp = Date.now();
       pteHasUserSpoken = true;
@@ -2644,20 +2903,21 @@
         ptePostSpeechAutoCloseTimer = null;
       }
     }
-    if (isVoiceNow) {
+    if (isActiveVoiceFrame) {
       pteSpeechOffsetTimestamp = Date.now();
       pteLastSpeechActivityMs = Date.now();
-      if (vadRes.inSpeech || bandInfo.isHumanSpeech) {
-        pteVoicedDurationMs += frameDurationMs;
-      }
+      pteVoicedDurationMs += Math.round(chunkVoicedMs > 0 ? chunkVoicedMs : exactChunkMs);
+      ptePauseCount = pteFluencyTracker.getNoticeablePauseCount();
       if (ptePostSpeechAutoCloseTimer) {
         clearTimeout(ptePostSpeechAutoCloseTimer);
         ptePostSpeechAutoCloseTimer = null;
       }
+    } else if (isGateOpen && ptePostSpeechAutoCloseTimer) {
+      clearTimeout(ptePostSpeechAutoCloseTimer);
+      ptePostSpeechAutoCloseTimer = null;
     }
     if (vadRes.speechEnded) {
-      pteSpeechOffsetTimestamp = Date.now();
-      ptePauseCount = (ptePauseCount || 0) + 1;
+      // Do NOT advance pteSpeechOffsetTimestamp or increment ptePauseCount during trailing hangover silence!
       sendOrQueuePteAsrStreamEnd(true);
       schedulePtePostSpeechAutoClose();
     }
@@ -2826,6 +3086,7 @@
     var clean = pteGeminiRawTranscript.replace(/[ \t]+/g, ' ').trim();
     if (clean) {
       state.speechTranscript = clean;
+      pteFluencyTracker.recordTranscriptEvent(Date.now(), clean.split(/\s+/).filter(Boolean).length);
       var liveEl = typeof document !== 'undefined' ? document.getElementById('fzPteLiveSpeechText') : null;
       if (liveEl) {
         liveEl.textContent = state.speechTranscript;
@@ -3127,6 +3388,7 @@
         if (text) {
           disarmSilenceWatchdog();
           pteHasUserSpoken = true;
+          pteFluencyTracker.recordTranscriptEvent(Date.now(), text.split(/\s+/).filter(Boolean).length);
           var geminiActiveAndHasText = Boolean(pteAsrWs && pteAsrWs.readyState === 1 && pteAsrSetupComplete && pteGeminiRawTranscript);
           if (!geminiActiveAndHasText) {
             state.speechTranscript = text;
@@ -3181,6 +3443,8 @@
     pteHasUserSpoken = false;
     pteLastSpeechActivityMs = 0;
     pteVadMaxScoreObserved = 0;
+    pteTurnTelemetry = null;
+    pteFluencyTracker.reset();
 
     armSilenceWatchdog();
 
@@ -3252,16 +3516,19 @@
       ptePostSpeechAutoCloseTimer = null;
     }
 
-    // Precise Pearson Speech Duration captured BEFORE tearing down bridge:
-    var rawDurationSec = (Date.now() - state.speechStartTime) / 1000;
-    var trueSpeechDurationSec;
-    if (pteSpeechOnsetTimestamp > 0 && pteSpeechOffsetTimestamp >= pteSpeechOnsetTimestamp) {
-      trueSpeechDurationSec = Math.max(1, (pteSpeechOffsetTimestamp - pteSpeechOnsetTimestamp) / 1000);
-    } else if (pteVoicedDurationMs > 0) {
-      trueSpeechDurationSec = Math.max(1, pteVoicedDurationMs / 1000);
-    } else {
-      trueSpeechDurationSec = Math.max(1, rawDurationSec);
+    // Hangover-free Pearson Speech Duration & Cadence Telemetry captured BEFORE tearing down bridge:
+    var rawWallMs = Date.now() - state.speechStartTime;
+    var telemetry = pteFluencyTracker.finalize(rawWallMs);
+    if (telemetry.measurementSource === 'timer_fallback') {
+      if (pteSpeechOnsetTimestamp > 0 && pteSpeechOffsetTimestamp >= pteSpeechOnsetTimestamp) {
+        telemetry.spanDurationSec = Math.max(1, (pteSpeechOffsetTimestamp - pteSpeechOnsetTimestamp) / 1000);
+      } else if (pteVoicedDurationMs > 0) {
+        telemetry.spanDurationSec = Math.max(1, pteVoicedDurationMs / 1000);
+      }
     }
+    pteTurnTelemetry = telemetry;
+    ptePauseCount = telemetry.pausesCount;
+    var trueSpeechDurationSec = Math.max(telemetry.isAcousticTiming ? 0.6 : 1, telemetry.spanDurationSec || 1);
 
     stopPteMicBridge();
 
@@ -3362,7 +3629,11 @@
     if (!item) return;
 
     var isEmpty = !transcript || !transcript.trim();
-    var pauseCount = ptePauseCount || state.pausesCount || 0;
+    var isManual = Boolean(evalOpts && evalOpts.isManual);
+    var telemetry = (!isManual && pteTurnTelemetry) ? pteTurnTelemetry : null;
+    var pauseCount = telemetry ? telemetry.pausesCount : (ptePauseCount || state.pausesCount || 0);
+    state.pausesCount = pauseCount;
+
     var empConfidence = computePteEmpiricalConfidence({
       transcript: transcript,
       durationSec: durationSec,
@@ -3370,14 +3641,25 @@
       speechConfidences: state.speechConfidences,
       vadMaxScore: pteVadMaxScoreObserved,
       isEmpty: isEmpty,
-      isManual: Boolean(evalOpts && evalOpts.isManual)
+      isManual: isManual
     });
     state.speechConfidence = empConfidence;
 
     var metrics = {
-      durationSec: Math.max(1, durationSec || 1),
+      durationSec: Math.max(telemetry && telemetry.isAcousticTiming ? 0.6 : 1, durationSec || 1),
       confidenceAvg: empConfidence,
-      pausesCount: pauseCount
+      pausesCount: pauseCount,
+      isManual: isManual,
+      activeSpeechSec: telemetry ? telemetry.activeSpeechSec : undefined,
+      phonationRatio: telemetry ? telemetry.phonationRatio : undefined,
+      shortPausesCount: telemetry ? telemetry.shortPausesCount : undefined,
+      hesitationPausesCount: telemetry ? telemetry.hesitationPausesCount : undefined,
+      longPausesCount: telemetry ? telemetry.longPausesCount : undefined,
+      maxPauseMs: telemetry ? telemetry.maxPauseMs : undefined,
+      pauseDurationsMs: telemetry ? telemetry.pauseDurationsMs : undefined,
+      burstDurationsMs: telemetry ? telemetry.burstDurationsMs : undefined,
+      isAcousticTiming: telemetry ? telemetry.isAcousticTiming : false,
+      measurementSource: isManual ? 'manual_text' : (telemetry ? telemetry.measurementSource : 'timer_fallback')
     };
 
     var res = null;
@@ -3426,8 +3708,9 @@
     if (!text) return;
     state.speechTranscript = text;
     state.speechConfidences = [];
+    pteTurnTelemetry = null;
     var wordCount = text.split(/\s+/).filter(Boolean).length;
-    var estimatedDuration = Math.max(3, Math.round(wordCount / 2.5));
+    var estimatedDuration = Math.max(3, Math.round(wordCount / 2.2));
     evaluateSpeechResult(text, estimatedDuration, { isManual: true });
   }
 
@@ -3778,6 +4061,7 @@
     renderGuidedCoachCard: renderGuidedCoachCard,
     getHandyVad: function () { return pteHandyVad; },
     HandyHumanVad: HandyHumanVad,
+    createPteFluencyTracker: createPteFluencyTracker,
     analyzePteHumanVoiceBand: analyzePteHumanVoiceBand,
     appendIncrementalTranscript: appendIncrementalTranscript,
     computePteEmpiricalConfidence: computePteEmpiricalConfidence,

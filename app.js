@@ -15909,10 +15909,68 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
   const activeLvl=level||meta?.level||getActiveLevel();
   let fullSentence=base.replace(/_{2,}|\[\.\.\.\]/g,correct).trim();
   if(!fullSentence.includes(correct))return null;
-  const cleanWord=w=>String(w||'').trim().replace(/^[^\w\s]+|[^\w\s]+$/g,'');
-  const rawTokens=fullSentence.split(/\s+/).map(cleanWord).filter(Boolean);
+  const cleanWord=w=>String(w||'').trim().replace(/^[\s.,\/#!$%\^&\*;:{}=\-_\x60~()“”\x22\x27?!¿¡。、，．？！「」『』（）【】《》：；…]+|[\s.,\/#!$%\^&\*;:{}=\-_\x60~()“”\x22\x27?!¿¡。、，．？！「」『』（）【】《》：；…]+$/g,'');
+  const hasCjk=/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(fullSentence);
+  const activeLang=(typeof activeTargetLang==='function'?activeTargetLang():'en');
+  let rawTokens=[];
+  if(!hasCjk){
+    rawTokens=fullSentence.split(/\s+/).map(cleanWord).filter(Boolean);
+  }else{
+    const spacedSentence=base.replace(/_{2,}|\[\.\.\.\]/g,' '+correct+' ').trim();
+    rawTokens=spacedSentence.split(/\s+/).map(cleanWord).filter(Boolean);
+    if(rawTokens.length<3){
+      const hasKana=/[\u3040-\u30ff]/.test(fullSentence);
+      const lexSet=new Set([
+        '我们','你们','他们','她们','大家','自己','现在','今天','明天','昨天','每天','时候','一起','非常',
+        '喜欢','觉得','认为','知道','希望','可以','应该','需要','想要','已经','正在','经常','还是','或者',
+        '因为','所以','但是','虽然','如果','尽管','学校','老师','同学','朋友','爸爸','妈妈','爷爷','奶奶',
+        '图书馆','医院','公司','家庭','电脑','手机','汉字','汉语','中文','日本','中国','美国','什么','怎么',
+        '哪里','谁的','多少','没有','不是','在','的','了','着','过','很','都','也','就','还','才','把','被',
+        '给','从','向','往','对','和','跟','比','去','来','是','有','会','能','要','想','说','看','吃','喝',
+        'わたし','あなた','かれ','かのじょ','これ','それ','あれ','ここ','そこ','あそこ','いつ','どこ','だれ','なに',
+        'きょう','あした','きのう','まいにち','がっこう','せんせい','ともだち','ほん','みず','パン','コーヒー','です','ます'
+      ]);
+      if(Array.isArray(V)){
+        for(const vw of V){
+          const wt=cleanWord(vw?.word||'');
+          if(wt&&hasCjk&&wt.length>=2&&wt.length<=6)lexSet.add(wt);
+        }
+      }
+      const segRun=(txt)=>{
+        const cleaned=cleanWord(txt);
+        if(!cleaned)return [];
+        if(hasKana){
+          return cleaned.split(/([はがをにでへとも])|([，。？！、；：])/).map(cleanWord).filter(Boolean)
+            .flatMap(p=>p.length>6?(p.match(/[\u4e00-\u9fff々]+|[\u3040-\u309f]+|[\u30a0-\u30ffー]+|[A-Za-z0-9]+/g)||[p]):[p]);
+        }
+        const out=[];
+        let pos=0;
+        while(pos<cleaned.length){
+          if(/[\s，。？！、；：]/.test(cleaned[pos])){pos++;continue;}
+          let hit='';
+          for(let len=Math.min(4,cleaned.length-pos);len>=2;len--){
+            const sub=cleaned.slice(pos,pos+len);
+            if(lexSet.has(sub)){hit=sub;break;}
+          }
+          if(!hit){
+            if(pos+2<=cleaned.length&&out.length>=1&&cleaned.length-pos===2&&!/[的了在是很都不有]/.test(cleaned[pos])){
+              hit=cleaned.slice(pos,pos+2);
+            }else{
+              hit=cleaned[pos];
+            }
+          }
+          out.push(hit);
+          pos+=hit.length;
+        }
+        return out;
+      };
+      const blankParts=base.split(/_{2,}|\[\.\.\.\]/);
+      const rebuilt=[...segRun(blankParts[0]||''),cleanWord(correct),...segRun(blankParts.slice(1).join(''))].filter(Boolean);
+      if(rebuilt.length>=3)rawTokens=rebuilt;
+    }
+  }
   if(rawTokens.length<3||rawTokens.length>18||rawTokens.some(t=>/[;/]/.test(t)))return null;
-  const distractors=opts.filter((_,i)=>i!==correctIndex).map(cleanWord).filter(w=>Boolean(w)&&!w.includes(' ')&&!/[;/]/.test(w)).slice(0,2);
+  const distractors=opts.filter((_,i)=>i!==correctIndex).map(cleanWord).filter(w=>Boolean(w)&&(hasCjk||!w.includes(' '))&&!/[;/]/.test(w)).slice(0,2);
   const alternates=[];
   if(fullSentence.includes(', but ')){
     const parts=fullSentence.split(', but ');
@@ -15969,6 +16027,7 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
     type:'token-order',
     sourceId:templateId,
     level:activeLvl,
+    targetLang: hasCjk ? (/[\u3040-\u30ff]/.test(fullSentence) ? 'ja' : (activeLang==='ja' ? 'ja' : 'zh')) : activeLang,
     skill:skill,
     lessonSkill:skill,
     instruction:tokenInstruction,

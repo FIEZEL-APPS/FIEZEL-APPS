@@ -1759,17 +1759,35 @@ export function recordSpeakingAttempt(
     measureMode: params.measureMode,
   };
 
-  // Estimate speaking duration from word/character length if not explicitly measured by mic timer
-  const wordCount = Math.max(1, params.userExactTranscript.trim().split(/\s+/).length);
+  // Derive language-appropriate speaking duration if acoustic timing was not supplied
+  const trimmedTranscript = params.userExactTranscript.trim();
+  const wordCount = Math.max(1, trimmedTranscript.split(/\s+/).filter(Boolean).length);
+  const effectiveLang = params.targetLang || state.targetLang || 'en';
+  const charCountCjk = trimmedTranscript.replace(/[\s.,!?。、！？]/g, '').length;
+  const derivedFallbackSec =
+    effectiveLang === 'ja' || effectiveLang === 'zh'
+      ? Math.max(2, Math.round(charCountCjk / 3.5))
+      : Math.max(2, Math.round(wordCount / 2.2));
   const estimatedSec =
     params.speakingDurationSec && params.speakingDurationSec > 0
-      ? Math.round(params.speakingDurationSec)
-      : Math.max(6, Math.min(45, wordCount * 2));
+      ? Math.max(1, Math.round(params.speakingDurationSec))
+      : derivedFallbackSec;
 
   const prevHistory = Array.isArray(state.speakingHistory)
     ? state.speakingHistory
     : getDefaultSpeakingHistory();
   const nextTurnNumber = prevHistory.length + 1;
+
+  const computedConvFluency =
+    typeof params.fluencyScore === 'number' && isFinite(params.fluencyScore)
+      ? Math.round(params.fluencyScore)
+      : evaluateConversationalOralFluency({
+          text: trimmedTranscript,
+          targetLang: effectiveLang,
+          durationSec: params.speakingDurationSec,
+          ok: params.ok,
+          inputMode: params.speakingDurationSec && params.speakingDurationSec > 0 ? 'voice' : 'typed',
+        }).fluencyScore;
 
   const newMetric: SpeakingSessionMetric = {
     id: `turn_metric_${now}_${Math.random().toString(36).slice(2, 6)}`,
@@ -1777,10 +1795,10 @@ export function recordSpeakingAttempt(
     timestamp: now,
     scenarioId: params.scenarioId,
     competencyId: params.competencyId,
-    targetLang: params.targetLang || state.targetLang || 'en',
+    targetLang: effectiveLang,
     ok: params.ok,
     grammarScore: params.grammarScore ?? (params.ok ? 94 : 45),
-    fluencyScore: params.fluencyScore ?? (params.ok ? 91 : 65),
+    fluencyScore: computedConvFluency,
     vocabUsageScore: params.vocabUsageScore ?? (params.ok ? 93 : 62),
     accuracyScore: params.accuracyScore ?? (params.ok ? 93 : 48),
     bktMasteryPct: Math.round(nextP * 100),
@@ -2405,12 +2423,400 @@ export function resetPteMasterState(): PteMasterState {
 }
 
 // =========================================================================
+// Hangover-Free Acoustic-Temporal Fluency Telemetry & Conversational Scorer
+// =========================================================================
+
+export interface TurnAcousticTelemetry {
+  spanDurationSec: number;
+  activeSpeechSec?: number;
+  phonationRatio?: number;
+  shortPausesCount: number;
+  hesitationPausesCount: number;
+  longPausesCount: number;
+  pausesCount: number;
+  maxPauseMs: number;
+  pauseDurationsMs: number[];
+  burstDurationsMs: number[];
+  isAcousticTiming: boolean;
+  measurementSource: 'acoustic_vad' | 'speech_rec_events' | 'estimated';
+}
+
+function classifyPauseTier(gapMs: number): 'long' | 'hesitation' | 'short' | 'none' {
+  if (gapMs >= 2000) return 'long';
+  if (gapMs >= 700) return 'hesitation';
+  if (gapMs >= 250) return 'short';
+  return 'none';
+}
+
+function clampBound(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+export function createTurnAcousticTracker() {
+  let elapsedAudioMs = 0;
+  let hasOnset = false;
+  let onsetAudioMs = 0;
+  let lastVocalAudioMs = 0;
+  let activeVoicedMs = 0;
+  let preOnsetVoicedMs = 0;
+  let pendingGapMs = 0;
+  let currentBurstMs = 0;
+  let burstDurationsMs: number[] = [];
+  let pauseDurationsMs: number[] = [];
+  let shortPausesCount = 0;
+  let hesitationPausesCount = 0;
+  let longPausesCount = 0;
+  let maxPauseMs = 0;
+  let firstGrowthWallMs = 0;
+  let lastGrowthWallMs = 0;
+  let lastWordCount = 0;
+  let speechRecPausesMs: number[] = [];
+
+  const reset = () => {
+    elapsedAudioMs = 0;
+    hasOnset = false;
+    onsetAudioMs = 0;
+    lastVocalAudioMs = 0;
+    activeVoicedMs = 0;
+    preOnsetVoicedMs = 0;
+    pendingGapMs = 0;
+    currentBurstMs = 0;
+    burstDurationsMs = [];
+    pauseDurationsMs = [];
+    shortPausesCount = 0;
+    hesitationPausesCount = 0;
+    longPausesCount = 0;
+    maxPauseMs = 0;
+    firstGrowthWallMs = 0;
+    lastGrowthWallMs = 0;
+    lastWordCount = 0;
+    speechRecPausesMs = [];
+  };
+
+  const recordAudioFrame = (opts: {
+    chunkMs: number;
+    voicedMs?: number;
+    isActiveVoice: boolean;
+    confirmedSpeech: boolean;
+  }) => {
+    const dt = Math.max(0, Number(opts.chunkMs) || 0);
+    if (dt <= 0) return;
+    elapsedAudioMs += dt;
+    const vMs = Math.min(dt, Math.max(0, Number(opts.voicedMs) || 0));
+
+    if (!hasOnset) {
+      if (opts.isActiveVoice) {
+        preOnsetVoicedMs += vMs > 0 ? vMs : dt;
+      } else if (!opts.confirmedSpeech) {
+        preOnsetVoicedMs = 0;
+      }
+      if (opts.confirmedSpeech && (opts.isActiveVoice || preOnsetVoicedMs > 0)) {
+        hasOnset = true;
+        const preDur = Math.min(elapsedAudioMs, preOnsetVoicedMs > 0 ? preOnsetVoicedMs : dt);
+        onsetAudioMs = Math.max(0, elapsedAudioMs - preDur);
+        activeVoicedMs = preDur;
+        currentBurstMs = preDur;
+        lastVocalAudioMs = elapsedAudioMs;
+        pendingGapMs = 0;
+        preOnsetVoicedMs = 0;
+      }
+      return;
+    }
+
+    if (opts.isActiveVoice) {
+      if (pendingGapMs >= 250) {
+        const gapDur = Math.round(pendingGapMs);
+        pauseDurationsMs.push(gapDur);
+        if (gapDur > maxPauseMs) maxPauseMs = gapDur;
+        const tier = classifyPauseTier(gapDur);
+        if (tier === 'long') longPausesCount += 1;
+        else if (tier === 'hesitation') hesitationPausesCount += 1;
+        else if (tier === 'short') shortPausesCount += 1;
+        if (currentBurstMs > 0) burstDurationsMs.push(Math.round(currentBurstMs));
+        currentBurstMs = 0;
+      } else if (pendingGapMs > 0) {
+        currentBurstMs += pendingGapMs;
+      }
+      pendingGapMs = 0;
+      activeVoicedMs += vMs > 0 ? vMs : dt;
+      currentBurstMs += dt;
+      lastVocalAudioMs = elapsedAudioMs;
+    } else {
+      pendingGapMs += dt;
+    }
+  };
+
+  const recordTranscriptEvent = (nowMs: number, unitCount: number) => {
+    const ts = Number(nowMs) || Date.now();
+    const uc = Math.max(0, Number(unitCount) || 0);
+    if (uc <= 0) return;
+    if (!firstGrowthWallMs) {
+      firstGrowthWallMs = ts;
+      lastGrowthWallMs = ts;
+      lastWordCount = uc;
+    } else if (uc > lastWordCount) {
+      const gap = ts - lastGrowthWallMs;
+      if (gap >= 900) {
+        speechRecPausesMs.push(Math.round(gap));
+      }
+      lastGrowthWallMs = ts;
+      lastWordCount = uc;
+    }
+  };
+
+  const finalize = (fallbackDurationSec?: number): TurnAcousticTelemetry => {
+    if (hasOnset && lastVocalAudioMs > onsetAudioMs) {
+      const bursts = burstDurationsMs.slice();
+      if (currentBurstMs > 0) bursts.push(Math.round(currentBurstMs));
+      const spanMs = Math.max(250, lastVocalAudioMs - onsetAudioMs);
+      const spanSec = Math.round((spanMs / 1000) * 100) / 100;
+      const activeSec = Math.round((activeVoicedMs / 1000) * 100) / 100;
+      const phonRatio = Math.min(1, Math.round((activeVoicedMs / spanMs) * 100) / 100);
+      return {
+        spanDurationSec: spanSec,
+        activeSpeechSec: activeSec,
+        phonationRatio: phonRatio,
+        shortPausesCount,
+        hesitationPausesCount,
+        longPausesCount,
+        pausesCount: hesitationPausesCount + longPausesCount,
+        maxPauseMs,
+        pauseDurationsMs: pauseDurationsMs.slice(),
+        burstDurationsMs: bursts,
+        isAcousticTiming: true,
+        measurementSource: 'acoustic_vad',
+      };
+    }
+    if (firstGrowthWallMs > 0 && lastGrowthWallMs > firstGrowthWallMs) {
+      const srSpanMs = Math.max(800, lastGrowthWallMs - firstGrowthWallMs);
+      let srHes = 0;
+      let srLong = 0;
+      let srMax = 0;
+      speechRecPausesMs.forEach((sg) => {
+        if (sg > srMax) srMax = sg;
+        if (sg >= 2000) srLong += 1;
+        else srHes += 1;
+      });
+      return {
+        spanDurationSec: Math.round((srSpanMs / 1000) * 100) / 100,
+        shortPausesCount: 0,
+        hesitationPausesCount: srHes,
+        longPausesCount: srLong,
+        pausesCount: srHes + srLong,
+        maxPauseMs: srMax,
+        pauseDurationsMs: speechRecPausesMs.slice(),
+        burstDurationsMs: [],
+        isAcousticTiming: false,
+        measurementSource: 'speech_rec_events',
+      };
+    }
+    const rawSec =
+      typeof fallbackDurationSec === 'number' && isFinite(fallbackDurationSec) && fallbackDurationSec > 0
+        ? Math.round(fallbackDurationSec * 100) / 100
+        : 0;
+    return {
+      spanDurationSec: rawSec,
+      shortPausesCount: 0,
+      hesitationPausesCount: 0,
+      longPausesCount: 0,
+      pausesCount: 0,
+      maxPauseMs: 0,
+      pauseDurationsMs: [],
+      burstDurationsMs: [],
+      isAcousticTiming: false,
+      measurementSource: 'estimated',
+    };
+  };
+
+  const hasCapturedAudio = () => hasOnset && lastVocalAudioMs > onsetAudioMs;
+
+  return { reset, recordAudioFrame, recordTranscriptEvent, finalize, hasCapturedAudio };
+}
+
+const EN_HESITATION_RE = /\b(umm+|uhh+|ehh+|aaa+|err+|um|uh|er|ah|emm+|wait|ano|eto|you know)\b/gi;
+const EN_SELF_CORRECTION_RE = /\b(sorry|i mean|no wait|wait no|excuse me|or rather|actually no)\b/gi;
+const JA_FILLER_RE = /(えっと|あのー|うーん|そのー|まあ)/g;
+const ZH_FILLER_RE = /(那个|就是|嗯+|呃+|这个)/g;
+
+function countRepeatedWordStutters(text: string): number {
+  const normTokens = text
+    .toLowerCase()
+    .replace(new RegExp("[^a-z0-9'\\s]", 'g'), ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+  let stutters = 0;
+  for (let i = 1; i < normTokens.length; i++) {
+    if (normTokens[i] === normTokens[i - 1] && (normTokens[i].length >= 2 || normTokens[i] === 'i')) {
+      stutters += 1;
+    }
+  }
+  return stutters;
+}
+
+export function evaluateConversationalOralFluency(params: {
+  text: string;
+  targetLang: 'en' | 'ja' | 'zh';
+  durationSec?: number;
+  ok?: boolean;
+  inputMode?: 'voice' | 'typed' | 'quick_chip';
+  telemetry?: Partial<TurnAcousticTelemetry> | null;
+}): {
+  fluencyScore: number;
+  rateValue: number;
+  rateUnit: 'WPM' | 'CPM';
+  measurementSource: string;
+  reasons: string[];
+} {
+  const clean = (params.text || '').trim();
+  const isJa = params.targetLang === 'ja';
+  const isZh = params.targetLang === 'zh';
+  const words = clean.split(/\s+/).filter(Boolean);
+  const cjkLen = clean.replace(/[\s.,!?。、！？…\-—]/g, '').length;
+  const isCjk = isJa || isZh;
+
+  if (!clean || (!isCjk && words.length === 0) || (isCjk && cjkLen === 0)) {
+    return {
+      fluencyScore: 15,
+      rateValue: 0,
+      rateUnit: isCjk ? 'CPM' : 'WPM',
+      measurementSource: 'empty',
+      reasons: ['Tidak ada tuturan'],
+    };
+  }
+
+  const fillers = clean.match(
+    isJa ? JA_FILLER_RE : isZh ? ZH_FILLER_RE : EN_HESITATION_RE
+  ) || [];
+  const selfCorrections = clean.match(
+    isJa
+      ? /(すみません|いや|じゃなくて|間違えた)/g
+      : isZh
+        ? /(不对|不好意思|我是说)/g
+        : EN_SELF_CORRECTION_RE
+  ) || [];
+  const stutters = isCjk ? 0 : countRepeatedWordStutters(clean);
+
+  const tel = params.telemetry || undefined;
+  const measuredSec =
+    tel && typeof tel.spanDurationSec === 'number' && tel.spanDurationSec > 0
+      ? tel.spanDurationSec
+      : typeof params.durationSec === 'number' && isFinite(params.durationSec) && params.durationSec > 0
+        ? params.durationSec
+        : 0;
+  const hasRealVoiceTiming = params.inputMode !== 'typed' && params.inputMode !== 'quick_chip' && measuredSec > 0;
+  const reasons: string[] = [];
+
+  if (!hasRealVoiceTiming) {
+    // Typed / quick-reply input without real mic stream: score discourse smoothness & completeness, never fake acoustic 91!
+    const unitLen = isCjk ? cjkLen : words.length;
+    const minCompleteUnits = isCjk ? 8 : 5;
+    let score = params.ok === false ? 66 : 86;
+    if (unitLen <= (isCjk ? 3 : 2)) {
+      score -= 18;
+      reasons.push('Respons singkat / fragmen');
+    } else if (unitLen < minCompleteUnits) {
+      score -= 8;
+    } else if (unitLen >= (isCjk ? 14 : 9) && params.ok !== false) {
+      score += 5;
+    }
+    score -= fillers.length * 7 + stutters * 8 + selfCorrections.length * 12;
+    if (params.ok === false) reasons.push('Tersendat struktur / koreksi tata bahasa');
+    if (fillers.length > 0 || stutters > 0) reasons.push(`${fillers.length + stutters} disfluensi teks`);
+    const bounded = clampBound(Math.round(score), 25, 95);
+    return {
+      fluencyScore: bounded,
+      rateValue: 0,
+      rateUnit: isCjk ? 'CPM' : 'WPM',
+      measurementSource: params.inputMode === 'quick_chip' ? 'quick_chip_text' : 'typed_text',
+      reasons,
+    };
+  }
+
+  const dur = Math.max(tel?.isAcousticTiming ? 0.6 : 0.9, measuredSec);
+  const units = isCjk ? cjkLen : words.length;
+  const rate = Math.round((units / dur) * 60);
+  const optLow = isJa ? 150 : isZh ? 120 : 100;
+  const optHigh = isJa ? 340 : isZh ? 280 : 160;
+  const slowFloor = isJa ? 90 : isZh ? 75 : 65;
+
+  let score = 95;
+  if (rate < optLow) {
+    const gapFrac = Math.min(1, (optLow - rate) / Math.max(20, optLow - slowFloor * 0.5));
+    score -= Math.round(gapFrac * 36);
+    reasons.push(`Tempo lambat (${rate} ${isCjk ? 'CPM' : 'WPM'})`);
+  } else if (rate > optHigh) {
+    const excessFrac = Math.min(1, (rate - optHigh) / (optHigh * 0.55));
+    score -= Math.round(excessFrac * 20);
+    reasons.push(`Tempo terburu-buru (${rate} ${isCjk ? 'CPM' : 'WPM'})`);
+  } else {
+    reasons.push(`Irama stabil (${rate} ${isCjk ? 'CPM' : 'WPM'})`);
+  }
+
+  const hesPauses = tel?.hesitationPausesCount || 0;
+  const longPauses = tel?.longPausesCount || 0;
+  const shortPauses = tel?.shortPausesCount || 0;
+  const shortBudget = Math.max(1, Math.floor(units / (isCjk ? 18 : 10)));
+  const excessShort = Math.max(0, shortPauses - shortBudget);
+
+  if (longPauses > 0) {
+    score -= longPauses * 18;
+    reasons.push(`${longPauses} jeda >=2d`);
+  }
+  if (hesPauses > 0) {
+    score -= hesPauses * 11;
+    reasons.push(`${hesPauses} jeda ragu`);
+  }
+  if (excessShort > 0) {
+    score -= excessShort * 4;
+  }
+
+  if (tel && typeof tel.phonationRatio === 'number' && dur >= 3.0 && tel.phonationRatio < 0.52) {
+    score -= Math.min(16, Math.round((0.52 - tel.phonationRatio) * 50));
+    reasons.push(`Suara aktif ${Math.round(tel.phonationRatio * 100)}%`);
+  }
+
+  if (fillers.length > 0 || stutters > 0) {
+    score -= (fillers.length + stutters) * 7;
+    reasons.push(`${fillers.length + stutters} filler/stutter`);
+  }
+  if (selfCorrections.length > 0) {
+    score -= selfCorrections.length * 14;
+    reasons.push(`${selfCorrections.length} koreksi diri`);
+  }
+  if (params.ok === false) {
+    score -= 10;
+  }
+  if ((!isCjk && words.length <= 2) || (isCjk && cjkLen <= 3)) {
+    score = Math.min(score, 62);
+  }
+
+  const bounded = clampBound(Math.round(score), 20, 98);
+  return {
+    fluencyScore: bounded,
+    rateValue: rate,
+    rateUnit: isCjk ? 'CPM' : 'WPM',
+    measurementSource: tel?.measurementSource || 'voice_measured',
+    reasons,
+  };
+}
+
+// =========================================================================
 // Real-Time Braincore Diagnostic Engine for PTE Academic Speech Evaluation
 // =========================================================================
 
 export interface PteDiagnosticSpeechInput {
   spokenTranscript: string;
   durationSec?: number;
+  activeSpeechSec?: number;
+  phonationRatio?: number;
+  shortPausesCount?: number;
+  hesitationPausesCount?: number;
+  longPausesCount?: number;
+  maxPauseMs?: number;
+  pauseDurationsMs?: number[];
+  burstDurationsMs?: number[];
+  isAcousticTiming?: boolean;
+  measurementSource?: 'acoustic_vad' | 'speech_rec_events' | 'estimated';
   questionId?: string;
   questionTitle?: string;
   expectedKeywords?: string[];
@@ -2423,7 +2829,10 @@ export interface PteDiagnosticSpeechInput {
 
 export interface PteDiagnosticSpeechResult {
   wpm: number;
+  articulationWpm?: number;
   durationSec: number;
+  activeSpeechSec?: number;
+  phonationRatio?: number;
   wordCount: number;
   pacingQuality: 'optimal' | 'rushed' | 'slow';
   hesitationCount: number;
@@ -2431,6 +2840,13 @@ export interface PteDiagnosticSpeechResult {
   selfCorrectionCount?: number;
   selfCorrectionTokens?: string[];
   pauseCount?: number;
+  shortPausesCount?: number;
+  hesitationPausesCount?: number;
+  longPausesCount?: number;
+  maxPauseMs?: number;
+  rhythmScore?: number;
+  measurementSource?: 'acoustic_vad' | 'speech_rec_events' | 'estimated';
+  fluencyReasons?: string[];
   droppedPluralS: Array<{ heard: string; expected: string; reason: string }>;
   droppedPastEd: Array<{ heard: string; expected: string; reason: string }>;
   misconceptionsFound: Array<{ id: string; label: string; detail: string }>;
@@ -2470,26 +2886,78 @@ export function diagnosePteCandidateSpeech(
     .split(/\s+/)
     .filter(Boolean);
 
-  const duration = Math.max(5, Math.min(60, Number(input.durationSec || 30)));
   const wordCount = cleanTokens.length;
-  const wpm = Math.round((wordCount / duration) * 60);
+  const hasRealDuration =
+    typeof input.durationSec === 'number' && isFinite(input.durationSec) && input.durationSec > 0;
+  const isAcousticTiming = Boolean(
+    input.isAcousticTiming ||
+      input.measurementSource === 'acoustic_vad' ||
+      (typeof input.activeSpeechSec === 'number' && input.activeSpeechSec > 0)
+  );
+  const measurementSource: 'acoustic_vad' | 'speech_rec_events' | 'estimated' =
+    input.measurementSource ||
+    (isAcousticTiming ? 'acoustic_vad' : hasRealDuration ? 'speech_rec_events' : 'estimated');
+  const duration = hasRealDuration
+    ? Math.max(isAcousticTiming ? 0.6 : 0.8, Math.min(60, Number(input.durationSec)))
+    : Math.max(2.0, Math.min(45, Math.round((Math.max(1, wordCount) / 2.2) * 10) / 10));
+
+  const activeSec =
+    typeof input.activeSpeechSec === 'number' && isFinite(input.activeSpeechSec) && input.activeSpeechSec > 0
+      ? Math.min(duration, Math.max(0.35, input.activeSpeechSec))
+      : duration;
+  const phonationRatio =
+    typeof input.phonationRatio === 'number' && isFinite(input.phonationRatio)
+      ? Math.max(0, Math.min(1, input.phonationRatio))
+      : isAcousticTiming
+        ? Math.min(1, Math.round((activeSec / duration) * 100) / 100)
+        : 1;
+
+  const wpm = wordCount > 0 ? Math.round((wordCount / duration) * 60) : 0;
+  const articulationWpm = wordCount > 0 ? Math.round((wordCount / activeSec) * 60) : 0;
 
   const pacingQuality: 'optimal' | 'rushed' | 'slow' =
-    wpm >= 115 && wpm <= 148 ? 'optimal' : wpm > 148 ? 'rushed' : 'slow';
+    wpm >= 115 && wpm <= 152 ? 'optimal' : wpm > 152 ? 'rushed' : 'slow';
 
   // 1. Deteksi Keraguan / Hesitasi / False Starts
-  const hesitationMatches = transcript.match(/\b(umm+|uhh+|ehh+|aaa+|err+|wait|ano)\b/gi) || [];
-  const stutterMatches = transcript.match(/\b([a-z]+)\s+\1\b/gi) || [];
-  const hesitationTokens = [...hesitationMatches, ...stutterMatches];
+  const hesitationMatches = transcript.match(EN_HESITATION_RE) || [];
+  const falseStartMatches = transcript.match(/(?:^|\s)[a-z]{1,4}-(?=\s|$)/gi) || [];
+  const stutterMatches = transcript.match(/\b([a-z]{2,})\s+\1\b/gi) || [];
+  const hesitationTokens = [...hesitationMatches, ...falseStartMatches, ...stutterMatches];
   const hesitationCount = hesitationTokens.length;
 
   // 1-B. Pearson Self-Correction Penalty (Reverse-Engineered from Pearson & APEUni Scorer)
-  const selfCorrectionMatches = transcript.match(/\b(sorry|i mean|no wait|excuse me|or rather|actually no)\b/gi) || [];
+  const selfCorrectionMatches = transcript.match(EN_SELF_CORRECTION_RE) || [];
   const selfCorrectionCount = selfCorrectionMatches.length;
 
-  // 1-C. Deteksi Jeda Panjang (> 2 detik)
-  const pauseMatches = transcript.match(/(\.{3,}|…|\[pause\]|\(\s*pause\s*\))/gi) || [];
-  const pauseCount = pauseMatches.length;
+  // 1-C. Pause Tiers (Acoustic telemetry prioritized; text markers fallback only if unmeasured acoustically)
+  const textPauseMatches = transcript.match(/(\.{3,}|…|\[pause\]|\(\s*pause\s*\))/gi) || [];
+  const hasAcousticPauses =
+    typeof input.shortPausesCount === 'number' ||
+    typeof input.hesitationPausesCount === 'number' ||
+    typeof input.longPausesCount === 'number' ||
+    Array.isArray(input.pauseDurationsMs);
+
+  let shortPausesCount = Number(input.shortPausesCount || 0);
+  let hesitationPausesCount = Number(input.hesitationPausesCount || 0);
+  let longPausesCount = Number(input.longPausesCount || 0);
+  let maxPauseMs = Number(input.maxPauseMs || 0);
+
+  if (Array.isArray(input.pauseDurationsMs) && typeof input.hesitationPausesCount !== 'number') {
+    shortPausesCount = 0;
+    hesitationPausesCount = 0;
+    longPausesCount = 0;
+    input.pauseDurationsMs.forEach((pd) => {
+      if (pd > maxPauseMs) maxPauseMs = pd;
+      const tier = classifyPauseTier(pd);
+      if (tier === 'long') longPausesCount += 1;
+      else if (tier === 'hesitation') hesitationPausesCount += 1;
+      else if (tier === 'short') shortPausesCount += 1;
+    });
+  } else if (!hasAcousticPauses && textPauseMatches.length > 0) {
+    longPausesCount = textPauseMatches.length;
+    maxPauseMs = Math.max(maxPauseMs, 2200);
+  }
+  const pauseCount = longPausesCount + hesitationPausesCount;
 
   // 2. Deteksi Fonetik: Dropped Plural 's'
   const COMMON_PLURALS: Record<string, string> = {
@@ -2586,20 +3054,95 @@ export function diagnosePteCandidateSpeech(
   const stagesMetCount = [hasIntro, hasKeyElements, hasMax, hasMin, hasConclusion].filter(Boolean).length;
   const contentScore = stagesMetCount >= 4 ? 3 : stagesMetCount >= 2 ? 2 : 1;
 
-  // 5. Kalkulasi Skor Enabling Skills (Fluency & Pronunciation)
-  let baseFluency = 5.0;
-  if (pacingQuality === 'slow') baseFluency -= 1.0;
-  if (pacingQuality === 'rushed') baseFluency -= 0.5;
-  if (hesitationCount > 0) baseFluency -= Math.min(2.0, hesitationCount * 0.5);
-  if (selfCorrectionCount > 0) baseFluency -= Math.min(2.5, selfCorrectionCount * 1.0);
-  if (pauseCount > 0) baseFluency -= Math.min(2.0, pauseCount * 1.0);
-  if (duration > 38) baseFluency -= 0.5;
-  const fluencyScore = Number(Math.max(1.0, Math.min(5.0, baseFluency)).toFixed(1));
+  // 5. Kalkulasi Skor Multi-Faktor Akustik-Temporal (Fluency & Pronunciation)
+  let rateBase = 5.0;
+  if (wpm >= 115 && wpm <= 152) {
+    rateBase = 5.0;
+  } else if (wpm >= 95 && wpm < 115) {
+    rateBase = 3.7 + ((wpm - 95) / 20) * 1.1;
+  } else if (wpm >= 75 && wpm < 95) {
+    rateBase = 2.6 + ((wpm - 75) / 20) * 1.0;
+  } else if (wpm < 75) {
+    rateBase = Math.max(1.0, 1.0 + (wpm / 75) * 1.5);
+  } else if (wpm <= 170) {
+    rateBase = 4.45 - ((wpm - 152) / 18) * 0.65;
+  } else {
+    rateBase = Math.max(1.5, 3.6 - ((wpm - 170) / 45) * 1.5);
+  }
+
+  let rhythmScore = 1.0;
+  let rhythmPenalty = 0;
+  const bursts = Array.isArray(input.burstDurationsMs)
+    ? input.burstDurationsMs.filter((b) => typeof b === 'number' && isFinite(b) && b > 0)
+    : [];
+  if (bursts.length >= 2) {
+    const meanB = bursts.reduce((acc, b) => acc + b, 0) / bursts.length;
+    const varB = bursts.reduce((acc, b) => acc + (b - meanB) * (b - meanB), 0) / bursts.length;
+    const cv = meanB > 0 ? Math.sqrt(varB) / meanB : 0;
+    const microBursts = bursts.length >= 3 ? bursts.filter((b) => b < 350).length : 0;
+    rhythmScore = Math.max(
+      0.25,
+      Math.min(1.0, 1.0 - Math.max(0, cv - 0.45) * 0.45 - (microBursts / bursts.length) * 0.45)
+    );
+    rhythmPenalty = (1.0 - rhythmScore) * 1.05;
+  }
+  rhythmScore = Number(rhythmScore.toFixed(2));
+
+  const shortBudget = Math.max(1, Math.floor(wordCount / 11));
+  const excessShortPauses = Math.max(0, shortPausesCount - shortBudget);
+  const pausePenalty =
+    excessShortPauses * 0.22 + hesitationPausesCount * 0.65 + longPausesCount * 1.35;
+  const phonationPenalty =
+    isAcousticTiming && duration >= 3.0 && phonationRatio < 0.54
+      ? Math.min(1.2, (0.54 - phonationRatio) * 3.0)
+      : 0;
+  const disfluencyPenalty = hesitationCount * 0.5 + selfCorrectionCount * 0.95;
+
+  let baseFluency =
+    wordCount === 0
+      ? 1.0
+      : rateBase - pausePenalty - phonationPenalty - rhythmPenalty - disfluencyPenalty;
+  if (wordCount > 0 && wordCount < 4) {
+    baseFluency = Math.min(baseFluency, 2.2);
+  }
+  if (
+    (hesitationCount > 0 || selfCorrectionCount > 0 || pauseCount > 0) &&
+    baseFluency >= 4.5
+  ) {
+    baseFluency = 4.4;
+  }
+  if (duration > 40) baseFluency -= 0.4;
+
+  const fluencyScore = Number(clampBound(baseFluency, 1.0, 5.0).toFixed(1));
+  const fluencyReasons: string[] = [];
+  if (measurementSource === 'estimated') {
+    fluencyReasons.push('Durasi diestimasi dari teks (tanpa stream audio penuh)');
+  } else if (pacingQuality === 'optimal') {
+    fluencyReasons.push(`Tempo optimal (${wpm} WPM)`);
+  } else if (pacingQuality === 'slow') {
+    fluencyReasons.push(`Tempo lambat (${wpm} WPM; target 115-152)`);
+  } else {
+    fluencyReasons.push(`Terburu-buru (${wpm} WPM)`);
+  }
+  if (longPausesCount > 0) {
+    fluencyReasons.push(`${longPausesCount} jeda panjang >=2d (${(maxPauseMs / 1000).toFixed(1)}d)`);
+  }
+  if (hesitationPausesCount > 0) {
+    fluencyReasons.push(`${hesitationPausesCount} jeda ragu 0.7-2.0d`);
+  }
+  if (phonationPenalty >= 0.2) {
+    fluencyReasons.push(`Suara aktif ${Math.round(phonationRatio * 100)}%`);
+  }
+  if (rhythmPenalty >= 0.25) {
+    fluencyReasons.push(`Ritme terpotong (stabilitas ${Math.round(rhythmScore * 100)}%)`);
+  }
+  if (hesitationCount > 0) fluencyReasons.push(`${hesitationCount} filler/stutter`);
+  if (selfCorrectionCount > 0) fluencyReasons.push(`${selfCorrectionCount} koreksi diri`);
 
   let basePron = 5.0;
   if (droppedPluralS.length > 0) basePron -= Math.min(1.5, droppedPluralS.length * 0.75);
   if (droppedPastEd.length > 0) basePron -= Math.min(1.5, droppedPastEd.length * 0.75);
-  const pronunciationScore = Number(Math.max(1.0, Math.min(5.0, basePron)).toFixed(1));
+  const pronunciationScore = Number(clampBound(basePron, 1.0, 5.0).toFixed(1));
 
   // Pearson Concordance Formula
   const rawFrac = (fluencyScore / 5) * 0.4 + (pronunciationScore / 5) * 0.35 + (contentScore / 3) * 0.25;
@@ -2615,11 +3158,17 @@ export function diagnosePteCandidateSpeech(
       detail: `Terdeteksi perbaikan diri ("${selfCorrectionMatches.join(', ')}"). Standar Pearson AI memotong skor Oral Fluency drastis jika kandidat meralat diri sendiri alih-alih terus berbicara lancar.`,
     });
   }
-  if (pauseCount > 0) {
+  if (longPausesCount > 0) {
     misconceptionsFound.push({
       id: 'pte_pause_over_2s',
-      label: `Unnatural Pause > 2s (${pauseCount}x)`,
-      detail: 'Terdeteksi jeda hening lebih dari 2 detik. Memotong poin Oral Fluency.',
+      label: `Unnatural Pause >= 2s (${longPausesCount}x, max ${(maxPauseMs / 1000).toFixed(1)}s)`,
+      detail: `Terdeteksi ${longPausesCount} jeda hening >= 2 detik saat berbicara. Memotong poin Oral Fluency.`,
+    });
+  } else if (hesitationPausesCount >= 2) {
+    misconceptionsFound.push({
+      id: 'pte_mid_utterance_hesitation',
+      label: `Mid-Utterance Hesitation Pauses (${hesitationPausesCount}x)`,
+      detail: `Terdeteksi ${hesitationPausesCount} jeda ragu (0.7-2.0 detik) yang mematahkan aliran kalimat.`,
     });
   }
   if (droppedPluralS.length > 0) {
@@ -2757,9 +3306,10 @@ export function diagnosePteCandidateSpeech(
 
   const clinicalDossierText = `[BRAINCORE REAL-TIME CLINICAL DIAGNOSTIC DOSSIER]:
 Candidate: ${learner}
-Evaluated Task: Describe Image (${input.questionTitle || 'Exam Visual'})
-- Real Speech Pacing: ${wpm} WPM (${pacingQuality === 'optimal' ? 'OPTIMAL 120-140 WPM' : pacingQuality === 'slow' ? 'TERLALU LAMBAT < 115 WPM' : 'TERBURU-BURU > 148 WPM'})
-- Oral Fluency Score: ${fluencyScore} / 5.0 (BKT P(L): ${fluencyP.toFixed(2)}, Latent Ability Theta: ${fluencyTheta.toFixed(2)})
+Evaluated Task: ${input.questionTitle || 'Speaking Diagnostic'}
+- Real Speech Pacing: ${wpm} WPM (Articulation ${articulationWpm} WPM | Durasi ${duration.toFixed(1)}s${isAcousticTiming ? `, Vokal aktif ${activeSec.toFixed(1)}s / ${Math.round(phonationRatio * 100)}%` : ''}) [${pacingQuality === 'optimal' ? 'OPTIMAL 115-152 WPM' : pacingQuality === 'slow' ? 'LAMBAT < 115 WPM' : 'TERBURU-BURU > 152 WPM'}]
+- Pause Breakdown: ${longPausesCount} long (>=2s), ${hesitationPausesCount} hesitation (0.7-2s), ${shortPausesCount} breath (<0.7s) [Source: ${measurementSource}]
+- Oral Fluency Score: ${fluencyScore} / 5.0 (BKT P(L): ${fluencyP.toFixed(2)}, Latent Ability Theta: ${fluencyTheta.toFixed(2)}) — ${fluencyReasons.join('; ')}
 - Pronunciation Score: ${pronunciationScore} / 5.0 (BKT P(L): ${pronP.toFixed(2)}, Latent Ability Theta: ${pronTheta.toFixed(2)})
 - Content Coverage: ${contentScore} / 3.0 (Intro: ${hasIntro ? '✓' : '✗'}, Key Elements: ${hasKeyElements ? '✓' : '✗'}, Max: ${hasMax ? '✓' : '✗'}, Min: ${hasMin ? '✓' : '✗'}, Conclusion: ${hasConclusion ? '✓' : '✗'})
 - Estimated Pearson Concordance: ${pearsonEstimate} / 90 (${passedTarget ? 'MEMENUHI TARGET 42+' : 'BELUM MEMENUHI TARGET 42 - WAJIB REMEDIAL'})
@@ -2768,12 +3318,15 @@ ${miscListText}
 
 [EXAMINER VERBAL MANDATE FOR DR. JULIAN]:
 Anda WAJIB mengutip diagnosa Braincore ini secara eksplisit dan klinis di awal respon Anda kepada ${learner}:
-Contoh pembuka wajib: "${learner}, berdasarkan diagnosa Braincore barusan: Kelancaranmu ${wpm} WPM (${pacingQuality === 'optimal' ? 'sudah stabil di zona optimal Pearson' : 'belum konsisten'}). ${droppedPluralS.length > 0 ? `Namun di Misconception Ledger tercatat kamu menghilangkan akhiran 's' pada kata: ${droppedPluralSummary}. ` : ''}${hesitationCount > 0 ? `Terdeteksi juga ${hesitationCount} keraguan yang memotong nilai Fluency. ` : ''}Nilai simulasi resmimu: Fluency ${fluencyScore}/5, Pronunciation ${pronunciationScore}/5, Content ${contentScore}/3 (Estimasi Pearson: ${pearsonEstimate}/90). ${passedTarget ? 'Pertahankan ritme ini!' : 'Kamu butuh remedial!'}"
+Contoh pembuka wajib: "${learner}, berdasarkan diagnosa Braincore barusan: Kelancaranmu ${wpm} WPM selama ${duration.toFixed(1)} detik (${pacingQuality === 'optimal' ? 'sudah stabil di zona optimal Pearson' : 'belum konsisten'}). ${droppedPluralS.length > 0 ? `Namun di Misconception Ledger tercatat kamu menghilangkan akhiran 's' pada kata: ${droppedPluralSummary}. ` : ''}${hesitationCount > 0 || pauseCount > 0 ? `Terdeteksi ${pauseCount} jeda ragu dan ${hesitationCount} disfluensi yang memotong nilai Fluency. ` : ''}Nilai simulasi resmimu: Fluency ${fluencyScore}/5, Pronunciation ${pronunciationScore}/5, Content ${contentScore}/3 (Estimasi Pearson: ${pearsonEstimate}/90). ${passedTarget ? 'Pertahankan ritme ini!' : 'Kamu butuh remedial!'}"
 ${droppedPluralS.length > 0 || droppedPastEd.length > 0 ? 'Tuntut murid melafalkan ulang kata yang salah sekarang juga sebelum lanjut!' : ''}`;
 
   return {
     wpm,
+    articulationWpm,
     durationSec: duration,
+    activeSpeechSec: isAcousticTiming ? Number(activeSec.toFixed(2)) : undefined,
+    phonationRatio: isAcousticTiming ? Number(phonationRatio.toFixed(2)) : undefined,
     wordCount,
     pacingQuality,
     hesitationCount,
@@ -2781,6 +3334,13 @@ ${droppedPluralS.length > 0 || droppedPastEd.length > 0 ? 'Tuntut murid melafalk
     selfCorrectionCount,
     selfCorrectionTokens: selfCorrectionMatches,
     pauseCount,
+    shortPausesCount,
+    hesitationPausesCount,
+    longPausesCount,
+    maxPauseMs: Math.round(maxPauseMs),
+    rhythmScore,
+    measurementSource,
+    fluencyReasons,
     droppedPluralS,
     droppedPastEd,
     misconceptionsFound,
@@ -2803,8 +3363,8 @@ ${droppedPluralS.length > 0 || droppedPastEd.length > 0 ? 'Tuntut murid melafalk
     bkt: {
       fluencyP,
       fluencyTheta,
-      pronunciationP,
-      pronunciationTheta,
+      pronunciationP: pronP,
+      pronunciationTheta: pronTheta,
     },
     clinicalDossierText,
   };

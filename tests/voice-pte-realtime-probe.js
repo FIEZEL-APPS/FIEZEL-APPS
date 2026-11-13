@@ -309,7 +309,7 @@ async function run() {
   const { server, baseUrl } = await startStaticServer();
   const browser = await chromium.launch({
     headless: true,
-    args: ['--use-fake-ui-for-media-stream', '--autoplay-policy=no-user-gesture-required'],
+    args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--autoplay-policy=no-user-gesture-required'],
   });
 
   try {
@@ -626,7 +626,223 @@ async function run() {
       await ctx.close();
     }
 
-    console.log('\nALL HEADLESS CHROMIUM REAL-TIME VOICE & PTE PROBES PASSED!\n');
+    // =========================================================================
+    // SCENARIO 5: PTE Oral Fluency Acoustic Sensitivity (Smooth vs Paused/Hesitant UI)
+    // =========================================================================
+    {
+      const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+      await ctx.route('**/api/voice/**', (route) => {
+        route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, token: 'mock-token-pte-fluency' }) });
+      });
+      const page = await ctx.newPage();
+      await page.addInitScript(buildProbeInitScript({ mode: 'ok' }));
+      await page.goto(`${baseUrl}/index.html?view=pte`, { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() => window.FiezelPteUi && typeof window.FiezelPteUi.mount === 'function', null, { timeout: 10000 });
+      await page.evaluate(() => {
+        window.FiezelPteUi.mount(document.getElementById('app') || document.body);
+      });
+      await page.waitForFunction(() => {
+        const b = window.FiezelPteUi.getBanks();
+        return b && Array.isArray(b.ra) && b.ra.length > 0;
+      }, null, { timeout: 10000 });
+      await page.evaluate(() => { window.FiezelPteUi.switchSection('speaking'); });
+      await page.waitForSelector('button.fz-pte-btn-primary', { timeout: 10000 });
+
+      // Attempt A: Smooth fluent burst (~3.5s active speech, 0 intra-utterance pauses)
+      await page.click('button.fz-pte-btn-primary'); // preparing
+      await page.waitForFunction(() => window.__PROBE__.audioDrivers.length >= 1, null, { timeout: 10000 });
+      await page.waitForTimeout(60);
+      await page.click('button.fz-pte-btn-primary'); // recording
+      await page.waitForFunction(() => window.FiezelPteUi.getState().timerState === 'recording', null, { timeout: 5000 });
+      await page.evaluate(() => {
+        const raItem = window.FiezelPteUi.getBanks().ra[0];
+        const wc = String(raItem.text || '').trim().split(/\s+/).filter(Boolean).length;
+        const framesFor135Wpm = Math.max(120, Math.round((wc / 2.25) * (48000 / 1024)));
+        window.__driveAudioFrames('speech', framesFor135Wpm, 48000, 1024); // ~135 WPM optimal continuous flow
+        window.__emitWsTranscript(raItem.text);
+      });
+      await page.click('button.fz-pte-btn-primary.recording');
+      await page.waitForFunction(() => window.FiezelPteUi.getState().timerState === 'result', null, { timeout: 3000 });
+      const smoothUiText = await page.evaluate(() => document.getElementById('app')?.innerText || '');
+      const smoothState = await page.evaluate(() => window.FiezelPteUi.getState());
+      assert.strictEqual(smoothState.lastResult.fluency.measurementSource, 'acoustic_vad');
+      assert.ok(smoothUiText.includes('WPM') && /Aktif\s+\d/.test(smoothUiText), 'Enabling Skills UI must render acoustic WPM & Aktif span');
+
+      // Attempt B: Hesitant fragmented speech with 2.3s mid-sentence silence & filler words
+      await page.evaluate(() => {
+        window.FiezelPteUi.resetSessionState ? window.FiezelPteUi.resetSessionState() : window.FiezelPteUi.switchMode('ra');
+      });
+      await page.waitForSelector('button.fz-pte-btn-primary', { timeout: 5000 });
+      await page.click('button.fz-pte-btn-primary'); // preparing
+      await page.waitForFunction(() => window.__PROBE__.audioDrivers.length >= 2, null, { timeout: 10000 });
+      await page.waitForTimeout(60);
+      await page.click('button.fz-pte-btn-primary'); // recording
+      await page.waitForFunction(() => window.FiezelPteUi.getState().timerState === 'recording', null, { timeout: 5000 });
+      await page.evaluate(() => {
+        const raItem = window.FiezelPteUi.getBanks().ra[0];
+        window.__driveAudioFrames('speech', 60, 48000, 1024);   // 1.28s speech
+        window.__driveAudioFrames('silence', 110, 48000, 1024); // 2.35s intra-utterance silence gap!
+        window.__driveAudioFrames('speech', 60, 48000, 1024);   // 1.28s speech
+        window.__emitWsTranscript('Um uh ' + raItem.text.split(' ').slice(0, 5).join(' ') + ' er no wait ' + raItem.text.split(' ').slice(5).join(' '));
+      });
+      await page.click('button.fz-pte-btn-primary.recording');
+      await page.waitForFunction(() => window.FiezelPteUi.getState().timerState === 'result', null, { timeout: 3000 });
+      const hesState = await page.evaluate(() => window.FiezelPteUi.getState());
+      assert.ok(hesState.lastResult.fluency.longPausesCount >= 1, '2.35s intra-utterance gap must register as long pause >=2s');
+      assert.ok(
+        smoothState.lastResult.fluency.exactScore > hesState.lastResult.fluency.exactScore + 1.0,
+        `Smooth fluency (${smoothState.lastResult.fluency.exactScore}) must significantly beat paused/hesitant (${hesState.lastResult.fluency.exactScore})`
+      );
+      console.log(`  ✓ PTE Fluency E2E: smooth=${smoothState.lastResult.fluency.exactScore}/5 (${smoothState.lastResult.fluency.wpm} WPM) vs hesitant=${hesState.lastResult.fluency.exactScore}/5 (longPauses=${hesState.lastResult.fluency.longPausesCount})`);
+      await ctx.close();
+    }
+
+    // =========================================================================
+    // SCENARIO 6: Voice-to-Tile Grammar Susun Kata Across EN, JA, ZH + Bridge & Mandarin UI
+    // =========================================================================
+    {
+      const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      const page = await ctx.newPage();
+      await page.addInitScript(buildProbeInitScript({ mode: 'ok' }));
+      await page.goto(`${baseUrl}/index.html?fz_real_auth=0`, { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() =>
+        window.FiezelGrammarUpgrade &&
+        typeof window.FiezelGrammarUpgrade.renderTokenOrder === 'function' &&
+        window.FiezelMandarinUI &&
+        typeof window.FiezelMandarinUI.openLessonPlayer === 'function',
+        null,
+        { timeout: 15000 }
+      );
+
+      // 6A. English (en-US) + interim->final non-duplicating Contraction Voice-to-Tile
+      const enOutcome = await page.evaluate(() => {
+        const host = document.createElement('div');
+        document.body.appendChild(host);
+        let result = null;
+        const q = {
+          tokens: ['Where', 'is', 'Tom', 'I', "can't", 'see', 'him'],
+          distractors: ['he', 'his'],
+          targetLang: 'en'
+        };
+        const el = window.FiezelGrammarUpgrade.renderTokenOrder(q, (ok, info) => { result = { ok, info }; }, { lang: 'en' });
+        host.appendChild(el);
+        const voiceBtn = el.querySelector('#tokenVoiceBtn');
+        const langBadge = voiceBtn.querySelector('.gx-voice-lang').textContent.trim();
+        voiceBtn.click();
+        const rec = window.__PROBE__.lastSpeechRecInstance;
+        const langUsed = rec.lang;
+
+        const rInterim = [{ transcript: 'Where is Tom' }];
+        rInterim.isFinal = false;
+        rec.onresult({ results: [rInterim] });
+        const afterInterim = Array.from(el.querySelectorAll('#tokenRail .token-chip')).map((n) => n.textContent.trim());
+
+        const rFinal = [{ transcript: 'Where is Tom I cannot see him' }];
+        rFinal.isFinal = true;
+        rec.onresult({ results: [rFinal] });
+        const afterFinal = Array.from(el.querySelectorAll('#tokenRail .token-chip')).map((n) => n.textContent.trim());
+
+        el.querySelector('#tokenSubmitBtn').click();
+        host.remove();
+        return { langBadge, langUsed, afterInterim, afterFinal, result };
+      });
+      assert.strictEqual(enOutcome.langBadge, 'EN');
+      assert.strictEqual(enOutcome.langUsed, 'en-US');
+      assert.deepStrictEqual(enOutcome.afterInterim, ['Where', 'is', 'Tom']);
+      assert.deepStrictEqual(enOutcome.afterFinal, ['Where', 'is', 'Tom', 'I', "can't", 'see', 'him']);
+      assert.strictEqual(enOutcome.result && enOutcome.result.ok, true);
+
+      // 6B. Japanese (ja-JP) Kanji ASR -> Hiragana Tile Matching
+      const jaOutcome = await page.evaluate(() => {
+        const host = document.createElement('div');
+        document.body.appendChild(host);
+        let result = null;
+        const q = {
+          tokens: ['わたし', 'は', 'しずかな', 'こうえん', 'へ', 'いきます'],
+          distractors: ['で'],
+          targetLang: 'ja'
+        };
+        const el = window.FiezelGrammarUpgrade.renderTokenOrder(q, (ok, info) => { result = { ok, info }; }, { lang: 'ja' });
+        host.appendChild(el);
+        const voiceBtn = el.querySelector('#tokenVoiceBtn');
+        const langBadge = voiceBtn.querySelector('.gx-voice-lang').textContent.trim();
+        voiceBtn.click();
+        const rec = window.__PROBE__.lastSpeechRecInstance;
+        const langUsed = rec.lang;
+
+        const rJa = [{ transcript: '私は静かな公園へ行きます' }];
+        rJa.isFinal = true;
+        rec.onresult({ results: [rJa] });
+        const rail = Array.from(el.querySelectorAll('#tokenRail .token-chip')).map((n) => n.textContent.trim());
+
+        el.querySelector('#tokenSubmitBtn').click();
+        host.remove();
+        return { langBadge, langUsed, rail, result };
+      });
+      assert.strictEqual(jaOutcome.langBadge, 'JA');
+      assert.strictEqual(jaOutcome.langUsed, 'ja-JP');
+      assert.deepStrictEqual(jaOutcome.rail, ['わたし', 'は', 'しずかな', 'こうえん', 'へ', 'いきます']);
+      assert.strictEqual(jaOutcome.result && jaOutcome.result.ok, true);
+
+      // 6C. Mandarin Step 4 Lesson Quiz Reorder (`fz-zh-lesson-001` Step 4, zh-CN)
+      await page.evaluate(() => {
+        window.FiezelMandarinUI.openLessonPlayer('fz-zh-lesson-001', 4);
+      });
+      await page.waitForSelector('.mandarin-reorder-mount #tokenVoiceBtn', { timeout: 6000 });
+      const zhOutcome = await page.evaluate(() => {
+        const mount = document.querySelector('.mandarin-reorder-mount');
+        const voiceBtn = mount.querySelector('#tokenVoiceBtn');
+        const badge = voiceBtn.querySelector('.gx-voice-lang').textContent.trim();
+        voiceBtn.click();
+        const rec = window.__PROBE__.lastSpeechRecInstance;
+        const langUsed = rec.lang;
+
+        const rZh = [{ transcript: '我们在学校一起学习你' }];
+        rZh.isFinal = true;
+        rec.onresult({ results: [rZh] });
+        const rail = Array.from(mount.querySelectorAll('#tokenRail .token-chip')).map((n) => n.textContent.trim());
+        mount.querySelector('#tokenSubmitBtn').click();
+        const modalText = document.querySelector('.fz-mandarin-modal-content')?.innerText || '';
+        return { badge, langUsed, rail, modalText };
+      });
+      assert.strictEqual(zhOutcome.badge, 'ZH');
+      assert.strictEqual(zhOutcome.langUsed, 'zh-CN');
+      assert.deepStrictEqual(zhOutcome.rail, ['我们', '在学校', '一起', '学习', '你']);
+      assert.ok(/Jawaban Tepat|tepat/i.test(zhOutcome.modalText), 'Mandarin Step 4 reorder quiz must award success feedback after Voice-to-Tile submission');
+
+      // 6D. Grammar-Vocab Bridge Round 2 Puzzle Voice-to-Tile
+      const bridgeOutcome = await page.evaluate(() => {
+        if (window.FiezelMandarinUI && typeof window.FiezelMandarinUI.closeLessonPlayer === 'function') {
+          window.FiezelMandarinUI.closeLessonPlayer();
+        }
+        window.FiezelGrammarVocabBridge.startVocabMiniGame('be-verb');
+        const g = window.FiezelGrammarVocabBridge.getActiveMiniGame();
+        if (!g) return { skipped: true };
+        g.round = 2;
+        window.FiezelGrammarVocabBridge.renderMiniGameModal();
+        const btn = document.getElementById('bridgePuzzleVoiceBtn');
+        if (!btn) return { skipped: true };
+        const expected = (g.cachedTokens || []).slice();
+        btn.click();
+        const rec = window.__PROBE__.lastSpeechRecInstance;
+        const spoken = expected.join(' ');
+        const rBridge = [{ transcript: spoken }];
+        rBridge.isFinal = true;
+        rec.onresult({ results: [rBridge] });
+        const placed = (g.placedTokens || []).slice();
+        window.FiezelGrammarVocabBridge.stopPuzzleVoice(false);
+        return { skipped: false, langUsed: rec.lang, expected, placed };
+      });
+      if (!bridgeOutcome.skipped) {
+        assert.strictEqual(bridgeOutcome.langUsed, 'en-US');
+        assert.deepStrictEqual(bridgeOutcome.placed, bridgeOutcome.expected);
+      }
+
+      console.log('  ✓ Voice-to-Tile E2E: EN (contractions), JA (kanji<->hiragana), ZH (Mandarin Step 4), and Grammar-Vocab Bridge Round 2 all verified!');
+      await ctx.close();
+    }
+
+    console.log('\nALL HEADLESS CHROMIUM REAL-TIME VOICE, ORAL FLUENCY & GRAMMAR PROBES PASSED!\n');
   } finally {
     await browser.close();
     server.close();

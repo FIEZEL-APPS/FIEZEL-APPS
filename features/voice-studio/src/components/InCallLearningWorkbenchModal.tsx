@@ -6,6 +6,7 @@ import {
   VoicePersona,
   VoiceUiAction,
 } from '../types/voiceCall';
+import { type PteDiagnosticSpeechResult } from '../lib/braincore';
 import { playFiezelSfx } from '../lib/sfx';
 import {
   PTE_DESCRIBE_IMAGE_BANK,
@@ -101,6 +102,7 @@ export interface PteReadAloudData {
 }
 
 export interface PteScorecardData {
+  hasLiveSample?: boolean;
   compositeScore: number;
   fluencyScore: number;
   pronunciationScore: number;
@@ -108,6 +110,17 @@ export interface PteScorecardData {
   passed: boolean;
   remedialWords: string[];
   examinerNotes: string;
+  wpm?: number;
+  articulationWpm?: number;
+  durationSec?: number;
+  activeSpeechSec?: number;
+  phonationRatio?: number;
+  pauseCount?: number;
+  hesitationCount?: number;
+  selfCorrectionCount?: number;
+  rhythmScore?: number;
+  measurementSource?: string;
+  fluencyReasons?: string[];
 }
 
 export interface DynamicBoardState {
@@ -199,6 +212,7 @@ export interface InCallLearningWorkbenchProps {
   externalQuizSeed?: number;
   initialMinimized?: boolean;
   cefrLevel?: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2' | string;
+  latestPteDiagnostic?: PteDiagnosticSpeechResult | null;
 }
 
 /**
@@ -230,7 +244,8 @@ export function deriveContextualPedagogicalBoard(
   rawQuery: string,
   targetLang: TargetLang,
   locale: LearnerLocale,
-  seedVariant = 0
+  seedVariant = 0,
+  latestPteDiagnostic?: PteDiagnosticSpeechResult | null
 ): DynamicBoardState {
   const query = (action?.topicTitle || rawQuery || '').trim();
   const lowerQ = query.toLowerCase();
@@ -644,23 +659,70 @@ export function deriveContextualPedagogicalBoard(
     action?.focusType === 'pte_scorecard' ||
     /scorecard|rapor.*pte|evaluasi.*pte|hasil.*ujian.*pte|pearson.*score/i.test(lowerQ)
   ) {
-    const scorecardData: PteScorecardData = {
-      compositeScore: 68,
-      fluencyScore: 4.2,
-      pronunciationScore: 4.0,
-      contentScore: 2.6,
-      passed: true,
-      remedialWords: ['fluctuations', 'distributed'],
-      examinerNotes:
-        'Irama tuturan sangat stabil dan percaya diri. Pemenggalan nafas di chunking marks sangat rapi. Sedikit perbaikan pada vokal kata "fluctuations".',
-    };
+    const diag = latestPteDiagnostic || null;
+    const derivedRemedial = diag
+      ? Array.from(
+          new Set([
+            ...diag.droppedPluralS.map((d) => d.expected),
+            ...diag.droppedPastEd.map((d) => d.expected),
+            ...diag.hesitationTokens.slice(0, 3),
+          ])
+        ).filter(Boolean)
+      : [];
+
+    const hasTiming = Boolean(diag && diag.durationSec > 0);
+    const dynamicNotes = diag
+      ? `Laju tutur terukur ${diag.wpm} WPM (${diag.pacingQuality === 'optimal' ? 'zona optimal 115-152 WPM' : diag.pacingQuality === 'rushed' ? 'terlalu cepat' : 'kurang cepat'}) dalam durasi ${diag.durationSec}d` +
+        (typeof diag.activeSpeechSec === 'number'
+          ? ` (vokal aktif ${diag.activeSpeechSec}d, fonasi ${Math.round((diag.phonationRatio || 0) * 100)}%). `
+          : '. ') +
+        (diag.fluencyReasons && diag.fluencyReasons.length > 0
+          ? diag.fluencyReasons.slice(0, 2).join('; ') + '.'
+          : 'Irama tutur konsisten.')
+      : 'Belum ada sampel ucapan PTE pada sesi ini. Mulai bicara ke mikrofon agar Oral Fluency (WPM, jeda, disfluensi, & irama burst) terukur secara langsung.';
+
+    const scorecardData: PteScorecardData = diag
+      ? {
+          hasLiveSample: true,
+          compositeScore: diag.scores.pearsonEstimate,
+          fluencyScore: diag.scores.fluency,
+          pronunciationScore: diag.scores.pronunciation,
+          contentScore: diag.templateAdherence.contentScore,
+          passed: diag.scores.passedTarget,
+          remedialWords: derivedRemedial,
+          examinerNotes: dynamicNotes,
+          wpm: diag.wpm,
+          articulationWpm: diag.articulationWpm,
+          durationSec: diag.durationSec,
+          activeSpeechSec: diag.activeSpeechSec,
+          phonationRatio: diag.phonationRatio,
+          pauseCount: diag.pauseCount,
+          hesitationCount: diag.hesitationCount,
+          selfCorrectionCount: diag.selfCorrectionCount,
+          rhythmScore: diag.rhythmScore,
+          measurementSource: diag.measurementSource,
+          fluencyReasons: diag.fluencyReasons,
+        }
+      : {
+          hasLiveSample: false,
+          compositeScore: 0,
+          fluencyScore: 0,
+          pronunciationScore: 0,
+          contentScore: 0,
+          passed: false,
+          remedialWords: [],
+          examinerNotes: dynamicNotes,
+        };
 
     return {
       contextMode: 'pte_scorecard',
       topicTitle: 'Rapor Ujian Resmi Pearson PTE',
       patternFormula: 'Pearson Metric: Fluency (5.0) + Pronunciation (5.0) + Content (3.0)',
-      coachExplanation:
-        'Berikut hasil evaluasi objektif tuturanmu. Kamu telah melampaui ambang kelulusan target 58 (PTE 58).',
+      coachExplanation: diag
+        ? hasTiming && diag.scores.passedTarget
+          ? `Hasil evaluasi objektif dari sampel ucapan terakhir (${diag.measurementSource || 'measured'}). Kamu memenuhi target PTE 58+.`
+          : `Hasil evaluasi objektif dari sampel ucapan terakhir (${diag.measurementSource || 'measured'}). Fokus pada kelancaran jeda dan kejelasan vokal akhir.`
+        : 'Rekam jawabanmu terlebih dahulu untuk melihat skor Pearson Concordance (/90), laju WPM, rasio fonasi aktif, dan rincian jeda nyata.',
       pteScorecardData: scorecardData,
       quiz: {
         prompt: 'Bagaimana pelafalan kata "fluctuations" yang benar?',
@@ -1841,6 +1903,7 @@ export const PteScorecardCanvas: React.FC<{
   data: PteScorecardData;
   onSpeakPreview?: (text: string) => void;
 }> = ({ data, onSpeakPreview }) => {
+  const hasSample = data.hasLiveSample !== false;
   return (
     <div className="space-y-3.5" data-testid="pte-scorecard-canvas">
       {/* Header Official Scorecard */}
@@ -1850,24 +1913,56 @@ export const PteScorecardCanvas: React.FC<{
         </span>
         <span
           className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-black uppercase ${
-            data.passed ? 'bg-[#E6F4EA] text-[#1B5E34]' : 'bg-[#FEF2F2] text-[#DC2626]'
+            !hasSample
+              ? 'bg-[#F3EDE2] text-[#6B5A48]'
+              : data.passed
+                ? 'bg-[#E6F4EA] text-[#1B5E34]'
+                : 'bg-[#FEF2F2] text-[#DC2626]'
           }`}
         >
-          {data.passed ? '✓ TARGET TERCAPAI' : '⚠️ REMEDIAL WAJIB'}
+          {!hasSample ? 'MENUNGGU SAMPEL SUARA' : data.passed ? '✓ TARGET TERCAPAI' : '⚠️ REMEDIAL WAJIB'}
         </span>
       </div>
 
       {/* Big Score Circle & Metric Summary */}
       <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-        <div className="relative w-20 h-20 rounded-full bg-[#FAF6EE] border-4 border-[#34D399] flex flex-col items-center justify-center shrink-0">
-          <span className="text-2xl font-black text-[#231A12] leading-none">{data.compositeScore}</span>
+        <div
+          className={`relative w-20 h-20 rounded-full bg-[#FAF6EE] border-4 flex flex-col items-center justify-center shrink-0 ${
+            !hasSample ? 'border-[#D7C7B2]' : data.passed ? 'border-[#34D399]' : 'border-[#F59E0B]'
+          }`}
+        >
+          <span className="text-2xl font-black text-[#231A12] leading-none">
+            {hasSample ? data.compositeScore : '--'}
+          </span>
           <span className="text-[9px] font-bold text-[#8C7760]">/ 90</span>
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <h4 className="text-xs font-black text-[#231A12]">Pearson Academic Concordance</h4>
           <p className="text-[11px] text-[#5C4A38] leading-snug">
             {data.examinerNotes}
           </p>
+          {hasSample && typeof data.wpm === 'number' && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <span className="px-2 py-0.5 rounded-full bg-[#FAF4E8] border border-[#EADBCE] text-[10px] font-bold text-[#5C4A38]">
+                {data.wpm} WPM
+              </span>
+              {typeof data.activeSpeechSec === 'number' && typeof data.durationSec === 'number' && (
+                <span className="px-2 py-0.5 rounded-full bg-[#FAF4E8] border border-[#EADBCE] text-[10px] font-bold text-[#5C4A38]">
+                  Aktif {data.activeSpeechSec}d / {data.durationSec}d
+                </span>
+              )}
+              {typeof data.phonationRatio === 'number' && (
+                <span className="px-2 py-0.5 rounded-full bg-[#FAF4E8] border border-[#EADBCE] text-[10px] font-bold text-[#5C4A38]">
+                  Fonasi {Math.round(data.phonationRatio * 100)}%
+                </span>
+              )}
+              {typeof data.pauseCount === 'number' && (
+                <span className="px-2 py-0.5 rounded-full bg-[#FAF4E8] border border-[#EADBCE] text-[10px] font-bold text-[#5C4A38]">
+                  Jeda &ge;0.7d: {data.pauseCount}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -1881,26 +1976,35 @@ export const PteScorecardCanvas: React.FC<{
           <div>
             <div className="flex justify-between text-[11px] mb-1">
               <span className="text-[#231A12]">Oral Fluency (Kelancaran Irama)</span>
-              <span className="font-bold text-[#B45309]">{data.fluencyScore} / 5.0</span>
+              <span className="font-bold text-[#B45309]">
+                {hasSample ? `${data.fluencyScore} / 5.0` : '-- / 5.0'}
+              </span>
             </div>
             <div className="w-full h-2 rounded-full bg-[#FAF4E8] overflow-hidden">
               <div
                 className="h-full rounded-full bg-[#B45309]"
-                style={{ width: `${(data.fluencyScore / 5.0) * 100}%` }}
+                style={{ width: `${hasSample ? (data.fluencyScore / 5.0) * 100 : 0}%` }}
               />
             </div>
+            {hasSample && data.fluencyReasons && data.fluencyReasons.length > 0 && (
+              <p className="mt-1 text-[10px] text-[#78614A] leading-snug">
+                {data.fluencyReasons.slice(0, 3).join(' • ')}
+              </p>
+            )}
           </div>
 
           {/* Pronunciation */}
           <div>
             <div className="flex justify-between text-[11px] mb-1">
               <span className="text-[#231A12]">Pronunciation (Kejelasan Lafal)</span>
-              <span className="font-bold text-[#10B981]">{data.pronunciationScore} / 5.0</span>
+              <span className="font-bold text-[#10B981]">
+                {hasSample ? `${data.pronunciationScore} / 5.0` : '-- / 5.0'}
+              </span>
             </div>
             <div className="w-full h-2 rounded-full bg-[#FAF4E8] overflow-hidden">
               <div
                 className="h-full rounded-full bg-[#10B981]"
-                style={{ width: `${(data.pronunciationScore / 5.0) * 100}%` }}
+                style={{ width: `${hasSample ? (data.pronunciationScore / 5.0) * 100 : 0}%` }}
               />
             </div>
           </div>
@@ -1909,12 +2013,14 @@ export const PteScorecardCanvas: React.FC<{
           <div>
             <div className="flex justify-between text-[11px] mb-1">
               <span className="text-[#231A12]">Content (Kelengkapan Informasi)</span>
-              <span className="font-bold text-[#3B82F6]">{data.contentScore} / 3.0</span>
+              <span className="font-bold text-[#3B82F6]">
+                {hasSample ? `${data.contentScore} / 3.0` : '-- / 3.0'}
+              </span>
             </div>
             <div className="w-full h-2 rounded-full bg-[#FAF4E8] overflow-hidden">
               <div
                 className="h-full rounded-full bg-[#3B82F6]"
-                style={{ width: `${(data.contentScore / 3.0) * 100}%` }}
+                style={{ width: `${hasSample ? (data.contentScore / 3.0) * 100 : 0}%` }}
               />
             </div>
           </div>
@@ -1972,6 +2078,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   externalQuizSeed,
   initialMinimized,
   cefrLevel = 'B1',
+  latestPteDiagnostic = null,
 }) => {
   const [boardState, setBoardState] = useState<DynamicBoardState | null>(null);
   const [quizMode, setQuizMode] = useState<WorkbenchQuizMode>(forcedExerciseMode || 'multiple_choice');
@@ -2056,7 +2163,14 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     const hasRich = hasRichDynamicAction(effectiveAction) || Boolean(focusType?.startsWith('pte_'));
 
     if (hasRich) {
-      const derived = deriveContextualPedagogicalBoard(effectiveAction, query, targetLang, locale, quizSeed);
+      const derived = deriveContextualPedagogicalBoard(
+        effectiveAction,
+        query,
+        targetLang,
+        locale,
+        quizSeed,
+        latestPteDiagnostic
+      );
       setBoardState(derived);
       setIsReady(true);
       return;
@@ -2065,13 +2179,20 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     setIsReady(false);
     const delayMs = isGeneratingTopic ? 5500 : 1800;
     const timer = setTimeout(() => {
-      const derived = deriveContextualPedagogicalBoard(effectiveAction, query, targetLang, locale, quizSeed);
+      const derived = deriveContextualPedagogicalBoard(
+        effectiveAction,
+        query,
+        targetLang,
+        locale,
+        quizSeed,
+        latestPteDiagnostic
+      );
       setBoardState(derived);
       setIsReady(true);
     }, delayMs);
 
     return () => clearTimeout(timer);
-  }, [isOpen, currentKey, topicTitle, focusType, patternFormula, sampleTarget, uiAction, targetLang, locale, isGeneratingTopic, quizSeed]);
+  }, [isOpen, currentKey, topicTitle, focusType, patternFormula, sampleTarget, uiAction, targetLang, locale, isGeneratingTopic, quizSeed, latestPteDiagnostic]);
 
   // Handler Suara Guru
   useEffect(() => {

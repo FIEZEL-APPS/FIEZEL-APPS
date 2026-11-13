@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-11-12T12:19:37.865Z",
+  "generatedAt": "2026-11-13T15:04:32.390Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -227,23 +227,23 @@
       "budget": 16,
       "sample": [
         {
-          "line": 159,
+          "line": 169,
           "text": "1. Kosakata"
         },
         {
-          "line": 187,
+          "line": 197,
           "text": "🔊 Suara"
         },
         {
-          "line": 192,
+          "line": 202,
           "text": "Kosakata Inti Pelajaran"
         },
         {
-          "line": 249,
+          "line": 274,
           "text": "Jawaban Tepat!"
         },
         {
-          "line": 311,
+          "line": 346,
           "text": "Misi Percakapan Murid:"
         }
       ]

@@ -166,19 +166,21 @@
   }
 
   /**
-   * Counts filler hesitations ("um", "uh", "er", "emm") and immediate word stutters ("the the")
-   * that Pearson Oral Fluency penalizes.
+   * Counts filler hesitations ("um", "uh", "er", "emm"), hyphen false starts,
+   * and immediate word stutters ("the the") that Pearson Oral Fluency penalizes.
    * @param {string} text
    * @returns {number}
    */
   function countSpeechDisfluencies(text) {
     var raw = String(text || '').toLowerCase();
     if (!raw) return 0;
-    var fillerMatches = raw.match(/\b(um+|uh+|er+|ah+|emm+|hmm+|you know)\b/g);
+    var fillerMatches = raw.match(/\b(um+|uh+|er+|ah+|emm+|ehh+|hmm+|ano|eto|you know)\b/g);
     var count = fillerMatches ? fillerMatches.length : 0;
-    var rawTokens = raw.replace(/[^a-z0-9'\s]/g, ' ').split(/\s+/).filter(Boolean);
+    var falseStartMatches = raw.match(/(?:^|\s)[a-z]{1,4}-(?=\s|$)/g);
+    if (falseStartMatches) count += falseStartMatches.length;
+    var rawTokens = raw.replace(/[^a-z0-9\x27\s]/g, ' ').split(/\s+/).filter(Boolean);
     for (var i = 1; i < rawTokens.length; i++) {
-      if (rawTokens[i] === rawTokens[i - 1] && rawTokens[i].length >= 2) {
+      if (rawTokens[i] === rawTokens[i - 1] && (rawTokens[i].length >= 2 || rawTokens[i] === 'i')) {
         count++;
       }
     }
@@ -186,35 +188,221 @@
   }
 
   /**
-   * Oral Fluency Heuristic (Pearson 0–5 scale).
-   * @param {number} durationSec - Actual duration of student speech
-   * @param {number} wordCount - Number of recognized speech tokens
-   * @param {number} pausesCount - Number of detected pauses > 2.0s
-   * @param {object} [extra] - Optional { disfluencyCount }
-   * @returns {{ score: number, wpm: number, label: string, disfluencyCount: number }}
+   * Counts explicit verbal self-corrections / restarts ("sorry", "i mean", "no wait").
+   * Pearson Academic heavily penalizes restarting mid-sentence.
+   * @param {string} text
+   * @returns {number}
+   */
+  function countSelfCorrections(text) {
+    var raw = String(text || '').toLowerCase();
+    if (!raw) return 0;
+    var matches = raw.match(/\b(sorry|i mean|no wait|wait no|excuse me|or rather|actually no)\b/g);
+    return matches ? matches.length : 0;
+  }
+
+  /**
+   * Computes a multi-factor continuous rate curve (0–5 scale) peaked at Pearson's
+   * optimal natural speech cadence (115–155 WPM).
+   * @param {number} wpm
+   * @returns {number}
+   */
+  function computeFluencyRatePoints(wpm) {
+    if (wpm >= 115 && wpm <= 155) return 5.0;
+    if (wpm >= 95 && wpm < 115) return 3.60 + ((wpm - 95) / 20) * 1.10;
+    if (wpm >= 80 && wpm < 95) return 2.60 + ((wpm - 80) / 15) * 0.85;
+    if (wpm >= 60 && wpm < 80) return 1.65 + ((wpm - 60) / 20) * 0.80;
+    if (wpm < 60) return Math.max(0.85, 0.85 + (wpm / 60) * 0.59);
+    if (wpm > 155 && wpm <= 170) return 4.45 - ((wpm - 155) / 15) * 0.60;
+    if (wpm > 170 && wpm <= 190) return 3.45 - ((wpm - 170) / 20) * 0.70;
+    return Math.max(1.25, 2.40 - ((wpm - 190) / 45) * 1.15);
+  }
+
+  /**
+   * Extracts structured pause buckets & rhythm metrics from raw acoustic telemetry.
+   */
+  function resolvePauseAndBurstTelemetry(wordCount, pausesCount, extra) {
+    var ex = extra || {};
+    var pauseDurs = Array.isArray(ex.pauseDurationsMs) ? ex.pauseDurationsMs : null;
+    var hasBuckets =
+      typeof ex.shortPausesCount === 'number' ||
+      typeof ex.hesitationPausesCount === 'number' ||
+      typeof ex.longPausesCount === 'number';
+
+    var shortPauses = 0;
+    var hesitationPauses = 0;
+    var longPauses = 0;
+    var maxPauseMs = typeof ex.maxPauseMs === 'number' ? Math.max(0, ex.maxPauseMs) : 0;
+
+    if (hasBuckets) {
+      shortPauses = Math.max(0, Number(ex.shortPausesCount) || 0);
+      hesitationPauses = Math.max(0, Number(ex.hesitationPausesCount) || 0);
+      longPauses = Math.max(0, Number(ex.longPausesCount) || 0);
+    } else if (pauseDurs && pauseDurs.length > 0) {
+      for (var pi = 0; pi < pauseDurs.length; pi++) {
+        var pd = Number(pauseDurs[pi]) || 0;
+        if (pd > maxPauseMs) maxPauseMs = pd;
+        if (pd >= 2000) longPauses++;
+        else if (pd >= 700) hesitationPauses++;
+        else if (pd >= 250) shortPauses++;
+      }
+    }
+
+    var isStructured = Boolean(hasBuckets || pauseDurs !== null);
+    var clauseBudget = Math.max(1, Math.floor(wordCount / 11));
+    var excessShort = isStructured ? Math.max(0, shortPauses - clauseBudget) : 0;
+    var rawPauses = Math.max(0, Number(pausesCount) || 0);
+    var noticeablePauses = isStructured ? (hesitationPauses + longPauses) : rawPauses;
+
+    var rhythmScore = 1.0;
+    var rhythmPenalty = 0;
+    var bursts = Array.isArray(ex.burstDurationsMs)
+      ? ex.burstDurationsMs.filter(function (b) { return typeof b === 'number' && isFinite(b) && b > 0; })
+      : [];
+    if (bursts.length >= 2) {
+      var sumB = 0;
+      var microCount = 0;
+      for (var bi = 0; bi < bursts.length; bi++) {
+        sumB += bursts[bi];
+        if (bursts[bi] < 350) microCount++;
+      }
+      var meanB = sumB / bursts.length;
+      var varB = 0;
+      for (var bj = 0; bj < bursts.length; bj++) {
+        var diffB = bursts[bj] - meanB;
+        varB += diffB * diffB;
+      }
+      var cv = meanB > 0 ? Math.sqrt(varB / bursts.length) / meanB : 0;
+      var chopRatio = (bursts.length >= 3) ? (microCount / bursts.length) : 0;
+      rhythmScore = Math.max(0.25, Math.min(1.0, 1.0 - Math.max(0, cv - 0.45) * 0.45 - chopRatio * 0.45));
+      rhythmPenalty = (1.0 - rhythmScore) * 1.1;
+    }
+
+    return {
+      isStructured: isStructured,
+      shortPauses: shortPauses,
+      hesitationPauses: hesitationPauses,
+      longPauses: longPauses,
+      excessShort: excessShort,
+      noticeablePauses: noticeablePauses,
+      maxPauseMs: Math.round(maxPauseMs),
+      rhythmScore: Math.round(rhythmScore * 100) / 100,
+      rhythmPenalty: rhythmPenalty
+    };
+  }
+
+  /**
+   * Multi-factor Acoustic-Temporal Oral Fluency Engine (Pearson 0–5 & 10–90 scales).
+   * Evaluates net speech rate (WPM), phonation time ratio, intra-utterance pause tiers,
+   * burst rhythm stability, fillers/stutters, and self-corrections without hangover inflation.
+   * @param {number} durationSec - Active utterance span duration (onset to last vocal offset)
+   * @param {number} wordCount - Recognized speech word count
+   * @param {number} pausesCount - Noticeable mid-utterance pauses
+   * @param {object} [extra] - Optional acoustic telemetry & disfluency metadata
    */
   function evaluateOralFluency(durationSec, wordCount, pausesCount, extra) {
-    var dur = Math.max(1, Number(durationSec) || 0);
+    var ex = extra || {};
+    var minDur = ex.isAcousticTiming ? 0.6 : 1;
+    var dur = Math.max(minDur, Number(durationSec) || 0);
     var count = Math.max(0, Number(wordCount) || 0);
-    var pauses = Math.max(0, Number(pausesCount) || 0);
-    var disfluencies = (extra && typeof extra.disfluencyCount === 'number') ? Math.max(0, extra.disfluencyCount) : 0;
-    var effectivePauses = pauses + Math.floor(disfluencies / 2);
-    var wpm = Math.round((count / dur) * 60);
+    var disfluencies = typeof ex.disfluencyCount === 'number' ? Math.max(0, ex.disfluencyCount) : 0;
+    var selfCorrections = typeof ex.selfCorrectionCount === 'number' ? Math.max(0, ex.selfCorrectionCount) : 0;
+    var measSource = ex.isManual
+      ? 'manual_text'
+      : (ex.measurementSource || (typeof ex.activeSpeechSec === 'number' ? 'acoustic_vad' : 'timer_measured'));
+    var isEst = Boolean(ex.isEstimatedTiming || ex.isManual);
 
-    // Target Pearson Cadence: 110 - 150 WPM
-    var score = 5;
-    if (wpm >= 115 && wpm <= 155 && effectivePauses === 0 && disfluencies === 0) {
-      score = 5; // Native-like / Smooth
-    } else if ((wpm >= 95 && wpm <= 170) && effectivePauses <= 1 && disfluencies <= 1) {
-      score = 4; // Advanced fluency
-    } else if ((wpm >= 80 && wpm <= 185) && effectivePauses <= 2) {
-      score = 3; // Intermediate / Target 42 benchmark
-    } else if (wpm >= 60 && effectivePauses <= 3) {
-      score = 2; // Limited fluency / hesitant
-    } else if (count > 0) {
-      score = 1; // Disfluent
+    if (count === 0) {
+      return {
+        score: 0,
+        exactScore: 0,
+        fluency90: 10,
+        wpm: 0,
+        articulationWpm: 0,
+        label: 'No speech detected',
+        disfluencyCount: disfluencies,
+        selfCorrectionCount: selfCorrections,
+        pausesCount: 0,
+        shortPausesCount: 0,
+        hesitationPausesCount: 0,
+        longPausesCount: 0,
+        maxPauseMs: 0,
+        activeSpeechSec: 0,
+        spanDurationSec: Math.round(dur * 10) / 10,
+        phonationRatio: 0,
+        rhythmScore: 0,
+        measurementSource: measSource,
+        isEstimatedTiming: isEst,
+        reasons: ['Tidak ada kata yang terdeteksi']
+      };
+    }
+
+    var hasActive = typeof ex.activeSpeechSec === 'number' && isFinite(ex.activeSpeechSec) && ex.activeSpeechSec > 0;
+    var activeSec = hasActive ? Math.min(dur, Math.max(0.35, ex.activeSpeechSec)) : dur;
+    var phonationRatio = typeof ex.phonationRatio === 'number' && isFinite(ex.phonationRatio)
+      ? Math.max(0, Math.min(1, ex.phonationRatio))
+      : (hasActive ? Math.min(1, activeSec / dur) : 1);
+    var wpm = Math.round((count / dur) * 60);
+    var articulationWpm = Math.round((count / activeSec) * 60);
+
+    var ratePts = computeFluencyRatePoints(wpm);
+    var tb = resolvePauseAndBurstTelemetry(count, pausesCount, ex);
+    var pausePenalty = tb.isStructured
+      ? (tb.excessShort * 0.22 + tb.hesitationPauses * 0.68 + tb.longPauses * 1.40)
+      : (tb.noticeablePauses * 0.85);
+    var disfPenalty = disfluencies * 0.55 + selfCorrections * 0.95;
+    var phonPenalty = (hasActive && dur >= 3.0 && phonationRatio < 0.54)
+      ? Math.min(1.25, (0.54 - phonationRatio) * 3.0)
+      : 0;
+
+    var exactScore = ratePts - pausePenalty - disfPenalty - phonPenalty - tb.rhythmPenalty;
+    exactScore = Math.max(1.0, Math.min(5.0, exactScore));
+
+    if (count < 4) {
+      exactScore = Math.min(exactScore, count <= 2 ? 1.5 : 2.2);
+    }
+    var hasNoticeableDisruption =
+      disfluencies > 0 || selfCorrections > 0 || tb.noticeablePauses > 0;
+    if (hasNoticeableDisruption && exactScore >= 4.5) {
+      exactScore = 4.4;
+    }
+
+    exactScore = Math.round(exactScore * 10) / 10;
+    var score = Math.min(5, Math.max(1, Math.round(exactScore)));
+    var fluency90 = Math.round(10 + ((exactScore - 1.0) / 4.0) * 80);
+
+    var reasons = [];
+    if (isEst) {
+      reasons.push('Input teks manual — kecepatan & jeda tidak terukur secara akustik');
     } else {
-      score = 0;
+      if (wpm < 95) reasons.push('Tempo lambat (' + wpm + ' WPM; target 115–155)');
+      else if (wpm > 165) reasons.push('Terlalu cepat/terburu-buru (' + wpm + ' WPM)');
+      else if (wpm >= 115 && wpm <= 155) reasons.push('Tempo optimal (' + wpm + ' WPM)');
+    }
+    if (tb.longPauses > 0) {
+      reasons.push(tb.longPauses + ' jeda panjang >=2d (maks ' + (tb.maxPauseMs / 1000).toFixed(1) + 'd)');
+    }
+    if (tb.hesitationPauses > 0) {
+      reasons.push(tb.hesitationPauses + ' jeda ragu 0.7–2.0d');
+    } else if (!tb.isStructured && tb.noticeablePauses > 0) {
+      reasons.push(tb.noticeablePauses + ' jeda terdeteksi');
+    }
+    if (tb.excessShort > 0) {
+      reasons.push(tb.shortPauses + ' jeda pendek sering (ritme terputus)');
+    }
+    if (phonPenalty >= 0.2) {
+      reasons.push('Rasio suara aktif rendah (' + Math.round(phonationRatio * 100) + '%)');
+    }
+    if (tb.rhythmPenalty >= 0.25) {
+      reasons.push('Irama terpotong-potong (stabilitas ' + Math.round(tb.rhythmScore * 100) + '%)');
+    }
+    if (disfluencies > 0) {
+      reasons.push(disfluencies + ' filler/pengulangan kata');
+    }
+    if (selfCorrections > 0) {
+      reasons.push(selfCorrections + ' koreksi diri (self-correction)');
+    }
+    if (reasons.length === 1 && !isEst && score === 5) {
+      reasons.push('Aliran kalimat mulus tanpa jeda ragu');
     }
 
     var label = 'Native-like';
@@ -223,8 +411,51 @@
     if (score === 2) label = 'Hesitant';
     if (score === 1) label = 'Disfluent';
     if (score === 0) label = 'No speech detected';
+    if (ex.isManual) label = 'Manual Text (Non-Acoustic)';
 
-    return { score: score, wpm: wpm, label: label, disfluencyCount: disfluencies };
+    return {
+      score: score,
+      exactScore: exactScore,
+      fluency90: fluency90,
+      wpm: wpm,
+      articulationWpm: articulationWpm,
+      label: label,
+      disfluencyCount: disfluencies,
+      selfCorrectionCount: selfCorrections,
+      pausesCount: tb.noticeablePauses,
+      shortPausesCount: tb.shortPauses,
+      hesitationPausesCount: tb.hesitationPauses,
+      longPausesCount: tb.longPauses,
+      maxPauseMs: tb.maxPauseMs,
+      activeSpeechSec: Math.round(activeSec * 10) / 10,
+      spanDurationSec: Math.round(dur * 10) / 10,
+      phonationRatio: Math.round(phonationRatio * 100) / 100,
+      rhythmScore: tb.rhythmScore,
+      measurementSource: measSource,
+      isEstimatedTiming: isEst,
+      reasons: reasons
+    };
+  }
+
+  function buildFluencyExtra(m, transcript, hasMeasuredDur) {
+    var metricsObj = m || {};
+    var hasAcoustic = typeof metricsObj.activeSpeechSec === 'number' && metricsObj.activeSpeechSec > 0;
+    return {
+      disfluencyCount: countSpeechDisfluencies(transcript),
+      selfCorrectionCount: countSelfCorrections(transcript),
+      activeSpeechSec: metricsObj.activeSpeechSec,
+      phonationRatio: metricsObj.phonationRatio,
+      shortPausesCount: metricsObj.shortPausesCount,
+      hesitationPausesCount: metricsObj.hesitationPausesCount,
+      longPausesCount: metricsObj.longPausesCount,
+      maxPauseMs: metricsObj.maxPauseMs,
+      pauseDurationsMs: metricsObj.pauseDurationsMs,
+      burstDurationsMs: metricsObj.burstDurationsMs,
+      isAcousticTiming: hasAcoustic || metricsObj.measurementSource === 'acoustic_vad',
+      measurementSource: metricsObj.measurementSource,
+      isManual: Boolean(metricsObj.isManual),
+      isEstimatedTiming: Boolean(metricsObj.isEstimatedTiming || metricsObj.isManual || !hasMeasuredDur)
+    };
   }
 
   /**
@@ -288,11 +519,12 @@
       contentScore = 0;
     }
 
+    var hasMeasuredDur = typeof m.durationSec === 'number' && isFinite(m.durationSec) && m.durationSec > 0;
     var fluency = evaluateOralFluency(
-      m.durationSec || (hypTokens.length * 0.45),
+      hasMeasuredDur ? m.durationSec : (hypTokens.length * 0.45),
       hypTokens.length,
       m.pausesCount || 0,
-      { disfluencyCount: countSpeechDisfluencies(studentTranscript) }
+      buildFluencyExtra(m, studentTranscript, hasMeasuredDur)
     );
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
@@ -301,12 +533,13 @@
     var totalRaw = 0;
     var pearsonEquivalent = 10;
     if (contentScore === 0 || hypTokens.length === 0) {
-      fluency = { score: 0, wpm: 0, label: 'No speech detected / Mismatched' };
+      fluency = { score: 0, exactScore: 0, fluency90: 10, wpm: 0, label: 'No speech detected / Mismatched', reasons: ['Ucapan tidak cocok atau kosong'] };
       pronunciation = { score: 0, confidence: 0, label: 'Unintelligible' };
       totalRaw = 0;
       pearsonEquivalent = 10;
     } else if (contentScore === 1) {
       fluency.score = Math.min(fluency.score, 3);
+      if (typeof fluency.exactScore === 'number') fluency.exactScore = Math.min(fluency.exactScore, 3.0);
       pronunciation.score = Math.min(pronunciation.score, 3);
       totalRaw = contentScore + fluency.score + pronunciation.score;
       pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 50); // Capped below Target 42
@@ -371,11 +604,12 @@
       contentScore = 0;
     }
 
+    var hasMeasuredRsDur = typeof m.durationSec === 'number' && isFinite(m.durationSec) && m.durationSec > 0;
     var fluency = evaluateOralFluency(
-      m.durationSec || (hypTokens.length * 0.4),
+      hasMeasuredRsDur ? m.durationSec : (hypTokens.length * 0.4),
       hypTokens.length,
       m.pausesCount || 0,
-      { disfluencyCount: countSpeechDisfluencies(studentTranscript) }
+      buildFluencyExtra(m, studentTranscript, hasMeasuredRsDur)
     );
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
@@ -383,13 +617,14 @@
     var totalRaw = 0;
     var pearsonEquivalent = 10;
     if (contentScore === 0 || hypTokens.length === 0) {
-      fluency = { score: 0, wpm: 0, label: 'No speech detected / Mismatched' };
+      fluency = { score: 0, exactScore: 0, fluency90: 10, wpm: 0, label: 'No speech detected / Mismatched', reasons: ['Ucapan tidak cocok atau kosong'] };
       pronunciation = { score: 0, confidence: 0, label: 'Unintelligible' };
       totalRaw = 0;
       pearsonEquivalent = 10;
     } else if (contentScore === 1) {
       // Partial content (<50%): cap fluency and pronunciation to max 3
       fluency.score = Math.min(fluency.score, 3);
+      if (typeof fluency.exactScore === 'number') fluency.exactScore = Math.min(fluency.exactScore, 3.0);
       pronunciation.score = Math.min(pronunciation.score, 3);
       totalRaw = contentScore + fluency.score + pronunciation.score;
       pearsonEquivalent = Math.round(10 + (totalRaw / 13) * 50); // Capped around 25-37 (below Target 42 benchmark)
@@ -538,23 +773,25 @@
       contentScore = 1;
     }
 
+    var hasMeasuredDiDur = typeof m.durationSec === 'number' && isFinite(m.durationSec) && m.durationSec > 0;
     var fluency = evaluateOralFluency(
       duration,
       hypTokens.length,
       m.pausesCount || 0,
-      { disfluencyCount: countSpeechDisfluencies(studentTranscript) }
+      buildFluencyExtra(m, studentTranscript, hasMeasuredDiDur)
     );
     var pronunciation = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
     var totalRaw = 0;
     var pearsonEquivalent = 10;
     if (contentScore === 0 || hypTokens.length === 0) {
-      fluency = { score: 0, wpm: 0, label: 'No speech detected / Mismatched' };
+      fluency = { score: 0, exactScore: 0, fluency90: 10, wpm: 0, label: 'No speech detected / Mismatched', reasons: ['Ucapan tidak cocok atau kosong'] };
       pronunciation = { score: 0, confidence: 0, label: 'Unintelligible' };
       totalRaw = 0;
       pearsonEquivalent = 10;
     } else if (hypTokens.length < 5 || duration < 10) {
-      fluency.score = 1;
+      fluency.score = Math.min(fluency.score, 1);
+      if (typeof fluency.exactScore === 'number') fluency.exactScore = Math.min(fluency.exactScore, 1.5);
       pronunciation.score = 1;
       totalRaw = contentScore + fluency.score + pronunciation.score;
       pearsonEquivalent = Math.round(10 + (totalRaw / 15) * 30); // ~16-20 (insufficient speech)
@@ -1233,10 +1470,10 @@
     }
 
     var m = metrics || {};
+    var hasMeasuredRlDur = typeof m.durationSec === 'number' && isFinite(m.durationSec) && m.durationSec > 0;
     var durationSec = Math.max(1, Number(m.durationSec) || (userTokens.length * 0.45));
     var pausesCount = Number(m.pausesCount) || 0;
-    var disfluencies = countSpeechDisfluencies(transcript);
-    var fluencyObj = evaluateOralFluency(durationSec, userTokens.length, pausesCount, { disfluencyCount: disfluencies });
+    var fluencyObj = evaluateOralFluency(durationSec, userTokens.length, pausesCount, buildFluencyExtra(m, transcript, hasMeasuredRlDur));
     var pronObj = evaluatePronunciation(m.confidenceAvg != null ? m.confidenceAvg : 0.85);
 
     var fluencyScore = typeof m.fluency === 'number'
@@ -1249,7 +1486,7 @@
     if (userTokens.length === 0 || contentScore === 0) {
       fluencyScore = 0;
       pronunciationScore = 0;
-      fluencyObj = { score: 0, wpm: 0, label: 'No speech detected / Mismatched', disfluencyCount: 0 };
+      fluencyObj = { score: 0, exactScore: 0, fluency90: 10, wpm: 0, label: 'No speech detected / Mismatched', disfluencyCount: 0, reasons: ['Ucapan tidak cocok atau kosong'] };
       pronObj = { score: 0, confidence: 0, label: 'Unintelligible' };
     } else {
       fluencyObj.score = fluencyScore;
@@ -1460,6 +1697,7 @@
     charLevenshtein: charLevenshtein,
     tokenAlignment: tokenAlignment,
     countSpeechDisfluencies: countSpeechDisfluencies,
+    countSelfCorrections: countSelfCorrections,
     evaluateOralFluency: evaluateOralFluency,
     evaluatePronunciation: evaluatePronunciation,
     evaluateReadAloud: evaluateReadAloud,

@@ -129,7 +129,16 @@
   var _activeStep = 1;
   var _quizState = {};
 
+  function stopMandarinLessonVoice() {
+    try {
+      if (window.FiezelGrammarUpgrade && typeof window.FiezelGrammarUpgrade.stopActiveVoice === 'function') {
+        window.FiezelGrammarUpgrade.stopActiveVoice();
+      }
+    } catch (_) {}
+  }
+
   function openLessonPlayer(lessonId, initialStep) {
+    stopMandarinLessonVoice();
     var currModule = (typeof FiezelMandarinCurriculum !== 'undefined') ? FiezelMandarinCurriculum : null;
     if (!currModule) return;
 
@@ -144,6 +153,7 @@
   }
 
   function setLessonStep(stepNum) {
+    stopMandarinLessonVoice();
     if (stepNum < 1) stepNum = 1;
     if (stepNum > 5) stepNum = 5;
     _activeStep = stepNum;
@@ -234,19 +244,35 @@
       var quizzes = l.quiz || [];
       var quizHtml = quizzes.map(function (q, qIdx) {
         var answered = _quizState[qIdx];
+        var isReorder = (q.type === 'reorder');
         var isAnswered = (answered !== undefined);
-        var isCorrect = isAnswered && (answered === q.answerIndex);
-        var chosenWrong = (!isCorrect && isAnswered && q.options && q.distractors)
-          ? q.distractors.find(function (d) { return d.option === q.options[answered]; })
-          : null;
-        var whyFailsText = chosenWrong ? chosenWrong.whyFailsId : 'Pilihan ini belum tepat untuk konteks kalimat.';
-        var misconceptionText = chosenWrong ? chosenWrong.misconceptionId : '';
+        var isCorrect = false;
+        var chosenWrong = null;
+        var whyFailsText = 'Pilihan ini belum tepat untuk konteks kalimat.';
+        var misconceptionText = '';
+
+        if (isReorder) {
+          isCorrect = Boolean(isAnswered && answered && answered.isCorrect);
+          if (isAnswered && !isCorrect) {
+            var userBuilt = answered && answered.userText ? ('Susunanmu ("' + answered.userText + '") belum sesuai urutan Mandarin.') : '';
+            whyFailsText = userBuilt || 'Urutan kata Mandarin ini belum sesuai pola Subjek + Waktu + Tempat + Kata Kerja + Objek.';
+            misconceptionText = 'Perhatikan struktur SOV/Waktu-Tempat sebelum verba.';
+          }
+        } else {
+          isCorrect = isAnswered && (answered === q.answerIndex);
+          chosenWrong = (!isCorrect && isAnswered && q.options && q.distractors)
+            ? q.distractors.find(function (d) { return d.option === q.options[answered]; })
+            : null;
+          whyFailsText = chosenWrong ? chosenWrong.whyFailsId : 'Pilihan ini belum tepat untuk konteks kalimat.';
+          misconceptionText = chosenWrong ? chosenWrong.misconceptionId : '';
+        }
 
         var tutorFeedback = '';
         if (isAnswered) {
           if (isCorrect) {
             tutorFeedback = '<div style="margin-top:10px;font-size:12px;color:#16A34A;background:#F0FDF4;border:1px solid #BBF7D0;padding:10px 12px;border-radius:10px;">'
               + '<div style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:12.5px;margin-bottom:3px;"><span>🌟</span> ' + (typeof FiezelI18n !== 'undefined' && FiezelI18n.t ? FiezelI18n.t('quiz.verdict-correct') : 'Jawaban Tepat!') + '</div>'
+              + (isReorder && q.sentenceHz ? '<div style="font-weight:800;font-family:var(--fz-font-cjk);margin-bottom:4px;">' + esc(q.sentenceHz) + '</div>' : '')
               + '<div>' + esc(q.explanation || 'Susunan dan pilihan jawaban sudah tepat!') + '</div>'
               + '</div>';
           } else {
@@ -267,23 +293,32 @@
           }
         }
 
+        var interactiveBody = '';
+        if (q.type === 'cloze') {
+          interactiveBody = '<div style="font-size:15px;font-weight:800;color:#BE123C;margin-bottom:10px;font-family:var(--fz-font-cjk);">' + esc(q.sentence || '') + '</div>'
+            + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
+            + (q.options || []).map(function (opt, oIdx) {
+              var isCor = (oIdx === q.answerIndex);
+              var isSel = (answered === oIdx);
+              var bg = isSel ? (isCor ? '#DCFCE7' : '#FEE2E2') : '#F8FAFC';
+              var border = isSel ? (isCor ? '#16A34A' : '#DC2626') : '#E2E8F0';
+              return '<button type="button" style="background:' + bg + ';border:1px solid ' + border + ';border-radius:8px;padding:8px;font-weight:700;font-size:13px;cursor:pointer;" onclick="FiezelMandarinUI.submitQuizAnswer(' + qIdx + ', ' + oIdx + ')">'
+                + esc(opt)
+                + '</button>';
+            }).join('')
+            + '</div>';
+        } else {
+          if (isCorrect) {
+            interactiveBody = '<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px;font-size:15px;font-weight:800;color:#166534;font-family:var(--fz-font-cjk);">' + esc(q.sentenceHz || ((q.correctTokens || q.tokens || []).join(' '))) + '</div>';
+          } else {
+            interactiveBody = '<div class="mandarin-reorder-mount" data-qidx="' + qIdx + '" style="margin-top:4px;"></div>';
+          }
+        }
+
         return '<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.02);">'
-          + '<div style="font-size:11px;font-weight:800;color:#BE123C;margin-bottom:4px;">SOAL #' + (qIdx + 1) + ' · ' + (q.type === 'reorder' ? 'SUSUN KATA' : 'MELENGKAPI') + '</div>'
+          + '<div style="font-size:11px;font-weight:800;color:#BE123C;margin-bottom:4px;">SOAL #' + (qIdx + 1) + ' · ' + (isReorder ? 'SUSUN KATA' : 'MELENGKAPI') + '</div>'
           + '<div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:8px;">' + esc(q.prompt) + '</div>'
-          + (q.type === 'cloze'
-            ? '<div style="font-size:15px;font-weight:800;color:#BE123C;margin-bottom:10px;font-family:var(--fz-font-cjk);">' + esc(q.sentence || '') + '</div>'
-              + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
-              + (q.options || []).map(function (opt, oIdx) {
-                var isCor = (oIdx === q.answerIndex);
-                var isSel = (answered === oIdx);
-                var bg = isSel ? (isCor ? '#DCFCE7' : '#FEE2E2') : '#F8FAFC';
-                var border = isSel ? (isCor ? '#16A34A' : '#DC2626') : '#E2E8F0';
-                return '<button type="button" style="background:' + bg + ';border:1px solid ' + border + ';border-radius:8px;padding:8px;font-weight:700;font-size:13px;cursor:pointer;" onclick="FiezelMandarinUI.submitQuizAnswer(' + qIdx + ', ' + oIdx + ')">'
-                  + esc(opt)
-                  + '</button>';
-              }).join('')
-              + '</div>'
-            : '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px;font-size:14px;font-weight:700;color:#0F172A;font-family:var(--fz-font-cjk);">' + esc(q.sentenceHz || '') + '</div>')
+          + interactiveBody
           + tutorFeedback
           + '</div>';
       }).join('');
@@ -324,7 +359,7 @@
       + '</div>';
 
     var modalHtml = '<div class="skill-help-panel fz-mandarin-modal-content" style="max-width:560px;margin:auto;max-height:85vh;overflow-y:auto;padding:8px 4px;">'
-      + '<button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="Tutup"><i data-lucide="x"></i></button>'
+      + '<button type="button" class="modal-close-corner" onclick="(window.FiezelGrammarUpgrade&&window.FiezelGrammarUpgrade.stopActiveVoice&&window.FiezelGrammarUpgrade.stopActiveVoice());closeModal()" aria-label="Tutup"><i data-lucide="x"></i></button>'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
       + '<span style="font-size:10px;font-weight:800;background:#FFE4E6;color:#BE123C;padding:2px 8px;border-radius:6px;">LEVEL ' + l.level + ' · BAB ' + l.num + '</span>'
       + '<span style="font-size:11px;color:#64748B;font-weight:700;">⏱️ ' + esc(l.durationLabel) + ' · +' + l.exp + ' EXP</span>'
@@ -336,6 +371,42 @@
       + '</div>';
 
     if (typeof window.openModal === 'function') window.openModal(modalHtml);
+
+    if (step === 4 && typeof document !== 'undefined' && window.FiezelGrammarUpgrade && typeof window.FiezelGrammarUpgrade.renderTokenOrder === 'function') {
+      var mounts = document.querySelectorAll('.mandarin-reorder-mount[data-qidx]');
+      mounts.forEach(function (mountEl) {
+        var idx = Number(mountEl.getAttribute('data-qidx'));
+        var qObj = (l.quiz || [])[idx];
+        if (!qObj) return;
+        var correctToks = (Array.isArray(qObj.correctTokens) && qObj.correctTokens.length > 0)
+          ? qObj.correctTokens
+          : (Array.isArray(qObj.tokens) ? qObj.tokens : []);
+        var widget = window.FiezelGrammarUpgrade.renderTokenOrder(
+          {
+            tokens: correctToks,
+            distractors: Array.isArray(qObj.distractors) ? qObj.distractors : [],
+            targetLang: 'zh',
+            strictOrder: true
+          },
+          function (ok, details) {
+            _quizState[idx] = {
+              type: 'reorder',
+              isCorrect: Boolean(ok),
+              userText: (details && details.userText) || ''
+            };
+            try {
+              if (typeof window.updateMastery === 'function' && l.skill) {
+                window.updateMastery(l.skill, Boolean(ok), 3000);
+              }
+            } catch (_) {}
+            renderLessonPlayerModal();
+          },
+          { lang: 'zh' }
+        );
+        mountEl.innerHTML = '';
+        mountEl.appendChild(widget);
+      });
+    }
   }
 
   function submitQuizAnswer(qIdx, oIdx) {

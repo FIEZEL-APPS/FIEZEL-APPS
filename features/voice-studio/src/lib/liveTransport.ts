@@ -12,6 +12,10 @@ import {
 } from './liveCallHelper.ts';
 import { stripEmojisAndEmotWords, toPhoneticRomaji } from './japanesePhonetics.js';
 import { toPhoneticPinyin, containsHanzi, stripHanzi } from './mandarinPhonetics.ts';
+import {
+  evaluateConversationalOralFluency,
+  type TurnAcousticTelemetry,
+} from './braincore.ts';
 
 export type LiveTransportMode = 'ws-duplex' | 'turn-by-turn-fallback';
 
@@ -2929,12 +2933,24 @@ export function evaluateUtteranceClientSide(params: {
   scenario: CallScenario;
   targetLang: TargetLang;
   history?: Array<{ speaker: 'ai' | 'user'; text: string }>;
+  speakingDurationSec?: number;
+  inputMode?: 'voice' | 'typed' | 'quick_chip';
+  fluencyTelemetry?: Partial<TurnAcousticTelemetry> | null;
 }): FlexibleTurnEvaluationResult {
   const exact = params.text.trim();
   const lower = exact.toLowerCase();
   const { scenario, targetLang, history } = params;
   const scenarioId = scenario.id;
   const lastAiTurn = [...(history || [])].reverse().find((h) => h.speaker === 'ai');
+  const computeDynamicFluency = (isTurnOk: boolean): number =>
+    evaluateConversationalOralFluency({
+      text: exact,
+      targetLang,
+      durationSec: params.speakingDurationSec,
+      ok: isTurnOk,
+      inputMode: params.inputMode || (params.speakingDurationSec && params.speakingDurationSec > 0 ? 'voice' : 'typed'),
+      telemetry: params.fluencyTelemetry,
+    }).fluencyScore;
 
   if (targetLang === 'en') {
     const hasSubjectDrop =
@@ -3198,7 +3214,7 @@ export function evaluateUtteranceClientSide(params: {
         ok: false,
         accuracyScore: 48,
         grammarScore: 42,
-        fluencyScore: isTooShort ? 45 : 64,
+        fluencyScore: isTooShort ? Math.min(48, computeDynamicFluency(false)) : computeDynamicFluency(false),
         vocabUsageScore: isOffTopicOrGibberish ? 35 : 65,
         userExactTranscript: exact,
         misconceptionId,
@@ -3241,7 +3257,7 @@ export function evaluateUtteranceClientSide(params: {
       ok: true,
       accuracyScore: 94,
       grammarScore: 95,
-      fluencyScore: 91,
+      fluencyScore: computeDynamicFluency(true),
       vocabUsageScore: 92,
       userExactTranscript: exact,
       misconceptionId: null,
@@ -3308,7 +3324,7 @@ export function evaluateUtteranceClientSide(params: {
         ok: false,
         accuracyScore: 52,
         grammarScore: 46,
-        fluencyScore: 68,
+        fluencyScore: isTooShortZh ? Math.min(48, computeDynamicFluency(false)) : computeDynamicFluency(false),
         vocabUsageScore: 66,
         userExactTranscript: exact,
         misconceptionId,
@@ -3330,7 +3346,7 @@ export function evaluateUtteranceClientSide(params: {
       ok: true,
       accuracyScore: 94,
       grammarScore: 95,
-      fluencyScore: 92,
+      fluencyScore: computeDynamicFluency(true),
       vocabUsageScore: 92,
       userExactTranscript: exact,
       misconceptionId: null,
@@ -3517,7 +3533,7 @@ export function evaluateUtteranceClientSide(params: {
       ok: false,
       accuracyScore: 46,
       grammarScore: 40,
-      fluencyScore: isTooShortJa ? 45 : 58,
+      fluencyScore: isTooShortJa ? Math.min(46, computeDynamicFluency(false)) : computeDynamicFluency(false),
       vocabUsageScore: isGibberishJa ? 30 : 62,
       userExactTranscript: exact,
       misconceptionId,
@@ -3550,7 +3566,7 @@ export function evaluateUtteranceClientSide(params: {
     ok: true,
     accuracyScore: 95,
     grammarScore: 96,
-    fluencyScore: 92,
+    fluencyScore: computeDynamicFluency(true),
     vocabUsageScore: 94,
     userExactTranscript: exact,
     misconceptionId: null,
@@ -3895,6 +3911,9 @@ export interface TurnEvaluationParams {
   history: Array<{ speaker: 'ai' | 'user'; text: string }>;
   learnerDossier?: string;
   callMode?: 'tutor_coach' | 'casual_chat';
+  speakingDurationSec?: number;
+  inputMode?: 'voice' | 'typed' | 'quick_chip';
+  fluencyTelemetry?: Partial<TurnAcousticTelemetry> | null;
 }
 
 /**
@@ -3908,6 +3927,9 @@ export function evaluateTurnLocal(params: TurnEvaluationParams): FlexibleTurnEva
     scenario: params.scenario,
     targetLang: params.targetLang,
     history: params.history,
+    speakingDurationSec: params.speakingDurationSec,
+    inputMode: params.inputMode,
+    fluencyTelemetry: params.fluencyTelemetry,
   });
 }
 

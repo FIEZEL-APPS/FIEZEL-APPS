@@ -10,6 +10,14 @@
 
 import { float32At16kToPcm16Base64 } from './handyVad';
 
+export interface SileroFrameTelemetry {
+  frameMs: number;
+  isActiveVoice: boolean;
+  confirmedSpeech: boolean;
+  pSpeech: number;
+  rms: number;
+}
+
 export interface SileroVadGateCallbacks {
   isMicMuted: () => boolean;
   isAiPlaying: () => boolean;
@@ -18,6 +26,7 @@ export interface SileroVadGateCallbacks {
   onHumanBargeIn: () => void;
   onSpeechPcm16kBase64: (pcmBase64: string) => void;
   onSpeechEnded: () => void;
+  onFrameTelemetry?: (telemetry: SileroFrameTelemetry) => void;
 }
 
 interface GlobalVadNamespace {
@@ -243,6 +252,7 @@ export class SileroNeuralVadGate {
               (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
             // Natural pedagogical pause: ~450ms allows crisp real-time turn ending without cutting off words
             const endSilenceFrames = isMobile ? 14 : 15; // ~448ms mobile, ~480ms desktop
+            const isActiveVoiceFrame = pSpeech >= 0.40 && rms >= 0.0018;
             if (pSpeech >= 0.35 && rms >= 0.0015) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
@@ -267,6 +277,13 @@ export class SileroNeuralVadGate {
                 }
               }
             }
+            cb.onFrameTelemetry?.({
+              frameMs: n > 0 ? Math.max(16, Math.round((n / 16000) * 1000)) : 32,
+              isActiveVoice: isActiveVoiceFrame,
+              confirmedSpeech: burstOpen || speechStreak >= 2,
+              pSpeech,
+              rms,
+            });
           }
 
           if (!pcmBase64) return;

@@ -827,6 +827,7 @@
   }
 
   function skipToGrammar(skill) {
+    stopPuzzleVoice(false);
     if (typeof closeModal === 'function') {
       closeModal();
     }
@@ -860,6 +861,7 @@
    * @param {string} skill
    */
   function startVocabMiniGame(skill) {
+    stopPuzzleVoice(false);
     const s = typeof state !== 'undefined' ? state : null;
     const isTh = (typeof self !== 'undefined' && self.FiezelI18n?.getLocale?.() === 'th') ||
                  (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.() === 'th');
@@ -942,6 +944,9 @@
     const g = _activeMiniGame;
     let stageHtml = '';
     const currentRound = (g.round === 3 || g.round === 4 || g.isVictory) ? 3 : (g.round === 2 ? 2 : 1);
+    if (currentRound !== 2 && _puzzleVoice.active) {
+      stopPuzzleVoice(false);
+    }
     const totalRounds = 3;
 
     // Segmented Stepper Bar
@@ -1034,7 +1039,7 @@
       const word = g.words[g.puzzleIndex] || g.words[0];
       const targetSentence = getAlignedSentenceForPuzzle(g.skill, word);
       if (!g.cachedTokens || g.cachedWord !== word.word) {
-        const rawTokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
+        const rawTokens = tokenizePuzzleSentence(targetSentence);
         // G13: Desensitisasi huruf kapital kata pertama agar tidak membocorkan urutan kalimat
         const tokens = rawTokens.map((tok, i) => {
           if (tok.toLowerCase() === 'i') return 'I';
@@ -1055,6 +1060,7 @@
       }
       const tokens = g.cachedTokens;
       const shuffledTokens = g.cachedShuffledTokens;
+      const voiceLangInfo = resolveBridgeSpeechLang(g);
 
       const meta = (typeof GRAMMAR_ITEMS !== 'undefined' && Array.isArray(GRAMMAR_ITEMS))
         ? GRAMMAR_ITEMS.find(x => x.skill === g.skill)
@@ -1121,7 +1127,20 @@
           ` : ''}
 
           <div class="puzzle-bank-wrapper">
-            <span class="bank-label">${t('scaffold.bank-label', 'Pilihan Kata:')}</span>
+            <div class="puzzle-bank-header">
+              <span class="bank-label">${t('scaffold.bank-label', 'Pilihan Kata:')}</span>
+              <button type="button"
+                      id="bridgePuzzleVoiceBtn"
+                      class="puzzle-voice-btn${_puzzleVoice.active ? ' is-listening' : ''}"
+                      aria-pressed="${_puzzleVoice.active}"
+                      aria-label="${esc(t('grammar.token-voice-aria', 'Susun kalimat dengan suara'))}"
+                      onclick="FiezelGrammarVocabBridge.togglePuzzleVoice()">
+                <span aria-hidden="true">🎙️</span>
+                <span>${_puzzleVoice.active ? esc(t('grammar.token-voice-listening', 'Mendengarkan...')) : esc(t('grammar.token-voice-btn', 'Susun Suara'))}</span>
+                <span class="puzzle-voice-lang">${esc(voiceLangInfo.badge)}</span>
+              </button>
+            </div>
+            ${_puzzleVoice.statusText ? `<div class="puzzle-voice-status${_puzzleVoice.mode ? ' is-' + _puzzleVoice.mode : ''}" id="bridgePuzzleVoiceStatus" role="status" aria-live="polite">${esc(_puzzleVoice.statusText)}</div>` : ''}
             <div class="puzzle-bank-tiles">
               ${shuffledTokens.map((tok, idx) => {
                 const usedCount = g.placedTokens.filter(t => t.toLowerCase() === tok.toLowerCase()).length;
@@ -1218,7 +1237,7 @@
               <span class="game-brand">FIEZEL QUEST</span>
               <span class="game-lesson-indicator">${esc((typeof friendlySkillName === 'function' && friendlySkillName(g.skill)) || g.skill)}</span>
             </div>
-            <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${t('scaffold.close', 'Tutup')}">
+            <button type="button" class="modal-close-corner" onclick="FiezelGrammarVocabBridge.stopPuzzleVoice(false); closeModal()" aria-label="${t('scaffold.close', 'Tutup')}">
               <i data-lucide="x"></i>
             </button>
           </div>
@@ -1346,8 +1365,280 @@
     }
   }
 
+  const BRIDGE_HAS_CJK_RE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/;
+
+  function tokenizePuzzleSentence(sentence) {
+    const cleaned = String(sentence || '')
+      .replace(/[.!?。！？、，,]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!cleaned) return [];
+    const spaced = cleaned.split(/\s+/).filter(Boolean);
+    if (spaced.length > 1 || !BRIDGE_HAS_CJK_RE.test(cleaned)) return spaced;
+    const raw = spaced[0] || cleaned;
+    if (/[\u3040-\u30ff]/.test(raw) && typeof global.FiezelJaConjugator?.tokenizeSentence === 'function') {
+      const ja = global.FiezelJaConjugator.tokenizeSentence(raw);
+      if (Array.isArray(ja) && ja.length > 1) return ja;
+    }
+    const segs = [];
+    let buf = '';
+    const chars = Array.from(raw);
+    for (let i = 0; i < chars.length; i++) {
+      buf += chars[i];
+      if (buf.length >= 2 || i === chars.length - 1) {
+        segs.push(buf);
+        buf = '';
+      }
+    }
+    return segs.length ? segs : [raw];
+  }
+
+  function normPuzzleSentence(s) {
+    const cleaned = String(s || '')
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return BRIDGE_HAS_CJK_RE.test(cleaned) ? cleaned.replace(/\s+/g, '') : cleaned;
+  }
+
+  function resolveBridgeSpeechLang(g) {
+    const upg = (typeof global !== 'undefined' && global.FiezelGrammarUpgrade) || (typeof self !== 'undefined' && self.FiezelGrammarUpgrade);
+    if (upg && typeof upg.resolveTokenOrderSpeechLang === 'function') {
+      const tokens = g?.cachedTokens || [];
+      const key = upg.resolveTokenOrderSpeechLang({ tokens }, tokens);
+      const bcp = key === 'ja' ? 'ja-JP' : (key === 'zh' ? 'zh-CN' : 'en-US');
+      return { key, bcp, badge: key.toUpperCase() };
+    }
+    const txt = (g?.cachedTokens || []).join('');
+    if (/[\u3040-\u30ff]/.test(txt)) return { key: 'ja', bcp: 'ja-JP', badge: 'JA' };
+    if (/[\u4e00-\u9fff]/.test(txt)) return { key: 'zh', bcp: 'zh-CN', badge: 'ZH' };
+    return { key: 'en', bcp: 'en-US', badge: 'EN' };
+  }
+
+  let _puzzleVoice = {
+    active: false,
+    rec: null,
+    timer: null,
+    mode: '',
+    statusText: '',
+    prePlaced: []
+  };
+
+  function stopPuzzleVoice(preserveStatus) {
+    if (_puzzleVoice.timer !== null) {
+      clearTimeout(_puzzleVoice.timer);
+      _puzzleVoice.timer = null;
+    }
+    const rec = _puzzleVoice.rec;
+    _puzzleVoice.rec = null;
+    _puzzleVoice.active = false;
+    if (rec) {
+      try {
+        rec.onresult = null;
+        rec.onerror = null;
+        rec.onend = null;
+        if (typeof rec.stop === 'function') rec.stop();
+        else if (typeof rec.abort === 'function') rec.abort();
+      } catch (_) {
+        try { if (typeof rec.abort === 'function') rec.abort(); } catch (__) {}
+      }
+    }
+    if (!preserveStatus) {
+      _puzzleVoice.mode = '';
+      _puzzleVoice.statusText = '';
+    }
+  }
+
+  function buildBridgeUnusedBankEntries(g, basePlaced) {
+    const shuffled = g.cachedShuffledTokens || [];
+    const tokens = g.cachedTokens || [];
+    const totalCounts = {};
+    tokens.forEach((tok) => {
+      const k = String(tok || '').toLowerCase();
+      totalCounts[k] = (totalCounts[k] || 0) + 1;
+    });
+    const usedCounts = {};
+    (basePlaced || []).forEach((tok) => {
+      const k = String(tok || '').toLowerCase();
+      usedCounts[k] = (usedCounts[k] || 0) + 1;
+    });
+    const remainingUsed = { ...usedCounts };
+    return shuffled.map((tok, idx) => {
+      const k = String(tok || '').toLowerCase();
+      let placed = false;
+      if ((remainingUsed[k] || 0) > 0) {
+        placed = true;
+        remainingUsed[k] -= 1;
+      }
+      return { id: idx, text: tok, placed };
+    });
+  }
+
+  function applyVoiceTranscriptToPuzzle(transcript, options) {
+    if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return null;
+    const g = _activeMiniGame;
+    const upg = (typeof global !== 'undefined' && global.FiezelGrammarUpgrade) || (typeof self !== 'undefined' && self.FiezelGrammarUpgrade);
+    if (!upg || typeof upg.matchSpokenTranscriptToTokens !== 'function') return null;
+
+    const basePlaced = (options && Array.isArray(options.basePlaced))
+      ? [...options.basePlaced]
+      : [...(g.placedTokens || [])];
+    const bankEntries = buildBridgeUnusedBankEntries(g, basePlaced);
+    const langInfo = resolveBridgeSpeechLang(g);
+    const res = upg.matchSpokenTranscriptToTokens(transcript, bankEntries, langInfo.key);
+
+    if (res.commandAction === 'clear') {
+      g.placedTokens = [];
+      _puzzleVoice.prePlaced = [];
+      _puzzleVoice.mode = 'matched';
+      _puzzleVoice.statusText = t('grammar.token-voice-matched', '{cocok} kata tersusun', { cocok: 0 });
+      renderMiniGameModal();
+      return res;
+    }
+
+    if (res.matchedTokens && res.matchedTokens.length > 0) {
+      g.placedTokens = [...basePlaced, ...res.matchedTokens];
+      _puzzleVoice.mode = 'matched';
+      _puzzleVoice.statusText = t('grammar.token-voice-matched', '{cocok} kata tersusun', { cocok: g.placedTokens.length });
+      renderMiniGameModal();
+    } else if (options && options.isFinal) {
+      _puzzleVoice.mode = 'error';
+      _puzzleVoice.statusText = t('grammar.token-voice-nomatch', 'Belum ada kata yang cocok dari {teks}.', { teks: String(transcript || '').slice(0, 48) });
+      renderMiniGameModal();
+    }
+    return res;
+  }
+
+  function togglePuzzleVoice() {
+    if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
+    if (_puzzleVoice.active) {
+      stopPuzzleVoice(true);
+      renderMiniGameModal();
+      return;
+    }
+    const SpeechRec = (typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition))
+      || (typeof self !== 'undefined' && (self.SpeechRecognition || self.webkitSpeechRecognition));
+    if (!SpeechRec) {
+      _puzzleVoice.mode = 'error';
+      _puzzleVoice.statusText = t('grammar.token-voice-unsupported', 'Peramban ini belum mendukung pengenalan suara otomatis.');
+      renderMiniGameModal();
+      return;
+    }
+
+    const g = _activeMiniGame;
+    const langInfo = resolveBridgeSpeechLang(g);
+    let rec;
+    try {
+      rec = new SpeechRec();
+    } catch (_) {
+      _puzzleVoice.mode = 'error';
+      _puzzleVoice.statusText = t('grammar.token-voice-unsupported', 'Peramban ini belum mendukung pengenalan suara otomatis.');
+      renderMiniGameModal();
+      return;
+    }
+
+    rec.lang = langInfo.bcp;
+    rec.interimResults = true;
+    rec.continuous = true;
+    rec.maxAlternatives = 3;
+
+    _puzzleVoice.active = true;
+    _puzzleVoice.rec = rec;
+    _puzzleVoice.prePlaced = [...(g.placedTokens || [])];
+    _puzzleVoice.mode = 'listening';
+    _puzzleVoice.statusText = t('grammar.token-voice-ready', 'Ucapkan kalimat sesuai kata yang tersedia...');
+
+    const armTimer = (ms) => {
+      if (_puzzleVoice.timer !== null) clearTimeout(_puzzleVoice.timer);
+      _puzzleVoice.timer = setTimeout(() => {
+        if (_puzzleVoice.active) {
+          stopPuzzleVoice(true);
+          if (_activeMiniGame) renderMiniGameModal();
+        }
+      }, ms);
+    };
+    armTimer(7500);
+
+    rec.onresult = (event) => {
+      const btn = typeof document !== 'undefined' ? document.getElementById('bridgePuzzleVoiceBtn') : null;
+      if (!_activeMiniGame || (typeof document !== 'undefined' && document.body && btn === null)) {
+        stopPuzzleVoice(false);
+        return;
+      }
+      const results = event && event.results ? Array.from(event.results) : [];
+      const candidates = [];
+      let allFinal = false;
+      if (results.length > 0) {
+        allFinal = results.every((r) => Boolean(r && r.isFinal));
+        const lastIdx = results.length - 1;
+        const prefix = results.slice(0, lastIdx).map((r) => (r && r[0] && r[0].transcript) || '').filter(Boolean).join(' ');
+        const lastRes = results[lastIdx];
+        const altLen = lastRes && typeof lastRes.length === 'number' ? Math.min(3, lastRes.length) : 0;
+        for (let a = 0; a < altLen; a++) {
+          const alt = [prefix, (lastRes[a] && lastRes[a].transcript) || ''].filter(Boolean).join(' ').trim();
+          if (alt) candidates.push(alt);
+        }
+      } else if (event && typeof event.transcript === 'string' && event.transcript.trim()) {
+        candidates.push(event.transcript.trim());
+        allFinal = true;
+      }
+      if (candidates.length === 0) return;
+
+      const upg = (typeof global !== 'undefined' && global.FiezelGrammarUpgrade) || (typeof self !== 'undefined' && self.FiezelGrammarUpgrade);
+      let bestTranscript = candidates[0];
+      let bestScore = -1;
+      if (upg && typeof upg.matchSpokenTranscriptToTokens === 'function') {
+        const entries = buildBridgeUnusedBankEntries(_activeMiniGame, _puzzleVoice.prePlaced);
+        for (let i = 0; i < candidates.length; i++) {
+          const r = upg.matchSpokenTranscriptToTokens(candidates[i], entries, langInfo.key);
+          if (r.commandAction === 'clear') { bestTranscript = candidates[i]; break; }
+          if (r.matchedIds.length > bestScore) { bestScore = r.matchedIds.length; bestTranscript = candidates[i]; }
+        }
+      }
+      const out = applyVoiceTranscriptToPuzzle(bestTranscript, { basePlaced: _puzzleVoice.prePlaced, isFinal: allFinal });
+      if (out && out.commandAction === 'clear') {
+        stopPuzzleVoice(true);
+        renderMiniGameModal();
+        return;
+      }
+      if (_puzzleVoice.active) armTimer(2600);
+    };
+
+    rec.onerror = (ev) => {
+      const err = String(ev && ev.error ? ev.error : '');
+      if (err === 'not-allowed' || err === 'service-not-allowed') {
+        _puzzleVoice.mode = 'error';
+        _puzzleVoice.statusText = t('grammar.token-voice-denied', 'Izin mikrofon ditolak. Aktifkan izin mikrofon di peramban.');
+      } else if (err && err !== 'no-speech' && err !== 'aborted') {
+        _puzzleVoice.mode = 'error';
+        _puzzleVoice.statusText = t('grammar.token-voice-unsupported', 'Peramban ini belum mendukung pengenalan suara otomatis.');
+      }
+      stopPuzzleVoice(true);
+      if (_activeMiniGame) renderMiniGameModal();
+    };
+
+    rec.onend = () => {
+      if (_puzzleVoice.rec === rec) {
+        stopPuzzleVoice(true);
+        if (_activeMiniGame) renderMiniGameModal();
+      }
+    };
+
+    renderMiniGameModal();
+    try {
+      rec.start();
+    } catch (_) {
+      _puzzleVoice.mode = 'error';
+      _puzzleVoice.statusText = t('grammar.token-voice-unsupported', 'Peramban ini belum mendukung pengenalan suara otomatis.');
+      stopPuzzleVoice(true);
+      renderMiniGameModal();
+    }
+  }
+
   function addPuzzleToken(tok) {
     if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
+    stopPuzzleVoice(true);
     _activeMiniGame.placedTokens.push(tok);
     playSfx('tap');
     renderMiniGameModal();
@@ -1364,6 +1655,7 @@
 
   function removePuzzleToken(idx) {
     if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
+    stopPuzzleVoice(true);
     _activeMiniGame.placedTokens.splice(idx, 1);
     playSfx('tap');
     renderMiniGameModal();
@@ -1371,17 +1663,17 @@
 
   function checkSentencePuzzle() {
     if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
+    stopPuzzleVoice(false);
     const g = _activeMiniGame;
     const word = g.words[g.puzzleIndex] || g.words[0];
     const targetSentence = getAlignedSentenceForPuzzle(g.skill, word);
-    const targetTokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
+    const targetTokens = tokenizePuzzleSentence(targetSentence);
 
-    const norm = s => String(s || '').toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
-    const userSentence = norm(g.placedTokens.join(' '));
-    const expectedSentence = norm(targetTokens.join(' '));
+    const userSentence = normPuzzleSentence(g.placedTokens.join(' '));
+    const expectedSentence = normPuzzleSentence(targetTokens.join(' '));
 
     // STRICT CHECK: Hanya lulus jika susunan kalimat benar-benar tepat sesuai target!
-    if (userSentence === expectedSentence) {
+    if (userSentence && userSentence === expectedSentence) {
       // Puzzle correct!
       recordGrammarMastery(g.skill, true, 3000);
       playSfx('success');
@@ -1394,6 +1686,7 @@
 
       setTimeout(() => {
         if (!_activeMiniGame) return;
+        stopPuzzleVoice(false);
         _activeMiniGame.puzzleIndex++;
         _activeMiniGame.placedTokens = [];
         _activeMiniGame.puzzleFeedback = null;
@@ -1415,7 +1708,7 @@
       triggerHaptic('light');
 
       // Analisis token yang tertinggal atau salah posisi
-      const missingTokens = targetTokens.filter(t => !g.placedTokens.some(p => p.toLowerCase() === t.toLowerCase()));
+      const missingTokens = targetTokens.filter(t => !g.placedTokens.some(p => normPuzzleSentence(p) === normPuzzleSentence(t)));
       let feedbackMsg = '';
       if (g.placedTokens.length < targetTokens.length) {
         if (missingTokens.length > 0) {
@@ -1445,7 +1738,7 @@
     const g = _activeMiniGame;
     const word = g.words[g.puzzleIndex] || g.words[0];
     const targetSentence = getAlignedSentenceForPuzzle(g.skill, word);
-    const targetTokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
+    const targetTokens = tokenizePuzzleSentence(targetSentence);
     const firstWord = targetTokens[0] || '';
 
     g.hintRequested = true;
@@ -1458,6 +1751,7 @@
   }
 
   function completeMiniGameAndUnlock(skill) {
+    stopPuzzleVoice(false);
     const s = typeof state !== 'undefined' ? state : null;
     if (s) {
       if (!s.grammar) s.grammar = {};
@@ -1554,6 +1848,9 @@
     removePuzzleToken,
     checkSentencePuzzle,
     requestPuzzleHint,
+    togglePuzzleVoice,
+    stopPuzzleVoice,
+    applyVoiceTranscriptToPuzzle,
     completeMiniGameAndUnlock,
     getSemanticMeaningDistractors,
     getActiveMiniGame: () => _activeMiniGame
