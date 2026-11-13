@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+<title id="title">FIEZEL PAW icon — vector</title>
+<defs><pattern id="swirl" width="90" height="90" patternUnits="userSpaceOnUse"><path d="M20 45c0-25 45-25 45 0 0 16-20 20-27 9" fill="none" stroke="#FFF4DA" stroke-width="6" stroke-linecap="round" opacity=".16"/></pattern></defs>
+<rect width="512" height="512" rx="112" fill="#F4A62A"/><rect width="512" height="512" rx="112" fill="url(#swirl)"/>
+<g stroke="#33201F" stroke-width="12" stroke-linejoin="round">
+<path d="M126 170 148 55l76 83ZM386 170 364 55l-76 83Z" fill="#FFD94F"/><path d="M148 140l13-56 39 43ZM364 140l-13-56-39 43Z" fill="#802B3A" stroke="none"/>
+<circle cx="256" cy="218" r="151" fill="#FFD94F"/>
+</g>
+<ellipse cx="256" cy="311" rx="61" ry="44" fill="#FFF4DA"/>
+<g fill="#33201F"><circle cx="205" cy="231" r="26"/><circle cx="307" cy="231" r="26"/></g>
+<g fill="#fff"><circle cx="214" cy="221" r="9"/><circle cx="316" cy="221" r="9"/></g>
+<g fill="#F0A0AC"><circle cx="190" cy="305" r="17"/><circle cx="322" cy="305" r="17"/></g>
+<path d="M244 282h24l-12 14Z" fill="#802B3A"/><path d="M256 298q-14 22-33 7M256 298q14 22 33 7" fill="none" stroke="#802B3A" stroke-width="8" stroke-linecap="round"/>
+<path d="M231 358q25 20 50 0" fill="none" stroke="#802B3A" stroke-width="8" stroke-linecap="round"/>
+<g transform="translate(211 355)" fill="#802B3A"><rect x="10" y="16" width="7" height="22" rx="3.5"/><rect x="21" y="10" width="7" height="28" rx="3.5"/><rect x="32" y="8" width="7" height="30" rx="3.5"/><rect x="43" y="12" width="7" height="26" rx="3.5"/><path d="M36 30c23 0 29 12 0 27-29-15-23-27 0-27Z"/></g>
+<path d="M386 350q82 33 68-61" fill="none" stroke="#EDB93A" stroke-width="34" stroke-linecap="round"/><circle cx="454" cy="289" r="20" fill="#802B3A"/>
+</svg>
