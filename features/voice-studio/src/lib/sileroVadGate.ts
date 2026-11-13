@@ -183,9 +183,9 @@ export class SileroNeuralVadGate {
         },
         positiveSpeechThreshold: 0.62,
         negativeSpeechThreshold: 0.42,
-        minSpeechMs: 192,
-        redemptionMs: 480,
-        preSpeechPadMs: 384,
+        minSpeechMs: 160,
+        redemptionMs: 380,
+        preSpeechPadMs: 256,
         submitUserSpeechOnPause: false,
         getStream: async () => stream,
         pauseStream: async () => {},
@@ -241,8 +241,8 @@ export class SileroNeuralVadGate {
             const isMobile =
               typeof navigator !== 'undefined' &&
               (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
-            // Natural pedagogical pause: 800-900ms allows foreign language learners to think/breathe without premature cutoff!
-            const endSilenceFrames = isMobile ? 26 : 28; // ~832ms mobile, ~896ms desktop
+            // Natural pedagogical pause: ~450ms allows crisp real-time turn ending without cutting off words
+            const endSilenceFrames = isMobile ? 14 : 15; // ~448ms mobile, ~480ms desktop
             if (pSpeech >= 0.35 && rms >= 0.0015) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
@@ -271,15 +271,17 @@ export class SileroNeuralVadGate {
 
           if (!pcmBase64) return;
 
-          if (burstOpen || !cb.isAiPlaying()) {
+          if (burstOpen || speechStreak > 0) {
             while (preRollBase64.length > 0) {
               const pre = preRollBase64.shift();
               if (pre) cb.onSpeechPcm16kBase64(pre);
             }
             cb.onSpeechPcm16kBase64(pcmBase64);
-          } else {
+          } else if (!cb.isAiPlaying()) {
             preRollBase64.push(pcmBase64);
             if (preRollBase64.length > MAX_PREROLL_FRAMES) preRollBase64.shift();
+          } else {
+            preRollBase64.length = 0;
           }
         },
         onVADMisfire: () => {

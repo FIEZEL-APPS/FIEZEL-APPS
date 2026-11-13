@@ -410,7 +410,7 @@ export default function App() {
       bargeSpeechStreakRef.current = 0;
       consecutiveSpeechFramesRef.current = 0;
       setIsPlayingAiAudio(true);
-    } else if (tailDelayMs > 0) {
+    } else if (tailDelayMs > 0 && (isPlayingAiAudioRef.current || activeSourcesRef.current.length > 0)) {
       aiPlayoutTailTimerRef.current = window.setTimeout(() => {
         aiPlayoutTailTimerRef.current = null;
         isPlayingAiAudioRef.current = false;
@@ -421,9 +421,12 @@ export default function App() {
         setIsPlayingAiAudio(false);
       }, tailDelayMs);
     } else {
+      const wasActive = isPlayingAiAudioRef.current || activeSourcesRef.current.length > 0;
       isPlayingAiAudioRef.current = false;
       openingGreetingCompletedRef.current = true;
-      lastAiPlayoutEndedAtRef.current = Date.now();
+      if (wasActive) {
+        lastAiPlayoutEndedAtRef.current = Date.now();
+      }
       bargeSpeechStreakRef.current = 0;
       handyVadRef.current.clearPreRoll();
       setIsPlayingAiAudio(false);
@@ -477,12 +480,15 @@ export default function App() {
   const awaitingOpeningTimerRef = useRef<number | null>(null);
   const openingGreetingCompletedRef = useRef<boolean>(false);
   const userAudioBurstActiveRef = useRef<boolean>(false);
+  const sentAudioSinceEndRef = useRef<boolean>(false);
   const userBurstEndTimerRef = useRef<number | null>(null);
   const preRollFramesRef = useRef<string[]>([]);
   const consecutiveSpeechFramesRef = useRef<number>(0);
   const bargeSpeechStreakRef = useRef<number>(0);
   const lastBargeInAtRef = useRef<number>(0);
-  const handyVadRef = useRef<HandyHumanVad>(new HandyHumanVad());
+  const handyVadRef = useRef<HandyHumanVad>(
+    new HandyHumanVad({ threshold: 0.48, prefillFrames: 15, hangoverFrames: 11, onsetFrames: 2 })
+  );
   const sileroVadGateRef = useRef<SileroNeuralVadGate | null>(null);
   const lastHandySpeechAtRef = useRef<number>(0);
   const liveAnalyserRef = useRef<AnalyserNode | null>(null);
@@ -3175,11 +3181,11 @@ export default function App() {
     const computeSpeechSilenceWaitMs = (text: string, isFinalResult = false) => {
       const incomplete = isGrammaticallyIncomplete(text, activeScenario.targetLang);
       if (isMobileDevice) {
-        if (isFinalResult && !incomplete) return 700;
-        return incomplete ? 1400 : 950;
+        if (isFinalResult && !incomplete) return 260;
+        return incomplete ? 850 : 480;
       }
-      if (isFinalResult && !incomplete) return 1100;
-      return incomplete ? 2100 : 1350;
+      if (isFinalResult && !incomplete) return 320;
+      return incomplete ? 1050 : 600;
     };
 
     const startListeningCycle = () => {
@@ -3601,6 +3607,23 @@ export default function App() {
 
   const lastMicFrameAtRef = useRef<number>(0);
 
+  const silent16kB64CacheRef = useRef<Map<number, string>>(new Map());
+  const getSilent16kPcmBase64 = (sampleRate: number, inputLen: number) => {
+    const sr = sampleRate > 0 ? sampleRate : 48000;
+    const outSamples = Math.max(160, Math.round((inputLen * 16000) / sr));
+    const cached = silent16kB64CacheRef.current.get(outSamples);
+    if (cached) return cached;
+    const bytes = new Uint8Array(outSamples * 2);
+    let binary = '';
+    const CHUNK = 8192;
+    for (let j = 0; j < bytes.length; j += CHUNK) {
+      binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(j, Math.min(j + CHUNK, bytes.length))));
+    }
+    const b64 = typeof btoa === 'function' ? btoa(binary) : '';
+    if (b64) silent16kB64CacheRef.current.set(outSamples, b64);
+    return b64;
+  };
+
   /**
    * Mochi SOS parity (`fiezel-mochi-voice-sos.js:1014-1054`):
    * First-order 300-3300 Hz human vocal band-pass + zero-crossing rate analyzer.
@@ -3621,8 +3644,7 @@ export default function App() {
     let sumAllSq = 0;
     let sumVoiceSq = 0;
     let zeroCrossings = 0;
-    let count = 0;
-    for (let i = 0; i < len; i += 2) {
+    for (let i = 0; i < len; i += 1) {
       const x = float32[i];
       sumAllSq += x * x;
       hpY = alphaHp * (hpY + x - prevX);
@@ -3633,10 +3655,9 @@ export default function App() {
         zeroCrossings++;
       }
       prevBpY = bpY;
-      count++;
     }
-    const rms = Math.sqrt(sumAllSq / Math.max(1, count));
-    const voiceBandRms = Math.sqrt(sumVoiceSq / Math.max(1, count));
+    const rms = Math.sqrt(sumAllSq / len);
+    const voiceBandRms = Math.sqrt(sumVoiceSq / len);
     const voiceRatio = rms > 0.0001 ? voiceBandRms / rms : 0;
     const durationSec = len / sr;
     const zcrHz = durationSec > 0 ? zeroCrossings / (2 * durationSec) : 0;
@@ -3660,39 +3681,50 @@ export default function App() {
     }
   };
 
-  const scheduleUserBurstEnd = () => {
+  const flushUserAudioStreamEnd = () => {
     clearUserBurstEndTimer();
-    const silenceHoldMs = 1050;
-    userBurstEndTimerRef.current = window.setTimeout(() => {
-      userBurstEndTimerRef.current = null;
-      if (userAudioBurstActiveRef.current) {
-        userAudioBurstActiveRef.current = false;
-        consecutiveSpeechFramesRef.current = 0;
-        preRollFramesRef.current = [];
-        if (isUserSpeakingLiveRef.current) {
-          isUserSpeakingLiveRef.current = false;
-          setIsUserSpeakingLive(false);
-        }
-        if (
-          wsRef.current &&
-          wsRef.current.readyState === WebSocket.OPEN &&
-          isLiveConnectedRef.current &&
-          !isPlayingAiAudioRef.current &&
-          !isAiServerTurnOpenRef.current
-        ) {
-          try {
-            wsRef.current.send(
-              JSON.stringify({
-                realtimeInput: {
-                  audioStreamEnd: true,
-                },
-              })
-            );
-          } catch {
-            // Ignore
-          }
+    const hadActiveOrSent = userAudioBurstActiveRef.current || sentAudioSinceEndRef.current;
+    userAudioBurstActiveRef.current = false;
+    consecutiveSpeechFramesRef.current = 0;
+    preRollFramesRef.current = [];
+    if (userSpeakingTimerRef.current) {
+      window.clearTimeout(userSpeakingTimerRef.current);
+      userSpeakingTimerRef.current = null;
+    }
+    if (isUserSpeakingLiveRef.current) {
+      isUserSpeakingLiveRef.current = false;
+      setIsUserSpeakingLive(false);
+    }
+    if (hadActiveOrSent && sentAudioSinceEndRef.current) {
+      sentAudioSinceEndRef.current = false;
+      if (
+        wsRef.current &&
+        wsRef.current.readyState === WebSocket.OPEN &&
+        isLiveConnectedRef.current &&
+        !isPlayingAiAudioRef.current &&
+        !isAiServerTurnOpenRef.current
+      ) {
+        try {
+          wsRef.current.send(
+            JSON.stringify({
+              realtimeInput: {
+                audioStreamEnd: true,
+              },
+            })
+          );
+        } catch {
+          // Ignore
         }
       }
+    }
+  };
+
+  const scheduleUserBurstEnd = () => {
+    clearUserBurstEndTimer();
+    const silenceHoldMs = 520;
+    userBurstEndTimerRef.current = window.setTimeout(() => {
+      userBurstEndTimerRef.current = null;
+      flushUserAudioStreamEnd();
     }, silenceHoldMs);
   };
 
@@ -3730,16 +3762,18 @@ export default function App() {
       (isPlayingAiAudioRef.current ||
         isAiServerTurnOpenRef.current ||
         activeSourcesRef.current.length > 0 ||
-        Date.now() - lastAiPlayoutEndedAtRef.current < 420);
+        Date.now() - lastAiPlayoutEndedAtRef.current < 260);
 
     if (aiActuallyPlaying) {
       clearUserBurstEndTimer();
       userAudioBurstActiveRef.current = false;
+      sentAudioSinceEndRef.current = false;
+      preRollFramesRef.current = [];
       consecutiveSpeechFramesRef.current = 0;
       if (
         !openingGreetingCompletedRef.current ||
         isWorkbenchOpenRef.current ||
-        Date.now() - lastAiPlayoutEndedAtRef.current < 420
+        Date.now() - lastAiPlayoutEndedAtRef.current < 260
       ) {
         bargeSpeechStreakRef.current = 0;
         return;
@@ -3767,6 +3801,7 @@ export default function App() {
             wsRef.current.readyState === WebSocket.OPEN &&
             isLiveConnectedRef.current
           ) {
+            sentAudioSinceEndRef.current = true;
             wsRef.current.send(
               JSON.stringify({
                 realtimeInput: {
@@ -3788,8 +3823,8 @@ export default function App() {
     }
 
     const vadRes = handyVadRef.current.processSamples(float32, sampleRate, false);
-    const isListeningSpeech =
-      (v.isHumanSpeech || vadRes.inSpeech || v.rms >= 0.005) && v.rms >= 0.0022;
+    const isListeningSpeech = (v.isHumanSpeech || vadRes.inSpeech) && v.rms >= 0.002;
+    const wsOpen = Boolean(wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current);
 
     if (isListeningSpeech) {
       consecutiveSpeechFramesRef.current += 1;
@@ -3804,28 +3839,81 @@ export default function App() {
         userSpeakingTimerRef.current = window.setTimeout(() => {
           isUserSpeakingLiveRef.current = false;
           setIsUserSpeakingLive(false);
-        }, 650);
+        }, 420);
         scheduleUserBurstEnd();
+
+        if (wsOpen && wsRef.current) {
+          while (preRollFramesRef.current.length > 0) {
+            const preB64 = preRollFramesRef.current.shift();
+            if (preB64) {
+              sentAudioSinceEndRef.current = true;
+              wsRef.current.send(
+                JSON.stringify({
+                  realtimeInput: {
+                    audio: {
+                      mimeType: 'audio/pcm;rate=16000',
+                      data: preB64,
+                    },
+                  },
+                })
+              );
+            }
+          }
+          const pcmBase64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
+          if (pcmBase64) {
+            sentAudioSinceEndRef.current = true;
+            wsRef.current.send(
+              JSON.stringify({
+                realtimeInput: {
+                  audio: {
+                    mimeType: 'audio/pcm;rate=16000',
+                    data: pcmBase64,
+                  },
+                },
+              })
+            );
+          }
+        }
+        return;
       }
     } else {
       consecutiveSpeechFramesRef.current = Math.max(0, consecutiveSpeechFramesRef.current - 1);
     }
 
-    // Stream continuous real-time 16kHz PCM directly to Gemini 3.8 Live's native server-side Automatic VAD
-    // (matching Mochi SOS `!mochiPlayingAudio` continuous streaming so the server VAD clock never stalls).
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-      const pcmBase64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
-      if (pcmBase64) {
-        wsRef.current.send(
-          JSON.stringify({
-            realtimeInput: {
-              audio: {
-                mimeType: 'audio/pcm;rate=16000',
-                data: pcmBase64,
+    if (userAudioBurstActiveRef.current) {
+      const silenceElapsedMs = lastHandySpeechAtRef.current > 0 ? Date.now() - lastHandySpeechAtRef.current : 0;
+      if (!vadRes.inSpeech && (vadRes.speechEnded || silenceElapsedMs >= 420)) {
+        flushUserAudioStreamEnd();
+        return;
+      }
+      if (wsOpen && wsRef.current) {
+        const tailB64 = vadRes.inSpeech
+          ? resampleFloat32To16kPcmBase64(float32, sampleRate)
+          : getSilent16kPcmBase64(sampleRate, float32.length);
+        if (tailB64) {
+          sentAudioSinceEndRef.current = true;
+          wsRef.current.send(
+            JSON.stringify({
+              realtimeInput: {
+                audio: {
+                  mimeType: 'audio/pcm;rate=16000',
+                  data: tailB64,
+                },
               },
-            },
-          })
-        );
+            })
+          );
+        }
+      }
+      return;
+    }
+
+    // Idle background noise: retain only a short pre-roll ring for onset consonants
+    // and withhold raw fan/room noise so Gemini server VAD and ASR stay noise-free.
+    const idleB64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
+    if (idleB64) {
+      preRollFramesRef.current.push(idleB64);
+      if (preRollFramesRef.current.length > 7) {
+        preRollFramesRef.current.shift();
       }
     }
   };
@@ -3957,6 +4045,7 @@ export default function App() {
         },
         onSpeechPcm16kBase64: (pcmBase64) => {
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+            sentAudioSinceEndRef.current = true;
             wsRef.current.send(
               JSON.stringify({
                 realtimeInput: {
@@ -3970,7 +4059,13 @@ export default function App() {
           }
         },
         onSpeechEnded: () => {
-          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+          if (
+            sentAudioSinceEndRef.current &&
+            wsRef.current &&
+            wsRef.current.readyState === WebSocket.OPEN &&
+            isLiveConnectedRef.current
+          ) {
+            sentAudioSinceEndRef.current = false;
             wsRef.current.send(
               JSON.stringify({
                 realtimeInput: {
@@ -4487,6 +4582,17 @@ ${
                       },
                     },
                   },
+                  realtimeInputConfig: {
+                    automaticActivityDetection: {
+                      disabled: false,
+                      startOfSpeechSensitivity: 'START_SENSITIVITY_HIGH',
+                      endOfSpeechSensitivity: 'END_SENSITIVITY_HIGH',
+                      prefixPaddingMs: 200,
+                      silenceDurationMs: 400,
+                    },
+                    activityHandling: 'START_OF_ACTIVITY_INTERRUPTS',
+                    turnCoverage: 'TURN_INCLUDES_ONLY_ACTIVITY',
+                  },
                   outputAudioTranscription: {},
                   inputAudioTranscription: {
                     languageCodes: allowedAsrLangs,
@@ -4827,6 +4933,8 @@ ${
           if (incomingAudioChunks.length > 0 && outputAudioCtxRef.current) {
             clearUserBurstEndTimer();
             userAudioBurstActiveRef.current = false;
+            sentAudioSinceEndRef.current = false;
+            preRollFramesRef.current = [];
             consecutiveSpeechFramesRef.current = 0;
             if (userSpeakingTimerRef.current) {
               window.clearTimeout(userSpeakingTimerRef.current);
@@ -5396,6 +5504,7 @@ ${
       awaitingOpeningTimerRef.current = null;
     }
     userAudioBurstActiveRef.current = false;
+    sentAudioSinceEndRef.current = false;
     if (userBurstEndTimerRef.current) {
       window.clearTimeout(userBurstEndTimerRef.current);
       userBurstEndTimerRef.current = null;
