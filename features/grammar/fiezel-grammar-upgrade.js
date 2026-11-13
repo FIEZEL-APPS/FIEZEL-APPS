@@ -758,7 +758,7 @@
             <span class="gx-voice-lang">${esc(speechBadge)}</span>
           </button>
           ${anyGloss ? `<button type="button" class="gx-btn-gloss" id="tokenGlossToggle" aria-pressed="false">
-            <span aria-hidden="true">📖</span> ${esc(t('grammar.token-intip-arti', 'Intip arti kata'))}
+            <span aria-hidden="true">📖</span> ${esc(typeof FiezelI18n !== 'undefined' && typeof FiezelI18n.t === 'function' ? FiezelI18n.t('grammar.token-intip-arti') : t('grammar.token-intip-arti', ''))}
           </button>` : ''}
         </div>
       </div>
