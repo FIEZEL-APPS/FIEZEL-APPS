@@ -61,4 +61,33 @@ const uiVad = FiezelPteUi.getHandyVad();
 assert.ok(uiVad, 'FiezelPteUi.getHandyVad() must return active instance');
 console.log('  ✓ FiezelPteUi internal Handy VAD singleton verified');
 
+// 7. Verify PTE Speech Recognition initialization & live transcription handling
+function MockSpeechRecognition() {
+  this.continuous = false;
+  this.interimResults = false;
+  this.lang = '';
+  this.onresult = null;
+  this.start = function () {};
+  this.stop = function () {};
+}
+global.window = global.window || {};
+global.window.webkitSpeechRecognition = MockSpeechRecognition;
+global.navigator = global.navigator || { userAgent: 'Chrome/120.0' };
+
+FiezelPteUi.initPteSpeechRecognition();
+const pteState = FiezelPteUi.getState();
+assert.ok(pteState.speechRecognizer, 'speechRecognizer must be instantiated');
+pteState.speechRecognizer.onresult({
+  results: [
+    [{ transcript: 'The development of artificial intelligence' }],
+    [{ transcript: ' has significantly transformed modern education.' }]
+  ]
+});
+assert.strictEqual(
+  pteState.speechTranscript,
+  'The development of artificial intelligence has significantly transformed modern education.',
+  'speechTranscript must accurately reflect spoken interim/final tokens'
+);
+console.log('  ✓ Browser SpeechRecognition initialization and live transcript capture verified');
+
 console.log('\nAll Handy VAD unit tests PASSED successfully!\n');
