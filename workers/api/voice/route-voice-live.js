@@ -17,8 +17,10 @@
  *    sehingga peramban murid langsung jatuh ke jalur cadangan (Turn-by-Turn Nanami) tanpa error.
  */
 
-import { jsonResponse as rawJsonResponse, badRequest } from '../errors.js';
+import { jsonResponse as rawJsonResponse, badRequest, unauthenticated } from '../errors.js';
 import { readJsonFromCtx } from '../mw-guard.js';
+import { aiSpendGate } from '../route-wiring.js';
+import { checkAiEnabled } from '../feature-gate.js';
 
 /**
  * FIEZEL copy invariant (owner mandate): no em-dash / en-dash in any learner-facing
@@ -302,9 +304,12 @@ function cleanSpokenText(raw) {
     .trim();
 }
 
-function looksLikeTargetLang(text, targetLang) {
+function looksLikeTargetLang(text, targetLang, allowBilingualSsw = false) {
   const tx = cleanSpokenText(text);
   if (!tx || /[\u0E00-\u0E7F]/.test(tx)) return false;
+  if (allowBilingualSsw) {
+    return /[A-Za-z\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
+  }
   if (targetLang === 'ja') return /[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
   if (targetLang === 'zh') return /[\u4e00-\u9fff]/.test(tx) && !/[\u3040-\u30ff]/.test(tx);
   return /[A-Za-z]/.test(tx) && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
@@ -346,9 +351,33 @@ export function extractFocalClause(aiText, targetLang = 'en') {
   const splitRe = isCjk ? /([。！？!?\n]+)/ : /([.?!;\n]+)/;
   const rawParts = clean.split(splitRe).map((p) => p.trim()).filter(Boolean);
   const sentences = [];
-  for (let i = 0; i < rawParts.length; i += 2) {
-    const s = rawParts[i] + (rawParts[i + 1] || '');
-    if (s.trim()) sentences.push(s.trim());
+  const whLeadRe = isCjk
+    ? /(?:何|なに|どこ|いつ|誰|どう|什么|哪里|哪儿|怎么|为什么)/u
+    : /^(?:what|where|when|why|how|who)\b/i;
+  const dashSplitRe = isCjk
+    ? /\s*(?:——|—|–|-|:|：)\s*/
+    : /(?:\s+[—–-]{1,2}\s+|(?<![\s])[—–](?![\s])|:\s+)/;
+  const pushWithDashSplit = (seg) => {
+    const trimmed = String(seg || '').trim();
+    if (!trimmed) return;
+    const subParts = trimmed.split(dashSplitRe).map((p) => p.trim()).filter(Boolean);
+    if (subParts.length >= 2) {
+      const tail = subParts[subParts.length - 1];
+      if (whLeadRe.test(tail)) {
+        const head = subParts.slice(0, -1).join(' ').trim();
+        if (head) sentences.push(head);
+        sentences.push(tail);
+        return;
+      }
+    }
+    sentences.push(trimmed);
+  };
+  for (let i = 0; i < rawParts.length; i++) {
+    if (splitRe.test(rawParts[i])) {
+      if (sentences.length > 0) sentences[sentences.length - 1] += rawParts[i];
+    } else {
+      pushWithDashSplit(rawParts[i]);
+    }
   }
 
   if (sentences.length <= 1) {
@@ -382,7 +411,15 @@ function normalizeHistory(rawHistory) {
     }));
 }
 
-function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallbackTarget = '', isCambridge = false, cefrLevel = 'B1') {
+function normalizeCopilotReplies(
+  rawReplies,
+  targetLang,
+  locale = 'id',
+  fallbackTarget = '',
+  isCambridge = false,
+  cefrLevel = 'B1',
+  allowBilingualSsw = false
+) {
   const list = Array.isArray(rawReplies) ? rawReplies : [];
 
   if (isCambridge) {
@@ -406,7 +443,7 @@ function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallback
       const item = list[i];
       if (!item || typeof item !== 'object') continue;
       const text = cleanSpokenText(item.text || '');
-      if (!looksLikeTargetLang(text, targetLang)) continue;
+      if (!looksLikeTargetLang(text, targetLang, allowBilingualSsw)) continue;
       let hint = cleanSpokenText(item.hint || (locale === 'th' ? item.hintTh : item.hintId) || item.translation || '').slice(0, 320);
       let pronunciation = cleanSpokenText(item.pronunciation || item.phonetic || '').slice(0, 320);
       return [
@@ -440,18 +477,37 @@ function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallback
     const item = list[i];
     if (!item || typeof item !== 'object') continue;
     const text = cleanSpokenText(item.text || '');
-    if (!looksLikeTargetLang(text, targetLang)) continue;
+    if (!looksLikeTargetLang(text, targetLang, allowBilingualSsw)) continue;
     const meta = defaultBadges[valid.length] || defaultBadges[0];
     let hint = cleanSpokenText(item.hint || (locale === 'th' ? item.hintTh : item.hintId) || item.translation || '').slice(0, 260);
     let pronunciation = cleanSpokenText(item.pronunciation || item.phonetic || '').slice(0, 260);
 
-    // CRITICAL: Clean any leaked Hanzi/Kanji from pronunciation and mother-tongue hints
-    if (targetLang === 'ja') {
+    // CRITICAL: Clean any leaked Hanzi/Kanji from pronunciation and non-CJK mother-tongue hints
+    if (allowBilingualSsw) {
       pronunciation = pronunciation.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g, '').replace(/\s{2,}/g, ' ').trim();
-      hint = hint.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '').replace(/\s{2,}/g, ' ').trim();
+      if (
+        pronunciation &&
+        pronunciation.toLowerCase().replace(/[^a-z0-9]/g, '') === text.toLowerCase().replace(/[^a-z0-9]/g, '')
+      ) {
+        pronunciation = '';
+      }
+    } else if (targetLang === 'ja') {
+      pronunciation = pronunciation.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g, '').replace(/\s{2,}/g, ' ').trim();
+      if (locale !== 'ja') {
+        hint = hint.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '').replace(/\s{2,}/g, ' ').trim();
+      }
     } else if (targetLang === 'zh') {
       pronunciation = pronunciation.replace(/[\u3400-\u4dbf\u4e00-\u9fff]/g, '').replace(/\s{2,}/g, ' ').trim();
-      hint = hint.replace(/[\u3400-\u4dbf\u4e00-\u9fff]+/g, '').replace(/\s{2,}/g, ' ').trim();
+      if (locale !== 'zh') {
+        hint = hint.replace(/[\u3400-\u4dbf\u4e00-\u9fff]+/g, '').replace(/\s{2,}/g, ' ').trim();
+      }
+    } else if (
+      pronunciation &&
+      pronunciation.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+        text.toLowerCase().replace(/[^a-z0-9]/g, '')
+    ) {
+      // Discard raw un-phoneticized English echoes so client deterministic phoneticizer synthesizes real Cara Baca
+      pronunciation = '';
     }
 
     valid.push({
@@ -469,9 +525,29 @@ function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallback
   }
 
   if (valid.length < 3) {
-    const cleanSample = looksLikeTargetLang(fallbackTarget, targetLang) ? cleanSpokenText(fallbackTarget) : '';
-    const fallbackBank =
-      targetLang === 'ja'
+    const cleanSample = looksLikeTargetLang(fallbackTarget, targetLang, allowBilingualSsw) ? cleanSpokenText(fallbackTarget) : '';
+    const fallbackBank = allowBilingualSsw
+      ? [
+          {
+            tier: 'easy',
+            text: cleanSample || 'Siap Sensei, cek progres Tahap 1 sekarang.',
+            pronunciation: '',
+            hint: 'Buka progres SSW dan mulai materi dasar Hal. 1 sampai 6.',
+          },
+          {
+            tier: 'mission',
+            text: 'Coba tes saya dengan 1 soal CBT atau jebakan Wakai Papa.',
+            pronunciation: '',
+            hint: 'Minta SSW SENSEI menarik 1 soal resmi beserta pembahasan halaman PDF.',
+          },
+          {
+            tier: 'rescue',
+            text: 'Sensei, jelaskan angka emas dan kata jebakan di halaman ini.',
+            pronunciation: '',
+            hint: 'Minta rangkuman angka mutlak dan kata kunci Jepang untuk ujian.',
+          },
+        ]
+      : targetLang === 'ja'
         ? [
             {
               tier: 'easy',
@@ -547,7 +623,8 @@ function normalizeCopilotReplies(rawReplies, targetLang, locale = 'id', fallback
         hintId: fb.hint,
         hintTh: fb.hint,
         hint: fb.hint,
-        isRealtimeAi: true,
+        isRealtimeAi: false,
+        isOfflineFallback: true,
       });
     }
   }
@@ -575,53 +652,62 @@ async function invokeSingleGeminiJson({
   try {
     const genCfg = {
       temperature: typeof temperature === 'number' ? temperature : 0.45,
-      max_output_tokens: Math.min(maxOutputTokens, 750),
+      max_output_tokens: Math.min(Math.max(maxOutputTokens || 750, 256), 1024),
       thinking_level: 'minimal',
     };
 
-    let res = await fetch(GOOGLE_INTERACTIONS_API, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-goog-api-key': key,
-        'Api-Revision': '2026-05-20',
-      },
-      body: JSON.stringify({
-        model,
-        store: false,
-        input: [
-          {
-            type: 'user_input',
-            content: [{ type: 'text', text: promptText }],
-          },
-        ],
-        response_format: {
-          type: 'text',
-          mime_type: 'application/json',
-        },
-        generation_config: genCfg,
-      }),
-      signal: controller.signal,
-    }).catch(() => null);
+    const generateContentCfg = {
+      response_mime_type: 'application/json',
+      temperature: genCfg.temperature,
+      max_output_tokens: genCfg.max_output_tokens,
+    };
+    if (String(model).startsWith('gemini-2.5')) {
+      generateContentCfg.thinkingConfig = { thinkingBudget: 0 };
+    }
 
-    // If interactions API returns 404/400 or fails, try standard Google generateContent API
-    if (!res || (!res.ok && (res.status === 404 || res.status === 400))) {
-      res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: promptText }] }],
-            generationConfig: {
-              response_mime_type: 'application/json',
-              temperature: genCfg.temperature,
-              max_output_tokens: genCfg.max_output_tokens,
+    // Standard v1beta :generateContent is fastest and highest-reliability for structured JSON.
+    let res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: promptText }] }],
+          generationConfig: generateContentCfg,
+        }),
+        signal: controller.signal,
+      }
+    ).catch(() => null);
+
+    // Fallback to Google Interactions API on any transport error or non-OK status
+    if (!res || !res.ok) {
+      const interactionsRes = await fetch(GOOGLE_INTERACTIONS_API, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-goog-api-key': key,
+          'Api-Revision': '2026-05-20',
+        },
+        body: JSON.stringify({
+          model,
+          store: false,
+          input: [
+            {
+              type: 'user_input',
+              content: [{ type: 'text', text: promptText }],
             },
-          }),
-          signal: controller.signal,
-        }
-      ).catch(() => null);
+          ],
+          response_format: {
+            type: 'text',
+            mime_type: 'application/json',
+          },
+          generation_config: genCfg,
+        }),
+        signal: controller.signal,
+      }).catch(() => null);
+      if (interactionsRes && (interactionsRes.ok || !res)) {
+        res = interactionsRes;
+      }
     }
 
     clearTimeout(timer);
@@ -891,34 +977,23 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
   const startKeyIdx = _copilotPoolIndex % totalKeys;
   _copilotPoolIndex = (_copilotPoolIndex + 1) % totalKeys;
 
+  const tierModels = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
   const candidates = [];
-  // Tier 1: gemini-2.5-flash across rotating keys
+  // Interleave across keys and model tiers so maxAttempts diversifies BOTH keys AND models!
   for (let k = 0; k < totalKeys; k++) {
-    const key = keys[(startKeyIdx + k) % totalKeys];
-    const model = 'gemini-2.5-flash';
-    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
-    candidates.push({ key, model, isCooledDown, tier: 1 });
-  }
-  // Tier 2: gemini-2.0-flash across rotating keys
-  for (let k = 0; k < totalKeys; k++) {
-    const key = keys[(startKeyIdx + k) % totalKeys];
-    const model = 'gemini-2.0-flash';
-    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
-    candidates.push({ key, model, isCooledDown, tier: 2 });
-  }
-  // Tier 3: gemini-1.5-flash across rotating keys
-  for (let k = 0; k < totalKeys; k++) {
-    const key = keys[(startKeyIdx + k) % totalKeys];
-    const model = 'gemini-1.5-flash';
-    const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
-    candidates.push({ key, model, isCooledDown, tier: 3 });
+    for (let t = 0; t < tierModels.length; t++) {
+      const key = keys[(startKeyIdx + k + t) % totalKeys];
+      const model = tierModels[t];
+      const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
+      candidates.push({ key, model, isCooledDown, tier: t + 1, keyOrder: k });
+    }
   }
 
-  // Sort so uncooled candidates come first, while preserving strict tier priority!
   candidates.sort((a, b) => {
     if (a.isCooledDown !== b.isCooledDown) {
       return Number(a.isCooledDown) - Number(b.isCooledDown);
     }
+    if (a.keyOrder !== b.keyOrder) return a.keyOrder - b.keyOrder;
     return a.tier - b.tier;
   });
 
@@ -926,9 +1001,9 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
   let lastReason = 'unknown';
 
   const HEDGE_DELAY_MS = 1200;
-  const OVERALL_DEADLINE_MS = 8000;
+  const OVERALL_DEADLINE_MS = 8500;
   const activeCandidates = healthyRestCandidates.length > 0 ? healthyRestCandidates : candidates;
-  const maxAttempts = Math.min(totalKeys === 1 ? 2 : 4, activeCandidates.length);
+  const maxAttempts = Math.min(totalKeys === 1 ? 3 : 6, activeCandidates.length);
   const overallController = new AbortController();
   const overallTimer = setTimeout(() => overallController.abort(), OVERALL_DEADLINE_MS);
 
@@ -1041,6 +1116,11 @@ export async function routeVoiceCopilotAssist(ctx) {
 
   const lastUserText = cleanSpokenText(body.lastUserText || '').slice(0, 320);
   const scenarioTitle = cleanSpokenText(body.scenarioTitle || body.scenarioId || 'Free Talk').slice(0, 100);
+  const activePopupTargetText = cleanSpokenText(body.activePopupTargetText || '').slice(0, 600);
+  const activePopupMode = cleanSpokenText(body.activePopupMode || '').slice(0, 80);
+  const popupScreenDirective = activePopupTargetText
+    ? `[ACTIVE SCREEN POPUP TARGET (${activePopupMode || 'learning_popup'})]: The popup on the learner's screen currently shows THIS exact text: "${activePopupTargetText}". Anchor suggestions and Read Aloud / practice help strictly to this exact text.`
+    : '';
   const historyLines = normalizeHistory(body.history || body.conversationHistory);
   const excludeList = Array.isArray(body.excludeTexts)
     ? body.excludeTexts.map((t) => cleanSpokenText(t).slice(0, 160)).filter(Boolean).slice(0, 6)
@@ -1050,15 +1130,21 @@ export async function routeVoiceCopilotAssist(ctx) {
   const focal = extractFocalClause(aiText, targetLang);
 
   const cefrLevel = String(body.cefrLevel || 'B1').toUpperCase().trim();
+  const isSswSensei =
+    Boolean(body.isSswSensei) ||
+    String(body.personaId || '').toLowerCase() === 'ssw_sensei' ||
+    String(body.scenarioId || '').toLowerCase().startsWith('scen_ssw_');
   const isCambridge =
-    Boolean(body.isCambridge) ||
-    body.personaId === 'cambridge_examiner' ||
-    String(body.scenarioId || '').startsWith('scen_ielts') ||
-    body.personaId === 'dr_julian' ||
-    String(body.scenarioId || '').startsWith('scen_pte');
+    !isSswSensei &&
+    (Boolean(body.isCambridge) ||
+      body.personaId === 'cambridge_examiner' ||
+      String(body.scenarioId || '').startsWith('scen_ielts') ||
+      body.personaId === 'dr_julian' ||
+      String(body.scenarioId || '').startsWith('scen_pte'));
 
-  const langSpec =
-    targetLang === 'ja'
+  const langSpec = isSswSensei
+    ? 'Bilingual Bahasa Indonesia + Japanese SSW Food Manufacturing terminology (OTAFF Ver 5.1, Kanji+Kana + romaji + clear Indonesian explanation, NO emojis, NO em-dash/en-dash)'
+    : targetLang === 'ja'
       ? 'Japanese (natural spoken N5-N3, Kanji+Hiragana, NO emojis; "pronunciation" = word-spaced Hepburn Romaji)'
       : targetLang === 'zh'
       ? 'Mandarin Chinese (natural spoken HSK1-HSK3, Simplified Chinese characters, NO emojis; "pronunciation" = tone-marked Pinyin)'
@@ -1079,11 +1165,25 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
     ? (cefrLevel === 'B1' ? '🎯 Jawaban B1 (PTE 42 / Band 5.5)' : cefrLevel === 'B2' ? '🎯 Jawaban B2 (Band 6.5)' : cefrLevel === 'A2' ? '🎯 Jawaban A2' : cefrLevel === 'A1' ? '🎯 Jawaban A1' : `🎯 Jawaban Terbaik (${cefrLevel})`)
     : '';
 
-  const prompt = isCambridge
+  const prompt = isSswSensei
+    ? [
+        `Speech Copilot for SSW SENSEI (Tokutei Ginou Food & Beverage Manufacturing / 飲食料品製造業 OTAFF Ver 5.1, Wakai Papa Pro method).`,
+        historyLines.length ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}` : '',
+        popupScreenDirective,
+        lastUserText ? `Learner said: "${lastUserText}"` : '',
+        `SSW SENSEI said: "${aiText}"`,
+        `Generate 3 direct spoken candidate responses in Bahasa Indonesia (optionally quoting the relevant Japanese term or PDF page number/answer letter A/B/C) that directly answer SSW SENSEI's latest question, quiz prompt, or advice ("${focal.focalText}").`,
+        `NEVER output em-dash or en-dash characters. easy=short direct answer/choice, mission=natural answer with specific exam detail, rescue=answer + ask SENSEI for trap/page explanation.`,
+        `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"","hint":"..."},{"tier":"mission","text":"...","pronunciation":"","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"","hint":"..."}]}`,
+      ]
+        .filter(Boolean)
+        .join('\n')
+    : isCambridge
     ? [
         `You are the Senior English Speaking Exam Copilot (PTE Academic / IELTS). Target Level: CEFR ${cefrLevel} (Target Score: ${cefrLevel === 'B1' ? 'PTE 42 / IELTS 5.0-5.5' : cefrLevel === 'B2' ? 'PTE 58 / IELTS 6.5' : cefrLevel === 'C1' ? 'PTE 76 / IELTS 7.5' : 'PTE 84+ / IELTS 8.5-9.0'}).`,
         `Examiner statement/question: "${aiText}".`,
         focal.focalText ? `Examiner focal focus: "${focal.focalText}".` : '',
+        popupScreenDirective,
         lastUserText ? `Candidate just said: "${lastUserText}".` : '',
         historyLines.length
           ? `Exam dialogue context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
@@ -1114,10 +1214,11 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
         lastUserText ? `Learner said: "${lastUserText}"` : '',
         `Partner AI said: "${aiText}"`,
         focalRule,
+        popupScreenDirective,
         excludeList.length
           ? `Do NOT repeat: ${JSON.stringify(excludeList)}. Give 3 fresh angles.`
           : '',
-        `Generate 3 spontaneous spoken replies directly answering "${focal.focalText}" (natural, conversational, punchy; NEVER generic textbook templates): easy=1 short direct sentence (or exact Echo repeat if demanded), mission=natural reply with concrete detail, rescue=reply + follow-up question back. Translate "${aiText}" into aiMeaning (${targetLocaleName}), and write natural first-person translation of each reply in hint (${targetLocaleName}).`,
+        `Generate 3 spontaneous spoken replies directly responding to Partner AI's latest point ("${focal.focalText}") in "${aiText}" (natural, conversational, punchy). STRICT ANCHOR RULE: Whether Partner AI asked a question, gave study/speaking advice, corrected a mistake, or stated a viewpoint, EVERY option MUST explicitly echo or engage with Partner AI's concrete words, strategy, or topic (e.g., if coach advises daily sentences and consistent reading, commit specifically to practicing daily sentences / reading consistently and ask a relevant follow-up!). BANNED GENERIC FILLERS: NEVER output vague empty fillers like "That makes a lot of sense!", "That's interesting!", or "Tell me more about that!" without naming the specific topic/advice. easy=1 short direct reply (or exact Echo repeat if demanded), mission=natural reply with concrete detail referencing the advice/topic, rescue=concrete reply + topic-specific follow-up question. Translate "${aiText}" into aiMeaning (${targetLocaleName}), and write natural first-person translation of each reply in hint (${targetLocaleName}).`,
         `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
       ]
         .filter(Boolean)
@@ -1129,8 +1230,17 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
     return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
 
-  const replies = normalizeCopilotReplies(gen.parsed.replies, targetLang, locale, '', isCambridge, cefrLevel);
-  if (!replies.length) {
+  const replies = normalizeCopilotReplies(
+    gen.parsed.replies,
+    targetLang,
+    locale,
+    '',
+    isCambridge,
+    cefrLevel,
+    isSswSensei
+  );
+  const realCount = replies.filter((r) => r.isRealtimeAi && !r.isOfflineFallback).length;
+  if (!replies.length || realCount === 0) {
     return jsonResponse({ ok: false, fallback: true, reason: 'invalid_replies' }, { status: 503 });
   }
 
@@ -1631,8 +1741,23 @@ export async function routeVoicePartnerTurn(ctx) {
   const effectiveCallMode =
     requestedSwitchMode || (body.callMode === 'casual_chat' ? 'casual_chat' : 'tutor_coach');
 
+  const personaId = cleanSpokenText(body.personaId || '').toLowerCase();
+  const activePopupTargetText = cleanSpokenText(body.activePopupTargetText || '').slice(0, 600);
+  const activePopupMode = cleanSpokenText(body.activePopupMode || '').slice(0, 80);
+  const isReadAloudPopupActive =
+    activePopupMode === 'pte_read_aloud' || activePopupMode === 'read_aloud';
+  const popupScreenDirective = activePopupTargetText
+    ? `[ACTIVE SCREEN POPUP TARGET (${activePopupMode || 'learning_popup'})]: The learner currently sees THIS exact target text on their screen: "${activePopupTargetText}".${
+        isReadAloudPopupActive
+          ? ' Strictly evaluate the learner reading word-for-word against THIS exact text. If they skipped, altered, or mispronounced any words, point out the exact mismatched words and ask them to re-read carefully instead of praising everything!'
+          : ' Reference and evaluate directly against this visible screen exercise.'
+      }`
+    : '';
+  const rawScenarioId = cleanSpokenText(body.scenarioId || '').toLowerCase();
+  const isSswSensei = personaId === 'ssw_sensei' || rawScenarioId.startsWith('scen_ssw_');
+
   // MANDATE #3: Deterministic Unapologetic Refusal if User Demands AI Switch Language
-  if (!forcePopup && detectLanguageSwitchDemand(userText, targetLang)) {
+  if (!isSswSensei && !forcePopup && detectLanguageSwitchDemand(userText, targetLang)) {
     const guard = buildIroncladGuardResponse('refuse_lang_switch', targetLang, locale);
     const replies = normalizeCopilotReplies(guard.replies, targetLang, locale);
     return jsonResponse({
@@ -1651,24 +1776,25 @@ export async function routeVoicePartnerTurn(ctx) {
   const isProfanityTurn = !forcePopup && !boardOnly && detectProfanityOrTrashTalk(userText);
   const isExplanationTurn = forcePopup || boardOnly || isExplanationQuestion(userText);
 
-  const personaId = cleanSpokenText(body.personaId || '').toLowerCase();
   const personaName = cleanSpokenText(
-    body.personaName || (targetLang === 'ja' ? 'Nanami' : targetLang === 'zh' ? 'Xiao Mochi' : 'Alex')
+    body.personaName || (isSswSensei ? 'SSW SENSEI' : targetLang === 'ja' ? 'Nanami' : targetLang === 'zh' ? 'Xiao Mochi' : 'Alex')
   ).slice(0, 40);
   const scenarioTitle = cleanSpokenText(body.scenarioTitle || 'Free Talk').slice(0, 100);
   const learnerDossier =
     typeof body.learnerDossier === 'string' ? body.learnerDossier.slice(0, 1800) : '';
   const historyLines = normalizeHistory(body.history);
 
-  const langSpec =
-    targetLang === 'ja'
+  const langSpec = isSswSensei
+    ? 'Bilingual Bahasa Indonesia mentor interspersed with Japanese Food Manufacturing SSW terminology (OTAFF Ver 5.1, Kanji+Kana + romaji + clear Indonesian explanation, NO emojis, NO em-dash/en-dash)'
+    : targetLang === 'ja'
       ? 'Japanese (street-real expressive Tokyo/Kansai spoken Japanese N5-N3, Kanji+Hiragana, NO emojis; reply "pronunciation" = word-spaced Hepburn Romaji)'
       : targetLang === 'zh'
         ? 'Mandarin Chinese (witty expressive Beijing Putonghua HSK1-HSK3, Simplified Chinese characters, NO emojis; reply "pronunciation" = tone-marked Pinyin)'
         : 'English (authentic street-smart American or razor-sharp British conversational English A2-B1, NO emojis; reply "pronunciation" = easy Indonesian phonetic guide)';
 
-  const dialectIdentity =
-    targetLang === 'ja'
+  const dialectIdentity = isSswSensei
+    ? `VOICE & MENTOR IDENTITY (SSW SENSEI - Mentor Pengolahan Makanan Wakai Papa Pro): Senior Indonesian-Japanese exam mentor for Tokutei Ginou Food & Beverage Manufacturing (飲食料品製造業 特定技能1号, OTAFF Ver 5.1 + 11 Trik Wakai Papa Pro). Speak natural, authoritative, crisp Bahasa Indonesia while quoting exact Japanese exam terms, Kanji+Kana readings, PDF page numbers (Hal. 1-91), and calculation formulas. Passing target = 65%. NEVER invent numbers outside OTAFF Ver 5.1.`
+    : targetLang === 'ja'
       ? personaId === 'keita' || /keita/i.test(personaName)
         ? `VOICE & DIALECT IDENTITY (Keita Senpai): Street-smart Tokyo-Kansai older-brother senpai. Sound human, sharp, witty, and playfully sarcastic ("なんでやねん！", "おいおい待てって", "〜やん", "それ教科書ロボットやん！"). NEVER sound like a polite NHK robot.`
         : `VOICE & DIALECT IDENTITY (Sensei Nanami): Sharp, sassy Tokyo-Osaka Tsundere Sensei. Sound alive, witty, and unapologetically sarcastic ("ちょっと待ってよ！", "なにそのロボットみたいな日本語？", "〜でしょ！", "もう一回ちゃんと言ってごらん！"). NEVER sound like a stiff assistant.`
@@ -1680,8 +1806,11 @@ export async function routeVoicePartnerTurn(ctx) {
             ? `VOICE & DIALECT IDENTITY (Examiner Arthur): Composed, observant British RP examiner.`
             : `VOICE & DIALECT IDENTITY (Coach Alex, Urban Street-Smart American "Hood" Mentor): Authentic urban American street-smart cadence with charismatic older-brother swagger, natural contractions & AAVE-inflected rhythm ("Yo hold up fam, what was that 'I am agree'?! Nah bro, drop that stiff textbook robot translation right now", "Aight bet, now run that back clean for me", "Talk to me for real-what part of English been stressing you out?"). Unapologetically witty, sarcastic on lazy slips, deeply loyal and caring underneath. NEVER sound like a corporate customer-service bot!`;
 
-  const modeDirective =
-    effectiveCallMode === 'casual_chat'
+  const modeDirective = isSswSensei
+    ? `[SSW SENSEI ACTIVE COACHING PROTOCOL]:
+- Communicate in clear Bahasa Indonesia mixed with key Japanese exam words (Kanji/Kana + romaji + meaning). NEVER lecture the candidate for speaking Indonesian.
+- Always point to exact OTAFF Ver 5.1 PDF pages (Hal. 1-91), the 13 Angka Emas, or Wakai Papa trap contrasts (such as yukkuri, kaifuu, seisan vs seisou). Remember April 2026 Allergen Law (OTAFF Ver 5.1): 9 item Wajib Label (termasuk kurumi/kenari & cashew nut/kacang mede sebagai ke-9), sementara pistachio (viral Coklat Dubai) mengisi slot ke-20 pada 20 Anjuran Label (bukan wajib label).`
+    : effectiveCallMode === 'casual_chat'
       ? `[CURRENT CALL MODE: CASUAL HANGOUT CHAT ("casual_chat")]:
 - The learner wants a chill, fun, street-real casual conversation like talking to a close friend.
 - Do NOT open the teaching whiteboard popup (keep uiAction.actionType="none" or "switch_call_mode") UNLESS the learner explicitly asks you to explain a grammar rule or open the popup!`
@@ -1707,6 +1836,7 @@ export async function routeVoicePartnerTurn(ctx) {
         dialectIdentity,
         `[FIEZEL ECOSYSTEM & IDENTITY]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku companion.`,
         learnerDossier,
+        popupScreenDirective,
         `[4 IRONCLAD MANDATES: ZERO EXCEPTIONS]:`,
         `1) MULTILINGUAL INPUT ACCEPTED, DUAL-CONTEXT SPOKEN OUTPUT:
    - The learner is 100% free to speak or type in Indonesian, English, Japanese, Mandarin, Thai, Vietnamese, Russian, or mixed languages. Understand their exact meaning without complaining.
@@ -1730,14 +1860,18 @@ export async function routeVoicePartnerTurn(ctx) {
           ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
           : '',
         `Learner said: "${userText}"`,
-        `1) "aiReply": Reply as ${personaName} in 2-4 punchy spoken sentences (max 48 words, no emojis) 100% in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}. Translate into clean aiReplyTranslation (${targetLocaleName}) with ZERO raw Hanzi/Kanji/Kana.`,
-        `2) "replies": 3 spontaneous spoken replies directly answering your aiReply in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}, with ${targetLocaleName} "hint" and clean Romanized "pronunciation".`,
+        isSswSensei
+          ? `1) "aiReply": Reply as SSW SENSEI in warm, natural, flowing conversational Bahasa Indonesia (4-7 complete spoken sentences, roughly 70-125 words, no emojis, zero em-dash/en-dash, zero dry textbook bullet lists!). FOCUS STRICTLY on the ONE activeStep inside the dossier: unpack every unfamiliar acronym/Japanese term in everyday Indonesian with a real analogy, give a concrete example, and end with 1 light check-in question before moving to the next step! Provide clean concise "aiReplyTranslation" summarizing key Japanese terms in Indonesian.`
+          : `1) "aiReply": Reply as ${personaName} in 2-4 punchy spoken sentences (max 48 words, no emojis) 100% in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}. Translate into clean aiReplyTranslation (${targetLocaleName}) with ZERO raw Hanzi/Kanji/Kana.`,
+        isSswSensei
+          ? `2) "replies": 3 direct beginner candidate replies in Bahasa Indonesia directly answering or asking about the ACTIVE step in aiReply (plus "Saya belum paham istilah ...", "Kebayang Sensei, lanjut langkah berikutnya!", or a concrete check question), with "hint" in ${targetLocaleName} and clean Latin "pronunciation".`
+          : `2) "replies": 3 spontaneous spoken replies directly answering your aiReply in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}, with ${targetLocaleName} "hint" and clean Romanized "pronunciation".`,
         `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"none","callMode":"","destination":"","bankTopicId":"","topicTitle":"","focusType":"grammar","coachSpokenScript":"","explanationText":"","patternFormula":"","drillInstruction":"","sampleTarget":"","leadText":"","triggerWord":"","triggerTag":"","wrongWord":"","wrongTag":"","rightWord":"","rightTag":"","tailText":"","secondLeadText":"","secondTriggerWord":"","secondWrongWord":"","secondRightWord":"","secondTailText":"","secondCoachScript":"","trapWrongSentence":"","trapWrongToken":"","trapWrongReason":"","drillMeaningPrompt":"","drillTargetSentence":"","drillTrapSentence":"","drillBlocks":[],"drillDistractors":[]}}`,
       ]
         .filter(Boolean)
         .join('\n');
 
-  const gen = await runGeminiJsonWithPool(keys, prompt, isExplanationTurn ? 0.45 : 0.65, isExplanationTurn ? 450 : 1500);
+  const gen = await runGeminiJsonWithPool(keys, prompt, isExplanationTurn ? 0.45 : 0.65, isSswSensei ? 1150 : isExplanationTurn ? 450 : 1500);
   if (!gen.ok || !gen.parsed) {
     if (isProfanityTurn) {
       const guard = buildIroncladGuardResponse('clapback_profanity', targetLang, locale);
@@ -1765,7 +1899,7 @@ export async function routeVoicePartnerTurn(ctx) {
   const rawAction =
     gen.parsed.uiAction && typeof gen.parsed.uiAction === 'object' ? gen.parsed.uiAction : null;
 
-  if (!looksLikeTargetLang(aiReply, targetLang)) {
+  if (!looksLikeTargetLang(aiReply, targetLang, isSswSensei)) {
     if (isExplanationTurn || rawAction?.actionType === 'open_learning_popup') {
       // Explanation is intentionally in the learner's language as instructed!
     } else if (isProfanityTurn) {
@@ -1790,7 +1924,10 @@ export async function routeVoicePartnerTurn(ctx) {
     gen.parsed.replies,
     targetLang,
     locale,
-    rawAction?.sampleTarget || ''
+    rawAction?.sampleTarget || '',
+    false,
+    'B1',
+    isSswSensei
   );
   let aiReplyTranslation = cleanSpokenText(
     gen.parsed.aiReplyTranslation ||
@@ -1798,7 +1935,7 @@ export async function routeVoicePartnerTurn(ctx) {
       gen.parsed.aiReplyTranslationTh ||
       ''
   );
-  if (targetLang === 'ja' && locale !== 'ja') {
+  if (!isSswSensei && targetLang === 'ja' && locale !== 'ja') {
     aiReplyTranslation = aiReplyTranslation
       .replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]+/g, '')
       .trim();
@@ -1922,10 +2059,18 @@ export async function routeVoicePartnerTurn(ctx) {
  * Idempotently acknowledges voice telemetry queue from student client.
  */
 export async function routeVoiceBraincoreSync(ctx) {
-  const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
-  const body = readRes?.value || {};
-  const attempts = Array.isArray(body?.attempts) ? body.attempts : [];
-  const acceptedIds = attempts.map((a) => a && a.id).filter(Boolean);
+  const readRes = await readJsonFromCtx(ctx).catch(() => null);
+  if (!readRes || !readRes.ok || !readRes.value || typeof readRes.value !== 'object') {
+    return badRequest('invalid_sync_payload');
+  }
+  const body = readRes.value;
+  if (!Array.isArray(body.attempts)) {
+    return badRequest('missing_attempts_array');
+  }
+  const acceptedIds = body.attempts
+    .slice(0, 100)
+    .map((a) => (a && typeof a.id === 'string' ? a.id.trim().slice(0, 128) : ''))
+    .filter(Boolean);
   return jsonResponse({ ok: true, acceptedIds, count: acceptedIds.length });
 }
 
@@ -1970,8 +2115,8 @@ export async function routeVoiceSyncKeys(ctx) {
     }
   }
 
-  // 3. Fallback dev lokal / bila env belum terpasang
-  if (!envOwnerHash && !envSyncKey) {
+  // Fail-closed unless explicit local test env flag ALLOW_INSECURE_LOCAL_SYNC === '1'
+  if (!envOwnerHash && !envSyncKey && String(ctx?.env?.ALLOW_INSECURE_LOCAL_SYNC || '') === '1') {
     isAuthorized = true;
   }
 
@@ -2039,7 +2184,7 @@ async function fallbackGoogleTranslate(text, targetLocale) {
     const tl = String(targetLocale || 'id').toLowerCase();
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(tl)}&dt=t&q=${encodeURIComponent(text)}`;
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 4000);
+    const tid = setTimeout(() => ctrl.abort(), 2200);
     const res = await fetch(url, { signal: ctrl.signal });
     clearTimeout(tid);
     if (!res.ok) return '';
@@ -2057,9 +2202,10 @@ async function fallbackMyMemoryTranslate(text, targetLocale, sourceLocale = 'en'
   try {
     const tl = String(targetLocale || 'id').toLowerCase();
     const sl = String(sourceLocale || 'en').toLowerCase();
+    if (!sl || sl === tl || sl === 'auto') return '';
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${encodeURIComponent(sl)}|${encodeURIComponent(tl)}`;
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 4500);
+    const tid = setTimeout(() => ctrl.abort(), 2200);
     const res = await fetch(url, { signal: ctrl.signal });
     clearTimeout(tid);
     if (!res.ok) return '';
@@ -2150,28 +2296,17 @@ export async function routeVoiceTranslate(ctx) {
       ? 'zh-CN'
       : /[\u0E00-\u0E7F]/.test(rawText)
         ? 'th'
-        : String(body.sourceLang || body.sourceLocale || 'en').toLowerCase().trim();
+        : /\b(saya|aku|kamu|anda|yang|dengan|untuk|tidak|bisa|mau|ingin|adalah|sudah|apa|bagaimana|terima kasih)\b/i.test(rawText)
+          ? 'id'
+          : String(body.sourceLang || body.sourceLocale || 'en').toLowerCase().trim();
 
   const keys = await resolvePoolKeys(ctx);
   let translatedText = '';
   let modelUsed = 'gemini-pool';
 
-  // Always prefer fast gtx/mymemory translation first so subtitle translation never opens a competing Gemini WebSocket or burns RPD quota
-  const gtxCand = await fallbackGoogleTranslate(rawText, targetLocale);
-  if (isValidTranslatedCandidate(gtxCand)) {
-    translatedText = gtxCand;
-    modelUsed = 'gtx-fast';
-  }
-
-  if (!translatedText) {
-    const mmCand = await fallbackMyMemoryTranslate(rawText, targetLocale, detectedSourceLoc);
-    if (isValidTranslatedCandidate(mmCand)) {
-      translatedText = mmCand;
-      modelUsed = 'mymemory-fast';
-    }
-  }
-
-  if (!translatedText && keys.length >= 1) {
+  // Prefer contextual Gemini REST translation when keys are available so idioms
+  // ("Boom! There you go!" -> "Mantap! Nah, itu dia!") are never mistranslated literally by gtx.
+  if (keys.length >= 1) {
     const cjkRule = !isNonCjkTarget
       ? 'Use appropriate native Kanji/Kana/Hanzi characters for natural readability in this language.'
       : 'ZERO raw Chinese Hanzi or Japanese Kanji characters in the output! If referencing a specific term, write its Romanized form.';
@@ -2179,7 +2314,7 @@ export async function routeVoiceTranslate(ctx) {
     const prompt = [
       `Translate the following spoken language-tutor utterance accurately and naturally into ${targetLangName}.`,
       `STRICT RULES:`,
-      `1) Translate the EXACT meaning and tone (including playful teasing, grammar corrections, or questions), NEVER output generic summaries like "Mochi menanggapi...".`,
+      `1) Translate the EXACT meaning and idiomatic tone (e.g. praise/interjections like "Boom! There you go!" -> "Mantap! Nah, itu dia!", NEVER literal "Ledakan!"), and NEVER output generic summaries like "Mochi menanggapi...".`,
       `2) ${cjkRule}`,
       `Utterance: "${rawText}"`,
       `JSON only: {"translatedText":"..."}`,
@@ -2194,6 +2329,22 @@ export async function routeVoiceTranslate(ctx) {
         translatedText = gemCand;
         modelUsed = gen.model || 'gemini';
       }
+    }
+  }
+
+  if (!translatedText) {
+    const gtxCand = await fallbackGoogleTranslate(rawText, targetLocale);
+    if (isValidTranslatedCandidate(gtxCand)) {
+      translatedText = gtxCand;
+      modelUsed = 'gtx-fast';
+    }
+  }
+
+  if (!translatedText) {
+    const mmCand = await fallbackMyMemoryTranslate(rawText, targetLocale, detectedSourceLoc);
+    if (isValidTranslatedCandidate(mmCand)) {
+      translatedText = mmCand;
+      modelUsed = 'mymemory-fast';
     }
   }
 
@@ -2244,11 +2395,18 @@ export async function routeVoiceGeminiTts(ctx) {
 
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
-  const cleanText = cleanSpokenText(body.text || '').slice(0, 520);
+  const rawCleanText = cleanSpokenText(body.text || '');
+  const cleanText = (() => {
+    if (rawCleanText.length <= 1350) return rawCleanText;
+    const windowSlice = rawCleanText.slice(0, 1350);
+    const lastStop = Math.max(windowSlice.lastIndexOf('. '), windowSlice.lastIndexOf('? '), windowSlice.lastIndexOf('! '));
+    return lastStop >= 420 ? windowSlice.slice(0, lastStop + 1).trim() : windowSlice.trim();
+  })();
   if (!cleanText) {
     return badRequest('empty_text');
   }
 
+  const personaId = cleanSpokenText(body.personaId || '').toLowerCase();
   const rawRequestedLang = String(body.spokenLang || body.speechLang || body.targetLang || 'en')
     .toLowerCase()
     .split(/[-_]/)[0]
@@ -2257,6 +2415,13 @@ export async function routeVoiceGeminiTts(ctx) {
     ? rawRequestedLang
     : 'en';
 
+  const hasSubstantialLatinForSsw =
+    personaId === 'ssw_sensei' &&
+    ((cleanText.match(/[A-Za-z]{2,}/g) || []).length >= 2 ||
+      /\b(halaman|hal|tahap|soal|jawaban|klorin|alergen|suhu|rumus|persen|benar|salah|coba|cek|lanjut|mulai|angka|emas|jebakan|sensei|bahasa|makanan|minuman|uji)\b/i.test(
+        cleanText
+      ));
+
   // Auto-detect explanation language from the actual text so interface explanations NEVER get spoken with foreign prosody
   if (/[\u0E00-\u0E7F]{2,}/.test(cleanText)) {
     effectiveLang = 'th';
@@ -2264,6 +2429,8 @@ export async function routeVoiceGeminiTts(ctx) {
     effectiveLang = 'ru';
   } else if (/[\u1EA0-\u1EF9]{2,}/.test(cleanText)) {
     effectiveLang = 'vi';
+  } else if (hasSubstantialLatinForSsw) {
+    effectiveLang = 'id';
   } else if (/[ぁ-んァ-ヶ]/.test(cleanText)) {
     effectiveLang = 'ja';
   } else if (/[\u4e00-\u9fff]/.test(cleanText)) {
@@ -2276,11 +2443,12 @@ export async function routeVoiceGeminiTts(ctx) {
     effectiveLang = 'id';
   }
 
-  const personaId = cleanSpokenText(body.personaId || '').toLowerCase();
   const validVoices = new Set(['Puck', 'Kore', 'Aoede', 'Charon', 'Fenrir', 'Leda', 'Orus', 'Zephyr']);
   const requestedVoice = cleanSpokenText(body.voiceName || '');
   const defaultVoice =
-    personaId === 'coach_sarah'
+    personaId === 'ssw_sensei'
+      ? 'Puck'
+      : personaId === 'coach_sarah'
       ? 'Kore'
       : personaId === 'cambridge_examiner'
       ? 'Charon'
@@ -2293,7 +2461,7 @@ export async function routeVoiceGeminiTts(ctx) {
 
   const defaultStyle =
     effectiveLang === 'id'
-      ? 'Warm, charismatic, crystal-clear native Indonesian language mentor speaking natural conversational Bahasa Indonesia, lively friendly Jakarta cadence, crisp pronunciation when quoting foreign example words, zero stiff robotic announcer tone'
+      ? 'Warm, engaging, genuinely human Indonesian older-brother mentor speaking lively conversational Bahasa Indonesia with natural Jakarta warmth and melodic inflection, crisp pronunciation when quoting Japanese terms, zero stiff robotic announcer tone'
       : effectiveLang === 'th'
       ? 'Warm, lively, crystal-clear native Thai language mentor speaking natural conversational Thai, friendly Bangkok cadence, crisp pronunciation when quoting foreign example words, zero robotic monotone'
       : effectiveLang === 'vi'
@@ -2319,9 +2487,10 @@ export async function routeVoiceGeminiTts(ctx) {
 
   const now = Date.now();
   const ttsCandidates = [];
-  for (const model of GEMINI_TTS_MODELS) {
-    for (let i = 0; i < keys.length; i++) {
-      const idx = (_copilotPoolIndex + i) % keys.length;
+  for (let i = 0; i < keys.length; i++) {
+    for (let m = 0; m < GEMINI_TTS_MODELS.length; m++) {
+      const model = GEMINI_TTS_MODELS[m];
+      const idx = (_copilotPoolIndex + i + m) % keys.length;
       const key = keys[idx];
       const cooldownKey = `${key}::${model}`;
       if (now >= (_ttsCooldownMap.get(cooldownKey) || 0)) {
@@ -2333,12 +2502,12 @@ export async function routeVoiceGeminiTts(ctx) {
   _copilotPoolIndex = (_copilotPoolIndex + 1) % keys.length;
 
   let lastReason = 'tts_failed';
-  const maxAttempts = Math.min(keys.length === 1 ? 2 : 4, ttsCandidates.length);
+  const maxAttempts = Math.min(keys.length === 1 ? 3 : 6, ttsCandidates.length);
 
   for (let a = 0; a < maxAttempts; a++) {
     const { key, model, cooldownKey } = ttsCandidates[a];
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8500);
+    const timer = setTimeout(() => controller.abort(), cleanText.length > 420 ? 12500 : 8500);
     try {
       const res = await fetch(GOOGLE_INTERACTIONS_API, {
         method: 'POST',
@@ -2424,7 +2593,7 @@ export async function routeVoiceGeminiTts(ctx) {
 
   // Server-side Gemini 3.8 Live 24kHz WAV failover so even when REST TTS models hit 429,
   // /api/voice/gemini-tts returns crisp native WAV audio in ~2s without a 503 round-trip!
-  for (let kOff = 0; kOff < Math.min(2, keys.length); kOff++) {
+  for (let kOff = 0; kOff < Math.min(5, keys.length); kOff++) {
     const liveKey = keys[(activeKeyIdx + kOff) % keys.length];
     const liveWav = await invokeGeminiLiveWavTts({
       key: liveKey,
@@ -2499,7 +2668,7 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
     return { ok: false, reason: 'ws_tts_unavailable' };
   }
   const cooldownKey = `${key}::gemini-3.8-live-tts`;
-  if (Date.now() < (_copilotCooldownMap.get(cooldownKey) || 0)) {
+  if (Date.now() < (_ttsCooldownMap.get(cooldownKey) || 0)) {
     return { ok: false, reason: 'live_tts_cooldown' };
   }
   const langLabel =
@@ -2538,7 +2707,7 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
       }
       const audioBase64 = pcmChunks.length > 0 ? encodePcm16ToWavBase64(pcmChunks, 24000) : '';
       if (audioBase64) {
-        _copilotCooldownMap.delete(cooldownKey);
+        _ttsCooldownMap.delete(cooldownKey);
         resolve({ ok: true, audioBase64 });
       } else {
         resolve({ ok: false, reason: reasonIfEmpty });
@@ -2573,7 +2742,6 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
               generationConfig: {
                 responseModalities: ['AUDIO'],
                 speechConfig: {
-                  languageCode: speechLangCode,
                   voiceConfig: { prebuiltVoiceConfig: { voiceName: voice || 'Puck' } },
                 },
               },
@@ -2631,7 +2799,7 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
               for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
               pcmChunks.push(bytes);
               if (idleTimer) clearTimeout(idleTimer);
-              idleTimer = setTimeout(() => finalize('live_tts_idle_complete'), 240);
+              idleTimer = setTimeout(() => finalize('live_tts_idle_complete'), 850);
             } catch {}
           }
         }
@@ -2654,20 +2822,161 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
     ws.onerror = () => finalize('live_tts_ws_error');
     ws.onclose = (ev) => {
       if (ev.code === 1011) {
-        _copilotCooldownMap.set(cooldownKey, Date.now() + 45000);
+        _ttsCooldownMap.set(cooldownKey, Date.now() + 45000);
       }
       finalize(`live_tts_closed_${ev.code}`);
     };
   });
 }
 
+/**
+ * Handler POST /api/voice/verify-speech
+ * Fast multimodal speech-language authenticator for noise-immune Barge-In.
+ * Distinguishes real spoken human words (any human language) from vehicle noise,
+ * horns, fans, wind, table knocks, unintelligible background chatter, or AI speaker echo.
+ */
+export async function routeVoiceVerifySpeech(ctx) {
+  const clientIp =
+    (ctx.request &&
+      (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) ||
+    '';
+  if (!checkLiveRateLimit(clientIp, 50, 60000)) {
+    return jsonResponse(
+      { ok: false, hasLanguage: false, isEchoOnly: false, transcript: '', reason: 'rate_limited' },
+      { status: 429 }
+    );
+  }
+
+  const keys = await resolvePoolKeys(ctx);
+  if (!keys.length) {
+    return jsonResponse({ ok: false, hasLanguage: false, isEchoOnly: false, transcript: '', reason: 'no_keys' }, { status: 503 });
+  }
+
+  const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
+  const body = readRes?.value || {};
+  const audioBase64 = String(body.audioBase64 || '').replace(/^data:audio\/[^;]+;base64,/, '').trim();
+  const mimeType = String(body.mimeType || 'audio/wav').trim();
+  const aiCurrentText = cleanSpokenText(body.aiCurrentText || '').slice(0, 220);
+
+  if (!audioBase64 || audioBase64.length < 120) {
+    return badRequest('empty_audio');
+  }
+
+  const prompt = [
+    `Inspect this short microphone clip strictly for real spoken human language.`,
+    aiCurrentText ? `Coach AI was currently playing aloud: "${aiCurrentText}"` : '',
+    `Rules:`,
+    `1. Set "hasLanguage": true ONLY if you clearly hear intelligible spoken human words/phrases in any natural language (Indonesian, English, Japanese, Mandarin, Thai, etc., including bilingual mixed Indonesian-Japanese speech and SSW exam terms like klorin, yukkuri, kurumi, pistachio).`,
+    `2. Set "hasLanguage": false for motorcycle/car/truck engines, traffic rumble, car horns, sirens, wind, fans, knocks, coughing, music, non-speech noise, unintelligible mumbling, or silence.`,
+    `3. Set "isEchoOnly": true if the heard words are only speaker bleed/echo of Coach AI's sentence above.`,
+    `JSON only: {"hasLanguage":boolean,"isEchoOnly":boolean,"transcript":"...","detectedLang":"id|en|ja|zh|th|other|none"}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const verifyModels = ['gemini-2.5-flash', 'gemini-3-flash-preview'];
+  const total = keys.length;
+  const startIdx = _copilotPoolIndex % total;
+
+  for (let attempt = 0; attempt < Math.min(total, 4); attempt++) {
+    const idx = (startIdx + attempt) % total;
+    const key = keys[idx];
+    for (const model of verifyModels) {
+      const ck = `${key}::${model}`;
+      if (Date.now() < (_copilotCooldownMap.get(ck) || 0)) continue;
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 3200);
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: 'user',
+                  parts: [
+                    { inlineData: { mimeType, data: audioBase64 } },
+                    { text: prompt },
+                  ],
+                },
+              ],
+              generationConfig: {
+                response_mime_type: 'application/json',
+                temperature: 0.0,
+                max_output_tokens: 160,
+              },
+            }),
+            signal: controller.signal,
+          }
+        ).catch(() => null);
+        clearTimeout(timer);
+
+        if (!res) continue;
+        if (res.status === 429) {
+          _copilotCooldownMap.set(ck, Date.now() + 45000);
+          continue;
+        }
+        if (!res.ok) continue;
+
+        const data = await res.json().catch(() => null);
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+        let parsed = null;
+        try {
+          parsed = JSON.parse(cleaned);
+        } catch {
+          const fb = cleaned.indexOf('{');
+          const lb = cleaned.lastIndexOf('}');
+          if (fb !== -1 && lb > fb) parsed = JSON.parse(cleaned.slice(fb, lb + 1));
+        }
+        if (parsed && typeof parsed === 'object') {
+          _copilotPoolIndex = (idx + 1) % total;
+          return jsonResponse({
+            ok: true,
+            hasLanguage: Boolean(parsed.hasLanguage),
+            isEchoOnly: Boolean(parsed.isEchoOnly),
+            transcript: cleanSpokenText(String(parsed.transcript || '')).slice(0, 180),
+            detectedLang: cleanSpokenText(String(parsed.detectedLang || 'none')).slice(0, 20),
+          });
+        }
+      } catch {
+        clearTimeout(timer);
+      }
+    }
+  }
+
+  return jsonResponse({ ok: false, hasLanguage: false, isEchoOnly: false, transcript: '', reason: 'verify_unavailable' }, { status: 503 });
+}
+
+function withVoiceIdentity(handler, { requireAiFlag = false } = {}) {
+  return async (ctx) => {
+    if (!ctx || !ctx.identity || !ctx.identity.verified || !ctx.identity.sub) {
+      return unauthenticated({ headers: ctx?.corsHeaders || {} });
+    }
+    if (requireAiFlag) {
+      const flag = await checkAiEnabled(ctx.env);
+      if (!flag.allowed) {
+        return jsonResponse(
+          { ok: false, error: 'ai_disabled', reason: flag.reason },
+          { status: 403, headers: ctx?.corsHeaders || {} }
+        );
+      }
+    }
+    return handler(ctx);
+  };
+}
+
 export const ROUTES = [
-  ['POST', '/api/voice/live-session', routeVoiceLiveSession],
-  ['POST', '/api/voice/report-drop', routeVoiceReportDrop],
-  ['POST', '/api/voice/copilot-assist', routeVoiceCopilotAssist],
-  ['POST', '/api/voice/partner-turn', routeVoicePartnerTurn],
-  ['POST', '/api/voice/translate', routeVoiceTranslate],
-  ['POST', '/api/voice/gemini-tts', routeVoiceGeminiTts],
+  ['POST', '/api/voice/live-session', aiSpendGate('aiChat', routeVoiceLiveSession)],
+  ['POST', '/api/voice/report-drop', withVoiceIdentity(routeVoiceReportDrop)],
+  ['POST', '/api/voice/copilot-assist', aiSpendGate('aiChat', routeVoiceCopilotAssist)],
+  ['POST', '/api/voice/partner-turn', aiSpendGate('aiChat', routeVoicePartnerTurn)],
+  ['POST', '/api/voice/translate', withVoiceIdentity(routeVoiceTranslate, { requireAiFlag: true })],
+  ['POST', '/api/voice/gemini-tts', aiSpendGate('aiChat', routeVoiceGeminiTts)],
+  ['POST', '/api/voice/verify-speech', withVoiceIdentity(routeVoiceVerifySpeech, { requireAiFlag: true })],
   ['POST', '/api/voice/sync-keys', routeVoiceSyncKeys],
-  ['POST', '/api/braincore/sync', routeVoiceBraincoreSync],
+  ['POST', '/api/braincore/sync', withVoiceIdentity(routeVoiceBraincoreSync)],
 ];

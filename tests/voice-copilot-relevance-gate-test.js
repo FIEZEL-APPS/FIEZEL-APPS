@@ -334,4 +334,64 @@ test('Open-Topic JA & ZH: Persona opening questions produce natural topic starte
   assert.ok(!/[\u3400-\u4dbf\u4e00-\u9fff]/.test(zhCards[0].hintId), `Zero Hanzi in ZH hintId: ${zhCards[0].hintId}`);
 });
 
+test('Read Aloud & Specific Popup Questions: Copilot mirrors visible screen target text & never hijacks specific choices', () => {
+  const raTarget = 'Commercial kitchen temperatures must remain strictly regulated for bacterial safety.';
+  const raCards = buildContextualFallbackCards({
+    aiText: 'Please read the passage shown on your screen aloud.',
+    targetLang: 'en',
+    locale: 'id',
+    activePopupMode: 'pte_read_aloud',
+    activePopupTargetText: raTarget,
+  });
+  assert.equal(raCards.length, 3);
+  assert.equal(raCards[0].text, raTarget, 'Copilot Card 1 must display exact on-screen Read Aloud passage');
+  assert.ok(raCards[1].text.includes('pronounce') || raCards[1].text.includes('stress'), 'Card 2 should ask about key word pronunciation');
+
+  const screenQuestionCards = buildContextualFallbackCards({
+    aiText: 'On your screen is a card. Which do you prefer, tea or coffee?',
+    targetLang: 'en',
+    locale: 'id',
+  });
+  assert.equal(screenQuestionCards.length, 3);
+  assert.ok(
+    /\b(tea|coffee)\b/i.test(screenQuestionCards[0].text),
+    `Choice question must not be hijacked by generic whiteboard card: ${screenQuestionCards[0].text}`
+  );
+});
+
+test('WH past action dash split & anti-invitation guard (EN/JA regression from LIVE 00:53)', () => {
+  const enLine = "Boom! There you go! That's the exact structure. Let's keep that energy moving - what else did you do today?";
+  const enIntent = detectAiIntent(enLine, 'en');
+  assert.equal(enIntent, 'wh_what_past_action', `Expected wh_what_past_action, got ${enIntent}`);
+
+  const enCards = buildContextualFallbackCards({
+    aiText: enLine,
+    targetLang: 'en',
+    locale: 'id',
+  });
+  assert.equal(enCards.length, 3);
+  assert.ok(
+    !/would love to join/i.test(enCards[0].text),
+    `Must never treat dash+what-else-did-you-do as invitation: ${enCards[0].text}`
+  );
+  assert.ok(
+    !enCards.some((c) => /energy|structure/i.test(c.text)),
+    `Must never echo meta coaching words as user topic: ${JSON.stringify(enCards)}`
+  );
+
+  const jaLine = '今日は他に何をした？';
+  const jaIntent = detectAiIntent(jaLine, 'ja');
+  assert.equal(jaIntent, 'wh_what_past_action', `Expected wh_what_past_action for JA, got ${jaIntent}`);
+  const jaCards = buildContextualFallbackCards({
+    aiText: jaLine,
+    targetLang: 'ja',
+    locale: 'id',
+  });
+  assert.equal(jaCards.length, 3);
+  assert.ok(
+    !jaCards.some((c) => c.text.includes('他に') || c.text.includes('今日は他')),
+    `Must never leak stopwords into JA topic extraction: ${JSON.stringify(jaCards)}`
+  );
+});
+
 console.log(`\n🎉 ALL ${passed} VOICE COPILOT RELEVANCE TESTS PASSED 100%!`);

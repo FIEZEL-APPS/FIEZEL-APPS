@@ -9,7 +9,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_01",
     "titleId": "FIEZEL Japanese Life A1: Topic",
-    "titleTh": "อิโรโดริ A1: Topic",
+    "titleTh": "FIEZEL Japanese Life A1: Topic",
     "subtitleId": "Can-Do Bab 1, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 1, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -64,7 +64,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_02",
     "titleId": "FIEZEL Japanese Life A1: I'm sorry, I don't really understand.",
-    "titleTh": "อิโรโดริ A1: I'm sorry, I don't really understand.",
+    "titleTh": "FIEZEL Japanese Life A1: I'm sorry, I don't really understand.",
     "subtitleId": "Can-Do Bab 2, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 2, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -119,7 +119,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_03",
     "titleId": "FIEZEL Japanese Life A1: Nice to meet you.",
-    "titleTh": "อิโรโดริ A1: Nice to meet you.",
+    "titleTh": "FIEZEL Japanese Life A1: Nice to meet you.",
     "subtitleId": "Can-Do Bab 3, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 3, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -174,7 +174,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_04",
     "titleId": "FIEZEL Japanese Life A1: I live in Tokyo.",
-    "titleTh": "อิโรโดริ A1: I live in Tokyo.",
+    "titleTh": "FIEZEL Japanese Life A1: I live in Tokyo.",
     "subtitleId": "Can-Do Bab 4, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 4, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -229,7 +229,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_05",
     "titleId": "FIEZEL Japanese Life A1: I like udon.",
-    "titleTh": "อิโรโดริ A1: I like udon.",
+    "titleTh": "FIEZEL Japanese Life A1: I like udon.",
     "subtitleId": "Can-Do Bab 5, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 5, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -284,7 +284,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_06",
     "titleId": "FIEZEL Japanese Life A1: I'd like a cheeseburger, please.",
-    "titleTh": "อิโรโดริ A1: I'd like a cheeseburger, please.",
+    "titleTh": "FIEZEL Japanese Life A1: I'd like a cheeseburger, please.",
     "subtitleId": "Can-Do Bab 6, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 6, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -339,7 +339,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_07",
     "titleId": "FIEZEL Japanese Life A1: There are four rooms.",
-    "titleTh": "อิโรโดริ A1: There are four rooms.",
+    "titleTh": "FIEZEL Japanese Life A1: There are four rooms.",
     "subtitleId": "Can-Do Bab 7, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 7, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -394,7 +394,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_08",
     "titleId": "FIEZEL Japanese Life A1: Where is Yamada-san?",
-    "titleTh": "อิโรโดริ A1: Where is Yamada-san?",
+    "titleTh": "FIEZEL Japanese Life A1: Where is Yamada-san?",
     "subtitleId": "Can-Do Bab 8, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 8, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -449,7 +449,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_09",
     "titleId": "FIEZEL Japanese Life A1: Lunch is from noon to 1 o'clock.",
-    "titleTh": "อิโรโดริ A1: Lunch is from noon to 1 o'clock.",
+    "titleTh": "FIEZEL Japanese Life A1: Lunch is from noon to 1 o'clock.",
     "subtitleId": "Can-Do Bab 9, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 9, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -504,7 +504,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_10",
     "titleId": "FIEZEL Japanese Life A1: Please lend me the stapler.",
-    "titleTh": "อิโรโดริ A1: Please lend me the stapler.",
+    "titleTh": "FIEZEL Japanese Life A1: Please lend me the stapler.",
     "subtitleId": "Can-Do Bab 10, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 10, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -559,7 +559,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_11",
     "titleId": "FIEZEL Japanese Life A1: What kind of manga do you like?",
-    "titleTh": "อิโรโดริ A1: What kind of manga do you like?",
+    "titleTh": "FIEZEL Japanese Life A1: What kind of manga do you like?",
     "subtitleId": "Can-Do Bab 11, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 11, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -614,7 +614,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_12",
     "titleId": "FIEZEL Japanese Life A1: Do you want to go for a drink together?",
-    "titleTh": "อิโรโดริ A1: Do you want to go for a drink together?",
+    "titleTh": "FIEZEL Japanese Life A1: Do you want to go for a drink together?",
     "subtitleId": "Can-Do Bab 12, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 12, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -669,7 +669,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_13",
     "titleId": "FIEZEL Japanese Life A1: Does this bus go to the airport?",
-    "titleTh": "อิโรโดริ A1: Does this bus go to the airport?",
+    "titleTh": "FIEZEL Japanese Life A1: Does this bus go to the airport?",
     "subtitleId": "Can-Do Bab 13, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 13, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -724,7 +724,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_14",
     "titleId": "FIEZEL Japanese Life A1: It's a big building, isn't it.",
-    "titleTh": "อิโรโดริ A1: It's a big building, isn't it.",
+    "titleTh": "FIEZEL Japanese Life A1: It's a big building, isn't it.",
     "subtitleId": "Can-Do Bab 14, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 14, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -779,7 +779,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_15",
     "titleId": "FIEZEL Japanese Life A1: I need some batteries.",
-    "titleTh": "อิโรโดริ A1: I need some batteries.",
+    "titleTh": "FIEZEL Japanese Life A1: I need some batteries.",
     "subtitleId": "Can-Do Bab 15, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 15, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -834,7 +834,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_16",
     "titleId": "FIEZEL Japanese Life A1: How much is this?",
-    "titleTh": "อิโรโดริ A1: How much is this?",
+    "titleTh": "FIEZEL Japanese Life A1: How much is this?",
     "subtitleId": "Can-Do Bab 16, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 16, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -889,7 +889,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_17",
     "titleId": "FIEZEL Japanese Life A1: I went to see a movie.",
-    "titleTh": "อิโรโดริ A1: I went to see a movie.",
+    "titleTh": "FIEZEL Japanese Life A1: I went to see a movie.",
     "subtitleId": "Can-Do Bab 17, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 17, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -944,7 +944,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_18",
     "titleId": "FIEZEL Japanese Life A1: I want to go to a hot spring.",
-    "titleTh": "อิโรโดริ A1: I want to go to a hot spring.",
+    "titleTh": "FIEZEL Japanese Life A1: I want to go to a hot spring.",
     "subtitleId": "Can-Do Bab 18, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 18, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -999,7 +999,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_19",
     "titleId": "FIEZEL Japanese Life A2.1: I work in a restaurant.",
-    "titleTh": "อิโรโดริ A2.1: I work in a restaurant.",
+    "titleTh": "FIEZEL Japanese Life A2.1: I work in a restaurant.",
     "subtitleId": "Can-Do Bab 1, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 1, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1054,7 +1054,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_20",
     "titleId": "FIEZEL Japanese Life A2.1: I like playing video games.",
-    "titleTh": "อิโรโดริ A2.1: I like playing video games.",
+    "titleTh": "FIEZEL Japanese Life A2.1: I like playing video games.",
     "subtitleId": "Can-Do Bab 2, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 2, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1109,7 +1109,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_21",
     "titleId": "FIEZEL Japanese Life A2.1: It gets very cold in winter.",
-    "titleTh": "อิโรโดริ A2.1: It gets very cold in winter.",
+    "titleTh": "FIEZEL Japanese Life A2.1: It gets very cold in winter.",
     "subtitleId": "Can-Do Bab 3, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 3, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1164,7 +1164,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_22",
     "titleId": "FIEZEL Japanese Life A2.1: It rained heavily yesterday.",
-    "titleTh": "อิโรโดริ A2.1: It rained heavily yesterday.",
+    "titleTh": "FIEZEL Japanese Life A2.1: It rained heavily yesterday.",
     "subtitleId": "Can-Do Bab 4, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 4, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1219,7 +1219,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_23",
     "titleId": "FIEZEL Japanese Life A2.1: It is very lively and convenient.",
-    "titleTh": "อิโรโดริ A2.1: It is very lively and convenient.",
+    "titleTh": "FIEZEL Japanese Life A2.1: It is very lively and convenient.",
     "subtitleId": "Can-Do Bab 5, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 5, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1274,7 +1274,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_24",
     "titleId": "FIEZEL Japanese Life A2.1: Please tell me how to get to the post office.",
-    "titleTh": "อิโรโดริ A2.1: Please tell me how to get to the post office.",
+    "titleTh": "FIEZEL Japanese Life A2.1: Please tell me how to get to the post office.",
     "subtitleId": "Can-Do Bab 6, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 6, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1329,7 +1329,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_25",
     "titleId": "FIEZEL Japanese Life A2.1: I will be a bit late because I got lost.",
-    "titleTh": "อิโรโดริ A2.1: I will be a bit late because I got lost.",
+    "titleTh": "FIEZEL Japanese Life A2.1: I will be a bit late because I got lost.",
     "subtitleId": "Can-Do Bab 7, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 7, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1384,7 +1384,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_26",
     "titleId": "FIEZEL Japanese Life A2.1: Have you ever played baseball?",
-    "titleTh": "อิโรโดริ A2.1: Have you ever played baseball?",
+    "titleTh": "FIEZEL Japanese Life A2.1: Have you ever played baseball?",
     "subtitleId": "Can-Do Bab 8, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 8, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1439,7 +1439,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_27",
     "titleId": "FIEZEL Japanese Life A2.1: Will you tell me how to read this?",
-    "titleTh": "อิโรโดริ A2.1: Will you tell me how to read this?",
+    "titleTh": "FIEZEL Japanese Life A2.1: Will you tell me how to read this?",
     "subtitleId": "Can-Do Bab 9, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 9, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1494,7 +1494,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_28",
     "titleId": "FIEZEL Japanese Life A2.1: I would like to take a Japanese-language class.",
-    "titleTh": "อิโรโดริ A2.1: I would like to take a Japanese-language class.",
+    "titleTh": "FIEZEL Japanese Life A2.1: I would like to take a Japanese-language class.",
     "subtitleId": "Can-Do Bab 10, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 10, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1549,7 +1549,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_29",
     "titleId": "FIEZEL Japanese Life A2.1: I will bring meat and vegetables.",
-    "titleTh": "อิโรโดริ A2.1: I will bring meat and vegetables.",
+    "titleTh": "FIEZEL Japanese Life A2.1: I will bring meat and vegetables.",
     "subtitleId": "Can-Do Bab 11, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 11, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1604,7 +1604,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_30",
     "titleId": "FIEZEL Japanese Life A2.1: Your bento looks delicious.",
-    "titleTh": "อิโรโดริ A2.1: Your bento looks delicious.",
+    "titleTh": "FIEZEL Japanese Life A2.1: Your bento looks delicious.",
     "subtitleId": "Can-Do Bab 12, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 12, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1659,7 +1659,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_31",
     "titleId": "FIEZEL Japanese Life A2.1: It will probably end in about ten minutes.",
-    "titleTh": "อิโรโดริ A2.1: It will probably end in about ten minutes.",
+    "titleTh": "FIEZEL Japanese Life A2.1: It will probably end in about ten minutes.",
     "subtitleId": "Can-Do Bab 13, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 13, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1714,7 +1714,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_32",
     "titleId": "FIEZEL Japanese Life A2.1: May I take a day off?",
-    "titleTh": "อิโรโดริ A2.1: May I take a day off?",
+    "titleTh": "FIEZEL Japanese Life A2.1: May I take a day off?",
     "subtitleId": "Can-Do Bab 14, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 14, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1769,7 +1769,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_33",
     "titleId": "FIEZEL Japanese Life A2.1: I have a fever, and my throat is sore.",
-    "titleTh": "อิโรโดริ A2.1: I have a fever, and my throat is sore.",
+    "titleTh": "FIEZEL Japanese Life A2.1: I have a fever, and my throat is sore.",
     "subtitleId": "Can-Do Bab 15, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 15, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1824,7 +1824,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_34",
     "titleId": "FIEZEL Japanese Life A2.1: I try not to eat too much.",
-    "titleTh": "อิโรโดริ A2.1: I try not to eat too much.",
+    "titleTh": "FIEZEL Japanese Life A2.1: I try not to eat too much.",
     "subtitleId": "Can-Do Bab 16, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 16, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1879,7 +1879,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_35",
     "titleId": "FIEZEL Japanese Life A2.1: This is a personal amulet my older brother gave me.",
-    "titleTh": "อิโรโดริ A2.1: This is a personal amulet my older brother gave me.",
+    "titleTh": "FIEZEL Japanese Life A2.1: This is a personal amulet my older brother gave me.",
     "subtitleId": "Can-Do Bab 17, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 17, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1934,7 +1934,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_36",
     "titleId": "FIEZEL Japanese Life A2.1: How about giving something as a gift?",
-    "titleTh": "อิโรโดริ A2.1: How about giving something as a gift?",
+    "titleTh": "FIEZEL Japanese Life A2.1: How about giving something as a gift?",
     "subtitleId": "Can-Do Bab 18, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 18, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -1989,7 +1989,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_37",
     "titleId": "FIEZEL Japanese Life A2.2: I just came to Japan last week.",
-    "titleTh": "อิโรโดริ A2.2: I just came to Japan last week.",
+    "titleTh": "FIEZEL Japanese Life A2.2: I just came to Japan last week.",
     "subtitleId": "Can-Do Bab 1, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 1, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2044,7 +2044,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_38",
     "titleId": "FIEZEL Japanese Life A2.2: He looks a serious person.",
-    "titleTh": "อิโรโดริ A2.2: He looks a serious person.",
+    "titleTh": "FIEZEL Japanese Life A2.2: He looks a serious person.",
     "subtitleId": "Can-Do Bab 2, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 2, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2099,7 +2099,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_39",
     "titleId": "FIEZEL Japanese Life A2.2: I cannot eat it because of an allergy.",
-    "titleTh": "อิโรโดริ A2.2: I cannot eat it because of an allergy.",
+    "titleTh": "FIEZEL Japanese Life A2.2: I cannot eat it because of an allergy.",
     "subtitleId": "Can-Do Bab 3, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 3, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2154,7 +2154,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_40",
     "titleId": "FIEZEL Japanese Life A2.2: Please eat it without soy sauce.",
-    "titleTh": "อิโรโดริ A2.2: Please eat it without soy sauce.",
+    "titleTh": "FIEZEL Japanese Life A2.2: Please eat it without soy sauce.",
     "subtitleId": "Can-Do Bab 4, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 4, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2209,7 +2209,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_41",
     "titleId": "FIEZEL Japanese Life A2.2: You should make a reservation early.",
-    "titleTh": "อิโรโดริ A2.2: You should make a reservation early.",
+    "titleTh": "FIEZEL Japanese Life A2.2: You should make a reservation early.",
     "subtitleId": "Can-Do Bab 5, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 5, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2264,7 +2264,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_42",
     "titleId": "FIEZEL Japanese Life A2.2: I am glad that I went to a lot of different places.",
-    "titleTh": "อิโรโดริ A2.2: I am glad that I went to a lot of different places.",
+    "titleTh": "FIEZEL Japanese Life A2.2: I am glad that I went to a lot of different places.",
     "subtitleId": "Can-Do Bab 6, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 6, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2319,7 +2319,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_43",
     "titleId": "FIEZEL Japanese Life A2.2: If it rains, it will be held at the hall.",
-    "titleTh": "อิโรโดริ A2.2: If it rains, it will be held at the hall.",
+    "titleTh": "FIEZEL Japanese Life A2.2: If it rains, it will be held at the hall.",
     "subtitleId": "Can-Do Bab 7, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 7, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2374,7 +2374,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_44",
     "titleId": "FIEZEL Japanese Life A2.2: Do you know where the food stands are?",
-    "titleTh": "อิโรโดริ A2.2: Do you know where the food stands are?",
+    "titleTh": "FIEZEL Japanese Life A2.2: Do you know where the food stands are?",
     "subtitleId": "Can-Do Bab 8, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 8, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2429,7 +2429,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_45",
     "titleId": "FIEZEL Japanese Life A2.2: What do people do on Coming-of-Age Day?",
-    "titleTh": "อิโรโดริ A2.2: What do people do on Coming-of-Age Day?",
+    "titleTh": "FIEZEL Japanese Life A2.2: What do people do on Coming-of-Age Day?",
     "subtitleId": "Can-Do Bab 9, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 9, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2484,7 +2484,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_46",
     "titleId": "FIEZEL Japanese Life A2.2: What kind of clothes should I wear?",
-    "titleTh": "อิโรโดริ A2.2: What kind of clothes should I wear?",
+    "titleTh": "FIEZEL Japanese Life A2.2: What kind of clothes should I wear?",
     "subtitleId": "Can-Do Bab 10, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 10, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2539,7 +2539,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_47",
     "titleId": "FIEZEL Japanese Life A2.2: I forgot to bring my point card.",
-    "titleTh": "อิโรโดริ A2.2: I forgot to bring my point card.",
+    "titleTh": "FIEZEL Japanese Life A2.2: I forgot to bring my point card.",
     "subtitleId": "Can-Do Bab 11, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 11, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2594,7 +2594,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_48",
     "titleId": "FIEZEL Japanese Life A2.2: This vacuum cleaner is light and easy to move around.",
-    "titleTh": "อิโรโดริ A2.2: This vacuum cleaner is light and easy to move around.",
+    "titleTh": "FIEZEL Japanese Life A2.2: This vacuum cleaner is light and easy to move around.",
     "subtitleId": "Can-Do Bab 12, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 12, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2649,7 +2649,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_49",
     "titleId": "FIEZEL Japanese Life A2.2: They display a lot of materials.",
-    "titleTh": "อิโรโดริ A2.2: They display a lot of materials.",
+    "titleTh": "FIEZEL Japanese Life A2.2: They display a lot of materials.",
     "subtitleId": "Can-Do Bab 13, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 13, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2704,7 +2704,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_50",
     "titleId": "FIEZEL Japanese Life A2.2: Will you cut my bangs a little shorter?",
-    "titleTh": "อิโรโดริ A2.2: Will you cut my bangs a little shorter?",
+    "titleTh": "FIEZEL Japanese Life A2.2: Will you cut my bangs a little shorter?",
     "subtitleId": "Can-Do Bab 14, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 14, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2759,7 +2759,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_51",
     "titleId": "FIEZEL Japanese Life A2.2: The lights in the meeting room were left on.",
-    "titleTh": "อิโรโดริ A2.2: The lights in the meeting room were left on.",
+    "titleTh": "FIEZEL Japanese Life A2.2: The lights in the meeting room were left on.",
     "subtitleId": "Can-Do Bab 15, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 15, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2814,7 +2814,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_52",
     "titleId": "FIEZEL Japanese Life A2.2: Do not panic in case of an earthquake.",
-    "titleTh": "อิโรโดริ A2.2: Do not panic in case of an earthquake.",
+    "titleTh": "FIEZEL Japanese Life A2.2: Do not panic in case of an earthquake.",
     "subtitleId": "Can-Do Bab 16, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 16, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2869,7 +2869,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_53",
     "titleId": "FIEZEL Japanese Life A2.2: I can speak Japanese better than before.",
-    "titleTh": "อิโรโดริ A2.2: I can speak Japanese better than before.",
+    "titleTh": "FIEZEL Japanese Life A2.2: I can speak Japanese better than before.",
     "subtitleId": "Can-Do Bab 17, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 17, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",
@@ -2924,7 +2924,7 @@ export const FIEZEL_LIFE_CALL_SCENARIOS: CallScenario[] = [
   {
     "id": "scen_ja_fiezel-life_54",
     "titleId": "FIEZEL Japanese Life A2.2: I am thinking about starting my own company in the future.",
-    "titleTh": "อิโรโดริ A2.2: I am thinking about starting my own company in the future.",
+    "titleTh": "FIEZEL Japanese Life A2.2: I am thinking about starting my own company in the future.",
     "subtitleId": "Can-Do Bab 18, Percakapan Kehidupan Nyata di Jepang",
     "subtitleTh": "Can-Do บทที่ 18, การสนทนาชีวิตจริงในญี่ปุ่น",
     "targetLang": "ja",

@@ -43,3 +43,8 @@ async def ensure_indexes():
     await db.classes.create_index("code", unique=True)
     await db.assessments.create_index([("class_id", 1), ("created_at", -1)])
     await db.sessions.create_index([("student_id", 1), ("assessment_id", 1)])
+    await db.ssw_knowledge_items.create_index("id", unique=True)
+    await db.ssw_knowledge_items.create_index("kind")
+    await db.ssw_quizzes.create_index("id", unique=True)
+    await db.ssw_video_chunks.create_index("chunkId", unique=True)
+    await db.ssw_video_chunks.create_index([("isWakaiPapa", 1), ("videoId", 1)])

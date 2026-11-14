@@ -288,12 +288,13 @@ body {
 ruby.fz-ja-ruby,
 ruby.zh-ruby {
   ruby-position: over;
+  ruby-align: center;
   display: inline-ruby;
   vertical-align: baseline;
   margin-inline: 0;
-  margin-block: 0.12em;
+  margin-block: 0.08em;
   padding-inline: 0.02em;
-  line-height: 2.85 !important;
+  line-height: 2.15 !important;
 }
 
 rt.fz-ja-rt {
@@ -321,12 +322,19 @@ rt.zh-rt {
 }
 
 .fz-ja-romaji-text,
-.fz-zh-pinyin-text {
+.fz-zh-pinyin-text,
+.fz-en-phonetic-text {
   font-feature-settings: "liga" 1;
   letter-spacing: 0.02em;
-  margin-top: 6px;
+  margin-top: 4px;
   line-height: 1.5 !important;
   display: block;
+}
+
+.fz-en-display-wrap {
+  position: relative;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* ============================================================================

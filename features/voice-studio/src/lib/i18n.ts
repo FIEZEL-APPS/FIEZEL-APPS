@@ -1,6 +1,6 @@
 import { LearnerLocale, MasteryStateName } from '../types/voiceCall';
 
-const COPY: Record<LearnerLocale, Record<string, string>> = {
+const COPY: Partial<Record<LearnerLocale, Record<string, string>>> = {
   id: {
     'app.brand': 'FIEZEL',
     'app.subtitle': 'Studio Panggilan Suara Fiezel · Braincore v3',

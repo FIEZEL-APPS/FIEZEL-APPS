@@ -1,5 +1,5 @@
 import { toPhoneticRomaji, renderFuriganaHtml, stripEmojisAndEmotWords } from './japanesePhonetics.js';
-import { toPhoneticPinyin, renderMandarinRubyHtml, containsHanzi, stripHanzi } from './mandarinPhonetics.ts';
+import { toPhoneticPinyin, renderMandarinRubyHtml, containsHanzi } from './mandarinPhonetics.ts';
 
 export interface BeginnerReplyCard {
   id: string;
@@ -657,8 +657,400 @@ const ENGLISH_WORD_PHONETICS: Record<string, string> = {
   trip: 'trip',
 };
 
+const EXTRA_ENGLISH_WORD_PHONETICS: Record<string, string> = {
+  practice: 'prek-tis',
+  practicing: 'prek-ti-sing',
+  practiced: 'prek-tist',
+  speak: 'spik',
+  speaking: 'spi-king',
+  spoke: 'spok',
+  spoken: 'spo-ken',
+  english: 'ing-glisy',
+  japanese: 'je-pe-niz',
+  chinese: 'cai-niz',
+  mandarin: 'men-de-rin',
+  conditional: 'kon-di-syo-nel',
+  grammar: 'gre-mer',
+  vocabulary: 'vo-ke-byu-le-ri',
+  pronunciation: 'pro-nan-si-ei-syen',
+  sentence: 'sen-tens',
+  sentences: 'sen-ten-ses',
+  conversation: 'kon-ver-sei-syen',
+  question: 'kwes-cen',
+  questions: 'kwes-cens',
+  answer: 'en-ser',
+  answers: 'en-sers',
+  meaning: 'mi-ning',
+  meanings: 'mi-nings',
+  explain: 'eks-plein',
+  example: 'ig-zem-pel',
+  examples: 'ig-zem-pels',
+  yesterday: 'yes-ter-dei',
+  tomorrow: 'tu-mo-ro',
+  today: 'tu-dei',
+  tonight: 'tu-nait',
+  restaurant: 'res-te-ront',
+  delicious: 'di-li-syes',
+  breakfast: 'brek-fest',
+  lunch: 'lanc',
+  dinner: 'di-ner',
+  library: 'lai-bre-ri',
+  university: 'yu-ni-ver-si-ti',
+  campus: 'kem-pes',
+  school: 'skul',
+  office: 'o-fis',
+  study: 'sta-di',
+  studying: 'sta-di-ing',
+  studied: 'sta-did',
+  work: 'werk',
+  working: 'wer-king',
+  worked: 'werkt',
+  meeting: 'mi-ting',
+  project: 'pro-jekt',
+  schedule: 'ske-jul',
+  weather: 'we-der',
+  raining: 'rei-ning',
+  rainy: 'rei-ni',
+  sunny: 'sa-ni',
+  interesting: 'in-tres-ting',
+  important: 'im-por-tent',
+  different: 'dif-rent',
+  difficult: 'di-fi-kelt',
+  easy: 'i-zi',
+  simple: 'sim-pel',
+  natural: 'ne-ce-rel',
+  naturally: 'ne-ce-re-li',
+  actually: 'ek-cu-e-li',
+  definitely: 'de-fi-nit-li',
+  probably: 'pro-be-bli',
+  nervous: 'ner-ves',
+  confident: 'kon-fi-dent',
+  confidently: 'kon-fi-dent-li',
+  mistake: 'mis-teik',
+  mistakes: 'mis-teiks',
+  wrong: 'rong',
+  right: 'rait',
+  correct: 'ke-rekt',
+  better: 'be-ter',
+  worst: 'werst',
+  improve: 'im-pruv',
+  improved: 'im-pruvd',
+  improving: 'im-pru-ving',
+  hobby: 'ho-bi',
+  hobbies: 'ho-biz',
+  travel: 'tre-vel',
+  traveling: 'tre-ve-ling',
+  traveled: 'tre-veld',
+  vacation: 'vei-kei-syen',
+  movie: 'mu-vi',
+  movies: 'mu-viz',
+  music: 'myu-zik',
+  song: 'song',
+  songs: 'songs',
+  game: 'geim',
+  games: 'geims',
+  listen: 'li-sen',
+  listening: 'li-se-ning',
+  listened: 'li-send',
+  watch: 'woc',
+  watching: 'wo-cing',
+  watched: 'woct',
+  visit: 'vi-zit',
+  visited: 'vi-zi-ted',
+  visiting: 'vi-zi-ting',
+  decide: 'di-said',
+  decided: 'di-sai-ded',
+  start: 'start',
+  started: 'star-ted',
+  finish: 'fi-nisy',
+  finished: 'fi-nisyt',
+  learn: 'lern',
+  learning: 'ler-ning',
+  learned: 'lernd',
+  forget: 'for-get',
+  forgot: 'for-got',
+  remember: 'ri-mem-ber',
+  think: 'tingk',
+  thinking: 'ting-king',
+  thought: 'tot',
+  bought: 'bot',
+  brought: 'brot',
+  caught: 'kot',
+  taught: 'tot',
+  might: 'mait',
+  light: 'lait',
+  write: 'rait',
+  writing: 'rai-ting',
+  written: 'ri-ten',
+  please: 'pliz',
+  sorry: 'so-ri',
+  excuse: 'iks-kyuz',
+  thank: 'tengk',
+  thanks: 'tengks',
+  welcome: 'wel-kem',
+  hello: 'he-lo',
+  everyone: 'ev-ri-wan',
+  someone: 'sam-wan',
+  anyone: 'e-ni-wan',
+  something: 'sam-ting',
+  anything: 'e-ni-ting',
+  everything: 'ev-ri-ting',
+  nothing: 'na-ting',
+  together: 'tu-ge-der',
+  already: 'ol-re-di',
+  almost: 'ol-most',
+  enough: 'i-naf',
+  instead: 'in-sted',
+  though: 'do',
+  through: 'tru',
+  drink: 'dringk',
+  drinking: 'dring-king',
+  order: 'or-der',
+  ordered: 'or-derd',
+  ordering: 'or-de-ring',
+  hot: 'hot',
+  iced: 'aist',
+  ice: 'ais',
+  latte: 'la-tei',
+  matcha: 'ma-ca',
+  tea: 'ti',
+  water: 'wo-ter',
+  food: 'fud',
+  eat: 'it',
+  eating: 'i-ting',
+  ate: 'eit',
+  sleep: 'slip',
+  sleeping: 'sli-ping',
+  slept: 'slept',
+  weekend_s: 'wik-ends',
+  saturday: 'se-ter-dei',
+  sunday: 'san-dei',
+  monday: 'man-dei',
+  tuesday: 'tyuz-dei',
+  wednesday: 'wenz-dei',
+  thursday: 'terz-dei',
+  friday: 'frai-dei',
+  sushi: 'su-syi',
+  ramen: 'ra-men',
+  karaoke: 'ka-ra-o-ke',
+  photography: 'fo-to-gre-fi',
+  museum: 'myu-zi-em',
+  station: 'stei-syen',
+  airport: 'er-port',
+  subway: 'sab-wei',
+  hotel: 'ho-tel',
+  umbrella: 'am-bre-la',
+  concert: 'kon-sert',
+  festival: 'fes-ti-vel',
+  people: 'pi-pel',
+  person: 'per-sen',
+  time: 'taim',
+  times: 'taims',
+  story: 'sto-ri',
+  happy: 'he-pi',
+  tired: 'ta-yerd',
+  excited: 'ik-sai-ted',
+  relaxed: 'ri-lekst',
+  calm: 'kam',
+  bus: 'bas',
+  train: 'trein',
+  car: 'kar',
+  slides: 'slaids',
+  ready: 're-di',
+  presentation: 'pre-zen-tei-syen',
+  marketing: 'mar-ke-ting',
+  digital: 'di-ji-tel',
+  social: 'so-syel',
+  media: 'mi-di-e',
+  technology: 'tek-no-lo-ji',
+  clean: 'klin',
+  energy: 'e-ner-ji',
+  communication: 'ke-myu-ni-kei-syen',
+  class: 'klas',
+  prepare: 'pri-per',
+  prepared: 'pri-perd',
+  preparing: 'pri-pe-ring',
+  sound: 'saund',
+  sounds: 'saunds',
+  went: 'went',
+  want: 'wont',
+  wanted: 'won-ted',
+  wanting: 'won-ting',
+  goes: 'goz',
+  going: 'go-ing',
+  got: 'got',
+  hours: 'awers',
+  hour: 'awer',
+  two: 'tu',
+  three: 'tri',
+  one: 'wan',
+  first: 'ferst',
+  last: 'last',
+  next: 'nekst',
+  chicken: 'ci-ken',
+  warm: 'worm',
+  rice: 'rais',
+  dish: 'disy',
+  satay: 'sa-tei',
+  fried: 'fraid',
+  still: 'stil',
+  bit: 'bit',
+  stiff: 'stif',
+  robot: 'ro-bot',
+  voice: 'vois',
+  door: 'dor',
+  late: 'leit',
+  lately: 'leit-li',
+  fam: 'fem',
+  said: 'sed',
+  know: 'no',
+  just: 'jast',
+  sure: 'syur',
+  even: 'i-ven',
+  also: 'ol-so',
+  only: 'on-li',
+  well: 'wel',
+  yes: 'yes',
+  no: 'no',
+  maybe: 'mei-bi',
+  really: 'ri-li',
+  actually_2: 'ek-cu-e-li',
+  "don't": 'dont',
+  "didn't": 'di-dent',
+  "won't": 'wont',
+  "can't": 'kent',
+  "isn't": 'i-zent',
+  "aren't": 'arent',
+  "wasn't": 'wo-zent',
+  "weren't": 'we-rent',
+  "haven't": 'he-vent',
+  "hasn't": 'he-zent',
+  "couldn't": 'ku-dent',
+  "wouldn't": 'wu-dent',
+  "shouldn't": 'syu-dent',
+  "it's": 'its',
+  "that's": 'dets',
+  "there's": 'ders',
+  "what's": 'wots',
+  "let's": 'lets',
+  "you're": 'yur',
+  "we're": 'wir',
+  "they're": 'deir',
+  "he's": 'hiz',
+  "she's": 'syiz',
+  "i'll": 'ail',
+  "you'll": 'yul',
+  "we'll": 'wil',
+  approach: 'e-prouc',
+  approaches: 'e-prou-cis',
+  approached: 'e-prouct',
+  approaching: 'e-prou-cing',
+  makes: 'meiks',
+  make: 'meik',
+  made: 'meid',
+  making: 'mei-king',
+  takes: 'teiks',
+  take: 'teik',
+  taken: 'tei-ken',
+  taking: 'tei-king',
+  them: 'dem',
+  these: 'diz',
+  those: 'doz',
+  than: 'den',
+  then: 'den',
+  fret: 'fret',
+  darling: 'dar-ling',
+  faster: 'fas-ter',
+  consistently: 'kon-sis-tent-li',
+  consistent: 'kon-sis-tent',
+  pick: 'pik',
+  picked: 'pikt',
+  sense: 'sens',
+  habit: 'he-bit',
+  habits: 'he-bits',
+  daily: 'dei-li',
+  shadowing: 'sye-do-ing',
+  routine: 'ru-tin',
+  fluent: 'flu-ent',
+  fluently: 'flu-ent-li',
+  fluency: 'flu-en-si',
+  pronounce: 'pro-nauns',
+  correctly: 'ke-rekt-li',
+  teach: 'tic',
+  teaches: 'ti-cis',
+  teaching: 'ti-cing',
+  teacher: 'ti-cer',
+  watches: 'wo-cis',
+  research: 'ri-serc',
+  researching: 'ri-ser-cing',
+  careful: 'ker-ful',
+  carefully: 'ker-fu-li',
+  "they'll": 'deil',
+  "you've": 'yuv',
+};
+
+const COMBINED_ENGLISH_PHONETICS: Record<string, string> = {
+  ...ENGLISH_WORD_PHONETICS,
+  ...EXTRA_ENGLISH_WORD_PHONETICS,
+};
+
+function phoneticizeUnknownEnglishWord(word: string): string {
+  // Keep short all-caps acronyms (TV, AI, OK, DJ) intact
+  if (/^[A-Z]{2,4}$/.test(word)) return word;
+  const CH_TOKEN = '\uE001';
+  let w = word.toLowerCase().replace(/\u2019/g, "'");
+  if (w.length <= 2) return w;
+  w = w
+    .replace(/tion\b/g, 'syen')
+    .replace(/sion\b/g, 'syen')
+    .replace(/cian\b/g, 'syen')
+    .replace(/(?:cious|tious)\b/g, 'syes')
+    .replace(/ous\b/g, 'es')
+    .replace(/ment\b/g, 'ment')
+    .replace(/ness\b/g, 'nes')
+    .replace(/ing\b/g, 'ing')
+    .replace(/^kn/g, 'n')
+    .replace(/^wr/g, 'r')
+    .replace(/eigh/g, 'ei')
+    .replace(/igh/g, 'ai')
+    .replace(/augh/g, 'o')
+    .replace(/ough/g, 'o')
+    .replace(/tch/g, CH_TOKEN)
+    .replace(/sh/g, 'sy')
+    .replace(/ch/g, CH_TOKEN)
+    .replace(/th/g, 't')
+    .replace(/ph/g, 'f')
+    .replace(/qu/g, 'kw')
+    .replace(/wh/g, 'w')
+    .replace(/ck/g, 'k')
+    .replace(/dg(?=[eiy])/g, 'j')
+    .replace(/([aiou])([bcdfghjklmnpqrstvwxyz])e(s?)\b/g, (_m, v, c, s) => {
+      const longV = v === 'a' ? 'ei' : v === 'i' ? 'ai' : v === 'o' ? 'ou' : 'yu';
+      return `${longV}${c}${s}`;
+    })
+    .replace(/ee|ea/g, 'i')
+    .replace(/oo/g, 'u')
+    .replace(/ou|ow/g, 'au')
+    .replace(/ai|ay/g, 'ei')
+    .replace(/au|aw/g, 'o')
+    .replace(/oa/g, 'o')
+    .replace(/c(?=[eiy])/g, 's')
+    .replace(/c/g, 'k')
+    .split(CH_TOKEN)
+    .join('c')
+    .replace(/age\b/g, 'ej')
+    .replace(/x/g, 'ks')
+    .replace(/([^aeiou])y\b/g, '$1i')
+    .replace(/([^aeiou])e\b/g, '$1')
+    .replace(/([b-df-hj-np-tv-z])\1+/g, '$1');
+  return w;
+}
+
 export function approximateEnglishPhoneticId(text: string): string {
-  const phraseModified = text
+  const normalized = (text || '')
+    .replace(/\u2019/g, "'")
+    .replace(/([A-Za-z])[-\u2013\u2014]+([A-Za-z])/g, '$1, $2');
+  const phraseModified = normalized
     .replace(/\bI'd like\b/gi, 'Aid laik')
     .replace(/\bI would like\b/gi, 'Ai wud laik')
     .replace(/\bCould you\b/gi, 'Kud yu')
@@ -669,19 +1061,88 @@ export function approximateEnglishPhoneticId(text: string): string {
 
   return phraseModified.replace(/[A-Za-z']+/g, (word) => {
     const lower = word.toLowerCase();
-    if (ENGLISH_WORD_PHONETICS[lower]) {
-      const mapped = ENGLISH_WORD_PHONETICS[lower];
+    if (COMBINED_ENGLISH_PHONETICS[lower]) {
+      const mapped = COMBINED_ENGLISH_PHONETICS[lower];
       if (word[0] === word[0].toUpperCase() && word[0] !== word[0].toLowerCase()) {
         return mapped.charAt(0).toUpperCase() + mapped.slice(1);
       }
       return mapped;
     }
-    return word;
+    const phonetic = phoneticizeUnknownEnglishWord(word);
+    if (word[0] === word[0].toUpperCase() && word[0] !== word[0].toLowerCase()) {
+      return phonetic.charAt(0).toUpperCase() + phonetic.slice(1);
+    }
+    return phonetic;
   });
 }
 
 export function approximateJapaneseRomaji(text: string): string {
   return toPhoneticRomaji(text);
+}
+
+/**
+ * Single Source of Truth for reading guides ("Cara Baca") across Live HUD,
+ * History transcripts, BeginnerAnswerAssistant, vocab pills, and Workbench Pop-ups.
+ */
+export function resolveUnifiedPronunciation(
+  rawText: string,
+  targetLang?: 'en' | 'ja' | 'zh',
+  explicitPronunciation?: string,
+  learnerLocale?: string
+): string {
+  const clean = stripEmojisAndEmotWords(rawText || '').trim();
+  if (!clean) return '';
+
+  const hasKanaOrKanji = /[\u3040-\u30ff]/.test(clean);
+  const hasHanzi = containsHanzi(clean);
+  if (!hasKanaOrKanji && !hasHanzi && looksAlreadyIndonesian(clean)) {
+    return '';
+  }
+  const effectiveLang: 'en' | 'ja' | 'zh' =
+    targetLang === 'ja' || hasKanaOrKanji
+      ? 'ja'
+      : targetLang === 'zh' || hasHanzi
+        ? 'zh'
+        : 'en';
+
+  if (effectiveLang === 'ja') {
+    const det = toPhoneticRomaji(clean).replace(/[\u3040-\u30ff\u4e00-\u9faf]/g, '').trim();
+    if (det) return det;
+  } else if (effectiveLang === 'zh') {
+    const det = toPhoneticPinyin(clean).replace(/[\u4e00-\u9fff]/g, '').trim();
+    if (det) return det;
+  } else {
+    let rawLoc = learnerLocale || '';
+    if (!rawLoc && typeof window !== 'undefined') {
+      try {
+        const qs = new URLSearchParams(window.location.search);
+        rawLoc =
+          qs.get('lang') ||
+          localStorage.getItem('fz_lang') ||
+          localStorage.getItem('fz_ui_lang') ||
+          '';
+      } catch {
+        // Ignore storage errors
+      }
+    }
+    const loc = String(rawLoc || 'id').toLowerCase().split(/[-_]/)[0];
+    // Deterministic EN phoneticizer is tailored to Indonesian orthography; avoid leaking it to th/ja/zh UI
+    if (loc === 'id') {
+      const det = approximateEnglishPhoneticId(clean).trim();
+      if (det) return det;
+    }
+  }
+
+  const fallback = (explicitPronunciation || '').trim();
+  if (!fallback || /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(fallback)) return '';
+  if (
+    effectiveLang === 'en' &&
+    fallback.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+      clean.toLowerCase().replace(/[^a-z0-9]/g, '')
+  ) {
+    return '';
+  }
+  return fallback;
 }
 
 function approximateJapaneseToIndonesian(text: string): string {
@@ -890,6 +1351,18 @@ function approximateEnglishToIndonesian(text: string): string {
   if (lower.includes('school pilot') || lower.includes('teachers or administrators')) {
     return 'Uji coba pilot di sekolah adalah langkah awal yang luar biasa! Apakah kamu sudah punya kontak guru atau kepala sekolah?';
   }
+  if (lower.includes('boom') && lower.includes('there you go') && lower.includes('what else did you do')) {
+    return 'Mantap! Nah, itu dia! Struktur kalimatnya sudah pas banget. Ayo lanjutkan semangat itu—apa lagi yang kamu lakukan hari ini?';
+  }
+  if (lower.includes('boom') && lower.includes('there you go')) {
+    return 'Mantap! Nah, itu dia! Tepat sekali!';
+  }
+  if (lower.includes('exact structure') || lower.includes('keep that energy moving')) {
+    return 'Struktur kalimatnya sudah pas! Ayo pertahankan ritme ini—apa lagi yang kamu lakukan hari ini?';
+  }
+  if (lower.includes('what else did you do')) {
+    return 'Apa lagi yang kamu lakukan hari ini?';
+  }
   if (lower.includes('?') || lower.includes('what') || lower.includes('how') || lower.includes('why')) {
     return 'Teman bicaramu menanyakan pendapat atau ceritamu lebih lanjut. Silakan jawab dengan santai ya!';
   }
@@ -901,6 +1374,24 @@ function approximateEnglishToThai(text: string): string {
   if (lower.includes('awesome to connect') || lower.includes("what's on your mind") || lower.includes('what is on your mind')) {
     return 'สวัสดีครับ! ดีใจมากที่ได้คุยกันวันนี้ เราคุยกันสบายๆ ได้ทุกเรื่องเลย ตอนนี้กำลังคิดเรื่องอะไรอยู่ครับ?';
   }
+  if (lower.includes('boom') && lower.includes('there you go') && lower.includes('what else did you do')) {
+    return 'Mantap! Nah, itu dia! Struktur kalimatnya sudah pas banget. Ayo lanjutkan semangat itu—apa lagi yang kamu lakukan hari ini?';
+  }
+  if (lower.includes('boom') && lower.includes('there you go')) {
+    return 'Mantap! Nah, itu dia! Tepat sekali!';
+  }
+  if (lower.includes('exact structure') || lower.includes('keep that energy moving')) {
+    return 'Struktur kalimatnya sudah pas! Ayo pertahankan ritme ini—apa lagi yang kamu lakukan hari ini?';
+  }
+  if (lower.includes('what else did you do')) {
+    return 'Apa lagi yang kamu lakukan hari ini?';
+  }
+  if (lower.includes('boom') && lower.includes('there you go') && lower.includes('what else did you do')) {
+    return 'เยี่ยมมาก! แบบนั้นแหละ โครงสร้างประโยคเป๊ะเลย มาลุยต่อกันเถอะ—วันนี้คุณทำอะไรอีกบ้างครับ/ค่ะ?';
+  }
+  if (lower.includes('boom') && lower.includes('there you go')) {
+    return 'เยี่ยมเลย! แบบนั้นแหละ ถูกต้องที่สุด!';
+  }
   if (lower.includes('?') || lower.includes('what') || lower.includes('how') || lower.includes('why')) {
     return 'เพื่อนคู่สนทนากำลังถามความคิดเห็นของคุณอยู่ ตอบกลับได้สบายๆ เลยครับ!';
   }
@@ -908,6 +1399,24 @@ function approximateEnglishToThai(text: string): string {
 }
 
 const liveTranslationCache = new Map<string, string>();
+const liveTranslationListeners = new Set<() => void>();
+
+export function subscribeLiveTranslationUpdates(listener: () => void): () => void {
+  liveTranslationListeners.add(listener);
+  return () => {
+    liveTranslationListeners.delete(listener);
+  };
+}
+
+function notifyLiveTranslationListeners(): void {
+  liveTranslationListeners.forEach((cb) => {
+    try {
+      cb();
+    } catch {
+      // Ignore subscriber errors
+    }
+  });
+}
 
 function resolveTranslationCandidateBases(): string[] {
   try {
@@ -930,12 +1439,85 @@ function resolveTranslationCandidateBases(): string[] {
 
 const inFlightTranslations = new Map<string, Promise<string>>();
 
-function looksAlreadyIndonesian(text: string): boolean {
-  return (
-    /\b(adalah|sedangkan|gunakan|perhatikan|bagaimana|kenapa|kapan|jelaskan|bedanya|kalau|dipakai|kalimat|artinya|contoh|jangan|ketika|tolong|aku|bingung)\b/i.test(
-      text
-    ) && !/\b(what|where|when|would|should|could|have|been|going)\b/i.test(text)
-  );
+type SharedAnonGate = {
+  ready: Set<string>;
+  inflight: Map<string, Promise<boolean>>;
+  cooldownUntil: Map<string, number>;
+};
+
+function getSharedAnonGate(): SharedAnonGate {
+  const g = globalThis as unknown as { __fzAnonSessionGate?: SharedAnonGate };
+  if (!g.__fzAnonSessionGate) {
+    g.__fzAnonSessionGate = {
+      ready: new Set<string>(),
+      inflight: new Map<string, Promise<boolean>>(),
+      cooldownUntil: new Map<string, number>(),
+    };
+  }
+  return g.__fzAnonSessionGate;
+}
+
+/**
+ * Single-flight, 429-aware `/api/auth/anon` cookie bootstrap shared across
+ * translation, live-session/copilot, and Braincore sync so concurrent calls
+ * never hammer Cloudflare rate limits.
+ */
+export async function ensureSharedAnonSession(base: string, force = false): Promise<boolean> {
+  const cleanBase = String(base || '').replace(/\/+$/, '');
+  const key = cleanBase || '__same_origin__';
+  const gate = getSharedAnonGate();
+  if (!force && gate.ready.has(key)) return true;
+  if (!force) {
+    const blockedUntil = gate.cooldownUntil.get(key) || 0;
+    if (blockedUntil > Date.now()) return false;
+    const inflight = gate.inflight.get(key);
+    if (inflight) return inflight;
+  }
+  const p = (async (): Promise<boolean> => {
+    try {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const tid = controller ? setTimeout(() => controller.abort(), 4500) : null;
+      const res = await fetch(`${cleanBase}/api/auth/anon`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+        credentials: 'include',
+        mode: 'cors',
+        ...(controller ? { signal: controller.signal } : {}),
+      });
+      if (tid) clearTimeout(tid);
+      if (res.ok || res.status === 409) {
+        gate.ready.add(key);
+        gate.cooldownUntil.delete(key);
+        return true;
+      }
+      if (res.status === 429) {
+        gate.cooldownUntil.set(key, Date.now() + 60_000);
+      }
+      return false;
+    } catch {
+      gate.cooldownUntil.set(key, Date.now() + 10_000);
+      return false;
+    } finally {
+      gate.inflight.delete(key);
+    }
+  })();
+  gate.inflight.set(key, p);
+  return p;
+}
+
+export function looksAlreadyIndonesian(text: string): boolean {
+  const clean = String(text || '').trim();
+  if (!clean) return false;
+  const hasIdWords =
+    /\b(adalah|sedangkan|gunakan|perhatikan|bagaimana|kenapa|kapan|jelaskan|bedanya|kalau|dipakai|kalimat|artinya|contoh|jangan|ketika|tolong|aku|bingung|santai|banget|bareng|akhirnya|ketemu|bahas|pelan-pelan|sampai|kebayang|materi|halaman|bagian|mulai|pejuang|sensei|kamu|saya|kita|hari\s+ini|atau|mau|sudah|belum|bikin)\b/i.test(
+      clean
+    );
+  const hasEnWords =
+    /\b(what|where|when|would|should|could|have|been|going|your|you'll|you're|this|that|with|from|they|their|which|there)\b/i.test(
+      clean
+    );
+  return hasIdWords && !hasEnWords;
 }
 
 /**
@@ -945,7 +1527,7 @@ function looksAlreadyIndonesian(text: string): boolean {
  */
 export async function fetchLiveTranslation(
   text: string,
-  targetLocale: LearnerLocale | string
+  targetLocale: string
 ): Promise<string> {
   const clean = (text || '').trim();
   if (!clean) return '';
@@ -992,10 +1574,12 @@ export async function fetchLiveTranslation(
 
   const task = (async (): Promise<string> => {
     for (const apiBase of resolveTranslationCandidateBases()) {
+      const cleanBase = String(apiBase || '').replace(/\/$/, '');
+      await ensureSharedAnonSession(cleanBase);
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 5500);
+      const timer = setTimeout(() => controller.abort(), 11000);
       try {
-        const res = await fetch(`${apiBase}/api/voice/translate`, {
+        const res = await fetch(`${cleanBase}/api/voice/translate`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
@@ -1003,6 +1587,7 @@ export async function fetchLiveTranslation(
             targetLocale: loc,
             sourceLang: detectedSourceLang,
           }),
+          credentials: 'include',
           mode: 'cors',
           signal: controller.signal,
         });
@@ -1025,6 +1610,7 @@ export async function fetchLiveTranslation(
             } catch {
               // Ignore
             }
+            notifyLiveTranslationListeners();
             return translated;
           }
         }
@@ -1171,7 +1757,7 @@ export function translateAndPhoneticizeLiveText(
   explicitTranslationId?: string,
   explicitTranslationTh?: string,
   explicitPronunciation?: string,
-  options?: { syncOnly?: boolean }
+  options?: { syncOnly?: boolean; locale?: string; forceFetch?: boolean }
 ): LiveTranslationResult {
   const clean = stripEmojisAndEmotWords(rawText || '').trim();
   if (!clean) {
@@ -1184,17 +1770,69 @@ export function translateAndPhoneticizeLiveText(
     };
   }
 
+  let activeLocale = (options?.locale || '').toLowerCase();
+  if (!activeLocale && typeof window !== 'undefined') {
+    try {
+      const qs = new URLSearchParams(window.location.search || '');
+      activeLocale = (
+        qs.get('locale') ||
+        qs.get('lang') ||
+        localStorage.getItem('fz_ui_lang') ||
+        'id'
+      ).toLowerCase();
+    } catch {
+      activeLocale = 'id';
+    }
+  }
+  if (!['id', 'th', 'ja', 'zh'].includes(activeLocale)) {
+    activeLocale = 'id';
+  }
+
+  const unifiedPron = (fallback?: string): string => {
+    const hasCjk = /[\u3040-\u30ff\u4e00-\u9faf]/.test(clean);
+    if (!hasCjk && looksAlreadyIndonesian(clean)) {
+      return '';
+    }
+    if (targetLang === 'ja') {
+      if (!hasCjk) return '';
+      const det = toPhoneticRomaji(clean).replace(/[\u3040-\u30ff\u4e00-\u9faf]/g, '').trim();
+      return det || fallback || explicitPronunciation || '';
+    }
+    if (targetLang === 'zh') {
+      const det = toPhoneticPinyin(clean).replace(/[\u4e00-\u9fff]/g, '').trim();
+      return det || fallback || explicitPronunciation || '';
+    }
+    const raw = (explicitPronunciation || '').trim();
+    const sameAsEnglish =
+      raw.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+      clean.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (activeLocale !== 'id') {
+      return raw && !sameAsEnglish ? raw : '';
+    }
+    return raw && !sameAsEnglish ? raw : approximateEnglishPhoneticId(clean);
+  };
+
   const lower = clean.toLowerCase();
   for (const item of KNOWN_UTTERANCE_TRANSLATIONS) {
     const m = item.match.toLowerCase();
     // Strict match: exact equality or starting with prefix and close in total length
     if (lower === m || (lower.startsWith(m) && Math.abs(lower.length - m.length) <= 12)) {
       const furiganaHtml = targetLang === 'ja' ? renderFuriganaHtml(clean) : targetLang === 'zh' ? renderMandarinRubyHtml(clean) : undefined;
+      const cachedLoc = liveTranslationCache.get(`${activeLocale}:${clean}`);
+      if (
+        !options?.syncOnly &&
+        (activeLocale === 'ja' || activeLocale === 'zh') &&
+        !cachedLoc
+      ) {
+        void fetchLiveTranslation(clean, activeLocale).catch(() => {});
+      }
       return {
         text: clean,
-        pronunciation: explicitPronunciation || (targetLang === 'ja' ? toPhoneticRomaji(clean) : targetLang === 'zh' ? toPhoneticPinyin(clean) : approximateEnglishPhoneticId(clean)),
-        translationId: sanitizeTranslationOutput(explicitTranslationId || item.translationId),
-        translationTh: sanitizeTranslationOutput(explicitTranslationTh || item.translationTh),
+        pronunciation: unifiedPron(item.pronunciation),
+        translationId: sanitizeTranslationOutput(explicitTranslationId || item.translationId, 'id'),
+        translationTh: sanitizeTranslationOutput(explicitTranslationTh || item.translationTh, 'th'),
+        translationJa: activeLocale === 'ja' ? cachedLoc || '' : undefined,
+        translationZh: activeLocale === 'zh' ? cachedLoc || '' : undefined,
         furiganaHtml,
       };
     }
@@ -1203,25 +1841,27 @@ export function translateAndPhoneticizeLiveText(
   const isAlreadyId = looksAlreadyIndonesian(clean);
   const isCompleteSentence =
     !options?.syncOnly &&
-    clean.length >= 10 &&
-    clean.length <= 220 &&
-    /[.?!。？！]$/.test(clean);
+    clean.length <= 260 &&
+    ((options?.forceFetch && clean.length >= 3) ||
+      (clean.length >= 10 && /[.?!。？！]$/.test(clean)));
 
-  // Trigger non-blocking background translation hydration ONLY on completed sentences (never on syllable-by-syllable streaming drafts!)
+  // Trigger non-blocking background translation hydration ONLY on completed/settled sentences
   const cachedId = liveTranslationCache.get(`id:${clean}`);
   const cachedTh = liveTranslationCache.get(`th:${clean}`);
+  const cachedJa = liveTranslationCache.get(`ja:${clean}`);
+  const cachedZh = liveTranslationCache.get(`zh:${clean}`);
   if (typeof window !== 'undefined' && isCompleteSentence) {
-    let activeLocale = 'id';
-    try {
-      const qs = new URLSearchParams(window.location.search || '');
-      const urlLang = (qs.get('lang') || localStorage.getItem('fz_ui_lang') || 'id').toLowerCase();
-      if (urlLang === 'th') activeLocale = 'th';
-    } catch {
-      // Ignore
-    }
     if (activeLocale === 'th') {
       if (!cachedTh && !explicitTranslationTh && !/[\u0E00-\u0E7F]{3,}/.test(clean)) {
         void fetchLiveTranslation(clean, 'th').catch(() => {});
+      }
+    } else if (activeLocale === 'ja') {
+      if (!cachedJa && !/[\u3040-\u30ff]/.test(clean)) {
+        void fetchLiveTranslation(clean, 'ja').catch(() => {});
+      }
+    } else if (activeLocale === 'zh') {
+      if (!cachedZh && !/[\u4e00-\u9fff]/.test(clean)) {
+        void fetchLiveTranslation(clean, 'zh').catch(() => {});
       }
     } else if (!cachedId && !explicitTranslationId && !isAlreadyId) {
       void fetchLiveTranslation(clean, 'id').catch(() => {});
@@ -1229,42 +1869,45 @@ export function translateAndPhoneticizeLiveText(
   }
 
   if (targetLang === 'zh') {
-    const pinyin = explicitPronunciation || toPhoneticPinyin(clean);
     const idTrans = explicitTranslationId || cachedId || (isAlreadyId ? clean : approximateMandarinToIndonesian(clean));
     const thTrans = explicitTranslationTh || cachedTh || approximateMandarinToThai(clean);
     const furiganaHtml = renderMandarinRubyHtml(clean);
     return {
       text: clean,
-      pronunciation: pinyin.replace(/[\u4e00-\u9fff]/g, '').trim(),
-      translationId: sanitizeTranslationOutput(idTrans),
-      translationTh: sanitizeTranslationOutput(thTrans),
+      pronunciation: unifiedPron(),
+      translationId: sanitizeTranslationOutput(idTrans, 'id'),
+      translationTh: sanitizeTranslationOutput(thTrans, 'th'),
+      translationJa: cachedJa ? sanitizeTranslationOutput(cachedJa, 'ja') : undefined,
+      translationZh: clean,
       furiganaHtml,
     };
   }
 
   if (targetLang === 'ja') {
-    const romaji = explicitPronunciation || toPhoneticRomaji(clean);
     const idTrans = explicitTranslationId || cachedId || (isAlreadyId ? clean : approximateJapaneseToIndonesian(clean));
     const thTrans = explicitTranslationTh || cachedTh || approximateJapaneseToThai(clean);
     const furiganaHtml = renderFuriganaHtml(clean);
     return {
       text: clean,
-      pronunciation: romaji.replace(/[\u3040-\u30ff\u4e00-\u9faf]/g, '').trim(),
-      translationId: sanitizeTranslationOutput(idTrans),
-      translationTh: sanitizeTranslationOutput(thTrans),
+      pronunciation: unifiedPron(),
+      translationId: sanitizeTranslationOutput(idTrans, 'id'),
+      translationTh: sanitizeTranslationOutput(thTrans, 'th'),
+      translationJa: clean,
+      translationZh: cachedZh ? sanitizeTranslationOutput(cachedZh, 'zh') : undefined,
       furiganaHtml,
     };
   }
 
-  const phoneticEn = explicitPronunciation || approximateEnglishPhoneticId(clean);
   const idTrans = explicitTranslationId || cachedId || (isAlreadyId ? clean : approximateEnglishToIndonesian(clean));
   const thTrans = explicitTranslationTh || cachedTh || approximateEnglishToThai(clean);
 
   return {
     text: clean,
-    pronunciation: phoneticEn,
-    translationId: sanitizeTranslationOutput(idTrans),
-    translationTh: sanitizeTranslationOutput(thTrans),
+    pronunciation: unifiedPron(),
+    translationId: sanitizeTranslationOutput(idTrans, 'id'),
+    translationTh: sanitizeTranslationOutput(thTrans, 'th'),
+    translationJa: cachedJa ? sanitizeTranslationOutput(cachedJa, 'ja') : undefined,
+    translationZh: cachedZh ? sanitizeTranslationOutput(cachedZh, 'zh') : undefined,
   };
 }
 
@@ -1422,7 +2065,7 @@ export function generateDynamicContextualAiReply(params: {
   userText: string;
   lastAiQuestionText?: string;
   scenarioId: string;
-  targetLang: 'en' | 'ja';
+  targetLang: 'en' | 'ja' | 'zh';
   history?: Array<{ speaker: 'ai' | 'user'; text: string }>;
 }): {
   aiReply: string;
@@ -1432,6 +2075,42 @@ export function generateDynamicContextualAiReply(params: {
   const uLower = (params.userText || '').toLowerCase();
   const prevAiLower = (params.lastAiQuestionText || '').toLowerCase();
   const ctx = extractUserConversationContext(params.userText, params.history);
+
+  if (params.targetLang === 'zh') {
+    if (/(你好|早上好|晚上好|很高兴|最近怎么样)/u.test(params.userText)) {
+      return {
+        aiReply: '你好呀！今天能和你练习中文我也很开心！你平时最常在什么时候练习说汉语呢？',
+        aiReplyTranslationId: 'Halo! Aku juga senang sekali bisa latihan Mandarin bersamamu hari ini! Biasanya kamu paling sering latihan bicara bahasa Mandarin kapan?',
+        aiReplyTranslationTh: 'สวัสดีค่ะ! ดีใจมากที่ได้ฝึกภาษาจีนด้วยกันวันนี้ ปกติคุณฝึกพูดภาษาจีนตอนไหนบ่อยที่สุดคะ?',
+      };
+    }
+    if (/(咖啡|奶茶|茶|点|喝|吃|菜|饭|水果|好吃)/u.test(params.userText) || params.scenarioId.includes('cafe')) {
+      return {
+        aiReply: '听起来真不错！你点的这个我也很喜欢。顺便问一下，你最喜欢的中国菜或者饮料是什么？',
+        aiReplyTranslationId: 'Terdengar enak sekali! Yang kamu pesan itu aku juga suka banget. Ngomong-ngomong, makanan atau minuman Tiongkok favoritmu apa?',
+        aiReplyTranslationTh: 'ฟังดูน่าอร่อยมากเลยค่ะ! เมนูนี้ฉันก็ชอบเหมือนกัน ว่าแต่อาหารจีนหรือเครื่องดื่มที่คุณชอบที่สุดคืออะไรคะ?',
+      };
+    }
+    if (/(学习|汉语|中文|在家|房间|练习|难|容易|文法|语法|词)/u.test(params.userText)) {
+      return {
+        aiReply: '太棒了！你每天都坚持练习，进步一定很快！记得地点“在家里”要放在动词“学习”前面哦。你今天还想练习什么句子？',
+        aiReplyTranslationId: 'Hebat! Kamu rajin latihan setiap hari, pasti cepat berkembang! Ingat keterangan tempat "di rumah (zài jiālǐ)" diletakkan sebelum kata kerja ya. Hari ini kamu ingin latihan kalimat apa lagi?',
+        aiReplyTranslationTh: 'ยอดเยี่ยมมากค่ะ! ขยันฝึกทุกวันแบบนี้เก่งขึ้นเร็วแน่นอน จำไว้ว่าคำบอกสถานที่วางหน้ากริยานะคะ วันนี้อยากฝึกประโยคแบบไหนต่อดีคะ?',
+      };
+    }
+    if (/(喜欢|爱好|电影|音乐|看|听|运动|旅游|朋友)/u.test(params.userText)) {
+      return {
+        aiReply: '哇，这个爱好很有意思！你周末的时候通常和朋友一起去，还是自己一个人呢？',
+        aiReplyTranslationId: 'Wah, hobi itu menarik sekali! Saat akhir pekan biasanya kamu pergi bersama teman, atau sendirian?',
+        aiReplyTranslationTh: 'ว้าว งานอดิเรกนี้น่าสนใจมากเลยค่ะ! ช่วงสุดสัปดาห์ปกติไปกับเพื่อนหรือไปคนเดียวคะ?',
+      };
+    }
+    return {
+      aiReply: '你说得很清楚！继续用简单的中文说说看，你每天怎么安排学习和休息时间？',
+      aiReplyTranslationId: 'Kamu mengatakannya dengan jelas! Coba lanjutkan cerita pakai bahasa Mandarin sederhana, bagaimana kamu mengatur waktu belajar dan istirahat setiap hari?',
+      aiReplyTranslationTh: 'คุณพูดได้ชัดเจนมากเลยค่ะ! ลองเล่าต่อเป็นภาษาจีนง่ายๆ ดูไหมคะว่าทุกวันแบ่งเวลาเรียนกับเวลาพักผ่อนยังไงบ้าง?',
+    };
+  }
 
   if (params.targetLang === 'ja') {
     if (params.scenarioId.includes('free')) {
@@ -1742,7 +2421,7 @@ function buildCard(params: {
   badgeTh: string;
   tier: 'easy' | 'mission' | 'rescue';
   text: string;
-  targetLang: 'en' | 'ja';
+  targetLang: 'en' | 'ja' | 'zh';
   pronunciation?: string;
   hintId: string;
   hintTh: string;
@@ -1750,11 +2429,14 @@ function buildCard(params: {
   contextAnchorTh?: string;
   wordBreakdown?: Array<{ word: string; reading: string; meaningId: string }>;
 }): BeginnerReplyCard {
-  const autoPron =
-    params.pronunciation ||
-    (params.targetLang === 'ja'
-      ? approximateJapaneseRomaji(params.text)
-      : approximateEnglishPhoneticId(params.text));
+  let autoPron = '';
+  if (params.targetLang === 'ja') {
+    autoPron = toPhoneticRomaji(params.text) || params.pronunciation || '';
+  } else if (params.targetLang === 'zh') {
+    autoPron = toPhoneticPinyin(params.text) || params.pronunciation || '';
+  } else {
+    autoPron = approximateEnglishPhoneticId(params.text);
+  }
 
   return {
     id: params.id,
@@ -1779,7 +2461,7 @@ function buildCard(params: {
  */
 export function getBeginnerReplyCards(
   scenarioId: string,
-  targetLang: 'en' | 'ja',
+  targetLang: 'en' | 'ja' | 'zh',
   dynamicSuggestions?: Array<{
     text: string;
     hintId: string;
@@ -1810,10 +2492,13 @@ export function getBeginnerReplyCards(
   if (dynamicSuggestions && dynamicSuggestions.length > 0) {
     const validDynamic = dynamicSuggestions.filter((d) => {
       const t = (d.text || '').trim();
-      if (!t || t.length < 4) return false;
+      if (!t || t.length < 3) return false;
       // Ignore generic fallback placeholders so contextual cards always win
       if (/could you tell me a little more about that/i.test(t)) return false;
       if (/yes, i usually do that with my friends on weekends/i.test(t)) return false;
+      // Ignore wrong-script dynamic suggestions (e.g. English text suggested for JA/ZH)
+      if (targetLang === 'ja' && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(t)) return false;
+      if (targetLang === 'zh' && !/[\u4e00-\u9fff]/.test(t)) return false;
       return true;
     });
 
@@ -1852,7 +2537,7 @@ export function getBeginnerReplyCards(
 
 function synthesizeContextualThreeCards(
   scenarioId: string,
-  targetLang: 'en' | 'ja',
+  targetLang: 'en' | 'ja' | 'zh',
   aiQ: string,
   rawAiText: string,
   lastUserText: string,
@@ -2140,6 +2825,132 @@ function synthesizeContextualThreeCards(
         hintId: 'Tolong satu es kopi. Saya akan meminumnya di dalam kafe.',
         hintTh: 'ขอกาแฟเย็น 1 แก้วครับ/ค่ะ จะดื่มที่ร้านครับ/ค่ะ',
         contextAnchorId: 'Memesan es kopi sekaligus menyebutkan makan di tempat',
+      }),
+    ];
+  }
+
+  // ============================================================================
+  // MANDARIN CHINESE (ZH) REAL-TIME CONTEXTUAL 3-OPTION GENERATOR
+  // ============================================================================
+  if (targetLang === 'zh') {
+    if (aiQ.includes('咖啡') || aiQ.includes('喝') || aiQ.includes('点') || scenarioId.includes('cafe')) {
+      return [
+        buildCard({
+          id: 'zh_cafe_1',
+          badgeId: 'Opsi 1 · Mudah & Singkat (Pesan Kopi Panas)',
+          badgeTh: 'ตัวเลือก 1 · สั้นและพูดง่าย (สั่งกาแฟร้อน)',
+          tier: 'easy',
+          text: '我想点一杯热咖啡，谢谢。',
+          targetLang: 'zh',
+          hintId: 'Saya mau pesan satu kopi panas, terima kasih.',
+          hintTh: 'ฉันอยากสั่งกาแฟร้อนหนึ่งแก้ว ขอบคุณค่ะ/ครับ',
+          contextAnchorId: 'Memesan minuman dengan sopan memakai 我想点...',
+        }),
+        buildCard({
+          id: 'zh_cafe_2',
+          badgeId: 'Opsi 2 · Natural & Kontekstual (Es Kopi & Kurangi Gula)',
+          badgeTh: 'ตัวเลือก 2 · เป็นธรรมชาติ (กาแฟเย็นหวานน้อย)',
+          tier: 'mission',
+          text: '请给我一杯冰美式咖啡，少糖，在这里喝。',
+          targetLang: 'zh',
+          hintId: 'Tolong buatkan saya satu es americano, sedikit gula, minum di sini.',
+          hintTh: 'ขออเมริกาโน่เย็นหวานน้อยหนึ่งแก้ว ดื่มที่นี่ค่ะ/ครับ',
+          contextAnchorId: 'Menyebutkan preferensi rasa dan minum di tempat',
+        }),
+        buildCard({
+          id: 'zh_cafe_3',
+          badgeId: 'Opsi 3 · Lengkap & Sopan (Tanya Rekomendasi Menu)',
+          badgeTh: 'ตัวเลือก 3 · สุภาพ (ถามเมนูแนะนำและสั่งอาหาร)',
+          tier: 'rescue',
+          text: '今天有什么推荐的饮料吗？我想和朋友一起喝点儿东西。',
+          targetLang: 'zh',
+          hintId: 'Hari ini ada minuman rekomendasi apa? Saya ingin minum sesuatu bersama teman.',
+          hintTh: 'วันนี้มีเครื่องดื่มแนะนำอะไรไหมคะ/ครับ อยากดื่มอะไรสักหน่อยกับเพื่อน',
+          contextAnchorId: 'Bertanya rekomendasi lalu menyampaikan rencana bersama teman',
+        }),
+      ];
+    }
+
+    if (
+      aiQ.includes('学习') ||
+      aiQ.includes('在家') ||
+      aiQ.includes('练习') ||
+      aiQ.includes('汉语') ||
+      aiQ.includes('中文') ||
+      scenarioId.includes('tone') ||
+      scenarioId.includes('le') ||
+      scenarioId.includes('free')
+    ) {
+      return [
+        buildCard({
+          id: 'zh_study_1',
+          badgeId: 'Opsi 1 · Mudah & Singkat (Belajar di Rumah)',
+          badgeTh: 'ตัวเลือก 1 · สั้นและพูดง่าย (เรียนที่บ้านทุกวัน)',
+          tier: 'easy',
+          text: '我每天都在家里学习汉语。',
+          targetLang: 'zh',
+          hintId: 'Saya setiap hari belajar bahasa Mandarin di rumah.',
+          hintTh: 'ฉันเรียนภาษาจีนที่บ้านทุกวัน',
+          contextAnchorId: 'Pola urutan waktu + tempat (在家里) sebelum kata kerja',
+        }),
+        buildCard({
+          id: 'zh_study_2',
+          badgeId: 'Opsi 2 · Natural & Kontekstual (Sudah Minum & Belajar)',
+          badgeTh: 'ตัวเลือก 2 · เป็นธรรมชาติ (ใช้ “了” บอกเหตุการณ์ที่ทำแล้ว)',
+          tier: 'mission',
+          text: '今天我喝了咖啡，然后和朋友练习说中文了。',
+          targetLang: 'zh',
+          hintId: 'Hari ini saya sudah minum kopi, lalu berlatih bicara Mandarin bersama teman.',
+          hintTh: 'วันนี้ฉันดื่มกาแฟแล้ว จากนั้นก็ฝึกพูดภาษาจีนกับเพื่อนแล้ว',
+          contextAnchorId: 'Mempraktikkan partikel 了 dan urutan aktivitas harian',
+        }),
+        buildCard({
+          id: 'zh_study_3',
+          badgeId: 'Opsi 3 · Lengkap & Sopan (Tanya Koreksi ke Tutor)',
+          badgeTh: 'ตัวเลือก 3 · สุภาพ (ขอให้คู่สนทนาช่วยแก้คำที่พูดผิด)',
+          tier: 'rescue',
+          text: '如果我说得不太自然，请随时纠正我，谢谢你！',
+          targetLang: 'zh',
+          hintId: 'Kalau ucapanku kurang natural, tolong koreksi aku kapan saja ya, terima kasih!',
+          hintTh: 'ถ้าฉันพูดยังไม่ค่อยเป็นธรรมชาติ ช่วยแก้ให้ได้เลยนะคะ/ครับ ขอบคุณมาก!',
+          contextAnchorId: 'Meminta masukan langsung jika ada kesalahan nada atau urutan kata',
+        }),
+      ];
+    }
+
+    return [
+      buildCard({
+        id: 'zh_free_1',
+        badgeId: 'Opsi 1 · Mudah & Singkat (Sapa Balik & Kabar Baik)',
+        badgeTh: 'ตัวเลือก 1 · สั้นและพูดง่าย (ทักทายกลับและบอกว่าสบายดี)',
+        tier: 'easy',
+        text: '你好！我今天很好，你呢？',
+        targetLang: 'zh',
+        hintId: 'Halo! Hari ini aku baik-baik saja, bagaimana denganmu?',
+        hintTh: 'สวัสดี! วันนี้ฉันสบายดี แล้วคุณล่ะ?',
+        contextAnchorId: 'Membalas sapaan secara ramah dalam percakapan sehari-hari',
+      }),
+      buildCard({
+        id: 'zh_free_2',
+        badgeId: 'Opsi 2 · Natural & Kontekstual (Cerita Hobi & Akhir Pekan)',
+        badgeTh: 'ตัวเลือก 2 · เป็นธรรมชาติ (เล่าเรื่องงานอดิเรก)',
+        tier: 'mission',
+        text: '我周末喜欢在家里看电影，有时候也出去散步。',
+        targetLang: 'zh',
+        hintId: 'Saat akhir pekan aku suka menonton film di rumah, kadang juga keluar jalan-jalan.',
+        hintTh: 'ช่วงสุดสัปดาห์ฉันชอบดูหนังอยู่ที่บ้าน บางครั้งก็ออกไปเดินเล่นข้างนอก',
+        contextAnchorId: 'Menceritakan kebiasaan akhir pekan dengan urutan tempat yang tepat',
+      }),
+      buildCard({
+        id: 'zh_free_3',
+        badgeId: 'Opsi 3 · Lengkap & Sopan (Ajak Latihan Topik Baru)',
+        badgeTh: 'ตัวเลือก 3 · สุภาพและครบถ้วน (ชวนคุยหัวข้อใหม่)',
+        tier: 'rescue',
+        text: '我们今天可以多练习日常对话吗？我想说得更流利。',
+        targetLang: 'zh',
+        hintId: 'Hari ini bisakah kita lebih banyak berlatih percakapan sehari-hari? Aku ingin bicara lebih lancar.',
+        hintTh: 'วันนี้เราซ้อมบทสนทนาประจำวันเพิ่มได้ไหมคะ/ครับ? ฉันอยากพูดให้คล่องขึ้น',
+        contextAnchorId: 'Menyampaikan tujuan latihan secara jelas kepada partner',
       }),
     ];
   }

@@ -66,14 +66,34 @@ console.log('🧪 Menjalankan owner-gem-wire-e2e-test...');
     reason: 'Hadiah Belajar'
   };
 
-  const ctx = {
-    env: { CORE_DB: mockDb },
+  const ownerSecret = 'test-owner-secret';
+  const ownerHash = Array.from(
+    new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ownerSecret)))
+  )
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+
+  const unauthRes = await routeOwnerSendMessage({
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: ownerHash },
     corsHeaders: {},
     now: 1700000000000,
     bodyText: JSON.stringify(payload),
     request: new Request('https://api.fiezel.my.id/api/owner/send-message', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  });
+  assert.strictEqual(unauthRes.status, 403, 'Tanpa token owner wajib ditolak 403');
+
+  const ctx = {
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: ownerHash },
+    corsHeaders: {},
+    now: 1700000000000,
+    bodyText: JSON.stringify(payload),
+    request: new Request('https://api.fiezel.my.id/api/owner/send-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-fiezel-owner-token': ownerSecret },
       body: JSON.stringify(payload)
     })
   };
@@ -130,14 +150,34 @@ console.log('🧪 Menjalankan owner-gem-wire-e2e-test...');
     grantedBy: 'owner'
   };
 
-  const ctx = {
-    env: { CORE_DB: mockDb },
+  const ownerSecret = 'test-owner-secret';
+  const ownerHash = Array.from(
+    new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ownerSecret)))
+  )
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+
+  const unauthRes = await routeOwnerGrantGems({
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: ownerHash },
     corsHeaders: {},
     now: 1700000000000,
     bodyText: JSON.stringify(payload),
     request: new Request('https://api.fiezel.my.id/api/owner/grant-gems', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  });
+  assert.strictEqual(unauthRes.status, 403, 'Tanpa token owner wajib ditolak 403');
+
+  const ctx = {
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: ownerHash },
+    corsHeaders: {},
+    now: 1700000000000,
+    bodyText: JSON.stringify(payload),
+    request: new Request('https://api.fiezel.my.id/api/owner/grant-gems', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-fiezel-owner-token': ownerSecret },
       body: JSON.stringify(payload)
     })
   };

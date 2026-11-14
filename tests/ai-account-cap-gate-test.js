@@ -153,7 +153,23 @@ function migrationStatements(relative) {
 }
 
 async function applyMigration(db, relative) {
-  for (const statement of migrationStatements(relative)) await db.prepare(statement).run();
+  for (const statement of migrationStatements(relative)) {
+    const alterMatch = statement.match(/^ALTER\s+TABLE\s+([A-Za-z_]\w*)\s+ADD\s+(?:COLUMN\s+)?([A-Za-z_]\w*)\b([\s\S]*)$/i);
+    if (alterMatch && db._tables && db._tables.has(alterMatch[1].toLowerCase())) {
+      const tbl = db._tables.get(alterMatch[1].toLowerCase());
+      const colName = alterMatch[2];
+      const defMatch = alterMatch[3].match(/\bDEFAULT\s+('[^']*'|-?[\d.]+)/i);
+      const defVal = defMatch ? (defMatch[1].startsWith("'") ? defMatch[1].slice(1, -1) : Number(defMatch[1])) : null;
+      if (!tbl.columns.some((c) => c.name === colName)) {
+        tbl.columns.push({ name: colName, default: defVal });
+        for (const row of tbl.rows) {
+          if (!(colName in row)) row[colName] = defVal;
+        }
+      }
+      continue;
+    }
+    await db.prepare(statement).run();
+  }
 }
 
 
@@ -164,7 +180,7 @@ async function applyMigration(db, relative) {
  * didiagnosis, jadi ia dibuat berisik di sini.
  */
 async function prepareDb(booted) {
-  for (const mig of ['0001_identity.sql', '0001_quota.sql', '0005_ai_account_budget.sql']) {
+  for (const mig of ['0001_identity.sql', '0001_quota.sql', '0005_ai_account_budget.sql', '0018_quota_ai_chat.sql']) {
     await applyMigration(booted.core, 'migrations/' + mig);
   }
   await applyMigration(booted.stats, 'migrations/0002_analytics.sql');
@@ -365,6 +381,25 @@ const ROUTE_FIXTURES = {
   'POST /api/content/patch/candidate': {
     expectModel: true, needsIdentity: false, ...OWNER_FIXTURE,
     body: JSON.stringify({ itemId: 'r0001#1', finding: { category: 'clarity' } })
+  },
+
+  /* --- SLOT 14 (voice/route-voice-live.js). Menggunakan Gemini Live API eksternal (bukan
+     binding Workers AI env.AI), dan dibuktikan expectModel: false + aiSpendGate('aiChat'). --- */
+  'POST /api/voice/live-session': {
+    expectModel: false, needsIdentity: true,
+    body: JSON.stringify({})
+  },
+  'POST /api/voice/copilot-assist': {
+    expectModel: false, needsIdentity: true,
+    body: JSON.stringify({ aiLastText: 'Hello!', targetLang: 'en', locale: 'id' })
+  },
+  'POST /api/voice/partner-turn': {
+    expectModel: false, needsIdentity: true,
+    body: JSON.stringify({ text: 'Hello!', targetLang: 'en', locale: 'id' })
+  },
+  'POST /api/voice/gemini-tts': {
+    expectModel: false, needsIdentity: true,
+    body: JSON.stringify({ text: 'Hello!', targetLang: 'en' })
   }
 };
 

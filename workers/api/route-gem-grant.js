@@ -8,6 +8,8 @@
 
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 import { readJsonFromCtx } from './mw-guard.js';
+import { roleGate } from './auth/gate.js';
+import { ownerGate } from './cron-status.js';
 
 export const GEMS_CLAIM_PATH = '/api/gems/claim';
 export const OWNER_GRANT_GEMS_PATH = '/api/owner/grant-gems';
@@ -62,6 +64,11 @@ export async function routeGemsClaim(ctx) {
  */
 export async function routeOwnerGrantGems(ctx) {
   const opt = { headers: ctx.corsHeaders || {} };
+  const secretGate = await ownerGate(ctx);
+  if (secretGate) {
+    const gate = await roleGate(ctx);
+    if (!gate.ok) return secretGate;
+  }
   const db = getCoreDb(ctx.env);
   if (!db) {
     return jsonError(503, ERR.UNAVAILABLE, opt);

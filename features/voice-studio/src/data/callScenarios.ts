@@ -2,6 +2,7 @@ import type { CallScenario, VoicePersona } from '../types/voiceCall.ts';
 import { FIEZEL_LIFE_CALL_SCENARIOS } from './fiezelLifeCallScenarios.ts';
 import { IELTS_CALL_SCENARIOS } from './ieltsCallScenarios.ts';
 import { PTE_CALL_SCENARIOS } from './pteCallScenarios.ts';
+import { SSW_CALL_SCENARIOS, SSW_SENSEI_PERSONA } from './sswCallScenarios.ts';
 
 export const FIEZEL_CORE_LORE = `
 [FIEZEL ECOSYSTEM & IDENTITY]:
@@ -451,6 +452,7 @@ For every practice task, you follow a strict 4-step sequence:
 - All exam prompts, sample responses, and phonetics must be standard British/Australian English.
 - No markdown tables that break TTS, no emojis.`,
   },
+  ssw_sensei: SSW_SENSEI_PERSONA,
 };
 
 export const CALL_SCENARIOS: CallScenario[] = [
@@ -2188,4 +2190,5 @@ export const CALL_SCENARIOS: CallScenario[] = [
   ...FIEZEL_LIFE_CALL_SCENARIOS,
   ...PTE_CALL_SCENARIOS,
   ...IELTS_CALL_SCENARIOS,
+  ...SSW_CALL_SCENARIOS,
 ];

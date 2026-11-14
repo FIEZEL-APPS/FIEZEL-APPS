@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Volume2, Send, Mic, RefreshCw, Sparkles, ChevronUp, ChevronDown, Check } from 'lucide-react';
-import type { BeginnerReplyCard } from '../lib/liveCallHelper';
+import { resolveUnifiedPronunciation, type BeginnerReplyCard } from '../lib/liveCallHelper';
+import { buildSswContextualReplyCards } from '../lib/sswSenseiEngine';
 import type { CallScenario, LearnerLocale, VoicePersona } from '../types/voiceCall';
 import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
 import { toPhoneticRomaji } from '../lib/japanesePhonetics';
@@ -60,7 +61,34 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
     setSelectedIndex(0);
   }, [aiQuestionText]);
 
-  const visibleCards = (cards || []).slice(0, 3);
+  const isSswMode =
+    persona?.id === 'ssw_sensei' ||
+    scenario.personaId === 'ssw_sensei' ||
+    scenario.id.startsWith('scen_ssw_');
+
+  const sswFallbackCards = useMemo(() => {
+    if (!isSswMode) return [];
+    return buildSswContextualReplyCards(aiQuestionText || '', lastUserText || '', 0).map((c) => ({
+      id: c.id,
+      tier: c.tier,
+      badgeId: c.badgeId,
+      badgeTh: c.badgeTh,
+      tierLabelId: c.tierLabelId,
+      tierLabelTh: c.tierLabelTh,
+      text: c.text,
+      pronunciation: c.pronunciation,
+      hintId: c.hintId,
+      hintTh: c.hintTh,
+      meaningId: c.meaningId,
+      meaningTh: c.meaningTh,
+      isRealtimeAi: false,
+      isOfflineFallback: true,
+    }));
+  }, [isSswMode, aiQuestionText, lastUserText]);
+
+  const incomingCards = (cards || []).slice(0, 3);
+  const visibleCards =
+    incomingCards.length > 0 ? incomingCards : isSswMode ? sswFallbackCards.slice(0, 3) : [];
   const safeIndex = selectedIndex < visibleCards.length ? selectedIndex : 0;
   const activeCard = visibleCards[safeIndex] || null;
 
@@ -85,10 +113,25 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
   }
 
   const getShortTabLabel = (card: BeginnerReplyCard, idx: number): string => {
+    if (isSswMode) {
+      if (idx === 0 || card.tier === 'easy') return '1 · Tanya Detail';
+      if (idx === 1 || card.tier === 'mission') return '2 · Trik & Contoh';
+      return '3 · Uji Saya';
+    }
     if (locale === 'th') {
       if (idx === 0 || card.tier === 'easy') return '1 · สั้น';
       if (idx === 1 || card.tier === 'mission') return '2 · ธรรมชาติ';
       return '3 · ถามกลับ';
+    }
+    if (locale === 'ja') {
+      if (idx === 0 || card.tier === 'easy') return '1 · 短め';
+      if (idx === 1 || card.tier === 'mission') return '2 · 自然';
+      return '3 · + 質問';
+    }
+    if (locale === 'zh') {
+      if (idx === 0 || card.tier === 'easy') return '1 · 简短';
+      if (idx === 1 || card.tier === 'mission') return '2 · 自然';
+      return '3 · + 反问';
     }
     if (idx === 0 || card.tier === 'easy') return '1 · Singkat';
     if (idx === 1 || card.tier === 'mission') return '2 · Alami';
@@ -96,31 +139,19 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
   };
 
   const resolvePronunciationGuide = (card: BeginnerReplyCard): string => {
-    const raw = (card.pronunciation || '').trim();
-    const hasCjkRaw = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(raw);
-    if (targetLang === 'ja') {
-      const deterministic = toPhoneticRomaji(card.text);
-      if (deterministic) return deterministic;
-      return hasCjkRaw ? '' : raw;
-    }
-    if (targetLang === 'zh') {
-      const deterministic = toPhoneticPinyin(card.text);
-      if (deterministic) return deterministic;
-      return hasCjkRaw ? '' : raw;
-    }
-    if (
-      raw &&
-      raw.toLowerCase().replace(/[^a-z0-9]/g, '') ===
-        String(card.text || '').toLowerCase().replace(/[^a-z0-9]/g, '')
-    ) {
+    if (isSswMode && !/[\u3040-\u30ff\u4e00-\u9fff]/.test(card.text || '')) {
       return '';
     }
-    return raw;
+    return resolveUnifiedPronunciation(card.text, targetLang, card.pronunciation);
   };
 
   const sanitizeMotherTongueHint = (hintText: string): string => {
     if (!hintText) return '';
     let res = hintText;
+    // Never replace target CJK characters when UI locale itself is Japanese or Chinese
+    if (locale === 'ja' || locale === 'zh') {
+      return res.replace(/\s{2,}/g, ' ').trim();
+    }
     res = res.replace(/["'「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'」』]/g, (_match, inner) => {
       if (targetLang === 'zh') {
         const py = toPhoneticPinyin(inner);
@@ -165,27 +196,85 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
       {/* DOCKED IN-FLOW CONTAINER: Menempel secara aman di atas input bar tanpa pernah menutupi mic atau input text */}
       <div
         data-testid="copilot-peek-container"
-        className="w-full bg-[#FDFAF4] rounded-2xl sm:rounded-3xl border border-[#EADBCE] shadow-sm p-2 sm:p-2.5 space-y-2 transition-all"
+        className={`w-full max-w-full min-w-0 rounded-2xl sm:rounded-3xl border shadow-sm p-2 sm:p-2.5 space-y-2 transition-all overflow-hidden ${
+          isSswMode ? 'bg-[#FCF9F1] border-[#DECFAF]' : 'bg-[#FDFAF4] border-[#EADBCE]'
+        }`}
       >
+        {isSswMode && (
+          <div
+            data-testid="ssw-quick-chips"
+            className="w-full max-w-full min-w-0 flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:overflow-x-auto no-scrollbar pb-0.5"
+          >
+            {[
+              {
+                label: 'Cek Progres & Tahap 1',
+                prompt: 'Sensei, cek progres SSW saya dan mulai dari mana untuk pemula nol?',
+              },
+              {
+                label: 'Update Alergen Apr 2026',
+                prompt: 'Bahas update alergen OTAFF Ver 5.1 April 2026: Kurumi, Cashew Nut, dan Pistachio!',
+              },
+              {
+                label: 'Tes Hitungan Klorin',
+                prompt: 'Tarik 1 soal hitungan kalkulator klorin atau budomari Wakai Papa sekarang!',
+              },
+              {
+                label: 'Jebakan Yukkuri',
+                prompt: 'Jelaskan jebakan kata yukkuri dan hokang sampuru di modul!',
+              },
+            ].map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => {
+                  if (onSendDirect) {
+                    onSendDirect(chip.prompt);
+                  } else {
+                    onSelectForInput(chip.prompt);
+                  }
+                }}
+                className="px-2.5 py-1 rounded-full bg-[#F6EDE0] hover:bg-[#8C2233] hover:text-white border border-[#DECFAF] text-[#5C3A21] text-[11px] font-bold whitespace-nowrap transition cursor-pointer shrink-0"
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        )}
         {/* HEADER BAR: Toggle Ciutkan + Quick Tabs + Tombol Refresh */}
-        <div className="w-full flex items-center justify-between gap-1.5 shrink-0">
+        <div className="w-full flex flex-wrap sm:flex-nowrap items-center justify-between gap-1.5 shrink-0">
           <button
             type="button"
             data-testid="copilot-toggle-collapse-btn"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FDE8E4] hover:bg-[#FCD8D2] text-[#B85D43] text-xs font-bold shrink-0 cursor-pointer transition-transform active:scale-95 shadow-2xs"
-            title={isExpanded ? 'Sembunyikan detail bantuan' : 'Tampilkan ide kalimat'}
+            className={`order-1 inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold shrink-0 cursor-pointer transition-transform active:scale-95 shadow-2xs ${
+              isSswMode
+                ? 'bg-[#FCECED] hover:bg-[#F9D7DB] text-[#8C2233] border border-[#E8B8BF]'
+                : 'bg-[#FDE8E4] hover:bg-[#FCD8D2] text-[#B85D43]'
+            }`}
+            title={
+              isSswMode
+                ? isExpanded
+                  ? 'Sembunyikan kartu aksi SSW Sensei'
+                  : 'Tampilkan aksi tanya & uji SSW Sensei'
+                : isExpanded
+                  ? 'Sembunyikan detail bantuan'
+                  : 'Tampilkan ide kalimat'
+            }
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#B85D43] shrink-0" />
+            <Sparkles className={`w-3.5 h-3.5 shrink-0 ${isSswMode ? 'text-[#8C2233]' : 'text-[#B85D43]'}`} />
             <span className="truncate">
-              {isCambridgeMode ? (locale === 'th' ? 'คำตอบ Band 9.0' : 'Model Answer') : (locale === 'th' ? 'ตัวช่วยตอบ' : 'Ide Bicara')}
+              {isSswMode
+                ? 'Aksi & Tanya Sensei'
+                : isCambridgeMode
+                  ? (locale === 'th' ? 'คำตอบ Band 9.0' : locale === 'ja' ? '模範解答' : locale === 'zh' ? '满分示范' : 'Model Answer')
+                  : (locale === 'th' ? 'ตัวช่วยตอบ' : locale === 'ja' ? '話すヒント' : locale === 'zh' ? '回答提示' : 'Ide Bicara')}
             </span>
             {isExpanded ? <ChevronDown className="w-3.5 h-3.5 shrink-0" /> : <ChevronUp className="w-3.5 h-3.5 shrink-0" />}
           </button>
 
           {/* Quick Tabs: Singkat · Alami · Tanya Balik OR Single Best Model Answer Badge */}
           {isCambridgeMode ? (
-            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <div className="order-3 sm:order-2 w-full sm:w-auto flex items-center gap-1.5 min-w-0 flex-1">
               <span className="px-2.5 py-1 rounded-xl bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-2xs truncate">
                 <span className="text-xs">🎯</span>
                 <span>
@@ -199,7 +288,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               </span>
             </div>
           ) : (
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar min-w-0 flex-1">
+            <div className="order-3 sm:order-2 w-full sm:w-auto max-w-full flex flex-wrap sm:flex-nowrap items-center gap-1 sm:overflow-x-auto no-scrollbar min-w-0 sm:flex-1 pt-0.5 sm:pt-0">
               {showLoadingState ? (
                 <div className="flex items-center gap-1 animate-pulse">
                   <span className="w-16 h-6 rounded-lg bg-[#EADBCE]/60 inline-block" />
@@ -219,7 +308,9 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                       }}
                       className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                         isSelected
-                          ? 'bg-[#1C1611] text-white shadow-2xs'
+                          ? isSswMode
+                            ? 'bg-[#8C2233] text-white shadow-2xs'
+                            : 'bg-[#1C1611] text-white shadow-2xs'
                           : 'bg-white/80 hover:bg-white text-[#5C4A38] border border-[#EADBCE]'
                       }`}
                     >
@@ -238,7 +329,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               data-testid="copilot-refresh-btn"
               disabled={showLoadingState || isAnalyzingTurn}
               onClick={onRefreshAssist}
-              className="w-7 h-7 rounded-xl bg-white hover:bg-[#FAF6EE] border border-[#EADBCE] text-[#5C4A38] flex items-center justify-center shrink-0 cursor-pointer transition-transform active:scale-95 disabled:opacity-40"
+              className="order-2 sm:order-3 ml-auto sm:ml-0 w-7 h-7 rounded-xl bg-white hover:bg-[#FAF6EE] border border-[#EADBCE] text-[#5C4A38] flex items-center justify-center shrink-0 cursor-pointer transition-transform active:scale-95 disabled:opacity-40"
               title="Minta ide jawaban baru"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingAssist ? 'animate-spin' : ''}`} />
@@ -287,7 +378,11 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               data-testid="teleprompter-meaning"
               className="text-xs sm:text-[12.5px] text-[#4A3B2C] font-medium leading-relaxed pt-1 border-t border-[#F2ECE0] break-words"
             >
-              💡 {isCambridgeMode && <span className="font-bold text-[#92400E] mr-1">[{locale === 'th' ? 'แปลคำตอบ Band 9.0' : 'Terjemahan Model Answer'}]:</span>}
+              {isSswMode ? (
+                <span className="font-bold text-[#8C2233] mr-1">[Arah Belajar]:</span>
+              ) : (
+                <>💡 {isCambridgeMode && <span className="font-bold text-[#92400E] mr-1">[{locale === 'th' ? 'แปลคำตอบ Band 9.0' : 'Terjemahan Model Answer'}]:</span>}</>
+              )}
               {sanitizeMotherTongueHint(locale === 'th' ? activeCard.hintTh || activeCard.hintId : activeCard.hintId)}
             </p>
 
@@ -302,7 +397,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                   title="Dengarkan cara baca"
                 >
                   <Volume2 className="w-3.5 h-3.5 text-[#5C4A38]" />
-                  <span>Dengar</span>
+                  <span>{locale === 'th' ? 'ฟัง' : locale === 'ja' ? '聞く' : locale === 'zh' ? '听发音' : 'Dengar'}</span>
                 </button>
 
                 {!isLiveConnected && (
@@ -318,10 +413,10 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                         ? 'bg-[#B85D43] text-white'
                         : 'bg-[#FAF6EE] hover:bg-[#F3EBE0] text-[#231A12] border border-[#EADBCE]'
                     }`}
-                    title="Ucapkan kalimat ini"
+                    title={locale === 'th' ? 'ฝึกพูดประโยคนี้' : locale === 'ja' ? 'この文を話す' : locale === 'zh' ? '跟读这句' : 'Ucapkan kalimat ini'}
                   >
                     <Mic className="w-3.5 h-3.5" />
-                    <span>Ucapkan</span>
+                    <span>{locale === 'th' ? 'พูดตาม' : locale === 'ja' ? '話す' : locale === 'zh' ? '跟读' : 'Ucapkan'}</span>
                   </button>
                 )}
               </div>
@@ -331,10 +426,22 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                 data-testid="teleprompter-send-btn"
                 disabled={isAnalyzingTurn}
                 onClick={() => onSendDirect(activeCard.text)}
-                className="px-3.5 py-1.5 rounded-lg bg-[#231A12] hover:bg-[#3D2E20] text-white text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-transform active:scale-95 shadow-xs disabled:opacity-40"
+                className={`px-3.5 py-1.5 rounded-lg text-white text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-transform active:scale-95 shadow-xs disabled:opacity-40 ${
+                  isSswMode ? 'bg-[#8C2233] hover:bg-[#731A28]' : 'bg-[#231A12] hover:bg-[#3D2E20]'
+                }`}
               >
                 <Send className="w-3 h-3" />
-                <span>Pakai Jawaban</span>
+                <span>
+                  {isSswMode
+                    ? 'Kirim ke Sensei'
+                    : locale === 'th'
+                      ? 'ใช้คำตอบนี้'
+                      : locale === 'ja'
+                        ? 'これを使う'
+                        : locale === 'zh'
+                          ? '使用这句'
+                          : 'Pakai Jawaban'}
+                </span>
               </button>
             </div>
           </div>
