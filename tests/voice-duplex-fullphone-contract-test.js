@@ -118,16 +118,17 @@ console.log('  ✓ Pemotongan audio instan & anti-bleed guard terverifikasi');
 const sileroGatePath = path.join(ROOT, 'features/voice-studio/src/lib/sileroVadGate.ts');
 const sileroGateContent = fs.readFileSync(sileroGatePath, 'utf8');
 
-console.log('[Test 7] Voice Studio SileroVadGate: Barge-In Threshold Alignment');
+console.log('[Test 7] Voice Studio SileroVadGate: Language-Verified Noise-Immune Barge-In');
 assert.ok(
-  sileroGateContent.includes('pSpeech >= 0.72 && rms >= 0.010'),
-  'SileroVadGate wajib menggunakan ambang toleran speakerphone (pSpeech >= 0.72, rms >= 0.010)'
+  sileroGateContent.includes('pSpeech >= 0.88 && rms >= 0.028'),
+  'SileroVadGate wajib menggunakan ambang ketat anti-bising kendaraan (pSpeech >= 0.88, rms >= 0.028)'
 );
 assert.ok(
-  sileroGateContent.includes('speechStreak >= 6'),
-  'SileroVadGate streak wajib 6 frame (~192ms)'
+  sileroGateContent.includes('speechStreak >= 18') &&
+    sileroGateContent.includes('onBargeCandidateAudio'),
+  'SileroVadGate wajib mendelegasikan audio kandidat barge-in ke onBargeCandidateAudio (atau fallback >= 18 frame)'
 );
-console.log('  ✓ Voice Studio SileroVadGate selaras dengan Mochi SOS');
+console.log('  ✓ Voice Studio SileroVadGate & language-verified barge-in guard terverifikasi');
 
 // 4. Audit Invarian Mutlak Mikrofon Mobile PWA Kawan Bicara (Zero Cross-Realm Hijack & Mochi SOS Parity)
 const appJsContent = fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8');
@@ -202,9 +203,9 @@ assert.ok(
   'ScriptProcessor wajib menggunakan ukuran buffer rendah-latensi 2048 sampel (42.6ms) di kedua jembatan'
 );
 assert.ok(
-  appTsxContent.includes('(v.isHumanSpeech || vadRes.inSpeech) && v.rms >= 0.002') &&
+  appTsxContent.includes('const isListeningSpeech = vadRes.inSpeech && v.voiceBandRms >= 0.003;') &&
     !appTsxContent.includes('v.rms >= 0.005'),
-  'Sensitivitas deteksi bicara isListeningSpeech wajib bebas bypass RMS noise (>0.005) agar kebisingan ruangan tidak menunda akhir giliran'
+  'Sensitivitas deteksi bicara isListeningSpeech wajib tervalidasi HandyHumanVad + pita vokal (bebas bypass RMS noise)'
 );
 assert.ok(
   handyVadContent.includes('const INITIAL_NOISE_FLOOR_DB = -65.0;') &&
@@ -259,6 +260,30 @@ assert.ok(
 );
 console.log('  ✓ Integritas bundle produksi dist/voice-studio.js terverifikasi');
 
+// ---------------------------------------------------------------------------
+// 14. Jitter-Buffered Seamless Playout, Handshake Timer Extension, & Anti-Stutter Barge-In
+// ---------------------------------------------------------------------------
+console.log('[Test 14] Kawan Bicara: Jitter-Buffered Audio, Handshake Timeout Extension, & Anti-Stutter Barge-In');
+assert.ok(
+  appTsxContent.includes('livePcmSchedulerRef.current.enqueueChunks(') &&
+    appTsxContent.includes("latencyHint: 'balanced'") &&
+    !appTsxContent.includes("latencyHint: 'interactive'") &&
+    !appJsContent.includes("latencyHint:'interactive'"),
+  'App.tsx & app.js wajib memakai LivePcmStreamScheduler & latencyHint balanced agar bebas glich/terputus-putus'
+);
+assert.ok(
+  appTsxContent.includes('connectTimer = window.setTimeout(handleHandshakeTimeout, 8000)') &&
+    appTsxContent.includes('liveReconnectAttemptsRef.current = 0;') &&
+    appTsxContent.includes('livePcmSchedulerRef.current.remainingMs(outputAudioCtxRef.current)') &&
+    appTsxContent.includes('suppressAiAudioForTurnRef.current = true'),
+  'App.tsx wajib memperpanjang connectTimer pasca ws.onopen, reset reconnect count saat ready, menunda finalize generationComplete sampai audio tuntas, dan mencegah stutter-loop barge-in'
+);
+assert.ok(
+  distVoiceStudioContent.includes('enqueueChunks') || distVoiceStudioContent.includes('minStartBufferSamples'),
+  'Bundle produksi dist/voice-studio.js wajib menyertakan LivePcmStreamScheduler terbaru'
+);
+console.log('  ✓ Jitter-buffered playout, extend handshake timeout, drain guard, & anti-stutter barge-in terverifikasi');
+
 console.log('\n================================================================');
-console.log('ALL 13/13 VOICE DUPLEX FULL-PHONE & BARGE-IN CONTRACT CHECKS PASSED!');
+console.log('ALL 14/14 VOICE DUPLEX FULL-PHONE & BARGE-IN CONTRACT CHECKS PASSED!');
 console.log('================================================================');

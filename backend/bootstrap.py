@@ -91,6 +91,7 @@ async def main():
     from db import db, ensure_indexes
     from seed import seed_curriculum, seed_questions
     from seed_english import seed_english_curriculum
+    from seed_ssw import seed_ssw_knowledge
 
     print(f"MongoDB   : {os.environ['DB_NAME']}")
 
@@ -120,6 +121,12 @@ async def main():
         print("Inggris   : disemai")
     else:
         print("Inggris   : sudah ada, semaian dilewati")
+
+    if await db.ssw_video_chunks.count_documents({}) == 0:
+        ssw_res = await seed_ssw_knowledge()
+        print(f"SSW SENSEI: disemai ({ssw_res['totals']})")
+    else:
+        print("SSW SENSEI: sudah ada, semaian dilewati")
 
     nodes = await db.curriculum_nodes.count_documents({})
     soal = await db.questions.count_documents({"is_current": True})

@@ -22,46 +22,89 @@ const MIME = {
   '.mp4': 'video/mp4',
   '.webm': 'video/webm',
   '.onnx': 'application/octet-stream',
+  '.wasm': 'application/wasm',
   '.webmanifest': 'application/manifest+json'
 };
 
 const server = http.createServer((req, res) => {
   let rel = decodeURIComponent(String(req.url || '/').split('?')[0]);
 
-  if (rel.startsWith('/api/voice/')) {
+  if (rel.startsWith('/api/')) {
+    const reqOrigin = req.headers.origin || '*';
     if (req.method === 'OPTIONS') {
       res.writeHead(204, {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        'Access-Control-Allow-Origin': reqOrigin,
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Fiezel-Owner-Token, X-Sentinel-Sync-Key'
       });
       res.end();
       return;
     }
+    const isTtsPersonas = rel.startsWith('/api/tts/personas') || rel.startsWith('/api/tts/line');
+    const upstreamBase = isTtsPersonas ? 'https://fiezel-apps.onrender.com' : 'https://api.fiezel.my.id';
     const chunks = [];
     req.on('data', (c) => chunks.push(c));
     req.on('end', () => {
+      const method = (req.method || 'GET').toUpperCase();
       const bodyBuf = Buffer.concat(chunks);
-      const upstreamReq = https.request('https://api.fiezel.my.id' + req.url, {
-        method: req.method || 'POST',
-        headers: {
-          'Content-Type': req.headers['content-type'] || 'application/json',
-          'Origin': 'https://fiezel.my.id',
-          'Content-Length': bodyBuf.length
-        }
+      const upstreamHeaders = {
+        Origin: 'https://fiezel.my.id',
+      };
+      if (req.headers['content-type']) upstreamHeaders['Content-Type'] = req.headers['content-type'];
+      else if (bodyBuf.length > 0) upstreamHeaders['Content-Type'] = 'application/json';
+      if (req.headers.cookie) upstreamHeaders.Cookie = req.headers.cookie;
+      if (req.headers.authorization) upstreamHeaders.Authorization = req.headers.authorization;
+      if (req.headers['x-fiezel-owner-token']) upstreamHeaders['X-Fiezel-Owner-Token'] = req.headers['x-fiezel-owner-token'];
+      if (req.headers['x-sentinel-sync-key']) upstreamHeaders['X-Sentinel-Sync-Key'] = req.headers['x-sentinel-sync-key'];
+      if (method !== 'GET' && method !== 'HEAD') {
+        upstreamHeaders['Content-Length'] = bodyBuf.length;
+      }
+
+      const upstreamReq = https.request(upstreamBase + req.url, {
+        method,
+        headers: upstreamHeaders
       }, (upstreamRes) => {
-        res.writeHead(upstreamRes.statusCode || 200, {
-          'Content-Type': upstreamRes.headers['content-type'] || 'application/json; charset=utf-8',
-          'Cache-Control': 'no-store',
-          'Access-Control-Allow-Origin': '*'
+        if (!res.headersSent && !res.writableEnded) {
+          const outHeaders = {
+            'Content-Type': upstreamRes.headers['content-type'] || 'application/json; charset=utf-8',
+            'Cache-Control': 'no-store',
+            'Access-Control-Allow-Origin': reqOrigin,
+            'Access-Control-Allow-Credentials': 'true'
+          };
+          const rawCookies = upstreamRes.headers['set-cookie'];
+          if (Array.isArray(rawCookies) && rawCookies.length) {
+            outHeaders['Set-Cookie'] = rawCookies.map((c) =>
+              String(c)
+                .replace(/;\s*Domain=[^;]+/gi, '')
+                .replace(/;\s*Secure\b/gi, '')
+            );
+          }
+          res.writeHead(upstreamRes.statusCode || 200, outHeaders);
+        }
+        upstreamRes.on('error', () => {
+          if (!res.writableEnded) res.end();
         });
         upstreamRes.pipe(res);
       });
       upstreamReq.on('error', (err) => {
-        res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        res.end(JSON.stringify({ ok: false, error: String(err && err.message || err) }));
+        if (!res.headersSent && !res.writableEnded) {
+          res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': reqOrigin });
+          res.end(JSON.stringify({ ok: false, error: String(err && err.message || err) }));
+        } else if (!res.writableEnded) {
+          res.end();
+        }
       });
-      upstreamReq.end(bodyBuf);
+      res.on('close', () => {
+        if (!res.writableEnded && !upstreamReq.destroyed) {
+          upstreamReq.destroy();
+        }
+      });
+      if (method === 'GET' || method === 'HEAD') {
+        upstreamReq.end();
+      } else {
+        upstreamReq.end(bodyBuf);
+      }
     });
     return;
   }

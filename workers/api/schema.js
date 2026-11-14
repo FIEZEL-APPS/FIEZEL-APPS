@@ -85,7 +85,9 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/voice/partner-turn': 12288,
   '/api/voice/translate': 4096,
   '/api/voice/gemini-tts': 4096,
+  '/api/voice/verify-speech': 65536,
   '/api/voice/sync-keys': 32768,
+  '/api/braincore/sync': 65536,
   '/api/teacher/node/archive': 512,
   '/api/teacher/question/list': 512,       // GET
   '/api/teacher/question/save': 16384,     // batang soal + opsi + penjelasan + contoh

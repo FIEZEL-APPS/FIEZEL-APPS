@@ -124,6 +124,14 @@ const mockDb = {
   console.log('  ✅ PASS: Akses dengan database tidak tersedia menghasilkan 503');
 }
 
+// Konstanta otentikasi Owner uji (diuji dua arah: tanpa token = 403, token sah = 200)
+const OWNER_TEST_SECRET = 'test-owner-messaging-secret';
+const OWNER_TEST_HASH = Array.from(
+  new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(OWNER_TEST_SECRET)))
+)
+  .map((b) => b.toString(16).padStart(2, '0'))
+  .join('');
+
 // 5. Test Owner mengirim pesan + suntik GEM
 {
   const payload = {
@@ -133,14 +141,30 @@ const mockDb = {
     gem_amount: 75,
     reason: 'Bonus Ulasan AI'
   };
-  const ctx = {
-    env: { CORE_DB: mockDb },
+  const unauthRes = await routeOwnerSendMessage({
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: OWNER_TEST_HASH },
     corsHeaders: {},
     now: 1700000000000,
     bodyText: JSON.stringify(payload),
     request: new Request('https://api.fiezel.my.id/api/owner/send-message', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  });
+  assert.strictEqual(unauthRes.status, 403, 'Owner send-message tanpa token owner wajib ditolak 403');
+
+  const ctx = {
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: OWNER_TEST_HASH },
+    corsHeaders: {},
+    now: 1700000000000,
+    bodyText: JSON.stringify(payload),
+    request: new Request('https://api.fiezel.my.id/api/owner/send-message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-fiezel-owner-token': OWNER_TEST_SECRET
+      },
       body: JSON.stringify(payload)
     })
   };
@@ -218,12 +242,22 @@ const mockDb = {
 
 // 9. Test Owner mengambil thread lengkap murid
 {
-  const ctx = {
-    env: { CORE_DB: mockDb },
+  const unauthOwnerGetRes = await routeOwnerLearnerMessages({
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: OWNER_TEST_HASH },
     corsHeaders: {},
-    request: {
-      url: 'https://api.fiezel.my.id/api/owner/learner-messages?sub=test-learner-1'
-    }
+    request: new Request('https://api.fiezel.my.id/api/owner/learner-messages?sub=test-learner-1', {
+      method: 'GET'
+    })
+  });
+  assert.strictEqual(unauthOwnerGetRes.status, 403, 'Owner learner-messages tanpa token wajib 403');
+
+  const ctx = {
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: OWNER_TEST_HASH },
+    corsHeaders: {},
+    request: new Request('https://api.fiezel.my.id/api/owner/learner-messages?sub=test-learner-1', {
+      method: 'GET',
+      headers: { 'x-fiezel-owner-token': OWNER_TEST_SECRET }
+    })
   };
   const res = await routeOwnerLearnerMessages(ctx);
   assert.strictEqual(res.status, 200);

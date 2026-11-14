@@ -110,6 +110,7 @@
       } catch (_) {}
       var existingFrame = mountPoint.querySelector('#fzMitraKaiwaStudioFrame');
       if (existingFrame && existingFrame.getAttribute('data-lang') === lang && existingFrame.getAttribute('data-locale') === locale) {
+        if (api && typeof api.__setMounted === 'function') api.__setMounted(true);
         if (autoCall && api && api.StudioBridge && typeof api.StudioBridge.send === 'function') {
           api.StudioBridge.send('fz.shell.autocall', { at: Date.now() });
         }
@@ -125,6 +126,7 @@
           nonce = api.StudioBridge.begin();
         }
       } catch (_) {}
+      if (api && typeof api.__setMounted === 'function') api.__setMounted(true);
       var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (autoCall ? '&autoCall=1' : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
       var titleText = lang === 'ja' ? 'Mitra Kaiwa' : (lang === 'zh' ? 'Xiao Mochi (小麻薯)' : 'Kawan Bicara');
       mountPoint.innerHTML =
@@ -4981,7 +4983,7 @@
     function validateAttempt(p) {
       if (!p || typeof p !== 'object') return 'schema';
       if (!str(p.turnId, 80) || !ID_RE.test(p.competencyId || '') || !str(p.scenarioId, 80)) return 'schema';
-      if (p.course !== 'en' && p.course !== 'ja') return 'schema';
+      if (p.course !== 'en' && p.course !== 'ja' && p.course !== 'zh') return 'schema';
       if (p.verdict !== true && p.verdict !== false && p.verdict !== null) return 'schema';
       if (typeof p.userTranscript !== 'string' || p.userTranscript.length > 500) return 'schema';
       if (p.misconceptionId != null && !ID_RE.test(p.misconceptionId)) return 'schema';
@@ -5088,15 +5090,25 @@
         return;
       }
 
-      // Backward compatibility for legacy FIEZEL_VOICE_STUDIO_ATTEMPT
+      // Backward compatibility for legacy FIEZEL_VOICE_STUDIO_ATTEMPT (deduplicated against nonce attempts)
       if (m.type === 'FIEZEL_VOICE_STUDIO_ATTEMPT' && m.payload) {
         var pLegacy = m.payload;
+        var legacyTurnId = str(pLegacy.turnId || pLegacy.id, 80);
+        var nowLegacy = Date.now();
+        if (legacyTurnId && seenTurnIds[legacyTurnId]) return;
         var compId = String(pLegacy.competencyId || 'kaiwa_general').replace(/[^a-z0-9_:-]/gi, '').slice(0, 80);
         if (!compId) return;
+        if (legacyTurnId) {
+          seenTurnIds[legacyTurnId] = nowLegacy;
+          try {
+            if (typeof sessionStorage !== 'undefined') {
+              sessionStorage.setItem('fz.studio.turns', JSON.stringify(seenTurnIds));
+            }
+          } catch (_) {}
+        }
         var isOk = Boolean(pLegacy.ok);
         var hintLegacy = (!isOk && pLegacy.misconceptionId) ? { id: String(pLegacy.misconceptionId).slice(0, 80) } : null;
         var latency = Math.max(300, Math.min(120000, Number(pLegacy.latencyMs) || 3000));
-        var nowLegacy = Date.now();
 
         callUpdateMastery('speaking', compId, isOk, latency, null, nowLegacy);
         callBktRecord(compId, isOk, computeSpeakingKappa(isOk, latency, 0), 1.2);
@@ -5251,6 +5263,9 @@
       FzStudioBridge.end();
       stopVoice();
       stopShadowingAudio();
+      if (typeof root.__fzStopSharedMicBridge === 'function') {
+        try { root.__fzStopSharedMicBridge(); } catch (_) {}
+      }
       if (state.isListening && state.recognition) {
         try {
           var rec = state.recognition;
@@ -5414,12 +5429,14 @@
       return PERSONAS[course === 'ja' ? 'ja' : (course === 'zh' ? 'zh' : 'en')] || PERSONAS.zh || PERSONAS.ja;
     },
     isMounted: function () { return isChatMounted; },
-    isChatMounted: function () { return isChatMounted; }
+    isChatMounted: function () { return isChatMounted; },
+    __setMounted: function (mounted) { isChatMounted = Boolean(mounted); }
   };
 
   // Auto-teardown on mobile app switch / page hide / tab backgrounding
   function handleChatGlobalHide() {
     if (isChatMounted) {
+      FzStudioBridge.send('fz.shell.hide', { at: Date.now() });
       stopVoice();
       stopShadowingAudio();
       if (state.isListening && state.recognition) {

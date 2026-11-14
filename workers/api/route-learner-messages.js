@@ -12,6 +12,8 @@
 
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 import { readJsonFromCtx } from './mw-guard.js';
+import { roleGate } from './auth/gate.js';
+import { ownerGate } from './cron-status.js';
 
 export const LEARNER_MESSAGES_PATH = '/api/learner/messages';
 export const LEARNER_MESSAGES_UNREAD_PATH = '/api/learner/messages/unread-count';
@@ -128,6 +130,11 @@ export async function routeLearnerMessagesRead(ctx) {
  */
 export async function routeOwnerSendMessage(ctx) {
   const opt = { headers: ctx.corsHeaders || {} };
+  const secretGate = await ownerGate(ctx);
+  if (secretGate) {
+    const gate = await roleGate(ctx);
+    if (!gate.ok) return secretGate;
+  }
   const db = getCoreDb(ctx.env);
   if (!db) return jsonError(503, ERR.UNAVAILABLE, opt);
 
@@ -199,6 +206,11 @@ export async function routeOwnerSendMessage(ctx) {
  */
 export async function routeOwnerLearnerMessages(ctx) {
   const opt = { headers: ctx.corsHeaders || {} };
+  const secretGate = await ownerGate(ctx);
+  if (secretGate) {
+    const gate = await roleGate(ctx);
+    if (!gate.ok) return secretGate;
+  }
   const db = getCoreDb(ctx.env);
   if (!db) return jsonError(503, ERR.UNAVAILABLE, opt);
 

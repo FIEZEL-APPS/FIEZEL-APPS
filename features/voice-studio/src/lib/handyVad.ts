@@ -173,13 +173,21 @@ export class HandyHumanVad {
   private onsetCounter: number;
   private inSpeech: boolean;
 
+  private prevNormSpec: Float32Array;
+  private hasPrevSpec: boolean;
+  private fluxEma: number;
+  private rmsEma: number;
+  private rmsVarEma: number;
+  private rejectedHighEnergyStreak: number;
+  private lastAiPlaying: boolean;
+
   constructor(opts: HandyVadOptions = {}) {
-    this.threshold = typeof opts.threshold === 'number' ? opts.threshold : 0.45;
-    this.bargeInThreshold = typeof opts.bargeInThreshold === 'number' ? opts.bargeInThreshold : 0.60;
+    this.threshold = typeof opts.threshold === 'number' ? opts.threshold : 0.48;
+    this.bargeInThreshold = typeof opts.bargeInThreshold === 'number' ? opts.bargeInThreshold : 0.68;
     this.prefillFrames = typeof opts.prefillFrames === 'number' ? opts.prefillFrames : 15;
-    this.hangoverFrames = typeof opts.hangoverFrames === 'number' ? opts.hangoverFrames : 11;
+    this.hangoverFrames = typeof opts.hangoverFrames === 'number' ? opts.hangoverFrames : 12;
     this.onsetFrames = typeof opts.onsetFrames === 'number' ? opts.onsetFrames : 2;
-    this.bargeInOnsetFrames = typeof opts.bargeInOnsetFrames === 'number' ? opts.bargeInOnsetFrames : 4;
+    this.bargeInOnsetFrames = typeof opts.bargeInOnsetFrames === 'number' ? opts.bargeInOnsetFrames : 5;
 
     this.noiseFloor = new Float32Array(VOCAL_BUCKETS);
     this.noiseFloor.fill(INITIAL_NOISE_FLOOR_DB);
@@ -197,6 +205,14 @@ export class HandyHumanVad {
     this.hangoverCounter = 0;
     this.onsetCounter = 0;
     this.inSpeech = false;
+
+    this.prevNormSpec = new Float32Array(128);
+    this.hasPrevSpec = false;
+    this.fluxEma = 0.25;
+    this.rmsEma = 0;
+    this.rmsVarEma = 0.15;
+    this.rejectedHighEnergyStreak = 0;
+    this.lastAiPlaying = false;
   }
 
   public isInSpeech(): boolean {
@@ -210,6 +226,13 @@ export class HandyHumanVad {
     this.hangoverCounter = 0;
     this.onsetCounter = 0;
     this.inSpeech = false;
+    this.prevNormSpec.fill(0);
+    this.hasPrevSpec = false;
+    this.fluxEma = 0.25;
+    this.rmsEma = 0;
+    this.rmsVarEma = 0.15;
+    this.rejectedHighEnergyStreak = 0;
+    this.lastAiPlaying = false;
   }
 
   public clearPreRoll(): void {
@@ -279,8 +302,9 @@ export class HandyHumanVad {
 
     const rms = Math.sqrt(sumSq / N);
     const zcr = zc / N;
-    const minRms = aiPlaying ? 0.012 : 0.0028;
+    const minRms = aiPlaying ? 0.014 : 0.0025;
     if (rms < minRms) {
+      this.rejectedHighEnergyStreak = Math.max(0, this.rejectedHighEnergyStreak - 1);
       return {
         score: 0,
         isVoice: false,
@@ -302,13 +326,30 @@ export class HandyHumanVad {
     }
 
     // Sub-band energy integration (31.25 Hz per bin @ 16 kHz)
-    // Sub-vocal rumble ONLY: bins 1..2 (31 - 62.5 Hz: wind, mic bumps, DC rumble; NEVER 85-250 Hz human F0!)
+    // Sub-vocal rumble ONLY: bins 1..2 (31 - 62.5 Hz) + engine/vehicle exhaust fundamental band (bins 1..4)
     let rumbleEnergy = 0;
     for (let k = 1; k <= 2; k++) rumbleEnergy += this.powSpec[k];
+    const subBassEngineEnergy = rumbleEnergy + this.powSpec[3] + 0.5 * this.powSpec[4];
 
     // Human vocal fundamental + formants F0/F1/F2/F3: bins 4..115 (125 - 3594 Hz)
     let vocalFormantEnergy = 0;
-    for (let k = 4; k <= 115; k++) vocalFormantEnergy += this.powSpec[k];
+    let peakK = 4;
+    let peakPow = 0;
+    for (let k = 4; k <= 115; k++) {
+      const p = this.powSpec[k];
+      vocalFormantEnergy += p;
+      if (p > peakPow) {
+        peakPow = p;
+        peakK = k;
+      }
+    }
+    const peak3Energy =
+      (this.powSpec[peakK - 1] || 0) + this.powSpec[peakK] + (this.powSpec[peakK + 1] || 0);
+    const singleToneConcentration = peak3Energy / (vocalFormantEnergy + 1e-12);
+
+    // Core vocal tract F1..F3 (218 - 3594 Hz, excluding sub-180Hz scooter/truck idle thrum)
+    let coreFormantEnergy = 0;
+    for (let k = 7; k <= 115; k++) coreFormantEnergy += this.powSpec[k];
 
     // Upper vocal harmonic/F2/F3 band: bins 24..122 (750 - 3812 Hz)
     let upperVocalEnergy = 0;
@@ -318,9 +359,29 @@ export class HandyHumanVad {
     for (let k = 1; k <= 240; k++) totalEnergy += this.powSpec[k];
 
     const vocalToRumble = vocalFormantEnergy / (rumbleEnergy + 1e-12);
+    const vocalToEngine = coreFormantEnergy / (subBassEngineEnergy + 1e-12);
     const vocalFormantShare = vocalFormantEnergy / totalEnergy;
     const upperVocalShare = upperVocalEnergy / (vocalFormantEnergy + 1e-12);
     const crestFactor = peak / (rms + 1e-9);
+
+    // Consecutive frame spectral flux & syllable RMS envelope variation (steady drones/horns lack speech modulation)
+    let fluxSum = 0;
+    const invFormant = 1 / (coreFormantEnergy + 1e-12);
+    for (let k = 7; k <= 112; k++) {
+      const curNorm = this.powSpec[k] * invFormant;
+      if (this.hasPrevSpec) {
+        fluxSum += Math.abs(curNorm - this.prevNormSpec[k]);
+      }
+      this.prevNormSpec[k] = curNorm;
+    }
+    if (this.hasPrevSpec) {
+      this.fluxEma = 0.68 * this.fluxEma + 0.32 * fluxSum;
+    } else {
+      this.hasPrevSpec = true;
+    }
+    const relRmsDiff = this.rmsEma > 1e-6 ? Math.abs(rms - this.rmsEma) / (this.rmsEma + 1e-6) : 0.2;
+    this.rmsEma = this.rmsEma > 0 ? 0.85 * this.rmsEma + 0.15 * rms : rms;
+    this.rmsVarEma = 0.80 * this.rmsVarEma + 0.20 * Math.min(1, relRmsDiff);
 
     // Spectral flatness (Wiener entropy) across 312 - 3812 Hz (bins 10..122)
     let logSum = 0;
@@ -334,6 +395,7 @@ export class HandyHumanVad {
     const spectralFlatness = Math.exp(logSum / flatBins) / (arithSum / flatBins + 1e-12);
 
     // Handy AudioVisualiser 16 vocal buckets + adaptive per-bucket noise floor
+    const adaptRate = this.rejectedHighEnergyStreak >= 6 ? 0.08 : NOISE_ALPHA;
     for (let b = 0; b < VOCAL_BUCKETS; b++) {
       const [startBin, endBin] = BUCKET_RANGES[b];
       let pSum = 0;
@@ -341,9 +403,28 @@ export class HandyHumanVad {
       const avgPower = pSum / Math.max(1, endBin - startBin);
       const db = avgPower > 1e-12 ? 20.0 * Math.log10(Math.sqrt(avgPower) / N) : -80.0;
 
-      // Only adapt noise floor on quiet / broadband non-voiced background frames
-      if (!this.inSpeech && (db < this.noiseFloor[b] + 8.0 || spectralFlatness > 0.48)) {
-        this.noiseFloor[b] = NOISE_ALPHA * db + (1.0 - NOISE_ALPHA) * this.noiseFloor[b];
+      // Adapt noise floor on quiet / broadband non-voiced background OR persistent rejected ambient roar (traffic/fan)
+      const isCalmAmbientDrift =
+        this.onsetCounter === 0 &&
+        db < -28.0 &&
+        db < this.noiseFloor[b] + 22.0 &&
+        (spectralFlatness > 0.34 || this.rejectedHighEnergyStreak >= 2);
+      if (
+        !this.inSpeech &&
+        (db < this.noiseFloor[b] + 8.0 ||
+          spectralFlatness > 0.45 ||
+          vocalToEngine < 0.45 ||
+          this.rejectedHighEnergyStreak >= 6 ||
+          isCalmAmbientDrift)
+      ) {
+        const rate =
+          this.rejectedHighEnergyStreak >= 6
+            ? adaptRate
+            : db > this.noiseFloor[b] + 8.0
+              ? 0.035
+              : adaptRate;
+        const nextFloor = rate * db + (1.0 - rate) * this.noiseFloor[b];
+        this.noiseFloor[b] = Math.max(-75.0, Math.min(-26.0, nextFloor));
       }
       this.bucketSnrs[b] = Math.max(0, db - this.noiseFloor[b]);
     }
@@ -360,15 +441,27 @@ export class HandyHumanVad {
     const vocalSnrDb = (top1 + top2 + top3 + top4) * 0.25;
 
     // Hard physical rejections for non-human street/ambient noise:
-    // 1) Vehicle engine / wind / thud rumble dominates vocal formants
+    // 1) Vehicle engine / wind / scooter exhaust dominates lower spectrum
     // 2) Sharp click / knock transient (crestFactor > 6.2)
-    // 3) Virtually no energy in F1-F3 vocal tract band or pure single-frequency low horn beep
+    // 3) Flat broadband fan/road/white/pink noise (spectralFlatness)
+    // 4) Mechanical car horn / beep / siren (single narrowband tone concentration > threshold)
+    // 5) Missing upper speech formants F2/F3 (750-3812 Hz)
+    const minVocalToRumble = aiPlaying ? 1.65 : 0.45;
+    const minVocalToEngine = aiPlaying ? 1.15 : 0.32;
+    const minFormantShare = aiPlaying ? 0.36 : 0.22;
+    const minUpperShare = aiPlaying ? 0.08 : 0.035;
+    const maxToneConc = aiPlaying ? 0.78 : 0.88;
+    const maxFlatness = aiPlaying ? 0.34 : 0.42;
     if (
-      vocalToRumble < 0.14 ||
-      vocalFormantShare < 0.12 ||
-      crestFactor > 6.8 ||
-      upperVocalShare < 0.008
+      vocalToRumble < minVocalToRumble ||
+      vocalToEngine < minVocalToEngine ||
+      vocalFormantShare < minFormantShare ||
+      crestFactor > 6.2 ||
+      upperVocalShare < minUpperShare ||
+      singleToneConcentration > maxToneConc ||
+      spectralFlatness > maxFlatness
     ) {
+      this.rejectedHighEnergyStreak = Math.min(120, this.rejectedHighEnergyStreak + 1);
       return {
         score: 0,
         isVoice: false,
@@ -418,10 +511,10 @@ export class HandyHumanVad {
     }
 
     const pitchScore = Math.max(0, Math.min(1, (bestCorr - 0.30) / 0.35));
-    const structureScore = Math.max(0, Math.min(1, (0.52 - spectralFlatness) / 0.34));
-    const snrScore = Math.max(0, Math.min(1, (vocalSnrDb - 5.0) / 13.0));
+    const structureScore = Math.max(0, Math.min(1, (0.50 - spectralFlatness) / 0.32));
+    const snrScore = Math.max(0, Math.min(1, (vocalSnrDb - 5.5) / 13.0));
     const formantBalanceScore =
-      Math.max(0, Math.min(1, (vocalToRumble - 0.22) / 0.90)) *
+      Math.max(0, Math.min(1, (vocalToRumble - 0.25) / 0.90)) *
       Math.max(0, Math.min(1, vocalFormantShare / 0.38));
 
     const score =
@@ -430,19 +523,28 @@ export class HandyHumanVad {
       0.22 * snrScore +
       0.18 * formantBalanceScore;
 
-    // Onset strictly requires human vocal-cord harmonicity (bestCorr >= 0.38) + non-flat formant structure.
-    // Once already in confirmed speech, mid-word unvoiced consonants (/s/, /t/, /k/, /f/) are also sustained.
-    const hasHarmonicVoice = bestCorr >= 0.38 && spectralFlatness < 0.48;
+    // Steady mechanical drones (constant engine/fan/horn across frames) fail modulation gate during barge-in
+    const isSteadyNonSpeech = this.fluxEma < 0.16 && this.rmsVarEma < 0.07;
+    const minPitchCorr = aiPlaying ? 0.44 : 0.32;
+    const hasHarmonicVoice =
+      bestCorr >= minPitchCorr &&
+      spectralFlatness < maxFlatness &&
+      (!aiPlaying || (vocalSnrDb >= 9.0 && !isSteadyNonSpeech));
     const hasMidWordConsonant =
       this.inSpeech &&
       !aiPlaying &&
-      structureScore >= 0.32 &&
-      snrScore >= 0.42 &&
+      structureScore >= 0.34 &&
+      snrScore >= 0.45 &&
       zcr >= 0.11 &&
-      zcr <= 0.48;
+      zcr <= 0.46;
 
     const activeThreshold = aiPlaying ? this.bargeInThreshold : this.threshold;
     const isVoice = (hasHarmonicVoice || hasMidWordConsonant) && score >= activeThreshold;
+    if (isVoice) {
+      this.rejectedHighEnergyStreak = 0;
+    } else {
+      this.rejectedHighEnergyStreak = Math.min(120, this.rejectedHighEnergyStreak + 1);
+    }
 
     return {
       score,
@@ -464,6 +566,14 @@ export class HandyHumanVad {
     inputSampleRate: number,
     aiPlaying = false
   ): HandyVadProcessResult {
+    if (aiPlaying && !this.lastAiPlaying) {
+      this.inSpeech = false;
+      this.onsetCounter = 0;
+      this.hangoverCounter = 0;
+      this.frameBuffer = [];
+    }
+    this.lastAiPlaying = aiPlaying;
+
     if (!inputSamples || inputSamples.length === 0) {
       return {
         speechPcm16k: null,
@@ -479,23 +589,7 @@ export class HandyHumanVad {
       };
     }
 
-    const fromRate = inputSampleRate > 0 ? inputSampleRate : HANDY_VAD_SAMPLE_RATE;
-    let resampled: Float32Array;
-    if (fromRate === HANDY_VAD_SAMPLE_RATE) {
-      resampled = inputSamples;
-    } else {
-      const ratio = fromRate / HANDY_VAD_SAMPLE_RATE;
-      const outLen = Math.max(1, Math.floor(inputSamples.length / ratio));
-      resampled = new Float32Array(outLen);
-      for (let i = 0; i < outLen; i++) {
-        const start = Math.floor(i * ratio);
-        let end = Math.min(inputSamples.length, Math.floor((i + 1) * ratio));
-        if (end <= start) end = Math.min(inputSamples.length, start + 1);
-        let acc = 0;
-        for (let k = start; k < end; k++) acc += inputSamples[k];
-        resampled[i] = acc / (end - start);
-      }
-    }
+    const resampled = resampleFloat32To16k(inputSamples, inputSampleRate);
 
     // Append to carry buffer
     const neededCap = this.resampleCarryLen + resampled.length;
@@ -569,9 +663,10 @@ export class HandyHumanVad {
         } else {
           this.inSpeech = false;
           speechEnded = true;
+          this.frameBuffer = [];
         }
       } else {
-        this.onsetCounter = 0;
+        this.onsetCounter = Math.max(0, this.onsetCounter - 2);
       }
     }
 
@@ -623,6 +718,56 @@ export function float32At16kToPcm16Base64(samples16k: Float32Array): string {
   return btoa(binary);
 }
 
+export function resampleFloat32To16k(
+  inputSamples: Float32Array,
+  inputSampleRate: number
+): Float32Array {
+  if (!inputSamples || inputSamples.length === 0) return new Float32Array(0);
+  const fromRate = inputSampleRate > 0 ? inputSampleRate : HANDY_VAD_SAMPLE_RATE;
+  if (fromRate === HANDY_VAD_SAMPLE_RATE) {
+    return inputSamples;
+  }
+  let source = inputSamples;
+  if (fromRate > 20000 && inputSamples.length >= 5) {
+    // 5-tap Hamming-windowed sinc low-pass (~7.2kHz) anti-aliasing pre-filter before decimation
+    const fc = 7200 / fromRate;
+    const mid = 2;
+    const kernel = new Float32Array(5);
+    let kSum = 0;
+    for (let k = 0; k < 5; k++) {
+      const m = k - mid;
+      const sinc = m === 0 ? 2 * fc : Math.sin(2 * Math.PI * fc * m) / (Math.PI * m);
+      const w = 0.54 - 0.46 * Math.cos((2 * Math.PI * k) / 4);
+      kernel[k] = sinc * w;
+      kSum += kernel[k];
+    }
+    for (let k = 0; k < 5; k++) kernel[k] /= kSum || 1;
+    const filtered = new Float32Array(inputSamples.length);
+    for (let i = 0; i < inputSamples.length; i++) {
+      let acc = 0;
+      for (let k = 0; k < 5; k++) {
+        const idx = Math.max(0, Math.min(inputSamples.length - 1, i + k - mid));
+        acc += inputSamples[idx] * kernel[k];
+      }
+      filtered[i] = acc;
+    }
+    source = filtered;
+  }
+
+  const ratio = fromRate / HANDY_VAD_SAMPLE_RATE;
+  const outLen = Math.max(1, Math.floor(source.length / ratio));
+  const resampled = new Float32Array(outLen);
+  for (let i = 0; i < outLen; i++) {
+    const start = Math.floor(i * ratio);
+    let end = Math.min(source.length, Math.floor((i + 1) * ratio));
+    if (end <= start) end = Math.min(source.length, start + 1);
+    let acc = 0;
+    for (let k = start; k < end; k++) acc += source[k];
+    resampled[i] = acc / (end - start);
+  }
+  return resampled;
+}
+
 /**
  * Resamples arbitrary hardware sample-rate Float32 audio (e.g. 44.1kHz / 48kHz)
  * directly to 16kHz 16-bit little-endian PCM base64 for continuous Gemini Live duplex streaming.
@@ -632,20 +777,63 @@ export function resampleFloat32To16kPcmBase64(
   inputSampleRate: number
 ): string {
   if (!inputSamples || inputSamples.length === 0) return '';
-  const fromRate = inputSampleRate > 0 ? inputSampleRate : HANDY_VAD_SAMPLE_RATE;
-  if (fromRate === HANDY_VAD_SAMPLE_RATE) {
-    return float32At16kToPcm16Base64(inputSamples);
+  return float32At16kToPcm16Base64(resampleFloat32To16k(inputSamples, inputSampleRate));
+}
+
+/**
+ * Checks whether a sequence of RMS frame values exhibits natural syllabic speech
+ * modulation rather than a steady engine hum, fan, or sustained car horn.
+ */
+export function hasDynamicSpeechModulation(rmsSeries: number[]): boolean {
+  if (!rmsSeries || rmsSeries.length < 4) return false;
+  let sum = 0;
+  for (let i = 0; i < rmsSeries.length; i++) sum += rmsSeries[i];
+  const mean = sum / rmsSeries.length;
+  if (mean <= 1e-5) return false;
+  let varSum = 0;
+  for (let i = 0; i < rmsSeries.length; i++) {
+    const d = rmsSeries[i] - mean;
+    varSum += d * d;
   }
-  const ratio = fromRate / HANDY_VAD_SAMPLE_RATE;
-  const outLen = Math.max(1, Math.floor(inputSamples.length / ratio));
-  const resampled = new Float32Array(outLen);
-  for (let i = 0; i < outLen; i++) {
-    const start = Math.floor(i * ratio);
-    let end = Math.min(inputSamples.length, Math.floor((i + 1) * ratio));
-    if (end <= start) end = Math.min(inputSamples.length, start + 1);
-    let acc = 0;
-    for (let k = start; k < end; k++) acc += inputSamples[k];
-    resampled[i] = acc / (end - start);
+  const std = Math.sqrt(varSum / rmsSeries.length);
+  const coeffVar = std / mean;
+  return coeffVar >= 0.10;
+}
+
+/**
+ * Encodes 16kHz Float32 mono PCM into a standard RIFF/WAVE Int16 base64 string
+ * for fast language-verification checks (/api/voice/verify-speech).
+ */
+export function encodeFloat32At16kToWavBase64(samples16k: Float32Array): string {
+  const n = samples16k.length;
+  const dataBytes = n * 2;
+  const buf = new ArrayBuffer(44 + dataBytes);
+  const view = new DataView(buf);
+  const writeStr = (off: number, s: string) => {
+    for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i));
+  };
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + dataBytes, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, HANDY_VAD_SAMPLE_RATE, true);
+  view.setUint32(28, HANDY_VAD_SAMPLE_RATE * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, dataBytes, true);
+  for (let i = 0; i < n; i++) {
+    const clamped = Math.max(-1, Math.min(1, samples16k[i]));
+    view.setInt16(44 + i * 2, clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff, true);
   }
-  return float32At16kToPcm16Base64(resampled);
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  const CHUNK = 8192;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode(...Array.from(bytes.subarray(i, Math.min(i + CHUNK, bytes.length))));
+  }
+  return btoa(binary);
 }

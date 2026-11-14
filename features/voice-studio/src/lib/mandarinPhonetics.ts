@@ -8,8 +8,120 @@
 
 import lexiconData from './mandarinLexicon.json' with { type: 'json' };
 
-const WORDS: Record<string, string> = lexiconData.words || {};
-const CHARS: Record<string, string> = lexiconData.chars || {};
+const EXTRA_MANDARIN_WORDS: Record<string, string> = {
+  '语序': 'yǔ xù',
+  '例子': 'lì zi',
+  '动词': 'dòng cí',
+  '前面': 'qián miàn',
+  '后面': 'hòu miàn',
+  '试试': 'shì shi',
+  '当场': 'dāng chǎng',
+  '声调': 'shēng diào',
+  '课文腔': 'kè wén qiāng',
+  '死板': 'sǐ bǎn',
+  '实话': 'shí huà',
+  '头疼': 'tóu téng',
+  '时间': 'shí jiān',
+  '位置': 'wèi zhì',
+  '量词': 'liàng cí',
+  '区别': 'qū bié',
+  '搞混': 'gǎo hùn',
+  '用法': 'yòng fǎ',
+  '一下': 'yí xià',
+  '一会儿': 'yí huìr',
+  '练习': 'liàn xí',
+  '汉语': 'Hàn yǔ',
+  '中文': 'Zhōng wén',
+  '图书馆': 'tú shū guǎn',
+  '语法': 'yǔ fǎ',
+  '家里': 'jiā lǐ',
+  '地道': 'dì dào',
+  '自然': 'zì rán',
+  '小糯米': 'Xiǎo Nuòmǐ',
+  '冰美式': 'bīng měi shì',
+  '咖啡': 'kā fēi',
+  '怎么': 'zěn me',
+  '为什么': 'wèi shén me',
+  '容易': 'róng yì',
+  '觉得': 'jué de',
+  '哪里': 'nǎ lǐ',
+  '块儿': 'kuàir',
+  '平时': 'píng shí',
+  '经常': 'jīng cháng',
+  '不好意思': 'bù hǎoyìsi',
+};
+
+const EXTRA_MANDARIN_CHARS: Record<string, string> = {
+  '怼': 'duì',
+  '呃': 'è',
+  '嗯': 'ǹg',
+  '呗': 'bei',
+  '嘛': 'ma',
+  '啥': 'shá',
+  '咋': 'zǎ',
+  '咱': 'zán',
+  '喂': 'wèi',
+  '哟': 'yō',
+  '啦': 'la',
+  '嘿': 'hēi',
+  '哼': 'hēng',
+  '哈': 'hā',
+  '呀': 'ya',
+  '哦': 'ò',
+  '喽': 'lou',
+  '咯': 'lo',
+  '呐': 'na',
+  '哩': 'li',
+  '飘': 'piāo',
+  '聊': 'liáo',
+  '棒': 'bàng',
+  '糟': 'zāo',
+  '晕': 'yūn',
+  '猜': 'cāi',
+  '忘': 'wàng',
+  '懂': 'dǒng',
+  '改': 'gǎi',
+  '查': 'chá',
+  '找': 'zhǎo',
+  '借': 'jiè',
+  '还': 'hái',
+  '买': 'mǎi',
+  '卖': 'mài',
+  '选': 'xuǎn',
+  '试': 'shì',
+  '穿': 'chuān',
+  '累': 'lèi',
+  '饿': 'è',
+  '渴': 'kě',
+  '甜': 'tián',
+  '辣': 'là',
+  '吵': 'chǎo',
+  '帮': 'bāng',
+  '错': 'cuò',
+  '混': 'hùn',
+  '搞': 'gǎo',
+  '练': 'liàn',
+  '读': 'dú',
+  '写': 'xiě',
+  '听': 'tīng',
+  '说': 'shuō',
+  '问': 'wèn',
+  '答': 'dá',
+  '让': 'ràng',
+  '被': 'bèi',
+  '把': 'bǎ',
+  '跟': 'gēn',
+  '给': 'gěi',
+  '比': 'bǐ',
+  '刚': 'gāng',
+  '才': 'cái',
+  '就': 'jiù',
+  '却': 'què',
+  '并': 'bìng',
+};
+
+const WORDS: Record<string, string> = { ...(lexiconData.words || {}), ...EXTRA_MANDARIN_WORDS };
+const CHARS: Record<string, string> = { ...EXTRA_MANDARIN_CHARS, ...(lexiconData.chars || {}) };
 
 const HANZI_REGEX = /[\u3400-\u4DBF\u4E00-\u9FFF]/;
 const ALL_HANZI_REGEX = /[\u3400-\u4DBF\u4E00-\u9FFF]/g;
@@ -29,8 +141,12 @@ const PUNCT_MAP: Record<string, string> = {
   '）': ')',
   '【': '[',
   '】': ']',
-  '“': '"',
-  '”': '"',
+  '「': '«',
+  '」': '»',
+  '『': '«',
+  '』': '»',
+  '“': '«',
+  '”': '»',
   '‘': "'",
   '’': "'",
   '\u2014': ',',
@@ -197,6 +313,11 @@ export function toPhoneticPinyin(rawText: string): string {
 
   for (const tk of tokens) {
     if (tk.isSpace) continue;
+    // Erhua suffix ('儿') merges directly onto the preceding Hanzi word without regex \b bugs on toned vowels (e.g. 'róngyì')
+    if (tk.text === '儿' && parts.length > 0 && /[a-z\u00C0-\u024F]$/i.test(parts[parts.length - 1])) {
+      parts[parts.length - 1] = `${parts[parts.length - 1]}r`;
+      continue;
+    }
     if (tk.pinyin) {
       if (tk.isHanzi && tk.text.length > 1) {
         parts.push(formatWordSyllablesForLine(tk.text, tk.pinyin));
@@ -210,10 +331,12 @@ export function toPhoneticPinyin(rawText: string): string {
 
   let pinyin = parts
     .join(' ')
-    .replace(/\s+(?:ér|r)\b/g, 'r')
     .replace(/,\s*,/g, ',')
-    .replace(/\s+([.,!?:;~")\]}])/g, '$1')
-    .replace(/([(\[{"])\s+/g, '$1')
+    .replace(/\s+([.,!?:;~)\]}»])/g, '$1')
+    .replace(/([(\[{«])\s+/g, '$1')
+    .replace(/([^\s(\[{«])([«])/g, '$1 $2')
+    .replace(/([»])([^\s.,!?:;~)\]}»])/g, '$1 $2')
+    .replace(/[«»]/g, '"')
     .replace(/\s{2,}/g, ' ')
     .trim();
 

@@ -66,7 +66,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
   const ringRadius = 24;
   const ringCircumference = 2 * Math.PI * ringRadius;
   const ringProgress = (completedToday / dailyGoal) * ringCircumference;
-  const streakDays = Math.max(3, Math.min(30, 3 + Math.floor(totalAttempts / 2)));
+  const streakDays = totalAttempts > 0 ? Math.min(30, 1 + Math.floor(totalAttempts / 2)) : 0;
 
   const totalVocabCount = scenariosForLang.reduce(
     (acc, s) => acc + s.vocabPrereqs.length,
@@ -295,7 +295,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
           <div className="flex flex-col sm:flex-row md:flex-col items-stretch sm:items-center md:items-end gap-3 shrink-0">
             <div className="hidden md:flex items-center gap-3 bg-white/95 border border-[#F0E4CF] rounded-2xl p-2.5 pr-4 shadow-xs">
               <img
-                src="./assets/brand/paw-mochi-speaking.svg"
+                src="./assets/brand/mochi-mascot-headset.png"
                 alt="Mochi"
                 className="w-14 h-14 rounded-xl bg-[#FFF3C4] p-1 object-contain border border-[#FFC700]"
               />
@@ -652,7 +652,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             className="w-14 h-14 cursor-pointer hover:scale-105 transition-transform"
           >
             <img
-              src="./assets/brand/paw-mochi-idle.svg"
+              src="./assets/brand/mochi-mascot-idle.png"
               alt="Mochi"
               className="w-full h-full object-contain"
             />

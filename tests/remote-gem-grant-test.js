@@ -146,13 +146,32 @@ await asyncTest('Owner grant-gems berhasil menyuntikkan grant ke D1', async () =
     }
   };
 
-  const ctx = {
-    env: { CORE_DB: mockDb },
+  const ownerSecret = 'test-owner-secret';
+  const ownerHash = Array.from(
+    new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ownerSecret)))
+  )
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+
+  const unauthRes = await routeOwnerGrantGems({
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: ownerHash },
     corsHeaders: {},
     now: 9999,
     request: new Request('http://localhost/api/owner/grant-gems', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ handle: 'zara', amount: 100, reason: 'Unauth' })
+    })
+  });
+  assert.equal(unauthRes.status, 403);
+
+  const ctx = {
+    env: { CORE_DB: mockDb, OWNER_TOKEN_HASH: ownerHash },
+    corsHeaders: {},
+    now: 9999,
+    request: new Request('http://localhost/api/owner/grant-gems', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-fiezel-owner-token': ownerSecret },
       body: JSON.stringify({
         handle: 'zara',
         amount: 100,

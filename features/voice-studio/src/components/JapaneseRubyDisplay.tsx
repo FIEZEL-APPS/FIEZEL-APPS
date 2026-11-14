@@ -1,12 +1,15 @@
 import React from 'react';
 import { renderFuriganaHtml, toPhoneticRomaji, stripEmojisAndEmotWords } from '../lib/japanesePhonetics';
 import { renderMandarinRubyHtml, toPhoneticPinyin, containsHanzi } from '../lib/mandarinPhonetics';
+import { resolveUnifiedPronunciation, looksAlreadyIndonesian } from '../lib/liveCallHelper';
 
 export interface JapaneseRubyDisplayProps {
   text: string;
   targetLang?: 'en' | 'ja' | 'zh';
   showRomaji?: boolean;
   showFurigana?: boolean;
+  phoneticText?: string;
+  pronunciationTestId?: string;
   className?: string;
   rubyClassName?: string;
   romajiClassName?: string;
@@ -18,6 +21,8 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
   targetLang,
   showRomaji = true,
   showFurigana = true,
+  phoneticText,
+  pronunciationTestId,
   className = '',
   rubyClassName = '',
   romajiClassName = '',
@@ -42,6 +47,10 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
   const isPredominantlyLatinSentence =
     latinWords.length >= 4 && latinWords.length > cjkCount * 2;
 
+  const cjkSpans = (clean.match(/[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF]+/g) || []).join(' · ');
+  const pinyinSource = isPredominantlyLatinSentence ? cjkSpans : clean;
+  const romajiSource = isPredominantlyLatinSentence ? cjkSpans : clean;
+
   // 1. MANDARIN CHINESE (targetLang === 'zh' OR explicitly contains Hanzi without Japanese Kana)
   const isMandarin =
     (targetLang === 'zh' && containsHanzi(clean)) ||
@@ -49,8 +58,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
 
   if (isMandarin) {
     const rubyHtml = renderMandarinRubyHtml(clean, { hideRuby: !allowFurigana });
-    const pinyin =
-      allowRomaji && !isPredominantlyLatinSentence ? toPhoneticPinyin(clean) : '';
+    const pinyin = allowRomaji && pinyinSource ? toPhoneticPinyin(pinyinSource) : '';
 
     return (
       <Component
@@ -70,7 +78,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
         {allowRomaji && pinyin && (
           <span
             lang="zh-Latn"
-            data-testid="mandarin-pinyin-text"
+            data-testid={pronunciationTestId || 'mandarin-pinyin-text'}
             className={`fz-zh-pinyin-text block text-[11px] sm:text-xs text-[#BE123C] font-semibold tracking-wide break-words leading-relaxed ${romajiClassName}`}
           >
             {pinyin}
@@ -87,8 +95,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
 
   if (isJapanese) {
     const furiganaHtml = renderFuriganaHtml(clean, { hideFurigana: !allowFurigana });
-    const romaji =
-      allowRomaji && !isPredominantlyLatinSentence ? toPhoneticRomaji(clean) : '';
+    const romaji = allowRomaji && romajiSource ? toPhoneticRomaji(romajiSource) : '';
 
     return (
       <Component
@@ -108,7 +115,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
         {allowRomaji && romaji && (
           <span
             lang="ja-Latn"
-            data-testid="japanese-romaji-text"
+            data-testid={pronunciationTestId || 'japanese-romaji-text'}
             className={`fz-ja-romaji-text block text-[11px] sm:text-xs text-[#8C6D1F] font-medium tracking-wide break-words leading-relaxed ${romajiClassName}`}
           >
             {romaji}
@@ -118,7 +125,40 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
     );
   }
 
-  // 3. ENGLISH / LATIN (plain text)
+  // 3. ENGLISH / LATIN (unified phonetic Cara Baca when showRomaji is enabled)
+  // Guard: never run English phonetics on Bahasa Indonesia prose (e.g. SSW Sensei bilingual dialogue).
+  const isIndonesianProse = looksAlreadyIndonesian(clean);
+  const safePhoneticProp =
+    phoneticText && !looksAlreadyIndonesian(phoneticText) ? phoneticText : '';
+  const phoneticEn =
+    allowRomaji &&
+    !isIndonesianProse &&
+    (targetLang === 'en' || Boolean(safePhoneticProp)) &&
+    /[A-Za-z]{2,}/.test(clean)
+      ? resolveUnifiedPronunciation(clean, 'en', safePhoneticProp)
+      : '';
+
+  if (allowRomaji && phoneticEn) {
+    return (
+      <Component
+        className={`fz-en-display-wrap ${
+          as === 'span' ? 'inline-block align-middle' : 'space-y-1'
+        } ${className}`}
+      >
+        <span lang="en" className={`break-words block ${rubyClassName}`}>
+          {clean}
+        </span>
+        <span
+          lang="id-Latn"
+          data-testid={pronunciationTestId || 'english-phonetic-text'}
+          className={`fz-en-phonetic-text block text-[11px] sm:text-xs text-[#6B5A48] font-medium tracking-wide break-words leading-relaxed ${romajiClassName}`}
+        >
+          {phoneticEn}
+        </span>
+      </Component>
+    );
+  }
+
   return <span className={className}>{clean}</span>;
 };
 

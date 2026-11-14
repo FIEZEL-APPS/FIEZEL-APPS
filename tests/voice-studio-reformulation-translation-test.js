@@ -569,6 +569,17 @@ async function run() {
   assert.strictEqual(zhQuestion.targetLang, 'zh');
   console.log(`✓ PASS (JA tokens=${jaQuestion.tokens.length}, ZH tokens=${zhQuestion.tokens.length})\n`);
 
+  console.log('--- TEST 6: Idiomatic Live Translation Anti-Literal ("Boom!") ---');
+  const boomTrans = translateAndPhoneticizeLiveText(
+    "Boom! There you go! That's the exact structure. Let's keep that energy moving - what else did you do today?",
+    'en'
+  );
+  assert.ok(
+    boomTrans.translationId && !/\bledakan\b/i.test(boomTrans.translationId) && !boomTrans.translationId.startsWith('Pahami'),
+    `Expected idiomatic Indonesian translation without literal "Ledakan", got: ${boomTrans.translationId}`
+  );
+  console.log(`✓ PASS ("Boom!..." -> "${boomTrans.translationId}")\n`);
+
   console.log('================================================================');
   console.log('ALL REFORMULATION, ORAL FLUENCY, & CROSS-LINGUAL VOICE TESTS PASSED!');
   console.log('================================================================');

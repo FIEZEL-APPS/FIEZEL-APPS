@@ -7,7 +7,10 @@ import type {
 } from '../types/voiceCall.ts';
 import {
   type BeginnerReplyCard,
+  approximateEnglishPhoneticId,
+  ensureSharedAnonSession,
   generateDynamicContextualAiReply,
+  resolveUnifiedPronunciation,
   translateAndPhoneticizeLiveText,
 } from './liveCallHelper.ts';
 import { stripEmojisAndEmotWords, toPhoneticRomaji } from './japanesePhonetics.js';
@@ -16,6 +19,15 @@ import {
   evaluateConversationalOralFluency,
   type TurnAcousticTelemetry,
 } from './braincore.ts';
+import {
+  alignSpokenToTargetPassage,
+  type SpeechAlignmentResult,
+} from './speechAlignment.ts';
+import {
+  buildSswCompactGroundedDossier,
+  buildSswContextualReplyCards,
+} from './sswSenseiEngine.ts';
+import { buildSswTurnDossierForHttp } from './sswSenseiTeacher.ts';
 
 export type LiveTransportMode = 'ws-duplex' | 'turn-by-turn-fallback';
 
@@ -47,6 +59,7 @@ export interface FlexibleTurnEvaluationResult {
    */
   replySource?: 'ai' | 'ai-gemini-key';
   uiAction?: VoiceUiAction;
+  readAloudAlignment?: SpeechAlignmentResult;
 }
 
 declare global {
@@ -303,8 +316,17 @@ export function resolveVoiceApiCandidateBases(): string[] {
 let _prewarmedLiveSession: { info: GeminiLiveSessionInfo; ts: number } | null = null;
 let _prewarmInflight: Promise<GeminiLiveSessionInfo> | null = null;
 
+/**
+ * Ensures an authenticated/anonymous Worker `fz_id` session cookie exists before
+ * calling cookie-protected `/api/voice/*` and `/api/braincore/sync` routes.
+ */
+export async function ensureVoiceWorkerSession(base: string, force = false): Promise<boolean> {
+  return ensureSharedAnonSession(base, force);
+}
+
 async function fetchFreshGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
   for (const base of resolveVoiceApiCandidateBases()) {
+    await ensureVoiceWorkerSession(base);
     const url = `${base}/api/voice/live-session`;
     try {
       const controller = new AbortController();
@@ -313,6 +335,7 @@ async function fetchFreshGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
+        credentials: 'include',
         mode: 'cors',
         signal: controller.signal,
       });
@@ -397,10 +420,12 @@ export async function reportGeminiLiveSessionDrop(
   }
   const base = resolveVoiceApiCandidateBases()[0] ?? 'https://api.fiezel.my.id';
   try {
+    await ensureVoiceWorkerSession(base);
     await fetch(`${base}/api/voice/report-drop`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reason, code, keyIndex }),
+      credentials: 'include',
       mode: 'cors',
     });
   } catch {
@@ -434,6 +459,7 @@ let _copilotServerCooldownUntil = 0;
 export type CopilotSpeechAct =
   | 'echo_redemption'
   | 'clarification_repeat'
+  | 'wh_what_past_action'
   | 'wh_what_action'
   | 'invitation'
   | 'choice'
@@ -456,6 +482,7 @@ export type CopilotSpeechAct =
   | 'yesno_did'
   | 'yesno_would'
   | 'yesno_do'
+  | 'coaching_advice'
   | 'greeting'
   | 'statement';
 
@@ -467,6 +494,145 @@ export interface FocalClauseResult {
   choiceOptionA?: string;
   choiceOptionB?: string;
   extractedTopic?: string;
+  adviceActionPhrase?: string;
+}
+
+/**
+ * Extracts a concise, first-person practice/action commitment from a tutor/partner
+ * coaching statement (e.g. "The best approach is to practice with daily sentences and
+ * read consistently-you'll pick them up faster..." -> "practice with daily sentences and read consistently").
+ */
+function extractCoachingAdviceAction(
+  focalText: string,
+  targetLang: TargetLang
+): string | undefined {
+  const clean = (focalText || '').trim();
+  if (!clean) return undefined;
+
+  if (targetLang === 'en') {
+    const enMatch =
+      clean.match(
+        /\b(?:best\s+(?:approach|way|method|habit|tip|strategy|trick)\s+is\s+(?:just\s+)?to|important\s+to|key\s+is\s+to|helps?\s+to|try\s+to|remember\s+to|make\s+sure\s+(?:you|to)|don't\s+forget\s+to|you\s+(?:should|can|could|need\s+to|might\s+want\s+to)|start\s+(?:by|with)|focus\s+on|practice)\s+([^.?!;\u2013\u2014]+)/i
+      ) ||
+      clean.match(
+        /\bwhen\s+you\s+[^,]+,\s*((?:just\s+|always\s+)?(?:watch|research|practice|read|speak|listen|write|review|repeat|study|focus|keep|try|take|record|use|teach)\b[^.?!;\u2013\u2014]+)/i
+      ) ||
+      clean.match(
+        /(?:^|[,;]\s*)(?:just\s+|always\s+|try\s+and\s+)?((?:watch\s+carefully|research\s+consistently|teach\s+yourself|practicing|reading|speaking|listening|recording\s+yourself|reviewing)\b[^.?!;\u2013\u2014]*)/i
+      ) ||
+      clean.match(
+        /\b(practicing\s+[^.?!;\u2013\u2014]+|reading\s+[^.?!;\u2013\u2014]+|speaking\s+[^.?!;\u2013\u2014]+|listening\s+[^.?!;\u2013\u2014]+)/i
+      );
+    if (!enMatch) return undefined;
+
+    const fullCapture = enMatch[0].toLowerCase().trim();
+    let rawAction = (
+      fullCapture.startsWith('practice ') ||
+      fullCapture.startsWith('focus on')
+        ? enMatch[0]
+        : enMatch[1] || ''
+    ).trim();
+
+    // Strip causal/consequence tails attached via hyphen or dash (e.g. "-you'll pick them up...")
+    rawAction = rawAction
+      .split(/\s*[-\u2013\u2014]+\s*(?:you(?:'ll|'re|\s+will|\s+can)|it(?:'ll|\s+will)|that\s+way|so\s+you)\b/i)[0]
+      .replace(/^(?:is\s+to|to|by)\s+/i, '')
+      .replace(/\s*,\s*(?:so|and\s+then|because|until)\b.*$/i, '')
+      .replace(/["'\u201c\u201d\u2018\u2019]+/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+
+    // Flip second-person possessives/pronouns to natural learner first-person
+    rawAction = rawAction
+      .replace(/\byourself\b/gi, 'myself')
+      .replace(/\byour\b/gi, 'my')
+      .replace(/\byou're\b/gi, 'I am')
+      .replace(/\byou\b/gi, 'me');
+
+    // Limit overly long clause cleanly while preserving dual coordinated actions ("practice X and read Y")
+    const words = rawAction.split(/\s+/).filter(Boolean);
+    if (words.length < 2) return undefined;
+    if (words.length > 11) {
+      rawAction = words.slice(0, 11).join(' ');
+    }
+    return rawAction.replace(/[.,;:!?-]+$/g, '').trim() || undefined;
+  }
+
+  if (targetLang === 'ja') {
+    const jaMatch = clean.match(
+      /([^、。！？]{2,26}(?:てみて(?:ください)?|ほうがいい|方?がいい|ことが(?:大切|大事|コツ)|を心がけ|を意識し|を続け|を練習し|毎日[^、。！？]{2,18}))/u
+    );
+    if (jaMatch?.[1]) {
+      return jaMatch[1]
+        .replace(/(?:てください|てみて(?:ください)?|ほうがいい|方がいい|ことが(?:大切|大事|コツ)です?|を心がけましょう|を意識しましょう).*$/u, '')
+        .trim() || jaMatch[1].trim();
+    }
+    return undefined;
+  }
+
+  const zhMatch = clean.match(
+    /(?:最好|建议(?:你)?|试着|可以多|每天坚持?|一定要|关键是)([^，。！？]{2,22})/u
+  );
+  if (zhMatch?.[1]) {
+    return zhMatch[1]
+      .replace(/你/g, '我')
+      .replace(/[。！？，、]+$/g, '')
+      .trim();
+  }
+  return undefined;
+}
+
+function buildIndonesianAdviceHint(actionPhrase: string): string {
+  const phrase = actionPhrase
+    .replace(/\bpractice with daily sentences\b/gi, 'berlatih dengan kalimat sehari-hari')
+    .replace(/\bpractice daily sentences\b/gi, 'berlatih kalimat sehari-hari')
+    .replace(/\bread consistently\b/gi, 'membaca secara konsisten')
+    .replace(/\bwatch carefully\b/gi, 'memperhatikan dengan cermat')
+    .replace(/\bresearch consistently\b/gi, 'mencari tahu secara konsisten')
+    .replace(/\bteach myself\b/gi, 'belajar mandiri')
+    .replace(/\bat lunch\b/gi, 'saat istirahat siang')
+    .replace(/\bstep by step\b/gi, 'selangkah demi selangkah')
+    .replace(/\bpractice\b/gi, 'berlatih')
+    .replace(/\bpracticing\b/gi, 'berlatih')
+    .replace(/\bdaily sentences\b/gi, 'kalimat sehari-hari')
+    .replace(/\bconsistently\b/gi, 'secara konsisten')
+    .replace(/\bcarefully\b/gi, 'dengan cermat')
+    .replace(/\bresearch\b/gi, 'mencari tahu')
+    .replace(/\bwatch\b/gi, 'memperhatikan')
+    .replace(/\bteach\b/gi, 'belajar')
+    .replace(/\bstudy\b/gi, 'mempelajari')
+    .replace(/\breview\b/gi, 'mengulang')
+    .replace(/\brepeat\b/gi, 'mengulangi')
+    .replace(/\bmyself\b/gi, 'diriku sendiri')
+    .replace(/\blunch\b/gi, 'makan siang')
+    .replace(/\bevery day\b/gi, 'setiap hari')
+    .replace(/\bfocus on\b/gi, 'fokus pada')
+    .replace(/\bspeak\b/gi, 'berbicara')
+    .replace(/\bspeaking\b/gi, 'berbicara')
+    .replace(/\blisten\b/gi, 'mendengarkan')
+    .replace(/\blistening\b/gi, 'mendengarkan')
+    .replace(/\bread\b/gi, 'membaca')
+    .replace(/\breading\b/gi, 'membaca')
+    .replace(/\bwrite\b/gi, 'menulis')
+    .replace(/\bvocabulary\b/gi, 'kosakata')
+    .replace(/\bgrammar\b/gi, 'tata bahasa')
+    .replace(/\bpronunciation\b/gi, 'pelafalan')
+    .replace(/\bslowly\b/gi, 'pelan-pelan')
+    .replace(/\bout loud\b/gi, 'dengan lantang')
+    .replace(/\bwith my\b/gi, 'dengan')
+    .replace(/\bwith\b/gi, 'dengan')
+    .replace(/\band\b/gi, 'dan')
+    .replace(/\bmy\b/gi, 'ku')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  const hasUntranslatedEnglish =
+    /\b(?:the|to|and|with|you|your|myself|watch|research|teach|lunch|approach|pick|them|faster|than|think)\b/i.test(
+      phrase
+    );
+  if (phrase && !hasUntranslatedEnglish) {
+    return `Baik, aku akan ${phrase.replace(/^ku\s+/i, '')}!`;
+  }
+  return 'Baik, aku akan langsung mempraktikkan saran itu!';
 }
 
 export function extractFocalClause(aiText: string, targetLang: TargetLang): FocalClauseResult {
@@ -507,14 +673,38 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
     };
   }
 
-  // 2. Split into sentences to isolate terminal speech act
+  // 2. Split into sentences (and dash/colon WH transitions) to isolate terminal speech act
   const isCjk = targetLang === 'ja' || targetLang === 'zh';
   const splitRe = isCjk ? /([。！？!?\n]+)/ : /([.?!;\n]+)/;
   const rawParts = clean.split(splitRe).map((p) => p.trim()).filter(Boolean);
   const sentences: string[] = [];
-  for (let i = 0; i < rawParts.length; i += 2) {
-    const s = rawParts[i] + (rawParts[i + 1] || '');
-    if (s.trim()) sentences.push(s.trim());
+  const whLeadRe = isCjk
+    ? /(?:何|なに|どこ|いつ|誰|どう|什么|哪里|哪儿|怎么|为什么)/u
+    : /^(?:what|where|when|why|how|who)\b/i;
+  const dashSplitRe = isCjk
+    ? /\s*(?:——|—|–|-|:|：)\s*/
+    : /(?:\s+[—–-]{1,2}\s+|(?<![\s])[—–](?![\s])|:\s+)/;
+  const pushWithDashSplit = (seg: string) => {
+    const trimmed = seg.trim();
+    if (!trimmed) return;
+    const subParts = trimmed.split(dashSplitRe).map((p) => p.trim()).filter(Boolean);
+    if (subParts.length >= 2) {
+      const tail = subParts[subParts.length - 1];
+      if (whLeadRe.test(tail)) {
+        const head = subParts.slice(0, -1).join(' ').trim();
+        if (head) sentences.push(head);
+        sentences.push(tail);
+        return;
+      }
+    }
+    sentences.push(trimmed);
+  };
+  for (let i = 0; i < rawParts.length; i++) {
+    if (splitRe.test(rawParts[i])) {
+      if (sentences.length > 0) sentences[sentences.length - 1] += rawParts[i];
+    } else {
+      pushWithDashSplit(rawParts[i]);
+    }
   }
 
   const parseDetails = (focalText: string): FocalClauseResult => {
@@ -549,12 +739,14 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
     let extractedTopic: string | undefined;
     if (targetLang === 'ja') {
       const jaStop = new Set([
-        '今日', '明日', '昨日', '今週末', '今週', '毎日', '最近', '普段', 'いつも',
+        '今日', '明日', '昨日', '今週末', '今週', '毎日', '最近', '普段', 'いつも', '他に', 'ほか',
         'あなた', 'わたし', '私', '僕', '俺', '君', 'お前', '先生', '後輩',
         'ところ', 'なに', '何', 'どこ', 'いつ', 'だれ', '誰', 'どう', 'それ', 'これ', 'あれ',
         '変な日本語', '日本語', '直訳',
       ]);
-      const rawTopic = focalText.match(/([一-龯ぁ-んァ-ン]{2,6})(?:は|が|を|に|について|のこと)/)?.[1];
+      const rawTopic = focalText.match(
+        /(?:^|[、。？！\sはがをにでとの])([一-龯ァ-ン]{2,6})(?:について|のこと|は|が|を)/u
+      )?.[1];
       extractedTopic = rawTopic && !jaStop.has(rawTopic) ? rawTopic : undefined;
     } else if (targetLang === 'zh') {
       const zhStop = new Set([
@@ -568,18 +760,32 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
     } else {
       const stop = new Set([
         'the', 'a', 'an', 'your', 'you', 'do', 'does', 'did', 'what', 'where', 'how', 'why', 'when',
-        'who', 'is', 'are', 'about', 'like', 'this', 'that', 'there', 'here', 'today', 'and', 'or',
-        'to', 'of', 'in', 'on', 'for', 'with', 'it', 'me', 'my', 'we', 'so', 'any', 'some', 'usually', 'would',
-        'lately', 'recently', 'been', 'tripping', 'part', 'english', 'japanese', 'mandarin', 'chinese',
-        'real', 'talk', 'door', 'spot', 'voice', 'robot', 'textbook', 'leave', 'stiff', 'slips', 'calling',
+        'who', 'whom', 'whose', 'which', 'is', 'are', 'about', 'like', 'this', 'that', 'there', 'here',
+        'today', 'and', 'or', 'to', 'of', 'in', 'on', 'for', 'with', 'it', 'me', 'my', 'we', 'so', 'any',
+        'some', 'usually', 'would', 'lately', 'recently', 'been', 'tripping', 'part', 'english', 'japanese',
+        'mandarin', 'chinese', 'real', 'talk', 'door', 'spot', 'voice', 'robot', 'textbook', 'leave', 'stiff',
+        'slips', 'calling', 'think', 'thought', 'know', 'knew', 'feel', 'felt', 'want', 'wanted', 'need',
+        'needed', 'mean', 'meant', 'make', 'made', 'take', 'took', 'give', 'gave', 'pick', 'picked', 'faster',
+        'fast', 'better', 'best', 'good', 'great', 'well', 'more', 'most', 'much', 'many', 'very', 'really',
+        'just', 'only', 'also', 'even', 'still', 'always', 'never', 'often', 'sometimes', 'maybe', 'perhaps',
+        'then', 'than', 'while', 'yourself', 'myself', 'themselves', 'them', 'they', 'their', 'ours', 'have',
+        'having', 'going', 'coming', 'doing', 'saying', 'getting', 'trying', 'working', 'looking', 'using',
+        'able', 'possible', 'important', 'consistent', 'careful', 'step', 'approach', 'method', 'habit',
+        'thing', 'things', 'stuff', 'something', 'anything', 'everything', 'nothing', 'someone', 'anyone',
+        'everyone', 'watch', 'teach', 'research', 'lunch', 'time', 'times', "you'll", "don't", "didn't",
+        'else', 'energy', 'moving', 'keep', 'keeps', 'kept', 'structure', 'sentence', 'sounds', 'boom', 'right',
       ]);
       const words = focalText
         .toLowerCase()
         .replace(/[^a-z\s']/g, ' ')
         .split(/\s+/)
-        .filter((w) => w.length > 3 && !stop.has(w));
+        .filter((w) => w.length > 3 && !w.endsWith('ly') && !stop.has(w));
       extractedTopic = words.length ? words[words.length - 1] : undefined;
     }
+
+    const adviceActionPhrase =
+      extractCoachingAdviceAction(focalText, targetLang) ||
+      extractCoachingAdviceAction(clean, targetLang);
 
     return {
       fullText: clean,
@@ -588,6 +794,7 @@ export function extractFocalClause(aiText: string, targetLang: TargetLang): Foca
       choiceOptionA,
       choiceOptionB,
       extractedTopic,
+      adviceActionPhrase,
     };
   };
 
@@ -635,37 +842,65 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
     }
   }
 
-  // 0.5. What Action / Activity (e.g. "what are you doing?", "what are you watching?", "what did you do today?")
+  // 0.45. Past What-Action / Activity (e.g. "what else did you do today?", "what did you eat?", "今日は他に何をした？")
   if (targetLang === 'ja') {
-    if (/(?:何をしている|何をしてる|今何してる|何してた|何を食べた|何を見てる|何やってる|何をしていらっしゃ)/u.test(focal.focalText)) {
+    if (/(?:他に何をし|何をした|何をしてた|何をしました|何を食べた|何を見た)/u.test(focal.focalText)) {
+      return 'wh_what_past_action';
+    }
+  } else if (targetLang === 'zh') {
+    if (/(?:还做了什么|做了什么|干了什么|吃了什么|看了什么)/u.test(focal.focalText)) {
+      return 'wh_what_past_action';
+    }
+  } else {
+    if (
+      /\bwhat(?:\s+else)?\s+(?:did you (?:do|eat|drink|watch|make|say|buy|learn|see|try|read)|were you doing|have you (?:done|been doing|been up to))\b/i.test(
+        s
+      )
+    ) {
+      return 'wh_what_past_action';
+    }
+  }
+
+  // 0.5. What Action / Activity (e.g. "what are you doing?", "what are you watching?")
+  if (targetLang === 'ja') {
+    if (/(?:何をしている|何をしてる|今何してる|何を見てる|何やってる|何をしていらっしゃ)/u.test(focal.focalText)) {
       return 'wh_what_action';
     }
   } else if (targetLang === 'zh') {
-    if (/(?:在干嘛|在做什么|在干什么|做了什么|吃了什么|看什么|在忙什么)/u.test(focal.focalText)) {
+    if (/(?:在干嘛|在做什么|在干什么|在看什么|在忙什么)/u.test(focal.focalText)) {
       return 'wh_what_action';
     }
   } else {
     if (
-      /\bwhat (?:are you doing|are you up to|is going on|did you do|were you doing|do you do now)\b/i.test(s) ||
-      /\bwhat (?:did you eat|are you watching|are you eating|are you working on)\b/i.test(s)
+      /\bwhat(?:\s+else)?\s+(?:are you doing|are you up to|is going on|do you do now)\b/i.test(s) ||
+      /\bwhat(?:\s+else)?\s+(?:are you watching|are you eating|are you working on)\b/i.test(s)
     ) {
       return 'wh_what_action';
     }
   }
 
-  // 1. Invitations & Proposals
+  // 1. Invitations & Proposals (guarded against WH-questions like "what else did you do today?")
   if (targetLang === 'ja') {
-    if (/(?:ませんか|ない[？?]|ましょう(?:か)?|どうですか|いかがですか)/u.test(focal.focalText)) {
+    if (
+      !/(?:他に?何|どこ|いつ|誰|どう|なぜ|なんで)/u.test(focal.focalText) &&
+      /(?:ませんか|ない[？?]|ましょう(?:か)?|どうですか|いかがですか)/u.test(focal.focalText)
+    ) {
       return 'invitation';
     }
   } else if (targetLang === 'zh') {
-    if (/(?:要不要|我们一起|好吗|怎么样|吧[？?]?)/u.test(focal.focalText)) {
+    if (
+      !/(?:什么|哪里|哪儿|怎么|为什么|谁|几点)/u.test(focal.focalText) &&
+      /(?:要不要|我们一起|好吗|怎么样|吧[？?]?)/u.test(focal.focalText)
+    ) {
       return 'invitation';
     }
   } else {
+    const hasWhOverride = /\b(what|where|when|how|who)\b/i.test(s);
     if (
-      /\b(why don't (?:we|you)|shall we|let's|how about|what about|care to join)\b/i.test(s) ||
-      (!/\b(what|where|when|why|how)\b/i.test(s) && /\b(would you like to|do you want to)\b/i.test(s))
+      (!hasWhOverride &&
+        (/\b(why don't (?:we|you)|shall we|let's|how about|what about|care to join)\b/i.test(s) ||
+          /\b(would you like to|do you want to)\b/i.test(s))) ||
+      /\bwhy don't (?:we|you)\b/i.test(s)
     ) {
       return 'invitation';
     }
@@ -738,6 +973,13 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
     if (/\bhow (do|can|could|did|would) you\b/i.test(s) || /\bhow to\b/i.test(s)) return 'wh_how_method';
   }
 
+  const hasQMark = /[?？]/.test(focal.focalText);
+
+  // Coaching Advice statements (non-question statements giving concrete study advice must run BEFORE loose WH words like "When you teach...")
+  if (focal.adviceActionPhrase && !hasQMark) {
+    return 'coaching_advice';
+  }
+
   // Where (Origin vs Action)
   if (targetLang === 'ja') {
     if (/(?:出身はどこ|どこから来ました|どこ出身)/u.test(focal.focalText)) return 'wh_where_origin';
@@ -748,7 +990,11 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
   } else {
     if (/\bwhere (are you|do you come) from\b/i.test(s) || /\bwhere were you born\b/i.test(s))
       return 'wh_where_origin';
-    if (/\bwhere\b/i.test(s)) return 'wh_where_action';
+    if (
+      (hasQMark && /\bwhere\b/i.test(s)) ||
+      /^(?:and\s+|so\s+)?where\s+(?:do|did|does|are|is|were|was|can|could|will|would|have|has|should)\b/i.test(s)
+    )
+      return 'wh_where_action';
   }
 
   // What (Food vs Open Conversation Topic vs General)
@@ -773,7 +1019,11 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
       /\bwhat challenge did you tackle\b/i.test(s)
     )
       return 'wh_what_talk';
-    if (/\bwhat\b/i.test(s)) return 'wh_what_general';
+    if (
+      (hasQMark && /\bwhat\b/i.test(s)) ||
+      /^(?:and\s+|so\s+)?what(?:'s|'re)?\s+(?:is|are|was|were|do|did|does|can|could|will|would|should|kind|type|time|color|food|drink|movie|book|hobby|name)\b/i.test(s)
+    )
+      return 'wh_what_general';
   }
 
   // Why
@@ -782,7 +1032,11 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
   } else if (targetLang === 'zh') {
     if (/(?:为什么|为何|怎么会)/u.test(focal.focalText)) return 'wh_why';
   } else {
-    if (/\bwhy\b/i.test(s)) return 'wh_why';
+    if (
+      (hasQMark && /\bwhy\b/i.test(s)) ||
+      /^(?:and\s+|so\s+)?why\s+(?:do|did|does|are|is|were|was|can|could|will|would|should|not|don't|didn't|aren't|isn't)\b/i.test(s)
+    )
+      return 'wh_why';
   }
 
   // When
@@ -791,7 +1045,11 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
   } else if (targetLang === 'zh') {
     if (/(?:什么时候|几点)/u.test(focal.focalText)) return 'wh_when';
   } else {
-    if (/\bwhen\b/i.test(s) || /\bwhat time\b/i.test(s)) return 'wh_when';
+    if (
+      (hasQMark && (/\bwhen\b/i.test(s) || /\bwhat time\b/i.test(s))) ||
+      /^(?:and\s+|so\s+)?(?:when\s+(?:do|did|does|are|is|were|was|can|could|will|would|have|has|should)|what time\s+(?:do|did|does|is|was|will|would))\b/i.test(s)
+    )
+      return 'wh_when';
   }
 
   // Who
@@ -800,7 +1058,11 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
   } else if (targetLang === 'zh') {
     if (/(?:谁|跟谁)/u.test(focal.focalText)) return 'wh_who';
   } else {
-    if (/\bwho\b/i.test(s) || /\bwith whom\b/i.test(s)) return 'wh_who';
+    if (
+      (hasQMark && (/\bwho\b/i.test(s) || /\bwith whom\b/i.test(s))) ||
+      /^(?:and\s+|so\s+)?who(?:'s|'re)?\s+(?:is|are|was|were|do|did|does|can|could|will|would|should)\b/i.test(s)
+    )
+      return 'wh_who';
   }
 
   // 4. Yes/No Questions with Auxiliary Matching
@@ -827,7 +1089,12 @@ export function detectAiIntent(aiText: string, targetLang: TargetLang): CopilotS
     if (/\?/.test(s)) return 'yesno_do';
   }
 
-  // 5. Greeting (only if focal sentence itself is a greeting)
+  // 5. Coaching Advice / Strategy / Practice Recommendation (non-question statements giving concrete study advice)
+  if (focal.adviceActionPhrase) {
+    return 'coaching_advice';
+  }
+
+  // 6. Greeting (only if focal sentence itself is a greeting)
   if (targetLang === 'ja') {
     if (/^(?:こんにちは|おはよう(?:ございます)?|こんばんは|はじめまして)\b/u.test(focal.focalText))
       return 'greeting';
@@ -1265,10 +1532,213 @@ export function buildContextualFallbackCards(params: {
   isCambridge?: boolean;
   personaId?: string;
   cefrLevel?: string;
+  activePopupTargetText?: string;
+  activePopupMode?: string;
 }): BeginnerReplyCard[] {
   const rawAi = String(params.aiText || '');
   const th = params.locale === 'th';
   const variationSeed = Number(params.variationSeed || 0);
+  const popupTarget = String(params.activePopupTargetText || '').trim();
+  const popupMode = String(params.activePopupMode || '').trim();
+
+  if (params.personaId === 'ssw_sensei') {
+    return buildSswContextualReplyCards(rawAi, params.lastUserText || '', variationSeed);
+  }
+
+  // Contextual Read Aloud grounding: whenever a Read Aloud sentence is visible on screen,
+  // align Copilot directly with the exact on-screen target passage and its hardest word!
+  if (popupMode === 'pte_read_aloud' && popupTarget.length >= 6) {
+    const cleanTarget = popupTarget.replace(/\s+/g, ' ').trim();
+    const targetPron = resolveUnifiedPronunciation(cleanTarget, params.targetLang) || cleanTarget;
+    const hardWord =
+      cleanTarget
+        .replace(/[^a-zA-Z0-9\u3040-\u30FF\u4E00-\u9FFF\s-]/g, ' ')
+        .split(/\s+/)
+        .filter((w) => w.length >= 5)
+        .sort((a, b) => b.length - a.length)[0] || '';
+    if (params.targetLang === 'ja') {
+      return [
+        {
+          id: 'ctx_ra_ja_1',
+          tier: 'easy',
+          badgeId: 'Teks di Layar',
+          badgeTh: 'ข้อความบนหน้าจอ',
+          tierLabelId: '1 · Baca Nyaring',
+          tierLabelTh: '1 · อ่านออกเสียง',
+          text: cleanTarget,
+          pronunciation: targetPron,
+          hintId: 'Bacakan kalimat target di layar ini dengan jelas.',
+          hintTh: 'อ่านประโยคเป้าหมายบนหน้าจอให้ชัดเจน',
+          meaningId: 'Bacakan kalimat target di layar ini dengan jelas.',
+          meaningTh: 'อ่านประโยคเป้าหมายบนหน้าจอให้ชัดเจน',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_ra_ja_2',
+          tier: 'mission',
+          badgeId: 'Tanya Pelafalan',
+          badgeTh: 'ถามการออกเสียง',
+          tierLabelId: '2 · Tanya Cara Baca',
+          tierLabelTh: '2 · ถามวิธีอ่าน',
+          text: hardWord
+            ? `「${hardWord}」の発音をもう一度ゆっくり教えてもらえますか？`
+            : 'この文の区切り方と発音をゆっくり教えてもらえますか？',
+          pronunciation: hardWord
+            ? toPhoneticRomaji(`${hardWord} no hatsuon o mou ichido yukkuri oshiete moraemasu ka?`)
+            : toPhoneticRomaji('Kono bun no kugirikata to hatsuon o yukkuri oshiete moraemasu ka?'),
+          hintId: hardWord
+            ? `Bisa ajari ulang pelafalan kata "${toPhoneticRomaji(hardWord)}" pelan-pelan?`
+            : 'Bisa ajari ulang pemenggalan jeda dan pelafalan kalimat ini?',
+          hintTh: 'ช่วยสอนวิธีออกเสียงคำนี้ช้าๆ อีกครั้งได้ไหม?',
+          meaningId: hardWord
+            ? `Bisa ajari ulang pelafalan kata "${toPhoneticRomaji(hardWord)}" pelan-pelan?`
+            : 'Bisa ajari ulang pemenggalan jeda dan pelafalan kalimat ini?',
+          meaningTh: 'ช่วยสอนวิธีออกเสียงคำนี้ช้าๆ อีกครั้งได้ไหม?',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_ra_ja_3',
+          tier: 'rescue',
+          badgeId: 'Minta Koreksi / Soal Baru',
+          badgeTh: 'ขอคำแนะนำ / ประโยคถัดไป',
+          tierLabelId: '3 · + Tanya Balik',
+          tierLabelTh: '3 · + ถามกลับ',
+          text: '今の読み方で大丈夫でしたか？次の文も練習したいです。',
+          pronunciation: 'Ima no yomikata de daijoubu deshita ka? Tsugi no bun mo renshuu shitai desu.',
+          hintId: 'Apakah bacaanku tadi sudah tepat? Aku mau latihan kalimat berikutnya juga.',
+          hintTh: 'เมื่อกี้อ่านถูกต้องไหม? อยากฝึกประโยคถัดไปด้วย',
+          meaningId: 'Apakah bacaanku tadi sudah tepat? Aku mau latihan kalimat berikutnya juga.',
+          meaningTh: 'เมื่อกี้อ่านถูกต้องไหม? อยากฝึกประโยคถัดไปด้วย',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+      ];
+    }
+    if (params.targetLang === 'zh') {
+      return [
+        {
+          id: 'ctx_ra_zh_1',
+          tier: 'easy',
+          badgeId: 'Teks di Layar',
+          badgeTh: 'ข้อความบนหน้าจอ',
+          tierLabelId: '1 · Baca Nyaring',
+          tierLabelTh: '1 · อ่านออกเสียง',
+          text: cleanTarget,
+          pronunciation: targetPron,
+          hintId: 'Bacakan kalimat target di layar ini dengan nada jelas.',
+          hintTh: 'อ่านประโยคเป้าหมายบนหน้าจอให้ชัดเจน',
+          meaningId: 'Bacakan kalimat target di layar ini dengan nada jelas.',
+          meaningTh: 'อ่านประโยคเป้าหมายบนหน้าจอให้ชัดเจน',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_ra_zh_2',
+          tier: 'mission',
+          badgeId: 'Tanya Pelafalan',
+          badgeTh: 'ถามการออกเสียง',
+          tierLabelId: '2 · Tanya Nada',
+          tierLabelTh: '2 · ถามวรรณยุกต์',
+          text: hardWord
+            ? `请问“${hardWord}”这个词的声调怎么读才最标准？`
+            : '请问这句话哪里应该停顿一下再读？',
+          pronunciation: hardWord
+            ? toPhoneticPinyin(`Qingwen ${hardWord} zhege ci de shengdiao zenme du cai zui biaozhun?`)
+            : toPhoneticPinyin('Qingwen zhe ju hua nali yinggai tingdun yixia zai du?'),
+          hintId: hardWord
+            ? `Bagaimana nada standar untuk membaca "${toPhoneticPinyin(hardWord)}"?`
+            : 'Di bagian mana kalimat ini sebaiknya diberi jeda?',
+          hintTh: 'ช่วยบอกเสียงวรรณยุกต์ที่ถูกต้องของคำนี้หน่อยได้ไหม?',
+          meaningId: hardWord
+            ? `Bagaimana nada standar untuk membaca "${toPhoneticPinyin(hardWord)}"?`
+            : 'Di bagian mana kalimat ini sebaiknya diberi jeda?',
+          meaningTh: 'ช่วยบอกเสียงวรรณยุกต์ที่ถูกต้องของคำนี้หน่อยได้ไหม?',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+        {
+          id: 'ctx_ra_zh_3',
+          tier: 'rescue',
+          badgeId: 'Minta Koreksi / Soal Baru',
+          badgeTh: 'ขอคำแนะนำ / ประโยคถัดไป',
+          tierLabelId: '3 · + Tanya Balik',
+          tierLabelTh: '3 · + ถามกลับ',
+          text: '我刚才读得准确吗？我们可以试下一句吗？',
+          pronunciation: 'Wo gangcai du de zhunque ma? Women keyi shi xia yi ju ma?',
+          hintId: 'Apakah bacaanku barusan akurat? Bisa kita coba kalimat berikutnya?',
+          hintTh: 'เมื่อกี้ฉันอ่านแม่นยำไหม? ลองประโยคถัดไปได้ไหม?',
+          meaningId: 'Apakah bacaanku barusan akurat? Bisa kita coba kalimat berikutnya?',
+          meaningTh: 'เมื่อกี้ฉันอ่านแม่นยำไหม? ลองประโยคถัดไปได้ไหม?',
+          isRealtimeAi: false,
+          isOfflineFallback: true,
+        },
+      ];
+    }
+    return [
+      {
+        id: 'ctx_ra_en_1',
+        tier: 'easy',
+        badgeId: 'Baca Teks di Layar',
+        badgeTh: 'อ่านข้อความบนจอ',
+        tierLabelId: '1 · Teks Target',
+        tierLabelTh: '1 · เป้าหมายบนหน้าจอ',
+        text: cleanTarget,
+        pronunciation: targetPron,
+        hintId: 'Bacakan kalimat ini sesuai teks di layar dengan artikulasi jelas.',
+        hintTh: 'อ่านประโยคนี้ตามข้อความบนหน้าจอให้ชัดเจน',
+        meaningId: 'Bacakan kalimat ini sesuai teks di layar dengan artikulasi jelas.',
+        meaningTh: 'อ่านประโยคนี้ตามข้อความบนหน้าจอให้ชัดเจน',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+      {
+        id: 'ctx_ra_en_2',
+        tier: 'mission',
+        badgeId: 'Tanya Pelafalan',
+        badgeTh: 'ถามการออกเสียง',
+        tierLabelId: '2 · Cek Artikulasi',
+        tierLabelTh: '2 · เช็กการออกเสียง',
+        text: hardWord
+          ? `How should I pronounce the word "${hardWord}" clearly in this passage?`
+          : 'Which words in this sentence should I stress when reading aloud?',
+        pronunciation: hardWord
+          ? approximateEnglishPhoneticId(`How should I pronounce the word ${hardWord} clearly in this passage?`)
+          : approximateEnglishPhoneticId('Which words in this sentence should I stress when reading aloud?'),
+        hintId: hardWord
+          ? `Bagaimana cara melafalkan kata "${hardWord}" dengan jelas di bacaan ini?`
+          : 'Kata mana saja di kalimat ini yang perlu penekanan saat dibaca nyaring?',
+        hintTh: hardWord
+          ? `ฉันควรออกเสียงคำว่า "${hardWord}" อย่างไรให้ชัดเจน?`
+          : 'คำไหนในประโยคนี้ที่ควรเน้นเสียงเวลาอ่านออกเสียง?',
+        meaningId: hardWord
+          ? `Bagaimana cara melafalkan kata "${hardWord}" dengan jelas di bacaan ini?`
+          : 'Kata mana saja di kalimat ini yang perlu penekanan saat dibaca nyaring?',
+        meaningTh: hardWord
+          ? `ฉันควรออกเสียงคำว่า "${hardWord}" อย่างไรให้ชัดเจน?`
+          : 'คำไหนในประโยคนี้ที่ควรเน้นเสียงเวลาอ่านออกเสียง?',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+      {
+        id: 'ctx_ra_en_3',
+        tier: 'rescue',
+        badgeId: 'Minta Koreksi / Lanjut',
+        badgeTh: 'ขอคำแนะนำ / ต่อเลย',
+        tierLabelId: '3 · + Tanya Balik',
+        tierLabelTh: '3 · + ถามกลับ',
+        text: 'Did I mispronounce or skip any words? Can we move to the next sentence?',
+        pronunciation: approximateEnglishPhoneticId('Did I mispronounce or skip any words? Can we move to the next sentence?'),
+        hintId: 'Apakah ada kata yang salah ucap atau terlewat? Bisa lanjut kalimat berikutnya?',
+        hintTh: 'ฉันออกเสียงผิดหรือข้ามคำไหนไปไหม? ไปประโยคถัดไปได้เลยไหม?',
+        meaningId: 'Apakah ada kata yang salah ucap atau terlewat? Bisa lanjut kalimat berikutnya?',
+        meaningTh: 'ฉันออกเสียงผิดหรือข้ามคำไหนไปไหม? ไปประโยคถัดไปได้เลยไหม?',
+        isRealtimeAi: false,
+        isOfflineFallback: true,
+      },
+    ];
+  }
 
   // If Cambridge Senior Examiner or PTE Academic mode, ALWAYS return EXACTLY ONE single best model answer!
   const isCambridge =
@@ -1623,10 +2093,19 @@ export function buildContextualFallbackCards(params: {
   }
 
   // Special handler when AI opens the interactive learning popup / explains a grammar rule or particle
+  // Only hijack with generic whiteboard ack when the AI did NOT ask a specific WH / choice / echo question!
+  const previewFocal = extractFocalClause(rawAi, params.targetLang);
+  const previewAct = detectAiIntent(rawAi, params.targetLang);
+  const hasSpecificQuestionIntent =
+    Boolean(previewFocal.echoCorrectionTarget) ||
+    (previewAct !== 'statement' &&
+      previewAct !== 'coaching_advice' &&
+      previewAct !== 'greeting');
   if (
-    /\b(popped up|on your screen|writing drill|latihan.*layar|papan tulis|partikel)\b/i.test(rawAi) ||
-    /(?:画面に.*カード|練習.*画面|書いてみて)/u.test(rawAi) ||
-    /(?:屏幕上|练习卡片|试着写|的用法)/u.test(rawAi)
+    !hasSpecificQuestionIntent &&
+    (/\b(popped up|on your screen|writing drill|latihan.*layar|papan tulis|partikel)\b/i.test(rawAi) ||
+      /(?:画面に.*カード|練習.*画面|書いてみて)/u.test(rawAi) ||
+      /(?:屏幕上|练习卡片|试着写|的用法)/u.test(rawAi))
   ) {
     if (params.targetLang === 'zh') {
       return [
@@ -1787,6 +2266,7 @@ export function buildContextualFallbackCards(params: {
   const focal = extractFocalClause(params.aiText || '', params.targetLang);
   const act = detectAiIntent(params.aiText || '', params.targetLang);
   const topic = focal.extractedTopic || '';
+  const advicePhrase = focal.adviceActionPhrase || '';
   const optA = focal.choiceOptionA ? capitalizeWord(focal.choiceOptionA) : '';
   const optB = focal.choiceOptionB ? capitalizeWord(focal.choiceOptionB) : '';
   const chosenOpt = variationSeed % 2 === 1 && optB ? optB : optA;
@@ -1794,32 +2274,104 @@ export function buildContextualFallbackCards(params: {
 
   type CardRow = [string, string, string, string]; // [text, pronunciation, hintId, hintTh]
   type Tpl = { easy: CardRow; mission: CardRow; rescue: CardRow };
-  const userEcho = (params.lastUserText || '').trim();
+  const rawUserEcho = (params.lastUserText || '')
+    .trim()
+    .replace(/^["'“‘「『]+|["'”’」』]+$/g, '')
+    .trim();
+  const reformulatedUserEcho = rawUserEcho
+    ? synthesizeNaturalReformulation(rawUserEcho, params.targetLang) || rawUserEcho
+    : '';
+  const safeUserEcho =
+    reformulatedUserEcho && replyLooksLikeTargetLanguage(reformulatedUserEcho, params.targetLang)
+      ? reformulatedUserEcho
+      : '';
+  const safeUserTrans = safeUserEcho
+    ? translateAndPhoneticizeLiveText(safeUserEcho, params.targetLang, undefined, undefined, undefined, {
+        syncOnly: true,
+      })
+    : null;
+  const safeEchoPronEn = echo ? approximateEnglishPhoneticId(echo) : '';
+  const enAdviceIsGerund = Boolean(
+    advicePhrase &&
+      /^(?:practicing|reading|speaking|listening|focusing|building|writing|reviewing|using|talking|making)\b/i.test(
+        advicePhrase
+      )
+  );
+  const enAdviceEasy = advicePhrase
+    ? variationSeed % 2 === 1
+      ? enAdviceIsGerund
+        ? `Got it, let me try ${advicePhrase}!`
+        : `Got it, let me ${advicePhrase}!`
+      : enAdviceIsGerund
+        ? `Okay, I'll try ${advicePhrase}!`
+        : `Okay, I will ${advicePhrase}!`
+    : 'Got it, I will follow your advice!';
+  const enAdviceMission = advicePhrase
+    ? enAdviceIsGerund
+      ? `That helps a lot! Starting today, I'll focus on ${advicePhrase} every day.`
+      : `That helps a lot! Starting today, I will ${advicePhrase} every day.`
+    : 'Thank you for the tip! I will start practicing that habit every day.';
+  const enAdviceRescue = advicePhrase
+    ? enAdviceIsGerund
+      ? `Sounds helpful! Should I try ${advicePhrase} for ten minutes a day?`
+      : `Sounds good! How often should I ${advicePhrase} each day?`
+    : 'Thanks for the tip! How many minutes a day should I practice that?';
+  const enAdviceHintId = advicePhrase
+    ? buildIndonesianAdviceHint(advicePhrase)
+    : 'Baik, aku akan langsung mempraktikkan saran itu!';
 
   const EN: Record<CopilotSpeechAct, Tpl> = {
     echo_redemption: {
-      easy: [echo, echo.toLowerCase(), `Ulangi: "${echo}"`, `พูดตาม: "${echo}"`],
-      mission: [`${echo}, got it.`, `${echo.toLowerCase()}, got it`, `Mengerti: "${echo}"`, `เข้าใจแล้ว: "${echo}"`],
-      rescue: [`${echo}. Did I say that right?`, `${echo.toLowerCase()}. did ai sei det rait?`, `"${echo}". Apakah pengucapanku sudah tepat?`, `"${echo}". ฉันออกเสียงถูกต้องไหม?`],
+      easy: [echo, safeEchoPronEn, `Coba sebutkan: "${echo}"`, `ลองพูดว่า: "${echo}"`],
+      mission: [`${echo}, got it.`, `${safeEchoPronEn}, got it.`, `Mengerti: "${echo}"`, `เข้าใจแล้ว: "${echo}"`],
+      rescue: [`${echo}. Did I say that right?`, `${safeEchoPronEn}. Did ai sei det rait?`, `"${echo}". Apakah pengucapanku sudah tepat?`, `"${echo}". ฉันออกเสียงถูกต้องไหม?`],
     },
     clarification_repeat: {
       easy: [
-        userEcho || "I said I'm practicing my English with you!",
-        userEcho ? userEcho.toLowerCase() : "ai sed aim praktising mai ingglis wid yu",
-        userEcho ? `Ulangi: "${userEcho}"` : "Kukatakan aku lagi latihan bahasa Inggris!",
-        userEcho ? `พูดซ้ำ: "${userEcho}"` : "ฉันบอกว่ากำลังฝึกภาษาอังกฤษอยู่!",
+        safeUserEcho || "I said I'm practicing my English with you!",
+        safeUserEcho
+          ? approximateEnglishPhoneticId(safeUserEcho)
+          : approximateEnglishPhoneticId("I said I'm practicing my English with you!"),
+        safeUserEcho
+          ? safeUserTrans?.translationId || `Maksudku: "${safeUserEcho}"`
+          : "Maksudku aku sedang berlatih bahasa Inggris bersamamu!",
+        safeUserEcho
+          ? safeUserTrans?.translationTh || `ฉันหมายถึง: "${safeUserEcho}"`
+          : "ฉันหมายถึงฉันกำลังฝึกภาษาอังกฤษกับคุณอยู่!",
       ],
       mission: [
-        userEcho ? `Sorry about that, I said: "${userEcho}".` : "Sorry about that! My connection glitched for a moment.",
-        userEcho ? `sori abaut det, ai sed: "${userEcho.toLowerCase()}".` : "sori abaut det! mai koneksyen glichd for e moument.",
-        userEcho ? `Maaf ya, tadi kukatakan: "${userEcho}".` : "Maaf ya! Koneksiku tadi sempat terputus sebentar.",
-        userEcho ? `ขอโทษทีนะ ฉันบอกว่า: "${userEcho}"` : "ขอโทษทีนะ สัญญาณของฉันสะดุดไปนิดหน่อย",
+        safeUserEcho ? `Sorry about that, I meant: "${safeUserEcho}".` : "Sorry about that! Let me say that more clearly.",
+        safeUserEcho
+          ? approximateEnglishPhoneticId(`Sorry about that, I meant: "${safeUserEcho}".`)
+          : approximateEnglishPhoneticId("Sorry about that! Let me say that more clearly."),
+        safeUserEcho ? `Maaf ya, maksudku: "${safeUserEcho}".` : "Maaf ya! Biar kuucapkan sekali lagi dengan lebih jelas.",
+        safeUserEcho ? `ขอโทษทีนะ ฉันหมายถึง: "${safeUserEcho}"` : "ขอโทษทีนะ เดี๋ยวฉันพูดใหม่อีกครั้งให้ชัดขึ้น",
       ],
       rescue: [
         "Can you hear me clearly now? Let's keep going!",
-        "ken yu hir mi klirli nau? lets kip gouing!",
+        approximateEnglishPhoneticId("Can you hear me clearly now? Let's keep going!"),
         "Apakah sekarang sudah terdengar jelas? Ayo kita lanjut!",
         "ตอนนี้คุณได้ยินฉันชัดเจนไหม? มาคุยกันต่อนะ!",
+      ],
+    },
+    wh_what_past_action: {
+      easy: [
+        "Not much, I just practiced a little and rested at home.",
+        "not mac, ai jast prektist e litl end rested et houm",
+        "Nggak banyak sih, tadi cuma latihan sebentar lalu istirahat di rumah.",
+        "ไม่มากหรอก แค่ฝึกนิดหน่อยแล้วก็พักผ่อนอยู่ที่บ้านครับ/ค่ะ",
+      ],
+      mission: [
+        "Earlier today I finished some errands, cooked dinner, and reviewed my notes.",
+        "erlier tudei ai finist sam erends, kukt diner, end rivyud mai nouts",
+        "Tadi aku menyelesaikan beberapa urusan, masak makan malam, lalu mengulas catatan.",
+        "ก่อนหน้านี้ฉันทำธุระเสร็จ ทำอาหารเย็น แล้วก็ทบทวนโน้ตที่จดไว้",
+      ],
+      rescue: [
+        "I went out for a quick walk and caught up on reading. What about you?",
+        "ai went aut for e kwik wok end kot ap on riding. wat abaut yu?",
+        "Tadi aku sempat jalan sebentar dan lanjut baca-baca. Kalau kamu gimana?",
+        "เมื่อกี้ฉันออกไปเดินเล่นแป๊บหนึ่งแล้วก็อ่านหนังสือต่อ แล้วคุณล่ะครับ/ค่ะ?",
       ],
     },
     wh_what_action: {
@@ -1947,42 +2499,121 @@ export function buildContextualFallbackCards(params: {
       mission: [topic ? `Yes, I really enjoy ${topic}.` : 'Yes, I really enjoy it.', topic ? `yes, ai rili enjoy ${topic}` : 'yes, ai rili enjoy it', topic ? `Ya, aku suka banget ${topic}.` : 'Ya, aku sangat menyukainya.', topic ? `ใช่ ฉันชอบ${topic}มากเลย` : 'ใช่ ฉันชอบสิ่งนี้มากเลย'],
       rescue: ['Yes, I do! Do you enjoy it as well?', 'yes, ai du! du yu enjoy it ez wel?', 'Ya, tentu! Apakah kamu juga menyukainya?', 'ใช่แน่นอน! แล้วคุณชอบเหมือนกันไหม?'],
     },
+    coaching_advice: {
+      easy: [
+        enAdviceEasy,
+        approximateEnglishPhoneticId(enAdviceEasy),
+        enAdviceHintId,
+        'โอเค ฉันจะทำตามคำแนะนำนั้นเลย!',
+      ],
+      mission: [
+        enAdviceMission,
+        approximateEnglishPhoneticId(enAdviceMission),
+        `${enAdviceHintId.replace(/!$/, '')} mulai hari ini secara rutin.`,
+        'ช่วยได้มากเลย! ตั้งแต่วันนี้ฉันจะทำตามวิธีนี้ทุกวัน',
+      ],
+      rescue: [
+        enAdviceRescue,
+        approximateEnglishPhoneticId(enAdviceRescue),
+        `${enAdviceHintId.replace(/!$/, '')} Berapa lama sebaiknya kulakukan setiap hari?`,
+        'ฟังดูดีเลย! ฉันควรฝึกวิธีนี้วันละกี่นาทีดี?',
+      ],
+    },
     greeting: {
       easy: ['Hi! Good to see you today.', 'hai! gud tu si yu tudei', 'Hai! Senang bertemu denganmu hari ini.', 'สวัสดี! ดีใจที่ได้พบคุณวันนี้'],
       mission: ["Hello! I'm feeling great and ready to practice.", 'helo! aim fiiling greit end redi tu praktis', 'Halo! Aku merasa prima dan siap berlatih.', 'สวัสดี! ฉันรู้สึกสดชื่นและพร้อมฝึกแล้ว'],
       rescue: ['Hi there! How are you doing today?', 'hai der! hau ar yu duing tudei?', 'Hai! Bagaimana kabarmu hari ini?', 'สวัสดี! วันนี้คุณเป็นอย่างไรบ้าง?'],
     },
     statement: {
-      easy: ['That makes a lot of sense!', 'det meiks e lot of sens!', 'Itu sangat masuk akal!', 'ฟังดูสมเหตุสมผลมากเลย!'],
-      mission: ["That sounds really interesting, I hadn't thought about it that way.", 'det saunds rili intresting, ai hedent tot abaut it det wei', 'Kedengarannya sangat menarik, aku belum pernah terpikir seperti itu.', 'ฟังดูน่าสนใจมาก ฉันไม่เคยคิดในมุมนั้นมาก่อนเลย'],
-      rescue: ['Really? Could you tell me a bit more about that?', 'rili? kud yu tel mi e bit mor abaut det?', 'Benarkah? Bisakah ceritakan lebih banyak tentang itu?', 'จริงเหรอ? คุณช่วยเล่ารายละเอียดเพิ่มเติมให้ฟังหน่อยได้ไหม?'],
+      easy: [
+        topic ? `Got it! Let's focus more on ${topic}.` : 'Got it, let us keep going!',
+        topic
+          ? approximateEnglishPhoneticId(`Got it! Let's focus more on ${topic}.`)
+          : approximateEnglishPhoneticId('Got it, let us keep going!'),
+        topic ? `Mengerti! Ayo kita fokus lebih dalam soal ${topic}.` : 'Mengerti, ayo kita lanjutkan latihannya!',
+        topic ? `เข้าใจแล้ว! มาโฟกัสเรื่อง ${topic} กันต่อเลย` : 'เข้าใจแล้ว มาฝึกกันต่อเลย!',
+      ],
+      mission: [
+        topic
+          ? `That makes sense! I want to get better at ${topic} step by step.`
+          : 'That is really helpful, let me keep practicing that step by step.',
+        topic
+          ? approximateEnglishPhoneticId(`That makes sense! I want to get better at ${topic} step by step.`)
+          : approximateEnglishPhoneticId('That is really helpful, let me keep practicing that step by step.'),
+        topic
+          ? `Masuk akal! Aku ingin makin lancar soal ${topic} selangkah demi selangkah.`
+          : 'Itu sangat membantu, biar kulatih terus selangkah demi selangkah.',
+        topic
+          ? `สมเหตุสมผลเลย! ฉันอยากเก่งเรื่อง ${topic} ทีละขั้นเลย`
+          : 'ช่วยได้มากเลย เดี๋ยวฉันจะฝึกไปทีละขั้นนะ',
+      ],
+      rescue: [
+        topic
+          ? `Got it! Could you give me one short example about ${topic}?`
+          : 'That makes sense! Could you give me a quick example to try?',
+        topic
+          ? approximateEnglishPhoneticId(`Got it! Could you give me one short example about ${topic}?`)
+          : approximateEnglishPhoneticId('That makes sense! Could you give me a quick example to try?'),
+        topic
+          ? `Siap! Bisakah kamu beri satu contoh singkat tentang ${topic}?`
+          : 'Masuk akal! Bisakah kamu beri satu contoh singkat untuk kucoba?',
+        topic
+          ? `ได้เลย! ช่วยยกตัวอย่างสั้นๆ เกี่ยวกับ ${topic} ให้หน่อยได้ไหม?`
+          : 'เข้าใจเลย! ช่วยยกตัวอย่างสั้นๆ ให้ฉันลองพูดได้ไหม?',
+      ],
     },
   };
 
   const JA: Record<CopilotSpeechAct, Tpl> = {
     echo_redemption: {
-      easy: [echo, toPhoneticRomaji(echo), `Ulangi: 「${echo}」`, `พูดตาม: 「${echo}」`],
-      mission: [`${echo}、ですね。`, `${toPhoneticRomaji(echo)}, desu ne`, `Mengerti: 「${echo}」`, `เข้าใจแล้ว: 「${echo}」`],
-      rescue: [`${echo}。これで合っていますか？`, `${toPhoneticRomaji(echo)}. kore de atte imasu ka?`, `「${echo}」. Apakah ini sudah benar?`, `「${echo}」 ถูกต้องไหมครับ/ค่ะ?`],
+      easy: [echo, toPhoneticRomaji(echo), `Coba ucapkan: "${toPhoneticRomaji(echo)}"`, `ลองพูดว่า: "${toPhoneticRomaji(echo)}"`],
+      mission: [`${echo}、ですね。`, toPhoneticRomaji(`${echo}、ですね。`), `Mengerti: "${toPhoneticRomaji(echo)}"`, `เข้าใจแล้ว: "${toPhoneticRomaji(echo)}"`],
+      rescue: [`${echo}。これで合っていますか？`, toPhoneticRomaji(`${echo}。これで合っていますか？`), `"${toPhoneticRomaji(echo)}". Apakah pengucapan ini sudah benar?`, `"${toPhoneticRomaji(echo)}" ถูกต้องไหมครับ/ค่ะ?`],
     },
     clarification_repeat: {
       easy: [
-        userEcho || "もう一度言いますね！",
-        userEcho ? toPhoneticRomaji(userEcho) : "Mou ichido iimasu ne!",
-        userEcho ? `Ulangi: 「${userEcho}」` : "Kukatakan sekali lagi ya!",
-        userEcho ? `พูดซ้ำ: 「${userEcho}」` : "ฉันจะพูดอีกรอบนะ!",
+        safeUserEcho || "もう一度ゆっくり言いますね！",
+        safeUserEcho ? toPhoneticRomaji(safeUserEcho) : toPhoneticRomaji("もう一度ゆっくり言いますね！"),
+        safeUserEcho
+          ? safeUserTrans?.translationId || `Maksud saya: "${toPhoneticRomaji(safeUserEcho)}"`
+          : "Saya ucapkan sekali lagi dengan perlahan ya!",
+        safeUserEcho
+          ? safeUserTrans?.translationTh || `ฉันหมายถึง: "${toPhoneticRomaji(safeUserEcho)}"`
+          : "ฉันจะพูดช้าๆ อีกรอบนะ!",
       ],
       mission: [
-        userEcho ? `すみません、さっき「${userEcho}」と言っていました。` : "すみません、電波が少し途切れてしまいました。",
-        userEcho ? `Sumimasen, sakki "${toPhoneticRomaji(userEcho)}" to itte imashita.` : "Sumimasen, denpa ga sukoshi togirete shimaimashita.",
-        userEcho ? `Maaf, tadi aku bilang: 「${userEcho}」.` : "Maaf, tadi sinyalku agak terputus sebentar.",
-        userEcho ? `ขอโทษที เมื่อกี้ฉันพูดว่า: 「${userEcho}」` : "ขอโทษที สัญญาณขัดข้องนิดหน่อยครับ/ค่ะ",
+        safeUserEcho ? `すみません、さっき「${safeUserEcho}」と言いたかったです。` : "すみません、もう一度はっきり話しますね。",
+        safeUserEcho
+          ? toPhoneticRomaji(`すみません、さっき「${safeUserEcho}」と言いたかったです。`)
+          : toPhoneticRomaji("すみません、もう一度はっきり話しますね。"),
+        safeUserEcho ? `Maaf, tadi maksudku: "${toPhoneticRomaji(safeUserEcho)}".` : "Maaf, biar saya ucapkan lagi dengan lebih jelas.",
+        safeUserEcho ? `ขอโทษที เมื่อกี้ฉันหมายถึง: "${toPhoneticRomaji(safeUserEcho)}"` : "ขอโทษที เดี๋ยวฉันพูดใหม่อีกครั้งให้ชัดขึ้นครับ/ค่ะ",
       ],
       rescue: [
         "今はっきり聞こえますか？続けましょう！",
-        "Ima hakkiri kikoemasu ka? Tsuzukemashou!",
+        toPhoneticRomaji("今はっきり聞こえますか？続けましょう！"),
         "Sekarang sudah terdengar jelas? Ayo kita lanjut!",
         "ตอนนี้ได้ยินชัดเจนไหมครับ/ค่ะ? มาคุยกันต่อเถอะ!",
+      ],
+    },
+    wh_what_past_action: {
+      easy: [
+        "少し勉強してから、家でゆっくり休みました。",
+        "Sukoshi benkyou shite kara, ie de yukkuri yasumimashita.",
+        "Setelah belajar sebentar, tadi aku istirahat santai di rumah.",
+        "หลังจากเรียนนิดหน่อย ฉันก็พักผ่อนสบายๆ อยู่ที่บ้านครับ/ค่ะ",
+      ],
+      mission: [
+        "友達と少し話して、それから晩ご飯を作りました。",
+        "Tomodachi to sukoshi hanashite, sorekara bangohan o tsukurimashita.",
+        "Tadi ngobrol sebentar sama teman, terus masak makan malam.",
+        "คุยกับเพื่อนสักพัก แล้วก็ทำอาหารเย็นครับ/ค่ะ",
+      ],
+      rescue: [
+        "家の用事を済ませて、少し散歩しました。先生は何かしましたか？",
+        "Ie no youji o sumasete, sukoshi sanpo shimashita. Sensei wa nanika shimashita ka?",
+        "Aku beresin urusan rumah lalu jalan santai sebentar. Kalau Sensei ngapain aja?",
+        "ทำธุระที่บ้านเสร็จแล้วก็ออกไปเดินเล่นนิดหน่อย แล้วคุณครูทำอะไรบ้างเหรอครับ/ค่ะ?",
       ],
     },
     wh_what_action: {
@@ -2110,6 +2741,26 @@ export function buildContextualFallbackCards(params: {
       mission: [topic ? `はい、${topic}が大好きです。` : 'はい、とても楽しんでやっていますよ。', topic ? `hai, ${toPhoneticRomaji(topic)} ga daisuki desu.` : 'hai, totemo tanoshinde yatte imasu yo.', topic ? `Ya, aku sangat suka "${toPhoneticRomaji(topic)}".` : 'Ya, aku sangat menikmatinya.', topic ? `ใช่ ฉันชอบ "${toPhoneticRomaji(topic)}" มากเลย` : 'ใช่ ฉันสนุกกับมันมากเลย'],
       rescue: ['はい、そうです！あなたもよくしますか？', 'hai, sou desu! anata mo yoku shimasu ka?', 'Ya, benar! Kamu juga sering melakukannya?', 'ใช่เลย! แล้วคุณทำบ่อยเหมือนกันไหม?'],
     },
+    coaching_advice: {
+      easy: [
+        advicePhrase ? `わかりました、これから${advicePhrase}ようにしてみます！` : 'なるほど、そのコツをやってみます！',
+        advicePhrase ? toPhoneticRomaji(`わかりました、これから${advicePhrase}ようにしてみます！`) : 'Naruhodo, sono kotsu o yatte mimasu!',
+        advicePhrase ? `Baik, mulai sekarang aku coba tips "${toPhoneticRomaji(advicePhrase)}" itu!` : 'Baik, aku coba tips bagus itu sekarang!',
+        'เข้าใจแล้ว ฉันจะลองทำตามเคล็ดลับนั้นดูนะ!',
+      ],
+      mission: [
+        'アドバイスありがとうございます！今日から意識して毎日練習してみますね。',
+        'Adobaisu arigatou gozaimasu! Kyou kara ishiki shite mainichi renshuu shite mimasu ne.',
+        'Terima kasih sarannya! Mulai hari ini aku akan membiasakan latihan itu setiap hari.',
+        'ขอบคุณสำหรับคำแนะนำนะ! ตั้งแต่วันนี้ฉันจะตั้งใจฝึกทุกวันเลย',
+      ],
+      rescue: [
+        'なるほど、意識してみます！具体的には毎日どのくらい練習すればいいですか？',
+        'Naruhodo, ishiki shite mimasu! Gutaiteki ni wa mainichi dono kurai renshuu sureba ii desu ka?',
+        'Begitu ya, akan kuperhatikan! Kira-kira setiap hari sebaiknya berlatih berapa lama?',
+        'เข้าใจแล้ว เดี๋ยวจะจำไว้ใช้! ปกติควรฝึกวันละนานแค่ไหนดีครับ/ค่ะ?',
+      ],
+    },
     greeting: {
       easy: ['こんにちは！よろしくお願いします。', 'konnichiwa! yoroshiku onegai shimasu.', 'Halo! Senang bisa berbincang denganmu.', 'สวัสดี! ยินดีที่ได้คุยกันนะ'],
       mission: ['こんにちは！今日も元気いっぱいですよ。', 'konnichiwa! kyou mo genki ippai desu yo.', 'Halo! Hari ini aku sangat bersemangat.', 'สวัสดี! วันนี้ฉันสดชื่นเต็มที่เลย'],
@@ -2124,28 +2775,54 @@ export function buildContextualFallbackCards(params: {
 
   const ZH: Record<CopilotSpeechAct, Tpl> = {
     echo_redemption: {
-      easy: [echo, toPhoneticPinyin(echo), `Ulangi: “${toPhoneticPinyin(echo)}”`, `พูดตาม: “${toPhoneticPinyin(echo)}”`],
-      mission: [`${echo}，对吧？`, `${toPhoneticPinyin(echo)}, duì ba?`, `Mengerti: “${toPhoneticPinyin(echo)}”`, `เข้าใจแล้ว: “${toPhoneticPinyin(echo)}”`],
-      rescue: [`${echo}。我读得对吗？`, `${toPhoneticPinyin(echo)}. Wǒ dú de duì ma?`, `“${toPhoneticPinyin(echo)}”. Apakah pengucapanku sudah benar?`, `“${toPhoneticPinyin(echo)}” ฉันอ่านถูกต้องไหม?`],
+      easy: [echo, toPhoneticPinyin(echo), `Coba ucapkan: "${toPhoneticPinyin(echo)}"`, `ลองพูดว่า: "${toPhoneticPinyin(echo)}"`],
+      mission: [`${echo}，对吧？`, toPhoneticPinyin(`${echo}，对吧？`), `Mengerti: "${toPhoneticPinyin(echo)}"`, `เข้าใจแล้ว: "${toPhoneticPinyin(echo)}"`],
+      rescue: [`${echo}。我读得对吗？`, toPhoneticPinyin(`${echo}。我读得对吗？`), `"${toPhoneticPinyin(echo)}". Apakah pengucapanku sudah benar?`, `"${toPhoneticPinyin(echo)}" ฉันอ่านถูกต้องไหม?`],
     },
     clarification_repeat: {
       easy: [
-        userEcho || "那我再说一遍吧！",
-        userEcho ? toPhoneticPinyin(userEcho) : "Nà wǒ zài shuō yí biàn ba!",
-        userEcho ? `Ulangi: "${userEcho}"` : "Kalau begitu aku ulangi lagi ya!",
-        userEcho ? `พูดซ้ำ: "${userEcho}"` : "งั้นฉันพูดอีกรอบนะ!",
+        safeUserEcho || "我再慢慢说一遍吧！",
+        safeUserEcho ? toPhoneticPinyin(safeUserEcho) : toPhoneticPinyin("我再慢慢说一遍吧！"),
+        safeUserEcho
+          ? safeUserTrans?.translationId || `Maksudku: "${toPhoneticPinyin(safeUserEcho)}"`
+          : "Biar saya ucapkan sekali lagi pelan-pelan ya!",
+        safeUserEcho
+          ? safeUserTrans?.translationTh || `ฉันหมายถึง: "${toPhoneticPinyin(safeUserEcho)}"`
+          : "เดี๋ยวฉันพูดช้าๆ อีกรอบนะ!",
       ],
       mission: [
-        userEcho ? `不好意思，我刚才说的是：“${userEcho}”。` : "不好意思，刚才我这边的网络卡了一下。",
-        userEcho ? `Bù hǎoyìsi, wǒ gāngcái shuō de shì: "${toPhoneticPinyin(userEcho)}".` : "Bù hǎoyìsi, gāngcái wǒ zhè biān de wǎngluò kǎ le yíxià.",
-        userEcho ? `Maaf ya, tadi maksudku: "${userEcho}".` : "Maaf ya, tadi jaringanku sempat macet sebentar.",
-        userEcho ? `ขอโทษที เมื่อกี้ฉันบอกว่า: "${userEcho}"` : "ขอโทษที เมื่อกี้เน็ตฉันกระตุกนิดหน่อย",
+        safeUserEcho ? `不好意思，我刚才想说的是：“${safeUserEcho}”。` : "不好意思，我再说得更清楚一点。",
+        safeUserEcho
+          ? toPhoneticPinyin(`不好意思，我刚才想说的是：“${safeUserEcho}”。`)
+          : toPhoneticPinyin("不好意思，我再说得更清楚一点。"),
+        safeUserEcho ? `Maaf ya, tadi maksudku: "${toPhoneticPinyin(safeUserEcho)}".` : "Maaf ya, biar kuucapkan lebih jelas sekali lagi.",
+        safeUserEcho ? `ขอโทษที เมื่อกี้ฉันหมายถึง: "${toPhoneticPinyin(safeUserEcho)}"` : "ขอโทษที เดี๋ยวฉันพูดให้ชัดขึ้นอีกครั้งนะ",
       ],
       rescue: [
         "现在能听清楚了吗？我们继续聊吧！",
-        "Xiànzài néng tīng qīngchu le ma? Wǒmen jìxù liáo ba!",
+        toPhoneticPinyin("现在能听清楚了吗？我们继续聊吧！"),
         "Sekarang sudah terdengar jelas? Ayo kita lanjut ngobrol!",
         "ตอนนี้ได้ยินชัดเจนไหม? มาคุยกันต่อนะ!",
+      ],
+    },
+    wh_what_past_action: {
+      easy: [
+        "今天我休息了一会儿，还复习了口语。",
+        "Jīntiān wǒ xiūxi le yíhuìr, hái fùxí le kǒuyǔ.",
+        "Hari ini aku istirahat sebentar, lalu mengulang latihan bicara.",
+        "วันนี้ฉันพักผ่อนนิดหน่อย แล้วก็ทบทวนการพูดด้วยครับ/ค่ะ",
+      ],
+      mission: [
+        "我忙完手头的事，出去散了会儿步，还做了晚饭。",
+        "Wǒ mángwán shǒutóu de shì, chūqù sàn le huìr bù, hái zuò le wǎnfàn.",
+        "Setelah menyelesaikan pekerjaan, aku jalan santai sebentar lalu masak makan malam.",
+        "พอทำธุระเสร็จ ฉันก็ออกไปเดินเล่นสักพักแล้วก็ทำอาหารเย็นครับ/ค่ะ",
+      ],
+      rescue: [
+        "我就处理了点日常事情，顺便听听音乐。你今天呢？",
+        "Wǒ jiù chǔlǐ le diǎn rìcháng shìqing, shùnbiàn tīngting yīnyuè. Nǐ jīntiān ne?",
+        "Aku cuma urus hal-hal harian sambil dengar musik. Kalau kamu hari ini gimana?",
+        "ฉันแค่จัดการธุระประจำวันนิดหน่อยแล้วก็ฟังเพลงเพลินๆ แล้ววันนี้คุณล่ะครับ/ค่ะ?",
       ],
     },
     wh_what_action: {
@@ -2273,6 +2950,26 @@ export function buildContextualFallbackCards(params: {
       mission: [topic ? `是的，我非常喜欢${topic}。` : '是的，我觉得这非常有意思。', topic ? `Shì de, wǒ fēicháng xǐhuān ${toPhoneticPinyin(topic)}.` : 'Shì de, wǒ juéde zhè fēicháng yǒu yìsi.', topic ? `Ya, saya sangat suka "${toPhoneticPinyin(topic)}".` : 'Ya, kurasa ini sangat menarik.', topic ? `ใช่ ฉันชอบ "${toPhoneticPinyin(topic)}" มากเลย` : 'ใช่ ฉันคิดว่าสิ่งนี้น่าสนใจมาก'],
       rescue: ['是的！你平时也喜欢这个吗？', 'Shì de! Nǐ píngshí yě xǐhuān zhè gè ma?', 'Ya! Kamu sendiri biasanya suka ini juga?', 'ใช่เลย! แล้วปกติคุณชอบสิ่งนี้เหมือนกันไหม?'],
     },
+    coaching_advice: {
+      easy: [
+        advicePhrase ? `好的，我试试${advicePhrase}！` : '好的，我这就照这个方法来练！',
+        advicePhrase ? toPhoneticPinyin(`好的，我试试${advicePhrase}！`) : 'Hǎo de, wǒ zhè jiù zhào zhè gè fāngfǎ lái liàn!',
+        advicePhrase ? `Baik, aku akan coba tips "${toPhoneticPinyin(advicePhrase)}" ini!` : 'Baik, aku akan langsung berlatih dengan cara itu!',
+        'โอเค เดี๋ยวฉันจะลองฝึกตามวิธีนี้ดูนะ!',
+      ],
+      mission: [
+        '谢谢您的建议！从今天起我会每天坚持按这个方法练习。',
+        'Xièxie nín de jiànyì! Cóng jīntiān qǐ wǒ huì měi tiān jiānchí àn zhè gè fāngfǎ liànxí.',
+        'Terima kasih sarannya! Mulai hari ini aku akan konsisten berlatih dengan metode itu setiap hari.',
+        'ขอบคุณสำหรับคำแนะนำนะ! ตั้งแต่วันนี้ฉันจะฝึกตามวิธีนี้ทุกวันเลย',
+      ],
+      rescue: [
+        '明白了！您觉得我每天花多少时间这样练习最合适？',
+        'Míngbái le! Nín juéde wǒ měi tiān huā duōshǎo shíjiān zhèyàng liànxí zuì héshì?',
+        'Mengerti! Menurutmu berapa menit sehari yang pas untuk melatih cara ini?',
+        'เข้าใจแล้ว! คุณคิดว่าฉันควรฝึกวิธีนี้วันละกี่นาทีถึงจะดีที่สุด?',
+      ],
+    },
     greeting: {
       easy: ['你好！今天很高兴跟你聊天。', 'Nǐ hǎo! Jīntiān hěn gāoxìng gēn nǐ liáotiān.', 'Halo! Senang bisa mengobrol denganmu hari ini.', 'สวัสดี! วันนี้ยินดีที่ได้คุยกับคุณนะ'],
       mission: ['你好呀！我今天状态挺不错的，准备好练习了。', 'Nǐ hǎo ya! Wǒ jīntiān zhuàngtài tǐng bùcuò de, zhǔnbèi hǎo liànxí le.', 'Halo! Keadaanku prima hari ini, siap berlatih.', 'สวัสดี! วันนี้ฉันรู้สึกดีมาก พร้อมฝึกแล้ว'],
@@ -2314,7 +3011,7 @@ export function buildContextualFallbackCards(params: {
       }
       return cleanP.replace(/[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
     }
-    return cleanP;
+    return approximateEnglishPhoneticId(fallbackText) || cleanP;
   };
 
   const sanitizeHint = (h: string, lang: TargetLang) => {
@@ -2357,7 +3054,8 @@ export function buildContextualFallbackCards(params: {
 
 function normalizeServerCopilotCards(
   rawList: unknown,
-  targetLang: TargetLang
+  targetLang: TargetLang,
+  allowBilingualSsw = false
 ): BeginnerReplyCard[] {
   if (!Array.isArray(rawList)) return [];
   const defaultMeta: Array<{ tier: 'easy' | 'mission' | 'rescue'; badgeId: string; badgeTh: string }> = [
@@ -2370,29 +3068,12 @@ function normalizeServerCopilotCards(
     const item = rawList[i] as Record<string, unknown> | null;
     if (!item || typeof item !== 'object') continue;
     const text = stripEmojisAndEmotWords(String(item.text || '')).trim();
-    if (!text || !replyLooksLikeTargetLanguage(text, targetLang)) continue;
+    if (!text || !replyLooksLikeTargetLanguage(text, targetLang, allowBilingualSsw)) continue;
     const meta = defaultMeta[out.length] || defaultMeta[0];
     const rawPron = stripEmojisAndEmotWords(String(item.pronunciation || item.phonetic || '')).trim();
 
-    // STRICT SANITIZATION: Zero Hanzi/Kanji in pronunciation
-    let safePron = '';
-    if (targetLang === 'zh') {
-      if (rawPron && !containsHanzi(rawPron)) {
-        safePron = rawPron;
-      } else {
-        safePron = toPhoneticPinyin(text);
-      }
-      safePron = safePron.replace(/[\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
-    } else if (targetLang === 'ja') {
-      if (rawPron && !/[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/.test(rawPron)) {
-        safePron = rawPron;
-      } else {
-        safePron = toPhoneticRomaji(text);
-      }
-      safePron = safePron.replace(/[\u3040-\u30ff\u3400-\u4DBF\u4E00-\u9FFF]/g, '').trim();
-    } else {
-      safePron = rawPron || text;
-    }
+    // STRICT SANITIZATION & SINGLE SOURCE OF TRUTH FOR CARA BACA
+    const safePron = resolveUnifiedPronunciation(text, targetLang, rawPron);
 
     const rawHintId = stripEmojisAndEmotWords(String(item.hintId || item.translationId || item.hint || '')).trim();
     const rawHintTh = stripEmojisAndEmotWords(String(item.hintTh || item.translationTh || item.hint || rawHintId)).trim();
@@ -2452,25 +3133,36 @@ export async function requestRealtimeCopilotAssist(params: {
   excludeTexts?: string[];
   signal?: AbortSignal;
   budgetMs?: number;
+  activePopupTargetText?: string;
+  activePopupMode?: string;
 }): Promise<RealtimeCopilotAssistResult> {
   const empty: RealtimeCopilotAssistResult = { ok: false, source: 'ai-realtime', aiMeaningId: '', aiMeaningTh: '', replies: [], cards: [] };
   const cleanAiText = stripEmojisAndEmotWords(params.aiText || params.aiQuestionText || '').trim();
   if (!cleanAiText || params.signal?.aborted) return empty;
 
   const variationSeed = params.variationSeed || 0;
+  const isSswSensei =
+    params.persona?.id === 'ssw_sensei' ||
+    params.scenario.personaId === 'ssw_sensei' ||
+    params.scenario.id.startsWith('scen_ssw_');
+
   const isCambridge =
-    params.persona?.id === 'cambridge_examiner' ||
-    params.scenario.personaId === 'cambridge_examiner' ||
-    params.scenario.id.startsWith('scen_ielts') ||
-    params.persona?.id === 'dr_julian' ||
-    params.scenario.personaId === 'dr_julian' ||
-    params.scenario.id.startsWith('scen_pte');
+    !isSswSensei &&
+    (params.persona?.id === 'cambridge_examiner' ||
+      params.scenario.personaId === 'cambridge_examiner' ||
+      params.scenario.id.startsWith('scen_ielts') ||
+      params.persona?.id === 'dr_julian' ||
+      params.scenario.personaId === 'dr_julian' ||
+      params.scenario.id.startsWith('scen_pte'));
 
   const cefrLevel =
     params.cefrLevel ||
     (typeof localStorage !== 'undefined' ? localStorage.getItem('fz_user_cefr_level') || 'B1' : 'B1');
 
-  const cacheKey = `${params.targetLang}::${isCambridge ? `cambridge_${cefrLevel}::` : ''}${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
+  const popupKey = params.activePopupTargetText
+    ? `popup:${params.activePopupMode || ''}:${params.activePopupTargetText.slice(0, 48).toLowerCase()}::`
+    : '';
+  const cacheKey = `${params.targetLang}::${popupKey}${isSswSensei ? 'ssw::' : isCambridge ? `cambridge_${cefrLevel}::` : ''}${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
   if (variationSeed === 0 && (!params.excludeTexts || params.excludeTexts.length === 0)) {
     const cached = _copilotTurnCache.get(cacheKey);
     if (cached && cached.replies.length > 0) return cached;
@@ -2485,8 +3177,10 @@ export async function requestRealtimeCopilotAssist(params: {
       variationSeed,
       excludeTexts: params.excludeTexts,
       isCambridge,
-      personaId: params.persona?.id,
+      personaId: isSswSensei ? 'ssw_sensei' : params.persona?.id,
       cefrLevel,
+      activePopupTargetText: params.activePopupTargetText,
+      activePopupMode: params.activePopupMode,
     }).map((c) => ({
       ...c,
       isRealtimeAi: false,
@@ -2526,9 +3220,24 @@ export async function requestRealtimeCopilotAssist(params: {
           : `English (Level ${cefrLevel}, accessible natural spoken English, NO emojis; readable phonetic guide in pronunciation)`;
       const learnerLangName = params.locale === 'th' ? 'Thai' : 'Indonesian';
       const hist = (params.history || []).slice(-6).map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner'}: "${h.text}"`).join('\n');
-      const prompt = isCambridge
+      const screenPopupCtx = params.activePopupTargetText
+        ? `Visible Learning Popup on Learner Screen (mode=${params.activePopupMode || 'popup'}): "${params.activePopupTargetText}".`
+        : '';
+      const prompt = isSswSensei
+        ? [
+            `Speech Copilot SSW SENSEI (Food Processing CBT / OTAFF Ver 5.1 Apr 2026).`,
+            screenPopupCtx,
+            hist ? `Context:\n${hist}` : '',
+            params.lastUserText ? `Learner said: "${params.lastUserText}"` : '',
+            `SSW SENSEI said: "${cleanAiText}"`,
+            `Generate 3 helpful bilingual replies in Bahasa Indonesia (naturally embedding Japanese SSW technical terms where helpful) directly answering SSW SENSEI's latest point/question.`,
+            `easy=1 short practical Indonesian reply/choice, mission=detailed Indonesian+JP SSW question/answer, rescue=ask SSW SENSEI for concrete PDF page, trap, or formula check.`,
+            `JSON only: {"aiMeaning":"Ringkasan singkat poin SSW SENSEI","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}`,
+          ].filter(Boolean).join('\n')
+        : isCambridge
         ? [
             `You are the Senior Examiner AI Speech Copilot for English speaking practice.`,
+            screenPopupCtx,
             `The examiner just said: "${cleanAiText}".`,
             params.lastUserText ? `Candidate just said: "${params.lastUserText}".` : '',
             hist ? `Exam Context:\n${hist}` : '',
@@ -2540,32 +3249,31 @@ export async function requestRealtimeCopilotAssist(params: {
           ].filter(Boolean).join('\n')
         : [
             `Speech Copilot (${params.scenario.titleId}). Target: ${langSpec}.`,
+            screenPopupCtx,
             hist ? `Context:\n${hist}` : '',
             params.lastUserText ? `Learner said: "${params.lastUserText}"` : '',
             `Partner said: "${cleanAiText}"`,
             params.excludeTexts?.length ? `Do NOT repeat: ${JSON.stringify(params.excludeTexts)}.` : '',
-            `Generate 3 spontaneous spoken replies directly answering it (easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back). Translate it into aiMeaning (${learnerLangName}); each reply's first-person translation in hint (${learnerLangName}).`,
+            `Generate 3 spontaneous spoken replies directly answering Partner's latest point/question (or referencing the visible screen popup if active). easy=1 short sentence, mission=natural reply with detail, rescue=reply + question back. Translate it into aiMeaning (${learnerLangName}); each reply's first-person translation in hint (${learnerLangName}).`,
             `JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"..."}]}`,
           ].filter(Boolean).join('\n');
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Api-Revision': '2026-05-20',
-          'x-goog-api-key': userGeminiKey,
-        },
-        body: JSON.stringify({
-          model: 'gemini-2.5-flash',
-          input: prompt,
-          response_mime_type: 'application/json',
-          generation_config: {
-            temperature: variationSeed > 0 ? 0.75 : 0.45,
-            max_output_tokens: 600,
-            thinking_level: 'minimal',
-          },
-        }),
-        signal: controller.signal,
-      });
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(userGeminiKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+              response_mime_type: 'application/json',
+              temperature: variationSeed > 0 ? 0.75 : 0.45,
+              max_output_tokens: 700,
+              thinkingConfig: { thinkingBudget: 0 },
+            },
+          }),
+          signal: controller.signal,
+        }
+      );
       clearTimeout(timer);
       if (res.ok) {
         const data = await res.json();
@@ -2576,7 +3284,7 @@ export async function requestRealtimeCopilotAssist(params: {
           .replace(/```\s*$/i, '')
           .trim();
         const parsed = raw ? JSON.parse(raw) : null;
-        const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
+        const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang, isSswSensei);
         const finalCards = isCambridge && cards.length > 0
           ? cards.slice(0, 1).map((c) => ({
               ...c,
@@ -2619,6 +3327,8 @@ export async function requestRealtimeCopilotAssist(params: {
     history: (params.history || []).slice(-6),
     variationSeed,
     excludeTexts: params.excludeTexts || [],
+    activePopupTargetText: params.activePopupTargetText || '',
+    activePopupMode: params.activePopupMode || '',
   };
 
   if (Date.now() < _copilotServerCooldownUntil) {
@@ -2627,6 +3337,7 @@ export async function requestRealtimeCopilotAssist(params: {
 
   for (const base of resolveVoiceApiCandidateBases()) {
     if (params.signal?.aborted) return empty;
+    await ensureVoiceWorkerSession(base);
     const remaining = deadline - Date.now();
     if (remaining < 600) break;
     const controller = new AbortController();
@@ -2638,6 +3349,7 @@ export async function requestRealtimeCopilotAssist(params: {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        credentials: 'include',
         mode: 'cors',
         signal: controller.signal,
       });
@@ -2652,7 +3364,7 @@ export async function requestRealtimeCopilotAssist(params: {
       }
       if (res.ok) {
         const data = await res.json();
-        const cards = normalizeServerCopilotCards(data?.replies || data?.suggestions, params.targetLang);
+        const cards = normalizeServerCopilotCards(data?.replies || data?.suggestions, params.targetLang, isSswSensei);
         const finalCards = isCambridge && cards.length > 0
           ? cards.slice(0, 1).map((c) => ({
               ...c,
@@ -2684,6 +3396,273 @@ export async function requestRealtimeCopilotAssist(params: {
   return fallback();
 }
 
+const ID_ITEM_TRANSLATION_MAP: Record<
+  string,
+  { en: string; enArt: string; ja: string; zh: string; zhMeasure?: string }
+> = {
+  teh: { en: 'tea', enArt: 'some tea', ja: 'お茶', zh: '茶', zhMeasure: '一杯茶' },
+  'teh panas': { en: 'hot tea', enArt: 'a hot tea', ja: '温かいお茶', zh: '热茶', zhMeasure: '一杯热茶' },
+  'teh hangat': { en: 'hot tea', enArt: 'a hot tea', ja: '温かいお茶', zh: '热茶', zhMeasure: '一杯热茶' },
+  'teh manis': { en: 'sweet tea', enArt: 'some sweet tea', ja: '甘いお茶', zh: '甜茶', zhMeasure: '一杯甜茶' },
+  'es teh': { en: 'iced tea', enArt: 'an iced tea', ja: 'アイスティー', zh: '冰茶', zhMeasure: '一杯冰茶' },
+  'teh dingin': { en: 'iced tea', enArt: 'an iced tea', ja: 'アイスティー', zh: '冰茶', zhMeasure: '一杯冰茶' },
+  'teh es': { en: 'iced tea', enArt: 'an iced tea', ja: 'アイスティー', zh: '冰茶', zhMeasure: '一杯冰茶' },
+  kopi: { en: 'coffee', enArt: 'a coffee', ja: 'コーヒー', zh: '咖啡', zhMeasure: '一杯咖啡' },
+  'kopi panas': { en: 'hot coffee', enArt: 'a hot coffee', ja: 'ホットコーヒー', zh: '热咖啡', zhMeasure: '一杯热咖啡' },
+  'kopi hangat': { en: 'hot coffee', enArt: 'a hot coffee', ja: 'ホットコーヒー', zh: '热咖啡', zhMeasure: '一杯热咖啡' },
+  'es kopi': { en: 'iced coffee', enArt: 'an iced coffee', ja: 'アイスコーヒー', zh: '冰咖啡', zhMeasure: '一杯冰咖啡' },
+  'kopi dingin': { en: 'iced coffee', enArt: 'an iced coffee', ja: 'アイスコーヒー', zh: '冰咖啡', zhMeasure: '一杯冰咖啡' },
+  'kopi susu': { en: 'latte', enArt: 'a latte', ja: 'カフェラテ', zh: '拿铁', zhMeasure: '一杯拿铁' },
+  latte: { en: 'latte', enArt: 'a latte', ja: 'カフェラテ', zh: '拿铁', zhMeasure: '一杯拿铁' },
+  air: { en: 'water', enArt: 'some water', ja: 'お水', zh: '水', zhMeasure: '一杯水' },
+  'air putih': { en: 'water', enArt: 'some water', ja: 'お水', zh: '水', zhMeasure: '一杯水' },
+  'air minum': { en: 'water', enArt: 'some water', ja: 'お水', zh: '水', zhMeasure: '一杯水' },
+  susu: { en: 'milk', enArt: 'some milk', ja: '牛乳', zh: '牛奶', zhMeasure: '一杯牛奶' },
+  jus: { en: 'juice', enArt: 'some juice', ja: 'ジュース', zh: '果汁', zhMeasure: '一杯果汁' },
+  nasi: { en: 'rice', enArt: 'some rice', ja: 'ご飯', zh: '米饭', zhMeasure: '一碗米饭' },
+  'nasi goreng': { en: 'fried rice', enArt: 'some fried rice', ja: 'チャーハン', zh: '炒饭', zhMeasure: '一份炒饭' },
+  roti: { en: 'bread', enArt: 'some bread', ja: 'パン', zh: '面包', zhMeasure: '一点面包' },
+  kue: { en: 'cake', enArt: 'a slice of cake', ja: 'ケーキ', zh: '蛋糕', zhMeasure: '一块蛋糕' },
+  mie: { en: 'noodles', enArt: 'some noodles', ja: 'ラーメン', zh: '面条', zhMeasure: '一碗面条' },
+  mi: { en: 'noodles', enArt: 'some noodles', ja: 'ラーメン', zh: '面条', zhMeasure: '一碗面条' },
+  ramen: { en: 'ramen', enArt: 'some ramen', ja: 'ラーメン', zh: '拉面', zhMeasure: '一碗拉面' },
+  ayam: { en: 'chicken', enArt: 'some chicken', ja: 'チキン', zh: '鸡肉', zhMeasure: '一份鸡肉' },
+};
+
+/**
+ * Translates common Indonesian learner utterances (e.g. "aku mau teh") directly into natural
+ * target-language expressions so the feedback board reflects what the learner actually meant.
+ */
+export function translateLearnerIndonesianIntent(
+  rawText: string,
+  targetLang: TargetLang
+): { target: string; idMeaning: string } | null {
+  const clean = String(rawText || '')
+    .replace(/[.!?。！？,]+$/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!clean) return null;
+  const lower = clean.toLowerCase();
+
+  // Do not misclassify utterances that are already primarily CJK or standard target English phrases
+  if (/[\u3040-\u30ff\u4e00-\u9fff]/.test(clean)) return null;
+  if (
+    targetLang === 'en' &&
+    /\b(i\s+(?:would\s+like|like|want|am|agree|went|ate|bought)|could\s+i|may\s+i|please|thank\s+you)\b/i.test(
+      lower
+    ) &&
+    !/\b(aku|saya|mau|ingin|minta|boleh|harganya|belum|paham|terima\s+kasih|makasih)\b/i.test(lower)
+  ) {
+    return null;
+  }
+
+  // 1. Common learner conversational phrases
+  if (/^(halo|hai|hai\s+kak|halo\s+kak)$/i.test(lower)) {
+    return {
+      target:
+        targetLang === 'ja'
+          ? 'こんにちは！元気ですか？'
+          : targetLang === 'zh'
+            ? '你好！最近怎么样？'
+            : 'Hello! How are you doing today?',
+      idMeaning: clean,
+    };
+  }
+  if (/^(terima\s+kasih(?:\s+banyak)?|makasih(?:\s+banyak)?)$/i.test(lower)) {
+    return {
+      target:
+        targetLang === 'ja'
+          ? 'ありがとうございます。'
+          : targetLang === 'zh'
+            ? '非常感谢！'
+            : 'Thank you very much!',
+      idMeaning: clean,
+    };
+  }
+  if (/^(permisi|maaf)$/i.test(lower)) {
+    return {
+      target:
+        targetLang === 'ja' ? 'すみません。' : targetLang === 'zh' ? '不好意思。' : 'Excuse me.',
+      idMeaning: clean,
+    };
+  }
+  if (
+    /^(?:aku|saya)?\s*(?:belum|tidak|gak|nggak|kurang)\s*(?:paham|mengerti|ngerti)/i.test(lower)
+  ) {
+    return {
+      target:
+        targetLang === 'ja'
+          ? 'すみません、まだよく分かりません。もう少し教えていただけますか？'
+          : targetLang === 'zh'
+            ? '不好意思，我还没有听懂，可以再解释一下吗？'
+            : "Sorry, I don't quite understand yet. Could you explain it again?",
+      idMeaning: clean,
+    };
+  }
+  if (/\b(ulangi|ulangi\s+lagi|bisa\s+diulang)\b/i.test(lower)) {
+    return {
+      target:
+        targetLang === 'ja'
+          ? 'すみません、もう一度お願いできますか？'
+          : targetLang === 'zh'
+            ? '请问可以再说一遍吗？'
+            : 'Could you say that again, please?',
+      idMeaning: clean,
+    };
+  }
+  if (/\b(lebih\s+pelan|pelan\s+pelan)\b/i.test(lower)) {
+    return {
+      target:
+        targetLang === 'ja'
+          ? 'もう少しゆっくり話していただけますか？'
+          : targetLang === 'zh'
+            ? '请说慢一点好吗？'
+            : 'Could you speak a little more slowly, please?',
+      idMeaning: clean,
+    };
+  }
+  if (/\b(berapa\s+harga(?:nya)?|harganya\s+berapa)\b/i.test(lower)) {
+    return {
+      target:
+        targetLang === 'ja'
+          ? 'これはいくらですか？'
+          : targetLang === 'zh'
+            ? '请问这个多少钱？'
+            : 'How much does this cost?',
+      idMeaning: clean,
+    };
+  }
+  if (/\b(di\s+mana\s+(?:toilet|kamar\s+mandi)|(?:toilet|kamar\s+mandi)\s+di\s+mana)\b/i.test(lower)) {
+    return {
+      target:
+        targetLang === 'ja'
+          ? 'トイレはどこですか？'
+          : targetLang === 'zh'
+            ? '请问洗手间在哪里？'
+            : 'Excuse me, where is the restroom?',
+      idMeaning: clean,
+    };
+  }
+
+  // 2. Self-introduction in Indonesian
+  const nameMatch = lower.match(/^(?:nama\s+(?:saya|aku)|aku|saya)\s+(?:adalah\s+)?([a-z]{2,24})$/i);
+  if (
+    nameMatch &&
+    !ID_ITEM_TRANSLATION_MAP[nameMatch[1]] &&
+    !/^(mau|ingin|pesan|minta|minum|makan|pergi|belajar|tidur|pulang|paham|mengerti)$/i.test(
+      nameMatch[1]
+    )
+  ) {
+    const rawName = clean.split(/\s+/).pop() || nameMatch[1];
+    const capName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    return {
+      target:
+        targetLang === 'ja'
+          ? `私の名前は${capName}です。`
+          : targetLang === 'zh'
+            ? `我的名字是${capName}。`
+            : `My name is ${capName}.`,
+      idMeaning: clean,
+    };
+  }
+
+  // 3. Indonesian desire/order patterns: "aku mau teh", "saya mau pesan kopi panas", "boleh minta air"
+  const orderMatch = lower.match(
+    /^(?:(?:aku|saya|gue|kita)\s+)?(?:mau|ingin|pengen|pingin|pesan|minta|boleh\s+minta|mau\s+pesan|mau\s+minum|mau\s+makan|kasih(?:\s+(?:aku|saya))?)\s+(.+)$/i
+  );
+  if (orderMatch) {
+    const rawItem = orderMatch[1]
+      .replace(/^(?:minum|makan|pesan|satu|segelas|secangkir|sebuah)\s+/i, '')
+      .replace(/\s+(?:dong|ya|nih|tolong|please)$/i, '')
+      .trim();
+
+    if (/^(makan|makanan)$/i.test(rawItem)) {
+      return {
+        target:
+          targetLang === 'ja'
+            ? '何か食べ物をいただきたいです。'
+            : targetLang === 'zh'
+              ? '我想吃点东西。'
+              : "I'd like something to eat, please.",
+        idMeaning: clean,
+      };
+    }
+    if (/^(minum|minuman)$/i.test(rawItem)) {
+      return {
+        target:
+          targetLang === 'ja'
+            ? '何か飲み物をお願いします。'
+            : targetLang === 'zh'
+              ? '我想喝点东西。'
+              : "I'd like something to drink, please.",
+        idMeaning: clean,
+      };
+    }
+    if (/^(tidur|istirahat)$/i.test(rawItem)) {
+      return {
+        target:
+          targetLang === 'ja'
+            ? '少し休みたいです。'
+            : targetLang === 'zh'
+              ? '我想休息一下。'
+              : 'I want to get some rest.',
+        idMeaning: clean,
+      };
+    }
+    if (/^(pulang|pulang\s+ke\s+rumah)$/i.test(rawItem)) {
+      return {
+        target:
+          targetLang === 'ja'
+            ? '家に帰りたいです。'
+            : targetLang === 'zh'
+              ? '我想回家。'
+              : 'I want to go home.',
+        idMeaning: clean,
+      };
+    }
+    if (/^belajar(?:\s+(.+))?$/i.test(rawItem)) {
+      return {
+        target:
+          targetLang === 'ja'
+            ? '一緒に練習して勉強したいです。'
+            : targetLang === 'zh'
+              ? '我想练习和学习中文。'
+              : 'I want to study and practice speaking.',
+        idMeaning: clean,
+      };
+    }
+
+    const mapped = ID_ITEM_TRANSLATION_MAP[rawItem];
+    if (mapped) {
+      return {
+        target:
+          targetLang === 'ja'
+            ? `${mapped.ja}をお願いします。`
+            : targetLang === 'zh'
+              ? `我想要${mapped.zhMeasure || mapped.zh}，谢谢。`
+              : `I'd like ${mapped.enArt}, please.`,
+        idMeaning: clean,
+      };
+    }
+  }
+
+  // 4. Bare item with unambiguous Indonesian word when learner asks concisely ("teh", "kopi panas", "es teh")
+  if (ID_ITEM_TRANSLATION_MAP[lower] && lower !== 'air' && lower !== 'ramen' && lower !== 'latte') {
+    const mapped = ID_ITEM_TRANSLATION_MAP[lower];
+    return {
+      target:
+        targetLang === 'ja'
+          ? `${mapped.ja}をお願いします。`
+          : targetLang === 'zh'
+            ? `我想要${mapped.zhMeasure || mapped.zh}，谢谢。`
+            : `I'd like ${mapped.enArt}, please.`,
+      idMeaning: clean,
+    };
+  }
+
+  return null;
+}
+
 /**
  * Synthesizes a natural, grammatical reformulation of the student's EXACT words,
  * addressing their exact grammar/morphology/spelling misconception while strictly
@@ -2696,6 +3675,11 @@ export function synthesizeNaturalReformulation(
 ): string {
   let text = (rawText || '').trim();
   if (!text) return '';
+
+  const idIntent = translateLearnerIndonesianIntent(text, targetLang);
+  if (idIntent) {
+    return idIntent.target;
+  }
 
   if (targetLang === 'en') {
     // 1. Clean introductory hesitation sounds ("ahem", "ahm", "uh", "um", "ah")
@@ -2798,6 +3782,11 @@ export function synthesizeNaturalReformulation(
     text = text.replace(/^(\s*(えっと|ええと|あの[ね]?|う[ー~]*ん|ああ|うん)\s*[,、]*\s*)+/, '');
     // Fix subject / object particle slip
     text = text.replace(/(私|僕|俺|君|あなた)を(行き|来|食べ|飲み|勉強し)/g, '$1は$2');
+    // Fix wrong object particle に -> を on food/drink items before consume verbs
+    text = text.replace(
+      /(コーヒー|アイスコーヒー|ホットコーヒー|紅茶|水|お茶|ラテ|ケーキ|パン|サンドイッチ|ご飯|ラーメン|寿司)に([^。、]*?(?:飲み|食べ|ください|お願い))/g,
+      '$1を$2'
+    );
     // Fix verb dict + desu: "飲むです" -> "飲みます"
     text = text.replace(/飲むです/g, '飲みます');
     text = text.replace(/食べるです/g, '食べます');
@@ -2811,8 +3800,12 @@ export function synthesizeNaturalReformulation(
     text = text.replace(/飲みますでした/g, '飲みました');
     text = text.replace(/見ますでした/g, '見ました');
     text = text.replace(/言いますでした/g, '言いました');
+    text = text.replace(/しますでした/g, 'しました');
+    text = text.replace(/来ますでした/g, '来ました');
+    text = text.replace(/勉強しますでした/g, '勉強しました');
     // Fix i-adjective past: "美味しいでした" -> "美味しかったです"
     text = text.replace(/美味しいでした/g, '美味しかったです');
+    text = text.replace(/おいしいでした/g, 'おいしかったです');
     text = text.replace(/いいでした/g, 'よかったです');
     // Fix na-adjective / noun double copula
     text = text.replace(/静かでしたです/g, '静かでした');
@@ -2828,10 +3821,21 @@ export function synthesizeNaturalReformulation(
 
   if (targetLang === 'zh') {
     text = text.replace(/^(\s*(呃|嗯|那个|就是)\s*[,，]*\s*)+/u, '');
-    text = text.replace(/(我|你|他|她|我们)是(喜欢|想|要|去|吃|喝|觉得|知道)/gu, '$1$2');
+    text = text.replace(/(我|你|他|她|我们)是(喜欢|想|要|去|吃|喝|觉得|知道|学习|工作)/gu, '$1$2');
     text = text.replace(/一个(咖啡|拿铁|美式|奶茶|茶|水|牛奶|果汁)/gu, '一杯$1');
-    text = text.replace(/不(吃|喝|去|看|买|做)了昨天/gu, '昨天没$1');
-    text = text.replace(/很非常/gu, '非常');
+    text = text.replace(/不(吃|喝|去|看|买|做)了(昨天|刚才|上个)/gu, '$2没$1');
+    text = text.replace(/很非常|非常很/gu, '非常');
+    // Fix trailing location word-order trap: "我学习汉语在家里。" -> "我在家里学习汉语。"
+    text = text.replace(
+      /^(我|你|他|她|我们|大家)?([^\u3002\uff01\uff1f!?]+?)((?:在|到)(?:家里|家|图书馆|学校|咖啡馆|餐厅|公园|办公室|房间|宿舍))([。！？!?]*)$/u,
+      (_m, subj = '', predicate: string, loc: string, punct = '') => {
+        const cleanPred = String(predicate || '').trim();
+        if (!cleanPred || cleanPred.startsWith('在')) {
+          return `${subj}${cleanPred}${loc}${punct}`;
+        }
+        return `${subj}${loc}${cleanPred}${punct}`;
+      }
+    );
     text = text.replace(/\s{2,}/g, ' ').trim();
     return text;
   }
@@ -2854,7 +3858,7 @@ export function sanitizeHallucinatedTranscript(
   const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
 
   // Forbidden scripts that indicate unconstrained multilingual ASR misfire (unless matching the learner's UI locale)
-  const forbiddenScriptRegex =
+  const baseForbiddenRegex =
     locCode === 'ru'
       ? /[\u0370-\u03FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F\uAC00-\uD7AF\u1100-\u11FF]/g
       : locCode === 'ko'
@@ -2862,33 +3866,48 @@ export function sanitizeHallucinatedTranscript(
         : locCode === 'ar'
           ? /[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u0590-\u05FF\u0900-\u097F\uAC00-\uD7AF\u1100-\u11FF]/g
           : /[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u0370-\u03FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F\uAC00-\uD7AF\u1100-\u11FF]/g;
+  const enCjkRegex = /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF]/g;
 
-  const forbiddenMatches = text.match(forbiddenScriptRegex);
-  if (forbiddenMatches && forbiddenMatches.length > 0) {
-    const stripped = text.replace(forbiddenScriptRegex, ' ').replace(/\s{2,}/g, ' ').trim();
+  const hadLeadSpace = /^\s/.test(text);
+  const hadTrailSpace = /\s$/.test(text);
+  const baseMatches = text.match(baseForbiddenRegex) || [];
+  const enCjkMatches = targetLang === 'en' ? (text.match(enCjkRegex) || []) : [];
+  const forbiddenCount = baseMatches.length + enCjkMatches.length;
+  if (forbiddenCount > 0) {
+    let stripped = text.replace(baseForbiddenRegex, ' ');
+    if (targetLang === 'en') {
+      stripped = stripped.replace(enCjkRegex, ' ');
+    }
+    stripped = stripped.replace(/\s{2,}/g, ' ').trim();
     const validScriptRegex =
       targetLang === 'ja'
         ? locCode === 'th'
           ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u3040-\u30FF\u4E00-\u9FAF\u0E00-\u0E7F]/g
-          : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u3040-\u30FF\u4E00-\u9FAF]/g
+          : locCode === 'ru'
+            ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u3040-\u30FF\u4E00-\u9FAF]/g
+            : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u3040-\u30FF\u4E00-\u9FAF]/g
         : targetLang === 'zh'
           ? locCode === 'th'
             ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u4E00-\u9FFF\u0E00-\u0E7F]/g
-            : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u4E00-\u9FFF]/g
+            : locCode === 'ru'
+              ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u4E00-\u9FFF]/g
+              : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u4E00-\u9FFF]/g
           : locCode === 'th'
             ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0E00-\u0E7F]/g
-            : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF]/g;
+            : locCode === 'ru'
+              ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF]/g
+              : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF]/g;
     const validMatches = stripped.match(validScriptRegex) || [];
-    if (validMatches.length < 2 || forbiddenMatches.length >= validMatches.length) {
+    if (validMatches.length < 2 || forbiddenCount >= validMatches.length) {
       return '';
     }
-    return stripped;
+    return `${hadLeadSpace ? ' ' : ''}${stripped}${hadTrailSpace ? ' ' : ''}`;
   }
 
   // If locale is not Thai ('th'), Thai script should also be stripped from ASR hallucinations
   if (locCode !== 'th' && /[\u0E00-\u0E7F]/.test(text)) {
     const stripped = text.replace(/[\u0E00-\u0E7F]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
-    return stripped.length >= 2 ? stripped : '';
+    return stripped.length >= 2 ? `${hadLeadSpace ? ' ' : ''}${stripped}${hadTrailSpace ? ' ' : ''}` : '';
   }
 
   return text;
@@ -2936,6 +3955,8 @@ export function evaluateUtteranceClientSide(params: {
   speakingDurationSec?: number;
   inputMode?: 'voice' | 'typed' | 'quick_chip';
   fluencyTelemetry?: Partial<TurnAcousticTelemetry> | null;
+  expectedTargetText?: string;
+  activePopupMode?: string;
 }): FlexibleTurnEvaluationResult {
   const exact = params.text.trim();
   const lower = exact.toLowerCase();
@@ -2951,6 +3972,124 @@ export function evaluateUtteranceClientSide(params: {
       inputMode: params.inputMode || (params.speakingDurationSec && params.speakingDurationSec > 0 ? 'voice' : 'typed'),
       telemetry: params.fluencyTelemetry,
     }).fluencyScore;
+
+  const idIntent = translateLearnerIndonesianIntent(exact, targetLang);
+  if (idIntent && !(scenario.personaId === 'ssw_sensei' || scenarioId.startsWith('scen_ssw_'))) {
+    const corr = idIntent.target;
+    const whyId = `Kamu barusan mengucapkan bahasa Indonesia ("${exact}"). Dalam bahasa target, ungkapkan maksudmu dengan kalimat: "${corr}".`;
+    const whyTh = `เมื่อสักครู่คุณพูดเป็นภาษาถิ่น ในภาษาเป้าหมายให้พูดว่า: "${corr}"`;
+    const aiPrompt =
+      targetLang === 'ja'
+        ? `なるほど！「${exact}」と言いたいのね。日本語では「${corr}」って言うよ。一緒にもう一回言ってみて！`
+        : targetLang === 'zh'
+          ? `明白了！你想说“${exact}”对吧？用中文可以说：“${corr}”。来，跟我一起读一遍！`
+          : `Got it! To say "${exact}" naturally in English, say: "${corr}". Try repeating that out loud!`;
+    return {
+      ok: false,
+      accuracyScore: 68,
+      grammarScore: 65,
+      fluencyScore: computeDynamicFluency(false),
+      vocabUsageScore: 70,
+      userExactTranscript: exact,
+      misconceptionId: 'ID_TO_TARGET_EXPRESS_HELP',
+      whyFailsId: whyId,
+      whyFailsTh: whyTh,
+      missingTokens: [corr],
+      syntacticCorrection: corr,
+      naturalReformulation: corr,
+      pedagogicalFeedbackId: whyId,
+      pedagogicalFeedbackTh: whyTh,
+      aiReply: aiPrompt,
+      aiReplyTranslationId: `Paham! Untuk mengatakan "${exact}", ucapkan: "${corr}". Ayo coba ulangi bersama!`,
+      aiReplyTranslationTh: `เข้าใจแล้ว! หากต้องการพูดว่า "${exact}" ให้พูดว่า: "${corr}" ลองพูดตามอีกครั้งนะ!`,
+      nextSuggestedReplies: [],
+    };
+  }
+
+  const targetPassage = (params.expectedTargetText || '').trim();
+  const isPopupMetaQuestion =
+    /^(?:apa\s+arti|artinya|terjemah(?:kan)?|maksudnya|jelaskan|kenapa\s+salah|yang\s+benar|opsi|pilihan|nomor\s+\d+|kata\s+(?:ini|itu|pertama|kedua|ketiga)|read\s+aloud|baca\s+ulang|contoh|explain|how\s+to\s+pronounce|cara\s+baca|ulangi|ganti\s+soal|soal\s+berikutnya|next\s+question|tutup|close|terima\s+kasih|makasih|ok\s+paham)\b/i.test(
+      exact
+    );
+  if (
+    targetPassage &&
+    !isPopupMetaQuestion &&
+    (params.activePopupMode === 'pte_read_aloud' ||
+      scenarioId === 'scen_pte_ra_level2' ||
+      scenario.competencyId === 'speak_pte_read_aloud')
+  ) {
+    const alignment = alignSpokenToTargetPassage(targetPassage, exact, targetLang);
+    const wordPct = Math.round(alignment.wordAccuracy * 100);
+    const phonPct = Math.round(alignment.phoneticAccuracy * 100);
+    if (!alignment.passed) {
+      const pairDetail = alignment.mispronouncedPairs
+        .slice(0, 4)
+        .map((p) => `"${p.heard || '?'}" -> seharusnya "${p.expected}"`)
+        .join(', ');
+      const missedDetail = alignment.missedWords.slice(0, 5).join(', ');
+      const whyId = `Akurasi bacaanmu ${wordPct}% (fonetik ${phonPct}%).${pairDetail ? ` Pengucapan meleset: ${pairDetail}.` : ''}${missedDetail ? ` Kata terlewat: ${missedDetail}.` : ''} Baca ulang kalimat target di layar dengan artikulasi jelas.`;
+      const whyTh = `ความแม่นยำในการอ่าน ${wordPct}% (โฟเนติกส์ ${phonPct}%)${pairDetail ? ` คำที่ออกเสียงผิด: ${pairDetail}` : ''}${missedDetail ? ` คำที่ข้าม: ${missedDetail}` : ''} กรุณาอ่านประโยคเป้าหมายบนหน้าจอใหม่อีกครั้ง`;
+      const aiPrompt =
+        targetLang === 'ja'
+          ? `画面の文と少しズレているよ（一致率${wordPct}%）。「${pairDetail || missedDetail || targetPassage}」に気をつけて、もう一度ゆっくり読んでみよう！`
+          : targetLang === 'zh'
+            ? `读音和屏幕上的句子还有偏差（准确率${wordPct}%）。注意「${pairDetail || missedDetail || targetPassage}」，再清楚读一遍吧！`
+            : `Wait, your reading accuracy was ${wordPct}% (${phonPct}% phonetic match).${pairDetail ? ` Watch out for: ${pairDetail}.` : ''}${missedDetail ? ` You skipped: ${missedDetail}.` : ''} Please read the passage on your screen again clearly!`;
+      return {
+        ok: false,
+        accuracyScore: Math.max(12, phonPct),
+        grammarScore: Math.max(15, wordPct),
+        fluencyScore: computeDynamicFluency(false),
+        vocabUsageScore: Math.max(15, wordPct),
+        userExactTranscript: exact,
+        misconceptionId: 'READ_ALOUD_PRONUNCIATION_MISMATCH',
+        whyFailsId: whyId,
+        whyFailsTh: whyTh,
+        missingTokens: [
+          ...alignment.missedWords,
+          ...alignment.mispronouncedPairs.map((p) => p.expected),
+        ],
+        syntacticCorrection: targetPassage,
+        naturalReformulation: targetPassage,
+        pedagogicalFeedbackId: whyId,
+        pedagogicalFeedbackTh: whyTh,
+        aiReply: aiPrompt,
+        aiReplyTranslationId: whyId,
+        aiReplyTranslationTh: whyTh,
+        nextSuggestedReplies: [],
+        readAloudAlignment: alignment,
+      };
+    }
+
+    const passId = `Tepat sekali! Akurasi bacaanmu ${wordPct}% (fonetik ${phonPct}%)${alignment.mispronouncedPairs.length > 0 ? `, tinggal haluskan: ${alignment.mispronouncedPairs.slice(0, 2).map((p) => p.expected).join(', ')}` : ''}.`;
+    const passTh = `ยอดเยี่ยม! ความแม่นยำในการอ่าน ${wordPct}% (โฟเนติกส์ ${phonPct}%)`;
+    return {
+      ok: true,
+      accuracyScore: Math.max(82, phonPct),
+      grammarScore: Math.max(84, wordPct),
+      fluencyScore: computeDynamicFluency(true),
+      vocabUsageScore: Math.max(82, wordPct),
+      userExactTranscript: exact,
+      misconceptionId: null,
+      whyFailsId: null,
+      whyFailsTh: null,
+      missingTokens: alignment.missedWords,
+      syntacticCorrection: null,
+      naturalReformulation: targetPassage,
+      pedagogicalFeedbackId: passId,
+      pedagogicalFeedbackTh: passTh,
+      aiReply:
+        targetLang === 'ja'
+          ? `完璧！発音もリズムもとても綺麗だったよ（正確率${wordPct}%）。次の文に進もうか？`
+          : targetLang === 'zh'
+            ? `太棒了！发音和节奏都很准确（准确率${wordPct}%）。我们继续下一句吧？`
+            : `Spot on! Your pronunciation and word alignment hit ${wordPct}% (${phonPct}% phonetic match). Ready for the next sentence?`,
+      aiReplyTranslationId: passId,
+      aiReplyTranslationTh: passTh,
+      nextSuggestedReplies: [],
+      readAloudAlignment: alignment,
+    };
+  }
 
   if (targetLang === 'en') {
     const hasSubjectDrop =
@@ -3091,7 +4230,7 @@ export function evaluateUtteranceClientSide(params: {
         'Kalimat masih terlalu singkat atau belum memuat struktur subjek + kata kerja yang utuh sesuai konteks situasi.';
       let whyFailsTh =
         'ประโยคยังสั้นเกินไปหรือยังไม่มีโครงสร้างประธาน + กริยาที่สมบูรณ์ตามบริบทของสถานการณ์';
-      let syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
+      let syntacticCorrection = synthesizeNaturalReformulation(exact, 'en') || exact;
 
       if (hasBePlusBaseVerb && hasDoubleConjunction) {
         misconceptionId = 'EN_STATIVE_BE_AND_DOUBLE_CONJ';
@@ -3186,7 +4325,7 @@ export function evaluateUtteranceClientSide(params: {
           'Kalimat belum memiliki kata kerja (predikat) yang bermakna atau kata-kata yang disusun belum menjawab konteks skenario percakapan. Gunakan kalimat utuh berpola Subjek + Kata Kerja + Objek.';
         whyFailsTh =
           'ประโยคยังไม่มีคำกริยาที่สมบูรณ์ หรือคำที่เรียงยังไม่ตรงกับบริบทของสถานการณ์ กรุณาพูดเป็นประโยคที่มี ประธาน + กริยา + กรรม';
-        syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
+        syntacticCorrection = synthesizeNaturalReformulation(exact, 'en') || exact;
       }
 
       // ANTI-NONSENSE NATURAL REFORMULATION:
@@ -3283,15 +4422,29 @@ export function evaluateUtteranceClientSide(params: {
     const hasWrongMeasureWordDrink = /一个(咖啡|拿铁|美式|奶茶|茶|水|牛奶|果汁)/u.test(exact);
     const hasPastBuLeTrap = /不(吃|喝|去|看|买|做)了(昨天|刚才|上个)/u.test(exact);
     const hasDoubleDegreeAdv = /很非常|非常很/u.test(exact);
+    const hasTrailingLocationZh =
+      !/(?:在|到)(?:家里|家|图书馆|学校|咖啡馆|餐厅|公园|办公室|房间|宿舍)[^。！？!?]*(?:学习|练习|工作|吃|喝|看|住|睡|写|读)/u.test(
+        exact
+      ) &&
+      /(?:学习|练习|工作|吃|喝|看|住|睡|写|读)[^\u3002\uff01\uff1f!?]*?(?:在|到)(?:家里|家|图书馆|学校|咖啡馆|餐厅|公园|办公室|房间|宿舍)[。！？!?]?$/u.test(
+        exact
+      );
     const isTooShortZh = exact.replace(/[^\u4E00-\u9FFFA-Za-z0-9]/g, '').length < 1;
 
-    if (hasCopulaBeforeVerb || hasWrongMeasureWordDrink || hasPastBuLeTrap || hasDoubleDegreeAdv || isTooShortZh) {
+    if (
+      hasCopulaBeforeVerb ||
+      hasWrongMeasureWordDrink ||
+      hasPastBuLeTrap ||
+      hasDoubleDegreeAdv ||
+      hasTrailingLocationZh ||
+      isTooShortZh
+    ) {
       let misconceptionId = 'ZH_GRAMMAR_SLIP';
       let whyFailsId =
         'Susunan kalimat Mandarin masih terpengaruh terjemahan kata-per-kata. Perhatikan kata bantu dan kata penggolong yang tepat.';
       let whyFailsTh =
         'โครงสร้างประโยคภาษาจีนยังแปลตรงตัวเกินไป โปรดสังเกตคำลักษณนามและรูปประโยคที่ถูกต้อง';
-      let syntacticCorrection = synthesizeNaturalReformulation(exact, 'zh') || scenario.sampleUtterances[0]?.text || '我想喝一杯冰美式咖啡。';
+      let syntacticCorrection = synthesizeNaturalReformulation(exact, 'zh') || exact;
 
       if (hasCopulaBeforeVerb) {
         misconceptionId = 'zh_copula_shi_before_verb';
@@ -3305,6 +4458,12 @@ export function evaluateUtteranceClientSide(params: {
           'Untuk minuman dalam cangkir/gelas, gunakan kata penggolong "一杯 (yī bēi)", bukan "一个 (yī gè)".';
         whyFailsTh =
           'สำหรับเครื่องดื่มในแก้วหรือถ้วย ต้องใช้คำลักษณนาม "一杯 (yī bēi)" ไม่ใช่ "一个 (yī gè)"';
+      } else if (hasTrailingLocationZh) {
+        misconceptionId = 'zh_location_before_verb';
+        whyFailsId =
+          'Miskonsepsi Urutan Lokasi Mandarin (Subjek + 在 Tempat + Kata Kerja): Jangan letakkan keterangan tempat ("在家里 / zài jiālǐ" = di rumah) di belakang seperti bahasa Indonesia/Inggris. Letakkan lokasi SEBELUM kata kerja ("我在家里学习汉语。").';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่องลำดับสถานที่ในภาษาจีน (ประธาน + 在 สถานที่ + กริยา): ห้ามวางคำบอกสถานที่ ("在家里 / zài jiālǐ") ไว้ท้ายประโยค ต้องวางไว้หน้าคำกริยาเสมอ ("我在家里学习汉语。")';
       } else if (hasPastBuLeTrap) {
         misconceptionId = 'zh_past_negation_bu_vs_mei';
         whyFailsId =
@@ -3360,6 +4519,31 @@ export function evaluateUtteranceClientSide(params: {
       aiReply: '说得很地道！那我们继续聊，你平时还喜欢做什么呢？',
       aiReplyTranslationId: 'Pengucapanmu sangat alami! Yuk lanjut ngobrol, biasanya kamu suka melakukan kegiatan apa lagi?',
       aiReplyTranslationTh: 'พูดได้เป็นธรรมชาติมากเลย! มาคุยกันต่อนะ ปกติคุณชอบทำกิจกรรมอะไรอีกบ้าง?',
+      nextSuggestedReplies: [],
+    };
+  }
+
+  if (scenario.personaId === 'ssw_sensei' || scenarioId.startsWith('scen_ssw_')) {
+    return {
+      ok: exact.length > 0,
+      accuracyScore: exact.length > 0 ? 90 : 0,
+      grammarScore: exact.length > 0 ? 90 : 0,
+      fluencyScore: computeDynamicFluency(exact.length > 0),
+      vocabUsageScore: exact.length > 0 ? 90 : 0,
+      userExactTranscript: exact,
+      misconceptionId: null,
+      whyFailsId: null,
+      whyFailsTh: null,
+      missingTokens: [],
+      syntacticCorrection: null,
+      naturalReformulation: exact,
+      pedagogicalFeedbackId:
+        'Pertanyaan atau jawaban SSW diterima. SSW SENSEI mencocokkan materi & halaman PDF OTAFF Ver 5.1 secara akurat.',
+      pedagogicalFeedbackTh: 'บันทึกข้อมูลการเรียน SSW เรียบร้อยแล้ว',
+      aiReply:
+        'Baik, saya cek dulu referensi halaman PDF OTAFF Ver 5.1 dan progres SSW kamu agar akurat.',
+      aiReplyTranslationId: 'SSW SENSEI siap membedah materi & pembahasan halaman PDF.',
+      aiReplyTranslationTh: 'SSW SENSEI กำลังตรวจสอบเนื้อหาและหน้า PDF',
       nextSuggestedReplies: [],
     };
   }
@@ -3446,16 +4630,23 @@ export function evaluateUtteranceClientSide(params: {
       'Miskonsepsi Register Sopan (Teineigo): Dalam percakapan situasi umum atau dengan senpai/staf, akhiri kalimat dengan bentuk sopan 「〜です / 〜ます / 〜てください / 〜をお願いします」.';
     let whyFailsTh =
       'ความเข้าใจผิดเรื่องระดับความสุภาพ (Teineigo): ในสถานการณ์ทั่วไปควรลงท้ายประโยคด้วยรูปสุภาพ 「〜です / 〜ます / 〜てください」';
-    let syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
+    let syntacticCorrection = synthesizeNaturalReformulation(exact, 'ja') || exact;
     const missingTokens: string[] = [];
 
     if (hasPolitePastMasuDeshita) {
-      misconceptionId = 'polite_past_masu_deshita';
-      whyFailsId =
-        'Miskonsepsi Bentuk Lampau Sopan (×～ますでした): Kata kerja bentuk ～ます TIDAK BOLEH ditempel 「でした」 (seperti 「×食べますでした / ×行きますでした」). Ubah langsung akhiran ～ます menjadi 「～ました」（「○食べました / ○行きました」).';
-      whyFailsTh =
-        'ความเข้าใจผิดเรื่องรูปอดีตสุภาพ (×～ますでした): ห้ามเติม 「でした」 หลังกริยารูป ～ます โดยตรง ต้องผันเป็น 「～ました」（「○食べました / ○行きました」）';
+      misconceptionId = hasWrongObjectParticle
+        ? 'JA_PARTICLE_NI_AND_MASU_DESHITA'
+        : 'polite_past_masu_deshita';
+      whyFailsId = hasWrongObjectParticle
+        ? 'Miskonsepsi Ganda (Partikel Objek & Lampau Sopan): (1) Objek makanan/minuman wajib memakai partikel 「を」 (bukan 「に」). (2) Kata kerja ～ます TIDAK BOLEH ditempel 「でした」; ubah langsung menjadi 「～ました」（○ コーヒーを飲みました）.'
+        : 'Miskonsepsi Bentuk Lampau Sopan (×～ますでした): Kata kerja bentuk ～ます TIDAK BOLEH ditempel 「でした」 (seperti 「×食べますでした / ×行きますでした」). Ubah langsung akhiran ～ます menjadi 「～ました」（「○食べました / ○行きました」).';
+      whyFailsTh = hasWrongObjectParticle
+        ? 'ความเข้าใจผิดซ้อน 2 จุด (คำช่วยกรรมตรงและรูปอดีต): (1) กรรมตรงของอาหาร/เครื่องดื่มต้องใช้ 「を」 (ไม่ใช่ 「に」) และ (2) ห้ามเติม 「でした」 หลัง ～ます ต้องผันเป็น 「～ました」（○ コーヒーを飲みました）'
+        : 'ความเข้าใจผิดเรื่องรูปอดีตสุภาพ (×～ますでした): ห้ามเติม 「でした」 หลังกริยารูป ～ます โดยตรง ต้องผันเป็น 「～ました」（「○食べました / ○行きました」）';
       syntacticCorrection = synthesizeNaturalReformulation(exact, 'ja', misconceptionId);
+      if (hasWrongObjectParticle) {
+        missingTokens.push('を (partikel objek)');
+      }
       missingTokens.push('～ました (bukan ～ますでした)');
     } else if (hasIAdjPastDeshita) {
       misconceptionId = 'i_adj_past_deshita';
@@ -3509,8 +4700,8 @@ export function evaluateUtteranceClientSide(params: {
         'Kalimat belum memuat kosakata atau maksud yang sesuai dengan konteks percakapan saat ini. Gunakan kosakata skenario (seperti menyebutkan pesanan dengan 「〜をお願いします」 atau bertanya kepada lawan bicara).';
       whyFailsTh =
         'ประโยคยังไม่มีคำศัพท์หรือความหมายที่ตรงกับบริบทของการสนทนา กรุณาใช้คำศัพท์และโครงสร้างที่แนะนำในสถานการณ์นี้';
-      syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
-      missingTokens.push(scenario.sampleUtterances[0]?.text || '〜をお願いします');
+      syntacticCorrection = synthesizeNaturalReformulation(exact, 'ja') || exact;
+      missingTokens.push('〜をお願いします / 〜です');
     } else if (lacksPoliteEnding) {
       missingTokens.push('〜です / 〜ます / 〜をお願いします');
     }
@@ -3652,17 +4843,10 @@ export function ensureLearnerIdentity(): Promise<boolean> {
   const base = resolveCfApiBase();
   if (!base) return Promise.resolve(false);
   if (!_identityPromise) {
-    _identityPromise = fetch(`${base}/api/auth/anon`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '{}',
-      credentials: 'include',
-      mode: 'cors',
-      cache: 'no-store',
-    })
-      .then((r) => {
-        const ok = r.ok || r.status === 409;
+    _identityPromise = ensureSharedAnonSession(base)
+      .then((ok) => {
         if (ok) _identityReady = true;
+        if (!ok) _identityPromise = null;
         return ok;
       })
       .catch(() => {
@@ -3699,9 +4883,14 @@ export function mapScenarioLevel(level: string | undefined): string {
   return 'A1';
 }
 
-export function replyLooksLikeTargetLanguage(text: string, targetLang: TargetLang): boolean {
+export function replyLooksLikeTargetLanguage(
+  text: string,
+  targetLang: TargetLang,
+  allowBilingualSsw = false
+): boolean {
   const tx = String(text || '');
   if (!tx.trim() || /[\u0E00-\u0E7F]/.test(tx)) return false;
+  if (allowBilingualSsw) return /[A-Za-z\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
   if (targetLang === 'ja') return /[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
   if (targetLang === 'zh') return /[\u4e00-\u9fff]/.test(tx) && !/[\u3040-\u30ff]/.test(tx);
   return /[A-Za-z]/.test(tx) && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
@@ -3914,6 +5103,8 @@ export interface TurnEvaluationParams {
   speakingDurationSec?: number;
   inputMode?: 'voice' | 'typed' | 'quick_chip';
   fluencyTelemetry?: Partial<TurnAcousticTelemetry> | null;
+  expectedTargetText?: string;
+  activePopupMode?: string;
 }
 
 /**
@@ -3930,6 +5121,8 @@ export function evaluateTurnLocal(params: TurnEvaluationParams): FlexibleTurnEva
     speakingDurationSec: params.speakingDurationSec,
     inputMode: params.inputMode,
     fluencyTelemetry: params.fluencyTelemetry,
+    expectedTargetText: params.expectedTargetText,
+    activePopupMode: params.activePopupMode,
   });
 }
 
@@ -3944,9 +5137,21 @@ function normalizeServerUiAction(raw: any): VoiceUiAction | undefined {
     return undefined;
   }
   const focusRaw = String(raw.focusType || 'grammar').trim();
-  const focusType = (['grammar', 'vocab', 'kanji', 'kana', 'sentence_drill'] as const).includes(
-    focusRaw as any
-  )
+  const focusType = (
+    [
+      'grammar',
+      'vocab',
+      'kanji',
+      'kanji_hanzi',
+      'pronunciation',
+      'kana',
+      'sentence_drill',
+      'pte_read_aloud',
+      'pte_describe_image',
+      'pte_scorecard',
+      'ssw_tactical_board',
+    ] as const
+  ).includes(focusRaw as any)
     ? (focusRaw as VoiceUiAction['focusType'])
     : 'grammar';
   return {
@@ -4024,9 +5229,39 @@ export async function resolveAiReply(
     ) => void;
   }
 ): Promise<FlexibleTurnEvaluationResult> {
+  const isSswSensei =
+    params.persona.id === 'ssw_sensei' ||
+    params.scenario.personaId === 'ssw_sensei' ||
+    params.scenario.id.startsWith('scen_ssw_');
+  const isCambridge =
+    !isSswSensei &&
+    (params.persona.id === 'cambridge_examiner' ||
+      params.scenario.personaId === 'cambridge_examiner' ||
+      params.scenario.id.startsWith('scen_ielts') ||
+      params.persona.id === 'dr_julian' ||
+      params.scenario.personaId === 'dr_julian' ||
+      params.scenario.id.startsWith('scen_pte'));
+  const cefrLevel =
+    typeof localStorage !== 'undefined' ? localStorage.getItem('fz_user_cefr_level') || 'B1' : 'B1';
+  const clampCambridgeCards = (cards: BeginnerReplyCard[]) =>
+    isCambridge && cards.length > 0
+      ? cards.slice(0, 1).map((c) => ({
+          ...c,
+          tier: 'cambridge_model' as any,
+          badgeId: c.badgeId || `🎯 Jawaban Terbaik (Level ${cefrLevel})`,
+          badgeTh: c.badgeTh || `🎯 คำตอบแนะนำ (Level ${cefrLevel})`,
+          tierLabelId: c.tierLabelId || `Level ${cefrLevel} Model Answer`,
+          tierLabelTh: c.tierLabelTh || `Level ${cefrLevel} Model Answer`,
+        }))
+      : cards;
+  const effectiveDossier = isSswSensei
+    ? [params.learnerDossier || '', buildSswTurnDossierForHttp(params.text), buildSswCompactGroundedDossier()].filter(Boolean).join('\n\n')
+    : params.learnerDossier || undefined;
+
   // 0) Unified Gemini Partner + Real-Time Copilot Turn (/api/voice/partner-turn)
   //    Generates BOTH Partner AI's spoken reply, 3 bespoke Real-Time Copilot replies, AND optional uiAction in ONE call!
   for (const base of resolveVoiceApiCandidateBases()) {
+    await ensureVoiceWorkerSession(base);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 24000);
     try {
@@ -4042,9 +5277,14 @@ export async function resolveAiReply(
           targetLang: params.targetLang,
           locale: params.locale,
           callMode: params.callMode || 'tutor_coach',
+          isCambridge,
+          cefrLevel,
+          activePopupTargetText: params.expectedTargetText || '',
+          activePopupMode: params.activePopupMode || '',
           history: params.history.slice(-6),
-          learnerDossier: params.learnerDossier || undefined,
+          learnerDossier: effectiveDossier,
         }),
+        credentials: 'include',
         mode: 'cors',
         signal: controller.signal,
       });
@@ -4056,10 +5296,12 @@ export async function resolveAiReply(
         const isExplanation =
           Boolean(data?.isExplanation) ||
           Boolean(uiAction && uiAction.actionType === 'open_learning_popup');
-        if (partnerReply && (isExplanation || replyLooksLikeTargetLanguage(partnerReply, params.targetLang))) {
+        if (partnerReply && (isSswSensei || isExplanation || replyLooksLikeTargetLanguage(partnerReply, params.targetLang))) {
           const transId = stripEmojisAndEmotWords(String(data?.aiReplyTranslationId || '')).trim();
           const transTh = stripEmojisAndEmotWords(String(data?.aiReplyTranslationTh || '')).trim();
-          const rtCards = normalizeServerCopilotCards(data?.replies, params.targetLang);
+          const rtCards = clampCambridgeCards(
+            normalizeServerCopilotCards(data?.replies, params.targetLang, isSswSensei)
+          );
           if (rtCards.length > 0) {
             const cacheKey = `${params.targetLang}::${partnerReply.toLowerCase()}::${params.text.trim().toLowerCase()}`;
             _copilotTurnCache.set(cacheKey, {
@@ -4072,10 +5314,17 @@ export async function resolveAiReply(
             });
           }
 
+          const hasStrictReadAloudFailure = Boolean(
+            localResult.readAloudAlignment && !localResult.readAloudAlignment.passed
+          );
+          const finalReplyText = hasStrictReadAloudFailure ? localResult.aiReply : partnerReply;
+          const finalTransId = hasStrictReadAloudFailure ? localResult.aiReplyTranslationId : transId;
+          const finalTransTh = hasStrictReadAloudFailure ? localResult.aiReplyTranslationTh : transTh;
+
           options?.onTextReady?.(
-            partnerReply,
-            transId,
-            transTh,
+            finalReplyText,
+            finalTransId,
+            finalTransTh,
             rtCards.length > 0 ? rtCards : undefined,
             uiAction
           );
@@ -4085,9 +5334,9 @@ export async function resolveAiReply(
           if (uiAction && uiAction.actionType === 'open_learning_popup') {
             return {
               ...localResult,
-              aiReply: partnerReply,
-              aiReplyTranslationId: transId,
-              aiReplyTranslationTh: transTh,
+              aiReply: finalReplyText,
+              aiReplyTranslationId: finalTransId,
+              aiReplyTranslationTh: finalTransTh,
               nextSuggestedReplies: rtCards.length > 0 ? rtCards : undefined,
               audioBase64: null,
               audioMimeType: 'audio/wav',
@@ -4098,15 +5347,15 @@ export async function resolveAiReply(
           }
 
           const ttsRes = await synthesizeFlexibleTts({
-            text: partnerReply,
-            targetLang: params.targetLang,
+            text: finalReplyText,
+            targetLang: isSswSensei ? 'id' : params.targetLang,
             persona: params.persona,
           });
           return {
             ...localResult,
-            aiReply: partnerReply,
-            aiReplyTranslationId: transId,
-            aiReplyTranslationTh: transTh,
+            aiReply: finalReplyText,
+            aiReplyTranslationId: finalTransId,
+            aiReplyTranslationTh: finalTransTh,
             nextSuggestedReplies: rtCards.length > 0 ? rtCards : undefined,
             audioBase64: ttsRes?.audioBase64 || null,
             audioMimeType: ttsRes?.audioMimeType || 'audio/wav',
@@ -4145,8 +5394,12 @@ export async function resolveAiReply(
         .filter((h) => h && h.text && h.text.trim())
         .slice(-6)
         .map((h) => `${h.speaker === 'ai' ? 'You' : 'Learner'}: ${h.text.trim().slice(0, 240)}`);
+      const screenPopupCtx = params.expectedTargetText
+        ? `Visible Learning Popup on Learner Screen (mode=${params.activePopupMode || 'popup'}): "${params.expectedTargetText}".`
+        : '';
       const promptText = [
         `You are ${params.persona.name}, a sharp, observant, deeply caring speaking mentor ("guru galak tapi penuh perhatian") in FIEZEL. Scenario: "${params.scenario.titleId}".`,
+        screenPopupCtx,
         `[FIEZEL ECOSYSTEM & IDENTITY]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh; powered by Braincore Engine; mascot is Mochi the Daifuku cat.`,
         `[WHY FIEZEL CRUSHES CHATGPT VOICE]: ChatGPT Voice is 'blind audio' (no subtitles, no hints, no Kanji phonetics) where users waste 70% of time in 'The Interruption Trap' asking for translations. FIEZEL gives Zero-Friction Flow: instant subtitles & translations, Furigana & Romaji phonetics for Kanji, and 3 beginner answer hints with audio preview, training vocal muscles 100% of the time!`,
         params.learnerDossier || '',
@@ -4166,25 +5419,23 @@ export async function resolveAiReply(
       ]
         .filter(Boolean)
         .join('\n');
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Api-Revision': '2026-05-20',
-          'x-goog-api-key': userGeminiKey,
-        },
-        body: JSON.stringify({
-          model: 'gemini-3.1-flash-lite',
-          input: promptText,
-          response_mime_type: 'application/json',
-          generation_config: {
-            temperature: 0.5,
-            max_output_tokens: 750,
-            thinking_level: 'minimal',
-          },
-        }),
-        signal: controller.signal,
-      });
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(userGeminiKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: promptText }] }],
+            generationConfig: {
+              response_mime_type: 'application/json',
+              temperature: 0.5,
+              max_output_tokens: 800,
+              thinkingConfig: { thinkingBudget: 0 },
+            },
+          }),
+          signal: controller.signal,
+        }
+      );
       clearTimeout(timeout);
       if (res.ok) {
         const data = await res.json();
@@ -4211,7 +5462,9 @@ export async function resolveAiReply(
         const geminiTransId = stripEmojisAndEmotWords(parsed?.aiReplyTranslationId || '');
         const geminiTransTh = stripEmojisAndEmotWords(parsed?.aiReplyTranslationTh || '');
         if (geminiReply && replyLooksLikeTargetLanguage(geminiReply, params.targetLang)) {
-          const rtCards = normalizeServerCopilotCards(parsed?.replies, params.targetLang);
+          const rtCards = clampCambridgeCards(
+            normalizeServerCopilotCards(parsed?.replies, params.targetLang, isSswSensei)
+          );
           options?.onTextReady?.(
             geminiReply,
             geminiTransId,
@@ -4221,7 +5474,7 @@ export async function resolveAiReply(
 
           const ttsRes = await synthesizeFlexibleTts({
             text: geminiReply,
-            targetLang: params.targetLang,
+            targetLang: isSswSensei ? 'id' : params.targetLang,
             persona: params.persona,
           });
           return {
@@ -4253,10 +5506,23 @@ export async function resolveAiReply(
   });
 
   if (partner) {
-    const cleanPartnerReply = stripEmojisAndEmotWords(partner.reply);
+    const hasStrictReadAloudFailure = Boolean(
+      localResult.readAloudAlignment && !localResult.readAloudAlignment.passed
+    );
+    const cleanPartnerReply = hasStrictReadAloudFailure
+      ? localResult.aiReply
+      : stripEmojisAndEmotWords(partner.reply);
     const cleanPartnerTrans = stripEmojisAndEmotWords(partner.translation);
-    const transId = params.locale === 'th' ? '' : cleanPartnerTrans;
-    const transTh = params.locale === 'th' ? cleanPartnerTrans : '';
+    const transId = hasStrictReadAloudFailure
+      ? localResult.aiReplyTranslationId
+      : params.locale === 'th'
+        ? ''
+        : cleanPartnerTrans;
+    const transTh = hasStrictReadAloudFailure
+      ? localResult.aiReplyTranslationTh
+      : params.locale === 'th'
+        ? cleanPartnerTrans
+        : '';
 
     // Reveal AI reply text immediately; App.tsx triggers real-time Copilot assist in parallel!
     options?.onTextReady?.(cleanPartnerReply, transId, transTh, undefined);
@@ -4264,25 +5530,30 @@ export async function resolveAiReply(
     const [ttsRes, copilotRes] = await Promise.all([
       synthesizeFlexibleTts({
         text: cleanPartnerReply,
-        targetLang: params.targetLang,
+        targetLang: isSswSensei ? 'id' : params.targetLang,
         persona: params.persona,
       }),
       requestRealtimeCopilotAssist({
         aiText: cleanPartnerReply,
         lastUserText: params.text,
         scenario: params.scenario,
+        persona: params.persona,
+        cefrLevel,
         targetLang: params.targetLang,
         locale: params.locale,
         history: params.history,
+        activePopupTargetText: params.expectedTargetText,
+        activePopupMode: params.activePopupMode,
       }),
     ]);
 
+    const clampedCopilot = copilotRes.ok ? clampCambridgeCards(copilotRes.replies) : undefined;
     return {
       ...localResult,
       aiReply: cleanPartnerReply,
       aiReplyTranslationId: transId || copilotRes.aiMeaningId,
       aiReplyTranslationTh: transTh || copilotRes.aiMeaningTh,
-      nextSuggestedReplies: copilotRes.ok ? copilotRes.replies : undefined,
+      nextSuggestedReplies: clampedCopilot,
       audioBase64: ttsRes?.audioBase64 || null,
       audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
       ttsEngine: ttsRes?.engine || 'fiezel-ai-partner',
@@ -4755,6 +6026,7 @@ export async function synthesizeViaGeminiLiveWav(params: {
  * accents, and expressive sarcastic inflection, NEVER flat robotic Edge TTS!
  */
 let _workerGeminiTtsCooldownUntil = 0;
+let _workerGeminiTtsConsecErrors = 0;
 
 export async function synthesizeViaWorkerGeminiTts(params: {
   text: string;
@@ -4769,8 +6041,9 @@ export async function synthesizeViaWorkerGeminiTts(params: {
   const isNativeExplainLang = ['id', 'th', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(rawLang);
 
   for (const base of resolveVoiceApiCandidateBases()) {
+    await ensureVoiceWorkerSession(base);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 9000);
+    const timer = setTimeout(() => controller.abort(), cleanText.length > 420 ? 13000 : 9500);
     try {
       const res = await fetch(`${base}/api/voice/gemini-tts`, {
         method: 'POST',
@@ -4785,6 +6058,7 @@ export async function synthesizeViaWorkerGeminiTts(params: {
             ? ''
             : params.persona?.ttsStylePrompt || params.persona?.speakingStyle || '',
         }),
+        credentials: 'include',
         mode: 'cors',
         signal: controller.signal,
       });
@@ -4794,6 +6068,7 @@ export async function synthesizeViaWorkerGeminiTts(params: {
         const b64 = String(json?.audioBase64 || '').replace(/^data:audio\/[^;]+;base64,/, '');
         if (b64.length > 64) {
           _workerGeminiTtsCooldownUntil = 0;
+          _workerGeminiTtsConsecErrors = 0;
           return {
             audioBase64: b64,
             audioMimeType: String(json?.audioMimeType || 'audio/wav'),
@@ -4801,7 +6076,10 @@ export async function synthesizeViaWorkerGeminiTts(params: {
           };
         }
       } else if (res.status >= 500) {
-        _workerGeminiTtsCooldownUntil = Date.now() + 60000;
+        _workerGeminiTtsConsecErrors += 1;
+        if (_workerGeminiTtsConsecErrors >= 3) {
+          _workerGeminiTtsCooldownUntil = Date.now() + 12000;
+        }
       }
     } catch {
       clearTimeout(timer);
@@ -4824,7 +6102,11 @@ export async function synthesizeFlexibleTts(params: {
   force?: boolean;
 }): Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> {
   const rawLang = String(params.targetLang || 'en').toLowerCase().trim();
-  const sanitizeLang: TargetLang = rawLang === 'ja' ? 'ja' : rawLang === 'zh' ? 'zh' : 'en';
+  const effectiveSynthLang =
+    params.persona?.id === 'ssw_sensei' && !/^[\u3040-\u30ff\u4e00-\u9fff\s。、！？]+$/.test(params.text || '')
+      ? 'id'
+      : rawLang;
+  const sanitizeLang: TargetLang = effectiveSynthLang === 'ja' ? 'ja' : effectiveSynthLang === 'zh' ? 'zh' : 'en';
   const cleanSpokenText = sanitizeSpokenTextForClassicTts(params.text, sanitizeLang);
   if (!cleanSpokenText) return null;
 
@@ -4835,19 +6117,22 @@ export async function synthesizeFlexibleTts(params: {
     sensei_keita: 'keita',
     nanami: 'sensei_nanami',
     keita: 'keita',
+    ssw_sensei: 'ssw_sensei',
     xiao_mochi: 'xiao_mochi',
     xiaoxiao: 'xiao_mochi',
     yunxi: 'yunxi',
   };
   const speaker =
     (params.persona && speakerMap[params.persona.id]) ||
-    (rawLang === 'ja'
-      ? 'sensei_nanami'
-      : rawLang === 'zh'
-        ? 'xiao_mochi'
-        : 'coach_alex');
+    (effectiveSynthLang === 'id'
+      ? 'ssw_sensei'
+      : effectiveSynthLang === 'ja'
+        ? 'sensei_nanami'
+        : effectiveSynthLang === 'zh'
+          ? 'xiao_mochi'
+          : 'coach_alex');
 
-  const cacheKey = `gemini-tts:${speaker}:${rawLang}:${cleanSpokenText}`;
+  const cacheKey = `gemini-tts:${speaker}:${effectiveSynthLang}:${cleanSpokenText}`;
   const cached = _ttsMemoryCache.get(cacheKey);
   if (cached) {
     return cached;
@@ -4978,4 +6263,413 @@ export function buildLiveTurnTranslations(text: string, targetLang: TargetLang) 
     translationTh: sub.translationTh,
     pronunciation: sub.pronunciation,
   };
+}
+
+export interface SpeechLanguageVerifyResult {
+  reached: boolean;
+  hasLanguage: boolean;
+  isEchoOnly: boolean;
+  transcript: string;
+  detectedLang?: string;
+}
+
+/**
+ * Verifies whether a candidate mic audio window captured while Coach AI was talking
+ * contains authentic intelligible spoken language (not vehicle noise, horns, static, or echo).
+ */
+export async function verifySpokenLanguageAudio(params: {
+  audioBase64: string;
+  mimeType?: string;
+  targetLang: TargetLang;
+  locale: LearnerLocale;
+  aiCurrentText?: string;
+  timeoutMs?: number;
+}): Promise<SpeechLanguageVerifyResult> {
+  if (!params.audioBase64) {
+    return { reached: false, hasLanguage: false, isEchoOnly: false, transcript: '' };
+  }
+  for (const base of resolveVoiceApiCandidateBases()) {
+    await ensureVoiceWorkerSession(base);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), Math.max(1200, params.timeoutMs || 2600));
+    try {
+      const res = await fetch(`${base}/api/voice/verify-speech`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          audioBase64: params.audioBase64,
+          mimeType: params.mimeType || 'audio/wav',
+          targetLang: params.targetLang,
+          locale: params.locale,
+          aiCurrentText: (params.aiCurrentText || '').slice(0, 220),
+        }),
+        credentials: 'include',
+        mode: 'cors',
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (!res.ok) continue;
+      const json = await res.json().catch(() => null);
+      if (!json || typeof json !== 'object') continue;
+      return {
+        reached: true,
+        hasLanguage: Boolean(json.hasLanguage),
+        isEchoOnly: Boolean(json.isEchoOnly),
+        transcript: String(json.transcript || '').trim(),
+        detectedLang: String(json.detectedLang || '').trim(),
+      };
+    } catch {
+      clearTimeout(timer);
+    }
+  }
+  return { reached: false, hasLanguage: false, isEchoOnly: false, transcript: '' };
+}
+
+export interface PcmSchedulerAudioBuffer {
+  duration: number;
+  getChannelData(channel: number): Float32Array;
+}
+
+export interface PcmSchedulerGainNode {
+  gain: {
+    setValueAtTime(value: number, startTime: number): void;
+    linearRampToValueAtTime(value: number, endTime: number): void;
+  };
+  connect(destination: any): void;
+  disconnect(): void;
+}
+
+export interface PcmSchedulerSourceNode {
+  buffer: PcmSchedulerAudioBuffer | null;
+  onended: ((this: any, ev?: any) => any) | null;
+  connect(destination: any): void;
+  start(when?: number): void;
+  stop(): void;
+  disconnect(): void;
+}
+
+export interface PcmSchedulerAudioContext {
+  currentTime: number;
+  sampleRate: number;
+  state?: string;
+  createBuffer(numberOfChannels: number, length: number, sampleRate: number): PcmSchedulerAudioBuffer;
+  createBufferSource(): PcmSchedulerSourceNode;
+  createGain?: () => PcmSchedulerGainNode;
+}
+
+export interface PcmSchedulerScheduledEvent {
+  startAt: number;
+  duration: number;
+  sampleCount: number;
+  wasRecovery: boolean;
+}
+
+export interface PcmSchedulerFlushParams {
+  ctx: PcmSchedulerAudioContext;
+  getDestination: (ctx: PcmSchedulerAudioContext) => any;
+  activeSources: PcmSchedulerSourceNode[];
+  onChunkScheduled?: (evt: PcmSchedulerScheduledEvent) => void;
+  onIdle?: () => void;
+}
+
+export interface LivePcmStreamSchedulerOptions {
+  sampleRate?: number;
+  minStartBufferMs?: number;
+  maxStartWaitMs?: number;
+  maxHeaderWaitMs?: number;
+  startLeadSec?: number;
+  minRecoveryBufferMs?: number;
+  maxRecoveryWaitMs?: number;
+  recoveryLeadSec?: number;
+  fadeRampSec?: number;
+  setTimer?: (fn: () => void, ms: number) => number;
+  clearTimer?: (id: number) => void;
+}
+
+/**
+ * Decodes little-endian signed 16-bit PCM base64 into normalized [-1, 1) Float32Array samples.
+ */
+export function decodePcm16Base64ToFloat32(pcmBase64: string): Float32Array {
+  if (!pcmBase64) return new Float32Array(0);
+  let bytes: Uint8Array;
+  if (typeof atob === 'function') {
+    const binary = atob(pcmBase64);
+    const len = binary.length;
+    bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+  } else {
+    const buf = Buffer.from(pcmBase64, 'base64');
+    bytes = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+  }
+  const usableBytes = bytes.byteLength & ~1;
+  if (usableBytes < 2) return new Float32Array(0);
+  const sampleCount = usableBytes >> 1;
+  const float32 = new Float32Array(sampleCount);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, usableBytes);
+  for (let i = 0; i < sampleCount; i++) {
+    float32[i] = view.getInt16(i * 2, true) / 32768;
+  }
+  return float32;
+}
+
+/**
+ * Jitter-buffered WebAudio PCM stream scheduler for Gemini Live 24kHz audio.
+ * Coalesces bursty WebSocket frames into continuous AudioBuffers with turn-start
+ * prebuffering and click-free underrun recovery so transient jitter does not chop words.
+ */
+export class LivePcmStreamScheduler {
+  readonly sampleRate: number;
+  readonly minStartBufferSamples: number;
+  readonly maxStartWaitMs: number;
+  readonly maxHeaderWaitMs: number;
+  readonly startLeadSec: number;
+  readonly minRecoveryBufferSamples: number;
+  readonly maxRecoveryWaitMs: number;
+  readonly recoveryLeadSec: number;
+  readonly fadeRampSec: number;
+  private readonly setTimer: (fn: () => void, ms: number) => number;
+  private readonly clearTimer: (id: number) => void;
+
+  private pendingChunks: Float32Array[] = [];
+  private pendingSamples = 0;
+  private nextStartTime = 0;
+  private hasScheduledInTurn = false;
+  private headerExtendedWaitUsed = false;
+  private flushTimerId: number | null = null;
+  private epoch = 0;
+  private latestFlushParams: PcmSchedulerFlushParams | null = null;
+
+  constructor(options: LivePcmStreamSchedulerOptions = {}) {
+    this.sampleRate = options.sampleRate ?? 24000;
+    this.minStartBufferSamples = Math.round(((options.minStartBufferMs ?? 240) / 1000) * this.sampleRate);
+    this.maxStartWaitMs = options.maxStartWaitMs ?? 260;
+    this.maxHeaderWaitMs = options.maxHeaderWaitMs ?? 420;
+    this.startLeadSec = options.startLeadSec ?? 0.065;
+    this.minRecoveryBufferSamples = Math.round(((options.minRecoveryBufferMs ?? 150) / 1000) * this.sampleRate);
+    this.maxRecoveryWaitMs = options.maxRecoveryWaitMs ?? 140;
+    this.recoveryLeadSec = options.recoveryLeadSec ?? 0.14;
+    this.fadeRampSec = options.fadeRampSec ?? 0.005;
+    this.setTimer =
+      options.setTimer ??
+      ((fn, ms) => (typeof window !== 'undefined' ? window.setTimeout(fn, ms) : Number(setTimeout(fn, ms))));
+    this.clearTimer =
+      options.clearTimer ??
+      ((id) => {
+        if (typeof window !== 'undefined') window.clearTimeout(id);
+        else clearTimeout(id);
+      });
+  }
+
+  getNextStartTime(): number {
+    return this.nextStartTime;
+  }
+
+  getPendingSamples(): number {
+    return this.pendingSamples;
+  }
+
+  hasPendingAudio(): boolean {
+    return this.pendingSamples > 0;
+  }
+
+  remainingMs(ctx: PcmSchedulerAudioContext | null): number {
+    const pendingMs = (this.pendingSamples / this.sampleRate) * 1000;
+    const queuedMs = ctx ? Math.max(0, (this.nextStartTime - ctx.currentTime) * 1000) : 0;
+    return Math.ceil(pendingMs + queuedMs);
+  }
+
+  hasPendingOrActiveAudio(ctx: PcmSchedulerAudioContext | null, activeSourcesLength: number): boolean {
+    if (this.pendingSamples > 0 || activeSourcesLength > 0) return true;
+    if (!ctx) return false;
+    return this.nextStartTime > ctx.currentTime + 0.01;
+  }
+
+  noteTurnBoundary(): void {
+    this.hasScheduledInTurn = false;
+    this.headerExtendedWaitUsed = false;
+  }
+
+  reset(ctx: PcmSchedulerAudioContext | null, activeSources: PcmSchedulerSourceNode[]): void {
+    this.epoch += 1;
+    if (this.flushTimerId !== null) {
+      this.clearTimer(this.flushTimerId);
+      this.flushTimerId = null;
+    }
+    this.pendingChunks = [];
+    this.pendingSamples = 0;
+    this.hasScheduledInTurn = false;
+    this.headerExtendedWaitUsed = false;
+    this.latestFlushParams = null;
+    this.nextStartTime = ctx ? ctx.currentTime : 0;
+    if (activeSources.length > 0) {
+      for (const src of activeSources) {
+        try {
+          src.onended = null;
+          src.stop();
+          src.disconnect();
+        } catch {
+          // Ignore already stopped source
+        }
+      }
+      activeSources.length = 0;
+    }
+  }
+
+  private cancelTimer(): void {
+    if (this.flushTimerId !== null) {
+      this.clearTimer(this.flushTimerId);
+      this.flushTimerId = null;
+    }
+  }
+
+  private scheduleTimerFlush(delayMs: number, expectedEpoch: number, isInitialStart: boolean): void {
+    this.cancelTimer();
+    this.flushTimerId = this.setTimer(() => {
+      this.flushTimerId = null;
+      if (this.epoch !== expectedEpoch || !this.latestFlushParams) return;
+      // If only a sub-20ms 2-byte WS header blip arrived on initial turn start, allow one short
+      // extra wait so the real first speech burst (~379ms) coalesces cleanly without creating a gap.
+      const minHeaderSamples = Math.round(0.02 * this.sampleRate);
+      if (
+        isInitialStart &&
+        !this.headerExtendedWaitUsed &&
+        this.pendingSamples > 0 &&
+        this.pendingSamples < minHeaderSamples
+      ) {
+        const extraWait = Math.max(40, this.maxHeaderWaitMs - this.maxStartWaitMs);
+        this.headerExtendedWaitUsed = true;
+        this.scheduleTimerFlush(extraWait, expectedEpoch, false);
+        return;
+      }
+      this.flush(this.latestFlushParams);
+    }, delayMs);
+  }
+
+  enqueueChunks(pcmBase64Chunks: string[], params: PcmSchedulerFlushParams): number {
+    if (!pcmBase64Chunks || pcmBase64Chunks.length === 0) return 0;
+    let added = 0;
+    for (const chunkB64 of pcmBase64Chunks) {
+      const decoded = decodePcm16Base64ToFloat32(chunkB64);
+      if (decoded.length > 0) {
+        this.pendingChunks.push(decoded);
+        this.pendingSamples += decoded.length;
+        added += decoded.length;
+      }
+    }
+    if (added === 0) return 0;
+    this.latestFlushParams = params;
+
+    const now = params.ctx.currentTime;
+    const isInitialTurnStart = !this.hasScheduledInTurn;
+    const isPipelineAhead = this.hasScheduledInTurn && this.nextStartTime >= now - 0.004;
+
+    if (isPipelineAhead) {
+      return this.flush(params);
+    }
+
+    if (isInitialTurnStart) {
+      if (this.pendingSamples >= this.minStartBufferSamples) {
+        return this.flush(params);
+      }
+      if (this.flushTimerId === null) {
+        this.scheduleTimerFlush(this.maxStartWaitMs, this.epoch, true);
+      }
+      return 0;
+    }
+
+    // Mid-turn underrun recovery: wait briefly to coalesce an incoming burst before scheduling
+    if (this.pendingSamples >= this.minRecoveryBufferSamples) {
+      return this.flush(params);
+    }
+    if (this.flushTimerId === null) {
+      this.scheduleTimerFlush(this.maxRecoveryWaitMs, this.epoch, false);
+    }
+    return 0;
+  }
+
+  flush(params?: PcmSchedulerFlushParams): number {
+    this.cancelTimer();
+    const activeParams = params || this.latestFlushParams;
+    if (!activeParams || this.pendingSamples <= 0) return 0;
+
+    const { ctx, getDestination, activeSources, onChunkScheduled, onIdle } = activeParams;
+    const totalSamples = this.pendingSamples;
+    const merged = new Float32Array(totalSamples);
+    let offset = 0;
+    for (const chunk of this.pendingChunks) {
+      merged.set(chunk, offset);
+      offset += chunk.length;
+    }
+    this.pendingChunks = [];
+    this.pendingSamples = 0;
+    this.headerExtendedWaitUsed = false;
+
+    const now = ctx.currentTime;
+    const wasRecovery = this.hasScheduledInTurn && this.nextStartTime < now - 0.004;
+    const needsLeadReset = !this.hasScheduledInTurn || wasRecovery || this.nextStartTime <= 0;
+    let needsFadeIn = false;
+
+    if (needsLeadReset) {
+      const leadSec = wasRecovery ? this.recoveryLeadSec : this.startLeadSec;
+      this.nextStartTime = now + leadSec;
+      needsFadeIn = true;
+    } else if (this.nextStartTime < now) {
+      this.nextStartTime = now;
+    }
+
+    this.hasScheduledInTurn = true;
+    const buffer = ctx.createBuffer(1, totalSamples, this.sampleRate);
+    buffer.getChannelData(0).set(merged);
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+
+    const startAt = this.nextStartTime;
+    const duration = buffer.duration > 0 ? buffer.duration : totalSamples / this.sampleRate;
+    this.nextStartTime = startAt + duration;
+
+    const destination = getDestination(ctx);
+    let fadeGain: PcmSchedulerGainNode | null = null;
+    if (needsFadeIn && typeof ctx.createGain === 'function') {
+      fadeGain = ctx.createGain();
+      const rampEnd = startAt + Math.min(this.fadeRampSec, duration * 0.45);
+      fadeGain.gain.setValueAtTime(0.0001, startAt);
+      fadeGain.gain.linearRampToValueAtTime(1.0, rampEnd);
+      source.connect(fadeGain);
+      fadeGain.connect(destination);
+    } else {
+      source.connect(destination);
+    }
+
+    source.start(startAt);
+    activeSources.push(source);
+
+    const myEpoch = this.epoch;
+    source.onended = () => {
+      if (fadeGain) {
+        try {
+          fadeGain.disconnect();
+        } catch {
+          // Ignore
+        }
+      }
+      const idx = activeSources.indexOf(source);
+      if (idx !== -1) {
+        activeSources.splice(idx, 1);
+      }
+      if (this.epoch === myEpoch && activeSources.length === 0 && this.pendingSamples === 0) {
+        onIdle?.();
+      }
+    };
+
+    onChunkScheduled?.({
+      startAt,
+      duration,
+      sampleCount: totalSamples,
+      wasRecovery,
+    });
+    return totalSamples;
+  }
 }

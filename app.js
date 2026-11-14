@@ -10513,7 +10513,7 @@ function dismissAllModalsDefensive(){
 }
 window.dismissAllModalsDefensive=dismissAllModalsDefensive;
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;dismissAllModalsDefensive();if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(state.view&&state.view!==v&&state.view!=='chat'){state._previousView=state.view;}if(state.view==='chat'&&v!=='chat'){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(v==='chat'&&!aiDoorAllowed())return false;dismissAllModalsDefensive();if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(state.view&&state.view!==v&&state.view!=='chat'){state._previousView=state.view;}if(state.view==='chat'&&v!=='chat'){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
 function handleTopbarBack(){if(typeof go!=='function')return;if(state.view==='chat'){const prev=state._previousView;if(prev&&VALID_VIEWS.has(prev)&&prev!=='chat'){go(prev);return;}if(typeof self.FiezelBackNav?.depth==='function'&&self.FiezelBackNav.depth()>0){try{if(self.FiezelBackNav.back())return;}catch(_){}}go('home');return;}const subViews=['grammar','vocab','skills','listening','speaking','reading','writing','library','kana','ask','search','story','pte'];if(subViews.includes(state.view)){go('latihan')}else{go('home')}} window.handleTopbarBack=handleTopbarBack;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
@@ -12506,7 +12506,7 @@ function conversationPartnerChatSnapshot(course){
   return{userTurns,correctionOn:!!(saved&&saved.correctionMode===true)};
 }
 function conversationPartnerHomeCardMarkup(){
-  const course=jaCourseOn()?'ja':'en';
+  const course=(typeof activeTargetLang==='function'&&activeTargetLang())||(jaCourseOn()?'ja':'en');
   const snap=conversationPartnerChatSnapshot(course);
   const nama=FiezelI18n.t('chat.nama');
   const lanjut=snap.userTurns>0;
@@ -12545,7 +12545,7 @@ function ensureSharedKawanAudioCtx(){
     const AC=self.AudioContext||self.webkitAudioContext;if(!AC)return null;
     let ctx=self.__fzSharedLiveAudioCtx;
     if(!ctx||ctx.state==='closed'){
-      try{ctx=new AC({latencyHint:'interactive'})}catch(_){ctx=new AC()}
+      try{ctx=new AC({latencyHint:'balanced'})}catch(_){ctx=new AC()}
       self.__fzSharedLiveAudioCtx=ctx;
     }
     self.__fzKawanRingCtx=ctx;
@@ -12677,12 +12677,13 @@ function closeKawanBicaraCallModal(keepSharedMedia){
 function kawanModalEsc(e){if(e.key==='Escape'){closeKawanBicaraCallModal(false)}}
 function openKawanBicaraCallModal(){
   if($('fzKawanCallModal'))return false;
+  if(!aiDoorAllowed())return false;
   // Stage 1 (Mochi SOS showConfirmModal parity): Pre-warm shared WebAudio + hardware microphone on Tap #1
   // so OS PlayAndRecord switch & mic permission complete BEFORE Tap #2!
   try{warmKawanAudioAndMic()}catch(_){}
   haptic('tap');uiSfx('open');
-  const course=jaCourseOn()?'ja':'en';
-  const persona=course==='ja'?'Sensei Nanami':'Coach Alex';
+  const course=(typeof activeTargetLang==='function'&&activeTargetLang())||(jaCourseOn()?'ja':'en');
+  const persona=course==='ja'?'Sensei Nanami':(course==='zh'?'Xiao Mochi':'Coach Alex');
   const title=FiezelI18n.t('home.kawan.modal-title','Telepon aku sekarang');
   const sub=FiezelI18n.t('home.kawan.modal-sub','Latih refleks bicaramu secara alami tanpa takut salah.');
   const cta=FiezelI18n.t('home.kawan.modal-cta','Telepon {persona}',{persona});
@@ -12762,7 +12763,9 @@ function openKawanBicaraCallModal(){
     try{warmKawanAudioAndMic()}catch(_){}
     haptic('confirm');playKawanRingtone();
     try{sessionStorage.setItem('fz_kawan_autocall','1')}catch(_){}
-    try{self.FiezelInteractiveChat?.StudioBridge?.send?.('fz.shell.autocall',{at:Date.now()})}catch(_){}
+    if(document.getElementById('fzMitraKaiwaStudioFrame')){
+      try{self.FiezelInteractiveChat?.StudioBridge?.send?.('fz.shell.autocall',{at:Date.now()})}catch(_){}
+    }
     setTimeout(()=>{closeKawanBicaraCallModal(true);go('chat')},160);
   };
   requestAnimationFrame(()=>{try{phone.focus({preventScroll:true})}catch(_){}});

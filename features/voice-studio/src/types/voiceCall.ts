@@ -51,7 +51,19 @@ export interface VoiceUiAction {
   bankTopicId?: string;
   sourceLayer?: 'bank' | 'ai_dynamic' | 'live_ws_native';
   topicTitle?: string;
-  focusType?: 'grammar' | 'vocab' | 'kanji_hanzi' | 'pronunciation' | 'kanji' | 'kana' | 'sentence_drill' | string;
+  focusType?:
+    | 'grammar'
+    | 'vocab'
+    | 'kanji_hanzi'
+    | 'pronunciation'
+    | 'kanji'
+    | 'kana'
+    | 'sentence_drill'
+    | 'pte_read_aloud'
+    | 'pte_describe_image'
+    | 'pte_scorecard'
+    | 'ssw_tactical_board'
+    | string;
   explanationText?: string;
   patternFormula?: string;
   drillInstruction?: string;
@@ -84,6 +96,9 @@ export interface VoiceUiAction {
   secondRightWord?: string;
   secondRightTag?: string;
   secondTailText?: string;
+  misconceptionId?: string;
+  whyFailsId?: string;
+  whyFailsTh?: string;
 }
 
 export interface VocabPrereqItem {

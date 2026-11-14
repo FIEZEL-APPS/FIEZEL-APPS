@@ -15,6 +15,11 @@ import type {
   SpeakingSessionMetric,
   TargetLang,
 } from '../types/voiceCall.ts';
+import {
+  alignSpokenToTargetPassage,
+  type SpeechAlignmentResult,
+} from './speechAlignment.ts';
+import { ensureSharedAnonSession } from './liveCallHelper.ts';
 
 /**
  * Canonical parameters from coordination/braincore-contract.json
@@ -39,6 +44,10 @@ const TAB_ID = `tab_${Math.random().toString(36).slice(2, 10)}_${Date.now()}`;
 
 let studioNonce: string | null = null;
 let studioSeq: number = 0;
+
+export function getNextStudioSeq(): number {
+  return studioSeq++;
+}
 
 export function getStudioNonce(): string {
   if (studioNonce !== null) return studioNonce;
@@ -1137,12 +1146,23 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: Le
 export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): void {
   try {
     if (typeof localStorage !== 'undefined') {
+      const compLower = String(eventPayload.competencyId || '').toLowerCase();
+      const scenLower = String(eventPayload.scenarioId || '').toLowerCase();
       const coursePrefix =
-        String(eventPayload.competencyId || '').includes('_ja_') ||
-        String(eventPayload.scenarioId || '').includes('_ja_') ||
-        localStorage.getItem('fz_target_course') === 'ja'
-          ? 'ja'
-          : 'en';
+        compLower.includes('_zh_') ||
+        compLower.startsWith('zh_') ||
+        scenLower.includes('_zh_') ||
+        scenLower.startsWith('scen_zh') ||
+        localStorage.getItem('fz_target_course') === 'zh'
+          ? 'zh'
+          : compLower.includes('_ja_') ||
+              compLower.startsWith('ja_') ||
+              compLower.includes('kaiwa_ja') ||
+              scenLower.includes('_ja_') ||
+              scenLower.startsWith('scen_ja') ||
+              localStorage.getItem('fz_target_course') === 'ja'
+            ? 'ja'
+            : 'en';
       const chatKey = 'fiezel-interactive-chat-v1';
       let chatSaved: any = null;
       try {
@@ -1171,8 +1191,8 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
       if (!eventPayload.ok && eventPayload.misconceptionId) {
         try {
           const targetKeys =
-            coursePrefix === 'ja'
-              ? ['fiezel-misconception-ledger-v1@ja', 'fiezel-misconception-ledger-v1']
+            coursePrefix === 'ja' || coursePrefix === 'zh'
+              ? [`fiezel-misconception-ledger-v1@${coursePrefix}`, 'fiezel-misconception-ledger-v1']
               : ['fiezel-misconception-ledger-v1'];
           const nowMs = Date.now();
           const mId = String(eventPayload.misconceptionId);
@@ -1275,6 +1295,18 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
           window.location.origin && window.location.origin !== 'null' ? window.location.origin : '*';
         const nonce = getStudioNonce();
         if (nonce) {
+          const detectedCourse =
+            (eventPayload as any).course === 'zh' ||
+            String(eventPayload.competencyId || '').includes('zh') ||
+            String(eventPayload.scenarioId || '').includes('_zh_') ||
+            localStorage.getItem('fz_target_course') === 'zh'
+              ? 'zh'
+              : (eventPayload as any).course === 'ja' ||
+                  String(eventPayload.competencyId || '').includes('ja') ||
+                  String(eventPayload.scenarioId || '').includes('_ja_') ||
+                  localStorage.getItem('fz_target_course') === 'ja'
+                ? 'ja'
+                : 'en';
           window.parent.postMessage(
             {
               v: 1,
@@ -1286,10 +1318,7 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
                 turnId: eventPayload.id || `turn_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
                 competencyId: String(eventPayload.competencyId || 'kaiwa_general'),
                 scenarioId: String(eventPayload.scenarioId || 'scen_ja_n5_kissaten'),
-                course:
-                  String(eventPayload.competencyId || '').includes('ja') || (eventPayload as any).course === 'ja'
-                    ? 'ja'
-                    : 'en',
+                course: detectedCourse,
                 verdict:
                   typeof (eventPayload as any).verdict === 'boolean' || (eventPayload as any).verdict === null
                     ? (eventPayload as any).verdict
@@ -1302,11 +1331,12 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
             },
             targetOrigin
           );
+        } else {
+          window.parent.postMessage(
+            { type: 'FIEZEL_VOICE_STUDIO_ATTEMPT', payload: eventPayload },
+            targetOrigin
+          );
         }
-        window.parent.postMessage(
-          { type: 'FIEZEL_VOICE_STUDIO_ATTEMPT', payload: eventPayload },
-          targetOrigin
-        );
       }
     }
     if (typeof indexedDB !== 'undefined') {
@@ -1588,7 +1618,7 @@ export function checkPrerequisiteStatus(
   prereqCompetencyId?: string
 ): { isReady: boolean; pMastery: number; stateLabel: MasteryStateName } {
   if (!prereqCompetencyId) {
-    return { isReady: true, pMastery: 1.0, stateLabel: 'mastered' };
+    return { isReady: true, pMastery: 1.0, stateLabel: 'MASTERED' };
   }
   const mergedComps = mergeHostBraincoreMastery(state.competencies || {});
   const comp =
@@ -2171,6 +2201,10 @@ function resolveSyncApiBase(): string {
   return 'https://api.fiezel.my.id';
 }
 
+async function ensureBrainSyncCookie(apiBase: string, force = false): Promise<void> {
+  await ensureSharedAnonSession(apiBase, force);
+}
+
 export async function brainSyncFlush(
   state: BraincoreStoreState
 ): Promise<{ nextState: BraincoreStoreState; flushedCount: number }> {
@@ -2178,18 +2212,30 @@ export async function brainSyncFlush(
     return { nextState: state, flushedCount: 0 };
   }
   try {
-    const syncUrl = `${resolveSyncApiBase()}/api/braincore/sync`;
-    const res = await fetch(syncUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tabId: state.tabId,
-        attempts: state.syncQueue,
-      }),
+    const apiBase = resolveSyncApiBase();
+    await ensureBrainSyncCookie(apiBase);
+    const syncUrl = `${apiBase}/api/braincore/sync`;
+    const postPayload = JSON.stringify({
+      tabId: state.tabId,
+      attempts: state.syncQueue,
     });
+    let res = await fetch(syncUrl, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: postPayload,
+    });
+    if (res.status === 401) {
+      await ensureBrainSyncCookie(apiBase, true);
+      res = await fetch(syncUrl, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: postPayload,
+      });
+    }
     if (!res.ok) {
-      // If server returns error, cap syncQueue to 40 items to prevent local storage quota crash
-      const capped = state.syncQueue.length > 40 ? state.syncQueue.slice(-30) : state.syncQueue;
+      const capped = state.syncQueue.length > 80 ? state.syncQueue.slice(-60) : state.syncQueue;
       const updated = saveBraincoreState({
         ...state,
         syncQueue: capped,
@@ -2210,7 +2256,7 @@ export async function brainSyncFlush(
     });
     return { nextState: updated, flushedCount: acceptedIds.size };
   } catch {
-    const capped = state.syncQueue.length > 40 ? state.syncQueue.slice(-30) : state.syncQueue;
+    const capped = state.syncQueue.length > 80 ? state.syncQueue.slice(-60) : state.syncQueue;
     const updated = saveBraincoreState({
       ...state,
       syncQueue: capped,
@@ -2824,6 +2870,8 @@ export interface PteDiagnosticSpeechInput {
   expectedMax?: string;
   expectedMin?: string;
   expectedConclusion?: string;
+  expectedPassageText?: string;
+  targetLang?: TargetLang;
   learnerName?: string;
 }
 
@@ -2872,6 +2920,7 @@ export interface PteDiagnosticSpeechResult {
     pronunciationP: number;
     pronunciationTheta: number;
   };
+  readAloudAlignment?: SpeechAlignmentResult;
   clinicalDossierText: string;
 }
 
@@ -3052,7 +3101,23 @@ export function diagnosePteCandidateSpeech(
   if (!hasConclusion) missingStages.push('Conclusion (Kesimpulan)');
 
   const stagesMetCount = [hasIntro, hasKeyElements, hasMax, hasMin, hasConclusion].filter(Boolean).length;
-  const contentScore = stagesMetCount >= 4 ? 3 : stagesMetCount >= 2 ? 2 : 1;
+  const expectedPassage = (input.expectedPassageText || '').trim();
+  const readAloudAlignment = expectedPassage
+    ? alignSpokenToTargetPassage(expectedPassage, transcript, input.targetLang || 'en')
+    : undefined;
+  const contentScore = readAloudAlignment
+    ? readAloudAlignment.passed && readAloudAlignment.wordAccuracy >= 0.85
+      ? 3
+      : readAloudAlignment.phoneticAccuracy >= 0.65
+        ? 2
+        : wordCount === 0
+          ? 0
+          : 1
+    : stagesMetCount >= 4
+      ? 3
+      : stagesMetCount >= 2
+        ? 2
+        : 1;
 
   // 5. Kalkulasi Skor Multi-Faktor Akustik-Temporal (Fluency & Pronunciation)
   let rateBase = 5.0;
@@ -3140,17 +3205,39 @@ export function diagnosePteCandidateSpeech(
   if (selfCorrectionCount > 0) fluencyReasons.push(`${selfCorrectionCount} koreksi diri`);
 
   let basePron = 5.0;
+  if (readAloudAlignment) {
+    basePron = Math.min(basePron, 1.0 + readAloudAlignment.phoneticAccuracy * 4.0);
+    if (!readAloudAlignment.passed) {
+      basePron = Math.min(basePron, 2.8);
+    }
+  }
   if (droppedPluralS.length > 0) basePron -= Math.min(1.5, droppedPluralS.length * 0.75);
   if (droppedPastEd.length > 0) basePron -= Math.min(1.5, droppedPastEd.length * 0.75);
   const pronunciationScore = Number(clampBound(basePron, 1.0, 5.0).toFixed(1));
 
   // Pearson Concordance Formula
   const rawFrac = (fluencyScore / 5) * 0.4 + (pronunciationScore / 5) * 0.35 + (contentScore / 3) * 0.25;
-  const pearsonEstimate = Math.round(10 + rawFrac * 80);
-  const passedTarget = pearsonEstimate >= 42;
+  const pearsonEstimate = readAloudAlignment && !readAloudAlignment.passed
+    ? Math.min(39, Math.round(10 + rawFrac * 70))
+    : Math.round(10 + rawFrac * 80);
+  const passedTarget = readAloudAlignment
+    ? readAloudAlignment.passed && pearsonEstimate >= 42
+    : pearsonEstimate >= 42;
 
   // 6. Misconception Ledger Integration
   const misconceptionsFound: Array<{ id: string; label: string; detail: string }> = [];
+  if (readAloudAlignment && !readAloudAlignment.passed) {
+    const pairSample = readAloudAlignment.mispronouncedPairs
+      .slice(0, 4)
+      .map((p) => `"${p.heard}" -> seharusnya "${p.expected}"`)
+      .join(', ');
+    const missSample = readAloudAlignment.missedWords.slice(0, 5).join(', ');
+    misconceptionsFound.push({
+      id: 'pte_read_aloud_pronunciation_mismatch',
+      label: `Read Aloud Accuracy ${Math.round(readAloudAlignment.wordAccuracy * 100)}% (Fonetik ${Math.round(readAloudAlignment.phoneticAccuracy * 100)}%)`,
+      detail: `Bacaan tidak cocok dengan teks target di layar.${pairSample ? ` Salah ucap: ${pairSample}.` : ''}${missSample ? ` Kata terlewat: ${missSample}.` : ''}`,
+    });
+  }
   if (selfCorrectionCount > 0) {
     misconceptionsFound.push({
       id: 'pte_self_correction_penalty',
@@ -3196,7 +3283,7 @@ export function diagnosePteCandidateSpeech(
       detail: `Terdeteksi ${hesitationCount} keraguan ("${hesitationTokens.join(', ')}"). Memotong skor Oral Fluency.`,
     });
   }
-  if (!hasConclusion) {
+  if (!hasConclusion && !readAloudAlignment) {
     misconceptionsFound.push({
       id: 'pte_missing_conclusion',
       label: 'Missing Conclusion Sentence',
@@ -3212,37 +3299,30 @@ export function diagnosePteCandidateSpeech(
 
   try {
     const brainState = loadBraincoreState();
+    const nowTs = Date.now();
     const updateBktSkill = (skillId: string, isSuccess: boolean) => {
-      const rec = brainState.competencies[skillId] || {
-        competencyId: skillId,
-        masteryProb: BRAINCORE_PARAMS.P_INIT,
-        attemptsCount: 0,
-        correctCount: 0,
-        streak: 0,
-        lastAttemptTs: Date.now(),
-        retentionDecayTs: Date.now(),
-        halfLifeDays: BRAINCORE_PARAMS.HALF_LIFE_DAYS,
-        status: 'learning',
-      };
-      const p = rec.masteryProb;
-      const pObs = isSuccess
-        ? (p * (1 - BRAINCORE_PARAMS.P_SLIP)) /
-          (p * (1 - BRAINCORE_PARAMS.P_SLIP) + (1 - p) * BRAINCORE_PARAMS.P_GUESS)
-        : (p * BRAINCORE_PARAMS.P_SLIP) /
-          (p * BRAINCORE_PARAMS.P_SLIP + (1 - p) * (1 - BRAINCORE_PARAMS.P_GUESS));
-      const nextP = Math.max(0.05, Math.min(0.99, pObs + (1 - pObs) * BRAINCORE_PARAMS.P_LEARN));
-      rec.masteryProb = Number(nextP.toFixed(3));
-      rec.attemptsCount += 1;
+      const existing = brainState.competencies[skillId];
+      const rec: CompetencyRecord = existing
+        ? { ...existing }
+        : createBlankCompetency(skillId, BRAINCORE_PARAMS.P_INIT);
+      const nextP = bktUpdate(rec.pMastery, isSuccess, 0, isSuccess ? 0.85 : 0.9);
+      rec.pMastery = Number(nextP.toFixed(3));
+      rec.pMasteryDecayed = rec.pMastery;
+      rec.attempts += 1;
+      rec.exposures += 1;
       if (isSuccess) {
-        rec.correctCount += 1;
+        rec.correct += 1;
         rec.streak += 1;
+        if (!rec.masteredAt && rec.pMastery >= BRAINCORE_PARAMS.MASTERY_T) {
+          rec.masteredAt = nowTs;
+        }
       } else {
         rec.streak = 0;
       }
-      rec.lastAttemptTs = Date.now();
-      rec.status = nextP >= BRAINCORE_PARAMS.MASTERY_T ? 'mastered' : 'learning';
+      rec.lastAt = nowTs;
+      rec.state = deriveMasteryState(rec);
       brainState.competencies[skillId] = rec;
-      return { p: rec.masteryProb, theta: abilityThetaFromMastery(rec.masteryProb) };
+      return { p: rec.pMastery, theta: abilityThetaFromMastery(rec.pMastery) };
     };
 
     const fRes = updateBktSkill('pte_oral_fluency', fluencyScore >= 3.5);
@@ -3254,36 +3334,54 @@ export function diagnosePteCandidateSpeech(
     pronP = pRes.p;
     pronTheta = pRes.theta;
 
-    // Catat ke Misconception Ledger
+    if (!brainState.misconceptionLedger || Array.isArray(brainState.misconceptionLedger)) {
+      brainState.misconceptionLedger = {};
+    }
+
     misconceptionsFound.forEach((m) => {
-      brainState.misconceptionLedger.push({
-        id: `pte_misc_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        ruleId: m.id,
-        ruleTitle: m.label,
+      const ledgerKey = `pte_pronunciation::${m.id}`;
+      const prevEntry = brainState.misconceptionLedger[ledgerKey];
+      brainState.misconceptionLedger[ledgerKey] = {
+        competencyId: 'pte_pronunciation',
         misconceptionId: m.id,
-        whyFailsId: m.detail,
-        userAttempt: transcript.slice(0, 80),
-        correctTarget: input.questionTitle || 'PTE Exam Question',
-        timestamp: Date.now(),
-        status: 'active',
-        streakCorrection: 0,
-      });
+        frequency: (prevEntry?.frequency || 0) + 1,
+        firstAt: prevEntry?.firstAt || nowTs,
+        lastAt: nowTs,
+        resolved: false,
+        lastUtterance: transcript.slice(0, 80),
+        correctionPattern: m.detail || input.questionTitle || 'PTE Exam Question',
+      };
     });
 
-    if (brainState.misconceptionLedger.length > 80) {
-      brainState.misconceptionLedger = brainState.misconceptionLedger.slice(-80);
+    const ledgerKeys = Object.keys(brainState.misconceptionLedger);
+    if (ledgerKeys.length > 80) {
+      ledgerKeys
+        .sort(
+          (a, b) =>
+            (brainState.misconceptionLedger[a]?.lastAt || 0) -
+            (brainState.misconceptionLedger[b]?.lastAt || 0)
+        )
+        .slice(0, ledgerKeys.length - 80)
+        .forEach((oldKey) => {
+          delete brainState.misconceptionLedger[oldKey];
+        });
     }
 
     saveBraincoreState(brainState);
 
     // Update PteMasterState
-    const missedWordsList = [
-      ...droppedPluralS.map((d) => d.expected),
-      ...droppedPastEd.map((d) => d.expected),
-    ];
+    const missedWordsList = readAloudAlignment
+      ? [
+          ...readAloudAlignment.missedWords,
+          ...readAloudAlignment.mispronouncedPairs.map((p) => p.expected),
+        ]
+      : [
+          ...droppedPluralS.map((d) => d.expected),
+          ...droppedPastEd.map((d) => d.expected),
+        ];
     recordPteMasterAttempt({
-      stage: 1,
-      taskName: 'Describe Image',
+      stage: readAloudAlignment ? 2 : 1,
+      taskName: readAloudAlignment ? 'Read Aloud' : 'Describe Image',
       fluency: Math.round(fluencyScore),
       pronunciation: Math.round(pronunciationScore),
       content: contentScore,
@@ -3304,9 +3402,13 @@ export function diagnosePteCandidateSpeech(
 
   const droppedPluralSummary = droppedPluralS.map((d) => `"${d.heard}" -> "${d.expected}"`).join(', ');
 
+  const alignmentDossier = readAloudAlignment
+    ? `\n- Read Aloud Word Alignment: ${readAloudAlignment.exactMatches}/${readAloudAlignment.expectedCount} kata tepat (${Math.round(readAloudAlignment.wordAccuracy * 100)}%, fonetik ${Math.round(readAloudAlignment.phoneticAccuracy * 100)}%)${readAloudAlignment.mispronouncedPairs.length > 0 ? ` | Salah ucap: ${readAloudAlignment.mispronouncedPairs.slice(0, 4).map((p) => `"${p.heard}"->"${p.expected}"`).join(', ')}` : ''}${readAloudAlignment.missedWords.length > 0 ? ` | Terlewat: ${readAloudAlignment.missedWords.slice(0, 5).join(', ')}` : ''}`
+    : '';
+
   const clinicalDossierText = `[BRAINCORE REAL-TIME CLINICAL DIAGNOSTIC DOSSIER]:
 Candidate: ${learner}
-Evaluated Task: ${input.questionTitle || 'Speaking Diagnostic'}
+Evaluated Task: ${input.questionTitle || 'Speaking Diagnostic'}${alignmentDossier}
 - Real Speech Pacing: ${wpm} WPM (Articulation ${articulationWpm} WPM | Durasi ${duration.toFixed(1)}s${isAcousticTiming ? `, Vokal aktif ${activeSec.toFixed(1)}s / ${Math.round(phonationRatio * 100)}%` : ''}) [${pacingQuality === 'optimal' ? 'OPTIMAL 115-152 WPM' : pacingQuality === 'slow' ? 'LAMBAT < 115 WPM' : 'TERBURU-BURU > 152 WPM'}]
 - Pause Breakdown: ${longPausesCount} long (>=2s), ${hesitationPausesCount} hesitation (0.7-2s), ${shortPausesCount} breath (<0.7s) [Source: ${measurementSource}]
 - Oral Fluency Score: ${fluencyScore} / 5.0 (BKT P(L): ${fluencyP.toFixed(2)}, Latent Ability Theta: ${fluencyTheta.toFixed(2)}) — ${fluencyReasons.join('; ')}
@@ -3366,6 +3468,7 @@ ${droppedPluralS.length > 0 || droppedPastEd.length > 0 ? 'Tuntut murid melafalk
       pronunciationP: pronP,
       pronunciationTheta: pronTheta,
     },
+    readAloudAlignment,
     clinicalDossierText,
   };
 }

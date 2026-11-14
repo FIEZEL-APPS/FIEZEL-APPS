@@ -8,7 +8,11 @@
  * from ever triggering user-speaking UI state, false barge-in, or silence-wait freezes.
  */
 
-import { float32At16kToPcm16Base64 } from './handyVad';
+import {
+  HandyHumanVad,
+  float32At16kToPcm16Base64,
+  hasDynamicSpeechModulation,
+} from './handyVad';
 
 export interface SileroFrameTelemetry {
   frameMs: number;
@@ -24,6 +28,7 @@ export interface SileroVadGateCallbacks {
   isWorkbenchOpen?: () => boolean;
   onHumanSpeechState: (speaking: boolean) => void;
   onHumanBargeIn: () => void;
+  onBargeCandidateAudio?: (samples16k: Float32Array, rms: number) => void;
   onSpeechPcm16kBase64: (pcmBase64: string) => void;
   onSpeechEnded: () => void;
   onFrameTelemetry?: (telemetry: SileroFrameTelemetry) => void;
@@ -64,24 +69,94 @@ function resolveSileroBaseCandidates(): string[] {
   return Array.from(new Set(out));
 }
 
+function loadScriptTag(src: string, attrName: string): Promise<boolean> {
+  return new Promise<boolean>((resolve) => {
+    const existing = document.querySelector(`script[${attrName}][src="${src}"]`);
+    if (existing) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.setAttribute(attrName, '1');
+    script.onload = () => resolve(true);
+    script.onerror = () => {
+      script.remove();
+      resolve(false);
+    };
+    (document.head || document.documentElement).appendChild(script);
+  });
+}
+
+function configureOrtWasm(ortObj: any, baseHref: string): void {
+  try {
+    if (ortObj?.env?.wasm) {
+      ortObj.env.wasm.wasmPaths = baseHref;
+      ortObj.env.wasm.numThreads = 1;
+      ortObj.env.wasm.proxy = false;
+    }
+  } catch {
+    // ignore
+  }
+}
+
+const SILERO_WARM_FILES = [
+  'bundle.min.js',
+  'ort-wasm-simd-threaded.js',
+  'ort-wasm-simd-threaded.wasm',
+  'silero_vad_v5.onnx',
+  'vad.worklet.bundle.min.js',
+];
+
+function warmSileroVendorCache(baseHref: string): void {
+  if (typeof window === 'undefined' || !('caches' in window) || typeof fetch !== 'function') return;
+  void (async () => {
+    try {
+      const keys = await window.caches.keys();
+      const targetCacheName =
+        keys.find((k) => k.startsWith('fiezel-v')) ||
+        `fiezel-v${String((window as unknown as { FIEZEL_VERSION?: string }).FIEZEL_VERSION || '5.19.0')}`;
+      const cache = await window.caches.open(targetCacheName);
+      await Promise.all(
+        SILERO_WARM_FILES.map(async (file) => {
+          const url = new URL(file, baseHref).href;
+          try {
+            const hit = await cache.match(url);
+            if (!hit) {
+              const res = await fetch(url, { credentials: 'same-origin' });
+              if (res && res.ok) {
+                await cache.put(url, res.clone());
+              }
+            }
+          } catch {
+            // Non-blocking warmup
+          }
+        })
+      );
+    } catch {
+      // CacheStorage unavailable (e.g. private browsing)
+    }
+  })();
+}
+
 function loadSileroBundle(): Promise<{ vad: GlobalVadNamespace; baseHref: string } | null> {
   if (typeof window === 'undefined' || typeof document === 'undefined' || typeof WebAssembly === 'undefined') {
     return Promise.resolve(null);
   }
   const win = window as unknown as {
     vad?: GlobalVadNamespace;
-    ort?: unknown;
+    ort?: { env?: { wasm?: Record<string, unknown> } };
     __fzSileroBaseHref?: string;
   };
-  // @ricky0123/vad-web UMD bundle requires global `window.ort` (onnxruntime-web).
-  // Skip script injection cleanly when `window.ort` is not preloaded to avoid dead script tags and console errors.
-  if (!win.ort) {
-    return Promise.resolve(null);
-  }
   if (win.vad?.MicVAD && typeof win.vad.MicVAD.new === 'function') {
+    const activeBase = win.__fzSileroBaseHref || resolveSileroBaseCandidates()[0];
+    if (win.ort) {
+      configureOrtWasm(win.ort, activeBase);
+    }
     return Promise.resolve({
       vad: win.vad,
-      baseHref: win.__fzSileroBaseHref || resolveSileroBaseCandidates()[0],
+      baseHref: activeBase,
     });
   }
 
@@ -94,33 +169,30 @@ function loadSileroBundle(): Promise<{ vad: GlobalVadNamespace; baseHref: string
   const candidates = resolveSileroBaseCandidates();
   bundleLoadPromise = new Promise<GlobalVadNamespace | null>((resolve) => {
     let idx = 0;
-    const tryNext = () => {
+    const tryNext = async () => {
       if (idx >= candidates.length) {
         bundleLoadPromise = null;
         resolve(null);
         return;
       }
       const baseHref = candidates[idx++];
-      const script = document.createElement('script');
-      script.src = `${baseHref}bundle.min.js`;
-      script.async = true;
-      script.setAttribute('data-fz-vs-silero', '1');
-      script.onload = () => {
-        if (win.vad?.MicVAD) {
-          win.__fzSileroBaseHref = baseHref;
-          resolve(win.vad);
-        } else {
-          script.remove();
-          tryNext();
+      if (win.ort) {
+        configureOrtWasm(win.ort, baseHref);
+      }
+
+      const vadLoaded = await loadScriptTag(`${baseHref}bundle.min.js`, 'data-fz-vs-silero');
+      if (vadLoaded && win.vad?.MicVAD) {
+        if (win.ort) {
+          configureOrtWasm(win.ort, baseHref);
         }
-      };
-      script.onerror = () => {
-        script.remove();
-        tryNext();
-      };
-      (document.head || document.documentElement).appendChild(script);
+        win.__fzSileroBaseHref = baseHref;
+        warmSileroVendorCache(baseHref);
+        resolve(win.vad);
+      } else {
+        void tryNext();
+      }
     };
-    tryNext();
+    void tryNext();
   });
 
   return bundleLoadPromise.then((v) =>
@@ -171,9 +243,17 @@ export class SileroNeuralVadGate {
     const { vad, baseHref } = loaded;
     const preRollBase64: string[] = [];
     const MAX_PREROLL_FRAMES = 14; // ~448ms @ 32ms/frame so initial consonants are preserved
+    const handyVerifier = new HandyHumanVad({
+      threshold: 0.48,
+      bargeInThreshold: 0.68,
+      onsetFrames: 2,
+      bargeInOnsetFrames: 5,
+    });
+    const bargeRmsSeries: number[] = [];
     let speechStreak = 0;
     let silenceStreak = 0;
     let burstOpen = false;
+    let lastBargeAt = 0;
 
     try {
       const micVad = await vad.MicVAD!.new({
@@ -181,20 +261,13 @@ export class SileroNeuralVadGate {
         baseAssetPath: baseHref,
         onnxWASMBasePath: baseHref,
         ortConfig: (ort: any) => {
-          try {
-            if (ort?.env?.wasm) {
-              ort.env.wasm.numThreads = 1;
-              ort.env.wasm.proxy = false;
-            }
-          } catch {
-            // ignore
-          }
+          configureOrtWasm(ort, baseHref);
         },
-        positiveSpeechThreshold: 0.62,
-        negativeSpeechThreshold: 0.42,
-        minSpeechMs: 160,
-        redemptionMs: 380,
-        preSpeechPadMs: 256,
+        positiveSpeechThreshold: 0.56,
+        negativeSpeechThreshold: 0.38,
+        minSpeechMs: 96,
+        redemptionMs: 420,
+        preSpeechPadMs: 280,
         submitUserSpeechOnPause: false,
         getStream: async () => stream,
         pauseStream: async () => {},
@@ -213,47 +286,61 @@ export class SileroNeuralVadGate {
           const pcmBase64 = n > 0 ? float32At16kToPcm16Base64(frame) : '';
 
           if (cb.isAiPlaying()) {
-            // While AI partner speaks:
-            // 1. If visual learning workbench is open, student is looking at the card - NEVER barge-in interrupt!
-            // 2. High threshold (>= 18 frames = 576ms with neural speech prob >= 0.94 & rms >= 0.14).
-            // Prevents laptop/phone speaker acoustic bleed from falsely cutting off AI playback or echoing back into Gemini Live.
-            if (cb.isWorkbenchOpen?.()) {
-              speechStreak = 0;
-              preRollBase64.length = 0;
-              return;
-            }
-            if (pSpeech >= 0.72 && rms >= 0.010) {
+            // Strict human-only echo & ambient vehicle/horn immune barge-in gate
+            const hm = frame && frame.length >= 256 ? handyVerifier.scoreFrame512(frame, true) : null;
+            const isModulatedHumanBarge =
+              hm === null || (hm.isVoice && hm.pitchCorr >= 0.42 && hm.vocalToRumble >= 1.35);
+            if (
+              ((pSpeech >= 0.88 && rms >= 0.028) || (pSpeech >= 0.78 && rms >= 0.018)) &&
+              isModulatedHumanBarge
+            ) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
-              if (speechStreak >= 6) {
-                burstOpen = true;
+              bargeRmsSeries.push(rms);
+              if (bargeRmsSeries.length > 16) bargeRmsSeries.shift();
+              if (pcmBase64) {
+                preRollBase64.push(pcmBase64);
+                if (preRollBase64.length > MAX_PREROLL_FRAMES) preRollBase64.shift();
+              }
+              if (frame && frame.length > 0 && cb.onBargeCandidateAudio) {
+                cb.onBargeCandidateAudio(new Float32Array(frame), rms);
+              }
+              if (
+                ((speechStreak >= 8 && hasDynamicSpeechModulation(bargeRmsSeries)) ||
+                  speechStreak >= 18) &&
+                Date.now() - lastBargeAt > 700
+              ) {
+                lastBargeAt = Date.now();
+                speechStreak = 0;
+                bargeRmsSeries.length = 0;
+                preRollBase64.length = 0;
                 this.confirmedSpeaking = true;
                 cb.onHumanBargeIn();
                 cb.onHumanSpeechState(true);
-              } else {
-                if (pcmBase64) {
-                  preRollBase64.push(pcmBase64);
-                  if (preRollBase64.length > MAX_PREROLL_FRAMES) preRollBase64.shift();
-                }
-                return;
               }
+              return;
             } else {
-              if (pSpeech < 0.70) speechStreak = 0;
-              // Never buffer AI speaker echo into preRollBase64 while AI is playing
-              preRollBase64.length = 0;
+              if (pSpeech < 0.65 || !isModulatedHumanBarge) {
+                speechStreak = 0;
+                bargeRmsSeries.length = 0;
+              }
+              // Never buffer AI speaker echo or traffic rumble into preRollBase64 while AI is playing
+              if (speechStreak === 0) preRollBase64.length = 0;
               return;
             }
           } else {
-            // Listening state: sensitive human vocal onset (>= 2 frames / 64ms with pSpeech >= 0.35 & rms >= 0.0015).
-            // Guarantees quiet speech and mobile/laptop built-in mics immediately open audio burst without clipping.
+            // Listening state: capture natural human speech onset, reject traffic rumble, and submit promptly on speech end
             const isMobile =
               typeof navigator !== 'undefined' &&
               (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || (navigator.maxTouchPoints || 0) > 1);
-            // Natural pedagogical pause: ~450ms allows crisp real-time turn ending without cutting off words
-            const endSilenceFrames = isMobile ? 14 : 15; // ~448ms mobile, ~480ms desktop
-            const isActiveVoiceFrame = pSpeech >= 0.40 && rms >= 0.0018;
-            if (pSpeech >= 0.35 && rms >= 0.0015) {
+            // Crisp auto-send pause (~448ms-480ms) after human stops speaking
+            const endSilenceFrames = isMobile ? 14 : 15;
+            const listenHm = frame && frame.length >= 256 ? handyVerifier.scoreFrame512(frame, false) : null;
+            const notMechanicalRumble =
+              !listenHm || rms < 0.016 || listenHm.vocalToRumble >= 0.35 || listenHm.isVoice;
+            const isActiveVoiceFrame = pSpeech >= 0.48 && rms >= 0.0022 && notMechanicalRumble;
+            if (isActiveVoiceFrame) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
               silenceStreak = 0;
@@ -271,6 +358,7 @@ export class SileroNeuralVadGate {
                 if (silenceStreak >= endSilenceFrames) {
                   burstOpen = false;
                   silenceStreak = 0;
+                  bargeRmsSeries.length = 0;
                   this.confirmedSpeaking = false;
                   cb.onHumanSpeechState(false);
                   cb.onSpeechEnded();

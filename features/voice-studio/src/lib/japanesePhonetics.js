@@ -26,6 +26,12 @@ const dict = (typeof globalThis !== 'undefined' && globalThis.FiezelJaDictionary
 
 // High-priority pedagogical & conversational compounds for Mitra Kaiwa / Voice Studio
 const PRIORITY_VOICE_STUDIO_WORDS = {
+  'なるほど': 'なるほど',
+  'この': 'この',
+  'その': 'その',
+  'あの': 'あの',
+  'どの': 'どの',
+  'どんな': 'どんな',
   '助詞': 'じょし',
   '活用': 'かつよう',
   '把握': 'はあく',
@@ -101,6 +107,115 @@ const PRIORITY_VOICE_STUDIO_WORDS = {
   'ちょっと': 'ちょっと',
   'もっと': 'もっと',
   'ちゃんと': 'ちゃんと',
+  '途切れました': 'とぎれました',
+  '途切れて': 'とぎれて',
+  '途切れる': 'とぎれる',
+  '途切れ': 'とぎれ',
+  '迷います': 'まよいます',
+  '迷いました': 'まよいました',
+  '迷って': 'まよって',
+  '迷った': 'まよった',
+  '迷う': 'まよう',
+  'て形': 'てけい',
+  'た形': 'たけい',
+  'ない形': 'ないけい',
+  '過去形': 'かこけい',
+  '辞書形': 'じしょけい',
+  '可能形': 'かのうけい',
+  '普通形': 'ふつうけい',
+  'ます形': 'ますけい',
+  '受身形': 'うけみけい',
+  '使役形': 'しえきけい',
+  '命令形': 'めいれいけい',
+  '意向形': 'いこうけい',
+  '条件形': 'じょうけんけい',
+  '使い分け': 'つかいわけ',
+  '使えます': 'つかえます',
+  '使います': 'つかいます',
+  '使って': 'つかって',
+  '使う': 'つかう',
+  '聞き取り': 'ききとり',
+  '聞き取れ': 'ききとれ',
+  'できますか': 'できますか',
+  'できます': 'できます',
+  'できました': 'できました',
+  'できません': 'できません',
+  'できる': 'できる',
+  '言い訳': 'いいわけ',
+  '会話': 'かいわ',
+  '例文': 'れいぶん',
+  '名詞': 'めいし',
+  '動詞': 'どうし',
+  '形容詞': 'けいようし',
+  '副詞': 'ふくし',
+  '相談': 'そうだん',
+  '空港': 'くうこう',
+  '旅館': 'りょかん',
+  '喫茶店': 'きっさてん',
+  '宿題': 'しゅくだい',
+  '注文': 'ちゅうもん',
+  '確認': 'かくにん',
+  '約束': 'やくそく',
+  '経験': 'けいけん',
+  '説明': 'せつめい',
+  '意味': 'いみ',
+  '理由': 'りゆう',
+  '違い': 'ちがい',
+  '間違い': 'まちがい',
+  '度胸': 'どきょう',
+  '仕方': 'しかた',
+  '書き方': 'かきかた',
+  '読み方': 'よみかた',
+  '言い方': 'いいかた',
+  '店内': 'てんない',
+  'お持ち帰り': 'おもちかえり',
+  '持ち帰り': 'もちかえり',
+  '電波': 'でんぱ',
+  '少し': 'すこし',
+  'もう一度': 'もういちど',
+  'お話': 'おはなし',
+  'お決まり': 'おきまり',
+  '一つ': 'ひとつ',
+  '二つ': 'ふたつ',
+  '一つずつ': 'ひとつずつ',
+  'お砂糖': 'おさとう',
+  'お願い': 'おねがい',
+  'お願いします': 'おねがいします',
+  '頑張っています': 'がんばっています',
+  '頑張りましょう': 'がんばりましょう',
+  '疲れました': 'つかれました',
+  '疲れた': 'つかれた',
+  '週末': 'しゅうまつ',
+  '困難': 'こんなん',
+  '充実': 'じゅうじつ',
+  '普段': 'ふだん',
+  '便利': 'べんり',
+  '静か': 'しずか',
+  '落ち着いて': 'おちついて',
+  '仕事': 'しごと',
+  '予定': 'よてい',
+  '将来': 'しょうらい',
+  '同僚': 'どうりょう',
+  '親切': 'しんせつ',
+  '順番': 'じゅんばん',
+  '視点': 'してん',
+  '詳しく': 'くわしく',
+  '大丈夫': 'だいじょうぶ',
+  '体験': 'たいけん',
+  '試した': 'ためした',
+  '試して': 'ためして',
+  '楽しい': 'たのしい',
+  '楽しかった': 'たのしかった',
+  '難しい': 'むずかしい',
+  '美味しい': 'おいしい',
+  '忙しい': 'いそがしい',
+  '面白い': 'おもしろい',
+  '新しい': 'あたらしい',
+  '素晴らしい': 'すばらしい',
+  '飲みますでした': 'のみますでした',
+  '飲みました': 'のみました',
+  '飲みます': 'のみます',
+  '飲む': 'のむ',
 };
 
 if (dict && dict.WORDS) {
@@ -139,10 +254,10 @@ const PUNCT = {
   '…': '...',
   '〜': '~',
   '~': '~',
-  '「': '"',
-  '」': '"',
-  '『': '"',
-  '』': '"',
+  '「': '«',
+  '」': '»',
+  '『': '«',
+  '』': '»',
   '（': '(',
   '）': ')',
   '(': '(',
@@ -360,8 +475,15 @@ export function tokenizeJapaneseToRuby(rawText) {
 
     const prev = tokens.length ? tokens[tokens.length - 1] : null;
 
-    // Standalone particles は / を / へ
-    if (/[はをへ]/.test(ch) && prev && !prev.isSpace && !prev.isPunct && !prev.isParticle && !/[ぁぃぅぇぉっゃゅょゎ]/.test(clean[i + 1])) {
+    // Standalone particles は / を / へ (including explicitly quoted particle discussion e.g. 「は」)
+    const isQuotedSingleParticle =
+      /[はをへ]/.test(ch) &&
+      (clean[i - 1] === '「' || clean[i - 1] === '『' || clean[i - 1] === '"' || clean[i - 1] === "'") &&
+      (clean[i + 1] === '」' || clean[i + 1] === '』' || clean[i + 1] === '"' || clean[i + 1] === "'");
+    if (
+      isQuotedSingleParticle ||
+      (/[はをへ]/.test(ch) && prev && !prev.isSpace && !prev.isPunct && !prev.isParticle && !/[ぁぃぅぇぉっゃゅょゎ]/.test(clean[i + 1]))
+    ) {
       tokens.push({ text: ch, isKanji: false, isParticle: true, romaji: PARTICLES[ch] });
       i++;
       continue;
@@ -466,14 +588,24 @@ export function tokenizeJapaneseToRuby(rawText) {
       continue;
     }
 
-    // 3. Other particles (never split immediately after sokuon っ or at the start of a sentence)
+    // 3. Other particles (never split immediately after sokuon っ, at sentence start, or inside common auxiliaries like できます/でした/ている/のに/ので/ながら)
+    const remainingSlice = clean.slice(i);
+    const isQuotedOtherParticle =
+      /[がのにでともからまでよりよねか]/.test(ch) &&
+      (clean[i - 1] === '「' || clean[i - 1] === '『' || clean[i - 1] === '"' || clean[i - 1] === "'") &&
+      (clean[i + 1] === '」' || clean[i + 1] === '』' || clean[i + 1] === '"' || clean[i + 1] === "'");
+    const startsNonParticleAux = /^(?:できます|できました|できません|できる|できた|できて|ですか|でした|でしょう|ですが|です|でも|ていた|ていて|ている|ています|てみる|てみた|てみます|ておく|てくれ|てあげ|てもら|てください|たら|たり|ながら|のに|ので|かも|かしら|ばかり|だけ)/.test(
+      remainingSlice
+    );
     if (
-      PARTICLES[ch] &&
-      prev &&
-      !prev.isPunct &&
-      !prev.isSpace &&
-      clean[i - 1] !== 'っ' &&
-      !/[ぁぃぅぇぉっゃゅょゎえ]/.test(clean[i + 1])
+      isQuotedOtherParticle ||
+      (PARTICLES[ch] &&
+        !startsNonParticleAux &&
+        prev &&
+        !prev.isPunct &&
+        !prev.isSpace &&
+        clean[i - 1] !== 'っ' &&
+        !/[ぁぃぅぇぉっゃゅょゎえ]/.test(clean[i + 1]))
     ) {
       tokens.push({ text: ch, isKanji: false, isParticle: true, romaji: PARTICLES[ch] });
       i++;
@@ -754,8 +886,11 @@ export function toPhoneticRomaji(text) {
 
   let romaji = parts
     .join(' ')
-    .replace(/\s+([.,!?:;~])/g, '$1')
-    .replace(/([(\[{])\s+/g, '$1')
+    .replace(/\s+([.,!?:;~)\]}»])/g, '$1')
+    .replace(/([(\[{«])\s+/g, '$1')
+    .replace(/([^\s(\[{«])([«])/g, '$1 $2')
+    .replace(/([»])([^\s.,!?:;~)\]}»])/g, '$1 $2')
+    .replace(/[«»]/g, '"')
     .replace(/\s{2,}/g, ' ')
     .trim();
 

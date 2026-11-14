@@ -39,6 +39,8 @@ import {
   createTurnAcousticTracker,
   dispatchVoiceAppNavigation,
   finalizeCallSessionMemory,
+  getNextStudioSeq,
+  getStudioNonce,
   loadBraincoreState,
   loadPteMasterState,
   recordPteMasterAttempt,
@@ -51,6 +53,7 @@ import {
   STORAGE_KEY,
   type TurnAcousticTelemetry,
 } from './lib/braincore';
+import { type SpeechAlignmentResult } from './lib/speechAlignment';
 import {
   InCallLearningWorkbenchModal,
   type WorkbenchEvaluationMeta,
@@ -63,6 +66,36 @@ import { BraincoreTrendChart } from './components/BraincoreTrendChart';
 import { HomeRedesignView } from './components/HomeRedesignView';
 import { BeginnerAnswerAssistant } from './components/BeginnerAnswerAssistant';
 import {
+  SswSenseiWorkbenchPanel,
+  type SswQuizDrawMode,
+  type SswWorkbenchTab,
+} from './components/SswSenseiWorkbenchPanel';
+import {
+  SSW_FOCUS_PAGE_EVENT,
+  SSW_FOCUS_STEP_EVENT,
+  SSW_MASTER_KB,
+  SSW_STATE_UPDATED_EVENT,
+  buildSswCompactGroundedDossier,
+  drawSswQuizQuestionAsync,
+  ensureSswFullKnowledgeLoaded,
+  getSswProgressReport,
+  gradeSswQuizAnswerAsync,
+  loadSswMasterState,
+  lookupSswMaterialAndPageAsync,
+  resetSswMasterState,
+  updateSswStudyProgress,
+  type SswDrawnQuestionPayload,
+  type SswGradeQuizResult,
+  type SswMasterState,
+} from './lib/sswSenseiEngine';
+import {
+  SSW_LIVE_TOOL_DECLARATIONS,
+  advanceSswLessonStep,
+  buildSswGreetingDirective,
+  buildSswLiveSystemInstruction,
+  lookupSswForLiveTeachingAsync,
+} from './lib/sswSenseiTeacher';
+import {
   FiezelBrandCrest,
   FiezelCornerOrnament,
   FiezelNeuralConstellation,
@@ -72,6 +105,7 @@ import {
 import {
   type BeginnerReplyCard,
   fetchLiveTranslation,
+  subscribeLiveTranslationUpdates,
   translateAndPhoneticizeLiveText,
 } from './lib/liveCallHelper';
 import { JapaneseRubyDisplay } from './components/JapaneseRubyDisplay';
@@ -80,6 +114,7 @@ import { toPhoneticPinyin } from './lib/mandarinPhonetics';
 import {
   buildContextualFallbackCards,
   evaluateTurnLocal,
+  LivePcmStreamScheduler,
   type LiveTransportMode,
   pcm16Base64ToAudioBuffer,
   reportGeminiLiveSessionDrop,
@@ -91,11 +126,15 @@ import {
   sanitizeHallucinatedTranscript,
   splitIntoSpeechChunks,
   synthesizeFlexibleTts,
+  verifySpokenLanguageAudio,
   warmUpVoiceServices,
 } from './lib/liveTransport';
 import {
   HandyHumanVad,
+  encodeFloat32At16kToWavBase64,
   float32At16kToPcm16Base64,
+  hasDynamicSpeechModulation,
+  resampleFloat32To16k,
   resampleFloat32To16kPcmBase64,
 } from './lib/handyVad';
 import { SileroNeuralVadGate } from './lib/sileroVadGate';
@@ -151,9 +190,37 @@ function syncGemBadgeInDom(doc: Document | null | undefined, balance: number): v
   } catch {}
 }
 
+function enumerateGemStateKeys(): string[] {
+  const keys: string[] = [
+    'fz_state_v1',
+    'fz_state_v1@ja',
+    'fz_state_v1@en',
+    'fz_state_v1@zh',
+    'fiezel-v5',
+    'fiezel-v4-state',
+  ];
+  try {
+    if (typeof localStorage !== 'undefined') {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && /^(?:fz_state_v1|fiezel-v5|fiezel-v4-state)(?:[:@].+)?$/i.test(k) && !keys.includes(k)) {
+          keys.push(k);
+        }
+      }
+    }
+  } catch {}
+  return keys;
+}
+
 export function isLocalTestEnvironment(): boolean {
   try {
     if (typeof location === 'undefined') return false;
+    const ownParams = new URLSearchParams(location.search || '');
+    if (ownParams.get('fz_real_auth') === '1') return false;
+    try {
+      const parentSearch = window.parent && window.parent !== window ? window.parent.location?.search || '' : '';
+      if (parentSearch && new URLSearchParams(parentSearch).get('fz_real_auth') === '1') return false;
+    } catch {}
     const h = location.hostname;
     const p = location.port;
     if (
@@ -200,7 +267,7 @@ function getHostGemBalance(): number {
   } catch {}
   try {
     if (typeof localStorage !== 'undefined') {
-      const keys = ['fz_state_v1', 'fz_state_v1@ja', 'fz_state_v1@en', 'fiezel-v5', 'fiezel-v4-state'];
+      const keys = enumerateGemStateKeys();
       for (const k of keys) {
         const raw = localStorage.getItem(k);
         if (!raw) continue;
@@ -224,6 +291,8 @@ function deductHostGems(amount: number, reason = 'kawan_bicara_voice_turn'): num
   if (!amount || amount <= 0) return 0;
   let actualDeducted = 0;
   let updatedBalance: number | null = null;
+  let targetSpentTotal: number | null = null;
+  const nowTs = Date.now();
 
   try {
     if (typeof window !== 'undefined') {
@@ -237,16 +306,18 @@ function deductHostGems(amount: number, reason = 'kawan_bicara_voice_turn'): num
             const avail = Math.max(0, st.gems.balance);
             const spend = actualDeducted > 0 ? actualDeducted : Math.min(amount, avail);
             if (spend > 0) {
+              if (st.gems.schema !== 'fiezel-gems-v1') st.gems.schema = 'fiezel-gems-v1';
+              if (typeof st.gems.earnedTotal !== 'number') st.gems.earnedTotal = avail;
               st.gems.balance = Math.max(0, avail - spend);
-              if (typeof st.gems.spentTotal === 'number') st.gems.spentTotal += spend;
-              if (Array.isArray(st.gems.ledger)) {
-                st.gems.ledger.push({
-                  at: Date.now(),
-                  delta: -spend,
-                  reason,
-                });
-                if (st.gems.ledger.length > 60) st.gems.ledger.shift();
-              }
+              st.gems.spentTotal = (typeof st.gems.spentTotal === 'number' ? st.gems.spentTotal : 0) + spend;
+              targetSpentTotal = st.gems.spentTotal;
+              if (!Array.isArray(st.gems.ledger)) st.gems.ledger = [];
+              st.gems.ledger.push({
+                at: nowTs,
+                delta: -spend,
+                reason,
+              });
+              if (st.gems.ledger.length > 60) st.gems.ledger.shift();
               actualDeducted = spend;
               updatedBalance = st.gems.balance;
             }
@@ -273,7 +344,7 @@ function deductHostGems(amount: number, reason = 'kawan_bicara_voice_turn'): num
 
   try {
     if (typeof localStorage !== 'undefined') {
-      const keys = ['fz_state_v1', 'fz_state_v1@ja', 'fz_state_v1@en', 'fiezel-v5', 'fiezel-v4-state'];
+      const keys = enumerateGemStateKeys();
       for (const k of keys) {
         const raw = localStorage.getItem(k);
         if (!raw) continue;
@@ -284,15 +355,26 @@ function deductHostGems(amount: number, reason = 'kawan_bicara_voice_turn'): num
               const avail = Math.max(0, parsed.gems.balance);
               const spend = actualDeducted > 0 ? actualDeducted : Math.min(amount, avail);
               if (spend > 0 || updatedBalance !== null) {
+                parsed.gems.schema = 'fiezel-gems-v1';
+                if (typeof parsed.gems.earnedTotal !== 'number') {
+                  parsed.gems.earnedTotal = avail;
+                }
                 parsed.gems.balance =
                   updatedBalance !== null ? updatedBalance : Math.max(0, avail - spend);
-                if (typeof parsed.gems.spentTotal === 'number' && actualDeducted === 0) {
-                  parsed.gems.spentTotal += spend;
+                const prevSpent = typeof parsed.gems.spentTotal === 'number' ? parsed.gems.spentTotal : 0;
+                parsed.gems.spentTotal =
+                  targetSpentTotal !== null ? Math.max(prevSpent, targetSpentTotal) : prevSpent + spend;
+                if (!Array.isArray(parsed.gems.ledger)) parsed.gems.ledger = [];
+                const lastL = parsed.gems.ledger[parsed.gems.ledger.length - 1];
+                if (!lastL || lastL.reason !== reason || Math.abs(Number(lastL.at || 0) - nowTs) > 2000) {
+                  parsed.gems.ledger.push({ at: nowTs, delta: -spend, reason });
+                  if (parsed.gems.ledger.length > 60) parsed.gems.ledger.shift();
                 }
                 localStorage.setItem(k, JSON.stringify(parsed));
                 if (actualDeducted === 0) {
                   actualDeducted = spend;
                   updatedBalance = parsed.gems.balance;
+                  targetSpentTotal = parsed.gems.spentTotal;
                 }
               }
             } else if (typeof parsed.gems === 'number') {
@@ -320,13 +402,17 @@ function deductHostGems(amount: number, reason = 'kawan_bicara_voice_turn'): num
   return actualDeducted;
 }
 
+function getWibDateKey(): string {
+  return new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
 function getDailyFreeCallAvailable(): boolean {
   if (isLocalTestEnvironment()) {
     return true; // Localhost test bypass: daily free calls are unlimited
   }
   try {
     if (typeof localStorage === 'undefined') return true;
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getWibDateKey();
     const storedDate = localStorage.getItem('fz_kawan_bicara_daily_date');
     const storedCount = parseInt(localStorage.getItem('fz_kawan_bicara_daily_count') || '0', 10);
     if (storedDate !== today) return true;
@@ -339,7 +425,7 @@ function getDailyFreeCallAvailable(): boolean {
 function markDailyFreeCallUsed(): void {
   try {
     if (typeof localStorage === 'undefined') return;
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getWibDateKey();
     const storedDate = localStorage.getItem('fz_kawan_bicara_daily_date');
     const storedCount = parseInt(localStorage.getItem('fz_kawan_bicara_daily_count') || '0', 10);
     const nextCount = storedDate === today ? (storedCount + 1) : 1;
@@ -367,6 +453,20 @@ export default function App() {
   const [selectedPersonaId, setSelectedPersonaId] = useState<string>(() => {
     const initialLang = loadBraincoreState().targetLang || 'en';
     try {
+      if (typeof window !== 'undefined') {
+        const qp = new URLSearchParams(window.location.search);
+        const qpScen = qp.get('scenario');
+        const matchedScen = qpScen
+          ? CALL_SCENARIOS.find((s) => s.id === qpScen && s.targetLang === initialLang)
+          : undefined;
+        if (matchedScen?.personaId && VOICE_PERSONAS[matchedScen.personaId]?.targetLang === initialLang) {
+          return matchedScen.personaId;
+        }
+        const qpPersona = qp.get('persona');
+        if (qpPersona && VOICE_PERSONAS[qpPersona]?.targetLang === initialLang) {
+          return qpPersona;
+        }
+      }
       const saved = localStorage.getItem('fiezel_voice_persona_pref');
       if (saved && VOICE_PERSONAS[saved] && VOICE_PERSONAS[saved].targetLang === initialLang) return saved;
     } catch {}
@@ -376,6 +476,18 @@ export default function App() {
   const [activeScenarioId, setActiveScenarioId] = useState<string>(() => {
     const initialLang = loadBraincoreState().targetLang || 'en';
     try {
+      if (typeof window !== 'undefined') {
+        const qp = new URLSearchParams(window.location.search);
+        const qpScen = qp.get('scenario');
+        if (qpScen && CALL_SCENARIOS.some((s) => s.id === qpScen && s.targetLang === initialLang)) {
+          return qpScen;
+        }
+        const qpPersona = qp.get('persona');
+        if (qpPersona && VOICE_PERSONAS[qpPersona]?.targetLang === initialLang) {
+          const qpMatch = CALL_SCENARIOS.find((s) => s.personaId === qpPersona && s.targetLang === initialLang);
+          if (qpMatch) return qpMatch.id;
+        }
+      }
       const savedScen = localStorage.getItem('fiezel_voice_scenario_pref');
       if (savedScen && CALL_SCENARIOS.some((s) => s.id === savedScen && s.targetLang === initialLang)) {
         return savedScen;
@@ -396,6 +508,13 @@ export default function App() {
   const [callViewMode, setCallViewMode] = useState<'stage' | 'history'>('stage');
 
   const [turns, setTurns] = useState<CallTurn[]>([]);
+  const [, setTranslationCacheTick] = useState<number>(0);
+
+  useEffect(() => {
+    return subscribeLiveTranslationUpdates(() => {
+      setTranslationCacheTick((v) => v + 1);
+    });
+  }, []);
   const [inputText, setInputText] = useState<string>('');
   const [isAnalyzingTurn, setIsAnalyzingTurn] = useState<boolean>(false);
   // m025-637: true while the REAL AI partner is generating its reply (Mochi "thinking").
@@ -411,6 +530,55 @@ export default function App() {
   const connectSeqRef = useRef<number>(0);
   const isAiServerTurnOpenRef = useRef<boolean>(false);
   const lastAiPlayoutEndedAtRef = useRef<number>(0);
+  const awaitingPostToolResponseRef = useRef<boolean>(false);
+  const liveGenCompleteTimerRef = useRef<number | null>(null);
+  const suppressAiAudioForTurnRef = useRef<boolean>(false);
+  const liveTurnFinalizedForCurrentAiTurnRef = useRef<boolean>(false);
+  const aiDraftUiTimerRef = useRef<number | null>(null);
+  const lastAiDraftUiPushAtRef = useRef<number>(0);
+  const liveTurnAutoCommitTimerRef = useRef<number | null>(null);
+  const activeWorkbenchTargetRef = useRef<{
+    isOpen: boolean;
+    contextMode: string;
+    topicTitle: string;
+    activeTargetText: string;
+  }>({
+    isOpen: false,
+    contextMode: '',
+    topicTitle: '',
+    activeTargetText: '',
+  });
+  const clearLiveTurnAutoCommitTimer = () => {
+    if (liveTurnAutoCommitTimerRef.current) {
+      window.clearTimeout(liveTurnAutoCommitTimerRef.current);
+      liveTurnAutoCommitTimerRef.current = null;
+    }
+  };
+
+  const clearLiveAiDraftUiTimer = () => {
+    if (aiDraftUiTimerRef.current) {
+      window.clearTimeout(aiDraftUiTimerRef.current);
+      aiDraftUiTimerRef.current = null;
+    }
+  };
+
+  const scheduleLiveAiDraftUiUpdate = () => {
+    const now = Date.now();
+    const elapsed = now - lastAiDraftUiPushAtRef.current;
+    if (elapsed >= 80) {
+      clearLiveAiDraftUiTimer();
+      lastAiDraftUiPushAtRef.current = now;
+      setLiveAiDraft(cleanMoodTags(liveAiDraftRef.current));
+      return;
+    }
+    if (!aiDraftUiTimerRef.current) {
+      aiDraftUiTimerRef.current = window.setTimeout(() => {
+        aiDraftUiTimerRef.current = null;
+        lastAiDraftUiPushAtRef.current = Date.now();
+        setLiveAiDraft(cleanMoodTags(liveAiDraftRef.current));
+      }, Math.max(16, 80 - elapsed));
+    }
+  };
 
   const setAiAudioPlaying = (playing: boolean, tailDelayMs = 0) => {
     if (aiPlayoutTailTimerRef.current) {
@@ -418,28 +586,42 @@ export default function App() {
       aiPlayoutTailTimerRef.current = null;
     }
     if (playing) {
+      const wasPlaying = isPlayingAiAudioRef.current;
       isPlayingAiAudioRef.current = true;
-      bargeSpeechStreakRef.current = 0;
       consecutiveSpeechFramesRef.current = 0;
+      if (!wasPlaying) {
+        bargeSpeechStreakRef.current = 0;
+        resetBargeCandidate();
+      }
       setIsPlayingAiAudio(true);
-    } else if (tailDelayMs > 0 && (isPlayingAiAudioRef.current || activeSourcesRef.current.length > 0)) {
+    } else if (
+      tailDelayMs > 0 &&
+      (isPlayingAiAudioRef.current ||
+        activeSourcesRef.current.length > 0 ||
+        livePcmSchedulerRef.current.hasPendingAudio())
+    ) {
       aiPlayoutTailTimerRef.current = window.setTimeout(() => {
         aiPlayoutTailTimerRef.current = null;
         isPlayingAiAudioRef.current = false;
         openingGreetingCompletedRef.current = true;
         lastAiPlayoutEndedAtRef.current = Date.now();
         bargeSpeechStreakRef.current = 0;
+        resetBargeCandidate();
         handyVadRef.current.clearPreRoll();
         setIsPlayingAiAudio(false);
       }, tailDelayMs);
     } else {
-      const wasActive = isPlayingAiAudioRef.current || activeSourcesRef.current.length > 0;
+      const wasActive =
+        isPlayingAiAudioRef.current ||
+        activeSourcesRef.current.length > 0 ||
+        livePcmSchedulerRef.current.hasPendingAudio();
       isPlayingAiAudioRef.current = false;
       openingGreetingCompletedRef.current = true;
       if (wasActive) {
         lastAiPlayoutEndedAtRef.current = Date.now();
       }
       bargeSpeechStreakRef.current = 0;
+      resetBargeCandidate();
       handyVadRef.current.clearPreRoll();
       setIsPlayingAiAudio(false);
     }
@@ -467,6 +649,63 @@ export default function App() {
   const pttStartedAtRef = useRef<number | null>(null);
   const turnAcousticTrackerRef = useRef(createTurnAcousticTracker());
   const [latestPteDiagnostic, setLatestPteDiagnostic] = useState<PteDiagnosticSpeechResult | null>(null);
+  const [latestReadAloudAlignment, setLatestReadAloudAlignment] = useState<SpeechAlignmentResult | null>(null);
+  const lastSyncedWorkbenchKeyRef = useRef<string>('');
+  const syncWorkbenchToLiveAi = useCallback(
+    (info: { contextMode: string; topicTitle: string; activeTargetText: string }) => {
+      const target = (info.activeTargetText || '').trim();
+      activeWorkbenchTargetRef.current = {
+        isOpen: true,
+        contextMode: info.contextMode,
+        topicTitle: info.topicTitle,
+        activeTargetText: target,
+      };
+      const syncKey = `${info.contextMode}::${info.topicTitle}::${target}`;
+      if (lastSyncedWorkbenchKeyRef.current === syncKey) return;
+      lastSyncedWorkbenchKeyRef.current = syncKey;
+
+      if (target) {
+        const lastAi = [...turnsRef.current].reverse().find((tr) => tr.speaker === 'ai');
+        if (lastAi && (info.contextMode === 'pte_read_aloud' || info.contextMode === 'read_aloud')) {
+          void triggerRealtimeCopilotRef.current(
+            lastAi.text,
+            '',
+            turnsRef.current.slice(-6).map((tr) => ({ speaker: tr.speaker, text: tr.text }))
+          );
+        }
+      }
+
+      if (
+        isLiveConnectedRef.current &&
+        wsRef.current &&
+        wsRef.current.readyState === WebSocket.OPEN &&
+        target
+      ) {
+        try {
+          wsRef.current.send(
+            JSON.stringify({
+              clientContent: {
+                turns: [
+                  {
+                    role: 'user',
+                    parts: [
+                      {
+                        text: `[SCREEN STATE SYNC: Interactive popup "${info.topicTitle}" (mode=${info.contextMode}) is now OPEN on the learner's screen. EXACT TARGET TEXT VISIBLE ON SCREEN: "${target}". Whenever the learner reads or answers from this popup, evaluate strictly word-for-word against THIS exact text! If they skip words, change words, or mispronounce words, explicitly tell them which words mismatched.]`,
+                      },
+                    ],
+                  },
+                ],
+                turnComplete: false,
+              },
+            })
+          );
+        } catch {
+          // Ignore non-fatal sync send errors
+        }
+      }
+    },
+    []
+  );
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const speechRecRef = useRef<any>(null);
@@ -500,8 +739,36 @@ export default function App() {
   const consecutiveSpeechFramesRef = useRef<number>(0);
   const bargeSpeechStreakRef = useRef<number>(0);
   const lastBargeInAtRef = useRef<number>(0);
+  const bargeCandidateChunksRef = useRef<Float32Array[]>([]);
+  const bargeCandidateSamplesRef = useRef<number>(0);
+  const bargeCandidateRmsRef = useRef<number[]>([]);
+  const bargeCandidatePitchSumRef = useRef<number>(0);
+  const bargeCandidatePitchCountRef = useRef<number>(0);
+  const bargeCandidateVoicedFramesRef = useRef<number>(0);
+  const bargeCandidateSilenceRef = useRef<number>(0);
+  const bargeVerifyInFlightRef = useRef<boolean>(false);
+  const lastBargeVerifyAtRef = useRef<number>(0);
+  const verifyEndpointUnavailableUntilRef = useRef<number>(0);
+  const lastRealtimeCopilotKeyRef = useRef<string>('');
+  const inFlightCopilotWasStreamingRef = useRef<boolean>(false);
+  const resetBargeCandidate = () => {
+    bargeCandidateChunksRef.current = [];
+    bargeCandidateSamplesRef.current = 0;
+    bargeCandidateRmsRef.current = [];
+    bargeCandidatePitchSumRef.current = 0;
+    bargeCandidatePitchCountRef.current = 0;
+    bargeCandidateVoicedFramesRef.current = 0;
+    bargeCandidateSilenceRef.current = 0;
+  };
   const handyVadRef = useRef<HandyHumanVad>(
-    new HandyHumanVad({ threshold: 0.48, prefillFrames: 15, hangoverFrames: 11, onsetFrames: 2 })
+    new HandyHumanVad({
+      threshold: 0.48,
+      bargeInThreshold: 0.68,
+      prefillFrames: 15,
+      hangoverFrames: 12,
+      onsetFrames: 2,
+      bargeInOnsetFrames: 5,
+    })
   );
   const sileroVadGateRef = useRef<SileroNeuralVadGate | null>(null);
   const lastHandySpeechAtRef = useRef<number>(0);
@@ -519,6 +786,7 @@ export default function App() {
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const nextStartTimeRef = useRef<number>(0);
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
+  const livePcmSchedulerRef = useRef<LivePcmStreamScheduler>(new LivePcmStreamScheduler());
   const isMicMutedRef = useRef<boolean>(false);
   const currentAudioElRef = useRef<HTMLAudioElement | null>(null);
   const sharedAudioElRef = useRef<HTMLAudioElement | null>(null);
@@ -712,7 +980,28 @@ export default function App() {
     uiAction?: VoiceUiAction;
     preferredExerciseMode?: 'multiple_choice' | 'cloze_gap' | 'sentence_blocks';
     quizSeed?: number;
+    openNonce?: number;
   } | null>(null);
+
+  useEffect(() => {
+    if (!learningWorkbench?.isOpen) {
+      activeWorkbenchTargetRef.current = {
+        isOpen: false,
+        contextMode: '',
+        topicTitle: '',
+        activeTargetText: '',
+      };
+      lastSyncedWorkbenchKeyRef.current = '';
+      setLatestReadAloudAlignment(null);
+    }
+  }, [learningWorkbench?.isOpen]);
+
+  const [sswMasterState, setSswMasterState] = useState<SswMasterState>(() => loadSswMasterState());
+  const [sswWorkbenchTab, setSswWorkbenchTab] = useState<SswWorkbenchTab>('roadmap');
+  const [sswFocusPage, setSswFocusPage] = useState<number>(() => loadSswMasterState().lastFocusPage || 1);
+  const [sswDrawnQuiz, setSswDrawnQuiz] = useState<SswDrawnQuestionPayload | null>(null);
+  const [sswLatestGrade, setSswLatestGrade] = useState<SswGradeQuizResult | null>(null);
+  const [showSswWorkbench, setShowSswWorkbench] = useState<boolean>(true);
 
   type CefrLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
   const [userCefrLevel, setUserCefrLevel] = useState<CefrLevel>(() => {
@@ -848,15 +1137,49 @@ export default function App() {
     return ready;
   };
 
-  const requestStartLiveCall = (isAutoCallTrigger = false) => {
+  const ensureTurnByTurnBillingSession = (): boolean => {
+    if (isLocalTestEnvironment()) return true;
+    if (callBillingRef.current.active) {
+      if (callBillingRef.current.outOfGemsAfterTurn) {
+        setInsufficientGemModal({
+          isOpen: true,
+          balance: getHostGemBalance(),
+          cost: KAWAN_BICARA_TURN_GEM_COST,
+        });
+        return false;
+      }
+      return true;
+    }
+    const hasDailyFree = getDailyFreeCallAvailable();
+    const balance = getHostGemBalance();
+    if (!hasDailyFree && balance < KAWAN_BICARA_MIN_START_GEMS) {
+      setInsufficientGemModal({
+        isOpen: true,
+        balance,
+        cost: KAWAN_BICARA_MIN_START_GEMS,
+      });
+      return false;
+    }
+    callBillingRef.current = {
+      active: true,
+      isDailyFree: hasDailyFree,
+      dailyFreeMarked: false,
+      aiVoiceTurnsDelivered: 0,
+      gemsSpentThisCall: 0,
+      turnMetered: false,
+      outOfGemsAfterTurn: false,
+    };
+    setLiveBillingUi({ isDailyFree: hasDailyFree, turns: 0, gemsSpent: 0 });
+    return true;
+  };
+
+  const requestStartLiveCall = (_isAutoCallTrigger = false) => {
     primeAudioPlayback();
     if (isLiveConnected || isLiveConnecting) return;
     const balance = getHostGemBalance();
     const hasDailyFree = getDailyFreeCallAvailable();
     const shouldStartImmediately =
       isLocalTestEnvironment() ||
-      isAutoCallTrigger ||
-      autoCallProcessedRef.current ||
       hasDailyFree ||
       balance >= KAWAN_BICARA_MIN_START_GEMS;
     if (shouldStartImmediately) {
@@ -922,14 +1245,14 @@ export default function App() {
         } else if (AudioCtx) {
           if (!ttsAudioCtxRef.current || ttsAudioCtxRef.current.state === 'closed') {
             try {
-              ttsAudioCtxRef.current = new AudioCtx({ latencyHint: 'interactive' });
+              ttsAudioCtxRef.current = new AudioCtx({ latencyHint: 'balanced' });
             } catch {
               ttsAudioCtxRef.current = new AudioCtx();
             }
           }
           if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
             try {
-              liveAudioCtxRef.current = new AudioCtx({ latencyHint: 'interactive' });
+              liveAudioCtxRef.current = new AudioCtx({ latencyHint: 'balanced' });
             } catch {
               liveAudioCtxRef.current = new AudioCtx();
             }
@@ -1036,7 +1359,7 @@ export default function App() {
     scenariosForLang.find((s) => s.id === activeScenarioId) ||
     scenariosForLang[0] ||
     CALL_SCENARIOS[0];
-  const activePersona: VoicePersona =
+  const activePersona =
     VOICE_PERSONAS[selectedPersonaId] && VOICE_PERSONAS[selectedPersonaId].targetLang === targetLang
       ? VOICE_PERSONAS[selectedPersonaId]
       : (VOICE_PERSONAS[activeScenario.personaId] ||
@@ -1045,9 +1368,63 @@ export default function App() {
             : targetLang === 'zh'
             ? VOICE_PERSONAS.xiao_mochi
             : VOICE_PERSONAS.coach_alex));
+  const activeScenarioRef = useRef<CallScenario>(activeScenario);
+  activeScenarioRef.current = activeScenario;
+  const activePersonaRef = useRef(activePersona);
+  activePersonaRef.current = activePersona;
 
   // Note: Opening line TTS is synthesized on demand when the user clicks "Putar Suara" or starts a call,
   // preserving 100% of the Gemini API rate-limit quota for active user interactions.
+
+  const isSswSensei =
+    activePersona.id === 'ssw_sensei' ||
+    activeScenario.personaId === 'ssw_sensei' ||
+    activeScenario.id.startsWith('scen_ssw_');
+
+  useEffect(() => {
+    if (!isSswSensei) return;
+    void ensureSswFullKnowledgeLoaded();
+    const syncState = (ev?: Event) => {
+      const detail = (ev as CustomEvent<SswMasterState> | undefined)?.detail;
+      setSswMasterState(detail || loadSswMasterState());
+    };
+    const syncPage = (ev?: Event) => {
+      const p = (ev as CustomEvent<{ page?: number }> | undefined)?.detail?.page;
+      if (typeof p === 'number' && Number.isFinite(p)) {
+        setSswFocusPage(Math.max(1, Math.min(SSW_MASTER_KB.meta.totalPdfPages || 91, Math.round(p))));
+      }
+      setSswMasterState(loadSswMasterState());
+    };
+    window.addEventListener(SSW_STATE_UPDATED_EVENT, syncState as EventListener);
+    window.addEventListener(SSW_FOCUS_PAGE_EVENT, syncPage as EventListener);
+    window.addEventListener(SSW_FOCUS_STEP_EVENT, syncPage as EventListener);
+    return () => {
+      window.removeEventListener(SSW_STATE_UPDATED_EVENT, syncState as EventListener);
+      window.removeEventListener(SSW_FOCUS_PAGE_EVENT, syncPage as EventListener);
+      window.removeEventListener(SSW_FOCUS_STEP_EVENT, syncPage as EventListener);
+    };
+  }, [isSswSensei]);
+
+  const handleDrawSswQuiz = (mode: SswQuizDrawMode, topicTag?: string) => {
+    setSswLatestGrade(null);
+    setSswWorkbenchTab('quiz');
+    setShowSswWorkbench(true);
+    void drawSswQuizQuestionAsync({ mode, topicTag, preferWeakOrUnseen: true }).then((drawn) => {
+      setSswDrawnQuiz(drawn);
+      setSswMasterState(loadSswMasterState());
+      setSswFocusPage(drawn.tryoutPdfPage);
+    });
+  };
+
+  const handleAnswerSswQuiz = (quizId: string, choiceLetter: string) => {
+    void gradeSswQuizAnswerAsync({ quizId, userAnswer: choiceLetter }).then((res) => {
+      setSswLatestGrade(res);
+      setSswMasterState(res.state);
+      if (res.discussionPdfPage) {
+        setSswFocusPage(res.discussionPdfPage);
+      }
+    });
+  };
 
   const isMeasureMode =
     customMeasureOverride !== null ? customMeasureOverride : activeScenario.isMeasureExam;
@@ -1104,7 +1481,7 @@ export default function App() {
         undefined,
         undefined,
         undefined,
-        { syncOnly: true }
+        { syncOnly: true, locale: targetLoc }
       );
       const localVal =
         targetLoc === 'th'
@@ -1140,17 +1517,13 @@ export default function App() {
     const scen = opts?.scenarioOverride || activeScenario;
     const pers = opts?.personaOverride || activePersona;
     const effectiveCefrLevel = opts?.cefrLevelOverride || userCefrLevel;
-    const dedupKey = `${scen.id}::${scen.targetLang}::${cleanAi}::${lastUserLine}::${effectiveCefrLevel}`;
-    if (!opts?.forceVariation) {
-      if (lastCopilotAiKeyRef.current === dedupKey && copilotCardsRef.current.length > 0) {
-        return;
-      }
-      if (inFlightCopilotKeyRef.current === dedupKey) {
-        return;
-      }
-    }
-
-    const currentSeq = ++copilotSeqRef.current;
+    const popupTarget = activeWorkbenchTargetRef.current.isOpen
+      ? activeWorkbenchTargetRef.current.activeTargetText
+      : undefined;
+    const popupMode = activeWorkbenchTargetRef.current.isOpen
+      ? activeWorkbenchTargetRef.current.contextMode
+      : undefined;
+    const dedupKey = `${scen.id}::${scen.targetLang}::${popupMode || ''}::${(popupTarget || '').slice(0, 60)}::${cleanAi}::${lastUserLine}::${effectiveCefrLevel}`;
 
     const isCambridge =
       pers?.id === 'cambridge_examiner' ||
@@ -1172,7 +1545,29 @@ export default function App() {
       isCambridge,
       personaId: pers?.id,
       cefrLevel: effectiveCefrLevel,
+      activePopupTargetText: popupTarget,
+      activePopupMode: popupMode,
     });
+
+    if (!opts?.forceVariation) {
+      if (lastRealtimeCopilotKeyRef.current === dedupKey && copilotCardsRef.current.length > 0) {
+        return;
+      }
+      if (
+        inFlightCopilotKeyRef.current === dedupKey &&
+        (opts?.isDebouncedStreaming || !inFlightCopilotWasStreamingRef.current)
+      ) {
+        if (copilotCardsRef.current.length === 0 && instantCards.length > 0) {
+          lastCopilotAiKeyRef.current = dedupKey;
+          setCopilotCards(isCambridge ? instantCards.slice(0, 1) : instantCards);
+          setCopilotSource('ai-realtime');
+          setIsGeneratingCopilot(false);
+        }
+        return;
+      }
+    }
+
+    const currentSeq = ++copilotSeqRef.current;
 
     if (instantCards.length > 0) {
       lastCopilotAiKeyRef.current = dedupKey;
@@ -1181,14 +1576,25 @@ export default function App() {
       setIsGeneratingCopilot(false);
     } else {
       setIsGeneratingCopilot(true);
-      if (copilotCardsRef.current.length === 0 && !opts?.isDebouncedStreaming) {
+      if (
+        !opts?.isDebouncedStreaming &&
+        (copilotCardsRef.current.length === 0 || lastCopilotAiKeyRef.current !== dedupKey)
+      ) {
+        lastCopilotAiKeyRef.current = dedupKey;
         setCopilotSource('loading');
         setCopilotCards([]);
       }
     }
 
     const instantMeaning = translateAndPhoneticizeLiveText(cleanAi, scen.targetLang);
-    if (instantMeaning.translationId || instantMeaning.translationTh) {
+    const isSswCopilot =
+      pers?.id === 'ssw_sensei' ||
+      scen?.personaId === 'ssw_sensei' ||
+      scen?.id.startsWith('scen_ssw_');
+    if (
+      (instantMeaning.translationId || instantMeaning.translationTh) &&
+      (!isSswCopilot || !/[A-Za-z]{3,}/.test(cleanAi))
+    ) {
       setTurns((prev) =>
         prev.map((tr) => {
           if (tr.speaker !== 'ai' || tr.text.trim() !== cleanAi) return tr;
@@ -1211,6 +1617,7 @@ export default function App() {
     const controller = new AbortController();
     copilotAbortRef.current = controller;
     inFlightCopilotKeyRef.current = dedupKey;
+    inFlightCopilotWasStreamingRef.current = Boolean(opts?.isDebouncedStreaming);
 
     try {
       const res = await requestRealtimeCopilotAssist({
@@ -1225,14 +1632,25 @@ export default function App() {
         variationSeed: opts?.forceVariation ? copilotVariationSeedRef.current : 0,
         excludeTexts: opts?.excludeTexts,
         signal: controller.signal,
-        budgetMs: 2500,
+        budgetMs: opts?.isDebouncedStreaming ? 2500 : 4500,
+        activePopupTargetText: popupTarget,
+        activePopupMode: popupMode,
       });
       if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
       const rawList = res.replies || res.cards || [];
       const validCards = rawList.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
+      const nonFallbackCards = rawList.filter((c) => !c.isOfflineFallback);
       if (validCards.length > 0) {
         lastCopilotAiKeyRef.current = dedupKey;
+        lastRealtimeCopilotKeyRef.current = dedupKey;
         setCopilotCards(isCambridge ? validCards.slice(0, 1) : validCards);
+        setCopilotSource('ai-realtime');
+      } else if (
+        nonFallbackCards.length > 0 &&
+        (!instantCards || instantCards.length === 0 || lastRealtimeCopilotKeyRef.current !== dedupKey)
+      ) {
+        lastCopilotAiKeyRef.current = dedupKey;
+        setCopilotCards(isCambridge ? nonFallbackCards.slice(0, 1) : nonFallbackCards);
         setCopilotSource('ai-realtime');
       } else if (rawList.length > 0 && (!instantCards || instantCards.length === 0)) {
         lastCopilotAiKeyRef.current = dedupKey;
@@ -1268,10 +1686,15 @@ export default function App() {
         copilotAbortRef.current = null;
         if (inFlightCopilotKeyRef.current === dedupKey) {
           inFlightCopilotKeyRef.current = '';
+          inFlightCopilotWasStreamingRef.current = false;
         }
       }
       if (copilotSeqRef.current === currentSeq) {
         setIsGeneratingCopilot(false);
+        if (copilotCardsRef.current.length === 0 && instantCards.length > 0) {
+          setCopilotCards(isCambridge ? instantCards.slice(0, 1) : instantCards);
+          setCopilotSource('ai-realtime');
+        }
       }
     }
   };
@@ -1340,8 +1763,6 @@ export default function App() {
     setCustomMeasureOverride(null);
     setStatusBanner(null);
     lastCopilotAiKeyRef.current = '';
-    setCopilotCards([]);
-    setCopilotSource('loading');
 
     const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
     let loadedTurns: CallTurn[] | null = null;
@@ -1390,6 +1811,9 @@ export default function App() {
         effectiveTurns.map((tr) => ({ speaker: tr.speaker, text: tr.text })),
         { scenarioOverride: activeScenario, personaOverride: activePersona }
       );
+    } else {
+      setCopilotCards([]);
+      setCopilotSource('loading');
     }
 
     try {
@@ -1419,12 +1843,19 @@ export default function App() {
   useEffect(() => {
     if (activeTab === 'call') {
       if (callViewMode === 'history' && turns.length > 1) {
-        if (transcriptContainerRef.current) {
-          transcriptContainerRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-          });
-        }
+        requestAnimationFrame(() => {
+          if (mainScrollRef.current) {
+            mainScrollRef.current.scrollTo({
+              top: mainScrollRef.current.scrollHeight,
+              behavior: 'smooth',
+            });
+          } else if (transcriptContainerRef.current) {
+            transcriptContainerRef.current.scrollIntoView({
+              behavior: 'smooth',
+              block: 'end',
+            });
+          }
+        });
       } else if (callViewMode === 'stage') {
         try {
           if (mainScrollRef.current && mainScrollRef.current.scrollTop > 0) {
@@ -1542,6 +1973,8 @@ export default function App() {
   const handleSelectTargetLang = (lang: TargetLang) => {
     playFiezelSfx('button_tap');
     stopLiveCall();
+    isWorkbenchExplanationActiveRef.current = false;
+    setLearningWorkbench(null);
     const defaultPersona = lang === 'ja' ? 'nanami' : (lang === 'zh' ? 'xiao_mochi' : 'coach_alex');
     setSelectedPersonaId(defaultPersona);
     try {
@@ -1571,6 +2004,8 @@ export default function App() {
   const handleSelectPersona = (pId: string) => {
     const p = VOICE_PERSONAS[pId];
     if (!p) return;
+    isWorkbenchExplanationActiveRef.current = false;
+    setLearningWorkbench(null);
     setSelectedPersonaId(pId);
     try {
       localStorage.setItem('fiezel_voice_persona_pref', pId);
@@ -1601,15 +2036,17 @@ export default function App() {
       timestamp: Date.now(),
     };
     setTurns([newOpeningTurn]);
-    void triggerRealtimeCopilotForAi(
-      lineToSay,
-      '',
-      [{ speaker: 'ai', text: lineToSay }],
-      { scenarioOverride: matchingScen, personaOverride: p }
-    );
+    if (!matchingScen || matchingScen.id === activeScenarioId) {
+      void triggerRealtimeCopilotForAi(
+        lineToSay,
+        '',
+        [{ speaker: 'ai', text: lineToSay }],
+        { scenarioOverride: matchingScen, personaOverride: p }
+      );
+    }
     if (lineToSay) {
       void speakAiText(lineToSay, null, undefined, {
-        spokenLang: p.targetLang,
+        spokenLang: p.id === 'ssw_sensei' ? 'id' : p.targetLang,
         personaOverride: p,
       });
     }
@@ -1619,6 +2056,8 @@ export default function App() {
   const handleSelectScenario = (scenId: string) => {
     const scen = CALL_SCENARIOS.find((s) => s.id === scenId);
     if (!scen) return;
+    isWorkbenchExplanationActiveRef.current = false;
+    setLearningWorkbench(null);
     setActiveScenarioId(scen.id);
     try {
       localStorage.setItem('fiezel_voice_scenario_pref', scen.id);
@@ -1654,7 +2093,7 @@ export default function App() {
     );
     if (lineToSay) {
       void speakAiText(lineToSay, null, undefined, {
-        spokenLang: scen.targetLang,
+        spokenLang: p.id === 'ssw_sensei' || scen.id.startsWith('scen_ssw_') ? 'id' : scen.targetLang,
         personaOverride: p,
       });
     }
@@ -1694,7 +2133,12 @@ export default function App() {
     personaOverride?: typeof activePersona
   ) => {
     const persToUse = personaOverride || activePersona;
-    const langToUse = (spokenLang as TargetLang) || persToUse?.targetLang || activeScenario.targetLang;
+    const isSswVoice =
+      persToUse?.id === 'ssw_sensei' || activeScenario.id.startsWith('scen_ssw_');
+    const hasLatinForSsw = isSswVoice && (text.match(/[A-Za-z]{2,}/g) || []).length >= 2;
+    const langToUse = hasLatinForSsw
+      ? ('id' as TargetLang)
+      : (spokenLang as TargetLang) || persToUse?.targetLang || activeScenario.targetLang;
     for (let attempt = 0; attempt < 2; attempt++) {
       const res = await synthesizeFlexibleTts({
         text,
@@ -1766,7 +2210,8 @@ export default function App() {
   const playNeuralBase64ViaWebAudio = async (
     audioBase64: string,
     targetRate: number,
-    onDone: () => void
+    onDone: () => void,
+    chunkSpokenText?: string
   ): Promise<boolean> => {
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -1805,10 +2250,11 @@ export default function App() {
 
       // Feed exact audio duration to Mochi's text-to-viseme phonetic sequencer
       const exactDuration = decoded.duration / Math.max(0.1, targetRate);
-      if (lastSpokenAiTextRef.current && mochiInstanceRef.current?.speakPhrase) {
+      const visemeText = chunkSpokenText || lastSpokenAiTextRef.current;
+      if (visemeText && mochiInstanceRef.current?.speakPhrase) {
         try {
           mochiInstanceRef.current.speakPhrase(
-            lastSpokenAiTextRef.current,
+            visemeText,
             lastSpokenAiLangRef.current || 'ja',
             exactDuration
           );
@@ -1844,7 +2290,8 @@ export default function App() {
   const playNeuralChunk = (
     audioBase64: string,
     audioMime: string,
-    targetRate: number
+    targetRate: number,
+    chunkSpokenText?: string
   ): Promise<boolean> =>
     new Promise<boolean>(async (resolve) => {
       let settled = false;
@@ -1867,7 +2314,12 @@ export default function App() {
 
       // 1. Primary: Unlocked Web Audio context connects directly to ttsAnalyserRef for real 60 FPS Mochi visemes!
       try {
-        const okWeb = await playNeuralBase64ViaWebAudio(audioBase64, targetRate, () => settle());
+        const okWeb = await playNeuralBase64ViaWebAudio(
+          audioBase64,
+          targetRate,
+          () => settle(),
+          chunkSpokenText
+        );
         if (okWeb) {
           started = true;
           return;
@@ -1968,9 +2420,48 @@ export default function App() {
     lastSpokenAiTextRef.current = cleanSpoken;
     lastSpokenAiLangRef.current = resolvedLang;
 
-    // Single continuous WAV synthesis: never split a spoken reply into multiple sequential WebSocket TTS requests,
-    // which causes mid-sentence pauses, prosody resets, and single-key WebSocket contention.
-    const chunks = [cleanSpoken];
+    // Split only long replies (> 420 chars) cleanly at sentence boundaries so neither worker TTS
+    // nor live failover WAV timeouts clip multi-sentence beginner explanations mid-thought.
+    const splitTtsChunksAtSentenceBoundaries = (raw: string, maxLen = 420): string[] => {
+      const s = String(raw || '').trim();
+      if (!s || s.length <= maxLen) return s ? [s] : [];
+      const sentences = s.match(/[^.!?。！？]+[.!?。！？]*["'”’)]*\s*/g) || [s];
+      const out: string[] = [];
+      let cur = '';
+      for (const piece of sentences) {
+        const seg = piece.trim();
+        if (!seg) continue;
+        if (!cur) {
+          if (seg.length <= maxLen) {
+            cur = seg;
+          } else {
+            // Word-boundary split if a single unpunctuated sentence exceeds maxLen
+            const words = seg.split(/\s+/);
+            let sub = '';
+            for (const w of words) {
+              if (!sub) sub = w;
+              else if (sub.length + 1 + w.length <= maxLen) sub += ' ' + w;
+              else {
+                out.push(sub);
+                sub = w;
+              }
+            }
+            if (sub) cur = sub;
+          }
+        } else if (cur.length + 1 + seg.length <= maxLen) {
+          cur += ' ' + seg;
+        } else {
+          out.push(cur);
+          cur = seg;
+        }
+      }
+      if (cur) out.push(cur);
+      return out.length > 0 ? out : [s];
+    };
+
+    const chunks = preloadedBase64
+      ? [cleanSpoken]
+      : splitTtsChunksAtSentenceBoundaries(cleanSpoken, 420);
     const fetchChunk = (idx: number) =>
       idx === 0 && preloadedBase64
         ? Promise.resolve({ audioBase64: preloadedBase64, audioMimeType: 'audio/mpeg', engine: 'preloaded' })
@@ -1992,16 +2483,21 @@ export default function App() {
     try {
       for (let i = 0; i < chunks.length; i++) {
         const currentJob = nextAudioJob || fetchChunk(i);
+        nextAudioJob = i + 1 < chunks.length ? fetchChunk(i + 1) : null;
         const res = await currentJob;
         if (token !== speakTokenRef.current) return;
         if ((isLiveConnectedRef.current || isLiveConnectingRef.current) && !opts?.isManualReplay) {
           return;
         }
-        nextAudioJob = i + 1 < chunks.length ? fetchChunk(i + 1) : null;
         if (!res?.audioBase64) continue;
         anyAudio = true;
         setAiAudioPlaying(true);
-        const ok = await playNeuralChunk(res.audioBase64, res.audioMimeType || 'audio/mpeg', targetRate);
+        const ok = await playNeuralChunk(
+          res.audioBase64,
+          res.audioMimeType || 'audio/mpeg',
+          targetRate,
+          chunks[i]
+        );
         if (token !== speakTokenRef.current) return;
         if (ok) {
           if (!anyPlayed && !opts?.isManualReplay && callBillingRef.current.active) {
@@ -2069,12 +2565,176 @@ export default function App() {
   };
 
   /**
+   * Filter non-lexical fillers/noise tags or speaker echo returned by speech verification/ASR
+   * so vehicle noise, short grunts, and AI's own voice never count as interrupting human speech.
+   */
+  const isSelfEchoOrNonLexical = (transcript: string, aiText: string): boolean => {
+    const raw = String(transcript || '').trim();
+    if (!raw) return true;
+    if (/^[\[\(*].*[\]\)*]$/.test(raw)) return true;
+    const strippedNoise = raw
+      .replace(/\[[^\]]*\]|\([^)]*\)|\*[^*]*\*/g, ' ')
+      .replace(/[.,!?;:'"~…\-\u2013\u2014。、！？「」『』]/g, ' ')
+      .trim();
+    if (!strippedNoise) return true;
+    const lexicalOnly = strippedNoise.replace(/[\s\d]/g, '');
+    if (lexicalOnly.length < 2 && !/[\u3040-\u30FF\u4E00-\u9FFF]/.test(lexicalOnly)) return true;
+    if (
+      /^(uh+|um+|umm+|er+|err+|hm+|hmm+|mm+|ah+|oh+|eh+|ha+|brr+|vroom+|shh+|pff+|tsk+|noise|static|horn|vehicle|engine|music|applause|laughter|cough)$/i.test(
+        strippedNoise
+      )
+    ) {
+      return true;
+    }
+    const cleanAi = String(aiText || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\u00c0-\u024f\u0e00-\u0e7f\u3040-\u30ff\u3400-\u9fff\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const cleanUser = strippedNoise
+      .toLowerCase()
+      .replace(/[^a-z0-9\u00c0-\u024f\u0e00-\u0e7f\u3040-\u30ff\u3400-\u9fff\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!cleanUser) return true;
+    if (cleanAi && cleanUser.length >= 4) {
+      if (cleanAi.includes(cleanUser)) return true;
+      const userWords = cleanUser.split(' ').filter((w) => w.length >= 2);
+      if (userWords.length >= 2) {
+        const aiWordSet = new Set(cleanAi.split(' ').filter((w) => w.length >= 2));
+        let overlap = 0;
+        for (const w of userWords) {
+          if (aiWordSet.has(w)) overlap += 1;
+        }
+        if (overlap / userWords.length >= 0.75) return true;
+      }
+    }
+    return false;
+  };
+
+  const commitVerifiedSpeechInterrupt = (samples16k: Float32Array) => {
+    lastBargeInAtRef.current = Date.now();
+    suppressAiAudioForTurnRef.current = true;
+    interruptAiAndStartListening();
+    const durationMs = Math.max(120, Math.round((samples16k.length / 16000) * 1000));
+    turnAcousticTrackerRef.current.recordAudioFrame({
+      chunkMs: durationMs,
+      voicedMs: durationMs,
+      isActiveVoice: true,
+      confirmedSpeech: true,
+    });
+    userAudioBurstActiveRef.current = true;
+    if (!isUserSpeakingLiveRef.current) {
+      isUserSpeakingLiveRef.current = true;
+      setIsUserSpeakingLive(true);
+    }
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+      const sliceLen = 2048;
+      for (let off = 0; off < samples16k.length; off += sliceLen) {
+        const end = Math.min(samples16k.length, off + sliceLen);
+        const pcmBase64 = float32At16kToPcm16Base64(samples16k.subarray(off, end));
+        if (pcmBase64) {
+          sentAudioSinceEndRef.current = true;
+          wsRef.current.send(
+            JSON.stringify({
+              realtimeInput: {
+                audio: {
+                  mimeType: 'audio/pcm;rate=16000',
+                  data: pcmBase64,
+                },
+              },
+            })
+          );
+        }
+      }
+    }
+    scheduleUserBurstEnd();
+  };
+
+  const runLanguageVerifiedBargeIn = async (
+    samples16k: Float32Array,
+    rmsSeries: number[],
+    avgPitchCorr: number,
+    voicedFramesCount: number
+  ) => {
+    if (bargeVerifyInFlightRef.current) return;
+    if (!samples16k || samples16k.length < 4096) return;
+    if (!hasDynamicSpeechModulation(rmsSeries)) return;
+    const stillAiActive =
+      isPlayingAiAudioRef.current || isAiServerTurnOpenRef.current || activeSourcesRef.current.length > 0;
+    if (!stillAiActive || awaitingOpeningTurnRef.current) return;
+
+    bargeVerifyInFlightRef.current = true;
+    lastBargeVerifyAtRef.current = Date.now();
+    try {
+      let res: {
+        reached: boolean;
+        hasLanguage: boolean;
+        isEchoOnly: boolean;
+        transcript: string;
+        detectedLang?: string;
+      } = { reached: false, hasLanguage: false, isEchoOnly: false, transcript: '' };
+
+      if (Date.now() >= verifyEndpointUnavailableUntilRef.current) {
+        const wavBase64 = encodeFloat32At16kToWavBase64(samples16k);
+        res = await verifySpokenLanguageAudio({
+          audioBase64: wavBase64,
+          mimeType: 'audio/wav',
+          targetLang: activeScenario.targetLang,
+          locale,
+          aiCurrentText: liveAiDraftRef.current || lastSpokenAiTextRef.current,
+          timeoutMs: 1800,
+        });
+        if (!res.reached) {
+          verifyEndpointUnavailableUntilRef.current = Date.now() + 5000;
+        }
+      }
+
+      const stillPlayingAfterVerify =
+        isPlayingAiAudioRef.current || isAiServerTurnOpenRef.current || activeSourcesRef.current.length > 0;
+      if (!stillPlayingAfterVerify || isMicMutedRef.current) return;
+
+      const activeAiText = liveAiDraftRef.current || lastSpokenAiTextRef.current || '';
+      if (res.reached) {
+        if (
+          res.hasLanguage === true &&
+          !res.isEchoOnly &&
+          !isSelfEchoOrNonLexical(res.transcript, activeAiText)
+        ) {
+          commitVerifiedSpeechInterrupt(samples16k);
+        }
+        return;
+      }
+
+      if (voicedFramesCount >= 4 && avgPitchCorr >= 0.44) {
+        commitVerifiedSpeechInterrupt(samples16k);
+        return;
+      }
+
+      resetBargeCandidate();
+      return;
+    } finally {
+      bargeVerifyInFlightRef.current = false;
+    }
+  };
+
+  /**
    * Instant Barge-In (Menyela AI seperti di ChatGPT Voice).
    * Memotong seketika audio balasan Mochi dan mengembalikan kendali mic ke murid.
    */
   const interruptAiAndStartListening = () => {
+    bargeSpeechStreakRef.current = 0;
+    resetBargeCandidate();
+    clearLiveTurnAutoCommitTimer();
+    clearLiveAiDraftUiTimer();
     speakTokenRef.current += 1;
     isAiServerTurnOpenRef.current = false;
+    liveTurnFinalizedForCurrentAiTurnRef.current = false;
+    awaitingPostToolResponseRef.current = false;
+    if (liveGenCompleteTimerRef.current) {
+      window.clearTimeout(liveGenCompleteTimerRef.current);
+      liveGenCompleteTimerRef.current = null;
+    }
     awaitingOpeningTurnRef.current = false;
     if (awaitingOpeningTimerRef.current) {
       window.clearTimeout(awaitingOpeningTimerRef.current);
@@ -2093,17 +2753,7 @@ export default function App() {
       livePlaybackSafetyTimerRef.current = null;
     }
     stopNeuralBufferSource();
-    if (activeSourcesRef.current.length > 0) {
-      activeSourcesRef.current.forEach((src) => {
-        try {
-          src.stop();
-          src.disconnect();
-        } catch {
-          // Ignore
-        }
-      });
-      activeSourcesRef.current = [];
-    }
+    livePcmSchedulerRef.current.reset(outputAudioCtxRef.current, activeSourcesRef.current as any);
     if (currentAudioElRef.current) {
       try {
         currentAudioElRef.current.onended = null;
@@ -2116,9 +2766,7 @@ export default function App() {
       }
       currentAudioElRef.current = null;
     }
-    if (outputAudioCtxRef.current) {
-      nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
-    }
+    nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
     setAiAudioPlaying(false, 0);
   };
 
@@ -2185,6 +2833,7 @@ export default function App() {
             const res = await fetch(`${base}/api/voice/partner-turn`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({
                 text: `[WHITEBOARD_REQUEST] ${uText}`,
                 forcePopup: true,
@@ -2229,6 +2878,12 @@ export default function App() {
       speakingDurationSec: liveTelemetry?.spanDurationSec || undefined,
       inputMode: effectiveInputMode,
       fluencyTelemetry: liveTelemetry || undefined,
+      expectedTargetText: activeWorkbenchTargetRef.current.isOpen
+        ? activeWorkbenchTargetRef.current.activeTargetText
+        : undefined,
+      activePopupMode: activeWorkbenchTargetRef.current.isOpen
+        ? activeWorkbenchTargetRef.current.contextMode
+        : undefined,
       learnerDossier: safeBuildDossier(
         brainStateRef.current,
         activeScenario,
@@ -2260,12 +2915,22 @@ export default function App() {
         isAcousticTiming: liveTelemetry?.isAcousticTiming,
         measurementSource: liveTelemetry?.measurementSource,
         questionTitle: learningWorkbench?.topicTitle || activeScenario.titleId,
+        expectedPassageText:
+          activeWorkbenchTargetRef.current.isOpen &&
+          (activeWorkbenchTargetRef.current.contextMode === 'pte_read_aloud' ||
+            activeWorkbenchTargetRef.current.contextMode === 'read_aloud')
+            ? activeWorkbenchTargetRef.current.activeTargetText
+            : undefined,
+        targetLang: activeScenario.targetLang,
         learnerName: regLearnerName,
       });
       setLatestPteDiagnostic(pteDiagResult);
       evalParams.learnerDossier += `\n\n${pteDiagResult.clinicalDossierText}`;
     }
     const ev = evaluateTurnLocal(evalParams);
+    if (ev.readAloudAlignment || pteDiagResult?.readAloudAlignment) {
+      setLatestReadAloudAlignment(ev.readAloudAlignment || pteDiagResult?.readAloudAlignment || null);
+    }
     const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
     const outcome = recordSpeakingAttempt(brainStateRef.current, {
       competencyId: activeScenario.competencyId,
@@ -2354,36 +3019,63 @@ export default function App() {
     const rawTitle = (override?.topicTitle || hintText || '').trim();
     const title = rawTitle || 'Papan Belajar';
 
+    const isSswPersona =
+      activePersona.id === 'ssw_sensei' ||
+      activeScenario.personaId === 'ssw_sensei' ||
+      activeScenario.id.startsWith('scen_ssw_');
+    const isPteSession =
+      activePersona.id === 'dr_julian' ||
+      activeScenario.personaId === 'dr_julian' ||
+      activeScenario.id.startsWith('scen_pte');
+
+    const rawOverrideFocus = override?.focusType;
+    const normalizedOverrideFocus =
+      !isSswPersona && rawOverrideFocus === 'pte_read_aloud' && !isPteSession
+        ? 'read_aloud'
+        : !isSswPersona && rawOverrideFocus === 'read_aloud' && isPteSession
+          ? 'pte_read_aloud'
+          : rawOverrideFocus;
+
     let focusType:
       | 'grammar'
       | 'vocab'
       | 'kanji'
       | 'kana'
       | 'sentence_drill'
+      | 'read_aloud'
       | 'pte_describe_image'
       | 'pte_read_aloud'
       | 'pte_scorecard'
+      | 'ssw_tactical_board'
       | string =
-      override?.focusType ||
-      (activeScenario.id === 'scen_pte_di_level1' || activeScenario.competencyId === 'speak_pte_describe_image' || /describe.*image|pte.*di|pte.*chart|grafik/i.test(title)
-        ? 'pte_describe_image'
-        : activeScenario.id === 'scen_pte_ra_level2' || activeScenario.competencyId === 'speak_pte_read_aloud' || /read.*aloud|pte.*ra|chunking|baca.*teks/i.test(title)
-          ? 'pte_read_aloud'
-          : /scorecard|rapor.*pte|evaluasi.*pte/i.test(title)
-            ? 'pte_scorecard'
-            : /kanji|hanzi|huruf china|aksara/i.test(title)
-              ? 'kanji'
-              : /kana|hiragana|katakana/i.test(title)
-                ? 'kana'
-                : /kosakata|vocab|kata baru|arti kata/i.test(title)
-                  ? 'vocab'
-                  : 'grammar');
+      normalizedOverrideFocus ||
+      (isSswPersona
+        ? 'ssw_tactical_board'
+        : activeScenario.id === 'scen_pte_di_level1' || activeScenario.competencyId === 'speak_pte_describe_image' || /describe.*image|pte.*di|pte.*chart|grafik/i.test(title)
+          ? 'pte_describe_image'
+          : /pte.*ra|pte.*read.*aloud/i.test(title) ||
+              ((activeScenario.id === 'scen_pte_ra_level2' ||
+                activeScenario.competencyId === 'speak_pte_read_aloud' ||
+                isPteSession) &&
+                /read.*aloud|chunking|baca.*teks|baca.*nyaring|latihan.*baca/i.test(title))
+            ? 'pte_read_aloud'
+            : /read.*aloud|baca.*teks|baca.*nyaring|latihan.*baca|kalimat.*baca/i.test(title)
+              ? 'read_aloud'
+              : /scorecard|rapor.*pte|evaluasi.*pte/i.test(title)
+                ? 'pte_scorecard'
+                : /kanji|hanzi|huruf china|aksara/i.test(title)
+                  ? 'kanji'
+                  : /kana|hiragana|katakana/i.test(title)
+                    ? 'kana'
+                    : /kosakata|vocab|kata baru|arti kata/i.test(title)
+                      ? 'vocab'
+                      : 'grammar');
 
     const effectiveUiAction: VoiceUiAction = {
       actionType: 'open_learning_popup',
-      focusType: focusType as any,
       topicTitle: title,
       ...(override || {}),
+      focusType: focusType as any,
     } as VoiceUiAction;
 
     return {
@@ -2419,22 +3111,29 @@ export default function App() {
 
   const workbenchSessionRef = useRef<{
     turnSeq: number;
+    openSeq: number;
     dismissedByUser: boolean;
     completedQuizSentence: string;
   }>({
     turnSeq: 0,
+    openSeq: 0,
     dismissedByUser: false,
     completedQuizSentence: '',
   });
 
-  const openLearningWorkbenchWithAction = (action?: Partial<VoiceUiAction>, hintText = '') => {
+  const openLearningWorkbenchWithAction = (
+    action?: Partial<VoiceUiAction>,
+    hintText = '',
+    opts?: { forceOpen?: boolean }
+  ) => {
     if (isMeasureMode) return;
     const hasRichAction = Boolean(
       (action?.sampleTarget && action.sampleTarget.trim().length > 3) ||
       (action?.rightWord && action.rightWord.trim().length > 0 && action.rightWord !== 'bentuk tepat')
     );
-    const dedupKey = `popup:${action?.bankTopicId || action?.topicTitle || hintText || activeScenario.id}`;
+    const dedupKey = `popup:${action?.focusType || ''}:${action?.bankTopicId || action?.topicTitle || hintText || activeScenario.id}`;
     if (
+      !opts?.forceOpen &&
       !hasRichAction &&
       lastSystemIntentAtRef.current.key === dedupKey &&
       Date.now() - lastSystemIntentAtRef.current.at < 1500
@@ -2443,6 +3142,7 @@ export default function App() {
     }
     lastSystemIntentAtRef.current = { key: dedupKey, at: Date.now() };
     workbenchSessionRef.current.dismissedByUser = false;
+    const nextOpenNonce = ++workbenchSessionRef.current.openSeq;
 
     const isLiveActive =
       Boolean(
@@ -2458,14 +3158,14 @@ export default function App() {
     // The learning workbench is visual. Opening it must NEVER kill or interrupt ongoing speech!
     isWorkbenchExplanationActiveRef.current = false;
 
-    const wbPayload = buildDefaultWorkbenchPayload(hintText, effectiveAction);
+    const wbPayload = { ...buildDefaultWorkbenchPayload(hintText, effectiveAction), openNonce: nextOpenNonce };
     setLearningWorkbench((prev) => {
       if (
         prev?.isOpen &&
         !hasRichAction &&
         Boolean(prev.uiAction?.sampleTarget && prev.uiAction.sampleTarget.trim().length > 3)
       ) {
-        return prev;
+        return { ...prev, openNonce: nextOpenNonce };
       }
       return wbPayload;
     });
@@ -2571,6 +3271,23 @@ export default function App() {
       return { actionType: 'switch_call_mode', callMode: 'tutor_coach' };
     }
 
+    // 0-B) Explicit Read Aloud / Baca Nyaring popup command MUST win over generic module navigation!
+    const wantsReadAloudPopup =
+      /\b(read\s*aloud|baca\s*nyaring)\b/i.test(s) ||
+      (/\b(pop[\s-]?up|papan|tampilkan|buka|bukain|bukakan|kasih|beri|munculkan|latihan)\b/i.test(s) &&
+        /\b(read\s*aloud|baca\s*nyaring|kalimat\s*(?:untuk\s*)?baca|reading\s+aloud)\b/i.test(s));
+    const isPteActive =
+      activePersona.id === 'dr_julian' ||
+      activeScenario.personaId === 'dr_julian' ||
+      activeScenario.id.startsWith('scen_pte_');
+    if (wantsReadAloudPopup) {
+      return {
+        actionType: 'open_learning_popup',
+        focusType: isPteActive ? 'pte_read_aloud' : 'read_aloud',
+        topicTitle: utterance.trim(),
+      };
+    }
+
     // 1) Explicit voice navigation commands to FIEZEL modules & courses
     const navTrigger =
       /\b(buka|bukain|bukakan|arahkan|arahin|pindah|ganti|masuk|pergi|lanjut|ke halaman|ke fitur|ke modul|ke kursus|open|go to|take me to|switch to|navigate to|เปิด|ไปที่)\b/i.test(
@@ -2604,7 +3321,7 @@ export default function App() {
       if (/\b(kanji|hanzi|menulis|tulisan|writing|คันจิ|เขียน)\b/i.test(s)) {
         return { actionType: 'navigate_app', destination: 'writing' };
       }
-      if (/\b(reading|bacaan|membaca|การอ่าน)\b/i.test(s)) {
+      if (!/\b(read\s*aloud|baca\s*nyaring|kalimat\s*baca)\b/i.test(s) && /\b(reading|bacaan|membaca|การอ่าน)\b/i.test(s)) {
         return { actionType: 'navigate_app', destination: 'reading' };
       }
       if (/\b(listening|pendengaran|mendengar|chokai|การฟัง)\b/i.test(s)) {
@@ -2627,12 +3344,17 @@ export default function App() {
       }
     }
 
-    // 2-A) Explicit request to be tested / quizzed
+    const isSswPersonaActive =
+      activePersona?.id === 'ssw_sensei' ||
+      activeScenario?.personaId === 'ssw_sensei' ||
+      String(activeScenario?.id || '').startsWith('scen_ssw_');
+
+    // 2-A) Explicit request to be tested / quizzed (skip generic grammar popup for SSW SENSEI, which uses native SSW panel tools)
     const asksTestingOrQuiz =
       /\b(tes\s+aku|coba\s+tes|uji\s+aku|coba\s+uji|kasih\s+soal|buatkan\s+(?:aku\s+)?latihan|coba\s+kasih\s+soal|kuiskan\s+aku|test\s+me|quiz\s+me)\b/i.test(
         s
       );
-    if (asksTestingOrQuiz) {
+    if (asksTestingOrQuiz && !isSswPersonaActive) {
       return {
         actionType: 'open_learning_popup',
         topicTitle: utterance.trim(),
@@ -2653,7 +3375,10 @@ export default function App() {
           s
         ));
 
-    if (explicitPopupCmd || (callModeRef.current === 'tutor_coach' && asksGrammarOrStruggle)) {
+    if (
+      explicitPopupCmd ||
+      (!isSswPersonaActive && callModeRef.current === 'tutor_coach' && asksGrammarOrStruggle)
+    ) {
       return {
         actionType: 'open_learning_popup',
         topicTitle: utterance.trim(),
@@ -2736,7 +3461,11 @@ export default function App() {
         extraFailReason =
           extraFailReason || 'Susun kalimat utuh minimal 3 kata (Subjek + Kata Kerja + Keterangan) agar polanya teruji.';
       }
-    } else if (activeScenario.targetLang === 'ja') {
+    } else if (
+      activeScenario.targetLang === 'ja' &&
+      activePersona.id !== 'ssw_sensei' &&
+      !activeScenario.id.startsWith('scen_ssw_')
+    ) {
       if (/ますでした/.test(clean)) {
         trappedTokens.push('ますでした');
         extraFailReason = 'Bentuk "ますでした" tidak baku, ubah langsung ます menjadi ました.';
@@ -2772,7 +3501,11 @@ export default function App() {
       trappedTokens.push(...ev.missingTokens.slice(0, 2));
     }
 
-    const finalOk = Boolean(ev.ok) && trappedTokens.length === 0 && !extraFailReason;
+    const finalOk = meta?.isQuizFailure
+      ? false
+      : meta?.isQuizSuccess
+        ? true
+        : Boolean(ev.ok) && trappedTokens.length === 0 && !extraFailReason;
     const outcome = recordSpeakingAttempt(brainStateRef.current, {
       competencyId: activeCompId,
       scenarioId: activeScenario.id,
@@ -2825,6 +3558,11 @@ export default function App() {
         ? 'ยอดเยี่ยม! โครงสร้างประโยคตรงตามสูตรเป๊ะ กดส่งเข้าสายเพื่อให้ติวเตอร์ฟังได้เลย'
         : 'Mantap! Susunan kalimat dan tata bahasamu sudah bersih sesuai rumus. Klik "Lanjut Ngobrol" untuk kembali ke obrolan.'
       : extraFailReason ||
+        (meta?.isQuizFailure
+          ? locale === 'th'
+            ? 'คำตอบยังไม่ถูกต้อง ลองทบทวนตัวเลือกที่เลือกอีกครั้ง'
+            : 'Jawaban kuis belum tepat. Perhatikan kata/arti yang dipilih dan coba lagi.'
+          : undefined) ||
         (locale === 'th'
           ? ev.whyFailsTh || ev.pedagogicalFeedbackTh
           : ev.whyFailsId || ev.pedagogicalFeedbackId) ||
@@ -2887,6 +3625,10 @@ export default function App() {
       }
     }
 
+    if (!isLiveConnectedRef.current && !ensureTurnByTurnBillingSession()) {
+      return;
+    }
+
     setInputText('');
     setLiveUserDraft('');
     setIsAnalyzingTurn(true);
@@ -2904,6 +3646,12 @@ export default function App() {
           : params.speakingDurationSec && params.speakingDurationSec > 0
             ? params.speakingDurationSec
             : undefined;
+      const visibleScreenTarget = isWorkbenchOpenRef.current
+        ? (activeWorkbenchTargetRef.current.activeTargetText || learningWorkbench?.sampleTarget || '').trim()
+        : '';
+      const visibleScreenMode = isWorkbenchOpenRef.current
+        ? activeWorkbenchTargetRef.current.contextMode || learningWorkbench?.focusType
+        : undefined;
       const evalParams = {
         text: trimmed || activeScenario.sampleUtterances[0]?.text || 'Hello',
         scenario: activeScenario,
@@ -2915,12 +3663,14 @@ export default function App() {
         speakingDurationSec: measuredDurationSec,
         inputMode: effectiveInputMode,
         fluencyTelemetry: params.fluencyTelemetry || undefined,
+        expectedTargetText: visibleScreenTarget || undefined,
+        activePopupMode: visibleScreenMode,
         learnerDossier: safeBuildDossier(
           brainStateRef.current,
           activeScenario,
           locale
         ),
-        history: turns.slice(-6).map((tItem) => ({
+        history: turnsRef.current.slice(-6).map((tItem) => ({
           speaker: tItem.speaker,
           text: tItem.text,
         })),
@@ -2946,18 +3696,29 @@ export default function App() {
           burstDurationsMs: params.fluencyTelemetry?.burstDurationsMs,
           isAcousticTiming: params.fluencyTelemetry?.isAcousticTiming,
           measurementSource: params.fluencyTelemetry?.measurementSource,
-          questionTitle: learningWorkbench?.topicTitle || activeScenario.titleId,
+          questionTitle: activeWorkbenchTargetRef.current.topicTitle || learningWorkbench?.topicTitle || activeScenario.titleId,
+          expectedPassageText:
+            (visibleScreenMode === 'pte_read_aloud' || visibleScreenMode === 'read_aloud') && visibleScreenTarget
+              ? visibleScreenTarget
+              : undefined,
+          targetLang: activeScenario.targetLang,
           learnerName: regLearnerName,
         });
         setLatestPteDiagnostic(pteDiagResult);
         evalParams.learnerDossier += `\n\n${pteDiagResult.clinicalDossierText}`;
       }
       const localEv = evaluateTurnLocal(evalParams);
+      if (localEv.readAloudAlignment || pteDiagResult?.readAloudAlignment) {
+        setLatestReadAloudAlignment(localEv.readAloudAlignment || pteDiagResult?.readAloudAlignment || null);
+      } else if (visibleScreenMode === 'pte_read_aloud' || visibleScreenMode === 'read_aloud') {
+        setLatestReadAloudAlignment(null);
+      }
       const exactTranscript = localEv.userExactTranscript;
       const ev = localEv;
 
       const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
-      const attemptOutcome = recordSpeakingAttempt(brainState, {
+      const freshBrain = loadBraincoreState();
+      const attemptOutcome = recordSpeakingAttempt(freshBrain, {
         competencyId: activeScenario.competencyId,
         scenarioId: activeScenario.id,
         targetLang: activeScenario.targetLang,
@@ -2975,6 +3736,7 @@ export default function App() {
         measureMode: isMeasureMode,
       });
 
+      brainStateRef.current = attemptOutcome.nextState;
       setBrainState(attemptOutcome.nextState);
       if (isMeasureMode) {
         playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
@@ -3012,9 +3774,10 @@ export default function App() {
 
       // The learner sees their own words + feedback immediately.
       const historyAfterUser: Array<{ speaker: 'ai' | 'user'; text: string }> = [
-        ...turns.slice(-7).map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+        ...turnsRef.current.slice(-7).map((tr) => ({ speaker: tr.speaker, text: tr.text })),
         { speaker: 'user', text: exactTranscript },
       ];
+      turnsRef.current = [...turnsRef.current, userTurn];
       setTurns((prev) => [...prev, userTurn]);
       setInputText('');
       setLiveUserDraft('');
@@ -3057,7 +3820,10 @@ export default function App() {
             const isCambridge =
               activePersona?.id === 'cambridge_examiner' ||
               activeScenario.personaId === 'cambridge_examiner' ||
-              activeScenario.id.startsWith('scen_ielts');
+              activeScenario.id.startsWith('scen_ielts') ||
+              activePersona?.id === 'dr_julian' ||
+              activeScenario.personaId === 'dr_julian' ||
+              activeScenario.id.startsWith('scen_pte');
             const aiOnly = suggestions.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
             if (aiOnly.length > 0) {
               lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${aiText.trim()}::${exactTranscript}`;
@@ -3141,7 +3907,10 @@ export default function App() {
         const isCambridge =
           activePersona?.id === 'cambridge_examiner' ||
           activeScenario.personaId === 'cambridge_examiner' ||
-          activeScenario.id.startsWith('scen_ielts');
+          activeScenario.id.startsWith('scen_ielts') ||
+          activePersona?.id === 'dr_julian' ||
+          activeScenario.personaId === 'dr_julian' ||
+          activeScenario.id.startsWith('scen_pte');
         const aiOnly = replyEv.nextSuggestedReplies.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
         if (aiOnly.length > 0) {
           lastCopilotAiKeyRef.current = `${activeScenario.id}::${activeScenario.targetLang}::${replyEv.aiReply.trim()}::${exactTranscript}`;
@@ -3266,11 +4035,11 @@ export default function App() {
     const computeSpeechSilenceWaitMs = (text: string, isFinalResult = false) => {
       const incomplete = isGrammaticallyIncomplete(text, activeScenario.targetLang);
       if (isMobileDevice) {
-        if (isFinalResult && !incomplete) return 260;
-        return incomplete ? 850 : 480;
+        if (isFinalResult && !incomplete) return 220;
+        return incomplete ? 680 : 420;
       }
-      if (isFinalResult && !incomplete) return 320;
-      return incomplete ? 1050 : 600;
+      if (isFinalResult && !incomplete) return 260;
+      return incomplete ? 780 : 480;
     };
 
     const startListeningCycle = () => {
@@ -3501,6 +4270,7 @@ export default function App() {
   ]);
 
   const startPttRecording = async () => {
+    if (!ensureTurnByTurnBillingSession()) return;
     try {
       // Immediate barge-in: stop the neural voice playback, and unlock audio for the reply.
       if (currentAudioElRef.current) {
@@ -3526,7 +4296,9 @@ export default function App() {
       if (SpeechRec) {
         const recognition = new SpeechRec();
         recognition.lang =
-          activeScenario.targetLang === 'ja'
+          activePersona.id === 'ssw_sensei' || activeScenario.id.startsWith('scen_ssw_')
+            ? 'id-ID'
+            : activeScenario.targetLang === 'ja'
             ? 'ja-JP'
             : activeScenario.targetLang === 'zh'
             ? 'zh-CN'
@@ -3565,15 +4337,15 @@ export default function App() {
             const incompletePtt = isGrammaticallyIncomplete(clean, activeScenario.targetLang);
             const pttSilenceWaitMs = isMobilePtt
               ? lastFinal && !incompletePtt
-                ? 700
+                ? 520
                 : incompletePtt
-                  ? 1250
-                  : 900
+                  ? 980
+                  : 720
               : lastFinal && !incompletePtt
-                ? 900
+                ? 650
                 : incompletePtt
-                  ? 1600
-                  : 1150;
+                  ? 1150
+                  : 850;
             pttSilenceTimerRef.current = window.setTimeout(() => {
               stopPttRecording();
             }, pttSilenceWaitMs);
@@ -3776,10 +4548,10 @@ export default function App() {
     const durationSec = len / sr;
     const zcrHz = durationSec > 0 ? zeroCrossings / (2 * durationSec) : 0;
     const isHumanSpeech =
-      voiceBandRms >= 0.0038 &&
-      voiceRatio >= 0.42 &&
-      zcrHz >= 140 &&
-      zcrHz <= 2900;
+      voiceBandRms >= 0.003 &&
+      voiceRatio >= 0.38 &&
+      zcrHz >= 120 &&
+      zcrHz <= 3100;
     return { rms, voiceBandRms, isHumanSpeech };
   };
 
@@ -3793,6 +4565,30 @@ export default function App() {
       window.clearTimeout(userBurstEndTimerRef.current);
       userBurstEndTimerRef.current = null;
     }
+  };
+
+  const scheduleLiveTurnAutoCommitWatchdog = () => {
+    clearLiveTurnAutoCommitTimer();
+    liveTurnAutoCommitTimerRef.current = window.setTimeout(() => {
+      liveTurnAutoCommitTimerRef.current = null;
+      const pendingDraft = sanitizeHallucinatedTranscript(
+        liveUserDraftRef.current,
+        activeScenarioRef.current.targetLang,
+        locale
+      ).trim();
+      if (
+        pendingDraft &&
+        wsRef.current &&
+        wsRef.current.readyState === WebSocket.OPEN &&
+        isLiveConnectedRef.current &&
+        !isPlayingAiAudioRef.current &&
+        !isAiServerTurnOpenRef.current &&
+        !awaitingPostToolResponseRef.current &&
+        !isUserSpeakingLiveRef.current
+      ) {
+        submitLiveUserUtterance(pendingDraft, { inputMode: 'voice' });
+      }
+    }, 950);
   };
 
   const flushUserAudioStreamEnd = () => {
@@ -3826,6 +4622,9 @@ export default function App() {
               },
             })
           );
+          if (liveUserDraftRef.current.trim()) {
+            scheduleLiveTurnAutoCommitWatchdog();
+          }
         } catch {
           // Ignore
         }
@@ -3835,6 +4634,7 @@ export default function App() {
 
   const scheduleUserBurstEnd = () => {
     clearUserBurstEndTimer();
+    clearLiveTurnAutoCommitTimer();
     const silenceHoldMs = 520;
     userBurstEndTimerRef.current = window.setTimeout(() => {
       userBurstEndTimerRef.current = null;
@@ -3876,7 +4676,8 @@ export default function App() {
       (isPlayingAiAudioRef.current ||
         isAiServerTurnOpenRef.current ||
         activeSourcesRef.current.length > 0 ||
-        Date.now() - lastAiPlayoutEndedAtRef.current < 260);
+        livePcmSchedulerRef.current.hasPendingAudio() ||
+        Date.now() - lastAiPlayoutEndedAtRef.current < 180);
 
     if (aiActuallyPlaying) {
       clearUserBurstEndTimer();
@@ -3884,60 +4685,105 @@ export default function App() {
       sentAudioSinceEndRef.current = false;
       preRollFramesRef.current = [];
       consecutiveSpeechFramesRef.current = 0;
-      if (
-        !openingGreetingCompletedRef.current ||
-        isWorkbenchOpenRef.current ||
-        Date.now() - lastAiPlayoutEndedAtRef.current < 260
-      ) {
+      if (Date.now() - lastAiPlayoutEndedAtRef.current < 180) {
         bargeSpeechStreakRef.current = 0;
+        resetBargeCandidate();
         return;
       }
       const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
+      const pitchCorr = bargeVad.lastMetrics?.pitchCorr ?? 0;
       const isBargeVoice =
-        v.isHumanSpeech &&
-        (bargeVad.inSpeech || bargeVad.speechStarted) &&
-        v.rms >= 0.026;
+        (bargeVad.inSpeech || bargeVad.voicedFrames >= 1) &&
+        v.rms >= 0.018 &&
+        pitchCorr >= 0.44;
       if (isBargeVoice) {
         bargeSpeechStreakRef.current += 1;
-        if (bargeSpeechStreakRef.current >= 5) {
+        bargeCandidateSilenceRef.current = 0;
+        const resampled = resampleFloat32To16k(float32, sampleRate);
+        if (resampled.length > 0) {
+          bargeCandidateChunksRef.current.push(resampled);
+          bargeCandidateSamplesRef.current += resampled.length;
+          bargeCandidateRmsRef.current.push(v.rms);
+          bargeCandidatePitchSumRef.current += pitchCorr;
+          bargeCandidatePitchCountRef.current += 1;
+          bargeCandidateVoicedFramesRef.current += Math.max(1, bargeVad.voicedFrames || 0);
+          while (bargeCandidateSamplesRef.current > 24000 && bargeCandidateChunksRef.current.length > 1) {
+            const dropped = bargeCandidateChunksRef.current.shift();
+            if (dropped) bargeCandidateSamplesRef.current -= dropped.length;
+            bargeCandidateRmsRef.current.shift();
+          }
+        }
+
+        if (
+          bargeSpeechStreakRef.current >= 7 &&
+          bargeCandidateVoicedFramesRef.current >= 3 &&
+          hasDynamicSpeechModulation(bargeCandidateRmsRef.current) &&
+          Date.now() - lastBargeInAtRef.current > 450
+        ) {
+          const capturedChunks = bargeCandidateChunksRef.current;
+          const totalSamples = bargeCandidateSamplesRef.current;
+          const rmsSeries = bargeCandidateRmsRef.current;
+          const avgPitchCorr =
+            bargeCandidatePitchCountRef.current > 0
+              ? bargeCandidatePitchSumRef.current / bargeCandidatePitchCountRef.current
+              : pitchCorr;
+          const voicedFramesCount = bargeCandidateVoicedFramesRef.current;
+          resetBargeCandidate();
           bargeSpeechStreakRef.current = 0;
-          lastBargeInAtRef.current = Date.now();
-          interruptAiAndStartListening();
-          const bargeChunkMs = Math.max(10, Math.round((float32.length / sampleRate) * 1000));
-          turnAcousticTrackerRef.current.recordAudioFrame({
-            chunkMs: bargeChunkMs,
-            voicedMs: bargeVad.voicedMs || bargeChunkMs,
-            isActiveVoice: true,
-            confirmedSpeech: true,
-          });
-          userAudioBurstActiveRef.current = true;
-          if (!isUserSpeakingLiveRef.current) {
-            isUserSpeakingLiveRef.current = true;
-            setIsUserSpeakingLive(true);
+          const merged16k = new Float32Array(Math.max(totalSamples, resampled.length));
+          let offset = 0;
+          if (totalSamples > 0) {
+            for (const chunk of capturedChunks) {
+              if (offset + chunk.length <= merged16k.length) {
+                merged16k.set(chunk, offset);
+                offset += chunk.length;
+              }
+            }
+          } else if (resampled.length > 0) {
+            merged16k.set(resampled, 0);
           }
-          const pcmBase64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
-          if (
-            pcmBase64 &&
-            wsRef.current &&
-            wsRef.current.readyState === WebSocket.OPEN &&
-            isLiveConnectedRef.current
-          ) {
-            sentAudioSinceEndRef.current = true;
-            wsRef.current.send(
-              JSON.stringify({
-                realtimeInput: {
-                  audio: {
-                    mimeType: 'audio/pcm;rate=16000',
-                    data: pcmBase64,
-                  },
-                },
-              })
-            );
+          if (merged16k.length >= 4096) {
+            void runLanguageVerifiedBargeIn(merged16k, rmsSeries, avgPitchCorr, voicedFramesCount);
+          } else {
+            commitVerifiedSpeechInterrupt(merged16k);
           }
-          scheduleUserBurstEnd();
+          return;
+        }
+
+        const requiredSamples =
+          Date.now() < verifyEndpointUnavailableUntilRef.current ? 16000 : 8000;
+        if (
+          bargeCandidateSamplesRef.current >= requiredSamples &&
+          !bargeVerifyInFlightRef.current &&
+          Date.now() - lastBargeVerifyAtRef.current >= 700
+        ) {
+          const capturedChunks = bargeCandidateChunksRef.current;
+          const totalSamples = bargeCandidateSamplesRef.current;
+          const rmsSeries = bargeCandidateRmsRef.current;
+          const avgPitchCorr =
+            bargeCandidatePitchCountRef.current > 0
+              ? bargeCandidatePitchSumRef.current / bargeCandidatePitchCountRef.current
+              : 0;
+          const voicedFramesCount = bargeCandidateVoicedFramesRef.current;
+          resetBargeCandidate();
+
+          // Steady/monotone ambient rumble or horns fail syllable envelope modulation -> keep AI talking
+          if (hasDynamicSpeechModulation(rmsSeries)) {
+            const merged16k = new Float32Array(totalSamples);
+            let offset = 0;
+            for (const chunk of capturedChunks) {
+              merged16k.set(chunk, offset);
+              offset += chunk.length;
+            }
+            void runLanguageVerifiedBargeIn(merged16k, rmsSeries, avgPitchCorr, voicedFramesCount);
+          }
         }
       } else {
         bargeSpeechStreakRef.current = Math.max(0, bargeSpeechStreakRef.current - 1);
+        bargeCandidateSilenceRef.current += 1;
+        if (bargeCandidateSilenceRef.current >= 4 || bargeSpeechStreakRef.current === 0) {
+          resetBargeCandidate();
+        }
         handyVadRef.current.clearPreRoll();
       }
       return;
@@ -3945,16 +4791,18 @@ export default function App() {
 
     const vadRes = handyVadRef.current.processSamples(float32, sampleRate, false);
     const frameChunkMs = Math.max(10, Math.round((float32.length / sampleRate) * 1000));
-    const isListeningSpeech = (v.isHumanSpeech || vadRes.inSpeech) && v.rms >= 0.002;
+    const isListeningSpeech = vadRes.inSpeech && v.voiceBandRms >= 0.003;
+    const isVerifiedListeningSpeech =
+      isListeningSpeech || (v.isHumanSpeech && v.voiceBandRms >= 0.0028);
     turnAcousticTrackerRef.current.recordAudioFrame({
       chunkMs: frameChunkMs,
-      voicedMs: vadRes.voicedMs || (v.isHumanSpeech ? frameChunkMs : 0),
-      isActiveVoice: (vadRes.voicedFrames || 0) > 0 || v.isHumanSpeech,
-      confirmedSpeech: Boolean(vadRes.inSpeech || isListeningSpeech),
+      voicedMs: vadRes.inSpeech ? vadRes.voicedMs || frameChunkMs : 0,
+      isActiveVoice: Boolean(vadRes.inSpeech && isVerifiedListeningSpeech),
+      confirmedSpeech: Boolean(vadRes.inSpeech && isVerifiedListeningSpeech),
     });
     const wsOpen = Boolean(wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current);
 
-    if (isListeningSpeech) {
+    if (isVerifiedListeningSpeech) {
       consecutiveSpeechFramesRef.current += 1;
       if (consecutiveSpeechFramesRef.current >= 2) {
         lastHandySpeechAtRef.current = Date.now();
@@ -3967,7 +4815,7 @@ export default function App() {
         userSpeakingTimerRef.current = window.setTimeout(() => {
           isUserSpeakingLiveRef.current = false;
           setIsUserSpeakingLive(false);
-        }, 420);
+        }, 560);
         scheduleUserBurstEnd();
 
         if (wsOpen && wsRef.current) {
@@ -4010,14 +4858,13 @@ export default function App() {
 
     if (userAudioBurstActiveRef.current) {
       const silenceElapsedMs = lastHandySpeechAtRef.current > 0 ? Date.now() - lastHandySpeechAtRef.current : 0;
-      if (!vadRes.inSpeech && (vadRes.speechEnded || silenceElapsedMs >= 420)) {
+      if (!vadRes.inSpeech && silenceElapsedMs >= 520) {
         flushUserAudioStreamEnd();
         return;
       }
       if (wsOpen && wsRef.current) {
-        const tailB64 = vadRes.inSpeech
-          ? resampleFloat32To16kPcmBase64(float32, sampleRate)
-          : getSilent16kPcmBase64(sampleRate, float32.length);
+        // Keep streaming continuous real microphone audio during active burst so unvoiced consonants are never zeroed out
+        const tailB64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
         if (tailB64) {
           sentAudioSinceEndRef.current = true;
           wsRef.current.send(
@@ -4035,12 +4882,11 @@ export default function App() {
       return;
     }
 
-    // Idle background noise: retain only a short pre-roll ring for onset consonants
-    // and withhold raw fan/room noise so Gemini server VAD and ASR stay noise-free.
+    // Idle pre-roll ring: continuously buffer ~480ms so word onsets and initial syllables are never clipped
     const idleB64 = resampleFloat32To16kPcmBase64(float32, sampleRate);
     if (idleB64) {
       preRollFramesRef.current.push(idleB64);
-      if (preRollFramesRef.current.length > 7) {
+      if (preRollFramesRef.current.length > 12) {
         preRollFramesRef.current.shift();
       }
     }
@@ -4085,45 +4931,54 @@ export default function App() {
         (stream === parentWin.__fzSharedMicStream ||
           (typeof window.MediaStream !== 'undefined' && !(stream instanceof window.MediaStream)))
     );
+    let wiredInParent = false;
     if (parentWin && typeof parentWin.__fzWireSharedMicBridge === 'function' && isParentStream) {
       parentWin.__fzSharedMicPcmCallback = (samples: Float32Array) => {
         handleMicPcmData(samples);
       };
-      const wiredInParent = Boolean(parentWin.__fzWireSharedMicBridge(stream));
+      wiredInParent = Boolean(parentWin.__fzWireSharedMicBridge(stream));
       if (wiredInParent) {
         try {
           (window as any).__fzLiveProcessor = parentWin.__fzSharedMicProcessor;
         } catch {}
         syncMicHardwareReadyState();
-        return;
       }
     }
 
-    if (micSourceNodeRef.current) {
-      try {
-        micSourceNodeRef.current.disconnect();
-      } catch {}
-      micSourceNodeRef.current = null;
-    }
-    if (audioWorkletNodeRef.current) {
-      try {
-        audioWorkletNodeRef.current.port.onmessage = null;
-        audioWorkletNodeRef.current.disconnect();
-      } catch {}
-      audioWorkletNodeRef.current = null;
-    }
-    if (scriptProcessorRef.current) {
-      try {
-        scriptProcessorRef.current.onaudioprocess = null;
-        scriptProcessorRef.current.disconnect();
-      } catch {}
-      scriptProcessorRef.current = null;
+    if (!wiredInParent) {
+      if (parentWin && typeof parentWin.__fzStopSharedMicBridge === 'function') {
+        try {
+          parentWin.__fzSharedMicPcmCallback = null;
+          parentWin.__fzStopSharedMicBridge();
+        } catch {}
+      }
+      if (micSourceNodeRef.current) {
+        try {
+          micSourceNodeRef.current.disconnect();
+        } catch {}
+        micSourceNodeRef.current = null;
+      }
+      if (audioWorkletNodeRef.current) {
+        try {
+          audioWorkletNodeRef.current.port.onmessage = null;
+          audioWorkletNodeRef.current.disconnect();
+        } catch {}
+        audioWorkletNodeRef.current = null;
+      }
+      if (scriptProcessorRef.current) {
+        try {
+          scriptProcessorRef.current.onaudioprocess = null;
+          scriptProcessorRef.current.disconnect();
+        } catch {}
+        scriptProcessorRef.current = null;
+      }
     }
 
     // Ensure same-realm AudioContext when wiring a stream created inside call.html's own window
     const LocalAudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     let micCtx: AudioContext = liveCtx;
     if (
+      !wiredInParent &&
       LocalAudioCtx &&
       typeof window.MediaStream !== 'undefined' &&
       stream instanceof window.MediaStream &&
@@ -4135,7 +4990,7 @@ export default function App() {
         !(inputAudioCtxRef.current instanceof LocalAudioCtx)
       ) {
         try {
-          inputAudioCtxRef.current = new LocalAudioCtx({ latencyHint: 'interactive' });
+          inputAudioCtxRef.current = new LocalAudioCtx({ latencyHint: 'balanced' });
         } catch {
           inputAudioCtxRef.current = new LocalAudioCtx();
         }
@@ -4151,16 +5006,18 @@ export default function App() {
     syncMicHardwareReadyState();
 
     try {
-      const source = micCtx.createMediaStreamSource(stream);
-      micSourceNodeRef.current = source;
-
-      // Start Self-Hosted Silero Neural VAD v5 if available
+      // Start Self-Hosted Silero Neural VAD v5 if available (covers both parent-bridged and standalone streams)
       sileroVadGateRef.current?.destroy();
       const sileroGate = new SileroNeuralVadGate();
       sileroVadGateRef.current = sileroGate;
       void sileroGate.start(stream, micCtx, {
         isMicMuted: () => isMicMutedRef.current,
-        isAiPlaying: () => isPlayingAiAudioRef.current,
+        isAiPlaying: () =>
+          isPlayingAiAudioRef.current ||
+          isAiServerTurnOpenRef.current ||
+          activeSourcesRef.current.length > 0 ||
+          livePcmSchedulerRef.current.hasPendingAudio() ||
+          (lastAiPlayoutEndedAtRef.current > 0 && Date.now() - lastAiPlayoutEndedAtRef.current < 180),
         isWorkbenchOpen: () => isWorkbenchOpenRef.current,
         onHumanSpeechState: (speaking) => {
           if (isUserSpeakingLiveRef.current !== speaking) {
@@ -4169,10 +5026,57 @@ export default function App() {
           }
         },
         onHumanBargeIn: () => {
-          lastBargeInAtRef.current = Date.now();
-          interruptAiAndStartListening();
+          if (awaitingOpeningTurnRef.current) return;
+          if (
+            isPlayingAiAudioRef.current ||
+            isAiServerTurnOpenRef.current ||
+            activeSourcesRef.current.length > 0 ||
+            livePcmSchedulerRef.current.hasPendingAudio()
+          ) {
+            if (Date.now() - lastBargeInAtRef.current > 700) {
+              const capturedChunks = bargeCandidateChunksRef.current;
+              const totalSamples = bargeCandidateSamplesRef.current;
+              const rmsSeries = [...bargeCandidateRmsRef.current];
+              bargeSpeechStreakRef.current = 0;
+              resetBargeCandidate();
+              if (totalSamples > 0) {
+                const merged16k = new Float32Array(totalSamples);
+                let offset = 0;
+                for (const chunk of capturedChunks) {
+                  if (offset + chunk.length <= merged16k.length) {
+                    merged16k.set(chunk, offset);
+                    offset += chunk.length;
+                  }
+                }
+                const endpointReady = Date.now() >= verifyEndpointUnavailableUntilRef.current;
+                if (endpointReady && merged16k.length >= 4096) {
+                  void runLanguageVerifiedBargeIn(
+                    merged16k,
+                    rmsSeries,
+                    0.56,
+                    Math.max(4, Math.floor(rmsSeries.length * 0.75))
+                  );
+                } else if (merged16k.length >= 2560 && !bargeVerifyInFlightRef.current) {
+                  commitVerifiedSpeechInterrupt(merged16k);
+                }
+              }
+            }
+          }
+        },
+        onBargeCandidateAudio: (samples16k, rms) => {
+          if (samples16k && samples16k.length > 0) {
+            bargeCandidateChunksRef.current.push(samples16k);
+            bargeCandidateSamplesRef.current += samples16k.length;
+            bargeCandidateRmsRef.current.push(rms);
+            while (bargeCandidateSamplesRef.current > 24000 && bargeCandidateChunksRef.current.length > 1) {
+              const dropped = bargeCandidateChunksRef.current.shift();
+              if (dropped) bargeCandidateSamplesRef.current -= dropped.length;
+              bargeCandidateRmsRef.current.shift();
+            }
+          }
         },
         onSpeechPcm16kBase64: (pcmBase64) => {
+          clearLiveTurnAutoCommitTimer();
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
             sentAudioSinceEndRef.current = true;
             wsRef.current.send(
@@ -4202,6 +5106,9 @@ export default function App() {
                 },
               })
             );
+            if (liveUserDraftRef.current.trim()) {
+              scheduleLiveTurnAutoCommitWatchdog();
+            }
           }
         },
         onFrameTelemetry: (ft) => {
@@ -4213,6 +5120,13 @@ export default function App() {
           });
         },
       });
+
+      if (wiredInParent) {
+        return;
+      }
+
+      const source = micCtx.createMediaStreamSource(stream);
+      micSourceNodeRef.current = source;
 
       // Mobile & iOS WebKit check: iOS Safari / Android Chrome / Mobile PWA standalone
       const isMobileOrIOSWebKit =
@@ -4265,18 +5179,22 @@ export default function App() {
                 this.bufferSize = 2048;
                 this.buffer = new Float32Array(this.bufferSize);
                 this.bytesWritten = 0;
+                this.prev1 = 0;
+                this.prev2 = 0;
+                this.needsLp = typeof sampleRate === 'number' && sampleRate > 20000;
               }
               process(inputs) {
                 const input = inputs[0];
                 if (!input || !input[0]) return true;
                 const channelData = input[0];
-                let offset = 0;
-                while (offset < channelData.length) {
-                  const needed = this.bufferSize - this.bytesWritten;
-                  const toCopy = Math.min(needed, channelData.length - offset);
-                  this.buffer.set(channelData.subarray(offset, offset + toCopy), this.bytesWritten);
-                  this.bytesWritten += toCopy;
-                  offset += toCopy;
+                for (let i = 0; i < channelData.length; i++) {
+                  const x0 = channelData[i];
+                  const sample = this.needsLp
+                    ? 0.25 * this.prev2 + 0.5 * this.prev1 + 0.25 * x0
+                    : x0;
+                  this.prev2 = this.prev1;
+                  this.prev1 = x0;
+                  this.buffer[this.bytesWritten++] = sample;
                   if (this.bytesWritten >= this.bufferSize) {
                     this.port.postMessage(this.buffer.slice(0));
                     this.bytesWritten = 0;
@@ -4394,7 +5312,7 @@ export default function App() {
       ttsAudioCtxRef.current = sharedParentCtx;
     } else if (!liveAudioCtxRef.current || liveAudioCtxRef.current.state === 'closed') {
       try {
-        liveAudioCtxRef.current = new CtxClass({ latencyHint: 'interactive' });
+        liveAudioCtxRef.current = new CtxClass({ latencyHint: 'balanced' });
       } catch {
         liveAudioCtxRef.current = new CtxClass();
       }
@@ -4533,8 +5451,18 @@ export default function App() {
 
       let settled = false;
       let ws: WebSocket;
+      const isDrJulian = activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian';
+      const isCambridgeExaminer =
+        activePersona.id === 'cambridge_examiner' || activeScenario.personaId === 'cambridge_examiner';
+      const isClinicalVoicePersona = isDrJulian || isCambridgeExaminer;
+      const isSswLive =
+        activePersona.id === 'ssw_sensei' ||
+        activeScenario.personaId === 'ssw_sensei' ||
+        activeScenario.id.startsWith('scen_ssw_');
+      const cognitiveSnapshot = readHostPwaCognitiveSnapshot(activeScenario.targetLang, locale);
+      const candidateName = cognitiveSnapshot.learnerName?.trim() || (locale === 'th' ? 'นักเรียน' : 'Candidate');
 
-      const connectTimer = window.setTimeout(() => {
+      const handleHandshakeTimeout = () => {
         if (mySeq !== connectSeqRef.current || userHungUpRef.current) return;
         if (!settled) {
           settled = true;
@@ -4550,20 +5478,33 @@ export default function App() {
             activateTurnByTurnLiveFallback();
           }
         }
-      }, 8000);
+      };
+
+      let connectTimer: number | null = window.setTimeout(handleHandshakeTimeout, 9000);
 
       try {
         ws = new WebSocket(targetWsUrl);
         ws.binaryType = 'arraybuffer';
         wsRef.current = ws;
       } catch {
-        window.clearTimeout(connectTimer);
+        if (connectTimer !== null) {
+          window.clearTimeout(connectTimer);
+          connectTimer = null;
+        }
         activateTurnByTurnLiveFallback();
         return;
       }
 
       ws.onopen = () => {
         if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) return;
+        // Extend handshake timeout cleanly once TLS/WebSocket opens so Gemini setupComplete
+        // always gets a fresh 8s budget even after slower mobile TLS handshakes.
+        if (!settled) {
+          if (connectTimer !== null) {
+            window.clearTimeout(connectTimer);
+          }
+          connectTimer = window.setTimeout(handleHandshakeTimeout, 8000);
+        }
         if (isGoogleLive) {
           try {
             const priorTurns = turnsRef.current.filter((t) => t.text && t.text.trim());
@@ -4581,10 +5522,6 @@ export default function App() {
               locale
             );
 
-            const isDrJulian = activePersona.id === 'dr_julian' || activeScenario.personaId === 'dr_julian';
-            const isCambridgeExaminer = activePersona.id === 'cambridge_examiner' || activeScenario.personaId === 'cambridge_examiner';
-            const cognitiveSnapshot = readHostPwaCognitiveSnapshot(activeScenario.targetLang, locale);
-            const candidateName = cognitiveSnapshot.learnerName?.trim() || (locale === 'th' ? 'นักเรียน' : 'Candidate');
             const pteMasterDirective = isDrJulian
               ? (() => {
                   const pteState = loadPteMasterState();
@@ -4594,7 +5531,7 @@ export default function App() {
                   const templateRec = bState.competencies['pte_template_adherence'];
                   const miscList = pteState.chronicMisconceptions.map((m) => `${m.word} (${m.missCount}x)`).join(', ');
 
-                  return `\n\n[BRAINCORE OFFICIAL CANDIDATE DOSSIER]:\nCandidate Name: ${candidateName} (address the candidate respectfully as "${candidateName}" or "Candidate")\nTarget Score Benchmark: PTE Academic ${pteState.targetScore}+ (Australian Visa & University Admissions)\nActive Curriculum Stage: Stage ${pteState.activeStage} of 4 (Stage 1: Describe Image, Stage 2: Read Aloud, Stage 3: Repeat Sentence, Stage 4: Write from Dictation)\nRolling Overall Estimate: ${pteState.overallEstimate}/90\nCompleted Stages: [${pteState.completedStages.join(', ') || 'None'}]\nRecent Scorecards: ${pteState.scorecards.slice(0, 3).map((s) => `${s.taskName}: ${s.pearsonScore}/90 (Fluency ${s.fluency}, Pron ${s.pronunciation})`).join(' | ') || 'None'}\nBayesian Knowledge Tracing (BKT) Telemetry:\n- Oral Fluency: P(L) = ${Number(fluencyRec?.masteryProb || 0.45).toFixed(2)}, Attempts: ${fluencyRec?.attemptsCount || 0}, Status: ${fluencyRec?.status || 'learning'}\n- Pronunciation: P(L) = ${Number(pronRec?.masteryProb || 0.45).toFixed(2)}, Attempts: ${pronRec?.attemptsCount || 0}, Status: ${pronRec?.status || 'learning'}\n- Template Adherence: P(L) = ${Number(templateRec?.masteryProb || 0.45).toFixed(2)}, Status: ${templateRec?.status || 'learning'}\nChronic Misconceptions: ${miscList || 'None recorded yet'}\n\n[EXAMINER VERBAL MANDATE]:\n- When greeting the candidate, address them respectfully as "${candidateName}" and state their current stage and target score (e.g. "Candidate ${candidateName}, we are at Stage 1: Describe Image. Target benchmark is PTE 42+").\n- DYNAMIC SYLLABUS ALIGNMENT: If ${candidateName} asks to practice a specific skill (e.g. Describe Image marathon, Repeat Sentence, or Read Aloud), immediately agree and align the roadmap: "Siap ${candidateName}, kita selaraskan target harian PTE 42 kita dengan fokus ke [permintaan ${candidateName}] hari ini! Mari kita mulai!" Never refuse or force an unwanted mode.\n- ACTIVE SPOKEN GRAMMAR CORRECTION: If ${candidateName} makes ANY grammatical mistake (subject-verb agreement 'he go', wrong tense 'yesterday I am', missing articles, wrong prepositions, dropped plural 's'), DO NOT LET IT PASS. Intercept immediately: "Tunggu sebentar, ${candidateName}. Ada kesalahan grammar barusan: kamu bilang [salah], yang benar adalah [benar] karena [alasan 1 kalimat]. Coba ulangi kalimat yang benar sekarang!"\n- PROACTIVE DRILLING (ZERO DEAD AIR): Never wait passively or ask "Mau lanjut?". In Repeat Sentence or Read Aloud, immediately read the sentence and say "Giliranmu, ulangi dalam 5 detik!", then evaluate, and immediately fire question #2 in the very same turn!\n- DESCRIBE IMAGE SPLIT-SCREEN WORKBENCH: Describe Image modal is now a wide side-by-side screen (SVG diagram on left, 5-line Nakul formula & 25-28s stopping hacks on right). Direct them: "Perhatikan layar lebarmu ${candidateName}: sebelah kiri adalah grafik, sebelah kanan adalah 5 baris template Nakul. Gunakan waktu persiapan 25 detik, lalu bicara 25 hingga 28 detik tanpa berhenti!"\n- When ${candidateName} speaks or describes an image, evaluate them strictly according to the Braincore rubrics:\n  1. Speech Pacing (WPM): Optimal is 120-140 WPM.\n  2. Hesitations & Aturan 3 Detik Pearson.\n  3. Dropped plural 's' or dropped past tense '-ed'.\n  4. Template 5-part structure adherence.\n- Always cite the Braincore diagnosis aloud: "${candidateName}, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM...".\n- Provide the official Pearson scorecard (Oral Fluency 1-5, Pronunciation 1-5, Content 0-3, Overall /90) and require immediate remedial practice on any missed words!`;
+                  return `\n\n[BRAINCORE OFFICIAL CANDIDATE DOSSIER]:\nCandidate Name: ${candidateName} (address the candidate respectfully as "${candidateName}" or "Candidate")\nTarget Score Benchmark: PTE Academic ${pteState.targetScore}+ (Australian Visa & University Admissions)\nActive Curriculum Stage: Stage ${pteState.activeStage} of 4 (Stage 1: Describe Image, Stage 2: Read Aloud, Stage 3: Repeat Sentence, Stage 4: Write from Dictation)\nRolling Overall Estimate: ${pteState.overallEstimate}/90\nCompleted Stages: [${pteState.completedStages.join(', ') || 'None'}]\nRecent Scorecards: ${pteState.scorecards.slice(0, 3).map((s) => `${s.taskName}: ${s.pearsonScore}/90 (Fluency ${s.fluency}, Pron ${s.pronunciation})`).join(' | ') || 'None'}\nBayesian Knowledge Tracing (BKT) Telemetry:\n- Oral Fluency: P(L) = ${Number(fluencyRec?.pMastery ?? 0.45).toFixed(2)}, Attempts: ${fluencyRec?.attempts ?? 0}, Status: ${fluencyRec?.state || 'learning'}\n- Pronunciation: P(L) = ${Number(pronRec?.pMastery ?? 0.45).toFixed(2)}, Attempts: ${pronRec?.attempts ?? 0}, Status: ${pronRec?.state || 'learning'}\n- Template Adherence: P(L) = ${Number(templateRec?.pMastery ?? 0.45).toFixed(2)}, Status: ${templateRec?.state || 'learning'}\nChronic Misconceptions: ${miscList || 'None recorded yet'}\n\n[EXAMINER VERBAL MANDATE]:\n- When greeting the candidate, address them respectfully as "${candidateName}" and state their current stage and target score (e.g. "Candidate ${candidateName}, we are at Stage 1: Describe Image. Target benchmark is PTE 42+").\n- DYNAMIC SYLLABUS ALIGNMENT: If ${candidateName} asks to practice a specific skill (e.g. Describe Image marathon, Repeat Sentence, or Read Aloud), immediately agree and align the roadmap: "Siap ${candidateName}, kita selaraskan target harian PTE 42 kita dengan fokus ke [permintaan ${candidateName}] hari ini! Mari kita mulai!" Never refuse or force an unwanted mode.\n- ACTIVE SPOKEN GRAMMAR CORRECTION: If ${candidateName} makes ANY grammatical mistake (subject-verb agreement 'he go', wrong tense 'yesterday I am', missing articles, wrong prepositions, dropped plural 's'), DO NOT LET IT PASS. Intercept immediately: "Tunggu sebentar, ${candidateName}. Ada kesalahan grammar barusan: kamu bilang [salah], yang benar adalah [benar] karena [alasan 1 kalimat]. Coba ulangi kalimat yang benar sekarang!"\n- PROACTIVE DRILLING (ZERO DEAD AIR): Never wait passively or ask "Mau lanjut?". In Repeat Sentence or Read Aloud, immediately read the sentence and say "Giliranmu, ulangi dalam 5 detik!", then evaluate, and immediately fire question #2 in the very same turn!\n- DESCRIBE IMAGE SPLIT-SCREEN WORKBENCH: Describe Image modal is now a wide side-by-side screen (SVG diagram on left, 5-line Nakul formula & 25-28s stopping hacks on right). Direct them: "Perhatikan layar lebarmu ${candidateName}: sebelah kiri adalah grafik, sebelah kanan adalah 5 baris template Nakul. Gunakan waktu persiapan 25 detik, lalu bicara 25 hingga 28 detik tanpa berhenti!"\n- When ${candidateName} speaks or describes an image, evaluate them strictly according to the Braincore rubrics:\n  1. Speech Pacing (WPM): Optimal is 120-140 WPM.\n  2. Hesitations & Aturan 3 Detik Pearson.\n  3. Dropped plural 's' or dropped past tense '-ed'.\n  4. Template 5-part structure adherence.\n- Always cite the Braincore diagnosis aloud: "${candidateName}, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM...".\n- Provide the official Pearson scorecard (Oral Fluency 1-5, Pronunciation 1-5, Content 0-3, Overall /90) and require immediate remedial practice on any missed words!`;
                 })()
               : '';
 
@@ -4638,20 +5575,62 @@ export default function App() {
 
             const allowedAsrLangs = Array.from(
               new Set(
-                activeScenario.targetLang === 'ja'
-                  ? ['ja-JP', learnerAsrBcp47]
+                isSswLive
+                  ? [learnerAsrBcp47, 'ja-JP']
+                  : activeScenario.targetLang === 'ja'
+                  ? [learnerAsrBcp47, 'ja-JP']
                   : activeScenario.targetLang === 'zh'
-                    ? ['zh-CN', 'cmn-Hans-CN', learnerAsrBcp47]
-                    : ['en-US', learnerAsrBcp47]
+                    ? [learnerAsrBcp47, 'zh-CN', 'cmn-Hans-CN']
+                    : [learnerAsrBcp47, 'en-US']
               )
             );
+            const sswVocabTerms = isSswLive
+              ? [
+                  'kurumi',
+                  'cashew nut',
+                  'pistachio',
+                  'yukkuri',
+                  'hokang sampuru',
+                  'seiton',
+                  'budomari',
+                  'jiaensosan',
+                  'norovirus',
+                  'anisakis',
+                  'kaifuu',
+                  'klorin',
+                  'ssw sensei',
+                  'machigatteiru',
+                  'tadashii',
+                ]
+              : [];
+            const activePopupTerms = activeWorkbenchTargetRef.current?.isOpen
+              ? String(activeWorkbenchTargetRef.current.activeTargetText || '')
+                  .split(/[\s,.;:!?()「」『』、。？！]+/)
+                  .map((w) => w.trim())
+                  .filter((w) => w.length >= 2 && w.length <= 24)
+              : [];
+            const patternTerms = Array.isArray(activeScenario.targetPatterns)
+              ? activeScenario.targetPatterns
+                  .flatMap((p) =>
+                    String(typeof p === 'string' ? p : (p as any)?.formula || '')
+                      .replace(/[+\[\]()/〜~]+/g, ' ')
+                      .split(/\s+/)
+                  )
+                  .map((w) => w.trim())
+                  .filter((w) => w.length >= 2 && w.length <= 24)
+              : [];
             const customVocabTerms = Array.from(
-              new Set(
-                activeScenario.vocabPrereqs
+              new Set([
+                ...(isSswLive ? sswVocabTerms : []),
+                ...(Array.isArray(activeScenario.vocabPrereqs) ? activeScenario.vocabPrereqs : [])
                   .map((v) => String(v.term || '').trim())
-                  .filter((t) => t.length >= 3)
-              )
-            ).slice(0, 16);
+                  .filter((t) => t.length >= 2 && t.length <= 28),
+                ...patternTerms,
+                ...activePopupTerms,
+              ])
+            )
+              .filter((t) => !/\b(fiezel|mochi)\b|xiao\s*mochi/i.test(t))
+              .slice(0, 20);
 
             const pacingDirective =
               speechRate <= 0.95
@@ -4722,10 +5701,10 @@ ${
                   realtimeInputConfig: {
                     automaticActivityDetection: {
                       disabled: false,
-                      startOfSpeechSensitivity: 'START_SENSITIVITY_HIGH',
+                      startOfSpeechSensitivity: 'START_SENSITIVITY_LOW',
                       endOfSpeechSensitivity: 'END_SENSITIVITY_HIGH',
-                      prefixPaddingMs: 200,
-                      silenceDurationMs: 400,
+                      prefixPaddingMs: 260,
+                      silenceDurationMs: 480,
                     },
                     activityHandling: 'START_OF_ACTIVITY_INTERRUPTS',
                     turnCoverage: 'TURN_INCLUDES_ONLY_ACTIVITY',
@@ -4741,22 +5720,22 @@ ${
                         {
                           name: 'open_interactive_learning_popup',
                           description:
-                            'Opens FIEZEL interactive written learning flashcard workbench on screen while keeping the voice call active. Call this whenever the learner says they are confused about grammar, particles, tenses, tones, kanji, or asks for a written explanation/exercise.',
+                            'Opens FIEZEL interactive written learning flashcard or Read Aloud workbench popup on screen while keeping the voice call active. Call this whenever the learner asks for a Read Aloud sentence popup ("tampilkan popup kalimat read aloud", "baca nyaring"), or says they are confused about grammar, particles, tenses, tones, kanji, or asks for a written explanation/exercise.',
                           behavior: 'NON_BLOCKING',
                           parameters: {
                             type: 'OBJECT',
                             properties: {
                               topicTitle: {
                                 type: 'STRING',
-                                description: `Concise title of the grammar/vocab/tone concept in ${learnerUiLangName}`,
+                                description: `Concise title of the grammar/vocab/tone/read-aloud concept in ${learnerUiLangName}`,
                               },
                               focusType: {
                                 type: 'STRING',
-                                description: 'One of: grammar, vocab, kanji, kana, sentence_drill',
+                                description: 'One of: grammar, vocab, kanji, kana, sentence_drill, read_aloud, pte_read_aloud, pte_describe_image, pte_scorecard',
                               },
                               explanationText: {
                                 type: 'STRING',
-                                description: `1-2 punchy sentences explaining the rule in ${learnerUiLangName}`,
+                                description: `1-2 punchy sentences explaining the rule or reading focus in ${learnerUiLangName}`,
                               },
                               patternFormula: {
                                 type: 'STRING',
@@ -4764,7 +5743,7 @@ ${
                               },
                               sampleTarget: {
                                 type: 'STRING',
-                                description: '1 natural model sentence in the target language demonstrating the rule',
+                                description: '1 natural model sentence (or the exact Read Aloud passage if focusType is read_aloud or pte_read_aloud) in the target language matching the visual popup',
                               },
                               trapWrongSentence: {
                                 type: 'STRING',
@@ -4815,17 +5794,23 @@ ${
                             required: ['destination'],
                           },
                         },
+                        ...(isSswLive ? SSW_LIVE_TOOL_DECLARATIONS : []),
                       ],
                     },
                   ],
                   systemInstruction: {
                     parts: [
                       {
-                        text: isDrJulian
-                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: ${candidateName} (address the candidate respectfully as "${candidateName}" or "Candidate").\n\n[ZERO-TOLERANCE REAL-TIME GRAMMAR INTERCEPTION MANDATE]:\n- Whenever ${candidateName} speaks in conversation or answers an exercise, if they make ANY grammatical flaw (subject-verb agreement 'he go', wrong tense 'yesterday I am', missing articles, wrong prepositions, dropped plural 's'), YOU MUST NOT LET IT PASS!\n- Stop them immediately with authoritative tough-love examiner demeanor:\n  "Tunggu sebentar, ${candidateName}. Ada kesalahan grammar barusan: kamu bilang '[kesalahan]', yang benar adalah '[perbaikan]' karena [penjelasan singkat 1 kalimat]. Coba ulangi kalimat yang benar sekarang!"\n- Require Echo Redemption (they repeat the corrected phrase aloud) before proceeding!\n\n[PROACTIVE AUTOMATED DRILLING PROTOCOL (ZERO DEAD AIR)]:\n- NEVER wait for the candidate to prompt you or say 'coba lanjut' or 'lanjutkan'!\n- In Repeat Sentence or Read Aloud or Describe Image: Act like an elite Australian private tutor in an intensive 1-on-1 session.\n- When introducing or transitioning, immediately read the sentence/question in the SAME breath:\n  E.g.: "Baik ${candidateName}, kita mulai Repeat Sentence nomor 1. Dengarkan kalimat ini baik-baik: '[academic sentence]'. ... Sekarang giliranmu, ulangi dalam 5 detik!"\n- When candidate repeats: Immediately grade it (evaluating the 50% rule: did they capture >=50% words without hesitation?), deliver punchy feedback, and IMMEDIATELY fire question number 2 in the very same turn:\n  "Bagus, kelancaranmu terjaga dan lebih dari 50% kata tertangkap. Sekarang nomor 2, dengarkan: '[academic sentence 2]'. ... Giliranmu!"\n- ZERO AWKWARD PAUSES! ZERO ASKING 'Mau lanjut ke nomor berikutnya?'! Automatically drive the test session forward with momentum!\n\n[DYNAMIC SYLLABUS ALIGNMENT MANDATE]:\n- When ${candidateName} says what they want to practice (e.g. 'aku mau latihan Describe Image dulu' or 'aku mau drill Repeat Sentence' or 'aku mau bahas tips rahasia'):\n- Immediately align with their wish while keeping the PTE 42 roadmap standards intact:\n  "Siap ${candidateName}, kita selaraskan roadmap target PTE 42 kita dengan fokus latihan [permintaan ${candidateName}] hari ini! Mari kita mulai!"\n- Never rigidly refuse or force an unwanted mode. Dynamically adapt the session to what they ask while maintaining examiner rigor!\n\n[DESCRIBE IMAGE SPLIT-SCREEN WORKBENCH INSTRUCTIONS]:\n- The Describe Image workbench is now a wide side-by-side landscape screen (diagram on left, Nakul 5-line formula & 25-28s stopping hacks on right).\n- Instruct ${candidateName}: "Perhatikan layar lebarmu ${candidateName}: di sebelah kiri adalah diagram ujian asli, dan di sebelah kanan adalah 5 baris template Nakul dan trik berhenti di detik 25-28. Gunakan waktu persiapan 25 detik untuk mengunci angka tertinggi dan terendah, lalu bicara selama 25 hingga 28 detik tanpa berhenti!"\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen ${candidateName} finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "${candidateName}, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing them to move on to the next question!\n\n${pteMasterDirective}${cefrCalibrationDirective}`
+                        text: isSswLive
+                          ? buildSswLiveSystemInstruction({
+                              personaPrompt: activePersona.systemPrompt,
+                              candidateName,
+                            })
+                          : isDrJulian
+                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: ${candidateName} (address the candidate respectfully as "${candidateName}" or "Candidate").\n\n[ZERO-TOLERANCE REAL-TIME GRAMMAR INTERCEPTION MANDATE]:\n- Whenever ${candidateName} speaks in conversation or answers an exercise, if they make ANY grammatical flaw (subject-verb agreement 'he go', wrong tense 'yesterday I am', missing articles, wrong prepositions, dropped plural 's'), YOU MUST NOT LET IT PASS!\n- Stop them immediately with authoritative tough-love examiner demeanor:\n  "Tunggu sebentar, ${candidateName}. Ada kesalahan grammar barusan: kamu bilang '[kesalahan]', yang benar adalah '[perbaikan]' karena [penjelasan singkat 1 kalimat]. Coba ulangi kalimat yang benar sekarang!"\n- Require Echo Redemption (they repeat the corrected phrase aloud) before proceeding!\n\n[PROACTIVE AUTOMATED DRILLING PROTOCOL (ZERO DEAD AIR)]:\n- NEVER wait for the candidate to prompt you or say 'coba lanjut' or 'lanjutkan'!\n- In Repeat Sentence or Read Aloud or Describe Image: Act like an elite Australian private tutor in an intensive 1-on-1 session.\n- When introducing or transitioning, immediately read the sentence/question in the SAME breath:\n  E.g.: "Baik ${candidateName}, kita mulai Repeat Sentence nomor 1. Dengarkan kalimat ini baik-baik: '[academic sentence]'. ... Sekarang giliranmu, ulangi dalam 5 detik!"\n- When candidate repeats: Immediately grade it (evaluating the 50% rule: did they capture >=50% words without hesitation?), deliver punchy feedback, and IMMEDIATELY fire question number 2 in the very same turn:\n  "Bagus, kelancaranmu terjaga dan lebih dari 50% kata tertangkap. Sekarang nomor 2, dengarkan: '[academic sentence 2]'. ... Giliranmu!"\n- ZERO AWKWARD PAUSES! ZERO ASKING 'Mau lanjut ke nomor berikutnya?'! Automatically drive the test session forward with momentum!\n\n[DYNAMIC SYLLABUS ALIGNMENT MANDATE]:\n- When ${candidateName} says what they want to practice (e.g. 'aku mau latihan Describe Image dulu' or 'aku mau drill Repeat Sentence' or 'aku mau bahas tips rahasia'):\n- Immediately align with their wish while keeping the PTE 42 roadmap standards intact:\n  "Siap ${candidateName}, kita selaraskan roadmap target PTE 42 kita dengan fokus latihan [permintaan ${candidateName}] hari ini! Mari kita mulai!"\n- Never rigidly refuse or force an unwanted mode. Dynamically adapt the session to what they ask while maintaining examiner rigor!\n\n[DESCRIBE IMAGE SPLIT-SCREEN WORKBENCH INSTRUCTIONS]:\n- The Describe Image workbench is now a wide side-by-side landscape screen (diagram on left, Nakul 5-line formula & 25-28s stopping hacks on right).\n- Instruct ${candidateName}: "Perhatikan layar lebarmu ${candidateName}: di sebelah kiri adalah diagram ujian asli, dan di sebelah kanan adalah 5 baris template Nakul dan trik berhenti di detik 25-28. Gunakan waktu persiapan 25 detik untuk mengunci angka tertinggi dan terendah, lalu bicara selama 25 hingga 28 detik tanpa berhenti!"\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen ${candidateName} finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "${candidateName}, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing them to move on to the next question!\n5. LIVE POPUP / SCREEN SYNC MANDATE:\n   When the learner asks for Read Aloud ("tampilkan popup kalimat read aloud", "baca nyaring"), call \`open_interactive_learning_popup\` with \`focusType: "pte_read_aloud"\`. Whenever \`[SCREEN STATE SYNC: ... EXACT TARGET TEXT VISIBLE ON SCREEN: "..."]\` arrives, evaluate strictly word-for-word against that exact text and NEVER pass skipped or mispronounced words.\n\n${pteMasterDirective}${cefrCalibrationDirective}`
                           : isCambridgeExaminer
                           ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "${candidateName}".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate ${candidateName} makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5–9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${cefrCalibrationDirective}`
-                          : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard, you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand the grammar rule 100% clearly! As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}${cefrCalibrationDirective}`,
+                          : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar) OR [SCREEN STATE SYNC]: When the learner asks for a Read Aloud sentence popup ("tampilkan popup kalimat read aloud", "baca nyaring", "kasih kalimat baca"), call \`open_interactive_learning_popup\` with \`focusType: "read_aloud"\` and populate \`sampleTarget\` with a natural sentence in ${targetLangLabel}! Whenever \`[SCREEN STATE SYNC: ... EXACT TARGET TEXT VISIBLE ON SCREEN: "..."]\` arrives, read/reference THAT exact sentence and evaluate strictly word-for-word against it (NEVER praise or mark correct if words were skipped or mispronounced!). When explaining a grammar rule popup, switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand 100% clearly, then switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}${cefrCalibrationDirective}`,
                       },
                     ],
                   },
@@ -4858,8 +5843,12 @@ ${
           if (isGoogleReady || msg.type === 'ready' || msg.type === 'live_ready') {
             if (!settled) {
               settled = true;
-              window.clearTimeout(connectTimer);
+              if (connectTimer !== null) {
+                window.clearTimeout(connectTimer);
+                connectTimer = null;
+              }
             }
+            liveReconnectAttemptsRef.current = 0;
             setLiveTransportMode('ws-duplex');
             isLiveConnectingRef.current = false;
             setIsLiveConnecting(false);
@@ -4900,9 +5889,14 @@ ${
                   : activeScenario.targetLang === 'zh'
                   ? 'Mandarin Chinese (Putonghua)'
                   : 'English';
-              const greetingDirective = hasUserSpoken
+              const greetingDirective = isSswLive
+                ? buildSswGreetingDirective({
+                    candidateName,
+                    isReturning: hasUserSpoken,
+                  })
+                : hasUserSpoken
                 ? `[Instruction: The learner just called you back! Greet them naturally in 1-2 short, composed sentences 100% in ${targetLangLabel} with authentic native ${targetLangLabel} pronunciation as ${activePersona.name}, briefly acknowledging your ongoing conversation above and asking a sharp follow-up question so they can reply immediately. NEVER speak Indonesian or Thai aloud, and do NOT start with forced laughter.]`
-                : priorSessionsCount > 0 && nextFocusNote
+                : isClinicalVoicePersona
                 ? `[Instruction: Begin our call now as ${activePersona.name} speaking 100% in ${targetLangLabel} with authentic native ${targetLangLabel} pronunciation. Deliver your opening greeting ("${activePersona.openingGreeting || activeScenario.openingLine}") with composed mentor authority (no forced laughter), and briefly ask a natural follow-up question in ${targetLangLabel}.]`
                 : `[Instruction: Begin our conversation now with composed, sharp, caring mentor energy as ${activePersona.name} speaking 100% in ${targetLangLabel} with authentic native ${targetLangLabel} pronunciation (do NOT start with forced laughter). Say your exact opening line in ${targetLangLabel}: "${activePersona.openingGreeting || activeScenario.openingLine}"]`;
               try {
@@ -4914,7 +5908,11 @@ ${
                 awaitingOpeningTimerRef.current = window.setTimeout(() => {
                   awaitingOpeningTurnRef.current = false;
                   awaitingOpeningTimerRef.current = null;
-                  if (!isPlayingAiAudioRef.current && activeSourcesRef.current.length === 0) {
+                  if (
+                    !awaitingPostToolResponseRef.current &&
+                    !isPlayingAiAudioRef.current &&
+                    activeSourcesRef.current.length === 0
+                  ) {
                     isAiServerTurnOpenRef.current = false;
                     openingGreetingCompletedRef.current = true;
                   }
@@ -4967,69 +5965,226 @@ ${
             }
           }
 
-          // Handle Gemini 3.8 Live NON_BLOCKING Tool Calls (Interactive Learning Popup & Full App Voice Navigation)
+          // Handle Gemini 3.8 Live Tool Calls (Non-blocking UI + Synchronous Blocking SSW Tools)
           if (Array.isArray(msg.toolCall?.functionCalls) && msg.toolCall.functionCalls.length > 0) {
-            const functionResponses: Array<Record<string, unknown>> = [];
-            for (const fc of msg.toolCall.functionCalls) {
-              const fnName = String(fc?.name || '');
-              const args = (fc?.args && typeof fc.args === 'object' ? fc.args : {}) as Record<string, any>;
-              if (fnName === 'open_interactive_learning_popup') {
-                openLearningWorkbenchWithAction({
-                  actionType: 'open_learning_popup',
-                  sourceLayer: 'live_ws_native',
-                  topicTitle: typeof args.topicTitle === 'string' ? args.topicTitle : undefined,
-                  focusType: typeof args.focusType === 'string' ? (args.focusType as any) : 'grammar',
-                  explanationText:
-                    typeof args.explanationText === 'string' ? args.explanationText : undefined,
-                  coachSpokenScript:
-                    typeof args.explanationText === 'string' ? args.explanationText : undefined,
-                  patternFormula:
-                    typeof args.patternFormula === 'string' ? args.patternFormula : undefined,
-                  drillInstruction:
-                    typeof args.drillInstruction === 'string' ? args.drillInstruction : undefined,
-                  sampleTarget:
-                    typeof args.sampleTarget === 'string' ? args.sampleTarget : undefined,
-                  trapWrongSentence:
-                    typeof args.trapWrongSentence === 'string' ? args.trapWrongSentence : undefined,
-                  trapWrongReason:
-                    typeof args.trapWrongReason === 'string' ? args.trapWrongReason : undefined,
-                  drillMeaningPrompt:
-                    typeof args.drillMeaningPrompt === 'string' ? args.drillMeaningPrompt : undefined,
-                  drillTargetSentence:
-                    typeof args.drillTargetSentence === 'string' ? args.drillTargetSentence : undefined,
-                  drillTrapSentence:
-                    typeof args.drillTrapSentence === 'string' ? args.drillTrapSentence : undefined,
-                });
-                functionResponses.push({
-                  id: fc.id,
-                  name: fnName,
-                  response: {
-                    result: 'Interactive learning workbench modal opened on learner screen.',
-                    scheduling: 'SILENT',
-                  },
-                });
-              } else if (fnName === 'navigate_fiezel_app' && typeof args.destination === 'string') {
-                const targetDest = args.destination;
-                functionResponses.push({
-                  id: fc.id,
-                  name: fnName,
-                  response: {
-                    result: `Navigating FIEZEL app to ${targetDest}.`,
-                    scheduling: 'SILENT',
-                  },
-                });
-                window.setTimeout(() => {
-                  handleVoiceNavigateApp(targetDest, 'gemini_live_tool');
-                }, 350);
-              }
+            awaitingPostToolResponseRef.current = true;
+            if (liveGenCompleteTimerRef.current) {
+              window.clearTimeout(liveGenCompleteTimerRef.current);
+              liveGenCompleteTimerRef.current = null;
             }
-            if (functionResponses.length > 0 && ws.readyState === WebSocket.OPEN) {
-              try {
-                ws.send(JSON.stringify({ toolResponse: { functionResponses } }));
-              } catch {
-                // Ignore
+            const rawToolCalls = msg.toolCall.functionCalls as Array<{
+              id?: string;
+              name?: string;
+              args?: Record<string, any>;
+            }>;
+            void (async () => {
+              const functionResponses: Array<Record<string, unknown>> = [];
+              for (const fc of rawToolCalls) {
+                const fnName = String(fc?.name || '');
+                const args = (fc?.args && typeof fc.args === 'object' ? fc.args : {}) as Record<string, any>;
+                if (fnName === 'open_interactive_learning_popup') {
+                  const isSswLive =
+                    activePersonaRef.current.id === 'ssw_sensei' ||
+                    activeScenarioRef.current.personaId === 'ssw_sensei' ||
+                    activeScenarioRef.current.id.startsWith('scen_ssw_');
+                  const isPteLive =
+                    activePersonaRef.current.id === 'dr_julian' ||
+                    activeScenarioRef.current.personaId === 'dr_julian' ||
+                    activeScenarioRef.current.id.startsWith('scen_pte');
+                  const rawFocus =
+                    typeof args.focusType === 'string' && args.focusType.trim()
+                      ? args.focusType.trim()
+                      : '';
+                  const normalizedFocus =
+                    !isSswLive && rawFocus === 'pte_read_aloud' && !isPteLive
+                      ? 'read_aloud'
+                      : !isSswLive && rawFocus === 'read_aloud' && isPteLive
+                        ? 'pte_read_aloud'
+                        : rawFocus || (isSswLive ? 'ssw_tactical_board' : 'grammar');
+                  openLearningWorkbenchWithAction({
+                    actionType: 'open_learning_popup',
+                    sourceLayer: 'live_ws_native',
+                    topicTitle: typeof args.topicTitle === 'string' ? args.topicTitle : undefined,
+                    focusType: normalizedFocus as any,
+                    explanationText:
+                      typeof args.explanationText === 'string' ? args.explanationText : undefined,
+                    coachSpokenScript:
+                      typeof args.explanationText === 'string' ? args.explanationText : undefined,
+                    patternFormula:
+                      typeof args.patternFormula === 'string' ? args.patternFormula : undefined,
+                    drillInstruction:
+                      typeof args.drillInstruction === 'string' ? args.drillInstruction : undefined,
+                    sampleTarget:
+                      typeof args.sampleTarget === 'string' ? args.sampleTarget : undefined,
+                    trapWrongSentence:
+                      typeof args.trapWrongSentence === 'string' ? args.trapWrongSentence : undefined,
+                    trapWrongReason:
+                      typeof args.trapWrongReason === 'string' ? args.trapWrongReason : undefined,
+                    drillMeaningPrompt:
+                      typeof args.drillMeaningPrompt === 'string' ? args.drillMeaningPrompt : undefined,
+                    drillTargetSentence:
+                      typeof args.drillTargetSentence === 'string' ? args.drillTargetSentence : undefined,
+                    drillTrapSentence:
+                      typeof args.drillTrapSentence === 'string' ? args.drillTrapSentence : undefined,
+                  });
+                  functionResponses.push({
+                    id: fc.id,
+                    name: fnName,
+                    response: {
+                      result: 'Interactive learning workbench modal opened on learner screen.',
+                      scheduling: 'SILENT',
+                    },
+                  });
+                } else if (fnName === 'navigate_fiezel_app' && typeof args.destination === 'string') {
+                  const targetDest = args.destination;
+                  functionResponses.push({
+                    id: fc.id,
+                    name: fnName,
+                    response: {
+                      result: `Navigating FIEZEL app to ${targetDest}.`,
+                      scheduling: 'SILENT',
+                    },
+                  });
+                  window.setTimeout(() => {
+                    handleVoiceNavigateApp(targetDest, 'gemini_live_tool');
+                  }, 350);
+                } else if (fnName === 'get_ssw_progress') {
+                  const report = getSswProgressReport();
+                  setSswMasterState(report.state);
+                  setSswWorkbenchTab('roadmap');
+                  setShowSswWorkbench(true);
+                  functionResponses.push({
+                    id: fc.id,
+                    name: fnName,
+                    response: { output: report },
+                  });
+                } else if (fnName === 'update_ssw_study_progress') {
+                  const res = updateSswStudyProgress({
+                    stageId: typeof args.stageId === 'string' ? args.stageId : undefined,
+                    status: args.status === 'completed' ? 'completed' : args.status === 'in_progress' ? 'in_progress' : undefined,
+                    pdfPagesRead: Array.isArray(args.pdfPagesRead) ? args.pdfPagesRead : undefined,
+                    kotobaIdsMastered: Array.isArray(args.kotobaIdsMastered) ? args.kotobaIdsMastered : undefined,
+                    focusPage: typeof args.focusPage === 'number' ? args.focusPage : undefined,
+                  });
+                  setSswMasterState(res.state);
+                  if (typeof args.focusPage === 'number') {
+                    setSswFocusPage(args.focusPage);
+                  }
+                  functionResponses.push({
+                    id: fc.id,
+                    name: fnName,
+                    response: { output: res },
+                  });
+                } else if (fnName === 'lookup_ssw_material_and_page') {
+                  const lookupRes = await lookupSswForLiveTeachingAsync({
+                    query: typeof args.query === 'string' ? args.query : undefined,
+                    pageNumber: typeof args.pageNumber === 'number' ? args.pageNumber : undefined,
+                    stepNumber: typeof args.stepNumber === 'number' ? args.stepNumber : undefined,
+                    category: typeof args.category === 'string' ? args.category : undefined,
+                    stageId: typeof args.stageId === 'string' ? args.stageId : undefined,
+                  });
+                  setSswMasterState(loadSswMasterState());
+                  const pageToShow =
+                    lookupRes.mode === 'structured_lesson_step'
+                      ? lookupRes.pageNumber
+                      : lookupRes.primaryMatchedPagePlan?.pageNumber ||
+                        lookupRes.matchedPagesSummary?.[0]?.page ||
+                        lookupRes.matchedKotoba?.[0]?.pdfPage;
+                  if (pageToShow) {
+                    setSswFocusPage(pageToShow);
+                  }
+                  setSswWorkbenchTab('pdf_kotoba');
+                  setShowSswWorkbench(true);
+                  functionResponses.push({
+                    id: fc.id,
+                    name: fnName,
+                    response: { output: lookupRes },
+                  });
+                } else if (fnName === 'advance_ssw_lesson_step') {
+                  const advRes = await advanceSswLessonStep({
+                    pageNumber: typeof args.pageNumber === 'number' ? args.pageNumber : undefined,
+                    completedStepNumber:
+                      typeof args.completedStepNumber === 'number' ? args.completedStepNumber : undefined,
+                    goToStepNumber:
+                      typeof args.goToStepNumber === 'number' ? args.goToStepNumber : undefined,
+                  });
+                  setSswMasterState(loadSswMasterState());
+                  const advPage =
+                    'pageNumber' in advRes && typeof advRes.pageNumber === 'number'
+                      ? advRes.pageNumber
+                      : 'completedPage' in advRes && typeof advRes.completedPage === 'number'
+                        ? advRes.completedPage
+                        : undefined;
+                  if (advPage) {
+                    setSswFocusPage(advPage);
+                  }
+                  setSswWorkbenchTab('pdf_kotoba');
+                  setShowSswWorkbench(true);
+                  functionResponses.push({
+                    id: fc.id,
+                    name: fnName,
+                    response: { output: advRes },
+                  });
+                } else if (fnName === 'draw_ssw_quiz_question') {
+                  const drawn = await drawSswQuizQuestionAsync({
+                    mode:
+                      args.mode === 'cbt' ||
+                      args.mode === 'math' ||
+                      args.mode === 'trap' ||
+                      args.mode === 'kotoba_drill' ||
+                      args.mode === 'mixed'
+                        ? args.mode
+                        : 'mixed',
+                    topicTag: typeof args.topicTag === 'string' ? args.topicTag : undefined,
+                    preferWeakOrUnseen:
+                      typeof args.preferWeakOrUnseen === 'boolean' ? args.preferWeakOrUnseen : true,
+                    quizId: typeof args.quizId === 'string' ? args.quizId : undefined,
+                  });
+                  setSswDrawnQuiz(drawn);
+                  setSswLatestGrade(null);
+                  setSswMasterState(loadSswMasterState());
+                  setSswFocusPage(drawn.tryoutPdfPage);
+                  setSswWorkbenchTab('quiz');
+                  setShowSswWorkbench(true);
+                  functionResponses.push({
+                    id: fc.id,
+                    name: fnName,
+                    response: { output: drawn },
+                  });
+                } else if (fnName === 'grade_ssw_quiz_answer') {
+                  const gradeRes = await gradeSswQuizAnswerAsync({
+                    quizId: typeof args.quizId === 'string' ? args.quizId : undefined,
+                    userAnswer: String(args.userAnswer ?? args.answer ?? ''),
+                  });
+                  setSswLatestGrade(gradeRes);
+                  setSswMasterState(gradeRes.state);
+                  if (gradeRes.discussionPdfPage) {
+                    setSswFocusPage(gradeRes.discussionPdfPage);
+                  }
+                  setSswWorkbenchTab('quiz');
+                  setShowSswWorkbench(true);
+                  functionResponses.push({
+                    id: fc.id,
+                    name: fnName,
+                    response: { output: gradeRes },
+                  });
+                }
               }
-            }
+              if (
+                functionResponses.length > 0 &&
+                wsRef.current === ws &&
+                ws.readyState === WebSocket.OPEN &&
+                !userHungUpRef.current
+              ) {
+                try {
+                  ws.send(JSON.stringify({ toolResponse: { functionResponses } }));
+                } catch {
+                  awaitingPostToolResponseRef.current = false;
+                }
+              } else {
+                awaitingPostToolResponseRef.current = false;
+              }
+            })();
           }
 
           // Audio Extraction from Gemini Live or custom proxy (preserve EVERY PCM16 chunk in multi-part frames!)
@@ -5037,6 +6192,7 @@ ${
           if (msg.type === 'audio' && msg.audio) {
             incomingAudioChunks.push(msg.audio);
           } else if (msg.serverContent?.modelTurn?.parts) {
+            clearLiveTurnAutoCommitTimer();
             // Commit user speech draft immediately as soon as AI begins its turn
             if (liveUserDraftRef.current.trim()) {
               commitLiveUserTurn(liveUserDraftRef.current.trim());
@@ -5057,13 +6213,26 @@ ${
           }
 
           if (incomingAudioChunks.length > 0 && outputAudioCtxRef.current) {
+            awaitingPostToolResponseRef.current = false;
+            liveTurnFinalizedForCurrentAiTurnRef.current = false;
+            if (liveGenCompleteTimerRef.current) {
+              window.clearTimeout(liveGenCompleteTimerRef.current);
+              liveGenCompleteTimerRef.current = null;
+            }
             awaitingOpeningTurnRef.current = false;
             if (awaitingOpeningTimerRef.current) {
               window.clearTimeout(awaitingOpeningTimerRef.current);
               awaitingOpeningTimerRef.current = null;
             }
-            if (lastBargeInAtRef.current > 0 && Date.now() - lastBargeInAtRef.current < 450) {
+            const msSinceBargeIn =
+              lastBargeInAtRef.current > 0 ? Date.now() - lastBargeInAtRef.current : Number.POSITIVE_INFINITY;
+            if (
+              msSinceBargeIn < 650 ||
+              (suppressAiAudioForTurnRef.current && (userAudioBurstActiveRef.current || msSinceBargeIn < 2000))
+            ) {
               incomingAudioChunks.length = 0;
+            } else if (suppressAiAudioForTurnRef.current) {
+              suppressAiAudioForTurnRef.current = false;
             }
           }
 
@@ -5120,39 +6289,29 @@ ${
               setAiAudioPlaying(true);
             }
 
-            for (const chunkB64 of incomingAudioChunks) {
-              const buffer = pcm16Base64ToAudioBuffer(ctx, chunkB64, 24000);
-              const source = ctx.createBufferSource();
-              source.buffer = buffer;
-
-              // Seamless back-to-back chunk scheduling:
-              // If previous chunk is still playing or queued in the future (nextStartTime >= now),
-              // chain this chunk IMMEDIATELY at nextStartTime with ZERO gap!
-              // Only if nextStartTime has fallen behind (true buffer underrun/new burst),
-              // reset to now + 35ms lead to prevent start-of-buffer clipping.
-              const now = ctx.currentTime;
-              if (nextStartTimeRef.current < now) {
-                nextStartTimeRef.current = now + 0.035;
-              }
-              const startAt = nextStartTimeRef.current;
-              const duration = buffer.duration;
-              nextStartTimeRef.current = startAt + duration;
-
-              source.connect(getOrAttachAnalyser(ctx, liveAnalyserRef));
-              source.start(startAt);
-
-              activeSourcesRef.current.push(source);
-              source.onended = () => {
-                activeSourcesRef.current = activeSourcesRef.current.filter((s) => s !== source);
-                if (activeSourcesRef.current.length === 0 && !isAiServerTurnOpenRef.current) {
+            livePcmSchedulerRef.current.enqueueChunks(incomingAudioChunks, {
+              ctx,
+              getDestination: (audioCtx) => getOrAttachAnalyser(audioCtx as unknown as AudioContext, liveAnalyserRef),
+              activeSources: activeSourcesRef.current as any,
+              onChunkScheduled: () => {
+                nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
+              },
+              onIdle: () => {
+                nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
+                if (
+                  activeSourcesRef.current.length === 0 &&
+                  !livePcmSchedulerRef.current.hasPendingAudio() &&
+                  !isAiServerTurnOpenRef.current
+                ) {
                   if (livePlaybackSafetyTimerRef.current) {
                     window.clearTimeout(livePlaybackSafetyTimerRef.current);
                     livePlaybackSafetyTimerRef.current = null;
                   }
                   setAiAudioPlaying(false, 350);
                 }
-              };
-            }
+              },
+            });
+            nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
 
             if (mochiInstanceRef.current) {
               try {
@@ -5173,13 +6332,14 @@ ${
               window.clearTimeout(livePlaybackSafetyTimerRef.current);
             }
             const remainingPlaybackMs = Math.max(
-              1200,
-              Math.ceil((nextStartTimeRef.current - ctx.currentTime) * 1000) + 2400
+              1400,
+              livePcmSchedulerRef.current.remainingMs(ctx) + 2400
             );
             livePlaybackSafetyTimerRef.current = window.setTimeout(() => {
               livePlaybackSafetyTimerRef.current = null;
               isAiServerTurnOpenRef.current = false;
-              activeSourcesRef.current = [];
+              livePcmSchedulerRef.current.reset(outputAudioCtxRef.current, activeSourcesRef.current as any);
+              nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
               setAiAudioPlaying(false, 0);
             }, remainingPlaybackMs);
           }
@@ -5187,23 +6347,15 @@ ${
           // Barge-in interruption from server
           if (msg.serverContent?.interrupted || msg.type === 'interrupted') {
             isAiServerTurnOpenRef.current = false;
+            suppressAiAudioForTurnRef.current = false;
+            liveTurnFinalizedForCurrentAiTurnRef.current = false;
             callBillingRef.current.turnMetered = false;
             if (livePlaybackSafetyTimerRef.current) {
               window.clearTimeout(livePlaybackSafetyTimerRef.current);
               livePlaybackSafetyTimerRef.current = null;
             }
-            if (outputAudioCtxRef.current) {
-              nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
-            }
-            activeSourcesRef.current.forEach((s) => {
-              try {
-                s.stop();
-                s.disconnect();
-              } catch {
-                // Ignore
-              }
-            });
-            activeSourcesRef.current = [];
+            livePcmSchedulerRef.current.reset(outputAudioCtxRef.current, activeSourcesRef.current as any);
+            nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
             setAiAudioPlaying(false, 0);
           }
 
@@ -5215,11 +6367,12 @@ ${
               locale
             );
             if (cleanChunk) {
-              liveUserDraftRef.current = sanitizeHallucinatedTranscript(
-                liveUserDraftRef.current + msg.serverContent.inputTranscription.text,
-                activeScenario.targetLang,
-                locale
-              );
+              const prevDraft = liveUserDraftRef.current;
+              const needsSpace =
+                prevDraft.length > 0 &&
+                /[.!?。！？,;:\])]$/.test(prevDraft) &&
+                /^[A-Za-z0-9\u00C0-\u024F]/.test(cleanChunk);
+              liveUserDraftRef.current = needsSpace ? `${prevDraft} ${cleanChunk}` : prevDraft + cleanChunk;
               setLiveUserDraft(liveUserDraftRef.current);
               evaluateAndTriggerUserSpeechSentiment(liveUserDraftRef.current);
               turnAcousticTrackerRef.current.recordTranscriptEvent(
@@ -5243,13 +6396,30 @@ ${
           }
 
           if (msg.serverContent?.outputTranscription?.text) {
-            liveAiDraftRef.current += msg.serverContent.outputTranscription.text;
+            clearLiveTurnAutoCommitTimer();
+            awaitingPostToolResponseRef.current = false;
+            if (liveGenCompleteTimerRef.current) {
+              window.clearTimeout(liveGenCompleteTimerRef.current);
+              liveGenCompleteTimerRef.current = null;
+            }
+            const nextChunk = msg.serverContent.outputTranscription.text;
+            const prevDraft = liveAiDraftRef.current;
+            const needsSpace =
+              prevDraft.length > 0 &&
+              /[.!?。！？,;:\])]$/.test(prevDraft) &&
+              /^[A-Za-z0-9\u00C0-\u024F]/.test(nextChunk);
+            liveAiDraftRef.current = needsSpace ? `${prevDraft} ${nextChunk}` : prevDraft + nextChunk;
             applyAiMoodFromText(liveAiDraftRef.current);
-            setLiveAiDraft(cleanMoodTags(liveAiDraftRef.current));
+            scheduleLiveAiDraftUiUpdate();
           } else if (msg.type === 'output_transcription' || msg.type === 'ai_transcript') {
+            awaitingPostToolResponseRef.current = false;
+            if (liveGenCompleteTimerRef.current) {
+              window.clearTimeout(liveGenCompleteTimerRef.current);
+              liveGenCompleteTimerRef.current = null;
+            }
             liveAiDraftRef.current = msg.fullText || msg.text || '';
             applyAiMoodFromText(liveAiDraftRef.current);
-            setLiveAiDraft(cleanMoodTags(liveAiDraftRef.current));
+            scheduleLiveAiDraftUiUpdate();
           }
 
           // Spekulatif pre-fetch: jika ucapan AI yang sedang streaming telah menyelesaikan klausul/pertanyaan
@@ -5257,7 +6427,15 @@ ${
           // sehingga kartu bantuan sudah SIAP SEKETIKA (0ms) saat audio bicara AI tuntas!
           const draftSoFar = (liveAiDraftRef.current || '').trim();
           const hasClosingPunct = /[?？.!。！]$/.test(draftSoFar);
-          const hasSubstantialText = draftSoFar.split(/\s+/).length >= 3 || draftSoFar.length >= 8;
+          const endsWithQuestion = /[?？]$/.test(draftSoFar);
+          const wordCount = draftSoFar.split(/\s+/).filter(Boolean).length;
+          const sentenceCount = (draftSoFar.match(/[.!?。！？]+/g) || []).length;
+          const isSubstantialCjk =
+            /[\u3040-\u30ff\u3400-\u9fff]/.test(draftSoFar) &&
+            draftSoFar.length >= (endsWithQuestion ? 10 : 24);
+          const hasSubstantialText = endsWithQuestion
+            ? wordCount >= 5 || isSubstantialCjk
+            : wordCount >= 12 || sentenceCount >= 2 || isSubstantialCjk;
 
           if (hasSubstantialText && hasClosingPunct && draftSoFar !== lastStreamedCopilotTextRef.current) {
             if (copilotEarlyTimerRef.current) {
@@ -5282,16 +6460,34 @@ ${
             }, 250);
           }
 
-          setLiveAiTranslationDraft('');
+          if (draftSoFar) {
+            updateLiveAiTranslationDraft(cleanMoodTags(draftSoFar));
+          } else {
+            setLiveAiTranslationDraft('');
+          }
 
-          // Turn Complete, evaluate learner utterance and record Braincore mastery
-          const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
-          if (isGoogleTurnComplete || msg.type === 'turn_complete') {
+          // Turn Complete (and post-tool generationComplete where Gemini 3.8 Live omits a second turnComplete)
+          const finalizeLiveServerTurn = (finalMsg: any) => {
+            clearLiveTurnAutoCommitTimer();
+            clearLiveAiDraftUiTimer();
+            if (liveGenCompleteTimerRef.current) {
+              window.clearTimeout(liveGenCompleteTimerRef.current);
+              liveGenCompleteTimerRef.current = null;
+            }
+            if (livePcmSchedulerRef.current.hasPendingAudio()) {
+              livePcmSchedulerRef.current.flush();
+              nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
+            }
+            livePcmSchedulerRef.current.noteTurnBoundary();
+            awaitingPostToolResponseRef.current = false;
             awaitingOpeningTurnRef.current = false;
             openingGreetingCompletedRef.current = true;
             isAiServerTurnOpenRef.current = false;
             if (
-              activeSourcesRef.current.length === 0 ||
+              !livePcmSchedulerRef.current.hasPendingOrActiveAudio(
+                outputAudioCtxRef.current,
+                activeSourcesRef.current.length
+              ) ||
               outputAudioCtxRef.current?.state === 'suspended'
             ) {
               if (livePlaybackSafetyTimerRef.current) {
@@ -5306,7 +6502,7 @@ ${
               }
               const exactLeftMs = Math.max(
                 200,
-                Math.ceil((nextStartTimeRef.current - outputAudioCtxRef.current.currentTime) * 1000) + 400
+                livePcmSchedulerRef.current.remainingMs(outputAudioCtxRef.current) + 400
               );
               livePlaybackSafetyTimerRef.current = window.setTimeout(() => {
                 livePlaybackSafetyTimerRef.current = null;
@@ -5318,7 +6514,7 @@ ${
             if (callBillingRef.current.outOfGemsAfterTurn && callBillingRef.current.active) {
               callBillingRef.current.outOfGemsAfterTurn = false;
               const waitAudioMs = outputAudioCtxRef.current
-                ? Math.max(350, Math.ceil((nextStartTimeRef.current - outputAudioCtxRef.current.currentTime) * 1000) + 250)
+                ? Math.max(350, livePcmSchedulerRef.current.remainingMs(outputAudioCtxRef.current) + 250)
                 : 400;
               window.setTimeout(() => {
                 if (isLiveConnectedRef.current && !userHungUpRef.current) {
@@ -5331,11 +6527,11 @@ ${
               copilotEarlyTimerRef.current = null;
             }
             const uText = sanitizeHallucinatedTranscript(
-              liveUserDraftRef.current || msg.userTranscript || '',
+              liveUserDraftRef.current || finalMsg?.userTranscript || '',
               activeScenario.targetLang,
               locale
             ).trim();
-            const rawAText = (liveAiDraftRef.current || msg.aiTranscript || '').trim();
+            const rawAText = (liveAiDraftRef.current || finalMsg?.aiTranscript || '').trim();
             applyAiMoodFromText(rawAText);
             const aText = cleanMoodTags(rawAText);
             if (uText) {
@@ -5387,6 +6583,12 @@ ${
                 speakingDurationSec: measuredTurnSec,
                 inputMode: 'voice' as const,
                 fluencyTelemetry: liveTelemetry,
+                expectedTargetText: activeWorkbenchTargetRef.current.isOpen
+                  ? activeWorkbenchTargetRef.current.activeTargetText
+                  : undefined,
+                activePopupMode: activeWorkbenchTargetRef.current.isOpen
+                  ? activeWorkbenchTargetRef.current.contextMode
+                  : undefined,
                 learnerDossier: safeBuildDossier(
                   brainStateRef.current,
                   activeScenario,
@@ -5418,6 +6620,13 @@ ${
                   isAcousticTiming: liveTelemetry.isAcousticTiming,
                   measurementSource: liveTelemetry.measurementSource,
                   questionTitle: learningWorkbench?.topicTitle || activeScenario.titleId,
+                  expectedPassageText:
+                    activeWorkbenchTargetRef.current.isOpen &&
+                    (activeWorkbenchTargetRef.current.contextMode === 'pte_read_aloud' ||
+                      activeWorkbenchTargetRef.current.contextMode === 'read_aloud')
+                      ? activeWorkbenchTargetRef.current.activeTargetText
+                      : undefined,
+                  targetLang: activeScenario.targetLang,
                   learnerName: regLearnerName,
                 });
                 setLatestPteDiagnostic(pteDiagResult);
@@ -5425,6 +6634,45 @@ ${
                 brainStateRef.current = loadBraincoreState();
               }
               const ev = evaluateTurnLocal(evalParams);
+              const activeAlignment = ev.readAloudAlignment || pteDiagResult?.readAloudAlignment || null;
+              if (activeAlignment) {
+                setLatestReadAloudAlignment(activeAlignment);
+                if (
+                  (!activeAlignment.passed || pteDiagResult?.scores.passedTarget === false) &&
+                  activeWorkbenchTargetRef.current.isOpen &&
+                  (activeWorkbenchTargetRef.current.contextMode === 'read_aloud' ||
+                    activeWorkbenchTargetRef.current.contextMode === 'pte_read_aloud') &&
+                  wsRef.current?.readyState === WebSocket.OPEN
+                ) {
+                  const missedList = (activeAlignment.missedWords || []).slice(0, 8);
+                  const wrongList = (activeAlignment.mispronouncedPairs || [])
+                    .map((p) => `${p.expected}(heard:${p.heard || '?'})`)
+                    .slice(0, 8);
+                  try {
+                    wsRef.current.send(
+                      JSON.stringify({
+                        clientContent: {
+                          turns: [
+                            {
+                              role: 'user',
+                              parts: [
+                                {
+                                  text: `[SYSTEM NOTE: Learner misread/skipped words on Read Aloud target "${activeWorkbenchTargetRef.current.activeTargetText}": missed=${JSON.stringify(missedList)}, wrong=${JSON.stringify(wrongList)}. Strictly point out the exact mistakes in your next spoken reply!]`,
+                                },
+                              ],
+                            },
+                          ],
+                          turnComplete: false,
+                        },
+                      })
+                    );
+                  } catch {
+                    // Ignore live WS Read Aloud note error
+                  }
+                }
+              } else {
+                setLatestReadAloudAlignment(null);
+              }
               const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
               const outcome = recordSpeakingAttempt(brainStateRef.current, {
                 competencyId: activeScenario.competencyId,
@@ -5486,8 +6734,8 @@ ${
                 /\b(adalah|sedangkan|gunakan|perhatikan|kalimat|karena|untuk|dalam|jangan|ketika|pakai|bedanya|artinya|lihat|papan|kata|contohnya|coba)\b/i.test(
                   aText
                 );
-              const initialTransId = isAiIndonesianExplanation ? aText : (msg.aiTranslationId || '');
-              const initialTransTh = msg.aiTranslationTh || '';
+              const initialTransId = isAiIndonesianExplanation ? aText : (finalMsg?.aiTranslationId || '');
+              const initialTransTh = finalMsg?.aiTranslationTh || '';
               const aiTurnId = `live_ai_${Date.now() + 1}`;
               setTurns((prev) => [
                 ...prev,
@@ -5497,7 +6745,7 @@ ${
                   text: aText,
                   translationId: initialTransId,
                   translationTh: initialTransTh,
-                  audioBase64: msg.aiAudioBase64 || undefined,
+                  audioBase64: finalMsg?.aiAudioBase64 || undefined,
                   timestamp: Date.now() + 1,
                   replySource: 'ai',
                 },
@@ -5539,6 +6787,66 @@ ${
               }
               liveSentenceTransMapRef.current.clear();
             }
+          };
+
+          const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
+          const isGoogleGenerationComplete = Boolean(msg.serverContent?.generationComplete);
+          if (isGoogleTurnComplete || msg.type === 'turn_complete' || isGoogleGenerationComplete) {
+            suppressAiAudioForTurnRef.current = false;
+            if (livePcmSchedulerRef.current.hasPendingAudio()) {
+              livePcmSchedulerRef.current.flush();
+              nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
+            }
+          }
+          if (isGoogleTurnComplete || msg.type === 'turn_complete') {
+            if (liveGenCompleteTimerRef.current) {
+              window.clearTimeout(liveGenCompleteTimerRef.current);
+              liveGenCompleteTimerRef.current = null;
+            }
+            const hasPendingSpeech = Boolean((liveAiDraftRef.current || msg.aiTranscript || '').trim());
+            const hasPendingUser = Boolean((liveUserDraftRef.current || msg.userTranscript || '').trim());
+            const alreadyFinalizedEmptyTurn =
+              liveTurnFinalizedForCurrentAiTurnRef.current && !hasPendingSpeech && !hasPendingUser;
+            liveTurnFinalizedForCurrentAiTurnRef.current = false;
+            const isEmptyPreToolHandoff =
+              awaitingPostToolResponseRef.current &&
+              !hasPendingSpeech &&
+              activeSourcesRef.current.length === 0;
+            if (!isEmptyPreToolHandoff && !alreadyFinalizedEmptyTurn) {
+              finalizeLiveServerTurn(msg);
+            }
+          } else if (isGoogleGenerationComplete) {
+            const hasPendingSpeech = Boolean((liveAiDraftRef.current || '').trim());
+            const isEmptyPreToolHandoff =
+              awaitingPostToolResponseRef.current &&
+              !hasPendingSpeech &&
+              activeSourcesRef.current.length === 0;
+            if (!isEmptyPreToolHandoff) {
+              awaitingPostToolResponseRef.current = false;
+              if (liveGenCompleteTimerRef.current) {
+                window.clearTimeout(liveGenCompleteTimerRef.current);
+              }
+              const capturedMsg = msg;
+              const schedulePostGenerationFinalize = () => {
+                const remainingAudioMs = livePcmSchedulerRef.current.remainingMs(outputAudioCtxRef.current);
+                const waitFinalizeMs = Math.max(480, remainingAudioMs + 450);
+                liveGenCompleteTimerRef.current = window.setTimeout(() => {
+                  liveGenCompleteTimerRef.current = null;
+                  if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) {
+                    return;
+                  }
+                  if (awaitingPostToolResponseRef.current) return;
+                  const leftoverAudioMs = livePcmSchedulerRef.current.remainingMs(outputAudioCtxRef.current);
+                  if (leftoverAudioMs > 120) {
+                    schedulePostGenerationFinalize();
+                    return;
+                  }
+                  liveTurnFinalizedForCurrentAiTurnRef.current = true;
+                  finalizeLiveServerTurn(capturedMsg);
+                }, waitFinalizeMs);
+              };
+              schedulePostGenerationFinalize();
+            }
           }
         } catch {
           // Ignore parse errors
@@ -5546,6 +6854,11 @@ ${
       };
 
       ws.onerror = () => {
+        if (liveGenCompleteTimerRef.current) {
+          window.clearTimeout(liveGenCompleteTimerRef.current);
+          liveGenCompleteTimerRef.current = null;
+        }
+        awaitingPostToolResponseRef.current = false;
         if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) return;
         if (!settled) {
           settled = true;
@@ -5560,10 +6873,23 @@ ${
       };
 
       ws.onclose = (event) => {
+        if (liveGenCompleteTimerRef.current) {
+          window.clearTimeout(liveGenCompleteTimerRef.current);
+          liveGenCompleteTimerRef.current = null;
+        }
+        awaitingPostToolResponseRef.current = false;
         if (wsRef.current !== ws || mySeq !== connectSeqRef.current || userHungUpRef.current) return;
         if (!settled) {
           settled = true;
-          window.clearTimeout(connectTimer);
+          if (connectTimer !== null) {
+            window.clearTimeout(connectTimer);
+            connectTimer = null;
+          }
+          clearLiveAiDraftUiTimer();
+          suppressAiAudioForTurnRef.current = false;
+          liveTurnFinalizedForCurrentAiTurnRef.current = false;
+          livePcmSchedulerRef.current.reset(outputAudioCtxRef.current, activeSourcesRef.current as any);
+          nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
           if (!isReconnect && liveReconnectAttemptsRef.current < 2) {
             liveReconnectAttemptsRef.current += 1;
             void connectDuplex(false);
@@ -5575,13 +6901,19 @@ ${
 
         // Active mid-call disconnect (quota limit, rate limit, or connection drop)
         if (isLiveConnectedRef.current && !userHungUpRef.current) {
+          clearLiveAiDraftUiTimer();
+          suppressAiAudioForTurnRef.current = false;
+          liveTurnFinalizedForCurrentAiTurnRef.current = false;
+          livePcmSchedulerRef.current.reset(outputAudioCtxRef.current, activeSourcesRef.current as any);
+          nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
           void reportGeminiLiveSessionDrop(
             event.reason || 'mid_call_disconnect',
             event.code,
             currentLiveSessionRef.current?.keyIndex
           );
 
-          if (liveReconnectAttemptsRef.current < 5) {
+          const isFatalWsClose = event.code === 1003 || event.code === 1008 || event.code === 4003;
+          if (!isFatalWsClose && liveReconnectAttemptsRef.current < 5) {
             liveReconnectAttemptsRef.current += 1;
             setStatusBanner(
               locale === 'th'
@@ -5608,6 +6940,15 @@ ${
     isLiveConnectedRef.current = false;
     isLiveConnectingRef.current = false;
     isAiServerTurnOpenRef.current = false;
+    suppressAiAudioForTurnRef.current = false;
+    liveTurnFinalizedForCurrentAiTurnRef.current = false;
+    awaitingPostToolResponseRef.current = false;
+    clearLiveTurnAutoCommitTimer();
+    clearLiveAiDraftUiTimer();
+    if (liveGenCompleteTimerRef.current) {
+      window.clearTimeout(liveGenCompleteTimerRef.current);
+      liveGenCompleteTimerRef.current = null;
+    }
     connectSeqRef.current += 1;
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
@@ -5752,15 +7093,8 @@ ${
       }
       wsRef.current = null;
     }
-    activeSourcesRef.current.forEach((src) => {
-      try {
-        src.stop();
-        src.disconnect();
-      } catch {
-        // Ignore
-      }
-    });
-    activeSourcesRef.current = [];
+    livePcmSchedulerRef.current.reset(outputAudioCtxRef.current, activeSourcesRef.current as any);
+    nextStartTimeRef.current = livePcmSchedulerRef.current.getNextStartTime();
     clearSpeechWatchdog();
     speakTokenRef.current += 1;
     stopNeuralBufferSource();
@@ -5796,7 +7130,8 @@ ${
     isMicMutedRef.current = false;
     setIsLiveConnected(false);
     setIsLiveConnecting(false);
-    setIsPlayingAiAudio(false);
+    setAiAudioPlaying(false, 0);
+    lastAiPlayoutEndedAtRef.current = 0;
     if (turnsRef.current.some((t) => t.speaker === 'user')) {
       try {
         const updatedBrain = finalizeCallSessionMemory(brainStateRef.current, {
@@ -6010,8 +7345,33 @@ ${
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
-  // Auto-Call Orchestration (Triggered from Home Screen "Telepon aku sekarang" Modal)
+  // Auto-Call Orchestration + Secure Studio Bridge Handshake & Page Lifecycle Teardown
+  const studioHelloSentRef = useRef(false);
   useEffect(() => {
+    const expectedNonce = getStudioNonce();
+    const isIframe = typeof window !== 'undefined' && window.parent && window.parent !== window;
+
+    if (isIframe && expectedNonce && !studioHelloSentRef.current) {
+      studioHelloSentRef.current = true;
+      try {
+        const targetOrigin =
+          window.location.origin && window.location.origin !== 'null' ? window.location.origin : '*';
+        window.parent.postMessage(
+          {
+            v: 1,
+            type: 'fz.studio.hello',
+            nonce: expectedNonce,
+            seq: getNextStudioSeq(),
+            sentAt: Date.now(),
+            payload: {},
+          },
+          targetOrigin
+        );
+      } catch {
+        // Ignore
+      }
+    }
+
     const checkAutoCall = () => {
       if (autoCallProcessedRef.current) return;
       let shouldAuto = false;
@@ -6024,25 +7384,60 @@ ${
       } catch {
         // Ignore
       }
-      if (shouldAuto && !isLiveConnected && !isLiveConnecting) {
+      if (shouldAuto && !isLiveConnectedRef.current && !isLiveConnectingRef.current) {
         autoCallProcessedRef.current = true;
         requestStartLiveCall(true);
       }
     };
 
     const handleWindowMsg = (e: MessageEvent) => {
-      if (!e.data) return;
+      if (!e.data || typeof e.data !== 'object') return;
+      if (isIframe && e.source !== window.parent) return;
+      const myOrigin = window.location.origin;
+      if (myOrigin && myOrigin !== 'null' && e.origin && e.origin !== 'null' && e.origin !== myOrigin) {
+        return;
+      }
+      if (expectedNonce && e.data.nonce && e.data.nonce !== expectedNonce) return;
       if (e.data.type === 'fz.shell.autocall') {
-        if (!isLiveConnected && !isLiveConnecting) {
+        if (expectedNonce && e.data.nonce !== expectedNonce) return;
+        try {
+          sessionStorage.removeItem('fz_kawan_autocall');
+        } catch {}
+        if (!isLiveConnectedRef.current && !isLiveConnectingRef.current) {
+          autoCallProcessedRef.current = true;
           requestStartLiveCall(true);
+        }
+      } else if (e.data.type === 'fz.shell.hide') {
+        if (expectedNonce && e.data.nonce !== expectedNonce) return;
+        stopLiveCall();
+        stopPttRecording();
+      }
+    };
+
+    const handleVisibilityOrHide = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+        if (isLiveConnectedRef.current || isLiveConnectingRef.current) {
+          stopLiveCall();
         }
       }
     };
 
+    const handlePageUnload = () => {
+      if (isLiveConnectedRef.current || isLiveConnectingRef.current) {
+        stopLiveCall();
+      }
+    };
+
     window.addEventListener('message', handleWindowMsg);
+    window.addEventListener('pagehide', handlePageUnload);
+    window.addEventListener('beforeunload', handlePageUnload);
+    document.addEventListener('visibilitychange', handleVisibilityOrHide);
     const timer = window.setTimeout(checkAutoCall, 40);
     return () => {
       window.removeEventListener('message', handleWindowMsg);
+      window.removeEventListener('pagehide', handlePageUnload);
+      window.removeEventListener('beforeunload', handlePageUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityOrHide);
       window.clearTimeout(timer);
     };
   }, [isLiveConnected, isLiveConnecting]);
@@ -6269,7 +7664,9 @@ ${
   const activeAiLiveText = liveAiDraft.trim() || lastAiTurn?.text || defaultOpeningText;
   const hasRealLettersForMeaning = (str?: string): boolean => {
     if (!str) return false;
-    return (str.match(/[A-Za-zÀ-ÖØ-öø-ÿ\u0E00-\u0E7F]/g) || []).length >= 3;
+    return (
+      str.match(/[A-Za-zÀ-ÖØ-öø-ÿ\u0E00-\u0E7F\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g) || []
+    ).length >= 2;
   };
   const rawCandidateId = isStreamingAiLive
     ? liveAiTranslationDraft
@@ -6287,7 +7684,9 @@ ${
     activeAiLiveText,
     activeScenario.targetLang,
     rawSubtitleSourceId || undefined,
-    rawSubtitleSourceTh || undefined
+    rawSubtitleSourceTh || undefined,
+    undefined,
+    { locale, forceFetch: !isStreamingAiLive }
   );
   const activeAiSubtitle = {
     ...computedAiSubtitle,
@@ -6366,6 +7765,9 @@ ${
     // Also guard if AI accidentally spoke in Indonesian while target course is zh/ja
     const cjkChars = (activeAiLiveText.match(/[\u4E00-\u9FFF\u3040-\u30FF]/g) || []).length;
     const latinWords = (activeAiLiveText.match(/[A-Za-zÀ-ÖØ-öø-ÿ]{2,}/g) || []).length;
+    if (isSswSensei && !rawSubtitleSourceId && latinWords >= cjkChars) {
+      return true;
+    }
     if (
       (activeScenario.targetLang === 'zh' || activeScenario.targetLang === 'ja') &&
       latinWords >= 4 &&
@@ -6378,8 +7780,36 @@ ${
 
   const activeUserLiveText = liveUserDraft.trim() || lastUserTurn?.text || '';
   const activeUserSubtitle = activeUserLiveText
-    ? translateAndPhoneticizeLiveText(activeUserLiveText, activeScenario.targetLang)
+    ? translateAndPhoneticizeLiveText(
+        activeUserLiveText,
+        activeScenario.targetLang,
+        lastUserTurn?.translationId,
+        lastUserTurn?.translationTh,
+        undefined,
+        { locale, forceFetch: !liveUserDraft.trim() }
+      )
     : null;
+  const resolvedActiveUserMeaning = (() => {
+    if (!activeUserSubtitle) return '';
+    const candidate =
+      locale === 'th'
+        ? activeUserSubtitle.translationTh || activeUserSubtitle.translationId
+        : locale === 'ja'
+        ? activeUserSubtitle.translationJa || activeUserSubtitle.translationId
+        : locale === 'zh'
+        ? activeUserSubtitle.translationZh || activeUserSubtitle.translationId
+        : activeUserSubtitle.translationId || activeUserSubtitle.translationTh;
+    if (!candidate || isGenericPlaceholderTranslation(candidate)) return '';
+    if (locale !== 'ja' && locale !== 'zh' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(candidate)) {
+      return candidate
+        .replace(/[\u4E00-\u9FFF\u3040-\u30FF]+/g, (cjk) =>
+          activeScenario.targetLang === 'zh' ? toPhoneticPinyin(cjk) : toPhoneticRomaji(cjk)
+        )
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    }
+    return candidate;
+  })();
 
   const handleRefreshLiveAssist = async () => {
     playFiezelSfx('button_tap');
@@ -6404,14 +7834,14 @@ ${
     <div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-[#F6F3EC] text-[#1C1611] flex flex-col">
       {/* TOP BAR RINGKAS & BERSIH (h-11 / 44px - FaceTime & Duolingo Max Style) */}
       <header className="shrink-0 sticky top-0 z-20 bg-[#F6F3EC]/95 backdrop-blur-md border-b border-[#E8DFC8]/60 pt-[env(safe-area-inset-top,0.25rem)]">
-        <div className="max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-3 sm:px-6 h-11 flex items-center justify-between gap-2">
+        <div className="max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-2.5 sm:px-6 min-h-11 py-1 sm:py-0 sm:h-11 flex flex-wrap sm:flex-nowrap items-center justify-between gap-x-1.5 gap-y-1 sm:gap-2">
           {/* SISI KIRI: Tombol Kembali & Persona Active */}
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="order-1 flex items-center gap-1 sm:gap-2 min-w-0">
             <a
               href="./index.html"
               onClick={handleBackToPwa}
               data-testid="mitra-kaiwa-back-btn"
-              className="px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] font-semibold text-[#1C1611] cursor-pointer flex items-center gap-1 transition-all text-xs shrink-0"
+              className="px-2 sm:px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] font-semibold text-[#1C1611] cursor-pointer flex items-center gap-1 transition-all text-xs shrink-0"
               title="Kembali"
             >
               <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
@@ -6425,6 +7855,23 @@ ${
               {targetLang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara'}
             </span>
 
+            {targetLang === 'ja' && (
+              <button
+                type="button"
+                data-testid="ssw-header-quick-btn"
+                onClick={() => handleSelectPersona('ssw_sensei')}
+                className={`px-2 py-1 rounded-full text-[10.5px] font-black transition cursor-pointer shrink-0 ${
+                  isSswSensei
+                    ? 'bg-[#8C2233] text-white shadow-xs'
+                    : 'bg-[#FFF3DC] hover:bg-[#8C2233] hover:text-white text-[#7A4B12] border border-[#E5CFA8]'
+                }`}
+                title="SSW SENSEI - Mentor Pengolahan Makanan (Wakai Papa Pro)"
+              >
+                <span className="sm:hidden">🍱 SSW</span>
+                <span className="hidden sm:inline">🍱 Mode SSW</span>
+              </button>
+            )}
+
             <button
               type="button"
               data-testid="persona-picker-trigger"
@@ -6432,14 +7879,14 @@ ${
                 playFiezelSfx('button_tap');
                 setShowPersonaModal(true);
               }}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-[#5C4E3C] text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+              className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-[#5C4E3C] text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95 min-w-0 shrink"
               title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์เสียง' : 'Ganti Karakter & Gaya Bicara Partner'}
             >
-              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-              <span className="max-w-[85px] xs:max-w-[120px] sm:max-w-[160px] truncate">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0"></span>
+              <span className="max-w-[76px] xs:max-w-[105px] sm:max-w-[160px] truncate">
                 {formatPersonaShortName(activePersona.name)}
               </span>
-              <svg className="w-3 h-3 text-[#8C7A65]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3 h-3 text-[#8C7A65] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -6447,80 +7894,130 @@ ${
 
           {/* TENGAH: Segmented Switcher FaceTime (Panggung) vs Riwayat Chat */}
           {activeTab === 'call' && (
-            <div
-              data-testid="call-view-mode-toggle"
-              className="inline-flex items-center p-0.5 rounded-full bg-[#EFE8DA] text-[11px] font-semibold shadow-2xs shrink-0"
-            >
-              <button
-                type="button"
-                onClick={() => {
-                  playFiezelSfx('button_tap');
-                  setCallViewMode('stage');
-                }}
-                className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-1 ${
-                  callViewMode === 'stage'
-                    ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
-                    : 'text-[#6E5E47] hover:text-[#1C1611]'
-                }`}
+            <div className="order-3 sm:order-2 w-full sm:w-auto flex justify-center pb-0.5 sm:pb-0">
+              <div
+                data-testid="call-view-mode-toggle"
+                className="inline-flex items-center p-0.5 rounded-full bg-[#EFE8DA] text-[11px] font-semibold shadow-2xs shrink-0"
               >
-                <Video className="w-3 h-3 text-[#8C2233]" />
-                <span>FaceTime</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  playFiezelSfx('button_tap');
-                  setCallViewMode('history');
-                }}
-                className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-1 ${
-                  callViewMode === 'history'
-                    ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
-                    : 'text-[#6E5E47] hover:text-[#1C1611]'
-                }`}
-              >
-                <MessageSquare className="w-3 h-3 text-[#5C4E3C]" />
-                <span>{locale === 'th' ? 'แชท' : 'Riwayat'}</span>
-                {turns.filter((tr) => tr.speaker === 'user').length > 0 && (
-                  <span className="w-3.5 h-3.5 rounded-full bg-[#8C2233] text-white text-[9px] flex items-center justify-center font-bold">
-                    {turns.filter((tr) => tr.speaker === 'user').length}
-                  </span>
-                )}
-              </button>
+                <button
+                  type="button"
+                  data-testid="tab-call-btn"
+                  onClick={() => {
+                    playFiezelSfx('button_tap');
+                    setCallViewMode('stage');
+                  }}
+                  className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+                    callViewMode === 'stage'
+                      ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                      : 'text-[#6E5E47] hover:text-[#1C1611]'
+                  }`}
+                >
+                  <Video className="w-3 h-3 text-[#8C2233]" />
+                  <span>FaceTime</span>
+                </button>
+                <button
+                  type="button"
+                  data-testid="tab-history-btn"
+                  onClick={() => {
+                    playFiezelSfx('button_tap');
+                    setCallViewMode('history');
+                  }}
+                  className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+                    callViewMode === 'history'
+                      ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
+                      : 'text-[#6E5E47] hover:text-[#1C1611]'
+                  }`}
+                >
+                  <MessageSquare className="w-3 h-3 text-[#5C4E3C]" />
+                  <span>{locale === 'th' ? 'แชท' : locale === 'ja' ? '履歴' : locale === 'zh' ? '记录' : 'Riwayat'}</span>
+                  {turns.filter((tr) => tr.speaker === 'user').length > 0 && (
+                    <span className="w-3.5 h-3.5 rounded-full bg-[#8C2233] text-white text-[9px] flex items-center justify-center font-bold">
+                      {turns.filter((tr) => tr.speaker === 'user').length}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           )}
 
-          {/* SISI KANAN: Papan Belajar Quick Action, EN/JA/ZH Pill, BKT % */}
-          <div className="flex items-center gap-1.5 text-xs shrink-0">
-            {!isMeasureMode && activeTab === 'call' && (
+          {/* SISI KANAN: Papan Belajar / Papan Taktis SSW Quick Action, EN/JA/ZH Pill */}
+          <div className="order-2 sm:order-3 flex items-center gap-1 sm:gap-1.5 text-xs shrink-0">
+            {!isMeasureMode && activeTab === 'call' && (() => {
+              const isSswPill =
+                activePersona.id === 'ssw_sensei' ||
+                activeScenario.personaId === 'ssw_sensei' ||
+                activeScenario.id.startsWith('scen_ssw_');
+              return (
               <button
                 type="button"
                 data-testid="open-workbench-pill-btn"
                 onClick={() => {
                   playFiezelSfx('button_tap');
-                  const focusQuery =
-                    lastUserTurn?.text?.trim() ||
-                    activeScenario.targetPatterns?.[0] ||
-                    activeScenario.competencyNameId ||
-                    'Perbedaan kata kerja dan pola kalimat percakapan';
+                  if (isSswPill) {
+                    workbenchSessionRef.current.dismissedByUser = false;
+                    const sswTitle = `Papan Taktis SSW · Hal. ${sswFocusPage || 1}`;
+                    openLearningWorkbenchWithAction(
+                      {
+                        actionType: 'open_learning_popup',
+                        focusType: 'ssw_tactical_board' as any,
+                        topicTitle: sswTitle,
+                      },
+                      sswTitle,
+                      { forceOpen: true }
+                    );
+                    return;
+                  }
+                  const lastDiag = lastUserTurn?.diagnosis;
+                  const hasDiagError = Boolean(lastDiag && !lastDiag.ok);
+                  const focusQuery = hasDiagError
+                    ? activeScenario.targetPatterns?.[0] ||
+                      activeScenario.competencyNameId ||
+                      lastDiag?.syntacticCorrection ||
+                      lastUserTurn?.text?.trim() ||
+                      'Tata bahasa percakapan'
+                    : lastUserTurn?.text?.trim() ||
+                      activeScenario.targetPatterns?.[0] ||
+                      activeScenario.competencyNameId ||
+                      'Perbedaan kata kerja dan pola kalimat percakapan';
                   const reqSeq = ++workbenchSessionRef.current.turnSeq;
                   workbenchSessionRef.current.dismissedByUser = false;
-                  setIsAnalyzingTurn(true);
                   const isPte = activeScenario.id.startsWith('scen_pte_') || activeScenario.personaId === 'dr_julian';
                   const pteFocus = activeScenario.id === 'scen_pte_ra_level2' ? 'pte_read_aloud' : (isPte ? 'pte_describe_image' : undefined);
+                  const correctedSample = hasDiagError
+                    ? (lastDiag?.syntacticCorrection || lastDiag?.naturalReformulation || '')
+                    : '';
                   openLearningWorkbenchWithAction(
                     {
                       actionType: 'open_learning_popup',
                       focusType: pteFocus,
                       topicTitle: focusQuery,
+                      ...(hasDiagError && lastDiag
+                        ? {
+                            misconceptionId: lastDiag.misconceptionId || undefined,
+                            wrongWord: lastUserTurn?.text?.trim() || undefined,
+                            rightWord: correctedSample || undefined,
+                            sampleTarget: correctedSample || undefined,
+                            explanationText:
+                              locale === 'th'
+                                ? lastDiag.whyFailsTh || lastDiag.pedagogicalFeedbackTh || ''
+                                : lastDiag.whyFailsId || lastDiag.pedagogicalFeedbackId || '',
+                          }
+                        : {}),
                     },
-                    focusQuery
+                    focusQuery,
+                    { forceOpen: true }
                   );
+                  if (pteFocus) {
+                    return;
+                  }
+                  setIsAnalyzingTurn(true);
                   void (async () => {
                     try {
                       for (const base of resolveVoiceApiCandidateBases()) {
                         const res = await fetch(`${base}/api/voice/partner-turn`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
+                          credentials: 'include',
                           body: JSON.stringify({
                             text: `[WHITEBOARD_REQUEST] Jelaskan aturan tata bahasa dan contoh untuk: ${focusQuery}`,
                             forcePopup: true,
@@ -6557,13 +8054,24 @@ ${
                     }
                   })();
                 }}
-                className="fz-wb-press px-2.5 py-1 rounded-full bg-[#FFF3C4] hover:bg-[#FFE896] border border-[#E6CE7A] text-[#241A11] text-[11px] font-bold shadow-2xs flex items-center gap-1 cursor-pointer transition-all"
-                title="Buka Papan Tulis Interaktif (Bank Materi Braincore + Bedah Kilat Fiezel)"
+                className={
+                  isSswPill
+                    ? 'fz-wb-press px-2.5 py-1 rounded-full bg-[#FCECED] hover:bg-[#F9D7DB] border border-[#E8B8BF] text-[#8C2233] text-[11px] font-bold shadow-2xs flex items-center gap-1 cursor-pointer transition-all'
+                    : 'fz-wb-press px-2.5 py-1 rounded-full bg-[#FFF3C4] hover:bg-[#FFE896] border border-[#E6CE7A] text-[#241A11] text-[11px] font-bold shadow-2xs flex items-center gap-1 cursor-pointer transition-all'
+                }
+                title={
+                  isSswPill
+                    ? 'Buka Papan Taktis SSW Sensei (Trik Wakai Papa+, Kotoba & Kuis Prometric)'
+                    : 'Buka Papan Tulis Interaktif (Bank Materi Braincore + Bedah Kilat Fiezel)'
+                }
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#8C6D1F] shrink-0" />
-                <span className="hidden sm:inline">{locale === 'th' ? 'กระดานติวเตอร์' : 'Papan Tulis'}</span>
+                <BookOpen className={`w-3.5 h-3.5 shrink-0 ${isSswPill ? 'text-[#8C2233]' : 'text-[#8C6D1F]'}`} />
+                <span className="hidden sm:inline">
+                  {isSswPill ? 'Papan Taktis' : locale === 'th' ? 'กระดานติวเตอร์' : 'Papan Tulis'}
+                </span>
               </button>
-            )}
+              );
+            })()}
 
             <div className="flex items-center bg-white/90 rounded-full p-0.5 shadow-[0_1px_2px_rgba(28,22,17,0.05)]">
               <button
@@ -6634,7 +8142,7 @@ ${
       )}
 
       {/* RUANG KERJA UTAMA VOICE-FIRST */}
-      <main ref={mainScrollRef} className="flex-1 min-h-0 max-w-4xl mx-auto px-4 sm:px-6 lg:max-w-6xl xl:max-w-7xl py-2 space-y-3 w-full overflow-y-auto overscroll-contain flex flex-col">
+      <main ref={mainScrollRef} className="flex-1 min-h-0 max-w-4xl mx-auto px-4 sm:px-6 lg:max-w-6xl xl:max-w-7xl pt-1.5 pb-4 sm:py-2 space-y-2 sm:space-y-3 w-full overflow-y-auto overscroll-contain flex flex-col">
         {activeTab === 'home' ? (
           <HomeRedesignView
             locale={locale}
@@ -6680,10 +8188,17 @@ ${
                   {activeScenario.vocabPrereqs.map((v) => (
                     <div
                       key={v.id}
-                      className="bg-[#F6F3EC] rounded-2xl p-3 text-xs"
+                      className="bg-[#F6F3EC] rounded-2xl p-3 text-xs space-y-1"
                     >
-                      <div className="font-bold text-[#1C1611]">{v.term}</div>
-                      <div className="text-[#6E5E47] mt-0.5">
+                      <JapaneseRubyDisplay
+                        text={v.term}
+                        targetLang={activeScenario.targetLang}
+                        showFurigana={!isMeasureMode}
+                        showRomaji={!isMeasureMode}
+                        className="font-bold text-[#1C1611]"
+                        rubyClassName="font-bold text-[#1C1611]"
+                      />
+                      <div className="text-[#6E5E47]">
                         {locale === 'th' ? v.meaningTh : v.meaningId}
                       </div>
                     </div>
@@ -6699,15 +8214,15 @@ ${
                 </button>
               </section>
             ) : (
-              <div className="w-full flex-1 flex flex-col space-y-3">
+              <div className="w-full flex-1 flex flex-col space-y-2 sm:space-y-3">
                 {/* KOLOM FACETIME (40-60 Split: 40% Video Stage Mochi | 60% Interactive Learning Surface) */}
-                <div className={`w-full max-w-xl lg:max-w-4xl mx-auto flex flex-col lg:grid lg:grid-cols-12 lg:items-start gap-3.5 ${callViewMode === 'stage' ? 'flex' : 'hidden'}`}>
+                <div className={`w-full max-w-xl lg:max-w-4xl mx-auto flex flex-col lg:grid lg:grid-cols-12 lg:items-start gap-2 sm:gap-3.5 ${callViewMode === 'stage' ? 'flex' : 'hidden'}`}>
                   {/* 1. ZONA 40%: FaceTime Video Stage Mochi */}
                   <section
                     data-testid="ai-call-card"
                     data-call-state={callStateKey}
                     data-transport-mode={liveTransportMode}
-                    className="lg:col-span-5 lg:self-start bg-gradient-to-b from-[#FAF5EB]/95 to-white/95 rounded-3xl p-3.5 sm:p-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-[#EADBCE]/80 flex flex-col justify-between items-center w-full h-auto min-h-[310px] sm:min-h-[345px] relative z-10 shrink-0"
+                    className="lg:col-span-5 lg:self-start bg-gradient-to-b from-[#FAF5EB]/95 to-white/95 rounded-3xl p-2 sm:p-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-[#EADBCE]/80 flex flex-col justify-between items-center w-full h-auto min-h-0 sm:min-h-[345px] relative z-10 shrink-0"
                   >
                     {/* Meta Bar Atas: Coach & Scenario Level & Mode Badges */}
                     <div className="w-full flex items-center justify-between gap-2 text-xs">
@@ -6738,7 +8253,15 @@ ${
                             title="Pilih Target Level CEFR (A1 - C2)"
                           >
                             <span className="text-[#B45309]">🎯</span>
-                            <span>Level {userCefrLevel}</span>
+                            <span>
+                              {locale === 'th'
+                                ? `ระดับ ${userCefrLevel}`
+                                : locale === 'ja'
+                                ? `レベル ${userCefrLevel}`
+                                : locale === 'zh'
+                                ? `等级 ${userCefrLevel}`
+                                : `Level ${userCefrLevel}`}
+                            </span>
                             <span className="text-[10px] text-[#8C7A65]">▾</span>
                           </button>
 
@@ -6807,7 +8330,21 @@ ${
                               : 'bg-[#F5F1E8] text-[#5C4E3C] hover:text-[#1C1611]'
                           }`}
                         >
-                          {isMeasureMode ? 'Mode Ujian' : 'Latihan'}
+                          {isMeasureMode
+                            ? locale === 'th'
+                              ? 'โหมดสอบ'
+                              : locale === 'ja'
+                              ? 'テスト'
+                              : locale === 'zh'
+                              ? '考试'
+                              : 'Mode Ujian'
+                            : locale === 'th'
+                            ? 'ฝึกพูด'
+                            : locale === 'ja'
+                            ? '練習'
+                            : locale === 'zh'
+                            ? '练习'
+                            : 'Latihan'}
                         </button>
 
                         {!isMeasureMode && (
@@ -6827,7 +8364,23 @@ ${
                                 : 'bg-[#F5EFE4] border-[#DFD4BF] text-[#3B2F23]'
                             }`}
                           >
-                            <span>{callMode === 'casual_chat' ? '☕ Kasual' : '🎓 Mentor'}</span>
+                            <span>
+                              {callMode === 'casual_chat'
+                                ? locale === 'th'
+                                  ? '☕ คุยเล่น'
+                                  : locale === 'ja'
+                                  ? '☕ 会話'
+                                  : locale === 'zh'
+                                  ? '☕ 闲聊'
+                                  : '☕ Kasual'
+                                : locale === 'th'
+                                ? '🎓 เมนเทอร์'
+                                : locale === 'ja'
+                                ? '🎓 メンター'
+                                : locale === 'zh'
+                                ? '🎓 导师'
+                                : '🎓 Mentor'}
+                            </span>
                           </button>
                         )}
                       </div>
@@ -6851,12 +8404,12 @@ ${
                           }
                         }}
                         title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi (Mitra Kaiwa 3D)'}
-                        className="relative w-[260px] sm:w-[300px] h-[200px] sm:h-[225px] flex items-center justify-center cursor-pointer select-none"
+                        className="relative w-[155px] sm:w-[280px] lg:w-[300px] h-[88px] sm:h-[200px] lg:h-[225px] flex items-center justify-center cursor-pointer select-none"
                       >
                         <div
                           ref={mochiContainerRef}
                           data-testid="mochi-3d-stage"
-                          className="w-[260px] sm:w-[300px] h-[200px] sm:h-[225px] flex items-center justify-center relative"
+                          className="w-[155px] sm:w-[280px] lg:w-[300px] h-[88px] sm:h-[200px] lg:h-[225px] flex items-center justify-center relative"
                         />
                         {!is3dMochiReady && !mochi3dFailed && (
                           <div
@@ -6873,8 +8426,8 @@ ${
                             }
                             onError={(e) => {
                               const fallback = isPlayingAiAudio
-                                ? './assets/brand/paw-mochi-speaking.svg'
-                                : './assets/brand/paw-mochi-idle.svg';
+                                ? './assets/brand/mochi-mascot-headset.png'
+                                : './assets/brand/mochi-mascot-idle.png';
                               if (e.currentTarget.getAttribute('src') !== fallback) {
                                 e.currentTarget.setAttribute('src', fallback);
                               }
@@ -6912,21 +8465,41 @@ ${
                               {isAiThinking && !isPlayingAiAudio
                                 ? locale === 'th'
                                   ? 'Mochi กำลังคิด…'
+                                  : locale === 'ja'
+                                  ? 'Mochiが考えています…'
+                                  : locale === 'zh'
+                                  ? 'Mochi 正在思考…'
                                   : 'Mochi sedang berpikir…'
                                 : isPlayingAiAudio
                                 ? isLiveConnected
                                   ? `Mochi berbicara... (${formatTimer(callDurationSec)})`
+                                  : locale === 'th'
+                                  ? 'กำลังพูด...'
+                                  : locale === 'ja'
+                                  ? '話し中...'
+                                  : locale === 'zh'
+                                  ? '正在说话...'
                                   : 'Sedang berbicara...'
                                 : isWaitingAfterSpeech
                                 ? locale === 'th'
                                   ? `Mochi กำลังฟัง… (ช่วงคิด) (${formatTimer(callDurationSec)})`
+                                  : locale === 'ja'
+                                  ? `Mochiが聴いています… (${formatTimer(callDurationSec)})`
+                                  : locale === 'zh'
+                                  ? `Mochi 正在聆听… (${formatTimer(callDurationSec)})`
                                   : `Mochi mendengarkan... (jeda berpikir) (${formatTimer(callDurationSec)})`
                                 : isRecordingPtt
                                   ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
                                   : isLiveConnected
                                     ? isMicMuted
-                                      ? `Mic dibisukan · ${formatTimer(callDurationSec)}`
+                                      ? `${locale === 'th' ? 'ปิดไมค์อยู่' : locale === 'ja' ? 'マイク消音' : locale === 'zh' ? '麦克风已静音' : 'Mic dibisukan'} · ${formatTimer(callDurationSec)}`
                                       : `LIVE · ${formatTimer(callDurationSec)}`
+                                    : locale === 'th'
+                                    ? 'พร้อมพูดคุย'
+                                    : locale === 'ja'
+                                    ? '話す準備完了'
+                                    : locale === 'zh'
+                                    ? '准备就绪'
                                     : 'Siap bicara'}
                             </span>
                           </div>
@@ -6955,19 +8528,47 @@ ${
                               data-testid="facetime-call-switch-btn"
                               disabled={isLiveConnecting}
                               onClick={() => requestStartLiveCall()}
-                              className="w-full xs:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(16,185,129,0.35)] transition-all cursor-pointer active:scale-95 disabled:opacity-60 group"
-                              title="Nyalakan panggilan suara FaceTime (Hands-free, mic aktif otomatis)"
+                              className="w-full xs:w-auto inline-flex items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(16,185,129,0.35)] transition-all cursor-pointer active:scale-95 disabled:opacity-60 group"
+                              title={
+                                locale === 'th'
+                                  ? 'เริ่มโทรเสียง FaceTime แบบแฮนด์ฟรี'
+                                  : 'Nyalakan panggilan suara FaceTime (Hands-free, mic aktif otomatis)'
+                              }
                             >
                               <span className="relative flex h-2.5 w-2.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
                               </span>
                               <Phone className="w-4 h-4 text-white group-hover:rotate-12 transition-transform shrink-0" />
-                              <span>{isLiveConnecting ? 'Menyambungkan FaceTime...' : 'Mulai Telepon FaceTime'}</span>
+                              <span>
+                                {isLiveConnecting
+                                  ? locale === 'th'
+                                    ? 'กำลังเชื่อมต่อ...'
+                                    : locale === 'ja'
+                                    ? '接続中...'
+                                    : locale === 'zh'
+                                    ? '连接中...'
+                                    : 'Menyambungkan FaceTime...'
+                                  : locale === 'th'
+                                  ? 'เริ่มโทร FaceTime'
+                                  : locale === 'ja'
+                                  ? 'FaceTime通話を開始'
+                                  : locale === 'zh'
+                                  ? '开始 FaceTime 通话'
+                                  : 'Mulai Telepon FaceTime'}
+                              </span>
                             </button>
-                            <span className="text-[11px] text-[#8C7A65] font-medium flex items-center gap-1.5">
+                            <span className="hidden sm:flex text-[11px] text-[#8C7A65] font-medium items-center gap-1.5">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                              <span>Hands-Free · Mikrofon aktif dua arah untuk ngobrol langsung</span>
+                              <span>
+                                {locale === 'th'
+                                  ? 'แฮนด์ฟรี · ไมค์สนทนาสองทางพร้อมใช้งาน'
+                                  : locale === 'ja'
+                                  ? 'ハンズフリー · 双方向マイクでそのまま会話'
+                                  : locale === 'zh'
+                                  ? '免提 · 双向麦克风实时对话'
+                                  : 'Hands-Free · Mikrofon aktif dua arah untuk ngobrol langsung'}
+                              </span>
                             </span>
                           </div>
                         ) : (
@@ -6992,10 +8593,10 @@ ${
                                     : isUserSpeakingLive
                                     ? 'Kamu Bicara...'
                                     : isPlayingAiAudio
-                                    ? 'Mochi Berbicara...'
+                                    ? 'Mochi Bicara'
                                     : !isMicHardwareReady
                                     ? 'Ketuk untuk Aktifkan Mic'
-                                    : 'Mic Aktif (Bicara Langsung)'}
+                                    : 'Mic Aktif'}
                                 </span>
                                 <span className="font-mono text-emerald-700 text-[11px] font-semibold shrink-0">
                                   ({formatTimer(callDurationSec)})
@@ -7037,11 +8638,11 @@ ${
                   </section>
 
                   {/* 2. ZONA 60%: Interactive Learning Surface (Subtitles & Learning Controls) */}
-                  <div className="lg:col-span-7 flex flex-col justify-between gap-3 w-full">
+                  <div className="lg:col-span-7 flex flex-col justify-between gap-2 sm:gap-3 w-full pb-2 sm:pb-0">
                     {/* SUBTITLE MELAYANG HALUS (Floating Subtitles Glass HUD) */}
                     <div
                       data-testid="live-translation-hud"
-                      className="w-full text-left rounded-3xl bg-white/95 backdrop-blur-md border border-[#EDE5D4] p-4 sm:p-5 shadow-sm space-y-3 flex flex-col justify-between min-h-[260px] sm:min-h-[300px]"
+                      className="w-full text-left rounded-3xl bg-white/95 backdrop-blur-md border border-[#EDE5D4] p-2.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-3 flex flex-col justify-between min-h-[108px] sm:min-h-[260px] lg:min-h-[300px]"
                     >
                       {isAiThinking ? (
                         <div
@@ -7053,33 +8654,49 @@ ${
                           <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse [animation-delay:-0.15s]" />
                           <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse" />
                           <span className="text-xs font-medium text-[#6E5E47]">
-                            {locale === 'th' ? 'กำลังตอบกลับ...' : 'Menyiapkan balasan...'}
+                            {locale === 'th' ? 'กำลังตอบกลับ...' : locale === 'ja' ? '返信を準備中...' : locale === 'zh' ? '正在思考回复...' : 'Menyiapkan balasan...'}
                           </span>
                         </div>
                       ) : (
                         <>
-                          {/* ATAS: Subtitle Bahasa Kursus (Bold & Furigana/Pinyin) */}
+                          {/* ATAS: Subtitle Bahasa Kursus (Bold & Furigana/Pinyin/Fonetik) */}
                           <div
                             data-testid="live-hud-ai-text"
                             data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
                           >
-                            <JapaneseRubyDisplay
-                              text={activeAiLiveText}
-                              targetLang={activeScenario.targetLang}
-                              showFurigana={!isMeasureMode}
-                              showRomaji={!isMeasureMode}
-                              className="text-[17px] sm:text-[19px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
-                              rubyClassName="text-[17px] sm:text-[19px]"
-                              romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
-                            />
+                            {(() => {
+                              const hideSswIndonesianPhonetic =
+                                isSswSensei && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(activeAiLiveText);
+                              return (
+                                <JapaneseRubyDisplay
+                                  text={activeAiLiveText}
+                                  targetLang={activeScenario.targetLang}
+                                  phoneticText={hideSswIndonesianPhonetic ? '' : activeAiSubtitle.pronunciation}
+                                  pronunciationTestId="live-hud-ai-pronunciation"
+                                  showFurigana={!isMeasureMode}
+                                  showRomaji={!isMeasureMode && !hideSswIndonesianPhonetic}
+                                  className="text-[16px] sm:text-[19px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
+                                  rubyClassName="text-[16px] sm:text-[19px]"
+                                  romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
+                                />
+                              );
+                            })()}
                           </div>
 
-                          {/* BAWAH: Terjemahan Bahasa Indonesia / Thai - DIBUAT SANGAT JELAS & PROMINEN */}
+                          {/* BAWAH: Terjemahan Bahasa Indonesia / Thai / dsb. */}
                           {!isMeasureMode && showTranslations && resolvedActiveAiMeaning && !isAiHudDuplicateMeaning && (
-                            <div className="flex items-start justify-between gap-2 p-2.5 sm:p-3 rounded-2xl bg-[#FFF8EE] border border-[#F0DFCA] shadow-2xs mt-1.5">
+                            <div className="flex items-start justify-between gap-2 p-2.5 sm:p-3 rounded-2xl bg-[#FFF8EE] border border-[#F0DFCA] shadow-2xs mt-1">
                               <div className="min-w-0 flex-1 space-y-0.5">
                                 <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-[#9C6119] tracking-wider uppercase">
-                                  <span>{locale === 'th' ? '🇹🇭 คำแปล:' : '🇮🇩 Arti / Terjemahan:'}</span>
+                                  <span>
+                                    {locale === 'th'
+                                      ? '🇹🇭 คำแปล:'
+                                      : locale === 'ja'
+                                      ? '🇯🇵 意味:'
+                                      : locale === 'zh'
+                                      ? '🇨🇳 翻译:'
+                                      : '🇮🇩 Arti / Terjemahan:'}
+                                  </span>
                                 </div>
                                 <p
                                   data-testid="live-hud-ai-translation"
@@ -7092,9 +8709,9 @@ ${
                                 type="button"
                                 onClick={() => setShowTranslations(false)}
                                 className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] shrink-0 font-medium cursor-pointer pt-0.5"
-                                title="Sembunyikan terjemahan"
+                                title={locale === 'th' ? 'ซ่อนคำแปล' : 'Sembunyikan terjemahan'}
                               >
-                                👁️ Sembunyikan
+                                {locale === 'th' ? '👁️ ซ่อน' : '👁️ Sembunyikan'}
                               </button>
                             </div>
                           )}
@@ -7104,9 +8721,9 @@ ${
                                 type="button"
                                 onClick={() => setShowTranslations(true)}
                                 className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] font-medium cursor-pointer"
-                                title="Tampilkan terjemahan"
+                                title={locale === 'th' ? 'แสดงคำแปล' : 'Tampilkan terjemahan'}
                               >
-                                👁️ Tampilkan Arti
+                                {locale === 'th' ? '👁️ แสดงคำแปล' : '👁️ Tampilkan Arti'}
                               </button>
                             </div>
                           )}
@@ -7123,10 +8740,26 @@ ${
                             if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64, speechRate, { isManualReplay: true });
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-xs font-semibold text-[#1C1611] transition-all cursor-pointer active:scale-95"
-                          title="Putar suara dengan kecepatan saat ini"
+                          title={locale === 'th' ? 'ฟังเสียงด้วยความเร็วปัจจุบัน' : locale === 'ja' ? '現在の速度で再生' : locale === 'zh' ? '按当前语速播放' : 'Putar suara dengan kecepatan saat ini'}
                         >
                           <Volume2 className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
-                          <span>{callStateKey === 'speaking' ? 'Diputar...' : 'Putar Suara'}</span>
+                          <span>
+                            {callStateKey === 'speaking'
+                              ? locale === 'th'
+                                ? 'กำลังเล่น...'
+                                : locale === 'ja'
+                                ? '再生中...'
+                                : locale === 'zh'
+                                ? '播放中...'
+                                : 'Diputar...'
+                              : locale === 'th'
+                              ? 'เล่นเสียง'
+                              : locale === 'ja'
+                              ? '音声を再生'
+                              : locale === 'zh'
+                              ? '播放语音'
+                              : 'Putar Suara'}
+                          </span>
                         </button>
 
                         {/* SKALAR DINAMIS: 0.85x | 0.92x | 1.0x */}
@@ -7183,16 +8816,108 @@ ${
                       </div>
 
                       {activeUserSubtitle && (
-                        <div className="pt-0.5">
-                          <span className="inline-flex items-center gap-1 max-w-full px-2.5 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] text-[#5C4E3C] truncate">
-                            <strong className="font-semibold text-[#1C1611] shrink-0">Kamu:</strong>
-                            <span className="truncate">{activeUserSubtitle.text}</span>
-                          </span>
+                        <div
+                          data-testid="live-hud-user-subtitle"
+                          className="pt-1.5 px-3 py-2 rounded-2xl bg-[#F5F1E8]/90 border border-[#E8DEC8]/70 space-y-0.5"
+                        >
+                          <div className="flex items-start gap-1.5 text-xs text-[#5C4E3C]">
+                            <strong className="font-semibold text-[#1C1611] shrink-0 pt-0.5">
+                              {locale === 'th' ? 'คุณ:' : locale === 'ja' ? 'あなた:' : locale === 'zh' ? '你:' : 'Kamu:'}
+                            </strong>
+                            <div className="min-w-0 flex-1">
+                              <JapaneseRubyDisplay
+                                text={activeUserSubtitle.text}
+                                targetLang={activeScenario.targetLang}
+                                phoneticText={activeUserSubtitle.pronunciation}
+                                pronunciationTestId="live-hud-user-pronunciation"
+                                showFurigana={!isMeasureMode}
+                                showRomaji={!isMeasureMode}
+                                className="text-xs sm:text-[13px] font-semibold text-[#1C1611] break-words"
+                                rubyClassName="text-xs sm:text-[13px] font-semibold text-[#1C1611]"
+                                romajiClassName="text-[11px] text-[#8C6D1F] font-medium"
+                              />
+                            </div>
+                          </div>
+                          {!isMeasureMode && showTranslations && resolvedActiveUserMeaning && (
+                            <p
+                              data-testid="live-hud-user-translation"
+                              className="text-[11px] text-[#6E5E47] italic pl-11 break-words"
+                            >
+                              {resolvedActiveUserMeaning}
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
+
+                {isSswSensei && !isMeasureMode && (
+                  <div className="w-full max-w-xl lg:max-w-4xl mx-auto">
+                    <div className="flex items-center justify-between gap-2 mb-1.5 px-1">
+                      <span className="text-[11px] font-black text-[#8C2233] uppercase tracking-wider">
+                        Panel Belajar &amp; Simulasi Ujian SSW (Hal. 1-91)
+                      </span>
+                      <button
+                        type="button"
+                        data-testid="toggle-ssw-workbench-btn"
+                        onClick={() => setShowSswWorkbench((v) => !v)}
+                        className="px-2.5 py-0.5 rounded-full border border-[#DECFAF] bg-white text-[11px] font-bold text-[#5B4B3A] cursor-pointer"
+                      >
+                        {showSswWorkbench ? 'Ciutkan Panel SSW' : 'Buka Panel SSW'}
+                      </button>
+                    </div>
+                    {showSswWorkbench && (
+                      <SswSenseiWorkbenchPanel
+                        activeTab={sswWorkbenchTab}
+                        onChangeTab={setSswWorkbenchTab}
+                        state={sswMasterState}
+                        focusPage={sswFocusPage}
+                        drawnQuiz={sswDrawnQuiz}
+                        latestGrade={sswLatestGrade}
+                        onSelectStage={(stageId, firstPage) => {
+                          const res = updateSswStudyProgress({ stageId, status: 'in_progress', focusPage: firstPage });
+                          setSswMasterState(res.state);
+                        }}
+                        onToggleStageComplete={(stageId) => {
+                          const alreadyDone = sswMasterState.completedStageIds.includes(stageId);
+                          const res = updateSswStudyProgress({
+                            stageId,
+                            status: alreadyDone ? 'in_progress' : 'completed',
+                          });
+                          setSswMasterState(res.state);
+                        }}
+                        onSelectPage={(pageNumber) => {
+                          setSswFocusPage(pageNumber);
+                        }}
+                        onMarkPageRead={(pageNumber) => {
+                          const res = updateSswStudyProgress({ pdfPagesRead: [pageNumber], focusPage: pageNumber });
+                          setSswMasterState(res.state);
+                        }}
+                        onToggleKotobaMastered={(kotobaId) => {
+                          const res = updateSswStudyProgress({ kotobaIdsMastered: [kotobaId] });
+                          setSswMasterState(res.state);
+                        }}
+                        onDrawQuiz={handleDrawSswQuiz}
+                        onAnswerQuiz={handleAnswerSswQuiz}
+                        onAskSensei={(promptText) => {
+                          if (isLiveConnected) {
+                            submitLiveUserUtterance(promptText, { inputMode: 'typed' });
+                          } else {
+                            void submitStudentTurn({ text: promptText, inputMode: 'typed' });
+                          }
+                        }}
+                        onResetProgress={() => {
+                          const def = resetSswMasterState();
+                          setSswMasterState(def);
+                          setSswDrawnQuiz(null);
+                          setSswLatestGrade(null);
+                          setSswFocusPage(1);
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
 
                 {/* KOLOM RIWAYAT: Khusus Chat History & Feedback Transkrip */}
                 <div className={`w-full max-w-2xl mx-auto flex flex-col gap-3 ${callViewMode === 'history' ? 'flex' : 'hidden'}`}>
@@ -7213,7 +8938,15 @@ ${
                           className="px-2.5 py-1 rounded-full bg-[#1C1611] text-white text-[11px] font-bold flex items-center gap-1 cursor-pointer"
                         >
                           <Video className="w-3 h-3" />
-                          <span>Kembali ke FaceTime</span>
+                          <span>
+                            {locale === 'th'
+                              ? 'กลับสู่หน้าต่างคุยสด'
+                              : locale === 'ja'
+                              ? '通話画面に戻る'
+                              : locale === 'zh'
+                              ? '返回实时通话'
+                              : 'Kembali ke FaceTime'}
+                          </span>
                         </button>
                         {!isMeasureMode && (
                           <button
@@ -7221,7 +8954,21 @@ ${
                             onClick={() => setShowTranslations(!showTranslations)}
                             className="font-medium text-[#6E5E47] hover:text-[#1C1611] cursor-pointer"
                           >
-                            {showTranslations ? 'Sembunyikan Arti' : 'Tampilkan Arti'}
+                            {showTranslations
+                              ? locale === 'th'
+                                ? 'ซ่อนคำแปล'
+                                : locale === 'ja'
+                                ? '訳を隠す'
+                                : locale === 'zh'
+                                ? '隐藏翻译'
+                                : 'Sembunyikan Arti'
+                              : locale === 'th'
+                                ? 'แสดงคำแปล'
+                                : locale === 'ja'
+                                ? '訳を表示'
+                                : locale === 'zh'
+                                ? '显示翻译'
+                                : 'Tampilkan Arti'}
                           </button>
                         )}
                         <button
@@ -7230,14 +8977,14 @@ ${
                           className="font-medium text-[#6E5E47] hover:text-[#1C1611] flex items-center gap-1 cursor-pointer"
                         >
                           <RefreshCw className="w-3 h-3" />
-                          <span>Ulangi</span>
+                          <span>{locale === 'th' ? 'เริ่มใหม่' : locale === 'ja' ? 'やり直し' : locale === 'zh' ? '重来' : 'Ulangi'}</span>
                         </button>
                       </div>
                     </div>
 
                   <div
                     ref={transcriptContainerRef}
-                    className="space-y-2 px-0.5"
+                    className="space-y-2.5 px-0.5 pb-8 sm:pb-10"
                   >
                     {turns.length <= 1 && (
                       <div
@@ -7262,6 +9009,23 @@ ${
                         return null;
                       }
                       if (turn.speaker === 'ai') {
+                        const aiHistorySubtitle = translateAndPhoneticizeLiveText(
+                          turn.text,
+                          activeScenario.targetLang,
+                          turn.translationId,
+                          turn.translationTh,
+                          undefined,
+                          { locale, forceFetch: true }
+                        );
+                        const aiMeaningText =
+                          locale === 'th'
+                            ? aiHistorySubtitle.translationTh || turn.translationTh || aiHistorySubtitle.translationId || turn.translationId
+                            : locale === 'ja'
+                            ? aiHistorySubtitle.translationJa || turn.translationJa || aiHistorySubtitle.translationId || turn.translationId
+                            : locale === 'zh'
+                            ? aiHistorySubtitle.translationZh || turn.translationZh || aiHistorySubtitle.translationId || turn.translationId
+                            : aiHistorySubtitle.translationId || turn.translationId || aiHistorySubtitle.translationTh || turn.translationTh;
+
                         return (
                           <div
                             key={turn.id}
@@ -7273,6 +9037,8 @@ ${
                                 <JapaneseRubyDisplay
                                   text={turn.text}
                                   targetLang={activeScenario.targetLang}
+                                  phoneticText={aiHistorySubtitle.pronunciation}
+                                  pronunciationTestId="history-ai-pronunciation"
                                   showFurigana={!isMeasureMode}
                                   showRomaji={!isMeasureMode}
                                   className="text-[15px] sm:text-[16px] font-bold text-[#1C1611] leading-snug break-words"
@@ -7284,31 +9050,43 @@ ${
                                 type="button"
                                 onClick={() => void speakAiText(turn.text, turn.audioBase64, 1.0, { isManualReplay: true })}
                                 className="w-6 h-6 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] flex items-center justify-center text-[#5C4E3C] shrink-0 cursor-pointer mt-0.5"
-                                title="Putar suara"
+                                title={locale === 'th' ? 'เล่นเสียง' : 'Putar suara'}
                               >
                                 <Volume2 className="w-3 h-3" />
                               </button>
                             </div>
 
-                            {/* BAWAH: Terjemahan bahasa user (Bahasa Indonesia / Jepang / Thai / dsb.) - SEKUNDER */}
-                            {!isMeasureMode &&
-                              showTranslations &&
-                              (turn.translationId || turn.translationTh || turn.translationJa || turn.translationZh) && (
-                                <p className="text-xs sm:text-[13px] text-[#5C4E3C] font-normal leading-relaxed break-words pt-1 border-t border-[#EDE5D4]/50">
-                                  {locale === 'th'
-                                    ? (turn.translationTh || turn.translationId)
-                                    : locale === 'ja'
-                                    ? (turn.translationJa || turn.translationId)
-                                    : locale === 'zh'
-                                    ? (turn.translationZh || turn.translationId)
-                                    : (turn.translationId || turn.translationTh)}
-                                </p>
-                              )}
+                            {/* BAWAH: Terjemahan bahasa user (Bahasa Indonesia / Thai / Jepang / Mandarin) */}
+                            {!isMeasureMode && showTranslations && aiMeaningText && (
+                              <p
+                                data-testid="history-ai-translation"
+                                className="text-xs sm:text-[13px] text-[#5C4E3C] font-normal leading-relaxed break-words pt-1 border-t border-[#EDE5D4]/50"
+                              >
+                                {aiMeaningText}
+                              </p>
+                            )}
                           </div>
                         );
                       }
 
                       const diag = turn.diagnosis;
+                      const userHistorySubtitle = translateAndPhoneticizeLiveText(
+                        turn.text,
+                        activeScenario.targetLang,
+                        turn.translationId,
+                        turn.translationTh,
+                        undefined,
+                        { locale, forceFetch: true }
+                      );
+                      const userMeaningText =
+                        locale === 'th'
+                          ? userHistorySubtitle.translationTh || turn.translationTh || userHistorySubtitle.translationId || turn.translationId
+                          : locale === 'ja'
+                          ? userHistorySubtitle.translationJa || turn.translationJa || userHistorySubtitle.translationId || turn.translationId
+                          : locale === 'zh'
+                          ? userHistorySubtitle.translationZh || turn.translationZh || userHistorySubtitle.translationId || turn.translationId
+                          : userHistorySubtitle.translationId || turn.translationId || userHistorySubtitle.translationTh || turn.translationTh;
+
                       return (
                         <div key={turn.id} className="flex flex-col items-end space-y-1">
                           <div className="bg-[#1C1611] text-white rounded-2xl rounded-tr-xs px-4 py-2 max-w-[90%] sm:max-w-[82%] break-words">
@@ -7321,21 +9099,20 @@ ${
                             <JapaneseRubyDisplay
                               text={turn.text}
                               targetLang={activeScenario.targetLang}
+                              phoneticText={userHistorySubtitle.pronunciation}
+                              pronunciationTestId="history-user-pronunciation"
                               showFurigana={!isMeasureMode}
                               showRomaji={!isMeasureMode}
                               className="text-sm font-medium text-white break-words"
                               rubyClassName="text-sm font-medium text-white"
                               romajiClassName="text-xs text-[#FFE082] font-medium mt-0.5"
                             />
-                            {!isMeasureMode && showTranslations && (turn.translationId || turn.translationTh || turn.translationJa || turn.translationZh) && (
-                              <p className="text-xs text-[#FFE082]/90 mt-1 pt-1 border-t border-white/10 break-words italic">
-                                {locale === 'th'
-                                  ? (turn.translationTh || turn.translationId)
-                                  : locale === 'ja'
-                                  ? (turn.translationJa || turn.translationId)
-                                  : locale === 'zh'
-                                  ? (turn.translationZh || turn.translationId)
-                                  : (turn.translationId || turn.translationTh)}
+                            {!isMeasureMode && showTranslations && userMeaningText && (
+                              <p
+                                data-testid="history-user-translation"
+                                className="text-xs text-[#FFE082]/90 mt-1 pt-1 border-t border-white/10 break-words italic"
+                              >
+                                {userMeaningText}
                               </p>
                             )}
                           </div>
@@ -7344,7 +9121,7 @@ ${
                             <div
                               data-testid="turn-diagnosis-card"
                               data-ok={diag.ok ? 'true' : 'false'}
-                              className={`rounded-2xl px-3.5 py-2 text-xs max-w-[90%] sm:max-w-[82%] break-words space-y-1 ${
+                              className={`rounded-2xl px-3.5 py-2 text-xs max-w-[90%] sm:max-w-[82%] break-words space-y-1.5 ${
                                 diag.ok
                                   ? 'bg-[#E9F7F0] text-[#1C1611]'
                                   : 'bg-[#FDE3DE] text-[#1C1611]'
@@ -7358,7 +9135,21 @@ ${
                                     <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-[#B8432D]" />
                                   )}
                                   <span className={diag.ok ? 'text-[#2E8B69]' : 'text-[#B8432D]'}>
-                                    {diag.ok ? 'Kalimat Tepat' : 'Perbaikan Kalimat'}
+                                    {diag.ok
+                                      ? locale === 'th'
+                                        ? 'ประโยคถูกต้อง'
+                                        : locale === 'ja'
+                                        ? '自然な文です'
+                                        : locale === 'zh'
+                                        ? '表达准确'
+                                        : 'Kalimat Tepat'
+                                      : locale === 'th'
+                                        ? 'คำแนะนำการแก้ไขประโยค'
+                                        : locale === 'ja'
+                                        ? '表現のアドバイス'
+                                        : locale === 'zh'
+                                        ? '表达优化建议'
+                                        : 'Perbaikan Kalimat'}
                                   </span>
                                 </div>
                                 <span className="font-mono tabular-nums text-[11px] text-[#6E5E47]">
@@ -7368,27 +9159,48 @@ ${
 
                               {(() => {
                                 const correction = (diag.syntacticCorrection || diag.naturalReformulation || '').trim();
+                                const normCompare = (s: string) =>
+                                  s.replace(/[\s.,!?。、！？「」『』"'（）()]/g, '').toLowerCase();
                                 const isDifferent = Boolean(
-                                  correction &&
-                                  correction.toLowerCase().replace(/[^a-z0-9]/g, '') !== turn.text.toLowerCase().replace(/[^a-z0-9]/g, '')
+                                  correction && normCompare(correction) !== normCompare(turn.text)
                                 );
                                 if (!isDifferent && diag.ok) return null;
                                 const displayCorrection = correction || diag.syntacticCorrection;
                                 if (!displayCorrection) return null;
                                 return (
-                                  <div className="bg-white/90 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[#1C1611]">
-                                    <span className="break-words">
-                                      <span className="font-semibold text-[#8C2233]">{locale === 'th' ? 'ประโยคที่เป็นธรรมชาติ:' : 'Naturalnya begini:'}</span>{' '}
-                                      <b className="text-[#8C2233]">"{displayCorrection}"</b>
-                                    </span>
+                                  <div className="bg-white/95 rounded-xl px-3 py-2 flex items-start justify-between gap-2 text-[#1C1611] border border-[#EADBCE]/60">
+                                    <div className="min-w-0 flex-1 space-y-0.5">
+                                      <span className="block font-semibold text-[11px] text-[#8C2233]">
+                                        {locale === 'th'
+                                          ? 'ประโยคที่เป็นธรรมชาติ:'
+                                          : locale === 'ja'
+                                          ? '自然な言い方:'
+                                          : locale === 'zh'
+                                          ? '更地道的说法:'
+                                          : 'Naturalnya begini:'}
+                                      </span>
+                                      <div data-testid="history-correction-display">
+                                        <JapaneseRubyDisplay
+                                          text={displayCorrection}
+                                          targetLang={activeScenario.targetLang}
+                                          pronunciationTestId="history-correction-pronunciation"
+                                          showFurigana={!isMeasureMode}
+                                          showRomaji={!isMeasureMode}
+                                          as="div"
+                                          className="text-xs font-bold text-[#8C2233] leading-snug"
+                                          rubyClassName="text-xs font-bold text-[#8C2233]"
+                                          romajiClassName="text-[11px] text-[#6E5E47] font-semibold mt-0.5"
+                                        />
+                                      </div>
+                                    </div>
                                     <button
                                       type="button"
                                       onClick={() => {
                                         setInputText(displayCorrection);
                                       }}
-                                      className="shrink-0 px-2.5 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] font-semibold cursor-pointer"
+                                      className="shrink-0 px-2.5 py-1 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[11px] font-semibold cursor-pointer mt-0.5"
                                     >
-                                      Gunakan
+                                      {locale === 'th' ? 'นำไปใช้' : locale === 'ja' ? '使う' : locale === 'zh' ? '使用' : 'Gunakan'}
                                     </button>
                                   </div>
                                 );
@@ -7410,7 +9222,7 @@ ${
                     {isAnalyzingTurn && (
                       <div className="bg-white/85 rounded-2xl px-3.5 py-2 max-w-[70%] text-xs font-medium text-[#6E5E47] inline-flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#1C1611] animate-ping" />
-                        <span>Menyiapkan balasan...</span>
+                        <span>{locale === 'th' ? 'กำลังเตรียมคำตอบ...' : 'Menyiapkan balasan...'}</span>
                       </div>
                     )}
                   </div>
@@ -7531,10 +9343,10 @@ ${
           data-testid="mitra-kaiwa-bottom-dock"
           className="shrink-0 w-full z-30 bg-[#F6F3EC]/95 backdrop-blur-md border-t border-[#E8DFC8]/70 px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(28,22,17,0.04)]"
         >
-          <div className="max-w-2xl lg:max-w-4xl mx-auto space-y-1.5">
+          <div className="w-full min-w-0 max-w-2xl lg:max-w-4xl mx-auto space-y-1.5">
             {/* COPILOT TELEPROMPTER DOCK: Menempel langsung di atas input bar - NO SCROLL NEEDED */}
             {!isMeasureMode && (
-              <div data-testid="docked-copilot-container" className="w-full pb-1">
+              <div data-testid="docked-copilot-container" className="w-full min-w-0 max-w-full pb-1">
                 <BeginnerAnswerAssistant
                   locale={locale}
                   targetLang={activeScenario.targetLang}
@@ -7611,15 +9423,30 @@ ${
                       : isPlayingAiAudio
                         ? locale === 'th'
                           ? 'ติวเตอร์กำลังพูด (พูดแทรกเพื่อขัดจังหวะได้)'
-                          : 'Coach sedang bicara... (bicara langsung untuk menyela)'
+                          : (
+                            <>
+                              Coach sedang bicara
+                              <span className="hidden sm:inline">... (bicara langsung untuk menyela)</span>
+                            </>
+                          )
                         : isLiveConnected
                           ? isMicMuted
                             ? locale === 'th'
                               ? 'ไมโครโฟนปิดอยู่: แตะไอคอนไมค์เพื่อเปิด'
-                              : 'Mikrofon nonaktif: klik tombol mic untuk aktifkan'
+                              : (
+                                <>
+                                  Mic nonaktif
+                                  <span className="hidden sm:inline">: klik tombol mic untuk aktifkan</span>
+                                </>
+                              )
                             : locale === 'th'
                               ? 'ไมโครโฟนแฮนด์ฟรีเปิดอยู่: พูดได้เลยไม่ต้องกดปุ่ม'
-                              : 'Mikrofon handsfree aktif: bicara langsung tanpa tekan tombol'
+                              : (
+                                <>
+                                  Mic handsfree aktif
+                                  <span className="hidden sm:inline">: bicara langsung tanpa tekan tombol</span>
+                                </>
+                              )
                           : locale === 'th'
                             ? 'กำลังฟังเสียงของคุณ...'
                             : 'Mendengarkan... Silakan bicara'}
@@ -7667,7 +9494,7 @@ ${
                     }
                     toggleMuteMic();
                   }}
-                  className={`px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
+                  className={`px-2.5 sm:px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1 sm:gap-1.5 shrink-0 cursor-pointer transition-all ${
                     isMicMuted
                       ? 'bg-[#8C2233] text-white hover:bg-[#721B29]'
                       : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
@@ -7713,12 +9540,12 @@ ${
                       !isLiveConnected &&
                       (isLocalTestEnvironment() || getDailyFreeCallAvailable() || getHostGemBalance() >= KAWAN_BICARA_MIN_START_GEMS)
                     ) {
-                      void startLiveCall();
+                      requestStartLiveCall(false);
                       return;
                     }
                     void startPttRecording();
                   }}
-                  className={`px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
+                  className={`px-2.5 sm:px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1 sm:gap-1.5 shrink-0 cursor-pointer transition-all ${
                     isRecordingPtt
                       ? 'bg-[#8C2233] text-white'
                       : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
@@ -7761,7 +9588,7 @@ ${
                   }
                 }}
                 placeholder={
-                  locale === 'th' ? 'พิมพ์หรือพูด...' : 'Ketik atau bicara...'
+                  locale === 'th' ? 'พิมพ์ข้อความ...' : 'Ketik pesan...'
                 }
                 className="min-w-0 flex-1 bg-transparent border-0 px-2.5 py-1.5 text-sm text-[#1C1611] placeholder:text-[#8C7E6A] focus:outline-none"
               />
@@ -7888,9 +9715,44 @@ ${
                 </span>
               </div>
 
+              {targetLang === 'ja' && VOICE_PERSONAS.ssw_sensei && (
+                <button
+                  type="button"
+                  data-testid="ssw-sensei-spotlight-btn"
+                  onClick={() => handleSelectPersona('ssw_sensei')}
+                  className={`w-full text-left p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                    activePersona.id === 'ssw_sensei'
+                      ? 'bg-[#FFF8EB] border-[#8C2233] shadow-sm'
+                      : 'bg-gradient-to-r from-[#FFF8EB] to-white border-[#DECFAF] hover:border-[#8C2233]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-full bg-[#8C2233] text-white flex items-center justify-center text-lg shrink-0 shadow-xs">
+                      🍱
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-black text-xs sm:text-sm text-[#1C1611]">
+                          SSW SENSEI - Mentor Pengolahan Makanan (Wakai Papa Pro)
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-[#8C2233] text-white text-[10px] font-black">
+                          OTAFF Ver 5.1 (Apr 2026)
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#5C4E3C] truncate mt-0.5">
+                        91 Hal PDF + 266 Kotoba + 58 Soal CBT + 86 Video Wakai Papa Pro (Bilingual ID + JP)
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-[#1C1611] text-white text-[11px] font-bold shrink-0">
+                    {activePersona.id === 'ssw_sensei' ? 'Aktif ✓' : 'Pilih'}
+                  </span>
+                </button>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {Object.values(VOICE_PERSONAS)
-                  .filter((p) => p.targetLang === targetLang)
+                  .filter((p) => p.targetLang === targetLang && !(targetLang === 'ja' && p.id === 'ssw_sensei'))
                   .map((persona) => {
                     const isSelected = activePersona.id === persona.id;
                     return (
@@ -7908,10 +9770,14 @@ ${
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
                             <div className="w-9 h-9 rounded-full bg-[#F3ECE0] flex items-center justify-center text-lg shrink-0">
-                              {persona.targetLang === 'ja'
+                              {persona.id === 'ssw_sensei'
+                                ? '🍱'
+                                : persona.targetLang === 'ja'
                                 ? persona.id === 'nanami'
                                   ? '🌸'
                                   : '⚡'
+                                : persona.targetLang === 'zh'
+                                ? '🐼'
                                 : persona.id === 'coach_alex'
                                 ? '🔥'
                                 : '🎓'}
@@ -8023,11 +9889,47 @@ ${
             interruptAiAndStartListening();
             setLearningWorkbench(null);
 
+            const isSswResume =
+              activePersona.id === 'ssw_sensei' ||
+              activeScenario.personaId === 'ssw_sensei' ||
+              activeScenario.id.startsWith('scen_ssw_');
+
+            if (isSswResume && /^Sensei,/i.test(quizSent.trim())) {
+              if (
+                isLiveConnectedRef.current &&
+                wsRef.current &&
+                wsRef.current.readyState === WebSocket.OPEN
+              ) {
+                submitLiveUserUtterance(quizSent, { inputMode: 'quick_chip' });
+              } else {
+                void submitStudentTurn({ text: quizSent, inputMode: 'quick_chip' });
+              }
+              return;
+            }
+
             if (
               isLiveConnectedRef.current &&
               wsRef.current &&
               wsRef.current.readyState === WebSocket.OPEN
             ) {
+              if (isSswResume) {
+                const sswResumeCue = quizSent
+                  ? `[System Note: Pembelajar baru menyelesaikan latihan cepat SSW di Papan Taktis ("${finishedTopic || 'SSW'}") dengan jawaban "${quizSent}". Lanjutkan bimbingan SSW dalam Bahasa Indonesia secara ringkas dan tanya apakah siap ke langkah berikutnya.]`
+                  : `[System Note: Pembelajar baru menutup Papan Taktis SSW ("${finishedTopic || 'SSW'}"). Lanjutkan bimbingan SSW dalam Bahasa Indonesia pada langkah aktif dengan jelas dan tanyakan pertanyaan cek paham singkat.]`;
+                try {
+                  wsRef.current.send(
+                    JSON.stringify({
+                      clientContent: {
+                        turns: [{ role: 'user', parts: [{ text: sswResumeCue }] }],
+                        turnComplete: true,
+                      },
+                    })
+                  );
+                } catch {
+                  // Ignore
+                }
+                return;
+              }
               const targetLangName =
                 activeScenario.targetLang === 'ja'
                   ? 'Japanese'
@@ -8050,14 +9952,16 @@ ${
                 // Ignore
               }
             } else if (quizSent) {
-              const followUpLine =
-                activeScenario.targetLang === 'ja'
+              const followUpLine = isSswResume
+                ? 'Mantap! Poin itu sudah masuk catatan SSW. Mau lanjut kupas langkah berikutnya di halaman ini?'
+                : activeScenario.targetLang === 'ja'
                   ? 'いい感じだね！じゃあ今の形を使って、日本語でもう一言話してみよう！'
                   : activeScenario.targetLang === 'zh'
                     ? '太棒了！现在用刚才那个句型，跟我用中文聊一句吧！'
                     : "Nice work locking that down! Now let's jump right back into English, hit me with your own sentence!";
-              const followUpTransId =
-                'Mantap sudah paham! Sekarang ayo balik ngobrol pakai bahasa target, coba buat satu kalimatmu sendiri!';
+              const followUpTransId = isSswResume
+                ? 'Mantap! Poin itu sudah masuk catatan SSW. Mau lanjut kupas langkah berikutnya?'
+                : 'Mantap sudah paham! Sekarang ayo balik ngobrol pakai bahasa target, coba buat satu kalimatmu sendiri!';
               const followUpTransTh =
                 'เก่งมากที่เข้าใจแล้ว! ตอนนี้กลับมาคุยกันต่อ ลองแต่งประโยคของคุณเองสักประโยคสิ!';
               const resumeTurn: CallTurn = {
@@ -8071,7 +9975,7 @@ ${
               };
               setTurns((prev) => [...prev, resumeTurn]);
               void speakAiText(followUpLine, null, undefined, {
-                spokenLang: activeScenario.targetLang,
+                spokenLang: isSswResume ? 'id' : activeScenario.targetLang,
               });
             }
           }}
@@ -8092,7 +9996,10 @@ ${
           sampleTarget={learningWorkbench.sampleTarget}
           forcedExerciseMode={learningWorkbench.preferredExerciseMode}
           externalQuizSeed={learningWorkbench.quizSeed}
+          openNonce={learningWorkbench.openNonce}
           latestPteDiagnostic={latestPteDiagnostic}
+          latestReadAloudAlignment={latestReadAloudAlignment}
+          onActiveBoardSync={syncWorkbenchToLiveAi}
           currentMasteryPct={Math.round(
             ((brainState.competencies[activeScenario.competencyId]?.pMasteryDecayed ??
               brainState.competencies[activeScenario.competencyId]?.pMastery ??
@@ -8125,6 +10032,7 @@ ${
                     const res = await fetch(`${base}/api/voice/partner-turn`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
+                      credentials: 'include',
                       body: JSON.stringify({
                         text: customQuestion,
                         personaId: activePersona.id,
