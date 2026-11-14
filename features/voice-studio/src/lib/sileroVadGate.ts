@@ -232,7 +232,8 @@ export class SileroNeuralVadGate {
   public async start(
     stream: MediaStream,
     audioContext: AudioContext,
-    cb: SileroVadGateCallbacks
+    cb: SileroVadGateCallbacks,
+    opts?: { preferScriptProcessor?: boolean }
   ): Promise<boolean> {
     this.disposed = false;
     const loaded = await loadSileroBundle();
@@ -241,11 +242,24 @@ export class SileroNeuralVadGate {
     }
 
     const { vad, baseHref } = loaded;
+    const isMobilePwaDevice =
+      typeof navigator !== 'undefined' &&
+      (/iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || '') ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+        Boolean(
+          navigator.vendor &&
+            navigator.vendor.includes('Apple') &&
+            !navigator.userAgent.includes('CriOS') &&
+            !navigator.userAgent.includes('Chrome')
+        ));
+    const useScriptProcessor =
+      typeof opts?.preferScriptProcessor === 'boolean' ? opts.preferScriptProcessor : isMobilePwaDevice;
+
     const preRollBase64: string[] = [];
     const MAX_PREROLL_FRAMES = 14; // ~448ms @ 32ms/frame so initial consonants are preserved
     const handyVerifier = new HandyHumanVad({
       threshold: 0.48,
-      bargeInThreshold: 0.68,
+      bargeInThreshold: useScriptProcessor ? 0.60 : 0.68,
       onsetFrames: 2,
       bargeInOnsetFrames: 5,
     });
@@ -256,6 +270,9 @@ export class SileroNeuralVadGate {
     let lastBargeAt = 0;
 
     try {
+      if (audioContext && (audioContext.state === 'suspended' || (audioContext.state as string) === 'interrupted')) {
+        void audioContext.resume().catch(() => {});
+      }
       const micVad = await vad.MicVAD!.new({
         model: 'v5',
         baseAssetPath: baseHref,
@@ -263,6 +280,7 @@ export class SileroNeuralVadGate {
         ortConfig: (ort: any) => {
           configureOrtWasm(ort, baseHref);
         },
+        processorType: useScriptProcessor ? 'ScriptProcessor' : 'auto',
         positiveSpeechThreshold: 0.56,
         negativeSpeechThreshold: 0.38,
         minSpeechMs: 96,
@@ -286,13 +304,27 @@ export class SileroNeuralVadGate {
           const pcmBase64 = n > 0 ? float32At16kToPcm16Base64(frame) : '';
 
           if (cb.isAiPlaying()) {
-            // Strict human-only echo & ambient vehicle/horn immune barge-in gate
+            // Strict human-only echo & ambient vehicle/horn immune barge-in gate,
+            // with Mobile-PWA hardware-AEC RMS compensation when vocal formants & harmonicity pass.
             const hm = frame && frame.length >= 256 ? handyVerifier.scoreFrame512(frame, true) : null;
+            const isMobilePwaDevice =
+              typeof navigator !== 'undefined' &&
+              (/iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || '') ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
             const isModulatedHumanBarge =
               hm === null || (hm.isVoice && hm.pitchCorr >= 0.42 && hm.vocalToRumble >= 1.35);
+            const isMobileAecHumanBarge =
+              isMobilePwaDevice &&
+              pSpeech >= 0.72 &&
+              rms >= 0.008 &&
+              hm !== null &&
+              hm.isVoice &&
+              hm.pitchCorr >= 0.42 &&
+              hm.vocalToRumble >= 1.45;
             if (
-              ((pSpeech >= 0.88 && rms >= 0.028) || (pSpeech >= 0.78 && rms >= 0.018)) &&
-              isModulatedHumanBarge
+              (((pSpeech >= 0.88 && rms >= 0.028) || (pSpeech >= 0.78 && rms >= 0.018)) &&
+                isModulatedHumanBarge) ||
+              isMobileAecHumanBarge
             ) {
               this.lastHumanSpeechAt = Date.now();
               speechStreak += 1;
@@ -306,8 +338,10 @@ export class SileroNeuralVadGate {
               if (frame && frame.length > 0 && cb.onBargeCandidateAudio) {
                 cb.onBargeCandidateAudio(new Float32Array(frame), rms);
               }
+              const requiredSileroBargeStreak = isMobilePwaDevice ? 6 : 8;
               if (
-                ((speechStreak >= 8 && hasDynamicSpeechModulation(bargeRmsSeries)) ||
+                ((speechStreak >= requiredSileroBargeStreak &&
+                  hasDynamicSpeechModulation(bargeRmsSeries)) ||
                   speechStreak >= 18) &&
                 Date.now() - lastBargeAt > 700
               ) {

@@ -13,13 +13,33 @@ export type FiezelSfxName =
   | 'xp_gain';
 
 let sharedSynthCtx: AudioContext | null = null;
+let registeredHostCtx: AudioContext | null = null;
+const decodedSfxBufferCache = new Map<string, AudioBuffer | null>();
+
+export function registerSfxHostAudioContext(ctx: AudioContext | null): void {
+  if (ctx && ctx.state !== 'closed') {
+    registeredHostCtx = ctx;
+  } else if (ctx === null) {
+    registeredHostCtx = null;
+  }
+}
 
 function getSharedSynthContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
+  if (registeredHostCtx && registeredHostCtx.state !== 'closed') {
+    if (registeredHostCtx.state === 'suspended') {
+      void registeredHostCtx.resume().catch(() => {});
+    }
+    return registeredHostCtx;
+  }
   const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   if (!AudioCtx) return null;
   if (!sharedSynthCtx || sharedSynthCtx.state === 'closed') {
-    sharedSynthCtx = new AudioCtx();
+    try {
+      sharedSynthCtx = new AudioCtx({ latencyHint: 'balanced' });
+    } catch {
+      sharedSynthCtx = new AudioCtx();
+    }
   }
   if (sharedSynthCtx.state === 'suspended') {
     void sharedSynthCtx.resume().catch(() => {});
@@ -122,10 +142,79 @@ function playSynthesizedFallback(name: FiezelSfxName): void {
   }
 }
 
+function playDecodedSfxBuffer(ctx: AudioContext, buf: AudioBuffer): void {
+  try {
+    if (ctx.state === 'suspended') {
+      void ctx.resume().catch(() => {});
+    }
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    src.buffer = buf;
+    gain.gain.value = 0.45;
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    src.onended = () => {
+      try {
+        src.disconnect();
+        gain.disconnect();
+      } catch {}
+    };
+    src.start(0);
+  } catch {
+    // Silent fallback
+  }
+}
+
 export function playFiezelSfx(name: FiezelSfxName): void {
   if (typeof window === 'undefined') return;
 
   try {
+    const winAny = window as unknown as {
+      __fzDuplexAudioActive?: boolean;
+      parent?: { __fzDuplexAudioActive?: boolean };
+    };
+    const isDuplexActive = Boolean(
+      winAny.__fzDuplexAudioActive ||
+        (winAny.parent && winAny.parent !== window && winAny.parent.__fzDuplexAudioActive) ||
+        (registeredHostCtx && registeredHostCtx.state !== 'closed')
+    );
+
+    if (isDuplexActive) {
+      // Never spawn HTML5 <audio> elements while voice duplex mic capture is active:
+      // on Android & iOS Mobile PWA, <audio>.play() requests media focus and interrupts mic capture.
+      const ctx = getSharedSynthContext();
+      if (ctx) {
+        const cached = decodedSfxBufferCache.get(name);
+        if (cached) {
+          playDecodedSfxBuffer(ctx, cached);
+          return;
+        }
+        playSynthesizedFallback(name);
+        if (!decodedSfxBufferCache.has(name)) {
+          decodedSfxBufferCache.set(name, null);
+          const candidateUrls = [
+            `./assets/audio/sfx/${name}.mp3`,
+            `/assets/audio/sfx/${name}.mp3`,
+          ];
+          void (async () => {
+            for (const url of candidateUrls) {
+              try {
+                const res = await fetch(url);
+                if (!res.ok) continue;
+                const ab = await res.arrayBuffer();
+                const decoded = await ctx.decodeAudioData(ab);
+                decodedSfxBufferCache.set(name, decoded);
+                return;
+              } catch {
+                // Keep synth fallback cleanly
+              }
+            }
+          })();
+        }
+      }
+      return;
+    }
+
     const candidateUrls = [
       `./assets/audio/sfx/${name}.mp3`,
       `/app/assets/audio/sfx/${name}.mp3`,

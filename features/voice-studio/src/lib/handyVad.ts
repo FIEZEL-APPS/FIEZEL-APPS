@@ -302,7 +302,7 @@ export class HandyHumanVad {
 
     const rms = Math.sqrt(sumSq / N);
     const zcr = zc / N;
-    const minRms = aiPlaying ? 0.014 : 0.0025;
+    const minRms = aiPlaying ? 0.006 : 0.0025;
     if (rms < minRms) {
       this.rejectedHighEnergyStreak = Math.max(0, this.rejectedHighEnergyStreak - 1);
       return {
@@ -526,10 +526,12 @@ export class HandyHumanVad {
     // Steady mechanical drones (constant engine/fan/horn across frames) fail modulation gate during barge-in
     const isSteadyNonSpeech = this.fluxEma < 0.16 && this.rmsVarEma < 0.07;
     const minPitchCorr = aiPlaying ? 0.44 : 0.32;
+    const minAiVocalSnrDb =
+      this.bargeInThreshold <= 0.62 ? (bestCorr >= 0.60 && vocalToRumble >= 2.5 ? 2.8 : 5.5) : 9.0;
     const hasHarmonicVoice =
       bestCorr >= minPitchCorr &&
       spectralFlatness < maxFlatness &&
-      (!aiPlaying || (vocalSnrDb >= 9.0 && !isSteadyNonSpeech));
+      (!aiPlaying || (vocalSnrDb >= minAiVocalSnrDb && !isSteadyNonSpeech));
     const hasMidWordConsonant =
       this.inSpeech &&
       !aiPlaying &&

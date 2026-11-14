@@ -236,7 +236,43 @@
    * pertama dibuat, dan kegagalannya ditelan.
    */
   var audioSessionClaimed = false;
+  function hasActiveDuplexMic(env) {
+    try {
+      if (env && env.__fzDuplexAudioActive) return true;
+      if (env && env.parent && env.parent !== env && env.parent.__fzDuplexAudioActive) return true;
+      if (env && env.top && env.top !== env && env.top.__fzDuplexAudioActive) return true;
+    } catch (_) {}
+    return false;
+  }
+  function setAudioSessionMode(mode, env) {
+    var target = env || (typeof window !== 'undefined' ? window : globalThis);
+    var nextMode = mode === 'play-and-record' ? 'play-and-record' : 'playback';
+    var targets = [target];
+    try { if (target && target.parent && target.parent !== target) targets.push(target.parent); } catch (_) {}
+    try { if (target && target.top && target.top !== target) targets.push(target.top); } catch (_) {}
+    var updated = false;
+    for (var i = 0; i < targets.length; i++) {
+      var t = targets[i];
+      if (!t) continue;
+      try { t.__fzDuplexAudioActive = nextMode === 'play-and-record'; } catch (_) {}
+      try {
+        var sess = t.navigator && t.navigator.audioSession;
+        if (sess && typeof sess.type === 'string' && sess.type !== nextMode) {
+          sess.type = nextMode;
+          updated = true;
+        }
+      } catch (_) {}
+    }
+    return updated;
+  }
+  try {
+    var _sfxRoot = typeof window !== 'undefined' ? window : globalThis;
+    if (_sfxRoot) _sfxRoot.__fzSetAudioSessionMode = setAudioSessionMode;
+  } catch (_) {}
   function claimAudioSession(env) {
+    if (hasActiveDuplexMic(env)) {
+      return setAudioSessionMode('play-and-record', env);
+    }
     if (audioSessionClaimed) return false;
     audioSessionClaimed = true;
     try {

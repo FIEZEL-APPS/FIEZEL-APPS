@@ -12600,6 +12600,7 @@ function wireSharedKawanMicBridge(stream){
   }catch(_){return false}
 }
 function stopSharedKawanMicBridge(){
+  try{self.__fzDuplexAudioActive=false;if(typeof self.__fzSetAudioSessionMode==='function')self.__fzSetAudioSessionMode('playback',self);else if(navigator.audioSession&&typeof navigator.audioSession.type==='string')navigator.audioSession.type='playback'}catch(_){}
   try{if(self.__fzSharedMicSource)self.__fzSharedMicSource.disconnect()}catch(_){}
   try{if(self.__fzSharedMicProcessor){self.__fzSharedMicProcessor.onaudioprocess=null;self.__fzSharedMicProcessor.disconnect()}}catch(_){}
   try{if(self.__fzSharedMicGain)self.__fzSharedMicGain.disconnect()}catch(_){}
@@ -12615,6 +12616,7 @@ function stopSharedKawanMicBridge(){
   self.__fzSharedMicStreamPromise=null;
 }
 function warmKawanAudioAndMic(){
+  try{self.__fzDuplexAudioActive=true;if(typeof self.__fzSetAudioSessionMode==='function')self.__fzSetAudioSessionMode('play-and-record',self);else if(navigator.audioSession&&typeof navigator.audioSession.type==='string')navigator.audioSession.type='play-and-record'}catch(_){}
   const ctx=ensureSharedKawanAudioCtx();
   try{
     const cur=self.__fzSharedMicStream;
