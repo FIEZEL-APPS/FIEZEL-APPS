@@ -3534,6 +3534,16 @@
 
     _wireMicrophoneStream: function (stream) {
       var self = this;
+      if (typeof root !== 'undefined') {
+        try {
+          root.__fzDuplexAudioActive = true;
+          if (typeof root.__fzSetAudioSessionMode === 'function') {
+            root.__fzSetAudioSessionMode('play-and-record', root);
+          } else if (root.navigator && root.navigator.audioSession && typeof root.navigator.audioSession.type === 'string') {
+            root.navigator.audioSession.type = 'play-and-record';
+          }
+        } catch (_) {}
+      }
       var ctx = getAudioContext();
       if (!ctx) return;
       try {
@@ -4453,6 +4463,16 @@
     },
 
     closeCall: function (reason) {
+      if (typeof root !== 'undefined') {
+        try {
+          root.__fzDuplexAudioActive = false;
+          if (typeof root.__fzSetAudioSessionMode === 'function') {
+            root.__fzSetAudioSessionMode('playback', root);
+          } else if (root.navigator && root.navigator.audioSession && typeof root.navigator.audioSession.type === 'string') {
+            root.navigator.audioSession.type = 'playback';
+          }
+        } catch (_) {}
+      }
       this._stopParallelSpeechRecognition();
       if (_silenceTimer) { clearTimeout(_silenceTimer); _silenceTimer = null; }
       if (_turnEndFallbackTimer) { clearTimeout(_turnEndFallbackTimer); _turnEndFallbackTimer = null; }

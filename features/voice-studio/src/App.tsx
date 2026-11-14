@@ -61,7 +61,7 @@ import {
 } from './components/InCallLearningWorkbenchModal';
 import { CALL_SCENARIOS, VOICE_PERSONAS } from './data/callScenarios';
 import { t, tMasteryState } from './lib/i18n';
-import { playFiezelSfx } from './lib/sfx';
+import { playFiezelSfx, registerSfxHostAudioContext } from './lib/sfx';
 import { BraincoreTrendChart } from './components/BraincoreTrendChart';
 import { HomeRedesignView } from './components/HomeRedesignView';
 import { BeginnerAnswerAssistant } from './components/BeginnerAnswerAssistant';
@@ -580,12 +580,57 @@ export default function App() {
     }
   };
 
+  const isMobilePwaDevice = () =>
+    typeof navigator !== 'undefined' &&
+    (/iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || '') ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+      (navigator as any).userAgentData?.platform === 'iOS' ||
+      Boolean(
+        navigator.vendor &&
+          navigator.vendor.includes('Apple') &&
+          !navigator.userAgent.includes('CriOS') &&
+          !navigator.userAgent.includes('Chrome')
+      ));
+
+  const setDuplexAudioSessionMode = (active: boolean) => {
+    if (typeof window === 'undefined') return;
+    const mode = active ? 'play-and-record' : 'playback';
+    try {
+      (window as any).__fzDuplexAudioActive = active;
+    } catch {}
+    try {
+      const parentWin = getParentWin();
+      if (parentWin && parentWin !== window) {
+        try {
+          parentWin.__fzDuplexAudioActive = active;
+        } catch {}
+      }
+      if (typeof (window as any).__fzSetAudioSessionMode === 'function') {
+        (window as any).__fzSetAudioSessionMode(mode, window);
+      } else if (parentWin && typeof parentWin.__fzSetAudioSessionMode === 'function') {
+        parentWin.__fzSetAudioSessionMode(mode, parentWin);
+      }
+    } catch {}
+    for (const targetWin of [window, getParentWin()]) {
+      if (!targetWin) continue;
+      try {
+        const sess = (targetWin.navigator as any)?.audioSession;
+        if (sess && typeof sess.type === 'string' && sess.type !== mode) {
+          sess.type = mode;
+        }
+      } catch {}
+    }
+  };
+
   const setAiAudioPlaying = (playing: boolean, tailDelayMs = 0) => {
     if (aiPlayoutTailTimerRef.current) {
       window.clearTimeout(aiPlayoutTailTimerRef.current);
       aiPlayoutTailTimerRef.current = null;
     }
     if (playing) {
+      if (isLiveConnectedRef.current || isLiveConnectingRef.current) {
+        setDuplexAudioSessionMode(true);
+      }
       const wasPlaying = isPlayingAiAudioRef.current;
       isPlayingAiAudioRef.current = true;
       consecutiveSpeechFramesRef.current = 0;
@@ -729,6 +774,9 @@ export default function App() {
   const userSpeakingTimerRef = useRef<number | null>(null);
   const [isMicHardwareReady, setIsMicHardwareReady] = useState<boolean>(false);
   const isMicHardwareReadyRef = useRef<boolean>(false);
+  const isAcquiringHardwareMicRef = useRef<boolean>(false);
+  const micCaptureHardFailedRef = useRef<boolean>(false);
+  const micHealthCleanupRef = useRef<(() => void) | null>(null);
   const awaitingOpeningTurnRef = useRef<boolean>(false);
   const awaitingOpeningTimerRef = useRef<number | null>(null);
   const openingGreetingCompletedRef = useRef<boolean>(false);
@@ -763,7 +811,7 @@ export default function App() {
   const handyVadRef = useRef<HandyHumanVad>(
     new HandyHumanVad({
       threshold: 0.48,
-      bargeInThreshold: 0.68,
+      bargeInThreshold: isMobilePwaDevice() ? 0.60 : 0.68,
       prefillFrames: 15,
       hangoverFrames: 12,
       onsetFrames: 2,
@@ -1264,7 +1312,16 @@ export default function App() {
         }
         const liveCtx = liveAudioCtxRef.current;
         if (liveCtx) {
+          registerSfxHostAudioContext(liveCtx);
           liveCtx.onstatechange = () => {
+            if (
+              (liveCtx.state === 'suspended' || (liveCtx.state as string) === 'interrupted') &&
+              (isLiveConnectedRef.current || isLiveConnectingRef.current) &&
+              !userHungUpRef.current
+            ) {
+              setDuplexAudioSessionMode(true);
+              void liveCtx.resume().catch(() => {});
+            }
             syncMicHardwareReadyState();
           };
           outputAudioCtxRef.current = liveCtx;
@@ -1274,7 +1331,7 @@ export default function App() {
           if (activeSourcesRef.current.length === 0 && nextStartTimeRef.current < liveCtx.currentTime) {
             nextStartTimeRef.current = liveCtx.currentTime;
           }
-          if (liveCtx.state === 'suspended') {
+          if (liveCtx.state === 'suspended' || (liveCtx.state as string) === 'interrupted') {
             void liveCtx.resume().then(() => {
               syncMicHardwareReadyState();
             }).catch(() => {});
@@ -1293,6 +1350,10 @@ export default function App() {
       }
     } catch {
       // Ignore
+    }
+    if (isLiveConnectedRef.current || isLiveConnectingRef.current || isAcquiringHardwareMicRef.current) {
+      setDuplexAudioSessionMode(true);
+      return;
     }
     try {
       if (!sharedAudioElRef.current) {
@@ -1348,6 +1409,10 @@ export default function App() {
       window.removeEventListener('pointerdown', onGesture, true);
       window.removeEventListener('click', onGesture, true);
       window.removeEventListener('keydown', onGesture, true);
+      micHealthCleanupRef.current?.();
+      micHealthCleanupRef.current = null;
+      setDuplexAudioSessionMode(false);
+      registerSfxHostAudioContext(null);
     };
   }, []);
 
@@ -3990,6 +4055,28 @@ export default function App() {
       };
     }
 
+    // Also suppress stop/start SpeechRecognition flapping during ws-duplex while hardware mic
+    // acquisition/recovery is pending or active on Mobile PWA (keeps duplex capture continuous).
+    if (
+      isLiveConnected &&
+      liveTransportMode === 'ws-duplex' &&
+      !micCaptureHardFailedRef.current &&
+      typeof navigator !== 'undefined' &&
+      Boolean(navigator.mediaDevices?.getUserMedia)
+    ) {
+      if (liveSpeechRecRef.current) {
+        try {
+          liveSpeechRecRef.current.onresult = null;
+          liveSpeechRecRef.current.onend = null;
+          liveSpeechRecRef.current.onerror = null;
+          liveSpeechRecRef.current.stop();
+        } catch {}
+        liveSpeechRecRef.current = null;
+      }
+      setIsWaitingAfterSpeech(false);
+      return;
+    }
+
     const shouldListenHandsFree =
       isLiveConnected &&
       !isPlayingAiAudio &&
@@ -4284,6 +4371,7 @@ export default function App() {
       clearSpeechWatchdog();
       stopNeuralBufferSource();
       primeAudioPlayback();
+      setDuplexAudioSessionMode(true);
       setIsPlayingAiAudio(false);
       setStatusBanner(null);
       liveDictatedTextRef.current = '';
@@ -4416,6 +4504,9 @@ export default function App() {
       setIsRecordingPtt(true);
     } catch {
       setIsRecordingPtt(false);
+      if (!isLiveConnectedRef.current && !isLiveConnectingRef.current) {
+        setDuplexAudioSessionMode(false);
+      }
       setStatusBanner(
         'Izin mikrofon belum aktif di peramban ini. Ketik kalimatmu atau pilih langsung dari kartu Bantuan Cara Jawab di atas.'
       );
@@ -4441,6 +4532,9 @@ export default function App() {
         // Ignore
       }
       setIsRecordingPtt(false);
+      if (!isLiveConnectedRef.current && !isLiveConnectingRef.current) {
+        setDuplexAudioSessionMode(false);
+      }
       window.setTimeout(() => {
         const dictated = liveDictatedTextRef.current.trim();
         if (dictated) {
@@ -4469,6 +4563,9 @@ export default function App() {
       mediaRecorderRef.current.stop();
     }
     setIsRecordingPtt(false);
+    if (!isLiveConnectedRef.current && !isLiveConnectingRef.current) {
+      setDuplexAudioSessionMode(false);
+    }
   };
 
   const activateTurnByTurnLiveFallback = () => {
@@ -4692,10 +4789,14 @@ export default function App() {
       }
       const bargeVad = handyVadRef.current.processSamples(float32, sampleRate, true);
       const pitchCorr = bargeVad.lastMetrics?.pitchCorr ?? 0;
+      const mobilePwaCapture = isMobilePwaDevice();
+      const minBargeRms = mobilePwaCapture ? 0.008 : 0.018;
+      const minBargePitchCorr = mobilePwaCapture ? 0.40 : 0.44;
       const isBargeVoice =
         (bargeVad.inSpeech || bargeVad.voicedFrames >= 1) &&
-        v.rms >= 0.018 &&
-        pitchCorr >= 0.44;
+        v.rms >= minBargeRms &&
+        pitchCorr >= minBargePitchCorr &&
+        (!mobilePwaCapture || (bargeVad.lastMetrics?.vocalToRumble ?? 0) >= 1.35 || v.voiceBandRms >= 0.0045);
       if (isBargeVoice) {
         bargeSpeechStreakRef.current += 1;
         bargeCandidateSilenceRef.current = 0;
@@ -4714,10 +4815,13 @@ export default function App() {
           }
         }
 
+        const requiredBargeStreak = mobilePwaCapture ? 5 : 7;
+        const requiredVoicedFrames = mobilePwaCapture ? 2 : 3;
         if (
-          bargeSpeechStreakRef.current >= 7 &&
-          bargeCandidateVoicedFramesRef.current >= 3 &&
-          hasDynamicSpeechModulation(bargeCandidateRmsRef.current) &&
+          bargeSpeechStreakRef.current >= requiredBargeStreak &&
+          bargeCandidateVoicedFramesRef.current >= requiredVoicedFrames &&
+          (hasDynamicSpeechModulation(bargeCandidateRmsRef.current) ||
+            (mobilePwaCapture && bargeSpeechStreakRef.current >= 7 && pitchCorr >= 0.52)) &&
           Date.now() - lastBargeInAtRef.current > 450
         ) {
           const capturedChunks = bargeCandidateChunksRef.current;
@@ -4893,17 +4997,105 @@ export default function App() {
   };
 
   const connectMicStreamToLiveProcessing = async (stream: MediaStream, liveCtx: AudioContext) => {
+    micHealthCleanupRef.current?.();
+    micHealthCleanupRef.current = null;
     micStreamRef.current = stream;
     if (!stream || !stream.getAudioTracks || stream.getAudioTracks().length === 0) return;
 
+    const isMobileOrIOSWebKit = isMobilePwaDevice();
+    micCaptureHardFailedRef.current = false;
+    isAcquiringHardwareMicRef.current = false;
+    setDuplexAudioSessionMode(true);
+
+    const healthCleanups: Array<() => void> = [];
+    let trackRecoveryStarted = false;
+
+    const resumeLiveAndMicContexts = () => {
+      if (!isLiveConnectedRef.current && !isLiveConnectingRef.current) return;
+      if (userHungUpRef.current) return;
+      setDuplexAudioSessionMode(true);
+      try {
+        if (liveCtx.state === 'suspended' || (liveCtx.state as string) === 'interrupted') {
+          void liveCtx.resume().then(() => syncMicHardwareReadyState()).catch(() => {});
+        }
+      } catch {}
+    };
+
     stream.getAudioTracks().forEach((track) => {
       track.enabled = !isMicMutedRef.current;
-      track.onended = () => {
+      const handleMute = () => {
+        if (isLiveConnectedRef.current && !userHungUpRef.current && !isMicMutedRef.current) {
+          resumeLiveAndMicContexts();
+        }
         syncMicHardwareReadyState();
       };
+      const handleUnmute = () => {
+        track.enabled = !isMicMutedRef.current;
+        resumeLiveAndMicContexts();
+        syncMicHardwareReadyState();
+      };
+      const handleEnded = () => {
+        syncMicHardwareReadyState();
+        if (
+          !trackRecoveryStarted &&
+          isLiveConnectedRef.current &&
+          !userHungUpRef.current &&
+          !isMicMutedRef.current &&
+          !isAcquiringHardwareMicRef.current &&
+          typeof navigator !== 'undefined' &&
+          navigator.mediaDevices?.getUserMedia
+        ) {
+          trackRecoveryStarted = true;
+          isAcquiringHardwareMicRef.current = true;
+          const pWin = getParentWin();
+          const reacquire =
+            pWin && typeof pWin.__fzWarmKawanAudioAndMic === 'function'
+              ? (pWin.__fzWarmKawanAudioAndMic() as Promise<MediaStream | null>)
+              : navigator.mediaDevices
+                  .getUserMedia({
+                    audio: {
+                      channelCount: 1,
+                      echoCancellation: true,
+                      noiseSuppression: true,
+                      autoGainControl: true,
+                    },
+                  })
+                  .catch(() => navigator.mediaDevices.getUserMedia({ audio: true }));
+          void Promise.resolve(reacquire)
+            .then(async (recovered) => {
+              isAcquiringHardwareMicRef.current = false;
+              if (!recovered || userHungUpRef.current || !isLiveConnectedRef.current) {
+                try {
+                  recovered?.getTracks().forEach((tr) => tr.stop());
+                } catch {}
+                return;
+              }
+              if (micStreamRef.current === stream) {
+                await connectMicStreamToLiveProcessing(recovered, liveCtx);
+              }
+            })
+            .catch(() => {
+              isAcquiringHardwareMicRef.current = false;
+            });
+        }
+      };
+      try {
+        track.addEventListener?.('mute', handleMute);
+        track.addEventListener?.('unmute', handleUnmute);
+        track.addEventListener?.('ended', handleEnded);
+        healthCleanups.push(() => {
+          try {
+            track.removeEventListener?.('mute', handleMute);
+            track.removeEventListener?.('unmute', handleUnmute);
+            track.removeEventListener?.('ended', handleEnded);
+          } catch {}
+        });
+      } catch {
+        track.onended = handleEnded;
+      }
     });
 
-    if (liveCtx.state === 'suspended') {
+    if (liveCtx.state === 'suspended' || (liveCtx.state as string) === 'interrupted') {
       await Promise.race([
         liveCtx.resume().catch(() => {}),
         new Promise<void>((r) => setTimeout(r, 150)),
@@ -5003,6 +5195,37 @@ export default function App() {
         ]);
       }
     }
+    registerSfxHostAudioContext(micCtx);
+    const trackedCtxs: AudioContext[] = micCtx !== liveCtx ? [liveCtx, micCtx] : [liveCtx];
+    trackedCtxs.forEach((ctx) => {
+      const onCtxStateChange = () => {
+        if (
+          (ctx.state === 'suspended' || (ctx.state as string) === 'interrupted') &&
+          (isLiveConnectedRef.current || isLiveConnectingRef.current) &&
+          !userHungUpRef.current
+        ) {
+          setDuplexAudioSessionMode(true);
+          void ctx.resume().then(() => syncMicHardwareReadyState()).catch(() => {});
+          return;
+        }
+        syncMicHardwareReadyState();
+      };
+      try {
+        ctx.addEventListener?.('statechange', onCtxStateChange);
+        healthCleanups.push(() => {
+          try {
+            ctx.removeEventListener?.('statechange', onCtxStateChange);
+          } catch {}
+        });
+      } catch {}
+    });
+    micHealthCleanupRef.current = () => {
+      for (const cleanup of healthCleanups) {
+        try {
+          cleanup();
+        } catch {}
+      }
+    };
     syncMicHardwareReadyState();
 
     try {
@@ -5010,116 +5233,121 @@ export default function App() {
       sileroVadGateRef.current?.destroy();
       const sileroGate = new SileroNeuralVadGate();
       sileroVadGateRef.current = sileroGate;
-      void sileroGate.start(stream, micCtx, {
-        isMicMuted: () => isMicMutedRef.current,
-        isAiPlaying: () =>
-          isPlayingAiAudioRef.current ||
-          isAiServerTurnOpenRef.current ||
-          activeSourcesRef.current.length > 0 ||
-          livePcmSchedulerRef.current.hasPendingAudio() ||
-          (lastAiPlayoutEndedAtRef.current > 0 && Date.now() - lastAiPlayoutEndedAtRef.current < 180),
-        isWorkbenchOpen: () => isWorkbenchOpenRef.current,
-        onHumanSpeechState: (speaking) => {
-          if (isUserSpeakingLiveRef.current !== speaking) {
-            isUserSpeakingLiveRef.current = speaking;
-            setIsUserSpeakingLive(speaking);
-          }
-        },
-        onHumanBargeIn: () => {
-          if (awaitingOpeningTurnRef.current) return;
-          if (
+      void sileroGate.start(
+        stream,
+        micCtx,
+        {
+          isMicMuted: () => isMicMutedRef.current,
+          isAiPlaying: () =>
             isPlayingAiAudioRef.current ||
             isAiServerTurnOpenRef.current ||
             activeSourcesRef.current.length > 0 ||
-            livePcmSchedulerRef.current.hasPendingAudio()
-          ) {
-            if (Date.now() - lastBargeInAtRef.current > 700) {
-              const capturedChunks = bargeCandidateChunksRef.current;
-              const totalSamples = bargeCandidateSamplesRef.current;
-              const rmsSeries = [...bargeCandidateRmsRef.current];
-              bargeSpeechStreakRef.current = 0;
-              resetBargeCandidate();
-              if (totalSamples > 0) {
-                const merged16k = new Float32Array(totalSamples);
-                let offset = 0;
-                for (const chunk of capturedChunks) {
-                  if (offset + chunk.length <= merged16k.length) {
-                    merged16k.set(chunk, offset);
-                    offset += chunk.length;
+            livePcmSchedulerRef.current.hasPendingAudio() ||
+            (lastAiPlayoutEndedAtRef.current > 0 && Date.now() - lastAiPlayoutEndedAtRef.current < 180),
+          isWorkbenchOpen: () => isWorkbenchOpenRef.current,
+          onHumanSpeechState: (speaking) => {
+            if (isUserSpeakingLiveRef.current !== speaking) {
+              isUserSpeakingLiveRef.current = speaking;
+              setIsUserSpeakingLive(speaking);
+            }
+          },
+          onHumanBargeIn: () => {
+            if (awaitingOpeningTurnRef.current) return;
+            if (
+              isPlayingAiAudioRef.current ||
+              isAiServerTurnOpenRef.current ||
+              activeSourcesRef.current.length > 0 ||
+              livePcmSchedulerRef.current.hasPendingAudio()
+            ) {
+              if (Date.now() - lastBargeInAtRef.current > 700) {
+                const capturedChunks = bargeCandidateChunksRef.current;
+                const totalSamples = bargeCandidateSamplesRef.current;
+                const rmsSeries = [...bargeCandidateRmsRef.current];
+                bargeSpeechStreakRef.current = 0;
+                resetBargeCandidate();
+                if (totalSamples > 0) {
+                  const merged16k = new Float32Array(totalSamples);
+                  let offset = 0;
+                  for (const chunk of capturedChunks) {
+                    if (offset + chunk.length <= merged16k.length) {
+                      merged16k.set(chunk, offset);
+                      offset += chunk.length;
+                    }
                   }
-                }
-                const endpointReady = Date.now() >= verifyEndpointUnavailableUntilRef.current;
-                if (endpointReady && merged16k.length >= 4096) {
-                  void runLanguageVerifiedBargeIn(
-                    merged16k,
-                    rmsSeries,
-                    0.56,
-                    Math.max(4, Math.floor(rmsSeries.length * 0.75))
-                  );
-                } else if (merged16k.length >= 2560 && !bargeVerifyInFlightRef.current) {
-                  commitVerifiedSpeechInterrupt(merged16k);
+                  const endpointReady = Date.now() >= verifyEndpointUnavailableUntilRef.current;
+                  if (endpointReady && merged16k.length >= 4096) {
+                    void runLanguageVerifiedBargeIn(
+                      merged16k,
+                      rmsSeries,
+                      0.56,
+                      Math.max(4, Math.floor(rmsSeries.length * 0.75))
+                    );
+                  } else if (merged16k.length >= 2560 && !bargeVerifyInFlightRef.current) {
+                    commitVerifiedSpeechInterrupt(merged16k);
+                  }
                 }
               }
             }
-          }
-        },
-        onBargeCandidateAudio: (samples16k, rms) => {
-          if (samples16k && samples16k.length > 0) {
-            bargeCandidateChunksRef.current.push(samples16k);
-            bargeCandidateSamplesRef.current += samples16k.length;
-            bargeCandidateRmsRef.current.push(rms);
-            while (bargeCandidateSamplesRef.current > 24000 && bargeCandidateChunksRef.current.length > 1) {
-              const dropped = bargeCandidateChunksRef.current.shift();
-              if (dropped) bargeCandidateSamplesRef.current -= dropped.length;
-              bargeCandidateRmsRef.current.shift();
+          },
+          onBargeCandidateAudio: (samples16k, rms) => {
+            if (samples16k && samples16k.length > 0) {
+              bargeCandidateChunksRef.current.push(samples16k);
+              bargeCandidateSamplesRef.current += samples16k.length;
+              bargeCandidateRmsRef.current.push(rms);
+              while (bargeCandidateSamplesRef.current > 24000 && bargeCandidateChunksRef.current.length > 1) {
+                const dropped = bargeCandidateChunksRef.current.shift();
+                if (dropped) bargeCandidateSamplesRef.current -= dropped.length;
+                bargeCandidateRmsRef.current.shift();
+              }
             }
-          }
-        },
-        onSpeechPcm16kBase64: (pcmBase64) => {
-          clearLiveTurnAutoCommitTimer();
-          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
-            sentAudioSinceEndRef.current = true;
-            wsRef.current.send(
-              JSON.stringify({
-                realtimeInput: {
-                  audio: {
-                    mimeType: 'audio/pcm;rate=16000',
-                    data: pcmBase64,
+          },
+          onSpeechPcm16kBase64: (pcmBase64) => {
+            clearLiveTurnAutoCommitTimer();
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
+              sentAudioSinceEndRef.current = true;
+              wsRef.current.send(
+                JSON.stringify({
+                  realtimeInput: {
+                    audio: {
+                      mimeType: 'audio/pcm;rate=16000',
+                      data: pcmBase64,
+                    },
                   },
-                },
-              })
-            );
-          }
-        },
-        onSpeechEnded: () => {
-          if (
-            sentAudioSinceEndRef.current &&
-            wsRef.current &&
-            wsRef.current.readyState === WebSocket.OPEN &&
-            isLiveConnectedRef.current
-          ) {
-            sentAudioSinceEndRef.current = false;
-            wsRef.current.send(
-              JSON.stringify({
-                realtimeInput: {
-                  audioStreamEnd: true,
-                },
-              })
-            );
-            if (liveUserDraftRef.current.trim()) {
-              scheduleLiveTurnAutoCommitWatchdog();
+                })
+              );
             }
-          }
+          },
+          onSpeechEnded: () => {
+            if (
+              sentAudioSinceEndRef.current &&
+              wsRef.current &&
+              wsRef.current.readyState === WebSocket.OPEN &&
+              isLiveConnectedRef.current
+            ) {
+              sentAudioSinceEndRef.current = false;
+              wsRef.current.send(
+                JSON.stringify({
+                  realtimeInput: {
+                    audioStreamEnd: true,
+                  },
+                })
+              );
+              if (liveUserDraftRef.current.trim()) {
+                scheduleLiveTurnAutoCommitWatchdog();
+              }
+            }
+          },
+          onFrameTelemetry: (ft) => {
+            turnAcousticTrackerRef.current.recordAudioFrame({
+              chunkMs: ft.frameMs,
+              voicedMs: ft.isActiveVoice ? ft.frameMs : 0,
+              isActiveVoice: ft.isActiveVoice,
+              confirmedSpeech: ft.confirmedSpeech,
+            });
+          },
         },
-        onFrameTelemetry: (ft) => {
-          turnAcousticTrackerRef.current.recordAudioFrame({
-            chunkMs: ft.frameMs,
-            voicedMs: ft.isActiveVoice ? ft.frameMs : 0,
-            isActiveVoice: ft.isActiveVoice,
-            confirmedSpeech: ft.confirmedSpeech,
-          });
-        },
-      });
+        { preferScriptProcessor: isMobileOrIOSWebKit }
+      );
 
       if (wiredInParent) {
         return;
@@ -5127,17 +5355,6 @@ export default function App() {
 
       const source = micCtx.createMediaStreamSource(stream);
       micSourceNodeRef.current = source;
-
-      // Mobile & iOS WebKit check: iOS Safari / Android Chrome / Mobile PWA standalone
-      const isMobileOrIOSWebKit =
-        typeof navigator !== 'undefined' &&
-        (/iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || '') ||
-          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
-          ((navigator as any).userAgentData?.platform === 'iOS') ||
-          (navigator.vendor &&
-            navigator.vendor.includes('Apple') &&
-            !navigator.userAgent.includes('CriOS') &&
-            !navigator.userAgent.includes('Chrome')));
 
       let workletInitialized = false;
       let workletReceivedFrames = false;
@@ -5262,6 +5479,10 @@ export default function App() {
     }
     isLiveConnectingRef.current = true;
     setIsLiveConnecting(true);
+    userHungUpRef.current = false;
+    micCaptureHardFailedRef.current = false;
+    isAcquiringHardwareMicRef.current = false;
+    setDuplexAudioSessionMode(true);
     if (!callBillingRef.current.active) {
       const autoFree = getDailyFreeCallAvailable();
       callBillingRef.current = {
@@ -5318,13 +5539,22 @@ export default function App() {
       }
     }
     const liveCtx = liveAudioCtxRef.current!;
+    registerSfxHostAudioContext(liveCtx);
     liveCtx.onstatechange = () => {
+      if (
+        (liveCtx.state === 'suspended' || (liveCtx.state as string) === 'interrupted') &&
+        (isLiveConnectedRef.current || isLiveConnectingRef.current) &&
+        !userHungUpRef.current
+      ) {
+        setDuplexAudioSessionMode(true);
+        void liveCtx.resume().catch(() => {});
+      }
       syncMicHardwareReadyState();
     };
     inputAudioCtxRef.current = liveCtx;
     outputAudioCtxRef.current = liveCtx;
     nextStartTimeRef.current = liveCtx.currentTime;
-    if (liveCtx.state === 'suspended') {
+    if (liveCtx.state === 'suspended' || (liveCtx.state as string) === 'interrupted') {
       void liveCtx.resume().then(() => {
         syncMicHardwareReadyState();
       }).catch(() => {});
@@ -5342,20 +5572,45 @@ export default function App() {
             ? (parentWin.__fzSharedMicStream as MediaStream)
             : null;
     if (!stream && parentWin?.__fzSharedMicStreamPromise) {
+      isAcquiringHardwareMicRef.current = true;
       try {
+        const sharedPromise = Promise.resolve(parentWin.__fzSharedMicStreamPromise as Promise<MediaStream | null>);
         const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
-        const sharedRes = await Promise.race([
-          parentWin.__fzSharedMicStreamPromise as Promise<MediaStream | null>,
-          timeoutPromise,
-        ]);
+        const sharedRes = await Promise.race([sharedPromise, timeoutPromise]);
         if (sharedRes && sharedRes.getAudioTracks?.().some((t) => t.readyState === 'live')) {
           stream = sharedRes;
+          isAcquiringHardwareMicRef.current = false;
+        } else {
+          void sharedPromise
+            .then(async (lateShared) => {
+              isAcquiringHardwareMicRef.current = false;
+              const alreadyLive = Boolean(
+                micStreamRef.current?.getAudioTracks?.().some((t) => t.readyState === 'live')
+              );
+              if (
+                alreadyLive ||
+                !lateShared ||
+                !lateShared.getAudioTracks?.().some((t) => t.readyState === 'live') ||
+                userHungUpRef.current ||
+                (!isLiveConnectedRef.current && !isLiveConnectingRef.current)
+              ) {
+                return;
+              }
+              await connectMicStreamToLiveProcessing(lateShared, liveCtx);
+            })
+            .catch(() => {
+              isAcquiringHardwareMicRef.current = false;
+            });
         }
-      } catch {}
+      } catch {
+        isAcquiringHardwareMicRef.current = false;
+      }
     }
     if (!stream && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+      isAcquiringHardwareMicRef.current = true;
       try {
-        const getStreamPromise =
+        let getStreamFailed = false;
+        const rawAcquire =
           parentWin && typeof parentWin.__fzWarmKawanAudioAndMic === 'function'
             ? (parentWin.__fzWarmKawanAudioAndMic() as Promise<MediaStream | null>)
             : navigator.mediaDevices
@@ -5370,32 +5625,59 @@ export default function App() {
                 .catch(() => {
                   return navigator.mediaDevices.getUserMedia({ audio: true });
                 });
+        const getStreamPromise = Promise.resolve(rawAcquire).catch((acquireErr) => {
+          getStreamFailed = true;
+          micCaptureHardFailedRef.current = true;
+          isAcquiringHardwareMicRef.current = false;
+          throw acquireErr;
+        });
         // Beri waktu 4000ms untuk dialog izin mic di Android/iOS
         const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
         const res = await Promise.race([getStreamPromise, timeoutPromise]);
         if (res && res.getAudioTracks && res.getAudioTracks().length > 0) {
+          isAcquiringHardwareMicRef.current = false;
+          micCaptureHardFailedRef.current = false;
           stream = res;
           await connectMicStreamToLiveProcessing(stream, liveCtx);
-        } else {
+        } else if (!getStreamFailed) {
           // Jika dialog izin sistem memakan waktu lebih lama, sambungkan seketika saat user klik Allow
           void getStreamPromise
             .then(async (lateStream) => {
-              if (!lateStream || userHungUpRef.current) {
-                try {
-                  lateStream?.getTracks().forEach((tr) => tr.stop());
-                } catch {}
+              isAcquiringHardwareMicRef.current = false;
+              const alreadyLive = Boolean(
+                micStreamRef.current?.getAudioTracks?.().some((t) => t.readyState === 'live')
+              );
+              if (!lateStream || userHungUpRef.current || (!isLiveConnectedRef.current && !isLiveConnectingRef.current)) {
+                if (!alreadyLive) {
+                  try {
+                    lateStream?.getTracks().forEach((tr) => tr.stop());
+                  } catch {}
+                }
                 return;
               }
-              await connectMicStreamToLiveProcessing(lateStream, liveCtx);
+              if (!alreadyLive) {
+                micCaptureHardFailedRef.current = false;
+                await connectMicStreamToLiveProcessing(lateStream, liveCtx);
+              }
             })
-            .catch(() => {});
+            .catch(() => {
+              isAcquiringHardwareMicRef.current = false;
+              micCaptureHardFailedRef.current = true;
+            });
         }
       } catch (micErr) {
+        isAcquiringHardwareMicRef.current = false;
+        micCaptureHardFailedRef.current = true;
         console.warn('[VoiceStudio] Non-blocking mic stream notice (SpeechRecognition will handle speech):', micErr);
         micStreamRef.current = null;
       }
     } else if (stream) {
+      isAcquiringHardwareMicRef.current = false;
+      micCaptureHardFailedRef.current = false;
       await connectMicStreamToLiveProcessing(stream, liveCtx);
+    } else {
+      isAcquiringHardwareMicRef.current = false;
+      micCaptureHardFailedRef.current = true;
     }
 
     setStatusBanner(null);
@@ -6939,6 +7221,11 @@ ${
     userHungUpRef.current = true;
     isLiveConnectedRef.current = false;
     isLiveConnectingRef.current = false;
+    isAcquiringHardwareMicRef.current = false;
+    micCaptureHardFailedRef.current = false;
+    micHealthCleanupRef.current?.();
+    micHealthCleanupRef.current = null;
+    setDuplexAudioSessionMode(false);
     isAiServerTurnOpenRef.current = false;
     suppressAiAudioForTurnRef.current = false;
     liveTurnFinalizedForCurrentAiTurnRef.current = false;
@@ -8593,7 +8880,9 @@ ${
                                     : isUserSpeakingLive
                                     ? 'Kamu Bicara...'
                                     : isPlayingAiAudio
-                                    ? 'Mochi Bicara'
+                                    ? liveTransportMode === 'ws-duplex' && isMicHardwareReady
+                                      ? 'Mochi Bicara · Mic Aktif'
+                                      : 'Mochi Bicara'
                                     : !isMicHardwareReady
                                     ? 'Ketuk untuk Aktifkan Mic'
                                     : 'Mic Aktif'}
@@ -9426,7 +9715,7 @@ ${
                           : (
                             <>
                               Coach sedang bicara
-                              <span className="hidden sm:inline">... (bicara langsung untuk menyela)</span>
+                              <span className="inline"> · mic aktif, bicara saja untuk menyela</span>
                             </>
                           )
                         : isLiveConnected
