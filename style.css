@@ -2230,21 +2230,25 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
   /* Aturan dasar .fiezel-splash-word adalah flex-baris; di splash brand wordmark
      dan tagline harus BERTUMPUK - display:block mengembalikannya. */
   position:absolute;display:block;left:0;right:0;margin:0 auto;
-  bottom:calc(7vh + env(safe-area-inset-bottom,0px));
-  width:min(52vw,238px);text-align:center;opacity:0;
+  bottom:max(calc(6.5vh + env(safe-area-inset-bottom,0px)),32px);
+  width:min(84vw,292px);text-align:center;opacity:0;
   transform:translateY(14px);will-change:transform,opacity;pointer-events:none;
 }
-.fiezel-splash-brand .fiezel-wordmark{display:block;width:min(30vw,132px);height:auto;margin:0 auto}
+.fiezel-splash-brand .fiezel-wordmark{display:block;width:min(34vw,136px);height:auto;margin:0 auto}
 .fiezel-splash-brand .fiezel-splash-tag{
-  font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;
-  text-transform:uppercase;color:#FFD94F;margin:14px 0 0;white-space:nowrap;
+  font-family:var(--fz-body);font-size:12px;letter-spacing:.28em;
+  text-transform:uppercase;color:#FFD94F;margin:12px 0 0;white-space:nowrap;
 }
-.fiezel-splash-brand .fiezel-splash-kelasku{margin-top:13px;display:flex;align-items:center;justify-content:center}
+.fiezel-splash-brand .fiezel-splash-kelasku{margin-top:12px;display:flex;align-items:center;justify-content:center}
 .fiezel-splash-brand .kelasku-brand{display:inline-flex;align-items:baseline;justify-content:center;gap:6px;white-space:nowrap}
-.fiezel-splash-brand .kelasku-wordmark{font-family:var(--fz-heading,'Plus Jakarta Sans',sans-serif) !important;font-weight:800;font-size:16px;letter-spacing:.02em;color:#34D399 !important;line-height:1;display:inline-block;animation:fz-kelasku-reveal .75s cubic-bezier(.16,1,.3,1) 1.4s both}
-.fiezel-splash-brand .kelasku-tag{font-family:var(--fz-body,'Plus Jakarta Sans',sans-serif);font-size:10.5px;font-weight:600;letter-spacing:.04em;color:rgba(253,250,243,.65);line-height:1;display:inline-block;animation:fz-tag-reveal .65s cubic-bezier(.16,1,.3,1) 1.52s both}
-@keyframes fz-kelasku-reveal{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
-@keyframes fz-tag-reveal{from{opacity:0;transform:translateY(4px)}to{opacity:.65;transform:none}}
+.fiezel-splash-brand .kelasku-wordmark{font-family:var(--fz-heading,'Plus Jakarta Sans',sans-serif) !important;font-weight:800;font-size:16.5px;letter-spacing:.02em;color:#34D399 !important;line-height:1.1;display:inline-block;opacity:0;transform:translateY(6px);will-change:transform,opacity}
+.fiezel-splash-brand .kelasku-tag{font-family:var(--fz-body,'Plus Jakarta Sans',sans-serif);font-size:11.5px;font-weight:600;letter-spacing:.035em;color:rgba(253,250,243,.90);line-height:1.1;display:inline-block;opacity:0;transform:translateY(4px);will-change:transform,opacity}
+.fiezel-splash-brand .fiezel-splash-word.is-word-shown .kelasku-wordmark{animation:fz-kelasku-reveal .52s cubic-bezier(.16,1,.3,1) .08s both}
+.fiezel-splash-brand .fiezel-splash-word.is-word-shown .kelasku-tag{animation:fz-tag-reveal .46s cubic-bezier(.16,1,.3,1) .18s both}
+.fiezel-splash-brand .fiezel-splash-word.is-word-settled .kelasku-wordmark,.fiezel-splash-brand .fiezel-splash-word.is-word-settled .kelasku-tag{animation:none;opacity:1;transform:none}
+@keyframes fz-kelasku-reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes fz-tag-reveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes fz-boot-bar-breathe{0%,100%{transform:scaleY(1);opacity:.94}50%{transform:scaleY(1.16);opacity:1}}
 /* Kurangi-gerak: lebih sedikit GERAKAN, bukan lebih sedikit pengalaman.
    Partikel dan hentakan dibuang; yang tersisa muncul dengan MEMUDAR pada
    KETUKAN YANG SAMA (--fz-b* dari fiezel-choreography.js) dan durasi yang
@@ -2262,7 +2266,8 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .fiezel-splash-still .fiezel-splash-tag{
   transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
 .fiezel-splash-still .fiezel-splash-kelasku{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
-.fiezel-splash-still .kelasku-wordmark,.fiezel-splash-still .kelasku-tag{animation:none!important;transform:none!important;filter:none!important}
+.fiezel-splash-still .kelasku-wordmark,.fiezel-splash-still .kelasku-tag{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
+.fiezel-splash.fiezel-splash-dark.is-leaving{animation:fz-splash-fade-out .32s cubic-bezier(.2,.8,.2,1) both;pointer-events:none}
 @keyframes fz-splash-fade-out{from{opacity:1}to{opacity:0}}
 
 /* ---------- Feature Carousel (Step 1) ---------- */

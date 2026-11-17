@@ -525,8 +525,17 @@
 
     /* FRAME — semua opasitas/transform dihitung MURNI dari t (parametrik):
        scrub, lompat, dan adopsi-terlambat selalu konsisten. */
-    var _lastF = '', _lastB = '', _lastWO = '', _lastWT = '';
+    var _lastF = '', _lastB = '', _lastWO = '', _lastWT = '', _wordShown = false;
     var adoptedRevealed = !!(ctl.adopted && !frozenMode && ctl.startOffset >= (particles.T ? particles.T.DONE : 1320));
+    if (adoptedRevealed && wordSlot && wordSlot.classList && typeof wordSlot.classList.add === 'function') {
+      wordSlot.classList.add('is-word-shown');
+      wordSlot.classList.add('is-word-settled');
+      _wordShown = true;
+    } else if (frozenMode && tParam >= TL.WORD0 && wordSlot && wordSlot.classList && typeof wordSlot.classList.add === 'function') {
+      wordSlot.classList.add('is-word-shown');
+      wordSlot.classList.add('is-word-settled');
+      _wordShown = true;
+    }
     try { env.__fiezelAuditSplashState = { ctlStartOffset: ctl.startOffset, adoptedRevealed: adoptedRevealed, ready: false, now: 0 }; } catch(_) {}
     function applyVisualState(t) {
       var sF = (adoptedRevealed ? 1 : easeOutCubic(ramp(t, TL.F_IN0, TL.F_IN1))).toFixed(3);
@@ -538,6 +547,16 @@
       if (sWO !== _lastWO) { wordSlot.style.opacity = sWO; _lastWO = sWO; }
       var sWT = 'translateY(' + ((1 - pw) * 14).toFixed(2) + 'px)';
       if (sWT !== _lastWT) { wordSlot.style.transform = sWT; _lastWT = sWT; }
+      if (!adoptedRevealed && !frozenMode && wordSlot && wordSlot.classList && typeof wordSlot.classList.add === 'function') {
+        var shouldShowWord = t >= TL.WORD0;
+        if (shouldShowWord && !_wordShown) {
+          _wordShown = true;
+          wordSlot.classList.add('is-word-shown');
+        } else if (!shouldShowWord && _wordShown && typeof wordSlot.classList.remove === 'function') {
+          _wordShown = false;
+          wordSlot.classList.remove('is-word-shown');
+        }
+      }
     }
     function perFrame(t, dt) {
       try { if (env.__fiezelAuditSplashState) { env.__fiezelAuditSplashState.now = t; env.__fiezelAuditSplashState.particlesN = (typeof particles.getCount === 'function' ? particles.getCount() : 0); } } catch(_) {}
@@ -775,18 +794,25 @@
       if (CHOREO && typeof CHOREO.applyTo === 'function') CHOREO.applyTo(host);
     } catch (_) {}
 
+    var bootElapsed = adopted ? bootSplashElapsed(target) : 0;
     // Sisa waktu tayang. Untuk splash yang diadopsi, waktu yang sudah dipakai
     // boot ikut dihitung; lantainya MIN_TAIL_MS = durasi penuh koreografi cap.
     var visibleMs = Number(opts.visibleMs) > 0 ? Number(opts.visibleMs) : VISIBLE_MS;
-    if (adopted) visibleMs = Math.max(MIN_TAIL_MS, visibleMs - bootSplashElapsed(target));
+    if (adopted) visibleMs = Math.max(MIN_TAIL_MS, visibleMs - bootElapsed);
+
+    // Apabila splash boot sudah mulai memunculkan logo F || lewat CSS (>= 220 ms
+    // sehabis frame pertama), jangan matikan ke opacity:0 atau ulangi partikel
+    // dari t=0 ("dua splash berbenturan"); teruskan ke equalizer + cap PAW.
+    var postRevealFloor = 1320;
+    var resumeOffset = (adopted && !still && bootElapsed >= 220)
+      ? Math.max(postRevealFloor, Math.min(TL.STAMP0 - 280, Math.round(bootElapsed)))
+      : 0;
 
     /* ctl — jabat tangan antara show() dan jalur gerak/statis. */
     var ctl = {
-      /* Jam koreografi: untuk jalur gerak (motion), partikel dan koreografi
-         pembentukan ikon F serta balok emas WAJIB dimulai dari t=0 agar murid
-         selalu menikmati animasi konvergensi partikel yang membentuk logo.
-         Jalur kurangi-gerak (still) atau offset eksplisit tetap memperhitungkan sisa waktu. */
-      startOffset: (still || typeof opts.startOffset === 'number') ? (typeof opts.startOffset === 'number' ? opts.startOffset : Math.max(0, VISIBLE_MS - visibleMs)) : 0,
+      startOffset: typeof opts.startOffset === 'number'
+        ? opts.startOffset
+        : (still ? Math.max(0, VISIBLE_MS - visibleMs) : resumeOffset),
       adopted: !!adopted,
       ready: false, stampStarted: false, frozen: false, closed: false,
       introRequested: false,
