@@ -1764,27 +1764,6 @@
       var levelDifficulty = ({ N5: 1, N4: 2, N3: 3, N2: 4, N1: 5, 'N1+': 6 })[curLevel] || 1;
       var itemKey = (q && (q.id || q.itemId)) || ('jlpt_' + safeLevelSlug + '_' + curIndex);
       var latencyMs = 6000;
-      if (typeof window.updateMastery === 'function') {
-        try {
-          window.updateMastery('listening', itemKey, isRight, latencyMs, null, Date.now());
-        } catch (_) {}
-      }
-      var recordFn = window.record || window.recordAnswer || (window.__fiezelAudit && window.__fiezelAudit.record);
-      if (typeof recordFn === 'function') {
-        try {
-          var fakeQ = {
-            id: itemKey,
-            type: 'listening',
-            level: curLevel,
-            skill: 'listening_comprehension',
-            target: itemKey,
-            options: q && q.options ? q.options : [],
-            answerIndex: (correctOptId - 1)
-          };
-          recordFn(fakeQ, isRight, latencyMs, optId > 0 ? (optId - 1) : null);
-        } catch (_) {}
-      }
-
       var chosenLabel = chosenOpt ?
         ((chosenOpt.text || '') + (chosenOpt.textId ? ' (' + chosenOpt.textId + ')' : '')) :
         (optId === -1 ? '(Waktu Habis)' : ('Pilihan ' + optId));
@@ -1792,40 +1771,78 @@
         ((correctOpt.text || '') + (correctOpt.textId ? ' (' + correctOpt.textId + ')' : '')) :
         ('Pilihan ' + correctOptId);
 
+      if (typeof window.updateMastery === 'function') {
+        try {
+          window.updateMastery('listening', itemKey, isRight, latencyMs, null, Date.now());
+        } catch (_) {}
+      }
+      var recordFn = window.record || window.recordAnswer || (window.__fiezelAudit && window.__fiezelAudit.record);
+      var recordedViaHost = false;
+      var jlptQuestion = {
+        id: itemKey,
+        type: 'listening',
+        level: curLevel,
+        skill: 'listening_' + safeLevelSlug,
+        lessonSkill: 'listening_' + safeLevelSlug,
+        target: itemKey,
+        difficulty: levelDifficulty,
+        options: q && q.options ? q.options : [],
+        answerIndex: (correctOptId - 1),
+        errorTag: isRight ? null : (whyFailsNote ? 'distractor_misconception' : 'jlpt_listening')
+      };
+      if (typeof recordFn === 'function') {
+        try {
+          recordFn(jlptQuestion, isRight, latencyMs, optId > 0 ? (optId - 1) : null);
+          recordedViaHost = true;
+        } catch (_) {}
+      }
+
       if (typeof window.__getFiezelState === 'function') {
         try {
           var s = window.__getFiezelState();
           if (s && Array.isArray(s.history)) {
-            s.totalAnswered = (s.totalAnswered || 0) + 1;
-            if (isRight) s.totalCorrect = (s.totalCorrect || 0) + 1;
-            var now = Date.now();
-            s.history.push({
-              attemptId: now.toString(36) + '-jlpt-' + Math.random().toString(36).slice(2, 6),
-              id: itemKey,
-              type: 'listening',
-              level: curLevel,
-              skill: 'listening_comprehension',
-              target: itemKey,
-              reviewBucket: 'listening',
-              reviewKey: itemKey,
-              difficulty: levelDifficulty,
-              ok: isRight,
-              ms: latencyMs,
-              confidence: null,
-              selectedIndex: optId > 0 ? (optId - 1) : null,
-              selectedChoice: optId,
-              selectedAnswer: chosenLabel,
-              correctAnswer: correctLabel,
-              errorTag: isRight ? null : (whyFailsNote ? 'distractor_misconception' : 'jlpt_listening'),
-              whyFails: isRight ? null : whyFailsNote,
-              at: now
-            });
-            if (s.history.length > 1000) s.history.shift();
-
-            if (typeof window.saveState === 'function') {
-              try { window.saveState(); } catch (_) {}
+            if (recordedViaHost) {
+              var lastRow = s.history[s.history.length - 1];
+              if (lastRow && lastRow.id === itemKey) {
+                lastRow.selectedChoice = optId;
+                lastRow.selectedAnswer = chosenLabel;
+                lastRow.correctAnswer = correctLabel;
+                if (!isRight && whyFailsNote) lastRow.whyFails = whyFailsNote;
+              }
+              if (typeof window.save === 'function') {
+                try { window.save(); } catch (_) {}
+              }
             } else {
-              try { localStorage.setItem('fiezel_state', JSON.stringify(s)); } catch (_) {}
+              s.totalAnswered = (s.totalAnswered || 0) + 1;
+              if (isRight) s.totalCorrect = (s.totalCorrect || 0) + 1;
+              var now = Date.now();
+              s.history.push({
+                attemptId: now.toString(36) + '-jlpt-' + Math.random().toString(36).slice(2, 6),
+                id: itemKey,
+                type: 'listening',
+                level: curLevel,
+                skill: 'listening_' + safeLevelSlug,
+                target: itemKey,
+                reviewBucket: 'listening',
+                reviewKey: itemKey,
+                difficulty: levelDifficulty,
+                ok: isRight,
+                ms: latencyMs,
+                confidence: null,
+                selectedIndex: optId > 0 ? (optId - 1) : null,
+                selectedChoice: optId,
+                selectedAnswer: chosenLabel,
+                correctAnswer: correctLabel,
+                errorTag: isRight ? null : (whyFailsNote ? 'distractor_misconception' : 'jlpt_listening'),
+                whyFails: isRight ? null : whyFailsNote,
+                at: now
+              });
+              if (s.history.length > 1000) s.history.shift();
+              if (typeof window.save === 'function') {
+                try { window.save(); } catch (_) {}
+              } else if (typeof window.saveState === 'function') {
+                try { window.saveState(); } catch (_) {}
+              }
             }
           }
         } catch (_) {}
@@ -1836,14 +1853,23 @@
         } catch (_) {}
       } else if (window.FiezelMasteryBKT && typeof window.FiezelMasteryBKT.update === 'function') {
         try {
-          var rawBkt = localStorage.getItem('fiezel-mastery-bkt-v1');
-          var bktData = rawBkt ? JSON.parse(rawBkt) : {};
+          var bktKey = (typeof window.sideStateKey === 'function') ? window.sideStateKey('fiezel-mastery-bkt-v1') : 'fiezel-mastery-bkt-v1';
+          var rawBkt = localStorage.getItem(bktKey);
+          var bktData = rawBkt ? JSON.parse(rawBkt) : null;
           var updated = window.FiezelMasteryBKT.update(bktData, {
             lesson: 'listening_' + safeLevelSlug,
             correct: isRight,
             weight: 1
           }, Date.now());
-          localStorage.setItem('fiezel-mastery-bkt-v1', JSON.stringify(updated));
+          localStorage.setItem(bktKey, JSON.stringify(updated));
+        } catch (_) {}
+      }
+      if (typeof window.misconceptionLedgerRecord === 'function') {
+        try {
+          var jlptDiag = (!isRight && whyFailsNote)
+            ? { misconception: 'jlpt_listening_distractor', timing: 'normal' }
+            : (isRight ? null : { misconception: 'jlpt_listening_comprehension', timing: 'normal' });
+          window.misconceptionLedgerRecord('jlpt_listening_' + safeLevelSlug, jlptQuestion, jlptDiag, isRight);
         } catch (_) {}
       }
     }

@@ -885,6 +885,8 @@ jobs:
           node tests/story-reader-integration-test.js
           # M025-703: Story Reader to Braincore bridge telemetry & BKT/Misconception ledger
           node tests/story-brain-bridge-test.js
+          # Real app.js + Worker + all module Braincore nervous-system wiring (P0/P1 regression gate)
+          node tests/braincore-nervous-system-wiring-test.js
           # M025-707: Graded Story Reader ElevenLabs voice playback & sequential scene autoplay
           node tests/story-voice-autoplay-test.js
           # M025-747: Graded Story Reader character-level forced alignment timings integrity

@@ -1276,14 +1276,26 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
         // Standalone window mode: update local window if available
         try {
           const w = window as any;
+          const skillId = String(eventPayload.competencyId || 'kaiwa_general');
+          const latencyMs = Number((eventPayload as any).latencyMs) || 3000;
+          const isOk = Boolean(eventPayload.ok);
+          if (typeof w.updateMastery === 'function') {
+            w.updateMastery('speaking', skillId, isOk, latencyMs);
+          }
           if (typeof w.bktRecord === 'function') {
             w.bktRecord(
-              String(eventPayload.competencyId || 'kaiwa_general'),
-              Boolean(eventPayload.ok),
-              {
-                source: 'voice-studio',
-                misconceptionId: eventPayload.misconceptionId || null,
-              }
+              { id: eventPayload.id || skillId, lessonSkill: skillId, skill: skillId, type: 'speaking' },
+              isOk,
+              0.7,
+              1.2
+            );
+          }
+          if (typeof w.misconceptionLedgerRecord === 'function') {
+            w.misconceptionLedgerRecord(
+              { startedAt: Date.now() },
+              { id: eventPayload.id || skillId, lessonSkill: skillId, skill: skillId, target: skillId, type: 'speaking' },
+              eventPayload.misconceptionId ? { misconception: String(eventPayload.misconceptionId), timing: 'normal' } : null,
+              isOk
             );
           }
         } catch {

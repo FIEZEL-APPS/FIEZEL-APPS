@@ -79,10 +79,41 @@
     list.push(id); st.seen[sk] = list.slice(-SEEN_CAP);
   }
   function allSeen() { var out = []; Object.keys(st.seen || {}).forEach(function (k) { out = out.concat(st.seen[k]); }); return out; }
-  function record(st, skill, correct) {
+  function forwardToHostBraincore(skill, correct, meta) {
+    try {
+      var m = meta || {};
+      var sk = String(skill || 'grammar').trim() || 'grammar';
+      var ok = !!correct;
+      var ms = Math.max(800, Math.min(180000, Number(m.ms) || 5000));
+      var kappa = m.isDiagnostic ? 0.85 : (m.isAssignment ? 0.80 : 0.75);
+      var key = 'flow_' + sk;
+      var qPayload = {
+        id: String(m.itemId || key),
+        type: 'grammar',
+        skill: sk,
+        lessonSkill: sk,
+        target: key
+      };
+      if (typeof root.updateMastery === 'function') {
+        try { root.updateMastery('grammar', key, ok, ms); } catch (_) {}
+      }
+      if (typeof root.bktRecord === 'function') {
+        try { root.bktRecord(qPayload, ok, kappa, 1.0); } catch (_) {}
+      }
+      if (typeof root.misconceptionLedgerRecord === 'function') {
+        try {
+          var diag = ok ? null : { misconception: String(m.misconception || ('flow_' + sk + '_error')), timing: 'normal' };
+          root.misconceptionLedgerRecord('learner_flow', qPayload, diag, ok);
+        } catch (_) {}
+      }
+    } catch (_) {}
+  }
+
+  function record(st, skill, correct, meta) {
     var s = st.skills[skill] || { correct: 0, total: 0, lastAt: 0 };
     s.total += 1; if (correct) s.correct += 1; s.lastAt = Date.now();
     st.skills[skill] = s;
+    forwardToHostBraincore(skill, correct, meta);
   }
   /* ══ BANKOR — ingatan soal per BUTIR + alokator (m025-278, langkah 1 handoff) ══════
      Sebelum ini pemilihan soal hanya tahu satu hal: "pernah tampil" (st.seen). Butir yang
@@ -299,7 +330,7 @@
     if (fb.correct || L.attempt >= 2) {
       var firstTry = fb.correct && L.attempt === 1;
       L.results.push({ itemId: item.id, skill: item.skill, correct: firstTry, attempts: L.attempt });
-      record(st, item.skill, firstTry);
+      record(st, item.skill, firstTry, { itemId: item.id, ms: Math.max(1000, Date.now() - (L.startedAt || Date.now())) });
       rememberAttempt(st, item, firstTry);
       L.revealed = true;
     }
@@ -548,7 +579,7 @@
   function recordAssignmentResult(res) {
     if (!res || !res.id || !Array.isArray(res.results)) return null; var s = ensureState(), B = bank();
     var correct = res.results.filter(function (r) { return r.correct; }).length;
-    res.results.forEach(function (r) { record(s, r.skill || res.skill || 'grammar', !!r.correct); });
+    res.results.forEach(function (r) { record(s, r.skill || res.skill || 'grammar', !!r.correct, { itemId: r.itemId, isAssignment: true }); });
     /* `selfDirected` (m025-349, temuan X5): misi kurikulum yang DIPILIH SENDIRI murid
        bukan tugas dari guru, dan tidak boleh dicatat sebagai tugas dari guru — tidak di
        jurnal murid, dan terutama tidak di laporan yang dibaca gurunya. Pemanggil lama
@@ -916,7 +947,7 @@
         var fb = B.explain(item, chosen); run.feedback = fb;
         run.answers.push({ itemId: item.id, skill: item.skill, chosen: chosen, correct: fb.correct });
         markSeen(item.skill, item.id);
-        record(st, item.skill, fb.correct);
+        record(st, item.skill, fb.correct, { itemId: item.id, isDiagnostic: true });
         break;
       }
       case 'diag-next': {

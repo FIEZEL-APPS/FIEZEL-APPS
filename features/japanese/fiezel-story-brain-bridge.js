@@ -57,7 +57,37 @@
   }
 
   function sanitizeId(id) {
-    return String(id || '').trim().replace(/[^a-zA-Z0-9._:@#-]/g, '_');
+    return String(id || '').trim().replace(/[^a-zA-Z0-9._:@#\-\u3040-\u30ff\u3400-\u9fff\u4e00-\u9faf]/g, '_');
+  }
+
+  function scopedSideKey(root, baseKey) {
+    try {
+      if (root && typeof root.sideStateKey === 'function') return root.sideStateKey(baseKey);
+    } catch (_) {}
+    return baseKey;
+  }
+
+  function readSideJson(root, baseKey) {
+    try {
+      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+      if (!ls) return null;
+      var raw = ls.getItem(scopedSideKey(root, baseKey));
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeSideJson(root, baseKey, val) {
+    try {
+      var ls = (root && root.localStorage) || (typeof localStorage !== 'undefined' ? localStorage : null);
+      if (!ls || !val) return;
+      ls.setItem(scopedSideKey(root, baseKey), JSON.stringify(val));
+    } catch (_) {}
+  }
+
+  function resolveBktModule(root) {
+    return (root && (root.FiezelMasteryBKT || root.FiezelMasteryBkt)) || null;
   }
 
   /**
@@ -77,27 +107,41 @@
     var tz = getTimezone();
     var dateStr = getLocalDateStr(now);
 
-    // Periksa status penguasaan awal via Braincore BKT bila ada
+    // Periksa status penguasaan awal & perbarui via Braincore BKT nyata
+    var bktModule = resolveBktModule(root);
+    var bktKey = 'fiezel-mastery-bkt-v1';
+    var bktState = readSideJson(root, bktKey);
     var currentPLt = 0.10;
-    var bktModule = root.FiezelMasteryBkt;
-    if (bktModule && typeof bktModule.getConceptState === 'function') {
+    if (bktModule && typeof bktModule.mastery === 'function') {
       try {
-        var st = bktModule.getConceptState(wordKey);
-        if (st && typeof st.pLt === 'number') currentPLt = st.pLt;
+        var st = bktModule.mastery(bktState, wordKey, now);
+        if (st && typeof st.L === 'number') currentPLt = st.L;
       } catch (_) {}
     }
 
-    // Bila interaksi adalah 'look up' (membuka arti karena belum paham) vs 'self-test'
     var isLookup = opts.isLookup !== false;
+    var weight = isLookup ? 0.55 : 1.0;
     var updatedPLt = currentPLt;
-    if (bktModule && typeof bktModule.updateMastery === 'function') {
+    if (typeof root.bktRecord === 'function') {
       try {
-        // Look up berarti murid butuh bantuan perancah (scaffolding) -> prior tetap dihitung objektif
-        var result = bktModule.updateMastery(wordKey, !isLookup, {
-          source: 'story_reading',
-          timing: isLookup ? 'struggled' : 'normal'
-        });
-        if (result && typeof result.pLt === 'number') updatedPLt = result.pLt;
+        root.bktRecord({ lessonSkill: wordKey, skill: wordKey }, !isLookup, weight);
+        if (bktModule && typeof bktModule.mastery === 'function') {
+          var afterHost = bktModule.mastery(readSideJson(root, bktKey), wordKey, now);
+          if (afterHost && typeof afterHost.L === 'number') updatedPLt = afterHost.L;
+        }
+      } catch (_) {}
+    } else if (bktModule && typeof bktModule.update === 'function') {
+      try {
+        var nextState = bktModule.update(bktState, {
+          lesson: wordKey,
+          correct: !isLookup,
+          weight: weight
+        }, now);
+        writeSideJson(root, bktKey, nextState);
+        if (typeof bktModule.mastery === 'function') {
+          var afterLocal = bktModule.mastery(nextState, wordKey, now);
+          if (afterLocal && typeof afterLocal.L === 'number') updatedPLt = afterLocal.L;
+        }
       } catch (_) {}
     }
 
@@ -168,45 +212,77 @@
     };
 
     var root = typeof globalThis !== 'undefined' ? globalThis : {};
+    var skillKey = 'reading_' + String((qData && qData.storyId) || storyId);
+    var masteryKey = 'story_' + String((qData && qData.storyId) || storyId);
+    var quizPayload = {
+      id: storyId,
+      type: 'reading',
+      level: (qData && qData.level) || 'A1',
+      skill: skillKey,
+      lessonSkill: skillKey,
+      target: masteryKey
+    };
 
-    // Alirkan ke Misconception Ledger global bila tersedia
-    var ledger = root.FiezelMisconceptionLedger;
-    if (!isCorrect && misconceptionId && ledger && typeof ledger.record === 'function') {
+    // Alirkan ke Misconception Ledger global (utamakan API host, fallback modul murni)
+    var diagPayload = (!isCorrect && misconceptionId)
+      ? { misconception: misconceptionId, skill: skillKey, concept: skillKey, family: 'reading' }
+      : (isCorrect ? null : { misconception: 'reading_comprehension_miss', skill: skillKey, concept: skillKey, family: 'reading' });
+    if (typeof root.misconceptionLedgerRecord === 'function') {
       try {
-        ledger.record({
-          misconception: misconceptionId,
-          target: storyId,
-          at: now
-        });
+        root.misconceptionLedgerRecord('story_' + storyId, quizPayload, diagPayload, isCorrect);
+      } catch (_) {}
+    } else {
+      var ledger = root.FiezelMisconceptionLedger;
+      if (!isCorrect && misconceptionId && ledger && typeof ledger.update === 'function') {
+        try {
+          var ledgerKey = 'fiezel-misconception-ledger-v1';
+          var nextLedger = ledger.update(readSideJson(root, ledgerKey), {
+            concept: skillKey,
+            family: 'reading',
+            misconception: misconceptionId,
+            correct: false,
+            timing: 'normal',
+            sessionId: 'story_' + storyId
+          }, now);
+          writeSideJson(root, ledgerKey, nextLedger);
+        } catch (_) {}
+      }
+    }
+
+    // Alirkan ke BKT, OLM, dan riwayat untuk jawaban BENAR maupun SALAH
+    if (typeof root.updateMastery === 'function') {
+      try {
+        root.updateMastery('reading', masteryKey, isCorrect);
+      } catch (_) {}
+    }
+    if (typeof root.bktRecord === 'function') {
+      try {
+        root.bktRecord({
+          lessonSkill: skillKey,
+          skill: skillKey
+        }, isCorrect, 1.0);
+      } catch (_) {}
+    } else {
+      var bktModule = resolveBktModule(root);
+      if (bktModule && typeof bktModule.update === 'function') {
+        try {
+          var bktKey = 'fiezel-mastery-bkt-v1';
+          var nextBkt = bktModule.update(readSideJson(root, bktKey), {
+            lesson: skillKey,
+            correct: isCorrect,
+            weight: 1.0
+          }, now);
+          writeSideJson(root, bktKey, nextBkt);
+        } catch (_) {}
+      }
+    }
+    if (typeof root.record === 'function') {
+      try {
+        root.record(quizPayload, isCorrect, 6000, userSelectedIndex);
       } catch (_) {}
     }
 
-    // Alirkan ke BKT dan OLM bila jawaban benar
-    if (isCorrect) {
-      if (typeof root.updateMastery === 'function') {
-        try {
-          root.updateMastery('reading', 'story_' + storyId, true);
-        } catch (_) {}
-      }
-      if (typeof root.bktRecord === 'function') {
-        try {
-          root.bktRecord({
-            lessonSkill: 'reading_' + storyId,
-            skill: 'reading_' + storyId,
-            toString: function () { return 'reading_' + storyId; }
-          }, true, 1.0);
-        } catch (_) {}
-      }
-      var bktModule = root.FiezelMasteryBkt || root.FiezelMasteryBKT;
-      if (bktModule && typeof bktModule.updateMastery === 'function') {
-        try {
-          bktModule.updateMastery('story_' + storyId, true, {
-            source: 'story_quiz'
-          });
-        } catch (_) {}
-      }
-    }
-
+    record.telemetryEmitted = true;
     return record;
   }
 

@@ -1015,7 +1015,7 @@
       this.index++;this.renderSession();return true}
     setFeedback(text){const el=this.root?.querySelector?.('[data-feedback]');if(el)el.innerHTML=`<div class="fsl-feedback">${esc(text)}</div>`}
     finishItem(item,result,prefix=''){
-      const ms=now()-this.startedAt;this.store.record(this.domain,item,result,ms,this.replays);this.emitEvidence();const label=result.passed?T('skillslab.target-pass'):T('skillslab.target-fail');
+      const ms=now()-this.startedAt;const event=this.store.record(this.domain,item,result,ms,this.replays);this.emitEvidence();try{if(typeof this.options.onAttempt==='function')this.options.onAttempt({domain:this.domain,item,result,ms,replays:this.replays,event})}catch(_){}const label=result.passed?T('skillslab.target-pass'):T('skillslab.target-fail');
       /* m025-246 — SKOR SPEAKING BERHENTI JADI ANGKA.
          OWNER: "Skor speaking: label 'Cakupan kata', satu kalimat penjelasan, tanpa
          angka nilai pengucapan."

@@ -4042,6 +4042,18 @@
   function reportBraincoreTelemetry(itemId, isSuccess, durationMs, misconceptions) {
     if (typeof window === 'undefined') return;
 
+    var pteSkill = 'pte_' + String(state.mode || 'general');
+    var ok = Boolean(isSuccess);
+    var ms = Math.max(500, Number(durationMs) || 6000);
+    var pteQuestion = {
+      id: String(itemId || 'pte_item'),
+      type: 'pte',
+      level: 'B2',
+      skill: pteSkill,
+      lessonSkill: pteSkill,
+      target: String(itemId || pteSkill)
+    };
+
     if (typeof window.__getFiezelState === 'function') {
       try {
         var rootState = window.__getFiezelState();
@@ -4049,9 +4061,17 @@
       } catch (_) {}
     }
 
+    if (typeof window.record === 'function') {
+      try {
+        window.record(pteQuestion, ok, ms, 0);
+      } catch (e) {
+        console.warn('[PTE record telemetry]', e);
+      }
+    }
+
     if (typeof window.updateMastery === 'function') {
       try {
-        window.updateMastery('pte', itemId, isSuccess, durationMs || 6000);
+        window.updateMastery('pte', itemId, ok, ms);
       } catch (e) {
         console.warn('[PTE updateMastery telemetry]', e);
       }
@@ -4059,17 +4079,23 @@
 
     if (typeof window.bktRecord === 'function') {
       try {
-        window.bktRecord({ id: itemId, skill: 'pte_' + state.mode }, isSuccess, 1.2);
+        window.bktRecord({ id: itemId, lessonSkill: pteSkill, skill: pteSkill }, ok, 0.9, 1.0);
       } catch (e) {
         console.warn('[PTE bktRecord telemetry]', e);
       }
     }
 
-    if (Array.isArray(misconceptions) && misconceptions.length > 0 && typeof window.misconceptionLedgerRecord === 'function') {
+    if (typeof window.misconceptionLedgerRecord === 'function') {
       try {
-        misconceptions.forEach(function (m) {
-          window.misconceptionLedgerRecord('pte_session', { id: itemId, prompt: m.targetWord }, m, false);
-        });
+        if (Array.isArray(misconceptions) && misconceptions.length > 0) {
+          misconceptions.forEach(function (m) {
+            var miscId = String((m && (m.misconception || m.rule || (m.targetWord ? 'pte_spelling_' + m.targetWord : ''))) || 'pte_spelling_error');
+            var diag = Object.assign({}, m || {}, { misconception: miscId, timing: 'normal' });
+            window.misconceptionLedgerRecord('pte_session', pteQuestion, diag, false);
+          });
+        } else {
+          window.misconceptionLedgerRecord('pte_session', pteQuestion, ok ? null : { misconception: 'pte_' + String(state.mode || 'general') + '_gap', timing: 'normal' }, ok);
+        }
       } catch (e) {
         console.warn('[PTE misconception telemetry]', e);
       }

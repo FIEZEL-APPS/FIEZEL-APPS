@@ -782,6 +782,116 @@
     }
   }
 
+  function nujumSideKey(baseKey) {
+    try {
+      if (typeof root.sideStateKey === 'function') return root.sideStateKey(baseKey);
+    } catch (_) {}
+    return baseKey;
+  }
+
+  function nujumReadBktState() {
+    try {
+      var raw = localStorage.getItem(nujumSideKey('fiezel-mastery-bkt-v1'));
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function resolveNujumTheta() {
+    try {
+      if (typeof root.coreBrainSnapshot === 'function') {
+        var snap = root.coreBrainSnapshot();
+        var ab = Number(snap && snap.ability && snap.ability.ability);
+        if (Number.isFinite(ab)) return (ab - 2.5) * 0.6;
+      }
+      var B = root.FiezelCoreBrain;
+      var s = typeof root.__getFiezelState === 'function' ? root.__getFiezelState() : null;
+      if (B && typeof B.estimateAbility === 'function' && s && Array.isArray(s.history) && s.history.length) {
+        var mapped = s.history.slice(-80).map(function (h) {
+          return { ok: !!h.ok, level: h.level || 'A2', kappa: Number(h.kappa) || 1 };
+        });
+        var res = B.estimateAbility(mapped);
+        var ab2 = Number(res && res.ability);
+        if (Number.isFinite(ab2)) return (ab2 - 2.5) * 0.6;
+      }
+    } catch (_) {}
+    return 0.0;
+  }
+
+  function syncNujumBktFromHost(skillId) {
+    try {
+      var BKT = root.FiezelMasteryBKT;
+      if (!BKT || typeof BKT.mastery !== 'function') return;
+      var st = nujumReadBktState();
+      if (!st) return;
+      var key = String(skillId || 'grammar').trim() || 'grammar';
+      var info = BKT.mastery(st, key, Date.now());
+      if (info && typeof info.L === 'number' && info.n > 0) {
+        nujumState.bktMean = Math.max(0.08, Math.min(0.96, +info.L.toFixed(2)));
+        nujumState.bktMargin = Math.max(0.04, Math.min(0.28, +(0.24 / Math.sqrt(info.n + 1)).toFixed(2)));
+      }
+    } catch (_) {}
+  }
+
+  function emitNujumBraincoreEvidence(q, isCorrect, durationMs, opts) {
+    if (!q || nujumState.isDemo) return;
+    var o = opts || {};
+    var ok = !!isCorrect;
+    var ms = Math.max(400, Math.min(180000, Number(durationMs) || 4000));
+    var skillKey = String(q.skillId || 'grammar').trim() || 'grammar';
+    var levelStr = (q.cefr && ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].indexOf(q.cefr) !== -1) ? q.cefr : 'A2';
+    var diff = (levelStr === 'B2' ? 0.9 : levelStr === 'B1' ? 0.5 : levelStr === 'A2' ? 0.0 : -0.5);
+    var nujumQ = {
+      id: String(q.id || ('nj_' + nujumState.roundIndex)),
+      type: 'grammar',
+      level: levelStr,
+      skill: skillKey,
+      lessonSkill: skillKey,
+      target: skillKey,
+      difficulty: diff,
+      options: Array.isArray(q.options) ? q.options : [],
+      answerIndex: Number.isFinite(Number(q.correctIndex)) ? Number(q.correctIndex) : 0
+    };
+    var hasHostRecord = typeof root.record === 'function';
+    if (typeof root.updateMastery === 'function') {
+      try { root.updateMastery('grammar', skillKey, ok, ms); } catch (_) {}
+    }
+    if (hasHostRecord) {
+      try {
+        var selIdx = (typeof o.selectedIndex === 'number') ? o.selectedIndex : (ok ? nujumQ.answerIndex : -1);
+        root.record(nujumQ, ok, ms, selIdx);
+      } catch (_) {}
+    } else if (typeof root.bktRecord === 'function') {
+      try { root.bktRecord(nujumQ, ok, o.kappa != null ? o.kappa : 1.0, 1.0); } catch (_) {}
+    }
+    var diagPayload = ok ? null : {
+      misconception: String(o.misconception || q.misconceptionCategory || 'nujum_trap'),
+      timing: ms < 1800 ? 'guess' : 'normal'
+    };
+    if (typeof root.misconceptionLedgerRecord === 'function') {
+      try {
+        root.misconceptionLedgerRecord({ startedAt: nujumState.roundStartTime || Date.now() }, nujumQ, diagPayload, ok);
+      } catch (_) {}
+    } else if (root.FiezelMisconceptionLedger && typeof root.FiezelMisconceptionLedger.update === 'function') {
+      try {
+        var lk = nujumSideKey('fiezel-misconception-ledger-v1');
+        var rawL = localStorage.getItem(lk);
+        var curL = rawL ? JSON.parse(rawL) : null;
+        var nextL = root.FiezelMisconceptionLedger.update(curL, {
+          concept: skillKey,
+          family: skillKey,
+          misconception: diagPayload ? diagPayload.misconception : '',
+          correct: ok,
+          timing: diagPayload ? diagPayload.timing : 'normal',
+          sessionId: String(nujumState.roundStartTime || Date.now())
+        }, Date.now());
+        if (nextL) localStorage.setItem(lk, JSON.stringify(nextL));
+      } catch (_) {}
+    }
+    syncNujumBktFromHost(skillKey);
+  }
+
   function handleRoundTimeout(q) {
     if (!nujumState.active || !q) return;
     stopRoundTimer();
@@ -792,6 +902,7 @@
     var bktPenalty = nujumState.isDoubleDown ? 0.20 : 0.14;
     nujumState.bktMean = Math.max(0.10, +(nujumState.bktMean - bktPenalty).toFixed(2));
     nujumState.bktMargin = Math.min(0.30, +(nujumState.bktMargin * 1.25).toFixed(2));
+    emitNujumBraincoreEvidence(q, false, getRoundTimerDuration() * 1000, { misconception: 'freeze_timeout', selectedIndex: -1 });
 
     var slotPod = doc.getElementById('nujumSlotPod');
     if (slotPod) {
@@ -885,6 +996,13 @@
     }
 
     var points = nujumState.isDoubleDown ? 2 : 1;
+    var selectedIdx = Array.isArray(q.options)
+      ? q.options.findIndex(function (opt) { return String(opt || '').toLowerCase().trim() === text; })
+      : -1;
+    emitNujumBraincoreEvidence(q, isCorrect, Math.round(durationSec * 1000), {
+      selectedIndex: selectedIdx,
+      misconception: durationSec < 1.8 ? 'false_confidence_speed' : (q.misconceptionCategory || 'nujum_trap')
+    });
 
     if (isCorrect) {
       // Mesin KALAH
@@ -1016,6 +1134,11 @@
     stopRoundTimer();
 
     nujumState.scoreMesin++;
+    emitNujumBraincoreEvidence(q, false, Math.max(1000, Date.now() - (nujumState.roundStartTime || Date.now())), {
+      selectedIndex: -1,
+      misconception: 'honest_surrender',
+      kappa: 0.7
+    });
     var fullCorrectSentence = q.stem.replace('___', q.options[q.correctIndex]);
 
     var slotPod = doc.getElementById('nujumSlotPod');
@@ -1163,6 +1286,7 @@
   function triggerDispute(template) {
     stopRoundTimer();
     nujumState.inDispute = true;
+    nujumState.lastDisputedQuestion = template || nujumState.currentQuestion || null;
     var appEl = doc.getElementById('app');
     if (!appEl) return;
 
@@ -1325,6 +1449,21 @@
     if (!appEl) return;
 
     var passed = nujumState.disputeCorrectCount === 3;
+    var disputedQ = nujumState.lastDisputedQuestion || nujumState.currentQuestion;
+    if (!nujumState.isDemo && disputedQ) {
+      if (root.FiezelOLM && typeof root.FiezelOLM.resolveDispute === 'function') {
+        try {
+          root.FiezelOLM.resolveDispute({
+            concept: String(disputedQ.skillId || 'grammar'),
+            probes: nujumState.disputeQuestions,
+            correctCount: nujumState.disputeCorrectCount
+          });
+        } catch (_) {}
+      }
+      if (passed) {
+        emitNujumBraincoreEvidence(disputedQ, true, 3000, { kappa: 0.85 });
+      }
+    }
 
     if (passed) {
       nujumState.scoreKamu++;
@@ -1391,8 +1530,9 @@
     nujumState.tapGridExpanded = false;
 
     var q = nujumState.currentQuestion = pickNextQuestion();
-    var theta = (root.__getFiezelState && root.__getFiezelState()?.skills?.grammar) || 0.0;
+    var theta = nujumState.isDemo ? 0.0 : resolveNujumTheta();
     nujumState.currentBet = calculateBetPercentage(q, theta);
+    if (!nujumState.isDemo) syncNujumBktFromHost(q.skillId);
     nujumState.isDoubleDown = false;
     nujumState.roundStartTime = Date.now();
 

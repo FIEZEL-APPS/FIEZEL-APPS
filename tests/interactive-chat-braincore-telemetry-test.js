@@ -45,6 +45,9 @@ const mockAppState = {
 };
 
 global.updateMastery = function (bucket, key, ok, ms, confidence, attemptAt) {
+  assert.strictEqual(typeof bucket, 'string');
+  assert.strictEqual(typeof key, 'string');
+  assert.strictEqual(typeof ok, 'boolean');
   telemetrySpy.masteryCalls.push({ bucket, key, ok, ms, confidence, attemptAt });
   if (!mockAppState[bucket]) mockAppState[bucket] = {};
   mockAppState[bucket][key] = {
@@ -55,10 +58,12 @@ global.updateMastery = function (bucket, key, ok, ms, confidence, attemptAt) {
 };
 
 global.bktRecord = function (q, ok, kappa, boost) {
+  assert.ok(q && typeof q === 'object' && (q.lessonSkill || q.skill), 'bktRecord wajib menerima objek { lessonSkill, skill }');
   telemetrySpy.bktCalls.push({ q, ok, kappa, boost });
 };
 
 global.misconceptionLedgerRecord = function (session, q, diagnosis, ok) {
+  assert.ok(q && typeof q === 'object' && (q.lessonSkill || q.skill || q.conceptId));
   telemetrySpy.misconceptionCalls.push({ session, q, diagnosis, ok });
 };
 
@@ -279,4 +284,40 @@ assert.strictEqual(lastCall.turns, 2);
 assert(lastCall.fluencyPace > 0, 'Fluency pace should be > 0 for spoken Japanese turns');
 console.log('✓ FiezelVoiceCall end event computed duration, turns, fluency pace, and persisted to fzc_chat_history_v1');
 
-console.log('\nALL TESTS PASSED SUCCESSFULLY! (7/7)');
+console.log('--- TEST 8: Mandarin (zh) Course Isolation (No en_* Leakage) ---');
+telemetrySpy.masteryCalls = [];
+telemetrySpy.bktCalls = [];
+telemetrySpy.misconceptionCalls = [];
+chat.getState().course = 'zh';
+chat.getState().scenarioId = 'hsk_cafe';
+chat.dispatchSpeakingTurnTelemetry('我想喝一杯咖啡。', 'hsk_cafe', null, true);
+assert.strictEqual(telemetrySpy.masteryCalls[0].key, 'zh_kaiwa_hsk_cafe');
+assert.strictEqual(telemetrySpy.masteryCalls[1].key, 'zh_speaking_fluency');
+chat.dispatchShadowingTelemetry({ score: 88, heard: '我想喝咖啡', passed: true }, 10, '我想喝咖啡', 'zh-1');
+assert.strictEqual(telemetrySpy.masteryCalls[2].key, 'zh_speaking_shadowing');
+chat.recordCallSession({ course: 'zh', scenarioId: 'hsk_cafe', durationSeconds: 20, turns: 2, wordsSpoken: 18, userUtterances: ['我想喝茶'] });
+assert.strictEqual(telemetrySpy.masteryCalls[3].key, 'zh_kaiwa_call_hsk_cafe');
+console.log('✓ Mandarin zh course tags preserved cleanly (zh_kaiwa_*, zh_speaking_fluency, zh_speaking_shadowing, zh_kaiwa_call_*)');
+
+console.log('--- TEST 9: Real FiezelMasteryBKT + FiezelMisconceptionLedger + sideStateKey Scoped Fallback ---');
+global.localStorage.clear();
+const savedBktRecord = global.bktRecord;
+const savedMiscRecord = global.misconceptionLedgerRecord;
+delete global.bktRecord;
+delete global.misconceptionLedgerRecord;
+global.FiezelMasteryBKT = require('../features/brain/fiezel-mastery-bkt.js');
+global.FiezelMisconceptionLedger = require('../features/brain/fiezel-misconception-ledger.js');
+global.sideStateKey = function (base) { return base + '@zh'; };
+chat.dispatchSpeakingTurnTelemetry('我昨天去了', 'hsk_market', { id: 'zh_tone_mistake' }, false);
+const scopedBktRaw = global.localStorage.getItem('fiezel-mastery-bkt-v1@zh');
+const scopedLedgerRaw = global.localStorage.getItem('fiezel-misconception-ledger-v1@zh');
+assert.ok(scopedBktRaw, 'Real BKT must persist under scoped sideStateKey (@zh)');
+assert.strictEqual(global.localStorage.getItem('fiezel-mastery-bkt-v1'), null, 'Bare BKT key must stay untouched');
+assert.strictEqual(JSON.parse(scopedBktRaw).schema, 'fiezel-mastery-bkt-v1');
+assert.ok(scopedLedgerRaw, 'Real MisconceptionLedger must persist under scoped sideStateKey (@zh)');
+assert.ok(JSON.parse(scopedLedgerRaw).entries['zh_kaiwa_hsk_market::zh_tone_mistake'], 'Misconception entry must use real Ledger schema');
+global.bktRecord = savedBktRecord;
+global.misconceptionLedgerRecord = savedMiscRecord;
+console.log('✓ Real Braincore BKT & Ledger fallback scoped cleanly via sideStateKey');
+
+console.log('\nALL TESTS PASSED SUCCESSFULLY! (9/9)');

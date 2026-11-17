@@ -139,6 +139,73 @@
   var _activeLesson = null;
   var _activeStep = 1;
   var _quizState = {};
+  var _quizTelemetryRecorded = {};
+
+  function emitMandarinBraincoreTelemetry(lesson, qIdx, quizItem, isOk, details) {
+    try {
+      var d = details || {};
+      var ok = Boolean(isOk);
+      var rawSkill = String((quizItem && quizItem.skill) || (lesson && lesson.skill) || 'zh_grammar_svo_aspect').trim();
+      var skillKey = rawSkill.indexOf('zh_') === 0 ? rawSkill : ('zh_' + rawSkill);
+      var ms = Math.max(500, Math.min(120000, Number(d.ms) || 3500));
+      var lessonId = String((lesson && lesson.id) || 'zh_lesson');
+      var recKey = lessonId + ':' + qIdx;
+      var firstTime = !_quizTelemetryRecorded[recKey];
+
+      var misconceptionCode = '';
+      if (!ok && quizItem) {
+        if (quizItem.type === 'reorder') {
+          misconceptionCode = 'ERR_SVO_TIME_PLACE_POSITION';
+        } else if (Array.isArray(quizItem.distractors) && typeof d.chosenIdx === 'number' && quizItem.options) {
+          var chosenOpt = quizItem.options[d.chosenIdx];
+          var hit = quizItem.distractors.find(function (dist) { return dist && dist.option === chosenOpt; });
+          if (hit && hit.misconceptionId) misconceptionCode = String(hit.misconceptionId);
+        }
+        if (!misconceptionCode) misconceptionCode = 'zh_syntax_or_lexical_gap';
+      }
+
+      if (typeof window.updateMastery === 'function') {
+        try { window.updateMastery('grammar', skillKey, ok, ms); } catch (_) {}
+      }
+
+      var qPayload = {
+        id: String((quizItem && quizItem.id) || (lessonId + '_q' + qIdx)),
+        type: (quizItem && quizItem.type === 'reorder') ? 'token-order' : 'grammar',
+        level: 'A' + Math.min(6, Math.max(1, Number(lesson && lesson.level) || 1)),
+        skill: skillKey,
+        lessonSkill: skillKey,
+        target: skillKey
+      };
+      if (d.userText) qPayload.__userTokenAnswer = String(d.userText);
+
+      if (firstTime && typeof window.record === 'function') {
+        _quizTelemetryRecorded[recKey] = true;
+        try {
+          window.record(qPayload, ok, ms, typeof d.chosenIdx === 'number' ? d.chosenIdx : -1);
+        } catch (_) {}
+      } else if (typeof window.bktRecord === 'function') {
+        try {
+          window.bktRecord(
+            { lessonSkill: skillKey, skill: skillKey },
+            ok,
+            firstTime ? 1.0 : 0.55,
+            (quizItem && quizItem.type === 'reorder') ? 1.2 : 1.0
+          );
+        } catch (_) {}
+      }
+
+      if (typeof window.misconceptionLedgerRecord === 'function') {
+        try {
+          window.misconceptionLedgerRecord(
+            'mandarin_' + lessonId,
+            qPayload,
+            ok ? null : { misconception: misconceptionCode, timing: 'normal' },
+            ok
+          );
+        } catch (_) {}
+      }
+    } catch (_) {}
+  }
 
   function stopMandarinLessonVoice() {
     try {
@@ -159,6 +226,7 @@
     _activeLesson = lesson;
     _activeStep = initialStep || 1;
     _quizState = {};
+    _quizTelemetryRecorded = {};
 
     renderLessonPlayerModal();
   }
@@ -405,11 +473,10 @@
               isCorrect: Boolean(ok),
               userText: (details && details.userText) || ''
             };
-            try {
-              if (typeof window.updateMastery === 'function' && l.skill) {
-                window.updateMastery(l.skill, Boolean(ok), 3000);
-              }
-            } catch (_) {}
+            emitMandarinBraincoreTelemetry(l, idx, qObj, Boolean(ok), {
+              userText: (details && details.userText) || '',
+              ms: (details && details.ms) || 4000
+            });
             renderLessonPlayerModal();
           },
           { lang: 'zh' }
@@ -422,6 +489,9 @@
 
   function submitQuizAnswer(qIdx, oIdx) {
     _quizState[qIdx] = oIdx;
+    var qObj = (_activeLesson && Array.isArray(_activeLesson.quiz)) ? _activeLesson.quiz[qIdx] : null;
+    var isOk = Boolean(qObj && Number(oIdx) === Number(qObj.answerIndex));
+    emitMandarinBraincoreTelemetry(_activeLesson, qIdx, qObj, isOk, { chosenIdx: Number(oIdx), ms: 3500 });
     renderLessonPlayerModal();
   }
 
