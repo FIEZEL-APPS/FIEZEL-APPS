@@ -504,7 +504,134 @@ assert.ok(
 );
 console.log('  ✓ Zero Dual-Voice Collision on First Activation verified');
 
+// 28. Cross-Origin Credentials + 401 -> /api/auth/anon Recovery + Error Banner Visibility
+{
+  const authFetchLog = [];
+  const authWsUrls = [];
+  const domNodes = new Map();
+  const makeNode = (tag) => {
+    let inner = '';
+    const attrs = {};
+    const clsSet = new Set();
+    return {
+      tagName: String(tag || 'DIV').toUpperCase(),
+      id: '',
+      style: {},
+      className: '',
+      children: [],
+      setAttribute: (k, v) => { attrs[k] = String(v); },
+      getAttribute: (k) => attrs[k] || null,
+      classList: {
+        add: (c) => clsSet.add(c),
+        remove: (c) => clsSet.delete(c),
+        contains: (c) => clsSet.has(c)
+      },
+      appendChild: (c) => {
+        if (c && c.id) domNodes.set(c.id, c);
+        return c;
+      },
+      remove: () => {
+        for (const [k, v] of domNodes.entries()) {
+          if (v && k && domNodes.get(k) === v) {
+            domNodes.delete(k);
+            break;
+          }
+        }
+      },
+      set innerHTML(v) {
+        inner = String(v || '');
+        if (inner.includes('id="fzMochiConnRetryBtn"')) {
+          domNodes.set('fzMochiConnRetryBtn', { id: 'fzMochiConnRetryBtn', onclick: null });
+        }
+      },
+      get innerHTML() { return inner; },
+      querySelector: () => null,
+      querySelectorAll: () => [],
+      contains: () => true
+    };
+  };
+  let liveSessionAttempts = 0;
+  class AuthTestWS {
+    constructor(url) {
+      this.url = url;
+      this.readyState = 1;
+      authWsUrls.push(url);
+      setTimeout(() => { if (this.onopen) this.onopen(); }, 2);
+    }
+    send() {}
+    close() { this.readyState = 3; }
+  }
+  const sb28 = {
+    console, setTimeout, clearTimeout, setInterval, clearInterval,
+    FIEZEL_CF_CONFIG: { enabled: true, base: 'https://api.fiezel.my.id' },
+    fetch: async (url, opts) => {
+      authFetchLog.push({ url: String(url), opts: opts || {} });
+      if (String(url).includes('/api/voice/live-session')) {
+        liveSessionAttempts++;
+        if (liveSessionAttempts === 1) {
+          return { ok: false, status: 401, json: async () => ({ error: 'unauthenticated' }) };
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            ok: true,
+            token: 'auth_tokens/recovered-tok-28',
+            model: 'gemini-3.8-live',
+            endpoint: 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained',
+            keyIndex: 1
+          })
+        };
+      }
+      if (String(url).includes('/api/auth/anon')) {
+        return { ok: true, status: 200, json: async () => ({ ok: true }) };
+      }
+      return { ok: false, status: 404 };
+    },
+    navigator: {},
+    WebSocket: AuthTestWS,
+    Date, Math, Number, String, RegExp, Object,
+    state: { gems: { balance: 20 }, level: 2 },
+    location: { hostname: 'fiezel.my.id', origin: 'https://fiezel.my.id' },
+    document: {
+      getElementById: (id) => domNodes.get(id) || null,
+      querySelector: (sel) => (sel === '.quiz-shell' ? makeNode('div') : null),
+      querySelectorAll: () => [],
+      createElement: (tag) => makeNode(tag),
+      body: {
+        appendChild: (el) => {
+          if (el && el.id) domNodes.set(el.id, el);
+          return el;
+        }
+      },
+      addEventListener: () => {},
+      removeEventListener: () => {}
+    },
+    FiezelI18n: { getLocale: () => 'id', t: (k) => k, registerCopy: () => {} }
+  };
+  vm.createContext(sb28);
+  vm.runInContext(code, sb28);
+  const M28 = sb28.FiezelMochiVoiceSos;
+  M28.onQuizSessionStart({ type: 'grammar', measure: false });
+  const q28 = { id: 'q28', type: 'grammar', stem: 'He ___ to school.', options: ['go', 'goes'], answerIndex: 1 };
+  M28.setActiveQuestion(q28, { cfgType: 'grammar' });
+  M28.setMochiEnabled(true, { silent: true, skipAutoStart: true });
+  M28.setConnectionStatus('error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi');
+  assert.ok(domNodes.get('fzMochiConnBanner'), 'Error state must render #fzMochiConnBanner instead of removing it');
+  assert.ok(domNodes.get('fzMochiConnRetryBtn'), 'Error banner must render #fzMochiConnRetryBtn for retry');
+  M28.startCall(q28, { userConfirmed: true });
+  await new Promise((r) => setTimeout(r, 80));
+  assert.strictEqual(authFetchLog[0].url, 'https://api.fiezel.my.id/api/voice/live-session');
+  assert.strictEqual(authFetchLog[0].opts.credentials, 'include', 'Worker live-session fetch MUST send credentials: include');
+  assert.strictEqual(authFetchLog[0].opts.mode, 'cors', 'Cross-origin Worker fetch MUST use mode: cors');
+  assert.ok(authFetchLog.some((x) => x.url === 'https://api.fiezel.my.id/api/auth/anon' && x.opts.credentials === 'include'), '401 must recover via /api/auth/anon with credentials: include');
+  assert.strictEqual(liveSessionAttempts, 2, 'live-session must retry once after /api/auth/anon succeeds');
+  assert.ok(authWsUrls.some((u) => u.includes('recovered-tok-28')), 'Recovered ephemeral token must open Gemini Live WebSocket');
+  M28.onQuizSessionEnd('test28_done');
+  console.log('  ✓ Cross-origin credentials:include, 401 -> /api/auth/anon recovery, & error retry banner verified');
+}
+
 execFileSync(process.execPath, [path.join(ROOT, 'tests', 'brain-fsrs-oracle.suite.cjs')], { stdio: 'inherit' });
 execFileSync(process.execPath, [path.join(ROOT, 'tests', 'japanese-grammar-conjugator.suite.cjs')], { stdio: 'inherit' });
 
-console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (27/27)! <<<');
+console.log('\n>>> ALL MOCHI VOICE SOS UNIT TESTS PASSED (28/28)! <<<');
