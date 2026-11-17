@@ -794,25 +794,18 @@
       if (CHOREO && typeof CHOREO.applyTo === 'function') CHOREO.applyTo(host);
     } catch (_) {}
 
-    var bootElapsed = adopted ? bootSplashElapsed(target) : 0;
     // Sisa waktu tayang. Untuk splash yang diadopsi, waktu yang sudah dipakai
     // boot ikut dihitung; lantainya MIN_TAIL_MS = durasi penuh koreografi cap.
     var visibleMs = Number(opts.visibleMs) > 0 ? Number(opts.visibleMs) : VISIBLE_MS;
-    if (adopted) visibleMs = Math.max(MIN_TAIL_MS, visibleMs - bootElapsed);
-
-    // Apabila splash boot sudah mulai memunculkan logo F || lewat CSS (>= 220 ms
-    // sehabis frame pertama), jangan matikan ke opacity:0 atau ulangi partikel
-    // dari t=0 ("dua splash berbenturan"); teruskan ke equalizer + cap PAW.
-    var postRevealFloor = 1320;
-    var resumeOffset = (adopted && !still && bootElapsed >= 220)
-      ? Math.max(postRevealFloor, Math.min(TL.STAMP0 - 280, Math.round(bootElapsed)))
-      : 0;
+    if (adopted) visibleMs = Math.max(MIN_TAIL_MS, visibleMs - bootSplashElapsed(target));
 
     /* ctl — jabat tangan antara show() dan jalur gerak/statis. */
     var ctl = {
-      startOffset: typeof opts.startOffset === 'number'
-        ? opts.startOffset
-        : (still ? Math.max(0, VISIBLE_MS - visibleMs) : resumeOffset),
+      /* Jam koreografi: untuk jalur gerak (motion), partikel sparkle dan koreografi
+         pembentukan ikon F serta balok emas WAJIB dimulai dari t=0 agar murid
+         selalu menikmati animasi konvergensi partikel yang membentuk logo.
+         Jalur kurangi-gerak (still) atau offset eksplisit tetap memperhitungkan sisa waktu. */
+      startOffset: (still || typeof opts.startOffset === 'number') ? (typeof opts.startOffset === 'number' ? opts.startOffset : Math.max(0, VISIBLE_MS - visibleMs)) : 0,
       adopted: !!adopted,
       ready: false, stampStarted: false, frozen: false, closed: false,
       introRequested: false,

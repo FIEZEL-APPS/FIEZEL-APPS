@@ -2248,7 +2248,6 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .fiezel-splash-brand .fiezel-splash-word.is-word-settled .kelasku-wordmark,.fiezel-splash-brand .fiezel-splash-word.is-word-settled .kelasku-tag{animation:none;opacity:1;transform:none}
 @keyframes fz-kelasku-reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes fz-tag-reveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-@keyframes fz-boot-bar-breathe{0%,100%{transform:scaleY(1);opacity:.94}50%{transform:scaleY(1.16);opacity:1}}
 /* Kurangi-gerak: lebih sedikit GERAKAN, bukan lebih sedikit pengalaman.
    Partikel dan hentakan dibuang; yang tersisa muncul dengan MEMUDAR pada
    KETUKAN YANG SAMA (--fz-b* dari fiezel-choreography.js) dan durasi yang
