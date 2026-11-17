@@ -9804,10 +9804,10 @@ html body .fiezel-splash-brand .fz-auth-topo {
 
   :root html body .fiezel-ob .fiezel-ob-reveal,
   :root .fiezel-ob .fiezel-ob-reveal {
-    height: 190px !important;
-    min-height: 190px !important;
-    max-height: 190px !important;
-    padding: 10px 16px 0 !important;
+    height: calc(180px + max(10px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    min-height: calc(180px + max(10px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    max-height: calc(180px + max(10px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    padding: max(10px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px)) 16px 0 !important;
   }
 
   :root html body .fiezel-ob .fiezel-ob-reveal .fiezel-ob-mascot,
@@ -9866,20 +9866,24 @@ html body .fiezel-splash-brand .fz-auth-topo {
 }
 
 /* Dark Espresso Topographic Header */
+:root .fiezel-ob {
+  --fz-ob-safe-top: env(safe-area-inset-top, 0px);
+}
+
 :root .fiezel-ob .fiezel-ob-reveal {
   position: relative !important;
   width: 100% !important;
   max-width: 100% !important;
-  height: 308px !important;
-  min-height: 308px !important;
-  max-height: 308px !important;
+  height: calc(308px + var(--fz-ob-safe-top, env(safe-area-inset-top, 0px))) !important;
+  min-height: calc(308px + var(--fz-ob-safe-top, env(safe-area-inset-top, 0px))) !important;
+  max-height: calc(308px + var(--fz-ob-safe-top, env(safe-area-inset-top, 0px))) !important;
   background: #1C1417 !important;
   background: radial-gradient(ellipse 75% 65% at 50% 42%, #2E1F24 0%, #1C1417 65%, #150E11 100%) !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  padding: 14px 20px 0 !important;
+  padding: calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 14px) 20px 0 !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
   border: none !important;
@@ -10185,7 +10189,7 @@ html body .fiezel-ob .fz-auth-wave {
 /* Mascot Stage: Floating on the Central Cloud Cushion (Enlarged Mochi) */
 html body .fiezel-ob .fiezel-stage {
   position: absolute !important;
-  top: 62px !important;
+  top: calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 62px) !important;
   bottom: auto !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
@@ -11225,10 +11229,10 @@ html body .fiezel-ob [data-ob-dots] span.dot.is-active {
 
 /* Step 0 (No Mascot Stage): Compact Header & Cushion */
 html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) {
-  height: 176px !important;
-  min-height: 176px !important;
-  max-height: 176px !important;
-  padding-top: 18px !important;
+  height: calc(176px + var(--fz-ob-safe-top, env(safe-area-inset-top, 0px))) !important;
+  min-height: calc(176px + var(--fz-ob-safe-top, env(safe-area-inset-top, 0px))) !important;
+  max-height: calc(176px + var(--fz-ob-safe-top, env(safe-area-inset-top, 0px))) !important;
+  padding-top: calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 18px) !important;
 }
 
 html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-ob-cloud-cushion,
@@ -11276,17 +11280,23 @@ html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-auth-wa
   }
 
   html:root body .fiezel-ob .fiezel-ob-reveal {
-    height: 204px !important;
-    min-height: 204px !important;
-    max-height: 204px !important;
-    padding: 10px 16px 0 !important;
+    height: calc(194px + max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    min-height: calc(194px + max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    max-height: calc(194px + max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    padding: max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px)) 16px 0 !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-ob-reveal:has(.fz-ob-header-row):has(.fiezel-stage) {
+    height: calc(218px + max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    min-height: calc(218px + max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    max-height: calc(218px + max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
   }
 
   html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) {
-    height: 142px !important;
-    min-height: 142px !important;
-    max-height: 142px !important;
-    padding-top: 14px !important;
+    height: calc(128px + max(14px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    min-height: calc(128px + max(14px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    max-height: calc(128px + max(14px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px))) !important;
+    padding-top: max(14px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px)) !important;
   }
 
   html:root body .fiezel-ob .fiezel-ob-reveal .fz-ob-cloud-cushion,
@@ -11310,11 +11320,15 @@ html:root body .fiezel-ob .fiezel-ob-reveal:not(:has(.fiezel-stage)) .fz-auth-wa
   }
 
   html:root body .fiezel-ob .fiezel-stage {
-    top: 38px !important;
+    top: calc(max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px)) + 36px) !important;
     width: 148px !important;
     max-width: 148px !important;
     height: 138px !important;
     max-height: 138px !important;
+  }
+
+  html:root body .fiezel-ob .fiezel-ob-reveal:has(.fz-ob-header-row) .fiezel-stage {
+    top: calc(max(12px, calc(var(--fz-ob-safe-top, env(safe-area-inset-top, 0px)) + 8px)) + 64px) !important;
   }
 
   html:root body .fiezel-ob .fiezel-stage-art,

@@ -1,7 +1,7 @@
 {
-  "version": "m025-797",
-  "claimedBy": "branch fix/ecosystem-perf-bugs-m025-797",
-  "claimedAt": "2026-11-17T13:33:19.021Z",
-  "reason": "fix(stabilize): ecosystem performance, Mochi 3D timer fix, placement purity, and worker hardening",
+  "version": "m025-798",
+  "claimedBy": "branch fix/onboarding-topbar-and-mochi-sos-m025-798",
+  "claimedAt": "2026-11-17T16:01:02.045Z",
+  "reason": "fix(onboarding,voice): restore iOS safe-area onboarding topbar and fix Mochi SOS cross-origin session auth",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

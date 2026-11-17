@@ -1097,6 +1097,16 @@ test('KUNCI: i18n kelengkapan kunci Furigana, Aksara, dan counter soal adaptif',
   assert.ok(/Furigana/.test(html) || /onboarding\.ja-kana-title/.test(html), 'panel furigana membawa teks/kunci yang valid');
 });
 
+test('KUNCI: header onboarding mobile menghormati safe-area-inset-top agar logo & Kembali bebas notch/Dynamic Island', () => {
+  const clay = fs.readFileSync('./features/ui/fiezel-tactile-clay.css', 'utf8');
+  assert.ok(/\.fiezel-ob\s*\.fiezel-ob-reveal[\s\S]{0,600}env\(safe-area-inset-top/.test(clay),
+    'reveal header onboarding wajib memperhitungkan env(safe-area-inset-top)');
+  assert.ok(/\.fiezel-ob\s*\.fiezel-stage[\s\S]{0,220}env\(safe-area-inset-top/.test(clay),
+    'posisi panggung maskot .fiezel-stage wajib memperhitungkan env(safe-area-inset-top)');
+  assert.ok(/\.fiezel-ob\s*\.fiezel-ob-reveal:has\(\.fz-ob-header-row\)\s*\.fiezel-stage[\s\S]{0,200}env\(safe-area-inset-top/.test(clay),
+    'step tanpa Kembali dengan logo+tagline wajib menurunkan .fiezel-stage agar telinga Mochi tidak menabrak tagline');
+});
+
 test('gate onboarding sudah terdaftar di CI', () => {
   const workflow = fs.readFileSync('./.github/workflows/quality.yml', 'utf8');
   assert.ok(/node tests\/onboarding-test\.js/.test(workflow));

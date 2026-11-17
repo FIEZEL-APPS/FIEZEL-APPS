@@ -641,16 +641,16 @@
     var doc = getDoc();
     if (!doc) return null;
     var st = _connStatus.state || 'idle';
-    if (st === 'idle' || st === 'connected' || !isMochiEnabledFromStorage() || isExamLocked() || st === 'error') {
+    if (st === 'idle' || st === 'connected' || !isMochiEnabledFromStorage() || isExamLocked()) {
       removeConnectionBannerInternal();
-      if (st === 'error') {
-        try {
-          if (typeof root.showToast === 'function') {
-            root.showToast(_connStatus.message || t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi'), 'warn');
-          }
-        } catch (_) {}
-      }
       return null;
+    }
+    if (st === 'error') {
+      try {
+        if (typeof root.showToast === 'function') {
+          root.showToast(_connStatus.message || t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi'), 'warn');
+        }
+      } catch (_) {}
     }
     if (isLocalEnv() && (st === 'reconnecting' || st === 'connecting')) {
       removeConnectionBannerInternal();
@@ -739,9 +739,10 @@
     }
     renderConnectionBannerInternal();
     if (nextState === 'error' || nextState === 'quota' || nextState === 'connecting' || nextState === 'reconnecting') {
+      var autoHideMs = (nextState === 'error' || nextState === 'quota') ? 10000 : 4000;
       _connBannerHideTimer = setTimeout(function () {
         removeConnectionBannerInternal();
-      }, 4000);
+      }, autoHideMs);
     }
     return _connStatus;
   }
@@ -1183,20 +1184,95 @@
     }
 
     var bases = resolveVoiceApiBases();
-    var tryBase = function (index) {
+    var lastErr = null;
+    var ensureAnonSessionForBase = function (fetchFn, base) {
+      var isExternal = /^https?:\/\//i.test(String(base || ''));
+      var key = base || '__same_origin__';
+      var gate = root.__fzMochiSosAnonGate || (root.__fzMochiSosAnonGate = { inflight: {}, cooldownUntil: {} });
+      if ((gate.cooldownUntil[key] || 0) > Date.now()) {
+        return Promise.resolve(false);
+      }
+      if (gate.inflight[key]) {
+        return gate.inflight[key];
+      }
+      var p = (function () {
+        if (isExternal && root.FiezelAccount && typeof root.FiezelAccount.ensureAnon === 'function') {
+          try {
+            var acctPromise = root.FiezelAccount.ensureAnon();
+            if (acctPromise && typeof acctPromise.then === 'function') {
+              return acctPromise.then(function (ok) {
+                if (ok) return true;
+                return false;
+              }).catch(function () { return false; });
+            }
+          } catch (_) {}
+        }
+        var anonUrl = (base ? base : '') + '/api/auth/anon';
+        var anonOpts = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: '{}',
+          credentials: 'include',
+          cache: 'no-store'
+        };
+        if (isExternal) anonOpts.mode = 'cors';
+        return fetchFn(anonUrl, anonOpts).then(function (res) {
+          if (res && (res.ok || res.status === 409)) {
+            delete gate.cooldownUntil[key];
+            return true;
+          }
+          if (res && res.status === 429) {
+            gate.cooldownUntil[key] = Date.now() + 60000;
+          }
+          return false;
+        }).catch(function () {
+          gate.cooldownUntil[key] = Date.now() + 5000;
+          return false;
+        });
+      })().then(function (ok) {
+        delete gate.inflight[key];
+        return ok;
+      }, function () {
+        delete gate.inflight[key];
+        return false;
+      });
+      gate.inflight[key] = p;
+      return p;
+    };
+    var tryBase = function (index, didAnonRetry) {
       if (index >= bases.length) {
-        return Promise.resolve({ ok: false });
+        return Promise.resolve(lastErr || { ok: false });
       }
       var base = bases[index];
+      var isExternal = /^https?:\/\//i.test(String(base || ''));
       var url = (base ? base : '') + '/api/voice/live-session';
       var fetchFn = (root && typeof root.fetch === 'function') ? root.fetch.bind(root) : (typeof fetch === 'function' ? fetch : null);
       if (!fetchFn) return Promise.resolve({ ok: false });
-      return fetchFn(url, {
+      var reqOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: '{}'
-      }).then(function (res) {
-        if (!res || !res.ok) return tryBase(index + 1);
+        body: '{}',
+        credentials: 'include',
+        cache: 'no-store'
+      };
+      if (isExternal) reqOpts.mode = 'cors';
+      return fetchFn(url, reqOpts).then(function (res) {
+        if (res && res.status === 401 && !didAnonRetry) {
+          return ensureAnonSessionForBase(fetchFn, base).then(function (okAnon) {
+            if (okAnon) return tryBase(index, true);
+            lastErr = { ok: false, status: 401, reason: 'auth' };
+            return tryBase(index + 1, false);
+          });
+        }
+        if (!res || !res.ok) {
+          var stCode = res ? res.status : 0;
+          lastErr = {
+            ok: false,
+            status: stCode,
+            reason: stCode === 429 ? 'quota' : (stCode === 401 ? 'auth' : 'http_error')
+          };
+          return tryBase(index + 1, false);
+        }
         return res.json().then(function (data) {
           if (data && data.ok && data.token) {
             var ep = data.endpoint || 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained';
@@ -1247,15 +1323,22 @@
     if (!force && _prewarm.session && (Date.now() - _prewarm.fetchedAt) < TOKEN_STALE_MS) {
       return Promise.resolve(_prewarm.session);
     }
+    if (!force && _prewarm.cooldownUntil && Date.now() < _prewarm.cooldownUntil) {
+      return Promise.resolve(null);
+    }
     if (_prewarm.promise) return _prewarm.promise;
     _prewarm.promise = fetchLiveSessionToken({ skipDirectKey: !isDirectKeyAvailable() }).then(function (session) {
       if (session && session.ok) {
         _prewarm.session = session;
         _prewarm.fetchedAt = Date.now();
+        _prewarm.cooldownUntil = 0;
+      } else {
+        _prewarm.cooldownUntil = Date.now() + 15000;
       }
       _prewarm.promise = null;
       return session;
     }).catch(function () {
+      _prewarm.cooldownUntil = Date.now() + 15000;
       _prewarm.promise = null;
       return null;
     });
@@ -1437,12 +1520,16 @@
     try {
       var bases = resolveVoiceApiBases();
       var base = bases.length ? bases[bases.length - 1] : '';
-      fetch(base + '/api/voice/report-drop', {
+      var isExternal = /^https?:\/\//i.test(String(base || ''));
+      var dropOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: code, reason: String(reason || ''), keyIndex: keyIndex || 0 }),
+        credentials: 'include',
         keepalive: true
-      }).catch(function () {});
+      };
+      if (isExternal) dropOpts.mode = 'cors';
+      fetch(base + '/api/voice/report-drop', dropOpts).catch(function () {});
     } catch (_) {}
   }
 
@@ -2302,6 +2389,17 @@
           cost: 0,
           balance: currentBalance,
           badge: String(currentBalance)
+        };
+      }
+
+      // Session already prepaid via confirmation modal (allows retry without re-charging when remaining balance is < cost)
+      if (_sessionPrepaidByModal && _sessionGemsSpent > 0) {
+        return {
+          allowed: true,
+          prepaidByModal: true,
+          cost: 0,
+          balance: currentBalance,
+          badge: '-' + _sessionGemsSpent + ' 💎'
         };
       }
 
@@ -3341,6 +3439,19 @@
         }
       }
 
+      var reportTokenFailure = function (sess) {
+        var errState = (typeof navigator !== 'undefined' && navigator.onLine === false)
+          ? 'offline'
+          : (sess && sess.reason === 'quota' ? 'quota' : 'error');
+        var errMsg = errState === 'offline'
+          ? t('mochi-sos.conn-offline', 'Koneksi internet terputus — Mochi menunggu jaringan kembali aktif')
+          : (errState === 'quota'
+            ? t('mochi-sos.conn-quota', 'Kuota API AI penuh — mengalihkan jalur koneksi...')
+            : t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi'));
+        setConnectionStatusInternal(errState, errMsg);
+        self._fallbackSpeechTurn(q);
+      };
+
       // 3c. Jalur pre-warm in-flight promise (menunggu fetch token yang sudah dipicu modal)
       if (_prewarm.promise) {
         _prewarm.promise.then(function (session) {
@@ -3354,8 +3465,7 @@
               if (s2 && s2.ok && s2.endpoint) {
                 self._connectLiveWebSocket(s2.endpoint, q, s2.keyIndex, !!s2.isDirectKey);
               } else {
-                setConnectionStatusInternal('error', t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi'));
-                self._fallbackSpeechTurn(q);
+                reportTokenFailure(s2);
               }
             });
           }
@@ -3365,8 +3475,7 @@
             if (s2 && s2.ok && s2.endpoint) {
               self._connectLiveWebSocket(s2.endpoint, q, s2.keyIndex, !!s2.isDirectKey);
             } else {
-              setConnectionStatusInternal('error', t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi'));
-              self._fallbackSpeechTurn(q);
+              reportTokenFailure(s2);
             }
           });
         });
@@ -3378,13 +3487,7 @@
         if (!self.isCallActive()) return;
         if (!session || !session.ok || !session.endpoint) {
           console.warn('[Mochi Voice SOS] Gemini Live endpoint unavailable, fallback to speech.');
-          setConnectionStatusInternal(
-            (typeof navigator !== 'undefined' && navigator.onLine === false) ? 'offline' : 'error',
-            (typeof navigator !== 'undefined' && navigator.onLine === false)
-              ? t('mochi-sos.conn-offline', 'Koneksi internet terputus — Mochi menunggu jaringan kembali aktif')
-              : t('mochi-sos.conn-error', 'Koneksi AI bermasalah — Ketuk untuk coba lagi')
-          );
-          self._fallbackSpeechTurn(q);
+          reportTokenFailure(session);
           return;
         }
         self._connectLiveWebSocket(session.endpoint, q, session.keyIndex, !!session.isDirectKey);
@@ -4326,8 +4429,9 @@
         endpoints.push('/api/tts/line');
       }
       var cfgEndpoint = root && root.FIEZEL_TTS_CONFIG && root.FIEZEL_TTS_CONFIG.endpoint;
-      if (cfgEndpoint) endpoints.push(cfgEndpoint);
-      endpoints.push('https://fiezel-apps.onrender.com/api/tts/line');
+      if (cfgEndpoint && endpoints.indexOf(cfgEndpoint) === -1) endpoints.push(cfgEndpoint);
+      var renderTtsUrl = 'https://fiezel-apps.onrender.com/api/tts/line';
+      if (endpoints.indexOf(renderTtsUrl) === -1) endpoints.push(renderTtsUrl);
 
       var tryNext = function (idx) {
         if (idx >= endpoints.length || !self.isCallActive()) return;
@@ -4515,6 +4619,11 @@
       }
       var call = _activeCall;
       _activeCall = null;
+      if (reason !== 'retry' && _sessionPrepaidByModal && _sessionGemsSpent > 0 && !call.firstAudioAt && !(call.turnsDelivered > 0) && !call.playedInstantGreeting) {
+        try { this.refundMisTap(_sessionGemsSpent); } catch (_) {}
+        _sessionGemsSpent = 0;
+        _sessionPrepaidByModal = false;
+      }
       removeConnectionBannerInternal();
       _connStatus = { state: 'idle', message: '', updatedAt: 0 };
 
