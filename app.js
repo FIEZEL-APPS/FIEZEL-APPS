@@ -3099,9 +3099,10 @@ function record(q,ok,ms,selectedIndex){
   /* Fase 2 (B3 butir 3+4): setiap jawaban grammar juga menjadi bukti BKT (bobot=kappa) dan,
      bila pilihan yang salah adalah opsi PINJAMAN dari lesson lain, satu sel confusion
      matrix. Keduanya punya guard sendiri: modul absen = tidak ada yang terjadi. */
-  if(q.type==='grammar'||q.type==='token-order'){
+  if(q.type==='token-order')recordTokenOrderEvidence(q,ok,h,selectedIndex);
+  if(q.type==='grammar'){
     try{bktRecord(q,ok,h.kappa)}catch{}
-    if(!ok&&Number(selectedIndex)>=0)try{confusionMatrixRecord(q,selectedIndex)}catch{}
+    if(!ok)try{confusionMatrixRecord(q,selectedIndex)}catch{}
     // Fase 3 (C5 butir 1): jawaban yang sama juga bukti KALIBRASI ITEM - seberapa sulit
     // soal ini sebenarnya, diukur dari murid nyata. Guarded di dalam helper-nya.
     try{itemCalibrationObserve(q,ok,h.kappa)}catch{}
@@ -3132,6 +3133,14 @@ function record(q,ok,ms,selectedIndex){
      tidak pernah ikut dihitung sebagai kesalahan baru. */
   if(!ok)try{levelTrustNoteMistake(q)}catch(_){}
   if(q.canary&&CONTENT_CANARY&&q.canary.canaryId===state.contentCanaryMeta?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordEvidence(state.contentCanaryMeta,q.canary.canaryId,{type:'outcome',phase:q.canary.phase||'canary',correct:!!ok,at:new Date(now).toISOString()});save();queueRemoteActivitySync()
+}
+function recordTokenOrderEvidence(q,ok,h,selectedIndex){
+  try{bktRecord(q,ok,h.kappa)}catch{}
+  if(!ok&&Number(selectedIndex)>=0)try{confusionMatrixRecord(q,selectedIndex)}catch{}
+  try{itemCalibrationObserve(q,ok,h.kappa)}catch{}
+  try{itemPoolObserve(q,ok)}catch{}
+  try{itemPoolObserveProbe(q,ok)}catch{}
+  try{learningTelemetryEmitAnswer(q,ok,h)}catch{}
 }
 /* m025-135: keyakinan MENGULANG penjadwalan jawaban yang sama dari titik awal yang sama -
    bukan menjadwalkan ulang di atas hasilnya. Tanpa itu satu jawaban salah dihitung dua kali:

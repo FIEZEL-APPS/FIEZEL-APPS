@@ -190,6 +190,7 @@ function bootFullAppHost(extraFiles, initialStore, customFetch) {
     return { ok: false, status: 404, json: async () => null };
   };
 
+  const resolvedFetch = typeof customFetch === 'function' ? customFetch : defaultFetch;
   const context = {
     console,
     document,
@@ -200,7 +201,7 @@ function bootFullAppHost(extraFiles, initialStore, customFetch) {
       setItem(k, v) { this._m[k] = String(v); },
       removeItem(k) { delete this._m[k]; }
     },
-    fetch: customFetch || defaultFetch,
+    fetch: resolvedFetch,
     location: { href: '', protocol: '', hostname: '', search: '' },
     navigator: { onLine: true, vibrate() {} },
     addEventListener() {},
@@ -399,7 +400,7 @@ function bootFullAppHost(extraFiles, initialStore, customFetch) {
     assert.strictEqual(bkt.lessons['ja_kana_あ'].n, 1);
   });
 
-  check('B2 Mandarin UI MCQ + reorder route real mastery, BKT, Ledger & history without crash or double count', () => {
+  check('B2 Mandarin UI quiz routes real mastery, BKT, Ledger & history without crash or double count', () => {
     const h = bootFullAppHost([
       'features/mandarin/mandarin-braincore-bridge.js',
       'features/mandarin/mandarin-curriculum.js',
@@ -408,11 +409,14 @@ function bootFullAppHost(extraFiles, initialStore, customFetch) {
     const { ctx, store } = h;
     const lessons = ctx.FiezelMandarinCurriculum.getLessonsByLevel(1);
     assert.ok(lessons.length > 0);
-    const lesson = lessons[0];
-    const wrongIdx = lesson.quiz[0].answerIndex === 0 ? 1 : 0;
+    const lesson = lessons.find(l => Array.isArray(l.quiz) && l.quiz.some(q => Array.isArray(q.options) && q.options.length > 1));
+    assert.ok(lesson, 'Harus ada lesson Mandarin level 1 dengan soal opsi');
+    const qIdx = lesson.quiz.findIndex(q => Array.isArray(q.options) && q.options.length > 1);
+    const quizItem = lesson.quiz[qIdx];
+    const wrongIdx = (Number(quizItem.answerIndex) + 1) % quizItem.options.length;
 
     ctx.FiezelMandarinUI.openLessonPlayer(lesson.id, 4);
-    ctx.FiezelMandarinUI.submitQuizAnswer(0, wrongIdx);
+    ctx.FiezelMandarinUI.submitQuizAnswer(qIdx, wrongIdx);
     const st = ctx.__fiezelAudit.liveState();
     assert.ok(Object.keys(st.grammar).some(k => k.startsWith('zh_')), 'Mandarin kuis harus memperbarui state.grammar berawalan zh_');
     assert.strictEqual(st.totalAnswered, 1, 'Total answered tidak boleh terhitung ganda');
@@ -421,8 +425,8 @@ function bootFullAppHost(extraFiles, initialStore, customFetch) {
     const ledger = JSON.parse(store[ctx.sideStateKey('fiezel-misconception-ledger-v1')]);
     assert.ok(Object.keys(ledger.entries).length > 0, 'Mandarin wrong answer wajib mencatat misconception ledger');
 
-    // Duplicate click on same qIdx 0 must NOT double increment totalAnswered
-    ctx.FiezelMandarinUI.submitQuizAnswer(0, lesson.quiz[0].answerIndex);
+    // Duplicate click on same qIdx must NOT double increment totalAnswered
+    ctx.FiezelMandarinUI.submitQuizAnswer(qIdx, quizItem.answerIndex);
     assert.strictEqual(ctx.__fiezelAudit.liveState().totalAnswered, 1);
   });
 
@@ -434,7 +438,7 @@ function bootFullAppHost(extraFiles, initialStore, customFetch) {
     const { ctx, store } = h;
     const story = ctx.FiezelStoryReader.STORIES[0];
     const quiz = story.scenes[4].quiz;
-    const wrongIdx = quiz.answerIndex === 0 ? 1 : 0;
+    const wrongIdx = (Number(quiz.answerIndex) + 1) % quiz.options.length;
 
     ctx.FiezelStoryReader.openStory(story.id);
     ctx.FiezelStoryReader.gotoScene(4);
