@@ -3,6 +3,7 @@
 Lifecycle: DRAFT -> REVIEW -> APPROVED -> PUBLISHED -> ARCHIVED.
 Hasil parser/import/kandidat otomatis selalu masuk REVIEW; hanya guru yang menerbitkan.
 """
+import asyncio
 import io
 import csv
 import re
@@ -497,35 +498,42 @@ def _rows_from_table(rows: list[dict]) -> list[dict]:
     return out
 
 
+MAX_IMPORT_BYTES = 15 * 1024 * 1024  # 15 MiB batas berkas impor
+
+
+def _parse_import_bytes_sync(raw: bytes, name: str) -> tuple[list[dict], str]:
+    if name.endswith(".csv"):
+        text = raw.decode("utf-8-sig", errors="replace")
+        return _rows_from_table(list(csv.DictReader(io.StringIO(text)))), "csv_import"
+    if name.endswith((".xlsx", ".xlsm")):
+        from openpyxl import load_workbook
+        wb = load_workbook(io.BytesIO(raw), data_only=True)
+        try:
+            ws = wb.active
+            it = ws.iter_rows(values_only=True)
+            header = [str(h or "") for h in next(it, [])]
+            return _rows_from_table([dict(zip(header, r)) for r in it]), "excel_import"
+        finally:
+            wb.close()
+    if name.endswith(".pdf"):
+        from pypdf import PdfReader
+        reader = PdfReader(io.BytesIO(raw))
+        text = "\n".join((p.extract_text() or "") for p in reader.pages)
+        return parse_paste(text), "pdf_import"
+    if name.endswith((".txt", ".md")):
+        return parse_paste(raw.decode("utf-8", errors="replace")), "document_import"
+    raise HTTPException(400, "Format tidak didukung. Pakai CSV, XLSX, PDF, atau TXT.")
+
+
 @router.post("/import/file")
 async def import_file(file: UploadFile = File(...), competency_id: str = Form(""),
                       u=Depends(teacher_user)):
     """Bulk import Excel/CSV, plus dokumen PDF/TXT (parser deterministik)."""
-    raw = await file.read()
+    raw = await file.read(MAX_IMPORT_BYTES + 1)
+    if len(raw) > MAX_IMPORT_BYTES:
+        raise HTTPException(413, "Berkas terlalu besar (maksimal 15 MB).")
     name = (file.filename or "").lower()
-    if name.endswith(".csv"):
-        text = raw.decode("utf-8-sig", errors="replace")
-        rows = _rows_from_table(list(csv.DictReader(io.StringIO(text))))
-        mode = "csv_import"
-    elif name.endswith((".xlsx", ".xlsm")):
-        from openpyxl import load_workbook
-        wb = load_workbook(io.BytesIO(raw), data_only=True)
-        ws = wb.active
-        it = ws.iter_rows(values_only=True)
-        header = [str(h or "") for h in next(it)]
-        rows = _rows_from_table([dict(zip(header, r)) for r in it])
-        mode = "excel_import"
-    elif name.endswith(".pdf"):
-        from pypdf import PdfReader
-        reader = PdfReader(io.BytesIO(raw))
-        text = "\n".join((p.extract_text() or "") for p in reader.pages)
-        rows = parse_paste(text)
-        mode = "pdf_import"
-    elif name.endswith((".txt", ".md")):
-        rows = parse_paste(raw.decode("utf-8", errors="replace"))
-        mode = "document_import"
-    else:
-        raise HTTPException(400, "Format tidak didukung. Pakai CSV, XLSX, PDF, atau TXT.")
+    rows, mode = await asyncio.to_thread(_parse_import_bytes_sync, raw, name)
     if not rows:
         raise HTTPException(400, "Tidak ada soal yang terbaca dari berkas ini.")
     return await _ingest_candidates(rows, {"competency_id": competency_id or None}, u["user_id"], mode)

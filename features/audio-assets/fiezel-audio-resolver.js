@@ -278,10 +278,40 @@
       }
       current = el;
       var settled = false;
+      function onPlaying() {
+        try { root.clearTimeout(el.__fiezelGuard); } catch (_) {}
+        if (warmUrl) {
+          var toWarm = warmUrl;
+          warmUrl = '';
+          warmCache(toWarm);
+        }
+      }
+      var onTimeUpdate = null;
+      if (typeof opts.onProgress === 'function') {
+        onTimeUpdate = function () {
+          try { opts.onProgress(el.currentTime || 0, el.duration || 0); } catch (_) {}
+        };
+      }
+      function onEnded() { finish(true); }
+      function onError() { finish(false); }
+      function detach() {
+        if (typeof el.removeEventListener === 'function') {
+          try { el.removeEventListener('playing', onPlaying); } catch (_) {}
+          if (onTimeUpdate) {
+            try { el.removeEventListener('timeupdate', onTimeUpdate); } catch (_) {}
+          }
+          try { el.removeEventListener('ended', onEnded); } catch (_) {}
+          try { el.removeEventListener('error', onError); } catch (_) {}
+        }
+        el.__fiezelSettle = null;
+      }
       function finish(ok) {
         if (settled) return;
         settled = true;
         try { root.clearTimeout(el.__fiezelGuard); } catch (_) {}
+        detach();
+        try { if (typeof el.pause === 'function') el.pause(); } catch (_) {}
+        try { if (typeof el.removeAttribute === 'function') el.removeAttribute('src'); el.src = ''; } catch (_) {}
         if (isObjectUrl) { try { root.URL.revokeObjectURL(src); } catch (_) {} }
         if (current === el) current = null;
         if (ok) {
@@ -294,24 +324,15 @@
       }
       el.__fiezelSettle = finish;
       el.__fiezelGuard = root.setTimeout(function () { finish(false); }, 10000);
-      el.addEventListener('playing', function () {
-        try { root.clearTimeout(el.__fiezelGuard); } catch (_) {}
-        if (warmUrl) {
-          var toWarm = warmUrl;
-          warmUrl = '';
-          warmCache(toWarm);
-        }
-      });
+      if (typeof el.addEventListener === 'function') {
+        el.addEventListener('playing', onPlaying);
+        if (onTimeUpdate) el.addEventListener('timeupdate', onTimeUpdate);
+        el.addEventListener('ended', onEnded);
+        el.addEventListener('error', onError);
+      }
       el.preload = 'auto';
       try { el.crossOrigin = 'anonymous'; } catch (_) {}
       if (typeof opts.speed === 'number' && opts.speed > 0) el.playbackRate = opts.speed;
-      if (typeof opts.onProgress === 'function') {
-        el.addEventListener('timeupdate', function () {
-          try { opts.onProgress(el.currentTime || 0, el.duration || 0); } catch (_) {}
-        });
-      }
-      el.addEventListener('ended', function () { finish(true); });
-      el.addEventListener('error', function () { finish(false); });
       el.src = src;
       var started = null;
       try { started = el.play(); } catch (_) { finish(false); return; }
@@ -338,10 +359,9 @@
   }
 
   function streamWithBlobFallback(Ctor, url, opts) {
-    // Jalur streaming langsung: langsung hangatkan cache persisten di latar belakang
-    warmCache(url);
+    // Pass url as warmUrl so playSource warms cache AFTER 'playing' starts, avoiding duplicate concurrent fetch.
     // countFailures false agar kegagalan awal tidak mendua bila jalur blob fallback berhasil.
-    return playSource(Ctor, url, false, opts, '', false).then(function (res) {
+    return playSource(Ctor, url, false, opts, url, false).then(function (res) {
       if (res.ok) return true;
       if (res.stopped) return false;
       return playBlobFallback(Ctor, url, opts);

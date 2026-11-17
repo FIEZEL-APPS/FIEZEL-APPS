@@ -473,6 +473,7 @@ export class FiezelMochi {
 
   initScene() {
     this.scene = new THREE.Scene();
+    this.isCompactCard = !this.voiceCompanionStrictMode && Math.max(this.width || 0, this.height || 0) <= 180;
 
     this.camera = new THREE.PerspectiveCamera(46, this.width / this.height, 0.1, 100);
     this.camera.position.set(0, this.baseCameraY, this.baseCameraZ || 5.05); // Configurable camera framing (e.g. 4.70 for full stage presence in FaceTime)
@@ -487,7 +488,7 @@ export class FiezelMochi {
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
     this.renderer.toneMapping = THREE.NoToneMapping;
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0)); // Crystal clear Retina DPR (capped at 2.0 for 60fps thermal comfort)
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.isCompactCard ? 1.5 : 2.0));
 
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
@@ -501,6 +502,26 @@ export class FiezelMochi {
 
     this.container.innerHTML = '';
     this.container.appendChild(this.renderer.domElement);
+
+    // Handle WebGL context loss/restoration gracefully on low-memory Android/mobile GPUs
+    const domEl = this.renderer.domElement;
+    if (domEl && typeof domEl.addEventListener === 'function') {
+      this._onContextLost = (e) => {
+        try { if (e && typeof e.preventDefault === 'function') e.preventDefault(); } catch (_) {}
+        this._contextLost = true;
+        this.pause();
+      };
+      this._onContextRestored = () => {
+        this._contextLost = false;
+        this._faceRenderSig = null;
+        this._fxRenderSig = null;
+        this._auraBackEmpty = false;
+        this._fxOverlayEmpty = false;
+        this.resume();
+      };
+      domEl.addEventListener('webglcontextlost', this._onContextLost, false);
+      domEl.addEventListener('webglcontextrestored', this._onContextRestored, false);
+    }
   }
 
   updateSize(width, height) {
@@ -519,6 +540,20 @@ export class FiezelMochi {
   setupLighting() {
     // Authentic 3D Studio Daifuku Lighting: rich volumetric form gradient with soft peach-rose sheen,
     // glint highlights, warm creamy bounce underbelly, and sculpted rim light!
+    if (this.isCompactCard) {
+      this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.55);
+      this.scene.add(this.ambientLight);
+      this.hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFF0E5, 1.35);
+      this.scene.add(this.hemiLight);
+      this.keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.65);
+      this.keyLight.position.set(2.4, 3.8, 3.8);
+      this.scene.add(this.keyLight);
+      this.rimLight = new THREE.DirectionalLight(0xFFD8E4, 1.35);
+      this.rimLight.position.set(0, 3.8, -2.8);
+      this.scene.add(this.rimLight);
+      return;
+    }
+
     this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.45);
     this.scene.add(this.ambientLight);
 
@@ -619,22 +654,33 @@ export class FiezelMochi {
     this.skinCanvas.height = SKIN_RES;
     this.sCtx = this.skinCanvas.getContext('2d');
     this.mochiSkinTexture = new THREE.CanvasTexture(this.skinCanvas);
+    this.mochiSkinTexture.generateMipmaps = false;
+    this.mochiSkinTexture.minFilter = THREE.LinearFilter;
 
     this.updateSkinBlush();
 
     // Mouth-watering velvety Daifuku rice-dough skin with soft peach-rose edge sheen (HD 3D studio quality)
-    this.mochiMaterial = new THREE.MeshPhysicalMaterial({
-      map: this.mochiSkinTexture,
-      color: 0xFFFFFF,
-      roughness: 0.28,
-      metalness: 0.0,
-      clearcoat: 0.12,
-      clearcoatRoughness: 0.25,
-      sheen: 0.90,
-      sheenRoughness: 0.30,
-      sheenColor: new THREE.Color(0xFFD2DE), // Soft rosy peach sheen along silhouette: pops on white & cream!
-      ior: 1.45
-    });
+    this.mochiMaterial = this.isCompactCard
+      ? new THREE.MeshStandardMaterial({
+          map: this.mochiSkinTexture,
+          color: 0xFFFFFF,
+          roughness: 0.34,
+          metalness: 0.0,
+          emissive: new THREE.Color(0xFFD2DE),
+          emissiveIntensity: 0.07
+        })
+      : new THREE.MeshPhysicalMaterial({
+          map: this.mochiSkinTexture,
+          color: 0xFFFFFF,
+          roughness: 0.28,
+          metalness: 0.0,
+          clearcoat: 0.12,
+          clearcoatRoughness: 0.25,
+          sheen: 0.90,
+          sheenRoughness: 0.30,
+          sheenColor: new THREE.Color(0xFFD2DE), // Soft rosy peach sheen along silhouette: pops on white & cream!
+          ior: 1.45
+        });
 
     this.mochiMesh = new THREE.Mesh(geo, this.mochiMaterial);
 
@@ -1121,6 +1167,17 @@ export class FiezelMochi {
         this.mochiMaterial.sheen = 0.90;
         this.mochiMaterial.sheenColor.setHex(0xFFC4D6);
       }
+    } else if (this.mochiMaterial) {
+      if (wFurious > 0.5) {
+        this.mochiMaterial.color.setHex(0x421218);
+        this.mochiMaterial.roughness = 0.88;
+      } else if (wMarah > 0.5) {
+        this.mochiMaterial.color.setHex(0xFFFFFF);
+        this.mochiMaterial.roughness = 0.62;
+      } else {
+        this.mochiMaterial.color.setHex(0xFFFFFF);
+        this.mochiMaterial.roughness = 0.34;
+      }
     }
 
     // Synchronize 3D Expressive Hand Materials with Body Mood State (Normal / Takut / Marah / Sangat Marah)
@@ -1495,16 +1552,22 @@ export class FiezelMochi {
     this.hornsGroup.visible = false;
     this.mochiGroup.add(this.hornsGroup);
 
-    const hornMat = new THREE.MeshPhysicalMaterial({
-      color: 0x260E12,
-      roughness: 0.28,
-      metalness: 0.08,
-      clearcoat: 0.55,
-      clearcoatRoughness: 0.24,
-      sheen: 0.90,
-      sheenRoughness: 0.25,
-      sheenColor: new THREE.Color(0xC83228)
-    });
+    const hornMat = this.isCompactCard
+      ? new THREE.MeshStandardMaterial({
+          color: 0x260E12,
+          roughness: 0.28,
+          metalness: 0.08
+        })
+      : new THREE.MeshPhysicalMaterial({
+          color: 0x260E12,
+          roughness: 0.28,
+          metalness: 0.08,
+          clearcoat: 0.55,
+          clearcoatRoughness: 0.24,
+          sheen: 0.90,
+          sheenRoughness: 0.25,
+          sheenColor: new THREE.Color(0xC83228)
+        });
 
     const buildHornMesh = (side) => {
       const spine = new THREE.CatmullRomCurve3([
@@ -1590,15 +1653,21 @@ export class FiezelMochi {
     this.empatiPawsGroup.visible = false;
     this.mochiGroup.add(this.empatiPawsGroup);
 
-    const pawMochiMat = new THREE.MeshPhysicalMaterial({
-      color: 0xFFFDFB,
-      roughness: 0.58,
-      metalness: 0.0,
-      clearcoat: 0.0,
-      sheen: 0.55,
-      sheenRoughness: 0.55,
-      sheenColor: new THREE.Color(0xFFD6E2)
-    });
+    const pawMochiMat = this.isCompactCard
+      ? new THREE.MeshStandardMaterial({
+          color: 0xFFFDFB,
+          roughness: 0.58,
+          metalness: 0.0
+        })
+      : new THREE.MeshPhysicalMaterial({
+          color: 0xFFFDFB,
+          roughness: 0.58,
+          metalness: 0.0,
+          clearcoat: 0.0,
+          sheen: 0.55,
+          sheenRoughness: 0.55,
+          sheenColor: new THREE.Color(0xFFD6E2)
+        });
 
     const shadowMat = new THREE.MeshBasicMaterial({
       color: 0xE6B8CA,
@@ -2153,6 +2222,8 @@ export class FiezelMochi {
     this.faceCanvas.height = 768;
     this.fCtx = this.faceCanvas.getContext('2d');
     this.faceTexture = new THREE.CanvasTexture(this.faceCanvas);
+    this.faceTexture.generateMipmaps = false;
+    this.faceTexture.minFilter = THREE.LinearFilter;
     this.faceTexture.needsUpdate = true;
 
     const shellW = 2.40;
@@ -2262,6 +2333,8 @@ export class FiezelMochi {
     this.auraBackCanvas.height = 1024;
     this.auraBackCtx = this.auraBackCanvas.getContext('2d');
     this.auraBackTexture = new THREE.CanvasTexture(this.auraBackCanvas);
+    this.auraBackTexture.generateMipmaps = false;
+    this.auraBackTexture.minFilter = THREE.LinearFilter;
 
     const auraBackGeo = new THREE.PlaneGeometry(4.30, 4.30, 1, 1);
     this.auraBackUniforms = {
@@ -2346,6 +2419,8 @@ export class FiezelMochi {
     this.fxCanvas.height = 800;
     this.fxCtx = this.fxCanvas.getContext('2d');
     this.fxTexture = new THREE.CanvasTexture(this.fxCanvas);
+    this.fxTexture.generateMipmaps = false;
+    this.fxTexture.minFilter = THREE.LinearFilter;
 
     const fxGeo = new THREE.PlaneGeometry(3.56, 2.78, 1, 1);
     this.fxOverlayMat = new THREE.MeshBasicMaterial({
@@ -2676,25 +2751,28 @@ export class FiezelMochi {
    */
   renderCurvedFaceAndFx() {
     if (!this.fCtx || !this.faceCanvas) return;
-    const ctx = this.fCtx;
-    const w = 1024;
-    const h = 768;
-    ctx.clearRect(0, 0, w, h);
-
     const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
     const rig = this.mouthRig || { open: 0, width: 1.0, smile: 0.28, roundness: 0, pucker: 0, presence: 0, headPitch: 0, headRoll: 0, headYaw: 0 };
     const sp = (!this._isStaticChartRenderer && rig.presence) ? Math.max(0, Math.min(1, rig.presence)) : 0;
     const cheekPush = sp * Math.max(0, (rig.open || 0) * 0.52 + (rig.smile || 0) * 0.56 - (rig.roundness || 0) * 0.20);
     const roundWonder = sp * (rig.roundness || 0) * Math.min(1, (rig.open || 0) * 1.4);
     const blinkScaleY = Math.max(0.08, 1.0 - Math.sin((this.blinkFactor || 0) * Math.PI));
-
-    // Subtle 2.5D spherical face parallax coupled to conversational head yaw/pitch so mouth, eyes & cheeks move as ONE 3D head!
     const faceParallaxX = sp * (rig.headYaw || 0) * 185;
     const faceParallaxY = sp * (rig.headPitch || 0) * 145;
-
-    // Subtle gaze tracking from head rotation + conversational speech engagement + mood gaze bias
     const gazeX = (this.currentRot ? this.currentRot.y * 28 : 0) + (rig.headYaw || 0) * 160 * sp + (desc.gazeBiasX || 0);
     const gazeY = (this.currentRot ? this.currentRot.x * 20 : 0) + (rig.headPitch || 0) * 120 * sp + (desc.gazeBiasY || 0);
+    const dynTime = (desc.id === 'takut' || desc.eyeType === 'heart_eyes') ? Math.round((this.time || 0) * 60) : 0;
+    const faceSig = `${desc.id}|${this._isStaticChartRenderer ? 1 : 0}|${this.activeViseme || ''}|${Math.round((this.visemeIntensity || 0) * 100)}|${Math.round(blinkScaleY * 500)}|${Math.round(sp * 500)}|${Math.round((rig.open || 0) * 500)}|${Math.round((rig.width ?? 1) * 200)}|${Math.round((rig.smile ?? 0.28) * 200)}|${Math.round((rig.roundness || 0) * 200)}|${Math.round((rig.pucker || 0) * 200)}|${Math.round((rig.bilabial || 0) * 200)}|${Math.round((rig.tongueLift || 0) * 200)}|${Math.round((rig.tongueCurl || 0) * 200)}|${Math.round((rig.lipTuck || 0) * 200)}|${Math.round(faceParallaxX * 4)}|${Math.round(faceParallaxY * 4)}|${Math.round(gazeX * 10)}|${Math.round(gazeY * 10)}|${dynTime}`;
+    if (this._faceRenderSig === faceSig) {
+      this.renderFloatingStoryboardFx(desc.fxType);
+      return;
+    }
+    this._faceRenderSig = faceSig;
+
+    const ctx = this.fCtx;
+    const w = 1024;
+    const h = 768;
+    ctx.clearRect(0, 0, w, h);
 
     // High-frequency micro-tremble for 'Takut' (Scared)
     const trembleX = (desc.id === 'takut' ? Math.sin(this.time * 48) * 3.2 : 0) + faceParallaxX;
@@ -4463,20 +4541,25 @@ export class FiezelMochi {
    */
   renderBackAuraAndFire(fxType) {
     if (!this.auraBackCtx || !this.auraBackCanvas) return;
-    const ctx = this.auraBackCtx;
-    const W = 1024;
-    const H = 1024;
-    ctx.clearRect(0, 0, W, H);
-
     const desc = this._currentMoodDesc || this.resolveMoodDescriptor(this.mood);
     const isFurious = (desc && desc.id === 'sangat_marah') || (this.skinBlend && this.skinBlend.furious > 0.08) || fxType === 'anger_vein_demon';
     const isMarah = (desc && desc.id === 'marah') || (this.skinBlend && this.skinBlend.marah > 0.08) || fxType === 'anger_marah_fire';
 
     if (!isFurious && !isMarah) {
       if (this.auraBackMesh) this.auraBackMesh.visible = false;
-      if (this.auraBackTexture) this.auraBackTexture.needsUpdate = true;
+      if (!this._auraBackEmpty) {
+        this.auraBackCtx.clearRect(0, 0, 1024, 1024);
+        if (this.auraBackTexture) this.auraBackTexture.needsUpdate = true;
+        this._auraBackEmpty = true;
+      }
       return;
     }
+
+    this._auraBackEmpty = false;
+    const ctx = this.auraBackCtx;
+    const W = 1024;
+    const H = 1024;
+    ctx.clearRect(0, 0, W, H);
 
     if (this.auraBackMesh) this.auraBackMesh.visible = true;
 
@@ -4732,15 +4815,31 @@ export class FiezelMochi {
     this.renderBackAuraAndFire(fxType);
 
     if (!this.fxCtx || !this.fxCanvas) return;
+    if (!fxType || fxType === 'none') {
+      this._fxRenderSig = null;
+      if (this.fxOverlayMesh) this.fxOverlayMesh.visible = false;
+      if (!this._fxOverlayEmpty) {
+        this.fxCtx.clearRect(0, 0, 1024, 800);
+        if (this.fxTexture) this.fxTexture.needsUpdate = true;
+        this._fxOverlayEmpty = true;
+      }
+      return;
+    }
+
+    const fxHz = (fxType === 'shiver_lines' || fxType === 'anger_flame' || fxType === 'demon_aura_fire') ? 24 : 12;
+    const fxSig = fxType + ':' + Math.round(this.time * fxHz);
+    if (this._fxRenderSig === fxSig && !this._fxOverlayEmpty) {
+      if (this.fxOverlayMesh) this.fxOverlayMesh.visible = true;
+      return;
+    }
+    this._fxRenderSig = fxSig;
+
+    this._fxOverlayEmpty = false;
+    if (this.fxOverlayMesh) this.fxOverlayMesh.visible = true;
     const ctx = this.fxCtx;
     const w = 1024;
     const h = 800;
     ctx.clearRect(0, 0, w, h);
-
-    if (!fxType || fxType === 'none') {
-      if (this.fxTexture) this.fxTexture.needsUpdate = true;
-      return;
-    }
 
     const bob = Math.sin(this.time * 4.2) * 6;
     const pulse = 1.0 + Math.sin(this.time * 5.0) * 0.05;
@@ -5019,6 +5118,8 @@ export class FiezelMochi {
     sCtx.fill();
 
     const shadowTex = new THREE.CanvasTexture(canvas);
+    shadowTex.generateMipmaps = false;
+    shadowTex.minFilter = THREE.LinearFilter;
     const shadowGeo = new THREE.PlaneGeometry(3.2, 1.6);
     const shadowMat = new THREE.MeshBasicMaterial({
       map: shadowTex,
@@ -5096,6 +5197,8 @@ export class FiezelMochi {
     this.badgeCanvas.height = 320 * BADGE_SCALE;
     this.badgeCtx = this.badgeCanvas.getContext('2d');
     this.badgeTex = new THREE.CanvasTexture(this.badgeCanvas);
+    this.badgeTex.generateMipmaps = false;
+    this.badgeTex.minFilter = THREE.LinearFilter;
 
     const badgePlaneMat = new THREE.MeshBasicMaterial({
       map: this.badgeTex,
@@ -6757,8 +6860,9 @@ export class FiezelMochi {
     this.particles = [];
   }
 
-  spawnParticle() {
-    if (this.fx === 'stars' && this.particles.length < 12) {
+  _getParticleTexture(kind) {
+    if (kind === 'stars') {
+      if (this._sparkleTexture) return this._sparkleTexture;
       const canvas = document.createElement('canvas');
       canvas.width = 64;
       canvas.height = 64;
@@ -6771,9 +6875,36 @@ export class FiezelMochi {
       ctx.quadraticCurveTo(32, 32, 2, 32);
       ctx.quadraticCurveTo(32, 32, 32, 2);
       ctx.fill();
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.generateMipmaps = false;
+      tex.minFilter = THREE.LinearFilter;
+      this._sparkleTexture = tex;
+      return tex;
+    }
+    if (this._heartTexture) return this._heartTexture;
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#FF3866';
+    ctx.beginPath();
+    ctx.moveTo(32, 45);
+    ctx.bezierCurveTo(15, 26, 10, 10, 24, 10);
+    ctx.bezierCurveTo(32, 10, 32, 18, 32, 18);
+    ctx.bezierCurveTo(32, 18, 32, 10, 40, 10);
+    ctx.bezierCurveTo(54, 10, 49, 26, 32, 45);
+    ctx.fill();
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.generateMipmaps = false;
+    tex.minFilter = THREE.LinearFilter;
+    this._heartTexture = tex;
+    return tex;
+  }
 
+  spawnParticle() {
+    if (this.fx === 'stars' && this.particles.length < 12) {
       const mat = new THREE.SpriteMaterial({
-        map: new THREE.CanvasTexture(canvas),
+        map: this._getParticleTexture('stars'),
         transparent: true,
         opacity: 0.95
       });
@@ -6791,21 +6922,8 @@ export class FiezelMochi {
       });
 
     } else if (this.fx === 'hearts' && this.particles.length < 8) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 64;
-      canvas.height = 64;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#FF3866';
-      ctx.beginPath();
-      ctx.moveTo(32, 45);
-      ctx.bezierCurveTo(15, 26, 10, 10, 24, 10);
-      ctx.bezierCurveTo(32, 10, 32, 18, 32, 18);
-      ctx.bezierCurveTo(32, 18, 32, 10, 40, 10);
-      ctx.bezierCurveTo(54, 10, 49, 26, 32, 45);
-      ctx.fill();
-
       const mat = new THREE.SpriteMaterial({
-        map: new THREE.CanvasTexture(canvas),
+        map: this._getParticleTexture('hearts'),
         transparent: true,
         opacity: 0.95
       });
@@ -6838,6 +6956,7 @@ export class FiezelMochi {
 
       if (p.life <= 0) {
         this.particleGroup.remove(p.sprite);
+        if (p.sprite.material) { try { p.sprite.material.dispose(); } catch (_) {} }
         this.particles.splice(i, 1);
       }
     }
@@ -6853,6 +6972,8 @@ export class FiezelMochi {
     this.setMood(m);
     this._instantMood = false;
     this.syncMoodTargets(true);
+    this._faceRenderSig = null;
+    this._fxRenderSig = null;
     this.renderCurvedFaceAndFx();
   }
 
@@ -6945,11 +7066,13 @@ export class FiezelMochi {
       pink:   0xFF5096
     };
 
-    if (a && auraColors[a]) {
-      this.auraLight.color.setHex(auraColors[a]);
-      this.auraLight.intensity = 3.6;
-    } else {
-      this.auraLight.intensity = 0;
+    if (this.auraLight) {
+      if (a && auraColors[a]) {
+        this.auraLight.color.setHex(auraColors[a]);
+        this.auraLight.intensity = 3.6;
+      } else {
+        this.auraLight.intensity = 0;
+      }
     }
   }
 
@@ -7015,7 +7138,7 @@ export class FiezelMochi {
    */
   startEarTwitchLoop(intervalMs = 3200) {
     this.stopEarTwitchLoop();
-    this.earTwitchTimer = setInterval(() => {
+    this._earTwitchInterval = setInterval(() => {
       if (this.showEars && !this.isDestroyed && !this.isTalking && this.handState !== 'wave') {
         this.triggerEarWiggle(0.85);
       }
@@ -7023,9 +7146,9 @@ export class FiezelMochi {
   }
 
   stopEarTwitchLoop() {
-    if (this.earTwitchTimer) {
-      clearInterval(this.earTwitchTimer);
-      this.earTwitchTimer = null;
+    if (this._earTwitchInterval != null) {
+      clearInterval(this._earTwitchInterval);
+      this._earTwitchInterval = null;
     }
   }
 
@@ -7948,6 +8071,7 @@ export class FiezelMochi {
 
   start() {
     let lastTime = performance.now();
+    let lastRenderAt = 0;
     this.isVisible = true;
     this._running = true;
     if (this.container && typeof IntersectionObserver !== 'undefined' && !this._visibilityObserver) {
@@ -7962,26 +8086,50 @@ export class FiezelMochi {
       } catch (_) {}
     }
 
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function' && !this._onVisibilityChange) {
+      this._onVisibilityChange = () => {
+        if (!document.hidden && this._running && !this._paused && !this._contextLost && !this.rafId) {
+          if (this._sleepTimer) {
+            clearTimeout(this._sleepTimer);
+            this._sleepTimer = null;
+          }
+          lastTime = performance.now();
+          this.rafId = requestAnimationFrame(loop);
+        }
+      };
+      try { document.addEventListener('visibilitychange', this._onVisibilityChange); } catch (_) {}
+    }
+
     const loop = (now) => {
       this.rafId = null;
       if (!this._running) return;
       // Offscreen or parked by the companion pool: poll at 4 Hz instead of rendering at 60 fps.
       // The sleep timer is kept apart from rafId so destroy() can cancel each with its own API.
       // CRITICAL: NEVER throttle if Mochi is actively speaking, has audio attached, or has speech presence!
-      const mustStayAwake = this.isTalking || this.talkDuration > 0 || !!(this.wawaLipsync && this.wawaLipsync.analyser) || (this.mouthRig && this.mouthRig.presence > 0.05);
-      if (!mustStayAwake && (this.isVisible === false || this._paused)) {
+      const docHidden = typeof document !== 'undefined' && document.hidden === true;
+      const mustStayAwake = !docHidden && !this._contextLost && (this.isTalking || this.talkDuration > 0 || !!(this.wawaLipsync && this.wawaLipsync.analyser) || (this.mouthRig && this.mouthRig.presence > 0.05) || this.earWiggleTimer > 0);
+      if ((!mustStayAwake && (this.isVisible === false || this._paused || docHidden)) || this._contextLost) {
         this._sleepTimer = setTimeout(() => {
           this._sleepTimer = null;
           if (this._running) this.rafId = requestAnimationFrame(loop);
-        }, 250);
+        }, docHidden ? 600 : 250);
         return;
       }
+      // Pace purely idle animation on mobile/high-refresh screens when resting (~15fps compact card, ~30fps stage).
+      const hasBurst = !!(this.particles && this.particles.length) || this.isHovered || Math.abs(this.jumpY || 0) > 0.01 || Math.abs(this.jiggleAmplitude || 0) > 0.02 || this.handGestureTimer > 0;
+      const idleMinMs = (this.isCompactCard && !hasBurst) ? 64 : 30;
+      if (!mustStayAwake && lastRenderAt > 0 && (now - lastRenderAt) < idleMinMs) {
+        this.rafId = requestAnimationFrame(loop);
+        return;
+      }
+      lastRenderAt = now;
       const dt = Math.max(0, Math.min((now - lastTime) / 1000, 0.1));
       lastTime = now;
       this.update(dt);
       this.render();
       this.rafId = requestAnimationFrame(loop);
     };
+    this._loopFn = loop;
     this.rafId = requestAnimationFrame(loop);
   }
 
@@ -7991,12 +8139,23 @@ export class FiezelMochi {
 
   resume() {
     this._paused = false;
+    if (this._running && !this._contextLost && !this.rafId && typeof this._loopFn === 'function') {
+      if (this._sleepTimer) {
+        clearTimeout(this._sleepTimer);
+        this._sleepTimer = null;
+      }
+      this.rafId = requestAnimationFrame(this._loopFn);
+    }
   }
 
   destroy() {
     this._running = false;
     this.stopEarTwitchLoop();
     this.detachAudioAnalyser();
+    if (this._onVisibilityChange && typeof document !== 'undefined') {
+      try { document.removeEventListener('visibilitychange', this._onVisibilityChange); } catch (_) {}
+      this._onVisibilityChange = null;
+    }
     if (this._visibilityObserver) {
       try { this._visibilityObserver.disconnect(); } catch (_) {}
       this._visibilityObserver = null;
@@ -8028,10 +8187,22 @@ export class FiezelMochi {
         }
       });
     }
+    if (this._sparkleTexture) { try { this._sparkleTexture.dispose(); } catch (_) {} this._sparkleTexture = null; }
+    if (this._heartTexture) { try { this._heartTexture.dispose(); } catch (_) {} this._heartTexture = null; }
     if (this.renderer) {
-      if (this.renderer.domElement && this.renderer.domElement.parentNode) {
-        this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+      if (this.renderer.domElement) {
+        if (this._onContextLost) {
+          try { this.renderer.domElement.removeEventListener('webglcontextlost', this._onContextLost, false); } catch (_) {}
+        }
+        if (this._onContextRestored) {
+          try { this.renderer.domElement.removeEventListener('webglcontextrestored', this._onContextRestored, false); } catch (_) {}
+        }
+        if (this.renderer.domElement.parentNode) {
+          this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+        }
       }
+      this._onContextLost = null;
+      this._onContextRestored = null;
       // dispose() alone leaves the GL context alive until GC; iOS caps live contexts and keeps
       // their memory, so release it now.
       try { this.renderer.forceContextLoss(); } catch (_) {}

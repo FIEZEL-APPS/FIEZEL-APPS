@@ -842,27 +842,31 @@
   var ZONES = '.quiz-shell,.flash-face,.passage,#quizPassage,.passage-reading,.card-reading';
   var observer = null, pending = false, lexiconSource = null;
   function scan(appEl) {
-    pending = false;
-    if (!appEl) return;
-    var exam = isExamModeActive();
-    var pool = typeof lexiconSource === 'function' ? lexiconSource() : lexiconSource;
-    appEl.querySelectorAll(ZONES).forEach(function (zone) {
-      if (zone.classList.contains('quiz-shell')) {
-        var existingBar = zone.querySelector('.ja-quiz-display');
-        if (exam) {
-          if (existingBar && existingBar.parentNode) existingBar.parentNode.removeChild(existingBar);
-        } else if (!existingBar) {
-          var bar = root.document.createElement('div');
-          bar.className = 'ja-quiz-display';
-          bar.innerHTML = togglesMarkup();
-          var top = zone.querySelector('.quiz-topbar');
-          if (top && top.parentNode === zone) top.insertAdjacentElement('afterend', bar);
-          else zone.insertBefore(bar, zone.firstChild);
+    if (!appEl) { pending = false; return; }
+    try {
+      var exam = isExamModeActive();
+      var pool = typeof lexiconSource === 'function' ? lexiconSource() : lexiconSource;
+      appEl.querySelectorAll(ZONES).forEach(function (zone) {
+        if (zone.classList.contains('quiz-shell')) {
+          var existingBar = zone.querySelector('.ja-quiz-display');
+          if (exam) {
+            if (existingBar && existingBar.parentNode) existingBar.parentNode.removeChild(existingBar);
+          } else if (!existingBar) {
+            var bar = root.document.createElement('div');
+            bar.className = 'ja-quiz-display';
+            bar.innerHTML = togglesMarkup();
+            var top = zone.querySelector('.quiz-topbar');
+            if (top && top.parentNode === zone) top.insertAdjacentElement('afterend', bar);
+            else zone.insertBefore(bar, zone.firstChild);
+          }
         }
-      }
-      if (!exam) annotate(zone, pool);
-    });
-    applyPrefs();
+        if (!exam) annotate(zone, pool);
+      });
+      applyPrefs();
+    } finally {
+      try { if (observer && typeof observer.takeRecords === 'function') observer.takeRecords(); } catch (_) {}
+      pending = false;
+    }
   }
   function observe(appEl, source) {
     lexiconSource = source;

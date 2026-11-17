@@ -181,18 +181,26 @@
     if (anonReady) return true;
     var base = baseUrl();
     if (!base) return false;
+    var ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+    var timer = (ctrl && typeof setTimeout === 'function') ? setTimeout(function () { try { ctrl.abort(); } catch (_) {} }, 10000) : null;
     try {
-      var r = await fetch(base + API_PATHS.anon, {
+      var anonOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
         credentials: 'include',
         mode: 'cors',
         cache: 'no-store'
-      });
+      };
+      if (ctrl) anonOpts.signal = ctrl.signal;
+      var r = await fetch(base + API_PATHS.anon, anonOpts);
+      if (timer && typeof clearTimeout === 'function') clearTimeout(timer);
       anonReady = !!(r && (r.ok || r.status === 409));
       return anonReady;
-    } catch (_) { return false; }
+    } catch (_) {
+      if (timer && typeof clearTimeout === 'function') clearTimeout(timer);
+      return false;
+    }
   }
 
   /**
@@ -216,8 +224,12 @@
       opts.headers = { 'Content-Type': 'application/json' };
       opts.body = JSON.stringify(body || {});
     }
+    var ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+    var timer = (ctrl && typeof setTimeout === 'function') ? setTimeout(function () { try { ctrl.abort(); } catch (_) {} }, 12000) : null;
+    if (ctrl) opts.signal = ctrl.signal;
     try {
       var r = await fetch(base + path, opts);
+      if (timer && typeof clearTimeout === 'function') clearTimeout(timer);
       var data = null;
       try { data = await r.json(); } catch (_) { data = null; }
       if (r.ok) return { ok: true, status: r.status, data: data, error: '', message: '' };
@@ -238,6 +250,7 @@
         message: copyFor(code, data && data.retryAfter)
       };
     } catch (_) {
+      if (timer && typeof clearTimeout === 'function') clearTimeout(timer);
       return fail(online() ? 'unavailable' : 'offline');
     }
   }

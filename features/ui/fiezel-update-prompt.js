@@ -36,7 +36,7 @@
   if (typeof navigator === 'undefined' || typeof document === 'undefined') return;
   if (self.FiezelUpdatePrompt) return;
 
-  var CHECK_MS = 60 * 1000;
+  var CHECK_MS = 5 * 60 * 1000;
   var APP_VERSION = String(self.FIEZEL_VERSION || '');
   /* m025-492 — PENANDA YANG BENAR-BENAR MAJU ADALAH BUILD HALAMAN, BUKAN VERSI SEMVER.
    *
@@ -59,7 +59,7 @@
    * kartu identik seperti sebelumnya bila suatu saat semver benar-benar maju. Yang berubah
    * hanyalah pensinyal UTAMA. */
   var APP_BUILD = String(self.FIEZEL_PAGE_BUILD || '');
-  var started = false, reloadBound = false, shown = false, pendingWorker = null;
+  var started = false, reloadBound = false, shown = false, applying = false, pendingWorker = null, lastPassiveCheckAt = 0;
   /* Kandidat terakhir yang sudah DIKONFIRMASI lebih baru, supaya perayapan berkala (yang
    * sengaja dibuat ringan) tidak perlu membandingkan ulang setiap kali. */
   var bestBuild = null, bestRemote = '';
@@ -152,6 +152,7 @@
   }
   function later() {
     shown = false;
+    applying = false;
     hide();
     setSess('fiezel-update-later', '1');
     setSess('fiezel-update-later-time', String(Date.now()));
@@ -223,6 +224,9 @@
   }
 
   function apply() {
+    if (applying) return;
+    applying = true;
+    setTimeout(function () { applying = false; }, 45000);
     bindReload();
     var node = el(), btn = node && node.querySelector('#updateBannerApply');
     var laterBtn = node && node.querySelector('#updateBannerLater');
@@ -424,8 +428,7 @@
     }
     if (!worker && !force && remoteVersion && !newerKind(remoteVersion) && !bestBuild && !bestRemote) return false;
     if (shown) return true;
-    if (sess('fiezel-apply-update') === '1') {
-      dropSess('fiezel-apply-update');
+    if (applying || (sess('fiezel-apply-update') === '1' && !force)) {
       return false;
     }
     if (sess('fiezel-update-later') === '1') {
@@ -550,6 +553,9 @@
   function check(force) {
     if (!force && typeof navigator.onLine === 'boolean' && !navigator.onLine) return Promise.resolve(false);
     if (!navigator.serviceWorker) return Promise.resolve(false);
+    var now = Date.now();
+    if (!force && lastPassiveCheckAt && (now - lastPassiveCheckAt) < 15000) return Promise.resolve(false);
+    lastPassiveCheckAt = now;
     bindReload();
     return resolveRegistration().then(function (reg) {
       return fetchRemoteVersion().then(function (remote) {
@@ -582,7 +588,7 @@
            * `installing`/`installed` yang belum sempat menjadi waiting. */
           try {
             var cand = reg && reg.installing;
-            if (cand && cand !== navigator.serviceWorker.controller && cand.state && cand.state !== 'activated') {
+            if (cand && cand !== navigator.serviceWorker.controller && cand.state === 'installed') {
               return show(cand, remote);
             }
           } catch (_) {}
@@ -626,6 +632,7 @@
   function start() {
     if (started || !navigator.serviceWorker) return;
     started = true;
+    if (!applying && sess('fiezel-apply-update') === '1') dropSess('fiezel-apply-update');
     bindReload();
     var targetAfterApply = sess('fiezel-target-build');
     if (targetAfterApply) {

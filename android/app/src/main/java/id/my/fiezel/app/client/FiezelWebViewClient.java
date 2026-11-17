@@ -117,12 +117,18 @@ public class FiezelWebViewClient extends WebViewClient {
         );
 
         // Google Authentication & identity services domains must stay inside WebView
-        boolean isAuthDomain = host != null && (
-                host.toLowerCase().contains("google.") ||
-                host.toLowerCase().endsWith(".google") ||
-                host.toLowerCase().contains("gstatic.com") ||
-                host.toLowerCase().contains("googleusercontent.com") ||
-                host.toLowerCase().contains("googleapis.com")
+        String lowerAuthHost = host != null ? host.toLowerCase(java.util.Locale.ROOT) : "";
+        boolean isAuthDomain = !lowerAuthHost.isEmpty() && (
+                lowerAuthHost.equals("accounts.google.com") ||
+                lowerAuthHost.equals("google.com") ||
+                lowerAuthHost.endsWith(".google.com") ||
+                lowerAuthHost.equals("gstatic.com") ||
+                lowerAuthHost.endsWith(".gstatic.com") ||
+                lowerAuthHost.equals("googleusercontent.com") ||
+                lowerAuthHost.endsWith(".googleusercontent.com") ||
+                lowerAuthHost.equals("googleapis.com") ||
+                lowerAuthHost.endsWith(".googleapis.com") ||
+                lowerAuthHost.matches("^(?:[a-z0-9-]+\\.)*google\\.(?:co\\.[a-z]{2}|com\\.[a-z]{2}|[a-z]{2,3})$")
         );
 
         if (isInternal || isAuthDomain) {

@@ -301,7 +301,7 @@ const RAW_ROUTES = [
        kalimat." `copyKey` dikirim DI SAMPING `text`, bukan menggantikannya, supaya klien
        lama tetap bekerja apa adanya. Ia dikosongkan begitu model benar-benar menjawab,
        karena jawaban model bukan naskah kami dan tidak punya terjemahan. */
-    let text = 'Halo! Saya PAW, asisten belajar FIEZEL.';
+    let text = 'Halo! Saya Mochi, asisten belajar FIEZEL.';
     let copyKey = 'worker.chat.fallback';
     if (ctx.env.AI) {
       try {

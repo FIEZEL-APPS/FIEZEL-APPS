@@ -29,7 +29,14 @@
     try {
       var AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
-      var ctx = new AudioCtx();
+      var ctx = window.__fiezelSharedAudioContext;
+      if (!ctx || ctx.state === 'closed') {
+        ctx = new AudioCtx();
+        window.__fiezelSharedAudioContext = ctx;
+      }
+      if (ctx.state === 'suspended') {
+        try { ctx.resume(); } catch (_) {}
+      }
       var osc = ctx.createOscillator();
       var gain = ctx.createGain();
 
@@ -79,12 +86,16 @@
 
   function playZhSpeech(text) {
     try {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance(text);
-        u.lang = 'zh-CN';
-        u.rate = 0.88;
-        window.speechSynthesis.speak(u);
+      var clean = String(text || '').trim();
+      if (!clean) return;
+      if (window.FiezelVoiceSay && typeof window.FiezelVoiceSay.say === 'function') {
+        var res = window.FiezelVoiceSay.say(clean, { locale: 'zh-CN', speed: 0.88, contentType: 'word' });
+        if (res && typeof res.catch === 'function') res.catch(function () {});
+        return;
+      }
+      if (window.audio && typeof window.audio.play === 'function') {
+        var p = window.audio.play(clean, { locale: 'zh-CN', speed: 0.88 });
+        if (p && typeof p.catch === 'function') p.catch(function () {});
       }
     } catch (_) {}
   }

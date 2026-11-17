@@ -859,15 +859,19 @@
   function warmAudioContext() {
     var ctx = getAudioContext();
     if (!ctx) return null;
+    if (ctx.state === 'running' && ctx._fzWarmed) return ctx;
     if (ctx.state === 'suspended') {
       try { ctx.resume().catch(function () {}); } catch (_) {}
     }
-    // Buffer kosong 1 frame: memaksa graph audio 'hidup' di iOS/Safari dalam gesture.
-    try {
-      var b = ctx.createBuffer(1, 1, ctx.sampleRate);
-      var s = ctx.createBufferSource();
-      s.buffer = b; s.connect(ctx.destination); s.start(0);
-    } catch (_) {}
+    // Buffer kosong 1 frame: memaksa graph audio 'hidup' di iOS/Safari dalam gesture (sekali saja bila running).
+    if (!ctx._fzWarmed) {
+      try {
+        var b = ctx.createBuffer(1, 1, ctx.sampleRate);
+        var s = ctx.createBufferSource();
+        s.buffer = b; s.connect(ctx.destination); s.start(0);
+        if (ctx.state === 'running') ctx._fzWarmed = true;
+      } catch (_) {}
+    }
     return ctx;
   }
 
@@ -876,20 +880,23 @@
     if (!doc || _audioWarmBound) return;
     _audioWarmBound = true;
     var onGesture = function () {
+      var sosSurface = isSosSurfaceActiveInternal();
+      var callActive = !!(_activeCall && _activeCall.active);
+      var needsCtxWake = !!(_audioCtx && (!_audioCtx._fzWarmed || _audioCtx.state === 'suspended'));
+      if (!sosSurface && !callActive && !needsCtxWake) return;
       var ctx = warmAudioContext();
       try {
         if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
           ctx.resume().catch(function () {});
         }
-        if (isMochiEnabledFromStorage() && isSosSurfaceActiveInternal()) {
+        if (isMochiEnabledFromStorage() && sosSurface) {
           prewarmLiveSession(false);
-          if (hasSessionStorage() && !_hotWs && !(_activeCall && _activeCall.active)) {
+          if (hasSessionStorage() && !_hotWs && !callActive) {
             openHotSocket();
           }
         }
         if (
-          _activeCall &&
-          _activeCall.active &&
+          callActive &&
           !_micMuted &&
           (!_micStream ||
             typeof _micStream.getAudioTracks !== 'function' ||
@@ -914,9 +921,9 @@
         }
       } catch (_) {}
     };
-    doc.addEventListener('pointerdown', onGesture, true);
-    doc.addEventListener('touchstart', onGesture, true);
-    doc.addEventListener('click', onGesture, true);
+    doc.addEventListener('pointerdown', onGesture, { capture: true, passive: true });
+    doc.addEventListener('touchstart', onGesture, { capture: true, passive: true });
+    doc.addEventListener('click', onGesture, { capture: true, passive: true });
     doc.addEventListener('keydown', onGesture, true);
   }
 
@@ -4426,7 +4433,7 @@
                   var c = root && root.FiezelMochiCompanion;
                   var m = c && typeof c.getInstance === 'function' ? c.getInstance() : null;
                   if (m) {
-                    var d = (audioEl.duration && Number.isFinite(audioEl.duration)) ? audioEl.duration : Math.max(1.0, guidance.length * 0.12);
+                    var d = (decoded && decoded.duration && Number.isFinite(decoded.duration)) ? decoded.duration : Math.max(1.0, guidance.length * 0.12);
                     if (typeof m.speakPhrase === 'function') m.speakPhrase(guidance, loc === 'th' ? 'th' : 'id', d);
                     else if (typeof m.setTalking === 'function') m.setTalking(true);
                   }
@@ -4721,7 +4728,7 @@
       } catch (_) {}
       try {
         if (typeof root.pawStagePose === 'function') {
-          root.pawStagePose('.quiz-stage fiezel-mascot, .fz-paw-above fiezel-mascot, .quiz-shell fiezel-mascot', isGreet ? 'happy' : 'idle');
+          root.pawStagePose('.quiz-stage fiezel-mascot, .fz-paw-above fiezel-mascot, .quiz-shell fiezel-mascot', isGreet ? 'waving' : 'idle');
         }
       } catch (_) {}
     },

@@ -502,6 +502,8 @@ if(window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(d
   if(saved==='id')return;
   if(saved==='th'){location.replace('th/');return;}
   if(typeof fetch!=='function')return;
+  if(/^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/i.test(location.hostname||'')||location.protocol==='file:')return;
+  try{if(sessionStorage.getItem('fz_geo_checked_v1'))return;sessionStorage.setItem('fz_geo_checked_v1','1');}catch(_){}
   var ctrl=('AbortController' in window)?new AbortController():null;
   var timer=setTimeout(function(){try{ctrl&&ctrl.abort()}catch(_){}}, 2000);
   fetch('https://ipwho.is/?fields=success,country_code', ctrl?{signal:ctrl.signal}:{})
@@ -2376,7 +2378,7 @@ if(window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(d
 <script src="assets/mascot/fiezel-mascot.js?v=20260903-hula02" defer></script>
 <script src="site.js?v=20260903-hula02" defer></script>
 <script>
-if('serviceWorker' in navigator){
+if('serviceWorker' in navigator && !/\/website(\/|$)/.test(location.pathname)){
   window.addEventListener('load',function(){
     navigator.serviceWorker.register('app/sw.js',{scope:'/app/',updateViaCache:'none'}).catch(function(){});
   });

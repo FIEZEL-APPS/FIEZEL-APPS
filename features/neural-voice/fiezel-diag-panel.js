@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-796';
+  var DIAG_BUILD = 'm025-797';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -169,7 +169,7 @@
   function inspectCache(name) {
     return root.caches.open(name).then(function(cache){
       return cache.keys().then(function(requests){
-        var neural = requests.filter(function(r){ return r.url.indexOf('/vendor/kokoro-') !== -1; });
+        var neural = requests.filter(function(r){ return r.url.indexOf('/vendor/kokoro-') !== -1 || r.url.indexOf('/vendor/supertonic-') !== -1; });
         return neural.reduce(function(chain, request){
           return chain.then(function(list){
             return cache.match(request).then(function(response){

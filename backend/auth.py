@@ -267,9 +267,9 @@ async def logout(request: Request, response: Response):
     st = request.cookies.get("session_token")
     if st:
         await db.user_sessions.delete_many({"session_token": st})
-    response.delete_cookie("access_token", path="/")
-    response.delete_cookie("refresh_token", path="/")
-    response.delete_cookie("session_token", path="/")
+    response.delete_cookie("access_token", path="/", secure=True, samesite="none", httponly=True)
+    response.delete_cookie("refresh_token", path="/", secure=True, samesite="none", httponly=True)
+    response.delete_cookie("session_token", path="/", secure=True, samesite="none", httponly=True)
     return {"ok": True}
 
 

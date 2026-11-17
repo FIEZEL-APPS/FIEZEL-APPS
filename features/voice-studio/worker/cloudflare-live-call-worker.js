@@ -6,15 +6,20 @@
  * and provides a serverless HTTP POST fallback when WebSocket is unavailable.
  */
 
+function isAllowedOrigin(origin) {
+  if (!origin) return false;
+  return (
+    origin === 'https://fiezel.my.id' ||
+    origin === 'https://www.fiezel.my.id' ||
+    origin === 'https://api.fiezel.my.id' ||
+    origin === 'https://appassets.androidplatform.net' ||
+    /^http:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?$/.test(origin)
+  );
+}
+
 function getCorsHeaders(request) {
   const origin = request.headers.get('Origin') || '';
-  const isAllowed = (
-    origin.startsWith('https://fiezel.my.id') ||
-    origin.startsWith('https://www.fiezel.my.id') ||
-    origin.startsWith('https://api.fiezel.my.id') ||
-    origin.startsWith('http://localhost') ||
-    origin.startsWith('http://127.0.0.1')
-  );
+  const isAllowed = isAllowedOrigin(origin);
 
   return {
     'Access-Control-Allow-Origin': isAllowed ? origin : 'https://fiezel.my.id',
@@ -39,9 +44,9 @@ export default {
       url.pathname.endsWith('/api/live-call') ||
       url.pathname.endsWith('/ws/live-call')
     ) {
-      // Validasi origin WebSocket agar tidak dibajak situs lain
+      // Validasi origin WebSocket secara ketat (tolak Origin kosong atau asing agar tidak dibajak)
       const origin = request.headers.get('Origin') || '';
-      if (origin && !origin.startsWith('https://fiezel.my.id') && !origin.startsWith('https://www.fiezel.my.id') && !origin.startsWith('http://localhost') && !origin.startsWith('http://127.0.0.1')) {
+      if (!isAllowedOrigin(origin)) {
         return new Response('Akses WebSocket ditolak: Origin tidak sah.', { status: 403 });
       }
 
@@ -124,7 +129,7 @@ export default {
             parts: [
               {
                 text: `You are ${personaName}, an encouraging, witty language speaking coach at FIEZEL. Scenario: "${scenarioTitle}". Speak naturally in ${
-                  targetLang === 'ja' ? 'Japanese' : 'English'
+                  targetLang === 'ja' ? 'Japanese' : targetLang === 'zh' ? 'Mandarin Chinese' : 'English'
                 }, keep responses concise (1-2 sentences), and end with a clear follow-up question.
 [FIEZEL ECOSYSTEM & WHY IT BEATS CHATGPT VOICE]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh; powered by Braincore Engine; mascot is Mochi the Daifuku cat. ChatGPT Voice has the Interruption Trap (blind audio, 70% time wasted on translation interruptions). FIEZEL has Zero-Friction Flow with instant subtitles, Furigana & Romaji phonetics, and 3 beginner answer hints with audio preview so 100% of study time trains vocal muscles! If asked about Fiezel or ChatGPT vs Fiezel, explain this proudly!`,
               },

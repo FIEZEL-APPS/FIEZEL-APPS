@@ -923,9 +923,8 @@
         var n = added[j];
         if (n.nodeType !== 1) continue;
         if (n.localName === 'fiezel-mascot' ||
-            (n.firstElementChild && n.querySelector('fiezel-mascot')) ||
             (n.classList && n.classList.contains('fz-vissol-mascot-wrap')) ||
-            (n.firstElementChild && n.querySelector('.fz-vissol-mascot-wrap'))) return true;
+            (n.firstElementChild && n.querySelector('fiezel-mascot, .fz-vissol-mascot-wrap'))) return true;
       }
     }
     return false;
@@ -946,6 +945,7 @@
       // It runs before paint, so a re-rendered question never flashes the 2D rig first.
       try {
         var mo = new MutationObserver(function (mutations) {
+          if (pool._manuallyPaused) return;
           if (needsRescan(mutations)) scanAndAttach();
         });
         mo.observe(global.document.body || global.document.documentElement, {
@@ -956,7 +956,9 @@
 
       // Global custom element defined hook
       if (global.customElements && typeof global.customElements.whenDefined === 'function') {
-        global.customElements.whenDefined('fiezel-mascot').then(scanAndAttach).catch(function () {});
+        global.customElements.whenDefined('fiezel-mascot').then(function () {
+          if (!pool._manuallyPaused) scanAndAttach();
+        }).catch(function () {});
       }
     }
 
@@ -964,16 +966,18 @@
       var started = false;
       var checkTimer = null;
       var fallbackTimer = null;
+      var safetyTimer = null;
       function onceStart() {
         if (started) return;
         started = true;
-        if (checkTimer) clearInterval(checkTimer);
-        if (fallbackTimer) clearTimeout(fallbackTimer);
+        if (checkTimer) { clearInterval(checkTimer); checkTimer = null; }
+        if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+        if (safetyTimer) { clearInterval(safetyTimer); safetyTimer = null; }
         start();
       }
       checkTimer = setInterval(function () {
         if (!isSplashActive()) onceStart();
-      }, 100);
+      }, 120);
       try {
         global.addEventListener('fiezel:splash-dismissed', onceStart, { once: true });
       } catch (_) {}
@@ -981,12 +985,10 @@
         if (!isSplashActive()) {
           onceStart();
         } else {
-          var safety = setInterval(function () {
-            if (!isSplashActive()) {
-              clearInterval(safety);
-              onceStart();
-            }
-          }, 200);
+          if (checkTimer) { clearInterval(checkTimer); checkTimer = null; }
+          safetyTimer = setInterval(function () {
+            if (!isSplashActive()) onceStart();
+          }, 250);
         }
       }, 5000);
     } else {
@@ -1004,7 +1006,8 @@
   if (typeof global.setInterval !== 'undefined') {
     global.setInterval(function () {
       try {
-        if (!pool.mochi || !pool.host) return;
+        if (pool._manuallyPaused || !pool.mochi || !pool.host || pool.mochi._paused) return;
+        if (global.document && global.document.hidden) return;
         var isSpeaking = false;
         if (typeof global.voiceIsSpeaking === 'function') isSpeaking = global.voiceIsSpeaking();
         else if (global.FiezelSpeechBridge && global.FiezelSpeechBridge.speaking && global.FiezelSpeechBridge.speaking()) isSpeaking = true;
@@ -1017,13 +1020,22 @@
           }
         }
       } catch (_) {}
-    }, 100);
+    }, 180);
   }
 
   global.FiezelMochiCompanion = {
     scan: scanAndAttach,
     attach: attachMochi,
     getInstance: function () { return pool.mochi; },
+    pause: function () {
+      pool._manuallyPaused = true;
+      try { if (pool.mochi && typeof pool.mochi.pause === 'function') pool.mochi.pause(); } catch (_) {}
+    },
+    resume: function () {
+      pool._manuallyPaused = false;
+      try { if (pool.mochi && typeof pool.mochi.resume === 'function') pool.mochi.resume(); } catch (_) {}
+      try { scanAndAttach(); } catch (_) {}
+    },
     setAccessory: function (acc) { if (pool.mochi && typeof pool.mochi.setAccessory === 'function') pool.mochi.setAccessory(acc); },
     setThinking: function (th) { if (pool.mochi && typeof pool.mochi.setThinking === 'function') pool.mochi.setThinking(th); },
     setTalking: function (tk, dur) { if (pool.mochi && typeof pool.mochi.setTalking === 'function') pool.mochi.setTalking(tk, dur); },

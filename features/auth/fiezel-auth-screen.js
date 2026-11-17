@@ -95,10 +95,14 @@
     var w = env || root, base = '';
     try { base = String(((w.FIEZEL_CF_CONFIG || {}).base) || '').trim().replace(/\/$/, ''); } catch (_) {}
     if (!base || typeof w.fetch !== 'function') return Promise.resolve(null);
-    return w.fetch(base + '/api/auth/session', { credentials: 'include', mode: 'cors', cache: 'no-store' })
-      .then(function (r) { return r && r.ok ? r.json() : null; })
+    var ctrl = (typeof w.AbortController === 'function') ? new w.AbortController() : null;
+    var timer = (ctrl && typeof w.setTimeout === 'function') ? w.setTimeout(function () { try { ctrl.abort(); } catch (_) {} }, 5000) : null;
+    var fetchOpts = { credentials: 'include', mode: 'cors', cache: 'no-store' };
+    if (ctrl) fetchOpts.signal = ctrl.signal;
+    return w.fetch(base + '/api/auth/session', fetchOpts)
+      .then(function (r) { if (timer && typeof w.clearTimeout === 'function') w.clearTimeout(timer); return r && r.ok ? r.json() : null; })
       .then(function (d) { return d && d.ok === true && typeof d.signedIn === 'boolean' ? d : null; })
-      .catch(function () { return null; });
+      .catch(function () { if (timer && typeof w.clearTimeout === 'function') w.clearTimeout(timer); return null; });
   }
 
   /** Kode KelasKu: FZ- + enam karakter. Bentuk saja — kebenarannya urusan server/guru. */
@@ -342,7 +346,7 @@
     host.setAttribute('aria-modal', 'true');
     host.setAttribute('data-testid', 'auth-screen');
     doc.body.appendChild(host);
-    try { doc.body.classList.add('fz-auth-open'); } catch (_) {}
+    try { doc.body.classList.add('fz-auth-open'); doc.documentElement.classList.add('fz-auth-open'); } catch (_) {}
     var closed = false, draft = {};
 
     function keepDraft() {
@@ -371,7 +375,7 @@
       closed = true;
       saveSession(env, detail);
       try { host.classList.add('is-leaving'); } catch (_) {}
-      try { doc.body.classList.remove('fz-auth-open'); } catch (_) {}
+      try { doc.documentElement.classList.remove('fz-auth-open'); doc.body.classList.remove('fz-auth-open'); } catch (_) {}
       (env.setTimeout || setTimeout)(function () { try { if (host.parentNode) host.parentNode.removeChild(host); } catch (_) {} }, 240);
       if (typeof o.onDone === 'function') { try { o.onDone(detail); } catch (_) {} }
     }
@@ -518,7 +522,7 @@
     return {
       shown: true,
       screen: function () { return ui.screen; },
-      close: function () { if (!closed) { closed = true; try { host.parentNode.removeChild(host); doc.body.classList.remove('fz-auth-open'); } catch (_) {} } }
+      close: function () { if (!closed) { closed = true; try { host.parentNode.removeChild(host); doc.documentElement.classList.remove('fz-auth-open'); doc.body.classList.remove('fz-auth-open'); } catch (_) {} } }
     };
   }
 

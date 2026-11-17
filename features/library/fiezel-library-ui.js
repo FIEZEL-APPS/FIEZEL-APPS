@@ -571,6 +571,7 @@
     stopNarration();
     closeTranslation();
     session.close();
+    try { doc.body && doc.body.classList && doc.body.classList.remove('has-library-reader'); doc.documentElement && doc.documentElement.classList && doc.documentElement.classList.remove('has-library-reader'); } catch (_) {}
     var node = mount();
     if (!node) return;
     node.innerHTML = shelfMarkup();
@@ -583,6 +584,7 @@
   function renderReader() {
     var node = mount();
     if (!node) return;
+    try { doc.body && doc.body.classList && doc.body.classList.add('has-library-reader'); doc.documentElement && doc.documentElement.classList && doc.documentElement.classList.add('has-library-reader'); } catch (_) {}
     node.innerHTML = readerMarkup();
     node.querySelectorAll('[data-sentence]').forEach(function (button) {
       button.addEventListener('click', function () { onSentence(Number(button.dataset.sentence)); });

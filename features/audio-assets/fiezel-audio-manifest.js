@@ -196,11 +196,16 @@
     state.assetBaseUrl = ''; state.url = DEFAULT_URL;
   }
 
-  // m025-472: hangatkan manifest di latar belakang seketika (0ms) di lingkungan peramban
+  // Defer background 2.2MB manifest warmup to idle time; resolve() still calls load() immediately on demand.
   if (typeof root !== 'undefined' && root.document) {
-    setTimeout(function () {
+    var scheduleWarm = function () {
       try { load().catch(function () {}); } catch (_) {}
-    }, 0);
+    };
+    if (typeof root.requestIdleCallback === 'function') {
+      root.requestIdleCallback(scheduleWarm, { timeout: 4000 });
+    } else {
+      setTimeout(scheduleWarm, 3500);
+    }
   }
 
   return Object.freeze({

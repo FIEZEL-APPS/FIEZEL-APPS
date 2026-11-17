@@ -125,9 +125,8 @@
   function playPearsonBeep() {
     if (typeof window !== 'undefined') {
       try {
-        var AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) {
-          var ctx = new AudioCtx();
+        var ctx = getPteAudioContext();
+        if (ctx) {
           var osc = ctx.createOscillator();
           var gain = ctx.createGain();
           osc.type = 'sine';
@@ -176,13 +175,90 @@
   }
 
   var isPteInitialized = false;
+  var BANK_FILES = {
+    ra: { file: 'content/pte/pte-read-aloud.json', items: true },
+    rs: { file: 'content/pte/pte-repeat-sentence.json', items: true },
+    di: { file: 'content/pte/pte-describe-image.json', items: true },
+    wfd: { file: 'content/pte/pte-write-dictation.json', items: true },
+    rwFib: { file: 'content/pte/pte-reading-fib.json', items: true },
+    rDd: { file: 'content/pte/pte-reading-drag-drop.json', items: true },
+    ro: { file: 'content/pte/pte-reorder-paragraphs.json', items: true },
+    swt: { file: 'content/pte/pte-summarize-written-text.json', items: true },
+    essay: { file: 'content/pte/pte-essay-writing.json', items: true },
+    rl: { file: 'content/pte/pte-retell-lecture.json', items: true },
+    sst: { file: 'content/pte/pte-summarize-spoken-text.json', items: true },
+    lf: { file: 'content/pte/pte-listening-fib.json', items: true },
+    hiw: { file: 'content/pte/pte-highlight-incorrect-words.json', items: true },
+    templates: { file: 'content/pte/pte-templates.json', items: false },
+    roadmap: { file: 'content/pte/pte-daily-roadmap.json', items: false }
+  };
+  var SECTION_BANKS = {
+    plan: ['roadmap', 'ra'],
+    speaking: ['ra', 'rs', 'di', 'rl', 'templates'],
+    writing: ['swt', 'essay', 'templates'],
+    reading: ['rwFib', 'rDd', 'ro'],
+    listening: ['sst', 'lf', 'hiw', 'wfd']
+  };
+  var bankInflight = {};
+  var bankBgScheduled = false;
+
+  function bankLoaded(key) {
+    var def = BANK_FILES[key];
+    if (!def) return true;
+    return def.items ? (Array.isArray(BANKS[key]) && BANKS[key].length > 0) : !!BANKS[key];
+  }
+
+  function loadSingleBank(key) {
+    var def = BANK_FILES[key];
+    if (!def || bankLoaded(key)) return Promise.resolve();
+    if (bankInflight[key]) return bankInflight[key];
+    bankInflight[key] = fetch(def.file)
+      .then(function (r) { return r && r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        BANKS[key] = def.items ? (d.items || []) : d;
+      })
+      .catch(function () {})
+      .then(function () { bankInflight[key] = null; });
+    return bankInflight[key];
+  }
+
+  function resolveScopeKeys(scope) {
+    if (Array.isArray(scope)) return scope;
+    if (typeof scope === 'string') {
+      if (SECTION_BANKS[scope]) return SECTION_BANKS[scope];
+      if (BANK_FILES[scope]) return scope === 'di' ? ['di', 'templates'] : [scope];
+    }
+    var keys = SECTION_BANKS[state.section];
+    if (keys && BANK_FILES[state.mode] && keys.indexOf(state.mode) === -1) return keys.concat([state.mode]);
+    return keys || SECTION_BANKS.plan;
+  }
+
+  function scheduleRemainingBanks() {
+    if (bankBgScheduled || typeof fetch !== 'function') return;
+    bankBgScheduled = true;
+    var runBg = function () {
+      Object.keys(BANK_FILES).forEach(function (k) { loadSingleBank(k); });
+    };
+    if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(runBg, { timeout: 1500 });
+    } else {
+      setTimeout(runBg, 120);
+    }
+  }
 
   /**
-   * Ensure all 15 content banks are populated in browser via fetch if empty.
+   * Ensure required PTE content banks are populated in browser (section/mode scoped, with idle background warmup).
    */
-  function ensureBanksLoaded(callback) {
-    if (BANKS.ra.length > 0 && BANKS.rwFib.length > 0 && BANKS.swt.length > 0 && BANKS.sst.length > 0) {
+  function ensureBanksLoaded(scopeOrCallback, maybeCallback) {
+    var hasScope = typeof scopeOrCallback !== 'function';
+    var callback = hasScope ? maybeCallback : scopeOrCallback;
+    var keys = hasScope ? resolveScopeKeys(scopeOrCallback) : resolveScopeKeys(null);
+    var missing = keys.filter(function (k) { return !bankLoaded(k); });
+
+    if (missing.length === 0) {
       if (typeof callback === 'function') callback();
+      scheduleRemainingBanks();
       return;
     }
 
@@ -191,30 +267,13 @@
       return;
     }
 
-    var promises = [
-      fetch('content/pte/pte-read-aloud.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.ra = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-repeat-sentence.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.rs = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-describe-image.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.di = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-write-dictation.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.wfd = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-reading-fib.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.rwFib = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-reading-drag-drop.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.rDd = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-reorder-paragraphs.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.ro = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-summarize-written-text.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.swt = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-essay-writing.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.essay = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-retell-lecture.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.rl = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-summarize-spoken-text.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.sst = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-listening-fib.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.lf = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-highlight-incorrect-words.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.hiw = d.items || []; }).catch(function () {}),
-      fetch('content/pte/pte-templates.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.templates = d; }).catch(function () {}),
-      fetch('content/pte/pte-daily-roadmap.json').then(function (r) { return r.json(); }).then(function (d) { BANKS.roadmap = d; }).catch(function () {})
-    ];
-
-    Promise.all(promises).then(function () {
+    Promise.all(missing.map(loadSingleBank)).then(function () {
       if (!isPteInitialized) {
         isPteInitialized = true;
         initCurrentItemState();
       }
       if (typeof callback === 'function') callback();
+      scheduleRemainingBanks();
     });
   }
 
@@ -1321,6 +1380,17 @@
     };
     state.mode = defaultMode[secId] || 'ra';
     state.itemIndex = 0;
+    if (!bankLoaded(state.mode)) {
+      initCurrentItemState();
+      renderHub();
+      ensureBanksLoaded(secId, function () {
+        if (state.section === secId) {
+          initCurrentItemState();
+          renderHub();
+        }
+      });
+      return;
+    }
     initCurrentItemState();
     renderHub();
   }
@@ -1328,6 +1398,17 @@
   function switchMode(m) {
     state.mode = m;
     state.itemIndex = 0;
+    if (!bankLoaded(m) || (m === 'di' && !bankLoaded('templates'))) {
+      initCurrentItemState();
+      renderHub();
+      ensureBanksLoaded(m, function () {
+        if (state.mode === m) {
+          initCurrentItemState();
+          renderHub();
+        }
+      });
+      return;
+    }
     initCurrentItemState();
     renderHub();
   }
@@ -1382,6 +1463,17 @@
     state.section = targetSec;
     state.mode = mode;
     state.itemIndex = 0;
+    if (!bankLoaded(mode) || (mode === 'di' && !bankLoaded('templates'))) {
+      initCurrentItemState();
+      renderHub();
+      ensureBanksLoaded(mode, function () {
+        if (state.mode === mode) {
+          initCurrentItemState();
+          renderHub();
+        }
+      });
+      return;
+    }
     initCurrentItemState();
     renderHub();
   }
@@ -1474,9 +1566,15 @@
 
   function getPteAudioContext() {
     if (!pteAudioCtx || pteAudioCtx.state === 'closed') {
-      var AudioCtx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) || null;
-      if (!AudioCtx) return null;
-      pteAudioCtx = new AudioCtx({ sampleRate: 24000 });
+      var shared = (typeof window !== 'undefined' && window.__fiezelSharedAudioContext && window.__fiezelSharedAudioContext.state !== 'closed') ? window.__fiezelSharedAudioContext : null;
+      if (shared) {
+        pteAudioCtx = shared;
+      } else {
+        var AudioCtx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) || null;
+        if (!AudioCtx) return null;
+        pteAudioCtx = new AudioCtx();
+        if (typeof window !== 'undefined') window.__fiezelSharedAudioContext = pteAudioCtx;
+      }
       pteNextAudioPlayTime = pteAudioCtx.currentTime;
     }
     if (pteAudioCtx.state === 'suspended') {
@@ -2458,7 +2556,6 @@
   // --- PTE Hardware Mic Bridge & Gemini Multimodal Live ASR ---
   var pteHandyVad = new HandyHumanVad({ threshold: 0.45, prefillFrames: 15, hangoverFrames: 10, onsetFrames: 2 });
   var pteMicStream = null;
-  var pteAudioCtx = null;
   var pteMediaSrcNode = null;
   var pteScriptProcessor = null;
   var pteWorkletNode = null;
@@ -4015,8 +4112,30 @@
     }
   }
 
+  function unmount() {
+    try { clearTimer(); } catch (_) {}
+    try { disarmSilenceWatchdog(); } catch (_) {}
+    try { stopPteAudio(); } catch (_) {}
+    try { closePteAsrWsImmediate(); } catch (_) {}
+    try { stopPteMicBridge(); } catch (_) {}
+    if (state.speechRecognizer) {
+      try {
+        state.speechRecognizer.onresult = null;
+        state.speechRecognizer.onerror = null;
+        state.speechRecognizer.onend = null;
+        if (typeof state.speechRecognizer.abort === 'function') state.speechRecognizer.abort();
+        else if (typeof state.speechRecognizer.stop === 'function') state.speechRecognizer.stop();
+      } catch (_) {}
+      state.speechRecognizer = null;
+    }
+    state.timerState = 'idle';
+    state.isAudioPlaying = false;
+    state.isListening = false;
+  }
+
   return {
     mount: mount,
+    unmount: unmount,
     switchSection: switchSection,
     switchMode: switchMode,
     nextItem: nextItem,

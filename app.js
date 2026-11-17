@@ -1112,11 +1112,11 @@ function targetLangOfRaw(raw){
   let stored=null;
   try{stored=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
   const v=stored||(raw&&raw.preferences?raw.preferences.targetLang:'');
-  try{return self.FiezelTargetLanguage?.normalize?.(v)||'en'}catch(_){return v==='ja'?'ja':'en'}
+  try{return self.FiezelTargetLanguage?.normalize?.(v)||'en'}catch(_){return v==='ja'?'ja':v==='zh'?'zh':'en'}
 }
 function targetLangsKnown(){
   try{const l=self.FiezelTargetLanguage?.all?.();if(Array.isArray(l)&&l.length)return l}catch(_){}
-  return ['en','ja'];
+  return ['en','ja','zh'];
 }
 function progressStorageKey(baseKey,lang){
   try{return self.FiezelTargetLanguage?.key?.(String(baseKey||''),lang)??String(baseKey||'')}
@@ -2005,7 +2005,7 @@ function saveFlushWrite(){
       let stored=null;
       try{stored=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
       const rawLang=stored||state?.preferences?.targetLang||'en';
-      try{return self.FiezelTargetLanguage?.normalize?.(rawLang)||'en'}catch(_){return rawLang==='ja'?'ja':'en'}
+      try{return self.FiezelTargetLanguage?.normalize?.(rawLang)||'en'}catch(_){return rawLang==='ja'?'ja':rawLang==='zh'?'zh':'en'}
     }());
     if(state&&state.preferences&&state.preferences.targetLang!==lang){
       state.preferences={...state.preferences,targetLang:lang};
@@ -2046,7 +2046,7 @@ function scheduleSafetySnapshot(json){
     try{
       if(studentProgressEvidenceScore(state)>0){
         localStorage.setItem(SAFETY_SNAPSHOT_KEY,typeof json==='string'?json:JSON.stringify(state));
-        const targetLang=(function(){try{return self.FiezelTargetLanguage?.normalize?.(state?.preferences?.targetLang)||'en'}catch(_){return state?.preferences?.targetLang==='ja'?'ja':'en'}}());
+        const targetLang=(function(){try{return self.FiezelTargetLanguage?.normalize?.(state?.preferences?.targetLang)||'en'}catch(_){return state?.preferences?.targetLang==='ja'?'ja':state?.preferences?.targetLang==='zh'?'zh':'en'}}());
         if(targetLang!=='en'){
           localStorage.setItem(progressStorageKey(SAFETY_SNAPSHOT_KEY,targetLang),JSON.stringify(pickProgress(state)));
         }
@@ -2336,7 +2336,7 @@ function abandonActiveSession(reason='exit'){
      menutup gerbang lesson itu 24 jam. Membuka lalu keluar sebelum menjawab tetap gratis. */
   if(String(a.type||'')==='level-exam'&&answered>0){try{recordSkipExamFail(state,String(a.levelScope||''),{score:0,total:Number(a.planned||LEVEL_EXAM_SIZE),accuracy:0,weakSkill:'ujian ditinggalkan sebelum selesai',noCooldown:!!a.isMoshi})}catch(_){}}
   if(String(a.type||'')==='grammar-skip'&&answered>0&&a.skipGateSkill){try{const g=state.grammar[a.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};g.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[a.skipGateSkill]=g}catch(_){}}
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();try{queueBrainSyncFlush()}catch(_){}/* Audit F2 */if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome,now);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/return true
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.quizActive=false;state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();try{queueBrainSyncFlush()}catch(_){}/* Audit F2 */if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome,now);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/return true
 }
 function completeActiveSession(cfg,score,total){
   try{['placement','level_exam','reading_exam'].forEach(k=>examLockEnd(k))}catch(_){}
@@ -2887,13 +2887,20 @@ function identityEvidenceMirror(event,nowMs=Date.now()){
  * menyimpan, atau mengirim `sub` sendiri — cookie fz_id adalah HttpOnly, jadi kode ini
  * secara harfiah tidak bisa melihat isinya.
  */
+let __identityAnonInflight=null,__identityAnonFailAt=0;
 function identityEvidenceEnsureAnon(){
   if(__identityAnonReady)return Promise.resolve(true);
+  try{if(typeof navigator!=='undefined'&&navigator.onLine===false)return Promise.resolve(false)}catch(_){}
+  if(__identityAnonInflight)return __identityAnonInflight;
+  const now=Date.now();
+  if(__identityAnonFailAt&&(now-__identityAnonFailAt)<15000)return Promise.resolve(false);
   const url=String(identityEvidenceCfg()?.anonEndpoint||(CORE_WORKER_URL?CORE_WORKER_URL+'/api/auth/anon':''));
   if(!url)return Promise.resolve(false);
-  return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',credentials:'include',mode:'cors',cache:'no-store'})
-    .then(r=>{__identityAnonReady=!!(r&&(r.ok||r.status===409));return __identityAnonReady})
-    .catch(()=>false);
+  __identityAnonInflight=fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',credentials:'include',mode:'cors',cache:'no-store'})
+    .then(r=>{__identityAnonReady=!!(r&&(r.ok||r.status===409));if(!__identityAnonReady)__identityAnonFailAt=Date.now();else __identityAnonFailAt=0;return __identityAnonReady})
+    .catch(()=>{__identityAnonFailAt=Date.now();return false})
+    .finally(()=>{__identityAnonInflight=null});
+  return __identityAnonInflight;
 }
 /**
  * Flush antrean lane D. Mode 'local' TIDAK PERNAH mengirim (antre saja) — jalur untuk
@@ -6591,40 +6598,68 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
      try{self.FiezelOfflineVault.saveBank(f,bankData)}catch(_){}
    }
    return bankData;
- };const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster,_misconceptions,grammarVocabMapRaw;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM,_misconceptions,grammarVocabMapRaw]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root),optional('content/grammar-vocab-map-v1.json',null)]);if(grammarMaster&&Array.isArray(grammarMaster.templates))self.__grammarTemplatesCache=grammarMaster.templates;if(grammarVocabMapRaw&&self.FiezelGrammarVocabBridge?.setGrammarVocabMap)self.FiezelGrammarVocabBridge.setGrammarVocabMap(grammarVocabMapRaw);GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
-  // dipakai Grammar Hub. Sebelumnya Core Brain hanya punya graph keluarga - lima keluarga
-  // bahkan hilang darinya - jadi diagnosis akar masalah tidak pernah bisa menunjuk lesson.
+ };const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};
+  const targetLangAtBoot=activeTargetLang();
+  const fetchEnglishBundle=async()=>{
+    const[vocab,read,gm,curr,writing,exam]=await Promise.all([
+      ...DATA.map(get),
+      optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),
+      optional('writing-prompts-v1.json',null),
+      optional('reading-exam-v1.json',null)
+    ]);
+    let outVocab=vocab,outRead=read,outGm=gm;
+    if(CONTENT_CANARY){
+      const canonical={version:APP_VERSION,vocabulary:outVocab,reading:outRead,grammar:outGm},now=Date.now();
+      contentPromotionRuntime=CONTENT_PROMOTION?CONTENT_PROMOTION.evaluate(CONTENT_CANARY_CONFIG,state.contentCanaryMeta,now):contentPromotionRuntime;
+      if(CONTENT_CANARY_CONFIG?.enabled&&CONTENT_CANARY_CONFIG?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordPromotionDecision(state.contentCanaryMeta,CONTENT_CANARY_CONFIG.canaryId,contentPromotionRuntime,new Date(now).toISOString());
+      contentCanaryRuntime=await CONTENT_CANARY.prepare(canonical,CONTENT_CANARY_CONFIG,learnerName(),state.contentCanaryMeta,now,contentPromotionRuntime);
+      state.contentCanaryMeta=contentCanaryRuntime.evidence||state.contentCanaryMeta;
+      outVocab=contentCanaryRuntime.dataset.vocabulary;outRead=contentCanaryRuntime.dataset.reading;outGm=contentCanaryRuntime.dataset.grammar;save();
+    }
+    return{vocab:outVocab,read:outRead,gm:outGm,curr,writing,exam};
+  };
+  const fetchLangFiles=async(langPrefix)=>{
+    const[bank,graph,vocab,read,write]=await Promise.all([
+      optional(`content/${langPrefix}/grammar-templates-${langPrefix}.json`,null),
+      optional(`content/${langPrefix}/family-graph-${langPrefix}.json`,null),
+      optional(`content/${langPrefix}/vocabulary-master-${langPrefix}.json`,null),
+      optional(`content/${langPrefix}/reading-bank-${langPrefix}.json`,null),
+      optional(`content/${langPrefix}/writing-prompts-${langPrefix}.json`,null)
+    ]);
+    return{bank,graph,vocab,read,write};
+  };
+  let grammarMaster={templates:[]},_misconceptions,grammarVocabMapRaw,zhBundle=null,jaBundle=null;
+  if(targetLangAtBoot==='en'){
+    const[enBundle,misc,gvMap]=await Promise.all([
+      fetchEnglishBundle(),
+      loadMisconceptionDiagnoses(root),
+      optional('content/grammar-vocab-map-v1.json',null)
+    ]);
+    V=enBundle.vocab;R=enBundle.read;grammarMaster=enBundle.gm;GRAMMAR_CURRICULUM=enBundle.curr;WRITING_BANK=enBundle.writing;READING_EXAM=enBundle.exam;_misconceptions=misc;grammarVocabMapRaw=gvMap;
+  }else{
+    V=[];R=[];GRAMMAR_CURRICULUM={schema:'fiezel-grammar-curriculum-v1',lessons:[]};WRITING_BANK=null;READING_EXAM=null;
+    const[langBundle,misc,gvMap]=await Promise.all([
+      fetchLangFiles(targetLangAtBoot==='zh'?'zh':'ja'),
+      loadMisconceptionDiagnoses(root),
+      optional('content/grammar-vocab-map-v1.json',null)
+    ]);
+    _misconceptions=misc;grammarVocabMapRaw=gvMap;
+    if(targetLangAtBoot==='zh')zhBundle=langBundle;else jaBundle=langBundle;
+  }
+  if(grammarMaster&&Array.isArray(grammarMaster.templates))self.__grammarTemplatesCache=grammarMaster.templates;
+  if(grammarVocabMapRaw&&self.FiezelGrammarVocabBridge?.setGrammarVocabMap)self.FiezelGrammarVocabBridge.setGrammarVocabMap(grammarVocabMapRaw);
+  GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */
   try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
-  // m025-285: SUMBU BAHASA TARGET. Bank Jepang memakai NAMA MEDAN yang sama persis dengan
-  // grammar-templates.json Inggris, jadi ia lewat jalur hidrasi YANG SAMA di bawah — satu
-  // mesin, dua bahasa. Membuat jalur kedua akan berarti murid Jepang kehilangan alokator,
-  // ingatan soal, dan tutor brain sekaligus: soalnya tetap keluar, tetapi berhenti
-  // menyesuaikan diri dengan murid.
-  //
-  // Jalur Inggris TIDAK tersentuh. Cabang ini hanya berjalan saat targetLang === 'ja';
-  // untuk 'en' (bawaan) satu-satunya yang terjadi adalah resetFamilyGraph, yang memulihkan
-  // graf Inggris — tanpa itu, murid yang pernah mencoba Jepang lalu kembali akan mewarisi
-  // prasyarat Jepang di diagnosis akar masalahnya.
-  //
-  // LETAKNYA WAJIB DI SINI, SESUDAH `G=grammarMaster`. Di m025-290 blok ini duduk SEBELUM
-  // baris itu, jadi bank Jepang dipasang lalu ditimpa kembali ke bank Inggris delapan belas
-  // baris kemudian oleh jalur canary. Murid memilih Jepang, menyimpannya, melihat toast
-  // "Sekarang belajar Bahasa Jepang", lalu kembali ke menu dan melihat soal Inggris.
-  // `tests/japanese-bank-survives-load-test.js` menahan urutan ini: setiap penugasan G baru
-  // di bawah sini akan membuatnya merah.
-  if(CONTENT_CANARY){const canonical={version:APP_VERSION,vocabulary:V,reading:R,grammar:grammarMaster},now=Date.now();contentPromotionRuntime=CONTENT_PROMOTION?CONTENT_PROMOTION.evaluate(CONTENT_CANARY_CONFIG,state.contentCanaryMeta,now):contentPromotionRuntime;if(CONTENT_CANARY_CONFIG?.enabled&&CONTENT_CANARY_CONFIG?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordPromotionDecision(state.contentCanaryMeta,CONTENT_CANARY_CONFIG.canaryId,contentPromotionRuntime,new Date(now).toISOString());contentCanaryRuntime=await CONTENT_CANARY.prepare(canonical,CONTENT_CANARY_CONFIG,learnerName(),state.contentCanaryMeta,now,contentPromotionRuntime);state.contentCanaryMeta=contentCanaryRuntime.evidence||state.contentCanaryMeta;V=contentCanaryRuntime.dataset.vocabulary;R=contentCanaryRuntime.dataset.reading;grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;
+  // Letak `G=grammarMaster` tetap SEBELUM cabang ja/zh (tests/japanese-bank-survives-load-test.js).
+  G=grammarMaster;
   if(activeTargetLang()==='zh'){
-    const zhBank=await optional('content/zh/grammar-templates-zh.json',null);
-    const zhGraph=await optional('content/zh/family-graph-zh.json',null);
-    const zhVocab=await optional('content/zh/vocabulary-master-zh.json',null);
+    const{bank:zhBank,graph:zhGraph,vocab:zhVocab,read:zhRead,write:zhWrite}=zhBundle||await fetchLangFiles('zh');
     if(zhVocab&&Array.isArray(zhVocab.words)&&zhVocab.words.length){
       V=zhVocab.words;
     }
-    const zhRead=await optional('content/zh/reading-bank-zh.json',null);
     if(Array.isArray(zhRead)&&zhRead.length){
       R=zhRead;
     }
-    const zhWrite=await optional('content/zh/writing-prompts-zh.json',null);
     if(zhWrite&&Array.isArray(zhWrite.prompts)&&zhWrite.prompts.length){
       WRITING_BANK=zhWrite;
     }
@@ -6659,6 +6694,9 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
       let persistentZh=false;
       try{persistentZh=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)==='zh'}catch(_){}
       if(!persistentZh){
+        const enFallback=await fetchEnglishBundle();
+        V=enFallback.vocab;R=enFallback.read;GRAMMAR_CURRICULUM=enFallback.curr;WRITING_BANK=enFallback.writing;READING_EXAM=enFallback.exam;
+        if(enFallback.gm){Object.assign(G,enFallback.gm);self.__grammarTemplatesCache=enFallback.gm.templates||[]}
         try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
         state.preferences={...state.preferences,targetLang:'en'};
         try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
@@ -6666,31 +6704,15 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
     }
   }
   if(activeTargetLang()==='ja'){
-    const jaBank=await optional('content/ja/grammar-templates-ja.json',null);
-    const jaGraph=await optional('content/ja/family-graph-ja.json',null);
-    // Kosakata Jepang berdiri sendiri dari bank tata bahasa: kalau salah satu gagal dimuat,
-    // yang satu lagi tetap sampai ke murid. Bank kosakata memakai NAMA MEDAN yang sama
-    // dengan vocabulary-master.json, jadi ia lewat normalisasi V yang sama beberapa baris
-    // di bawah - kartu, ulangan, dan soal kosakata semuanya ikut tanpa jalur kedua.
-    const jaVocab=await optional('content/ja/vocabulary-master-ja.json',null);
+    const{bank:jaBank,graph:jaGraph,vocab:jaVocab,read:jaRead,write:jaWrite}=jaBundle||await fetchLangFiles('ja');
     if(jaVocab&&Array.isArray(jaVocab.words)&&jaVocab.words.length){
       for(const w of jaVocab.words){if(w.level==='C2'){w.level='C1';w.jlpt='N1';}}
       V=jaVocab.words;
     }
-    // Bank bacaan Jepang: bentuknya identik dengan reading-bank.json (id, level, title,
-    // text, topic, qs[[pertanyaan, opsi, kunci, meta]]), jadi ia dibaca jalur yang sama.
-    // Teksnya Jepang, pertanyaannya Indonesia - murid diuji membaca Jepang, bukan diuji
-    // dua bahasa sekaligus di tingkat yang belum sampai ke situ.
-    const jaRead=await optional('content/ja/reading-bank-ja.json',null);
     if(Array.isArray(jaRead)&&jaRead.length){
       for(const r of jaRead){if(r.level==='C2')r.level='C1';}
       R=jaRead;
     }
-    // m025-312: bank menulis Jepang. Bentuknya identik dengan writing-prompts-v1.json
-    // (schema, rubric, prompts[]), jadi penyaji dan penilai membacanya lewat jalur yang
-    // sama tanpa cabang kedua. Medan `en` menyimpan naskah JEPANG - nama itu warisan dari
-    // bank Inggris dan sengaja tidak diganti, karena penyaji membacanya apa adanya.
-    const jaWrite=await optional('content/ja/writing-prompts-ja.json',null);
     if(jaWrite&&Array.isArray(jaWrite.prompts)&&jaWrite.prompts.length){
       for(const p of jaWrite.prompts){if(p.level==='C2')p.level='C1';}
       WRITING_BANK=jaWrite;
@@ -6725,12 +6747,12 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
       try{self.FiezelCoreBrain?.setFamilyGraph?.(rawFamilies)}catch{}
       try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:jaLessons})}catch{}
     }else{
-      // Bank Jepang gagal dimuat: JANGAN diam-diam menyajikan kursus Inggris dengan label
-      // Jepang. Kembalikan murid ke Inggris dan katakan, supaya kegagalannya terlihat,
-      // KECUALI jika kursus Jepang sengaja dikunci via FIEZEL_TARGET_COURSE_KEY.
       let persistentJa=false;
       try{persistentJa=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)==='ja'}catch(_){}
       if(!persistentJa){
+        const enFallback=await fetchEnglishBundle();
+        V=enFallback.vocab;R=enFallback.read;GRAMMAR_CURRICULUM=enFallback.curr;WRITING_BANK=enFallback.writing;READING_EXAM=enFallback.exam;
+        if(enFallback.gm){Object.assign(G,enFallback.gm);self.__grammarTemplatesCache=enFallback.gm.templates||[]}
         try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
         state.preferences={...state.preferences,targetLang:'en'};
         try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
@@ -6948,10 +6970,11 @@ function statusBarSurfaceColor(){
   return('#'+hx(o.r)+hx(o.g)+hx(o.b)).toUpperCase();
 }
 let statusBarRaf=0;
-function syncStatusBarColor(){if(statusBarRaf)return;const run=()=>{statusBarRaf=0;try{const meta=document.querySelector('meta[name="theme-color"]');if(!meta)return;const c=statusBarSurfaceColor();if(meta.getAttribute('content')!==c)meta.setAttribute('content',c)}catch(_){}};statusBarRaf=typeof requestAnimationFrame==='function'?requestAnimationFrame(run):(run(),0)}
+let statusBarTimer=0;
+function syncStatusBarColor(){if(statusBarRaf||(typeof document!=='undefined'&&document.hidden))return;const run=()=>{statusBarRaf=0;try{const meta=document.querySelector('meta[name="theme-color"]');if(!meta)return;const c=statusBarSurfaceColor();if(meta.getAttribute('content')!==c)meta.setAttribute('content',c)}catch(_){}};statusBarRaf=typeof requestAnimationFrame==='function'?requestAnimationFrame(run):(run(),0)}
 /* Splash, layar masuk, dan tur menempel/lepas sebagai anak <body> (fiezel-splash.js, fiezel-auth-screen.js, fiezel-tour.js) dan mengubah kelas <html>/<body>;
    satu observer dangkal cukup. Cek kedua 450 ms kemudian menangkap akhir transisi pudar splash. */
-try{const statusBarObserver=new MutationObserver(()=>{syncStatusBarColor();setTimeout(syncStatusBarColor,450)});statusBarObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});if(document.body)statusBarObserver.observe(document.body,{attributes:true,attributeFilter:['class'],childList:true});window.addEventListener('load',syncStatusBarColor);window.addEventListener('resize',syncStatusBarColor,{passive:true})}catch(_){}
+try{let lastSbSurfaceSig='';const getSbSurfaceSig=()=>((document.documentElement?.className||'')+'|'+(document.body?.className||'')).split(/\s+/).filter(c=>/boot|splash|auth|dark|modal|tour|ob|chat|teacher|studio|sheet|scene|classroom|open/.test(c)).sort().join(' ');lastSbSurfaceSig=getSbSurfaceSig();const statusBarObserver=new MutationObserver(muts=>{const hasNodeMut=muts.some(m=>Array.from(m.addedNodes).concat(Array.from(m.removedNodes)).some(n=>n&&n.nodeType===1&&(n.id==='splash'||n.id==='bootSplash'||n.id==='authGate'||n.id==='modal'||n.classList?.contains?.('fz-auth')||n.classList?.contains?.('fiezel-ob')||n.classList?.contains?.('fz-tour'))));const nextSig=muts.some(m=>m.type==='attributes')?getSbSurfaceSig():lastSbSurfaceSig;const clsChanged=nextSig!==lastSbSurfaceSig;if(clsChanged)lastSbSurfaceSig=nextSig;if(!hasNodeMut&&!clsChanged)return;syncStatusBarColor();clearTimeout(statusBarTimer);statusBarTimer=setTimeout(syncStatusBarColor,450);statusBarTimer.unref?.()});statusBarObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});if(document.body)statusBarObserver.observe(document.body,{attributes:true,attributeFilter:['class'],childList:true});window.addEventListener('load',syncStatusBarColor);window.addEventListener('resize',syncStatusBarColor,{passive:true})}catch(_){}
 const SCENE_STATIC_PHASE='day';
 /* Mode gelap dihapus sesuai permintaan OWNER: aplikasi terkunci ke tampilan terang cream. */
 function activeThemeMode(){ return 'light'; }
@@ -6969,19 +6992,34 @@ function getCelestialState(input=new Date()){
   return{body,phase,progress:Number(progress.toFixed(4)),x:Number(x.toFixed(2)),y:Number(y.toFixed(2)),time,position,palette,light,label:isDay?FiezelI18n.t('home.celestial-label-matahari'):FiezelI18n.t('home.celestial-label-bulan'),detail:FiezelI18n.t('home.celestial-detail',{benda:FiezelI18n.t(isDay?'home.celestial-matahari':'home.celestial-bulan'),posisi:position,pukul:time})}
 }
 function celestialStatusMarkup(){const c=getCelestialState();return`<span class="celestial-status" id="celestialStatus" title="${esc(c.detail)}"><i data-lucide="clock-3"></i><b id="celestialTime">${esc(c.time)}</b><span id="celestialDetail">${esc(FiezelI18n.t('home.celestial-status',{benda:FiezelI18n.t(c.body==='sun'?'home.celestial-matahari':'home.celestial-bulan'),posisi:c.position}))}</span></span>`}
+let celestialVarsApplied=false;
 function updateCelestialClock(input=new Date()){
   const c=getCelestialState(input),root=document.documentElement,sky=$('globalSky');
-  root?.style?.setProperty?.('--orbit-x',`${c.x}%`);root?.style?.setProperty?.('--orbit-y',`${c.y}%`);root?.style?.setProperty?.('--sky-top',c.palette.top);root?.style?.setProperty?.('--sky-bottom',c.palette.bottom);root?.style?.setProperty?.('--scene-light',c.light);
-  if(sky)sky.className=`global-sky phase-${c.phase}`;
-  const body=$('globalCelestial');if(body){body.className=`global-celestial ${c.body}`;if(body.dataset?.kind!==c.body){if(body.dataset)body.dataset.kind=c.body;body.innerHTML=`<i data-lucide="${c.body}"></i>`}}
-  document.body?.classList?.remove?.('scene-dawn','scene-day','scene-dusk','scene-night');document.body?.classList?.add?.(`scene-${c.phase}`);
-  syncStatusBarColor();
-  if($('celestialTime'))$('celestialTime').textContent=c.time;if($('celestialDetail'))$('celestialDetail').textContent=FiezelI18n.t('home.celestial-status',{benda:FiezelI18n.t(c.body==='sun'?'home.celestial-matahari':'home.celestial-bulan'),posisi:c.position});if($('celestialStatus'))$('celestialStatus').title=c.detail;refreshIcons();return c
+  const staticScene=uxOff('scenePhases');
+  if(!staticScene||!celestialVarsApplied){
+    root?.style?.setProperty?.('--orbit-x',`${c.x}%`);root?.style?.setProperty?.('--orbit-y',`${c.y}%`);
+    root?.style?.setProperty?.('--sky-top',c.palette.top);root?.style?.setProperty?.('--sky-bottom',c.palette.bottom);root?.style?.setProperty?.('--scene-light',c.light);
+    celestialVarsApplied=true;
+  }
+  if(sky){const skyCls=`global-sky phase-${c.phase}`;if(sky.className!==skyCls)sky.className=skyCls;}
+  const body=$('globalCelestial');
+  let iconChanged=false;
+  if(body){const cls=`global-celestial ${c.body}`;if(body.className!==cls)body.className=cls;if(body.dataset?.kind!==c.body){if(body.dataset)body.dataset.kind=c.body;body.innerHTML=`<i data-lucide="${c.body}"></i>`;iconChanged=true}}
+  if(document.body&&!document.body.classList?.contains?.(`scene-${c.phase}`)){
+    document.body.classList.remove('scene-dawn','scene-day','scene-dusk','scene-night');
+    document.body.classList.add(`scene-${c.phase}`);
+    syncStatusBarColor();
+  }else if(input instanceof Date===false||!celestialTimer){
+    syncStatusBarColor();
+  }
+  if($('celestialTime'))$('celestialTime').textContent=c.time;if($('celestialDetail'))$('celestialDetail').textContent=FiezelI18n.t('home.celestial-status',{benda:FiezelI18n.t(c.body==='sun'?'home.celestial-matahari':'home.celestial-bulan'),posisi:c.position});if($('celestialStatus'))$('celestialStatus').title=c.detail;
+  if(iconChanged)refreshIcons();
+  return c
 }
 let celestialTimer=null;
 function watchThemeChanges(){}
-function startCelestialClock(){updateCelestialClock();watchThemeChanges();if(typeof setInterval!=='function')return;if(celestialTimer&&typeof clearInterval==='function')clearInterval(celestialTimer);celestialTimer=setInterval(updateCelestialClock,30000);celestialTimer.unref?.()}
-function enhanceUI(){document.body?.classList?.toggle('reduce-motion',state.preferences?.motion===false);updateCelestialClock();try{document.getElementById('fiezelDiagOpen')?.setAttribute('tabindex','-1')}catch(_){}/* v31-1 2026-08-29: tombol diagnostik 1x1 tak terlihat ikut urutan Tab di semua layar \u2014 gestur rahasianya pakai click(), bukan fokus keyboard; file panelnya diklaim tim neural-voice jadi perbaikannya dari sisi app. */(window.requestAnimationFrame||setTimeout)(refreshIcons)}
+function startCelestialClock(){updateCelestialClock();watchThemeChanges();if(typeof setInterval!=='function')return;if(celestialTimer&&typeof clearInterval==='function')clearInterval(celestialTimer);celestialTimer=setInterval(()=>{if(typeof document==='undefined'||!document.hidden)updateCelestialClock()},30000);celestialTimer.unref?.()}
+function enhanceUI(){document.documentElement?.classList?.toggle('reduce-motion',state.preferences?.motion===false);document.body?.classList?.toggle('reduce-motion',state.preferences?.motion===false);updateCelestialClock();try{document.getElementById('fiezelDiagOpen')?.setAttribute('tabindex','-1')}catch(_){}/* v31-1 2026-08-29: tombol diagnostik 1x1 tak terlihat ikut urutan Tab di semua layar \u2014 gestur rahasianya pakai click(), bukan fokus keyboard; file panelnya diklaim tim neural-voice jadi perbaikannya dari sisi app. */(window.requestAnimationFrame||setTimeout)(refreshIcons)}
 // m028 fase3 (PATCH-PLAN §8/§9.3): setApp adalah corong tunggal SEMUA layar, jadi
 // di sinilah panggung dicatat. Layar kuis digambar langsung dari quizLoop tanpa
 // melewati router, jadi renderInner/syncCoachBubble tidak pernah tahu sedang ada
@@ -6990,16 +7028,38 @@ function enhanceUI(){document.body?.classList?.toggle('reduce-motion',state.pref
 // untuk mengecilkan dan menaikkan gelembung, tanpa memindahkan gelembungnya keluar
 // dari <body> (itu kontrak arsitektur m025-115 di fiezel-coach-bubble.js).
 function setApp(html){
-  $('app').innerHTML=html;
+  const appEl=$('app');
+  appEl.innerHTML=html;
   // Opsional-berantai dengan sengaja: harness tes menjalankan app.js di atas DOM
   // tiruan yang tidak punya <body>, dan penandaan panggung tidak boleh pernah menjadi
   // alasan sebuah layar gagal digambar.
-  const isQuiz = String(html).includes('quiz-shell');
-  document.body?.classList?.toggle?.('fz-stage-quiz', isQuiz);
+  const rawHtml=String(html);
+  const isQuiz=rawHtml.includes('quiz-shell');
+  const isHomeToday=rawHtml.includes('home-today');
+  const isFlashcard=rawHtml.includes('card-flashcard');
+  const isKanaChart=rawHtml.includes('jaKanaChart')||rawHtml.includes('ja-kana');
+  const isLibReader=rawHtml.includes('library-reader');
+  const isLibPage=rawHtml.includes('library-page');
+  const isFsl=rawHtml.includes('fsl-shell')||rawHtml.includes('speakingListeningRoot');
+  const rootCls=document.documentElement?.classList;
+  const bodyCls=document.body?.classList;
+  const appCls=appEl?.classList;
+  rootCls?.toggle?.('has-home-today',isHomeToday);
+  rootCls?.toggle?.('has-library-reader',isLibReader);
+  bodyCls?.toggle?.('fz-stage-quiz',isQuiz);
+  bodyCls?.toggle?.('has-home-today',isHomeToday);
+  bodyCls?.toggle?.('has-flashcard',isFlashcard);
+  bodyCls?.toggle?.('fz-stage-kana',isKanaChart);
+  bodyCls?.toggle?.('has-library-reader',isLibReader);
+  bodyCls?.toggle?.('fz-view-library',isLibPage);
+  if(!isFsl)bodyCls?.remove?.('fsl-session-active');
+  bodyCls?.remove?.('has-feedback-sheet-open');
+  appCls?.toggle?.('has-quiz-shell',isQuiz);
+  appCls?.toggle?.('has-home-today',isHomeToday);
   if (isQuiz) {
-    document.body?.classList?.remove?.('fz-stage-home');
-  } else if (String(html).includes('home-page')) {
-    document.body?.classList?.remove?.('fz-stage-quiz');
+    bodyCls?.remove?.('fz-stage-home');
+  } else if (rawHtml.includes('home-page')) {
+    bodyCls?.remove?.('fz-stage-quiz');
     try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
   }
   enhanceUI();
@@ -7139,8 +7199,10 @@ function shouldInviteNotifications(){
   if(state.preferences?.reminders===false)return false;
   return reminderInviteOffers()<REMINDER_INVITE_MAX_OFFERS;
 }
+let notificationInvitationSettled=false,notificationSettleTimer=0,notificationHideTimer=0;
 function setNotificationGateState(status){
   const gate=$('welcome'),button=$('notificationGateButton'),body=$('notificationGateBody'),stateText=$('notificationGateStatus'),help=$('notificationGateHelp'),title=$('welcomeTitle'),skip=$('notificationGateSkip');if(!gate)return;
+  if(status==='default'){notificationInvitationSettled=false;if(notificationSettleTimer){clearTimeout(notificationSettleTimer);notificationSettleTimer=0}if(notificationHideTimer){clearTimeout(notificationHideTimer);notificationHideTimer=0}}
   // m025-80 OWNER: "walaupun notifikasi dan puter sudah diaktifkan, setiap kali masuk apps
   // selalu muncul popup cepat". Panel yang sedang tersembunyi dan sudah dijawab tidak perlu
   // dibuka sama sekali hanya untuk ditutup lagi 220ms kemudian.
@@ -7194,7 +7256,7 @@ function releaseGateFocus(){
      aman dipanggil dari kedua gerbang. */
   setTimeout(()=>{try{maybeShowDailyRitual()}catch(_){}},360);
 }
-function hideNotificationGate(){const gate=$('welcome');if(!gate)return;gate.classList.remove('show');setTimeout(()=>{gate.classList.add('hidden');releaseGateFocus()},300)}
+function hideNotificationGate(){const gate=$('welcome');if(!gate)return;gate.classList.remove('show');if(notificationHideTimer)clearTimeout(notificationHideTimer);notificationHideTimer=setTimeout(()=>{notificationHideTimer=0;gate.classList.add('hidden');releaseGateFocus()},300)}
 // m025-79: a second mandatory gate, Puter account sign-in, sits right after the
 // notification gate clears. It reuses the same lock/overlay pattern (a body class that
 // hides .app/.bottomnav, plus a full-screen panel) and aiErrorMessage() for failure copy,
@@ -8547,7 +8609,7 @@ function openApp(){
     state.view='tutor';
     try{self.FiezelTeacherShell?.ensureCss?.()}catch(_){}document.body?.classList?.add?.('fz-teacher-mode');
   }
-  notifyAppUpdateIfNew();render();try{dismissBootSplash()}catch(_){}try{updateTopbarCourseButton()}catch(_){}
+  if(state.quizActive||stageStack.length)notifyAppUpdateIfNew();else{notifyAppUpdateIfNew();render();}try{dismissBootSplash()}catch(_){}try{updateTopbarCourseButton()}catch(_){}
   // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka KelasKu untuk Guru
   try{checkUrlTeacherToken()}catch(_){}
   // PWA Shortcuts (?invite-hub=1, ?duel-hub=1): tangkap parameter pintasan PWA
@@ -8611,7 +8673,7 @@ function openApp(){
   // yang sama dengan undangan teman: alamat dibaca di sini, aksinya ditunda sedikit
   // supaya splash & lencana Home selesai lebih dulu.
   try{fzStageAutoJoin()}catch(_){}
-  try{pollStageInvites();setInterval(pollStageInvites,12000)}catch(_){}
+  try{pollStageInvites();const stageInviteTimer=setInterval(pollStageInvites,12000);stageInviteTimer?.unref?.()}catch(_){}
   armSocialInviteSheet();
   try{refreshFriendRequestCount()}catch(_){}
   // Sesi akun ditanyakan di gelombang yang sama: sesudah sambutan selesai, sebelum murid
@@ -8799,14 +8861,14 @@ function offerNotificationInvitation(reason='after_onboarding'){
   }
   return true
 }
-let notificationInvitationSettled=false;
 // Satu jalan keluar untuk semua jawaban - diterima, ditolak, atau dilewati. Setelah panel
 // pergi, gerbang akun Puter dipasang persis seperti dulu setelah gerbang notifikasi lolos.
 function settleNotificationInvitation(status){
   if(notificationInvitationSettled)return false;
   notificationInvitationSettled=true;
   setNotificationGateState(status);
-  setTimeout(hideNotificationGate,220);
+  if(notificationSettleTimer)clearTimeout(notificationSettleTimer);
+  notificationSettleTimer=setTimeout(()=>{notificationSettleTimer=0;hideNotificationGate()},220);
   /* m025-262: dulu gerbang akun Puter menyusul di sini. Sekarang tidak ada gerbang kedua —
      identitas murid sudah lahir di onboarding. */
   return true
@@ -8959,13 +9021,14 @@ function startWelcomeExperience(){
   }
   let onboardingDone=true;
   try{onboardingDone=self.FiezelOnboarding?.completed?.(self)!==false}catch{}
-  let proceedCalled=false;
+  let proceedCalled=false,runProceed=null;
   const safeWatchdog=setTimeout(()=>{
     try{
-      if(!proceedCalled&&!appOpened&&(!document.getElementById('app')?.innerHTML||document.getElementById('app').innerHTML.length===0)){
+      const modalOpen=Boolean(document.getElementById('authGate')?.classList?.contains('show')||document.querySelector('.fiezel-ob,#modal.show'));
+      if(!modalOpen&&!proceedCalled&&!appOpened&&(!document.getElementById('app')?.innerHTML||document.getElementById('app').innerHTML.length===0)){
         proceedCalled=true;
         dismissBootSplash();
-        if(typeof proceed==='function')proceed();
+        if(typeof runProceed==='function')runProceed();else openApp();
       }
     }catch(_){}
   },6500);
@@ -8998,6 +9061,7 @@ function startWelcomeExperience(){
       maybeSyncLearnerName(at);
       return startNotificationInvitation()
     };
+    runProceed=proceed;
     if(pendingUrlTeacherToken&&!roleResolutionDone&&roleResolutionPromise){
       Promise.race([roleResolutionPromise,new Promise(r=>setTimeout(r,1200))]).then(proceed).catch(proceed);
       return null;
@@ -9605,19 +9669,33 @@ function dismissStageCall(){
     if(b&&b.parentNode)b.parentNode.removeChild(b);
   }catch(_){}
 }
+let _stageInviteNextAt=0,_stageInviteFailStreak=0;
 async function pollStageInvites(){
+  if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return;
   if(fzStageDrawerOpen)return;
+  const now=Date.now();
+  if(_stageInviteNextAt&&now<_stageInviteNextAt)return;
   const core=socialCore();
   if(!core||!core.api)return;
   const myHandle=socialProfileCache?.handle||learnerName().toLowerCase().replace(/\s+/g,'_');
   if(!myHandle)return;
   try{
     const res=await core.api.stageInvites(myHandle);
-    if(res&&res.ok&&Array.isArray(res.data?.invites)&&res.data.invites.length>0){
-      const latest=res.data.invites[0];
-      showStageIncomingCallBanner(latest);
+    if(res&&res.ok){
+      _stageInviteFailStreak=0;_stageInviteNextAt=0;
+      if(Array.isArray(res.data?.invites)&&res.data.invites.length>0){
+        const latest=res.data.invites[0];
+        showStageIncomingCallBanner(latest);
+      }
+    }else{
+      _stageInviteFailStreak=Math.min(5,_stageInviteFailStreak+1);
+      _stageInviteNextAt=Date.now()+Math.min(120000,12000*(1<<_stageInviteFailStreak));
     }
-  }catch(_){}
+  }catch(_){
+    _stageInviteFailStreak=Math.min(5,_stageInviteFailStreak+1);
+    _stageInviteNextAt=Date.now()+Math.min(120000,12000*(1<<_stageInviteFailStreak));
+  }
 }
 /** Undangan WhatsApp. Kode ruang + tautan ?stage= dirakit modul transport (satu sumber). */
 function fzStageInvite(){
@@ -10119,14 +10197,14 @@ let vtViewPaint=false;
 function captureActiveElement(container){try{const act=document.activeElement;if(act&&container&&container.contains(act)&&/^(INPUT|TEXTAREA)$/i.test(act.tagName||'')){return{id:act.id,name:act.name,testId:act.getAttribute('data-testid'),val:act.value,s:act.selectionStart,e:act.selectionEnd}}}catch(_){}return null}
 function restoreActiveElement(container,saved){if(!saved||!container)return;try{let r=null;if(saved.id)r=container.querySelector('#'+saved.id);if(!r&&saved.testId)r=container.querySelector('[data-testid="'+saved.testId+'"]');if(!r&&saved.name)r=container.querySelector('[name="'+saved.name+'"]');if(r){if(saved.val!=null&&r.value!==saved.val)r.value=saved.val;r.focus();if(typeof r.setSelectionRange==='function'&&saved.s!=null)r.setSelectionRange(saved.s,saved.e)}}catch(_){}}
 const TAB_PARENT={chat:'latihan',nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online',profile:'online'};
-function syncNavActivePill(targetEl){try{const pill=document.getElementById('navActivePill'),nav=document.querySelector('.bottomnav');if(!pill||!nav)return;let activeEl=targetEl;if(!activeEl||!activeEl.getBoundingClientRect||!nav.contains(activeEl)){const curV=(typeof state!=='undefined'&&state?.view)?state.view:'home';activeEl=nav.querySelector(`[data-view="${curV}"]`)||(TAB_PARENT[curV]?nav.querySelector(`[data-view="${TAB_PARENT[curV]}"]`):null)||(curV==='profile'?nav.querySelector('[data-view="online"]'):null)||nav.querySelector('.nav.active')||nav.querySelector('[data-view="home"]')}if(!activeEl){pill.style.setProperty('opacity','0','important');return}const navRect=nav.getBoundingClientRect();if(navRect.width===0){pill.style.setProperty('opacity','0','important');requestAnimationFrame(()=>syncNavActivePill(activeEl));return}const elRect=activeEl.getBoundingClientRect();if(elRect.width===0){activeEl._pillRetries=(activeEl._pillRetries||0)+1;if(activeEl._pillRetries<=8){requestAnimationFrame(()=>syncNavActivePill(activeEl))}return}activeEl._pillRetries=0;const left=elRect.left-navRect.left;pill.style.setProperty('width',elRect.width+'px','important');/* m025-575: di tablet/desktop navigasi menjadi rail/sidebar vertikal (fiezel-tactile-clay.css 15.8), jadi pil ikut bergerak 2D; di dok HP tetap geser horizontal. */if(getComputedStyle(nav).flexDirection==='column'){const top=elRect.top-navRect.top+nav.scrollTop;pill.style.setProperty('top','0px','important');pill.style.setProperty('height',elRect.height+'px','important');pill.style.setProperty('transform',`translate3d(${left}px,${top}px,0)`,'important')}else{pill.style.removeProperty('top');pill.style.removeProperty('height');pill.style.setProperty('transform',`translateX(${left}px)`,'important')}pill.style.setProperty('opacity','1','important');nav.classList.add('pill-synced')}catch(_){}}
+function syncNavActivePill(targetEl){try{const pill=document.getElementById('navActivePill'),nav=document.querySelector('.bottomnav');if(!pill||!nav)return;let activeEl=targetEl;if(!activeEl||!activeEl.getBoundingClientRect||!nav.contains(activeEl)){const curV=(typeof state!=='undefined'&&state?.view)?state.view:'home';activeEl=nav.querySelector(`[data-view="${curV}"]`)||(TAB_PARENT[curV]?nav.querySelector(`[data-view="${TAB_PARENT[curV]}"]`):null)||(curV==='profile'?nav.querySelector('[data-view="online"]'):null)||nav.querySelector('.nav.active')||nav.querySelector('[data-view="home"]')}if(!activeEl){pill.style.setProperty('opacity','0','important');return}const navRect=nav.getBoundingClientRect();if(navRect.width===0){pill.style.setProperty('opacity','0','important');nav._pillNavRetries=(nav._pillNavRetries||0)+1;if(nav._pillNavRetries<=6&&getComputedStyle(nav).display!=='none'){requestAnimationFrame(()=>syncNavActivePill(activeEl))}return}nav._pillNavRetries=0;const elRect=activeEl.getBoundingClientRect();if(elRect.width===0){activeEl._pillRetries=(activeEl._pillRetries||0)+1;if(activeEl._pillRetries<=6){requestAnimationFrame(()=>syncNavActivePill(activeEl))}return}activeEl._pillRetries=0;const left=elRect.left-navRect.left;pill.style.setProperty('width',elRect.width+'px','important');/* m025-575: di tablet/desktop navigasi menjadi rail/sidebar vertikal (fiezel-tactile-clay.css 15.8), jadi pil ikut bergerak 2D; di dok HP tetap geser horizontal. */if(getComputedStyle(nav).flexDirection==='column'){const top=elRect.top-navRect.top+nav.scrollTop;pill.style.setProperty('top','0px','important');pill.style.setProperty('height',elRect.height+'px','important');pill.style.setProperty('transform',`translate3d(${left}px,${top}px,0)`,'important')}else{pill.style.removeProperty('top');pill.style.removeProperty('height');pill.style.setProperty('transform',`translateX(${left}px)`,'important')}pill.style.setProperty('opacity','1','important');nav.classList.add('pill-synced')}catch(_){}}
 window.syncNavActivePill=syncNavActivePill;
 try{window.addEventListener('resize',()=>syncNavActivePill(),{passive:true});window.addEventListener('orientationchange',()=>{syncNavActivePill();setTimeout(syncNavActivePill,120)},{passive:true})}catch(_){}
 /* m025-573: topbar mendapat tepi (garis + bayangan tipis) HANYA ketika isi halaman sudah lewat di bawahnya, pola app bar Material/iOS. Tanpa tepi, latar topbar yang nyaris sama dengan latar halaman membuat kartu tampak terpotong garis tak terlihat saat di-scroll. CSS-nya di fiezel-tactile-clay.css (header.topbar.is-scrolled).
    Yang digulir bisa jendela ATAU panel dalam #app (cangkang 100dvh menggulir #app > section, bukan jendela), jadi listener-nya fase capture di document: event scroll elemen tidak menggelembung, tetapi tetap lewat capture. Penggulir horizontal (deret tab, karosel) diabaikan karena tingginya tidak bisa digulir. renderInner() memanggil syncTopbarScrolled() saat pindah layar supaya tepi dari layar lama tidak tertinggal. */
-function syncTopbarScrolled(source){const bar=document.querySelector('header.topbar');if(!bar)return;let y=window.scrollY||document.documentElement?.scrollTop||0;if(source&&source.nodeType===1){if(source.scrollHeight<=source.clientHeight+1||!document.getElementById('app')?.contains(source))return;y=Math.max(y,source.scrollTop||0)}bar.classList.toggle('is-scrolled',y>2)}
-try{let topbarScrollRaf=0,topbarScrollSrc=null;document.addEventListener('scroll',e=>{topbarScrollSrc=e.target;if(topbarScrollRaf)return;topbarScrollRaf=requestAnimationFrame(()=>{topbarScrollRaf=0;syncTopbarScrolled(topbarScrollSrc)})},{capture:true,passive:true})}catch(_){}
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)||state.view==='game'){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}if(state.view!=='chat'&&(document.body?.classList?.contains?.('fz-view-chat')||document.documentElement?.classList?.contains?.('fz-view-chat'))){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}if(state.view!=='story'){try{self.FiezelStoryReader?.stopAudio?.()}catch(_){}}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));try{if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();if(state.view==='chat')interactiveChatView();if(state.view==='story')japaneseStoryView();if(state.view==='news')japaneseNewsView();if(state.view==='pte')pteAcademicView();}catch(viewErr){console.error('[renderInner view error]',viewErr);const appContainer=$('app');if(appContainer){appContainer.innerHTML=`<div class="card" style="padding:24px;text-align:center;margin:32px auto;max-width:420px"><h3 style="margin-bottom:8px">Error</h3><p style="color:#64748B;font-size:14px;margin-bottom:16px">${esc(String(viewErr?.message||viewErr))}</p><button class="btn btn-primary" onclick="go('home')">OK</button></div>`;}}/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={chat:'latihan',nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online',profile:'online',story:'latihan',news:'latihan',pte:'latihan'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');if(state.view!=='chat'){const _bn=document.querySelector('.bottomnav');if(_bn){_bn.style.removeProperty('display');_bn.style.removeProperty('visibility');_bn.style.removeProperty('opacity');}}syncNavActivePill(activeTabEl);try{requestAnimationFrame(()=>syncNavActivePill(activeTabEl))}catch(_){}/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-progress',state.view==='progress');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');document.body?.classList?.toggle?.('fz-view-vocab',state.view==='vocab');document.body?.classList?.toggle?.('fz-view-kana',state.view==='kana');document.body?.classList?.toggle?.('fz-view-story',state.view==='story');document.body?.classList?.toggle?.('fz-view-news',state.view==='news');document.documentElement?.classList?.toggle?.('fz-view-chat',state.view==='chat');document.body?.classList?.toggle?.('fz-view-chat',state.view==='chat');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topContextWrap=$('topContextWrap'),_topContextBackBtn=$('topContextBackBtn'),_topContextTitle=$('topContextTitle'),_topContextActions=$('topContextActions'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isHome=state.view==='home',_isK=state.view==='classroom',_isP=state.view==='online'||state.view==='profile',_setBtn=$('topSettingsBtn'),_cBtn=$('fzCourseSwitchBtn'),_frBtn=$('topProfileFriendBtn'),_notifBtn=$('fzNotifBtn');if(_isP&&_frBtn){const _fb=$('topProfileFriendBadge');if(_fb){if(socialRequestCount>0){_fb.textContent=String(socialRequestCount);_fb.classList.remove('hidden');}else{_fb.classList.add('hidden');}}}if(_isHome){if(_topBrandNormal)_topBrandNormal.style.display='flex';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='inline-flex';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='inline-flex';if(_frBtn)_frBtn.style.display='none';}else if(_isK){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='flex';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='flex';updateTopbarClassState();if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';}else if(_isP){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';if(_topContextBackBtn)_topContextBackBtn.style.display='none';if(_topContextTitle)_topContextTitle.textContent=FiezelI18n.t('nav.profile','Profil');}if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='inline-flex';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='inline-flex';}else{if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';const _hasBack=['grammar','vocab','reading','writing','skills','listening','speaking','library','kana','ask','search','chat','story','news','test','pte'].includes(state.view);if(_topContextBackBtn)_topContextBackBtn.style.display=_hasBack?'inline-flex':'none';let _title='Latihan';if(state.view==='test')_title=FiezelI18n.t('placement.tes-kemampuan-dasar','Tes Kemampuan Dasar');else if(state.view==='latihan')_title=FiezelI18n.t('nav.latihan','Latihan');else if(state.view==='grammar')_title=FiezelI18n.t('student.grammar-title','Grammar');else if(state.view==='vocab')_title=FiezelI18n.t('student.vocab-title','Kosakata');else if(state.view==='skills'||state.view==='listening'||state.view==='speaking')_title=state.view==='listening'?'Listening':state.view==='speaking'?'Speaking':FiezelI18n.t('student.skills-title','Bicara & Dengar');else if(state.view==='reading')_title=FiezelI18n.t('skill.reading','Membaca');else if(state.view==='writing')_title=FiezelI18n.t('skill.writing','Menulis');else if(state.view==='library')_title=FiezelI18n.t('library.title','Perpustakaan');else if(state.view==='progress')_title=FiezelI18n.t('nav.progres','Progres');else if(state.view==='arena')_title='Arena';else if(state.view==='tutor')_title='Pusat Tutor';else if(state.view==='kana')_title='Karakter Kana';else if(state.view==='nujum')_title='Nujum Mentor';else if(state.view==='chat')_title=FiezelI18n.t('chat.title','Kawan Bicara');else if(state.view==='story')_title='Cerita Bergambar N5';else if(state.view==='news')_title='Daily News Chokai';else if(state.view==='pte')_title='PTE Academic Hub';else if(state.view==='ask'||state.view==='search')_title=FiezelI18n.t('ask.judul','Tanya FIEZEL');if(_topContextTitle)_topContextTitle.textContent=_title;}if(_topContextActions){const _hasLevel=['latihan','grammar','vocab','reading','writing','skills','listening','speaking','progress','library'].includes(state.view);if(_hasLevel){_topContextActions.style.display='flex';_topContextActions.innerHTML=levelControlMarkup();}else{_topContextActions.style.display='none';}}}const _bTag=$('topBrandTag')||document.querySelector('#topBrandWrap .fiezel-brand-tag');if(_bTag){let _t='AKTIF';if(state.view==='test')_t='TES';else if(state.view==='latihan'||['vocab','grammar','reading','skills','listening','speaking','writing','library','kana','ask','search','chat','story','news'].includes(state.view)||TAB_PARENT[state.view]==='latihan')_t='LATIHAN';else if(state.view==='progress')_t='PROGRES';else if(state.view==='arena')_t='ARENA';else if(state.view==='online'||state.view==='profile')_t='PROFIL';else if(state.view==='classroom')_t='KELAS';else if(state.view==='tutor')_t='TUTOR';else if(state.view==='nujum')_t='MENTOR';else if(state.view==='chat')_t='CHAT';_bTag.textContent=_t;}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}try{self.FiezelMandarinPinyinEngine?.applyDisplayPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){try{const _rEl=document.getElementById('fzRitual');if(_rEl&&state.view!=='home'){clearTimeout(_rEl._fzAutoClose);_rEl.remove()}}catch(_){}window.scrollTo(0,0);syncTopbarScrolled()}}
+function syncTopbarScrolled(source){const bar=document.querySelector('header.topbar');if(!bar)return;let y=window.scrollY||document.documentElement?.scrollTop||0;if(y<=2&&source&&source.nodeType===1){if(source.scrollHeight<=source.clientHeight+1||!document.getElementById('app')?.contains(source))return;y=Math.max(y,source.scrollTop||0)}bar.classList.toggle('is-scrolled',y>2)}
+try{let topbarScrollRaf=0,topbarScrollSrc=null;document.addEventListener('scroll',e=>{topbarScrollSrc=e.target;if(typeof requestAnimationFrame!=='function'){syncTopbarScrolled(topbarScrollSrc);return}if(topbarScrollRaf)return;topbarScrollRaf=requestAnimationFrame(()=>{topbarScrollRaf=0;syncTopbarScrolled(topbarScrollSrc)})},{capture:true,passive:true})}catch(_){}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)||state.view==='game'){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}if(state.view!=='chat'&&(document.body?.classList?.contains?.('fz-view-chat')||document.documentElement?.classList?.contains?.('fz-view-chat'))){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}if(state.view!=='nujum'){try{self.FiezelNujum?.unmount?.()}catch(_){}}if(state.view!=='pte'){try{self.FiezelPteUi?.unmount?.()}catch(_){}}if(state.view!=='story'&&state.view!=='news'){try{self.FiezelStoryReader?.stopAudio?.()}catch(_){}}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));try{if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();if(state.view==='chat')interactiveChatView();if(state.view==='story'||state.view==='news')japaneseStoryView(state.view==='news'?'shinkansen-trip':undefined);if(state.view==='pte')pteAcademicView();}catch(viewErr){console.error('[renderInner view error]',viewErr);const appContainer=$('app');if(appContainer){appContainer.innerHTML=`<div class="card" style="padding:24px;text-align:center;margin:32px auto;max-width:420px"><h3 style="margin-bottom:8px">Error</h3><p style="color:#64748B;font-size:14px;margin-bottom:16px">${esc(String(viewErr?.message||viewErr))}</p><button class="btn btn-primary" onclick="go('home')">OK</button></div>`;}}/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={chat:'latihan',nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online',profile:'online',story:'latihan',news:'latihan',pte:'latihan'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');if(state.view!=='chat'){const _bn=document.querySelector('.bottomnav');if(_bn){_bn.style.removeProperty('display');_bn.style.removeProperty('visibility');_bn.style.removeProperty('opacity');}}syncNavActivePill(activeTabEl);try{requestAnimationFrame(()=>syncNavActivePill(activeTabEl))}catch(_){}/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-progress',state.view==='progress');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');document.body?.classList?.toggle?.('fz-view-vocab',state.view==='vocab');document.body?.classList?.toggle?.('fz-view-kana',state.view==='kana');document.body?.classList?.toggle?.('fz-view-library',state.view==='library');if(state.view!=='library'){document.body?.classList?.remove?.('has-library-reader');document.documentElement?.classList?.remove?.('has-library-reader');}document.body?.classList?.toggle?.('fz-view-story',state.view==='story');document.body?.classList?.toggle?.('fz-view-news',state.view==='news');document.documentElement?.classList?.toggle?.('fz-view-chat',state.view==='chat');document.body?.classList?.toggle?.('fz-view-chat',state.view==='chat');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topContextWrap=$('topContextWrap'),_topContextBackBtn=$('topContextBackBtn'),_topContextTitle=$('topContextTitle'),_topContextActions=$('topContextActions'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isHome=state.view==='home',_isK=state.view==='classroom',_isP=state.view==='online'||state.view==='profile',_setBtn=$('topSettingsBtn'),_cBtn=$('fzCourseSwitchBtn'),_frBtn=$('topProfileFriendBtn'),_notifBtn=$('fzNotifBtn');if(_isP&&_frBtn){const _fb=$('topProfileFriendBadge');if(_fb){if(socialRequestCount>0){_fb.textContent=String(socialRequestCount);_fb.classList.remove('hidden');}else{_fb.classList.add('hidden');}}}if(_isHome){if(_topBrandNormal)_topBrandNormal.style.display='flex';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='inline-flex';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='inline-flex';if(_frBtn)_frBtn.style.display='none';}else if(_isK){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='flex';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='flex';updateTopbarClassState();if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';}else if(_isP){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';if(_topContextBackBtn)_topContextBackBtn.style.display='none';if(_topContextTitle)_topContextTitle.textContent=FiezelI18n.t('nav.profile','Profil');}if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='inline-flex';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='inline-flex';}else{if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';const _hasBack=['grammar','vocab','reading','writing','skills','listening','speaking','library','kana','ask','search','chat','story','news','test','pte'].includes(state.view);if(_topContextBackBtn)_topContextBackBtn.style.display=_hasBack?'inline-flex':'none';let _title='Latihan';if(state.view==='test')_title=FiezelI18n.t('placement.tes-kemampuan-dasar','Tes Kemampuan Dasar');else if(state.view==='latihan')_title=FiezelI18n.t('nav.latihan','Latihan');else if(state.view==='grammar')_title=FiezelI18n.t('student.grammar-title','Grammar');else if(state.view==='vocab')_title=FiezelI18n.t('student.vocab-title','Kosakata');else if(state.view==='skills'||state.view==='listening'||state.view==='speaking')_title=state.view==='listening'?'Listening':state.view==='speaking'?'Speaking':FiezelI18n.t('student.skills-title','Bicara & Dengar');else if(state.view==='reading')_title=FiezelI18n.t('skill.reading','Membaca');else if(state.view==='writing')_title=FiezelI18n.t('skill.writing','Menulis');else if(state.view==='library')_title=FiezelI18n.t('library.title','Perpustakaan');else if(state.view==='progress')_title=FiezelI18n.t('nav.progres','Progres');else if(state.view==='arena')_title='Arena';else if(state.view==='tutor')_title='Pusat Tutor';else if(state.view==='kana')_title='Karakter Kana';else if(state.view==='nujum')_title='Nujum Mentor';else if(state.view==='chat')_title=FiezelI18n.t('chat.title','Kawan Bicara');else if(state.view==='story')_title='Cerita Bergambar N5';else if(state.view==='news')_title='Daily News Chokai';else if(state.view==='pte')_title='PTE Academic Hub';else if(state.view==='ask'||state.view==='search')_title=FiezelI18n.t('ask.judul','Tanya FIEZEL');if(_topContextTitle)_topContextTitle.textContent=_title;}if(_topContextActions){const _hasLevel=['latihan','grammar','vocab','reading','writing','skills','listening','speaking','progress','library'].includes(state.view);if(_hasLevel){_topContextActions.style.display='flex';_topContextActions.innerHTML=levelControlMarkup();}else{_topContextActions.style.display='none';}}}const _bTag=$('topBrandTag')||document.querySelector('#topBrandWrap .fiezel-brand-tag');if(_bTag){let _t='AKTIF';if(state.view==='test')_t='TES';else if(state.view==='latihan'||['vocab','grammar','reading','skills','listening','speaking','writing','library','kana','ask','search','chat','story','news'].includes(state.view)||TAB_PARENT[state.view]==='latihan')_t='LATIHAN';else if(state.view==='progress')_t='PROGRES';else if(state.view==='arena')_t='ARENA';else if(state.view==='online'||state.view==='profile')_t='PROFIL';else if(state.view==='classroom')_t='KELAS';else if(state.view==='tutor')_t='TUTOR';else if(state.view==='nujum')_t='MENTOR';else if(state.view==='chat')_t='CHAT';_bTag.textContent=_t;}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}try{self.FiezelMandarinPinyinEngine?.applyDisplayPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){try{const _rEl=document.getElementById('fzRitual');if(_rEl&&state.view!=='home'){clearTimeout(_rEl._fzAutoClose);_rEl.remove()}}catch(_){}window.scrollTo(0,0);syncTopbarScrolled()}}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -10182,7 +10260,7 @@ function syncCoachBubble(){
    tautan dalam layar, dan tur semuanya membawa nama view yang sudah ada, dan menghapus
    satu nama dari himpunan ini akan membuat go() menampilkan toast "halaman tak tersedia"
    pada perjalanan yang benar-benar valid. */
-const VALID_VIEWS=new Set(['kana','home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum','chat','story','pte']);
+const VALID_VIEWS=new Set(['kana','home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum','chat','story','news','pte']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -10513,8 +10591,8 @@ function dismissAllModalsDefensive(){
 }
 window.dismissAllModalsDefensive=dismissAllModalsDefensive;
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(v==='chat'&&!aiDoorAllowed())return false;dismissAllModalsDefensive();if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(state.view&&state.view!==v&&state.view!=='chat'){state._previousView=state.view;}if(state.view==='chat'&&v!=='chat'){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
-function handleTopbarBack(){if(typeof go!=='function')return;if(state.view==='chat'){const prev=state._previousView;if(prev&&VALID_VIEWS.has(prev)&&prev!=='chat'){go(prev);return;}if(typeof self.FiezelBackNav?.depth==='function'&&self.FiezelBackNav.depth()>0){try{if(self.FiezelBackNav.back())return;}catch(_){}}go('home');return;}const subViews=['grammar','vocab','skills','listening','speaking','reading','writing','library','kana','ask','search','story','pte'];if(subViews.includes(state.view)){go('latihan')}else{go('home')}} window.handleTopbarBack=handleTopbarBack;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(v==='chat'&&!aiDoorAllowed())return false;dismissAllModalsDefensive();if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(state.view&&state.view!==v&&state.view!=='chat'){state._previousView=state.view;}if(state.view==='chat'&&v!=='chat'){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();if(!stageStack.length&&state.view===v)render()};const isBottomTab=['home','latihan','classroom','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
+function handleTopbarBack(){if(typeof go!=='function')return;if(state.view==='chat'){const prev=state._previousView;if(prev&&VALID_VIEWS.has(prev)&&prev!=='chat'){go(prev);return;}if(typeof self.FiezelBackNav?.depth==='function'&&self.FiezelBackNav.depth()>0){try{if(self.FiezelBackNav.back())return;}catch(_){}}go('home');return;}const subViews=['grammar','vocab','skills','listening','speaking','reading','writing','library','kana','ask','search','story','news','pte'];if(subViews.includes(state.view)){go('latihan')}else{go('home')}} window.handleTopbarBack=handleTopbarBack;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
  * OWNER: "misalnya sudah masuk ke dalam folder, dan ingin kembali, ketika swipe back malah
@@ -13573,7 +13651,7 @@ function showOnboarding(now=Date.now()){
          menutup lapisan: perkenalan masih terbuka di atasnya, dan bank kursus harus sudah
          termuat sebelum tes penempatan dimulai dua langkah kemudian. */
       onCourse:({course})=>{
-        const value=course==='ja'?'ja':'en';
+        const value=(function(){try{return self.FiezelTargetLanguage?.normalize?.(course)||'en'}catch(_){return course==='ja'?'ja':course==='zh'?'zh':'en'}}());
         (async()=>{
           try{if(activeTargetLang()===value)return;switchTargetLangStorage(value);await load({kontenSaja:true})}catch(_){}
           try{render()}catch(_){}
@@ -17103,14 +17181,14 @@ async function startPlacement(){
   /* Audit F01: setiap jalan yang TIDAK jadi membuka tes melepas sambutan yang ditahan
      (tawaran pengingat + tur) - kalau tidak, murid yang tesnya gagal dimulai kehilangan
      keduanya untuk sesi ini. resumeDeferredWelcome() diam kalau tidak ada yang ditahan. */
-  if(state.placementDone){const wait=Math.max(0,Number(state.placementLastAt||0)+LEVEL_EXAM_COOLDOWN_MS-Date.now());if(wait>0){resumeDeferredWelcome();return showToast(FiezelI18n.t('placement.tes-level-bisa-diulang',{level:levelExamCooldownLabel(wait)}))}}
+  if(state.placementDone){const wait=Math.max(0,Number(state.placementLastAt||0)+LEVEL_EXAM_COOLDOWN_MS-Date.now());if(wait>0){resumeDeferredWelcome();if(!appOpened){try{dismissBootSplash();openApp()}catch(_){}}return showToast(FiezelI18n.t('placement.tes-level-bisa-diulang',{level:levelExamCooldownLabel(wait)}))}}
   let qs=[];
-  try{qs=await buildPlacement()}catch(error){resumeDeferredWelcome();return showToast(FiezelI18n.t('placement.tes-pending-can-dijalankan',{error:String(error?.message||error)}),'warn')}
+  try{qs=await buildPlacement()}catch(error){resumeDeferredWelcome();if(!appOpened){try{dismissBootSplash();openApp()}catch(_){}}return showToast(FiezelI18n.t('placement.tes-pending-can-dijalankan',{error:String(error?.message||error)}),'warn')}
   // Enam dari 25 soal berasal dari bank listening yang diambil lewat jaringan. Kalau bank
   // itu tidak termuat, sembilan belas soal grammar dan vocabulary masih cukup untuk membaca
   // level; di bawah itu angkanya tidak lagi berarti dan tes ditahan.
   const floor=placementSize()-Object.values(placementBlueprint()).reduce((n,plan)=>n+plan.listening,0);
-  if(qs.length<floor){resumeDeferredWelcome();return showToast(FiezelI18n.t('placement.validator-hanya-menemukan-item-unik',{length:qs.length}),'warn')}
+  if(qs.length<floor){resumeDeferredWelcome();if(!appOpened){try{dismissBootSplash();openApp()}catch(_){}}return showToast(FiezelI18n.t('placement.validator-hanya-menemukan-item-unik',{length:qs.length}),'warn')}
   quizLoop({type:'placement',count:placementSize(),pool:qs,factory:x=>x,placement:true,placementLite:uxOn('placementLite')});
   /* Jaring pengaman: kalau kuisnya tidak jadi masuk sebagai stage (overlay tak kunjung
      pergi), sambutan yang ditahan tidak boleh ikut hilang. */
@@ -17880,7 +17958,7 @@ function quizLoop(cfg){
   $('quizFloatingBar')?.remove();
   try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
   document.querySelectorAll('body > #feedback').forEach(el=>el.remove());
-  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
+  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}document.body?.classList?.remove?.('has-feedback-sheet-open');
   document.getElementById('quizScaffoldNudge')?.remove();
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
   /* P1-1 (audit UX 2026-10): milestone penyemangat di tengah jalan pada sesi panjang (>=10 soal). */
@@ -18613,6 +18691,7 @@ function quizLoop(cfg){
    const stampHtml=stampText?`<div class="feedback-stamp" data-testid="memory-stamp" data-stamp="${esc(q.__memoryStamp.kind)}">${esc(stampText)}</div>`:'';
     f.classList.remove('hidden');
     f.classList.add('feedback-sheet', ok ? 'feedback-sheet-correct' : 'feedback-sheet-wrong', ok ? 'is-correct' : 'is-wrong');
+    document.body?.classList?.add('has-feedback-sheet-open');
     let bd = document.getElementById('feedbackBackdrop');
     if(!bd){
       bd = document.createElement('div');
@@ -18637,6 +18716,7 @@ function quizLoop(cfg){
     const advanceToNextQuestion = () => {
       window.__closeFeedbackSheet = null;
       try {
+        document.body?.classList?.remove('has-feedback-sheet-open');
         bd?.classList.remove('is-active');
         f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
         f.classList.add('hidden');
@@ -18658,6 +18738,7 @@ function quizLoop(cfg){
     const closeFeedbackSheet = (advance = true) => {
       window.__closeFeedbackSheet = null;
       try {
+        document.body?.classList?.remove('has-feedback-sheet-open');
         bd?.classList.remove('is-active');
         f.classList.remove('feedback-sheet', 'feedback-sheet-correct', 'feedback-sheet-wrong', 'is-correct', 'is-wrong');
         f.classList.add('hidden');
@@ -18920,7 +19001,7 @@ function quizLoop(cfg){
    // BARU SAJA keliru dan ditahan sampai murid menekan Lanjut, jadi urutannya menjadi
    // "buka jawaban ini -> ajarkan konsepnya -> soal berikutnya dengan konsep yang sama",
    // bukan langsung melempar soal serupa kepada orang yang keyakinannya belum tersentuh.
-   if(decision.move==='reteach'&&!cfg.noHints&&!MEASURE){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
+   if(decision.move==='reteach'&&!cfg.noHints&&!MEASURE&&!cfg.placement){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
    if(decision.move==='breathe')answer.breathe=true;
   }else{
    // Percobaan kedua berhasil berkat scaffolding (Zone of Proximal Development)
@@ -19105,7 +19186,7 @@ function quizLoop(cfg){
   $('quizFloatingBar')?.remove();
   try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
   document.querySelectorAll('body > #feedback').forEach(el=>el.remove());
-  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
+  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}document.body?.classList?.remove?.('has-feedback-sheet-open');
   document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
   /* W1 P1-1: mode ukur melompati popup keyakinan (verdiknya tertulis di popup itu) DAN
      teater analyzing 700ms \u2014 langsung ke tanda terima netral. */
@@ -19294,7 +19375,7 @@ function quizLoop(cfg){
   $('quizFloatingBar')?.remove();
   try{const bd=document.getElementById('feedbackBackdrop');if(bd&&typeof bd.remove==='function')bd.remove();else if(bd&&bd.parentNode)bd.parentNode.removeChild(bd);}catch(_){}
   document.querySelectorAll('body > #feedback').forEach(el=>el.remove());
-  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}
+  const fReset=$('feedback');if(fReset){fReset.classList.remove('feedback-sheet','feedback-sheet-correct','feedback-sheet-wrong','is-correct','is-wrong');fReset.classList.add('hidden');}document.body?.classList?.remove?.('has-feedback-sheet-open');
   if(!cfg.__finished)abandonActiveSession('quiz_exit')
  }});
  draw();
@@ -20376,7 +20457,7 @@ window.activeTargetLang=activeTargetLang;
    bicara lahir DAN paku en-US dicabut, hapus entri 'ja' — bukan tambahkan pengecualian di
    tempat lain. tests/japanese-surface-honesty-test.js mengikat kedua syarat itu ke isi
    direktori content/ja/, jadi ia yang akan menuntut penghapusannya. */
-const TARGET_LANG_BLOCKED_VIEWS=Object.freeze({ja:Object.freeze(['skills','listening','speaking']),/* Tabel kana hanya bermakna di kursus Jepang. */en:Object.freeze(['kana'])});
+const TARGET_LANG_BLOCKED_VIEWS=Object.freeze({ja:Object.freeze(['skills','listening','speaking']),/* Tabel kana hanya bermakna di kursus Jepang. */en:Object.freeze(['kana']),zh:Object.freeze(['kana','skills','listening','speaking','story','news','pte'])});
 function targetLangSurfaceBlocked(view){
   const daftar=TARGET_LANG_BLOCKED_VIEWS[activeTargetLang()];
   return Array.isArray(daftar)&&daftar.indexOf(String(view||''))>=0;
@@ -20407,7 +20488,7 @@ function courseLanguageLabel(){
     const label=FiezelI18n.t('bahasa.'+kode);
     if(label&&label!=='bahasa.'+kode)return String(label);
   }catch(_){}
-  return kode==='ja'?'Bahasa Jepang':'Bahasa Inggris';
+  return kode==='ja'?'Bahasa Jepang':kode==='zh'?'Bahasa Mandarin':'Bahasa Inggris';
 }
 window.courseLanguageLabel=courseLanguageLabel;
 /* KURSUS YANG BELUM PUNYA SUARA (m025-314).
@@ -20777,13 +20858,13 @@ function bindUiSfxDelegation(){
 // benar-benar BARU dibuka yang mendorong entri: openSettings -> openReportPreview ->
 // openSettings hanya menukar isi panel yang sama, dan tiga entri untuk satu dialog akan
 // membuang dua tekanan kembali pada layar yang sudah tidak ada.
-function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);try{document.documentElement?.classList?.add?.('fz-modal-open');document.body?.classList?.add?.('fz-modal-open');}catch(_){}const modal=$('modal');const panel=$('modalPanel');if(panel){panel.innerHTML=html;panel.scrollTop=0;}modal.classList.remove('hidden');enhanceUI();try{const appEl=$('app');if(appEl){appEl.setAttribute('aria-hidden','true');if('inert' in appEl)appEl.inert=true}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.setAttribute('aria-hidden','true');if('inert' in nav)nav.inert=true}}catch(_){}/* q17-S1 2026-08-29: dialog wajib mengelola fokus — fokus awal ke tombol pertama, dan fokus dikembalikan saat tutup (lihat closeModalNow). Trap Tab ada di modalTrapKeydown. */if(!wasOpen)modalReturnFocus=document.activeElement;(window.requestAnimationFrame||setTimeout)(()=>{modal.classList.add('show');try{const first=modal.querySelector('#modalPanel button,#modalPanel [href],#modalPanel input,#modalPanel select,#modalPanel textarea');(first||modal.querySelector('#modalPanel'))?.focus?.({preventScroll:true});if(panel)panel.scrollTop=0;}catch(_){}});if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
+function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);const rawModalHtml=String(html||'');const isSettingsModal=rawModalHtml.includes('settings-modal-wrapper');const isLevelPickerModal=rawModalHtml.includes('level-picker-grid');try{document.documentElement?.classList?.add?.('fz-modal-open');document.body?.classList?.add?.('fz-modal-open');}catch(_){}const modal=$('modal');const panel=$('modalPanel');try{modal?.classList?.toggle?.('has-settings-wrapper',isSettingsModal);panel?.classList?.toggle?.('has-settings-wrapper',isSettingsModal);panel?.classList?.toggle?.('has-level-picker',isLevelPickerModal);}catch(_){}if(panel){panel.innerHTML=html;panel.scrollTop=0;}modal.classList.remove('hidden');enhanceUI();try{const appEl=$('app');if(appEl){appEl.setAttribute('aria-hidden','true');if('inert' in appEl)appEl.inert=true}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.setAttribute('aria-hidden','true');if('inert' in nav)nav.inert=true}}catch(_){}/* q17-S1 2026-08-29: dialog wajib mengelola fokus — fokus awal ke tombol pertama, dan fokus dikembalikan saat tutup (lihat closeModalNow). Trap Tab ada di modalTrapKeydown. */if(!wasOpen)modalReturnFocus=document.activeElement;(window.requestAnimationFrame||setTimeout)(()=>{modal.classList.add('show');try{const first=modal.querySelector('#modalPanel button,#modalPanel [href],#modalPanel input,#modalPanel select,#modalPanel textarea');(first||modal.querySelector('#modalPanel'))?.focus?.({preventScroll:true});if(panel)panel.scrollTop=0;}catch(_){}});if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
 // Penutup mentah. Ini yang dipegang riwayat, jadi ia TIDAK BOLEH menyentuh riwayat lagi -
 // kalau ia melakukannya, satu tekanan kembali akan memakan dua entri. Mengembalikan false
 // bila memang tidak ada modal terbuka, supaya jalur kembali tahu tekanan itu belum terpakai
 // dan boleh meneruskannya ke lapisan di bawahnya.
 let modalReturnFocus=null;
-function closeModalNow(){if(!modalOpen)return false;modalOpen=false;try{document.documentElement?.classList?.remove?.('fz-modal-open');document.body?.classList?.remove?.('fz-modal-open');}catch(_){}try{dismissAllModalsDefensive()}catch(_){}try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}try{$('modalPanel')?.classList.remove('modal-connect-panel')}catch(_){}uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');if(modal)modal.classList.remove('show');modalCloseTimer=setTimeout(()=>{if(modal)modal.classList.add('hidden')},320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
+function closeModalNow(){if(!modalOpen)return false;modalOpen=false;try{document.documentElement?.classList?.remove?.('fz-modal-open');document.body?.classList?.remove?.('fz-modal-open');}catch(_){}try{dismissAllModalsDefensive()}catch(_){}try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}try{$('modal')?.classList?.remove?.('has-settings-wrapper');const mp=$('modalPanel');mp?.classList?.remove?.('modal-connect-panel','has-settings-wrapper','has-level-picker');}catch(_){}uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');if(modal)modal.classList.remove('show');modalCloseTimer=setTimeout(()=>{if(modal)modal.classList.add('hidden')},320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
 // Ditutup oleh aplikasi sendiri (tombol Batal/Tutup/Escape): layarnya berubah seketika, dan
 // entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
 // sudah tidak ada.
@@ -23615,11 +23696,12 @@ async function socialNotifyPoll(force){
   if(!force&&Date.now()-socialNotifyAt<SOCIAL_NOTIFY_MIN_GAP_MS)return null;
   if(typeof navigator!=='undefined'&&navigator.onLine===false)return null;
   socialNotifyBusy=true;
+  if(!force)socialNotifyAt=Date.now();
   try{
     let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
-    if(flag!=='on')return null;
+    if(flag!=='on'){socialNotifyAt=Date.now();return null}
     const fr=await core.api.friends();
-    if(!fr.ok||!fr.data)return null;
+    if(!fr.ok||!fr.data){socialNotifyAt=Date.now();return null}
     socialNotifyAt=Date.now();
     /* Permintaan masuk ditarik BERSAMA daftar teman, di ronde yang sama. Ia bukan teman,
        jadi ia tidak pernah muncul di fr.data - tanpa panggilan ini tidak ada tempat mana pun
@@ -24000,6 +24082,7 @@ async function notifSyncRound(){
 const NOTIF_POLL_MS=6000;
 function startNotifPolling(){
   if(notifPollTimer)return false;
+  let ownerMsgNextAt=0,ownerMsgFailStreak=0,gemGrantNextAt=0,gemGrantFailStreak=0,dailyGemNextAt=0,dailyGemHistLen=-1;
   notifPollTimer=setInterval(()=>{
     const plan=notifSyncPlan();
     if(plan==='reset'){notifSyncing=false;notifSyncingSince=0}
@@ -24011,7 +24094,33 @@ function startNotifPolling(){
     else if(typeof document==='undefined'||document.visibilityState==='visible'){
       try{if(navigator&&navigator.onLine!==false){socialNotifyPoll(false);refreshFriendRequestCount()}}catch(_){}
     }
-    try{if(navigator&&navigator.onLine!==false){pollOwnerMessages(false);checkPendingGemGrants(true);checkDailyGemRewards(true)}}catch(_){}
+    if(typeof document==='undefined'||document.visibilityState==='visible'){
+      const now=Date.now();
+      try{
+        if(typeof navigator==='undefined'||navigator.onLine!==false){
+          if(now>=ownerMsgNextAt){
+            ownerMsgNextAt=now+60000;
+            Promise.resolve(pollOwnerMessages(false)).then(ok=>{
+              if(ok){ownerMsgFailStreak=0;ownerMsgNextAt=Date.now()+60000}
+              else{ownerMsgFailStreak=Math.min(4,ownerMsgFailStreak+1);ownerMsgNextAt=Date.now()+Math.min(300000,30000*(1<<ownerMsgFailStreak))}
+            }).catch(()=>{ownerMsgFailStreak=Math.min(4,ownerMsgFailStreak+1);ownerMsgNextAt=Date.now()+Math.min(300000,30000*(1<<ownerMsgFailStreak))});
+          }
+          if(now>=gemGrantNextAt){
+            gemGrantNextAt=now+60000;
+            Promise.resolve(checkPendingGemGrants(true)).then(ok=>{
+              if(ok){gemGrantFailStreak=0;gemGrantNextAt=Date.now()+60000}
+              else{gemGrantFailStreak=Math.min(4,gemGrantFailStreak+1);gemGrantNextAt=Date.now()+Math.min(300000,30000*(1<<gemGrantFailStreak))}
+            }).catch(()=>{gemGrantFailStreak=Math.min(4,gemGrantFailStreak+1);gemGrantNextAt=Date.now()+Math.min(300000,30000*(1<<gemGrantFailStreak))});
+          }
+        }
+        const hLen=Array.isArray(state?.history)?state.history.length:0;
+        const drDone=Boolean(state?.dailyRewards?.loginBonusClaimed&&state?.dailyRewards?.study10MinClaimed&&state?.dailyRewards?.date===studyDayKey(now,state));
+        if(!drDone&&(hLen!==dailyGemHistLen||now>=dailyGemNextAt)){
+          dailyGemHistLen=hLen;dailyGemNextAt=now+30000;
+          checkDailyGemRewards(true);
+        }
+      }catch(_){}
+    }
   },NOTIF_POLL_MS);
   notifPollTimer?.unref?.();
   try{
@@ -24168,7 +24277,10 @@ async function accountSubmit(){
       go('tutor');
       return true;
     }
-    showToast(FiezelI18n.t('account.signed-in',{handle:st?.handle||handle}),'success');
+    const accHandle=String(st?.handle||handle||'').trim();
+    try{activateAccountState(accHandle||'murid')}catch(_){}
+    try{self.FiezelAuthScreen?.saveSession?.(self,{role:'murid',via:'akun',name:accHandle})}catch(_){}
+    showToast(FiezelI18n.t('account.signed-in',{handle:accHandle||handle}),'success');
     try{render()}catch(_){}
     return true;
   }
@@ -24408,68 +24520,10 @@ function maybeAutoDetectLocale(){
 function installScrollRubberBand(){
   if(window.__fzScrollRubberBandInstalled)return;
   window.__fzScrollRubberBandInstalled=true;
-  let startY=0,startX=0,isRubberBanding=false,activeBoundary=0,lastPull=0;
-  window.addEventListener('touchstart',e=>{
-    if(!e.touches||e.touches.length!==1)return;
-    const t=e.touches[0];
-    startY=t.clientY;startX=t.clientX;
-    isRubberBanding=false;activeBoundary=0;lastPull=0;
-  },{passive:true});
-  window.addEventListener('touchmove',e=>{
-    if(!e.touches||e.touches.length!==1)return;
-    const t=e.touches[0];
-    const dy=t.clientY-startY,dx=t.clientX-startX;
-    if(!isRubberBanding){
-      if(Math.abs(dx)>Math.abs(dy))return;
-      if(Math.abs(dy)<8)return;
-      if(e.target&&e.target.closest&&e.target.closest('.flashcard,.card-flashcard,input,textarea,select,.modal-content,.fiezel-ob,.fzc-container,.fzc-feed'))return;
-      if(document.body.classList.contains('fz-view-chat')||
-         document.body.classList.contains('fz-lesson-mode')||
-         document.body.classList.contains('fz-stage-quiz')||
-         document.body.classList.contains('fz-stage-sl')||
-         (e.target&&e.target.closest&&e.target.closest('.fzc-container,.fzc-feed,.quiz-shell,.quiz-stage,fiezel-mascot,.fz-mochi-viewport,canvas,.card,.fsl-player,.jlpt-mobile-card,.jlpt-mascot-slot,.fsl-shell,.writing-stage')))return;
-      const scrollEl=document.scrollingElement||document.documentElement||document.body;
-      const scrollTop=scrollEl?scrollEl.scrollTop:window.scrollY;
-      const maxScroll=scrollEl?Math.max(0,scrollEl.scrollHeight-window.innerHeight):0;
-      if(scrollTop<=1&&dy>0){
-        isRubberBanding=true;activeBoundary=1;
-      }else if(scrollTop>=maxScroll-2&&dy<0){
-        isRubberBanding=true;activeBoundary=-1;
-      }
-    }
-    if(isRubberBanding){
-      if(e.cancelable)e.preventDefault();
-      const pull=activeBoundary===1?Math.max(0,dy):Math.min(0,dy);
-      lastPull=pull;
-      const dimension=300,c=0.52,sign=pull>=0?1:-1,absPull=Math.abs(pull);
-      const resisted=sign*((absPull*dimension*c)/(dimension+absPull*c));
-      const appEl=document.getElementById('app');
-      if(appEl){
-        appEl.style.transition='none';
-        appEl.style.transform=`translate3d(0,${resisted.toFixed(1)}px,0)`;
-      }
-    }
-  },{passive:false});
-  const releaseRubberBand=()=>{
-    if(!isRubberBanding)return;
-    isRubberBanding=false;
-    const appEl=document.getElementById('app');
-    if(appEl){
-      appEl.style.transition='transform 0.42s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-      appEl.style.transform='translate3d(0,0,0)';
-      if(Math.abs(lastPull)>28){
-        try{haptic('tap')}catch(_){}
-      }
-      setTimeout(()=>{
-        if(!isRubberBanding&&appEl){
-          appEl.style.transition='';
-          appEl.style.transform='';
-        }
-      },420);
-    }
-  };
-  window.addEventListener('touchend',releaseRubberBand,{passive:true});
-  window.addEventListener('touchcancel',releaseRubberBand,{passive:true});
+  try{
+    document.documentElement.style.overscrollBehaviorY='contain';
+    if(document.body)document.body.style.overscrollBehaviorY='contain';
+  }catch(_){}
 }
 function syncLearnerAccountOnBoot(){
   try{

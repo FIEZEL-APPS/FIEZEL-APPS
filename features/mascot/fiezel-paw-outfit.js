@@ -499,9 +499,26 @@
   function mulai() {
     pindai();
     try {
+      var scanScheduled = false;
+      function schedulePindai() {
+        if (scanScheduled) return;
+        scanScheduled = true;
+        var run = function () { scanScheduled = false; pindai(); };
+        if (typeof global.requestAnimationFrame === 'function') global.requestAnimationFrame(run);
+        else setTimeout(run, 16);
+      }
       new MutationObserver(function (muts) {
         for (var i = 0; i < muts.length; i++) {
-          if (muts[i].addedNodes && muts[i].addedNodes.length) { pindai(); return; }
+          var added = muts[i].addedNodes;
+          if (!added) continue;
+          for (var j = 0; j < added.length; j++) {
+            var n = added[j];
+            if (n.nodeType !== 1) continue;
+            if (n.localName === 'fiezel-mascot' || (n.firstElementChild && n.querySelector('fiezel-mascot'))) {
+              schedulePindai();
+              return;
+            }
+          }
         }
       }).observe(doc.body || doc.documentElement, { childList: true, subtree: true });
     } catch (_) { }

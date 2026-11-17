@@ -111,6 +111,7 @@ const BANNED_DIRS = new Set([
 // 1. Core top-level web shell files
 const CORE_ROOT_FILES = [
   'index.html',
+  'call.html',
   'kurikulum.html',
   'misi.html',
   'undercover.html',

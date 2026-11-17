@@ -880,6 +880,7 @@
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      try { document.body.classList.add('has-listening-modal'); } catch (_) {}
       try {
         var appEl = document.getElementById('app');
         if (appEl) { appEl.setAttribute('aria-hidden', 'true'); if ('inert' in appEl) appEl.inert = true; }
@@ -908,6 +909,7 @@
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      try { document.body.classList.remove('has-listening-modal'); } catch (_) {}
       try {
         var appEl = document.getElementById('app');
         if (appEl) { appEl.removeAttribute('aria-hidden'); if ('inert' in appEl) appEl.inert = false; }
@@ -2373,6 +2375,7 @@
 
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
+    try { document.body.classList.add('has-jlpt-sheet'); } catch (_) {}
     var modalEl = document.getElementById('listeningPanelModal') || document.querySelector('.listening-modal');
     if (modalEl) modalEl.classList.add('sheet-open');
     if (!sheetOpen) {
@@ -2394,6 +2397,7 @@
     if (sheet) {
       sheet.classList.remove('open');
       sheet.setAttribute('aria-hidden', 'true');
+      try { document.body.classList.remove('has-jlpt-sheet'); } catch (_) {}
       var container = sheet.querySelector('#jlptSheetContainer');
       if (container) container.style.transform = '';
     }

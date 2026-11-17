@@ -1717,14 +1717,27 @@
     doc.getElementById('nujumSummaryExitBtn').onclick = exitNujum;
   }
 
-  function exitNujum() {
+  function cleanupNujum() {
     nujumState.active = false;
     stopRoundTimer();
-    if (nujumState.waveAnimFrame) cancelAnimationFrame(nujumState.waveAnimFrame);
+    if (nujumState.waveAnimFrame) {
+      cancelAnimationFrame(nujumState.waveAnimFrame);
+      nujumState.waveAnimFrame = null;
+    }
+    if (currentMachineAudio) {
+      try {
+        currentMachineAudio.pause();
+        currentMachineAudio.currentTime = 0;
+      } catch (_) {}
+      currentMachineAudio = null;
+    }
     if (nujumState.recognition) {
       try { nujumState.recognition.stop(); } catch (_) {}
     }
-    if (nujumState.disputeTimerInterval) clearInterval(nujumState.disputeTimerInterval);
+    if (nujumState.disputeTimerInterval) {
+      clearInterval(nujumState.disputeTimerInterval);
+      nujumState.disputeTimerInterval = null;
+    }
     doc.body.classList.remove('fz-view-nujum');
     try {
       var nav = doc.querySelector('.bottomnav');
@@ -1732,6 +1745,10 @@
       var topbar = doc.querySelector('.topbar');
       if (topbar) topbar.style.removeProperty('display');
     } catch (_) {}
+  }
+
+  function exitNujum() {
+    cleanupNujum();
     if (typeof root.go === 'function') {
       root.go('home');
     }
@@ -1785,6 +1802,7 @@
     startSession: startSession,
     homeCardMarkup: homeCardMarkup,
     exit: exitNujum,
+    unmount: cleanupNujum,
     teleportToPractice: teleportToPractice,
     getCurrentAudio: function () { return currentMachineAudio; },
     getState: function () { return nujumState; },

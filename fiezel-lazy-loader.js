@@ -144,7 +144,7 @@
       nodes().forEach(function (node) {
         var name = node.getAttribute('data-fiezel-lazy') || '';
         if (!name || out.indexOf(name) !== -1) return;
-        if ((node.getAttribute('data-fiezel-lazy-when') || 'idle') === 'idle') out.push(name);
+        if (node.getAttribute('data-fiezel-lazy-when') === 'idle') out.push(name);
       });
       return out;
     }

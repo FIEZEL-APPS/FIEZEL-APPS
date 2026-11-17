@@ -209,8 +209,8 @@ public class MainActivity extends AppCompatActivity {
      */
     @SuppressLint("SetJavaScriptEnabled")
     private void setupWebView() {
-        // Ensure hardware layer acceleration
-        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        // Let Chromium WebView use its native GPU compositor directly without an extra offscreen FBO copy
+        webView.setLayerType(View.LAYER_TYPE_NONE, null);
 
         WebSettings settings = webView.getSettings();
 
@@ -223,12 +223,8 @@ public class MainActivity extends AppCompatActivity {
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 
-        // Cache mode based on network connectivity
-        if (isNetworkConnected()) {
-            settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        } else {
-            settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        }
+        // Cache mode based on current network connectivity
+        syncWebCacheMode();
 
         // Security hardening
         settings.setAllowFileAccess(false);
@@ -389,7 +385,11 @@ public class MainActivity extends AppCompatActivity {
                 popupSettings.setDatabaseEnabled(true);
                 popupSettings.setSupportMultipleWindows(true);
                 popupSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-                popupSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+                popupSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+                popupSettings.setAllowFileAccess(false);
+                popupSettings.setAllowContentAccess(false);
+                popupSettings.setAllowFileAccessFromFileURLs(false);
+                popupSettings.setAllowUniversalAccessFromFileURLs(false);
                 popupSettings.setUserAgentString(cleanUA);
 
                 if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
@@ -420,12 +420,17 @@ public class MainActivity extends AppCompatActivity {
                         Uri uri = req.getUrl();
                         String host = uri.getHost();
                         if (host != null) {
-                            String lowerHost = host.toLowerCase();
-                            if (lowerHost.contains("google.") ||
-                                lowerHost.endsWith(".google") ||
-                                lowerHost.contains("gstatic.com") ||
-                                lowerHost.contains("googleusercontent.com") ||
-                                lowerHost.contains("googleapis.com") ||
+                            String lowerHost = host.toLowerCase(java.util.Locale.ROOT);
+                            if (lowerHost.equals("accounts.google.com") ||
+                                lowerHost.equals("google.com") ||
+                                lowerHost.endsWith(".google.com") ||
+                                lowerHost.equals("gstatic.com") ||
+                                lowerHost.endsWith(".gstatic.com") ||
+                                lowerHost.equals("googleusercontent.com") ||
+                                lowerHost.endsWith(".googleusercontent.com") ||
+                                lowerHost.equals("googleapis.com") ||
+                                lowerHost.endsWith(".googleapis.com") ||
+                                lowerHost.matches("^(?:[a-z0-9-]+\\.)*google\\.(?:co\\.[a-z]{2}|com\\.[a-z]{2}|[a-z]{2,3})$") ||
                                 lowerHost.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
                                 lowerHost.endsWith("." + FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
                                 lowerHost.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_APPASSETS)) {
@@ -442,7 +447,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onPageFinished(WebView v, String url) {
                         super.onPageFinished(v, url);
-                        if (url != null && url.contains(FiezelAssetLoaderFactory.DOMAIN_FIEZEL) && !url.contains("accounts.google.com")) {
+                        Uri finishedUri = url != null ? Uri.parse(url) : null;
+                        String finishedHost = finishedUri != null && finishedUri.getHost() != null
+                                ? finishedUri.getHost().toLowerCase(java.util.Locale.ROOT)
+                                : "";
+                        boolean isFiezelHost = finishedHost.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_FIEZEL)
+                                || finishedHost.endsWith("." + FiezelAssetLoaderFactory.DOMAIN_FIEZEL);
+                        if (isFiezelHost && !"accounts.google.com".equals(finishedHost)) {
                             // Delay dismissal slightly to allow postMessage token exchange with parent window
                             v.postDelayed(() -> {
                                 if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
@@ -455,6 +466,10 @@ public class MainActivity extends AppCompatActivity {
 
                 activeAuthDialog.show();
 
+                if (resultMsg == null || !(resultMsg.obj instanceof WebView.WebViewTransport)) {
+                    activeAuthDialog.dismiss();
+                    return false;
+                }
                 WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
                 transport.setWebView(popupWebView);
                 resultMsg.sendToTarget();
@@ -530,7 +545,7 @@ public class MainActivity extends AppCompatActivity {
         // Prevent pull-to-refresh triggering when webView has scrolled down
         swipeRefreshLayout.setOnChildScrollUpCallback((parent, child) -> {
             if (webView != null) {
-                return webView.getScrollY() > 0;
+                return webView.getScrollY() > 0 || webView.canScrollVertically(-1);
             }
             return false;
         });
@@ -634,6 +649,7 @@ public class MainActivity extends AppCompatActivity {
      * Retries loading the last failed URL or default entry point.
      */
     private void retryConnection() {
+        syncWebCacheMode();
         showOfflineScreen(false, null);
         if (lastAttemptedUrl != null && !lastAttemptedUrl.isEmpty()) {
             webView.loadUrl(lastAttemptedUrl);
@@ -663,8 +679,13 @@ public class MainActivity extends AppCompatActivity {
                 webView.loadUrl(targetUrl);
                 return;
             } else if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
-                webView.loadUrl(data.toString());
-                return;
+                String host = data.getHost() != null ? data.getHost().toLowerCase(java.util.Locale.ROOT) : "";
+                if (host.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
+                    host.endsWith("." + FiezelAssetLoaderFactory.DOMAIN_FIEZEL)) {
+                    webView.loadUrl(data.toString());
+                    return;
+                }
+                Log.w(TAG, "Ignored untrusted Intent URL host: " + host);
             }
         }
 
@@ -678,6 +699,18 @@ public class MainActivity extends AppCompatActivity {
         handleIntent(intent);
     }
 
+    private void syncWebCacheMode() {
+        if (webView == null) return;
+        WebSettings settings = webView.getSettings();
+        if (settings == null) return;
+        int targetMode = isNetworkConnected()
+                ? WebSettings.LOAD_DEFAULT
+                : WebSettings.LOAD_CACHE_ELSE_NETWORK;
+        if (settings.getCacheMode() != targetMode) {
+            settings.setCacheMode(targetMode);
+        }
+    }
+
     private boolean isNetworkConnected() {
         try {
             ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -686,7 +719,8 @@ public class MainActivity extends AppCompatActivity {
                 android.net.Network network = cm.getActiveNetwork();
                 if (network == null) return false;
                 NetworkCapabilities cap = cm.getNetworkCapabilities(network);
-                return cap != null && (
+                return cap != null &&
+                        cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && (
                         cap.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                         cap.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                         cap.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
@@ -721,6 +755,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if (webView != null) {
             webView.onResume();
+            syncWebCacheMode();
         }
         if (isOfflineVisible && isNetworkConnected()) {
             Log.i(TAG, "Network restored on resume, retrying connection to live server");

@@ -1,6 +1,7 @@
 """Student Learning Loop — learning mission, sesi adaptif, diagnosis, penjelasan,
 hint, retry, evidence, mastery, retensi, transfer. Termasuk telemetry idempoten.
 """
+import asyncio
 import re
 import uuid
 import math
@@ -166,13 +167,15 @@ async def offline_batch(body: OfflineBatchIn, u=Depends(current_user)):
             raise HTTPException(400, f"Butir {n}: cap waktu di masa depan")
         if (sekarang - d).days > 60:
             raise HTTPException(400, f"Butir {n}: bukti lebih tua dari 60 hari")
+    cids = list({STATIC_COMPETENCY[a.static_item_id] for a in items if a.static_item_id in STATIC_COMPETENCY})
+    comp_tp_map: dict[str, str | None] = {}
+    if cids:
+        comps = await db.curriculum_nodes.find({"id": {"$in": cids}}, {"_id": 0, "id": 1, "tp_id": 1}).to_list(len(cids))
+        comp_tp_map = {c["id"]: c.get("tp_id") for c in comps if c.get("id")}
     hasil, terpapar, tanpa_peta = [], 0, 0
     for a in items:
         cid = STATIC_COMPETENCY.get(a.static_item_id)
-        tp = None
-        if cid:
-            comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0, "tp_id": 1})
-            tp = (comp or {}).get("tp_id")
+        tp = comp_tp_map.get(cid) if cid else None
         ev = await record_event("question_answered", sid, {
             "question_id": a.static_item_id, "unit_id": a.unit_id,
             "subchapter_id": a.subchapter_id, "competency_id": cid,
@@ -216,10 +219,21 @@ async def today(u=Depends(current_user)):
          "$or": [{"student_ids": u["user_id"]},
                  {"for_whole_class": True, "class_id": {"$in": class_ids}}]},
         {"_id": 0}).sort("created_at", -1).to_list(50)
+    aids = [a["id"] for a in assessments]
+    all_tp_ids = list({tid for a in assessments for tid in (a.get("tp_ids") or [])})
+    async def _empty_docs():
+        return []
+    sess_list, tp_list, due_rev = await asyncio.gather(
+        db.sessions.find({"assessment_id": {"$in": aids}, "student_id": u["user_id"]}, {"_id": 0}).to_list(len(aids) or 1) if aids else _empty_docs(),
+        db.curriculum_nodes.find({"id": {"$in": all_tp_ids}}, {"_id": 0}).to_list(len(all_tp_ids) or 1) if all_tp_ids else _empty_docs(),
+        bc.due_reviews(u["user_id"]),
+    )
+    sess_by_aid = {s["assessment_id"]: s for s in sess_list if s.get("assessment_id")}
+    tp_by_id = {t["id"]: t for t in tp_list if t.get("id")}
     out = []
     for a in assessments:
-        sess = await db.sessions.find_one({"assessment_id": a["id"], "student_id": u["user_id"]}, {"_id": 0})
-        tps = await db.curriculum_nodes.find({"id": {"$in": a.get("tp_ids") or []}}, {"_id": 0}).to_list(50)
+        sess = sess_by_aid.get(a["id"])
+        tps = [tp_by_id[tid] for tid in (a.get("tp_ids") or []) if tid in tp_by_id]
         out.append({"assessment_id": a["id"], "title": a["title"], "type": a["assessment_type"],
                     "type_label": ASSESSMENT_TYPES.get(a["assessment_type"], {}).get("label"),
                     "purpose": ASSESSMENT_TYPES.get(a["assessment_type"], {}).get("purpose"),
@@ -227,7 +241,7 @@ async def today(u=Depends(current_user)):
                     "minutes": a.get("minutes"), "question_count": a.get("question_count"),
                     "session": {"id": sess["id"], "state": sess["state"],
                                 "answered": sess.get("answered_count", 0)} if sess else None})
-    return {"missions": out, "due_reviews": await bc.due_reviews(u["user_id"])}
+    return {"missions": out, "due_reviews": due_rev}
 
 
 # ------------------------- sesi -------------------------

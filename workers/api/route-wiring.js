@@ -911,6 +911,7 @@ export { runSocialRetentionPurge };
 
 export const CRON_QUOTA_SWEEP = '*/5 * * * *';
 export const CRON_ANALYTICS_ROLLUP = '5 17 * * *';
+export const CRON_REMINDERS = '17 * * * *';
 
 export async function runScheduled(event, env, executionCtx, now) {
   const cron = String((event && event.cron) || '');
@@ -926,8 +927,12 @@ export async function runScheduled(event, env, executionCtx, now) {
     socialRetentionPurge: null
   };
 
-  const wantSweep = cron === CRON_QUOTA_SWEEP || cron !== CRON_ANALYTICS_ROLLUP;
-  const wantRollup = cron === CRON_ANALYTICS_ROLLUP || cron !== CRON_QUOTA_SWEEP;
+  const knownCron =
+    cron === CRON_QUOTA_SWEEP ||
+    cron === CRON_ANALYTICS_ROLLUP ||
+    cron === CRON_REMINDERS;
+  const wantSweep = cron === CRON_QUOTA_SWEEP || !knownCron;
+  const wantRollup = cron === CRON_ANALYTICS_ROLLUP || !knownCron;
 
   // A3: tiap job dibungkus `withCronRun` supaya SUKSES DAN GAGAL meninggalkan
   // satu baris `cron_run` di `fiezel-core`. Pembungkusnya tidak mengubah nilai
