@@ -21,6 +21,8 @@ import { jsonResponse as rawJsonResponse, badRequest, unauthenticated } from '..
 import { readJsonFromCtx } from '../mw-guard.js';
 import { aiSpendGate } from '../route-wiring.js';
 import { checkAiEnabled } from '../feature-gate.js';
+import { ensureLegacySchema } from '../legacy-schema.js';
+import { projectBrainAttempt } from '../route-legacy.js';
 
 /**
  * FIEZEL copy invariant (owner mandate): no em-dash / en-dash in any learner-facing
@@ -2054,9 +2056,49 @@ export async function routeVoicePartnerTurn(ctx) {
   });
 }
 
+function sanitizeSyncToken(value, fallback = '') {
+  const cleaned = String(value == null ? '' : value)
+    .trim()
+    .replace(/[^A-Za-z0-9._:@#-]/g, '_')
+    .slice(0, 80);
+  return cleaned || fallback;
+}
+
+function projectVoiceSyncAttempt(raw, tabId, nowMs) {
+  if (!raw || typeof raw !== 'object') return null;
+  const attemptId = sanitizeSyncToken(raw.id || raw.attemptId);
+  if (!attemptId) return null;
+  const okVal = typeof raw.verdict === 'boolean' ? raw.verdict : (typeof raw.ok === 'boolean' ? raw.ok : null);
+  if (okVal === null) return null;
+  const atRaw = Number(raw.timestamp ?? raw.at);
+  const at = Number.isFinite(atRaw) && atRaw > 0 ? Math.floor(atRaw) : nowMs;
+  const skill = sanitizeSyncToken(raw.competencyId || raw.skill || 'kaiwa_general', 'kaiwa_general');
+  const item = sanitizeSyncToken(raw.scenarioId || raw.item || skill, skill);
+  const candidate = {
+    schema: 'fiezel-attempt-record-v1',
+    attemptId,
+    at,
+    ok: okVal,
+    type: 'speaking',
+    skill,
+    lesson: skill,
+    item,
+    concept: skill,
+    kappa: raw.hintsUsed ? 0.5 : (raw.measureMode ? 1.0 : 0.75),
+    timing: raw.hintsUsed ? 'struggled' : 'normal',
+  };
+  const pred = Number(raw.pMasteryBefore ?? raw.predicted);
+  if (Number.isFinite(pred) && pred >= 0 && pred <= 1) candidate.predicted = Number(pred.toFixed(4));
+  const misc = !okVal && raw.misconceptionId ? sanitizeSyncToken(raw.misconceptionId) : '';
+  if (misc) candidate.misconception = misc;
+  const sess = sanitizeSyncToken(tabId || raw.sessionId || raw.scenarioId);
+  if (sess) candidate.sessionId = sess;
+  return projectBrainAttempt(candidate);
+}
+
 /**
  * Handler POST /api/braincore/sync
- * Idempotently acknowledges voice telemetry queue from student client.
+ * Persists allowlisted voice attempts (no raw transcript/audio) to CORE_DB `brain_attempts`.
  */
 export async function routeVoiceBraincoreSync(ctx) {
   const readRes = await readJsonFromCtx(ctx).catch(() => null);
@@ -2067,11 +2109,56 @@ export async function routeVoiceBraincoreSync(ctx) {
   if (!Array.isArray(body.attempts)) {
     return badRequest('missing_attempts_array');
   }
-  const acceptedIds = body.attempts
-    .slice(0, 100)
-    .map((a) => (a && typeof a.id === 'string' ? a.id.trim().slice(0, 128) : ''))
-    .filter(Boolean);
-  return jsonResponse({ ok: true, acceptedIds, count: acceptedIds.length });
+  const sub = String(ctx?.identity?.sub || '').trim();
+  if (!sub) {
+    return unauthenticated({ headers: ctx?.corsHeaders || {} });
+  }
+  const db = (ctx && ctx.env && (ctx.env.CORE_DB || ctx.env.DB)) || null;
+  if (!db || typeof db.prepare !== 'function') {
+    return jsonResponse(
+      { ok: false, error: 'storage_unavailable' },
+      { status: 503, headers: ctx?.corsHeaders || {} }
+    );
+  }
+
+  const now = Number(ctx?.now) || Date.now();
+  const batch = body.attempts.slice(0, 100);
+  const projected = [];
+  for (const rawAttempt of batch) {
+    const clean = projectVoiceSyncAttempt(rawAttempt, body.tabId, now);
+    if (clean) projected.push(clean);
+  }
+
+  if (projected.length > 0) {
+    try {
+      await ensureLegacySchema(db);
+      const stmts = projected.map((att) =>
+        db.prepare(
+          'INSERT OR REPLACE INTO brain_attempts (sub, attempt_id, data, created_at) VALUES (?, ?, ?, ?)'
+        ).bind(sub, att.attemptId, JSON.stringify(att), now)
+      );
+      if (typeof db.batch === 'function') {
+        await db.batch(stmts);
+      } else {
+        for (const st of stmts) await st.run();
+      }
+    } catch (_) {
+      return jsonResponse(
+        { ok: false, error: 'storage_failed' },
+        { status: 503, headers: ctx?.corsHeaders || {} }
+      );
+    }
+  }
+
+  const acceptedIds = projected.map((a) => a.attemptId);
+  return jsonResponse({
+    ok: true,
+    persisted: true,
+    acceptedIds,
+    storedCount: acceptedIds.length,
+    rejected: batch.length - acceptedIds.length,
+    count: acceptedIds.length,
+  });
 }
 
 /**

@@ -1017,13 +1017,28 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
       : Array.isArray(body.entries)
         ? body.entries
         : [];
-    const acceptedIds = items
-      .map((item) => (item && typeof item.id === 'string' ? item.id : null))
-      .filter(Boolean);
+    const devStore = globalThis.__fiezelDevBrainAttempts || (globalThis.__fiezelDevBrainAttempts = new Map());
+    const acceptedIds = [];
+    for (const item of items.slice(0, 100)) {
+      const rawId = item && (item.id || item.attemptId);
+      if (typeof rawId !== 'string' || !rawId.trim()) continue;
+      const attemptId = rawId.trim().slice(0, 80);
+      devStore.set(attemptId, {
+        attemptId,
+        at: Number(item.timestamp ?? item.at) || Date.now(),
+        ok: typeof item.verdict === 'boolean' ? item.verdict : Boolean(item.ok),
+        type: 'speaking',
+        skill: String(item.competencyId || item.skill || 'kaiwa_general').slice(0, 80),
+        misconception: item.misconceptionId ? String(item.misconceptionId).slice(0, 80) : undefined
+      });
+      acceptedIds.push(attemptId);
+    }
     return sendJson(res, 200, {
       ok: true,
+      persisted: true,
       acceptedIds,
       syncedCount: acceptedIds.length,
+      storedCount: acceptedIds.length,
       serverTime: Date.now()
     });
   }

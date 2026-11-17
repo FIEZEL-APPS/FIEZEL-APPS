@@ -455,17 +455,42 @@
     return { ok: true };
   }
 
+  function emitKakijunBraincoreTelemetry(data) {
+    var charStr = String((data && data.char) || '').trim();
+    if (!charStr) return;
+    var key = 'ja_kana_' + charStr;
+    var ms = Math.max(800, Number(data && data.elapsedMs) || 4000);
+    try {
+      if (typeof root.updateMastery === 'function') {
+        root.updateMastery('kana', key, true, ms);
+      }
+    } catch (_) {}
+    try {
+      if (typeof root.bktRecord === 'function') {
+        root.bktRecord({ lessonSkill: key, skill: key }, true, 0.9, 1.2);
+      }
+    } catch (_) {}
+    try {
+      if (typeof root.record === 'function') {
+        root.record({
+          id: key,
+          type: 'kana',
+          level: 'A1',
+          skill: key,
+          target: charStr,
+          difficulty: 1
+        }, true, ms, 0);
+      }
+    } catch (_) {}
+  }
+
   function onCharacterCompleted(data) {
     setFeedback(T('jepang.kakijun-sempurna', 'Sempurna! Karakter ') + data.char + T('jepang.kakijun-berhasil-ditulis', ' berhasil ditulis!'), 'success');
     triggerHaptic('complete');
     speakJapanese(data.char);
 
-    // Emit Braincore Telemetry: genuine learner mastery update
-    try {
-      if (typeof root.updateMastery === 'function') {
-        root.updateMastery('ja_kana_' + data.char, true);
-      }
-    } catch (_) {}
+    // Emit Braincore Telemetry: genuine learner mastery, BKT, and history update
+    emitKakijunBraincoreTelemetry(data);
 
     // Show celebratory next button
     isCharacterCompleted = true;
@@ -967,7 +992,8 @@
     resetCanvas: resetCanvas,
     playDemo: playDemoAnimation,
     stopDemo: stopDemoAnimation,
-    speak: speakJapanese
+    speak: speakJapanese,
+    _onCharacterCompleted: onCharacterCompleted
   };
 
   root.FiezelKakijunStudio = FiezelKakijunStudio;

@@ -1085,7 +1085,7 @@ function gemsCore(){try{return self.FiezelGems||null}catch(_){return null}}
 function defaultGems(){const g=gemsCore();return g?g.freshGems():{schema:'fiezel-gems-v1',balance:0,earnedTotal:0,spentTotal:0,ledger:[]}}
 function sanitizeGemsState(raw){const g=gemsCore();return g?g.sanitizeGems(raw):defaultGems()}
 function gemsBalance(){return Math.max(0,Math.floor(Number(state?.gems?.balance)||0))}
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},listening:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},listening:{},speaking:{},pte:{},kana:{},writing:{entries:[],draft:'',promptIndex:0,lastAt:0},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
 // m026-03: bendera tur BERSESI. Sebelumnya keputusan "sudah pernah lihat tur" tinggal di
 // localStorage['fiezel-tour-v1'] - satu kunci untuk seluruh aplikasi, di luar state, jadi ia
 // tidak ikut backup/restore DAN dibagi antar akun Puter di perangkat yang sama. Sekarang tiap
@@ -1101,7 +1101,7 @@ let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='';
 const PROGRESS_STATE_FIELDS=Object.freeze([
   'level','placementDone','placementBandLevel','placementBands',
   'totalAnswered','totalCorrect','totalTimeMs',
-  'history','wrongAnswers','vocab','grammar','reading','listening',
+  'history','wrongAnswers','vocab','grammar','reading','listening','speaking','pte','kana','writing',
   'adaptiveReady','adaptiveReadyByLevel','confidenceHistory',
   'sessionHistory','activeSession','inflightAttempt',
   'levelTrust','adaptivePolicyMeta','policyOutcomeMeta','coachCache'
@@ -1122,9 +1122,14 @@ function progressStorageKey(baseKey,lang){
   try{return self.FiezelTargetLanguage?.key?.(String(baseKey||''),lang)??String(baseKey||'')}
   catch(_){return String(baseKey||'')}
 }
+function clonePlainContainer(val){
+  if(Array.isArray(val))return val.slice();
+  if(val&&typeof val==='object')return {...val};
+  return val;
+}
 function pickProgress(src){
   const out={};
-  PROGRESS_STATE_FIELDS.forEach(f=>{if(src&&Object.prototype.hasOwnProperty.call(src,f))out[f]=src[f]});
+  PROGRESS_STATE_FIELDS.forEach(f=>{if(src&&Object.prototype.hasOwnProperty.call(src,f))out[f]=clonePlainContainer(src[f])});
   const prefs={};
   PROGRESS_PREF_FIELDS.forEach(f=>{if(src&&src.preferences&&Object.prototype.hasOwnProperty.call(src.preferences,f))prefs[f]=src.preferences[f]});
   out.preferences=prefs;
@@ -1138,10 +1143,11 @@ function studentProgressEvidenceScore(blob){
   const vocabCount=Object.keys(blob.vocab||{}).length;
   const grammarCount=Object.keys(blob.grammar||{}).length;
   const readingCount=Object.keys(blob.reading||{}).length;
+  const sideBucketCount=Object.keys(blob.speaking||{}).length+Object.keys(blob.pte||{}).length+Object.keys(blob.kana||{}).length+(Array.isArray(blob.writing?.entries)?blob.writing.entries.length:0);
   const streak=Number(blob.streak||0);
   const placement=blob.placementDone?50:0;
   const name=String(blob.userName||'').trim()&&blob.userName!=='Murid'?10:0;
-  return (answered*10)+(hist*5)+(vocabCount*2)+(grammarCount*2)+(readingCount*2)+(streak*20)+placement+name;
+  return (answered*10)+(hist*5)+(vocabCount*2)+(grammarCount*2)+(readingCount*2)+(sideBucketCount*2)+(streak*20)+placement+name;
 }
 function findBestStoredStudentState(){
   let best=null,maxScore=0;
@@ -1172,7 +1178,7 @@ function findBestStoredStudentState(){
 function loadState(key=activeStateStorageKey){
   try{
     const raw=JSON.parse(localStorage.getItem(key));
-    const dasar=raw||defaultState;
+    const dasar=raw||JSON.parse(JSON.stringify(defaultState));
     const lang=targetLangOfRaw(dasar);
     if(lang==='en'){
       const bersihEn=sanitizeState(dasar);
@@ -1788,7 +1794,12 @@ function normalizeHistoryRow(h){
 }
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},listening:raw?.listening||{},history:Array.isArray(raw?.history)?raw.history.map(normalizeHistoryRow).filter(Boolean):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory.filter(x=>x&&typeof x==='object'):[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory.filter(s=>s&&typeof s==='object'):[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',learningIntensity:['santai','teladan','rajin'].includes(String(rawPreferences.learningIntensity||''))?String(rawPreferences.learningIntensity):(defaultPreferences.learningIntensity||'santai'),selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),dailyRewards:raw?.dailyRewards&&typeof raw.dailyRewards==='object'?raw.dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  const sanitizeBucket=v=>(v&&typeof v==='object'&&!Array.isArray(v))?{...v}:{};
+  const sanitizeWriting=w=>{
+    const obj=w&&typeof w==='object'&&!Array.isArray(w)?w:{};
+    return{entries:Array.isArray(obj.entries)?obj.entries.slice():[],draft:String(obj.draft||'').slice(0,4000),promptIndex:Math.max(0,Math.floor(Number(obj.promptIndex)||0)),lastAt:Math.max(0,Number(obj.lastAt)||0)};
+  };
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:sanitizeBucket(raw?.vocab),grammar:sanitizeBucket(raw?.grammar),reading:sanitizeBucket(raw?.reading),listening:sanitizeBucket(raw?.listening),speaking:sanitizeBucket(raw?.speaking),pte:sanitizeBucket(raw?.pte),kana:sanitizeBucket(raw?.kana),writing:sanitizeWriting(raw?.writing),history:Array.isArray(raw?.history)?raw.history.map(normalizeHistoryRow).filter(Boolean):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory.filter(x=>x&&typeof x==='object'):[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory.filter(s=>s&&typeof s==='object'):[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',learningIntensity:['santai','teladan','rajin'].includes(String(rawPreferences.learningIntensity||''))?String(rawPreferences.learningIntensity):(defaultPreferences.learningIntensity||'santai'),selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw?.reminderMeta?.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),dailyRewards:raw?.dailyRewards&&typeof raw.dailyRewards==='object'?raw.dailyRewards:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},toursSeen:sanitizeToursSeen(raw?.toursSeen)};
   if(raw&&raw._integrity&&typeof computeStateIntegrity==="function"){
     const expectedSig=computeStateIntegrity(raw);
     if(raw._integrity!==expectedSig){
@@ -1828,7 +1839,8 @@ function sanitizeState(raw){
     const fresh=next.history.filter(h=>!h?.at||Number(h.at)>cutoff);
     next.history=fresh.length>=200?fresh:next.history.slice(-200);
   }
-  if(!next.totalAnswered){next.vocab={};next.grammar={};next.reading={};next.listening={};next.history=[];next.wrongAnswers=[];next.confidenceHistory=[];next.sessionHistory=[];next.learningDays=[];next.activeSession=null;next.policyOutcomeMeta={last:null,history:[],queue:[]};next.daily={date:'',count:0,attempts:0,meaningful:false};next.adaptiveReady=false;next.placementDone=false;next.level=1}
+  const hasNonQuizBucketEvidence=Object.keys(next.speaking||{}).length||Object.keys(next.pte||{}).length||Object.keys(next.kana||{}).length||(Array.isArray(next.writing?.entries)&&next.writing.entries.length);
+  if(!next.totalAnswered&&!hasNonQuizBucketEvidence){next.vocab={};next.grammar={};next.reading={};next.listening={};next.speaking={};next.pte={};next.kana={};next.writing={entries:[],draft:'',promptIndex:0,lastAt:0};next.history=[];next.wrongAnswers=[];next.confidenceHistory=[];next.sessionHistory=[];next.learningDays=[];next.activeSession=null;next.policyOutcomeMeta={last:null,history:[],queue:[]};next.daily={date:'',count:0,attempts:0,meaningful:false};next.adaptiveReady=false;next.placementDone=false;next.level=1}
   if(next.totalAnswered&&next.activeSession?.startedAt){const a=next.activeSession,now=Date.now(),started=Math.max(0,Number(a.startedAt||now));next.sessionHistory=[...(next.sessionHistory||[]),{id:String(a.id||`session-${started}`),at:new Date(now).toISOString(),startedAt:new Date(started||now).toISOString(),level:LEVELS.includes(String(a.level||''))?String(a.level):'',type:String(a.type||'practice'),planned:Math.max(0,Number(a.planned||0)),answered:Math.max(0,Number(a.answered||0)),score:null,total:Math.max(0,Number(a.planned||0)),accuracy:null,completed:false,abandoned:true,abandonReason:'interrupted',durationMs:Math.max(0,now-started),policyId:String(a.policyId||'').slice(0,120),policyMode:String(a.policyMode||'').slice(0,30),targetSkill:String(a.targetSkill||'').slice(0,80),primaryDomain:String(a.primaryDomain||'').slice(0,20),policySource:String(a.policySource||'').slice(0,40),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null}].slice(-100);next.activeSession=null}
   /* W1 P1-2 (10-002, 09-003): SETTLE penanda percobaan-berjalan. Reload/kill PWA di tengah
      ujian kini mendarat di aturan yang SAMA dengan tombol Keluar: sudah menjawab >=1 soal =
@@ -2107,7 +2119,9 @@ async function activateAccountStateFromPuter(sdk=self.puter){
          akan membuat migrasi melewatinya, dan murid itu masuk akun ke progres kosong. */
       const adaIsinya=(blob)=>!!blob&&(
         Number(blob.totalAnswered||0)>0||String(blob.userName||'').trim()||blob.placementDone||
-        Object.keys(blob.vocab||{}).length||Object.keys(blob.grammar||{}).length||Object.keys(blob.reading||{}).length
+        Object.keys(blob.vocab||{}).length||Object.keys(blob.grammar||{}).length||Object.keys(blob.reading||{}).length||
+        Object.keys(blob.listening||{}).length||Object.keys(blob.speaking||{}).length||Object.keys(blob.pte||{}).length||
+        Object.keys(blob.kana||{}).length||(Array.isArray(blob.writing?.entries)&&blob.writing.entries.length)
       );
       /* Kunci progres per bahasa milik ruang ANONIM, dipasangkan dengan tujuannya di ruang akun. */
       const progresBahasa=targetLangsKnown()
@@ -3047,8 +3061,8 @@ function record(q,ok,ms,selectedIndex){
   /* Ember dan kunci ulangan DITULIS di riwayat, tidak ditebak ulang belakangan. Dulu
      setConfidence menebaknya dengan "kalau bukan vocab dan bukan grammar, berarti reading" -
      jadi jawaban listening/speaking diam-diam menulis ke state.reading. */
-  const reviewBucket=q.type==='vocab'?'vocab':q.type==='grammar'?'grammar':q.type==='reading'?'reading':'';
-  const reviewKey=q.type==='grammar'?(q.lessonSkill||q.skill||''):(q.target||q.id||'');
+  const reviewBucket=q.type==='vocab'?'vocab':(q.type==='grammar'||q.type==='token-order')?'grammar':q.type==='reading'?'reading':q.type==='kana'?'kana':q.type==='pte'?'pte':q.type==='speaking'?'speaking':q.type==='listening'?'listening':q.type==='writing'?'writing':'';
+  const reviewKey=(q.type==='grammar'||q.type==='token-order')?(q.lessonSkill||q.skill||''):(q.target||q.id||'');
   const corrAnswer=(q.type==='cloze'&&q.answer)?q.answer:(q.type==='token-order'&&Array.isArray(q.tokens))?q.tokens.join(' '):(q.options?.[q.answerIndex]||null);
   const h={attemptId:nextAttemptId(now),id:q.id||sigQ(q),type:q.type||'unknown',level:q.level||getActiveLevel(),skill:q.skill||'general',target:q.target||q.lessonSkill||q.skill||q.id||'',reviewBucket,reviewKey,difficulty:q.difficulty||null,ok,ms:Math.max(0,ms||0),confidence:null,selectedIndex,selectedAnswer:selected||null,correctAnswer:corrAnswer,errorTag:q.errorTag||q.skill||q.type||'general',at:now};
   /* Fase 2 (B3 butir 1): prediksi P saat PENYAJIAN (ditulis draw() ke q.__predicted) dan
@@ -3085,6 +3099,7 @@ function record(q,ok,ms,selectedIndex){
   /* Fase 2 (B3 butir 3+4): setiap jawaban grammar juga menjadi bukti BKT (bobot=kappa) dan,
      bila pilihan yang salah adalah opsi PINJAMAN dari lesson lain, satu sel confusion
      matrix. Keduanya punya guard sendiri: modul absen = tidak ada yang terjadi. */
+  if(q.type==='token-order')recordTokenOrderEvidence(q,ok,h,selectedIndex);
   if(q.type==='grammar'){
     try{bktRecord(q,ok,h.kappa)}catch{}
     if(!ok)try{confusionMatrixRecord(q,selectedIndex)}catch{}
@@ -3118,6 +3133,14 @@ function record(q,ok,ms,selectedIndex){
      tidak pernah ikut dihitung sebagai kesalahan baru. */
   if(!ok)try{levelTrustNoteMistake(q)}catch(_){}
   if(q.canary&&CONTENT_CANARY&&q.canary.canaryId===state.contentCanaryMeta?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordEvidence(state.contentCanaryMeta,q.canary.canaryId,{type:'outcome',phase:q.canary.phase||'canary',correct:!!ok,at:new Date(now).toISOString()});save();queueRemoteActivitySync()
+}
+function recordTokenOrderEvidence(q,ok,h,selectedIndex){
+  try{bktRecord(q,ok,h.kappa)}catch{}
+  if(!ok&&Number(selectedIndex)>=0)try{confusionMatrixRecord(q,selectedIndex)}catch{}
+  try{itemCalibrationObserve(q,ok,h.kappa)}catch{}
+  try{itemPoolObserve(q,ok)}catch{}
+  try{itemPoolObserveProbe(q,ok)}catch{}
+  try{learningTelemetryEmitAnswer(q,ok,h)}catch{}
 }
 /* m025-135: keyakinan MENGULANG penjadwalan jawaban yang sama dari titik awal yang sama -
    bukan menjadwalkan ulang di atas hasilnya. Tanpa itu satu jawaban salah dihitung dua kali:
@@ -3392,12 +3415,13 @@ function scheduleNext(b,ok,ms,confidence,options={}){
   if(!fsrsScheduled)b.nextReview=now+interval*86400000;
   return b;
 }
-function updateMastery(bucket,key,ok,ms=6000,confidence=null,attemptAt=Date.now()){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0,nextReview:0,stability:1,lapses:0,lapseBurden:0,lastSeen:0,lastWrong:0};const baseStability=Math.max(.25,Number(b.stability)||1),baseLapses=Math.max(0,Number(b.lapses)||0),baseLapseBurden=Math.max(0,Number(b.lapseBurden??b.lapses)||0),baseStabilityDays=Number(b.stabilityDays)>0?Number(b.stabilityDays):0,baseLastSeen=Math.max(0,Number(b.lastSeen)||0),itemDifficulty=memoryItemDifficulty(bucket,key);b.total++;if(ok){b.correct++;b.streak++}else b.streak=0;
+function ensureStateBucket(bucket){if(!bucket||typeof bucket!=='string')return null;if(!state[bucket]||typeof state[bucket]!=='object'||Array.isArray(state[bucket]))state[bucket]={};return state[bucket]}
+function updateMastery(bucket,key,ok,ms=6000,confidence=null,attemptAt=Date.now()){if(!key||!bucket)return;const store=ensureStateBucket(bucket);if(!store)return;const b=store[key]||{correct:0,total:0,streak:0,mastery:0,nextReview:0,stability:1,lapses:0,lapseBurden:0,lastSeen:0,lastWrong:0};const baseStability=Math.max(.25,Number(b.stability)||1),baseLapses=Math.max(0,Number(b.lapses)||0),baseLapseBurden=Math.max(0,Number(b.lapseBurden??b.lapses)||0),baseStabilityDays=Number(b.stabilityDays)>0?Number(b.stabilityDays):0,baseLastSeen=Math.max(0,Number(b.lastSeen)||0),itemDifficulty=memoryItemDifficulty(bucket,key);b.total++;if(ok){b.correct++;b.streak++}else b.streak=0;
   // m025-35: a teacher notices a run of misses. Tracked here because every answer in
   // the app passes through updateMastery, so no call site can forget to report.
   state.consecutiveWrong=ok?0:Number(state.consecutiveWrong||0)+1;
-  if(!ok)state.lastWrongAt=Date.now();const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence,{now:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty});b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty,ok:!!ok,ms:Math.max(0,Number(ms)||0)};state[bucket][key]=b;save()}
-function markMastered(bucket,key){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0};b.mastery=100;b.streak=Math.max(1,b.streak);b.stability=Math.max(30,b.stability||1);b.nextReview=Date.now()+Math.max(30,b.stability)*86400000;b.lastSeen=Date.now();b.lapseBurden=Math.max(0,Number(b.lapseBurden)||0)*.5;state[bucket][key]=b;save()}
+  if(!ok)state.lastWrongAt=Date.now();const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence,{now:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty});b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty,ok:!!ok,ms:Math.max(0,Number(ms)||0)};store[key]=b;save()}
+function markMastered(bucket,key){if(!key||!bucket)return;const store=ensureStateBucket(bucket);if(!store)return;const b=store[key]||{correct:0,total:0,streak:0,mastery:0};b.mastery=100;b.streak=Math.max(1,b.streak);b.stability=Math.max(30,b.stability||1);b.nextReview=Date.now()+Math.max(30,b.stability)*86400000;b.lastSeen=Date.now();b.lapseBurden=Math.max(0,Number(b.lapseBurden)||0)*.5;store[key]=b;save()}
 /* Audit V-E 2026-10-04: "Masih belajar" di flashcard adalah PENILAIAN DIRI, bukan jawaban salah.
    Dulu tombol itu memanggil updateMastery(...,false): total naik, lapses naik, dan
    consecutiveWrong naik - murid yang jujur berkata "belum hafal" saat menjelajah kartu tercatat
@@ -6687,17 +6711,20 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
           prerequisites:validPrereqs
         });
       }
+      GRAMMAR_CURRICULUM={schema:'fiezel-grammar-curriculum-v1',lessons:zhLessons};
       GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(zhLessons);
       try{self.FiezelCoreBrain?.setFamilyGraph?.(rawFamilies)}catch{}
-      try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:zhLessons})}catch{}
+      try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
     }else{
       let persistentZh=false;
       try{persistentZh=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)==='zh'}catch(_){}
       if(!persistentZh){
         const enFallback=await fetchEnglishBundle();
         V=enFallback.vocab;R=enFallback.read;GRAMMAR_CURRICULUM=enFallback.curr;WRITING_BANK=enFallback.writing;READING_EXAM=enFallback.exam;
+        GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);
         if(enFallback.gm){Object.assign(G,enFallback.gm);self.__grammarTemplatesCache=enFallback.gm.templates||[]}
         try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
+        try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
         state.preferences={...state.preferences,targetLang:'en'};
         try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
       }
@@ -6743,17 +6770,20 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
           prerequisites:validPrereqs
         });
       }
+      GRAMMAR_CURRICULUM={schema:'fiezel-grammar-curriculum-v1',lessons:jaLessons};
       GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(jaLessons);
       try{self.FiezelCoreBrain?.setFamilyGraph?.(rawFamilies)}catch{}
-      try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:jaLessons})}catch{}
+      try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
     }else{
       let persistentJa=false;
       try{persistentJa=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)==='ja'}catch(_){}
       if(!persistentJa){
         const enFallback=await fetchEnglishBundle();
         V=enFallback.vocab;R=enFallback.read;GRAMMAR_CURRICULUM=enFallback.curr;WRITING_BANK=enFallback.writing;READING_EXAM=enFallback.exam;
+        GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);
         if(enFallback.gm){Object.assign(G,enFallback.gm);self.__grammarTemplatesCache=enFallback.gm.templates||[]}
         try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
+        try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
         state.preferences={...state.preferences,targetLang:'en'};
         try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
       }
@@ -14839,7 +14869,33 @@ async function markOwnerMessagesRead() {
     });
   } catch (_) {}
 }
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="skillsLab()" aria-label="${esc(FiezelI18n.t('skillslab.btn-back','Kembali'))}"><i data-lucide="arrow-left"></i><span>${esc(FiezelI18n.t('skillslab.btn-back','Kembali'))}</span></button><div class="skill-topbar-actions"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('student.skills-title', FiezelI18n.t('latihan.bicara-dengar')))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}/* m025-273: kunci ujian dilepas SESUDAH pemberitahuan Puter, bukan sebelumnya — dua gerbang (quota-notice-a11y, puter-popup-once) mengunci bentuk pembuka callback ini karena di sinilah pemberitahuan boleh muncul, dan menyisipkan apa pun di depannya memerahkan keduanya. */try{examLockEnd('listening_exam');examLockEnd('speaking_exam')}catch(_){}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. *//* m025-273: pintu ujian Skills Lab. Addon memanggil this.open('listening_exam'/'speaking_exam')
+/** Teruskan setiap percobaan Skills Lab yang baru dinilai ke kanal Braincore host tanpa membawa transkrip/audio mentah. */
+function recordSkillsLabBraincoreAttempt(info){
+  try{
+    const domain=String(info?.domain||''),item=info?.item&&typeof info.item==='object'?info.item:{};
+    if(!domain)return;
+    const bucket=(domain==='listening'||domain==='listening_exam')?'listening':'speaking';
+    const isSpeaking=bucket==='speaking';
+    const key=String(item.id||(domain+'_'+(item.level||getActiveLevel()))).trim().slice(0,80);
+    if(!key)return;
+    const modeSlug=String(item.mode||item.skill||'practice').replace(/[^a-z0-9_]+/gi,'_').replace(/^_|_$/g,'').toLowerCase()||'practice';
+    const lang=activeTargetLang();
+    const skillKey=(lang==='en'?'':lang+'_')+'skills_lab_'+bucket+'_'+modeSlug;
+    const ok=!!info?.result?.passed;
+    const ms=Math.max(300,Math.min(600000,Number(info?.ms)||6000));
+    const kappa=isSpeaking?0.72:0.85;
+    const boost=isSpeaking?1.15:1.0;
+    try{updateMastery(bucket,key,ok,ms)}catch(_){}
+    try{bktRecord({lessonSkill:skillKey,skill:skillKey},ok,kappa,boost)}catch(_){}
+    try{
+      if(typeof misconceptionLedgerRecord==='function'){
+        const diag=ok?null:{misconception:domain+'_concept_gap',skill:skillKey,concept:skillKey,family:bucket};
+        misconceptionLedgerRecord('skills_lab_'+domain,{id:key,type:bucket,skill:skillKey,lessonSkill:skillKey,target:key},diag,ok);
+      }
+    }catch(_){}
+  }catch(_){}
+}
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="skillsLab()" aria-label="${esc(FiezelI18n.t('skillslab.btn-back','Kembali'))}"><i data-lucide="arrow-left"></i><span>${esc(FiezelI18n.t('skillslab.btn-back','Kembali'))}</span></button><div class="skill-topbar-actions"><button type="button" class="skill-help-dot" onclick="openSkillHelp('${esc(domain)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div></div>`:`<div class="section-head"><div><h1>${esc(FiezelI18n.t('student.skills-title', FiezelI18n.t('latihan.bicara-dengar')))}</h1><p>${FiezelI18n.t('skills.lead-hub')}</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">${FiezelI18n.t('skills.memuat')}</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',/* S1b: satu-satunya PENULIS sidecar Speaking/Listening. Kuncinya di-override di sini, di titik mount, supaya penulis dan kedua pembacanya selalu menunjuk ruang akun yang sama. */config:{...self.FIEZEL_SPEAKING_LISTENING_CONFIG,storageKey:sideStateKey(SL_STATE_KEY)},getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}/* m025-273: kunci ujian dilepas SESUDAH pemberitahuan Puter, bukan sebelumnya — dua gerbang (quota-notice-a11y, puter-popup-once) mengunci bentuk pembuka callback ini karena di sinilah pemberitahuan boleh muncul, dan menyisipkan apa pun di depannya memerahkan keduanya. */try{examLockEnd('listening_exam');examLockEnd('speaking_exam')}catch(_){}},/* m025-246: kait skip rate. Addon melaporkan; app.js yang memutuskan boleh-tidaknya mengirim (satu gerbang persetujuan, bukan dua). */onSkip:info=>{try{anQuestionSkipped(info?.domain,info?.level,info?.reason)}catch(_){}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook(),onAttempt:recordSkillsLabBraincoreAttempt});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. *//* m025-273: pintu ujian Skills Lab. Addon memanggil this.open('listening_exam'/'speaking_exam')
      dari kartunya sendiri, jadi membungkus properti instans menangkap SEMUA jalur masuknya —
      tanpa menyentuh satu baris pun di dalam addon. Kuncinya dilepas oleh onSessionEnd di atas. */
   try{const baseOpen=controller.open?.bind(controller);if(baseOpen)controller.open=(d,...rest)=>{try{const k=String(d||'');if(k==='listening_exam')examLockBegin('listening_exam',{});else if(k==='speaking_exam')examLockBegin('speaking_exam',{})}catch(_){}return baseOpen(d,...rest)}}catch(_){}
@@ -14887,6 +14943,15 @@ function saveWritingEntry(prompt,words){
   // ini yang ikut ke laporan jarak jauh - kontraknya sama dengan Speaking.
   const entries=w.entries.concat([{at:Date.now(),promptId:prompt.id,level:prompt.level,words}]).slice(-30);
   state.writing={...(state.writing||{}),entries,lastAt:Date.now()};
+  try{
+    const lang=activeTargetLang();
+    const wKey=String(prompt?.id||'writing_general').slice(0,80);
+    const targetWords=writingTargetWords(prompt);
+    const metTarget=words>=targetWords;
+    const skillKey=(lang==='en'?'':lang+'_')+'writing_'+String(prompt?.level||getActiveLevel()).toLowerCase();
+    updateMastery('writing',wKey,metTarget,Math.max(10000,words*1500));
+    bktRecord({lessonSkill:skillKey,skill:skillKey},metTarget,0.8,1.2);
+  }catch(_){}
   save();
 }
 function writingSaveDraft(text){state.writing={...(state.writing||{}),draft:String(text||'').slice(0,4000)};save()}

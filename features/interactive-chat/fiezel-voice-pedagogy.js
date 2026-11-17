@@ -362,6 +362,13 @@
     return Math.max(0.01, Math.min(0.99, Number(updated.toFixed(4))));
   }
 
+  function resolveSideKey(baseKey) {
+    try {
+      if (typeof root.sideStateKey === 'function') return root.sideStateKey(baseKey);
+    } catch (_) {}
+    return baseKey;
+  }
+
   /**
    * Telemetry recording into Braincore BKT & Misconception Ledger
    */
@@ -373,6 +380,24 @@
 
     var ok = p.ok;
     var now = Date.now();
+    var hasHostBkt = typeof root.bktRecord === 'function';
+    var hasHostLedger = typeof root.misconceptionLedgerRecord === 'function';
+    var kappa = p.hintsUsed ? 0.45 : (ok ? 0.70 : 0.55);
+    var boost = 1.2;
+
+    // 1. Baca estimasi BKT awal sebelum pembaruan (canonical BKT atau standalone fallback)
+    var bktModule = root.FiezelMasteryBKT || null;
+    var bktKey = resolveSideKey('fiezel-mastery-bkt-v1');
+    var bktBefore = BRAINCORE_PARAMS.P_INIT;
+    var bktAfter = BRAINCORE_PARAMS.P_INIT;
+    if (hasHostBkt && bktModule && typeof bktModule.mastery === 'function') {
+      try {
+        var rawHostBkt = localStorage.getItem(bktKey);
+        var hostBktData = rawHostBkt ? JSON.parse(rawHostBkt) : null;
+        var pre = bktModule.mastery(hostBktData, cid, now);
+        if (pre && typeof pre.L === 'number') bktBefore = pre.L;
+      } catch (_) {}
+    }
 
     // Rute ke Host Braincore Gateway bila berjalan di aplikasi web Fiezel
     if (typeof root.updateMastery === 'function') {
@@ -380,36 +405,55 @@
         root.updateMastery('speaking', cid, ok, p.latencyMs || 2500, p.confidence || null, now);
       } catch (_) {}
     }
-    if (typeof root.bktRecord === 'function') {
+    if (hasHostBkt) {
       try {
-        root.bktRecord(cid, ok, ok ? 0.10 : 0.20, 0.20);
+        root.bktRecord({ lessonSkill: cid, skill: cid, competencyId: cid }, ok, kappa, boost);
+        if (bktModule && typeof bktModule.mastery === 'function') {
+          var postRaw = localStorage.getItem(bktKey);
+          var postData = postRaw ? JSON.parse(postRaw) : null;
+          var post = bktModule.mastery(postData, cid, now);
+          if (post && typeof post.L === 'number') bktAfter = post.L;
+        } else {
+          bktAfter = computeBktUpdate(bktBefore, ok, p.hintsUsed, p.confidence || 0.85);
+        }
+      } catch (_) {}
+    }
+    if (hasHostLedger) {
+      try {
+        var qPayload = { id: 'kaiwa:' + cid, lessonSkill: cid, skill: cid, conceptId: cid, target: cid, type: 'speaking' };
+        var diagPayload = (!ok && p.misconceptionId) ? { misconception: String(p.misconceptionId), timing: 'normal' } : null;
+        root.misconceptionLedgerRecord({ startedAt: now }, qPayload, diagPayload, ok);
       } catch (_) {}
     }
 
-    // Simulasi in-memory / storage fallback untuk node test harness
-    var bktBefore = BRAINCORE_PARAMS.P_INIT;
-    var bktAfter = BRAINCORE_PARAMS.P_INIT;
-    try {
-      var rawBkt = localStorage.getItem('fiezel-mastery-bkt-v1');
-      var bktData = rawBkt ? JSON.parse(rawBkt) : { skills: {} };
-      if (!bktData.skills) bktData.skills = {};
-      var curSkill = bktData.skills[cid] || { p: BRAINCORE_PARAMS.P_INIT, attempts: 0, correct: 0 };
-      bktBefore = curSkill.p || BRAINCORE_PARAMS.P_INIT;
-      bktAfter = computeBktUpdate(bktBefore, ok, p.hintsUsed, p.confidence || 0.85);
-      bktData.skills[cid] = {
-        p: bktAfter,
-        attempts: (curSkill.attempts || 0) + 1,
-        correct: (curSkill.correct || 0) + (ok ? 1 : 0),
-        updatedAt: now
-      };
-      localStorage.setItem('fiezel-mastery-bkt-v1', JSON.stringify(bktData));
-    } catch (_) {}
-
-    // 2. Update Misconception Ledger
-    if (!ok && p.misconceptionId) {
+    // 2. Fallback standalone untuk Node test harness saat host Braincore tidak dimuat.
+    //    Jangan menimpa skema host `{ schema, lessons }` saat `root.bktRecord` aktif.
+    if (!hasHostBkt) {
       try {
-        var rawLedger = localStorage.getItem('fiezel-misconception-ledger-v1');
+        var rawBkt = localStorage.getItem(bktKey);
+        var bktData = rawBkt ? JSON.parse(rawBkt) : { skills: {} };
+        if (!bktData || typeof bktData !== 'object') bktData = { skills: {} };
+        if (!bktData.skills) bktData.skills = {};
+        var curSkill = bktData.skills[cid] || { p: BRAINCORE_PARAMS.P_INIT, attempts: 0, correct: 0 };
+        bktBefore = curSkill.p || BRAINCORE_PARAMS.P_INIT;
+        bktAfter = computeBktUpdate(bktBefore, ok, p.hintsUsed, p.confidence || 0.85);
+        bktData.skills[cid] = {
+          p: bktAfter,
+          attempts: (curSkill.attempts || 0) + 1,
+          correct: (curSkill.correct || 0) + (ok ? 1 : 0),
+          updatedAt: now
+        };
+        localStorage.setItem(bktKey, JSON.stringify(bktData));
+      } catch (_) {}
+    }
+
+    // 3. Fallback Misconception Ledger saat host misconceptionLedgerRecord tidak tersedia
+    if (!hasHostLedger && !ok && p.misconceptionId) {
+      try {
+        var ledgerKey = resolveSideKey('fiezel-misconception-ledger-v1');
+        var rawLedger = localStorage.getItem(ledgerKey);
         var ledger = rawLedger ? JSON.parse(rawLedger) : { concepts: {} };
+        if (!ledger || typeof ledger !== 'object') ledger = { concepts: {} };
         if (!ledger.concepts) ledger.concepts = {};
         var entry = ledger.concepts[cid] || { misconceptions: {} };
         var mKey = String(p.misconceptionId);
@@ -420,7 +464,7 @@
         mObj.lastUtterance = p.userExactTranscript;
         entry.misconceptions[mKey] = mObj;
         ledger.concepts[cid] = entry;
-        localStorage.setItem('fiezel-misconception-ledger-v1', JSON.stringify(ledger));
+        localStorage.setItem(ledgerKey, JSON.stringify(ledger));
       } catch (_) {}
     }
 

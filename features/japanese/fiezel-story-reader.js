@@ -1209,23 +1209,35 @@
     var evalRes = null;
     if (bridge && typeof bridge.evaluateStoryQuiz === 'function') {
       try {
-        evalRes = bridge.evaluateStoryQuiz(quiz, selectedIdx, opt.text);
+        var quizWithStory = Object.assign({}, quiz, { storyId: story.id });
+        evalRes = bridge.evaluateStoryQuiz(quizWithStory, selectedIdx, opt.text);
       } catch (_) {}
     }
 
-    // Alirkan ke mastery global
-    if (typeof root.updateMastery === 'function') {
-      try { root.updateMastery('reading', 'story_' + story.id, isCorrect); } catch (_) {}
-      try { root.updateMastery('reading_quiz_' + story.id, isCorrect); } catch (_) {}
-    }
-    if (typeof root.bktRecord === 'function') {
-      try {
-        root.bktRecord({
-          lessonSkill: 'reading_' + story.id,
-          skill: 'reading_' + story.id,
-          toString: function () { return 'reading_' + story.id; }
-        }, isCorrect, 1.0);
-      } catch (_) {}
+    // Alirkan ke mastery/BKT global hanya bila bridge belum mengirimkannya
+    if (!(evalRes && evalRes.telemetryEmitted)) {
+      if (typeof root.updateMastery === 'function') {
+        try { root.updateMastery('reading', 'story_' + story.id, isCorrect); } catch (_) {}
+      }
+      if (typeof root.bktRecord === 'function') {
+        try {
+          root.bktRecord({
+            lessonSkill: 'reading_' + story.id,
+            skill: 'reading_' + story.id
+          }, isCorrect, 1.0);
+        } catch (_) {}
+      }
+      if (typeof root.record === 'function') {
+        try {
+          root.record({
+            id: 'story_' + story.id,
+            type: 'reading',
+            level: story.level || 'A1',
+            skill: 'reading_' + story.id,
+            target: 'story_' + story.id
+          }, isCorrect, 6000, selectedIdx);
+        } catch (_) {}
+      }
     }
 
     if (isCorrect) {

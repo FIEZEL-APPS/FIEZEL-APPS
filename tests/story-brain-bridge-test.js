@@ -12,6 +12,19 @@
 'use strict';
 const assert = require('assert');
 const path = require('path');
+
+// Setup real Braincore modules & scoped storage (NO fake lowercase/invented mocks)
+const _store = {};
+global.localStorage = {
+  getItem: function (k) { return Object.prototype.hasOwnProperty.call(_store, k) ? _store[k] : null; },
+  setItem: function (k, v) { _store[k] = String(v); },
+  removeItem: function (k) { delete _store[k]; },
+  clear: function () { for (var k in _store) delete _store[k]; }
+};
+global.FiezelMasteryBKT = require(path.join(__dirname, '..', 'features', 'brain', 'fiezel-mastery-bkt.js'));
+global.FiezelMisconceptionLedger = require(path.join(__dirname, '..', 'features', 'brain', 'fiezel-misconception-ledger.js'));
+global.sideStateKey = function (base) { return base + '@ja'; };
+
 const Bridge = require(path.join(__dirname, '..', 'features', 'japanese', 'fiezel-story-brain-bridge.js'));
 
 console.log('--- TEST FIEZEL STORY BRAIN BRIDGE ---');
@@ -23,21 +36,24 @@ const dateStr = Bridge.getLocalDateStr();
 assert.match(dateStr, /^\d{4}-\d{2}-\d{2}$/, 'Format tanggal harus YYYY-MM-DD');
 console.log('PASS 1: Timezone & Local Date format valid (' + tz + ', ' + dateStr + ')');
 
-// Test 2: Word Interaction
+// Test 2: Word Interaction (Preserves Japanese chars + drives real FiezelMasteryBKT under scoped key)
 const wordEvent = Bridge.recordWordInteraction({
   ja: '着物',
   reading: 'きもの',
   id: 'baju kimono tradisional'
-}, { isLookup: true });
+}, { isLookup: false });
 
 assert.strictEqual(wordEvent.schema, Bridge.SCHEMA);
 assert.strictEqual(wordEvent.ja, '着物');
-assert.strictEqual(wordEvent.wordKey, 'vocab___');
+assert.strictEqual(wordEvent.wordKey, 'vocab_着物');
 assert.strictEqual(wordEvent.isMastered, false);
-assert.ok(wordEvent.pLt >= 0 && wordEvent.pLt <= 1);
+assert.ok(wordEvent.pLt > 0.2 && wordEvent.pLt <= 1, 'Real FiezelMasteryBKT must increase pLt above prior 0.2 (got ' + wordEvent.pLt + ')');
 assert.strictEqual(wordEvent.timezone, tz);
 assert.strictEqual(wordEvent.activityDate, dateStr);
-console.log('PASS 2: Word interaction telemetri valid');
+const storedWordBkt = JSON.parse(_store['fiezel-mastery-bkt-v1@ja']);
+assert.strictEqual(storedWordBkt.schema, 'fiezel-mastery-bkt-v1');
+assert.strictEqual(storedWordBkt.lessons['vocab_着物'].n, 1, 'Word interaction must write real BKT entry under scoped key');
+console.log('PASS 2: Word interaction telemetri valid dengan FiezelMasteryBKT nyata');
 
 // Test 3: Zero-Loss Input & Anti-Ghost Answer Evaluation
 const qData = {
@@ -82,25 +98,69 @@ assert.ok(renderedHtml.includes('<rt>きょうと</rt>'), 'Harus memuat furigana
 assert.ok(renderedHtml.includes('<span class="fz-story-plain">の</span>'), 'Harus memuat token biasa');
 console.log('PASS 4: Render Ruby Markup interaktif valid');
 
-// Test 5: Telemetri Kognitif BKT & OLM pada Jawaban Benar
+// Test 5: Telemetri Kognitif BKT, OLM & Ledger NYATA pada jawaban BENAR maupun SALAH
+global.localStorage.clear();
+// 5A. Tanpa host callback, bridge WAJIB menulis ke real FiezelMasteryBKT dan real FiezelMisconceptionLedger (scoped)
+const offlineWrongQuiz = {
+  id: 'story-n5-test-q-offline',
+  questionJapanese: 'テスト',
+  options: [
+    { text: 'Salah', misconceptionId: 'particle_wa_confuse', failWhy: 'Keliru partikel' },
+    { text: 'Benar', isCorrect: true }
+  ],
+  answerIndex: 1
+};
+const offlineWrongRes = Bridge.evaluateStoryQuiz(offlineWrongQuiz, 0);
+assert.strictEqual(offlineWrongRes.ok, false);
+assert.strictEqual(offlineWrongRes.telemetryEmitted, true);
+const bktOffline = JSON.parse(_store['fiezel-mastery-bkt-v1@ja']);
+assert.strictEqual(bktOffline.lessons['reading_story-n5-test-q-offline'].n, 1, 'Jawaban salah WAJIB dicatat BKT nyata');
+assert.ok(bktOffline.lessons['reading_story-n5-test-q-offline'].L < 0.2, 'Jawaban salah harus menurunkan p(L)');
+const ledgerOffline = JSON.parse(_store['fiezel-misconception-ledger-v1@ja']);
+assert.ok(
+  ledgerOffline && ledgerOffline.entries && ledgerOffline.entries['reading_story-n5-test-q-offline::particle_wa_confuse'],
+  'FiezelMisconceptionLedger.update wajib mencatat entri miskonsepsi saat salah'
+);
+
+// 5B. Dengan kontrak callback host app.js nyata (tolak argumen string pada bktRecord!)
 let bktCalls = [];
 let masteryCalls = [];
+let ledgerCalls = [];
 global.bktRecord = function (payload, ok, kappa) {
+  assert.ok(payload && typeof payload === 'object' && typeof payload.lessonSkill === 'string', 'bktRecord wajib menerima objek {lessonSkill, skill}');
   bktCalls.push({ payload, ok, kappa });
 };
 global.updateMastery = function (bucket, key, ok) {
+  assert.strictEqual(typeof bucket, 'string', 'bucket wajib string');
+  assert.strictEqual(typeof key, 'string', 'key wajib string');
+  assert.strictEqual(typeof ok, 'boolean', 'ok wajib boolean');
   masteryCalls.push({ bucket, key, ok });
 };
+global.misconceptionLedgerRecord = function (session, q, diag, ok) {
+  ledgerCalls.push({ session, q, diag, ok });
+};
+
+const evalWrongHost = Bridge.evaluateStoryQuiz(qData, 0);
+assert.strictEqual(evalWrongHost.ok, false);
+assert.strictEqual(bktCalls.length, 1, 'bktRecord WAJIB terpanggil meski jawaban SALAH');
+assert.strictEqual(bktCalls[0].ok, false);
+assert.strictEqual(masteryCalls.length, 1, 'updateMastery WAJIB terpanggil meski jawaban SALAH');
+assert.strictEqual(masteryCalls[0].ok, false);
+assert.strictEqual(ledgerCalls.length, 1);
+assert.strictEqual(ledgerCalls[0].diag.misconception, 'age_off_by_one');
 
 const evalTelemetry = Bridge.evaluateStoryQuiz(qData, 1);
 assert.strictEqual(evalTelemetry.ok, true);
-assert.ok(bktCalls.length > 0, 'bktRecord WAJIB terpanggil saat jawaban kuis benar');
-assert.strictEqual(bktCalls[0].ok, true, 'bktRecord harus mencatat ok: true');
-assert.strictEqual(bktCalls[0].payload.lessonSkill, 'reading_story-n5-maiko-q1');
-assert.ok(masteryCalls.length > 0, 'updateMastery WAJIB terpanggil saat jawaban kuis benar');
-assert.strictEqual(masteryCalls[0].ok, true, 'updateMastery harus mencatat ok: true');
-assert.strictEqual(masteryCalls[0].bucket, 'reading');
-console.log('PASS 5: Saluran telemetri BKT (bktRecord) dan OLM (updateMastery) terverifikasi');
+assert.strictEqual(bktCalls.length, 2, 'bktRecord WAJIB terpanggil saat jawaban kuis benar');
+assert.strictEqual(bktCalls[1].ok, true, 'bktRecord harus mencatat ok: true');
+assert.strictEqual(bktCalls[1].payload.lessonSkill, 'reading_story-n5-maiko-q1');
+assert.strictEqual(masteryCalls.length, 2, 'updateMastery WAJIB terpanggil saat jawaban kuis benar');
+assert.strictEqual(masteryCalls[1].ok, true, 'updateMastery harus mencatat ok: true');
+assert.strictEqual(masteryCalls[1].bucket, 'reading');
+assert.strictEqual(ledgerCalls.length, 2);
+assert.strictEqual(ledgerCalls[1].ok, true);
+delete global.bktRecord; delete global.updateMastery; delete global.misconceptionLedgerRecord;
+console.log('PASS 5: Saluran telemetri BKT, OLM, dan Ledger NYATA (benar + salah) terverifikasi');
 
 // Test 6: Invarian Zero-Praise & failWhy pada Jawaban Salah (Rule 4)
 const wrongQuizData = {

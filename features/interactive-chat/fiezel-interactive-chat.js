@@ -2676,12 +2676,12 @@
     var BKT = root.FiezelMasteryBKT || (typeof self !== 'undefined' ? self.FiezelMasteryBKT : null);
     if (BKT && typeof BKT.update === 'function') {
       try {
-        var BKT_KEY = 'fiezel-mastery-bkt-v1';
-        var raw = localStorage.getItem(BKT_KEY);
+        var bktKey = (typeof root.sideStateKey === 'function') ? root.sideStateKey('fiezel-mastery-bkt-v1') : 'fiezel-mastery-bkt-v1';
+        var raw = localStorage.getItem(bktKey);
         var currentSt = raw ? JSON.parse(raw) : null;
         var updated = BKT.update(currentSt, { lesson: lid, correct: isOk, weight: k * b }, Date.now());
         if (updated) {
-          localStorage.setItem(BKT_KEY, JSON.stringify(updated));
+          localStorage.setItem(bktKey, JSON.stringify(updated));
         }
       } catch (_) {}
     }
@@ -2721,8 +2721,8 @@
     var Ledger = root.FiezelMisconceptionLedger || (typeof self !== 'undefined' ? self.FiezelMisconceptionLedger : null);
     if (Ledger && typeof Ledger.update === 'function') {
       try {
-        var LEDGER_KEY = 'fiezel-misconception-ledger-v1';
-        var raw = localStorage.getItem(LEDGER_KEY);
+        var ledgerKey = (typeof root.sideStateKey === 'function') ? root.sideStateKey('fiezel-misconception-ledger-v1') : 'fiezel-misconception-ledger-v1';
+        var raw = localStorage.getItem(ledgerKey);
         var currentLedger = raw ? JSON.parse(raw) : null;
         var updated = Ledger.update(currentLedger, {
           concept: cid,
@@ -2733,7 +2733,7 @@
           sessionId: 'chat_' + Date.now()
         }, Date.now());
         if (updated) {
-          localStorage.setItem(LEDGER_KEY, JSON.stringify(updated));
+          localStorage.setItem(ledgerKey, JSON.stringify(updated));
         }
       } catch (_) {}
     }
@@ -2767,15 +2767,17 @@
 
     var m = meta || {};
     var sid = scenarioId || state.scenarioId || 'free';
-    var course = m.course || (m.competencyId && m.competencyId.indexOf('en') >= 0 ? 'en' : (state.course || 'ja'));
-    var isJa = (course === 'ja');
-    var conceptId = m.competencyId || ((isJa ? 'ja_kaiwa_' : 'en_kaiwa_') + sid);
-    var fluencyConcept = (isJa ? 'ja_speaking_fluency' : 'en_speaking_fluency');
+    var fallbackCourse = (state.course === 'ja' || state.course === 'zh') ? state.course : 'en';
+    var course = m.course || (m.competencyId && m.competencyId.indexOf('zh_') === 0 ? 'zh' : (m.competencyId && m.competencyId.indexOf('en') >= 0 ? 'en' : fallbackCourse));
+    var normCourse = (course === 'ja' || course === 'zh') ? course : 'en';
+    var coursePrefix = normCourse + '_';
+    var conceptId = m.competencyId || (coursePrefix + 'kaiwa_' + sid);
+    var fluencyConcept = coursePrefix + 'speaking_fluency';
 
     var verdict = (m.verdict !== undefined) ? m.verdict : (!hint);
     var latencyMs = m.latencyMs || (isVoice ? 2800 : 4500);
 
-    var wordCount = isJa
+    var wordCount = (normCourse === 'ja' || normCourse === 'zh')
       ? Math.max(1, Math.round(cleanText.replace(/\s+/g, '').length / 2.5))
       : Math.max(1, cleanText.split(/\s+/).filter(Boolean).length);
 
@@ -2835,8 +2837,8 @@
   function dispatchShadowingTelemetry(evalRes, xpGain, targetText, msgId) {
     if (!evalRes) return;
     try {
-      var isJa = (state.course === 'ja');
-      var conceptId = isJa ? 'ja_speaking_shadowing' : 'en_speaking_shadowing';
+      var shadowCourse = (state.course === 'ja' || state.course === 'zh') ? state.course : 'en';
+      var conceptId = shadowCourse + '_speaking_shadowing';
       var isPassed = !!evalRes.passed;
       var score = Number(evalRes.score) || 0;
       var heardText = String(evalRes.heard || '').trim();
@@ -2917,7 +2919,8 @@
     saveChatHistoryRecord(callRecord);
 
     // Braincore session telemetry
-    var callSkill = (course === 'ja' ? 'ja_kaiwa_call_' : 'en_kaiwa_call_') + scenarioId;
+    var callCourse = (course === 'ja' || course === 'zh') ? course : 'en';
+    var callSkill = (callCourse + '_kaiwa_call_') + scenarioId;
     var callOk = turns > 0;
     callUpdateMastery('speaking', callSkill, callOk, durationSec * 1000, null, Date.now());
     callBktRecord(callSkill, callOk, 0.6, 1.3);
