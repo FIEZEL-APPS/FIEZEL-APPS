@@ -33,7 +33,7 @@
   <meta name="theme-color" content="#1B1418">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
-  <meta name="fz-build" content="m025-799">
+  <meta name="fz-build" content="m025-800">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa adaptif: kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4), dengan vocabulary, grammar, reading, dan AI Tutor. Gratis dan bisa dipakai offline.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -232,7 +232,6 @@ html.fz-booting #globalSky {
 .fiezel-splash-brand .fiezel-splash-word.is-word-settled .kelasku-wordmark,.fiezel-splash-brand .fiezel-splash-word.is-word-settled .kelasku-tag{animation:none;opacity:1;transform:none}
 @keyframes fz-kelasku-reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes fz-tag-reveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-@keyframes fz-boot-bar-breathe{0%,100%{transform:scaleY(1);opacity:.94}50%{transform:scaleY(1.16);opacity:1}}
 @keyframes fz-fade-in{from{opacity:0}to{opacity:1}}
 .fiezel-splash-still .fz-splash-canvas{display:none}
 .fiezel-splash-still .fz-fgroup,.fiezel-splash-still .fz-barsgroup{opacity:1}
@@ -243,12 +242,6 @@ html.fz-booting #globalSky {
 .fiezel-splash-still .fiezel-splash-kelasku{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
 .fiezel-splash-still .kelasku-wordmark,.fiezel-splash-still .kelasku-tag{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
 .fiezel-splash.fiezel-splash-dark.is-leaving{animation:fz-splash-fade-out .32s cubic-bezier(.2,.8,.2,1) both;pointer-events:none}
-#fiezelBootSplash:not([data-fiezel-boot-claimed="shown"]):not(.fiezel-splash-still):not(.is-leaving) .fz-fgroup,#fiezelBootSplash:not([data-fiezel-boot-claimed="shown"]):not(.fiezel-splash-still):not(.is-leaving) .fz-barsgroup{animation:fz-fade-in .26s ease .22s both}
-#fiezelBootSplash:not([data-fiezel-boot-claimed="shown"]):not(.fiezel-splash-still):not(.is-leaving) .fz-bar1{transform-origin:50% 100%;animation:fz-boot-bar-breathe 1.5s ease-in-out .48s infinite}
-#fiezelBootSplash:not([data-fiezel-boot-claimed="shown"]):not(.fiezel-splash-still):not(.is-leaving) .fz-bar2{transform-origin:50% 100%;animation:fz-boot-bar-breathe 1.5s ease-in-out .72s infinite}
-#fiezelBootSplash:not([data-fiezel-boot-claimed="shown"]):not(.fiezel-splash-still):not(.is-leaving) .fiezel-splash-word{transform:none;animation:fz-fade-in .4s ease .34s both}
-#fiezelBootSplash:not([data-fiezel-boot-claimed="shown"]):not(.fiezel-splash-still):not(.is-leaving) .kelasku-wordmark{animation:fz-kelasku-reveal .46s cubic-bezier(.16,1,.3,1) .42s both}
-#fiezelBootSplash:not([data-fiezel-boot-claimed="shown"]):not(.fiezel-splash-still):not(.is-leaving) .kelasku-tag{animation:fz-tag-reveal .42s cubic-bezier(.16,1,.3,1) .52s both}
 #fiezelBootSplash.is-leaving{animation:fz-splash-fade-out .32s cubic-bezier(.2,.8,.2,1) both;pointer-events:none}
 @keyframes fz-splash-fade-out{from{opacity:1}to{opacity:0}}
   </style>
