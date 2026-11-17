@@ -1,7 +1,7 @@
 {
-  "version": "m025-798",
-  "claimedBy": "branch fix/onboarding-topbar-and-mochi-sos-m025-798",
-  "claimedAt": "2026-11-17T16:01:02.045Z",
-  "reason": "fix(onboarding,voice): restore iOS safe-area onboarding topbar and fix Mochi SOS cross-origin session auth",
+  "version": "m025-799",
+  "claimedBy": "branch fix/splash-mochi-hd-m025-799",
+  "claimedAt": "2026-11-17T20:29:53.156Z",
+  "reason": "fix(pwa): fix splash footer sync & dual-splash seam and restore HD Mochi without lag",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

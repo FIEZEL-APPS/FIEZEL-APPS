@@ -487,8 +487,11 @@ export class FiezelMochi {
     });
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
     this.renderer.toneMapping = THREE.NoToneMapping;
+    this._maxAniso = (this.renderer.capabilities && typeof this.renderer.capabilities.getMaxAnisotropy === 'function')
+      ? Math.min(4, Math.max(1, this.renderer.capabilities.getMaxAnisotropy()))
+      : 1;
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.isCompactCard ? 1.5 : 2.0));
+    this.renderer.setPixelRatio(this._computeTargetPixelRatio());
 
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
@@ -524,15 +527,33 @@ export class FiezelMochi {
     }
   }
 
+  _computeTargetPixelRatio() {
+    const baseDpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
+    return this.isCompactCard
+      ? Math.min(Math.max(baseDpr, 2.0), 3.0)
+      : Math.min(Math.max(baseDpr, 1.5), 2.25);
+  }
+
+  _configureCrispTexture(tex) {
+    if (!tex) return tex;
+    tex.generateMipmaps = true;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    if (this._maxAniso > 1) tex.anisotropy = this._maxAniso;
+    return tex;
+  }
+
   updateSize(width, height) {
     if (!width || !height || width <= 0 || height <= 0) return;
     this.width = width;
     this.height = height;
+    this.isCompactCard = !this.voiceCompanionStrictMode && Math.max(width || 0, height || 0) <= 180;
     if (this.camera) {
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
     }
     if (this.renderer) {
+      this.renderer.setPixelRatio(this._computeTargetPixelRatio());
       this.renderer.setSize(width, height, false);
     }
   }
@@ -540,20 +561,6 @@ export class FiezelMochi {
   setupLighting() {
     // Authentic 3D Studio Daifuku Lighting: rich volumetric form gradient with soft peach-rose sheen,
     // glint highlights, warm creamy bounce underbelly, and sculpted rim light!
-    if (this.isCompactCard) {
-      this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.55);
-      this.scene.add(this.ambientLight);
-      this.hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFF0E5, 1.35);
-      this.scene.add(this.hemiLight);
-      this.keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.65);
-      this.keyLight.position.set(2.4, 3.8, 3.8);
-      this.scene.add(this.keyLight);
-      this.rimLight = new THREE.DirectionalLight(0xFFD8E4, 1.35);
-      this.rimLight.position.set(0, 3.8, -2.8);
-      this.scene.add(this.rimLight);
-      return;
-    }
-
     this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.45);
     this.scene.add(this.ambientLight);
 
@@ -653,34 +660,23 @@ export class FiezelMochi {
     this.skinCanvas.width = SKIN_RES;
     this.skinCanvas.height = SKIN_RES;
     this.sCtx = this.skinCanvas.getContext('2d');
-    this.mochiSkinTexture = new THREE.CanvasTexture(this.skinCanvas);
-    this.mochiSkinTexture.generateMipmaps = false;
-    this.mochiSkinTexture.minFilter = THREE.LinearFilter;
+    this.mochiSkinTexture = this._configureCrispTexture(new THREE.CanvasTexture(this.skinCanvas));
 
     this.updateSkinBlush();
 
     // Mouth-watering velvety Daifuku rice-dough skin with soft peach-rose edge sheen (HD 3D studio quality)
-    this.mochiMaterial = this.isCompactCard
-      ? new THREE.MeshStandardMaterial({
-          map: this.mochiSkinTexture,
-          color: 0xFFFFFF,
-          roughness: 0.34,
-          metalness: 0.0,
-          emissive: new THREE.Color(0xFFD2DE),
-          emissiveIntensity: 0.07
-        })
-      : new THREE.MeshPhysicalMaterial({
-          map: this.mochiSkinTexture,
-          color: 0xFFFFFF,
-          roughness: 0.28,
-          metalness: 0.0,
-          clearcoat: 0.12,
-          clearcoatRoughness: 0.25,
-          sheen: 0.90,
-          sheenRoughness: 0.30,
-          sheenColor: new THREE.Color(0xFFD2DE), // Soft rosy peach sheen along silhouette: pops on white & cream!
-          ior: 1.45
-        });
+    this.mochiMaterial = new THREE.MeshPhysicalMaterial({
+      map: this.mochiSkinTexture,
+      color: 0xFFFFFF,
+      roughness: 0.28,
+      metalness: 0.0,
+      clearcoat: 0.12,
+      clearcoatRoughness: 0.25,
+      sheen: 0.90,
+      sheenRoughness: 0.30,
+      sheenColor: new THREE.Color(0xFFD2DE), // Soft rosy peach sheen along silhouette: pops on white & cream!
+      ior: 1.45
+    });
 
     this.mochiMesh = new THREE.Mesh(geo, this.mochiMaterial);
 
@@ -1552,22 +1548,16 @@ export class FiezelMochi {
     this.hornsGroup.visible = false;
     this.mochiGroup.add(this.hornsGroup);
 
-    const hornMat = this.isCompactCard
-      ? new THREE.MeshStandardMaterial({
-          color: 0x260E12,
-          roughness: 0.28,
-          metalness: 0.08
-        })
-      : new THREE.MeshPhysicalMaterial({
-          color: 0x260E12,
-          roughness: 0.28,
-          metalness: 0.08,
-          clearcoat: 0.55,
-          clearcoatRoughness: 0.24,
-          sheen: 0.90,
-          sheenRoughness: 0.25,
-          sheenColor: new THREE.Color(0xC83228)
-        });
+    const hornMat = new THREE.MeshPhysicalMaterial({
+      color: 0x260E12,
+      roughness: 0.28,
+      metalness: 0.08,
+      clearcoat: 0.55,
+      clearcoatRoughness: 0.24,
+      sheen: 0.90,
+      sheenRoughness: 0.25,
+      sheenColor: new THREE.Color(0xC83228)
+    });
 
     const buildHornMesh = (side) => {
       const spine = new THREE.CatmullRomCurve3([
@@ -1653,21 +1643,15 @@ export class FiezelMochi {
     this.empatiPawsGroup.visible = false;
     this.mochiGroup.add(this.empatiPawsGroup);
 
-    const pawMochiMat = this.isCompactCard
-      ? new THREE.MeshStandardMaterial({
-          color: 0xFFFDFB,
-          roughness: 0.58,
-          metalness: 0.0
-        })
-      : new THREE.MeshPhysicalMaterial({
-          color: 0xFFFDFB,
-          roughness: 0.58,
-          metalness: 0.0,
-          clearcoat: 0.0,
-          sheen: 0.55,
-          sheenRoughness: 0.55,
-          sheenColor: new THREE.Color(0xFFD6E2)
-        });
+    const pawMochiMat = new THREE.MeshPhysicalMaterial({
+      color: 0xFFFDFB,
+      roughness: 0.58,
+      metalness: 0.0,
+      clearcoat: 0.0,
+      sheen: 0.55,
+      sheenRoughness: 0.55,
+      sheenColor: new THREE.Color(0xFFD6E2)
+    });
 
     const shadowMat = new THREE.MeshBasicMaterial({
       color: 0xE6B8CA,
@@ -2221,9 +2205,7 @@ export class FiezelMochi {
     this.faceCanvas.width = 1024;
     this.faceCanvas.height = 768;
     this.fCtx = this.faceCanvas.getContext('2d');
-    this.faceTexture = new THREE.CanvasTexture(this.faceCanvas);
-    this.faceTexture.generateMipmaps = false;
-    this.faceTexture.minFilter = THREE.LinearFilter;
+    this.faceTexture = this._configureCrispTexture(new THREE.CanvasTexture(this.faceCanvas));
     this.faceTexture.needsUpdate = true;
 
     const shellW = 2.40;
@@ -2418,9 +2400,7 @@ export class FiezelMochi {
     this.fxCanvas.width = 1024;
     this.fxCanvas.height = 800;
     this.fxCtx = this.fxCanvas.getContext('2d');
-    this.fxTexture = new THREE.CanvasTexture(this.fxCanvas);
-    this.fxTexture.generateMipmaps = false;
-    this.fxTexture.minFilter = THREE.LinearFilter;
+    this.fxTexture = this._configureCrispTexture(new THREE.CanvasTexture(this.fxCanvas));
 
     const fxGeo = new THREE.PlaneGeometry(3.56, 2.78, 1, 1);
     this.fxOverlayMat = new THREE.MeshBasicMaterial({
@@ -5196,9 +5176,7 @@ export class FiezelMochi {
     this.badgeCanvas.width = 512 * BADGE_SCALE;
     this.badgeCanvas.height = 320 * BADGE_SCALE;
     this.badgeCtx = this.badgeCanvas.getContext('2d');
-    this.badgeTex = new THREE.CanvasTexture(this.badgeCanvas);
-    this.badgeTex.generateMipmaps = false;
-    this.badgeTex.minFilter = THREE.LinearFilter;
+    this.badgeTex = this._configureCrispTexture(new THREE.CanvasTexture(this.badgeCanvas));
 
     const badgePlaneMat = new THREE.MeshBasicMaterial({
       map: this.badgeTex,
@@ -8115,9 +8093,9 @@ export class FiezelMochi {
         }, docHidden ? 600 : 250);
         return;
       }
-      // Pace purely idle animation on mobile/high-refresh screens when resting (~15fps compact card, ~30fps stage).
+      // Pace purely idle animation on mobile/high-refresh screens when resting (~21fps compact card, ~33fps stage).
       const hasBurst = !!(this.particles && this.particles.length) || this.isHovered || Math.abs(this.jumpY || 0) > 0.01 || Math.abs(this.jiggleAmplitude || 0) > 0.02 || this.handGestureTimer > 0;
-      const idleMinMs = (this.isCompactCard && !hasBurst) ? 64 : 30;
+      const idleMinMs = (this.isCompactCard && !hasBurst) ? 48 : 30;
       if (!mustStayAwake && lastRenderAt > 0 && (now - lastRenderAt) < idleMinMs) {
         this.rafId = requestAnimationFrame(loop);
         return;

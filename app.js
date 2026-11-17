@@ -13467,10 +13467,36 @@ function dismissBootSplash(){
   try{self.__fiezelBootSplash?.clearRecovery?.()}catch(_){}
   try{self.__fiezelBootSplash?.clearWatchdog?.()}catch(_){}
   try{const r=self.document?.getElementById?.('fiezelBootRecovery');if(r)r.remove()}catch(_){}
+  const bs=self.document?.getElementById?.('fiezelBootSplash');
+  const alreadyLeaving=!!(bs&&bs.classList&&bs.classList.contains('is-leaving'));
+  if(alreadyLeaving){
+    try{self.document?.documentElement?.classList?.remove?.('fz-booting');self.document?.body?.classList?.remove?.('fz-booting')}catch(_){}
+    try{self.__fiezelBootSplashDismissed=true}catch(_){}
+    try{syncStatusBarColor()}catch(_){}
+    return true;
+  }
+  const reducedMotion=!!(self.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
+  if(bs&&bs.parentNode&&bs.classList&&!self.__fiezelBootWatchdogFired&&!reducedMotion&&typeof bs.getBoundingClientRect==='function'){
+    try{
+      bs.setAttribute('data-fiezel-boot-claimed','leaving');
+      bs.classList.add('is-leaving');
+      bs.style.pointerEvents='none';
+      self.document?.documentElement?.classList?.remove?.('fz-booting');
+      self.document?.body?.classList?.remove?.('fz-booting');
+      self.__fiezelBootSplashDismissed=true;
+      try{syncStatusBarColor()}catch(_){}
+      setTimeout(()=>{
+        try{self.FiezelSplash?.disposeBootSplash?.(self)}catch(_){}
+        try{self.__fiezelBootSplash?.dismiss?.()}catch(_){}
+        try{if(bs.parentNode)bs.parentNode.removeChild(bs)}catch(_){}
+        try{self.document?.querySelectorAll?.('.fiezel-splash')?.forEach?.(s=>s.remove?.())}catch(_){}
+      },320);
+      return true;
+    }catch(_){}
+  }
   try{self.FiezelSplash?.disposeBootSplash?.(self)}catch(_){}
   try{self.__fiezelBootSplash?.dismiss?.()}catch(_){}
   try{
-    const bs=self.document?.getElementById?.('fiezelBootSplash');
     if(bs&&bs.parentNode)bs.parentNode.removeChild(bs);
   }catch(_){}
   try{
