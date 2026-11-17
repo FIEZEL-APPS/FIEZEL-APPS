@@ -176,7 +176,8 @@ public class FiezelNativeBridge {
                 android.net.Network activeNetwork = cm.getActiveNetwork();
                 if (activeNetwork == null) return false;
                 NetworkCapabilities capabilities = cm.getNetworkCapabilities(activeNetwork);
-                return capabilities != null && (
+                return capabilities != null &&
+                        capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && (
                         capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                         capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                         capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)

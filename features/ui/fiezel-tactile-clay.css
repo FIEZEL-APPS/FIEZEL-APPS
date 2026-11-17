@@ -247,7 +247,7 @@ button.brand-button {
   color: var(--sky-blue) !important;
   box-shadow: 0 4px 0 #BAE6FD !important;
   cursor: pointer !important;
-  transition: all 0.12s !important;
+  transition: transform 0.12s, opacity 0.12s, background-color 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s !important;
 }
 
 .fz-aurora-audio-btn:active, .audio-btn-3d:active {
@@ -262,8 +262,8 @@ html body.fz-lux nav.bottomnav,
 html body.fz-lux .bottomnav,
 html body.fz-lang-ja nav.bottomnav,
 html body.fz-lang-ja .bottomnav,
-html body:has(.home-today) nav.bottomnav,
-html body:has(.home-today) .bottomnav,
+html body.has-home-today nav.bottomnav,
+html body.has-home-today .bottomnav,
 .bottomnav {
   position: fixed !important;
   top: auto !important;
@@ -359,26 +359,26 @@ html body.fz-stage-sl.fsl-session-active nav.bottomnav,
 html body.fz-stage-sl.fsl-session-active .bottomnav,
 html body.fz-stage-sl nav.bottomnav,
 html body.fz-stage-sl .bottomnav,
-html body:has(#speakingListeningRoot .fsl-card-listening) nav.bottomnav,
-html body:has(#speakingListeningRoot .fsl-card-listening) .bottomnav,
-html body:has(.fsl-card-listening) nav.bottomnav,
-html body:has(.fsl-card-listening) .bottomnav,
-html body:has(.fsl-feedback) nav.bottomnav,
-html body:has(.fsl-feedback) .bottomnav,
-html body:has(.card-flashcard) nav.bottomnav,
-html body:has(.card-flashcard) .bottomnav,
-html body:has(.quiz-shell) nav.bottomnav,
-html body:has(.quiz-shell) .bottomnav,
+html body.fsl-session-active nav.bottomnav,
+html body.fsl-session-active .bottomnav,
+html body.fsl-session-active nav.bottomnav,
+html body.fsl-session-active .bottomnav,
+html body.fsl-session-active nav.bottomnav,
+html body.fsl-session-active .bottomnav,
+html body.has-flashcard nav.bottomnav,
+html body.has-flashcard .bottomnav,
+html body.fz-stage-quiz nav.bottomnav,
+html body.fz-stage-quiz .bottomnav,
 body.fz-lesson-mode .bottomnav,
 body.fz-stage-quiz .bottomnav,
 body.fsl-session-active .bottomnav,
 body.fz-stage-sl.fsl-session-active .bottomnav,
 body.fz-stage-sl .bottomnav,
-body:has(#speakingListeningRoot .fsl-card-listening) .bottomnav,
-body:has(.fsl-card-listening) .bottomnav,
-body:has(.fsl-feedback) .bottomnav,
-body:has(.card-flashcard) .bottomnav,
-body:has(.quiz-shell) .bottomnav {
+body.fsl-session-active .bottomnav,
+body.fsl-session-active .bottomnav,
+body.fsl-session-active .bottomnav,
+body.has-flashcard .bottomnav,
+body.fz-stage-quiz .bottomnav {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -477,7 +477,7 @@ html body .bottomnav .nav span,
 
 html body nav.bottomnav .nav.active,
 html body .bottomnav .nav.active,
-html body:has(.home-today) .bottomnav .nav.active,
+html body.has-home-today .bottomnav .nav.active,
 .bottomnav .nav.active {
   color: #78350F !important;
   background: transparent !important;
@@ -739,7 +739,7 @@ html body .bottomnav .nav[data-view="classroom"].active span,
   color: #78350F !important;
   cursor: pointer !important;
   margin-top: 8px !important;
-  transition: all 0.1s ease !important;
+  transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease !important;
 }
 
 .gx-pin-formula-btn:active {
@@ -1004,9 +1004,7 @@ html body:not(.fz-teacher-mode) .fz-welcome-header .fz-greet-title,
 /* 14. TOPBAR: 100% TACTILE CLAY SPECIFICATION */
 header.topbar,
 .topbar {
-  background: rgba(253, 250, 243, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  background: rgba(253, 250, 243, 0.98) !important;
   border-bottom: 1px solid transparent !important;
   box-shadow: none !important;
   padding: 8px 16px !important;
@@ -1119,7 +1117,7 @@ header.topbar,
   min-width: auto !important;
   flex-shrink: 0 !important;
   line-height: 1 !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
   overflow: visible !important;
 }
 
@@ -1226,8 +1224,8 @@ header.topbar,
 /* ==========================================================================
    15. TACTILE CLAY HOME COCKPIT & CARDS (HERO, BUG ARENA, QUICK GRID, KELASKU)
    ========================================================================== */
-body:has(.home-today) #app,
-#app:has(.home-today) {
+body.has-home-today #app,
+#app.has-home-today {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
@@ -1399,7 +1397,7 @@ body:has(.home-today) #app,
   justify-content: center !important;
   cursor: pointer !important;
   box-shadow: 0 4px 0 #BAE6FD !important;
-  transition: all 0.12s !important;
+  transition: transform 0.12s, opacity 0.12s, background-color 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s !important;
   flex-shrink: 0 !important;
 }
 
@@ -1445,7 +1443,7 @@ button.hero-cta-btn,
   gap: 8px !important;
   box-shadow: 0 5px 0 #D97706, 0 12px 24px rgba(255, 183, 3, 0.35) !important;
   position: relative !important;
-  transition: all 0.12s ease-out !important;
+  transition: transform 0.12s ease-out, opacity 0.12s ease-out, background-color 0.12s ease-out, border-color 0.12s ease-out, color 0.12s ease-out, box-shadow 0.12s ease-out !important;
   box-sizing: border-box !important;
 }
 
@@ -1537,7 +1535,7 @@ button.hero-cta-btn:active,
   gap: 6px !important;
   cursor: pointer !important;
   box-shadow: 0 3px 0 #E2E8F0 !important;
-  transition: all 0.15s !important;
+  transition: transform 0.15s, opacity 0.15s, background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s !important;
 }
 
 .bug-row:hover {
@@ -1639,7 +1637,7 @@ button.bug-raid-btn,
   justify-content: center !important;
   gap: 9px !important;
   box-shadow: 0 5px 0 var(--shadow-ivory), 0 10px 20px rgba(11, 15, 23, 0.15) !important;
-  transition: all 0.12s !important;
+  transition: transform 0.12s, opacity 0.12s, background-color 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s !important;
   box-sizing: border-box !important;
 }
 
@@ -1711,7 +1709,7 @@ button.target-lang-chip,
   box-shadow: 0 3px 0 #E2E8F0 !important;
   cursor: pointer !important;
   text-align: left !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
   box-sizing: border-box !important;
 }
 
@@ -1781,7 +1779,7 @@ button.target-lang-chip:active,
   gap: 10px !important;
   box-shadow: 0 5px 0 var(--card-bevel), 0 10px 20px rgba(15, 23, 42, 0.04) !important;
   cursor: pointer !important;
-  transition: all 0.15s !important;
+  transition: transform 0.15s, opacity 0.15s, background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s !important;
 }
 
 .grid-tile:hover {
@@ -1944,7 +1942,7 @@ button.class-btn-3d,
   border-radius: 9999px !important;
   cursor: pointer !important;
   box-shadow: 0 3px 0 var(--kelasku-emerald-deep), 0 6px 14px rgba(31, 122, 99, 0.35) !important;
-  transition: all 0.12s !important;
+  transition: transform 0.12s, opacity 0.12s, background-color 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s !important;
   white-space: nowrap !important;
 }
 
@@ -2085,7 +2083,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   color: #334155 !important;
   box-shadow: 0 2px 0 #CBD5E1 !important;
   cursor: pointer !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 .section-head .active-level-control button:hover,
@@ -2180,7 +2178,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   box-sizing: border-box !important;
   text-align: left !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   position: relative !important;
 }
 
@@ -2284,7 +2282,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   box-shadow: 0 3px 0 #CBD5E1 !important;
   cursor: pointer !important;
   white-space: nowrap !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 .ch-nav button.active,
@@ -2502,7 +2500,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   color: #334155 !important;
   cursor: pointer !important;
   box-shadow: 0 2px 0 #CBD5E1 !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 .profile-btn-edit:active {
@@ -2687,7 +2685,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   color: #047857 !important;
   cursor: pointer !important;
   box-shadow: 0 2px 0 #A7F3D0 !important;
-  transition: all 0.1s ease !important;
+  transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease !important;
 }
 
 .btn-copy-code:active {
@@ -2752,7 +2750,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   color: #475569 !important;
   cursor: pointer !important;
   box-shadow: 0 2px 0 #CBD5E1 !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   flex-shrink: 0 !important;
 }
 
@@ -2793,7 +2791,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   display: flex !important;
   flex-direction: column !important;
   gap: 14px !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .profile-section-card.is-collapsed .section-card-body {
@@ -2830,7 +2828,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   gap: 3px !important;
   cursor: pointer !important;
   box-shadow: 0 3px 0 #CBD5E1 !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 .goal-pill-btn:hover {
@@ -2918,7 +2916,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   background: #E2E8F0 !important;
   border-radius: 999px !important;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .tactile-slider:before {
@@ -2931,7 +2929,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   background: #FFFFFF !important;
   border-radius: 50% !important;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .tactile-toggle input:checked + .tactile-slider {
@@ -2962,7 +2960,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   font-weight: 800 !important;
   color: #64748B !important;
   cursor: pointer !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 .speed-btn.active {
@@ -3027,7 +3025,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 .profile-action-btn:active {
@@ -3266,7 +3264,7 @@ html body .progress-tab,
   padding: 8px 12px !important;
   box-shadow: none !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   white-space: nowrap !important;
   flex: 1 1 auto !important;
   min-width: 0 !important;
@@ -3322,7 +3320,7 @@ html body .ch-tab,
   box-shadow: none !important;
   cursor: pointer !important;
   white-space: nowrap !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   box-sizing: border-box !important;
 }
 
@@ -4040,7 +4038,7 @@ html body .fz2-lvl,
   font-weight: 800 !important;
   letter-spacing: -0.01em !important;
   text-shadow: none !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 /* Active Level Pill: Radiant Solar Gold Clay Key */
@@ -4120,7 +4118,7 @@ body.fz-view-classroom header.topbar #topKelasKuCluster {
   border-radius: 6px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.04em !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 .kelasku-top-brand .kelasku-brand-tag.is-unjoined,
@@ -4151,7 +4149,7 @@ body.fz-view-classroom header.topbar #topKelasKuCluster {
   width: auto !important;
   flex-shrink: 0 !important;
   line-height: 1 !important;
-  transition: all 0.12s !important;
+  transition: transform 0.12s, opacity 0.12s, background-color 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s !important;
 }
 
 .btn-class-selector svg {
@@ -4211,7 +4209,7 @@ html body .ch-segbar .ch-segbar-btn,
   color: #334155 !important;
   white-space: nowrap !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -5727,7 +5725,7 @@ html body .tutor-speed-pill,
   justify-content: center !important;
   gap: 8px !important;
   cursor: pointer !important;
-  transition: all 120ms ease !important;
+  transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease !important;
   box-sizing: border-box !important;
 }
 
@@ -5779,7 +5777,7 @@ html body .tutor-speed-pill,
   justify-content: center !important;
   gap: 8px !important;
   cursor: pointer !important;
-  transition: all 120ms ease !important;
+  transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease !important;
   box-sizing: border-box !important;
 }
 
@@ -6161,21 +6159,21 @@ div.jlpt-explain-tip-card b {
 }
 
 /* 17. CLEAN DAYLIGHT MINIMALIST LEVEL PROGRESSION CARDS (COMPACT & UNCLIPPED) */
-.modal-panel:has(.level-picker-grid),
-body.fz-lux .modal-panel:has(.level-picker-grid),
-#modalPanel:has(.level-picker-grid) {
+.modal-panel.has-level-picker,
+body.fz-lux .modal-panel.has-level-picker,
+#modalPanel.has-level-picker {
   padding: 16px 16px 18px !important;
   max-height: 92vh !important;
   overflow-y: auto !important;
 }
 
-.modal-panel:has(.level-picker-grid) h2 {
+.modal-panel.has-level-picker h2 {
   font-size: 1.3rem !important;
   line-height: 1.2 !important;
   margin: 2px 0 4px !important;
 }
 
-.modal-panel:has(.level-picker-grid) > p {
+.modal-panel.has-level-picker > p {
   font-size: 0.78rem !important;
   line-height: 1.35 !important;
   margin: 0 0 8px !important;
@@ -6204,7 +6202,7 @@ button.level-picker-card {
   box-shadow: 0 2px 0 #CBD5E1 !important;
   text-align: left !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   width: 100% !important;
   box-sizing: border-box !important;
 }
@@ -6396,7 +6394,7 @@ html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-stage-h
     padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
-html body.fz-lesson-mode main.app.app,html body.fz-lux.fz-lesson-mode main.app.app,html body.fz-lux.fz-stage-quiz main.app.app,html body:has(.quiz-shell) main.app.app,html body.fz-view-chat main.app.app,html body.fz-lux.fz-view-chat main.app.app { padding-top: 0 !important; }
+html body.fz-lesson-mode main.app.app,html body.fz-lux.fz-lesson-mode main.app.app,html body.fz-lux.fz-stage-quiz main.app.app,html body.fz-stage-quiz main.app.app,html body.fz-view-chat main.app.app,html body.fz-lux.fz-view-chat main.app.app { padding-top: 0 !important; }
 html body.fz-lesson-mode header.topbar,
 html body.fz-teacher-mode header.topbar,
 html body.fz-teacher-mode nav.bottomnav,
@@ -6531,7 +6529,7 @@ button.quiz-listen-speed-btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 #quizListenSpeed:hover,
@@ -6642,7 +6640,7 @@ button.skill-back-btn {
   font-size: 0.88rem !important;
   font-weight: 800 !important;
   cursor: pointer !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 .skill-back-btn:hover,
@@ -6684,7 +6682,7 @@ html.fiezel-ui-v6 .skill-help-dot {
   justify-content: center !important;
   padding: 0 !important;
   cursor: pointer !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
 }
 
 .skill-help-dot:hover,
@@ -6849,14 +6847,14 @@ header.topbar .active-level-control::after,
 }
 @media (min-width: 1100px) {
   html body:is(.fz-stage-home, .fz-view-latihan, .fz-stage-map, .fz-view-profile, .fz-view-kana):not(.fz-teacher-mode),
-  html body:has(#app > .library-page, #jaKanaChart, .ja-kana):not(.fz-teacher-mode) {
+  html body:is(.fz-view-library, .fz-stage-kana):not(.fz-teacher-mode) {
     --fz-col: 1160px;
   }
 }
 @media (min-width: 768px) {
   /* Navigasi disembunyikan di keadaan ini oleh aturan di Section 8 dan mobile-edge-fit. */
-  html body:is(.fz-lesson-mode, .fz-stage-quiz, .fsl-session-active, .fz-stage-sl),
-  html body:has(.fsl-card-listening, .fsl-feedback, .card-flashcard, .quiz-shell) {
+  html body:is(.fz-lesson-mode, .fz-stage-quiz, .fsl-session-active, .fz-stage-sl, .has-flashcard),
+  html body .quiz-shell {
     --fz-rail: 0px !important;
     --fz-col: 880px !important;
   }
@@ -7327,8 +7325,6 @@ html body #app .quiz-shell #quizFloatingBar.quiz-floating-bar,
   margin: 0 !important;
   padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 12px)) 16px !important;
   background: rgba(255, 253, 249, 0.98) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
   border-top: 1.5px solid #E8DFD3 !important;
   box-shadow: 0 -6px 24px rgba(36, 26, 17, 0.14) !important;
   z-index: 9999 !important;
@@ -7592,7 +7588,7 @@ header.topbar {
 }
 
 /* Home Cockpit Layout Container */
-body:has(.home-today),
+body.has-home-today,
 .home-page.home-today,
 .home-today {
   background-color: #FDFAF3 !important;
@@ -8190,8 +8186,7 @@ html body #app .fz-kawan-card.fz-vissol-kawan-card::after {
 .fz-kawan-modal-scrim {
   position: fixed !important; inset: 0 !important; z-index: 12000 !important;
   display: flex !important; align-items: center !important; justify-content: center !important; padding: 20px !important;
-  background: rgba(15, 23, 42, 0.6) !important;
-  backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(15, 23, 42, 0.72) !important;
   animation: fzKawanScrimIn 0.22s ease-out !important;
   box-sizing: border-box !important;
 }
@@ -8705,9 +8700,7 @@ html body #app .fz-kawan-card.fz-vissol-kawan-card::after {
 
 /* 7. Bottom Navigation Dock */
 html body:not(.fz-teacher-mode) nav.bottomnav {
-  background: rgba(255, 255, 255, 0.94) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  background: rgba(255, 255, 255, 0.97) !important;
   border-top: 1px solid rgba(241, 245, 249, 0.8) !important;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.03) !important;
 }
@@ -9068,16 +9061,12 @@ html body header.topbar .kelasku-top-cluster {
   stroke: rgba(245, 158, 11, 0.35);
   stroke-width: 1;
   stroke-dasharray: 4 8;
-  animation: fzflow-edge 14s linear infinite;
 }
 
 .topbar-fx-net circle {
   fill: #F59E0B;
   stroke: rgba(140, 34, 51, 0.3);
   stroke-width: 0.8;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: fzflow-node 5s ease-in-out infinite;
 }
 
 .topbar-contour-wave {
@@ -9096,8 +9085,8 @@ html body header.topbar .kelasku-top-cluster {
   border-radius: 50%;
   opacity: 0;
   background: radial-gradient(circle, #FFDE59 0%, rgba(245, 158, 11, 0.6) 50%, rgba(245, 158, 11, 0) 100%);
-  animation: sparkRise 8s ease-in-out infinite;
 }
+.reduce-motion .fz-vissol-bg-motion *, .reduce-motion .topbar-fx-net * { animation: none !important; }
 
 .topbar-sp1 { left: 24%; top: 40%; animation-delay: 1.2s; }
 .topbar-sp2 { right: 30%; top: 50%; animation-delay: 3.8s; }
@@ -9596,7 +9585,7 @@ html body .fiezel-splash-brand .fz-auth-topo {
   font-weight: 700 !important;
   cursor: pointer !important;
   overflow: hidden !important;
-  transition: all 0.1s ease !important;
+  transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease !important;
   transform: translateY(0) !important;
 }
 
@@ -9624,7 +9613,7 @@ html body .fiezel-splash-brand .fz-auth-topo {
   transform: translateY(3px) !important;
   background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%) !important;
   box-shadow: 0 2px 0 #CBD5E1, 0 4px 10px rgba(0, 0, 0, 0.06) !important;
-  transition: all 0.1s ease !important;
+  transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease !important;
 }
 
 /* Native inline links, password eye button & welcome next button */
@@ -9667,7 +9656,7 @@ html body .fiezel-splash-brand .fz-auth-topo {
   min-height: 48px !important;
   color: #FFFDF8 !important;
   cursor: pointer !important;
-  transition: all 0.18s ease !important;
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
 }
 
 :root .fz-auth .fz-auth-next:hover {
@@ -10069,7 +10058,7 @@ html body .fiezel-ob .fiezel-topbar button.fiezel-back {
   align-items: center !important;
   gap: 5px !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 html body .fiezel-ob .fiezel-topbar button.fiezel-back:hover {
@@ -10384,7 +10373,7 @@ html body .fiezel-ob .fiezel-sheet[data-ob-step="name"] [data-ob-advance] {
   padding: 0 20px !important;
   box-shadow: 0 4px 14px rgba(27, 20, 24, 0.04) !important;
   box-sizing: border-box !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
   position: relative !important;
   overflow: hidden !important;
 }
@@ -10480,7 +10469,7 @@ html body .fiezel-ob .fiezel-course-card {
   box-shadow: 0 3px 10px rgba(27, 20, 24, 0.04) !important;
   box-sizing: border-box !important;
   cursor: pointer !important;
-  transition: all 0.18s ease !important;
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
 }
 
 html body .fiezel-ob .fiezel-course-card .fiezel-course-flag {
@@ -10568,7 +10557,7 @@ html body .fiezel-ob button.fiezel-goal-card {
   box-shadow: 0 3px 10px rgba(27, 20, 24, 0.04) !important;
   box-sizing: border-box !important;
   cursor: pointer !important;
-  transition: all 0.18s ease !important;
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
   position: relative !important;
   text-align: left !important;
 }
@@ -11034,7 +11023,7 @@ html body .fiezel-ob button.fiezel-level-chip {
   cursor: pointer !important;
   text-align: center !important;
   box-sizing: border-box !important;
-  transition: all 0.16s ease !important;
+  transition: transform 0.16s ease, opacity 0.16s ease, background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease !important;
 }
 
 html body .fiezel-ob button.fiezel-level-chip.is-selected {
@@ -11078,7 +11067,7 @@ html body .fiezel-ob .fiezel-path-card {
   box-shadow: 0 4px 14px rgba(27, 20, 24, 0.04) !important;
   box-sizing: border-box !important;
   cursor: pointer !important;
-  transition: all 0.18s ease !important;
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
 }
 
 html body .fiezel-ob .fiezel-path-card.is-selected {
@@ -11182,7 +11171,7 @@ html body .fiezel-ob [data-ob-main-start] {
   gap: 8px !important;
   cursor: pointer !important;
   margin-top: 14px !important;
-  transition: all 0.18s ease !important;
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
 }
 
 html body .fiezel-ob button.fiezel-btn-primary:not(:disabled):hover,
@@ -11222,7 +11211,7 @@ html body .fiezel-ob [data-ob-dots] span.dot {
   border-radius: 50% !important;
   background: #C9B9A6 !important;
   opacity: 1 !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 html body .fiezel-ob .fiezel-dots span.fiezel-dot.is-active,

@@ -318,7 +318,10 @@
     // belajarmu") membuat murid melihat dua jendela sekaligus. Ditunda TANPA markCompleted, sama
     // seperti pelajaran: tur berhak ditawarkan lagi saat layarnya sudah lapang.
     try {
-      var openDialog = doc.querySelector('.modal.show, .modal.open, [aria-modal="true"]:not(.fz-tour)');
+      var openDialog = doc.querySelector('.modal.show, .modal.open, [aria-modal="true"]:not(.fz-tour):not(.hidden):not([aria-hidden="true"])');
+      if (openDialog && doc.defaultView && typeof doc.defaultView.getComputedStyle === 'function') {
+        if (doc.defaultView.getComputedStyle(openDialog).display === 'none') openDialog = null;
+      }
       if (opts.force !== true && openDialog) return { shown: false, reason: 'dialog_open' };
     } catch (_) {}
 

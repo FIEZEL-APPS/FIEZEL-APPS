@@ -151,7 +151,17 @@ export async function routeAuthGoogle(ctx) {
   const db = coreDb(ctx.env);
   if (!db) return jsonError(503, ERR.UNAVAILABLE, {}, opt);
 
-  if (tooFast(ctx.identity && ctx.identity.sub ? ctx.identity.sub : 'anon', ctx.now)) {
+  const clientIp = ctx.request && ctx.request.headers
+    ? (
+        ctx.request.headers.get('cf-connecting-ip') ||
+        String(ctx.request.headers.get('x-forwarded-for') || '').split(',')[0].trim() ||
+        ''
+      )
+    : '';
+  const rateKey = (ctx.identity && ctx.identity.sub)
+    ? ctx.identity.sub
+    : (clientIp ? `ip:${clientIp}` : 'anon');
+  if (tooFast(rateKey, ctx.now)) {
     return jsonError(429, ERR.RATE_LIMITED, {}, opt);
   }
 

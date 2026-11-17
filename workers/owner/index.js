@@ -6347,7 +6347,7 @@ async function handle(request, env, ctx, nowMs) {
       model.curriculumStatus = { state: 'unknown', mapel: null, english: null, soal: null };
     }
 
-    const classCookie = `fz_cls=${encodeURIComponent(activeClass)}; Path=/; Max-Age=31536000; SameSite=Lax; HttpOnly`;
+    const classCookie = `fz_cls=${encodeURIComponent(activeClass)}; Path=/; Max-Age=31536000; SameSite=Lax; HttpOnly; Secure`;
     return html(renderDashboard(model), 200, { 'set-cookie': [refreshed, classCookie] });
   }
   if (path === '/api/summary') {

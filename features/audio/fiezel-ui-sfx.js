@@ -174,17 +174,19 @@
    * Pemanggil lama tidak diubah satu pun; alias inilah kabel penyambungnya.
    */
   var ALIASES = Object.freeze({
-    tap:          'button_tap',       // ketuk generik
-    toggle:       'button_tap',       // sakelar = ketuk standar (bunyi khusus toggle pensiun)
-    open:         'button_tap',       // buka/tutup panel: cukup ketuk standar (14 §3.1-5)
-    close:        'button_tap',
-    notif:        'notif_general',    // notifikasi baru tiba
-    notification: 'notif_general',
-    nav:          'page_transition',  // pindah layar → whoosh transisi
-    celebrate:    'lesson_complete',  // akor perayaan lama = fanfare lesson_complete
-    success:      'answer_correct',   // kosakata playFeedbackSound lama
-    error:        'answer_wrong',
-    motif:        'paw_greet'         // slot signature/sapaan → paw_greet (putusan OWNER)
+    tap:              'button_tap',       // ketuk generik
+    pop:              'button_tap',       // ketuk ringan chip token susun kata
+    toggle:           'button_tap',       // sakelar = ketuk standar (bunyi khusus toggle pensiun)
+    open:             'button_tap',       // buka/tutup panel: cukup ketuk standar (14 §3.1-5)
+    close:            'button_tap',
+    notif:            'notif_general',    // notifikasi baru tiba
+    notification:     'notif_general',
+    nav:              'page_transition',  // pindah layar → whoosh transisi
+    celebrate:        'lesson_complete',  // akor perayaan lama = fanfare lesson_complete
+    success:          'answer_correct',   // kosakata playFeedbackSound lama
+    error:            'answer_wrong',
+    motif:            'paw_greet',        // slot signature/sapaan → paw_greet (putusan OWNER)
+    streak_milestone: 'streak_5'          // pencapaian runtun / pemulihan scaffold
   });
 
   // Empat bunyi berfrekuensi tertinggi: dipanaskan setelah sentuhan pertama supaya jawaban

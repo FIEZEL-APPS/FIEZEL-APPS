@@ -1,8 +1,11 @@
+import asyncio
 import base64
 import hashlib
+import re
 import time
 import uuid
 import xml.sax.saxutils
+from collections import OrderedDict
 from typing import Optional
 try:
     import aiohttp
@@ -15,6 +18,22 @@ router = APIRouter(prefix="/api/tts", tags=["neural-tts"])
 
 TRUSTED_CLIENT_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4"
 WSS_URL = "wss://api.msedgeservices.com/tts/cognitiveservices/websocket/v1"
+_HTTP_SESSION = None
+_HTTP_SESSION_LOOP = None
+
+
+async def _get_http_session():
+    global _HTTP_SESSION, _HTTP_SESSION_LOOP
+    loop = asyncio.get_running_loop()
+    if _HTTP_SESSION is None or _HTTP_SESSION.closed or _HTTP_SESSION_LOOP is not loop:
+        if _HTTP_SESSION is not None and not _HTTP_SESSION.closed:
+            try:
+                await _HTTP_SESSION.close()
+            except Exception:
+                pass
+        _HTTP_SESSION = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=15))
+        _HTTP_SESSION_LOOP = loop
+    return _HTTP_SESSION
 
 # Voice Persona Mapping
 PERSONA_CONFIGS = {
@@ -139,7 +158,7 @@ PERSONA_CONFIGS = {
     },
 }
 
-AUDIO_CACHE = {}
+AUDIO_CACHE: "OrderedDict[str, dict]" = OrderedDict()
 CACHE_MAX_SIZE = 250
 
 
@@ -203,8 +222,6 @@ async def synthesize_edge_tts(text: str, voice_name: str, pitch: str = "+0Hz", r
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
         "Origin": "chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold",
     }
-    timeout = aiohttp.ClientTimeout(total=15)
-    import re
     # Haluskan elipsis dan tanda baca berulang agar Edge TTS tidak menimbulkan jeda hening beku
     cleaned = re.sub(r'\.{2,}|…|‥', ', ', text.strip())
     cleaned = re.sub(r'([?!])\1+', r'\1', cleaned)
@@ -213,8 +230,8 @@ async def synthesize_edge_tts(text: str, voice_name: str, pitch: str = "+0Hz", r
     escaped_text = xml.sax.saxutils.escape(cleaned)
     audio_data = bytearray()
 
-    async with aiohttp.ClientSession(timeout=timeout) as session:
-        async with session.ws_connect(url, headers=headers) as ws:
+    session = await _get_http_session()
+    async with session.ws_connect(url, headers=headers) as ws:
             cfg = (
                 f"Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n"
                 f'{{"context":{{"synthesis":{{"audio":{{"metadataoptions":{{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"}},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}}}}}'
@@ -280,9 +297,12 @@ async def synthesize_line(req: TtsLineRequest):
         raise HTTPException(status_code=400, detail="Text exceeds 1000 characters limit")
 
     persona = resolve_persona(req.speaker, req.lang or req.course, raw_text)
-    cache_key = f"{persona['edgeVoice']}::{raw_text}"
+    pitch = persona.get("pitch", "+0Hz")
+    rate = persona.get("rate", "+0%")
+    cache_key = f"{persona['edgeVoice']}::{pitch}::{rate}::{raw_text}"
 
     if cache_key in AUDIO_CACHE:
+        AUDIO_CACHE.move_to_end(cache_key)
         return {
             "ok": True,
             "cached": True,
@@ -293,8 +313,8 @@ async def synthesize_line(req: TtsLineRequest):
         audio_bytes = await synthesize_edge_tts(
             raw_text,
             voice_name=persona["edgeVoice"],
-            pitch=persona.get("pitch", "+0Hz"),
-            rate=persona.get("rate", "+0%"),
+            pitch=pitch,
+            rate=rate,
             lang=persona.get("lang", "en-US"),
         )
     except Exception as exc:
@@ -313,7 +333,7 @@ async def synthesize_line(req: TtsLineRequest):
     }
 
     if len(AUDIO_CACHE) >= CACHE_MAX_SIZE:
-        AUDIO_CACHE.pop(next(iter(AUDIO_CACHE)))
+        AUDIO_CACHE.popitem(last=False)
     AUDIO_CACHE[cache_key] = result
 
     return {

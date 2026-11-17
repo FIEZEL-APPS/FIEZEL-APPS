@@ -71,10 +71,10 @@
         linear-gradient(180deg,var(--uc-obsidian) 0%,var(--uc-obsidian-2) 55%,var(--uc-obsidian) 100%)}
     .uc-bg::before{content:'';position:absolute;inset:-50%;
       background-image:linear-gradient(rgba(0,245,212,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,212,.06) 1px,transparent 1px);
-      background-size:34px 34px;transform:perspective(600px) rotateX(58deg) translateY(10%);transform-origin:50% 100%;
-      animation:uc-grid-drift 18s linear infinite;mask-image:linear-gradient(180deg,transparent 30%,#000 70%)}
+      background-size:34px 34px;transform:perspective(600px) rotateX(58deg) translate3d(0,10%,0);transform-origin:50% 100%;
+      animation:uc-grid-drift 18s linear infinite;mask-image:linear-gradient(180deg,transparent 30%,#000 70%);will-change:transform}
     .uc-bg::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);mix-blend-mode:overlay}
-    @keyframes uc-grid-drift{to{background-position:0 34px,34px 0}}
+    @keyframes uc-grid-drift{from{transform:perspective(600px) rotateX(58deg) translate3d(0,10%,0)}to{transform:perspective(600px) rotateX(58deg) translate3d(34px,calc(10% + 34px),0)}}
     .uc-app[data-phase="tribunal"] .uc-bg{filter:brightness(.55) saturate(1.3)}
     .uc-app[data-phase="showdown"] .uc-bg{filter:brightness(.7) saturate(1.2)}
     .uc-app[data-phase="showdown"] .uc-bg::after{background:radial-gradient(60% 45% at 50% 45%,rgba(255,0,84,.22),transparent 70%),repeating-linear-gradient(180deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px)}

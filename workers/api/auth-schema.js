@@ -318,12 +318,19 @@ const APPLIED = new WeakMap();
  */
 export async function ensureAuthSchema(db) {
   if (!db || typeof db.prepare !== 'function') throw new Error('auth_schema_no_db');
-  if (APPLIED.get(db)) return;
-  for (const statement of ALL_DDL) {
-    /* eslint-disable no-await-in-loop */
-    await db.prepare(statement).run();
+  let pending = APPLIED.get(db);
+  if (!pending) {
+    pending = (async () => {
+      for (const statement of ALL_DDL) {
+        /* eslint-disable no-await-in-loop */
+        await db.prepare(statement).run();
+      }
+      return true;
+    })();
+    APPLIED.set(db, pending);
+    pending.catch(() => APPLIED.delete(db));
   }
-  APPLIED.set(db, true);
+  await pending;
 }
 
 /** Hanya untuk gerbang: melupakan cache supaya urutan terapan bisa diuji ulang. */

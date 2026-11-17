@@ -16,6 +16,7 @@
 const __fzRoot = require('path').join(__dirname, '..');
 const fs = require('fs');
 const path = require('path');
+const { pathToFileURL } = require('url');
 const assert = require('assert');
 
 let pass = 0, fail = 0;
@@ -26,7 +27,7 @@ function check(name, fn) {
 const read = (p) => fs.readFileSync(path.join(__fzRoot, p), 'utf8');
 
 (async () => {
-  const legacy = await import(path.join(__fzRoot, 'workers/api/route-legacy.js'));
+  const legacy = await import(pathToFileURL(path.join(__fzRoot, 'workers/api/route-legacy.js')).href);
   const client = require(path.join(__fzRoot, 'features/brain/fiezel-attempt-record.js'));
   const route = (m, p) => legacy.ROUTES.find((r) => r[0] === m && r[1] === p)[2];
 

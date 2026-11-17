@@ -113,7 +113,8 @@ public final class FiezelAssetLoaderFactory {
                 Network network = cm.getActiveNetwork();
                 if (network == null) return false;
                 NetworkCapabilities cap = cm.getNetworkCapabilities(network);
-                return cap != null && (
+                return cap != null &&
+                        cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && (
                         cap.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                         cap.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                         cap.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)

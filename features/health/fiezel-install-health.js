@@ -41,8 +41,11 @@
   }
 
   function buildNumber(marker) {
-    var match = /m025-(\d+)/.exec(String(marker || ''));
-    return match ? Number(match[1]) : null;
+    var match = /m(\d+)-(\d+)/.exec(String(marker || ''));
+    if (!match) return null;
+    var major = Number(match[1]);
+    var minor = Number(match[2]);
+    return major === 25 ? minor : (major * 100000 + minor);
   }
 
   /**

@@ -63,11 +63,12 @@
       if (typeof root === 'undefined' || !root.location) return true; // Node / test env
       var proto = (root.location.protocol || '').toLowerCase();
       if (proto === 'capacitor:' || proto === 'file:' || proto === 'ionic:') return true;
-      if (root.Capacitor || root._isAndroidApp || root.isNativeApp) return true;
+      if (root.Capacitor || root._isAndroidApp || root.isNativeApp || root.FiezelNative) return true;
       if (isLocalOrTest()) return true;
 
       var h = (root.location.hostname || '').toLowerCase();
-      if (h === 'fiezel.my.id' || h === 'www.fiezel.my.id' || h === 'fiezel-apps.github.io') return true;
+      if (h === 'fiezel.my.id' || h === 'www.fiezel.my.id' || h === 'fiezel-apps.github.io' || h === 'appassets.androidplatform.net') return true;
+      if (h === 'fiezel.uji' && typeof navigator !== 'undefined' && navigator.webdriver) return true;
       if (h.slice(-13) === '.fiezel.my.id') return true;
     } catch (_) {
       return true;

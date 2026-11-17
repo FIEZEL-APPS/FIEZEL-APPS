@@ -519,7 +519,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   width:auto;max-width:min(280px,calc(100% - 32px));display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 14px;height:32px;box-sizing:border-box;
   border-radius:var(--radius-pill);
   box-shadow:0 8px 24px rgba(0,0,0,0.3);opacity:0;transform:translate(-50%,-18px) scale(.9);
-  transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring);backdrop-filter:blur(16px)
+  transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring)
 }
 .answer-burst.hidden{display:none}.answer-burst.show{opacity:1;transform:translate(-50%,0) scale(1)}
 .answer-burst-icon{width:18px;height:18px;display:grid;place-items:center;border-radius:var(--radius-xs)}.answer-burst-icon svg{width:14px;height:14px}
@@ -791,7 +791,7 @@ html body:not(.fz-teacher-mode) .flash-back h3.flash-meaning,
    atas: ia yang memikul notch (viewport-fit=cover) lewat env(safe-area-inset-top). */
 .quiz-topbar{
   position:sticky;top:0;z-index:30;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:var(--sp-3);
-  padding:max(10px,env(safe-area-inset-top)) 0 var(--sp-3);background:rgba(var(--bg-rgb),.9);backdrop-filter:blur(14px)
+  padding:max(10px,env(safe-area-inset-top)) 0 var(--sp-3);background:rgba(var(--bg-rgb),.96)
 }
 .quiz-exit{min-width:44px;min-height:44px}
 .quiz-progress{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;text-align:center !important;font-weight:700 !important;font-variant-numeric:tabular-nums !important;min-width:0 !important}
@@ -869,7 +869,7 @@ html body:not(.fz-teacher-mode) .flash-back h3.flash-meaning,
   /* Backdrop dulu kabut TERANG di atas layar terang (rgba(bg,.82)) - panel dialog
      tidak pernah benar-benar terangkat dari latarnya. Scrim gelap turunan --text
      memisahkan keduanya tanpa menambah satu elemen pun. */
-  position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(18px);
+  position:fixed;inset:0;background:var(--scrim);backdrop-filter:none;
   display:grid;place-items:center;z-index:2500 !important;opacity:0;pointer-events:none;transition:opacity var(--dur-l) var(--ease);
   padding:20px;
 }
@@ -882,7 +882,7 @@ html body:not(.fz-teacher-mode) .flash-back h3.flash-meaning,
 }
 .welcome.show .welcome-panel,.modal.show .modal-panel{transform:none}
 .notification-locked .app,.notification-locked .bottomnav{visibility:hidden;pointer-events:none;user-select:none}
-.notification-gate{display:grid;place-items:center;opacity:1;pointer-events:auto;background:rgba(26,12,18,.82);backdrop-filter:blur(18px)}
+.notification-gate{display:grid;place-items:center;opacity:1;pointer-events:auto;background:rgba(26,12,18,.92);backdrop-filter:none}
 .notification-gate.hidden{display:none}.notification-gate.show{opacity:1}
 .notification-panel{box-shadow:var(--shadow-lg)}
 .notification-requirement{display:flex;gap:10px;align-items:flex-start;margin:18px 0 14px;padding:13px 14px;border:1px solid rgba(184,69,47,.18);border-radius:var(--radius-sm);background:var(--accent-soft);color:var(--text);font-size:.78rem;line-height:1.5;text-align:left}
@@ -1090,7 +1090,7 @@ html body:not(.fz-teacher-mode) .flash-back h3.flash-meaning,
   border-radius:var(--radius-pill, 999px);padding:8px 14px;min-height:44px;
   font-size:.88rem;font-weight:700;color:var(--ink);cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;
-  transition:all .15s ease;
+  transition: transform .15s ease, opacity .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
 .quiz-listen-speed-btn:hover{background:var(--panel);border-color:var(--accent)}
 .quiz-listen-speed-btn.is-slow{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
@@ -1518,7 +1518,7 @@ button.setup-link{display:block;width:100%;margin:6px 0;padding:10px 14px;color:
 
 @keyframes signalPulse{0%,100%{opacity:.7;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
 .reduce-motion *{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
-html:has(body.reduce-motion){scroll-behavior:auto!important}/* v30 2026-08-29: toggle in-app harus setara jalur OS \u2014 riseIn delay dinolkan + smooth-scroll dimatikan (html di luar jangkauan selektor ber-scope body). */
+html.reduce-motion{scroll-behavior:auto!important}/* v30 2026-08-29: toggle in-app harus setara jalur OS \u2014 riseIn delay dinolkan + smooth-scroll dimatikan (html di luar jangkauan selektor ber-scope body). */
 
 @media(min-width:900px){.topbar{padding-top:14px}.section-head{padding-top:22px}}
 @media(max-width:860px){
@@ -1592,7 +1592,7 @@ html:has(body.reduce-motion){scroll-behavior:auto!important}/* v30 2026-08-29: t
 .classroom-actions button{min-height:46px;padding:0 16px;border-radius:var(--radius-sm)}
 
 /* m025-43 mandatory one-batch neural voice download — stays until it finishes */
-.voice-bundle-sheet{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,rgba(7,13,29,.95),rgba(45,37,86,.95));backdrop-filter:blur(10px)}
+.voice-bundle-sheet{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,rgba(7,13,29,.97),rgba(45,37,86,.97))}
 body.voice-bundle-locked{overflow:hidden}
 body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer-events:none;opacity:.3}
 .voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:var(--radius-lg);background:var(--panel,#fff);color:var(--text,#2E2724);border:1px solid var(--line,#EFE7DE);box-shadow:var(--shadow-lg)}
@@ -1638,7 +1638,7 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .library-translation-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #libraryCloseOne{margin-left:auto;width:44px;padding:0}
 .library-translation-actions button{min-height:42px;padding:0 13px;border-radius:var(--radius-sm)}
-.library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(250,247,247,.94));backdrop-filter:blur(12px);border-top:1px solid var(--line,#EFE7DE)}
+.library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(250,247,247,.97));border-top:1px solid var(--line,#EFE7DE)}
 .library-progress-line{height:5px;border-radius:var(--radius-pill);background:var(--line-soft,var(--panel-soft));overflow:hidden}
 .library-progress-line span{display:block;height:100%;background:var(--sun-deep);transition:width .25s ease}
 .library-status{margin:0;font-size:.84rem;color:var(--muted,#6E635C)}
@@ -3289,7 +3289,7 @@ html.fiezel-ui-v6 .skill-help-dot{border-radius:50%}
 .modal-close-corner{
   position:absolute;top:-8px;right:-8px;width:38px;height:38px;border-radius:999px;
   border:1px solid var(--line);background:var(--panel-soft);color:var(--muted);
-  display:grid;place-items:center;cursor:pointer;padding:0;transition:all .15s ease;
+  display:grid;place-items:center;cursor:pointer;padding:0;transition: transform .15s ease, opacity .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
 .modal-close-corner:hover{color:var(--text);background:var(--surface-tint);border-color:var(--line-strong)}
 .modal-close-corner svg{width:18px;height:18px}
@@ -4241,7 +4241,6 @@ html.fiezel-ui-v6 .launcher-shell{
   min-height:58px;box-sizing:border-box;
   width:100%;
   background:#161622;
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
   border-top:1px solid rgba(255,255,255,0.1);
   box-shadow:0 -6px 16px rgba(0,0,0,0.4)
 }
@@ -4416,7 +4415,7 @@ body.fz-lesson-mode .toast{bottom:calc(24px + env(safe-area-inset-bottom))}
    sticky + memikul safe-area atas, karena topbar global yang dulu memikul notch hilang. */
 body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
   padding:max(10px,env(safe-area-inset-top)) 0 10px;margin-bottom:12px;
-  background:rgba(var(--bg-rgb),.9);backdrop-filter:blur(14px)}
+  background:rgba(var(--bg-rgb),.96)}
 
 /* ---------- §2 kuis: benar / salah / pijakan ----------
    Banner benar-salah, kartu sebab, dan tip ingatan SUDAH ada 1:1 di reveal(); yang
@@ -5052,8 +5051,6 @@ body.fz-lux.fz-stage-quiz .quiz-topbar {
   padding: max(10px, env(safe-area-inset-top, 10px)) 16px 10px 16px !important;
   border-radius: 0 !important;
   background: rgba(253, 250, 243, 0.98) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
   border-bottom: 1.5px solid #E2E8F0 !important;
   box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05) !important;
 }
@@ -5556,7 +5553,7 @@ html[data-fz-input="touch"] :focus{outline-color:transparent!important}
 .account-card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
 .account-card-header h3{margin:0 0 4px 0;font-size:1.05rem;color:var(--text)}
 .auth-tabs{display:flex;gap:6px;padding:4px;background:var(--panel-soft);border-radius:var(--radius-pill);margin:12px 0 16px}
-.auth-tab{flex:1;padding:8px 12px;border-radius:var(--radius-pill);border:none;background:transparent;color:var(--muted);font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s ease;text-align:center}
+.auth-tab{flex:1;padding:8px 12px;border-radius:var(--radius-pill);border:none;background:transparent;color:var(--muted);font-size:.88rem;font-weight:600;cursor:pointer;transition: transform .2s ease, opacity .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;text-align:center}
 .auth-tab.active{background:var(--panel);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .auth-form{display:flex;flex-direction:column;gap:12px;margin-top:8px}
 .auth-field-label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;font-weight:600;color:var(--text);text-align:left}
@@ -6262,7 +6259,7 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth-tagline-curve{width:140px;height:7px;display:block;margin-top:3px}
 .fz-auth .fz-auth-lang-wrap{position:absolute;z-index:10;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:14px}
 .fz-auth .fz-auth-lang{display:flex;align-items:center;gap:2px;padding:3px 6px;border-radius:9999px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(215,182,109,.35)}
-.fz-auth .fz-auth-lang button{border:0;background:transparent;box-shadow:none;color:rgba(255,253,248,.88);font:inherit;font-size:.82rem;font-weight:700;padding:5px 10px;border-radius:9999px;min-height:0;cursor:pointer;transition:all .15s ease}
+.fz-auth .fz-auth-lang button{border:0;background:transparent;box-shadow:none;color:rgba(255,253,248,.88);font:inherit;font-size:.82rem;font-weight:700;padding:5px 10px;border-radius:9999px;min-height:0;cursor:pointer;transition: transform .15s ease, opacity .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease}
 .fz-auth .fz-auth-lang button.is-on{background:#FFFDF8;color:#1B1515;box-shadow:0 2px 6px rgba(0,0,0,.22)}
 .fz-auth .fz-auth-lang-more{padding:5px 7px !important;color:#D7B66D !important;font-size:.78rem}
 .fz-lang-chevron{font-size:10px;opacity:0.75}
@@ -6280,7 +6277,7 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth-title.is-underlined{display:inline-block;align-self:flex-start;text-decoration:none !important;border-bottom:3.5px solid #922D43 !important;padding-bottom:4px}
 .fz-auth-lead{margin:0;color:#5C4E4B !important;font-size:1.05rem;line-height:1.6;max-width:38ch}
 .fz-auth-carousel-dots{display:flex;gap:8px;align-items:center;margin:28px 0 20px}
-.fz-auth-carousel-dots .fz-dot{width:8px;height:8px;border-radius:50%;background:#D9CEC1;transition:all .2s ease}
+.fz-auth-carousel-dots .fz-dot{width:8px;height:8px;border-radius:50%;background:#D9CEC1;transition: transform .2s ease, opacity .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease}
 .fz-auth-carousel-dots .fz-dot.is-active{width:26px;border-radius:9999px;background:#922D43}
 .fz-auth-next-row{margin-top:auto;padding-top:24px;display:flex;justify-content:flex-end}
 .fz-auth .fz-auth-next{display:inline-flex;align-items:center;gap:12px;border:0;background:#922D43 !important;box-shadow:0 6px 20px -4px rgba(146,45,67,0.40) !important;color:#FFFDF8 !important;font:inherit;font-weight:700;font-size:1.05rem;padding:12px 24px;border-radius:9999px;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s}
@@ -6292,7 +6289,7 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth-next-arrow svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none}
 .fz-auth-i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .fz-auth-roles{display:flex;gap:6px;padding:5px;border-radius:14px;background:#EFE7DE;margin:0 0 18px}
-.fz-auth .fz-auth-role{flex:1;border:0;background:transparent;box-shadow:none;color:#6E635C;font:inherit;font-weight:700;font-size:.92rem;padding:10px;border-radius:11px;cursor:pointer;min-height:0;transition:all .18s ease}
+.fz-auth .fz-auth-role{flex:1;border:0;background:transparent;box-shadow:none;color:#6E635C;font:inherit;font-weight:700;font-size:.92rem;padding:10px;border-radius:11px;cursor:pointer;min-height:0;transition: transform .18s ease, opacity .18s ease, background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease}
 .fz-auth .fz-auth-role.is-on{background:#922D43 !important;color:#FFFDF8 !important;box-shadow:0 4px 14px -4px rgba(146,45,67,0.35) !important}
 .fz-auth-google{min-height:48px;display:flex;justify-content:center;align-items:center;position:relative;width:100%}
 .fz-auth-google[hidden]{display:none}
@@ -6323,7 +6320,7 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth-note.is-info{text-align:left;background:#EFE7DE;border-radius:12px;padding:10px 12px}
 .fz-auth-error{margin:0;color:#B91C1C;font-size:.88rem;font-weight:700;line-height:1.45}
 .fz-auth-error:empty{display:none}
-.fz-auth .fz-auth-submit{width:100%;margin-top:8px;padding:14px 20px;font-size:1.02rem;font-weight:800;border-radius:9999px;background:#922D43 !important;border:none;color:#FFFDF8 !important;cursor:pointer;box-shadow:0 6px 20px -4px rgba(146,45,67,0.40) !important;transition:all .18s ease}
+.fz-auth .fz-auth-submit{width:100%;margin-top:8px;padding:14px 20px;font-size:1.02rem;font-weight:800;border-radius:9999px;background:#922D43 !important;border:none;color:#FFFDF8 !important;cursor:pointer;box-shadow:0 6px 20px -4px rgba(146,45,67,0.40) !important;transition: transform .18s ease, opacity .18s ease, background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease}
 .fz-auth .fz-auth-submit:hover{background:#7A2437 !important;transform:translateY(-1px);box-shadow:0 8px 24px -4px rgba(146,45,67,0.50) !important}
 .fz-auth .fz-auth-submit:active{transform:translateY(1px)}
 .fz-auth-alt{margin:16px 0 0;text-align:center;color:#6E635C;font-size:.92rem}
@@ -6363,7 +6360,7 @@ body.fz-auth-open{overflow:hidden}
   .fz-btn-text-desktop{display:inline !important}
   .fz-btn-text-mobile{display:none !important}
   .fz-auth-next-row{position:absolute !important;bottom:48px !important;right:48px !important;margin:0 !important;padding:0 !important;z-index:20 !important;display:flex !important;justify-content:flex-end !important}
-  .fz-auth .fz-auth-next{padding:18px 40px !important;font-size:18px !important;font-weight:700 !important;letter-spacing:-0.01em !important;border-radius:9999px !important;background:linear-gradient(135deg,#7C1D3A,#581428) !important;color:#FFFDF8 !important;box-shadow:0 8px 24px rgba(124,29,58,0.35) !important;transition:all 0.22s cubic-bezier(0.16,1,0.3,1) !important}
+  .fz-auth .fz-auth-next{padding:18px 40px !important;font-size:18px !important;font-weight:700 !important;letter-spacing:-0.01em !important;border-radius:9999px !important;background:linear-gradient(135deg,#7C1D3A,#581428) !important;color:#FFFDF8 !important;box-shadow:0 8px 24px rgba(124,29,58,0.35) !important;transition: transform 0.22s cubic-bezier(0.16,1,0.3,1), opacity 0.22s cubic-bezier(0.16,1,0.3,1), background-color 0.22s cubic-bezier(0.16,1,0.3,1), border-color 0.22s cubic-bezier(0.16,1,0.3,1), color 0.22s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s cubic-bezier(0.16,1,0.3,1) !important}
   .fz-auth .fz-auth-next:hover{background:linear-gradient(135deg,#922D43,#6E1D30) !important;transform:translateY(-2px) scale(1.02) !important;box-shadow:0 12px 32px rgba(124,29,58,0.45) !important}
   .fz-auth-next-arrow{width:22px !important;height:22px !important}
   .fz-auth-next-arrow svg{width:20px !important;height:20px !important;stroke-width:2.4 !important}
@@ -6411,11 +6408,11 @@ body.fz-auth-open{overflow:hidden}
 .fiezel-ja-onboarding-panel{display:flex;flex-direction:column;gap:6px;margin:2px 0 6px;padding:8px 10px;background:#ffffff;border:1.5px solid #e2e8f0;border-radius:14px;box-shadow:0 3px 12px rgba(0,0,0,0.05);box-sizing:border-box;width:100%;text-align:left}
 .fz-ja-compact-header{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%}
 .fz-ja-compact-title{font-size:.78rem;font-weight:800;color:#0f172a;letter-spacing:-0.01em}
-.fiezel-ob-furigana-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:#ffffff;border:1px solid #cbd5e1;font-size:.68rem;font-weight:700;color:#64748b;cursor:pointer;transition:all .15s ease}
+.fiezel-ob-furigana-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:#ffffff;border:1px solid #cbd5e1;font-size:.68rem;font-weight:700;color:#64748b;cursor:pointer;transition: transform .15s ease, opacity .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease}
 .fiezel-ob-furigana-pill:hover{background:#f1f5f9;color:#0f172a}
 .fiezel-ob-furigana-pill.is-active{background:#0f172a !important;border-color:#0f172a !important;color:#ffffff !important;box-shadow:0 1px 4px rgba(15,23,42,0.2)}
 .fiezel-ja-kana-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;background:#f1f5f9;padding:3px;border-radius:10px;border:1px solid #e2e8f0;width:100%;box-sizing:border-box}
-body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn{display:flex;align-items:center;justify-content:center;padding:6px 10px;min-height:34px;background:transparent !important;border:none !important;border-radius:7px !important;cursor:pointer;transition:all .15s cubic-bezier(0.16,1,0.3,1);box-sizing:border-box;width:100%;box-shadow:none !important}
+body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn{display:flex;align-items:center;justify-content:center;padding:6px 10px;min-height:34px;background:transparent !important;border:none !important;border-radius:7px !important;cursor:pointer;transition: transform .15s cubic-bezier(0.16,1,0.3,1), opacity .15s cubic-bezier(0.16,1,0.3,1), background-color .15s cubic-bezier(0.16,1,0.3,1), border-color .15s cubic-bezier(0.16,1,0.3,1), color .15s cubic-bezier(0.16,1,0.3,1), box-shadow .15s cubic-bezier(0.16,1,0.3,1);box-sizing:border-box;width:100%;box-shadow:none !important}
 body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn:focus-visible{outline:2px solid #2563eb !important;outline-offset:2px !important}
 body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn .fz-kana-btn-badge{font-size:.78rem;font-weight:600;color:#64748b !important;letter-spacing:-0.01em;line-height:1;transition:color .15s ease}
 body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn:hover .fz-kana-btn-badge{color:#0f172a !important}
@@ -6424,7 +6421,7 @@ body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected .fz-kana-bt
 .fiezel-ob-sentence-card{display:flex;flex-direction:column;gap:5px;padding:8px 10px;background:#ffffff;border:1.5px solid #e2e8f0;border-radius:11px;width:100%;box-sizing:border-box}
 .fz-ob-jp-row{display:flex;align-items:baseline;justify-content:space-between;gap:6px;flex-wrap:wrap;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif}
 .fz-ob-jp-line{display:inline-flex;align-items:baseline;gap:2px;font-size:1.18rem;font-weight:800;color:#0f172a;line-height:1.4}
-.fz-ob-ruby{display:inline-flex;flex-direction:row;align-items:baseline;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;padding:2px 7px;margin:0 2px;cursor:pointer;font-family:inherit;font-size:inherit;font-weight:inherit;color:#0f172a;transition:all .15s ease}
+.fz-ob-ruby{display:inline-flex;flex-direction:row;align-items:baseline;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;padding:2px 7px;margin:0 2px;cursor:pointer;font-family:inherit;font-size:inherit;font-weight:inherit;color:#0f172a;transition: transform .15s ease, opacity .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease}
 .fz-ob-ruby:hover,.fz-ob-ruby.is-active{background:#eff6ff !important;border-color:#3b82f6 !important;box-shadow:0 0 0 2px rgba(59,130,246,0.2) !important}
 .fz-ob-ruby ruby{font-size:inherit;font-weight:800;color:#0f172a;margin:0;padding:0}
 .fz-ob-ruby rt{font-size:.64rem;font-weight:700;color:#2563eb;transform:translateY(-1px);transition:opacity .15s ease}
@@ -6729,7 +6726,7 @@ body .fiezel-ob .fiezel-ja-kana-options .fiezel-kana-btn.is-selected .fz-kana-bt
   gap: 4px !important;
   box-sizing: border-box !important;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .fiezel-path-badge {
@@ -6835,14 +6832,14 @@ html, body {
 }
 
 /* Home Page Canvas & Shell Resets */
-html:has(.home-today),
-body:has(.home-today) {
+html.has-home-today,
+body.has-home-today {
   scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom, 16px)) !important;
   background: #FAF8F5 !important;
   color: #0F172A !important;
 }
 
-body:has(.home-today) main.app {
+body.has-home-today main.app {
   padding: 0 0 calc(96px + env(safe-area-inset-bottom, 16px)) 0 !important;
   margin: 0 auto !important;
   max-width: 100% !important;
@@ -6850,7 +6847,7 @@ body:has(.home-today) main.app {
   background: transparent !important;
 }
 
-body:has(.home-today) #globalSky,
+body.has-home-today #globalSky,
 html.has-home-today #globalSky {
   display: none !important;
 }
@@ -6928,9 +6925,9 @@ html.has-home-today #globalSky {
   gap: 10px !important;
 }
 
-html body:has(.home-today) .fz-home-action-btn,
-body.fz-lux:has(.home-today) button.fz-home-action-btn,
-body.fz-lang-ja:has(.home-today) button.fz-home-action-btn,
+html body.has-home-today .fz-home-action-btn,
+body.fz-lux.has-home-today button.fz-home-action-btn,
+body.fz-lang-ja.has-home-today button.fz-home-action-btn,
 .fz-home-action-btn {
   width: 44px !important;
   height: 44px !important;
@@ -6944,7 +6941,7 @@ body.fz-lang-ja:has(.home-today) button.fz-home-action-btn,
   color: #8E8E98 !important;
   cursor: pointer !important;
   padding: 0 !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
   position: relative !important;
 }
 .fz-home-action-btn:hover {
@@ -6961,9 +6958,9 @@ body.fz-lang-ja:has(.home-today) button.fz-home-action-btn,
   height: 18px !important;
 }
 
-html body:has(.home-today) .fz-home-course-btn,
-body.fz-lux:has(.home-today) button.fz-home-course-btn,
-body.fz-lang-ja:has(.home-today) button.fz-home-course-btn,
+html body.has-home-today .fz-home-course-btn,
+body.fz-lux.has-home-today button.fz-home-course-btn,
+body.fz-lang-ja.has-home-today button.fz-home-course-btn,
 .fz-home-course-btn {
   width: 44px !important;
   height: 44px !important;
@@ -6977,7 +6974,7 @@ body.fz-lang-ja:has(.home-today) button.fz-home-course-btn,
   padding: 0 !important;
   color: #FFFFFF !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
 .fz-home-course-btn:hover {
   background: #242430 !important;
@@ -7027,9 +7024,9 @@ body.fz-lang-ja:has(.home-today) button.fz-home-course-btn,
   display: none !important;
 }
 
-html body:has(.home-today) .fz-learning-pill,
-body.fz-lux:has(.home-today) button.fz-learning-pill,
-body.fz-lang-ja:has(.home-today) button.fz-learning-pill,
+html body.has-home-today .fz-learning-pill,
+body.fz-lux.has-home-today button.fz-learning-pill,
+body.fz-lang-ja.has-home-today button.fz-learning-pill,
 .fz-learning-pill {
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 9999px !important;
@@ -7039,7 +7036,7 @@ body.fz-lang-ja:has(.home-today) button.fz-learning-pill,
   white-space: nowrap !important;
   cursor: pointer !important;
   box-shadow: none !important;
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
   background: #18181E !important;
   color: #7A7A84 !important;
   flex-shrink: 0 !important;
@@ -7048,9 +7045,9 @@ body.fz-lang-ja:has(.home-today) button.fz-learning-pill,
   background: #22222C !important;
   color: #FFFFFF !important;
 }
-html body:has(.home-today) .fz-learning-pill.is-active,
-body.fz-lux:has(.home-today) button.fz-learning-pill.is-active,
-body.fz-lang-ja:has(.home-today) button.fz-learning-pill.is-active,
+html body.has-home-today .fz-learning-pill.is-active,
+body.fz-lux.has-home-today button.fz-learning-pill.is-active,
+body.fz-lang-ja.has-home-today button.fz-learning-pill.is-active,
 .fz-learning-pill.is-active {
   background: rgba(255, 215, 0, 0.15) !important;
   color: #FFE082 !important;
@@ -7229,7 +7226,7 @@ body.fz-lang-ja:has(.home-today) button.fz-learning-pill.is-active,
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   margin-top: 4px !important;
 }
 .fz-edu-secondary-btn:hover {
@@ -7276,7 +7273,7 @@ html body #app section.today-card.fz-edu-card {
   user-select: none !important;
   list-style: none !important;
   background: rgba(255, 255, 255, 0.03) !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
 .fz-drawer-toggle::-webkit-details-marker {
   display: none !important;
@@ -7491,8 +7488,8 @@ details[open] .fz-drawer-arrow {
   html body.fz-lang-ja .bottomnav,
   html.fiezel-ui-v6 nav.bottomnav,
   html.fiezel-ui-v6 .bottomnav,
-  body:has(.home-today) nav.bottomnav,
-  body:has(.home-today) .bottomnav,
+  body.has-home-today nav.bottomnav,
+  body.has-home-today .bottomnav,
   .home-today ~ .bottomnav {
     position: fixed !important;
     top: auto !important;
@@ -7557,9 +7554,9 @@ html:not(.fz-app-open) nav.bottomnav,
 html:not(.fz-app-open) .bottomnav,
 body:not(.fz-app-open) nav.bottomnav,
 body:not(.fz-app-open) .bottomnav,
-body:has(#listeningPanelModal.open) .bottomnav,
-body:has(.listening-modal.open) .bottomnav,
-body:has(#jlptDetailSheet.open) .bottomnav,
+body.has-listening-modal .bottomnav,
+body.has-listening-modal .bottomnav,
+body.has-jlpt-sheet .bottomnav,
 body.fz-lesson-mode nav.bottomnav,
 body.fz-lesson-mode .bottomnav {
   display: none !important;
@@ -7570,7 +7567,7 @@ html body.fz-lang-ja .bottomnav .nav,
 html body nav.bottomnav .nav,
 html body .bottomnav .nav,
 html body.fz-lux nav.bottomnav .nav,
-html body:has(.home-today) .bottomnav .nav {
+html body.has-home-today .bottomnav .nav {
   border-radius: 9999px !important;
   flex: 1 1 0 !important;
   min-width: 0 !important;
@@ -7666,7 +7663,7 @@ html body.fz-lang-ja .bottomnav .nav.active,
 html body nav.bottomnav .nav.active,
 html body .bottomnav .nav.active,
 html body.fz-lux nav.bottomnav .nav.active,
-html body:has(.home-today) .bottomnav .nav.active {
+html body.has-home-today .bottomnav .nav.active {
   background: transparent !important;
   color: #78350F !important;
   border-radius: 9999px !important;
@@ -7768,8 +7765,8 @@ html body.fz-lux nav.bottomnav .nav:active,
 html body.fz-lux .bottomnav .nav:active,
 html body.fz-lang-ja nav.bottomnav .nav:active,
 html body.fz-lang-ja .bottomnav .nav:active,
-html body:has(.home-today) .bottomnav .nav:active,
-html body:has(.home-today) .bottomnav .nav.active:active {
+html body.has-home-today .bottomnav .nav:active,
+html body.has-home-today .bottomnav .nav.active:active {
   transform: scale(0.92) !important;
   transition: transform 0.08s cubic-bezier(0.2, 0, 0, 1) !important;
 }
@@ -7828,8 +7825,6 @@ section.fade,
 /* 2. Universal Tactile Clay Daylight Topbar */
 header.topbar {
   background: var(--bgDay, #FDFAF3) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
   border: none !important;
   border-bottom: none !important;
   box-shadow: none !important;
@@ -7912,7 +7907,7 @@ header.topbar {
   border: 2px solid #E2E8F0 !important;
   color: #0F172A !important;
   box-shadow: 0 3px 0 #CBD5E1 !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .topbar .icon-button:hover {
@@ -7944,7 +7939,7 @@ header.topbar {
   min-width: auto !important;
   flex-shrink: 0 !important;
   line-height: 1 !important;
-  transition: all 0.12s ease !important;
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease !important;
   overflow: visible !important;
 }
 
@@ -8033,7 +8028,7 @@ header.topbar {
   color: #0F172A !important;
   border-radius: 14px !important;
   box-shadow: 0 4px 0 #CBD5E1 !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .active-level-control:hover {
@@ -8057,7 +8052,7 @@ header.topbar {
 }
 
 /* 4. Universal Cards across App */
-html body:has(.home-today) .card,
+html body.has-home-today .card,
 body.fz-lux .card,
 .social-card,
 .progress-card {
@@ -8099,7 +8094,7 @@ html body #app .launch-card,
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
   padding: 16px 14px !important;
   color: #FFFFFF !important;
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.24s cubic-bezier(0.16, 1, 0.3, 1), color 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 html body #app .learning-launcher .launch-card:hover,
@@ -8287,7 +8282,7 @@ html body #app .learning-launcher .launch-card svg,
   font-size: 0.88rem !important;
   font-weight: 700 !important;
   cursor: pointer !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   white-space: nowrap !important;
   flex: 0 0 auto !important;
 }
@@ -8533,8 +8528,8 @@ html.fz-modal-open nav.bottomnav,
 html.fz-modal-open .bottomnav,
 body.fz-modal-open nav.bottomnav,
 body.fz-modal-open .bottomnav,
-body:has(#modal.show) nav.bottomnav,
-body:has(#modal.show) .bottomnav {
+body.fz-modal-open nav.bottomnav,
+body.fz-modal-open .bottomnav {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -8542,11 +8537,11 @@ body:has(#modal.show) .bottomnav {
 }
 
 body.fz-lux .modal-panel,
-body:has(.home-today) .modal-panel,
+body.has-home-today .modal-panel,
 body.fz-lux #modalPanel,
-body:has(.home-today) #modalPanel,
-.modal-panel:has(.settings-modal-wrapper),
-#modalPanel:has(.settings-modal-wrapper) {
+body.has-home-today #modalPanel,
+.modal-panel.has-settings-wrapper,
+#modalPanel.has-settings-wrapper {
   background: #14141C !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 24px !important;
@@ -8560,8 +8555,8 @@ body:has(.home-today) #modalPanel,
 }
 
 /* Dedicated settings modal wrapper inside modal panel */
-.modal-panel:has(.settings-modal-wrapper),
-#modalPanel:has(.settings-modal-wrapper) {
+.modal-panel.has-settings-wrapper,
+#modalPanel.has-settings-wrapper {
   padding: 0 !important;
   height: min(820px, 92dvh) !important;
   max-height: 92dvh !important;
@@ -8571,14 +8566,14 @@ body:has(.home-today) #modalPanel,
 }
 
 @media (max-width: 640px) {
-  #modal:has(.settings-modal-wrapper) {
+  #modal.has-settings-wrapper {
     padding: 0 !important;
     align-items: flex-end !important;
     display: flex !important;
     justify-content: center !important;
   }
-  .modal-panel:has(.settings-modal-wrapper),
-  #modalPanel:has(.settings-modal-wrapper) {
+  .modal-panel.has-settings-wrapper,
+  #modalPanel.has-settings-wrapper {
     max-width: 100% !important;
     width: 100% !important;
     height: 92dvh !important;
@@ -8796,7 +8791,7 @@ body.fz-lux #modalPanel .settings-head p,
 .modal-panel .modal-actions.settings-actions,
 #modalPanel .modal-actions.settings-actions,
 body.fz-lux .modal-actions.settings-actions,
-body:has(.home-today) .modal-actions.settings-actions {
+body.has-home-today .modal-actions.settings-actions {
   flex: 0 0 auto !important;
   position: relative !important;
   bottom: auto !important;
@@ -8820,7 +8815,7 @@ body:has(.home-today) .modal-actions.settings-actions {
 .modal-panel .modal-actions.settings-actions button#settingsCancel,
 #modalPanel .modal-actions.settings-actions button#settingsCancel,
 body.fz-lux .modal-actions.settings-actions button#settingsCancel,
-body:has(.home-today) .modal-actions.settings-actions button#settingsCancel {
+body.has-home-today .modal-actions.settings-actions button#settingsCancel {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   height: 46px !important;
@@ -8847,7 +8842,7 @@ body:has(.home-today) .modal-actions.settings-actions button#settingsCancel {
 .modal-panel .modal-actions.settings-actions button#settingsSave,
 #modalPanel .modal-actions.settings-actions button#settingsSave,
 body.fz-lux .modal-actions.settings-actions button#settingsSave,
-body:has(.home-today) .modal-actions.settings-actions button#settingsSave {
+body.has-home-today .modal-actions.settings-actions button#settingsSave {
   flex: 1.4 1 0 !important;
   min-width: 0 !important;
   height: 46px !important;
@@ -9074,7 +9069,7 @@ body.fz-lux .path-node {
   color: #E2E8F0 !important;
 }
 
-html body:has(.home-today) .lesson-example,
+html body.has-home-today .lesson-example,
 body.fz-lux .lesson-example {
   background: #181824 !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -9241,7 +9236,7 @@ body:not(.theme-dark):not(.fz-lux) .card-light .feedback .memory-tip strong {
 }
 
 body.fz-lux .quiz-topbar,
-body:has(.home-today) .quiz-topbar,
+body.has-home-today .quiz-topbar,
 .stage-header {
   background: #FFFFFF !important;
   border-bottom: 2px solid #E2E8F0 !important;
@@ -9561,7 +9556,7 @@ button.option.is-wrong .badge {
 }
 
 /* Feedback Bottom Sheet / Card: Daylight Porcelain Luxury (Zero-Scroll Thumb Zone) */
-html body:has(.home-today) .feedback,
+html body.has-home-today .feedback,
 body.fz-lux .feedback,
 .feedback-card,
 .feedback {
@@ -10174,8 +10169,8 @@ button.fz-coach-bubble,
 
   /* Quiz Shell: Sleek edge-to-edge fit with 6px margin, ZERO lateral void */
   body.fz-stage-quiz #app,
-  body:has(.quiz-shell) #app,
-  #app:has(.quiz-shell) {
+  body.fz-stage-quiz #app,
+  #app.has-quiz-shell {
     padding-left: 6px !important;
     padding-right: 6px !important;
     box-sizing: border-box !important;
@@ -10199,9 +10194,7 @@ header.topbar {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
   padding: max(10px, env(safe-area-inset-top)) 16px 10px 16px !important;
-  background: rgba(14, 14, 20, 0.94) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
+  background: rgba(14, 14, 20, 0.96) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
@@ -10784,7 +10777,7 @@ html body .tutor-stuck,
   display: inline-flex !important;
   align-items: center !important;
   gap: 7px !important;
-  transition: all .15s ease !important;
+  transition: transform .15s ease, opacity .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease !important;
   text-decoration: none !important;
 }
 
@@ -11111,8 +11104,8 @@ body.fz-view-library .section-head,
 /* Anti-Leak Exam Purity (Rule 4.5): No romaji or hints in placement/exam mode */
 body.fz-view-test .ja-romaji,
 body.fz-exam-mode .ja-romaji,
-body:has(.quiz-shell) .ja-romaji,
-body:has(#placementSoal) .ja-romaji,
+body.fz-stage-quiz .ja-romaji,
+#placementSoal .ja-romaji,
 .quiz-shell .ja-romaji,
 .quiz-card .ja-romaji {
   display: none !important;
@@ -11683,7 +11676,7 @@ html body #app .result-alasan li{color:#4B5563 !important}
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 .fz-story-tab-btn.active {
   background: #0F172A;
@@ -11707,7 +11700,7 @@ html body #app .result-alasan li{color:#4B5563 !important}
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 .fz-btn-furigana.active {
   background: #0284C7;
@@ -11825,7 +11818,7 @@ html body #app .result-alasan li{color:#4B5563 !important}
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 .fz-speaker-avatar.speaking {
   border-color: #0284C7;
@@ -11951,7 +11944,7 @@ html body #app .result-alasan li{color:#4B5563 !important}
   background: #F8FAFC;
   border: 1.5px solid #E2E8F0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 .fz-sentence-block.active {
   background: #FFFFFF;
@@ -11979,7 +11972,7 @@ html body #app .result-alasan li{color:#4B5563 !important}
   padding: 0 2px;
   border-radius: 4px;
   border-bottom: 1.5px dashed #0284C7;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .fz-story-token:hover,
 .fz-story-token:active {
@@ -12085,7 +12078,7 @@ html body #app .result-alasan li{color:#4B5563 !important}
   font-weight: 700;
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 .fz-option-btn:hover {
   border-color: #0284C7;
@@ -12274,7 +12267,7 @@ html body #app .result-alasan li{color:#4B5563 !important}
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   padding: 0;
 }
 .fz-scene-step-pill.active {
@@ -12311,7 +12304,7 @@ button.fz-btn-nav-prev,
   font-weight: 700 !important;
   cursor: pointer !important;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 }
 button.fz-btn-nav-prev:hover,
 .fz-btn-nav-prev:hover {
@@ -12335,7 +12328,7 @@ button.fz-btn-nav-next.primary,
   font-weight: 800 !important;
   cursor: pointer !important;
   box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3) !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 }
 button.fz-btn-nav-next:active,
 .fz-btn-nav-next:active {
@@ -12869,9 +12862,9 @@ body.fz-stage-quiz #topContextWrap,
 body.fz-lesson-mode header.topbar,
 body.fz-lesson-mode main.app > .topbar,
 body.fz-lesson-mode #topContextWrap,
-body:has(.quiz-shell) header.topbar,
-body:has(.quiz-shell) main.app > .topbar,
-body:has(.quiz-shell) #topContextWrap {
+body.fz-stage-quiz header.topbar,
+body.fz-stage-quiz main.app > .topbar,
+body.fz-stage-quiz #topContextWrap {
   display: none !important;
 }
 
@@ -12915,8 +12908,6 @@ body.fz-lux.fz-stage-quiz .quiz-topbar {
   max-height: calc(54px + env(safe-area-inset-top, 0px)) !important;
   padding: env(safe-area-inset-top, 0px) 16px 0 16px !important;
   background: rgba(255, 255, 255, 0.98) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
   border-bottom: 1.5px solid #E2E8F0 !important;
   display: flex !important;
   align-items: center !important;
@@ -13672,7 +13663,7 @@ html body #feedback.feedback-sheet p.takeaway-text {
   place-items: center !important;
   cursor: pointer !important;
   flex-shrink: 0 !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 }
 .feedback-sheet-close-btn:hover {
   background: #E2E8F0 !important;
@@ -13736,7 +13727,7 @@ html body #feedback.feedback-sheet p.takeaway-text {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   white-space: nowrap !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   box-sizing: border-box !important;
 }
 .feedback-sheet-exit-btn:hover {
@@ -13767,7 +13758,7 @@ html body #feedback.feedback-sheet p.takeaway-text {
   flex: 1.6 1 0 !important;
   min-width: 0 !important;
   white-space: nowrap !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   box-sizing: border-box !important;
 }
 .feedback-sheet-explain-btn:hover {
@@ -13944,7 +13935,6 @@ body > #feedback.feedback-sheet div {
 /* Hide Floating Bar When Feedback Sheet or Modal is active */
 #quizFloatingBar:empty,
 .feedback-sheet ~ #quizFloatingBar,
-body:has(#feedback.feedback-sheet:not(.hidden)) #quizFloatingBar,
 body.has-feedback-sheet-open #quizFloatingBar {
   display: none !important;
   opacity: 0 !important;
@@ -13980,7 +13970,7 @@ body.has-feedback-sheet-open #quizFloatingBar {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 }
 .ja-display .ja-toggle[aria-pressed="true"],
 .ja-display .ja-toggle.active {
@@ -14022,9 +14012,7 @@ body.has-tutor-modal .quiz-topbar {
 .tutor-hint-backdrop {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(15, 23, 42, 0.45) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(15, 23, 42, 0.56) !important;
   z-index: 2147482400 !important;
   animation: fzFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both !important;
 }
@@ -14131,7 +14119,7 @@ body.has-tutor-modal .quiz-topbar {
   display: grid !important;
   place-items: center !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
 }
 .tutor-modal-close-x:hover {
   background: #F1F5F9 !important;
@@ -14300,7 +14288,7 @@ body.has-tutor-modal .quiz-topbar {
   justify-content: center !important;
   gap: 6px !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
   touch-action: manipulation !important;
   user-select: none !important;
 }
@@ -14314,7 +14302,6 @@ body.has-tutor-modal .quiz-topbar {
 }
 
 /* Hide floating bar when bottom sheet or tutor modal is active */
-body:has(#feedback.feedback-sheet:not(.hidden)) #quizFloatingBar,
 body.has-feedback-sheet-open #quizFloatingBar,
 body.has-tutor-modal #quizFloatingBar {
   display: none !important;

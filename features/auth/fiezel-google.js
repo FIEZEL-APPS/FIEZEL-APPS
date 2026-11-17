@@ -107,17 +107,32 @@
         resolve(ok);
       }
       var existing = d.querySelector('script[data-fz-gsi="1"]');
+      if (existing && !(root.google && root.google.accounts)) {
+        try { if (existing.parentNode) existing.parentNode.removeChild(existing); } catch (_) {}
+        existing = null;
+      }
       var el = existing || d.createElement('script');
+      var timeoutId = null;
+      var cleanupAndFinish = function (ok) {
+        if (timeoutId && typeof root.clearTimeout === 'function') {
+          try { root.clearTimeout(timeoutId); } catch (_) {}
+          timeoutId = null;
+        }
+        if (!ok && el && el.parentNode && !(root.google && root.google.accounts)) {
+          try { el.parentNode.removeChild(el); } catch (_) {}
+        }
+        finish(ok);
+      };
       if (!existing) {
         el.src = GSI_SRC;
         el.async = true;
         el.defer = true;
         el.setAttribute('data-fz-gsi', '1');
+        el.addEventListener('load', function () { cleanupAndFinish(!!(root.google && root.google.accounts)); }, { once: true });
+        el.addEventListener('error', function () { cleanupAndFinish(false); }, { once: true });
         d.head.appendChild(el);
       }
-      el.addEventListener('load', function () { finish(!!(root.google && root.google.accounts)); });
-      el.addEventListener('error', function () { finish(false); });
-      root.setTimeout(function () { finish(!!(root.google && root.google.accounts)); }, LOAD_TIMEOUT_MS);
+      timeoutId = root.setTimeout(function () { cleanupAndFinish(!!(root.google && root.google.accounts)); }, LOAD_TIMEOUT_MS);
     });
     return loading;
   }
@@ -149,18 +164,24 @@
     var body = { credential: String(credential || '') };
     if (nonce) body.nonce = String(nonce);
     var res;
+    var ctrl = (typeof root.AbortController === 'function') ? new root.AbortController() : null;
+    var reqTimer = (ctrl && typeof root.setTimeout === 'function') ? root.setTimeout(function () { try { ctrl.abort(); } catch (_) {} }, 12000) : null;
     try {
-      res = await root.fetch(base + PATH, {
+      var fetchOpts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
         credentials: 'include',
         mode: 'cors',
         cache: 'no-store'
-      });
+      };
+      if (ctrl) fetchOpts.signal = ctrl.signal;
+      res = await root.fetch(base + PATH, fetchOpts);
     } catch (_) {
+      if (reqTimer && typeof root.clearTimeout === 'function') root.clearTimeout(reqTimer);
       return { ok: false, error: 'offline', message: t('google.gagal-jaringan', 'Sambungan ke server putus. Coba lagi setelah internetmu stabil.') };
     }
+    if (reqTimer && typeof root.clearTimeout === 'function') root.clearTimeout(reqTimer);
     var data = null;
     try { data = await res.json(); } catch (_) { data = null; }
     if (res.ok && data && data.ok) {

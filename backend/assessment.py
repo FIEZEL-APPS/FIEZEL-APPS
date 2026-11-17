@@ -3,6 +3,7 @@
 Delapan jenis asesmen dengan perilaku berbeda (bukan “assignment biasa”):
 diagnostic, practice, formative, summative, remedial, enrichment, review, transfer.
 """
+import asyncio
 import uuid
 import random
 from datetime import datetime, timezone
@@ -152,11 +153,16 @@ async def check_blueprint(bp: dict) -> dict:
     if bp.get("transfer_ratio", 0) <= 0 and bp.get("assessment_type") in ("summative", "formative"):
         warnings.append({"level": "info", "message":
                          "Tanpa soal transfer, sistem tidak bisa membedakan hafalan pola dari pemahaman."})
-    # ketersediaan soal per TP
+    # ketersediaan soal per TP (paralel)
+    async def _tp_avail(t):
+        n, tp = await asyncio.gather(
+            db.questions.count_documents({"tp_id": t["tp_id"], "is_current": True, "status": "PUBLISHED"}),
+            db.curriculum_nodes.find_one({"id": t["tp_id"]}, {"_id": 0}),
+        )
+        return t, n, tp or {}
+
     availability = []
-    for t in bp["tp_targets"]:
-        n = await db.questions.count_documents({"tp_id": t["tp_id"], "is_current": True, "status": "PUBLISHED"})
-        tp = await db.curriculum_nodes.find_one({"id": t["tp_id"]}, {"_id": 0}) or {}
+    for t, n, tp in await asyncio.gather(*(_tp_avail(t) for t in bp["tp_targets"])):
         availability.append({"tp_id": t["tp_id"], "tp_code": tp.get("code"), "needed": t["count"], "available": n})
         if n < t["count"]:
             warnings.append({"level": "warn", "message":

@@ -28,6 +28,8 @@
   // Dynamic Ephemeral Session Key (RAM only, zero disk persistence)
   var _dynamicSessionKey = null;
   var _dynamicSessionKeyExpiresAt = 0;
+  var _keyCache = Object.create(null);
+  var _dbPromise = null;
 
   // Memory fallback storage for non-IndexedDB or test environments
   var _memoryStore = {};
@@ -39,6 +41,7 @@
     if (!keyOrSeed) return false;
     _dynamicSessionKey = keyOrSeed;
     _dynamicSessionKeyExpiresAt = durationMs ? Date.now() + durationMs : Date.now() + (24 * 60 * 60 * 1000);
+    _keyCache = Object.create(null);
     return true;
   }
 
@@ -53,6 +56,7 @@
   function clearDynamicSessionKey() {
     _dynamicSessionKey = null;
     _dynamicSessionKeyExpiresAt = 0;
+    _keyCache = Object.create(null);
   }
 
   function getDeviceBoundSalt(ownerUuid) {
@@ -68,13 +72,12 @@
     if (typeof Buffer !== 'undefined') {
       return Buffer.from(bytes).toString('base64');
     }
-    var binary = '';
-    var len = bytes.byteLength;
-    var u8 = new Uint8Array(bytes);
-    for (var i = 0; i < len; i++) {
-      binary += String.fromCharCode(u8[i]);
+    var u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    var chunks = [];
+    for (var i = 0; i < u8.byteLength; i += 16384) {
+      chunks.push(String.fromCharCode.apply(null, u8.subarray(i, i + 16384)));
     }
-    return btoa(binary);
+    return btoa(chunks.join(''));
   }
 
   function fromBase64(b64) {
@@ -111,26 +114,36 @@
 
     // Web Crypto API in browser
     if (typeof crypto !== 'undefined' && crypto.subtle) {
-      var enc = new TextEncoder();
-      var keyMaterial = await crypto.subtle.importKey(
-        'raw',
-        enc.encode(seed),
-        'PBKDF2',
-        false,
-        ['deriveKey']
-      );
-      return crypto.subtle.deriveKey(
-        {
-          name: 'PBKDF2',
-          salt: enc.encode(salt),
-          iterations: 10000,
-          hash: 'SHA-256'
-        },
-        keyMaterial,
-        { name: 'AES-GCM', length: 256 },
-        false,
-        ['encrypt', 'decrypt']
-      );
+      var cacheId = String(seed) + '\u0000' + String(salt);
+      if (_keyCache[cacheId]) return _keyCache[cacheId];
+      var pending = (async function () {
+        var enc = new TextEncoder();
+        var keyMaterial = await crypto.subtle.importKey(
+          'raw',
+          enc.encode(seed),
+          'PBKDF2',
+          false,
+          ['deriveKey']
+        );
+        return crypto.subtle.deriveKey(
+          {
+            name: 'PBKDF2',
+            salt: enc.encode(salt),
+            iterations: 10000,
+            hash: 'SHA-256'
+          },
+          keyMaterial,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['encrypt', 'decrypt']
+        );
+      })();
+      if (Object.keys(_keyCache).length >= 16) _keyCache = Object.create(null);
+      _keyCache[cacheId] = pending.catch(function (err) {
+        delete _keyCache[cacheId];
+        throw err;
+      });
+      return _keyCache[cacheId];
     }
 
     throw new Error('Web Crypto API or node:crypto not available in this environment.');
@@ -233,24 +246,40 @@
    * IndexedDB Helper: Open database and object store
    */
   function openDatabase() {
-    return new Promise(function (resolve, reject) {
+    if (_dbPromise) return _dbPromise;
+    _dbPromise = new Promise(function (resolve) {
       if (typeof indexedDB === 'undefined') {
+        _dbPromise = null;
         return resolve(null); // fallback to memory store
       }
-      var req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = function (e) {
-        var db = e.target.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME, { keyPath: 'bankKey' });
-        }
-      };
-      req.onsuccess = function (e) {
-        resolve(e.target.result);
-      };
-      req.onerror = function () {
-        resolve(null); // fail-soft to memory store
-      };
+      try {
+        var req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = function (e) {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME, { keyPath: 'bankKey' });
+          }
+        };
+        req.onsuccess = function (e) {
+          var db = e.target.result;
+          if (db) {
+            db.onversionchange = function () { try { db.close(); } catch (_) {} _dbPromise = null; };
+            db.onclose = function () { _dbPromise = null; };
+          } else {
+            _dbPromise = null;
+          }
+          resolve(db);
+        };
+        req.onerror = function () {
+          _dbPromise = null;
+          resolve(null); // fail-soft to memory store
+        };
+      } catch (_) {
+        _dbPromise = null;
+        resolve(null);
+      }
     });
+    return _dbPromise;
   }
 
   /**

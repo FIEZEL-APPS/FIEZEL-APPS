@@ -1291,6 +1291,7 @@
     var returnedToPick = false;
     var selectedKanaPref = 'learning';
     var selectedFurigana = true;
+    var selectedIpa = true;
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
@@ -1715,6 +1716,8 @@
       }
     }
     function remove() {
+      try { if (doc.documentElement && doc.documentElement.classList) doc.documentElement.classList.remove('fz-ob-open'); } catch (_) {}
+      try { if (doc.body && doc.body.classList) doc.body.classList.remove('fz-ob-open'); } catch (_) {}
       try { if (host.parentNode) host.parentNode.removeChild(host); } catch (_) {}
     }
 
@@ -1909,9 +1912,13 @@
         var courseGrid = host.querySelector('[data-ob-course-grid]');
         var ipaToggle = host.querySelector('[data-ob-toggle-ipa]');
         if (ipaToggle) {
+          ipaToggle.checked = selectedIpa;
+          var initIpaSpan = host.querySelector('[data-ob-ipa-phonetic]');
+          if (initIpaSpan && initIpaSpan.style) initIpaSpan.style.display = selectedIpa ? 'inline' : 'none';
           ipaToggle.addEventListener('change', function () {
+            selectedIpa = !!ipaToggle.checked;
             var ipaSpan = host.querySelector('[data-ob-ipa-phonetic]');
-            if (ipaSpan && ipaSpan.style) ipaSpan.style.display = ipaToggle.checked ? 'inline' : 'none';
+            if (ipaSpan && ipaSpan.style) ipaSpan.style.display = selectedIpa ? 'inline' : 'none';
           });
         }
         function syncCourseStageUI() {
@@ -2132,7 +2139,7 @@
         var pathCards = host.querySelectorAll('[data-ob-path]');
         for (var pIdx = 0; pIdx < pathCards.length; pIdx++) {
           (function (card) {
-            card.addEventListener('click', function (e) {
+            var activatePath = function (e) {
               if (e && e.target && e.target.tagName === 'BUTTON') return;
               var pathVal = card.getAttribute('data-ob-path') || 'beginner';
               selectedPath = pathVal;
@@ -2141,6 +2148,14 @@
                   c.classList.toggle('is-selected', c === card);
                 }
               });
+            };
+            card.addEventListener('click', activatePath);
+            card.addEventListener('keydown', function (e) {
+              if (e && (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar')) {
+                if (e.target && e.target.tagName === 'BUTTON') return;
+                if (typeof e.preventDefault === 'function') e.preventDefault();
+                activatePath(e);
+              }
             });
           })(pathCards[pIdx]);
         }
@@ -2207,6 +2222,8 @@
 
     paint();
     try { doc.body.appendChild(host); } catch (_) { return { shown: false, reason: 'append_failed' }; }
+    try { if (doc.documentElement && doc.documentElement.classList) doc.documentElement.classList.add('fz-ob-open'); } catch (_) {}
+    try { if (doc.body && doc.body.classList) doc.body.classList.add('fz-ob-open'); } catch (_) {}
     // Cat pertama terjadi SEBELUM host masuk dokumen, jadi custom element-nya belum
     // ter-upgrade dan setState() waktu itu masih ditolak (komponen menolak sebelum
     // connect). Pose dipasang lagi di sini - sekali, bukan lewat penantian berulang.

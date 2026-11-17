@@ -16,6 +16,7 @@
 const __fzRoot = require('path').join(__dirname, '..');
 const fs = require('fs');
 const path = require('path');
+const { pathToFileURL } = require('url');
 const assert = require('assert');
 
 let pass = 0, fail = 0;
@@ -25,7 +26,7 @@ async function check(name, fn) {
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 (async () => {
-  const core = await import(path.join(__fzRoot, 'workers/api/teacher/class-sync-core.js'));
+  const core = await import(pathToFileURL(path.join(__fzRoot, 'workers/api/teacher/class-sync-core.js')).href);
 
   await check('O1 mergeAssign: gabung, selesai menang, batas tersimpan', () => {
     const m = core.mergeAssign([{ id: 'a', at: 1, c: 3, t: 5 }, { id: 'b', at: 2, s: 1 }], [{ id: 'a', at: 9, s: 1 }, { id: 'b', at: 3, c: 4, t: 4 }, { id: 'c', at: 4, c: 1, t: 2 }]);

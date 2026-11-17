@@ -54,10 +54,10 @@ button, a, [role="button"], .launch-card, .quiz-option, .choice-btn, .token-chip
   }
 
   /* Quiz Shell: Edge-to-edge mobile fit, ZERO VOID */
-  body:has(.quiz-shell) main.app,
+  body.fz-stage-quiz main.app,
   body.fz-stage-quiz main.app,
   body.fz-lesson-mode main.app,
-  body:has(.quiz-shell) .app,
+  body.fz-stage-quiz .app,
   body.fz-stage-quiz .app,
   body.fz-lesson-mode .app {
     padding-top: 0 !important;
@@ -69,10 +69,10 @@ button, a, [role="button"], .launch-card, .quiz-option, .choice-btn, .token-chip
     box-sizing: border-box !important;
   }
 
-  body:has(.quiz-shell) #app,
+  body.fz-stage-quiz #app,
   body.fz-stage-quiz #app,
   body.fz-lesson-mode #app,
-  .app > #app:has(.quiz-shell) {
+  .app > #app.has-quiz-shell {
     padding-top: 0 !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -88,7 +88,7 @@ button, a, [role="button"], .launch-card, .quiz-option, .choice-btn, .token-chip
   body.fz-stage-quiz .quiz-topbar,
   body.fz-lux.fz-stage-quiz .quiz-topbar,
   body.fz-lesson-mode .quiz-topbar,
-  body:has(.quiz-shell) .quiz-topbar {
+  body.fz-stage-quiz .quiz-topbar {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -151,8 +151,6 @@ html body.fz-lang-ja .topbar {
   box-shadow: none !important;
   padding: max(8px, env(safe-area-inset-top)) 16px 8px 16px !important;
   background: var(--bgDay, #FDFAF3) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
@@ -624,7 +622,7 @@ html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active span {
   height: 5px !important;
   border-radius: 50% !important;
   background: rgba(255, 255, 255, 0.2) !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
 .fz-aurora-dot-item.is-active {
   width: 14px !important;
@@ -1022,7 +1020,7 @@ html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active span {
 }
 
 /* 4. Auth & Login Screen: 100% Viewport-Fit (No Scroll Required) */
-body:has(.fz-auth) {
+body.fz-auth-open {
   overflow: hidden !important;
   height: 100vh !important;
 }
@@ -1032,10 +1030,10 @@ body.fz-auth-open nav.bottomnav,
 body.fz-auth-open .bottomnav,
 body.fz-auth-open .topbar,
 body.fz-auth-open header.topbar,
-html:has(.fz-auth) nav.bottomnav,
-html:has(.fz-auth) .bottomnav,
-html:has(.fz-auth) .topbar,
-html:has(.fz-auth) header.topbar,
+html.fz-auth-open nav.bottomnav,
+html.fz-auth-open .bottomnav,
+html.fz-auth-open .topbar,
+html.fz-auth-open header.topbar,
 html.fz-booting nav.bottomnav,
 html.fz-booting .bottomnav,
 html.fz-booting .topbar,
@@ -1247,7 +1245,7 @@ html.fz-booting header.topbar {
     padding: 12px 24px !important;
     border-radius: 9999px !important;
     cursor: pointer !important;
-    transition: all 0.18s ease !important;
+    transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
   }
 
   .fz-auth .fz-auth-next:hover {
@@ -1368,7 +1366,7 @@ html.fz-booting header.topbar {
     padding: 18px 40px !important;
     border-radius: 9999px !important;
     cursor: pointer !important;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), color 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
   .fz-auth .fz-auth-next:hover {
@@ -1622,7 +1620,7 @@ html.fz-booting header.topbar {
   border: none !important;
   box-shadow: 0 8px 24px rgba(124, 29, 58, 0.35) !important;
   cursor: pointer !important;
-  transition: all 0.18s ease !important;
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
 }
 
 .fz-auth .fz-auth-submit:hover {
@@ -3152,46 +3150,46 @@ button.primary,
 /* 2. Quiz, Flashcard & Skills Lab / Listening Session: Hide bottom nav completely to prevent overlap and accidental tab switching */
 html body.fz-stage-quiz nav.bottomnav,
 html body.fz-stage-quiz .bottomnav,
-html body:has(.quiz-shell) nav.bottomnav,
-html body:has(.quiz-shell) .bottomnav,
+html body.fz-stage-quiz nav.bottomnav,
+html body.fz-stage-quiz .bottomnav,
 html body.fz-lux.fz-stage-quiz nav.bottomnav,
 html body.fz-lux.fz-stage-quiz .bottomnav,
 html.fiezel-ui-v6 body.fz-stage-quiz nav.bottomnav,
-html.fiezel-ui-v6 body:has(.quiz-shell) nav.bottomnav,
+html.fiezel-ui-v6 body.fz-stage-quiz nav.bottomnav,
 body.fz-stage-quiz nav.bottomnav,
 body.fz-stage-quiz .bottomnav,
-body:has(.quiz-shell) nav.bottomnav,
-body:has(.quiz-shell) .bottomnav,
+body.fz-stage-quiz nav.bottomnav,
+body.fz-stage-quiz .bottomnav,
 html body.fsl-session-active nav.bottomnav,
 html body.fsl-session-active .bottomnav,
 html body.fz-stage-sl nav.bottomnav,
 html body.fz-stage-sl .bottomnav,
 html body.fz-stage-sl.fsl-session-active nav.bottomnav,
 html body.fz-stage-sl.fsl-session-active .bottomnav,
-html body:has(.fsl-card-listening) nav.bottomnav,
-html body:has(.fsl-card-listening) .bottomnav,
-html body:has(.fsl-feedback) nav.bottomnav,
-html body:has(.fsl-feedback) .bottomnav,
-html body:has(#speakingListeningRoot .fsl-card-listening) nav.bottomnav,
-html body:has(#speakingListeningRoot .fsl-card-listening) .bottomnav,
+html body.fsl-session-active nav.bottomnav,
+html body.fsl-session-active .bottomnav,
+html body.fsl-session-active nav.bottomnav,
+html body.fsl-session-active .bottomnav,
+html body.fsl-session-active nav.bottomnav,
+html body.fsl-session-active .bottomnav,
 body.fsl-session-active nav.bottomnav,
 body.fsl-session-active .bottomnav,
-body:has(.fsl-card-listening) nav.bottomnav,
-body:has(.fsl-card-listening) .bottomnav,
-body:has(.fsl-feedback) nav.bottomnav,
-body:has(.fsl-feedback) .bottomnav,
+body.fsl-session-active nav.bottomnav,
+body.fsl-session-active .bottomnav,
+body.fsl-session-active nav.bottomnav,
+body.fsl-session-active .bottomnav,
 html body.fz-lesson-mode nav.bottomnav,
 html body.fz-lesson-mode .bottomnav,
-html body:has(.card-flashcard) nav.bottomnav,
-html body:has(.card-flashcard) .bottomnav,
+html body.has-flashcard nav.bottomnav,
+html body.has-flashcard .bottomnav,
 html body.fz-lux.fz-lesson-mode nav.bottomnav,
 html body.fz-lux.fz-lesson-mode .bottomnav,
 html.fiezel-ui-v6 body.fz-lesson-mode nav.bottomnav,
-html.fiezel-ui-v6 body:has(.card-flashcard) nav.bottomnav,
+html.fiezel-ui-v6 body.has-flashcard nav.bottomnav,
 body.fz-lesson-mode nav.bottomnav,
 body.fz-lesson-mode .bottomnav,
-body:has(.card-flashcard) nav.bottomnav,
-body:has(.card-flashcard) .bottomnav {
+body.has-flashcard nav.bottomnav,
+body.has-flashcard .bottomnav {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -3246,9 +3244,7 @@ button.level-card .level-num,
   width: 100% !important;
   max-width: 100% !important;
   padding: 12px 16px max(14px, env(safe-area-inset-bottom)) 16px !important;
-  background: rgba(14, 14, 20, 0.96) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  background: rgba(14, 14, 20, 0.97) !important;
   border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.6) !important;
   z-index: 2000 !important;
@@ -3439,7 +3435,7 @@ html body .tutor-stuck {
   border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
   color: #FFFFFF !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .tutor-stuck:hover,
@@ -4798,9 +4794,7 @@ button.library-card,
   color: #CBD5E1 !important;
 }
 .library-dock {
-  background: rgba(20, 20, 30, 0.97) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  background: rgba(20, 20, 30, 0.98) !important;
   border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6) !important;
   color: #FFFFFF !important;
@@ -4831,14 +4825,14 @@ button.library-card,
   border-color: #FFE02E !important;
   background: rgba(255, 224, 46, 0.1) !important;
 }
-html body:has(.library-reader) nav.bottomnav,
-html body.fz-lux:has(.library-reader) nav.bottomnav,
-html.fiezel-ui-v6 body:has(.library-reader) nav.bottomnav,
-html body:has(.library-reader) .bottomnav,
-body:has(.library-reader) nav.bottomnav,
-body:has(.library-reader) .bottomnav,
+html body.has-library-reader nav.bottomnav,
+html body.fz-lux.has-library-reader nav.bottomnav,
+html.fiezel-ui-v6 body.has-library-reader nav.bottomnav,
+html body.has-library-reader .bottomnav,
 body.has-library-reader nav.bottomnav,
-html:has(.library-reader) nav.bottomnav {
+body.has-library-reader .bottomnav,
+body.has-library-reader nav.bottomnav,
+html.has-library-reader nav.bottomnav {
   display: none !important;
 }
 
@@ -4923,19 +4917,19 @@ html body .ja-kana .kana-tab[aria-selected="true"] {
 /* ==========================================================================
    AUDIT FIX 9: LEVEL PICKER MODAL CLEAN DAYLIGHT TACTILE (COMPACT & UNCLIPPED)
    ========================================================================== */
-.modal-panel:has(.level-picker-grid),
-body.fz-lux .modal-panel:has(.level-picker-grid),
-#modalPanel:has(.level-picker-grid) {
+.modal-panel.has-level-picker,
+body.fz-lux .modal-panel.has-level-picker,
+#modalPanel.has-level-picker {
   padding: 16px 16px 18px !important;
   max-height: 92vh !important;
   overflow-y: auto !important;
 }
-.modal-panel:has(.level-picker-grid) h2 {
+.modal-panel.has-level-picker h2 {
   font-size: 1.3rem !important;
   line-height: 1.2 !important;
   margin: 2px 0 4px !important;
 }
-.modal-panel:has(.level-picker-grid) > p {
+.modal-panel.has-level-picker > p {
   font-size: 0.78rem !important;
   line-height: 1.35 !important;
   margin: 0 0 8px !important;
@@ -5081,10 +5075,10 @@ button.level-picker-card {
   color: #FFE02E !important;
   font-weight: 800 !important;
 }
-.modal-panel:has(.level-picker-grid) .modal-actions {
+.modal-panel.has-level-picker .modal-actions {
   margin-top: 8px !important;
 }
-.modal-panel:has(.level-picker-grid) .modal-actions button {
+.modal-panel.has-level-picker .modal-actions button {
   min-height: 40px !important;
   padding: 8px 16px !important;
 }
@@ -5194,7 +5188,7 @@ main.app,
 
 body.fz-lesson-mode main.app,
 body.fz-stage-quiz main.app,
-body:has(.quiz-shell) main.app {
+body.fz-stage-quiz main.app {
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 12px)) !important;
 }
 
@@ -5445,7 +5439,7 @@ html body .tutor-stuck,
   display: inline-flex !important;
   align-items: center !important;
   gap: 7px !important;
-  transition: all .15s ease !important;
+  transition: transform .15s ease, opacity .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease !important;
   text-decoration: none !important;
 }
 
@@ -6114,8 +6108,6 @@ html body .skill-writing button.active-level-control {
   border-radius: 18px !important;
   padding: 12px 18px !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -6645,8 +6637,6 @@ html body #app .quiz-shell #quizFloatingBar.quiz-floating-bar,
   margin: 0 !important;
   padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 12px)) 16px !important;
   background: rgba(255, 253, 249, 0.98) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
   border-top: 1.5px solid #E8DFD3 !important;
   box-shadow: 0 -6px 24px rgba(36, 26, 17, 0.14) !important;
   z-index: 9999 !important;

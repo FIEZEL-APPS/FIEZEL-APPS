@@ -92,8 +92,13 @@
   }
 
   var currentModalEl = null;
+  var activeModalKeyDown = null;
 
   function closeModal() {
+    if (activeModalKeyDown && typeof window !== 'undefined') {
+      try { window.removeEventListener('keydown', activeModalKeyDown); } catch (_) {}
+      activeModalKeyDown = null;
+    }
     if (currentModalEl && currentModalEl.parentNode) {
       currentModalEl.parentNode.removeChild(currentModalEl);
     }
@@ -101,11 +106,13 @@
     if (typeof document !== 'undefined' && document.body) {
       document.body.classList.remove('fiezel-voice-studio-modal-open');
     }
+    try { if (global.FiezelMochiCompanion && typeof global.FiezelMochiCompanion.resume === 'function') global.FiezelMochiCompanion.resume(); } catch (_) {}
   }
 
   function openModal(options) {
     if (typeof document === 'undefined') return null;
     closeModal();
+    try { if (global.FiezelMochiCompanion && typeof global.FiezelMochiCompanion.pause === 'function') global.FiezelMochiCompanion.pause(); } catch (_) {}
 
     var opts = options || {};
     var overlay = document.createElement('div');
@@ -114,7 +121,7 @@
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-label', 'FIEZEL AI Voice Call Studio');
     overlay.style.cssText =
-      'position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+      'position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
 
     var card = document.createElement('div');
     card.style.cssText =
@@ -184,9 +191,9 @@
     var onKeyDown = function (e) {
       if (e.key === 'Escape') {
         closeModal();
-        window.removeEventListener('keydown', onKeyDown);
       }
     };
+    activeModalKeyDown = onKeyDown;
     window.addEventListener('keydown', onKeyDown);
 
     document.body.appendChild(overlay);
@@ -198,6 +205,12 @@
   // Listen for non-destructive Braincore telemetry messages from the Voice Studio iframe
   if (typeof window !== 'undefined') {
     window.addEventListener('message', function (event) {
+      try {
+        var myOrigin = window.location && window.location.origin;
+        if (myOrigin && myOrigin !== 'null' && event && event.origin && event.origin !== myOrigin) {
+          return;
+        }
+      } catch (_) {}
       var data = event && event.data;
       if (!data || data.type !== 'FIEZEL_VOICE_STUDIO_ATTEMPT') return;
       try {

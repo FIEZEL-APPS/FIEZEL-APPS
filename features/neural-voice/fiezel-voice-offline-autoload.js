@@ -143,6 +143,7 @@
       var c = root.navigator && root.navigator.connection;
       if (c && c.saveData === true) return 'save_data';
       if (c && typeof c.effectiveType === 'string' && /(^|-)2g$/.test(c.effectiveType)) return 'slow_network';
+      if (c && c.type === 'cellular') return 'cellular_network';
     } catch (_) {}
     return '';
   }
@@ -158,7 +159,7 @@
     var size = buffers.reduce(function (sum, b) { return sum + b.byteLength; }, 0);
     if (size !== item.bytes) return false;
     var merged = new Uint8Array(size), at = 0;
-    for (var j = 0; j < buffers.length; j++) { merged.set(new Uint8Array(buffers[j]), at); at += buffers[j].byteLength; }
+    for (var j = 0; j < buffers.length; j++) { merged.set(new Uint8Array(buffers[j]), at); at += buffers[j].byteLength; buffers[j] = null; }
     await cache.put(url, new Response(merged, {
       headers: {
         'Content-Type': contentTypeFor(item.path),
@@ -335,11 +336,14 @@
       // Perakitan selesai untuk semua aset. prepare() sekarang tidak mengunduh apa pun -
       // ia hanya memverifikasi dan menyalakan mesinnya, jadi statusnya menjadi 'siap'
       // lewat jalur yang sama persis dengan tombol manual.
-      try { await rt.prepare({}); } catch (error) {
+      var preparedOk = false;
+      try { await rt.prepare({}); preparedOk = true; } catch (error) {
         log({ phase: 'autoload_prepare_failed', error: String((error && error.message) || error).slice(0, 160) });
       }
-      writeState({ done: true, doneAt: Date.now() });
-      log({ phase: 'autoload_done' });
+      if (preparedOk) {
+        writeState({ done: true, doneAt: Date.now() });
+        log({ phase: 'autoload_done' });
+      }
     } catch (error) {
       log({ phase: 'autoload_error', error: String((error && error.message) || error).slice(0, 160) });
     } finally {

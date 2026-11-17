@@ -8,11 +8,13 @@
   const cacheName=`fiezel-v${version}`;
   const rootUrl=new URL('../../',document.currentScript?.src||location.href);
   const absolute=path=>new URL(String(path).replace(/^\.\//,''),rootUrl).href;
-  const WASM={path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',bytes:21596019,mime:'application/wasm'};
-  const MODEL={path:'vendor/kokoro-model/onnx/model_quantized.onnx',bytes:92361116};
+  const LARGE_ASSET_MIN_BYTES=8*1024*1024;
+  const assetList=typeof runtime.assets==='function'?runtime.assets():[];
+  const largeWasmAssets=assetList.filter(a=>a&&Number(a.bytes)>=LARGE_ASSET_MIN_BYTES&&/\.wasm(?:\?|$)/i.test(String(a.path||'')));
+  const largeModelAssets=assetList.filter(a=>a&&Number(a.bytes)>=LARGE_ASSET_MIN_BYTES&&!/\.wasm(?:\?|$)/i.test(String(a.path||'')));
   // Regression fix: the original patch had no ceiling on how long priming
   // could take. On a slow/stalled connection, fetch()/cache.add() for the
-  // 21MB WASM and 92MB model can hang indefinitely with zero feedback --
+  // large WASM and ONNX assets can hang indefinitely with zero feedback --
   // this was reported as "Siapkan suara offline" getting stuck forever
   // with the button never re-enabling. PRIME_TIMEOUT_MS caps that: if
   // priming doesn't finish in time, we give up on the head-start and let
@@ -23,14 +25,8 @@
   // sudah diselaraskan ke "45 detik (45.000 ms)" pada 2026-08-14 (sebelumnya
   // tertulis "25 detik"). Nilai runtime TIDAK diubah di sini.
   const PRIME_TIMEOUT_MS=Number(root.FIEZEL_IOS_PRIME_TIMEOUT_MS)||45000;
-  const PRIME_ASSET_COUNT=Number(runtime.assetCount)||13;
-  // [DOC-SYNC-M017-20260814] PRIME_TOTAL_BYTES fallback (119.796.601 B) hanya
-  // dipakai saat runtime.totalBytes tidak tersedia. Angka terverifikasi dari
-  // manifest asli (fiezel-neural-voice-bootstrap.js:17-31, 13 aset):
-  // total = 119.274.361 B. Selisih +522.240 B = ukuran satu voice .bin
-  // (af_heart/af_bella/dll, masing-masing 522.240 B). Efeknya kosmetik
-  // (hanya progress bar), bukan logika priming. Sumber: analysis/idb-migration-design.md.
-  const PRIME_TOTAL_BYTES=Number(runtime.totalBytes)||119274361;
+  const PRIME_ASSET_COUNT=Number(runtime.assetCount)||assetList.length||11;
+  const PRIME_TOTAL_BYTES=Number(runtime.totalBytes)||assetList.reduce((s,a)=>s+(Number(a?.bytes)||0),0)||158889523;
   let primePromise=null,primeTask=null;
 
   function withTimeout(promise,ms,label){
@@ -99,7 +95,7 @@
   }
 
   async function primeStoragePreflight(cache){
-    const candidates=typeof runtime.assets==='function'?runtime.assets():[WASM,MODEL];
+    const candidates=typeof runtime.assets==='function'?runtime.assets():assetList;
     let missingBytes=0;
     for(const item of candidates){
       if(!(await has(cache,absolute(item.path))))missingBytes+=Number(item.bytes)||0;
@@ -119,23 +115,29 @@
     if(!root.caches)return false;
     const cache=await root.caches.open(cacheName);
     await primeStoragePreflight(cache);
+    const liveAssets=typeof runtime.assets==='function'?runtime.assets():assetList;
+    const wasmItems=liveAssets.filter(a=>a&&Number(a.bytes)>=LARGE_ASSET_MIN_BYTES&&/\.wasm(?:\?|$)/i.test(String(a.path||'')));
+    const modelItems=liveAssets.filter(a=>a&&Number(a.bytes)>=LARGE_ASSET_MIN_BYTES&&!/\.wasm(?:\?|$)/i.test(String(a.path||'')));
     let completed=0,completedBytes=0;
     const done=(item)=>{
       completed++;completedBytes+=item.bytes;
       reportProgress({phase:'downloading',completed,completedBytes,current:item.path},onProgress);
     };
-    // WebKit is more reliable when the 21 MB WASM is fully materialized before cache.put.
-    if(!(await has(cache,absolute(WASM.path)))){
-      try{await cacheBuffered(cache,WASM)}catch(error){diag({phase:'wasm_prime_failed',error:String(error?.message||error)});throw error}
+    for(const wasmItem of wasmItems){
+      const targetItem={...wasmItem,mime:wasmItem.mime||'application/wasm'};
+      if(!(await has(cache,absolute(targetItem.path)))){
+        try{await cacheBuffered(cache,targetItem)}catch(error){diag({phase:'wasm_prime_failed',asset:targetItem.path,error:String(error?.message||error)});throw error}
+      }
+      if(!(await has(cache,absolute(targetItem.path))))throw new Error(`WASM priming verification failed: ${targetItem.path}`);
+      done(targetItem);
     }
-    if(!(await has(cache,absolute(WASM.path))))throw new Error(`WASM priming verification failed: ${WASM.path}`);
-    done(WASM);
-    // Let CacheStorage own the 92 MB model transfer instead of wrapping a live JS ReadableStream.
-    if(!(await has(cache,absolute(MODEL.path)))){
-      try{await cacheBrowserManaged(cache,MODEL)}catch(error){diag({phase:'model_prime_failed',error:String(error?.message||error)});throw error}
+    for(const modelItem of modelItems){
+      if(!(await has(cache,absolute(modelItem.path)))){
+        try{await cacheBrowserManaged(cache,modelItem)}catch(error){diag({phase:'model_prime_failed',asset:modelItem.path,error:String(error?.message||error)});throw error}
+      }
+      if(!(await has(cache,absolute(modelItem.path))))throw new Error(`Model priming verification failed: ${modelItem.path}`);
+      done(modelItem);
     }
-    if(!(await has(cache,absolute(MODEL.path))))throw new Error(`Model priming verification failed: ${MODEL.path}`);
-    done(MODEL);
     return true;
   }
 

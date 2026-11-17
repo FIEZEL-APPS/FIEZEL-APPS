@@ -491,11 +491,12 @@ async function routeFriendsRedeem(ctx) {
   const inviter = await readProfile(gate.db, invite.sub);
   if (!inviter) return invalid(); // profil pengundang sudah lenyap: kode mati sunyi
 
-  // Periksa kuota teman FRIENDS_MAX (50 teman) untuk KEDUA belah pihak
-  if ((await mutualFriendCount(gate.db, gate.sub)) >= FRIENDS_MAX) {
-    return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
-  }
-  if ((await mutualFriendCount(gate.db, invite.sub)) >= FRIENDS_MAX) {
+  // Periksa kuota teman FRIENDS_MAX (50 teman) untuk KEDUA belah pihak secara paralel
+  const [myFriendCount, inviterFriendCount] = await Promise.all([
+    mutualFriendCount(gate.db, gate.sub),
+    mutualFriendCount(gate.db, invite.sub),
+  ]);
+  if (myFriendCount >= FRIENDS_MAX || inviterFriendCount >= FRIENDS_MAX) {
     return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
   }
 
@@ -570,14 +571,10 @@ const SCHEMA_ADD = { allow: { handle: { type: 'string', max: 24, required: true 
 const EDGE_SCAN_LIMIT = 200;
 
 async function friendEdges(db, sub) {
-  const out = await db
-    .prepare('SELECT b, since_day FROM social_friend WHERE a = ?1 LIMIT 200')
-    .bind(sub)
-    .all();
-  const inc = await db
-    .prepare('SELECT a, since_day FROM social_friend WHERE b = ?1 LIMIT 200')
-    .bind(sub)
-    .all();
+  const [out, inc] = await Promise.all([
+    db.prepare('SELECT b, since_day FROM social_friend WHERE a = ?1 LIMIT 200').bind(sub).all(),
+    db.prepare('SELECT a, since_day FROM social_friend WHERE b = ?1 LIMIT 200').bind(sub).all(),
+  ]);
   const outgoing = ((out && out.results) || []);
   const incoming = ((inc && inc.results) || []);
   const incomingSubs = new Set(incoming.map((r) => r.a));
@@ -727,11 +724,12 @@ async function routeFriendsAccept(ctx) {
     .first();
   if (!theirs) return invalid();
 
-  /* Batasnya dicek untuk KEDUA belah pihak sebelum menerima */
-  if ((await mutualFriendCount(gate.db, gate.sub)) >= FRIENDS_MAX) {
-    return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
-  }
-  if ((await mutualFriendCount(gate.db, target.sub)) >= FRIENDS_MAX) {
+  /* Batasnya dicek untuk KEDUA belah pihak sebelum menerima secara paralel */
+  const [myFriendCount, targetFriendCount] = await Promise.all([
+    mutualFriendCount(gate.db, gate.sub),
+    mutualFriendCount(gate.db, target.sub),
+  ]);
+  if (myFriendCount >= FRIENDS_MAX || targetFriendCount >= FRIENDS_MAX) {
     return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
   }
 

@@ -1390,8 +1390,12 @@ export default function App() {
   useEffect(() => {
     warmUpVoiceServices();
     const onGesture = () => {
-      primeAudioPlayback();
       try {
+        const liveRunning = liveAudioCtxRef.current && liveAudioCtxRef.current.state === 'running';
+        const ttsRunning = ttsAudioCtxRef.current && ttsAudioCtxRef.current.state === 'running';
+        if (!liveRunning || !ttsRunning) {
+          primeAudioPlayback();
+        }
         if (liveAudioCtxRef.current && liveAudioCtxRef.current.state === 'suspended') {
           void liveAudioCtxRef.current.resume().catch(() => {});
         }
@@ -7566,9 +7570,9 @@ ${
         }
       } catch {}
     };
-    window.addEventListener('pointerdown', healLiveAudioAndMicOnGesture, true);
-    window.addEventListener('touchstart', healLiveAudioAndMicOnGesture, true);
-    window.addEventListener('click', healLiveAudioAndMicOnGesture, true);
+    window.addEventListener('pointerdown', healLiveAudioAndMicOnGesture, { capture: true, passive: true });
+    window.addEventListener('touchstart', healLiveAudioAndMicOnGesture, { capture: true, passive: true });
+    window.addEventListener('click', healLiveAudioAndMicOnGesture, { capture: true, passive: true });
     return () => {
       window.removeEventListener('pointerdown', healLiveAudioAndMicOnGesture, true);
       window.removeEventListener('touchstart', healLiveAudioAndMicOnGesture, true);

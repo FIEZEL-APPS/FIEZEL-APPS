@@ -134,11 +134,16 @@
     var jpText = document.getElementById('fzModalJpText');
     var idText = document.getElementById('fzModalIdText');
     var optionBtns = document.querySelectorAll('.facetime-option-btn');
+    var audioSocketStarted = false;
 
     if (!modal) return;
 
     function openModal(e) {
       if (e) e.preventDefault();
+      if (!audioSocketStarted) {
+        audioSocketStarted = true;
+        try { initCloudflareAudioSocket(); } catch (_) {}
+      }
       modal.classList.add('is-open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -198,7 +203,6 @@
 
   /* ============ DUAL-LANGUAGE LISTENING STUDIO & CLOUDFLARE D1 SOCKET ============ */
   function initListeningStudio() {
-    initCloudflareAudioSocket();
     initListeningTabs();
     setupAudioSession({
       audioId: 'fzEnglishAudio',

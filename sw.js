@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-796-unified-grammar-20261002';
+const SW_REV='m025-797-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
@@ -272,11 +272,12 @@ const isShellRequest=request=>request?.mode==='navigate'||(Boolean(request?.url)
 const COEP_POLICY='credentialless';
 function openerPolicyFor(request){return request?.mode==='navigate'?'same-origin-allow-popups':'same-origin'}
 function withCoopCoep(response,request){
-  if(!response)return response;
+  if(!response||response.type==='opaque'||response.type==='opaqueredirect'||response.status===0)return response;
   const headers=new Headers(response.headers);
   headers.set('Cross-Origin-Opener-Policy',openerPolicyFor(request));
   headers.set('Cross-Origin-Embedder-Policy',COEP_POLICY);
-  return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+  const emptyBody=response.status===101||response.status===204||response.status===205||response.status===304;
+  return new Response(emptyBody?null:response.body,{status:response.status,statusText:response.statusText,headers});
 }
 
 function isStaticAsset(url){
@@ -310,7 +311,9 @@ async function installShell(c){
     toFetch.push(req);
   }
   if(toFetch.length>0){
-    await c.addAll(toFetch);
+    for(let i=0;i<toFetch.length;i+=10){
+      await c.addAll(toFetch.slice(i,i+10));
+    }
   }
   if(otherShells.length>0){
     await Promise.all(otherShells.map(k=>caches.delete(k).catch(()=>{})));
@@ -488,10 +491,10 @@ self.addEventListener('fetch',e=>{
         }catch(_){}
         const copyIdx=(!isSubHtml&&isUpdateNav)?r.clone():null;
         const putKey=(requestUrl.search&&(isSubHtml||isUpdateNav))?new Request(cleanNavUrl):e.request;
-        caches.open(SHELL_CACHE).then(cache=>{
-          cache.put(putKey,copy);
-          if(copyIdx)cache.put('./index.html',copyIdx).catch(()=>{});
-        });
+        return caches.open(SHELL_CACHE).then(cache=>Promise.all([
+          cache.put(putKey,copy).catch(()=>{}),
+          copyIdx?cache.put('./index.html',copyIdx).catch(()=>{}):Promise.resolve()
+        ])).then(()=>r);
       }
       return r;
     });
