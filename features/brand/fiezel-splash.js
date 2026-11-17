@@ -527,11 +527,11 @@
        scrub, lompat, dan adopsi-terlambat selalu konsisten. */
     var _lastF = '', _lastB = '', _lastWO = '', _lastWT = '', _wordShown = false;
     var adoptedRevealed = !!(ctl.adopted && !frozenMode && ctl.startOffset >= (particles.T ? particles.T.DONE : 1320));
-    if (adoptedRevealed && wordSlot && wordSlot.classList) {
+    if (adoptedRevealed && wordSlot && wordSlot.classList && typeof wordSlot.classList.add === 'function') {
       wordSlot.classList.add('is-word-shown');
       wordSlot.classList.add('is-word-settled');
       _wordShown = true;
-    } else if (frozenMode && tParam >= TL.WORD0 && wordSlot && wordSlot.classList) {
+    } else if (frozenMode && tParam >= TL.WORD0 && wordSlot && wordSlot.classList && typeof wordSlot.classList.add === 'function') {
       wordSlot.classList.add('is-word-shown');
       wordSlot.classList.add('is-word-settled');
       _wordShown = true;
@@ -547,12 +547,12 @@
       if (sWO !== _lastWO) { wordSlot.style.opacity = sWO; _lastWO = sWO; }
       var sWT = 'translateY(' + ((1 - pw) * 14).toFixed(2) + 'px)';
       if (sWT !== _lastWT) { wordSlot.style.transform = sWT; _lastWT = sWT; }
-      if (!adoptedRevealed && !frozenMode && wordSlot && wordSlot.classList) {
+      if (!adoptedRevealed && !frozenMode && wordSlot && wordSlot.classList && typeof wordSlot.classList.add === 'function') {
         var shouldShowWord = t >= TL.WORD0;
         if (shouldShowWord && !_wordShown) {
           _wordShown = true;
           wordSlot.classList.add('is-word-shown');
-        } else if (!shouldShowWord && _wordShown) {
+        } else if (!shouldShowWord && _wordShown && typeof wordSlot.classList.remove === 'function') {
           _wordShown = false;
           wordSlot.classList.remove('is-word-shown');
         }

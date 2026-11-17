@@ -13468,7 +13468,7 @@ function dismissBootSplash(){
   try{self.__fiezelBootSplash?.clearWatchdog?.()}catch(_){}
   try{const r=self.document?.getElementById?.('fiezelBootRecovery');if(r)r.remove()}catch(_){}
   const bs=self.document?.getElementById?.('fiezelBootSplash');
-  const alreadyLeaving=!!(bs&&bs.classList&&bs.classList.contains('is-leaving'));
+  const alreadyLeaving=!!(bs?.classList?.contains?.('is-leaving'));
   if(alreadyLeaving){
     try{self.document?.documentElement?.classList?.remove?.('fz-booting');self.document?.body?.classList?.remove?.('fz-booting')}catch(_){}
     try{self.__fiezelBootSplashDismissed=true}catch(_){}
@@ -13476,11 +13476,11 @@ function dismissBootSplash(){
     return true;
   }
   const reducedMotion=!!(self.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
-  if(bs&&bs.parentNode&&bs.classList&&!self.__fiezelBootWatchdogFired&&!reducedMotion&&typeof bs.getBoundingClientRect==='function'){
+  if(bs&&bs.parentNode&&typeof bs.classList?.add==='function'&&!self.__fiezelBootWatchdogFired&&!reducedMotion&&typeof bs.getBoundingClientRect==='function'){
     try{
-      bs.setAttribute('data-fiezel-boot-claimed','leaving');
+      bs.setAttribute?.('data-fiezel-boot-claimed','leaving');
       bs.classList.add('is-leaving');
-      bs.style.pointerEvents='none';
+      if(bs.style)bs.style.pointerEvents='none';
       self.document?.documentElement?.classList?.remove?.('fz-booting');
       self.document?.body?.classList?.remove?.('fz-booting');
       self.__fiezelBootSplashDismissed=true;
