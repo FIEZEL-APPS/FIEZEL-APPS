@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { WhiteboardSceneStep } from '../lib/whiteboardDirector';
 import { MathText } from './MathText';
+import { wbPick } from '../lib/i18n';
 
 const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -220,10 +221,10 @@ const ZoomInspectButton: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
         onClick();
       }}
       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/95 hover:bg-[#EFF6FF] border border-[#CBD5E1] text-[10.5px] font-bold text-[#1E40AF] shadow-xs transition-transform active:scale-95 cursor-pointer"
-      title="Perbesar visual ini untuk melihat lebih jelas"
+      title={wbPick('Enlarge diagram for a closer view', 'Perbesar visual ini untuk melihat lebih jelas')}
     >
       <span>🔍</span>
-      <span>Perbesar</span>
+      <span>{wbPick('Zoom', 'Perbesar')}</span>
     </button>
   );
 };
@@ -411,14 +412,14 @@ const MetaphorThemeHeroSvg: React.FC<{
                 {svgLeft}
               </text>
               <text x="121" y="117" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#B45309">
-                PEMICU / SUBJEK
+                {wbPick('TRIGGER / SUBJECT', 'PEMICU / SUBJEK')}
               </text>
             </g>
 
             <path d="M 222 78 L 334 78" stroke="#16A34A" strokeWidth="3" strokeDasharray="6 4" />
             <rect x="244" y="60" width="72" height="34" rx="17" fill="#DCFCE7" stroke="#15803D" strokeWidth="2.2" />
             <text x="280" y="81" textAnchor="middle" fontSize="11" fontWeight="800" fill="#14532D">
-              PASANG!
+              {wbPick('PAIR!', 'PASANG!')}
             </text>
 
             {/* Right Padlock Card (cleanly padded inside border with zero clipping) */}
@@ -431,7 +432,7 @@ const MetaphorThemeHeroSvg: React.FC<{
                 {svgRight}
               </text>
               <text x="439" y="117" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#0369A1">
-                KATA PASANGAN
+                {wbPick('MATCHING FORM', 'KATA PASANGAN')}
               </text>
             </g>
           </g>
@@ -453,7 +454,7 @@ const MetaphorThemeHeroSvg: React.FC<{
               {svgLeft}
             </text>
             <text x="138" y="90" textAnchor="middle" fontSize="10" fontWeight="700" fill="#1D4ED8">
-              Gerbong Awal
+              {wbPick('Lead Car', 'Gerbong Awal')}
             </text>
             {/* Coupler */}
             <line x1="242" y1="78" x2="314" y2="78" stroke="#0F172A" strokeWidth="4" />
@@ -466,7 +467,7 @@ const MetaphorThemeHeroSvg: React.FC<{
               {svgRight}
             </text>
             <text x="420" y="90" textAnchor="middle" fontSize="10" fontWeight="700" fill="#15803D">
-              Sambungan Tepat
+              {wbPick('Right Link', 'Sambungan Tepat')}
             </text>
           </g>
         )}
@@ -478,7 +479,7 @@ const MetaphorThemeHeroSvg: React.FC<{
               {svgLeft}
             </text>
             <text x="118" y="96" textAnchor="middle" fontSize="10" fontWeight="700" fill="#DC2626">
-              Cek Situasi
+              {wbPick('Check Context', 'Cek Situasi')}
             </text>
             <rect x="252" y="18" width="56" height="120" rx="16" fill="#1E293B" />
             <circle cx="280" cy="44" r="13" fill="#EF4444" />
@@ -489,7 +490,7 @@ const MetaphorThemeHeroSvg: React.FC<{
               {svgRight}
             </text>
             <text x="442" y="96" textAnchor="middle" fontSize="10" fontWeight="700" fill="#15803D">
-              Aman Dipakai
+              {wbPick('Safe to Use', 'Aman Dipakai')}
             </text>
           </g>
         )}
@@ -562,16 +563,16 @@ export const MetaphorSceneDiagram: React.FC<{
   const defaultRightIcon =
     theme === 'camera_vs_video' ? 'video' : theme === 'key_and_lock' ? 'lock' : theme === 'bridge_timeline' ? 'bridge' : 'bolt';
   const lp = step.leftPanel || {
-    badge: theme === 'camera_vs_video' ? 'FOTO KONDISI' : 'ATURAN 1',
-    title: step.termA || 'Bentuk Utama',
+    badge: theme === 'camera_vs_video' ? wbPick('SNAPSHOT', 'FOTO KONDISI') : wbPick('RULE 1', 'ATURAN 1'),
+    title: step.termA || wbPick('Core Form', 'Bentuk Utama'),
     subtitle: step.descA || '',
     icon: defaultLeftIcon,
     accentColor: '#0284C7',
     bgColor: '#E0F2FE',
   };
   const rp = step.rightPanel || {
-    badge: theme === 'camera_vs_video' ? 'VIDEO AKSI' : 'ATURAN 2',
-    title: step.termB || 'Bentuk Pembanding',
+    badge: theme === 'camera_vs_video' ? wbPick('ACTION VIDEO', 'VIDEO AKSI') : wbPick('RULE 2', 'ATURAN 2'),
+    title: step.termB || wbPick('Contrast Form', 'Bentuk Pembanding'),
     subtitle: step.descB || '',
     icon: defaultRightIcon,
     accentColor: '#15803D',
@@ -663,11 +664,11 @@ export const MetaphorSceneDiagram: React.FC<{
                 className="px-2 py-0.5 rounded-full text-[9.5px] font-black tracking-wider uppercase text-white"
                 style={{ backgroundColor: lp.accentColor || '#0284C7' }}
               >
-                {lp.badge || 'KONSEP 1'}
+                {lp.badge || wbPick('CONCEPT 1', 'KONSEP 1')}
               </span>
               {focusSide === 'left' && (
                 <span className="px-1.5 py-0.5 rounded-full bg-white/95 text-[#0369A1] text-[9px] font-extrabold shadow-2xs">
-                  🔎 Fokus
+                  {wbPick('🔎 Focus', '🔎 Fokus')}
                 </span>
               )}
             </div>
@@ -717,11 +718,11 @@ export const MetaphorSceneDiagram: React.FC<{
                 className="px-2 py-0.5 rounded-full text-[9.5px] font-black tracking-wider uppercase text-white"
                 style={{ backgroundColor: rp.accentColor || '#15803D' }}
               >
-                {rp.badge || 'KONSEP 2'}
+                {rp.badge || wbPick('CONCEPT 2', 'KONSEP 2')}
               </span>
               {focusSide === 'right' && (
                 <span className="px-1.5 py-0.5 rounded-full bg-white/95 text-[#15803D] text-[9px] font-extrabold shadow-2xs">
-                  🔎 Fokus
+                  {wbPick('🔎 Focus', '🔎 Fokus')}
                 </span>
               )}
             </div>
@@ -776,7 +777,7 @@ export const MindMapDiagram: React.FC<{
   if (branches.length === 0) return null;
   const effProgress = isLightbox ? 1 : queuedPreview ? 0.04 : progress;
   const isWritingNow = !isLightbox && !queuedPreview && isActive && isPlaying && effProgress > 0.01 && effProgress < 0.95;
-  const centerLabel = step.metaphorCenterLabel || step.title || 'Konsep Inti';
+  const centerLabel = step.metaphorCenterLabel || step.title || wbPick('Core Concept', 'Konsep Inti');
   const terms = queuedPreview ? [] : step.highlightTerms || [];
   const spokenL = String(spokenText || '').toLowerCase();
   let tokenMatchedBranch = -1;
@@ -1071,10 +1072,10 @@ export const FormulaBlocksDiagram: React.FC<{
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DCFCE7] border border-[#16A34A]/35 text-[10.5px] font-extrabold text-[#14532D]">
           <span>🧩</span>
-          <span>Rakit Puzzle Pola Kalimat</span>
+          <span>{wbPick('Sentence Pattern Blocks', 'Rakit Puzzle Pola Kalimat')}</span>
         </span>
         <div className="flex items-center gap-2">
-          {isWritingNow && <AnimatedTutorPenSvg label="Menyusun blok..." />}
+          {isWritingNow && <AnimatedTutorPenSvg label={wbPick('Arranging blocks...', 'Menyusun blok...')} />}
           {!isLightbox && <ZoomInspectButton onClick={onZoomInspect} />}
         </div>
       </div>
@@ -1205,7 +1206,7 @@ export const VisualZoomLightbox: React.FC<{
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-base">🔍</span>
             <h4 className="font-extrabold text-[14px] text-[#0F172A] truncate">
-              {step.title || 'Detail Visual Papan Belajar'}
+              {step.title || wbPick('Whiteboard Visual Detail', 'Detail Visual Papan Belajar')}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -1215,7 +1216,7 @@ export const VisualZoomLightbox: React.FC<{
                 data-testid="wb-lightbox-zoom-out"
                 onClick={() => setScale((s) => Math.max(0.8, Number((s - 0.15).toFixed(2))))}
                 className="px-2.5 py-1 hover:bg-[#F1F5F9] cursor-pointer"
-                title="Perkecil"
+                title={wbPick('Zoom Out', 'Perkecil')}
               >
                 −
               </button>
@@ -1233,7 +1234,7 @@ export const VisualZoomLightbox: React.FC<{
                 data-testid="wb-lightbox-zoom-in"
                 onClick={() => setScale((s) => Math.min(2.2, Number((s + 0.15).toFixed(2))))}
                 className="px-2.5 py-1 hover:bg-[#F1F5F9] cursor-pointer"
-                title="Perbesar"
+                title={wbPick('Zoom In', 'Perbesar')}
               >
                 +
               </button>

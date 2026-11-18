@@ -1,0 +1,1226 @@
+{
+  "schema": "fiezel-jlpt-listening-en-v1",
+  "status": "APPROVED-EN-SIDECAR",
+  "count": 62,
+  "items": {
+    "jlpt-n5-m1-01": {
+      "situationEn": "A female teacher is giving assignment instructions to a male student in the classroom.",
+      "scriptEn": "Teacher: Everyone, please read from page 10 to page 12 today. Then, do the exercises on page 13.\nStudent: Teacher, should we do all the exercises on page 13?\nTeacher: No, just do number 1 and number 2.",
+      "questionEn": "What should the student do first?",
+      "explainEn": "The teacher instructs: \"きょうは じゅっぺーじから じゅうにぺーじまで よんでください。そして、じゅうさんぺーじの もんだいを...\" (Today read pages 10-12, then do the exercises). The question asks what to do 'first' (はじめに), so the answer is reading pages 10-12 (Option 1).",
+      "options": [
+        "Reading pages 10 to 12",
+        "Doing all exercises on page 13",
+        "Doing only numbers 1 and 2 on page 13",
+        "Closing the book"
+      ],
+      "vocab": [
+        "book page",
+        "first / to begin with",
+        "from ... to ...",
+        "only / just"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n5-m1-02": {
+      "situationEn": "A male and female student are shopping for groceries for a get-together.",
+      "scriptEn": "Female: The apples are cheap, aren't they? Shall we buy three?\nMale: But we already bought a lot of bananas yesterday.\nFemale: I see. In that case, let's just get two apples. Should we buy one orange too?\nMale: No, we still have oranges at home.",
+      "questionEn": "What are they buying and in what quantity?",
+      "explainEn": "Initially, the woman suggests buying 3 apples, but the man reminds her they already have bananas. The woman decides: \"じゃあ、りんごは ふたつに しましょう\" (In that case, let's make it 2 apples). The orange is not bought because they still have some at home. Therefore, they buy 2 apples (Option 2).",
+      "options": [
+        "3 apples",
+        "2 apples",
+        "2 apples and 1 orange",
+        "Bananas and oranges"
+      ],
+      "vocab": [
+        "one, two, three (counter for round/general objects)",
+        "to decide to ...",
+        "still"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n5-m1-03": {
+      "situationEn": "A woman and a man are on the phone to decide on a meeting location at the train station.",
+      "scriptEn": "Man: Is it okay to meet at the station's east exit tomorrow?\nWoman: The east exit is currently under construction, you know. How about in front of the bookstore at the west exit?\nMan: Alright, I understand. Near the ticket gate, right?\nWoman: Yes, that's right.",
+      "questionEn": "Where will they meet tomorrow?",
+      "explainEn": "The man suggests the east exit (ひがしぐち), but the woman declines because of construction (こうじ), and suggests: \"にしぐちの ほんやの まえに しませんか\" (Why don't we meet in front of the bookstore at the west exit?). The man agrees. So the meeting place is in front of the bookstore at the west exit (Option 2).",
+      "options": [
+        "Station east exit",
+        "In front of the west exit bookstore",
+        "Cafe inside the station",
+        "Construction site location"
+      ],
+      "vocab": [
+        "appointment / meeting",
+        "east exit / west exit",
+        "bookstore",
+        "construction work / repairs"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n5-m1-04": {
+      "situationEn": "A mother and her son are talking before the son leaves for school on a cloudy day.",
+      "scriptEn": "Mother: Takeshi, it looks like it's going to rain outside. Take an umbrella!\nSon: Where is my blue umbrella?\nMother: The blue umbrella is broken. Use the black umbrella in the entrance (genkan).\nSon: Okay, got it. I'm leaving!",
+      "questionEn": "Which umbrella does the son take?",
+      "explainEn": "The boy's blue umbrella is broken (こわれている), and his mother tells him to use the black umbrella in the genkan: \"げんかんの くろい かさを つかいなさい\". The boy agrees, so he takes the black umbrella (Option 4).",
+      "options": [
+        "Blue umbrella",
+        "Taking no umbrella",
+        "White umbrella",
+        "Black umbrella in the genkan"
+      ],
+      "vocab": [
+        "rain falls",
+        "broken",
+        "Japanese-style house entrance area",
+        "to take away"
+      ],
+      "distractors": {
+        "1": "The mother asserts that the blue umbrella is broken (こわれている) and tells them to use the black umbrella.",
+        "2": "The weather is cloudy and it is going to rain; the mother tells them to take an umbrella, not to leave it behind.",
+        "3": "The white umbrella was never mentioned in this weather arrangement conversation."
+      }
+    },
+    "jlpt-n5-m2-01": {
+      "situationEn": "A man asks his friend why she didn't attend the party yesterday.",
+      "scriptEn": "Man: Tanaka-san, why didn't you come to the party yesterday?\nWoman: I actually wanted to go, but I had a headache yesterday and stayed home to rest.\nMan: I see. Are you okay now?\nWoman: Yes, I've fully recovered today. Thank you.",
+      "questionEn": "Why didn't Tanaka-san come to the party yesterday?",
+      "explainEn": "The woman (Tanaka-san) explains the reason directly: \"きのうは あたまが いたくて、いえで ねて いました\" (Yesterday my head hurt and I was sleeping/resting at home). So the reason for not coming was a headache (Option 2).",
+      "options": [
+        "Because work was busy",
+        "Because of a headache",
+        "Because she forgot about the party",
+        "Because a friend came to the house"
+      ],
+      "vocab": [
+        "headache",
+        "to sleep / to rest",
+        "why",
+        "completely / fully"
+      ],
+      "distractors": {
+        "1": "The man initially suspected he was busy working, but Tanaka denied it and stated that he had a headache.",
+        "3": "Tanaka did not forget the party; he remembered it but was forced to rest at home because of a headache.",
+        "4": "A friend coming over to the house is not a reason mentioned in the dialogue at all."
+      }
+    },
+    "jlpt-n5-m2-02": {
+      "situationEn": "A man is looking for his lost keys and asks his friend.",
+      "scriptEn": "Man: Huh? My keys are gone. I was sure I put them on the table.\nWoman: There's only a book on the table. Have you checked inside your bag?\nMan: Yeah, they're not in the bag either.\nWoman: Ah, something fell under the chair!\nMan: Ah, you're right. Thank you!",
+      "questionEn": "Where are the keys located?",
+      "explainEn": "The woman sees the keys have fallen under the chair: \"あ、いすの したに おちているわよ！\" (Ah, they've fallen under the chair!). The man confirms: \"あ、ほんとだ\" (Ah, that's right). So their position is under the chair (Option 3).",
+      "options": [
+        "On the table",
+        "Inside the bag",
+        "Under the chair",
+        "In front of the door"
+      ],
+      "vocab": [
+        "key",
+        "above / below / inside",
+        "fall"
+      ],
+      "distractors": {
+        "1": "The key was not on top of the table but had fallen on the floor near the seating area.",
+        "2": "The man briefly checked his bag, but the key was not inside the bag.",
+        "4": "The front doorway area was never mentioned as the location where the key was found."
+      }
+    },
+    "jlpt-n5-m2-03": {
+      "situationEn": "A student is asking a language school receptionist about the Japanese class schedule.",
+      "scriptEn": "Student: Excuse me, what time does the Japanese class start?\nReceptionist: The morning class starts at 09:30 and finishes at 11:30. The evening class starts at 18:30.\nStudent: I am taking the morning class.\nReceptionist: In that case, please come before 09:30 tomorrow.",
+      "questionEn": "What time does the student's class start?",
+      "explainEn": "The student chooses the morning class (あさの クラス). The receptionist explains that the morning class starts at 09:30: \"あさの クラスは くじはんに はじまって\". 11:30 is the finishing time (おわります), and 18:30 is the evening class schedule. So the student's class starts at 09:30 (Option 4).",
+      "options": [
+        "09:00",
+        "18:30",
+        "11:30",
+        "09:30"
+      ],
+      "vocab": [
+        "from what time",
+        "half (30 minutes)",
+        "begin / start",
+        "finish / end"
+      ],
+      "distractors": {
+        "1": "09:00 is not the start time of the morning class chosen by the student.",
+        "2": "18:30 (6時半) is the evening class schedule, not the morning class chosen.",
+        "3": "11:30 is the time the morning class finishes (おわります), not the start time."
+      }
+    },
+    "jlpt-n5-m2-04": {
+      "situationEn": "At a cafe, a man and a woman are discussing what drinks to order.",
+      "scriptEn": "Man: What would you like to drink? Do you want coffee?\nWoman: Hmm, I don't drink coffee very often. I prefer tea or juice.\nMan: The apple juice at this shop is really good, you know.\nWoman: In that case, I'll go with that!",
+      "questionEn": "What drink will the woman have?",
+      "explainEn": "The woman declines coffee (\"あまり のまない\"). Although she briefly mentions tea or juice (\"おちゃか ジュースが いいな\"), when the man recommends the cafe's apple juice as good, the woman decides: \"じゃあ、それに する！\" (In that case, I'll go with that!). Therefore, the drink she will have is apple juice (Option 3).",
+      "options": [
+        "Coffee",
+        "Green tea",
+        "Apple juice",
+        "Plain water"
+      ],
+      "vocab": [
+        "not very much / rarely",
+        "decide on ... / choose ...",
+        "delicious / tasty"
+      ],
+      "distractors": {
+        "1": "The woman declines coffee because she rarely drinks it (あまり のまない).",
+        "2": "Green tea was not chosen by the woman.",
+        "4": "Plain water is not the drink agreed upon to be ordered."
+      }
+    },
+    "jlpt-n5-m3-01": {
+      "situationEn": "A student is about to knock on the door and enter the teachers' office.",
+      "scriptEn": "You are going to enter the teachers' room. What do you say?",
+      "questionEn": "When entering the room, what do you say?",
+      "explainEn": "The standard polite expression when entering someone else's room or a teachers' office in Japanese culture is \"しつれいします\" (Shitsurei shimasu - Excuse me / Pardon the intrusion). Option 2 is for parting ways, and option 3 is after a meal.",
+      "options": [
+        "Shitsurei shimasu (Excuse me)",
+        "Jaa, mata (See you again)",
+        "Gochisousama deshita (Thank you for the meal)"
+      ],
+      "vocab": [
+        "excuse me (when entering a room/meeting someone)",
+        "enter",
+        "room"
+      ],
+      "distractors": {
+        "2": "\"じゃあ、また\" is a farewell/see you later expression, not used when entering a room.",
+        "3": "\"ごちそうさまでした\" is spoken after finishing a meal, not when visiting or entering a room."
+      }
+    },
+    "jlpt-n5-m3-02": {
+      "situationEn": "A child is getting ready to leave for school and saying goodbye to their mother at home.",
+      "scriptEn": "You are leaving the house in the morning. What do you say to your family?",
+      "questionEn": "When leaving the house in the morning, what do you say?",
+      "explainEn": "When someone leaves the house to go to work or school, they say \"いってきます\" (Ittekimasu - I'm going and will come back). The person staying behind replies \"いってらっしゃい\". \"Tadaima\" is said when returning home.",
+      "options": [
+        "Tadaima (I'm home)",
+        "Ittekimasu (I'm off)",
+        "Okaerinasai (Welcome back)"
+      ],
+      "vocab": [
+        "I am leaving (said by the person departing)",
+        "have a safe trip (replied by the person at home)",
+        "I'm home"
+      ],
+      "distractors": {
+        "1": "\"ただいま\" is spoken by someone who has just returned home, not someone leaving.",
+        "3": "\"おかえりなさい\" is spoken by someone at home welcoming a returnee, not someone departing."
+      }
+    },
+    "jlpt-n5-m3-03": {
+      "situationEn": "You are giving a souvenir box of pastries to your friend.",
+      "scriptEn": "You are handing a gift to a friend. What do you say?",
+      "questionEn": "When handing over a gift, what do you say?",
+      "explainEn": "When handing over a gift or offering something to someone else, the most natural expression is \"これ、どうぞ\" (Kore, douzo - Here, please).",
+      "options": [
+        "Kore, douzo (Here you are)",
+        "Itadakimasu (Let's eat / I gratefully accept)",
+        "Dou itashimashite (You're welcome)"
+      ],
+      "vocab": [
+        "please",
+        "to hand over",
+        "gift / present"
+      ],
+      "distractors": {
+        "2": "\"いただきます\" is spoken by the recipient before eating or receiving something, not by the giver.",
+        "3": "\"どういたしまして\" is spoken in response to thanks, not when handing over a gift."
+      }
+    },
+    "jlpt-n5-m4-01": {
+      "situationEn": "Someone greets you at a bus stop and mentions the cold weather today.",
+      "scriptEn": "Man: It is very cold today, isn't it.",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The particle \"ね\" at the end of the sentence functions to seek agreement. The most natural response to agree is \"そうですね\" (Sou desu ne - Yes, that is indeed so).",
+      "options": [
+        "Sou desu ne. (Yes, that is indeed so.)",
+        "Dou itashimashite. (You're welcome.)",
+        "Sayounara. (Goodbye.)"
+      ],
+      "vocab": [
+        "cold (weather/air temperature)",
+        "that is true / I agree"
+      ],
+      "distractors": {
+        "2": "\"どういたしまして\" is to reply to thanks, not to agree with a remark about cold weather.",
+        "3": "\"さようなら\" is for parting/goodbye, unsuitable for a casual conversation on-site."
+      }
+    },
+    "jlpt-n5-m4-02": {
+      "situationEn": "Someone points to a bag left on a classroom bench.",
+      "scriptEn": "Woman: Whose bag is this?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The question asks about ownership (\"だれの\" - whose). The answer stating the owner is \"田中さんのです\" (Tanaka-san no desu - It belongs to Tanaka). Option 1 points to a location, and option 3 answers a yes/no question.",
+      "options": [
+        "Asoko desu. (It is over there.)",
+        "Tanaka-san no desu. (It belongs to Mr./Ms. Tanaka.)",
+        "Iie, chigaimasu. (No, that is incorrect.)"
+      ],
+      "vocab": [
+        "whose",
+        "bag"
+      ],
+      "distractors": {
+        "1": "\"あそこです\" answers a location (where), even though the question asks about ownership (だれのかさ).",
+        "3": "\"いいえ、ちがいます\" does not answer the question of whose umbrella it is."
+      }
+    },
+    "jlpt-n5-m4-03": {
+      "situationEn": "A classmate invites you to go for tea after class ends.",
+      "scriptEn": "Woman: Would you like to have some tea together?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The sentence \"～ませんか\" is a polite invitation. Accepting the invitation is responded to with \"ええ、～ましょう\" (Ee, ...-mashou - Yes, let's do it). Therefore, the answer is \"ええ、のみましょう\" (Option 1).",
+      "options": [
+        "Ee, nomimashou. (Yes, let's drink together.)",
+        "Iie, nomimashita. (No, I have already drunk.)",
+        "Hai, ocha desu. (Yes, it is tea.)"
+      ],
+      "vocab": [
+        "together",
+        "would you like to ... (invitation)",
+        "let's ..."
+      ],
+      "distractors": {
+        "2": "The past tense form \"のみました\" is not suitable for responding to an invitation to drink tea together right now.",
+        "3": "\"はい、おちゃです\" only states the name of the object without accepting the invitation to drink."
+      }
+    },
+    "jlpt-n5-m4-04": {
+      "situationEn": "A classmate asks how the exam went yesterday.",
+      "scriptEn": "Man: How was the exam yesterday?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The question \"どうでしたか\" asks for an impression/state in the past tense. The answer describing the state is the past tense of the adjective: \"とても むずかしかったです\" (It was very difficult - Option 2).",
+      "options": [
+        "Ashita desu. (It is tomorrow.)",
+        "Totemo muzukashikatta desu. (It was very difficult.)",
+        "Kyoushitsu ni arimasu. (It is in the classroom.)"
+      ],
+      "vocab": [
+        "how (past state)",
+        "difficult / hard",
+        "very"
+      ],
+      "distractors": {
+        "1": "\"あしたです\" answers time (when), not the impression of the past test (どうでしたか).",
+        "3": "\"きょうしつに あります\" answers the location of an object, not the experience of taking an exam."
+      }
+    },
+    "jlpt-n4-m1-01": {
+      "situationEn": "A restaurant manager gives instructions on preparation before opening to a new part-time staff member.",
+      "scriptEn": "Manager: Lee-san, before the shop opens, please wipe the tables and tidy up the menu books.\nStaff: Understood. I have already wiped the tables.\nManager: Ah, thank you. In that case, before putting out the menus, could you arrange the water glasses on the counter first?\nStaff: Understood, I will do it right away!",
+      "questionEn": "What is the first thing the staff member must do now?",
+      "explainEn": "The tables have already been wiped. The manager asks: \"メニューを おくまえに、まず おひやの グラスを...\" (Before putting out the menus, first arrange the water glasses). The question asks what to do 'first' (まず), so the answer is arranging the water glasses (Option 3).",
+      "options": [
+        "Wiping the tables",
+        "Arranging the menu books",
+        "Arranging water glasses on the counter",
+        "Opening the restaurant door"
+      ],
+      "vocab": [
+        "first / to begin with",
+        "before ...",
+        "to arrange / to line up",
+        "cold drinking water (restaurant term)"
+      ],
+      "distractors": {
+        "1": "The manager asserts that the table has already been wiped beforehand (テーブルは もう ふいたよ).",
+        "2": "Setting up the menu is done after preparing the drinking water glasses at the counter.",
+        "4": "Opening the restaurant door is the final step after all preparations are complete."
+      }
+    },
+    "jlpt-n4-m1-02": {
+      "situationEn": "A doctor explains the rules for taking cold medicine to a patient at a clinic.",
+      "scriptEn": "Doctor: I am prescribing two types of medicine. Take the white medicine after breakfast, lunch, and dinner.\nPatient: What about the red medicine, Doctor?\nDoctor: The red medicine causes drowsiness, so take one pill at night before sleeping. Do not take it during the day at all.\nPatient: Understood.",
+      "questionEn": "Which medicine does the patient take after lunch?",
+      "explainEn": "The white medicine is taken after breakfast, lunch, and dinner (\"あさ、ひる、ばんの ごはんの あと\"). The red medicine is only taken at night before sleep and is forbidden during the day (\"ひるまは ぜったいに のまないで\"). Therefore, after lunch, only the white medicine is taken (Option 1).",
+      "options": [
+        "White medicine only",
+        "Red medicine only",
+        "White medicine and red medicine",
+        "Do not take medicine"
+      ],
+      "vocab": [
+        "two kinds / two types",
+        "to become sleepy",
+        "must not ... at all",
+        "after ..."
+      ],
+      "distractors": {
+        "2": "The red medicine is to be taken only in the morning and evening, not at midday.",
+        "3": "The red medicine must not be taken at midday; only the white medicine is taken 3 times a day.",
+        "4": "The doctor requires the white medicine to still be taken after lunch."
+      }
+    },
+    "jlpt-n4-m1-03": {
+      "situationEn": "A woman asks a station staff member about the fastest and cheapest train to Narita Airport.",
+      "scriptEn": "Woman: I want to go to the airport; between the limited express (tokkyuu) and the rapid train (kaisoku), which is better?\nStaff: The express train arrives in 40 minutes, but it requires a 1500 yen express ticket. The rapid train takes 1 hour, but you only need to pay the regular fare.\nWoman: My flight is still 3 hours away, so I'm not in a hurry.\nStaff: In that case, the rapid train is cheaper and better. It's at platform number 2.",
+      "questionEn": "Which train will the woman take?",
+      "explainEn": "The woman is not in a hurry (\"いそぎません\") because her flight is still 3 hours away. The staff suggests the kaisoku because it is cheaper: \"それなら、かいそくの ほうが やすくて いいですよ\". Therefore, she chooses the rapid train kaisoku (Option 4).",
+      "options": [
+        "Limited express train (tokkyuu)",
+        "Bus",
+        "Taxi",
+        "Rapid train (kaisoku)"
+      ],
+      "vocab": [
+        "limited express train / regular rapid train",
+        "in a hurry / rushing",
+        "more ... (comparison)",
+        "fare / ticket price"
+      ],
+      "distractors": {
+        "1": "The limited express train requires an additional express ticket fee which the passenger wants to avoid.",
+        "2": "The bus requires too much travel time and was rejected by the passenger.",
+        "3": "A taxi was not chosen because the fare is expensive and there is already a rapid train."
+      }
+    },
+    "jlpt-n4-m1-04": {
+      "situationEn": "Two colleagues are dividing shopping tasks for a coworker's farewell party.",
+      "scriptEn": "Man: For the farewell party preparations, I'll buy the cake and snacks.\nWoman: Thank you. In that case, I'll go buy the drinks.\nMan: Ah, one more thing, please collect the message cards from everyone, because they will be presented tomorrow.\nWoman: Okay. Before I go shopping, I'll ask them to write them first.",
+      "questionEn": "What will the woman do first right now?",
+      "explainEn": "The woman says: \"かいだしに いくまえに、みんなに かいてもらいます\" (Before going shopping, I will have everyone write them). So the first thing she does is collect the message cards (Option 3).",
+      "options": [
+        "Go buy cake and snacks",
+        "Go buy drinks",
+        "Collect message cards",
+        "Clean the meeting room"
+      ],
+      "vocab": [
+        "farewell party",
+        "to collect / gather",
+        "go shopping for necessities"
+      ],
+      "distractors": {
+        "1": "Buying cake and snacks is delegated to the male colleague, not the female.",
+        "2": "Buying new drinks will be done after the greeting cards are collected.",
+        "4": "Cleaning the meeting room will be done later as the event approaches."
+      }
+    },
+    "jlpt-n4-m2-01": {
+      "situationEn": "A male employee apologizes to his boss for arriving late to the office.",
+      "scriptEn": "Section Chief: Yamada-kun, you're late today. What happened?\nYamada: I'm sorry, sir. I left the house on time as usual this morning, but due to an accident, the train was stopped for 30 minutes.\nSection Chief: I see. Couldn't you switch to a bus?\nYamada: Yes, but the queue at the bus stop was also very long, so I couldn't get on.\nSection Chief: Oh, I see, that's very troublesome.",
+      "questionEn": "What is the main reason for Yamada's lateness?",
+      "explainEn": "Yamada left home at the usual time (\"いつもどおりの じかん\"), but the train was stopped for 30 minutes due to an accident (\"じこで でんしゃが 30ぷんも とまって しまった\"). He also couldn't switch to a bus because the queue was very long. Therefore, the main cause of the delay is the train stopping due to an accident (Option 2).",
+      "options": [
+        "Because he overslept",
+        "Because the train stopped due to an accident",
+        "Because he took the wrong bus",
+        "Because he got lost on the way"
+      ],
+      "vocab": [
+        "as usual",
+        "accident",
+        "stop / halted",
+        "switch vehicles"
+      ],
+      "distractors": {
+        "1": "Yamada asserts that he woke up on time and did not oversleep.",
+        "3": "Yamada did not board the wrong bus fleet.",
+        "4": "Yamada already knows the travel route well and did not get lost on the way."
+      }
+    },
+    "jlpt-n4-m2-02": {
+      "situationEn": "Two friends have just left the cinema and are talking about the movie they watched.",
+      "scriptEn": "Woman: The action scenes in today's movie were amazing, right?\nMan: Yeah, the visuals were beautiful, but the plot was a bit hard to understand.\nWoman: Really? The plot twist at the end was really exciting.\nMan: Well, it was okay. But the music was truly the best. I'm thinking of buying the soundtrack.",
+      "questionEn": "Which part of the movie does the man think is the best?",
+      "explainEn": "The woman praises the action scenes, while the man criticizes the plot for being a bit complicated/hard to understand (\"わかりにくかった\"). However, the man emphasizes that the music was outstanding: \"でも、おんがくは さいこうだったよ\" (But the music was the best) and wants to buy the soundtrack. So the best part according to the man is the music (Option 3).",
+      "options": [
+        "The plot",
+        "The action scenes",
+        "The music",
+        "The cinema seats"
+      ],
+      "vocab": [
+        "hard to understand",
+        "the greatest / the best",
+        "visuals / video images"
+      ],
+      "distractors": {
+        "1": "The man thought the movie's plot was ordinary and predictable.",
+        "2": "The action scenes were rated as decent, but the background music aspect was what impressed him the most.",
+        "4": "Cinema seats are merely facilities of the movie theater building, not a part of the film work itself."
+      }
+    },
+    "jlpt-n4-m2-03": {
+      "situationEn": "A woman tells her office friend about her trip to Kyoto.",
+      "scriptEn": "Man: How was your vacation to Kyoto? Were you able to visit both Kinkakuji and Kiyomizudera?\nWoman: I was able to go to Kiyomizudera, but I ran out of time for Kinkakuji, so I couldn't go.\nMan: Oh, I see. What about Fushimi Inari?\nWoman: Since I went to Fushimi Inari very early in the morning, I was able to enjoy it at a leisurely pace. It was beautiful!",
+      "questionEn": "Which place did the woman NOT manage to visit?",
+      "explainEn": "The woman states clearly: \"きんかくじは じかんが なくなって いけなかったの\" (I ran out of time for Kinkakuji, so I couldn't go). Meanwhile, she managed to visit Kiyomizudera and Fushimi Inari. Therefore, the place she failed to visit is Kinkakuji (Option 4).",
+      "options": [
+        "Kiyomizudera Temple",
+        "All places were visited",
+        "Fushimi Inari Shrine",
+        "Kinkakuji Golden Pavilion"
+      ],
+      "vocab": [
+        "both",
+        "run out of time",
+        "leisurely / slowly"
+      ],
+      "distractors": {
+        "1": "Kiyomizudera Temple was visited earliest in the morning.",
+        "2": "The woman ran out of time, so some temples had to be cancelled.",
+        "3": "Fushimi Inari Shrine was visited during the daytime."
+      }
+    },
+    "jlpt-n4-m2-04": {
+      "situationEn": "An international student talks to their teacher about the hardest part of learning Japanese.",
+      "scriptEn": "Teacher: John-san, how is your Japanese study going?\nJohn: Grammar and conversation are fun, but memorizing kanji is indeed the hardest part.\nTeacher: I see. How about listening (choukai)?\nJohn: Because I often watch anime, I don't have much trouble with listening.",
+      "questionEn": "What does John find the most difficult?",
+      "explainEn": "John explicitly states: \"かんじを おぼえるのが いちばん たいへんです\" (Memorizing kanji is the most difficult). Grammar and conversation are considered fun, and listening is not difficult for him because he often watches anime. Therefore, the most difficult thing is memorizing kanji (Option 3).",
+      "options": [
+        "Grammar",
+        "Conversation (speaking)",
+        "Memorizing Kanji",
+        "Listening (choukai)"
+      ],
+      "vocab": [
+        "to memorize / to remember",
+        "heavy / difficult / troublesome",
+        "to have difficulty"
+      ],
+      "distractors": {
+        "1": "John finds Japanese grammar interesting and it doesn't give him too much trouble.",
+        "2": "Conversation (kaiwa) is the skill John enjoys the most and practices frequently.",
+        "4": "Listening is indeed challenging, but memorizing kanji is considered the hardest."
+      }
+    },
+    "jlpt-n4-m3-01": {
+      "situationEn": "You are at your part-time job and feel feverish, so you want to ask to go home early.",
+      "scriptEn": "Because you are not feeling well, you want to go home early. What do you say to the manager?",
+      "questionEn": "How do you ask the manager for permission to go home?",
+      "explainEn": "The polite pattern for asking permission is \"～ても いいですか\" (May I ...). Option 1 tells someone else to go home, and Option 3 sounds like an order. Therefore, the correct expression is Option 2.",
+      "options": [
+        "Kyou wa mou kaette kudasai. (Please go home now for today.)",
+        "Kibun ga warui node, hayaku kaette mo ii desu ka. (Since I am not feeling well, may I go home early?)",
+        "Kyou wa kaeranakereba narimasen yo. (You must go home today.)"
+      ],
+      "vocab": [
+        "to feel unwell",
+        "may I ... (permission)",
+        "faster / earlier"
+      ],
+      "distractors": {
+        "1": "This sentence tells a superior to go home, rather than asking permission for oneself.",
+        "3": "A very impolite, demanding-toned sentence used toward a superior or manager."
+      }
+    },
+    "jlpt-n4-m3-02": {
+      "situationEn": "A friend invites you to the cinema tonight, but you already have other plans.",
+      "scriptEn": "You are invited to watch a movie tonight, but you have other business. How do you decline politely?",
+      "questionEn": "How do you decline an invitation politely?",
+      "explainEn": "In Japanese etiquette, declining an invitation is not done directly. The most appropriate polite expression is \"ちょっと つごうが わるくて...\" (Chotto tsugou ga warukute... - The situation is a bit inconvenient for me...). Options 1 & 3 are very rude.",
+      "options": [
+        "Eiga wa daikirai desu. (I hate movies.)",
+        "Konban wa chotto tsugou ga warukute... (Tonight is a bit inconvenient for me...)",
+        "Zettai ni ikitaku arimasen. (I absolutely do not want to go.)"
+      ],
+      "vocab": [
+        "condition/schedule is inconvenient",
+        "to invite",
+        "to decline"
+      ],
+      "distractors": {
+        "1": "Too rude and blunt for declining a colleague's invitation.",
+        "3": "Highly confrontational and violates conversational politeness in Japanese culture."
+      }
+    },
+    "jlpt-n4-m3-03": {
+      "situationEn": "Your boss at the office treats you to dinner at a restaurant after overtime ends.",
+      "scriptEn": "You are treated to a meal by your boss. When leaving the restaurant, what do you say?",
+      "questionEn": "When leaving the shop, what do you say to your boss?",
+      "explainEn": "After finishing a meal and being treated by someone, the mandatory phrase is \"ごちそうさまでした\" (Gochisousama deshita) accompanied by \"ありがとうございました\" (Thank you). \"Itadakimasu\" is said BEFORE eating.",
+      "options": [
+        "Gochisousama deshita. Arigatou gozaimashita. (Thank you for the meal.)",
+        "Itadakimasu. (Let's eat / Thank you for the meal - before eating.)",
+        "Onegai shimasu. (Please do.)"
+      ],
+      "vocab": [
+        "to be treated to a meal by someone",
+        "office boss",
+        "thank you for the meal (after eating)"
+      ],
+      "distractors": {
+        "2": "\"いただきます\" is said before starting to eat, not when finishing and leaving the restaurant.",
+        "3": "\"おねがいします\" is a request for a favor, not an expression of appreciation for a treat."
+      }
+    },
+    "jlpt-n4-m4-01": {
+      "situationEn": "A colleague sees you carrying many thick document boxes.",
+      "scriptEn": "Man: That luggage looks heavy. Shall I help you carry it?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "When someone offers help (\"～ましょうか\"), the polite way to accept is \"すみません、おねがいします\" (Sumimasen, onegai shimasu). Option 2 is unnatural, and Option 3 is a response to thanks.",
+      "options": [
+        "Sumimasen, onegai shimasu. (Excuse me, please help me.)",
+        "Iie, mochimasen. (No, I am not carrying anything.)",
+        "Dou itashimashite. (You're welcome.)"
+      ],
+      "vocab": [
+        "looks heavy",
+        "to carry / to hold",
+        "please help / I would appreciate your help"
+      ],
+      "distractors": {
+        "2": "Stiffly and unnaturally declining an offer of help in Japanese etiquette.",
+        "3": "\"どういたしまして\" is used to reply to expressions of gratitude, not offers of help."
+      }
+    },
+    "jlpt-n4-m4-02": {
+      "situationEn": "A colleague asks to confirm what time the board meeting starts tomorrow morning.",
+      "scriptEn": "Woman: What time does the meeting start tomorrow?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "Questions ending in \"～だっけ\" ask for confirmation of something forgotten (\"なんじから\" - from what time). The answer stating the time is \"10じからだよ\" (It starts from 10 - Option 3). Option 2 answers the location.",
+      "options": [
+        "Kinou datta yo. (It was yesterday.)",
+        "Kaigishitsu da yo. (It is in the meeting room.)",
+        "Juuji kara da yo. (It starts from 10.)"
+      ],
+      "vocab": [
+        "meeting",
+        "... right? (confirming something forgotten)"
+      ],
+      "distractors": {
+        "1": "\"きのうだったよ\" refers to the past day yesterday, whereas the meeting is scheduled for today.",
+        "2": "\"かいぎしつだよ\" answers the place (where), not what time the meeting starts."
+      }
+    },
+    "jlpt-n4-m4-03": {
+      "situationEn": "The host offers another cup of coffee to a visiting guest.",
+      "scriptEn": "Woman: Would you like another cup of coffee?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The polite offer \"いかがですか\" (Would you like ...?) if you want to decline politely is said as \"いいえ、けっこうです\" (Iie, kekkou desu - No thank you, that is enough - Option 2).",
+      "options": [
+        "Hai, ippai desu. (Yes, it is full.)",
+        "Iie, kekkou desu. Mou onaka ippai desu kara. (No, thank you, that is enough. Because I am already full.)",
+        "Gochisousama deshita. (Thank you for the meal.)"
+      ],
+      "vocab": [
+        "one more cup",
+        "how about ... (polite offer)",
+        "that is enough"
+      ],
+      "distractors": {
+        "1": "\"はい、いっぱいです\" is ambiguous and impolite for declining an offer of a drink refill.",
+        "3": "\"ごちそうさまでした\" is used when taking leave after a meal, not for responding to a drink offer."
+      }
+    },
+    "jlpt-n4-m4-04": {
+      "situationEn": "Someone on the street greets you and asks for directions to the nearest station.",
+      "scriptEn": "Man: Excuse me, could you tell me the way to the station?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The polite request for help \"～て いただけませんか\" (Could you please...) is responded to with directions: \"ええ、あの しんごうを みぎに まがってください\" (Yes, please turn right at that traffic light - Option 1).",
+      "options": [
+        "Ee, ano shingou o migi ni magatte kudasai. (Yes, please turn right at that traffic light.)",
+        "Hai, oshiemashita. (Yes, I have told you.)",
+        "Iie, wakarimasen. (No, I don't understand.)"
+      ],
+      "vocab": [
+        "road / street",
+        "would you be kind enough to help ... (very polite)",
+        "traffic light",
+        "turn"
+      ],
+      "distractors": {
+        "2": "\"はい、おしえました\" is in the past tense (already informed), failing to answer the present question.",
+        "3": "\"いいえ、わかりません\" is too stiff and uninformative for giving directions."
+      }
+    },
+    "jlpt-n3-m1-01": {
+      "situationEn": "At the office, a section chief is giving instructions for afternoon meeting preparations to a female staff member.",
+      "scriptEn": "Section Chief: Suzuki-san, regarding this afternoon's meeting, could you book Meeting Room B and print 15 copies of the materials?\nWoman: Certainly, I already booked Meeting Room B this morning. However, for the materials, since 3 interns are also joining, 15 copies might not be enough.\nSection Chief: Oh, you're right. In that case, please print 20 copies including extras. Do we need to prepare a projector as well?\nWoman: No need, it is already scheduled that Sato-san will bring the projector directly from the previous meeting.",
+      "questionEn": "What will the woman do after this?",
+      "explainEn": "Meeting Room B was already booked this morning (\"今朝もう予約しておきました\"), and the projector will be brought by Sato-san. Regarding the number of printed materials, the initial proposal of 15 copies was revised by the section chief after hearing about the additional interns: \"じゃあ予備も含めて20部頼むよ\" (Then please print 20 copies including extras). Therefore, the task the woman will perform next is printing 20 copies of the materials (Option 2).",
+      "options": [
+        "Printing 15 copies of materials",
+        "Printing 20 copies of materials",
+        "Booking Meeting Room B",
+        "Preparing the projector"
+      ],
+      "vocab": [
+        "to print (documents)",
+        "reserve / extra",
+        "to include / to insert",
+        "it is already scheduled / agreed that ..."
+      ],
+      "distractors": {}
+    },
+    "jlpt-n3-m1-02": {
+      "situationEn": "A male student is talking to a receptionist at the university library counter.",
+      "scriptEn": "Student: Excuse me, I would like to return this history book, and can this special dictionary be extended for another week?\nReceptionist: Let me check. Oh, because there is a waiting list for this dictionary, it cannot be extended. By the way, the return deadline for the economics magazine you are borrowing is tomorrow, is that okay?\nStudent: Yes, I will bring the magazine tomorrow. I still want to use the dictionary, what should I do?\nReceptionist: After returning it today, please fill out and submit the application form over there; once your turn comes, we will notify you via email.",
+      "questionEn": "After returning the book, what will the male student do immediately?",
+      "explainEn": "The special dictionary cannot be extended because there is a queue of other borrowers. When the student asks how he can still use it, the staff directs him: \"いったん今日ご返却いただいたうえで、あちらの申込用紙に記入して出してくだされば...\" (After returning it today, please fill out and submit the application form over there). So the action he will take immediately after returning the book is to fill out and submit the form (Option 4).",
+      "options": [
+        "Extending the loan period of the special dictionary",
+        "Going home to get the economics magazine",
+        "Borrowing the history book again",
+        "Filling out and submitting the waiting list application form"
+      ],
+      "vocab": [
+        "extension (time/loan period)",
+        "return date",
+        "application form",
+        "once / as soon as ..."
+      ],
+      "distractors": {}
+    },
+    "jlpt-n3-m2-01": {
+      "situationEn": "A pair of coworkers are chatting during a break about the man's new apartment.",
+      "scriptEn": "Woman: Takahashi-san, I heard you moved last month? Even though your previous apartment was near the station and you liked it, did the rent go up?\nMan: No, the rent is the same, and since it's a 5-minute walk to the station, it's actually very practical for commuting.\nWoman: In that case, is it because the building is old and the room is narrow?\nMan: I knew the building was old from the beginning, so that wasn't an issue. Actually, the road in front of the apartment has become a shortcut for large trucks at night, so I've been waking up in the middle of the night for days.",
+      "questionEn": "What is the main reason the man moved house?",
+      "explainEn": "The man dismisses the assumptions about rent increases, distance to the station, or the age of the building. At the end of the dialogue, he reveals the real reason with the keyword \"実は\" (actually): \"前の道路が夜間の大型トラックの抜け道になっちゃって、夜中に目が覚める日が続いたんだ\" (The road in front became a shortcut for large trucks at night, so I kept waking up in the middle of the night). So the main reason is the noise of vehicles at night (Option 1).",
+      "options": [
+        "Because the noise of vehicles at night makes it impossible to sleep soundly",
+        "Because the apartment rent increased",
+        "Because it is far from the station and impractical for commuting",
+        "Because the building is old and uncomfortable to live in"
+      ],
+      "vocab": [
+        "house/apartment rent",
+        "commuting to work",
+        "nighttime",
+        "shortcut / alternative route"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n3-m2-02": {
+      "situationEn": "Two members of the university photography club are discussing the schedule for a weekend photo shoot activity.",
+      "scriptEn": "Man: The photo shoot in Kamakura is planned to meet at the station this Saturday at 8 AM, right? After checking the weather forecast, it says there will be heavy rain on Saturday morning.\nWoman: Oh, really? In that case, shall we move it to Saturday afternoon? They say the rain will stop starting in the afternoon.\nMan: Hmm, the temple visit is only until 4 PM, so if we leave in the afternoon, it feels like we won't have time to take pictures. Sunday is sunny all day, you know.\nWoman: Many members have part-time jobs on Sunday afternoon, but if we meet at 7:30 AM and go around in the morning, it seems everyone can join. Let's do that!",
+      "questionEn": "When will the photo shoot activity be held?",
+      "explainEn": "The initial schedule of Saturday at 08:00 is canceled due to heavy rain, and the Saturday afternoon option is rejected because the temple closes at 16:00. Because many members work part-time on Sunday afternoon, the woman proposes: \"日曜日の...朝7時半集合にして午前中に回るなら全員参加できそうね。そうしよう！\" (Let's meet at 7:30 AM on Sunday). So the final schedule is Sunday at 07:30 AM (Option 3).",
+      "options": [
+        "Saturday at 08:00 AM",
+        "Saturday afternoon",
+        "Sunday at 07:30 AM",
+        "Sunday afternoon"
+      ],
+      "vocab": [
+        "group photo shoot activity",
+        "to shift (schedule/time)",
+        "to stop / to cease (rain/wind)",
+        "a visit to see a temple"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n3-m3-01": {
+      "situationEn": "In the faculty office, a student explains the trouble with a broken laptop just before the report submission deadline this afternoon.",
+      "scriptEn": "Professor: Hayashi-kun, the seminar report deadline is today at 5 PM. Is it ready to be submitted?\nStudent: Um, Professor, actually my laptop suddenly died last night and it is currently being repaired.\nProfessor: Oh, that's troublesome. Is the data safe?\nStudent: Yes, the repair is scheduled to be finished tomorrow morning and I will get the laptop back.",
+      "questionEn": "What should the student say to the professor to ask for permission after this?",
+      "explainEn": "To ask for a deadline extension from a professor (academic superior), the appropriate polite pattern is an apology \"申し訳ありませんが\" followed by a request for permission \"～てもよろしいでしょうか\" (May I...?). Option 1 is incorrect as it asks the professor to do the submitting, while Option 3 uses '～させてあげます', which sounds condescending to the listener.",
+      "options": [
+        "Excuse me, could you please submit the report tomorrow afternoon?",
+        "I am very sorry, would it be permissible if I submitted it tomorrow afternoon?",
+        "If your laptop is fixed, I will allow you to submit it tomorrow afternoon."
+      ],
+      "vocab": [
+        "deadline",
+        "to hand over for repair/servicing",
+        "to submit / to hand in documents",
+        "would it be permissible if... (polite request)"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n3-m3-02": {
+      "situationEn": "In the office building lobby, a female staff member sees her section chief about to lift a stack of brochure boxes by himself.",
+      "scriptEn": "Woman: Section Chief, are those brochure boxes being taken to the 3rd-floor hall?\nSection Chief: Yes, as it happens, the elevator is currently stopped for routine inspection, so I have to take them up the stairs.\nWoman: There are 4 boxes in total, right? I still have about 20 minutes before my shift at the reception desk.",
+      "questionEn": "What should the woman say to the section chief to offer help after this?",
+      "explainEn": "To offer help politely to a superior (謙譲語 / kenjougo), Japanese uses the pattern \"お + masu-stem + しましょうか\" accompanied by the softening expression \"よろしければ\" (If you don't mind). Therefore, \"よろしければ、半分お持ちしましょうか\" (Option 3) is the most appropriate and polite expression.",
+      "options": [
+        "Sir, the stairs are heavy, you should just take the elevator.",
+        "Since I have time, would you like me to carry half of them?",
+        "If you don't mind, shall I carry half of them for you?"
+      ],
+      "vocab": [
+        "under inspection/maintenance",
+        "to offer oneself / to propose",
+        "shall I carry it for you? (humble/polite offer)",
+        "if you don't mind / if it is okay"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n3-m4-01": {
+      "situationEn": "A colleague praises the clarity of the charts in the presentation you just gave.",
+      "scriptEn": "Woman: The charts in the presentation just now were very easy to see. The preparation must have been tough, right?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The colleague appreciates the presentation charts and empathizes with the hard work of preparation (\"大変だったでしょう？\"). The most natural response at the N3 level is to express gratitude accompanied by the expression of relief \"～た甲斐があった\" (the hard work paid off / it was worth it) in Option 1.",
+      "options": [
+        "Thank you. It feels like it was worth staying up all night to redo it.",
+        "Yes, from now on I plan to make the charts.",
+        "No, I have no idea at all whether they were easy to see or not."
+      ],
+      "vocab": [
+        "presentation",
+        "easy to see / clearly readable",
+        "to redo / to revise",
+        "it was worth it / the effort was not in vain"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n3-m4-02": {
+      "situationEn": "A travel companion panics looking at the clock because the express train will depart in 5 minutes.",
+      "scriptEn": "Man: Oh no! The express train leaves in five minutes. If we don't run, won't we miss it?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The friend is worried about not catching the express train departing in 5 minutes (\"走らないと間に合わないんじゃない？\"). Reassuring the friend that the next rapid train (快速) has a similar arrival time (Option 2) is a coherent and logical conversational response.",
+      "options": [
+        "Thank goodness, even though we walked slowly, we made it in time.",
+        "Don't worry, even if we take the next rapid train, the arrival time is almost the same.",
+        "Yes, the train already left 5 minutes ago."
+      ],
+      "vocab": [
+        "in ... more time",
+        "to make it in time / on time",
+        "arrival time",
+        "hardly ... / almost not ..."
+      ],
+      "distractors": {}
+    },
+    "jlpt-n2-m1-01": {
+      "situationEn": "A division manager is checking a price quotation draft with a female staff member.",
+      "scriptEn": "Division Manager: I have checked the quotation for Aoba Shouji. The unit price and delivery deadline are fine, and the shipping discount is correctly reflected.\nWoman: Thank you. May I convert it to PDF as it is and send it via email to the client?\nDivision Manager: Wait a moment. The change of maintenance fees to a monthly plan requested by the client over the phone yesterday is still written as annual, and the tax-inclusive price note is also missing.\nWoman: Ah, I apologize! I will fix it immediately and show it to you once more. The postal delivery of the original document will be next week, right?",
+      "questionEn": "What must the woman do first after this?",
+      "explainEn": "The division manager holds back the email because he found two flaws in the draft: \"保守費用の月額プランへの変更がまだ年額のままだし、税込表記も抜けているよ\" (The maintenance fee is still written as annual and the tax-inclusive note is missing). The woman agrees to fix it immediately first (\"すぐ直してもう一度お見せします\"). Therefore, her first step is to revise the maintenance fee details and the tax note (Option 3).",
+      "options": [
+        "Convert the quotation to PDF and send it via email to the client",
+        "Include the shipping discount in the quotation",
+        "Fix the maintenance fee details and the tax-inclusive note",
+        "Send the original quotation document by mail"
+      ],
+      "vocab": [
+        "price quotation",
+        "delivery deadline",
+        "maintenance fee",
+        "missed / left out (data/writing)"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n2-m1-02": {
+      "situationEn": "In the online store customer service division, a female staff member reports a customer complaint to the section chief.",
+      "scriptEn": "Woman: Section Chief, there was just a call from a customer, saying that one plate from the tableware set that arrived yesterday is cracked. She wants to use it for her wedding anniversary tomorrow.\nSection Chief: I see. If we wait for the return of the defective item according to the manual, it won't make it in time for tomorrow. Is there still stock of the same set in the warehouse?\nWoman: Yes, when I checked earlier, there were 3 sets left. Should we offer a refund?\nSection Chief: No, if she wants to use it for her anniversary, let's arrange for a replacement to be sent today via express courier. Include a cash-on-delivery return slip in the box, and once the arrangements are done, call the customer immediately to provide the tracking number.",
+      "questionEn": "After speaking with the section chief, what does the woman do first?",
+      "explainEn": "Stock has been confirmed available, and the refund option was rejected. The section chief instructed a clear work sequence: arrange the express delivery of the replacement along with the return slip first (\"代替品を今日中に至急便で手配しよう。箱に返送用の着払い伝票を同封して\"), and only after that is done, call the customer (\"手配が済み次第...\"). Therefore, the first action is to arrange the express courier for the replacement (Option 1).",
+      "options": [
+        "Arranging express delivery of replacement items accompanied by a return slip",
+        "Going to the warehouse to check the stock quantity",
+        "Waiting for cracked tableware to be sent back by the customer",
+        "Calling the customer to guide them through the refund procedure"
+      ],
+      "vocab": [
+        "cracked (ceramic/glass)",
+        "replacement item",
+        "cash-on-delivery shipping slip",
+        "to enclose together in a package/envelope"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n2-m2-01": {
+      "situationEn": "Two marketing staff members are analyzing consumer survey results for a new herbal drink product.",
+      "scriptEn": "Man: The questionnaire results for the ginger herbal drink launched last month are all in. Even though the initial sales were good, the second and subsequent purchase rates are stagnant, aren't they?\nWoman: Could it be that the ginger flavor is too sharp, causing consumer tastes to be divided? The price is also slightly higher compared to other companies.\nMan: Actually, regarding the taste, more than 80% answered 'refreshing and easy to drink', and the price was considered reasonable for being additive-free. The packaging was also praised for being stylish.\nWoman: Oh really? Ah, try looking at the free comment section. Many voices highlight that 'The glass bottle is heavy to put in a work bag, and on top of that, it's confusing to dispose of'.",
+      "questionEn": "What is the main cause of the stagnant repeat purchase rate for the new product?",
+      "explainEn": "Taste, price, and visual appearance all received positive ratings. The cause of low repeat purchases was revealed in the free comment section: \"通勤かばんに入れるにはガラス瓶が重いうえに、捨てる場所にも困る\" (The glass bottle is heavy to carry in a work bag and it is difficult to find a place to dispose of it). Therefore, the main cause is the impracticality of the glass bottle container (Option 4).",
+      "options": [
+        "The ginger flavor is too stinging, making it difficult to drink",
+        "The price is too expensive compared to the quality",
+        "The packaging design is not eye-catching",
+        "The container is heavy and impractical to carry or dispose of"
+      ],
+      "vocab": [
+        "stagnant / growth is stalled",
+        "without preservatives/additives",
+        "reasonable / fair / sensible",
+        "besides ... on top of that ..."
+      ],
+      "distractors": {}
+    },
+    "jlpt-n2-m2-02": {
+      "situationEn": "A professor and a graduate student are choosing a guest speaker for an environmental symposium at the university.",
+      "scriptEn": "Student: Professor, for next month's environmental symposium keynote lecture, how about economist Mr. Murata, who often appears as a TV commentator? I think he could attract many participants.\nProfessor: Hmm, this time, 90% of the quota is already filled by registrations from partner universities, so there is no need to gather people through popularity.\nStudent: I see. In that case, rather than a researcher of cutting-edge theory, would it be better to have a practitioner who has built a resource recycling system directly in the field of local government?\nProfessor: Correct. In last year's survey, the most requested thing from undergraduate students was 'wanting to hear about concrete trials and errors in the field rather than abstract discussions', so let's choose that direction.",
+      "questionEn": "What is the main priority for the professor in choosing the lecture speaker?",
+      "explainEn": "The professor rejects the media fame factor because the quota is almost full, and avoids abstract theoretical discussions. He agrees with the proposal to invite a field practitioner because students want to hear \"抽象的な議論より現場の具体的な試行錯誤を聞きたい\" (concrete experiences in the field rather than abstract discussions). Therefore, the main criterion is real practical experience in the field (Option 2).",
+      "options": [
+        "Has high fame in the media so is able to attract an audience",
+        "Able to share concrete experiences regarding real-world application in the field",
+        "Able to explain cutting-edge economic theory academically and in-depth",
+        "Already known to students as a lecturer from a partner university"
+      ],
+      "vocab": [
+        "attracting the number of visitors/participants",
+        "level of popularity / fame",
+        "field practitioner",
+        "trial and error"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n2-m3-01": {
+      "situationEn": "A sales staff member consults with the division head before responding to a request for an additional price discount from a business partner.",
+      "scriptEn": "Man: Division Head, the client is exploring whether it is possible to get an additional 10% discount on the condition of a large-volume order.\nDivision Head: Hmm, this quarter the cost of raw materials is also rising, so further price reductions are very difficult.\nMan: That's true, sir. However, if it is in the form of providing initial operation training free of charge, it seems we can accommodate that.\nDivision Head: Good, include that alternative proposal and decline politely so as not to offend them.",
+      "questionEn": "After this, what business expression will the man convey to the business partner?",
+      "explainEn": "In N2-level Japanese business correspondence/negotiation, a soft refusal uses the cushion phrase \"恐れ入りますが\" followed by the humble form \"～いたしかねます\" (we cannot do...), then closes with a polite alternative solution \"無償でご提供いたします\" (Option 1).",
+      "options": [
+        "I apologize, we cannot provide further price discounts; instead, we will provide initial training at no cost.",
+        "I apologize for not meeting your expectations, instead we kindly accept initial training for free for you.",
+        "Because raw material costs are rising, if you want a discount, how about ordering from another company?"
+      ],
+      "vocab": [
+        "exploration / asking about possibility",
+        "offending / causing friction",
+        "I apologize but we cannot ... (polite business refusal)",
+        "free of charge / at no cost"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n2-m3-02": {
+      "situationEn": "Two clinic nurses are discussing a new shift scheduling trial rule before the staff meeting begins.",
+      "scriptEn": "Man: The new shift system that will be tested starting next month, because the entry time can be chosen from 3 patterns, it will be practical, right?\nWoman: The increase in the range of time options is indeed something to be grateful for, but the shift schedule is only released 3 days before the workday, you know...\nMan: Oh right, all this time it was released 2 weeks before, right?\nWoman: Correct. Staff who have to pick up children at daycare or attend night classes cannot arrange their schedules, so specifically for that part, I intend to ask for improvements at today's meeting.",
+      "questionEn": "What is the main point the woman wants to voice at today's meeting?",
+      "explainEn": "The woman welcomes the flexibility of working hours, but takes issue with the schedule announcement being too sudden: \"確定したシフト表が出るのが勤務日の3日前っていうのがねえ……そこだけは今日の会議で改善を求めようと思ってるの\". Therefore, what she wants to fight for in the meeting is the acceleration of the shift schedule announcement time (Option 3).",
+      "options": [
+        "Requesting that the 3-pattern work entry time system be canceled",
+        "Requesting that staff who are raising children be exempted from night shifts",
+        "Requesting that the determination and announcement of shift schedules be done earlier"
+      ],
+      "vocab": [
+        "pilot trial",
+        "choice / option",
+        "arranging a plan/schedule",
+        "voicing / filing an objection"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n2-m4-01": {
+      "situationEn": "The section chief is surprised why Yamada has not followed the new procedure announced yesterday.",
+      "scriptEn": "Section Chief: Regarding the regulation revision this time, since it was announced to all staff yesterday, it's impossible that Yamada-san doesn't know, right?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The N2 double negative pattern \"知らないはずがない\" means \"it is impossible not to know\" (should definitely know). Providing a logical reason why Yamada might not know—namely, being on an out-of-town business trip since yesterday (Option 2)—is the most appropriate response.",
+      "options": [
+        "Yes, it is true that Yamada-san does not know.",
+        "Ah, Yamada-san has been on an out-of-town business trip since yesterday, so he might not have had time to open his email.",
+        "Okay, it is agreed that it was not announced to everyone yesterday."
+      ],
+      "vocab": [
+        "regulation/rule revision",
+        "addressed to ...",
+        "cannot not ... / definitely ...",
+        "currently on a business trip"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n2-m4-02": {
+      "situationEn": "A business partner from another company responds via phone to a proposed meeting schedule for Wednesday.",
+      "scriptEn": "Woman: Regarding next week's meeting, unfortunately my schedule is packed all day on Wednesday...",
+      "questionEn": "What is the appropriate way to respond?",
+      "explainEn": "The adverb \"あいにく\" (unfortunately) and the trailing clause \"終日予定が立て込んでおりまして……\" (schedule is packed all day...) represent a typical indirect schedule refusal in Japanese business. The correct response is to acknowledge it (\"左様ですか\") and then offer an alternative day such as Thursday afternoon (Option 1).",
+      "options": [
+        "I see. In that case, how does your schedule look on Thursday afternoon?",
+        "Thank you. Then I will visit on Wednesday at 14:00.",
+        "Oh I see. I'm glad to hear you are free all day on Wednesday."
+      ],
+      "vocab": [
+        "unfortunately / unluckily",
+        "all day",
+        "busy / packed with tasks (schedule/work)",
+        "availability / condition (polite)"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n1-m1-01": {
+      "situationEn": "A product manager reports the results of server load testing ahead of a new app launch to the division head.",
+      "scriptEn": "Man: Division Head, regarding the payment app scheduled for release next week, the legal review and security audit have passed smoothly. However, load testing revealed response delay symptoms when concurrent connections exceeded 50,000 users...\nDivision Head: Hmmm, postponing the release date itself at this stage touches upon our external credibility. Can't the load be reduced if early registration is shifted to a phased invitation system?\nMan: Understood, in that case the system can operate stably while waiting for server capacity expansion. However, a terminology inconsistency was also found in the user guide video narration.\nDivision Head: Fixing the video tomorrow will still be in time. Hold off on sending out the press release for now, and first consult with the development person in charge to build an upper limit for the invitation system registration.",
+      "questionEn": "What is the highest priority task the man will undertake right after this?",
+      "explainEn": "The division head refuses to postpone the launch date, asks for the press release to be temporarily suspended (\"いったん見合わせて\"), and postpones the video revision to tomorrow. His primary priority instruction is strict: \"まずは開発責任者と協議して招待制の登録上限をシステムに組み込んでくれ\" (First, consult with the development lead to incorporate the registration upper limit for the invitation system into the system). Therefore, the answer is Option 4.",
+      "options": [
+        "Ask the legal division to review the terms of service",
+        "Distribute a press release announcing the postponement of the launch date",
+        "Re-record the guide video narration today as well",
+        "Consult with the chief developer to implement registration limit settings"
+      ],
+      "vocab": [
+        "load testing",
+        "concerns / seriously impacts ...",
+        "suspend / hold temporarily",
+        "embed / integrate into the system"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n1-m1-02": {
+      "situationEn": "A female doctoral student consults with her academic advisor regarding her draft dissertation manuscript.",
+      "scriptEn": "Student: Professor, regarding the dissertation draft on dialect shifts I submitted the other day, is an additional field survey necessary?\nProf: I have read it thoroughly. Its literature review mapping is flawless and the sample size is sufficient, so an additional survey is not needed. However, in the current tabulation, people in their 20s to 40s are grouped together, and as a result, subtle intergenerational changes are obscured.\nStudent: I see. In that case, before rewriting the conclusions of Chapter 4, what if I re-tabulate the existing recorded data by 10-year age brackets and send you the cross-tabulation table?\nProf: Yes, without looking at those figures, the direction of the conclusion cannot be determined yet. Please work on that first.",
+      "questionEn": "What will the student do first right after this?",
+      "explainEn": "The professor praises the literature review (\"申し分ない\") and states that an additional survey is unnecessary (\"追加調査には及ばない\"). However, he points out that the age grouping of 20–40 years old is too broad. The student proposes re-tabulating the existing data by 10-year brackets before rewriting Chapter 4, and the professor agrees: \"まずはそれを頼むよ\". Therefore, the first step is to re-tabulate the data by 10-year brackets (Option 2).",
+      "options": [
+        "Go to the field location to collect additional survey data",
+        "Re-tabulate existing data based on 10-year age groups",
+        "Rewrite the literature review section from scratch",
+        "Rewrite the conclusion section of Chapter 4 first and submit it"
+      ],
+      "vocab": [
+        "perfect / flawless",
+        "does not need to go as far as ...",
+        "combining/generalizing into a single group",
+        "without doing ..., one cannot ..."
+      ],
+      "distractors": {}
+    },
+    "jlpt-n1-m2-01": {
+      "situationEn": "Two industry analysts are discussing the financial performance of two regional logistics companies one year after their merger.",
+      "scriptEn": "Man: It has been a year since the management integration of the two major regional logistics companies, but the profit improvements expected at the beginning are not yet visible, are they? Is the consolidation of overlapping distribution depots running into trouble?\nWoman: No, the depot restructuring itself actually finished ahead of schedule, and the increase in fuel prices has largely been passed on to shippers.\nMan: Then, is it because a wave of resignations post-merger has caused labor costs to swell?\nWoman: The resignation rate is actually low. It's just that the inventory management systems of both former companies are still being operated separately, making double data entry routine in the field and overtime pay is pressing down on profits.",
+      "questionEn": "According to the woman, what is the biggest factor causing post-integration profits to stall?",
+      "explainEn": "The woman refutes the man's three hypotheses (depot closures, fuel prices, and the wave of resignations). She emphasizes the true root of the problem: \"旧両社の在庫管理システムがいまだに別々のまま運用されていて、現場でデータの二重入力が常態化し、残業代が利益を圧迫している\". Therefore, the main factor is that the management systems of both companies have not yet been integrated (Option 1).",
+      "options": [
+        "The management systems of the two former companies have not been unified, making fieldwork inefficient",
+        "The consolidation of overlapping shipping depots is severely behind schedule",
+        "Fuel cost increases have not yet been successfully passed on to freight rates",
+        "Many employees resigned post-merger, causing recruitment costs to soar"
+      ],
+      "vocab": [
+        "merger and elimination of organizational units",
+        "schedule brought forward ahead of plan",
+        "transferring cost increase burdens to the selling price",
+        "becoming chronic / an everyday habit"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n1-m2-02": {
+      "situationEn": "A female journalist interviews the head of the museum conservation division regarding a digital restoration project for ancient paintings.",
+      "scriptEn": "Woman: Recently, exhibitions vividly reproducing faded Edo-period screen paintings with high-resolution projection have become increasingly common; from a conservation standpoint, do you have any objections?\nDivision Head: No, I don't oppose digital restoration itself at all. That method prevents damage to original works that must not be exposed to strong light, and its research value is also great.\nWoman: In that case, does the technical reproduction accuracy still leave some issues?\nDivision Head: The technical standards are exceptionally high. However, what I am concerned about is that a restoration visualization based on only one of several hypotheses regarding colorants from that era is accepted by visitors as if it were the sole, definite historical form.",
+      "questionEn": "What is the division head's biggest concern regarding the digital restoration exhibition?",
+      "explainEn": "The division head supports the preservation benefits and technical quality of digital restoration, but emphasizes his concern through the key phrase \"ただ私が危惧しているのは\": visualizations based on only one hypothesis can be misunderstood by visitors as absolute historical facts (\"あたかも歴史的に確定した唯一の姿であるかのように...受け止められてしまうこと\"). Therefore, the answer is Option 3.",
+      "options": [
+        "Projection light can physically damage the original artwork",
+        "Current digital technology is not yet capable of adequately reproducing colors of the past",
+        "Hypothesis-based visualization risks being misunderstood as a single, absolute historical fact",
+        "The spotlight is focused only on visual effects, resulting in cuts to academic research budgets"
+      ],
+      "vocab": [
+        "fading in color",
+        "quality degradation / physical damage",
+        "worrying / concerning",
+        "as if / like ..."
+      ],
+      "distractors": {}
+    },
+    "jlpt-n1-m3-01": {
+      "situationEn": "Just before the meeting with the client begins, the junior staff realizes the figures in the printed booklet are still using provisional numbers.",
+      "scriptEn": "Man: Senior, this is bad! It turns out one part of the attachment graph in the booklet already distributed to the client is still printed with last week's provisional figures.\nWoman: Stay calm. The slides to be projected on the screen were updated to the final figures this morning, right?\nMan: Yes, the data on the screen uses the latest final figures. What should I do? Should I apologize for my mistake and take back the booklets?\nWoman: Don't. If you take them back, it will hinder the meeting. So, at the opening, I will make an elegant announcement and ask them to refer to the screen.",
+      "questionEn": "After this, how will the woman open the presentation to the client at the start of the meeting?",
+      "explainEn": "The woman decides not to collect the booklets to avoid disrupting the meeting, but instead to provide a professional correction at the start, directing the client to the official figures on the screen. Option 2 uses appropriate N1 keigo, is direct, maintains the team's authority, and clearly directs the client's attention (\"お手元の冊子付録の一部が暫定値となっておりますので、画面の確定値をご参照いただけますでしょうか\").",
+      "options": [
+        "Due to our junior staff's negligence, there are incorrect figures, so we ask to take back all the booklets.",
+        "Excuse me, since some of the booklet attachments in your hands are still provisional figures, would you mind referring to the final figures on the screen?",
+        "The figures in the booklet cannot be entirely called wrong, so please read them together with the slides."
+      ],
+      "vocab": [
+        "provisional figure",
+        "final figure",
+        "replace with a new version",
+        "make an announcement/apology at the beginning"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n1-m3-02": {
+      "situationEn": "Two urban planners discuss the city government's new policy regarding subsidies for the renovation of old, unoccupied buildings.",
+      "scriptEn": "Man: The renovation subsidy for vacant houses recently announced by the city government has doubled its ceiling, so won't the revitalization of traditional houses progress rapidly?\nWoman: The stance of expanding the budget scale is indeed commendable. However, if you read the application guidelines in detail, it is required to complete official stamps and letters of consent from all heirs scattered far away within 60 days.\nMan: Wow, the more complicated the ownership status of the vacant house, the more the document collection process will get stuck halfway, right?\nWoman: Exactly. As long as the procedural hurdles are not relaxed, no matter how much budget is poured in, it could end up just being beautiful on paper.",
+      "questionEn": "What is the main point the woman wants to convey regarding this subsidy program?",
+      "explainEn": "The woman appreciates the increase in the funding ceiling but criticizes the overly burdensome administrative requirements, concluding with the N1 proverb \"手続きのハードルを緩和しない限り、いくら予算を積んでも絵に描いた餅に終わりかねない\" (As long as procedural hurdles are not relaxed, no matter how much budget is allocated, it risks ending up as a pipe dream on paper). Thus, the point is the need for relaxing procedural requirements for the policy to be effective (Option 1).",
+      "options": [
+        "If the application procedure requirements are not realistically relaxed, the program's effectiveness will not increase.",
+        "The subsidy ceiling should be raised even higher to adjust to the surge in renovation costs.",
+        "Old houses with complicated inheritance status should not be renovated but demolished immediately."
+      ],
+      "vocab": [
+        "worthy of appreciation/positive evaluation",
+        "stuck / fail halfway",
+        "grand plan that is not realized (beautiful on paper)",
+        "risks / feared to end up badly ..."
+      ],
+      "distractors": {}
+    },
+    "jlpt-n1-m4-01": {
+      "situationEn": "The division head considers whether the tight deadline requested by the client is actually still feasible.",
+      "scriptEn": "Division Head: Regarding the delivery deadline proposed by the client, if we rearrange our personnel placement, isn't it actually not entirely impossible to meet?",
+      "questionEn": "What is the appropriate way to respond?",
+      "explainEn": "The N1 expression \"あながち無理な相談でもないんじゃないか\" is a litotes (softening negation) that has a positive meaning: \"it is actually quite possible to fulfill if we rearrange personnel.\" Thus, the appropriate response is to agree and propose support from other teams so the deadline can be met (Option 3).",
+      "options": [
+        "Yes, no matter how it is arranged, this time we are forced to refuse.",
+        "As you said, sir, if we reduce our staff, we can immediately refuse it.",
+        "That's right, sir. If we ask for help from the second development team, I think the time is quite sufficient."
+      ],
+      "vocab": [
+        "personnel placement / allocation",
+        "not necessarily / not entirely ...",
+        "forced to ...",
+        "ask for help/support"
+      ],
+      "distractors": {}
+    },
+    "jlpt-n1-m4-02": {
+      "situationEn": "A colleague complains about the multi-layered internal security approval flow that hinders the main work.",
+      "scriptEn": "Woman: Security measures are indeed better the more thorough they are, but if the approval flow is this complicated, isn't it a reversal of goals and means?",
+      "questionEn": "What is the appropriate response?",
+      "explainEn": "The speaker acknowledges the importance of security thoroughness (\"念を入れるに越したことはない\"), but criticizes the overly convoluted (\"煩雑\") approval procedure that is counter-productive (\"本末転倒\"). Option 2 captures this nuance precisely with the equivalent idiom \"元も子もない\" (everything becomes futile if field operations stop).",
+      "options": [
+        "That's very true, adding even more approval stages is indeed better.",
+        "It is true, if time is wasted on procedures until field work is paralyzed, everything becomes futile, right.",
+        "Correct, such security measures are indeed better not done at all from the start."
+      ],
+      "vocab": [
+        "certainly best / there is no harm if ...",
+        "complicated / convoluted (procedure)",
+        "reversal of main goal and means (counter-productive)",
+        "lose everything / become entirely futile"
+      ],
+      "distractors": {}
+    },
+    "jlpt-c2-m1-01": {
+      "situationEn": "The head of the legal division and the lead negotiator review the final draft of the joint research memorandum of understanding on the night before the signing ceremony.",
+      "scriptEn": "Woman: Division Head, while carefully examining the final version of the joint research MOU for tomorrow's signing ceremony, although the confidentiality and cost-sharing clauses are in accordance with the agreement, the partner side slipped in one sentence at the last minute about 'exclusive license rights over derivative patents'.\nDivision Head: What... If we swallow that clause whole, it could leave long-term problems for our future business expansion.\nWoman: That's right, sir. Should we just inform the partner's secretariat that tomorrow's signing ceremony is canceled and back to square one?\nDivision Head: Don't. If it breaks at this point, it will damage the relationship, and let the venue preparations remain on standby as scheduled. Immediately draft an additional clause that hands over ownership of derivative patents to separate good-faith negotiations within 90 days, then ask for a review from our patent consultant. Probing the partner side should only be done after the legal opinion comes out.",
+      "questionEn": "What will the woman do immediately after this conversation?",
+      "explainEn": "The division head rejects canceling the event (\"白紙に戻す\") as well as accepting the clause blindly (\"丸呑み\"). He sets a precise sequence of actions: \"付帯条項案を今すぐ起草して顧問弁理士に照会してくれ。先方への打診はその見解を得てからだ\" (Draft an additional clause right now and ask for the patent consultant's opinion; contacting the other party is done only after obtaining that view). Thus, the first action to be taken is Option 1.",
+      "options": [
+        "Drafting an additional clause and then consulting it with a patent consultant",
+        "Informing the partner side of the cancellation of tomorrow's signing ceremony",
+        "Reformulating the confidentiality clause and cost-sharing ratio from the beginning",
+        "Immediately calling the partner's secretariat to urge the removal of the derivative patent clause"
+      ],
+      "vocab": [
+        "last minute / most critical moment",
+        "leaving a source of problems/disputes in the future",
+        "canceling everything back to the starting point",
+        "designing / drafting legal text or official documents"
+      ],
+      "distractors": {}
+    },
+    "jlpt-c2-m1-02": {
+      "situationEn": "The editor-in-chief of an academic journal (professor) and the managing editor discuss a controversial manuscript that received conflicting evaluations from two reviewers.",
+      "scriptEn": "Man: Professor, regarding the peer review results of the incoming manuscript, while the first reviewer recommends acceptance, the second reviewer demands rejection because it is considered circular reasoning, and the author sent a sharply worded rebuttal letter. Should we just forward the rebuttal letter to the second reviewer?\nProfessor: Don't. If it turns into an emotional back-and-forth, it could end in an endless, pointless debate. However, rejecting a manuscript that contains original ideas at this stage is also very regrettable.\nMan: In that case, should we ask the author to do a major revision of the conclusion section first?\nProfessor: That should also be done after the situation is clear. First of all, ask for an objective view from a third editorial board member who is free of conflicts of interest, focusing specifically on one point: the validity of the analysis model.",
+      "questionEn": "Which handling step will the man take first after this?",
+      "explainEn": "The professor refuses to continue the rebuttal as a mere \"水掛け論に終始しかねない\" (endless argument without proof), refuses to dismiss the manuscript outright (\"門前払いにしてしまうのも惜しまれる\"), and postpones the request for revisions to the author. His first instruction is clear: \"まずは利害関係のない第三の編集委員に、分析モデル的妥当性一点に絞って客観的な所見を仰いでくれ\" (First, ask a neutral third-party editorial board member for an objective opinion, focusing solely on the validity of the analysis model) (Option 3).",
+      "options": [
+        "Forwarding the author's rebuttal letter as-is to the second reviewer",
+        "Sending a manuscript rejection letter to the author",
+        "Asking another editorial board member for their opinion regarding the validity of the analysis model",
+        "Asking the author to perform a comprehensive revision of the conclusion section"
+      ],
+      "vocab": [
+        "academic peer review",
+        "endless argument without decisive evidence",
+        "outright rejection at the door",
+        "to ask for an expert's view/opinion (honorific)"
+      ],
+      "distractors": {}
+    },
+    "jlpt-c2-m2-01": {
+      "situationEn": "In an in-depth discussion program, an interviewer asks an industrial sociologist about the impact of AI inspection systems in precision lens factories.",
+      "scriptEn": "Woman: It is said that after the AI visual inspection system was implemented in the precision lens production line, the inspection speed increased threefold. On the other hand, have problems like the loss of jobs for senior craftsmen emerged?\nProfessor: No, amidst labor shortages, they are absorbed through position rotation, so job loss is not an issue. The investment costs have even been recouped within two years.\nWoman: In that case, it seems to be a win-win for the field.\nProfessor: That is precisely where there is a blind spot that cannot be ignored. Previously, in the process of inspecting thousands of defective products daily by eye, young staff honed 'tacit knowledge' to catch subtle signs of distortion that are difficult to quantify. However, because all routine anomalies are now filtered directly by AI, a paradox has emerged where human resources capable of tracking root causes when new, unknown disturbances occur fail to grow.",
+      "questionEn": "What is the fundamental problem with the implementation of AI inspection highlighted by the professor?",
+      "explainEn": "The professor dismisses issues of unemployment and costs, then explains the \"見過ごせない盲点\" (crucial blind spot): because AI automatically filters all standard anomalies, the younger generation loses the daily training process to cultivate \"暗黙知\" (tacit knowledge) needed when tracking new, unexpected disturbances (Option 4).",
+      "options": [
+        "Experienced craftsmen lose their roles, triggering mass layoffs",
+        "Equipment investment costs are too heavy, making it difficult to reach the break-even point",
+        "AI misses subtle scratches, so the leakage of defective products actually increases",
+        "The experience of sorting daily defects is lost, so the intuition to handle unexpected anomalies fails to form"
+      ],
+      "vocab": [
+        "all good / purely advantageous",
+        "blind spot",
+        "tacit knowledge",
+        "paradox"
+      ],
+      "distractors": {}
+    },
+    "jlpt-c2-m2-02": {
+      "situationEn": "Two literary critics are reviewing a modern language adaptation of a Meiji-era psychological novel.",
+      "scriptEn": "Man: The modern translation edition of Meiji literature published last month seems to be selling well, especially among young readers. The dialogue sentences have been changed to contemporary spoken language so it can be read in one sitting; perhaps that is its appeal.\nWoman: Yes, in terms of lowering the threshold of difficulty and readability, it far surpasses others. There are no apparent errors in its historical background research; the translator's ability is unquestionable.\nMan: Wow, even though you praise it that much, your tone still sounds like you have some reservations.\nWoman: Hmm, because it over-polishes the winding expressions and punctuation pauses characteristic of the original text into modern sentences that are overly clear, I cannot help but feel that the protagonist's complex inner doubts and the lingering echoes of meaning between the lines have been eroded away.",
+      "questionEn": "What is the core of the dissatisfaction felt by the woman regarding this new translation edition?",
+      "explainEn": "The woman praises the ease of reading and the accuracy of historical research, but expresses the core of her objection through the N1/C2 patterns \"～あまり\" (too much) and \"気がしてならない\" (cannot help but feel): because it over-polishes the original sentences into clear modern language (\"明快な現代文に整えすぎたあまり\"), the protagonist's inner doubts and the lingering echoes of meaning are eroded away (\"主人公の屈折したためらいや行間の余韻までもが削ぎ落とされてしまった\"). Therefore, the answer is Option 2.",
+      "options": [
+        "The historical background research of that era is insufficient, leading to many mistranslations",
+        "Due to being over-polished into straightforward sentences, the psychological nuances and lingering echoes of the original text are eroded",
+        "The archaic language style is left as is, so it remains difficult for young readers to understand",
+        "Commercial promotion is over-emphasized, so the original theme of the work is misunderstood"
+      ],
+      "vocab": [
+        "far surpasses others / exceptionally prominent",
+        "speaking with hesitation / appearing to have reservations",
+        "lingering echo of feeling / nuance of meaning between the lines",
+        "to trim / to erode away"
+      ],
+      "distractors": {}
+    },
+    "jlpt-c2-m3-01": {
+      "situationEn": "An external advisor has just proposed opening branches in three countries at once; the division head whispers instructions to the planning team leader before he speaks.",
+      "scriptEn": "Division Head: The advisor just threw out a proposal for simultaneous expansion into three Asian countries, but the calculations for local regulations and cash flow are still too optimistic.\nWoman: That's right, sir. Moving simultaneously in three locations right now carries too high a risk. However, we want to avoid a way of speaking that undermines his authority.\nDivision Head: Yes. Express the highest respect for his long-term vision, while steering the meeting's conclusion to limit steps to a preliminary trial in one location first to ensure perfect readiness.",
+      "questionEn": "After this, how will the woman convey her response before the board meeting forum?",
+      "explainEn": "In accordance with the division head's instruction to maintain the advisor's dignity (\"顔をつぶすような言い方は避けたい\") while limiting steps to a one-location trial, Option 3 combines the peak C2 keigo \"大局的なご示唆に深謝いたします\" (sincere appreciation for macro insights) with an elegant diplomatic redirection \"万全を期すためにも、まずは1拠点での先行検証から着手してはいかがでしょうか\" (To ensure perfection, how about we start with a preliminary verification at one location first?).",
+      "options": [
+        "Your proposal is just theory on paper that ignores funding aspects, so it must be limited to one location.",
+        "Thank you for the insightful advice. We will immediately begin preparations for opening three locations at once.",
+        "We express our deep gratitude for such broad-minded strategic guidance. To ensure perfect readiness, how about we start with an initial verification at one location first?"
+      ],
+      "vocab": [
+        "to undermine authority / to cause someone to lose face",
+        "ensuring perfect readiness without gaps",
+        "to narrow down / focus the direction of discussion to a conclusion",
+        "to express deep gratitude (formal C2)"
+      ],
+      "distractors": {}
+    },
+    "jlpt-c2-m3-02": {
+      "situationEn": "Two management consultants discuss the trend of companies recording and opening all exploratory meeting chats to all employees.",
+      "scriptEn": "Man: Recently, more and more companies are adopting 'full transparency' by opening all internal meetings and chats in real-time to all employees. In the sense of eliminating closed-door politics, isn't that ideal?\nWoman: Opening the basis for final decision-making to fulfill accountability is indeed beyond debate. However, showing every single step up to the stage of raw, immature idea-tossing is something that needs to be questioned.\nMan: Wait, isn't the organizational atmosphere more open if the middle process is also visible?\nWoman: Just the opposite. Once every utterance is permanently recorded, anyone will shrink back for fear of their words being twisted, and end up only throwing out safe, flat comments.",
+      "questionEn": "Which statement best summarizes the core of the woman's argument?",
+      "explainEn": "The woman sharply distinguishes between the transparency of final decision results which is mandatory (\"論をまたない\" = indisputable) and extreme openness at the initial brainstorming stage (\"生煮えのたたき台\"), which actually makes members afraid of speaking wrongly (\"萎縮し、当たり障りのない意見に終始してしまう\"). Therefore, the essence is balancing accountability with a safe, closed space for free discussion (Option 2).",
+      "options": [
+        "To prevent closed-door misconduct, there is no other way but to open discussions from the initial stage",
+        "Accountability must be maintained, but certain closed spaces are absolutely necessary to encourage honest and bold discussion",
+        "To prevent staff from feeling pressured, minutes after the final decision should also not be published"
+      ],
+      "vocab": [
+        "already clear and beyond debate",
+        "initial rough draft as discussion material",
+        "looking for gaps in someone's speech",
+        "safe / neutral, not offending anyone (cliché)"
+      ],
+      "distractors": {}
+    },
+    "jlpt-c2-m4-01": {
+      "situationEn": "The professor is happy to share a research collaboration offer from an outside institution at a time when the laboratory budget is tight.",
+      "scriptEn": "Professor: There is a research inquiry from them; for us, who were previously hesitant due to budget difficulties, this is truly like \"渡りに船\" (finding a boat when one wants to cross = a godsend).",
+      "questionEn": "What is the appropriate way to respond?",
+      "explainEn": "In C2-level Japanese, \"二の足を踏む\" means to hesitate to take a step, while \"渡りに船\" (like finding a boat when wanting to cross = a godsend) means an ideal opportunity arriving exactly when needed. A matching response is \"願ってもない好機\" (a highly desired golden opportunity) in Option 1.",
+      "options": [
+        "That's right, Prof, this is an unexpected golden opportunity, so let's follow up positively.",
+        "That's right, because we risk having our weaknesses exploited, let's politely decline this time.",
+        "Indeed, by sea route the research equipment will not make it in time, so let's switch to air cargo."
+      ],
+      "vocab": [
+        "budget difficulty / constraints",
+        "hesitant / reluctant to act",
+        "a long-awaited opportunity arrives (an opportunity comes at the exact right moment)",
+        "an extraordinary golden opportunity"
+      ],
+      "distractors": {}
+    },
+    "jlpt-c2-m4-02": {
+      "situationEn": "A senior colleague humbles themselves when praised for successfully settling a tricky negotiation deal.",
+      "scriptEn": "Woman: You speak as if the successful conclusion of today's negotiation was entirely my doing, when it was simply due to a shift in the other party's circumstances; you are overestimating my abilities.",
+      "questionEn": "What is the appropriate way to respond?",
+      "explainEn": "Note: Pay attention to the C2 vocabulary \"買いかぶりすぎ\" (from \"買いかぶる\" = to overestimate someone's ability), which is used gracefully to humble oneself regarding a success (\"手柄\" = achievement/credit). The most mature and elegant social response is to brush off that modesty (\"いや、ご謙遜を\") while appreciating the behind-the-scenes lobbying preparations (\"事前の根回しが行き届いていたからこそ\") in Option 3.",
+      "options": [
+        "No, we really did buy too much and exceeded the budget.",
+        "That's right, starting next time we ask that you reflect more on your mistakes so you don't make them again.",
+        "Ah, you are being too modest. It is precisely because your initial approach was so thorough that this agreement was successfully reached without missing the momentum."
+      ],
+      "vocab": [
+        "achievement / proud accomplishment",
+        "to overestimate / overrate someone's ability",
+        "humble attitude (polite)",
+        "informal preliminary approach / lobbying before an official decision"
+      ],
+      "distractors": {}
+    }
+  }
+}

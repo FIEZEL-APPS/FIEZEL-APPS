@@ -1,0 +1,433 @@
+{
+  "schema": "fiezel-reading-exam-en-v1",
+  "status": "APPROVED-EN-SIDECAR",
+  "honesty": "FIEZEL does not predict IELTS bands or TOEFL scores. This set is an exam-formatted practice; the difficulty level is designed to approximate the actual exam, not copied from it.",
+  "formats": {
+    "ielts_academic_reading": {
+      "label": "IELTS Academic Reading",
+      "note": "The actual exam contains 3 reading passages in 60 minutes. True/False/Not Given tests FACTS in the text; Yes/No/Not Given tests the author's VIEWS, and confusing the two is one of the most common reasons for losing marks. Not Given means the text is SILENT, not that the statement feels doubtful."
+    },
+    "toefl_reading": {
+      "label": "TOEFL iBT Reading",
+      "note": "The actual exam contains 2 reading passages in 35 minutes. EXCEPT and insert-text questions penalize readers who rush."
+    }
+  },
+  "passages": {
+    "rx-tram": {
+      "questions": {
+        "rx-tram-1": {
+          "why": "The text mentions the fare is cheap enough that employees and factory workers use it daily, exactly as the statement says.",
+          "whyOthersFail": "False requires the text to contradict; Not Given requires the text to be silent regarding the fare. Neither applies here."
+        },
+        "rx-tram-2": {
+          "why": "The text states that some closed routes still had rising passenger numbers. That contradicts the word 'every', so it is False.",
+          "whyOthersFail": "True contradicts that sentence. Not Given is incorrect because the text speaks directly about this; the most common mistake in TFNG is choosing Not Given when the answer is present."
+        },
+        "rx-tram-3": {
+          "why": "The text mentions buses were MARKETED as an alternative, but never mentions manufacturers lobbying the committee. There is no information, so it is Not Given.",
+          "whyOthersFail": "True adds information not written; False requires a contradiction that is also absent. 'Marketed' is not the same as 'lobbying the committee'."
+        },
+        "rx-tram-4": {
+          "why": "The lane fills up again within a few years, and that is the definition of temporary relief.",
+          "whyOthersFail": "False requires text stating the relief lasts. Not Given is incorrect because the pattern is even named in the text."
+        },
+        "rx-tram-5": {
+          "why": "It is the exact opposite: before the war it was every 200 meters, now it is often every 500 meters. This statement is reversed, so it is False.",
+          "whyOthersFail": "True reverses the numbers. Not Given is incorrect because both numbers are mentioned explicitly."
+        },
+        "rx-tram-6": {
+          "why": "Only paragraph 5 compares carrying capacity per meter of road width.",
+          "whyOthersFail": "Paragraph 3 is about rail maintenance costs, paragraph 4 about the congestion cycle, and paragraph 7 about failed projects."
+        },
+        "rx-tram-7": {
+          "why": "Paragraph 3 explains that old rails were nearing the end of their lifespan and wartime scarcity delayed the bill.",
+          "whyOthersFail": "Paragraph 2 is about private cars, paragraph 6 about technical improvements, and paragraph 8 about concluding assessments."
+        },
+        "rx-tram-8": {
+          "why": "Paragraph 4 explains that buses slowed down due to traffic, passengers switched to cars, and traffic increased, becoming a self-reinforcing cycle.",
+          "whyOthersFail": "Paragraph 1 is historical background, paragraph 6 is modern system technical improvements, and paragraph 7 is project risks."
+        },
+        "rx-tram-9": {
+          "why": "Paragraph 7 mentions disruption to businesses along the route and ballooning costs.",
+          "whyOthersFail": "Paragraphs 5 and 6 actually explain the advantages of the modern system; paragraph 8 compares the two eras."
+        },
+        "rx-tram-10": {
+          "why": "If cars defeated trams, the closures should have happened AFTER cars became widespread, whereas in some cities the order was reversed.",
+          "whyOthersFail": "The text actually mentions cars are faster from door to door; 'never decreased in any city' is too broad and unsupported; the completeness of fare records is not discussed."
+        },
+        "rx-tram-11": {
+          "why": "The committee calculates what appears on its own balance sheet; congestion costs borne by others are not included.",
+          "whyOthersFail": "Fuel prices and population decline are not mentioned. The ease of moving bus routes is actually used as a REASON for choosing buses, not something overlooked."
+        },
+        "rx-tram-12": {
+          "why": "The text states it directly: slow but reliable service is easier to plan than service that is sometimes fast.",
+          "whyOthersFail": "Fares, seat comfort, and the number of stops are not compared to speed in that section; stops were actually REDUCED in the modern system."
+        },
+        "rx-tram-13": {
+          "why": "The characteristic is actually not grand: routes follow where people are already traveling, not where development is hoped to follow.",
+          "whyOthersFail": "Route length, old rails, and car bans are not mentioned as characteristics of success."
+        }
+      }
+    },
+    "rx-rings": {
+      "questions": {
+        "rx-rings-1": {
+          "why": "The SAME pattern in many trees is what turns the rings from a record of one tree into a climate record.",
+          "whyOthersFail": "The text actually mentions most tropical trees do not form one ring per year; measurement precision and widening with age are not the reasons given in paragraph 1."
+        },
+        "rx-rings-2": {
+          "why": "Crossdating connects: older beams are overlapped onto sequences that are already dated, then become the basis for the next connection.",
+          "whyOthersFail": "Living trees are only the STARTING point, not a way to extend. Radiocarbon is discussed as a comparison, not part of the method."
+        },
+        "rx-rings-3": {
+          "why": "The first three limitations are mentioned explicitly in paragraph 4. The difficulty of MEASURING very old wood is never mentioned.",
+          "whyOthersFail": "EXCEPT questions test thoroughness so you do not stop once you find one correct option; here, you are looking for what is NOT there."
+        },
+        "rx-rings-4": {
+          "why": "The context is questions that cannot be answered by radiocarbon ranges; tree rings can RESOLVE them.",
+          "whyOthersFail": "'Postpone' and 'question' move in the opposite direction of the context; 'calculate' narrows the meaning to mere arithmetic."
+        },
+        "rx-rings-5": {
+          "why": "If the outermost ring has been planed off by a carpenter, the date obtained is the year BEFORE felling, so it is always too early.",
+          "whyOthersFail": "'Too late' reverses the direction; the text actually emphasizes the error is NOT random, so 'accurate' and 'incomparable' both miss the mark."
+        },
+        "rx-rings-6": {
+          "why": "Co-occurrence proves simultaneity, not cause-and-effect. That is the core of the sentence.",
+          "whyOthersFail": "Other options go beyond the text: the author does not state they are unrelated, does not say people ALWAYS leave first, and does not make rainfall the only explanation."
+        },
+        "rx-rings-7": {
+          "why": "That paragraph opens with the statement that rings record events other than weather; frost rings are an example.",
+          "whyOthersFail": "The text actually mentions historical eruption records are often blurry or contradictory, and does not compare the reliability of the two methods."
+        },
+        "rx-rings-8": {
+          "why": "The text states the narrowing occurs REGARDLESS of conditions, which is the geometric effect of the widening trunk and not a climate effect.",
+          "whyOthersFail": "Rainfall, laboratory differences, and fire scars are indeed mentioned elsewhere, but not as the cause of this narrowing."
+        },
+        "rx-rings-9": {
+          "why": "That sentence sets up the pair 'For many... / For others...'. It must stand exactly BEFORE 'For others it is not', which is position C.",
+          "whyOthersFail": "In A and B, the sentence interrupts the explanation of what a range is; in D, the pair has already passed and 'For others' is left hanging."
+        },
+        "rx-rings-10": {
+          "why": "What differs is the PROCESSED result, because there are considerations involved, not the measurement, and not the date.",
+          "whyOthersFail": "It is the exact opposite in the last option: the author concludes by stating the date is precise and that is the foundation of the argument."
+        }
+      }
+    },
+    "rx-fall": {
+      "questions": {
+        "rx-fall-1": {
+          "why": "The text states it directly, then gives an example: engineers in Glasgow can repeat mistakes that have already killed people in Manchester.",
+          "whyOthersFail": "False requires a contradiction; Not Given is incorrect because the text explicitly discusses this matter."
+        },
+        "rx-fall-2": {
+          "why": "It TOOK IT INTO ACCOUNT, only it was too small. \"Ignored completely\" reverses the fact.",
+          "whyOthersFail": "True accepts the word 'completely' which is unsupported; Not Given is incorrect because the figures are mentioned."
+        },
+        "rx-fall-3": {
+          "why": "The text mentions its investigation became a precedent for knowledge sharing, but never states it produced the first national building code.",
+          "whyOthersFail": "True adds unwritten information. This is the most typical TFNG trap: a conclusion that feels reasonable but is never stated."
+        },
+        "rx-fall-4": {
+          "why": "Quite the opposite: the clause is almost never revoked, because revoking it demands a negative proof.",
+          "whyOthersFail": "True reverses the statement; Not Given is incorrect because the reason is explained at length."
+        },
+        "rx-fall-5": {
+          "why": "The sentence is almost identical, and that is why failures tend to cluster at the edge of novelty.",
+          "whyOthersFail": "False requires a contradiction; Not Given is incorrect because the statement appears almost word for word."
+        },
+        "rx-fall-6": {
+          "why": "Paragraph 5 explains that codes accumulate and are almost never reduced.",
+          "whyOthersFail": "Paragraph 4 defines what a code is; paragraph 3 concerns the Tay Bridge; paragraph 7 concerns margins and costs."
+        },
+        "rx-fall-7": {
+          "why": "Paragraph 8 recounts a New York tower that was secretly repaired at night.",
+          "whyOthersFail": "Paragraph 6 concerns novelty, paragraph 7 margins, and paragraph 9 the concluding assessment."
+        },
+        "rx-fall-8": {
+          "why": "Paragraph 7: the client requesting a lower safety factor was not being unreasonable, and the answer is frequently 'no one knows for sure'.",
+          "whyOthersFail": "Paragraph 5 concerns code complexity; paragraph 6 novelty; paragraph 8 near-misses."
+        },
+        "rx-fall-9": {
+          "why": "Each clause typically exists because at some point a building constructed below that standard collapsed.",
+          "whyOthersFail": "Other options are not mentioned at all; codes are instead portrayed as feeling bureaucratic, not a matter of price or materials."
+        },
+        "rx-fall-10": {
+          "why": "Accumulated caution protects the familiar; at the edge of novelty that protection has not yet formed.",
+          "whyOthersFail": "Material weaknesses, the engineer's age, and haste are never mentioned as causes."
+        },
+        "rx-fall-11": {
+          "why": "What teaches us most is the near-miss, not the collapse.",
+          "whyOthersFail": "There is no mention of demolition, licensing, or government funding."
+        },
+        "rx-fall-12": {
+          "why": "The author praises the outcome but refuses to tidy up the story, which is what leaves the final paragraph open-ended.",
+          "whyOthersFail": "Failed repairs, student acknowledgements, and corner wind safety are not mentioned."
+        },
+        "rx-fall-13": {
+          "why": "Only the norm changes: hiding is now considered shameful. Whether that norm survives when expensive is tested every year.",
+          "whyOthersFail": "The absence of codes, the inability to calculate wind, and disagreements over safety factors are not stated."
+        }
+      }
+    },
+    "rx-poverty": {
+      "questions": {
+        "rx-pov-1": {
+          "why": "The author states the direct opposite. Yes/No/Not Given test the author's VIEW, not worldly facts.",
+          "whyOthersFail": "Yes reverses the view; Not Given is incorrect because the sentence appears in the opening paragraph."
+        },
+        "rx-pov-2": {
+          "why": "The author states it precisely like that, and adds that the claim is informative only after its definition is provided.",
+          "whyOthersFail": "No reverses the author's view; Not Given is incorrect because that sentence actually concludes the argument. Remember: YNNG asks what the AUTHOR thinks, not whether the statement is true in the real world."
+        },
+        "rx-pov-3": {
+          "why": "That is precisely what the news omits, whereas without that explanation the poverty reduction claim is scarcely informative.",
+          "whyOthersFail": "Yes reverses it; Not Given is incorrect because the author concludes the writing with this point."
+        },
+        "rx-pov-4": {
+          "why": "The author explains the strengths AND weaknesses, but never crowns it as the most accurate.",
+          "whyOthersFail": "Yes and No both add rankings that the author never gave."
+        },
+        "rx-pov-5": {
+          "why": "And most importantly: without any actual change in anyone's circumstances.",
+          "whyOthersFail": "False requires a contradiction; Not Given is incorrect because the figures are mentioned."
+        },
+        "rx-pov-6": {
+          "why": "Because the line itself drops, not because anyone has improved.",
+          "whyOthersFail": "False reverses it; Not Given is incorrect because this is the paragraph's primary example."
+        },
+        "rx-pov-7": {
+          "why": "Paragraph 5 provides two opposing examples: recession and prosperity.",
+          "whyOthersFail": "Paragraph 4 introduces relative measures; paragraph 3 objects to absolute measures; paragraph 6 multidimensional measures."
+        },
+        "rx-pov-8": {
+          "why": "Paragraph 9 adds a practical asymmetry: the chosen measure is sometimes the affordable one, not the most informative.",
+          "whyOthersFail": "Paragraphs 6 and 7 discuss the contents and weaknesses of multidimensional measures; paragraph 10 is the reading conclusion."
+        },
+        "rx-pov-9": {
+          "why": "That is why the primary figure for global poverty reduction since 1990 uses this type of threshold.",
+          "whyOthersFail": "Moving with the median is a characteristic of RELATIVE measures; service access is a characteristic of multidimensional measures."
+        },
+        "rx-pov-10": {
+          "why": "Their designers are generally upfront about this, and that candor is what gets lost when it enters news headlines.",
+          "whyOthersFail": "Children's schooling is actually used as an example of its dimensions; there is no claim that figures are always lower."
+        },
+        "rx-pov-11": {
+          "why": "Questions of quantity cannot be answered without choosing definitions first.",
+          "whyOthersFail": "Survey funding and collection timing are never put forward by the author as key questions."
+        },
+        "rx-pov-12": {
+          "why": "Examples are given: absolute poverty falls while relative rises, or multidimensional improves when both worsen.",
+          "whyOthersFail": "That non-interchangeability is precisely the point, making 'always simultaneous' and 'always identical' contrary to the text."
+        },
+        "rx-pov-13": {
+          "why": "Where budgets are tight, the chosen measure is sometimes the affordable one, not the most informative.",
+          "whyOthersFail": "Wealthy cities, international institutions, and households are not identified as the most overburdened parties."
+        },
+        "rx-pov-14": {
+          "why": "Individuals unable to purchase what their surroundings consider ordinary remain deprived, regardless of their caloric intake.",
+          "whyOthersFail": "Calories and exchange rates are instead part of absolute metrics; the number of children is not discussed."
+        }
+      }
+    },
+    "rx-lakes": {
+      "questions": {
+        "rx-lake-1": {
+          "why": "That property explains ice floating AND the structure of lakes in midsummer.",
+          "whyOthersFail": "Trapped air, sinking cold water, and wind are not identified as the cause."
+        },
+        "rx-lake-2": {
+          "why": "That zone acts as a barrier: wind can mix the upper layer, but is rarely strong enough to penetrate it.",
+          "whyOthersFail": "The text instead states that a moderate breeze is sufficient to mix the entire lake once the barrier is gone."
+        },
+        "rx-lake-3": {
+          "why": "The first three are mentioned explicitly. An increase in water temperature throughout the summer is never stated, as the text instead notes that deep water often remains unchanged.",
+          "whyOthersFail": "The EXCEPT question penalizes readers who stop after finding a single correct option."
+        },
+        "rx-lake-4": {
+          "why": "Both directions are equally uninhabitable, and that is the bind.",
+          "whyOthersFail": "Pressure, rock fissures, and food scarcity do not match the explanation following the colon."
+        },
+        "rx-lake-5": {
+          "why": "After that, a moderate breeze is sufficient to mix the lake from top to bottom within a matter of days.",
+          "whyOthersFail": "Rain, fish, and ice formation are not mentioned as triggers."
+        },
+        "rx-lake-6": {
+          "why": "Two consequences at once, one restorative and one triggering, and that is the core of the sentence.",
+          "whyOthersFail": "Other options go beyond the text: the nutrients are not discarded, the author does not weigh pros and cons, and turnover is not limited to fertilizer-runoff lakes."
+        },
+        "rx-lake-7": {
+          "why": "Both are presented as two extremes of exception: the one that never mixes and the one that mixes continuously.",
+          "whyOthersFail": "The text does not evaluate the health of tropical lakes nor the general reliability of textbooks."
+        },
+        "rx-lake-8": {
+          "why": "Water from the anoxic layer carries dissolved iron and manganese that must be removed before use.",
+          "whyOthersFail": "Raising the temperature, adding algae, and accelerating turnover for the sake of fish are not stated as the reason."
+        },
+        "rx-lake-9": {
+          "why": "Those lakes stratify earlier and mix later; what lengthens is the duration, not the temperature.",
+          "whyOthersFail": "The author instead asserts that deep water often does NOT change, and does not mention the cessation of turnover."
+        },
+        "rx-lake-10": {
+          "why": "The sentence completes the cause pair: supply stops (B), while consumption proceeds; only then does the conclusion 'exhausted completely' (C) make sense.",
+          "whyOthersFail": "In A it precedes the opening statement; in D the discussion has shifted to fish and 'meanwhile' loses its reference."
+        }
+      }
+    },
+    "rx-mangrove-heads": {
+      "questions": {
+        "rx-mangrove-heads-1": {
+          "why": "The main idea of paragraph 2 is how forests weaken waves, and the conclusion is explicit: what determines the width of the belt, not the height of the trees.",
+          "whyOthersFail": "Headings about fish and seedling prices capture only details from other paragraphs; headings for campaigns, species, tides, and funding are the main ideas of paragraphs 4-7, not this paragraph."
+        },
+        "rx-mangrove-heads-2": {
+          "why": "Paragraph 3 opens with 'Protection is not the only service' and then details two other benefits: fish nurseries and carbon storage. Its main idea is benefits beyond coastal protection.",
+          "whyOthersFail": "'How young fish use the mangrove roots' is indeed mentioned, but that is only ONE detail within the paragraph; the classic matching headings trap is choosing a heading that captures a detail rather than the umbrella."
+        },
+        "rx-mangrove-heads-3": {
+          "why": "Paragraph 4 recounts the grand scale of the campaign and the disappointing survey results, exactly matching the pair 'large campaigns, few survive'.",
+          "whyOthersFail": "'The low price of a single seedling' is only a small detail in this paragraph, not its core. Headings for other paragraphs: belt width (2), other benefits (3), species and land (5)."
+        },
+        "rx-mangrove-heads-4": {
+          "why": "Paragraph 5 explains two mistakes: species are chosen because they are easy to handle, and the land is a mudflat that is too low. The heading 'wrong species on the wrong land' summarizes both.",
+          "whyOthersFail": "Headings for large campaigns (paragraph 4) and restored tides (paragraph 6) discuss other matters; detailed headings for fish and seedling prices never become the main idea of any paragraph."
+        },
+        "rx-mangrove-heads-5": {
+          "why": "Paragraph 6 outlines an approach that restores tidal flow first so that seeds arrive and grow on their own, namely 'letting the tides bring the forest back'.",
+          "whyOthersFail": "The funding heading is the idea of paragraph 7; the large campaign heading belongs to paragraph 4. Detail headings (fish, seedling prices) remain distractors in all questions."
+        },
+        "rx-mangrove-heads-6": {
+          "why": "Paragraph 7 is entirely about funding incentives: seedling numbers are available immediately, while the number of surviving trees comes after the budget is closed. The system rewards the wrong metric.",
+          "whyOthersFail": "The tidal heading belongs to paragraph 6, the campaign heading to paragraph 4. Seedling prices are mentioned in paragraph 4 as a detail, not here, and not as the main idea."
+        },
+        "rx-mangrove-heads-7": {
+          "why": "The text states it almost word for word: villages behind wide belts repeatedly recorded smaller floods than their neighbors during the same storm.",
+          "whyOthersFail": "False requires text that refutes; Not Given requires text that is silent on floods. Neither applies because the sentence exists and aligns with the statement."
+        },
+        "rx-mangrove-heads-8": {
+          "why": "Quite the opposite: because the mud is waterlogged and oxygen-poor, decomposition proceeds very slowly and carbon accumulates over centuries. The statement is reversed, so it is False.",
+          "whyOthersFail": "True accepts the reversed direction. Not Given is wrong because the text discusses that decomposition rate directly, so this is not something left unmentioned."
+        },
+        "rx-mangrove-heads-9": {
+          "why": "The text states that the cause of failure rarely lies in the seedlings, then discusses species and land, but disease is never hinted at at all. The text is silent, so it is Not Given.",
+          "whyOthersFail": "True adds an unwritten cause. False is also wrong: for False, the text must REFUTE the presence of disease, and even that refutation is absent. Not Given means the text is silent, not that the statement feels doubtful."
+        },
+        "rx-mangrove-heads-10": {
+          "why": "The text states it directly: surveys of sites where tidal flow was restored report much higher survival rates than planting campaigns.",
+          "whyOthersFail": "False requires text that refutes the comparison; Not Given is wrong because the survey results are mentioned explicitly, not left unmentioned."
+        },
+        "rx-mangrove-heads-11": {
+          "why": "The reason is administrative, not ecological: the space is vacant and there are no landowners whose permission must be sought.",
+          "whyOthersFail": "The text instead states that the mudflat is too low within the tidal range so that seedlings are submerged for too long; soil richness and wave calmness are never mentioned."
+        },
+        "rx-mangrove-heads-12": {
+          "why": "The weakness is presentational: for the first few years all that is visible is mud and water, whereas surveys actually report much higher survival rates.",
+          "whyOthersFail": "Lower survival reverses the content of the text; claims about greater costs and seedlings from other regions are never stated."
+        },
+        "rx-mangrove-heads-13": {
+          "why": "The author concludes by reversing the metric: restoration is not hopeless, rather the benchmark is, counting what survives for ten years instead of what is planted in a day.",
+          "whyOthersFail": "Tree species are instead left to nature ('accept whichever species arrive naturally'); replacing donor agencies and national seedling targets is never proposed."
+        }
+      }
+    },
+    "rx-batik-summary": {
+      "questions": {
+        "rx-batik-summary-1": {
+          "why": "The author's definition centers on wax: the design must be born as wax before it is born as color. Both the canting and the stamp are equally valid because both use wax.",
+          "whyOthersFail": "'A copper stamp' is merely one tool (cap), whereas batik tulis does not use it; 'indigo' is a dye, not a resist; 'a printing press' is actually a marker of imitation fabric that contains no wax at all."
+        },
+        "rx-batik-summary-2": {
+          "why": "The text is explicit: the ratio of paraffin, beeswax, and resin is the deciding factor; more paraffin creates a brittle layer with fine cracks, while more beeswax creates flexible lines.",
+          "whyOthersFail": "'Temperature' is indeed mentioned, but it is for melting the wax so it flows during application, not for determining its behavior in the dye bath. Color is the result of dyeing, not a property of the mixture; the cost of the mixture is not discussed at all."
+        },
+        "rx-batik-summary-3": {
+          "why": "The text contrasts two durations: batik tulis takes weeks to months, while batik cap is completed in a matter of days.",
+          "whyOthersFail": "'Seconds' is the time a stamp takes to imprint a pattern in one press, not the duration to finish a fabric; 'hours' refers to the effect of synthetic dyes in dyeing; 'years' is used by the text for the time required to master the skill, not to make a single piece of fabric."
+        },
+        "rx-batik-summary-4": {
+          "why": "Because hot wax penetrates the fabric, genuine batik carries a design almost as clear on both sides; printed imitations are only strong on the front, leaving the reverse side pale.",
+          "whyOthersFail": "'Front' reverses the facts, as the front side of an imitation is precisely the clear one; 'borders' are only part of the motif and 'fibre' is only the material being dyed, so neither is ever used as a marker of authenticity by the text."
+        },
+        "rx-batik-summary-5": {
+          "why": "This is the irony pointed out by the author: a decision that respects a technique actually expands the market for its imitations, which are printed without wax.",
+          "whyOthersFail": "'Genuine', 'stamped', and 'waxed' all refer to fabric that truly uses wax, which is the exact opposite of those accommodating the surge in demand according to the text."
+        },
+        "rx-batik-summary-6": {
+          "why": "The conclusion is concrete: regulations that lock the word 'batik' only for wax-resist fabrics, honest labeling for others, and prices that make years of apprenticeship worthwhile.",
+          "whyOthersFail": "'Printed' is precisely the fabric that MUST be labeled as not batik; 'patriotic' only describes the image of the word after 2009; 'photographed' is used by the text for motifs that can be copied indefinitely."
+        },
+        "rx-batik-summary-7": {
+          "why": "Paragraph 6 provides three markers on the fabric: an equally clear reverse side, hand-drawn lines that vary in thickness, and a faint smell of wax.",
+          "whyOthersFail": "Paragraph 4 distinguishes between canting and cap; paragraph 5 concerns the price of imitations; paragraph 7 concerns UNESCO recognition."
+        },
+        "rx-batik-summary-8": {
+          "why": "Paragraph 5 explains the mechanism: printed imitations are sold at a fraction of the price, a hurried eye finds it difficult to distinguish them, and workshops that pay skilled labor lose out on competition.",
+          "whyOthersFail": "Paragraph 3 concerns the chemistry of wax and dyes; paragraph 7 concerns the impact of UNESCO recognition; paragraph 9 is a conclusion on what is worth protecting."
+        },
+        "rx-batik-summary-9": {
+          "why": "Paragraph 8 opens up the nearly invisible labor side: mostly women, paid by the piece, and the younger generation choosing other jobs.",
+          "whyOthersFail": "Paragraph 5 concerns price competition, paragraph 6 concerns how to recognize genuine fabric, paragraph 7 concerns UNESCO; none discuss artisan wages."
+        },
+        "rx-batik-summary-10": {
+          "why": "The author's view is stated firmly in the opening paragraph: no matter how faithful the imitation, printed fabric is not batik. The answer is No.",
+          "whyOthersFail": "Yes reverses the author's stance. Not Given is wrong because this is the main thesis of the writing; YNNG tests the author's VIEW, and here the view is explicit."
+        },
+        "rx-batik-summary-11": {
+          "why": "The author uses the word 'irony' himself: recognition of a technique actually expands the market for imitations that abandon that technique.",
+          "whyOthersFail": "No reverses the author's attitude; Not Given is wrong because the sentence exists, complete with his assessment."
+        },
+        "rx-batik-summary-12": {
+          "why": "The only things the author assesses are the TIME and ECONOMIC impacts of synthetic dyes. Regarding which is more beautiful, the text is completely silent, so it is Not Given.",
+          "whyOthersFail": "Yes adds an aesthetic assessment that was never written; No is also wrong because the author does not defend synthetic dyes, but simply holds no opinion. Not Given means the author is silent, not that the statement sounds wrong."
+        },
+        "rx-batik-summary-13": {
+          "why": "The author actually defends batik cap: purists may place tulis above cap, but both are batik because their patterns are born as wax. The answer is No.",
+          "whyOthersFail": "Yes equates the author's stance with the purists he actually corrects. Not Given is wrong because the author states his position directly."
+        }
+      }
+    },
+    "rx-deepsea-c2": {
+      "questions": {
+        "rx-deepsea-c2-1": {
+          "why": "Old view: the only food reaching the bottom is 'marine snow', organic particles that descend slowly from the sunlit layer, which is a very thin ration.",
+          "whyOthersFail": "Dissolved minerals and volcanic heat are actually part of the 1977 discovery that DISPROVED that assumption; bacteria carried by currents are never mentioned as a food source."
+        },
+        "rx-deepsea-c2-2": {
+          "why": "Giant tube worms have neither mouths nor guts; they are essentially 'homes' for symbiotic bacteria that feed them from within.",
+          "whyOthersFail": "The very absence of mouths and guts precludes filtering and predation; mineral absorption through the skin is never stated, because the minerals are processed by bacteria and not absorbed by the host directly."
+        },
+        "rx-deepsea-c2-3": {
+          "why": "The word is contrasted directly with 'scarcity', then detailed: clam beds, tube worm clusters, density many times over. The opposite of scarcity is abundance.",
+          "whyOthersFail": "'Confusion' is just similar in sound; 'variety' highlights diversity when the emphasis is on density; 'danger' is not the opposite of 'scarcity' at all."
+        },
+        "rx-deepsea-c2-4": {
+          "why": "The first three statements are in paragraph 4, including 'many vent species occur nowhere else'. An EVEN distribution of vents on every ridge is never stated anywhere.",
+          "whyOthersFail": "The EXCEPT question tests thoroughness so one does not stop upon finding one correct option; here three options are indeed correct, and the one sought is the only one not in the text."
+        },
+        "rx-deepsea-c2-5": {
+          "why": "The core of the sentence: independence from the sun is not complete, because the oxidation that sustains the entire community uses oxygen, and ocean oxygen is almost entirely the product of photosynthesis elsewhere.",
+          "whyOthersFail": "The second option reverses the effect; oxygen scarcity at vents is never compared; photosynthesis in water around vents contradicts 'conducted elsewhere'."
+        },
+        "rx-deepsea-c2-6": {
+          "why": "The author discounts the impression of 'scarcity': that impression may say more about the few locations examined than the actual abundance.",
+          "whyOthersFail": "Systematic surveys of every ridge actually contradict 'handful of sites'; extinction and larval failure are never concluded, because larvae are actually described as their survival mechanism."
+        },
+        "rx-deepsea-c2-7": {
+          "why": "The word 'already' points to its function: the urgency of regulation is no longer hypothetical, exploration permits have been issued while the baseline inventory does not yet exist.",
+          "whyOthersFail": "The author does not doubt the mineral content, does not claim the ecosystem is already destroyed, and the chemical process was explained in the previous sentence, not by the mention of permits."
+        },
+        "rx-deepsea-c2-8": {
+          "why": "Assessing damage presupposes knowing what is there first, whereas it is precisely that inventory that has never been compiled due to the difficulty of access.",
+          "whyOthersFail": "Commercial profit is actually called 'quantifiable'; the speed of mining technology and the regulator's authority to deny permits are never discussed."
+        },
+        "rx-deepsea-c2-9": {
+          "why": "'Even' closes a list of escalating disturbances: sampling tools damage, submarines are noisy, and at the peak, even light interferes. That sentence must stand after the complete list, in the gap before the 'accordingly' conclusion in sentence (D).",
+          "whyOthersFail": "In the gap before (A) and (B), the methodological difficulties have not even been detailed; in the gap before (C), the concrete examples (sampling tools and submarines) have not been mentioned, yet 'Even' closes a list that does not yet exist to be closed."
+        },
+        "rx-deepsea-c2-10": {
+          "why": "The epistemological lesson: claims of absence deserve a 'constant discount' because they report the reach of our instruments just as faithfully as they report the contents of the world.",
+          "whyOthersFail": "The author asks for such claims to be DISCOUNTED, not abandoned entirely; he does not limit it to the deep sea; and improving instruments actually confirms that old claims were indeed stories about tools."
+        }
+      }
+    }
+  }
+}

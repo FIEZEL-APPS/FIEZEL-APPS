@@ -1,4 +1,4 @@
-export type LearnerLocale = 'id' | 'th' | 'ja' | 'en' | 'zh' | 'vi' | 'ru' | 'ko' | 'ms' | (string & {});
+export type LearnerLocale = 'en' | 'id' | 'th' | 'ja' | 'zh' | 'vi' | 'ms' | 'fil' | 'km' | 'ru' | 'ko' | (string & {});
 export type TargetLang = 'en' | 'ja' | 'zh';
 export type MasteryStateName =
   | 'NOT_EXPOSED'

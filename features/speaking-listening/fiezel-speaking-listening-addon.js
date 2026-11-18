@@ -448,17 +448,26 @@
       const d=global.FiezelThData;
       return d&&d.listeningExam?d.listeningExam:null;
     }
+    enData(){
+      const loc=(I18N&&I18N.getLocale&&I18N.getLocale())||'id';
+      if(loc==='id'||loc==='th')return null;
+      return global.FiezelEnData||null;
+    }
+    enExam(){
+      const d=this.enData();
+      return d&&d.listeningExam?d.listeningExam:null;
+    }
     listeningFormat(set){
       const key=String(set&&set.exam||'');
       const meta=key?this.listeningFormats[key]:null;
       if(!meta)return null;
-      const th=this.thExam();
-      const thMeta=th&&th.examFormats?th.examFormats[key]:null;
-      return thMeta?{id:key,...meta,...thMeta}:{id:key,...meta};
+      const ov=this.thExam()||this.enExam();
+      const ovMeta=ov&&ov.examFormats?ov.examFormats[key]:null;
+      return ovMeta?{id:key,...meta,...ovMeta}:{id:key,...meta};
     }
     listeningHonestyText(){
-      const th=this.thExam();
-      return String((th&&th.honesty)||this.listeningHonesty||'');
+      const ov=this.thExam()||this.enExam();
+      return String((ov&&ov.honesty)||this.listeningHonesty||'');
     }
     listeningExamLevels(){return [...new Set(this.listeningExam.map(x=>x.level))].filter(Boolean).sort()}
     listeningExamFor(level){
@@ -466,25 +475,26 @@
       let rows=this.listeningExam.filter(x=>x.level===target);
       const thData=global.FiezelThData;
       const isTh=(I18N&&I18N.getLocale()==='th')||(global.FiezelThLoader&&global.FiezelThLoader.isThActive&&global.FiezelThLoader.isThActive());
-      if(isTh&&thData?.listening){
+      const locData=(isTh?thData:this.enData());
+      if(locData?.listening){
         rows=rows.map(set=>{
-          const thSet=thData.listening[set.id];
-          return thSet?{...set,...thSet}:set;
+          const locSet=locData.listening[set.id];
+          return locSet?{...set,...locSet}:set;
         });
       }
-      const thEx=this.thExam();
-      if(thEx&&thEx.sets){
+      const ovEx=this.thExam()||this.enExam();
+      if(ovEx&&ovEx.sets){
         rows=rows.map(set=>{
-          const thSet=thEx.sets[set.id];
-          if(!thSet)return set;
-          const merged={...set,...thSet};
+          const ovSet=ovEx.sets[set.id];
+          if(!ovSet)return set;
+          const merged={...set,...ovSet};
           /* questions adalah LARIK di sumber tapi PETA-per-id di sidecar: gabung per id,
              jangan menyalin petanya mentah-mentah. Urutan dan answerIndex milik sumber
              harus utuh - satu soal yang bergeser diam-diam mengubah kunci jawaban. */
           if(Array.isArray(set.questions)){
             merged.questions=set.questions.map(q=>{
-              const thQ=thSet.questions&&thSet.questions[q.id];
-              return thQ?{...q,...thQ}:q;
+              const ovQ=ovSet.questions&&ovSet.questions[q.id];
+              return ovQ?{...q,...ovQ}:q;
             });
           }
           return merged;
@@ -499,17 +509,21 @@
       const d=global.FiezelThData;
       return d&&d.speakingExam?d.speakingExam:null;
     }
+    enSpeakingExam(){
+      const d=this.enData();
+      return d&&d.speakingExam?d.speakingExam:null;
+    }
     examFormat(item){
       const key=String(item&&item.exam||'');
       const meta=key?this.examFormats[key]:null;
       if(!meta)return null;
-      const th=this.thSpeakingExam();
-      const thMeta=th&&th.examFormats?th.examFormats[key]:null;
-      return thMeta?{id:key,...meta,...thMeta}:{id:key,...meta};
+      const ov=this.thSpeakingExam()||this.enSpeakingExam();
+      const ovMeta=ov&&ov.examFormats?ov.examFormats[key]:null;
+      return ovMeta?{id:key,...meta,...ovMeta}:{id:key,...meta};
     }
     examHonestyText(){
-      const th=this.thSpeakingExam();
-      return String((th&&th.honesty)||this.examHonesty||'');
+      const ov=this.thSpeakingExam()||this.enSpeakingExam();
+      return String((ov&&ov.honesty)||this.examHonesty||'');
     }
     examLevels(){return [...new Set(this.speakingExam.map(x=>x.level))].filter(Boolean).sort()}
     examFor(level){
@@ -517,10 +531,11 @@
       const rows=this.speakingExam.filter(x=>x.level===target);
       const thData=global.FiezelThData;
       const isTh=(I18N&&I18N.getLocale()==='th')||(global.FiezelThLoader&&global.FiezelThLoader.isThActive&&global.FiezelThLoader.isThActive());
-      if(isTh&&thData?.speaking){
+      const locData=(isTh?thData:this.enData());
+      if(locData?.speaking){
         return rows.map(item=>{
-          const thItem=thData.speaking[item.id];
-          return thItem?{...item,...thItem}:item;
+          const locItem=locData.speaking[item.id];
+          return locItem?{...item,...locItem}:item;
         });
       }
       return rows;
@@ -541,8 +556,9 @@
       const active=normalizeLevel(level)||DEFAULT_ACTIVE_LEVEL;
       const thData=global.FiezelThData;
       const isTh=(I18N&&I18N.getLocale()==='th')||(global.FiezelThLoader&&global.FiezelThLoader.isThActive&&global.FiezelThLoader.isThActive());
-      if(isTh&&thData){
-        const mapObj=domain==='speaking'?thData.speaking:thData.listening;
+      const locData=(isTh?thData:this.enData());
+      if(locData){
+        const mapObj=domain==='speaking'?locData.speaking:locData.listening;
         if(mapObj)return shuffle(rows.filter(x=>x.level===active).map(i=>mapObj[i.id]?{...i,...mapObj[i.id]}:i));
       }
       return shuffle(rows.filter(x=>x.level===active));

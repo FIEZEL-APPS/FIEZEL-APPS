@@ -338,10 +338,18 @@ export interface WorkbenchPracticeCheckResult {
 }
 
 /** Helper lokalisasi, tokenisasi CJK & antarmuka papan belajar dari main. */
-function normalizeWbLocale(locale?: LearnerLocale): 'th' | 'ja' | 'zh' | 'id' {
+function normalizeWbLocale(locale?: LearnerLocale): 'th' | 'ja' | 'zh' | 'id' | 'en' {
   const code = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
-  if (code === 'th' || code === 'ja' || code === 'zh') return code;
-  return 'id';
+  if (code === 'th' || code === 'ja' || code === 'zh' || code === 'id') return code;
+  return 'en';
+}
+
+function wbT(locale: LearnerLocale | undefined, en: string, id: string, th?: string, ja?: string): string {
+  const loc = normalizeWbLocale(locale);
+  if (loc === 'id') return id;
+  if (loc === 'th' && th) return th;
+  if (loc === 'ja' && ja) return ja;
+  return en;
 }
 
 function isTargetSentenceForRuby(text: string, targetLang: TargetLang): boolean {
@@ -536,38 +544,73 @@ function getWorkbenchUiStrings(locale?: LearnerLocale) {
       blocksInstruction: '请将下方词块按正确语序排列:',
     };
   }
+  if (loc === 'id') {
+    return {
+      badge: '✦ Papan Belajar',
+      minimizedBadge: 'Papan Aktif',
+      openBtn: '⤢ Buka',
+      minimizeTitle: 'Kecilkan Papan (Lihat Mochi & Tetap Bicara)',
+      closeTitle: 'Tutup & Lanjut Ngobrol',
+      preparingTitle: 'Menyiapkan papan belajar...',
+      preparingSub: 'Meracik penjelasan visual dan latihan khusus untukmu',
+      keyPointLabel: '💡 Intinya:',
+      syntaxLabel: 'Pola Susunan Kalimat',
+      listenBtn: 'Dengarkan',
+      modeChoice: 'Pilihan',
+      modeCloze: 'Isian Kata',
+      modeBlocks: 'Susun Balok',
+      rerollBtn: 'Ganti Soal',
+      rerollTitle: 'Ganti Soal Baru Tanpa Terjawab Duluan',
+      clozePrompt: 'Ketuk kata yang tepat untuk melengkapi kalimat:',
+      clozeWrong: 'Kata tersebut belum pas. Coba kata yang lain!',
+      blocksEmpty: 'Ketuk balok di bawah untuk menyusun kalimat...',
+      micListening: (name: string) => `${name} sedang mendengarkan (bisa bicara langsung via mic)`,
+      talkBtn: (name: string) => `Lanjut Bicara dengan ${name}`,
+      closeBtn: 'Tutup ✕',
+      wrongLabel: '× Kurang Alami',
+      rightLabel: '✓ Bentuk Alami',
+      radicalLabel: 'Radikal Utama',
+      strokesLabel: 'Goresan',
+      toneShapeLabel: 'Kontur Nada & Pelafalan',
+      correctFeedback: 'Tepat sekali! Susunan kalimat ini sudah benar dan alami.',
+      wrongFeedback: 'Terkecoh! Pilihan ini memiliki susunan kata yang kurang tepat.',
+      clozeCorrectFeedback: 'Mantap! Kata yang kamu pilih tepat melengkapi kalimat.',
+      blocksCorrectFeedback: 'Susunan kalimat selesai dengan rapi!',
+      blocksInstruction: 'Susun kata-kata berikut agar membentuk kalimat yang padu.',
+    };
+  }
   return {
-    badge: '✦ Papan Belajar',
-    minimizedBadge: 'Papan Aktif',
-    openBtn: '⤢ Buka',
-    minimizeTitle: 'Kecilkan Papan (Lihat Mochi & Tetap Bicara)',
-    closeTitle: 'Tutup & Lanjut Ngobrol',
-    preparingTitle: 'Menyiapkan papan belajar...',
-    preparingSub: 'Meracik penjelasan visual dan latihan khusus untukmu',
-    keyPointLabel: '💡 Intinya:',
-    syntaxLabel: 'Pola Susunan Kalimat',
-    listenBtn: 'Dengarkan',
-    modeChoice: 'Pilihan',
-    modeCloze: 'Isian Kata',
-    modeBlocks: 'Susun Balok',
-    rerollBtn: 'Ganti Soal',
-    rerollTitle: 'Ganti Soal Baru Tanpa Terjawab Duluan',
-    clozePrompt: 'Ketuk kata yang tepat untuk melengkapi kalimat:',
-    clozeWrong: 'Kata tersebut belum pas. Coba kata yang lain!',
-    blocksEmpty: 'Ketuk balok di bawah untuk menyusun kalimat...',
-    micListening: (name: string) => `${name} sedang mendengarkan (bisa bicara langsung via mic)`,
-    talkBtn: (name: string) => `Lanjut Bicara dengan ${name}`,
-    closeBtn: 'Tutup ✕',
-    wrongLabel: '× Kurang Alami',
-    rightLabel: '✓ Bentuk Alami',
-    radicalLabel: 'Radikal Utama',
-    strokesLabel: 'Goresan',
-    toneShapeLabel: 'Kontur Nada & Pelafalan',
-    correctFeedback: 'Tepat sekali! Susunan kalimat ini sudah benar dan alami.',
-    wrongFeedback: 'Terkecoh! Pilihan ini memiliki susunan kata yang kurang tepat.',
-    clozeCorrectFeedback: 'Mantap! Kata yang kamu pilih tepat melengkapi kalimat.',
-    blocksCorrectFeedback: 'Susunan kalimat selesai dengan rapi!',
-    blocksInstruction: 'Susun kata-kata berikut agar membentuk kalimat yang padu.',
+    badge: '✦ Learning Board',
+    minimizedBadge: 'Board Active',
+    openBtn: '⤢ Open',
+    minimizeTitle: 'Minimize Board (See Mochi & Keep Talking)',
+    closeTitle: 'Close & Continue Talking',
+    preparingTitle: 'Preparing learning board...',
+    preparingSub: 'Building visual explanations and tailored practice for you',
+    keyPointLabel: '💡 Key Point:',
+    syntaxLabel: 'Sentence Pattern',
+    listenBtn: 'Listen',
+    modeChoice: 'Choice',
+    modeCloze: 'Fill in Blank',
+    modeBlocks: 'Word Order',
+    rerollBtn: 'New Question',
+    rerollTitle: 'Switch to a fresh practice question',
+    clozePrompt: 'Tap the right word to complete the sentence:',
+    clozeWrong: 'That word does not fit yet. Try another option!',
+    blocksEmpty: 'Tap tiles below to build the sentence...',
+    micListening: (name: string) => `${name} is listening (speak anytime via mic)`,
+    talkBtn: (name: string) => `Continue Talking with ${name}`,
+    closeBtn: 'Close ✕',
+    wrongLabel: '× Unnatural / Avoid',
+    rightLabel: '✓ Natural Form',
+    radicalLabel: 'Key Radical',
+    strokesLabel: 'Strokes',
+    toneShapeLabel: 'Tone Contour & Pronunciation',
+    correctFeedback: 'Spot on! This sentence structure is clear and natural.',
+    wrongFeedback: 'Not quite — check the word order and pattern above and try again.',
+    clozeCorrectFeedback: 'Nice work! That word completes the sentence naturally.',
+    blocksCorrectFeedback: 'Cleanly arranged! Word order is spot on.',
+    blocksInstruction: 'Arrange the tiles below into a natural sentence:',
   };
 }
 
@@ -623,12 +666,14 @@ export function deriveContextualPedagogicalBoard(
       : targetLang === 'zh' || (containsHanzi(combinedHintText) && !/[\u3040-\u30ff]/.test(combinedHintText))
         ? 'zh'
         : targetLang || 'en';
-  const lt = (idText: string, thText: string, jaText?: string, zhText?: string) => {
+  const lt = (idText: string, thText: string, jaText?: string, zhText?: string, enText?: string) => {
+    if (loc === 'id') return idText;
     if (loc === 'th') return thText;
     if (loc === 'ja' && jaText) return jaText;
     if (loc === 'zh' && zhText) return zhText;
-    return idText;
+    return enText || thText;
   };
+  const isId = loc === 'id';
 
   // 0. KASUS KHUSUS SSW SENSEI: PAPAN TAKTIS HALAMAN, TRIK WAKAI PAPA+, & KUIS SSW
   if (
@@ -643,13 +688,15 @@ export function deriveContextualPedagogicalBoard(
       ? Math.max(1, Math.min(SSW_MASTER_KB.meta.totalPdfPages || 91, parseInt(pageMatch[1], 10)))
       : cursor.page || 1;
     const plan = getStructuredPagePlan(targetPageNum);
-    const pageTitle = plan.pageObj?.title || `Halaman ${plan.targetPage}`;
+    const pageTitle = plan.pageObj?.title || (isId ? `Halaman ${plan.targetPage}` : `Page ${plan.targetPage}`);
 
     return {
       contextMode: 'ssw_tactical_board',
       focusType: 'ssw_tactical_board',
-      topicTitle: `Hal. ${plan.targetPage}: ${pageTitle}`,
-      patternFormula: `Hal. ${plan.targetPage} · Langkah ${plan.activeStepIndex} dari ${plan.steps.length}`,
+      topicTitle: `${isId ? 'Hal.' : 'Page'} ${plan.targetPage}: ${pageTitle}`,
+      patternFormula: isId
+        ? `Hal. ${plan.targetPage} · Langkah ${plan.activeStepIndex} dari ${plan.steps.length}`
+        : `Page ${plan.targetPage} · Step ${plan.activeStepIndex} of ${plan.steps.length}`,
       coachExplanation: '',
       sswTacticalData: {
         pageNumber: plan.targetPage,
@@ -657,13 +704,13 @@ export function deriveContextualPedagogicalBoard(
         requestedQuery: query,
       },
       quiz: {
-        prompt: 'Latihan cepat SSW tersedia di panel Papan Taktis di atas.',
+        prompt: isId ? 'Latihan cepat SSW tersedia di panel Papan Taktis di atas.' : 'Quick SSW practice is available in the Tactical Board panel above.',
         options: [
-          { id: 'opt_1', text: 'Siap lanjut memahami materi', isCorrect: true, feedback: 'Bagus!' },
-          { id: 'opt_2', text: 'Perlu penjelasan tambahan', isCorrect: false, feedback: 'Pilih langkah aktif di atas.' },
+          { id: 'opt_1', text: isId ? 'Siap lanjut memahami materi' : 'Ready to continue lesson', isCorrect: true, feedback: isId ? 'Bagus!' : 'Great!' },
+          { id: 'opt_2', text: isId ? 'Perlu penjelasan tambahan' : 'Need extra explanation', isCorrect: false, feedback: isId ? 'Pilih langkah aktif di atas.' : 'Select an active step above.' },
         ],
         cloze: { prefix: '', blankWord: 'SSW', suffix: '', chips: ['SSW'], feedback: '' },
-        blocks: { correctOrder: ['SSW'], pool: ['SSW'], meaningId: 'SSW Pengolahan Makanan', feedback: '' },
+        blocks: { correctOrder: ['SSW'], pool: ['SSW'], meaningId: isId ? 'SSW Pengolahan Makanan' : 'SSW Food Manufacturing', feedback: '' },
       },
     };
   }
@@ -724,29 +771,30 @@ export function deriveContextualPedagogicalBoard(
       contextMode: 'pte_describe_image',
       topicTitle: pteChart.title,
       patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-      coachExplanation:
-        'Kunci Describe Image adalah KELANCARAN MUTLAK. Jangan berhenti lebih dari 3 detik! Gunakan 5 kalimat sakti Fiezel tanpa ragu, biarkan intonasi terus mengalir santai tapi tegas.',
+      coachExplanation: isId
+        ? 'Kunci Describe Image adalah KELANCARAN MUTLAK. Jangan berhenti lebih dari 3 detik! Gunakan 5 kalimat sakti Fiezel tanpa ragu, biarkan intonasi terus mengalir santai tapi tegas.'
+        : 'The key to Describe Image is STEADY FLUENCY. Never pause longer than 3 seconds! Deliver the 5 structured Fiezel sentences smoothly with steady, confident intonation.',
       pteChartData: pteChart,
       quiz: {
-        prompt: `Pilih kalimat pembuka (Introduction) yang BENAR untuk ${targetQ.title}:`,
+        prompt: isId ? `Pilih kalimat pembuka (Introduction) yang BENAR untuk ${targetQ.title}:` : `Choose the CORRECT opening sentence for ${targetQ.title}:`,
         options: [
           {
             id: 'opt_1',
             text: targetQ.universalTemplate.intro,
             isCorrect: true,
-            feedback: 'Sempurna! Formula pembuka standar Pearson yang menjamin poin Fluency & Content.',
+            feedback: isId ? 'Sempurna! Formula pembuka standar Pearson yang menjamin poin Fluency & Content.' : 'Perfect! A standard high-scoring opening structure covering Fluency and Content.',
           },
           {
             id: 'opt_2',
             text: 'I see many colorful bars with numbers in this picture.',
             isCorrect: false,
-            feedback: 'Hindari bahasa kasual seperti "I see"! Gunakan kalimat akademik standar.',
+            feedback: isId ? 'Hindari bahasa kasual seperti "I see"! Gunakan kalimat akademik standar.' : 'Avoid casual phrasing like "I see"! Use standard academic register.',
           },
           {
             id: 'opt_3',
             text: 'This image is talking about renewable energy maybe.',
             isCorrect: false,
-            feedback: 'Hindari kata ragu "maybe". Bersikaplah tegas dan percaya diri.',
+            feedback: isId ? 'Hindari kata ragu "maybe". Bersikaplah tegas dan percaya diri.' : 'Avoid hedging words like "maybe". Speak decisively and clearly.',
           },
         ],
         cloze: {
@@ -754,13 +802,13 @@ export function deriveContextualPedagogicalBoard(
           blankWord: 'maximum',
           suffix: 'figure can be clearly observed in this informative visual.',
           chips: ['maximum', 'huge', 'big', 'taller'],
-          feedback: 'Tepat! "maximum figure" adalah kolokasi akademik baku yang sangat disukai Pearson AI scorer.',
+          feedback: isId ? 'Tepat! "maximum figure" adalah kolokasi akademik baku yang sangat disukai Pearson AI scorer.' : 'Spot on! "maximum figure" is an academic collocation valued in Pearson scoring.',
         },
         blocks: {
           correctOrder: ['The', 'given', 'image', 'provides', 'key', 'information', 'about', 'the', 'visual.'],
           pool: ['about', 'given', 'The', 'visual.', 'information', 'provides', 'key', 'image', 'the'],
-          meaningId: 'Susun kalimat pengantar standar Pearson Describe Image:',
-          feedback: 'Susunan kalimat pembuka tepat sempurna!',
+          meaningId: isId ? 'Susun kalimat pengantar standar Pearson Describe Image:' : 'Arrange the standard Pearson Describe Image opening sentence:',
+          feedback: isId ? 'Susunan kalimat pembuka tepat sempurna!' : 'Opening sentence ordered accurately!',
         },
       },
     };
@@ -835,13 +883,13 @@ export function deriveContextualPedagogicalBoard(
             passage: 'Every morning, I practice speaking English clearly for ten minutes before starting work.',
             idTrans: 'Setiap pagi saya berlatih berbicara bahasa Inggris dengan jelas selama sepuluh menit sebelum mulai bekerja.',
             thTrans: 'ทุกเช้า ฉันฝึกพูดภาษาอังกฤษให้ชัดเจนเป็นเวลาสิบนาทีก่อนเริ่มทำงาน',
-            title: lt('Read Aloud Bahasa Inggris', 'ฝึกอ่านออกเสียงภาษาอังกฤษ'),
+            title: lt('Read Aloud Bahasa Inggris', 'ฝึกอ่านออกเสียงภาษาอังกฤษ', undefined, undefined, 'English Read Aloud'),
           },
           {
             passage: 'Could you please speak a little more slowly so I can understand every detail?',
             idTrans: 'Bisakah kamu berbicara sedikit lebih pelan agar aku bisa memahami setiap detailnya?',
             thTrans: 'ช่วยพูดช้าลงอีกนิดได้ไหม เพื่อให้ฉันเข้าใจทุกรายละเอียด',
-            title: lt('Read Aloud Bahasa Inggris', 'ฝึกอ่านออกเสียงภาษาอังกฤษ'),
+            title: lt('Read Aloud Bahasa Inggris', 'ฝึกอ่านออกเสียงภาษาอังกฤษ', undefined, undefined, 'English Read Aloud'),
           },
         ],
       };
@@ -854,10 +902,14 @@ export function deriveContextualPedagogicalBoard(
       const transText = useCustom
         ? loc === 'th'
           ? (liveTrans.translationTh && !liveTrans.translationTh.startsWith('Pahami') ? liveTrans.translationTh : '')
-          : (liveTrans.translationId && !liveTrans.translationId.startsWith('Pahami') ? liveTrans.translationId : '')
+          : isId && liveTrans.translationId && !liveTrans.translationId.startsWith('Pahami')
+            ? liveTrans.translationId
+            : ''
         : loc === 'th'
           ? preset.thTrans
-          : preset.idTrans;
+          : isId
+            ? preset.idTrans
+            : '';
       const readingGuide = resolveUnifiedPronunciation(passage, effectiveLang, undefined, loc) || '';
       const segs =
         effectiveLang === 'ja' || effectiveLang === 'zh'
@@ -965,13 +1017,16 @@ export function deriveContextualPedagogicalBoard(
               .map((word) => ({
                 word,
                 ipa: resolveUnifiedPronunciation(word, effectiveLang, undefined, loc) || word,
-                tip: 'Ucapkan suku kata akhir dengan artikulasi jelas.',
+                tip: isId ? 'Ucapkan suku kata akhir dengan artikulasi jelas.' : 'Articulate the final syllable clearly.',
               })),
-            oneSentenceHack:
-              'Jaga intonasi stabil di tiap klausa dan berhenti sejenak (0.3d) di setiap tanda jeda //.',
+            oneSentenceHack: isId
+              ? 'Jaga intonasi stabil di tiap klausa dan berhenti sejenak (0.3d) di setiap tanda jeda //.'
+              : 'Keep steady pitch across each clause and pause briefly (0.3s) at every // boundary.',
             examinerTips:
               action?.explanationText ||
-              'Baca kalimat persis sesuai teks di layar dengan pelafalan konsonan akhir yang jelas.',
+              (isId
+                ? 'Baca kalimat persis sesuai teks di layar dengan pelafalan konsonan akhir yang jelas.'
+                : 'Read the sentence accurately with crisp final consonant articulation.'),
           }
         : getRandomPteRaQuestion(prefCat));
 
@@ -997,28 +1052,38 @@ export function deriveContextualPedagogicalBoard(
       patternFormula: 'Read Aloud Technique: Syntax Chunking (//) + 130 WPM Balanced Pacing',
       coachExplanation:
         targetRa.examinerTips ||
-        'Pearson tidak menilai kecepatan balap, melainkan KONSISTENSI IRAMA. Tarik nafas hanya pada tanda jeda //, jangan berhenti di tengah kata frasa!',
+        (isId
+          ? 'Pearson tidak menilai kecepatan balap, melainkan KONSISTENSI IRAMA. Tarik nafas hanya pada tanda jeda //, jangan berhenti di tengah kata frasa!'
+          : 'Pearson scores STEADY RHYTHM rather than speed. Pause briefly only at // phrase breaks—never stop mid-phrase!'),
       pteReadAloudData: readAloudData,
       quiz: {
-        prompt: 'Di manakah jeda nafas (chunking) yang BENAR pada kalimat ini?',
+        prompt: isId
+          ? 'Di manakah jeda nafas (chunking) yang BENAR pada kalimat ini?'
+          : 'Where is the NATURAL breath pause (chunking) in this sentence?',
         options: [
           {
             id: 'opt_1',
             text: 'The proliferation of renewable technologies // has transformed power grids.',
             isCorrect: true,
-            feedback: 'Tepat! Pemenggalan dilakukan di antara Subjek Frasa Kompleks dan Kata Kerja Utama.',
+            feedback: isId
+              ? 'Tepat! Pemenggalan dilakukan di antara Subjek Frasa Kompleks dan Kata Kerja Utama.'
+              : 'Exact! Pause cleanly between the complex noun subject and the main verb.',
           },
           {
             id: 'opt_2',
             text: 'The proliferation // of renewable // technologies has // transformed grids.',
             isCorrect: false,
-            feedback: 'Terlalu banyak jeda patah-patah! Ini akan merusak skor Oral Fluency.',
+            feedback: isId
+              ? 'Terlalu banyak jeda patah-patah! Ini akan merusak skor Oral Fluency.'
+              : 'Too many choppy breaks! Choppy pausing lowers Oral Fluency.',
           },
           {
             id: 'opt_3',
             text: 'The proliferation of renewable technologies has transformed power grids without breathing.',
             isCorrect: false,
-            feedback: 'Membaca tanpa jeda sama sekali akan membuat suara kehabisan nafas di akhir.',
+            feedback: isId
+              ? 'Membaca tanpa jeda sama sekali akan membuat suara kehabisan nafas di akhir.'
+              : 'Reading with zero pauses makes the final words lose clarity and breath support.',
           },
         ],
         cloze: {
@@ -1026,13 +1091,19 @@ export function deriveContextualPedagogicalBoard(
           blankWord: 'demonstrate',
           suffix: 'that battery storage provides stable output.',
           chips: ['demonstrate', 'demonstrates', 'demonstrated'],
-          feedback: 'Benar! Subjek "studies" berbentuk jamak, jadi gunakan kata kerja dasar "demonstrate".',
+          feedback: isId
+            ? 'Benar! Subjek "studies" berbentuk jamak, jadi gunakan kata kerja dasar "demonstrate".'
+            : 'Correct! Plural subject "studies" takes the base verb "demonstrate".',
         },
         blocks: {
           correctOrder: ['Recent', 'empirical', 'studies', 'demonstrate', 'clean', 'energy', 'growth.'],
           pool: ['growth.', 'demonstrate', 'Recent', 'energy', 'studies', 'empirical', 'clean'],
-          meaningId: 'Susun kalimat akademik Read Aloud dengan urutan yang tepat:',
-          feedback: 'Sempurna! Frasa terangkai dengan sintaksis akademik yang baik.',
+          meaningId: isId
+            ? 'Susun kalimat akademik Read Aloud dengan urutan yang tepat:'
+            : 'Order this academic Read Aloud sentence accurately:',
+          feedback: isId
+            ? 'Sempurna! Frasa terangkai dengan sintaksis akademik yang baik.'
+            : 'Perfect! Clean academic phrase grouping.',
         },
       },
     };
@@ -1059,14 +1130,24 @@ export function deriveContextualPedagogicalBoard(
 
     const hasTiming = Boolean(diag && diag.durationSec > 0);
     const dynamicNotes = diag
-      ? `Laju tutur terukur ${diag.wpm} WPM (${diag.pacingQuality === 'optimal' ? 'zona optimal 115-152 WPM' : diag.pacingQuality === 'rushed' ? 'terlalu cepat' : 'kurang cepat'}) dalam durasi ${diag.durationSec}d` +
-        (typeof diag.activeSpeechSec === 'number'
-          ? ` (vokal aktif ${diag.activeSpeechSec}d, fonasi ${Math.round((diag.phonationRatio || 0) * 100)}%). `
-          : '. ') +
-        (diag.fluencyReasons && diag.fluencyReasons.length > 0
-          ? diag.fluencyReasons.slice(0, 2).join('; ') + '.'
-          : 'Irama tutur konsisten.')
-      : 'Belum ada sampel ucapan PTE pada sesi ini. Mulai bicara ke mikrofon agar Oral Fluency (WPM, jeda, disfluensi, & irama burst) terukur secara langsung.';
+      ? isId
+        ? `Laju tutur terukur ${diag.wpm} WPM (${diag.pacingQuality === 'optimal' ? 'zona optimal 115-152 WPM' : diag.pacingQuality === 'rushed' ? 'terlalu cepat' : 'kurang cepat'}) dalam durasi ${diag.durationSec}d` +
+          (typeof diag.activeSpeechSec === 'number'
+            ? ` (vokal aktif ${diag.activeSpeechSec}d, fonasi ${Math.round((diag.phonationRatio || 0) * 100)}%). `
+            : '. ') +
+          (diag.fluencyReasons && diag.fluencyReasons.length > 0
+            ? diag.fluencyReasons.slice(0, 2).join('; ') + '.'
+            : 'Irama tutur konsisten.')
+        : `Measured speech pace ${diag.wpm} WPM (${diag.pacingQuality === 'optimal' ? 'optimal zone 115-152 WPM' : diag.pacingQuality === 'rushed' ? 'too fast' : 'too slow'}) over ${diag.durationSec}s` +
+          (typeof diag.activeSpeechSec === 'number'
+            ? ` (active vocalization ${diag.activeSpeechSec}s, phonation ${Math.round((diag.phonationRatio || 0) * 100)}%). `
+            : '. ') +
+          (diag.fluencyReasons && diag.fluencyReasons.length > 0
+            ? diag.fluencyReasons.slice(0, 2).join('; ') + '.'
+            : 'Steady speech rhythm.')
+      : isId
+        ? 'Belum ada sampel ucapan PTE pada sesi ini. Mulai bicara ke mikrofon agar Oral Fluency (WPM, jeda, disfluensi, & irama burst) terukur secara langsung.'
+        : 'No PTE speech sample recorded in this session yet. Speak into the mic to measure Oral Fluency (WPM, pauses, disfluency, & burst rhythm) live.';
 
     const scorecardData: PteScorecardData = diag
       ? {
@@ -1103,28 +1184,34 @@ export function deriveContextualPedagogicalBoard(
 
     return {
       contextMode: 'pte_scorecard',
-      topicTitle: 'Rapor Ujian Resmi Pearson PTE',
+      topicTitle: isId ? 'Rapor Ujian Resmi Pearson PTE' : 'Pearson PTE Official Scorecard',
       patternFormula: 'Pearson Metric: Fluency (5.0) + Pronunciation (5.0) + Content (3.0)',
       coachExplanation: diag
         ? hasTiming && diag.scores.passedTarget
-          ? `Hasil evaluasi objektif dari sampel ucapan terakhir (${diag.measurementSource || 'measured'}). Kamu memenuhi target PTE 58+.`
-          : `Hasil evaluasi objektif dari sampel ucapan terakhir (${diag.measurementSource || 'measured'}). Fokus pada kelancaran jeda dan kejelasan vokal akhir.`
-        : 'Rekam jawabanmu terlebih dahulu untuk melihat skor Pearson Concordance (/90), laju WPM, rasio fonasi aktif, dan rincian jeda nyata.',
+          ? isId
+            ? `Hasil evaluasi objektif dari sampel ucapan terakhir (${diag.measurementSource || 'measured'}). Kamu memenuhi target PTE 58+.`
+            : `Objective evaluation from your latest sample (${diag.measurementSource || 'measured'}). You meet the PTE 58+ target.`
+          : isId
+            ? `Hasil evaluasi objektif dari sampel ucapan terakhir (${diag.measurementSource || 'measured'}). Fokus pada kelancaran jeda dan kejelasan vokal akhir.`
+            : `Objective evaluation from your latest sample (${diag.measurementSource || 'measured'}). Focus on smooth phrasing and clear final consonants.`
+        : isId
+          ? 'Rekam jawabanmu terlebih dahulu untuk melihat skor Pearson Concordance (/90), laju WPM, rasio fonasi aktif, dan rincian jeda nyata.'
+          : 'Record a speech sample first to see your Pearson Concordance (/90), WPM pace, active phonation ratio, and pause telemetry.',
       pteScorecardData: scorecardData,
       quiz: {
-        prompt: 'Bagaimana pelafalan kata "fluctuations" yang benar?',
+        prompt: isId ? 'Bagaimana pelafalan kata "fluctuations" yang benar?' : 'How is "fluctuations" pronounced naturally?',
         options: [
           {
             id: 'opt_1',
-            text: '/ˌflʌk.tʃuˈeɪ.ʃənz/ (dengan bunyi sh pada -tion)',
+            text: isId ? '/ˌflʌk.tʃuˈeɪ.ʃənz/ (dengan bunyi sh pada -tion)' : '/ˌflʌk.tʃuˈeɪ.ʃənz/ (with crisp /ʃ/ in -tion)',
             isCorrect: true,
-            feedback: 'Tepat sekali! Akhiran -tion dibaca /ʃənz/.',
+            feedback: isId ? 'Tepat sekali! Akhiran -tion dibaca /ʃənz/.' : 'Exact! The -tion ending is pronounced /ʃənz/.',
           },
           {
             id: 'opt_2',
-            text: '/fluk-tu-a-si-on/ (pelafalan harfiah)',
+            text: isId ? '/fluk-tu-a-si-on/ (pelafalan harfiah)' : '/fluk-tu-a-si-on/ (letter-by-letter reading)',
             isCorrect: false,
-            feedback: 'Kurang tepat. Jangan melafalkan huruf demi huruf secara harfiah.',
+            feedback: isId ? 'Kurang tepat. Jangan melafalkan huruf demi huruf secara harfiah.' : 'Not natural—avoid spelling-based syllable stress.',
           },
         ],
         cloze: {
@@ -1132,13 +1219,13 @@ export function deriveContextualPedagogicalBoard(
           blankWord: 'fluency',
           suffix: 'throughout the speech.',
           chips: ['fluency', 'fluent', 'fluently'],
-          feedback: 'Tepat! Kata benda "fluency" yang dibutuhkan.',
+          feedback: isId ? 'Tepat! Kata benda "fluency" yang dibutuhkan.' : 'Right! The noun "fluency" fits after steady.',
         },
         blocks: {
           correctOrder: ['Fluency', 'is', 'the', 'key', 'to', 'high', 'scores.'],
           pool: ['scores.', 'key', 'Fluency', 'to', 'high', 'is', 'the'],
-          meaningId: 'Susun kalimat prinsip kelancaran PTE:',
-          feedback: 'Tepat! Fluency is the key to high scores.',
+          meaningId: isId ? 'Susun kalimat prinsip kelancaran PTE:' : 'Order the core PTE fluency principle:',
+          feedback: isId ? 'Tepat! Fluency is the key to high scores.' : 'Exact! Fluency is the key to high scores.',
         },
       },
     };
@@ -1147,7 +1234,7 @@ export function deriveContextualPedagogicalBoard(
   // -------------------------------------------------------------
   // 6. KUMPULAN HASIL REAL-TIME AI (ZERO TEMPLATE STATIS)
   // -------------------------------------------------------------
-  const cleanTitle = (action?.topicTitle || query || 'Papan Belajar').trim();
+  const cleanTitle = (action?.topicTitle || query || ui.badge.replace(/^✦\s*/, '')).trim();
   const cleanFormula = (action?.patternFormula || '').trim();
   const cleanExplanation = (action?.coachSpokenScript || action?.explanationText || '').trim();
 
@@ -1782,9 +1869,9 @@ export const PteDescribeImageCanvas: React.FC<{
             <div className="grid grid-cols-2 gap-2">
               {/* Prep Timer (25s) */}
               <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
-                <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Persiapan</span>
+                <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">{wbT(locale, 'Prep Time', 'Waktu Persiapan', 'เวลาเตรียมตัว')}</span>
                 <div className="text-lg font-black text-[#231A12] my-0.5">
-                  {prepSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+                  {prepSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">{wbT(locale, 'sec', 'detik', 'วินาที')}</span>
                 </div>
                 <button
                   type="button"
@@ -1795,15 +1882,15 @@ export const PteDescribeImageCanvas: React.FC<{
                   }}
                   className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#231A12] text-white text-[10px] font-bold cursor-pointer active:scale-95"
                 >
-                  {isPrepRunning ? 'Pause' : prepSeconds === 0 ? 'Reset' : 'Mulai (25d)'}
+                  {isPrepRunning ? 'Pause' : prepSeconds === 0 ? 'Reset' : wbT(locale, 'Start (25s)', 'Mulai (25d)', 'เริ่ม (25วิ)')}
                 </button>
               </div>
 
               {/* Speaking Timer (40s) */}
               <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
-                <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Rekam Bicara</span>
+                <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">{wbT(locale, 'Recording Time', 'Waktu Rekam Bicara', 'เวลาพูด')}</span>
                 <div className={`text-lg font-black my-0.5 ${speakSeconds <= 10 ? 'text-[#DC2626]' : 'text-[#231A12]'}`}>
-                  {speakSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+                  {speakSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">{wbT(locale, 'sec', 'detik', 'วินาที')}</span>
                 </div>
                 <button
                   type="button"
@@ -1814,7 +1901,7 @@ export const PteDescribeImageCanvas: React.FC<{
                   }}
                   className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#B45309] text-white text-[10px] font-bold cursor-pointer active:scale-95"
                 >
-                  {isSpeakRunning ? 'Stop' : speakSeconds === 0 ? 'Reset' : 'Mulai Bicara (40d)'}
+                  {isSpeakRunning ? 'Stop' : speakSeconds === 0 ? 'Reset' : wbT(locale, 'Start Speaking (40s)', 'Mulai Bicara (40d)', 'เริ่มพูด (40วิ)')}
                 </button>
               </div>
             </div>
@@ -1824,7 +1911,7 @@ export const PteDescribeImageCanvas: React.FC<{
               <div className="flex items-center gap-1.5">
                 <span className="text-sm">⚡</span>
                 <span className="text-[10.5px] font-bold text-[#065F46]">
-                  Zona Berhenti Ideal: <strong className="font-black text-[#047857]">25–28 Detik!</strong>
+                  {wbT(locale, 'Ideal Stop Zone:', 'Zona Berhenti Ideal:')} <strong className="font-black text-[#047857]">{wbT(locale, '25–28 Sec!', '25–28 Detik!')}</strong>
                 </span>
               </div>
               <span className="px-2 py-0.5 rounded-md bg-[#059669] text-white text-[9px] font-black uppercase">
@@ -1836,7 +1923,12 @@ export const PteDescribeImageCanvas: React.FC<{
             <div className="p-2 rounded-xl bg-[#FEF2F2] border border-[#FCA5A5] flex items-start gap-1.5">
               <span className="text-base select-none shrink-0 leading-none mt-0.5">⚠️</span>
               <p className="text-[10px] text-[#991B1B] font-semibold leading-snug">
-                <span className="font-bold">Aturan 3 Detik Pearson:</span> Jangan hening &gt;3 detik! Mikrofon akan otomatis tertutup dan skor Fluency dinilai 0.
+                <span className="font-bold">{wbT(locale, 'Pearson 3-Second Rule:', 'Aturan 3 Detik Pearson:')}</span>{' '}
+                {wbT(
+                  locale,
+                  'Never stay silent for >3 seconds! The microphone closes automatically and Fluency scores 0.',
+                  'Jangan hening >3 detik! Mikrofon akan otomatis tertutup dan skor Fluency dinilai 0.'
+                )}
               </p>
             </div>
           </div>
@@ -1845,10 +1937,10 @@ export const PteDescribeImageCanvas: React.FC<{
           <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block">
-                Checklist Kata Kunci (Ketuk saat diucapkan):
+                {wbT(locale, 'Keyword Checklist (Tap as spoken):', 'Checklist Kata Kunci (Ketuk saat diucapkan):')}
               </span>
               <span className="text-[10px] font-bold text-[#B45309]">
-                {Object.values(checkedKeywords).filter(Boolean).length} / {activeQuestion.keywords.length} terucap
+                {Object.values(checkedKeywords).filter(Boolean).length} / {activeQuestion.keywords.length} {wbT(locale, 'spoken', 'terucap')}
               </span>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -2323,11 +2415,11 @@ export const PteReadAloudCanvas: React.FC<{
                 >
                   <div className="flex items-center justify-between gap-2 font-bold text-[11px]">
                     <span>
-                      {latestAlignment.passed ? '✓ Pelafalan Sesuai Target' : '✕ Perbaiki Pengucapan & Kata'}
+                      {latestAlignment.passed ? wbT(locale, '✓ Pronunciation on Target', '✓ Pelafalan Sesuai Target') : wbT(locale, '✕ Refine Pronunciation & Words', '✕ Perbaiki Pengucapan & Kata')}
                     </span>
                     <span>
-                      {Math.round(latestAlignment.wordAccuracy * 100)}% Kata •{' '}
-                      {Math.round(latestAlignment.phoneticAccuracy * 100)}% Fonetik
+                      {Math.round(latestAlignment.wordAccuracy * 100)}% {wbT(locale, 'Words', 'Kata')} •{' '}
+                      {Math.round(latestAlignment.phoneticAccuracy * 100)}% {wbT(locale, 'Phonetics', 'Fonetik')}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1 leading-normal">
@@ -2343,9 +2435,9 @@ export const PteReadAloudCanvas: React.FC<{
                         }`}
                         title={
                           tok.status === 'miss'
-                            ? 'Terlewat saat membaca'
+                            ? wbT(locale, 'Missed while reading', 'Terlewat saat membaca')
                             : tok.heard
-                              ? `Terdengar: "${tok.heard}"`
+                              ? `${wbT(locale, 'Heard:', 'Terdengar:')} "${tok.heard}"`
                               : undefined
                         }
                       >
@@ -2364,9 +2456,9 @@ export const PteReadAloudCanvas: React.FC<{
               <div className="grid grid-cols-2 gap-2">
                 {/* Prep Timer (35s) */}
                 <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
-                  <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Persiapan</span>
+                  <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">{wbT(locale, 'Prep Time', 'Waktu Persiapan')}</span>
                   <div className="text-lg font-black text-[#231A12] my-0.5">
-                    {prepSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+                    {prepSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">{wbT(locale, 'sec', 'detik')}</span>
                   </div>
                   <button
                     type="button"
@@ -2377,15 +2469,15 @@ export const PteReadAloudCanvas: React.FC<{
                     }}
                     className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#231A12] text-white text-[10px] font-bold cursor-pointer active:scale-95"
                   >
-                    {isPrepRunning ? 'Pause' : prepSeconds === 0 ? 'Reset' : 'Mulai (35d)'}
+                    {isPrepRunning ? 'Pause' : prepSeconds === 0 ? 'Reset' : wbT(locale, 'Start (35s)', 'Mulai (35d)')}
                   </button>
                 </div>
 
                 {/* Speaking Timer (40s) */}
                 <div className="p-2.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-col items-center justify-center text-center">
-                  <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">Waktu Rekam Bicara</span>
+                  <span className="text-[9.5px] font-bold text-[#8C7760] uppercase tracking-wider">{wbT(locale, 'Recording Time', 'Waktu Rekam Bicara')}</span>
                   <div className={`text-lg font-black my-0.5 ${speakSeconds <= 10 ? 'text-[#DC2626]' : 'text-[#231A12]'}`}>
-                    {speakSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">detik</span>
+                    {speakSeconds} <span className="text-[10px] font-semibold text-[#8C7760]">{wbT(locale, 'sec', 'detik')}</span>
                   </div>
                   <button
                     type="button"
@@ -2396,7 +2488,7 @@ export const PteReadAloudCanvas: React.FC<{
                     }}
                     className="mt-1 px-2.5 py-0.5 rounded-lg bg-[#B45309] text-white text-[10px] font-bold cursor-pointer active:scale-95"
                   >
-                    {isSpeakRunning ? 'Stop' : speakSeconds === 0 ? 'Reset' : 'Mulai Bicara (40d)'}
+                    {isSpeakRunning ? 'Stop' : speakSeconds === 0 ? 'Reset' : wbT(locale, 'Start Speaking (40s)', 'Mulai Bicara (40d)')}
                   </button>
                 </div>
               </div>
@@ -2406,8 +2498,8 @@ export const PteReadAloudCanvas: React.FC<{
                 <div className="flex items-center gap-2">
                   <span className="text-lg">⏱️</span>
                   <div>
-                    <span className="text-xs font-bold text-[#231A12] block">Pacing Konsisten (120 - 140 WPM)</span>
-                    <span className="text-[9.5px] text-[#8C7760]">Tarik nafas pendek hanya pada tanda jeda //</span>
+                    <span className="text-xs font-bold text-[#231A12] block">{wbT(locale, 'Steady Pacing (120–140 WPM)', 'Pacing Konsisten (120 - 140 WPM)')}</span>
+                    <span className="text-[9.5px] text-[#8C7760]">{wbT(locale, 'Take a short breath only at // breaks', 'Tarik nafas pendek hanya pada tanda jeda //')}</span>
                   </div>
                 </div>
                 <div className="px-2 py-1 rounded-lg bg-[#E6F4EA] text-[#1B5E34] text-[10px] font-black shrink-0">
@@ -2425,7 +2517,7 @@ export const PteReadAloudCanvas: React.FC<{
           {/* Articulation & Phonetic Chips */}
           <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] shadow-2xs space-y-2">
             <span className="text-[10px] font-bold text-[#8C7760] uppercase tracking-wider block pb-1 border-b border-[#F0E6D9]">
-              Titik Kritis Artikulasi & Pelafalan:
+              {wbT(locale, 'Key Articulation & Pronunciation Spots:', 'Titik Kritis Artikulasi & Pelafalan:')}
             </span>
             <div className="grid grid-cols-1 gap-2">
               {activeQuestion.phoneticFocus.map((p, idx) => (
@@ -2444,7 +2536,7 @@ export const PteReadAloudCanvas: React.FC<{
                       onClick={() => onSpeakPreview(p.word)}
                       className="mt-1 text-left text-[9.5px] font-bold text-[#B85D43] hover:underline cursor-pointer"
                     >
-                      🔊 Tes dengar suku kata
+                      {wbT(locale, '🔊 Preview word pronunciation', '🔊 Tes dengar suku kata')}
                     </button>
                   )}
                 </div>
@@ -2457,26 +2549,26 @@ export const PteReadAloudCanvas: React.FC<{
               <div className="flex items-center gap-1.5 pb-1 border-b border-[#DBEAFE]">
                 <span className="text-sm">💡</span>
                 <span className="text-xs font-black text-[#1E40AF]">
-                  Trik & Tips Rahasia Lulus PTE 42 Read Aloud
+                  {wbT(locale, 'PTE 42+ Read Aloud Tips & Strategy', 'Trik & Tips Rahasia Lulus PTE 42 Read Aloud')}
                 </span>
               </div>
 
               <div className="space-y-1.5 text-[10.5px] text-[#1E3A8A] leading-snug">
                 <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex flex-col gap-1">
-                  <span className="font-bold text-blue-700">⚡ Trik 1-Kalimat APEUni (One-Sentence Hack):</span>
+                  <span className="font-bold text-blue-700">{wbT(locale, '⚡ One-Sentence Hack:', '⚡ Trik 1-Kalimat APEUni (One-Sentence Hack):')}</span>
                   <span>{activeQuestion.oneSentenceHack}</span>
                 </div>
                 <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
                   <span className="font-bold text-blue-700 shrink-0">🎯 Monotone Pitch:</span>
-                  <span>Pertahankan nada datar 135–145 Hz. Pearson acoustic engine mendeteksi kelancaran konstan dengan skor kelancaran tertinggi.</span>
+                  <span>{wbT(locale, 'Hold a steady 135–145 Hz pitch for optimal fluency recognition.', 'Pertahankan nada datar 135–145 Hz. Pearson acoustic engine mendeteksi kelancaran konstan dengan skor kelancaran tertinggi.')}</span>
                 </div>
                 <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
-                  <span className="font-bold text-blue-700 shrink-0">💨 Jeda 0.3 Detik:</span>
-                  <span>Ambil nafas pendek di tanda // tanpa menghela nafas keras di mikrofon.</span>
+                  <span className="font-bold text-blue-700 shrink-0">{wbT(locale, '💨 0.3s Pause:', '💨 Jeda 0.3 Detik:')}</span>
+                  <span>{wbT(locale, 'Take a brief breath at // breaks without audible sighing.', 'Ambil nafas pendek di tanda // tanpa menghela nafas keras di mikrofon.')}</span>
                 </div>
                 {activeQuestion.examinerTips && (
                   <div className="p-2 rounded-xl bg-white/70 border border-[#BFDBFE] flex items-start gap-1.5 text-[#1E3A8A]">
-                    <span className="font-bold text-amber-700 shrink-0">📌 Tips Penguji:</span>
+                    <span className="font-bold text-amber-700 shrink-0">{wbT(locale, '📌 Examiner Tip:', '📌 Tips Penguji:')}</span>
                     <span>{activeQuestion.examinerTips}</span>
                   </div>
                 )}
@@ -2487,7 +2579,7 @@ export const PteReadAloudCanvas: React.FC<{
               <div className="flex items-center gap-1.5 pb-1 border-b border-[#F0E6D9]">
                 <span className="text-sm">📖</span>
                 <span className="text-xs font-black text-[#231A12]">
-                  Panduan Baca Nyaring & Evaluasi AI
+                  {wbT(locale, 'Read Aloud & AI Evaluation Guide', 'Panduan Baca Nyaring & Evaluasi AI')}
                 </span>
               </div>
               <div className="space-y-1.5 text-[10.5px] text-[#3D2E20] leading-snug">
@@ -2498,7 +2590,7 @@ export const PteReadAloudCanvas: React.FC<{
                 )}
                 {data.translationText && (
                   <div className="p-2 rounded-xl bg-[#E6F4EA] border border-[#BBF7D0] text-[#14532D]">
-                    <span className="font-bold block">Terjemahan:</span>
+                    <span className="font-bold block">{wbT(locale, 'Translation:', 'Terjemahan:')}</span>
                     <span>{data.translationText}</span>
                   </div>
                 )}
@@ -4746,10 +4838,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
             <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B85D43] bg-[#FDE8E4] px-1.5 py-0.2 rounded-full shrink-0">
-              Papan Aktif
+              {ui.minimizedBadge}
             </span>
             <span className="text-xs font-bold text-[#231A12] truncate">
-              {boardState?.topicTitle || topicTitle || 'Papan Belajar'}
+              {boardState?.topicTitle || topicTitle || ui.badge.replace(/^✦\s*/, '')}
             </span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
@@ -4761,16 +4853,16 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 setIsMinimized(false);
               }}
               className="px-2 py-0.5 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer border border-[#EADBCE]"
-              title="Perbesar Papan Belajar"
+              title={wbT(locale, 'Expand Learning Board', 'Perbesar Papan Belajar', 'ขยายกระดานเรียนรู้')}
             >
-              ⤢ Buka
+              {ui.openBtn}
             </button>
             <button
               type="button"
               data-testid="workbench-minimized-close-btn"
               onClick={onClose}
               className="w-6 h-6 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] text-[11px] font-bold flex items-center justify-center cursor-pointer"
-              title="Tutup Papan"
+              title={wbT(locale, 'Close Board', 'Tutup Papan', 'ปิดกระดาน')}
             >
               ✕
             </button>
@@ -4868,8 +4960,18 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         text: cleanQ,
         areaExcerpt,
         tutorAnswer: areaExcerpt
-          ? `⏳ Sedang menyiapkan penjelasan lanjutan khusus bagian "${areaExcerpt}"...`
-          : '⏳ Sedang menyusun penjelasan lanjutan & diagram di papan tulis...',
+          ? wbT(
+              locale,
+              `⏳ Preparing detailed explanation for "${areaExcerpt}"...`,
+              `⏳ Sedang menyiapkan penjelasan lanjutan khusus bagian "${areaExcerpt}"...`,
+              `⏳ กำลังเตรียมคำอธิบายเพิ่มเติมสำหรับ "${areaExcerpt}"...`
+            )
+          : wbT(
+              locale,
+              '⏳ Preparing follow-up explanation and whiteboard diagram...',
+              '⏳ Sedang menyusun penjelasan lanjutan & diagram di papan tulis...',
+              '⏳ กำลังเรียบเรียงคำอธิบายและแผนภาพบนกระดาน...'
+            ),
       },
     ]);
 
@@ -5176,7 +5278,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
       {quizMode === 'cloze_gap' && (
         <div className="space-y-2.5 pt-1">
-          <p className="text-xs font-bold text-[#231A12]">Ketuk kata yang tepat untuk melengkapi kalimat:</p>
+          <p className="text-xs font-bold text-[#231A12]">{ui.clozePrompt}</p>
           <div className="p-3 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] text-xs font-medium text-[#231A12] leading-relaxed">
             {activeQuiz.cloze.prefix}{' '}
             <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#FFFFFF] border-2 border-dashed border-[#B45309] font-bold text-[#B45309] min-w-[50px] text-center">
@@ -5211,7 +5313,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
             }`}>
               {clozeAnswer.toLowerCase() === activeQuiz.cloze.blankWord.toLowerCase()
                 ? activeQuiz.cloze.feedback
-                : 'Kata tersebut belum pas. Coba kata yang lain!'}
+                : ui.clozeWrong}
             </p>
           )}
         </div>
@@ -5222,7 +5324,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           <p className="text-xs font-bold text-[#231A12]">{activeQuiz.blocks.meaningId}</p>
           <div className="min-h-[44px] p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-wrap gap-1.5 items-center">
             {placedBlocks.length === 0 ? (
-              <span className="text-[11px] text-[#8C7760] italic">Ketuk balok di bawah untuk menyusun kalimat...</span>
+              <span className="text-[11px] text-[#8C7760] italic">{ui.blocksEmpty}</span>
             ) : (
               placedBlocks.map((blk, idx) => (
                 <button
@@ -5326,20 +5428,20 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 }}
                 data-testid="wb-toggle-sidebar-btn"
                 className="px-2.5 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold flex items-center gap-1 cursor-pointer shrink-0"
-                title="Buka / Tutup Materi Sumber"
+                title={wbT(locale, 'Toggle Source Materials', 'Buka / Tutup Materi Sumber', 'เปิด / ปิดสื่อประกอบ')}
               >
                 <span>📄</span>
-                <span className="hidden sm:inline">Materi</span>
+                <span className="hidden sm:inline">{wbT(locale, 'Sources', 'Materi', 'สื่อ')}</span>
               </button>
             )}
             <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[10px] font-extrabold tracking-wide uppercase shrink-0">
-              ✦ Papan Tulis AI
+              {wbT(locale, '✦ AI Whiteboard', '✦ Papan Tulis AI', '✦ กระดานไวท์บอร์ด AI')}
             </span>
             <h3
               className="text-xs sm:text-sm font-extrabold text-[#231A12] leading-tight truncate min-w-0"
               data-testid="workbench-topic-title"
             >
-              {boardState?.topicTitle || topicTitle || 'Papan Belajar'}
+              {boardState?.topicTitle || topicTitle || ui.badge.replace(/^✦\s*/, '')}
             </h3>
             {!isPteModal && isReady && isGeneratingTopic && (
               <span
@@ -5347,7 +5449,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#1D4ED8] text-[10px] font-bold shrink-0 animate-pulse"
               >
                 <span>⏳</span>
-                <span className="hidden sm:inline">Menyusun lanjutan...</span>
+                <span className="hidden sm:inline">{wbT(locale, 'Updating...', 'Menyusun lanjutan...', 'กำลังเรียบเรียง...')}</span>
               </span>
             )}
             {!showInitialBuffering && !isPteModal && isReady && !isGeneratingTopic && isAudioPreparing && (
@@ -5356,7 +5458,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF3C7] border border-[#FCD34D] text-[#92400E] text-[10px] font-extrabold shrink-0 animate-pulse"
               >
                 <span>🎙️</span>
-                <span className="hidden sm:inline">Menyiapkan suara natural...</span>
+                <span className="hidden sm:inline">{wbT(locale, 'Preparing natural voice...', 'Menyiapkan suara natural...', 'กำลังเตรียมเสียงธรรมชาติ...')}</span>
               </span>
             )}
           </div>
@@ -5366,7 +5468,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               <>
                 <select
                   data-testid="wb-speed-select"
-                  aria-label="Kecepatan menulis papan"
+                  aria-label={wbT(locale, 'Board writing speed', 'Kecepatan menulis papan', 'ความเร็วการเขียนกระดาน')}
                   value={playbackSpeed}
                   onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value) as 0.75 | 1 | 1.25 | 1.5)}
                   className="px-2 py-1 rounded-xl bg-[#F4F6F3] border border-[#DCE2DA] text-[11px] font-bold text-[#334155] cursor-pointer"
@@ -5385,10 +5487,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     setIsWritingPlaying(true);
                   }}
                   className="px-2.5 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold cursor-pointer hidden sm:inline-flex items-center gap-1"
-                  title="Putar Ulang Goresan Papan"
+                  title={wbT(locale, 'Replay board strokes', 'Putar Ulang Goresan Papan', 'เล่นซ้ำขั้นตอนบนกระดาน')}
                 >
                   <span>↺</span>
-                  <span>Ulangi</span>
+                  <span>{wbT(locale, 'Replay', 'Ulangi', 'เล่นซ้ำ')}</span>
                 </button>
 
                 <div className="hidden sm:flex items-center bg-[#F4F6F3] border border-[#DCE2DA] rounded-xl overflow-hidden text-[11px] font-bold text-[#334155]" data-testid="wb-zoom-controls">
@@ -5397,7 +5499,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     data-testid="wb-zoom-out"
                     onClick={() => setZoomLevel((z) => Math.max(0.75, Number((z - 0.1).toFixed(2))))}
                     className="px-2 py-1 hover:bg-[#E7ECE6] cursor-pointer"
-                    title="Perkecil papan (Zoom Out)"
+                    title={wbT(locale, 'Zoom Out', 'Perkecil papan (Zoom Out)')}
                   >
                     −
                   </button>
@@ -5415,7 +5517,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     data-testid="wb-zoom-in"
                     onClick={() => setZoomLevel((z) => Math.min(1.6, Number((z + 0.1).toFixed(2))))}
                     className="px-2 py-1 hover:bg-[#E7ECE6] cursor-pointer"
-                    title="Perbesar papan (Zoom In)"
+                    title={wbT(locale, 'Zoom In', 'Perbesar papan (Zoom In)')}
                   >
                     +
                   </button>
@@ -5429,19 +5531,19 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       ? 'bg-[#DCFCE7] border-[#86EFAC] text-[#14532D]'
                       : 'bg-[#F4F6F3] border-[#DCE2DA] text-[#475569]'
                   }`}
-                  title="Sorot & gulir otomatis ke langkah aktif"
+                  title={wbT(locale, 'Auto-highlight & scroll to active step', 'Sorot & gulir otomatis ke langkah aktif')}
                 >
-                  <span>{autoSpotlight ? '🎯 Fokus Auto' : '🎯 Fokus Manual'}</span>
+                  <span>{autoSpotlight ? wbT(locale, '🎯 Auto Focus', '🎯 Fokus Auto', '🎯 โฟกัสอัตโนมัติ') : wbT(locale, '🎯 Manual Focus', '🎯 Fokus Manual', '🎯 โฟกัสเอง')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleExportBoardPng}
                   className="px-2 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold cursor-pointer hidden sm:inline-flex items-center gap-1"
-                  title="Simpan Catatan Papan Tulis (PNG)"
+                  title={wbT(locale, 'Save whiteboard note (PNG)', 'Simpan Catatan Papan Tulis (PNG)', 'บันทึกกระดานเป็นรูป PNG')}
                 >
                   <span>⬇</span>
-                  <span className="hidden lg:inline">Simpan</span>
+                  <span className="hidden lg:inline">{wbT(locale, 'Save', 'Simpan', 'บันทึก')}</span>
                 </button>
               </>
             )}
@@ -5454,7 +5556,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               }}
               data-testid="workbench-minimize-btn"
               className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-sm flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
-              title="Kecilkan Papan (Lihat Mochi & Tetap Bicara)"
+              title={ui.minimizeTitle}
             >
               —
             </button>
@@ -5464,11 +5566,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               onClick={onClose}
               data-testid="workbench-close-btn"
               className="px-2.5 sm:px-3 py-1.5 rounded-full bg-[#FEE2E2] hover:bg-[#FECACA] text-[#B91C1C] font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shrink-0 transition-transform active:scale-95"
-              title="Akhiri Sesi Papan & Lanjut Ngobrol"
+              title={ui.closeTitle}
             >
               <span className="w-2 h-2 rounded-full bg-[#DC2626]" />
-              <span className="hidden sm:inline">Akhiri Papan</span>
-              <span className="sm:hidden">Tutup</span>
+              <span className="hidden sm:inline">{wbT(locale, 'End Board', 'Akhiri Papan', 'ปิดกระดาน')}</span>
+              <span className="sm:hidden">{wbT(locale, 'Close', 'Tutup', 'ปิด')}</span>
             </button>
           </div>
         </div>
@@ -5513,9 +5615,12 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       <span>{persona.name}</span>
                     </span>
                     <h3 className="text-sm sm:text-[15px] font-extrabold text-[#1C1611] leading-snug">
-                      {locale === 'th'
-                        ? 'Fiezel กำลังเตรียมคำอธิบายให้คุณ'
-                        : 'Fiezel sedang menyiapkan penjelasan untukmu'}
+                      {wbT(
+                        locale,
+                        'Fiezel is preparing your explanation',
+                        'Fiezel sedang menyiapkan penjelasan untukmu',
+                        'Fiezel กำลังเตรียมคำอธิบายให้คุณ'
+                      )}
                     </h3>
                   </div>
                 </div>
@@ -5532,12 +5637,22 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
               <div className="text-left space-y-1.5 px-0.5">
                 <div className="text-[11px] font-bold text-[#8C6D1F] uppercase tracking-wider truncate">
-                  {topicTitle || scenario.titleId}
+                  {topicTitle || (normalizeWbLocale(locale) === 'id' ? scenario.titleId : (scenario.titleTh && normalizeWbLocale(locale) === 'th' ? scenario.titleTh : topicTitle || 'Learning Session'))}
                 </div>
                 <p className="text-xs text-[#57534E] leading-relaxed">
                   {!isReady
-                    ? 'Merangkai alur materi, analogi visual, dan contoh kalimat dari nol...'
-                    : 'Papan & diagram siap, menyelaraskan suara tutor natural agar langsung bicara...'}
+                    ? wbT(
+                        locale,
+                        'Structuring concepts, visual analogies, and example sentences from scratch...',
+                        'Merangkai alur materi, analogi visual, dan contoh kalimat dari nol...',
+                        'กำลังจัดลำดับเนื้อหา แผนภาพเปรียบเทียบ และประโยคตัวอย่าง...'
+                      )
+                    : wbT(
+                        locale,
+                        'Board & diagrams ready — syncing natural tutor voice to begin right away...',
+                        'Papan & diagram siap, menyelaraskan suara tutor natural agar langsung bicara...',
+                        'กระดานและแผนภาพพร้อมแล้ว กำลังซิงค์เสียงติวเตอร์เพื่อเริ่มอธิบายทันที...'
+                      )}
                 </p>
               </div>
 
@@ -5545,17 +5660,17 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left">
                 {[
                   {
-                    label: 'Konsep & Rumus',
+                    label: wbT(locale, 'Concepts & Formula', 'Konsep & Rumus', 'แนวคิดและสูตร'),
                     done: isReady,
                     active: !isReady,
                   },
                   {
-                    label: 'Diagram Visual',
+                    label: wbT(locale, 'Visual Diagram', 'Diagram Visual', 'แผนภาพประกอบ'),
                     done: isReady,
                     active: !isReady,
                   },
                   {
-                    label: 'Suara Natural',
+                    label: wbT(locale, 'Natural Voice', 'Suara Natural', 'เสียงธรรมชาติ'),
                     done: isReady && !isAudioPreparing,
                     active: isReady && isAudioPreparing,
                   },
@@ -5952,7 +6067,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     setIsWritingPlaying((v) => !v);
                   }}
                   className="w-8 h-8 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-xs font-bold flex items-center justify-center cursor-pointer shrink-0"
-                  title={isWritingPlaying ? 'Jeda Menulis Papan' : 'Lanjut Menulis Papan'}
+                  title={isWritingPlaying ? wbT(locale, 'Pause Board', 'Jeda Menulis Papan') : wbT(locale, 'Resume Board', 'Lanjut Menulis Papan')}
                 >
                   {isWritingPlaying ? '⏸' : '▶'}
                 </button>
@@ -5962,7 +6077,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   onClick={handleReplayVoice}
                   data-testid="wb-replay-voice-btn"
                   className="w-8 h-8 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-xs font-bold flex items-center justify-center cursor-pointer shrink-0"
-                  title="Putar Ulang Papan & Suara dari Langkah 1"
+                  title={wbT(locale, 'Replay board & audio from Step 1', 'Putar Ulang Papan & Suara dari Langkah 1')}
                 >
                   🔊
                 </button>
@@ -5970,7 +6085,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 <span
                   data-testid="wb-lockstep-timer"
                   className="px-2 py-0.5 rounded-md bg-[#F4F6F3] border border-[#DCE2DA] text-[10px] font-bold text-[#334155] tabular-nums shrink-0"
-                  title={`Langkah ${Math.min(totalStepsCount, lockstepIndex + 1)} dari ${totalStepsCount}`}
+                  title={wbT(locale, `Step ${Math.min(totalStepsCount, lockstepIndex + 1)} of ${totalStepsCount}`, `Langkah ${Math.min(totalStepsCount, lockstepIndex + 1)} dari ${totalStepsCount}`)}
                 >
                   {fmtClock(clockElapsedMs)} / {fmtClock(clockTotalMs)} • {Math.min(totalStepsCount, lockstepIndex + 1)}/{totalStepsCount}
                 </span>
@@ -5981,7 +6096,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   className={`px-2 py-1 rounded-lg text-[10.5px] font-black cursor-pointer shrink-0 ${
                     showCaptions ? 'bg-[#0F172A] text-white' : 'bg-[#F1F5F9] text-[#475569]'
                   }`}
-                  title="Tampilkan / Sembunyikan Teks Penjelasan"
+                  title={wbT(locale, 'Toggle Explanation Captions', 'Tampilkan / Sembunyikan Teks Penjelasan')}
                 >
                   CC
                 </button>
@@ -6025,9 +6140,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     className={`px-2 py-0.5 rounded-full text-[11px] font-bold cursor-pointer transition-all ${
                       isPenActive ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#334155] hover:bg-white'
                     }`}
-                    title="Pakai Spidol untuk Lingkari Papan & Tanya"
+                    title={wbT(locale, 'Use pen to circle on the board & ask', 'Pakai Spidol untuk Lingkari Papan & Tanya')}
                   >
-                    ✏️ {isPenActive ? 'Spidol On' : 'Coret'}
+                    ✏️ {isPenActive ? wbT(locale, 'Pen On', 'Spidol On') : wbT(locale, 'Draw', 'Coret')}
                   </button>
                   {isPenActive &&
                     (['#2563EB', '#DC2626', '#059669', '#D97706'] as PenColor[]).map((col) => (
@@ -6039,7 +6154,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                         className={`w-4 h-4 rounded-full cursor-pointer transition-transform ${
                           penColor === col ? 'ring-2 ring-offset-1 ring-[#0F172A] scale-110' : 'opacity-70'
                         }`}
-                        title="Pilih Warna Spidol"
+                        title={wbT(locale, 'Pick pen color', 'Pilih Warna Spidol')}
                       />
                     ))}
                 </div>
@@ -6056,7 +6171,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     type="button"
                     onClick={() => materialUploadInputRef.current?.click()}
                     className="text-sm text-[#64748B] hover:text-[#0F172A] cursor-pointer shrink-0"
-                    title="Lampirkan gambar atau catatan"
+                    title={wbT(locale, 'Attach image or note', 'Lampirkan gambar atau catatan')}
                   >
                     📎
                   </button>
@@ -6065,7 +6180,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     data-testid="wb-board-question-input"
                     value={questionDraft}
                     onChange={(e) => setQuestionDraft(e.target.value)}
-                    placeholder="Tulis pertanyaan atau minta contoh lain..."
+                    placeholder={wbT(locale, 'Ask a question or request another example...', 'Tulis pertanyaan atau minta contoh lain...', 'พิมพ์คำถามหรือขอตัวอย่างเพิ่ม...')}
                     className="flex-1 min-w-0 bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
                   />
                   {questionDraft.trim().length > 0 && (
@@ -6074,7 +6189,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       data-testid="wb-board-question-submit"
                       className="px-2.5 py-0.5 rounded-full bg-[#2563EB] text-white text-[11px] font-bold cursor-pointer shrink-0"
                     >
-                      Tanya
+                      {wbT(locale, 'Ask', 'Tanya', 'ถาม')}
                     </button>
                   )}
                 </form>
@@ -6085,10 +6200,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   onClick={handleResumeTalk}
                   data-testid="wb-talk-coach-btn"
                   className="px-3.5 py-2 rounded-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all shrink-0"
-                  title={`Lanjut Bicara dengan ${persona.name}`}
+                  title={ui.talkBtn(persona.name)}
                 >
                   <span>🎙️</span>
-                  <span className="hidden sm:inline">Bicara</span>
+                  <span className="hidden sm:inline">{wbT(locale, 'Speak', 'Bicara', 'พูด')}</span>
                 </button>
 
                 <button

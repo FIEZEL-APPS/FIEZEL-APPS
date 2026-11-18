@@ -95,16 +95,60 @@
   const HAS_KANA_RE = /[\u3040-\u30ff]/;
   const HAS_HANZI_RE = /[\u4e00-\u9fff]/;
 
+  const EN_GRAMMAR_FALLBACK = {
+    'grammar.token-lepas': 'Tap to remove',
+    'quiz.periksa-ulang': 'Check Again',
+    'grammar.hint-level-1': 'Focus',
+    'grammar.hint-fallback': 'Check the sentence subject and time markers to choose the right form.',
+    'grammar.hint-level-2': 'Pattern Rule',
+    'quiz.fallback-context': 'Use the verb form that fits the subject and context.',
+    'grammar.hint-level-3': 'Watch the Trap',
+    'quiz.fallback-hint-check': 'Watch out for distractors that look similar but do not fit the sentence context.',
+    'grammar.hint-level-4': 'Memory Key',
+    'quiz.fallback-hint-connect': 'Remember the sentence pattern and how it connects to the subject.',
+    'grammar.petunjuk': 'Grammar Hint',
+    'modal.tutup': 'Close',
+    'grammar.hint-next': 'Next Hint',
+    'grammar.hint-close': 'Got it',
+    'quiz.verdict-correct': 'Spot on!',
+    'quiz.correct-answer': 'Correct answer: {answer}',
+    'quiz.verdict-wrong': 'Not quite right',
+    'quiz.jawabanmu': 'Your answer:',
+    'quiz.answer-paling-tepat-adalah': 'Correct answer:',
+    'quiz.mengapa-salah': 'Why is this not right?',
+    'quiz.intinya': 'Key point:',
+    'quiz.aturannya': 'Rule:',
+    'grammar.contrast-title': 'Key Contrast',
+    'quiz.trik-ingat': 'Quick Memory Trick',
+    'quiz.jelaskan-dengan-cara-lebih-sederhana': 'Explain more simply',
+    'grammar.mistake-vault-title': 'Mistake Vault',
+    'grammar.mistake-vault-items': 'notes',
+    'grammar.mistake-vault-desc-active': 'Practice these patterns again until mastered twice.',
+    'grammar.mistake-vault-btn': 'Practice Mistakes',
+    'grammar.token-rail-aria': 'Sentence builder area',
+    'grammar.token-bank-aria': 'Available word tokens',
+    'grammar.token-voice-btn': 'Speak Sentence',
+    'grammar.token-voice-listening': 'Listening...',
+    'grammar.token-voice-matched': '{cocok} words placed',
+    'grammar.token-voice-nomatch': 'No matching words heard yet',
+    'grammar.token-voice-unsupported': 'Voice input is not supported in this browser',
+    'grammar.token-voice-ready': 'Speak the sentence using the words in the bank',
+    'grammar.token-voice-denied': 'Microphone permission denied',
+    'umum.hapus': 'Clear'
+  };
+
   function t(key, fallback, params) {
     let out;
+    let loc = 'id';
     try {
       const i18n = typeof FiezelI18n !== 'undefined' ? FiezelI18n : self.FiezelI18n;
+      if (i18n && typeof i18n.getLocale === 'function') loc = i18n.getLocale() || 'id';
       if (i18n && typeof i18n.t === 'function') {
         const res = i18n.t(key, params);
         if (res && res !== key) out = res;
       }
     } catch (_) {}
-    if (!out) out = fallback;
+    if (!out) out = (loc && loc !== 'id' && EN_GRAMMAR_FALLBACK[key]) ? EN_GRAMMAR_FALLBACK[key] : fallback;
     if (params && typeof out === 'string') {
       out = out.replace(/\{(\w+)\}/g, (m, k) => (Object.prototype.hasOwnProperty.call(params, k) ? String(params[k]) : m));
     }
@@ -849,7 +893,7 @@
         } else {
           btn.textContent = token.text;
         }
-        btn.setAttribute('title', FiezelI18n.t('grammar.token-lepas', 'Ketuk untuk melepas'));
+        btn.setAttribute('title', t('grammar.token-lepas', 'Ketuk untuk melepas'));
         btn.onclick = () => {
           FiezelGrammarUpgrade.stopActiveVoice();
           if (typeof self.haptic === 'function') self.haptic('tap');
@@ -877,7 +921,7 @@
       submitBtn.disabled = placedTokens.length < targetCount;
       if (q.__scaffoldAttempt) {
         submitBtn.classList.add('token-submit-retry');
-        submitBtn.innerHTML = `<i data-lucide="rotate-ccw"></i> <span>${FiezelI18n.t('quiz.periksa-ulang', 'Periksa Ulang')}</span>`;
+        submitBtn.innerHTML = `<i data-lucide="rotate-ccw"></i> <span>${t('quiz.periksa-ulang', 'Periksa Ulang')}</span>`;
       }
       if (resetBtn) resetBtn.disabled = placedTokens.length === 0;
     };
@@ -1360,26 +1404,26 @@
     const levels = [
       {
         num: 1,
-        title: FiezelI18n.t('grammar.hint-level-1', 'Arah Fokus'),
-        text: exp.clue || q.pedagogicalObjective || FiezelI18n.t('grammar.hint-fallback', 'Perhatikan subjek kalimat dan penanda waktu untuk menentukan bentuk yang tepat.')
+        title: t('grammar.hint-level-1', 'Arah Fokus'),
+        text: exp.clue || q.pedagogicalObjective || t('grammar.hint-fallback', 'Perhatikan subjek kalimat dan penanda waktu untuk menentukan bentuk yang tepat.')
       },
       {
         num: 2,
-        title: FiezelI18n.t('grammar.hint-level-2', 'Aturan Pola'),
-        text: exp.rule || q.rule || FiezelI18n.t('quiz.fallback-context', 'Gunakan pola bentuk kata kerja yang sesuai dengan subjek.')
+        title: t('grammar.hint-level-2', 'Aturan Pola'),
+        text: exp.rule || q.rule || t('quiz.fallback-context', 'Gunakan pola bentuk kata kerja yang sesuai dengan subjek.')
       },
       {
         num: 3,
-        title: FiezelI18n.t('grammar.hint-level-3', 'Waspada Jebakan'),
-        text: hideKey(exp.avoid) || FiezelI18n.t('quiz.fallback-hint-check', 'Hati-hati dengan pilihan pengecoh yang mirip tapi tidak sesuai konteks kalimat.')
+        title: t('grammar.hint-level-3', 'Waspada Jebakan'),
+        text: hideKey(exp.avoid) || t('quiz.fallback-hint-check', 'Hati-hati dengan pilihan pengecoh yang mirip tapi tidak sesuai konteks kalimat.')
       },
       {
         num: 4,
-        title: FiezelI18n.t('grammar.hint-level-4', 'Kunci & Memori'),
+        title: t('grammar.hint-level-4', 'Kunci & Memori'),
         // Audit G8: dulu tingkat ini membuka `explain.why` - kalimat "kenapa jawaban benar itu
         // benar" yang pada ±78% soal menyebut kuncinya, SEBELUM murid menjawab. Kini hanya
         // pegangan ingatan; alasan lengkapnya tetap ada di pembahasan sesudah menjawab.
-        text: exp.memory ? `💡 ${hideKey(exp.memory)}` : FiezelI18n.t('quiz.fallback-hint-connect', 'Ingat pola kalimat dan hubungannya dengan subjek.')
+        text: exp.memory ? `💡 ${hideKey(exp.memory)}` : t('quiz.fallback-hint-connect', 'Ingat pola kalimat dan hubungannya dengan subjek.')
       }
     ];
 
@@ -1406,10 +1450,10 @@
         <div class="hint-popover-header">
           <div style="display:flex;align-items:center;gap:6px">
             <i data-lucide="info"></i>
-            <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>
+            <strong>${t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>
           </div>
           <span class="hint-level-pill">${currentLvl}/4</span>
-          <button type="button" id="hintCloseBtn" class="hint-close-btn" aria-label="${FiezelI18n.t('modal.tutup', 'Tutup')}"><i data-lucide="x"></i></button>
+          <button type="button" id="hintCloseBtn" class="hint-close-btn" aria-label="${t('modal.tutup', 'Tutup')}"><i data-lucide="x"></i></button>
         </div>
         <div class="hint-step-indicator" aria-hidden="true">
           ${[1,2,3,4].map(i => `<div class="hint-step-dot${i <= currentLvl ? ' active' : ''}"></div>`).join('')}
@@ -1420,8 +1464,8 @@
         </div>
         <div class="hint-popover-actions">
           ${currentLvl < 4
-            ? `<button type="button" class="hint-next-btn" id="hintNextBtn">${FiezelI18n.t('grammar.hint-next', 'Petunjuk Berikutnya')} <i data-lucide="arrow-right"></i></button>`
-            : `<button type="button" class="hint-next-btn" id="hintNextBtn"><i data-lucide="check"></i> ${FiezelI18n.t('grammar.hint-close', 'Mengerti')}</button>`
+            ? `<button type="button" class="hint-next-btn" id="hintNextBtn">${t('grammar.hint-next', 'Petunjuk Berikutnya')} <i data-lucide="arrow-right"></i></button>`
+            : `<button type="button" class="hint-next-btn" id="hintNextBtn"><i data-lucide="check"></i> ${t('grammar.hint-close', 'Mengerti')}</button>`
           }
         </div>
       `;
@@ -1483,7 +1527,7 @@
     const correctOption = (q.tokens ? q.tokens.join(' ') : '') || (q.options ? q.options[q.answerIndex] : '');
 
     const icon = ok ? 'circle-check-big' : 'circle-x';
-    const title = ok ? FiezelI18n.t('quiz.verdict-correct', 'Tepat sekali!') : FiezelI18n.t('quiz.verdict-wrong', 'Belum tepat');
+    const title = ok ? t('quiz.verdict-correct', 'Tepat sekali!') : t('quiz.verdict-wrong', 'Belum tepat');
 
     let pickedWhyFails = '';
     if (!ok && (q.type === 'grammar') && q.explain && Array.isArray(q.explain.distractors)) {
@@ -1491,9 +1535,9 @@
       pickedWhyFails = dist ? (dist.reason || '').trim() : '';
     }
 
-    const whyText = q.explain && q.explain.why ? esc(q.explain.why) : FiezelI18n.t('quiz.fallback-context', 'Pemakaian bentuk yang tepat.');
+    const whyText = q.explain && q.explain.why ? esc(q.explain.why) : t('quiz.fallback-context', 'Pemakaian bentuk yang tepat.');
     const ruleText = q.explain && q.explain.rule ? esc(q.explain.rule) : '';
-    const memoryTip = q.explain && q.explain.memory ? esc(q.explain.memory) : FiezelI18n.t('quiz.fallback-hint-connect', 'Ingat pola kalimatnya.');
+    const memoryTip = q.explain && q.explain.memory ? esc(q.explain.memory) : t('quiz.fallback-hint-connect', 'Ingat pola kalimatnya.');
 
     return `
       <div class="feedback-title">
@@ -1502,29 +1546,29 @@
 
       <div class="feedback-comparison">
         ${ok
-          ? `<p>${FiezelI18n.t('quiz.correct-answer', { answer: `<strong>${esc(pickedOption)}</strong>` })}</p>`
-          : `<p class="wrong-pick"><i data-lucide="x"></i> ${FiezelI18n.t('quiz.jawabanmu', 'Jawabanmu:')} <strong>${esc(pickedOption)}</strong></p>
-             <p class="correct-pick"><i data-lucide="check"></i> ${FiezelI18n.t('quiz.answer-paling-tepat-adalah', 'Yang benar:')} <strong>${esc(correctOption)}</strong></p>`
+          ? `<p>${t('quiz.correct-answer', 'Jawaban benar: {answer}', { answer: `<strong>${esc(pickedOption)}</strong>` })}</p>`
+          : `<p class="wrong-pick"><i data-lucide="x"></i> ${t('quiz.jawabanmu', 'Jawabanmu:')} <strong>${esc(pickedOption)}</strong></p>
+             <p class="correct-pick"><i data-lucide="check"></i> ${t('quiz.answer-paling-tepat-adalah', 'Yang benar:')} <strong>${esc(correctOption)}</strong></p>`
         }
       </div>
 
-      ${pickedWhyFails ? `<div class="feedback-your-pick-box"><p><strong>${FiezelI18n.t('quiz.mengapa-salah', 'Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p></div>` : ''}
+      ${pickedWhyFails ? `<div class="feedback-your-pick-box"><p><strong>${t('quiz.mengapa-salah', 'Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p></div>` : ''}
 
       <div class="feedback-rule-pill grammar-rule-pill">
-        <p class="grammar-rule-why"><strong>${FiezelI18n.t('quiz.intinya', 'Intinya:')}</strong> ${whyText}</p>
-        ${ruleText ? `<p class="grammar-rule-text"><strong>${FiezelI18n.t('quiz.aturannya', 'Aturannya:')}</strong> ${ruleText}</p>` : ''}
+        <p class="grammar-rule-why"><strong>${t('quiz.intinya', 'Intinya:')}</strong> ${whyText}</p>
+        ${ruleText ? `<p class="grammar-rule-text"><strong>${t('quiz.aturannya', 'Aturannya:')}</strong> ${ruleText}</p>` : ''}
       </div>
 
       ${(q.contrast || q.explain?.contrast) ? `
       <div class="gx-contrast-card">
-        <div class="gx-contrast-title">💡 ${FiezelI18n.t('grammar.contrast-title')}</div>
+        <div class="gx-contrast-title">💡 ${t('grammar.contrast-title')}</div>
         <div class="gx-contrast-body">${esc(q.contrast || q.explain?.contrast)}</div>
       </div>` : ''}
 
       <div class="feedback-memory-box memory-tip">
         <div class="feedback-memory-header">
           <i data-lucide="lightbulb"></i>
-          <span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat', 'Trik Cepat Ingat')}</span>
+          <span class="feedback-memory-kicker">${t('quiz.trik-ingat', 'Trik Cepat Ingat')}</span>
         </div>
         <div class="feedback-memory-content">
           ${FiezelGrammarUpgrade.formatMemoryTip ? FiezelGrammarUpgrade.formatMemoryTip(memoryTip) : ('<span>' + memoryTip + '</span>')}
@@ -1532,7 +1576,7 @@
       </div>
 
       <button class="ai-btn" id="aiExplainBtn">
-        <i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana', 'Jelaskan lebih sederhana')}
+        <i data-lucide="sparkles"></i> ${t('quiz.jelaskan-dengan-cara-lebih-sederhana', 'Jelaskan lebih sederhana')}
       </button>
     `;
   };
@@ -1575,14 +1619,14 @@
 
     const cardHtml = `
       <div class="row">
-        <b><i data-lucide="archive"></i> ${FiezelI18n.t('grammar.mistake-vault-title', 'Koleksi Kesalahan')}</b>
-        <span>${count} ${FiezelI18n.t('grammar.mistake-vault-items', 'catatan')}</span>
+        <b><i data-lucide="archive"></i> ${t('grammar.mistake-vault-title', 'Koleksi Kesalahan')}</b>
+        <span>${count} ${t('grammar.mistake-vault-items', 'catatan')}</span>
       </div>
       <p class="muted">
-        ${FiezelI18n.t('grammar.mistake-vault-desc-active', 'Latih kembali polanya sampai tuntas 2x sesi.')}
+        ${t('grammar.mistake-vault-desc-active', 'Latih kembali polanya sampai tuntas 2x sesi.')}
       </p>
       <button onclick="startMistakeVaultSession()" class="primary">
-        ${FiezelI18n.t('grammar.mistake-vault-btn', 'Latih Kesalahan')} <i data-lucide="arrow-right"></i>
+        ${t('grammar.mistake-vault-btn', 'Latih Kesalahan')} <i data-lucide="arrow-right"></i>
       </button>
     `;
 

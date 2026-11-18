@@ -1992,7 +1992,7 @@
   "kurikulum.papan-title": "Lớp học và Hội đồng giảng dạy",
   "kurikulum.paspor-kicker": "Nhật ký thành tích học tập",
   "kurikulum.paspor-miskonsepsi": "Những quan niệm sai lầm thường xuyên lặp lại",
-  "kurikulum.paspor-perlu-review": "Cần gia cố vật chất",
+  "kurikulum.paspor-perlu-review": "Cần củng cố bài học",
   "kurikulum.paspor-retensi": "sự giữ lại",
   "kurikulum.paspor-tanpa-evidence": "Chưa có kết quả thực tập.",
   "kurikulum.peringatan-kicker": "Cảnh báo cấu trúc",
@@ -3072,7 +3072,7 @@
   "progress.perkiraan-level": "Mức độ gần đúng:",
   "progress.peta-kemampuanmu-bukan-rapor-rendah": "Đây không phải là một thẻ báo cáo. Con số thấp chỉ có nghĩa là bạn chưa được đào tạo nhiều.",
   "progress.peta-skill-reading": "Bản đồ kỹ năng đọc",
-  "progress.peta-study": "Tiến độ vật chất",
+  "progress.peta-study": "Tiến độ bài học",
   "progress.peta-study-lab": "Tiến độ học tập",
   "progress.pilihan-paling-sering-muncul-kali": "Tùy chọn xảy ra thường xuyên nhất: “ {common} ” ( {count} lần)",
   "progress.pola-kesalahan": "Mẫu lỗi",
@@ -4879,5 +4879,9 @@
   "mandarin.chapter_word": "BÀI",
   "mandarin.reorder_hint": "Trật tự câu tiếng Trung theo mẫu Chủ ngữ + Thời gian + Địa điểm + Động từ + Tân ngữ.",
   "mandarin.reorder_pattern_hint": "Đặt trạng ngữ thời gian và nơi chốn trước động từ.",
-  "story.cat-teknologi": "Công nghệ & Du lịch"
+  "story.cat-teknologi": "Công nghệ & Du lịch",
+  "onboarding.ja-meaning-go": "đi",
+  "mandarin.level-0-tab": "Nền tảng (Cấp 0)",
+  "mandarin.level-7-tab": "Cấp 7 (Diễn ngôn)",
+  "mandarin.level-8-tab": "Cấp 8 (Văn học)"
 }

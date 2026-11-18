@@ -1259,6 +1259,46 @@ export function t(locale: LearnerLocale, key: string): string {
   return COPY[locale]?.[key] ?? COPY.en?.[key] ?? COPY.id?.[key] ?? key;
 }
 
+export function resolveRuntimeVoiceLocale(locale?: LearnerLocale | string): LearnerLocale {
+  const raw = String(locale || '').trim().toLowerCase().split(/[-_]/)[0];
+  if (raw === 'id' || raw === 'th' || raw === 'en' || raw === 'vi' || raw === 'ms' || raw === 'fil' || raw === 'ja' || raw === 'km' || raw === 'ru') {
+    return raw as LearnerLocale;
+  }
+  try {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search || '');
+      const hasTarget = sp.has('target') || sp.has('course');
+      const explicitLoc = (sp.get('locale') || sp.get('hl') || sp.get('ui_lang') || (hasTarget ? sp.get('lang') : '') || '')
+        .trim().toLowerCase().split(/[-_]/)[0];
+      if (explicitLoc) return resolveRuntimeVoiceLocale(explicitLoc);
+      if (typeof localStorage !== 'undefined') {
+        const storedLoc = (
+          localStorage.getItem('fiezel_lang_chosen') ||
+          localStorage.getItem('fz_ui_lang') ||
+          localStorage.getItem('fiezel-ui-lang') ||
+          localStorage.getItem('fiezel_ui_lang') ||
+          ''
+        ).trim().toLowerCase().split(/[-_]/)[0];
+        if (storedLoc) return resolveRuntimeVoiceLocale(storedLoc);
+      }
+      const qLang = (sp.get('lang') || '').trim().toLowerCase().split(/[-_]/)[0];
+      if (qLang === 'id' || qLang === 'th' || qLang === 'vi' || qLang === 'ms' || qLang === 'fil' || qLang === 'km' || qLang === 'ru') {
+        return qLang as LearnerLocale;
+      }
+      const htmlLang = (document.documentElement?.lang || '').trim().toLowerCase().split(/[-_]/)[0];
+      if (htmlLang && htmlLang !== 'id') return resolveRuntimeVoiceLocale(htmlLang);
+    }
+  } catch { /* ignore */ }
+  return 'en';
+}
+
+export function wbPick<T>(en: T, id: T, th?: T, locale?: LearnerLocale | string): T {
+  const loc = resolveRuntimeVoiceLocale(locale);
+  if (loc === 'id') return id;
+  if (loc === 'th' && th !== undefined) return th;
+  return en;
+}
+
 export function tMasteryState(locale: LearnerLocale, state: MasteryStateName): string {
   return t(locale, `state.${state}`);
 }

@@ -25,6 +25,13 @@
     });
   }
 
+  function pteIsId() {
+    try {
+      var i = (typeof self !== 'undefined' ? self : globalThis).FiezelI18n;
+      return !i || typeof i.getLocale !== 'function' || i.getLocale() === 'id';
+    } catch (_) { return true; }
+  }
+
   // Preloaded Content Bank Caches (All 15 Banks)
   var BANKS = {
     ra: [],
@@ -610,9 +617,10 @@
    * Render 6 Rumus Grammar 3 Detik & Collocations Quick Guide Drawer.
    */
   function renderGrammarQuickGuide() {
+    var isId = pteIsId();
     var out = ['  <div class="fz-pte-grammar-guide-card fade">'];
     out.push('    <div class="fz-pte-guide-header">');
-    out.push('      <h4>💡 6 Rumus Grammar 3 Detik (PTE FIB Cheat-Sheet)</h4>');
+    out.push('      <h4>' + (isId ? '💡 6 Rumus Grammar 3 Detik (PTE FIB Cheat-Sheet)' : '💡 6 Three-Second Grammar Formulas (PTE FIB Cheat-Sheet)') + '</h4>');
     out.push('      <button type="button" class="fz-pte-close-guide" onclick="FiezelPteUi.toggleGrammarGuide()">✕ Close</button>');
     out.push('    </div>');
 
@@ -620,38 +628,50 @@
 
     // Rule 1
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>Rumus 1: Modal Auxiliary + V1</b>');
-    out.push('        <p>Setelah modal (<code>can</code>, <code>could</code>, <code>will</code>, <code>would</code>, <code>must</code>, <code>should</code>, <code>may</code>), kata kerja wajib berbentuk dasar (V1 tanpa -s/-ed/-ing).<br>Contoh: <i>will <b>provide</b></i>, <i>must <b>ensure</b></i>.</p>');
+    out.push('        <b>' + (isId ? 'Rumus 1: Modal Auxiliary + V1' : 'Formula 1: Modal Auxiliary + Base Verb (V1)') + '</b>');
+    out.push('        <p>' + (isId
+      ? 'Setelah modal (<code>can</code>, <code>could</code>, <code>will</code>, <code>would</code>, <code>must</code>, <code>should</code>, <code>may</code>), kata kerja wajib berbentuk dasar (V1 tanpa -s/-ed/-ing).<br>Contoh: <i>will <b>provide</b></i>, <i>must <b>ensure</b></i>.'
+      : 'After modal verbs (<code>can</code>, <code>could</code>, <code>will</code>, <code>would</code>, <code>must</code>, <code>should</code>, <code>may</code>), always use the bare infinitive (V1 with no -s/-ed/-ing).<br>Example: <i>will <b>provide</b></i>, <i>must <b>ensure</b></i>.') + '</p>');
     out.push('      </div>');
 
     // Rule 2
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>Rumus 2: Passive Voice (to be + V3)</b>');
-    out.push('        <p>Setelah <code>is / are / was / were / been / being</code> jika subjek menerima aksi (di-/ter-), wajib gunakan Verb 3 (Past Participle).<br>Contoh: <i>was <b>conducted</b></i>, <i>is widely <b>regarded</b></i>.</p>');
+    out.push('        <b>' + (isId ? 'Rumus 2: Passive Voice (to be + V3)' : 'Formula 2: Passive Voice (to be + V3)') + '</b>');
+    out.push('        <p>' + (isId
+      ? 'Setelah <code>is / are / was / were / been / being</code> jika subjek menerima aksi (di-/ter-), wajib gunakan Verb 3 (Past Participle).<br>Contoh: <i>was <b>conducted</b></i>, <i>is widely <b>regarded</b></i>.'
+      : 'After <code>is / are / was / were / been / being</code> when the subject receives the action, use the Past Participle (V3).<br>Example: <i>was <b>conducted</b></i>, <i>is widely <b>regarded</b></i>.') + '</p>');
     out.push('      </div>');
 
     // Rule 3
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>Rumus 3: Perfect Aspect (have/has/had + V3)</b>');
-    out.push('        <p>Setelah <code>has / have / had</code>, kata kerja wajib Verb 3 (Past Participle).<br>Contoh: <i>has <b>developed</b></i>, <i>have <b>demonstrated</b></i>.</p>');
+    out.push('        <b>' + (isId ? 'Rumus 3: Perfect Aspect (have/has/had + V3)' : 'Formula 3: Perfect Aspect (have/has/had + V3)') + '</b>');
+    out.push('        <p>' + (isId
+      ? 'Setelah <code>has / have / had</code>, kata kerja wajib Verb 3 (Past Participle).<br>Contoh: <i>has <b>developed</b></i>, <i>have <b>demonstrated</b></i>.'
+      : 'After <code>has / have / had</code>, use the Past Participle (V3).<br>Example: <i>has <b>developed</b></i>, <i>have <b>demonstrated</b></i>.') + '</p>');
     out.push('      </div>');
 
     // Rule 4
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>Rumus 4: Adjective before Noun</b>');
-    out.push('        <p>Jika titik-titik berada di antara Determiner (<code>a / an / the / their</code>) dan Noun (kata benda), wajib diisi Adjective (kata sifat).<br>Contoh: <i>a <b>vital</b> role</i>, <i><b>significant</b> impact</i>.</p>');
+    out.push('        <b>' + (isId ? 'Rumus 4: Adjective before Noun' : 'Formula 4: Adjective before Noun') + '</b>');
+    out.push('        <p>' + (isId
+      ? 'Jika titik-titik berada di antara Determiner (<code>a / an / the / their</code>) dan Noun (kata benda), wajib diisi Adjective (kata sifat).<br>Contoh: <i>a <b>vital</b> role</i>, <i><b>significant</b> impact</i>.'
+      : 'When the blank sits between a Determiner (<code>a / an / the / their</code>) and a Noun, fill it with an Adjective.<br>Example: <i>a <b>vital</b> role</i>, <i><b>significant</b> impact</i>.') + '</p>');
     out.push('      </div>');
 
     // Rule 5
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>Rumus 5: Adverb modifies Verb or Adjective</b>');
-    out.push('        <p>Adverb berakhiran <code>-ly</code> menjelaskan cara kerja (Verb) atau kadar (Adjective).<br>Contoh: <i>increased <b>dramatically</b></i>, <i><b>substantially</b> more cost-effective</i>.</p>');
+    out.push('        <b>' + (isId ? 'Rumus 5: Adverb modifies Verb or Adjective' : 'Formula 5: Adverb modifies Verb or Adjective') + '</b>');
+    out.push('        <p>' + (isId
+      ? 'Adverb berakhiran <code>-ly</code> menjelaskan cara kerja (Verb) atau kadar (Adjective).<br>Contoh: <i>increased <b>dramatically</b></i>, <i><b>substantially</b> more cost-effective</i>.'
+      : 'Adverbs ending in <code>-ly</code> modify verbs or adjectives.<br>Example: <i>increased <b>dramatically</b></i>, <i><b>substantially</b> more cost-effective</i>.') + '</p>');
     out.push('      </div>');
 
     // Rule 6
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>Rumus 6: Preposition + Gerund (V-ing) / Noun</b>');
-    out.push('        <p>Setelah preposisi (<code>by</code>, <code>in</code>, <code>of</code>, <code>for</code>, <code>through</code>, <code>without</code>), kata kerja wajib berbentuk <code>V-ing</code> (Gerund) atau Noun.<br>Contoh: <i>by <b>analyzing</b></i>, <i>in <b>determining</b></i>.</p>');
+    out.push('        <b>' + (isId ? 'Rumus 6: Preposition + Gerund (V-ing) / Noun' : 'Formula 6: Preposition + Gerund (V-ing) / Noun') + '</b>');
+    out.push('        <p>' + (isId
+      ? 'Setelah preposisi (<code>by</code>, <code>in</code>, <code>of</code>, <code>for</code>, <code>through</code>, <code>without</code>), kata kerja wajib berbentuk <code>V-ing</code> (Gerund) atau Noun.<br>Contoh: <i>by <b>analyzing</b></i>, <i>in <b>determining</b></i>.'
+      : 'After prepositions (<code>by</code>, <code>in</code>, <code>of</code>, <code>for</code>, <code>through</code>, <code>without</code>), use a Gerund (<code>V-ing</code>) or Noun.<br>Example: <i>by <b>analyzing</b></i>, <i>in <b>determining</b></i>.') + '</p>');
     out.push('      </div>');
 
     out.push('    </div>');
@@ -765,7 +785,7 @@
       out.push('      <button type="button" class="fz-pte-play-btn" style="width:auto; padding:6px 14px; border-radius:20px; font-size:0.8rem; gap:6px; display:inline-flex; align-items:center;" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■ Stop Audio' : '🔊 Listen Model Pronunciation') + '</button>');
       out.push('    </div>');
       out.push('    <div class="fz-pte-secret-tip">');
-      out.push('      <b>💡 Nakul 7-Hour Secret:</b> Baca dengan tempo stabil 12-14 detik. Jangan terburu-buru, jangan ubah nada saat tanda titik! Bernafas hanya di tanda jeda ganda (//).');
+      out.push('      <b>💡 Nakul 7-Hour Secret:</b> ' + (pteIsId() ? 'Baca dengan tempo stabil 12-14 detik. Jangan terburu-buru, jangan ubah nada saat tanda titik! Bernafas hanya di tanda jeda ganda (//).' : 'Read at a steady 12–14s pace. Do not rush or drop pitch prematurely at periods—pause only at double slashes (//).'));
       out.push('    </div>');
     } else if (state.mode === 'rs') {
       out.push('    <div class="fz-pte-audio-prompt-card">');
@@ -785,7 +805,7 @@
       out.push('      <div class="fz-pte-rs-rule-note">🎧 <b>Pearson Rule:</b> Prompt text is hidden. Listen carefully and speak immediately after the tone.</div>');
       out.push('    </div>');
       out.push('    <div class="fz-pte-secret-tip">');
-      out.push('      <b>💡 Nakul 50% Rule:</b> Tangkap 50-60% kata awal dengan lancar tanpa jeda. Jangan mengoreksi diri sendiri!');
+      out.push('      <b>💡 Nakul 50% Rule:</b> ' + (pteIsId() ? 'Tangkap 50-60% kata awal dengan lancar tanpa jeda. Jangan mengoreksi diri sendiri!' : 'Capture the first 50–60% of words smoothly without hesitating. Never self-correct mid-sentence!') + '');
       out.push('    </div>');
     } else if (state.mode === 'di') {
       if (item.svg) {
@@ -854,7 +874,7 @@
     } else if (state.mode === 'rwFib') {
       out.push('    <div style="display:flex; justify-content:flex-end;">');
       out.push('      <button type="button" class="fz-pte-guide-toggle-btn" onclick="FiezelPteUi.toggleGrammarGuide()">');
-      out.push('        <span>' + (state.showGrammarGuide ? '▲ Close Guide' : '💡 6 Rumus Grammar 3 Detik & Collocations') + '</span>');
+      out.push('        <span>' + (state.showGrammarGuide ? '▲ Close Guide' : (pteIsId() ? '💡 6 Rumus Grammar 3 Detik & Collocations' : '💡 6 Three-Second Grammar Formulas & Collocations')) + '</span>');
       out.push('      </button>');
       out.push('    </div>');
       if (state.showGrammarGuide) {
@@ -866,7 +886,7 @@
     } else if (state.mode === 'rDd') {
       out.push('    <div style="display:flex; justify-content:flex-end;">');
       out.push('      <button type="button" class="fz-pte-guide-toggle-btn" onclick="FiezelPteUi.toggleGrammarGuide()">');
-      out.push('        <span>' + (state.showGrammarGuide ? '▲ Close Guide' : '💡 6 Rumus Grammar 3 Detik & Collocations') + '</span>');
+      out.push('        <span>' + (state.showGrammarGuide ? '▲ Close Guide' : (pteIsId() ? '💡 6 Rumus Grammar 3 Detik & Collocations' : '💡 6 Three-Second Grammar Formulas & Collocations')) + '</span>');
       out.push('      </button>');
       out.push('    </div>');
       if (state.showGrammarGuide) {
@@ -1271,14 +1291,14 @@
         var fMetaParts = [];
         if (res.fluency.wpm > 0) fMetaParts.push(res.fluency.wpm + ' WPM');
         if (typeof res.fluency.activeSpeechSec === 'number' && typeof res.fluency.spanDurationSec === 'number' && res.fluency.activeSpeechSec > 0 && !res.fluency.isEstimatedTiming) {
-          fMetaParts.push('Aktif ' + res.fluency.activeSpeechSec + 'd / ' + res.fluency.spanDurationSec + 'd (' + Math.round((res.fluency.phonationRatio || 0) * 100) + '%)');
+          fMetaParts.push((pteIsId() ? 'Aktif ' : 'Active ') + res.fluency.activeSpeechSec + (pteIsId() ? 'd / ' : 's / ') + res.fluency.spanDurationSec + (pteIsId() ? 'd (' : 's (') + Math.round((res.fluency.phonationRatio || 0) * 100) + '%)');
         }
         var fNoticeablePauses = (res.fluency.hesitationPausesCount || 0) + (res.fluency.longPausesCount || 0);
         if (!res.fluency.isEstimatedTiming && typeof res.fluency.pausesCount === 'number') {
-          fMetaParts.push((fNoticeablePauses > 0 ? fNoticeablePauses : res.fluency.pausesCount) + ' jeda >=0.7d');
+          fMetaParts.push((fNoticeablePauses > 0 ? fNoticeablePauses : res.fluency.pausesCount) + (pteIsId() ? ' jeda >=0.7d' : ' pauses >=0.7s'));
         }
         if (res.fluency.disfluencyCount > 0) fMetaParts.push(res.fluency.disfluencyCount + ' filler');
-        if (res.fluency.selfCorrectionCount > 0) fMetaParts.push(res.fluency.selfCorrectionCount + ' koreksi');
+        if (res.fluency.selfCorrectionCount > 0) fMetaParts.push(res.fluency.selfCorrectionCount + (pteIsId() ? ' koreksi' : ' corrections'));
         var fReasonText = Array.isArray(res.fluency.reasons) && res.fluency.reasons.length > 0
           ? res.fluency.reasons.slice(0, 2).join(' · ')
           : '';

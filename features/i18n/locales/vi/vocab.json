@@ -18,7 +18,7 @@
   "vocab.kosong": "Chưa có sẵn cho cấp độ này.",
   "vocab.n-kata": "{jumlah} từ",
   "vocab.quiz-kosong": "Hiện chưa có từ vựng cho {level}.",
-  "vocab.review-due": "Đến hạn xem xét ( {jumlah} )</button>",
+  "vocab.review-due": " Cần ôn ({jumlah})</button>",
   "vocab.subjudul": "{jumlah} từ ở cấp độ {level} . Tất cả các bài tập theo mức độ học tập tích cực của bạn.",
   "vocab.uji": "Kiểm tra từ vựng {level} </button>"
 }

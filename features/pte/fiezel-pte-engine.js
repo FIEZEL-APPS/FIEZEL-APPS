@@ -311,6 +311,14 @@
       : (ex.measurementSource || (typeof ex.activeSpeechSec === 'number' ? 'acoustic_vad' : 'timer_measured'));
     var isEst = Boolean(ex.isEstimatedTiming || ex.isManual);
 
+    function pteIsId() {
+      try {
+        var i = (typeof self !== 'undefined' ? self : globalThis).FiezelI18n;
+        return !i || typeof i.getLocale !== 'function' || i.getLocale() === 'id';
+      } catch (_) { return true; }
+    }
+    var _isId = pteIsId();
+
     if (count === 0) {
       return {
         score: 0,
@@ -332,7 +340,7 @@
         rhythmScore: 0,
         measurementSource: measSource,
         isEstimatedTiming: isEst,
-        reasons: ['Tidak ada kata yang terdeteksi']
+        reasons: [_isId ? 'Tidak ada kata yang terdeteksi' : 'No words detected']
       };
     }
 
@@ -372,37 +380,37 @@
 
     var reasons = [];
     if (isEst) {
-      reasons.push('Input teks manual — kecepatan & jeda tidak terukur secara akustik');
+      reasons.push(_isId ? 'Input teks manual — kecepatan & jeda tidak terukur secara akustik' : 'Manual text input — speed and pauses are not acoustically measured');
     } else {
-      if (wpm < 95) reasons.push('Tempo lambat (' + wpm + ' WPM; target 115–155)');
-      else if (wpm > 165) reasons.push('Terlalu cepat/terburu-buru (' + wpm + ' WPM)');
-      else if (wpm >= 115 && wpm <= 155) reasons.push('Tempo optimal (' + wpm + ' WPM)');
+      if (wpm < 95) reasons.push(_isId ? ('Tempo lambat (' + wpm + ' WPM; target 115–155)') : ('Slow pace (' + wpm + ' WPM; target 115–155)'));
+      else if (wpm > 165) reasons.push(_isId ? ('Terlalu cepat/terburu-buru (' + wpm + ' WPM)') : ('Too fast / rushed (' + wpm + ' WPM)'));
+      else if (wpm >= 115 && wpm <= 155) reasons.push(_isId ? ('Tempo optimal (' + wpm + ' WPM)') : ('Optimal pace (' + wpm + ' WPM)'));
     }
     if (tb.longPauses > 0) {
-      reasons.push(tb.longPauses + ' jeda panjang >=2d (maks ' + (tb.maxPauseMs / 1000).toFixed(1) + 'd)');
+      reasons.push(tb.longPauses + (_isId ? ' jeda panjang >=2d (maks ' : ' long pauses >=2s (max ') + (tb.maxPauseMs / 1000).toFixed(1) + (_isId ? 'd)' : 's)'));
     }
     if (tb.hesitationPauses > 0) {
-      reasons.push(tb.hesitationPauses + ' jeda ragu 0.7–2.0d');
+      reasons.push(tb.hesitationPauses + (_isId ? ' jeda ragu 0.7–2.0d' : ' hesitation pauses 0.7–2.0s'));
     } else if (!tb.isStructured && tb.noticeablePauses > 0) {
-      reasons.push(tb.noticeablePauses + ' jeda terdeteksi');
+      reasons.push(tb.noticeablePauses + (_isId ? ' jeda terdeteksi' : ' pauses detected'));
     }
     if (tb.excessShort > 0) {
-      reasons.push(tb.shortPauses + ' jeda pendek sering (ritme terputus)');
+      reasons.push(tb.shortPauses + (_isId ? ' jeda pendek sering (ritme terputus)' : ' frequent short pauses (choppy rhythm)'));
     }
     if (phonPenalty >= 0.2) {
-      reasons.push('Rasio suara aktif rendah (' + Math.round(phonationRatio * 100) + '%)');
+      reasons.push((_isId ? 'Rasio suara aktif rendah (' : 'Low active phonation ratio (') + Math.round(phonationRatio * 100) + '%)');
     }
     if (tb.rhythmPenalty >= 0.25) {
-      reasons.push('Irama terpotong-potong (stabilitas ' + Math.round(tb.rhythmScore * 100) + '%)');
+      reasons.push((_isId ? 'Irama terpotong-potong (stabilitas ' : 'Fragmented rhythm (stability ') + Math.round(tb.rhythmScore * 100) + '%)');
     }
     if (disfluencies > 0) {
-      reasons.push(disfluencies + ' filler/pengulangan kata');
+      reasons.push(disfluencies + (_isId ? ' filler/pengulangan kata' : ' fillers / word repetitions'));
     }
     if (selfCorrections > 0) {
-      reasons.push(selfCorrections + ' koreksi diri (self-correction)');
+      reasons.push(selfCorrections + (_isId ? ' koreksi diri (self-correction)' : ' self-corrections'));
     }
     if (reasons.length === 1 && !isEst && score === 5) {
-      reasons.push('Aliran kalimat mulus tanpa jeda ragu');
+      reasons.push(_isId ? 'Aliran kalimat mulus tanpa jeda ragu' : 'Smooth continuous flow without hesitation pauses');
     }
 
     var label = 'Native-like';

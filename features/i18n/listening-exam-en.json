@@ -1,0 +1,245 @@
+{
+  "schema": "fiezel-listening-exam-en-v1",
+  "locale": "en",
+  "count": 8,
+  "honesty": "FIEZEL does not predict IELTS bands or TOEFL scores. The audio is generated via text-to-speech from original scripts, not actual exam recordings: one voice for all speakers, and without the variety of accents used in real exams. What is practiced here is question format, listening under pressure, and note-taking - not accent familiarization.",
+  "examFormats": {
+    "ielts_listening_s1": {
+      "label": "IELTS Listening Section 1",
+      "note": "Everyday conversation, usually form-filling. Audio is played ONCE. You may read the questions while listening - that is how the exam works, and that is the skill itself: reading, listening, and writing simultaneously."
+    },
+    "ielts_listening_s2": {
+      "label": "IELTS Listening Section 2",
+      "note": "Monologue about everyday situations. Audio ONCE. Original map/plan questions require images, so here they are replaced by location-based multiple-choice questions - that is an adaptation, not the full format."
+    },
+    "ielts_listening_s3": {
+      "label": "IELTS Listening Section 3",
+      "note": "Academic discussion between two to four people. Audio ONCE. What is tested: following who thinks what, not just capturing facts."
+    },
+    "ielts_listening_s4": {
+      "label": "IELTS Listening Section 4",
+      "note": "Academic lecture without pauses. Audio ONCE and does not stop in the middle - it is the hardest part precisely because of that."
+    },
+    "toefl_listening_conversation": {
+      "label": "TOEFL iBT Listening - Conversation",
+      "note": "Campus conversation. Audio ONCE, and questions only appear AFTER the audio finishes - so note-taking is not an option, but a necessity."
+    },
+    "toefl_listening_lecture": {
+      "label": "TOEFL iBT Listening - Lecture",
+      "note": "Academic lecture. Audio ONCE, questions appear afterwards. The question types test the lecturer's structure and intent, not just the content."
+    }
+  },
+  "sets": {
+    "lx-ielts-s1": {
+      "title": "Mendaftar program renang",
+      "questions": {
+        "lx-s1-1": {
+          "explain": "Dieja langsung olehnya: M-A-R-S-H."
+        },
+        "lx-s1-2": {
+          "explain": "\"Forty-two Bridgeway Road.\" In the actual exam, numbers are written as digits."
+        },
+        "lx-s1-3": {
+          "explain": "\"L S nine, four T P.\" Postcodes are always read letter by letter - write them together without hesitation."
+        },
+        "lx-s1-4": {
+          "explain": "\"Oh-seven-nine, one-one, three-four-oh, six-two-eight.\" The officer repeats - that repetition is provided by the exam for correction purposes."
+        },
+        "lx-s1-5": {
+          "explain": "He can swim but his technique is poor and he gets tired after two laps - that is the definition of 'Improvers' given by the officer."
+        },
+        "lx-s1-6": {
+          "explain": "He chooses Thursday because on Tuesday he only finishes work at seven."
+        },
+        "lx-s1-7": {
+          "explain": "One session per week = 32 pounds a month. The trap here is 48, which is for TWO sessions."
+        },
+        "lx-s1-8": {
+          "explain": "One-time payment fee of 15 pounds; he cannot get an exemption because he is neither a student nor over 65."
+        },
+        "lx-s1-9": {
+          "explain": "\"We don't supply padlocks any more.\" Goggles are only optional - that is the differentiator."
+        },
+        "lx-s1-10": {
+          "explain": "\"The eleventh of October.\""
+        }
+      }
+    },
+    "lx-ielts-s2": {
+      "title": "Pengarahan relawan kebun raya",
+      "questions": {
+        "lx-s2-1": {
+          "explain": "\"The large building on the western edge.\" The Rose Garden is on the eastern side."
+        },
+        "lx-s2-2": {
+          "explain": "Only the upper path is closed, because the metal becomes slippery - not the entire Glasshouse."
+        },
+        "lx-s2-3": {
+          "explain": "\"On your left as you're walking up\" - and he is walking north, so left = northwest. The toilets are in the same building."
+        },
+        "lx-s2-4": {
+          "explain": "Ada batas beban, dan aturannya maksimal lima belas anak sekaligus."
+        },
+        "lx-s2-5": {
+          "explain": "The reason is stated directly: there is no lighting."
+        },
+        "lx-s2-6": {
+          "explain": "\"It's absolutely fine to say so. What is not fine is guessing.\" The berry example is used to emphasize this."
+        }
+      }
+    },
+    "lx-ielts-s3": {
+      "title": "Diskusi proyek suhu perkotaan",
+      "questions": {
+        "lx-s3-1": {
+          "explain": "Initially they thought it was the effect of the trees - but the difference remained at three in the morning, so it was not shade."
+        },
+        "lx-s3-2": {
+          "explain": "Priya membuang, Tom mempertahankan sambil menandai - jangan tertukar."
+        },
+        "lx-s3-3": {
+          "explain": "Two reasons, and both must be captured - the number of sensors AND the fact that the data values are of different types."
+        },
+        "lx-s3-4": {
+          "explain": "\"The failure mode here isn't dropping data or keeping it. It's doing either quietly.\""
+        },
+        "lx-s3-5": {
+          "explain": "Tiga meter versus dua meter, dan selisihnya terukur terutama di atas permukaan beraspal."
+        },
+        "lx-s3-6": {
+          "explain": "\"A wide honest interval is worth more than a narrow invented one.\""
+        },
+        "lx-s3-7": {
+          "explain": "The tutor distinguishes between audiences: Priya's order is suitable for a conference, Tom's order is for a graded report."
+        },
+        "lx-s3-8": {
+          "explain": "The laboratory is closed for maintenance on the 9th and 10th, while the deadline is the 12th."
+        }
+      }
+    },
+    "lx-ielts-s4": {
+      "title": "Kuliah: sejarah waktu standar",
+      "questions": {
+        "lx-s4-1": {
+          "explain": "The difference is about ten minutes - and it was never a problem as long as the fastest communication was as fast as a horse."
+        },
+        "lx-s4-2": {
+          "explain": "Great Western Railway. Passengers in the west of England had to subtract the difference themselves."
+        },
+        "lx-s4-3": {
+          "explain": "Late passengers are troublesome; two trains on one track with crews who disagree on the time leads to a collision."
+        },
+        "lx-s4-4": {
+          "explain": "The practical standard had been used by trains since the 1850s; the law followed in 1880."
+        },
+        "lx-s4-5": {
+          "explain": "The defendant arrived on time according to local time - he was correct according to the old rules, and that is precisely what worked against him."
+        },
+        "lx-s4-6": {
+          "explain": "And the choice was about shipping, not scientific superiority: the majority of world maps already used Greenwich."
+        },
+        "lx-s4-7": {
+          "explain": "\"What I want you to take from this is not the dates. It is the shape of the process.\""
+        }
+      }
+    },
+    "lx-toefl-conv": {
+      "title": "Conversation: campus library",
+      "questions": {
+        "lx-tc-1": {
+          "explain": "Gist-purpose questions ask for the REASON for coming, not the most interesting thing that appears later."
+        },
+        "lx-tc-2": {
+          "explain": "The book is available at three libraries - the problem is time, not availability."
+        },
+        "lx-tc-3": {
+          "explain": "That is why he must choose one essay first and request the second one next month."
+        },
+        "lx-tc-4": {
+          "explain": "The large book is registered under the donor's name, not the subject - so any search will not find it."
+        },
+        "lx-tc-5": {
+          "explain": "Cannot leave the building, pencils only, photography allowed without flash."
+        },
+        "lx-tc-6": {
+          "explain": "That expression means using two safeguards at once - he suggests still requesting a scan as a backup."
+        }
+      }
+    },
+    "lx-toefl-lecture": {
+      "title": "Kuliah biologi: warna peringatan dan peniruan",
+      "questions": {
+        "lx-tl-1": {
+          "explain": "Camouflage and Bates' history are only touched upon; the backbone of the lecture is those three mechanisms."
+        },
+        "lx-tl-2": {
+          "explain": "The entire system depends on the predator surviving and then REMEMBERING - that is why the color is not a warning to the attacker at that moment."
+        },
+        "lx-tl-3": {
+          "explain": "There is a natural ceiling: mimics are only safe as long as their numbers remain small compared to the poisonous ones."
+        },
+        "lx-tl-4": {
+          "explain": "The teaching cost is shared - and no one is freeloading, both benefit equally."
+        },
+        "lx-tl-5": {
+          "explain": "Every lesson is paid for with an individual's life; one lesson for two species means fewer victims."
+        },
+        "lx-tl-6": {
+          "explain": "The lecturer concludes by asking students to be ready to DEBATE the continuum claim - a sign it has not been agreed upon."
+        }
+      }
+    },
+    "lx-ielts-s2-v2": {
+      "title": "Pengarahan anggota baru museum kota",
+      "questions": {
+        "lx-s2v2-1": {
+          "explain": "\"You can bring two guests with you each month at half price.\" Not free - half price."
+        },
+        "lx-s2v2-2": {
+          "explain": "\"At the back of the building, behind the stairs\" - the only room where items can actually be touched."
+        },
+        "lx-s2v2-3": {
+          "explain": "Lantai dua khusus staf - jangan naik; minta di meja depan dan viewing diatur sekitar dua minggu."
+        },
+        "lx-s2v2-4": {
+          "explain": "\"Beside the cloakroom, on the right as you come in.\" The coin is returned when the locker is opened again."
+        },
+        "lx-s2v2-5": {
+          "explain": "The first Tuesday of every month opens at one in the afternoon because the gallery is cleaned in the morning. The trap: the one closed all day is Monday."
+        },
+        "lx-s2v2-6": {
+          "explain": "\"Your membership card is yours and nobody else's.\" Loan cards will be held at the front desk."
+        }
+      }
+    },
+    "lx-ielts-s4-v2": {
+      "title": "Kuliah: kina dan monopoli obat malaria",
+      "questions": {
+        "lx-s4v2-1": {
+          "explain": "\"The bark of the cinchona tree\" - the medicine is taken from the bark, not the leaves or roots."
+        },
+        "lx-s4v2-2": {
+          "explain": "\"Not because the trees died, but because they lived.\" The trees were fertile - their quinine content was nearly zero."
+        },
+        "lx-s4v2-3": {
+          "explain": "\"The turning point came in eighteen sixty-five.\" On the answer sheet, write 1865."
+        },
+        "lx-s4v2-4": {
+          "explain": "Inggris menolak benihnya - \"one savours the irony\" - lalu Ledger menjualnya murah ke Belanda."
+        },
+        "lx-s4v2-5": {
+          "explain": "The digression shows that the Quechua name from the Andes crossed over along with the tree - \"languages, like bark, preserve things\"."
+        },
+        "lx-s4v2-6": {
+          "explain": "\"Roughly ninety percent\" - ninety percent of the world's supply from the highlands of one island."
+        },
+        "lx-s4v2-7": {
+          "explain": "\"Synthetic substitutes had been developed and manufactured at scale\" - dan monopoli kuinin tamat permanen."
+        },
+        "lx-s4v2-8": {
+          "explain": "\"Carry the shape of the argument\" - concentration looks like strength until the day it becomes the mechanism of its own collapse."
+        }
+      }
+    }
+  }
+}

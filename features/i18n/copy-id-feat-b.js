@@ -486,6 +486,7 @@
     'onboarding.path-beginner-desc-v2': 'Belajar dari kosakata dan tata bahasa dasar secara bertahap.',
     'onboarding.path-test-desc-v2': 'Tentukan level awal berdasarkan kemampuanmu.',
     'onboarding.skip-later-v2': 'Nanti Saja',
-    'onboarding.start-learn-arrow': 'Mulai Belajar \u2192'
+    'onboarding.start-learn-arrow': 'Mulai Belajar \u2192',
+    'onboarding.ja-meaning-go': 'pergi'
   });
 }());

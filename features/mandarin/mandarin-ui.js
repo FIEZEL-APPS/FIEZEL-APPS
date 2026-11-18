@@ -49,6 +49,57 @@
     return en;
   }
 
+  function zhEnSidecar() {
+    if (curLoc() === 'id') return null;
+    try {
+      var g = (typeof self !== 'undefined' ? self : (typeof globalThis !== 'undefined' ? globalThis : this));
+      return (g.FiezelEnData && g.FiezelEnData.mandarin) || null;
+    } catch (_) { return null; }
+  }
+
+  function zhLessonView(raw) {
+    if (!raw || curLoc() === 'id') return raw;
+    var sc = zhEnSidecar();
+    var ov = sc && sc.lessons && sc.lessons[String(raw.id || '')];
+    if (!ov) return raw;
+    var out = Object.assign({}, raw);
+    if (ov.formula) out.grammarFormula = ov.formula;
+    if (Array.isArray(raw.dialogue) && Array.isArray(ov.dialogue)) {
+      out.dialogue = raw.dialogue.map(function (d, idx) {
+        var tr = ov.dialogue[idx];
+        var isMochi = d.speaker && d.speaker.indexOf('Mochi') >= 0;
+        var sp = isMochi ? d.speaker : pickM('Student', d.speaker, mt('speaker.student', 'Student'));
+        return Object.assign({}, d, { speaker: sp }, tr ? { id: tr } : {});
+      });
+    }
+    if (Array.isArray(raw.quiz) && Array.isArray(ov.quiz)) {
+      out.quiz = raw.quiz.map(function (q, qIdx) {
+        var qOv = ov.quiz[qIdx];
+        if (!qOv) return q;
+        var qOut = Object.assign({}, q);
+        if (qOv.prompt) qOut.prompt = qOv.prompt;
+        if (qOv.explanation) qOut.explanation = qOv.explanation;
+        if (qOv.reasoning) qOut.reasoningOperationId = qOv.reasoning;
+        if (Array.isArray(q.distractors) && qOv.distractors) {
+          qOut.distractors = q.distractors.map(function (dist) {
+            var dOv = qOv.distractors[String(dist.option || '')];
+            if (!dOv) return dist;
+            return Object.assign({}, dist,
+              dOv.whyFails ? { whyFailsId: dOv.whyFails, whyFails: dOv.whyFails } : {},
+              dOv.misconception ? { misconceptionId: dOv.misconception, misconception: dOv.misconception } : {}
+            );
+          });
+        }
+        return qOut;
+      });
+    }
+    if (ov.aiScenario && raw.aiSpeaking) {
+      out.aiSpeaking = Object.assign({}, raw.aiSpeaking, { scenario: ov.aiScenario });
+    }
+    if (ov.scenario) out.scenario = ov.scenario;
+    return out;
+  }
+
   // Web Audio Synthesizer untuk 4 Kontur Nada Pinyin (55, 35, 214, 51)
   function playSynthesizedTone(toneNumber, baseFreq) {
     try {
@@ -266,7 +317,7 @@
 
   function renderLessonPlayerModal() {
     if (!_activeLesson) return;
-    var l = _activeLesson;
+    var l = zhLessonView(_activeLesson);
     var step = _activeStep;
 
     var stepLabels = [
@@ -318,7 +369,7 @@
         + '</div>'
         + '<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;margin-bottom:12px;">'
         + '<h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:0 0 4px 0;">' + esc(mt('mandarin.grammar_note_title', 'Contrastive Language Note')) + '</h4>'
-        + '<p style="font-size:12px;color:#475569;margin:0;line-height:1.4;">' + esc(mt('mandarin.grammar_note_body', 'In Mandarin, time and place expressions typically precede the main verb.')) + '</p>'
+        + '<p style="font-size:12px;color:#475569;margin:0;line-height:1.4;">' + esc(curLoc() === 'id' ? mt('mandarin.grammar_note_body', 'Bahasa Mandarin menaruh keterangan waktu dan tempat sebelum kata kerja.') : mt('mandarin.grammar_note_body', 'In Mandarin, time and place expressions typically precede the main verb.')) + '</p>'
         + '</div>'
         + '</div>';
 
@@ -383,7 +434,7 @@
               + '</div>';
           } else {
             tutorFeedback = '<div style="margin-top:10px;font-size:12px;color:#991B1B;background:#FEF2F2;border:1.5px solid #FECACA;padding:10px 12px;border-radius:10px;">'
-              + '<div style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:12.5px;color:#DC2626;margin-bottom:4px;"><span>🎓</span> Tutor FIEZEL:</div>'
+              + '<div style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:12.5px;color:#DC2626;margin-bottom:4px;"><span>🎓</span> ' + esc(pickM('FIEZEL Tutor:', 'Tutor FIEZEL:', 'ติวเตอร์ FIEZEL:')) + '</div>'
               + '<div style="line-height:1.4;margin-bottom:4px;">' + esc(whyFailsText) + '</div>'
               + (misconceptionText ? '<div style="font-size:11px;color:#BE123C;font-weight:700;background:#FFF1F2;padding:3px 8px;border-radius:6px;display:inline-block;margin-top:4px;">' + esc(mt('mandarin.pattern_prefix', '💡 Pattern:')) + ' ' + esc(misconceptionText) + '</div>' : '')
               + (q.reasoningOperationId ? (function () {
@@ -464,13 +515,14 @@
         : '<button type="button" class="btn btn-primary" style="background:#16A34A;border-radius:10px;font-weight:800;padding:8px 20px;" onclick="closeModal()">' + esc(mt('mandarin.btn_finish_lesson', 'Finish & Save Progress ✓')) + '</button>')
       + '</div>';
 
+    var hasDistinctZhTitle = l.titleZh && String(l.titleZh).trim().toLowerCase() !== String(l.title || '').trim().toLowerCase();
     var modalHtml = '<div class="skill-help-panel fz-mandarin-modal-content" style="max-width:560px;margin:auto;max-height:85vh;overflow-y:auto;padding:8px 4px;">'
       + '<button type="button" class="modal-close-corner" onclick="(window.FiezelGrammarUpgrade&&window.FiezelGrammarUpgrade.stopActiveVoice&&window.FiezelGrammarUpgrade.stopActiveVoice());closeModal()" aria-label="' + esc(mt('common.tutup', 'Close')) + '"><i data-lucide="x"></i></button>'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
       + '<span style="font-size:10px;font-weight:800;background:#FFE4E6;color:#BE123C;padding:2px 8px;border-radius:6px;">LEVEL ' + l.level + ' · ' + esc(mt('mandarin.chapter_word', 'UNIT')) + ' ' + l.num + '</span>'
       + '<span style="font-size:11px;color:#64748B;font-weight:700;">⏱️ ' + esc(l.durationLabel) + ' · +' + l.exp + ' EXP</span>'
       + '</div>'
-      + '<h2 style="font-size:18px;font-weight:800;color:#0F172A;margin:2px 0 10px 0;">' + esc(l.title) + ' · <span style="font-family:var(--fz-font-cjk);color:#BE123C;">' + esc(l.titleZh) + '</span></h2>'
+      + '<h2 style="font-size:18px;font-weight:800;color:#0F172A;margin:2px 0 10px 0;">' + esc(l.title) + (hasDistinctZhTitle ? ' · <span style="font-family:var(--fz-font-cjk);color:#BE123C;">' + esc(l.titleZh) + '</span>' : '') + '</h2>'
       + pillsHtml
       + bodyHtml
       + footerHtml
@@ -547,15 +599,15 @@
     var curLvl = _curriculumMapLevel;
 
     var levelTabs = [
-      { lvl: 0, title: 'Fondasi (Lvl 0)' },
+      { lvl: 0, title: mt('mandarin.level-0-tab', 'Foundations (Lvl 0)') },
       { lvl: 1, title: 'Lvl 1 (HSK 1)' },
       { lvl: 2, title: 'Lvl 2 (HSK 2)' },
       { lvl: 3, title: 'Lvl 3 (HSK 3)' },
       { lvl: 4, title: 'Lvl 4 (HSK 4)' },
       { lvl: 5, title: 'Lvl 5 (HSK 5)' },
       { lvl: 6, title: 'Lvl 6 (HSK 5+)' },
-      { lvl: 7, title: 'Lvl 7 (Wacana)' },
-      { lvl: 8, title: 'Lvl 8 (Sastra)' }
+      { lvl: 7, title: mt('mandarin.level-7-tab', 'Lvl 7 (Discourse)') },
+      { lvl: 8, title: mt('mandarin.level-8-tab', 'Lvl 8 (Literature)') }
     ];
 
     var tabsHtml = '<div style="display:flex;align-items:center;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;border-bottom:1px solid #F1F5F9;">'
@@ -572,16 +624,20 @@
     if (curLvl === 0) {
       // Level 0 Foundation Units
       var units = currModule.getFoundation ? currModule.getFoundation() : [];
+      var mSc = zhEnSidecar();
       var unitList = units.map(function (u) {
         var actionCall = "FiezelMandarinUI.openPinyinModal()";
         if (u.unit === 4) actionCall = "FiezelMandarinUI.openSandhiModal()";
         if (u.unit === 6) actionCall = "FiezelMandarinUI.openStrokeModal()";
+        var uOv = (mSc && mSc.foundation && mSc.foundation[String(u.unit)]) || null;
+        var uTitle = (uOv && uOv.title) ? uOv.title : u.title;
+        var uDesc = (uOv && uOv.description) ? uOv.description : u.description;
 
         return '<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.02);display:flex;align-items:center;justify-content:space-between;">'
           + '<div>'
           + '<span style="font-size:10px;font-weight:800;background:#E0F2FE;color:#0369A1;padding:2px 6px;border-radius:4px;">UNIT ' + u.unit + '</span>'
-          + '<h4 style="font-size:14px;font-weight:800;color:#0F172A;margin:4px 0 2px 0;">' + esc(u.title) + '</h4>'
-          + '<p style="font-size:12px;color:#64748B;margin:0;">' + esc(u.description) + '</p>'
+          + '<h4 style="font-size:14px;font-weight:800;color:#0F172A;margin:4px 0 2px 0;">' + esc(uTitle) + '</h4>'
+          + '<p style="font-size:12px;color:#64748B;margin:0;">' + esc(uDesc) + '</p>'
           + '</div>'
           + '<button type="button" class="btn btn-sm" style="background:#FFF1F2;border:1px solid #FDA4AF;color:#BE123C;border-radius:8px;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer;" onclick="' + actionCall + '">' + esc(mt('mandarin.btn-open-unit', 'Open Unit')) + '</button>'
           + '</div>';
@@ -591,14 +647,16 @@
     } else {
       // Levels 1 to 8 Lessons
       var lessons = currModule.getLessonsByLevel ? currModule.getLessonsByLevel(curLvl) : [];
+      var unitPrefix = mt('mandarin.chapter_word', curLoc() === 'id' ? 'BAB' : 'UNIT');
       var lessonList = lessons.map(function (l) {
+        var cardZh = l.titleZh && String(l.titleZh).trim().toLowerCase() !== String(l.title || '').trim().toLowerCase();
         return '<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.02);display:flex;align-items:center;justify-content:space-between;">'
           + '<div>'
           + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">'
-          + '<span style="font-size:10px;font-weight:800;background:#FFE4E6;color:#BE123C;padding:1px 6px;border-radius:4px;">BAB ' + l.num + '</span>'
+          + '<span style="font-size:10px;font-weight:800;background:#FFE4E6;color:#BE123C;padding:1px 6px;border-radius:4px;">' + esc(unitPrefix) + ' ' + l.num + '</span>'
           + '<span style="font-size:11px;color:#64748B;font-weight:700;">⏱️ ' + esc(l.durationLabel) + ' · +' + l.exp + ' EXP</span>'
           + '</div>'
-          + '<h4 style="font-size:13.5px;font-weight:800;color:#0F172A;margin:0 0 2px 0;">' + esc(l.title) + ' <span style="font-family:var(--fz-font-cjk);color:#BE123C;font-size:13px;">(' + esc(l.titleZh) + ')</span></h4>'
+          + '<h4 style="font-size:13.5px;font-weight:800;color:#0F172A;margin:0 0 2px 0;">' + esc(l.title) + (cardZh ? ' <span style="font-family:var(--fz-font-cjk);color:#BE123C;font-size:13px;">(' + esc(l.titleZh) + ')</span>' : '') + '</h4>'
           + '<p style="font-size:11.5px;color:#64748B;margin:0;">' + esc(mt('mandarin.label-grammar', 'Grammar')) + ': <b>' + esc(l.grammarTopic) + '</b></p>'
           + '</div>'
           + '<button type="button" class="btn btn-sm" style="background:#BE123C;color:#FFFFFF;border-radius:8px;font-weight:800;font-size:12px;padding:6px 14px;cursor:pointer;" onclick="FiezelMandarinUI.openLessonPlayer(\'' + l.id + '\')">' + esc(mt('mandarin.btn-study', 'Study')) + '</button>'
@@ -962,7 +1020,12 @@
       + '</div>';
 
     // Render cards (showing up to 80 per view with fast scroll)
+    var mSc = zhEnSidecar();
+    var exMap = mSc && mSc.vocabExamples;
     var cards = words.slice(0, 80).map(function (w) {
+      var exTrans = curLoc() === 'id'
+        ? (w.example && w.example.id)
+        : ((exMap && exMap[String(w.id || '')]) || (w.example && w.example.en) || '');
       return '<div class="fz-vocab-card" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.02);display:flex;align-items:center;justify-content:space-between;">'
         + '<div style="display:flex;align-items:center;gap:12px;">'
         + '<div style="min-width:44px;text-align:center;">'
@@ -972,7 +1035,7 @@
         + '<div>'
         + '<div style="font-size:12.5px;font-weight:700;color:#0F172A;">' + esc(curLoc() === 'id' ? w.idMeaning : (w.enMeaning || w.idMeaning)) + '</div>'
         + (w.example && w.example.hz
-          ? '<div style="font-size:11.5px;color:#64748B;font-family:var(--fz-font-cjk);">' + esc(w.example.hz) + (curLoc() === 'id' ? ' · <span style="font-family:sans-serif;">' + esc(w.example.id) + '</span>' : (w.example.en ? ' · <span style="font-family:sans-serif;">' + esc(w.example.en) + '</span>' : '')) + '</div>'
+          ? '<div style="font-size:11.5px;color:#64748B;font-family:var(--fz-font-cjk);">' + esc(w.example.hz) + (exTrans ? ' · <span style="font-family:sans-serif;">' + esc(exTrans) + '</span>' : '') + '</div>'
           : '')
         + '</div>'
         + '</div>'
@@ -1003,19 +1066,27 @@
     var gModule = (typeof FiezelMandarinGrammarBank !== 'undefined') ? FiezelMandarinGrammarBank : null;
     var patterns = gModule ? gModule.getAll() : [];
 
+    var gSc = zhEnSidecar();
+    var gMap = gSc && gSc.patterns;
     var cards = patterns.slice(0, 30).map(function (g) {
+      var ov = (curLoc() !== 'id' && gMap && gMap[String(g.id || '')]) || null;
+      var formulaTxt = (ov && ov.formula) ? ov.formula : g.formula;
+      var expTxt = curLoc() === 'id' ? g.explanationId : ((ov && ov.explanation) || g.explanationEn || g.explanation?.whyCorrect || g.explanationId);
+      var exTrans = (g.examples && g.examples[0])
+        ? (curLoc() === 'id' ? g.examples[0].id : ((ov && ov.exampleEn) || g.examples[0].en || ''))
+        : '';
       return '<div class="fz-grammar-card" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.02);">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">'
         + '<span style="font-size:10px;font-weight:800;background:#E0F2FE;color:#0369A1;padding:2px 8px;border-radius:6px;">LEVEL ' + g.level + '</span>'
         + '<strong style="font-size:14px;color:#BE123C;font-weight:800;">' + esc(g.title) + '</strong>'
         + '</div>'
         + '<div style="font-size:12.5px;font-weight:700;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:6px 10px;color:#0F172A;font-family:monospace;margin:6px 0;">'
-        + esc(g.formula)
+        + esc(formulaTxt)
         + '</div>'
-        + '<p style="font-size:12px;color:#334155;margin:0 0 6px 0;line-height:1.4;">' + esc(g.explanationId) + '</p>'
+        + '<p style="font-size:12px;color:#334155;margin:0 0 6px 0;line-height:1.4;">' + esc(expTxt) + '</p>'
         + (g.examples && g.examples[0]
           ? '<div style="font-size:12px;color:#BE123C;font-family:var(--fz-font-cjk);margin-bottom:2px;">' + esc(g.examples[0].hz) + '</div>'
-            + '<div style="font-size:11.5px;color:#64748B;">' + esc(g.examples[0].id) + '</div>'
+            + (exTrans ? '<div style="font-size:11.5px;color:#64748B;">' + esc(exTrans) + '</div>' : '')
           : '')
         + '</div>';
     }).join('');
@@ -1128,22 +1199,22 @@
       {
         id: 'zh',
         flag: '🇨🇳',
-        name: 'Bahasa Mandarin (Putonghua)',
-        sub: 'HSK 1–6 · 192 Bab, Pinyin 4 Nada, Ruby Hanzi, Xiao Mochi & 24 Can-Do',
-        badge: 'BARU · HSK ACADEMY'
+        name: pickM('Mandarin Chinese (Putonghua)', 'Bahasa Mandarin (Putonghua)', 'ภาษาจีนกลาง (พู่ทงฮว่า)'),
+        sub: pickM('HSK 1–6 · 192 Units, 4-Tone Pinyin, Ruby Hanzi, Xiao Mochi & 24 Can-Dos', 'HSK 1–6 · 192 Bab, Pinyin 4 Nada, Ruby Hanzi, Xiao Mochi & 24 Can-Do', 'HSK 1–6 · 192 บท, พินอิน 4 เสียง, Ruby ฮั่นจื้อ, เสี่ยวโมจิ และ 24 สถานการณ์'),
+        badge: pickM('NEW · HSK ACADEMY', 'BARU · HSK ACADEMY', 'ใหม่ · HSK ACADEMY')
       },
       {
         id: 'ja',
         flag: '🇯🇵',
-        name: 'Bahasa Jepang (Nihongo)',
-        sub: 'JLPT N5–N1 · Kana, 54 Can-Do Cards, 4.248 Pitch Accent & Chōkai',
-        badge: 'LENGKAP JLPT'
+        name: pickM('Japanese (Nihongo)', 'Bahasa Jepang (Nihongo)', 'ภาษาญี่ปุ่น (นิฮงโกะ)'),
+        sub: pickM('JLPT N5–N1 · Kana, 54 Can-Do Cards, 4,248 Pitch Accents & Chōkai', 'JLPT N5–N1 · Kana, 54 Can-Do Cards, 4.248 Pitch Accent & Chōkai', 'JLPT N5–N1 · คานะ, 54 การ์ด Can-Do, 4,248 สำเนียงเสียงสูงต่ำ และ Chōkai'),
+        badge: pickM('FULL JLPT', 'LENGKAP JLPT', 'ครบถ้วน JLPT')
       },
       {
         id: 'en',
         flag: '🇬🇧',
-        name: 'Bahasa Inggris (English)',
-        sub: 'CEFR A1–C2 · Vocabulary, Grammar, Reading, Speaking & Listening',
+        name: pickM('English', 'Bahasa Inggris (English)', 'ภาษาอังกฤษ (English)'),
+        sub: pickM('CEFR A1–C2 · Vocabulary, Grammar, Reading, Speaking & Listening', 'CEFR A1–C2 · Vocabulary, Grammar, Reading, Speaking & Listening', 'CEFR A1–C2 · คำศัพท์ ไวยากรณ์ การอ่าน การพูด และการฟัง'),
         badge: 'CEFR STANDARD'
       }
     ];
