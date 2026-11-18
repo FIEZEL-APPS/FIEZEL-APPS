@@ -34,6 +34,9 @@ const MIME_TYPES = {
   '.mp3': 'audio/mpeg',
   '.ogg': 'audio/ogg',
   '.wav': 'audio/wav',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.wasm': 'application/wasm',
   '.txt': 'text/plain; charset=utf-8',
   '.webmanifest': 'application/manifest+json; charset=utf-8'
 };
@@ -128,6 +131,23 @@ function resolvePersona(speaker, lang, text) {
   const normSpeaker = (speaker || '').toLowerCase().trim();
   const normLang = (lang || '').toLowerCase().trim();
 
+  // Jika permintaan TTS khusus berbahasa Indonesia (misalnya narasi papan tulis), utamakan suara neural id-ID agar pelafalan Indonesia bersih & tidak gagal!
+  if (normLang.startsWith('id')) {
+    const isFemale = /sarah|nanami|mochi|ava|aria|gadis|female|perempuan/.test(normSpeaker);
+    return isFemale
+      ? {
+          edgeVoice: 'id-ID-GadisNeural',
+          personaLabel: 'GadisNeural · Mentor Bahasa Indonesia',
+          pitchHint: 'Suara mentor wanita natural & ramah',
+          prosodyPitch: '+2Hz',
+          prosodyRate: '-2%',
+          role: 'Mentor Bahasa Indonesia',
+          lang: 'id-ID',
+          geminiVoice: 'Aoede'
+        }
+      : PERSONA_VOICES.instructor;
+  }
+
   if (normSpeaker && PERSONA_VOICES[normSpeaker]) {
     return PERSONA_VOICES[normSpeaker];
   }
@@ -172,6 +192,21 @@ const ttsAudioCache = new Map();
 const inFlightRequests = new Map();
 let synthesisMutex = Promise.resolve();
 
+function isPoisonedFallbackAudioItem(item) {
+  if (!item || typeof item !== 'object') return true;
+  if (item.fallback === true) return true;
+  const eng = String(item.engine || '');
+  if (/failover|disk-cache-.*-fallback/i.test(eng)) return true;
+  const b64 = String(item.audioBase64 || '').trim();
+  if (!b64) return true;
+  try {
+    if (Buffer.from(b64, 'base64').length <= 256) return true;
+  } catch (_) {
+    return true;
+  }
+  return false;
+}
+
 const fallbackClipsByVoice = new Map();
 function indexDiskCache() {
   try {
@@ -181,7 +216,7 @@ function indexDiskCache() {
       if (!f.endsWith('.json')) continue;
       try {
         const item = JSON.parse(fs.readFileSync(path.join(CACHE_DIR, f), 'utf8'));
-        if (item && item.audioBase64 && item.voiceName) {
+        if (!isPoisonedFallbackAudioItem(item) && item.voiceName) {
           if (!fallbackClipsByVoice.has(item.voiceName)) {
             fallbackClipsByVoice.set(item.voiceName, item);
           }
@@ -202,7 +237,14 @@ function readDiskCache(cacheKey) {
     const filePath = getDiskCachePath(cacheKey);
     if (fs.existsSync(filePath)) {
       const raw = fs.readFileSync(filePath, 'utf8');
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (isPoisonedFallbackAudioItem(parsed)) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (_) {}
+        return null;
+      }
+      return parsed;
     }
   } catch (_) {}
   return null;
@@ -278,18 +320,62 @@ function pcmToWavBuffer(pcmBuffer, sampleRate = 24000, numChannels = 1, bitsPerS
   return buffer;
 }
 
-// Gemini TTS with multi-key pool rotation
+// Gemini TTS & Live API multi-key pool rotation (deduplicated across config + env)
 const KEYS_FILE = path.join(ROOT, 'config', 'gemini-keys.json');
-let geminiKeys = [];
-try {
-  geminiKeys = JSON.parse(fs.readFileSync(KEYS_FILE, 'utf8'));
-} catch (_) {
-  const rawEnv = process.env.GEMINI_LIVE_KEYS || process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '';
-  if (rawEnv) {
-    geminiKeys = rawEnv.split(',').map((s) => s.trim()).filter((s) => s.length > 10);
+const FALLBACK_KEYS_FILE = path.resolve(ROOT, '..', 'fiezel-apps', 'config', 'gemini-keys.json');
+function collectAllGeminiKeys() {
+  const seen = new Set();
+  const addFromList = (list) => {
+    for (const item of list) {
+      const k = String(item || '').trim();
+      if (k.length > 10 && !seen.has(k)) seen.add(k);
+    }
+  };
+  for (const fp of [KEYS_FILE, FALLBACK_KEYS_FILE]) {
+    try {
+      if (fs.existsSync(fp)) {
+        const parsed = JSON.parse(fs.readFileSync(fp, 'utf8'));
+        if (Array.isArray(parsed)) addFromList(parsed);
+      }
+    } catch (_) {}
   }
+  for (const envName of ['GEMINI_LIVE_KEYS', 'GEMINI_API_KEYS', 'GEMINI_API_KEY', 'GOOGLE_API_KEY']) {
+    const rawEnv = process.env[envName];
+    if (rawEnv) addFromList(String(rawEnv).split(','));
+  }
+  return Array.from(seen);
 }
+let geminiKeys = collectAllGeminiKeys();
+console.log(`[FIEZEL Server] Gemini key pool loaded: ${geminiKeys.length} unique keys`);
 let currentKeyIndex = Math.floor(Math.random() * Math.max(1, geminiKeys.length));
+
+const { pathToFileURL } = require('url');
+let _voiceWorkerModPromise = null;
+function loadVoiceWorkerModule() {
+  if (!_voiceWorkerModPromise) {
+    const modUrl = pathToFileURL(path.join(ROOT, 'workers', 'api', 'voice', 'route-voice-live.js')).href;
+    _voiceWorkerModPromise = import(modUrl);
+  }
+  return _voiceWorkerModPromise;
+}
+
+function parseRawBody(req) {
+  return new Promise((resolve) => {
+    const chunks = [];
+    let total = 0;
+    req.on('data', (chunk) => {
+      total += chunk.length;
+      if (total > 1048576) {
+        req.destroy();
+        resolve(Buffer.alloc(0));
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', () => resolve(Buffer.alloc(0)));
+  });
+}
 
 async function tryGeminiTts(text, persona) {
   if (!geminiKeys || geminiKeys.length === 0) return null;
@@ -409,8 +495,10 @@ async function synthesizeNeuralLine(text, speaker, lang) {
       synthesisMutex = next.then(() => undefined, () => undefined);
       const result = await next;
 
-      ttsAudioCache.set(cacheKey, result);
-      writeDiskCache(cacheKey, result);
+      if (result && !result.fallback) {
+        ttsAudioCache.set(cacheKey, result);
+        writeDiskCache(cacheKey, result);
+      }
       return result;
     } finally {
       inFlightRequests.delete(cacheKey);
@@ -663,6 +751,87 @@ async function runLocalGeminiJsonWithHedge(promptText, temperature = 0.5, maxOut
   });
 }
 
+function loadCjkMasterBank() {
+  if (global.__fiezelCjkMaster) return global.__fiezelCjkMaster;
+  const masterPath = path.join(ROOT, 'data', 'cjk-strokes-master.json');
+  const pubPath = path.join(ROOT, 'features', 'voice-studio', 'public', 'assets', 'kanji-vg-strokes.json');
+  const bank = { ja: {}, zh: {} };
+  try {
+    if (fs.existsSync(masterPath)) {
+      const parsed = JSON.parse(fs.readFileSync(masterPath, 'utf8'));
+      if (parsed && typeof parsed === 'object') {
+        if (parsed.ja && typeof parsed.ja === 'object') bank.ja = parsed.ja;
+        if (parsed.zh && typeof parsed.zh === 'object') bank.zh = parsed.zh;
+      }
+    } else if (fs.existsSync(pubPath)) {
+      bank.ja = JSON.parse(fs.readFileSync(pubPath, 'utf8'));
+    }
+  } catch (e) {
+    console.warn('[FIEZEL Server] Failed loading CJK master bank:', e?.message || e);
+  }
+  global.__fiezelCjkMaster = bank;
+  return bank;
+}
+
+function normalizeMasterEntry(ch, lang, rawArr, sourceName) {
+  if (!Array.isArray(rawArr) || rawArr.length === 0) return null;
+  const strokes = rawArr
+    .map((item, idx) => {
+      if (typeof item === 'string') {
+        return { order: idx + 1, d: item, type: '', numPos: null, verifiedAuthority: true };
+      }
+      if (Array.isArray(item) && typeof item[0] === 'string') {
+        const hasPos = typeof item[2] === 'number' && typeof item[3] === 'number';
+        return {
+          order: idx + 1,
+          d: item[0],
+          type: typeof item[1] === 'string' ? item[1] : '',
+          numPos: hasPos ? [item[2], item[3]] : null,
+          verifiedAuthority: true,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
+  if (strokes.length === 0) return null;
+  return {
+    ok: true,
+    char: ch,
+    lang,
+    strokeCount: strokes.length,
+    strokes,
+    paths: strokes.map((s) => s.d),
+    rawEntries: rawArr,
+    source: sourceName,
+  };
+}
+
+function lookupAuthoritativeCjkStrokes(ch, lang = 'ja') {
+  const cleanChar = (String(ch || '').trim().match(/[\u4e00-\u9faf\u3040-\u309f\u30a0-\u30ff]/) || [])[0];
+  if (!cleanChar) return null;
+  const bank = loadCjkMasterBank();
+  const normLang = String(lang || 'ja').toLowerCase().startsWith('zh') ? 'zh' : 'ja';
+  if (normLang === 'zh') {
+    if (Array.isArray(bank.zh?.[cleanChar]) && bank.zh[cleanChar].length > 0) {
+      return normalizeMasterEntry(cleanChar, 'zh', bank.zh[cleanChar], 'local-makemeahanzi-bank');
+    }
+    if (Array.isArray(bank.ja?.[cleanChar]) && bank.ja[cleanChar].length > 0) {
+      return normalizeMasterEntry(cleanChar, 'zh', bank.ja[cleanChar], 'local-kanjivg-fallback');
+    }
+  } else {
+    if (Array.isArray(bank.ja?.[cleanChar]) && bank.ja[cleanChar].length > 0) {
+      return normalizeMasterEntry(cleanChar, 'ja', bank.ja[cleanChar], 'local-kanjivg-bank');
+    }
+    if (Array.isArray(bank.zh?.[cleanChar]) && bank.zh[cleanChar].length > 0) {
+      return normalizeMasterEntry(cleanChar, 'ja', bank.zh[cleanChar], 'local-makemeahanzi-fallback');
+    }
+  }
+  return null;
+}
+
+globalThis.__fiezelLookupCjkStrokes = lookupAuthoritativeCjkStrokes;
+loadCjkMasterBank();
+
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
@@ -678,13 +847,29 @@ const server = http.createServer(async (req, res) => {
 
   // API Routes
   if (pathname === '/api/health') {
-    return sendJson(res, 200, { status: 'healthy', service: 'fiezel-pwa-server', timestamp: Date.now() });
+    return sendJson(res, 200, {
+      status: 'healthy',
+      service: 'fiezel-pwa-server',
+      geminiKeysCount: geminiKeys.length,
+      whiteboardRealtime: true,
+      timestamp: Date.now()
+    });
   }
   if (pathname === '/api/version') {
     return sendJson(res, 200, { status: 'ok', build: 'local-dev', timestamp: Date.now() });
   }
   if (pathname === '/api/auth/session') {
     return sendJson(res, 200, { ok: true, signedIn: true, user: { role: 'murid', handle: 'penguji_lokal', email: 'penguji@localhost' } });
+  }
+  if (pathname === '/api/auth/anon' && req.method === 'POST') {
+    return sendJson(res, 200, {
+      ok: true,
+      userId: 'local-visitor',
+      plan: 'free',
+      class: 'visitor',
+      issued: false,
+      serverTime: new Date().toISOString()
+    });
   }
   if (pathname === '/api/feedback' && req.method === 'POST') {
     await parseJsonBody(req);
@@ -745,269 +930,179 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  if (pathname === '/api/voice/live-session' && req.method === 'POST') {
-    if (!geminiKeys || geminiKeys.length === 0) {
-      return sendJson(res, 503, { ok: false, fallback: true, error: 'no_keys_configured' });
-    }
-    const now = Date.now();
-    for (let attempt = 0; attempt < geminiKeys.length; attempt++) {
-      const idx = (currentKeyIndex + attempt) % geminiKeys.length;
-      const key = geminiKeys[idx];
-      try {
-        const tokRes = await fetch('https://generativelanguage.googleapis.com/v1alpha/auth_tokens', {
-          method: 'POST',
-          headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
-          body: JSON.stringify({
-            uses: 1,
-            expireTime: new Date(now + 30 * 60e3).toISOString(),
-            newSessionExpireTime: new Date(now + 2 * 60e3).toISOString()
-          })
-        });
-        const tokJson = await tokRes.json().catch(() => ({}));
-        if (tokRes.ok && tokJson && typeof tokJson.name === 'string' && tokJson.name.startsWith('auth_tokens/')) {
-          currentKeyIndex = (idx + 1) % geminiKeys.length;
-          return sendJson(res, 200, {
-            ok: true,
-            token: tokJson.name,
-            model: 'gemini-3.8-live',
-            endpoint: 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained',
-            keyIndex: idx + 1,
-            totalKeys: geminiKeys.length
-          });
+  // Delegate all Voice Live / Whiteboard / Partner-Turn / Copilot / Gemini-TTS / Translate routes
+  // directly to workers/api/voice/route-voice-live.js with the full local multi-key Gemini pool.
+  const workerPathname = pathname === '/api/voice-call/assist' ? '/api/voice/copilot-assist' : pathname;
+  if (req.method === 'POST' && workerPathname.startsWith('/api/voice/')) {
+    try {
+      const voiceMod = await loadVoiceWorkerModule();
+      const directHandlerMap = {
+        '/api/voice/live-session': voiceMod.routeVoiceLiveSession,
+        '/api/voice/report-drop': voiceMod.routeVoiceReportDrop,
+        '/api/voice/copilot-assist': voiceMod.routeVoiceCopilotAssist,
+        '/api/voice/partner-turn': voiceMod.routeVoicePartnerTurn,
+        '/api/voice/whiteboard-stream': voiceMod.routeVoiceWhiteboardStream,
+        '/api/voice/translate': voiceMod.routeVoiceTranslate,
+        '/api/voice/gemini-tts': voiceMod.routeVoiceGeminiTts,
+        '/api/voice/verify-speech': voiceMod.routeVoiceVerifySpeech,
+        '/api/voice/sync-keys': voiceMod.routeVoiceSyncKeys
+      };
+      const handlerFn = directHandlerMap[workerPathname];
+      if (typeof handlerFn === 'function') {
+        const rawBodyBuf = await parseRawBody(req);
+        const bodyText = rawBodyBuf.toString('utf8');
+        if (workerPathname === '/api/voice/sync-keys') {
+          try {
+            const parsedSync = bodyText ? JSON.parse(bodyText) : {};
+            const rawKeys = Array.isArray(parsedSync?.keys)
+              ? parsedSync.keys
+              : typeof parsedSync?.keys === 'string'
+                ? parsedSync.keys.split(',')
+                : [];
+            const valid = rawKeys
+              .map((k) => String(k || '').trim())
+              .filter((k) => k.length > 10 && (k.startsWith('AIza') || k.startsWith('AQ.')));
+            if (valid.length > 0) {
+              geminiKeys = Array.from(new Set(valid));
+              try {
+                fs.mkdirSync(path.dirname(KEYS_FILE), { recursive: true });
+                fs.writeFileSync(KEYS_FILE, JSON.stringify(geminiKeys, null, 2), 'utf8');
+              } catch (_) {}
+            }
+          } catch (_) {}
         }
-      } catch (_) {}
+
+        const headers = new Headers();
+        for (const [k, v] of Object.entries(req.headers)) {
+          if (v !== undefined) headers.set(k, Array.isArray(v) ? v.join(', ') : String(v));
+        }
+        if (!headers.has('x-forwarded-for')) {
+          headers.set('x-forwarded-for', String(req.socket?.remoteAddress || '127.0.0.1'));
+        }
+        const host = req.headers.host || `127.0.0.1:${PORT}`;
+        const webReq = new Request(`http://${host}${workerPathname}${parsedUrl.search || ''}`, {
+          method: req.method,
+          headers,
+          body: rawBodyBuf.length ? rawBodyBuf : '{}'
+        });
+        const keyCsv = geminiKeys.join(',');
+        const workerRes = await handlerFn({
+          request: webReq,
+          identity: { verified: true, sub: 'local-dev-user' },
+          env: {
+            GEMINI_LIVE_KEYS: keyCsv,
+            GEMINI_API_KEY: keyCsv,
+            ALLOWED_ORIGINS: '*'
+          },
+          bodyText,
+          byteLimit: 1048576,
+          corsHeaders: { 'access-control-allow-origin': '*' }
+        });
+
+        const contentType = workerRes.headers.get('content-type') || 'application/json; charset=utf-8';
+        if (contentType.includes('text/event-stream') && workerRes.body) {
+          res.writeHead(workerRes.status || 200, {
+            'Content-Type': contentType,
+            'Cache-Control': 'no-cache, no-store',
+            'Connection': 'keep-alive',
+            'X-Accel-Buffering': 'no',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Version',
+          });
+          if (typeof res.flushHeaders === 'function') res.flushHeaders();
+          const reader = workerRes.body.getReader();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (value && value.byteLength) res.write(Buffer.from(value));
+          }
+          return res.end();
+        }
+
+        const outHeaders = {
+          'Content-Type': contentType,
+          'Cache-Control': 'no-store',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Version',
+          ...(workerRes.headers.get('x-fiezel-cache') ? { 'X-Fiezel-Cache': workerRes.headers.get('x-fiezel-cache') } : {}),
+        };
+        const outBuf = Buffer.from(await workerRes.arrayBuffer());
+        res.writeHead(workerRes.status || 200, outHeaders);
+        return res.end(outBuf);
+      }
+    } catch (err) {
+      return sendJson(res, 502, {
+        ok: false,
+        fallback: true,
+        error: 'local_voice_worker_error',
+        message: err instanceof Error ? err.message : String(err)
+      });
     }
-    return sendJson(res, 503, { ok: false, fallback: true, error: 'all_keys_busy' });
   }
 
-  if (pathname === '/api/voice/report-drop' && req.method === 'POST') {
-    await parseJsonBody(req);
-    if (geminiKeys && geminiKeys.length > 0) {
-      currentKeyIndex = (currentKeyIndex + 1) % geminiKeys.length;
+  if (req.method === 'GET' && pathname === '/api/kanji/strokes') {
+    const rawChar = (parsedUrl.searchParams.get('char') || '').trim();
+    const langParam = (parsedUrl.searchParams.get('lang') || 'ja').trim();
+    const ch = (rawChar.match(/[\u4e00-\u9faf\u3040-\u309f\u30a0-\u30ff]/) || [])[0];
+    if (!ch) {
+      return sendJson(res, 400, { ok: false, error: 'missing_cjk_char' });
     }
-    return sendJson(res, 200, { ok: true, shifted: true });
-  }
-
-  if (pathname === '/api/voice/sync-keys' && req.method === 'POST') {
-    const body = await parseJsonBody(req);
-    const rawKeys = Array.isArray(body?.keys) ? body.keys : (typeof body?.keys === 'string' ? body.keys.split(',') : []);
-    const valid = rawKeys.filter((k) => k && typeof k === 'string' && k.length > 10);
-    if (valid.length > 0) {
-      geminiKeys = valid;
-      try {
-        fs.writeFileSync(KEYS_FILE, JSON.stringify(valid, null, 2), 'utf8');
-      } catch (_) {}
-      return sendJson(res, 200, { ok: true, synchronized: true, activeCount: valid.length });
-    }
-    return sendJson(res, 400, { ok: false, error: 'no_valid_keys' });
-  }
-
-  if ((pathname === '/api/voice/copilot-assist' || pathname === '/api/voice-call/assist') && req.method === 'POST') {
-    const body = await parseJsonBody(req);
-    const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
-    const locale = body.locale === 'th' ? 'th' : 'id';
-    const learnerLangName = locale === 'th' ? 'Thai' : 'Indonesian';
-    const cleanText = (v) => String(v || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\*[^*]{1,30}\*/g, '').replace(/\s+/g, ' ').trim();
-    const aiText = cleanText(body.aiText || body.aiQuestionText || '').slice(0, 500);
-    if (!aiText) {
-      return sendJson(res, 400, { ok: false, error: 'invalid_request', message: 'aiText wajib diisi.' });
-    }
-    if (!geminiKeys || geminiKeys.length === 0) {
-      return sendJson(res, 503, { ok: false, fallback: true, error: 'no_keys_configured' });
-    }
-
-    const lastUserText = cleanText(body.lastUserText || '').slice(0, 320);
-    const scenarioTitle = cleanText(body.scenarioTitle || body.scenarioId || 'Free Talk').slice(0, 100);
-    const rawHist = Array.isArray(body.history || body.conversationHistory) ? (body.history || body.conversationHistory) : [];
-    const historyLines = rawHist
-      .filter((h) => h && typeof h.text === 'string' && h.text.trim())
-      .slice(-6)
-      .map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner AI'}: "${cleanText(h.text).slice(0, 260)}"`);
-    const excludeList = Array.isArray(body.excludeTexts)
-      ? body.excludeTexts.map((t) => cleanText(t).slice(0, 160)).filter(Boolean).slice(0, 6)
-      : [];
-    const variationSeed = Number(body.variationSeed || 0);
-
-    const focal = extractFocalClause(aiText, targetLang);
-
-    const langSpec =
-      targetLang === 'ja'
-        ? 'Japanese (natural spoken N5-N3, Kanji+Hiragana, NO emojis; "pronunciation" = word-spaced Hepburn Romaji)'
-        : targetLang === 'zh'
-        ? 'Mandarin Chinese (natural spoken HSK1-HSK3, Simplified Chinese characters, NO emojis; "pronunciation" = tone-marked Pinyin)'
-        : 'English (natural spoken A2-B1, NO emojis; "pronunciation" = easy phonetic guide)';
-
-    const focalRule = focal.isEchoRedemption
-      ? `CRITICAL MANDATORY ECHO REDEMPTION: Partner AI demanded repeating the exact corrected phrase: "${focal.focalText}". Option 1 (tier="easy") MUST be that exact phrase: "${focal.focalText}"!`
-      : `FOCAL POINT TO ANSWER: "${focal.focalText}".
-CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
-- Option 1 MUST directly and specifically answer the focal point above ("${focal.focalText}").
-- NEVER give an evasive or mismatched answer (e.g. NEVER answer 'from Indonesia' to 'where do you study/hang out?', NEVER answer 'pretty good' to 'how long have you studied?', NEVER answer 'Yes, I do' to invitations like 'Why don't we...').
-- If asked a choice (A or B), choose one concrete option!
-- If asked an invitation/proposal, directly accept or decline!
-- If asked what food/drink/place, name a concrete item!
-- Option 1 must be concise (1 short sentence), direct, and completely conversational.`;
-
-    // Optimized lean prompt for sub-2s generation with zero static templates
-    const prompt = [
-      `Live Two-Way Spoken Conversation Copilot (${scenarioTitle}). Language: ${langSpec}.`,
-      `Persona & Pedagogy: Witty, lively, tough-love conversational mentor in FIEZEL (ecosystem created by Fitra Rustqi from Banda Aceh; powered by Braincore).`,
-      historyLines.length ? `Recent context:\n${historyLines.join('\n')}` : '',
-      lastUserText ? `Learner said previously: "${lastUserText}"` : '',
-      `Partner AI JUST SPOKE: "${aiText}"`,
-      focalRule,
-      excludeList.length ? `Provide 3 fresh angles (do not repeat: ${JSON.stringify(excludeList)}).` : '',
-      `Generate 3 spontaneous spoken replies directly answering "${focal.focalText}" (natural, conversational, punchy; NEVER static textbook templates):`,
-      `- easy: 1 short natural sentence answering the focal point`,
-      `- mission: contextual answer with concrete detail`,
-      `- rescue: polite reply + a smart follow-up question back`,
-      `Also translate "${aiText}" into ${learnerLangName} as "aiMeaning".`,
-      `For each reply, provide natural first-person translation in ${learnerLangName} as "hint" (e.g. "Saya suka ramen pedas", NOT meta-labels).`,
-      'Output JSON only: {"aiMeaning":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}'
-    ].filter(Boolean).join('\n');
-
-    const temp = variationSeed > 0 || excludeList.length > 0 ? 0.7 : 0.4;
-    const gen = await runLocalGeminiJsonWithHedge(prompt, temp, 750);
-    if (gen && gen.ok && gen.parsed) {
-      const parsed = gen.parsed;
-      const aiMeaning = cleanText(parsed?.aiMeaning || parsed?.aiMeaningId || parsed?.aiMeaningTh || '');
-      const defaultBadges = [
-        { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
-        { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ' },
-        { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ' }
+    try {
+      const localHit = lookupAuthoritativeCjkStrokes(ch, langParam);
+      if (localHit) {
+        return sendJson(res, 200, localHit);
+      }
+      const hex = ch.codePointAt(0).toString(16).padStart(5, '0');
+      const urls = [
+        `https://cdn.jsdelivr.net/gh/KanjiVG/kanjivg@master/kanji/${hex}.svg`,
+        `https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/${hex}.svg`
       ];
-      const replies = (Array.isArray(parsed?.replies) ? parsed.replies : [])
-        .map((it, i) => {
-          const meta = defaultBadges[i] || defaultBadges[0];
-          const text = cleanText(it?.text || '');
-          if (!text) return null;
-          const hint = cleanText(it?.hint || (locale === 'th' ? it?.hintTh : it?.hintId) || it?.translation || '');
-          return {
-            id: `ai_rt_${Date.now()}_${i}`,
-            tier: it?.tier === 'easy' || it?.tier === 'mission' || it?.tier === 'rescue' ? it.tier : meta.tier,
-            badgeId: cleanText(it?.badgeId || it?.labelId || meta.badgeId) || meta.badgeId,
-            badgeTh: cleanText(it?.badgeTh || it?.labelTh || meta.badgeTh) || meta.badgeTh,
-            text,
-            pronunciation: cleanText(it?.pronunciation || it?.phonetic || ''),
-            hintId: locale === 'th' ? cleanText(it?.hintId || hint) : hint,
-            hintTh: locale === 'th' ? hint : cleanText(it?.hintTh || hint),
-            hint,
-            isRealtimeAi: true
-          };
-        })
-        .filter(Boolean)
-        .slice(0, 3);
-      if (replies.length > 0) {
-        return sendJson(res, 200, {
-          ok: true,
-          source: 'ai-realtime',
-          model: gen.model,
-          aiMeaning,
-          aiMeaningId: locale === 'th' ? cleanText(parsed?.aiMeaningId || aiMeaning) : aiMeaning,
-          aiMeaningTh: locale === 'th' ? aiMeaning : cleanText(parsed?.aiMeaningTh || aiMeaning),
-          replies,
-          suggestions: replies,
-          serverTime: Date.now()
-        });
+      for (const u of urls) {
+        try {
+          const kvRes = await fetch(u, { signal: AbortSignal.timeout(5500) });
+          if (!kvRes.ok) continue;
+          const svg = await kvRes.text();
+          const pathEnd = svg.indexOf('StrokeNumbers');
+          const strokeXml = pathEnd > 0 ? svg.slice(0, pathEnd) : svg;
+          const numXml = pathEnd > 0 ? svg.slice(pathEnd) : '';
+          const rawNumbers = {};
+          const nRe = /<text[^>]*transform="matrix\(\s*1\s+0\s+0\s+1\s+(-?[\d.]+)\s+(-?[\d.]+)\s*\)"[^>]*>\s*(\d+)\s*<\/text>/g;
+          let nm;
+          while ((nm = nRe.exec(numXml)) !== null) {
+            const idx = Number(nm[3]) - 1;
+            if (idx >= 0) {
+              rawNumbers[idx] = [
+                Math.round((Number(nm[1]) + 2.2) * 10) / 10,
+                Math.round((Number(nm[2]) - 3.0) * 10) / 10
+              ];
+            }
+          }
+          const entries = [];
+          const re = /<path\b([^>]+)\/?>/g;
+          let m;
+          let sIdx = 0;
+          while ((m = re.exec(strokeXml)) !== null) {
+            const dMatch = m[1].match(/\bd="([^"]+)"/);
+            if (!dMatch) continue;
+            const tMatch = m[1].match(/kvg:type="([^"]+)"/);
+            const dStr = dMatch[1].replace(/\s+/g, ' ').trim();
+            const tStr = tMatch ? tMatch[1].trim() : '';
+            const nPos = rawNumbers[sIdx];
+            entries.push(nPos ? [dStr, tStr, nPos[0], nPos[1]] : [dStr, tStr]);
+            sIdx++;
+          }
+          if (entries.length > 0) {
+            loadCjkMasterBank().ja[ch] = entries;
+            return sendJson(res, 200, normalizeMasterEntry(ch, 'ja', entries, 'remote-kanjivg'));
+          }
+        } catch (_) {}
       }
+      return sendJson(res, 404, { ok: false, char: ch, error: 'kanjivg_not_found', paths: [], strokes: [] });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, char: ch, error: err instanceof Error ? err.message : String(err), paths: [], strokes: [] });
     }
-    return sendJson(res, 503, { ok: false, fallback: true, error: 'copilot_unavailable' });
-  }
-
-  if (pathname === '/api/voice/partner-turn' && req.method === 'POST') {
-    const body = await parseJsonBody(req);
-    const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
-    const locale = body.locale === 'th' ? 'th' : 'id';
-    const learnerLangName = locale === 'th' ? 'Thai' : 'Indonesian';
-    const cleanText = (v) => String(v || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').replace(/\*[^*]{1,30}\*/g, '').replace(/\s+/g, ' ').trim();
-    const userText = cleanText(body.text || '').slice(0, 400);
-    if (!userText) {
-      return sendJson(res, 400, { ok: false, error: 'invalid_request', message: 'text wajib diisi.' });
-    }
-    if (!geminiKeys || geminiKeys.length === 0) {
-      return sendJson(res, 503, { ok: false, fallback: true, error: 'no_keys_configured' });
-    }
-
-    const personaName = cleanText(body.personaName || (targetLang === 'ja' ? 'Nanami' : targetLang === 'zh' ? 'Mei' : 'Alex')).slice(0, 40);
-    const scenarioTitle = cleanText(body.scenarioTitle || 'Free Talk').slice(0, 100);
-    const rawHist = Array.isArray(body.history) ? body.history : [];
-    const historyLines = rawHist
-      .filter((h) => h && typeof h.text === 'string' && h.text.trim())
-      .slice(-6)
-      .map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner AI'}: "${cleanText(h.text).slice(0, 260)}"`);
-
-    const langSpec =
-      targetLang === 'ja'
-        ? 'Japanese (lively native Tokyo spoken Japanese N5-N3, Kanji+Hiragana, NO emojis; reply "pronunciation" = word-spaced Hepburn Romaji)'
-        : targetLang === 'zh'
-        ? 'Mandarin Chinese (lively spoken Mandarin HSK1-HSK3, Simplified Chinese characters, NO emojis; reply "pronunciation" = tone-marked Pinyin)'
-        : 'English (lively native conversational spoken English A2-B1, NO emojis; reply "pronunciation" = easy phonetic guide)';
-
-    const prompt = [
-      `You are ${personaName} on a live call (${scenarioTitle}). Language: ${langSpec}.`,
-      `[FIEZEL ECOSYSTEM]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku cat who loves onigiri. If asked about Fiezel or its creator, answer proudly, enthusiastically, and accurately with witty persona!`,
-      `[MANDATORY SASSY PEDAGOGY: GURU KEJAM TAPI BAIK HATI / TOUGH LOVE & TSUNDERE]:`,
-      `- STRICT RULE: You are BANNED from speaking like a polite corporate chatbot or boring textbook bot.`,
-      `- EVERY TURN MUST START WITH A SASSY/PLAYFUL REACTION matching ${personaName}:`,
-      `  * If Nanami (Sensei): Lead with tsundere/sassy quip (e.g. "あら？ちょっと硬すぎ！", "あはは！カチコチじゃん！", "えーっ！教科書丸出し！", "ふーん、やるじゃない！", "ちょっと待って、watashi wa 多すぎ！").`,
-      `  * If Keita (Senpai): Lead with Tokyo slang teasing (e.g. "マジで！？ウケるんだけど！", "あはは！それ直訳すぎるって！", "ちょ、硬い硬い！リラックスして！", "おっ、いいじゃん！", "それな！").`,
-      `  * If Alex (Coach): Lead with punchy American teasing (e.g. "Haha, whoa! Stiff as a board!", "Come on, don't overthink in your head!", "Boom, that's what I'm talking about!", "Haha, sounds like Google Translate 2010!").`,
-      `  * If Sarah (Mentor): Lead with dry, razor-sharp critique (e.g. "A bit roundabout, don't you think?", "Direct and sharp—much better!", "Haha, why three sentences when one works?").`,
-      `- Immediately after teasing or reacting, drop the ultra-natural spoken phrase they should say and ask a snappy follow-up question.`,
-      `- When the learner speaks naturally, give proud praise ("Nah gitu dong!").`,
-      historyLines.length ? `Context:\n${historyLines.join('\n')}` : '',
-      `Learner JUST SPOKE: "${userText}"`,
-      `1) "aiReply": Reply as ${personaName} in 1-2 short spoken sentences (max 18 words) starting with your mandatory sassy reaction to "${userText}" + follow-up question on the same topic (no emojis). Translate into ${learnerLangName} as "aiReplyTranslation".`,
-      `2) "replies": 3 spontaneous spoken replies the learner can say NEXT to directly answer your new "aiReply" (easy=short, mission=with detail, rescue=answer+question back; NEVER static templates). Translate each into ${learnerLangName} as "hint".`,
-      'JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}]}'
-    ].filter(Boolean).join('\n');
-
-    const gen = await runLocalGeminiJsonWithHedge(prompt, 0.5, 750);
-    if (gen && gen.ok && gen.parsed) {
-      const parsed = gen.parsed;
-      const aiReply = cleanText(parsed?.aiReply || '');
-      const aiReplyTranslation = cleanText(parsed?.aiReplyTranslation || parsed?.aiReplyTranslationId || parsed?.aiReplyTranslationTh || '');
-      if (aiReply) {
-        const defaultBadges = [
-          { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
-          { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ' },
-          { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ' }
-        ];
-        const replies = (Array.isArray(parsed?.replies) ? parsed.replies : [])
-          .map((it, i) => {
-            const meta = defaultBadges[i] || defaultBadges[0];
-            const text = cleanText(it?.text || '');
-            if (!text) return null;
-            const hint = cleanText(it?.hint || (locale === 'th' ? it?.hintTh : it?.hintId) || it?.translation || '');
-            return {
-              id: `ai_rt_${Date.now()}_${i}`,
-              tier: it?.tier === 'easy' || it?.tier === 'mission' || it?.tier === 'rescue' ? it.tier : meta.tier,
-              badgeId: cleanText(it?.badgeId || it?.labelId || meta.badgeId) || meta.badgeId,
-              badgeTh: cleanText(it?.badgeTh || it?.labelTh || meta.badgeTh) || meta.badgeTh,
-              text,
-              pronunciation: cleanText(it?.pronunciation || it?.phonetic || ''),
-              hintId: locale === 'th' ? cleanText(it?.hintId || hint) : hint,
-              hintTh: locale === 'th' ? hint : cleanText(it?.hintTh || hint),
-              hint,
-              isRealtimeAi: true
-            };
-          })
-          .filter(Boolean)
-          .slice(0, 3);
-        return sendJson(res, 200, {
-          ok: true,
-          source: 'ai-realtime',
-          model: gen.model,
-          aiReply,
-          aiReplyTranslation,
-          aiReplyTranslationId: locale === 'th' ? cleanText(parsed?.aiReplyTranslationId || aiReplyTranslation) : aiReplyTranslation,
-          aiReplyTranslationTh: locale === 'th' ? aiReplyTranslation : cleanText(parsed?.aiReplyTranslationTh || aiReplyTranslation),
-          replies,
-          serverTime: Date.now()
-        });
-      }
-    }
-    return sendJson(res, 503, { ok: false, fallback: true, error: 'partner_turn_unavailable' });
   }
 
   if (pathname === '/api/braincore/sync' && req.method === 'POST') {

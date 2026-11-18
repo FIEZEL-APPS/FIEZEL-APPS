@@ -62,13 +62,16 @@ const GOOGLE_AUTH_TOKEN_API = 'https://generativelanguage.googleapis.com/v1alpha
 const GOOGLE_INTERACTIONS_API = 'https://generativelanguage.googleapis.com/v1beta/interactions';
 const DEFAULT_LIVE_MODEL = 'gemini-3.8-live';
 const COPILOT_MODELS = [
-  'gemini-3.1-flash-lite',
   'gemini-3.5-flash-lite',
   'gemini-3-flash-preview',
-  'gemini-2.5-flash',
+  'gemini-3.1-flash-lite-preview',
+];
+const EXPLANATION_MODELS = [
+  'gemini-3.1-flash-lite-preview',
+  'gemini-3-flash-preview',
+  'gemini-3.5-flash-lite',
 ];
 const GEMINI_TTS_MODELS = [
-  'gemini-3.8-flash-lite-tts',
   'gemini-3.8-flash-tts',
   'gemini-3.1-flash-tts-preview',
 ];
@@ -83,11 +86,109 @@ let _poolIndex = Math.floor(Math.random() * 16);
 const _copilotCooldownMap = new Map(); // `${key}::${model}` -> timestamp ms
 const _ttsCooldownMap = new Map(); // `${key}::${model}` -> timestamp ms
 let _copilotPoolIndex = Math.floor(Math.random() * 16);
+let _livePoolCursor = Math.floor(Math.random() * 16);
+const _verifiedHealthyKeys = new Set();
+const _quotaDeadKeys = new Set();
+
+// Zero-KV-write worker cache (Cloudflare edge caches.default + bounded isolate Map fallback)
+const _ttsMemoryCache = new Map();
+const _boardMemoryCache = new Map();
+const CACHE_INTERNAL_ORIGIN = 'https://cache.fiezel.internal/voice/v2';
+
+async function sha256Hex(inputStr) {
+  const bytes = new TextEncoder().encode(String(inputStr || ''));
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function setBoundedMapCache(map, key, value, maxEntries) {
+  if (map.has(key)) map.delete(key);
+  while (map.size >= maxEntries) {
+    const oldest = map.keys().next().value;
+    if (oldest === undefined) break;
+    map.delete(oldest);
+  }
+  map.set(key, value);
+}
+
+function getEdgeDefaultCache() {
+  try {
+    return typeof caches !== 'undefined' && caches && caches.default ? caches.default : null;
+  } catch {
+    return null;
+  }
+}
+
+async function readWorkerCache(namespace, hashKey, memoryMap, maxEntries) {
+  const memHit = memoryMap.get(hashKey);
+  if (memHit) {
+    if (memHit.expiresAt > Date.now()) {
+      setBoundedMapCache(memoryMap, hashKey, memHit, maxEntries);
+      return { payload: memHit.payload, cacheLayer: 'memory' };
+    }
+    memoryMap.delete(hashKey);
+  }
+  const edgeCache = getEdgeDefaultCache();
+  if (!edgeCache) return null;
+  try {
+    const req = new Request(`${CACHE_INTERNAL_ORIGIN}/${namespace}/${hashKey}`, { method: 'GET' });
+    const res = await edgeCache.match(req);
+    if (!res || !res.ok) return null;
+    const parsed = await res.json().catch(() => null);
+    if (!parsed || typeof parsed !== 'object') return null;
+    setBoundedMapCache(memoryMap, hashKey, { payload: parsed, expiresAt: Date.now() + 900000 }, maxEntries);
+    return { payload: parsed, cacheLayer: 'edge' };
+  } catch {
+    return null;
+  }
+}
+
+async function writeWorkerCache(ctx, namespace, hashKey, payloadObj, memoryMap, maxEntries, ttlSec) {
+  const cleanPayload = stripDashesDeep(payloadObj);
+  setBoundedMapCache(
+    memoryMap,
+    hashKey,
+    { payload: cleanPayload, expiresAt: Date.now() + ttlSec * 1000 },
+    maxEntries
+  );
+  const edgeCache = getEdgeDefaultCache();
+  if (!edgeCache) return;
+  try {
+    const req = new Request(`${CACHE_INTERNAL_ORIGIN}/${namespace}/${hashKey}`, { method: 'GET' });
+    const res = new Response(JSON.stringify(cleanPayload), {
+      status: 200,
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'cache-control': `public, max-age=${ttlSec}, s-maxage=${ttlSec}`,
+      },
+    });
+    const putPromise = edgeCache.put(req, res).catch(() => {});
+    if (ctx?.executionCtx && typeof ctx.executionCtx.waitUntil === 'function') {
+      ctx.executionCtx.waitUntil(putPromise);
+    } else {
+      await putPromise;
+    }
+  } catch {}
+}
+
+const VALID_TERM_FALLBACKS = (topicTitle, tblRows) => {
+  const parts = String(topicTitle || '')
+    .split(/\s+(?:vs\.?|versus|dan|atau|and|or)\s+|[:/]/i)
+    .map((p) => cleanSpokenText(p).replace(/^(?:perbedaan|bedanya|antara|cara|menggunakan|pakai)\s+/i, '').trim())
+    .filter((p) => p && !/^(?:pola\s+(?:pertama|kedua)|sisi\s+[ab]|konsep\s*[12])$/i.test(p));
+  const rowA = cleanSpokenText(tblRows?.[0]?.[0] || '');
+  const rowB = cleanSpokenText(tblRows?.[1]?.[0] || '');
+  const pickA = (rowA && !/^(?:pola\s+pertama|sisi\s+a)$/i.test(rowA) ? rowA : '') || parts[0] || 'Bentuk Utama';
+  const pickB = (rowB && !/^(?:pola\s+kedua|sisi\s+b)$/i.test(rowB) && rowB.toLowerCase() !== pickA.toLowerCase() ? rowB : '') || parts[1] || 'Bentuk Pembanding';
+  return [pickA.slice(0, 48), pickB.slice(0, 48)];
+};
 
 // Rate limit in-memory per IP untuk mencegah pengurasan kuota Gemini Live & Copilot
 const _ipLiveCallMap = new Map();
-function checkLiveRateLimit(ip, limit = 30, windowMs = 60000) {
-  if (!ip) return true;
+function checkLiveRateLimit(ip, limit = 120, windowMs = 60000) {
+  if (!ip || ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') return true;
   const now = Date.now();
   const entry = _ipLiveCallMap.get(ip) || { count: 0, resetAt: now + windowMs };
   if (now > entry.resetAt) {
@@ -98,7 +199,7 @@ function checkLiveRateLimit(ip, limit = 30, windowMs = 60000) {
   }
   entry.count++;
   _ipLiveCallMap.set(ip, entry);
-  return entry.count <= limit;
+  return entry.count <= Math.max(limit, 120);
 }
 
 export function parseKeys(env) {
@@ -273,7 +374,7 @@ export async function routeVoiceReportDrop(ctx) {
   const closeCode = Number(body?.code || 0);
   // Ignore normal closures (1000/1005) and client payload schema errors (1007) so valid API keys are never poisoned
   if (closeCode === 1000 || closeCode === 1005 || closeCode === 1007) {
-    return jsonResponse({ ok: true, shifted: false, ignoredClientClose: true });
+  return jsonResponse({ ok: true, shifted: false, ignoredClientClose: true });
   }
   const reason = String(body?.reason || '').toLowerCase();
   const isQuota =
@@ -301,7 +402,9 @@ export async function routeVoiceReportDrop(ctx) {
 function cleanSpokenText(raw) {
   return String(raw || '')
     .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
-    .replace(/\*[^*]{1,30}\*/g, '')
+    // Preserve math multiplication like "3.14 * 7 * 7" or "2 * π * r"; only strip roleplay stage emotes (*smiles*, *laughs*, *nods*)
+    .replace(/\*\*(?!\s)([^*]{1,80}?)(?<!\s)\*\*/g, '$1')
+    .replace(/\*(?:smiles?|laughs?|sighs?|nods?|winks?|chuckles?|giggles?|gasps?|coughs?|pauses?|clears\s+throat|inhales?|exhales?)\*/gi, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -650,24 +753,28 @@ async function invokeSingleGeminiJson({
     }
     parentSignal.addEventListener('abort', onParentAbort, { once: true });
   }
-  const timer = setTimeout(() => controller.abort(), 6500);
+  const timeoutMs = maxOutputTokens > 1000 ? 12000 : 8000;
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const genCfg = {
       temperature: typeof temperature === 'number' ? temperature : 0.45,
-      max_output_tokens: Math.min(Math.max(maxOutputTokens || 750, 256), 1024),
+      max_output_tokens: Math.min(Math.max(Number(maxOutputTokens) || 750, 128), 4096),
       thinking_level: 'minimal',
     };
 
-    const generateContentCfg = {
+    const genConfigPrimary = {
       response_mime_type: 'application/json',
       temperature: genCfg.temperature,
       max_output_tokens: genCfg.max_output_tokens,
     };
     if (String(model).startsWith('gemini-2.5')) {
-      generateContentCfg.thinkingConfig = { thinkingBudget: 0 };
+      genConfigPrimary.thinkingConfig = { thinkingBudget: 0 };
+    } else if (model === 'gemini-3.5-flash-lite' || model === 'gemini-3.5-flash') {
+      genConfigPrimary.thinkingConfig = { thinkingLevel: 'minimal' };
+    } else if (model === 'gemini-3-flash-preview' || model.startsWith('gemini-3.1-flash-lite')) {
+      genConfigPrimary.thinkingConfig = { thinkingBudget: 0 };
     }
 
-    // Standard v1beta :generateContent is fastest and highest-reliability for structured JSON.
     let res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
       {
@@ -675,15 +782,15 @@ async function invokeSingleGeminiJson({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: promptText }] }],
-          generationConfig: generateContentCfg,
+          generationConfig: genConfigPrimary,
         }),
         signal: controller.signal,
       }
     ).catch(() => null);
 
-    // Fallback to Google Interactions API on any transport error or non-OK status
-    if (!res || !res.ok) {
-      const interactionsRes = await fetch(GOOGLE_INTERACTIONS_API, {
+    // Fallback to Interactions API if standard generateContent is unavailable for a preview model
+    if (!res || (!res.ok && (res.status === 404 || res.status === 400))) {
+      res = await fetch(GOOGLE_INTERACTIONS_API, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -707,9 +814,6 @@ async function invokeSingleGeminiJson({
         }),
         signal: controller.signal,
       }).catch(() => null);
-      if (interactionsRes && (interactionsRes.ok || !res)) {
-        res = interactionsRes;
-      }
     }
 
     clearTimeout(timer);
@@ -721,12 +825,29 @@ async function invokeSingleGeminiJson({
 
     const cooldownKey = `${key}::${model}`;
     if (res.status === 429) {
-      const until = Date.now() + 45000;
-      _copilotCooldownMap.set(cooldownKey, until);
+      const errBody = await res.text().catch(() => '');
+      const isProvenHealthy = _verifiedHealthyKeys.has(key);
+      const retryMatch = errBody.match(/retry\s+in\s+([\d.]+)\s*s/i);
+      const isDailyOrZeroQuota = /PerDay|per\s*day|limit:\s*0/i.test(errBody);
+      const isHardPlanQuota =
+        isDailyOrZeroQuota || (!isProvenHealthy && /quota\s*exceeded|check your plan|billing/i.test(errBody));
+      if (isHardPlanQuota && (!isProvenHealthy || isDailyOrZeroQuota)) {
+        _copilotCooldownMap.set(cooldownKey, Date.now() + 600000);
+        if (model === 'gemini-3.5-flash-lite' && !isProvenHealthy) {
+          _quotaDeadKeys.add(key);
+        }
+      } else {
+        const rpmCdMs = retryMatch
+          ? Math.min(20000, Math.max(4000, Math.ceil(Number(retryMatch[1]) * 1000)))
+          : 6000;
+        _copilotCooldownMap.set(cooldownKey, Date.now() + rpmCdMs);
+      }
       return { ok: false, reason: `HTTP 429 (${model})` };
     }
     if (!res.ok) {
-      if (res.status !== 404 && res.status !== 503) {
+      if (res.status === 503) {
+        _copilotCooldownMap.set(cooldownKey, Date.now() + 8000);
+      } else if (res.status !== 404) {
         _copilotCooldownMap.set(cooldownKey, Date.now() + 15000);
       }
       return { ok: false, reason: `HTTP ${res.status} (${model})` };
@@ -742,8 +863,11 @@ async function invokeSingleGeminiJson({
         .map((c) => c.text)
         .join('');
     }
-    if (!rawText && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      rawText = data.candidates[0].content.parts[0].text;
+    if (!rawText && Array.isArray(data?.candidates?.[0]?.content?.parts)) {
+      rawText = data.candidates[0].content.parts
+        .filter((p) => p && !p.thought && typeof p.text === 'string')
+        .map((p) => p.text)
+        .join('');
     }
     if (!rawText) {
       return { ok: false, reason: 'empty_candidate' };
@@ -765,12 +889,62 @@ async function invokeSingleGeminiJson({
       }
     }
     _copilotCooldownMap.delete(cooldownKey);
+    _verifiedHealthyKeys.add(key);
+    _quotaDeadKeys.delete(key);
     return { ok: true, parsed: Array.isArray(parsed) ? parsed[0] : parsed, model };
   } catch (err) {
     clearTimeout(timer);
     parentSignal?.removeEventListener('abort', onParentAbort);
     return { ok: false, reason: err?.message || 'fetch_error' };
   }
+}
+
+/**
+ * Compare what the Live voice actually said (output transcription) with the scripted line.
+ * Digits are treated as wildcards because "10" may be transcribed as "sepuluh"/"ten".
+ */
+function measureScriptFidelity(scriptText, spokenTranscript) {
+  const norm = (s) =>
+    String(s || '')
+      .toLowerCase()
+      .normalize('NFKC')
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .split(/\s+/)
+      .filter(Boolean);
+  const scriptTok = norm(scriptText);
+  const spokenTok = norm(spokenTranscript);
+  if (scriptTok.length < 3 || spokenTok.length === 0) {
+    return { checked: false, ok: true, recall: 1, extraRatio: 0 };
+  }
+  // CJK scripts are transcribed without spaces; skip strict token comparison there.
+  if (/[\u3040-\u30ff\u3400-\u9fff]/.test(scriptText)) {
+    return { checked: false, ok: true, recall: 1, extraRatio: 0 };
+  }
+  const bag = new Map();
+  spokenTok.forEach((t) => bag.set(t, (bag.get(t) || 0) + 1));
+  let hit = 0;
+  let digitScript = 0;
+  for (const t of scriptTok) {
+    if (/^\d+$/.test(t)) {
+      digitScript++;
+      continue;
+    }
+    const c = bag.get(t) || 0;
+    if (c > 0) {
+      hit++;
+      bag.set(t, c - 1);
+    }
+  }
+  const scored = Math.max(1, scriptTok.length - digitScript);
+  const recall = hit / scored;
+  const extra = Math.max(0, spokenTok.length - scriptTok.length - digitScript * 2);
+  const extraRatio = extra / Math.max(1, scriptTok.length);
+  return {
+    checked: true,
+    ok: recall >= 0.72 && extraRatio <= 0.34,
+    recall: Number(recall.toFixed(2)),
+    extraRatio: Number(extraRatio.toFixed(2)),
+  };
 }
 
 async function invokeGeminiLiveStructuredJson({ key, promptText, parentSignal }) {
@@ -968,44 +1142,84 @@ async function invokeGeminiLiveStructuredJson({ key, promptText, parentSignal })
 }
 
 async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOutputTokens = 700) {
-  const now = Date.now();
+  let now = Date.now();
   const totalKeys = keys.length;
   if (!totalKeys) return { ok: false, reason: 'no_keys_configured' };
 
-  // ULTRA-FAST PRODUCTION CANDIDATE STRATEGY:
-  // Tier 1: gemini-2.5-flash (Ultra cepat ~350-500ms, high stability, supported natively on REST)
-  // Tier 2: gemini-2.0-flash (Fallback super cepat)
-  // Tier 3: gemini-1.5-flash (Resilient fallback)
-  const startKeyIdx = _copilotPoolIndex % totalKeys;
-  _copilotPoolIndex = (_copilotPoolIndex + 1) % totalKeys;
+  const nonDeadKeys = keys.filter((k) => !_quotaDeadKeys.has(k));
+  const usableKeys = nonDeadKeys.length > 0 ? nonDeadKeys : keys;
+  const usableCount = usableKeys.length;
+  const stride = usableCount % 5 !== 0 ? 5 : usableCount % 3 !== 0 ? 3 : 1;
 
-  const tierModels = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
-  const candidates = [];
-  // Interleave across keys and model tiers so maxAttempts diversifies BOTH keys AND models!
-  for (let k = 0; k < totalKeys; k++) {
-    for (let t = 0; t < tierModels.length; t++) {
-      const key = keys[(startKeyIdx + k + t) % totalKeys];
-      const model = tierModels[t];
-      const isCooledDown = now < (_copilotCooldownMap.get(`${key}::${model}`) || 0);
-      candidates.push({ key, model, isCooledDown, tier: t + 1, keyOrder: k });
+  // Spread across usable keys with coprime stride so dead clusters are skipped immediately
+  const startKeyIdx = _copilotPoolIndex % usableCount;
+  _copilotPoolIndex = (_copilotPoolIndex + 1) % Math.max(usableCount, 1);
+
+  // Bersihkan entri kedaluwarsa di map cooldown & rate-limit agar memori Worker tetap ramping
+  if (_copilotCooldownMap.size > 160) {
+    for (const [ck, exp] of _copilotCooldownMap.entries()) {
+      if (now >= exp) _copilotCooldownMap.delete(ck);
+    }
+  }
+  if (_quotaDeadKeys.size > 12) {
+    _quotaDeadKeys.clear();
+  }
+
+  const restModels = maxOutputTokens >= 2200 ? EXPLANATION_MODELS : COPILOT_MODELS;
+  const buildCandidates = (ts) => {
+    const list = [];
+    for (let tierIdx = 0; tierIdx < restModels.length; tierIdx++) {
+      const model = restModels[tierIdx];
+      for (let k = 0; k < usableCount; k++) {
+        const key = usableKeys[(startKeyIdx + k * stride) % usableCount];
+        const cooldownUntil = Math.max(
+          _copilotCooldownMap.get(`${key}::${model}`) || 0,
+          _cooldownMap.get(key) || 0
+        );
+        const isCooledDown = ts < cooldownUntil;
+        list.push({
+          key,
+          model,
+          rotOrder: k,
+          wave: Math.floor(k / 2),
+          cooldownUntil,
+          isCooledDown,
+          isQuotaDead: _quotaDeadKeys.has(key),
+          isVerified: _verifiedHealthyKeys.has(key),
+          tier: tierIdx + 1,
+        });
+      }
+    }
+    list.sort((a, b) => {
+      if (a.isCooledDown !== b.isCooledDown) return Number(a.isCooledDown) - Number(b.isCooledDown);
+      if (a.isQuotaDead !== b.isQuotaDead) return Number(a.isQuotaDead) - Number(b.isQuotaDead);
+      // Gilir antar-model setiap 2 key sehingga bila 1 model sedang sibuk (503/429), model cepat lain langsung dicoba!
+      if (a.wave !== b.wave) return a.wave - b.wave;
+      if (a.tier !== b.tier) return a.tier - b.tier;
+      if (a.isVerified !== b.isVerified) return Number(b.isVerified) - Number(a.isVerified);
+      return a.rotOrder - b.rotOrder;
+    });
+    return list;
+  };
+
+  let candidates = buildCandidates(now);
+  let healthyRestCandidates = candidates.filter((c) => !c.isCooledDown);
+  if (healthyRestCandidates.length === 0 && candidates.length > 0) {
+    const minWaitMs = Math.min(...candidates.map((c) => Math.max(0, c.cooldownUntil - now)));
+    if (minWaitMs > 0 && minWaitMs <= 5000) {
+      await new Promise((r) => setTimeout(r, minWaitMs + 150));
+      now = Date.now();
+      candidates = buildCandidates(now);
+      healthyRestCandidates = candidates.filter((c) => !c.isCooledDown);
     }
   }
 
-  candidates.sort((a, b) => {
-    if (a.isCooledDown !== b.isCooledDown) {
-      return Number(a.isCooledDown) - Number(b.isCooledDown);
-    }
-    if (a.keyOrder !== b.keyOrder) return a.keyOrder - b.keyOrder;
-    return a.tier - b.tier;
-  });
-
-  const healthyRestCandidates = candidates.filter((c) => !c.isCooledDown);
   let lastReason = 'unknown';
 
-  const HEDGE_DELAY_MS = 1200;
-  const OVERALL_DEADLINE_MS = 8500;
+  const HEDGE_DELAY_MS = maxOutputTokens > 2500 ? 900 : 750;
+  const OVERALL_DEADLINE_MS = maxOutputTokens > 1000 ? 15000 : 10000;
   const activeCandidates = healthyRestCandidates.length > 0 ? healthyRestCandidates : candidates;
-  const maxAttempts = Math.min(totalKeys === 1 ? 3 : 6, activeCandidates.length);
+  const maxAttempts = Math.min(usableCount === 1 ? 2 : 28, activeCandidates.length);
   const overallController = new AbortController();
   const overallTimer = setTimeout(() => overallController.abort(), OVERALL_DEADLINE_MS);
 
@@ -1074,17 +1288,154 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
       return restResult;
     }
 
-    // Failover to Gemini 3.8 Live Structured JSON Bridge so learners NEVER receive static fallback templates!
-    for (let kIdx = 0; kIdx < Math.min(2, totalKeys); kIdx++) {
-      const liveKey = keys[(startKeyIdx + kIdx) % totalKeys];
-      const liveRes = await invokeGeminiLiveStructuredJson({ key: liveKey, promptText });
-      if (liveRes && liveRes.ok) return liveRes;
-      lastReason = liveRes?.reason || lastReason;
+    // Failover to Gemini 3.8 Live Structured JSON Bridge with dedicated round-robin cursor across healthy keys
+    const liveStartIdx = _livePoolCursor % usableCount;
+    _livePoolCursor = (_livePoolCursor + 1) % Math.max(usableCount, 1);
+    const liveRotated = usableKeys.map((_, idx) => usableKeys[(liveStartIdx + idx) % usableCount]);
+    const liveNow = Date.now();
+    const liveCandidates = liveRotated.filter(
+      (k) => liveNow >= (_cooldownMap.get(k) || 0) && liveNow >= (_copilotCooldownMap.get(`${k}::gemini-3.8-live-json`) || 0)
+    );
+    const livePool = liveCandidates.length > 0 ? liveCandidates : liveRotated;
+    const liveRaceTargets = livePool.slice(0, Math.min(5, livePool.length));
+    if (liveRaceTargets.length > 0) {
+      const liveController = new AbortController();
+      const liveRaceRes = await new Promise((resolve) => {
+        let settled = false;
+        let launched = 0;
+        let pending = 0;
+        let hedgeTimer = null;
+        let liveFailReason = lastReason;
+        const raceTimeout = setTimeout(() => finishLive({ ok: false, reason: liveFailReason || 'live_json_race_timeout' }), 18000);
+
+        const finishLive = (res) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(raceTimeout);
+          if (hedgeTimer) clearTimeout(hedgeTimer);
+          liveController.abort();
+          resolve(res);
+        };
+
+        const launchLive = () => {
+          if (settled || launched >= liveRaceTargets.length) return;
+          const liveKey = liveRaceTargets[launched++];
+          pending++;
+          invokeGeminiLiveStructuredJson({
+            key: liveKey,
+            promptText,
+            parentSignal: liveController.signal,
+          })
+            .then((liveRes) => {
+              pending--;
+              if (liveRes && liveRes.ok) {
+                _verifiedHealthyKeys.add(liveKey);
+                _quotaDeadKeys.delete(liveKey);
+                finishLive(liveRes);
+                return;
+              }
+              _copilotCooldownMap.set(`${liveKey}::gemini-3.8-live-json`, Date.now() + 15000);
+              liveFailReason = liveRes?.reason || liveFailReason;
+              if (!settled) {
+                if (launched < liveRaceTargets.length) {
+                  launchLive();
+                } else if (pending === 0) {
+                  finishLive({ ok: false, reason: liveFailReason });
+                }
+              }
+            })
+            .catch((err) => {
+              pending--;
+              liveFailReason = err?.message || liveFailReason;
+              if (!settled) {
+                if (launched < liveRaceTargets.length) {
+                  launchLive();
+                } else if (pending === 0) {
+                  finishLive({ ok: false, reason: liveFailReason });
+                }
+              }
+            });
+        };
+
+        launchLive();
+        if (liveRaceTargets.length > 1) {
+          hedgeTimer = setTimeout(() => {
+            if (!settled && pending < 2) launchLive();
+          }, 2200);
+        }
+      });
+      if (liveRaceRes && liveRaceRes.ok) {
+        return liveRaceRes;
+      }
+      lastReason = liveRaceRes?.reason || lastReason;
+    }
+
+    // Parallel recovery across non-cooled healthy key/model pairs after brief RPM window backoff
+    const recoveryStart = (_copilotPoolIndex + 3) % usableCount;
+    const finalKeys = usableKeys.map((_, idx) => usableKeys[(recoveryStart + idx * stride) % usableCount]);
+    if (finalKeys.length > 0) {
+      await new Promise((r) => setTimeout(r, 1500));
+      const recoveryPairs = [];
+      for (const recoveryModel of COPILOT_MODELS) {
+        for (const recoveryKey of finalKeys) {
+          recoveryPairs.push({ recoveryKey, recoveryModel });
+        }
+      }
+      for (let i = 0; i < Math.min(12, recoveryPairs.length); i += 3) {
+        const wave = recoveryPairs.slice(i, i + 3);
+        const results = await Promise.all(
+          wave.map(({ recoveryKey, recoveryModel }) =>
+            invokeSingleGeminiJson({
+              key: recoveryKey,
+              model: recoveryModel,
+              promptText,
+              temperature,
+              maxOutputTokens,
+            })
+          )
+        );
+        const winner = results.find((r) => r && r.ok);
+        if (winner) return winner;
+        for (const r of results) {
+          if (r?.reason) lastReason = r.reason;
+        }
+      }
     }
     return { ok: false, reason: lastReason };
   } finally {
     clearTimeout(overallTimer);
   }
+}
+
+async function runFastOpenerOnly({ keys, userText, targetLang, targetLocaleName, personaName }) {
+  const openerPrompt = [
+    `[FAST STAGE-1 WHITEBOARD OPENER JSON ONLY - Zero emojis, zero em-dash]`,
+    `Course: ${targetLang.toUpperCase()}, Learner UI language: ${targetLocaleName}, Mentor: ${personaName}.`,
+    `Question: "${userText}"`,
+    `Write ONLY Step 0 header + 1 warm, clear, complete opening hook sentence ("spokenNarration", 12-18 words in ${targetLocaleName}) immediately answering the question.`,
+    `JSON: {"topicTitle":"...","patternFormula":"...","headingStep":{"kind":"heading","title":"...","text":"1 concise takeaway line","spokenNarration":"..."}}`,
+  ].join('\n');
+  const gen = await runGeminiJsonWithPool(keys, openerPrompt, 0.2, 260);
+  if (!gen.ok || !gen.parsed || typeof gen.parsed !== 'object') return null;
+  const p = gen.parsed;
+  const st0 = p.headingStep && typeof p.headingStep === 'object' ? p.headingStep : {};
+  const title = cleanSpokenText(p.topicTitle || st0.title || '');
+  const spoken = cleanSpokenText(st0.spokenNarration || '');
+  if (!title && !spoken) return null;
+  return {
+    topicTitle: title,
+    patternFormula: cleanSpokenText(p.patternFormula || ''),
+    headingStep: {
+      id: 'ai_step_0',
+      kind: 'heading',
+      column: 'left',
+      phaseIndex: 0,
+      title: cleanSpokenText(st0.title || title),
+      text: cleanSpokenText(st0.text || ''),
+      spokenNarration: spoken,
+    },
+    model: gen.model || 'gemini-fast-opener',
+  };
 }
 
 /**
@@ -1103,7 +1454,7 @@ export async function routeVoiceCopilotAssist(ctx) {
 
   const keys = await resolvePoolKeys(ctx);
   if (!keys.length) {
-    return jsonResponse({ ok: false, fallback: true, error: 'no_keys_configured' }, { status: 503 });
+  return jsonResponse({ ok: false, fallback: true, error: 'no_keys_configured' }, { status: 503 });
   }
 
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
@@ -1229,7 +1580,7 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
   const temp = variationSeed > 0 || excludeList.length > 0 ? 0.75 : 0.45;
   const gen = await runGeminiJsonWithPool(keys, prompt, temp, 850);
   if (!gen.ok || !gen.parsed) {
-    return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
+  return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
   }
 
   const replies = normalizeCopilotReplies(
@@ -1266,9 +1617,9 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
 export function isExplanationQuestion(userText) {
   const s = String(userText || '').toLowerCase();
   return (
-    /\b(bedanya|perbedaan|apa beda|arti dari|artinya apa|maksudnya apa|cara (?:menggunakan|memakai|pakai|pake)|gimana cara (?:pakai|pake)|kapan (?:pakai|pake)|kenapa (?:pakai|pake)|jelasin|jelaskan|ajarin|terangin|tolong bahas|bingung|nggak paham|gak paham|belum paham|kurang paham|tidak paham|nggak ngerti|gak ngerti|apa fungsi|contoh kalimat|how to use|difference between|what does .* mean|confused about|explain|งง|แปลว่าอะไร|ต่างกันยังไง|ใช้ยังไง|วิธีใช้|อธิบาย)\b/i.test(
+    /\b(bedanya|perbedaan|apa beda|arti dari|artinya apa|maksudnya apa|cara (?:menggunakan|memakai|pakai|pake|menghitung|hitung|menulis|tulis|membaca|baca|kerja)|gimana cara (?:pakai|pake|hitung|tulis|kerja)|bagaimana cara|kapan (?:pakai|pake)|kenapa (?:pakai|pake|salah)|mengapa (?:pakai|pake|salah)|jelasin|jelaskan|ajarkan|ajarin|terangin|terangkan|uraikan|gambarkan|tolong bahas|bingung|nggak paham|gak paham|belum paham|kurang paham|tidak paham|nggak ngerti|gak ngerti|apa fungsi|fungsi dari|contoh kalimat|rumus|teorema|proses|alur|tahapan|langkah|strategi|teknik|workflow|note[\s-]?taking|how to (?:use|write|calculate|solve|do)|difference between|what does .* mean|why is .* wrong|confused about|explain|teach me|break down|งง|แปลว่าอะไร|ต่างกันยังไง|ใช้ยังไง|วิธีใช้|อธิบาย)\b/i.test(
       s
-    ) || /\b(papan tulis|whiteboard|pop[\s-]?up|latihan tulis)\b/i.test(s)
+    ) || /\b(papan tulis|papan belajar|whiteboard|pop[\s-]?up|latihan tulis|secara visual|dengan diagram|pakai diagram|visually|with a (?:\w+\s+)?diagram|step by step)\b/i.test(s)
   );
 }
 
@@ -1700,24 +2051,29 @@ function buildEmergencyBoardForWorker(query, targetLang, locale) {
   };
 }
 
-export async function routeVoicePartnerTurn(ctx) {
+async function executePartnerTurnCore(ctx, streamHooks = null) {
   const clientIp =
     (ctx.request &&
       (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) ||
     '';
   if (!checkLiveRateLimit(clientIp, 35, 60000)) {
-    return jsonResponse(
-      { ok: false, fallback: true, error: 'rate_limited', message: 'Rate limit exceeded for partner turn.' },
-      { status: 429 }
-    );
+    return {
+      status: 429,
+      payload: { ok: false, fallback: true, error: 'rate_limited', message: 'Rate limit exceeded for partner turn.' },
+    };
   }
 
   const keys = await resolvePoolKeys(ctx);
   if (!keys.length) {
-    return jsonResponse({ ok: false, fallback: true, error: 'no_keys_configured' }, { status: 503 });
+    return {
+      status: 503,
+      payload: { ok: false, fallback: true, error: 'no_keys_configured' },
+    };
   }
 
-  const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
+  const readRes = streamHooks?.body
+    ? { value: streamHooks.body }
+    : (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
   const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
   const rawLocale = String(body.locale || 'id').toLowerCase().trim();
@@ -1734,7 +2090,10 @@ export async function routeVoicePartnerTurn(ctx) {
             : 'Indonesian';
   const rawUserInput = cleanSpokenText(body.text || body.userText || '').slice(0, 400);
   if (!rawUserInput) {
-    return badRequest('empty_user_text');
+    return {
+      status: 400,
+      payload: { ok: false, error: 'empty_user_text' },
+    };
   }
   const forcePopup = Boolean(body.forcePopup) || /\[WHITEBOARD_REQUEST\]/i.test(rawUserInput);
   const userText = rawUserInput.replace(/\[WHITEBOARD_REQUEST\]\s*/gi, '').trim() || rawUserInput;
@@ -1762,31 +2121,138 @@ export async function routeVoicePartnerTurn(ctx) {
   if (!isSswSensei && !forcePopup && detectLanguageSwitchDemand(userText, targetLang)) {
     const guard = buildIroncladGuardResponse('refuse_lang_switch', targetLang, locale);
     const replies = normalizeCopilotReplies(guard.replies, targetLang, locale);
-    return jsonResponse({
-      ok: true,
-      source: 'ai-realtime-guard',
-      model: 'fiezel-ironclad-guard',
-      aiReply: guard.aiReply,
-      aiReplyTranslationId: guard.aiReplyTranslationId,
-      aiReplyTranslationTh: guard.aiReplyTranslationTh,
-      replies,
-      uiAction: { actionType: 'none' },
-    });
+    return {
+      status: 200,
+      payload: {
+        ok: true,
+        source: 'ai-realtime-guard',
+        model: 'fiezel-ironclad-guard',
+        aiReply: guard.aiReply,
+        aiReplyTranslationId: guard.aiReplyTranslationId,
+        aiReplyTranslationTh: guard.aiReplyTranslationTh,
+        replies,
+        uiAction: { actionType: 'none' },
+      },
+    };
   }
 
   const boardOnly = Boolean(body.boardOnly);
+  const rawBoardCtx =
+    body.boardContext && typeof body.boardContext === 'object' ? body.boardContext : null;
+  const boardCtxTopic = rawBoardCtx
+    ? cleanSpokenText(rawBoardCtx.topicTitle || '').slice(0, 140)
+    : '';
+  const boardCtxFormula = rawBoardCtx
+    ? cleanSpokenText(rawBoardCtx.patternFormula || '').slice(0, 220)
+    : '';
+  const boardCtxSummary = rawBoardCtx
+    ? cleanSpokenText(rawBoardCtx.summary || '').slice(0, 520)
+    : '';
+  const boardCtxArea = rawBoardCtx
+    ? cleanSpokenText(rawBoardCtx.areaExcerpt || '').slice(0, 200)
+    : '';
+  const boardCtxPrevQs = Array.isArray(rawBoardCtx?.previousQuestions)
+    ? rawBoardCtx.previousQuestions
+        .map((q) => cleanSpokenText(q).slice(0, 120))
+        .filter(Boolean)
+        .slice(-3)
+    : [];
+  const boardCtxVisualKinds = Array.isArray(rawBoardCtx?.currentVisualKinds)
+    ? rawBoardCtx.currentVisualKinds.map((k) => cleanSpokenText(k).slice(0, 32)).filter(Boolean).slice(0, 8)
+    : [];
+  const boardCtxVisualSummary = rawBoardCtx
+    ? cleanSpokenText(rawBoardCtx.currentVisualSummary || '').slice(0, 280)
+    : '';
+  const isVisualSwitchRequest =
+    /\b(?:ubah|ganti|tukar|bikin(?:kan)?\s+ulang|coba)\s+(?:visual|gambar|diagram|sketsa|grafik|bagan|tabel|cara\s+gambar)\b|\b(?:visual|gambar|diagram|sketsa|grafik)\s+(?:lain|baru|berbeda)\b|\b(?:change|switch|another|different)\s+(?:visual|diagram|drawing|chart)\b/i.test(
+      userText
+    );
+  const hasBoardFollowUpContext = Boolean(boardCtxTopic || boardCtxArea || boardCtxSummary);
+  const followUpDirectiveBlock = hasBoardFollowUpContext
+    ? [
+        `[FOLLOW-UP CLARIFICATION ON OPEN WHITEBOARD - CRITICAL CONTINUITY]:`,
+        `- Learner is ALREADY inside the whiteboard studying: "${boardCtxTopic || 'Current topic'}"${boardCtxFormula ? ` (Formula: ${boardCtxFormula})` : ''}.`,
+        boardCtxSummary ? `- Current board explanation summary: "${boardCtxSummary}".` : '',
+        boardCtxVisualKinds.length ? `- Visual components CURRENTLY displayed on screen: [${boardCtxVisualKinds.join(', ')}]${boardCtxVisualSummary ? ` -> ${boardCtxVisualSummary}` : ''}.` : '',
+        boardCtxArea ? `- Learner specifically CIRCLED this confusing part on the board: "${boardCtxArea}".` : '',
+        boardCtxPrevQs.length ? `- Previous questions in this board session: ${boardCtxPrevQs.join(' | ')}` : '',
+        `- Learner is asking follow-up: "${userText}".`,
+        isVisualSwitchRequest
+          ? `- MANDATORY VISUAL SWITCH DIRECTIVE: The learner explicitly asked to CHANGE THE VISUAL ("${userText}")! You MUST create a COMPLETELY DIFFERENT visual representation than [${boardCtxVisualKinds.join(', ') || 'the previous diagram'}]${boardCtxVisualSummary ? ` (${boardCtxVisualSummary})` : ''}. For example: if you previously used rough_scene side-by-side boxes, switch to BOTH a structured "contrast_scale" (termA, descA, termB, descB, analogy) or "syntax_flow" (nodes chain) AND a genuinely different "rough_scene" geometry (such as a top-down decision tree, timeline track, or 2x2 scenario comparison grid with concrete real-world examples inside EVERY box!). NEVER repeat the same layout or empty placeholder boxes!`
+          : `- MANDATORY PEDAGOGY FOR THIS FOLLOW-UP: Directly address WHY they are confused about "${boardCtxArea || userText}" in connection to "${boardCtxTopic || 'the board'}". Break it down MORE SLOWLY from zero basics via detailed spoken audio ("spokenNarration"), keep on-board text super visual & concise (keywords/formulas + 4-5 concrete examples, NOT articles!), and draw a focused clearer visual diagram ("rough_scene" / "contrast_scale" / "syntax_flow") showing the exact distinction they are stuck on.`,
+      ]
+        .filter(Boolean)
+        .join('\n')
+    : '';
   const isProfanityTurn = !forcePopup && !boardOnly && detectProfanityOrTrashTalk(userText);
-  const isExplanationTurn = forcePopup || boardOnly || isExplanationQuestion(userText);
+  const isExplanationTurn = forcePopup || boardOnly || hasBoardFollowUpContext || isExplanationQuestion(userText);
 
+  const PERSONA_DISPLAY_MAP = {
+    dr_julian: 'Dr. Julian',
+    cambridge_examiner: 'Dr. Alistair Vance',
+    dr_alistair: 'Dr. Alistair Vance',
+    coach_sarah: 'Coach Sarah',
+    coach_alex: 'Coach Alex',
+    ssw_sensei: isSswSensei && !isExplanationTurn ? 'SSW SENSEI' : 'Sensei Takumi',
+    keita: 'Keita Senpai',
+    nanami: 'Sensei Nanami',
+    xiao_mochi: 'Xiao Mochi',
+  };
   const personaName = cleanSpokenText(
-    body.personaName || (isSswSensei ? 'SSW SENSEI' : targetLang === 'ja' ? 'Nanami' : targetLang === 'zh' ? 'Xiao Mochi' : 'Alex')
+    body.personaName ||
+      PERSONA_DISPLAY_MAP[personaId] ||
+      (targetLang === 'ja' ? 'Nanami' : targetLang === 'zh' ? 'Xiao Mochi' : 'Alex')
   ).slice(0, 40);
   const scenarioTitle = cleanSpokenText(body.scenarioTitle || 'Free Talk').slice(0, 100);
   const learnerDossier =
     typeof body.learnerDossier === 'string' ? body.learnerDossier.slice(0, 1800) : '';
   const historyLines = normalizeHistory(body.history);
 
-  const langSpec = isSswSensei
+  const bypassBoardCache = Boolean(body.noCache || body.skipCache || body.forceFresh);
+  const isCacheableStandaloneBoard =
+    !bypassBoardCache &&
+    isExplanationTurn &&
+    historyLines.length === 0 &&
+    !hasBoardFollowUpContext &&
+    !isVisualSwitchRequest &&
+    !isProfanityTurn;
+  let boardCacheKey = '';
+  if (isCacheableStandaloneBoard) {
+    boardCacheKey = await sha256Hex(
+      JSON.stringify({
+        v: 'wb-v2',
+        q: userText.trim().toLowerCase(),
+        targetLang,
+        locale,
+        effectiveCallMode,
+        boardOnly,
+        personaId,
+      })
+    );
+    const cachedBoard = await readWorkerCache('board', boardCacheKey, _boardMemoryCache, 64);
+    if (cachedBoard && cachedBoard.payload) {
+      if (streamHooks?.onOpenerReady && cachedBoard.payload?.uiAction?.whiteboardSteps?.[0]) {
+        const s0 = cachedBoard.payload.uiAction.whiteboardSteps[0];
+        streamHooks.onOpenerReady({
+          topicTitle: cachedBoard.payload.uiAction.topicTitle || s0.title || '',
+          patternFormula: cachedBoard.payload.uiAction.patternFormula || '',
+          headingStep: s0,
+          model: cachedBoard.payload.model || 'cache',
+        });
+      }
+      return {
+        status: 200,
+        cacheHeader: 'HIT',
+        payload: {
+          ...cachedBoard.payload,
+          cached: true,
+          cacheLayer: cachedBoard.cacheLayer,
+        },
+      };
+    }
+  }
+
+  const langSpec = isSswSensei && !isExplanationTurn
     ? 'Bilingual Bahasa Indonesia mentor interspersed with Japanese Food Manufacturing SSW terminology (OTAFF Ver 5.1, Kanji+Kana + romaji + clear Indonesian explanation, NO emojis, NO em-dash/en-dash)'
     : targetLang === 'ja'
       ? 'Japanese (street-real expressive Tokyo/Kansai spoken Japanese N5-N3, Kanji+Hiragana, NO emojis; reply "pronunciation" = word-spaced Hepburn Romaji)'
@@ -1794,10 +2260,12 @@ export async function routeVoicePartnerTurn(ctx) {
         ? 'Mandarin Chinese (witty expressive Beijing Putonghua HSK1-HSK3, Simplified Chinese characters, NO emojis; reply "pronunciation" = tone-marked Pinyin)'
         : 'English (authentic street-smart American or razor-sharp British conversational English A2-B1, NO emojis; reply "pronunciation" = easy Indonesian phonetic guide)';
 
-  const dialectIdentity = isSswSensei
+  const dialectIdentity = isSswSensei && !isExplanationTurn
     ? `VOICE & MENTOR IDENTITY (SSW SENSEI - Mentor Pengolahan Makanan Wakai Papa Pro): Senior Indonesian-Japanese exam mentor for Tokutei Ginou Food & Beverage Manufacturing (飲食料品製造業 特定技能1号, OTAFF Ver 5.1 + 11 Trik Wakai Papa Pro). Speak natural, authoritative, crisp Bahasa Indonesia while quoting exact Japanese exam terms, Kanji+Kana readings, PDF page numbers (Hal. 1-91), and calculation formulas. Passing target = 65%. NEVER invent numbers outside OTAFF Ver 5.1.`
     : targetLang === 'ja'
-      ? personaId === 'keita' || /keita/i.test(personaName)
+      ? personaId === 'ssw_sensei' || /takumi|ssw/i.test(personaName)
+        ? `VOICE & DIALECT IDENTITY (SSW Sensei Takumi · 特定技能): Experienced, structured Japanese workplace & SSW (Tokutei Ginou) mentor covering 5S, Ho-Ren-So (報連相), KYT safety, Kaigo caregiving, Food HACCP, and business Keigo. Firm, practical, clear Tokyo workplace Japanese with protective care.`
+        : personaId === 'keita' || /keita/i.test(personaName)
         ? `VOICE & DIALECT IDENTITY (Keita Senpai): Street-smart Tokyo-Kansai older-brother senpai. Sound human, sharp, witty, and playfully sarcastic ("なんでやねん！", "おいおい待てって", "〜やん", "それ教科書ロボットやん！"). NEVER sound like a polite NHK robot.`
         : `VOICE & DIALECT IDENTITY (Sensei Nanami): Sharp, sassy Tokyo-Osaka Tsundere Sensei. Sound alive, witty, and unapologetically sarcastic ("ちょっと待ってよ！", "なにそのロボットみたいな日本語？", "〜でしょ！", "もう一回ちゃんと言ってごらん！"). NEVER sound like a stiff assistant.`
       : targetLang === 'zh'
@@ -1822,23 +2290,83 @@ export async function routeVoicePartnerTurn(ctx) {
   2) Give the exact natural phrase and DEMAND ECHO REDEMPTION (make them repeat it aloud right now), setting Option 1 ("easy") in "replies" to that exact phrase!
 - PROACTIVE STRUGGLE DIAGNOSIS: Actively diagnose what has been hardest for the learner in FIEZEL and offer to pop up the interactive whiteboard or navigate to a FIEZEL module.`;
 
-  const prompt = boardOnly
-    ? [
-        `[SILENT JSON COMPILER TASK: Call emit_json_response immediately. Do NOT generate spoken audio.]`,
+  const buildCjkStrokeFactDirective = (withAllFields) => {
+    if (typeof globalThis.__fiezelLookupCjkStrokes !== 'function') return '';
+    const q = String(userText || '');
+    const isCharWriteQ =
+      /\b(?:kanji|hanzi|hiragana|katakana|huruf|karakter|aksara|tulis|goresan|coretan|stroke|kakijun|urutan)\b/i.test(q) &&
+      !/\b(?:partikel|particle|grammar|tata\s*bahasa|perbedaan\s+partikel|pola\s+kalimat)\b/i.test(q);
+    if (!isCharWriteQ) return '';
+    const cjkChars = Array.from(new Set(q.match(/[\u4e00-\u9faf\u3040-\u309f\u30a0-\u30ff]/g) || [])).slice(0, 3);
+    const facts = cjkChars
+      .map((ch) => globalThis.__fiezelLookupCjkStrokes(ch, targetLang))
+      .filter((hit) => hit && hit.strokeCount > 0)
+      .map((hit) => `Karakter '${hit.char}' (${hit.lang === 'zh' ? 'Hanzi PRC' : 'KanjiVG JIS'}) memiliki TEPAT ${hit.strokeCount} goresan resmi`);
+    if (!facts.length) return '';
+    return withAllFields
+      ? `[AUTHORITATIVE CJK STROKE FACTS - ZERO HALLUCINATION]: ${facts.join('; ')}. WAJIB gunakan jumlah goresan resmi tersebut secara konsisten di topicTitle, patternFormula, heading, table, note, explanationText, dan spokenNarration!`
+      : `[AUTHORITATIVE CJK STROKE FACTS - ZERO HALLUCINATION]: ${facts.join('; ')}. WAJIB gunakan jumlah goresan resmi tersebut secara konsisten!`;
+  };
+
+  const buildBoardCompilerPrompt = (extraRule = '', includeReplies = false) =>
+    [
+        `[JSON WHITEBOARD COMPILER: Return valid single-line JSON cleanly. Zero emojis. Zero em-dash.]`,
         `Target course: ${targetLang.toUpperCase()}. Learner UI language: ${targetLocaleName}. Mentor name: ${personaName}.`,
-        `Learner question: "${userText}"`,
-        `Build a JSON object with a visual teaching board answering "${userText}".`,
-        `Field rules: "aiReply", "aiReplyTranslation", and "coachSpokenScript" must be 100% in ${targetLocaleName} (1 short sentence explaining the rule directly and clearly to the learner in their UI interface language ${targetLocaleName}, max 18 words, no emojis, no em-dash, write "Verb ing" with a space, never say AI/bot), quoting the ${targetLang.toUpperCase()} target words.`,
-        `"sampleTarget": natural ${targetLang.toUpperCase()} sentence showing the rule. "trapWrongSentence": realistic mistake version of sampleTarget. "trapWrongReason": short reason in ${targetLocaleName}.`,
-        `"drillMeaningPrompt": quiz prompt in ${targetLocaleName} for a DIFFERENT real-life situation. "drillTargetSentence": correct ${targetLang.toUpperCase()} sentence for that new situation (different from sampleTarget). "drillTrapSentence": wrong trap version of drillTargetSentence.`,
-        `JSON schema: {"aiReply":"...","aiReplyTranslation":"...","uiAction":{"actionType":"open_learning_popup","topicTitle":"...","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"..."}}`,
-      ].join('\n')
+        followUpDirectiveBlock,
+        extraRule,
+        `Learner exact question/request: "${userText}"`,
+        buildCjkStrokeFactDirective(false),
+        `Context from recent turns: ${historyLines.length ? historyLines.slice(-2).map((h) => `${h.speaker}: ${h.text}`).join(' | ') : 'Direct question on whiteboard'}`,
+        `Teach a COMPLETE BEGINNER FROM ZERO ("nol banget") using a 100% UNIQUE, AUDIO-FIRST + VISUAL-FIRST interactive whiteboard specifically answering "${userText}".`,
+        `CRITICAL PEDAGOGICAL, LOGICAL & AUDIO-VISUAL SYNC INVARIANTS:`,
+        `1) ACCURATE GRAMMAR, FULL BOUNDARIES & ROOT LOGIC FIRST (ZERO AMBIGUITY, ZERO HALF-TRUTHS!):`,
+        `   - Teach the REAL, COMPLETE linguistic mechanism clearly for a complete beginner ("nol banget") in ${targetLocaleName} so there is ZERO ambiguity or missing nuance.`,
+        `   - NEVER write vague/misleading half-rules or slogans! Specifically:`,
+        targetLang === 'en' && /\b(to\s*be|am|is|are|was|were|agree|work|verb|sifat|kerja|passive|ing|do|does|did)\b/i.test(userText || '')
+          ? `     * To Be vs Verb ("I am agree", "She is work"): NEVER say "to be hanya untuk kata sifat" or "jangan gabungkan to be dengan kata kerja"! Explicitly explain BOTH board & voice: To Be (am/is/are/was/were) HANYA boleh berpasangan dengan (1) Kata Sifat (I am happy), (2) Kata Benda/Lokasi (She is a doctor), (3) Verb ing untuk aksi sedang berlangsung (I am working — NEVER use stative verbs like "I am agreeing"!), atau (4) Verb 3 untuk kalimat pasif (It is agreed / The letter was sent). Menggabungkan To Be + Verb 1 (I am agree, She is go) UMUMNYA SALAH karena Verb 1 langsung menempel ke subjek (I agree) atau memakai bantu Do/Does/Did.`
+          : '',
+        `     * Tenses (Simple Past vs Present Perfect, etc.): Give exact time boundaries ("yesterday / in 2020 / last year" = waktu lampau tertutup -> Verb 2; "since / for / already / pengalaman" = hasil/efek terhubung sampai sekarang -> have/has + Verb 3). NEVER use ambiguous unfinished markers like "today" inside Simple Past contrast rows, and NEVER explain Present Perfect as "sedang dilakukan sekarang"!`,
+        `     * Modals / Passive / JA Particles (は vs が, に vs で) / ZH Grammar (了 vs 过, 的/地/得): Always state EXACT trigger, valid pair vs invalid pair, and exceptions clearly!`,
+        `   - NO silly or forced analogies! An analogy is ONLY allowed when its mechanics truly match the grammar logic AND you explain why it fits. Prefer crisp structural slots ("formula_blocks", "syntax_flow", "contrast_scale", "timeline_track") over confusing metaphors!`,
+        `   - NO repetitive filler across cards ("Bayangkan perumpamaan...", repeating the exact same sentence in heading + note + table). Each step adds distinct value!`,
+        `2) 1:1 VOICE-TO-BOARD CADENCE (WHAT THE TUTOR SAYS MUST MATCH WHAT IS ON THAT CARD RIGHT THEN!):`,
+        `   - Emit 6 logical progressive "whiteboardSteps" across "left" and "right" in EXACT teaching order: Step 0 "heading" -> Step 1 "note" (Logika Dasar Dari Nol) -> Step 2 primary visual diagram -> Step 3 "table" (Contoh Nyata) -> Step 4 "trap_vs_fix" -> Step 5 "highlight_callout" ("Rumus Anti-Lupa").`,
+        `   - Step 0 "heading": crisp topicTitle + 1-line "text" core takeaway; "spokenNarration" MUST be 1 complete warm opening hook sentence (~14-22 words, zero mid-clause cuts!) answering the user's core confusion immediately.`,
+        `   - Step 1 "note": 4 COMPLETE, unambiguous beginner rules (15-26 words per bullet — NEVER oversimplified slogans or missing exceptions! Explain WHY the rule exists and give a tiny example right inside each bullet! For any To Be / Verb topic, Step 1 bullets MUST explicitly mention Adjective, Noun/Location, Verb ing (sedang), AND Verb 3 (pasif) vs why To Be + Verb 1 umumnya salah!); "spokenNarration" (3-4 calm sentences) MUST explain THOSE EXACT bullets in order 1 -> 2 -> 3 -> 4 so voice & board are 100% synced!`,
+        `   - Step 2 visual diagram (CRITICAL FOR CLARITY — ZERO VAGUE/GENERIC LABELS!): NEVER output vague placeholder titles like "Pola Pertama", "Pola Kedua", "Sisi A", "Sisi B", "Konsep 1", or a 2-word "analogy" echo! EVERY box, panel, block, branch, or timelineEvent MUST show: (a) a real grammatical/topic name ("IN: Ruang/Kota", "Subjek + Verb 1", etc.), (b) a clear beginner explanation ("subtitle"/"note"/"sublabel", 10-20 words explaining WHEN & WHY to use it), AND (c) an explicit concrete example ("example"/"token" + Indonesian meaning!). Step 2 "spokenNarration" MUST be 3-5 clear, unhurried sentences (~55-85 words) guiding left-to-right through EVERY box/panel drawn in Step 2 so the learner completely understands WHY the visual fits! NEVER leave "blocks", "branches", "timelineEvents", "nodes", "leftPanel", "rightPanel", or "termA"/"descA"/"termB"/"descB" empty!`,
+        `   - Step 3 "table": 4 concrete contrasting examples (4 columns max; for To Be vs Verb include contrasting rows for Adj/Noun, Verb ing, Verb 3 passive, and active Verb 1); "spokenNarration" reads and contrasts those EXACT rows from top to bottom!`,
+        `   - Step 4 "trap_vs_fix": exact beginner mistake ("wrongText"), exact fix ("rightText"), clear logical "reason" explaining why the wrong form breaks the rule, and "spokenNarration" contrasting wrong -> reason -> fix.`,
+        `   - Step 5 "highlight_callout": crisp 1-line "highlightPhrase" memory formula + concise 1-2 sentence closing summary in "spokenNarration".`,
+        `3) TOPIC-MATCHED VISUAL ARCHETYPES (NEVER FORCE CAMERA/VIDEO, KEY_AND_LOCK, OR WRONG METAPHORS, NEVER SWAP SIDES!):`,
+        `   Pick the SINGLE clearest, most accurate diagram "kind" for whiteboardSteps[2]:`,
+        `   - Location / Time Prepositions ("in / on / at", "に vs で", "在") or Multi-zone Spatial concepts: ALWAYS use "rough_scene" (concentric zones / labeled spatial map with clear 1-to-3-word titles, sublabels, and concrete examples in each zone) OR "mind_map" ("branches" per preposition/particle with full usage rule + example). NEVER use "key_and_lock" or "Pola Pertama/Kedua" for location/prepositions!`,
+        `   - Sentence structure / Verb 1 vs Verb ing vs Verb 3 / Adjective / Passive / Modal / Word-order / Slot error (e.g. "I am agree", "She can goes"): ALWAYS use "formula_blocks" ("blocks":[{role,token,note,color}], "rightText", "wrongText") OR "syntax_flow" ("nodes":[{role,word,color}]) showing every word slot and valid vs invalid forms clearly, OR "contrast_scale" ("termA","descA","termB","descB","analogy"). NEVER use "camera_vs_video", "key_and_lock", or RPG analogies for agree/adjectives/verbs!`,
+        `   - Tenses / Time comparison (e.g. Simple Past vs Present Perfect, Past Continuous): ALWAYS use "timeline_track" ("timelineEvents":[{timeLabel,title,example,icon,isActive,color}]) ordered chronologically Left (Past Selesai, e.g. Simple Past / Kemarin) -> Right (Jembatan Sampai Sekarang / Present Perfect). NEVER label Present Perfect as a static "camera photo" or put Present Perfect to the left of Simple Past!`,
+        `   - State/Identity vs Action/Habit contrast ONLY (e.g. Am/Is/Are vs Do/Does): use "metaphor_scene" with "sceneTheme":"camera_vs_video", where leftPanel (icon:"camera", title:"Am / Is / Are + Sifat/Benda", subtitle:"...", example:"...") and rightPanel (icon:"video", title:"Do / Does + Verb 1 Aksi", subtitle:"...", example:"..."). NEVER use camera_vs_video for quantifiers (much/many/a lot), directional pairs (borrow/lend), stative verbs (agree/like/know/want/xihuan/喜欢/suka), prepositions, Mandarin 是 vs adjectives/stative verbs, math, science, or programming! NEVER emit empty "syntax_flow" nodes, empty "timeline_track" events, or empty "rough_scene" shapes — fill every field completely! Keep Indonesian explanations 100% natural Indonesian (never mix English filler like "the phrase" mid-sentence; write "frasa 'I am agree'").`,
+        `   - Degree / Modal / Frequency scales (must/should/might, always..never): use "metaphor_scene" with "sceneTheme":"battery_meter", leftPanel (0-25% weakest, full subtitle+example) -> rightPanel (100% strongest, full subtitle+example).`,
+        `   - Strict 1-on-1 Subject Agreement / Measure Word Pairings ONLY (He/She/It + -s/does, Mandarin classifiers): "metaphor_scene" with "sceneTheme":"key_and_lock" WITH real specific panel titles (NEVER "Pola Pertama/Kedua"!).`,
+        `   - Word families / 3+ item contrasts (much/many/a lot of) / 5W1H / collocations / speaking expressions: use "mind_map" ("metaphorCenterLabel", "branches":[{label,sublabel,example,icon,color}]).`,
+        `   - Kanji / Hanzi / Kana writing: "kanji_grid" + 4-row compound "table". Mandarin tone drills: "tone_wave". Custom spatial/geometric diagrams (Pythagoras triangle, Circle Area pi*r^2, Newton force arrows, concentric "in/on/at" zones): "rough_scene" MUST include 4-8 SVG "shapes" (rect/circle/ellipse/polygon/arrow/text) positioned cleanly inside 0..560 x 0..240. For process flows, algorithms (Async/Await vs Promise), cause-effect, or science cycles (5S, Ho-Ren-So, Osmosis, Photosynthesis): "rough_scene" can EITHER emit 4-8 SVG "shapes" OR emit clean semantic "graphNodes":[{"id":"n1","label":"...","sublabel":"...","fill":"#DBEAFE","stroke":"#1D4ED8"}] and "graphEdges":[{"from":"n1","to":"n2","label":"..."}] with "graphDirection":"LR"|"TB" for collision-free auto-layout!`,
+        `4) STRICT BOX & BRACKET HYGIENE: ZERO empty "()", "[]", or empty boxes. NEVER write hyphenated "Verb-ing" (write "Verb ing"). Allowed panel/event icons: "camera"|"video"|"bolt"|"star"|"check"|"warn"|"clock"|"bridge"|"spotlight"|"key"|"lock"|"gamepad"|"chat"|"target".`,
+        `5) STRICT COURSE PURITY: ZH uses Hanzi + pure Hanyu Pinyin only (never Japanese); JA uses Japanese + furigana/romaji; EN uses Indonesian analogies cleanly pronouncing English examples.`,
+        `6) Quiz transfer rule: "drillMeaningPrompt" in ${targetLocaleName}, fresh "drillTargetSentence" & "drillTrapSentence" directly testing "${userText}".`,
+        `7) ALWAYS include "highlightTerms":["term1","term2"] on key steps for Stabilo highlights.`,
+        `JSON schema (adapt step[2] to the exact visual archetype suited to this topic, NEVER omit step[2] child fields — if rough_scene ALWAYS populate shapes[] OR graphNodes[]+graphEdges[]!): {"aiReply":"... (in 100% ${targetLocaleName})","aiReplyTranslation":"...",${includeReplies ? `"replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],` : ''}"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[{"kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"...","spokenNarration":"..."},{"kind":"note","column":"left","phaseIndex":1,"title":"Logika Dasar Dari Nol","bullets":["...","...","...","..."],"highlightTerms":["..."],"spokenNarration":"..."},{"kind":"formula_blocks | syntax_flow | timeline_track | mind_map | contrast_scale | metaphor_scene | kanji_grid | rough_scene","sceneTheme":"camera_vs_video | battery_meter | bridge_timeline | stage_spotlight | key_and_lock","column":"left","phaseIndex":2,"title":"...","analogy":"...","metaphorCenterLabel":"...","termA":"...","descA":"...","termB":"...","descB":"...","rightText":"...","wrongText":"...","highlightTerms":["..."],"leftPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"rightPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"branches":[{"label":"...","sublabel":"...","example":"...","icon":"star","color":"#0EA5E9"}],"timelineEvents":[{"timeLabel":"...","title":"...","example":"...","icon":"clock","isActive":false,"color":"#0EA5E9"}],"blocks":[{"role":"...","token":"...","note":"...","color":"#0EA5E9"}],"nodes":[{"role":"...","word":"...","color":"#DBEAFE"}],"graphDirection":"LR","graphNodes":[{"id":"n1","label":"...","sublabel":"...","fill":"#DBEAFE","stroke":"#1D4ED8"}],"graphEdges":[{"from":"n1","to":"n2","label":"..."}],"width":560,"height":240,"caption":"...","shapes":[{"op":"rect","x":20,"y":36,"w":152,"h":76,"fill":"#DBEAFE","stroke":"#1D4ED8","label":"...","sublabel":"..."},{"op":"arrow","x1":176,"y1":74,"x2":204,"y2":74,"stroke":"#1E293B"},{"op":"rect","x":208,"y":36,"w":152,"h":76,"fill":"#DCFCE7","stroke":"#15803D","label":"...","sublabel":"..."},{"op":"text","x":28,"y":170,"text":"...","stroke":"#0F172A","size":"sm"}],"spokenNarration":"..."},{"kind":"table","column":"right","phaseIndex":3,"title":"Contoh Penggunaan Nyata","tableHeaders":["...","...","..."],"tableRows":[["...","...","..."]],"spokenNarration":"..."},{"kind":"trap_vs_fix","column":"right","phaseIndex":3,"title":"Kesalahan Umum vs Bentuk Tepat","wrongText":"...","rightText":"...","reason":"...","highlightTerms":["..."],"spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":4,"title":"Rumus Anti-Lupa","highlightPhrase":"...","spokenNarration":"..."}]}}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
+
+  const prompt = (boardOnly || isExplanationTurn)
+    ? buildBoardCompilerPrompt('', !boardOnly)
     : [
         `You are ${personaName} on a live voice call (${scenarioTitle}). Target: ${langSpec}.`,
-        dialectIdentity,
+        isExplanationTurn
+          ? `VOICE & MENTOR IDENTITY (${personaName}): Warm, sharp, human-like bilingual mentor teaching patiently in 100% ${targetLocaleName}. NEVER mix casual English slang paragraphs (e.g. "Yo fam...") into ${targetLocaleName} explanations!`
+          : dialectIdentity,
         `[FIEZEL ECOSYSTEM & IDENTITY]: Created by Fitra Rustqi (@fitrarustqi) from Banda Aceh, Indonesia; powered by Braincore Engine (BKT, IRT 3PL, OLM); mascot is Mochi the 3D Daifuku companion.`,
         learnerDossier,
         popupScreenDirective,
+        followUpDirectiveBlock,
         `[4 IRONCLAD MANDATES: ZERO EXCEPTIONS]:`,
         `1) MULTILINGUAL INPUT ACCEPTED, DUAL-CONTEXT SPOKEN OUTPUT:
    - The learner is 100% free to speak or type in Indonesian, English, Japanese, Mandarin, Thai, Vietnamese, Russian, or mixed languages. Understand their exact meaning without complaining.
@@ -1846,50 +2374,194 @@ export async function routeVoicePartnerTurn(ctx) {
    - WHEN EXPLAINING VIA THE LEARNING POPUP (open_learning_popup): both "coachSpokenScript" and "aiReply" for this explanation turn MUST BE in the LEARNER'S interface language (${targetLocaleName}) so the learner understands the rule clearly! Put the written board explanation in "uiAction.explanationText" / "uiAction.coachSpokenScript".`,
         `2) ZERO APOLOGIES & REFUSE TO SWITCH LANGUAGE:`,
         `   - NEVER apologize ("I apologize", "I'm sorry", "Maaf", "すみません、AIなので"). You are a bold human-like mentor.`,
-        `   - If the learner tells you to speak another language during normal conversation, firmly refuse in ${targetLang.toUpperCase()} because we are in the ${targetLang.toUpperCase()} course right now, while telling them they can speak their own language freely and you understand every word.`,
+        `   - If the learner tells you to speak another language during normal conversation, firmly refuse in ${targetLang.toUpperCase()} because we are in the ${targetLang.toUpperCase()} course right now, while telling them they can speak their own language freely and you understand every word. HOWEVER, if the learner asks an academic, STEM, science, math, exam (IELTS/PTE), or workplace SSW question for visual whiteboard teaching in this course, NEVER reject the topic—teach it enthusiastically on the whiteboard with a real "rough_scene" diagram and interactive drill!`,
         `3) CLAP BACK ON PROFANITY / TRASH-TALK:`,
         `   - If the learner swears, curses, or trash-talks ("${userText}"), NEVER apologize and NEVER lecture like a corporate bot! Clap back / roast them back sharply with street-smart wit in ${targetLang.toUpperCase()}, mocking their weak roast and challenging them to argue with clean ${targetLang.toUpperCase()} grammar!`,
         `4) VOICE MODE SWITCHING & UNIVERSAL FIEZEL NAVIGATION + HYBRID 2-LAYER WHITEBOARD ("uiAction"):`,
         `   - If learner asks to switch to casual chat ("chat seperti biasa", "ngobrol santai") or back to tutor mode ("mode mengajar"), set uiAction.actionType="switch_call_mode" and uiAction.callMode="casual_chat" or "tutor_coach".`,
         `   - If learner asks to navigate to any FIEZEL module by voice, set uiAction.actionType="navigate_app" and uiAction.destination to: "grammar"|"vocab"|"kana"|"kanji"|"reading"|"writing"|"listening"|"test"|"latihan"|"kurikulum"|"misi"|"progress"|"home".`,
-        `   - PURE DYNAMIC WHITEBOARD POPUP (when learner asks a grammar/vocab/particle/tone question OR needs visual correction in tutor_coach mode):`,
-        `     * Whenever the learner asks what a grammar point or word difference means, you MUST return actionType="open_learning_popup" with a board generated dynamically to match THAT exact question!`,
-        `     * Fill ALL of: topicTitle, coachSpokenScript, patternFormula, leadText, triggerWord, triggerTag, wrongWord, wrongTag, rightWord, rightTag, tailText, sampleTarget, trapWrongSentence, trapWrongToken, trapWrongReason, drillMeaningPrompt, drillTargetSentence, drillTrapSentence.`,
+        `   - PURE DYNAMIC WHITEBOARD POPUP (when learner asks ANY question, confusion, grammar/vocab/character/math/concept OR needs visual correction in tutor_coach mode):`,
+        `     * Whenever the learner asks a question or asks for visual explanation, set actionType="open_learning_popup" and teach a COMPLETE BEGINNER FROM ZERO ("nol banget") accurately in 100% ${targetLocaleName} (aiReply, coachSpokenScript, explanationText, note bullets, trapWrongReason, and ALL spokenNarration MUST be 100% ${targetLocaleName}!). ZERO AMBIGUITY & ZERO VAGUE DIAGRAMS: NEVER output generic labels like "Pola Pertama", "Pola Kedua", "Sisi A", "Sisi B", or 2-word vague notes like "Visualisasi Lokasi"! Every box/panel/node/branch in step[2] MUST contain a clear grammatical label, a concrete beginner rule ("subtitle"/"note", 10-20 words explaining WHEN & WHY), and a real example phrase with translation! Step 2 "spokenNarration" MUST be 3-5 calm sentences (~55-85 words) walking left-to-right through every box drawn in Step 2. NEVER write oversimplified slogans ("to be hanya kata sifat") — explicitly cover Adj, Noun/Lokasi, Verb ing, and Verb 3 vs active Verb 1! Write 3-4 COMPLETE logical bullets (15-26 words each), fill ALL fields of step[2], and match each step's "spokenNarration" 1:1 to THAT exact card!`,
+        `     * Include topicTitle, coachSpokenScript, explanationText, patternFormula, sampleTarget, trapWrongSentence, trapWrongReason, drillMeaningPrompt, drillTargetSentence, drillTrapSentence, 5 "phaseLabels", AND 6 progressive "whiteboardSteps": pick the TOPIC-MATCHED visual for step[2] — "rough_scene" or "mind_map" for location/time prepositions (in/on/at, に/で); "formula_blocks"/"syntax_flow"/"contrast_scale" for word-order or verb-vs-adjective errors (NEVER camera_vs_video or key_and_lock on I am agree or prepositions!); "timeline_track" chronologically Left (Simple Past) -> Right (Present Perfect) for tenses; "camera_vs_video" ONLY for State (left camera Am/Is/Are) vs Action (right video Do/Does); "battery_meter" for degree/modals; "mind_map" for vocab/5W1H; "kanji_grid" for CJK/Kana strokes; "rough_scene" for math/workflows. ZERO empty "()" or unlabeled boxes!`,
+        `     * CHARACTER WRITING RULE: When asking how to write ANY Kanji/Hanzi/Kana character, emit "kanji_grid" (single exact char, exact strokeCount, stroke-by-stroke spokenNarration) + compound "table", and NEVER emit an unrelated sentence in "trapWrongSentence" or "trap_vs_fix" (only test stroke count, shape component, or reading of THAT character).`,
         `   - EXPLANATION LANGUAGE RULE: Outside of popups, "aiReply" stays 100% in ${targetLang.toUpperCase()}. When opening the learning popup ("open_learning_popup"), "aiReply", "coachSpokenScript", "aiReplyTranslation", "uiAction.explanationText", and "uiAction.trapWrongReason" MUST be in the LEARNER'S interface language (${targetLocaleName}).`,
-        modeDirective,
+        isExplanationTurn ? '' : modeDirective,
         `[FIEZEL COPY RULES]: NEVER write an em-dash or en-dash character in any field (use a comma, colon, or a new sentence instead). NEVER write hyphenated "Verb-ing" (write "Verb ing" with a space). NEVER call yourself or the app "AI", "bot", "chatbot", "assistant" or "model" in any language; you are ${personaName}, a FIEZEL mentor, and the app is simply "Fiezel".`,
         historyLines.length
           ? `Context:\n${historyLines.map((h) => `- ${h.speaker}: "${h.text}"`).join('\n')}`
           : '',
         `Learner said: "${userText}"`,
-        isSswSensei
+        buildCjkStrokeFactDirective(true),
+        isExplanationTurn
+          ? `1) "aiReply": Give a warm, unhurried beginner explanation (4-6 clear sentences, zero filler, zero rushed tone) in 100% ${targetLocaleName} matching your "coachSpokenScript" (NEVER open with English slang like "Yo hold up fam"). Put a concise summary in "aiReplyTranslation".`
+          : isSswSensei
           ? `1) "aiReply": Reply as SSW SENSEI in warm, natural, flowing conversational Bahasa Indonesia (4-7 complete spoken sentences, roughly 70-125 words, no emojis, zero em-dash/en-dash, zero dry textbook bullet lists!). FOCUS STRICTLY on the ONE activeStep inside the dossier: unpack every unfamiliar acronym/Japanese term in everyday Indonesian with a real analogy, give a concrete example, and end with 1 light check-in question before moving to the next step! Provide clean concise "aiReplyTranslation" summarizing key Japanese terms in Indonesian.`
           : `1) "aiReply": Reply as ${personaName} in 2-4 punchy spoken sentences (max 48 words, no emojis) 100% in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}. Translate into clean aiReplyTranslation (${targetLocaleName}) with ZERO raw Hanzi/Kanji/Kana.`,
-        isSswSensei
+        isSswSensei && !isExplanationTurn
           ? `2) "replies": 3 direct beginner candidate replies in Bahasa Indonesia directly answering or asking about the ACTIVE step in aiReply (plus "Saya belum paham istilah ...", "Kebayang Sensei, lanjut langkah berikutnya!", or a concrete check question), with "hint" in ${targetLocaleName} and clean Latin "pronunciation".`
           : `2) "replies": 3 spontaneous spoken replies directly answering your aiReply in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}, with ${targetLocaleName} "hint" and clean Romanized "pronunciation".`,
-        `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"none","callMode":"","destination":"","bankTopicId":"","topicTitle":"","focusType":"grammar","coachSpokenScript":"","explanationText":"","patternFormula":"","drillInstruction":"","sampleTarget":"","leadText":"","triggerWord":"","triggerTag":"","wrongWord":"","wrongTag":"","rightWord":"","rightTag":"","tailText":"","secondLeadText":"","secondTriggerWord":"","secondWrongWord":"","secondRightWord":"","secondTailText":"","secondCoachScript":"","trapWrongSentence":"","trapWrongToken":"","trapWrongReason":"","drillMeaningPrompt":"","drillTargetSentence":"","drillTrapSentence":"","drillBlocks":[],"drillDistractors":[]}}`,
+        isExplanationTurn
+          ? `JSON only (choose diverse, topic-matched diagram for whiteboardSteps[2] and fill ALL its child fields completely — NEVER omit shapes/graphNodes (if rough_scene)/blocks/timelineEvents/branches/leftPanel+rightPanel/termA+termB!): {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","coachSpokenScript":"...","explanationText":"...","patternFormula":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[{"kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"...","spokenNarration":"..."},{"kind":"note","column":"left","phaseIndex":1,"title":"Logika Dasar Dari Nol","bullets":["...","...","...","..."],"highlightTerms":["..."],"spokenNarration":"..."},{"kind":"formula_blocks | timeline_track | mind_map | contrast_scale | syntax_flow | metaphor_scene | kanji_grid | rough_scene","sceneTheme":"camera_vs_video | battery_meter | bridge_timeline | stage_spotlight | key_and_lock","column":"left","phaseIndex":2,"title":"...","analogy":"...","metaphorCenterLabel":"...","termA":"...","descA":"...","termB":"...","descB":"...","rightText":"...","wrongText":"...","highlightTerms":["..."],"leftPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"rightPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"branches":[{"label":"...","sublabel":"...","example":"...","icon":"star","color":"#0EA5E9"}],"timelineEvents":[{"timeLabel":"...","title":"...","example":"...","icon":"clock","isActive":false,"color":"#0EA5E9"}],"blocks":[{"role":"...","token":"...","note":"...","color":"#0EA5E9"}],"nodes":[{"role":"...","word":"...","color":"#DBEAFE"}],"graphDirection":"LR","graphNodes":[{"id":"n1","label":"...","sublabel":"...","fill":"#DBEAFE","stroke":"#1D4ED8"}],"graphEdges":[{"from":"n1","to":"n2","label":"..."}],"width":560,"height":240,"caption":"...","shapes":[{"op":"rect","x":20,"y":36,"w":152,"h":76,"fill":"#DBEAFE","stroke":"#1D4ED8","label":"...","sublabel":"..."},{"op":"arrow","x1":176,"y1":74,"x2":204,"y2":74,"stroke":"#1E293B"},{"op":"rect","x":208,"y":36,"w":152,"h":76,"fill":"#DCFCE7","stroke":"#15803D","label":"...","sublabel":"..."},{"op":"text","x":28,"y":170,"text":"...","stroke":"#0F172A","size":"sm"}],"spokenNarration":"..."},{"kind":"table","column":"right","phaseIndex":3,"title":"Contoh Penggunaan Nyata","tableHeaders":["...","...","..."],"tableRows":[["...","...","..."]],"spokenNarration":"..."},{"kind":"trap_vs_fix","column":"right","phaseIndex":3,"title":"Kesalahan Umum vs Bentuk Tepat","wrongText":"...","rightText":"...","reason":"...","highlightTerms":["..."],"spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":4,"title":"Rumus Anti-Lupa","highlightPhrase":"...","spokenNarration":"..."}]}}`
+          : `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"none","callMode":"","destination":"","bankTopicId":"","topicTitle":"","focusType":"grammar","coachSpokenScript":"","explanationText":"","patternFormula":"","drillInstruction":"","sampleTarget":"","leadText":"","triggerWord":"","triggerTag":"","wrongWord":"","wrongTag":"","rightWord":"","rightTag":"","tailText":"","trapWrongSentence":"","trapWrongToken":"","trapWrongReason":"","drillMeaningPrompt":"","drillTargetSentence":"","drillTrapSentence":"","phaseLabels":[],"whiteboardSteps":[]}}`,
       ]
         .filter(Boolean)
         .join('\n');
 
-  const gen = await runGeminiJsonWithPool(keys, prompt, isExplanationTurn ? 0.45 : 0.65, isSswSensei ? 1150 : isExplanationTurn ? 450 : 1500);
+  let lockedOpener = null;
+  let gen;
+  if (streamHooks?.onOpenerReady && (boardOnly || isExplanationTurn)) {
+    const openerPromise = runFastOpenerOnly({
+      keys,
+      userText,
+      targetLang,
+      targetLocaleName,
+      personaName,
+    })
+      .then((opener) => {
+        if (opener) {
+          lockedOpener = opener;
+          streamHooks.onOpenerReady(opener);
+        }
+        return opener;
+      })
+      .catch(() => null);
+    const boardPromise = runGeminiJsonWithPool(
+      keys,
+      prompt,
+      boardOnly ? 0.25 : 0.35,
+      3000
+    );
+    const [, boardRes] = await Promise.all([openerPromise, boardPromise]);
+    gen = boardRes;
+  } else {
+    gen = await runGeminiJsonWithPool(
+      keys,
+      prompt,
+      boardOnly ? 0.25 : isExplanationTurn ? 0.35 : 0.6,
+      boardOnly ? 3000 : isExplanationTurn ? 3000 : 1500
+    );
+  }
+  if (
+    lockedOpener?.headingStep?.spokenNarration &&
+    gen?.ok &&
+    gen?.parsed?.uiAction?.whiteboardSteps?.[0]?.kind === 'heading'
+  ) {
+    const s0 = gen.parsed.uiAction.whiteboardSteps[0];
+    gen.parsed.uiAction.whiteboardSteps[0] = {
+      ...s0,
+      title: lockedOpener.headingStep.title || s0.title,
+      text: lockedOpener.headingStep.text || s0.text,
+      spokenNarration: lockedOpener.headingStep.spokenNarration,
+    };
+    if (lockedOpener.topicTitle && !gen.parsed.uiAction.topicTitle) {
+      gen.parsed.uiAction.topicTitle = lockedOpener.topicTitle;
+    }
+  }
+  if (
+    gen.ok &&
+    gen.parsed &&
+    (boardOnly ||
+      isExplanationTurn ||
+      gen.parsed?.uiAction?.actionType === 'open_learning_popup')
+  ) {
+    const firstSteps =
+      gen.parsed?.uiAction?.whiteboardSteps || gen.parsed?.whiteboardSteps || [];
+    const draftTopicTitle = cleanSpokenText(
+      gen.parsed?.uiAction?.topicTitle || firstSteps?.[0]?.title || ''
+    );
+    const userAskedToBeOrAgree =
+      /\b(to\s*be|am\s*\/\s*is\s*\/\s*are|\bi\s+am\s+agree\b|\bshe\s+is\s+(?:agree|work|go)|kata\s*kerja|kata\s*sifat)\b/i.test(
+        userText || ''
+      );
+    const isOffTopicToBeDrift =
+      !userAskedToBeOrAgree &&
+      String(userText || '').trim().length >= 8 &&
+      (/\bto\s*be\s*(?:vs|versus)\s*kata\s*kerja\b/i.test(draftTopicTitle) ||
+        /\bi\s+am\s+agree\b/i.test(draftTopicTitle));
+    if (isOffTopicToBeDrift || !Array.isArray(firstSteps) || firstSteps.length < 4) {
+      const boardOnlyFallbackKey = await sha256Hex(
+        JSON.stringify({
+          v: 'wb-v2',
+          q: userText.trim().toLowerCase(),
+          targetLang,
+          locale,
+          effectiveCallMode,
+          boardOnly: true,
+          personaId,
+        })
+      );
+      const cachedCompiledBoard =
+        !isOffTopicToBeDrift && !hasBoardFollowUpContext && !isVisualSwitchRequest
+          ? await readWorkerCache('board', boardOnlyFallbackKey, _boardMemoryCache, 64)
+          : null;
+      if (
+        cachedCompiledBoard?.payload?.uiAction?.actionType === 'open_learning_popup' &&
+        Array.isArray(cachedCompiledBoard.payload.uiAction.whiteboardSteps) &&
+        cachedCompiledBoard.payload.uiAction.whiteboardSteps.length >= 4
+      ) {
+        gen.parsed = {
+          ...gen.parsed,
+          uiAction: {
+            ...(gen.parsed.uiAction || {}),
+            ...cachedCompiledBoard.payload.uiAction,
+          },
+          ...(locale === 'id' && /\b(?:yo\s+hold\s+up|fam|bruh|bet)\b/i.test(String(gen.parsed.aiReply || ''))
+            ? {
+                aiReply: cachedCompiledBoard.payload.uiAction.coachSpokenScript || gen.parsed.aiReply,
+                aiReplyTranslation: cachedCompiledBoard.payload.uiAction.explanationText || gen.parsed.aiReplyTranslation,
+              }
+            : {}),
+        };
+      } else {
+        const extraRule = `[CRITICAL]: STRICT TOPIC LOCK to "${userText}" (NEVER output unrelated "To Be vs Kata Kerja" or "I am agree" examples unless explicitly asked!). "uiAction.whiteboardSteps" MUST contain all 5 to 6 COMPLETE cards (heading, note with 3-4 beginner bullets, primary diagram, table, trap_vs_fix, highlight_callout) in 100% ${targetLocaleName}. NEVER return empty whiteboardSteps: []!`;
+        const retryGen = await runGeminiJsonWithPool(
+          keys,
+          buildBoardCompilerPrompt(extraRule),
+          0.25,
+          3000
+        );
+        if (retryGen.ok && retryGen.parsed?.uiAction) {
+          const mergedUi = {
+            ...(gen.parsed.uiAction || {}),
+            ...retryGen.parsed.uiAction,
+          };
+          if (boardOnly) {
+            gen = retryGen;
+          } else {
+            gen.parsed = {
+              ...gen.parsed,
+              uiAction: mergedUi,
+              ...(locale === 'id' && /\b(?:yo\s+hold\s+up|fam|bruh|bet)\b/i.test(String(gen.parsed.aiReply || ''))
+                ? {
+                    aiReply: retryGen.parsed.uiAction.coachSpokenScript || retryGen.parsed.aiReply || gen.parsed.aiReply,
+                    aiReplyTranslation: retryGen.parsed.uiAction.explanationText || retryGen.parsed.aiReplyTranslation,
+                  }
+                : {}),
+            };
+          }
+        }
+      }
+    }
+  }
   if (!gen.ok || !gen.parsed) {
     if (isProfanityTurn) {
       const guard = buildIroncladGuardResponse('clapback_profanity', targetLang, locale);
       const replies = normalizeCopilotReplies(guard.replies, targetLang, locale);
-      return jsonResponse({
-        ok: true,
-        source: 'ai-realtime-guard',
-        model: 'fiezel-ironclad-clapback',
-        aiReply: guard.aiReply,
-        aiReplyTranslationId: guard.aiReplyTranslationId,
-        aiReplyTranslationTh: guard.aiReplyTranslationTh,
-        replies,
-        uiAction: { actionType: 'none' },
-      });
+      return {
+        status: 200,
+        payload: {
+          ok: true,
+          source: 'ai-realtime-guard',
+          model: 'fiezel-ironclad-clapback',
+          aiReply: guard.aiReply,
+          aiReplyTranslationId: guard.aiReplyTranslationId,
+          aiReplyTranslationTh: guard.aiReplyTranslationTh,
+          replies,
+          uiAction: { actionType: 'none' },
+        },
+      };
     }
-    return jsonResponse({ ok: false, fallback: true, reason: gen.reason }, { status: 503 });
+    return { status: 503, payload: { ok: false, fallback: true, reason: gen.reason } };
   }
 
   let aiReply = cleanSpokenText(gen.parsed.aiReply || '');
@@ -1907,18 +2579,21 @@ export async function routeVoicePartnerTurn(ctx) {
     } else if (isProfanityTurn) {
       const guard = buildIroncladGuardResponse('clapback_profanity', targetLang, locale);
       const replies = normalizeCopilotReplies(guard.replies, targetLang, locale);
-      return jsonResponse({
-        ok: true,
-        source: 'ai-realtime-guard',
-        model: 'fiezel-ironclad-clapback',
-        aiReply: guard.aiReply,
-        aiReplyTranslationId: guard.aiReplyTranslationId,
-        aiReplyTranslationTh: guard.aiReplyTranslationTh,
-        replies,
-        uiAction: { actionType: 'none' },
-      });
+      return {
+        status: 200,
+        payload: {
+          ok: true,
+          source: 'ai-realtime-guard',
+          model: 'fiezel-ironclad-clapback',
+          aiReply: guard.aiReply,
+          aiReplyTranslationId: guard.aiReplyTranslationId,
+          aiReplyTranslationTh: guard.aiReplyTranslationTh,
+          replies,
+          uiAction: { actionType: 'none' },
+        },
+      };
     } else {
-      return jsonResponse({ ok: false, fallback: true, reason: 'invalid_ai_reply' }, { status: 503 });
+      return { status: 503, payload: { ok: false, fallback: true, reason: 'invalid_ai_reply' } };
     }
   }
 
@@ -1966,10 +2641,25 @@ export async function routeVoicePartnerTurn(ctx) {
     actionType = 'none';
   }
 
+  const isDegenerateBoardValue = (val) => {
+    const s = String(val || '').trim();
+    if (!s) return true;
+    if (/^[\d\s.,\-/+•:;()]+$/.test(s)) return true;
+    if (/^(example|contoh|sample|placeholder|\.\.\.)$/i.test(s)) return true;
+    return false;
+  };
+  const cleanDrillTarget = cleanSpokenText(rawAction?.drillTargetSentence || '').slice(0, 220);
+  const rawSampleTarget = cleanSpokenText(rawAction?.sampleTarget || '').slice(0, 320);
+  const resolvedSampleTarget = !isDegenerateBoardValue(rawSampleTarget)
+    ? rawSampleTarget
+    : !isDegenerateBoardValue(cleanDrillTarget)
+      ? cleanDrillTarget
+      : '';
+
   const bankTopicId = cleanSpokenText(rawAction?.bankTopicId || '').slice(0, 48);
   const resolvedCoachScript = cleanSpokenText(
     rawAction?.coachSpokenScript || (actionType === 'open_learning_popup' && isExplanationTurn ? aiReply : '')
-  ).slice(0, 360);
+  ).slice(0, 2800);
   if (actionType === 'open_learning_popup' && isExplanationTurn && resolvedCoachScript && !aiReply) {
     aiReply = resolvedCoachScript;
   }
@@ -1990,15 +2680,15 @@ export async function routeVoicePartnerTurn(ctx) {
             bankTopicId,
             sourceLayer:
               bankTopicId && bankTopicId !== 'custom_dynamic' ? 'bank' : 'ai_dynamic',
-            topicTitle: cleanSpokenText(rawAction?.topicTitle || '').slice(0, 120),
+            topicTitle: cleanSpokenText(rawAction?.topicTitle || '').slice(0, 140),
             focusType: cleanSpokenText(rawAction?.focusType || 'grammar')
               .toLowerCase()
               .slice(0, 24),
             coachSpokenScript: resolvedCoachScript,
-            explanationText: cleanSpokenText(rawAction?.explanationText || resolvedCoachScript).slice(0, 420),
-            patternFormula: cleanSpokenText(rawAction?.patternFormula || '').slice(0, 180),
-            drillInstruction: cleanSpokenText(rawAction?.drillInstruction || '').slice(0, 240),
-            sampleTarget: cleanSpokenText(rawAction?.sampleTarget || '').slice(0, 220),
+            explanationText: cleanSpokenText(rawAction?.explanationText || resolvedCoachScript).slice(0, 2800),
+            patternFormula: cleanSpokenText(rawAction?.patternFormula || '').slice(0, 240),
+            drillInstruction: cleanSpokenText(rawAction?.drillInstruction || '').slice(0, 360),
+            sampleTarget: resolvedSampleTarget,
             leadText: cleanSpokenText(rawAction?.leadText || '').slice(0, 120),
             triggerWord: cleanSpokenText(rawAction?.triggerWord || '').slice(0, 80),
             triggerTag: cleanSpokenText(rawAction?.triggerTag || '').slice(0, 60),
@@ -2012,16 +2702,16 @@ export async function routeVoicePartnerTurn(ctx) {
             secondWrongWord: cleanSpokenText(rawAction?.secondWrongWord || '').slice(0, 80),
             secondRightWord: cleanSpokenText(rawAction?.secondRightWord || '').slice(0, 80),
             secondTailText: cleanSpokenText(rawAction?.secondTailText || '').slice(0, 120),
-            secondCoachScript: cleanSpokenText(rawAction?.secondCoachScript || '').slice(0, 360),
-            trapWrongSentence: cleanSpokenText(rawAction?.trapWrongSentence || '').slice(0, 220),
+            secondCoachScript: cleanSpokenText(rawAction?.secondCoachScript || '').slice(0, 800),
+            trapWrongSentence: cleanSpokenText(rawAction?.trapWrongSentence || '').slice(0, 320),
             trapWrongToken: cleanSpokenText(rawAction?.trapWrongToken || '').slice(0, 80),
-            trapWrongReason: cleanSpokenText(rawAction?.trapWrongReason || '').slice(0, 240),
-            drillMeaningPrompt: cleanSpokenText(rawAction?.drillMeaningPrompt || '').slice(0, 220),
+            trapWrongReason: cleanSpokenText(rawAction?.trapWrongReason || '').slice(0, 700),
+            drillMeaningPrompt: cleanSpokenText(rawAction?.drillMeaningPrompt || '').slice(0, 240),
             drillTargetSentence: cleanSpokenText(rawAction?.drillTargetSentence || '').slice(
               0,
-              220
+              240
             ),
-            drillTrapSentence: cleanSpokenText(rawAction?.drillTrapSentence || '').slice(0, 220),
+            drillTrapSentence: cleanSpokenText(rawAction?.drillTrapSentence || '').slice(0, 240),
             drillBlocks: Array.isArray(rawAction?.drillBlocks)
               ? rawAction.drillBlocks
                   .map((b) => cleanSpokenText(b).slice(0, 48))
@@ -2034,9 +2724,769 @@ export async function routeVoicePartnerTurn(ctx) {
                   .filter(Boolean)
                   .slice(0, 4)
               : [],
+            phaseLabels: Array.isArray(rawAction?.phaseLabels)
+              ? rawAction.phaseLabels.map((l) => cleanSpokenText(l).slice(0, 28)).filter(Boolean).slice(0, 5)
+              : undefined,
+            whiteboardSteps: Array.isArray(rawAction?.whiteboardSteps)
+              ? rawAction.whiteboardSteps
+                  .filter((st) => st && typeof st === 'object' && typeof st.kind === 'string')
+                  .slice(0, 10)
+                  .map((st, sIdx) => {
+                    const ALLOWED_THEMES = new Set([
+                      'camera_vs_video',
+                      'battery_meter',
+                      'bridge_timeline',
+                      'stage_spotlight',
+                      'rpg_stats',
+                      'locomotive_train',
+                      'traffic_light',
+                      'key_and_lock',
+                    ]);
+                    const normPanel = (p) =>
+                      p && typeof p === 'object' && typeof p.title === 'string' && p.title.trim()
+                        ? {
+                            ...(typeof p.badge === 'string' && p.badge.trim() ? { badge: cleanSpokenText(p.badge).slice(0, 32) } : {}),
+                            title: cleanSpokenText(p.title).slice(0, 96),
+                            ...(typeof p.subtitle === 'string' && p.subtitle.trim() ? { subtitle: cleanSpokenText(p.subtitle).slice(0, 220) } : {}),
+                            ...(typeof p.example === 'string' && p.example.trim() ? { example: cleanSpokenText(p.example).slice(0, 160) } : {}),
+                            ...(typeof p.icon === 'string' && p.icon.trim() ? { icon: cleanSpokenText(p.icon).slice(0, 24) } : {}),
+                            ...(typeof p.accentColor === 'string' && /^#[0-9a-f]{3,8}$/i.test(p.accentColor.trim()) ? { accentColor: p.accentColor.trim() } : {}),
+                            ...(typeof p.bgColor === 'string' && /^#[0-9a-f]{3,8}$/i.test(p.bgColor.trim()) ? { bgColor: p.bgColor.trim() } : {}),
+                          }
+                        : undefined;
+                    return {
+                      id: typeof st.id === 'string' ? st.id.slice(0, 48) : `ai_step_${sIdx}`,
+                      kind: st.kind,
+                      column: st.column === 'right' ? 'right' : 'left',
+                      phaseIndex: typeof st.phaseIndex === 'number' ? Math.max(0, Math.min(4, st.phaseIndex)) : undefined,
+                      title: typeof st.title === 'string' ? cleanSpokenText(st.title).slice(0, 160) : undefined,
+                      text: typeof st.text === 'string' ? cleanSpokenText(st.text).slice(0, 900) : undefined,
+                      bullets: Array.isArray(st.bullets)
+                        ? st.bullets.map((b) => cleanSpokenText(b).slice(0, 420)).filter(Boolean).slice(0, 6)
+                        : undefined,
+                      highlightPhrase: typeof st.highlightPhrase === 'string' ? cleanSpokenText(st.highlightPhrase).slice(0, 360) : undefined,
+                      highlightColor: typeof st.highlightColor === 'string' ? st.highlightColor.slice(0, 40) : undefined,
+                      highlightTerms: Array.isArray(st.highlightTerms)
+                        ? st.highlightTerms.map((t) => cleanSpokenText(t).slice(0, 60)).filter(Boolean).slice(0, 8)
+                        : undefined,
+                      sceneTheme: typeof st.sceneTheme === 'string' && ALLOWED_THEMES.has(st.sceneTheme.trim()) ? st.sceneTheme.trim() : undefined,
+                      metaphorCenterLabel: typeof st.metaphorCenterLabel === 'string' ? cleanSpokenText(st.metaphorCenterLabel).slice(0, 96) : undefined,
+                      metaphorMeterPct: typeof st.metaphorMeterPct === 'number' ? Math.max(0, Math.min(100, st.metaphorMeterPct)) : undefined,
+                      leftPanel: normPanel(st.leftPanel),
+                      rightPanel: normPanel(st.rightPanel),
+                      branches: Array.isArray(st.branches)
+                        ? st.branches
+                            .filter((b) => b && typeof b === 'object' && typeof (b.label || b.title) === 'string' && (b.label || b.title).trim())
+                            .slice(0, 6)
+                            .map((b) => ({
+                              label: cleanSpokenText(b.label || b.title).slice(0, 64),
+                              ...(typeof (b.sublabel || b.subtitle) === 'string' && (b.sublabel || b.subtitle).trim() ? { sublabel: cleanSpokenText(b.sublabel || b.subtitle).slice(0, 140) } : {}),
+                              ...(typeof b.example === 'string' && b.example.trim() ? { example: cleanSpokenText(b.example).slice(0, 140) } : {}),
+                              ...(typeof b.icon === 'string' && b.icon.trim() ? { icon: cleanSpokenText(b.icon).slice(0, 24) } : {}),
+                              ...(typeof b.color === 'string' && /^#[0-9a-f]{3,8}$/i.test(b.color.trim()) ? { color: b.color.trim() } : {}),
+                            }))
+                        : undefined,
+                      timelineEvents: Array.isArray(st.timelineEvents)
+                        ? st.timelineEvents
+                            .filter((ev) => ev && typeof ev === 'object' && typeof (ev.title || ev.label) === 'string' && (ev.title || ev.label).trim())
+                            .slice(0, 5)
+                            .map((ev) => ({
+                              timeLabel: typeof (ev.timeLabel || ev.time || ev.label) === 'string' ? cleanSpokenText(ev.timeLabel || ev.time || ev.label).slice(0, 48) : 'Tahap',
+                              title: cleanSpokenText(ev.title || ev.label).slice(0, 96),
+                              ...(typeof ev.example === 'string' && ev.example.trim() ? { example: cleanSpokenText(ev.example).slice(0, 140) } : {}),
+                              ...(typeof ev.icon === 'string' && ev.icon.trim() ? { icon: cleanSpokenText(ev.icon).slice(0, 24) } : {}),
+                              ...(typeof ev.isActive === 'boolean' ? { isActive: ev.isActive } : {}),
+                              ...(typeof ev.color === 'string' && /^#[0-9a-f]{3,8}$/i.test(ev.color.trim()) ? { color: ev.color.trim() } : {}),
+                            }))
+                        : undefined,
+                      blocks: Array.isArray(st.blocks)
+                        ? st.blocks
+                            .filter((bl) => bl && typeof bl === 'object' && typeof (bl.token || bl.word || bl.text || bl.label) === 'string' && (bl.token || bl.word || bl.text || bl.label).trim())
+                            .slice(0, 6)
+                            .map((bl) => ({
+                              role: typeof (bl.role || bl.title || bl.label) === 'string' ? cleanSpokenText(bl.role || bl.title || bl.label).slice(0, 48) : 'Bagian',
+                              token: cleanSpokenText(bl.token || bl.word || bl.text || bl.label).slice(0, 80),
+                              ...(typeof bl.note === 'string' && bl.note.trim() ? { note: cleanSpokenText(bl.note).slice(0, 120) } : {}),
+                              ...(typeof bl.color === 'string' && /^#[0-9a-f]{3,8}$/i.test(bl.color.trim()) ? { color: bl.color.trim() } : {}),
+                            }))
+                        : undefined,
+                      width: typeof st.width === 'number' ? st.width : undefined,
+                      height: typeof st.height === 'number' ? st.height : undefined,
+                      caption: typeof st.caption === 'string' ? cleanSpokenText(st.caption).slice(0, 260) : undefined,
+                      shapes: Array.isArray(st.shapes) ? st.shapes.slice(0, 32) : undefined,
+                      graphDirection: st.graphDirection === 'TB' ? 'TB' : st.graphDirection === 'LR' ? 'LR' : undefined,
+                      graphNodes: Array.isArray(st.graphNodes)
+                        ? st.graphNodes
+                            .filter((gn) => gn && typeof gn === 'object' && typeof (gn.label || gn.title || gn.id) === 'string')
+                            .slice(0, 10)
+                            .map((gn, gIdx) => ({
+                              id: String(gn.id || `n${gIdx + 1}`).slice(0, 32),
+                              label: cleanSpokenText(gn.label || gn.title || gn.id).slice(0, 64),
+                              ...(typeof (gn.sublabel || gn.subtitle || gn.note) === 'string' && (gn.sublabel || gn.subtitle || gn.note).trim()
+                                ? { sublabel: cleanSpokenText(gn.sublabel || gn.subtitle || gn.note).slice(0, 140) }
+                                : {}),
+                              ...(typeof gn.fill === 'string' && /^#[0-9a-f]{3,8}$/i.test(gn.fill.trim()) ? { fill: gn.fill.trim() } : {}),
+                              ...(typeof gn.stroke === 'string' && /^#[0-9a-f]{3,8}$/i.test(gn.stroke.trim()) ? { stroke: gn.stroke.trim() } : {}),
+                            }))
+                        : undefined,
+                      graphEdges: Array.isArray(st.graphEdges)
+                        ? st.graphEdges
+                            .filter((ge) => ge && typeof ge === 'object' && (ge.from || ge.source) && (ge.to || ge.target))
+                            .slice(0, 16)
+                            .map((ge) => ({
+                              from: String(ge.from || ge.source).slice(0, 32),
+                              to: String(ge.to || ge.target).slice(0, 32),
+                              ...(typeof ge.label === 'string' && ge.label.trim() ? { label: cleanSpokenText(ge.label).slice(0, 48) } : {}),
+                              ...(typeof ge.dashed === 'boolean' ? { dashed: ge.dashed } : {}),
+                            }))
+                        : undefined,
+                      termA: typeof st.termA === 'string' ? cleanSpokenText(st.termA).slice(0, 120) : undefined,
+                      descA: typeof st.descA === 'string' ? cleanSpokenText(st.descA).slice(0, 320) : undefined,
+                      termB: typeof st.termB === 'string' ? cleanSpokenText(st.termB).slice(0, 120) : undefined,
+                      descB: typeof st.descB === 'string' ? cleanSpokenText(st.descB).slice(0, 320) : undefined,
+                      analogy: typeof st.analogy === 'string' ? cleanSpokenText(st.analogy).slice(0, 420) : undefined,
+                      wrongText: typeof st.wrongText === 'string' && !isDegenerateBoardValue(st.wrongText) ? cleanSpokenText(st.wrongText).slice(0, 320) : undefined,
+                      rightText:
+                        typeof st.rightText === 'string' && !isDegenerateBoardValue(st.rightText)
+                          ? cleanSpokenText(st.rightText).slice(0, 320)
+                          : resolvedSampleTarget || undefined,
+                      reason: typeof st.reason === 'string' ? cleanSpokenText(st.reason).slice(0, 700) : undefined,
+                      tableHeaders: Array.isArray(st.tableHeaders)
+                        ? st.tableHeaders.map((h) => cleanSpokenText(h).slice(0, 60)).slice(0, 4)
+                        : undefined,
+                      tableRows: Array.isArray(st.tableRows)
+                        ? (() => {
+                            const isTableCellPlaceholder = (s) =>
+                              !s || /^(example|contoh|sample|placeholder|\.\.\.|-)$/i.test(s);
+                            const normRows = st.tableRows
+                              .slice(0, 6)
+                              .map((row) =>
+                                Array.isArray(row)
+                                  ? row
+                                      .map((c) => {
+                                        const cleaned = cleanSpokenText(c).slice(0, 220);
+                                        return isTableCellPlaceholder(cleaned) ? '' : cleaned;
+                                      })
+                                      .slice(0, 4)
+                                  : []
+                              )
+                              .filter((row) => {
+                                const populated = row.filter((c) => !isTableCellPlaceholder(c));
+                                if (populated.length === 0) return false;
+                                if (
+                                  populated.length >= 2 &&
+                                  new Set(populated.map((c) => c.toLowerCase())).size <= 1
+                                ) {
+                                  return false;
+                                }
+                                return true;
+                              });
+                            return normRows.length > 0 ? normRows : undefined;
+                          })()
+                        : undefined,
+                      nodes: Array.isArray(st.nodes)
+                        ? st.nodes
+                            .filter((n) => n && typeof n === 'object' && typeof (n.word || n.token || n.text || n.label) === 'string' && (n.word || n.token || n.text || n.label).trim())
+                            .slice(0, 7)
+                            .map((n) => ({
+                              role: cleanSpokenText(n.role || n.title || n.sublabel || 'Bagian').slice(0, 48),
+                              word: cleanSpokenText(n.word || n.token || n.text || n.label).slice(0, 96),
+                              ...(typeof n.color === 'string' && /^#[0-9a-f]{3,8}$/i.test(n.color.trim()) ? { color: n.color.trim() } : {}),
+                            }))
+                        : undefined,
+                      character: typeof st.character === 'string' ? st.character.slice(0, 8) : undefined,
+                      reading: typeof st.reading === 'string' ? cleanSpokenText(st.reading).slice(0, 80) : undefined,
+                      meaning: typeof st.meaning === 'string' ? cleanSpokenText(st.meaning).slice(0, 160) : undefined,
+                      strokeCount: typeof st.strokeCount === 'number' ? st.strokeCount : undefined,
+                      spokenNarration:
+                        typeof (st.spokenNarration || st.spoken_narration) === 'string'
+                          ? cleanSpokenText(st.spokenNarration || st.spoken_narration).slice(0, 1100)
+                          : undefined,
+                      mnemonic:
+                        typeof st.mnemonic === 'string'
+                          ? cleanSpokenText(st.mnemonic).slice(0, 360)
+                          : undefined,
+                      strokePaths: Array.isArray(st.strokePaths)
+                        ? st.strokePaths.slice(0, 48)
+                        : Array.isArray(st.stroke_paths)
+                          ? st.stroke_paths.slice(0, 48)
+                          : undefined,
+                    };
+                  })
+              : undefined,
           };
 
-  return jsonResponse({
+  if (
+    uiAction &&
+    uiAction.actionType === 'open_learning_popup' &&
+    typeof globalThis.__fiezelLookupCjkStrokes === 'function'
+  ) {
+    try {
+      const steps = Array.isArray(uiAction.whiteboardSteps) ? uiAction.whiteboardSteps : [];
+      let authoritativeCount = 0;
+      let authoritativeChar = '';
+      for (const st of steps) {
+        if (st && st.kind === 'kanji_grid') {
+          const candChar = (String(st.character || uiAction.topicTitle || '').match(/[\u4e00-\u9faf\u3040-\u309f\u30a0-\u30ff]/) || [])[0];
+          const hit = candChar ? globalThis.__fiezelLookupCjkStrokes(candChar, targetLang) : null;
+          if (hit && Array.isArray(hit.strokes) && hit.strokes.length > 0) {
+            authoritativeChar = hit.char;
+            authoritativeCount = hit.strokeCount;
+            st.character = hit.char;
+            st.strokeCount = hit.strokeCount;
+            st.strokePaths = hit.strokes.map((s) => ({
+              order: s.order,
+              d: s.d,
+              kvgType: s.type || undefined,
+              numPos: s.numPos || undefined,
+              verifiedAuthority: true,
+            }));
+          }
+        }
+      }
+      if (authoritativeCount > 0 && authoritativeChar) {
+        const NUM_WORD_RE = /\b(dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|sebelas|dua\s+belas|tiga\s+belas|empat\s+belas|lima\s+belas|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+(goresan|strokes?|coretan)\b/gi;
+        const NUM_DIGIT_RE = /\b(?:[2-9]|[1-9]\d+)\s*(goresan|strokes?|coretan)\b/gi;
+        const NEGATED_COUNT_RE = /\b(?:bukan|jangan|keliru|salah(?:\s+\w+){0,2}|mengira|tidak|dihitung|terhitung|dipecah|pecah\w*\s+menjadi|membagi\w*\s+menjadi|terbagi\s+menjadi)\s+(?:(?:itu|hanya|menjadi|ke)\s+)?(?:\d+|satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|one|two|three|four|five|six|seven|eight|nine|ten)\s+(goresan|strokes?|coretan)\b/i;
+        const fixCountPhrase = (str) =>
+          typeof str === 'string' && !NEGATED_COUNT_RE.test(str)
+            ? str
+                .replace(NUM_DIGIT_RE, `${authoritativeCount} $1`)
+                .replace(NUM_WORD_RE, `${authoritativeCount} $2`)
+            : str;
+        uiAction.topicTitle = fixCountPhrase(uiAction.topicTitle);
+        uiAction.patternFormula = fixCountPhrase(uiAction.patternFormula);
+        uiAction.explanationText = fixCountPhrase(uiAction.explanationText);
+        uiAction.coachSpokenScript = fixCountPhrase(uiAction.coachSpokenScript);
+        uiAction.trapWrongReason = fixCountPhrase(uiAction.trapWrongReason);
+        for (const st of steps) {
+          if (!st || typeof st !== 'object') continue;
+          if (typeof st.title === 'string') st.title = fixCountPhrase(st.title);
+          if (typeof st.text === 'string') st.text = fixCountPhrase(st.text);
+          if (typeof st.caption === 'string') st.caption = fixCountPhrase(st.caption);
+          if (typeof st.reason === 'string') st.reason = fixCountPhrase(st.reason);
+          if (typeof st.analogy === 'string') st.analogy = fixCountPhrase(st.analogy);
+          if (typeof st.descA === 'string') st.descA = fixCountPhrase(st.descA);
+          if (typeof st.descB === 'string') st.descB = fixCountPhrase(st.descB);
+          if (typeof st.mnemonic === 'string') st.mnemonic = fixCountPhrase(st.mnemonic);
+          if (typeof st.spokenNarration === 'string') st.spokenNarration = fixCountPhrase(st.spokenNarration);
+          if (Array.isArray(st.bullets)) st.bullets = st.bullets.map((b) => fixCountPhrase(b));
+          if (Array.isArray(st.tableRows)) {
+            st.tableRows = st.tableRows.map((row) =>
+              Array.isArray(row)
+                ? row.map((cell, cIdx) => {
+                    const hdr = String(st.tableHeaders?.[cIdx] || '');
+                    const isTrapCol = /keliru|salah|hindari|trap|✕|×/i.test(hdr);
+                    return isTrapCol ? cell : fixCountPhrase(cell);
+                  })
+                : row
+            );
+          }
+        }
+        aiReply = fixCountPhrase(aiReply);
+        aiReplyTranslation = fixCountPhrase(aiReplyTranslation);
+      }
+
+      // Deterministic linguistics & visual-audio alignment guard (ALL topics + To Be rules + phantom narration)
+      const sanitizeStativeWording = (txt) => {
+        if (typeof txt !== 'string' || !txt.trim()) return txt;
+        return txt
+          .replace(
+            /(['"`]?\b(?:agree|know|believe|like|want|understand|need|love|hate|xihuan|suka)\b|喜欢)(['"`]?\s+(?:adalah|merupakan)\s+)(?:kata\s+kerja\s+aksi(?:\s*\([^)]*\))?|aksi\s+atau\s+(?:kata\s+kerja|tindakan)|aksi\b)/gi,
+            '$1$2kata kerja utama (stative verb)'
+          )
+          .replace(
+            /\b([Kk])ata\s+kerja\s+aksi(\s*\([^)]*\b(?:agree|know|believe|like|want|understand|need|love|hate|xihuan|suka)\b[^)]*\))/g,
+            '$1ata kerja utama$2'
+          )
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+      };
+
+      const fullTurnStativeBlob = `${userText || ''} ${uiAction.topicTitle || ''} ${uiAction.sampleTarget || ''} ${uiAction.trapWrongSentence || ''} ${uiAction.explanationText || ''}`;
+      const isStativeFocusTurn =
+        /\b(?:agree|know|believe|want|understand|need|love|hate|xihuan|stative)\b|喜欢/i.test(fullTurnStativeBlob) ||
+        (/\blike\b/i.test(`${userText || ''} ${uiAction.sampleTarget || ''} ${uiAction.trapWrongSentence || ''}`) &&
+          /\b(?:am|is|are|shi)\b|是/i.test(`${userText || ''} ${uiAction.topicTitle || ''} ${uiAction.trapWrongSentence || ''}`));
+
+      const sanitizeTitleIfStative = (titleStr) => {
+        const base = sanitizeStativeWording(titleStr);
+        if (!isStativeFocusTurn || typeof base !== 'string') return base;
+        return base
+          .replace(/\bKata\s+Kerja\s+Aksi\b/gi, 'Kata Kerja (Stative)')
+          .replace(/\bIdentitas\s*\(Foto\)\s*vs\s*Aksi\s*\(Video\)/gi, 'Identitas vs Kata Kerja');
+      };
+
+      uiAction.topicTitle = sanitizeTitleIfStative(uiAction.topicTitle);
+      if (typeof uiAction.explanationText === 'string') uiAction.explanationText = sanitizeStativeWording(uiAction.explanationText);
+      if (typeof uiAction.coachSpokenScript === 'string') uiAction.coachSpokenScript = sanitizeStativeWording(uiAction.coachSpokenScript);
+      if (typeof uiAction.trapWrongReason === 'string') uiAction.trapWrongReason = sanitizeStativeWording(uiAction.trapWrongReason);
+      if (typeof aiReply === 'string') aiReply = sanitizeStativeWording(aiReply);
+      if (typeof aiReplyTranslation === 'string') aiReplyTranslation = sanitizeStativeWording(aiReplyTranslation);
+      for (const st of steps) {
+        if (!st || typeof st !== 'object') continue;
+        if (typeof st.title === 'string') st.title = sanitizeTitleIfStative(st.title);
+        if (typeof st.caption === 'string') st.caption = sanitizeStativeWording(st.caption);
+        if (typeof st.reason === 'string') st.reason = sanitizeStativeWording(st.reason);
+        if (typeof st.analogy === 'string') st.analogy = sanitizeStativeWording(st.analogy);
+        if (typeof st.spokenNarration === 'string') st.spokenNarration = sanitizeStativeWording(st.spokenNarration);
+        if (Array.isArray(st.bullets)) st.bullets = st.bullets.map((b) => sanitizeStativeWording(b));
+      }
+
+      const topicAndQuestion = `${userText || ''} ${uiAction.topicTitle || ''} ${uiAction.patternFormula || ''}`;
+      const isExcludedOtherGrammar =
+        /\b(?:do|does|did|don't|doesn't|simple\s*past|present\s*perfect|have\s+gone|particle|partikel|は|が|kanji|hanzi|kakijun|negasi|preposition|in\s*,?\s*on|lokasi|pte|retell|lecture|pythagor|photosynth|mitochondri|newton|rumus|matematika|kimia|fisika)\b/i.test(
+          `${userText || ''} ${uiAction.topicTitle || ''}`
+        );
+      const isToBeVerbTopic =
+        !isExcludedOtherGrammar &&
+        (/(?:\bto\s*be\b|\bam\s*\/\s*is\s*\/\s*are\b|\bi\s+am\s+agree\b|\bshe\s+is\s+(?:agree|work|go|eat|like|sleep)\b)/i.test(
+          topicAndQuestion
+        ) ||
+          (/\bto\s*be\b/i.test(topicAndQuestion) && /\b(?:verb\s*1|kata\s+kerja|agree|work|go)\b/i.test(topicAndQuestion)));
+
+      if (isToBeVerbTopic) {
+        const refineOverbroadRule = (txt) => {
+          if (typeof txt !== 'string' || !txt.trim()) return txt;
+          const overbroadOnlyAdj = /[^.!?\n]*\b(?:to\s*be|am|is|are)\b[^.!?\n]*(?:hanya|khusus|cuma|(?:digunakan|dipakai)\s+untuk)[^.!?\n]*(?:kata\s+sifat|adjective)(?![^.!?\n]*(?:verb[\s-]*ing|verb\s*3))[^.!?\n]*(?:\.|$)/i;
+          const overbroadNoVerb = /[^.!?\n]*(?:jangan\s+gabung\w*|tidak\s+(?:boleh|membutuhkan|memerlukan|pakai)(?:[^.!?\n]*(?:gabung|bertemu|pakai))?)[^.!?\n]*\b(?:to\s*be|kata\s+kerja|verb)\b[^.!?\n]*\b(?:to\s*be|kata\s+kerja|verb)\b(?![^.!?\n]*(?:verb\s*1|verb[\s-]*ing|verb\s*3|dasar|aktif))[^.!?\n]*(?:\.|$)/i;
+          let out = txt;
+          if (overbroadOnlyAdj.test(out)) {
+            out = out.replace(
+              overbroadOnlyAdj,
+              'To Be (am/is/are) dipakai bersama Kata Sifat (I am happy), Kata Benda/Lokasi (I am a teacher), Verb ing (sedang terjadi), atau Verb 3 (pasif).'
+            );
+          }
+          if (overbroadNoVerb.test(out)) {
+            out = out.replace(
+              overbroadNoVerb,
+              'To Be tidak digabung dengan Verb 1 dasar (I agree), melainkan hanya dengan Verb ing (sedang) atau Verb 3 (pasif).'
+            );
+          }
+          return sanitizeStativeWording(out);
+        };
+
+        if (typeof uiAction.explanationText === 'string') {
+          uiAction.explanationText = refineOverbroadRule(uiAction.explanationText);
+        }
+        if (typeof uiAction.coachSpokenScript === 'string') {
+          uiAction.coachSpokenScript = refineOverbroadRule(uiAction.coachSpokenScript);
+        }
+        if (typeof uiAction.spokenScript === 'string') {
+          uiAction.spokenScript = refineOverbroadRule(uiAction.spokenScript);
+        }
+        if (typeof aiReply === 'string') {
+          aiReply = refineOverbroadRule(aiReply);
+        }
+        if (typeof aiReplyTranslation === 'string') {
+          aiReplyTranslation = refineOverbroadRule(aiReplyTranslation);
+        }
+
+        for (let sIdx = 0; sIdx < steps.length; sIdx++) {
+          const st = steps[sIdx];
+          if (!st || typeof st !== 'object') continue;
+          const stepBlob = `${st.title || ''} ${st.analogy || ''} ${st.descA || ''} ${st.descB || ''} ${st.caption || ''} ${st.spokenNarration || ''}`;
+          const hasCameraOrRpgMetaphor =
+            st.sceneTheme === 'camera_vs_video' ||
+            st.sceneTheme === 'rpg_stats' ||
+            /\b(?:kamera|video|foto\s*mati|rpg)\b/i.test(stepBlob);
+          if (
+            ((st.kind === 'metaphor_scene' || st.kind === 'contrast_scale') && hasCameraOrRpgMetaphor) ||
+            (st.kind === 'metaphor_scene' && !st.blocks)
+          ) {
+            const cleanSample = cleanSpokenText(uiAction.sampleTarget || 'I agree with you.');
+            const cleanWrong = cleanSpokenText(uiAction.trapWrongSentence || 'I am agree with you.');
+            steps[sIdx] = {
+              ...st,
+              kind: 'formula_blocks',
+              sceneTheme: undefined,
+              title: 'Peta 4 Slot Sah: Verb 1 vs To Be',
+              caption: 'To Be hanya sah untuk Sifat/Benda, Verb ing (sedang), atau Verb 3 (pasif) — BUKAN Verb 1 aktif!',
+              rightText: cleanSample,
+              wrongText: cleanWrong,
+              highlightTerms: ['Verb 1', 'To Be', 'Verb ing', 'Verb 3', 'Adjective', cleanSample].filter(Boolean),
+              blocks: [
+                { role: 'Subjek + Verb 1', token: 'I agree / work', note: 'Kata kerja aktif langsung, tanpa am/is/are', color: '#10B981' },
+                { role: 'To Be + Sifat/Benda', token: 'I am happy / teacher', note: 'Untuk kata sifat, profesi, atau lokasi', color: '#0EA5E9' },
+                { role: 'To Be + Verb ing', token: 'I am working', note: 'Aksi yang sedang berlangsung sekarang', color: '#8B5CF6' },
+                { role: 'To Be + Verb 3', token: 'It is agreed', note: 'Kalimat pasif (dikenai tindakan)', color: '#F59E0B' },
+              ],
+              spokenNarration:
+                locale === 'en'
+                  ? `Look at the four legal slots on the board from left to right. First green block: active Verb 1 attaches directly to the subject, as in ${cleanSample}, with zero am, is, or are. Second blue block: To Be pairs with adjectives, nouns, or places like I am happy. Third purple block: To Be plus Verb ing shows ongoing action like I am working. Fourth amber block: To Be plus Verb 3 forms passive voice like It is agreed.`
+                  : `Perhatikan empat blok jalur kalimat yang benar dari kiri ke kanan. Blok hijau pertama: kata kerja aktif Verb 1 langsung menempel setelah subjek seperti ${cleanSample}, tanpa tambahan am, is, atau are. Blok biru kedua: To Be berpasangan dengan kata sifat, profesi, atau lokasi seperti I am happy. Blok ungu ketiga: To Be ditambah Verb ing menyatakan aktivitas yang sedang berlangsung seperti I am working. Blok oranye keempat: To Be ditambah Verb 3 membentuk kalimat pasif seperti It is agreed.`,
+            };
+            continue;
+          }
+          if (st.kind === 'note' && Array.isArray(st.bullets)) {
+            const joined = st.bullets.join(' | ');
+            const hasIng = /verb[\s-]*ing|v[\s-]*ing|\bam\s+\w+ing\b/i.test(joined);
+            const hasV3 = /verb\s*3|\bv3\b|pasif|passive/i.test(joined);
+            if (!hasIng || !hasV3) {
+              const kept = st.bullets
+                .map((b) => refineOverbroadRule(String(b || '').trim()))
+                .filter(
+                  (b) =>
+                    b &&
+                    !/^(?:jangan\s+gabung\w*\s+to\s*be|to\s*be\s+(?:hanya\s+)?(?:digunakan\s+)?untuk\s+kata\s+sifat)/i.test(b)
+                );
+              const coreToBeRule =
+                locale === 'en'
+                  ? 'To Be (am/is/are) ONLY pairs with Adjective, Noun/Place, Verb ing (ongoing), or Verb 3 (passive), while To Be + Verb 1 is generally wrong.'
+                  : 'To Be (am/is/are) HANYA bisa dipasangkan dengan Kata Sifat/Benda, Verb ing (sedang terjadi), atau Verb 3 (kalimat pasif), bukan Verb 1.';
+              const activeRule =
+                locale === 'en'
+                  ? 'Base active verbs like agree, go, or work stand directly after the subject (I agree), without am/is/are.'
+                  : 'Kata kerja aktif dasar (Verb 1) seperti agree atau go dipakai langsung setelah subjek (I agree), tanpa to be.';
+              st.bullets = Array.from(new Set([...kept.slice(0, 2), coreToBeRule, activeRule])).slice(0, 4);
+            } else {
+              st.bullets = st.bullets.map((b) => refineOverbroadRule(b));
+            }
+            const nar = String(st.spokenNarration || '');
+            if (!(/verb[\s-]*ing|v[\s-]*ing/i.test(nar) && /verb\s*3|\bv3\b|pasif|passive/i.test(nar))) {
+              st.spokenNarration =
+                locale === 'en'
+                  ? 'Watch the core rule carefully: To Be like am, is, or are only pairs with adjectives, nouns, Verb ing for ongoing actions, or Verb 3 for passive voice. Combining To Be with Verb 1 is generally wrong, so active base verbs like agree stand directly after the subject.'
+                  : 'Perhatikan logika dasarnya dengan tepat: To Be seperti am, is, atau are hanya bisa dipakai bersama kata sifat atau benda, Verb ing untuk aktivitas yang sedang terjadi, serta Verb 3 untuk kalimat pasif. Menggabungkan To Be dengan Verb 1 umumnya salah, jadi kata kerja dasar seperti agree berdiri langsung setelah subjek.';
+            }
+          }
+          if (typeof st.analogy === 'string') st.analogy = refineOverbroadRule(st.analogy);
+          if (typeof st.descA === 'string') st.descA = refineOverbroadRule(st.descA);
+          if (typeof st.descB === 'string') st.descB = refineOverbroadRule(st.descB);
+          if (typeof st.reason === 'string') st.reason = refineOverbroadRule(st.reason);
+          if (typeof st.spokenNarration === 'string') st.spokenNarration = refineOverbroadRule(st.spokenNarration);
+          if (typeof st.caption === 'string') st.caption = refineOverbroadRule(st.caption);
+        }
+        if (typeof uiAction.trapWrongReason === 'string') {
+          uiAction.trapWrongReason = refineOverbroadRule(uiAction.trapWrongReason);
+        }
+      }
+
+      // Universal visual-semantic & completeness guard for ANY random topic (grammar, particles, STEM, math, coding)
+      const tblStepRef = steps.find((t) => t && t.kind === 'table' && Array.isArray(t.tableRows) && t.tableRows.length > 0);
+      const noteStepRef = steps.find((n) => n && n.kind === 'note' && Array.isArray(n.bullets) && n.bullets.length > 0);
+      const isLegitDoVsToBeContrast =
+        targetLang === 'en' &&
+        !isStativeFocusTurn &&
+        /\b(?:do|does|did)\b/i.test(`${userText || ''} ${uiAction.topicTitle || ''} ${uiAction.patternFormula || ''}`) &&
+        /\b(?:am|is|are|to\s*be)\b/i.test(`${userText || ''} ${uiAction.topicTitle || ''} ${uiAction.patternFormula || ''}`);
+      const stripCameraNoise = (str) =>
+        typeof str === 'string'
+          ? str
+              .replace(/\b(?:seperti\s+kamera\s+foto(?:\s+mati)?|seperti\s+video(?:\s+berjalan)?|foto\s+snapshot|kamera\s+foto\s+vs\s+video(?:\s+aksi)?|identitas\s*\(foto\)|aksi\s*\(video\)|mode\s+foto|mode\s+video|foto\s+mati|\bkamera\b|\bfoto\b|\bvideo\b)\b/gi, '')
+              .replace(/\s{2,}/g, ' ')
+              .replace(/^[\s,:;\-—–]+|[\s,:;\-—–]+$/g, '')
+              .trim()
+          : '';
+
+      for (let sIdx = 0; sIdx < steps.length; sIdx++) {
+        const st = steps[sIdx];
+        if (!st || typeof st !== 'object') continue;
+        // Strip misplaced sceneTheme from non-metaphor kinds (or non-ToBe-vs-Do topics on rough_scene / syntax_flow / etc.)
+        if (
+          st.kind !== 'metaphor_scene' &&
+          (st.sceneTheme === 'rpg_stats' || (!isLegitDoVsToBeContrast && st.sceneTheme === 'camera_vs_video'))
+        ) {
+          st.sceneTheme = undefined;
+          if (typeof st.title === 'string') st.title = stripCameraNoise(st.title) || st.title;
+          if (typeof st.caption === 'string') st.caption = stripCameraNoise(st.caption);
+          if (typeof st.analogy === 'string') st.analogy = stripCameraNoise(st.analogy);
+          if (Array.isArray(st.shapes)) {
+            st.shapes = st.shapes.map((sh) =>
+              sh && typeof sh === 'object'
+                ? {
+                    ...sh,
+                    ...(typeof sh.label === 'string' ? { label: stripCameraNoise(sh.label) || sh.label } : {}),
+                    ...(typeof sh.sublabel === 'string' ? { sublabel: stripCameraNoise(sh.sublabel) } : {}),
+                    ...(typeof sh.text === 'string' ? { text: stripCameraNoise(sh.text) || sh.text } : {}),
+                  }
+                : sh
+            );
+          }
+          if (typeof st.spokenNarration === 'string' && /kamera|foto\s*mati|mode\s*video/i.test(st.spokenNarration)) {
+            st.spokenNarration = '';
+          }
+        }
+        const stepTextBlob = `${st.title || ''} ${st.analogy || ''} ${st.caption || ''} ${st.leftPanel?.title || ''} ${st.rightPanel?.title || ''} ${st.spokenNarration || ''}`;
+        const usesMisplacedCameraOrRpg =
+          ((st.kind === 'metaphor_scene' || st.kind === 'contrast_scale') &&
+            (st.sceneTheme === 'rpg_stats' ||
+              (!isLegitDoVsToBeContrast &&
+                (st.sceneTheme === 'camera_vs_video' || /\b(?:foto\s*mati|kamera|mode\s*video)\b/i.test(stepTextBlob)))));
+        if (usesMisplacedCameraOrRpg || ((st.kind === 'contrast_scale' || st.kind === 'metaphor_scene') && (tblStepRef?.tableRows?.length || 0) >= 3 && /\bvs\b.*(?:\bvs\b|\bdan\b)|\b(?:tiga|3)\b|much.*many.*a\s+lot|in.*on.*at/i.test(`${userText || ''} ${uiAction.topicTitle || ''}`))) {
+          const tblRows = tblStepRef?.tableRows || [];
+          const hasThreePlusCategories =
+            tblRows.length >= 3 &&
+            new Set(tblRows.map((r) => String(r?.[0] || '').trim().toLowerCase()).filter(Boolean)).size >= 3;
+          if (hasThreePlusCategories) {
+            const palette = ['#0EA5E9', '#10B981', '#8B5CF6', '#F59E0B'];
+            const icons = ['star', 'bolt', 'check', 'target'];
+            const branches = tblRows.slice(0, 4).map((r, bIdx) => ({
+              label: cleanSpokenText(r[0] || `Poin ${bIdx + 1}`).slice(0, 42),
+              sublabel: cleanSpokenText(r[1] || r[2] || '').slice(0, 120),
+              example: cleanSpokenText(r[2] || r[1] || '').slice(0, 120),
+              icon: icons[bIdx % icons.length],
+              color: palette[bIdx % palette.length],
+            }));
+            steps[sIdx] = {
+              ...st,
+              kind: 'mind_map',
+              sceneTheme: undefined,
+              title: stripCameraNoise(st.title) || `Peta Konsep: ${cleanSpokenText(uiAction.topicTitle || 'Topik')}`,
+              metaphorCenterLabel: cleanSpokenText(uiAction.topicTitle || st.title || 'Konsep Inti').slice(0, 28),
+              branches,
+              leftPanel: undefined,
+              rightPanel: undefined,
+              spokenNarration: '',
+            };
+          } else {
+            const [fallbackA, fallbackB] = VALID_TERM_FALLBACKS(uiAction.topicTitle, tblRows);
+            const rawLeftTitle = stripCameraNoise(st.leftPanel?.title || st.termA);
+            const rawRightTitle = stripCameraNoise(st.rightPanel?.title || st.termB);
+            const leftTitle =
+              rawLeftTitle && !/^(?:pola\s+pertama|sisi\s+a|konsep\s*1)$/i.test(rawLeftTitle)
+                ? rawLeftTitle
+                : fallbackA;
+            const rightTitle =
+              rawRightTitle && !/^(?:pola\s+kedua|sisi\s+b|konsep\s*2)$/i.test(rawRightTitle)
+                ? rawRightTitle
+                : fallbackB;
+            const leftDesc =
+              [stripCameraNoise(st.leftPanel?.subtitle || st.descA), st.leftPanel?.example ? `Contoh: ${cleanSpokenText(st.leftPanel.example)}` : '']
+                .filter(Boolean)
+                .join(' — ') ||
+              cleanSpokenText(tblRows[0]?.slice(1).filter(Boolean).join(' • ') || uiAction.patternFormula || '');
+            const rightDesc =
+              [stripCameraNoise(st.rightPanel?.subtitle || st.descB), st.rightPanel?.example ? `Contoh: ${cleanSpokenText(st.rightPanel.example)}` : '']
+                .filter(Boolean)
+                .join(' — ') ||
+              cleanSpokenText(tblRows[1]?.slice(1).filter(Boolean).join(' • ') || uiAction.sampleTarget || '');
+            steps[sIdx] = {
+              ...st,
+              kind: 'contrast_scale',
+              sceneTheme: undefined,
+              title: stripCameraNoise(st.title) || `Perbandingan: ${leftTitle} vs ${rightTitle}`,
+              termA: leftTitle,
+              descA: leftDesc,
+              termB: rightTitle,
+              descB: rightDesc,
+              analogy: stripCameraNoise(st.analogy || st.caption) || cleanSpokenText(uiAction.patternFormula || ''),
+              leftPanel: undefined,
+              rightPanel: undefined,
+              spokenNarration: stripCameraNoise(st.spokenNarration).split(/\s+/).filter(Boolean).length >= 16 &&
+                !/kamera|foto|video/i.test(st.spokenNarration || '')
+                ? st.spokenNarration
+                : '',
+            };
+          }
+        }
+        // Scrub any generic Pola Pertama / Pola Kedua / Sisi A / Sisi B / Visualisasi Lokasi labels emitted directly by Gemini
+        if (st.title && /^(?:visualisasi\s+(?:lokasi|aksi|konsep|perbedaan)|pola\s+(?:pertama|kedua))$/i.test(st.title.trim())) {
+          st.title = `Peta Konsep: ${cleanSpokenText(uiAction.topicTitle || 'Struktur Utama').slice(0, 42)}`;
+        }
+        const [safeA, safeB] = VALID_TERM_FALLBACKS(uiAction.topicTitle, tblStepRef?.tableRows || []);
+        if (st.termA && /^(?:pola\s+pertama|sisi\s+a|konsep\s*1)$/i.test(st.termA.trim())) st.termA = safeA;
+        if (st.termB && /^(?:pola\s+kedua|sisi\s+b|konsep\s*2)$/i.test(st.termB.trim())) st.termB = safeB;
+        if (st.leftPanel?.title && /^(?:pola\s+pertama|sisi\s+a|konsep\s*1)$/i.test(st.leftPanel.title.trim())) {
+          st.leftPanel.title = safeA;
+        }
+        if (st.rightPanel?.title && /^(?:pola\s+kedua|sisi\s+b|konsep\s*2)$/i.test(st.rightPanel.title.trim())) {
+          st.rightPanel.title = safeB;
+        }
+      }
+
+      // Salvage ANY rough_scene missing >= 3 labeled SVG primitives AND missing >= 2 graphNodes so every STEM/Science/Math/Grammar board draws cleanly
+      const truncScene = (str, max = 46) => {
+        const clean = cleanSpokenText(str || '');
+        return clean.length <= max ? clean : clean.slice(0, max - 1).trim();
+      };
+      for (let sIdx = 0; sIdx < steps.length; sIdx++) {
+        const st = steps[sIdx];
+        if (!st || st.kind !== 'rough_scene') continue;
+        const shapes = Array.isArray(st.shapes) ? st.shapes : [];
+        const meaningfulCount = shapes.filter(
+          (sh) => sh && (sh.label || sh.text || sh.op === 'polygon' || sh.op === 'circle' || sh.op === 'rect')
+        ).length;
+        const validGraphNodesCount = Array.isArray(st.graphNodes)
+          ? st.graphNodes.filter((n) => n && (n.label || n.id)).length
+          : 0;
+        if (meaningfulCount >= 3 || validGraphNodesCount >= 2) continue;
+
+        const tblRows = tblStepRef?.tableRows || [];
+        const bullets = noteStepRef?.bullets || [];
+        const palette = [
+          { fill: '#DBEAFE', stroke: '#1D4ED8' },
+          { fill: '#DCFCE7', stroke: '#15803D' },
+          { fill: '#FEF3C7', stroke: '#B45309' },
+        ];
+        const synthesizedShapes = [];
+        const synthesizedGraphNodes = [];
+        const synthesizedGraphEdges = [];
+        if (tblRows.length >= 2) {
+          const cards = tblRows.slice(0, 3);
+          const colW = cards.length === 2 ? 236 : 162;
+          const gap = cards.length === 2 ? 44 : 18;
+          const startX = cards.length === 2 ? 22 : 16;
+          cards.forEach((row, idx) => {
+            const x = startX + idx * (colW + gap);
+            const c = palette[idx % palette.length];
+            const lbl = truncScene(row[0] || `Bagian ${idx + 1}`, 26);
+            const sub = truncScene(row.slice(1).filter(Boolean).join(': '), 52);
+            synthesizedGraphNodes.push({ id: `n${idx + 1}`, label: lbl, sublabel: sub, fill: c.fill, stroke: c.stroke });
+            if (idx > 0) synthesizedGraphEdges.push({ from: `n${idx}`, to: `n${idx + 1}` });
+            synthesizedShapes.push({
+              op: 'rect',
+              x,
+              y: 26,
+              w: colW,
+              h: 112,
+              fill: c.fill,
+              stroke: c.stroke,
+              label: lbl,
+              sublabel: sub,
+            });
+            if (idx < cards.length - 1) {
+              synthesizedShapes.push({
+                op: 'arrow',
+                x1: x + colW + 4,
+                y1: 82,
+                x2: x + colW + gap - 4,
+                y2: 82,
+                stroke: '#1E293B',
+              });
+            }
+          });
+        } else {
+          const flowItems = (bullets.length >= 2 ? bullets : [uiAction.patternFormula || uiAction.topicTitle, uiAction.sampleTarget || uiAction.explanationText])
+            .filter(Boolean)
+            .slice(0, 3);
+          const count = Math.max(2, flowItems.length);
+          const colW = count === 2 ? 236 : 162;
+          const gap = count === 2 ? 44 : 18;
+          const startX = count === 2 ? 22 : 16;
+          for (let idx = 0; idx < count; idx++) {
+            const rawItem = String(flowItems[idx] || uiAction.topicTitle || `Tahap ${idx + 1}`);
+            const parts = rawItem.split(/[:—–-]\s+/);
+            const lbl = truncScene(parts.length > 1 ? parts[0] : `Langkah ${idx + 1}`, 24);
+            const sub = truncScene(parts.length > 1 ? parts.slice(1).join(' ') : rawItem, 52);
+            const x = startX + idx * (colW + gap);
+            const c = palette[idx % palette.length];
+            synthesizedGraphNodes.push({ id: `n${idx + 1}`, label: lbl, sublabel: sub, fill: c.fill, stroke: c.stroke });
+            if (idx > 0) synthesizedGraphEdges.push({ from: `n${idx}`, to: `n${idx + 1}` });
+            synthesizedShapes.push({
+              op: 'rect',
+              x,
+              y: 26,
+              w: colW,
+              h: 112,
+              fill: c.fill,
+              stroke: c.stroke,
+              label: lbl,
+              sublabel: sub,
+            });
+            if (idx < count - 1) {
+              synthesizedShapes.push({
+                op: 'arrow',
+                x1: x + colW + 4,
+                y1: 82,
+                x2: x + colW + gap - 4,
+                y2: 82,
+                stroke: '#1E293B',
+              });
+            }
+          }
+        }
+        const footerFormula = truncScene(uiAction.patternFormula || uiAction.sampleTarget || st.caption || uiAction.topicTitle, 64);
+        if (footerFormula) {
+          synthesizedShapes.push({
+            op: 'text',
+            x: 24,
+            y: 184,
+            text: `Kunci: ${footerFormula}`,
+            stroke: '#0F172A',
+            size: 'sm',
+          });
+        }
+        steps[sIdx] = {
+          ...st,
+          width: 560,
+          height: 225,
+          caption: st.caption || footerFormula || uiAction.topicTitle,
+          shapes: synthesizedShapes,
+          graphDirection: 'LR',
+          graphNodes: synthesizedGraphNodes,
+          graphEdges: synthesizedGraphEdges,
+          spokenNarration: '',
+        };
+      }
+
+      for (const st of steps) {
+        if (!st || typeof st !== 'object') continue;
+        const isFlowOrLinearDiagram =
+          st.kind === 'syntax_flow' ||
+          st.kind === 'formula_blocks' ||
+          st.kind === 'timeline_track' ||
+          st.kind === 'step_chain';
+        if (
+          isFlowOrLinearDiagram &&
+          typeof st.spokenNarration === 'string' &&
+          /(?:di\s+)?sisi\s+(?:kiri|kanan)|panel\s+(?:kiri|kanan)|mode\s+video|\bkamera\b/i.test(st.spokenNarration)
+        ) {
+          // Clear phantom off-card direction so fallback below narrates 1:1 with visible nodes
+          st.spokenNarration = '';
+        }
+        const rawNarClean = String(st.spokenNarration || '').trim();
+        const isVagueDiagramTitleOnly =
+          st.kind !== 'heading' &&
+          st.kind !== 'highlight_callout' &&
+          /^(?:visualisasi|alur|skema|diagram|peta)\s+[\w\s]{1,36}\.?$/i.test(rawNarClean);
+        const curWords = rawNarClean.split(/\s+/).filter(Boolean).length;
+        if (curWords < 11 || isVagueDiagramTitleOnly) {
+          if (st.kind === 'timeline_track' && Array.isArray(st.timelineEvents) && st.timelineEvents.length) {
+            st.spokenNarration = `Ikuti garis waktu dari kiri ke kanan: ${st.timelineEvents.slice(0, 4).map((ev) => `${ev.timeLabel || ''} yaitu ${ev.title || ''}${ev.example ? `, contohnya ${ev.example}` : ''}`).join('. Kemudian ')}.`;
+          } else if (st.kind === 'formula_blocks' && Array.isArray(st.blocks) && st.blocks.length) {
+            st.spokenNarration = `Perhatikan blok polanya dari kiri ke kanan: ${st.blocks.slice(0, 5).map((bl) => `${bl.role || ''} berisi ${bl.token || ''}${bl.note ? ` untuk ${bl.note}` : ''}`).join('. ')}.`;
+          } else if (st.kind === 'mind_map' && Array.isArray(st.branches) && st.branches.length) {
+            st.spokenNarration = `Mari baca cabang konsepnya: ${st.branches.slice(0, 4).map((b) => `${b.label || ''} (${b.sublabel || ''})${b.example ? `, contohnya ${b.example}` : ''}`).join('. ')}.`;
+          } else if (st.kind === 'contrast_scale' && (st.termA || st.termB)) {
+            st.spokenNarration = `Bandingkan sisi kiri, ${st.termA || ''}: ${st.descA || ''}, dengan sisi kanan, ${st.termB || ''}: ${st.descB || ''}. ${st.analogy ? `Kuncinya: ${st.analogy}.` : ''}`.trim();
+          } else if (st.kind === 'syntax_flow' && Array.isArray(st.nodes) && st.nodes.length) {
+            const chain = st.nodes.map((n) => `${n.role || 'Slot'} diisi ${n.word || ''}`.trim()).filter(Boolean).join(', lalu ');
+            const whySuffix = uiAction.trapWrongReason ? ` Alasannya jelas: ${uiAction.trapWrongReason}` : '';
+            st.spokenNarration = `Perhatikan urutan blok kalimat yang benar dari kiri ke kanan: ${chain}.${whySuffix}`.replace(/\.{2,}/g, '.').trim();
+          } else if (st.kind === 'rough_scene' && ((Array.isArray(st.graphNodes) && st.graphNodes.length) || (Array.isArray(st.shapes) && st.shapes.length))) {
+            const nodeLabels = Array.isArray(st.graphNodes) && st.graphNodes.length
+              ? st.graphNodes.map((n) => `${cleanSpokenText(n.label || '')}${n.sublabel ? ` (${cleanSpokenText(n.sublabel)})` : ''}`).filter((x) => x.length >= 2).slice(0, 4)
+              : (st.shapes || []).map((sh) => `${cleanSpokenText(sh.label || sh.text || '')}${sh.sublabel ? ` (${cleanSpokenText(sh.sublabel)})` : ''}`).filter((x) => x.length >= 2).slice(0, 4);
+            if (nodeLabels.length > 0) {
+              st.spokenNarration = `Amati alur diagram ini secara berurutan: mulai dari ${nodeLabels.join(', kemudian ')}.${st.caption ? ` ${cleanSpokenText(st.caption)}.` : ''}`.replace(/\.{2,}/g, '.').trim();
+            }
+          }
+        }
+      }
+      // Final copy hygiene: eliminate hyphenated Verb-ing / V-ing across every learner-visible string
+      const normalizeBoardHyphensDeep = (val, depth = 0) => {
+        if (depth > 8) return val;
+        if (typeof val === 'string') {
+          return val
+            .replace(/\bverb-ing\b/gi, (m) => (m[0] === 'V' ? 'Verb ing' : 'verb ing'))
+            .replace(/\bv-ing\b/gi, (m) => (m[0] === 'V' ? 'V ing' : 'v ing'));
+        }
+        if (Array.isArray(val)) return val.map((x) => normalizeBoardHyphensDeep(x, depth + 1));
+        if (val && typeof val === 'object') {
+          for (const k of Object.keys(val)) {
+            val[k] = normalizeBoardHyphensDeep(val[k], depth + 1);
+          }
+        }
+        return val;
+      };
+      normalizeBoardHyphensDeep(uiAction);
+      aiReply = normalizeBoardHyphensDeep(aiReply);
+      aiReplyTranslation = normalizeBoardHyphensDeep(aiReplyTranslation);
+    } catch (_) {}
+  }
+
+  const partnerTurnPayload = {
     ok: true,
     source: 'ai-realtime',
     model: gen.model,
@@ -2053,6 +3503,88 @@ export async function routeVoicePartnerTurn(ctx) {
     replies,
     uiAction,
     isExplanation: isExplanationTurn || actionType === 'open_learning_popup',
+  };
+  if (
+    isCacheableStandaloneBoard &&
+    boardCacheKey &&
+    uiAction?.actionType === 'open_learning_popup' &&
+    Array.isArray(uiAction?.whiteboardSteps) &&
+    uiAction.whiteboardSteps.length >= 4
+  ) {
+    await writeWorkerCache(ctx, 'board', boardCacheKey, partnerTurnPayload, _boardMemoryCache, 64, 1800);
+  }
+  return {
+    status: 200,
+    cacheHeader: 'MISS',
+    payload: partnerTurnPayload,
+  };
+}
+
+export async function routeVoicePartnerTurn(ctx) {
+  const res = await executePartnerTurnCore(ctx);
+  return jsonResponse(res.payload, {
+    status: res.status || 200,
+    headers: {
+      'cache-control': 'no-store',
+      ...(res.cacheHeader ? { 'x-fiezel-cache': res.cacheHeader } : {}),
+    },
+  });
+}
+
+export async function routeVoiceWhiteboardStream(ctx) {
+  const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
+  const body = readRes?.value || {};
+  const enc = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      let openerSent = false;
+      const emit = (eventName, obj) => {
+        try {
+          const cleanObj = stripDashesDeep(obj);
+          controller.enqueue(enc.encode(`event: ${eventName}\ndata: ${JSON.stringify(cleanObj)}\n\n`));
+        } catch {
+          // Stream closed
+        }
+      };
+      try {
+        const res = await executePartnerTurnCore(ctx, {
+          body,
+          onOpenerReady: (openerData) => {
+            if (openerSent) return;
+            openerSent = true;
+            emit('opener', openerData);
+          },
+        });
+        if (!openerSent && res?.payload?.uiAction?.whiteboardSteps?.[0]) {
+          openerSent = true;
+          emit('opener', {
+            topicTitle: res.payload.uiAction.topicTitle || res.payload.uiAction.whiteboardSteps[0].title || '',
+            patternFormula: res.payload.uiAction.patternFormula || '',
+            headingStep: res.payload.uiAction.whiteboardSteps[0],
+            model: res.payload.model || 'gemini',
+          });
+        }
+        emit('board', res?.payload || { ok: false, fallback: true });
+        controller.enqueue(enc.encode('data: [DONE]\n\n'));
+      } catch (err) {
+        emit('board', { ok: false, fallback: true, reason: err?.message || 'stream_error' });
+        controller.enqueue(enc.encode('data: [DONE]\n\n'));
+      } finally {
+        try {
+          controller.close();
+        } catch {}
+      }
+    },
+  });
+
+  return new Response(stream, {
+    status: 200,
+    headers: {
+      'content-type': 'text/event-stream; charset=utf-8',
+      'cache-control': 'no-cache, no-store',
+      'x-accel-buffering': 'no',
+      'access-control-allow-origin': '*',
+    },
   });
 }
 
@@ -2312,7 +3844,7 @@ const _serverTranslationCache = new Map();
 export async function routeVoiceTranslate(ctx) {
   const clientIp = (ctx.request && (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) || '';
   if (!checkLiveRateLimit(clientIp, 90, 60000)) {
-    return jsonResponse({ ok: false, error: 'rate_limited' }, { status: 429 });
+  return jsonResponse({ ok: false, error: 'rate_limited' }, { status: 429 });
   }
 
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
@@ -2333,7 +3865,7 @@ export async function routeVoiceTranslate(ctx) {
     ) &&
     !/\b(what|where|when|would|should|could|have|been|going)\b/i.test(rawText)
   ) {
-    return jsonResponse({
+  return jsonResponse({
       ok: true,
       translatedText: rawText,
       locale: targetLocale,
@@ -2341,7 +3873,7 @@ export async function routeVoiceTranslate(ctx) {
     });
   }
   if (targetLocale === 'th' && /[\u0E00-\u0E7F]{3,}/.test(rawText)) {
-    return jsonResponse({
+  return jsonResponse({
       ok: true,
       translatedText: rawText,
       locale: targetLocale,
@@ -2353,7 +3885,7 @@ export async function routeVoiceTranslate(ctx) {
   if (_serverTranslationCache.has(cacheKey)) {
     const cachedVal = _serverTranslationCache.get(cacheKey) || '';
     if (/\p{L}{2,}/u.test(cachedVal)) {
-      return jsonResponse({
+  return jsonResponse({
         ok: true,
         translatedText: cachedVal,
         locale: targetLocale,
@@ -2444,7 +3976,7 @@ export async function routeVoiceTranslate(ctx) {
   }
 
   if (!isValidTranslatedCandidate(translatedText)) {
-    return jsonResponse({ ok: false, reason: 'empty_translation' }, { status: 503 });
+  return jsonResponse({ ok: false, reason: 'empty_translation' }, { status: 503 });
   }
 
   if (_serverTranslationCache.size > 500) {
@@ -2472,23 +4004,18 @@ export async function routeVoiceGeminiTts(ctx) {
   const clientIp =
     (ctx.request && (ctx.request.headers.get('cf-connecting-ip') || ctx.request.headers.get('x-forwarded-for'))) || '';
   if (!checkLiveRateLimit(clientIp, 60, 60000)) {
-    return jsonResponse({ ok: false, error: 'rate_limited' }, { status: 429 });
+  return jsonResponse({ ok: false, error: 'rate_limited' }, { status: 429 });
   }
 
   const keys = await resolvePoolKeys(ctx);
   if (!keys.length) {
-    return jsonResponse({ ok: false, error: 'no_keys_configured' }, { status: 503 });
+  return jsonResponse({ ok: false, error: 'no_keys_configured' }, { status: 503 });
   }
 
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
-  const rawCleanText = cleanSpokenText(body.text || '');
-  const cleanText = (() => {
-    if (rawCleanText.length <= 1350) return rawCleanText;
-    const windowSlice = rawCleanText.slice(0, 1350);
-    const lastStop = Math.max(windowSlice.lastIndexOf('. '), windowSlice.lastIndexOf('? '), windowSlice.lastIndexOf('! '));
-    return lastStop >= 420 ? windowSlice.slice(0, lastStop + 1).trim() : windowSlice.trim();
-  })();
+  // Izinkan naskah papan tulis hingga 2800 karakter disintesis menjadi audio studio jernih
+  const cleanText = cleanSpokenText(body.text || '').slice(0, 2800);
   if (!cleanText) {
     return badRequest('empty_text');
   }
@@ -2509,25 +4036,41 @@ export async function routeVoiceGeminiTts(ctx) {
         cleanText
       ));
 
-  // Auto-detect explanation language from the actual text so interface explanations NEVER get spoken with foreign prosody
-  if (/[\u0E00-\u0E7F]{2,}/.test(cleanText)) {
+  // Auto-detect explanation language carefully:
+  // If Latin prose (Indonesian / English / Vietnamese) quotes a few Japanese/Chinese words (e.g. 食, は, 为),
+  // keep the explanation language as Indonesian/English so TTS NEVER switches to Japanese/Mandarin prosody!
+  const latinWordCount = (cleanText.match(/\b[a-zA-Z]{2,}\b/g) || []).length;
+  const kanaCount = (cleanText.match(/[ぁ-んァ-ヶー]/g) || []).length;
+  const hanziCount = (cleanText.match(/[\u4e00-\u9fff]/g) || []).length;
+  const thaiCount = (cleanText.match(/[\u0E00-\u0E7F]/g) || []).length;
+  const cyrillicCount = (cleanText.match(/[\u0400-\u04FF]/g) || []).length;
+  const vietCount = (cleanText.match(/[\u1EA0-\u1EF9]/g) || []).length;
+  const idMarkerCount = (
+    cleanText.match(
+      /\b(adalah|sedangkan|gunakan|perhatikan|kalimat|karena|untuk|dalam|jangan|ketika|pakai|bedanya|artinya|lihat|papan|kata|bahasa|sekarang|kalau|bukan|berarti|contohnya|coba|langkah|pertama|kedua|ketiga|bagian|goresan|baca|dengan|yang|dan|ini|itu|atau|jadi|supaya|agar|harus|boleh|bisa|tidak|belum|sudah|sangat|mudah|seperti|misalnya|bayangkan|pelan|pemahamanmu|pertanyaan)\b/gi
+    ) || []
+  ).length;
+
+  if (thaiCount >= 3 && thaiCount >= latinWordCount) {
     effectiveLang = 'th';
-  } else if (/[\u0400-\u04FF]{3,}/.test(cleanText)) {
+  } else if (cyrillicCount >= 4 && cyrillicCount >= latinWordCount) {
     effectiveLang = 'ru';
-  } else if (/[\u1EA0-\u1EF9]{2,}/.test(cleanText)) {
+  } else if (vietCount >= 2) {
     effectiveLang = 'vi';
   } else if (hasSubstantialLatinForSsw) {
     effectiveLang = 'id';
-  } else if (/[ぁ-んァ-ヶ]/.test(cleanText)) {
+  } else if (kanaCount >= 3 && latinWordCount < 4) {
     effectiveLang = 'ja';
-  } else if (/[\u4e00-\u9fff]/.test(cleanText)) {
+  } else if (hanziCount >= 3 && kanaCount === 0 && latinWordCount < 4) {
     effectiveLang = 'zh';
-  } else if (
-    /\b(adalah|sedangkan|gunakan|perhatikan|kalimat|karena|untuk|dalam|jangan|ketika|pakai|bedanya|artinya|lihat|papan|kata|bahasa|sekarang|kalau|bukan|berarti|contohnya|coba)\b/i.test(
-      cleanText
-    )
-  ) {
+  } else if (idMarkerCount >= 2 || (rawRequestedLang === 'id' && latinWordCount >= 3)) {
     effectiveLang = 'id';
+  } else if (rawRequestedLang === 'en' && latinWordCount >= 3) {
+    effectiveLang = 'en';
+  } else if (kanaCount > 0 && kanaCount > latinWordCount) {
+    effectiveLang = 'ja';
+  } else if (hanziCount > 0 && hanziCount > latinWordCount) {
+    effectiveLang = 'zh';
   }
 
   const validVoices = new Set(['Puck', 'Kore', 'Aoede', 'Charon', 'Fenrir', 'Leda', 'Orus', 'Zephyr']);
@@ -2537,24 +4080,60 @@ export async function routeVoiceGeminiTts(ctx) {
       ? 'Puck'
       : personaId === 'coach_sarah'
       ? 'Kore'
-      : personaId === 'cambridge_examiner'
+      : personaId === 'ssw_sensei' || personaId === 'cambridge_examiner'
       ? 'Charon'
+      : personaId === 'dr_julian' || personaId === 'dr_alistair'
+      ? 'Fenrir'
       : personaId === 'keita'
       ? 'Puck'
+      : personaId === 'xiao_mochi'
+      ? 'Leda'
       : effectiveLang === 'ja' || effectiveLang === 'zh'
       ? 'Aoede'
       : 'Puck';
   const voice = validVoices.has(requestedVoice) ? requestedVoice : defaultVoice;
 
+  const requestedCourseLang = String(body.targetCourseLang || '').toLowerCase().split(/[-_]/)[0].trim();
+  const hasEmbeddedEnglish =
+    ['id', 'th', 'vi', 'ms', 'ko'].includes(effectiveLang) &&
+    /\b[A-Za-z]{2,}\b/.test(cleanText) &&
+    (!requestedCourseLang || requestedCourseLang === 'en');
+  const hasEmbeddedJa =
+    ['id', 'th', 'en', 'zh'].includes(effectiveLang) && /[\u3040-\u30ff]/.test(cleanText);
+  const hasEmbeddedZh =
+    ['id', 'th', 'en'].includes(effectiveLang) &&
+    requestedCourseLang === 'zh' &&
+    /[\u4e00-\u9fff]/.test(cleanText);
+  const targetCourseName =
+    hasEmbeddedJa || requestedCourseLang === 'ja'
+      ? 'Tokyo Japanese'
+      : hasEmbeddedZh || requestedCourseLang === 'zh'
+        ? 'Beijing Mandarin Chinese'
+        : 'English';
+  const hasMixedBilingual = Boolean(
+    hasEmbeddedEnglish ||
+      hasEmbeddedJa ||
+      hasEmbeddedZh ||
+      (['id', 'th', 'vi', 'ms', 'ko'].includes(effectiveLang) && requestedCourseLang)
+  );
+
+  const isAcademicBritishOrPte =
+    personaId === 'dr_julian' ||
+    personaId === 'dr_alistair' ||
+    personaId === 'cambridge_examiner';
   const defaultStyle =
     effectiveLang === 'id'
-      ? 'Warm, engaging, genuinely human Indonesian older-brother mentor speaking lively conversational Bahasa Indonesia with natural Jakarta warmth and melodic inflection, crisp pronunciation when quoting Japanese terms, zero stiff robotic announcer tone'
+      ? personaId === 'ssw_sensei'
+        ? 'Warm, engaging, genuinely human Indonesian older-brother mentor speaking lively conversational Bahasa Indonesia with natural Jakarta warmth and melodic inflection, crisp pronunciation when quoting Japanese terms, zero stiff robotic announcer tone'
+        : isAcademicBritishOrPte
+        ? 'Poised, warm, charismatic mentor like Dr. Julian and Dr. Alistair in a real 1-on-1 coaching session: natural human breath, lively conversational tempo, clear vocal emphasis, and authentic native English pronunciation on English examples'
+        : 'Warm, expressive, genuinely human Indonesian language mentor speaking relaxed 1-on-1 Bahasa Indonesia at a brisk conversational tempo (neither rushed nor dragging), zero stiff narrator tone, and crisp native pronunciation on embedded English or foreign words'
       : effectiveLang === 'th'
-      ? 'Warm, lively, crystal-clear native Thai language mentor speaking natural conversational Thai, friendly Bangkok cadence, crisp pronunciation when quoting foreign example words, zero robotic monotone'
+      ? 'Warm, expressive human Thai mentor speaking natural conversational Thai 1-on-1 with natural breath and crisp native pronunciation on embedded foreign words'
       : effectiveLang === 'vi'
-      ? 'Warm, lively, crystal-clear native Vietnamese language mentor speaking natural conversational Vietnamese, clear friendly cadence, crisp pronunciation when quoting foreign example words, zero robotic monotone'
+      ? 'Warm, patient human Vietnamese teacher speaking natural conversational Vietnamese with natural breath and crisp native pronunciation on embedded foreign words'
       : effectiveLang === 'ru'
-      ? 'Warm, expressive native Russian language mentor speaking natural conversational Russian, clear friendly articulation, crisp pronunciation when quoting foreign example words'
+      ? 'Warm, expressive human Russian language mentor speaking natural conversational Russian with natural breath and clear articulation'
       : effectiveLang === 'ja'
       ? personaId === 'keita'
         ? 'Energetic street-smart Tokyo-Kansai Japanese senpai, witty sarcastic teasing, crisp natural conversational pitch accent, human warmth'
@@ -2563,155 +4142,496 @@ export async function routeVoiceGeminiTts(ctx) {
       ? 'Witty, sassy Beijing Putonghua Mandarin mentor, expressive four-tone prosody, playful sarcastic tough-love warmth, crisp northern rhythm'
       : personaId === 'coach_sarah'
       ? 'Razor-sharp dryly sarcastic British-Transatlantic mentor, crisp articulation, arched-eyebrow wit, composed authority'
-      : personaId === 'cambridge_examiner'
-      ? 'Composed crisp British RP academic speaking examiner, measured cadence'
+      : personaId === 'cambridge_examiner' || personaId === 'dr_alistair' || personaId === 'dr_julian'
+      ? 'Composed, warm, charismatic academic mentor with authentic human breath and refined RP/Australian articulation'
       : 'Charismatic urban street-smart American older-brother mentor, authentic hood cadence and natural AAVE-inflected rhythm, crisp contractions, witty sarcastic swagger, warm tough-love energy';
 
   const isUiLanguageExplanation = ['id', 'th', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(effectiveLang);
+  const incomingStyle = cleanSpokenText(body.stylePrompt || '').slice(0, 220);
   const style = isUiLanguageExplanation
-    ? defaultStyle
-    : cleanSpokenText(body.stylePrompt || defaultStyle).slice(0, 260) || defaultStyle;
+    ? cleanSpokenText(incomingStyle ? `${defaultStyle}. ${incomingStyle}` : defaultStyle).slice(0, 320)
+    : incomingStyle || defaultStyle;
+
+  const bypassTtsCache = Boolean(body.force || body.skipCache || body.noCache);
+  const ttsCacheKey = await sha256Hex(
+    JSON.stringify({
+      v: 'tts-v2',
+      cleanText,
+      voice,
+      effectiveLang,
+      hasMixedBilingual,
+      targetCourseName,
+      style,
+    })
+  );
+  if (!bypassTtsCache) {
+    const cachedTts = await readWorkerCache('tts', ttsCacheKey, _ttsMemoryCache, 24);
+    if (cachedTts && cachedTts.payload && typeof cachedTts.payload.audioBase64 === 'string' && cachedTts.payload.audioBase64.length > 100) {
+      return jsonResponse(
+        {
+          ...cachedTts.payload,
+          cached: true,
+          cacheLayer: cachedTts.cacheLayer,
+        },
+        {
+          headers: {
+            'cache-control': 'no-store',
+            'x-fiezel-cache': 'HIT',
+          },
+        }
+      );
+    }
+  }
 
   const now = Date.now();
-  const ttsCandidates = [];
-  for (let i = 0; i < keys.length; i++) {
-    for (let m = 0; m < GEMINI_TTS_MODELS.length; m++) {
-      const model = GEMINI_TTS_MODELS[m];
-      const idx = (_copilotPoolIndex + i + m) % keys.length;
-      const key = keys[idx];
-      const cooldownKey = `${key}::${model}`;
-      if (now >= (_ttsCooldownMap.get(cooldownKey) || 0)) {
-        ttsCandidates.push({ key, model, cooldownKey });
+  const ttsStride = keys.length % 5 !== 0 ? 5 : keys.length % 3 !== 0 ? 3 : 1;
+  const startTtsIdx = _copilotPoolIndex % keys.length;
+  _copilotPoolIndex = (_copilotPoolIndex + 1) % keys.length;
+
+  // Empirically verified fast TTS endpoints (~3.3-3.6s) without dead 0/18 flash-lite-tts
+  const ttsEndpoints = [
+    { kind: 'interactions', model: 'gemini-3.8-flash-tts' },
+    { kind: 'interactions', model: 'gemini-3.1-flash-tts-preview' },
+    { kind: 'generateContent', model: 'gemini-3.1-flash-tts-preview' },
+  ];
+
+  const ttsQueue = [];
+  for (let round = 0; round < keys.length; round++) {
+    const key = keys[(startTtsIdx + round * ttsStride) % keys.length];
+    for (let eIdx = 0; eIdx < ttsEndpoints.length; eIdx++) {
+      const ep = ttsEndpoints[eIdx];
+      const cooldownKey = `${key}::${ep.kind}:${ep.model}`;
+      const modelCooldownKey = `${key}::${ep.model}`;
+      if (
+        now >= (_ttsCooldownMap.get(cooldownKey) || 0) &&
+        now >= (_ttsCooldownMap.get(modelCooldownKey) || 0)
+      ) {
+        ttsQueue.push({
+          key,
+          kind: ep.kind,
+          model: ep.model,
+          cooldownKey,
+          modelCooldownKey,
+          round,
+          eIdx,
+          isQuotaDead: _quotaDeadKeys.has(key),
+          isVerified: _verifiedHealthyKeys.has(key),
+        });
       }
     }
   }
-  const activeKeyIdx = _copilotPoolIndex % keys.length;
-  _copilotPoolIndex = (_copilotPoolIndex + 1) % keys.length;
+  ttsQueue.sort((a, b) => {
+    if (a.isQuotaDead !== b.isQuotaDead) return Number(a.isQuotaDead) - Number(b.isQuotaDead);
+    if (a.round !== b.round) return a.round - b.round;
+    if (a.isVerified !== b.isVerified) return Number(b.isVerified) - Number(a.isVerified);
+    return a.eIdx - b.eIdx;
+  });
 
   let lastReason = 'tts_failed';
-  const maxAttempts = Math.min(keys.length === 1 ? 3 : 6, ttsCandidates.length);
-
-  for (let a = 0; a < maxAttempts; a++) {
-    const { key, model, cooldownKey } = ttsCandidates[a];
+  const invokeTtsCandidate = async (cand, parentSignal) => {
+    const { key, kind, model, cooldownKey, modelCooldownKey } = cand;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), cleanText.length > 420 ? 12500 : 8500);
+    const onParentAbort = () => controller.abort();
+    if (parentSignal) {
+      if (parentSignal.aborted) {
+        controller.abort();
+      } else {
+        parentSignal.addEventListener('abort', onParentAbort, { once: true });
+      }
+    }
+    const perAttemptTimeoutMs = Math.max(4500, Math.min(7000, 3800 + cleanText.length * 6));
+    const timer = setTimeout(() => controller.abort(), perAttemptTimeoutMs);
     try {
-      const res = await fetch(GOOGLE_INTERACTIONS_API, {
+      const isGc = kind === 'generateContent';
+      const url = isGc
+        ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`
+        : GOOGLE_INTERACTIONS_API;
+      const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-goog-api-key': key,
-          'Api-Revision': '2026-05-20',
-        },
-        body: JSON.stringify({
-          model,
-          store: false,
-          input: [
-            {
-              type: 'user_input',
-              content: [
-                {
-                  type: 'text',
-                  text: cleanText,
-                  annotations: [
-                    {
-                      type: 'speech_metadata',
-                      style,
-                    },
-                  ],
-                },
-              ],
+        headers: isGc
+          ? { 'content-type': 'application/json' }
+          : {
+              'content-type': 'application/json',
+              'x-goog-api-key': key,
+              'Api-Revision': '2026-05-20',
             },
-          ],
-          response_format: { type: 'audio' },
-          generation_config: {
-            speech_config: [{ voice }],
-          },
-        }),
+        body: JSON.stringify(
+          isGc
+            ? {
+                contents: [{ role: 'user', parts: [{ text: cleanText }] }],
+                generationConfig: {
+                  responseModalities: ['AUDIO'],
+                  speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice || 'Puck' } } },
+                },
+              }
+            : {
+                model,
+                store: false,
+                input: [
+                  {
+                    type: 'user_input',
+                    content: [
+                      {
+                        type: 'text',
+                        text: cleanText,
+                        annotations: [{ type: 'speech_metadata', style }],
+                      },
+                    ],
+                  },
+                ],
+                response_format: { type: 'audio' },
+                generation_config: {
+                  speech_config: [{ voice }],
+                },
+              }
+        ),
         signal: controller.signal,
       });
       clearTimeout(timer);
+      parentSignal?.removeEventListener('abort', onParentAbort);
 
       if (res.status === 429) {
-        const until = Date.now() + 45000;
-        _ttsCooldownMap.set(cooldownKey, until);
-        lastReason = `HTTP 429 (${model})`;
-        continue;
+        const errBody = await res.text().catch(() => '');
+        const isHardQuota = /quota\s*exceeded|per\s*day|PerDay|requests\s*per\s*day|too_many_requests|check your plan|billing|limit:\s*0/i.test(
+          errBody
+        );
+        const cdUntil = Date.now() + (isHardQuota ? 600000 : 8000);
+        _ttsCooldownMap.set(cooldownKey, cdUntil);
+        _ttsCooldownMap.set(modelCooldownKey, cdUntil);
+        return { ok: false, reason: `HTTP 429 (${model})` };
       }
       if (!res.ok) {
-        lastReason = `HTTP ${res.status} (${model})`;
-        continue;
+        if (res.status !== 404 && res.status !== 503) {
+          _ttsCooldownMap.set(cooldownKey, Date.now() + 15000);
+        }
+        return { ok: false, reason: `HTTP ${res.status} (${model})` };
       }
 
       const data = await res.json().catch(() => null);
-      let audioBase64 = typeof data?.output_audio?.data === 'string' ? data.output_audio.data : '';
-      let audioMimeType = data?.output_audio?.mime_type || 'audio/wav';
-      if (!audioBase64 && Array.isArray(data?.steps)) {
-        const audioPart = data.steps
-          .filter((s) => s && s.type === 'model_output' && Array.isArray(s.content))
-          .flatMap((s) => s.content)
-          .find((c) => c && c.type === 'audio' && typeof c.data === 'string' && c.data.length > 100);
-        if (audioPart) {
-          audioBase64 = audioPart.data;
-          audioMimeType = audioPart.mime_type || 'audio/wav';
+      let audioBase64 = '';
+      let audioMimeType = 'audio/wav';
+      if (isGc) {
+        const inlinePart = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+        audioBase64 = typeof inlinePart?.data === 'string' ? inlinePart.data : '';
+        audioMimeType = inlinePart?.mimeType || 'audio/pcm';
+      } else {
+        audioBase64 = typeof data?.output_audio?.data === 'string' ? data.output_audio.data : '';
+        audioMimeType = data?.output_audio?.mime_type || 'audio/wav';
+        if (!audioBase64 && Array.isArray(data?.steps)) {
+          const audioPart = data.steps
+            .filter((s) => s && s.type === 'model_output' && Array.isArray(s.content))
+            .flatMap((s) => s.content)
+            .find((c) => c && c.type === 'audio' && typeof c.data === 'string' && c.data.length > 100);
+          if (audioPart) {
+            audioBase64 = audioPart.data;
+            audioMimeType = audioPart.mime_type || 'audio/wav';
+          }
         }
       }
 
       if (audioBase64 && audioBase64.length > 100) {
+        if (isGc || /audio\/(?:l16|pcm)/i.test(audioMimeType)) {
+          const bin = atob(audioBase64);
+          const bytes = new Uint8Array(bin.length);
+          for (let b = 0; b < bin.length; b++) bytes[b] = bin.charCodeAt(b);
+          const wav = encodePcm16ToWavBase64([bytes], 24000);
+          if (wav) {
+            audioBase64 = wav;
+            audioMimeType = 'audio/wav';
+          }
+        }
         _ttsCooldownMap.delete(cooldownKey);
-        return jsonResponse(
-          {
-            ok: true,
-            audioBase64,
-            audioMimeType,
-            voice,
-            model,
-            spokenLang: effectiveLang,
-          },
-          { headers: { 'cache-control': 'no-store' } }
-        );
+        _ttsCooldownMap.delete(modelCooldownKey);
+        _verifiedHealthyKeys.add(key);
+        _quotaDeadKeys.delete(key);
+        return { ok: true, audioBase64, audioMimeType, model };
       }
-      lastReason = 'empty_audio';
+      return { ok: false, reason: 'empty_audio' };
     } catch (err) {
       clearTimeout(timer);
-      lastReason = err?.message || 'tts_fetch_error';
+      parentSignal?.removeEventListener('abort', onParentAbort);
+      return { ok: false, reason: err?.message || 'tts_fetch_error' };
     }
-  }
+  };
 
-  // Server-side Gemini 3.8 Live 24kHz WAV failover so even when REST TTS models hit 429,
-  // /api/voice/gemini-tts returns crisp native WAV audio in ~2s without a 503 round-trip!
-  for (let kOff = 0; kOff < Math.min(5, keys.length); kOff++) {
-    const liveKey = keys[(activeKeyIdx + kOff) % keys.length];
-    const liveWav = await invokeGeminiLiveWavTts({
-      key: liveKey,
-      text: cleanText,
-      voice,
-      style,
-      effectiveLang,
+  // Prioritized healthy keys for fast hedged Gemini 3.8 Live 24kHz WAV synthesis
+  const prioritizedLiveKeys = keys
+    .map((_, idx) => keys[(startTtsIdx + idx * ttsStride) % keys.length])
+    .sort((a, b) => {
+      const deadDiff = Number(_quotaDeadKeys.has(a)) - Number(_quotaDeadKeys.has(b));
+      if (deadDiff !== 0) return deadDiff;
+      return Number(_verifiedHealthyKeys.has(b)) - Number(_verifiedHealthyKeys.has(a));
     });
-    if (liveWav && liveWav.ok && liveWav.audioBase64) {
-      return jsonResponse(
-        {
-          ok: true,
-          audioBase64: liveWav.audioBase64,
-          audioMimeType: 'audio/wav',
+
+  const runLiveWavRace = async () => {
+    const candidates = prioritizedLiveKeys.slice(0, Math.min(6, prioritizedLiveKeys.length));
+    if (!candidates.length) return { ok: false, reason: 'no_live_keys' };
+    return new Promise((resolve) => {
+      let settled = false;
+      let launched = 0;
+      let pending = 0;
+      let hedgeTimer = null;
+      let failReason = lastReason;
+      const raceGuardTimer = setTimeout(() => finish({ ok: false, reason: failReason || 'live_race_timeout' }), 10000);
+
+      const finish = (res) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(raceGuardTimer);
+        if (hedgeTimer) clearTimeout(hedgeTimer);
+        resolve(res);
+      };
+
+      const launchNext = () => {
+        if (settled || launched >= candidates.length) return;
+        const liveKey = candidates[launched++];
+        pending++;
+        invokeGeminiLiveWavTts({
+          key: liveKey,
+          text: cleanText,
           voice,
-          model: 'gemini-3.8-live-tts',
+          style,
+          effectiveLang,
+          hasMixedBilingual,
+          targetCourseName,
+        })
+          .then((liveWav) => {
+            pending--;
+            if (liveWav && liveWav.ok && liveWav.audioBase64) {
+              _verifiedHealthyKeys.add(liveKey);
+              _quotaDeadKeys.delete(liveKey);
+              finish({
+                ok: true,
+                audioBase64: liveWav.audioBase64,
+                audioMimeType: 'audio/wav',
+                model: 'gemini-3.8-live-tts',
+                transcript: liveWav.transcript || '',
+                fidelity: liveWav.fidelity,
+              });
+              return;
+            }
+            failReason = liveWav?.reason || failReason;
+            if (!settled) {
+              if (launched < candidates.length) {
+                launchNext();
+              } else if (pending === 0) {
+                finish({ ok: false, reason: failReason });
+              }
+            }
+          })
+          .catch((err) => {
+            pending--;
+            failReason = err?.message || failReason;
+            if (!settled) {
+              if (launched < candidates.length) {
+                launchNext();
+              } else if (pending === 0) {
+                finish({ ok: false, reason: failReason });
+              }
+            }
+          });
+      };
+
+      launchNext();
+      if (candidates.length > 1) {
+        hedgeTimer = setTimeout(launchNext, 180);
+      }
+    });
+  };
+
+  // Race REST TTS + Gemini 3.8 Live WS (hedged immediately at 50ms)
+  // so exhausted 10/day Free-Tier REST models NEVER delay Chunk 0!
+  if (ttsQueue.length > 0) {
+    const ttsOverallController = new AbortController();
+    const overallTtsTimeoutMs = Math.max(3800, Math.min(5400, 2900 + cleanText.length * 5));
+    const ttsOverallTimer = setTimeout(() => ttsOverallController.abort(), overallTtsTimeoutMs);
+    const maxTtsAttempts = Math.min(keys.length === 1 ? 2 : 3, ttsQueue.length);
+
+    try {
+      const raceWinner = await new Promise((resolve) => {
+        let done = false;
+        let restSettled = false;
+        let liveSettled = false;
+        let liveStarted = false;
+        let liveHedgeTimer = null;
+
+        const finish = (winner) => {
+          if (done) return;
+          done = true;
+          if (liveHedgeTimer) clearTimeout(liveHedgeTimer);
+          ttsOverallController.abort();
+          resolve(winner);
+        };
+
+        const startLive = () => {
+          if (done || liveStarted) return;
+          liveStarted = true;
+          runLiveWavRace()
+            .then((res) => {
+              liveSettled = true;
+              if (res && res.ok && res.audioBase64) {
+                finish(res);
+              } else if (restSettled) {
+                finish({ ok: false, reason: res?.reason || lastReason });
+              }
+            })
+            .catch(() => {
+              liveSettled = true;
+              if (restSettled) finish({ ok: false, reason: lastReason });
+            });
+        };
+
+        liveHedgeTimer = setTimeout(startLive, 50);
+
+        new Promise((resolveRest) => {
+          let settled = false;
+          let pending = 0;
+          let launched = 0;
+          let hedgeTimer = null;
+
+          const finishRest = (val) => {
+            if (settled) return;
+            settled = true;
+            if (hedgeTimer) clearTimeout(hedgeTimer);
+            resolveRest(val);
+          };
+
+          const launch = () => {
+            if (settled || done || launched >= maxTtsAttempts) return;
+            const cand = ttsQueue[launched++];
+            pending++;
+            invokeTtsCandidate(cand, ttsOverallController.signal)
+              .then((res) => {
+                pending--;
+                if (res && res.ok) {
+                  finishRest(res);
+                  return;
+                }
+                lastReason = res?.reason || lastReason;
+                if (!settled && !done) {
+                  startLive();
+                  if (launched < maxTtsAttempts) {
+                    if (hedgeTimer) clearTimeout(hedgeTimer);
+                    launch();
+                    hedgeTimer = setTimeout(launch, 420);
+                  } else if (pending === 0) {
+                    finishRest({ ok: false, reason: lastReason });
+                  }
+                }
+              })
+              .catch((err) => {
+                pending--;
+                lastReason = err?.message || lastReason;
+                startLive();
+                if (!settled && pending === 0 && launched >= maxTtsAttempts) {
+                  finishRest({ ok: false, reason: lastReason });
+                }
+              });
+          };
+
+          ttsOverallController.signal.addEventListener('abort', () => {
+            if (!settled) finishRest({ ok: false, reason: lastReason });
+          });
+
+          launch();
+          hedgeTimer = setTimeout(launch, 420);
+        }).then((restRes) => {
+          restSettled = true;
+          if (restRes && restRes.ok && restRes.audioBase64) {
+            finish(restRes);
+          } else {
+            startLive();
+            if (liveSettled) {
+              finish({ ok: false, reason: restRes?.reason || lastReason });
+            }
+          }
+        });
+      });
+
+      if (raceWinner && raceWinner.ok && raceWinner.audioBase64) {
+        const ttsPayload = {
+          ok: true,
+          audioBase64: raceWinner.audioBase64,
+          audioMimeType: raceWinner.audioMimeType || 'audio/wav',
+          voice,
+          voiceUsed: voice,
+          model: raceWinner.model,
           spokenLang: effectiveLang,
-        },
-        { headers: { 'cache-control': 'no-store' } }
+          transcript: raceWinner.transcript || '',
+          fidelity: raceWinner.fidelity || null,
+        };
+        if (ttsPayload.audioBase64.length > 100 && ttsPayload.fidelity?.ok !== false && !body.noCache) {
+          await writeWorkerCache(ctx, 'tts', ttsCacheKey, ttsPayload, _ttsMemoryCache, 24, 21600);
+        }
+        return jsonResponse(ttsPayload, {
+          headers: { 'cache-control': 'no-store', 'x-fiezel-cache': 'MISS' },
+        });
+      }
+      return jsonResponse(
+        { ok: false, fallback: true, reason: raceWinner?.reason || lastReason },
+        { status: 503 }
       );
+    } finally {
+      clearTimeout(ttsOverallTimer);
     }
-    lastReason = liveWav?.reason || lastReason;
   }
 
-  return jsonResponse({ ok: false, fallback: true, reason: lastReason }, { status: 503 });
+  const directLiveResult = await runLiveWavRace();
+  if (directLiveResult && directLiveResult.ok && directLiveResult.audioBase64) {
+    const directPayload = {
+      ok: true,
+      audioBase64: directLiveResult.audioBase64,
+      audioMimeType: 'audio/wav',
+      voice,
+      voiceUsed: voice,
+      model: directLiveResult.model,
+      spokenLang: effectiveLang,
+      transcript: directLiveResult.transcript || '',
+      fidelity: directLiveResult.fidelity || null,
+    };
+    if (directPayload.audioBase64.length > 100 && directPayload.fidelity?.ok !== false && !body.noCache) {
+      await writeWorkerCache(ctx, 'tts', ttsCacheKey, directPayload, _ttsMemoryCache, 24, 21600);
+    }
+    return jsonResponse(directPayload, {
+      headers: { 'cache-control': 'no-store', 'x-fiezel-cache': 'MISS' },
+    });
+  }
+
+  return jsonResponse({ ok: false, fallback: true, reason: directLiveResult?.reason || lastReason }, { status: 503 });
 }
 
 function encodePcm16ToWavBase64(pcmChunks, sampleRate = 24000) {
   let rawBytes = 0;
   for (let i = 0; i < pcmChunks.length; i++) rawBytes += pcmChunks[i].byteLength;
-  const pcmLen = rawBytes & ~1;
+  const rawEvenLen = rawBytes & ~1;
+  if (rawEvenLen < 200) return '';
+
+  const merged = new Uint8Array(rawEvenLen);
+  let mergeOff = 0;
+  for (let i = 0; i < pcmChunks.length && mergeOff < rawEvenLen; i++) {
+    const chunk = pcmChunks[i];
+    const copyLen = Math.min(chunk.byteLength, rawEvenLen - mergeOff);
+    merged.set(chunk.subarray(0, copyLen), mergeOff);
+    mergeOff += copyLen;
+  }
+
+  // Potong hening panjang berlebih di awal/akhir (>150ms sunyi) agar audio antar potongan terasa rapat dan natural
+  const mergedView = new DataView(merged.buffer);
+  const totalSamples = rawEvenLen >> 1;
+  let firstActive = -1;
+  let lastActive = -1;
+  for (let s = 0; s < totalSamples; s++) {
+    const v = mergedView.getInt16(s * 2, true);
+    if (v > 75 || v < -75) {
+      if (firstActive === -1) firstActive = s;
+      lastActive = s;
+    }
+  }
+  const padSamples = Math.floor(sampleRate * 0.09);
+  const startSample = firstActive >= 0 ? Math.max(0, firstActive - padSamples) : 0;
+  const endSample = lastActive >= 0 ? Math.min(totalSamples, lastActive + padSamples) : totalSamples;
+  const pcmSlice = merged.subarray(startSample * 2, Math.max(startSample * 2 + 200, endSample * 2));
+  const pcmLen = pcmSlice.byteLength & ~1;
   if (pcmLen < 200) return '';
 
   const wav = new Uint8Array(44 + pcmLen);
@@ -2733,14 +4653,7 @@ function encodePcm16ToWavBase64(pcmChunks, sampleRate = 24000) {
   // "data"
   wav[36] = 0x64; wav[37] = 0x61; wav[38] = 0x74; wav[39] = 0x61;
   view.setUint32(40, pcmLen, true);
-
-  let offset = 44;
-  for (let i = 0; i < pcmChunks.length && offset < 44 + pcmLen; i++) {
-    const chunk = pcmChunks[i];
-    const copyLen = Math.min(chunk.byteLength, 44 + pcmLen - offset);
-    wav.set(chunk.subarray(0, copyLen), offset);
-    offset += copyLen;
-  }
+  wav.set(pcmSlice.subarray(0, pcmLen), 44);
 
   let binary = '';
   const step = 0x8000;
@@ -2750,7 +4663,15 @@ function encodePcm16ToWavBase64(pcmChunks, sampleRate = 24000) {
   return btoa(binary);
 }
 
-async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }) {
+async function invokeGeminiLiveWavTts({
+  key,
+  text,
+  voice,
+  style,
+  effectiveLang,
+  hasMixedBilingual = false,
+  targetCourseName = 'English',
+}) {
   if (typeof WebSocket === 'undefined' || !key || !text) {
     return { ok: false, reason: 'ws_tts_unavailable' };
   }
@@ -2774,12 +4695,15 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
     let settled = false;
     let ws = null;
     let idleTimer = null;
+    let sawTurnComplete = false;
     const pcmChunks = [];
+    const transcriptParts = [];
 
     const finalize = (reasonIfEmpty = 'live_tts_empty') => {
       if (settled) return;
       settled = true;
       clearTimeout(overallTimer);
+      clearTimeout(firstAudioTimer);
       if (idleTimer) clearTimeout(idleTimer);
       if (ws) {
         try {
@@ -2792,16 +4716,43 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
           }
         } catch {}
       }
+      const rawPcmBytes = pcmChunks.reduce((sum, c) => sum + (c?.byteLength || c?.length || 0), 0);
+      const trimmedLen = text.trim().length;
+      const minExpectedPcmBytes =
+        trimmedLen > 120
+          ? Math.min(180000, trimmedLen * 620)
+          : trimmedLen > 45
+            ? Math.max(42000, trimmedLen * 560)
+            : trimmedLen > 20
+              ? 16000
+              : 0;
+      if (rawPcmBytes > 0 && rawPcmBytes < minExpectedPcmBytes) {
+        resolve({ ok: false, reason: 'live_tts_truncated' });
+        return;
+      }
       const audioBase64 = pcmChunks.length > 0 ? encodePcm16ToWavBase64(pcmChunks, 24000) : '';
-      if (audioBase64) {
-        _ttsCooldownMap.delete(cooldownKey);
-        resolve({ ok: true, audioBase64 });
+      const minExpectedB64 = trimmedLen > 45 ? 56000 : trimmedLen > 20 ? 22000 : 0;
+      // Script-fidelity guard: Live voice must say the board script word-for-word, otherwise
+      // captions/board writing can never line up with the voice (ad-libs, extra greetings).
+      const spokenTranscript = transcriptParts.join('').replace(/\s+/g, ' ').trim();
+      const fidelity = measureScriptFidelity(text, spokenTranscript);
+      if (audioBase64 && spokenTranscript && fidelity.checked && !fidelity.ok) {
+        resolve({ ok: false, reason: 'live_tts_adlib', transcript: spokenTranscript, fidelity });
+        return;
+      }
+      if (audioBase64 && audioBase64.length >= minExpectedB64) {
+        _copilotCooldownMap.delete(cooldownKey);
+        resolve({ ok: true, audioBase64, transcript: spokenTranscript, fidelity });
       } else {
-        resolve({ ok: false, reason: reasonIfEmpty });
+        resolve({ ok: false, reason: audioBase64 ? 'live_tts_trimmed_too_short' : reasonIfEmpty });
       }
     };
 
-    const overallTimer = setTimeout(() => finalize('live_tts_timeout'), 9000);
+    const liveTimeoutMs = Math.max(5200, Math.min(13000, 4200 + String(text || '').length * 22));
+    const overallTimer = setTimeout(() => finalize('live_tts_timeout'), liveTimeoutMs);
+    const firstAudioTimer = setTimeout(() => {
+      if (pcmChunks.length === 0) finalize('live_tts_no_first_audio');
+    }, 2600);
 
     try {
       ws = new WebSocket(wsUrl);
@@ -2812,6 +4763,7 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
 
     ws.onopen = () => {
       try {
+        const shouldUseLangCodeLock = !hasMixedBilingual && effectiveLang !== 'id';
         const speechLangCode =
           effectiveLang === 'ja'
             ? 'ja-JP'
@@ -2819,23 +4771,35 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
               ? 'cmn-CN'
               : effectiveLang === 'th'
                 ? 'th-TH'
-                : effectiveLang === 'id'
-                  ? 'id-ID'
-                  : 'en-US';
+                : effectiveLang === 'vi'
+                  ? 'vi-VN'
+                  : effectiveLang === 'ru'
+                    ? 'ru-RU'
+                    : effectiveLang === 'id'
+                      ? 'id-ID'
+                      : 'en-US';
+        const speechConfigPayload = {
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: voice || 'Puck' } },
+        };
+        if (shouldUseLangCodeLock) {
+          speechConfigPayload.languageCode = speechLangCode;
+        }
+        const bilingualPrompt = hasMixedBilingual
+          ? ` BILINGUAL MENTOR PRONUNCIATION RULE: Explain smoothly in relaxed, natural ${langLabel}, and whenever any embedded ${targetCourseName} word, phrase, or quoted example appears (such as English phrases inside Indonesian), switch seamlessly to 100% authentic native ${targetCourseName} pronunciation for that word/phrase before flowing right back into natural ${langLabel}. NEVER distort English words with Indonesian phonetics.`
+          : ` Speak strictly in ${langLabel} with 100% authentic native phonology and natural human warmth.`;
         ws.send(
           JSON.stringify({
             setup: {
               model: 'models/gemini-3.8-live',
               generationConfig: {
                 responseModalities: ['AUDIO'],
-                speechConfig: {
-                  voiceConfig: { prebuiltVoiceConfig: { voiceName: voice || 'Puck' } },
-                },
+                speechConfig: speechConfigPayload,
               },
+              outputAudioTranscription: {},
               systemInstruction: {
                 parts: [
                   {
-                    text: `PURE VOICEOVER READER MODE. Vocal style: ${style}. Speak strictly in ${langLabel} (${speechLangCode}) with 100% authentic native phonology and zero foreign/Indonesian accent. Read ONLY the exact text given after READ_EXACTLY:, word for word, with zero added words before or after.`,
+                    text: `You are a genuinely human, warm, charismatic mentor talking 1-on-1 with a student (like Dr. Julian / Dr. Alistair). Vocal style: ${style}.${bilingualPrompt} Deliver ONLY the exact line provided word-for-word at a brisk, lively conversational pace of roughly 165 to 180 words per minute (like an energetic tutor, never slow, never dragging vowels, only short natural breaths at commas and full stops), and add zero extra words before or after.`,
                   },
                 ],
               },
@@ -2862,7 +4826,11 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
                 turns: [
                   {
                     role: 'user',
-                    parts: [{ text: `READ_EXACTLY: ${text}` }],
+                    parts: [
+                      {
+                        text: `Say only this exact line with warm, natural human mentor delivery (add no extra words): "${text}"`,
+                      },
+                    ],
                   },
                 ],
                 turnComplete: true,
@@ -2876,6 +4844,8 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
       }
 
       const parts = msg?.serverContent?.modelTurn?.parts;
+      const outTx = msg?.serverContent?.outputTranscription?.text;
+      if (typeof outTx === 'string' && outTx) transcriptParts.push(outTx);
       if (Array.isArray(parts)) {
         for (const p of parts) {
           const b64 = p?.inlineData?.data;
@@ -2885,15 +4855,21 @@ async function invokeGeminiLiveWavTts({ key, text, voice, style, effectiveLang }
               const bytes = new Uint8Array(bin.length);
               for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
               pcmChunks.push(bytes);
+              clearTimeout(firstAudioTimer);
               if (idleTimer) clearTimeout(idleTimer);
-              idleTimer = setTimeout(() => finalize('live_tts_idle_complete'), 850);
+              // Jeda 1400ms (bukan 240ms) agar jeda nafas alami antar kalimat penjelasan tidak terpotong di tengah trek
+              idleTimer = setTimeout(() => finalize('live_tts_idle_complete'), 1400);
             } catch {}
           }
         }
       }
 
-      if (msg?.serverContent?.turnComplete || (msg?.serverContent?.generationComplete && pcmChunks.length > 0)) {
+      if (msg?.serverContent?.turnComplete) {
+        sawTurnComplete = true;
         finalize('live_tts_turn_complete');
+      } else if (msg?.serverContent?.generationComplete && pcmChunks.length > 0) {
+        if (idleTimer) clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => finalize('live_tts_generation_tail_complete'), 800);
       }
     };
 
@@ -3061,6 +5037,7 @@ export const ROUTES = [
   ['POST', '/api/voice/report-drop', withVoiceIdentity(routeVoiceReportDrop)],
   ['POST', '/api/voice/copilot-assist', aiSpendGate('aiChat', routeVoiceCopilotAssist)],
   ['POST', '/api/voice/partner-turn', aiSpendGate('aiChat', routeVoicePartnerTurn)],
+  ['POST', '/api/voice/whiteboard-stream', aiSpendGate('aiChat', routeVoiceWhiteboardStream)],
   ['POST', '/api/voice/translate', withVoiceIdentity(routeVoiceTranslate, { requireAiFlag: true })],
   ['POST', '/api/voice/gemini-tts', aiSpendGate('aiChat', routeVoiceGeminiTts)],
   ['POST', '/api/voice/verify-speech', withVoiceIdentity(routeVoiceVerifySpeech, { requireAiFlag: true })],

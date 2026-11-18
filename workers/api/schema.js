@@ -83,6 +83,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/voice/report-drop': 2048,
   '/api/voice/copilot-assist': 12288,
   '/api/voice/partner-turn': 12288,
+  '/api/voice/whiteboard-stream': 12288,
   '/api/voice/translate': 4096,
   '/api/voice/gemini-tts': 4096,
   '/api/voice/verify-speech': 65536,

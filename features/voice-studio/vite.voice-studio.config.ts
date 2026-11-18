@@ -36,6 +36,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,
     cssCodeSplit: false,
+    assetsInlineLimit: 0,
     rollupOptions: {
       input: path.resolve(__dirname, 'src/main.tsx'),
       output: {

@@ -397,6 +397,10 @@ const ROUTE_FIXTURES = {
     expectModel: false, needsIdentity: true,
     body: JSON.stringify({ text: 'Hello!', targetLang: 'en', locale: 'id' })
   },
+  'POST /api/voice/whiteboard-stream': {
+    expectModel: false, needsIdentity: true,
+    body: JSON.stringify({ text: 'Hello!', targetLang: 'en', locale: 'id', forcePopup: true })
+  },
   'POST /api/voice/gemini-tts': {
     expectModel: false, needsIdentity: true,
     body: JSON.stringify({ text: 'Hello!', targetLang: 'en' })

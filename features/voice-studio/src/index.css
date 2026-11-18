@@ -261,10 +261,15 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  .fz-status-transition,
+  .fz-aura-pulse,
+  .fz-wave-bar-1,
+  .fz-wave-bar-2,
+  .fz-wave-bar-3,
+  .fz-wave-bar-4 {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
   }
 }
 
@@ -276,15 +281,19 @@ body {
   word-break: break-word;
 }
 
+.fz-ja-display-wrap .fz-ja-ruby-text,
+.fz-zh-display-wrap .fz-zh-ruby-text,
 .fz-ja-ruby-text,
 .fz-zh-ruby-text {
-  line-height: 2.85 !important;
+  line-height: 2.85;
   padding-top: 0.45em;
   display: block;
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
+.fz-ja-display-wrap ruby.fz-ja-ruby,
+.fz-zh-display-wrap ruby.zh-ruby,
 ruby.fz-ja-ruby,
 ruby.zh-ruby {
   ruby-position: over;
@@ -321,6 +330,8 @@ rt.zh-rt {
   margin-bottom: 2px;
 }
 
+.fz-ja-display-wrap .fz-ja-romaji-text,
+.fz-zh-display-wrap .fz-zh-pinyin-text,
 .fz-ja-romaji-text,
 .fz-zh-pinyin-text,
 .fz-en-phonetic-text {
@@ -509,13 +520,322 @@ rt.zh-rt {
   .fz-wb-eq-2,
   .fz-wb-eq-3,
   .fz-wb-eq-4 {
-    animation: none !important;
+    animation: none;
   }
   .fz-wb-check-path {
-    animation: none !important;
-    stroke-dashoffset: 0 !important;
+    animation: none;
+    stroke-dashoffset: 0;
   }
   .fz-wb-press:active:not(:disabled) {
-    transform: none !important;
+    transform: none;
   }
+}
+
+/* ============================================================================
+   SOLVELY-PARITY INTERACTIVE WHITEBOARD SURFACE & MARKER STROKE ANIMATIONS
+   ============================================================================ */
+.fz-solvely-dotgrid {
+  background-color: #FAFBF9;
+  background-image: radial-gradient(#D5DAD3 1.25px, transparent 1.25px);
+  background-size: 22px 22px;
+}
+
+.fz-handwriting-heading {
+  font-family: 'Caveat', 'Kalam', 'Plus Jakarta Sans', cursive, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.fz-handwriting-body {
+  font-family: 'Kalam', 'Caveat', 'Plus Jakarta Sans', 'Noto Sans Thai Looped', cursive, sans-serif;
+  letter-spacing: 0.005em;
+}
+
+@keyframes fzMarkerNibBob {
+  0%, 100% { transform: translate(0px, 0px) rotate(-18deg); }
+  25% { transform: translate(3px, -2px) rotate(-12deg); }
+  50% { transform: translate(5px, 1px) rotate(-21deg); }
+  75% { transform: translate(2px, -1px) rotate(-15deg); }
+}
+
+.fz-marker-nib-bob {
+  animation: fzMarkerNibBob 360ms ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes fzStrokeReveal {
+  from { stroke-dashoffset: var(--fz-path-len, 600); }
+  to { stroke-dashoffset: 0; }
+}
+
+.fz-rough-path-draw {
+  stroke-dasharray: var(--fz-path-len, 600);
+  stroke-dashoffset: var(--fz-path-len, 600);
+  animation: fzStrokeReveal var(--fz-draw-ms, 650ms) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fzHighlightSweep {
+  from { transform: scaleX(0); opacity: 0.55; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+.fz-highlighter-sweep {
+  transform-origin: left center;
+  animation: fzHighlightSweep 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fzWbCardEnter {
+  0% {
+    opacity: 0.35;
+    transform: translate3d(0, 8px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.fz-wb-card-enter {
+  animation: fzWbCardEnter 280ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+
+.fz-wb-spotlight-card {
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    background-color 220ms ease;
+  transform-origin: center top;
+  will-change: transform, opacity;
+}
+
+.fz-wb-spotlight-dimmed {
+  opacity: 0.56;
+  transform: scale(0.992);
+}
+
+.fz-wb-spotlight-active {
+  box-shadow: 0 10px 28px rgba(21, 128, 61, 0.13), 0 0 0 2px rgba(34, 197, 94, 0.45);
+  transform: translate3d(0, -1px, 0);
+}
+
+.fz-wb-spotlight-zoom-in {
+  z-index: 25;
+  box-shadow: 0 16px 38px rgba(21, 128, 61, 0.16), 0 0 0 2px rgba(34, 197, 94, 0.62);
+  transform: translate3d(0, -2px, 0) scale(1.016);
+}
+
+.fz-wb-spotlight-zoom-out {
+  z-index: 18;
+  box-shadow: 0 8px 20px rgba(21, 128, 61, 0.1), 0 0 0 1.5px rgba(134, 239, 172, 0.72);
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+@media (min-width: 768px) {
+  .fz-wb-spotlight-zoom-in {
+    transform: translate3d(0, -2px, 0) scale(1.022);
+  }
+}
+
+.fz-sub-zoom-item {
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    background-color 220ms ease,
+    box-shadow 240ms ease;
+  transform-origin: left center;
+}
+
+.fz-sub-zoom-in {
+  position: relative;
+  z-index: 12;
+  transform: translate3d(0, -1px, 0) scale(1.016);
+  background-color: #ECFDF5;
+  box-shadow: 0 6px 18px rgba(21, 128, 61, 0.12), inset 3.5px 0 0 #16A34A;
+}
+
+.fz-sub-dim {
+  opacity: 0.56;
+  transform: scale(0.992);
+}
+
+@media (min-width: 768px) {
+  .fz-sub-zoom-in {
+    transform: translate3d(0, -1px, 0) scale(1.02);
+  }
+}
+
+.fz-table-row-focus {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease,
+    background-color 180ms ease,
+    box-shadow 200ms ease;
+}
+
+.fz-table-row-focus-active {
+  background-color: #ECFDF5;
+  box-shadow: inset 4px 0 0 #16A34A, 0 8px 22px rgba(21, 128, 61, 0.14);
+}
+
+@keyframes fzStabiloGlow {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(250, 204, 21, 0);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.14);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.52);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 2px 10px rgba(250, 204, 21, 0.38);
+  }
+}
+
+.fz-keyword-highlight {
+  display: inline-block;
+  background: linear-gradient(
+    104deg,
+    rgba(254, 240, 138, 0.28) 0%,
+    rgba(254, 240, 138, 0.92) 12%,
+    rgba(253, 224, 71, 0.96) 88%,
+    rgba(254, 240, 138, 0.35) 100%
+  );
+  color: #142117;
+  font-weight: 800;
+  border-radius: 5px;
+  padding: 0 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 320ms ease;
+}
+
+.fz-keyword-highlight-active {
+  animation: fzStabiloGlow 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.45);
+}
+
+@keyframes fzPenFloatBob {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-3deg);
+  }
+  50% {
+    transform: translate3d(2px, -3px, 0) rotate(3deg);
+  }
+}
+
+.fz-pen-float-badge {
+  animation: fzPenFloatBob 900ms cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes fzZoomLightboxIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fz-zoom-lightbox-card {
+  animation: fzZoomLightboxIn 240ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fz-wb-card-enter,
+  .fz-keyword-highlight,
+  .fz-keyword-highlight-active,
+  .fz-pen-float-badge,
+  .fz-zoom-lightbox-card,
+  .fz-highlighter-sweep,
+  .fz-marker-nib-bob,
+  .fz-rough-path-draw {
+    animation: none;
+  }
+  .fz-wb-spotlight-card,
+  .fz-wb-spotlight-zoom-in,
+  .fz-wb-spotlight-zoom-out,
+  .fz-sub-zoom-item,
+  .fz-sub-zoom-in,
+  .fz-sub-dim,
+  .fz-table-row-focus {
+    transition: none;
+  }
+}
+
+@keyframes fzInkTrace {
+  0% {
+    stroke-dashoffset: 240;
+    opacity: 0.45;
+  }
+  50% {
+    stroke-dashoffset: 60;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -240;
+    opacity: 0.45;
+  }
+}
+
+@keyframes fzAtelierNibFloat {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-3deg);
+  }
+  50% {
+    transform: translate3d(8px, -4px, 0) rotate(2deg);
+  }
+}
+
+@keyframes fzAtelierWaveBar {
+  0%, 100% {
+    transform: scaleY(0.32);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.fz-atelier-ink-path {
+  stroke-dasharray: 120 120;
+  animation: fzInkTrace 2.2s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+}
+
+.fz-atelier-nib {
+  will-change: transform;
+  animation: fzAtelierNibFloat 2.2s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+}
+
+.fz-atelier-wave-bar {
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+  animation: fzAtelierWaveBar 0.96s ease-in-out infinite;
+}
+
+.fz-atelier-wave-bar-2 { animation-delay: 140ms; animation-duration: 0.86s; }
+.fz-atelier-wave-bar-3 { animation-delay: 280ms; animation-duration: 1.04s; }
+.fz-atelier-wave-bar-4 { animation-delay: 420ms; animation-duration: 0.9s; }
+.fz-atelier-wave-bar-5 { animation-delay: 560ms; animation-duration: 1.08s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fz-atelier-ink-path,
+  .fz-atelier-nib,
+  .fz-atelier-wave-bar {
+    animation: none;
+  }
+}
+
+/* Local offline KaTeX math inline alignment inside handwritten cards */
+.fz-katex-inline {
+  font-family: KaTeX_Main, 'Times New Roman', serif;
+  line-height: 1.25;
+}
+.fz-katex-inline .katex {
+  font-size: 1.08em;
+  color: inherit;
+  white-space: nowrap;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   LearnerLocale,
   TargetLang,
@@ -12,22 +12,6 @@ import { playFiezelSfx } from '../lib/sfx';
 import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
 import { resolveUnifiedPronunciation, translateAndPhoneticizeLiveText } from '../lib/liveCallHelper';
 import { containsHanzi } from '../lib/mandarinPhonetics';
-import {
-  PTE_DESCRIBE_IMAGE_BANK,
-  PteDescribeImageQuestion,
-  PteChartCategory,
-  getPteQuestionById,
-  getPteQuestionsByCategory,
-  getRandomPteQuestion,
-} from '../data/pteDescribeImageBank';
-import {
-  PTE_READ_ALOUD_BANK,
-  PteReadAloudQuestion,
-  PteRaCategory,
-  getPteRaQuestionById,
-  getPteRaQuestionsByCategory,
-  getRandomPteRaQuestion,
-} from '../data/pteReadAloudBank';
 import {
   SSW_MASTER_KB,
   SSW_FOCUS_PAGE_EVENT,
@@ -53,6 +37,48 @@ import {
   getStructuredPagePlan,
   getWakaiPapaTacticalInsightsForPage,
 } from '../lib/sswSenseiTeacher';
+import { LiveWhiteboardCanvas, type PenColor } from './LiveWhiteboardCanvas';
+import {
+  buildCohesiveBoardNarrationScript,
+  buildWhiteboardScenePlan,
+  computeProsodicTextWeight,
+  computeProsodicWordWeight,
+  splitTtsIntoSentenceChunks,
+  type SourceMaterialPage,
+  type StudentBoardQuestion,
+  type WhiteboardFollowUpContext,
+} from '../lib/whiteboardDirector';
+import {
+  ensureKanjiStrokesLoaded,
+  resolveKakijunRequestFromPrompt,
+  subscribeKanjiVgUpdates,
+} from '../data/kakijunStrokeBank';
+import { sanitizeSpokenTextForClassicTts, synthesizeFlexibleTts } from '../lib/liveTransport';
+import {
+  alignWordsToSpeech,
+  locateWordAt,
+  processSpeechBuffer,
+  type SpeechAlignment,
+} from '../lib/speechAlignment';
+
+/** Padding aman minimal tanpa WSOLA atau pemotongan kata. */
+const BOARD_SPEECH_PROCESSING = { edgePadSec: 0.08 } as const;
+import {
+  PTE_DESCRIBE_IMAGE_BANK,
+  PteDescribeImageQuestion,
+  PteChartCategory,
+  getPteQuestionById,
+  getPteQuestionsByCategory,
+  getRandomPteQuestion,
+} from '../data/pteDescribeImageBank';
+import {
+  PTE_READ_ALOUD_BANK,
+  PteReadAloudQuestion,
+  PteRaCategory,
+  getPteRaQuestionById,
+  getPteRaQuestionsByCategory,
+  getRandomPteRaQuestion,
+} from '../data/pteReadAloudBank';
 
 export type WorkbenchContextMode =
   | 'confusing_pair'   // Timbangan Konseptual / Dual Contrast Stream
@@ -160,6 +186,11 @@ export interface PteScorecardData {
 
 export interface DynamicBoardState {
   contextMode: WorkbenchContextMode;
+  focusType?: string;
+  title?: string;
+  summary?: string;
+  sampleTarget?: string;
+  sampleMeaningId?: string;
   topicTitle: string;
   patternFormula: string;
   coachExplanation: string;
@@ -172,6 +203,8 @@ export interface DynamicBoardState {
     descB: string;
     colorB: string;
     keyAnalogy: string;
+    labelA?: string;
+    labelB?: string;
   };
   // Data Khusus Syntax Ribbon
   ribbonSegments?: Array<{
@@ -195,7 +228,7 @@ export interface DynamicBoardState {
     toneType: string;
     toneShape: string;
   };
-  // Data Khusus PTE Academic
+  // Data Khusus PTE Academic & Target Standar
   pteChartData?: PteChartData;
   pteReadAloudData?: PteReadAloudData;
   pteScorecardData?: PteScorecardData;
@@ -210,8 +243,9 @@ export interface DynamicBoardState {
     stepNumber: number;
     requestedQuery?: string;
   };
-  // Kuis Interaktif Multi-Mode
-  quiz: DynamicQuizData;
+  // Kuis Interaktif Multi-Mode (opsional bila papan murni visual atau offline)
+  quiz?: DynamicQuizData;
+  isOfflineNotice?: boolean;
 }
 
 export interface InCallLearningWorkbenchProps {
@@ -243,8 +277,13 @@ export interface InCallLearningWorkbenchProps {
   uiAction?: VoiceUiAction;
   topMisconceptionId?: string | null;
   isGeneratingTopic?: boolean;
-  onRequestCustomTopic?: (customQuestion: string, bankTopicId?: string) => void;
+  onRequestCustomTopic?: (
+    customQuestion: string,
+    bankTopicId?: string,
+    followUpContext?: WhiteboardFollowUpContext
+  ) => void;
   onSpeakPreview?: (sampleText: string, spokenLang?: string) => void;
+  onStopMainAudio?: () => void;
   onResumeConversation?: (completedSentence?: string, topicTitle?: string) => void;
   onEvaluatePractice?: (
     writtenText: string,
@@ -261,11 +300,23 @@ export interface InCallLearningWorkbenchProps {
   cefrLevel?: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2' | string;
   latestPteDiagnostic?: PteDiagnosticSpeechResult | null;
   latestReadAloudAlignment?: SpeechAlignmentResult | null;
+  latestAiSubtitle?: string;
   onActiveBoardSync?: (info: {
     contextMode: string;
     topicTitle: string;
     activeTargetText: string;
   }) => void;
+  onWhiteboardBraincoreEvent?: (evt: {
+    kind: 'board_completed' | 'circle_ask_confusion';
+    topicTitle: string;
+    targetText?: string;
+    misconceptionId?: string;
+    isCorrect?: boolean;
+  }) => void;
+}
+
+export interface WhiteboardEvaluationResultMeta {
+  ok?: boolean;
 }
 
 export interface WorkbenchEvaluationMeta {
@@ -286,6 +337,7 @@ export interface WorkbenchPracticeCheckResult {
   nextMasteryPct: number;
 }
 
+/** Helper lokalisasi, tokenisasi CJK & antarmuka papan belajar dari main. */
 function normalizeWbLocale(locale?: LearnerLocale): 'th' | 'ja' | 'zh' | 'id' {
   const code = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
   if (code === 'th' || code === 'ja' || code === 'zh') return code;
@@ -522,11 +574,17 @@ function getWorkbenchUiStrings(locale?: LearnerLocale) {
 /**
  * Memeriksa apakah `uiAction` membawa data dinamis lengkap dari backend Fiezel.
  */
+
+/**
+ * Memeriksa apakah `uiAction` membawa data dinamis lengkap dari backend Fiezel.
+ */
 export function hasRichDynamicAction(action?: VoiceUiAction): boolean {
   if (!action) return false;
   if (action.focusType === 'ssw_tactical_board') return true;
   if (action.focusType === 'read_aloud' || (action.focusType && action.focusType.startsWith('pte_'))) return true;
+  if (Array.isArray(action.whiteboardSteps) && action.whiteboardSteps.length > 0) return true;
   const hasSample = Boolean(action.sampleTarget && action.sampleTarget.trim().length > 3);
+  const hasExplanation = Boolean(action.explanationText && action.explanationText.trim().length > 12);
   const hasFormula = Boolean(
     action.patternFormula &&
     action.patternFormula.trim().length > 3 &&
@@ -537,15 +595,13 @@ export function hasRichDynamicAction(action?: VoiceUiAction): boolean {
     action.rightWord.trim().length > 0 &&
     action.rightWord !== 'bentuk tepat'
   );
-  const hasMisconceptionPair = Boolean(
-    action.misconceptionId || (action.wrongWord && action.rightWord && action.rightWord !== 'bentuk tepat')
-  );
-  return hasSample || hasMisconceptionPair || (hasFormula && hasRightWord);
+  return hasSample || hasExplanation || (hasFormula && hasRightWord);
 }
 
 /**
- * Menganalisis topik dan menurunkan Kanvas Kontekstual + Soal Interaktif Multi-Mode
- * dengan prinsip ANTI-SPOILING (soal kuis selalu menguji transfer pemahaman baru).
+ * Menganalisis payload dinamis dari Gemini Live / Worker dan menurunkan Kanvas Kontekstual
+ * secara 100% real-time (ZERO template statis untuk percakapan umum/materi belajar).
+ * Cabang resmi PTE Academic tetap dipertahankan sesuai bank Pearson.
  */
 export function deriveContextualPedagogicalBoard(
   action: VoiceUiAction | undefined,
@@ -574,9 +630,7 @@ export function deriveContextualPedagogicalBoard(
     return idText;
   };
 
-  // -------------------------------------------------------------
   // 0. KASUS KHUSUS SSW SENSEI: PAPAN TAKTIS HALAMAN, TRIK WAKAI PAPA+, & KUIS SSW
-  // -------------------------------------------------------------
   if (
     action?.focusType === 'ssw_tactical_board' ||
     /papan\s*taktis\s*ssw|ssw_hal_/i.test(lowerQ)
@@ -593,6 +647,7 @@ export function deriveContextualPedagogicalBoard(
 
     return {
       contextMode: 'ssw_tactical_board',
+      focusType: 'ssw_tactical_board',
       topicTitle: `Hal. ${plan.targetPage}: ${pageTitle}`,
       patternFormula: `Hal. ${plan.targetPage} · Langkah ${plan.activeStepIndex} dari ${plan.steps.length}`,
       coachExplanation: '',
@@ -607,318 +662,8 @@ export function deriveContextualPedagogicalBoard(
           { id: 'opt_1', text: 'Siap lanjut memahami materi', isCorrect: true, feedback: 'Bagus!' },
           { id: 'opt_2', text: 'Perlu penjelasan tambahan', isCorrect: false, feedback: 'Pilih langkah aktif di atas.' },
         ],
-        cloze: {
-          prefix: '',
-          blankWord: 'SSW',
-          suffix: '',
-          chips: ['SSW'],
-          feedback: '',
-        },
-        blocks: {
-          correctOrder: ['SSW'],
-          pool: ['SSW'],
-          meaningId: 'SSW Pengolahan Makanan',
-          feedback: '',
-        },
-      },
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 1. KASUS CONFUSING PAIR: DO VS THAT / DID VS DO
-  // -------------------------------------------------------------
-  if (/do\s*(?:vs|versus|sama|dan|ke)\s*that|do\s*that|did\s*(?:vs|versus|sama)\s*do/i.test(lowerQ)) {
-    return {
-      contextMode: 'confusing_pair',
-      topicTitle: 'Penggunaan "Do" vs "That"',
-      patternFormula: 'Do (Melakukan Tindakan) vs That (Merujuk Benda/Hal Tersebut)',
-      coachExplanation:
-        '"Do" adalah kata kerja tindakan (melakukan/mengerjakan), sedangkan "that" adalah kata penunjuk benda atau hal yang sedang dibicarakan. Sering dipadukan menjadi: "I do that" (Saya melakukan hal itu).',
-      pairData: {
-        termA: 'Do / Did',
-        descA: 'Kata kerja perbuatan (Aksi)',
-        colorA: '#FAF2E6',
-        termB: 'That',
-        descB: 'Kata penunjuk hal / objek (Benda)',
-        colorB: '#F4EFEA',
-        keyAnalogy: 'Do = Gerakannya (Aksi). That = Yang ditunjuk (Hal itu).',
-      },
-      quiz: {
-        prompt: 'Lengkapi kalimat: "Kemarin saya sudah menyelesaikan tugas itu."',
-        options: [
-          { id: 'opt_1', text: 'I did that homework yesterday.', isCorrect: true, feedback: 'Tepat sekali! "Did" untuk lampau, "that" merujuk tugas tersebut.' },
-          { id: 'opt_2', text: 'I that did homework yesterday.', isCorrect: false, feedback: 'Urutan terbalik! Kata kerja "did" diletakkan sebelum "that".' },
-          { id: 'opt_3', text: 'I do that yesterday.', isCorrect: false, feedback: 'Karena ada kata "yesterday", gunakan bentuk lampau "did", bukan "do".' },
-        ],
-        cloze: {
-          prefix: 'I really enjoyed the movie, so I will',
-          blankWord: 'do',
-          suffix: 'that again next weekend.',
-          chips: ['do', 'that', 'did'],
-          feedback: 'Keren! Setelah "will" gunakan kata kerja dasar "do", lalu "that" sebagai objek.',
-        },
-        blocks: {
-          correctOrder: ['Can', 'you', 'do', 'that', 'for', 'me?'],
-          pool: ['that', 'do', 'Can', 'for', 'you', 'me?', 'did'],
-          meaningId: 'Bisakah kamu melakukan hal itu untukku?',
-          feedback: 'Susunan sempurna! "Can you do that for me?"',
-        },
-      },
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 2. KASUS CONFUSING PAIR: HARD VS HARDLY
-  // -------------------------------------------------------------
-  if (/hard/i.test(lowerQ)) {
-    return {
-      contextMode: 'confusing_pair',
-      topicTitle: 'Hard versus Hardly',
-      patternFormula: 'Work hard (giat/keras) vs Hardly work (hampir tidak)',
-      coachExplanation:
-        'Kata "hard" berarti giat atau bersungguh-sungguh. Sebaliknya, "hardly" bermakna hampir tidak sama sekali. Hati-hati, arti keduanya bertolak belakang 180 derajat!',
-      pairData: {
-        termA: 'Hard',
-        descA: 'Giat, keras, sungguh-sungguh',
-        colorA: '#FEF3C7',
-        termB: 'Hardly',
-        descB: 'Hampir tidak pernah sama sekali',
-        colorB: '#FDE8E4',
-        keyAnalogy: 'He works hard (Rajin banget) ≠ He hardly works (Pemalas, gak kerja).',
-      },
-      quiz: {
-        prompt: seedVariant % 2 === 0
-          ? 'Pilih kata yang tepat: "Chef itu bekerja ______ untuk menyiapkan hidangan pesta."'
-          : 'Pilih kata yang tepat: "Rian begitu kelelahan sampai dia ______ bisa membuka matanya."',
-        options: seedVariant % 2 === 0
-          ? [
-              { id: 'opt_1', text: 'The dedicated chef worked hard all evening.', isCorrect: true, feedback: 'Benar! "Worked hard" artinya bekerja giat dan bersungguh-sungguh.' },
-              { id: 'opt_2', text: 'The dedicated chef worked hardly all evening.', isCorrect: false, feedback: 'Terkecoh! "Hardly" artinya hampir tidak bekerja sama sekali.' },
-              { id: 'opt_3', text: 'The dedicated chef hardly working all evening.', isCorrect: false, feedback: 'Bentuk tata bahasa kurang tepat.' },
-            ]
-          : [
-              { id: 'opt_1', text: 'Rian was so exhausted that he could hardly open his eyes.', isCorrect: true, feedback: 'Tepat sekali! "Hardly" diletakkan sebelum kata kerja untuk arti "hampir tidak bisa".' },
-              { id: 'opt_2', text: 'Rian was so exhausted that he could hard open his eyes.', isCorrect: false, feedback: 'Gunakan "hardly" untuk arti hampir tidak bisa.' },
-              { id: 'opt_3', text: 'Rian was so exhausted that he hard opened his eyes.', isCorrect: false, feedback: 'Kata "hard" bukan bermakna hampir tidak.' },
-            ],
-        cloze: {
-          prefix: 'Athletes must train',
-          blankWord: 'hard',
-          suffix: 'every morning to win the trophy.',
-          chips: ['hard', 'hardly', 'hardness'],
-          feedback: 'Mantap! Untuk menyatakan usaha keras, selalu gunakan "hard".',
-        },
-        blocks: {
-          correctOrder: ['He', 'studied', 'hard', 'for', 'the', 'final', 'exam.'],
-          pool: ['hard', 'studied', 'He', 'for', 'the', 'hardly', 'final', 'exam.'],
-          meaningId: 'Dia belajar giat untuk ujian akhir.',
-          feedback: 'Susunan kalimat tepat sekali!',
-        },
-      },
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 3. KASUS CONFUSING PAIR: BORROW VS LEND
-  // -------------------------------------------------------------
-  if (/borrow|lend|pinjam/i.test(lowerQ)) {
-    return {
-      contextMode: 'confusing_pair',
-      topicTitle: 'Borrow versus Lend',
-      patternFormula: 'Borrow from (Meminjam dari orang) vs Lend to (Meminjamkan ke orang)',
-      coachExplanation:
-        '"Borrow" artinya meminjam (kita yang menerima barang dari teman). "Lend" artinya meminjamkan (kita yang memberikan barang ke orang lain). Perhatikan arah barangnya!',
-      pairData: {
-        termA: 'Borrow (← Menerima)',
-        descA: 'Kita meminjam dari orang lain',
-        colorA: '#E6F4EA',
-        termB: 'Lend (→ Memberi)',
-        descB: 'Kita meminjamkan ke orang lain',
-        colorB: '#FEF3C7',
-        keyAnalogy: 'Barang masuk ke kita = Borrow. Barang keluar dari kita = Lend.',
-      },
-      quiz: {
-        prompt: 'Pilih kalimat yang sopan saat kamu ingin meminjam payung temanmu:',
-        options: [
-          { id: 'opt_1', text: 'Could I please borrow your umbrella for an hour?', isCorrect: true, feedback: 'Tepat! Kita yang meminjam, jadi gunakan "borrow".' },
-          { id: 'opt_2', text: 'Could I please lend your umbrella for an hour?', isCorrect: false, feedback: 'Salah arah! "Lend" artinya kamu meminjamkan payung temanmu ke orang lain.' },
-          { id: 'opt_3', text: 'Could you please borrow me your umbrella?', isCorrect: false, feedback: 'Jika subjeknya "you", gunakan "lend me", bukan "borrow me".' },
-        ],
-        cloze: {
-          prefix: 'My brother agreed to',
-          blankWord: 'lend',
-          suffix: 'me his gaming laptop tonight.',
-          chips: ['lend', 'borrow', 'lending'],
-          feedback: 'Benar! Kakak memberikan pinjaman ke saya, jadi gunakan "lend me".',
-        },
-        blocks: {
-          correctOrder: ['May', 'I', 'borrow', 'your', 'dictionary', 'please?'],
-          pool: ['borrow', 'May', 'I', 'lend', 'your', 'please?', 'dictionary'],
-          meaningId: 'Bolehkah saya meminjam kamusmu?',
-          feedback: 'Luar biasa! Kalimat tersusun dengan sangat sopan.',
-        },
-      },
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 4. KASUS TATA BAHASA SINTAKSIS: VERB ING / PRESENT CONTINUOUS
-  // -------------------------------------------------------------
-  if (/verb.*ing|continuous|sedang|right now|studying/i.test(lowerQ)) {
-    return {
-      contextMode: 'syntax_ribbon',
-      topicTitle: 'Pola Waktu Sedang Berlangsung (Verb-ing)',
-      patternFormula: 'Subjek + [am / is / are] + Kata Kerja (Verb-ing)',
-      coachExplanation:
-        'Gunakan kata bantu to be (am/is/are) diikuti kata kerja berakhiran -ing saat menyatakan kegiatan yang sedang berlangsung detik ini juga. Jangan pernah meninggalkan to be!',
-      ribbonSegments: [
-        { role: 'Subjek', word: 'The engineers', tagColor: '#FEF3C7' },
-        { role: 'Kata Bantu', word: 'are', tagColor: '#E6F4EA' },
-        { role: 'Kata Kerja (-ing)', word: 'testing', tagColor: '#FDE8E4' },
-        { role: 'Keterangan', word: 'the new system', tagColor: '#F1F0F7' },
-      ],
-      quiz: {
-        prompt: 'Pilih kalimat yang BENAR saat para siswa sedang membaca buku di perpustakaan saat ini:',
-        options: [
-          { id: 'opt_1', text: 'The students are reading books in the library right now.', isCorrect: true, feedback: 'Tepat sekali! "Are reading" menyatakan kegiatan yang sedang berlangsung.' },
-          { id: 'opt_2', text: 'The students are read books in the library right now.', isCorrect: false, feedback: 'Setelah "are", kata kerja wajib memakai bentuk -ing (reading).' },
-          { id: 'opt_3', text: 'The students reading books in the library right now.', isCorrect: false, feedback: 'Jangan hilangkan kata bantu to be "are"!' },
-        ],
-        cloze: {
-          prefix: 'Listen! The choir is',
-          blankWord: 'singing',
-          suffix: 'a beautiful song on stage.',
-          chips: ['singing', 'sing', 'sang'],
-          feedback: 'Sempurna! Setelah "is", kata kerja bernyanyi menjadi "singing".',
-        },
-        blocks: {
-          correctOrder: ['We', 'are', 'learning', 'English', 'together', 'today.'],
-          pool: ['learning', 'are', 'We', 'learn', 'English', 'together', 'today.'],
-          meaningId: 'Kita sedang belajar bahasa Inggris bersama hari ini.',
-          feedback: 'Rangkaian kalimat sangat alami dan tepat!',
-        },
-      },
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 4-Z. KASUS JEPANG: PARTIKEL は (WA) VS が (GA)
-  // -------------------------------------------------------------
-  if (
-    /wa\s*(?:vs|sama|dan|dengan)\s*ga|partikel\s*(?:wa|ga)\b|助詞.*は.*が|は\s*(?:vs|と|dan)\s*が|は.*が/i.test(
-      lowerQ
-    )
-  ) {
-    return {
-      contextMode: 'confusing_pair',
-      topicTitle: lt('Partikel は (Wa) vs が (Ga)', 'คำช่วย は (Wa) vs が (Ga)', '助詞「は」と「が」の違い', '助词 は (Wa) 与 が (Ga) 对比'),
-      patternFormula: lt(
-        'Topik + は (Fokus ke predikat) vs Subjek + が (Menegaskan SIAPA/APA)',
-        'หัวข้อ + は (เน้นส่วนขยายด้านหลัง) vs ประธาน + が (เน้นว่าใคร/อะไร)'
-      ),
-      coachExplanation: lt(
-        'Partikel は (dibaca "wa") memperkenalkan TOPIK besar kalimat ("kalau soal X, gimana?"). Sedangkan が (ga) mengunci SUBJEK spesifik atau menjawab pertanyaan "siapa/apa yang melakukan?"',
-        'คำช่วย は (อ่านว่า wa) ใช้เปิดหัวข้อใหญ่ของประโยค ส่วน が (ga) ใช้ชี้เฉพาะตัวประธานหรือใช้ตอบคำถามว่า "ใคร/อะไร"'
-      ),
-      pairData: {
-        termA: '私は学生です (Watashi wa gakusei desu)',
-        descA: lt(
-          'Topik Umum: Membahas predikat setelah は ("Soal saya, saya mahasiswa").',
-          'หัวข้อทั่วไป: เน้นข้อมูลหลัง は ("เรื่องฉัน ฉันเป็นนักศึกษา")'
-        ),
-        colorA: '#FEF3C7',
-        termB: '私がしました (Watashi ga shimashita)',
-        descB: lt(
-          'Penekanan Subjek: Menegaskan pelaku tepat pada kata sebelum が ("SAYALAH yang melakukannya").',
-          'ชี้เฉพาะประธาน: เน้นตัวผู้กระทำหน้า が ("ฉันนี่แหละที่เป็นคนทำ")'
-        ),
-        colorB: '#E6F4EA',
-        keyAnalogy: lt(
-          'Trik cepat: Setelah kata tanya (誰/どれ/何), WAJIB pakai が, jangan pernah pakai は!',
-          'จำง่ายๆ: หลังคำถามเช่น 誰 (ใคร) หรือ 何 (อะไร) ต้องใช้ が เสมอ ห้ามใช้ は!'
-        ),
-      },
-      quiz: {
-        prompt: lt(
-          'Saat menjawab pertanyaan "Siapa yang membuat ini?", kalimat manakah yang tepat?',
-          'เมื่อตอบคำถามว่า "ใครเป็นคนทำสิ่งนี้?" ประโยคใดถูกต้อง?'
-        ),
-        options: [
-          { id: 'opt_1', text: '私が作りました。', isCorrect: true, feedback: ui.correctFeedback },
-          {
-            id: 'opt_2',
-            text: '誰は作りましたか？',
-            isCorrect: false,
-            feedback: lt('Salah! Kata tanya seperti 誰 (siapa) wajib memakai が, bukan は.', 'ผิด! คำถามอย่าง 誰 ต้องตามด้วย が เสมอ'),
-          },
-          {
-            id: 'opt_3',
-            text: '桜は雨がきれいです。',
-            isCorrect: false,
-            feedback: lt('Sifat/keadaan subjek langsung seperti bunga sakura lebih alami memakai が (桜がきれい).', 'ลักษณะเฉพาะของสิ่งนั้นๆ มักใช้ が (桜がきれい)'),
-          },
-        ],
-        cloze: {
-          prefix: '誰',
-          blankWord: 'が',
-          suffix: '来ますか？',
-          chips: ['が', 'は', 'を'],
-          feedback: ui.clozeCorrectFeedback,
-        },
-        blocks: {
-          correctOrder: ['桜', 'が', 'きれいです。'],
-          pool: ['は', 'きれいです。', '桜', 'が'],
-          meaningId: lt('Susun kata menjadi: "Bunga sakura itu indah."', 'เรียงคำเป็น: "ดอกซากุระสวยมาก"'),
-          feedback: ui.blocksCorrectFeedback,
-        },
-      },
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 5. KASUS JEPANG: PARTIKEL に (NI) VS で (DE)
-  // -------------------------------------------------------------
-  if (/ni\s*(?:vs|sama|dan)\s*de|partikel\s*ni|partikel\s*de|に.*で/i.test(lowerQ)) {
-    return {
-      contextMode: 'confusing_pair',
-      topicTitle: lt('Partikel に (Ni) vs で (De)', 'คำช่วย に (Ni) vs で (De)', '助詞「に」と「で」の使い分け', '助词 に (Ni) 与 で (De) 对比'),
-      patternFormula: lt(
-        'Tempat + に (Tujuan Gerakan / Keberadaan) vs Tempat + で (Lokasi Aktivitas)',
-        'สถานที่ + に (จุดหมายการเดินทาง / การมีอยู่) vs สถานที่ + で (สถานที่ทำกิจกรรม)'
-      ),
-      coachExplanation: lt(
-        'Partikel に (ni) dipakai untuk titik tujuan gerakan (pergi ke...) atau tempat diamnya sesuatu (ada di...). Sedangkan partikel で (de) dipakai untuk tempat berlangsungnya suatu kegiatan aktif (belajar di..., makan di...).',
-        'คำช่วย に (ni) ใช้บอกจุดหมายปลายทางที่ไปถึง (ไปที่...) หรือตำแหน่งที่มีสิ่งของ/คนอยู่ ส่วนคำช่วย で (de) ใช้บอกสถานที่ที่เกิดการกระทำหรือกิจกรรม (เรียนที่..., กินที่...)'
-      ),
-      pairData: {
-        termA: lt('Tempat + に (Ni)', 'สถานที่ + に (Ni)'),
-        descA: lt('Titik tujuan (pergi ke) / Posisi diam', 'จุดหมายปลายทาง (ไปที่) / ตำแหน่งคงที่'),
-        colorA: '#FAF2E6',
-        termB: lt('Tempat + で (De)', 'สถานที่ + で (De)'),
-        descB: lt('Tempat melakukan aktivitas / aksi', 'สถานที่ลงมือทำกิจกรรม'),
-        colorB: '#E6F4EA',
-        keyAnalogy: lt('Tujuan pergi = に (Ni). Tempat beraksi = で (De).', 'จุดหมายที่จะไป = に (Ni). ที่ที่ทำกิจกรรม = で (De).'),
-      },
-      quiz: {
-        prompt: lt('Lengkapi kalimat: "Saya makan ramen di restoran."', 'เติมคำช่วยในประโยค: "ฉันกินราเมงที่ร้านอาหาร"'),
-        options: [
-          { id: 'opt_1', text: 'レストランで ラーメンを 食べます。', isCorrect: true, feedback: lt('Tepat sekali! Makan ramen adalah aktivitas, jadi gunakan partikel で (de).', 'ถูกต้อง! การกินราเมงคือกิจกรรม จึงต้องใช้คำช่วย で (de)') },
-          { id: 'opt_2', text: 'レストランに ラーメンを 食べます。', isCorrect: false, feedback: lt('Kurang pas. Partikel に untuk tujuan arah, bukan tempat beraktivitas.', 'ยังไม่ตรง คำช่วย に ใช้กับจุดหมาย ไม่ใช่สถานที่ทำกิจกรรม') },
-          { id: 'opt_3', text: 'レストランを ラーメンに 食べます。', isCorrect: false, feedback: lt('Partikel terbalik.', 'คำช่วยสลับตำแหน่งกันอยู่') },
-        ],
-        cloze: {
-          prefix: 'あした ともだちと としょかん',
-          blankWord: 'で',
-          suffix: 'べんきょうします。',
-          chips: ['で', 'に', 'を'],
-          feedback: lt('Benar! Belajar (べんきょうします) adalah aktivitas, jadi gunakan で.', 'ถูกต้อง! การเรียน (べんきょうします) เป็นกิจกรรม ใช้ で'),
-        },
-        blocks: {
-          correctOrder: ['わたしは', 'にちようびに', 'とうきょうに', 'いきます。'],
-          pool: ['いきます。', 'わたしは', 'とうきょうに', 'とうきょうで', 'にちようびに'],
-          meaningId: lt('Saya pergi ke Tokyo pada hari Minggu.', 'ฉันไปโตเกียวในวันอาทิตย์'),
-          feedback: lt('Susunan kalimat bahasa Jepang sudah sangat tepat!', 'เรียงประโยคภาษาญี่ปุ่นได้ถูกต้องและเป็นธรรมชาติมาก!'),
-        },
+        cloze: { prefix: '', blankWord: 'SSW', suffix: '', chips: ['SSW'], feedback: '' },
+        blocks: { correctOrder: ['SSW'], pool: ['SSW'], meaningId: 'SSW Pengolahan Makanan', feedback: '' },
       },
     };
   }
@@ -928,10 +673,9 @@ export function deriveContextualPedagogicalBoard(
   // -------------------------------------------------------------
   if (
     action?.focusType === 'pte_describe_image' ||
-    (action?.focusType !== 'pte_read_aloud' &&
-      (lowerQ.includes('renewable') ||
-        lowerQ.includes('describe image') ||
-        /describe.*image|pte.*di|pte.*chart|pte.*grafik|bar chart|line graph|pie chart|process flow|map|table/i.test(lowerQ)))
+    lowerQ.includes('renewable') ||
+    lowerQ.includes('describe image') ||
+    /describe.*image|pte.*di|pte.*chart|pte.*grafik|bar chart|line graph|pie chart|process flow|map|table/i.test(lowerQ)
   ) {
     const isLine = /line|garis|tren|growth|inflation|co2/i.test(lowerQ);
     const isPie = /pie|lingkaran|persen|share|smartphone|waste/i.test(lowerQ);
@@ -1295,6 +1039,7 @@ export function deriveContextualPedagogicalBoard(
   }
 
   // -------------------------------------------------------------
+
   // 5-C. KASUS PTE ACADEMIC: SCORECARD (PEARSON EVALUATION)
   // -------------------------------------------------------------
   if (
@@ -1400,868 +1145,127 @@ export function deriveContextualPedagogicalBoard(
   }
 
   // -------------------------------------------------------------
-  // 5-D. KASUS BAHASA JEPANG ALAMI: TE-KEI / PAST / PARTIKEL WO-NI / MASU-DESHITA
+  // 6. KUMPULAN HASIL REAL-TIME AI (ZERO TEMPLATE STATIS)
   // -------------------------------------------------------------
-  if (
-    effectiveLang === 'ja' &&
-    (/て形|過去形|tekei|kakokei|ますでした|ました|コーヒー|に.*を|partikel.*o|partikel.*wo/i.test(combinedHintText) ||
-      action?.misconceptionId === 'JA_PARTICLE_NI_AND_MASU_DESHITA')
-  ) {
-    const isTePast = /て形|過去形|tekei|kakokei|tsukaiwake|使い分け/i.test(combinedHintText);
-    if (isTePast) {
-      return {
-        contextMode: 'confusing_pair',
-        topicTitle: query || lt('Pola て形 (Sambung/Minta) vs 過去形 (Lampau)', 'รูป て形 (เชื่อม/ขอร้อง) vs 過去形 (อดีต)', 'て形と過去形の使い分け', 'て形与过去式用法对比'),
-        patternFormula: lt(
-          'V-て (Sambung aksi / Meminta) vs V-た / ました (Sudah selesai di masa lalu)',
-          'V-て (เชื่อมกริยา/ขอร้อง) vs V-た / ました (ทำเสร็จแล้วในอดีต)',
-          'V-て（つなぐ・依頼） vs V-た／ました（過去の完了）',
-          'V-て（连接/请求） vs V-た／ました（过去完成）'
-        ),
-        coachExplanation: lt(
-          'Bentuk て形 (te-kei) dipakai untuk menyambung dua aksi berurutan atau meminta dengan sopan (~てください). Bentuk 過去形 (kakokei: ~た / ~ました) menyatakan kejadian yang sudah selesai.',
-          'รูป て形 (te-kei) ใช้เชื่อมกริยาต่อเนื่องหรือขอร้องอย่างสุภาพ (~てください) ส่วนรูป 過去形 (~た / ~ました) ใช้บอกสิ่งที่ทำเสร็จสิ้นแล้วในอดีต',
-          '「て形」は動作をつないだりお願いするとき（〜てください）に使い、「過去形（〜た／〜ました）」は完了した出来事を表します。',
-          '「て形」用于连接动作或礼貌请求（〜てください），而「过去式（〜た／〜ました）」表示已经完成的动作。'
-        ),
-        pairData: {
-          termA: 'コーヒーを 買って 帰ります',
-          descA: lt('て形: Beli kopi dulu, lalu pulang (aksi berurutan)', 'て形: ซื้อกาแฟแล้วกลับ (เชื่อมกริยาต่อเนื่อง)'),
-          colorA: '#FEF3C7',
-          termB: 'きのう カフェで コーヒーを 飲みました',
-          descB: lt('過去形 (~ました): Sudah minum kopi kemarin (lampau)', '過去形 (~ました): ดื่มกาแฟแล้วเมื่อวาน (อดีต)'),
-          colorB: '#E6F4EA',
-          keyAnalogy: lt(
-            'Sambung / minta = ~て。Sudah selesai = ~ました / ~た。',
-            'เชื่อมกริยา/ขอร้อง = ~て。ทำเสร็จแล้ว = ~ました / ~た。'
-          ),
-        },
-        quiz: {
-          prompt: lt(
-            'Pilih kalimat yang benar untuk "Kemarin saya minum kopi di kafe."',
-            'เลือกประโยคที่ถูกต้องสำหรับ "เมื่อวานฉันดื่มกาแฟที่คาเฟ่"'
-          ),
-          options: [
-            { id: 'opt_1', text: 'きのう カフェで コーヒーを 飲みました。', isCorrect: true, feedback: ui.correctFeedback },
-            { id: 'opt_2', text: 'きのう カフェに コーヒーを 飲みますでした。', isCorrect: false, feedback: lt('Hindari bentuk tidak alami "飲みますでした" dan pakai で untuk tempat aktivitas.', 'หลีกเลี่ยงรูป "飲みますでした" และใช้ で สำหรับสถานที่ทำกิจกรรม') },
-            { id: 'opt_3', text: 'きのう カフェで コーヒーを 飲んで いますでした。', isCorrect: false, feedback: lt('Bentuk lampau sopan dari ~ます adalah ~ました, bukan ~ますでした.', 'รูปอดีตสุภาพของ ~ます คือ ~ました ไม่ใช่ ~ますでした') },
-          ],
-          cloze: {
-            prefix: 'ちょっと',
-            blankWord: 'まって',
-            suffix: 'ください。',
-            chips: ['まって', 'まちました', 'まつの'],
-            feedback: ui.clozeCorrectFeedback,
-          },
-          blocks: {
-            correctOrder: ['カフェで', 'コーヒーを', '買って', '帰りました。'],
-            pool: ['帰りました。', 'カフェで', '買って', '買うでした', 'コーヒーを'],
-            meaningId: lt('Saya membeli kopi di kafe lalu pulang.', 'ฉันซื้อกาแฟที่คาเฟ่แล้วกลับบ้าน'),
-            feedback: ui.blocksCorrectFeedback,
-          },
-        },
-      };
-    }
+  const cleanTitle = (action?.topicTitle || query || 'Papan Belajar').trim();
+  const cleanFormula = (action?.patternFormula || '').trim();
+  const cleanExplanation = (action?.coachSpokenScript || action?.explanationText || '').trim();
 
-    return {
-      contextMode: 'confusing_pair',
-      topicTitle: query || lt('Pola Objek を & Lampau ～ました', 'คำช่วยกรรม を และรูปอดีต ～ました'),
-      patternFormula: lt('Tempat + で · Objek + を · Kata Kerja + ました', 'สถานที่ + で · กรรม + を · กริยา + ました'),
-      coachExplanation: lt(
-        'Untuk aktivitas di tempat gunakan で (de), untuk objek langsung (seperti kopi) gunakan を (wo/o), dan bentuk lampau sopan dari ~ます adalah ~ました (BUKAN ~ますでした!).',
-        'สำหรับสถานที่ทำกิจกรรมใช้ で (de) สำหรับกรรมตรง (เช่น กาแฟ) ใช้ を (o) และรูปอดีตสุภาพของ ~ます คือ ~ました (ไม่ใช่ ~ますでした!)',
-        '場所での動作には「で」、目的語には「を」を使い、「〜ます」の過去形は「〜ました」になります（「〜ますでした」は不自然です）。',
-        '动作发生的地点用「で」，直接宾语用「を」，「〜ます」的礼貌过去式是「〜ました」（不能说「〜ますでした」）。'
-      ),
-      pairData: {
-        termA: action?.wrongWord || 'コーヒーに 飲みますでした',
-        descA: lt('Kurang tepat: に untuk tujuan, dan ～ますでした tidak ada.', 'ยังไม่ถูก: に ใช้กับจุดหมาย และไม่มีรูป ～ますでした'),
-        colorA: '#FDE8E4',
-        termB: action?.rightWord || 'カフェで コーヒーを 飲みました',
-        descB: lt('Alami: Tempat + で, Objek + を, Lampau ～ました.', 'เป็นธรรมชาติ: สถานที่ + で, กรรม + を, อดีต ～ました'),
-        colorB: '#E6F4EA',
-        keyAnalogy: lt('Objek minuman = を。Lampau dari 飲みます = 飲みました。', 'กรรมของกริยา = を。รูปอดีตของ 飲みます = 飲みました'),
-      },
-      quiz: {
-        prompt: lt('Manakah kalimat bahasa Jepang yang paling alami?', 'ประโยคภาษาญี่ปุ่นข้อใดถูกต้องและเป็นธรรมชาติที่สุด?'),
-        options: [
-          { id: 'opt_1', text: 'カフェで コーヒーを 飲みました。', isCorrect: true, feedback: ui.correctFeedback },
-          { id: 'opt_2', text: 'カフェに コーヒーに 飲みますでした。', isCorrect: false, feedback: lt('Partikel objek harus を dan lampau harus 飲みました.', 'คำช่วยกรรมต้องใช้ を และรูปอดีตต้องเป็น 飲みました') },
-          { id: 'opt_3', text: 'カフェを コーヒーで 飲みました。', isCorrect: false, feedback: lt('Partikel で dan を tertukar.', 'คำช่วย で และ を สลับตำแหน่งกันอยู่') },
-        ],
-        cloze: {
-          prefix: 'さっき コーヒーを',
-          blankWord: '飲みました',
-          suffix: '。',
-          chips: ['飲みました', '飲みますでした', '飲みません'],
-          feedback: ui.clozeCorrectFeedback,
-        },
-        blocks: {
-          correctOrder: ['カフェで', 'コーヒーを', '飲みました。'],
-          pool: ['コーヒーを', '飲みました。', 'カフェで', '飲みますでした'],
-          meaningId: lt('Saya sudah minum kopi di kafe.', 'ฉันดื่มกาแฟที่คาเฟ่แล้ว'),
-          feedback: ui.blocksCorrectFeedback,
-        },
-      },
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 5-E. KASUS BAHASA MANDARIN: LOKASI SEBELUM KATA KERJA / CLASSIFIER / NADA
-  // -------------------------------------------------------------
-  if (
-    effectiveLang === 'zh' &&
-    (/在家里|在.*学习|学习汉语|zh_location_before_verb|一杯|一个|nada|tone|hanzi|radikal/i.test(combinedHintText) ||
-      Boolean(action?.misconceptionId?.startsWith('zh_')))
-  ) {
-    if (/一杯|一个|classifier|量词/i.test(combinedHintText)) {
-      return {
-        contextMode: 'confusing_pair',
-        topicTitle: query || lt('Kata Satuan: 一杯 (Secangkir) vs 一个 (Sebuah)', 'ลักษณนาม: 一杯 (1 แก้ว) vs 一个 (1 อัน)', '量詞：一杯 vs 一個', '量词对比：一杯 vs 一个'),
-        patternFormula: lt('Bilangan + Kata Satuan (杯 untuk gelas/cangkir) + Benda', 'ตัวเลข + ลักษณนาม (杯 สำหรับแก้ว/ถ้วย) + คำนาม'),
-        coachExplanation: lt(
-          'Dalam Mandarin, minuman di cangkir/gelas memakai kata satuan 杯 (bēi), bukan kata satuan umum 个 (gè). Contoh alami: 一杯咖啡 (secangkir kopi).',
-          'ในภาษาจีนกลาง เครื่องดื่มที่ใส่แก้วหรือถ้วยใช้ลักษณนามว่า 杯 (bēi) ไม่ใช่ 个 (gè) ตัวอย่างเช่น 一杯咖啡 (กาแฟ 1 แก้ว)',
-          '中国語ではカップやグラスに入った飲み物には量詞「杯 (bēi)」を使います（「个」ではありません）。',
-          '在汉语中，盛在杯子里的饮品使用量词“杯”，不用通用量词“个”。如：一杯咖啡。'
-        ),
-        pairData: {
-          termA: '一个咖啡',
-          descA: lt('Kurang alami untuk cangkir kopi', 'ไม่นิยมใช้กับกาแฟ 1 แก้ว'),
-          colorA: '#FDE8E4',
-          termB: '一杯咖啡',
-          descB: lt('Alami: secangkir / segelas kopi', 'เป็นธรรมชาติ: กาแฟ 1 แก้ว'),
-          colorB: '#E6F4EA',
-          keyAnalogy: lt('Cangkir/gelas = 杯 (bēi). Benda umum = 个 (gè).', 'แก้ว/ถ้วย = 杯 (bēi). ของทั่วไป = 个 (gè).'),
-        },
-        characterData: {
-          char: '杯',
-          reading: 'bēi',
-          meaning: lt('cangkir / gelas', 'ถ้วย / แก้ว'),
-          radical: '木',
-          radicalMeaning: lt('kayu (cangkir kuno dari kayu)', 'ไม้'),
-          strokesCount: 8,
-        },
-        quiz: {
-          prompt: lt('Bagaimana memesan "secangkir teh" secara alami?', 'จะสั่ง "ชา 1 แก้ว" อย่างเป็นธรรมชาติได้อย่างไร?'),
-          options: [
-            { id: 'opt_1', text: '我要一杯茶，谢谢。', isCorrect: true, feedback: ui.correctFeedback },
-            { id: 'opt_2', text: '我要一个茶，谢谢。', isCorrect: false, feedback: lt('Minuman dalam gelas lebih alami memakai 杯, bukan 个.', 'เครื่องดื่มในแก้วควรใช้ 杯 แทน 个') },
-            { id: 'opt_3', text: '我一杯要茶，谢谢。', isCorrect: false, feedback: lt('Letakkan kata kerja 要 sebelum 一杯茶.', 'วางกริยา 要 ไว้หน้า 一杯茶') },
-          ],
-          cloze: {
-            prefix: '我想点一',
-            blankWord: '杯',
-            suffix: '冰咖啡。',
-            chips: ['杯', '个', '本'],
-            feedback: ui.clozeCorrectFeedback,
-          },
-          blocks: {
-            correctOrder: ['我', '想要', '一杯', '热咖啡。'],
-            pool: ['一杯', '我', '热咖啡。', '想要', '一个'],
-            meaningId: lt('Saya ingin memesan secangkir kopi panas.', 'ฉันต้องการสั่งกาแฟร้อนหนึ่งแก้ว'),
-            feedback: ui.blocksCorrectFeedback,
-          },
-        },
-      };
-    }
-
-    if (/nada|tone|声调/i.test(combinedHintText) && !/在家里|学习汉语/i.test(combinedHintText)) {
-      return {
-        contextMode: 'tone_waveform',
-        topicTitle: query || lt('Kontur 4 Nada Mandarin (声调)', 'ผันเสียงวรรณยุกต์จีน 4 เสียง (声调)'),
-        patternFormula: lt('Nada 1 (ā datar) · Nada 2 (á naik) · Nada 3 (ǎ turun-naik) · Nada 4 (à turun tajam)', 'เสียง 1 (ā สามัญสูง) · เสียง 2 (á จัตวา) · เสียง 3 (ǎ ต่ำ) · เสียง 4 (à โทตก)'),
-        coachExplanation: lt(
-          'Perbedaan nada mengubah arti kata Mandarin sepenuhnya. Pertahankan tinggi-rendah nada sebelum menyambung ke kata berikutnya.',
-          'ความต่างของวรรณยุกต์เปลี่ยนความหมายของคำในภาษาจีนกลางโดยสิ้นเชิง ลองฝึกออกเสียงให้ชัดเจนก่อนเชื่อมคำถัดไป',
-          '中国語は声調によって意味が完全に変わります。それぞれの音の高低を意識しましょう。',
-          '汉语声调不同意思完全不同，发音时请把调值发饱满。'
-        ),
-        toneData: {
-          word: '喝茶',
-          phonetic: 'hē chá',
-          toneType: lt('Nada 1 (Datar Tinggi) + Nada 2 (Naik)', 'เสียง 1 (สูงราบ) + เสียง 2 (ไต่ขึ้น)'),
-          toneShape: '55 ˉ + 35 ˊ',
-        },
-        quiz: {
-          prompt: lt('Manakah nada yang benar untuk "minum kopi" (hē kāfēi)?', 'ข้อใดคือพินอินและวรรณยุกต์ที่ถูกต้องของ "ดื่มกาแฟ"?'),
-          options: [
-            { id: 'opt_1', text: '喝咖啡 (Hē kāfēi)', isCorrect: true, feedback: ui.correctFeedback },
-            { id: 'opt_2', text: '和咖啡 (Hé kāfēi)', isCorrect: false, feedback: lt('和 (hé, nada 2) berarti "dan", sedangkan 喝 (hē, nada 1) berarti "minum".', '和 (hé) แปลว่า "และ" ส่วน 喝 (hē) แปลว่า "ดื่ม"') },
-            { id: 'opt_3', text: '喝可乐 (Hē kělè)', isCorrect: false, feedback: lt('可乐 berarti cola, bukan kopi.', '可乐 แปลว่าโคล่า ไม่ใช่กาแฟ') },
-          ],
-          cloze: {
-            prefix: '我每天早上都',
-            blankWord: '喝',
-            suffix: '咖啡。',
-            chips: ['喝', '和', '吃'],
-            feedback: ui.clozeCorrectFeedback,
-          },
-          blocks: {
-            correctOrder: ['我', '每天', '喝', '热茶。'],
-            pool: ['喝', '每天', '热茶。', '我', '和'],
-            meaningId: lt('Saya minum teh hangat setiap hari.', 'ฉันดื่มชาร้อนทุกวัน'),
-            feedback: ui.blocksCorrectFeedback,
-          },
-        },
-      };
-    }
-
-    // Default ZH misconception board: Lokasi [在 + Tempat] sebelum Kata Kerja!
-    return {
-      contextMode: 'syntax_ribbon',
-      topicTitle: query || lt('Urutan Lokasi Mandarin: 在 + Tempat + Aksi', 'ลำดับตำแหน่งภาษาจีน: 在 + สถานที่ + กริยา', '中国語の語順：在 + 場所 + 動詞', '汉语语序：在 + 地点 + 动词'),
-      patternFormula: lt('Subjek + 在 + Tempat + Kata Kerja + Objek', 'ประธาน + 在 + สถานที่ + กริยา + กรรม'),
-      coachExplanation: lt(
-        'Dalam bahasa Mandarin, keterangan tempat (在 + lokasi) WAJIB diletakkan SEBELUM kata kerja, BUKAN di akhir kalimat seperti bahasa Indonesia atau Inggris!',
-        'ในภาษาจีนกลาง คำบอกสถานที่ (在 + สถานที่) ต้องวางไว้ก่อนคำกริยาเสมอ ห้ามวางไว้ท้ายประโยคเหมือนภาษาไทยหรืออังกฤษ!',
-        '中国語では「在＋場所」を必ず動詞の前に置きます。文末には置きません。',
-        '汉语中地点状语“在＋地点”必须放在动词前面，不能像印尼语或英语那样放在句尾！'
-      ),
-      ribbonSegments: [
-        { role: lt('Subjek', 'ประธาน'), word: '我', tagColor: '#FEF3C7' },
-        { role: lt('Lokasi (Sebelum Aksi!)', 'สถานที่ (ก่อนกริยา!)'), word: '在家里', tagColor: '#E6F4EA' },
-        { role: lt('Aksi + Objek', 'กริยา + กรรม'), word: '学习汉语', tagColor: '#FDE8E4' },
-      ],
-      pairData: {
-        termA: action?.wrongWord || '我学习汉语在家里',
-        descA: lt('Salah posisi: 在家里 ditaruh di belakang kata kerja', 'วางผิดตำแหน่ง: เอา 在家里 ไว้หลังกริยา'),
-        colorA: '#FDE8E4',
-        termB: action?.rightWord || '我在家里学习汉语',
-        descB: lt('Alami: 在家里 ditaruh tepat sebelum 学习汉语', 'เป็นธรรมชาติ: วาง 在家里 ไว้ก่อน 学习汉语'),
-        colorB: '#E6F4EA',
-        keyAnalogy: lt('Rumus emas: Orang dulu -> Di mana -> Ngapain.', 'สูตรจำง่าย: ใคร -> ที่ไหน -> ทำอะไร'),
-      },
-      quiz: {
-        prompt: lt('Manakah urutan kalimat Mandarin yang benar untuk "Saya belajar Mandarin di rumah."?', 'ประโยคภาษาจีนข้อใดเรียงลำดับถูกต้องสำหรับ "ฉันเรียนภาษาจีนที่บ้าน"?'),
-        options: [
-          { id: 'opt_1', text: '我在家里学习汉语。', isCorrect: true, feedback: ui.correctFeedback },
-          { id: 'opt_2', text: '我学习汉语在家里。', isCorrect: false, feedback: lt('Jangan taruh 在家里 di akhir kalimat - pindahkan ke sebelum 学习!', 'อย่าวาง 在家里 ไว้ท้ายประโยค ให้ย้ายมาไว้หน้า 学习') },
-          { id: 'opt_3', text: '在家里学习我汉语。', isCorrect: false, feedback: lt('Subjek 我 tetap diletakkan di awal sebelum kata kerja.', 'ประธาน 我 ต้องอยู่หน้าคำกริยา') },
-        ],
-        cloze: {
-          prefix: '我',
-          blankWord: '在图书馆',
-          suffix: '看书。',
-          chips: ['在图书馆', '看书在', '图书馆去'],
-          feedback: ui.clozeCorrectFeedback,
-        },
-        blocks: {
-          correctOrder: ['我', '在家里', '学习', '汉语。'],
-          pool: ['学习', '我', '汉语。', '在家里', '去'],
-          meaningId: lt('Saya belajar bahasa Mandarin di rumah.', 'ฉันเรียนภาษาจีนที่บ้าน'),
-          feedback: ui.blocksCorrectFeedback,
-        },
-      },
-    };
-  }
-
-  // -------------------------------------------------------------
-  // 6. DEFAULT ADAPTIVE FALLBACK (BEBAS KAKU, ZERO ENGLISH LEAK PADA JA/ZH)
-  // -------------------------------------------------------------
-  const defaultTitles: Record<TargetLang, string> = {
-    en: lt('Pemahaman Materi', 'ความเข้าใจบทเรียน', '学習ポイント', '学习重点'),
-    ja: lt('Latihan Pola Bahasa Jepang', 'ฝึกโครงสร้างภาษาญี่ปุ่น', '日本語表現の練習', '日语表达练习'),
-    zh: lt('Latihan Pola Bahasa Mandarin', 'ฝึกโครงสร้างภาษาจีนกลาง', '中国語表現の練習', '汉语表达练习'),
-  };
-  const cleanTitle = (action?.topicTitle || query || defaultTitles[effectiveLang]).trim();
-  const cleanFormula = (
-    action?.patternFormula ||
-    lt(`Pola Inti: ${cleanTitle}`, `โครงสร้างหลัก: ${cleanTitle}`, `基本パターン: ${cleanTitle}`, `核心句型: ${cleanTitle}`)
-  ).trim();
-  const cleanExplanation = (
-    action?.coachSpokenScript ||
-    action?.explanationText ||
-    lt(
-      'Perhatikan pola dan penggunaannya dalam kalimat agar tuturanmu terdengar alami dan percaya diri.',
-      'สังเกตโครงสร้างและวิธีใช้งานในประโยคจริง เพื่อให้คุณพูดได้เป็นธรรมชาติและมั่นใจมากขึ้น',
-      '文の組み立てと自然な使い方を意識して、声に出して練習してみましょう。',
-      '注意观察句型搭配与语序，大声跟读会让表达更加自然地道。'
-    )
-  ).trim();
-
-  const fallbackDefaults: Record<TargetLang, { target: string; trap: string; distractors: string[]; wrongReason: string }> = {
-    en: {
-      target: 'I practice speaking English every day.',
-      trap: 'I practice speak English every day.',
-      distractors: ['is', 'practicing', 'practiced'],
-      wrongReason: lt('Terkecoh! Pilihan ini memiliki susunan kata yang kurang tepat.', 'ยังไม่ใช่คำตอบที่ถูก ประโยคนี้โครงสร้างยังไม่ถูกต้อง'),
-    },
-    ja: {
-      target: '毎日日本語で話す練習をします。',
-      trap: '毎日日本語で話します練習です。',
-      distractors: ['を', 'に', 'で'],
-      wrongReason: lt('Kurang alami! Perhatikan kata sambung & partikel bahasa Jepang.', 'ยังไม่เป็นธรรมชาติ ลองสังเกตคำช่วยและรูปกริยาภาษาญี่ปุ่นอีกครั้ง'),
-    },
-    zh: {
-      target: '我每天在家里练习说汉语。',
-      trap: '我每天练习说汉语在家里。',
-      distractors: ['在', '了', '的'],
-      wrongReason: lt('Urutan kata kurang tepat! Ingat lokasi diletakkan sebelum kata kerja.', 'ลำดับคำยังไม่ถูก อย่าลืมว่าสถานที่ในภาษาจีนวางไว้หน้ากริยา'),
-    },
-  };
-
-  const langFallback = fallbackDefaults[effectiveLang] || fallbackDefaults.en;
-  const candidateTarget = (action?.drillTargetSentence || action?.sampleTarget || '').trim();
-  const useCandidateTarget =
-    candidateTarget.length > 0 &&
-    (effectiveLang === 'en' ? !/練習|汉语/.test(candidateTarget) : isTargetSentenceForRuby(candidateTarget, effectiveLang));
-
-  const rightWordCandidate =
-    !useCandidateTarget &&
-    action?.rightWord &&
-    action.rightWord.trim() &&
-    action.rightWord.trim() !== 'bentuk tepat' &&
-    (effectiveLang === 'en' ? !/練習|汉语/.test(action.rightWord) : isTargetSentenceForRuby(action.rightWord, effectiveLang))
-      ? action.rightWord.trim()
-      : '';
-
-  const topicInlineCandidate =
-    !useCandidateTarget && !rightWordCandidate && effectiveLang !== 'en' && isTargetSentenceForRuby(query, effectiveLang)
-      ? (query.match(/[\u3040-\u30ff\u3400-\u9fffー。？！]+/)?.[0] || '').trim()
-      : '';
-
-  const targetSent = (
-    useCandidateTarget
-      ? candidateTarget
-      : rightWordCandidate || (topicInlineCandidate.length >= 3 ? topicInlineCandidate : langFallback.target)
-  ).trim();
-  const rawTrap = (action?.drillTrapSentence || action?.trapWrongSentence || '').trim();
-  const trapSent =
-    rawTrap && (effectiveLang === 'en' || isTargetSentenceForRuby(rawTrap, effectiveLang))
-      ? rawTrap
-      : action?.wrongWord && effectiveLang !== 'en' && isTargetSentenceForRuby(action.wrongWord, effectiveLang)
-        ? action.wrongWord.trim()
-        : langFallback.trap;
-
-  const targetLiveMeta = translateAndPhoneticizeLiveText(targetSent, effectiveLang, undefined, undefined, undefined, { locale: loc });
-  const rawTargetMeaning =
-    loc === 'th' ? targetLiveMeta.translationTh || '' : targetLiveMeta.translationId || '';
-  const targetMeaning =
-    rawTargetMeaning && !/^Pahami makna|^ทำความเข้าใจ|^arti kalimat|^arti pola/i.test(rawTargetMeaning)
-      ? rawTargetMeaning
-      : '';
-  const targetReading = resolveUnifiedPronunciation(targetSent, effectiveLang, undefined, loc) || '';
-
-  const words = tokenizeSentenceIntoBlocks(targetSent, effectiveLang);
-  const midIdx = Math.max(0, Math.min(words.length - 1, Math.floor(words.length / 2)));
-  const blankWord = words[midIdx] || words[0] || (effectiveLang === 'ja' ? 'を' : effectiveLang === 'zh' ? '在' : 'practice');
-  const blockPool = [...words];
-  if (words.length > 2) {
-    const extraToken = langFallback.distractors.find((d) => !blockPool.includes(d)) || langFallback.distractors[0];
-    if (extraToken) blockPool.push(extraToken);
-  }
-  const clozeChips = Array.from(
-    new Set([blankWord, ...langFallback.distractors].filter(Boolean))
-  ).slice(0, 3);
-
-  const hasCustomContrast = Boolean(
-    action?.wrongWord &&
-      action?.rightWord &&
-      action.wrongWord.trim() &&
-      action.rightWord.trim() &&
-      action.wrongWord.trim() !== action.rightWord.trim() &&
-      action.rightWord !== 'bentuk tepat'
+  const rawTargetSent = (action?.drillTargetSentence || action?.sampleTarget || '').trim();
+  const isDegenerateVal = (v: string) => /^[\d\s.,\-/+•:;()]+$/.test(v.trim()) || /^(example|contoh|sample|placeholder|\.\.\.)$/i.test(v.trim());
+  const targetSent = isDegenerateVal(rawTargetSent)
+    ? !isDegenerateVal(action?.drillTargetSentence || '')
+      ? (action?.drillTargetSentence || '').trim()
+      : ''
+    : rawTargetSent;
+  const rawTrapSent = (action?.drillTrapSentence || action?.trapWrongSentence || '').trim();
+  const trapSent = isDegenerateVal(rawTrapSent) ? '' : rawTrapSent;
+  const hasAnyAiPayload = Boolean(
+    (Array.isArray(action?.whiteboardSteps) && action.whiteboardSteps.length > 0) ||
+    cleanExplanation ||
+    cleanFormula ||
+    targetSent
   );
 
-  return {
-    contextMode: hasCustomContrast ? 'confusing_pair' : 'standard_clarity',
-    topicTitle: cleanTitle,
-    patternFormula: cleanFormula,
-    coachExplanation: cleanExplanation,
-    standardTarget: {
-      text: targetSent,
-      reading: targetReading,
-      translation: targetMeaning,
-    },
-    ...(hasCustomContrast
+  // Deteksi apakah topik secara eksplisit membahas karakter Kanji/Hanzi/Kana tertentu
+  const cjkMatch = `${cleanTitle} ${targetSent}`.match(/[\u4e00-\u9faf\u3040-\u309f\u30a0-\u30ff]/);
+  const kakijunHits =
+    targetLang === 'ja' || targetLang === 'zh'
+      ? resolveKakijunRequestFromPrompt(`${cleanTitle} ${targetSent} ${cleanExplanation}`, targetLang)
+      : [];
+  const matchedChar = kakijunHits[0]?.char || cjkMatch?.[0] || '';
+  const characterData =
+    matchedChar &&
+    (targetLang === 'ja' || targetLang === 'zh') &&
+    (kakijunHits.length > 0 || /kanji|hanzi|hiragana|katakana|huruf|karakter|aksara|tulis|goresan|coret|stroke/i.test(`${cleanTitle} ${cleanExplanation}`))
       ? {
-          pairData: {
-            termA: action!.wrongWord!.trim(),
-            descA: lt('Bentuk yang perlu diperbaiki', 'รูปแบบที่ควรปรับให้เป็นธรรมชาติ'),
-            colorA: '#FDE8E4',
-            termB: action!.rightWord!.trim(),
-            descB: lt('Bentuk alami yang disarankan', 'รูปแบบที่ถูกต้องและเป็นธรรมชาติ'),
-            colorB: '#E6F4EA',
-            keyAnalogy: cleanFormula,
-          },
+          char: matchedChar,
+          reading: (action as any)?.kanjiReading || kakijunHits[0]?.reading || cleanFormula || '',
+          meaning: (action as any)?.kanjiMeaning || kakijunHits[0]?.meaningId || cleanTitle,
+          radical: '',
+          radicalMeaning: '',
+          strokesCount: Number((action as any)?.kanjiStrokeCount) || kakijunHits[0]?.strokeCount || 0,
         }
-      : {}),
-    quiz: {
-      prompt:
-        action?.drillMeaningPrompt ||
-        lt(`Manakah kalimat yang BENAR untuk "${cleanTitle}"?`, `ประโยคใดถูกต้องสำหรับ "${cleanTitle}"?`),
-      options: [
-        { id: 'opt_1', text: targetSent, isCorrect: true, feedback: ui.correctFeedback },
-        { id: 'opt_2', text: trapSent, isCorrect: false, feedback: action?.trapWrongReason || langFallback.wrongReason },
-      ],
+      : undefined;
+
+  let quiz: DynamicQuizData | undefined;
+  let standardReading = '';
+  let standardMeaning = '';
+  if (targetSent) {
+    const cleanWords = tokenizeSentenceIntoBlocks(targetSent, effectiveLang);
+    const midIdx = Math.max(0, Math.floor(cleanWords.length / 2));
+    const blankTarget = cleanWords[midIdx] || cleanWords[0] || '';
+    const distractorChips = [
+      blankTarget,
+      ...(Array.isArray(action?.drillBlocks) ? action.drillBlocks.slice(0, 2) : []),
+      ...(Array.isArray(action?.drillDistractors) ? action.drillDistractors.slice(0, 2) : []),
+    ]
+      .filter((w, i, arr) => Boolean(w) && arr.indexOf(w) === i)
+      .slice(0, 3);
+
+    standardReading = resolveUnifiedPronunciation(targetSent, effectiveLang, undefined, loc) || '';
+    const liveMeta = translateAndPhoneticizeLiveText(targetSent, effectiveLang, undefined, undefined, undefined, { locale: loc });
+    const rawMeaning = loc === 'th' ? liveMeta.translationTh || '' : liveMeta.translationId || '';
+    if (rawMeaning && !/^Pahami makna|^ทำความเข้าใจ|^arti kalimat|^arti pola/i.test(rawMeaning)) {
+      standardMeaning = rawMeaning;
+    }
+
+    const quizOptions: DynamicQuizData['options'] = [
+      {
+        id: 'opt_1',
+        text: targetSent,
+        isCorrect: true,
+        feedback: ui.correctFeedback,
+      },
+    ];
+    if (trapSent && trapSent !== targetSent) {
+      quizOptions.push({
+        id: 'opt_2',
+        text: trapSent,
+        isCorrect: false,
+        feedback: action?.trapWrongReason || ui.wrongFeedback,
+      });
+    }
+
+    quiz = {
+      prompt: action?.drillMeaningPrompt || `Manakah bentuk yang paling tepat untuk "${cleanTitle}"?`,
+      options: quizOptions,
       cloze: {
-        prefix: joinTokensForTarget(words.slice(0, midIdx), effectiveLang),
-        blankWord,
-        suffix: joinTokensForTarget(words.slice(midIdx + 1), effectiveLang),
-        chips: clozeChips,
+        prefix: joinTokensForTarget(cleanWords.slice(0, midIdx), effectiveLang),
+        blankWord: blankTarget,
+        suffix: joinTokensForTarget(cleanWords.slice(midIdx + 1), effectiveLang),
+        chips: distractorChips.length > 0 ? distractorChips : [blankTarget],
         feedback: ui.clozeCorrectFeedback,
       },
       blocks: {
-        correctOrder: words,
-        pool: [...blockPool].sort((a, b) => a.localeCompare(b)),
-        meaningId: targetMeaning
-          ? lt(`Susun kata menjadi: "${targetMeaning}"`, `เรียงคำเป็น: "${targetMeaning}"`)
-          : ui.blocksInstruction,
+        correctOrder: cleanWords,
+        pool: [...cleanWords].sort(() => (seedVariant % 2 === 0 ? 0.2 : -0.2)),
+        meaningId: action?.drillMeaningPrompt || `Susun bagian berikut untuk: "${cleanTitle}"`,
         feedback: ui.blocksCorrectFeedback,
       },
-    },
+    };
+  }
+
+  return {
+    contextMode: characterData ? 'magic_character' : 'standard_clarity',
+    focusType: action?.focusType,
+    title: cleanTitle,
+    summary: cleanExplanation || cleanFormula,
+    sampleTarget: targetSent || undefined,
+    sampleMeaningId: standardMeaning || undefined,
+    topicTitle: cleanTitle,
+    patternFormula: cleanFormula,
+    coachExplanation: hasAnyAiPayload
+      ? cleanExplanation || cleanFormula
+      : `Belum menerima penjelasan visual real-time untuk "${cleanTitle}". Ketik pertanyaan atau pastikan koneksi Tutor aktif.`,
+    isOfflineNotice: !hasAnyAiPayload,
+    characterData,
+    standardTarget: targetSent
+      ? { text: targetSent, reading: standardReading, translation: standardMeaning }
+      : undefined,
+    quiz,
   };
 }
-
-/**
- * -------------------------------------------------------------
- * KANVAS KHUSUS SSW SENSEI: PAPAN TAKTIS HALAMAN, TRIK WAKAI PAPA+,
- * KAMUS PEMULA & KOTOBA, SERTA CEK PAHAM KILAT 3 OPSI PROMETRIC
- * -------------------------------------------------------------
- */
-export const SswTacticalBoardCanvas: React.FC<{
-  initialPageNumber: number;
-  initialStepNumber: number;
-  personaName: string;
-  onSpeakPreview?: (text: string, spokenLang?: string) => void;
-  onAskSensei?: (question: string) => void;
-  onEvaluatePractice?: (...args: any[]) => void;
-}> = ({
-  initialPageNumber,
-  initialStepNumber,
-  personaName,
-  onSpeakPreview,
-  onAskSensei,
-  onEvaluatePractice,
-}) => {
-  const [activePage, setActivePage] = useState<number>(initialPageNumber || 1);
-  const [requestedStep, setRequestedStep] = useState<number | undefined>(initialStepNumber);
-  const [showFurigana, setShowFurigana] = useState<boolean>(true);
-  const [pageKotoba, setPageKotoba] = useState<SswKotobaItem[]>([]);
-  const [activeQuiz, setActiveQuiz] = useState<SswDrawnQuestionPayload | null>(null);
-  const [quizGrade, setQuizGrade] = useState<SswGradeQuizResult | null>(null);
-  const [isLoadingQuiz, setIsLoadingQuiz] = useState<boolean>(false);
-  const [stateTick, setStateTick] = useState<number>(0);
-
-  const totalPages = SSW_MASTER_KB.meta.totalPdfPages || 91;
-
-  useEffect(() => {
-    setActivePage(initialPageNumber || 1);
-    setRequestedStep(initialStepNumber);
-  }, [initialPageNumber, initialStepNumber]);
-
-  useEffect(() => {
-    const onFocusPage = (ev: Event) => {
-      const ce = ev as CustomEvent<{ page?: number }>;
-      if (typeof ce?.detail?.page === 'number') {
-        setActivePage(Math.max(1, Math.min(totalPages, ce.detail.page)));
-        setRequestedStep(undefined);
-      }
-    };
-    const onFocusStep = (ev: Event) => {
-      const ce = ev as CustomEvent<{ page?: number; stepIndex?: number }>;
-      if (typeof ce?.detail?.page === 'number') {
-        setActivePage(Math.max(1, Math.min(totalPages, ce.detail.page)));
-      }
-      if (typeof ce?.detail?.stepIndex === 'number') {
-        setRequestedStep(ce.detail.stepIndex);
-      }
-      setStateTick((n) => n + 1);
-    };
-    const onStateChanged = () => setStateTick((n) => n + 1);
-    const onHydrated = () => setStateTick((n) => n + 1);
-    void ensureSswFullKnowledgeLoaded().then(() => setStateTick((n) => n + 1));
-    window.addEventListener(SSW_FOCUS_PAGE_EVENT, onFocusPage as EventListener);
-    window.addEventListener(SSW_FOCUS_STEP_EVENT, onFocusStep as EventListener);
-    window.addEventListener(SSW_STATE_UPDATED_EVENT, onStateChanged);
-    window.addEventListener(SSW_KNOWLEDGE_HYDRATED_EVENT, onHydrated);
-    return () => {
-      window.removeEventListener(SSW_FOCUS_PAGE_EVENT, onFocusPage as EventListener);
-      window.removeEventListener(SSW_FOCUS_STEP_EVENT, onFocusStep as EventListener);
-      window.removeEventListener(SSW_STATE_UPDATED_EVENT, onStateChanged);
-      window.removeEventListener(SSW_KNOWLEDGE_HYDRATED_EVENT, onHydrated);
-    };
-  }, [totalPages]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void lookupSswMaterialAndPageAsync({ pageNumber: activePage }).then((res) => {
-      if (!cancelled) {
-        setPageKotoba((res.kotobaOnPage || []).slice(0, 6));
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [activePage]);
-
-  const drawQuickQuiz = () => {
-    setIsLoadingQuiz(true);
-    setQuizGrade(null);
-    void drawSswQuizQuestionAsync({ mode: 'mixed', preferWeakOrUnseen: true })
-      .then((q) => {
-        setActiveQuiz(q);
-      })
-      .finally(() => setIsLoadingQuiz(false));
-  };
-
-  useEffect(() => {
-    if (!activeQuiz) {
-      drawQuickQuiz();
-    }
-  }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _tickRef = stateTick;
-  const plan = getStructuredPagePlan(activePage, requestedStep);
-  const report = getSswProgressReport();
-  const activeStep = plan.activeStep;
-  const activeText = activeStep ? `${activeStep.title} ${activeStep.content}` : '';
-  const insights = getWakaiPapaTacticalInsightsForPage(activePage, activeText, 3);
-  const glossary = extractBeginnerGlossaryForText(
-    `${activeText} ${plan.pageObj?.title || ''} ${plan.pageObj?.focusCompass || ''}`,
-    5
-  );
-
-  const handleSelectPage = (nextPage: number) => {
-    const safePage = Math.max(1, Math.min(totalPages, nextPage));
-    playFiezelSfx('button_tap');
-    setActivePage(safePage);
-    setRequestedStep(undefined);
-    updateSswLessonStepCursor({ page: safePage, stepIndex: 1 });
-  };
-
-  const handleSelectStep = (stepNum: number) => {
-    playFiezelSfx('button_tap');
-    setRequestedStep(stepNum);
-    updateSswLessonStepCursor({ page: activePage, stepIndex: stepNum });
-  };
-
-  const handleCompleteStepAndNext = () => {
-    if (!activeStep) return;
-    playFiezelSfx('answer_correct');
-    const result = advanceSswLessonStep({
-      pageNumber: activePage,
-      completedStepNumber: activeStep.stepNumber,
-    });
-    if ((result as any)?.pageCompleted) {
-      setRequestedStep(undefined);
-    } else if (typeof (result as any)?.activeStepNumber === 'number') {
-      setRequestedStep((result as any).activeStepNumber);
-    }
-    setStateTick((n) => n + 1);
-  };
-
-  const handleAnswerQuickQuiz = async (letter: string) => {
-    if (!activeQuiz || quizGrade) return;
-    const result = await gradeSswQuizAnswerAsync({
-      quizId: activeQuiz.quizId,
-      userAnswer: letter,
-    });
-    setQuizGrade(result);
-    if (result.ok) {
-      playFiezelSfx('answer_correct');
-      onEvaluatePractice?.(letter, result.correctAnswerJp, `SSW Hal. ${result.discussionPdfPage}`, {
-        isQuizSuccess: true,
-      });
-    } else {
-      playFiezelSfx('answer_wrong');
-      onEvaluatePractice?.(letter, result.correctAnswerJp, `SSW Hal. ${result.discussionPdfPage}`, {
-        isQuizSuccess: false,
-        isQuizFailure: true,
-        misconceptionId: `ssw_quiz_page_${result.discussionPdfPage}`,
-      });
-    }
-    setStateTick((n) => n + 1);
-  };
-
-  return (
-    <div data-testid="ssw-tactical-popup" className="space-y-3.5 text-[#231A12]">
-      {/* BAR NAVIGASI HALAMAN, KESEPADANAN KESIAPAN, & FURIGANA */}
-      <div className="p-3 rounded-2xl bg-[#8C2233] text-white flex flex-wrap items-center justify-between gap-2 shadow-xs">
-        <div className="flex items-center gap-2 min-w-0">
-          <button
-            type="button"
-            onClick={() => handleSelectPage(activePage - 1)}
-            disabled={activePage <= 1}
-            className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 disabled:opacity-40 text-xs font-black flex items-center justify-center cursor-pointer"
-            title="Halaman sebelumnya"
-          >
-            &lt;
-          </button>
-          <div className="min-w-0 flex-1">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-white/80">
-              Papan Taktis OTAFF Ver 5.1 · Hal. {activePage} / {totalPages}
-            </div>
-            <div className="text-xs sm:text-sm font-black leading-snug break-words">
-              {plan.pageObj?.title || `Halaman ${activePage}`}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => handleSelectPage(activePage + 1)}
-            disabled={activePage >= totalPages}
-            className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 disabled:opacity-40 text-xs font-black flex items-center justify-center cursor-pointer"
-            title="Halaman berikutnya"
-          >
-            &gt;
-          </button>
-        </div>
-
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="px-2.5 py-1 rounded-full bg-white/15 text-[10.5px] font-extrabold">
-            Kesiapan {report.readinessScorePct}% / 65%
-          </span>
-          <button
-            type="button"
-            onClick={() => setShowFurigana((v) => !v)}
-            className={`px-2 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer transition ${
-              showFurigana ? 'bg-white text-[#8C2233]' : 'bg-white/15 text-white'
-            }`}
-          >
-            Aa Furigana
-          </button>
-        </div>
-      </div>
-
-      {/* KARTU 1: KUNCI FOKUS LANGKAH AKTIF (ANTI LOMPAT MATERI) */}
-      <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#E2D2BA] space-y-2.5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="text-[11px] font-extrabold uppercase tracking-wide text-[#8C2233]">
-            Fokus Saat Ini: Langkah {plan.activeStepIndex} dari {plan.steps.length}
-          </div>
-          <div className="flex items-center gap-1 flex-wrap">
-            {plan.steps.map((s) => {
-              const isDone = plan.completedSteps.includes(s.stepNumber);
-              const isCurrent = s.stepNumber === plan.activeStepIndex;
-              return (
-                <button
-                  key={s.stepNumber}
-                  type="button"
-                  onClick={() => handleSelectStep(s.stepNumber)}
-                  className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold cursor-pointer border transition ${
-                    isCurrent
-                      ? 'bg-[#8C2233] text-white border-[#8C2233]'
-                      : isDone
-                        ? 'bg-[#E6F4EA] text-[#1B5E34] border-[#A7F3D0]'
-                        : 'bg-[#FAF4E8] text-[#5C4A38] border-[#EADBCE]'
-                  }`}
-                >
-                  {isDone && !isCurrent ? `✓ ${s.stepNumber}` : `Langkah ${s.stepNumber}`}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {activeStep && (
-          <div className="space-y-2">
-            <div className="text-sm font-black text-[#231A12]">{activeStep.title}</div>
-            <p className="text-xs text-[#3D2E20] leading-relaxed whitespace-pre-line">
-              {cleanSpacedJapanese(activeStep.content)}
-            </p>
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={handleCompleteStepAndNext}
-                className="px-3 py-1.5 rounded-xl bg-[#1B5E34] hover:bg-[#144727] text-white text-[11px] font-bold cursor-pointer"
-              >
-                ✓ Paham Langkah {activeStep.stepNumber} & Lanjut
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  onAskSensei?.(
-                    `Sensei, bedah lebih dalam Langkah ${activeStep.stepNumber} (${activeStep.title}) di Halaman ${activePage} pakai contoh pabrik!`
-                  )
-                }
-                className="px-3 py-1.5 rounded-xl bg-[#FCECED] hover:bg-[#F9D7DB] text-[#8C2233] text-[11px] font-bold cursor-pointer whitespace-nowrap"
-              >
-                Tanya Sensei Langkah Ini
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* KARTU 2: TRIK RAHASIA & JEBAKAN UJIAN (WAKAI PAPA+ MASTER MODE) */}
-      <div className="space-y-2">
-        <div className="text-[11px] font-extrabold uppercase tracking-wide text-[#5C4A38]">
-          Trik Rahasia & Jebakan Ujian Halaman {activePage}
-        </div>
-        <div className="grid grid-cols-1 gap-2">
-          {insights.map((tip) => (
-            <div
-              key={tip.id}
-              data-testid="ssw-tactical-tip-card"
-              className="p-3 rounded-2xl bg-[#FFFBF2] border border-[#E9D7B8] space-y-1.5"
-            >
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="px-2 py-0.5 rounded-md bg-[#8C2233] text-white text-[9.5px] font-black tracking-wide">
-                  {tip.badge}
-                </span>
-                <span className="text-xs font-black text-[#231A12]">{tip.title}</span>
-              </div>
-              <p className="text-xs text-[#3D2E20] leading-relaxed">{tip.trick}</p>
-              <p className="text-[11px] font-semibold text-[#991B1B] bg-[#FFF1F2] border border-[#FECDD3] rounded-xl px-2.5 py-1.5">
-                Waspada Jebakan: {tip.trapAlert}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* KARTU 3: KAMUS PEMULA & KOTOBA HALAMAN INI */}
-      {(glossary.length > 0 || pageKotoba.length > 0) && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {glossary.length > 0 && (
-            <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-1.5">
-              <div className="text-[10.5px] font-extrabold uppercase tracking-wide text-[#8C2233]">
-                Kamus Istilah Pemula
-              </div>
-              <div className="space-y-1.5">
-                {glossary.map((g) => (
-                  <div key={g.term} className="text-[11px] leading-snug border-b border-[#F3EBE0] last:border-b-0 pb-1 last:pb-0">
-                    <span className="font-black text-[#231A12]">{g.term}: </span>
-                    <span className="text-[#4A3B2C]">{g.simpleMeaningId}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {pageKotoba.length > 0 && (
-            <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-1.5">
-              <div className="text-[10.5px] font-extrabold uppercase tracking-wide text-[#2D7A4D]">
-                Kotoba Kunci Hal. {activePage}
-              </div>
-              <div className="space-y-1.5">
-                {pageKotoba.map((k, idx) => (
-                  <div
-                    key={`${k.jp}_${idx}`}
-                    className="flex items-center justify-between gap-2 text-[11px] border-b border-[#F3EBE0] last:border-b-0 pb-1 last:pb-0"
-                  >
-                    <div className="min-w-0">
-                      <div
-                        className="font-black text-[#231A12]"
-                        dangerouslySetInnerHTML={{
-                          __html: renderSswRubyHtml(k.rubyMarkup || k.jp, !showFurigana),
-                        }}
-                      />
-                      <div className="text-[10px] text-[#6E5E47]">
-                        {k.romaji} · {k.meaningId}
-                      </div>
-                    </div>
-                    {onSpeakPreview && (
-                      <button
-                        type="button"
-                        onClick={() => onSpeakPreview(cleanSpacedJapanese(k.jp), 'ja')}
-                        className="px-2 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[10px] font-bold text-[#5C4A38] shrink-0 cursor-pointer"
-                      >
-                        Dengar
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* KARTU 4: CEK PAHAM KILAT 1 SOAL PROMETRIC (3 PILIHAN A/B/C) */}
-      <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#DECFAF] space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-extrabold uppercase tracking-wide text-[#8C2233]">
-            Uji Paham Kilat SSW (3 Pilihan Asli Prometric)
-          </span>
-          <button
-            type="button"
-            onClick={drawQuickQuiz}
-            disabled={isLoadingQuiz}
-            className="px-2.5 py-1 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-bold cursor-pointer"
-          >
-            ↻ Soal Lain
-          </button>
-        </div>
-
-        {activeQuiz ? (
-          <div className="space-y-2">
-            <div
-              className="text-xs font-black text-[#231A12] leading-snug"
-              dangerouslySetInnerHTML={{
-                __html: renderSswRubyHtml(activeQuiz.questionRuby || activeQuiz.questionJp, !showFurigana),
-              }}
-            />
-            {activeQuiz.questionId && (
-              <p className="text-[11px] text-[#5C4A38] font-medium">
-                Arti soal: {activeQuiz.questionId}
-              </p>
-            )}
-            <div className="grid grid-cols-1 gap-1.5">
-              {activeQuiz.options.map((opt) => {
-                const isPicked = quizGrade?.selectedLetter === opt.letter;
-                const isRight = quizGrade && quizGrade.correctLetter === opt.letter;
-                return (
-                  <button
-                    key={opt.letter}
-                    type="button"
-                    disabled={Boolean(quizGrade)}
-                    onClick={() => void handleAnswerQuickQuiz(opt.letter)}
-                    data-testid={`ssw-popup-quiz-opt-${opt.letter}`}
-                    className={`w-full p-2.5 rounded-xl border text-left text-xs transition cursor-pointer ${
-                      quizGrade
-                        ? isRight
-                          ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
-                          : isPicked
-                            ? 'bg-[#FDE8E4] border-[#F87171] text-[#991B1B]'
-                            : 'bg-[#FAF6EE] border-[#EADBCE] text-[#6E5E47] opacity-75'
-                        : 'bg-[#FDFAF4] border-[#EADBCE] hover:border-[#8C2233] text-[#231A12]'
-                    }`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <span className="font-black text-[#8C2233] shrink-0">{opt.letter}.</span>
-                      <div className="min-w-0 flex-1">
-                        <div
-                          className="font-bold"
-                          dangerouslySetInnerHTML={{
-                            __html: renderSswRubyHtml(opt.ruby || opt.jp, !showFurigana),
-                          }}
-                        />
-                        {opt.id && (
-                          <div className="text-[10.5px] opacity-85 mt-0.5">{opt.id}</div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-            {quizGrade && (
-              <div
-                className={`p-2.5 rounded-xl text-[11px] border ${
-                  quizGrade.ok
-                    ? 'bg-[#E6F4EA] border-[#A7F3D0] text-[#1B5E34]'
-                    : 'bg-[#FFF1F2] border-[#FECDD3] text-[#991B1B]'
-                }`}
-              >
-                <div className="font-black">
-                  {quizGrade.ok
-                    ? `Benar (${quizGrade.correctLetter})! Kesiapan naik ke ${quizGrade.readinessScorePct}%`
-                    : `Keliru (${quizGrade.selectedLetter}). Jawaban tepat: ${quizGrade.correctLetter}`}
-                </div>
-                <p className="mt-1 font-medium leading-relaxed">{quizGrade.explanationId}</p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="text-xs text-[#8C7760]">Menyiapkan 1 soal SSW...</div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 /**
  * -------------------------------------------------------------
@@ -2274,12 +1278,7 @@ export const SswTacticalBoardCanvas: React.FC<{
 export const PteDescribeImageCanvas: React.FC<{
   data: PteChartData;
   onSpeakPreview?: (text: string) => void;
-  onActiveQuestionChange?: (info: {
-    questionId: string;
-    title: string;
-    targetText: string;
-  }) => void;
-}> = ({ data, onSpeakPreview, onActiveQuestionChange }) => {
+}> = ({ data, onSpeakPreview }) => {
   const [selectedCategory, setSelectedCategory] = useState<'all' | PteChartCategory>('all');
   const [currentQuestionId, setCurrentQuestionId] = useState<string>(data.questionId || 'di_bar_01');
   const [prepSeconds, setPrepSeconds] = useState<number>(25);
@@ -2310,24 +1309,6 @@ export const PteDescribeImageCanvas: React.FC<{
       setCurrentQuestionId(data.questionId);
     }
   }, [data.questionId]);
-
-  useEffect(() => {
-    if (onActiveQuestionChange && activeQuestion) {
-      const targetSummary = [
-        activeQuestion.title,
-        (activeQuestion.keywords || []).slice(0, 6).join(', '),
-        activeQuestion.dataSummary?.highest,
-        activeQuestion.dataSummary?.lowest,
-      ]
-        .filter(Boolean)
-        .join(' | ');
-      onActiveQuestionChange({
-        questionId: activeQuestion.id,
-        title: activeQuestion.title,
-        targetText: targetSummary,
-      });
-    }
-  }, [activeQuestion.id, activeQuestion.title]);
 
   // Reset timers & state when switching question
   const handleSelectQuestion = (q: PteDescribeImageQuestion) => {
@@ -2417,13 +1398,13 @@ export const PteDescribeImageCanvas: React.FC<{
   return (
     <div className="space-y-3.5" data-testid="pte-describe-image-canvas">
       {/* Top Banner, Category Pills & Question Navigator */}
-      <div className="flex flex-col gap-2.5 min-w-0 max-w-full">
+      <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between gap-1.5 flex-wrap">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="px-2.5 py-0.5 rounded-full bg-[#E6F4EA] text-[#1B5E34] text-[10.5px] font-extrabold uppercase tracking-wide">
               PTE Academic • Describe Image
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-[#FEF3C4] text-[#92400E] text-[10px] font-bold">
+            <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
               🔥 {activeQuestion.examFrequency}
             </span>
           </div>
@@ -2433,7 +1414,7 @@ export const PteDescribeImageCanvas: React.FC<{
         </div>
 
         {/* Category Filter Pills */}
-        <div className="w-full max-w-full min-w-0 flex flex-wrap sm:flex-nowrap items-center gap-1 sm:overflow-x-auto pb-1 bg-[#FAF4E8] p-1.5 rounded-2xl scrollbar-none">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 bg-[#FAF4E8] p-1.5 rounded-2xl scrollbar-none">
           {CATEGORY_TABS.map((tab) => {
             const isSelected = selectedCategory === tab.key;
             return (
@@ -3530,6 +2511,7 @@ export const PteReadAloudCanvas: React.FC<{
   );
 };
 
+
 /**
  * -------------------------------------------------------------
  * KANVAS KHUSUS 3: PTE ACADEMIC - OFFICIAL SCORECARD
@@ -3690,6 +2672,456 @@ export const PteScorecardCanvas: React.FC<{
 };
 
 /**
+ * -------------------------------------------------------------
+ * KANVAS KHUSUS SSW SENSEI: PAPAN TAKTIS HALAMAN, TRIK WAKAI PAPA+,
+ * KAMUS PEMULA & KOTOBA, SERTA CEK PAHAM KILAT 3 OPSI PROMETRIC
+ * -------------------------------------------------------------
+ */
+export const SswTacticalBoardCanvas: React.FC<{
+  initialPageNumber: number;
+  initialStepNumber: number;
+  personaName: string;
+  onSpeakPreview?: (text: string, spokenLang?: string) => void;
+  onAskSensei?: (question: string) => void;
+  onEvaluatePractice?: (...args: any[]) => void;
+}> = ({
+  initialPageNumber,
+  initialStepNumber,
+  personaName,
+  onSpeakPreview,
+  onAskSensei,
+  onEvaluatePractice,
+}) => {
+  const [activePage, setActivePage] = useState<number>(initialPageNumber || 1);
+  const [requestedStep, setRequestedStep] = useState<number | undefined>(initialStepNumber);
+  const [showFurigana, setShowFurigana] = useState<boolean>(true);
+  const [pageKotoba, setPageKotoba] = useState<SswKotobaItem[]>([]);
+  const [activeQuiz, setActiveQuiz] = useState<SswDrawnQuestionPayload | null>(null);
+  const [quizGrade, setQuizGrade] = useState<SswGradeQuizResult | null>(null);
+  const [isLoadingQuiz, setIsLoadingQuiz] = useState<boolean>(false);
+  const [stateTick, setStateTick] = useState<number>(0);
+
+  const totalPages = SSW_MASTER_KB.meta.totalPdfPages || 91;
+
+  useEffect(() => {
+    setActivePage(initialPageNumber || 1);
+    setRequestedStep(initialStepNumber);
+  }, [initialPageNumber, initialStepNumber]);
+
+  useEffect(() => {
+    const onFocusPage = (ev: Event) => {
+      const ce = ev as CustomEvent<{ page?: number }>;
+      if (typeof ce?.detail?.page === 'number') {
+        setActivePage(Math.max(1, Math.min(totalPages, ce.detail.page)));
+        setRequestedStep(undefined);
+      }
+    };
+    const onFocusStep = (ev: Event) => {
+      const ce = ev as CustomEvent<{ page?: number; stepIndex?: number }>;
+      if (typeof ce?.detail?.page === 'number') {
+        setActivePage(Math.max(1, Math.min(totalPages, ce.detail.page)));
+      }
+      if (typeof ce?.detail?.stepIndex === 'number') {
+        setRequestedStep(ce.detail.stepIndex);
+      }
+      setStateTick((n) => n + 1);
+    };
+    const onStateChanged = () => setStateTick((n) => n + 1);
+    const onHydrated = () => setStateTick((n) => n + 1);
+    void ensureSswFullKnowledgeLoaded().then(() => setStateTick((n) => n + 1));
+    window.addEventListener(SSW_FOCUS_PAGE_EVENT, onFocusPage as EventListener);
+    window.addEventListener(SSW_FOCUS_STEP_EVENT, onFocusStep as EventListener);
+    window.addEventListener(SSW_STATE_UPDATED_EVENT, onStateChanged);
+    window.addEventListener(SSW_KNOWLEDGE_HYDRATED_EVENT, onHydrated);
+    return () => {
+      window.removeEventListener(SSW_FOCUS_PAGE_EVENT, onFocusPage as EventListener);
+      window.removeEventListener(SSW_FOCUS_STEP_EVENT, onFocusStep as EventListener);
+      window.removeEventListener(SSW_STATE_UPDATED_EVENT, onStateChanged);
+      window.removeEventListener(SSW_KNOWLEDGE_HYDRATED_EVENT, onHydrated);
+    };
+  }, [totalPages]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void lookupSswMaterialAndPageAsync({ pageNumber: activePage }).then((res) => {
+      if (!cancelled) {
+        setPageKotoba((res.kotobaOnPage || []).slice(0, 6));
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [activePage]);
+
+  const drawQuickQuiz = () => {
+    setIsLoadingQuiz(true);
+    setQuizGrade(null);
+    void drawSswQuizQuestionAsync({ mode: 'mixed', preferWeakOrUnseen: true })
+      .then((q) => {
+        setActiveQuiz(q);
+      })
+      .finally(() => setIsLoadingQuiz(false));
+  };
+
+  useEffect(() => {
+    if (!activeQuiz) {
+      drawQuickQuiz();
+    }
+  }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _tickRef = stateTick;
+  const plan = getStructuredPagePlan(activePage, requestedStep);
+  const report = getSswProgressReport();
+  const activeStep = plan.activeStep;
+  const activeText = activeStep ? `${activeStep.title} ${activeStep.content}` : '';
+  const insights = getWakaiPapaTacticalInsightsForPage(activePage, activeText, 3);
+  const glossary = extractBeginnerGlossaryForText(
+    `${activeText} ${plan.pageObj?.title || ''} ${plan.pageObj?.focusCompass || ''}`,
+    5
+  );
+
+  const handleSelectPage = (nextPage: number) => {
+    const safePage = Math.max(1, Math.min(totalPages, nextPage));
+    playFiezelSfx('button_tap');
+    setActivePage(safePage);
+    setRequestedStep(undefined);
+    updateSswLessonStepCursor({ page: safePage, stepIndex: 1 });
+  };
+
+  const handleSelectStep = (stepNum: number) => {
+    playFiezelSfx('button_tap');
+    setRequestedStep(stepNum);
+    updateSswLessonStepCursor({ page: activePage, stepIndex: stepNum });
+  };
+
+  const handleCompleteStepAndNext = () => {
+    if (!activeStep) return;
+    playFiezelSfx('answer_correct');
+    const result = advanceSswLessonStep({
+      pageNumber: activePage,
+      completedStepNumber: activeStep.stepNumber,
+    });
+    if ((result as any)?.pageCompleted) {
+      setRequestedStep(undefined);
+    } else if (typeof (result as any)?.activeStepNumber === 'number') {
+      setRequestedStep((result as any).activeStepNumber);
+    }
+    setStateTick((n) => n + 1);
+  };
+
+  const handleAnswerQuickQuiz = async (letter: string) => {
+    if (!activeQuiz || quizGrade) return;
+    const result = await gradeSswQuizAnswerAsync({
+      quizId: activeQuiz.quizId,
+      userAnswer: letter,
+    });
+    setQuizGrade(result);
+    if (result.ok) {
+      playFiezelSfx('answer_correct');
+      onEvaluatePractice?.(letter, result.correctAnswerJp, `SSW Hal. ${result.discussionPdfPage}`, {
+        isQuizSuccess: true,
+      });
+    } else {
+      playFiezelSfx('answer_wrong');
+      onEvaluatePractice?.(letter, result.correctAnswerJp, `SSW Hal. ${result.discussionPdfPage}`, {
+        isQuizSuccess: false,
+        isQuizFailure: true,
+        misconceptionId: `ssw_quiz_page_${result.discussionPdfPage}`,
+      });
+    }
+    setStateTick((n) => n + 1);
+  };
+
+  return (
+    <div data-testid="ssw-tactical-popup" className="space-y-3.5 text-[#231A12]">
+      {/* BAR NAVIGASI HALAMAN, KESEPADANAN KESIAPAN, & FURIGANA */}
+      <div className="p-3 rounded-2xl bg-[#8C2233] text-white flex flex-wrap items-center justify-between gap-2 shadow-xs">
+        <div className="flex items-center gap-2 min-w-0">
+          <button
+            type="button"
+            onClick={() => handleSelectPage(activePage - 1)}
+            disabled={activePage <= 1}
+            className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 disabled:opacity-40 text-xs font-black flex items-center justify-center cursor-pointer"
+            title="Halaman sebelumnya"
+          >
+            &lt;
+          </button>
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-white/80">
+              Papan Taktis OTAFF Ver 5.1 · Hal. {activePage} / {totalPages}
+            </div>
+            <div className="text-xs sm:text-sm font-black leading-snug break-words">
+              {plan.pageObj?.title || `Halaman ${activePage}`}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleSelectPage(activePage + 1)}
+            disabled={activePage >= totalPages}
+            className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 disabled:opacity-40 text-xs font-black flex items-center justify-center cursor-pointer"
+            title="Halaman berikutnya"
+          >
+            &gt;
+          </button>
+        </div>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="px-2.5 py-1 rounded-full bg-white/15 text-[10.5px] font-extrabold">
+            Kesiapan {report.readinessScorePct}% / 65%
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowFurigana((v) => !v)}
+            className={`px-2 py-1 rounded-lg text-[10.5px] font-bold cursor-pointer transition ${
+              showFurigana ? 'bg-white text-[#8C2233]' : 'bg-white/15 text-white'
+            }`}
+          >
+            Aa Furigana
+          </button>
+        </div>
+      </div>
+
+      {/* KARTU 1: KUNCI FOKUS LANGKAH AKTIF (ANTI LOMPAT MATERI) */}
+      <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#E2D2BA] space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="text-[11px] font-extrabold uppercase tracking-wide text-[#8C2233]">
+            Fokus Saat Ini: Langkah {plan.activeStepIndex} dari {plan.steps.length}
+          </div>
+          <div className="flex items-center gap-1 flex-wrap">
+            {plan.steps.map((s) => {
+              const isDone = plan.completedSteps.includes(s.stepNumber);
+              const isCurrent = s.stepNumber === plan.activeStepIndex;
+              return (
+                <button
+                  key={s.stepNumber}
+                  type="button"
+                  onClick={() => handleSelectStep(s.stepNumber)}
+                  className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold cursor-pointer border transition ${
+                    isCurrent
+                      ? 'bg-[#8C2233] text-white border-[#8C2233]'
+                      : isDone
+                        ? 'bg-[#E6F4EA] text-[#1B5E34] border-[#A7F3D0]'
+                        : 'bg-[#FAF4E8] text-[#5C4A38] border-[#EADBCE]'
+                  }`}
+                >
+                  {isDone && !isCurrent ? `✓ ${s.stepNumber}` : `Langkah ${s.stepNumber}`}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {activeStep && (
+          <div className="space-y-2">
+            <div className="text-sm font-black text-[#231A12]">{activeStep.title}</div>
+            <p className="text-xs text-[#3D2E20] leading-relaxed whitespace-pre-line">
+              {cleanSpacedJapanese(activeStep.content)}
+            </p>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleCompleteStepAndNext}
+                className="px-3 py-1.5 rounded-xl bg-[#1B5E34] hover:bg-[#144727] text-white text-[11px] font-bold cursor-pointer"
+              >
+                ✓ Paham Langkah {activeStep.stepNumber} & Lanjut
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onAskSensei?.(
+                    `Sensei, bedah lebih dalam Langkah ${activeStep.stepNumber} (${activeStep.title}) di Halaman ${activePage} pakai contoh pabrik!`
+                  )
+                }
+                className="px-3 py-1.5 rounded-xl bg-[#FCECED] hover:bg-[#F9D7DB] text-[#8C2233] text-[11px] font-bold cursor-pointer whitespace-nowrap"
+              >
+                Tanya Sensei Langkah Ini
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* KARTU 2: TRIK RAHASIA & JEBAKAN UJIAN (WAKAI PAPA+ MASTER MODE) */}
+      <div className="space-y-2">
+        <div className="text-[11px] font-extrabold uppercase tracking-wide text-[#5C4A38]">
+          Trik Rahasia & Jebakan Ujian Halaman {activePage}
+        </div>
+        <div className="grid grid-cols-1 gap-2">
+          {insights.map((tip) => (
+            <div
+              key={tip.id}
+              data-testid="ssw-tactical-tip-card"
+              className="p-3 rounded-2xl bg-[#FFFBF2] border border-[#E9D7B8] space-y-1.5"
+            >
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded-md bg-[#8C2233] text-white text-[9.5px] font-black tracking-wide">
+                  {tip.badge}
+                </span>
+                <span className="text-xs font-black text-[#231A12]">{tip.title}</span>
+              </div>
+              <p className="text-xs text-[#3D2E20] leading-relaxed">{tip.trick}</p>
+              <p className="text-[11px] font-semibold text-[#991B1B] bg-[#FFF1F2] border border-[#FECDD3] rounded-xl px-2.5 py-1.5">
+                Waspada Jebakan: {tip.trapAlert}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* KARTU 3: KAMUS PEMULA & KOTOBA HALAMAN INI */}
+      {(glossary.length > 0 || pageKotoba.length > 0) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {glossary.length > 0 && (
+            <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-1.5">
+              <div className="text-[10.5px] font-extrabold uppercase tracking-wide text-[#8C2233]">
+                Kamus Istilah Pemula
+              </div>
+              <div className="space-y-1.5">
+                {glossary.map((g) => (
+                  <div key={g.term} className="text-[11px] leading-snug border-b border-[#F3EBE0] last:border-b-0 pb-1 last:pb-0">
+                    <span className="font-black text-[#231A12]">{g.term}: </span>
+                    <span className="text-[#4A3B2C]">{g.simpleMeaningId}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {pageKotoba.length > 0 && (
+            <div className="p-3 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-1.5">
+              <div className="text-[10.5px] font-extrabold uppercase tracking-wide text-[#2D7A4D]">
+                Kotoba Kunci Hal. {activePage}
+              </div>
+              <div className="space-y-1.5">
+                {pageKotoba.map((k, idx) => (
+                  <div
+                    key={`${k.jp}_${idx}`}
+                    className="flex items-center justify-between gap-2 text-[11px] border-b border-[#F3EBE0] last:border-b-0 pb-1 last:pb-0"
+                  >
+                    <div className="min-w-0">
+                      <div
+                        className="font-black text-[#231A12]"
+                        dangerouslySetInnerHTML={{
+                          __html: renderSswRubyHtml(k.rubyMarkup || k.jp, !showFurigana),
+                        }}
+                      />
+                      <div className="text-[10px] text-[#6E5E47]">
+                        {k.romaji} · {k.meaningId}
+                      </div>
+                    </div>
+                    {onSpeakPreview && (
+                      <button
+                        type="button"
+                        onClick={() => onSpeakPreview(cleanSpacedJapanese(k.jp), 'ja')}
+                        className="px-2 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[10px] font-bold text-[#5C4A38] shrink-0 cursor-pointer"
+                      >
+                        Dengar
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* KARTU 4: CEK PAHAM KILAT 1 SOAL PROMETRIC (3 PILIHAN A/B/C) */}
+      <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#DECFAF] space-y-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] font-extrabold uppercase tracking-wide text-[#8C2233]">
+            Uji Paham Kilat SSW (3 Pilihan Asli Prometric)
+          </span>
+          <button
+            type="button"
+            onClick={drawQuickQuiz}
+            disabled={isLoadingQuiz}
+            className="px-2.5 py-1 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-bold cursor-pointer"
+          >
+            ↻ Soal Lain
+          </button>
+        </div>
+
+        {activeQuiz ? (
+          <div className="space-y-2">
+            <div
+              className="text-xs font-black text-[#231A12] leading-snug"
+              dangerouslySetInnerHTML={{
+                __html: renderSswRubyHtml(activeQuiz.questionRuby || activeQuiz.questionJp, !showFurigana),
+              }}
+            />
+            {activeQuiz.questionId && (
+              <p className="text-[11px] text-[#5C4A38] font-medium">
+                Arti soal: {activeQuiz.questionId}
+              </p>
+            )}
+            <div className="grid grid-cols-1 gap-1.5">
+              {activeQuiz.options.map((opt) => {
+                const isPicked = quizGrade?.selectedLetter === opt.letter;
+                const isRight = quizGrade && quizGrade.correctLetter === opt.letter;
+                return (
+                  <button
+                    key={opt.letter}
+                    type="button"
+                    disabled={Boolean(quizGrade)}
+                    onClick={() => void handleAnswerQuickQuiz(opt.letter)}
+                    data-testid={`ssw-popup-quiz-opt-${opt.letter}`}
+                    className={`w-full p-2.5 rounded-xl border text-left text-xs transition cursor-pointer ${
+                      quizGrade
+                        ? isRight
+                          ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
+                          : isPicked
+                            ? 'bg-[#FDE8E4] border-[#F87171] text-[#991B1B]'
+                            : 'bg-[#FAF6EE] border-[#EADBCE] text-[#6E5E47] opacity-75'
+                        : 'bg-[#FDFAF4] border-[#EADBCE] hover:border-[#8C2233] text-[#231A12]'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2">
+                      <span className="font-black text-[#8C2233] shrink-0">{opt.letter}.</span>
+                      <div className="min-w-0 flex-1">
+                        <div
+                          className="font-bold"
+                          dangerouslySetInnerHTML={{
+                            __html: renderSswRubyHtml(opt.ruby || opt.jp, !showFurigana),
+                          }}
+                        />
+                        {opt.id && (
+                          <div className="text-[10.5px] opacity-85 mt-0.5">{opt.id}</div>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            {quizGrade && (
+              <div
+                className={`p-2.5 rounded-xl text-[11px] border ${
+                  quizGrade.ok
+                    ? 'bg-[#E6F4EA] border-[#A7F3D0] text-[#1B5E34]'
+                    : 'bg-[#FFF1F2] border-[#FECDD3] text-[#991B1B]'
+                }`}
+              >
+                <div className="font-black">
+                  {quizGrade.ok
+                    ? `Benar (${quizGrade.correctLetter})! Kesiapan naik ke ${quizGrade.readinessScorePct}%`
+                    : `Keliru (${quizGrade.selectedLetter}). Jawaban tepat: ${quizGrade.correctLetter}`}
+                </div>
+                <p className="mt-1 font-medium leading-relaxed">{quizGrade.explanationId}</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-xs text-[#8C7760]">Menyiapkan 1 soal SSW...</div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+/**
  * KOMPONEN UTAMA KANVAS ADAPTIF KAWAN BICARA
  * Desain Minimalis, Elegan, Anti-AI-Slop, Palet Pastel Lembut FIEZEL.
  */
@@ -3701,13 +3133,16 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   scenario,
   persona,
   isLiveConnected,
+  isPlayingPreview = false,
   topicTitle,
   focusType,
   patternFormula,
   sampleTarget,
   uiAction,
+  topMisconceptionId = null,
   isGeneratingTopic,
   onSpeakPreview,
+  onStopMainAudio,
   onResumeConversation,
   onEvaluatePractice,
   onRequestCustomTopic,
@@ -3718,18 +3153,145 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   cefrLevel = 'B1',
   latestPteDiagnostic = null,
   latestReadAloudAlignment = null,
+  latestAiSubtitle = '',
   onActiveBoardSync,
+  onWhiteboardBraincoreEvent,
 }) => {
-  const [boardState, setBoardState] = useState<DynamicBoardState | null>(null);
   const [quizMode, setQuizMode] = useState<WorkbenchQuizMode>(forcedExerciseMode || 'multiple_choice');
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [clozeAnswer, setClozeAnswer] = useState<string | null>(null);
   const [placedBlocks, setPlacedBlocks] = useState<string[]>([]);
   const [isQuizCompleted, setIsQuizCompleted] = useState<boolean>(false);
-  const [isReady, setIsReady] = useState<boolean>(false);
   const [quizSeed, setQuizSeed] = useState<number>(externalQuizSeed ?? 0);
   const [isMinimized, setIsMinimized] = useState<boolean>(initialMinimized ?? false);
   const lastOpenNonceRef = useRef<number | undefined>(openNonce);
+  const onActiveBoardSyncRef = useRef(onActiveBoardSync);
+  onActiveBoardSyncRef.current = onActiveBoardSync;
+  const onWhiteboardBraincoreEventRef = useRef(onWhiteboardBraincoreEvent);
+  onWhiteboardBraincoreEventRef.current = onWhiteboardBraincoreEvent;
+  const reportedQuizKeysRef = useRef<Set<string>>(new Set());
+  const reportedBoardDoneKeysRef = useRef<Set<string>>(new Set());
+  const ui = getWorkbenchUiStrings(locale);
+
+  // Solvely-Parity Interactive Whiteboard Studio Controls
+  const [playbackSpeed, setPlaybackSpeed] = useState<0.75 | 1 | 1.25 | 1.5>(1);
+  const [isWritingPlaying, setIsWritingPlaying] = useState<boolean>(true);
+  const [replayNonce, setReplayNonce] = useState<number>(0);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [autoSpotlight, setAutoSpotlight] = useState<boolean>(true);
+  const onStopMainAudioRef = useRef(onStopMainAudio);
+  onStopMainAudioRef.current = onStopMainAudio;
+  const [lockstepIndex, setLockstepIndex] = useState<number>(0);
+  const [lockstepProgress, setLockstepProgress] = useState<number>(0);
+  const [activeStepSubtitle, setActiveStepSubtitle] = useState<string>('');
+  // Kursor kata yang SEDANG diucapkan tutor (dari stempel waktu audio nyata) + jam audio nyata
+  const [spokenCursor, setSpokenCursor] = useState<{ stepIndex: number; wordIdx: number } | null>(null);
+  const spokenCursorRef = useRef<{ stepIndex: number; wordIdx: number } | null>(null);
+  const [audioClock, setAudioClock] = useState<{ elapsedSec: number; totalSec: number } | null>(null);
+  const [isStepAudioActive, setIsStepAudioActive] = useState<boolean>(false);
+  const [isAudioPreparing, setIsAudioPreparing] = useState<boolean>(false);
+  const [isInitialAudioGateActive, setIsInitialAudioGateActive] = useState<boolean>(true);
+  const hasRevealedCanvasRef = useRef<boolean>(false);
+  const [forceManualTts, setForceManualTts] = useState<boolean>(false);
+  const lastCommitIdxRef = useRef<number>(-1);
+  const lastCommitProgRef = useRef<number>(-1);
+  const lastCommitProgAtRef = useRef<number>(0);
+  const lastCommitSubRef = useRef<string>('');
+  const playbackSpeedRef = useRef(playbackSpeed);
+  playbackSpeedRef.current = playbackSpeed;
+  const lockstepProgressRef = useRef(lockstepProgress);
+  lockstepProgressRef.current = lockstepProgress;
+  const lockstepAudioRef = useRef<HTMLAudioElement | null>(null);
+  const trackAudioCtxRef = useRef<AudioContext | null>(null);
+  const trackSourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
+  const trackCacheRef = useRef<
+    Map<
+      string,
+      Promise<{
+        audioBuffer: AudioBuffer | null;
+        dataUrl: string;
+        durationSec: number;
+        chunksTotal?: number;
+        chunksSucceeded?: number;
+      } | null>
+    >
+  >(new Map());
+  const trackOffsetSecRef = useRef<number>(0);
+  const trackTotalSecRef = useRef<number>(0);
+  const trackFracRef = useRef<number>(0);
+  const seekTargetStepRef = useRef<number | null>(null);
+  const [seekNonce, setSeekNonce] = useState<number>(0);
+  const lockstepSeqIdRef = useRef<number>(0);
+  const personaRef = useRef<VoicePersona>(persona);
+  personaRef.current = persona;
+  const stopLockstepAudio = () => {
+    lockstepSeqIdRef.current += 1;
+    try {
+      (window as unknown as { __fzWbLockstepActive?: boolean }).__fzWbLockstepActive = false;
+    } catch {
+      // Ignore
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // Ignore speechSynthesis cancel errors
+      }
+    }
+    if (trackSourceNodeRef.current) {
+      try {
+        trackSourceNodeRef.current.onended = null;
+        trackSourceNodeRef.current.stop();
+        trackSourceNodeRef.current.disconnect();
+      } catch {
+        // Ignore cleanup error
+      }
+      trackSourceNodeRef.current = null;
+    }
+    if (lockstepAudioRef.current) {
+      try {
+        lockstepAudioRef.current.onended = null;
+        lockstepAudioRef.current.pause();
+        lockstepAudioRef.current.src = '';
+      } catch {
+        // Ignore cleanup error
+      }
+      lockstepAudioRef.current = null;
+    }
+    setIsStepAudioActive(false);
+    setIsAudioPreparing(false);
+  };
+  useEffect(() => {
+    const onStopWb = () => stopLockstepAudio();
+    window.addEventListener('fz:stop-workbench-audio', onStopWb);
+    return () => window.removeEventListener('fz:stop-workbench-audio', onStopWb);
+  }, []);
+  const [isPenActive, setIsPenActive] = useState<boolean>(false);
+  const [penColor, setPenColor] = useState<PenColor>('#2563EB');
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 920 : true
+  );
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 767px)');
+    const syncDrawer = () => {
+      if (mq.matches) setIsSidebarOpen(false);
+    };
+    syncDrawer();
+    mq.addEventListener?.('change', syncDrawer);
+    return () => mq.removeEventListener?.('change', syncDrawer);
+  }, []);
+  const [showCaptions, setShowCaptions] = useState<boolean>(true);
+  const [questionDraft, setQuestionDraft] = useState<string>('');
+  const [studentQuestions, setStudentQuestions] = useState<StudentBoardQuestion[]>([]);
+  const pendingQuestionIdRef = useRef<string | null>(null);
+  const pendingQuestionActionSigRef = useRef<string>('');
+  const prevGeneratingTopicRef = useRef<boolean>(false);
+  const [uploadedMaterials, setUploadedMaterials] = useState<SourceMaterialPage[]>([]);
+  const [selectedMaterialPage, setSelectedMaterialPage] = useState<SourceMaterialPage | null>(null);
+  const [loaderProgress, setLoaderProgress] = useState<number>(18);
+  const boardContainerRef = useRef<HTMLDivElement | null>(null);
+  const materialUploadInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (initialMinimized !== undefined) {
@@ -3766,54 +3328,18 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
   const onSpeakPreviewRef = useRef(onSpeakPreview);
   onSpeakPreviewRef.current = onSpeakPreview;
-  const onActiveBoardSyncRef = useRef(onActiveBoardSync);
-  onActiveBoardSyncRef.current = onActiveBoardSync;
   const lastSpokenKeyRef = useRef<string>('');
 
-  const ui = getWorkbenchUiStrings(locale);
-
-  // Close popup cleanly via Escape key on desktop
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (ev: KeyboardEvent) => {
-      if (ev.key === 'Escape') {
-        ev.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, onClose]);
-
   // Identifikasi kunci soal saat ini
-  const currentKey = `${uiAction?.focusType || focusType || ''}::${uiAction?.bankTopicId || ''}::${uiAction?.topicTitle || topicTitle || ''}::${uiAction?.wrongWord || ''}::${uiAction?.sampleTarget || ''}::${quizSeed}`;
+  const currentKey = `${uiAction?.bankTopicId || ''}::${uiAction?.topicTitle || topicTitle || ''}::${quizSeed}`;
   const lastKeyRef = useRef<string>('');
 
-  // SIKLUS HIDUP STATE BERSIH (PEMBERANTAS MUTLAK GHOST ANSWER BUG)
-  useEffect(() => {
-    if (!isOpen) {
-      setBoardState(null);
-      setSelectedOptionId(null);
-      setClozeAnswer(null);
-      setPlacedBlocks([]);
-      setIsQuizCompleted(false);
-      setIsReady(false);
-      setIsMinimized(false);
-      lastKeyRef.current = '';
-      lastSpokenKeyRef.current = '';
-      return;
-    }
-
-    // JIKA TOPIK BERGANTI SELAGI MODAL TERBUKA: BERSIHKAN JAWABAN LAMA SEKETIKA!
-    if (lastKeyRef.current && lastKeyRef.current !== currentKey) {
-      setSelectedOptionId(null);
-      setClozeAnswer(null);
-      setPlacedBlocks([]);
-      setIsQuizCompleted(false);
-      setIsMinimized(false);
-    }
-    lastKeyRef.current = currentKey;
-
+  // Derivasi sinkron boardState & isReady agar zero 1-render lag dan zero double-TTS race
+  const { boardState, isReady } = useMemo<{
+    boardState: DynamicBoardState | null;
+    isReady: boolean;
+  }>(() => {
+    if (!isOpen) return { boardState: null, isReady: false };
     const isSswPersonaModal = Boolean(
       persona?.id === 'ssw_sensei' ||
       scenario?.personaId === 'ssw_sensei' ||
@@ -3838,19 +3364,21 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           focusType: 'ssw_tactical_board' as any,
         }
       : baseAction;
-    const query = (effectiveAction?.topicTitle || topicTitle || '').trim();
     const isPteSessionModal = Boolean(
       scenario?.id?.startsWith('scen_pte') ||
       persona?.id === 'dr_julian' ||
       scenario?.personaId === 'dr_julian'
     );
+    const query = (effectiveAction?.topicTitle || topicTitle || '').trim();
     const hasRich =
       hasRichDynamicAction(effectiveAction) ||
       focusType === 'read_aloud' ||
       Boolean(focusType?.startsWith('pte_')) ||
       isSswPersonaModal;
-
-    const previewDerived = deriveContextualPedagogicalBoard(
+    if (!hasRich && isGeneratingTopic) {
+      return { boardState: null, isReady: false };
+    }
+    const derived = deriveContextualPedagogicalBoard(
       effectiveAction,
       query,
       targetLang,
@@ -3859,32 +3387,24 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       latestPteDiagnostic,
       isPteSessionModal
     );
+    return { boardState: derived, isReady: true };
+  }, [
+    isOpen,
+    uiAction,
+    focusType,
+    topicTitle,
+    patternFormula,
+    sampleTarget,
+    isGeneratingTopic,
+    targetLang,
+    locale,
+    quizSeed,
+    latestPteDiagnostic,
+    scenario,
+    persona,
+  ]);
 
-    if (hasRich || previewDerived.contextMode !== 'standard_clarity' || !isGeneratingTopic) {
-      setBoardState(previewDerived);
-      setIsReady(true);
-      return;
-    }
-
-    setIsReady(false);
-    const timer = setTimeout(() => {
-      const derived = deriveContextualPedagogicalBoard(
-        effectiveAction,
-        query,
-        targetLang,
-        locale,
-        quizSeed,
-        latestPteDiagnostic,
-        isPteSessionModal
-      );
-      setBoardState(derived);
-      setIsReady(true);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [isOpen, currentKey, topicTitle, focusType, patternFormula, sampleTarget, uiAction, targetLang, locale, isGeneratingTopic, quizSeed, latestPteDiagnostic, scenario, persona]);
-
-  // Handler Suara Guru & Sinkronisasi Target Layar -> AI Live
+  // Sinkronkan konten target papan tulis aktif -> konteks AI Live + catat selesainya alur papan ke Braincore
   useEffect(() => {
     if (!isOpen || !isReady || !boardState) return;
     if (
@@ -3894,12 +3414,12 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       boardState.contextMode !== 'pte_describe_image'
     ) {
       const targetText =
-        boardState.pteReadAloudData?.passageText ||
         boardState.pteChartData?.title ||
         boardState.pairData?.termB ||
-        boardState.ribbonSegments?.map((s) => s.word).join(' ') ||
+        boardState.standardTarget?.text ||
         boardState.characterData?.char ||
         boardState.toneData?.word ||
+        uiAction?.sampleTarget ||
         boardState.topicTitle ||
         '';
       onActiveBoardSyncRef.current({
@@ -3908,120 +3428,1264 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         activeTargetText: targetText,
       });
     }
-    if (boardState.coachExplanation && onSpeakPreviewRef.current) {
-      const key = `${boardState.topicTitle}::${boardState.coachExplanation}`;
-      if (lastSpokenKeyRef.current !== key) {
-        lastSpokenKeyRef.current = key;
-        if (!isLiveConnected) {
-          const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
-          onSpeakPreviewRef.current(boardState.coachExplanation, locCode);
+  }, [isOpen, isReady, boardState, uiAction?.sampleTarget]);
+
+  // SIKLUS HIDUP STATE BERSIH (PEMBERANTAS MUTLAK GHOST ANSWER BUG)
+  useEffect(() => {
+    if (!isOpen) {
+      stopLockstepAudio();
+      trackCacheRef.current.clear();
+      trackOffsetSecRef.current = 0;
+      trackTotalSecRef.current = 0;
+      trackFracRef.current = 0;
+      setSelectedOptionId(null);
+      setClozeAnswer(null);
+      setPlacedBlocks([]);
+      setIsQuizCompleted(false);
+      setIsMinimized(false);
+      setIsPenActive(false);
+      setStudentQuestions([]);
+      pendingQuestionIdRef.current = null;
+      pendingQuestionActionSigRef.current = '';
+      setSelectedMaterialPage(null);
+      setLoaderProgress(18);
+      setLockstepIndex(0);
+      setLockstepProgress(0);
+      setActiveStepSubtitle('');
+      lastKeyRef.current = '';
+      lastSpokenKeyRef.current = '';
+      return;
+    }
+
+    // JIKA TOPIK BERGANTI SELAGI MODAL TERBUKA: BERSIHKAN JAWABAN, CACHE AUDIO & STATE LAMA SEKETIKA!
+    if (lastKeyRef.current && lastKeyRef.current !== currentKey) {
+      const prevBaseTitle = lastKeyRef.current.split('::')[1] || '';
+      const nextBaseTitle = currentKey.split('::')[1] || '';
+      trackCacheRef.current.clear();
+      setSelectedOptionId(null);
+      setClozeAnswer(null);
+      setPlacedBlocks([]);
+      setIsQuizCompleted(false);
+      lastCommitIdxRef.current = -1;
+      lastCommitProgRef.current = -1;
+      lastCommitSubRef.current = '';
+    spokenCursorRef.current = null;
+    setSpokenCursor(null);
+    setAudioClock(null);
+      setActiveStepSubtitle('');
+      setLockstepIndex(0);
+      setLockstepProgress(0);
+      if (prevBaseTitle !== nextBaseTitle) {
+        setStudentQuestions([]);
+        prevStudentQCountRef.current = 0;
+        pendingQuestionIdRef.current = null;
+        setSelectedMaterialPage(null);
+      }
+    }
+    lastKeyRef.current = currentKey;
+
+    if (hasRichDynamicAction(uiAction) || Boolean(focusType?.startsWith('pte_'))) {
+      setForceManualTts(false);
+      setIsWritingPlaying(true);
+    }
+  }, [isOpen, currentKey, uiAction, focusType]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      hasRevealedCanvasRef.current = false;
+      setIsInitialAudioGateActive(true);
+      return;
+    }
+    if (isReady) return;
+    setLoaderProgress(18);
+    const id = window.setInterval(() => {
+      setLoaderProgress((prev) => (prev >= 94 ? 94 : prev + 7));
+    }, 180);
+    return () => window.clearInterval(id);
+  }, [isOpen, isReady]);
+
+  // Sinkronkan pembukaan kanvas pertama kali agar suara tutor sudah ter-decode & siap diputar seketika tanpa hening
+  useEffect(() => {
+    if (!isOpen || !isReady || hasRevealedCanvasRef.current || !isInitialAudioGateActive) return;
+    const isPtePopup =
+      boardState?.contextMode === 'read_aloud' ||
+      boardState?.contextMode === 'ssw_tactical_board' ||
+      Boolean(boardState?.focusType?.startsWith('pte_')) ||
+      String(uiAction?.focusType || focusType || '').startsWith('pte_') ||
+      focusType === 'read_aloud' ||
+      focusType === 'ssw_tactical_board';
+    if (isPtePopup || boardState?.isOfflineNotice) {
+      hasRevealedCanvasRef.current = true;
+      setIsInitialAudioGateActive(false);
+      return;
+    }
+    const safetyTimer = window.setTimeout(() => {
+      if (!hasRevealedCanvasRef.current) {
+        hasRevealedCanvasRef.current = true;
+        setIsInitialAudioGateActive(false);
+      }
+    }, 11500);
+    return () => window.clearTimeout(safetyTimer);
+  }, [
+    isOpen,
+    isReady,
+    isInitialAudioGateActive,
+    boardState?.focusType,
+    boardState?.isOfflineNotice,
+    uiAction?.focusType,
+    focusType,
+  ]);
+
+  const [cjkRevision, setCjkRevision] = useState(0);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const unsub = subscribeKanjiVgUpdates(() => {
+      setCjkRevision((v) => v + 1);
+    });
+    const candidates = new Set<string>();
+    const scanText = (txt?: string) => {
+      if (!txt) return;
+      const matches = txt.match(/[\u4e00-\u9faf\u3040-\u309f\u30a0-\u30ff]/g);
+      if (matches) matches.slice(0, 6).forEach((ch) => candidates.add(ch));
+    };
+    scanText(uiAction?.topicTitle);
+    scanText(boardState?.title);
+    if (Array.isArray(uiAction?.whiteboardSteps)) {
+      for (const st of uiAction.whiteboardSteps) {
+        if (st?.kind === 'kanji_grid') {
+          scanText(st.character);
+          scanText(st.title);
         }
       }
     }
-  }, [isOpen, isReady, boardState, isLiveConnected, locale]);
+    candidates.forEach((ch) => {
+      void ensureKanjiStrokesLoaded(ch, targetLang);
+    });
+    return unsub;
+  }, [isOpen, uiAction, boardState?.title, targetLang]);
+
+  const whiteboardPlan = useMemo(() => {
+    if (!boardState) return null;
+    return buildWhiteboardScenePlan({
+      boardState,
+      uiAction,
+      scenario,
+      targetLang,
+      locale,
+      studentQuestions,
+      uploadedMaterials,
+    });
+  }, [boardState, uiAction, scenario, targetLang, locale, studentQuestions, uploadedMaterials, cjkRevision]);
+
+  const cohesiveAudioPlan = useMemo(
+    () => (whiteboardPlan ? buildCohesiveBoardNarrationScript(whiteboardPlan) : null),
+    [whiteboardPlan]
+  );
+
+  // Reset track & lockstep ke detik 0 saat topik papan berganti atau pengguna menekan Replay
+  useEffect(() => {
+    if (!isOpen || !isReady || !whiteboardPlan) return;
+    stopLockstepAudio();
+    trackOffsetSecRef.current = 0;
+    trackTotalSecRef.current = 0;
+    trackFracRef.current = 0;
+    lastCommitIdxRef.current = -1;
+    lastCommitProgRef.current = -1;
+    lastCommitSubRef.current = '';
+    spokenCursorRef.current = null;
+    setSpokenCursor(null);
+    setAudioClock(null);
+    setActiveStepSubtitle('');
+    setLockstepIndex(0);
+    setLockstepProgress(0);
+    setIsWritingPlaying(true);
+  }, [isOpen, isReady, whiteboardPlan?.boardTitle, uiAction?.explanationText, replayNonce]);
+
+  const prevStudentQCountRef = useRef<number>(0);
+  useEffect(() => {
+    const count = studentQuestions.length;
+    if (
+      count > prevStudentQCountRef.current &&
+      !isGeneratingTopic &&
+      !pendingQuestionIdRef.current &&
+      whiteboardPlan &&
+      cohesiveAudioPlan
+    ) {
+      // Mulai presentasi dari atas agar diagram/visual baru langsung terlihat jelas
+      // tanpa melompat ke kartu pojok kanan bawah dan menyisakan area kosong di kiri.
+      trackFracRef.current = 0;
+      trackOffsetSecRef.current = 0;
+      lastCommitIdxRef.current = -1;
+      lastCommitProgRef.current = -1;
+      lastCommitSubRef.current = '';
+    spokenCursorRef.current = null;
+    setSpokenCursor(null);
+    setAudioClock(null);
+      setActiveStepSubtitle('');
+      setLockstepIndex(0);
+      setLockstepProgress(0.02);
+      setIsWritingPlaying(true);
+      setSeekNonce((n) => n + 1);
+      try {
+        document.querySelector('[data-testid="solvely-dotgrid-whiteboard"]')?.scrollTo?.({
+          top: 0,
+          behavior: 'smooth',
+        });
+      } catch {
+        // ignore
+      }
+    }
+    prevStudentQCountRef.current = count;
+  }, [studentQuestions.length, isGeneratingTopic, whiteboardPlan, cohesiveAudioPlan]);
+
+  // Perbarui jawaban kartu tanya-jawab begitu penjelasan lanjutan dari tutor selesai dimuat
+  useEffect(() => {
+    const wasGenerating = prevGeneratingTopicRef.current;
+    prevGeneratingTopicRef.current = Boolean(isGeneratingTopic);
+
+    const pendingId = pendingQuestionIdRef.current;
+    if (!pendingId || isGeneratingTopic) return;
+
+    const currentSig = `${uiAction?.topicTitle || ''}::${uiAction?.explanationText || ''}::${uiAction?.coachSpokenScript || ''}`;
+    const actionChanged = Boolean(currentSig) && currentSig !== pendingQuestionActionSigRef.current;
+    if (!wasGenerating && !actionChanged) return;
+
+    const rawReply =
+      (uiAction?.coachSpokenScript || uiAction?.explanationText || boardState?.summary || '').trim();
+    const allSentences = rawReply
+      .replace(/\s+/g, ' ')
+      .split(/(?<=[.!?])\s+/)
+      .map((s) =>
+        s
+          .replace(/^(?:dengar(?:kan)?|perhatikan|simak)\s+baik-?baik(?:\s+ya)?[,!.\s]*/i, '')
+          .trim()
+      )
+      .filter(
+        (s) =>
+          s.length > 8 &&
+          !/^(?:halo|hai|hi|hey|oke|baik|siap|nah|wah|bagus|tentu)[^.!?]{0,24}[.!?]?$/i.test(s) &&
+          !/^(?:halo!?\s*)?(?:aku\s+)?coach\s+\w+\s+di\s+sini[.!]?$/i.test(s)
+      );
+    const declarative = allSentences.filter((s) => !/\?\s*$/.test(s));
+    const meaningfulSentences = declarative.length > 0 ? declarative : allSentences;
+    const cleanedSentences = meaningfulSentences.slice(0, 2).join(' ').slice(0, 260);
+    const finalAnswer =
+      cleanedSentences || 'Penjelasan lanjutan beserta visual papan tulis sudah diperbarui di atas.';
+
+    setStudentQuestions((prev) =>
+      prev.map((q) => (q.id === pendingId ? { ...q, tutorAnswer: finalAnswer } : q))
+    );
+    pendingQuestionIdRef.current = null;
+    pendingQuestionActionSigRef.current = '';
+  }, [
+    isGeneratingTopic,
+    uiAction?.topicTitle,
+    uiAction?.explanationText,
+    uiAction?.coachSpokenScript,
+    boardState?.summary,
+  ]);
+
+  // Update active audio playback speed smoothly without resetting progress
+  useEffect(() => {
+    if (trackSourceNodeRef.current) {
+      try {
+        trackSourceNodeRef.current.playbackRate.value = playbackSpeed;
+      } catch {
+        // Ignore rate update error
+      }
+    }
+    if (lockstepAudioRef.current) {
+      try {
+        lockstepAudioRef.current.playbackRate = playbackSpeed;
+      } catch {
+        // Ignore rate update error
+      }
+    }
+  }, [playbackSpeed]);
+
+  // Single-Track Continuous Audio-Visual Lockstep Sequencer (1 TTS terpadu via Web Audio API, nol jeda antar-step!)
+  useEffect(() => {
+    const isPteBoard =
+      boardState?.contextMode === 'read_aloud' ||
+      boardState?.contextMode === 'ssw_tactical_board' ||
+      focusType === 'read_aloud' ||
+      focusType === 'ssw_tactical_board' ||
+      uiAction?.focusType === 'read_aloud' ||
+      uiAction?.focusType === 'ssw_tactical_board' ||
+      Boolean(boardState?.contextMode?.startsWith('pte_')) ||
+      Boolean(focusType?.startsWith('pte_')) ||
+      Boolean(uiAction?.focusType?.startsWith('pte_'));
+
+    if (!isOpen || !isReady || isPteBoard || !whiteboardPlan || !cohesiveAudioPlan) {
+      stopLockstepAudio();
+      return;
+    }
+
+    const steps = whiteboardPlan.steps;
+    const spans = cohesiveAudioPlan.stepSpans;
+    if (!steps.length || !spans.length) return;
+
+    if (!activeStepSubtitle && spans[0]?.caption) {
+      setActiveStepSubtitle(spans[0].caption);
+    }
+
+    if (!isWritingPlaying) {
+      stopLockstepAudio();
+      return;
+    }
+
+    let cancelled = false;
+    const seqId = ++lockstepSeqIdRef.current;
+    let rafId = 0;
+
+    const estTotalSec = Math.max(
+      4,
+      steps.reduce((sum, s) => sum + (s.durationMs || 2200), 0) / 1000
+    );
+
+    const fullScript = cohesiveAudioPlan.fullScript;
+
+    // 1:1 Step-to-Chunk Audio Packing:
+    // - Satu chunk TTS hanya berisi kalimat dari SATU langkah yang sama (tidak pernah menggabungkan langkah berbeda ke 1 audio blob)
+    // - Tidak pernah memotong kalimat di tengah klausa (split hanya bila 1 langkah > 260 karakter pada batas kalimat utuh)
+    type StepPiece = { stepIndex: number; caption: string; text: string; weight: number };
+    const stepPieces: StepPiece[] = [];
+    spans.forEach((sp) => {
+      const txt = String(sp.spokenText || '').trim();
+      if (!txt) return;
+      // Step 0 opener selalu dipotong pada <=145 karakter agar selaras 1:1 dengan pre-warm stream & langsung bunyi!
+      const subParts = splitTtsIntoSentenceChunks(txt, sp.stepIndex === 0 ? 145 : sp.stepIndex === 1 ? 175 : 215);
+      subParts.forEach((sub) => {
+        const w = computeProsodicTextWeight(sub);
+        stepPieces.push({
+          stepIndex: sp.stepIndex,
+          caption: sp.caption,
+          text: sub,
+          weight: w,
+        });
+      });
+    });
+
+    type PackedChunk = { stepIndex: number; text: string; pieces: StepPiece[]; weight: number };
+    const packedChunks: PackedChunk[] = [];
+    for (const pc of stepPieces) {
+      const last = packedChunks[packedChunks.length - 1];
+      const packMaxChars = pc.stepIndex === 0 && packedChunks.length <= 1 ? 145 : pc.stepIndex === 1 ? 175 : 215;
+      if (last && last.stepIndex === pc.stepIndex && `${last.text} ${pc.text}`.length <= packMaxChars) {
+        last.text = `${last.text} ${pc.text}`.trim();
+        last.pieces.push(pc);
+        last.weight += pc.weight;
+      } else {
+        packedChunks.push({ stepIndex: pc.stepIndex, text: pc.text, pieces: [pc], weight: pc.weight });
+      }
+    }
+    const chunks = packedChunks.length > 0 ? packedChunks.map((c) => c.text) : splitTtsIntoSentenceChunks(fullScript, 420);
+    const chunkWeights =
+      packedChunks.length > 0
+        ? packedChunks.map((c) => Math.max(4, c.weight))
+        : chunks.map((c) => computeProsodicTextWeight(c));
+    const decodedDurations: Array<number | null> = new Array(chunks.length).fill(null);
+
+    // Peta kata per chunk: posisi pecahan (dalam ruang bobot chunk) di AWAL tiap kata + indeks kata
+    // di dalam narasi langkahnya. Dipakai untuk mengunci papan & caption ke stempel waktu kata nyata.
+    type ChunkWordMap = { fracs: number[]; stepIndex: number; stepWordOffset: number; count: number };
+    const stepWordCursor = new Map<number, number>();
+    const chunkWordMaps: ChunkWordMap[] = chunks.map((chunkText, cIdx) => {
+      const pk = packedChunks[cIdx];
+      const chunkWords = chunkText.split(/\s+/).filter(Boolean);
+      const stepIndex = pk ? pk.stepIndex : -1;
+      const stepWordOffset = stepWordCursor.get(stepIndex) || 0;
+      stepWordCursor.set(stepIndex, stepWordOffset + chunkWords.length);
+      const fracs: number[] = [];
+      const pieceWords = pk ? pk.pieces.map((pc) => pc.text.split(/\s+/).filter(Boolean)) : [];
+      const pieceTotal = pieceWords.reduce((s, ws) => s + ws.length, 0);
+      if (pk && pieceTotal === chunkWords.length) {
+        const pkW = Math.max(1, pk.weight);
+        let pieceStart = 0;
+        pk.pieces.forEach((pc, pIdx) => {
+          const ws = pieceWords[pIdx];
+          const wW = ws.map(computeProsodicWordWeight);
+          const wSum = Math.max(1e-6, wW.reduce((a, b) => a + b, 0));
+          const pieceSpan = pc.weight / pkW;
+          let acc = 0;
+          ws.forEach((_, wi) => {
+            fracs.push(pieceStart + (acc / wSum) * pieceSpan);
+            acc += wW[wi];
+          });
+          pieceStart += pieceSpan;
+        });
+      } else {
+        const wW = chunkWords.map(computeProsodicWordWeight);
+        const wSum = Math.max(1e-6, wW.reduce((a, b) => a + b, 0));
+        let acc = 0;
+        wW.forEach((w) => {
+          fracs.push(acc / wSum);
+          acc += w;
+        });
+      }
+      fracs.push(1);
+      return { fracs, stepIndex, stepWordOffset, count: chunkWords.length };
+    });
+
+    const publishSpokenWord = (chunkIdx: number, wordIdxInChunk: number, audioSecInChunk: number) => {
+      const wm = chunkWordMaps[chunkIdx];
+      if (!wm || wm.stepIndex < 0) return;
+      const wordIdx = wm.stepWordOffset + wordIdxInChunk;
+      const prev = spokenCursorRef.current;
+      if (prev && prev.stepIndex === wm.stepIndex && prev.wordIdx === wordIdx) return;
+      spokenCursorRef.current = { stepIndex: wm.stepIndex, wordIdx };
+      setSpokenCursor({ stepIndex: wm.stepIndex, wordIdx });
+      // Jam papan dari durasi audio NYATA (bukan estimasi), diperbarui setiap pergantian kata
+      const knownIdx = decodedDurations.map((d, i) => (d && d > 0 ? i : -1)).filter((i) => i >= 0);
+      const knownSec = knownIdx.reduce((s, i) => s + (decodedDurations[i] || 0), 0);
+      const knownW = knownIdx.reduce((s, i) => s + chunkWeights[i], 0);
+      const secPerW = knownW > 0 ? knownSec / knownW : 0.066;
+      const durOf = (i: number) => (decodedDurations[i] && decodedDurations[i]! > 0 ? decodedDurations[i]! : chunkWeights[i] * secPerW);
+      let elapsed = audioSecInChunk;
+      for (let i = 0; i < chunkIdx; i++) elapsed += durOf(i);
+      let total = 0;
+      for (let i = 0; i < chunks.length; i++) total += durOf(i);
+      setAudioClock({ elapsedSec: elapsed, totalSec: Math.max(elapsed, total) });
+    };
+
+    const buildBoundsAndSpans = () => {
+      // Gunakan durasi audio nyata (jika beberapa potongan berbagi stepIndex yang sama) agar transisi intra-step presisi!
+      const effectiveWeights = chunkWeights.map((w, idx) => {
+        if (packedChunks.length > 0 && decodedDurations[idx] && decodedDurations[idx]! > 0.25) {
+          const sameStepIndices = packedChunks
+            .map((pk, pi) => (pk.stepIndex === packedChunks[idx].stepIndex ? pi : -1))
+            .filter((pi) => pi >= 0);
+          if (sameStepIndices.length > 1 && sameStepIndices.every((pi) => decodedDurations[pi] && decodedDurations[pi]! > 0.25)) {
+            const stepWeightSum = sameStepIndices.reduce((s, pi) => s + chunkWeights[pi], 0);
+            const stepDurSum = sameStepIndices.reduce((s, pi) => s + (decodedDurations[pi] || 0), 0);
+            if (stepDurSum > 0.2) {
+              return (decodedDurations[idx]! / stepDurSum) * stepWeightSum;
+            }
+          }
+        }
+        return w;
+      });
+      const totalWeight = Math.max(1, effectiveWeights.reduce((a, b) => a + b, 0));
+      let prefixW = 0;
+      const cBounds = effectiveWeights.map((w, idx) => {
+        const startFrac = prefixW / totalWeight;
+        prefixW += w;
+        const endFrac = idx === chunks.length - 1 ? 1 : prefixW / totalWeight;
+        return { startFrac, endFrac };
+      });
+      const aSpans: Array<{ stepIndex: number; startFrac: number; endFrac: number; caption: string }> = [];
+      if (packedChunks.length > 0) {
+        const stepRangeMap = new Map<number, { startFrac: number; endFrac: number; caption: string }>();
+        packedChunks.forEach((pk, pkIdx) => {
+          const cStart = cBounds[pkIdx].startFrac;
+          const cSpan = Math.max(0.0001, cBounds[pkIdx].endFrac - cStart);
+          let inChunkW = 0;
+          const pkW = Math.max(1, pk.weight);
+          pk.pieces.forEach((pc) => {
+            const pStart = cStart + (inChunkW / pkW) * cSpan;
+            inChunkW += pc.weight;
+            const pEnd = cStart + (inChunkW / pkW) * cSpan;
+            const prev = stepRangeMap.get(pc.stepIndex);
+            if (!prev) {
+              stepRangeMap.set(pc.stepIndex, { startFrac: pStart, endFrac: pEnd, caption: pc.caption });
+            } else {
+              prev.endFrac = Math.max(prev.endFrac, pEnd);
+            }
+          });
+        });
+        const ordered = Array.from(stepRangeMap.entries()).sort((a, b) => a[0] - b[0]);
+        ordered.forEach(([stepIndex, rng], idx) => {
+          aSpans.push({
+            stepIndex,
+            startFrac: idx === 0 ? 0 : rng.startFrac,
+            endFrac: idx === ordered.length - 1 ? 1 : rng.endFrac,
+            caption: rng.caption,
+          });
+        });
+      }
+      return { cBounds, aSpans: aSpans.length > 0 ? aSpans : spans };
+    };
+    const { cBounds: chunkBounds, aSpans: activeSpans } = buildBoundsAndSpans();
+
+    let pauseTimerId = 0;
+
+    const applyTrackFraction = (frac: number, allowComplete = true): boolean => {
+      if (cancelled || lockstepSeqIdRef.current !== seqId) return true;
+      const clampedRaw = Math.max(0, Math.min(1, frac));
+      const f = allowComplete ? clampedRaw : Math.min(0.994, clampedRaw);
+      trackFracRef.current = f;
+      if (allowComplete && f >= 0.999) {
+        lastCommitIdxRef.current = steps.length;
+        lastCommitProgRef.current = 1;
+        lastCommitProgAtRef.current = performance.now();
+        setLockstepIndex(steps.length);
+        setLockstepProgress(1);
+        setIsWritingPlaying(false);
+        setIsAudioPreparing(false);
+        stopLockstepAudio();
+        return true;
+      }
+      const { aSpans: currentSpans } = buildBoundsAndSpans();
+      let matched = currentSpans[currentSpans.length - 1];
+      for (let i = 0; i < currentSpans.length; i++) {
+        if (f >= currentSpans[i].startFrac && (f < currentSpans[i].endFrac || i === currentSpans.length - 1)) {
+          matched = currentSpans[i];
+          break;
+        }
+      }
+      const spanLen = Math.max(0.001, matched.endFrac - matched.startFrac);
+      const rawLocalP = Math.max(0, Math.min(1, (f - matched.startFrac) / spanLen));
+      // Izinkan progres langkah berjalan penuh 0.02 -> 0.995 sepanjang audio langkah tersebut agar Zoom In (0.015..0.84) & Zoom Out Transisi (0.84..0.995) serasi 1:1
+      const localP = allowComplete && rawLocalP >= 0.99 ? rawLocalP : Math.max(0.02, Math.min(0.995, rawLocalP));
+      const nowPerf = performance.now();
+      const idxChanged = lastCommitIdxRef.current !== matched.stepIndex;
+      if (idxChanged) {
+        lastCommitIdxRef.current = matched.stepIndex;
+        setLockstepIndex(matched.stepIndex);
+      }
+      const progDelta = Math.abs(localP - lastCommitProgRef.current);
+      if (
+        idxChanged ||
+        localP <= 0.025 ||
+        localP >= 0.99 ||
+        progDelta >= 0.008 ||
+        nowPerf - lastCommitProgAtRef.current >= 28
+      ) {
+        lastCommitProgRef.current = localP;
+        lastCommitProgAtRef.current = nowPerf;
+        setLockstepProgress(localP);
+      }
+      // Tampilkan teks/judul langkah yang tepat saat tutor bicara agar sub-elemen & caption 100% sinkron
+      if (matched.caption && lastCommitSubRef.current !== matched.caption) {
+        lastCommitSubRef.current = matched.caption;
+        setActiveStepSubtitle(matched.caption);
+      }
+      return false;
+    };
+
+    const runSilentClock = (totalSec: number, leadOffsetSec: number) => {
+      trackTotalSecRef.current = totalSec;
+      trackOffsetSecRef.current = Math.max(0, Math.min(totalSec * 0.98, leadOffsetSec));
+      let lastPerf = performance.now();
+      const tickClock = (now: number) => {
+        if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+        const dtSec = Math.max(0, Math.min(0.12, (now - lastPerf) / 1000));
+        lastPerf = now;
+        trackOffsetSecRef.current += dtSec * playbackSpeedRef.current;
+        const done = applyTrackFraction(trackOffsetSecRef.current / totalSec, true);
+        if (!done) {
+          rafId = requestAnimationFrame(tickClock);
+        }
+      };
+      rafId = requestAnimationFrame(tickClock);
+    };
+
+    const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
+    // Popup selalu memegang otoritas suara tunggal (outer Kawan Bicara sudah dibungkam saat modal terbuka)
+    onStopMainAudioRef.current?.();
+    const allowStepTts = !isGeneratingTopic;
+
+    if (!allowStepTts || !fullScript) {
+      runSilentClock(trackTotalSecRef.current || estTotalSec, trackOffsetSecRef.current);
+      return () => {
+        cancelled = true;
+        cancelAnimationFrame(rafId);
+        if (pauseTimerId) window.clearTimeout(pauseTimerId);
+        stopLockstepAudio();
+      };
+    }
+
+    const scriptWords = Math.max(8, fullScript.split(/\s+/).filter(Boolean).length);
+    let succeededCount = 0;
+    let decodedDurationSum = 0;
+    let silentChunksCount = 0;
+    const playedChunks: Array<{ idx: number; mode: string }> = [];
+
+    const publishAudioDebug = (patch: Record<string, unknown>) => {
+      try {
+        const w = window as unknown as { __fzWbAudioDebug?: Record<string, unknown> };
+        w.__fzWbAudioDebug = {
+          ...(w.__fzWbAudioDebug || {}),
+          seqId,
+          scriptChars: fullScript.length,
+          wordCount: scriptWords,
+          chunksTotal: chunks.length,
+          chunksSucceeded: succeededCount,
+          silentChunksCount,
+          playedChunks: [...playedChunks],
+          durationSec: Number(decodedDurationSum.toFixed(2)),
+          playbackSpeed: playbackSpeedRef.current,
+          ...patch,
+        };
+      } catch {
+        // Ignore window telemetry errors
+      }
+    };
+    publishAudioDebug({
+      chunksSucceeded: 0,
+      silentChunksCount: 0,
+      playedChunks: [],
+      durationSec: 0,
+      mode: 'synthesizing',
+      isPlaying: true,
+      completed: false,
+      error: null,
+    });
+
+    type ChunkRes = {
+      audioBuffer: AudioBuffer | null;
+      dataUrl: string;
+      durationSec: number;
+      alignment?: SpeechAlignment | null;
+    };
+
+    const explicitTargetStep = seekTargetStepRef.current;
+    seekTargetStepRef.current = null;
+    const explicitTargetSpan =
+      explicitTargetStep !== null ? activeSpans.find((s) => s.stepIndex === explicitTargetStep) : undefined;
+    const explicitTargetChunkIdx =
+      explicitTargetStep !== null ? packedChunks.findIndex((pk) => pk.stepIndex === explicitTargetStep) : -1;
+
+    const resumeFrac =
+      explicitTargetSpan
+        ? explicitTargetSpan.startFrac
+        : trackFracRef.current >= 0.992
+          ? 0
+          : trackFracRef.current > 0.005
+            ? trackFracRef.current
+            : trackTotalSecRef.current > 0
+              ? Math.max(0, Math.min(0.99, trackOffsetSecRef.current / trackTotalSecRef.current))
+              : 0;
+    let startChunkIdx = explicitTargetChunkIdx >= 0 ? explicitTargetChunkIdx : 0;
+    if (explicitTargetChunkIdx < 0) {
+      for (let i = 0; i < chunkBounds.length; i++) {
+        if (resumeFrac >= chunkBounds[i].startFrac && (resumeFrac < chunkBounds[i].endFrac || i === chunkBounds.length - 1)) {
+          startChunkIdx = i;
+          break;
+        }
+      }
+    }
+    const startSpan = Math.max(0.001, chunkBounds[startChunkIdx].endFrac - chunkBounds[startChunkIdx].startFrac);
+    const startIntraFrac =
+      explicitTargetChunkIdx >= 0
+        ? 0
+        : Math.max(0, Math.min(0.95, (resumeFrac - chunkBounds[startChunkIdx].startFrac) / startSpan));
+
+    const activePersona = personaRef.current;
+
+    const fetchAndDecodeChunk = (idx: number): Promise<ChunkRes | null> => {
+      const chunkText = chunks[idx];
+      const chunkKey = `${activePersona.id}::${locCode}::chunk::${chunkText}`;
+      const existing = trackCacheRef.current.get(chunkKey);
+      if (existing) {
+        return existing.then((res) => {
+          if (res && !cancelled && lockstepSeqIdRef.current === seqId) {
+            decodedDurations[idx] = res.durationSec;
+            succeededCount = Math.min(chunks.length, succeededCount + 1);
+            decodedDurationSum += res.durationSec;
+            publishAudioDebug({});
+          }
+          return res;
+        });
+      }
+
+      const promise = (async (): Promise<ChunkRes | null> => {
+        if (cancelled || lockstepSeqIdRef.current !== seqId) return null;
+        let tts = await synthesizeFlexibleTts({
+          text: chunkText,
+          targetLang: locCode,
+          persona: activePersona,
+        }).catch(() => null);
+        if (!tts?.audioBase64) {
+          if (cancelled || lockstepSeqIdRef.current !== seqId) return null;
+          await new Promise((r) => window.setTimeout(r, 180));
+          if (cancelled || lockstepSeqIdRef.current !== seqId) return null;
+          tts = await synthesizeFlexibleTts({
+            text: chunkText,
+            targetLang: locCode,
+            persona: activePersona,
+            force: true,
+          }).catch(() => null);
+        }
+        if (cancelled || lockstepSeqIdRef.current !== seqId) return null;
+        if (!tts?.audioBase64) return null;
+
+        const dataUrl = `data:${tts.audioMimeType || 'audio/wav'};base64,${tts.audioBase64}`;
+        let audioBuffer: AudioBuffer | null = null;
+        let durationSec = 0;
+        let alignment: SpeechAlignment | null = null;
+        try {
+          const bin = atob(tts.audioBase64);
+          const bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          const AudioCtx =
+            window.AudioContext ||
+            (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+          if (AudioCtx) {
+            if (!trackAudioCtxRef.current || trackAudioCtxRef.current.state === 'closed') {
+              trackAudioCtxRef.current = new AudioCtx();
+            }
+            const decoded = await trackAudioCtxRef.current.decodeAudioData(bytes.buffer.slice(0));
+            if (decoded && decoded.duration > 0.18) {
+              // Pertahankan suara asli utuh tanpa WSOLA/pemotongan kata, lalu sejajarkan kata tepat dengan teks TTS bersih
+              audioBuffer = processSpeechBuffer(trackAudioCtxRef.current, decoded, BOARD_SPEECH_PROCESSING);
+              durationSec = audioBuffer.duration;
+              const alignLang = locCode === 'ja' ? 'ja' : locCode === 'zh' ? 'zh' : 'en';
+              const exactSpokenForAlign = sanitizeSpokenTextForClassicTts(chunkText, alignLang) || chunkText;
+              alignment = alignWordsToSpeech(exactSpokenForAlign, audioBuffer);
+            }
+          }
+        } catch {
+          // Fallback neatly to HTMLAudioElement if decodeAudioData fails
+        }
+        if (!durationSec) {
+          durationSec = Math.max(1.8, chunkWeights[idx] * 0.068);
+        }
+        return { audioBuffer, dataUrl, durationSec, alignment };
+      })();
+
+      promise.then((res) => {
+        if (!res && trackCacheRef.current.get(chunkKey) === promise) {
+          trackCacheRef.current.delete(chunkKey);
+        }
+      });
+
+      if (trackCacheRef.current.size >= 20) {
+        const oldestKey = trackCacheRef.current.keys().next().value;
+        if (oldestKey !== undefined) trackCacheRef.current.delete(oldestKey);
+      }
+      trackCacheRef.current.set(chunkKey, promise);
+      return promise.then((res) => {
+        if (res && !cancelled && lockstepSeqIdRef.current === seqId) {
+          decodedDurations[idx] = res.durationSec;
+          succeededCount = Math.min(chunks.length, succeededCount + 1);
+          decodedDurationSum += res.durationSec;
+          publishAudioDebug({});
+        }
+        return res;
+      });
+    };
+
+    // Sliding Lookahead Pipeline:
+    // 1) Launch startChunkIdx SOLO first so Chunk 0 decodes as fast as possible with zero contention
+    // 2) Immediately process K+1, K+2, K+3 ahead of currentPlayingIdx in the background (concurrency = 3)
+    const startedFlags = new Set<number>();
+    let activePlayChunk = startChunkIdx;
+
+    const chunkDeferredMap = new Map<
+      number,
+      { resolve: (v: ChunkRes | null) => void; promise: Promise<ChunkRes | null> }
+    >();
+    const chunkPromiseMap = new Map<number, Promise<ChunkRes | null>>();
+    for (let i = 0; i < chunks.length; i++) {
+      let resFn!: (v: ChunkRes | null) => void;
+      const p = new Promise<ChunkRes | null>((resolve) => {
+        resFn = resolve;
+      });
+      chunkDeferredMap.set(i, { resolve: resFn, promise: p });
+      chunkPromiseMap.set(i, p);
+    }
+
+    const pickNextPendingChunkIdx = (): number | null => {
+      for (let i = activePlayChunk; i < chunks.length; i++) {
+        if (!startedFlags.has(i)) return i;
+      }
+      for (let i = 0; i < activePlayChunk; i++) {
+        if (!startedFlags.has(i)) return i;
+      }
+      return null;
+    };
+
+    const runLookaheadWorker = async () => {
+      while (!cancelled && lockstepSeqIdRef.current === seqId) {
+        const nextIdx = pickNextPendingChunkIdx();
+        if (nextIdx === null) break;
+        startedFlags.add(nextIdx);
+        const res = await fetchAndDecodeChunk(nextIdx);
+        chunkDeferredMap.get(nextIdx)?.resolve(res);
+      }
+    };
+
+    // Launch Chunk 0 / target start chunk immediately alone; start lookahead pool once it starts arriving (~160ms)
+    if (chunks.length > 0) {
+      startedFlags.add(startChunkIdx);
+      const firstPromise = fetchAndDecodeChunk(startChunkIdx).then((res) => {
+        chunkDeferredMap.get(startChunkIdx)?.resolve(res);
+        return res;
+      });
+      let lookaheadStarted = false;
+      const kickLookahead = () => {
+        if (lookaheadStarted || cancelled || lockstepSeqIdRef.current !== seqId) return;
+        lookaheadStarted = true;
+        const lookaheadWorkers = Math.min(3, Math.max(0, chunks.length - 1));
+        for (let w = 0; w < lookaheadWorkers; w++) {
+          void runLookaheadWorker();
+        }
+      };
+      void firstPromise.then(kickLookahead);
+      window.setTimeout(kickLookahead, 160);
+    }
+
+    // Tahan kursor tepat di pembuka langkah awal selagi Chunk-0 disintesis (ZERO pre-advance sebelum suara mulai!)
+    setIsAudioPreparing(true);
+    const activeStartSpan = explicitTargetSpan || activeSpans[0] || { startFrac: 0, endFrac: 0.2 };
+    const idleEntryFrac = explicitTargetSpan
+      ? explicitTargetSpan.startFrac + Math.max(0.001, explicitTargetSpan.endFrac - explicitTargetSpan.startFrac) * 0.025
+      : Math.max(
+          resumeFrac,
+          activeStartSpan.startFrac + Math.max(0.001, activeStartSpan.endFrac - activeStartSpan.startFrac) * 0.025
+        );
+    applyTrackFraction(idleEntryFrac, false);
+
+    const playChunkAt = async (chunkIdx: number, intraFrac = 0): Promise<void> => {
+      if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+      activePlayChunk = chunkIdx;
+      if (chunkIdx >= chunks.length) {
+        setIsStepAudioActive(false);
+        setIsAudioPreparing(false);
+        publishAudioDebug({ isPlaying: false, completed: true });
+        applyTrackFraction(1, true);
+        return;
+      }
+
+      const resolveLiveChunkBounds = () => {
+        const { cBounds: liveCBounds } = buildBoundsAndSpans();
+        return liveCBounds[chunkIdx] || chunkBounds[chunkIdx] || { startFrac: 0, endFrac: 1 };
+      };
+      const applyChunkLocalRatio = (localRatio: number) => {
+        const { startFrac: liveStart, endFrac: liveEnd } = resolveLiveChunkBounds();
+        applyTrackFraction(liveStart + localRatio * (liveEnd - liveStart), false);
+      };
+      const isLastChunk = chunkIdx === chunks.length - 1;
+      const chunkPromise = chunkPromiseMap.get(chunkIdx)!;
+      const raceTimeoutMs = chunkIdx === startChunkIdx ? 11000 : 14000;
+      let raceTimeoutId = 0;
+      const raceTimeout = new Promise<null>((resolve) => {
+        raceTimeoutId = window.setTimeout(() => resolve(null), raceTimeoutMs);
+      });
+      let chunkRes = await Promise.race([chunkPromise, raceTimeout]);
+      window.clearTimeout(raceTimeoutId);
+      if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+      if (chunkIdx === startChunkIdx) {
+        setIsAudioPreparing(false);
+      }
+      cancelAnimationFrame(rafId);
+
+      // NEURAL-ONLY VOICE INVARIANT: Banned 100% browser window.speechSynthesis robotic TTS!
+      // Bila prefetch timeout/kosong, coba 1x sintesis Neural darurat paksa (force Edge Neural / Gemini) sebelum jatuh ke pacing visual senyap.
+      if (!chunkRes) {
+        const emergencyTts = await synthesizeFlexibleTts({
+          text: chunks[chunkIdx] || '',
+          targetLang: locCode,
+          persona: activePersona,
+          force: true,
+        }).catch(() => null);
+        if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+        if (emergencyTts?.audioBase64) {
+          const dataUrl = `data:${emergencyTts.audioMimeType || 'audio/wav'};base64,${emergencyTts.audioBase64}`;
+          let audioBuffer: AudioBuffer | null = null;
+          let durationSec = Math.max(1.8, chunkWeights[chunkIdx] * 0.068);
+          try {
+            const bin = atob(emergencyTts.audioBase64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            const AudioCtx =
+              window.AudioContext ||
+              (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+            if (AudioCtx) {
+              if (!trackAudioCtxRef.current || trackAudioCtxRef.current.state === 'closed') {
+                trackAudioCtxRef.current = new AudioCtx();
+              }
+              const decoded = await trackAudioCtxRef.current.decodeAudioData(bytes.buffer.slice(0));
+              if (decoded && decoded.duration > 0.18) {
+                audioBuffer = processSpeechBuffer(trackAudioCtxRef.current, decoded, BOARD_SPEECH_PROCESSING);
+                durationSec = audioBuffer.duration;
+              }
+            }
+          } catch {
+            // Gunakan HTMLAudioElement jika decodeAudioData gagal
+          }
+          succeededCount = Math.min(chunks.length, succeededCount + 1);
+          decodedDurationSum += durationSec;
+          decodedDurations[chunkIdx] = durationSec;
+              const alignLang = locCode === 'ja' ? 'ja' : locCode === 'zh' ? 'zh' : 'en';
+              const exactSpokenForAlign = sanitizeSpokenTextForClassicTts(chunks[chunkIdx] || '', alignLang) || (chunks[chunkIdx] || '');
+              chunkRes = {
+                audioBuffer,
+                dataUrl,
+                durationSec,
+                alignment: audioBuffer ? alignWordsToSpeech(exactSpokenForAlign, audioBuffer) : null,
+              };
+        }
+      }
+
+      if (chunkIdx === startChunkIdx && !hasRevealedCanvasRef.current) {
+        hasRevealedCanvasRef.current = true;
+        setIsInitialAudioGateActive(false);
+        // Yield 2 animation frames (~32ms) so <LiveWhiteboardCanvas> paints Step 0 BEFORE word 1 hits the speaker!
+        await new Promise<void>((r) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => r()));
+        });
+        if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+      }
+
+      let safetyWatchdogId = 0;
+      const advanceToNextOrDone = () => {
+        window.clearTimeout(safetyWatchdogId);
+        if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+        cancelAnimationFrame(rafId);
+        if (isLastChunk) {
+          setIsStepAudioActive(false);
+          publishAudioDebug({ isPlaying: false, completed: true });
+          applyTrackFraction(1, true);
+        } else {
+          applyTrackFraction(resolveLiveChunkBounds().endFrac, false);
+          pauseTimerId = window.setTimeout(() => {
+            if (!cancelled && lockstepSeqIdRef.current === seqId) {
+              void playChunkAt(chunkIdx + 1, 0);
+            }
+          }, 15);
+        }
+      };
+
+      // Bila jaringan offline total dan seluruh jalur Neural gagal, lanjutkan penulisan papan secara senyap (TANPA suara robot OS speechSynthesis)
+      if (!chunkRes) {
+        const estChunkSec = Math.max(2.0, chunkWeights[chunkIdx] / 2.2);
+        silentChunksCount += 1;
+        playedChunks.push({ idx: chunkIdx, mode: 'silent_timeout' });
+        let localElapsed = intraFrac * estChunkSec;
+        publishAudioDebug({ mode: 'silent_timeout', isPlaying: true, error: 'tts_timeout_or_empty', activeChunk: chunkIdx });
+        let lastPerf = performance.now();
+        const tickChunkSilent = (now: number) => {
+          if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+          const dtSec = Math.max(0, Math.min(0.12, (now - lastPerf) / 1000));
+          lastPerf = now;
+          localElapsed += dtSec * playbackSpeedRef.current;
+          const localRatio = Math.max(0, Math.min(1, localElapsed / estChunkSec));
+          if (localRatio >= 0.999) {
+            advanceToNextOrDone();
+          } else {
+            applyChunkLocalRatio(localRatio);
+            rafId = requestAnimationFrame(tickChunkSilent);
+          }
+        };
+        rafId = requestAnimationFrame(tickChunkSilent);
+        return;
+      }
+
+      const chunkDurSec = Math.max(0.4, chunkRes.durationSec);
+      const seekInChunkSec = Math.max(0, Math.min(chunkDurSec - 0.1, intraFrac * chunkDurSec));
+      const chunkAlignment = chunkRes.alignment;
+      const chunkWordMap = chunkWordMaps[chunkIdx];
+      const useWordClock = Boolean(
+        chunkAlignment && chunkWordMap && chunkAlignment.times.length === chunkWordMap.count && chunkWordMap.count > 0
+      );
+      const leadTrim = Math.min(0.05, chunkDurSec * 0.02);
+      const tailTrim = Math.min(0.07, chunkDurSec * 0.025);
+      const speakWindow = Math.max(0.22, chunkDurSec - leadTrim - tailTrim);
+      const computeLocalRatioFromAudible = (audibleSec: number): number => {
+        if (useWordClock && chunkAlignment && chunkWordMap) {
+          // Kunci ke kata yang sedang diucapkan: papan berhenti saat tutor jeda, melaju saat tutor bicara
+          const { wordIdx, partial } = locateWordAt(chunkAlignment, audibleSec);
+          const fa = chunkWordMap.fracs[wordIdx] ?? 0;
+          const fb = chunkWordMap.fracs[wordIdx + 1] ?? 1;
+          if (audibleSec >= chunkAlignment.times[0].start - 0.02) {
+            publishSpokenWord(chunkIdx, wordIdx, Math.min(chunkDurSec, audibleSec));
+          }
+          return Math.max(0, Math.min(0.996, fa + (fb - fa) * partial));
+        }
+        return Math.max(0, Math.min(0.996, (audibleSec - leadTrim) / speakWindow));
+      };
+
+      // Prioritas 1: Web Audio API AudioBufferSourceNode per-kalimat
+      if (chunkRes.audioBuffer && trackAudioCtxRef.current && trackAudioCtxRef.current.state !== 'closed') {
+        try {
+          const ctx = trackAudioCtxRef.current;
+          if (ctx.state === 'suspended') {
+            await ctx.resume();
+          }
+          if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+          if (ctx.state === 'running') {
+            const src = ctx.createBufferSource();
+            src.buffer = chunkRes.audioBuffer;
+            src.playbackRate.value = playbackSpeedRef.current;
+            src.connect(ctx.destination);
+            trackSourceNodeRef.current = src;
+
+            let settled = false;
+            const completeBuffer = () => {
+              if (settled || cancelled || lockstepSeqIdRef.current !== seqId) return;
+              settled = true;
+              advanceToNextOrDone();
+            };
+            src.onended = completeBuffer;
+
+            onStopMainAudioRef.current?.();
+            try {
+              (window as unknown as { __fzWbLockstepActive?: boolean }).__fzWbLockstepActive = true;
+            } catch {
+              // Ignore
+            }
+            src.start(0, seekInChunkSec);
+            setIsStepAudioActive(true);
+            playedChunks.push({ idx: chunkIdx, mode: 'webaudio' });
+            publishAudioDebug({ mode: 'webaudio', isPlaying: true, completed: false, activeChunk: chunkIdx });
+            const remainingSec = Math.max(0.5, chunkDurSec - seekInChunkSec);
+            safetyWatchdogId = window.setTimeout(
+              completeBuffer,
+              Math.ceil((remainingSec / Math.max(0.6, playbackSpeedRef.current) + 5) * 1000)
+            );
+            let anchorAudioSec = seekInChunkSec;
+            let anchorCtxTime = ctx.currentTime;
+            let anchorRate = playbackSpeedRef.current;
+            // Latensi keluaran penuh (termasuk headset Bluetooth) agar papan mengikuti suara yang BENAR-BENAR terdengar,
+            // dikurangi ~45 ms lead visual (seperti subtitle film yang muncul sepersekian detik sebelum diucapkan).
+            const hwLatency = Math.min(
+              0.3,
+              (ctx.baseLatency || 0) + ((ctx as unknown as { outputLatency?: number }).outputLatency || 0)
+            );
+            const outLatCompensation = hwLatency - 0.045;
+            const syncBufferFrame = () => {
+              if (settled || cancelled || lockstepSeqIdRef.current !== seqId) return;
+              const nowCtx = ctx.currentTime;
+              const currRate = playbackSpeedRef.current;
+              const elapsedInAnchor = Math.max(0, nowCtx - anchorCtxTime);
+              const currentAudioSec = anchorAudioSec + elapsedInAnchor * anchorRate;
+              if (Math.abs(currRate - anchorRate) > 0.001) {
+                anchorAudioSec = currentAudioSec;
+                anchorCtxTime = nowCtx;
+                anchorRate = currRate;
+                try {
+                  src.playbackRate.value = currRate;
+                } catch {}
+              }
+              const audibleSec = Math.max(0, currentAudioSec - outLatCompensation);
+              const localRatio = computeLocalRatioFromAudible(audibleSec);
+              applyChunkLocalRatio(localRatio);
+              if (!settled) {
+                rafId = requestAnimationFrame(syncBufferFrame);
+              }
+            };
+            rafId = requestAnimationFrame(syncBufferFrame);
+            return;
+          }
+        } catch {
+          // Fall through cleanly to HTMLAudioElement
+        }
+      }
+
+      // Prioritas 2: HTMLAudioElement terpisah per-kalimat jika WebAudio suspended
+      if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+      const audio = new Audio(chunkRes.dataUrl);
+      audio.playbackRate = playbackSpeedRef.current;
+      lockstepAudioRef.current = audio;
+      try {
+        if (seekInChunkSec > 0.05) audio.currentTime = seekInChunkSec;
+      } catch {}
+
+      let settled = false;
+      const completeHtmlAudio = () => {
+        if (settled || cancelled || lockstepSeqIdRef.current !== seqId) return;
+        settled = true;
+        advanceToNextOrDone();
+      };
+      audio.onended = completeHtmlAudio;
+      audio.onerror = () => {
+        if (!settled && !cancelled && lockstepSeqIdRef.current === seqId) {
+          settled = true;
+          silentChunksCount += 1;
+          playedChunks.push({ idx: chunkIdx, mode: 'html_audio_error' });
+          publishAudioDebug({ mode: 'html_audio_error', isPlaying: true, error: 'html_audio_decode_error', activeChunk: chunkIdx });
+          advanceToNextOrDone();
+        }
+      };
+
+      onStopMainAudioRef.current?.();
+      audio
+        .play()
+        .then(() => {
+          if (cancelled || lockstepSeqIdRef.current !== seqId) {
+            try {
+              audio.pause();
+              audio.src = '';
+            } catch {}
+            return;
+          }
+          try {
+            (window as unknown as { __fzWbLockstepActive?: boolean }).__fzWbLockstepActive = true;
+          } catch {
+            // Ignore
+          }
+          setIsStepAudioActive(true);
+          playedChunks.push({ idx: chunkIdx, mode: 'html_audio' });
+          publishAudioDebug({ mode: 'html_audio', isPlaying: true, completed: false, activeChunk: chunkIdx });
+          const remainingSec = Math.max(0.5, chunkDurSec - seekInChunkSec);
+          safetyWatchdogId = window.setTimeout(
+            completeHtmlAudio,
+            Math.ceil((remainingSec / Math.max(0.6, playbackSpeedRef.current) + 5) * 1000)
+          );
+          const syncHtmlAudioFrame = () => {
+            if (settled || cancelled || lockstepSeqIdRef.current !== seqId) return;
+            try { audio.playbackRate = playbackSpeedRef.current; } catch {}
+            const localRatio = computeLocalRatioFromAudible(Math.max(0, audio.currentTime + 0.03));
+            applyChunkLocalRatio(localRatio);
+            if (!audio.ended && !settled) {
+              rafId = requestAnimationFrame(syncHtmlAudioFrame);
+            }
+          };
+          rafId = requestAnimationFrame(syncHtmlAudioFrame);
+        })
+        .catch(() => {
+          if (!settled && !cancelled && lockstepSeqIdRef.current === seqId) {
+            settled = true;
+            setIsStepAudioActive(false);
+            silentChunksCount += 1;
+            playedChunks.push({ idx: chunkIdx, mode: 'silent_autoplay_blocked' });
+            publishAudioDebug({ mode: 'silent_autoplay_blocked', isPlaying: true, activeChunk: chunkIdx });
+            advanceToNextOrDone();
+          }
+        });
+    };
+
+    void playChunkAt(startChunkIdx, startIntraFrac);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+      if (pauseTimerId) window.clearTimeout(pauseTimerId);
+      stopLockstepAudio();
+    };
+  }, [
+    isOpen,
+    isReady,
+    boardState?.contextMode,
+    focusType,
+    uiAction?.focusType,
+    uiAction?.sourceLayer,
+    cohesiveAudioPlan?.fullScript,
+    isWritingPlaying,
+    isLiveConnected,
+    isPlayingPreview,
+    isGeneratingTopic,
+    forceManualTts,
+    locale,
+    persona?.id,
+    seekNonce,
+    replayNonce,
+  ]);
 
   if (!isOpen) return null;
 
-  // Interaksi 1: Pilihan Ganda 3 Opsi
+  const resolvedMisconceptionId =
+    topMisconceptionId ||
+    uiAction?.misconceptionId ||
+    (boardState?.topicTitle
+      ? `wb_${boardState.topicTitle.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 32)}`
+      : 'workbench_syntax_slip');
+
+  // Interaksi 1: Pilihan Ganda (Catat jawaban benar & salah ke Braincore)
   const handleSelectOption = (optId: string) => {
-    if (!boardState) return;
+    if (!boardState?.quiz) return;
     setSelectedOptionId(optId);
     const opt = boardState.quiz.options.find((o) => o.id === optId);
-    if (opt?.isCorrect) {
+    if (!opt) return;
+    const correctText = boardState.quiz.options.find((o) => o.isCorrect)?.text || boardState.topicTitle;
+    const attemptKey = `${currentKey}::mcq::${optId}`;
+    const firstForKey = !reportedQuizKeysRef.current.has(attemptKey);
+    if (firstForKey) reportedQuizKeysRef.current.add(attemptKey);
+    if (opt.isCorrect) {
       playFiezelSfx('answer_correct');
       setIsQuizCompleted(true);
-      if (onEvaluatePractice) {
-        onEvaluatePractice(opt.text, opt.text, boardState.patternFormula, { isQuizSuccess: true });
+      if (onEvaluatePractice && firstForKey) {
+        onEvaluatePractice(opt.text, opt.text, boardState.patternFormula, {
+          isQuizSuccess: true,
+          misconceptionId: resolvedMisconceptionId,
+        });
       }
     } else {
       playFiezelSfx('answer_wrong');
-      if (onEvaluatePractice && opt) {
-        onEvaluatePractice(
-          opt.text,
-          boardState.quiz.options.find((o) => o.isCorrect)?.text || boardState.topicTitle,
-          boardState.patternFormula,
-          { isQuizSuccess: false, isQuizFailure: true }
-        );
-      }
-    }
-  };
-
-  // Interaksi 2: Isian Rumpang (Cloze)
-  const isClozeWordMatch = (candidate: string | null | undefined, blank: string | undefined) => {
-    if (!candidate || !blank) return false;
-    return candidate.replace(/\s+/g, '').toLowerCase() === blank.replace(/\s+/g, '').toLowerCase();
-  };
-
-  const handleSelectClozeChip = (word: string) => {
-    if (!boardState || isQuizCompleted) return;
-    setClozeAnswer(word);
-    const isCorrect = isClozeWordMatch(word, boardState.quiz.cloze.blankWord);
-    if (isCorrect) {
-      playFiezelSfx('answer_correct');
-      setIsQuizCompleted(true);
-      if (onEvaluatePractice) {
-        const full = joinTokensForTarget(
-          [boardState.quiz.cloze.prefix, word, boardState.quiz.cloze.suffix],
-          targetLang
-        );
-        onEvaluatePractice(full, full, boardState.patternFormula, { isQuizSuccess: true });
-      }
-    } else {
-      playFiezelSfx('answer_wrong');
-      if (onEvaluatePractice) {
-        const attempted = joinTokensForTarget(
-          [boardState.quiz.cloze.prefix, word, boardState.quiz.cloze.suffix],
-          targetLang
-        );
-        const expected = joinTokensForTarget(
-          [boardState.quiz.cloze.prefix, boardState.quiz.cloze.blankWord, boardState.quiz.cloze.suffix],
-          targetLang
-        );
-        onEvaluatePractice(attempted, expected, boardState.patternFormula, {
-          isQuizSuccess: false,
-          isQuizFailure: true,
+      if (onEvaluatePractice && firstForKey) {
+        onEvaluatePractice(opt.text, correctText, boardState.patternFormula, {
+          isQuizSuccess: false, isQuizFailure: true,
+          trapWrongToken: opt.text,
+          misconceptionId: resolvedMisconceptionId,
         });
       }
     }
   };
 
-  // Interaksi 3: Susun Balok Kata (Sentence Blocks)
-  const normalizeBlocksForComparison = (tokens: string[]) => {
-    if (targetLang === 'ja' || targetLang === 'zh') {
-      return tokens.join('').replace(/[\s。？！、.,?!]+/g, '').toLowerCase();
+  // Interaksi 2: Isian Rumpang (Cloze — catat benar & salah ke Braincore)
+  const handleSelectClozeChip = (word: string) => {
+    if (!boardState?.quiz || isQuizCompleted) return;
+    setClozeAnswer(word);
+    const isCorrect =
+      word.replace(/\s+/g, '').toLowerCase() ===
+      boardState.quiz.cloze.blankWord.replace(/\s+/g, '').toLowerCase();
+    const attemptKey = `${currentKey}::cloze::${word}`;
+    const firstForKey = !reportedQuizKeysRef.current.has(attemptKey);
+    if (firstForKey) reportedQuizKeysRef.current.add(attemptKey);
+    const fullTarget = joinTokensForTarget(
+      [boardState.quiz.cloze.prefix, boardState.quiz.cloze.blankWord, boardState.quiz.cloze.suffix],
+      targetLang
+    );
+    const fullAttempt = joinTokensForTarget(
+      [boardState.quiz.cloze.prefix, word, boardState.quiz.cloze.suffix],
+      targetLang
+    );
+    if (isCorrect) {
+      playFiezelSfx('answer_correct');
+      setIsQuizCompleted(true);
+      if (onEvaluatePractice && firstForKey) {
+        onEvaluatePractice(fullAttempt, fullAttempt, boardState.patternFormula, {
+          isQuizSuccess: true,
+          misconceptionId: resolvedMisconceptionId,
+        });
+      }
+    } else {
+      playFiezelSfx('answer_wrong');
+      if (onEvaluatePractice && firstForKey) {
+        onEvaluatePractice(fullAttempt, fullTarget, boardState.patternFormula, {
+          isQuizSuccess: false,
+          isQuizFailure: true,
+          trapWrongToken: word,
+          misconceptionId: resolvedMisconceptionId,
+        });
+      }
     }
-    return tokens.join(' ').replace(/\s+/g, ' ').trim().toLowerCase();
   };
 
+  // Interaksi 3: Susun Balok Kata (Sentence Blocks — catat benar & salah ke Braincore)
   const handleAddBlock = (word: string) => {
-    if (isQuizCompleted) return;
+    if (!boardState?.quiz || isQuizCompleted) return;
     playFiezelSfx('button_tap');
     const nextBlocks = [...placedBlocks, word];
     setPlacedBlocks(nextBlocks);
 
-    if (nextBlocks.length === boardState?.quiz.blocks.correctOrder.length) {
-      const normPlaced = normalizeBlocksForComparison(nextBlocks);
-      const normTarget = normalizeBlocksForComparison(boardState.quiz.blocks.correctOrder);
-      if (normPlaced === normTarget) {
+    if (nextBlocks.length === boardState.quiz.blocks.correctOrder.length) {
+      const joinedPlaced = joinTokensForTarget(nextBlocks, targetLang).toLowerCase();
+      const joinedTarget = joinTokensForTarget(boardState.quiz.blocks.correctOrder, targetLang).toLowerCase();
+      const attemptKey = `${currentKey}::blocks::${joinedPlaced}`;
+      const firstForKey = !reportedQuizKeysRef.current.has(attemptKey);
+      if (firstForKey) reportedQuizKeysRef.current.add(attemptKey);
+      if (joinedPlaced === joinedTarget) {
         playFiezelSfx('answer_correct');
         setIsQuizCompleted(true);
-        if (onEvaluatePractice) {
-          onEvaluatePractice(
-            joinTokensForTarget(nextBlocks, targetLang),
-            joinTokensForTarget(boardState.quiz.blocks.correctOrder, targetLang),
-            boardState.patternFormula,
-            { isQuizSuccess: true }
-          );
+        if (onEvaluatePractice && firstForKey) {
+          onEvaluatePractice(joinedPlaced, joinedTarget, boardState.patternFormula, {
+            isQuizSuccess: true,
+            misconceptionId: resolvedMisconceptionId,
+          });
         }
       } else {
         playFiezelSfx('answer_wrong');
-        if (onEvaluatePractice) {
-          onEvaluatePractice(
-            joinTokensForTarget(nextBlocks, targetLang),
-            joinTokensForTarget(boardState.quiz.blocks.correctOrder, targetLang),
-            boardState.patternFormula,
-            { isQuizSuccess: false, isQuizFailure: true }
-          );
+        if (onEvaluatePractice && firstForKey) {
+          onEvaluatePractice(joinedPlaced, joinedTarget, boardState.patternFormula, {
+            isQuizSuccess: false,
+            isQuizFailure: true,
+            trapWrongToken: joinedPlaced,
+            misconceptionId: resolvedMisconceptionId,
+          });
         }
       }
     }
@@ -4041,17 +4705,27 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     setPlacedBlocks([]);
     setIsQuizCompleted(false);
     setQuizSeed((prev) => prev + 1);
-
-    if (onRequestCustomTopic) {
-      onRequestCustomTopic(`Soal latihan baru tentang ${topicTitle}`, 'custom_dynamic');
-    }
   };
 
   const handleReplayVoice = () => {
-    if (boardState?.coachExplanation && onSpeakPreview) {
-      const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
-      onSpeakPreview(boardState.coachExplanation, locCode);
+    const isPteBoardNow =
+      Boolean(boardState?.contextMode?.startsWith('pte_')) ||
+      Boolean(focusType?.startsWith('pte_')) ||
+      Boolean(uiAction?.focusType?.startsWith('pte_'));
+    if (isPteBoardNow) {
+      if (boardState?.coachExplanation && onSpeakPreview) {
+        const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
+        onSpeakPreview(boardState.coachExplanation, locCode);
+      }
+      return;
     }
+    stopLockstepAudio();
+    trackOffsetSecRef.current = 0;
+    setForceManualTts(true);
+    setLockstepIndex(0);
+    setLockstepProgress(0);
+    setReplayNonce((n) => n + 1);
+    setIsWritingPlaying(true);
   };
 
   const handleResumeTalk = () => {
@@ -4065,17 +4739,17 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   if (isMinimized) {
     return (
       <aside
-        className="fixed bottom-24 left-3 right-3 sm:left-auto sm:right-4 z-50 max-w-[calc(100vw-24px)] sm:max-w-sm sm:w-full rounded-2xl bg-[#FFFDF8]/95 border-2 border-[#EADBCE] shadow-2xl backdrop-blur-md p-3 flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
+        className="fixed top-20 right-4 z-50 max-w-xs sm:max-w-sm w-full rounded-2xl bg-[#FFFDF8]/95 border-2 border-[#EADBCE] shadow-2xl backdrop-blur-md p-3 flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200"
         data-testid="in-call-workbench-minimized"
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0" />
             <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B85D43] bg-[#FDE8E4] px-1.5 py-0.2 rounded-full shrink-0">
-              {ui.minimizedBadge}
+              Papan Aktif
             </span>
             <span className="text-xs font-bold text-[#231A12] truncate">
-              {boardState?.topicTitle || topicTitle || ui.badge}
+              {boardState?.topicTitle || topicTitle || 'Papan Belajar'}
             </span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
@@ -4087,16 +4761,16 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 setIsMinimized(false);
               }}
               className="px-2 py-0.5 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer border border-[#EADBCE]"
-              title={ui.openBtn}
+              title="Perbesar Papan Belajar"
             >
-              {ui.openBtn}
+              ⤢ Buka
             </button>
             <button
               type="button"
               data-testid="workbench-minimized-close-btn"
               onClick={onClose}
               className="w-6 h-6 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] text-[11px] font-bold flex items-center justify-center cursor-pointer"
-              title={ui.closeTitle}
+              title="Tutup Papan"
             >
               ✕
             </button>
@@ -4111,26 +4785,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     );
   }
 
-  const resolvedTitle = boardState?.topicTitle || topicTitle || ui.badge;
-  const resolvedEffectiveLang: TargetLang =
-    targetLang === 'ja' || /[\u3040-\u30ff]/.test(`${resolvedTitle} ${boardState?.quiz?.options?.[0]?.text || ''}`)
-      ? 'ja'
-      : targetLang === 'zh' || containsHanzi(`${resolvedTitle} ${boardState?.quiz?.options?.[0]?.text || ''}`)
-        ? 'zh'
-        : targetLang;
-  const isClozeCorrect = Boolean(
-    boardState && isClozeWordMatch(clozeAnswer, boardState.quiz.cloze.blankWord)
-  );
-  const titleHasCjk =
-    resolvedEffectiveLang !== 'en' && isTargetSentenceForRuby(resolvedTitle, resolvedEffectiveLang);
-
-  const isGeneralReadAloudCanvas =
-    boardState?.contextMode === 'read_aloud' ||
-    focusType === 'read_aloud' ||
-    uiAction?.focusType === 'read_aloud';
-
   const isWidePteCanvas =
-    isGeneralReadAloudCanvas ||
     boardState?.contextMode === 'pte_describe_image' ||
     boardState?.contextMode === 'pte_read_aloud' ||
     focusType === 'pte_describe_image' ||
@@ -4142,43 +4797,655 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     Boolean(scenario?.id?.startsWith('scen_pte_di')) ||
     Boolean(scenario?.id?.startsWith('scen_pte_ra'));
 
-  const isSswTacticalBoard =
+  const isSpecialCanvasModal =
+    isWidePteCanvas ||
+    boardState?.contextMode === 'pte_scorecard' ||
+    boardState?.contextMode === 'read_aloud' ||
     boardState?.contextMode === 'ssw_tactical_board' ||
+    focusType === 'read_aloud' ||
     focusType === 'ssw_tactical_board' ||
-    uiAction?.focusType === 'ssw_tactical_board' ||
-    persona?.id === 'ssw_sensei' ||
-    scenario?.personaId === 'ssw_sensei' ||
-    Boolean(scenario?.id?.startsWith('scen_ssw_'));
+    uiAction?.focusType === 'read_aloud' ||
+    uiAction?.focusType === 'ssw_tactical_board';
+  const isPteModal = isSpecialCanvasModal;
+
+  // Laporkan penyelesaian presentasi papan tulis (Solvely Walkthrough Completed) ke Braincore 1x per topik
+  useEffect(() => {
+    if (!isOpen || !isReady || !boardState || isSpecialCanvasModal || !whiteboardPlan) return;
+    if (whiteboardPlan.steps.length >= 2 && lockstepIndex >= whiteboardPlan.steps.length - 1) {
+      if (!reportedBoardDoneKeysRef.current.has(currentKey)) {
+        reportedBoardDoneKeysRef.current.add(currentKey);
+        onWhiteboardBraincoreEventRef.current?.({
+          kind: 'board_completed',
+          topicTitle: boardState.topicTitle,
+          targetText: boardState.standardTarget?.text || uiAction?.sampleTarget || boardState.topicTitle,
+          isCorrect: true,
+        });
+      }
+    }
+  }, [isOpen, isReady, boardState, isSpecialCanvasModal, whiteboardPlan, lockstepIndex, currentKey, uiAction?.sampleTarget]);
+
+  const handleSubmitBoardQuestion = (rawQ: string, areaExcerpt?: string) => {
+    const cleanQ = rawQ.trim();
+    if (!cleanQ) return;
+    playFiezelSfx('button_tap');
+    const qId = `q_${Date.now()}`;
+    const currentVisualSteps = (whiteboardPlan?.steps || []).filter((s) =>
+      ['rough_scene', 'contrast_scale', 'syntax_flow', 'kanji_grid', 'tone_wave', 'table'].includes(s.kind)
+    );
+    const currentVisualKinds = Array.from(new Set(currentVisualSteps.map((s) => s.kind)));
+    const currentVisualSummary = currentVisualSteps
+      .map((s) => {
+        if (s.kind === 'rough_scene') {
+          const lbls = (s.shapes || []).map((sh) => sh.label || sh.text || '').filter(Boolean).slice(0, 4).join(', ');
+          return `${s.title || 'rough_scene'}${lbls ? ` [${lbls}]` : ''}`;
+        }
+        if (s.kind === 'contrast_scale') return `contrast_scale [${s.termA || ''} vs ${s.termB || ''}]`;
+        if (s.kind === 'syntax_flow') return `syntax_flow [${(s.nodes || []).map((n) => n.word).filter(Boolean).join(' -> ')}]`;
+        return `${s.kind} [${s.title || s.character || ''}]`;
+      })
+      .filter(Boolean)
+      .join('; ');
+
+    const followUpContext: WhiteboardFollowUpContext | undefined = boardState
+      ? {
+          topicTitle: boardState.topicTitle || uiAction?.topicTitle || topicTitle,
+          patternFormula: boardState.patternFormula || uiAction?.patternFormula,
+          summary: boardState.summary || uiAction?.explanationText,
+          areaExcerpt: areaExcerpt || undefined,
+          previousQuestions: studentQuestions.slice(-3).map((q) => q.text),
+          currentVisualKinds: currentVisualKinds.length ? currentVisualKinds : undefined,
+          currentVisualSummary: currentVisualSummary || undefined,
+        }
+      : undefined;
+
+    pendingQuestionIdRef.current = qId;
+    pendingQuestionActionSigRef.current = `${uiAction?.topicTitle || ''}::${uiAction?.explanationText || ''}::${uiAction?.coachSpokenScript || ''}`;
+
+    setStudentQuestions((prev) => [
+      ...prev.slice(-3),
+      {
+        id: qId,
+        text: cleanQ,
+        areaExcerpt,
+        tutorAnswer: areaExcerpt
+          ? `⏳ Sedang menyiapkan penjelasan lanjutan khusus bagian "${areaExcerpt}"...`
+          : '⏳ Sedang menyusun penjelasan lanjutan & diagram di papan tulis...',
+      },
+    ]);
+
+    if (areaExcerpt || /bingung|kenapa|apa beda|tidak paham|mengerti|explain|confusion|detail/i.test(cleanQ)) {
+      onWhiteboardBraincoreEventRef.current?.({
+        kind: 'circle_ask_confusion',
+        topicTitle: boardState?.topicTitle || topicTitle,
+        targetText: areaExcerpt || cleanQ,
+        misconceptionId: topMisconceptionId || uiAction?.misconceptionId || undefined,
+        isCorrect: false,
+      });
+    }
+
+    setQuestionDraft('');
+    if (onRequestCustomTopic) {
+      onRequestCustomTopic(cleanQ, 'custom_dynamic', followUpContext);
+    }
+  };
+
+  const handleMaterialUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    if (file.type.startsWith('image/')) {
+      reader.onload = () => {
+        const dataUrl = typeof reader.result === 'string' ? reader.result : '';
+        const newPage: SourceMaterialPage = {
+          id: `up_${Date.now()}`,
+          pageNumber: (whiteboardPlan?.sourcePages.length || 2) + 1,
+          badge: 'GAMBARMU',
+          title: file.name,
+          subtitle: 'Materi gambar yang kamu unggah',
+          highlights: ['Ketuk untuk meminta tutor menjelaskan materi ini'],
+          promptToExplain: `Jelaskan materi dari gambar ${file.name} terkait ${boardState?.topicTitle || scenario.titleId}`,
+          imageDataUrl: dataUrl,
+        };
+        setUploadedMaterials((prev) => [...prev, newPage]);
+        setIsSidebarOpen(true);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      reader.onload = () => {
+        const rawText = typeof reader.result === 'string' ? reader.result : '';
+        const lines = rawText
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter(Boolean)
+          .slice(0, 4);
+        const newPage: SourceMaterialPage = {
+          id: `up_${Date.now()}`,
+          pageNumber: (whiteboardPlan?.sourcePages.length || 2) + 1,
+          badge: 'CATATAN',
+          title: file.name,
+          subtitle: `${lines.length || 1} baris catatan belajar`,
+          highlights: lines.length > 0 ? lines : [rawText.slice(0, 120)],
+          promptToExplain: `Jelaskan catatan berikut: ${lines.join(' ').slice(0, 140)}`,
+        };
+        setUploadedMaterials((prev) => [...prev, newPage]);
+        setIsSidebarOpen(true);
+      };
+      reader.readAsText(file);
+    }
+    e.target.value = '';
+  };
+
+  const handleExportBoardPng = async () => {
+    if (!boardState) return;
+    playFiezelSfx('button_tap');
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 760;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.fillStyle = '#FAFBF9';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Dot grid
+    ctx.fillStyle = '#D5DAD3';
+    for (let x = 22; x < canvas.width; x += 22) {
+      for (let y = 22; y < canvas.height; y += 22) {
+        ctx.beginPath();
+        ctx.arc(x, y, 1.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    ctx.fillStyle = '#15803D';
+    ctx.font = 'bold 36px sans-serif';
+    ctx.fillText(boardState.topicTitle || 'FIEZEL Whiteboard', 56, 78);
+
+    ctx.fillStyle = '#334155';
+    ctx.font = '600 21px sans-serif';
+    ctx.fillText(boardState.patternFormula || '', 56, 118);
+
+    ctx.fillStyle = 'rgba(125, 211, 252, 0.42)';
+    ctx.fillRect(52, 142, 1080, 50);
+    ctx.fillStyle = '#0F172A';
+    ctx.font = '19px sans-serif';
+    ctx.fillText((boardState.coachExplanation || '').slice(0, 108), 62, 174);
+
+    // Draw rendered SVG diagram / Kanji stroke animator if present on the live board
+    const renderedSvg = boardContainerRef.current?.querySelector('svg[viewBox]') as SVGSVGElement | null;
+    const hasSvg = Boolean(renderedSvg);
+    const cardLeft = hasSvg ? 610 : 56;
+    const cardW = hasSvg ? 534 : 1088;
+
+    if (renderedSvg) {
+      try {
+        const cloned = renderedSvg.cloneNode(true) as SVGSVGElement;
+        const vb = renderedSvg.getAttribute('viewBox') || '0 0 560 250';
+        const vbParts = vb.split(/[\s,]+/).map(Number);
+        const svgW = vbParts[2] || 560;
+        const svgH = vbParts[3] || 250;
+        cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        cloned.setAttribute('width', String(svgW));
+        cloned.setAttribute('height', String(svgH));
+        const xml = new XMLSerializer().serializeToString(cloned);
+        const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(xml)}`;
+        const img = new Image();
+        await new Promise<void>((resolve) => {
+          img.onload = () => {
+            const maxBoxW = 520;
+            const maxBoxH = 380;
+            const scale = Math.min(maxBoxW / svgW, maxBoxH / svgH);
+            const drawW = Math.round(svgW * scale);
+            const drawH = Math.round(svgH * scale);
+            ctx.drawImage(img, 56, 224, drawW, drawH);
+            resolve();
+          };
+          img.onerror = () => resolve();
+          img.src = svgUrl;
+        });
+      } catch {
+        // Fallback to text card only
+      }
+    }
+
+    ctx.strokeStyle = '#E2E0D8';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(cardLeft, 224, cardW, 250);
+    ctx.strokeRect(cardLeft, 224, cardW, 250);
+
+    const maxLineChars = hasSvg ? 44 : 88;
+    ctx.fillStyle = '#15803D';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.fillText('Contoh Tepat:', cardLeft + 24, 272);
+    ctx.fillStyle = '#1E293B';
+    ctx.font = '20px sans-serif';
+    ctx.fillText(
+      (uiAction?.sampleTarget || boardState.quiz?.options?.find((o) => o.isCorrect)?.text || '').slice(0, maxLineChars),
+      cardLeft + 24,
+      308
+    );
+
+    ctx.fillStyle = '#DC2626';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.fillText('Hindari Jebakan:', cardLeft + 24, 372);
+    ctx.fillStyle = '#7F1D1D';
+    ctx.font = '18px sans-serif';
+    ctx.fillText(
+      (uiAction?.trapWrongSentence || boardState.quiz?.options?.find((o) => !o.isCorrect)?.text || '').slice(0, maxLineChars),
+      cardLeft + 24,
+      408
+    );
+
+    ctx.fillStyle = '#64748B';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText(`FIEZEL Whiteboard Tutor • ${persona.name}`, 56, 716);
+
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `fiezel-whiteboard-${(boardState.topicTitle || 'lesson').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+    a.click();
+  };
+
+  const activeQuiz = boardState?.quiz;
+  const quizPanelElement = activeQuiz ? (
+    <div className="space-y-3" data-testid="wb-interactive-quiz-card">
+      {boardState?.characterData && (
+        <div
+          data-testid="wb-magic-character-canvas"
+          className="p-2.5 rounded-xl bg-[#FFFDF8] border border-[#EADBCE] flex items-center gap-3 text-xs"
+        >
+          <div className="w-10 h-10 rounded-lg bg-[#FAF4E8] border border-[#EADBCE] flex items-center justify-center text-xl font-black text-[#231A12] shrink-0">
+            {boardState.characterData.char}
+          </div>
+          <div className="min-w-0 flex-1">
+            <JapaneseRubyDisplay
+              as="div"
+              text={boardState.characterData.char}
+              targetLang={targetLang === 'zh' ? 'zh' : 'ja'}
+              phoneticText={boardState.characterData.reading || resolveUnifiedPronunciation(boardState.characterData.char, targetLang === 'zh' ? 'zh' : 'ja', undefined, locale)}
+              showFurigana={true}
+              showRomaji={true}
+              className="font-bold text-[#231A12]"
+            />
+            <div className="text-[10.5px] text-[#64748B]">
+              {boardState.characterData.meaning} · {boardState.characterData.strokesCount || '?'} {ui.strokesLabel}
+            </div>
+          </div>
+        </div>
+      )}
+      {boardState?.toneData && (
+        <div
+          data-testid="wb-tone-waveform-canvas"
+          className="p-2.5 rounded-xl bg-[#FFFDF8] border border-[#EADBCE] flex items-center justify-between gap-2 text-xs"
+        >
+          <div>
+            <JapaneseRubyDisplay
+              as="span"
+              text={boardState.toneData.word}
+              targetLang={targetLang}
+              phoneticText={boardState.toneData.phonetic || resolveUnifiedPronunciation(boardState.toneData.word, targetLang, undefined, locale)}
+              showFurigana={true}
+              showRomaji={true}
+              className="font-black text-[#231A12]"
+            />
+            <div className="text-[10.5px] text-[#B45309] font-semibold">
+              {boardState.toneData.toneType} ({boardState.toneData.toneShape})
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="flex items-center justify-between gap-2 border-b border-[#F0E6D9] pb-2.5">
+        <div className="flex items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl">
+          <button
+            type="button"
+            onClick={() => { playFiezelSfx('button_tap'); setQuizMode('multiple_choice'); }}
+            data-testid="mode-tab-multiple_choice"
+            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+              quizMode === 'multiple_choice' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
+            }`}
+          >
+            Pilihan
+          </button>
+          <button
+            type="button"
+            onClick={() => { playFiezelSfx('button_tap'); setQuizMode('cloze_gap'); }}
+            data-testid="mode-tab-cloze_gap"
+            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+              quizMode === 'cloze_gap' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
+            }`}
+          >
+            Isian Kata
+          </button>
+          <button
+            type="button"
+            onClick={() => { playFiezelSfx('button_tap'); setQuizMode('sentence_blocks'); }}
+            data-testid="mode-tab-sentence_blocks"
+            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+              quizMode === 'sentence_blocks' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
+            }`}
+          >
+            Susun Balok
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleReRollQuestion}
+          data-testid="wb-reroll-btn"
+          className="px-2.5 py-1 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-bold inline-flex items-center gap-1 cursor-pointer transition-transform active:scale-95"
+          title="Ganti Soal Baru Tanpa Terjawab Duluan"
+        >
+          <span>↻</span>
+          <span>Ganti Soal</span>
+        </button>
+      </div>
+
+      {quizMode === 'multiple_choice' && (
+        <div className="space-y-2 pt-1">
+          <p className="fz-handwriting-body text-sm font-bold text-[#231A12]">{activeQuiz.prompt}</p>
+          <div className="grid grid-cols-1 gap-1.5">
+            {activeQuiz.options.map((opt) => {
+              const isSelected = selectedOptionId === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => handleSelectOption(opt.id)}
+                  data-testid={`quiz-option-${opt.id}`}
+                  className={`w-full p-2.5 rounded-xl border text-left text-xs font-semibold cursor-pointer transition-all active:scale-98 ${
+                    isSelected
+                      ? opt.isCorrect
+                        ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
+                        : 'bg-[#FDE8E4] border-[#F87171] text-[#991B1B]'
+                      : 'bg-[#FDFAF4] border-[#EADBCE] text-[#3D2E20] hover:border-[#D8CBB5]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{opt.text}</span>
+                    {isSelected && <span>{opt.isCorrect ? '✓' : '✕'}</span>}
+                  </div>
+                  {isSelected && (
+                    <p className="text-[10.5px] mt-1 font-medium opacity-90">{opt.feedback}</p>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {quizMode === 'cloze_gap' && (
+        <div className="space-y-2.5 pt-1">
+          <p className="text-xs font-bold text-[#231A12]">Ketuk kata yang tepat untuk melengkapi kalimat:</p>
+          <div className="p-3 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] text-xs font-medium text-[#231A12] leading-relaxed">
+            {activeQuiz.cloze.prefix}{' '}
+            <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#FFFFFF] border-2 border-dashed border-[#B45309] font-bold text-[#B45309] min-w-[50px] text-center">
+              {clozeAnswer || '______'}
+            </span>{' '}
+            {activeQuiz.cloze.suffix}
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {activeQuiz.cloze.chips.map((chip, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleSelectClozeChip(chip)}
+                data-testid={`cloze-chip-${idx}`}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+                  clozeAnswer === chip
+                    ? chip.toLowerCase() === activeQuiz.cloze.blankWord.toLowerCase()
+                      ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
+                      : 'bg-[#FDE8E4] border-[#F87171] text-[#991B1B]'
+                    : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#D8CBB5]'
+                }`}
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+          {clozeAnswer && (
+            <p className={`text-[11px] font-semibold ${
+              clozeAnswer.toLowerCase() === activeQuiz.cloze.blankWord.toLowerCase()
+                ? 'text-[#1B5E34]'
+                : 'text-[#991B1B]'
+            }`}>
+              {clozeAnswer.toLowerCase() === activeQuiz.cloze.blankWord.toLowerCase()
+                ? activeQuiz.cloze.feedback
+                : 'Kata tersebut belum pas. Coba kata yang lain!'}
+            </p>
+          )}
+        </div>
+      )}
+
+      {quizMode === 'sentence_blocks' && (
+        <div className="space-y-2.5 pt-1">
+          <p className="text-xs font-bold text-[#231A12]">{activeQuiz.blocks.meaningId}</p>
+          <div className="min-h-[44px] p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-wrap gap-1.5 items-center">
+            {placedBlocks.length === 0 ? (
+              <span className="text-[11px] text-[#8C7760] italic">Ketuk balok di bawah untuk menyusun kalimat...</span>
+            ) : (
+              placedBlocks.map((blk, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleRemoveBlock(idx)}
+                  className="px-2.5 py-1 rounded-lg bg-[#FFFFFF] border border-[#D8CBB5] text-xs font-bold text-[#231A12] shadow-2xs hover:bg-[#FEE2E2] cursor-pointer"
+                >
+                  {blk} ✕
+                </button>
+              ))
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {activeQuiz.blocks.pool.map((blk, idx) => {
+              const countInPool = activeQuiz.blocks.pool.filter(w => w === blk).length;
+              const countPlaced = placedBlocks.filter(w => w === blk).length;
+              const isExhausted = countPlaced >= countInPool;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  disabled={isExhausted}
+                  onClick={() => handleAddBlock(blk)}
+                  data-testid={`available-block-${idx}`}
+                  className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                    isExhausted
+                      ? 'opacity-35 bg-[#EADBCE] border-transparent text-[#8C7760] cursor-not-allowed'
+                      : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#B45309] active:scale-95'
+                  }`}
+                >
+                  {blk}
+                </button>
+              );
+            })}
+          </div>
+          {isQuizCompleted && (
+            <p className="text-[11px] font-bold text-[#1B5E34]">
+              ✓ {activeQuiz.blocks.feedback}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  ) : boardState?.isOfflineNotice ? (
+    <div
+      className="rounded-2xl border border-amber-200 bg-amber-50/90 p-3.5 space-y-2.5"
+      data-testid="wb-offline-retry-card"
+    >
+      <p className="text-xs font-bold text-amber-950">
+        Koneksi Tutor AI sedang offline atau belum merespons untuk topik &ldquo;{boardState.topicTitle}&rdquo;.
+      </p>
+      <p className="text-[11px] text-amber-900/90 leading-relaxed">
+        Papan tulis FIEZEL bebas template palsu dan meracik penjelasan serta kuis langsung sesuai pertanyaanmu. Hubungkan internet atau tambahkan Gemini API key lokal lalu muat ulang.
+      </p>
+      {onRequestCustomTopic && (
+        <button
+          type="button"
+          onClick={() => onRequestCustomTopic(boardState.topicTitle || 'Jelaskan topik ini', 'custom_dynamic')}
+          data-testid="wb-retry-realtime-btn"
+          className="px-3 py-1.5 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold cursor-pointer"
+        >
+          ↻ Coba Muat Ulang Real-Time
+        </button>
+      )}
+    </div>
+  ) : null;
+
+  const showInitialBuffering =
+    !isReady ||
+    (!isPteModal &&
+      !boardState?.isOfflineNotice &&
+      !hasRevealedCanvasRef.current &&
+      isInitialAudioGateActive);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1C1611]/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#1C1611]/78 animate-in fade-in duration-150"
       data-testid="in-call-learning-workbench"
     >
-      <div className={`w-full ${isGeneralReadAloudCanvas ? 'max-w-3xl' : isWidePteCanvas ? 'max-w-5xl xl:max-w-6xl' : isSswTacticalBoard ? 'max-w-3xl' : 'max-w-lg'} rounded-[28px] bg-[#FDFAF4] border ${isSswTacticalBoard ? 'border-[#DECFAF]' : 'border-[#EADBCE]'} shadow-[0_20px_50px_rgba(28,22,17,0.18)] overflow-hidden flex flex-col max-h-[92vh]`}>
-        {/* HEADER MINIMALIS PASTEL FIEZEL */}
-        <div className={`px-5 py-3.5 ${isSswTacticalBoard ? 'bg-[#FCF6EE] border-[#E6D5BD]' : 'bg-[#FBF8F1] border-[#F0E6D9]'} border-b flex items-center justify-between gap-2 shrink-0`}>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase w-fit ${isSswTacticalBoard ? 'bg-[#FCECED] text-[#8C2233]' : 'bg-[#FDE8E4] text-[#B85D43]'}`}>
-                {isSswTacticalBoard ? 'Papan Taktis SSW' : ui.badge}
+      <div
+        className={`w-full max-w-[calc(100vw-24px)] ${
+          isPteModal
+            ? 'sm:max-w-5xl xl:max-w-6xl max-h-[92vh] bg-[#FDFAF4] border-[#EADBCE]'
+            : 'sm:max-w-[1260px] h-[92vh] bg-[#FAFBF9] border-[#DDE2DC]'
+        } rounded-[26px] border shadow-[0_24px_60px_rgba(28,22,17,0.25)] overflow-hidden flex flex-col`}
+      >
+        {/* TOP HEADER BAR ALA SOLVELY + KONTROL KECEPATAN, EXPORT, MINIMIZE, AKHIRI */}
+        <div
+          className={`px-3.5 sm:px-5 py-2.5 border-b flex items-center justify-between gap-2 shrink-0 ${
+            isPteModal ? 'bg-[#FBF8F1] border-[#F0E6D9]' : 'bg-white/95 border-[#E5E8E3]'
+          }`}
+        >
+          <div className="min-w-0 flex-1 flex items-center gap-2">
+            {!showInitialBuffering && !isPteModal && isReady && (
+              <button
+                type="button"
+                onClick={() => {
+                  playFiezelSfx('button_tap');
+                  setIsSidebarOpen((v) => !v);
+                }}
+                data-testid="wb-toggle-sidebar-btn"
+                className="px-2.5 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold flex items-center gap-1 cursor-pointer shrink-0"
+                title="Buka / Tutup Materi Sumber"
+              >
+                <span>📄</span>
+                <span className="hidden sm:inline">Materi</span>
+              </button>
+            )}
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[10px] font-extrabold tracking-wide uppercase shrink-0">
+              ✦ Papan Tulis AI
+            </span>
+            <h3
+              className="text-xs sm:text-sm font-extrabold text-[#231A12] leading-tight truncate min-w-0"
+              data-testid="workbench-topic-title"
+            >
+              {boardState?.topicTitle || topicTitle || 'Papan Belajar'}
+            </h3>
+            {!isPteModal && isReady && isGeneratingTopic && (
+              <span
+                data-testid="wb-updating-indicator"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#1D4ED8] text-[10px] font-bold shrink-0 animate-pulse"
+              >
+                <span>⏳</span>
+                <span className="hidden sm:inline">Menyusun lanjutan...</span>
               </span>
-              <h3 className="text-xs sm:text-sm font-extrabold text-[#231A12] leading-tight line-clamp-2" data-testid="workbench-topic-title">
-                {titleHasCjk ? (
-                  <JapaneseRubyDisplay
-                    as="span"
-                    text={resolvedTitle}
-                    targetLang={resolvedEffectiveLang}
-                    showFurigana={true}
-                    showRomaji={isMostlyTargetPhrase(resolvedTitle, resolvedEffectiveLang)}
-                  />
-                ) : (
-                  resolvedTitle
-                )}
-              </h3>
-            </div>
+            )}
+            {!showInitialBuffering && !isPteModal && isReady && !isGeneratingTopic && isAudioPreparing && (
+              <span
+                data-testid="wb-audio-preparing-pill"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF3C7] border border-[#FCD34D] text-[#92400E] text-[10px] font-extrabold shrink-0 animate-pulse"
+              >
+                <span>🎙️</span>
+                <span className="hidden sm:inline">Menyiapkan suara natural...</span>
+              </span>
+            )}
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
+
+          <div className="flex items-center gap-1.5 shrink-0 justify-end">
+            {!showInitialBuffering && !isPteModal && isReady && (
+              <>
+                <select
+                  data-testid="wb-speed-select"
+                  aria-label="Kecepatan menulis papan"
+                  value={playbackSpeed}
+                  onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value) as 0.75 | 1 | 1.25 | 1.5)}
+                  className="px-2 py-1 rounded-xl bg-[#F4F6F3] border border-[#DCE2DA] text-[11px] font-bold text-[#334155] cursor-pointer"
+                >
+                  <option value={0.75}>0.75x</option>
+                  <option value={1}>1.0x</option>
+                  <option value={1.25}>1.25x</option>
+                  <option value={1.5}>1.5x</option>
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    playFiezelSfx('button_tap');
+                    setReplayNonce((n) => n + 1);
+                    setIsWritingPlaying(true);
+                  }}
+                  className="px-2.5 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold cursor-pointer hidden sm:inline-flex items-center gap-1"
+                  title="Putar Ulang Goresan Papan"
+                >
+                  <span>↺</span>
+                  <span>Ulangi</span>
+                </button>
+
+                <div className="hidden sm:flex items-center bg-[#F4F6F3] border border-[#DCE2DA] rounded-xl overflow-hidden text-[11px] font-bold text-[#334155]" data-testid="wb-zoom-controls">
+                  <button
+                    type="button"
+                    data-testid="wb-zoom-out"
+                    onClick={() => setZoomLevel((z) => Math.max(0.75, Number((z - 0.1).toFixed(2))))}
+                    className="px-2 py-1 hover:bg-[#E7ECE6] cursor-pointer"
+                    title="Perkecil papan (Zoom Out)"
+                  >
+                    −
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="wb-zoom-reset"
+                    onClick={() => setZoomLevel(1)}
+                    className="px-1.5 py-1 hover:bg-[#E7ECE6] cursor-pointer tabular-nums"
+                    title="Reset zoom 100%"
+                  >
+                    {Math.round(zoomLevel * 100)}%
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="wb-zoom-in"
+                    onClick={() => setZoomLevel((z) => Math.min(1.6, Number((z + 0.1).toFixed(2))))}
+                    className="px-2 py-1 hover:bg-[#E7ECE6] cursor-pointer"
+                    title="Perbesar papan (Zoom In)"
+                  >
+                    +
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  data-testid="wb-auto-spotlight-toggle"
+                  onClick={() => setAutoSpotlight((v) => !v)}
+                  className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border text-[11px] font-bold transition-colors cursor-pointer ${
+                    autoSpotlight
+                      ? 'bg-[#DCFCE7] border-[#86EFAC] text-[#14532D]'
+                      : 'bg-[#F4F6F3] border-[#DCE2DA] text-[#475569]'
+                  }`}
+                  title="Sorot & gulir otomatis ke langkah aktif"
+                >
+                  <span>{autoSpotlight ? '🎯 Fokus Auto' : '🎯 Fokus Manual'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleExportBoardPng}
+                  className="px-2 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold cursor-pointer hidden sm:inline-flex items-center gap-1"
+                  title="Simpan Catatan Papan Tulis (PNG)"
+                >
+                  <span>⬇</span>
+                  <span className="hidden lg:inline">Simpan</span>
+                </button>
+              </>
+            )}
+
             <button
               type="button"
               onClick={() => {
@@ -4187,239 +5454,157 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               }}
               data-testid="workbench-minimize-btn"
               className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-sm flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
-              title={ui.minimizeTitle}
+              title="Kecilkan Papan (Lihat Mochi & Tetap Bicara)"
             >
               —
             </button>
+
             <button
               type="button"
               onClick={onClose}
               data-testid="workbench-close-btn"
-              className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-xs flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
-              title={ui.closeTitle}
+              className="px-2.5 sm:px-3 py-1.5 rounded-full bg-[#FEE2E2] hover:bg-[#FECACA] text-[#B91C1C] font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shrink-0 transition-transform active:scale-95"
+              title="Akhiri Sesi Papan & Lanjut Ngobrol"
             >
-              ✕
+              <span className="w-2 h-2 rounded-full bg-[#DC2626]" />
+              <span className="hidden sm:inline">Akhiri Papan</span>
+              <span className="sm:hidden">Tutup</span>
             </button>
           </div>
         </div>
 
-        {/* JIKA SEDANG MERACIK MATERI: ANIMASI ORGANIK MINIMALIS */}
-        {!isReady && (
-          <div data-testid="workbench-buffering-state" className="p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[280px]">
-            <div className="relative w-16 h-16 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full bg-[#FDE8E4] animate-ping opacity-75" />
-              <div className="relative w-14 h-14 rounded-2xl bg-[#FFF9F5] border border-[#F5D5CE] flex items-center justify-center shadow-xs">
-                <span className="text-2xl select-none">✨</span>
+        {/* STAGE PERSIAPAN EDITORIAL ANTI-SLOP: Menahan tirai sampai papan + suara awal siap serentak */}
+        {showInitialBuffering && (
+          <div
+            data-testid="workbench-buffering-state"
+            className="flex-1 p-5 sm:p-10 flex flex-col items-center justify-center text-center fz-solvely-dotgrid"
+          >
+            <div className="w-full max-w-lg rounded-[26px] bg-[#FDFAF4] border border-[#E6DFD1] shadow-[0_22px_52px_rgba(28,22,17,0.10)] p-6 sm:p-7 space-y-5 relative overflow-hidden">
+              {/* Architectural Ink & Acoustic Waveform Slate */}
+              <div className="rounded-2xl bg-[#F7F3E9] border border-[#EAE2D2] px-4 py-4 flex items-center justify-between gap-4 relative overflow-hidden">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-16 h-12 rounded-xl bg-white/90 border border-[#E6DFD1] shadow-2xs flex items-center justify-center shrink-0 relative">
+                    <svg viewBox="0 0 80 44" className="w-14 h-9 overflow-visible" aria-hidden="true">
+                      <line x1="6" y1="35" x2="74" y2="35" stroke="#D6CEC0" strokeWidth="1.2" strokeDasharray="3 3" />
+                      <path
+                        d="M 8 32 C 20 8, 34 36, 48 16 C 56 6, 65 24, 72 15"
+                        fill="none"
+                        stroke="#DCFCE7"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M 8 32 C 20 8, 34 36, 48 16 C 56 6, 65 24, 72 15"
+                        fill="none"
+                        stroke="#15803D"
+                        strokeWidth="2.6"
+                        strokeLinecap="round"
+                        className="fz-atelier-ink-path"
+                      />
+                      <g className="fz-atelier-nib">
+                        <circle cx="48" cy="16" r="3.4" fill="#D97706" />
+                        <circle cx="48" cy="16" r="6.5" fill="#F59E0B" opacity="0.22" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div className="text-left min-w-0">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] text-[10px] font-extrabold tracking-wide uppercase mb-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
+                      <span>{persona.name}</span>
+                    </span>
+                    <h3 className="text-sm sm:text-[15px] font-extrabold text-[#1C1611] leading-snug">
+                      {locale === 'th'
+                        ? 'Fiezel กำลังเตรียมคำอธิบายให้คุณ'
+                        : 'Fiezel sedang menyiapkan penjelasan untukmu'}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Live Acoustic Calibrator Equalizer */}
+                <div className="flex items-end gap-1 h-7 px-2.5 py-1.5 rounded-xl bg-white/85 border border-[#E6DFD1] shrink-0" aria-hidden="true">
+                  <span className="w-1 h-4 rounded-full bg-[#15803D] fz-atelier-wave-bar" />
+                  <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-2" />
+                  <span className="w-1 h-3.5 rounded-full bg-[#22C55E] fz-atelier-wave-bar fz-atelier-wave-bar-3" />
+                  <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-4" />
+                  <span className="w-1 h-3 rounded-full bg-[#D97706] fz-atelier-wave-bar fz-atelier-wave-bar-5" />
+                </div>
               </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-extrabold text-[#231A12] tracking-tight">
-                {ui.preparingTitle}
-              </h3>
-              <p className="text-xs text-[#8C7760] max-w-[220px] leading-relaxed">
-                {ui.preparingSub}
-              </p>
+
+              <div className="text-left space-y-1.5 px-0.5">
+                <div className="text-[11px] font-bold text-[#8C6D1F] uppercase tracking-wider truncate">
+                  {topicTitle || scenario.titleId}
+                </div>
+                <p className="text-xs text-[#57534E] leading-relaxed">
+                  {!isReady
+                    ? 'Merangkai alur materi, analogi visual, dan contoh kalimat dari nol...'
+                    : 'Papan & diagram siap, menyelaraskan suara tutor natural agar langsung bicara...'}
+                </p>
+              </div>
+
+              {/* 3-Stage Tactile Pipeline Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left">
+                {[
+                  {
+                    label: 'Konsep & Rumus',
+                    done: isReady,
+                    active: !isReady,
+                  },
+                  {
+                    label: 'Diagram Visual',
+                    done: isReady,
+                    active: !isReady,
+                  },
+                  {
+                    label: 'Suara Natural',
+                    done: isReady && !isAudioPreparing,
+                    active: isReady && isAudioPreparing,
+                  },
+                ].map((stage, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-[11px] font-bold transition-colors ${
+                      stage.done
+                        ? 'bg-[#F0FDF4] border-[#BBF7D0] text-[#14532D]'
+                        : stage.active
+                          ? 'bg-white border-[#FCD34D] text-[#92400E] shadow-2xs'
+                          : 'bg-[#FAF7F0] border-[#EDE6D8] text-[#9A8F7E]'
+                    }`}
+                  >
+                    <span
+                      className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] shrink-0 ${
+                        stage.done
+                          ? 'bg-[#16A34A] text-white'
+                          : stage.active
+                            ? 'bg-[#FEF3C7] text-[#B45309]'
+                            : 'bg-[#EDE6D8] text-[#9A8F7E]'
+                      }`}
+                    >
+                      {stage.done ? '✓' : stage.active ? '●' : idx + 1}
+                    </span>
+                    <span className="truncate">{stage.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* JIKA MATERI SIAP: KANVAS ADAPTIF & LATIHAN MULTI-MODE */}
-        {isReady && boardState && (
-          <div className="p-4 sm:p-5 space-y-4 overflow-y-auto">
-            {/* -------------------------------------------------------------
-                KANVAS 1: DUAL-STREAM CONTRAST (UNTUK CONFUSING PAIR)
-            ------------------------------------------------------------- */}
-            {boardState.contextMode === 'confusing_pair' && boardState.pairData && (
-              <div className="space-y-2.5" data-testid="wb-confusing-pair-canvas">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {/* Sisi A */}
-                  <div className="p-3 rounded-2xl bg-[#FFF9F2] border border-[#F0E4D3] space-y-1">
-                    <span className="text-xs font-black text-[#B45309] block">
-                      {isTargetSentenceForRuby(boardState.pairData.termA, resolvedEffectiveLang) ? (
-                        <JapaneseRubyDisplay
-                          as="span"
-                          text={boardState.pairData.termA}
-                          targetLang={resolvedEffectiveLang}
-                          showFurigana={true}
-                          showRomaji={isMostlyTargetPhrase(boardState.pairData.termA, resolvedEffectiveLang) || resolvedEffectiveLang === 'en'}
-                        />
-                      ) : (
-                        boardState.pairData.termA
-                      )}
-                    </span>
-                    <p className="text-[11px] font-medium text-[#5C4A38] leading-tight">{boardState.pairData.descA}</p>
-                  </div>
-                  {/* Sisi B */}
-                  <div className="p-3 rounded-2xl bg-[#F7F9F5] border border-[#E3EBDC] space-y-1">
-                    <span className="text-xs font-black text-[#2D7A4D] block">
-                      {isTargetSentenceForRuby(boardState.pairData.termB, resolvedEffectiveLang) ? (
-                        <JapaneseRubyDisplay
-                          as="span"
-                          text={boardState.pairData.termB}
-                          targetLang={resolvedEffectiveLang}
-                          showFurigana={true}
-                          showRomaji={isMostlyTargetPhrase(boardState.pairData.termB, resolvedEffectiveLang) || resolvedEffectiveLang === 'en'}
-                        />
-                      ) : (
-                        boardState.pairData.termB
-                      )}
-                    </span>
-                    <p className="text-[11px] font-medium text-[#5C4A38] leading-tight">{boardState.pairData.descB}</p>
-                  </div>
-                </div>
-                {/* Analogi Inti */}
-                <div className="px-3.5 py-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] text-[11.5px] font-semibold text-[#5C4A38] flex items-center gap-2">
-                  <span className="text-amber-600 font-bold shrink-0">{ui.keyPointLabel}</span>
-                  <span>{boardState.pairData.keyAnalogy}</span>
-                </div>
-              </div>
-            )}
-
-            {/* -------------------------------------------------------------
-                KANVAS 2: PITA KALIMAT SINTAKSIS (UNTUK GRAMMAR / FORMULA)
-            ------------------------------------------------------------- */}
-            {boardState.contextMode === 'syntax_ribbon' && boardState.ribbonSegments && (
-              <div className="space-y-2.5 p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE]" data-testid="wb-syntax-ribbon-canvas">
-                <span className="text-[10px] font-bold text-[#8C7760] tracking-wider uppercase block">
-                  {ui.syntaxLabel}
-                </span>
-                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                  {boardState.ribbonSegments.map((seg, idx) => (
-                    <React.Fragment key={idx}>
-                      <div className="px-2.5 py-1.5 rounded-xl border border-black/5 flex flex-col items-center text-center" style={{ backgroundColor: seg.tagColor }}>
-                        <span className="text-[9px] font-bold text-black/60 uppercase">{seg.role}</span>
-                        <span className="text-xs font-black text-[#231A12]">
-                          {isTargetSentenceForRuby(seg.word, resolvedEffectiveLang) ? (
-                            <JapaneseRubyDisplay
-                              as="span"
-                              text={seg.word}
-                              targetLang={resolvedEffectiveLang}
-                              showFurigana={true}
-                              showRomaji={true}
-                            />
-                          ) : (
-                            seg.word
-                          )}
-                        </span>
-                      </div>
-                      {idx < boardState.ribbonSegments!.length - 1 && (
-                        <span className="text-[#8C7760] font-bold text-xs">→</span>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </div>
-                {boardState.pairData && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                    <div className="px-2.5 py-1.5 rounded-xl bg-[#FFF5F5] border border-[#FECACA] text-[11px] text-[#991B1B]">
-                      <span className="text-[9.5px] font-extrabold uppercase block">{ui.wrongLabel}</span>
-                      <JapaneseRubyDisplay
-                        as="span"
-                        text={boardState.pairData.termA}
-                        targetLang={resolvedEffectiveLang}
-                        showFurigana={true}
-                        showRomaji={true}
-                      />
-                    </div>
-                    <div className="px-2.5 py-1.5 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-[11px] text-[#166534]">
-                      <span className="text-[9.5px] font-extrabold uppercase block">{ui.rightLabel}</span>
-                      <JapaneseRubyDisplay
-                        as="span"
-                        text={boardState.pairData.termB}
-                        targetLang={resolvedEffectiveLang}
-                        showFurigana={true}
-                        showRomaji={true}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* -------------------------------------------------------------
-                KANVAS 3: KARAKTER / RADIKAL ZEN (MAGIC CHARACTER)
-            ------------------------------------------------------------- */}
-            {boardState.contextMode === 'magic_character' && boardState.characterData && (
-              <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] flex items-center gap-3.5" data-testid="wb-magic-character-canvas">
-                <div className="w-16 h-16 rounded-2xl bg-[#FAF4E8] border border-[#EADBCE] flex items-center justify-center text-3xl font-black text-[#231A12] shrink-0">
-                  {boardState.characterData.char}
-                </div>
-                <div className="min-w-0 flex-1 space-y-1 text-xs">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-black text-[#B85D43]">
-                      {boardState.characterData.reading || resolveUnifiedPronunciation(boardState.characterData.char, resolvedEffectiveLang, undefined, locale)}
-                    </span>
-                    <span className="text-[#5C4A38] font-semibold">· {boardState.characterData.meaning}</span>
-                  </div>
-                  <div className="text-[11px] text-[#8C7760] flex flex-wrap gap-3">
-                    <span>{ui.radicalLabel}: <strong className="text-[#3D2E20]">{boardState.characterData.radical}</strong> ({boardState.characterData.radicalMeaning})</span>
-                    <span>{ui.strokesLabel}: <strong className="text-[#3D2E20]">{boardState.characterData.strokesCount}</strong></span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* -------------------------------------------------------------
-                KANVAS 4: KONTUR NADA & INTONASI (TONE WAVEFORM)
-            ------------------------------------------------------------- */}
-            {boardState.contextMode === 'tone_waveform' && boardState.toneData && (
-              <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-1.5" data-testid="wb-tone-waveform-canvas">
-                <span className="text-[10px] font-bold text-[#8C7760] tracking-wider uppercase block">
-                  {ui.toneShapeLabel}
-                </span>
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <div className="space-y-0.5">
-                    <div className="text-base font-black text-[#231A12]">
-                      <JapaneseRubyDisplay
-                        as="span"
-                        text={boardState.toneData.word}
-                        targetLang={resolvedEffectiveLang}
-                        phoneticText={boardState.toneData.phonetic || resolveUnifiedPronunciation(boardState.toneData.word, resolvedEffectiveLang, undefined, locale)}
-                        showFurigana={true}
-                        showRomaji={true}
-                      />
-                    </div>
-                    <p className="text-[11px] font-semibold text-[#B45309]">{boardState.toneData.toneType} ({boardState.toneData.toneShape})</p>
-                  </div>
-                  {onSpeakPreview && (
-                    <button
-                      type="button"
-                      onClick={() => onSpeakPreview(boardState.toneData!.word, resolvedEffectiveLang)}
-                      className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer"
-                    >
-                      🔊 {ui.listenBtn}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* -------------------------------------------------------------
-                KANVAS PTE 1: DESCRIBE IMAGE (SVG CHARTS & TIMERS)
-            ------------------------------------------------------------- */}
+        {/* CABANG 1: KANVAS KHUSUS PTE ACADEMIC, READ ALOUD & SSW SENSEI */}
+        {!showInitialBuffering && isReady && boardState && isSpecialCanvasModal && (
+          <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
             {boardState.contextMode === 'pte_describe_image' && boardState.pteChartData && (
               <PteDescribeImageCanvas
                 data={boardState.pteChartData}
                 onSpeakPreview={(text) => onSpeakPreview && onSpeakPreview(text, 'en')}
-                onActiveQuestionChange={(info) => {
-                  onActiveBoardSyncRef.current?.({
-                    contextMode: 'pte_describe_image',
-                    topicTitle: info.title,
-                    activeTargetText: info.targetText,
-                  });
-                }}
               />
             )}
-
-            {/* -------------------------------------------------------------
-                KANVAS 2: READ ALOUD (PTE & NON-PTE EN/JA/ZH)
-            ------------------------------------------------------------- */}
             {(boardState.contextMode === 'pte_read_aloud' || boardState.contextMode === 'read_aloud') &&
               boardState.pteReadAloudData && (
               <PteReadAloudCanvas
                 data={boardState.pteReadAloudData}
                 onSpeakPreview={(text) =>
                   onSpeakPreview &&
-                  onSpeakPreview(text, boardState.pteReadAloudData?.targetLang || resolvedEffectiveLang)
+                  onSpeakPreview(text, boardState.pteReadAloudData?.targetLang || targetLang)
                 }
                 latestAlignment={latestReadAloudAlignment}
                 onActiveQuestionChange={(info) => {
@@ -4431,20 +5616,12 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 }}
               />
             )}
-
-            {/* -------------------------------------------------------------
-                KANVAS PTE 3: SCORECARD (PEARSON EVALUATION)
-            ------------------------------------------------------------- */}
             {boardState.contextMode === 'pte_scorecard' && boardState.pteScorecardData && (
               <PteScorecardCanvas
                 data={boardState.pteScorecardData}
                 onSpeakPreview={(text) => onSpeakPreview && onSpeakPreview(text, 'en')}
               />
             )}
-
-            {/* -------------------------------------------------------------
-                KANVAS KHUSUS SSW SENSEI: PAPAN TAKTIS & KUIS SSW 3 OPSI
-            ------------------------------------------------------------- */}
             {boardState.contextMode === 'ssw_tactical_board' && boardState.sswTacticalData && (
               <SswTacticalBoardCanvas
                 initialPageNumber={boardState.sswTacticalData.pageNumber}
@@ -4461,318 +5638,6 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 onEvaluatePractice={onEvaluatePractice}
               />
             )}
-
-            {/* KANVAS STANDARD CLARITY: CONTOH KALIMAT MODEL + CARA BACA + TERJEMAHAN */}
-            {boardState.contextMode === 'standard_clarity' && boardState.standardTarget?.text && (
-              <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2" data-testid="wb-standard-clarity-canvas">
-                <div className="flex items-start justify-between gap-2">
-                  <JapaneseRubyDisplay
-                    as="div"
-                    text={boardState.standardTarget.text}
-                    targetLang={resolvedEffectiveLang}
-                    phoneticText={boardState.standardTarget.reading}
-                    showFurigana={true}
-                    showRomaji={!boardState.standardTarget.reading}
-                    pronunciationTestId={!boardState.standardTarget.reading ? 'wb-standard-target-pronunciation' : undefined}
-                    className="text-sm font-black text-[#231A12]"
-                  />
-                  {onSpeakPreview && (
-                    <button
-                      type="button"
-                      onClick={() => onSpeakPreview(boardState.standardTarget!.text, resolvedEffectiveLang)}
-                      className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-bold cursor-pointer shrink-0"
-                    >
-                      🔊 {ui.listenBtn}
-                    </button>
-                  )}
-                </div>
-                {(boardState.standardTarget.reading || boardState.standardTarget.translation) && (
-                  <div className="pt-1 border-t border-[#F0E6D9] space-y-0.5 text-[11px]">
-                    {boardState.standardTarget.reading && (
-                      <p className="font-semibold text-[#8C6D1F]" data-testid="wb-standard-target-pronunciation">
-                        <span className="font-bold text-[#8C7760]">Cara Baca: </span>
-                        {boardState.standardTarget.reading}
-                      </p>
-                    )}
-                    {boardState.standardTarget.translation && (
-                      <p className="font-semibold text-[#5C4A38]">
-                        <span className="font-bold text-[#8C7760]">Terjemahan: </span>
-                        {boardState.standardTarget.translation}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* PENJELASAN SINGKAT GURU DENGAN TOMBOL AUDIO - hanya jika bukan mode PTE canvas lebar atau SSW tactical board */}
-            {!isWidePteCanvas && !isSswTacticalBoard && boardState.coachExplanation && (
-              <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-2">
-                <p className="text-xs text-[#3D2E20] leading-relaxed font-medium">
-                  {boardState.coachExplanation}
-                </p>
-                <div className="flex items-center justify-between pt-1 border-t border-[#F0E6D9]">
-                  <span className="text-[11px] font-semibold text-[#8C7760]">
-                    {persona.name} {(persona.geminiVoice || persona.edgeVoice) ? `(${persona.geminiVoice || persona.edgeVoice})` : ''}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleReplayVoice}
-                    data-testid="wb-replay-voice-btn"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold cursor-pointer transition-colors active:scale-95"
-                  >
-                    <span>🔊</span>
-                    <span>{ui.listenBtn}</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* -------------------------------------------------------------
-                AREA LATIHAN INTERAKTIF MULTI-MODE (ANTI-SPOILING)
-            ------------------------------------------------------------- */}
-            {!isWidePteCanvas && !isSswTacticalBoard && (
-              <div className="p-4 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] space-y-3">
-              {/* Top Bar Kuis & Switcher Mode */}
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F0E6D9] pb-2.5">
-                <div className="flex items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl overflow-x-auto no-scrollbar max-w-full">
-                  <button
-                    type="button"
-                    onClick={() => { playFiezelSfx('button_tap'); setQuizMode('multiple_choice'); }}
-                    data-testid="mode-tab-multiple_choice"
-                    className={`px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
-                      quizMode === 'multiple_choice' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
-                    }`}
-                  >
-                    {ui.modeChoice}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { playFiezelSfx('button_tap'); setQuizMode('cloze_gap'); }}
-                    data-testid="mode-tab-cloze_gap"
-                    className={`px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
-                      quizMode === 'cloze_gap' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
-                    }`}
-                  >
-                    {ui.modeCloze}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { playFiezelSfx('button_tap'); setQuizMode('sentence_blocks'); }}
-                    data-testid="mode-tab-sentence_blocks"
-                    className={`px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
-                      quizMode === 'sentence_blocks' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
-                    }`}
-                  >
-                    {ui.modeBlocks}
-                  </button>
-                </div>
-
-                {/* Tombol Ganti Soal Bersih */}
-                <button
-                  type="button"
-                  onClick={handleReRollQuestion}
-                  data-testid="wb-reroll-btn"
-                  className="px-2.5 py-1 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10px] sm:text-[10.5px] font-bold whitespace-nowrap shrink-0 inline-flex items-center gap-1 cursor-pointer transition-transform active:scale-95"
-                  title={ui.rerollTitle}
-                >
-                  <span>↻</span>
-                  <span>{ui.rerollBtn}</span>
-                </button>
-              </div>
-
-              {/* MODE 1: PILIHAN GANDA (3 OPSI TRANSFER) */}
-              {quizMode === 'multiple_choice' && (
-                <div className="space-y-2 pt-1">
-                  <p className="text-xs font-bold text-[#231A12]">{boardState.quiz.prompt}</p>
-                  <div className="grid grid-cols-1 gap-1.5">
-                    {boardState.quiz.options.map((opt) => {
-                      const isSelected = selectedOptionId === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => handleSelectOption(opt.id)}
-                          data-testid={`quiz-option-${opt.id}`}
-                          className={`w-full p-2.5 rounded-xl border text-left text-xs font-semibold cursor-pointer transition-all active:scale-98 ${
-                            isSelected
-                              ? opt.isCorrect
-                                ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
-                                : 'bg-[#FDE8E4] border-[#F87171] text-[#991B1B]'
-                              : 'bg-[#FDFAF4] border-[#EADBCE] text-[#3D2E20] hover:border-[#D8CBB5]'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <JapaneseRubyDisplay
-                              as="span"
-                              text={opt.text}
-                              targetLang={resolvedEffectiveLang}
-                              showFurigana={true}
-                              showRomaji={true}
-                              pronunciationTestId={`wb-option-pronunciation-${opt.id}`}
-                              className="flex-1"
-                            />
-                            {isSelected && <span>{opt.isCorrect ? '✓' : '✕'}</span>}
-                          </div>
-                          {isSelected && (
-                            <p className="text-[10.5px] mt-1 font-medium opacity-90">{opt.feedback}</p>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* MODE 2: ISIAN RUMPANG (CLOZE GAP) */}
-              {quizMode === 'cloze_gap' && (
-                <div className="space-y-2.5 pt-1">
-                  <p className="text-xs font-bold text-[#231A12]">{ui.clozePrompt}</p>
-                  <div className="p-3 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] text-xs font-medium text-[#231A12] leading-relaxed flex flex-wrap items-center gap-1.5">
-                    {boardState.quiz.cloze.prefix && (
-                      <JapaneseRubyDisplay
-                        as="span"
-                        text={boardState.quiz.cloze.prefix}
-                        targetLang={resolvedEffectiveLang}
-                        showFurigana={true}
-                        showRomaji={true}
-                      />
-                    )}
-                    <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#FFFFFF] border-2 border-dashed border-[#B45309] font-bold text-[#B45309] min-w-[50px] text-center">
-                      {clozeAnswer ? (
-                        <JapaneseRubyDisplay
-                          as="span"
-                          text={clozeAnswer}
-                          targetLang={resolvedEffectiveLang}
-                          showFurigana={true}
-                          showRomaji={true}
-                        />
-                      ) : (
-                        '______'
-                      )}
-                    </span>
-                    {boardState.quiz.cloze.suffix && (
-                      <JapaneseRubyDisplay
-                        as="span"
-                        text={boardState.quiz.cloze.suffix}
-                        targetLang={resolvedEffectiveLang}
-                        showFurigana={true}
-                        showRomaji={true}
-                      />
-                    )}
-                  </div>
-                  {/* Pilihan Kata Chip */}
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    {boardState.quiz.cloze.chips.map((chip, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => handleSelectClozeChip(chip)}
-                        data-testid={`cloze-chip-${idx}`}
-                        className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer active:scale-95 ${
-                          clozeAnswer === chip
-                            ? isClozeCorrect
-                              ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
-                              : 'bg-[#FDE8E4] border-[#F87171] text-[#991B1B]'
-                            : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#D8CBB5]'
-                        }`}
-                      >
-                        <JapaneseRubyDisplay
-                          as="span"
-                          text={chip}
-                          targetLang={resolvedEffectiveLang}
-                          showFurigana={true}
-                          showRomaji={true}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                  {clozeAnswer && (
-                    <p className={`text-[11px] font-semibold ${
-                      isClozeCorrect ? 'text-[#1B5E34]' : 'text-[#991B1B]'
-                    }`}>
-                      {isClozeCorrect ? boardState.quiz.cloze.feedback : ui.clozeWrong}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* MODE 3: SUSUN BALOK KATA (SENTENCE BLOCKS) */}
-              {quizMode === 'sentence_blocks' && (
-                <div className="space-y-2.5 pt-1">
-                  <p className="text-xs font-bold text-[#231A12]">{boardState.quiz.blocks.meaningId}</p>
-                  {/* Slot Kalimat yang Sedang Disusun */}
-                  <div className="min-h-[44px] p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-wrap gap-1.5 items-center">
-                    {placedBlocks.length === 0 ? (
-                      <span className="text-[11px] text-[#8C7760] italic">{ui.blocksEmpty}</span>
-                    ) : (
-                      placedBlocks.map((blk, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleRemoveBlock(idx)}
-                          className="px-2.5 py-1 rounded-lg bg-[#FFFFFF] border border-[#D8CBB5] text-xs font-bold text-[#231A12] shadow-2xs hover:bg-[#FEE2E2] cursor-pointer inline-flex items-center gap-1"
-                        >
-                          <JapaneseRubyDisplay
-                            as="span"
-                            text={blk}
-                            targetLang={resolvedEffectiveLang}
-                            showFurigana={true}
-                            showRomaji={true}
-                          />
-                          <span aria-hidden="true">✕</span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                  {/* Pool Balok Kata Tersedia */}
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    {boardState.quiz.blocks.pool.map((blk, idx) => {
-                      const countInPool = boardState.quiz.blocks.pool.filter(w => w === blk).length;
-                      const countPlaced = placedBlocks.filter(w => w === blk).length;
-                      const isExhausted = countPlaced >= countInPool;
-                      return (
-                        <button
-                          key={idx}
-                          type="button"
-                          disabled={isExhausted}
-                          onClick={() => handleAddBlock(blk)}
-                          data-testid={`available-block-${idx}`}
-                          className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                            isExhausted
-                              ? 'opacity-35 bg-[#EADBCE] border-transparent text-[#8C7760] cursor-not-allowed'
-                              : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#B45309] active:scale-95'
-                          }`}
-                        >
-                          <JapaneseRubyDisplay
-                            as="span"
-                            text={blk}
-                            targetLang={resolvedEffectiveLang}
-                            showFurigana={true}
-                            showRomaji={true}
-                          />
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {isQuizCompleted && (
-                    <p className="text-[11px] font-bold text-[#1B5E34]">
-                      ✓ {boardState.quiz.blocks.feedback}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-            )}
-
-            {/* STATUS SUARA MIKROFON & TOMBOL SELESAI */}
-            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FBF8F1] border border-[#F0E6D9] text-[11px] text-[#5C4A38]">
-              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping shrink-0" />
-              <span className="font-semibold truncate">
-                {ui.micListening(persona.name)}
-              </span>
-            </div>
-
             <div className="flex items-center gap-2 pt-1 pb-1">
               <button
                 type="button"
@@ -4794,6 +5659,452 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
             </div>
           </div>
         )}
+
+        {/* CABANG 2: PAPAN TULIS INTERAKTIF ALA SOLVELY (SIDEBAR MATERI + KANVAS DOT-GRID + BAR BAWAH) */}
+        {!showInitialBuffering && isReady && boardState && !isSpecialCanvasModal && whiteboardPlan && (() => {
+          const rawStepFullText = (
+            cohesiveAudioPlan?.stepSpans?.[lockstepIndex]?.caption ||
+            activeStepSubtitle ||
+            latestAiSubtitle ||
+            boardState.coachExplanation ||
+            ''
+          ).trim();
+          const sentences = rawStepFullText
+            .split(/(?<=[.!?。！？])\s+/)
+            .map((s) => s.trim())
+            .filter(Boolean);
+          let activeSentenceText = rawStepFullText;
+          let sentenceLocalFrac = lockstepProgress;
+          if (sentences.length > 1) {
+            const weights = sentences.map(computeProsodicTextWeight);
+            const totalW = Math.max(1, weights.reduce((a, b) => a + b, 0));
+            let curW = 0;
+            const p = Math.max(0, Math.min(0.999, lockstepProgress));
+            for (let sIdx = 0; sIdx < sentences.length; sIdx++) {
+              const sStart = curW / totalW;
+              curW += weights[sIdx];
+              const sEnd = sIdx === sentences.length - 1 ? 1 : curW / totalW;
+              if (p >= sStart && (p <= sEnd || sIdx === sentences.length - 1)) {
+                activeSentenceText = sentences[sIdx];
+                const spanW = Math.max(0.01, sEnd - sStart);
+                sentenceLocalFrac = Math.max(0, Math.min(1, (p - sStart) / spanW));
+                break;
+              }
+            }
+          }
+
+          const totalStepsCount = Math.max(1, whiteboardPlan.steps.length);
+          const totalBoardMs = whiteboardPlan.steps.reduce(
+            (acc, s) => acc + Math.max(900, (s.durationMs || 2200) / playbackSpeed),
+            0
+          );
+          const elapsedBoardMs = whiteboardPlan.steps.reduce((acc, s, i) => {
+            const d = Math.max(900, (s.durationMs || 2200) / playbackSpeed);
+            if (i < lockstepIndex) return acc + d;
+            if (i === lockstepIndex) return acc + d * lockstepProgress;
+            return acc;
+          }, 0);
+          const fmtClock = (ms: number) => {
+            const sec = Math.max(0, Math.round(ms / 1000));
+            return `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+          };
+          let captionText = activeSentenceText;
+          let captionWords = captionText.split(/\s+/).filter(Boolean);
+          let activeWordIdx = -1;
+          if (captionWords.length > 0 && isWritingPlaying && lockstepIndex < totalStepsCount) {
+            const wWeights = captionWords.map(computeProsodicWordWeight);
+            const wTotal = Math.max(1, wWeights.reduce((a, b) => a + b, 0));
+            const targetW = Math.max(0, Math.min(0.9999, sentenceLocalFrac)) * wTotal;
+            let accW = 0;
+            activeWordIdx = captionWords.length - 1;
+            for (let wi = 0; wi < captionWords.length; wi += 1) {
+              accW += wWeights[wi];
+              if (targetW < accW) {
+                activeWordIdx = wi;
+                break;
+              }
+            }
+          }
+          // Subtitle presisi: bila stempel waktu kata nyata tersedia, tampilkan kalimat yang SEDANG diucapkan
+          // (diambil dari naskah suara yang persis sama) dan sorot kata yang sedang terdengar.
+          const spokenStepText = String(cohesiveAudioPlan?.stepSpans?.[lockstepIndex]?.spokenText || '').trim();
+          if (
+            spokenCursor &&
+            spokenCursor.stepIndex === lockstepIndex &&
+            spokenStepText &&
+            isWritingPlaying &&
+            lockstepIndex < totalStepsCount
+          ) {
+            const stepTokens = spokenStepText.split(/\s+/).filter(Boolean);
+            const cursor = Math.max(0, Math.min(stepTokens.length - 1, spokenCursor.wordIdx));
+            let sStart = 0;
+            for (let i = 0; i < cursor; i++) {
+              if (/[.!?。！？]["')\]]*$/.test(stepTokens[i])) sStart = i + 1;
+            }
+            let sEnd = stepTokens.length - 1;
+            for (let i = cursor; i < stepTokens.length; i++) {
+              if (/[.!?。！？]["')\]]*$/.test(stepTokens[i])) {
+                sEnd = i;
+                break;
+              }
+            }
+            captionWords = stepTokens.slice(sStart, sEnd + 1);
+            captionText = captionWords.join(' ');
+            activeSentenceText = captionText;
+            activeWordIdx = cursor - sStart;
+          }
+          const clockElapsedMs = audioClock ? (audioClock.elapsedSec * 1000) / Math.max(0.5, playbackSpeed) : elapsedBoardMs;
+          const clockTotalMs = audioClock ? (audioClock.totalSec * 1000) / Math.max(0.5, playbackSpeed) : totalBoardMs;
+
+          return (
+            <>
+            <div className="flex-1 min-h-0 flex overflow-hidden relative">
+              {/* LEFT SIDEBAR: COURSE SOURCE / MATERI SUMBER (Drawer di Mobile, Statis di Desktop) */}
+              {isSidebarOpen && (
+                <>
+                  <div
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="md:hidden fixed inset-0 bg-black/30 z-30"
+                    aria-hidden="true"
+                  />
+                  <aside
+                    data-testid="wb-course-source-sidebar"
+                    className="absolute inset-y-0 left-0 z-40 w-[264px] max-w-[82vw] md:static md:w-[248px] md:max-w-none md:z-10 shrink-0 bg-[#F8FAFC] border-r border-[#E2E8F0] flex flex-col overflow-hidden shadow-2xl md:shadow-none"
+                  >
+                  <div className="px-3.5 py-2.5 border-b border-[#E2E8F0] flex items-center justify-between">
+                    <div>
+                      <div className="text-[9.5px] font-black uppercase tracking-widest text-[#64748B]">
+                        COURSE SOURCE
+                      </div>
+                      <div className="text-xs font-extrabold text-[#0F172A]">Materi Sesi Ini</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className="w-6 h-6 rounded-lg hover:bg-[#E2E8F0] text-[#475569] text-xs font-bold flex items-center justify-center cursor-pointer"
+                      title="Tutup panel materi"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
+                    {whiteboardPlan.sourcePages.map((pg) => (
+                      <div
+                        key={pg.id}
+                        className={`rounded-2xl border p-2.5 bg-white transition-all cursor-pointer hover:border-[#15803D] shadow-2xs ${
+                          selectedMaterialPage?.id === pg.id ? 'border-[#2563EB] ring-2 ring-[#BFDBFE]' : 'border-[#E2E8F0]'
+                        }`}
+                        onClick={() => {
+                          setSelectedMaterialPage(pg);
+                          playFiezelSfx('button_tap');
+                        }}
+                      >
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <span className="text-[9px] font-black tracking-wider uppercase text-[#64748B]">
+                            HALAMAN {pg.pageNumber}
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded bg-[#DCFCE7] text-[#15803D] text-[9px] font-extrabold">
+                            {pg.badge}
+                          </span>
+                        </div>
+                        {pg.imageDataUrl && (
+                          <img
+                            src={pg.imageDataUrl}
+                            alt={pg.title}
+                            className="w-full h-24 object-cover rounded-xl border border-[#E2E8F0] mb-1.5"
+                          />
+                        )}
+                        <div className="text-xs font-extrabold text-[#0F172A] line-clamp-1">{pg.title}</div>
+                        <div className="text-[10.5px] text-[#64748B] line-clamp-1 mb-1.5">{pg.subtitle}</div>
+                        <ul className="space-y-1">
+                          {pg.highlights.slice(0, 3).map((hl, idx) => (
+                            <li
+                              key={idx}
+                              className="text-[10px] text-[#334155] bg-[#F8FAFC] px-2 py-1 rounded-lg border border-[#F1F5F9] line-clamp-2"
+                            >
+                              {hl}
+                            </li>
+                          ))}
+                        </ul>
+                        <button
+                          type="button"
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            handleSubmitBoardQuestion(pg.promptToExplain, pg.title);
+                          }}
+                          className="mt-2 w-full py-1 px-2 rounded-lg bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#1D4ED8] text-[10.5px] font-bold cursor-pointer"
+                        >
+                          ⭕ Jelaskan di Papan Tulis
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-3 border-t border-[#E2E8F0] bg-white">
+                    <input
+                      ref={materialUploadInputRef}
+                      type="file"
+                      accept="image/*,.txt,.md"
+                      onChange={handleMaterialUpload}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => materialUploadInputRef.current?.click()}
+                      className="w-full py-2 px-3 rounded-xl border border-dashed border-[#94A3B8] hover:border-[#2563EB] bg-[#F8FAFC] hover:bg-[#EFF6FF] text-[#334155] hover:text-[#1D4ED8] text-[11px] font-bold cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>📎</span>
+                      <span>Tambah Gambar / Catatan</span>
+                    </button>
+                  </div>
+                </aside>
+                </>
+              )}
+
+            {/* KANVAS UTAMA SPIDOL HIDUP DOT-GRID */}
+                  <LiveWhiteboardCanvas
+                    plan={whiteboardPlan}
+                    targetLang={targetLang}
+                    playbackSpeed={playbackSpeed}
+                    isPlaying={isWritingPlaying}
+                    onPlayingChange={(playing) => {
+                      setIsWritingPlaying(playing);
+                      if (!playing && lockstepAudioRef.current) {
+                        try {
+                          lockstepAudioRef.current.pause();
+                        } catch {}
+                      }
+                    }}
+                    replayNonce={replayNonce}
+                    zoomLevel={zoomLevel}
+                    onZoomChange={(nextZ) => setZoomLevel(Math.max(0.75, Math.min(1.6, Number(nextZ.toFixed(2)))))}
+                    autoSpotlight={autoSpotlight}
+                    onToggleAutoSpotlight={setAutoSpotlight}
+                    isPenActive={isPenActive}
+                    penColor={penColor}
+                    onPenToggle={setIsPenActive}
+                    onCircleAsk={(excerpt, userQ) => {
+                      handleSubmitBoardQuestion(
+                        userQ || `Jelaskan lebih detail bagian "${excerpt}"`,
+                        excerpt
+                      );
+                    }}
+                    quizSlot={quizPanelElement}
+                    boardContainerRef={boardContainerRef}
+                    externalStepIndex={lockstepIndex}
+                    externalStepProgress={lockstepProgress}
+                    activeSpokenText={activeSentenceText}
+                    onSelectStepIndex={(idx) => {
+                      stopLockstepAudio();
+                      const total = whiteboardPlan.steps.length;
+                      const bounded = Math.max(0, Math.min(total, idx));
+                      seekTargetStepRef.current = bounded < total ? bounded : null;
+                      const span = cohesiveAudioPlan?.stepSpans[bounded];
+                      const estSec = Math.max(
+                        4,
+                        whiteboardPlan.steps.reduce((s, st) => s + (st.durationMs || 2200), 0) / 1000
+                      );
+                      const totalSec = trackTotalSecRef.current || estSec;
+                      const targetFrac = bounded >= total ? 1 : span ? span.startFrac : 0;
+                      trackFracRef.current = targetFrac;
+                      trackOffsetSecRef.current =
+                        bounded >= total ? totalSec : span ? span.startFrac * totalSec : 0;
+                      lastCommitIdxRef.current = bounded;
+                      lastCommitProgRef.current = bounded >= total ? 1 : 0.04;
+                      lastCommitSubRef.current = span?.caption || '';
+                      spokenCursorRef.current = null;
+                      setSpokenCursor(null);
+                      setActiveStepSubtitle(span?.caption || '');
+                      setLockstepIndex(bounded);
+                      setLockstepProgress(bounded >= total ? 1 : 0.04);
+                      setIsWritingPlaying(bounded < total);
+                      setSeekNonce((n) => n + 1);
+                    }}
+                  />
+                </div>
+
+                {/* BOTTOM FLOATING BAR ALA SOLVELY (AVATAR + SUBTITLE + PEN TOOL + INPUT + MIC) */}
+                <div className="px-3 sm:px-5 py-2.5 bg-white border-t border-[#E5E8E3] flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-2 shrink-0">
+              {/* Kiri: Avatar Tutor + Kontrol Putar + Timer + CC Live Karaoke */}
+              <div className="flex items-center gap-2 min-w-0 w-full sm:w-auto sm:flex-1 sm:max-w-lg">
+                <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#15803D] bg-[#FFF9EE] shrink-0">
+                  <img
+                    src={persona.avatarUrl || './assets/brand/fiezel-icon.svg'}
+                    alt={persona.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <span
+                    className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border border-white ${
+                      isStepAudioActive || isLiveConnected ? 'bg-[#10B981]' : 'bg-[#F59E0B]'
+                    }`}
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  data-testid="wb-play-pause-btn"
+                  onClick={() => {
+                    if (lockstepIndex >= totalStepsCount) {
+                      handleReplayVoice();
+                      return;
+                    }
+                    setIsWritingPlaying((v) => !v);
+                  }}
+                  className="w-8 h-8 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-xs font-bold flex items-center justify-center cursor-pointer shrink-0"
+                  title={isWritingPlaying ? 'Jeda Menulis Papan' : 'Lanjut Menulis Papan'}
+                >
+                  {isWritingPlaying ? '⏸' : '▶'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleReplayVoice}
+                  data-testid="wb-replay-voice-btn"
+                  className="w-8 h-8 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-xs font-bold flex items-center justify-center cursor-pointer shrink-0"
+                  title="Putar Ulang Papan & Suara dari Langkah 1"
+                >
+                  🔊
+                </button>
+
+                <span
+                  data-testid="wb-lockstep-timer"
+                  className="px-2 py-0.5 rounded-md bg-[#F4F6F3] border border-[#DCE2DA] text-[10px] font-bold text-[#334155] tabular-nums shrink-0"
+                  title={`Langkah ${Math.min(totalStepsCount, lockstepIndex + 1)} dari ${totalStepsCount}`}
+                >
+                  {fmtClock(clockElapsedMs)} / {fmtClock(clockTotalMs)} • {Math.min(totalStepsCount, lockstepIndex + 1)}/{totalStepsCount}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setShowCaptions((v) => !v)}
+                  className={`px-2 py-1 rounded-lg text-[10.5px] font-black cursor-pointer shrink-0 ${
+                    showCaptions ? 'bg-[#0F172A] text-white' : 'bg-[#F1F5F9] text-[#475569]'
+                  }`}
+                  title="Tampilkan / Sembunyikan Teks Penjelasan"
+                >
+                  CC
+                </button>
+
+                {showCaptions && (
+                  <p
+                    data-testid="wb-lockstep-caption"
+                    className="text-[11px] font-medium text-[#334155] line-clamp-2 leading-snug min-w-0"
+                  >
+                    {activeWordIdx >= 0
+                      ? captionWords.map((w, wIdx) => (
+                          <span
+                            key={wIdx}
+                            className={
+                              wIdx === activeWordIdx
+                                ? 'bg-[#DCFCE7] text-[#15803D] font-bold px-0.5 rounded'
+                                : wIdx < activeWordIdx
+                                  ? 'text-[#0F172A]'
+                                  : 'text-[#64748B]'
+                            }
+                          >
+                            {w}{' '}
+                          </span>
+                        ))
+                      : captionText}
+                  </p>
+                )}
+              </div>
+
+              {/* Tengah-Kanan: Pen Tool + Color Swatches + Input Pertanyaan + Mic Button */}
+              <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto sm:flex-1 justify-between sm:justify-end min-w-0">
+                {/* Pen Tool + Ink Colors */}
+                <div className="flex items-center gap-1 bg-[#F4F6F3] border border-[#DCE2DA] rounded-full px-2 py-1 shrink-0">
+                  <button
+                    type="button"
+                    data-testid="wb-pen-toggle-btn"
+                    onClick={() => {
+                      playFiezelSfx('button_tap');
+                      setIsPenActive((v) => !v);
+                    }}
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold cursor-pointer transition-all ${
+                      isPenActive ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#334155] hover:bg-white'
+                    }`}
+                    title="Pakai Spidol untuk Lingkari Papan & Tanya"
+                  >
+                    ✏️ {isPenActive ? 'Spidol On' : 'Coret'}
+                  </button>
+                  {isPenActive &&
+                    (['#2563EB', '#DC2626', '#059669', '#D97706'] as PenColor[]).map((col) => (
+                      <button
+                        key={col}
+                        type="button"
+                        onClick={() => setPenColor(col)}
+                        style={{ backgroundColor: col }}
+                        className={`w-4 h-4 rounded-full cursor-pointer transition-transform ${
+                          penColor === col ? 'ring-2 ring-offset-1 ring-[#0F172A] scale-110' : 'opacity-70'
+                        }`}
+                        title="Pilih Warna Spidol"
+                      />
+                    ))}
+                </div>
+
+                {/* Form Tanya di Papan Tulis */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmitBoardQuestion(questionDraft);
+                  }}
+                  className="flex items-center gap-1.5 flex-1 max-w-md bg-[#F8FAFC] border border-[#CBD5E1] focus-within:border-[#2563EB] rounded-full px-3 py-1"
+                >
+                  <button
+                    type="button"
+                    onClick={() => materialUploadInputRef.current?.click()}
+                    className="text-sm text-[#64748B] hover:text-[#0F172A] cursor-pointer shrink-0"
+                    title="Lampirkan gambar atau catatan"
+                  >
+                    📎
+                  </button>
+                  <input
+                    type="text"
+                    data-testid="wb-board-question-input"
+                    value={questionDraft}
+                    onChange={(e) => setQuestionDraft(e.target.value)}
+                    placeholder="Tulis pertanyaan atau minta contoh lain..."
+                    className="flex-1 min-w-0 bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+                  />
+                  {questionDraft.trim().length > 0 && (
+                    <button
+                      type="submit"
+                      data-testid="wb-board-question-submit"
+                      className="px-2.5 py-0.5 rounded-full bg-[#2563EB] text-white text-[11px] font-bold cursor-pointer shrink-0"
+                    >
+                      Tanya
+                    </button>
+                  )}
+                </form>
+
+                {/* Mic / Lanjut Bicara CTA */}
+                <button
+                  type="button"
+                  onClick={handleResumeTalk}
+                  data-testid="wb-talk-coach-btn"
+                  className="px-3.5 py-2 rounded-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all shrink-0"
+                  title={`Lanjut Bicara dengan ${persona.name}`}
+                >
+                  <span>🎙️</span>
+                  <span className="hidden sm:inline">Bicara</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  data-testid="wb-dismiss-footer-btn"
+                  className="hidden"
+                  aria-hidden="true"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          </>
+          );
+        })()}
       </div>
     </div>
   );
