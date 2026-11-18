@@ -1138,6 +1138,40 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  if (pathname === '/api/brain/state' && (req.method === 'GET' || req.method === 'POST')) {
+    const devCloudStore = globalThis.__fiezelDevCloudState || (globalThis.__fiezelDevCloudState = new Map());
+    const cookieHeader = String(req.headers.cookie || '');
+    const subMatch = /fz_id=([^;\s]+)/.exec(cookieHeader);
+    const subKey = subMatch ? subMatch[1].slice(0, 80) : 'local-dev-sub';
+    if (req.method === 'GET') {
+      const existing = devCloudStore.get(subKey) || null;
+      return sendJson(res, 200, {
+        ok: true,
+        hasSnapshot: Boolean(existing && existing.snapshot),
+        snapshot: existing ? existing.snapshot : null,
+        revision: existing ? existing.revision : 0,
+        updatedAt: existing ? existing.updatedAt : 0
+      });
+    }
+    const body = await parseJsonBody(req);
+    const incoming = body && typeof body.snapshot === 'object' ? body.snapshot : body;
+    const prev = devCloudStore.get(subKey) || null;
+    const legacyMod = await import('./workers/api/route-legacy.js');
+    const now = Date.now();
+    const merged = prev && prev.snapshot
+      ? legacyMod.mergeAccountCloudSnapshots(prev.snapshot, incoming, now)
+      : legacyMod.sanitizeAccountCloudSnapshot(incoming, now);
+    const nextRev = (prev ? Number(prev.revision) || 0 : 0) + 1;
+    devCloudStore.set(subKey, { snapshot: merged, revision: nextRev, updatedAt: now });
+    return sendJson(res, 200, {
+      ok: true,
+      hasSnapshot: true,
+      snapshot: merged,
+      revision: nextRev,
+      updatedAt: now
+    });
+  }
+
   if (pathname.startsWith('/api/')) {
     const body = req.method === 'POST' ? await parseJsonBody(req) : {};
     return sendJson(res, 200, {

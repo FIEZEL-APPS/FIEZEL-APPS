@@ -11,7 +11,8 @@ export const LEGACY_TABLES = Object.freeze([
   'brain_attempts',
   'policy_outcomes',
   'feedback',
-  'evolution_ledger'
+  'evolution_ledger',
+  'account_cloud_state'
 ]);
 
 export const LEGACY_DDL = Object.freeze([
@@ -54,6 +55,12 @@ export const LEGACY_DDL = Object.freeze([
     ' id INTEGER PRIMARY KEY AUTOINCREMENT,' +
     ' entry TEXT NOT NULL,' +
     ' created_at INTEGER NOT NULL' +
+    ' )',
+  'CREATE TABLE IF NOT EXISTS account_cloud_state (' +
+    ' sub TEXT NOT NULL PRIMARY KEY,' +
+    ' snapshot_json TEXT NOT NULL,' +
+    ' revision INTEGER NOT NULL DEFAULT 1,' +
+    ' updated_at INTEGER NOT NULL' +
     ' )'
 ]);
 
