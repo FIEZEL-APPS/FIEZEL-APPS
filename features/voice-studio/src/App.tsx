@@ -65,6 +65,7 @@ import {
   type WorkbenchPracticeCheckResult,
 } from './components/InCallLearningWorkbenchModal';
 import {
+  extractOpenerFirstTtsChunk,
   requestRealtimeWhiteboardAction,
   requestRealtimeWhiteboardStream,
   type WhiteboardFollowUpContext,
@@ -3002,7 +3003,7 @@ export default function App() {
       );
       void (async () => {
         try {
-          const liveWb = await requestRealtimeWhiteboardAction({
+          const liveWb = await requestRealtimeWhiteboardStream({
             question: `[WHITEBOARD_REQUEST] ${uText}`,
             personaId: activePersona.id,
             personaName: activePersona.name,
@@ -3012,6 +3013,20 @@ export default function App() {
             locale,
             learnerDossier: safeBuildDossier(brainStateRef.current, activeScenario, locale),
             history: turnsRef.current.slice(-4).map((t) => ({ speaker: t.speaker, text: t.text })),
+            onOpenerReady: (opener) => {
+              const firstChunk = extractOpenerFirstTtsChunk(opener);
+              if (
+                firstChunk &&
+                reqSeq === workbenchSessionRef.current.turnSeq &&
+                !workbenchSessionRef.current.dismissedByUser
+              ) {
+                void synthesizeFlexibleTts({
+                  text: firstChunk,
+                  targetLang: locale,
+                  persona: activePersona,
+                }).catch(() => null);
+              }
+            },
           });
           if (
             liveWb?.uiAction?.actionType === 'open_learning_popup' &&
@@ -8956,14 +8971,12 @@ ${
                           .slice(-4)
                           .map((t) => ({ speaker: t.speaker, text: t.text })),
                         onOpenerReady: (opener) => {
-                          const intro = String(opener?.headingStep?.spokenNarration || opener?.topicTitle || '').trim();
+                          const firstChunk = extractOpenerFirstTtsChunk(opener);
                           if (
-                            intro &&
+                            firstChunk &&
                             reqSeq === workbenchSessionRef.current.turnSeq &&
                             !workbenchSessionRef.current.dismissedByUser
                           ) {
-                            const normIntro = /[.!?。！？]$/.test(intro) ? intro : `${intro}.`;
-                            const firstChunk = splitTtsIntoSentenceChunks(normIntro, 145)[0] || normIntro;
                             void synthesizeFlexibleTts({
                               text: firstChunk,
                               targetLang: locale,
@@ -10922,14 +10935,12 @@ ${
                     learnerDossier: safeBuildDossier(brainStateRef.current, activeScenario, locale),
                     boardContext: followUpContext,
                     onOpenerReady: (opener) => {
-                      const intro = String(opener?.headingStep?.spokenNarration || opener?.topicTitle || '').trim();
+                      const firstChunk = extractOpenerFirstTtsChunk(opener);
                       if (
-                        intro &&
+                        firstChunk &&
                         reqSeq === workbenchSessionRef.current.turnSeq &&
                         !workbenchSessionRef.current.dismissedByUser
                       ) {
-                        const normIntro = /[.!?。！？]$/.test(intro) ? intro : `${intro}.`;
-                        const firstChunk = splitTtsIntoSentenceChunks(normIntro, 145)[0] || normIntro;
                         void synthesizeFlexibleTts({
                           text: firstChunk,
                           targetLang: locale,

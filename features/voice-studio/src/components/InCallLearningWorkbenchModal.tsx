@@ -9,6 +9,7 @@ import {
 import { type PteDiagnosticSpeechResult } from '../lib/braincore';
 import { type SpeechAlignmentResult } from '../lib/speechAlignment';
 import { playFiezelSfx } from '../lib/sfx';
+import { wbPick } from '../lib/i18n';
 import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
 import { resolveUnifiedPronunciation, translateAndPhoneticizeLiveText } from '../lib/liveCallHelper';
 import { containsHanzi } from '../lib/mandarinPhonetics';
@@ -435,6 +436,251 @@ function joinTokensForTarget(tokens: string[], targetLang: TargetLang): string {
     return clean.join('');
   }
   return clean.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Pengacak deterministik berbasis seed (`quizSeed`) yang menjamin:
+ * 1) Hasil tidak pernah identik dengan urutan jawaban asli (`items`) maupun kebalikan murni (`reverse`) untuk n >= 3.
+ * 2) Setiap kenaikan `seed` ("Ganti Soal") menghasilkan permutasi berbeda secara deterministik.
+ */
+function seededShuffle<T>(items: readonly T[], seed: number): T[] {
+  const n = items.length;
+  if (n <= 1) return [...items];
+  if (n === 2) {
+    return Math.abs(seed) % 2 === 0 ? [items[1], items[0]] : [items[0], items[1]];
+  }
+  const origSig = items.map((x) => JSON.stringify(x)).join('||');
+  const revSig = [...items].reverse().map((x) => JSON.stringify(x)).join('||');
+  const firstSig = JSON.stringify(items[0]);
+  const desiredFirstPos = (Math.abs(seed) + 1) % n;
+
+  const allCandidates: T[][] = [];
+  const posMatchedCandidates: T[][] = [];
+  for (let variant = 0; variant < 32; variant++) {
+    const arr = [...items];
+    let state = (Math.abs(seed * 131 + variant * 97 + n * 31) + 1) >>> 0;
+    for (let i = n - 1; i > 0; i--) {
+      state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+      const j = state % (i + 1);
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    const sig = arr.map((x) => JSON.stringify(x)).join('||');
+    if (
+      sig !== origSig &&
+      sig !== revSig &&
+      !allCandidates.some((c) => c.map((x) => JSON.stringify(x)).join('||') === sig)
+    ) {
+      allCandidates.push(arr);
+      if (JSON.stringify(arr[desiredFirstPos]) === firstSig) {
+        posMatchedCandidates.push(arr);
+      }
+    }
+  }
+  if (posMatchedCandidates.length > 0) {
+    return posMatchedCandidates[Math.abs(seed) % posMatchedCandidates.length];
+  }
+  if (allCandidates.length > 0) {
+    return allCandidates[Math.abs(seed) % allCandidates.length];
+  }
+  const shift = (Math.abs(seed) % (n - 1)) + 1;
+  return items.map((_, idx) => items[(idx + shift) % n]);
+}
+
+function synthesizeSentenceDistractors(
+  targetSent: string,
+  primaryTrap: string,
+  targetLang: TargetLang,
+  action?: VoiceUiAction,
+  defaultWrongFeedback = 'Periksa kembali struktur tata bahasa dan pilihan katanya.',
+  locale?: LearnerLocale
+): Array<{ text: string; feedback: string }> {
+  const pick = (en: string, id: string) => wbPick(en, id, undefined, locale);
+  const cleanTarget = targetSent.trim();
+  const seen = new Set<string>([cleanTarget.toLowerCase()]);
+  const out: Array<{ text: string; feedback: string }> = [];
+  const pushCandidate = (txt: string, feedback: string) => {
+    const t = String(txt || '').replace(/\s+/g, ' ').trim();
+    if (!t || t.length < 2) return;
+    const key = t.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ text: t, feedback });
+  };
+
+  if (primaryTrap && primaryTrap.trim() !== cleanTarget) {
+    pushCandidate(primaryTrap, action?.trapWrongReason || defaultWrongFeedback);
+  }
+
+  if (Array.isArray(action?.whiteboardSteps)) {
+    for (const st of action.whiteboardSteps) {
+      if (st?.wrongText) {
+        pushCandidate(st.wrongText, st.reason || action?.trapWrongReason || defaultWrongFeedback);
+      }
+    }
+  }
+
+  if (targetLang === 'en') {
+    if (/\b(?:am|is|are)\s+([a-z]+)\b/i.test(cleanTarget)) {
+      pushCandidate(
+        cleanTarget.replace(/\b(?:am|is|are)\s+/i, ''),
+        pick(
+          'This sentence is missing its linking verb (to be: am/is/are) after the subject.',
+          'Kalimat ini kehilangan kata penghubung (to be: am/is/are) setelah subjek.'
+        )
+      );
+      pushCandidate(
+        cleanTarget.replace(/\b(is)\b/i, 'are').replace(/\b(are)\b/i, 'is').replace(/\b(am)\b/i, 'is'),
+        pick(
+          'The linking verb (am/is/are) does not agree with the subject.',
+          'Pasangan to be (am/is/are) tidak sesuai dengan subjek kalimatnya.'
+        )
+      );
+      pushCandidate(
+        cleanTarget.replace(/\b(?:am|is|are)\b/i, (m) => (/^am$/i.test(m) ? 'do' : /^are$/i.test(m) ? 'do' : 'does')),
+        pick(
+          'Before an adjective or state, use to be (am/is/are), not do/does.',
+          'Untuk kata sifat atau kondisi, gunakan to be (am/is/are), bukan do/does.'
+        )
+      );
+    }
+    const words = tokenizeSentenceIntoBlocks(cleanTarget, 'en');
+    if (words.length >= 3) {
+      const midSwap = [...words];
+      const swapIdx = midSwap.length >= 4 ? 2 : 1;
+      const t = midSwap[swapIdx - 1];
+      midSwap[swapIdx - 1] = midSwap[swapIdx];
+      midSwap[swapIdx] = t;
+      const rawSwap = `${midSwap.join(' ')}.`;
+      pushCandidate(
+        rawSwap.charAt(0).toUpperCase() + rawSwap.slice(1),
+        pick(
+          'The word order in this statement is reversed.',
+          'Urutan kata dalam kalimat pernyataan ini terbalik.'
+        )
+      );
+      const dropped = words.filter((_, idx) => idx !== 1);
+      const rawDrop = `${dropped.join(' ')}.`;
+      pushCandidate(
+        rawDrop.charAt(0).toUpperCase() + rawDrop.slice(1),
+        pick(
+          'An essential verb or linking word is missing in the middle of the sentence.',
+          'Ada unsur kata kerja atau penghubung penting yang terlewat di tengah kalimat.'
+        )
+      );
+    }
+  } else if (targetLang === 'ja') {
+    if (/は/.test(cleanTarget)) {
+      pushCandidate(
+        cleanTarget.replace(/は/, 'を'),
+        pick(
+          'Topic marker は cannot be replaced with direct-object particle を here.',
+          'Partikel penanda topik は tidak boleh diganti partikel objek を di posisi ini.'
+        )
+      );
+    }
+    if (/を/.test(cleanTarget)) {
+      pushCandidate(
+        cleanTarget.replace(/を/, 'が'),
+        pick(
+          'Object marker を was mistakenly swapped with subject marker が.',
+          'Partikel objek を keliru diganti menjadi が pada kata kerja ini.'
+        )
+      );
+    }
+    if (/です|ます/.test(cleanTarget)) {
+      pushCandidate(
+        cleanTarget.replace(/です|ます/g, ''),
+        pick(
+          'The polite predicate ending (です/ます) is incomplete.',
+          'Akhiran predikat sopan (です/ます) di akhir kalimat belum lengkap.'
+        )
+      );
+    }
+  } else if (targetLang === 'zh') {
+    if (/是/.test(cleanTarget)) {
+      pushCandidate(
+        cleanTarget.replace(/是/, '很'),
+        pick(
+          '是 (to be) and 很 (stative linker) serve different grammatical roles here.',
+          'Kata penghubung 是 dan 很 memiliki fungsi berbeda pada pola kalimat ini.'
+        )
+      );
+    }
+    const toks = tokenizeSentenceIntoBlocks(cleanTarget, 'zh');
+    if (toks.length >= 3) {
+      const swapped = [...toks];
+      const t = swapped[1];
+      swapped[1] = swapped[2];
+      swapped[2] = t;
+      pushCandidate(
+        swapped.join(''),
+        pick(
+          'The Mandarin adverbial and predicate order is inverted.',
+          'Susunan kata keterangan dan predikat Mandarin-nya terbalik.'
+        )
+      );
+    }
+  }
+
+  // Fallback universal bila kalimat sangat pendek
+  const tokens = tokenizeSentenceIntoBlocks(cleanTarget, targetLang);
+  if (out.length < 2 && tokens.length >= 2) {
+    pushCandidate(
+      joinTokensForTarget([tokens[1], tokens[0], ...tokens.slice(2)], targetLang),
+      pick(
+        'The word order in this choice is incorrect.',
+        'Susunan urutan kata pada pilihan ini belum tepat.'
+      )
+    );
+    pushCandidate(
+      joinTokensForTarget(tokens.slice(0, -1), targetLang),
+      pick(
+        'This sentence is incomplete because the final part is missing.',
+        'Kalimat ini belum lengkap karena bagian akhirnya terpotong.'
+      )
+    );
+  }
+  return out.slice(0, 3);
+}
+
+function buildClozeDistractorChips(
+  blankTarget: string,
+  cleanWords: string[],
+  trapSent: string,
+  targetLang: TargetLang,
+  action: VoiceUiAction | undefined,
+  seed: number
+): string[] {
+  const cleanBlank = String(blankTarget || '').trim();
+  if (!cleanBlank) return [];
+  const chips: string[] = [cleanBlank];
+  const addChip = (raw: string) => {
+    const c = String(raw || '').replace(/^[×✓\s]+|[.?!,。？！、]+$/g, '').trim();
+    if (!c || c.length > 28) return;
+    if (chips.some((x) => x.toLowerCase() === c.toLowerCase())) return;
+    chips.push(c);
+  };
+
+  if (Array.isArray(action?.drillDistractors)) action.drillDistractors.forEach(addChip);
+  if (Array.isArray(action?.drillBlocks)) action.drillBlocks.forEach(addChip);
+  if (trapSent) {
+    tokenizeSentenceIntoBlocks(trapSent, targetLang)
+      .filter((w) => !cleanWords.some((cw) => cw.toLowerCase() === w.toLowerCase()))
+      .forEach(addChip);
+  }
+  cleanWords.filter((w) => w.toLowerCase() !== cleanBlank.toLowerCase()).forEach(addChip);
+
+  const fallbackPool =
+    targetLang === 'ja'
+      ? ['は', 'が', 'を', 'に', 'で', 'です', 'ます']
+      : targetLang === 'zh'
+        ? ['是', '很', '了', '的', '在', '不']
+        : ['is', 'are', 'am', 'do', 'does', 'to', 'very'];
+  fallbackPool.forEach(addChip);
+
+  return seededShuffle(chips.slice(0, 4), seed + 5);
 }
 
 function getWorkbenchUiStrings(locale?: LearnerLocale) {
@@ -963,12 +1209,33 @@ export function deriveContextualPedagogicalBoard(
         pteReadAloudData: readAloudData,
         quiz: {
           prompt: lt('Baca kalimat target berikut dengan jelas kata demi kata:', 'อ่านออกเสียงประโยคต่อไปนี้ให้ชัดเจนทีละคำ:'),
-          options: [
-            { id: 'opt_1', text: passage, isCorrect: true, feedback: ui.correctFeedback },
-            { id: 'opt_2', text: passage, isCorrect: false, feedback: ui.wrongFeedback },
-          ],
-          cloze: { prefix: '', blankWord: cleanTokens[0] || passage, suffix: '', chips: [cleanTokens[0] || passage], feedback: ui.clozeCorrectFeedback },
-          blocks: { correctOrder: cleanTokens, pool: cleanTokens, meaningId: transText || ui.blocksInstruction, feedback: ui.blocksCorrectFeedback },
+          options: seededShuffle(
+            [
+              { id: 'opt_1', text: passage, isCorrect: true, feedback: ui.correctFeedback },
+              ...synthesizeSentenceDistractors(passage, '', effectiveLang, action, ui.wrongFeedback, loc)
+                .slice(0, 2)
+                .map((d, idx) => ({
+                  id: `opt_${idx + 2}`,
+                  text: d.text,
+                  isCorrect: false,
+                  feedback: d.feedback,
+                })),
+            ],
+            seedVariant + 1
+          ),
+          cloze: {
+            prefix: '',
+            blankWord: cleanTokens[0] || passage,
+            suffix: joinTokensForTarget(cleanTokens.slice(1), effectiveLang),
+            chips: buildClozeDistractorChips(cleanTokens[0] || passage, cleanTokens, '', effectiveLang, action, seedVariant),
+            feedback: ui.clozeCorrectFeedback,
+          },
+          blocks: {
+            correctOrder: cleanTokens,
+            pool: seededShuffle(cleanTokens, seedVariant + 3),
+            meaningId: transText || ui.blocksInstruction,
+            feedback: ui.blocksCorrectFeedback,
+          },
         },
       };
     }
@@ -1280,15 +1547,19 @@ export function deriveContextualPedagogicalBoard(
   let standardMeaning = '';
   if (targetSent) {
     const cleanWords = tokenizeSentenceIntoBlocks(targetSent, effectiveLang);
-    const midIdx = Math.max(0, Math.floor(cleanWords.length / 2));
+    const midIdx =
+      cleanWords.length > 0
+        ? (Math.floor(cleanWords.length / 2) + Math.abs(seedVariant)) % cleanWords.length
+        : 0;
     const blankTarget = cleanWords[midIdx] || cleanWords[0] || '';
-    const distractorChips = [
+    const distractorChips = buildClozeDistractorChips(
       blankTarget,
-      ...(Array.isArray(action?.drillBlocks) ? action.drillBlocks.slice(0, 2) : []),
-      ...(Array.isArray(action?.drillDistractors) ? action.drillDistractors.slice(0, 2) : []),
-    ]
-      .filter((w, i, arr) => Boolean(w) && arr.indexOf(w) === i)
-      .slice(0, 3);
+      cleanWords,
+      trapSent,
+      effectiveLang,
+      action,
+      seedVariant
+    );
 
     standardReading = resolveUnifiedPronunciation(targetSent, effectiveLang, undefined, loc) || '';
     const liveMeta = translateAndPhoneticizeLiveText(targetSent, effectiveLang, undefined, undefined, undefined, { locale: loc });
@@ -1297,22 +1568,29 @@ export function deriveContextualPedagogicalBoard(
       standardMeaning = rawMeaning;
     }
 
-    const quizOptions: DynamicQuizData['options'] = [
+    const synthesizedDistractors = synthesizeSentenceDistractors(
+      targetSent,
+      trapSent,
+      effectiveLang,
+      action,
+      ui.wrongFeedback,
+      loc
+    );
+    const rawQuizOptions: DynamicQuizData['options'] = [
       {
         id: 'opt_1',
         text: targetSent,
         isCorrect: true,
         feedback: ui.correctFeedback,
       },
-    ];
-    if (trapSent && trapSent !== targetSent) {
-      quizOptions.push({
-        id: 'opt_2',
-        text: trapSent,
+      ...synthesizedDistractors.map((d, idx) => ({
+        id: `opt_${idx + 2}`,
+        text: d.text,
         isCorrect: false,
-        feedback: action?.trapWrongReason || ui.wrongFeedback,
-      });
-    }
+        feedback: d.feedback,
+      })),
+    ];
+    const quizOptions = seededShuffle(rawQuizOptions, seedVariant + 1);
 
     quiz = {
       prompt: action?.drillMeaningPrompt || `Manakah bentuk yang paling tepat untuk "${cleanTitle}"?`,
@@ -1326,7 +1604,7 @@ export function deriveContextualPedagogicalBoard(
       },
       blocks: {
         correctOrder: cleanWords,
-        pool: [...cleanWords].sort(() => (seedVariant % 2 === 0 ? 0.2 : -0.2)),
+        pool: seededShuffle(cleanWords, seedVariant + 3),
         meaningId: action?.drillMeaningPrompt || `Susun bagian berikut untuk: "${cleanTitle}"`,
         feedback: ui.blocksCorrectFeedback,
       },
@@ -3422,8 +3700,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   onSpeakPreviewRef.current = onSpeakPreview;
   const lastSpokenKeyRef = useRef<string>('');
 
-  // Identifikasi kunci soal saat ini
-  const currentKey = `${uiAction?.bankTopicId || ''}::${uiAction?.topicTitle || topicTitle || ''}::${quizSeed}`;
+  // Identifikasi kunci topik (untuk siklus hidup papan & cache audio) vs kunci soal (termasuk quizSeed untuk dedup Braincore).
+  // Memisahkan quizSeed dari topicKey mencegah klik "Ganti Soal" menghapus cache audio atau mereset narasi papan ke Langkah 0.
+  const topicKey = `${uiAction?.bankTopicId || ''}::${uiAction?.topicTitle || topicTitle || ''}::${(uiAction?.explanationText || '').slice(0, 64)}`;
+  const currentKey = `${topicKey}::${quizSeed}`;
   const lastKeyRef = useRef<string>('');
 
   // Derivasi sinkron boardState & isReady agar zero 1-render lag dan zero double-TTS race
@@ -3550,9 +3830,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     }
 
     // JIKA TOPIK BERGANTI SELAGI MODAL TERBUKA: BERSIHKAN JAWABAN, CACHE AUDIO & STATE LAMA SEKETIKA!
-    if (lastKeyRef.current && lastKeyRef.current !== currentKey) {
+    if (lastKeyRef.current && lastKeyRef.current !== topicKey) {
       const prevBaseTitle = lastKeyRef.current.split('::')[1] || '';
-      const nextBaseTitle = currentKey.split('::')[1] || '';
+      const nextBaseTitle = topicKey.split('::')[1] || '';
       trackCacheRef.current.clear();
       setSelectedOptionId(null);
       setClozeAnswer(null);
@@ -3561,9 +3841,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       lastCommitIdxRef.current = -1;
       lastCommitProgRef.current = -1;
       lastCommitSubRef.current = '';
-    spokenCursorRef.current = null;
-    setSpokenCursor(null);
-    setAudioClock(null);
+      spokenCursorRef.current = null;
+      setSpokenCursor(null);
+      setAudioClock(null);
       setActiveStepSubtitle('');
       setLockstepIndex(0);
       setLockstepProgress(0);
@@ -3574,13 +3854,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         setSelectedMaterialPage(null);
       }
     }
-    lastKeyRef.current = currentKey;
+    lastKeyRef.current = topicKey;
 
     if (hasRichDynamicAction(uiAction) || Boolean(focusType?.startsWith('pte_'))) {
       setForceManualTts(false);
       setIsWritingPlaying(true);
     }
-  }, [isOpen, currentKey, uiAction, focusType]);
+  }, [isOpen, topicKey, uiAction, focusType]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -3596,37 +3876,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     return () => window.clearInterval(id);
   }, [isOpen, isReady]);
 
-  // Sinkronkan pembukaan kanvas pertama kali agar suara tutor sudah ter-decode & siap diputar seketika tanpa hening
+  // Begitu data papan siap (`isReady`), langsung buka tirai kanvas agar murid segera melihat Langkah 0
+  // sementara kursor narasi tetap terparkir di awal Langkah 0 sampai audio Chunk-0 mulai berbunyi.
   useEffect(() => {
     if (!isOpen || !isReady || hasRevealedCanvasRef.current || !isInitialAudioGateActive) return;
-    const isPtePopup =
-      boardState?.contextMode === 'read_aloud' ||
-      boardState?.contextMode === 'ssw_tactical_board' ||
-      Boolean(boardState?.focusType?.startsWith('pte_')) ||
-      String(uiAction?.focusType || focusType || '').startsWith('pte_') ||
-      focusType === 'read_aloud' ||
-      focusType === 'ssw_tactical_board';
-    if (isPtePopup || boardState?.isOfflineNotice) {
-      hasRevealedCanvasRef.current = true;
-      setIsInitialAudioGateActive(false);
-      return;
-    }
-    const safetyTimer = window.setTimeout(() => {
-      if (!hasRevealedCanvasRef.current) {
-        hasRevealedCanvasRef.current = true;
-        setIsInitialAudioGateActive(false);
-      }
-    }, 11500);
-    return () => window.clearTimeout(safetyTimer);
-  }, [
-    isOpen,
-    isReady,
-    isInitialAudioGateActive,
-    boardState?.focusType,
-    boardState?.isOfflineNotice,
-    uiAction?.focusType,
-    focusType,
-  ]);
+    hasRevealedCanvasRef.current = true;
+    setIsInitialAudioGateActive(false);
+  }, [isOpen, isReady, isInitialAudioGateActive]);
 
   const [cjkRevision, setCjkRevision] = useState(0);
 
@@ -4076,9 +4332,15 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     const locCode = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
     // Popup selalu memegang otoritas suara tunggal (outer Kawan Bicara sudah dibungkam saat modal terbuka)
     onStopMainAudioRef.current?.();
-    const allowStepTts = !isGeneratingTopic;
 
-    if (!allowStepTts || !fullScript) {
+    // Pertanyaan lanjutan sedang diracik: BEKUKAN papan lama di posisinya (tanpa suara, tanpa jam senyap
+    // yang berlari menghabiskan langkah lama). Papan baru akan mengambil alih begitu tiba.
+    if (isGeneratingTopic) {
+      stopLockstepAudio();
+      return;
+    }
+
+    if (!fullScript) {
       runSilentClock(trackTotalSecRef.current || estTotalSec, trackOffsetSecRef.current);
       return () => {
         cancelled = true;
@@ -4319,8 +4581,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       window.setTimeout(kickLookahead, 160);
     }
 
-    // Tahan kursor tepat di pembuka langkah awal selagi Chunk-0 disintesis (ZERO pre-advance sebelum suara mulai!)
-    setIsAudioPreparing(true);
+    // Tahan kursor tepat di pembuka langkah awal selagi Chunk-0 disintesis (ZERO pre-advance sebelum suara mulai!).
+    // Tunda 60ms sebelum menampilkan pill "Menyiapkan suara" agar klik Resume/Play dari cache tidak berkedip kuning.
+    let prepTimerId = window.setTimeout(() => {
+      if (!cancelled && lockstepSeqIdRef.current === seqId) {
+        setIsAudioPreparing(true);
+      }
+    }, 60);
     const activeStartSpan = explicitTargetSpan || activeSpans[0] || { startFrac: 0, endFrac: 0.2 };
     const idleEntryFrac = explicitTargetSpan
       ? explicitTargetSpan.startFrac + Math.max(0.001, explicitTargetSpan.endFrac - explicitTargetSpan.startFrac) * 0.025
@@ -4360,6 +4627,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       window.clearTimeout(raceTimeoutId);
       if (cancelled || lockstepSeqIdRef.current !== seqId) return;
       if (chunkIdx === startChunkIdx) {
+        window.clearTimeout(prepTimerId);
         setIsAudioPreparing(false);
       }
       cancelAnimationFrame(rafId);
@@ -4644,6 +4912,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
     return () => {
       cancelled = true;
+      window.clearTimeout(prepTimerId);
       cancelAnimationFrame(rafId);
       if (pauseTimerId) window.clearTimeout(pauseTimerId);
       stopLockstepAudio();
@@ -4654,18 +4923,58 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     boardState?.contextMode,
     focusType,
     uiAction?.focusType,
-    uiAction?.sourceLayer,
+    // Catatan: isLiveConnected / isPlayingPreview / forceManualTts / sourceLayer sengaja TIDAK menjadi dependensi.
+    // Nilai itu tidak dipakai di efek ini; dulu setiap kali papan membungkam audio utama (isPlayingPreview true->false)
+    // efek ikut di-restart dan memotong kalimat pembuka tutor di tengah jalan.
     cohesiveAudioPlan?.fullScript,
     isWritingPlaying,
-    isLiveConnected,
-    isPlayingPreview,
     isGeneratingTopic,
-    forceManualTts,
     locale,
     persona?.id,
     seekNonce,
     replayNonce,
   ]);
+
+  const isWidePteCanvas =
+    boardState?.contextMode === 'pte_describe_image' ||
+    boardState?.contextMode === 'pte_read_aloud' ||
+    focusType === 'pte_describe_image' ||
+    focusType === 'pte_read_aloud' ||
+    uiAction?.focusType === 'pte_describe_image' ||
+    uiAction?.focusType === 'pte_read_aloud' ||
+    scenario?.competencyId === 'speak_pte_describe_image' ||
+    scenario?.competencyId === 'speak_pte_read_aloud' ||
+    Boolean(scenario?.id?.startsWith('scen_pte_di')) ||
+    Boolean(scenario?.id?.startsWith('scen_pte_ra'));
+
+  const isSpecialCanvasModal =
+    isWidePteCanvas ||
+    boardState?.contextMode === 'pte_scorecard' ||
+    boardState?.contextMode === 'read_aloud' ||
+    boardState?.contextMode === 'ssw_tactical_board' ||
+    focusType === 'read_aloud' ||
+    focusType === 'ssw_tactical_board' ||
+    uiAction?.focusType === 'read_aloud' ||
+    uiAction?.focusType === 'ssw_tactical_board';
+  const isPteModal = isSpecialCanvasModal;
+
+  // Laporkan penyelesaian presentasi papan tulis (Solvely Walkthrough Completed) ke Braincore 1x per topik.
+  // WAJIB berada SEBELUM early-return (`!isOpen` / `isMinimized`): hook setelah return bersyarat memicu
+  // React error #300 ("Rendered fewer hooks") dan meruntuhkan seluruh Voice Studio saat papan diminimalkan.
+  useEffect(() => {
+    if (!isOpen || !isReady || !boardState || isSpecialCanvasModal || !whiteboardPlan) return;
+    if (whiteboardPlan.steps.length >= 2 && lockstepIndex >= whiteboardPlan.steps.length - 1) {
+      if (!reportedBoardDoneKeysRef.current.has(currentKey)) {
+        reportedBoardDoneKeysRef.current.add(currentKey);
+        onWhiteboardBraincoreEventRef.current?.({
+          kind: 'board_completed',
+          topicTitle: boardState.topicTitle,
+          targetText: boardState.standardTarget?.text || uiAction?.sampleTarget || boardState.topicTitle,
+          isCorrect: true,
+        });
+      }
+    }
+  }, [isOpen, isReady, boardState, isSpecialCanvasModal, whiteboardPlan, lockstepIndex, currentKey, uiAction?.sampleTarget]);
 
   if (!isOpen) return null;
 
@@ -4877,52 +5186,25 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     );
   }
 
-  const isWidePteCanvas =
-    boardState?.contextMode === 'pte_describe_image' ||
-    boardState?.contextMode === 'pte_read_aloud' ||
-    focusType === 'pte_describe_image' ||
-    focusType === 'pte_read_aloud' ||
-    uiAction?.focusType === 'pte_describe_image' ||
-    uiAction?.focusType === 'pte_read_aloud' ||
-    scenario?.competencyId === 'speak_pte_describe_image' ||
-    scenario?.competencyId === 'speak_pte_read_aloud' ||
-    Boolean(scenario?.id?.startsWith('scen_pte_di')) ||
-    Boolean(scenario?.id?.startsWith('scen_pte_ra'));
-
-  const isSpecialCanvasModal =
-    isWidePteCanvas ||
-    boardState?.contextMode === 'pte_scorecard' ||
-    boardState?.contextMode === 'read_aloud' ||
-    boardState?.contextMode === 'ssw_tactical_board' ||
-    focusType === 'read_aloud' ||
-    focusType === 'ssw_tactical_board' ||
-    uiAction?.focusType === 'read_aloud' ||
-    uiAction?.focusType === 'ssw_tactical_board';
-  const isPteModal = isSpecialCanvasModal;
-
-  // Laporkan penyelesaian presentasi papan tulis (Solvely Walkthrough Completed) ke Braincore 1x per topik
-  useEffect(() => {
-    if (!isOpen || !isReady || !boardState || isSpecialCanvasModal || !whiteboardPlan) return;
-    if (whiteboardPlan.steps.length >= 2 && lockstepIndex >= whiteboardPlan.steps.length - 1) {
-      if (!reportedBoardDoneKeysRef.current.has(currentKey)) {
-        reportedBoardDoneKeysRef.current.add(currentKey);
-        onWhiteboardBraincoreEventRef.current?.({
-          kind: 'board_completed',
-          topicTitle: boardState.topicTitle,
-          targetText: boardState.standardTarget?.text || uiAction?.sampleTarget || boardState.topicTitle,
-          isCorrect: true,
-        });
-      }
-    }
-  }, [isOpen, isReady, boardState, isSpecialCanvasModal, whiteboardPlan, lockstepIndex, currentKey, uiAction?.sampleTarget]);
-
   const handleSubmitBoardQuestion = (rawQ: string, areaExcerpt?: string) => {
     const cleanQ = rawQ.trim();
     if (!cleanQ) return;
     playFiezelSfx('button_tap');
     const qId = `q_${Date.now()}`;
     const currentVisualSteps = (whiteboardPlan?.steps || []).filter((s) =>
-      ['rough_scene', 'contrast_scale', 'syntax_flow', 'kanji_grid', 'tone_wave', 'table'].includes(s.kind)
+      [
+        'rough_scene',
+        'contrast_scale',
+        'syntax_flow',
+        'kanji_grid',
+        'tone_wave',
+        'table',
+        'metaphor_scene',
+        'mind_map',
+        'timeline_track',
+        'formula_blocks',
+        'trap_vs_fix',
+      ].includes(s.kind)
     );
     const currentVisualKinds = Array.from(new Set(currentVisualSteps.map((s) => s.kind)));
     const currentVisualSummary = currentVisualSteps
@@ -5393,12 +5675,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     </div>
   ) : null;
 
-  const showInitialBuffering =
-    !isReady ||
-    (!isPteModal &&
-      !boardState?.isOfflineNotice &&
-      !hasRevealedCanvasRef.current &&
-      isInitialAudioGateActive);
+  const showInitialBuffering = !isReady;
 
   return (
     <div
@@ -5558,7 +5835,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-sm flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
               title={ui.minimizeTitle}
             >
-              —
+              −
             </button>
 
             <button
@@ -6030,6 +6307,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       lastCommitSubRef.current = span?.caption || '';
                       spokenCursorRef.current = null;
                       setSpokenCursor(null);
+                      setAudioClock(null);
                       setActiveStepSubtitle(span?.caption || '');
                       setLockstepIndex(bounded);
                       setLockstepProgress(bounded >= total ? 1 : 0.04);

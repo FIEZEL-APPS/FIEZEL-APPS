@@ -1899,10 +1899,9 @@ const RoughFreeformSceneDiagram: React.FC<{
       }
       return [sx, sy];
     };
-    if (effP < 0.65 && activeShape) {
+    if (effP < 0.86 && activeShape) {
       const n = Math.max(1, shapes.length);
-      const exactIdx = (effP / 0.65) * n;
-      const idx = Math.min(n - 1, Math.max(0, penShapeIdx));
+      const exactIdx = (effP / 0.86) * n;
       const localT = Math.min(1, Math.max(0, exactIdx - Math.floor(exactIdx)));
       const raw = activeShape as unknown as Record<string, unknown>;
       if (
@@ -2309,14 +2308,19 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     if (!stepEl) return;
 
     let timerId = 0;
+    let lastFocusedSub: Element | null = null;
     const scheduleCameraCheck = () => {
-      if (timerId) window.clearTimeout(timerId);
+      if (timerId) return;
       timerId = window.setTimeout(() => {
+        timerId = 0;
         if (Date.now() < userManualScrollUntilRef.current) return;
         const cRect = container.getBoundingClientRect();
         if (cRect.height <= 40 || cRect.width <= 40) return;
 
-        const focusedSub = stepEl.querySelector('.fz-sub-zoom-in, .fz-table-row-focus-active');
+        const focusedSub = stepEl.querySelector(
+          '.fz-sub-zoom-in, .fz-table-row-focus-active, [data-wb-panel-focus="zoom-in"]'
+        );
+        lastFocusedSub = focusedSub;
         const targetEl = focusedSub || stepEl;
         const tRect = targetEl.getBoundingClientRect();
         if (tRect.height <= 0 || tRect.width <= 0) return;
@@ -2391,7 +2395,14 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
 
     const observer =
       typeof MutationObserver !== 'undefined'
-        ? new MutationObserver(() => scheduleCameraCheck())
+        ? new MutationObserver(() => {
+            const currentSub = stepEl.querySelector(
+              '.fz-sub-zoom-in, .fz-table-row-focus-active, [data-wb-panel-focus="zoom-in"]'
+            );
+            if (currentSub !== lastFocusedSub) {
+              scheduleCameraCheck();
+            }
+          })
         : null;
     observer?.observe(stepEl, { attributes: true, attributeFilter: ['class'], subtree: true });
     scheduleCameraCheck();
@@ -2474,13 +2485,15 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       return;
     }
     if (phaseIdx >= lastPhaseIdx) {
+      const lastPhaseStepIdx = steps.findIndex((s) => (s?.phaseIndex ?? 0) >= phaseIdx);
+      const targetIdx = lastPhaseStepIdx >= 0 ? lastPhaseStepIdx : totalSteps;
       if (onSelectStepIndex) {
-        onSelectStepIndex(totalSteps);
+        onSelectStepIndex(targetIdx);
       } else {
-        setInternalStepIndex(totalSteps);
-        setInternalStepProgress(1);
+        setInternalStepIndex(targetIdx);
+        setInternalStepProgress(targetIdx < totalSteps ? 0.05 : 1);
       }
-      onPlayingChange(false);
+      onPlayingChange(targetIdx < totalSteps);
       return;
     }
     const exactIdx = steps.findIndex((s) => (s?.phaseIndex ?? 0) === phaseIdx);
@@ -2665,7 +2678,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         {isQueued && (
           <div className="mb-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F1F5F9] border border-[#E2E8F0] text-[10px] font-bold text-[#64748B] pointer-events-none">
             <span className="w-1.5 h-1.5 rounded-full bg-[#94A3B8]" />
-            <span>{wbPick('Up next', 'Menunggu giliran')} {step.title ? `— ${step.title}` : ''}</span>
+            <span>{wbPick('Up next', 'Menunggu giliran')}{step.title ? `: ${step.title}` : ''}</span>
           </div>
         )}
         {showActivePen && (
@@ -2683,7 +2696,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     if (step.kind === 'heading') {
       return wrapQueued(
         <div
-          data-wb-excerpt={`${step.title || ''} — ${step.text || ''}`}
+          data-wb-excerpt={`${step.title || ''}: ${step.text || ''}`}
           className="space-y-1 pb-2"
         >
           <h2 className="fz-handwriting-heading text-2xl sm:text-3xl font-bold text-[#15803D] leading-snug">
@@ -3380,7 +3393,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           )}
           {isPenActive && (
             <div className="flex items-center gap-1.5 bg-white border border-[#BFDBFE] px-2.5 py-0.5 rounded-full text-[11px] font-bold text-[#1D4ED8]">
-              <span>{wbPick('✏️ Pen Mode Active — Circle any part to ask', '✏️ Mode Spidol Aktif — Lingkari bagian mana pun untuk bertanya')}</span>
+              <span>{wbPick('✏️ Pen Mode Active: circle any part to ask', '✏️ Mode Spidol Aktif: lingkari bagian mana pun untuk bertanya')}</span>
               {strokes.length > 0 && (
                 <>
                   <button

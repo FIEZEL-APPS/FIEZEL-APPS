@@ -15,7 +15,14 @@ import {
   synthesizeFallbackStrokesForAnyChar,
   type KakijunCharEntry,
 } from '../data/kakijunStrokeBank';
-import { resolveVoiceApiCandidateBases } from './liveTransport';
+import { resolveVoiceApiCandidateBases, ensureVoiceWorkerSession, splitTtsIntoSentenceChunks } from './liveTransport';
+import {
+  cleanBoardDisplayText as cleanBoardDisplayTextSsot,
+  cleanStepCaptionAndSpokenText,
+  deriveHeadingSpokenNarration,
+  openerSpokenText,
+  type OpenerPacketLike,
+} from './boardSpeechText';
 import { layoutGraphToShapes } from './dagreLayout';
 import { wbPick } from './i18n';
 
@@ -116,21 +123,7 @@ function readLocalGeminiApiKey(): string {
 }
 
 function cleanBoardDisplayText(val: unknown): string {
-  const s = String(val ?? '')
-    .replace(/\(\s*\)|（\s*）|\[\s*\]|\{\s*\}/g, '')
-    .replace(
-      /(['"`]?\b(?:agree|know|believe|like|want|understand)\b['"`]?\s+(?:adalah|merupakan)\s+)(?:kata\s+kerja\s+aksi(?:\s*\([^)]*\))?|aksi\s+atau\s+(?:kata\s+kerja|tindakan)|aksi\b)/gi,
-      '$1kata kerja utama (stative verb)'
-    )
-    .replace(
-      /\b([Kk])ata\s+kerja\s+aksi(\s*\([^)]*\b(?:agree|know|believe|like|want|understand)\b[^)]*\))/g,
-      '$1ata kerja utama$2'
-    )
-    .replace(/\s+([,.;:!?])/g, '$1')
-    .replace(/([,:•])\s*$/g, (m, ch) => (ch === ':' ? ':' : ''))
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-  return s;
+  return cleanBoardDisplayTextSsot(val);
 }
 
 function condenseNoteBulletToVisualKey(raw: string): string {
@@ -208,6 +201,35 @@ export function isVisualSwitchRequestText(text?: string): boolean {
   );
 }
 
+/**
+ * POST JSON ke Worker suara dengan cookie sesi anonim/terverifikasi.
+ * Mengembalikan Response (termasuk 4xx) atau null bila jaringan/timeout gagal.
+ */
+async function postWorkerJson(
+  url: string,
+  base: string,
+  body: string,
+  timeoutMs: number
+): Promise<Response | null> {
+  await ensureVoiceWorkerSession(base).catch(() => false);
+  const controller = new AbortController();
+  const t = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+      credentials: 'include',
+      mode: 'cors',
+      signal: controller.signal,
+    });
+  } catch {
+    return null;
+  } finally {
+    window.clearTimeout(t);
+  }
+}
+
 export async function requestRealtimeWhiteboardAction(params: {
   question: string;
   personaId: string;
@@ -219,6 +241,8 @@ export async function requestRealtimeWhiteboardAction(params: {
   history?: Array<{ speaker: string; text: string }>;
   boardContext?: WhiteboardFollowUpContext;
   learnerDossier?: string;
+  /** Lewati Worker (dipakai saat jalur stream sudah ditolak Worker, agar tidak menembak ulang rute yang sama). */
+  skipBackend?: boolean;
 }): Promise<{ uiAction?: VoiceUiAction; aiReply?: string } | null> {
   const { question, personaId, personaName, scenarioId, scenarioTitle, targetLang, locale, history = [], boardContext, learnerDossier } = params;
   const bases = resolveVoiceApiCandidateBases();
@@ -243,29 +267,29 @@ export async function requestRealtimeWhiteboardAction(params: {
     ...(boardContext ? { boardContext } : {}),
   });
 
-  // 1. Panggil backend resmi (local proxy atau Cloudflare Worker)
-  for (const base of bases) {
-    try {
-      const controller = new AbortController();
-      const t = window.setTimeout(() => controller.abort(), 24000);
-      const res = await fetch(`${base}/api/voice/partner-turn`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payloadBody,
-        signal: controller.signal,
-      });
-      window.clearTimeout(t);
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.uiAction?.actionType === 'open_learning_popup') {
-          return {
-            uiAction: data.uiAction as VoiceUiAction,
-            aiReply: data.aiReplyTranslation || data.aiReplyTranslationId || data.aiReply || '',
-          };
+  // 1. Panggil backend resmi (local proxy atau Cloudflare Worker).
+  // Rute /api/voice/* dijaga aiSpendGate (identitas wajib): tanpa cookie sesi `fz_id` +
+  // credentials:'include', Worker lintas-origin selalu menjawab 401 dan papan jatuh ke kartu offline.
+  if (!params.skipBackend) {
+    for (const base of bases) {
+      try {
+        let res = await postWorkerJson(`${base}/api/voice/partner-turn`, base, payloadBody, 24000);
+        if (res && (res.status === 401 || res.status === 403)) {
+          await ensureVoiceWorkerSession(base, true).catch(() => false);
+          res = await postWorkerJson(`${base}/api/voice/partner-turn`, base, payloadBody, 24000);
         }
+        if (res?.ok) {
+          const data = await res.json().catch(() => null);
+          if (data?.uiAction?.actionType === 'open_learning_popup') {
+            return {
+              uiAction: data.uiAction as VoiceUiAction,
+              aiReply: data.aiReplyTranslation || data.aiReplyTranslationId || data.aiReply || '',
+            };
+          }
+        }
+      } catch {
+        // Lanjut fallback berikutnya
       }
-    } catch {
-      // Lanjut fallback berikutnya
     }
   }
 
@@ -308,8 +332,9 @@ export async function requestRealtimeWhiteboardAction(params: {
         `AUDIO-FIRST, ZERO-AMBIGUITY & VISUAL-FIRST RULE: Never output vague placeholder labels ("Pola Pertama", "Pola Kedua", "Sisi A", "Visualisasi Lokasi") or oversimplified slogans ("to be hanya kata sifat"). Every box/panel/branch in step[2] MUST have a real rule title, a plain beginner explanation (10-20 words telling WHEN & WHY), and a real example phrase with translation! Keep Step 1 bullets complete and unambiguous (3-4 rules, 15-25 words each). For To Be vs Verb, explicitly teach Adj, Noun/Lokasi, Verb ing, and Verb 3 vs Verb 1. Match Step 2 "spokenNarration" (3-5 calm sentences, ~55-85 words) 1:1 left-to-right to every visual element drawn on Step 2.`,
         `SHAPE & BOX HYGIENE: NEVER put empty parentheses "()" or unlabeled empty boxes in shapes. Every rect/circle/ellipse MUST have a clear short label (1-4 words) + sublabel inside roomy non-overlapping coords (x:24..536, y:20..225 of width:560 height:250, >=24px gaps).`,
         `Produce a 100% UNIQUE, ZERO-TEMPLATE JSON teaching board tailored ONLY to "${question}".`,
-        `Must include "whiteboardSteps" (5-6 steps across "left" and "right", phaseIndex 0..4) with calm natural multi-sentence "spokenNarration" per step, AND "phaseLabels" (5 labels), sampleTarget, trapWrongSentence, trapWrongReason, drillMeaningPrompt, drillTargetSentence, drillTrapSentence.`,
-        `Return ONLY valid JSON: {"aiReply":"...","uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[]}}`,
+        `Must include "whiteboardSteps" (5-6 steps across "left" and "right", phaseIndex 0..4) with calm natural multi-sentence "spokenNarration" per step, AND "phaseLabels" (5 labels), sampleTarget, trapWrongSentence, trapWrongReason, drillMeaningPrompt, drillTargetSentence, drillTrapSentence, plus "drillDistractors" (2-3 plausible wrong word forms for the key word of drillTargetSentence).`,
+        `Step kinds: step[0] "heading" (title, text, spokenNarration), step[1] "note" (title, bullets[3-4]), step[2] ONE visual (pick exactly one kind: contrast_scale | syntax_flow | mind_map | timeline_track | formula_blocks | rough_scene, filling only that kind's fields), step[3] "table" (tableHeaders, tableRows), step[4] "trap_vs_fix" (wrongText, rightText, reason), step[5] "highlight_callout" (highlightPhrase).`,
+        `Return ONLY valid JSON shaped like: {"aiReply":"...","uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","drillDistractors":["...","..."],"phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[{"id":"s0","kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"...","spokenNarration":"..."},{"id":"s1","kind":"note","column":"left","phaseIndex":1,"title":"...","bullets":["...","...","..."],"spokenNarration":"..."}]}} and continue whiteboardSteps through step[5]. NEVER return an empty whiteboardSteps array.`,
       ].filter(Boolean).join('\n');
 
       const controller = new AbortController();
@@ -350,18 +375,10 @@ export async function requestRealtimeWhiteboardAction(params: {
   // 3. Jika running lokal tanpa server proxy (/api/* 404) & tanpa GEMINI_API_KEY, coba api.fiezel.my.id jika online
   if (isLocalHost) {
     try {
-      const controller = new AbortController();
-      const t = window.setTimeout(() => controller.abort(), 14000);
-      const res = await fetch('https://api.fiezel.my.id/api/voice/partner-turn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payloadBody,
-        mode: 'cors',
-        signal: controller.signal,
-      });
-      window.clearTimeout(t);
-      if (res.ok) {
-        const data = await res.json();
+      const prodBase = 'https://api.fiezel.my.id';
+      const res = await postWorkerJson(`${prodBase}/api/voice/partner-turn`, prodBase, payloadBody, 14000);
+      if (res?.ok) {
+        const data = await res.json().catch(() => null);
         if (data?.uiAction?.actionType === 'open_learning_popup') {
           return {
             uiAction: data.uiAction as VoiceUiAction,
@@ -425,19 +442,32 @@ export async function requestRealtimeWhiteboardStream(params: {
     ...(boardContext ? { boardContext } : {}),
   });
 
+  let backendAnswered = false;
   for (const base of bases) {
+    const controller = new AbortController();
+    const t = window.setTimeout(() => controller.abort(), 24000);
     try {
-      const controller = new AbortController();
-      const t = window.setTimeout(() => controller.abort(), 24000);
-      const res = await fetch(`${base}/api/voice/whiteboard-stream`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payloadBody,
-        signal: controller.signal,
-      });
+      await ensureVoiceWorkerSession(base).catch(() => false);
+      const doFetch = () =>
+        fetch(`${base}/api/voice/whiteboard-stream`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payloadBody,
+          credentials: 'include',
+          mode: 'cors',
+          signal: controller.signal,
+        });
+      let res = await doFetch();
+      if (res.status === 401 || res.status === 403) {
+        // Sesi kedaluwarsa / belum terbit: terbitkan ulang cookie fz_id sekali lalu ulangi.
+        await ensureVoiceWorkerSession(base, true).catch(() => false);
+        res = await doFetch();
+      }
       if (!res.ok) {
         window.clearTimeout(t);
         if (res.status === 404 || res.status === 405) break;
+        // Worker menjawab (401/403/429/5xx): jangan tembak ulang rute AI yang sama lewat fallback JSON.
+        backendAnswered = res.status < 500;
         continue;
       }
       const ctype = res.headers.get('content-type') || '';
@@ -446,38 +476,58 @@ export async function requestRealtimeWhiteboardStream(params: {
         const decoder = new TextDecoder();
         let buf = '';
         let resolvedBoard: { uiAction?: VoiceUiAction; aiReply?: string } | null = null;
+        let openerFired = false;
+        const handleFrame = (frame: string) => {
+          let evName = 'message';
+          const dataLines: string[] = [];
+          for (const line of frame.split(/\r?\n/)) {
+            if (line.startsWith('event:')) evName = line.slice(6).trim();
+            else if (line.startsWith('data:')) dataLines.push(line.slice(5).trim());
+          }
+          const dataStr = dataLines.join('\n').trim();
+          if (!dataStr || dataStr === '[DONE]') return;
+          try {
+            const pkt = JSON.parse(dataStr);
+            if (evName === 'opener') {
+              if (!openerFired && typeof onOpenerReady === 'function') {
+                openerFired = true;
+                try {
+                  onOpenerReady(pkt);
+                } catch {
+                  // Pre-warm hook must never break the stream
+                }
+              }
+            } else if (evName === 'board' && pkt?.uiAction?.actionType === 'open_learning_popup') {
+              resolvedBoard = {
+                uiAction: pkt.uiAction as VoiceUiAction,
+                aiReply: pkt.aiReplyTranslation || pkt.aiReplyTranslationId || pkt.aiReply || '',
+              };
+            }
+          } catch {
+            // Ignore partial SSE frame
+          }
+        };
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           buf += decoder.decode(value, { stream: true });
           const frames = buf.split(/\r?\n\r?\n/);
           buf = frames.pop() || '';
-          for (const frame of frames) {
-            let evName = 'message';
-            const dataLines: string[] = [];
-            for (const line of frame.split(/\r?\n/)) {
-              if (line.startsWith('event:')) evName = line.slice(6).trim();
-              else if (line.startsWith('data:')) dataLines.push(line.slice(5).trim());
-            }
-            const dataStr = dataLines.join('\n').trim();
-            if (!dataStr || dataStr === '[DONE]') continue;
+          frames.forEach(handleFrame);
+          // Papan sudah lengkap: langsung kembalikan tanpa menunggu server menutup koneksi.
+          if (resolvedBoard) {
             try {
-              const pkt = JSON.parse(dataStr);
-              if (evName === 'opener' && typeof onOpenerReady === 'function') {
-                onOpenerReady(pkt);
-              } else if (evName === 'board' && pkt?.uiAction?.actionType === 'open_learning_popup') {
-                resolvedBoard = {
-                  uiAction: pkt.uiAction as VoiceUiAction,
-                  aiReply: pkt.aiReplyTranslation || pkt.aiReplyTranslationId || pkt.aiReply || '',
-                };
-              }
+              void reader.cancel();
             } catch {
-              // Ignore partial SSE frame
+              // ignore
             }
+            break;
           }
         }
+        if (!resolvedBoard && buf.trim()) handleFrame(buf);
         window.clearTimeout(t);
         if (resolvedBoard) return resolvedBoard;
+        backendAnswered = true;
       } else {
         const data = await res.json().catch(() => null);
         window.clearTimeout(t);
@@ -489,11 +539,12 @@ export async function requestRealtimeWhiteboardStream(params: {
         }
       }
     } catch {
+      window.clearTimeout(t);
       // Fallback to standard JSON endpoint below
     }
   }
 
-  return requestRealtimeWhiteboardAction(params);
+  return requestRealtimeWhiteboardAction({ ...params, skipBackend: backendAnswered });
 }
 
 export function isTrivialFillerBullet(val: string): boolean {
@@ -788,11 +839,7 @@ function deriveStepSpokenNarration(
 
   // Pertahankan narasi kontekstual dari tutor bila sudah bermakna dan utuh (hindari menggantinya dengan template generik)
   if (step.kind === 'heading') {
-    const subTxt = cleanBoardDisplayText(step.text || '');
-    if (existingWords >= 6) {
-      return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
-    }
-    return `${cleanBoardDisplayText(step.title || topicTitle)}${subTxt ? `. ${subTxt}` : ''}.`.replace(/\.{2,}/g, '.').trim();
+    return deriveHeadingSpokenNarration(step, topicTitle);
   }
 
   if (existingWords >= 10 && step.kind !== 'kanji_grid' && step.kind !== 'note' && step.kind !== 'trap_vs_fix') {
@@ -1209,11 +1256,11 @@ function synthesizeTopicSpecificScene(
       width: 560,
       height: 290,
       shapes: [
-        { op: 'rect', x: 24, y: 14, w: 512, h: 66, fill: '#DBEAFE', stroke: '#1D4ED8', label: '1. IN — Wilayah / Ruang Tertutup (Paling Luas)', sublabel: 'Negara, kota, dalam ruangan: in Jakarta, in the room' },
+        { op: 'rect', x: 24, y: 14, w: 512, h: 66, fill: '#DBEAFE', stroke: '#1D4ED8', label: '1. IN: Wilayah / Ruang Tertutup (Paling Luas)', sublabel: 'Negara, kota, dalam ruangan: in Jakarta, in the room' },
         { op: 'arrow', x1: 280, y1: 82, x2: 280, y2: 100, stroke: '#1E293B' },
-        { op: 'rect', x: 76, y: 102, w: 408, h: 66, fill: '#FEF3C7', stroke: '#D97706', label: '2. ON — Permukaan / Nama Jalan (Sedang)', sublabel: 'Benda menempel permukaan, jalan: on the table, on Sudirman St.' },
+        { op: 'rect', x: 76, y: 102, w: 408, h: 66, fill: '#FEF3C7', stroke: '#D97706', label: '2. ON: Permukaan / Nama Jalan (Sedang)', sublabel: 'Benda menempel permukaan, jalan: on the table, on Sudirman St.' },
         { op: 'arrow', x1: 280, y1: 170, x2: 280, y2: 188, stroke: '#1E293B' },
-        { op: 'rect', x: 132, y: 190, w: 296, h: 66, fill: '#DCFCE7', stroke: '#15803D', label: '3. AT — Titik Lokasi / Jam Persis (Paling Sempit)', sublabel: 'Alamat bernomor, pintu, jam: at 10 Sudirman, at 7 AM' },
+        { op: 'rect', x: 132, y: 190, w: 296, h: 66, fill: '#DCFCE7', stroke: '#15803D', label: '3. AT: Titik Lokasi / Jam Persis (Paling Sempit)', sublabel: 'Alamat bernomor, pintu, jam: at 10 Sudirman, at 7 AM' },
         { op: 'text', x: 24, y: 276, text: 'Prinsip Corong: Besar/Kota (IN) → Permukaan/Jalan (ON) → Titik Spesifik (AT)', stroke: '#0F172A', size: 'sm' },
       ],
       spokenNarration:
@@ -1236,8 +1283,8 @@ function synthesizeTopicSpecificScene(
       phaseIndex: 2,
       title: wbPick('To Be vs Active Verb Map', 'Peta Slot Sah To Be vs Verb 1 Aktif'),
       caption: wbPick(
-        'Use To Be only with Adjectives, Nouns/Locations, Verb-ing, or Passive Verb 3 — NEVER bare Verb 1',
-        'To Be hanya sah dengan Kata Sifat, Kata Benda/Lokasi, Verb ing, atau Verb 3 (pasif) — BUKAN Verb 1'
+        'Use To Be only with Adjectives, Nouns/Locations, Verb ing, or Passive Verb 3, NEVER bare Verb 1',
+        'To Be hanya sah dengan Kata Sifat, Kata Benda/Lokasi, Verb ing, atau Verb 3 (pasif), BUKAN Verb 1'
       ),
       rightText: cleanSample,
       wrongText: cleanWrong,
@@ -1735,7 +1782,7 @@ export function buildSourceMaterialsFromScenario(
       subtitle: `${scenario.vocabPrereqs.length} butir terkait skenario`,
       highlights: scenario.vocabPrereqs
         .slice(0, 4)
-        .map((v) => `${v.term}${v.reading ? ` (${v.reading})` : ''} — ${v.meaningId}`),
+        .map((v) => `${v.term}${v.reading ? ` (${v.reading})` : ''}: ${v.meaningId}`),
       promptToExplain: `Berikan contoh kalimat memakai ${scenario.vocabPrereqs
         .slice(0, 2)
         .map((v) => v.term)
@@ -1890,31 +1937,12 @@ function synthesizeAlternativeVisualStep(params: {
     // Variant 3: Illustrated Metaphor / Focused Two-Side Contrast (no legacy rpg_stats)
     const lowerBlob = `${shortTitle} ${rawFormula} ${rightExpr}`.toLowerCase();
     const hasStative = /\b(?:agree|know|believe|like|want|understand|need|love|hate|xihuan)\b|喜欢/.test(lowerBlob);
-    const theme: NonNullable<WhiteboardStepCommand['sceneTheme']> | null =
+    const theme: NonNullable<WhiteboardStepCommand['sceneTheme']> =
       /\b(?:always|usually|often|sometimes|never|modal|must|should|might)\b/.test(lowerBlob)
         ? 'battery_meter'
         : !hasStative && /\b(?:am|is|are|to\s*be)\b/.test(lowerBlob) && /\b(?:do|does|did)\b/.test(lowerBlob)
           ? 'camera_vs_video'
-          : /\b(?:pasif|passive|fokus|sorot|は|が)\b/.test(lowerBlob)
-            ? 'stage_spotlight'
-            : null;
-    if (!theme) {
-      return {
-        id: `wb_alt_metaphor_${variantIndex}`,
-        kind: 'contrast_scale',
-        column: 'left',
-        phaseIndex: 2,
-        title: `Perbandingan Jelas: ${truncateDiagramLabel(shortTitle, 30)}`,
-        termA: truncateDiagramLabel(wrongExpr, 28) || 'Pola Jebakan',
-        descA: wrongReason,
-        termB: truncateDiagramLabel(rightExpr, 28) || 'Pola Akurat',
-        descB: rightReason,
-        analogy: boardState.pairData?.keyAnalogy || rightReason,
-        highlightTerms: [rightExpr, wrongExpr, shortTitle].filter(Boolean).slice(0, 6),
-        caption: 'Bandingkan pola tepat vs jebakan secara berdampingan.',
-        spokenNarration: `Sekarang kita tampilkan perbandingan jernih kiri dan kanan! Di sisi kiri adalah jebakan umum yaitu ${wrongExpr}, karena ${wrongReason}. Di sisi kanan adalah bentuk yang akurat yaitu ${rightExpr}, karena ${rightReason}.`,
-      };
-    }
+          : 'stage_spotlight';
     return {
       id: `wb_alt_metaphor_${variantIndex}`,
       kind: 'metaphor_scene',
@@ -2005,7 +2033,7 @@ function synthesizeAlternativeVisualStep(params: {
     };
   }
 
-  // Variant 4 (cycle === 4): Vertical Stepped Timeline (Rough Scene)
+  // Variant 6 (cycle === 6): Vertical Stepped Timeline (Rough Scene)
   return {
     id: `wb_alt_timeline_${variantIndex}`,
     kind: 'rough_scene',
@@ -2271,7 +2299,7 @@ export function buildWhiteboardScenePlan(params: {
             kind: 'formula_blocks',
             sceneTheme: undefined,
             title: 'Peta 4 Slot Sah: Verb 1 vs To Be',
-            caption: 'To Be hanya sah untuk Sifat/Benda, Verb ing (sedang), atau Verb 3 (pasif) — BUKAN Verb 1 aktif!',
+            caption: 'To Be hanya sah untuk Sifat/Benda, Verb ing (sedang), atau Verb 3 (pasif), BUKAN Verb 1 aktif!',
             rightText: boardState.sampleTarget || 'I agree with you.',
             wrongText: 'I am agree with you.',
             blocks: [
@@ -2948,8 +2976,14 @@ export function buildWhiteboardScenePlan(params: {
         s.text = !s.text || /guratan\s*1\s*:|\|/i.test(s.text) || (targetLang === 'zh' && /sui\s*\/\s*mizu|go\s*\/\s*itsu/i.test(s.text))
           ? conciseCharText
           : cleanBoardDisplayText(cleanReadingForLang(s.text, s.text, targetLang, resolvedHeadingEntry.char));
+        const existingHeadingNar = cleanBoardDisplayText(s.spokenNarration || '');
+        const hasWrongLangHeadingNar =
+          !existingHeadingNar ||
+          existingHeadingNar.split(/\s+/).filter(Boolean).length < 6 ||
+          /guratan\s*1\s*:|\|/i.test(existingHeadingNar) ||
+          (targetLang === 'zh' && /sui\s*\/\s*mizu|go\s*\/\s*itsu/i.test(existingHeadingNar));
         const cleanHeadingNarration = deriveStepSpokenNarration(
-          { ...s, spokenNarration: undefined },
+          { ...s, spokenNarration: hasWrongLangHeadingNar ? undefined : existingHeadingNar },
           shortTitle,
           boardState.coachExplanation || '',
           targetLang
@@ -3503,6 +3537,19 @@ export interface CohesiveBoardNarrationResult {
   stepSpans: CohesiveBoardStepSpan[];
 }
 
+export { cleanStepCaptionAndSpokenText };
+
+/**
+ * Menghasilkan teks TTS Chunk-0 pembuka yang 100% identik dengan hasil
+ * `buildWhiteboardScenePlan` -> `buildCohesiveBoardNarrationScript` -> `splitTtsIntoSentenceChunks(..., 145)[0]`
+ * sehingga audio yang di-pre-warm saat SSE `opener` tiba langsung cache-hit 0 ms saat papan lengkap tiba.
+ */
+export function extractOpenerFirstTtsChunk(opener?: OpenerPacketLike | null): string {
+  const spokenText = openerSpokenText(opener);
+  if (!spokenText) return '';
+  return splitTtsIntoSentenceChunks(spokenText, 145)[0] || spokenText;
+}
+
 /**
  * Menggabungkan narasi seluruh langkah papan tulis menjadi SATU naskah tutur yang mengalir alami
  * sehingga backend menyintesis audio studio mulus sementara kursor langkah & efek Zoom In/Out
@@ -3517,19 +3564,9 @@ export function buildCohesiveBoardNarrationScript(plan: WhiteboardScenePlan): Co
   const rawParts: Array<{ stepId: string; stepIndex: number; text: string; caption: string; weight: number }> = [];
 
   steps.forEach((st, idx) => {
-    const rawCaption = (st.spokenNarration || st.title || st.text || '')
-      .replace(
-        /\b(?:perhatikan|dengar(?:kan)?|simak|catat)\s+baik[- ]?baik(?:\s+pembagian\s+tugasnya|\s+aturan\s+ini|\s+kawan)?[,!.:;\s]*/gi,
-        ''
-      )
-      .replace(/\s+/g, ' ')
-      .trim();
-    const cleaned = rawCaption.replace(/[•|]/g, ', ').replace(/\s+/g, ' ').trim();
-    const spokenChunk = !cleaned
-      ? ''
-      : /[.!?。！？]$/.test(cleaned)
-        ? cleaned
-        : `${cleaned}.`;
+    const { caption: rawCaption, spokenText: spokenChunk } = cleanStepCaptionAndSpokenText(
+      st.spokenNarration || st.title || st.text || ''
+    );
     const spokenWeight = spokenChunk ? computeProsodicTextWeight(spokenChunk) : 4;
     rawParts.push({
       stepId: st.id,
