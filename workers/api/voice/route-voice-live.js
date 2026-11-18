@@ -2402,7 +2402,8 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
           : `2) "replies": 3 spontaneous spoken replies directly answering your aiReply in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}, with ${targetLocaleName} "hint" and clean Romanized "pronunciation".`,
         isExplanationTurn
           ? `JSON only (choose diverse, topic-matched diagram for whiteboardSteps[2] and fill ALL its child fields completely — NEVER omit shapes/graphNodes (if rough_scene)/blocks/timelineEvents/branches/leftPanel+rightPanel/termA+termB!): {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","coachSpokenScript":"...","explanationText":"...","patternFormula":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[{"kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"...","spokenNarration":"..."},{"kind":"note","column":"left","phaseIndex":1,"title":"Logika Dasar Dari Nol","bullets":["...","...","...","..."],"highlightTerms":["..."],"spokenNarration":"..."},{"kind":"formula_blocks | timeline_track | mind_map | contrast_scale | syntax_flow | metaphor_scene | kanji_grid | rough_scene","sceneTheme":"camera_vs_video | battery_meter | bridge_timeline | stage_spotlight | key_and_lock","column":"left","phaseIndex":2,"title":"...","analogy":"...","metaphorCenterLabel":"...","termA":"...","descA":"...","termB":"...","descB":"...","rightText":"...","wrongText":"...","highlightTerms":["..."],"leftPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"rightPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"branches":[{"label":"...","sublabel":"...","example":"...","icon":"star","color":"#0EA5E9"}],"timelineEvents":[{"timeLabel":"...","title":"...","example":"...","icon":"clock","isActive":false,"color":"#0EA5E9"}],"blocks":[{"role":"...","token":"...","note":"...","color":"#0EA5E9"}],"nodes":[{"role":"...","word":"...","color":"#DBEAFE"}],"graphDirection":"LR","graphNodes":[{"id":"n1","label":"...","sublabel":"...","fill":"#DBEAFE","stroke":"#1D4ED8"}],"graphEdges":[{"from":"n1","to":"n2","label":"..."}],"width":560,"height":240,"caption":"...","shapes":[{"op":"rect","x":20,"y":36,"w":152,"h":76,"fill":"#DBEAFE","stroke":"#1D4ED8","label":"...","sublabel":"..."},{"op":"arrow","x1":176,"y1":74,"x2":204,"y2":74,"stroke":"#1E293B"},{"op":"rect","x":208,"y":36,"w":152,"h":76,"fill":"#DCFCE7","stroke":"#15803D","label":"...","sublabel":"..."},{"op":"text","x":28,"y":170,"text":"...","stroke":"#0F172A","size":"sm"}],"spokenNarration":"..."},{"kind":"table","column":"right","phaseIndex":3,"title":"Contoh Penggunaan Nyata","tableHeaders":["...","...","..."],"tableRows":[["...","...","..."]],"spokenNarration":"..."},{"kind":"trap_vs_fix","column":"right","phaseIndex":3,"title":"Kesalahan Umum vs Bentuk Tepat","wrongText":"...","rightText":"...","reason":"...","highlightTerms":["..."],"spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":4,"title":"Rumus Anti-Lupa","highlightPhrase":"...","spokenNarration":"..."}]}}`
-          : `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"none","callMode":"","destination":"","bankTopicId":"","topicTitle":"","focusType":"grammar","coachSpokenScript":"","explanationText":"","patternFormula":"","drillInstruction":"","sampleTarget":"","leadText":"","triggerWord":"","triggerTag":"","wrongWord":"","wrongTag":"","rightWord":"","rightTag":"","tailText":"","trapWrongSentence":"","trapWrongToken":"","trapWrongReason":"","drillMeaningPrompt":"","drillTargetSentence":"","drillTrapSentence":"","phaseLabels":[],"whiteboardSteps":[]}}`,
+          : `3) "diagnosis": Diagnose ANY grammar/syntax/particle/conjugation error in learner's turn (set ok:true if natural/grammatical, ok:false if error exists + choose canonical misconceptionCode from [tense_aspect.timeline_mismatch, tense_aspect.progressive_overuse, tense_aspect.perfect_misuse, tense_aspect.future_form_confusion, agreement.bare_form, agreement.number_mismatch, agreement.missing_auxiliary, structure.double_marking, structure.word_order, structure.malformed_blend, structure.omitted_element, modality.function_confusion, conditionals.type_mismatch, conditionals.clause_form_swap, passive.participle_form, articles.definiteness_mismatch, articles.countability_quantifier, prepositions.semantic_category, prepositions.collocation, lexical.form_confusion, lexical.register_mismatch, complementation.gerund_infinitive_swap, question.auxiliary_error, pronouns.case_form, transfer.id_l1_pattern]).
+JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"misconceptionCode":null,"whyFailsId":"","correction":""},"replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"none","callMode":"","destination":"","bankTopicId":"","topicTitle":"","focusType":"grammar","coachSpokenScript":"","explanationText":"","patternFormula":"","drillInstruction":"","sampleTarget":"","leadText":"","triggerWord":"","triggerTag":"","wrongWord":"","wrongTag":"","rightWord":"","rightTag":"","tailText":"","trapWrongSentence":"","trapWrongToken":"","trapWrongReason":"","drillMeaningPrompt":"","drillTargetSentence":"","drillTrapSentence":"","phaseLabels":[],"whiteboardSteps":[]}}`,
       ]
         .filter(Boolean)
         .join('\n');
@@ -3486,6 +3487,73 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
     } catch (_) {}
   }
 
+  const CANONICAL_TAXONOMY_SET = new Set([
+    'tense_aspect.aspect_for_completed', 'tense_aspect.habitual_overgeneralized',
+    'tense_aspect.progressive_overuse', 'tense_aspect.perfect_misuse',
+    'tense_aspect.timeline_mismatch', 'tense_aspect.future_form_confusion',
+    'agreement.bare_form', 'agreement.number_mismatch', 'agreement.missing_auxiliary',
+    'structure.double_marking', 'structure.word_order', 'structure.inversion_error',
+    'structure.malformed_blend', 'structure.omitted_element',
+    'modality.function_confusion', 'modality.strength_miscalibrated',
+    'modality.negation_scope', 'modality.past_reference_error',
+    'conditionals.type_mismatch', 'conditionals.clause_form_swap',
+    'passive.active_for_passive', 'passive.participle_form',
+    'passive.causative_confusion', 'passive.impersonal_pattern',
+    'reported.backshift_error', 'reported.deixis_shift',
+    'articles.definiteness_mismatch', 'articles.countability_quantifier',
+    'articles.sound_rule', 'articles.zero_article',
+    'comparison.degree_scope', 'comparison.form_intensifier',
+    'prepositions.semantic_category', 'prepositions.collocation',
+    'lexical.form_confusion', 'lexical.register_mismatch',
+    'complementation.gerund_infinitive_swap', 'complementation.meaning_pair_shift',
+    'complementation.bare_form_error', 'complementation.verb_pattern',
+    'relative.pronoun_choice', 'relative.restrictiveness', 'relative.reduction_error',
+    'question.auxiliary_error', 'question.polarity_negation', 'question.wh_choice',
+    'pronouns.case_form', 'linking.connector_choice', 'transfer.id_l1_pattern',
+  ]);
+  const resolveCanonicalDiagCode = (rawCode, whyText, lang) => {
+    const clean = String(rawCode || '').trim().toLowerCase();
+    if (CANONICAL_TAXONOMY_SET.has(clean)) return clean;
+    const probe = `${clean} ${String(whyText || '')} ${String(userText || '')}`.toLowerCase();
+    if (/lampau|past|yesterday|tense|timeline/.test(probe)) return 'tense_aspect.timeline_mismatch';
+    if (/continuous|progressive|stative|-ing\b/.test(probe)) return 'tense_aspect.progressive_overuse';
+    if (/perfect|already|since/.test(probe)) return 'tense_aspect.perfect_misuse';
+    if (/future|will\b|going\s+to/.test(probe)) return 'tense_aspect.future_form_confusion';
+    if (/partikel|は|が|を|に|で|preposit|in\/on\/at/.test(probe)) return 'prepositions.semantic_category';
+    if (/plural|singular|number|agreement|subjek/.test(probe)) return 'agreement.number_mismatch';
+    if (/auxiliary|kata bantu|tanya/.test(probe)) return 'agreement.missing_auxiliary';
+    if (/infleksi|bare|third\s*person|goed|buyed|eated/.test(probe)) return 'agreement.bare_form';
+    if (/double_mark|although.*but/.test(probe)) return 'structure.double_marking';
+    if (/urutan|word_order|svo/.test(probe)) return 'structure.word_order';
+    if (/konjugasi|blend|desu_verb|tara/.test(probe)) return 'structure.malformed_blend';
+    if (/modal|must|should|might/.test(probe)) return 'modality.function_confusion';
+    if (/passive|pasif|participle/.test(probe)) return 'passive.participle_form';
+    if (/article|a\/an\/the|satuan|quantifier/.test(probe)) return 'articles.definiteness_mismatch';
+    if (/agree|kopula|l1|indones/.test(probe)) return 'transfer.id_l1_pattern';
+    if (/tone|pitch|nada|aksen|phonem|pronun/.test(probe)) return 'lexical.form_confusion';
+    return lang === 'ja' || lang === 'zh' ? 'structure.malformed_blend' : 'lexical.form_confusion';
+  };
+
+  let normalizedDiagnosis = null;
+  const rawDiag = gen?.parsed?.diagnosis;
+  if (rawDiag && typeof rawDiag === 'object' && typeof rawDiag.ok === 'boolean') {
+    const corr = cleanSpokenText(rawDiag.correction || '').slice(0, 280);
+    const why = cleanSpokenText(rawDiag.whyFailsId || rawDiag.reason || '').slice(0, 420);
+    const hasFixDiff = Boolean(corr && corr.toLowerCase() !== String(userText || '').trim().toLowerCase());
+    const diagOk = rawDiag.ok && !rawDiag.misconceptionCode && !hasFixDiff;
+    const canonicalCode = !diagOk
+      ? resolveCanonicalDiagCode(rawDiag.misconceptionCode || rawDiag.misconceptionId, why, targetLang)
+      : null;
+    normalizedDiagnosis = {
+      ok: diagOk,
+      misconceptionCode: canonicalCode,
+      canonicalCode,
+      whyFailsId: diagOk ? '' : why || (corr ? `Bentuk lebih tepat: ${corr}` : 'Periksa ketepatan tata bahasa dan pilihan kata.'),
+      correction: diagOk ? '' : corr,
+      source: 'gemini_neural_partner',
+    };
+  }
+
   const partnerTurnPayload = {
     ok: true,
     source: 'ai-realtime',
@@ -3500,6 +3568,7 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
       locale === 'th'
         ? (aiReplyTranslation || aiReply)
         : cleanSpokenText(gen.parsed.aiReplyTranslationTh || ''),
+    ...(normalizedDiagnosis ? { diagnosis: normalizedDiagnosis } : {}),
     replies,
     uiAction,
     isExplanation: isExplanationTurn || actionType === 'open_learning_popup',

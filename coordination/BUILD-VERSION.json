@@ -1,7 +1,7 @@
 {
-  "version": "m025-802",
-  "claimedBy": "branch feat/solvely-whiteboard-tutor-local",
-  "claimedAt": "2026-11-18T02:12:30.127Z",
-  "reason": "feat(voice-studio,brain): audio-lockstep Solvely whiteboard, Dagre/KaTeX, caching & Braincore wiring",
+  "version": "m025-803",
+  "claimedBy": "branch feat/braincore-unified-neural-fsrs6",
+  "claimedAt": "2026-11-18T03:57:29.555Z",
+  "reason": "feat(brain,voice): unify BKT, neural freeform+acoustic diagnosis, FSRS-6 shadow",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

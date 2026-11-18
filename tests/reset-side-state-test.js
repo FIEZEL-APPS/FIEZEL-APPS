@@ -82,7 +82,9 @@ const DIHAPUS_SAAT_RESET = [
   'UNDERCOVER_RECEIPT_KEY',
   // m025-668: Snapshot perlindungan progres murid otomatis (auto-rescue). Reset progres
   // menghapus snapshot ini agar reset permanen tidak memulihkan kembali data yang sengaja direset.
-  'SAFETY_SNAPSHOT_KEY'
+  'SAFETY_SNAPSHOT_KEY',
+  // FSRS-6 shadow vs FSRS-lite paired calibration telemetry
+  'FSRS6_SHADOW_KEY'
 ];
 
 /**

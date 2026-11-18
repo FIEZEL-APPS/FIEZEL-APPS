@@ -22,22 +22,98 @@ import {
 import { ensureSharedAnonSession } from './liveCallHelper.ts';
 
 /**
- * Canonical parameters from coordination/braincore-contract.json
+ * Canonical client Braincore BKT + IRT parameters ("Satu Otak, Satu Penggaris"):
+ * Synchronized dynamically at runtime with host `FiezelBrainConfig` & `FiezelMasteryBKT`
+ * (features/brain/fiezel-brain-config.js, features/brain/fiezel-mastery-bkt.js).
  */
 export const BRAINCORE_PARAMS = {
-  P_INIT: 0.25,
-  P_LEARN: 0.18,
+  P_INIT: 0.20,
+  P_LEARN: 0.15,
   P_SLIP: 0.10,
-  P_GUESS: 0.20,
-  MASTERY_T: 0.80,
-  DEVELOPING_T: 0.60,
-  MIN_CORRECT_FOR_MASTERY: 3,
+  P_GUESS: 0.25,
+  MASTERY_T: 0.95,
+  DEVELOPING_T: 0.55,
+  MIN_CORRECT_FOR_MASTERY: 5,
+  MIN_OBSERVATIONS: 5,
+  ZPD_HI: 0.90,
   RETENTION_DAYS: 3,
   DISCRIMINATION: 1.5,
   GUESS_FLOOR: 0.25,
   TARGET_SUCCESS: 0.80,
   HALF_LIFE_DAYS: 30.0,
 } as const;
+
+export interface ResolvedCanonicalBrainConfig {
+  P_INIT: number;
+  P_LEARN: number;
+  P_SLIP: number;
+  P_GUESS: number;
+  MASTERY_T: number;
+  DEVELOPING_T: number;
+  MIN_CORRECT_FOR_MASTERY: number;
+  MIN_OBSERVATIONS: number;
+  ZPD_HI: number;
+  RETENTION_DAYS: number;
+  DISCRIMINATION: number;
+  GUESS_FLOOR: number;
+  TARGET_SUCCESS: number;
+  HALF_LIFE_DAYS: number;
+  source: 'host_brain_config' | 'parent_brain_config' | 'canonical_default';
+}
+
+function readHostBrainObjects(): {
+  cfg: any;
+  bkt: any;
+  source: 'host_brain_config' | 'parent_brain_config' | 'canonical_default';
+} {
+  try {
+    const g = typeof globalThis !== 'undefined' ? (globalThis as any) : null;
+    if (g?.FiezelBrainConfig?.bkt || g?.FiezelMasteryBKT?.PARAMS) {
+      return { cfg: g.FiezelBrainConfig || null, bkt: g.FiezelMasteryBKT || null, source: 'host_brain_config' };
+    }
+    const win = typeof window !== 'undefined' ? (window as any) : null;
+    if (win?.FiezelBrainConfig?.bkt || win?.FiezelMasteryBKT?.PARAMS) {
+      return { cfg: win.FiezelBrainConfig || null, bkt: win.FiezelMasteryBKT || null, source: 'host_brain_config' };
+    }
+    if (win?.parent && win.parent !== win) {
+      const p = win.parent;
+      if (p.FiezelBrainConfig?.bkt || p.FiezelMasteryBKT?.PARAMS) {
+        return { cfg: p.FiezelBrainConfig || null, bkt: p.FiezelMasteryBKT || null, source: 'parent_brain_config' };
+      }
+    }
+  } catch {
+    // Cross-origin parent access blocked safely
+  }
+  return { cfg: null, bkt: null, source: 'canonical_default' };
+}
+
+export function resolveCanonicalBktConfig(): ResolvedCanonicalBrainConfig {
+  const { cfg, bkt, source } = readHostBrainObjects();
+  const hostBktParams = bkt?.PARAMS || cfg?.bkt || null;
+  const hostGate = bkt?.GATE || null;
+  const hostZpd = bkt?.ZPD || null;
+  const hostDiff = cfg?.difficulty || null;
+  const hostMem = cfg?.memory || null;
+  const n = (v: unknown, fb: number) =>
+    typeof v === 'number' && Number.isFinite(v) ? v : fb;
+  return {
+    P_INIT: n(hostBktParams?.L0, BRAINCORE_PARAMS.P_INIT),
+    P_LEARN: n(hostBktParams?.T, BRAINCORE_PARAMS.P_LEARN),
+    P_SLIP: n(hostBktParams?.slip, BRAINCORE_PARAMS.P_SLIP),
+    P_GUESS: n(hostBktParams?.guess, BRAINCORE_PARAMS.P_GUESS),
+    MASTERY_T: n(hostGate?.L, BRAINCORE_PARAMS.MASTERY_T),
+    DEVELOPING_T: n(hostZpd?.lo, BRAINCORE_PARAMS.DEVELOPING_T),
+    MIN_CORRECT_FOR_MASTERY: Math.max(1, Math.round(n(hostGate?.minN, BRAINCORE_PARAMS.MIN_CORRECT_FOR_MASTERY))),
+    MIN_OBSERVATIONS: Math.max(1, Math.round(n(hostGate?.minN, BRAINCORE_PARAMS.MIN_OBSERVATIONS))),
+    ZPD_HI: n(hostZpd?.hi, BRAINCORE_PARAMS.ZPD_HI),
+    RETENTION_DAYS: BRAINCORE_PARAMS.RETENTION_DAYS,
+    DISCRIMINATION: n(hostDiff?.discrimination, BRAINCORE_PARAMS.DISCRIMINATION),
+    GUESS_FLOOR: n(hostDiff?.guessFloor, BRAINCORE_PARAMS.GUESS_FLOOR),
+    TARGET_SUCCESS: n(hostDiff?.targetSuccess, BRAINCORE_PARAMS.TARGET_SUCCESS),
+    HALF_LIFE_DAYS: n(hostMem?.baseHalfLifeDays, BRAINCORE_PARAMS.HALF_LIFE_DAYS),
+    source,
+  };
+}
 
 const STORAGE_KEY = 'fiezel-braincore-voice-v1';
 const TAB_ID = `tab_${Math.random().toString(36).slice(2, 10)}_${Date.now()}`;
@@ -68,9 +144,10 @@ export function getStudioNonce(): string {
 export function successProbability(
   ability: number,
   difficulty: number,
-  discrimination: number = BRAINCORE_PARAMS.DISCRIMINATION
+  discrimination?: number
 ): number {
-  const a = Math.max(0.01, Number(discrimination || BRAINCORE_PARAMS.DISCRIMINATION));
+  const cfg = resolveCanonicalBktConfig();
+  const a = Math.max(0.01, Number(discrimination ?? cfg.DISCRIMINATION));
   const diff = Number(ability || 0) - Number(difficulty || 0);
   const z = -a * diff;
   let latent: number;
@@ -81,7 +158,7 @@ export function successProbability(
   } else {
     latent = 1.0 / (1.0 + Math.exp(z));
   }
-  return BRAINCORE_PARAMS.GUESS_FLOOR + (1.0 - BRAINCORE_PARAMS.GUESS_FLOOR) * latent;
+  return cfg.GUESS_FLOOR + (1.0 - cfg.GUESS_FLOOR) * latent;
 }
 
 /**
@@ -89,14 +166,15 @@ export function successProbability(
  */
 export function optimalDifficulty(
   ability: number,
-  targetSuccess: number = BRAINCORE_PARAMS.TARGET_SUCCESS,
-  discrimination: number = BRAINCORE_PARAMS.DISCRIMINATION
+  targetSuccess?: number,
+  discrimination?: number
 ): number {
-  const p = Math.max(BRAINCORE_PARAMS.GUESS_FLOOR + 0.05, Math.min(0.97, Number(targetSuccess)));
-  const a = Math.max(0.01, Number(discrimination));
+  const cfg = resolveCanonicalBktConfig();
+  const p = Math.max(cfg.GUESS_FLOOR + 0.05, Math.min(0.97, Number(targetSuccess ?? cfg.TARGET_SUCCESS)));
+  const a = Math.max(0.01, Number(discrimination ?? cfg.DISCRIMINATION));
   const latent = Math.max(
     0.01,
-    Math.min(0.99, (p - BRAINCORE_PARAMS.GUESS_FLOOR) / (1.0 - BRAINCORE_PARAMS.GUESS_FLOOR))
+    Math.min(0.99, (p - cfg.GUESS_FLOOR) / (1.0 - cfg.GUESS_FLOOR))
   );
   return Number((Number(ability || 0) - Math.log(latent / (1.0 - latent)) / a).toFixed(3));
 }
@@ -105,7 +183,8 @@ export function optimalDifficulty(
  * Canonical Theta mapping: 1.0 + 4.0 * clamp(p, 0, 1)
  */
 export function abilityThetaFromMastery(pMastery: number): number {
-  const clamped = Math.max(0.0, Math.min(1.0, Number(pMastery || BRAINCORE_PARAMS.P_INIT)));
+  const cfg = resolveCanonicalBktConfig();
+  const clamped = Math.max(0.0, Math.min(1.0, Number(pMastery ?? cfg.P_INIT)));
   return Number((1.0 + 4.0 * clamped).toFixed(2));
 }
 
@@ -115,19 +194,21 @@ export function abilityThetaFromMastery(pMastery: number): number {
 export function bktDecay(
   p: number | null | undefined,
   elapsedDays: number,
-  halfLifeDays: number = BRAINCORE_PARAMS.HALF_LIFE_DAYS
+  halfLifeDays?: number
 ): number {
-  let pVal = Number(p ?? BRAINCORE_PARAMS.P_INIT);
+  const cfg = resolveCanonicalBktConfig();
+  const effHalfLife = typeof halfLifeDays === 'number' && Number.isFinite(halfLifeDays) ? halfLifeDays : cfg.HALF_LIFE_DAYS;
+  let pVal = Number(p ?? cfg.P_INIT);
   if (Number.isNaN(pVal) || !Number.isFinite(pVal)) {
-    pVal = BRAINCORE_PARAMS.P_INIT;
+    pVal = cfg.P_INIT;
   }
   const dt = Number(elapsedDays || 0);
-  if (Number.isNaN(dt) || !Number.isFinite(dt) || dt <= 0 || pVal <= BRAINCORE_PARAMS.P_INIT) {
+  if (Number.isNaN(dt) || !Number.isFinite(dt) || dt <= 0 || pVal <= cfg.P_INIT) {
     return Number(pVal.toFixed(4));
   }
-  const tau = Math.max(1.0, halfLifeDays) / Math.LN2;
+  const tau = Math.max(1.0, effHalfLife) / Math.LN2;
   const decayRatio = Math.exp(-Math.min(50.0, dt / tau));
-  const decayed = BRAINCORE_PARAMS.P_INIT + (pVal - BRAINCORE_PARAMS.P_INIT) * decayRatio;
+  const decayed = cfg.P_INIT + (pVal - cfg.P_INIT) * decayRatio;
   return Number(Math.max(0.01, Math.min(0.99, decayed)).toFixed(4));
 }
 
@@ -137,18 +218,19 @@ export function bktDecay(
 export function bktStep(
   p: number,
   correct: boolean,
-  slip: number = BRAINCORE_PARAMS.P_SLIP,
-  guess: number = BRAINCORE_PARAMS.P_GUESS,
-  learn: number = BRAINCORE_PARAMS.P_LEARN
+  slip?: number,
+  guess?: number,
+  learn?: number
 ): number {
-  let pVal = Number(p ?? BRAINCORE_PARAMS.P_INIT);
+  const cfg = resolveCanonicalBktConfig();
+  let pVal = Number(p ?? cfg.P_INIT);
   if (Number.isNaN(pVal) || !Number.isFinite(pVal)) {
-    pVal = BRAINCORE_PARAMS.P_INIT;
+    pVal = cfg.P_INIT;
   }
   pVal = Math.max(0.001, Math.min(0.999, pVal));
-  const s = Math.max(0.01, Math.min(0.49, slip));
-  const g = Math.max(0.01, Math.min(0.49, guess));
-  const l = Math.max(0.0, Math.min(0.50, learn));
+  const s = Math.max(0.01, Math.min(0.49, slip ?? cfg.P_SLIP));
+  const g = Math.max(0.01, Math.min(0.49, guess ?? cfg.P_GUESS));
+  const l = Math.max(0.0, Math.min(0.50, learn ?? cfg.P_LEARN));
 
   const num = correct ? pVal * (1.0 - s) : pVal * s;
   const den = correct ? num + (1.0 - pVal) * g : num + (1.0 - pVal) * (1.0 - g);
@@ -165,11 +247,12 @@ export function bktUpdate(
   hints: number = 0,
   confidence: number = 0.8
 ): number {
-  let slip: number = BRAINCORE_PARAMS.P_SLIP;
-  let guess: number = BRAINCORE_PARAMS.P_GUESS;
+  const cfg = resolveCanonicalBktConfig();
+  let slip: number = cfg.P_SLIP;
+  let guess: number = cfg.P_GUESS;
   const h = Math.max(0, Math.floor(hints || 0));
   if (h > 0 && correct) {
-    slip = Math.min(0.35, BRAINCORE_PARAMS.P_SLIP + 0.08 * h);
+    slip = Math.min(0.35, cfg.P_SLIP + 0.08 * h);
   }
   if (typeof confidence === 'number' && !Number.isNaN(confidence)) {
     if (correct && confidence <= 0.34) {
@@ -180,7 +263,7 @@ export function bktUpdate(
     }
   }
   return Number(
-    Math.max(0.01, Math.min(0.99, bktStep(p, correct, slip, guess, BRAINCORE_PARAMS.P_LEARN))).toFixed(4)
+    Math.max(0.01, Math.min(0.99, bktStep(p, correct, slip, guess, cfg.P_LEARN))).toFixed(4)
   );
 }
 
@@ -188,36 +271,41 @@ export function deriveMasteryState(rec: CompetencyRecord): MasteryStateName {
   if (rec.attempts === 0) {
     return rec.exposures === 0 ? 'NOT_EXPOSED' : 'EXPOSED';
   }
-  const pVal = rec.pMasteryDecayed ?? rec.pMastery ?? BRAINCORE_PARAMS.P_INIT;
-  const stillMastered =
-    pVal >= BRAINCORE_PARAMS.MASTERY_T && rec.correct >= BRAINCORE_PARAMS.MIN_CORRECT_FOR_MASTERY;
+  const cfg = resolveCanonicalBktConfig();
+  const pVal = rec.pMasteryDecayed ?? rec.pMastery ?? cfg.P_INIT;
+  const meetsObs =
+    rec.attempts >= cfg.MIN_OBSERVATIONS ||
+    (rec.correct >= cfg.MIN_CORRECT_FOR_MASTERY && rec.attempts >= cfg.MIN_CORRECT_FOR_MASTERY);
+  const stillMastered = pVal >= cfg.MASTERY_T && meetsObs;
   if (rec.transferredAt && stillMastered) return 'TRANSFERRED';
   if (rec.retainedAt && stillMastered) return 'RETAINED';
   if (stillMastered) return 'MASTERED';
-  if (pVal >= BRAINCORE_PARAMS.DEVELOPING_T) return 'DEVELOPING';
+  if (pVal >= cfg.DEVELOPING_T) return 'DEVELOPING';
   if (rec.attempts >= 2) return 'PRACTICING';
   return 'EXPOSED';
 }
 
 export function createBlankCompetency(
   competencyId: string,
-  initialMastery: number = BRAINCORE_PARAMS.P_INIT,
+  initialMastery?: number,
   initialAttempts: number = 0,
   initialCorrect: number = 0
 ): CompetencyRecord {
+  const cfg = resolveCanonicalBktConfig();
+  const effInit = typeof initialMastery === 'number' && Number.isFinite(initialMastery) ? initialMastery : cfg.P_INIT;
   const rec: CompetencyRecord = {
     competencyId,
-    pMastery: initialMastery,
-    pMasteryDecayed: initialMastery,
+    pMastery: effInit,
+    pMasteryDecayed: effInit,
     state: 'NOT_EXPOSED',
     exposures: initialAttempts > 0 ? initialAttempts : 1,
     attempts: initialAttempts,
     correct: initialCorrect,
     streak: initialCorrect,
     hintsUsed: 0,
-    stabilityDays: initialMastery >= 0.8 ? 7.0 : 2.0,
+    stabilityDays: effInit >= cfg.MASTERY_T ? 7.0 : 2.0,
     lastAt: initialAttempts > 0 ? Date.now() - 3600_000 : null,
-    masteredAt: initialMastery >= 0.8 ? Date.now() - 86400_000 : null,
+    masteredAt: effInit >= cfg.MASTERY_T ? Date.now() - 86400_000 : null,
     retainedAt: null,
     transferredAt: null,
   };
@@ -588,6 +676,7 @@ function syncCompetencyToHostBkt(comp: CompetencyRecord): void {
         Math.max(0.01, Math.min(0.99, comp.pMasteryDecayed ?? comp.pMastery)).toFixed(4)
       );
       const now = comp.lastAt || Date.now();
+      const cfg = resolveCanonicalBktConfig();
       const aliases = HOST_COMPETENCY_ALIASES[comp.competencyId] || [comp.competencyId];
       for (const targetKey of aliases) {
         const prevSkill = hostBkt.skills[targetKey] || {};
@@ -604,7 +693,7 @@ function syncCompetencyToHostBkt(comp: CompetencyRecord): void {
         const prevLesson = hostBkt.lessons[targetKey] || {};
         const nextN = Math.max(Number(prevLesson.n || 0), comp.attempts);
         const passedAt =
-          prevLesson.gatePassedAt || (pVal >= 0.95 && nextN >= 5 ? now : 0);
+          prevLesson.gatePassedAt || (pVal >= cfg.MASTERY_T && nextN >= cfg.MIN_OBSERVATIONS ? now : 0);
         hostBkt.lessons[targetKey] = {
           L: Math.max(Number(prevLesson.L || 0), pVal),
           n: nextN,
@@ -1235,10 +1324,13 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
               ? prevSessions
               : [...prevSessions, sessionTag].slice(-24);
             const nextHits = (Number(prevCanonical?.hits) || 0) + 1;
+            const resolvedCanonical = String(
+              (eventPayload as any).canonicalCode || mId
+            ).trim() || mId;
             hostLedger.entries[entryKey] = {
               concept: conceptId,
               misconception: mId,
-              canonical: mId,
+              canonical: resolvedCanonical,
               family: 'voice_speaking',
               logOdds: Number(nextLogOdds.toFixed(4)),
               lastMs: nowMs,
@@ -1294,7 +1386,13 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
             w.misconceptionLedgerRecord(
               { startedAt: Date.now() },
               { id: eventPayload.id || skillId, lessonSkill: skillId, skill: skillId, target: skillId, type: 'speaking' },
-              eventPayload.misconceptionId ? { misconception: String(eventPayload.misconceptionId), timing: 'normal' } : null,
+              eventPayload.misconceptionId
+                ? {
+                    misconception: String(eventPayload.misconceptionId),
+                    canonical: String((eventPayload as any).canonicalCode || eventPayload.misconceptionId),
+                    timing: 'normal',
+                  }
+                : null,
               isOk
             );
           }
@@ -1632,14 +1730,15 @@ export function checkPrerequisiteStatus(
   if (!prereqCompetencyId) {
     return { isReady: true, pMastery: 1.0, stateLabel: 'MASTERED' };
   }
+  const cfg = resolveCanonicalBktConfig();
   const mergedComps = mergeHostBraincoreMastery(state.competencies || {});
   const comp =
     mergedComps[prereqCompetencyId] ||
     state.competencies[prereqCompetencyId] ||
-    createBlankCompetency(prereqCompetencyId, BRAINCORE_PARAMS.P_INIT);
-  const p = comp.pMasteryDecayed ?? comp.pMastery ?? BRAINCORE_PARAMS.P_INIT;
+    createBlankCompetency(prereqCompetencyId, cfg.P_INIT);
+  const p = comp.pMasteryDecayed ?? comp.pMastery ?? cfg.P_INIT;
   return {
-    isReady: p >= BRAINCORE_PARAMS.DEVELOPING_T,
+    isReady: p >= cfg.DEVELOPING_T,
     pMastery: p,
     stateLabel: comp.state,
   };
@@ -1650,9 +1749,10 @@ export function recordVocabPrereqMastery(
   prereqCompetencyId?: string
 ): BraincoreStoreState {
   if (!prereqCompetencyId) return state;
+  const cfg = resolveCanonicalBktConfig();
   const existing =
     state.competencies[prereqCompetencyId] ||
-    createBlankCompetency(prereqCompetencyId, BRAINCORE_PARAMS.P_INIT);
+    createBlankCompetency(prereqCompetencyId, cfg.P_INIT);
   const p1 = bktUpdate(existing.pMasteryDecayed ?? existing.pMastery, true, 0, 0.9);
   const p2 = bktUpdate(p1, true, 0, 0.9);
   const updatedComp: CompetencyRecord = {
@@ -1695,11 +1795,23 @@ export function recordSpeakingAttempt(
     accuracyScore?: number;
     speakingDurationSec?: number;
     misconceptionId: string | null;
+    canonicalCode?: string | null;
     correctionPattern: string | null;
     hintsUsed: number;
     confidence: number;
     measureMode: boolean;
     isTransfer?: boolean;
+    acousticMetrics?: {
+      hasSufficientAudio?: boolean;
+      prosodyConfidence?: number;
+      toneAccuracy?: number;
+      pitchAccentScore?: number;
+      acousticMisconceptionId?: string | null;
+      canonicalTaxonomyCode?: string | null;
+      whyFailsId?: string | null;
+      f0MedianHz?: number;
+      pitchSpanSemitones?: number;
+    } | null;
   }
 ): {
   nextState: BraincoreStoreState;
@@ -1709,16 +1821,29 @@ export function recordSpeakingAttempt(
   masteryStateAfter: MasteryStateName;
 } {
   const now = Date.now();
+  const cfg = resolveCanonicalBktConfig();
   const existing =
     state.competencies[params.competencyId] ||
-    createBlankCompetency(params.competencyId, BRAINCORE_PARAMS.P_INIT);
+    createBlankCompetency(params.competencyId, cfg.P_INIT);
+
+  // Calibrate effective ok, misconception, and confidence using real acoustic pitch/prosody evidence
+  const ac = params.acousticMetrics && params.acousticMetrics.hasSufficientAudio ? params.acousticMetrics : null;
+  const acousticFailed = Boolean(ac && ac.acousticMisconceptionId);
+  const effOk = acousticFailed ? false : params.ok;
+  const effMiscId =
+    params.misconceptionId || (acousticFailed ? ac?.acousticMisconceptionId || null : null);
+  const effCanonCode =
+    params.canonicalCode || (acousticFailed ? ac?.canonicalTaxonomyCode || 'lexical.form_confusion' : null);
+  const effConf = ac && typeof ac.prosodyConfidence === 'number'
+    ? Math.max(0.25, Math.min(0.95, 0.55 * params.confidence + 0.45 * ac.prosodyConfidence))
+    : params.confidence;
 
   const elapsedDays = existing.lastAt ? Math.max(0, (now - existing.lastAt) / 86400_000) : 0;
   const startP = bktDecay(existing.pMastery, elapsedDays);
-  const nextP = bktUpdate(startP, params.ok, params.hintsUsed, params.confidence);
+  const nextP = bktUpdate(startP, effOk, params.hintsUsed, effConf);
 
-  const nextStreak = params.ok ? existing.streak + 1 : 0;
-  const nextCorrect = params.ok ? existing.correct + 1 : existing.correct;
+  const nextStreak = effOk ? existing.streak + 1 : 0;
+  const nextCorrect = effOk ? existing.correct + 1 : existing.correct;
   const prevMastered = existing.masteredAt;
 
   const updatedComp: CompetencyRecord = {
@@ -1754,19 +1879,19 @@ export function recordSpeakingAttempt(
     updatedComp.retainedAt = null;
   }
 
-  if (params.isTransfer && params.ok && nextP >= BRAINCORE_PARAMS.MASTERY_T) {
+  if (params.isTransfer && effOk && nextP >= cfg.MASTERY_T) {
     updatedComp.transferredAt = updatedComp.transferredAt || now;
   }
   updatedComp.state = deriveMasteryState(updatedComp);
 
   // Update Misconception Ledger
   const nextLedger = { ...state.misconceptionLedger };
-  if (!params.ok && params.misconceptionId) {
-    const key = `${params.competencyId}::${params.misconceptionId}`;
+  if (!effOk && effMiscId) {
+    const key = `${params.competencyId}::${effMiscId}`;
     const prevEntry = nextLedger[key];
     nextLedger[key] = {
       competencyId: params.competencyId,
-      misconceptionId: params.misconceptionId,
+      misconceptionId: effMiscId,
       frequency: (prevEntry?.frequency || 0) + 1,
       firstAt: prevEntry?.firstAt || now,
       lastAt: now,
@@ -1774,7 +1899,7 @@ export function recordSpeakingAttempt(
       lastUtterance: params.userExactTranscript,
       correctionPattern: params.correctionPattern || prevEntry?.correctionPattern || '',
     };
-  } else if (params.ok && nextStreak >= 2) {
+  } else if (effOk && nextStreak >= 2) {
     for (const k of Object.keys(nextLedger)) {
       if (nextLedger[k].competencyId === params.competencyId && !nextLedger[k].resolved) {
         nextLedger[k] = {
@@ -1792,12 +1917,14 @@ export function recordSpeakingAttempt(
     competencyId: params.competencyId,
     scenarioId: params.scenarioId,
     userTranscript: params.userExactTranscript,
-    ok: params.ok,
+    ok: effOk,
     pMasteryBefore: startP,
     pMasteryAfter: nextP,
-    misconceptionId: params.misconceptionId,
+    misconceptionId: effMiscId,
+    canonicalCode: effCanonCode || effMiscId || null,
+    ...(ac ? { prosodyConfidence: ac.prosodyConfidence, f0MedianHz: ac.f0MedianHz } : {}),
     hintsUsed: params.hintsUsed,
-    confidence: params.confidence,
+    confidence: effConf,
     measureMode: params.measureMode,
   };
 
@@ -1936,6 +2063,136 @@ export function recordSpeakingAttempt(
     bktBefore: startP,
     bktAfter: nextP,
     thetaAfter: abilityThetaFromMastery(nextP),
+    masteryStateAfter: updatedComp.state,
+  };
+}
+
+/**
+ * Retroactively reconciles a free-form neural classifier diagnosis into an already recorded
+ * turn WITHOUT double-counting `attempts`, replacing a tentative optimistic/unclassified turn
+ * when the Worker neural model (/api/voice/partner-turn or /api/ai/task) detects an error.
+ */
+export function reconcileNeuralDiagnosis(
+  state: BraincoreStoreState,
+  params: {
+    competencyId: string;
+    scenarioId: string;
+    targetLang?: TargetLang;
+    userExactTranscript: string;
+    priorBktBefore: number;
+    neuralOk: boolean;
+    misconceptionCode: string | null;
+    whyFailsId?: string | null;
+    correctionPattern?: string | null;
+    hintsUsed?: number;
+    confidence?: number;
+  }
+): {
+  nextState: BraincoreStoreState;
+  bktAfter: number;
+  thetaAfter: number;
+  masteryStateAfter: MasteryStateName;
+} {
+  if (params.neuralOk || !params.misconceptionCode) {
+    const existing = state.competencies[params.competencyId];
+    const p = existing?.pMastery ?? resolveCanonicalBktConfig().P_INIT;
+    return {
+      nextState: state,
+      bktAfter: p,
+      thetaAfter: abilityThetaFromMastery(p),
+      masteryStateAfter: existing ? deriveMasteryState(existing) : 'EXPOSED',
+    };
+  }
+
+  const now = Date.now();
+  const cfg = resolveCanonicalBktConfig();
+  const existing =
+    state.competencies[params.competencyId] ||
+    createBlankCompetency(params.competencyId, cfg.P_INIT);
+
+  const correctedP = bktUpdate(
+    params.priorBktBefore,
+    false,
+    params.hintsUsed || 0,
+    params.confidence ?? 0.88
+  );
+
+  const adjustedCorrect = Math.max(0, existing.correct - 1);
+  const updatedComp: CompetencyRecord = {
+    ...existing,
+    pMastery: correctedP,
+    pMasteryDecayed: correctedP,
+    correct: adjustedCorrect,
+    streak: 0,
+    lastAt: now,
+  };
+  updatedComp.state = deriveMasteryState(updatedComp);
+
+  const mId = String(params.misconceptionCode).trim();
+  const ledgerKey = `${params.competencyId}::${mId}`;
+  const prevEntry = state.misconceptionLedger[ledgerKey];
+  const nextLedger = {
+    ...state.misconceptionLedger,
+    [ledgerKey]: {
+      competencyId: params.competencyId,
+      misconceptionId: mId,
+      frequency: (prevEntry?.frequency || 0) + 1,
+      firstAt: prevEntry?.firstAt || now,
+      lastAt: now,
+      resolved: false,
+      lastUtterance: params.userExactTranscript,
+      correctionPattern: params.correctionPattern || prevEntry?.correctionPattern || '',
+    },
+  };
+
+  const mem = ensureDualBrainMemory(state.dualBrainMemory);
+  mem.userBrain.chronicWeaknesses[ledgerKey] = {
+    misconceptionId: mId,
+    labelId: params.whyFailsId || prevEntry?.lastUtterance || mId,
+    labelTh: params.whyFailsId || mId,
+    hits: (mem.userBrain.chronicWeaknesses[ledgerKey]?.hits || 0) + 1,
+    resolvedHits: 0,
+    lastBrokenUtterance: params.userExactTranscript,
+    targetFixPattern: params.correctionPattern || prevEntry?.correctionPattern || '',
+    lastSeenAt: now,
+    active: true,
+  };
+  mem.userBrain.updatedAt = now;
+
+  const correctionEvent = {
+    id: `att_neural_${now}_${Math.random().toString(36).slice(2, 7)}`,
+    timestamp: now,
+    competencyId: params.competencyId,
+    scenarioId: params.scenarioId,
+    userTranscript: params.userExactTranscript,
+    ok: false,
+    pMasteryBefore: params.priorBktBefore,
+    pMasteryAfter: correctedP,
+    misconceptionId: mId,
+    canonicalCode: mId,
+    hintsUsed: params.hintsUsed || 0,
+    confidence: params.confidence ?? 0.88,
+    measureMode: false,
+  };
+
+  const nextState = saveBraincoreState({
+    ...state,
+    competencies: {
+      ...state.competencies,
+      [params.competencyId]: updatedComp,
+    },
+    misconceptionLedger: nextLedger,
+    syncQueue: [...state.syncQueue, correctionEvent],
+    dualBrainMemory: mem,
+  });
+
+  syncCompetencyToHostBkt(updatedComp);
+  bridgeAttemptToHostPwa(correctionEvent);
+
+  return {
+    nextState,
+    bktAfter: correctedP,
+    thetaAfter: abilityThetaFromMastery(correctedP),
     masteryStateAfter: updatedComp.state,
   };
 }
@@ -3312,11 +3569,12 @@ export function diagnosePteCandidateSpeech(
   try {
     const brainState = loadBraincoreState();
     const nowTs = Date.now();
+    const cfgPte = resolveCanonicalBktConfig();
     const updateBktSkill = (skillId: string, isSuccess: boolean) => {
       const existing = brainState.competencies[skillId];
       const rec: CompetencyRecord = existing
         ? { ...existing }
-        : createBlankCompetency(skillId, BRAINCORE_PARAMS.P_INIT);
+        : createBlankCompetency(skillId, cfgPte.P_INIT);
       const nextP = bktUpdate(rec.pMastery, isSuccess, 0, isSuccess ? 0.85 : 0.9);
       rec.pMastery = Number(nextP.toFixed(3));
       rec.pMasteryDecayed = rec.pMastery;
@@ -3325,7 +3583,7 @@ export function diagnosePteCandidateSpeech(
       if (isSuccess) {
         rec.correct += 1;
         rec.streak += 1;
-        if (!rec.masteredAt && rec.pMastery >= BRAINCORE_PARAMS.MASTERY_T) {
+        if (!rec.masteredAt && rec.pMastery >= cfgPte.MASTERY_T) {
           rec.masteredAt = nowTs;
         }
       } else {

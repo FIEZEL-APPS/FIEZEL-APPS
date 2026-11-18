@@ -1167,6 +1167,9 @@
     if (withCorrection) {
       lines.push('FIX: <corrected sentence, or NONE>');
       lines.push('WHY: <one short explanation, or NONE>');
+      lines.push(
+        'CODE: <canonical code from tense_aspect.timeline_mismatch|tense_aspect.aspect_for_completed|tense_aspect.habitual_overgeneralized|tense_aspect.progressive_overuse|tense_aspect.perfect_misuse|tense_aspect.future_form_confusion|agreement.bare_form|agreement.number_mismatch|agreement.missing_auxiliary|structure.double_marking|structure.word_order|structure.inversion_error|structure.malformed_blend|structure.omitted_element|modality.function_confusion|modality.strength_miscalibrated|modality.negation_scope|modality.past_reference_error|conditionals.type_mismatch|conditionals.clause_form_swap|passive.active_for_passive|passive.participle_form|articles.definiteness_mismatch|articles.countability_quantifier|prepositions.semantic_category|prepositions.collocation|lexical.form_confusion|lexical.register_mismatch|complementation.gerund_infinitive_swap|question.auxiliary_error|pronouns.case_form|linking.connector_choice|transfer.id_l1_pattern, or NONE>'
+      );
     } else if (!isCall) {
       // Sinyal DIAM untuk ajakan menyalakan koreksi di klien: satu kata, tidak pernah
       // ditampilkan, dan REPLY tetap dilarang menyinggungnya.
@@ -1190,14 +1193,14 @@
   function promptConversationTurn(input, locale) { return promptConversation(input, locale, false); }
   function promptConversationCorrect(input, locale) { return promptConversation(input, locale, true); }
 
-  /** Pecah keluaran bertag menjadi {reply, meaning, fix, why}. Baris tanpa tag menyambung tag sebelumnya. */
+  /** Pecah keluaran bertag menjadi {reply, meaning, fix, why, check, code}. Baris tanpa tag menyambung tag sebelumnya. */
   function parseConversationTags(text) {
-    var out = { reply: '', meaning: '', fix: '', why: '', check: '' };
-    var map = { REPLY: 'reply', MEANING: 'meaning', FIX: 'fix', WHY: 'why', CHECK: 'check' };
+    var out = { reply: '', meaning: '', fix: '', why: '', check: '', code: '' };
+    var map = { REPLY: 'reply', MEANING: 'meaning', FIX: 'fix', WHY: 'why', CHECK: 'check', CODE: 'code' };
     var current = '';
     var lines = stripCodeFence(text).split(/\r?\n/);
     for (var i = 0; i < lines.length; i++) {
-      var m = /^\s*[*_#>\-\s]*(REPLY|MEANING|FIX|WHY|CHECK)[*_\s]*[:\uff1a]\s*(.*)$/i.exec(lines[i]);
+      var m = /^\s*[*_#>\-\s]*(REPLY|MEANING|FIX|WHY|CHECK|CODE)[*_\s]*[:\uff1a]\s*(.*)$/i.exec(lines[i]);
       if (m) {
         current = map[m[1].toUpperCase()];
         out[current] = out[current] ? out[current] + ' ' + m[2] : m[2];
@@ -1224,6 +1227,52 @@
   }
 
   function isNoneMarker(v) { return /^(none|n\/a|-+|tidak ada|nggak ada|ไม่มี)\.?$/i.test(s(v).trim()) || !s(v).trim(); }
+
+  var CANONICAL_MISCONCEPTION_CODES = Object.freeze({
+    'tense_aspect.aspect_for_completed': 1, 'tense_aspect.habitual_overgeneralized': 1,
+    'tense_aspect.progressive_overuse': 1, 'tense_aspect.perfect_misuse': 1,
+    'tense_aspect.timeline_mismatch': 1, 'tense_aspect.future_form_confusion': 1,
+    'agreement.bare_form': 1, 'agreement.number_mismatch': 1, 'agreement.missing_auxiliary': 1,
+    'structure.double_marking': 1, 'structure.word_order': 1, 'structure.inversion_error': 1,
+    'structure.malformed_blend': 1, 'structure.omitted_element': 1,
+    'modality.function_confusion': 1, 'modality.strength_miscalibrated': 1,
+    'modality.negation_scope': 1, 'modality.past_reference_error': 1,
+    'conditionals.type_mismatch': 1, 'conditionals.clause_form_swap': 1,
+    'passive.active_for_passive': 1, 'passive.participle_form': 1,
+    'passive.causative_confusion': 1, 'passive.impersonal_pattern': 1,
+    'reported.backshift_error': 1, 'reported.deixis_shift': 1,
+    'articles.definiteness_mismatch': 1, 'articles.countability_quantifier': 1,
+    'articles.sound_rule': 1, 'articles.zero_article': 1,
+    'comparison.degree_scope': 1, 'comparison.form_intensifier': 1,
+    'prepositions.semantic_category': 1, 'prepositions.collocation': 1,
+    'lexical.form_confusion': 1, 'lexical.register_mismatch': 1,
+    'complementation.gerund_infinitive_swap': 1, 'complementation.meaning_pair_shift': 1,
+    'complementation.bare_form_error': 1, 'complementation.verb_pattern': 1,
+    'relative.pronoun_choice': 1, 'relative.restrictiveness': 1, 'relative.reduction_error': 1,
+    'question.auxiliary_error': 1, 'question.polarity_negation': 1, 'question.wh_choice': 1,
+    'pronouns.case_form': 1, 'linking.connector_choice': 1, 'transfer.id_l1_pattern': 1
+  });
+
+  function resolveCanonicalTaxonomyCode(rawCode, detailText, course) {
+    var clean = s(rawCode).trim().toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(CANONICAL_MISCONCEPTION_CODES, clean)) return clean;
+    var probe = (clean + ' ' + s(detailText)).toLowerCase();
+    if (/lampau|past|yesterday|ago|went|tense|timeline/.test(probe)) return 'tense_aspect.timeline_mismatch';
+    if (/continuous|progressive|stative|-ing\b/.test(probe)) return 'tense_aspect.progressive_overuse';
+    if (/perfect|already|since/.test(probe)) return 'tense_aspect.perfect_misuse';
+    if (/future|will|going to/.test(probe)) return 'tense_aspect.future_form_confusion';
+    if (/partikel|は|が|を|に|で|preposit|in\/on\/at/.test(probe)) return 'prepositions.semantic_category';
+    if (/plural|singular|jamak|tunggal|agreement|subjek/.test(probe)) return 'agreement.number_mismatch';
+    if (/auxiliary|kata bantu|tanya|question/.test(probe)) return 'agreement.missing_auxiliary';
+    if (/infleksi|bare|third person|bentuk dasar/.test(probe)) return 'agreement.bare_form';
+    if (/urutan|order|svo/.test(probe)) return 'structure.word_order';
+    if (/konjugasi|blend|campur/.test(probe)) return 'structure.malformed_blend';
+    if (/modal|must|should|can|might/.test(probe)) return 'modality.function_confusion';
+    if (/pasif|passive/.test(probe)) return 'passive.participle_form';
+    if (/article|a\/an\/the|satuan|quantifier/.test(probe)) return 'articles.definiteness_mismatch';
+    if (/terjemah|l1|indones|kopula/.test(probe)) return 'transfer.id_l1_pattern';
+    return course === 'ja' ? 'structure.malformed_blend' : 'lexical.form_confusion';
+  }
 
   /** Huruf kecil, tanpa tanda baca dan spasi: dasar perbandingan "apakah koreksinya beda". */
   function normalizeForCompare(v) {
@@ -1384,7 +1433,8 @@
       if (changed && ratio <= CONVERSATION.maxFixChangeRatio && isTargetLanguage(fix, course) &&
           fix.length <= CONVERSATION.maxReplyChars && why && why.length <= CONVERSATION.maxNoteChars &&
           isLearnerLanguage(why, locale) && !scaffoldEchoIn(why)) {
-        correction = { corrected: fix, note: why };
+        var canonicalCode = resolveCanonicalTaxonomyCode(tags.code, why + ' ' + fix + ' ' + input.message, course);
+        correction = { corrected: fix, note: why, canonicalCode: canonicalCode };
       } else {
         // Koreksi yang tidak lolos tidak boleh tampil sebagai "kalimatmu sudah benar".
         correctionChecked = false;
@@ -1398,7 +1448,14 @@
     else if (/^\W*ok\b/i.test(tags.check)) mistakeSignal = false;
     return {
       ok: true, reason: '', text: reply,
-      turn: { reply: reply, translation: meaning, correction: correction, correctionChecked: correctionChecked, mistakeSignal: mistakeSignal }
+      turn: {
+        reply: reply,
+        translation: meaning,
+        correction: correction,
+        correctionChecked: correctionChecked,
+        mistakeSignal: mistakeSignal,
+        canonicalCode: correction ? correction.canonicalCode : null
+      }
     };
   }
 
