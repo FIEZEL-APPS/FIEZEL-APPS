@@ -50,3 +50,11 @@ CREATE TABLE IF NOT EXISTS evolution_ledger (
     entry TEXT NOT NULL,
     created_at INTEGER NOT NULL
 );
+
+-- Tabel untuk account_cloud_state (m025-806: sinkronisasi lintas perangkat penuh untuk progres multi-bahasa, GEM, level, streak, & side-state Braincore)
+CREATE TABLE IF NOT EXISTS account_cloud_state (
+    sub TEXT NOT NULL PRIMARY KEY,
+    snapshot_json TEXT NOT NULL,
+    revision INTEGER NOT NULL DEFAULT 1,
+    updated_at INTEGER NOT NULL
+);
