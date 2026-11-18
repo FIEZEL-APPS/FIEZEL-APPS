@@ -457,5 +457,8 @@
     'mandarin.reorder_hint': 'การเรียงคำภาษาจีนใช้โครงสร้าง ประธาน + เวลา + สถานที่ + กริยา + กรรม',
     'mandarin.reorder_pattern_hint': 'สังเกตตำแหน่งของคำบอกเวลาและสถานที่ก่อนคำกริยา',
     'story.cat-teknologi': 'เทคโนโลยีและการเดินทาง',
+    'mandarin.level-0-tab': 'พื้นฐาน (Lvl 0)',
+    'mandarin.level-7-tab': 'Lvl 7 (วาทกรรม)',
+    'mandarin.level-8-tab': 'Lvl 8 (วรรณกรรม)'
   });
 })();

@@ -22,6 +22,28 @@
 
   var doc = root.document;
 
+  function njIsId() {
+    try {
+      var I = (typeof root !== 'undefined' && root && root.FiezelI18n) || (typeof self !== 'undefined' ? self.FiezelI18n : null);
+      return ((I && typeof I.getLocale === 'function' && I.getLocale()) || 'id') === 'id';
+    } catch (_) { return true; }
+  }
+
+  function njPick(en, id) {
+    return njIsId() ? id : en;
+  }
+
+  function njTxt(s) {
+    if (!s) return '';
+    if (typeof s === 'string') return s;
+    return njIsId() ? (s.text_id || s.text_en || '') : (s.text_en || s.text_id || '');
+  }
+
+  function njRule(q) {
+    if (!q) return '';
+    return njIsId() ? (q.rule || q.ruleEn || '') : (q.ruleEn || q.rule || '');
+  }
+
   function t(k, fallback) {
     var s;
     try {
@@ -132,6 +154,7 @@
       misconceptionCategory: "tense_continuous",
       misconceptionText: "present continuous dipakai buat jadwal rutin yang pasti.",
       rule: "Present simple digunakan untuk jadwal, kebiasaan rutin, dan fakta umum.",
+      ruleEn: "Present simple is used for fixed schedules, routines, and general facts.",
       cefr: "A1",
       skillId: "present_simple"
     },
@@ -144,6 +167,7 @@
       misconceptionCategory: "sva_intervening",
       misconceptionText: "subjek orang ketiga tunggal (she) lupa diberi akhiran -es.",
       rule: "Subjek he/she/it mewajibkan akhiran -s atau -es pada present simple.",
+      ruleEn: "Third-person singular subjects (he/she/it) require -s or -es in present simple.",
       cefr: "A1",
       skillId: "present_simple"
     },
@@ -156,6 +180,7 @@
       misconceptionCategory: "sva_auxiliary_double",
       misconceptionText: "memakai 'does' untuk subjek jamak (they).",
       rule: "Subjek they/we/you/I menggunakan kata bantu 'do' / 'don't'.",
+      ruleEn: "Plural and I/you subjects use the auxiliary 'do' / 'don't'.",
       cefr: "A1",
       skillId: "present_simple"
     },
@@ -169,6 +194,7 @@
       misconceptionCategory: "tense_continuous",
       misconceptionText: "kebiasaan dipakai buat kejadian yang lagi berlangsung saat itu.",
       rule: "Present continuous (am/is/are + -ing) untuk peristiwa yang sedang berlangsung sekarang.",
+      ruleEn: "Use present continuous (am/is/are + -ing) for actions happening right now.",
       cefr: "A2",
       skillId: "present_continuous"
     },
@@ -181,6 +207,7 @@
       misconceptionCategory: "tense_past",
       misconceptionText: "bentuk present dipakai pada kalimat lampau yang berpenanda 'yesterday'.",
       rule: "Past simple (V2: went) wajib dipakai ketika waktu lampau sudah selesai.",
+      ruleEn: "Use past simple (went) for completed actions at a specific past time.",
       cefr: "A2",
       skillId: "past_simple"
     },
@@ -193,6 +220,7 @@
       misconceptionCategory: "sva_auxiliary_double",
       misconceptionText: "menambahkan -s pada kata kerja utama padahal sudah ada kata bantu 'doesn't'.",
       rule: "Setelah auxiliary verb (doesn't / don't / didn't), kata kerja kembali ke bentuk dasar.",
+      ruleEn: "After doesn't / don't / didn't, the main verb stays in its base form.",
       cefr: "A2",
       skillId: "present_simple"
     },
@@ -205,6 +233,7 @@
       misconceptionCategory: "preposition_good_at",
       misconceptionText: "menerjemahkan 'pandai dalam' secara harfiah menjadi 'good in'.",
       rule: "Kolokasi baku bahasa Inggris adalah 'good at', bukan 'good in'.",
+      ruleEn: "The natural English collocation is 'good at', not 'good in'.",
       cefr: "A2",
       skillId: "prepositions"
     },
@@ -218,6 +247,7 @@
       misconceptionCategory: "tense_perfect",
       misconceptionText: "mengabaikan durasi 'for three years' yang menuntut present perfect.",
       rule: "Present perfect digunakan untuk tindakan yang dimulai di masa lalu dan berlanjut hingga sekarang.",
+      ruleEn: "Use present perfect for actions that started in the past and continue to the present.",
       cefr: "B1",
       skillId: "present_perfect"
     },
@@ -230,6 +260,7 @@
       misconceptionCategory: "sva_neither",
       misconceptionText: "menyesuaikan kata kerja dengan 'candidates' (jamak), padahal subjeknya 'neither' (tunggal).",
       rule: "'Neither' mengambil kata kerja tunggal (singular verb 'is').",
+      ruleEn: "'Neither' (of two) takes a singular verb ('is').",
       cefr: "B1",
       skillId: "subject_verb_agreement"
     },
@@ -242,6 +273,7 @@
       misconceptionCategory: "subjunctive",
       misconceptionText: "memakai 'was' dalam klausa pengandaian formal (second conditional subjunctive).",
       rule: "Dalam conditional type 2 formal, bentuk subjunctive 'were' digunakan untuk semua subjek.",
+      ruleEn: "In formal second conditionals, the subjunctive 'were' is used for all subjects.",
       cefr: "B1",
       skillId: "conditionals"
     },
@@ -255,6 +287,7 @@
       misconceptionCategory: "auditory_trap",
       misconceptionText: "menyamakan inversi 'hardly... when' dengan 'no sooner... than'.",
       rule: "Korelasi inversi negatif: 'hardly/scarcely... when', sedangkan 'no sooner... than'.",
+      ruleEn: "Correlative inversion pairs: 'hardly/scarcely... when', whereas 'no sooner... than'.",
       cefr: "B2",
       skillId: "inversion"
     },
@@ -267,6 +300,7 @@
       misconceptionCategory: "auditory_trap",
       misconceptionText: "menyamakan inversi 'no sooner... than' dengan 'hardly... when'.",
       rule: "Pasangan inversi negatif adalah 'no sooner... than'.",
+      ruleEn: "The correlative partner for 'no sooner' is 'than'.",
       cefr: "B2",
       skillId: "inversion"
     }
@@ -384,8 +418,13 @@
 
       var distObj = (picked.distractors && picked.distractors[0]) || {};
       var trap = distObj.option || picked.options[(picked.correctIndex + 1) % picked.options.length];
-      var ruleText = (picked.explanation && (picked.explanation.ruleId || picked.explanation.rule)) || "Perhatikan konteks waktu dan kesesuaian subjek.";
-      var miscText = distObj.whyFailsId || distObj.misconceptionId || distObj.whyFails || "kebiasaan malas berpikir atau salah mengartikan konteks.";
+      var isId = njIsId();
+      var ruleText = isId
+        ? ((picked.explanation && (picked.explanation.ruleId || picked.explanation.rule)) || "Perhatikan konteks waktu dan kesesuaian subjek.")
+        : ((picked.explanation && (picked.explanation.rule || picked.explanation.ruleId)) || "Pay attention to time context and subject agreement.");
+      var miscText = isId
+        ? (distObj.whyFailsId || distObj.misconceptionId || distObj.whyFails || "kebiasaan malas berpikir atau salah mengartikan konteks.")
+        : (distObj.whyFails || distObj.misconception || distObj.whyFailsId || "autopilot habit or misreading the sentence context.");
 
       return {
         id: picked.id || ("NJ-" + Math.random().toString(36).slice(2, 7)),
@@ -396,6 +435,7 @@
         misconceptionCategory: distObj.misconception || "auditory_trap",
         misconceptionText: miscText,
         rule: ruleText,
+        ruleEn: (picked.explanation && (picked.explanation.rule || picked.explanation.ruleId)) || "Pay attention to time context and subject agreement.",
         cefr: picked.cefr || userCefr,
         skillId: picked.subskill || picked.family || "grammar"
       };
@@ -472,12 +512,12 @@
 
     if (typeof scriptOrTextEn === 'object' && scriptOrTextEn !== null) {
       scriptId = scriptOrTextEn.id || '';
-      speechText = scriptOrTextEn.text_id || scriptOrTextEn.text_en || '';
+      speechText = njTxt(scriptOrTextEn);
     } else if (typeof maybeTextId === 'object' && maybeTextId !== null) {
       scriptId = maybeTextId.id || '';
-      speechText = maybeTextId.text_id || maybeTextId.text_en || '';
+      speechText = njTxt(maybeTextId);
     } else {
-      speechText = maybeTextId || scriptOrTextEn || '';
+      speechText = njIsId() ? (maybeTextId || scriptOrTextEn || '') : (scriptOrTextEn || maybeTextId || '');
       scriptId = maybeScriptId || '';
     }
 
@@ -735,13 +775,13 @@
     if (!screenEl) { callback(); return; }
     var overlay = doc.createElement('div');
     overlay.className = 'nujum-ready-overlay';
-    overlay.innerHTML = '<div class="nujum-ready-count">⚡</div><div class="nujum-ready-label">BERSIAP...</div>';
+    overlay.innerHTML = '<div class="nujum-ready-count">⚡</div><div class="nujum-ready-label">' + esc(njTxt('GET READY...', 'BERSIAP...')) + '</div>';
     screenEl.appendChild(overlay);
 
     setTimeout(function () {
       if (!overlay.parentNode) return;
       overlay.querySelector('.nujum-ready-count').textContent = '1';
-      overlay.querySelector('.nujum-ready-label').textContent = 'MULAI!';
+      overlay.querySelector('.nujum-ready-label').textContent = njTxt('GO!', 'MULAI!');
       setTimeout(function () {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
         callback();
@@ -934,16 +974,16 @@
     speakMachine(toScript);
 
     var doubleLossBanner = nujumState.isDoubleDown
-      ? '<div class="nujum-verdict-banner-loss">⚠️ DOUBLE DOWN GAGAL KARENA TIMEOUT (+2 POIN MESIN)</div>'
+      ? '<div class="nujum-verdict-banner-loss">' + njPick('⚠️ DOUBLE DOWN FAILED DUE TO TIMEOUT (+2 MACHINE PTS)', '⚠️ DOUBLE DOWN GAGAL KARENA TIMEOUT (+2 POIN MESIN)') + '</div>'
       : '';
 
     showVerdict([
       '<div class="nujum-loss-card is-timeout">',
-      '  <div class="nujum-loss-title">⏱️ WAKTU HABIS (+' + points + ' POIN MESIN)</div>',
+      '  <div class="nujum-loss-title">' + njPick('⏱️ TIME UP (+' + points + ' MACHINE PTS)', '⏱️ WAKTU HABIS (+' + points + ' POIN MESIN)') + '</div>',
       doubleLossBanner,
-      '  <div class="nujum-loss-quote">«' + toScript.text_id + '»</div>',
+      '  <div class="nujum-loss-quote">«' + njTxt(toScript) + '»</div>',
       '  <div class="nujum-loss-pattern">',
-      '    <b>Bentuk benar:</b> «' + q.options[q.correctIndex] + '». ' + q.rule,
+      '    <b>' + njPick('Correct form:', 'Bentuk benar:') + '</b> «' + q.options[q.correctIndex] + '». ' + njRule(q),
       '  </div>',
       '  <div style="display:flex;flex-direction:column;gap:6px">',
       '    <button class="nujum-dispute-btn" id="nujumDisputeBtn">' + t('nujum.dispute_claim', '⚡ SANGGAH KLAIM (Buktikan 3 Soal)') + '</button>',
@@ -1040,14 +1080,14 @@
       speakMachine(swScript);
 
       var doubleDownBanner = nujumState.isDoubleDown
-        ? '<div style="background:#FEF3C7;color:#92400E;border:1px solid #D97706;padding:4px 8px;border-radius:6px;font-weight:800;font-size:0.75rem;margin-bottom:8px">🔥 DOUBLE DOWN BERHASIL (+2 POIN KAMU)</div>'
+        ? '<div style="background:#FEF3C7;color:#92400E;border:1px solid #D97706;padding:4px 8px;border-radius:6px;font-weight:800;font-size:0.75rem;margin-bottom:8px">' + njPick('🔥 DOUBLE DOWN WON (+2 PTS YOU)', '🔥 DOUBLE DOWN BERHASIL (+2 POIN KAMU)') + '</div>'
         : '';
 
       showVerdict([
         '<div class="nujum-win-card">',
-        '  <div class="nujum-win-title">✦ TARUHAN MESIN PATAH (-' + nujumState.currentBet + '%)</div>',
+        '  <div class="nujum-win-title">' + njPick('✦ MACHINE BET BROKEN (-' + nujumState.currentBet + '%)', '✦ TARUHAN MESIN PATAH (-' + nujumState.currentBet + '%)') + '</div>',
         doubleDownBanner,
-        '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:8px;line-height:1.45">«' + swScript.text_id + '» Jawaban benar: <b>' + q.options[q.correctIndex] + '</b>. ' + q.rule + '</div>',
+        '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:8px;line-height:1.45">«' + njTxt(swScript) + '» ' + t('stage.chat-benar', 'Jawaban benar: ').trim() + ' <b>' + q.options[q.correctIndex] + '</b>. ' + njRule(q) + '</div>',
         '  <button class="nujum-teleport-btn" id="nujumNextRoundBtn" style="background:#059669;margin-top:6px">' + t('nujum.next_duel', 'Lanjut Duel Berikutnya →') + '</button>',
         '</div>'
       ].join(''));
@@ -1089,16 +1129,16 @@
       speakMachine(mwScript);
 
       var doubleLossBanner = nujumState.isDoubleDown
-        ? '<div style="background:#FEE2E2;color:#991B1B;border:1px solid #DC2626;padding:4px 8px;border-radius:6px;font-weight:800;font-size:0.75rem;margin-bottom:8px">⚠️ DOUBLE DOWN GAGAL (+2 POIN MESIN)</div>'
+        ? '<div style="background:#FEE2E2;color:#991B1B;border:1px solid #DC2626;padding:4px 8px;border-radius:6px;font-weight:800;font-size:0.75rem;margin-bottom:8px">' + njPick('⚠️ DOUBLE DOWN FAILED (+2 MACHINE PTS)', '⚠️ DOUBLE DOWN GAGAL (+2 POIN MESIN)') + '</div>'
         : '';
 
       showVerdict([
         '<div class="nujum-loss-card">',
-        '  <div class="nujum-loss-title">✕ MESIN MENANG (' + nujumState.currentBet + '%)</div>',
+        '  <div class="nujum-loss-title">' + njPick('✕ MACHINE WON (' + nujumState.currentBet + '%)', '✕ MESIN MENANG (' + nujumState.currentBet + '%)') + '</div>',
         doubleLossBanner,
-        '  <div class="nujum-loss-quote">«' + mwScript.text_id + '»</div>',
+        '  <div class="nujum-loss-quote">«' + njTxt(mwScript) + '»</div>',
         '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 10px;font-size:0.75rem;margin-bottom:10px;color:#FECDD3">',
-        '    <b>Bentuk benar:</b> «' + q.options[q.correctIndex] + '». ' + q.rule,
+        '    <b>' + njPick('Correct form:', 'Bentuk benar:') + '</b> «' + q.options[q.correctIndex] + '». ' + njRule(q),
         '  </div>',
         '  <div style="display:flex;flex-direction:column;gap:6px">',
         '    <button class="nujum-dispute-btn" id="nujumDisputeBtn">' + t('nujum.dispute_claim', '⚡ SANGGAH KLAIM (Buktikan 3 Soal)') + '</button>',
@@ -1156,28 +1196,28 @@
 
     showVerdict([
       '<div class="nujum-surrender-sanctum">',
-      '  <div class="nujum-surrender-sanctum-badge">✦ PROTOKOL KEJUJURAN KOGNITIF (TIDAK DI-ROAST)</div>',
-      '  <div class="nujum-surrender-sanctum-quote">«' + srScript.text_id + '»</div>',
+      '  <div class="nujum-surrender-sanctum-badge">' + njPick('✦ COGNITIVE HONESTY PROTOCOL (NO ROAST)', '✦ PROTOKOL KEJUJURAN KOGNITIF (TIDAK DI-ROAST)') + '</div>',
+      '  <div class="nujum-surrender-sanctum-quote">«' + njTxt(srScript) + '»</div>',
       '  <div class="nujum-echo-player-card">',
       '    <div class="nujum-echo-top"><span>ECHO REDEMPTION AUDIO</span><span>VOICE: NATIVE EDUCATOR</span></div>',
       '    <div class="nujum-echo-body">',
-      '      <button class="nujum-echo-play-btn" id="nujumEchoPlayBtn" aria-label="Putar audio echo redemption">',
+      '      <button class="nujum-echo-play-btn" id="nujumEchoPlayBtn" aria-label="' + njPick('Play echo redemption audio', 'Putar audio echo redemption') + '">',
       '        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
       '      </button>',
       '      <div>',
       '        <div class="nujum-echo-sentence">«' + fullCorrectSentence + '»</div>',
-      '        <div style="font-size:0.68rem;color:var(--nj-text-muted);font-family:var(--nj-font-mono);margin-top:2px">Dengarkan & ikuti bentuk yang benar</div>',
+      '        <div style="font-size:0.68rem;color:var(--nj-text-muted);font-family:var(--nj-font-mono);margin-top:2px">' + njPick('Listen & repeat the correct form', 'Dengarkan & ikuti bentuk yang benar') + '</div>',
       '      </div>',
       '    </div>',
       '  </div>',
       '  <div style="text-align:center;margin:4px 0">',
       '    <button class="nujum-echo-record-btn" id="nujumEchoMicBtn">',
       '      <span>🎙️</span>',
-      '      <span>Ucapkan Bentuk yang Benar</span>',
+      '      <span>' + njPick('Speak the Correct Form', 'Ucapkan Bentuk yang Benar') + '</span>',
       '    </button>',
       '    <div id="nujumEchoFeedback" style="margin-top:6px"></div>',
       '  </div>',
-      '  <div class="nujum-kaidah-card"><b>Kaidah:</b> ' + q.rule + '</div>',
+      '  <div class="nujum-kaidah-card"><b>' + njPick('Rule:', 'Kaidah:') + '</b> ' + njRule(q) + '</div>',
       '  <div style="display:flex;flex-direction:column;gap:6px">',
       '    <button class="nujum-teleport-btn" id="nujumTeleportPracticeBtn">',
       '      <span>🚀</span> ' + t('nujum.teleport_practice', 'Latih Materi Ini Sekarang (Modul Latihan) →'),
@@ -1323,13 +1363,13 @@
     appEl.innerHTML = [
       '<div class="nujum-screen">',
       '  <div class="nujum-topbar">',
-      '    <span class="nujum-pill-tag"><span class="pulse-dot" style="background:#F59E0B"></span> NEGOSIASI OLM AKTIF</span>',
+      '    <span class="nujum-pill-tag"><span class="pulse-dot" style="background:#F59E0B"></span> ' + njPick('ACTIVE OLM NEGOTIATION', 'NEGOSIASI OLM AKTIF') + '</span>',
       '    <button class="nujum-back-btn" id="nujumCancelDisputeBtn">' + t('nujum.cancel_dispute', 'Batal Sanggah') + '</button>',
       '  </div>',
       '  <div class="nujum-bet-card" style="border-color:#F59E0B">',
-      '    <div class="nujum-bet-label" style="color:#F59E0B">SANGGAHAN DIAJUKAN</div>',
-      '    <div class="nujum-claim-statement">«' + dsScript.text_id + '»</div>',
-      '    <div class="nujum-bet-rationale">Aturan OLM FIEZEL: Sanggahan yang berhasil menaikkan varians model dan menghapus label miskonsepsi dari ledgermu.</div>',
+      '    <div class="nujum-bet-label" style="color:#F59E0B">' + njPick('DISPUTE SUBMITTED', 'SANGGAHAN DIAJUKAN') + '</div>',
+      '    <div class="nujum-claim-statement">«' + njTxt(dsScript) + '»</div>',
+      '    <div class="nujum-bet-rationale">' + njPick('FIEZEL OLM Rule: A successful dispute increases model variance and clears the misconception label from your ledger.', 'Aturan OLM FIEZEL: Sanggahan yang berhasil menaikkan varians model dan menghapus label miskonsepsi dari ledgermu.') + '</div>',
       '  </div>',
       '  <div id="nujumDisputeProbeArea" style="text-align:center;padding:16px 0">',
       '    <button class="nujum-opt-btn" id="nujumStartProbesBtn" style="background:#F59E0B;color:#000;font-weight:800;padding:16px 24px;border-radius:12px">' + t('nujum.start_dispute', 'Mulai Pembuktian 3 Soal →') + '</button>',
@@ -1375,11 +1415,11 @@
       '<div class="nujum-screen">',
       '  <div class="nujum-topbar">',
       '    <span class="nujum-pill-tag"><span class="pulse-dot" style="background:#F59E0B"></span> PROBE ' + (nujumState.disputeIndex + 1) + '/3</span>',
-      '    <span class="nujum-diag-tag" id="nujumProbeTimerLabel">Waktu: 10s</span>',
+      '    <span class="nujum-diag-tag" id="nujumProbeTimerLabel">' + njPick('Time:', 'Waktu:') + ' 10s</span>',
       '  </div>',
       '  <div class="nujum-probe-wrap">',
       '    <div class="nujum-probe-header">',
-      '      <span>PEMBUKTIAN KOGNITIF KILAT</span>',
+      '      <span>' + njPick('RAPID COGNITIVE VERIFICATION', 'PEMBUKTIAN KOGNITIF KILAT') + '</span>',
       '      <div class="nujum-probe-pips">' + pipsHtml + '</div>',
       '    </div>',
       '    <div class="nujum-probe-timer-rail">',
@@ -1394,7 +1434,7 @@
       '  </div>',
       '  <div class="nujum-footer">',
       '    <span>DISPUTE TRIAL ACTIVE</span>',
-      '    <span>TARGET: 3/3 BENAR</span>',
+      '    <span>' + njPick('TARGET: 3/3 CORRECT', 'TARGET: 3/3 BENAR') + '</span>',
       '  </div>',
       '</div>'
     ].join('');
@@ -1405,7 +1445,7 @@
       timeLeft--;
       var lbl = doc.getElementById('nujumProbeTimerLabel');
       var bar = doc.getElementById('nujumProbeTimerBar');
-      if (lbl) lbl.textContent = 'Waktu: ' + timeLeft + 's';
+      if (lbl) lbl.textContent = njPick('Time: ', 'Waktu: ') + timeLeft + 's';
       if (bar) bar.style.width = (timeLeft * 10) + '%';
 
       if (timeLeft <= 0) {
@@ -1479,16 +1519,16 @@
       appEl.innerHTML = [
         '<div class="nujum-screen">',
         '  <div class="nujum-topbar">',
-        '    <span class="nujum-pill-tag" style="background:#10B981;color:#fff">✦ SANGGAHAN BERHASIL</span>',
+        '    <span class="nujum-pill-tag" style="background:#10B981;color:#fff">' + njPick('✦ DISPUTE WON', '✦ SANGGAHAN BERHASIL') + '</span>',
         '  </div>',
         '  <div class="nujum-win-card" style="margin-top:20px">',
-        '    <div class="nujum-win-title">3/3 SOAL TERJAWAB BENAR (+1 POIN)</div>',
-        '    <div style="font-size:0.92rem;font-weight:700;line-height:1.5;margin:8px 0">«' + dwScript.text_id + '»</div>',
+        '    <div class="nujum-win-title">' + njPick('3/3 ANSWERED CORRECTLY (+1 PT)', '3/3 SOAL TERJAWAB BENAR (+1 POIN)') + '</div>',
+        '    <div style="font-size:0.92rem;font-weight:700;line-height:1.5;margin:8px 0">«' + njTxt(dwScript) + '»</div>',
         '    <div style="background:#fff;border:1px solid #10B981;padding:10px;border-radius:10px;font-family:var(--nj-font-mono);font-size:0.75rem;color:#165646">',
         '      ' + t('nujum.dispute_status_revoked', 'Status: Label miskonsepsi DICABUT dari ledgermu.') + '<br>',
-        '      BKT Mastery Estimate naik ke: <b>' + Math.round(nujumState.bktMean * 100) + '%</b>.',
+        '      ' + njPick('BKT Mastery Estimate raised to:', 'BKT Mastery Estimate naik ke:') + ' <b>' + Math.round(nujumState.bktMean * 100) + '%</b>.',
         '    </div>',
-        '    <button class="nujum-teleport-btn" id="nujumDisputeContinueBtn" style="background:#059669;margin-top:10px">Lanjut Duel Berikutnya →</button>',
+        '    <button class="nujum-teleport-btn" id="nujumDisputeContinueBtn" style="background:#059669;margin-top:10px">' + t('nujum.next_duel', 'Lanjut Duel Berikutnya →') + '</button>',
         '  </div>',
         '</div>'
       ].join('');
@@ -1504,15 +1544,15 @@
       appEl.innerHTML = [
         '<div class="nujum-screen">',
         '  <div class="nujum-topbar">',
-        '    <span class="nujum-pill-tag" style="background:#F43F5E;color:#fff">✕ SANGGAHAN GAGAL</span>',
+        '    <span class="nujum-pill-tag" style="background:#F43F5E;color:#fff">' + njPick('✕ DISPUTE FAILED', '✕ SANGGAHAN GAGAL') + '</span>',
         '  </div>',
         '  <div class="nujum-loss-card" style="margin-top:20px">',
-        '    <div class="nujum-loss-title">HANYA ' + nujumState.disputeCorrectCount + '/3 BENAR</div>',
-        '    <div class="nujum-loss-quote">«' + dlScript.text_id + '»</div>',
+        '    <div class="nujum-loss-title">' + njPick('ONLY ', 'HANYA ') + nujumState.disputeCorrectCount + njPick('/3 CORRECT', '/3 BENAR') + '</div>',
+        '    <div class="nujum-loss-quote">«' + njTxt(dlScript) + '»</div>',
         '    <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:10px;font-size:0.75rem;color:#FECDD3">',
         '      ' + t('nujum.dispute_status_failed', 'Status: Tuduhan mesin tetap berlaku. Masuk ke ruang latihan dan latih polanya.') + '',
         '    </div>',
-        '    <button class="nujum-next-btn" id="nujumDisputeContinueBtn" style="margin-top:10px">Terima & Lanjut Ronde →</button>',
+        '    <button class="nujum-next-btn" id="nujumDisputeContinueBtn" style="margin-top:10px">' + t('nujum.accept_next', 'Terima & Lanjut Ronde →') + '</button>',
         '  </div>',
         '</div>'
       ].join('');
@@ -1559,13 +1599,13 @@
 
     // Progressive timer display
     var timerDuration = getRoundTimerDuration();
-    var roundLabel = (nujumState.roundIndex >= 7) ? 'FINAL' : 'Ronde ' + (nujumState.roundIndex + 1) + '/8';
-    var roundPhase = (nujumState.roundIndex <= 2) ? 'STANDAR' : (nujumState.roundIndex <= 4) ? 'INTENSIF' : (nujumState.roundIndex <= 6) ? 'KRITIS' : '⚡ ALL-IN';
+    var roundLabel = (nujumState.roundIndex >= 7) ? 'FINAL' : njPick('Round ', 'Ronde ') + (nujumState.roundIndex + 1) + '/8';
+    var roundPhase = (nujumState.roundIndex <= 2) ? njPick('STANDARD', 'STANDAR') : (nujumState.roundIndex <= 4) ? njPick('INTENSIVE', 'INTENSIF') : (nujumState.roundIndex <= 6) ? njPick('CRITICAL', 'KRITIS') : '⚡ ALL-IN';
 
     // Shield break bonus banner
     var shieldBanner = '';
     if (nujumState.machineShield <= 0 && nujumState.scoreKamu > 0) {
-      shieldBanner = '<div class="nujum-shield-destroyed-banner">🛡️ SHIELD MESIN HANCUR — RONDE BONUS AKTIF (+15s)</div>';
+      shieldBanner = '<div class="nujum-shield-destroyed-banner">' + njPick('🛡️ MACHINE SHIELD SHATTERED — BONUS ROUND ACTIVE (+15s)', '🛡️ SHIELD MESIN HANCUR — RONDE BONUS AKTIF (+15s)') + '</div>';
       timerDuration = 15.0;
     }
 
@@ -1574,16 +1614,16 @@
       '  <div class="nujum-topbar">',
       '    <button class="nujum-back-btn" id="nujumExitBtn">',
       '      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>',
-      '      <span>Keluar</span>',
+      '      <span>' + njPick('Exit', 'Keluar') + '</span>',
       '    </button>',
       '    <div class="nujum-round-pill">',
       '      <span>' + roundLabel + '</span>',
       '      <span class="nujum-phase-tag">' + roundPhase + '</span>',
       '    </div>',
       '    <div class="nujum-scoreboard" id="nujumScorePill">',
-      '      <span class="score-mesin">MESIN <b>' + nujumState.scoreMesin + '</b> <small id="nujumShieldText">(' + nujumState.machineShield + '%)</small></span>',
+      '      <span class="score-mesin">' + njPick('MACHINE', 'MESIN') + ' <b>' + nujumState.scoreMesin + '</b> <small id="nujumShieldText">(' + nujumState.machineShield + '%)</small></span>',
       '      <span aria-hidden="true">⚡</span>',
-      '      <span class="score-kamu"><b>' + nujumState.scoreKamu + '</b> KAMU</span>',
+      '      <span class="score-kamu"><b>' + nujumState.scoreKamu + '</b> ' + njPick('YOU', 'KAMU') + '</span>',
       '    </div>',
       '  </div>',
 
@@ -1599,24 +1639,24 @@
       '  <div class="nujum-bet-banner">',
       '    <div class="nujum-bet-headline">',
       '      <div class="nujum-machine-presence">',
-      '        <div class="nujum-anima-core" id="nujumAnimaCore" aria-label="Mata mesin mentor Nujum">',
+      '        <div class="nujum-anima-core" id="nujumAnimaCore" aria-label="' + njPick('Nujum mentor core eye', 'Mata mesin mentor Nujum') + '">',
       '          <div class="nujum-core-ring ring-outer"></div>',
       '          <div class="nujum-core-ring ring-middle"></div>',
       '          <div class="nujum-core-pupil" id="nujumCorePupil"></div>',
       '        </div>',
       '        <div class="nujum-bet-badge">',
       '          <span class="pulse-dot"></span>',
-      '          <span>TARUHAN MESIN: <b id="nujumOddsNumber">' + nujumState.currentBet + '%</b></span>',
+      '          <span>' + njPick('MACHINE BET:', 'TARUHAN MESIN:') + ' <b id="nujumOddsNumber">' + nujumState.currentBet + '%</b></span>',
       '        </div>',
       '      </div>',
       '      <button class="nujum-double-down-btn" id="nujumDoubleDownBtn" type="button">',
       '        <span aria-hidden="true">🔥</span>',
-      '        <span>Tantang Balik</span>',
+      '        <span>' + njPick('Double Down', 'Tantang Balik') + '</span>',
       '        <span class="nujum-dd-tag">2x</span>',
       '      </button>',
       '    </div>',
       '    <div class="nujum-bet-taunt">',
-      '      «' + escapeHtml(pbScript.text_id) + '»',
+      '      «' + escapeHtml(njTxt(pbScript)) + '»',
       '    </div>',
       '  </div>',
 
@@ -1628,11 +1668,11 @@
       '  <div class="nujum-play-area" id="nujumPlayArea">',
       '    <div class="nujum-action-zone" id="nujumActionZone">',
       '      <div class="nujum-voice-hub">',
-      '        <button class="nujum-orb-btn" id="nujumMicBtn" aria-label="Tekan untuk bicara — ucapkan jawaban">',
+      '        <button class="nujum-orb-btn" id="nujumMicBtn" aria-label="' + njPick('Tap to speak — say your answer', 'Tekan untuk bicara — ucapkan jawaban') + '">',
       '          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>',
       '        </button>',
       '        <div class="nujum-voice-sub">',
-      '          <span class="nujum-voice-hint" id="nujumMicHint">Ucapkan atau ketuk pilihanmu:</span>',
+      '          <span class="nujum-voice-hint" id="nujumMicHint">' + njPick('Speak or tap your choice:', 'Ucapkan atau ketuk pilihanmu:') + '</span>',
       '          <canvas id="nujumWaveCanvas" class="nujum-wave-canvas" width="180" height="20" style="height:20px;width:100%"></canvas>',
       '          <div class="nujum-stt-preview" id="nujumSttPreview"></div>',
       '        </div>',
@@ -1679,7 +1719,7 @@
         if (screenEl) screenEl.classList.toggle('is-overdrive', nujumState.isDoubleDown);
         var labelSpan = ddBtn.querySelector('span:nth-child(2)');
         if (labelSpan) {
-          labelSpan.textContent = nujumState.isDoubleDown ? 'Double Down Aktif (2x Taruhan)!' : 'Tantang Balik';
+          labelSpan.textContent = nujumState.isDoubleDown ? njPick('Double Down Active (2x Bet)!', 'Double Down Aktif (2x Taruhan)!') : njPick('Double Down', 'Tantang Balik');
         }
         var oddsEl = doc.getElementById('nujumOddsNumber');
         if (oddsEl) {
@@ -1764,9 +1804,9 @@
     var pill = doc.getElementById('nujumScorePill');
     if (pill) {
       pill.innerHTML = [
-        '<span class="score-mesin">MESIN <b>' + nujumState.scoreMesin + '</b></span>',
+        '<span class="score-mesin">' + njPick('MACHINE', 'MESIN') + ' <b>' + nujumState.scoreMesin + '</b></span>',
         '<span>⚡</span>',
-        '<span class="score-kamu"><b>' + nujumState.scoreKamu + '</b> KAMU</span>'
+        '<span class="score-kamu"><b>' + nujumState.scoreKamu + '</b> ' + njPick('YOU', 'KAMU') + '</span>'
       ].join('');
     }
   }
@@ -1779,7 +1819,7 @@
     var playerWon = nujumState.scoreKamu > nujumState.scoreMesin;
     var draw = nujumState.scoreKamu === nujumState.scoreMesin;
 
-    var headline = playerWon ? "KAMU MENGALAHKAN MESIN" : draw ? "DUEL IMBANG" : "MESIN MEMBACA POLAMU";
+    var headline = playerWon ? njPick('YOU DEFEATED THE MACHINE', 'KAMU MENGALAHKAN MESIN') : draw ? njPick('DRAW', 'DUEL IMBANG') : njPick('MACHINE READ YOUR PATTERN', 'MESIN MEMBACA POLAMU');
     var color = playerWon ? "#10B981" : draw ? "#FFD700" : "#F43F5E";
 
     var fsCategory = playerWon ? "player_victory" : draw ? "draw" : "machine_victory";
@@ -1817,8 +1857,8 @@
     appEl.innerHTML = [
       '<div class="nujum-screen">',
       '  <div class="nujum-topbar">',
-      '    <span class="nujum-pill-tag">HASIL DUEL 8 RONDE</span>',
-      '    <button class="nujum-back-btn" id="nujumSummaryExitBtn">Ke Beranda</button>',
+      '    <span class="nujum-pill-tag">' + njPick('8-ROUND DUEL RESULT', 'HASIL DUEL 8 RONDE') + '</span>',
+      '    <button class="nujum-back-btn" id="nujumSummaryExitBtn">' + njPick('Home', 'Ke Beranda') + '</button>',
       '  </div>',
       '  <div class="nujum-duel-wrap">',
       '    <h1 style="color:' + color + ';font-size:1.6rem;font-weight:800;margin:0">' + headline + '</h1>',
@@ -1827,23 +1867,23 @@
       '      <span style="color:var(--nj-text-muted);font-size:3rem"> - </span>',
       '      <span style="color:#F43F5E">' + nujumState.scoreMesin + '</span>',
       '    </div>',
-      '    <div style="font-size:0.9rem;color:var(--nj-text-muted)">' + fsScript.text_id + '</div>',
-      (playerWon ? '    <div style="margin-top:8px"><span class="nujum-home-badge" style="background:#DDF3EA;color:#165646;border-color:#10B981">💎 REWARD +25 GEMS DITAMBAHKAN</span></div>' : ''),
+      '    <div style="font-size:0.9rem;color:var(--nj-text-muted)">' + njTxt(fsScript) + '</div>',
+      (playerWon ? '    <div style="margin-top:8px"><span class="nujum-home-badge" style="background:#DDF3EA;color:#165646;border-color:#10B981">' + njPick('💎 +25 GEMS REWARD ADDED', '💎 REWARD +25 GEMS DITAMBAHKAN') + '</span></div>' : ''),
       '  </div>',
 
       '  <div class="nujum-broken-claims">',
-      '    <div class="nujum-broken-title">Klaim Taruhan Mesin yang Kamu Patahkan:</div>',
+      '    <div class="nujum-broken-title">' + njPick('Machine Bet Claims You Broke:', 'Klaim Taruhan Mesin yang Kamu Patahkan:') + '</div>',
       '    <ul class="nujum-broken-list">',
       nujumState.brokenClaims.length > 0
         ? nujumState.brokenClaims.map(function (c) {
-            return '<li class="nujum-broken-item">Taruhan <b>' + c.bet + '%</b> meleset: kamu mengucapkan «' + c.actual + '» (mesin memprediksi «' + c.predicted + '»).</li>';
+            return '<li class="nujum-broken-item">' + njPick('Bet ', 'Taruhan ') + '<b>' + c.bet + '%</b> ' + njPick('missed: you answered «', 'meleset: kamu mengucapkan «') + c.actual + njPick('» (machine predicted «', '» (mesin memprediksi «') + c.predicted + '»).</li>';
           }).join('')
         : '<li style="color:var(--nj-text-muted);font-style:italic">' + t('nujum.empty_victories', 'Belum ada taruhan yang dipatahkan di sesi ini.') + '</li>',
       '    </ul>',
       '  </div>',
 
       '  <div style="display:flex;flex-direction:column;gap:12px;margin-top:auto">',
-      '    <button class="nujum-opt-btn" id="nujumRematchBtn" style="background:var(--nj-maroon);color:#fff;border-color:#F43F5E;font-size:1.1rem;padding:16px;font-weight:700">Tantang 8 Taruhan Lagi →</button>',
+      '    <button class="nujum-opt-btn" id="nujumRematchBtn" style="background:var(--nj-maroon);color:#fff;border-color:#F43F5E;font-size:1.1rem;padding:16px;font-weight:700">' + njPick('Challenge 8 More Rounds →', 'Tantang 8 Taruhan Lagi →') + '</button>',
       '    <button class="nujum-opt-btn" id="nujumReturnHomeBtn">' + t('nujum.return_home', 'Kembali ke Beranda') + '</button>',
       '  </div>',
       '</div>'

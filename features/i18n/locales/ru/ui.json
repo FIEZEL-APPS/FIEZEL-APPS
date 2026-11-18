@@ -4879,5 +4879,9 @@
   "mandarin.chapter_word": "УРОК",
   "mandarin.reorder_hint": "Порядок слов в китайском: Подлежащее + Время + Место + Глагол + Дополнение.",
   "mandarin.reorder_pattern_hint": "Ставьте время и место перед глаголом.",
-  "story.cat-teknologi": "Технологии и путешествия"
+  "story.cat-teknologi": "Технологии и путешествия",
+  "onboarding.ja-meaning-go": "идти",
+  "mandarin.level-0-tab": "Основы (Ур. 0)",
+  "mandarin.level-7-tab": "Ур. 7 (Дискурс)",
+  "mandarin.level-8-tab": "Ур. 8 (Литература)"
 }

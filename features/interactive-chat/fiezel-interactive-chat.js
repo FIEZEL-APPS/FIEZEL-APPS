@@ -83,7 +83,7 @@
         }
       }
 
-      var locale = 'id';
+      var locale = 'en';
       try {
         var rawUiLoc = '';
         if (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function') {
@@ -91,14 +91,31 @@
         }
         if (!rawUiLoc && typeof localStorage !== 'undefined') {
           rawUiLoc = String(
+            localStorage.getItem('fiezel_lang_chosen') ||
             localStorage.getItem('fz_ui_lang') ||
             localStorage.getItem('fiezel-ui-lang') ||
             localStorage.getItem('fiezel_ui_lang') ||
             ''
           ).trim().toLowerCase();
         }
-        if (rawUiLoc && /^[a-z]{2}(?:-[a-z]{2,4})?$/.test(rawUiLoc)) {
+        if (rawUiLoc && /^[a-z]{2,3}(?:-[a-z]{2,4})?$/.test(rawUiLoc)) {
           locale = rawUiLoc.split('-')[0];
+        }
+      } catch (_) {}
+      try {
+        if (!root.__fzChatLocaleListener && root.FiezelI18n && typeof root.FiezelI18n.onChange === 'function') {
+          root.__fzChatLocaleListener = true;
+          root.FiezelI18n.onChange(function (newLoc) {
+            var clean = String(newLoc || '').trim().toLowerCase().split('-')[0];
+            if (!clean) return;
+            var fr = root.document && root.document.getElementById('fzMitraKaiwaStudioFrame');
+            if (fr) {
+              fr.setAttribute('data-locale', clean);
+              if (api && api.StudioBridge && typeof api.StudioBridge.send === 'function') {
+                api.StudioBridge.send('fz.shell.locale', { locale: clean });
+              }
+            }
+          });
         }
       } catch (_) {}
       var autoCall = '';
@@ -130,7 +147,9 @@
       if (api && typeof api.__setMounted === 'function') api.__setMounted(true);
       try { if (root.FiezelMochiCompanion && typeof root.FiezelMochiCompanion.pause === 'function') root.FiezelMochiCompanion.pause(); } catch (_) {}
       var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (autoCall ? '&autoCall=1' : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
-      var titleText = lang === 'ja' ? 'Mitra Kaiwa' : (lang === 'zh' ? 'Xiao Mochi (小麻薯)' : 'Kawan Bicara');
+      var titleText = lang === 'ja'
+        ? (locale === 'id' ? 'Mitra Kaiwa' : 'Kaiwa Partner')
+        : (lang === 'zh' ? 'Xiao Mochi (小麻薯)' : (locale === 'id' ? 'Kawan Bicara' : 'Speaking Partner'));
       mountPoint.innerHTML =
         '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
         '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone; camera; autoplay; display-capture; clipboard-write; microphone *; autoplay *; camera *" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
@@ -208,6 +227,20 @@
     } catch (_) {}
     if (s === undefined || s === k) s = (fb == null ? k : fb);
     return s;
+  }
+
+  function getUiLocale() {
+    try {
+      if (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function') {
+        var l = String(root.FiezelI18n.getLocale() || '').trim().toLowerCase();
+        if (l) return l.split('-')[0];
+      }
+      if (typeof localStorage !== 'undefined') {
+        var ls = localStorage.getItem('fiezel_lang_chosen') || localStorage.getItem('fz_ui_lang');
+        if (ls) return String(ls).trim().toLowerCase().split('-')[0];
+      }
+    } catch (_) {}
+    return 'en';
   }
 
   function esc(s) {
@@ -1432,18 +1465,20 @@
   // memeriksa kalimatnya (offline / mode hemat).
   function checkMisconception(text, course) {
     if (!text) return null;
-    var isTh = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+    var uiLoc = getUiLocale();
+    var isTh = (uiLoc === 'th');
+    var isId = (uiLoc === 'id');
     if (root.FiezelVoicePedagogy && typeof root.FiezelVoicePedagogy.analyzeUtterancePedagogy === 'function') {
       var pDiag = root.FiezelVoicePedagogy.analyzeUtterancePedagogy(text, state.scenarioId, course);
       if (pDiag && pDiag.ok === false && pDiag.misconceptionId) {
         return {
           id: pDiag.misconceptionId,
           title: course === 'ja'
-            ? (isTh ? 'ความเข้าใจผิดทางไวยากรณ์ภาษาญี่ปุ่น' : 'Miskonsepsi Tata Bahasa Jepang')
+            ? (isTh ? 'ความเข้าใจผิดทางไวยากรณ์ภาษาญี่ปุ่น' : (isId ? 'Miskonsepsi Tata Bahasa Jepang' : 'Japanese Grammar Misconception'))
             : (isTh ? 'ความเข้าใจผิดทางไวยากรณ์ภาษาอังกฤษ' : 'Grammar Misconception'),
           desc: isTh
-            ? (pDiag.whyFailsTh || pDiag.pedagogicalFeedbackTh || pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)
-            : (pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)
+            ? (pDiag.whyFailsTh || pDiag.pedagogicalFeedbackTh || pDiag.whyFailsEn || pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)
+            : (isId ? (pDiag.whyFailsId || pDiag.pedagogicalFeedbackId) : (pDiag.whyFailsEn || pDiag.pedagogicalFeedbackEn || pDiag.whyFailsId || pDiag.pedagogicalFeedbackId))
         };
       }
     }
@@ -1452,15 +1487,15 @@
       if (/(わたし|私|ぼく|僕)\s*わ/i.test(tRaw) || /わたしわ/.test(tRaw)) {
         return {
           id: 'particle_wa_ha',
-          title: t('chat_misc_wa_title', 'Tips Partikel は'),
-          desc: t('chat_misc_wa_desc', 'Partikel penanda topik "wa" selalu ditulis dengan hiragana「は」, bukan「わ」.')
+          title: t('chat_misc_wa_title', isId ? 'Tips Partikel は' : 'Particle は Tip'),
+          desc: t('chat_misc_wa_desc', isId ? 'Partikel penanda topik "wa" selalu ditulis dengan hiragana「は」, bukan「わ」.' : 'The topic marker "wa" is always written with hiragana 「は」, not 「わ」.')
         };
       }
       if (/これ\s*わ/i.test(tRaw) || /それ\s*わ/i.test(tRaw) || /あれ\s*わ/i.test(tRaw)) {
         return {
           id: 'particle_wa_pronoun',
-          title: t('chat_misc_wa_pron_title', 'Tips Partikel は'),
-          desc: t('chat_misc_wa_pron_desc', 'Gunakan hiragana「は」untuk partikel penanda topik (contoh: これは / それは).')
+          title: t('chat_misc_wa_pron_title', isId ? 'Tips Partikel は' : 'Particle は Tip'),
+          desc: t('chat_misc_wa_pron_desc', isId ? 'Gunakan hiragana「は」untuk partikel penanda topik (contoh: これは / それは).' : 'Use hiragana 「は」 as the topic particle (e.g., これは / それは).')
         };
       }
       // 〜たい (ラーメンが食べたい) dan kata kerja potensial/spontan (見える, 聞こえる) WAJAR
@@ -1469,15 +1504,15 @@
       if (/[がガ]\s*(食べ|たべ|飲み|のみ|買い|勉強し|べんきょうし)(?!たい|たく|たかった)/.test(tRaw)) {
         return {
           id: 'particle_o_vs_ga',
-          title: t('chat_misc_o_ga_title', 'Tips Partikel を vs が'),
-          desc: t('chat_misc_o_ga_desc', 'Gunakan partikel penanda objek「を」untuk kata kerja yang dikenai aksi (contoh: ラーメンを食べます).')
+          title: t('chat_misc_o_ga_title', isId ? 'Tips Partikel を vs が' : 'Particles を vs が Tip'),
+          desc: t('chat_misc_o_ga_desc', isId ? 'Gunakan partikel penanda objek「を」untuk kata kerja yang dikenai aksi (contoh: ラーメンを食べます).' : 'Use the object marker 「を」 for direct transitive actions (e.g., ラーメンを食べます).')
         };
       }
       if (/ですかか|ですか\s*か/.test(tRaw)) {
         return {
           id: 'particle_ka_repeat',
-          title: t('chat_misc_ka_rep_title', 'Partikel Tanya か'),
-          desc: t('chat_misc_ka_rep_desc', 'Partikel tanya「か」cukup digunakan satu kali di akhir kalimat tanya sopan.')
+          title: t('chat_misc_ka_rep_title', isId ? 'Partikel Tanya か' : 'Question Particle か'),
+          desc: t('chat_misc_ka_rep_desc', isId ? 'Partikel tanya「か」cukup digunakan satu kali di akhir kalimat tanya sopan.' : 'The question particle 「か」 only needs to appear once at the end of a polite question.')
         };
       }
       if (/ありがとう\s*ございます/i.test(tRaw) && !/ありがとう/i.test(tRaw)) {
@@ -1488,7 +1523,7 @@
         return {
           id: 'prep_since_vs_for',
           title: t('chat_misc_since_title', 'Preposition: For vs Since'),
-          desc: t('chat_misc_since_desc', 'Gunakan "for" untuk durasi rentang waktu (misal: for 3 years), dan "since" hanya untuk titik awal waktu (misal: since 2021).')
+          desc: t('chat_misc_since_desc', isId ? 'Gunakan "for" untuk durasi rentang waktu (misal: for 3 years), dan "since" hanya untuk titik awal waktu (misal: since 2021).' : 'Use "for" for durations (e.g. "for 3 years") and "since" only for starting points in time (e.g. "since 2021").')
         };
       }
       if (/\bi\s+am\s+agree\b/i.test(tRaw)) {
@@ -1576,16 +1611,20 @@
   function generateOfflineReply(userText, scenarioId, course, optionsOrLevel) {
     if (scenarioId && String(scenarioId).indexOf('scen_') === 0) {
       if (root.FiezelVoicePedagogy && typeof root.FiezelVoicePedagogy.analyzeUtterancePedagogy === 'function') {
-        var isTh = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+        var uiLocOff = getUiLocale();
+        var isTh = (uiLocOff === 'th');
+        var isIdOff = (uiLocOff === 'id');
         var pDiag = root.FiezelVoicePedagogy.analyzeUtterancePedagogy(userText, scenarioId, course);
         return {
           text: pDiag.aiReply,
           furigana: course === 'ja' ? pDiag.aiReply : null,
           romaji: null,
-          translation: isTh ? (pDiag.aiReplyTranslationTh || pDiag.aiReplyTranslationId) : pDiag.aiReplyTranslationId,
+          translation: isTh
+            ? (pDiag.aiReplyTranslationTh || pDiag.aiReplyTranslationEn || pDiag.aiReplyTranslationId)
+            : (isIdOff ? pDiag.aiReplyTranslationId : (pDiag.aiReplyTranslationEn || pDiag.aiReplyTranslationId)),
           grammarNote: isTh
-            ? (pDiag.whyFailsTh || pDiag.pedagogicalFeedbackTh || pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)
-            : (pDiag.whyFailsId || pDiag.pedagogicalFeedbackId),
+            ? (pDiag.whyFailsTh || pDiag.pedagogicalFeedbackTh || pDiag.whyFailsEn || pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)
+            : (isIdOff ? (pDiag.whyFailsId || pDiag.pedagogicalFeedbackId) : (pDiag.whyFailsEn || pDiag.pedagogicalFeedbackEn || pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)),
           suggestions: []
         };
       }
@@ -3016,8 +3055,9 @@
 
   // Prompt HANYA untuk jalur Puter (transport CF mati). Jalur CF mengabaikannya.
   function puterConversationPrompt(text, sc, course, isPhone, history) {
-    var target = course === 'ja' ? 'Japanese' : 'English';
-    var learnerLang = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th') ? 'Thai' : 'Indonesian';
+    var target = course === 'ja' ? 'Japanese' : (course === 'zh' ? 'Mandarin Chinese' : 'English');
+    var locNameMap = { id: 'Indonesian', th: 'Thai', ja: 'Japanese', ms: 'Malay', vi: 'Vietnamese', fil: 'Filipino', km: 'Khmer', ru: 'Russian', en: 'English' };
+    var learnerLang = locNameMap[getUiLocale()] || 'English';
     return [
       'You are FIEZEL, chatting in ' + target + ' with a language learner (level ' + getLearnerLevel() + ') in the situation "' + sc.title + '".',
       'Talk like a real friend in everyday life. Never lecture, never explain grammar, never grade the learner.',

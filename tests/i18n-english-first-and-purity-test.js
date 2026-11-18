@@ -152,4 +152,71 @@ check('5. Voice Studio supports 9 locales with English Golden Pivot and scenario
   assert(!vsApp.includes("'Transkrip Percakapan'") && !vsApp.includes("'Ketik pesan...'"), 'App.tsx Voice Studio must route History/Composer UI through i18n t()');
 });
 
+// 6-14: Track A-D English-first sidecar wiring, Voice Studio locale resolution & native module purity
+(() => {
+  const assertMod = require('assert');
+  const fsMod = require('fs');
+  const pathMod = require('path');
+  const rootDir = pathMod.resolve(__dirname, '..');
+  const readUtf8 = (rel) => fsMod.readFileSync(pathMod.join(rootDir, rel), 'utf8');
+  const readJson = (rel) => JSON.parse(readUtf8(rel));
+
+  // 6. index.html + sw.js precache registration for fiezel-en-loader.js
+  const idxHtml = readUtf8('index.html');
+  const swJs = readUtf8('sw.js');
+  assertMod.ok(idxHtml.includes('./features/i18n/fiezel-en-loader.js'), 'index.html loads fiezel-en-loader.js');
+  assertMod.ok(swJs.includes("'./features/i18n/fiezel-en-loader.js'"), 'sw.js precaches fiezel-en-loader.js');
+  passed++;
+  console.log('6. PASS: index.html & sw.js wire fiezel-en-loader.js');
+
+  // 7. All 11 EN sidecar files exist with expected cardinality & no ID instruction leaks
+  const sidecarChecks = [
+    ['vocabulary-en.json', (d) => Object.keys(d.entries || {}).length >= 2440],
+    ['features/i18n/cloze-bank-en.json', (d) => Object.keys(d.items || {}).length >= 436],
+    ['features/i18n/reading-bank-en.json', (d) => Object.keys(d.items || {}).length >= 312],
+    ['features/i18n/reading-exam-en.json', (d) => Object.keys(d.passages || {}).length >= 8 && !/\bberbasis\b|\bbacaan\b/i.test(String(d.honesty || ''))],
+    ['features/i18n/listening-bank-en.json', (d) => Object.keys(d.items || {}).length >= 1407],
+    ['features/i18n/listening-exam-en.json', (d) => Object.keys(d.sets || {}).length >= 8 && !/\bberbasis\b|\bbacaan\b/i.test(String(d.honesty || ''))],
+    ['features/i18n/speaking-bank-en.json', (d) => Object.keys(d.items || {}).length >= 53],
+    ['features/i18n/speaking-exam-en.json', (d) => !JSON.stringify(d.examFormats || {}).includes('berbasis teks') && !/\bberbasis\b/i.test(String(d.honesty || ''))],
+    ['features/i18n/jlpt-listening-en.json', (d) => Object.keys(d.items || {}).length >= 62],
+    ['features/i18n/japanese-en.json', (d) => Object.keys(d.vocab || {}).length >= 1984 && Object.keys(d.reading || {}).length >= 180],
+    ['features/i18n/mandarin-en.json', (d) => Object.keys(d.lessons || {}).length >= 192 && Object.keys(d.patterns || {}).length >= 192]
+  ];
+  for (const [rel, pred] of sidecarChecks) {
+    const abs = pathMod.join(rootDir, rel);
+    assertMod.ok(fsMod.existsSync(abs), `Missing EN sidecar: ${rel}`);
+    const parsed = readJson(rel);
+    assertMod.ok(pred(parsed), `EN sidecar schema/count check failed: ${rel}`);
+  }
+  passed++;
+  console.log('7. PASS: All 11 EN sidecars validated');
+
+  // 8-11. PWA app.js & native module overlay wiring
+  const appJs = readUtf8('app.js');
+  assertMod.ok(appJs.includes('FiezelOnEnDataReady') && appJs.includes('grammarItemForEn') && appJs.includes('vocabForLocale'), 'app.js wires FiezelEnData helpers');
+  const slAddon = readUtf8('features/speaking-listening/fiezel-speaking-listening-addon.js');
+  assertMod.ok(slAddon.includes('enExam') && slAddon.includes('enSpeakingExam'), 'speaking-listening addon wires EN sidecars');
+  const jlptJs = readUtf8('features/speaking-listening/fiezel-jlpt-listening.js');
+  assertMod.ok(jlptJs.includes('jlptEnEntry') && !jlptJs.includes("'quiz.wrong-default'"), 'JLPT listening uses jlptEnEntry and removes quiz.wrong-default');
+  const nujumJs = readUtf8('features/nujum/fiezel-nujum.js');
+  assertMod.ok(nujumJs.includes('njTxt') && nujumJs.includes('ruleEn:'), 'Nujum localizes UI & template rules via njTxt/ruleEn');
+  passed += 4;
+  console.log('8-11. PASS: PWA, Speaking/Listening, JLPT & Nujum EN overlays verified');
+
+  // 12-14. Voice Studio EN-first defaults, complete EN keys, & interactive-chat locale propagation
+  const vsBrain = readUtf8('features/voice-studio/src/lib/braincore.ts');
+  assertMod.ok(vsBrain.includes("learnerLocale: 'en'") && vsBrain.includes("'fiezel_lang_chosen'") && vsBrain.includes("'fil'") && vsBrain.includes("'km'"), 'Voice Studio defaults to en and reads fiezel_lang_chosen/onboarding/fil/km');
+  const vsI18n = readUtf8('features/voice-studio/src/lib/i18n.ts').replace(/\r\n/g, '\n');
+  const allVsKeys = new Set([...vsI18n.matchAll(/'([a-z]+\.[a-zA-Z0-9_]+)'\s*:/g)].map((m) => m[1]));
+  const enSlice = vsI18n.slice(vsI18n.indexOf('const EN_CORE'), vsI18n.indexOf('  id: {', vsI18n.indexOf('const MULTI_UI')));
+  const enVsKeys = new Set([...enSlice.matchAll(/'([a-z]+\.[a-zA-Z0-9_]+)'\s*:/g)].map((m) => m[1]));
+  const missingVsEn = [...allVsKeys].filter((k) => !enVsKeys.has(k));
+  assertMod.strictEqual(missingVsEn.length, 0, `Voice Studio EN missing keys: ${missingVsEn.join(', ')}`);
+  const chatJs = readUtf8('features/interactive-chat/fiezel-interactive-chat.js');
+  assertMod.ok(chatJs.includes("localStorage.getItem('fiezel_lang_chosen')") && chatJs.includes("'fz.shell.locale'") && chatJs.includes('locNameMap'), 'interactive-chat propagates locale and localizes prompt/feedback');
+  passed += 3;
+  console.log('12-14. PASS: Voice Studio & interactive-chat EN-first checks passed');
+})();
+
 console.log(`\nFIEZEL English-First & Global Purity: ${passed} checks passed.`);

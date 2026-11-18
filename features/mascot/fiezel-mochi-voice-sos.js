@@ -270,6 +270,60 @@
     'mochi-sos.bubble-correct-praise': 'ยอดเยี่ยมมาก! ตอบถูกแล้ว 🎉'
   };
 
+  var COPY_EN = {
+    'mochi-sos.bubble-tap': 'Tap me',
+    'mochi-sos.bubble-title': 'Voice chat live with Mochi for a hint',
+    'mochi-sos.badge-free': 'Free',
+    'mochi-sos.call-title': 'Mochi Call',
+    'mochi-sos.call-listening': 'Mochi is listening...',
+    'mochi-sos.call-speaking': 'Mochi is explaining...',
+    'mochi-sos.call-close-title': 'Tap to end call',
+    'mochi-sos.toast-insufficient': 'Not enough Gems ({balance}/{cost} 💎). Keep practicing to earn more!',
+    'mochi-sos.toast-refund': 'Brief call: {cost} Gems refunded 💎',
+    'mochi-sos.toast-cashback': 'Great job! Correct answer: +{reward} Gems cashback! 🎉',
+    'mochi-sos.intro-title': 'Live Mochi Voice Helper! ✨',
+    'mochi-sos.intro-body': 'Stuck on a question? Tap Mochi for live voice coaching without giving away the answer!',
+    'mochi-sos.intro-btn': 'Got it, let\'s practice!',
+    'mochi-sos.guide-rule-prefix': 'Mochi Hint: ',
+    'mochi-sos.guide-concept-prefix': 'This checks "{concept}" — look closely at the word form or particle!',
+    'mochi-sos.guide-default': 'Mochi is ready to help! Check the time marker or structure in this sentence.',
+    'mochi-sos.exam-locked': 'You\'ve got this! Mochi rests during assessment tests.',
+    'mochi-sos.greet-1': 'Hi! Mochi is here with you today — tap me anytime if you need a hint! ✨',
+    'mochi-sos.greet-2': 'Keep going! Mochi is right here whenever you want a quick hint.',
+    'mochi-sos.greet-3': 'Let\'s begin! Tap me anytime if you want to talk through a question!',
+    'mochi-sos.greet-listening': 'Hi! Listening round — focus on the audio first, and tap me if anything is unclear!',
+    'mochi-sos.greet-reading': 'Hi! Reading time — take it easy, and tap me if a tricky sentence comes up!',
+    'mochi-sos.greet-vocab': 'Hi! Vocabulary round — tap me anytime to explore word meanings together!',
+    'mochi-sos.greet-grammar': 'Hi! Grammar practice — watch the tense and structure, and tap me if you get stuck!',
+    'mochi-sos.greet-kanji': 'Hi! Kanji round — inspect the strokes and readings, tap me for a hint!',
+    'mochi-sos.greet-build': 'Hi! Let\'s build the sentence step by step — tap me if you get stuck!',
+    'mochi-sos.greet-cue': 'Hi! Mochi is ready whenever you need a hint — just tap me!',
+    'mochi-sos.leak-correction': '[SYSTEM FIEZEL: You almost revealed the answer. Never state the option letter or exact answer text. Rephrase as a 1-sentence Socratic hint.]',
+    'mochi-sos.connecting': 'Connecting Mochi...',
+    'mochi-sos.conn-connecting': 'Connecting Mochi voice...',
+    'mochi-sos.conn-reconnecting': 'Reconnecting Mochi voice...',
+    'mochi-sos.conn-offline': 'No internet connection — Mochi is waiting to reconnect',
+    'mochi-sos.conn-quota': 'AI quota busy — switching voice route...',
+    'mochi-sos.conn-error': 'AI connection issue — Tap to retry',
+    'mochi-sos.conn-retry': 'Retry',
+    'mochi-sos.toggle-on-title': 'Disable Mochi voice helper',
+    'mochi-sos.toggle-off-title': 'Enable Mochi voice helper',
+    'mochi-sos.toggle-label': 'Mochi Helper',
+    'mochi-sos.toggle-on-badge': 'ON',
+    'mochi-sos.toggle-off-badge': 'OFF',
+    'mochi-sos.toast-disabled': 'Mochi voice helper disabled',
+    'mochi-sos.toast-out-of-gems': 'Not enough Gems for the next question. Mochi helper closed safely.',
+    'mochi-sos.modal-confirm-title': 'Mochi SOS Voice Helper',
+    'mochi-sos.modal-confirm-body': 'Mochi will break down this question live with Gemini Live voice. Cost: 10 Gems (Balance: {balance} 💎). Cashback Bonus: answer right to earn +5 Gems back!',
+    'mochi-sos.modal-confirm-cancel': 'Cancel',
+    'mochi-sos.modal-confirm-ok': 'Use 10 Gems & Start',
+    'mochi-sos.modal-insufficient-title': 'Not Enough Gems 💎',
+    'mochi-sos.modal-insufficient-body': 'You need at least 2 Gems to analyze this question with Mochi AI voice (Balance: {balance} 💎). Finish practice questions to earn free Gems!',
+    'mochi-sos.modal-insufficient-btn': 'Understood',
+    'mochi-sos.bubble-wrong-hint': 'Stuck on this part? Tap Mochi and let\'s break it down together!',
+    'mochi-sos.bubble-correct-praise': 'Awesome! Spot-on analysis! 🎉'
+  };
+
   // Safe registration in canonical FiezelI18n
   if (root && root.FiezelI18n && typeof root.FiezelI18n.registerCopy === 'function') {
     try {
@@ -413,7 +467,8 @@
       }
     } catch (_) {}
     if (fallbackCandidate) return fallbackCandidate;
-    return getLocale() === 'th' ? 'เพื่อน' : 'Teman';
+    var loc = getLocale();
+    return loc === 'th' ? 'เพื่อน' : (loc === 'id' ? 'Teman' : 'Friend');
   }
 
   function t(key, fallback, vars) {
@@ -431,7 +486,9 @@
           if (I2 && typeof I2.getLocale === 'function') loc = I2.getLocale();
         }
       } catch (_) {}
-      var map = loc === 'th' ? (typeof COPY_TH !== 'undefined' ? COPY_TH : {}) : (typeof COPY_ID !== 'undefined' ? COPY_ID : {});
+      var map = loc === 'th'
+        ? (typeof COPY_TH !== 'undefined' ? COPY_TH : {})
+        : (loc === 'id' ? (typeof COPY_ID !== 'undefined' ? COPY_ID : {}) : (typeof COPY_EN !== 'undefined' ? COPY_EN : {}));
       s = map[key] || (fallback == null ? key : fallback);
     }
     if (vars && typeof vars === 'object') {

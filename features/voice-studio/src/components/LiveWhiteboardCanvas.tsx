@@ -28,6 +28,7 @@ import {
 } from './WhiteboardVisualDiagrams';
 import { MathText, splitMathSegments } from './MathText';
 import { layoutGraphToShapes } from '../lib/dagreLayout';
+import { wbPick } from '../lib/i18n';
 
 export type PenColor = '#2563EB' | '#DC2626' | '#059669' | '#D97706';
 
@@ -296,9 +297,9 @@ const RoughContrastScaleDiagram: React.FC<{
   const leftBoxRef = useRef<SVGSVGElement | null>(null);
   const rightBoxRef = useRef<SVGSVGElement | null>(null);
 
-  const termA = cleanBracketArtifacts(step.termA) || 'Konsep A';
+  const termA = cleanBracketArtifacts(step.termA) || wbPick('Concept A', 'Konsep A');
   const descA = cleanBracketArtifacts(step.descA);
-  const termB = cleanBracketArtifacts(step.termB) || 'Konsep B';
+  const termB = cleanBracketArtifacts(step.termB) || wbPick('Concept B', 'Konsep B');
   const descB = cleanBracketArtifacts(step.descB);
   const analogy = cleanBracketArtifacts(step.analogy);
   const effP = isLightbox ? 1 : queuedPreview ? 0.04 : progress;
@@ -387,11 +388,11 @@ const RoughContrastScaleDiagram: React.FC<{
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
         <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
           <span>⚖️</span>
-          <span>{cleanBracketArtifacts(step.title) || 'Diagram Timbangan Konsep'}</span>
+          <span>{cleanBracketArtifacts(step.title) || wbPick('Concept Balance Diagram', 'Diagram Timbangan Konsep')}</span>
         </div>
         <div className="flex items-center gap-2">
           {!isLightbox && isActive && isPlaying && effP > 0.02 && effP < 0.98 && (
-            <AnimatedTutorPenSvg label="Membandingkan..." />
+            <AnimatedTutorPenSvg label={wbPick('Comparing...', 'Membandingkan...')} />
           )}
           {!isLightbox && onZoomInspect && (
             <button
@@ -572,11 +573,11 @@ const RoughSyntaxFlowDiagram: React.FC<{
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
         <div className="text-[11px] font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
           <span>🚂</span>
-          <span>{cleanBracketArtifacts(step.title) || 'Alur Pola Kalimat'}</span>
+          <span>{cleanBracketArtifacts(step.title) || wbPick('Sentence Pattern Flow', 'Alur Pola Kalimat')}</span>
         </div>
         <div className="flex items-center gap-2">
           {!isLightbox && isActive && isPlaying && effP > 0.02 && effP < 0.98 && (
-            <AnimatedTutorPenSvg label="Menyusun alur..." />
+            <AnimatedTutorPenSvg label={wbPick('Building flow...', 'Menyusun alur...')} />
           )}
           {!isLightbox && onZoomInspect && (
             <button
@@ -586,7 +587,7 @@ const RoughSyntaxFlowDiagram: React.FC<{
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white hover:bg-[#EFF6FF] border border-[#CBD5E1] text-[10.5px] font-bold text-[#1E40AF] cursor-pointer"
             >
               <span>🔍</span>
-              <span>Perbesar</span>
+              <span>{wbPick('Zoom', 'Perbesar')}</span>
             </button>
           )}
         </div>
@@ -950,10 +951,10 @@ const RoughKanjiGridDiagram: React.FC<{
         <div className="min-w-[190px] flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#64748B]">
-              {targetLang === 'zh' || /hanzi/i.test(`${step.title || ''} ${step.spokenNarration || ''}`) ? 'HANZI' : kakijun.type.toUpperCase()} • {strokes.length > 0 ? `${strokes.length} GORESAN` : kakijun.strokeCount ? `${kakijun.strokeCount} GORESAN` : 'KANJIVG'}
+              {targetLang === 'zh' || /hanzi/i.test(`${step.title || ''} ${step.spokenNarration || ''}`) ? 'HANZI' : kakijun.type.toUpperCase()} • {strokes.length > 0 ? `${strokes.length} ${wbPick('STROKES', 'GORESAN')}` : kakijun.strokeCount ? `${kakijun.strokeCount} ${wbPick('STROKES', 'GORESAN')}` : 'KANJIVG'}
             </span>
             <span className="px-2 py-0.5 rounded-full bg-[#FEE2E2] text-[#B91C1C] text-[11px] font-bold">
-              {strokes.length > 0 ? `Goresan ${activeIdx + 1}/${strokes.length}` : 'Memuat goresan...'}
+              {strokes.length > 0 ? `${wbPick('Stroke', 'Goresan')} ${activeIdx + 1}/${strokes.length}` : wbPick('Loading strokes...', 'Memuat goresan...')}
             </span>
             {strokes.length > 0 && (
               <button
@@ -964,9 +965,9 @@ const RoughKanjiGridDiagram: React.FC<{
                     ? 'bg-[#E2E8F0] text-[#0F172A] border-[#94A3B8]'
                     : 'bg-white text-[#64748B] border-[#E2E8F0] hover:text-[#0F172A]'
                 }`}
-                title="Tampilkan / sembunyikan garis bayangan untuk latihan menjiplak"
+                title={wbPick('Show / hide trace guidelines', 'Tampilkan / sembunyikan garis bayangan untuk latihan menjiplak')}
               >
-                {showTraceGuide ? '👁 Tutup Jiplak' : '👁 Jiplak'}
+                {showTraceGuide ? wbPick('👁 Hide Trace', '👁 Tutup Jiplak') : wbPick('👁 Trace', '👁 Jiplak')}
               </button>
             )}
             {focusedStrokeIdx !== null && (
@@ -975,7 +976,7 @@ const RoughKanjiGridDiagram: React.FC<{
                 onClick={() => setFocusedStrokeIdx(null)}
                 className="px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11px] font-bold hover:bg-[#BBF7D0] cursor-pointer"
               >
-                ▶ Ikuti Tutor
+                {wbPick('▶ Follow Tutor', '▶ Ikuti Tutor')}
               </button>
             )}
           </div>
@@ -1012,7 +1013,7 @@ const RoughKanjiGridDiagram: React.FC<{
               type="button"
               data-testid={`kanji-stroke-step-${boxIdx + 1}`}
               onClick={() => setFocusedStrokeIdx(boxIdx)}
-              title={`Klik untuk lihat cara tulis Goresan ${boxIdx + 1}`}
+              title={wbPick(`Click to view stroke ${boxIdx + 1}`, `Klik untuk lihat cara tulis Goresan ${boxIdx + 1}`)}
               className={`group flex flex-col items-center p-1 rounded-xl border transition-all cursor-pointer ${
                 isSelected
                   ? 'border-[#DC2626] bg-[#FEF2F2] ring-2 ring-[#FCA5A5]/60 scale-105'
@@ -1967,19 +1968,19 @@ const RoughFreeformSceneDiagram: React.FC<{
       <div className="flex flex-wrap items-center justify-between gap-2 px-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#15803D] flex items-center gap-1.5">
-            <span>✦ {cleanBracketArtifacts(step.title) || 'Sketsa Visual Topik'}</span>
+            <span>✦ {cleanBracketArtifacts(step.title) || wbPick('Topic Visual Sketch', 'Sketsa Visual Topik')}</span>
           </span>
-          {penActive && <AnimatedTutorPenSvg color="#15803D" label="Menggambar..." />}
+          {penActive && <AnimatedTutorPenSvg color="#15803D" label={wbPick('Drawing...', 'Menggambar...')} />}
           {!isLightbox && onZoomInspect && (
             <button
               type="button"
               data-testid="wb-visual-zoom-btn"
               onClick={onZoomInspect}
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border border-[#E2D9C5] bg-white/95 text-[#334155] hover:bg-[#FEF3C7] hover:border-[#F59E0B] transition-colors cursor-pointer"
-              title="Perbesar diagram untuk melihat detail"
+              title={wbPick('Zoom in to inspect details', 'Perbesar diagram untuk melihat detail')}
             >
               <span>🔍</span>
-              <span>Perbesar</span>
+              <span>{wbPick('Zoom', 'Perbesar')}</span>
             </button>
           )}
         </div>
@@ -2664,7 +2665,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         {isQueued && (
           <div className="mb-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F1F5F9] border border-[#E2E8F0] text-[10px] font-bold text-[#64748B] pointer-events-none">
             <span className="w-1.5 h-1.5 rounded-full bg-[#94A3B8]" />
-            <span>Menunggu giliran {step.title ? `— ${step.title}` : ''}</span>
+            <span>{wbPick('Up next', 'Menunggu giliran')} {step.title ? `— ${step.title}` : ''}</span>
           </div>
         )}
         {showActivePen && (
@@ -2672,7 +2673,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
             data-testid="wb-active-pen-badge"
             className="fz-pen-float-badge absolute bottom-2 right-3 z-20 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/95 border border-[#86EFAC] shadow-xs pointer-events-none"
           >
-            <AnimatedTutorPenSvg color="#15803D" label="Tutor Menulis..." />
+            <AnimatedTutorPenSvg color="#15803D" label={wbPick('Tutor Writing...', 'Tutor Menulis...')} />
           </div>
         )}
         <div className={isQueued ? (step.kind === 'checkpoint' ? 'opacity-75 transition-opacity duration-300' : 'opacity-25 select-none transition-opacity duration-300') : 'fz-wb-card-enter'}>{node}</div>
@@ -3299,7 +3300,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     if (step.kind === 'checkpoint') {
       return wrapQueued(
         <div
-          data-wb-excerpt="Latihan Cek Pemahaman"
+          data-wb-excerpt={wbPick('Quick Check Practice', 'Latihan Cek Pemahaman')}
           className="relative z-30 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm p-3.5"
         >
           {quizSlot}
@@ -3359,7 +3360,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           {isPlaying && (
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2.5 py-0.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] animate-ping" />
-              <span>Tutor sedang menulis di papan...</span>
+              <span>{wbPick('Tutor is writing on the board...', 'Tutor sedang menulis di papan...')}</span>
             </span>
           )}
           {autoSpotlight && isPlaying && (
@@ -3370,16 +3371,16 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
               <span>🔍</span>
               <span>
                 {activeStepProgress > 0.84
-                  ? 'Zoom Out Transisi'
+                  ? wbPick('Zoom Out Transition', 'Zoom Out Transisi')
                   : activeStepProgress >= 0.015
-                    ? 'Zoom In Fokus'
-                    : 'Fokus Siap'}
+                    ? wbPick('Focus Zoom', 'Zoom In Fokus')
+                    : wbPick('Focus Ready', 'Fokus Siap')}
               </span>
             </span>
           )}
           {isPenActive && (
             <div className="flex items-center gap-1.5 bg-white border border-[#BFDBFE] px-2.5 py-0.5 rounded-full text-[11px] font-bold text-[#1D4ED8]">
-              <span>✏️ Mode Spidol Aktif — Lingkari bagian mana pun untuk bertanya</span>
+              <span>{wbPick('✏️ Pen Mode Active — Circle any part to ask', '✏️ Mode Spidol Aktif — Lingkari bagian mana pun untuk bertanya')}</span>
               {strokes.length > 0 && (
                 <>
                   <button
@@ -3400,7 +3401,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                     }}
                     className="underline text-[#DC2626] cursor-pointer"
                   >
-                    Hapus
+                    {wbPick('Clear', 'Hapus')}
                   </button>
                 </>
               )}

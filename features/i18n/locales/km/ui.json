@@ -4879,5 +4879,9 @@
   "mandarin.chapter_word": "មេរៀន",
   "mandarin.reorder_hint": "លំដាប់ពាក្យភាសាចិនប្រើទម្រង់ ប្រធាន + ពេលវេលា + ទីកន្លែង + កិរិយាសព្ទ + កម្មបទ។",
   "mandarin.reorder_pattern_hint": "ដាក់ពាក្យបង្ហាញពេលវេលា និងទីកន្លែងនៅមុខកិរិយាសព្ទ។",
-  "story.cat-teknologi": "បច្ចេកវិទ្យា និងការធ្វើដំណើរ"
+  "story.cat-teknologi": "បច្ចេកវិទ្យា និងការធ្វើដំណើរ",
+  "onboarding.ja-meaning-go": "ទៅ",
+  "mandarin.level-0-tab": "មូលដ្ឋាន (Lvl 0)",
+  "mandarin.level-7-tab": "Lvl 7 (សុន្ទរកថា)",
+  "mandarin.level-8-tab": "Lvl 8 (អក្សរសាស្ត្រ)"
 }

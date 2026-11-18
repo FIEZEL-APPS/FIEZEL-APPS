@@ -1106,7 +1106,7 @@
                   displayTok = 'I';
                 }
                 return `
-                  <button type="button" class="puzzle-placed-chip" onclick="FiezelGrammarVocabBridge.removePuzzleToken(${idx})" title="Ketuk untuk melepas">
+                  <button type="button" class="puzzle-placed-chip" onclick="FiezelGrammarVocabBridge.removePuzzleToken(${idx})" title="${t('grammar.token-lepas', 'Ketuk untuk melepas')}">
                     <span class="tok-text">${esc(displayTok)}</span>
                     <i data-lucide="x" class="chip-remove-icon"></i>
                   </button>

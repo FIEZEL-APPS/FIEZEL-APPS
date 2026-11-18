@@ -1434,7 +1434,7 @@ export default function App() {
     };
   }, []);
 
-  const locale: LearnerLocale = brainState.learnerLocale || 'id';
+  const locale: LearnerLocale = brainState.learnerLocale || 'en';
   const targetLang: TargetLang = brainState.targetLang || 'en';
 
   const scenariosForLang = CALL_SCENARIOS.filter((s) => s.targetLang === targetLang);
@@ -1818,7 +1818,9 @@ export default function App() {
       setStatusBanner(
         locale === 'th'
           ? 'ฟีเจอร์คุยสดกับ Fiezel ต้องการการเชื่อมต่ออินเทอร์เน็ตสำหรับการสนทนาแบบเรียลไทม์'
-          : 'Kawan Bicara membutuhkan koneksi internet aktif untuk percakapan Fiezel realtime.'
+          : locale === 'id'
+            ? 'Kawan Bicara membutuhkan koneksi internet aktif untuk percakapan Fiezel realtime.'
+            : 'Voice Partner requires an active internet connection for real-time Fiezel conversation.'
       );
     };
     const handleOnline = () => {
@@ -1865,7 +1867,11 @@ export default function App() {
 
     const initialLine = activePersona.openingGreeting || activeScenario.openingLine;
     const initialTransId =
-      activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId;
+      locale === 'id'
+        ? activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId
+        : activePersona.openingGreetingTranslationEn ||
+          scenarioMetaForLocale(locale, activeScenario).openingTranslation ||
+          '';
     const initialTransTh =
       activePersona.openingGreetingTranslationTh || activeScenario.openingTranslationTh;
     const effectiveTurns: CallTurn[] =
@@ -2022,7 +2028,11 @@ export default function App() {
       // Ignore
     }
     const transId =
-      activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId;
+      locale === 'id'
+        ? activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId
+        : activePersona.openingGreetingTranslationEn ||
+          scenarioMetaForLocale(locale, activeScenario).openingTranslation ||
+          '';
     const transTh =
       activePersona.openingGreetingTranslationTh || activeScenario.openingTranslationTh;
     const openingTurn: CallTurn = {
@@ -2128,7 +2138,12 @@ export default function App() {
       stopLiveCall();
     }
     const lineToSay = p.openingGreeting || matchingScen.openingLine;
-    const transId = p.openingGreetingTranslationId || matchingScen.openingTranslationId;
+    const transId =
+      locale === 'id'
+        ? p.openingGreetingTranslationId || matchingScen.openingTranslationId
+        : p.openingGreetingTranslationEn ||
+          scenarioMetaForLocale(locale, matchingScen).openingTranslation ||
+          '';
     const transTh = p.openingGreetingTranslationTh || matchingScen.openingTranslationTh;
     const newOpeningTurn: CallTurn = {
       id: `turn_open_${matchingScen.id}_${Date.now()}`,
@@ -2177,7 +2192,12 @@ export default function App() {
       stopLiveCall();
     }
     const lineToSay = p.openingGreeting || scen.openingLine;
-    const transId = p.openingGreetingTranslationId || scen.openingTranslationId;
+    const transId =
+      locale === 'id'
+        ? p.openingGreetingTranslationId || scen.openingTranslationId
+        : p.openingGreetingTranslationEn ||
+          scenarioMetaForLocale(locale, scen).openingTranslation ||
+          '';
     const transTh = p.openingGreetingTranslationTh || scen.openingTranslationTh;
     const newOpeningTurn: CallTurn = {
       id: `turn_open_${scen.id}_${Date.now()}`,
@@ -2614,7 +2634,9 @@ export default function App() {
           setStatusBanner(
             locale === 'th'
               ? 'เบราว์เซอร์บล็อกการเล่นอัตโนมัติ แตะ "เล่นเสียง" เพื่อฟังคำตอบ'
-              : 'Peramban menahan pemutaran otomatis. Ketuk "Putar Suara" untuk mendengar balasan.'
+              : locale === 'id'
+                ? 'Peramban menahan pemutaran otomatis. Ketuk "Putar Suara" untuk mendengar balasan.'
+                : 'Browser blocked autoplay. Tap "Play Voice" to hear the reply.'
           );
           break;
         }
@@ -2624,7 +2646,9 @@ export default function App() {
         setStatusBanner(
           locale === 'th'
             ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
-            : 'Suara Fiezel sedang menyambung ulang. Teks balasan tetap tampil, ketuk "Putar Suara" untuk mencoba lagi.'
+            : locale === 'id'
+              ? 'Suara Fiezel sedang menyambung ulang. Teks balasan tetap tampil, ketuk "Putar Suara" untuk mencoba lagi.'
+              : 'Fiezel voice is reconnecting. Text reply stays visible—tap "Play Voice" to retry.'
         );
       }
     } catch {
@@ -3175,7 +3199,7 @@ export default function App() {
     override?: Partial<VoiceUiAction>
   ): NonNullable<typeof learningWorkbench> => {
     const rawTitle = (override?.topicTitle || hintText || '').trim();
-    const title = rawTitle || 'Papan Belajar';
+    const title = rawTitle || (locale === 'id' ? 'Papan Belajar' : (locale === 'th' ? 'กระดานเรียนรู้' : 'Learning Board'));
 
     const isSswPersona =
       activePersona.id === 'ssw_sensei' ||
@@ -3607,7 +3631,9 @@ export default function App() {
       const cleanTrap = meta.trapWrongToken.replace(/^×\s*/, '').trim();
       if (cleanTrap && clean.toLowerCase().includes(cleanTrap.toLowerCase())) {
         trappedTokens.push(cleanTrap);
-        extraFailReason = `Kamu masih memakai bentuk jebakan "${cleanTrap}", ganti dengan bentuk yang disorot hijau di papan tulis.`;
+        extraFailReason = locale === 'id'
+          ? `Kamu masih memakai bentuk jebakan "${cleanTrap}", ganti dengan bentuk yang disorot hijau di papan tulis.`
+          : `You are still using the trap form "${cleanTrap}" — switch to the highlighted form on the whiteboard.`;
       }
     }
 
@@ -3618,34 +3644,48 @@ export default function App() {
       );
       if (mDidPast) {
         trappedTokens.push(mDidPast[1]);
-        extraFailReason = `Setelah "Did / Didn't / Does", kata kerja tidak boleh berbentuk lampau "${mDidPast[1]}", kembalikan ke bentuk dasar V1.`;
+        extraFailReason = locale === 'id'
+          ? `Setelah "Did / Didn't / Does", kata kerja tidak boleh berbentuk lampau "${mDidPast[1]}", kembalikan ke bentuk dasar V1.`
+          : `After "Did / Didn't / Does", use the base verb (V1) instead of past tense "${mDidPast[1]}".`;
       }
       const mDoubleBe = clean.match(
         /\b(am|is|are|i'm|you're|he's|she's)\s+(agree|disagree|want|need|think|believe|know|understand|prefer)\b/i
       );
       if (mDoubleBe) {
         trappedTokens.push(`${mDoubleBe[1]} ${mDoubleBe[2]}`);
-        extraFailReason = `Jangan menaruh "${mDoubleBe[1]}" di depan kata kerja "${mDoubleBe[2]}". Gunakan subjek langsung diikuti kata kerja.`;
+        extraFailReason = locale === 'id'
+          ? `Jangan menaruh "${mDoubleBe[1]}" di depan kata kerja "${mDoubleBe[2]}". Gunakan subjek langsung diikuti kata kerja.`
+          : `Do not place "${mDoubleBe[1]}" before the verb "${mDoubleBe[2]}". Use the subject directly followed by the verb.`;
       }
       if (/\bfor\s+(?:19\d\d|20\d\d|monday|tuesday|wednesday|thursday|friday|saturday|sunday|january|february|march|april|may|june|july|august|september|october|november|december|yesterday|last\s+\w+)\b/i.test(clean)) {
-        trappedTokens.push('for + titik awal waktu');
-        extraFailReason = 'Untuk titik awal waktu (seperti tahun 2020 atau Monday), gunakan "since", bukan "for".';
+        trappedTokens.push('for + starting time');
+        extraFailReason = locale === 'id'
+          ? 'Untuk titik awal waktu (seperti tahun 2020 atau Monday), gunakan "since", bukan "for".'
+          : 'For a specific starting point in time (like 2020 or Monday), use "since", not "for".';
       }
       if (/\bin\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(clean)) {
-        trappedTokens.push('in + nama hari');
-        extraFailReason = 'Untuk nama hari (Monday, Friday, dll.), wajib menggunakan preposisi "on", bukan "in".';
+        trappedTokens.push('in + weekday');
+        extraFailReason = locale === 'id'
+          ? 'Untuk nama hari (Monday, Friday, dll.), wajib menggunakan preposisi "on", bukan "in".'
+          : 'With days of the week (Monday, Friday, etc.), use the preposition "on", not "in".';
       }
       if (/\bdespite\s+of\b/i.test(clean)) {
         trappedTokens.push('despite of');
-        extraFailReason = '"Despite" tidak boleh diikuti "of", gunakan "despite + noun" langsung atau "in spite of".';
+        extraFailReason = locale === 'id'
+          ? '"Despite" tidak boleh diikuti "of", gunakan "despite + noun" langsung atau "in spite of".'
+          : '"Despite" is never followed by "of" — use "despite + noun" directly or "in spite of".';
       }
       if (/\b(?:should|must|can|could|would|might)\s+to\s+[a-z]+\b/i.test(clean)) {
         trappedTokens.push('modal + to');
-        extraFailReason = 'Setelah modal verb (should/must/can), langsung gunakan kata kerja dasar V1 tanpa "to".';
+        extraFailReason = locale === 'id'
+          ? 'Setelah modal verb (should/must/can), langsung gunakan kata kerja dasar V1 tanpa "to".'
+          : 'After modal verbs (should/must/can), use the bare verb directly without "to".';
       }
       if (clean.split(/\s+/).filter(Boolean).length < 3) {
         extraFailReason =
-          extraFailReason || 'Susun kalimat utuh minimal 3 kata (Subjek + Kata Kerja + Keterangan) agar polanya teruji.';
+          extraFailReason || (locale === 'id'
+            ? 'Susun kalimat utuh minimal 3 kata (Subjek + Kata Kerja + Keterangan) agar polanya teruji.'
+            : 'Build a complete sentence of at least 3 words (Subject + Verb + Complement) to test the pattern.');
       }
     } else if (
       activeScenario.targetLang === 'ja' &&
@@ -3654,32 +3694,46 @@ export default function App() {
     ) {
       if (/ますでした/.test(clean)) {
         trappedTokens.push('ますでした');
-        extraFailReason = 'Bentuk "ますでした" tidak baku, ubah langsung ます menjadi ました.';
+        extraFailReason = locale === 'id'
+          ? 'Bentuk "ますでした" tidak baku, ubah langsung ます menjadi ました.'
+          : '"ますでした" is ungrammatical — conjugate ます directly to ました for past tense.';
       }
       if (/(行く|飲む|食べる|見る|する|来る|読む|書く|買う)です/.test(clean)) {
         trappedTokens.push('動詞+です');
-        extraFailReason = 'Kata kerja kamus tidak boleh langsung ditempel です. Gunakan bentuk 〜ます / 〜ました.';
+        extraFailReason = locale === 'id'
+          ? 'Kata kerja kamus tidak boleh langsung ditempel です. Gunakan bentuk 〜ます / 〜ました.'
+          : 'Plain dictionary verbs cannot attach です directly — use the polite 〜ます / 〜ました form.';
       }
       if (patternFormula.includes('で') && /図書館に勉強|カフェに飲|家に勉強|学校に勉強/.test(clean)) {
-        trappedTokens.push('に (lokasi aksi)');
-        extraFailReason = 'Untuk tempat melakukan aksi aktif (belajar/minum), gunakan partikel で, bukan に.';
+        trappedTokens.push('に (action location)');
+        extraFailReason = locale === 'id'
+          ? 'Untuk tempat melakukan aksi aktif (belajar/minum), gunakan partikel で, bukan に.'
+          : 'For the location where an action takes place (studying/drinking), use particle で instead of に.';
       }
       if (clean.length < 4 || !/[\u3040-\u30ff\u4e00-\u9fff]/.test(clean)) {
         extraFailReason =
-          extraFailReason || 'Tulis kalimat dalam huruf Jepang (Hiragana/Kanji) secara utuh sesuai rumus.';
+          extraFailReason || (locale === 'id'
+            ? 'Tulis kalimat dalam huruf Jepang (Hiragana/Kanji) secara utuh sesuai rumus.'
+            : 'Write the complete sentence in Japanese script (Hiragana/Kanji) following the pattern.');
       }
     } else if (activeScenario.targetLang === 'zh') {
       if (/是(看|吃|喝|学习|学|去|做|工作|买)/.test(clean)) {
-        trappedTokens.push('是 + 动词');
-        extraFailReason = 'Untuk menyatakan "sedang", gunakan 正在 atau 在 sebelum kata kerja, bukan 是.';
+        trappedTokens.push('是 + verb');
+        extraFailReason = locale === 'id'
+          ? 'Untuk menyatakan "sedang", gunakan 正在 atau 在 sebelum kata kerja, bukan 是.'
+          : 'To express an ongoing action, use 正在 or 在 before the verb instead of 是.';
       }
       if (/(看书|吃饭|喝咖啡|学习中文|学习|工作)(昨天|今天|现在)[。！？?!]?$/.test(clean)) {
-        trappedTokens.push('Waktu di akhir kalimat');
-        extraFailReason = 'Dalam bahasa Mandarin, keterangan waktu (seperti 现在 / 昨天) wajib diletakkan SEBELUM kata kerja.';
+        trappedTokens.push('Time at end');
+        extraFailReason = locale === 'id'
+          ? 'Dalam bahasa Mandarin, keterangan waktu (seperti 现在 / 昨天) wajib diletakkan SEBELUM kata kerja.'
+          : 'In Mandarin, time expressions (such as 现在 / 昨天) must be placed BEFORE the verb.';
       }
       if (clean.length < 3 || !/[\u4e00-\u9fff]/.test(clean)) {
         extraFailReason =
-          extraFailReason || 'Tulis kalimat dalam karakter Mandarin (Hanzi) secara utuh sesuai pola.';
+          extraFailReason || (locale === 'id'
+            ? 'Tulis kalimat dalam karakter Mandarin (Hanzi) secara utuh sesuai pola.'
+            : 'Write the full sentence in Chinese characters (Hanzi) matching the pattern.');
       }
     }
 
@@ -3742,17 +3796,25 @@ export default function App() {
     const reasonText = finalOk
       ? locale === 'th'
         ? 'ยอดเยี่ยม! โครงสร้างประโยคตรงตามสูตรเป๊ะ กดส่งเข้าสายเพื่อให้ติวเตอร์ฟังได้เลย'
-        : 'Mantap! Susunan kalimat dan tata bahasamu sudah bersih sesuai rumus. Klik "Lanjut Ngobrol" untuk kembali ke obrolan.'
+        : locale === 'id'
+          ? 'Mantap! Susunan kalimat dan tata bahasamu sudah bersih sesuai rumus. Klik "Lanjut Ngobrol" untuk kembali ke obrolan.'
+          : 'Great job! Your sentence structure and grammar match the pattern cleanly. Tap "Continue Talking" to return to the conversation.'
       : extraFailReason ||
         (meta?.isQuizFailure
           ? locale === 'th'
             ? 'คำตอบยังไม่ถูกต้อง ลองทบทวนตัวเลือกที่เลือกอีกครั้ง'
-            : 'Jawaban kuis belum tepat. Perhatikan kata/arti yang dipilih dan coba lagi.'
+            : locale === 'id'
+              ? 'Jawaban kuis belum tepat. Perhatikan kata/arti yang dipilih dan coba lagi.'
+              : 'Not quite right yet. Review the meaning and structure above and try again.'
           : undefined) ||
         (locale === 'th'
           ? ev.whyFailsTh || ev.pedagogicalFeedbackTh
-          : ev.whyFailsId || ev.pedagogicalFeedbackId) ||
-        'Periksa kembali urutan kata dan bentuk kata kerja sesuai blok rumus di atas.';
+          : locale === 'id'
+            ? ev.whyFailsId || ev.pedagogicalFeedbackId
+            : ev.pedagogicalFeedbackEn) ||
+        (locale === 'id'
+          ? 'Periksa kembali urutan kata dan bentuk kata kerja sesuai blok rumus di atas.'
+          : 'Check your word order and verb form against the formula blocks above.');
     const suggestedClean =
       (!finalOk && (ev.syntacticCorrection || ev.naturalReformulation)) &&
       (ev.syntacticCorrection || ev.naturalReformulation) !== clean
@@ -4524,14 +4586,18 @@ export default function App() {
               setStatusBanner(
                 locale === 'th'
                   ? 'ไมโครโฟนถูกบล็อก อนุญาตไมโครโฟนในแถบที่อยู่ หรือพิมพ์ประโยคด้านล่าง'
-                  : 'Mikrofon tidak aktif atau diblokir peramban. Ketuk tombol Bicara untuk mengizinkan mic, atau ketik kalimatmu.'
+                  : locale === 'id'
+                    ? 'Mikrofon tidak aktif atau diblokir peramban. Ketuk tombol Bicara untuk mengizinkan mic, atau ketik kalimatmu.'
+                    : 'Microphone is inactive or blocked by the browser. Tap Speak to allow mic access, or type your sentence below.'
               );
             }
           } else if (code === 'network') {
             setStatusBanner(
               locale === 'th'
                 ? 'การรู้จำเสียงต้องใช้อินเทอร์เน็ต ลองอีกครั้งหรือพิมพ์ประโยค'
-                : 'Pengenalan suara butuh koneksi internet. Coba bicara lagi atau ketik kalimatmu.'
+                : locale === 'id'
+                  ? 'Pengenalan suara butuh koneksi internet. Coba bicara lagi atau ketik kalimatmu.'
+                  : 'Speech recognition needs an internet connection. Try speaking again or type your sentence.'
             );
           }
         };
@@ -4840,7 +4906,11 @@ export default function App() {
           turnAcousticTrackerRef.current.reset();
           acousticProsodyRef.current.reset();
           setStatusBanner(
-            'Belum ada suara yang terdengar. Pastikan mikrofon aktif dan ucapkan kalimat dengan jelas, atau ketik di kolom bawah.'
+            locale === 'th'
+              ? 'ยังไม่ได้ยินเสียง พูดให้ชัดเจนใส่ไมโครโฟน หรือพิมพ์ในช่องด้านล่าง'
+              : locale === 'id'
+                ? 'Belum ada suara yang terdengar. Pastikan mikrofon aktif dan ucapkan kalimat dengan jelas, atau ketik di kolom bawah.'
+                : 'No speech was detected yet. Make sure your microphone is active and speak clearly, or type in the box below.'
           );
         }
       }, 80);
@@ -7793,19 +7863,25 @@ ${
         setStatusBanner(
           locale === 'th'
             ? 'ยังไม่มีเสียง Fiezel เล่นออกมา, ไม่ถูกหัก Gem (0 💎 ปลอดภัย)!'
-            : 'Belum ada suara Fiezel yang diputar, 0 Gem terpakai (Saldo & Kuota Aman)!'
+            : locale === 'id'
+              ? 'Belum ada suara Fiezel yang diputar, 0 Gem terpakai (Saldo & Kuota Aman)!'
+              : 'No Fiezel voice played yet, 0 Gems spent (Balance & Quota Safe)!'
         );
       } else if (wasFree && spentGems === 0) {
         setStatusBanner(
           locale === 'th'
             ? `จบการสนทนา: ${turnsCount} การตอบกลับเสียง Fiezel, สิทธิ์ฟรีรายวัน (0 💎)`
-            : `Panggilan selesai: ${turnsCount} respon suara Fiezel, Kuota Gratis Harian (0 💎)`
+            : locale === 'id'
+              ? `Panggilan selesai: ${turnsCount} respon suara Fiezel, Kuota Gratis Harian (0 💎)`
+              : `Call ended: ${turnsCount} Fiezel voice replies, Daily Free Quota (0 💎)`
         );
       } else {
         setStatusBanner(
           locale === 'th'
             ? `จบการสนทนา: ${turnsCount} การตอบกลับเสียง Fiezel, ใช้ไป ${spentGems} 💎 ตามโควตาจริง`
-            : `Panggilan selesai: ${turnsCount} respon suara Fiezel, ${spentGems} 💎 terpakai sesuai kuota suara`
+            : locale === 'id'
+              ? `Panggilan selesai: ${turnsCount} respon suara Fiezel, ${spentGems} 💎 terpakai sesuai kuota suara`
+              : `Call ended: ${turnsCount} Fiezel voice replies, ${spentGems} 💎 used per voice quota`
         );
       }
     }
@@ -8221,6 +8297,25 @@ ${
         if (expectedNonce && e.data.nonce !== expectedNonce) return;
         stopLiveCall();
         stopPttRecording();
+      } else if (e.data.type === 'fz.shell.locale' && e.data.locale) {
+        if (expectedNonce && e.data.nonce && e.data.nonce !== expectedNonce) return;
+        const nextLoc = String(e.data.locale).trim().toLowerCase().split(/[-_]/)[0] as LearnerLocale;
+        if (nextLoc && nextLoc !== brainStateRef.current.learnerLocale) {
+          const updated = saveBraincoreState({ ...brainStateRef.current, learnerLocale: nextLoc });
+          brainStateRef.current = updated;
+          setBrainState(updated);
+        }
+      }
+    };
+
+    const handleStorageLocaleSync = (ev: StorageEvent) => {
+      if (ev.key === 'fiezel_lang_chosen' || ev.key === 'fz_ui_lang' || ev.key === 'fiezel-ui-lang' || ev.key === 'fiezel_ui_lang') {
+        const rawVal = String(ev.newValue || '').trim().toLowerCase().split(/[-_]/)[0] as LearnerLocale;
+        if (rawVal && rawVal !== brainStateRef.current.learnerLocale) {
+          const updated = saveBraincoreState({ ...brainStateRef.current, learnerLocale: rawVal });
+          brainStateRef.current = updated;
+          setBrainState(updated);
+        }
       }
     };
 
@@ -8239,12 +8334,14 @@ ${
     };
 
     window.addEventListener('message', handleWindowMsg);
+    window.addEventListener('storage', handleStorageLocaleSync);
     window.addEventListener('pagehide', handlePageUnload);
     window.addEventListener('beforeunload', handlePageUnload);
     document.addEventListener('visibilitychange', handleVisibilityOrHide);
     const timer = window.setTimeout(checkAutoCall, 40);
     return () => {
       window.removeEventListener('message', handleWindowMsg);
+      window.removeEventListener('storage', handleStorageLocaleSync);
       window.removeEventListener('pagehide', handlePageUnload);
       window.removeEventListener('beforeunload', handlePageUnload);
       document.removeEventListener('visibilitychange', handleVisibilityOrHide);
@@ -8499,13 +8596,9 @@ ${
   };
   const rawCandidateId = isStreamingAiLive
     ? liveAiTranslationDraft
-    : lastAiTurn
-    ? lastAiTurn.translationId || ''
     : locale === 'id'
-    ? defaultOpeningTransId
-    : locale === 'th'
-    ? ''
-    : defaultOpeningTransEn;
+      ? (lastAiTurn ? lastAiTurn.translationId || '' : defaultOpeningTransId)
+      : '';
   const rawSubtitleSourceId = hasRealLettersForMeaning(rawCandidateId) ? rawCandidateId : '';
   const rawCandidateTh = isStreamingAiLive
     ? (locale === 'th' ? liveAiTranslationDraft : '')
@@ -8527,7 +8620,7 @@ ${
     translationId:
       rawSubtitleSourceId ||
       (locale === 'id' ? computedAiSubtitle.translationId : '') ||
-      (!isStreamingAiLive && !lastAiTurn ? openingFallbackNonTh : '') ||
+      (!isStreamingAiLive && (!lastAiTurn || lastAiTurn.id?.startsWith('turn_open_')) ? openingFallbackNonTh : '') ||
       '',
     translationTh:
       rawSubtitleSourceTh ||
@@ -8548,15 +8641,17 @@ ${
       } else if (locale === 'ja') {
         rawMeaning =
           activeAiSubtitle.translationJa ||
-          (activeScenario.targetLang === 'ja' ? '' : activeAiSubtitle.translationId || defaultOpeningTransEn);
+          (activeScenario.targetLang === 'ja' ? '' : (isStreamingAiLive ? liveAiTranslationDraft : '') || (lastAiTurn && !lastAiTurn.id?.startsWith('turn_open_') ? ((lastAiTurn as any).translationEn || '') : defaultOpeningTransEn));
       } else if (locale === 'zh') {
         rawMeaning =
           activeAiSubtitle.translationZh ||
-          (activeScenario.targetLang === 'zh' ? '' : activeAiSubtitle.translationId || defaultOpeningTransEn);
+          (activeScenario.targetLang === 'zh' ? '' : (isStreamingAiLive ? liveAiTranslationDraft : '') || (lastAiTurn && !lastAiTurn.id?.startsWith('turn_open_') ? ((lastAiTurn as any).translationEn || '') : defaultOpeningTransEn));
       } else {
         rawMeaning =
-          activeAiSubtitle.translationId ||
-          (!isStreamingAiLive && !lastAiTurn ? defaultOpeningTransEn : '');
+          (isStreamingAiLive ? liveAiTranslationDraft : '') ||
+          (lastAiTurn && !lastAiTurn.id?.startsWith('turn_open_') ? ((lastAiTurn as any).translationEn || '') : defaultOpeningTransEn) ||
+          activeAiSubtitle.translationEn ||
+          '';
       }
 
       // 1. Jika terjemahan valid sudah tersedia (dari skenario/turn/memori terjemahan),
@@ -8802,11 +8897,12 @@ ${
                     return;
                   }
                   const trimmedUserTurn = lastUserTurn?.text?.trim() || '';
+                  const sm = scenarioMetaForLocale(locale, activeScenario);
                   const scenarioStarterTitle =
-                    activeScenario.competencyNameId ||
-                    activeScenario.titleId ||
+                    sm.competency ||
+                    sm.title ||
                     activeScenario.targetPatterns?.[0] ||
-                    'Materi percakapan sesi ini';
+                    (locale === 'id' ? 'Materi percakapan sesi ini' : 'Session conversation guide');
                   const focusQuery =
                     (trimmedUserTurn.split(/\s+/).length >= 3 ? trimmedUserTurn : '') ||
                     (trimmedUserTurn ? lastAiTurn?.text?.trim() : '') ||
@@ -8824,8 +8920,8 @@ ${
                     '';
                   const starterExplanation = !trimmedUserTurn
                     ? [
-                        activeScenario.situationId,
-                        ...(Array.isArray(activeScenario.missionGoalsId) ? activeScenario.missionGoalsId : []),
+                        sm.situation,
+                        ...(Array.isArray(sm.missionGoals) ? sm.missionGoals : []),
                       ]
                         .filter(Boolean)
                         .join(' ')
@@ -10651,9 +10747,10 @@ ${
               wsRef.current.readyState === WebSocket.OPEN
             ) {
               if (isSswResume) {
+                const instrLang = locale === 'id' ? 'Bahasa Indonesia' : (locale === 'th' ? 'Thai' : 'English');
                 const sswResumeCue = quizSent
-                  ? `[System Note: Pembelajar baru menyelesaikan latihan cepat SSW di Papan Taktis ("${finishedTopic || 'SSW'}") dengan jawaban "${quizSent}". Lanjutkan bimbingan SSW dalam Bahasa Indonesia secara ringkas dan tanya apakah siap ke langkah berikutnya.]`
-                  : `[System Note: Pembelajar baru menutup Papan Taktis SSW ("${finishedTopic || 'SSW'}"). Lanjutkan bimbingan SSW dalam Bahasa Indonesia pada langkah aktif dengan jelas dan tanyakan pertanyaan cek paham singkat.]`;
+                  ? `[System Note: Learner just completed the SSW Tactical Board quick exercise ("${finishedTopic || 'SSW'}") with answer "${quizSent}". Continue SSW coaching concisely in ${instrLang} and ask if they are ready for the next step.]`
+                  : `[System Note: Learner just closed the SSW Tactical Board ("${finishedTopic || 'SSW'}"). Continue SSW coaching clearly in ${instrLang} on the active step and ask a brief comprehension check.]`;
                 try {
                   wsRef.current.send(
                     JSON.stringify({

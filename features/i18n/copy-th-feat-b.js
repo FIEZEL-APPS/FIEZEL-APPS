@@ -428,6 +428,7 @@
     'onboarding.path-beginner-desc-v2': 'เริ่มเรียนจากคำศัพท์และไวยากรณ์พื้นฐานทีละขั้น',
     'onboarding.path-test-desc-v2': 'วัดระดับเริ่มต้นตามพื้นฐานความรู้ของคุณ',
     'onboarding.skip-later-v2': 'ไว้ทีหลัง',
-    'onboarding.start-learn-arrow': 'เริ่มเรียนเลย \u2192'
+    'onboarding.start-learn-arrow': 'เริ่มเรียนเลย \u2192',
+    'onboarding.ja-meaning-go': 'ไป'
   });
 }());

@@ -18,7 +18,7 @@
   "vocab.kosong": "Пока недоступно для этого уровня.",
   "vocab.n-kata": "{jumlah} слов",
   "vocab.quiz-kosong": "Словарь для {level} пока недоступен.",
-  "vocab.review-due": "Срок проверки ( {jumlah} )</button>",
+  "vocab.review-due": " Повторить ({jumlah})</button>",
   "vocab.subjudul": "{jumlah} слов на уровне {level} . Все упражнения соответствуют вашему активному уровню обучения.",
   "vocab.uji": "Проверка словарного запаса {level} </button>"
 }

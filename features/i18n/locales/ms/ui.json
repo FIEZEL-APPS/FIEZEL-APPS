@@ -1452,7 +1452,7 @@
   "journey.goal-everyday-p1": "Perbualan dalam kehidupan seharian",
   "journey.goal-everyday-p2": "Mesej ringkas dan sembang",
   "journey.goal-everyday-p3": "Perbendaharaan kata isi rumah, perjalanan dan membeli-belah",
-  "journey.goal-exam-label": "Yayasan IELTS/TOEFL",
+  "journey.goal-exam-label": "Asas IELTS/TOEFL",
   "journey.goal-exam-note": "FIEZEL tidak meneka skor IELTS/TOEFL anda. Ia hanya menunjukkan kepada anda perkara yang perlu anda kuasai terlebih dahulu.",
   "journey.goal-exam-p1": "Baca teks akademik",
   "journey.goal-exam-p2": "Ambil nota sambil mendengar",
@@ -4879,5 +4879,9 @@
   "mandarin.chapter_word": "UNIT",
   "mandarin.reorder_hint": "Susunan kata Mandarin mengikut pola Subjek + Masa + Tempat + Kata Kerja + Objek.",
   "mandarin.reorder_pattern_hint": "Letakkan keterangan masa dan tempat sebelum kata kerja.",
-  "story.cat-teknologi": "Teknologi & Perjalanan"
+  "story.cat-teknologi": "Teknologi & Perjalanan",
+  "onboarding.ja-meaning-go": "pergi",
+  "mandarin.level-0-tab": "Asas (Tahap 0)",
+  "mandarin.level-7-tab": "Tahap 7 (Wacana)",
+  "mandarin.level-8-tab": "Tahap 8 (Sastera)"
 }

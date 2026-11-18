@@ -1164,7 +1164,7 @@ export function getInitialBraincoreState(): BraincoreStoreState {
     version: 1,
     updatedAt: Date.now(),
     tabId: TAB_ID,
-    learnerLocale: 'id',
+    learnerLocale: 'en',
     targetLang: 'en',
     competencies: mergeHostBraincoreMastery(baseCompetencies),
     misconceptionLedger: {},
@@ -1183,18 +1183,27 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: Le
     let learnerLocale: LearnerLocale | undefined;
     const isSupportedUiLocale = (val?: string | null): val is LearnerLocale => {
       if (!val) return false;
-      const clean = String(val).trim().toLowerCase().split('-')[0];
-      return ['id', 'th', 'ja', 'en', 'zh', 'vi', 'ru', 'ko', 'ms', 'es', 'fr', 'de', 'ar'].includes(clean);
+      const clean = String(val).trim().toLowerCase().split(/[-_]/)[0];
+      return ['id', 'th', 'ja', 'en', 'zh', 'vi', 'ru', 'ko', 'ms', 'fil', 'km', 'es', 'fr', 'de', 'ar'].includes(clean);
     };
+    const normalizeLocale = (val: string): LearnerLocale =>
+      String(val).trim().toLowerCase().split(/[-_]/)[0] as LearnerLocale;
     if (typeof window !== 'undefined' && window.location && window.location.search) {
       const params = new URLSearchParams(window.location.search);
-      const langParam = params.get('lang') || params.get('course');
-      if (langParam === 'ja' || langParam === 'en' || langParam === 'zh') {
+      const explicitTarget = params.get('target') || params.get('course');
+      const langParam = params.get('lang');
+      if (explicitTarget === 'ja' || explicitTarget === 'en' || explicitTarget === 'zh') {
+        targetLang = explicitTarget;
+      } else if (!explicitTarget && (langParam === 'ja' || langParam === 'en' || langParam === 'zh')) {
         targetLang = langParam;
       }
-      const locParam = params.get('locale') || params.get('hl') || params.get('ui_lang');
+      const locParam =
+        params.get('locale') ||
+        params.get('hl') ||
+        params.get('ui_lang') ||
+        (explicitTarget ? langParam : null);
       if (isSupportedUiLocale(locParam)) {
-        learnerLocale = String(locParam).trim().toLowerCase().split('-')[0] as LearnerLocale;
+        learnerLocale = normalizeLocale(locParam);
       }
     }
     if (!targetLang) {
@@ -1205,11 +1214,35 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: Le
     }
     if (!learnerLocale) {
       const uiLangRaw =
+        localStorage.getItem('fiezel_lang_chosen') ||
         localStorage.getItem('fz_ui_lang') ||
         localStorage.getItem('fiezel-ui-lang') ||
         localStorage.getItem('fiezel_ui_lang');
       if (isSupportedUiLocale(uiLangRaw)) {
-        learnerLocale = String(uiLangRaw).trim().toLowerCase().split('-')[0] as LearnerLocale;
+        learnerLocale = normalizeLocale(uiLangRaw);
+      }
+    }
+    if (!learnerLocale) {
+      try {
+        const obRaw = localStorage.getItem('fiezel-onboarding-v1');
+        if (obRaw) {
+          const obLoc = JSON.parse(obRaw)?.locale;
+          if (isSupportedUiLocale(obLoc)) {
+            learnerLocale = normalizeLocale(obLoc);
+          }
+        }
+      } catch {
+        // Ignore malformed onboarding JSON
+      }
+    }
+    if (!learnerLocale && typeof window !== 'undefined' && window.parent && window.parent !== window) {
+      try {
+        const parentLocale = (window.parent as unknown as { FiezelI18n?: { getLocale?: () => string } })?.FiezelI18n?.getLocale?.();
+        if (isSupportedUiLocale(parentLocale)) {
+          learnerLocale = normalizeLocale(parentLocale);
+        }
+      } catch {
+        // Cross-origin frame access guard
       }
     }
     if (!learnerLocale) {
@@ -1218,7 +1251,7 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: Le
         const legacy = JSON.parse(legacyRaw);
         const legLoc = legacy?.learnerLocale || legacy?.locale || legacy?.uiLang;
         if (isSupportedUiLocale(legLoc)) {
-          learnerLocale = String(legLoc).trim().toLowerCase().split('-')[0] as LearnerLocale;
+          learnerLocale = normalizeLocale(legLoc);
         }
       }
     }

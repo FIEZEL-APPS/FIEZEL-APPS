@@ -1,0 +1,7327 @@
+{
+  "schema": "fiezel-vocabulary-en-v1",
+  "status": "APPROVED-EN-SIDECAR",
+  "count": 2440,
+  "entries": {
+    "vocab_00003": {
+      "meaning": "every; the whole"
+    },
+    "vocab_00004": {
+      "meaning": "fine; okay"
+    },
+    "vocab_00006": {
+      "meaning": "nearly; close to"
+    },
+    "vocab_00007": {
+      "meaning": "by oneself; without others"
+    },
+    "vocab_00008": {
+      "meaning": "running the length of"
+    },
+    "vocab_00009": {
+      "meaning": "previously completed"
+    },
+    "vocab_00010": {
+      "meaning": "too; in addition"
+    },
+    "vocab_00011": {
+      "meaning": "at all times"
+    },
+    "vocab_00012": {
+      "meaning": "first-person singular state of being"
+    },
+    "vocab_00013": {
+      "meaning": "one; a single item"
+    },
+    "vocab_00014": {
+      "meaning": "plus; as well as"
+    },
+    "vocab_00015": {
+      "meaning": "feeling or showing strong annoyance"
+    },
+    "vocab_00016": {
+      "meaning": "living creature"
+    },
+    "vocab_00017": {
+      "meaning": "one more; a different one"
+    },
+    "vocab_00018": {
+      "meaning": "a spoken or written reply"
+    },
+    "vocab_00020": {
+      "meaning": "some; any amount"
+    },
+    "vocab_00022": {
+      "meaning": "any person"
+    },
+    "vocab_00023": {
+      "meaning": "any person"
+    },
+    "vocab_00024": {
+      "meaning": "any thing"
+    },
+    "vocab_00025": {
+      "meaning": "a round, edible fruit"
+    },
+    "vocab_00026": {
+      "meaning": "the fourth month"
+    },
+    "vocab_00027": {
+      "meaning": "protective garment for clothing"
+    },
+    "vocab_00028": {
+      "meaning": "plural or second-person state of being"
+    },
+    "vocab_00031": {
+      "meaning": "reach a destination"
+    },
+    "vocab_00032": {
+      "meaning": "creative expression or skill"
+    },
+    "vocab_00033": {
+      "meaning": "a piece of writing"
+    },
+    "vocab_00035": {
+      "meaning": "to inquire or request"
+    },
+    "vocab_00036": {
+      "meaning": "at a specific location or time"
+    },
+    "vocab_00037": {
+      "meaning": "the eighth month"
+    },
+    "vocab_00038": {
+      "meaning": "parent's sister"
+    },
+    "vocab_00039": {
+      "meaning": "the season after summer"
+    },
+    "vocab_00040": {
+      "meaning": "not asleep"
+    },
+    "vocab_00041": {
+      "meaning": "to a distance; away from"
+    },
+    "vocab_00042": {
+      "meaning": "a very young child"
+    },
+    "vocab_00045": {
+      "meaning": "not good; poor quality"
+    },
+    "vocab_00046": {
+      "meaning": "container for carrying items"
+    },
+    "vocab_00047": {
+      "meaning": "round object used in games"
+    },
+    "vocab_00048": {
+      "meaning": "long, yellow tropical fruit"
+    },
+    "vocab_00049": {
+      "meaning": "musical group; a strip"
+    },
+    "vocab_00051": {
+      "meaning": "place serving alcoholic drinks"
+    },
+    "vocab_00052": {
+      "meaning": "bat-and-ball field game"
+    },
+    "vocab_00053": {
+      "meaning": "team sport with a hoop"
+    },
+    "vocab_00054": {
+      "meaning": "club used to hit balls"
+    },
+    "vocab_00055": {
+      "meaning": "act of washing in water"
+    },
+    "vocab_00056": {
+      "meaning": "room for washing"
+    },
+    "vocab_00057": {
+      "meaning": "to exist; to become"
+    },
+    "vocab_00058": {
+      "meaning": "sandy shore by the sea"
+    },
+    "vocab_00059": {
+      "meaning": "edible seed"
+    },
+    "vocab_00061": {
+      "meaning": "pleasing to the senses"
+    },
+    "vocab_00062": {
+      "meaning": "for the reason that"
+    },
+    "vocab_00063": {
+      "meaning": "to grow or turn into"
+    },
+    "vocab_00064": {
+      "meaning": "furniture for sleeping"
+    },
+    "vocab_00065": {
+      "meaning": "room for sleeping"
+    },
+    "vocab_00066": {
+      "meaning": "flying insect that makes honey"
+    },
+    "vocab_00067": {
+      "meaning": "meat from a cow"
+    },
+    "vocab_00069": {
+      "meaning": "at an earlier time"
+    },
+    "vocab_00070": {
+      "meaning": "to start"
+    },
+    "vocab_00071": {
+      "meaning": "at the back of"
+    },
+    "vocab_00073": {
+      "meaning": "to accept as true"
+    },
+    "vocab_00074": {
+      "meaning": "device that makes a ringing sound"
+    },
+    "vocab_00075": {
+      "meaning": "lower than"
+    },
+    "vocab_00077": {
+      "meaning": "next to"
+    },
+    "vocab_00078": {
+      "meaning": "of the highest quality"
+    },
+    "vocab_00080": {
+      "meaning": "more favorable or improved"
+    },
+    "vocab_00081": {
+      "meaning": "in the space separating two"
+    },
+    "vocab_00082": {
+      "meaning": "two-wheeled vehicle"
+    },
+    "vocab_00083": {
+      "meaning": "large in size"
+    },
+    "vocab_00084": {
+      "meaning": "two-wheeled vehicle"
+    },
+    "vocab_00085": {
+      "meaning": "feathered animal"
+    },
+    "vocab_00086": {
+      "meaning": "emergence from the womb"
+    },
+    "vocab_00087": {
+      "meaning": "anniversary of one's birth"
+    },
+    "vocab_00088": {
+      "meaning": "small, crisp baked cake"
+    },
+    "vocab_00089": {
+      "meaning": "color of coal or night"
+    },
+    "vocab_00091": {
+      "meaning": "empty; containing nothing"
+    },
+    "vocab_00094": {
+      "meaning": "color of the clear sky"
+    },
+    "vocab_00096": {
+      "meaning": "flat, thin piece of material"
+    },
+    "vocab_00097": {
+      "meaning": "vessel for travel on water"
+    },
+    "vocab_00098": {
+      "meaning": "physical structure of a person"
+    },
+    "vocab_00099": {
+      "meaning": "hard part of the skeleton"
+    },
+    "vocab_00101": {
+      "meaning": "shop selling books"
+    },
+    "vocab_00102": {
+      "meaning": "dull; uninteresting"
+    },
+    "vocab_00103": {
+      "meaning": "take something temporarily"
+    },
+    "vocab_00104": {
+      "meaning": "the two of them"
+    },
+    "vocab_00107": {
+      "meaning": "container for liquids"
+    },
+    "vocab_00108": {
+      "meaning": "lowest part; base"
+    },
+    "vocab_00109": {
+      "meaning": "deep round dish"
+    },
+    "vocab_00110": {
+      "meaning": "container with flat sides"
+    },
+    "vocab_00111": {
+      "meaning": "male child"
+    },
+    "vocab_00112": {
+      "meaning": "male romantic partner"
+    },
+    "vocab_00113": {
+      "meaning": "organ inside the head"
+    },
+    "vocab_00114": {
+      "meaning": "baked food made of flour"
+    },
+    "vocab_00115": {
+      "meaning": "smash; damage"
+    },
+    "vocab_00116": {
+      "meaning": "morning meal"
+    },
+    "vocab_00117": {
+      "meaning": "inhale and exhale air"
+    },
+    "vocab_00118": {
+      "meaning": "structure over a river"
+    },
+    "vocab_00119": {
+      "meaning": "shining; intelligent"
+    },
+    "vocab_00120": {
+      "meaning": "carry toward a place"
+    },
+    "vocab_00121": {
+      "meaning": "damaged; fractured"
+    },
+    "vocab_00122": {
+      "meaning": "male sibling"
+    },
+    "vocab_00123": {
+      "meaning": "color of earth"
+    },
+    "vocab_00124": {
+      "meaning": "tool for cleaning or painting"
+    },
+    "vocab_00126": {
+      "meaning": "open container for liquids"
+    },
+    "vocab_00127": {
+      "meaning": "construct"
+    },
+    "vocab_00128": {
+      "meaning": "large structure"
+    },
+    "vocab_00129": {
+      "meaning": "meat sandwich"
+    },
+    "vocab_00130": {
+      "meaning": "large vehicle for passengers"
+    },
+    "vocab_00131": {
+      "meaning": "commercial activity"
+    },
+    "vocab_00132": {
+      "meaning": "occupied with work"
+    },
+    "vocab_00134": {
+      "meaning": "fatty food from cream"
+    },
+    "vocab_00135": {
+      "meaning": "flying insect with colorful wings"
+    },
+    "vocab_00136": {
+      "meaning": "fastener for clothes; switch"
+    },
+    "vocab_00137": {
+      "meaning": "purchase"
+    },
+    "vocab_00138": {
+      "meaning": "via; through"
+    },
+    "vocab_00139": {
+      "meaning": "goodbye"
+    },
+    "vocab_00140": {
+      "meaning": "coffee shop"
+    },
+    "vocab_00141": {
+      "meaning": "sweet baked dessert"
+    },
+    "vocab_00143": {
+      "meaning": "device for taking photos"
+    },
+    "vocab_00144": {
+      "meaning": "temporary shelter; camp"
+    },
+    "vocab_00145": {
+      "meaning": "able to"
+    },
+    "vocab_00146": {
+      "meaning": "sweet treat"
+    },
+    "vocab_00147": {
+      "meaning": "brimless hat"
+    },
+    "vocab_00148": {
+      "meaning": "motor vehicle"
+    },
+    "vocab_00149": {
+      "meaning": "stiff piece of paper"
+    },
+    "vocab_00151": {
+      "meaning": "cautious"
+    },
+    "vocab_00152": {
+      "meaning": "in a cautious manner"
+    },
+    "vocab_00153": {
+      "meaning": "transport by hand"
+    },
+    "vocab_00154": {
+      "meaning": "animated film"
+    },
+    "vocab_00155": {
+      "meaning": "instance; situation"
+    },
+    "vocab_00156": {
+      "meaning": "small furry pet"
+    },
+    "vocab_00157": {
+      "meaning": "act of capturing"
+    },
+    "vocab_00159": {
+      "meaning": "digital storage disc"
+    },
+    "vocab_00160": {
+      "meaning": "device to play discs"
+    },
+    "vocab_00161": {
+      "meaning": "observe a special event"
+    },
+    "vocab_00162": {
+      "meaning": "event for celebration"
+    },
+    "vocab_00163": {
+      "meaning": "seat for one person"
+    },
+    "vocab_00165": {
+      "meaning": "alter; switch"
+    },
+    "vocab_00166": {
+      "meaning": "personality; fictional person"
+    },
+    "vocab_00168": {
+      "meaning": "solid food from milk"
+    },
+    "vocab_00169": {
+      "meaning": "farm bird"
+    },
+    "vocab_00170": {
+      "meaning": "young human"
+    },
+    "vocab_00171": {
+      "meaning": "sweet brown food"
+    },
+    "vocab_00172": {
+      "meaning": "select"
+    },
+    "vocab_00173": {
+      "meaning": "place of worship"
+    },
+    "vocab_00174": {
+      "meaning": "movie theater"
+    },
+    "vocab_00175": {
+      "meaning": "round shape"
+    },
+    "vocab_00176": {
+      "meaning": "large town"
+    },
+    "vocab_00177": {
+      "meaning": "group of students"
+    },
+    "vocab_00178": {
+      "meaning": "peer in school"
+    },
+    "vocab_00179": {
+      "meaning": "room for teaching"
+    },
+    "vocab_00181": {
+      "meaning": "make free of dirt"
+    },
+    "vocab_00182": {
+      "meaning": "smart; intelligent"
+    },
+    "vocab_00183": {
+      "meaning": "go up"
+    },
+    "vocab_00184": {
+      "meaning": "device showing time"
+    },
+    "vocab_00185": {
+      "meaning": "near"
+    },
+    "vocab_00187": {
+      "meaning": "not open"
+    },
+    "vocab_00188": {
+      "meaning": "fabric"
+    },
+    "vocab_00189": {
+      "meaning": "garments"
+    },
+    "vocab_00190": {
+      "meaning": "white mass in sky"
+    },
+    "vocab_00191": {
+      "meaning": "covered with clouds"
+    },
+    "vocab_00192": {
+      "meaning": "group with shared interests"
+    },
+    "vocab_00193": {
+      "meaning": "trainer or instructor"
+    },
+    "vocab_00194": {
+      "meaning": "jacket or outer garment"
+    },
+    "vocab_00195": {
+      "meaning": "system of signals or symbols"
+    },
+    "vocab_00196": {
+      "meaning": "caffeinated beverage"
+    },
+    "vocab_00197": {
+      "meaning": "cola-flavored soft drink"
+    },
+    "vocab_00198": {
+      "meaning": "low temperature"
+    },
+    "vocab_00200": {
+      "meaning": "gather together"
+    },
+    "vocab_00201": {
+      "meaning": "group of items"
+    },
+    "vocab_00202": {
+      "meaning": "university or higher education institution"
+    },
+    "vocab_00203": {
+      "meaning": "hue or pigment"
+    },
+    "vocab_00205": {
+      "meaning": "move toward speaker"
+    },
+    "vocab_00206": {
+      "meaning": "electronic data processing machine"
+    },
+    "vocab_00207": {
+      "meaning": "musical performance"
+    },
+    "vocab_00208": {
+      "meaning": "competition"
+    },
+    "vocab_00209": {
+      "meaning": "talk between people"
+    },
+    "vocab_00210": {
+      "meaning": "professional food preparer"
+    },
+    "vocab_00212": {
+      "meaning": "small sweet biscuit"
+    },
+    "vocab_00213": {
+      "meaning": "chilly; fashionable or excellent"
+    },
+    "vocab_00214": {
+      "meaning": "police officer"
+    },
+    "vocab_00216": {
+      "meaning": "cereal plant with yellow kernels"
+    },
+    "vocab_00217": {
+      "meaning": "point where two lines meet"
+    },
+    "vocab_00218": {
+      "meaning": "accurate or right"
+    },
+    "vocab_00219": {
+      "meaning": "long upholstered seat"
+    },
+    "vocab_00220": {
+      "meaning": "past or polite form of 'can'"
+    },
+    "vocab_00221": {
+      "meaning": "educational program; path"
+    },
+    "vocab_00222": {
+      "meaning": "child of one's aunt or uncle"
+    },
+    "vocab_00224": {
+      "meaning": "large farm animal"
+    },
+    "vocab_00225": {
+      "meaning": "thick fatty part of milk"
+    },
+    "vocab_00226": {
+      "meaning": "card for deferred payment"
+    },
+    "vocab_00228": {
+      "meaning": "customs and social behavior"
+    },
+    "vocab_00229": {
+      "meaning": "small bowl-shaped drinking vessel"
+    },
+    "vocab_00230": {
+      "meaning": "divide with a sharp tool"
+    },
+    "vocab_00231": {
+      "meaning": "charming or adorable"
+    },
+    "vocab_00232": {
+      "meaning": "father"
+    },
+    "vocab_00233": {
+      "meaning": "informal term for father"
+    },
+    "vocab_00234": {
+      "meaning": "rhythmic movement to music"
+    },
+    "vocab_00236": {
+      "meaning": "act of performing dance"
+    },
+    "vocab_00237": {
+      "meaning": "lacking light"
+    },
+    "vocab_00238": {
+      "meaning": "calendar day; romantic meeting"
+    },
+    "vocab_00239": {
+      "meaning": "female offspring"
+    },
+    "vocab_00240": {
+      "meaning": "twenty-four hour period"
+    },
+    "vocab_00242": {
+      "meaning": "twelfth month of the year"
+    },
+    "vocab_00243": {
+      "meaning": "tasty"
+    },
+    "vocab_00244": {
+      "meaning": "explain in detail"
+    },
+    "vocab_00246": {
+      "meaning": "table for writing or work"
+    },
+    "vocab_00247": {
+      "meaning": "book of word definitions"
+    },
+    "vocab_00248": {
+      "meaning": "past tense of 'do'"
+    },
+    "vocab_00249": {
+      "meaning": "state of being unlike"
+    },
+    "vocab_00250": {
+      "meaning": "not the same"
+    },
+    "vocab_00251": {
+      "meaning": "hard to do or understand"
+    },
+    "vocab_00252": {
+      "meaning": "move earth with a tool"
+    },
+    "vocab_00253": {
+      "meaning": "room for eating meals"
+    },
+    "vocab_00254": {
+      "meaning": "main evening meal"
+    },
+    "vocab_00255": {
+      "meaning": "covered with dirt"
+    },
+    "vocab_00256": {
+      "meaning": "talk over a topic"
+    },
+    "vocab_00257": {
+      "meaning": "food item; shallow container"
+    },
+    "vocab_00258": {
+      "meaning": "perform an action"
+    },
+    "vocab_00398": {
+      "meaning": "permit or let happen"
+    },
+    "vocab_00401": {
+      "meaning": "satisfactory or okay"
+    },
+    "vocab_00403": {
+      "meaning": "in spite of the fact"
+    },
+    "vocab_00404": {
+      "meaning": "strong desire for success"
+    },
+    "vocab_00405": {
+      "meaning": "surrounded by"
+    },
+    "vocab_00406": {
+      "meaning": "entertained or amused"
+    },
+    "vocab_00407": {
+      "meaning": "source of entertainment"
+    },
+    "vocab_00408": {
+      "meaning": "forefather"
+    },
+    "vocab_00409": {
+      "meaning": "very old"
+    },
+    "vocab_00410": {
+      "meaning": "divine messenger"
+    },
+    "vocab_00411": {
+      "meaning": "in an angry manner"
+    },
+    "vocab_00412": {
+      "meaning": "joint connecting foot and leg"
+    },
+    "vocab_00413": {
+      "meaning": "yearly celebration of an event"
+    },
+    "vocab_00414": {
+      "meaning": "bother or irritate"
+    },
+    "vocab_00415": {
+      "meaning": "causing irritation"
+    },
+    "vocab_00417": {
+      "meaning": "worried or uneasy"
+    },
+    "vocab_00418": {
+      "meaning": "no longer"
+    },
+    "vocab_00419": {
+      "meaning": "in any case"
+    },
+    "vocab_00420": {
+      "meaning": "at or to any place"
+    },
+    "vocab_00421": {
+      "meaning": "separated by distance"
+    },
+    "vocab_00422": {
+      "meaning": "set of rooms for living"
+    },
+    "vocab_00423": {
+      "meaning": "express regret"
+    },
+    "vocab_00424": {
+      "meaning": "seemingly or evidently"
+    },
+    "vocab_00425": {
+      "meaning": "to come into view or existence"
+    },
+    "vocab_00426": {
+      "meaning": "way someone looks; act of emerging"
+    },
+    "vocab_00427": {
+      "meaning": "to make a formal request; to put into use"
+    },
+    "vocab_00428": {
+      "meaning": "arranged meeting time; job placement"
+    },
+    "vocab_00429": {
+      "meaning": "to be grateful for; to value greatly"
+    },
+    "vocab_00430": {
+      "meaning": "suitable; proper and fitting"
+    },
+    "vocab_00431": {
+      "meaning": "art and science of building design"
+    },
+    "vocab_00432": {
+      "meaning": "region; specific space or district"
+    },
+    "vocab_00433": {
+      "meaning": "to quarrel; to exchange opposing views"
+    },
+    "vocab_00434": {
+      "meaning": "dispute; reasoning or verbal conflict"
+    },
+    "vocab_00435": {
+      "meaning": "comfortable chair with side supports"
+    },
+    "vocab_00436": {
+      "meaning": "equipped with weapons"
+    },
+    "vocab_00437": {
+      "meaning": "encircling; located near or about"
+    },
+    "vocab_00438": {
+      "meaning": "man-made; not natural"
+    },
+    "vocab_00439": {
+      "meaning": "because; while; in the manner of"
+    },
+    "vocab_00440": {
+      "meaning": "sleeping; in a state of sleep"
+    },
+    "vocab_00441": {
+      "meaning": "helper; subordinate assistant"
+    },
+    "vocab_00442": {
+      "meaning": "organization; society of people"
+    },
+    "vocab_00443": {
+      "meaning": "person trained to travel in space"
+    },
+    "vocab_00444": {
+      "meaning": "person trained in sports"
+    },
+    "vocab_00445": {
+      "meaning": "basic unit of a chemical element"
+    },
+    "vocab_00447": {
+      "meaning": "to launch an aggressive action against"
+    },
+    "vocab_00448": {
+      "meaning": "effort; trial or try"
+    },
+    "vocab_00449": {
+      "meaning": "careful consideration; mental focus"
+    },
+    "vocab_00450": {
+      "meaning": "settled way of thinking or feeling"
+    },
+    "vocab_00451": {
+      "meaning": "pleasing; charmingly appealing"
+    },
+    "vocab_00452": {
+      "meaning": "spectators; gathering of listeners"
+    },
+    "vocab_00453": {
+      "meaning": "relating to sound"
+    },
+    "vocab_00454": {
+      "meaning": "writer of a book or article"
+    },
+    "vocab_00455": {
+      "meaning": "working by itself; self-acting"
+    },
+    "vocab_00456": {
+      "meaning": "happening by itself without intervention"
+    },
+    "vocab_00457": {
+      "meaning": "typical; intermediate standard value"
+    },
+    "vocab_00459": {
+      "meaning": "to keep away from"
+    },
+    "vocab_00460": {
+      "meaning": "prize; formal recognition of merit"
+    },
+    "vocab_00461": {
+      "meaning": "very bad; horrifying or dreadful"
+    },
+    "vocab_00463": {
+      "meaning": "scenery behind; foundational conditions"
+    },
+    "vocab_00464": {
+      "meaning": "in a poor or severely bad manner"
+    },
+    "vocab_00465": {
+      "meaning": "racquet sport played with a shuttlecock"
+    },
+    "vocab_00466": {
+      "meaning": "to cook with dry heat in an oven"
+    },
+    "vocab_00467": {
+      "meaning": "platform projecting from a wall"
+    },
+    "vocab_00468": {
+      "meaning": "inflatable rubber bag filled with air"
+    },
+    "vocab_00469": {
+      "meaning": "riverbank; financial institution"
+    },
+    "vocab_00470": {
+      "meaning": "financial services and operations"
+    },
+    "vocab_00471": {
+      "meaning": "outdoor grilled food event; grill"
+    },
+    "vocab_00472": {
+      "meaning": "hairdresser for men"
+    },
+    "vocab_00473": {
+      "meaning": "good deal; advantageous purchase"
+    },
+    "vocab_00474": {
+      "meaning": "foundation; bottom support"
+    },
+    "vocab_00475": {
+      "meaning": "fundamental; primary"
+    },
+    "vocab_00476": {
+      "meaning": "fundamentally; essentially"
+    },
+    "vocab_00477": {
+      "meaning": "container made of woven material"
+    },
+    "vocab_00478": {
+      "meaning": "group processed together"
+    },
+    "vocab_00479": {
+      "meaning": "device producing electrical energy"
+    },
+    "vocab_00480": {
+      "meaning": "broad inlet of the sea"
+    },
+    "vocab_00481": {
+      "meaning": "to endure; to carry or support"
+    },
+    "vocab_00482": {
+      "meaning": "quality of being very attractive"
+    },
+    "vocab_00483": {
+      "meaning": "past participle of 'be'"
+    },
+    "vocab_00484": {
+      "meaning": "alcoholic beverage made from grain"
+    },
+    "vocab_00486": {
+      "meaning": "to ask earnestly; to plead"
+    },
+    "vocab_00487": {
+      "meaning": "novice; person starting something new"
+    },
+    "vocab_00488": {
+      "meaning": "start; point where something begins"
+    },
+    "vocab_00489": {
+      "meaning": "manner of conducting oneself"
+    },
+    "vocab_00490": {
+      "meaning": "living creature; existence"
+    },
+    "vocab_00491": {
+      "meaning": "abdomen or stomach area"
+    },
+    "vocab_00492": {
+      "meaning": "to be the property of; to fit in"
+    },
+    "vocab_00493": {
+      "meaning": "band worn around the waist"
+    },
+    "vocab_00494": {
+      "meaning": "long seating bench"
+    },
+    "vocab_00495": {
+      "meaning": "to curve; to flex an extremity"
+    },
+    "vocab_00496": {
+      "meaning": "furthermore; in addition"
+    },
+    "vocab_00498": {
+      "meaning": "past; farther than"
+    },
+    "vocab_00499": {
+      "meaning": "statement of money owed"
+    },
+    "vocab_00500": {
+      "meaning": "small piece or amount"
+    },
+    "vocab_00501": {
+      "meaning": "act of biting; small snack"
+    },
+    "vocab_00502": {
+      "meaning": "dark writing board for classrooms"
+    },
+    "vocab_00503": {
+      "meaning": "to hold responsible for a fault"
+    },
+    "vocab_00504": {
+      "meaning": "warm bed covering"
+    },
+    "vocab_00505": {
+      "meaning": "having fair or yellow hair"
+    },
+    "vocab_00506": {
+      "meaning": "red fluid circulating in veins"
+    },
+    "vocab_00507": {
+      "meaning": "to produce flowers"
+    },
+    "vocab_00508": {
+      "meaning": "hard strike; sudden impact"
+    },
+    "vocab_00509": {
+      "meaning": "game played on a flat surface"
+    },
+    "vocab_00510": {
+      "meaning": "cook in water; reach boiling point"
+    },
+    "vocab_00511": {
+      "meaning": "cooked in water"
+    },
+    "vocab_00512": {
+      "meaning": "extra payment or reward"
+    },
+    "vocab_00513": {
+      "meaning": "furniture for storing books"
+    },
+    "vocab_00514": {
+      "meaning": "shelf for holding books"
+    },
+    "vocab_00515": {
+      "meaning": "store selling books"
+    },
+    "vocab_00516": {
+      "meaning": "feeling uninterested or weary"
+    },
+    "vocab_00517": {
+      "meaning": "manager; person in charge"
+    },
+    "vocab_00518": {
+      "meaning": "annoy; cause trouble"
+    },
+    "vocab_00519": {
+      "meaning": "undergarment for breasts"
+    },
+    "vocab_00520": {
+      "meaning": "generate creative ideas"
+    },
+    "vocab_00521": {
+      "meaning": "device to stop a vehicle"
+    },
+    "vocab_00522": {
+      "meaning": "part of a tree"
+    },
+    "vocab_00523": {
+      "meaning": "commercial product name"
+    },
+    "vocab_00524": {
+      "meaning": "showing no fear"
+    },
+    "vocab_00526": {
+      "meaning": "gentle, light wind"
+    },
+    "vocab_00527": {
+      "meaning": "woman on her wedding day"
+    },
+    "vocab_00528": {
+      "meaning": "very bright; excellent"
+    },
+    "vocab_00530": {
+      "meaning": "financial plan for spending"
+    },
+    "vocab_00531": {
+      "meaning": "insect; software error"
+    },
+    "vocab_00532": {
+      "meaning": "light source; plant root"
+    },
+    "vocab_00533": {
+      "meaning": "injury from heat or fire"
+    },
+    "vocab_00534": {
+      "meaning": "put underground"
+    },
+    "vocab_00535": {
+      "meaning": "place where buses start/end"
+    },
+    "vocab_00536": {
+      "meaning": "place to wait for buses"
+    },
+    "vocab_00537": {
+      "meaning": "low woody plant"
+    },
+    "vocab_00538": {
+      "meaning": "man in business"
+    },
+    "vocab_00539": {
+      "meaning": "woman in business"
+    },
+    "vocab_00540": {
+      "meaning": "taxi"
+    },
+    "vocab_00541": {
+      "meaning": "place to buy food"
+    },
+    "vocab_00542": {
+      "meaning": "system for organizing dates"
+    },
+    "vocab_00543": {
+      "meaning": "shout to; contact by phone"
+    },
+    "vocab_00545": {
+      "meaning": "living outdoors in tents"
+    },
+    "vocab_00546": {
+      "meaning": "university grounds"
+    },
+    "vocab_00548": {
+      "meaning": "main city; money for investment"
+    },
+    "vocab_00549": {
+      "meaning": "uppercase letter"
+    },
+    "vocab_00550": {
+      "meaning": "leader of a team"
+    },
+    "vocab_00551": {
+      "meaning": "area for parking vehicles"
+    },
+    "vocab_00552": {
+      "meaning": "orange root vegetable"
+    },
+    "vocab_00553": {
+      "meaning": "physical money"
+    },
+    "vocab_00554": {
+      "meaning": "magnetic tape for audio"
+    },
+    "vocab_00555": {
+      "meaning": "large fortified building"
+    },
+    "vocab_00556": {
+      "meaning": "reason for an event"
+    },
+    "vocab_00557": {
+      "meaning": "monetary unit"
+    },
+    "vocab_00558": {
+      "meaning": "middle point"
+    },
+    "vocab_00559": {
+      "meaning": "unit of length"
+    },
+    "vocab_00560": {
+      "meaning": "period of 100 years"
+    },
+    "vocab_00561": {
+      "meaning": "grain-based breakfast food"
+    },
+    "vocab_00562": {
+      "meaning": "sure; definite"
+    },
+    "vocab_00563": {
+      "meaning": "definitely; of course"
+    },
+    "vocab_00564": {
+      "meaning": "series of connected metal links"
+    },
+    "vocab_00565": {
+      "meaning": "person leading a meeting"
+    },
+    "vocab_00566": {
+      "meaning": "difficult task"
+    },
+    "vocab_00567": {
+      "meaning": "sparkling wine"
+    },
+    "vocab_00568": {
+      "meaning": "competition for a title"
+    },
+    "vocab_00569": {
+      "meaning": "opportunity; possibility"
+    },
+    "vocab_00570": {
+      "meaning": "division of a book"
+    },
+    "vocab_00571": {
+      "meaning": "diagram; map"
+    },
+    "vocab_00572": {
+      "meaning": "talk informally"
+    },
+    "vocab_00573": {
+      "meaning": "low in price"
+    },
+    "vocab_00574": {
+      "meaning": "examine or verify"
+    },
+    "vocab_00575": {
+      "meaning": "side of the face"
+    },
+    "vocab_00576": {
+      "meaning": "shout with joy"
+    },
+    "vocab_00577": {
+      "meaning": "professional cook"
+    },
+    "vocab_00578": {
+      "meaning": "relating to chemistry"
+    },
+    "vocab_00579": {
+      "meaning": "written order to pay money"
+    },
+    "vocab_00580": {
+      "meaning": "board game for two"
+    },
+    "vocab_00581": {
+      "meaning": "upper body; large box"
+    },
+    "vocab_00582": {
+      "meaning": "time of being a child"
+    },
+    "vocab_00583": {
+      "meaning": "spicy pepper"
+    },
+    "vocab_00584": {
+      "meaning": "type of ape"
+    },
+    "vocab_00585": {
+      "meaning": "part of face below mouth"
+    },
+    "vocab_00586": {
+      "meaning": "make a bird sound"
+    },
+    "vocab_00587": {
+      "meaning": "act of selecting"
+    },
+    "vocab_00588": {
+      "meaning": "tobacco product"
+    },
+    "vocab_00589": {
+      "meaning": "member of a nation"
+    },
+    "vocab_00591": {
+      "meaning": "traditional; standard"
+    },
+    "vocab_00592": {
+      "meaning": "traditional art music"
+    },
+    "vocab_00593": {
+      "meaning": "cleaning worker; cleaning tool"
+    },
+    "vocab_00594": {
+      "meaning": "easy to see; transparent"
+    },
+    "vocab_00595": {
+      "meaning": "clearly"
+    },
+    "vocab_00596": {
+      "meaning": "administrative staff"
+    },
+    "vocab_00597": {
+      "meaning": "to click"
+    },
+    "vocab_00599": {
+      "meaning": "climbing activity"
+    },
+    "vocab_00600": {
+      "meaning": "clone"
+    },
+    "vocab_00601": {
+      "meaning": "clown"
+    },
+    "vocab_00602": {
+      "meaning": "clue; hint"
+    },
+    "vocab_00603": {
+      "meaning": "shore; coastline"
+    },
+    "vocab_00604": {
+      "meaning": "metal money; coin"
+    },
+    "vocab_00605": {
+      "meaning": "cola drink"
+    },
+    "vocab_00606": {
+      "meaning": "colorful"
+    },
+    "vocab_00607": {
+      "meaning": "column; pillar"
+    },
+    "vocab_00608": {
+      "meaning": "comb"
+    },
+    "vocab_00609": {
+      "meaning": "comfortable"
+    },
+    "vocab_00610": {
+      "meaning": "funny; comedic"
+    },
+    "vocab_00612": {
+      "meaning": "commitment"
+    },
+    "vocab_00613": {
+      "meaning": "committee"
+    },
+    "vocab_00614": {
+      "meaning": "common; usual"
+    },
+    "vocab_00615": {
+      "meaning": "to communicate"
+    },
+    "vocab_00616": {
+      "meaning": "communication"
+    },
+    "vocab_00617": {
+      "meaning": "company"
+    },
+    "vocab_00618": {
+      "meaning": "comparative"
+    },
+    "vocab_00619": {
+      "meaning": "to compare"
+    },
+    "vocab_00620": {
+      "meaning": "competition; rivalry"
+    },
+    "vocab_00621": {
+      "meaning": "to complain"
+    },
+    "vocab_00622": {
+      "meaning": "complaint"
+    },
+    "vocab_00623": {
+      "meaning": "complete; intact"
+    },
+    "vocab_00624": {
+      "meaning": "composer"
+    },
+    "vocab_00625": {
+      "meaning": "to concentrate"
+    },
+    "vocab_00626": {
+      "meaning": "concern; worry"
+    },
+    "vocab_00627": {
+      "meaning": "condition"
+    },
+    "vocab_00628": {
+      "meaning": "self-confident"
+    },
+    "vocab_00629": {
+      "meaning": "to confuse"
+    },
+    "vocab_00630": {
+      "meaning": "confused"
+    },
+    "vocab_00631": {
+      "meaning": "consequence"
+    },
+    "vocab_00632": {
+      "meaning": "to consider"
+    },
+    "vocab_00633": {
+      "meaning": "to consist of"
+    },
+    "vocab_00635": {
+      "meaning": "to contact"
+    },
+    "vocab_00636": {
+      "meaning": "container"
+    },
+    "vocab_00637": {
+      "meaning": "context"
+    },
+    "vocab_00638": {
+      "meaning": "continent"
+    },
+    "vocab_00639": {
+      "meaning": "to continue"
+    },
+    "vocab_00640": {
+      "meaning": "contrast; difference"
+    },
+    "vocab_00642": {
+      "meaning": "convenience; practicality"
+    },
+    "vocab_00643": {
+      "meaning": "convenient; practical"
+    },
+    "vocab_00644": {
+      "meaning": "cooker (British)"
+    },
+    "vocab_00645": {
+      "meaning": "cooking activity"
+    },
+    "vocab_00646": {
+      "meaning": "cooler box"
+    },
+    "vocab_00647": {
+      "meaning": "to copy"
+    },
+    "vocab_00648": {
+      "meaning": "correctly"
+    },
+    "vocab_00649": {
+      "meaning": "cost"
+    },
+    "vocab_00651": {
+      "meaning": "count; tally"
+    },
+    "vocab_00652": {
+      "meaning": "country"
+    },
+    "vocab_00653": {
+      "meaning": "countryside"
+    },
+    "vocab_00654": {
+      "meaning": "couple; several"
+    },
+    "vocab_00655": {
+      "meaning": "court; sports field"
+    },
+    "vocab_00656": {
+      "meaning": "to cover; to include"
+    },
+    "vocab_00657": {
+      "meaning": "crazy; extraordinary (informal)"
+    },
+    "vocab_00659": {
+      "meaning": "to create"
+    },
+    "vocab_00660": {
+      "meaning": "creative"
+    },
+    "vocab_00661": {
+      "meaning": "creativity"
+    },
+    "vocab_00662": {
+      "meaning": "creature"
+    },
+    "vocab_00663": {
+      "meaning": "credit; recognition"
+    },
+    "vocab_00664": {
+      "meaning": "cricket"
+    },
+    "vocab_00665": {
+      "meaning": "crime"
+    },
+    "vocab_00666": {
+      "meaning": "crisp; fresh (air)"
+    },
+    "vocab_00667": {
+      "meaning": "to criticize"
+    },
+    "vocab_00668": {
+      "meaning": "angry; annoyed"
+    },
+    "vocab_00670": {
+      "meaning": "crowd"
+    },
+    "vocab_00671": {
+      "meaning": "crowded; packed"
+    },
+    "vocab_00672": {
+      "meaning": "crown"
+    },
+    "vocab_00673": {
+      "meaning": "leisure cruise"
+    },
+    "vocab_00674": {
+      "meaning": "to cry"
+    },
+    "vocab_00675": {
+      "meaning": "cupboard"
+    },
+    "vocab_00676": {
+      "meaning": "curry"
+    },
+    "vocab_00677": {
+      "meaning": "curse; swear word"
+    },
+    "vocab_00678": {
+      "meaning": "custom; tradition"
+    },
+    "vocab_00679": {
+      "meaning": "customer"
+    },
+    "vocab_00680": {
+      "meaning": "cycling activity"
+    },
+    "vocab_00681": {
+      "meaning": "daily"
+    },
+    "vocab_00683": {
+      "meaning": "barrier to hold back water"
+    },
+    "vocab_00684": {
+      "meaning": "person who performs dance"
+    },
+    "vocab_00685": {
+      "meaning": "possibility of harm or injury"
+    },
+    "vocab_00686": {
+      "meaning": "likely to cause harm"
+    },
+    "vocab_00687": {
+      "meaning": "natural light during the day"
+    },
+    "vocab_00688": {
+      "meaning": "no longer living"
+    },
+    "vocab_00689": {
+      "meaning": "agreement or business arrangement"
+    },
+    "vocab_00690": {
+      "meaning": "end of life"
+    },
+    "vocab_00691": {
+      "meaning": "formal discussion on a topic"
+    },
+    "vocab_00692": {
+      "meaning": "to make a choice"
+    },
+    "vocab_00693": {
+      "meaning": "extending far down or in"
+    },
+    "vocab_00694": {
+      "meaning": "profoundly; very much"
+    },
+    "vocab_00695": {
+      "meaning": "academic rank; unit of measurement"
+    },
+    "vocab_00697": {
+      "meaning": "doctor who treats teeth"
+    },
+    "vocab_00698": {
+      "meaning": "large store with many sections"
+    },
+    "vocab_00699": {
+      "meaning": "to rely on"
+    },
+    "vocab_00700": {
+      "meaning": "account of what something is"
+    },
+    "vocab_00701": {
+      "meaning": "dry, sandy, barren land"
+    },
+    "vocab_00702": {
+      "meaning": "sweet food eaten after meals"
+    },
+    "vocab_00703": {
+      "meaning": "to ruin or demolish"
+    },
+    "vocab_00704": {
+      "meaning": "small individual part or item"
+    },
+    "vocab_00705": {
+      "meaning": "to grow or improve"
+    },
+    "vocab_00706": {
+      "meaning": "advanced; progressed"
+    },
+    "vocab_00707": {
+      "meaning": "precious hard gemstone"
+    },
+    "vocab_00708": {
+      "meaning": "book for personal daily records"
+    },
+    "vocab_00709": {
+      "meaning": "to stop living"
+    },
+    "vocab_00710": {
+      "meaning": "food habits; restricted eating"
+    },
+    "vocab_00711": {
+      "meaning": "in a distinct manner"
+    },
+    "vocab_00712": {
+      "meaning": "state of being hard to do"
+    },
+    "vocab_00713": {
+      "meaning": "device for taking electronic photos"
+    },
+    "vocab_00714": {
+      "meaning": "extinct giant reptile"
+    },
+    "vocab_00715": {
+      "meaning": "straight; without intermediaries"
+    },
+    "vocab_00716": {
+      "meaning": "course or path to follow"
+    },
+    "vocab_00717": {
+      "meaning": "manager; film or play supervisor"
+    },
+    "vocab_00718": {
+      "meaning": "drawback; negative aspect"
+    },
+    "vocab_00719": {
+      "meaning": "to hold a different opinion"
+    },
+    "vocab_00720": {
+      "meaning": "to vanish from sight"
+    },
+    "vocab_00721": {
+      "meaning": "sad due to unmet expectations"
+    },
+    "vocab_00722": {
+      "meaning": "causing feelings of dissatisfaction"
+    },
+    "vocab_00723": {
+      "meaning": "club for dancing to music"
+    },
+    "vocab_00724": {
+      "meaning": "to find something new"
+    },
+    "vocab_00725": {
+      "meaning": "conversation about a topic"
+    },
+    "vocab_00726": {
+      "meaning": "not truthful"
+    },
+    "vocab_00727": {
+      "meaning": "feeling of not liking"
+    },
+    "vocab_00729": {
+      "meaning": "to interrupt or bother"
+    },
+    "vocab_00730": {
+      "meaning": "to separate into parts"
+    },
+    "vocab_00731": {
+      "meaning": "feeling unsteady or spinning"
+    },
+    "vocab_00813": {
+      "meaning": "having a negative physical reaction"
+    },
+    "vocab_00814": {
+      "meaning": "regularly provided money"
+    },
+    "vocab_00815": {
+      "meaning": "audibly; not silently"
+    },
+    "vocab_00816": {
+      "meaning": "set of letters in order"
+    },
+    "vocab_00817": {
+      "meaning": "another available option"
+    },
+    "vocab_00819": {
+      "meaning": "completely; in total"
+    },
+    "vocab_00820": {
+      "meaning": "filled with wonder"
+    },
+    "vocab_00821": {
+      "meaning": "very impressive"
+    },
+    "vocab_00822": {
+      "meaning": "having a strong desire to succeed"
+    },
+    "vocab_00823": {
+      "meaning": "vehicle for medical emergencies"
+    },
+    "vocab_00824": {
+      "meaning": "quantity of something"
+    },
+    "vocab_00825": {
+      "meaning": "funny or entertaining"
+    },
+    "vocab_00826": {
+      "meaning": "detailed examination of something"
+    },
+    "vocab_00827": {
+      "meaning": "to examine in detail"
+    },
+    "vocab_00828": {
+      "meaning": "strong feeling of displeasure"
+    },
+    "vocab_00829": {
+      "meaning": "space between two intersecting lines"
+    },
+    "vocab_00830": {
+      "meaning": "lively; created via animation"
+    },
+    "vocab_00831": {
+      "meaning": "moving images or cartoons"
+    },
+    "vocab_00832": {
+      "meaning": "to make something known publicly"
+    },
+    "vocab_00833": {
+      "meaning": "public statement or notice"
+    },
+    "vocab_00834": {
+      "meaning": "feeling of irritation"
+    },
+    "vocab_00835": {
+      "meaning": "slightly angry or irritated"
+    },
+    "vocab_00836": {
+      "meaning": "happening once every year"
+    },
+    "vocab_00837": {
+      "meaning": "once per year"
+    },
+    "vocab_00838": {
+      "meaning": "small social insect"
+    },
+    "vocab_00839": {
+      "meaning": "opposed to; against"
+    },
+    "vocab_00841": {
+      "meaning": "word with opposite meaning"
+    },
+    "vocab_00842": {
+      "meaning": "feeling of worry or unease"
+    },
+    "vocab_00843": {
+      "meaning": "in a worried manner"
+    },
+    "vocab_00844": {
+      "meaning": "in any case; regardless"
+    },
+    "vocab_00845": {
+      "meaning": "large primate like a gorilla"
+    },
+    "vocab_00846": {
+      "meaning": "expression of regret"
+    },
+    "vocab_00847": {
+      "meaning": "clearly visible or understood"
+    },
+    "vocab_00848": {
+      "meaning": "charm; formal request"
+    },
+    "vocab_00849": {
+      "meaning": "desire to eat"
+    },
+    "vocab_00850": {
+      "meaning": "clap hands; praise"
+    },
+    "vocab_00851": {
+      "meaning": "clapping of hands"
+    },
+    "vocab_00852": {
+      "meaning": "formal request; software program"
+    },
+    "vocab_00853": {
+      "meaning": "designate; assign to a position"
+    },
+    "vocab_00854": {
+      "meaning": "recognition; gratitude"
+    },
+    "vocab_00855": {
+      "meaning": "method of dealing with something"
+    },
+    "vocab_00856": {
+      "meaning": "official agreement"
+    },
+    "vocab_00857": {
+      "meaning": "give official consent"
+    },
+    "vocab_00858": {
+      "meaning": "roughly; about"
+    },
+    "vocab_00859": {
+      "meaning": "building designer"
+    },
+    "vocab_00860": {
+      "meaning": "emerge; happen"
+    },
+    "vocab_00861": {
+      "meaning": "mathematics; calculation"
+    },
+    "vocab_00862": {
+      "meaning": "provide with weapons"
+    },
+    "vocab_00863": {
+      "meaning": "military force; land forces"
+    },
+    "vocab_00864": {
+      "meaning": "organize; put in order"
+    },
+    "vocab_00865": {
+      "meaning": "organization; preparation"
+    },
+    "vocab_00867": {
+      "meaning": "take into custody"
+    },
+    "vocab_00868": {
+      "meaning": "act of arriving"
+    },
+    "vocab_00869": {
+      "meaning": "pointed projectile"
+    },
+    "vocab_00870": {
+      "meaning": "creative person"
+    },
+    "vocab_00871": {
+      "meaning": "creative; related to art"
+    },
+    "vocab_00872": {
+      "meaning": "feeling shame for a mistake"
+    },
+    "vocab_00873": {
+      "meaning": "to the side; apart"
+    },
+    "vocab_00874": {
+      "meaning": "feature or facet"
+    },
+    "vocab_00875": {
+      "meaning": "pain relief medication"
+    },
+    "vocab_00876": {
+      "meaning": "give a task"
+    },
+    "vocab_00877": {
+      "meaning": "given task"
+    },
+    "vocab_00878": {
+      "meaning": "help"
+    },
+    "vocab_00879": {
+      "meaning": "help or support"
+    },
+    "vocab_00881": {
+      "meaning": "connect; socialize"
+    },
+    "vocab_00882": {
+      "meaning": "suppose; presume"
+    },
+    "vocab_00883": {
+      "meaning": "space scientist"
+    },
+    "vocab_00884": {
+      "meaning": "fit; related to sports"
+    },
+    "vocab_00885": {
+      "meaning": "related to the Atlantic Ocean"
+    },
+    "vocab_00886": {
+      "meaning": "air layer; mood"
+    },
+    "vocab_00887": {
+      "meaning": "related to atoms or nuclear"
+    },
+    "vocab_00888": {
+      "meaning": "fasten; join"
+    },
+    "vocab_00889": {
+      "meaning": "enclosure; emotional bond"
+    },
+    "vocab_00890": {
+      "meaning": "achieve a goal"
+    },
+    "vocab_00892": {
+      "meaning": "be present at"
+    },
+    "vocab_00893": {
+      "meaning": "draw interest or attention"
+    },
+    "vocab_00894": {
+      "meaning": "charm; tourist site"
+    },
+    "vocab_00895": {
+      "meaning": "power; official control"
+    },
+    "vocab_00896": {
+      "meaning": "supplementary; helping"
+    },
+    "vocab_00897": {
+      "meaning": "ready for use"
+    },
+    "vocab_00898": {
+      "meaning": "wide street"
+    },
+    "vocab_00900": {
+      "meaning": "having knowledge of"
+    },
+    "vocab_00901": {
+      "meaning": "state of being aware"
+    },
+    "vocab_00902": {
+      "meaning": "impressive; very good"
+    },
+    "vocab_00903": {
+      "meaning": "clumsy; uncomfortable"
+    },
+    "vocab_00904": {
+      "meaning": "care for children temporarily"
+    },
+    "vocab_00905": {
+      "meaning": "temporary child caregiver"
+    },
+    "vocab_00906": {
+      "meaning": "support; move backward"
+    },
+    "vocab_00907": {
+      "meaning": "pain in the back"
+    },
+    "vocab_00908": {
+      "meaning": "bag carried on back"
+    },
+    "vocab_00909": {
+      "meaning": "traveler with a backpack"
+    },
+    "vocab_00910": {
+      "meaning": "traveling with a backpack"
+    },
+    "vocab_00911": {
+      "meaning": "cured pork meat"
+    },
+    "vocab_00912": {
+      "meaning": "luggage"
+    },
+    "vocab_00913": {
+      "meaning": "person who bakes bread"
+    },
+    "vocab_00914": {
+      "meaning": "bread shop"
+    },
+    "vocab_00915": {
+      "meaning": "state of stability"
+    },
+    "vocab_00916": {
+      "meaning": "having no hair"
+    },
+    "vocab_00917": {
+      "meaning": "dressing for a wound"
+    },
+    "vocab_00918": {
+      "meaning": "loud sudden noise"
+    },
+    "vocab_00920": {
+      "meaning": "financial account at bank"
+    },
+    "vocab_00923": {
+      "meaning": "uncovered; naked"
+    },
+    "vocab_00924": {
+      "meaning": "hardly; scarcely"
+    },
+    "vocab_00925": {
+      "meaning": "sound made by dogs"
+    },
+    "vocab_00926": {
+      "meaning": "male bartender"
+    },
+    "vocab_00927": {
+      "meaning": "large cylindrical container"
+    },
+    "vocab_00929": {
+      "meaning": "underground room"
+    },
+    "vocab_00930": {
+      "meaning": "bowl; sink"
+    },
+    "vocab_00931": {
+      "meaning": "foundation; base"
+    },
+    "vocab_00933": {
+      "meaning": "wash; take a bath"
+    },
+    "vocab_00934": {
+      "meaning": "fight or combat"
+    },
+    "vocab_00935": {
+      "meaning": "facial hair on chin"
+    },
+    "vocab_00936": {
+      "meaning": "wild animal"
+    },
+    "vocab_00937": {
+      "meaning": "defeat; strike"
+    },
+    "vocab_00938": {
+      "meaning": "in a beautiful manner"
+    },
+    "vocab_00939": {
+      "meaning": "semi-aquatic rodent"
+    },
+    "vocab_00940": {
+      "meaning": "due to; caused by"
+    },
+    "vocab_00941": {
+      "meaning": "area next to a bed"
+    },
+    "vocab_00942": {
+      "meaning": "in the name of"
+    },
+    "vocab_00943": {
+      "meaning": "act in a certain way"
+    },
+    "vocab_00944": {
+      "meaning": "faith; conviction"
+    },
+    "vocab_00945": {
+      "meaning": "dearly loved"
+    },
+    "vocab_00946": {
+      "meaning": "underneath"
+    },
+    "vocab_00948": {
+      "meaning": "curved or twisted"
+    },
+    "vocab_00950": {
+      "meaning": "wager"
+    },
+    "vocab_00951": {
+      "meaning": "speaking two languages"
+    },
+    "vocab_00953": {
+      "meaning": "trash container; receptacle"
+    },
+    "vocab_00954": {
+      "meaning": "chemistry of living organisms"
+    },
+    "vocab_00955": {
+      "meaning": "account of a person's life"
+    },
+    "vocab_00956": {
+      "meaning": "study of living organisms"
+    },
+    "vocab_00957": {
+      "meaning": "high-ranking church official"
+    },
+    "vocab_00959": {
+      "meaning": "sharp, pungent taste"
+    },
+    "vocab_00961": {
+      "meaning": "lose blood"
+    },
+    "vocab_00962": {
+      "meaning": "mix together"
+    },
+    "vocab_00963": {
+      "meaning": "confer divine favor"
+    },
+    "vocab_00964": {
+      "meaning": "divine gift or favor"
+    },
+    "vocab_00965": {
+      "meaning": "unable to see"
+    },
+    "vocab_00966": {
+      "meaning": "obstruct; clog"
+    },
+    "vocab_00967": {
+      "meaning": "online journal"
+    },
+    "vocab_00968": {
+      "meaning": "person who writes a blog"
+    },
+    "vocab_00969": {
+      "meaning": "reddening of face from embarrassment"
+    },
+    "vocab_00971": {
+      "meaning": "brag; show off"
+    },
+    "vocab_00972": {
+      "meaning": "courageous; confident"
+    },
+    "vocab_00973": {
+      "meaning": "in a courageous manner"
+    },
+    "vocab_00974": {
+      "meaning": "explosive device"
+    },
+    "vocab_00976": {
+      "meaning": "connection or tie"
+    },
+    "vocab_00977": {
+      "meaning": "reserve in advance"
+    },
+    "vocab_00978": {
+      "meaning": "reservation"
+    },
+    "vocab_00979": {
+      "meaning": "economic surge; loud noise"
+    },
+    "vocab_00980": {
+      "meaning": "sturdy footwear"
+    },
+    "vocab_00981": {
+      "meaning": "boundary line"
+    },
+    "vocab_00982": {
+      "meaning": "cause to feel weary"
+    },
+    "vocab_00983": {
+      "meaning": "state of being weary"
+    },
+    "vocab_00985": {
+      "meaning": "rebound off a surface"
+    },
+    "vocab_00986": {
+      "meaning": "certain to; tied"
+    },
+    "vocab_00987": {
+      "meaning": "act of bending in respect"
+    },
+    "vocab_00989": {
+      "meaning": "sport of fighting with fists"
+    },
+    "vocab_00990": {
+      "meaning": "wrist ornament"
+    },
+    "vocab_00991": {
+      "meaning": "group idea generation"
+    },
+    "vocab_00993": {
+      "meaning": "completely new"
+    },
+    "vocab_00994": {
+      "meaning": "yellow metal alloy"
+    },
+    "vocab_00995": {
+      "meaning": "in a courageous manner"
+    },
+    "vocab_00996": {
+      "meaning": "significant discovery or advance"
+    },
+    "vocab_00997": {
+      "meaning": "chest area"
+    },
+    "vocab_00998": {
+      "meaning": "air taken into lungs"
+    },
+    "vocab_00999": {
+      "meaning": "gasping for air"
+    },
+    "vocab_01000": {
+      "meaning": "reproduce; raise animals"
+    },
+    "vocab_01001": {
+      "meaning": "process of reproduction"
+    },
+    "vocab_01002": {
+      "meaning": "hard clay building block"
+    },
+    "vocab_01003": {
+      "meaning": "short in duration"
+    },
+    "vocab_01004": {
+      "meaning": "for a short time"
+    },
+    "vocab_01005": {
+      "meaning": "in a luminous manner"
+    },
+    "vocab_01006": {
+      "meaning": "wide; extensive"
+    },
+    "vocab_01008": {
+      "meaning": "green vegetable"
+    },
+    "vocab_01009": {
+      "meaning": "brown metal alloy"
+    },
+    "vocab_01010": {
+      "meaning": "fraternity; fellowship"
+    },
+    "vocab_01011": {
+      "meaning": "thin film sphere"
+    },
+    "vocab_01012": {
+      "meaning": "informal friend"
+    },
+    "vocab_01013": {
+      "meaning": "construction worker"
+    },
+    "vocab_01014": {
+      "meaning": "male bovine"
+    },
+    "vocab_01015": {
+      "meaning": "projectile for a gun"
+    },
+    "vocab_01016": {
+      "meaning": "official news report"
+    },
+    "vocab_01017": {
+      "meaning": "swelling; collision"
+    },
+    "vocab_01018": {
+      "meaning": "cluster; group"
+    },
+    "vocab_01019": {
+      "meaning": "heavy load"
+    },
+    "vocab_01020": {
+      "meaning": "office or agency"
+    },
+    "vocab_01021": {
+      "meaning": "house thief"
+    },
+    "vocab_01023": {
+      "meaning": "on fire; glowing"
+    },
+    "vocab_01024": {
+      "meaning": "break open suddenly"
+    },
+    "vocab_01025": {
+      "meaning": "sculpture of head/shoulders; raid"
+    },
+    "vocab_01026": {
+      "meaning": "apart from"
+    },
+    "vocab_01027": {
+      "meaning": "person who sells meat"
+    },
+    "vocab_01028": {
+      "meaning": "purchaser"
+    },
+    "vocab_01029": {
+      "meaning": "leafy vegetable"
+    },
+    "vocab_01030": {
+      "meaning": "small wooden house; ship room"
+    },
+    "vocab_01031": {
+      "meaning": "enclosure for animals"
+    },
+    "vocab_01032": {
+      "meaning": "to compute"
+    },
+    "vocab_01033": {
+      "meaning": "the act of computing"
+    },
+    "vocab_01034": {
+      "meaning": "device for math"
+    },
+    "vocab_01035": {
+      "meaning": "young cow; lower leg"
+    },
+    "vocab_01036": {
+      "meaning": "person making a phone call"
+    },
+    "vocab_01037": {
+      "meaning": "peaceful; not excited"
+    },
+    "vocab_01038": {
+      "meaning": "state of being peaceful"
+    },
+    "vocab_01039": {
+      "meaning": "desert animal with humps"
+    },
+    "vocab_01040": {
+      "meaning": "place for camping"
+    },
+    "vocab_01041": {
+      "meaning": "artificial waterway"
+    },
+    "vocab_01042": {
+      "meaning": "to stop or annul"
+    },
+    "vocab_01043": {
+      "meaning": "serious disease"
+    },
+    "vocab_01044": {
+      "meaning": "wax light"
+    },
+    "vocab_01045": {
+      "meaning": "stored in a metal container"
+    },
+    "vocab_01046": {
+      "meaning": "cafeteria"
+    },
+    "vocab_01047": {
+      "meaning": "able; skilled"
+    },
+    "vocab_01048": {
+      "meaning": "maximum amount"
+    },
+    "vocab_01049": {
+      "meaning": "small medicinal container"
+    },
+    "vocab_01051": {
+      "meaning": "to catch; to record"
+    },
+    "vocab_01052": {
+      "meaning": "to feel concern"
+    },
+    "vocab_01053": {
+      "meaning": "professional life"
+    },
+    "vocab_01054": {
+      "meaning": "not careful"
+    },
+    "vocab_01055": {
+      "meaning": "in a reckless manner"
+    },
+    "vocab_01056": {
+      "meaning": "lack of care"
+    },
+    "vocab_01057": {
+      "meaning": "floor covering"
+    },
+    "vocab_01058": {
+      "meaning": "horse-drawn vehicle; train car"
+    },
+    "vocab_01059": {
+      "meaning": "cardboard packaging box"
+    },
+    "vocab_01060": {
+      "meaning": "automated teller machine"
+    },
+    "vocab_01061": {
+      "meaning": "relaxed; informal"
+    },
+    "vocab_01062": {
+      "meaning": "to group by type"
+    },
+    "vocab_01063": {
+      "meaning": "a specific group or class"
+    },
+    "vocab_01064": {
+      "meaning": "farm animals"
+    },
+    "vocab_01065": {
+      "meaning": "carefulness"
+    },
+    "vocab_01066": {
+      "meaning": "alert; careful"
+    },
+    "vocab_01067": {
+      "meaning": "large underground opening"
+    },
+    "vocab_01068": {
+      "meaning": "CD-ROM"
+    },
+    "vocab_01069": {
+      "meaning": "famous person"
+    },
+    "vocab_01070": {
+      "meaning": "biological unit; prison room"
+    },
+    "vocab_01071": {
+      "meaning": "middle; main"
+    },
+    "vocab_01072": {
+      "meaning": "system for heating a building"
+    },
+    "vocab_01073": {
+      "meaning": "formal event"
+    },
+    "vocab_01074": {
+      "meaning": "state of being certain"
+    },
+    "vocab_01075": {
+      "meaning": "difficult but stimulating"
+    },
+    "vocab_01076": {
+      "meaning": "winner"
+    },
+    "vocab_01077": {
+      "meaning": "waterway; TV frequency"
+    },
+    "vocab_01078": {
+      "meaning": "complete disorder"
+    },
+    "vocab_01080": {
+      "meaning": "to describe the qualities of"
+    },
+    "vocab_01081": {
+      "meaning": "cost; formal accusation"
+    },
+    "vocab_01083": {
+      "meaning": "ancient horse-drawn vehicle"
+    },
+    "vocab_01084": {
+      "meaning": "charitable organization; generosity"
+    },
+    "vocab_01085": {
+      "meaning": "attractiveness"
+    },
+    "vocab_01088": {
+      "meaning": "TV interview program"
+    },
+    "vocab_01089": {
+      "meaning": "airport registration counter"
+    },
+    "vocab_01090": {
+      "meaning": "airport registration desk"
+    },
+    "vocab_01091": {
+      "meaning": "payment area; hotel departure"
+    },
+    "vocab_01092": {
+      "meaning": "happy and positive"
+    },
+    "vocab_01094": {
+      "meaning": "scientist; pharmacist"
+    },
+    "vocab_01095": {
+      "meaning": "study of substances"
+    },
+    "vocab_01096": {
+      "meaning": "to treasure; to hold dear"
+    },
+    "vocab_01097": {
+      "meaning": "furniture with drawers"
+    },
+    "vocab_01098": {
+      "meaning": "gum for chewing"
+    },
+    "vocab_01099": {
+      "meaning": "leader"
+    },
+    "vocab_01100": {
+      "meaning": "group of singers"
+    },
+    "vocab_01101": {
+      "meaning": "to struggle to breathe"
+    },
+    "vocab_01102": {
+      "meaning": "related to Christianity"
+    },
+    "vocab_01103": {
+      "meaning": "in time order"
+    },
+    "vocab_01104": {
+      "meaning": "to laugh quietly"
+    },
+    "vocab_01106": {
+      "meaning": "round-shaped"
+    },
+    "vocab_01107": {
+      "meaning": "traveling performance show"
+    },
+    "vocab_01108": {
+      "meaning": "status of being a citizen"
+    },
+    "vocab_01109": {
+      "meaning": "non-military; public"
+    },
+    "vocab_01110": {
+      "meaning": "advanced human society"
+    },
+    "vocab_01111": {
+      "meaning": "to assert; to demand"
+    },
+    "vocab_01112": {
+      "meaning": "traditional; standard style"
+    },
+    "vocab_01113": {
+      "meaning": "to arrange by category"
+    },
+    "vocab_01116": {
+      "meaning": "steep rock face"
+    },
+    "vocab_01117": {
+      "meaning": "long-term weather pattern"
+    },
+    "vocab_01118": {
+      "meaning": "mountain climber"
+    },
+    "vocab_01119": {
+      "meaning": "medical facility"
+    },
+    "vocab_01120": {
+      "meaning": "fastener; video excerpt"
+    },
+    "vocab_01121": {
+      "meaning": "closely; thoroughly"
+    },
+    "vocab_01122": {
+      "meaning": "black rock fuel"
+    },
+    "vocab_01124": {
+      "meaning": "near the coast"
+    },
+    "vocab_01125": {
+      "meaning": "marine food fish"
+    },
+    "vocab_01126": {
+      "meaning": "burial box"
+    },
+    "vocab_01128": {
+      "meaning": "shirt neckband"
+    },
+    "vocab_01129": {
+      "meaning": "opinion writer"
+    },
+    "vocab_01130": {
+      "meaning": "mixture; blend"
+    },
+    "vocab_01131": {
+      "meaning": "to join together"
+    },
+    "vocab_01132": {
+      "meaning": "funny performer"
+    },
+    "vocab_01133": {
+      "meaning": "funny entertainment"
+    },
+    "vocab_01134": {
+      "meaning": "icy space object"
+    },
+    "vocab_01135": {
+      "meaning": "ease; solace"
+    },
+    "vocab_01136": {
+      "meaning": "punctuation mark ( , )"
+    },
+    "vocab_01137": {
+      "meaning": "order; instruction"
+    },
+    "vocab_01138": {
+      "meaning": "remark; feedback"
+    },
+    "vocab_01140": {
+      "meaning": "to perpetrate; to pledge"
+    },
+    "vocab_01141": {
+      "meaning": "practical good sense"
+    },
+    "vocab_01142": {
+      "meaning": "generally; usually"
+    },
+    "vocab_01143": {
+      "meaning": "friend; companion"
+    },
+    "vocab_01144": {
+      "meaning": "contrast; evaluation"
+    },
+    "vocab_01145": {
+      "meaning": "to vie; to contest"
+    },
+    "vocab_01146": {
+      "meaning": "ambitious; rivalry-based"
+    },
+    "vocab_01147": {
+      "meaning": "rival; contender"
+    },
+    "vocab_01148": {
+      "meaning": "to enhance; to complete"
+    },
+    "vocab_01150": {
+      "meaning": "wholly; entirely"
+    },
+    "vocab_01151": {
+      "meaning": "intricate; complex"
+    },
+    "vocab_01152": {
+      "meaning": "to make difficult"
+    },
+    "vocab_01153": {
+      "meaning": "intricate; hard"
+    },
+    "vocab_01154": {
+      "meaning": "expression of praise"
+    },
+    "vocab_01155": {
+      "meaning": "to write; to assemble"
+    },
+    "vocab_01156": {
+      "meaning": "structure; essay"
+    },
+    "vocab_01157": {
+      "meaning": "chemical mixture; combination"
+    },
+    "vocab_01158": {
+      "meaning": "mutual agreement"
+    },
+    "vocab_01159": {
+      "meaning": "mental focus"
+    },
+    "vocab_01160": {
+      "meaning": "idea; notion"
+    },
+    "vocab_01161": {
+      "meaning": "worried; caring"
+    },
+    "vocab_01162": {
+      "meaning": "to deduce; to finish"
+    },
+    "vocab_01163": {
+      "meaning": "final decision; deduction"
+    },
+    "vocab_01164": {
+      "meaning": "behavior; demeanor"
+    },
+    "vocab_01165": {
+      "meaning": "self-assurance"
+    },
+    "vocab_01166": {
+      "meaning": "to verify"
+    },
+    "vocab_01167": {
+      "meaning": "verification"
+    },
+    "vocab_01168": {
+      "meaning": "dispute; clash"
+    },
+    "vocab_01169": {
+      "meaning": "puzzling; unclear"
+    },
+    "vocab_01170": {
+      "meaning": "state of disorder"
+    },
+    "vocab_01171": {
+      "meaning": "to praise success"
+    },
+    "vocab_01172": {
+      "meaning": "to link; to join"
+    },
+    "vocab_01173": {
+      "meaning": "link; connection"
+    },
+    "vocab_01174": {
+      "meaning": "to defeat; to overcome"
+    },
+    "vocab_01175": {
+      "meaning": "awake; aware"
+    },
+    "vocab_01176": {
+      "meaning": "as a result"
+    },
+    "vocab_01177": {
+      "meaning": "preservation; protection"
+    },
+    "vocab_01178": {
+      "meaning": "traditional; conventional"
+    },
+    "vocab_01179": {
+      "meaning": "substantial; significant"
+    },
+    "vocab_01180": {
+      "meaning": "thoughtful deliberation"
+    },
+    "vocab_01181": {
+      "meaning": "non-vowel sound"
+    },
+    "vocab_01182": {
+      "meaning": "all the time"
+    },
+    "vocab_01183": {
+      "meaning": "to form; to comprise"
+    },
+    "vocab_01184": {
+      "meaning": "fundamental law; constitution"
+    },
+    "vocab_01185": {
+      "meaning": "to build; to form"
+    },
+    "vocab_01186": {
+      "meaning": "building; creation"
+    },
+    "vocab_01187": {
+      "meaning": "to eat; to use up"
+    },
+    "vocab_01188": {
+      "meaning": "buyer; user"
+    },
+    "vocab_01189": {
+      "meaning": "using up; intake"
+    },
+    "vocab_01190": {
+      "meaning": "to hold; to include"
+    },
+    "vocab_01192": {
+      "meaning": "frequent; repeated"
+    },
+    "vocab_01193": {
+      "meaning": "repeatedly"
+    },
+    "vocab_01194": {
+      "meaning": "unbroken; ongoing"
+    },
+    "vocab_01195": {
+      "meaning": "without stopping"
+    },
+    "vocab_01196": {
+      "meaning": "opposite; conflicting"
+    },
+    "vocab_01197": {
+      "meaning": "to give support"
+    },
+    "vocab_01198": {
+      "meaning": "provision; input"
+    },
+    "vocab_01199": {
+      "meaning": "to manage; to check"
+    },
+    "vocab_01200": {
+      "meaning": "causing disagreement"
+    },
+    "vocab_01201": {
+      "meaning": "to communicate; to transport"
+    },
+    "vocab_01202": {
+      "meaning": "to persuade"
+    },
+    "vocab_01203": {
+      "meaning": "legal right to creative work"
+    },
+    "vocab_01204": {
+      "meaning": "act of fixing errors"
+    },
+    "vocab_01205": {
+      "meaning": "soft plant fiber; fabric"
+    },
+    "vocab_01206": {
+      "meaning": "expel air from lungs noisily"
+    },
+    "vocab_01207": {
+      "meaning": "advisory or legislative body"
+    },
+    "vocab_01208": {
+      "meaning": "professional guidance or therapy"
+    },
+    "vocab_01210": {
+      "meaning": "oppose; respond to an argument"
+    },
+    "vocab_01211": {
+      "meaning": "too many to be counted"
+    },
+    "vocab_01212": {
+      "meaning": "administrative region"
+    },
+    "vocab_01213": {
+      "meaning": "ability to face fear"
+    },
+    "vocab_01214": {
+      "meaning": "brave"
+    },
+    "vocab_01215": {
+      "meaning": "type of summer squash"
+    },
+    "vocab_01216": {
+      "meaning": "skillful handiwork"
+    },
+    "vocab_01217": {
+      "meaning": "violent collision; sudden collapse"
+    },
+    "vocab_01219": {
+      "meaning": "maker or inventor"
+    },
+    "vocab_01220": {
+      "meaning": "relating to illegal acts"
+    },
+    "vocab_01221": {
+      "meaning": "time of intense difficulty"
+    },
+    "vocab_01222": {
+      "meaning": "person who judges art or work"
+    },
+    "vocab_01223": {
+      "meaning": "expressing disapproval; crucial"
+    },
+    "vocab_01224": {
+      "meaning": "harvested agricultural plants"
+    },
+    "vocab_01225": {
+      "meaning": "place to cross a road"
+    },
+    "vocab_01226": {
+      "meaning": "intersection of two roads"
+    },
+    "vocab_01227": {
+      "meaning": "black bird"
+    },
+    "vocab_01228": {
+      "meaning": "causing pain or suffering"
+    },
+    "vocab_01229": {
+      "meaning": "break into small pieces"
+    },
+    "vocab_01230": {
+      "meaning": "long green vegetable"
+    },
+    "vocab_01231": {
+      "meaning": "grow plants; develop skills"
+    },
+    "vocab_01232": {
+      "meaning": "relating to social customs"
+    },
+    "vocab_01234": {
+      "meaning": "desire to learn"
+    },
+    "vocab_01235": {
+      "meaning": "eager to know"
+    },
+    "vocab_01236": {
+      "meaning": "in an inquisitive manner"
+    },
+    "vocab_01237": {
+      "meaning": "having spiral hair"
+    },
+    "vocab_01238": {
+      "meaning": "money used in a country"
+    },
+    "vocab_01239": {
+      "meaning": "happening now; present"
+    },
+    "vocab_01240": {
+      "meaning": "at the present time"
+    },
+    "vocab_01241": {
+      "meaning": "course of study"
+    },
+    "vocab_01242": {
+      "meaning": "window fabric covering"
+    },
+    "vocab_01243": {
+      "meaning": "bending line or shape"
+    },
+    "vocab_01244": {
+      "meaning": "soft pillow for furniture"
+    },
+    "vocab_01245": {
+      "meaning": "government tax on imports"
+    },
+    "vocab_01247": {
+      "meaning": "summary of work experience"
+    },
+    "vocab_01248": {
+      "meaning": "recurring series; bicycle"
+    },
+    "vocab_01250": {
+      "meaning": "type of white flower"
+    },
+    "vocab_01252": {
+      "meaning": "cause physical harm"
+    },
+    "vocab_01253": {
+      "meaning": "broken or harmed"
+    },
+    "vocab_01254": {
+      "meaning": "slightly wet"
+    },
+    "vocab_01255": {
+      "meaning": "in a risky way"
+    },
+    "vocab_01256": {
+      "meaning": "have courage to do something"
+    },
+    "vocab_01257": {
+      "meaning": "absence of light"
+    },
+    "vocab_01259": {
+      "meaning": "going on romantic dates"
+    },
+    "vocab_01260": {
+      "meaning": "state of confusion"
+    },
+    "vocab_01261": {
+      "meaning": "impress greatly; blind temporarily"
+    },
+    "vocab_01262": {
+      "meaning": "time limit for completion"
+    },
+    "vocab_01263": {
+      "meaning": "causing death"
+    },
+    "vocab_01264": {
+      "meaning": "unable to hear"
+    },
+    "vocab_01266": {
+      "meaning": "person who sells goods"
+    },
+    "vocab_01267": {
+      "meaning": "scattered pieces of waste"
+    },
+    "vocab_01268": {
+      "meaning": "money owed"
+    },
+    "vocab_01269": {
+      "meaning": "choice made after consideration"
+    },
+    "vocab_01270": {
+      "meaning": "formal statement"
+    },
+    "vocab_01271": {
+      "meaning": "state officially"
+    },
+    "vocab_01274": {
+      "meaning": "become or make smaller"
+    },
+    "vocab_01275": {
+      "meaning": "devote time or effort"
+    },
+    "vocab_01276": {
+      "meaning": "action or act"
+    },
+    "vocab_01277": {
+      "meaning": "win against an opponent"
+    },
+    "vocab_01278": {
+      "meaning": "protect from harm"
+    },
+    "vocab_01279": {
+      "meaning": "person who protects; sports player"
+    },
+    "vocab_01280": {
+      "meaning": "act of protecting"
+    },
+    "vocab_01281": {
+      "meaning": "lack of something necessary"
+    },
+    "vocab_01282": {
+      "meaning": "state the meaning of"
+    },
+    "vocab_01283": {
+      "meaning": "certain; clear"
+    },
+    "vocab_01284": {
+      "meaning": "the word 'the'"
+    },
+    "vocab_01285": {
+      "meaning": "without doubt"
+    },
+    "vocab_01286": {
+      "meaning": "meaning of a word"
+    },
+    "vocab_01287": {
+      "meaning": "make late; postpone"
+    },
+    "vocab_01288": {
+      "meaning": "remove or erase"
+    },
+    "vocab_01289": {
+      "meaning": "fine; easily broken"
+    },
+    "vocab_01290": {
+      "meaning": "great pleasure"
+    },
+    "vocab_01291": {
+      "meaning": "very happy"
+    },
+    "vocab_01292": {
+      "meaning": "highly pleasing"
+    },
+    "vocab_01293": {
+      "meaning": "to send or hand over"
+    },
+    "vocab_01294": {
+      "meaning": "the act of sending goods"
+    },
+    "vocab_01296": {
+      "meaning": "to ask for firmly"
+    },
+    "vocab_01297": {
+      "meaning": "government by the people"
+    },
+    "vocab_01298": {
+      "meaning": "favoring social equality"
+    },
+    "vocab_01299": {
+      "meaning": "to show clearly or protest"
+    },
+    "vocab_01300": {
+      "meaning": "a public protest or display"
+    },
+    "vocab_01301": {
+      "meaning": "to state that something is untrue"
+    },
+    "vocab_01302": {
+      "meaning": "to leave a place"
+    },
+    "vocab_01303": {
+      "meaning": "a distinct part of a larger organization"
+    },
+    "vocab_01304": {
+      "meaning": "the act of leaving"
+    },
+    "vocab_01305": {
+      "meaning": "relying on someone else"
+    },
+    "vocab_01306": {
+      "meaning": "money put down as advance payment"
+    },
+    "vocab_01307": {
+      "meaning": "feeling very sad or low"
+    },
+    "vocab_01308": {
+      "meaning": "causing great sadness"
+    },
+    "vocab_01309": {
+      "meaning": "a state of extreme sadness"
+    },
+    "vocab_01310": {
+      "meaning": "to take away something needed"
+    },
+    "vocab_01311": {
+      "meaning": "how deep something is"
+    },
+    "vocab_01312": {
+      "meaning": "to get from a source"
+    },
+    "vocab_01313": {
+      "meaning": "to have a right to"
+    },
+    "vocab_01314": {
+      "meaning": "to plan or make a layout"
+    },
+    "vocab_01315": {
+      "meaning": "someone who creates plans or clothes"
+    },
+    "vocab_01316": {
+      "meaning": "a strong wish or longing"
+    },
+    "vocab_01317": {
+      "meaning": "complete loss of hope"
+    },
+    "vocab_01318": {
+      "meaning": "hopeless or reckless"
+    },
+    "vocab_01319": {
+      "meaning": "in spite of"
+    },
+    "vocab_01320": {
+      "meaning": "place where someone is going"
+    },
+    "vocab_01321": {
+      "meaning": "the process of ruining completely"
+    },
+    "vocab_01322": {
+      "meaning": "causing severe damage"
+    },
+    "vocab_01323": {
+      "meaning": "an investigator of crimes"
+    },
+    "vocab_01324": {
+      "meaning": "firmness of purpose"
+    },
+    "vocab_01325": {
+      "meaning": "to decide or settle"
+    },
+    "vocab_01326": {
+      "meaning": "to ruin widely and completely"
+    },
+    "vocab_01327": {
+      "meaning": "causing extreme destruction"
+    },
+    "vocab_01328": {
+      "meaning": "growth or gradual improvement"
+    },
+    "vocab_01329": {
+      "meaning": "a mechanical or electronic tool"
+    },
+    "vocab_01330": {
+      "meaning": "deep loyalty and commitment"
+    },
+    "vocab_01331": {
+      "meaning": "a simplified drawing showing structure"
+    },
+    "vocab_01332": {
+      "meaning": "a numbered circular face"
+    },
+    "vocab_01334": {
+      "meaning": "a conversation between two people"
+    },
+    "vocab_01335": {
+      "meaning": "a straight line through a circle"
+    },
+    "vocab_01336": {
+      "meaning": "absorbent baby underwear"
+    },
+    "vocab_01337": {
+      "meaning": "to be unlike each other"
+    },
+    "vocab_01339": {
+      "meaning": "stored or transmitted via computers"
+    },
+    "vocab_01340": {
+      "meaning": "steady and earnest effort"
+    },
+    "vocab_01341": {
+      "meaning": "hardworking and industrious"
+    },
+    "vocab_01342": {
+      "meaning": "an oxide containing two atoms"
+    },
+    "vocab_01344": {
+      "meaning": "straightaway without stopping"
+    },
+    "vocab_01345": {
+      "meaning": "soiled matter or earth"
+    },
+    "vocab_01346": {
+      "meaning": "a physical or mental impairment"
+    },
+    "vocab_01347": {
+      "meaning": "to switch off or make useless"
+    },
+    "vocab_01348": {
+      "meaning": "having a physical or mental impairment"
+    },
+    "vocab_01349": {
+      "meaning": "a failure to agree"
+    },
+    "vocab_01350": {
+      "meaning": "to fail to fulfill expectations"
+    },
+    "vocab_01351": {
+      "meaning": "sadness from unmet expectations"
+    },
+    "vocab_01352": {
+      "meaning": "a sudden great misfortune"
+    },
+    "vocab_01353": {
+      "meaning": "causing severe negative consequences"
+    },
+    "vocab_01354": {
+      "meaning": "music mixer and announcer"
+    },
+    "vocab_01355": {
+      "meaning": "slight physical discomfort"
+    },
+    "vocab_01356": {
+      "meaning": "a reduction in price"
+    },
+    "vocab_01357": {
+      "meaning": "to take away courage or confidence"
+    },
+    "vocab_01358": {
+      "meaning": "the finding of something new"
+    },
+    "vocab_01359": {
+      "meaning": "unfair treatment of different groups"
+    },
+    "vocab_01360": {
+      "meaning": "an illness or medical condition"
+    },
+    "vocab_01361": {
+      "meaning": "causing strong dislike or nausea"
+    },
+    "vocab_01362": {
+      "meaning": "machine that washes plates"
+    },
+    "vocab_01363": {
+      "meaning": "a flat circular object"
+    },
+    "vocab_01365": {
+      "meaning": "to show or exhibit"
+    },
+    "vocab_01366": {
+      "meaning": "to pass into solution"
+    },
+    "vocab_01367": {
+      "meaning": "the amount of space between things"
+    },
+    "vocab_01368": {
+      "meaning": "far away in space or time"
+    },
+    "vocab_01369": {
+      "meaning": "a difference or special feature"
+    },
+    "vocab_01370": {
+      "meaning": "clearly and unmistakably"
+    },
+    "vocab_01371": {
+      "meaning": "to recognize as separate or different"
+    },
+    "vocab_01372": {
+      "meaning": "to hand out shares"
+    },
+    "vocab_01373": {
+      "meaning": "the action of sharing out"
+    },
+    "vocab_01374": {
+      "meaning": "an area or region"
+    },
+    "vocab_01375": {
+      "meaning": "an interruption or civil unrest"
+    },
+    "vocab_01376": {
+      "meaning": "to plunge headfirst into water"
+    },
+    "vocab_01378": {
+      "meaning": "someone who swims underwater"
+    },
+    "vocab_01379": {
+      "meaning": "varied; assorted"
+    },
+    "vocab_01381": {
+      "meaning": "godly; sacred"
+    },
+    "vocab_01382": {
+      "meaning": "underwater swimming activity"
+    },
+    "vocab_01383": {
+      "meaning": "legally separated"
+    },
+    "vocab_01384": {
+      "meaning": "disc jockey"
+    },
+    "vocab_01385": {
+      "meaning": "document; doctor"
+    },
+    "vocab_01469": {
+      "meaning": "unproven accusation"
+    },
+    "vocab_01470": {
+      "meaning": "formal union or association"
+    },
+    "vocab_01471": {
+      "meaning": "partner in a cause"
+    },
+    "vocab_01472": {
+      "meaning": "next to; together with"
+    },
+    "vocab_01473": {
+      "meaning": "in order of the alphabet"
+    },
+    "vocab_01474": {
+      "meaning": "sacred table for worship"
+    },
+    "vocab_01475": {
+      "meaning": "to change"
+    },
+    "vocab_01476": {
+      "meaning": "to take turns"
+    },
+    "vocab_01477": {
+      "meaning": "as another option"
+    },
+    "vocab_01478": {
+      "meaning": "height above sea level"
+    },
+    "vocab_01479": {
+      "meaning": "lightweight metal"
+    },
+    "vocab_01480": {
+      "meaning": "to fill with wonder"
+    },
+    "vocab_01481": {
+      "meaning": "feeling of great surprise"
+    },
+    "vocab_01482": {
+      "meaning": "in a surprising manner"
+    },
+    "vocab_01483": {
+      "meaning": "diplomatic representative"
+    },
+    "vocab_01484": {
+      "meaning": "uncertainty or double meaning"
+    },
+    "vocab_01485": {
+      "meaning": "having multiple possible meanings"
+    },
+    "vocab_01486": {
+      "meaning": "chemical compound"
+    },
+    "vocab_01487": {
+      "meaning": "in the middle of"
+    },
+    "vocab_01488": {
+      "meaning": "plentiful; abundant"
+    },
+    "vocab_01489": {
+      "meaning": "sound booster"
+    },
+    "vocab_01490": {
+      "meaning": "to increase volume or signal"
+    },
+    "vocab_01491": {
+      "meaning": "to entertain"
+    },
+    "vocab_01492": {
+      "meaning": "comparison; parallel"
+    },
+    "vocab_01493": {
+      "meaning": "person who analyzes"
+    },
+    "vocab_01494": {
+      "meaning": "heavy object to hold ships"
+    },
+    "vocab_01495": {
+      "meaning": "place for ships to dock"
+    },
+    "vocab_01496": {
+      "meaning": "main male news presenter"
+    },
+    "vocab_01497": {
+      "meaning": "main news presenter"
+    },
+    "vocab_01498": {
+      "meaning": "severe mental or physical pain"
+    },
+    "vocab_01499": {
+      "meaning": "to bring to life"
+    },
+    "vocab_01500": {
+      "meaning": "without a name"
+    },
+    "vocab_01501": {
+      "meaning": "defensive against aircraft"
+    },
+    "vocab_01502": {
+      "meaning": "destroying or inhibiting bacteria"
+    },
+    "vocab_01503": {
+      "meaning": "preventing or treating cancer"
+    },
+    "vocab_01504": {
+      "meaning": "to expect or foresee"
+    },
+    "vocab_01505": {
+      "meaning": "hopeful expectation"
+    },
+    "vocab_01506": {
+      "meaning": "preventing pollution"
+    },
+    "vocab_01507": {
+      "meaning": "valuable due to age"
+    },
+    "vocab_01508": {
+      "meaning": "preventing static electricity"
+    },
+    "vocab_01509": {
+      "meaning": "preventing or removing computer viruses"
+    },
+    "vocab_01510": {
+      "meaning": "punctuation mark ( ' )"
+    },
+    "vocab_01512": {
+      "meaning": "person applying for something"
+    },
+    "vocab_01513": {
+      "meaning": "showing gratitude or value"
+    },
+    "vocab_01515": {
+      "meaning": "in a suitable manner"
+    },
+    "vocab_01516": {
+      "meaning": "estimated; near"
+    },
+    "vocab_01517": {
+      "meaning": "curved structure"
+    },
+    "vocab_01518": {
+      "meaning": "expert in ancient history"
+    },
+    "vocab_01519": {
+      "meaning": "extremely cold; polar"
+    },
+    "vocab_01520": {
+      "meaning": "place for public events"
+    },
+    "vocab_01521": {
+      "meaning": "the nobility"
+    },
+    "vocab_01522": {
+      "meaning": "amount held in arms"
+    },
+    "vocab_01523": {
+      "meaning": "to stir up feelings"
+    },
+    "vocab_01524": {
+      "meaning": "haughty; conceited"
+    },
+    "vocab_01525": {
+      "meaning": "blood vessel carrying blood"
+    },
+    "vocab_01526": {
+      "meaning": "speaking clearly and fluently"
+    },
+    "vocab_01527": {
+      "meaning": "in a non-natural way"
+    },
+    "vocab_01528": {
+      "meaning": "artistic skill"
+    },
+    "vocab_01529": {
+      "meaning": "powdery residue from fire"
+    },
+    "vocab_01530": {
+      "meaning": "strong desire or ambition"
+    },
+    "vocab_01531": {
+      "meaning": "to have a strong ambition"
+    },
+    "vocab_01532": {
+      "meaning": "violent attack"
+    },
+    "vocab_01533": {
+      "meaning": "to put together; gather"
+    },
+    "vocab_01534": {
+      "meaning": "process of joining; meeting"
+    },
+    "vocab_01535": {
+      "meaning": "to state firmly"
+    },
+    "vocab_01536": {
+      "meaning": "to evaluate"
+    },
+    "vocab_01537": {
+      "meaning": "act of evaluating"
+    },
+    "vocab_01538": {
+      "meaning": "something accepted as true"
+    },
+    "vocab_01539": {
+      "meaning": "guarantee; confidence"
+    },
+    "vocab_01540": {
+      "meaning": "to convince or promise"
+    },
+    "vocab_01541": {
+      "meaning": "to surprise greatly"
+    },
+    "vocab_01542": {
+      "meaning": "very surprised"
+    },
+    "vocab_01543": {
+      "meaning": "very surprising"
+    },
+    "vocab_01544": {
+      "meaning": "feeling of great surprise"
+    },
+    "vocab_01545": {
+      "meaning": "study of stars"
+    },
+    "vocab_01546": {
+      "meaning": "sports branch"
+    },
+    "vocab_01547": {
+      "meaning": "enclosed; emotionally close"
+    },
+    "vocab_01548": {
+      "meaning": "achievable"
+    },
+    "vocab_01549": {
+      "meaning": "achievement"
+    },
+    "vocab_01550": {
+      "meaning": "presence"
+    },
+    "vocab_01551": {
+      "meaning": "attentive"
+    },
+    "vocab_01552": {
+      "meaning": "attentively"
+    },
+    "vocab_01553": {
+      "meaning": "attractiveness"
+    },
+    "vocab_01554": {
+      "meaning": "trait; attribute"
+    },
+    "vocab_01556": {
+      "meaning": "unusual; atypical"
+    },
+    "vocab_01557": {
+      "meaning": "British term for 'eggplant'"
+    },
+    "vocab_01558": {
+      "meaning": "financial examination"
+    },
+    "vocab_01559": {
+      "meaning": "audition"
+    },
+    "vocab_01561": {
+      "meaning": "authoritative"
+    },
+    "vocab_01562": {
+      "meaning": "to legalize; to authorize"
+    },
+    "vocab_01563": {
+      "meaning": "availability"
+    },
+    "vocab_01564": {
+      "meaning": "to wait"
+    },
+    "vocab_01565": {
+      "meaning": "feeling of awe and amazement"
+    },
+    "vocab_01566": {
+      "meaning": "axe"
+    },
+    "vocab_01567": {
+      "meaning": "axis"
+    },
+    "vocab_01568": {
+      "meaning": "reserve"
+    },
+    "vocab_01569": {
+      "meaning": "backward; moving back"
+    },
+    "vocab_01570": {
+      "meaning": "backyard"
+    },
+    "vocab_01571": {
+      "meaning": "short-tempered; easily angered"
+    },
+    "vocab_01572": {
+      "meaning": "badge"
+    },
+    "vocab_01574": {
+      "meaning": "balanced"
+    },
+    "vocab_01575": {
+      "meaning": "hard to control; resistant"
+    },
+    "vocab_01576": {
+      "meaning": "narrative song or poem"
+    },
+    "vocab_01577": {
+      "meaning": "ballet"
+    },
+    "vocab_01578": {
+      "meaning": "ballot; voting"
+    },
+    "vocab_01580": {
+      "meaning": "to forbid"
+    },
+    "vocab_01581": {
+      "meaning": "banker"
+    },
+    "vocab_01582": {
+      "meaning": "bankrupt"
+    },
+    "vocab_01583": {
+      "meaning": "bankruptcy"
+    },
+    "vocab_01584": {
+      "meaning": "barbershop"
+    },
+    "vocab_01588": {
+      "meaning": "type of grain"
+    },
+    "vocab_01589": {
+      "meaning": "agricultural barn or warehouse"
+    },
+    "vocab_01590": {
+      "meaning": "air pressure measuring device"
+    },
+    "vocab_01591": {
+      "meaning": "barren; arid"
+    },
+    "vocab_01592": {
+      "meaning": "barrier; obstacle"
+    },
+    "vocab_01593": {
+      "meaning": "bartender"
+    },
+    "vocab_01594": {
+      "meaning": "public bathhouse"
+    },
+    "vocab_01595": {
+      "meaning": "battlefield"
+    },
+    "vocab_01596": {
+      "meaning": "hunting dog breed"
+    },
+    "vocab_01597": {
+      "meaning": "bird's beak"
+    },
+    "vocab_01598": {
+      "meaning": "beam; ray of light"
+    },
+    "vocab_01599": {
+      "meaning": "bearing; navigation direction"
+    },
+    "vocab_01601": {
+      "meaning": "to beautify"
+    },
+    "vocab_01602": {
+      "meaning": "to shout loudly; to roar"
+    },
+    "vocab_01603": {
+      "meaning": "personal belongings"
+    },
+    "vocab_01605": {
+      "meaning": "beneficial"
+    },
+    "vocab_01606": {
+      "meaning": "to benefit; to profit"
+    },
+    "vocab_01607": {
+      "meaning": "benevolence; generosity"
+    },
+    "vocab_01608": {
+      "meaning": "kind-hearted; generous"
+    },
+    "vocab_01609": {
+      "meaning": "berry"
+    },
+    "vocab_01610": {
+      "meaning": "to bestow; to grant"
+    },
+    "vocab_01611": {
+      "meaning": "bestseller"
+    },
+    "vocab_01612": {
+      "meaning": "to betray"
+    },
+    "vocab_01613": {
+      "meaning": "to confuse"
+    },
+    "vocab_01614": {
+      "meaning": "confusion"
+    },
+    "vocab_01615": {
+      "meaning": "price offer; attempt"
+    },
+    "vocab_01616": {
+      "meaning": "auction bidding process"
+    },
+    "vocab_01617": {
+      "meaning": "bikini"
+    },
+    "vocab_01618": {
+      "meaning": "billion"
+    },
+    "vocab_01619": {
+      "meaning": "to bind"
+    },
+    "vocab_01620": {
+      "meaning": "short biography"
+    },
+    "vocab_01621": {
+      "meaning": "biological"
+    },
+    "vocab_01622": {
+      "meaning": "biotechnology"
+    },
+    "vocab_01623": {
+      "meaning": "birdcage"
+    },
+    "vocab_01624": {
+      "meaning": "birthplace"
+    },
+    "vocab_01625": {
+      "meaning": "bitterly; intensely"
+    },
+    "vocab_01626": {
+      "meaning": "weird; odd"
+    },
+    "vocab_01627": {
+      "meaning": "blade"
+    },
+    "vocab_01628": {
+      "meaning": "explosion"
+    },
+    "vocab_01630": {
+      "meaning": "blaze"
+    },
+    "vocab_01633": {
+      "meaning": "blindly; thoughtlessly"
+    },
+    "vocab_01634": {
+      "meaning": "blindness"
+    },
+    "vocab_01635": {
+      "meaning": "to blink"
+    },
+    "vocab_01636": {
+      "meaning": "bloodstream"
+    },
+    "vocab_01638": {
+      "meaning": "very (informal British intensifier)"
+    },
+    "vocab_01639": {
+      "meaning": "blooming; flourishing"
+    },
+    "vocab_01640": {
+      "meaning": "flower of a fruit tree"
+    },
+    "vocab_01641": {
+      "meaning": "fuzziness; something unclear"
+    },
+    "vocab_01642": {
+      "meaning": "speak suddenly without thinking"
+    },
+    "vocab_01644": {
+      "meaning": "boiling; very hot"
+    },
+    "vocab_01647": {
+      "meaning": "lock with a bar; run away"
+    },
+    "vocab_01648": {
+      "meaning": "attack repeatedly"
+    },
+    "vocab_01649": {
+      "meaning": "aircraft designed to drop bombs"
+    },
+    "vocab_01650": {
+      "meaning": "act of dropping bombs"
+    },
+    "vocab_01651": {
+      "meaning": "bony; thin"
+    },
+    "vocab_01652": {
+      "meaning": "fond of reading; bookworm"
+    },
+    "vocab_01653": {
+      "meaning": "small book; pamphlet"
+    },
+    "vocab_01654": {
+      "meaning": "marker for a book page"
+    },
+    "vocab_01657": {
+      "meaning": "increase"
+    },
+    "vocab_01658": {
+      "meaning": "small stall or cubicle"
+    },
+    "vocab_01659": {
+      "meaning": "fond of giving orders"
+    },
+    "vocab_01660": {
+      "meaning": "study of plants"
+    },
+    "vocab_01661": {
+      "meaning": "disturbed; feeling concerned"
+    },
+    "vocab_01662": {
+      "meaning": "annoying; troublesome"
+    },
+    "vocab_01665": {
+      "meaning": "type of American whiskey"
+    },
+    "vocab_01667": {
+      "meaning": "person who boxes"
+    },
+    "vocab_01668": {
+      "meaning": "parentheses; category group"
+    },
+    "vocab_01669": {
+      "meaning": "boast about oneself"
+    },
+    "vocab_01671": {
+      "meaning": "courage"
+    },
+    "vocab_01672": {
+      "meaning": "easily broken"
+    },
+    "vocab_01673": {
+      "meaning": "failure; collapse of machine or mind"
+    },
+    "vocab_01674": {
+      "meaning": "end of a relationship"
+    },
+    "vocab_01675": {
+      "meaning": "stunning; amazing"
+    },
+    "vocab_01677": {
+      "meaning": "breezy; relaxed"
+    },
+    "vocab_01678": {
+      "meaning": "factory for making beer"
+    },
+    "vocab_01679": {
+      "meaning": "brilliantly"
+    },
+    "vocab_01680": {
+      "meaning": "high-speed internet"
+    },
+    "vocab_01681": {
+      "meaning": "transmit via radio or television"
+    },
+    "vocab_01682": {
+      "meaning": "announcer; broadcasting station"
+    },
+    "vocab_01683": {
+      "meaning": "make wider"
+    },
+    "vocab_01684": {
+      "meaning": "generally; widely"
+    },
+    "vocab_01685": {
+      "meaning": "pamphlet"
+    },
+    "vocab_01686": {
+      "meaning": "brother of one's spouse"
+    },
+    "vocab_01687": {
+      "meaning": "look through; scan"
+    },
+    "vocab_01688": {
+      "meaning": "software for viewing websites"
+    },
+    "vocab_01689": {
+      "meaning": "skin discoloration from injury"
+    },
+    "vocab_01690": {
+      "meaning": "flower bud"
+    },
+    "vocab_01692": {
+      "meaning": "eating disorder"
+    },
+    "vocab_01693": {
+      "meaning": "intimidate; mistreat"
+    },
+    "vocab_01694": {
+      "meaning": "buttocks; homeless person"
+    },
+    "vocab_01695": {
+      "meaning": "car protective bar"
+    },
+    "vocab_01696": {
+      "meaning": "small bread roll; hair bun"
+    },
+    "vocab_01698": {
+      "meaning": "burdensome"
+    },
+    "vocab_01699": {
+      "meaning": "system of government administration"
+    },
+    "vocab_01700": {
+      "meaning": "house theft"
+    },
+    "vocab_01701": {
+      "meaning": "steal by breaking into homes"
+    },
+    "vocab_01702": {
+      "meaning": "funeral"
+    },
+    "vocab_01703": {
+      "meaning": "busy activity"
+    },
+    "vocab_01704": {
+      "meaning": "crowded and busy"
+    },
+    "vocab_01706": {
+      "meaning": "humming sound"
+    },
+    "vocab_01708": {
+      "meaning": "cupboard; government body"
+    },
+    "vocab_01709": {
+      "meaning": "thick wire or rope"
+    },
+    "vocab_01710": {
+      "meaning": "in a calm manner"
+    },
+    "vocab_01711": {
+      "meaning": "organized effort for a goal"
+    },
+    "vocab_01712": {
+      "meaning": "person seeking a position"
+    },
+    "vocab_01713": {
+      "meaning": "walking stick; plant stem"
+    },
+    "vocab_01714": {
+      "meaning": "heavy metal ball for cannon"
+    },
+    "vocab_01715": {
+      "meaning": "canon; major literary works"
+    },
+    "vocab_01716": {
+      "meaning": "ability"
+    },
+    "vocab_01717": {
+      "meaning": "image description; text"
+    },
+    "vocab_01718": {
+      "meaning": "captured; confined"
+    },
+    "vocab_01719": {
+      "meaning": "vehicle used as a home"
+    },
+    "vocab_01720": {
+      "meaning": "chemical element"
+    },
+    "vocab_01721": {
+      "meaning": "carbon dioxide"
+    },
+    "vocab_01722": {
+      "meaning": "measure of environmental impact"
+    },
+    "vocab_01723": {
+      "meaning": "carbon monoxide"
+    },
+    "vocab_01724": {
+      "meaning": "stiff paper material"
+    },
+    "vocab_01725": {
+      "meaning": "open-fronted sweater"
+    },
+    "vocab_01726": {
+      "meaning": "free from worry; relaxed"
+    },
+    "vocab_01727": {
+      "meaning": "affectionate; concerned"
+    },
+    "vocab_01728": {
+      "meaning": "festival"
+    },
+    "vocab_01729": {
+      "meaning": "share a car ride"
+    },
+    "vocab_01730": {
+      "meaning": "cut into a hard material"
+    },
+    "vocab_01731": {
+      "meaning": "small waterfall; series"
+    },
+    "vocab_01732": {
+      "meaning": "actors in a film or play"
+    },
+    "vocab_01734": {
+      "meaning": "in a relaxed manner"
+    },
+    "vocab_01735": {
+      "meaning": "a list of items"
+    },
+    "vocab_01736": {
+      "meaning": "a trigger; an agent of change"
+    },
+    "vocab_01737": {
+      "meaning": "a major disaster"
+    },
+    "vocab_01738": {
+      "meaning": "devastating; destructive"
+    },
+    "vocab_01739": {
+      "meaning": "easily remembered"
+    },
+    "vocab_01740": {
+      "meaning": "grouping into classes"
+    },
+    "vocab_01741": {
+      "meaning": "food service"
+    },
+    "vocab_01742": {
+      "meaning": "a large church"
+    },
+    "vocab_01744": {
+      "meaning": "to stop"
+    },
+    "vocab_01745": {
+      "meaning": "the upper interior surface of a room"
+    },
+    "vocab_01746": {
+      "meaning": "an underground storage room"
+    },
+    "vocab_01747": {
+      "meaning": "a person who plays the cello"
+    },
+    "vocab_01748": {
+      "meaning": "a large stringed musical instrument"
+    },
+    "vocab_01749": {
+      "meaning": "a public graveyard"
+    },
+    "vocab_01750": {
+      "meaning": "Celsius temperature scale"
+    },
+    "vocab_01751": {
+      "meaning": "an official document"
+    },
+    "vocab_01752": {
+      "meaning": "the process of official verification"
+    },
+    "vocab_01753": {
+      "meaning": "to verify officially"
+    },
+    "vocab_01755": {
+      "meaning": "a high-ranking official or university head"
+    },
+    "vocab_01756": {
+      "meaning": "disorderly and confused"
+    },
+    "vocab_01757": {
+      "meaning": "a distinctive feature"
+    },
+    "vocab_01758": {
+      "meaning": "delightful or attractive"
+    },
+    "vocab_01759": {
+      "meaning": "to pursue"
+    },
+    "vocab_01760": {
+      "meaning": "to act dishonestly or deceive"
+    },
+    "vocab_01761": {
+      "meaning": "a security inspection point"
+    },
+    "vocab_01762": {
+      "meaning": "playfully impudent or rude"
+    },
+    "vocab_01763": {
+      "meaning": "in a happy manner"
+    },
+    "vocab_01764": {
+      "meaning": "the state of being happy"
+    },
+    "vocab_01765": {
+      "meaning": "medical treatment for cancer"
+    },
+    "vocab_01766": {
+      "meaning": "highly valued or treasured"
+    },
+    "vocab_01767": {
+      "meaning": "a small red fruit"
+    },
+    "vocab_01768": {
+      "meaning": "to bite and grind with teeth"
+    },
+    "vocab_01770": {
+      "meaning": "immature"
+    },
+    "vocab_01771": {
+      "meaning": "a smoke vent"
+    },
+    "vocab_01772": {
+      "meaning": "a thin slice or electronic component"
+    },
+    "vocab_01773": {
+      "meaning": "to cut into pieces"
+    },
+    "vocab_01774": {
+      "meaning": "a thick, solid piece"
+    },
+    "vocab_01775": {
+      "meaning": "a path for electricity or racing"
+    },
+    "vocab_01776": {
+      "meaning": "electronic circuits"
+    },
+    "vocab_01777": {
+      "meaning": "a situation or condition"
+    },
+    "vocab_01778": {
+      "meaning": "covering an entire city"
+    },
+    "vocab_01779": {
+      "meaning": "a type of shellfish"
+    },
+    "vocab_01780": {
+      "meaning": "to strike hands together"
+    },
+    "vocab_01781": {
+      "meaning": "to make something clear"
+    },
+    "vocab_01783": {
+      "meaning": "the act of sorting into groups"
+    },
+    "vocab_01784": {
+      "meaning": "a grammatical unit or legal provision"
+    },
+    "vocab_01785": {
+      "meaning": "the quality of being clear"
+    },
+    "vocab_01786": {
+      "meaning": "related to office work"
+    },
+    "vocab_01787": {
+      "meaning": "a customer or recipient of services"
+    },
+    "vocab_01788": {
+      "meaning": "long-term shifts in global weather"
+    },
+    "vocab_01789": {
+      "meaning": "to block or obstruct"
+    },
+    "vocab_01790": {
+      "meaning": "the act of closing"
+    },
+    "vocab_01791": {
+      "meaning": "garments in general"
+    },
+    "vocab_01792": {
+      "meaning": "physically awkward or clumsy"
+    },
+    "vocab_01794": {
+      "meaning": "the process of training or tutoring"
+    },
+    "vocab_01795": {
+      "meaning": "an alliance of groups"
+    },
+    "vocab_01796": {
+      "meaning": "rough in texture"
+    },
+    "vocab_01797": {
+      "meaning": "the outline of a coast"
+    },
+    "vocab_01798": {
+      "meaning": "a mixed alcoholic drink"
+    },
+    "vocab_01799": {
+      "meaning": "powder from roasted seeds"
+    },
+    "vocab_01800": {
+      "meaning": "a tropical fruit"
+    },
+    "vocab_01801": {
+      "meaning": "logical consistency"
+    },
+    "vocab_01802": {
+      "meaning": "logically consistent and clear"
+    },
+    "vocab_01803": {
+      "meaning": "to happen at the same time"
+    },
+    "vocab_01804": {
+      "meaning": "a remarkable concurrence of events"
+    },
+    "vocab_01806": {
+      "meaning": "to fall down or fail suddenly"
+    },
+    "vocab_01807": {
+      "meaning": "a professional associate"
+    },
+    "vocab_01808": {
+      "meaning": "a person who collects items"
+    },
+    "vocab_01809": {
+      "meaning": "natural word pairings"
+    },
+    "vocab_01810": {
+      "meaning": "the punctuation mark :"
+    },
+    "vocab_01811": {
+      "meaning": "relating to a colony"
+    },
+    "vocab_01812": {
+      "meaning": "a state of deep unconsciousness"
+    },
+    "vocab_01814": {
+      "meaning": "in a comfortable way"
+    },
+    "vocab_01815": {
+      "meaning": "a person in authority"
+    },
+    "vocab_01816": {
+      "meaning": "to honor the memory of"
+    },
+    "vocab_01818": {
+      "meaning": "the activity of buying and selling"
+    },
+    "vocab_01819": {
+      "meaning": "an advertisement on broadcast media"
+    },
+    "vocab_01820": {
+      "meaning": "a formal task or payment percentage"
+    },
+    "vocab_01821": {
+      "meaning": "political association of nations"
+    },
+    "vocab_01822": {
+      "meaning": "able to communicate well"
+    },
+    "vocab_01823": {
+      "meaning": "group of people; society"
+    },
+    "vocab_01824": {
+      "meaning": "travel to work regularly"
+    },
+    "vocab_01825": {
+      "meaning": "pity and desire to help"
+    },
+    "vocab_01826": {
+      "meaning": "showing pity and concern"
+    },
+    "vocab_01827": {
+      "meaning": "able to exist together; suitable"
+    },
+    "vocab_01828": {
+      "meaning": "to pay back; to reimburse"
+    },
+    "vocab_01829": {
+      "meaning": "payment for loss or work"
+    },
+    "vocab_01830": {
+      "meaning": "skill; ability"
+    },
+    "vocab_01831": {
+      "meaning": "capable; skilled"
+    },
+    "vocab_01832": {
+      "meaning": "to gather and organize"
+    },
+    "vocab_01833": {
+      "meaning": "the act of finishing"
+    },
+    "vocab_01834": {
+      "meaning": "natural skin color of face"
+    },
+    "vocab_01835": {
+      "meaning": "state of being complicated"
+    },
+    "vocab_01836": {
+      "meaning": "part of a whole"
+    },
+    "vocab_01837": {
+      "meaning": "ability to understand"
+    },
+    "vocab_01838": {
+      "meaning": "thorough; including everything"
+    },
+    "vocab_01839": {
+      "meaning": "to press into smaller space"
+    },
+    "vocab_01840": {
+      "meaning": "the act of pressing together"
+    },
+    "vocab_01842": {
+      "meaning": "required by law or rule"
+    },
+    "vocab_01843": {
+      "meaning": "to calculate"
+    },
+    "vocab_01844": {
+      "meaning": "to hide"
+    },
+    "vocab_01845": {
+      "meaning": "to admit defeat or fault"
+    },
+    "vocab_01846": {
+      "meaning": "excessive pride"
+    },
+    "vocab_01847": {
+      "meaning": "imaginable; possible"
+    },
+    "vocab_01848": {
+      "meaning": "to imagine; to form ideas"
+    },
+    "vocab_01849": {
+      "meaning": "idea; understanding"
+    },
+    "vocab_01851": {
+      "meaning": "about; regarding"
+    },
+    "vocab_01852": {
+      "meaning": "a granted allowance or right"
+    },
+    "vocab_01854": {
+      "meaning": "real; tangible"
+    },
+    "vocab_01855": {
+      "meaning": "to express strong disapproval"
+    },
+    "vocab_01857": {
+      "meaning": "orchestra leader; ticket collector"
+    },
+    "vocab_01858": {
+      "meaning": "pointed circular object"
+    },
+    "vocab_01859": {
+      "meaning": "formal meeting"
+    },
+    "vocab_01860": {
+      "meaning": "remote meeting"
+    },
+    "vocab_01861": {
+      "meaning": "to admit a fault"
+    },
+    "vocab_01862": {
+      "meaning": "formal admission of guilt"
+    },
+    "vocab_01863": {
+      "meaning": "with self-assurance"
+    },
+    "vocab_01864": {
+      "meaning": "to limit; to restrict"
+    },
+    "vocab_01865": {
+      "meaning": "to face directly"
+    },
+    "vocab_01866": {
+      "meaning": "connecting word"
+    },
+    "vocab_01867": {
+      "meaning": "act of defeating"
+    },
+    "vocab_01868": {
+      "meaning": "inner sense of right"
+    },
+    "vocab_01869": {
+      "meaning": "state of being aware"
+    },
+    "vocab_01870": {
+      "meaning": "general agreement"
+    },
+    "vocab_01871": {
+      "meaning": "permission; agreement"
+    },
+    "vocab_01872": {
+      "meaning": "significantly; to a large degree"
+    },
+    "vocab_01873": {
+      "meaning": "taking into account"
+    },
+    "vocab_01875": {
+      "meaning": "steady; unchanging"
+    },
+    "vocab_01876": {
+      "meaning": "comfort in time of grief"
+    },
+    "vocab_01877": {
+      "meaning": "to comfort"
+    },
+    "vocab_01878": {
+      "meaning": "steady; unchanging"
+    },
+    "vocab_01879": {
+      "meaning": "to seek advice"
+    },
+    "vocab_01880": {
+      "meaning": "expert advisor"
+    },
+    "vocab_01881": {
+      "meaning": "to pollute"
+    },
+    "vocab_01882": {
+      "meaning": "modern; current"
+    },
+    "vocab_01883": {
+      "meaning": "feeling of deep disrespect"
+    },
+    "vocab_01884": {
+      "meaning": "satisfied"
+    },
+    "vocab_01885": {
+      "meaning": "legal agreement"
+    },
+    "vocab_01886": {
+      "meaning": "to conflict; to deny"
+    },
+    "vocab_01887": {
+      "meaning": "a logical inconsistency"
+    },
+    "vocab_01888": {
+      "meaning": "mutually opposed"
+    },
+    "vocab_01889": {
+      "meaning": "public disagreement"
+    },
+    "vocab_01890": {
+      "meaning": "in a practical way"
+    },
+    "vocab_01891": {
+      "meaning": "custom; formal agreement"
+    },
+    "vocab_01892": {
+      "meaning": "traditional"
+    },
+    "vocab_01893": {
+      "meaning": "to talk"
+    },
+    "vocab_01894": {
+      "meaning": "on the other hand"
+    },
+    "vocab_01895": {
+      "meaning": "change in form"
+    },
+    "vocab_01896": {
+      "meaning": "to change or transform"
+    },
+    "vocab_01897": {
+      "meaning": "certain; sure"
+    },
+    "vocab_01899": {
+      "meaning": "to work together"
+    },
+    "vocab_01900": {
+      "meaning": "working together"
+    },
+    "vocab_01901": {
+      "meaning": "willing to help"
+    },
+    "vocab_01903": {
+      "meaning": "to manage successfully"
+    },
+    "vocab_01904": {
+      "meaning": "reddish-brown metal"
+    },
+    "vocab_01905": {
+      "meaning": "marine skeletal deposit"
+    },
+    "vocab_01906": {
+      "meaning": "central part"
+    },
+    "vocab_01907": {
+      "meaning": "fundamental principle or base"
+    },
+    "vocab_01908": {
+      "meaning": "brass wind instrument"
+    },
+    "vocab_01909": {
+      "meaning": "halo of light"
+    },
+    "vocab_01910": {
+      "meaning": "relating to physical punishment"
+    },
+    "vocab_01911": {
+      "meaning": "corporate; business"
+    },
+    "vocab_01912": {
+      "meaning": "large corporation"
+    },
+    "vocab_01914": {
+      "meaning": "being correct"
+    },
+    "vocab_01915": {
+      "meaning": "to match; to correspond"
+    },
+    "vocab_01916": {
+      "meaning": "written correspondence; mail"
+    },
+    "vocab_01917": {
+      "meaning": "reporter; correspondent"
+    },
+    "vocab_01918": {
+      "meaning": "matching; corresponding"
+    },
+    "vocab_01919": {
+      "meaning": "hallway; corridor"
+    },
+    "vocab_01920": {
+      "meaning": "corrupt"
+    },
+    "vocab_01921": {
+      "meaning": "corruption"
+    },
+    "vocab_01922": {
+      "meaning": "expensive; costly"
+    },
+    "vocab_01923": {
+      "meaning": "costume"
+    },
+    "vocab_01924": {
+      "meaning": "small cottage"
+    },
+    "vocab_01927": {
+      "meaning": "fellow citizen"
+    },
+    "vocab_01928": {
+      "meaning": "nationwide"
+    },
+    "vocab_01929": {
+      "meaning": "politeness"
+    },
+    "vocab_01930": {
+      "meaning": "coward"
+    },
+    "vocab_01931": {
+      "meaning": "cowardly"
+    },
+    "vocab_01932": {
+      "meaning": "comfort; warmth"
+    },
+    "vocab_01933": {
+      "meaning": "cozy and warm"
+    },
+    "vocab_01934": {
+      "meaning": "crab"
+    },
+    "vocab_01935": {
+      "meaning": "crack; split"
+    },
+    "vocab_01937": {
+      "meaning": "artisan; craftsman"
+    },
+    "vocab_01938": {
+      "meaning": "crater"
+    },
+    "vocab_01939": {
+      "meaning": "to crawl"
+    },
+    "vocab_01940": {
+      "meaning": "fold; wrinkle"
+    },
+    "vocab_01941": {
+      "meaning": "creation"
+    },
+    "vocab_01942": {
+      "meaning": "creatively"
+    },
+    "vocab_01943": {
+      "meaning": "small stream"
+    },
+    "vocab_01944": {
+      "meaning": "scary; creepy"
+    },
+    "vocab_01945": {
+      "meaning": "crew"
+    },
+    "vocab_01947": {
+      "meaning": "to paralyze"
+    },
+    "vocab_01948": {
+      "meaning": "critically"
+    },
+    "vocab_01949": {
+      "meaning": "criticism"
+    },
+    "vocab_01950": {
+      "meaning": "crocodile"
+    },
+    "vocab_01951": {
+      "meaning": "angrily"
+    },
+    "vocab_01952": {
+      "meaning": "crucial; very important"
+    },
+    "vocab_01953": {
+      "meaning": "cruelly"
+    },
+    "vocab_01954": {
+      "meaning": "cruelty"
+    },
+    "vocab_01956": {
+      "meaning": "to crystallize; to become clear"
+    },
+    "vocab_01957": {
+      "meaning": "cube"
+    },
+    "vocab_01958": {
+      "meaning": "cubism (art movement)"
+    },
+    "vocab_01959": {
+      "meaning": "shirt sleeve cuff"
+    },
+    "vocab_01960": {
+      "meaning": "peak; culmination"
+    },
+    "vocab_01961": {
+      "meaning": "culturally"
+    },
+    "vocab_01962": {
+      "meaning": "to cure; to heal"
+    },
+    "vocab_01963": {
+      "meaning": "hair curl"
+    },
+    "vocab_01964": {
+      "meaning": "computer cursor"
+    },
+    "vocab_01965": {
+      "meaning": "internet addict"
+    },
+    "vocab_01966": {
+      "meaning": "internet café"
+    },
+    "vocab_01967": {
+      "meaning": "cybercrime"
+    },
+    "vocab_01968": {
+      "meaning": "virtual pet"
+    },
+    "vocab_01969": {
+      "meaning": "online school"
+    },
+    "vocab_01970": {
+      "meaning": "cyberspace"
+    },
+    "vocab_01971": {
+      "meaning": "cyclist"
+    },
+    "vocab_01972": {
+      "meaning": "silly; foolish (British informal)"
+    },
+    "vocab_01974": {
+      "meaning": "very (informal)"
+    },
+    "vocab_01976": {
+      "meaning": "dandelion flower"
+    },
+    "vocab_01977": {
+      "meaning": "dear; beloved"
+    },
+    "vocab_01980": {
+      "meaning": "to dash; to run fast"
+    },
+    "vocab_01981": {
+      "meaning": "data"
+    },
+    "vocab_01982": {
+      "meaning": "database"
+    },
+    "vocab_01983": {
+      "meaning": "outdated"
+    },
+    "vocab_01984": {
+      "meaning": "daughter-in-law"
+    },
+    "vocab_01985": {
+      "meaning": "dawn"
+    },
+    "vocab_01986": {
+      "meaning": "daytime"
+    },
+    "vocab_01987": {
+      "meaning": "de facto (in reality)"
+    },
+    "vocab_01988": {
+      "meaning": "expensive (British informal)"
+    },
+    "vocab_01989": {
+      "meaning": "very dearly"
+    },
+    "vocab_01990": {
+      "meaning": "debit entry"
+    },
+    "vocab_01992": {
+      "meaning": "debit card"
+    },
+    "vocab_01993": {
+      "meaning": "decade"
+    },
+    "vocab_01994": {
+      "meaning": "to decay; to rot"
+    },
+    "vocab_01995": {
+      "meaning": "to deceive"
+    },
+    "vocab_01996": {
+      "meaning": "decent; proper"
+    },
+    "vocab_01997": {
+      "meaning": "deceptive; misleading"
+    },
+    "vocab_01998": {
+      "meaning": "decisive; firm"
+    },
+    "vocab_01999": {
+      "meaning": "ship floor; wooden terrace"
+    },
+    "vocab_02000": {
+      "meaning": "politely refuse; decrease"
+    },
+    "vocab_02001": {
+      "meaning": "decay; breakdown"
+    },
+    "vocab_02002": {
+      "meaning": "to adorn"
+    },
+    "vocab_02003": {
+      "meaning": "ornament"
+    },
+    "vocab_02004": {
+      "meaning": "ornamental"
+    },
+    "vocab_02005": {
+      "meaning": "commitment"
+    },
+    "vocab_02006": {
+      "meaning": "to infer"
+    },
+    "vocab_02007": {
+      "meaning": "inference; subtraction"
+    },
+    "vocab_02008": {
+      "meaning": "to consider; to view"
+    },
+    "vocab_02010": {
+      "meaning": "antlered mammal"
+    },
+    "vocab_02012": {
+      "meaning": "shortage"
+    },
+    "vocab_02013": {
+      "meaning": "clearing of forests"
+    },
+    "vocab_02014": {
+      "meaning": "to resist"
+    },
+    "vocab_02015": {
+      "meaning": "to strip of human qualities"
+    },
+    "vocab_02016": {
+      "meaning": "representative; envoy"
+    },
+    "vocab_02017": {
+      "meaning": "intentional"
+    },
+    "vocab_02018": {
+      "meaning": "on purpose"
+    },
+    "vocab_02019": {
+      "meaning": "special food; refinement"
+    },
+    "vocab_02020": {
+      "meaning": "gently; finely"
+    },
+    "vocab_02022": {
+      "meaning": "requiring effort; difficult"
+    },
+    "vocab_02023": {
+      "meaning": "to destroy; to tear down"
+    },
+    "vocab_02024": {
+      "meaning": "sturdy cotton fabric"
+    },
+    "vocab_02025": {
+      "meaning": "thick; crowded"
+    },
+    "vocab_02026": {
+      "meaning": "in a crowded manner"
+    },
+    "vocab_02027": {
+      "meaning": "related to teeth"
+    },
+    "vocab_02028": {
+      "meaning": "trustworthy"
+    },
+    "vocab_02030": {
+      "meaning": "second-in-command"
+    },
+    "vocab_02031": {
+      "meaning": "to go down"
+    },
+    "vocab_02032": {
+      "meaning": "descriptive"
+    },
+    "vocab_02034": {
+      "meaning": "wanted; wished for"
+    },
+    "vocab_02036": {
+      "meaning": "office computer; screen background"
+    },
+    "vocab_02037": {
+      "meaning": "destruction; loneliness"
+    },
+    "vocab_02038": {
+      "meaning": "urgently"
+    },
+    "vocab_02039": {
+      "meaning": "deep hopelessness"
+    },
+    "vocab_02040": {
+      "meaning": "to hate; to scorn"
+    },
+    "vocab_02041": {
+      "meaning": "fate"
+    },
+    "vocab_02042": {
+      "meaning": "to separate"
+    },
+    "vocab_02043": {
+      "meaning": "detachment; indifference"
+    },
+    "vocab_02044": {
+      "meaning": "thorough"
+    },
+    "vocab_02045": {
+      "meaning": "to discover"
+    },
+    "vocab_02046": {
+      "meaning": "resolute"
+    },
+    "vocab_02047": {
+      "meaning": "grammar word specifying a noun"
+    },
+    "vocab_02048": {
+      "meaning": "growing"
+    },
+    "vocab_02049": {
+      "meaning": "evil spirit"
+    },
+    "vocab_02050": {
+      "meaning": "to dedicate"
+    },
+    "vocab_02051": {
+      "meaning": "loyal; dedicated"
+    },
+    "vocab_02052": {
+      "meaning": "loose bowel movements"
+    },
+    "vocab_02053": {
+      "meaning": "absolute ruler"
+    },
+    "vocab_02054": {
+      "meaning": "to process food"
+    },
+    "vocab_02055": {
+      "meaning": "to honor"
+    },
+    "vocab_02056": {
+      "meaning": "self-respect; honor"
+    },
+    "vocab_02057": {
+      "meaning": "difficult choice"
+    },
+    "vocab_02058": {
+      "meaning": "faint; not bright"
+    },
+    "vocab_02059": {
+      "meaning": "ten-cent coin"
+    },
+    "vocab_02060": {
+      "meaning": "measurement; aspect"
+    },
+    "vocab_02061": {
+      "meaning": "to immerse briefly"
+    },
+    "vocab_02062": {
+      "meaning": "bacterial throat infection"
+    },
+    "vocab_02063": {
+      "meaning": "educational certificate"
+    },
+    "vocab_02064": {
+      "meaning": "official representative"
+    },
+    "vocab_02065": {
+      "meaning": "act of vanishing"
+    },
+    "vocab_02066": {
+      "meaning": "disagreement"
+    },
+    "vocab_02067": {
+      "meaning": "to object to"
+    },
+    "vocab_02068": {
+      "meaning": "to release; to discharge"
+    },
+    "vocab_02069": {
+      "meaning": "follower"
+    },
+    "vocab_02070": {
+      "meaning": "self-control; order"
+    },
+    "vocab_02071": {
+      "meaning": "to break a connection"
+    },
+    "vocab_02072": {
+      "meaning": "to damage reputation"
+    },
+    "vocab_02073": {
+      "meaning": "to treat unfairly"
+    },
+    "vocab_02074": {
+      "meaning": "shame; dishonor"
+    },
+    "vocab_02075": {
+      "meaning": "costume; camouflage"
+    },
+    "vocab_02077": {
+      "meaning": "lack of truthfulness"
+    },
+    "vocab_02078": {
+      "meaning": "to shatter illusions"
+    },
+    "vocab_02079": {
+      "meaning": "to fire; to reject"
+    },
+    "vocab_02080": {
+      "meaning": "chaos; medical condition"
+    },
+    "vocab_02081": {
+      "meaning": "unruly"
+    },
+    "vocab_02082": {
+      "meaning": "messy; chaotic"
+    },
+    "vocab_02083": {
+      "meaning": "unnecessary; replaceable"
+    },
+    "vocab_02084": {
+      "meaning": "to force out; to replace"
+    },
+    "vocab_02085": {
+      "meaning": "annoyance"
+    },
+    "vocab_02086": {
+      "meaning": "getting rid of something"
+    },
+    "vocab_02087": {
+      "meaning": "character; innate trait"
+    },
+    "vocab_02088": {
+      "meaning": "disagreement or argument"
+    },
+    "vocab_02089": {
+      "meaning": "to make ineligible"
+    },
+    "vocab_02090": {
+      "meaning": "to ignore or pay no attention"
+    },
+    "vocab_02091": {
+      "meaning": "to disturb or throw into confusion"
+    },
+    "vocab_02092": {
+      "meaning": "feeling of discontent"
+    },
+    "vocab_02093": {
+      "meaning": "discontented; unhappy"
+    },
+    "vocab_02094": {
+      "meaning": "rebel or dissenter"
+    },
+    "vocab_02095": {
+      "meaning": "prominent; honored"
+    },
+    "vocab_02096": {
+      "meaning": "distortion; deviation"
+    },
+    "vocab_02097": {
+      "meaning": "to divert attention"
+    },
+    "vocab_02098": {
+      "meaning": "disturbance; distraction"
+    },
+    "vocab_02099": {
+      "meaning": "heartbreaking; distressing"
+    },
+    "vocab_02100": {
+      "meaning": "distributor"
+    },
+    "vocab_02101": {
+      "meaning": "diversion; alternative route"
+    },
+    "vocab_02102": {
+      "meaning": "to redirect"
+    },
+    "vocab_02103": {
+      "meaning": "split; divided"
+    },
+    "vocab_02104": {
+      "meaning": "division; department"
+    },
+    "vocab_02105": {
+      "meaning": "ending of a marriage"
+    },
+    "vocab_02107": {
+      "meaning": "DNA"
+    },
+    "vocab_02108": {
+      "meaning": "pier; dock"
+    },
+    "c2_curated_0001": {
+      "meaning": "unusual deviation"
+    },
+    "c2_curated_0002": {
+      "meaning": "to agree without protest"
+    },
+    "c2_curated_0003": {
+      "meaning": "bitterness or hostility"
+    },
+    "c2_curated_0004": {
+      "meaning": "to relieve or lessen"
+    },
+    "c2_curated_0006": {
+      "meaning": "to improve a situation"
+    },
+    "c2_curated_0007": {
+      "meaning": "oddity; anomaly"
+    },
+    "c2_curated_0008": {
+      "meaning": "fundamentally opposed"
+    },
+    "c2_curated_0009": {
+      "meaning": "indifferent or uncaring"
+    },
+    "c2_curated_0012": {
+      "meaning": "clever and sharp in judgment"
+    },
+    "c2_curated_0013": {
+      "meaning": "simple and strict"
+    },
+    "c2_curated_0014": {
+      "meaning": "aggressive or quarrelsome"
+    },
+    "c2_curated_0016": {
+      "meaning": "to strengthen or support"
+    },
+    "c2_curated_0017": {
+      "meaning": "carefully considering risks"
+    },
+    "c2_curated_0018": {
+      "meaning": "to merge into one"
+    },
+    "c2_curated_0019": {
+      "meaning": "convincing and logical"
+    },
+    "c2_curated_0020": {
+      "meaning": "commensurate; proportional"
+    },
+    "c2_curated_0021": {
+      "meaning": "extremely persuasive"
+    },
+    "c2_curated_0022": {
+      "meaning": "confusing and difficult problem"
+    },
+    "c2_curated_0023": {
+      "meaning": "to confirm with evidence"
+    },
+    "c2_curated_0024": {
+      "meaning": "harmful"
+    },
+    "c2_curated_0025": {
+      "meaning": "to outline or explain limits"
+    },
+    "c2_curated_0026": {
+      "meaning": "derived from another source"
+    },
+    "c2_curated_0027": {
+      "meaning": "intended to teach"
+    },
+    "c2_curated_0028": {
+      "meaning": "having good judgment"
+    },
+    "c2_curated_0029": {
+      "meaning": "fundamentally different"
+    },
+    "c2_curated_0030": {
+      "meaning": "full of enthusiasm"
+    },
+    "c2_curated_0031": {
+      "meaning": "combining various styles or sources"
+    },
+    "c2_curated_0032": {
+      "meaning": "effective in producing results"
+    },
+    "c2_curated_0033": {
+      "meaning": "to elicit response or information"
+    },
+    "c2_curated_0034": {
+      "meaning": "to imitate to achieve similar results"
+    },
+    "c2_curated_0035": {
+      "meaning": "to drain of energy"
+    },
+    "c2_curated_0036": {
+      "meaning": "lasting a very short time"
+    },
+    "c2_curated_0037": {
+      "meaning": "ambiguous or unclear"
+    },
+    "c2_curated_0038": {
+      "meaning": "understood by few specialists"
+    },
+    "c2_curated_0039": {
+      "meaning": "to make worse"
+    },
+    "c2_curated_0040": {
+      "meaning": "to clear from blame"
+    },
+    "c2_curated_0041": {
+      "meaning": "very meticulous"
+    },
+    "c2_curated_0042": {
+      "meaning": "fortunate and accidental"
+    },
+    "c2_curated_0043": {
+      "meaning": "sociable; fond of company"
+    },
+    "c2_curated_0044": {
+      "meaning": "overused and cliché"
+    },
+    "c2_curated_0045": {
+      "meaning": "unchangeable"
+    },
+    "c2_curated_0046": {
+      "meaning": "neutral; fair"
+    },
+    "c2_curated_0047": {
+      "meaning": "unintentional"
+    },
+    "c2_curated_0048": {
+      "meaning": "sharp and direct"
+    },
+    "c2_curated_0049": {
+      "meaning": "inappropriate or out of place"
+    },
+    "c2_curated_0050": {
+      "meaning": "indescribable; too great for words"
+    },
+    "c2_curated_0051": {
+      "meaning": "unstoppable; relentless"
+    },
+    "c2_curated_0052": {
+      "meaning": "subtly harmful"
+    },
+    "c2_curated_0053": {
+      "meaning": "uncompromising"
+    },
+    "c2_curated_0054": {
+      "meaning": "having good judgment"
+    },
+    "c2_curated_0055": {
+      "meaning": "using very few words"
+    },
+    "c2_curated_0056": {
+      "meaning": "very generous"
+    },
+    "c2_curated_0057": {
+      "meaning": "extremely thorough and careful"
+    },
+    "c2_curated_0059": {
+      "meaning": "vague or cloudy"
+    },
+    "c2_curated_0060": {
+      "meaning": "casually unconcerned"
+    },
+    "c2_curated_0061": {
+      "meaning": "to make obscure or confusing"
+    },
+    "c2_curated_0062": {
+      "meaning": "stated or apparent"
+    },
+    "c2_curated_0063": {
+      "meaning": "serving as a typical example"
+    },
+    "c2_curated_0064": {
+      "meaning": "done without care or interest"
+    },
+    "c2_curated_0065": {
+      "meaning": "widespread"
+    },
+    "c2_curated_0066": {
+      "meaning": "focused on practical solutions"
+    },
+    "c2_curated_0067": {
+      "meaning": "very steep or sudden"
+    },
+    "c2_curated_0068": {
+      "meaning": "increase or spread rapidly"
+    },
+    "c2_curated_0069": {
+      "meaning": "ordinary and unimaginative"
+    },
+    "c2_curated_0070": {
+      "meaning": "the most typical example"
+    },
+    "c2_curated_0071": {
+      "meaning": "difficult to control or stubborn"
+    },
+    "c2_curated_0072": {
+      "meaning": "to settle or make harmonious"
+    },
+    "c2_curated_0073": {
+      "meaning": "unnecessary because it is repetitive"
+    },
+    "c2_curated_0074": {
+      "meaning": "not talkative"
+    },
+    "c2_curated_0075": {
+      "meaning": "very thorough and principled"
+    },
+    "c2_curated_0076": {
+      "meaning": "occurring irregularly"
+    },
+    "c2_curated_0077": {
+      "meaning": "very strict"
+    },
+    "c2_curated_0078": {
+      "meaning": "support a claim with evidence"
+    },
+    "c2_curated_0079": {
+      "meaning": "excessive and unnecessary"
+    },
+    "c2_curated_0080": {
+      "meaning": "done secretly"
+    },
+    "c2_curated_0081": {
+      "meaning": "persistent and determined"
+    },
+    "c2_curated_0082": {
+      "meaning": "present almost everywhere"
+    },
+    "c2_curated_0083": {
+      "meaning": "clear and unambiguous"
+    },
+    "c2_curated_0085": {
+      "meaning": "expressing opinions loudly"
+    },
+    "c2_curated_0086": {
+      "meaning": "very enthusiastic in pursuing goals"
+    },
+    "c2_curated_0087": {
+      "meaning": "mixing two different things"
+    },
+    "c2_curated_0088": {
+      "meaning": "spread information widely"
+    },
+    "c2_curated_0089": {
+      "meaning": "unintentionally"
+    },
+    "c2_curated_0090": {
+      "meaning": "too difficult to overcome"
+    },
+    "c2_curated_0091": {
+      "meaning": "placing things side-by-side for comparison"
+    },
+    "c2_curated_0092": {
+      "meaning": "examine very carefully"
+    },
+    "c2_curated_0093": {
+      "meaning": "emphasize the importance of something"
+    },
+    "c2_curated_0094": {
+      "meaning": "avoid rules or obstacles"
+    },
+    "c2_curated_0095": {
+      "meaning": "deny or reject responsibility"
+    },
+    "c2_curated_0096": {
+      "meaning": "encourage people to act"
+    },
+    "c2_curated_0097": {
+      "meaning": "acting too quickly without consideration"
+    },
+    "c2_curated_0098": {
+      "meaning": "not yet yielding a conclusion"
+    },
+    "c2_curated_0099": {
+      "meaning": "tireless"
+    },
+    "c2_curated_0100": {
+      "meaning": "difficult to understand"
+    },
+    "c2_curated_0101": {
+      "meaning": "using very grand language"
+    },
+    "c2_curated_0102": {
+      "meaning": "excessively frugal"
+    },
+    "c2_curated_0103": {
+      "meaning": "very harmful"
+    },
+    "c2_curated_0104": {
+      "meaning": "deserving condemnation"
+    },
+    "c2_curated_0105": {
+      "meaning": "quiet and rarely speaks"
+    },
+    "c2_curated_0106": {
+      "meaning": "lasting only temporarily"
+    },
+    "c2_curated_0107": {
+      "meaning": "very sharp and hateful"
+    },
+    "c1_curated_0001": {
+      "meaning": "to distribute or assign"
+    },
+    "c1_curated_0006": {
+      "meaning": "happening at the same time"
+    },
+    "c1_curated_0008": {
+      "meaning": "to restrict"
+    },
+    "c1_curated_0009": {
+      "meaning": "consider seriously"
+    },
+    "c1_curated_0011": {
+      "meaning": "believable"
+    },
+    "c1_curated_0012": {
+      "meaning": "increasing gradually"
+    },
+    "c1_curated_0014": {
+      "meaning": "to worsen"
+    },
+    "c1_curated_0015": {
+      "meaning": "to decrease"
+    },
+    "c1_curated_0016": {
+      "meaning": "inconsistency"
+    },
+    "c1_curated_0017": {
+      "meaning": "separate and distinct"
+    },
+    "c1_curated_0018": {
+      "meaning": "alter so meaning is inaccurate"
+    },
+    "c1_curated_0019": {
+      "meaning": "differing in direction or view"
+    },
+    "c1_curated_0020": {
+      "meaning": "based on observation or evidence"
+    },
+    "c1_curated_0021": {
+      "meaning": "improve quality"
+    },
+    "c1_curated_0022": {
+      "meaning": "stated clearly"
+    },
+    "c1_curated_0023": {
+      "meaning": "practically possible"
+    },
+    "c1_curated_0024": {
+      "meaning": "change up and down"
+    },
+    "c1_curated_0025": {
+      "meaning": "formulate systematically"
+    },
+    "c1_curated_0026": {
+      "meaning": "naturally inherent"
+    },
+    "c1_curated_0027": {
+      "meaning": "essential part of the whole"
+    },
+    "c1_curated_0028": {
+      "meaning": "derived from basic nature"
+    },
+    "c1_curated_0029": {
+      "meaning": "call upon or use as reason"
+    },
+    "c1_curated_0030": {
+      "meaning": "small or on the edge"
+    },
+    "c1_curated_0031": {
+      "meaning": "nevertheless"
+    },
+    "c1_curated_0032": {
+      "meaning": "having important subtle differences"
+    },
+    "c1_curated_0033": {
+      "meaning": "unbiased"
+    },
+    "c1_curated_0034": {
+      "meaning": "make something continue"
+    },
+    "c1_curated_0035": {
+      "meaning": "reasonable"
+    },
+    "c1_curated_0036": {
+      "meaning": "previous example or decision"
+    },
+    "c1_curated_0037": {
+      "meaning": "most common or dominant"
+    },
+    "c1_curated_0038": {
+      "meaning": "very deep"
+    },
+    "c1_curated_0039": {
+      "meaning": "highly productive"
+    },
+    "c1_curated_0040": {
+      "meaning": "underlying reason for a decision"
+    },
+    "c1_curated_0041": {
+      "meaning": "to perfect"
+    },
+    "c1_curated_0042": {
+      "meaning": "able to recover quickly"
+    },
+    "c1_curated_0043": {
+      "meaning": "strong and resistant to interference"
+    },
+    "c1_curated_0044": {
+      "meaning": "most prominent or relevant"
+    },
+    "c1_curated_0045": {
+      "meaning": "very careful inspection"
+    },
+    "c1_curated_0046": {
+      "meaning": "delicate and hard to notice"
+    },
+    "c1_curated_0047": {
+      "meaning": "combine ideas into a whole"
+    },
+    "c1_curated_0048": {
+      "meaning": "temporary and uncertain"
+    },
+    "c1_curated_0049": {
+      "meaning": "feasible or capable of working"
+    },
+    "a1_curated_0001": {
+      "meaning": "consume food"
+    },
+    "a1_curated_0002": {
+      "meaning": "laid by birds or reptiles"
+    },
+    "a1_curated_0003": {
+      "meaning": "night; late afternoon"
+    },
+    "a1_curated_0004": {
+      "meaning": "organ of sight"
+    },
+    "a1_curated_0005": {
+      "meaning": "front part of the head"
+    },
+    "a1_curated_0006": {
+      "meaning": "group of related people"
+    },
+    "a1_curated_0007": {
+      "meaning": "moving with high speed"
+    },
+    "a1_curated_0008": {
+      "meaning": "male parent"
+    },
+    "a1_curated_0009": {
+      "meaning": "discover something"
+    },
+    "a1_curated_0010": {
+      "meaning": "burning flame"
+    },
+    "a1_curated_0011": {
+      "meaning": "aquatic animal"
+    },
+    "a1_curated_0012": {
+      "meaning": "bottom surface of a room"
+    },
+    "a1_curated_0013": {
+      "meaning": "blossom of a plant"
+    },
+    "a1_curated_0014": {
+      "meaning": "things to be consumed"
+    },
+    "a1_curated_0015": {
+      "meaning": "bottom part of the leg"
+    },
+    "a1_curated_0016": {
+      "meaning": "companion; close associate"
+    },
+    "a1_curated_0017": {
+      "meaning": "edible plant product"
+    },
+    "a1_curated_0018": {
+      "meaning": "activity for amusement"
+    },
+    "a1_curated_0019": {
+      "meaning": "cultivated area for plants"
+    },
+    "a1_curated_0020": {
+      "meaning": "female child; young woman"
+    },
+    "a1_curated_0021": {
+      "meaning": "hand over to someone"
+    },
+    "a1_curated_0022": {
+      "meaning": "move to another place"
+    },
+    "a1_curated_0023": {
+      "meaning": "high quality; virtuous"
+    },
+    "a1_curated_0024": {
+      "meaning": "color of grass"
+    },
+    "a1_curated_0025": {
+      "meaning": "strands growing on head"
+    },
+    "a1_curated_0026": {
+      "meaning": "part of the arm"
+    },
+    "a1_curated_0027": {
+      "meaning": "feeling pleasure or joy"
+    },
+    "a1_curated_0028": {
+      "meaning": "possess or own"
+    },
+    "a1_curated_0029": {
+      "meaning": "perceive sound"
+    },
+    "a1_curated_0030": {
+      "meaning": "greeting"
+    },
+    "a1_curated_0031": {
+      "meaning": "assist someone"
+    },
+    "a1_curated_0032": {
+      "meaning": "at this location"
+    },
+    "a1_curated_0033": {
+      "meaning": "vacation; day off"
+    },
+    "a1_curated_0034": {
+      "meaning": "place of residence"
+    },
+    "a1_curated_0035": {
+      "meaning": "medical treatment facility"
+    },
+    "a1_curated_0036": {
+      "meaning": "high temperature"
+    },
+    "a1_curated_0037": {
+      "meaning": "sixty minutes"
+    },
+    "a1_curated_0038": {
+      "meaning": "building for living"
+    },
+    "a1_curated_0039": {
+      "meaning": "needing food"
+    },
+    "a1_curated_0040": {
+      "meaning": "task or employment"
+    },
+    "a1_curated_0041": {
+      "meaning": "liquid from fruit"
+    },
+    "a1_curated_0042": {
+      "meaning": "instrument for locking"
+    },
+    "a1_curated_0043": {
+      "meaning": "room for cooking"
+    },
+    "a1_curated_0044": {
+      "meaning": "have information or familiarity"
+    },
+    "a1_curated_0045": {
+      "meaning": "gain knowledge or skill"
+    },
+    "a1_curated_0046": {
+      "meaning": "period of instruction"
+    },
+    "a1_curated_0047": {
+      "meaning": "find pleasant"
+    },
+    "a1_curated_0048": {
+      "meaning": "pay attention to sound"
+    },
+    "a1_curated_0049": {
+      "meaning": "reside; be alive"
+    },
+    "a1_curated_0050": {
+      "meaning": "great length or duration"
+    },
+    "a1_curated_0051": {
+      "meaning": "direct eyes toward"
+    },
+    "a1_curated_0052": {
+      "meaning": "feel deep affection"
+    },
+    "a1_curated_0053": {
+      "meaning": "midday meal"
+    },
+    "a1_curated_0054": {
+      "meaning": "create or construct"
+    },
+    "a1_curated_0055": {
+      "meaning": "adult male human"
+    },
+    "a1_curated_0056": {
+      "meaning": "come into contact with"
+    },
+    "a1_curated_0057": {
+      "meaning": "white liquid from mammals"
+    },
+    "a1_curated_0058": {
+      "meaning": "sixty seconds"
+    },
+    "a1_curated_0059": {
+      "meaning": "currency for payment"
+    },
+    "a1_curated_0060": {
+      "meaning": "unit of calendar time"
+    },
+    "a1_curated_0061": {
+      "meaning": "early part of day"
+    },
+    "a1_curated_0062": {
+      "meaning": "female parent"
+    },
+    "a1_curated_0063": {
+      "meaning": "organized sound"
+    },
+    "a1_curated_0064": {
+      "meaning": "word used for identification"
+    },
+    "a1_curated_0065": {
+      "meaning": "close in distance"
+    },
+    "a1_curated_0066": {
+      "meaning": "recently made or created"
+    },
+    "a1_curated_0067": {
+      "meaning": "pleasant; kind; attractive"
+    },
+    "a1_curated_0068": {
+      "meaning": "time after sunset"
+    },
+    "a1_curated_0069": {
+      "meaning": "at this moment"
+    },
+    "a1_curated_0070": {
+      "meaning": "symbol for quantity"
+    },
+    "a1_curated_0071": {
+      "meaning": "medical caregiver"
+    },
+    "a1_curated_0072": {
+      "meaning": "aged; not new"
+    },
+    "a1_curated_0073": {
+      "meaning": "uncover or unfasten"
+    },
+    "a1_curated_0074": {
+      "meaning": "citrus fruit"
+    },
+    "a1_curated_0075": {
+      "meaning": "material for writing"
+    },
+    "a1_curated_0076": {
+      "meaning": "city park or garden"
+    },
+    "a1_curated_0077": {
+      "meaning": "pen or ballpoint pen"
+    },
+    "a1_curated_0078": {
+      "meaning": "pencil"
+    },
+    "a1_curated_0079": {
+      "meaning": "people"
+    },
+    "a1_curated_0080": {
+      "meaning": "telephone or mobile phone"
+    },
+    "a1_curated_0081": {
+      "meaning": "picture or photo"
+    },
+    "a1_curated_0082": {
+      "meaning": "to play or act out"
+    },
+    "a1_curated_0083": {
+      "meaning": "please or polite request word"
+    },
+    "a1_curated_0084": {
+      "meaning": "question or test problem"
+    },
+    "a1_curated_0085": {
+      "meaning": "rain"
+    },
+    "a1_curated_0086": {
+      "meaning": "to read"
+    },
+    "a1_curated_0087": {
+      "meaning": "red"
+    },
+    "a1_curated_0088": {
+      "meaning": "cooked or raw rice"
+    },
+    "a1_curated_0089": {
+      "meaning": "river"
+    },
+    "a1_curated_0090": {
+      "meaning": "room"
+    },
+    "a1_curated_0091": {
+      "meaning": "to run"
+    },
+    "a1_curated_0092": {
+      "meaning": "sad"
+    },
+    "a1_curated_0093": {
+      "meaning": "school"
+    },
+    "a1_curated_0094": {
+      "meaning": "sea"
+    },
+    "a1_curated_0095": {
+      "meaning": "to see"
+    },
+    "a1_curated_0096": {
+      "meaning": "to sing"
+    },
+    "a1_curated_0097": {
+      "meaning": "female sibling or sister"
+    },
+    "a1_curated_0098": {
+      "meaning": "to sit"
+    },
+    "a1_curated_0099": {
+      "meaning": "to sleep"
+    },
+    "a1_curated_0100": {
+      "meaning": "small"
+    },
+    "a1_curated_0101": {
+      "meaning": "to speak"
+    },
+    "a1_curated_0102": {
+      "meaning": "to stand"
+    },
+    "a1_curated_0103": {
+      "meaning": "to stop or halt"
+    },
+    "a1_curated_0104": {
+      "meaning": "pupil, student, or undergrad"
+    },
+    "a1_curated_0105": {
+      "meaning": "sun"
+    },
+    "a1_curated_0106": {
+      "meaning": "table"
+    },
+    "a1_curated_0107": {
+      "meaning": "to take, carry, or ride"
+    },
+    "a1_curated_0108": {
+      "meaning": "to talk or chat"
+    },
+    "a1_curated_0109": {
+      "meaning": "teacher"
+    },
+    "a1_curated_0110": {
+      "meaning": "to inform or narrate"
+    },
+    "a1_curated_0111": {
+      "meaning": "time"
+    },
+    "a1_curated_0112": {
+      "meaning": "today"
+    },
+    "a1_curated_0113": {
+      "meaning": "tomorrow"
+    },
+    "a1_curated_0114": {
+      "meaning": "train"
+    },
+    "a1_curated_0115": {
+      "meaning": "tree"
+    },
+    "a1_curated_0116": {
+      "meaning": "to walk on foot"
+    },
+    "a1_curated_0117": {
+      "meaning": "to want or desire"
+    },
+    "a1_curated_0118": {
+      "meaning": "water"
+    },
+    "a1_curated_0119": {
+      "meaning": "week"
+    },
+    "a1_curated_0120": {
+      "meaning": "white"
+    },
+    "a1_curated_0121": {
+      "meaning": "window"
+    },
+    "a1_curated_0122": {
+      "meaning": "adult woman or female"
+    },
+    "a1_curated_0123": {
+      "meaning": "to work"
+    },
+    "a1_curated_0124": {
+      "meaning": "to write"
+    },
+    "a1_curated_0125": {
+      "meaning": "year"
+    },
+    "a1_curated_0126": {
+      "meaning": "yellow"
+    },
+    "a1_curated_0127": {
+      "meaning": "yes"
+    },
+    "a1_curated_0128": {
+      "meaning": "yesterday"
+    },
+    "a1_curated_0129": {
+      "meaning": "young"
+    },
+    "a1_curated_0130": {
+      "meaning": "zoo"
+    },
+    "vocab_02500": {
+      "meaning": "early or ahead of schedule"
+    },
+    "vocab_02501": {
+      "meaning": "easy or not difficult"
+    },
+    "vocab_02502": {
+      "meaning": "to enjoy or take pleasure"
+    },
+    "vocab_02503": {
+      "meaning": "factory"
+    },
+    "vocab_02504": {
+      "meaning": "sport or physical exercise"
+    },
+    "vocab_02505": {
+      "meaning": "expensive"
+    },
+    "vocab_02506": {
+      "meaning": "famous"
+    },
+    "vocab_02507": {
+      "meaning": "fresh"
+    },
+    "vocab_02508": {
+      "meaning": "favorite or most liked"
+    },
+    "vocab_02509": {
+      "meaning": "to feel or sense"
+    },
+    "vocab_02510": {
+      "meaning": "festival or celebration"
+    },
+    "vocab_02511": {
+      "meaning": "to finish or complete"
+    },
+    "vocab_02512": {
+      "meaning": "to fly or travel by plane"
+    },
+    "vocab_02513": {
+      "meaning": "foreign or from overseas"
+    },
+    "vocab_02514": {
+      "meaning": "to forget"
+    },
+    "vocab_02515": {
+      "meaning": "free, gratis, or unoccupied"
+    },
+    "vocab_02516": {
+      "meaning": "gate or fence door"
+    },
+    "vocab_02517": {
+      "meaning": "fun or enjoyable activity"
+    },
+    "vocab_02518": {
+      "meaning": "future"
+    },
+    "vocab_02519": {
+      "meaning": "grass"
+    },
+    "vocab_02520": {
+      "meaning": "guest"
+    },
+    "vocab_02521": {
+      "meaning": "healthy or wholesome"
+    },
+    "vocab_02522": {
+      "meaning": "heavy"
+    },
+    "vocab_02523": {
+      "meaning": "history"
+    },
+    "vocab_02524": {
+      "meaning": "hobby or pastime"
+    },
+    "vocab_02525": {
+      "meaning": "celestial body orbiting a star"
+    },
+    "vocab_02526": {
+      "meaning": "to desire or trust"
+    },
+    "vocab_02527": {
+      "meaning": "use up money or time"
+    },
+    "vocab_02528": {
+      "meaning": "unexpected event"
+    },
+    "vocab_02529": {
+      "meaning": "married man"
+    },
+    "vocab_02530": {
+      "meaning": "land surrounded by water"
+    },
+    "vocab_02531": {
+      "meaning": "become part of; participate"
+    },
+    "vocab_02532": {
+      "meaning": "act of traveling"
+    },
+    "vocab_02533": {
+      "meaning": "perceive flavor; sample food"
+    },
+    "vocab_02534": {
+      "meaning": "system of human communication"
+    },
+    "vocab_02535": {
+      "meaning": "make sounds of amusement"
+    },
+    "vocab_02536": {
+      "meaning": "vehicles on a road"
+    },
+    "vocab_02537": {
+      "meaning": "having good fortune"
+    },
+    "vocab_02538": {
+      "meaning": "place for buying and selling"
+    },
+    "vocab_02539": {
+      "meaning": "food eaten at one time"
+    },
+    "vocab_02540": {
+      "meaning": "small community in rural area"
+    },
+    "vocab_02541": {
+      "meaning": "written or spoken communication"
+    },
+    "vocab_02542": {
+      "meaning": "large natural elevation"
+    },
+    "vocab_02543": {
+      "meaning": "place for historical exhibits"
+    },
+    "vocab_02544": {
+      "meaning": "physical world and its phenomena"
+    },
+    "vocab_02545": {
+      "meaning": "person living nearby"
+    },
+    "vocab_02546": {
+      "meaning": "loud or unpleasant sound"
+    },
+    "vocab_02547": {
+      "meaning": "propose to give or do"
+    },
+    "vocab_02548": {
+      "meaning": "request goods or food"
+    },
+    "vocab_02549": {
+      "meaning": "mother or father"
+    },
+    "vocab_02550": {
+      "meaning": "social gathering for celebration"
+    },
+    "vocab_02551": {
+      "meaning": "official travel document"
+    },
+    "vocab_02552": {
+      "meaning": "intended course of action"
+    },
+    "vocab_02553": {
+      "meaning": "small bag sewn into clothing"
+    },
+    "vocab_02554": {
+      "meaning": "repeated exercise or activity"
+    },
+    "vocab_02555": {
+      "meaning": "like better than another"
+    },
+    "vocab_02556": {
+      "meaning": "make ready"
+    },
+    "vocab_02557": {
+      "meaning": "gift"
+    },
+    "vocab_02558": {
+      "meaning": "silent; calm; noiseless"
+    },
+    "vocab_02559": {
+      "meaning": "get something given"
+    },
+    "vocab_02560": {
+      "meaning": "recall to the mind"
+    },
+    "vocab_02561": {
+      "meaning": "do or say again"
+    },
+    "vocab_02562": {
+      "meaning": "place to buy prepared meals"
+    },
+    "vocab_02563": {
+      "meaning": "go back; give back"
+    },
+    "vocab_02564": {
+      "meaning": "exchange for money"
+    },
+    "vocab_02565": {
+      "meaning": "cause to go elsewhere"
+    },
+    "vocab_02566": {
+      "meaning": "place for retail business"
+    },
+    "vocab_02567": {
+      "meaning": "ill; not healthy"
+    },
+    "vocab_02568": {
+      "meaning": "stop for trains or buses"
+    },
+    "vocab_02569": {
+      "meaning": "remain; reside temporarily"
+    },
+    "vocab_02570": {
+      "meaning": "account of events"
+    },
+    "vocab_02571": {
+      "meaning": "public road in a city"
+    },
+    "vocab_02572": {
+      "meaning": "having great physical power"
+    },
+    "vocab_02573": {
+      "meaning": "warmest season of the year"
+    },
+    "vocab_02574": {
+      "meaning": "document for entry or travel"
+    },
+    "vocab_02575": {
+      "meaning": "needing rest; exhausted"
+    },
+    "vocab_02576": {
+      "meaning": "go from place to place"
+    },
+    "vocab_02577": {
+      "meaning": "short journey or excursion"
+    },
+    "vocab_02578": {
+      "meaning": "device for protection from rain"
+    },
+    "vocab_02579": {
+      "meaning": "helpful; practical"
+    },
+    "vocab_02580": {
+      "meaning": "edible plant parts"
+    },
+    "vocab_02581": {
+      "meaning": "go to see someone or somewhere"
+    },
+    "vocab_02582": {
+      "meaning": "stay until something happens"
+    },
+    "vocab_02583": {
+      "meaning": "atmospheric conditions"
+    },
+    "vocab_02584": {
+      "meaning": "marriage ceremony"
+    },
+    "vocab_02585": {
+      "meaning": "Saturday and Sunday"
+    },
+    "vocab_02586": {
+      "meaning": "be successful in a contest"
+    },
+    "vocab_02587": {
+      "meaning": "coldest season of the year"
+    },
+    "vocab_02588": {
+      "meaning": "direction where sun rises"
+    },
+    "vocab_02589": {
+      "meaning": "person trained in technical design"
+    },
+    "vocab_02590": {
+      "meaning": "go or come inside"
+    },
+    "vocab_02591": {
+      "meaning": "sound produced by human mouth"
+    },
+    "vocab_02592": {
+      "meaning": "formal test of knowledge"
+    },
+    "vocab_02593": {
+      "meaning": "very enthusiastic or eager"
+    },
+    "vocab_02594": {
+      "meaning": "truth; reality"
+    },
+    "vocab_02595": {
+      "meaning": "not succeed"
+    },
+    "vocab_02596": {
+      "meaning": "land used for agriculture"
+    },
+    "vocab_02597": {
+      "meaning": "make full"
+    },
+    "vocab_02598": {
+      "meaning": "physically healthy and strong"
+    },
+    "vocab_02599": {
+      "meaning": "large area covered with trees"
+    },
+    "vocab_02600": {
+      "meaning": "increase in size; cultivate"
+    },
+    "vocab_02601": {
+      "meaning": "estimate without certain knowledge"
+    },
+    "vocab_02602": {
+      "meaning": "feel intense dislike"
+    },
+    "vocab_02603": {
+      "meaning": "raised area of land"
+    },
+    "vocab_02604": {
+      "meaning": "cause pain; feel pain"
+    },
+    "vocab_02605": {
+      "meaning": "unwell; sick"
+    },
+    "vocab_02606": {
+      "meaning": "untamed; feral"
+    },
+    "vocab_02607": {
+      "meaning": "to ask someone to attend"
+    },
+    "vocab_02608": {
+      "meaning": "funny story; jest"
+    },
+    "vocab_02609": {
+      "meaning": "large body of water"
+    },
+    "vocab_02610": {
+      "meaning": "to let someone borrow"
+    },
+    "vocab_02611": {
+      "meaning": "to misplace; to be defeated"
+    },
+    "vocab_02612": {
+      "meaning": "high volume; noisy"
+    },
+    "vocab_02613": {
+      "meaning": "mechanical device"
+    },
+    "vocab_02614": {
+      "meaning": "to wed"
+    },
+    "vocab_02615": {
+      "meaning": "brief point in time"
+    },
+    "vocab_02616": {
+      "meaning": "anxious; uneasy"
+    },
+    "vocab_02617": {
+      "meaning": "to succeed; to go past"
+    },
+    "vocab_02618": {
+      "meaning": "feasible; capable of happening"
+    },
+    "vocab_02619": {
+      "meaning": "reward for winning"
+    },
+    "vocab_02620": {
+      "meaning": "anxious; uneasy"
+    },
+    "vocab_02621": {
+      "meaning": "to tug toward oneself"
+    },
+    "vocab_02622": {
+      "meaning": "to press away from oneself"
+    },
+    "vocab_02623": {
+      "meaning": "to rest; to chill"
+    },
+    "vocab_02624": {
+      "meaning": "free from danger"
+    },
+    "vocab_02625": {
+      "meaning": "to store; to rescue; to deposit"
+    },
+    "vocab_02626": {
+      "meaning": "time of year"
+    },
+    "vocab_02627": {
+      "meaning": "something kept hidden"
+    },
+    "vocab_02628": {
+      "meaning": "to divide; to use together"
+    },
+    "vocab_02629": {
+      "meaning": "to yell"
+    },
+    "b1_curated_0001": {
+      "meaning": "border; margin"
+    },
+    "b1_curated_0002": {
+      "meaning": "attempt; hard work"
+    },
+    "b1_curated_0003": {
+      "meaning": "to hire for work"
+    },
+    "b1_curated_0004": {
+      "meaning": "to support; to motivate"
+    },
+    "b1_curated_0005": {
+      "meaning": "surroundings"
+    },
+    "b1_curated_0006": {
+      "meaning": "necessary tools or gear"
+    },
+    "b1_curated_0007": {
+      "meaning": "to run away"
+    },
+    "b1_curated_0008": {
+      "meaning": "crucial; fundamental"
+    },
+    "b1_curated_0009": {
+      "meaning": "happening; occasion"
+    },
+    "b1_curated_0010": {
+      "meaning": "proof"
+    },
+    "b1_curated_0011": {
+      "meaning": "to inspect; to study"
+    },
+    "b1_curated_0012": {
+      "meaning": "excluding"
+    },
+    "b1_curated_0013": {
+      "meaning": "to be real; to live"
+    },
+    "b1_curated_0014": {
+      "meaning": "to anticipate; to look forward to"
+    },
+    "b1_curated_0015": {
+      "meaning": "knowledge gained through living"
+    },
+    "b1_curated_0016": {
+      "meaning": "to make clear"
+    },
+    "b1_curated_0017": {
+      "meaning": "to convey thoughts or feelings"
+    },
+    "b1_curated_0018": {
+      "meaning": "well-known; acquainted"
+    },
+    "b1_curated_0019": {
+      "meaning": "distinctive attribute"
+    },
+    "b1_curated_0020": {
+      "meaning": "payment for services"
+    },
+    "b1_curated_0021": {
+      "meaning": "open land; area of study"
+    },
+    "b1_curated_0022": {
+      "meaning": "number; person; body shape"
+    },
+    "b1_curated_0023": {
+      "meaning": "to repair; to set"
+    },
+    "b1_curated_0024": {
+      "meaning": "to compel"
+    },
+    "b1_curated_0025": {
+      "meaning": "prediction"
+    },
+    "b1_curated_0026": {
+      "meaning": "to obtain"
+    },
+    "b1_curated_0027": {
+      "meaning": "people born around same time"
+    },
+    "b1_curated_0028": {
+      "meaning": "objective; target"
+    },
+    "b1_curated_0029": {
+      "meaning": "ruling body of a nation"
+    },
+    "b1_curated_0030": {
+      "meaning": "development; increase in size"
+    },
+    "b1_curated_0031": {
+      "meaning": "routine behavior"
+    },
+    "b1_curated_0032": {
+      "meaning": "to manage; to deal with"
+    },
+    "b1_curated_0033": {
+      "meaning": "to pay for services"
+    },
+    "b1_curated_0034": {
+      "meaning": "nevertheless"
+    },
+    "b1_curated_0035": {
+      "meaning": "to recognize; to determine"
+    },
+    "b1_curated_0036": {
+      "meaning": "picture; public perception"
+    },
+    "b1_curated_0037": {
+      "meaning": "right away"
+    },
+    "b1_curated_0038": {
+      "meaning": "to make better"
+    },
+    "b1_curated_0039": {
+      "meaning": "to contain; to count in"
+    },
+    "b1_curated_0040": {
+      "meaning": "to grow; to add to"
+    },
+    "b1_curated_0041": {
+      "meaning": "single person"
+    },
+    "b1_curated_0042": {
+      "meaning": "manufacturing sector"
+    },
+    "b1_curated_0043": {
+      "meaning": "to affect"
+    },
+    "b1_curated_0044": {
+      "meaning": "to notify"
+    },
+    "b1_curated_0045": {
+      "meaning": "as an alternative"
+    },
+    "b1_curated_0046": {
+      "meaning": "to plan; to aim"
+    },
+    "b1_curated_0047": {
+      "meaning": "to present someone new"
+    },
+    "b1_curated_0048": {
+      "meaning": "to include; to engage"
+    },
+    "b1_curated_0049": {
+      "meaning": "problem; topic; publication edition"
+    },
+    "b1_curated_0050": {
+      "meaning": "official who decides cases"
+    },
+    "b1_curated_0051": {
+      "meaning": "information and understanding"
+    },
+    "b1_curated_0052": {
+      "meaning": "shortage; absence"
+    },
+    "b1_curated_0053": {
+      "meaning": "rank; standard"
+    },
+    "b1_curated_0054": {
+      "meaning": "boundary"
+    },
+    "b1_curated_0055": {
+      "meaning": "connection; web link"
+    },
+    "b1_curated_0056": {
+      "meaning": "local; regional"
+    },
+    "b1_curated_0057": {
+      "meaning": "to manage; to succeed in doing"
+    },
+    "b1_curated_0058": {
+      "meaning": "to determine size or amount"
+    },
+    "b1_curated_0059": {
+      "meaning": "to state or name"
+    },
+    "b1_curated_0060": {
+      "meaning": "a way of doing something"
+    },
+    "b1_curated_0061": {
+      "meaning": "the seat of consciousness"
+    },
+    "b1_curated_0062": {
+      "meaning": "to observe; to become aware"
+    },
+    "b1_curated_0063": {
+      "meaning": "to get or acquire"
+    },
+    "b1_curated_0064": {
+      "meaning": "to happen"
+    },
+    "b1_curated_0065": {
+      "meaning": "a personal view or belief"
+    },
+    "b1_curated_0066": {
+      "meaning": "a favorable chance"
+    },
+    "b1_curated_0067": {
+      "meaning": "to arrange or coordinate"
+    },
+    "b1_curated_0068": {
+      "meaning": "specific; distinct"
+    },
+    "b1_curated_0069": {
+      "meaning": "able to wait calmly"
+    },
+    "b1_curated_0070": {
+      "meaning": "a repeated design or sequence"
+    },
+    "b1_curated_0071": {
+      "meaning": "to carry out; to present"
+    },
+    "b1_curated_0072": {
+      "meaning": "a length of time"
+    },
+    "b1_curated_0073": {
+      "meaning": "private; individual"
+    },
+    "b1_curated_0074": {
+      "meaning": "to convince someone to act"
+    },
+    "b1_curated_0075": {
+      "meaning": "total number of inhabitants"
+    },
+    "b1_curated_0076": {
+      "meaning": "a place or status"
+    },
+    "b1_curated_0077": {
+      "meaning": "a potential event"
+    },
+    "b1_curated_0078": {
+      "meaning": "to stop something from happening"
+    },
+    "b1_curated_0079": {
+      "meaning": "a series of actions"
+    },
+    "b1_curated_0080": {
+      "meaning": "to create or manufacture"
+    },
+    "b1_curated_0081": {
+      "meaning": "to give one's word"
+    },
+    "b1_curated_0082": {
+      "meaning": "to keep safe from harm"
+    },
+    "b1_curated_0083": {
+      "meaning": "to supply or make available"
+    },
+    "b1_curated_0084": {
+      "meaning": "concerning the people generally"
+    },
+    "b1_curated_0085": {
+      "meaning": "an intended goal"
+    },
+    "b1_curated_0086": {
+      "meaning": "the standard or grade"
+    },
+    "b1_curated_0087": {
+      "meaning": "to lift or increase"
+    },
+    "b1_curated_0088": {
+      "meaning": "to arrive at or attain"
+    },
+    "b1_curated_0089": {
+      "meaning": "to become fully aware"
+    },
+    "b1_curated_0090": {
+      "meaning": "a cause or justification"
+    },
+    "b1_curated_0091": {
+      "meaning": "to identify or acknowledge"
+    },
+    "b1_curated_0092": {
+      "meaning": "to make smaller in size"
+    },
+    "b1_curated_0093": {
+      "meaning": "to mention or direct attention"
+    },
+    "b1_curated_0094": {
+      "meaning": "a specific area or zone"
+    },
+    "b1_curated_0095": {
+      "meaning": "to stay or be left"
+    },
+    "b1_curated_0096": {
+      "meaning": "to take away or delete"
+    },
+    "b1_curated_0097": {
+      "meaning": "to take the place of"
+    },
+    "b1_curated_0098": {
+      "meaning": "a formal account"
+    },
+    "b1_curated_0099": {
+      "meaning": "a formal ask"
+    },
+    "b1_curated_0100": {
+      "meaning": "to need or demand"
+    },
+    "b1_curated_0101": {
+      "meaning": "a systematic investigation"
+    },
+    "b1_curated_0102": {
+      "meaning": "to reply or react"
+    },
+    "b1_curated_0103": {
+      "meaning": "an outcome or consequence"
+    },
+    "b1_curated_0104": {
+      "meaning": "a strong feeling"
+    },
+    "b1_curated_0105": {
+      "meaning": "a sudden urgent situation"
+    },
+    "b1_curated_0106": {
+      "meaning": "a person who hires others"
+    },
+    "b1_curated_0107": {
+      "meaning": "work or job status"
+    },
+    "b1_curated_0108": {
+      "meaning": "very large"
+    },
+    "b1_curated_0109": {
+      "meaning": "to provide amusement"
+    },
+    "b1_curated_0110": {
+      "meaning": "whole or complete"
+    },
+    "b1_curated_0111": {
+      "meaning": "completely; totally"
+    },
+    "b1_curated_0112": {
+      "meaning": "related to the natural world"
+    },
+    "b1_curated_0113": {
+      "meaning": "the same in value"
+    },
+    "b1_curated_0114": {
+      "meaning": "a mistake"
+    },
+    "b1_curated_0115": {
+      "meaning": "a short written composition"
+    },
+    "b1_curated_0116": {
+      "meaning": "in the end"
+    },
+    "b1_curated_0117": {
+      "meaning": "accurate or precise"
+    },
+    "b1_curated_0118": {
+      "meaning": "to trade one for another"
+    },
+    "b1_curated_0119": {
+      "meaning": "a public display"
+    },
+    "b1_curated_0120": {
+      "meaning": "a scientific test"
+    },
+    "b1_curated_0121": {
+      "meaning": "a person with special skill"
+    },
+    "b1_curated_0122": {
+      "meaning": "to travel through unknown areas"
+    },
+    "b1_curated_0123": {
+      "meaning": "a look or phrase"
+    },
+    "b1_curated_0124": {
+      "meaning": "very intense or severe"
+    },
+    "b1_curated_0125": {
+      "meaning": "to a very high degree"
+    },
+    "b1_curated_0126": {
+      "meaning": "an unpleasant feeling of danger"
+    },
+    "b1_curated_0127": {
+      "meaning": "often"
+    },
+    "b1_curated_0128": {
+      "meaning": "usually; in most cases"
+    },
+    "b1_curated_0129": {
+      "meaning": "slowly over time"
+    },
+    "b1_curated_0130": {
+      "meaning": "scarcely; barely"
+    },
+    "b2_curated_0001": {
+      "meaning": "to explain in detail"
+    },
+    "b2_curated_0002": {
+      "meaning": "to remove or get rid of"
+    },
+    "b2_curated_0003": {
+      "meaning": "to come into view"
+    },
+    "b2_curated_0004": {
+      "meaning": "special importance or stress"
+    },
+    "b2_curated_0005": {
+      "meaning": "to make possible"
+    },
+    "b2_curated_0006": {
+      "meaning": "face; meet"
+    },
+    "b2_curated_0007": {
+      "meaning": "bear; withstand"
+    },
+    "b2_curated_0008": {
+      "meaning": "make certain"
+    },
+    "b2_curated_0009": {
+      "meaning": "equal; comparable"
+    },
+    "b2_curated_0010": {
+      "meaning": "set up; create"
+    },
+    "b2_curated_0011": {
+      "meaning": "calculate approximately"
+    },
+    "b2_curated_0012": {
+      "meaning": "assess; judge"
+    },
+    "b2_curated_0014": {
+      "meaning": "develop gradually"
+    },
+    "b2_curated_0015": {
+      "meaning": "go beyond"
+    },
+    "b2_curated_0016": {
+      "meaning": "leave out"
+    },
+    "b2_curated_0017": {
+      "meaning": "make larger; grow"
+    },
+    "b2_curated_0018": {
+      "meaning": "use unfairly"
+    },
+    "b2_curated_0019": {
+      "meaning": "reveal; uncover"
+    },
+    "b2_curated_0020": {
+      "meaning": "make longer; expand"
+    },
+    "b2_curated_0021": {
+      "meaning": "make easier"
+    },
+    "b2_curated_0022": {
+      "meaning": "contributing element"
+    },
+    "b2_curated_0023": {
+      "meaning": "supporting structure"
+    },
+    "b2_curated_0024": {
+      "meaning": "basic; essential"
+    },
+    "b2_curated_0025": {
+      "meaning": "produce"
+    },
+    "b2_curated_0026": {
+      "meaning": "real; sincere"
+    },
+    "b2_curated_0027": {
+      "meaning": "slowly; step-by-step"
+    },
+    "b2_curated_0028": {
+      "meaning": "promise; vouch for"
+    },
+    "b2_curated_0029": {
+      "meaning": "be uncertain"
+    },
+    "b2_curated_0030": {
+      "meaning": "emphasize; draw attention to"
+    },
+    "b2_curated_0032": {
+      "meaning": "explain with examples"
+    },
+    "b2_curated_0033": {
+      "meaning": "effect"
+    },
+    "b2_curated_0034": {
+      "meaning": "put into action"
+    },
+    "b2_curated_0035": {
+      "meaning": "suggest indirectly"
+    },
+    "b2_curated_0036": {
+      "meaning": "force upon"
+    },
+    "b2_curated_0037": {
+      "meaning": "motivation; reward"
+    },
+    "b2_curated_0038": {
+      "meaning": "event; occurrence"
+    },
+    "b2_curated_0039": {
+      "meaning": "point out; show"
+    },
+    "b2_curated_0040": {
+      "meaning": "unavoidable"
+    },
+    "b2_curated_0041": {
+      "meaning": "first; beginning"
+    },
+    "b2_curated_0042": {
+      "meaning": "proactive plan"
+    },
+    "b2_curated_0043": {
+      "meaning": "deep understanding"
+    },
+    "b2_curated_0044": {
+      "meaning": "combine; merge"
+    },
+    "b2_curated_0045": {
+      "meaning": "explain meaning"
+    },
+    "b2_curated_0046": {
+      "meaning": "get involved"
+    },
+    "b2_curated_0047": {
+      "meaning": "separate; set apart"
+    },
+    "b2_curated_0048": {
+      "meaning": "provide valid reason"
+    },
+    "b2_curated_0049": {
+      "meaning": "laws"
+    },
+    "b2_curated_0050": {
+      "meaning": "keep in good condition"
+    },
+    "b2_curated_0051": {
+      "meaning": "hidden reason"
+    },
+    "b2_curated_0052": {
+      "meaning": "discuss to reach agreement"
+    },
+    "b2_curated_0053": {
+      "meaning": "fail to care for"
+    },
+    "b2_curated_0054": {
+      "meaning": "however; nonetheless"
+    },
+    "b2_curated_0056": {
+      "meaning": "barrier; hurdle"
+    },
+    "b2_curated_0057": {
+      "meaning": "live in; fill space"
+    },
+    "b2_curated_0058": {
+      "meaning": "final result"
+    },
+    "b2_curated_0059": {
+      "meaning": "defeat; deal with"
+    },
+    "b2_curated_0060": {
+      "meaning": "see; interpret"
+    },
+    "b2_curated_0061": {
+      "meaning": "observable event"
+    },
+    "b2_curated_0062": {
+      "meaning": "exact; accurate"
+    },
+    "b2_curated_0063": {
+      "meaning": "assume; suppose"
+    },
+    "b2_curated_0064": {
+      "meaning": "main concern"
+    },
+    "b2_curated_0065": {
+      "meaning": "official way of doing"
+    },
+    "b2_curated_0066": {
+      "meaning": "officially forbid"
+    },
+    "b2_curated_0067": {
+      "meaning": "cause; trigger"
+    },
+    "b2_curated_0068": {
+      "meaning": "follow; strive for"
+    },
+    "b2_curated_0069": {
+      "meaning": "without pattern"
+    },
+    "b2_curated_0070": {
+      "meaning": "logical; sensible"
+    },
+    "b2_curated_0071": {
+      "meaning": "strengthen"
+    },
+    "b2_curated_0072": {
+      "meaning": "connected; applicable"
+    },
+    "b2_curated_0073": {
+      "meaning": "unwilling"
+    },
+    "b2_curated_0074": {
+      "meaning": "solve; settle"
+    },
+    "b2_curated_0075": {
+      "meaning": "limit"
+    },
+    "b2_curated_0076": {
+      "meaning": "keep; hold onto"
+    },
+    "b2_curated_0077": {
+      "meaning": "make known"
+    },
+    "b2_curated_0078": {
+      "meaning": "planned program"
+    },
+    "b2_curated_0079": {
+      "meaning": "important; meaningful"
+    },
+    "b2_curated_0080": {
+      "meaning": "happening at once"
+    },
+    "b2_curated_0082": {
+      "meaning": "careful plan"
+    },
+    "b2_curated_0083": {
+      "meaning": "following; later"
+    },
+    "b2_curated_0084": {
+      "meaning": "large; considerable"
+    },
+    "b2_curated_0085": {
+      "meaning": "enough"
+    },
+    "b2_curated_0086": {
+      "meaning": "support; keep going"
+    },
+    "b2_curated_0087": {
+      "meaning": "inclination"
+    },
+    "b2_curated_0088": {
+      "meaning": "change completely"
+    },
+    "b2_curated_0089": {
+      "meaning": "change; shift"
+    },
+    "b2_curated_0090": {
+      "meaning": "last; highest; principal"
+    },
+    "b2_curated_0091": {
+      "meaning": "to undergo; to experience"
+    },
+    "b2_curated_0092": {
+      "meaning": "to carry out; to shoulder"
+    },
+    "b2_curated_0093": {
+      "meaning": "unclear; vague"
+    },
+    "b2_curated_0094": {
+      "meaning": "valid; in effect"
+    },
+    "b2_curated_0095": {
+      "meaning": "to vary; to differ"
+    },
+    "b2_curated_0096": {
+      "meaning": "widespread; expanding"
+    },
+    "b2_curated_0097": {
+      "meaning": "to withdraw money or oneself; to retreat"
+    },
+    "b2_curated_0098": {
+      "meaning": "ethical; principled"
+    },
+    "b2_curated_0099": {
+      "meaning": "ethnic"
+    },
+    "b2_curated_0100": {
+      "meaning": "clearly visible; apparent"
+    },
+    "b2_curated_0101": {
+      "meaning": "to exaggerate"
+    },
+    "b2_curated_0102": {
+      "meaning": "excessive"
+    },
+    "b2_curated_0103": {
+      "meaning": "to execute; to run"
+    },
+    "b2_curated_0104": {
+      "meaning": "to exhibit; to show"
+    },
+    "b2_curated_0105": {
+      "meaning": "expertise"
+    },
+    "b2_curated_0106": {
+      "meaning": "flexible; adaptable"
+    },
+    "b2_curated_0107": {
+      "meaning": "to forbid"
+    },
+    "b2_curated_0108": {
+      "meaning": "formula"
+    },
+    "b2_curated_0109": {
+      "meaning": "fraction; small part"
+    },
+    "b2_curated_0110": {
+      "meaning": "frequency"
+    },
+    "b2_curated_0111": {
+      "meaning": "furthermore; besides that"
+    },
+    "b2_curated_0112": {
+      "meaning": "genetic"
+    },
+    "b2_curated_0113": {
+      "meaning": "guidance"
+    },
+    "b2_curated_0114": {
+      "meaning": "habitat"
+    },
+    "b2_curated_0115": {
+      "meaning": "harsh; cruel; unfriendly"
+    },
+    "b2_curated_0116": {
+      "meaning": "therefore; thus"
+    },
+    "b2_curated_0117": {
+      "meaning": "identical; exact same"
+    },
+    "b2_curated_0118": {
+      "meaning": "immense; very large"
+    },
+    "b2_curated_0119": {
+      "meaning": "infrastructure"
+    },
+    "b2_curated_0120": {
+      "meaning": "to inherit"
+    },
+    "b2_curated_0121": {
+      "meaning": "innovation; renewal"
+    },
+    "b2_curated_0122": {
+      "meaning": "to interact"
+    },
+    "b2_curated_0123": {
+      "meaning": "to modify"
+    },
+    "b2_curated_0124": {
+      "meaning": "namely; that is"
+    },
+    "b2_curated_0125": {
+      "meaning": "ongoing; continuous"
+    },
+    "b2_curated_0126": {
+      "meaning": "opponent"
+    },
+    "b2_curated_0127": {
+      "meaning": "optimistic; hopeful"
+    },
+    "b2_curated_0128": {
+      "meaning": "urban"
+    },
+    "b2_curated_0129": {
+      "meaning": "voluntary"
+    },
+    "b2_curated_0130": {
+      "meaning": "vulnerable"
+    },
+    "c1_curated_0050": {
+      "meaning": "to advocate or support actively"
+    },
+    "c1_curated_0051": {
+      "meaning": "to obey or strictly follow rules or principles"
+    },
+    "c1_curated_0052": {
+      "meaning": "arbitrary; without clear justification"
+    },
+    "c1_curated_0053": {
+      "meaning": "autonomy; self-governing freedom"
+    },
+    "c1_curated_0054": {
+      "meaning": "bleak and hopeless"
+    },
+    "c1_curated_0055": {
+      "meaning": "blatant regarding bad behavior"
+    },
+    "c1_curated_0056": {
+      "meaning": "violation of rules, agreements, or security"
+    },
+    "c1_curated_0057": {
+      "meaning": "honest and straightforward"
+    },
+    "c1_curated_0058": {
+      "meaning": "to begin officially"
+    },
+    "c1_curated_0059": {
+      "meaning": "to conform or adapt to rules and norms"
+    },
+    "c1_curated_0060": {
+      "meaning": "to argue or contend firmly"
+    },
+    "c1_curated_0061": {
+      "meaning": "to converge or meet at a single point"
+    },
+    "c1_curated_0062": {
+      "meaning": "daunting due to extreme difficulty"
+    },
+    "c1_curated_0063": {
+      "meaning": "harmful; having bad impacts"
+    },
+    "c1_curated_0064": {
+      "meaning": "to dismantle or phase out a system"
+    },
+    "c1_curated_0065": {
+      "meaning": "to disperse; to scatter in various directions"
+    },
+    "c1_curated_0066": {
+      "meaning": "elusive; hard to catch or find"
+    },
+    "c1_curated_0067": {
+      "meaning": "to embody or represent an idea or value"
+    },
+    "c1_curated_0068": {
+      "meaning": "to endorse or approve officially and openly"
+    },
+    "c1_curated_0069": {
+      "meaning": "to entail or require as a consequence"
+    },
+    "c1_curated_0070": {
+      "meaning": "epitome; perfect example or highest embodiment"
+    },
+    "c1_curated_0071": {
+      "meaning": "to erode slowly"
+    },
+    "c1_curated_0072": {
+      "meaning": "to exemplify; to serve as a typical example"
+    },
+    "c1_curated_0073": {
+      "meaning": "to forge relationships or agreements with hard work"
+    },
+    "c1_curated_0074": {
+      "meaning": "formidable; very strong or intimidatingly difficult"
+    },
+    "c1_curated_0075": {
+      "meaning": "to foster; to encourage development"
+    },
+    "c1_curated_0076": {
+      "meaning": "futile; unlikely to succeed"
+    },
+    "c1_curated_0077": {
+      "meaning": "to gauge or estimate roughly"
+    },
+    "c1_curated_0078": {
+      "meaning": "to grapple or struggle hard with problems"
+    },
+    "c1_curated_0079": {
+      "meaning": "to hinder progress or development"
+    },
+    "c1_curated_0080": {
+      "meaning": "hypothesis; scientific guess needing testing"
+    },
+    "c1_curated_0081": {
+      "meaning": "implicit; not directly stated"
+    },
+    "c1_curated_0082": {
+      "meaning": "inclination or desire to do something"
+    },
+    "c1_curated_0083": {
+      "meaning": "to incur costs, losses, or risks"
+    },
+    "c1_curated_0084": {
+      "meaning": "intact; undamaged"
+    },
+    "c1_curated_0085": {
+      "meaning": "intricate with many small details"
+    },
+    "c1_curated_0086": {
+      "meaning": "to jeopardize; to threaten success"
+    },
+    "c1_curated_0087": {
+      "meaning": "legitimate; justifiable"
+    },
+    "c1_curated_0088": {
+      "meaning": "lenient; not harsh in punishment"
+    },
+    "c1_curated_0089": {
+      "meaning": "long life; lasting durability"
+    },
+    "c1_curated_0090": {
+      "meaning": "highly profitable"
+    },
+    "c1_curated_0091": {
+      "meaning": "to show clearly"
+    },
+    "c1_curated_0092": {
+      "meaning": "average; not special"
+    },
+    "c1_curated_0093": {
+      "meaning": "to reduce negative impact"
+    },
+    "c1_curated_0094": {
+      "meaning": "growing force or momentum"
+    },
+    "c1_curated_0095": {
+      "meaning": "boring due to daily routine"
+    },
+    "c1_curated_0096": {
+      "meaning": "standard of behavior"
+    },
+    "c1_curated_0097": {
+      "meaning": "idea or understanding"
+    },
+    "c1_curated_0098": {
+      "meaning": "famous for bad reasons"
+    },
+    "c1_curated_0099": {
+      "meaning": "to require or mandate"
+    },
+    "c1_curated_0100": {
+      "meaning": "little known; hard to understand"
+    },
+    "c1_curated_0101": {
+      "meaning": "outdated; no longer used"
+    },
+    "c1_curated_0102": {
+      "meaning": "to balance out losses"
+    },
+    "c1_curated_0103": {
+      "meaning": "very difficult or painful experience"
+    },
+    "c1_curated_0104": {
+      "meaning": "greater or more important than"
+    },
+    "c1_curated_0105": {
+      "meaning": "a framework for thinking"
+    },
+    "c1_curated_0106": {
+      "meaning": "to drop sharply"
+    },
+    "c1_curated_0107": {
+      "meaning": "introductory or initial stage"
+    },
+    "c1_curated_0108": {
+      "meaning": "to win or succeed"
+    },
+    "c1_curated_0109": {
+      "meaning": "highly skilled"
+    },
+    "c1_curated_0110": {
+      "meaning": "to trigger a reaction"
+    },
+    "c1_curated_0111": {
+      "meaning": "to measure numerically"
+    },
+    "c1_curated_0112": {
+      "meaning": "to disprove with evidence"
+    },
+    "c1_curated_0113": {
+      "meaning": "to cause to be in a state"
+    },
+    "c1_curated_0114": {
+      "meaning": "to repeat a process identically"
+    },
+    "c1_curated_0115": {
+      "meaning": "very thorough and strict"
+    },
+    "c1_curated_0116": {
+      "meaning": "shortage"
+    },
+    "c1_curated_0117": {
+      "meaning": "doubting the truth of claims"
+    },
+    "c1_curated_0118": {
+      "meaning": "to guess without certain proof"
+    },
+    "c1_curated_0119": {
+      "meaning": "not developing or flowing"
+    },
+    "c1_curated_0120": {
+      "meaning": "strikingly clear or harsh"
+    },
+    "c1_curated_0121": {
+      "meaning": "sudden large increase"
+    },
+    "c1_curated_0122": {
+      "meaning": "real; able to be measured"
+    },
+    "c1_curated_0123": {
+      "meaning": "to grow or develop well"
+    },
+    "c1_curated_0124": {
+      "meaning": "to go beyond limits"
+    },
+    "c1_curated_0125": {
+      "meaning": "unimportant; minor"
+    },
+    "c1_curated_0126": {
+      "meaning": "chaos; turmoil"
+    },
+    "c1_curated_0127": {
+      "meaning": "agreed by all parties"
+    },
+    "c1_curated_0128": {
+      "meaning": "to weaken authority gradually"
+    },
+    "c1_curated_0129": {
+      "meaning": "never happened before"
+    },
+    "c1_curated_0130": {
+      "meaning": "to defend decisions or values"
+    },
+    "c1_curated_0131": {
+      "meaning": "able to do many things"
+    },
+    "c1_curated_0132": {
+      "meaning": "unstable; easily changing"
+    },
+    "c1_curated_0133": {
+      "meaning": "to promise solemnly"
+    },
+    "c1_curated_0135": {
+      "meaning": "to justify or provide reason"
+    },
+    "c1_curated_0136": {
+      "meaning": "cautious of possible danger"
+    },
+    "c1_curated_0137": {
+      "meaning": "to endure or resist"
+    },
+    "c1_curated_0138": {
+      "meaning": "to long for deeply"
+    },
+    "c1_curated_0139": {
+      "meaning": "to produce results or profit"
+    },
+    "c1_curated_0200": {
+      "meaning": "to prevent danger or crisis"
+    },
+    "c1_curated_0201": {
+      "meaning": "to signify or symbolize"
+    },
+    "c1_curated_0202": {
+      "meaning": "to reveal hidden information"
+    },
+    "c1_curated_0203": {
+      "meaning": "to give power or ability"
+    },
+    "c1_curated_0204": {
+      "meaning": "to imagine or foresee"
+    },
+    "c1_curated_0205": {
+      "meaning": "to bring to mind"
+    },
+    "c1_curated_0206": {
+      "meaning": "to exert pressure or influence"
+    },
+    "c1_curated_0207": {
+      "meaning": "to hinder progress"
+    },
+    "c1_curated_0208": {
+      "meaning": "technical equipment or institutional devices"
+    },
+    "c1_curated_0209": {
+      "meaning": "a standard for comparison"
+    },
+    "c1_curated_0210": {
+      "meaning": "unity among members"
+    },
+    "c1_curated_0211": {
+      "meaning": "implied meaning of a word"
+    },
+    "c1_curated_0212": {
+      "meaning": "standard for judgment"
+    },
+    "c1_curated_0213": {
+      "meaning": "official set of beliefs"
+    },
+    "c1_curated_0214": {
+      "meaning": "a wide range"
+    },
+    "c1_curated_0215": {
+      "meaning": "fair treatment or access"
+    },
+    "c1_curated_0216": {
+      "meaning": "a delay or obstacle"
+    },
+    "c1_curated_0217": {
+      "meaning": "a system of levels"
+    },
+    "c1_curated_0218": {
+      "meaning": "understanding after the fact"
+    },
+    "c1_curated_0219": {
+      "meaning": "a way to solve problems"
+    },
+    "c1_curated_0220": {
+      "meaning": "reluctance to change"
+    },
+    "c1_curated_0221": {
+      "meaning": "unfavorable or harmful"
+    },
+    "c1_curated_0222": {
+      "meaning": "creating supportive conditions"
+    },
+    "c1_curated_0223": {
+      "meaning": "causing intense debate"
+    },
+    "c1_curated_0224": {
+      "meaning": "fluent and persuasive"
+    },
+    "c1_curated_0225": {
+      "meaning": "unpredictable; inconsistent"
+    },
+    "c1_curated_0226": {
+      "meaning": "about to happen"
+    },
+    "c1_curated_0227": {
+      "meaning": "essential; cannot be replaced"
+    },
+    "c1_curated_0228": {
+      "meaning": "very small; insignificant"
+    },
+    "c1_curated_0229": {
+      "meaning": "allegedly; according to accusations"
+    },
+    "c1_curated_0230": {
+      "meaning": "debatably; reasonably claimed"
+    },
+    "c1_curated_0231": {
+      "meaning": "always without exception"
+    },
+    "c1_curated_0232": {
+      "meaning": "noticeably; clearly different"
+    },
+    "c1_curated_0233": {
+      "meaning": "especially; prominently"
+    },
+    "c1_curated_0234": {
+      "meaning": "easily; without hesitation"
+    },
+    "c1_curated_0235": {
+      "meaning": "appearing so, but perhaps not"
+    },
+    "c1_curated_0236": {
+      "meaning": "afterwards; following that"
+    },
+    "c1_curated_0237": {
+      "meaning": "by that means"
+    },
+    "c1_curated_0238": {
+      "meaning": "completely; totally"
+    },
+    "c1_curated_0239": {
+      "meaning": "to cause or trigger"
+    },
+    "c1_curated_0240": {
+      "meaning": "to conclude from indirect evidence"
+    },
+    "c1_curated_0241": {
+      "meaning": "to hinder or restrain"
+    },
+    "c1_curated_0242": {
+      "meaning": "to make impossible; prevent"
+    },
+    "c1_curated_0243": {
+      "meaning": "to protect or keep safe"
+    },
+    "c1_curated_0244": {
+      "meaning": "to specify as a requirement"
+    },
+    "c1_curated_0245": {
+      "meaning": "to support or form a foundation"
+    },
+    "c1_curated_0246": {
+      "meaning": "honesty and strong moral principles"
+    },
+    "c1_curated_0247": {
+      "meaning": "understanding without conscious reasoning"
+    },
+    "c1_curated_0248": {
+      "meaning": "inheritance; influence from the past"
+    },
+    "c1_curated_0249": {
+      "meaning": "influence to achieve a goal"
+    },
+    "c1_curated_0250": {
+      "meaning": "official authority or command"
+    },
+    "c1_curated_0251": {
+      "meaning": "hidden danger or unexpected difficulty"
+    },
+    "c1_curated_0252": {
+      "meaning": "basis for an argument"
+    },
+    "c1_curated_0253": {
+      "meaning": "supporter of an idea"
+    },
+    "c1_curated_0254": {
+      "meaning": "starting point or limit"
+    },
+    "c1_curated_0255": {
+      "meaning": "insecure and risky"
+    },
+    "c1_curated_0256": {
+      "meaning": "likely to suffer something bad"
+    },
+    "c1_curated_0257": {
+      "meaning": "shallow; only on the surface"
+    },
+    "c1_curated_0258": {
+      "meaning": "easily affected or vulnerable"
+    },
+    "c1_curated_0259": {
+      "meaning": "wise and careful"
+    },
+    "c1_curated_0260": {
+      "meaning": "fundamentally; completely changed"
+    },
+    "c1_curated_0261": {
+      "meaning": "in an organized, orderly way"
+    },
+    "c1_curated_0262": {
+      "meaning": "barely; almost not at all"
+    },
+    "c1_curated_0263": {
+      "meaning": "only; exclusively"
+    },
+    "c1_curated_0264": {
+      "meaning": "excessively; beyond reasonable limits"
+    },
+    "c1_curated_0265": {
+      "meaning": "in the order mentioned"
+    },
+    "c1_curated_0266": {
+      "meaning": "at the same time"
+    },
+    "c1_curated_0267": {
+      "meaning": "properly; as expected"
+    },
+    "c1_curated_0268": {
+      "meaning": "frugally; in small amounts"
+    },
+    "c1_curated_0269": {
+      "meaning": "likely; based on reasonable assumptions"
+    }
+  }
+}

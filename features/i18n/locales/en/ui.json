@@ -3129,7 +3129,7 @@
   "progress2.days": "Mon, Tue, Wed, Thu, Fri, Sat, Sun",
   "progress2.level-aria": "Level and progress cards",
   "progress2.level-eyebrow": "Your level",
-  "progress2.level-lead": "{pct} % goes to {next} . Just {sisa} grammar lesson left.",
+  "progress2.level-lead": "{pct}% toward {next} — just {sisa} grammar lessons left.",
   "progress2.level-top": "Highest level. Maintain it with regular sessions.",
   "progress2.streak": "{days} days",
   "progress2.week-empty": "No practice this week. One small session is enough to start.",
@@ -3273,7 +3273,7 @@
   "reading.apa-tujuan-utama-penulis-membuat": "What is the author's main purpose in making this reading?",
   "reading.arti-kata-atau-frasa-tersebut": "What is the most appropriate meaning of the word or phrase in this context?",
   "reading.baca-pertanyaannya-dulu-cari-bagian": "Read the question first, look for the relevant parts of the text, then match each choice with the evidence. Don't choose just because they say they look the same.",
-  "reading.bacaan": "{length} reading",
+  "reading.bacaan": "{length} passages",
   "reading.bacaan-2": "this reading",
   "reading.bacaan-3": "Reading",
   "reading.bacaan-4": "Reading",
@@ -4879,5 +4879,9 @@
   "mandarin.chapter_word": "UNIT",
   "mandarin.reorder_hint": "Follow Subject + Time + Place + Verb + Object.",
   "mandarin.reorder_pattern_hint": "Place time and place expressions before the verb.",
-  "story.cat-teknologi": "Technology & Travel"
+  "story.cat-teknologi": "Technology & Travel",
+  "onboarding.ja-meaning-go": "go",
+  "mandarin.level-0-tab": "Foundations (Lvl 0)",
+  "mandarin.level-7-tab": "Lvl 7 (Discourse)",
+  "mandarin.level-8-tab": "Lvl 8 (Literature)"
 }

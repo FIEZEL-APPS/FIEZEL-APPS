@@ -17,6 +17,7 @@ import {
 } from '../data/kakijunStrokeBank';
 import { resolveVoiceApiCandidateBases } from './liveTransport';
 import { layoutGraphToShapes } from './dagreLayout';
+import { wbPick } from './i18n';
 
 export interface BoardDynamicDataSubset {
   contextMode: string;
@@ -684,7 +685,7 @@ function sanitizeStepVisualFields(step: WhiteboardStepCommand): WhiteboardStepCo
     next.timelineEvents = step.timelineEvents
       .map((ev) => ({
         ...ev,
-        timeLabel: cleanBoardDisplayText(ev.timeLabel) || 'Tahap',
+        timeLabel: cleanBoardDisplayText(ev.timeLabel) || wbPick('Stage', 'Tahap'),
         title: cleanBoardDisplayText(ev.title),
         example: cleanBoardDisplayText(ev.example || '') || undefined,
       }))
@@ -694,7 +695,7 @@ function sanitizeStepVisualFields(step: WhiteboardStepCommand): WhiteboardStepCo
     next.blocks = step.blocks
       .map((bl) => ({
         ...bl,
-        role: cleanBoardDisplayText(bl.role) || 'Bagian',
+        role: cleanBoardDisplayText(bl.role) || wbPick('Part', 'Bagian'),
         token: cleanBoardDisplayText(bl.token),
         note: cleanBoardDisplayText(bl.note || '') || undefined,
       }))
@@ -824,36 +825,57 @@ function deriveStepSpokenNarration(
       const rp = step.rightPanel;
       const an = cleanBoardDisplayText(step.analogy || '');
       const leftCue = lp
-        ? `Pertama di sisi kiri, ${lp.title}: ${lp.subtitle || 'perhatikan aturan utamanya'}${lp.example ? `. Contohnya kalimat ${lp.example}` : ''}`
+        ? wbPick(
+            `First on the left, ${lp.title}: ${lp.subtitle || 'focus on the core rule'}${lp.example ? `. Example: ${lp.example}` : ''}`,
+            `Pertama di sisi kiri, ${lp.title}: ${lp.subtitle || 'perhatikan aturan utamanya'}${lp.example ? `. Contohnya kalimat ${lp.example}` : ''}`
+          )
         : '';
       const rightCue = rp
-        ? `Kedua di sisi kanan, ${rp.title}: ${rp.subtitle || 'ini perbandingannya'}${rp.example ? `. Contohnya kalimat ${rp.example}` : ''}`
+        ? wbPick(
+            `Second on the right, ${rp.title}: ${rp.subtitle || 'compare with this form'}${rp.example ? `. Example: ${rp.example}` : ''}`,
+            `Kedua di sisi kanan, ${rp.title}: ${rp.subtitle || 'ini perbandingannya'}${rp.example ? `. Contohnya kalimat ${rp.example}` : ''}`
+          )
         : '';
-      return `${leftCue ? `${leftCue}. ` : ''}${rightCue ? `${rightCue}. ` : ''}${an && !/^visualisasi/i.test(an) ? `Kuncinya: ${an}.` : ''}`.replace(/\.{2,}/g, '.').trim();
+      return `${leftCue ? `${leftCue}. ` : ''}${rightCue ? `${rightCue}. ` : ''}${an && !/^visualisasi/i.test(an) ? `${wbPick('Key idea', 'Kuncinya')}: ${an}.` : ''}`.replace(/\.{2,}/g, '.').trim();
     }
     case 'mind_map': {
       if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       const items = (step.branches || [])
         .slice(0, 4)
-        .map((b, bIdx) => `Cabang ${bIdx + 1}, ${b.label}${b.sublabel ? `, yaitu ${b.sublabel}` : ''}${b.example ? `, contohnya ${b.example}` : ''}`)
+        .map((b, bIdx) => wbPick(
+          `Branch ${bIdx + 1}, ${b.label}${b.sublabel ? `, meaning ${b.sublabel}` : ''}${b.example ? `, for example ${b.example}` : ''}`,
+          `Cabang ${bIdx + 1}, ${b.label}${b.sublabel ? `, yaitu ${b.sublabel}` : ''}${b.example ? `, contohnya ${b.example}` : ''}`
+        ))
         .join('. ');
-      return `Mari kita baca peta konsep ${cleanBoardDisplayText(step.metaphorCenterLabel || step.title || topicTitle)} satu per satu. ${items || cleanBoardDisplayText(step.title || topicTitle)}.`.replace(/\.{2,}/g, '.').trim();
+      return wbPick(
+        `Let's walk through the concept map for ${cleanBoardDisplayText(step.metaphorCenterLabel || step.title || topicTitle)} one by one. ${items || cleanBoardDisplayText(step.title || topicTitle)}.`,
+        `Mari kita baca peta konsep ${cleanBoardDisplayText(step.metaphorCenterLabel || step.title || topicTitle)} satu per satu. ${items || cleanBoardDisplayText(step.title || topicTitle)}.`
+      ).replace(/\.{2,}/g, '.').trim();
     }
     case 'timeline_track': {
       if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       const stops = (step.timelineEvents || [])
         .slice(0, 4)
-        .map((ev) => `${ev.timeLabel}: ${ev.title}${ev.example ? `, contohnya ${ev.example}` : ''}`)
-        .join('. Kemudian ');
-      return `Ikuti garis waktu dari kiri ke kanan. ${stops || cleanBoardDisplayText(step.title || topicTitle)}.`.replace(/\.{2,}/g, '.').trim();
+        .map((ev) => `${ev.timeLabel}: ${ev.title}${ev.example ? wbPick(`, e.g. ${ev.example}`, `, contohnya ${ev.example}`) : ''}`)
+        .join(wbPick('. Then ', '. Kemudian '));
+      return wbPick(
+        `Follow the timeline from left to right. ${stops || cleanBoardDisplayText(step.title || topicTitle)}.`,
+        `Ikuti garis waktu dari kiri ke kanan. ${stops || cleanBoardDisplayText(step.title || topicTitle)}.`
+      ).replace(/\.{2,}/g, '.').trim();
     }
     case 'formula_blocks': {
       if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       const pieceDesc = (step.blocks || [])
         .slice(0, 5)
-        .map((bl, bIdx) => `Blok ${bIdx + 1}, ${bl.role}, berisi ${bl.token}${bl.note ? `, digunakan untuk ${bl.note}` : ''}`)
+        .map((bl, bIdx) => wbPick(
+          `Block ${bIdx + 1}, ${bl.role}, contains ${bl.token}${bl.note ? `, used for ${bl.note}` : ''}`,
+          `Blok ${bIdx + 1}, ${bl.role}, berisi ${bl.token}${bl.note ? `, digunakan untuk ${bl.note}` : ''}`
+        ))
         .join('. ');
-      return `Perhatikan susunan blok polanya dari kiri ke kanan. ${pieceDesc || cleanBoardDisplayText(step.title || topicTitle)}.`.replace(/\.{2,}/g, '.').trim();
+      return wbPick(
+        `Notice the pattern blocks from left to right. ${pieceDesc || cleanBoardDisplayText(step.title || topicTitle)}.`,
+        `Perhatikan susunan blok polanya dari kiri ke kanan. ${pieceDesc || cleanBoardDisplayText(step.title || topicTitle)}.`
+      ).replace(/\.{2,}/g, '.').trim();
     }
     case 'rough_scene': {
       if (existingWords >= 8) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
@@ -865,18 +887,24 @@ function deriveStepSpokenNarration(
         })
         .filter((s) => s && s.length <= 80)
         .slice(0, 4);
-      const visualCue = partsDesc.length ? ` Mulai dari ${partsDesc.join(', lalu ')}.` : '';
+      const visualCue = partsDesc.length ? wbPick(` Starting from ${partsDesc.join(', then ')}.`, ` Mulai dari ${partsDesc.join(', lalu ')}.`) : '';
       const cap = step.caption ? ` ${cleanBoardDisplayText(step.caption)}.` : '';
-      return `Perhatikan skema ${cleanBoardDisplayText(step.title || topicTitle)} di papan.${cap}${visualCue}`.trim();
+      return wbPick(
+        `Look closely at the ${cleanBoardDisplayText(step.title || topicTitle)} diagram on the board.${cap}${visualCue}`,
+        `Perhatikan skema ${cleanBoardDisplayText(step.title || topicTitle)} di papan.${cap}${visualCue}`
+      ).trim();
     }
     case 'contrast_scale': {
       if (existingWords >= 8) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
-      const a = cleanBoardDisplayText(step.termA || 'Bentuk utama');
+      const a = cleanBoardDisplayText(step.termA || wbPick('Primary form', 'Bentuk utama'));
       const dA = cleanBoardDisplayText(step.descA || '');
-      const b = cleanBoardDisplayText(step.termB || 'Bentuk pembanding');
+      const b = cleanBoardDisplayText(step.termB || wbPick('Comparison form', 'Bentuk pembanding'));
       const dB = cleanBoardDisplayText(step.descB || '');
       const an = cleanBoardDisplayText(step.analogy || '');
-      return `Bandingkan sisi kiri dan kanan: ${a}${dA ? ` (${dA})` : ''}, versus ${b}${dB ? ` (${dB})` : ''}.${an ? ` Kuncinya: ${an}.` : ''}`.trim();
+      return wbPick(
+        `Compare both sides: ${a}${dA ? ` (${dA})` : ''} versus ${b}${dB ? ` (${dB})` : ''}.${an ? ` Key insight: ${an}.` : ''}`,
+        `Bandingkan sisi kiri dan kanan: ${a}${dA ? ` (${dA})` : ''}, versus ${b}${dB ? ` (${dB})` : ''}.${an ? ` Kuncinya: ${an}.` : ''}`
+      ).trim();
     }
     case 'syntax_flow': {
       if (existingWords >= 12) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
@@ -884,16 +912,22 @@ function deriveStepSpokenNarration(
         .map((n) => {
           const r = cleanBoardDisplayText(n.role);
           const w = cleanBoardDisplayText(n.word);
-          return r && w ? `${r} diisi ${w}` : w || r;
+          return r && w ? wbPick(`${r}: ${w}`, `${r} diisi ${w}`) : w || r;
         })
         .filter(Boolean)
-        .join(', lalu ');
+        .join(wbPick(', followed by ', ', lalu '));
       const extraExplain = cleanBoardDisplayText(step.reason || _coachExplanation || '');
       if (chain) {
-        return `Perhatikan urutan blok kalimat yang tepat dari kiri ke kanan: ${chain}.${extraExplain ? ` ${extraExplain.split(/(?<=[.!?])\s+/)[0]}` : ''}`.replace(/\.{2,}/g, '.').trim();
+        return wbPick(
+          `Follow the sentence blocks from left to right: ${chain}.${extraExplain ? ` ${extraExplain.split(/(?<=[.!?])\s+/)[0]}` : ''}`,
+          `Perhatikan urutan blok kalimat yang tepat dari kiri ke kanan: ${chain}.${extraExplain ? ` ${extraExplain.split(/(?<=[.!?])\s+/)[0]}` : ''}`
+        ).replace(/\.{2,}/g, '.').trim();
       }
       const formulaHint = cleanBoardDisplayText(step.rightText || step.text || '');
-      return `Perhatikan susunan struktur kalimat untuk ${cleanBoardDisplayText(step.title || topicTitle)}: ${formulaHint || extraExplain || 'letakkan setiap unsur kalimat tepat pada posisinya agar tidak bertabrakan'}.`.replace(/\.{2,}/g, '.').trim();
+      return wbPick(
+        `Examine the sentence structure for ${cleanBoardDisplayText(step.title || topicTitle)}: ${formulaHint || extraExplain || 'place each clause element in its proper slot'}.`,
+        `Perhatikan susunan struktur kalimat untuk ${cleanBoardDisplayText(step.title || topicTitle)}: ${formulaHint || extraExplain || 'letakkan setiap unsur kalimat tepat pada posisinya agar tidak bertabrakan'}.`
+      ).replace(/\.{2,}/g, '.').trim();
     }
     case 'table': {
       if (existingWords >= 8) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
@@ -901,10 +935,10 @@ function deriveStepSpokenNarration(
         .slice(0, 4)
         .map((r) => r.map((c) => cleanBoardDisplayText(c)).filter(Boolean).slice(0, 3).join(', '))
         .filter(Boolean)
-        .join('. Berikutnya: ');
+        .join(wbPick('. Next: ', '. Berikutnya: '));
       return rowSummaries
-        ? `${cleanBoardDisplayText(step.title || 'Contoh nyata di papan')}: ${rowSummaries}.`.trim()
-        : `${cleanBoardDisplayText(step.title || 'Perhatikan contoh di tabel ini')}.`.trim();
+        ? `${cleanBoardDisplayText(step.title || wbPick('Examples on the board', 'Contoh nyata di papan'))}: ${rowSummaries}.`.trim()
+        : `${cleanBoardDisplayText(step.title || wbPick('Review the examples in this table', 'Perhatikan contoh di tabel ini'))}.`.trim();
     }
     case 'trap_vs_fix': {
       const wrongClean = cleanBoardDisplayText(step.wrongText || '');
@@ -915,16 +949,25 @@ function deriveStepSpokenNarration(
       if (existingWords >= 10 && coversWrong && coversRight) {
         return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       }
-      const why = step.reason ? ` Alasannya: ${cleanBoardDisplayText(step.reason)}.` : '';
-      return `Hindari kesalahan seperti ${wrongClean || 'bentuk yang keliru'}. Yang benar adalah ${rightClean}.${why}`.replace(/\.{2,}/g, '.').trim();
+      const why = step.reason ? ` ${wbPick('Reason:', 'Alasannya:')} ${cleanBoardDisplayText(step.reason)}.` : '';
+      return wbPick(
+        `Avoid forms like ${wrongClean || 'the common mistake'}. Use ${rightClean}.${why}`,
+        `Hindari kesalahan seperti ${wrongClean || 'bentuk yang keliru'}. Yang benar adalah ${rightClean}.${why}`
+      ).replace(/\.{2,}/g, '.').trim();
     }
     case 'highlight_callout':
       if (existingWords >= 6) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
-      return `Ingat kuncinya: ${cleanBoardDisplayText(step.highlightPhrase || step.text || step.title || topicTitle)}.`.trim();
+      return `${wbPick('Remember this key point:', 'Ingat kuncinya:')} ${cleanBoardDisplayText(step.highlightPhrase || step.text || step.title || topicTitle)}.`.trim();
     case 'tone_wave':
-      return `Amati gelombang nada untuk ${cleanBoardDisplayText(step.text || step.title)} dan ikuti naik turunnya garis biru saat membaca ${cleanBoardDisplayText(step.reading || '')}.`.trim();
+      return wbPick(
+        `Watch the pitch contour for ${cleanBoardDisplayText(step.text || step.title)} and trace the blue curve as you pronounce ${cleanBoardDisplayText(step.reading || '')}.`,
+        `Amati gelombang nada untuk ${cleanBoardDisplayText(step.text || step.title)} dan ikuti naik turunnya garis biru saat membaca ${cleanBoardDisplayText(step.reading || '')}.`
+      ).trim();
     case 'checkpoint':
-      return `Sekarang coba jawab latihan singkat ini: ${cleanBoardDisplayText(step.text || 'pilih bentuk kalimat yang benar')}.`.trim();
+      return wbPick(
+        `Now try this quick check: ${cleanBoardDisplayText(step.text || 'choose the accurate sentence form')}.`,
+        `Sekarang coba jawab latihan singkat ini: ${cleanBoardDisplayText(step.text || 'pilih bentuk kalimat yang benar')}.`
+      ).trim();
     default:
       return existing || `${cleanBoardDisplayText(step.title || topicTitle)}. ${cleanBoardDisplayText(step.text || step.reason || '')}`.trim();
   }
@@ -1191,16 +1234,19 @@ function synthesizeTopicSpecificScene(
       kind: 'formula_blocks',
       column: 'left',
       phaseIndex: 2,
-      title: 'Peta Slot Sah To Be vs Verb 1 Aktif',
-      caption: 'To Be hanya sah dengan Kata Sifat, Kata Benda/Lokasi, Verb ing, atau Verb 3 (pasif) — BUKAN Verb 1',
+      title: wbPick('To Be vs Active Verb Map', 'Peta Slot Sah To Be vs Verb 1 Aktif'),
+      caption: wbPick(
+        'Use To Be only with Adjectives, Nouns/Locations, Verb-ing, or Passive Verb 3 — NEVER bare Verb 1',
+        'To Be hanya sah dengan Kata Sifat, Kata Benda/Lokasi, Verb ing, atau Verb 3 (pasif) — BUKAN Verb 1'
+      ),
       rightText: cleanSample,
       wrongText: cleanWrong,
       highlightTerms: ['Verb ing', 'Verb 3', 'Verb 1', 'To Be', 'Adjective', cleanSample],
       blocks: [
-        { role: 'Subjek + Verb 1', token: 'I agree / work', note: 'Kata kerja aktif langsung, tanpa To Be', color: '#10B981' },
-        { role: 'To Be + Sifat/Benda', token: 'I am ready / a student', note: 'Kondisi, sifat, profesi, atau lokasi', color: '#0EA5E9' },
-        { role: 'To Be + Verb ing', token: 'I am working', note: 'Aksi yang sedang berlangsung sekarang', color: '#8B5CF6' },
-        { role: 'To Be + Verb 3', token: 'It is agreed', note: 'Kalimat pasif (dikenai tindakan)', color: '#F59E0B' },
+        { role: wbPick('Subject + Verb 1', 'Subjek + Verb 1'), token: 'I agree / work', note: wbPick('Direct active verb, no To Be', 'Kata kerja aktif langsung, tanpa To Be'), color: '#10B981' },
+        { role: wbPick('To Be + Adj/Noun', 'To Be + Sifat/Benda'), token: 'I am ready / a student', note: wbPick('State, trait, role, or location', 'Kondisi, sifat, profesi, atau lokasi'), color: '#0EA5E9' },
+        { role: wbPick('To Be + Verb-ing', 'To Be + Verb ing'), token: 'I am working', note: wbPick('Action happening right now', 'Aksi yang sedang berlangsung sekarang'), color: '#8B5CF6' },
+        { role: wbPick('To Be + Verb 3', 'To Be + Verb 3'), token: 'It is agreed', note: wbPick('Passive voice (acted upon)', 'Kalimat pasif (dikenai tindakan)'), color: '#F59E0B' },
       ],
     };
   }
@@ -1440,22 +1486,28 @@ function synthesizeTopicSpecificScene(
     const cleanSample = cleanBoardDisplayText(sampleSentence);
     const cleanWrong = cleanBoardDisplayText(wrongSentence);
     const tokens = cleanSample.split(/\s+/).filter(Boolean).slice(0, 5);
-    const rolesGuess = ['Subjek / Pelaku', 'Kunci / Penghubung', 'Kata Kerja / Inti', 'Objek / Pelengkap', 'Keterangan'];
+    const rolesGuess = [
+      wbPick('Subject', 'Subjek / Pelaku'),
+      wbPick('Key Connector', 'Kunci / Penghubung'),
+      wbPick('Main Verb / Core', 'Kata Kerja / Inti'),
+      wbPick('Object / Complement', 'Objek / Pelengkap'),
+      wbPick('Details', 'Keterangan'),
+    ];
     const blockColors = ['#0EA5E9', '#10B981', '#8B5CF6', '#F59E0B', '#EC4899'];
     return {
       id: 'wb_dynamic_blocks',
       kind: 'formula_blocks',
       column: 'left',
       phaseIndex: 2,
-      title: `Rakit Puzzle Kalimat: ${cleanBoardDisplayText(title).slice(0, 36)}`,
+      title: `${wbPick('Build the Sentence', 'Rakit Puzzle Kalimat')}: ${cleanBoardDisplayText(title).slice(0, 36)}`,
       caption: cleanBoardDisplayText(boardState.patternFormula || title),
       rightText: cleanSample,
       wrongText: cleanWrong && cleanWrong !== cleanSample ? cleanWrong : undefined,
       highlightTerms: [...tokens.slice(0, 3), cleanSample],
       blocks: tokens.map((tok, idx) => ({
-        role: rolesGuess[idx] || `Blok ${idx + 1}`,
+        role: rolesGuess[idx] || `${wbPick('Block', 'Blok')} ${idx + 1}`,
         token: tok,
-        note: idx === 1 ? 'Posisi penentu pola' : undefined,
+        note: idx === 1 ? wbPick('Key pattern slot', 'Posisi penentu pola') : undefined,
         color: blockColors[idx % blockColors.length],
       })),
     };
@@ -1590,20 +1642,20 @@ function upgradePlainTwoBoxToRichVisual(
       kind: 'metaphor_scene',
       sceneTheme: theme,
       analogy: noteTexts[0] || boardState.pairData?.keyAnalogy || cleanBoardDisplayText(raw.caption) || undefined,
-      metaphorCenterLabel: isCamVid ? 'Kamera Foto vs Video Aksi' : `${t1} vs ${t2}`,
+      metaphorCenterLabel: isCamVid ? wbPick('Photo vs Action Video', 'Kamera Foto vs Video Aksi') : `${t1} vs ${t2}`,
       highlightTerms: [t1, t2, ...(raw.highlightTerms || []), sampleSentence].filter(Boolean).slice(0, 6),
       leftPanel: {
-        badge: isCamVid ? 'MODE FOTO' : 'KONSEP 1',
+        badge: isCamVid ? wbPick('PHOTO MODE', 'MODE FOTO') : wbPick('CONCEPT 1', 'KONSEP 1'),
         title: t1,
-        subtitle: d1 || 'Fokus pada kondisi, sifat, atau keadaan',
+        subtitle: d1 || wbPick('Focuses on state, trait, or condition', 'Fokus pada kondisi, sifat, atau keadaan'),
         icon: isCamVid ? 'camera' : 'star',
         accentColor: c1.stroke || '#0369A1',
         bgColor: c1.fill || '#E0F2FE',
       },
       rightPanel: {
-        badge: isCamVid ? 'MODE VIDEO' : 'KONSEP 2',
+        badge: isCamVid ? wbPick('VIDEO MODE', 'MODE VIDEO') : wbPick('CONCEPT 2', 'KONSEP 2'),
         title: t2,
-        subtitle: d2 || 'Fokus pada aktivitas, gerakan, atau aksi nyata',
+        subtitle: d2 || wbPick('Focuses on action, movement, or habit', 'Fokus pada aktivitas, gerakan, atau aksi nyata'),
         example: sampleSentence || undefined,
         icon: isCamVid ? 'video' : 'bolt',
         accentColor: c2.stroke || '#15803D',
@@ -1824,12 +1876,12 @@ function synthesizeAlternativeVisualStep(params: {
       kind: 'formula_blocks',
       column: 'left',
       phaseIndex: 2,
-      title: `Puzzle Blok Pola: ${truncateDiagramLabel(shortTitle, 32)}`,
+      title: `${wbPick('Pattern Block Puzzle', 'Puzzle Blok Pola')}: ${truncateDiagramLabel(shortTitle, 32)}`,
       rightText: rightExpr,
       wrongText: wrongExpr !== rightExpr ? wrongExpr : undefined,
       highlightTerms: [rightExpr, ...blocks.map((b) => b.token)].filter(Boolean).slice(0, 6),
       blocks,
-      caption: 'Klip puzzle warna-warni dari kiri ke kanan sampai klik jadi kalimat alami.',
+      caption: wbPick('Snap the colored blocks left to right into a natural sentence.', 'Klip puzzle warna-warni dari kiri ke kanan sampai klik jadi kalimat alami.'),
       spokenNarration: `Sekarang kita rakit dalam bentuk blok puzzle berwarna dari kiri ke kanan! Mulai dari ${blocks[0]?.token || 'bagian awal'}, disambung ${blocks[1]?.token || 'kunci pola'}, hingga membentuk ${rightExpr}. Pola ini gampang diingat karena tiap warna punya peran masing-masing.`,
     };
   }
@@ -2124,15 +2176,15 @@ export function buildWhiteboardScenePlan(params: {
       : null;
 
   const phaseLabels = customPhases || [
-    '0 Mulai',
-    '1 Konsep',
-    '2 Sketsa',
-    '3 Bedah',
-    '4 Latihan',
+    wbPick('0 Start', '0 Mulai'),
+    wbPick('1 Concept', '1 Konsep'),
+    wbPick('2 Sketch', '2 Sketsa'),
+    wbPick('3 Breakdown', '3 Bedah'),
+    wbPick('4 Practice', '4 Latihan'),
   ];
 
   const steps: WhiteboardSceneStep[] = [];
-  const shortTitle = (boardState.topicTitle || 'Topik Pertanyaan').trim();
+  const shortTitle = (boardState.topicTitle || wbPick('Question Topic', 'Topik Pertanyaan')).trim();
   const rawSampleGlobal = (
     uiAction?.sampleTarget ||
     boardState.quiz?.options?.find((o) => o.isCorrect)?.text ||
@@ -2687,7 +2739,7 @@ export function buildWhiteboardScenePlan(params: {
             kind: 'note',
             column: 'left',
             phaseIndex: 1,
-            title: 'Inti Pembahasan',
+            title: wbPick('Key Takeaways', 'Inti Pembahasan'),
             bullets,
           },
           steps.length
@@ -2876,7 +2928,7 @@ export function buildWhiteboardScenePlan(params: {
             kind: 'checkpoint',
             column: rightCount <= leftCount ? 'right' : 'left',
             phaseIndex: Math.max(3, phaseLabels.length - 1),
-            title: 'Latihan Kontekstual',
+            title: wbPick('Contextual Practice', 'Latihan Kontekstual'),
             text: boardState.quiz.prompt,
           },
           steps.length
@@ -3056,19 +3108,19 @@ export function buildWhiteboardScenePlan(params: {
     } else if (st.kind === 'formula_blocks' && (!st.blocks || st.blocks.length < 2)) {
       const topicBlob = `${shortTitle} ${sampleSentenceGlobal} ${uiAction?.trapWrongSentence || ''}`.toLowerCase();
       if (/\b(am|is|are|to\s*be)\b/i.test(topicBlob) && !/\b(do|does|did)\b/i.test(topicBlob)) {
-        st.title = st.title || 'Peta Slot Sah To Be vs Verb 1 Aktif';
+        st.title = st.title || wbPick('To Be vs Active Verb Map', 'Peta Slot Sah To Be vs Verb 1 Aktif');
         st.blocks = [
-          { role: 'Subjek + Verb 1', token: 'I agree / work', note: 'Kata kerja aktif langsung, tanpa To Be', color: '#10B981' },
-          { role: 'To Be + Sifat/Benda', token: 'I am ready / a student', note: 'Kata sifat, profesi, atau lokasi', color: '#0EA5E9' },
-          { role: 'To Be + Verb ing', token: 'I am working', note: 'Aksi sedang berlangsung sekarang', color: '#8B5CF6' },
-          { role: 'To Be + Verb 3', token: 'It is agreed', note: 'Kalimat pasif (dikenai tindakan)', color: '#F59E0B' },
+          { role: wbPick('Subject + Verb 1', 'Subjek + Verb 1'), token: 'I agree / work', note: wbPick('Direct active verb, no To Be', 'Kata kerja aktif langsung, tanpa To Be'), color: '#10B981' },
+          { role: wbPick('To Be + Adj/Noun', 'To Be + Sifat/Benda'), token: 'I am ready / a student', note: wbPick('States, traits, roles, or places', 'Kata sifat, profesi, atau lokasi'), color: '#0EA5E9' },
+          { role: wbPick('To Be + Verb-ing', 'To Be + Verb ing'), token: 'I am working', note: wbPick('Action happening right now', 'Aksi sedang berlangsung sekarang'), color: '#8B5CF6' },
+          { role: wbPick('To Be + Verb 3', 'To Be + Verb 3'), token: 'It is agreed', note: wbPick('Passive voice (acted upon)', 'Kalimat pasif (dikenai tindakan)'), color: '#F59E0B' },
         ];
       } else {
         const toks = cleanBoardDisplayText(sampleSentenceGlobal || st.rightText || '').split(/\s+/).filter(Boolean).slice(0, 5);
         const colors = ['#0EA5E9', '#10B981', '#8B5CF6', '#F59E0B', '#EC4899'];
         if (toks.length >= 2) {
           st.blocks = toks.map((tok, bIdx) => ({
-            role: bIdx === 0 ? 'Subjek' : bIdx === 1 ? 'Inti Pola' : `Bagian ${bIdx + 1}`,
+            role: bIdx === 0 ? wbPick('Subject', 'Subjek') : bIdx === 1 ? wbPick('Core Pattern', 'Inti Pola') : `${wbPick('Part', 'Bagian')} ${bIdx + 1}`,
             token: tok,
             color: colors[bIdx % colors.length],
           }));
@@ -3081,7 +3133,7 @@ export function buildWhiteboardScenePlan(params: {
       const colors = ['#DBEAFE', '#DCFCE7', '#EDE9FE', '#FEF3C7', '#FCE7F3'];
       if (toks.length >= 2) {
         st.nodes = toks.map((tok, nIdx) => ({
-          role: nIdx === 0 ? 'Subjek' : nIdx === 1 ? 'Kata Kerja / Kunci' : 'Pelengkap',
+          role: nIdx === 0 ? wbPick('Subject', 'Subjek') : nIdx === 1 ? wbPick('Verb / Key', 'Kata Kerja / Kunci') : wbPick('Complement', 'Pelengkap'),
           word: tok,
           color: colors[nIdx % colors.length],
         }));

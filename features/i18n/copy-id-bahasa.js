@@ -466,5 +466,8 @@
     'mandarin.reorder_hint': 'Urutan kata Mandarin mengikuti pola Subjek + Waktu + Tempat + Kata Kerja + Objek.',
     'mandarin.reorder_pattern_hint': 'Perhatikan struktur SOV / Waktu-Tempat sebelum kata kerja.',
     'story.cat-teknologi': 'Teknologi & Perjalanan',
+    'mandarin.level-0-tab': 'Fondasi (Lvl 0)',
+    'mandarin.level-7-tab': 'Lvl 7 (Wacana)',
+    'mandarin.level-8-tab': 'Lvl 8 (Sastra)'
   });
 })();

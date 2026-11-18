@@ -6,7 +6,7 @@ import type { CallScenario, LearnerLocale, VoicePersona } from '../types/voiceCa
 import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
 import { toPhoneticRomaji } from '../lib/japanesePhonetics';
 import { toPhoneticPinyin, containsHanzi } from '../lib/mandarinPhonetics';
-import { t } from '../lib/i18n';
+import { t, wbPick } from '../lib/i18n';
 
 export interface BeginnerAnswerAssistantProps {
   locale: LearnerLocale;
@@ -115,9 +115,9 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
 
   const getShortTabLabel = (card: BeginnerReplyCard, idx: number): string => {
     if (isSswMode) {
-      if (idx === 0 || card.tier === 'easy') return '1 · Tanya Detail';
-      if (idx === 1 || card.tier === 'mission') return '2 · Trik & Contoh';
-      return '3 · Uji Saya';
+      if (idx === 0 || card.tier === 'easy') return wbPick('1 · Ask Details', '1 · Tanya Detail', undefined, locale);
+      if (idx === 1 || card.tier === 'mission') return wbPick('2 · Tips & Example', '2 · Trik & Contoh', undefined, locale);
+      return wbPick('3 · Test Me', '3 · Uji Saya', undefined, locale);
     }
     if (idx === 0 || card.tier === 'easy') return t(locale, 'ui.tabShort');
     if (idx === 1 || card.tier === 'mission') return t(locale, 'ui.tabNatural');
@@ -193,20 +193,40 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
           >
             {[
               {
-                label: 'Cek Progres & Tahap 1',
-                prompt: 'Sensei, cek progres SSW saya dan mulai dari mana untuk pemula nol?',
+                label: wbPick('Check Progress & Stage 1', 'Cek Progres & Tahap 1', undefined, locale),
+                prompt: wbPick(
+                  'Sensei, check my SSW progress and where to start from zero!',
+                  'Sensei, cek progres SSW saya dan mulai dari mana untuk pemula nol?',
+                  undefined,
+                  locale
+                ),
               },
               {
-                label: 'Update Alergen Apr 2026',
-                prompt: 'Bahas update alergen OTAFF Ver 5.1 April 2026: Kurumi, Cashew Nut, dan Pistachio!',
+                label: wbPick('Allergen Update Apr 2026', 'Update Alergen Apr 2026', undefined, locale),
+                prompt: wbPick(
+                  'Explain OTAFF Ver 5.1 April 2026 allergen updates: Walnut (Kurumi), Cashew Nut, and Pistachio!',
+                  'Bahas update alergen OTAFF Ver 5.1 April 2026: Kurumi, Cashew Nut, dan Pistachio!',
+                  undefined,
+                  locale
+                ),
               },
               {
-                label: 'Tes Hitungan Klorin',
-                prompt: 'Tarik 1 soal hitungan kalkulator klorin atau budomari Wakai Papa sekarang!',
+                label: wbPick('Chlorine Math Drill', 'Tes Hitungan Klorin', undefined, locale),
+                prompt: wbPick(
+                  'Give me 1 chlorine dilution or budomari calculation question now!',
+                  'Tarik 1 soal hitungan kalkulator klorin atau budomari Wakai Papa sekarang!',
+                  undefined,
+                  locale
+                ),
               },
               {
-                label: 'Jebakan Yukkuri',
-                prompt: 'Jelaskan jebakan kata yukkuri dan hokang sampuru di modul!',
+                label: wbPick('Yukkuri Traps', 'Jebakan Yukkuri', undefined, locale),
+                prompt: wbPick(
+                  'Explain the yukkuri speed trap and hokang sampuru terms in the module!',
+                  'Jelaskan jebakan kata yukkuri dan hokang sampuru di modul!',
+                  undefined,
+                  locale
+                ),
               },
             ].map((chip) => (
               <button
@@ -240,8 +260,8 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             title={
               isSswMode
                 ? isExpanded
-                  ? 'Sembunyikan kartu aksi SSW Sensei'
-                  : 'Tampilkan aksi tanya & uji SSW Sensei'
+                  ? wbPick('Hide SSW Sensei quick actions', 'Sembunyikan kartu aksi SSW Sensei', undefined, locale)
+                  : wbPick('Show SSW Sensei quick actions', 'Tampilkan aksi tanya & uji SSW Sensei', undefined, locale)
                 : isExpanded
                   ? t(locale, 'ui.toggleHideIdeas')
                   : t(locale, 'ui.toggleShowIdeas')
@@ -250,7 +270,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             <Sparkles className={`w-3.5 h-3.5 shrink-0 ${isSswMode ? 'text-[#8C2233]' : 'text-[#B85D43]'}`} />
             <span className="truncate">
               {isSswMode
-                ? 'Aksi & Tanya Sensei'
+                ? wbPick('Actions & Ask Sensei', 'Aksi & Tanya Sensei', undefined, locale)
                 : isCambridgeMode
                   ? t(locale, 'ui.modelAnswerBtn')
                   : t(locale, 'ui.ideaBtn')}
@@ -364,15 +384,11 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             {/* Terjemahan Bahasa Indonesia / Thai yang JELAS & TEGAS */}
             {(() => {
               const resolvedCardHint = sanitizeMotherTongueHint(
-                isSswMode
-                  ? locale === 'th'
-                    ? activeCard.hintTh || activeCard.hintId
-                    : activeCard.hintId
-                  : locale === 'th'
-                    ? activeCard.hintTh || activeCard.hintId
-                    : locale === 'id'
-                      ? activeCard.hintId
-                      : (activeCard as any).hintEn || ''
+                locale === 'th'
+                  ? activeCard.hintTh || (activeCard as any).hintEn || ''
+                  : locale === 'id'
+                    ? activeCard.hintId
+                    : (activeCard as any).hintEn || ''
               );
               if (!resolvedCardHint) return null;
               return (

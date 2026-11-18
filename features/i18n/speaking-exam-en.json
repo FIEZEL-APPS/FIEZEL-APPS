@@ -1,0 +1,60 @@
+{
+  "schema": "fiezel-speaking-exam-en-v1",
+  "locale": "en",
+  "honesty": "FIEZEL does not predict IELTS band scores or TOEFL scores, and does NOT assess pronunciation. The only element calculable from the transcript is idea coverage; the rest requires review by a teacher or AI.",
+  "examFormats": {
+    "ielts_speaking_part1": {
+      "label": "IELTS Speaking Part 1",
+      "note": "Q&A about yourself and everyday matters. Answer in two to three sentences—a single word wastes the opportunity, while a single paragraph eats into the time for the next part."
+    },
+    "ielts_speaking_part2": {
+      "label": "IELTS Speaking Part 2 (cue card)",
+      "note": "One minute to prepare notes, then speak for one to two minutes without interruption. All four bullet points on the card must be addressed; the final point is the most frequently missed."
+    },
+    "ielts_speaking_part3": {
+      "label": "IELTS Speaking Part 3 (discussion)",
+      "note": "Abstract discussion extending the Part 3 topic. Evaluated on the ability to develop reasons, not the truthfulness of your opinion."
+    },
+    "toefl_speaking_task1": {
+      "label": "TOEFL iBT Speaking Task 1 (Independent)",
+      "note": "15 seconds to prepare, 45 seconds to speak. State your choice in the first sentence, followed by two reasons with examples."
+    },
+    "toefl_speaking_task2_adapted": {
+      "label": "TOEFL iBT Speaking Task 2 (Campus, text-adapted)",
+      "note": "ADAPTATION: originally a campus announcement reading followed by an AUDIO conversation. Here, the conversation is presented in written form, so the focus is on synthesizing rather than listening. Summarize the speaker's opinion AND their reasons, not your own opinion."
+    },
+    "toefl_speaking_task3_adapted": {
+      "label": "TOEFL iBT Speaking Task 3 (Academic, text-adapted)",
+      "note": "ADAPTATION: originally an academic term reading followed by an AUDIO lecture containing examples. Here, the lecture is written. Explain the term using examples from the lecture, not textbook definitions."
+    },
+    "toefl_speaking_task4_adapted": {
+      "label": "TOEFL iBT Speaking Task 4 (Lecture, text-adapted)",
+      "note": "ADAPTATION: originally just an AUDIO lecture without a reading. Here, the lecture is written. Summarize two main points along with their respective examples."
+    }
+  },
+  "rubric": {
+    "note": "The four criteria follow the IELTS Speaking rubric family. Only one can be machine-scored; the remaining three are flagged as-is along with their rationales.",
+    "criteria": [
+      {
+        "id": "fluency_coherence",
+        "label": "Fluency and coherence",
+        "asks": "Is the speech fluent and easy to follow?"
+      },
+      {
+        "id": "lexical_resource",
+        "label": "Lexical resource",
+        "asks": "Are the words sufficiently precise for the topic?"
+      },
+      {
+        "id": "grammatical_range_accuracy",
+        "label": "Grammatical range and accuracy",
+        "asks": "Are the sentence structures varied and accurate?"
+      },
+      {
+        "id": "pronunciation",
+        "label": "Pronunciation",
+        "asks": "Is the speech easy for the listener to understand?"
+      }
+    ]
+  }
+}

@@ -41,10 +41,69 @@
   var ROLES = ['murid', 'guru'];
 
   function I() { return root.FiezelI18n || null; }
+  var EN_FALLBACK = {
+    'auth.layar.aktifkan': 'Activate teacher account',
+    'auth.layar.aktifkan-singkat': 'Activate account',
+    'auth.layar.atau-akun': 'or use a FIEZEL account',
+    'auth.layar.atau-buat': 'or create a FIEZEL account',
+    'auth.layar.belum-akun': "Don't have an account?",
+    'auth.layar.belum-guru': 'New teacher?',
+    'auth.layar.daftar': 'Register',
+    'auth.layar.demo-guru': "View Teacher's Lounge demo",
+    'auth.layar.galat-beda': 'The two passwords do not match.',
+    'auth.layar.galat-bukan-guru': 'This is a student account. Select the Student tab to sign in.',
+    'auth.layar.galat-cepat': 'Too many attempts. Please wait a moment and try again.',
+    'auth.layar.galat-kode-kelas': 'Your Class Code starts with FZ- followed by six letters/numbers, for example FZ-AB2C3D.',
+    'auth.layar.galat-kode-kosong': 'Please enter the invitation code from the FIEZEL admin.',
+    'auth.layar.galat-kosong': 'Please enter your username and password.',
+    'auth.layar.galat-kredensial': 'Incorrect username or password.',
+    'auth.layar.galat-nama': 'Usernames can only contain letters, numbers, periods, underscores, or hyphens.',
+    'auth.layar.galat-nama-dipakai': 'That username is already taken. Try another name.',
+    'auth.layar.galat-offline': 'No internet connection. Signing in requires an internet connection just once.',
+    'auth.layar.galat-sandi': 'That password cannot be used yet. Try a different password.',
+    'auth.layar.galat-sandi-mudah': 'That password is too easy to guess. Choose another one.',
+    'auth.layar.galat-server': 'Unable to reach the server. Please try again shortly.',
+    'auth.layar.galat-sudah-ada': 'This device already has an account. Sign in with that account.',
+    'auth.layar.galat-umum': "That didn't work. Please try again.",
+    'auth.layar.galat-undangan': 'The invitation code is invalid or has already been used.',
+    'auth.layar.google-daftar': 'Sign up with Google',
+    'auth.layar.google-diblokir': 'The Google button could not be loaded on this network. Use your FIEZEL account below.',
+    'auth.layar.google-masuk': 'Sign in with Google',
+    'auth.layar.guru': 'Teacher',
+    'auth.layar.guru-daftar-hint': 'Teacher accounts are created using an invitation code from the FIEZEL admin.',
+    'auth.layar.guru-masuk-hint': 'Sign in with the teacher account you have activated.',
+    'auth.layar.kata-sandi': 'Password',
+    'auth.layar.kode-kelasku': 'My Class Code',
+    'auth.layar.kode-undangan': 'Invitation code',
+    'auth.layar.lang-more-aria': 'More language options',
+    'auth.layar.lanjut': 'Continue',
+    'auth.layar.lihat-sandi': 'Show password',
+    'auth.layar.lupa': 'Forgot password?',
+    'auth.layar.lupa-guru': 'Contact the FIEZEL admin to reset your teacher password.',
+    'auth.layar.lupa-murid': 'Automatic recovery is not available yet. Sign in with Google if your account is linked, or ask your teacher for help.',
+    'auth.layar.masuk': 'Sign in',
+    'auth.layar.memproses': 'Processing…',
+    'auth.layar.mulai-sekarang': 'Start Now',
+    'auth.layar.murid': 'Student',
+    'auth.layar.nama-pengguna': 'Username',
+    'auth.layar.opsional': '(optional)',
+    'auth.layar.peran-aria': 'Sign in as',
+    'auth.layar.selamat-datang': 'Welcome',
+    'auth.layar.slogan': 'Learn Beyond Languages.',
+    'auth.layar.sudah-akun': 'Already have an account?',
+    'auth.layar.sudah-guru': 'Already have a teacher account?',
+    'auth.layar.tamu': 'Sign in as Guest / Visitor',
+    'auth.layar.tamu-hint': 'Learn right away without an account. Progress is saved on this device.',
+    'auth.layar.ulangi-sandi': 'Confirm password',
+    'auth.layar.welcome-lead': 'Adaptive English and Japanese learning. Sign in once, and your progress follows you to any device.'
+  };
   function t(key, fallback, params) {
     var s;
     try { var i18n = I(); s = i18n && i18n.t ? i18n.t(key, params) : undefined; } catch (_) {}
-    if (s === undefined || s === key) s = fallback == null ? key : fallback;
+    if (s === undefined || s === key) {
+      var cur = locale();
+      s = (cur && cur !== 'id' && EN_FALLBACK[key]) ? EN_FALLBACK[key] : (fallback == null ? key : fallback);
+    }
     if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m; });
     return s;
   }
@@ -174,12 +233,14 @@
     var cur = locale();
     var curItem = ALL_LANGS.filter(function (l) { return l.id === cur; })[0] || ALL_LANGS[0];
     return '<div class="fz-auth-lang-wrap">'
-      + '<div class="fz-auth-lang" role="group" aria-label="Bahasa · Language">'
+      + '<div class="fz-auth-lang" role="group" aria-label="Language · Bahasa">'
+      + '<button type="button" data-auth-locale="en" aria-pressed="' + (cur === 'en' ? 'true' : 'false') + '"'
+      + ' class="fz-plain fz-lang-seg' + (cur === 'en' ? ' is-on' : '') + '" lang="en">EN</button>'
       + '<button type="button" data-auth-locale="id" aria-pressed="' + (cur === 'id' ? 'true' : 'false') + '"'
       + ' class="fz-plain fz-lang-seg' + (cur === 'id' ? ' is-on' : '') + '" lang="id">ID</button>'
       + '<button type="button" data-auth-locale="th" aria-pressed="' + (cur === 'th' ? 'true' : 'false') + '"'
       + ' class="fz-plain fz-lang-seg' + (cur === 'th' ? ' is-on' : '') + '" lang="th">ไทย</button>'
-      + (cur !== 'id' && cur !== 'th' ? '<button type="button" data-auth-locale="' + esc(curItem.id) + '" aria-pressed="true" class="fz-plain fz-lang-seg is-on" lang="' + esc(curItem.id) + '">' + esc(curItem.label) + '</button>' : '')
+      + (cur !== 'id' && cur !== 'th' && cur !== 'en' ? '<button type="button" data-auth-locale="' + esc(curItem.id) + '" aria-pressed="true" class="fz-plain fz-lang-seg is-on" lang="' + esc(curItem.id) + '">' + esc(curItem.label) + '</button>' : '')
       + '<button type="button" class="fz-plain fz-lang-seg fz-auth-lang-more" data-auth-lang-toggle aria-label="' + esc(t('auth.layar.lang-more-aria', 'Pilihan bahasa lainnya')) + '">▾</button>'
       + '</div>'
       + '<div class="fz-auth-lang-dropdown" data-auth-lang-menu hidden>'
@@ -508,12 +569,12 @@
       }
       if (b.hasAttribute('data-auth-locale')) {
         var loc = b.getAttribute('data-auth-locale');
+        try { if (env && env.localStorage && typeof env.localStorage.setItem === 'function') env.localStorage.setItem('fiezel_lang_chosen', loc); } catch (_) {}
         if (typeof o.onLocale === 'function') { try { o.onLocale(loc); } catch (_) {} }
         try {
           var i18n = I();
-          if (i18n && typeof i18n.setLocale === 'function') {
-            i18n.setLocale(loc);
-          }
+          if (i18n && typeof i18n.setLocale === 'function') i18n.setLocale(loc);
+          if (i18n && loc && loc !== 'id' && typeof i18n.loadLocale === 'function') i18n.loadLocale(loc);
         } catch (_) {}
         paint();
         try {
@@ -532,10 +593,22 @@
     }
     host.addEventListener('click', onClick);
     host.addEventListener('submit', onSubmit);
-    /* Naskah Thai dimuat malas (fiezel-th-loader). Begitu locale berganti, layar dicat
-       ulang supaya murid Thai tidak membaca layar pertamanya dalam bahasa Indonesia. */
+    /* Naskah non-id dimuat asinkron. Begitu locale berganti atau JSON mendarat, layar dicat
+       ulang supaya pengguna langsung membaca bahasanya tanpa flash bahasa Indonesia. */
     try { var i18n = I(); if (i18n && i18n.onChange) i18n.onChange(function () { if (!closed && !ui.busy) paint(); }); } catch (_) {}
     paint();
+    try {
+      var bootI18n = I();
+      var initLoc = locale();
+      if (initLoc && initLoc !== 'id' && bootI18n) {
+        if (typeof bootI18n.loadLocale === 'function') bootI18n.loadLocale(initLoc);
+        if (typeof bootI18n.whenAvailable === 'function') {
+          bootI18n.whenAvailable(initLoc, 'auth.layar.selamat-datang').then(function () {
+            if (!closed && !ui.busy) paint();
+          });
+        }
+      }
+    } catch (_) {}
     return {
       shown: true,
       screen: function () { return ui.screen; },

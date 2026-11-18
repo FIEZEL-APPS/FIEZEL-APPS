@@ -336,7 +336,7 @@
     'vocab.ket-mastered': '{jumlah} mastered · คลังระดับอื่นยังเก็บไว้อยู่ แต่ไม่ถูกแสดง',
     'vocab.kosong': 'ยังไม่พร้อมใช้งานสำหรับระดับนี้',
     'vocab.n-kata': '{jumlah} คำ',
-    'vocab.review-due': ' Review Due ({jumlah})</button>',
+    'vocab.review-due': ' ทบทวน ({jumlah})</button>',
     'vocab.subjudul': '{jumlah} คำของระดับ {level} แบบฝึกหัดทั้งหมดตามระดับการเรียนที่ใช้อยู่',
     'vocab.uji': ' ทดสอบ Vocabulary {level}</button>',
     'tour.listen-miss-body': 'ผิดตอนฝึกเป็นเรื่องธรรมดา ไม่มีปัญหาเลย Mochi คอยอยู่เป็นเพื่อนในทุกข้อนะ',

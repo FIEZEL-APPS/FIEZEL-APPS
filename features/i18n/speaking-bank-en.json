@@ -1,0 +1,173 @@
+{
+  "schema": "fiezel-speaking-en-v1",
+  "status": "APPROVED-EN-SIDECAR",
+  "items": {
+    "speak_0001": {
+      "instruction": "Read this sentence with a clear voice."
+    },
+    "speak_0002": {
+      "instruction": "Read this sentence with a clear voice."
+    },
+    "speak_0003": {
+      "instruction": "Answer in English: name one food you like and a simple reason."
+    },
+    "speak_0004": {
+      "instruction": "Answer in English: briefly introduce your name and school activities."
+    },
+    "speak_0005": {
+      "instruction": "You are at a shop. Politely ask for one bottle of water."
+    },
+    "speak_0006": {
+      "instruction": "You meet a new friend. Ask where they are from."
+    },
+    "speak_0007": {
+      "instruction": "Read this sentence with natural intonation."
+    },
+    "speak_0008": {
+      "instruction": "Read this sentence with natural intonation."
+    },
+    "speak_0009": {
+      "instruction": "Answer in English: talk about what you usually do after getting home from school."
+    },
+    "speak_0010": {
+      "instruction": "Answer in English: explain one plan for the weekend."
+    },
+    "speak_0011": {
+      "instruction": "You do not understand the teacher's instructions. Politely ask the teacher to repeat them."
+    },
+    "speak_0012": {
+      "instruction": "You are calling a clinic. Ask if there are any open slots tomorrow morning."
+    },
+    "speak_0013": {
+      "instruction": "Read this sentence with a steady rhythm."
+    },
+    "speak_0014": {
+      "instruction": "Read this sentence with a steady rhythm."
+    },
+    "speak_0015": {
+      "instruction": "Answer in English: explain one study habit you want to improve and why."
+    },
+    "speak_0016": {
+      "instruction": "Answer in English: share an experience when you completed a task that initially felt difficult."
+    },
+    "speak_0017": {
+      "instruction": "Your friend invites you out when you need to study. Politely decline and offer another time."
+    },
+    "speak_0018": {
+      "instruction": "In group work, ask a peer to explain the reasoning behind their choice."
+    },
+    "speak_0019": {
+      "instruction": "Read this sentence without rushing."
+    },
+    "speak_0020": {
+      "instruction": "Read this sentence without rushing."
+    },
+    "speak_0021": {
+      "instruction": "Answer in English: compare studying alone with studying with friends, then choose which one suits you better."
+    },
+    "speak_0022": {
+      "instruction": "Answer in English: explain one risk of using AI for learning and how to mitigate it."
+    },
+    "speak_0023": {
+      "instruction": "You are late submitting an assignment due to technical issues. Explain the situation and request a short extension."
+    },
+    "speak_0024": {
+      "instruction": "In a meeting, you disagree with a peer's idea. Convey your objection without sounding attacking."
+    },
+    "speak_0025": {
+      "instruction": "Read this sentence with logical stress on the contrast part."
+    },
+    "speak_0026": {
+      "instruction": "Read this sentence with logical stress on the contrast part."
+    },
+    "speak_0027": {
+      "instruction": "Answer in English: explain why correlation does not always indicate a causal relationship."
+    },
+    "speak_0028": {
+      "instruction": "Answer in English: give a brief argument on whether schools should allow generative AI for certain assignments."
+    },
+    "speak_0029": {
+      "instruction": "You are giving a presentation. An audience member challenges the main assumption of your analysis. Acknowledge the limitations and explain the next verification steps."
+    },
+    "speak_0030": {
+      "instruction": "In a scholarship discussion, ask specifically whether living expenses are included in the funding."
+    },
+    "speak_0031": {
+      "instruction": "Read this sentence while maintaining clear phrasing."
+    },
+    "speak_0032": {
+      "instruction": "Read this sentence while maintaining clear phrasing."
+    },
+    "speak_0033": {
+      "instruction": "Answer in English: explain when a rhetorically persuasive argument remains evidentially weak."
+    },
+    "speak_0034": {
+      "instruction": "Answer in English: explain how you would evaluate a policy that appears successful based on a single average metric."
+    },
+    "speak_0035": {
+      "instruction": "As a reviewer, state that the author's conclusion makes sense but is too definitive given the strength of the evidence."
+    },
+    "speak_0036": {
+      "instruction": "In a meeting, clearly distinguish between the need to act quickly and the certainty that one specific solution is correct."
+    },
+    "speakx_0001": {
+      "instruction": "Part 1. Answer these four questions one by one, two to three sentences each: Where do you live? Do you prefer studying in the morning or at night? How often do you use English outside class? What kind of music do you listen to?"
+    },
+    "speakx_0002": {
+      "instruction": "Part 1. Answer these four questions, two to three sentences each: Do you work or study? What do you enjoy most about it? Has your daily routine changed in the last year? Would you like to live in a different city?"
+    },
+    "speakx_0003": {
+      "instruction": "Part 2. You have one minute to make notes, then speak for one to two minutes. Describe a skill you learned that took a long time to get right. You must touch upon all four bullet points on the card."
+    },
+    "speakx_0004": {
+      "instruction": "Part 2. Satu menit menyiapkan catatan, lalu bicara satu sampai dua menit. Describe a decision you made that other people disagreed with. Keempat butir wajib disentuh, termasuk butir terakhir."
+    },
+    "speakx_0005": {
+      "instruction": "Part 3. Follow-up discussion on the topic of skills. Answer these three questions, four to six sentences each: Why do some people give up on a skill halfway? Should schools teach practical skills as well as academic subjects? Is it easier to learn new skills as an adult than it used to be?"
+    },
+    "speakx_0006": {
+      "instruction": "Part 3. Follow-up discussion on the topic of decisions. Answer these three questions, four to six sentences each: Should young people always follow their parents' advice about their future? How much should a person's career be shaped by what their country needs? Do people regret decisions more when others warned them?"
+    },
+    "speakx_0007": {
+      "instruction": "Task 1. 15 seconds to prepare, 45 seconds to speak. Some students prefer to take a year off before university; others prefer to start immediately. Which do you think is better, and why? State your choice in the first sentence."
+    },
+    "speakx_0008": {
+      "instruction": "Task 1. 15 seconds to prepare, 45 seconds to speak. Do you agree or disagree: schools should replace printed textbooks with tablets for every student? Give two reasons with examples."
+    },
+    "speakx_0009": {
+      "instruction": "Task 2. Read the announcement, read the student's response, then 30 seconds to prepare and 60 seconds to speak. Summarize the student's OPINION and REASONS - not your own opinion.",
+      "sourceText": "UNIVERSITY ANNOUNCEMENT: Starting next semester, eight small study rooms on the first floor of the library will be combined into a single group work area. The reasons: demand for group space is increasing, and the small rooms are often used by just one person.\n\nSTUDENT RESPONSE (written): \"I don't think this is a good idea. Those small rooms are the only quiet place left in the evening - the main hall gets loud after six, and I can't do close reading there. And honestly, the reason they gave doesn't match what I see. There's already a group area on the second floor and it's half empty most nights. If group space were really that scarce, that floor would be full.\"",
+      "sourceNote": "ADAPTATION: the original student conversation was in audio form; here it is presented in writing."
+    },
+    "speakx_0010": {
+      "instruction": "Task 3. Read the definition, read the lecture, then 30 seconds to prepare and 60 seconds to speak. Explain the term USING examples from the lecture, not the textbook definition.",
+      "sourceText": "READING - Sunk Cost Fallacy: the tendency to continue an endeavor based on what has ALREADY been invested (money, time, effort), rather than on the benefits that can still be gained. Sunk costs cannot be recovered, so logically they are irrelevant to subsequent decisions.\n\nLECTURE (written): \"Let me give you two examples. A software company I consulted for had spent four years on a platform. The engineers said plainly that the architecture would not scale. Management approved two more years of funding, and the argument in the meeting was, word for word, 'we've already put four years into this'. That is the fallacy, stated out loud.\n\nA smaller one, from my own life: I once sat through ninety minutes of a terrible film because I had paid for the ticket. The ticket money was gone either way. All I did was add ninety minutes to the loss.\"",
+      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+    },
+    "speakx_0011": {
+      "instruction": "Task 4. Baca kuliahnya, lalu 20 detik menyiapkan dan 60 detik bicara. Ringkas DUA poin utama beserta contohnya masing-masing.",
+      "sourceText": "KULIAH (tertulis): \"Animals facing a cold season have broadly two options, and they cost different things.\n\nThe first is migration - leaving before conditions get severe. The Arctic tern is the extreme case: it flies between the Arctic and the Antarctic every year, so it spends most of its life in summer. But look at the price. That is an enormous amount of energy spent on travel alone.\n\nThe second option is dormancy - staying, but slowing down. The ground squirrel drops its body temperature close to freezing and its heart rate to a few beats a minute, for months. That saves a remarkable amount of energy. The cost is that it cannot feed at all during that time, so everything depends on what it stored beforehand.\"",
+      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+    },
+    "speakx_0012": {
+      "instruction": "Part 1. Answer these four questions one by one, one to two sentences each: How many people are there in your family? What do you usually eat for breakfast? What time do you get up in the morning? What do you do after school or work?"
+    },
+    "speakx_0013": {
+      "instruction": "Task 1. 15 seconds to prepare, 45 seconds to speak. Some people like watching films at home; others like watching them at the cinema. Which do you prefer, and why? State your choice in the first sentence, then give one reason and one example - three to four sentences are enough."
+    },
+    "speakx_0014": {
+      "instruction": "Part 2. You have one minute to make notes, then speak for one to two minutes. Describe a journey you took that you remember well. You must touch upon all four bullet points on the card, including the last one."
+    },
+    "speakx_0015": {
+      "instruction": "Part 2. Satu menit menyiapkan catatan, lalu bicara satu sampai dua menit. Describe an assumption you once held that you have since abandoned. Keempat butir wajib disentuh, termasuk butir terakhir."
+    },
+    "speakx_0016": {
+      "instruction": "Part 3. Follow-up discussion on the topic of beliefs and assumptions. Answer these three questions, two to three sentences each: Should governments try to change what citizens believe, or only how they behave? If a comforting false belief does no obvious harm, should anyone challenge it? Which beliefs that are common today do you think future generations will reject?"
+    },
+    "speakx_0017": {
+      "instruction": "Task 4. Baca kuliahnya, lalu 20 detik menyiapkan dan 60 detik bicara. Ringkas DUA mekanisme utama beserta contohnya masing-masing.",
+      "sourceText": "KULIAH (tertulis): \"We like to imagine memory as a recording, but it behaves more like a story that is rewritten each time it is told. Let me describe two mechanisms of distortion.\n\nThe first is post-event information. What we encounter after an event can be written back into the memory of the event itself. In a classic type of experiment, people watch a short film of a minor car accident. Those later asked how fast the cars were going when they 'smashed' into each other do not just give higher speed estimates than those asked about cars that 'hit' each other - a week later, they are also more likely to remember broken glass that was never in the film. The question has quietly edited the memory.\n\nThe second mechanism is imagination inflation. The act of imagining an event leaves a trace that can later be mistaken for the trace of a real experience. In one study, adults who spent a few minutes vividly imagining a childhood incident - breaking a window with their hand - became measurably more confident, weeks later, that it had actually happened to them. Nothing was presented as true; imagining it was enough.\"",
+      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+    }
+  }
+}

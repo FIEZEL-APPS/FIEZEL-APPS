@@ -18,7 +18,7 @@
   "vocab.kosong": "このレベルはまだ準備中です。",
   "vocab.n-kata": "{jumlah}語",
   "vocab.quiz-kosong": "レベル{level}の語彙はまだ準備中です。",
-  "vocab.review-due": " 復習 ({jumlah})</button>",
+  "vocab.review-due": " 復習対象 ({jumlah})</button>",
   "vocab.subjudul": "レベル{level}の単語は{jumlah}語あります。すべての練習問題は現在の学習レベルに合わせて出題されます。",
   "vocab.uji": " 語彙テスト {level}</button>"
 }

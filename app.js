@@ -1287,8 +1287,36 @@ stateReady=true;
 // <html lang> tanpa wiring ulang. setLocale('id') saat boot murid Indonesia adalah no-op
 // (locale awal FiezelI18n memang 'id') — listener tidak terpanggil, byte halaman tak berubah.
 try{
-  self.FiezelI18n?.onChange?.(()=>{try{document.documentElement.lang=FiezelI18n.getBcp47()}catch(_){/* VM test tanpa DOM */}});
-  self.FiezelI18n?.setLocale?.(state?.preferences?.learnerLocale);
+  const I18n=self.FiezelI18n;
+  I18n?.onChange?.(()=>{try{document.documentElement.lang=I18n.getBcp47()}catch(_){/* VM test tanpa DOM */}});
+  let bootLocale=state?.preferences?.learnerLocale;
+  try{
+    const sup=I18n?.SUPPORTED||[];
+    if(typeof location!=='undefined'&&location.search){
+      const sp=new URLSearchParams(location.search);
+      const q=(sp.get('lang')||sp.get('locale')||'').trim().toLowerCase();
+      if(q&&sup.includes(q)){
+        bootLocale=q;
+        if(state?.preferences){
+          state.preferences={...state.preferences,learnerLocale:q,learnerLocaleExplicit:true};
+          try{localStorage.setItem('fiezel_lang_chosen',q)}catch(_){}
+        }
+      }
+    }
+    if(!bootLocale||bootLocale==='id'){
+      const explicit=state?.preferences?.learnerLocaleExplicit===true;
+      if(!explicit){
+        const rawChosen=(typeof localStorage!=='undefined'?localStorage.getItem('fiezel_lang_chosen')||'':'')||(self.FiezelOnboarding?.storedLocale?.(self)||'');
+        const chosen=String(rawChosen).trim().toLowerCase();
+        if(chosen&&sup.includes(chosen)){
+          bootLocale=chosen;
+          if(state?.preferences)state.preferences={...state.preferences,learnerLocale:chosen};
+        }
+      }
+    }
+  }catch(_){}
+  I18n?.setLocale?.(bootLocale);
+  if(bootLocale&&bootLocale!=='id'&&typeof I18n?.loadLocale==='function')I18n.loadLocale(bootLocale);
 }catch(_){/* i18n absen (harness lama) = perilaku hari ini, bukan boot gagal */}
 // W4-MERGE (AI-06 F04/F10 + AI-07 F04): data th mendarat ASINKRON dari fiezel-th-loader.js,
 // dan locale bisa berganti di Pengaturan — dua-duanya menuntut hidrasi ulang bank dari sumber
@@ -1297,7 +1325,8 @@ try{
 // Murid id: FiezelThData tidak pernah ada, listener ini praktis no-op yang murah.
 try{
   self.FiezelI18n?.onChange?.(()=>{try{__fzRefreshI18nTables();searchIndexCache=null;applyContentLocale();if(typeof window!=='undefined'&&window.__fiezelLastRenderMs!==undefined)render()}catch(_){}});
-  self.FiezelOnThDataReady=()=>{try{__fzRefreshI18nTables();/* v49-F1: copy-map th baru mendarat \u2014 tabel eager dibangun ulang */searchIndexCache=null;applyContentLocale();if(window.__fiezelLastRenderMs!==undefined)render()}catch(_){}};
+  self.FiezelOnThDataReady=()=>{try{__fzRefreshI18nTables();/* v49-F1: copy-map th baru mendarat — tabel eager dibangun ulang */searchIndexCache=null;applyContentLocale();if(window.__fiezelLastRenderMs!==undefined)render()}catch(_){}};
+  self.FiezelOnEnDataReady=()=>{try{__fzRefreshI18nTables();searchIndexCache=null;applyContentLocale();if(typeof window!=='undefined'&&window.__fiezelLastRenderMs!==undefined)render()}catch(_){}};
 }catch(_){/* harness tanpa i18n */}
 // ============================== W4-MERGE: OVERLAY DATA LOCALE TH ==============================
 // (AI-06 F04/F10 + AI-07 F02/F04) Dua dataset sidecar Thai (grammar-explanations-th.json,
@@ -1319,9 +1348,36 @@ function grammarItemForTh(item,thMap){
   it[4]=(Array.isArray(item[1])?item[1]:[]).map((o,i)=>{if(i===item[2])return String(x.whyCorrect||item[4]?.[i]||'');const dx=x.distractors?.[String(o)];return String(dx?.whyFails||item[4]?.[i]||'')});
   return it;
 }
-function grammarItemForEn(item){
+function grammarItemForEn(item,zhMap){
   const exp=item?.[12]||{};
   const it=item.slice();
+  const zhOv=zhMap?zhMap[String(item?.[8]||'')]:null;
+  if(zhOv){
+    it[12]=Object.assign({},exp,
+      zhOv.rule?{ruleId:zhOv.rule,rule:zhOv.rule}:{},
+      zhOv.whyCorrect?{whyCorrectId:zhOv.whyCorrect,whyCorrect:zhOv.whyCorrect}:{},
+      zhOv.whyOthersFail?{whyOthersFailId:zhOv.whyOthersFail,whyOthersFail:zhOv.whyOthersFail}:{},
+      zhOv.howToAvoid?{howToAvoidId:zhOv.howToAvoid,howToAvoid:zhOv.howToAvoid}:{},
+      zhOv.memoryCue?{memoryCueId:zhOv.memoryCue,memoryCue:zhOv.memoryCue}:{}
+    );
+    if(zhOv.rule)it[3]=zhOv.rule;
+    if(zhOv.whyCorrect)it[7]=zhOv.whyCorrect;
+    it[16]={
+      objectiveId:String(zhOv.objective||item?.[9]||item?.[16]?.objectiveId||''),
+      misconceptionId:String(zhOv.misconception||item?.[10]||item?.[16]?.misconceptionId||''),
+      reasoningId:String(zhOv.reasoning||item?.[11]||item?.[16]?.reasoningId||'')
+    };
+    it[17]=(Array.isArray(item?.[17])?item[17]:[]).map(d=>{
+      const zd=zhOv.distractors?.[String(d?.option||'')];
+      return Object.assign({},d,
+        (zd?.whyFails||d?.enWhyFails)?{whyFails:zd?.whyFails||d.enWhyFails}:{},
+        (zd?.misconception||d?.enMisconception||d?.misconceptionKey)?{misconception:String(zd?.misconception||d?.enMisconception||d?.misconceptionKey)}:{}
+      );
+    });
+    const dMap=new Map(it[17].map(d=>[String(d?.option||''),d]));
+    it[4]=(Array.isArray(item?.[1])?item[1]:[]).map((o,i)=>{if(i===item?.[2])return String(zhOv.whyCorrect||exp.whyCorrect||item?.[7]||FiezelI18n.t('grammar.alasan-benar-fallback'));const dx=dMap.get(String(o));return String(dx?.whyFails||item?.[4]?.[i]||'')});
+    return it;
+  }
   it[12]=Object.assign({},exp,exp.rule?{ruleId:exp.rule}:{},exp.whyCorrect?{whyCorrectId:exp.whyCorrect}:{},exp.whyOthersFail?{whyOthersFailId:exp.whyOthersFail}:{},exp.howToAvoid?{howToAvoidId:exp.howToAvoid}:{},exp.memoryCue?{memoryCueId:exp.memoryCue}:{});
   it[16]={objectiveId:String(item?.[9]||item?.[16]?.objectiveId||''),misconceptionId:String(item?.[10]||item?.[16]?.misconceptionId||''),reasoningId:String(item?.[11]||item?.[16]?.reasoningId||'')};
   it[17]=(Array.isArray(item?.[17])?item[17]:[]).map(d=>Object.assign({},d,d?.enWhyFails?{whyFails:d.enWhyFails}:{},(d?.enMisconception||d?.misconceptionKey)?{misconception:String(d.enMisconception||d.misconceptionKey)}:{}));
@@ -1329,31 +1385,49 @@ function grammarItemForEn(item){
   it[4]=(Array.isArray(item?.[1])?item[1]:[]).map((o,i)=>{if(i===item?.[2])return String(exp.whyCorrect||item?.[7]||FiezelI18n.t('grammar.alasan-benar-fallback'));const dx=dMap.get(String(o));return String(dx?.whyFails||item?.[4]?.[i]||'')});
   return it;
 }
-// Helper BERSAMA load() dan ensureSearchIndex() (dua jalur fetch terpisah; overlay di satu
-// jalur saja = campuran id/th antara kuis dan pencarian — AI-06 F10). meaning th menimpa
-// gloss id; example th masuk exampleTranslation (terjemahan kalimat contoh) — kalimat Inggris
-// TIDAK disentuh dan pola examples[].id sengaja dihindari (jebakan overload, AI-06 F03).
-// Entri tanpa padanan th memakai gloss id (fallback th->id) supaya filter v.meaning tidak
-// menghapus kata diam-diam (F04). Jalur id: list dikembalikan APA ADANYA.
 function vocabForLocale(list){
-  if(self.FiezelI18n?.getLocale?.()!=='th')return list;
-  const th=self.FiezelThData?.vocab?.entries;
-  if(!th||!Array.isArray(list))return list;
-  return list.map(v=>{const x=th[String(v?.id||'')];if(!x)return v;
-    return Object.assign({},v,x.meaning?{meaning:x.meaning}:{},x.example?{exampleTranslation:x.example}:{})});
+  if(!Array.isArray(list))return list;
+  const loc=self.FiezelI18n?.getLocale?.()||'id';
+  const tl=activeTargetLang();
+  if(loc==='id')return list;
+  if(loc==='th'){
+    const th=self.FiezelThData?.vocab?.entries;
+    if(tl==='en'&&th){
+      return list.map(v=>{const x=th[String(v?.id||'')];if(!x)return v;
+        return Object.assign({},v,x.meaning?{meaning:x.meaning}:{},x.example?{exampleTranslation:x.example}:{})});
+    }
+    return list;
+  }
+  const enD=self.FiezelEnData;
+  if(!enD)return list;
+  if(tl==='ja'&&enD.ja?.vocab){
+    return list.map(v=>{const x=enD.ja.vocab[String(v?.id||'')];if(!x)return v;
+      return Object.assign({},v,x.meaning?{meaning:x.meaning}:{},x.exampleTranslation!==undefined?{exampleTranslation:x.exampleTranslation}:{})});
+  }
+  if(tl==='zh'&&enD.mandarin){
+    const vm=enD.mandarin.vocabMeanings,ve=enD.mandarin.vocabExamples;
+    return list.map(v=>{const k=String(v?.id||'');const m=vm?.[k];const ex=ve?.[k];
+      if(!m&&ex===undefined)return v;
+      return Object.assign({},v,m?{meaning:m}:{},ex!==undefined?{exampleTranslation:ex}:{})});
+  }
+  const en=enD.vocab?.entries;
+  if(!en)return list;
+  return list.map(v=>{const x=en[String(v?.id||'')];
+    return x&&x.meaning?Object.assign({},v,{meaning:x.meaning,exampleTranslation:''}):Object.assign({},v,{exampleTranslation:''});
+  });
 }
-// Terapkan locale ke bank runtime. id: kembalikan referensi hasil hidrasi (byte-identik).
-// th + sidecar siap: bangun ulang GRAMMAR_ITEMS/G/V dari salinan ber-overlay. Non-id/th:
-// bangun dari bidang kanonis Inggris (grammarItemForEn). Idempoten.
 function applyContentLocale(){
   if(!CONTENT_BASE)return;
   placementListeningBank=null;
   const loc=self.FiezelI18n?.getLocale?.()||'id';
+  const tl=activeTargetLang();
   const thReady=loc==='th'?self.FiezelThData:null;
+  const enReady=(loc!=='id'&&loc!=='th')?self.FiezelEnData:null;
   const gTh=thReady?.grammar?.templates||null;
+  const zhGMap=(tl==='zh')?enReady?.mandarin?.zhCourseGrammar:null;
   if(((loc==='id'||loc==='th')&&!gTh)||!CONTENT_BASE.items.length){GRAMMAR_ITEMS=CONTENT_BASE.items;G=CONTENT_BASE.g}
   else if(loc==='th'){GRAMMAR_ITEMS=CONTENT_BASE.items.map(e=>Object.assign({},e,{item:grammarItemForTh(e.item,gTh)}));const buckets={};for(const e of GRAMMAR_ITEMS)(buckets[e.skill]??=[]).push(e.item);G=buckets}
-  else{GRAMMAR_ITEMS=CONTENT_BASE.items.map(e=>Object.assign({},e,{item:grammarItemForEn(e.item)}));const buckets={};for(const e of GRAMMAR_ITEMS)(buckets[e.skill]??=[]).push(e.item);G=buckets}
+  else{GRAMMAR_ITEMS=CONTENT_BASE.items.map(e=>Object.assign({},e,{item:grammarItemForEn(e.item,zhGMap)}));const buckets={};for(const e of GRAMMAR_ITEMS)(buckets[e.skill]??=[]).push(e.item);G=buckets}
   V=vocabForLocale(CONTENT_BASE.v);
   if(thReady?.writing && WRITING_BANK){
     if(!WRITING_BANK._orig) WRITING_BANK._orig = JSON.parse(JSON.stringify(WRITING_BANK));
@@ -1398,16 +1472,41 @@ function applyContentLocale(){
     const hNote = self.FiezelI18n?.t?.('tulis.honesty-note');
     WRITING_BANK.honesty = (hNote && hNote !== 'tulis.honesty-note') ? hNote : WRITING_BANK._orig.honesty;
     if(WRITING_BANK.rubric && Array.isArray(WRITING_BANK._orig.rubric?.criteria)){
+      if(WRITING_BANK._orig.rubric.noteEn) WRITING_BANK.rubric.note = WRITING_BANK._orig.rubric.noteEn;
       WRITING_BANK.rubric.criteria = WRITING_BANK._orig.rubric.criteria.map(c=>{
         const lbl = self.FiezelI18n?.t?.('writing.rubric-'+c.id);
         const ask = self.FiezelI18n?.t?.('writing.asks-'+c.id);
         return Object.assign({}, c, {
           label: (lbl && lbl !== 'writing.rubric-'+c.id) ? lbl : (c.labelEn || c.label),
-          asks: (ask && ask !== 'writing.asks-'+c.id) ? ask : c.asks
+          asks: (ask && ask !== 'writing.asks-'+c.id) ? ask : (c.asksEn || c.asks),
+          levels: Array.isArray(c.levelsEn) && c.levelsEn.length ? c.levelsEn : c.levels
         });
       });
     }
-    if(Array.isArray(WRITING_BANK._orig.prompts)) WRITING_BANK.prompts = WRITING_BANK._orig.prompts.map(p=>Object.assign({},p,{focus:p.focusEn||p.focus}));
+    if(Array.isArray(WRITING_BANK._orig.prompts)){
+      WRITING_BANK.prompts = WRITING_BANK._orig.prompts.map(p=>{
+        if(tl==='ja'&&enReady?.ja?.writing?.prompts?.[p.id]){
+          const jp=enReady.ja.writing.prompts[p.id];
+          return Object.assign({},p,{focus:jp.focus||p.focus});
+        }
+        if(tl==='zh'&&enReady?.mandarin?.zhCourseWriting?.[p.id]){
+          const zw=enReady.mandarin.zhCourseWriting[p.id];
+          return Object.assign({},p,zw.title?{title:zw.title}:{});
+        }
+        return Object.assign({},p,{focus:p.focusEn||p.focus});
+      });
+    }
+    if(tl==='ja'&&enReady?.ja?.writing){
+      const jw=enReady.ja.writing;
+      if(jw.honesty)WRITING_BANK.honesty=jw.honesty;
+      if(jw.rubric?.note&&WRITING_BANK.rubric)WRITING_BANK.rubric.note=jw.rubric.note;
+      if(jw.rubric?.criteria&&WRITING_BANK.rubric&&Array.isArray(WRITING_BANK._orig.rubric?.criteria)){
+        WRITING_BANK.rubric.criteria=WRITING_BANK._orig.rubric.criteria.map(c=>{
+          const jc=jw.rubric.criteria[c.id];
+          return jc?Object.assign({},c,jc):c;
+        });
+      }
+    }
     if(WRITING_BANK._orig.examTasks){
       const nextTasks = JSON.parse(JSON.stringify(WRITING_BANK._orig.examTasks));
       for(const k of Object.keys(nextTasks)){
@@ -1418,34 +1517,26 @@ function applyContentLocale(){
     }
   } else if(WRITING_BANK?._orig) {
     WRITING_BANK.honesty = WRITING_BANK._orig.honesty;
-    if(WRITING_BANK.rubric) WRITING_BANK.rubric.criteria = WRITING_BANK._orig.rubric.criteria;
+    if(WRITING_BANK.rubric){
+      WRITING_BANK.rubric.criteria = WRITING_BANK._orig.rubric.criteria;
+      WRITING_BANK.rubric.note = WRITING_BANK._orig.rubric.note;
+    }
     if(Array.isArray(WRITING_BANK._orig.prompts)) WRITING_BANK.prompts = WRITING_BANK._orig.prompts;
     if(WRITING_BANK._orig.examTasks) WRITING_BANK.examTasks = JSON.parse(JSON.stringify(WRITING_BANK._orig.examTasks));
   }
-  if(thReady?.reading && READING_EXAM){
+  const readingOv = thReady?.reading || enReady?.reading || null;
+  if(readingOv && READING_EXAM){
     if(!READING_EXAM._orig) READING_EXAM._orig = JSON.parse(JSON.stringify(READING_EXAM));
-    if(thReady.reading.honesty) READING_EXAM.honesty = thReady.reading.honesty;
-    if(thReady.reading.formats && READING_EXAM.examFormats){
-      for(const k of Object.keys(thReady.reading.formats)){
-        if(READING_EXAM.examFormats[k]) Object.assign(READING_EXAM.examFormats[k], thReady.reading.formats[k]);
+    if(readingOv.honesty) READING_EXAM.honesty = readingOv.honesty;
+    if(readingOv.formats && READING_EXAM.examFormats){
+      for(const k of Object.keys(readingOv.formats)){
+        if(READING_EXAM.examFormats[k]) Object.assign(READING_EXAM.examFormats[k], readingOv.formats[k]);
       }
     }
-    // m025-308: umpan balik per soal. Sama seperti writing: 8 set / 96 soal terjemahan `why`
-    // dan `whyOthersFail` sudah ada di perangkat murid dan tidak pernah dipakai, jadi setiap
-    // penjelasan sesudah menjawab berbahasa Indonesia.
-    //
-    // makeExamReadingQuestion() membaca q.explain.why -> why dan q.explain.whyOthersFail ->
-    // distractor, jadi overlay bekerja di tingkat SUMBER, bukan di objek soal yang sudah jadi.
-    //
-    // Yang TIDAK disentuh, dan alasannya keras: `stem`, `options`, `answerIndex`, dan
-    // `evidence`. Ketiga yang pertama adalah objek ujinya - satu pilihan bergeser menilai
-    // murid salah atas jawaban yang benar, tanpa jejak. `evidence` adalah kutipan verbatim
-    // dari teks berbahasa Inggris; menerjemahkannya membuat murid mencari kalimat yang tidak
-    // ada di bacaan.
-    if(thReady.reading.passages && Array.isArray(READING_EXAM._orig.passages)){
-      const pTh = thReady.reading.passages;
+    if(readingOv.passages && Array.isArray(READING_EXAM._orig.passages)){
+      const pOv = readingOv.passages;
       READING_EXAM.passages = READING_EXAM._orig.passages.map(p=>{
-        const e = pTh[String(p?.id||'')];
+        const e = pOv[String(p?.id||'')];
         if(!e?.questions || !Array.isArray(p.questions)) return p;
         return Object.assign({}, p, {questions:p.questions.map(q=>{
           const t = e.questions[String(q?.id||'')];
@@ -1462,22 +1553,13 @@ function applyContentLocale(){
     if(READING_EXAM.examFormats) READING_EXAM.examFormats = JSON.parse(JSON.stringify(READING_EXAM._orig.examFormats));
     if(Array.isArray(READING_EXAM._orig.passages)) READING_EXAM.passages = READING_EXAM._orig.passages;
   }
-  // --- BANK SOAL: reading A1/A2, cloze, diagnosis miskonsepsi (m025-230) ---------------
-  // Tiga sidecar ini menutup jalur yang dulu TIDAK PERNAH punya overlay: murid Thai membaca
-  // pertanyaan, pilihan, dan umpan balik berbahasa Indonesia sepanjang sesi. Polanya sama
-  // dengan writing/reading-exam di atas: simpan sumber pristine sekali, tulis SALINAN
-  // ber-Thai, dan pulihkan sumbernya saat locale kembali ke id.
-  //
-  // reading: HANYA A1/A2 yang punya sidecar — mulai B1 pertanyaannya memang berbahasa
-  // Inggris (imersi yang disengaja, sama untuk id maupun th). Panjang options WAJIB sama
-  // dengan sumber: satu pilihan hilang menggeser indeks jawaban dan murid dinilai salah
-  // atas jawaban yang benar, jadi overlay per-soal dibatalkan kalau panjangnya berbeda.
-  if(thReady?.readingBank && Array.isArray(CONTENT_BASE.r)){
-    const rTh=thReady.readingBank;
+  const readingBankOv = thReady?.readingBank || (enReady ? (tl==='ja'?enReady.ja?.reading:(tl==='zh'?enReady.mandarin?.zhCourseReading:enReady.readingBank)) : null);
+  if(readingBankOv && Array.isArray(CONTENT_BASE.r)){
+    const rOv=readingBankOv;
     R=CONTENT_BASE.r.map(p=>{
-      const e=rTh[String(p?.id||'')];
-      if(!e||!Array.isArray(e.qs)||!Array.isArray(p.qs)||e.qs.length!==p.qs.length)return p;
-      return Object.assign({},p,{qs:p.qs.map((q,i)=>{
+      const e=rOv[String(p?.id||'')];
+      if(!e||!Array.isArray(e.qs)||!Array.isArray(p.qs)||e.qs.length!==p.qs.length)return e?.title?Object.assign({},p,{title:e.title}):p;
+      return Object.assign({},p,e.title?{title:e.title}:{},{qs:p.qs.map((q,i)=>{
         const t=e.qs[i];
         if(!t||!Array.isArray(q))return q;
         const opts=Array.isArray(t.options)&&Array.isArray(q[1])&&t.options.length===q[1].length?t.options:q[1];
@@ -1485,12 +1567,13 @@ function applyContentLocale(){
         if(t.stem)out[0]=t.stem;
         out[1]=opts;
         const m=q[3]&&typeof q[3]===typeof{}?q[3]:null;
-        /* m025-483: why/whyOthersFail A1/A2 adalah teks MURID ID. Sidecar Thai belum
-           menerjemahkannya, jadi menyalinnya apa adanya akan menampilkan penjelasan Indonesia
-           di layar Thai. Salon hanya bila sidecar punya versi Thai; kalau tidak, buang
-           supaya penyaji jatuh ke templat netral (yang lokalisasi lewat FiezelI18n), BUKAN
-           membocorkan naskah Indonesia. */
-        if(m){const m2=Object.assign({},m);if(t.why){m2.why=t.why;if(t.whyOthersFail)m2.whyOthersFail=t.whyOthersFail;else delete m2.whyOthersFail}else{delete m2.why;delete m2.whyOthersFail}out[3]=m2;}
+        if(m){
+          const m2=Object.assign({},m);
+          if(tl==='zh'&&t.why){m2.explanation=t.why}
+          else if(t.why){m2.why=t.why;if(t.whyOthersFail)m2.whyOthersFail=t.whyOthersFail;else delete m2.whyOthersFail}
+          else if(loc==='th'){delete m2.why;delete m2.whyOthersFail}
+          out[3]=m2;
+        }
         return out;
       })});
     });
@@ -1515,18 +1598,16 @@ function applyContentLocale(){
 let CLOZE_BANK_BASE=null;
 function applyClozeLocale(){
   if(!Array.isArray(CLOZE_BANK_BASE))return;
-  const thReady=self.FiezelI18n?.getLocale?.()==='th'?self.FiezelThData:null;
-  const thC=thReady?.cloze;
-  if(!thC){CLOZE_BANK=CLOZE_BANK_BASE;return}
+  const loc=self.FiezelI18n?.getLocale?.()||'id';
+  const locData=loc==='th'?self.FiezelThData:(loc!=='id'?self.FiezelEnData:null);
+  const locC=locData?.cloze;
+  if(!locC){CLOZE_BANK=CLOZE_BANK_BASE;return}
   CLOZE_BANK=CLOZE_BANK_BASE.map(it=>{
-    const e=thC[String(it?.id||'')];
+    const e=locC[String(it?.id||'')];
     if(!e)return it;
     const out=Object.assign({},it);
     if(e.explain&&it.explain)out.explain=Object.assign({},it.explain,e.explain);
     if(e.distractors&&Array.isArray(it.distractors)){
-      // Kunci distraktor = TEKS PILIHAN persis (urutan pilihan diacak saat disajikan, jadi
-      // indeks tidak stabil). Meleset satu byte = umpan balik tak ditemukan dan murid melihat
-      // kalimat umum, bukan koreksi atas kekeliruannya.
       out.distractors=it.distractors.map(d=>{const x=e.distractors[String(d?.text||'')];return x?Object.assign({},d,x):d});
     }
     return out;
@@ -2262,8 +2343,20 @@ function activateAccountState(rawId){
   }catch(_){}
   activeAccountUuid=uuid;activeStateStorageKey=key;
   migrateSideStateToAccount(uuid);
-  state=loadState(key);state.ownerUuid=uuid;coreBrainCache=null;save();
-  try{self.FiezelI18n?.setLocale?.(state?.preferences?.learnerLocale)}catch(_){}
+  state=loadState(key);state.ownerUuid=uuid;coreBrainCache=null;
+  try{
+    const sup=self.FiezelI18n?.SUPPORTED||[];
+    const chosen=(typeof localStorage!=='undefined'?localStorage.getItem('fiezel_lang_chosen')||'':'').trim().toLowerCase();
+    if(!state?.preferences?.learnerLocaleExplicit&&chosen&&sup.includes(chosen)){
+      state.preferences={...state.preferences,learnerLocale:chosen,learnerLocaleExplicit:true};
+    }
+  }catch(_){}
+  save();
+  try{
+    const nextLoc=state?.preferences?.learnerLocale;
+    self.FiezelI18n?.setLocale?.(nextLoc);
+    if(nextLoc&&nextLoc!=='id'&&typeof self.FiezelI18n?.loadLocale==='function')self.FiezelI18n.loadLocale(nextLoc);
+  }catch(_){}
   /* m025-669: Sinkron otomatis saat login Google/akun.
    * Murid yang login sudah memberikan persetujuan implisit bahwa data belajarnya
    * boleh disimpan di server — ini layanan inti FIEZEL, bukan opsional.
@@ -7007,6 +7100,7 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
   }
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;const kana=v.kana||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[0].trim():'');const kanji=v.kanji||v.word||'';const romaji=v.romaji||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[1].trim():'');return{id:v.id,word:v.word,kana,kanji,romaji,jlpt:v.jlpt||'',phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
+  try{if(self.FiezelEnLoader?.ensureCourse&&(targetLangAtBoot==='ja'||targetLangAtBoot==='zh'))await Promise.race([self.FiezelEnLoader.ensureCourse(targetLangAtBoot),new Promise(r=>setTimeout(r,800))])}catch(_){}
   try{if(self.__fzLocaleBootPromise){await Promise.race([self.__fzLocaleBootPromise,new Promise(r=>setTimeout(r,600))]);self.__fzLocaleBootPromise=null}}catch(_){}
   CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
   try{window.CONTENT_BASE=CONTENT_BASE;window.V=V;window.G=G;window.R=R;window.GRAMMAR_ITEMS=GRAMMAR_ITEMS;}catch(_){}
@@ -10061,7 +10155,8 @@ function showAuthGate(at,next){
       const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
       const value=supported.includes(locale)?locale:'id';
       state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();
-      try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
+      try{localStorage.setItem('fiezel_lang_chosen',value)}catch(_){}
+      try{self.FiezelI18n?.setLocale?.(value);if(value!=='id')self.FiezelI18n?.loadLocale?.(value)}catch(_){}
       try{self.FiezelOnboarding?.markLocaleSelected?.(self,value)}catch(_){}
     },
     onDone:(detail)=>{
@@ -12259,20 +12354,22 @@ function todayHomeMarkup(){
   } catch(_) {}
 
   if (!dailyFiveWords.length) {
+    const _loc = typeof FiezelI18n !== 'undefined' ? FiezelI18n.getLocale() : 'id';
+    const isId = _loc === 'id';
     dailyFiveWords = jaCourseOn()
       ? [
-          { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: isTh ? 'พยายามอย่างเต็มที่, มุ่งมั่นไม่ยอมแพ้' : 'Berusaha keras, bersemangat pantang menyerah.', example: '毎日少しずつ頑張りましょう。', exampleTranslation: isTh ? 'มาพยายามไปด้วยกันนะ' : 'Mari berusaha setiap hari sedikit demi sedikit.' },
-          { word: '約束', phonetic: 'やくそく (yakusoku)', meaning: isTh ? 'สัญญา' : 'Janji atau kesepakatan.', example: '約束を守ります。', exampleTranslation: 'Menepati janji.' },
-          { word: '大切', phonetic: 'たいせつ (taisetsu)', meaning: isTh ? 'สำคัญ' : 'Penting atau sangat berharga.', example: '時間を大切にする。', exampleTranslation: 'Menghargai waktu.' },
-          { word: '準備', phonetic: 'じゅんび (junbi)', meaning: isTh ? 'เตรียมตัว' : 'Persiapan atau bersiap-siap.', example: '試験の準備をする。', exampleTranslation: 'Mempersiapkan ujian.' },
-          { word: '感謝', phonetic: 'かんしゃ (kansha)', meaning: isTh ? 'ขอบคุณ' : 'Rasa syukur atau terima kasih.', example: 'いつも感謝しています。', exampleTranslation: 'Selalu bersyukur.' }
+          { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: isTh ? 'พยายามอย่างเต็มที่, มุ่งมั่นไม่ยอมแพ้' : isId ? 'Berusaha keras, bersemangat pantang menyerah.' : 'To persevere and do your best.', example: '毎日少しずつ頑張りましょう。', exampleTranslation: isTh ? 'มาพยายามไปด้วยกันนะ' : isId ? 'Mari berusaha setiap hari sedikit demi sedikit.' : "Let's try our best little by little every day." },
+          { word: '約束', phonetic: 'やくそく (yakusoku)', meaning: isTh ? 'สัญญา' : isId ? 'Janji atau kesepakatan.' : 'A promise or appointment.', example: '約束を守ります。', exampleTranslation: isId ? 'Menepati janji.' : 'I will keep my promise.' },
+          { word: '大切', phonetic: 'たいせつ (taisetsu)', meaning: isTh ? 'สำคัญ' : isId ? 'Penting atau sangat berharga.' : 'Important, precious, or valuable.', example: '時間を大切にする。', exampleTranslation: isId ? 'Menghargai waktu.' : 'Value your time.' },
+          { word: '準備', phonetic: 'じゅんび (junbi)', meaning: isTh ? 'เตรียมตัว' : isId ? 'Persiapan atau bersiap-siap.' : 'Preparation or getting ready.', example: '試験の準備をする。', exampleTranslation: isId ? 'Mempersiapkan ujian.' : 'Prepare for the exam.' },
+          { word: '感謝', phonetic: 'かんしゃ (kansha)', meaning: isTh ? 'ขอบคุณ' : isId ? 'Rasa syukur atau terima kasih.' : 'Gratitude or appreciation.', example: 'いつも感謝しています。', exampleTranslation: isId ? 'Selalu bersyukur.' : 'I am always grateful.' }
         ]
       : [
-          { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: isTh ? 'ทำสำเร็จ, บรรลุเป้าหมายที่ตั้งไว้' : 'Meraih, menuntaskan, atau berhasil mencapai target.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: isTh ? 'คุณสามารถทำทุกสิ่งให้สำเร็จได้' : 'Kamu bisa meraih apa saja dengan latihan konsisten.' },
-          { word: 'Consistent', phonetic: '/kənˈsɪs.tənt/ • Adj', meaning: isTh ? 'สม่ำเสมอ' : 'Konsisten dan berkelanjutan.', example: 'Consistent effort brings great results.', exampleTranslation: 'Usaha yang konsisten membawa hasil besar.' },
-          { word: 'Opportunity', phonetic: '/ˌɒp.əˈtjuː.nə.ti/ • Noun', meaning: isTh ? 'โอกาส' : 'Peluang emas atau kesempatan baru.', example: 'Every challenge is a new opportunity.', exampleTranslation: 'Setiap tantangan adalah peluang baru.' },
-          { word: 'Persistent', phonetic: '/pəˈzɪs.tənt/ • Adj', meaning: isTh ? 'ไม่ย่อท้อ' : 'Gigih, tekun, dan pantang menyerah.', example: 'Be persistent in pursuing your goals.', exampleTranslation: 'Gigihlah dalam mengejar impianmu.' },
-          { word: 'Enhance', phonetic: '/ɪnˈhɑːns/ • Verb', meaning: isTh ? 'เพิ่มพูน' : 'Meningkatkan mutu, nilai, atau kemampuan.', example: 'Reading helps enhance your vocabulary.', exampleTranslation: 'Membaca membantu meningkatkan kosakatamu.' }
+          { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: isTh ? 'ทำสำเร็จ, บรรลุเป้าหมายที่ตั้งไว้' : isId ? 'Meraih, menuntaskan, atau berhasil mencapai target.' : 'To succeed in completing or achieving a goal.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: isTh ? 'คุณสามารถทำทุกสิ่งให้สำเร็จได้' : isId ? 'Kamu bisa meraih apa saja dengan latihan konsisten.' : 'You can achieve anything with consistent practice.' },
+          { word: 'Consistent', phonetic: '/kənˈsɪs.tənt/ • Adj', meaning: isTh ? 'สม่ำเสมอ' : isId ? 'Konsisten dan berkelanjutan.' : 'Acting or done in the same steady way over time.', example: 'Consistent effort brings great results.', exampleTranslation: isId ? 'Usaha yang konsisten membawa hasil besar.' : 'Steady effort brings great results.' },
+          { word: 'Opportunity', phonetic: '/ˌɒp.əˈtjuː.nə.ti/ • Noun', meaning: isTh ? 'โอกาส' : isId ? 'Peluang emas atau kesempatan baru.' : 'A favorable time or chance to do something.', example: 'Every challenge is a new opportunity.', exampleTranslation: isId ? 'Setiap tantangan adalah peluang baru.' : 'Every challenge is a new opportunity.' },
+          { word: 'Persistent', phonetic: '/pəˈzɪs.tənt/ • Adj', meaning: isTh ? 'ไม่ย่อท้อ' : isId ? 'Gigih, tekun, dan pantang menyerah.' : 'Continuing firmly despite difficulty or obstacles.', example: 'Be persistent in pursuing your goals.', exampleTranslation: isId ? 'Gigihlah dalam mengejar impianmu.' : 'Stay determined in pursuing your goals.' },
+          { word: 'Enhance', phonetic: '/ɪnˈhɑːns/ • Verb', meaning: isTh ? 'เพิ่มพูน' : isId ? 'Meningkatkan mutu, nilai, atau kemampuan.' : 'To improve the quality, value, or strength of something.', example: 'Reading helps enhance your vocabulary.', exampleTranslation: isId ? 'Membaca membantu meningkatkan kosakatamu.' : 'Reading helps expand your vocabulary.' }
         ];
   }
 
@@ -15107,7 +15204,7 @@ function writingExamTask(prompt){const key=String(prompt?.examTask||'');const me
 // Batas kata yang MENGIKAT diambil dari kontrak ujiannya kalau ada. Di IELTS, tulisan di bawah
 // batas kena penalti - jadi menampilkan target yang lebih rendah daripada ujian aslinya akan
 // menyesatkan justru pada hal yang paling mudah dihindari murid.
-function writingTargetWords(prompt){const exam=writingExamTask(prompt);return Math.max(Number(prompt?.target)||0,Number(exam?.minWords)||0)||Number(prompt?.target)||40}
+function writingTargetWords(prompt){const exam=writingExamTask(prompt);return Math.max(Number(prompt?.target||prompt?.targetChars)||0,Number(exam?.minWords)||0)||Number(prompt?.target||prompt?.targetChars)||40}
 function writingPromptFor(index){
   const list=writingPromptPool();
   if(!list.length)return null;
@@ -15147,7 +15244,7 @@ ${(()=>{/* 2026-08-31: Writing memakai PANGGUNG maskot, bukan cap bundar .quiz-m
 <div class="card writing-prompt">
   <span class="skill-badge">${FiezelI18n.t('tulis.badge-topik',{level:esc(displayLevel(prompt.level)),done:done,goal:WRITING_WEEKLY_TARGET})}</span>
   ${exam?`<p class="writing-exam"><b>${esc(exam.label)}</b><span>${FiezelI18n.t('tulis.meta-ujian',{kata:exam.minWords,menit:exam.minutes})}</span><small>${esc(exam.note)}</small></p>`:''}
-  <b>${esc(prompt.en)}</b>
+  <b>${esc(prompt.en||prompt.prompt||prompt.title||'')}</b>
   ${(FiezelI18n.getLocale()==='id'||FiezelI18n.getLocale()==='th')&&prompt.id_hint?`<p class="muted">${esc(prompt.id_hint)}</p>`:''}
   ${prompt.focus?`<p class="writing-focus">${FiezelI18n.t('tulis.fokus',{fokus:esc(prompt.focus)})}</p>`:''}
   <textarea id="writingBox" placeholder="${jaCourseOn() ? 'ここに入力してください…' : esc(FiezelI18n.t('tulis.placeholder'))}" aria-label="${FiezelI18n.t('tulis.aria-kotak')}">${esc(draft)}</textarea>
@@ -15181,7 +15278,7 @@ async function requestWritingFeedback(prompt){
   const rubricBrief=criteria.map(c=>`- ${c.label} (${c.labelEn}): ${c.asks}`).join('\n');
   const scaleBrief=loc==='id'
     ?(criteria.length?`Skala 0-4 untuk SETIAP kriteria. Acuan singkat 4: ${criteria[0].levels[4]}`:'Skala 0-4 untuk setiap kriteria.')
-    :(criteria.length?`Scale 0-4 for EACH criterion.`:'Scale 0-4 for each criterion.');
+    :(criteria.length?`Scale 0-4 for EACH criterion. Reference Band 4: ${criteria[0].levelsEn?.[4]||criteria[0].levels?.[4]||''}`:'Scale 0-4 for each criterion.');
   /* W3-BRAIN-TH: prompt penilai per-locale. Cabang id (bawah) byte-identik dengan naskah
    * beku; cabang th (DRAFT AI) padanannya. Non-id/non-th merespons dalam bahasa antarmuka. */
   const ai=loc==='th'?`คุณคือผู้ตรวจงานเขียน${courseLanguageLabel()}สำหรับนักเรียนไทยระดับ ${prompt.level} ภาษาที่ใช้ตอบ: ภาษาไทยที่เป็นกันเองแต่ชัดเจน ไม่เกิน 220 คำ
@@ -17556,6 +17653,8 @@ function startLevelPractice(level){
 function startQuickWinLesson(lang) {
   const cur = (lang || activeTargetLang());
   const targetLang = cur === 'ja' ? 'ja' : (cur === 'zh' ? 'zh' : 'en');
+  const qwIsId = (self.FiezelI18n?.getLocale?.() || 'id') === 'id';
+  const qwPick = (en, id) => qwIsId ? id : en;
   let pool = [];
   if (targetLang === 'ja') {
     pool = [
@@ -17569,10 +17668,10 @@ function startQuickWinLesson(lang) {
         audio: 'あ',
         skill: 'hiragana_basics',
         explain: {
-          why: 'Huruf あ berbunyi a, merupakan huruf vokal pertama dalam bahasa Jepang.',
-          rule: 'Gojūon vokal bahasa Jepang dimulai dari deret A-I-U-E-O.',
-          distractor: 'Pilihan lain merupakan huruf vokal い (i), う (u), dan え (e).',
-          memory: 'Bayangkan huruf あ menyerupai bentuk bulat buah apel (a).'
+          why: qwPick('The character あ sounds like "a" and is the first vowel in Japanese.', 'Huruf あ berbunyi a, merupakan huruf vokal pertama dalam bahasa Jepang.'),
+          rule: qwPick('Japanese Gojūon vowels start with the A-I-U-E-O row.', 'Gojūon vokal bahasa Jepang dimulai dari deret A-I-U-E-O.'),
+          distractor: qwPick('The other options are the vowels い (i), う (u), and え (e).', 'Pilihan lain merupakan huruf vokal い (i), う (u), dan え (e).'),
+          memory: qwPick('Picture あ shaped like a round apple (a).', 'Bayangkan huruf あ menyerupai bentuk bulat buah apel (a).')
         }
       },
       {
@@ -17585,10 +17684,10 @@ function startQuickWinLesson(lang) {
         audio: 'い',
         skill: 'hiragana_basics',
         explain: {
-          why: 'Huruf い berbunyi i, ditulis dengan dua goresan melengkung.',
-          rule: 'Huruf い merupakan vokal kedua dalam deretan vokal dasar Hiragana.',
-          distractor: 'Pilihan lain adalah vokal あ (a), お (o), dan konsonan か (ka).',
-          memory: 'Dua goresan い terlihat sejajar seperti dua pilar atau jari telunjuk (i).'
+          why: qwPick('The character い sounds like "i" and is written with two curved strokes.', 'Huruf い berbunyi i, ditulis dengan dua goresan melengkung.'),
+          rule: qwPick('い is the second vowel in the basic Hiragana vowel row.', 'Huruf い merupakan vokal kedua dalam deretan vokal dasar Hiragana.'),
+          distractor: qwPick('The other choices are vowels あ (a), お (o), and consonant か (ka).', 'Pilihan lain adalah vokal あ (a), お (o), dan konsonan か (ka).'),
+          memory: qwPick('The two strokes of い look like two side-by-side pillars (i).', 'Dua goresan い terlihat sejajar seperti dua pilar atau jari telunjuk (i).')
         }
       },
       {
@@ -17601,10 +17700,10 @@ function startQuickWinLesson(lang) {
         audio: 'あい',
         skill: 'hiragana_vocab',
         explain: {
-          why: 'あい (ai) berarti cinta atau kasih sayang dalam bahasa Jepang.',
-          rule: 'Penggabungan vokal hiragana あ (a) dan い (i) membentuk kosakata utuh: ai (cinta).',
-          distractor: 'Terima kasih adalah arigatou, selamat pagi adalah ohayou, dan air adalah mizu.',
-          memory: 'Ingat: AI = Aku Ingin mencintaimu (Cinta).'
+          why: qwPick('あい (ai) means love or affection in Japanese.', 'あい (ai) berarti cinta atau kasih sayang dalam bahasa Jepang.'),
+          rule: qwPick('Combining Hiragana vowels あ (a) and い (i) forms a complete word: ai (love).', 'Penggabungan vokal hiragana あ (a) dan い (i) membentuk kosakata utuh: ai (cinta).'),
+          distractor: qwPick('Thank you is arigatou, good morning is ohayou, and water is mizu.', 'Terima kasih adalah arigatou, selamat pagi adalah ohayou, dan air adalah mizu.'),
+          memory: qwPick('Remember: AI = Affection / Love.', 'Ingat: AI = Aku Ingin mencintaimu (Cinta).')
         }
       }
     ];
@@ -17620,10 +17719,10 @@ function startQuickWinLesson(lang) {
         audio: '你好',
         skill: 'zh_greetings',
         explain: {
-          why: '你好 (Nǐ hǎo) adalah sapaan salam "Halo / Apa kabar" yang paling dasar dan lazim dalam bahasa Mandarin.',
-          rule: 'Gabungan kata 你 (kamu) + 好 (baik) membentuk salam ramah untuk menyapa seseorang.',
-          distractor: '谢谢 berarti terima kasih, 再见 berarti sampai jumpa, dan 对不起 berarti maaf.',
-          memory: 'Ingat: Nǐ (kamu) + Hǎo (baik) = Semoga kamu baik-baik saja (Halo).'
+          why: qwPick('你好 (Nǐ hǎo) is the most common basic greeting meaning "Hello" in Mandarin.', '你好 (Nǐ hǎo) adalah sapaan salam "Halo / Apa kabar" yang paling dasar dan lazim dalam bahasa Mandarin.'),
+          rule: qwPick('Combining 你 (you) + 好 (good) creates a polite greeting.', 'Gabungan kata 你 (kamu) + 好 (baik) membentuk salam ramah untuk menyapa seseorang.'),
+          distractor: qwPick('谢谢 means thank you, 再见 means goodbye, and 对不起 means sorry.', '谢谢 berarti terima kasih, 再见 berarti sampai jumpa, dan 对不起 berarti maaf.'),
+          memory: qwPick('Remember: Nǐ (you) + Hǎo (good) = Wishing you well (Hello).', 'Ingat: Nǐ (kamu) + Hǎo (baik) = Semoga kamu baik-baik saja (Halo).')
         }
       },
       {
@@ -17636,10 +17735,10 @@ function startQuickWinLesson(lang) {
         audio: '谢谢',
         skill: 'zh_polite_expressions',
         explain: {
-          why: '谢谢 (Xièxie) adalah ungkapan terima kasih baku dalam bahasa Mandarin.',
-          rule: 'Pengulangan karakter 谢 (xiè) dengan nada netral di suku kata kedua membentuk rasa terima kasih yang santun.',
-          distractor: '不客气 berarti sama-sama, 早上好 berarti selamat pagi, dan 没关系 berarti tidak apa-apa.',
-          memory: 'Xièxie = Terima kasih!'
+          why: qwPick('谢谢 (Xièxie) is the standard expression for "thank you" in Mandarin.', '谢谢 (Xièxie) adalah ungkapan terima kasih baku dalam bahasa Mandarin.'),
+          rule: qwPick('Repeating the character 谢 (xiè) with a neutral tone on the second syllable expresses polite gratitude.', 'Pengulangan karakter 谢 (xiè) dengan nada netral di suku kata kedua membentuk rasa terima kasih yang santun.'),
+          distractor: qwPick('不客气 means you are welcome, 早上好 means good morning, and 没关系 means it is okay.', '不客气 berarti sama-sama, 早上好 berarti selamat pagi, dan 没关系 berarti tidak apa-apa.'),
+          memory: qwPick('Xièxie = Thank you!', 'Xièxie = Terima kasih!')
         }
       },
       {
@@ -17647,15 +17746,20 @@ function startQuickWinLesson(lang) {
         type: 'choice',
         level: 'A1',
         question: t('quiz.quickwin-zh-q3', 'Pilih arti bahasa Indonesia yang tepat untuk kata 再见 (Zàijiàn):'),
-        options: ['Sampai jumpa', 'Selamat malam', 'Permisi', 'Tolong'],
+        options: [
+          qwPick('Goodbye / See you again', 'Sampai jumpa'),
+          qwPick('Good night', 'Selamat malam'),
+          qwPick('Excuse me', 'Permisi'),
+          qwPick('Please / Help', 'Tolong')
+        ],
         answerIndex: 0,
         audio: '再见',
         skill: 'zh_farewell',
         explain: {
-          why: '再见 (Zàijiàn) berarti sampai jumpa atau selamat tinggal.',
-          rule: '再 (lagi) + 见 (bertemu) secara harfiah bermakna "bertemu kembali".',
-          distractor: 'Pilihan lain merupakan arti dari kata sapaan waktu atau permohonan bantuan.',
-          memory: 'Zài (lagi) + Jiàn (lihat/jumpa) = Sampai jumpa lagi.'
+          why: qwPick('再见 (Zàijiàn) means goodbye or see you again.', '再见 (Zàijiàn) berarti sampai jumpa atau selamat tinggal.'),
+          rule: qwPick('再 (again) + 见 (meet/see) literally means "see you again".', '再 (lagi) + 见 (bertemu) secara harfiah bermakna "bertemu kembali".'),
+          distractor: qwPick('The other options are time greetings or polite requests.', 'Pilihan lain merupakan arti dari kata sapaan waktu atau permohonan bantuan.'),
+          memory: qwPick('Zài (again) + Jiàn (see) = See you again (Goodbye).', 'Zài (lagi) + Jiàn (lihat/jumpa) = Sampai jumpa lagi.')
         }
       }
     ];
@@ -17671,10 +17775,10 @@ function startQuickWinLesson(lang) {
         audio: 'Hello',
         skill: 'greetings',
         explain: {
-          why: 'Hello adalah sapaan paling umum dan ramah dalam bahasa Inggris.',
-          rule: 'Kata sapaan digunakan saat pertama kali bertemu seseorang.',
-          distractor: 'Goodbye digunakan saat berpisah, sedangkan never dan behind bukan kata sapaan.',
-          memory: 'Hello digunakan untuk menyapa teman atau siapa pun.'
+          why: qwPick('Hello is the most common and friendly greeting in English.', 'Hello adalah sapaan paling umum dan ramah dalam bahasa Inggris.'),
+          rule: qwPick('A greeting is used when meeting or approaching someone.', 'Kata sapaan digunakan saat pertama kali bertemu seseorang.'),
+          distractor: qwPick('Goodbye is used when parting, while "never" and "behind" are not greetings.', 'Goodbye digunakan saat berpisah, sedangkan never dan behind bukan kata sapaan.'),
+          memory: qwPick('Use "Hello" to greet friends or anyone warmly.', 'Hello digunakan untuk menyapa teman atau siapa pun.')
         }
       },
       {
@@ -17687,10 +17791,10 @@ function startQuickWinLesson(lang) {
         audio: 'Good morning',
         skill: 'greetings',
         explain: {
-          why: 'Good morning digunakan untuk menyapa selamat pagi hingga tengah hari.',
-          rule: 'Waktu pagi (morning) dipasangkan dengan kata sifat good menjadi Good morning.',
-          distractor: 'Good evening untuk petang/malam, good night untuk menjelang tidur, dan goodbye untuk perpisahan.',
-          memory: 'Morning = pagi, jadi Good morning = Selamat pagi.'
+          why: qwPick('"Good morning" is used to greet someone from sunrise until noon.', 'Good morning digunakan untuk menyapa selamat pagi hingga tengah hari.'),
+          rule: qwPick('Pair the time word "morning" with "good" to make "Good morning".', 'Waktu pagi (morning) dipasangkan dengan kata sifat good menjadi Good morning.'),
+          distractor: qwPick('"Good evening" is for evening, "good night" before sleep, and "goodbye" for parting.', 'Good evening untuk petang/malam, good night untuk menjelang tidur, dan goodbye untuk perpisahan.'),
+          memory: qwPick('Morning + Good = Good morning.', 'Morning = pagi, jadi Good morning = Selamat pagi.')
         }
       },
       {
@@ -17703,10 +17807,10 @@ function startQuickWinLesson(lang) {
         audio: 'Thank you',
         skill: 'polite_expressions',
         explain: {
-          why: 'Thank you adalah ungkapan baku untuk berterima kasih dalam bahasa Inggris.',
-          rule: 'Ungkapan kesopanan diekspresikan setelah menerima bantuan atau pemberian.',
-          distractor: 'Excuse me adalah permisi, please adalah tolong, dan sorry adalah maaf.',
-          memory: 'Thank you = Terima kasih.'
+          why: qwPick('"Thank you" is the standard polite way to express gratitude in English.', 'Thank you adalah ungkapan baku untuk berterima kasih dalam bahasa Inggris.'),
+          rule: qwPick('Polite expressions of gratitude follow receiving help or a kindness.', 'Ungkapan kesopanan diekspresikan setelah menerima bantuan atau pemberian.'),
+          distractor: qwPick('"Excuse me" gets attention politely, "please" makes requests polite, and "sorry" apologizes.', 'Excuse me adalah permisi, please adalah tolong, dan sorry adalah maaf.'),
+          memory: qwPick('Thank you = gratitude.', 'Thank you = Terima kasih.')
         }
       }
     ];
@@ -20774,7 +20878,10 @@ function courseLanguageLabel(){
     const label=FiezelI18n.t('bahasa.'+kode);
     if(label&&label!=='bahasa.'+kode)return String(label);
   }catch(_){}
-  return kode==='ja'?'Bahasa Jepang':kode==='zh'?'Bahasa Mandarin':'Bahasa Inggris';
+  if((self.FiezelI18n?.getLocale?.()||'id')==='id'){
+    return kode==='ja'?'Bahasa Jepang':kode==='zh'?'Bahasa Mandarin':'Bahasa Inggris';
+  }
+  return kode==='ja'?'Japanese':kode==='zh'?'Mandarin Chinese':'English';
 }
 window.courseLanguageLabel=courseLanguageLabel;
 /* KURSUS YANG BELUM PUNYA SUARA (m025-314).
@@ -20854,6 +20961,7 @@ async function setTargetLangPreference(next){
   }
   switchTargetLangStorage(value);
   try{localStorage.setItem(FIEZEL_TARGET_COURSE_KEY,value)}catch(_){}
+  try{await self.FiezelEnLoader?.ensureCourse?.(value)}catch(_){}
   try{await load({kontenSaja:appOpened})}catch(_){}
   try{leaveAllStages()}catch(_){}
   closeModal();render();haptic('confirm');

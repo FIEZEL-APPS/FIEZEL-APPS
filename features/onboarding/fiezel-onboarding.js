@@ -106,6 +106,14 @@
       require('../i18n/copy-id-feat-b.js');
     } catch (loadError) { I18N = null; }
   }
+  var EN_OB_FALLBACK = {
+    'onboarding.ja-opt-learn-title': 'Need Furigana',
+    'onboarding.ja-opt-fluent-title': 'Kana Fluent',
+    'onboarding.ja-meaning-go': 'go',
+    'guru.soal-count': 'questions',
+    'onboarding.checking': 'Checking...',
+    'social.error-handle-taken': 'That username is already taken — try a different variation.'
+  };
   function T(key, params, fallback) {
     if (typeof params === 'string' && fallback === undefined) {
       fallback = params;
@@ -115,6 +123,10 @@
       var res = I18N.t(key, params, fallback);
       if (res && res !== key) return res;
     }
+    try {
+      var cur = I18N && typeof I18N.getLocale === 'function' ? I18N.getLocale() : 'id';
+      if (cur && cur !== 'id' && EN_OB_FALLBACK[key]) return EN_OB_FALLBACK[key];
+    } catch (_) {}
     return fallback !== undefined ? fallback : String(key);
   }
 
@@ -959,7 +971,7 @@
       + '<div class="fz-ob-jp-line" aria-label="Tokyo e ikimasu">'
       + '<button type="button" class="fz-ob-ruby fz-plain is-active" data-ob-ruby data-word="\u6771\u4EAC" data-reading="\u3068\u3046\u304D\u3087\u3046" data-meaning="Tokyo"><ruby>\u6771\u4EAC<rt>\u3068\u3046\u304D\u3087\u3046</rt></ruby></button>'
       + '<span class="fz-ob-plain">\u3078</span>'
-      + '<button type="button" class="fz-ob-ruby fz-plain" data-ob-ruby data-word="\u884C\u304D" data-reading="\u3044\u304D" data-meaning="pergi"><ruby>\u884C<rt>\u3044</rt></ruby>\u304D</button>'
+      + '<button type="button" class="fz-ob-ruby fz-plain" data-ob-ruby data-word="\u884C\u304D" data-reading="\u3044\u304D" data-meaning="' + escapeHtml(T('onboarding.ja-meaning-go', 'pergi')) + '"><ruby>\u884C<rt>\u3044</rt></ruby>\u304D</button>'
       + '<span class="fz-ob-plain">\u307E\u3059\u3002</span>'
       + '</div>'
       + '<span class="fz-ob-id-line">"Tokyo"</span>'
@@ -1171,7 +1183,7 @@
       + '<b class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-test-title')) + '</b>'
       + '<span class="fz-path-soal-pill">' + facts.soal + ' ' + escapeHtml(T('guru.soal-count', 'soal')) + '</span>'
       + '</div>'
-      + '<p class="fiezel-path-desc"><span class="fiezel-path-count" style="display:none;">' + facts.soal + ' soal</span> ' + escapeHtml(T('onboarding.path-test-desc-v2')) + '</p>'
+      + '<p class="fiezel-path-desc"><span class="fiezel-path-count" style="display:none;">' + facts.soal + ' ' + escapeHtml(T('guru.soal-count', 'soal')) + '</span> ' + escapeHtml(T('onboarding.path-test-desc-v2')) + '</p>'
       + '</div>'
       + '</div>'
       + '<div class="fz-path-radio" aria-hidden="true"><span class="fz-radio-dot"></span></div>'
@@ -2228,6 +2240,17 @@
     // ter-upgrade dan setState() waktu itu masih ditolak (komponen menolak sebelum
     // connect). Pose dipasang lagi di sini - sekali, bukan lewat penantian berulang.
     applyMascot();
+    try {
+      var initObLoc = I18N && typeof I18N.getLocale === 'function' ? I18N.getLocale() : 'id';
+      if (initObLoc && initObLoc !== 'id' && I18N && typeof I18N.hasCopy === 'function' && !I18N.hasCopy(initObLoc, 'onboarding.dialog-aria')) {
+        if (typeof I18N.loadLocale === 'function') I18N.loadLocale(initObLoc);
+        if (typeof I18N.whenAvailable === 'function') {
+          I18N.whenAvailable(initObLoc, 'onboarding.dialog-aria').then(function () {
+            if (!closed) paint();
+          });
+        }
+      }
+    } catch (_) {}
 
     return {
       shown: true,
