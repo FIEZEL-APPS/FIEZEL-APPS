@@ -39,7 +39,7 @@
 
   var GSI_SRC = 'https://accounts.google.com/gsi/client';
   var PATH = '/api/auth/google';
-  var LOAD_TIMEOUT_MS = 8000;
+  var LOAD_TIMEOUT_MS = 15000;
   var STORE_KEY = 'fz.google.email';
 
   var I18N = root.FiezelI18n;
@@ -207,6 +207,7 @@
       case 'rate_limited':
         return t('google.terlalu-cepat', 'Terlalu cepat. Tunggu sebentar, lalu coba lagi.');
       case 'unavailable':
+      case 'internal_error':
         return t('google.server-sibuk', 'Server belum bisa menjawab sekarang. Coba lagi sebentar lagi, ya.');
       case 'google_email_unverified':
         return t('google.email-belum-terverifikasi', 'Alamat email akun Google itu belum diverifikasi Google, jadi belum bisa dipakai masuk.');
@@ -272,14 +273,20 @@
          menanyakan bahasanya. */
       if (o.locale !== 'auto') cfg.locale = (o.locale === 'th' || o.locale === 'id') ? o.locale
         : (locale() === 'th' ? 'th' : 'id');
-      if (o.width) cfg.width = o.width;
+      if (o.width) cfg.width = Math.min(400, Math.max(200, Number(o.width) || 320));
       /* m025-367: layar Daftar memakai label "Daftar dengan Google"; nilai lain dari Google ditolak. */
       if (o.text === 'signup_with' || o.text === 'continue_with' || o.text === 'signin_with') cfg.text = o.text;
+      try { host.innerHTML = ''; } catch (_) {}
       root.google.accounts.id.renderButton(host, cfg);
     } catch (_) {
       return { ok: false, error: 'script', message: t('google.gagal-muat', 'Tombol Google belum bisa dimuat. Masuk dengan akun FIEZEL di bawah, ya.') };
     }
     return { ok: true };
+  }
+
+  function preload() {
+    if (!available()) return Promise.resolve(false);
+    return loadScript();
   }
 
   /** Dipanggil saat murid keluar: status tampilan ikut hilang, cookie diurus server. */
@@ -293,6 +300,7 @@
     SCRIPT: GSI_SRC,
     available: available,
     clientId: clientId,
+    preload: preload,
     renderButton: renderButton,
     submitCredential: submitCredential,
     messageFor: messageFor,

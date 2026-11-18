@@ -304,10 +304,15 @@ export const OAUTH_DDL = Object.freeze([
 export const ALL_DDL = Object.freeze([...AUTH_DDL, ...TEACHER_DDL, ...OAUTH_DDL]);
 
 /**
- * Cache per handle DB. WeakMap supaya isolate yang membuang binding-nya tidak
- * menahan entri hidup; `Set` sederhana akan bocor sepanjang umur isolate.
+ * Penanda per handle DB (WeakSet boolean, BUKAN Promise).
+ * WeakSet supaya isolate yang membuang binding-nya tidak menahan entri hidup, DAN
+ * tidak pernah menyimpan Promise lintas permintaan: dengan `compatibility_date =
+ * "2026-06-01"` (`handle_cross_request_promise_resolution`), meng-await Promise yang
+ * lahir di permintaan sebelumnya melempar "This promise was created by a request
+ * that has since ended, so it can never settle" -> 500 di /api/account/login dan
+ * /api/auth/google.
  */
-const APPLIED = new WeakMap();
+const APPLIED = new WeakSet();
 
 /**
  * ensureAuthSchema(db) -> Promise<void>. Idempoten, aman dipanggil di awal
@@ -318,19 +323,16 @@ const APPLIED = new WeakMap();
  */
 export async function ensureAuthSchema(db) {
   if (!db || typeof db.prepare !== 'function') throw new Error('auth_schema_no_db');
-  let pending = APPLIED.get(db);
-  if (!pending) {
-    pending = (async () => {
-      for (const statement of ALL_DDL) {
-        /* eslint-disable no-await-in-loop */
-        await db.prepare(statement).run();
-      }
-      return true;
-    })();
-    APPLIED.set(db, pending);
-    pending.catch(() => APPLIED.delete(db));
+  if (APPLIED.has(db)) return;
+  if (typeof db.batch === 'function') {
+    await db.batch(ALL_DDL.map((statement) => db.prepare(statement)));
+  } else {
+    for (const statement of ALL_DDL) {
+      /* eslint-disable no-await-in-loop */
+      await db.prepare(statement).run();
+    }
   }
-  await pending;
+  APPLIED.add(db);
 }
 
 /** Hanya untuk gerbang: melupakan cache supaya urutan terapan bisa diuji ulang. */

@@ -57,22 +57,21 @@ export const LEGACY_DDL = Object.freeze([
     ' )'
 ]);
 
-const ENSURED = new WeakMap();
+const ENSURED = new WeakSet();
 
-export function ensureLegacySchema(db) {
+export async function ensureLegacySchema(db) {
   if (!db || typeof db.prepare !== 'function') {
-    return Promise.resolve(false);
+    return false;
   }
-  let pending = ENSURED.get(db);
-  if (!pending) {
-    pending = (async () => {
-      for (const statement of LEGACY_DDL) {
-        await db.prepare(statement).run();
-      }
-      return true;
-    })();
-    ENSURED.set(db, pending);
-    pending.catch(() => ENSURED.delete(db));
+  if (ENSURED.has(db)) return true;
+  if (typeof db.batch === 'function') {
+    await db.batch(LEGACY_DDL.map((statement) => db.prepare(statement)));
+  } else {
+    for (const statement of LEGACY_DDL) {
+      /* eslint-disable no-await-in-loop */
+      await db.prepare(statement).run();
+    }
   }
-  return pending;
+  ENSURED.add(db);
+  return true;
 }
