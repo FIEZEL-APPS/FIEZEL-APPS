@@ -1,21 +1,21 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-11-18T04:19:47.444Z",
+  "generatedAt": "2026-11-18T14:09:19.535Z",
   "files": {
     "app.js": {
       "leaks": 3,
       "budget": 3,
       "sample": [
         {
-          "line": 13154,
+          "line": 13209,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 14097,
+          "line": 14152,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 15155,
+          "line": 15226,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         }
       ]
@@ -219,32 +219,6 @@
         {
           "line": 392,
           "text": "Latihan Pasangan Minimal (Minimal Pairs Discrimination)"
-        }
-      ]
-    },
-    "features/mandarin/mandarin-ui.js": {
-      "leaks": 16,
-      "budget": 16,
-      "sample": [
-        {
-          "line": 248,
-          "text": "1. Kosakata"
-        },
-        {
-          "line": 276,
-          "text": "🔊 Suara"
-        },
-        {
-          "line": 281,
-          "text": "Kosakata Inti Pelajaran"
-        },
-        {
-          "line": 353,
-          "text": "Jawaban Tepat!"
-        },
-        {
-          "line": 425,
-          "text": "Misi Percakapan Murid:"
         }
       ]
     },
@@ -582,8 +556,8 @@
     }
   },
   "copyKeys": {
-    "id": 4751,
-    "th": 4575,
+    "id": 4886,
+    "th": 4710,
     "idTanpaTh": 0
   },
   "pass": true

@@ -216,7 +216,7 @@
     'progress.mulai-lelah': 'เริ่มล้า',
     'progress.mulai-review-btn': 'เริ่มทบทวน ({jumlah})',
     'progress.mulai-sesi': 'เริ่มรอบเรียน',
-    'progress.next-session-dipilih-paw': 'NEXT SESSION · เลือกโดย PAW',
+    'progress.next-session-dipilih-paw': 'NEXT SESSION · เลือกโดย MOCHI',
     'progress.outcome-menjadi-evidence-policy-upcoming': 'ผลนี้ใช้จัดแผนของรอบถัดไป คำตอบของเธอไม่ได้ถูกส่งไปที่ไหนเลย',
     'progress.penguasaan-keyakinan': '{skillName} · ความเชี่ยวชาญ {L}% · ความมั่นใจ {confidence}%',
     'progress.penguasaan-terkuat': 'ที่เชี่ยวชาญที่สุด:',

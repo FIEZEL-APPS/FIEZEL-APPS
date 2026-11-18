@@ -554,7 +554,7 @@
     // app.js:4496 — startLevelExam: toast mulai ujian
     'level.toast-mulai-ujian': '{judul} {level} · {jumlah} soal tanpa petunjuk',
     // app.js:4414 — levelGuardWarn: toast peringatan
-    'level.toast-warn': 'Salah {miss} dari {batas} di {level}. PAW menemani.',
+    'level.toast-warn': 'Salah {miss} dari {batas} di {level}. Mochi menemani.',
     // app.js:4318 — openLevelPanel: tombol cooldown
     'level.tombol-cooldown': 'Bisa diulang {jeda}',
     // app.js:4024 — openFeedback: tombol batal
@@ -651,6 +651,9 @@
     // app.js:5808 — vocab(): subjudul shell
     'vocab.subjudul': '{jumlah} kata level {level}. Semua latihan mengikuti level belajar aktif.',
     // app.js:5808 — vocab(): tombol uji
-    'vocab.uji': ' Uji Vocabulary {level}</button>'
+    'vocab.uji': ' Uji Vocabulary {level}</button>',
+    'tour.listen-miss-body': 'Salah saat latihan itu biasa, nggak masalah sama sekali. Mochi menemani di tiap soal.',
+    'tour.menu-ask-body': 'Tombol kanan ini gerbang ke Mochi pembimbing. Bingung bagian mana? Tanya di sini (butuh koneksi internet).',
+    'tour.menu-home-body': 'Ini halaman Hari ini: kemajuanmu hari ini, runtun belajar, dan saran latihan dari Mochi. Seluruh perjalanan belajarmu dimulai dari sini.'
   });
 }());

@@ -1494,20 +1494,21 @@ export function buildCambridgeModelAnswerFallback(
     }
   }
 
+  const isIdLoc = locale === 'id';
   const badgeLevel = isHigherLevel
     ? 'Band 9.0 · Advanced'
     : isB2
     ? 'Level B2 · PTE 58'
     : isA1
-    ? 'Level A1 · Pemula Dasar'
+    ? isIdLoc ? 'Level A1 · Pemula Dasar' : 'Level A1 · Beginner'
     : isA2
-    ? 'Level A2 · Percakapan Simpel'
+    ? isIdLoc ? 'Level A2 · Percakapan Simpel' : 'Level A2 · Everyday Conversation'
     : 'Level B1 · Target PTE 42';
 
   const card: BeginnerReplyCard = {
     id: `cambridge_model_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     tier: 'cambridge_model',
-    badgeId: `🎯 Jawaban Terbaik (${badgeLevel})`,
+    badgeId: isIdLoc ? `🎯 Jawaban Terbaik (${badgeLevel})` : `🎯 Best Answer (${badgeLevel})`,
     badgeTh: `🎯 คำตอบแนะนำ (${badgeLevel})`,
     tierLabelId: `${badgeLevel} Model Answer`,
     tierLabelTh: `${badgeLevel} Model Answer`,
@@ -1515,6 +1516,7 @@ export function buildCambridgeModelAnswerFallback(
     pronunciation,
     hintId,
     hintTh,
+    hintEn: '',
     meaningId: hintId,
     meaningTh: hintTh,
     isRealtimeAi: false,
@@ -1545,6 +1547,7 @@ export function buildContextualFallbackCards(params: {
 }): BeginnerReplyCard[] {
   const rawAi = String(params.aiText || '');
   const th = params.locale === 'th';
+  const isIdLoc = params.locale === 'id';
   const variationSeed = Number(params.variationSeed || 0);
   const popupTarget = String(params.activePopupTargetText || '').trim();
   const popupMode = String(params.activePopupMode || '').trim();
@@ -1569,14 +1572,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_ra_ja_1',
           tier: 'easy',
-          badgeId: 'Teks di Layar',
+          badgeId: isIdLoc ? 'Teks di Layar' : 'On-Screen Text',
           badgeTh: 'ข้อความบนหน้าจอ',
-          tierLabelId: '1 · Baca Nyaring',
+          tierLabelId: isIdLoc ? '1 · Baca Nyaring' : '1 · Read Aloud',
           tierLabelTh: '1 · อ่านออกเสียง',
           text: cleanTarget,
           pronunciation: targetPron,
           hintId: 'Bacakan kalimat target di layar ini dengan jelas.',
           hintTh: 'อ่านประโยคเป้าหมายบนหน้าจอให้ชัดเจน',
+          hintEn: 'Read the on-screen target sentence clearly.',
           meaningId: 'Bacakan kalimat target di layar ini dengan jelas.',
           meaningTh: 'อ่านประโยคเป้าหมายบนหน้าจอให้ชัดเจน',
           isRealtimeAi: false,
@@ -1585,9 +1589,9 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_ra_ja_2',
           tier: 'mission',
-          badgeId: 'Tanya Pelafalan',
+          badgeId: isIdLoc ? 'Tanya Pelafalan' : 'Ask Pronunciation',
           badgeTh: 'ถามการออกเสียง',
-          tierLabelId: '2 · Tanya Cara Baca',
+          tierLabelId: isIdLoc ? '2 · Tanya Cara Baca' : '2 · Pronunciation Check',
           tierLabelTh: '2 · ถามวิธีอ่าน',
           text: hardWord
             ? `「${hardWord}」の発音をもう一度ゆっくり教えてもらえますか？`
@@ -1599,6 +1603,9 @@ export function buildContextualFallbackCards(params: {
             ? `Bisa ajari ulang pelafalan kata "${toPhoneticRomaji(hardWord)}" pelan-pelan?`
             : 'Bisa ajari ulang pemenggalan jeda dan pelafalan kalimat ini?',
           hintTh: 'ช่วยสอนวิธีออกเสียงคำนี้ช้าๆ อีกครั้งได้ไหม?',
+          hintEn: hardWord
+            ? `Could you teach me how to pronounce "${toPhoneticRomaji(hardWord)}" slowly again?`
+            : 'Could you walk through the phrasing breaks and pronunciation slowly?',
           meaningId: hardWord
             ? `Bisa ajari ulang pelafalan kata "${toPhoneticRomaji(hardWord)}" pelan-pelan?`
             : 'Bisa ajari ulang pemenggalan jeda dan pelafalan kalimat ini?',
@@ -1609,14 +1616,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_ra_ja_3',
           tier: 'rescue',
-          badgeId: 'Minta Koreksi / Soal Baru',
+          badgeId: isIdLoc ? 'Minta Koreksi / Soal Baru' : 'Check / Next Line',
           badgeTh: 'ขอคำแนะนำ / ประโยคถัดไป',
-          tierLabelId: '3 · + Tanya Balik',
+          tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
           tierLabelTh: '3 · + ถามกลับ',
           text: '今の読み方で大丈夫でしたか？次の文も練習したいです。',
           pronunciation: 'Ima no yomikata de daijoubu deshita ka? Tsugi no bun mo renshuu shitai desu.',
           hintId: 'Apakah bacaanku tadi sudah tepat? Aku mau latihan kalimat berikutnya juga.',
           hintTh: 'เมื่อกี้อ่านถูกต้องไหม? อยากฝึกประโยคถัดไปด้วย',
+          hintEn: 'Was my reading okay just now? I would like to practice the next sentence too.',
           meaningId: 'Apakah bacaanku tadi sudah tepat? Aku mau latihan kalimat berikutnya juga.',
           meaningTh: 'เมื่อกี้อ่านถูกต้องไหม? อยากฝึกประโยคถัดไปด้วย',
           isRealtimeAi: false,
@@ -1629,14 +1637,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_ra_zh_1',
           tier: 'easy',
-          badgeId: 'Teks di Layar',
+          badgeId: isIdLoc ? 'Teks di Layar' : 'On-Screen Text',
           badgeTh: 'ข้อความบนหน้าจอ',
-          tierLabelId: '1 · Baca Nyaring',
+          tierLabelId: isIdLoc ? '1 · Baca Nyaring' : '1 · Read Aloud',
           tierLabelTh: '1 · อ่านออกเสียง',
           text: cleanTarget,
           pronunciation: targetPron,
           hintId: 'Bacakan kalimat target di layar ini dengan nada jelas.',
           hintTh: 'อ่านประโยคเป้าหมายบนหน้าจอให้ชัดเจน',
+          hintEn: 'Read the on-screen target sentence clearly with steady tones.',
           meaningId: 'Bacakan kalimat target di layar ini dengan nada jelas.',
           meaningTh: 'อ่านประโยคเป้าหมายบนหน้าจอให้ชัดเจน',
           isRealtimeAi: false,
@@ -1645,9 +1654,9 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_ra_zh_2',
           tier: 'mission',
-          badgeId: 'Tanya Pelafalan',
+          badgeId: isIdLoc ? 'Tanya Pelafalan' : 'Ask Pronunciation',
           badgeTh: 'ถามการออกเสียง',
-          tierLabelId: '2 · Tanya Nada',
+          tierLabelId: isIdLoc ? '2 · Tanya Nada' : '2 · Ask Tones',
           tierLabelTh: '2 · ถามวรรณยุกต์',
           text: hardWord
             ? `请问“${hardWord}”这个词的声调怎么读才最标准？`
@@ -1659,6 +1668,9 @@ export function buildContextualFallbackCards(params: {
             ? `Bagaimana nada standar untuk membaca "${toPhoneticPinyin(hardWord)}"?`
             : 'Di bagian mana kalimat ini sebaiknya diberi jeda?',
           hintTh: 'ช่วยบอกเสียงวรรณยุกต์ที่ถูกต้องของคำนี้หน่อยได้ไหม?',
+          hintEn: hardWord
+            ? `How should the tones for "${toPhoneticPinyin(hardWord)}" be pronounced accurately?`
+            : 'Where is the natural pause in this sentence?',
           meaningId: hardWord
             ? `Bagaimana nada standar untuk membaca "${toPhoneticPinyin(hardWord)}"?`
             : 'Di bagian mana kalimat ini sebaiknya diberi jeda?',
@@ -1669,14 +1681,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_ra_zh_3',
           tier: 'rescue',
-          badgeId: 'Minta Koreksi / Soal Baru',
+          badgeId: isIdLoc ? 'Minta Koreksi / Soal Baru' : 'Check / Next Line',
           badgeTh: 'ขอคำแนะนำ / ประโยคถัดไป',
-          tierLabelId: '3 · + Tanya Balik',
+          tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
           tierLabelTh: '3 · + ถามกลับ',
           text: '我刚才读得准确吗？我们可以试下一句吗？',
           pronunciation: 'Wo gangcai du de zhunque ma? Women keyi shi xia yi ju ma?',
           hintId: 'Apakah bacaanku barusan akurat? Bisa kita coba kalimat berikutnya?',
           hintTh: 'เมื่อกี้ฉันอ่านแม่นยำไหม? ลองประโยคถัดไปได้ไหม?',
+          hintEn: 'Was my reading accurate just now? Can we try the next sentence?',
           meaningId: 'Apakah bacaanku barusan akurat? Bisa kita coba kalimat berikutnya?',
           meaningTh: 'เมื่อกี้ฉันอ่านแม่นยำไหม? ลองประโยคถัดไปได้ไหม?',
           isRealtimeAi: false,
@@ -1688,14 +1701,15 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_ra_en_1',
         tier: 'easy',
-        badgeId: 'Baca Teks di Layar',
+        badgeId: isIdLoc ? 'Baca Teks di Layar' : 'Read On-Screen Text',
         badgeTh: 'อ่านข้อความบนจอ',
-        tierLabelId: '1 · Teks Target',
+        tierLabelId: isIdLoc ? '1 · Teks Target' : '1 · Target Text',
         tierLabelTh: '1 · เป้าหมายบนหน้าจอ',
         text: cleanTarget,
         pronunciation: targetPron,
         hintId: 'Bacakan kalimat ini sesuai teks di layar dengan artikulasi jelas.',
         hintTh: 'อ่านประโยคนี้ตามข้อความบนหน้าจอให้ชัดเจน',
+        hintEn: 'Read this sentence clearly following the on-screen text.',
         meaningId: 'Bacakan kalimat ini sesuai teks di layar dengan artikulasi jelas.',
         meaningTh: 'อ่านประโยคนี้ตามข้อความบนหน้าจอให้ชัดเจน',
         isRealtimeAi: false,
@@ -1704,9 +1718,9 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_ra_en_2',
         tier: 'mission',
-        badgeId: 'Tanya Pelafalan',
+        badgeId: isIdLoc ? 'Tanya Pelafalan' : 'Ask Pronunciation',
         badgeTh: 'ถามการออกเสียง',
-        tierLabelId: '2 · Cek Artikulasi',
+        tierLabelId: isIdLoc ? '2 · Cek Artikulasi' : '2 · Articulation Check',
         tierLabelTh: '2 · เช็กการออกเสียง',
         text: hardWord
           ? `How should I pronounce the word "${hardWord}" clearly in this passage?`
@@ -1720,6 +1734,9 @@ export function buildContextualFallbackCards(params: {
         hintTh: hardWord
           ? `ฉันควรออกเสียงคำว่า "${hardWord}" อย่างไรให้ชัดเจน?`
           : 'คำไหนในประโยคนี้ที่ควรเน้นเสียงเวลาอ่านออกเสียง?',
+        hintEn: hardWord
+          ? `How do I pronounce "${hardWord}" clearly here?`
+          : 'Which words should carry stress when reading aloud?',
         meaningId: hardWord
           ? `Bagaimana cara melafalkan kata "${hardWord}" dengan jelas di bacaan ini?`
           : 'Kata mana saja di kalimat ini yang perlu penekanan saat dibaca nyaring?',
@@ -1732,14 +1749,15 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_ra_en_3',
         tier: 'rescue',
-        badgeId: 'Minta Koreksi / Lanjut',
+        badgeId: isIdLoc ? 'Minta Koreksi / Lanjut' : 'Check / Next Line',
         badgeTh: 'ขอคำแนะนำ / ต่อเลย',
-        tierLabelId: '3 · + Tanya Balik',
+        tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
         tierLabelTh: '3 · + ถามกลับ',
         text: 'Did I mispronounce or skip any words? Can we move to the next sentence?',
         pronunciation: approximateEnglishPhoneticId('Did I mispronounce or skip any words? Can we move to the next sentence?'),
         hintId: 'Apakah ada kata yang salah ucap atau terlewat? Bisa lanjut kalimat berikutnya?',
         hintTh: 'ฉันออกเสียงผิดหรือข้ามคำไหนไปไหม? ไปประโยคถัดไปได้เลยไหม?',
+        hintEn: 'Ask if any word was mispronounced or skipped and move on.',
         meaningId: 'Apakah ada kata yang salah ucap atau terlewat? Bisa lanjut kalimat berikutnya?',
         meaningTh: 'ฉันออกเสียงผิดหรือข้ามคำไหนไปไหม? ไปประโยคถัดไปได้เลยไหม?',
         isRealtimeAi: false,
@@ -1770,14 +1788,15 @@ export function buildContextualFallbackCards(params: {
           {
             id: 'ctx_struggle_ja_v2_1',
             tier: 'easy',
-            badgeId: 'Singkat & Mudah',
+            badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
             badgeTh: 'สั้นและง่าย',
-            tierLabelId: '1 · Singkat',
+            tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
             tierLabelTh: '1 · สั้นและง่าย',
             text: '動詞の活用と敬語の使い分けが一番難しいです。',
             pronunciation: 'Doushi no katsuyou to keigo no tsukaiwake ga ichiban muzukashii desu.',
             hintId: 'Konjugasi kata kerja dan penggunaan keigo yang paling sulit bagiku.',
             hintTh: 'การผันคำกริยาและการใช้คำสุภาพเป็นสิ่งที่ยากที่สุดสำหรับฉัน',
+            hintEn: 'Verb conjugations and keigo polite forms are hardest for me.',
             meaningId: 'Konjugasi kata kerja dan penggunaan keigo yang paling sulit bagiku.',
             meaningTh: 'การผันคำกริยาและการใช้คำสุภาพเป็นสิ่งที่ยากที่สุดสำหรับฉัน',
             isRealtimeAi: false,
@@ -1786,14 +1805,15 @@ export function buildContextualFallbackCards(params: {
           {
             id: 'ctx_struggle_ja_v2_2',
             tier: 'mission',
-            badgeId: 'Alami & Kontekstual',
+            badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
             badgeTh: 'เป็นธรรมชาติ',
-            tierLabelId: '2 · Alami',
+            tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
             tierLabelTh: '2 · เป็นธรรมชาติ',
             text: '頭では分かっていても、早口で話されると聞き取れなくなります。',
             pronunciation: 'Atama de wa wakatte itemo, hayakuchi de hanasareru to kikitorenaku narimasu.',
             hintId: 'Di kepala paham, tapi kalau diajak bicara cepat aku jadi tidak bisa menangkap artinya.',
             hintTh: 'ในหัวเข้าใจนะ แต่พอพูดเร็วๆ ฉันฟังไม่ทันเลย',
+            hintEn: 'I understand it mentally, but once people speak fast I lose track.',
             meaningId: 'Di kepala paham, tapi kalau diajak bicara cepat aku jadi tidak bisa menangkap artinya.',
             meaningTh: 'ในหัวเข้าใจนะ แต่พอพูดเร็วๆ ฉันฟังไม่ทันเลย',
             isRealtimeAi: false,
@@ -1802,14 +1822,15 @@ export function buildContextualFallbackCards(params: {
           {
             id: 'ctx_struggle_ja_v2_3',
             tier: 'rescue',
-            badgeId: 'Jawab + Tanya Balik',
+            badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
             badgeTh: 'ตอบและถามกลับ',
-            tierLabelId: '3 · + Tanya Balik',
+            tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
             tierLabelTh: '3 · + ถามกลับ',
             text: '言いたい単語がすぐに出てきません。ゆっくり話してもらえますか？',
             pronunciation: 'Iitai tango ga sugu ni dete kimasen. Yukkuri hanashite moraemasu ka?',
             hintId: 'Kata yang mau kuucapkan tidak langsung keluar. Bisakah bicara lebih pelan?',
             hintTh: 'คำที่อยากพูดยังนึกไม่ออกทันที ช่วยพูดช้าลงหน่อยได้ไหมครับ/ค่ะ?',
+            hintEn: "The words I want don't come out quickly. Could you speak more slowly?",
             meaningId: 'Kata yang mau kuucapkan tidak langsung keluar. Bisakah bicara lebih pelan?',
             meaningTh: 'คำที่อยากพูดยังนึกไม่ออกทันที ช่วยพูดช้าลงหน่อยได้ไหมครับ/ค่ะ?',
             isRealtimeAi: false,
@@ -1821,14 +1842,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_ja_1',
           tier: 'easy',
-          badgeId: 'Singkat & Mudah',
+          badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
           badgeTh: 'สั้นและง่าย',
-          tierLabelId: '1 · Singkat',
+          tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
           tierLabelTh: '1 · สั้นและง่าย',
           text: '助詞の「は」と「が」の使い分けが一番モヤモヤしています。',
           pronunciation: 'Joshi no "wa" to "ga" no tsukaiwake ga ichiban moyamoya shite imasu.',
           hintId: 'Perbedaan partikel "wa" dan "ga" yang paling bikin aku bingung.',
           hintTh: 'การใช้คำช่วย "wa" กับ "ga" คือสิ่งที่ฉันสับสนที่สุด',
+          hintEn: 'Telling the difference between particles "wa" and "ga" confuses me most.',
           meaningId: 'Perbedaan partikel "wa" dan "ga" yang paling bikin aku bingung.',
           meaningTh: 'การใช้คำช่วย "wa" กับ "ga" คือสิ่งที่ฉันสับสนที่สุด',
           isRealtimeAi: false,
@@ -1837,14 +1859,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_ja_2',
           tier: 'mission',
-          badgeId: 'Alami & Kontekstual',
+          badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
           badgeTh: 'เป็นธรรมชาติ',
-          tierLabelId: '2 · Alami',
+          tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
           tierLabelTh: '2 · เป็นธรรมชาติ',
           text: '正直、動詞のて形と過去形の活用をすぐ口に出すのがまだ難しいです。',
           pronunciation: 'Shoujiki, doushi no te-kei to kakokei no katsuyou o sugu kuchi ni dasu no ga mada muzukashii desu.',
           hintId: 'Jujur, konjugasi kata kerja bentuk Te dan bentuk lampau masih sulit langsung kuucapkan.',
           hintTh: 'พูดตามตรง การผันกริยารูป Te และรูปอดีตให้พูดออกมาได้ทันทียังยากอยู่',
+          hintEn: 'Honestly, saying Te-form and past verb conjugations on the spot is still hard.',
           meaningId: 'Jujur, konjugasi kata kerja bentuk Te dan bentuk lampau masih sulit langsung kuucapkan.',
           meaningTh: 'พูดตามตรง การผันกริยารูป Te และรูปอดีตให้พูดออกมาได้ทันทียังยากอยู่',
           isRealtimeAi: false,
@@ -1853,14 +1876,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_ja_3',
           tier: 'rescue',
-          badgeId: 'Jawab + Tanya Balik',
+          badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
           badgeTh: 'ตอบและถามกลับ',
-          tierLabelId: '3 · + Tanya Balik',
+          tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
           tierLabelTh: '3 · + ถามกลับ',
           text: '「に」と「で」の助詞でよく迷います。今すぐ一緒に練習できますか？',
           pronunciation: '"Ni" to "de" no joshi de yoku mayoimasu. Ima sugu issho ni renshuu dekimasu ka?',
           hintId: 'Aku sering bingung antara partikel "ni" dan "de". Bisa kita latih sekarang juga?',
           hintTh: 'ฉันมักจะสับสนระหว่างคำช่วย "ni" กับ "de" เราฝึกด้วยกันตอนนี้เลยได้ไหม?',
+          hintEn: 'I often mix up particles "ni" and "de". Can we drill that right now?',
           meaningId: 'Aku sering bingung antara partikel "ni" dan "de". Bisa kita latih sekarang juga?',
           meaningTh: 'ฉันมักจะสับสนระหว่างคำช่วย "ni" กับ "de" เราฝึกด้วยกันตอนนี้เลยได้ไหม?',
           isRealtimeAi: false,
@@ -1874,14 +1898,15 @@ export function buildContextualFallbackCards(params: {
           {
             id: 'ctx_struggle_zh_v2_1',
             tier: 'easy',
-            badgeId: 'Singkat & Mudah',
+            badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
             badgeTh: 'สั้นและง่าย',
-            tierLabelId: '1 · Singkat',
+            tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
             tierLabelTh: '1 · สั้นและง่าย',
             text: '生词太多了，我经常记不住。',
             pronunciation: 'Shēngcí tài duō le, wǒ jīngcháng jì bù zhù.',
             hintId: 'Kosakata baru terlalu banyak, aku sering tidak ingat.',
             hintTh: 'คำศัพท์ใหม่เยอะมาก ฉันมักจำไม่ค่อยได้',
+            hintEn: 'There are too many new words and I keep forgetting them.',
             meaningId: 'Kosakata baru terlalu banyak, aku sering tidak ingat.',
             meaningTh: 'คำศัพท์ใหม่เยอะมาก ฉันมักจำไม่ค่อยได้',
             isRealtimeAi: false,
@@ -1890,14 +1915,15 @@ export function buildContextualFallbackCards(params: {
           {
             id: 'ctx_struggle_zh_v2_2',
             tier: 'mission',
-            badgeId: 'Alami & Kontekstual',
+            badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
             badgeTh: 'เป็นธรรมชาติ',
-            tierLabelId: '2 · Alami',
+            tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
             tierLabelTh: '2 · เป็นธรรมชาติ',
             text: '听中国人说话语速太快，我有点反应不过来。',
             pronunciation: 'Tīng Zhōngguórén shuōhuà yǔsù tài kuài, wǒ yǒudiǎn fǎnyìng bù guòlái.',
             hintId: 'Mendengar orang Tiongkok bicara terlalu cepat, refleksku agak lambat.',
             hintTh: 'ฟังคนจีนพูดเร็วมาก ฉันตามไม่ค่อยทันเลย',
+            hintEn: 'Native speakers talk very fast, so my reaction time lags behind.',
             meaningId: 'Mendengar orang Tiongkok bicara terlalu cepat, refleksku agak lambat.',
             meaningTh: 'ฟังคนจีนพูดเร็วมาก ฉันตามไม่ค่อยทันเลย',
             isRealtimeAi: false,
@@ -1906,14 +1932,15 @@ export function buildContextualFallbackCards(params: {
           {
             id: 'ctx_struggle_zh_v2_3',
             tier: 'rescue',
-            badgeId: 'Jawab + Tanya Balik',
+            badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
             badgeTh: 'ตอบและถามกลับ',
-            tierLabelId: '3 · + Tanya Balik',
+            tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
             tierLabelTh: '3 · + ถามกลับ',
             text: '我能听懂一点，但是不知道怎么回答。你能教我吗？',
             pronunciation: 'Wǒ néng tīng dǒng yīdiǎn, dànshì bù zhīdào zěnme huídá. Nǐ néng jiāo wǒ ma?',
             hintId: 'Aku paham sedikit tapi bingung bagaimana menjawabnya. Bisakah kamu ajari aku?',
             hintTh: 'ฉันฟังเข้าใจนิดหน่อยแต่ไม่รู้จะตอบยังไง ช่วยสอนฉันหน่อยได้ไหม?',
+            hintEn: 'I understand a little, but I am not sure how to reply. Can you teach me?',
             meaningId: 'Aku paham sedikit tapi bingung bagaimana menjawabnya. Bisakah kamu ajari aku?',
             meaningTh: 'ฉันฟังเข้าใจนิดหน่อยแต่ไม่รู้จะตอบยังไง ช่วยสอนฉันหน่อยได้ไหม?',
             isRealtimeAi: false,
@@ -1925,14 +1952,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_zh_1',
           tier: 'easy',
-          badgeId: 'Singkat & Mudah',
+          badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
           badgeTh: 'สั้นและง่าย',
-          tierLabelId: '1 · Singkat',
+          tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
           tierLabelTh: '1 · สั้นและง่าย',
           text: '我最头疼的是四个声调和“了”的用法。',
           pronunciation: 'Wǒ zuì tóuténg de shì sì gè shēngdiào hé "le" de yòngfǎ.',
           hintId: 'Yang paling bikin aku pusing itu empat nada dan cara pakai partikel "le".',
           hintTh: 'สิ่งที่ฉันปวดหัวที่สุดคือวรรณยุกต์ทั้งสี่เสียงและการใช้ "le"',
+          hintEn: 'My biggest headache is the four tones and how to use "le".',
           meaningId: 'Yang paling bikin aku pusing itu empat nada dan cara pakai partikel "le".',
           meaningTh: 'สิ่งที่ฉันปวดหัวที่สุดคือวรรณยุกต์ทั้งสี่เสียงและการใช้ "le"',
           isRealtimeAi: false,
@@ -1941,14 +1969,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_zh_2',
           tier: 'mission',
-          badgeId: 'Alami & Kontekstual',
+          badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
           badgeTh: 'เป็นธรรมชาติ',
-          tierLabelId: '2 · Alami',
+          tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
           tierLabelTh: '2 · เป็นธรรมชาติ',
           text: '说实话，我经常把时间词放错位置，还容易用错量词。',
           pronunciation: 'Shuō shíhuà, wǒ jīngcháng bǎ shíjiāncí fàng cuò wèizhì, hái róngyì yòng cuò liàngcí.',
           hintId: 'Jujur, aku sering salah taruh posisi keterangan waktu dan salah pakai kata bantu bilangan.',
           hintTh: 'พูดตามตรง ฉันมักวางคำบอกเวลาผิดตำแหน่งและใช้ลักษณนามผิดบ่อยๆ',
+          hintEn: 'Honestly, I often misplace time words and mix up measure words.',
           meaningId: 'Jujur, aku sering salah taruh posisi keterangan waktu dan salah pakai kata bantu bilangan.',
           meaningTh: 'พูดตามตรง ฉันมักวางคำบอกเวลาผิดตำแหน่งและใช้ลักษณนามผิดบ่อยๆ',
           isRealtimeAi: false,
@@ -1957,14 +1986,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_zh_3',
           tier: 'rescue',
-          badgeId: 'Jawab + Tanya Balik',
+          badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
           badgeTh: 'ตอบและถามกลับ',
-          tierLabelId: '3 · + Tanya Balik',
+          tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
           tierLabelTh: '3 · + ถามกลับ',
           text: '“不”和“没”的区别老是搞混，你能带我练一下吗？',
           pronunciation: '"Bù" hé "méi" de qūbié lǎoshì gǎohùn, nǐ néng dài wǒ liàn yīxià ma?',
           hintId: 'Bedanya "bù" dan "méi" sering ketukar terus, bisa bantu latih aku sebentar?',
           hintTh: 'ฉันสับสนความแตกต่างระหว่าง "bù" กับ "méi" ตลอดเลย ช่วยพาฉันฝึกหน่อยได้ไหม?',
+          hintEn: 'I keep mixing up "bù" and "méi"—could you drill that with me briefly?',
           meaningId: 'Bedanya "bù" dan "méi" sering ketukar terus, bisa bantu latih aku sebentar?',
           meaningTh: 'ฉันสับสนความแตกต่างระหว่าง "bù" กับ "méi" ตลอดเลย ช่วยพาฉันฝึกหน่อยได้ไหม?',
           isRealtimeAi: false,
@@ -1977,9 +2007,9 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_en_v2_1',
           tier: 'easy',
-          badgeId: 'Singkat & Mudah',
+          badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
           badgeTh: 'สั้นและง่าย',
-          tierLabelId: '1 · Singkat',
+          tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
           tierLabelTh: '1 · สั้นและง่าย',
           text: 'Vocabulary and word order are my biggest obstacles.',
           pronunciation: 'vokebyuleri end werd order ar mai bigest obstakels',
@@ -1987,6 +2017,7 @@ export function buildContextualFallbackCards(params: {
             ? 'คำศัพท์และลำดับคำเป็นอุปสรรคที่ใหญ่ที่สุดของฉัน'
             : 'Kosakata dan urutan kata adalah rintangan terbesarku.',
           hintTh: 'คำศัพท์และลำดับคำเป็นอุปสรรคที่ใหญ่ที่สุดของฉัน',
+          hintEn: '',
           meaningId: th
             ? 'คำศัพท์และลำดับคำเป็นอุปสรรคที่ใหญ่ที่สุดของฉัน'
             : 'Kosakata dan urutan kata adalah rintangan terbesarku.',
@@ -1997,9 +2028,9 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_en_v2_2',
           tier: 'mission',
-          badgeId: 'Alami & Kontekstual',
+          badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
           badgeTh: 'เป็นธรรมชาติ',
-          tierLabelId: '2 · Alami',
+          tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
           tierLabelTh: '2 · เป็นธรรมชาติ',
           text: 'I hesitate a lot when forming questions under pressure.',
           pronunciation: 'ai heziteit e lot wen forming kwescens ander presyer',
@@ -2007,6 +2038,7 @@ export function buildContextualFallbackCards(params: {
             ? 'ฉันลังเลบ่อยมากเวลาสร้างประโยคคำถามตอนกดดัน'
             : 'Aku sering ragu-ragu saat menyusun pertanyaan di bawah tekanan.',
           hintTh: 'ฉันลังเลบ่อยมากเวลาสร้างประโยคคำถามตอนกดดัน',
+          hintEn: '',
           meaningId: th
             ? 'ฉันลังเลบ่อยมากเวลาสร้างประโยคคำถามตอนกดดัน'
             : 'Aku sering ragu-ragu saat menyusun pertanyaan di bawah tekanan.',
@@ -2017,9 +2049,9 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_struggle_en_v2_3',
           tier: 'rescue',
-          badgeId: 'Jawab + Tanya Balik',
+          badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
           badgeTh: 'ตอบและถามกลับ',
-          tierLabelId: '3 · + Tanya Balik',
+          tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
           tierLabelTh: '3 · + ถามกลับ',
           text: "I know the words in my head, but can't speak fast enough. Can you help me?",
           pronunciation: 'ai nou de werds in mai hed, bat kent spik fast inaf. ken yu help mi?',
@@ -2027,6 +2059,7 @@ export function buildContextualFallbackCards(params: {
             ? 'ฉันรู้คำศัพท์ในหัวแต่ยังพูดไม่เร็วพอ คุณช่วยฝึกให้ฉันหน่อยได้ไหม?'
             : 'Aku tahu kata-katanya di kepala tapi belum bisa bicara cepat. Bisa bantu latih aku?',
           hintTh: 'ฉันรู้คำศัพท์ในหัวแต่ยังพูดไม่เร็วพอ คุณช่วยฝึกให้ฉันหน่อยได้ไหม?',
+          hintEn: '',
           meaningId: th
             ? 'ฉันรู้คำศัพท์ในหัวแต่ยังพูดไม่เร็วพอ คุณช่วยฝึกให้ฉันหน่อยได้ไหม?'
             : 'Aku tahu kata-katanya di kepala tapi belum bisa bicara cepat. Bisa bantu latih aku?',
@@ -2040,9 +2073,9 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_struggle_en_1',
         tier: 'easy',
-        badgeId: 'Singkat & Mudah',
+        badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
         badgeTh: 'สั้นและง่าย',
-        tierLabelId: '1 · Singkat',
+        tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
         tierLabelTh: '1 · สั้นและง่าย',
         text: 'Honestly, past tense and prepositions trip me up the most.',
         pronunciation: 'onestli, past tens end prepozisyens trip mi ap de moust',
@@ -2050,6 +2083,7 @@ export function buildContextualFallbackCards(params: {
           ? 'พูดตามตรง รูปอดีตและคำบุพบททำให้ฉันสับสนที่สุด'
           : 'Jujur, past tense dan preposisi yang paling sering bikin aku kepleset.',
         hintTh: 'พูดตามตรง รูปอดีตและคำบุพบททำให้ฉันสับสนที่สุด',
+        hintEn: '',
         meaningId: th
           ? 'พูดตามตรง รูปอดีตและคำบุพบททำให้ฉันสับสนที่สุด'
           : 'Jujur, past tense dan preposisi yang paling sering bikin aku kepleset.',
@@ -2060,9 +2094,9 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_struggle_en_2',
         tier: 'mission',
-        badgeId: 'Alami & Kontekstual',
+        badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
         badgeTh: 'เป็นธรรมชาติ',
-        tierLabelId: '2 · Alami',
+        tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
         tierLabelTh: '2 · เป็นธรรมชาติ',
         text: 'For real, I always mix up when to use "am/is/are" versus action verbs.',
         pronunciation: 'for ril, ai olweiz miks ap wen tu yuz em iz ar verses eksyen verbs',
@@ -2070,6 +2104,7 @@ export function buildContextualFallbackCards(params: {
           ? 'เอาจริงๆ ฉันมักสับสนว่าเมื่อไหร่ควรใช้ am/is/are กับกริยาแท้'
           : 'Serius, aku sering ketukar kapan harus pakai "am/is/are" lawan kata kerja langsung.',
         hintTh: 'เอาจริงๆ ฉันมักสับสนว่าเมื่อไหร่ควรใช้ am/is/are กับกริยาแท้',
+        hintEn: '',
         meaningId: th
           ? 'เอาจริงๆ ฉันมักสับสนว่าเมื่อไหร่ควรใช้ am/is/are กับกริยาแท้'
           : 'Serius, aku sering ketukar kapan harus pakai "am/is/are" lawan kata kerja langsung.',
@@ -2080,9 +2115,9 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_struggle_en_3',
         tier: 'rescue',
-        badgeId: 'Jawab + Tanya Balik',
+        badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
         badgeTh: 'ตอบและถามกลับ',
-        tierLabelId: '3 · + Tanya Balik',
+        tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
         tierLabelTh: '3 · + ถามกลับ',
         text: 'Grammar tenses mess me up when I speak fast. Can we drill that right now?',
         pronunciation: 'gremer tenses mes mi ap wen ai spik fast. ken wi dril det rait nau?',
@@ -2090,6 +2125,7 @@ export function buildContextualFallbackCards(params: {
           ? 'เทนส์ไวยากรณ์ทำให้ฉันรวนเวลาพูดเร็วๆ เราฝึกเรื่องนี้กันตอนนี้เลยได้ไหม?'
           : 'Tenses grammar bikin aku kacau pas ngomong cepat. Bisa kita latih itu sekarang?',
         hintTh: 'เทนส์ไวยากรณ์ทำให้ฉันรวนเวลาพูดเร็วๆ เราฝึกเรื่องนี้กันตอนนี้เลยได้ไหม?',
+        hintEn: '',
         meaningId: th
           ? 'เทนส์ไวยากรณ์ทำให้ฉันรวนเวลาพูดเร็วๆ เราฝึกเรื่องนี้กันตอนนี้เลยได้ไหม?'
           : 'Tenses grammar bikin aku kacau pas ngomong cepat. Bisa kita latih itu sekarang?',
@@ -2120,14 +2156,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_wb_zh_1',
           tier: 'easy',
-          badgeId: 'Singkat & Mudah',
+          badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
           badgeTh: 'สั้นและง่าย',
-          tierLabelId: '1 · Singkat',
+          tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
           tierLabelTh: '1 · สั้นและง่าย',
           text: '好的，我现在就试着造一个句子！',
           pronunciation: 'Hǎo de, wǒ xiànzài jiù shìzhe zào yī gè jùzi!',
           hintId: 'Baik, aku coba buat satu kalimat sekarang juga!',
           hintTh: 'โอเค ฉันจะลองแต่งประโยคดูเดี๋ยวนี้เลย!',
+          hintEn: 'Okay, I will try making a sentence right now!',
           meaningId: 'Baik, aku coba buat satu kalimat sekarang juga!',
           meaningTh: 'โอเค ฉันจะลองแต่งประโยคดูเดี๋ยวนี้เลย!',
           isRealtimeAi: false,
@@ -2136,14 +2173,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_wb_zh_2',
           tier: 'mission',
-          badgeId: 'Alami & Kontekstual',
+          badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
           badgeTh: 'เป็นธรรมชาติ',
-          tierLabelId: '2 · Alami',
+          tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
           tierLabelTh: '2 · เป็นธรรมชาติ',
           text: '我看懂屏幕上的规则了，比如：这是我的中文书。',
           pronunciation: 'Wǒ kàn dǒng píngmù shàng de guīzé le, bǐrú: zhè shì wǒ de Zhōngwén shū.',
           hintId: 'Aku sudah paham aturan di layar, misalnya: ini adalah buku bahasa Mandarinku.',
           hintTh: 'ฉันเข้าใจกฎบนหน้าจอแล้ว เช่น นี่คือหนังสือภาษาจีนของฉัน',
+          hintEn: 'I see the rule on screen now—for example: this is my Chinese book.',
           meaningId: 'Aku sudah paham aturan di layar, misalnya: ini adalah buku bahasa Mandarinku.',
           meaningTh: 'ฉันเข้าใจกฎบนหน้าจอแล้ว เช่น นี่คือหนังสือภาษาจีนของฉัน',
           isRealtimeAi: false,
@@ -2152,14 +2190,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_wb_zh_3',
           tier: 'rescue',
-          badgeId: 'Jawab + Tanya Balik',
+          badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
           badgeTh: 'ตอบและถามกลับ',
-          tierLabelId: '3 · + Tanya Balik',
+          tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
           tierLabelTh: '3 · + ถามกลับ',
           text: '原来是这样用的！你觉得我刚才的发音标准吗？',
           pronunciation: 'Yuánlái shì zhèyàng yòng de! Nǐ juéde wǒ gāngcái de fāyīn biāozhǔn ma?',
           hintId: 'Ternyata begini cara pakainya! Menurutmu pelafalanku barusan sudah tepat?',
           hintTh: 'ใช้แบบนี้เองเหรอ! คุณคิดว่าการออกเสียงของฉันเมื่อกี้ชัดเจนไหม?',
+          hintEn: 'So that is how it is used! How accurate was my pronunciation just now?',
           meaningId: 'Ternyata begini cara pakainya! Menurutmu pelafalanku barusan sudah tepat?',
           meaningTh: 'ใช้แบบนี้เองเหรอ! คุณคิดว่าการออกเสียงของฉันเมื่อกี้ชัดเจนไหม?',
           isRealtimeAi: false,
@@ -2172,14 +2211,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_wb_ja_1',
           tier: 'easy',
-          badgeId: 'Singkat & Mudah',
+          badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
           badgeTh: 'สั้นและง่าย',
-          tierLabelId: '1 · Singkat',
+          tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
           tierLabelTh: '1 · สั้นและง่าย',
           text: 'わかりました、今すぐ文を作ってみます！',
           pronunciation: 'Wakarimashita, ima sugu bun o tsukutte mimasu!',
           hintId: 'Mengerti, aku coba buat kalimatnya sekarang juga!',
           hintTh: 'เข้าใจแล้ว ฉันจะลองแต่งประโยคดูเดี๋ยวนี้เลย!',
+          hintEn: 'Got it, I will try making a sentence right now!',
           meaningId: 'Mengerti, aku coba buat kalimatnya sekarang juga!',
           meaningTh: 'เข้าใจแล้ว ฉันจะลองแต่งประโยคดูเดี๋ยวนี้เลย!',
           isRealtimeAi: false,
@@ -2188,14 +2228,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_wb_ja_2',
           tier: 'mission',
-          badgeId: 'Alami & Kontekstual',
+          badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
           badgeTh: 'เป็นธรรมชาติ',
-          tierLabelId: '2 · Alami',
+          tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
           tierLabelTh: '2 · เป็นธรรมชาติ',
           text: '画面の解説でスッキリ分かりました、練習してみますね。',
           pronunciation: 'Gamen no kaisetsu de sukkiri wakarimashita, renshuu shite mimasu ne.',
           hintId: 'Penjelasan di layar bikin langsung paham, aku coba latihannya ya.',
           hintTh: 'คำอธิบายบนหน้าจอทำให้เข้าใจชัดเจนเลย เดี๋ยวลองฝึกดูนะ',
+          hintEn: 'The on-screen breakdown made it clear—I will practice it now.',
           meaningId: 'Penjelasan di layar bikin langsung paham, aku coba latihannya ya.',
           meaningTh: 'คำอธิบายบนหน้าจอทำให้เข้าใจชัดเจนเลย เดี๋ยวลองฝึกดูนะ',
           isRealtimeAi: false,
@@ -2204,14 +2245,15 @@ export function buildContextualFallbackCards(params: {
         {
           id: 'ctx_wb_ja_3',
           tier: 'rescue',
-          badgeId: 'Jawab + Tanya Balik',
+          badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
           badgeTh: 'ตอบและถามกลับ',
-          tierLabelId: '3 · + Tanya Balik',
+          tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
           tierLabelTh: '3 · + ถามกลับ',
           text: 'なるほど、そういう使い分けなんですね！もう一つ例文を教えてくれますか？',
           pronunciation: 'Naruhodo, sou iu tsukaiwake nan desu ne! Mou hitotsu reibun o oshiete kuremasu ka?',
           hintId: 'Begitu toh perbedaannya! Bisa kasih satu contoh kalimat lagi?',
           hintTh: 'อ๋อ แยกใช้อย่างนี้นี่เอง! ช่วยยกตัวอย่างประโยคอีกสักอันได้ไหม?',
+          hintEn: 'Ah, so that is the distinction! Could you share one more example sentence?',
           meaningId: 'Begitu toh perbedaannya! Bisa kasih satu contoh kalimat lagi?',
           meaningTh: 'อ๋อ แยกใช้อย่างนี้นี่เอง! ช่วยยกตัวอย่างประโยคอีกสักอันได้ไหม?',
           isRealtimeAi: false,
@@ -2223,14 +2265,15 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_wb_en_1',
         tier: 'easy',
-        badgeId: 'Singkat & Mudah',
+        badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy',
         badgeTh: 'สั้นและง่าย',
-        tierLabelId: '1 · Singkat',
+        tierLabelId: isIdLoc ? '1 · Singkat' : '1 · Short',
         tierLabelTh: '1 · สั้นและง่าย',
         text: 'Got it, let me try writing a sentence right now!',
         pronunciation: 'got it, let mi trai raiting e sentens rait nau!',
         hintId: 'Mengerti, coba aku tulis kalimatnya sekarang!',
         hintTh: 'เข้าใจแล้ว ขอฉันลองเขียนประโยคดูเดี๋ยวนี้เลย!',
+        hintEn: '',
         meaningId: 'Mengerti, coba aku tulis kalimatnya sekarang!',
         meaningTh: 'เข้าใจแล้ว ขอฉันลองเขียนประโยคดูเดี๋ยวนี้เลย!',
         isRealtimeAi: false,
@@ -2239,14 +2282,15 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_wb_en_2',
         tier: 'mission',
-        badgeId: 'Alami & Kontekstual',
+        badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual',
         badgeTh: 'เป็นธรรมชาติ',
-        tierLabelId: '2 · Alami',
+        tierLabelId: isIdLoc ? '2 · Alami' : '2 · Natural',
         tierLabelTh: '2 · เป็นธรรมชาติ',
         text: 'The formula on screen makes total sense, I see the difference now.',
         pronunciation: 'de formula on skrin meiks toutal sens, ai si de diferens nau',
         hintId: 'Rumus di layar masuk akal banget, sekarang aku paham bedanya.',
         hintTh: 'สูตรบนหน้าจอเข้าใจง่ายมาก ตอนนี้ฉันเห็นความแตกต่างแล้ว',
+        hintEn: '',
         meaningId: 'Rumus di layar masuk akal banget, sekarang aku paham bedanya.',
         meaningTh: 'สูตรบนหน้าจอเข้าใจง่ายมาก ตอนนี้ฉันเห็นความแตกต่างแล้ว',
         isRealtimeAi: false,
@@ -2255,14 +2299,15 @@ export function buildContextualFallbackCards(params: {
       {
         id: 'ctx_wb_en_3',
         tier: 'rescue',
-        badgeId: 'Jawab + Tanya Balik',
+        badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up',
         badgeTh: 'ตอบและถามกลับ',
-        tierLabelId: '3 · + Tanya Balik',
+        tierLabelId: isIdLoc ? '3 · + Tanya Balik' : '3 · + Follow-up',
         tierLabelTh: '3 · + ถามกลับ',
         text: 'That clears it up! Can you give me one more situation to test it?',
         pronunciation: 'det klirs it ap! ken yu giv mi wan mor sicuesyen tu test it?',
         hintId: 'Itu bikin jelas! Bisa kasih satu situasi lagi buat mengujinya?',
         hintTh: 'ชัดเจนเลย! ช่วยยกอีกสักสถานการณ์ให้ฉันลองทดสอบหน่อยได้ไหม?',
+        hintEn: '',
         meaningId: 'Itu bikin jelas! Bisa kasih satu situasi lagi buat mengujinya?',
         meaningTh: 'ชัดเจนเลย! ช่วยยกอีกสักสถานการณ์ให้ฉันลองทดสอบหน่อยได้ไหม?',
         isRealtimeAi: false,
@@ -2999,9 +3044,9 @@ export function buildContextualFallbackCards(params: {
     badgeTh: string;
     row: CardRow;
   }> = [
-    { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย', row: tpl.easy },
-    { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ', row: tpl.mission },
-    { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ', row: tpl.rescue },
+    { tier: 'easy', badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy', badgeTh: 'สั้นและง่าย', row: tpl.easy },
+    { tier: 'mission', badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual', badgeTh: 'เป็นธรรมชาติ', row: tpl.mission },
+    { tier: 'rescue', badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up', badgeTh: 'ตอบและถามกลับ', row: tpl.rescue },
   ];
 
   const stamp = Date.now();
@@ -3052,8 +3097,9 @@ export function buildContextualFallbackCards(params: {
     badgeTh: m.badgeTh,
     text: m.row[0],
     pronunciation: sanitizePron(m.row[1], params.targetLang, m.row[0]),
-    hintId: sanitizeHint(m.row[2], params.targetLang),
+    hintId: isIdLoc ? sanitizeHint(m.row[2], params.targetLang) : '',
     hintTh: sanitizeHint(th ? m.row[3] : m.row[2], params.targetLang),
+    hintEn: '',
     isRealtimeAi: false,
     isOfflineFallback: true,
     wordBreakdown: [],
@@ -3063,13 +3109,15 @@ export function buildContextualFallbackCards(params: {
 function normalizeServerCopilotCards(
   rawList: unknown,
   targetLang: TargetLang,
-  allowBilingualSsw = false
+  allowBilingualSsw = false,
+  locale: LearnerLocale = 'en'
 ): BeginnerReplyCard[] {
   if (!Array.isArray(rawList)) return [];
+  const isIdLoc = locale === 'id';
   const defaultMeta: Array<{ tier: 'easy' | 'mission' | 'rescue'; badgeId: string; badgeTh: string }> = [
-    { tier: 'easy', badgeId: 'Singkat & Mudah', badgeTh: 'สั้นและง่าย' },
-    { tier: 'mission', badgeId: 'Alami & Kontekstual', badgeTh: 'เป็นธรรมชาติ' },
-    { tier: 'rescue', badgeId: 'Jawab + Tanya Balik', badgeTh: 'ตอบและถามกลับ' },
+    { tier: 'easy', badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy', badgeTh: 'สั้นและง่าย' },
+    { tier: 'mission', badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual', badgeTh: 'เป็นธรรมชาติ' },
+    { tier: 'rescue', badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up', badgeTh: 'ตอบและถามกลับ' },
   ];
   const out: BeginnerReplyCard[] = [];
   for (let i = 0; i < rawList.length && out.length < 3; i++) {
@@ -3085,6 +3133,9 @@ function normalizeServerCopilotCards(
 
     const rawHintId = stripEmojisAndEmotWords(String(item.hintId || item.translationId || item.hint || '')).trim();
     const rawHintTh = stripEmojisAndEmotWords(String(item.hintTh || item.translationTh || item.hint || rawHintId)).trim();
+    const rawHintEn = stripEmojisAndEmotWords(
+      String(item.hintEn || item.translationEn || (!isIdLoc && locale !== 'th' ? item.hint : '') || '')
+    ).trim();
 
     const sanitizeHint = (h: string) => {
       return h
@@ -3120,6 +3171,7 @@ function normalizeServerCopilotCards(
       pronunciation: safePron,
       hintId: sanitizeHint(rawHintId),
       hintTh: sanitizeHint(rawHintTh),
+      hintEn: sanitizeHint(rawHintEn),
       isRealtimeAi: true,
       wordBreakdown: [],
     });
@@ -3170,7 +3222,7 @@ export async function requestRealtimeCopilotAssist(params: {
   const popupKey = params.activePopupTargetText
     ? `popup:${params.activePopupMode || ''}:${params.activePopupTargetText.slice(0, 48).toLowerCase()}::`
     : '';
-  const cacheKey = `${params.targetLang}::${popupKey}${isSswSensei ? 'ssw::' : isCambridge ? `cambridge_${cefrLevel}::` : ''}${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
+  const cacheKey = `${params.locale || 'en'}::${params.targetLang}::${popupKey}${isSswSensei ? 'ssw::' : isCambridge ? `cambridge_${cefrLevel}::` : ''}${cleanAiText.toLowerCase()}::${(params.lastUserText || '').trim().toLowerCase()}`;
   if (variationSeed === 0 && (!params.excludeTexts || params.excludeTexts.length === 0)) {
     const cached = _copilotTurnCache.get(cacheKey);
     if (cached && cached.replies.length > 0) return cached;
@@ -3292,12 +3344,12 @@ export async function requestRealtimeCopilotAssist(params: {
           .replace(/```\s*$/i, '')
           .trim();
         const parsed = raw ? JSON.parse(raw) : null;
-        const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang, isSswSensei);
+        const cards = normalizeServerCopilotCards(parsed?.replies, params.targetLang, isSswSensei, params.locale);
         const finalCards = isCambridge && cards.length > 0
           ? cards.slice(0, 1).map((c) => ({
               ...c,
               tier: 'cambridge_model' as any,
-              badgeId: c.badgeId || `🎯 Jawaban Terbaik (Level ${cefrLevel})`,
+              badgeId: c.badgeId || (params.locale === 'id' ? `🎯 Jawaban Terbaik (Level ${cefrLevel})` : `🎯 Best Answer (Level ${cefrLevel})`),
               badgeTh: c.badgeTh || `🎯 คำตอบแนะนำ (Level ${cefrLevel})`,
               tierLabelId: `Level ${cefrLevel} Model Answer`,
               tierLabelTh: `Level ${cefrLevel} Model Answer`,
@@ -3307,7 +3359,7 @@ export async function requestRealtimeCopilotAssist(params: {
           const meaning = stripEmojisAndEmotWords(String(parsed?.aiMeaning || '')).trim();
           const result: RealtimeCopilotAssistResult = {
             ok: true, source: 'ai-realtime',
-            aiMeaningId: params.locale === 'id' ? meaning : '',
+            aiMeaningId: params.locale !== 'th' ? meaning : '',
             aiMeaningTh: params.locale === 'th' ? meaning : '',
             replies: finalCards, cards: finalCards,
           };
@@ -3372,12 +3424,12 @@ export async function requestRealtimeCopilotAssist(params: {
       }
       if (res.ok) {
         const data = await res.json();
-        const cards = normalizeServerCopilotCards(data?.replies || data?.suggestions, params.targetLang, isSswSensei);
+        const cards = normalizeServerCopilotCards(data?.replies || data?.suggestions, params.targetLang, isSswSensei, params.locale);
         const finalCards = isCambridge && cards.length > 0
           ? cards.slice(0, 1).map((c) => ({
               ...c,
               tier: 'cambridge_model' as any,
-              badgeId: c.badgeId || `🎯 Jawaban Terbaik (Level ${cefrLevel})`,
+              badgeId: c.badgeId || (params.locale === 'id' ? `🎯 Jawaban Terbaik (Level ${cefrLevel})` : `🎯 Best Answer (Level ${cefrLevel})`),
               badgeTh: c.badgeTh || `🎯 คำตอบแนะนำ (Level ${cefrLevel})`,
               tierLabelId: `Level ${cefrLevel} Model Answer`,
               tierLabelTh: `Level ${cefrLevel} Model Answer`,
@@ -5512,10 +5564,10 @@ export async function resolveAiReply(
           const transId = stripEmojisAndEmotWords(String(data?.aiReplyTranslationId || '')).trim();
           const transTh = stripEmojisAndEmotWords(String(data?.aiReplyTranslationTh || '')).trim();
           const rtCards = clampCambridgeCards(
-            normalizeServerCopilotCards(data?.replies, params.targetLang, isSswSensei)
+            normalizeServerCopilotCards(data?.replies, params.targetLang, isSswSensei, params.locale)
           );
           if (rtCards.length > 0) {
-            const cacheKey = `${params.targetLang}::${partnerReply.toLowerCase()}::${params.text.trim().toLowerCase()}`;
+            const cacheKey = `${params.locale || 'en'}::${params.targetLang}::${partnerReply.toLowerCase()}::${params.text.trim().toLowerCase()}`;
             copilotCacheSet(cacheKey, {
               ok: true,
               source: 'ai-realtime',
@@ -5696,7 +5748,7 @@ export async function resolveAiReply(
         const geminiTransTh = stripEmojisAndEmotWords(parsed?.aiReplyTranslationTh || '');
         if (geminiReply && replyLooksLikeTargetLanguage(geminiReply, params.targetLang)) {
           const rtCards = clampCambridgeCards(
-            normalizeServerCopilotCards(parsed?.replies, params.targetLang, isSswSensei)
+            normalizeServerCopilotCards(parsed?.replies, params.targetLang, isSswSensei, params.locale)
           );
           options?.onTextReady?.(
             geminiReply,

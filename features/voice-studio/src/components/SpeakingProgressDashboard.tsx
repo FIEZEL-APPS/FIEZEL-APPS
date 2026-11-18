@@ -24,7 +24,8 @@ function formatSpeakingDuration(totalSeconds: number, locale: LearnerLocale): st
   if (locale === 'th') {
     return `${mins}น. ${String(remSec).padStart(2, '0')}ว.`;
   }
-  return `${mins}m ${String(remSec).padStart(2, '0')}d`;
+  const secSuffix = locale === 'id' ? 'd' : 's';
+  return `${mins}m ${String(remSec).padStart(2, '0')}${secSuffix}`;
 }
 
 export const SpeakingProgressDashboard: React.FC<SpeakingProgressDashboardProps> = ({
@@ -59,7 +60,7 @@ export const SpeakingProgressDashboard: React.FC<SpeakingProgressDashboardProps>
       {/* Minimal Header + Inline Legend */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-sm font-bold text-[#241A11]">
-          {locale === 'th' ? 'สถิติการพูดในเซสชันนี้' : 'Ringkasan Progres Bicara'}
+          {t(locale, 'dash.title')}
         </h2>
         <div className="flex items-center gap-3 text-xs text-[#6E5E47]">
           <span className="inline-flex items-center gap-1.5">

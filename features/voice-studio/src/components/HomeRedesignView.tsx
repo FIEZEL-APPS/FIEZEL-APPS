@@ -20,6 +20,7 @@ import {
   TargetLang,
 } from '../types/voiceCall';
 import { checkPrerequisiteStatus } from '../lib/braincore';
+import { t, scenarioMetaForLocale, vocabMeaningForLocale } from '../lib/i18n';
 import {
   FiezelCornerOrnament,
   FiezelNeuralConstellation,
@@ -91,17 +92,13 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
 
   const langLabel =
     targetLang === 'en'
-      ? locale === 'th'
-        ? 'ภาษาอังกฤษ · English Studio'
-        : 'Bahasa Inggris · English Studio'
-      : locale === 'th'
-        ? 'ภาษาญี่ปุ่น · Japanese Studio'
-        : 'Bahasa Jepang · Japanese Studio';
+      ? t(locale, 'home.studioEn')
+      : targetLang === 'zh'
+        ? t(locale, 'home.studioZh')
+        : t(locale, 'home.studioJa');
 
-  const activeGrammarFocus =
-    locale === 'th'
-      ? activeScenario.competencyNameTh
-      : activeScenario.competencyNameId;
+  const activeMeta = scenarioMetaForLocale(locale, activeScenario);
+  const activeGrammarFocus = activeMeta.competency;
 
   const cleanLevelLabel = (lvl: string) =>
     String(lvl || '')
@@ -113,7 +110,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
       {/* 1. SAPAAN EDITORIAL & RITME HARIAN KHAS FIEZEL */}
       <section
         className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch"
-        aria-label="Sapaan dan Ritme Harian"
+        aria-label={t(locale, 'home.ariaDailyRhythm')}
       >
         <div className="lg:col-span-7 fz-studio-card rounded-3xl p-6 flex flex-col justify-between gap-4 relative overflow-hidden">
           <FiezelCornerOrnament className="absolute -right-2 -top-2 w-28 h-28 opacity-80" />
@@ -123,14 +120,10 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <span>{langLabel}</span>
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#241A11] leading-tight tracking-tight">
-              {locale === 'th'
-                ? 'พร้อมฝึกพูดกับ Mochi วันนี้หรือยัง?'
-                : 'Siap Bicara Lebih Lancar Bersama Mochi?'}
+              {t(locale, 'home.readyTitle')}
             </h1>
             <p className="text-sm text-[#6E5E47] leading-relaxed">
-              {locale === 'th'
-                ? 'ฝึกสนทนาจริงกับ Mochi พร้อมคำแปลเรียลไทม์และตัวช่วยตอบสำหรับผู้เริ่มต้น'
-                : 'Latihan telepon interaktif bersama Mochi dilengkapi terjemahan langsung, panduan cara baca, dan evaluasi Braincore.'}
+              {t(locale, 'home.readyDesc')}
             </p>
           </div>
 
@@ -144,7 +137,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   : 'bg-[#FFF3DC] text-[#6E5E47] hover:text-[#241A11] border border-[#F0E4CF]'
               }`}
             >
-              {locale === 'th' ? 'ทั้งหมด' : 'Semua Jalur'}
+              {t(locale, 'home.filterAll')}
             </button>
             <button
               type="button"
@@ -155,7 +148,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   : 'bg-[#FFF3DC] text-[#6E5E47] hover:text-[#241A11] border border-[#F0E4CF]'
               }`}
             >
-              {locale === 'th' ? 'พูดคุยอิสระ (Free Talk)' : 'Free Talk (Bebas)'}
+              {t(locale, 'home.filterFree')}
             </button>
             <button
               type="button"
@@ -166,7 +159,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   : 'bg-[#FFF3DC] text-[#6E5E47] hover:text-[#241A11] border border-[#F0E4CF]'
               }`}
             >
-              {locale === 'th' ? 'ชีวิตประจำวัน' : 'Percakapan Harian'}
+              {t(locale, 'home.filterDaily')}
             </button>
             <button
               type="button"
@@ -177,7 +170,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   : 'bg-[#FFF3DC] text-[#6E5E47] hover:text-[#241A11] border border-[#F0E4CF]'
               }`}
             >
-              {locale === 'th' ? 'เรียนและงาน' : 'Perkenalan & Opini'}
+              {t(locale, 'home.filterAcademic')}
             </button>
           </div>
         </div>
@@ -189,7 +182,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <div
                 className="relative w-14 h-14 shrink-0"
                 role="img"
-                aria-label={`${completedToday} dari ${dailyGoal} target bicara hari ini`}
+                aria-label={`${completedToday} / ${dailyGoal} ${t(locale, 'home.goalAriaSuffix')}`}
               >
                 <svg viewBox="0 0 56 56" className="w-14 h-14 -rotate-90" aria-hidden="true">
                   <circle
@@ -218,16 +211,12 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
 
               <div>
                 <div className="text-sm font-bold text-[#241A11]">
-                  {locale === 'th' ? 'เป้าหมายการพูดวันนี้' : 'Target Bicara Harian'}
+                  {t(locale, 'home.dailyGoal')}
                 </div>
                 <p className="text-xs text-[#6E5E47] mt-0.5 leading-snug">
                   {remainingToday > 0
-                    ? locale === 'th'
-                      ? `อีก ${remainingToday} รอบเพื่อรักษาจังหวะ`
-                      : `${remainingToday} giliran bicara lagi hari ini`
-                    : locale === 'th'
-                      ? 'บรรลุเป้าหมายวันนี้แล้ว!'
-                      : 'Target harian telah tercapai!'}
+                    ? `${remainingToday} ${t(locale, 'home.turnsLeftSuffix')}`
+                    : t(locale, 'home.goalDone')}
                 </p>
               </div>
             </div>
@@ -238,14 +227,14 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                 <span>{streakDays}</span>
               </span>
               <span className="text-[11px] font-bold text-[#8C6D1F]">
-                {locale === 'th' ? 'วันต่อเนื่อง' : 'Hari Runtun'}
+                {t(locale, 'home.streakDays')}
               </span>
             </div>
           </div>
 
           <div className="pt-3 border-t border-[#F0E4CF] flex items-center justify-between text-xs">
             <span className="text-[#6E5E47] font-semibold">
-              {locale === 'th' ? 'ความแม่นยำเฉลี่ย (Braincore)' : 'Penguasaan Aktif (Braincore)'}
+              {t(locale, 'home.accuracy')}
             </span>
             <span className="font-mono font-bold text-[#8C2233] tabular-nums">
               {Math.round(currentMasteryP * 100)}% Mastery
@@ -254,9 +243,9 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
         </div>
       </section>
 
-      {/* 2. KARTU HERO REKOMENDASI PAW (Solar Gold + Maroon + Neural Constellation Ornament) */}
+      {/* 2. KARTU HERO REKOMENDASI MOCHI */}
       <section
-        aria-label="Lanjut belajar"
+        aria-label={t(locale, 'home.ariaContinue')}
         data-testid="home-bright-mind-card"
         className="relative overflow-hidden rounded-3xl p-6 sm:p-7 bg-gradient-to-br from-[#FFF3C4] via-[#FFF9EE] to-[#FFF3DC] border-2 border-[#FFC700] text-[#241A11] shadow-[0_16px_40px_-12px_rgba(230,168,0,0.28)]"
       >
@@ -271,23 +260,21 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8C2233] text-[#FFFBF3] text-xs font-bold tracking-wide shadow-xs">
               <FiezelSparkleOrnament className="w-4 h-4" />
               <span>
-                {locale === 'th'
-                  ? `แนะนำโดย Mochi · ระดับ ${cleanLevelLabel(activeScenario.level)}`
-                  : `Pilihan Utama Mochi · Level ${cleanLevelLabel(activeScenario.level)}`}
+                {`${t(locale, 'home.mochiPickPrefix')} · ${t(locale, 'ui.levelWord')} ${cleanLevelLabel(activeScenario.level)}`}
               </span>
             </div>
 
             <h2 className="font-display text-xl sm:text-2xl font-bold text-[#241A11] leading-snug">
-              {locale === 'th' ? activeScenario.titleTh : activeScenario.titleId}
+              {activeMeta.title}
             </h2>
 
             <p className="text-sm text-[#6E5E47] leading-relaxed max-w-2xl">
-              {locale === 'th' ? activeScenario.situationTh : activeScenario.situationId}
+              {activeMeta.situation}
             </p>
 
             {/* Preview Pertanyaan Pembuka Mochi */}
             <div className="inline-flex flex-wrap items-center gap-2 bg-white/90 border border-[#F0E4CF] fz-solar-ribbon rounded-2xl px-3.5 py-2 text-xs text-[#241A11] shadow-2xs">
-              <span className="font-bold text-[#8C2233]">Pertanyaan Pembuka Mochi:</span>
+              <span className="font-bold text-[#8C2233]">{t(locale, 'home.openingPromptLabel')}</span>
               <span className="font-semibold italic">"{activeScenario.openingLine}"</span>
             </div>
           </div>
@@ -300,9 +287,9 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                 className="w-14 h-14 rounded-xl bg-[#FFF3C4] p-1 object-contain border border-[#FFC700]"
               />
               <div>
-                <div className="text-xs font-bold text-[#241A11]">Mochi si Teman Bicara</div>
+                <div className="text-xs font-bold text-[#241A11]">{t(locale, 'home.mochiHelperTitle')}</div>
                 <div className="text-[11px] text-[#2E8B69] font-bold">
-                  ● Siap Telepon & Bantu Jawab
+                  {t(locale, 'home.mochiHelperSub')}
                 </div>
               </div>
             </div>
@@ -314,26 +301,22 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               className="px-6 py-3.5 rounded-2xl btn-maroon-tactile font-bold text-sm flex items-center justify-center gap-2.5 cursor-pointer"
             >
               <Play className="w-4 h-4 fill-[#FFC700] text-[#FFC700]" />
-              <span>
-                {locale === 'th' ? 'เริ่มคุยกับ Mochi ตอนนี้' : 'Mulai Telepon Bersama Mochi'}
-              </span>
+              <span>{t(locale, 'home.startCallBtn')}</span>
               <ArrowRight className="w-4 h-4 text-[#FFC700]" />
             </button>
           </div>
         </div>
       </section>
 
-      {/* 3. STUDIO FOKUS HARI INI (4 Kartu Taktil Khas FIEZEL) */}
-      <section aria-label="Pilih fokus" className="space-y-3">
+      {/* 3. STUDIO FOKUS HARI INI */}
+      <section aria-label={t(locale, 'home.ariaPickFocus')} className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="fz-solar-ribbon pl-3">
             <h2 className="text-base sm:text-lg font-bold text-[#241A11]">
-              {locale === 'th' ? 'สตูดิโอฝึกทักษะเสริม' : 'Pilih Fokus Hari Ini'}
+              {t(locale, 'home.pickFocusTitle')}
             </h2>
             <p className="text-xs text-[#6E5E47]">
-              {locale === 'th'
-                ? 'ทบทวนคำศัพท์และรูปประโยคก่อนเริ่มโทรจริง'
-                : 'Pelajari kosakata kunci atau dengarkan contoh pelafalan sebelum telepon dimulai'}
+              {t(locale, 'home.pickFocusSub')}
             </p>
           </div>
           <button
@@ -342,7 +325,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#F0E4CF] hover:border-[#FFC700] text-xs font-bold text-[#8C2233] cursor-pointer shadow-2xs"
           >
             <Compass className="w-3.5 h-3.5" />
-            <span>{locale === 'th' ? 'ดูแผนที่การเรียน' : 'Peta Braincore'}</span>
+            <span>{t(locale, 'home.braincoreMap')}</span>
           </button>
         </div>
 
@@ -356,9 +339,9 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <Phone className="w-5 h-5" />
             </span>
             <div className="mt-3">
-              <div className="text-sm font-bold text-[#241A11]">Telepon Live Fiezel</div>
+              <div className="text-sm font-bold text-[#241A11]">{t(locale, 'home.liveCallTitle')}</div>
               <div className="text-xs text-[#6E5E47] mt-0.5">
-                {scenariosForLang.length} skenario aktif
+                {scenariosForLang.length} {t(locale, 'home.activeScenarios')}
               </div>
             </div>
           </button>
@@ -374,9 +357,9 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <BookOpen className="w-5 h-5" />
             </span>
             <div className="mt-3">
-              <div className="text-sm font-bold text-[#241A11]">Vocabulary</div>
+              <div className="text-sm font-bold text-[#241A11]">{t(locale, 'home.studioVocabTile')}</div>
               <div className="text-xs text-[#6E5E47] mt-0.5">
-                {totalVocabCount} kata inti prasyarat
+                {totalVocabCount} {t(locale, 'home.vocabCoreSuffix')}
               </div>
             </div>
           </button>
@@ -392,7 +375,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <MessageSquare className="w-5 h-5" />
             </span>
             <div className="mt-3">
-              <div className="text-sm font-bold text-[#241A11]">Grammar</div>
+              <div className="text-sm font-bold text-[#241A11]">{t(locale, 'home.studioGrammarTile')}</div>
               <div className="text-xs text-[#6E5E47] mt-0.5">{activeGrammarFocus}</div>
             </div>
           </button>
@@ -408,14 +391,14 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <Headphones className="w-5 h-5" />
             </span>
             <div className="mt-3">
-              <div className="text-sm font-bold text-[#241A11]">Shadowing Suara</div>
-              <div className="text-xs text-[#6E5E47] mt-0.5">Dengar & tirukan lafal Mochi</div>
+              <div className="text-sm font-bold text-[#241A11]">{t(locale, 'home.studioShadowTile')}</div>
+              <div className="text-xs text-[#6E5E47] mt-0.5">{t(locale, 'home.studioShadowSub')}</div>
             </div>
           </button>
         </div>
       </section>
 
-      {/* PANEL STUDIO INTERAKTIF (VOCAB / GRAMMAR / SHADOWING) */}
+      {/* PANEL STUDIO INTERAKTIF */}
       {activeStudio !== 'none' && (
         <section
           data-testid="home-interactive-studio"
@@ -425,20 +408,20 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             <div>
               <div className="text-[11px] font-bold uppercase tracking-wider text-[#8C2233]">
                 {activeStudio === 'vocab'
-                  ? 'STUDIO KOSAKATA PRASYARAT'
+                  ? t(locale, 'home.panelVocabLabel')
                   : activeStudio === 'grammar'
-                    ? 'STUDIO POLA TATA BAHASA'
-                    : 'STUDIO SHADOWING PELAFALAN'}
+                    ? t(locale, 'home.panelGrammarLabel')
+                    : t(locale, 'home.panelShadowLabel')}
               </div>
               <h3 className="text-base font-bold text-[#241A11]">
-                {locale === 'th' ? activeScenario.titleTh : activeScenario.titleId}
+                {activeMeta.title}
               </h3>
             </div>
             <button
               type="button"
               onClick={() => setActiveStudio('none')}
               className="w-9 h-9 rounded-xl bg-[#FFF3DC] hover:bg-[#FFF3C4] flex items-center justify-center text-[#241A11] cursor-pointer"
-              aria-label="Tutup studio"
+              aria-label={t(locale, 'home.closeStudio')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -455,14 +438,14 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                     <div>
                       <div className="text-sm font-bold text-[#241A11]">{v.term}</div>
                       <div className="text-xs text-[#6E5E47] mt-0.5">
-                        {locale === 'th' ? v.meaningTh : v.meaningId}
+                        {vocabMeaningForLocale(locale, v)}
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => onSpeakSample(v.term)}
                       className="w-9 h-9 rounded-xl bg-white border border-[#F0E4CF] hover:border-[#FFC700] text-[#8C2233] flex items-center justify-center shrink-0 cursor-pointer"
-                      aria-label={`Dengarkan ${v.term}`}
+                      aria-label={`${t(locale, 'home.listenTermPrefix')} ${v.term}`}
                     >
                       <Volume2 className="w-4 h-4" />
                     </button>
@@ -476,14 +459,14 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   className="px-4 py-2.5 rounded-xl bg-[#FFF3DC] hover:bg-[#FFF3C4] border border-[#F0E4CF] text-xs font-bold text-[#241A11] flex items-center gap-1.5 cursor-pointer"
                 >
                   <Unlock className="w-3.5 h-3.5 text-[#2E8B69]" />
-                  <span>Tandai Kosakata Dikuasai (Braincore BKT)</span>
+                  <span>{t(locale, 'home.markVocabMastered')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => onSelectScenarioAndCall(activeScenario.id)}
                   className="px-4 py-2.5 rounded-xl btn-sun-tactile text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>Latih di Panggilan Suara</span>
+                  <span>{t(locale, 'home.practiceInCall')}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -494,18 +477,15 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             <div className="space-y-3">
               <div className="bg-[#FFF3C4]/60 border border-[#F0E4CF] fz-solar-ribbon rounded-2xl p-4 space-y-1.5">
                 <div className="text-xs font-bold text-[#8C2233]">
-                  Fokus Kompetensi: {activeGrammarFocus}
+                  {t(locale, 'home.competencyFocusLabel')} {activeGrammarFocus}
                 </div>
                 <p className="text-sm text-[#241A11] leading-relaxed">
-                  {(locale === 'th'
-                    ? activeScenario.missionGoalsTh
-                    : activeScenario.missionGoalsId
-                  ).join(' · ')}
+                  {activeMeta.missionGoals.join(' · ')}
                 </p>
               </div>
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-[#6E5E47]">
-                  Klik kalimat di bawah untuk mendengar pelafalan natural:
+                  {t(locale, 'home.tapListenNatural')}
                 </div>
                 {activeScenario.sampleUtterances
                   .filter((s) => s.intent === 'accurate')
@@ -529,15 +509,15 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
           {activeStudio === 'shadowing' && (
             <div className="bg-[#FFF9EE] border border-[#F0E4CF] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
-                <div className="text-xs font-bold text-[#8C2233]">Kalimat Pembuka Mochi</div>
+                <div className="text-xs font-bold text-[#8C2233]">{t(locale, 'home.mochiOpeningSentence')}</div>
                 <p className="text-base font-bold text-[#241A11]">
                   "{activeScenario.openingLine}"
                 </p>
-                <p className="text-xs text-[#6E5E47]">
-                  {locale === 'th'
-                    ? activeScenario.openingTranslationTh
-                    : activeScenario.openingTranslationId}
-                </p>
+                {activeMeta.openingTranslation && (
+                  <p className="text-xs text-[#6E5E47]">
+                    {activeMeta.openingTranslation}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
@@ -545,7 +525,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                 className="px-4 py-2.5 rounded-xl btn-sun-tactile text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
               >
                 <Volume2 className="w-4 h-4" />
-                <span>Dengarkan Lafal</span>
+                <span>{t(locale, 'home.listenPronBtn')}</span>
               </button>
             </div>
           )}
@@ -553,13 +533,13 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
       )}
 
       {/* 4. JALUR SKENARIO PERCAKAPAN */}
-      <section aria-label="Jalur skenario percakapan" className="space-y-3">
+      <section aria-label={t(locale, 'home.ariaScenarioTrack')} className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base sm:text-lg font-bold text-[#241A11] fz-solar-ribbon pl-3">
-            {locale === 'th' ? 'เลือกสถานการณ์สนทนา' : 'Jalur Skenario Percakapan'}
+            {t(locale, 'home.pickScenarioTitle')}
           </h2>
           <span className="text-xs font-bold text-[#6E5E47]">
-            {filteredScenarios.length} skenario tersedia
+            {filteredScenarios.length} {t(locale, 'home.scenariosAvailSuffix')}
           </span>
         </div>
 
@@ -571,6 +551,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               ((scenComp?.pMasteryDecayed ?? scenComp?.pMastery) ?? 0.65) * 100
             );
             const isSelected = scen.id === activeScenario.id;
+            const scenMeta = scenarioMetaForLocale(locale, scen);
 
             return (
               <div
@@ -583,9 +564,9 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   <div className="flex items-center justify-between gap-2 text-xs">
                     <span className="fz-badge-paw">
                       <FiezelPawStamp className="w-3 h-3 text-[#8C2233]" />
-                      <span>Level {cleanLevelLabel(scen.level)}</span>
+                      <span>{t(locale, 'ui.levelWord')} {cleanLevelLabel(scen.level)}</span>
                       <span>·</span>
-                      <span>{locale === 'th' ? scen.competencyNameTh : scen.competencyNameId}</span>
+                      <span>{scenMeta.competency}</span>
                     </span>
                     <span className="font-mono tabular-nums font-bold text-[#8C2233]">
                       {scenMastery}% Mastery
@@ -593,11 +574,11 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                   </div>
 
                   <h3 className="text-base font-bold text-[#241A11]">
-                    {locale === 'th' ? scen.titleTh : scen.titleId}
+                    {scenMeta.title}
                   </h3>
 
                   <p className="text-xs text-[#6E5E47] line-clamp-2 leading-relaxed">
-                    {locale === 'th' ? scen.situationTh : scen.situationId}
+                    {scenMeta.situation}
                   </p>
                 </div>
 
@@ -606,12 +587,8 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                     <CheckCircle2 className="w-3.5 h-3.5 text-[#2E8B69]" />
                     <span>
                       {pStatus.isReady
-                        ? locale === 'th'
-                          ? 'พร้อมสนทนา'
-                          : 'Siap Bicara'
-                        : locale === 'th'
-                          ? 'ต้องทบทวนคำศัพท์'
-                          : 'Prasyarat Kosakata'}
+                        ? t(locale, 'home.readyToTalk')
+                        : t(locale, 'home.vocabPrereq')}
                     </span>
                   </span>
 
@@ -620,7 +597,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
                     onClick={() => onSelectScenarioAndCall(scen.id)}
                     className="px-4 py-2 rounded-xl btn-sun-tactile text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                   >
-                    <span>{locale === 'th' ? 'เริ่มโทร' : 'Mulai Bicara'}</span>
+                    <span>{t(locale, 'home.startTalk')}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -633,14 +610,14 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
       {/* 5. DOCK MASKOT MOCHI RESMI */}
       {showPawDock && (
         <aside
-          aria-label="Maskot Mochi"
+          aria-label={t(locale, 'home.ariaMascot')}
           data-testid="home-paw-dock"
           className="fixed right-4 bottom-20 sm:bottom-6 z-40 w-20 h-20 bg-[#FFF9EE] border-2 border-[#FFC700] rounded-3xl shadow-xl flex items-center justify-center"
         >
           <button
             type="button"
             onClick={() => setShowPawDock(false)}
-            aria-label="Sembunyikan maskot"
+            aria-label={t(locale, 'home.hideMascot')}
             className="absolute -top-2.5 -left-2.5 w-7 h-7 rounded-full bg-white border border-[#F0E4CF] shadow-xs flex items-center justify-center text-[#241A11] cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
@@ -648,7 +625,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
           <button
             type="button"
             onClick={() => onSelectScenarioAndCall(activeScenario.id)}
-            title="Langsung bicara dengan Mochi"
+            title={t(locale, 'home.talkWithMochi')}
             className="w-14 h-14 cursor-pointer hover:scale-105 transition-transform"
           >
             <img

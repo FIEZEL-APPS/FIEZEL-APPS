@@ -6,6 +6,7 @@ import type { CallScenario, LearnerLocale, VoicePersona } from '../types/voiceCa
 import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
 import { toPhoneticRomaji } from '../lib/japanesePhonetics';
 import { toPhoneticPinyin, containsHanzi } from '../lib/mandarinPhonetics';
+import { t } from '../lib/i18n';
 
 export interface BeginnerAnswerAssistantProps {
   locale: LearnerLocale;
@@ -118,24 +119,9 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
       if (idx === 1 || card.tier === 'mission') return '2 · Trik & Contoh';
       return '3 · Uji Saya';
     }
-    if (locale === 'th') {
-      if (idx === 0 || card.tier === 'easy') return '1 · สั้น';
-      if (idx === 1 || card.tier === 'mission') return '2 · ธรรมชาติ';
-      return '3 · ถามกลับ';
-    }
-    if (locale === 'ja') {
-      if (idx === 0 || card.tier === 'easy') return '1 · 短め';
-      if (idx === 1 || card.tier === 'mission') return '2 · 自然';
-      return '3 · + 質問';
-    }
-    if (locale === 'zh') {
-      if (idx === 0 || card.tier === 'easy') return '1 · 简短';
-      if (idx === 1 || card.tier === 'mission') return '2 · 自然';
-      return '3 · + 反问';
-    }
-    if (idx === 0 || card.tier === 'easy') return '1 · Singkat';
-    if (idx === 1 || card.tier === 'mission') return '2 · Alami';
-    return '3 · + Tanya Balik';
+    if (idx === 0 || card.tier === 'easy') return t(locale, 'ui.tabShort');
+    if (idx === 1 || card.tier === 'mission') return t(locale, 'ui.tabNatural');
+    return t(locale, 'ui.tabFollowUp');
   };
 
   const resolvePronunciationGuide = (card: BeginnerReplyCard): string => {
@@ -257,8 +243,8 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                   ? 'Sembunyikan kartu aksi SSW Sensei'
                   : 'Tampilkan aksi tanya & uji SSW Sensei'
                 : isExpanded
-                  ? 'Sembunyikan detail bantuan'
-                  : 'Tampilkan ide kalimat'
+                  ? t(locale, 'ui.toggleHideIdeas')
+                  : t(locale, 'ui.toggleShowIdeas')
             }
           >
             <Sparkles className={`w-3.5 h-3.5 shrink-0 ${isSswMode ? 'text-[#8C2233]' : 'text-[#B85D43]'}`} />
@@ -266,8 +252,8 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               {isSswMode
                 ? 'Aksi & Tanya Sensei'
                 : isCambridgeMode
-                  ? (locale === 'th' ? 'คำตอบ Band 9.0' : locale === 'ja' ? '模範解答' : locale === 'zh' ? '满分示范' : 'Model Answer')
-                  : (locale === 'th' ? 'ตัวช่วยตอบ' : locale === 'ja' ? '話すヒント' : locale === 'zh' ? '回答提示' : 'Ide Bicara')}
+                  ? t(locale, 'ui.modelAnswerBtn')
+                  : t(locale, 'ui.ideaBtn')}
             </span>
             {isExpanded ? <ChevronDown className="w-3.5 h-3.5 shrink-0" /> : <ChevronUp className="w-3.5 h-3.5 shrink-0" />}
           </button>
@@ -279,12 +265,14 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                 <span className="text-xs">🎯</span>
                 <span>
                   {locale === 'th'
-                    ? (activeCard?.badgeTh || 'คำตอบแนะนำ')
-                    : (activeCard?.badgeId || 'Jawaban Terbaik')}
+                    ? (activeCard?.badgeTh || t(locale, 'ui.bestAnswer'))
+                    : locale === 'id'
+                      ? (activeCard?.badgeId || t(locale, 'ui.bestAnswer'))
+                      : t(locale, 'ui.bestAnswer')}
                 </span>
               </span>
               <span className="hidden sm:inline-block text-[10.5px] font-semibold text-[#8C7760] truncate">
-                {activeCard?.tierLabelId || (scenario.id.startsWith('scen_pte') ? 'Pearson PTE Academic' : 'Cambridge IELTS Academic')}
+                {locale === 'id' ? (activeCard?.tierLabelId || (scenario.id.startsWith('scen_pte') ? 'Pearson PTE Academic' : 'Cambridge IELTS Academic')) : (scenario.id.startsWith('scen_pte') ? 'Pearson PTE Academic' : 'Cambridge IELTS Academic')}
               </span>
             </div>
           ) : (
@@ -330,7 +318,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               disabled={showLoadingState || isAnalyzingTurn}
               onClick={onRefreshAssist}
               className="order-2 sm:order-3 ml-auto sm:ml-0 w-7 h-7 rounded-xl bg-white hover:bg-[#FAF6EE] border border-[#EADBCE] text-[#5C4A38] flex items-center justify-center shrink-0 cursor-pointer transition-transform active:scale-95 disabled:opacity-40"
-              title="Minta ide jawaban baru"
+              title={t(locale, 'ui.refreshIdeas')}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingAssist ? 'animate-spin' : ''}`} />
             </button>
@@ -374,17 +362,35 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
             )}
 
             {/* Terjemahan Bahasa Indonesia / Thai yang JELAS & TEGAS */}
-            <p
-              data-testid="teleprompter-meaning"
-              className="text-xs sm:text-[12.5px] text-[#4A3B2C] font-medium leading-relaxed pt-1 border-t border-[#F2ECE0] break-words"
-            >
-              {isSswMode ? (
-                <span className="font-bold text-[#8C2233] mr-1">[Arah Belajar]:</span>
-              ) : (
-                <>💡 {isCambridgeMode && <span className="font-bold text-[#92400E] mr-1">[{locale === 'th' ? 'แปลคำตอบ Band 9.0' : 'Terjemahan Model Answer'}]:</span>}</>
-              )}
-              {sanitizeMotherTongueHint(locale === 'th' ? activeCard.hintTh || activeCard.hintId : activeCard.hintId)}
-            </p>
+            {(() => {
+              const resolvedCardHint = sanitizeMotherTongueHint(
+                isSswMode
+                  ? locale === 'th'
+                    ? activeCard.hintTh || activeCard.hintId
+                    : activeCard.hintId
+                  : locale === 'th'
+                    ? activeCard.hintTh || activeCard.hintId
+                    : locale === 'id'
+                      ? activeCard.hintId
+                      : (activeCard as any).hintEn || ''
+              );
+              if (!resolvedCardHint) return null;
+              return (
+                <p
+                  data-testid="teleprompter-meaning"
+                  className="text-xs sm:text-[12.5px] text-[#4A3B2C] font-medium leading-relaxed pt-1 border-t border-[#F2ECE0] break-words"
+                >
+                  {isSswMode ? (
+                    <span className="font-bold text-[#8C2233] mr-1">
+                      {locale === 'id' ? '[Arah Belajar]:' : '[Study Focus]:'}
+                    </span>
+                  ) : (
+                    <>💡 {isCambridgeMode && <span className="font-bold text-[#92400E] mr-1">[{t(locale, 'ui.modelTranslationLabel')}]:</span>}</>
+                  )}
+                  {resolvedCardHint}
+                </p>
+              );
+            })()}
 
             {/* Action Bar: Dengar, Ucapkan, Pakai */}
             <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#F2ECE0]">
@@ -394,10 +400,10 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                   data-testid="teleprompter-listen-btn"
                   onClick={() => onSpeakSample(activeCard.text, 0.92)}
                   className="px-2.5 py-1 rounded-lg bg-[#FAF6EE] hover:bg-[#F3EBE0] text-[#231A12] text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-transform active:scale-95 border border-[#EADBCE]"
-                  title="Dengarkan cara baca"
+                  title={t(locale, 'ui.listenTitle')}
                 >
                   <Volume2 className="w-3.5 h-3.5 text-[#5C4A38]" />
-                  <span>{locale === 'th' ? 'ฟัง' : locale === 'ja' ? '聞く' : locale === 'zh' ? '听发音' : 'Dengar'}</span>
+                  <span>{t(locale, 'ui.listenBtn')}</span>
                 </button>
 
                 {!isLiveConnected && (
@@ -413,10 +419,10 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                         ? 'bg-[#B85D43] text-white'
                         : 'bg-[#FAF6EE] hover:bg-[#F3EBE0] text-[#231A12] border border-[#EADBCE]'
                     }`}
-                    title={locale === 'th' ? 'ฝึกพูดประโยคนี้' : locale === 'ja' ? 'この文を話す' : locale === 'zh' ? '跟读这句' : 'Ucapkan kalimat ini'}
+                    title={t(locale, 'ui.speakTitle')}
                   >
                     <Mic className="w-3.5 h-3.5" />
-                    <span>{locale === 'th' ? 'พูดตาม' : locale === 'ja' ? '話す' : locale === 'zh' ? '跟读' : 'Ucapkan'}</span>
+                    <span>{t(locale, 'ui.speakBtn')}</span>
                   </button>
                 )}
               </div>
@@ -434,13 +440,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                 <span>
                   {isSswMode
                     ? 'Kirim ke Sensei'
-                    : locale === 'th'
-                      ? 'ใช้คำตอบนี้'
-                      : locale === 'ja'
-                        ? 'これを使う'
-                        : locale === 'zh'
-                          ? '使用这句'
-                          : 'Pakai Jawaban'}
+                    : t(locale, 'ui.useAnswerBtn')}
                 </span>
               </button>
             </div>

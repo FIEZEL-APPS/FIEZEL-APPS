@@ -333,3 +333,27 @@ Atas perintah OWNER, tiga kesalahan fatal berikut DILARANG KERAS terulang di rep
      * `accounts.google.com` DILARANG KERAS dihapus dari `script-src`, `style-src`, dan `frame-src`.
      * `connect-src` WAJIB mengizinkan `api.fiezel.my.id` (atau `https: wss:`). DILARANG memperketat CSP hingga memblokir panggilan API Cloudflare.
    - **Gerbang Penegak**: `node tests/csp-header-superset-gate-test.js` dan `node tests/tri-core-invariants-gate-test.js`.
+
+---
+
+## 19. MANDATORY PROTOCOL: ENGLISH-FIRST CODE, FALLBACKS & MULTI-LOCALE CONTENT ARCHITECTURE (ATURAN ENGLISH-FIRST I18N)
+Untuk mencegah kebocoran Bahasa Indonesia, duplikasi pekerjaan penerjemahan, maupun efek *"gado-gado"* (kalimat campuran Inggris + aksara target) pada aplikasi global FIEZEL (`id`, `en`, `th`, `vi`, `ms`, `fil`, `ja`, `km`, `ru`), setiap kontribusi kode baru WAJIB mematuhi arsitektur *English Golden Pivot* berikut:
+
+1. **English-First Code & UI Chrome (Wajib Bahasa Inggris sebagai Sumber Utama)**:
+   - Seluruh pengenal internal, komentar teknis, fallback HTML, `aria-label`, placeholder, label tombol default, dan nilai cadangan fungsi `t(key, ...)` WAJIB ditulis dalam **Bahasa Inggris yang natural**, BUKAN Bahasa Indonesia.
+   - Jangan pernah meneruskan string Indonesia sebagai argumen ke-2 pada `FiezelI18n.t(key, ...)` (ingat `FiezelI18n.t(key, params)` menerima objek `{ params }`, bukan fallback string). Seluruh kunci UI baru WAJIB didaftarkan serentak pada:
+     - `features/i18n/copy-id-*.js` & `features/i18n/locales/id/{ns}.json` (naskah Indonesia murid ID tetap utuh & ramah).
+     - `features/i18n/copy-th-*.js` & `features/i18n/locales/th/{ns}.json`.
+     - `features/i18n/locales/{en,vi,ms,fil,ja,km,ru}/{ns}.json` (diterjemahkan utuh secara semantik penuh per kalimat — **DILARANG** memakai substitusi kata-per-kata parsial seperti pola usang `replace()` yang menghasilkan kalimat gado-gado).
+   - Di sub-aplikasi Voice Studio (`features/voice-studio/src/lib/i18n.ts`), rantai fallback WAJIB bermuara ke **`COPY.en`** sebagai *Golden Pivot*: `locale === 'id' ? COPY.id[key] : (COPY[locale]?.[key] ?? COPY.en[key] ?? key)`. Dilarang menjadikan `locale === 'th' ? thText : idText` sebagai pola UI.
+
+2. **English-First Pedagogy Data & Multi-Locale Resolution (`app.js`, Quiz, Writing, Grammar)**:
+   - Setiap konten bank soal, penjelasan grammar, diagnostik miskonsepsi, rubrik menulis, atau modul kursus baru WAJIB menyimpan field kanonis **Bahasa Inggris** (`rule`, `whyCorrect`, `whyOthersFail`, `howToAvoid`, `memoryCue`, `whyFails`, `labelEn`, dll.) dan memilih naskah lewat helper resolusi bahasa (`loc === 'id'` -> `*Id`, `loc === 'th'` -> `*Th`, bahasa lain -> `*En` / sidecar target) sehingga pengguna non-Indonesia (`en`, `vi`, `ms`, `fil`, `ja`, `km`, `ru`) tidak pernah menerima teks Indonesia mentah.
+   - Jangan pernah mengubah kunci audio (`LOCKED_FILES`, `workers/api/tts/tts-key.js`, `features/audio-assets/fiezel-audio-key.js`) maupun menghidupkan kembali maskot **PAW** (wajib **Mochi** di seluruh 9 bahasa).
+
+3. **Pengecualian Nasional Kurikulum Merdeka Indonesia (Carve-Out Eksplisit)**:
+   - Permukaan Kurikulum Merdeka (`misi.html`, `kurikulum.html`, `content/mapel/*.json`, serta kunci domain `sekolah.*` dan `Mapel Fase D`) adalah fitur kurikulum nasional Indonesia sesuai mandat owner (`2026-09-07` & `2026-10-05`) dan TETAP berbahasa Indonesia agar selaras dengan raport e-Rapor Kemendikdasmen (`tests/th-ui-leak-test.js`, `tests/th-coverage-test.js`).
+
+4. **Gerbang Penegak I18N English-First**:
+   - Seluruh PR yang menyentuh UI, Voice Studio, atau katalog terjemahan WAJIB lolos 100%:
+     `node tests/i18n-global-purity-test.js`, `node tests/i18n-english-first-and-purity-test.js`, `node tests/i18n-kunci-hantu-test.js`, `node tests/i18n-fallback-wrapper-test.js`, `node tests/i18n-leak-guard-test.js`, `node tests/th-ui-leak-test.js`, `node tests/th-coverage-test.js`, dan `node tests/id-golden-snapshot-test.js`.

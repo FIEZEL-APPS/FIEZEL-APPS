@@ -35,7 +35,7 @@
     // gems-core.js GEMS_COPY.emptyTitle
     'gems.empty-title': 'Gem kamu lagi kosong',
     // gems-core.js GEMS_COPY.emptyBody
-    'gems.empty-body': 'Tenang, ini bukan tembok bayar — Gem Terjemahan memang nggak dijual, dan nggak akan pernah. Cara dapatnya cuma satu: belajar. Kumpulin rentetan jawaban benar, dan gem-nya ngalir sendiri. PAW yakin nggak butuh lama, kok.',
+    'gems.empty-body': 'Tenang, ini bukan tembok bayar — Gem Terjemahan memang nggak dijual, dan nggak akan pernah. Cara dapatnya cuma satu: belajar. Kumpulin rentetan jawaban benar, dan gem-nya ngalir sendiri. Mochi yakin nggak butuh lama, kok.',
     // gems-core.js GEMS_COPY.settingsTitle
     'gems.settings-title': 'Gem Terjemahan',
     // gems-core.js GEMS_COPY.settingsBody

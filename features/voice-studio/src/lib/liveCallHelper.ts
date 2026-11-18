@@ -10,8 +10,10 @@ export interface BeginnerReplyCard {
   pronunciation: string;
   hintId: string;
   hintTh: string;
+  hintEn?: string;
   meaningId?: string;
   meaningTh?: string;
+  meaningEn?: string;
   tierLabelId?: string;
   tierLabelTh?: string;
   contextAnchorId?: string;

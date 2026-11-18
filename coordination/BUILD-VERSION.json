@@ -1,7 +1,7 @@
 {
-  "version": "m025-804",
-  "claimedBy": "branch fix/auth-google-and-account",
-  "claimedAt": "2026-11-18T11:21:27.040Z",
-  "reason": "fix(auth): fix cross-request Worker schema promise trap and Google login button overlay",
+  "version": "m025-805",
+  "claimedBy": "branch feat/english-first-foundation-m025-805",
+  "claimedAt": "2026-11-18T14:09:13.947Z",
+  "reason": "feat(i18n): english-first architecture pivot and multi-locale leak elimination",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

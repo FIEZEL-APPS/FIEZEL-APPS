@@ -15,7 +15,7 @@
 
   I18N.registerCopy('th', {
     // --- cangkang arena ---
-    'pawarena.title': 'PAW ARENA',
+    'pawarena.title': 'FIEZEL ARENA',
     'pawarena.subtitle': 'สนามเล่นของ FIEZEL — เรียนไปแข่งไป',
     'pawarena.pick-game': 'เลือกเกม',
     'pawarena.solo-vs-bot': 'เล่นคนเดียวสู้กับบอต',

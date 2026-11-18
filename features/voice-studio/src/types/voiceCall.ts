@@ -28,6 +28,7 @@ export interface VoicePersona {
   openingGreeting?: string;
   openingGreetingTranslationId?: string;
   openingGreetingTranslationTh?: string;
+  openingGreetingTranslationEn?: string;
   roastStyleId?: string;
   roastStyleTh?: string;
 }
