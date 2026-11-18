@@ -59,6 +59,11 @@ import {
   type WorkbenchEvaluationMeta,
   type WorkbenchPracticeCheckResult,
 } from './components/InCallLearningWorkbenchModal';
+import {
+  requestRealtimeWhiteboardAction,
+  requestRealtimeWhiteboardStream,
+  type WhiteboardFollowUpContext,
+} from './lib/whiteboardDirector';
 import { CALL_SCENARIOS, VOICE_PERSONAS } from './data/callScenarios';
 import { t, tMasteryState } from './lib/i18n';
 import { playFiezelSfx, registerSfxHostAudioContext } from './lib/sfx';
@@ -125,6 +130,7 @@ import {
   resolveVoiceApiCandidateBases,
   sanitizeHallucinatedTranscript,
   splitIntoSpeechChunks,
+  splitTtsIntoSentenceChunks,
   synthesizeFlexibleTts,
   verifySpokenLanguageAudio,
   warmUpVoiceServices,
@@ -517,6 +523,7 @@ export default function App() {
   }, []);
   const [inputText, setInputText] = useState<string>('');
   const [isAnalyzingTurn, setIsAnalyzingTurn] = useState<boolean>(false);
+  const [isGeneratingWorkbench, setIsGeneratingWorkbench] = useState<boolean>(false);
   // m025-637: true while the REAL AI partner is generating its reply (Mochi "thinking").
   const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
   const [isPlayingAiAudio, setIsPlayingAiAudio] = useState<boolean>(false);
@@ -1894,13 +1901,33 @@ export default function App() {
     }
   }, [activeScenario.id, activeScenario.targetLang]);
 
-  // Persist conversation turns across refreshes and tab switches
+  // Persist conversation turns across refreshes without bloating localStorage with heavy board trees or stale scenarios
   useEffect(() => {
     if (turns.length > 0) {
       const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
       try {
         if (typeof localStorage !== 'undefined') {
-          localStorage.setItem(sessionKey, JSON.stringify(turns.slice(-40)));
+          const compactTurns = turns.slice(-24).map((tr) => ({
+            id: tr.id,
+            speaker: tr.speaker,
+            text: tr.text,
+            translationId: tr.translationId,
+            translationTh: tr.translationTh,
+            timestamp: tr.timestamp,
+          }));
+          localStorage.setItem(sessionKey, JSON.stringify(compactTurns));
+          const kaiwaKeys: string[] = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.startsWith('fz_kaiwa_turns_') && k !== sessionKey) kaiwaKeys.push(k);
+          }
+          if (kaiwaKeys.length > 5) {
+            kaiwaKeys.slice(0, kaiwaKeys.length - 5).forEach((oldKey) => {
+              try {
+                localStorage.removeItem(oldKey);
+              } catch {}
+            });
+          }
         }
       } catch {
         // Ignore quota errors
@@ -2456,8 +2483,9 @@ export default function App() {
     const cleanSpoken = stripEmojisAndEmotWords(text).trim();
     if (!cleanSpoken) return;
 
-    // Never allow automatic background HTTP TTS to interrupt or overlap with an active/connecting Gemini 3.8 Live WebSocket call!
-    if ((isLiveConnectedRef.current || isLiveConnectingRef.current) && !opts?.isManualReplay) {
+    // Never allow automatic background HTTP TTS to interrupt or overlap with an active/connecting Gemini 3.8 Live WebSocket call
+    // or an open Papan Belajar workbench (which runs its own unified single-track narration).
+    if (((isLiveConnectedRef.current || isLiveConnectingRef.current) || isWorkbenchOpenRef.current) && !opts?.isManualReplay) {
       return;
     }
 
@@ -2889,6 +2917,11 @@ export default function App() {
     if (earlyIntent?.actionType === 'open_learning_popup') {
       const reqSeq = ++workbenchSessionRef.current.turnSeq;
       workbenchSessionRef.current.dismissedByUser = false;
+      const isLiveWsUp = Boolean(
+        isLiveConnectedRef.current && wsRef.current && wsRef.current.readyState === WebSocket.OPEN
+      );
+      setIsAnalyzingTurn(true);
+      setIsGeneratingWorkbench(true);
       openLearningWorkbenchWithAction(
         {
           ...earlyIntent,
@@ -2898,41 +2931,34 @@ export default function App() {
       );
       void (async () => {
         try {
-          for (const base of resolveVoiceApiCandidateBases()) {
-            const res = await fetch(`${base}/api/voice/partner-turn`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
-              body: JSON.stringify({
-                text: `[WHITEBOARD_REQUEST] ${uText}`,
-                forcePopup: true,
-                personaId: activePersona.id,
-                personaName: activePersona.name,
-                scenarioId: activeScenario.id,
-                scenarioTitle: activeScenario.titleId,
-                targetLang: activeScenario.targetLang,
-                locale,
-                callMode: 'tutor_coach',
-                history: turnsRef.current.slice(-4).map((t) => ({ speaker: t.speaker, text: t.text })),
-              }),
-            });
-            if (res.ok) {
-              const data = await res.json();
-              if (
-                reqSeq === workbenchSessionRef.current.turnSeq &&
-                !workbenchSessionRef.current.dismissedByUser &&
-                data?.uiAction?.actionType === 'open_learning_popup'
-              ) {
-                openLearningWorkbenchWithAction(
-                  { ...data.uiAction, sourceLayer: 'live_ws_native' },
-                  uText
-                );
-              }
-              break;
-            }
+          const liveWb = await requestRealtimeWhiteboardAction({
+            question: `[WHITEBOARD_REQUEST] ${uText}`,
+            personaId: activePersona.id,
+            personaName: activePersona.name,
+            scenarioId: activeScenario.id,
+            scenarioTitle: activeScenario.titleId,
+            targetLang: activeScenario.targetLang,
+            locale,
+            learnerDossier: safeBuildDossier(brainStateRef.current, activeScenario, locale),
+            history: turnsRef.current.slice(-4).map((t) => ({ speaker: t.speaker, text: t.text })),
+          });
+          if (
+            liveWb?.uiAction?.actionType === 'open_learning_popup' &&
+            reqSeq === workbenchSessionRef.current.turnSeq &&
+            !workbenchSessionRef.current.dismissedByUser
+          ) {
+            openLearningWorkbenchWithAction(
+              { ...liveWb.uiAction, sourceLayer: isLiveWsUp ? 'live_ws_native' : liveWb.uiAction.sourceLayer },
+              uText
+            );
           }
         } catch {
           // Ignore network fallback
+        } finally {
+          if (reqSeq === workbenchSessionRef.current.turnSeq) {
+            setIsAnalyzingTurn(false);
+            setIsGeneratingWorkbench(false);
+          }
         }
       })();
     }
@@ -3197,13 +3223,20 @@ export default function App() {
   ) => {
     if (isMeasureMode) return;
     const hasRichAction = Boolean(
+      (Array.isArray(action?.whiteboardSteps) && action.whiteboardSteps.length > 0) ||
       (action?.sampleTarget && action.sampleTarget.trim().length > 3) ||
+      (action?.explanationText && action.explanationText.trim().length > 8) ||
+      (action?.coachSpokenScript && action.coachSpokenScript.trim().length > 8) ||
       (action?.rightWord && action.rightWord.trim().length > 0 && action.rightWord !== 'bentuk tepat')
     );
+    if (hasRichAction) {
+      setIsGeneratingWorkbench(false);
+    }
     const dedupKey = `popup:${action?.focusType || ''}:${action?.bankTopicId || action?.topicTitle || hintText || activeScenario.id}`;
     if (
       !opts?.forceOpen &&
       !hasRichAction &&
+      action?.bankTopicId !== 'custom_dynamic' &&
       lastSystemIntentAtRef.current.key === dedupKey &&
       Date.now() - lastSystemIntentAtRef.current.at < 1500
     ) {
@@ -3224,26 +3257,47 @@ export default function App() {
       ? { ...(action || {}), sourceLayer: 'live_ws_native' }
       : action;
 
-    // The learning workbench is visual. Opening it must NEVER kill or interrupt ongoing speech!
-    isWorkbenchExplanationActiveRef.current = false;
+    // Single-voice invariant: the moment Papan Tulis opens, immediately halt any outer AI voice,
+    // outer SpeechRecognition, and pending drafts so the popup AI never collides with the outer call monitor.
+    isWorkbenchOpenRef.current = true;
+    isWorkbenchExplanationActiveRef.current = true;
+    interruptAiAndStartListening();
+    if (liveSilenceTimerRef.current) {
+      window.clearTimeout(liveSilenceTimerRef.current);
+      liveSilenceTimerRef.current = null;
+    }
+    if (liveSpeechRecRef.current) {
+      try {
+        liveSpeechRecRef.current.onresult = null;
+        liveSpeechRecRef.current.onend = null;
+        liveSpeechRecRef.current.onerror = null;
+        liveSpeechRecRef.current.stop();
+      } catch {
+        // Ignore
+      }
+      liveSpeechRecRef.current = null;
+    }
+    liveUserDraftRef.current = '';
+    liveAiDraftRef.current = '';
+    setLiveUserDraft('');
+    setLiveAiDraft('');
+    setIsUserSpeakingLive(false);
+    setIsListeningLiveSpeech(false);
+    clearUserBurstEndTimer();
+    preRollFramesRef.current = [];
+    consecutiveSpeechFramesRef.current = 0;
+    userAudioBurstActiveRef.current = false;
+    sentAudioSinceEndRef.current = false;
 
     const wbPayload = { ...buildDefaultWorkbenchPayload(hintText, effectiveAction), openNonce: nextOpenNonce };
-    setLearningWorkbench((prev) => {
-      if (
-        prev?.isOpen &&
-        !hasRichAction &&
-        Boolean(prev.uiAction?.sampleTarget && prev.uiAction.sampleTarget.trim().length > 3)
-      ) {
-        return { ...prev, openNonce: nextOpenNonce };
-      }
-      return wbPayload;
-    });
+    setLearningWorkbench(wbPayload);
   };
 
   const executeVoiceUiAction = (uiAction?: VoiceUiAction, userHint = ''): boolean => {
     if (!uiAction || uiAction.actionType === 'none') return false;
     if (uiAction.actionType === 'close_learning_popup') {
       workbenchSessionRef.current.dismissedByUser = true;
+      isWorkbenchOpenRef.current = false;
       isWorkbenchExplanationActiveRef.current = false;
       setLearningWorkbench(null);
       playFiezelSfx('button_tap');
@@ -3430,17 +3484,17 @@ export default function App() {
       };
     }
 
-    // 2-B) Explicit request for interactive written learning popup OR any grammar/usage question
+    // 2-B) Explicit request for interactive written learning popup OR any grammar/usage/visual explanation question
     const explicitPopupCmd =
-      /\b(pop[\s-]?up|papan tulis|papan belajar|whiteboard|latihan tulis|tulis langsung|ajarin tertulis|buka kartu belajar|munculkan latihan)\b/i.test(
+      /\b(pop[\s-]?up|papan tulis|papan belajar|whiteboard|latihan tulis|tulis langsung|ajarin tertulis|buka kartu belajar|munculkan latihan|secara visual|dengan diagram|pakai diagram|visually|with a (?:\w+\s+)?diagram|step by step diagram)\b/i.test(
         s
       );
     const asksGrammarOrStruggle =
-      /\b(bingung|susah|sulit|belum paham|nggak paham|gak paham|kurang paham|pusing|confused|struggling|don't understand|hard to understand|bedanya|perbedaan|cara\s+(?:menggunakan|memakai|pakai)|bagaimana\s+cara|gimana cara pakai|kapan pakai|kenapa pakai|jelasin|ajarin|tolong bahas|งง|ไม่เข้าใจ)\b/i.test(
+      /\b(bingung|susah|sulit|belum paham|nggak paham|gak paham|kurang paham|pusing|confused|struggling|don't understand|hard to understand|bedanya|perbedaan|difference between|why is|cara\s+(?:menggunakan|memakai|pakai|tulis|menulis)|how to\s+(?:use|write)|bagaimana\s+(?:cara|membedakan)|gimana cara pakai|kapan pakai|kenapa\s+(?:pakai|salah)|mengapa\s+(?:pakai|salah)|jelasin|jelaskan|ajarkan|ajarin|terangkan|uraikan|gambarkan|tolong bahas|explain|teach me|งง|ไม่เข้าใจ)\b/i.test(
         s
       ) &&
       (s.length >= 10 ||
-        /\b(grammar|tata bahasa|partikel|particle|tenses?|past tense|present|perfect|verb|konjugasi|nada|tone|kanji|hanzi|pola|kalimat|since|for|did|does|agree|although|despite|modal|passive|conditional|は|が|を|に|で|了|正在|把|不|没)\b/i.test(
+        /\b(grammar|tata bahasa|partikel|particle|tenses?|past tense|present|perfect|verb|konjugasi|nada|tone|kanji|hanzi|pola|kalimat|since|for|did|does|agree|although|despite|modal|passive|conditional|theorem|pythagor|photosynthesis|diagram|は|が|を|に|で|了|正在|把|不|没)\b/i.test(
           s
         ));
 
@@ -3690,7 +3744,11 @@ export default function App() {
         return;
       }
       if (clientIntent?.actionType === 'open_learning_popup') {
-        openLearningWorkbenchWithAction(clientIntent, trimmed);
+        setIsAnalyzingTurn(true);
+        setIsGeneratingWorkbench(true);
+        if (!isWorkbenchOpenRef.current) {
+          openLearningWorkbenchWithAction(clientIntent, trimmed);
+        }
       }
     }
 
@@ -3721,6 +3779,41 @@ export default function App() {
       const visibleScreenMode = isWorkbenchOpenRef.current
         ? activeWorkbenchTargetRef.current.contextMode || learningWorkbench?.focusType
         : undefined;
+      const openBoardSteps = learningWorkbench?.uiAction?.whiteboardSteps;
+      const openVisualKinds = Array.isArray(openBoardSteps)
+        ? Array.from(
+            new Set(
+              openBoardSteps
+                .map((s) => s.kind)
+                .filter((k) =>
+          [
+            'metaphor_scene',
+            'mind_map',
+            'timeline_track',
+            'formula_blocks',
+            'rough_scene',
+            'contrast_scale',
+            'syntax_flow',
+            'kanji_grid',
+            'tone_wave',
+            'table',
+          ].includes(k)
+        )
+            )
+          )
+        : [];
+      const openBoardContext: WhiteboardFollowUpContext | undefined =
+        isWorkbenchOpenRef.current && learningWorkbench?.isOpen
+          ? {
+              topicTitle:
+                learningWorkbench.uiAction?.topicTitle || learningWorkbench.topicTitle,
+              patternFormula:
+                learningWorkbench.uiAction?.patternFormula || learningWorkbench.patternFormula,
+              summary:
+                learningWorkbench.uiAction?.explanationText || learningWorkbench.explanationText,
+              currentVisualKinds: openVisualKinds.length ? openVisualKinds : undefined,
+            }
+          : undefined;
       const evalParams = {
         text: trimmed || activeScenario.sampleUtterances[0]?.text || 'Hello',
         scenario: activeScenario,
@@ -3734,6 +3827,7 @@ export default function App() {
         fluencyTelemetry: params.fluencyTelemetry || undefined,
         expectedTargetText: visibleScreenTarget || undefined,
         activePopupMode: visibleScreenMode,
+        boardContext: openBoardContext,
         learnerDossier: safeBuildDossier(
           brainStateRef.current,
           activeScenario,
@@ -4005,6 +4099,8 @@ export default function App() {
 
       if (
         !isOpeningPopup &&
+        !isWorkbenchOpenRef.current &&
+        !(window as any).__fzWbLockstepActive &&
         myTurnSeq === workbenchSessionRef.current.turnSeq &&
         !workbenchSessionRef.current.dismissedByUser
       ) {
@@ -4017,7 +4113,10 @@ export default function App() {
     } finally {
       isAiThinkingRef.current = false;
       setIsAiThinking(false);
-      setIsAnalyzingTurn(false);
+      if (myTurnSeq === workbenchSessionRef.current.turnSeq) {
+        setIsAnalyzingTurn(false);
+        setIsGeneratingWorkbench(false);
+      }
     }
   };
 
@@ -4086,7 +4185,8 @@ export default function App() {
       !isPlayingAiAudio &&
       !isAnalyzingTurn &&
       !isMicMuted &&
-      !isRecordingPtt;
+      !isRecordingPtt &&
+      !learningWorkbench?.isOpen;
 
     if (!shouldListenHandsFree) {
       if (liveSilenceTimerRef.current) {
@@ -4157,6 +4257,8 @@ export default function App() {
 
         rec.onresult = (event: any) => {
           if (isDisposed) return;
+          // While Papan Tulis popup is open, outer SpeechRecognition MUST stay completely inert so popup voice cannot bounce to outer AI
+          if (isWorkbenchOpenRef.current || Boolean((window as any).__fzWbLockstepActive)) return;
           let transcript = '';
           let lastIsFinal = false;
           for (let i = 0; i < event.results.length; i++) {
@@ -4170,10 +4272,30 @@ export default function App() {
             .trim();
           if (!clean) return;
 
-          // User spoke into microphone: update speech timestamps across all VAD monitors
-          lastHandySpeechAtRef.current = Date.now();
-          if (sileroVadGateRef.current?.isActive()) {
-            sileroVadGateRef.current.markHumanSpeechAt(Date.now());
+          // Acoustic car-noise / street traffic guard: when mic hardware DSP is active, verify
+          // either genuine vocal speech was detected recently OR it's a clear multi-word final phrase.
+          const dspCapturingAudio =
+            lastMicFrameAtRef.current > 0 && Date.now() - lastMicFrameAtRef.current < 1600;
+          const recentAcousticVoice =
+            handyVadRef.current.isInSpeech() ||
+            Boolean(sileroVadGateRef.current?.isConfirmedSpeaking()) ||
+            Date.now() -
+              Math.max(
+                lastHandySpeechAtRef.current,
+                sileroVadGateRef.current?.getLastHumanSpeechAt?.() || 0
+              ) <=
+              2200;
+          const wordsCount = clean.split(/\s+/).filter(Boolean).length;
+          const isShortNoiseHallucination =
+            wordsCount <= 1 && /^(um+|uh+|hmm+|ah+|oh+|eh+|ha+|hm+|no|m+|a+)$/i.test(clean);
+          if (dspCapturingAudio && !recentAcousticVoice && (isShortNoiseHallucination || (!lastIsFinal && wordsCount < 2))) {
+            return;
+          }
+          if (!dspCapturingAudio || recentAcousticVoice) {
+            lastHandySpeechAtRef.current = Date.now();
+            if (sileroVadGateRef.current?.isActive()) {
+              sileroVadGateRef.current.markHumanSpeechAt(Date.now());
+            }
           }
 
           accumulatedSpeech = clean;
@@ -4355,6 +4477,7 @@ export default function App() {
     isAnalyzingTurn,
     isMicMuted,
     isRecordingPtt,
+    learningWorkbench?.isOpen,
     activeScenario.targetLang,
     activeScenario.id,
     locale,
@@ -4712,6 +4835,7 @@ export default function App() {
         wsRef.current &&
         wsRef.current.readyState === WebSocket.OPEN &&
         isLiveConnectedRef.current &&
+        !isWorkbenchOpenRef.current &&
         !isPlayingAiAudioRef.current &&
         !isAiServerTurnOpenRef.current
       ) {
@@ -4756,6 +4880,17 @@ export default function App() {
       }
     }
     if (isMicMutedRef.current) return;
+    // While Papan Tulis popup is open, outer live mic PCM streaming is completely suspended so popup speaker audio never triggers outer Gemini Live
+    if (isWorkbenchOpenRef.current) {
+      clearUserBurstEndTimer();
+      userAudioBurstActiveRef.current = false;
+      sentAudioSinceEndRef.current = false;
+      preRollFramesRef.current = [];
+      consecutiveSpeechFramesRef.current = 0;
+      bargeSpeechStreakRef.current = 0;
+      handyVadRef.current.clearPreRoll();
+      return;
+    }
     // Once Silero Neural VAD v5 WASM is active, it exclusively owns 16kHz human-speech streaming & barge-in.
     if (sileroVadGateRef.current?.isActive()) return;
 
@@ -5247,6 +5382,7 @@ export default function App() {
             isAiServerTurnOpenRef.current ||
             activeSourcesRef.current.length > 0 ||
             livePcmSchedulerRef.current.hasPendingAudio() ||
+            Boolean((window as unknown as { __fzWbLockstepActive?: boolean }).__fzWbLockstepActive) ||
             (lastAiPlayoutEndedAtRef.current > 0 && Date.now() - lastAiPlayoutEndedAtRef.current < 180),
           isWorkbenchOpen: () => isWorkbenchOpenRef.current,
           onHumanSpeechState: (speaking) => {
@@ -6021,7 +6157,7 @@ ${
                               },
                               explanationText: {
                                 type: 'STRING',
-                                description: `1-2 punchy sentences explaining the rule or reading focus in ${learnerUiLangName}`,
+                                description: `3-5 complete, clear sentences thoroughly explaining the core meaning, grammar rule, nuance, and everyday usage in ${learnerUiLangName} (never 1-sentence stubs)`,
                               },
                               patternFormula: {
                                 type: 'STRING',
@@ -6051,15 +6187,177 @@ ${
                                 type: 'STRING',
                                 description: 'A realistic grammar-trap version of drillTargetSentence for the comprehension quiz',
                               },
+                              phaseLabels: {
+                                type: 'ARRAY',
+                                description: `3 to 5 custom contextual phase labels in ${learnerUiLangName} for this exact lesson (never generic templates)`,
+                                items: { type: 'STRING' },
+                              },
+                              whiteboardSteps: {
+                                type: 'ARRAY',
+                                description:
+                                  'Structured strokes drawn step by step on the live dot-grid whiteboard (heading, note, highlight_callout, metaphor_scene, mind_map, timeline_track, formula_blocks, rough_scene, contrast_scale, syntax_flow, table, trap_vs_fix, kanji_grid, tone_wave, student_question, checkpoint). Prefer rich SMP-friendly visual metaphors, mind maps, timelines, or puzzle formula blocks instead of repetitive plain boxes!',
+                                items: {
+                                  type: 'OBJECT',
+                                  properties: {
+                                    kind: {
+                                      type: 'STRING',
+                                      description:
+                                        'One of: heading, note, highlight_callout, metaphor_scene, mind_map, timeline_track, formula_blocks, rough_scene, contrast_scale, syntax_flow, table, trap_vs_fix, kanji_grid, tone_wave, student_question, checkpoint',
+                                    },
+                                    sceneTheme: {
+                                      type: 'STRING',
+                                      description:
+                                        'For kind="metaphor_scene": camera_vs_video | battery_meter | bridge_timeline | stage_spotlight | rpg_stats | locomotive_train | traffic_light | key_and_lock',
+                                    },
+                                    highlightTerms: {
+                                      type: 'ARRAY',
+                                      items: { type: 'STRING' },
+                                      description: 'Important keywords to animate with Stabilo highlighter mark on the card',
+                                    },
+                                    metaphorCenterLabel: { type: 'STRING' },
+                                    leftPanel: {
+                                      type: 'OBJECT',
+                                      properties: {
+                                        badge: { type: 'STRING' },
+                                        title: { type: 'STRING' },
+                                        subtitle: { type: 'STRING' },
+                                        example: { type: 'STRING' },
+                                        icon: { type: 'STRING' },
+                                      },
+                                    },
+                                    rightPanel: {
+                                      type: 'OBJECT',
+                                      properties: {
+                                        badge: { type: 'STRING' },
+                                        title: { type: 'STRING' },
+                                        subtitle: { type: 'STRING' },
+                                        example: { type: 'STRING' },
+                                        icon: { type: 'STRING' },
+                                      },
+                                    },
+                                    branches: {
+                                      type: 'ARRAY',
+                                      items: {
+                                        type: 'OBJECT',
+                                        properties: {
+                                          label: { type: 'STRING' },
+                                          sublabel: { type: 'STRING' },
+                                          example: { type: 'STRING' },
+                                          icon: { type: 'STRING' },
+                                          color: { type: 'STRING' },
+                                        },
+                                      },
+                                    },
+                                    timelineEvents: {
+                                      type: 'ARRAY',
+                                      items: {
+                                        type: 'OBJECT',
+                                        properties: {
+                                          timeLabel: { type: 'STRING' },
+                                          title: { type: 'STRING' },
+                                          example: { type: 'STRING' },
+                                          icon: { type: 'STRING' },
+                                          isActive: { type: 'BOOLEAN' },
+                                          color: { type: 'STRING' },
+                                        },
+                                      },
+                                    },
+                                    blocks: {
+                                      type: 'ARRAY',
+                                      items: {
+                                        type: 'OBJECT',
+                                        properties: {
+                                          role: { type: 'STRING' },
+                                          token: { type: 'STRING' },
+                                          note: { type: 'STRING' },
+                                          color: { type: 'STRING' },
+                                        },
+                                      },
+                                    },
+                                    column: {
+                                      type: 'STRING',
+                                      description: 'left or right',
+                                    },
+                                    title: { type: 'STRING' },
+                                    text: { type: 'STRING' },
+                                    bullets: {
+                                      type: 'ARRAY',
+                                      items: { type: 'STRING' },
+                                    },
+                                    highlightPhrase: { type: 'STRING' },
+                                    width: { type: 'NUMBER' },
+                                    height: { type: 'NUMBER' },
+                                    caption: { type: 'STRING' },
+                                    shapes: {
+                                      type: 'ARRAY',
+                                      description: 'For kind="rough_scene", vector marker shapes forming a bespoke diagram tailored to the exact question',
+                                      items: {
+                                        type: 'OBJECT',
+                                        properties: {
+                                          op: { type: 'STRING', description: 'rect, circle, ellipse, line, arrow, polygon, curve, or text' },
+                                          x: { type: 'NUMBER' },
+                                          y: { type: 'NUMBER' },
+                                          w: { type: 'NUMBER' },
+                                          h: { type: 'NUMBER' },
+                                          r: { type: 'NUMBER' },
+                                          x1: { type: 'NUMBER' },
+                                          y1: { type: 'NUMBER' },
+                                          x2: { type: 'NUMBER' },
+                                          y2: { type: 'NUMBER' },
+                                          pointsText: { type: 'STRING', description: 'Semicolon-separated x,y pairs for polygon/curve e.g. "120,200;120,60;320,200"' },
+                                          stroke: { type: 'STRING' },
+                                          fill: { type: 'STRING' },
+                                          dashed: { type: 'BOOLEAN' },
+                                          label: { type: 'STRING' },
+                                          sublabel: { type: 'STRING' },
+                                          text: { type: 'STRING' },
+                                          size: { type: 'STRING' },
+                                        },
+                                      },
+                                    },
+                                    termA: { type: 'STRING' },
+                                    descA: { type: 'STRING' },
+                                    termB: { type: 'STRING' },
+                                    descB: { type: 'STRING' },
+                                    analogy: { type: 'STRING' },
+                                    wrongText: { type: 'STRING' },
+                                    rightText: { type: 'STRING' },
+                                    reason: { type: 'STRING' },
+                                    tableHeaders: {
+                                      type: 'ARRAY',
+                                      items: { type: 'STRING' },
+                                    },
+                                    nodes: {
+                                      type: 'ARRAY',
+                                      items: {
+                                        type: 'OBJECT',
+                                        properties: {
+                                          role: { type: 'STRING' },
+                                          word: { type: 'STRING' },
+                                          color: { type: 'STRING' },
+                                        },
+                                      },
+                                    },
+                                    character: { type: 'STRING' },
+                                    reading: { type: 'STRING' },
+                                    meaning: { type: 'STRING' },
+                                    strokeCount: { type: 'NUMBER' },
+                                    spokenNarration: { type: 'STRING' },
+                                    mnemonic: { type: 'STRING' },
+                                  },
+                                },
+                              },
                             },
                             required: [
                               'topicTitle',
+                              'explanationText',
                               'patternFormula',
                               'sampleTarget',
                               'trapWrongSentence',
                               'drillMeaningPrompt',
                               'drillTargetSentence',
                               'drillTrapSentence',
+                              'whiteboardSteps',
                             ],
                           },
                         },
@@ -6096,7 +6394,12 @@ ${
                           ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: ${candidateName} (address the candidate respectfully as "${candidateName}" or "Candidate").\n\n[ZERO-TOLERANCE REAL-TIME GRAMMAR INTERCEPTION MANDATE]:\n- Whenever ${candidateName} speaks in conversation or answers an exercise, if they make ANY grammatical flaw (subject-verb agreement 'he go', wrong tense 'yesterday I am', missing articles, wrong prepositions, dropped plural 's'), YOU MUST NOT LET IT PASS!\n- Stop them immediately with authoritative tough-love examiner demeanor:\n  "Tunggu sebentar, ${candidateName}. Ada kesalahan grammar barusan: kamu bilang '[kesalahan]', yang benar adalah '[perbaikan]' karena [penjelasan singkat 1 kalimat]. Coba ulangi kalimat yang benar sekarang!"\n- Require Echo Redemption (they repeat the corrected phrase aloud) before proceeding!\n\n[PROACTIVE AUTOMATED DRILLING PROTOCOL (ZERO DEAD AIR)]:\n- NEVER wait for the candidate to prompt you or say 'coba lanjut' or 'lanjutkan'!\n- In Repeat Sentence or Read Aloud or Describe Image: Act like an elite Australian private tutor in an intensive 1-on-1 session.\n- When introducing or transitioning, immediately read the sentence/question in the SAME breath:\n  E.g.: "Baik ${candidateName}, kita mulai Repeat Sentence nomor 1. Dengarkan kalimat ini baik-baik: '[academic sentence]'. ... Sekarang giliranmu, ulangi dalam 5 detik!"\n- When candidate repeats: Immediately grade it (evaluating the 50% rule: did they capture >=50% words without hesitation?), deliver punchy feedback, and IMMEDIATELY fire question number 2 in the very same turn:\n  "Bagus, kelancaranmu terjaga dan lebih dari 50% kata tertangkap. Sekarang nomor 2, dengarkan: '[academic sentence 2]'. ... Giliranmu!"\n- ZERO AWKWARD PAUSES! ZERO ASKING 'Mau lanjut ke nomor berikutnya?'! Automatically drive the test session forward with momentum!\n\n[DYNAMIC SYLLABUS ALIGNMENT MANDATE]:\n- When ${candidateName} says what they want to practice (e.g. 'aku mau latihan Describe Image dulu' or 'aku mau drill Repeat Sentence' or 'aku mau bahas tips rahasia'):\n- Immediately align with their wish while keeping the PTE 42 roadmap standards intact:\n  "Siap ${candidateName}, kita selaraskan roadmap target PTE 42 kita dengan fokus latihan [permintaan ${candidateName}] hari ini! Mari kita mulai!"\n- Never rigidly refuse or force an unwanted mode. Dynamically adapt the session to what they ask while maintaining examiner rigor!\n\n[DESCRIBE IMAGE SPLIT-SCREEN WORKBENCH INSTRUCTIONS]:\n- The Describe Image workbench is now a wide side-by-side landscape screen (diagram on left, Nakul 5-line formula & 25-28s stopping hacks on right).\n- Instruct ${candidateName}: "Perhatikan layar lebarmu ${candidateName}: di sebelah kiri adalah diagram ujian asli, dan di sebelah kanan adalah 5 baris template Nakul dan trik berhenti di detik 25-28. Gunakan waktu persiapan 25 detik untuk mengunci angka tertinggi dan terendah, lalu bicara selama 25 hingga 28 detik tanpa berhenti!"\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen ${candidateName} finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "${candidateName}, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing them to move on to the next question!\n5. LIVE POPUP / SCREEN SYNC MANDATE:\n   When the learner asks for Read Aloud ("tampilkan popup kalimat read aloud", "baca nyaring"), call \`open_interactive_learning_popup\` with \`focusType: "pte_read_aloud"\`. Whenever \`[SCREEN STATE SYNC: ... EXACT TARGET TEXT VISIBLE ON SCREEN: "..."]\` arrives, evaluate strictly word-for-word against that exact text and NEVER pass skipped or mispronounced words.\n\n${pteMasterDirective}${cefrCalibrationDirective}`
                           : isCambridgeExaminer
                           ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "${candidateName}".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate ${candidateName} makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5–9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${cefrCalibrationDirective}`
-                          : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Speak in 2-4 punchy spoken sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar) OR [SCREEN STATE SYNC]: When the learner asks for a Read Aloud sentence popup ("tampilkan popup kalimat read aloud", "baca nyaring", "kasih kalimat baca"), call \`open_interactive_learning_popup\` with \`focusType: "read_aloud"\` and populate \`sampleTarget\` with a natural sentence in ${targetLangLabel}! Whenever \`[SCREEN STATE SYNC: ... EXACT TARGET TEXT VISIBLE ON SCREEN: "..."]\` arrives, read/reference THAT exact sentence and evaluate strictly word-for-word against it (NEVER praise or mark correct if words were skipped or mispronounced!). When explaining a grammar rule popup, switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}) so they understand 100% clearly, then switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}${cefrCalibrationDirective}`,
+                          : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Outside of popup explanations, speak in 2-4 punchy sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard (OR when you proactively open the whiteboard to teach a rule you just brought up!), you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`, \`whiteboardSteps\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}). AUDIO-FIRST, VISUAL-FIRST RULE:
+   - Your SPOKEN voice (\`explanationText\` / live speech) must be DEEP, UNHURRIED, and BEGINNER-FRIENDLY (150-240 words: crystal-clear intuition, step-by-step logic, 4-5 concrete spoken examples, and common mistakes — NEVER rush or stop mid-explanation!).
+   - Meanwhile, ON THE WHITEBOARD (\`whiteboardSteps\`), NEVER write vague labels like "Pola Pertama", "Pola Kedua", or "Visualisasi ..."! Keep \`note\` bullets unambiguous and complete for a zero-base beginner (3-4 clear rules with tiny concrete examples inside each bullet, 14-24 words each) + \`highlightTerms\`. Pick the EXACT topic-matched visual for step[2]: \`rough_scene\` or \`mind_map\` for prepositions/location (in/on/at, に/で), \`formula_blocks\`/\`syntax_flow\`/\`contrast_scale\` for sentence slots/To Be vs Verb 1, \`timeline_track\` (Left Past -> Right Present Perfect) for tenses, \`camera_vs_video\` ONLY for State Am/Is/Are vs Action Do/Does, \`battery_meter\` for frequency/modals, \`kanji_grid\` for CJK/Kana — EVERY panel/block/branch MUST include a clear label, beginner explanation ("subtitle"/"note"), and real example phrase, and Step 2's spoken explanation MUST walk through every drawn element left-to-right clearly! Plus a concrete comparison \`table\` (4-5 examples) + \`trap_vs_fix\`.
+   - DIAGRAM HYGIENE: NEVER write empty brackets \`()\`, \`[]\`, \`{}\` and NEVER draw empty unlabeled boxes/shapes! Keep every panel/node label short (<=22 chars per line) so nothing overflows its border.
+   - VISUAL VARIETY & SWITCHING: Every explanation gets the visual archetype that best fits its metaphor; if the learner asks for a different visual ("ubah visual lain"), switch to a GENUINELY DIFFERENT visual structure (\`mind_map\`, \`formula_blocks\`, \`timeline_track\`, \`metaphor_scene\`, or \`contrast_scale\`), never repeat the previous layout!
+   - ZERO TEMPLATES: NEVER use generic placeholder titles or unrelated canned grammar examples—ALWAYS tailor \`phaseLabels\` and \`whiteboardSteps\` to the exact sentence/concept being discussed. For \`kanji_grid\`, pass ONLY \`character\`, \`reading\`, \`meaning\`, and \`strokeCount\`. As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}${cefrCalibrationDirective}`,
                       },
                     ],
                   },
@@ -6312,6 +6615,8 @@ ${
                       typeof args.drillTargetSentence === 'string' ? args.drillTargetSentence : undefined,
                     drillTrapSentence:
                       typeof args.drillTrapSentence === 'string' ? args.drillTrapSentence : undefined,
+                    phaseLabels: Array.isArray(args.phaseLabels) ? args.phaseLabels : undefined,
+                    whiteboardSteps: Array.isArray(args.whiteboardSteps) ? args.whiteboardSteps : undefined,
                   });
                   functionResponses.push({
                     id: fc.id,
@@ -6493,9 +6798,10 @@ ${
             }
           }
 
-          if (isWorkbenchExplanationActiveRef.current && !isLiveConnectedRef.current) {
-            // Only discard chunks if a manual HTTP TTS explanation is playing while NOT in a live WebSocket call
+          if (isWorkbenchOpenRef.current || isWorkbenchExplanationActiveRef.current) {
+            // Popup Papan Tulis owns 100% of audio while open: drop ANY outer Gemini Live audio chunks so two voices NEVER collide
             incomingAudioChunks.length = 0;
+            isAiServerTurnOpenRef.current = false;
           }
 
           if (incomingAudioChunks.length > 0 && outputAudioCtxRef.current) {
@@ -6541,7 +6847,7 @@ ${
               window.clearTimeout(liveOpeningAudioWatchdogRef.current);
               liveOpeningAudioWatchdogRef.current = null;
             }
-            // Silence any stray HTTP TTS / HTMLAudioElement / speechSynthesis so two voices NEVER play simultaneously!
+            // Silence any stray HTTP TTS / HTMLAudioElement / speechSynthesis in the outer monitor (never interrupt active popup lockstep)
             speakTokenRef.current += 1;
             if (ttsSourceNodeRef.current || playbackSettleRef.current) {
               stopNeuralBufferSource();
@@ -6645,8 +6951,8 @@ ${
             setAiAudioPlaying(false, 0);
           }
 
-          // Real-time transcriptions (with Acoustic & Script Lock against Russian/foreign ASR hallucinations)
-          if (msg.serverContent?.inputTranscription?.text) {
+          // Real-time transcriptions (ignored cleanly while Papan Tulis popup is open)
+          if (!isWorkbenchOpenRef.current && msg.serverContent?.inputTranscription?.text) {
             const cleanChunk = sanitizeHallucinatedTranscript(
               msg.serverContent.inputTranscription.text,
               activeScenario.targetLang,
@@ -6666,7 +6972,7 @@ ${
                 countUtteranceUnits(liveUserDraftRef.current, activeScenario.targetLang)
               );
             }
-          } else if (msg.type === 'input_transcription' || msg.type === 'user_transcript') {
+          } else if (!isWorkbenchOpenRef.current && (msg.type === 'input_transcription' || msg.type === 'user_transcript')) {
             const cleanFull = sanitizeHallucinatedTranscript(
               msg.fullText || msg.text || '',
               activeScenario.targetLang,
@@ -6723,7 +7029,7 @@ ${
             ? wordCount >= 5 || isSubstantialCjk
             : wordCount >= 12 || sentenceCount >= 2 || isSubstantialCjk;
 
-          if (hasSubstantialText && hasClosingPunct && draftSoFar !== lastStreamedCopilotTextRef.current) {
+          if (!isWorkbenchOpenRef.current && hasSubstantialText && hasClosingPunct && draftSoFar !== lastStreamedCopilotTextRef.current) {
             if (copilotEarlyTimerRef.current) {
               window.clearTimeout(copilotEarlyTimerRef.current);
             }
@@ -6828,6 +7134,11 @@ ${
             setLiveUserDraft('');
             setLiveAiDraft('');
             setLiveAiTranslationDraft('');
+
+            if (isWorkbenchOpenRef.current) {
+              // Popup Papan Tulis owns conversation turns & audio while open; discard background turn updates from outer monitor.
+              return;
+            }
 
             if (uText) {
               const spokenIntent = detectClientVoiceSystemIntent(uText);
@@ -7905,6 +8216,21 @@ ${
     };
   }, [activeTab, prereqStatus.isReady]);
 
+  // Pause background 3D WebGL Mochi loop while whiteboard popup is open to eliminate UI lag & GPU contention
+  useEffect(() => {
+    const inst = mochiInstanceRef.current;
+    if (!inst) return;
+    try {
+      if (learningWorkbench?.isOpen) {
+        inst.pause?.();
+      } else {
+        inst.resume?.();
+      }
+    } catch {
+      // Ignore
+    }
+  }, [learningWorkbench?.isOpen, is3dMochiReady]);
+
   // GoPrep FaceTime Interactive Companion Dynamic Speaking Layer:
   // Updates talking and speech wave without suppressing or resetting Mochi's active emotional state
   useEffect(() => {
@@ -8258,89 +8584,94 @@ ${
                     );
                     return;
                   }
-                  const lastDiag = lastUserTurn?.diagnosis;
-                  const hasDiagError = Boolean(lastDiag && !lastDiag.ok);
-                  const focusQuery = hasDiagError
-                    ? activeScenario.targetPatterns?.[0] ||
-                      activeScenario.competencyNameId ||
-                      lastDiag?.syntacticCorrection ||
-                      lastUserTurn?.text?.trim() ||
-                      'Tata bahasa percakapan'
-                    : lastUserTurn?.text?.trim() ||
-                      activeScenario.targetPatterns?.[0] ||
-                      activeScenario.competencyNameId ||
-                      'Perbedaan kata kerja dan pola kalimat percakapan';
+                  const trimmedUserTurn = lastUserTurn?.text?.trim() || '';
+                  const scenarioStarterTitle =
+                    activeScenario.competencyNameId ||
+                    activeScenario.titleId ||
+                    activeScenario.targetPatterns?.[0] ||
+                    'Materi percakapan sesi ini';
+                  const focusQuery =
+                    (trimmedUserTurn.split(/\s+/).length >= 3 ? trimmedUserTurn : '') ||
+                    (trimmedUserTurn ? lastAiTurn?.text?.trim() : '') ||
+                    trimmedUserTurn ||
+                    activeScenario.targetPatterns?.[0] ||
+                    scenarioStarterTitle;
                   const reqSeq = ++workbenchSessionRef.current.turnSeq;
                   workbenchSessionRef.current.dismissedByUser = false;
                   const isPte = activeScenario.id.startsWith('scen_pte_') || activeScenario.personaId === 'dr_julian';
                   const pteFocus = activeScenario.id === 'scen_pte_ra_level2' ? 'pte_read_aloud' : (isPte ? 'pte_describe_image' : undefined);
-                  const correctedSample = hasDiagError
-                    ? (lastDiag?.syntacticCorrection || lastDiag?.naturalReformulation || '')
+                  const starterFormula = activeScenario.targetPatterns?.slice(0, 2).join(' • ') || '';
+                  const starterSample =
+                    activeScenario.sampleUtterances?.find((u) => u.intent === 'accurate')?.text ||
+                    activeScenario.targetPatterns?.[0] ||
+                    '';
+                  const starterExplanation = !trimmedUserTurn
+                    ? [
+                        activeScenario.situationId,
+                        ...(Array.isArray(activeScenario.missionGoalsId) ? activeScenario.missionGoalsId : []),
+                      ]
+                        .filter(Boolean)
+                        .join(' ')
                     : '';
+                  setIsAnalyzingTurn(!pteFocus && Boolean(trimmedUserTurn));
+                  setIsGeneratingWorkbench(!pteFocus && Boolean(trimmedUserTurn));
                   openLearningWorkbenchWithAction(
                     {
                       actionType: 'open_learning_popup',
                       focusType: pteFocus,
-                      topicTitle: focusQuery,
-                      ...(hasDiagError && lastDiag
-                        ? {
-                            misconceptionId: lastDiag.misconceptionId || undefined,
-                            wrongWord: lastUserTurn?.text?.trim() || undefined,
-                            rightWord: correctedSample || undefined,
-                            sampleTarget: correctedSample || undefined,
-                            explanationText:
-                              locale === 'th'
-                                ? lastDiag.whyFailsTh || lastDiag.pedagogicalFeedbackTh || ''
-                                : lastDiag.whyFailsId || lastDiag.pedagogicalFeedbackId || '',
-                          }
-                        : {}),
+                      topicTitle: !trimmedUserTurn ? scenarioStarterTitle : focusQuery,
+                      patternFormula: !trimmedUserTurn ? starterFormula : undefined,
+                      explanationText: starterExplanation || undefined,
+                      sampleTarget: !trimmedUserTurn ? starterSample : undefined,
+                      bankTopicId: pteFocus ? undefined : 'custom_dynamic',
                     },
-                    focusQuery,
-                    { forceOpen: true }
+                    !trimmedUserTurn ? scenarioStarterTitle : focusQuery
                   );
-                  if (pteFocus) {
-                    return;
-                  }
-                  setIsAnalyzingTurn(true);
+                  if (pteFocus || !trimmedUserTurn) return;
                   void (async () => {
                     try {
-                      for (const base of resolveVoiceApiCandidateBases()) {
-                        const res = await fetch(`${base}/api/voice/partner-turn`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          credentials: 'include',
-                          body: JSON.stringify({
-                            text: `[WHITEBOARD_REQUEST] Jelaskan aturan tata bahasa dan contoh untuk: ${focusQuery}`,
-                            forcePopup: true,
-                            personaId: activePersona.id,
-                            personaName: activePersona.name,
-                            scenarioId: activeScenario.id,
-                            scenarioTitle: activeScenario.titleId,
-                            targetLang: activeScenario.targetLang,
-                            locale,
-                            callMode: 'tutor_coach',
-                            history: turnsRef.current
-                              .slice(-4)
-                              .map((t) => ({ speaker: t.speaker, text: t.text })),
-                          }),
-                        });
-                        if (res.ok) {
-                          const data = await res.json();
+                      const liveWb = await requestRealtimeWhiteboardStream({
+                        question: `[WHITEBOARD_REQUEST] Jelaskan konsep, diagram visual, dan contoh untuk: ${focusQuery}`,
+                        personaId: activePersona.id,
+                        personaName: activePersona.name,
+                        scenarioId: activeScenario.id,
+                        scenarioTitle: activeScenario.titleId,
+                        targetLang: activeScenario.targetLang,
+                        locale,
+                        learnerDossier: safeBuildDossier(brainStateRef.current, activeScenario, locale),
+                        history: turnsRef.current
+                          .slice(-4)
+                          .map((t) => ({ speaker: t.speaker, text: t.text })),
+                        onOpenerReady: (opener) => {
+                          const intro = String(opener?.headingStep?.spokenNarration || opener?.topicTitle || '').trim();
                           if (
+                            intro &&
                             reqSeq === workbenchSessionRef.current.turnSeq &&
-                            !workbenchSessionRef.current.dismissedByUser &&
-                            data?.uiAction?.actionType === 'open_learning_popup'
+                            !workbenchSessionRef.current.dismissedByUser
                           ) {
-                            openLearningWorkbenchWithAction(data.uiAction, focusQuery);
+                            const normIntro = /[.!?。！？]$/.test(intro) ? intro : `${intro}.`;
+                            const firstChunk = splitTtsIntoSentenceChunks(normIntro, 145)[0] || normIntro;
+                            void synthesizeFlexibleTts({
+                              text: firstChunk,
+                              targetLang: locale,
+                              persona: activePersona,
+                            }).catch(() => null);
                           }
-                          break;
-                        }
+                        },
+                      });
+                      if (
+                        liveWb?.uiAction?.actionType === 'open_learning_popup' &&
+                        reqSeq === workbenchSessionRef.current.turnSeq &&
+                        !workbenchSessionRef.current.dismissedByUser
+                      ) {
+                        openLearningWorkbenchWithAction(liveWb.uiAction, focusQuery);
                       }
                     } catch {
-                      // Fallback gracefully
+                      // Honest offline retry card shown once analyzing finishes
                     } finally {
                       if (reqSeq === workbenchSessionRef.current.turnSeq) {
                         setIsAnalyzingTurn(false);
+                        setIsGeneratingWorkbench(false);
                       }
                     }
                   })();
@@ -10169,6 +10500,7 @@ ${
           isOpen={learningWorkbench.isOpen}
           onClose={() => {
             workbenchSessionRef.current.dismissedByUser = true;
+            isWorkbenchOpenRef.current = false;
             isWorkbenchExplanationActiveRef.current = false;
             setLearningWorkbench(null);
           }}
@@ -10177,6 +10509,7 @@ ${
               completedSentence || workbenchSessionRef.current.completedQuizSentence || '';
             workbenchSessionRef.current.dismissedByUser = true;
             workbenchSessionRef.current.completedQuizSentence = '';
+            isWorkbenchOpenRef.current = false;
             isWorkbenchExplanationActiveRef.current = false;
             speakTokenRef.current += 1;
             interruptAiAndStartListening();
@@ -10279,7 +10612,7 @@ ${
           isLiveConnected={isLiveConnected}
           callDurationSec={callDurationSec}
           isPlayingPreview={isPlayingAiAudio}
-          isGeneratingTopic={isAnalyzingTurn}
+          isGeneratingTopic={isGeneratingWorkbench}
           uiAction={learningWorkbench.uiAction}
           topicTitle={learningWorkbench.topicTitle}
           focusType={learningWorkbench.focusType}
@@ -10290,14 +10623,48 @@ ${
           forcedExerciseMode={learningWorkbench.preferredExerciseMode}
           externalQuizSeed={learningWorkbench.quizSeed}
           openNonce={learningWorkbench.openNonce}
+          topMisconceptionId={
+            Object.values(brainState.misconceptionLedger).find((m) => !m.resolved)?.misconceptionId ||
+            null
+          }
           latestPteDiagnostic={latestPteDiagnostic}
           latestReadAloudAlignment={latestReadAloudAlignment}
           onActiveBoardSync={syncWorkbenchToLiveAi}
+          onWhiteboardBraincoreEvent={(evt) => {
+            const compId = activeScenario.competencyId || `${activeScenario.targetLang}_wb_topic`;
+            const isConfused = evt.kind === 'circle_ask_confusion';
+            const outcome = recordSpeakingAttempt(brainStateRef.current, {
+              competencyId: compId,
+              scenarioId: activeScenario.id,
+              targetLang: activeScenario.targetLang,
+              userExactTranscript: String(evt.targetText || evt.topicTitle || '').slice(0, 120),
+              ok: !isConfused && evt.isCorrect !== false,
+              grammarScore: isConfused ? 62 : 84,
+              fluencyScore: isConfused ? 70 : 85,
+              vocabUsageScore: isConfused ? 68 : 86,
+              accuracyScore: isConfused ? 64 : 85,
+              misconceptionId: isConfused ? evt.misconceptionId || 'wb_concept_clarification' : null,
+              correctionPattern: null,
+              hintsUsed: isConfused ? 1 : 0,
+              confidence: isConfused ? 0.55 : 0.72,
+              measureMode: false,
+            });
+            brainStateRef.current = outcome.nextState;
+            setBrainState(outcome.nextState);
+            void brainSyncFlush(outcome.nextState).then(({ nextState }) => {
+              brainStateRef.current = nextState;
+              setBrainState(nextState);
+            });
+          }}
+          latestAiSubtitle={turns.filter((t) => t.speaker === 'ai').slice(-1)[0]?.text || ''}
           currentMasteryPct={Math.round(
             ((brainState.competencies[activeScenario.competencyId]?.pMasteryDecayed ??
               brainState.competencies[activeScenario.competencyId]?.pMastery ??
               0.35) || 0.35) * 100
           )}
+          onStopMainAudio={() => {
+            interruptAiAndStartListening();
+          }}
           onSpeakPreview={(sampleText, spokenLang) => {
             interruptAiAndStartListening();
             isWorkbenchExplanationActiveRef.current = true;
@@ -10308,70 +10675,99 @@ ${
               isWorkbenchExplanationActiveRef.current = false;
             });
           }}
-          onRequestCustomTopic={(customQuestion, bankTopicId) => {
-            openLearningWorkbenchWithAction(
-              {
-                actionType: 'open_learning_popup',
-                topicTitle: customQuestion,
-                bankTopicId,
-              },
-              customQuestion
+          onRequestCustomTopic={(customQuestion, bankTopicId, followUpContext) => {
+            interruptAiAndStartListening();
+            const reqSeq = ++workbenchSessionRef.current.turnSeq;
+            workbenchSessionRef.current.dismissedByUser = false;
+            const isFollowUpOnOpenBoard = Boolean(
+              learningWorkbench?.isOpen && bankTopicId === 'custom_dynamic'
             );
+            if (bankTopicId === 'custom_dynamic') {
+              setIsAnalyzingTurn(true);
+              setIsGeneratingWorkbench(true);
+            }
+            if (!isFollowUpOnOpenBoard) {
+              openLearningWorkbenchWithAction(
+                {
+                  actionType: 'open_learning_popup',
+                  topicTitle: customQuestion,
+                  bankTopicId,
+                },
+                customQuestion
+              );
+            }
             if (bankTopicId === 'custom_dynamic') {
               void (async () => {
                 try {
-                  const bases = resolveVoiceApiCandidateBases();
-                  for (const base of bases) {
-                    const res = await fetch(`${base}/api/voice/partner-turn`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      credentials: 'include',
-                      body: JSON.stringify({
-                        text: customQuestion,
-                        personaId: activePersona.id,
-                        personaName: activePersona.name,
-                        scenarioId: activeScenario.id,
-                        scenarioTitle: activeScenario.titleId,
-                        targetLang: activeScenario.targetLang,
-                        locale,
-                        callMode: 'tutor_coach',
-                        history: turnsRef.current.slice(-4).map((t) => ({ speaker: t.speaker, text: t.text })),
-                      }),
-                    });
-                    if (res.ok) {
-                      const data = await res.json();
-                      const derivedUiAction: VoiceUiAction =
-                        data?.uiAction && data.uiAction.actionType === 'open_learning_popup'
-                          ? data.uiAction
-                          : {
-                              actionType: 'open_learning_popup',
-                              topicTitle: customQuestion,
-                              coachSpokenScript: data?.aiReplyTranslationId || data?.aiReply || '',
-                              sampleTarget: data?.replies?.[0]?.text || '',
-                              patternFormula: `Pola: ${customQuestion}`,
-                            };
-                      setLearningWorkbench((prev) => {
-                        if (!prev) return prev;
-                        return {
-                          ...prev,
-                          ...derivedUiAction,
-                          uiAction: derivedUiAction,
-                          topicTitle: derivedUiAction.topicTitle || prev.topicTitle,
-                          explanationText:
-                            derivedUiAction.coachSpokenScript ||
-                            derivedUiAction.explanationText ||
-                            prev.explanationText,
-                          patternFormula: derivedUiAction.patternFormula || prev.patternFormula,
-                          sampleTarget: derivedUiAction.sampleTarget || prev.sampleTarget,
-                        };
-                      });
-                      return;
+                  const liveWb = await requestRealtimeWhiteboardStream({
+                    question: customQuestion,
+                    personaId: activePersona.id,
+                    personaName: activePersona.name,
+                    scenarioId: activeScenario.id,
+                    scenarioTitle: activeScenario.titleId,
+                    targetLang: activeScenario.targetLang,
+                    locale,
+                    history: turnsRef.current
+                      .slice(-4)
+                      .map((t) => ({ speaker: t.speaker, text: t.text })),
+                    learnerDossier: safeBuildDossier(brainStateRef.current, activeScenario, locale),
+                    boardContext: followUpContext,
+                    onOpenerReady: (opener) => {
+                      const intro = String(opener?.headingStep?.spokenNarration || opener?.topicTitle || '').trim();
+                      if (
+                        intro &&
+                        reqSeq === workbenchSessionRef.current.turnSeq &&
+                        !workbenchSessionRef.current.dismissedByUser
+                      ) {
+                        const normIntro = /[.!?。！？]$/.test(intro) ? intro : `${intro}.`;
+                        const firstChunk = splitTtsIntoSentenceChunks(normIntro, 145)[0] || normIntro;
+                        void synthesizeFlexibleTts({
+                          text: firstChunk,
+                          targetLang: locale,
+                          persona: activePersona,
+                        }).catch(() => null);
+                      }
+                    },
+                  });
+                  if (
+                    reqSeq === workbenchSessionRef.current.turnSeq &&
+                    !workbenchSessionRef.current.dismissedByUser
+                  ) {
+                    if (liveWb?.uiAction?.actionType === 'open_learning_popup') {
+                      openLearningWorkbenchWithAction(liveWb.uiAction, customQuestion);
+                    } else if (!followUpContext?.areaExcerpt) {
+                      openLearningWorkbenchWithAction(
+                        {
+                          actionType: 'open_learning_popup',
+                          topicTitle: customQuestion,
+                          bankTopicId,
+                        },
+                        customQuestion
+                      );
                     }
                   }
                 } catch {
-                  // Fallback
+                  if (
+                    reqSeq === workbenchSessionRef.current.turnSeq &&
+                    !workbenchSessionRef.current.dismissedByUser &&
+                    isFollowUpOnOpenBoard &&
+                    !followUpContext?.areaExcerpt
+                  ) {
+                    openLearningWorkbenchWithAction(
+                      {
+                        actionType: 'open_learning_popup',
+                        topicTitle: customQuestion,
+                        bankTopicId,
+                      },
+                      customQuestion
+                    );
+                  }
+                } finally {
+                  if (reqSeq === workbenchSessionRef.current.turnSeq) {
+                    setIsAnalyzingTurn(false);
+                    setIsGeneratingWorkbench(false);
+                  }
                 }
-                void submitStudentTurn({ text: customQuestion, inputMode: 'typed' });
               })();
             }
           }}

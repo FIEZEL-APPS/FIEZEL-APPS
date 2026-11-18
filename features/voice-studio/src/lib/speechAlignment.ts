@@ -553,3 +553,382 @@ export function alignSpokenToTargetPassage(
     tokens,
   };
 }
+
+// ============================================================================
+// WHITEBOARD TTS WAVEFORM FORCED-ALIGNMENT & BUFFER PROCESSING
+// ============================================================================
+/**
+ * Speech alignment ("forced-alignment-lite") for the whiteboard tutor.
+ *
+ * Instead of assuming every word occupies a fixed share of the audio, we read the real
+ * waveform of each TTS chunk, find where the tutor actually pauses (breaths, commas,
+ * sentence ends), snap those pauses to the matching word boundaries in the script, and
+ * spread the words only across the VOICED time between pauses. The result is a per-word
+ * start/end timestamp that drives captions, board writing, zoom and phase switching.
+ *
+ * It also tightens delivery: leading/trailing silence is trimmed, over-long pauses are
+ * capped, and a pitch-preserving WSOLA time-stretch brings the pace to a brisk,
+ * natural conversational tempo.
+ */
+
+export interface WordTiming {
+  start: number;
+  end: number;
+}
+
+export interface SpeechAlignment {
+  words: string[];
+  times: WordTiming[];
+  speechStart: number;
+  speechEnd: number;
+  duration: number;
+}
+
+export interface SpeechProcessOptions {
+  /** Pitch-preserving tempo factor (1 = original). */
+  tempo?: number;
+  /** Longest pause kept inside speech, in seconds. */
+  maxPauseSec?: number;
+  /** Silence kept before the first and after the last voiced frame, in seconds. */
+  edgePadSec?: number;
+}
+
+const HOP_SEC = 0.01;
+const SENTENCE_END_RE = /[.!?。！？]["')\]]*$/;
+const CLAUSE_END_RE = /[,;:、，；：]["')\]]*$/;
+
+function toMono(buf: AudioBuffer): Float32Array {
+  const len = buf.length;
+  if (buf.numberOfChannels === 1) return buf.getChannelData(0).slice();
+  const out = new Float32Array(len);
+  for (let ch = 0; ch < buf.numberOfChannels; ch++) {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++) out[i] += d[i];
+  }
+  const inv = 1 / buf.numberOfChannels;
+  for (let i = 0; i < len; i++) out[i] *= inv;
+  return out;
+}
+
+function rmsEnvelope(x: Float32Array, sr: number): Float32Array {
+  const hop = Math.max(1, Math.round(sr * HOP_SEC));
+  const frames = Math.max(1, Math.floor(x.length / hop));
+  const env = new Float32Array(frames);
+  for (let f = 0; f < frames; f++) {
+    let acc = 0;
+    const base = f * hop;
+    for (let i = 0; i < hop; i++) {
+      const v = x[base + i] || 0;
+      acc += v * v;
+    }
+    env[f] = Math.sqrt(acc / hop);
+  }
+  return env;
+}
+
+function percentile(arr: Float32Array, p: number): number {
+  const sorted = Array.from(arr).sort((a, b) => a - b);
+  if (!sorted.length) return 0;
+  return sorted[Math.min(sorted.length - 1, Math.max(0, Math.floor(p * (sorted.length - 1))))];
+}
+
+/** Voiced mask with hangover so plosive closures (<= 120 ms) never count as pauses. */
+function voicedMask(env: Float32Array): boolean[] {
+  const p75 = percentile(env, 0.78);
+  const floor = percentile(env, 0.08);
+  const thr = Math.max(0.0020, floor * 2.2, p75 * 0.035);
+  const mask = Array.from(env, (v) => v > thr);
+  const HANG = 12;
+  let i = 0;
+  while (i < mask.length) {
+    if (mask[i]) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j < mask.length && !mask[j]) j++;
+    if (i > 0 && j < mask.length && j - i <= HANG) {
+      for (let k = i; k < j; k++) mask[k] = true;
+    }
+    i = j;
+  }
+  return mask;
+}
+
+interface Region {
+  a: number;
+  b: number;
+}
+
+function speechBounds(mask: boolean[]): Region | null {
+  const first = mask.indexOf(true);
+  if (first < 0) return null;
+  const last = mask.lastIndexOf(true);
+  return { a: first, b: last + 1 };
+}
+
+/** Silent runs (in frames) strictly inside the speech region. */
+function innerPauses(mask: boolean[], speech: Region, minFrames: number): Region[] {
+  const out: Region[] = [];
+  let i = speech.a;
+  while (i < speech.b) {
+    if (mask[i]) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j < speech.b && !mask[j]) j++;
+    if (j - i >= minFrames) out.push({ a: i, b: j });
+    i = j;
+  }
+  return out;
+}
+
+/**
+ * Gently trim only dead edge padding while keeping 100% of spoken audio intact
+ * (zero inner-pause slicing and zero synchronous CPU WSOLA stalls/tail-truncation).
+ */
+export function processSpeechBuffer(
+  ctx: BaseAudioContext,
+  buf: AudioBuffer,
+  opts: SpeechProcessOptions = {}
+): AudioBuffer {
+  const leadPad = Math.max(0.06, opts.edgePadSec ?? 0.08);
+  const tailPad = Math.max(0.09, (opts.edgePadSec ?? 0.08) + 0.04);
+  try {
+    const sr = buf.sampleRate;
+    const x = toMono(buf);
+    const hop = Math.max(1, Math.round(sr * HOP_SEC));
+    const env = rmsEnvelope(x, sr);
+    const floor = percentile(env, 0.08);
+    const p75 = percentile(env, 0.78);
+    const deadThr = Math.max(0.0012, floor * 1.8, p75 * 0.015);
+    const rawMask = Array.from(env, (v) => v > deadThr);
+    const speech = speechBounds(rawMask);
+    if (!speech) return buf;
+    const startSample = Math.max(0, speech.a * hop - Math.round(leadPad * sr));
+    const endSample = Math.min(x.length, speech.b * hop + Math.round(tailPad * sr));
+    const len = endSample - startSample;
+    if (len <= sr * 0.15) return buf;
+    if (startSample === 0 && endSample === x.length && buf.numberOfChannels === 1) {
+      return buf;
+    }
+    const out = ctx.createBuffer(1, len, sr);
+    const slice = x.subarray(startSample, endSample);
+    const fade = Math.min(Math.round(sr * 0.006), Math.floor(len / 8));
+    if (fade > 2) {
+      for (let i = 0; i < fade; i++) {
+        slice[i] *= i / fade;
+        slice[len - 1 - i] *= i / fade;
+      }
+    }
+    out.copyToChannel(new Float32Array(slice), 0);
+    return out;
+  } catch {
+    return buf;
+  }
+}
+
+function computeProsodicWordWeight(word: string): number {
+  const w = String(word || '').trim();
+  if (!w) return 0;
+  const cleanLen = w.replace(/[^a-zA-Z0-9\u3040-\u30ff\u4e00-\u9faf\u0e00-\u0e7f]/g, '').length;
+  const cjkChars = (w.match(/[\u3040-\u30ff\u4e00-\u9faf]/g) || []).length;
+  const pauseW = /[,:;()]$/.test(w) ? 2.8 : /[.!?。！？]$/.test(w) ? 4.4 : 0;
+  const syllabic = Math.max(cleanLen + cjkChars * 1.4, 1.5);
+  return Math.max(2.6, Math.min(12.5, syllabic + 1.1)) + pauseW;
+}
+
+/** Spoken-length estimate in syllable units (vowel groups, digits/symbols read aloud, CJK morae). */
+function articulationWeight(word: string): number {
+  const raw = String(word || '').trim();
+  const bare = raw.replace(/[,.;:!?()"'“”‘’。！？、，；：]+/g, '');
+  if (!bare) return 0.6;
+  let symSyl = 0;
+  if (/=/.test(bare)) symSyl += 4.0;
+  if (/\^2|\u00B2/.test(bare)) symSyl += 3.2;
+  if (/\^3|\u00B3/.test(bare)) symSyl += 3.2;
+  if (/[*×·]/.test(bare)) symSyl += 2.2;
+  if (/\+/.test(bare)) symSyl += 2.6;
+  if (/->|→/.test(bare)) symSyl += 2.8;
+  if (/[π]/i.test(bare)) symSyl += 1.4;
+  const cjk = (bare.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\u0e00-\u0e7f]/g) || []).length;
+  const digits = (bare.match(/\d/g) || []).length;
+  const latin = bare.replace(/[^a-zA-Z\u00C0-\u024F]/g, '');
+  const vowelGroups = (latin.match(/[aeiouyàáâãäåèéêëìíîïòóôõöùúûüāēīōū]+/gi) || []).length;
+  const consonants = Math.max(0, latin.length - (latin.match(/[aeiouy]/gi) || []).length);
+  const syl = (latin ? Math.max(1, vowelGroups) : 0) + consonants * 0.18 + digits * 2.1 + cjk * 1.0 + symSyl;
+  const fallback = syl > 0 ? syl : Math.max(1, computeProsodicWordWeight(bare) / 3);
+  return 0.45 + fallback;
+}
+
+/**
+ * Align every word of `text` to real time in `buf` using the voiced/silent structure.
+ */
+export function alignWordsToSpeech(text: string, buf: AudioBuffer): SpeechAlignment {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  const duration = buf.duration;
+  const fallbackLinear = (s0: number, s1: number): SpeechAlignment => {
+    const ws = words.map(articulationWeight);
+    const W = Math.max(1e-6, ws.reduce((a, b) => a + b, 0));
+    let acc = 0;
+    const times = ws.map((wt) => {
+      const start = s0 + (acc / W) * (s1 - s0);
+      acc += wt;
+      return { start, end: s0 + (acc / W) * (s1 - s0) };
+    });
+    return { words, times, speechStart: s0, speechEnd: s1, duration };
+  };
+  if (!words.length) return { words, times: [], speechStart: 0, speechEnd: duration, duration };
+
+  let mask: boolean[];
+  try {
+    mask = voicedMask(rmsEnvelope(toMono(buf), buf.sampleRate));
+  } catch {
+    return fallbackLinear(0, duration);
+  }
+  const speech = speechBounds(mask);
+  if (!speech) return fallbackLinear(0, duration);
+  const s0 = speech.a * HOP_SEC;
+  const s1 = speech.b * HOP_SEC;
+  if (words.length === 1) return fallbackLinear(s0, s1);
+
+  const pauses = innerPauses(mask, speech, 14);
+  const weights = words.map(articulationWeight);
+  const W = weights.reduce((a, b) => a + b, 0);
+  const cumW: number[] = [0];
+  weights.forEach((wt) => cumW.push(cumW[cumW.length - 1] + wt));
+
+  // Voiced frames before each frame index (prefix sum) to work in "speaking time".
+  const voicedPrefix = new Int32Array(mask.length + 1);
+  for (let i = 0; i < mask.length; i++) {
+    const inSpeech = i >= speech.a && i < speech.b;
+    voicedPrefix[i + 1] = voicedPrefix[i] + (inSpeech && mask[i] ? 1 : 0);
+  }
+  const totalVoiced = Math.max(1, voicedPrefix[speech.b] - voicedPrefix[speech.a]);
+  const voicedAt = (frame: number) => voicedPrefix[frame] - voicedPrefix[speech.a];
+
+  // Boundaries after word b (b = 0..n-2).
+  const B = words.length - 1;
+  const boundaryExpected = Array.from({ length: B }, (_, b) => (cumW[b + 1] / W) * totalVoiced);
+  const boundaryPunct = Array.from({ length: B }, (_, b) =>
+    SENTENCE_END_RE.test(words[b]) ? 1 : CLAUSE_END_RE.test(words[b]) ? 0.65 : 0
+  );
+  const P = pauses.length;
+  const POS_K = 7;
+  const SKIP_COST = 0.35;
+  const maxPauseFrames = Math.max(1, ...pauses.map((p) => p.b - p.a));
+  const cost = (p: number, b: number) => {
+    // Relative pause length: sentence ends carry the longest breaths, commas medium,
+    // and a long silence is very unlikely to sit between two words of the same phrase.
+    const durN = Math.min(1, (pauses[p].b - pauses[p].a) / maxPauseFrames);
+    const pos = (Math.abs(boundaryExpected[b] - voicedAt(pauses[p].a)) / totalVoiced) * POS_K;
+    if (boundaryPunct[b] >= 1) return pos - 1.2 * durN + 0.5 * (1 - durN);
+    if (boundaryPunct[b] > 0) return pos - 0.6 * durN;
+    return pos + 0.9 * durN * durN;
+  };
+  // f[p][b]: min cost for pauses p.. given next free boundary index >= b.
+  const INF = 1e9;
+  const f: Float64Array[] = Array.from({ length: P + 1 }, () => new Float64Array(B + 1).fill(INF));
+  const choice: Int32Array[] = Array.from({ length: P + 1 }, () => new Int32Array(B + 1).fill(-2));
+  for (let b = 0; b <= B; b++) f[P][b] = 0;
+  for (let p = P - 1; p >= 0; p--) {
+    // Skipping a long pause is expensive (it is almost surely a word boundary).
+    const longPause = pauses[p].b - pauses[p].a >= 22;
+    const skip = longPause ? SKIP_COST * 3 : SKIP_COST;
+    let bestAssign = INF;
+    let bestAssignB = -1;
+    for (let b = B; b >= 0; b--) {
+      if (b < B) {
+        const c = cost(p, b) + f[p + 1][b + 1];
+        if (c < bestAssign) {
+          bestAssign = c;
+          bestAssignB = b;
+        }
+      }
+      const skipC = skip + f[p + 1][b];
+      if (bestAssign <= skipC) {
+        f[p][b] = bestAssign;
+        choice[p][b] = bestAssignB;
+      } else {
+        f[p][b] = skipC;
+        choice[p][b] = -1;
+      }
+    }
+  }
+  const assigned: Array<{ boundary: number; pause: Region }> = [];
+  let nb = 0;
+  for (let p = 0; p < P; p++) {
+    const ch = choice[p][nb];
+    if (ch >= 0) {
+      assigned.push({ boundary: ch, pause: pauses[p] });
+      nb = ch + 1;
+    }
+  }
+
+  // Build word groups split by assigned pauses, then spread words over voiced frames.
+  const times: WordTiming[] = new Array(words.length);
+  let groupStartWord = 0;
+  let regionStartFrame = speech.a;
+  const flushGroup = (endWord: number, regionEndFrame: number) => {
+    const gw = weights.slice(groupStartWord, endWord + 1);
+    const gW = Math.max(1e-6, gw.reduce((a, b) => a + b, 0));
+    const vA = voicedAt(regionStartFrame);
+    const vB = Math.max(vA + 1, voicedAt(regionEndFrame));
+    // Map a voiced-time target back to a real frame inside the region.
+    const realFrameAtVoiced = (target: number): number => {
+      let lo = regionStartFrame;
+      let hi = regionEndFrame;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (voicedAt(mid) < target) lo = mid + 1;
+        else hi = mid;
+      }
+      return lo;
+    };
+    let acc = 0;
+    for (let i = groupStartWord; i <= endWord; i++) {
+      const startV = vA + (acc / gW) * (vB - vA);
+      acc += weights[i];
+      const endV = vA + (acc / gW) * (vB - vA);
+      const startF = i === groupStartWord ? regionStartFrame : realFrameAtVoiced(startV);
+      const endF = i === endWord ? regionEndFrame : realFrameAtVoiced(endV);
+      times[i] = { start: startF * HOP_SEC, end: Math.max(startF + 1, endF) * HOP_SEC };
+    }
+  };
+  for (const { boundary, pause } of assigned) {
+    flushGroup(boundary, pause.a);
+    groupStartWord = boundary + 1;
+    regionStartFrame = pause.b;
+  }
+  flushGroup(words.length - 1, speech.b);
+
+  return {
+    words,
+    times,
+    speechStart: s0,
+    speechEnd: s1,
+    duration,
+    debug: {
+      pauses: pauses.map((p) => [p.a * HOP_SEC, p.b * HOP_SEC]),
+      assigned: assigned.map((a) => [a.boundary, words[a.boundary], a.pause.a * HOP_SEC]),
+    },
+  } as SpeechAlignment;
+}
+
+/** Locate the word being spoken at time `t` (seconds in the processed buffer). */
+export function locateWordAt(al: SpeechAlignment, t: number): { wordIdx: number; partial: number } {
+  const n = al.times.length;
+  if (!n) return { wordIdx: 0, partial: 0 };
+  if (t <= al.times[0].start) return { wordIdx: 0, partial: 0 };
+  let lo = 0;
+  let hi = n - 1;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (al.times[mid].start <= t) lo = mid;
+    else hi = mid - 1;
+  }
+  const wt = al.times[lo];
+  const partial = t >= wt.end ? 1 : Math.max(0, Math.min(1, (t - wt.start) / Math.max(0.01, wt.end - wt.start)));
+  return { wordIdx: lo, partial };
+}

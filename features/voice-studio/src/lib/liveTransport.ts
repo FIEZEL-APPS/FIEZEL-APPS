@@ -4780,10 +4780,23 @@ export function evaluateUtteranceClientSide(params: {
 let _turnApiAvailable: boolean | null = null;
 let _ttsCooldownUntil = 0;
 let _ttsConsecutiveFailures = 0;
+const TTS_MEMORY_CACHE_MAX = 32;
 const _ttsMemoryCache = new Map<
   string,
   { audioBase64: string; audioMimeType: string; engine: string }
 >();
+function ttsCacheSet(
+  key: string,
+  val: { audioBase64: string; audioMimeType: string; engine: string }
+): void {
+  if (_ttsMemoryCache.has(key)) _ttsMemoryCache.delete(key);
+  _ttsMemoryCache.set(key, val);
+  while (_ttsMemoryCache.size > TTS_MEMORY_CACHE_MAX) {
+    const oldest = _ttsMemoryCache.keys().next().value;
+    if (oldest !== undefined) _ttsMemoryCache.delete(oldest);
+    else break;
+  }
+}
 const _ttsInFlight = new Map<
   string,
   Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null>
@@ -5105,6 +5118,13 @@ export interface TurnEvaluationParams {
   fluencyTelemetry?: Partial<TurnAcousticTelemetry> | null;
   expectedTargetText?: string;
   activePopupMode?: string;
+  boardContext?: {
+    topicTitle?: string;
+    patternFormula?: string;
+    summary?: string;
+    areaExcerpt?: string;
+    previousQuestions?: string[];
+  };
 }
 
 /**
@@ -5213,6 +5233,14 @@ function normalizeServerUiAction(raw: any): VoiceUiAction | undefined {
     drillDistractors: Array.isArray(raw.drillDistractors)
       ? raw.drillDistractors.map((b: any) => String(b || '').trim()).filter(Boolean)
       : undefined,
+    phaseLabels: Array.isArray(raw.phaseLabels)
+      ? raw.phaseLabels.map((l: any) => String(l || '').trim()).filter(Boolean).slice(0, 5)
+      : undefined,
+    whiteboardSteps: Array.isArray(raw.whiteboardSteps)
+      ? raw.whiteboardSteps
+          .filter((st: any) => st && typeof st === 'object' && typeof st.kind === 'string')
+          .slice(0, 10)
+      : undefined,
   };
 }
 
@@ -5260,12 +5288,23 @@ export async function resolveAiReply(
 
   // 0) Unified Gemini Partner + Real-Time Copilot Turn (/api/voice/partner-turn)
   //    Generates BOTH Partner AI's spoken reply, 3 bespoke Real-Time Copilot replies, AND optional uiAction in ONE call!
+  // 0) Unified Gemini Partner + Real-Time Copilot Turn (/api/voice/partner-turn or SSE /api/voice/whiteboard-stream for explanations)
+  //    Streams Step 0 opener early so Chunk-0 TTS pre-warms IN PARALLEL while remaining board steps compile!
+  const looksLikeExplainQuery =
+    Boolean(params.boardContext) ||
+    // Must be a SUPERSET of App.tsx local popup intent (explicitPopupCmd / asksGrammarOrStruggle):
+    // if the UI opens the whiteboard locally but the request went to /partner-turn (which may answer
+    // casually with no board), the learner sees an empty "Belum menerima penjelasan visual" placeholder.
+    /\[WHITEBOARD_REQUEST\]|\b(?:jelas\w*|ajar\w*|apa\s*beda\w*|bedanya|perbedaan|membedakan|kenapa|mengapa|bagaimana|gimana|kapan|fungsi|rumus|cara\s*(?:tulis|pakai|guna|baca|hitung)|(?:meng|me)?hitung\w*|menggunakan|memakai|menulis|explain|teach\s+me|difference|how\s+to|why\s+(?:is|are|do|does|did)|what\s+is|whiteboard|papan\s*(?:tulis|belajar)|pop[\s-]?up|latihan\s+tulis|tulis\s+langsung|ajarin\s+tertulis|kartu\s+belajar|munculkan\s+latihan|diagram\w*|visual\w*|step\s+by\s+step|bingung|susah|sulit|paham|pusing|confused|struggling|understand|terangkan|uraikan|gambarkan|bahas|proses|alur|vs|versus)\b|งง|ไม่เข้าใจ|[?？]/i.test(
+      params.text || ''
+    );
   for (const base of resolveVoiceApiCandidateBases()) {
     await ensureVoiceWorkerSession(base);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 24000);
+    const timer = setTimeout(() => controller.abort(), 30000);
     try {
-      const res = await fetch(`${base}/api/voice/partner-turn`, {
+      const endpointPath = looksLikeExplainQuery ? '/api/voice/whiteboard-stream' : '/api/voice/partner-turn';
+      let res = await fetch(`${base}${endpointPath}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -5283,14 +5322,84 @@ export async function resolveAiReply(
           activePopupMode: params.activePopupMode || '',
           history: params.history.slice(-6),
           learnerDossier: effectiveDossier,
+          boardContext: params.boardContext || undefined,
         }),
         credentials: 'include',
         mode: 'cors',
         signal: controller.signal,
       });
-      clearTimeout(timer);
+      if (looksLikeExplainQuery && (res.status === 404 || res.status === 405)) {
+        res = await fetch(`${base}/api/voice/partner-turn`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: params.text,
+            personaId: params.persona.id,
+            personaName: params.persona.name,
+            scenarioId: params.scenario.id,
+            scenarioTitle: params.scenario.titleId,
+            targetLang: params.targetLang,
+            locale: params.locale,
+            callMode: params.callMode || 'tutor_coach',
+            history: params.history.slice(-6),
+            learnerDossier: params.learnerDossier || undefined,
+            boardContext: params.boardContext || undefined,
+          }),
+          mode: 'cors',
+          signal: controller.signal,
+        });
+      }
       if (res.ok) {
-        const data = await res.json();
+        let data: any = null;
+        const ctype = res.headers.get('content-type') || '';
+        if (ctype.includes('text/event-stream') && res.body) {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buf = '';
+          let openerWarmed = false;
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            const frames = buf.split(/\r?\n\r?\n/);
+            buf = frames.pop() || '';
+            for (const frame of frames) {
+              let evName = 'message';
+              const dataLines: string[] = [];
+              for (const line of frame.split(/\r?\n/)) {
+                if (line.startsWith('event:')) evName = line.slice(6).trim();
+                else if (line.startsWith('data:')) dataLines.push(line.slice(5).trim());
+              }
+              const dataStr = dataLines.join('\n').trim();
+              if (!dataStr || dataStr === '[DONE]') continue;
+              try {
+                const pkt = JSON.parse(dataStr);
+                if (evName === 'opener' && !openerWarmed) {
+                  const intro = String(pkt?.headingStep?.spokenNarration || pkt?.topicTitle || '').trim();
+                  if (intro) {
+                    openerWarmed = true;
+                    const normIntro = /[.!?。！？]$/.test(intro) ? intro : `${intro}.`;
+                    const firstChunk = splitTtsIntoSentenceChunks(normIntro, 145)[0] || normIntro;
+                    void synthesizeFlexibleTts({
+                      text: firstChunk,
+                      targetLang: params.locale,
+                      persona: params.persona,
+                    }).catch(() => null);
+                  }
+                } else if (evName === 'board') {
+                  data = pkt;
+                }
+              } catch {
+                // Ignore partial SSE packet
+              }
+            }
+          }
+          clearTimeout(timer);
+        } else {
+          data = await res.json();
+          clearTimeout(timer);
+        }
+        if (data && data.ok !== false) {
         const partnerReply = stripEmojisAndEmotWords(String(data?.aiReply || '')).trim();
         const uiAction = normalizeServerUiAction(data?.uiAction);
         const isExplanation =
@@ -5304,7 +5413,7 @@ export async function resolveAiReply(
           );
           if (rtCards.length > 0) {
             const cacheKey = `${params.targetLang}::${partnerReply.toLowerCase()}::${params.text.trim().toLowerCase()}`;
-            _copilotTurnCache.set(cacheKey, {
+            copilotCacheSet(cacheKey, {
               ok: true,
               source: 'ai-realtime',
               aiMeaningId: transId,
@@ -5364,6 +5473,9 @@ export async function resolveAiReply(
             uiAction,
           };
         }
+        }
+      } else {
+        clearTimeout(timer);
       }
     } catch {
       clearTimeout(timer);
@@ -5663,6 +5775,84 @@ export function splitIntoSpeechChunks(text: string, targetLang: TargetLang, maxC
 }
 
 /**
+ * Memecah skrip narasi papan tulis menjadi potongan kalimat alami (maks maxChunkChars).
+ */
+export function splitTtsIntoSentenceChunks(script: string, maxChunkChars = 340): string[] {
+  const normalized = String(script || '').replace(/\s+/g, ' ').trim();
+  if (!normalized) return [];
+  if (normalized.length <= maxChunkChars) return [normalized];
+
+  const rawSentences = normalized
+    .split(/(?<=[.!?。！？])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const chunks: string[] = [];
+  let current = '';
+
+  const pushLongSentence = (sentence: string) => {
+    if (sentence.length <= maxChunkChars) {
+      chunks.push(sentence);
+      return;
+    }
+    const clauses = sentence
+      .split(/(?<=[,;、:])\s+/)
+      .map((c) => c.trim())
+      .filter(Boolean);
+    let sub = '';
+    for (const cl of clauses) {
+      if (!sub) {
+        sub = cl;
+      } else if (`${sub} ${cl}`.length <= maxChunkChars) {
+        sub = `${sub} ${cl}`;
+      } else {
+        chunks.push(sub);
+        sub = cl;
+      }
+    }
+    if (sub) {
+      if (sub.length <= maxChunkChars) {
+        chunks.push(sub);
+      } else {
+        const words = sub.split(/\s+/);
+        let buf = '';
+        for (const w of words) {
+          if (!buf) buf = w;
+          else if (`${buf} ${w}`.length <= maxChunkChars) buf = `${buf} ${w}`;
+          else {
+            chunks.push(buf);
+            buf = w;
+          }
+        }
+        if (buf) chunks.push(buf);
+      }
+    }
+  };
+
+  for (const sent of rawSentences) {
+    if (!current) {
+      if (sent.length > maxChunkChars) {
+        pushLongSentence(sent);
+      } else {
+        current = sent;
+      }
+    } else if (`${current} ${sent}`.length <= maxChunkChars) {
+      current = `${current} ${sent}`;
+    } else {
+      chunks.push(current);
+      if (sent.length > maxChunkChars) {
+        pushLongSentence(sent);
+        current = '';
+      } else {
+        current = sent;
+      }
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks.length ? chunks : [normalized];
+}
+
+/**
  * Conversational acoustic fillers (Aizuchi 相槌 / Backchannels) disabled.
  * Ensures AI partner responds directly and synchronously without artificial canned phrases like "naruhodo".
  */
@@ -5819,22 +6009,28 @@ export async function synthesizeViaGeminiLiveWav(params: {
                   : effectiveLang === 'zh'
                     ? 'natural Putonghua Mandarin Chinese'
                     : 'natural English';
+  const personaBaseStyle =
+    params.persona?.ttsStylePrompt || params.persona?.speakingStyle || '';
+  const isAcademicBritishOrPte =
+    params.persona?.id === 'dr_julian' ||
+    params.persona?.id === 'cambridge_examiner';
   const personaStyle =
     effectiveLang === 'id'
-      ? 'Warm, charismatic native Indonesian language mentor speaking natural conversational Bahasa Indonesia with friendly Jakarta cadence and crisp foreign word quoting'
+      ? isAcademicBritishOrPte
+        ? `Poised, warm, charismatic mentor like Dr. Julian and Dr. Alistair in a real 1-on-1 lesson: speak fluid conversational Bahasa Indonesia with natural human breath, thoughtful emphasis, and zero announcer stiffness, switching smoothly into 100% authentic native English pronunciation whenever speaking English example words or sentences. ${personaBaseStyle}`.trim()
+        : `Warm, expressive, genuinely human Indonesian language mentor speaking relaxed 1-on-1 Bahasa Indonesia with natural breath, lively conversational pitch, and crisp native English/Japanese/Mandarin pronunciation on foreign example phrases (never Indonesian-accented English). ${personaBaseStyle}`.trim()
       : effectiveLang === 'th'
-        ? 'Warm, lively native Thai language mentor speaking natural conversational Thai with friendly Bangkok cadence'
+        ? `Warm, expressive human Thai mentor speaking relaxed conversational Thai 1-on-1 with natural breath and crisp native foreign-word code-switching. ${personaBaseStyle}`.trim()
         : effectiveLang === 'vi'
-          ? 'Warm, lively native Vietnamese language mentor speaking natural conversational Vietnamese with clear pronunciation'
+          ? `Warm, expressive human Vietnamese mentor with natural conversational rhythm and clear foreign-word switching. ${personaBaseStyle}`.trim()
           : effectiveLang === 'ru'
-            ? 'Warm, expressive native Russian language mentor speaking natural conversational Russian with clear articulation'
-            : params.persona?.ttsStylePrompt ||
-              params.persona?.speakingStyle ||
+            ? `Warm, expressive human Russian mentor with natural conversational articulation and clear foreign-word switching. ${personaBaseStyle}`.trim()
+            : personaBaseStyle ||
               (effectiveLang === 'ja'
                 ? 'Expressive, sassy, sharp-witted Tokyo-Osaka mentor with authentic Kansai/Tokyo pitch accent'
                 : effectiveLang === 'zh'
                   ? 'Witty, brisk, expressive Beijing Putonghua Mandarin mentor with authentic erhua rhythm and crystal-clear four tones'
-                  : 'Urban street-smart American English mentor with natural hood cadence, warm rasp, and witty older-brother sarcasm');
+                  : 'Urban street-smart American English mentor with natural cadence, warm rasp, and charismatic human pacing');
 
   return new Promise((resolve) => {
     let settled = false;
@@ -5872,9 +6068,10 @@ export async function synthesizeViaGeminiLiveWav(params: {
       resolve(null);
     };
 
+    const wsTimeoutMs = Math.max(12000, Math.min(20000, 7500 + cleanText.length * 45));
     const timeoutId = setTimeout(() => {
       finalize(pcmChunks.length > 0);
-    }, 8500);
+    }, wsTimeoutMs);
 
     try {
       ws = new WebSocket(wsEndpoint);
@@ -5885,6 +6082,10 @@ export async function synthesizeViaGeminiLiveWav(params: {
 
     ws.onopen = () => {
       try {
+        const hasMixedBilingualText =
+          ['id', 'th', 'vi', 'ms', 'ko'].includes(effectiveLang) &&
+          (/[A-Za-z]{2,}/.test(cleanText) || /[\u3040-\u30ff\u4e00-\u9fff]/.test(cleanText));
+        const shouldUseLangCodeLock = !hasMixedBilingualText && effectiveLang !== 'id';
         const speechLangCode =
           effectiveLang === 'ja'
             ? 'ja-JP'
@@ -5903,25 +6104,34 @@ export async function synthesizeViaGeminiLiveWav(params: {
                         : effectiveLang === 'id'
                           ? 'id-ID'
                           : 'en-US';
+        const speechConfigPayload: Record<string, unknown> = {
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName,
+            },
+          },
+        };
+        if (shouldUseLangCodeLock) {
+          speechConfigPayload.languageCode = speechLangCode;
+        }
+        const foreignTargetName =
+          params.persona?.targetLang === 'ja'
+            ? 'Tokyo Japanese'
+            : params.persona?.targetLang === 'zh'
+              ? 'Mandarin Chinese'
+              : 'English';
         ws?.send(
           JSON.stringify({
             setup: {
               model: 'models/gemini-3.8-live',
               generationConfig: {
                 responseModalities: ['AUDIO'],
-                speechConfig: {
-                  languageCode: speechLangCode,
-                  voiceConfig: {
-                    prebuiltVoiceConfig: {
-                      voiceName,
-                    },
-                  },
-                },
+                speechConfig: speechConfigPayload,
               },
               systemInstruction: {
                 parts: [
                   {
-                    text: `You are ${params.persona?.name || 'a charismatic native mentor'}, a 100% native speaker performing spoken dialogue in ${langLabel} (${speechLangCode}) with authentic native phonology and zero foreign/Indonesian accent. Vocal profile: ${personaStyle}. Perform ONLY the exact line inside quotes with vivid human prosody, natural breath, and authentic emotional inflection. Never spell out literal laugh words like "h-a-h-a", if a chuckle is present, render it acoustically as a subtle, genuine human sound. Never add extra words outside the quotes.`,
+                    text: `You are ${params.persona?.name || 'Dr. Julian'}, a charismatic, warm, deeply human mentor talking 1-on-1 with a student. Vocal profile: ${personaStyle}. Primary explanation language: ${langLabel}. BILINGUAL CODE-SWITCHING RULE: When speaking ${langLabel}, sound natural, conversational, empathetic, and unhurried with genuine human breath and intonation (NEVER stiff announcer or robotic voiceover cadence). Whenever an embedded ${foreignTargetName} word or example phrase appears in the line, switch smoothly to 100% authentic native ${foreignTargetName} pronunciation for that word/phrase (never distort English words with Indonesian phonetics!), then glide right back into ${langLabel}. Deliver ONLY the exact line requested inside quotes with zero extra commentary. Never spell out literal laugh words like "h-a-h-a".`,
                   },
                 ],
               },
@@ -6038,7 +6248,8 @@ export async function synthesizeViaWorkerGeminiTts(params: {
   if (!cleanText) return null;
 
   const rawLang = String(params.targetLang || 'en').toLowerCase().split(/[-_]/)[0].trim();
-  const isNativeExplainLang = ['id', 'th', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(rawLang);
+  const isUiExplainLang = ['id', 'th', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(rawLang);
+  const baseStylePrompt = params.persona?.ttsStylePrompt || params.persona?.speakingStyle || '';
 
   for (const base of resolveVoiceApiCandidateBases()) {
     await ensureVoiceWorkerSession(base);
@@ -6052,11 +6263,12 @@ export async function synthesizeViaWorkerGeminiTts(params: {
           text: cleanText,
           targetLang: rawLang,
           spokenLang: rawLang,
+          targetCourseLang: params.persona?.targetLang || '',
           personaId: params.persona?.id || '',
           voiceName: params.persona?.geminiVoice || '',
-          stylePrompt: isNativeExplainLang
-            ? ''
-            : params.persona?.ttsStylePrompt || params.persona?.speakingStyle || '',
+          stylePrompt: isUiExplainLang
+            ? `${baseStylePrompt}${baseStylePrompt ? '. ' : ''}Speak warmly like a real human mentor explaining 1-on-1 in natural ${rawLang.toUpperCase()}, switching cleanly into authentic native pronunciation for embedded foreign example words.`
+            : baseStylePrompt,
         }),
         credentials: 'include',
         mode: 'cors',
@@ -6078,7 +6290,7 @@ export async function synthesizeViaWorkerGeminiTts(params: {
       } else if (res.status >= 500) {
         _workerGeminiTtsConsecErrors += 1;
         if (_workerGeminiTtsConsecErrors >= 3) {
-          _workerGeminiTtsCooldownUntil = Date.now() + 12000;
+          _workerGeminiTtsCooldownUntil = Date.now() + 4000;
         }
       }
     } catch {
@@ -6147,32 +6359,22 @@ export async function synthesizeFlexibleTts(params: {
 
   const requestPromise = (async () => {
     try {
-      // 1) PRIMARY: Genuine Gemini 3.8 Neural TTS with Persona Accent & Sarcastic Style!
+      const hasWorkerBase = resolveVoiceApiCandidateBases().length > 0;
+      // 1) PRIMARY: Genuine Gemini 3.8 Neural TTS via Worker `/api/voice/gemini-tts` (internally races REST + 6-key Live WS)
       const geminiTts = await synthesizeViaWorkerGeminiTts({
         text: cleanSpokenText,
         targetLang: params.targetLang,
         persona: params.persona,
       });
       if (geminiTts) {
-        _ttsMemoryCache.set(cacheKey, geminiTts);
+        ttsCacheSet(cacheKey, geminiTts);
         return geminiTts;
       }
 
-      // 2) SECONDARY: Gemini 3.8 Live WebSocket WAV synthesis!
-      const liveWav = await synthesizeViaGeminiLiveWav({
-        text: cleanSpokenText,
-        targetLang: params.targetLang,
-        persona: params.persona,
-      });
-      if (liveWav) {
-        _ttsMemoryCache.set(cacheKey, liveWav);
-        return liveWav;
-      }
-
-      // 3) EMERGENCY LAST RESORT ONLY: Classic `/api/tts/line` if both Gemini neural pipelines are unreachable
-      if (params.force || Date.now() >= _ttsCooldownUntil) {
+      // 2) FAST NEURAL FALLBACK: Edge Neural `/api/tts/line` (24kHz, ~0.4-1.0s) before spending 10s on client Live WS
+      if (params.force || Date.now() >= _ttsCooldownUntil || _ttsConsecutiveFailures < 5) {
         const controller = new AbortController();
-        const httpTimeoutMs = _ttsWarm ? 5500 : 3500;
+        const httpTimeoutMs = _ttsWarm ? 7000 : 8000;
         const timer = setTimeout(() => controller.abort(), httpTimeoutMs);
         try {
           const res = await fetch(endpoint, {
@@ -6191,7 +6393,7 @@ export async function synthesizeFlexibleTts(params: {
             const contentType = res.headers.get('content-type') || '';
             if (contentType.includes('audio/')) {
               const buf = await res.arrayBuffer();
-              if (buf.byteLength > 64) {
+              if (buf.byteLength > 256) {
                 _ttsWarm = true;
                 const bytes = new Uint8Array(buf);
                 let binary = '';
@@ -6205,7 +6407,7 @@ export async function synthesizeFlexibleTts(params: {
                   audioMimeType: contentType.split(';')[0] || 'audio/mpeg',
                   engine: 'fiezel-edge-tts-binary',
                 };
-                _ttsMemoryCache.set(cacheKey, result);
+                ttsCacheSet(cacheKey, result);
                 return result;
               }
             } else if (contentType.includes('application/json')) {
@@ -6215,8 +6417,11 @@ export async function synthesizeFlexibleTts(params: {
                 (params.targetLang === 'zh' && voiceNameResp && !voiceNameResp.startsWith('zh')) ||
                 (params.targetLang === 'ja' && voiceNameResp && !voiceNameResp.startsWith('ja')) ||
                 (params.targetLang === 'en' && voiceNameResp && !voiceNameResp.startsWith('en'));
+              const isSilentOrStaleFallback =
+                Boolean(json?.fallback) ||
+                /failover|disk-cache-.*-fallback/i.test(String(json?.engine || ''));
               const b64 = json?.audioBase64 || json?.audio_base64 || json?.audio || json?.data;
-              if (!isVoiceLangMismatch && typeof b64 === 'string' && b64.length > 32) {
+              if (!isSilentOrStaleFallback && !isVoiceLangMismatch && typeof b64 === 'string' && b64.length > 256) {
                 _ttsWarm = true;
                 _ttsConsecutiveFailures = 0;
                 _ttsCooldownUntil = 0;
@@ -6225,7 +6430,7 @@ export async function synthesizeFlexibleTts(params: {
                   audioMimeType: json?.mimeType || json?.audioMimeType || 'audio/mpeg',
                   engine: 'fiezel-edge-tts-json',
                 };
-                _ttsMemoryCache.set(cacheKey, result);
+                ttsCacheSet(cacheKey, result);
                 return result;
               }
             }
@@ -6240,6 +6445,19 @@ export async function synthesizeFlexibleTts(params: {
           if (_ttsConsecutiveFailures >= 2) {
             _ttsCooldownUntil = Date.now() + 8000;
           }
+        }
+      }
+
+      // 3) LAST-RESORT DIRECT LIVE WS (only if worker wasn't configured or both REST & Edge failed)
+      if (!hasWorkerBase || params.force) {
+        const liveWav = await synthesizeViaGeminiLiveWav({
+          text: cleanSpokenText,
+          targetLang: params.targetLang,
+          persona: params.persona,
+        });
+        if (liveWav) {
+          ttsCacheSet(cacheKey, liveWav);
+          return liveWav;
         }
       }
     } finally {
@@ -6400,7 +6618,8 @@ export function decodePcm16Base64ToFloat32(pcmBase64: string): Float32Array {
       bytes[i] = binary.charCodeAt(i);
     }
   } else {
-    const buf = Buffer.from(pcmBase64, 'base64');
+    const NodeBuf = (globalThis as unknown as { Buffer?: { from: (s: string, enc: string) => Uint8Array } }).Buffer;
+    const buf = NodeBuf ? NodeBuf.from(pcmBase64, 'base64') : new Uint8Array(0);
     bytes = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
   }
   const usableBytes = bytes.byteLength & ~1;

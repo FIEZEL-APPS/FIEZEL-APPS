@@ -692,6 +692,140 @@ function bootFullAppHost(extraFiles, initialStore, customFetch) {
     assert.strictEqual(JSON.parse(storedRows[0].data).misconception, 'particle_wa_ha');
   });
 
+  await checkAsync('B9 Solvely Whiteboard & AI Director wire bidirectionally to Braincore (runtime + source + dist parity)', async () => {
+    const brainMod = await import(
+      pathToFileURL(path.join(ROOT, 'features/voice-studio/src/lib/braincore.ts')).href
+    );
+    const {
+      loadBraincoreState,
+      recordSpeakingAttempt,
+      buildBraincoreCognitiveDossier,
+    } = brainMod;
+
+    const origWindow = globalThis.window;
+    const origLocalStorage = globalThis.localStorage;
+    const memStore = new Map();
+    const calls = { mastery: [], bkt: [], ledger: [] };
+    const fakeLs = {
+      getItem: (k) => (memStore.has(k) ? memStore.get(k) : null),
+      setItem: (k, v) => memStore.set(k, String(v)),
+      removeItem: (k) => memStore.delete(k),
+      clear: () => memStore.clear(),
+    };
+    const fakeWin = {
+      localStorage: fakeLs,
+      navigator: { onLine: false },
+      dispatchEvent: () => true,
+      updateMastery: (...a) => calls.mastery.push(a),
+      bktRecord: (...a) => calls.bkt.push(a),
+      misconceptionLedgerRecord: (...a) => calls.ledger.push(a),
+      recordBrainTelemetry: () => {},
+    };
+
+    try {
+      globalThis.window = fakeWin;
+      globalThis.localStorage = fakeLs;
+
+      const st0 = loadBraincoreState();
+      const s1 = recordSpeakingAttempt(st0, {
+        competencyId: 'speak_en_free_talk',
+        scenarioId: 'scen_en_a1_agree',
+        userExactTranscript: '[WB_CIRCLE_CONFUSION] I am agree -> wb_trap_to_be_before_verb',
+        ok: false,
+        misconceptionId: 'wb_trap_to_be_before_verb',
+        targetLang: 'en',
+        locale: 'id',
+        inputMode: 'typed',
+        responseTimeMs: 4200,
+        latencyMs: 4200,
+      }).nextState;
+
+      const s2 = recordSpeakingAttempt(s1, {
+        competencyId: 'speak_en_free_talk',
+        scenarioId: 'scen_en_a1_agree',
+        userExactTranscript: '[WB_COMPLETED] Mengapa I am agree salah',
+        ok: true,
+        targetLang: 'en',
+        locale: 'id',
+        inputMode: 'typed',
+        responseTimeMs: 2500,
+        latencyMs: 2500,
+      }).nextState;
+
+      assert.strictEqual(calls.mastery.length, 2, 'Whiteboard confusion + completion wajib mengalir ke host updateMastery');
+      assert.strictEqual(calls.mastery[0][2], false, 'circle_ask_confusion wajib tercatat ok=false');
+      assert.strictEqual(calls.mastery[1][2], true, 'board_completed wajib tercatat ok=true');
+      assert.strictEqual(calls.bkt.length, 2, 'Whiteboard wajib mengalir ke host bktRecord');
+      assert.strictEqual(calls.ledger.length, 2, 'Whiteboard wajib mengalir ke host misconceptionLedgerRecord');
+      assert.strictEqual(calls.ledger[0][3], false, 'Misconception salah wajib berstatus ok=false di Ledger');
+      assert.strictEqual(calls.ledger[0][2].misconception, 'wb_trap_to_be_before_verb');
+      assert.ok(Array.isArray(s2.syncQueue) && s2.syncQueue.length >= 2, 'Whiteboard attempts wajib antre di D1 syncQueue');
+
+      const dossier = buildBraincoreCognitiveDossier(
+        s2,
+        {
+          id: 'scen_en_a1_agree',
+          competencyId: 'speak_en_free_talk',
+          targetLang: 'en',
+          titleId: 'Agree',
+          level: 'CEFR A1',
+          personaId: 'coach_alex',
+          targetPatterns: ['agree'],
+          missionGoalsId: [],
+        },
+        'id'
+      );
+      assert.ok(
+        dossier && (dossier.includes('wb_trap_to_be_before_verb') || dossier.includes('speak_en_free_talk') || dossier.includes('A1')),
+        'buildBraincoreCognitiveDossier wajib membawa profil/misconception whiteboard ke AI Whiteboard Director'
+      );
+    } finally {
+      if (origWindow === undefined) delete globalThis.window;
+      else globalThis.window = origWindow;
+      if (origLocalStorage === undefined) delete globalThis.localStorage;
+      else globalThis.localStorage = origLocalStorage;
+    }
+
+    const dirSrc = fs.readFileSync(path.join(ROOT, 'features/voice-studio/src/lib/whiteboardDirector.ts'), 'utf8');
+    assert.ok(dirSrc.includes('learnerDossier?: string'), 'whiteboardDirector wajib menerima learnerDossier');
+    assert.ok(
+      (dirSrc.match(/learnerDossier\s*\?\s*\{\s*learnerDossier\s*\}/g) || []).length >= 2,
+      'whiteboardDirector wajib mengirim learnerDossier pada action & stream'
+    );
+
+    const modalSrc = fs.readFileSync(path.join(ROOT, 'features/voice-studio/src/components/InCallLearningWorkbenchModal.tsx'), 'utf8');
+    for (const sym of [
+      'onWhiteboardBraincoreEvent',
+      'topMisconceptionId',
+      'reportedQuizKeysRef',
+      'board_completed',
+      'circle_ask_confusion',
+      'SswTacticalBoardCanvas',
+      'PteReadAloudCanvas',
+      'LiveWhiteboardCanvas',
+      'wb-magic-character-canvas',
+    ]) {
+      assert.ok(modalSrc.includes(sym), `InCallLearningWorkbenchModal.tsx wajib memuat simbol ${sym}`);
+    }
+
+    const appSrc = fs.readFileSync(path.join(ROOT, 'features/voice-studio/src/App.tsx'), 'utf8');
+    const dossierMatches = appSrc.match(/requestRealtimeWhiteboard(?:Action|Stream)\(\{[\s\S]{0,600}?learnerDossier:/g) || [];
+    assert.strictEqual(dossierMatches.length, 3, 'Seluruh 3 callsite requestRealtimeWhiteboard* di App.tsx wajib menyertakan learnerDossier');
+    assert.ok(appSrc.includes('onWhiteboardBraincoreEvent={'), 'App.tsx wajib menghubungkan onWhiteboardBraincoreEvent ke Braincore');
+
+    const distSrc = fs.readFileSync(path.join(ROOT, 'features/voice-studio/dist/voice-studio.js'), 'utf8');
+    for (const tok of [
+      'solvely-dotgrid-whiteboard',
+      'circle_ask_confusion',
+      'board_completed',
+      'ssw-tactical-popup',
+      'wb-katex-math',
+      'trapReasonId',
+    ]) {
+      assert.ok(distSrc.includes(tok), `Bundle dist/voice-studio.js wajib menyertakan fitur terbaru (${tok})`);
+    }
+  });
+
   if (failed > 0) {
     console.error('\nFIEZEL Braincore nervous system wiring: FAIL (' + failed + ' failed, ' + passed + ' passed)');
     process.exit(1);

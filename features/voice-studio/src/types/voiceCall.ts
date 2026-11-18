@@ -99,6 +99,169 @@ export interface VoiceUiAction {
   misconceptionId?: string;
   whyFailsId?: string;
   whyFailsTh?: string;
+  trapReasonId?: string;
+  learnerWeaknesses?: string[];
+  /** Structured stroke-by-stroke AI Whiteboard Director commands */
+  whiteboardSteps?: WhiteboardStepCommand[];
+  /** Custom AI-generated phase labels for the board scrubber */
+  phaseLabels?: string[];
+}
+
+export interface WhiteboardVectorShape {
+  op: 'rect' | 'circle' | 'ellipse' | 'line' | 'arrow' | 'polygon' | 'curve' | 'text';
+  x?: number;
+  y?: number;
+  cx?: number;
+  cy?: number;
+  w?: number;
+  h?: number;
+  r?: number;
+  x1?: number;
+  y1?: number;
+  x2?: number;
+  y2?: number;
+  points?: number[][] | string;
+  pointsText?: string;
+  stroke?: string;
+  color?: string;
+  fill?: string;
+  strokeWidth?: number;
+  dashed?: boolean;
+  arrowHead?: boolean;
+  label?: string;
+  sublabel?: string;
+  text?: string;
+  size?: 'sm' | 'md' | 'lg';
+  icon?: string;
+  badge?: string;
+  cardStyle?: 'card' | 'sticky' | 'pill' | 'cloud' | 'banner';
+  highlight?: boolean;
+}
+
+export type WhiteboardMetaphorTheme =
+  | 'camera_vs_video'
+  | 'battery_meter'
+  | 'bridge_timeline'
+  | 'stage_spotlight'
+  | 'rpg_stats'
+  | 'locomotive_train'
+  | 'traffic_light'
+  | 'key_and_lock';
+
+export interface WhiteboardStepCommand {
+  id?: string;
+  kind:
+    | 'heading'
+    | 'note'
+    | 'highlight_callout'
+    | 'rough_scene'
+    | 'metaphor_scene'
+    | 'mind_map'
+    | 'timeline_track'
+    | 'formula_blocks'
+    | 'contrast_scale'
+    | 'syntax_flow'
+    | 'table'
+    | 'trap_vs_fix'
+    | 'kanji_grid'
+    | 'tone_wave'
+    | 'student_question'
+    | 'checkpoint';
+  sceneTheme?: WhiteboardMetaphorTheme;
+  highlightTerms?: string[];
+  leftPanel?: {
+    badge?: string;
+    title: string;
+    subtitle?: string;
+    example?: string;
+    icon?: string;
+    accentColor?: string;
+    bgColor?: string;
+  };
+  rightPanel?: {
+    badge?: string;
+    title: string;
+    subtitle?: string;
+    example?: string;
+    icon?: string;
+    accentColor?: string;
+    bgColor?: string;
+  };
+  metaphorMeterPct?: number;
+  metaphorCenterLabel?: string;
+  branches?: Array<{
+    label: string;
+    sublabel?: string;
+    example?: string;
+    icon?: string;
+    color?: string;
+  }>;
+  timelineEvents?: Array<{
+    timeLabel: string;
+    title: string;
+    example?: string;
+    icon?: string;
+    isActive?: boolean;
+    color?: string;
+  }>;
+  blocks?: Array<{
+    role: string;
+    token: string;
+    note?: string;
+    color?: string;
+  }>;
+  column?: 'left' | 'right';
+  phaseIndex?: number;
+  title?: string;
+  text?: string;
+  bullets?: string[];
+  highlightPhrase?: string;
+  highlightColor?: string;
+  width?: number;
+  height?: number;
+  caption?: string;
+  shapes?: WhiteboardVectorShape[];
+  graphDirection?: 'LR' | 'TB';
+  graphNodes?: Array<{
+    id: string;
+    label: string;
+    sublabel?: string;
+    fill?: string;
+    stroke?: string;
+  }>;
+  graphEdges?: Array<{
+    from: string;
+    to: string;
+    label?: string;
+    dashed?: boolean;
+  }>;
+  termA?: string;
+  descA?: string;
+  termB?: string;
+  descB?: string;
+  analogy?: string;
+  wrongText?: string;
+  rightText?: string;
+  reason?: string;
+  tableHeaders?: string[];
+  tableRows?: string[][];
+  nodes?: Array<{ role: string; word: string; color?: string }>;
+  character?: string;
+  reading?: string;
+  meaning?: string;
+  strokeCount?: number;
+  spokenNarration?: string;
+  mnemonic?: string;
+  strokePaths?: Array<{
+    order?: number;
+    d: string;
+    start?: [number, number];
+    numPos?: [number, number];
+    hint?: string;
+    kvgType?: string;
+    type?: string;
+    verifiedAuthority?: boolean;
+  }>;
 }
 
 export interface VocabPrereqItem {

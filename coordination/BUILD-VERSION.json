@@ -1,7 +1,7 @@
 {
-  "version": "m025-801",
-  "claimedBy": "branch fix/braincore-full-wiring",
-  "claimedAt": "2026-11-17T22:37:04.496Z",
-  "reason": "fix(brain): wire all learning modules to Braincore, fix silent crashes, and persist voice sync",
+  "version": "m025-802",
+  "claimedBy": "branch feat/solvely-whiteboard-tutor-local",
+  "claimedAt": "2026-11-18T02:12:30.127Z",
+  "reason": "feat(voice-studio,brain): audio-lockstep Solvely whiteboard, Dagre/KaTeX, caching & Braincore wiring",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
